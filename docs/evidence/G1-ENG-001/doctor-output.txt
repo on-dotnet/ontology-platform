@@ -1,0 +1,8 @@
+PASS: PowerShell 7.6.5，Microsoft Windows 10.0.22631
+BLOCKED: 目标SDK 10.0.402 未安装；不执行OS级安装。
+BLOCKED: node=24.21.0，目标=24.22.1；未升级全局工具。
+BLOCKED: pnpm=11.25.0，目标=11.28.8；未升级全局工具。
+WARN: codex-cli 0.163.0-alpha.11.2；仅版本观察，不代表自定义角色加载通过。
+WARN: Aspire PATH未发现；本任务不安装。
+NOT_RUN: 局部dotnet-ef恢复、MSTest/MTP、Kiota/Hey API、Docker daemon及应用链路；不调用全局EF9替代局部EF10。
+EXIT=2

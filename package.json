@@ -1,0 +1,13 @@
+{
+  "name": "ontology-platform",
+  "private": true,
+  "packageManager": "pnpm@11.28.8",
+  "engines": {
+    "node": "24.22.1",
+    "pnpm": "11.28.8"
+  },
+  "scripts": {
+    "verify": "pwsh -NoProfile -File scripts/verify.ps1",
+    "doctor": "pwsh -NoProfile -File scripts/doctor.ps1"
+  }
+}
