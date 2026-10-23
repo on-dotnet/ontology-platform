@@ -1,0 +1,37 @@
+PASS: committed snapshot, Unicode, full diff and reopened ZIP
+PASS: PASS requires real command evidence
+PASS: non-ancestor commits
+PASS: dirty tracked delivery
+PASS: untracked delivery
+PASS: forbidden committed member .env
+PASS: forbidden committed member .env.production
+PASS: forbidden committed member .ssh/id
+PASS: forbidden committed member .codex/auth.json
+PASS: forbidden committed member auth/config.json
+PASS: forbidden committed member cert.pem
+PASS: forbidden committed member nested/bin/output
+PASS: forbidden committed member .tools/sdk/file
+PASS: forbidden committed member models/weights.dat
+PASS: forbidden committed member state.db
+PASS: forbidden committed member .cache/item
+PASS: forbidden committed member node_modules/item
+PASS: synthetic token in source
+PASS: removed synthetic token retained in patch
+PASS: reopened archive rejects injected or changed member .git/config
+PASS: reopened archive rejects injected or changed member .env
+PASS: reopened archive rejects injected or changed member ../escape.txt
+PASS: reopened archive rejects injected or changed member source/app.txt
+PASS: git archive export-ignore cannot omit committed source
+PASS: git archive export-subst cannot rewrite committed source
+PASS: git symlink blob cannot silently become source
+PASS: committed submodule cannot be omitted by git archive
+PASS: complete patch rejects removed forbidden environment member
+PASS: reopened archive rejects payload tamper even after checksum rewrite
+PASS: missing checksum/member is rejected on reopen
+PASS: CI PASS cannot be inferred without run metadata
+PASS: explicit CI metadata avoids self-referential commit evidence
+PASS: existing delivery ZIP is preserved
+PASS: valid committed evidence preserves command and status
+ReviewPackage: 34 tests, 0 failures; product/container tests NOT_RUN.
+Command: pwsh -NoProfile -File scripts/tests/ReviewPackage.Tests.ps1
+ExitCode: 0

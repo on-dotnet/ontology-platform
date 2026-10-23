@@ -1,0 +1,15 @@
+pwsh -NoProfile -File scripts/create-review-package.ps1 -BaseSha 968ab2a3378427cc4f2612ddb1dbb1b60b5ce9e2 -HeadSha 876c34a84fb73d0ee6a8981afdb7f4067404d09d -TaskId G1-INFRA-001-A -Status PARTIAL -EvidencePath docs/evidence/G1-INFRA-001/A/validation.json
+ExitCode: 0
+{"packagePath":"C:\\Users\\Administrator\\.codex\\worktrees\\g1-infra-review-pack\\ontology-platform\\artifacts\\reviews\\OntologyPlatform-Review-G1-INFRA-001-A-876c34a84fb7.zip","sizeBytes":287007,"sha256":"2d1ca4489eff695297f805ed50d70f29225f560f2195ae964f10d455a630f3a1","taskStatus":"PARTIAL","verification":{"status":"PASS","checks":["reopen","paths","forbidden-members","finite-secret-patterns","complete-member-set","member-sha256","source-blob-and-head","full-base-head-diff"],"memberCount":126}}
+Command: pwsh -NoProfile -File scripts/create-review-package.ps1 -VerifyOnly -PackagePath <exact path in package JSON>
+ExitCode: 0
+{"status":"PASS","checks":["reopen","paths","forbidden-members","finite-secret-patterns","complete-member-set","member-sha256","source-blob-and-head","full-base-head-diff"],"memberCount":126}
+Command: git -c credential.interactive=false push -u origin codex/g1-infra-001-review-pack
+ExitCode: 0
+remote:
+remote: Create a pull request for 'codex/g1-infra-001-review-pack' on GitHub by visiting:
+remote:      https://github.com/on-dotnet/ontology-platform/pull/new/codex/g1-infra-001-review-pack
+remote:
+To https://github.com/on-dotnet/ontology-platform.git
+ * [new branch]      codex/g1-infra-001-review-pack -> codex/g1-infra-001-review-pack
+branch 'codex/g1-infra-001-review-pack' set up to track 'origin/codex/g1-infra-001-review-pack'.

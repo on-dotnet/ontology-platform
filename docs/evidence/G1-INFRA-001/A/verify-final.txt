@@ -1,0 +1,35 @@
+
+Check             Status Message
+-----             ------ -------
+repository-static PASS   检查77个文件：语法/格式/相对链接/有限机密模式/基线策略通过
+
+PASS: clean baseline accepted
+PASS: wrong package name rejected
+PASS: broken relative link rejected
+PASS: synthetic token rejected without printing value
+PASS: synthetic token in TypeScript rejected
+PASS: credential assignment in dot-env rejected
+PASS: unpinned action rejected
+
+Check             Status Message
+-----             ------ -------
+repository-static PASS   检查80个文件：语法/格式/相对链接/有限机密模式/基线策略通过
+
+NOT_RUN: .NET test：测试runner及测试项目须按ADR-005验证后单独接入。
+NOT_RUN: Web lint：未建立实际目标。
+NOT_RUN: Web typecheck：未建立实际目标。
+NOT_RUN: Web build：未建立实际目标。
+NOT_RUN: Web test：未建立实际目标。
+NOT_RUN: Web test:e2e：未建立实际目标。
+PASS: 工程静态门禁；不是产品构建/测试或整个G1通过。
+PASS: native commands resolve SDK and config from selected Root
+Checker tests: 8 passed; application tests: NOT_RUN.
+NOT_RUN: .NET build/test/format：无项目，空solution不作为通过。
+NOT_RUN: Web lint：未建立实际目标。
+NOT_RUN: Web typecheck：未建立实际目标。
+NOT_RUN: Web build：未建立实际目标。
+NOT_RUN: Web test：未建立实际目标。
+NOT_RUN: Web test:e2e：未建立实际目标。
+PASS: 工程静态门禁；不是产品构建/测试或整个G1通过。
+Command: pwsh -NoProfile -File scripts/verify.ps1 -SelfTest
+ExitCode: 0
