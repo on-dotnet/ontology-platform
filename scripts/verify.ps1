@@ -19,7 +19,7 @@ function Get-SourceFiles {
     foreach ($entry in Get-ChildItem -LiteralPath $Directory -Force) {
         if (($entry.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { continue }
         if ($entry.PSIsContainer) {
-            if ($entry.Name -notin @('.git', 'node_modules', 'bin', 'obj', '.next', '.turbo', '.worktrees', 'artifacts')) {
+            if ($entry.Name -notin @('.git', 'node_modules', 'bin', 'obj', '.next', '.turbo', '.worktrees', '.tools', 'artifacts')) {
                 Get-SourceFiles -Directory $entry.FullName
             }
         } else { $entry }

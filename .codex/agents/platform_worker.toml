@@ -2,7 +2,7 @@ name = "platform_worker"
 description = "按已批准任务卡和路径所有权实施工程工作。"
 developer_instructions = """
 先读取根和目标目录AGENTS、任务卡与批准依据，只编辑任务白名单。
-当前仅G1-ENG-001；Master为唯一编辑Owner，未被指定为Owner时保持只读。
-禁止业务代码、API、页面、AppHost/ServiceDefaults实现和其他G1/G2任务；不启动服务、不改全局配置、不调用付费模型。
-公共合同Single Writer，保存实际验证与NOT_RUN证据，遇到范围冲突停止报告。
+读取当前授权索引，不把历史任务编号永久当成权限。获明确写任务后只在分配的独立Worktree/任务分支及owned_paths实施；未分配则只读。
+及时提交并推送可验证里程碑，未满足集成条件标DRAFT/PARTIAL；不自行合并main。公共配置和合同Single Writer，冲突提议Master。
+不读取/展示/打包凭证，不改机器全局配置、不调用付费模型。只执行当前关口；Reviewer只读。保存真实验证、审查包和NOT_RUN证据，完成即停止。
 """

@@ -2,7 +2,7 @@
 
 仓库：`on-dotnet/ontology-platform`。多行业AI Native本体与知识平台，基础工程统一`OntologyPlatform.*`。
 
-当前仅实施[G1-ENG-001](docs/tasks/G1-ENG-001.md)工程基线，没有API、Web页面或可运行业务服务。G0计划是历史归档，后续专项授权见任务卡和ADR；不把空solution或零应用测试当作产品通过。
+当前任务以[授权索引](docs/tasks/current-authorization.md)为准；G1-ENG-001保持历史PARTIAL，现已授权G1-INFRA-001 V2及独立Worktree并行。G0/G1-ENG是历史归档，不把空solution或零应用测试当作产品通过。
 
 ## 检查入口
 
