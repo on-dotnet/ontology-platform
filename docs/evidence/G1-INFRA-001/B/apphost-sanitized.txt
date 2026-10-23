@@ -1,0 +1,24 @@
+从 backend\src\AppHost\Properties\launchSettings.json 使用启动设置...
+info: Aspire.Hosting.DistributedApplication[0]
+      Aspire AppHost version: 13.6.3+38294b1b31552dae42a516cffa0cbc737ec08976
+info: Aspire.Hosting.DistributedApplication[0]
+      Distributed application starting.
+info: Aspire.Hosting.DistributedApplication[0]
+      Application host directory is: C:\Users\Administrator\.codex\worktrees\g1-infra-aspire\ontology-platform\backend\src\AppHost
+info: Microsoft.AspNetCore.DataProtection.KeyManagement.XmlKeyManager[63]
+      User profile is available. Using 'C:\Users\Administrator\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+info: Aspire.Hosting.Dcp.DcpHost[0]
+      Starting DCP with arguments: start-apiserver --monitor 118008 --detach --kubeconfig "C:\Users\Administrator\AppData\Local\Temp\aspire-dcpyi0yoblg.2hb\kubeconfig" --tls-cert-thumbprint "EDA65D69C7CD7DC18D8B7E71F1880AC63973FA82"
+info: Aspire.Hosting.DistributedApplication[0]
+      Now listening on: http://localhost:15888
+info: Aspire.Hosting.DistributedApplication[0]
+info: Aspire.Hosting.DistributedApplication[0]
+      Aspire Dashboard
+
+      - Dashboard:  http://localhost:15888
+      - OTLP/gRPC:  http://localhost:14317
+
+info: Aspire.Hosting.DistributedApplication[0]
+      Distributed application started. Press Ctrl+C to shut down.
+
+the logs should have been written to a Unix domain socket 'C:\Users\Administrator\AppData\Local\Temp\aspire-dcpyi0yoblg.2hb\output.sock' but an error occcurred when trying to connect: dial unix C:\Users\Administrator\AppData\Local\Temp\aspire-dcpyi0yoblg.2hb\output.sock: connect: An invalid argument was supplied.2026-10-23T23:29:10.990+0800	info	dcp.start-apiserver.monitor	Started monitoring process	{"PID": 118008}

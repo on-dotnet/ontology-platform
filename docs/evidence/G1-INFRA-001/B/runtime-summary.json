@@ -1,0 +1,113 @@
+{
+  "status": "PASS",
+  "time": "2026-10-23T23:32:28.9621248+08:00",
+  "volumePrefix": "ontology-platform-g1-01297fcc",
+  "probes": [
+    {
+      "url": "http://localhost:15080/health",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:15080/alive",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:13030/$/ping",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:19000/health/ready",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:19090/health/ready",
+      "status": 200
+    }
+  ],
+  "images": [
+    "/postgres-vkqrnzvy docker.io/library/postgres@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6",
+    "/fuseki-yxbrxqxe fuseki:6e3fe5dedfe06ce5a555e369dee315ed6d500187",
+    "/rustfs-nbsjexqs rustfs/rustfs@sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+    "/keycloak-pkppjgdd quay.io/keycloak/keycloak@sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b"
+  ],
+  "bindings": [
+    {
+      "LocalAddress": "::1",
+      "LocalPort": 19090
+    },
+    {
+      "LocalAddress": "::1",
+      "LocalPort": 19001
+    },
+    {
+      "LocalAddress": "::1",
+      "LocalPort": 19000
+    },
+    {
+      "LocalAddress": "::1",
+      "LocalPort": 18080
+    },
+    {
+      "LocalAddress": "::1",
+      "LocalPort": 15888
+    },
+    {
+      "LocalAddress": "::1",
+      "LocalPort": 15432
+    },
+    {
+      "LocalAddress": "::1",
+      "LocalPort": 15080
+    },
+    {
+      "LocalAddress": "::1",
+      "LocalPort": 13030
+    },
+    {
+      "LocalAddress": "127.0.0.1",
+      "LocalPort": 19090
+    },
+    {
+      "LocalAddress": "127.0.0.1",
+      "LocalPort": 19001
+    },
+    {
+      "LocalAddress": "127.0.0.1",
+      "LocalPort": 19000
+    },
+    {
+      "LocalAddress": "127.0.0.1",
+      "LocalPort": 18080
+    },
+    {
+      "LocalAddress": "127.0.0.1",
+      "LocalPort": 15888
+    },
+    {
+      "LocalAddress": "127.0.0.1",
+      "LocalPort": 15432
+    },
+    {
+      "LocalAddress": "127.0.0.1",
+      "LocalPort": 15080
+    },
+    {
+      "LocalAddress": "127.0.0.1",
+      "LocalPort": 13030
+    }
+  ],
+  "persistence": {
+    "Status": "PASS",
+    "PostgreSql": "重启后随机标记保留，命名卷挂载符合PG18路径",
+    "Fuseki": "重启后TDB2测试URN保留",
+    "RustFS": "重启后S3签名写入对象内容一致",
+    "Keycloak": "管理就绪恢复，外置库引导身份ID与重启前一致",
+    "Marker": "186fdcea83b644fb86ede63215b56a5a",
+    "Cleanup": "仅保留本次开发探针，不删除卷；不代表生产恢复或业务认证验收"
+  },
+  "telemetry": {
+    "configuration": "AppHost自动注入OTLP；ServiceDefaults仅在配置端点时启用Exporter",
+    "dashboard": "AppHost dashboard进程已启动，未浏览仪表盘",
+    "correlation": "PASS：独立trace-correlation.json与trace-correlated-log.txt证明真实404请求TraceId及日志scope一致；Dashboard ingest/OTLP全链仍NOT_VERIFIED"
+  }
+}

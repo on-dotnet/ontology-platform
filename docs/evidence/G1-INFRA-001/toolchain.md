@@ -48,4 +48,10 @@ Master执行`python -m pip install --index-url https://pypi.org/simple --only-bi
 
 独立Reviewer发现解析器文件缺失会静默跳过的Important问题；新增进程内只隐藏解析器的回归，先实测exit1并报告Missing structured parser was not rejected，再补明确FAIL与required-files。复验4项真实正反例exit0；有效YAML通过，无效YAML/TOML和缺失解析器被拒绝。README明确当前哈希覆盖的两个Python/平台组合。`pwsh -NoProfile -File scripts/verify.ps1 -SelfTest`完整实测exit0，包括历史8项、doctor缺Node回归及新解析器测试；不将这些工程检查冒充应用/容器通过。
 
-局部EF实测命令为`dotnet tool restore --tool-manifest .config/dotnet-tools.json --configfile NuGet.Config`及`dotnet tool run dotnet-ef --version`，均使用项目隔离SDK/缓存，exit0，显示10.0.13。没有初始化数据库或执行迁移。
+局部EF实测命令为`dotnet tool restore --tool-manifest .config/dotnet-tools.json --configfile NuGet.Config`及`dotnet tool run dotnet-ef --version`，均使用项目隔离SDK/缓存，exit0，显示10.0.13。未用EF初始化数据库或执行迁移；B仅建立获准的开发资源库和独立持久化探针。
+
+## 实际锁图许可核验
+
+Master从四个真实项目（AppHost按Windows/Linux分锁）的dependencies逐项收集唯一resolved包，读取项目隔离NuGet缓存中相应版本的公开nuspec许可元数据，exit0。共110个唯一包版本：MIT 77、Apache-2.0 26、BSD-3-Clause 5、PostgreSQL 1、文件型许可1。逐项结果见[许可清单](license-inventory.csv)。文件型Fractions7.3.0的license.txt已人工阅读，为两条再分发条件的BSD文本，须保留上游通知。
+
+SDK解析依赖另按上表登记；本清单不是容器OS层SBOM、完整再分发合规或法律意见。已恢复图的漏洞查询由B记录，未发现已知漏洞也不等于全部依赖或镜像安全。

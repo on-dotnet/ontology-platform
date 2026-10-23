@@ -1,0 +1,81 @@
+{
+  "checks": [
+    {
+      "name": "exact-isolated-toolchain-and-docker",
+      "command": "pwsh -NoProfile -File scripts/doctor.ps1 -CheckDocker",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "SDK10.0.402, Node24.22.1, pnpm11.28.8 and Docker29.8.2 observed; doctor-final.txt. Optional Aspire CLI/Codex-role loading not asserted."
+    },
+    {
+      "name": "four-project-locked-solution-restore",
+      "command": ".tools/dotnet/dotnet.exe restore backend/OntologyPlatform.slnx --locked-mode",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "All four real projects restored with five committed locks; restore-final.txt. Windows/Linux AppHost platform graphs separate."
+    },
+    {
+      "name": "static-policy-and-checker-regressions",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1 -SelfTest -RunNative -RunTests",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Repository syntax/links/policy/finite secret checks, historical8, doctor missing-Node regression and structured4 cases passed; verify-final.txt. Not a comprehensive security audit."
+    },
+    {
+      "name": "review-package-positive-negative-regressions",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1 -SelfTest -RunNative -RunTests",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "ReviewPackage35 real Git/ZIP cases, 0 failures, including color.ui=always, forbidden source/deleted patch, archive tamper and CI evidence; verify-final.txt."
+    },
+    {
+      "name": "real-solution-build",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1 -SelfTest -RunNative -RunTests",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "All four projects built, 0 errors; ASPIRE010 retained and documented, verify-final.txt."
+    },
+    {
+      "name": "solution-format-coverage",
+      "command": ".tools/dotnet/dotnet.exe format backend/OntologyPlatform.slnx --verify-no-changes --no-restore --verbosity diagnostic",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Four project analyzer passes, 21 files considered, 0 files formatted; workspace warning traced to ASPIRE010. format-diagnostic.txt."
+    },
+    {
+      "name": "mtp-real-loopback-host-tests",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1 -SelfTest -RunNative -RunTests",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "MTP tests 4 passed, 0 failed, 0 skipped. Development health, readiness/liveness distinction, production probe absence and real logical-service discovery; verify-final.txt."
+    },
+    {
+      "name": "apphost-and-development-resource-health",
+      "command": "命令摘要：dotnet run --project backend/src/AppHost/OntologyPlatform.AppHost.csproj --no-build；随后Invoke-WebRequest检查五个健康URL，精确URL和实际HTTP状态见B/runtime-summary.json，执行步骤见docs/development/local-infrastructure.md",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "API health/alive, Fuseki, RustFS and Keycloak returned200; all published ports loopback; pinned images and isolated volumes observed. B/runtime-summary.json, B/validation.md. Final test hosts/containers stopped."
+    },
+    {
+      "name": "four-resource-restart-persistence",
+      "command": "pwsh -File infra/development/test-resource-persistence.ps1 -PostgresContainer postgres-vkqrnzvy -FusekiContainer fuseki-yxbrxqxe -RustfsContainer rustfs-nbsjexqs -KeycloakContainer keycloak-pkppjgdd -VolumePrefix ontology-platform-g1-01297fcc",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "PostgreSQL random marker, TDB2 test URN, SigV4 S3 object and Keycloak nonsecret bootstrap identity ID survived real container restart; B/runtime-summary.json. No production or business authentication claim."
+    },
+    {
+      "name": "real-request-log-trace-correlation",
+      "command": "Invoke-WebRequest http://127.0.0.1:15081/g1-infra-unknown -Headers @{traceparent='00-0123456789abcdef0123456789abcdef-0123456789abcdef-01'} -SkipHttpErrorCheck",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "HTTP404 and same public traceId in console request scopes; B/trace-correlation.json and B/trace-correlated-log.txt. OTLP/Dashboard ingest and full LGTM not verified."
+    }
+  ],
+  "ci": {
+    "status": "NOT_VERIFIED",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  }
+}

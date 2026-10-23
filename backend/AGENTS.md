@@ -1,6 +1,6 @@
 # 后端工程规则
 
-继承根AGENTS。`OntologyPlatform.slnx`仅非业务入口，当前无可构建项目，不以空solution构建表示后端通过。
+继承根AGENTS。`OntologyPlatform.slnx`为后端工程入口；是否包含真实项目及验证结果以当前任务证据为准，不以空solution构建表示后端通过。
 
 ## 架构与实现
 
@@ -14,4 +14,4 @@
 - 所有手写class/interface/record/struct/enum及枚举成员、属性、字段、常量、构造函数、方法均有有意义中文XML Documentation；按语义提供summary/remarks/param/returns/exception，不能用模板复述名称。
 - 每个手写局部变量在声明处用中文说明用途；核心算法解释业务依据、单位、时间、身份、幂等、事务一致性和错误恢复边界。
 - 相邻成员/属性之间保留一空行；`///`文档紧贴对应Attribute组或声明，不插入破坏关联的空行。Allman、4空格、Nullable、Roslyn分析；生成文件明确豁免。
-- CS1591仅检查编译器可覆盖的公开成员。私有成员、局部变量、中文质量和成员空行需专项工具/人工评审。本轮无C#源码，相关编译/格式检查NOT_RUN；不得宣称PowerShell静态检查覆盖注释语义。
+- CS1591仅检查编译器可覆盖的公开成员。私有成员、局部变量、中文质量和成员空行需专项工具/人工评审。编译、测试、格式必须按真实命令分别记录结果；不得宣称PowerShell静态检查覆盖注释语义。

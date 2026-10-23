@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Sdk Name="Aspire.AppHost.Sdk" Version="13.6.3" />
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <NuGetLockFilePath>packages.$(NETCoreSdkRuntimeIdentifier).lock.json</NuGetLockFilePath>
+    <UserSecretsId>OntologyPlatform-AppHost-Development</UserSecretsId>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.AppHost" />
+    <PackageReference Include="Aspire.Hosting.PostgreSQL" />
+    <ProjectReference Include="../Hosts/OntologyPlatform.InfrastructureApi/OntologyPlatform.InfrastructureApi.csproj" />
+  </ItemGroup>
+</Project>

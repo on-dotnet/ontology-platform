@@ -10,6 +10,8 @@ param(
     [string]$Root = (Split-Path $PSScriptRoot -Parent),
     [switch]$SelfTest,
     [switch]$RunNative,
+    [switch]$RunTests,
+    [string]$ToolRoot = $Root,
     [switch]$Library
 )
 $ErrorActionPreference = 'Stop'
@@ -153,6 +155,7 @@ function Test-Repository {
 
 if ($Library) { return }
 try {
+    if ($RunTests -and -not $RunNative) { throw 'RunTests必须同时显式指定RunNative。' }
     $checks = @(Test-Repository -RepositoryRoot $Root)
     $checks | Format-Table -AutoSize | Out-Host
     if (@($checks | Where-Object Status -eq 'FAIL').Count -gt 0) { exit 1 }
@@ -171,20 +174,46 @@ try {
     # 只有显式获准RunNative时才运行真实项目命令，不执行安装或恢复。
     $nativeSolution = [IO.Path]::GetFullPath((Join-Path $Root 'backend/OntologyPlatform.slnx'))
     $projects = @(Get-ChildItem -LiteralPath (Join-Path $Root 'backend') -Recurse -Filter '*.csproj' -File)
-    if ($projects.Count -eq 0) { Write-Output 'NOT_RUN: .NET build/test/format：无项目，空solution不作为通过。' }
+    if ($projects.Count -eq 0) {
+        if ($RunTests) { throw 'RunTests不能以零项目通过。' }
+        Write-Output 'NOT_RUN: .NET build/test/format：无项目，空solution不作为通过。'
+    }
     elseif ($RunNative) {
         # dotnet按cwd解析global.json；绝对solution路径本身不足以锁定SDK。
         Push-Location $Root
+        $environmentNames = @('DOTNET_ROOT', 'DOTNET_CLI_HOME', 'NUGET_PACKAGES', 'DOTNET_CLI_TELEMETRY_OPTOUT')
+        $previousEnvironment = @{}
+        foreach ($name in $environmentNames) { $previousEnvironment[$name] = [Environment]::GetEnvironmentVariable($name, 'Process') }
         try {
+            $dotnetRelativePath = if ($IsWindows) { '.tools/dotnet/dotnet.exe' } else { '.tools/dotnet/dotnet' }
+            $isolatedDotnet = Join-Path $ToolRoot $dotnetRelativePath
+            $dotnetCommand = 'dotnet'
+            if (Test-Path -LiteralPath $isolatedDotnet) {
+                $dotnetCommand = [IO.Path]::GetFullPath($isolatedDotnet)
+                $env:DOTNET_ROOT = Split-Path $dotnetCommand -Parent
+                $env:DOTNET_CLI_HOME = Join-Path $ToolRoot '.tools/dotnet-home'
+                $env:NUGET_PACKAGES = Join-Path $ToolRoot '.tools/nuget'
+                $env:DOTNET_CLI_TELEMETRY_OPTOUT = '1'
+            }
             foreach ($arguments in @(
                 @('build', $nativeSolution, '--no-restore'),
                 @('format', $nativeSolution, '--verify-no-changes', '--no-restore')
             )) {
-                & dotnet @arguments
+                & $dotnetCommand @arguments
                 if ($LASTEXITCODE -ne 0) { exit 1 }
             }
-        } finally { Pop-Location }
-        Write-Output 'NOT_RUN: .NET test：测试runner及测试项目须按ADR-005验证后单独接入。'
+            if ($RunTests) {
+                $testProjects = @(Get-ChildItem -LiteralPath (Join-Path $Root 'backend/tests') -Recurse -Filter '*.csproj' -File)
+                if ($testProjects.Count -eq 0) { throw 'RunTests不能以零测试项目通过。' }
+                foreach ($project in $testProjects) {
+                    & $dotnetCommand test --project $project.FullName --no-build --no-restore
+                    if ($LASTEXITCODE -ne 0) { exit 1 }
+                }
+            } else { Write-Output 'NOT_RUN: .NET test：须显式追加-RunTests执行已批准测试项目。' }
+        } finally {
+            foreach ($name in $environmentNames) { [Environment]::SetEnvironmentVariable($name, $previousEnvironment[$name], 'Process') }
+            Pop-Location
+        }
     } else { Write-Output 'NOT_RUN: .NET原生检查需显式-RunNative及对应任务授权。' }
     $web = Get-Content -Raw (Join-Path $Root 'apps/web/package.json') | ConvertFrom-Json -AsHashtable
     foreach ($task in @('lint', 'typecheck', 'build', 'test', 'test:e2e')) {
@@ -194,7 +223,7 @@ try {
             if ($LASTEXITCODE -ne 0) { exit 1 }
         } else { Write-Output "NOT_RUN: Web $task：需要显式-RunNative及对应授权。" }
     }
-    Write-Output 'PASS: 工程静态门禁；不是产品构建/测试或整个G1通过。'
+    Write-Output 'PASS: 所选工程检查；范围以逐项输出为准，不表示业务、前端或整个G1通过。'
     exit 0
 } catch {
     Write-Output "FAIL: 工程检查异常：$($_.Exception.Message)"
