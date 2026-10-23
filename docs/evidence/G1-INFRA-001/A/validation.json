@@ -1,0 +1,32 @@
+{
+  "checks": [
+    {
+      "name": "review-package-self-tests",
+      "command": "pwsh -NoProfile -File scripts/tests/ReviewPackage.Tests.ps1",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "34 real isolated Git/ZIP cases, 0 failures. See docs/evidence/G1-INFRA-001/A/tests-final.txt."
+    },
+    {
+      "name": "repository-static-self-test",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1 -SelfTest",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Repository static gate and 8 checker self-tests passed. A tree verify has not been edited to dispatch package tests; Master owns integration."
+    },
+    {
+      "name": "product-and-container-tests",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Outside A ownership; no product/container runtime claim."
+    }
+  ],
+  "ci": {
+    "status": "NOT_VERIFIED",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  }
+}

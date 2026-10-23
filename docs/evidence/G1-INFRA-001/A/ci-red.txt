@@ -1,0 +1,9 @@
+FAIL: explicit CI metadata avoids self-referential commit evidence -- Explicit CI fixture rejected: FAIL: EVIDENCE_REQUIRED: overall PASS requires all checks, diff-check and observed CI PASS; checkFailures=0; ci=PASS; diffExit=2
+ReviewPackage: 1 tests, 1 failures; product/container tests NOT_RUN.
+Exception: C:\Users\Administrator\.codex\worktrees\g1-infra-review-pack\ontology-platform\scripts\tests\ReviewPackage.Tests.ps1:242
+Line |
+ 242 |  if ($failed -gt 0) { throw 'Review package self-tests failed' }
+     |                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     | Review package self-tests failed
+Command: pwsh -NoProfile -File scripts/tests/ReviewPackage.Tests.ps1 -CaseFilter '*explicit CI*'
+ExitCode: 1

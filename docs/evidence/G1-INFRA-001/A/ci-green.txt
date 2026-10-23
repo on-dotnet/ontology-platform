@@ -1,0 +1,4 @@
+PASS: explicit CI metadata avoids self-referential commit evidence
+ReviewPackage: 1 tests, 0 failures; product/container tests NOT_RUN.
+Command: pwsh -NoProfile -File scripts/tests/ReviewPackage.Tests.ps1 -CaseFilter '*explicit CI*'
+ExitCode: 0
