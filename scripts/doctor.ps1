@@ -5,7 +5,11 @@
 退出0为必要版本满足；退出2为环境BLOCKED；退出1为诊断异常。
 #>
 [CmdletBinding()]
-param([string]$Root = (Split-Path $PSScriptRoot -Parent))
+param(
+    [string]$Root = (Split-Path $PSScriptRoot -Parent),
+    [string]$ToolRoot = '',
+    [switch]$CheckDocker
+)
 $ErrorActionPreference = 'Stop'
 try {
     # 从项目文件读取目标，避免机器旧版本变成实际标准。
@@ -13,19 +17,32 @@ try {
     $package = Get-Content -Raw (Join-Path $Root 'package.json') | ConvertFrom-Json
     $nodeTarget = (Get-Content -Raw (Join-Path $Root '.node-version')).Trim()
     $pnpmTarget = $package.packageManager.Split('@')[1]
+    # 项目并存安装优先；只读选择，不改变用户/机器默认工具或PATH。
+    if (-not $ToolRoot) { $ToolRoot = Join-Path $Root '.tools' }
+    $dotnetCandidate = Join-Path $ToolRoot $(if ($IsWindows) { 'dotnet/dotnet.exe' } else { 'dotnet/dotnet' })
+    $nodeCandidate = Join-Path $ToolRoot $(if ($IsWindows) { "node-v$nodeTarget-win-x64/node.exe" } else { "node-v$nodeTarget-linux-x64/bin/node" })
+    $pnpmCandidate = Join-Path $ToolRoot 'pnpm/package/bin/pnpm.cjs'
+    $dotnetCommand = if (Test-Path -LiteralPath $dotnetCandidate) { $dotnetCandidate } elseif (Get-Command dotnet -ErrorAction SilentlyContinue) { (Get-Command dotnet).Source } else { $null }
+    $nodeCommand = if (Test-Path -LiteralPath $nodeCandidate) { $nodeCandidate } elseif (Get-Command node -ErrorAction SilentlyContinue) { (Get-Command node).Source } else { $null }
     $blocked = $false
     Write-Output "PASS: PowerShell $($PSVersionTable.PSVersion)，$([Runtime.InteropServices.RuntimeInformation]::OSDescription)"
-    if (Get-Command dotnet -ErrorAction SilentlyContinue) {
-        $sdks = @(& dotnet --list-sdks 2>&1)
+    if ($dotnetCommand) {
+        $sdks = @(& $dotnetCommand --list-sdks 2>&1)
         if ($LASTEXITCODE -eq 0 -and @($sdks | Where-Object { "$_" -match ('^' + [regex]::Escape($sdkTarget) + ' ') }).Count -gt 0) {
-            Write-Output "PASS: SDK $sdkTarget 已安装"
+            Write-Output "PASS: SDK $sdkTarget 已安装，入口=$dotnetCommand"
         } else { $blocked = $true; Write-Output "BLOCKED: 目标SDK $sdkTarget 未安装；不执行OS级安装。" }
     } else { $blocked = $true; Write-Output 'BLOCKED: 未找到dotnet' }
     foreach ($tool in @(@('node', $nodeTarget), @('pnpm', $pnpmTarget))) {
-        if (Get-Command $tool[0] -ErrorAction SilentlyContinue) {
-            $output = @(& $tool[0] --version 2>&1)
+        $toolCommand = if ($tool[0] -eq 'node') { $nodeCommand } elseif (Test-Path -LiteralPath $pnpmCandidate) { $pnpmCandidate } elseif (Get-Command pnpm -ErrorAction SilentlyContinue) { (Get-Command pnpm).Source } else { $null }
+        if ($toolCommand -eq $pnpmCandidate -and -not $nodeCommand) {
+            $blocked = $true
+            Write-Output 'BLOCKED: 项目pnpm存在但Node缺失；跳过执行，不安装工具。'
+            continue
+        }
+        if ($toolCommand) {
+            $output = if ($toolCommand -eq $pnpmCandidate) { @(& $nodeCommand $pnpmCandidate --version 2>&1) } else { @(& $toolCommand --version 2>&1) }
             $actual = ($output | Select-Object -Last 1).ToString().Trim().TrimStart('v')
-            if ($LASTEXITCODE -eq 0 -and $actual -eq $tool[1]) { Write-Output "PASS: $($tool[0]) $actual" }
+            if ($LASTEXITCODE -eq 0 -and $actual -eq $tool[1]) { Write-Output "PASS: $($tool[0]) $actual，入口=$toolCommand" }
             else { $blocked = $true; Write-Output "BLOCKED: $($tool[0])=$actual，目标=$($tool[1])；未升级全局工具。" }
         } else { $blocked = $true; Write-Output "BLOCKED: 未找到$($tool[0])" }
     }
@@ -35,7 +52,14 @@ try {
     } else { Write-Output 'WARN: Codex PATH未发现；静态CI不要求安装Codex。' }
     if (Get-Command aspire -ErrorAction SilentlyContinue) { Write-Output 'WARN: Aspire入口存在，服务编排验证归后续任务。' }
     else { Write-Output 'WARN: Aspire PATH未发现；本任务不安装。' }
-    Write-Output 'NOT_RUN: 局部dotnet-ef恢复、MSTest/MTP、Kiota/Hey API、Docker daemon及应用链路；不调用全局EF9替代局部EF10。'
+    if ($CheckDocker) {
+        if (Get-Command docker -ErrorAction SilentlyContinue) {
+            $dockerVersion = @(& docker info --format '{{json .ServerVersion}}' 2>&1)
+            if ($LASTEXITCODE -eq 0) { Write-Output "PASS: Docker daemon $($dockerVersion[-1])" }
+            else { $blocked = $true; Write-Output 'BLOCKED: Docker daemon当前不可访问；不安装/启动Docker或修改虚拟化。' }
+        } else { $blocked = $true; Write-Output 'BLOCKED: Docker命令未找到。' }
+    } else { Write-Output 'NOT_RUN: Docker daemon未探测；基础设施启动前用-CheckDocker复核。' }
+    Write-Output 'NOT_RUN: 本命令不恢复局部EF或执行构建/测试/业务PoC；这些状态由对应实际命令记录，不调用全局EF9替代。'
     if ($blocked) { exit 2 }
     exit 0
 } catch {
