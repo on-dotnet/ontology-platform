@@ -72,3 +72,5 @@ Dashboard ingest、OTLP全链传输/可检索性与完整LGTM仍NOT_VERIFIED/NOT
 真实NuGet漏洞检查对AppHost和测试工程分别执行list <csproj> package --vulnerable --include-transitive --no-restore，均exit0，源https://api.nuget.org/v3/index.json报告当前无易受攻击包。锁图与SDK共112个包身份的许可元数据登记见dependency-lock-inventory.json。此检查不是全面安全保证；容器CVE扫描、OS层SBOM/复合许可、生产安全/备份恢复均NOT_VERIFIED。
 
 CI实际run/URL/commit结论及最终main集成尚由Master验证，本树标NOT_VERIFIED。没有启动SEC/FE/OBS/G2或付费模型。等待独立最终Review和当前关口交付，不自动进入下游。
+
+最终证据脱敏核验：在仍持有本次秘密的验证进程中，对所有B证据文件逐值检查当前四个随机开发秘密，0命中，仅输出PASS而不输出原值。独立Reviewer建议补充卷前缀无效时ArgumentException中文XML，已补齐。该有限检查不宣称全面防泄露。

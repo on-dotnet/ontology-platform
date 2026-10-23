@@ -12,6 +12,7 @@ internal static class DevelopmentInfrastructure
     /// 注册 PostgreSQL、Fuseki、RustFS、Keycloak 和非业务健康宿主。
     /// </summary>
     /// <param name="builder">当前 Aspire 应用模型构建器。</param>
+    /// <exception cref="ArgumentException">开发卷前缀不符合限定长度或字符规则。</exception>
     internal static void AddDevelopmentInfrastructure(this IDistributedApplicationBuilder builder)
     {
         // 默认卷名用于日常开发；集成验证可提供独立前缀，避免复用开发者数据。
