@@ -37,3 +37,9 @@ verify/CI接入入口为`pwsh -NoProfile -File scripts/tests/ReviewPackage.Tests
 有限路径/UTF8/UTF16模式扫描不等于全面防泄露；未知秘密、二进制隐写、私有数据/生产数据、全部历史提交仍需独立审查。工具不读取被忽略文件内容，清单仅报告排除路径；需交付资料必须先依法提交。大仓库使用内存快照，超大合法源码仓库需将来另做流式扩展，不为当前小型基线新增依赖。
 
 CI实际run/URL/最终commit结论本工作项NOT_VERIFIED；模拟CI测试仅验证结构，不是远程运行。应用构建/容器/资源健康测试NOT_RUN，不属于A的写入边界。Independent Reviewer由Master安排，当前NOT_VERIFIED。A只普通push任务分支，不merge main、不强推、不清理含成果的工作树。最终阶段审查包由Master按最终集成提交生成，A样例包只能证明所标明提交的工具实测。
+
+## 已验证里程碑及真实样例
+
+源码/测试里程碑提交876c34a84fb73d0ee6a8981afdb7f4067404d09d，git staged diff-check退出0。完整34项测试退出0；仓库verify -SelfTest退出0（8项历史检查器测试），均不表示产品测试通过。普通push -u origin codex/g1-infra-001-review-pack退出0，远端分支已创建；未创建PR或合并main。完整命令/输出见real-package-and-push.txt。
+
+真实样例从Base 968ab2a3378427cc4f2612ddb1dbb1b60b5ce9e2至Head 876c34a84fb73d0ee6a8981afdb7f4067404d09d，TaskId=G1-INFRA-001-A、Status=PARTIAL，使用本目录validation.json。生成退出0，126成员；另行VerifyOnly退出0。样例为artifacts/reviews/OntologyPlatform-Review-G1-INFRA-001-A-876c34a84fb7.zip，287007字节，SHA256=2d1ca4489eff695297f805ed50d70f29225f560f2195ae964f10d455a630f3a1。ZIP被忽略，未提交。它只对应此里程碑，后续证据提交和最终main不能假称被此旧Head快照覆盖；Master最终只交付一个按最终Head重建的阶段ZIP。
