@@ -68,3 +68,9 @@
 - 普通非强制`git -c credential.interactive=false -c http.lowSpeedLimit=1000 -c http.lowSpeedTime=15 push origin main`实际退出1：`Cannot prompt because user interactivity has been disabled`、`unable to get password from user`。远程未确认更新，CI未确认执行。
 - 用户再次明确“git我授权了，你记录下”。根AGENTS/PLANS已持久记录：无需worktree、默认main、阶段验证和审查后主动commit/push，不再重复询问Git授权。当前失败是GitHub认证阻断，不是授权缺失；没有读取/输出私密凭证，也不修改全局凭证设置。
 - 本次授权记录补充将单独本地提交；最终SHA见交付报告/Git历史。因认证前提未变化，不将重复失败当作推送成功。
+
+### 后续认证恢复（用户明确要求重新弹出并记住凭证）
+
+用户再次明确要求打开GitHub凭证授权并避免以后重复弹出。执行GCM2.7.3的浏览器登录（旧凭证存在后按用户要求force重新认证），退出0；只检查GCM返回字段是否存在，不输出密码/token。发现需要明确选择on-dotnet账号，指定后ls-remote退出0，远程main为226457bfbbd1e16bd1608115a72de7682b0811ef。
+
+已在当前仓库Git配置中绑定GitHub账号on-dotnet和manager helper，不更改全局配置、不在文档/源码存凭证。随后不显式指定helper/username的非交互ls-remote验证静默复用。根AGENTS已记录持续Git授权和不反复弹登录的偏好；凭证失效需报告，不能假称永久有效。工程缺失SDK/Node/pnpm等状态不因Git认证恢复而改变。
