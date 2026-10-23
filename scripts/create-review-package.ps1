@@ -32,7 +32,7 @@ function Invoke-ReviewGit {
     $info.UseShellExecute = $false
     $info.RedirectStandardOutput = $true
     $info.RedirectStandardError = $true
-    foreach ($argument in @('-c', 'core.autocrlf=false', '-c', 'core.quotePath=false') + $Arguments) { $info.ArgumentList.Add($argument) }
+    foreach ($argument in @('-c', 'core.autocrlf=false', '-c', 'core.quotePath=false', '-c', 'color.ui=false') + $Arguments) { $info.ArgumentList.Add($argument) }
     $process = [Diagnostics.Process]::new()
     $process.StartInfo = $info
     $buffer = [IO.MemoryStream]::new()
@@ -106,7 +106,7 @@ function Get-ReviewSnapshot {
     $ignored = Invoke-ReviewGit $Repository @('ls-files', '--others', '--ignored', '--exclude-standard', '-z')
     $ignoredPaths = @($ignored.Text.Split([char]0, [StringSplitOptions]::RemoveEmptyEntries))
     # 忽略项仅报告路径，不读取其内容；它们不是交付输入。
-    $changedPaths = Invoke-ReviewGit $Repository @('diff', '--name-only', '-z', '--no-renames', $Base, $Head, '--')
+    $changedPaths = Invoke-ReviewGit $Repository @('diff', '--no-color', '--name-only', '-z', '--no-renames', $Base, $Head, '--')
     foreach ($changedPath in $changedPaths.Text.Split([char]0, [StringSplitOptions]::RemoveEmptyEntries)) { Assert-ReviewPath $changedPath }
     $tree = Invoke-ReviewGit $Repository @('ls-tree', '-r', '-z', $Head)
     $blobs = [Collections.Generic.Dictionary[string,string]]::new([StringComparer]::Ordinal)
@@ -148,12 +148,12 @@ function Get-ReviewSnapshot {
         }
     } finally { $archive.Dispose(); $memory.Dispose() }
     if ($seen.Count -ne $blobs.Count) { throw 'SNAPSHOT_MISMATCH: git archive omitted tracked delivery; check export-ignore attributes' }
-    $diff = Invoke-ReviewGit $Repository @('diff', '--binary', '--full-index', '--no-ext-diff', '--no-textconv', '--no-renames', $Base, $Head, '--')
+    $diff = Invoke-ReviewGit $Repository @('diff', '--no-color', '--binary', '--full-index', '--no-ext-diff', '--no-textconv', '--no-renames', $Base, $Head, '--')
     Assert-ReviewContent $diff.Bytes 'complete patch including removed lines'
-    $changed = Invoke-ReviewGit $Repository @('diff', '--name-status', '--no-renames', $Base, $Head, '--')
-    $commits = Invoke-ReviewGit $Repository @('log', '--format=fuller', '--no-decorate', "$Base..$Head")
+    $changed = Invoke-ReviewGit $Repository @('diff', '--no-color', '--name-status', '--no-renames', $Base, $Head, '--')
+    $commits = Invoke-ReviewGit $Repository @('log', '--no-color', '--format=fuller', '--no-decorate', "$Base..$Head")
     Assert-ReviewContent $commits.Bytes 'commit messages'
-    $check = Invoke-ReviewGit $Repository @('diff', '--check', $Base, $Head, '--') -AllowFailure
+    $check = Invoke-ReviewGit $Repository @('diff', '--no-color', '--check', $Base, $Head, '--') -AllowFailure
     $members.Add('git/diff.patch', $diff.Bytes)
     $members.Add('git/changed-files.txt', $changed.Bytes)
     $members.Add('git/commits.txt', $commits.Bytes)

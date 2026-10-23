@@ -1,0 +1,9 @@
+FAIL: color.ui always cannot contaminate machine-readable patch -- Color contamination: ANSI=64; git apply --numstat exit=128; VerifyOnly exit=0
+ReviewPackage: 1 tests, 1 failures; product/container tests NOT_RUN.
+Exception: C:\Users\Administrator\.codex\worktrees\g1-infra-review-pack\ontology-platform\scripts\tests\ReviewPackage.Tests.ps1:264
+Line |
+ 264 |  if ($failed -gt 0) { throw 'Review package self-tests failed' }
+     |                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     | Review package self-tests failed
+Command: pwsh -NoProfile -File scripts/tests/ReviewPackage.Tests.ps1 -CaseFilter '*color.ui*'
+ExitCode: 1

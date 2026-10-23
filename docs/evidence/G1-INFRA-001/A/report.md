@@ -43,3 +43,13 @@ CI实际run/URL/最终commit结论本工作项NOT_VERIFIED；模拟CI测试仅�
 源码/测试里程碑提交876c34a84fb73d0ee6a8981afdb7f4067404d09d，git staged diff-check退出0。完整34项测试退出0；仓库verify -SelfTest退出0（8项历史检查器测试），均不表示产品测试通过。普通push -u origin codex/g1-infra-001-review-pack退出0，远端分支已创建；未创建PR或合并main。完整命令/输出见real-package-and-push.txt。
 
 真实样例从Base 968ab2a3378427cc4f2612ddb1dbb1b60b5ce9e2至Head 876c34a84fb73d0ee6a8981afdb7f4067404d09d，TaskId=G1-INFRA-001-A、Status=PARTIAL，使用本目录validation.json。生成退出0，126成员；另行VerifyOnly退出0。样例为artifacts/reviews/OntologyPlatform-Review-G1-INFRA-001-A-876c34a84fb7.zip，287007字节，SHA256=2d1ca4489eff695297f805ed50d70f29225f560f2195ae964f10d455a630f3a1。ZIP被忽略，未提交。它只对应此里程碑，后续证据提交和最终main不能假称被此旧Head快照覆盖；Master最终只交付一个按最终Head重建的阶段ZIP。
+
+## 独立Review Important修复：彩色Git输出
+
+Master转交独立只读Reviewer发现的一个Important：用户color.ui=always可污染完整patch，而生成与复检使用相同污染输出，导致错误自洽。Reviewer反馈其余项目无其他阻断；本段Owner自审不替代独立复核。
+
+新增真实Git局部配置回归，未使用mock或修改用户/机器配置。color-red.txt记录修复前：ANSI=64，git apply --numstat退出128，旧VerifyOnly退出0；单例测试实际退出1。根因是Invoke-ReviewGit没有固定颜色配置，机器可读diff继承了color.ui=always。现统一添加-c color.ui=false，所有diff/log调用另显式--no-color。
+
+color-green.txt记录修复后同一单例退出0：patch无ANSI，git apply --numstat退出0且识别app.txt变更，独立VerifyOnly退出0。全量35项结果见tests-color-final.txt；仓库要求SelfTest结果见verify-color-final.txt。源码变更仅颜色输出确定性，参数/目录/状态合同保持兼容；新增测试调用真实Git patch解析器，避免只比较同源生成结果再次自洽。完整最终stage包必须使用修复后的集成Head，旧876c34a样例仍仅作已明确标记的历史里程碑。
+
+最终颜色修复全量结果：35项测试，0失败，退出0。自审git diff --check退出0，所有改动均在A owned_paths；所有diff/log分支均已显式--no-color，入口统一color.ui=false。没有新依赖、参数破坏或共享文件修改。

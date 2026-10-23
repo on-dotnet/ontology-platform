@@ -20,7 +20,7 @@ Base/Head/TaskId/Status必须明确提供。Root默认脚本所在仓库；Evide
 
 - `REVIEW_SUMMARY.md`：中文范围、验证状态、阻断/未运行说明及当前关口停止要求。
 - `manifest.json`：schemaVersion=1、taskId、完整baseSha/headSha、当前branch、UTC date、显式status、逐项checks、ci、Git命令/退出码、diffCheck、sourceMembers映射和excludedIgnoredPaths。
-- `git/changed-files.txt`、`diff.patch`、`commits.txt`、`status.txt`、`diff-check.txt`：完整binary/full-index差异、提交详情、实测干净状态及diff-check退出码。禁用外部diff/textconv，无改动时patch可为空，且Base/Head仍明确。
+- `git/changed-files.txt`、`diff.patch`、`commits.txt`、`status.txt`、`diff-check.txt`：完整binary/full-index差异、提交详情、实测干净状态及diff-check退出码。所有Git调用固定color.ui=false，diff/log显式--no-color，避免用户彩色偏好污染机器可读内容；禁用外部diff/textconv，无改动时patch可为空，且Base/Head仍明确。
 - `source/`：Head的完整常规Git文件树，包含隐藏配置、中文Markdown、源码、脚本、任务、ADR及原始证据；保留仓库相对路径与文档导航。
 - `docs/`：原docs文档便捷副本（证据见evidence）。`evidence/`：原docs/evidence便捷副本及`validation.json`规范化状态。原始完整路径仍可在source中找到。
 - `SHA256SUMS.txt`：每个其他ZIP成员精确字节的SHA256；校验和文件不自校验，整个ZIP的SHA256由最终JSON给出。
@@ -66,4 +66,4 @@ manifest.archiveVerification在封包时为NOT_VERIFIED，因为最终重开尚�
 
 ## 验证入口与隔离
 
-测试脚本建立临时Git仓库，提交真实Base/Head并调用实际CLI，验证正例、非祖先、脏树、未跟踪资料、禁止目录/文件、合成token、仅在被删patch中的token、ZIP篡改与路径注入。全部值为人工合成，不读取用户凭证。夹具清理仅限其生成且经绝对路径边界校验的系统临时目录。测试成功返回正常流程，失败throw；Master可用`& scripts/tests/ReviewPackage.Tests.ps1`接入verify和CI。必须保留实际测试数、命令和退出码，不把测试入口存在视作执行通过。
+测试脚本建立临时Git仓库，提交真实Base/Head并调用实际CLI，验证正例、非祖先、脏树、未跟踪资料、禁止目录/文件、合成token、仅在被删patch中的token、ZIP篡改与路径注入，并在真实color.ui=always配置下提取patch，断言无ANSI、git apply --numstat退出0以及独立VerifyOnly通过。全部值为人工合成，不读取用户凭证。夹具清理仅限其生成且经绝对路径边界校验的系统临时目录。测试成功返回正常流程，失败throw；Master可用`& scripts/tests/ReviewPackage.Tests.ps1`接入verify和CI。必须保留实际测试数、命令和退出码，不把测试入口存在视作执行通过。

@@ -1,0 +1,4 @@
+PASS: color.ui always cannot contaminate machine-readable patch
+ReviewPackage: 1 tests, 0 failures; product/container tests NOT_RUN.
+Command: pwsh -NoProfile -File scripts/tests/ReviewPackage.Tests.ps1 -CaseFilter '*color.ui*'
+ExitCode: 0

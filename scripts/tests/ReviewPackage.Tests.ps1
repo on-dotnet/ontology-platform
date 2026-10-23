@@ -85,6 +85,27 @@ try {
         $verified = Invoke-Package -Verify -Extra @('-VerifyOnly', '-PackagePath', $zip[0].FullName)
         Assert-True ($verified.Exit -eq 0) "External reopen failed: $($verified.Output)"
     }
+    Case 'color.ui always cannot contaminate machine-readable patch' {
+        # 真实仓库局部配置，模拟用户always彩色偏好；不修改用户或机器配置。
+        $null = Git @('config', 'color.ui', 'always')
+        $actual = Invoke-Package
+        Assert-True ($actual.Exit -eq 0) "Color fixture generation failed: $($actual.Output)"
+        $zip = @(Get-ChildItem (Join-Path $script:repo 'artifacts/reviews') -Filter '*.zip')[0]
+        $patchPath = Join-Path $script:repo 'artifacts/reviews/extracted.patch'
+        $archive = [IO.Compression.ZipFile]::OpenRead($zip.FullName)
+        try {
+            $buffer = [IO.MemoryStream]::new()
+            $stream = $archive.GetEntry('git/diff.patch').Open()
+            try { $stream.CopyTo($buffer); $patchBytes = $buffer.ToArray() } finally { $stream.Dispose(); $buffer.Dispose() }
+        } finally { $archive.Dispose() }
+        [IO.File]::WriteAllBytes($patchPath, $patchBytes)
+        $numstat = & $script:gitExecutable -C $script:repo apply --numstat $patchPath 2>&1
+        $applyExit = $LASTEXITCODE
+        $verified = Invoke-Package -Verify -Extra @('-VerifyOnly', '-PackagePath', $zip.FullName)
+        $escapeCount = @($patchBytes | Where-Object { $_ -eq 27 }).Count
+        Assert-True ($escapeCount -eq 0 -and $applyExit -eq 0 -and $verified.Exit -eq 0) "Color contamination: ANSI=$escapeCount; git apply --numstat exit=$applyExit; VerifyOnly exit=$($verified.Exit)"
+        Assert-True (($numstat -join "`n").Contains('app.txt')) 'Patch parser did not observe expected source change'
+    }
     Case 'PASS requires real command evidence' {
         $actual = Invoke-Package -DeclaredStatus PASS
         Assert-True ($actual.Exit -ne 0 -and $actual.Output.Contains('EVIDENCE_REQUIRED')) 'PASS accepted without command evidence'

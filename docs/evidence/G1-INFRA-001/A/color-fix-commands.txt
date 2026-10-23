@@ -1,0 +1,11 @@
+2026-10-23 Important color-output review fix
+Command: git status --short; git fetch origin; git rev-parse HEAD
+ExitCode: 0 (initial HEAD 8ddeb4f31c17da3a8160620f6afa550668dc6cad; clean)
+Command: git diff --check
+ExitCode: 0
+Command: pwsh -NoProfile -File scripts/tests/ReviewPackage.Tests.ps1 -CaseFilter '*color.ui*'
+RED ExitCode: 1; GREEN ExitCode: 0; see color-red.txt/color-green.txt
+Command: pwsh -NoProfile -File scripts/tests/ReviewPackage.Tests.ps1
+ExitCode: 0; 35 tests, 0 failures; see tests-color-final.txt
+Command: pwsh -NoProfile -File scripts/verify.ps1 -SelfTest
+ExitCode: 0; see verify-color-final.txt
