@@ -21,3 +21,17 @@
 - NuGet 恢复后生成项目 packages.lock.json；锁定恢复与漏洞审计结果见 validation.md。新引入传递依赖只按真实锁图登记，不伪造锁。
 - 容器镜像 CVE 全量扫描、OS层 SBOM/复合许可清单、生产安全评估均 NOT_VERIFIED；开发启动成功不能替代这些工作。Keycloak 仅本地 start-dev；Fuseki 开发更新端点没有业务认证，不能用于正式发布。
 - RustFS 就绪探针只能证明其报告就绪，不能替代实际 S3 写读/重启持久化测试。Keycloak 数据库健康须启用 metrics，管理健康端口9000，官方镜像中无 curl。
+
+## 实际拉取摘要与传递图
+
+三项预构建镜像已实际pull成功，并通过Aspire稳定WithImageSHA256固定（传入不含sha256:前缀的64位摘要）：
+
+| 镜像 | 实测RepoDigest |
+|---|---|
+| postgres:18.6-trixie | sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6 |
+| rustfs/rustfs:1.0.3 | sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b |
+| quay.io/keycloak/keycloak:26.8.1 | sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b |
+
+[dependency-lock-inventory.json](dependency-lock-inventory.json)来自五份真实锁图和两个SDK包内nuspec，共112个不同包身份：79个MIT、26个Apache-2.0、5个BSD-3-Clause、1个PostgreSQL；Fractions7.3.0使用文件许可license.txt，实际读取为BSD-2-Clause条款。该文件引用与推断分开登记，不把文件名当SPDX表达式。保留各依赖通知的分发义务；容器OS层复合许可/SBOM仍未完整审计。
+
+AppHost与测试项目含传递图的NuGet漏洞查询均实际exit0，官方源当时报告无已知易受攻击包；此观察不代表未来无漏洞或全面安全。

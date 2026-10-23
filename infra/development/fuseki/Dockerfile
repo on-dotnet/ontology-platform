@@ -15,9 +15,11 @@ RUN set -eu; \
     useradd --uid 10001 --gid fuseki --no-create-home --home-dir /fuseki fuseki; \
     chown -R fuseki:fuseki /fuseki
 
+COPY --chmod=0555 entrypoint.sh /opt/fuseki/entrypoint.sh
+
 ENV FUSEKI_BASE=/fuseki
 WORKDIR /fuseki
 USER 10001:10001
 EXPOSE 3030
-ENTRYPOINT ["/opt/fuseki/fuseki-server"]
+ENTRYPOINT ["/opt/fuseki/entrypoint.sh"]
 CMD ["--tdb2", "--loc=/fuseki/databases/ontology", "--update", "/ontology"]

@@ -73,3 +73,15 @@ pwsh -NoProfile -File scripts/verify.ps1 -SelfTest
 ```
 
 MSTest 使用真实回环 Kestrel，不要求容器，覆盖开发探针、就绪失败但存活成功、生产默认无探针、逻辑服务发现。容器集成验收另记，不能用四个宿主测试替代。端口占用、镜像不可取、Docker 权限或包恢复失败均保留现场并报告 BLOCKED/NOT_RUN；不降低版本，不自动安装系统组件，不无审查进入下游关口。
+
+## 复现本阶段资源重启验证
+
+```powershell
+pwsh -NoProfile -File infra/development/test-resource-persistence.ps1 -PostgresContainer <本次PG容器名> -FusekiContainer <本次Fuseki容器名> -RustfsContainer <本次RustFS容器名> -KeycloakContainer <本次Keycloak容器名>
+```
+
+该脚本从当前进程读取已注入的PostgreSQL及RustFS秘密，PostgreSQL密码只传Docker子进程环境，S3签名异常不回显原始头。它会写独立开发探针并重启明确指定的四个容器；只针对本任务专用开发资源运行。可用DevelopmentInfrastructure:VolumePrefix覆盖默认ontology-platform前缀创建独立测试卷，须同时向脚本传同一-VolumePrefix。前缀只允许1至48位小写字母、数字和连字符且首位为字母或数字，不自动删除卷。
+
+本机HTTP profile显式设置ASPIRE_ALLOW_UNSECURED_TRANSPORT=true，仅允许回环开发明文传输，保留Dashboard默认认证。不要外推为生产或公网配置。资源容器后端与Aspire固定代理端口已实际核验仅绑定127.0.0.1/::1，见本阶段运行证据。
+
+AppHost官方NuGet回退工具包含平台专用Dashboard/DCP，当前锁定支持win-x64与linux-x64，分别使用packages.win-x64.lock.json/packages.linux-x64.lock.json。其他RID尚未提供锁图。Windows执行Linux包恢复不等于Linux运行成功，后者等待实际CI。
