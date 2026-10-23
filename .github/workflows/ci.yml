@@ -15,6 +15,12 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - name: Prepare isolated verification parser
+        shell: pwsh
+        run: |
+          python3 --version
+          python3 -m pip install --index-url https://pypi.org/simple --only-binary=:all: --no-deps --require-hashes --disable-pip-version-check --target .tools/pythonlibs -r scripts/verification-requirements.txt
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Repository policy and positive-negative checks
         shell: pwsh
         run: ./scripts/verify.ps1 -SelfTest

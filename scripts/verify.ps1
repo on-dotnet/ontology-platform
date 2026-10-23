@@ -39,7 +39,7 @@ function Test-Repository {
     $jsonValues = @{}
     foreach ($file in $files) {
         $relative = [IO.Path]::GetRelativePath($base, $file.FullName).Replace('\', '/')
-        if ($file.Extension -notin @('.json', '.xml', '.props', '.targets', '.slnx', '.Config', '.ps1', '.md', '.toml', '.yaml', '.yml', '.example', '.cs', '.ts', '.tsx', '.js', '.jsx', '.mjs', '.css', '.html', '.py', '.txt', '.log', '.csv') -and
+        if ($file.Extension -notin @('.json', '.xml', '.csproj', '.props', '.targets', '.slnx', '.Config', '.ps1', '.md', '.toml', '.yaml', '.yml', '.example', '.cs', '.ts', '.tsx', '.js', '.jsx', '.mjs', '.css', '.html', '.py', '.txt', '.log', '.csv') -and
             $file.Name -notmatch '^\.env(?:\.|$)' -and
             $file.Name -notin @('.editorconfig', '.node-version', '.gitignore', '.dockerignore', '.gitattributes', 'CODEOWNERS')) { continue }
         $text = [IO.File]::ReadAllText($file.FullName)
@@ -53,8 +53,11 @@ function Test-Repository {
             try { $jsonValues[$relative] = ConvertFrom-Json -InputObject $text -AsHashtable -ErrorAction Stop }
             catch { Record 'json' 'FAIL' "$relative JSON无效" }
         }
-        if ($file.Extension -in @('.props', '.targets', '.slnx', '.Config')) {
+        if ($file.Extension -in @('.csproj', '.props', '.targets', '.slnx', '.Config')) {
             try { $null = [xml]$text } catch { Record 'xml' 'FAIL' "$relative XML无效" }
+            if ($text -match '(?i)(?:PackageReference|PackageVersion)\s+Include="(?:AutoMapper|FluentUI|AntDesign|Microsoft\.GraphRAG)[^"]*"') {
+                Record 'prohibited-packages' 'FAIL' "$relative 引用了冻结禁止包"
+            }
         }
         if ($file.Extension -eq '.ps1') {
             $tokens = $null
@@ -92,9 +95,31 @@ function Test-Repository {
             }
         }
     }
+    foreach ($path in $jsonValues.Keys | Where-Object { $_ -like '*package.json' }) {
+        foreach ($section in @('dependencies', 'devDependencies', 'optionalDependencies')) {
+            if ($jsonValues[$path][$section]) {
+                foreach ($dependency in $jsonValues[$path][$section].Keys) {
+                    if ($dependency -match '^(antd|@ant-design/|@fluentui/|umi$|@umijs/)') { Record 'prohibited-packages' 'FAIL' "$path 引用了冻结禁止前端包" }
+                }
+            }
+        }
+    }
+    # 使用真正的安全YAML解析器和Python标准库TOML解析器；不以正则冒充语法解析。
+    $parser = Join-Path $PSScriptRoot 'validate-structured-files.py'
+    if (Test-Path -LiteralPath $parser) {
+        $previousPythonPath = [Environment]::GetEnvironmentVariable('PYTHONPATH', 'Process')
+        try {
+            $env:PYTHONPATH = Join-Path (Split-Path $PSScriptRoot -Parent) '.tools/pythonlibs'
+            $python = if ($IsWindows) { (Get-Command python -ErrorAction Stop).Source } else { (Get-Command python3 -ErrorAction Stop).Source }
+            $structuredOutput = @(& $python $parser $base 2>&1)
+            if ($LASTEXITCODE -ne 0) { Record 'structured-syntax' 'FAIL' 'YAML/TOML解析失败或项目解析器不可用；请按requirements隔离恢复并在允许上下文运行。' }
+        } catch { Record 'structured-syntax' 'FAIL' '缺少可运行Python3.11+解析环境。' }
+        finally { [Environment]::SetEnvironmentVariable('PYTHONPATH', $previousPythonPath, 'Process') }
+    } else { Record 'structured-syntax' 'FAIL' '必要的YAML/TOML解析器缺失。' }
     $required = @('global.json', 'Directory.Build.props', 'Directory.Packages.props', 'NuGet.Config', '.config/dotnet-tools.json',
         'package.json', 'apps/web/package.json', 'pnpm-workspace.yaml', 'turbo.json', '.node-version',
-        'AGENTS.md', 'PLANS.md', 'backend/AGENTS.md', 'apps/web/AGENTS.md', '.editorconfig', '.github/workflows/ci.yml')
+        'AGENTS.md', 'PLANS.md', 'backend/AGENTS.md', 'apps/web/AGENTS.md', '.editorconfig', '.github/workflows/ci.yml',
+        'scripts/validate-structured-files.py', 'scripts/verification-requirements.txt')
     foreach ($path in $required) {
         if (-not (Test-Path -LiteralPath (Join-Path $base $path))) { Record 'required-files' 'FAIL' "$path 缺失" }
     }
@@ -114,7 +139,8 @@ function Test-Repository {
     if (Test-Path -LiteralPath $workflowPath) {
         $workflow = [IO.File]::ReadAllText($workflowPath)
         $uses = [regex]::Matches($workflow, '(?m)^\s*-?\s*uses:\s*(\S+)')
-        if ($uses.Count -eq 0 -or @($uses | Where-Object { $_.Groups[1].Value -notmatch '^actions/checkout@[a-f0-9]{40}$' }).Count -gt 0 -or
+        $approvedActions = @('actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1', 'actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68')
+        if ($uses.Count -eq 0 -or @($uses | Where-Object { $_.Groups[1].Value -notin $approvedActions }).Count -gt 0 -or
             $workflow -notmatch '(?m)^permissions:\n  contents: read\s*$' -or $workflow -notmatch 'persist-credentials: false' -or
             $workflow -match '(pull_request_target|write-all|secrets\.|curl |wget |npm install|pnpm install)' -or
             $workflow -notmatch 'runs-on: ubuntu-24.04' -or $workflow -notmatch 'verify.ps1 -SelfTest') {
@@ -133,6 +159,14 @@ try {
     if ($SelfTest) {
         & (Join-Path $PSScriptRoot '../docs/evidence/G1-ENG-001/verify.tests.ps1')
         if (-not $?) { exit 1 }
+        & (Join-Path $PSScriptRoot 'tests/Doctor.Tests.ps1')
+        if (-not $?) { exit 1 }
+        & (Join-Path $PSScriptRoot 'tests/StructuredFiles.Tests.ps1')
+        if (-not $?) { exit 1 }
+        if (Test-Path (Join-Path $PSScriptRoot 'tests/ReviewPackage.Tests.ps1')) {
+            & (Join-Path $PSScriptRoot 'tests/ReviewPackage.Tests.ps1')
+            if (-not $?) { exit 1 }
+        }
     }
     # 只有显式获准RunNative时才运行真实项目命令，不执行安装或恢复。
     $nativeSolution = [IO.Path]::GetFullPath((Join-Path $Root 'backend/OntologyPlatform.slnx'))

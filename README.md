@@ -6,9 +6,10 @@
 
 ## 检查入口
 
-使用PowerShell7，无需安装项目依赖即可运行：
+使用PowerShell7；解析器代码要求Python3.11+，当前批准的安装哈希仅覆盖Windows CPython3.13 x64与Ubuntu CPython3.12 x64。V2完整语法门禁先按精确哈希隔离恢复小型解析器，不修改全局Python；其他组合需先核验发行物并登记哈希：
 
 ```powershell
+python -m pip install --index-url https://pypi.org/simple --only-binary=:all: --no-deps --require-hashes --target .tools/pythonlibs -r scripts/verification-requirements.txt
 pwsh -NoProfile -File scripts/verify.ps1 -SelfTest
 pwsh -NoProfile -File scripts/doctor.ps1
 ```
