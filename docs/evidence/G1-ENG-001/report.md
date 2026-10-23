@@ -60,3 +60,11 @@
 `git -c credential.interactive=false -c http.lowSpeedLimit=1000 -c http.lowSpeedTime=15 ls-remote origin refs/heads/main`实际退出1：无法在禁止交互时取得密码。未要求用户输入或输出任何凭证，未改全局Git配置。已尝试可用GitHub连接器只读get_repo，连接chatgpt.com后端失败，不能借此确认远端状态。
 
 因此远程验证BLOCKED；本地成果仍可提交、快进main，普通非force push自身将保护远端不被覆盖。最终推送结果另在交付报告说明，不因用户已授权就宣称已推送成功。
+
+## 实际Git交付及持续授权记录
+
+- 工程提交已生成：`2d7a352`，`chore: establish G1-ENG-001 engineering baseline`；42文件、915新增行、1删除行，G0历史文档无修改。
+- `git switch main`及`git merge --ff-only codex/g1-eng-001`均退出0；main由226457b安全快进至2d7a352，包含G0归档312209e和本任务，不产生合并提交，不重写历史。
+- 普通非强制`git -c credential.interactive=false -c http.lowSpeedLimit=1000 -c http.lowSpeedTime=15 push origin main`实际退出1：`Cannot prompt because user interactivity has been disabled`、`unable to get password from user`。远程未确认更新，CI未确认执行。
+- 用户再次明确“git我授权了，你记录下”。根AGENTS/PLANS已持久记录：无需worktree、默认main、阶段验证和审查后主动commit/push，不再重复询问Git授权。当前失败是GitHub认证阻断，不是授权缺失；没有读取/输出私密凭证，也不修改全局凭证设置。
+- 本次授权记录补充将单独本地提交；最终SHA见交付报告/Git历史。因认证前提未变化，不将重复失败当作推送成功。

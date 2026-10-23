@@ -3,7 +3,8 @@
 - 仓库为 `on-dotnet/ontology-platform`；.NET项目及命名空间使用`OntologyPlatform.*`，Web包为`@ontology-platform/web`。
 - 先读[任务卡](docs/tasks/G1-ENG-001.md)、[计划规则](PLANS.md)、适用目录AGENTS及[冻结合同](docs/bootstrap/ontology-platform-codex-master-plan-bootstrap-v1.0.md)。G0文档是历史快照，后续明确授权记录优先。
 - 当前仅授权G1-ENG-001工程基线。禁止自动进入其他G1或G2；不创建业务源码、API、页面、AppHost/ServiceDefaults实现，不启动容器/数据库/服务，不调用付费模型。
-- 修改前检查Git状态，保留用户改动；公共合同、迁移、Design Tokens实行Single Writer。本任务Master为唯一编辑Owner，其他Agent只读。独立本地分支隔离；不自动Push/Merge或改全局设置。
+- 修改前检查Git状态，保留用户改动；公共合同、迁移、Design Tokens实行Single Writer。本任务Master为唯一编辑Owner，其他Agent只读。
+- **用户持续Git授权（2026-10-23）：无需worktree，默认直接main推进；阶段验证和独立审查完成后主动本地commit并push远程，不重复询问Git授权。** 可安全快进已完成阶段，不强推、不覆盖用户改动、不改全局凭证配置；若认证失败记录BLOCKED，不将凭证缺失误报为用户未授权。Git授权不扩大任务/阶段范围。
 - 模块化单体、Pragmatic Clean Architecture、Vertical Slice、必要DDD；Domain不依赖EF/HTTP/Jena/LLM SDK。模块各有DbContext和写入边界，不跨模块写表；模块内直接DbContext、显式映射/LINQ Projection。
 - ServiceDefaults仅宿主OTel/健康/发现/HTTP弹性；BuildingBlocks仅真实稳定技术合同，不建立万能类或泛型Repository/UoW。
 - 禁止TMDL、Microsoft GraphRAG、AutoMapper、Ant Design/Fluent UI依赖、生产系统写入、LLM自动发布和未经批准依赖。RDF/OWL/SHACL为正式语义；REST/MCP/UI复用语义应用服务。
