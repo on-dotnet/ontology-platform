@@ -1,3 +1,9 @@
+# G1 Wave2 当前授权增量（2026-10-25）
+
+当前：**G1-WAVE2 Mac V2，SEC/FE/OBS正式授权执行**。用户在本会话明确批准附件全部任务，由Master先冻结公共契约，再三线独立Worktree并行、审查、集成/Push和验收；最后唯一Review ZIP并停等复审，不进G2。附件已完整读取并归档在G1-WAVE2证据。任务合同见[G1-WAVE2](G1-WAVE2.md)；三个子卡分别SEC/FE/OBS。新授权覆盖历史停止条款，M0仍保留Mac基础PASS/跨平台总体PARTIAL，Windows/Intel未运行，不改历史证据。系统级/管理员/付费/生产凭证只停止对应操作，不扩大技术选型和生产权限。
+
+---
+
 # M0 当前授权增量（2026-10-25）
 
 当前关口：**M0-MAC-PORTABILITY-001，READY_FOR_REVIEW / PARTIAL**。Mac最低工程验收、独立审查已通过；Windows等未运行项保留，最终同Head CI/ZIP以manifest为准。仅允许本任务收尾/复审，不启动下一关口。人类在本会话正式批准 Mac Codex Master 接管与跨平台兼容验收，明确读取迁移合同第二节至文末并直接执行。允许项目隔离依赖恢复、开发容器与测试、多 Agent 独立 Worktree/任务分支、独立审查后 Master 集成 main、一个标准 Review ZIP。任务合同与验收矩阵见 [M0 任务卡](M0-MAC-PORTABILITY-001.md)。只批准 M0，不启动 G1 Wave 2 SEC/FE/OBS 或 G2；系统级改动、管理员权限、付费和不明凭证停止对应操作。下文为原 G1 历史索引，原状态不改写。
