@@ -61,3 +61,5 @@ OBS资源建议固定开发端口：Grafana15330、Loki13100、Tempo13200、Prom
 真实Keycloak登录/回调/退出、Cookie坏例/过期/重放、CSRF、错误回调、伪造Forwarded、角色/跨厂区、双实例共享加密keyring/PG会话；PG审计、重启持久化。真实Web lint/typecheck/test/build+Playwright1280/宽屏/键盘/主题持久化/加载/网络错误和完整OIDC闭环；Console无水合/焦点错误。真实Loki/Tempo/Prometheus查询、中文Grafana、告警触发/恢复及持久化。原4项Infra测试保留。Windows本轮无主机则NOT_RUN并给复现命令，Linux现有CI必须不退化。任何核心失败总PARTIAL/BLOCKED，未跑不算PASS。
 
 独立契约审查修订：浏览器退出采用原生form POST及隐藏__RequestVerificationToken，允许内置header用于其他客户端但不能用fetch跟随OIDC跨源注销。错误媒体类型统一application/problem+json，type字段必须存在（默认about:blank）；audit limit非法明确400 invalid_request。本修订在任何产品并行写入前完成。
+
+遥测实施增量：API同一Meter增加platform.heartbeat ObservableGauge，值为当前UTC Unix秒，无单位/无用户厂区标签；导出周期5秒。OBS用time()-heartbeat/absent判断真实API停启，避免缓存旧计数冒充存活；Prometheus归一化名以实际查询为准。本地告警时间阈值明确不是生产SLO。

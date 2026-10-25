@@ -13,3 +13,5 @@
 | Vitest5.0.5、ESLint10.13.0、eslint-config-next16.4.3 | 官方npm / MIT | 分离真实test/lint，与实际peer兼容及恢复结果为准 |
 
 最新版本只作官方观察，真实批准采用精确上表版本且恢复peer/哈希/漏洞必须验证；若不兼容提出基于官方稳定线的最小修订并登记，不能擅自浮动升级。全部传递依赖许可/漏洞与镜像digest/SBOM在恢复/OBS提案后补实际清单；目前NOT_VERIFIED，不把registry发布当运行PASS。新专业组件容器仅Alloy/Loki/Tempo/Prometheus/Grafana，本地部署，OBS登记精确官方稳定版/ARM64 index digest/许可后Master审核，禁止Cloud或额外框架。
+
+实施兼容增量：SEC首次真实恢复发现Npgsql10.0.3默认Relational10.0.4与EF Design10.0.13的MSB3277冲突；Master显式CPM Microsoft.EntityFrameworkCore.Relational10.0.13（微软官方MIT）统一EF家族，不降级或隐藏警告。FE类型编译依赖@types/react19.3.0、@types/react-dom19.3.0、@types/node24.19.2（官方npm/DefinitelyTyped，MIT）对应已批准React19/Node24，精确恢复由FE记录。OBS五已批准专业容器经官方release/index/ARM64提案，Master允许Alloy1.21.2 Apache-2.0、Loki3.7.9/Tempo3.1.1/Grafana13.2.4 AGPL-3.0、Prometheus3.15.1 Apache-2.0，精确index/来源/许可和CVE/SBOM边界见OBS清单；Tempo target all不加Kafka。

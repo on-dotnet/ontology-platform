@@ -1,3 +1,5 @@
 # 公共契约独立审查
 
 Reviewer wave2_review审查固定2c93331edece9045cd3bbb67f80bbf11706b1160：Critical0/Important1/Minor2。Important为header-only CSRF+302跨源注销无法直接用于浏览器；Master在任何产品派发前改为原生form POST+内置Antiforgery隐藏字段，再顶层OIDC302。Minor为ProblemDetails媒体类型应application/problem+json，以及audit limit非法400/type必需字段缺失，均同步修订JSON和文字契约。静态只读审查祖先/diff-check通过、7路径23引用、6DTO所有成员中文XML完整、任务链接存在；运行能力尚NOT_RUN。修订固定头将再次focused复核，不能以静态契约声称产品PASS。
+
+最终冻结头87eb51a77bffe7468164a0e418bbbd2e101d95bc独立focused复核Critical0/Important0/Minor0，全部问题解除，允许三线从该头开发；真实运行仍NOT_RUN。后续Metric心跳是现有技术Meter的明确采样增量，不新增产品功能。
