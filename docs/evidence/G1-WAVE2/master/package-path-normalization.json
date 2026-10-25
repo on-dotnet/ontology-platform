@@ -14,5 +14,9 @@
   "contentPreflight": {
     "finding": "finite archive scanner matched quoted password key with public Python variable reference, not a stored secret",
     "safeFix": "explicit same four-field admin_form assembly; runtime payload unchanged; scanner/deny rules unchanged"
+  },
+  "evidenceSchemaPreflight": {
+    "finding": "archive manifest normalizes only checks/ci; extra task/reviewer/context keys in evidence input caused DeepEquals mismatch",
+    "safeFix": "keep checks and ci byte-equivalent JSON values; move extra context to validation-context.json; no status promotion, no verifier changes"
   }
 }

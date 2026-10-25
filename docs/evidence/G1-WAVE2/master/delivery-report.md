@@ -54,3 +54,5 @@ SEC最终分支cecf43b00f4f5f12c9309640d68ed665f2643498，FE ce28552c3feb839eb2d
 构包前的真实路径检查曾拒绝Kiota PoC默认auth/models源码目录；未生成交付ZIP。Master仅重命名该证据目录及相对import，验证全部非import行及/auth URL模板逐字不变、相对依赖可解析；产品代码/依赖/构包拒绝规则完全不变，详见package-path-normalization.json。最终Head的CI与独立重开仍须实际通过。
 
 同一构包预检还发现有限模式将bootstrap源码中的password键+变量引用误认作固定秘密；Master仅把相同四字段表单显式组装，运行payload不变，原本地HTTP正反例复验；规则不放宽，真实秘密仍只在环境/私有忽略文件。
+
+构包重开阶段还检出输入JSON额外上下文字段与manifest仅checks/ci的归一化范围不一致；全部checks/ci原值保留，额外任务/旧候选CI/Reviewer说明移validation-context.json，构包器与状态校验不变，失败partial由工具清理，尚未生成任何交付ZIP。
