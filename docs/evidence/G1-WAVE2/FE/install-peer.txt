@@ -1,0 +1,16 @@
+$ node .tools/pnpm/package/bin/pnpm.cjs install --lockfile-dir .tools/fe-lock --store-dir .tools/pnpm-store --ignore-scripts
+Scope: all 2 workspace projects
+✓ Lockfile at .tools/fe-lock/pnpm-lock.yaml passes supply-chain policies (verified 32m ago)
+apps/web                                 | [WARN] deprecated eslint@9.39.5
+.tools/fe-lock                           | Progress: resolved 1, reused 0, downloaded 0, added 0
+.tools/fe-lock                           | Progress: resolved 94, reused 78, downloaded 0, added 0
+.tools/fe-lock                           | Progress: resolved 352, reused 258, downloaded 15, added 0
+.tools/fe-lock                           | Progress: resolved 357, reused 258, downloaded 25, added 0
+.tools/fe-lock                           |  +56  -47 ++++++-----
+.tools/fe-lock                           | Progress: resolved 493, reused 367, downloaded 30, added 55
+.tools/fe-lock                           | Progress: resolved 493, reused 367, downloaded 30, added 56, done
+
+[ERR_PNPM_IGNORED_BUILDS] Ignored build scripts: unrs-resolver@1.12.2
+
+Run "pnpm approve-builds" to pick which dependencies should be allowed to run scripts.
+EXIT_CODE=1

@@ -1,0 +1,3 @@
+import { defineConfig } from "@playwright/test";
+/** 隔离 UI 合成夹具：只验证展示行为，不代表真实身份/纵向验收。 */
+export default defineConfig({ testDir: "./tests/ui", fullyParallel: false, workers: 1, reporter: "list", outputDir: "artifacts/test-results/ui", use: { baseURL: "http://127.0.0.1:15310", launchOptions: { channel: "msedge" }, trace: "off", screenshot: "off", video: "off" }, webServer: [{ command: "node tests/fixture-server.mjs", port: 15410, reuseExistingServer: false }, { command: "node node_modules/next/dist/bin/next start --hostname 127.0.0.1 --port 15310", port: 15310, reuseExistingServer: false, env: { PLATFORM_API_ORIGIN: "http://127.0.0.1:15410", NEXT_TELEMETRY_DISABLED: "1" } }] });
