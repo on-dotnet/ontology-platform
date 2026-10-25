@@ -1,0 +1,68 @@
+# 真实promtool规则时间推进负例：心跳新鲜、缺失、过期、恢复及依赖停启。
+rule_files:
+  - /etc/prometheus/alerts.yaml
+evaluation_interval: 10s
+tests:
+  - name: 新鲜心跳不会告警
+    interval: 5s
+    input_series:
+      - series: 'platform_heartbeat{service_name="ontology-platform-api"}'
+        values: '0+5x30'
+    alert_rule_test:
+      - eval_time: 60s
+        alertname: 平台心跳停止
+        exp_alerts: []
+  - name: 缺失心跳触发
+    interval: 5s
+    input_series: []
+    alert_rule_test:
+      - eval_time: 30s
+        alertname: 平台心跳停止
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              environment: Development
+            exp_annotations:
+              summary: 平台API心跳过期或缺失
+              description: 检查API进程与OTLP链路；开发心跳每5秒导出，超过25秒且持续20秒告警，非生产SLO。
+  - name: 缓存旧心跳仍触发且恢复可清除
+    interval: 5s
+    input_series:
+      - series: 'platform_heartbeat{service_name="ontology-platform-api"}'
+        values: '0+5x4 _x15 100+5x10'
+    alert_rule_test:
+      - eval_time: 70s
+        alertname: 平台心跳停止
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              environment: Development
+            exp_annotations:
+              summary: 平台API心跳过期或缺失
+              description: 检查API进程与OTLP链路；开发心跳每5秒导出，超过25秒且持续20秒告警，非生产SLO。
+      - eval_time: 120s
+        alertname: 平台心跳停止
+        exp_alerts: []
+  - name: 依赖离线持续才触发并恢复
+    interval: 10s
+    input_series:
+      - series: 'up{job="observability",instance="tempo:3200"}'
+        values: '1 1 0 0 0 0 1 1'
+    alert_rule_test:
+      - eval_time: 30s
+        alertname: 观测依赖不可用
+        exp_alerts: []
+      - eval_time: 40s
+        alertname: 观测依赖不可用
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              environment: Development
+              job: observability
+              instance: tempo:3200
+            exp_annotations:
+              summary: 观测依赖 tempo:3200 不可用
+              description: 受控停启后观察pending/firing与恢复，禁止以Running代替数据就绪。
+      - eval_time: 70s
+        alertname: 观测依赖不可用
+        exp_alerts: []

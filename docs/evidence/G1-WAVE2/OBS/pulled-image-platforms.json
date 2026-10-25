@@ -1,0 +1,58 @@
+[
+  {
+    "argv": [
+      "docker",
+      "image",
+      "inspect",
+      "grafana/loki:3.7.9@sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28",
+      "--format",
+      "{{json .Os}} {{json .Architecture}} {{json .Config.User}}"
+    ],
+    "exitCode": 0,
+    "stdout": "\"linux\" \"arm64\" \"10001\"\n",
+    "stderr": "",
+    "observedAtUtc": "2026-10-25T05:54:07.301751+00:00"
+  },
+  {
+    "argv": [
+      "docker",
+      "image",
+      "inspect",
+      "grafana/tempo:3.1.1@sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044",
+      "--format",
+      "{{json .Os}} {{json .Architecture}} {{json .Config.User}}"
+    ],
+    "exitCode": 0,
+    "stdout": "\"linux\" \"arm64\" \"10001:10001\"\n",
+    "stderr": "",
+    "observedAtUtc": "2026-10-25T05:54:07.334839+00:00"
+  },
+  {
+    "argv": [
+      "docker",
+      "image",
+      "inspect",
+      "prom/prometheus:v3.15.1@sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2",
+      "--format",
+      "{{json .Os}} {{json .Architecture}} {{json .Config.User}}"
+    ],
+    "exitCode": 0,
+    "stdout": "\"linux\" \"arm64\" \"nobody\"\n",
+    "stderr": "",
+    "observedAtUtc": "2026-10-25T05:54:07.359913+00:00"
+  },
+  {
+    "argv": [
+      "docker",
+      "image",
+      "inspect",
+      "grafana/grafana:13.2.4@sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f",
+      "--format",
+      "{{json .Os}} {{json .Architecture}} {{json .Config.User}}"
+    ],
+    "exitCode": 0,
+    "stdout": "\"linux\" \"arm64\" \"472\"\n",
+    "stderr": "",
+    "observedAtUtc": "2026-10-25T05:54:07.383077+00:00"
+  }
+]

@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "docker",
+    "run",
+    "--pull=never",
+    "--rm",
+    "--network",
+    "none",
+    "--mount",
+    "type=bind,src=/Users/chasen/.codex/worktrees/g1-wave2-obs/ontology-platform/infra/observability/loki/loki.yaml,dst=/etc/loki/loki.yaml,readonly",
+    "grafana/loki:3.7.9@sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28",
+    "-config.file=/etc/loki/loki.yaml",
+    "-verify-config=true"
+  ],
+  "startedAtUtc": "2026-10-25T05:54:38.021865+00:00",
+  "exitCode": 0,
+  "stdout": "",
+  "stderr": "level=info ts=2026-10-25T05:54:38.181640298Z caller=main.go:109 msg=\"config is valid\"\n"
+}

@@ -1,0 +1,276 @@
+{
+  "uid": "platform-overview",
+  "title": "平台运维 · 系统总览",
+  "schemaVersion": 41,
+  "version": 1,
+  "editable": false,
+  "tags": [
+    "平台运维",
+    "开发环境"
+  ],
+  "timezone": "browser",
+  "refresh": "10s",
+  "time": {
+    "from": "now-15m",
+    "to": "now"
+  },
+  "annotations": {
+    "list": []
+  },
+  "links": [
+    {
+      "title": "系统总览",
+      "type": "link",
+      "url": "/d/platform-overview",
+      "keepTime": true
+    },
+    {
+      "title": "API性能",
+      "type": "link",
+      "url": "/d/platform-api",
+      "keepTime": true
+    },
+    {
+      "title": "依赖健康",
+      "type": "link",
+      "url": "/d/platform-dependencies",
+      "keepTime": true
+    },
+    {
+      "title": "错误与Trace",
+      "type": "link",
+      "url": "/d/platform-errors",
+      "keepTime": true
+    }
+  ],
+  "templating": {
+    "list": []
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "观测依赖在线数",
+      "type": "stat",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "platform-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 8,
+        "h": 5
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(up{job=\"observability\"})",
+          "query": "sum(up{job=\"observability\"})",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "platform-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      }
+    },
+    {
+      "id": 2,
+      "title": "API心跳距今（秒）",
+      "type": "stat",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "platform-prometheus"
+      },
+      "gridPos": {
+        "x": 8,
+        "y": 0,
+        "w": 8,
+        "h": 5
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "time() - max(platform_heartbeat{service_name=\"ontology-platform-api\"})",
+          "query": "time() - max(platform_heartbeat{service_name=\"ontology-platform-api\"})",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "platform-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      }
+    },
+    {
+      "id": 3,
+      "title": "API请求速率",
+      "type": "stat",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "platform-prometheus"
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 0,
+        "w": 8,
+        "h": 5
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(platform_requests_total{service_name=\"ontology-platform-api\"}[1m]))",
+          "query": "sum(rate(platform_requests_total{service_name=\"ontology-platform-api\"}[1m]))",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "platform-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      }
+    },
+    {
+      "id": 4,
+      "title": "真实请求趋势",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "platform-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 5,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (method, status_class) (rate(platform_requests_total{service_name=\"ontology-platform-api\"}[1m]))",
+          "query": "sum by (method, status_class) (rate(platform_requests_total{service_name=\"ontology-platform-api\"}[1m]))",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "platform-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 5,
+      "title": "本地告警状态（1=当前）",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "platform-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 5,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "ALERTS{alertstate=~\"pending|firing\"}",
+          "query": "ALERTS{alertstate=~\"pending|firing\"}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "platform-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 6,
+      "title": "开发范围与数据来源",
+      "type": "text",
+      "gridPos": {
+        "x": 0,
+        "y": 13,
+        "w": 24,
+        "h": 4
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "本页来自本机真实 API → Alloy → Loki / Tempo / Prometheus。无数据时显示无数据，不填充示例成功值。仅开发基础；告警阈值不是生产 SLO。审计事实保存在 PostgreSQL，使用有权限的 `/api/v1/platform/audit` 获取 TraceId / 审计ID。"
+      }
+    }
+  ]
+}

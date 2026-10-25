@@ -13,7 +13,7 @@ groups:
           summary: "观测依赖 {{ $labels.instance }} 不可用"
           description: "受控停启后观察pending/firing与恢复，禁止以Running代替数据就绪。"
       - alert: 平台心跳停止
-        expr: (time() - max(platform_heartbeat{service_name="ontology-platform-api"}) > 25) or absent(platform_heartbeat{service_name="ontology-platform-api"})
+        expr: (time() - max(platform_heartbeat{service_name="ontology-platform-api"}) > 25) or absent(max(platform_heartbeat{service_name="ontology-platform-api"}))
         for: 20s
         labels:
           severity: warning

@@ -17,18 +17,21 @@ otelcol.processor.transform "boundary" {
   metric_statements {
     context = "datapoint"
     statements = [
+      `keep_keys(resource.attributes, ["service.name", "service.version", "deployment.environment.name"])`,
       `keep_keys(attributes, ["http.request.method", "http.route", "http.response.status_code", "method", "route", "status_class"])`,
     ]
   }
   log_statements {
     context = "log"
     statements = [
+      `keep_keys(resource.attributes, ["service.name", "service.version", "deployment.environment.name"])`,
       `keep_keys(attributes, ["eventcode", "EventId", "EventName", "OriginalFormat", "path", "status", "status_class", "method", "route", "traceId", "auditId", "correlationId", "TraceId", "AuditId", "CorrelationId"])`,
     ]
   }
   trace_statements {
     context = "span"
     statements = [
+      `keep_keys(resource.attributes, ["service.name", "service.version", "deployment.environment.name"])`,
       `delete_matching_keys(attributes, "(?i).*(cookie|authorization|token|password|secret|url\\.query|url\\.full|http\\.url|http\\.target|db\\.statement|db\\.query\\.text).*")`,
     ]
   }

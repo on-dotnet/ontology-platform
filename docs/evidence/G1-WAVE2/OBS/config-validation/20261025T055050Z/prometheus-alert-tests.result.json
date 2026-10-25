@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "docker",
+    "run",
+    "--rm",
+    "--network",
+    "none",
+    "--mount",
+    "type=bind,src=/Users/chasen/.codex/worktrees/g1-wave2-obs/ontology-platform/infra/observability/prometheus,dst=/etc/prometheus,readonly",
+    "--entrypoint",
+    "/bin/promtool",
+    "prom/prometheus:v3.15.1@sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2",
+    "test",
+    "rules",
+    "/etc/prometheus/alert-tests.yaml"
+  ],
+  "startedAtUtc": "2026-10-25T05:50:51.019685+00:00",
+  "exitCode": 1,
+  "stdout": "\n\n",
+  "stderr": "  FAILED:\n    name: \u7f3a\u5931\u5fc3\u8df3\u89e6\u53d1,\n    alertname: \u5e73\u53f0\u5fc3\u8df3\u505c\u6b62, time: 30s, \n        exp:[\n            0:\n              Labels:{alertname=\"\u5e73\u53f0\u5fc3\u8df3\u505c\u6b62\", environment=\"Development\", severity=\"warning\"}\n              Annotations:{description=\"\u68c0\u67e5API\u8fdb\u7a0b\u4e0eOTLP\u94fe\u8def\uff1b\u5f00\u53d1\u5fc3\u8df3\u6bcf5\u79d2\u5bfc\u51fa\uff0c\u8d85\u8fc725\u79d2\u4e14\u6301\u7eed20\u79d2\u544a\u8b66\uff0c\u975e\u751f\u4ea7SLO\u3002\", summary=\"\u5e73\u53f0API\u5fc3\u8df3\u8fc7\u671f\u6216\u7f3a\u5931\"}\n            ], \n        got:[\n            0:\n              Labels:{alertname=\"\u5e73\u53f0\u5fc3\u8df3\u505c\u6b62\", environment=\"Development\", service_name=\"ontology-platform-api\", severity=\"warning\"}\n              Annotations:{description=\"\u68c0\u67e5API\u8fdb\u7a0b\u4e0eOTLP\u94fe\u8def\uff1b\u5f00\u53d1\u5fc3\u8df3\u6bcf5\u79d2\u5bfc\u51fa\uff0c\u8d85\u8fc725\u79d2\u4e14\u6301\u7eed20\u79d2\u544a\u8b66\uff0c\u975e\u751f\u4ea7SLO\u3002\", summary=\"\u5e73\u53f0API\u5fc3\u8df3\u8fc7\u671f\u6216\u7f3a\u5931\"}\n            ]\n"
+}

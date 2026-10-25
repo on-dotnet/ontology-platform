@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "docker",
+    "image",
+    "inspect",
+    "grafana/loki:3.7.9@sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28",
+    "--format",
+    "{{json .Os}} {{json .Architecture}} {{json .Config.User}}"
+  ],
+  "startedAtUtc": "2026-10-25T05:54:37.931682+00:00",
+  "exitCode": 0,
+  "stdout": "\"linux\" \"arm64\" \"10001\"\n",
+  "stderr": ""
+}

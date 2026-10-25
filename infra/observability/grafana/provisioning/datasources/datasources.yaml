@@ -21,7 +21,8 @@ datasources:
     jsonData:
       derivedFields:
         - name: TraceID
-          matcherRegex: '"(?:trace_id|traceId)"\s*:\s*"([a-f0-9]{32})"'
+          matcherRegex: '^trace_?id$'
+          matcherType: label
           datasourceUid: platform-tempo
           url: '$${__value.raw}'
   - name: 平台链路

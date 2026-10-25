@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "docker",
+    "run",
+    "--rm",
+    "--network",
+    "none",
+    "--mount",
+    "type=bind,src=/Users/chasen/.codex/worktrees/g1-wave2-obs/ontology-platform/infra/observability/prometheus,dst=/etc/prometheus,readonly",
+    "--entrypoint",
+    "/bin/promtool",
+    "prom/prometheus:v3.15.1@sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2",
+    "test",
+    "rules",
+    "/etc/prometheus/alert-tests.yaml"
+  ],
+  "startedAtUtc": "2026-10-25T05:51:17.975364+00:00",
+  "exitCode": 0,
+  "stdout": "  SUCCESS\n\n",
+  "stderr": ""
+}

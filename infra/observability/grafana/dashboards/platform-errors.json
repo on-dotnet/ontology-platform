@@ -1,0 +1,138 @@
+{
+  "uid": "platform-errors",
+  "title": "平台运维 · 错误与Trace关联",
+  "schemaVersion": 41,
+  "version": 1,
+  "editable": false,
+  "tags": [
+    "平台运维",
+    "开发环境"
+  ],
+  "timezone": "browser",
+  "refresh": "10s",
+  "time": {
+    "from": "now-15m",
+    "to": "now"
+  },
+  "annotations": {
+    "list": []
+  },
+  "links": [
+    {
+      "title": "系统总览",
+      "type": "link",
+      "url": "/d/platform-overview",
+      "keepTime": true
+    },
+    {
+      "title": "API性能",
+      "type": "link",
+      "url": "/d/platform-api",
+      "keepTime": true
+    },
+    {
+      "title": "依赖健康",
+      "type": "link",
+      "url": "/d/platform-dependencies",
+      "keepTime": true
+    },
+    {
+      "title": "错误与Trace",
+      "type": "link",
+      "url": "/d/platform-errors",
+      "keepTime": true
+    }
+  ],
+  "templating": {
+    "list": []
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "API安全结构化日志（TraceId不做索引）",
+      "type": "logs",
+      "datasource": {
+        "type": "loki",
+        "uid": "platform-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 10
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "{service_name=\"ontology-platform-api\"}",
+          "query": "{service_name=\"ontology-platform-api\"}",
+          "datasource": {
+            "type": "loki",
+            "uid": "platform-loki"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 2,
+      "title": "真实错误Trace",
+      "type": "table",
+      "datasource": {
+        "type": "tempo",
+        "uid": "platform-tempo"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 10,
+        "w": 24,
+        "h": 10
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "{ resource.service.name = \"ontology-platform-api\" && status = error }",
+          "query": "{ resource.service.name = \"ontology-platform-api\" && status = error }",
+          "datasource": {
+            "type": "tempo",
+            "uid": "platform-tempo"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 3,
+      "title": "从审计关联到Trace",
+      "type": "text",
+      "gridPos": {
+        "x": 0,
+        "y": 20,
+        "w": 24,
+        "h": 5
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "以 .NET 授权 API 返回的 X-Trace-Id / X-Audit-Id 为入口。Loki 使用 `{service_name=\"ontology-platform-api\"} | trace_id=\"实际TraceId\"` 查询结构化元数据；审计ID使用 `| auditId=\"实际审计ID\"`（按实际归一化字段检查）。在 Explore 选择「平台链路」按 Trace ID 查询。PostgreSQL审计仍为业务事实；日志不是可靠审计存储。"
+      }
+    }
+  ]
+}

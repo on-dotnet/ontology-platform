@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ontology-platform:behavior-event:1",
+  "title": "平台行为事件V1（仅合同，本轮无接收实现）",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["eventId", "eventType", "schemaVersion", "occurredAtUtc", "consent", "scope", "traceId"],
+  "properties": {
+    "eventId": { "type": "string", "format": "uuid" },
+    "eventType": { "enum": ["navigation.view", "interaction.action", "performance.measure", "client.error"] },
+    "schemaVersion": { "const": "1" },
+    "occurredAtUtc": { "type": "string", "format": "date-time", "pattern": "Z$" },
+    "consent": { "const": "granted", "description": "未获同意不得发送；接收端仍需校验当前同意状态" },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["organizationId", "siteId"],
+      "properties": {
+        "organizationId": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "siteId": { "type": "string", "minLength": 1, "maxLength": 64 }
+      }
+    },
+    "traceId": { "type": ["string", "null"], "pattern": "^[a-f0-9]{32}$" }
+  }
+}
