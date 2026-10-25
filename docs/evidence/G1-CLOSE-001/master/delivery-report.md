@@ -1,6 +1,6 @@
 # G1-CLOSE-001 收口交付报告
 
-日期：2026-10-26（Asia/Shanghai；2026-10-25启动）。状态：**PARTIAL / FINAL_REVIEW_PENDING**。本轮两项P1与Mac授权纵向回归已实际通过，整体G1仍含明确未实施/未验证项。BaseSha=`d181f66e569e190a66b0f48b179f2fd9390b9467`；最终已提交Head及同Head CI以唯一Review ZIP manifest.headSha/runtimeCi为准，避免自引用。不得进入G2。
+日期：2026-10-26（Asia/Shanghai；2026-10-25启动）。状态：**PARTIAL / READY_FOR_REVIEW（最终Git/CI/ZIP以manifest与回执核准）**。本轮两项P1与Mac授权纵向回归已实际通过，整体G1仍含明确未实施/未验证项。BaseSha=`d181f66e569e190a66b0f48b179f2fd9390b9467`；最终已提交Head及同Head CI以唯一Review ZIP manifest.headSha/runtimeCi为准，避免自引用。不得进入G2。
 
 ## 改动与为什么
 
@@ -14,8 +14,8 @@
 
 | 运行项 | 结果/原始证据 |
 |---|---|
-| 受锁restore、Release build、format | PASS，0编译错误；保留ASPIRE010/format workspace警告；baseline-restore/final-release-build/final-format |
-| 全安全/迁移真实PG+Keycloak | PASS 46/46、0skip；原14+SEC13+OBS17+迁移2；final-release-security |
+| 受锁restore、Release build、format | PASS，0编译错误；保留ASPIRE010/format workspace警告；baseline-restore/race-green-build/race-final-format |
+| 全安全/迁移真实PG+Keycloak | PASS 46/46、0skip；原14+SEC13+OBS17+迁移2；race-green-full |
 | Infrastructure | PASS 4/4，final-infrastructure |
 | 标准SelfTest | PASS；包含ReviewPackage35正反项；final-selftest/打包前策略复验 |
 | Web lint/typecheck/Vitest/build | PASS，6单测；精确Node24.22.1/pnpm11.28.8；final-web |

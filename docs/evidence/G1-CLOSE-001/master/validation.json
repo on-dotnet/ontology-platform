@@ -12,7 +12,7 @@
       "command": "dotnet build backend/OntologyPlatform.slnx --configuration Release --no-restore",
       "status": "PASS",
       "exitCode": 0,
-      "output": "0错误，保留ASPIRE010；final-release-build.txt"
+      "output": "最新迁移并发修复源码Release build 0错误，保留ASPIRE010；race-green-build.txt"
     },
     {
       "name": "real-security-and-migration",
@@ -33,14 +33,14 @@
       "command": "dotnet format backend/OntologyPlatform.slnx --verify-no-changes --no-restore",
       "status": "PASS",
       "exitCode": 0,
-      "output": "实际exit0，工作区加载警告保留；final-format.txt"
+      "output": "最新全后端实际exit0，工作区加载警告保留；race-final-format.txt"
     },
     {
       "name": "policy-selftest",
       "command": "pwsh -NoProfile -File scripts/verify.ps1 -SelfTest",
       "status": "PASS",
       "exitCode": 0,
-      "output": "原语法/策略/正反例及标准ReviewPackage35项0失败；最终输出见final-selftest.txt，打包前还执行一次"
+      "output": "原语法/策略/正反例及标准ReviewPackage35项0失败；after-review-policy.txt"
     },
     {
       "name": "web-gates",
@@ -82,7 +82,7 @@
       "command": "python3 scripts/acceptance/test-governance.py --filter FullyQualifiedName~ScopeMigrationPreservesLegacyAndRefusesDestructiveRollback",
       "status": "PASS",
       "exitCode": 0,
-      "output": "去守卫真实红例拒丢事实测试FAIL，恢复守卫1/1绿，最终全集45/45；legacy保留、[]/多厂Down拒绝、无新事实Down/Up与前向重入通过"
+      "output": "原Down守卫红绿及新增pg_locks确定性并发红绿均通过；最新完整Release46/46含两迁移用例，race-green-full.txt；旧并发删列FAIL完整保留"
     },
     {
       "name": "native-otlp-alloy",

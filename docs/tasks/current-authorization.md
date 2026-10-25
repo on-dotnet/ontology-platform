@@ -1,6 +1,6 @@
 # G1-CLOSE-001 当前授权增量（2026-10-25）
 
-当前：**G1-CLOSE-001 / IN_PROGRESS**。人类明确批准收口授权V1全部任务，原文见[授权](../evidence/G1-CLOSE-001/authorization-v1.md)。BaseSha=`d181f66e569e190a66b0f48b179f2fd9390b9467`。只修复审计成功事实/真实多厂范围和安全结构化异常诊断，完成G1阶段矩阵、只读G2准备、独立Review、真实回归、CI、Master集成Push及唯一Review ZIP后停止。独立SEC/OBS托管Worktree；公共合同/迁移/CI/主线Master单写者。历史PARTIAL和未运行项不改写。禁止G2功能/进程、生产/系统管理员/付费操作，不修改GitHub规则。详细任务与冻结合同见[G1-CLOSE-001](G1-CLOSE-001.md)。
+当前：**G1-CLOSE-001 / READY_FOR_REVIEW / PARTIAL**（2026-10-26收口；Mac两P1修复和46安全/完整纵向实测、独立审查已完成；最终main/同Head CI/唯一ZIP以交付manifest及回执为准）。人类明确批准收口授权V1全部任务，原文见[授权](../evidence/G1-CLOSE-001/authorization-v1.md)。BaseSha=`d181f66e569e190a66b0f48b179f2fd9390b9467`。只修复审计成功事实/真实多厂范围和安全结构化异常诊断，完成G1阶段矩阵、只读G2准备、独立Review、真实回归、CI、Master集成Push及唯一Review ZIP后停止。独立SEC/OBS托管Worktree；公共合同/迁移/CI/主线Master单写者。历史PARTIAL和未运行项不改写。禁止G2功能/进程、生产/系统管理员/付费操作，不修改GitHub规则。详细任务与冻结合同见[G1-CLOSE-001](G1-CLOSE-001.md)。
 
 ---
 

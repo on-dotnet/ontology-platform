@@ -56,7 +56,8 @@
 - [x] 3: OBS 19355e0已push，所有专项/限定Review闭环；原生出口15/15、真正LGTM16通过，合入Master。
 - [x] 4: 最终Mac Release45安全/4Infra、Web6/UI5/OIDC2、310协议、实际OpenAPI/故障恢复/七容器14项/告警/进程替换通过；原始红例保留。
 - [x] 5: G1退出矩阵/14模块/未完项分期、只读G2接口样例DAG、部署ADR与只读GitHub保护评估完成。
-- [ ] 6: 最终整体独立Review，任务分支同Head Linux CI；通过后Master集成main/push，再核最终main同Head CI。
+- [x] 6a: 最终整体独立Review及并发缺口红绿/限定复审闭环。
+- [ ] 6b: 最新任务分支CI后Master集成main/push，最终同Head main CI以manifest/交付回执核准。
 - [ ] 7: 标准唯一ZIP与独立VerifyOnly/逐成员重开，交付G1_CLOSE_READY_FOR_REVIEW后停止。
 
 实际矩阵见本轮master/validation.json与delivery-report；最终Head/实际CI由包manifest绑定。用户批准方式已明确，不另询问执行方式。所有测试原始失败/修复/当前PASS及未运行分别保留。
