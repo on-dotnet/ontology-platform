@@ -1,0 +1,35 @@
+{
+  "command": "gh run list --branch codex/M0-master --limit 5 --json databaseId,headSha,status,conclusion,url",
+  "exitCode": 0,
+  "runs": [
+    {
+      "conclusion": "success",
+      "databaseId": 40153407207,
+      "headSha": "3ca9c9713409d5217024afec6216a281a8ea5f3e",
+      "status": "completed",
+      "url": "https://github.com/on-dotnet/ontology-platform/actions/runs/40153407207"
+    },
+    {
+      "conclusion": "cancelled",
+      "databaseId": 40153379466,
+      "headSha": "c8f09f09de9e415de220e01c49ec319693411957",
+      "status": "completed",
+      "url": "https://github.com/on-dotnet/ontology-platform/actions/runs/40153379466"
+    },
+    {
+      "conclusion": "cancelled",
+      "databaseId": 40153297927,
+      "headSha": "4d6f0a7ca3beacba68f171d57a711b18902e9f22",
+      "status": "completed",
+      "url": "https://github.com/on-dotnet/ontology-platform/actions/runs/40153297927"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 40152975563,
+      "headSha": "e3f0b9694412f7a91b6075be9d7e8d4fac4b890b",
+      "status": "completed",
+      "url": "https://github.com/on-dotnet/ontology-platform/actions/runs/40152975563"
+    }
+  ],
+  "note": "中间push触发concurrency取消属于实际历史；只以最终head完成run判Linux门禁。"
+}

@@ -37,3 +37,7 @@ Agent 不是唯一写者，Master 是 main 唯一集成者。其他人同时工�
 | Aspire/Dashboard/Trace 查询 | NOT_RUN | M0 NOT_RUN | M0 NOT_RUN |
 
 记录命令、退出码、真实版本/架构/测试数、提交及 CI run ID/URL/head/conclusion。缺条件 BLOCKED；未做 NOT_RUN；静态配置不替代运行。负例必须运行。验收入口为 pwsh -NoProfile -File scripts/verify.ps1 -SelfTest、受锁 restore、-RunNative -RunTests、Docker manifest 与实际资源探针/重启脚本，以及 create-review-package -VerifyOnly。
+
+## 修复阶段写权调整（2026-10-25）
+
+组合入口实际失败后，A已定位null恢复为空字符串；为完成当前关口，Master暂停A worker的后续写入，收回A脚本修复写权，在同一独立m0-scripts树/codex/M0-scripts分支串行完成最小环境恢复修复和回归。A原里程碑仍由worker独立提交。Reviewer保持只读并复核修复固定头。没有并发抢写，不改变其他owned_paths。

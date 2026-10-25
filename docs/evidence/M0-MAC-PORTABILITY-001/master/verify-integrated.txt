@@ -1,0 +1,95 @@
+command: pwsh -NoProfile -File scripts/verify.ps1 -SelfTest -RunNative -RunTests
+exitCode: 1
+
+Check             Status Message
+-----             ------ -------
+repository-static PASS   检查152个文件：语法/格式/相对链接/有限机密模式/基线策…
+
+PASS: clean baseline accepted
+PASS: wrong package name rejected
+PASS: broken relative link rejected
+PASS: synthetic token rejected without printing value
+PASS: synthetic token in TypeScript rejected
+PASS: credential assignment in dot-env rejected
+PASS: unpinned action rejected
+
+Check             Status Message
+-----             ------ -------
+repository-static PASS   检查155个文件：语法/格式/相对链接/有限机密模式/基线策…
+
+NOT_RUN: .NET test：须显式追加-RunTests执行已批准测试项目。
+NOT_RUN: Web lint：未建立实际目标。
+NOT_RUN: Web typecheck：未建立实际目标。
+NOT_RUN: Web build：未建立实际目标。
+NOT_RUN: Web test：未建立实际目标。
+NOT_RUN: Web test:e2e：未建立实际目标。
+PASS: 所选工程检查；范围以逐项输出为准，不表示业务、前端或整个G1通过。
+PASS: native commands resolve SDK and config from selected Root
+Checker tests: 8 passed; application tests: NOT_RUN.
+PASS: Doctor handles existing pnpm without Node as BLOCKED/2.
+PASS: Doctor discovers real macOS ARM64 Node from isolated path with spaces.
+PASS: YAML/TOML syntax, 1 files; runtime compatibility not implied.
+FAIL: structured syntax invalid.yml (ParserError)
+FAIL: structured syntax invalid.toml (TOMLDecodeError)
+PASS: structured parser 4 real positive/negative cases.
+PASS: committed snapshot, Unicode, full diff and reopened ZIP
+PASS: color.ui always cannot contaminate machine-readable patch
+PASS: PASS requires real command evidence
+PASS: non-ancestor commits
+PASS: dirty tracked delivery
+PASS: untracked delivery
+PASS: forbidden committed member .env
+PASS: forbidden committed member .env.production
+PASS: forbidden committed member .ssh/id
+PASS: forbidden committed member .codex/auth.json
+PASS: forbidden committed member auth/config.json
+PASS: forbidden committed member cert.pem
+PASS: forbidden committed member nested/bin/output
+PASS: forbidden committed member .tools/sdk/file
+PASS: forbidden committed member models/weights.dat
+PASS: forbidden committed member state.db
+PASS: forbidden committed member .cache/item
+PASS: forbidden committed member node_modules/item
+PASS: synthetic token in source
+PASS: removed synthetic token retained in patch
+PASS: reopened archive rejects injected or changed member .git/config
+PASS: reopened archive rejects injected or changed member .env
+PASS: reopened archive rejects injected or changed member ../escape.txt
+PASS: reopened archive rejects injected or changed member source/app.txt
+PASS: git archive export-ignore cannot omit committed source
+PASS: git archive export-subst cannot rewrite committed source
+PASS: git symlink blob cannot silently become source
+PASS: committed submodule cannot be omitted by git archive
+PASS: complete patch rejects removed forbidden environment member
+PASS: reopened archive rejects payload tamper even after checksum rewrite
+PASS: missing checksum/member is rejected on reopen
+PASS: CI PASS cannot be inferred without run metadata
+PASS: explicit CI metadata avoids self-referential commit evidence
+PASS: existing delivery ZIP is preserved
+PASS: valid committed evidence preserves command and status
+ReviewPackage: 35 tests, 0 failures; product/container tests NOT_RUN.
+/Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/src/AppHost/OntologyPlatform.AppHost.csproj : error : 无法解析 SDK“Aspire.AppHost.Sdk”。下面的探测消息中正好有一条指示我们无法解析 SDK 的原因。调查并解决该消息以正确指定 SDK。
+/Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/src/AppHost/OntologyPlatform.AppHost.csproj : error :   SDK 解析程序“Microsoft.DotNet.MSBuildWorkloadSdkResolver”返回 null。
+/Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/src/AppHost/OntologyPlatform.AppHost.csproj : error :   Failed to load NuGet settings. 读取 NuGet.Config 时发生意外失败。路径:“/Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/src/AppHost/OntologyPlatform.AppHost.csproj/.nuget/NuGet/NuGet.Config”。
+/Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/OntologyPlatform.InfrastructureTests.csproj : error : 无法解析 SDK“MSTest.Sdk”。下面的探测消息中正好有一条指示我们无法解析 SDK 的原因。调查并解决该消息以正确指定 SDK。
+/Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/OntologyPlatform.InfrastructureTests.csproj : error :   SDK 解析程序“Microsoft.DotNet.MSBuildWorkloadSdkResolver”返回 null。
+/Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/OntologyPlatform.InfrastructureTests.csproj : error :   Failed to load NuGet settings. 读取 NuGet.Config 时发生意外失败。路径:“/Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/OntologyPlatform.InfrastructureTests.csproj/.nuget/NuGet/NuGet.Config”。
+/Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/src/AppHost/OntologyPlatform.AppHost.csproj : error MSB4236: 找不到指定的 SDK“Aspire.AppHost.Sdk/13.6.3”。
+/Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/OntologyPlatform.InfrastructureTests.csproj : error MSB4236: 找不到指定的 SDK“MSTest.Sdk/4.5.1”。
+  OntologyPlatform.ServiceDefaults -> /Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/src/ServiceDefaults/bin/Debug/net10.0/OntologyPlatform.ServiceDefaults.dll
+  OntologyPlatform.InfrastructureApi -> /Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/src/Hosts/OntologyPlatform.InfrastructureApi/bin/Debug/net10.0/OntologyPlatform.InfrastructureApi.dll
+
+生成失败。
+
+/Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/src/AppHost/OntologyPlatform.AppHost.csproj : error : 无法解析 SDK“Aspire.AppHost.Sdk”。下面的探测消息中正好有一条指示我们无法解析 SDK 的原因。调查并解决该消息以正确指定 SDK。
+/Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/src/AppHost/OntologyPlatform.AppHost.csproj : error :   SDK 解析程序“Microsoft.DotNet.MSBuildWorkloadSdkResolver”返回 null。
+/Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/src/AppHost/OntologyPlatform.AppHost.csproj : error :   Failed to load NuGet settings. 读取 NuGet.Config 时发生意外失败。路径:“/Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/src/AppHost/OntologyPlatform.AppHost.csproj/.nuget/NuGet/NuGet.Config”。
+/Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/OntologyPlatform.InfrastructureTests.csproj : error : 无法解析 SDK“MSTest.Sdk”。下面的探测消息中正好有一条指示我们无法解析 SDK 的原因。调查并解决该消息以正确指定 SDK。
+/Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/OntologyPlatform.InfrastructureTests.csproj : error :   SDK 解析程序“Microsoft.DotNet.MSBuildWorkloadSdkResolver”返回 null。
+/Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/OntologyPlatform.InfrastructureTests.csproj : error :   Failed to load NuGet settings. 读取 NuGet.Config 时发生意外失败。路径:“/Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/OntologyPlatform.InfrastructureTests.csproj/.nuget/NuGet/NuGet.Config”。
+/Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/src/AppHost/OntologyPlatform.AppHost.csproj : error MSB4236: 找不到指定的 SDK“Aspire.AppHost.Sdk/13.6.3”。
+/Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/OntologyPlatform.InfrastructureTests.csproj : error MSB4236: 找不到指定的 SDK“MSTest.Sdk/4.5.1”。
+    0 个警告
+    4 个错误
+
+已用时间 00:00:01.33

@@ -1,0 +1,118 @@
+command: pwsh -NoProfile -File scripts/verify.ps1 -SelfTest -RunNative -RunTests
+exitCode: 0
+
+Check             Status Message
+-----             ------ -------
+repository-static PASS   检查162个文件：语法/格式/相对链接/有限机密模式/基线策…
+
+PASS: clean baseline accepted
+PASS: wrong package name rejected
+PASS: broken relative link rejected
+PASS: synthetic token rejected without printing value
+PASS: synthetic token in TypeScript rejected
+PASS: credential assignment in dot-env rejected
+PASS: unpinned action rejected
+
+Check             Status Message
+-----             ------ -------
+repository-static PASS   检查165个文件：语法/格式/相对链接/有限机密模式/基线策…
+
+NOT_RUN: .NET test：须显式追加-RunTests执行已批准测试项目。
+NOT_RUN: Web lint：未建立实际目标。
+NOT_RUN: Web typecheck：未建立实际目标。
+NOT_RUN: Web build：未建立实际目标。
+NOT_RUN: Web test：未建立实际目标。
+NOT_RUN: Web test:e2e：未建立实际目标。
+PASS: 所选工程检查；范围以逐项输出为准，不表示业务、前端或整个G1通过。
+PASS: native commands resolve SDK and config from selected Root
+Checker tests: 8 passed; application tests: NOT_RUN.
+PASS: Doctor handles existing pnpm without Node as BLOCKED/2.
+PASS: Doctor discovers real macOS ARM64 Node from isolated path with spaces.
+PASS: YAML/TOML syntax, 1 files; runtime compatibility not implied.
+FAIL: structured syntax invalid.yml (ParserError)
+FAIL: structured syntax invalid.toml (TOMLDecodeError)
+PASS: structured parser 4 real positive/negative cases.
+
+Check             Status Message
+-----             ------ -------
+repository-static PASS   检查162个文件：语法/格式/相对链接/有限机密模式/基线策…
+
+PASS: verification preserves unset environment state for five process variables.
+
+Check             Status Message
+-----             ------ -------
+repository-static PASS   检查162个文件：语法/格式/相对链接/有限机密模式/基线策…
+
+PASS: verification preserves empty environment state for five process variables.
+
+Check             Status Message
+-----             ------ -------
+repository-static PASS   检查162个文件：语法/格式/相对链接/有限机密模式/基线策…
+
+PASS: verification preserves value environment state for five process variables.
+Environment regression: 3 state groups and structured-suite cleanup passed; native calls are synthetic, product tests NOT_RUN.
+PASS: committed snapshot, Unicode, full diff and reopened ZIP
+PASS: color.ui always cannot contaminate machine-readable patch
+PASS: PASS requires real command evidence
+PASS: non-ancestor commits
+PASS: dirty tracked delivery
+PASS: untracked delivery
+PASS: forbidden committed member .env
+PASS: forbidden committed member .env.production
+PASS: forbidden committed member .ssh/id
+PASS: forbidden committed member .codex/auth.json
+PASS: forbidden committed member auth/config.json
+PASS: forbidden committed member cert.pem
+PASS: forbidden committed member nested/bin/output
+PASS: forbidden committed member .tools/sdk/file
+PASS: forbidden committed member models/weights.dat
+PASS: forbidden committed member state.db
+PASS: forbidden committed member .cache/item
+PASS: forbidden committed member node_modules/item
+PASS: synthetic token in source
+PASS: removed synthetic token retained in patch
+PASS: reopened archive rejects injected or changed member .git/config
+PASS: reopened archive rejects injected or changed member .env
+PASS: reopened archive rejects injected or changed member ../escape.txt
+PASS: reopened archive rejects injected or changed member source/app.txt
+PASS: git archive export-ignore cannot omit committed source
+PASS: git archive export-subst cannot rewrite committed source
+PASS: git symlink blob cannot silently become source
+PASS: committed submodule cannot be omitted by git archive
+PASS: complete patch rejects removed forbidden environment member
+PASS: reopened archive rejects payload tamper even after checksum rewrite
+PASS: missing checksum/member is rejected on reopen
+PASS: CI PASS cannot be inferred without run metadata
+PASS: explicit CI metadata avoids self-referential commit evidence
+PASS: existing delivery ZIP is preserved
+PASS: valid committed evidence preserves command and status
+ReviewPackage: 35 tests, 0 failures; product/container tests NOT_RUN.
+/Users/chasen/.nuget/packages/aspire.hosting.apphost/13.6.3/build/Aspire.Hosting.AppHost.targets(157,5): warning ASPIRE010: OntologyPlatform.AppHost is configured with AspireUseCliBundle=false. Some Aspire features require the Aspire CLI bundle. Set AspireUseCliBundle=true to enable those features, or suppress ASPIRE010 to continue without the bundle. See https://aka.ms/aspire/diagnostics/aspire010 for more information. [/Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/src/AppHost/OntologyPlatform.AppHost.csproj]
+  OntologyPlatform.ServiceDefaults -> /Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/src/ServiceDefaults/bin/Debug/net10.0/OntologyPlatform.ServiceDefaults.dll
+  OntologyPlatform.InfrastructureApi -> /Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/src/Hosts/OntologyPlatform.InfrastructureApi/bin/Debug/net10.0/OntologyPlatform.InfrastructureApi.dll
+  OntologyPlatform.AppHost -> /Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/src/AppHost/bin/Debug/net10.0/OntologyPlatform.AppHost.dll
+  OntologyPlatform.InfrastructureTests -> /Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/bin/Debug/net10.0/OntologyPlatform.InfrastructureTests.dll
+
+已成功生成。
+
+/Users/chasen/.nuget/packages/aspire.hosting.apphost/13.6.3/build/Aspire.Hosting.AppHost.targets(157,5): warning ASPIRE010: OntologyPlatform.AppHost is configured with AspireUseCliBundle=false. Some Aspire features require the Aspire CLI bundle. Set AspireUseCliBundle=true to enable those features, or suppress ASPIRE010 to continue without the bundle. See https://aka.ms/aspire/diagnostics/aspire010 for more information. [/Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/src/AppHost/OntologyPlatform.AppHost.csproj]
+    1 个警告
+    0 个错误
+
+已用时间 00:00:01.57
+加载工作区时遇到警告。要记录警告，请将“详细级别”选项设置为“诊断”级别。
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/bin/Debug/net10.0/OntologyPlatform.InfrastructureTests.dll (net10.0|arm64)
+/Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/bin/Debug/net10.0/OntologyPlatform.InfrastructureTests.dll (net10.0|arm64) 已通过 (1s 851ms)
+
+测试运行摘要: 已通过!
+  总计: 4
+  失败: 0
+  成功: 4
+  已跳过: 0
+  持续时间: 2s 488ms
+NOT_RUN: Web lint：未建立实际目标。
+NOT_RUN: Web typecheck：未建立实际目标。
+NOT_RUN: Web build：未建立实际目标。
+NOT_RUN: Web test：未建立实际目标。
+NOT_RUN: Web test:e2e：未建立实际目标。
+PASS: 所选工程检查；范围以逐项输出为准，不表示业务、前端或整个G1通过。

@@ -1,0 +1,35 @@
+{
+  "platform": {},
+  "commands": [
+    {
+      "command": "sw_vers",
+      "exitCode": 0,
+      "output": "ProductName:\t\tmacOS\nProductVersion:\t\t27.0.1\nBuildVersion:\t\t26A434"
+    },
+    {
+      "command": "uname -m",
+      "exitCode": 0,
+      "output": "arm64"
+    },
+    {
+      "command": "git --version",
+      "exitCode": 0,
+      "output": "git version 2.56.0"
+    },
+    {
+      "command": "aspire --version",
+      "exitCode": 0,
+      "output": "13.6.4+c89352703f78ae46de90fbf751ed8b52b77b89bf"
+    },
+    {
+      "command": "docker version --format \"{{.Server.Version}} {{.Server.Arch}}\"",
+      "exitCode": 0,
+      "output": "29.9.2 arm64"
+    },
+    {
+      "command": "node .tools/pnpm/package/bin/pnpm.cjs --version",
+      "exitCode": 0,
+      "output": "11.28.8"
+    }
+  ]
+}

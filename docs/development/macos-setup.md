@@ -65,3 +65,5 @@ Windows卷不迁移，本机初始化测试数据；保留真实数据时须另�
 ## Master 恢复
 
 任务合同冻结Single Writer与路径所有权，独立树使用明确分支和规范化绝对路径。自定义explorer/platform_worker/quality_reviewer已按实际工具派发；只读角色是指令约束，OS权限仍由宿主决定。未集成果保留树；只有独立审查、Mac真实验收和Linux CI门禁通过才进入main。恢复资料见 [Master交接](../handoffs/2026-10-25-mac-master.md)。
+
+M0发现并修复PowerShell/.NET环境恢复差异：未设置变量不能恢复成空字符串；现在以NullString保留unset，完整组合入口已实际验证。原因参照[.NET9环境变量行为变更](https://learn.microsoft.com/en-us/dotnet/core/compatibility/core-libraries/9.0/empty-env-variable)，回归覆盖五过程变量的unset/empty/value，不修改用户或机器环境。
