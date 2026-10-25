@@ -1,3 +1,9 @@
+# M0 当前授权增量（2026-10-25）
+
+当前执行：**M0-MAC-PORTABILITY-001**。人类在本会话正式批准 Mac Codex Master 接管与跨平台兼容验收，明确读取迁移合同第二节至文末并直接执行。允许项目隔离依赖恢复、开发容器与测试、多 Agent 独立 Worktree/任务分支、独立审查后 Master 集成 main、一个标准 Review ZIP。任务合同与验收矩阵见 [M0 任务卡](M0-MAC-PORTABILITY-001.md)。只批准 M0，不启动 G1 Wave 2 SEC/FE/OBS 或 G2；系统级改动、管理员权限、付费和不明凭证停止对应操作。下文为原 G1 历史索引，原状态不改写。
+
+---
+
 # 当前授权索引
 
 当前：**G1-INFRA-001 V2，READY_FOR_REVIEW**。本机工程验收PASS；仅允许本任务收尾核验/范围内修复与最终ZIP交付，不自动启动其他任务。最终快照/CI见[总交付记录](../evidence/G1-INFRA-001/delivery-report.md)及包内manifest。2026-10-23用户明确选择“按V2全部授权执行，采用Worktree并行”。依据为已完整读取的`OntologyPlatform-CodexMaster-G1-INFRA-001-Parallel-Worktrees-ReviewPack-V2.md`，归档在本阶段证据目录。
