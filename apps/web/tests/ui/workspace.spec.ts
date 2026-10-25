@@ -71,3 +71,33 @@ test("审计拒绝和公开注销面板", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "已安全退出" })).toBeVisible();
   await expect(page.getByRole("link", { name: /使用组织身份登录/ })).toHaveAttribute("href", "/auth/login?returnUrl=/");
 });
+
+test("390关闭导航跳过屏外Tab且响应式桌面菜单可用", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  // 原生AX树反映读屏可见性；Playwright角色选择器本身不排除inert元素。
+  const accessibility = await page.context().newCDPSession(page);
+  async function navigationIsExposed() {
+    const { nodes } = await accessibility.send("Accessibility.getFullAXTree");
+    return nodes.some(node => !node.ignored && node.role?.value === "complementary" && node.name?.value === "主导航");
+  }
+  await expect(page.getByRole("heading", { name: "平台资源", exact: true })).toBeVisible();
+  await page.keyboard.press("Tab");
+  await expect(page.getByRole("link", { name: "跳到主内容" })).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(page.getByRole("button", { name: "打开导航" })).toBeFocused();
+  await expect.poll(navigationIsExposed).toBe(false);
+  await page.getByRole("button", { name: "打开导航" }).click();
+  await expect.poll(navigationIsExposed).toBe(true);
+  await page.getByRole("button", { name: "授权范围", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "当前身份与访问边界" })).toBeVisible();
+  await expect.poll(navigationIsExposed).toBe(false);
+  await page.setViewportSize({ width: 1280, height: 1000 });
+  await expect.poll(navigationIsExposed).toBe(true);
+  await page.getByRole("button", { name: "平台资源", exact: true }).focus();
+  await expect(page.getByRole("button", { name: "平台资源", exact: true })).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("heading", { name: "平台资源", exact: true })).toBeVisible();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect.poll(navigationIsExposed).toBe(false);
+});

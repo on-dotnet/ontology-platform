@@ -1,0 +1,53 @@
+$ node .tools/pnpm/package/bin/pnpm.cjs --config.verifyDepsBeforeRun=false --filter @ontology-platform/web test:e2e
+$ playwright test
+[WebServer] (node:5981) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:5982) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 5 tests using 1 worker
+
+(node:5985) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/ui/workspace.spec.ts:6:1 › 1280布局、键盘详情、浅色持久化和Console (589ms)
+  ✓  2 tests/ui/workspace.spec.ts:29:1 › 宽屏、移动导航、授权范围与搜索空状态 (390ms)
+  ✓  3 tests/ui/workspace.spec.ts:47:1 › 加载中、403、网络错误、空集合和会话过期各自准确 (363ms)
+  ✓  4 tests/ui/workspace.spec.ts:65:1 › 审计拒绝和公开注销面板 (284ms)
+  ✘  5 tests/ui/workspace.spec.ts:75:1 › 390关闭导航跳过屏外Tab且响应式桌面菜单可用 (5.2s)
+
+
+  1) tests/ui/workspace.spec.ts:75:1 › 390关闭导航跳过屏外Tab且响应式桌面菜单可用 ────────────────────────────────────
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByRole('complementary', { name: '主导航' })
+    Expected: 0
+    Received: 1
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" getByRole('complementary', { name: '主导航' }) with timeout 5000ms
+      - waiting for getByRole('complementary', { name: '主导航' })
+        14 × locator resolved to 1 element
+           - unexpected value "1"
+
+
+      81 |   await page.keyboard.press("Tab");
+      82 |   await expect(page.getByRole("button", { name: "打开导航" })).toBeFocused();
+    > 83 |   await expect(page.getByRole("complementary", { name: "主导航" })).toHaveCount(0);
+         |                                                                  ^
+      84 |   await page.getByRole("button", { name: "打开导航" }).click();
+      85 |   await expect(page.getByRole("complementary", { name: "主导航" })).toHaveCount(1);
+      86 |   await page.getByRole("button", { name: "授权范围", exact: true }).click();
+        at /Users/chasen/.codex/worktrees/g1-wave2-fe/ontology-platform/apps/web/tests/ui/workspace.spec.ts:83:66
+
+    Error Context: artifacts/test-results/ui/workspace-390关闭导航跳过屏外Tab且响应式桌面菜单可用/error-context.md
+
+  1 failed
+    tests/ui/workspace.spec.ts:75:1 › 390关闭导航跳过屏外Tab且响应式桌面菜单可用 ─────────────────────────────────────
+  4 passed (7.9s)
+/Users/chasen/.codex/worktrees/g1-wave2-fe/ontology-platform/apps/web:
+[ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL] @ontology-platform/web@0.1.0 test:e2e: `playwright test`
+Exit status 1
+
+EXIT_CODE=1
