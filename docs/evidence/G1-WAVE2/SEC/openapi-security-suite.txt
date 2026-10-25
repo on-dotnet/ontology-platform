@@ -1,0 +1,30 @@
+COMMAND: ['docker', 'run', '--detach', '--name', 'wave2-sec-openapi-0b17c8edc3cd', '--env', 'POSTGRES_PASSWORD', '--env', 'POSTGRES_DB', '--publish', '127.0.0.1::5432', '--tmpfs', '/var/lib/postgresql', 'postgres:18.6-trixie@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6']
+EXIT: 0
+63a5a76a2378dde0b12d5b719eb418240c128c2428f8f584e8b5db2eee2f13b1
+
+COMMAND: ['dotnet', 'tool', 'run', 'dotnet-ef', 'database', 'update', '--project', 'backend/src/Modules/Governance/OntologyPlatform.Modules.Governance', '--startup-project', 'backend/src/Modules/Governance/OntologyPlatform.Modules.Governance', '--no-build']
+EXIT: 0
+Failed executing DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM governance."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261025062847_InitialGovernance'.
+Done.
+
+COMMAND: ['dotnet', 'test', '--project', 'backend/tests/OntologyPlatform.SecurityTests', '--no-restore']
+EXIT: 0
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已跳过 RealIssuerPushRetainsCodePkceStateAndNonce
+  Assert.Inconclusive。 NOT_RUN: 未注入本轮专用Keycloak运行时配置。
+  从 /Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+/Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64) 已通过 (5s 377ms)
+
+测试运行摘要: 已通过!
+  总计: 13
+  失败: 0
+  成功: 12
+  已跳过: 1
+  持续时间: 5s 960ms
+
+PASS: Full C# source suite used dedicated PG18 and actual Kestrel-generated OpenAPI. RealIssuerPush is explicitly NOT_RUN because the shared identity runtime was not consumed during Master persistence checks.

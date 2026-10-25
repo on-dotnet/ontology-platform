@@ -109,6 +109,86 @@ public sealed class HttpSecurityTests
         Assert.AreEqual(HttpStatusCode.BadRequest, (await client.GetAsync("/health/live")).StatusCode);
     }
 
+    /// <summary>真实运行导出的OpenAPI必须声明重定向、安全负例及必需错误扩展字段。</summary>
+    /// <returns>Kestrel实际生成文档的合同核对任务。</returns>
+    [TestMethod]
+    public async Task RuntimeOpenApiDeclaresRedirectsAndCompleteErrors()
+    {
+        // 文档生成走正式宿主，不以静态JSON或端点配置读取替代真实导出。
+        using var fixture = new SecurityHostFixture();
+        // OpenAPI在开发回环可读，生成文档不应连接数据库或身份服务。
+        await using var app = fixture.Create();
+        await app.StartAsync();
+        // 真实HTTP客户端读取当前编译源码所生成的文档。
+        using var client = fixture.CreateClient(app);
+        // 响应正文只包含公共schema，不包含认证或运行时配置。
+        using var response = await client.GetAsync("/openapi/v1.json");
+        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+        // 按路径和方法核对冻结的关键状态码集合。
+        using var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        // 预期为公开合同常量，断言不输出任何请求秘密。
+        var expected = new Dictionary<string, string[]>
+        {
+            ["get /auth/login"] = ["302", "400"],
+            ["post /auth/logout"] = ["302", "401", "403"],
+            ["get /signin-oidc"] = ["400"],
+            ["get /health/live"] = ["200", "401"],
+            ["get /health/ready"] = ["200", "401", "503"],
+            ["get /api/v1/platform/me"] = ["200", "401", "403", "503"],
+            ["get /auth/csrf"] = ["200"],
+            ["get /api/v1/platform/resources"] = ["200", "401", "403", "503"],
+            ["get /api/v1/platform/resources/{id}"] = ["200", "401", "403", "404", "503"],
+            ["get /api/v1/platform/audit"] = ["200", "400", "401", "403", "503"]
+        };
+        // 逐条读取公开路由的实际响应定义，避免只测某一个正常路径。
+        foreach (var entry in expected)
+        {
+            // 键使用固定的方法/路径对，方便失败时指出公共合同位置。
+            var parts = entry.Key.Split(' ', 2);
+            // 每个响应读取自真实生成文档而非手工构造。
+            var responses = document.RootElement.GetProperty("paths").GetProperty(parts[1]).GetProperty(parts[0]).GetProperty("responses");
+            CollectionAssert.AreEquivalent(entry.Value, responses.EnumerateObject().Select(value => value.Name).ToArray(), entry.Key);
+            // 已认证API与注销使用session；内部探针使用独立health头方案。
+            var scheme = parts[1].StartsWith("/api/v1/platform/", StringComparison.Ordinal) || parts[1] == "/auth/logout"
+                ? "session" : parts[1].StartsWith("/health/", StringComparison.Ordinal) ? "health" : null;
+            if (scheme is not null)
+            {
+                Assert.IsTrue(document.RootElement.GetProperty("paths").GetProperty(parts[1]).GetProperty(parts[0])
+                    .GetProperty("security")[0].TryGetProperty(scheme, out _), entry.Key);
+            }
+            // 每个错误状态都必须提供相同完整schema。
+            foreach (var status in entry.Value.Where(value => int.Parse(value, System.Globalization.CultureInfo.InvariantCulture) >= 400))
+            {
+                // 每种错误都引用完整公共错误类型，媒体类型不回落普通JSON。
+                var schema = responses.GetProperty(status).GetProperty("content").GetProperty("application/problem+json").GetProperty("schema");
+                Assert.AreEqual("#/components/schemas/PlatformProblem", schema.GetProperty("$ref").GetString(), entry.Key + " " + status);
+            }
+        }
+        // 每个冻结DTO的字段必须明确必需；审计范围可以null但不能省略字段。
+        var requiredFields = new Dictionary<string, string[]>
+        {
+            ["PlatformIdentity"] = ["subjectId", "displayName", "roles", "scopes"],
+            ["PlatformScope"] = ["organizationId", "siteId"],
+            ["PlatformResource"] = ["id", "name", "organizationId", "siteId", "status"],
+            ["PlatformResourceList"] = ["items", "auditId", "traceId"],
+            ["PlatformAuditEntry"] = ["id", "occurredAtUtc", "actor", "action", "resource", "outcome", "traceId", "correlationId", "organizationId", "siteId"],
+            ["CsrfResponse"] = ["requestToken"],
+            ["PlatformProblem"] = ["type", "status", "title", "code", "traceId", "correlationId"]
+        };
+        // 所有字段要求均在运行文档中检查，不能只读取C#属性或JsonRequired。
+        foreach (var entry in requiredFields)
+        {
+            // 生成文档中的required集合是客户端工具实际消费的合同。
+            var required = document.RootElement.GetProperty("components").GetProperty("schemas").GetProperty(entry.Key).GetProperty("required")
+                .EnumerateArray().Select(value => value.GetString()).ToArray();
+            CollectionAssert.IsSubsetOf(entry.Value, required, entry.Key);
+        }
+        // session方案只描述安全Cookie引用，不能宣称浏览器持有Bearer token。
+        var session = document.RootElement.GetProperty("components").GetProperty("securitySchemes").GetProperty("session");
+        Assert.AreEqual("cookie", session.GetProperty("in").GetString());
+        Assert.AreEqual(".OntologyPlatform.Session", session.GetProperty("name").GetString());
+    }
+
     /// <summary>向本轮真实Keycloak推送授权，记录五个安全布尔并观察前端仅含PAR引用。</summary>
     /// <returns>正式宿主与真实签发者的推送验证任务。</returns>
     [TestMethod]
