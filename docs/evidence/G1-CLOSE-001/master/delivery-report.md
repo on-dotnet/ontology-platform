@@ -15,7 +15,7 @@
 | 运行项 | 结果/原始证据 |
 |---|---|
 | 受锁restore、Release build、format | PASS，0编译错误；保留ASPIRE010/format workspace警告；baseline-restore/final-release-build/final-format |
-| 全安全/迁移真实PG+Keycloak | PASS 45/45、0skip；原14+SEC13+OBS17+迁移1；final-release-security |
+| 全安全/迁移真实PG+Keycloak | PASS 46/46、0skip；原14+SEC13+OBS17+迁移2；final-release-security |
 | Infrastructure | PASS 4/4，final-infrastructure |
 | 标准SelfTest | PASS；包含ReviewPackage35正反项；final-selftest/打包前策略复验 |
 | Web lint/typecheck/Vitest/build | PASS，6单测；精确Node24.22.1/pnpm11.28.8；final-web |
@@ -49,3 +49,7 @@
 Windows原生、Intel Mac NOT_RUN；全镜像CVE/SBOM/签名NOT_VERIFIED；生产证书轮换/HA跨主机SSR/SLO/RPO/RTO未验证。当前API Web:Origin仅回环HTTP，不能当HA方案；ADR-008列未来前置。main.protected=false仍只读事实、rulesets403套餐限制，ADR-007仅建议，未改设置/套餐/可见性。G2只有接口/合成样例/DAG文档，不含功能源码、进程或模型调用。
 
 当前无系统管理员/全局工具/系统信任/收费服务/生产凭证改动，无新依赖/锁变更；原checkout六个.DS_Store保留。开发栈验收后正常停止，六卷与忽略私有runtime保留以便恢复，不打包。有限扫描不是全面防泄露，审查包按标准重新打开逐成员验证。最终只交一个ZIP，停止等待ChatGPT复审。
+
+## 最终审查增量
+
+ade0476整体Review发现并发Down丢范围Important与四证据EOF空白Minor，均按真实红绿/散列修正。检查前同事务ACCESS EXCLUSIVE锁+后续新语句快照，精确pg_locks并发负例旧实现删列FAIL、修复后保留完整范围；最新Release46/46无skip，format通过。前一代45/45输出完整保留，最终安全结果见race-green-full。旧候选CI40219134362两个job success，但该成功不能代替并发修复新Head CI。

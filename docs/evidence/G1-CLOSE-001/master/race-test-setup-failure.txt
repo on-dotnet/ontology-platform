@@ -1,0 +1,49 @@
+0f5117e3c146c732a4a444a0146c833c083bd15f14c27f21fb0eb9c5c222e0ab
+工具“dotnet-ef”(版本“10.0.13”)已还原。可用的命令: dotnet-ef
+
+还原成功。
+Failed executing DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM governance."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261025062847_InitialGovernance'.
+Applying migration '20261025144246_AuditScopeSites'.
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Done.
+cfd48e2afe27d4ec5b13795be141b3a0c8277e178b7a5bfbe5fd3eba082cadf6
+{"status": "CREATED", "realm": "wave2-b9e9669ba7cc5448", "identities": ["wave2-viewer-a", "wave2-viewer-b", "wave2-no-role-a", "wave2-operator-a", "wave2-auditor-a"], "secrets": "runtime-only"}
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g1-close-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+失败 ConcurrentFirstScopeWriteCannotBeLostByRollback (363ms)
+  从 /Users/chasen/.codex/worktrees/g1-close-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+  测试方法 OntologyPlatform.SecurityTests.AuditScopeMigrationTests。ConcurrentFirstScopeWriteCannotBeLostByRollback 引发了异常:
+  System.InvalidCastException: Writing values of 'System.UInt32' is not supported for parameters having no NpgsqlDbType or DataTypeName. Try setting one of these values to the expected database type..
+    在 Npgsql.Internal.AdoSerializerHelpers.<GetTypeInfoForWriting>g__ThrowWritingNotSupported|1_0(Type type, PgSerializerOptions options, Nullable`1 pgTypeId, Nullable`1 npgsqlDbType, Exception inner)
+    在 Npgsql.Internal.AdoSerializerHelpers.GetTypeInfoForWriting(Type type, Nullable`1 pgTypeId, PgSerializerOptions options, Nullable`1 npgsqlDbType)
+    在 Npgsql.NpgsqlParameter.ResolveTypeInfo(PgSerializerOptions options, IDbTypeResolver dbTypeResolver)
+    在 Npgsql.NpgsqlParameterCollection.ProcessParameters(ReloadableState reloadableState, Boolean validateValues, CommandType commandType)
+    在 Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+    在 Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+    在 Npgsql.NpgsqlCommand.ExecuteScalar(Boolean async, CancellationToken cancellationToken)
+    在 OntologyPlatform.SecurityTests.AuditScopeMigrationTests.ConcurrentFirstScopeWriteCannotBeLostByRollback() 位于 /Users/chasen/.codex/worktrees/g1-close-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/AuditScopeMigrationTests.cs:172
+    在 OntologyPlatform.SecurityTests.AuditScopeMigrationTests.ConcurrentFirstScopeWriteCannotBeLostByRollback() 位于 /Users/chasen/.codex/worktrees/g1-close-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/AuditScopeMigrationTests.cs:201
+    在 OntologyPlatform.SecurityTests.AuditScopeMigrationTests.ConcurrentFirstScopeWriteCannotBeLostByRollback() 位于 /Users/chasen/.codex/worktrees/g1-close-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/AuditScopeMigrationTests.cs:201
+    在 OntologyPlatform.SecurityTests.AuditScopeMigrationTests.ConcurrentFirstScopeWriteCannotBeLostByRollback() 位于 /Users/chasen/.codex/worktrees/g1-close-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/AuditScopeMigrationTests.cs:201
+    在 OntologyPlatform.SecurityTests.AuditScopeMigrationTests.ConcurrentFirstScopeWriteCannotBeLostByRollback() 位于 /Users/chasen/.codex/worktrees/g1-close-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/AuditScopeMigrationTests.cs:201
+    在 OntologyPlatform.SecurityTests.AuditScopeMigrationTests.ConcurrentFirstScopeWriteCannotBeLostByRollback() 位于 /Users/chasen/.codex/worktrees/g1-close-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/AuditScopeMigrationTests.cs:201
+    在 OntologyPlatform.SecurityTests.AuditScopeMigrationTests.ConcurrentFirstScopeWriteCannotBeLostByRollback() 位于 /Users/chasen/.codex/worktrees/g1-close-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/AuditScopeMigrationTests.cs:201
+    在 OntologyPlatform.SecurityTests.AuditScopeMigrationTests.ConcurrentFirstScopeWriteCannotBeLostByRollback() 位于 /Users/chasen/.codex/worktrees/g1-close-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/AuditScopeMigrationTests.cs:208
+    在 OntologyPlatform.SecurityTests.AuditScopeMigrationTests.ConcurrentFirstScopeWriteCannotBeLostByRollback() 位于 /Users/chasen/.codex/worktrees/g1-close-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/AuditScopeMigrationTests.cs:208
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+
+/Users/chasen/.codex/worktrees/g1-close-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64) 失败并出现 1 个错误 (1s 446ms)
+退出代码: 2
+
+测试运行摘要: 失败!
+  总计: 1
+  失败: 1
+  成功: 0
+  已跳过: 0
+  持续时间: 2s 085ms
+已完成测试运行，但显示非成功退出代码: 2 (请参阅: https://aka.ms/testingplatform/exitcodes)
+FAIL: real governance integration; details retained only after sanitization

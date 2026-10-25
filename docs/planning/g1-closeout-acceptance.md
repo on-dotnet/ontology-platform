@@ -18,7 +18,7 @@
 | 原G1标准 | 实际能力与界限 | 本轮状态/负责后续 |
 |---|---|---|
 | 固定工具链/CI/模块边界 | 当前锁、隔离pnpm、真实solution和独立模块；Linux同HeadCI按manifest | PASS（Mac受锁/Release/format/SelfTest，实际CI待最终Head绑定）；见本轮报告 |
-| 真实登录/拒绝/Shell/API/OpenAPI | 已有真实链路，本次必须重跑，审计成功/500合同为增量 | PASS（45安全/4Infra、310协议、UI5/OIDC2、真实OpenAPI）；见本轮报告 |
+| 真实登录/拒绝/Shell/API/OpenAPI | 已有真实链路，本次必须重跑，审计成功/500合同为增量 | PASS（46安全/4Infra、310协议、UI5/OIDC2、真实OpenAPI）；见本轮报告 |
 | PG审计/Outbox | PG会话/登录注销/资源/拒绝审计已实现；本次补audit-read。通用发布Outbox尚无真实消费者/实现 | 审计本轮验收；Outbox NOT_RUN，G2发布事务首次需要时实施，不冒充G1完整交付 |
 | Jena/RustFS开发资源 | M0/INFRA有真实资源/探针持久证据；本轮Wave2使用7容器模型，无Jena正式发布/S3完整兼容承诺 | 开发能力历史PASS；Jena正式发布、RustFS各消费者PoC G2/G8 NOT_RUN |
 | OTel与中文入口 | 自建LGTM、4中文技术面板和原生安全日志；完整业务查询树/运行中心未实现 | 本轮诊断重跑；完整产品运维 G2-G8分期 |
@@ -66,4 +66,4 @@
 
 阶段结论必须保留PARTIAL：本轮修复通过只表明两P1闭合及已跑链路不退化；缺失Outbox/业务RUM/生产目标与跨平台验证不通过重命名历史变成PASS。
 
-本次Mac实际结果：两P1收口与授权纵向回归PASS，完整45/4/6/5/2/310、真实LGTM16、七容器持久化14与进程替换/告警证据见[本轮报告](../evidence/G1-CLOSE-001/master/delivery-report.md)。本地结果不替代最终同Head Linux CI与独立总体Review，整体阶段继续PARTIAL。
+本次Mac实际结果：两P1收口与授权纵向回归PASS，完整46/4/6/5/2/310、真实LGTM16、七容器持久化14与进程替换/告警证据见[本轮报告](../evidence/G1-CLOSE-001/master/delivery-report.md)。本地结果不替代最终同Head Linux CI与独立总体Review，整体阶段继续PARTIAL。

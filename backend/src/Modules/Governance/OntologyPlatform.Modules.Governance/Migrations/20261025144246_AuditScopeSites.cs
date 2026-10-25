@@ -22,6 +22,8 @@ namespace OntologyPlatform.Modules.Governance.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            // 与检查和删列共用迁移事务；先等并发写入提交，再以新语句快照检查真实事实。
+            migrationBuilder.Sql("LOCK TABLE governance.audit_records IN ACCESS EXCLUSIVE MODE;");
             // 结构化范围是已提交审计事实；存在任何新范围（包括空数组）时禁止破坏性降级。
             migrationBuilder.Sql("""
                 DO $$ BEGIN

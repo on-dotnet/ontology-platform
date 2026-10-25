@@ -70,3 +70,5 @@
 集成账本：SEC 5d92109经独立0/0/0审查在357345f合入Master；OBS240929c经0Critical/0Important/2Minor审查在Master合入，737c38d两个证据Minor限定复审已闭环，待同步。集成Release安全45/45无跳过、实际OpenAPI PASS。真正LGTM验收先9项事实/失败关闭/恢复PASS，但EventId/EventName出口缺失FAIL（trace22e6a80c6fc2a7c67630be18a37612e2）；已交OBS调查修复，不放宽断言。main仍Base，完整LGTM/CI/最终审查未完成。
 
 2026-10-26收口账本：OBS19355e0出口身份映射已独立0/0/0复审，Master集成重启专用Alloy后真正16项LGTM PASS；最终Release45/45/Infra4/4/Web6/UI5/OIDC2/协议310均PASS。原PG恢复脚本仅等API1导致API2旧池503已真实重现，双实例门禁加强后注销两401及七容器14项均PASS，服务端未改。告警触发恢复/实际四中文面板与两实例指标通过；旧Cookie跨三个全新PID通过。全部开发栈已正常停止，私有资产/六卷保留；main待整体Review+最终CI后集成。
+
+最终审查修复账本：ade0476发现Down并发丢范围Important，Master真实pg_locks竞争复现后加同事务检查前表锁，完整Release46/46与format通过；四原始证据只规范化EOF空行并记录散列。等待固定新头限定复审/CI，不将前代CI成功当当前通过。
