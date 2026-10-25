@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "docker",
+    "run",
+    "--pull=never",
+    "--rm",
+    "--network",
+    "none",
+    "--mount",
+    "type=bind,src=/Users/chasen/.codex/worktrees/g1-wave2-obs/ontology-platform/infra/observability/alloy/config.alloy,dst=/etc/alloy/config.alloy,readonly",
+    "-e",
+    "LOKI_OTLP_ENDPOINT=http://loki:3100/otlp",
+    "-e",
+    "TEMPO_OTLP_ENDPOINT=http://tempo:4318",
+    "-e",
+    "PROMETHEUS_OTLP_ENDPOINT=http://prometheus:9090/api/v1/otlp",
+    "grafana/alloy:v1.21.2@sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18",
+    "validate",
+    "/etc/alloy/config.alloy"
+  ],
+  "startedAtUtc": "2026-10-25T06:30:36.395367+00:00",
+  "exitCode": 0,
+  "stdout": "",
+  "stderr": ""
+}
