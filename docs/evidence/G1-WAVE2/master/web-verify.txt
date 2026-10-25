@@ -1,0 +1,42 @@
+Scope: all 2 workspace projects
+Already up to date
+Done in 151ms using pnpm v11.28.8
+$ eslint .
+$ tsc --noEmit
+$ vitest run
+
+ RUN  v5.0.5 /Users/chasen/.codex/worktrees/g1-wave2-master/ontology-platform/apps/web
+
+
+ Test Files  1 passed (1)
+      Tests  6 passed (6)
+   Start at  14:30:18
+   Duration  352ms (transform 40%, tests 30%, import 18%, worker 11%)
+
+$ next build
+▲ Next.js 16.4.3 (Turbopack)
+✓ Running next.config.ts took 692ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 822ms
+  Running TypeScript ...
+  Finished TypeScript in 815ms ...
+  Collecting page data using 6 workers ...
+  Generating static pages using 6 workers (0/4) ...
+  Generating static pages using 6 workers (1/4)
+  Generating static pages using 6 workers (2/4)
+  Generating static pages using 6 workers (3/4)
+✓ Generating static pages using 6 workers (4/4) in 129ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ƒ /
+├ ○ /_not-found
+├ ○ /icon.svg
+└ ○ /signed-out
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
+PASS: exact Node/pnpm; separate Web lint/typecheck/test/build. Real OIDC/E2E is a separate acceptance.

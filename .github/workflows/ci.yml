@@ -1,4 +1,4 @@
-name: Engineering baseline
+name: Engineering and platform foundation
 on:
   push:
   pull_request:
@@ -27,14 +27,40 @@ jobs:
       - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:
           global-json-file: global.json
-      - name: Restore exact committed infrastructure graph
+      - name: Restore exact committed platform graph
         shell: pwsh
         run: |
           dotnet restore backend/OntologyPlatform.slnx --locked-mode
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-      - name: Build format and real infrastructure host tests
+      - name: Frozen Web restore and separate lint typecheck test build
         shell: pwsh
-        run: ./scripts/verify.ps1 -RunNative -RunTests
+        run: ./scripts/verify-web.ps1 -Restore
+      - name: Runtime output boundary negatives
+        shell: pwsh
+        run: python3 scripts/tests/Wave2Runtime.Tests.py
+      - name: Build format and real host security tests
+        shell: pwsh
+        run: ./scripts/verify.ps1 -RunNative -RunTests -SkipWeb
       - name: Scope notice
         shell: pwsh
-        run: Write-Output 'NOT_RUN - containers, business features, frontend and E2E are outside this CI job; local container evidence is recorded separately.'
+        run: Write-Output 'Web checks ran separately above; real browser OIDC/LGTM acceptance is recorded separately. Governance container tests run in the mandatory integration job.'
+  governance-integration:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+      - name: Frozen restore and backend build
+        shell: pwsh
+        run: |
+          dotnet restore backend/OntologyPlatform.slnx --locked-mode
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet build backend/OntologyPlatform.slnx --no-restore
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Real PostgreSQL security integration
+        shell: pwsh
+        run: python3 scripts/acceptance/test-governance.py

@@ -1,4 +1,5 @@
 using Aspire.Hosting;
+using Microsoft.Extensions.Configuration;
 
 namespace OntologyPlatform.AppHost;
 
@@ -16,7 +17,14 @@ internal static class Program
     {
         // 将路径解析、秘密参数和容器生命周期交给 Aspire 标准宿主。
         var builder = DistributedApplication.CreateBuilder(args);
-        builder.AddDevelopmentInfrastructure();
+        if (builder.Configuration.GetValue<bool>("Wave2:Enabled"))
+        {
+            builder.AddWave2Infrastructure();
+        }
+        else
+        {
+            builder.AddDevelopmentInfrastructure();
+        }
         await builder.Build().RunAsync();
     }
 }

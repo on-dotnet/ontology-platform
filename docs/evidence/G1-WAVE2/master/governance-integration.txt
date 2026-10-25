@@ -1,0 +1,21 @@
+5bbf331790c6c79e5e03bde3c97b419bbc1ff283b894b2803e9fd8059ee72733
+工具“dotnet-ef”(版本“10.0.13”)已还原。可用的命令: dotnet-ef
+
+还原成功。
+Failed executing DbCommand (11ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM governance."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261025062847_InitialGovernance'.
+Done.
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g1-wave2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+/Users/chasen/.codex/worktrees/g1-wave2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64) 已通过 (4s 123ms)
+
+测试运行摘要: 已通过!
+  总计: 9
+  失败: 0
+  成功: 9
+  已跳过: 0
+  持续时间: 4s 419ms
+PASS: real PostgreSQL shared encrypted tickets, revocation, expiry and audit integration.

@@ -11,11 +11,11 @@ try {
     Push-Location $Root
     try {
         if ($Restore) {
-            & $tools.nodePath $tools.pnpmPath install --frozen-lockfile
+            & $tools.nodePath $tools.pnpmPath install --frozen-lockfile --store-dir (Join-Path $Root '.tools/pnpm-store')
             if ($LASTEXITCODE -ne 0) { throw 'Frozen Web restore failed' }
         }
         foreach ($task in @('lint', 'typecheck', 'test', 'build')) {
-            & $tools.nodePath $tools.pnpmPath --dir apps/web run $task
+            & $tools.nodePath $tools.pnpmPath --config.verifyDepsBeforeRun=error --dir apps/web run $task
             if ($LASTEXITCODE -ne 0) { throw "Web $task failed" }
         }
     } finally { Pop-Location }

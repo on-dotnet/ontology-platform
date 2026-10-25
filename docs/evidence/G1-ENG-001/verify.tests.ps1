@@ -66,7 +66,7 @@ try {
     try { $expectedNativeLocation = (Get-Location).Path }
     finally { Pop-Location }
     Push-Location $tempBase
-    try { & (Join-Path $repoRoot 'scripts/verify.ps1') -Root $fixtureRoot -RunNative }
+    try { & (Join-Path $repoRoot 'scripts/verify.ps1') -Root $fixtureRoot -RunNative -SkipWeb }
     finally { Pop-Location }
     Assert-Check ($nativeCalls.Count -eq 2 -and @($nativeCalls | Where-Object { $_.Location -ne $expectedNativeLocation }).Count -eq 0) 'native commands resolve SDK and config from selected Root'
     Write-Output "Checker tests: $testCount passed; application tests: NOT_RUN."

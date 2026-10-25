@@ -11,6 +11,7 @@ param(
     [switch]$SelfTest,
     [switch]$RunNative,
     [switch]$RunTests,
+    [switch]$SkipWeb,
     [string]$ToolRoot = $Root,
     [switch]$Library
 )
@@ -221,10 +222,11 @@ try {
         }
     } else { Write-Output 'NOT_RUN: .NET原生检查需显式-RunNative及对应任务授权。' }
     $web = Get-Content -Raw (Join-Path $Root 'apps/web/package.json') | ConvertFrom-Json -AsHashtable
-    if ($RunNative -and $web.scripts -and $web.scripts.ContainsKey('build')) {
+    if ($RunNative -and -not $SkipWeb -and $web.scripts -and $web.scripts.ContainsKey('build')) {
         & (Join-Path $PSScriptRoot 'verify-web.ps1') -Root $Root
         if (-not $?) { exit 1 }
     } else { Write-Output 'NOT_RUN: Web独立检查需真实目标及显式-RunNative。' }
+    if ($SkipWeb) { Write-Output 'NOT_RUN: Web检查被显式-SkipWeb跳过，仅用于隔离工程检查器fixture或独立验收。' }
     Write-Output 'NOT_RUN: 浏览器真实OIDC/E2E需独立受控联调，不隐式混入工程检查。'
     Write-Output 'PASS: 所选工程检查；范围以逐项输出为准，不表示业务、前端或整个G1通过。'
     exit 0

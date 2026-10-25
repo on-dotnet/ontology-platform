@@ -19,7 +19,7 @@
 1. fetch/main/全树/doctor门禁、依赖官方来源/许可登记，更新授权；Master冻结最小契约并独立Review。
 2. SEC/FE/OBS从已审合同提交并行。Master唯一处理公共根版本/锁/DTO/迁移/AppHost接线。FE解析锁先输出忽略.tools/fe-lock，Master生成正式根锁；SEC直接项目restore可关闭生成锁，正式锁Master产生。
 3. 各专项真实可验证里程碑commit/push，PARTIAL/DRAFT明确；独立只读Review，修复交回Owner，不抢写。通过独立Review+适用契约/集成测试+同Head Linux CI后分批进入main并push。
-4. 正式API+Next+专用KeycloakRealm/PG会话/审计/共享证书keyring+LGTM9资源，真实纵向验收与负例、双实例、重启；原4测试保留。
+4. 正式API+Next+专用KeycloakRealm/PG会话/审计/共享证书keyring+LGTM五资源（共7容器、2个API实例和Next进程），真实纵向验收与负例、双实例、重启；原4测试保留。
 5. 更新合同/ADR/运行手册、完整原始脱敏证据/截图/CI/风险矩阵，独立总审查，一个标准Review ZIP并重开，停止输出G1_WAVE2_READY_FOR_REVIEW。
 
 ## 禁止与门禁

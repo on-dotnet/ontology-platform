@@ -22,7 +22,7 @@ try {
         $expectedValues = @{}
         foreach ($environmentName in $environmentNames) { $expectedValues[$environmentName] = [Environment]::GetEnvironmentVariable($environmentName, 'Process') }
         $nativeCalls = [Collections.Generic.List[string]]::new()
-        $messages = @(& $VerifyScript -Root $repositoryRoot -ToolRoot $temporaryTools -RunNative)
+        $messages = @(& $VerifyScript -Root $repositoryRoot -ToolRoot $temporaryTools -RunNative -SkipWeb)
         if ($LASTEXITCODE -ne 0 -or $nativeCalls.Count -ne 2) { throw "Environment fixture failed to exercise two native calls ($state)" }
         foreach ($environmentName in $environmentNames) {
             $actualValue = [Environment]::GetEnvironmentVariable($environmentName, 'Process')
