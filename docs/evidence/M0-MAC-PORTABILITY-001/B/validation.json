@@ -1,0 +1,46 @@
+{
+  "checks": [
+    {
+      "name": "native-image-manifests",
+      "command": "docker buildx imagetools inspect (four exact pinned image indexes; see validation.md)",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Four OCI indexes expose linux/arm64 variants; exact index and child digests recorded."
+    },
+    {
+      "name": "apphost-two-sessions",
+      "command": "dotnet run --no-build --no-restore --project backend/src/AppHost/OntologyPlatform.AppHost.csproj",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "DCP/Dashboard started; six HTTP endpoints200, native ARM64 containers, only loopback bindings; both sessions stopped exit0."
+    },
+    {
+      "name": "four-resource-persistence",
+      "command": "pwsh -NoProfile -File infra/development/test-resource-persistence.ps1 -VolumePrefix m0-mac-b-20261025 -PostgresContainer postgres-dpsuefdm -FusekiContainer fuseki-dbucruvp -RustfsContainer rustfs-qbvfvptr -KeycloakContainer keycloak-ytkejubw",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "PG/Fuseki/RustFS marker bf2ba15d9ca6488984024ca5283e2000 persisted; Keycloak identity stable after restart."
+    },
+    {
+      "name": "authenticated-trace-query",
+      "command": "GET /api/telemetry/traces/f839abe3f6f2ae5cde90e09c3e16d304 with process-only X-API-Key",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "HTTP200,returnedCount1,exact TraceId/parent/resource matched; missing-key negative HTTP401."
+    },
+    {
+      "name": "b-tree-legacy-selftest",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1 -SelfTest",
+      "status": "BLOCKED",
+      "exitCode": 1,
+      "output": "B tree lacks .tools/pythonlibs; both original and external PYTHONPATH attempts fail structured parser; no bypass. Master integrated suite separately verified."
+    }
+  ],
+  "ci": {
+    "status": "NOT_VERIFIED",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  }
+}
