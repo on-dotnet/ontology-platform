@@ -1,0 +1,7 @@
+{
+  "status": "FAIL",
+  "observedFailure": "AttributeError: urllib.request.Request has no method attribute",
+  "phase": "first health response evidence save",
+  "repair": "request.get_method(); actual loopback HTTP regression added",
+  "note": "Original run created this empty directory before the exception; this note preserves the failure, not a successful response."
+}

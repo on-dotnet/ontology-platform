@@ -1,0 +1,24 @@
+{
+  "atUtc": "2026-10-25T09:22:49.026551+00:00",
+  "method": "GET",
+  "url": "http://localhost:19095/api/v1/query?query=sum%28platform_requests_total%7Bservice_name%3D%22ontology-platform-api%22%7D%29&time=1792920168.024399",
+  "httpStatus": 200,
+  "responseHeaders": {
+    "Content-Type": "application/json"
+  },
+  "response": {
+    "status": "success",
+    "data": {
+      "resultType": "vector",
+      "result": [
+        {
+          "metric": {},
+          "value": [
+            1792920168.024,
+            "121"
+          ]
+        }
+      ]
+    }
+  }
+}

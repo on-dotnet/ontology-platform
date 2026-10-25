@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "python3",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "infra/observability/tests",
+    "-v"
+  ],
+  "observedAtUtc": "2026-10-25T10:51:47.362035+00:00",
+  "status": "PASS",
+  "exitCode": 0,
+  "stdout": "",
+  "stderr": "test_actual_http_success_is_saved_with_method_and_safe_headers (test_runtime_queries.QueryAssertions.test_actual_http_success_is_saved_with_method_and_safe_headers) ... ok\ntest_counter_instances_are_aggregated_after_independent_series (test_runtime_queries.QueryAssertions.test_counter_instances_are_aggregated_after_independent_series) ... ok\ntest_missing_second_instance_is_rejected (test_runtime_queries.QueryAssertions.test_missing_second_instance_is_rejected) ... ok\ntest_remote_or_credential_origin_is_rejected (test_runtime_queries.QueryAssertions.test_remote_or_credential_origin_is_rejected) ... ok\ntest_secret_fields_are_redacted_recursively (test_runtime_queries.QueryAssertions.test_secret_fields_are_redacted_recursively) ... ok\ntest_three_loki_index_labels_are_allowed (test_runtime_queries.QueryAssertions.test_three_loki_index_labels_are_allowed) ... ok\ntest_trace_attribute_does_not_count_as_loki_index (test_runtime_queries.QueryAssertions.test_trace_attribute_does_not_count_as_loki_index) ... ok\ntest_unbounded_instance_is_rejected (test_runtime_queries.QueryAssertions.test_unbounded_instance_is_rejected) ... ok\ntest_unbounded_label_fails_cardinality_check (test_runtime_queries.QueryAssertions.test_unbounded_label_fails_cardinality_check) ... ok\n\n----------------------------------------------------------------------\nRan 9 tests in 0.509s\n\nOK\n"
+}
