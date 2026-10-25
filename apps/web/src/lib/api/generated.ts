@@ -61,6 +61,8 @@ export interface PlatformAuditEntry {
   organizationId: string | null;
   /** 事件适用的厂区范围，匿名时可空。 */
   siteId: string | null;
+  /** 完整事件厂区集合；历史未知为null，明确无厂区为空数组。 */
+  scopeSiteIds: Array<string> | null;
 }
 
 export interface CsrfResponse {

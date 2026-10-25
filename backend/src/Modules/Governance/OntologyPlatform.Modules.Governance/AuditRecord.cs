@@ -30,6 +30,9 @@ public sealed class AuditRecord
     /// <summary>事件所属组织，匿名时为空。</summary>
     public string? OrganizationId { get; set; } = null;
 
-    /// <summary>事件所属厂区，无单厂范围时为空。</summary>
+    /// <summary>真实授权厂区集合；历史未知为null，明确无厂区为独立空数组。</summary>
+    public string[]? ScopeSiteIds { get; set; }
+
+    /// <summary>兼容的唯一厂区；多厂区和无厂区时为空，不代表组织全局权限。</summary>
     public string? SiteId { get; set; } = null;
 }

@@ -16,7 +16,7 @@
 
 | Owner | 分支/独立托管Worktree | owned_paths | read_only_dependencies |
 |---|---|---|---|
-| Master | codex/G1-CLOSE-001-master; /Users/chasen/.codex/worktrees/g1-close-master/ontology-platform | 公共Contracts/OpenAPI/生成TS、Governance AuditRecord/DbContext/Migrations、既有HttpSecurityTests合同断言、新AuditScopeMigrationTests、scripts/acceptance/**、CI、docs总卡/授权/阶段/证据 | 专项源码只审查集成 |
+| Master | codex/G1-CLOSE-001-master; /Users/chasen/.codex/worktrees/g1-close-master/ontology-platform | 公共Contracts/OpenAPI/生成TS、PlatformProblem.cs运行错误工厂、Governance AuditRecord/DbContext/Migrations、既有HttpSecurityTests合同断言、新AuditScopeMigrationTests、scripts/acceptance/**、CI、docs总卡/授权/阶段/证据 | 专项源码只审查集成 |
 | SEC | codex/G1-CLOSE-SEC; /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform | PlatformEndpoints.cs、Security/AuditService.cs、新AuditReadTests.cs及专属helper、docs/evidence/G1-CLOSE-001/SEC/** | Host/Telemetry/公共DTO/模块模型/迁移/锁/CI只读 |
 | OBS | codex/G1-CLOSE-OBS; /Users/chasen/.codex/worktrees/g1-close-obs/ontology-platform | PlatformApiHost.cs、PlatformTelemetry.cs、新PlatformFailure*.cs、新ObservabilityFailureTests.cs及专属helper、infra/observability/alloy/config.alloy、docs/evidence/G1-CLOSE-001/OBS/** | Endpoints/AuditService/现有测试/ServiceDefaults/公共合同/迁移/锁/CI只读 |
 | Independent Reviewer | 只读固定提交/差异/实际证据 | 无 | 全部范围 |
@@ -51,7 +51,8 @@
 ## DAG与任务
 
 - [x] 0: 完读授权、fetch确认Base、全树状态和工具诊断；原checkout六个.DS_Store保留，各历史树干净，未清理。新建三个独立托管树/任务分支。
-- [ ] 1: Master冻结上述契约并独立只读Review；模块模型/DTO/迁移，受锁restore/build与真实迁移恢复验证。
+- [x] 1a: 冻结契约8fdf242经独立Reviewer通过（0 P0/P1，一项路径P3已补全）；
+- [ ] 1b: 模块模型/DTO/迁移，受锁restore/build与真实迁移恢复验证。
 - [ ] 2: SEC写真实PG红例，再修复成功审计/数组权限/一次事件，含允许拒绝/过期/空/跨厂/多厂/失败写入/Trace/并发与脱敏；commit/push DRAFT。
 - [ ] 3: OBS写真实Kestrel红例，再改固定分类/取消/已开始/脱敏，官方Alloy语法和实际导出测试；commit/push DRAFT。
 - [ ] 4: 固定提交独立Review两线、Owner修复；Master集成，全部后端/format/SelfTest/Web/浏览器/OIDC/OpenAPI/真实LGTM正反回归。

@@ -63,3 +63,7 @@ OBS资源建议固定开发端口：Grafana15330、Loki13100、Tempo13200、Prom
 独立契约审查修订：浏览器退出采用原生form POST及隐藏__RequestVerificationToken，允许内置header用于其他客户端但不能用fetch跟随OIDC跨源注销。错误媒体类型统一application/problem+json，type字段必须存在（默认about:blank）；audit limit非法明确400 invalid_request。本修订在任何产品并行写入前完成。
 
 遥测实施增量：API同一Meter增加platform.heartbeat ObservableGauge，值为当前UTC Unix秒，无单位/无用户厂区标签；导出周期5秒。OBS用time()-heartbeat/absent判断真实API停启，避免缓存旧计数冒充存活；Prometheus归一化名以实际查询为准。本地告警时间阈值明确不是生产SLO。
+
+## G1-CLOSE-001 收口增量（当前授权）
+
+成功审计读取在响应前提交platform.audit.read/platform.audit/allowed；空集合也记录。先物化再写入，本次不包含自身、后续查询可见；并发按PG实际快照可见性，不递归写。新增scopeSiteIds结构化厂区数组，可信claims去重排序，显式单厂来自已授权资源；单厂SiteId兼容，多厂/空范围SiteId=null。普通审计API仅允许同非空组织且完整非空数组是调用者厂区子集；legacy null/空数组隐藏，旧首厂无法恢复真实范围，保留原事实不自动补写。新增500 internal_error通用错误，原401/403/OIDC400/PG503保留。原始异常/SQL/输入/秘密不能进Problem或日志/Span。诊断事件1003 PlatformRequestFault固定Route/ExceptionCategory/Outcome/Status/TraceId，不接受Exception；字段仅结构化元数据，不增加索引或指标维度。完整时序、分类及迁移恢复门禁见本轮总卡。

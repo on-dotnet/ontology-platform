@@ -146,16 +146,16 @@ public sealed class HttpSecurityTests
         // 预期为公开合同常量，断言不输出任何请求秘密。
         var expected = new Dictionary<string, string[]>
         {
-            ["get /auth/login"] = ["302", "400"],
-            ["post /auth/logout"] = ["302", "401", "403"],
-            ["get /signin-oidc"] = ["400"],
-            ["get /health/live"] = ["200", "401"],
-            ["get /health/ready"] = ["200", "401", "503"],
-            ["get /api/v1/platform/me"] = ["200", "401", "403", "503"],
-            ["get /auth/csrf"] = ["200"],
-            ["get /api/v1/platform/resources"] = ["200", "401", "403", "503"],
-            ["get /api/v1/platform/resources/{id}"] = ["200", "401", "403", "404", "503"],
-            ["get /api/v1/platform/audit"] = ["200", "400", "401", "403", "503"]
+            ["get /auth/login"] = ["302", "400", "500"],
+            ["post /auth/logout"] = ["302", "401", "403", "500"],
+            ["get /signin-oidc"] = ["400", "500"],
+            ["get /health/live"] = ["200", "401", "500"],
+            ["get /health/ready"] = ["200", "401", "503", "500"],
+            ["get /api/v1/platform/me"] = ["200", "401", "403", "503", "500"],
+            ["get /auth/csrf"] = ["200", "500"],
+            ["get /api/v1/platform/resources"] = ["200", "401", "403", "503", "500"],
+            ["get /api/v1/platform/resources/{id}"] = ["200", "401", "403", "404", "503", "500"],
+            ["get /api/v1/platform/audit"] = ["200", "400", "401", "403", "503", "500"]
         };
         // 逐条读取公开路由的实际响应定义，避免只测某一个正常路径。
         foreach (var entry in expected)
@@ -188,7 +188,7 @@ public sealed class HttpSecurityTests
             ["PlatformScope"] = ["organizationId", "siteId"],
             ["PlatformResource"] = ["id", "name", "organizationId", "siteId", "status"],
             ["PlatformResourceList"] = ["items", "auditId", "traceId"],
-            ["PlatformAuditEntry"] = ["id", "occurredAtUtc", "actor", "action", "resource", "outcome", "traceId", "correlationId", "organizationId", "siteId"],
+            ["PlatformAuditEntry"] = ["id", "occurredAtUtc", "actor", "action", "resource", "outcome", "traceId", "correlationId", "organizationId", "siteId", "scopeSiteIds"],
             ["CsrfResponse"] = ["requestToken"],
             ["PlatformProblem"] = ["type", "status", "title", "code", "traceId", "correlationId"]
         };

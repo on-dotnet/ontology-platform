@@ -46,6 +46,7 @@ public sealed class GovernanceDbContext : DbContext
             entity.Property(value => value.CorrelationId).HasMaxLength(64);
             entity.Property(value => value.OrganizationId).HasMaxLength(128);
             entity.Property(value => value.SiteId).HasMaxLength(128);
+            entity.Property(value => value.ScopeSiteIds).HasColumnType("text[]");
             entity.HasIndex(value => new { value.OrganizationId, value.SiteId, value.OccurredAtUtc });
         });
         modelBuilder.Entity<SyntheticResource>(entity =>

@@ -170,7 +170,13 @@ public sealed class PlatformAuditEntry
     public string? OrganizationId { get; init; } = null;
 
     /// <summary>
-    /// 事件适用的厂区范围，匿名时可空。
+    /// 完整事件厂区集合；历史未知为null，空数组不能授予组织范围访问。
+    /// </summary>
+    [JsonRequired]
+    public string[]? ScopeSiteIds { get; init; }
+
+    /// <summary>
+    /// 兼容的唯一厂区；多厂区和无厂区时为空。
     /// </summary>
     [JsonRequired]
     public string? SiteId { get; init; } = null;
