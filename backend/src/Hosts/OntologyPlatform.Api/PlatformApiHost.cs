@@ -69,9 +69,9 @@ public static class PlatformApiHost
             database => database.MigrationsHistoryTable("__EFMigrationsHistory", "governance")));
         builder.Services.AddScoped<AuditService>();
         builder.Services.AddSingleton<PostgresTicketStore>();
-        // 证书只在内存中加载，不装入系统信任，也不允许明文keyring回退。
+        // macOS由.NET临时keychain导入并随证书释放删除，其余平台使用内存导入；不安装信任。
         var certificate = X509CertificateLoader.LoadPkcs12FromFile(security.CertificatePath,
-            security.CertificatePassword, X509KeyStorageFlags.EphemeralKeySet);
+            security.CertificatePassword, OperatingSystem.IsMacOS() ? X509KeyStorageFlags.DefaultKeySet : X509KeyStorageFlags.EphemeralKeySet);
         if (!certificate.HasPrivateKey || certificate.NotAfter.ToUniversalTime() <= DateTime.UtcNow)
         {
             throw new InvalidOperationException("共享密钥环证书无效。");
@@ -134,6 +134,7 @@ public static class PlatformApiHost
         });
         // 构建后仅组装中间件，数据库迁移与seed由显式初始化入口控制。
         var app = builder.Build();
+        app.Lifetime.ApplicationStopped.Register(certificate.Dispose);
         app.Use(async (context, next) =>
         {
             // 关联ID仅接受有限安全字符，外部输入不能注入日志内容。
@@ -195,6 +196,11 @@ public static class PlatformApiHost
         });
         app.MapOpenApi();
         app.MapPlatformEndpoints(security);
+        // 保留技术及API前缀的未知路径也不能落入Web代理。
+        foreach (var prefix in new[] { "api", "auth", "health", "openapi" })
+        {
+            app.Map("/" + prefix + "/{**reservedPath}", (HttpContext context) => PlatformProblem.Create(context, 404, "resource_not_found"));
+        }
         app.MapReverseProxy();
         return app;
     }

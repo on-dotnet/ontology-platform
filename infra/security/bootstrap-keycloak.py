@@ -16,6 +16,36 @@ import urllib.request
 from pathlib import Path
 
 
+class NoRedirect(urllib.request.HTTPRedirectHandler):
+    """Never forward an administrative request to a redirect destination."""
+
+    def redirect_request(self, request, response, code, message, headers, new_url):
+        return None
+
+
+def validate_origin(origin):
+    """Accept only canonical HTTP loopback origins for dedicated development."""
+    parsed = urllib.parse.urlsplit(origin)
+    if (parsed.scheme != "http" or parsed.hostname not in ("localhost", "127.0.0.1")
+            or parsed.username or parsed.password or parsed.path or parsed.query or parsed.fragment
+            or parsed.port == 0):
+        raise ValueError("Only canonical isolated loopback development origins are allowed")
+
+
+def validate_runtime_output(destination):
+    """Constrain generated secrets to this checkout's ignored private runtime tree."""
+    runtime = Path(__file__).resolve().parents[2] / ".tools" / "security"
+    output = Path(destination).absolute()
+    if not output.resolve().is_relative_to(runtime.resolve()) or output.name in ("", ".", ".."):
+        raise ValueError("Runtime output must be inside this checkout's .tools/security directory")
+    if output.exists() or output.is_symlink():
+        raise ValueError("Runtime output already exists; preserve existing realm and credentials")
+    output.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+    if os.name != "nt" and output.parent.stat().st_mode & 0o077:
+        raise ValueError("Runtime parent must have private 0700 permissions")
+    return output
+
+
 def request(origin, path, payload=None, token=None, form=False):
     """Call the dedicated development Keycloak without printing response data."""
     headers = {}
@@ -26,7 +56,8 @@ def request(origin, path, payload=None, token=None, form=False):
         data = urllib.parse.urlencode(payload).encode() if form else json.dumps(payload).encode()
         headers["Content-Type"] = "application/x-www-form-urlencoded" if form else "application/json"
     operation = urllib.request.Request(origin + path, data=data, headers=headers)
-    with urllib.request.urlopen(operation, timeout=20) as response:
+    opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), NoRedirect())
+    with opener.open(operation, timeout=20) as response:
         body = response.read()
         return json.loads(body) if body else None
 
@@ -39,12 +70,8 @@ def main():
     parser.add_argument("--runtime-output", required=True)
     arguments = parser.parse_args()
     for origin in (arguments.keycloak_origin, arguments.public_origin):
-        parsed = urllib.parse.urlsplit(origin)
-        if parsed.scheme != "http" or parsed.hostname not in ("localhost", "127.0.0.1") or parsed.username or parsed.password:
-            raise ValueError("Only isolated loopback development origins are allowed")
-    output = Path(arguments.runtime_output).resolve()
-    if output.exists():
-        raise ValueError("Runtime output already exists; preserve existing realm and credentials")
+        validate_origin(origin)
+    output = validate_runtime_output(arguments.runtime_output)
     admin_password = os.environ["WAVE2_KEYCLOAK_ADMIN_PASSWORD"]
     admin_username = os.environ.get("WAVE2_KEYCLOAK_ADMIN_USERNAME", "wave2-bootstrap")
     token = request(arguments.keycloak_origin, "/realms/master/protocol/openid-connect/token", {
@@ -52,7 +79,7 @@ def main():
         "password": admin_password}, form=True)["access_token"]
     realm_name = "wave2-" + secrets.token_hex(8)
     client_id = realm_name + "-bff"
-    client_secret = secrets.token_urlsafe(48)
+    generated_client_secret = secrets.token_urlsafe(48)
     identities = {}
     users = []
     for label, role, site in (("viewer-a", "platform.viewer", "site-a"),
@@ -61,13 +88,13 @@ def main():
                               ("operator-a", "platform.operator", "site-a"),
                               ("auditor-a", "platform.auditor", "site-a")):
         username = "wave2-" + label
-        password = secrets.token_urlsafe(30)
-        identities[username] = {"username": username, "password": password}
+        generated_password = secrets.token_urlsafe(30)
+        identities[username] = {"username": username, "password": generated_password}
         users.append({"username": username, "enabled": True, "emailVerified": True,
-                      "firstName": "合成开发身份", "lastName": label,
+                      "firstName": "合成开发身份", "lastName": label, "email": label + "@example.invalid",
                       "attributes": {"organization_id": ["org-demo"], "site_ids": [site]},
                       "realmRoles": [role] if role else [],
-                      "credentials": [{"type": "password", "value": password, "temporary": False}]})
+                      "credentials": [{"type": "password", "value": generated_password, "temporary": False}]})
     mappers = []
     for attribute, multivalued in (("organization_id", False), ("site_ids", True)):
         mappers.append({"name": attribute, "protocol": "openid-connect",
@@ -82,7 +109,7 @@ def main():
     realm = {"realm": realm_name, "enabled": True, "sslRequired": "none", "registrationAllowed": False,
              "resetPasswordAllowed": False, "loginWithEmailAllowed": False,
              "roles": {"realm": [{"name": role} for role in ("platform.viewer", "platform.operator", "platform.auditor")]},
-             "clients": [{"clientId": client_id, "secret": client_secret, "enabled": True,
+             "clients": [{"clientId": client_id, "secret": generated_client_secret, "enabled": True,
                           "protocol": "openid-connect", "publicClient": False, "clientAuthenticatorType": "client-secret",
                           "standardFlowEnabled": True, "directAccessGrantsEnabled": False,
                           "implicitFlowEnabled": False, "serviceAccountsEnabled": False,
@@ -90,10 +117,9 @@ def main():
                           "attributes": {"pkce.code.challenge.method": "S256", "post.logout.redirect.uris": arguments.public_origin + "/signout-callback-oidc"},
                           "protocolMappers": mappers}], "users": users}
     request(arguments.keycloak_origin, "/admin/realms", realm, token)
-    output.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
     with output.open("x", encoding="utf-8", opener=lambda path, flags: os.open(path, flags, 0o600)) as stream:
         json.dump({"authority": arguments.keycloak_origin + "/realms/" + realm_name,
-                   "clientId": client_id, "clientSecret": client_secret, "identities": identities}, stream)
+                   "clientId": client_id, "clientSecret": generated_client_secret, "identities": identities}, stream)
     print(json.dumps({"status": "CREATED", "realm": realm_name, "identities": list(identities), "secrets": "runtime-only"}))
 
 

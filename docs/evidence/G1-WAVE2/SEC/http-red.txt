@@ -1,0 +1,55 @@
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+失败 AnonymousAndCorruptedCookieRemainUnauthenticated (168ms)
+  从 /Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+  测试方法 OntologyPlatform.SecurityTests.HttpSecurityTests。AnonymousAndCorruptedCookieRemainUnauthenticated 引发了异常:
+  System.PlatformNotSupportedException: This platform does not support loading with EphemeralKeySet. Remove the flag to allow keys to be temporarily created on disk.
+    在 System.Security.Cryptography.X509Certificates.X509CertificateLoader.ValidatePlatformKeyStorageFlags(X509KeyStorageFlags keyStorageFlags)
+    在 System.Security.Cryptography.X509Certificates.X509CertificateLoader.LoadPkcs12FromFile(String path, ReadOnlySpan`1 password, X509KeyStorageFlags keyStorageFlags, Pkcs12LoaderLimits loaderLimits)
+    在 OntologyPlatform.Api.PlatformApiHost.CreateApplication(String[] args, Action`1 configure) 位于 /Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/PlatformApiHost.cs:73
+    在 OntologyPlatform.SecurityTests.SecurityHostFixture.Create(String environment) 位于 /Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/HttpSecurityTests.cs:143
+    在 OntologyPlatform.SecurityTests.HttpSecurityTests.AnonymousAndCorruptedCookieRemainUnauthenticated() 位于 /Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/HttpSecurityTests.cs:28
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+
+失败 ForwardedHeadersAndInvalidCallbackFailClosed (143ms)
+  从 /Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+  测试方法 OntologyPlatform.SecurityTests.HttpSecurityTests。ForwardedHeadersAndInvalidCallbackFailClosed 引发了异常:
+  System.PlatformNotSupportedException: This platform does not support loading with EphemeralKeySet. Remove the flag to allow keys to be temporarily created on disk.
+    在 System.Security.Cryptography.X509Certificates.X509CertificateLoader.ValidatePlatformKeyStorageFlags(X509KeyStorageFlags keyStorageFlags)
+    在 System.Security.Cryptography.X509Certificates.X509CertificateLoader.LoadPkcs12FromFile(String path, ReadOnlySpan`1 password, X509KeyStorageFlags keyStorageFlags, Pkcs12LoaderLimits loaderLimits)
+    在 OntologyPlatform.Api.PlatformApiHost.CreateApplication(String[] args, Action`1 configure) 位于 /Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/PlatformApiHost.cs:73
+    在 OntologyPlatform.SecurityTests.SecurityHostFixture.Create(String environment) 位于 /Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/HttpSecurityTests.cs:143
+    在 OntologyPlatform.SecurityTests.HttpSecurityTests.ForwardedHeadersAndInvalidCallbackFailClosed() 位于 /Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/HttpSecurityTests.cs:57
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+
+失败 ProductionHealthRemainsProtectedAndDependencyAware (101ms)
+  从 /Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+  测试方法 OntologyPlatform.SecurityTests.HttpSecurityTests。ProductionHealthRemainsProtectedAndDependencyAware 引发了异常:
+  System.PlatformNotSupportedException: This platform does not support loading with EphemeralKeySet. Remove the flag to allow keys to be temporarily created on disk.
+    在 System.Security.Cryptography.X509Certificates.X509CertificateLoader.ValidatePlatformKeyStorageFlags(X509KeyStorageFlags keyStorageFlags)
+    在 System.Security.Cryptography.X509Certificates.X509CertificateLoader.LoadPkcs12FromFile(String path, ReadOnlySpan`1 password, X509KeyStorageFlags keyStorageFlags, Pkcs12LoaderLimits loaderLimits)
+    在 OntologyPlatform.Api.PlatformApiHost.CreateApplication(String[] args, Action`1 configure) 位于 /Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/PlatformApiHost.cs:73
+    在 OntologyPlatform.SecurityTests.SecurityHostFixture.Create(String environment) 位于 /Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/HttpSecurityTests.cs:143
+    在 OntologyPlatform.SecurityTests.HttpSecurityTests.ProductionHealthRemainsProtectedAndDependencyAware() 位于 /Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/HttpSecurityTests.cs:77
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+
+失败 ReservedPrefixesNeverReachWebProxy (98ms)
+  从 /Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+  测试方法 OntologyPlatform.SecurityTests.HttpSecurityTests。ReservedPrefixesNeverReachWebProxy 引发了异常:
+  System.PlatformNotSupportedException: This platform does not support loading with EphemeralKeySet. Remove the flag to allow keys to be temporarily created on disk.
+    在 System.Security.Cryptography.X509Certificates.X509CertificateLoader.ValidatePlatformKeyStorageFlags(X509KeyStorageFlags keyStorageFlags)
+    在 System.Security.Cryptography.X509Certificates.X509CertificateLoader.LoadPkcs12FromFile(String path, ReadOnlySpan`1 password, X509KeyStorageFlags keyStorageFlags, Pkcs12LoaderLimits loaderLimits)
+    在 OntologyPlatform.Api.PlatformApiHost.CreateApplication(String[] args, Action`1 configure) 位于 /Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/PlatformApiHost.cs:73
+    在 OntologyPlatform.SecurityTests.SecurityHostFixture.Create(String environment) 位于 /Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/HttpSecurityTests.cs:143
+    在 OntologyPlatform.SecurityTests.HttpSecurityTests.ReservedPrefixesNeverReachWebProxy() 位于 /Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/HttpSecurityTests.cs:96
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+
+/Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64) 失败并出现 4 个错误 (3s 060ms)
+退出代码: 2
+
+测试运行摘要: 失败!
+  总计: 6
+  失败: 4
+  成功: 2
+  已跳过: 0
+  持续时间: 3s 428ms
+已完成测试运行，但显示非成功退出代码: 2 (请参阅: https://aka.ms/testingplatform/exitcodes)

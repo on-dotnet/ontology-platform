@@ -1,0 +1,23 @@
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+失败 ReservedPrefixesNeverReachWebProxy (161ms)
+  从 /Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+  Assertion failed. 预期值相等。
+  保留前缀不得代理至Web
+
+  expected: NotFound
+  actual:   BadGateway
+
+  Assert.AreEqual(HttpStatusCode.NotFound, (await client.GetAsync(path)).StatusCode)
+    在 OntologyPlatform.SecurityTests.HttpSecurityTests.ReservedPrefixesNeverReachWebProxy() 位于 /Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/HttpSecurityTests.cs:102
+    在 OntologyPlatform.SecurityTests.HttpSecurityTests.ReservedPrefixesNeverReachWebProxy() 位于 /Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/HttpSecurityTests.cs:100
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+/Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64) 失败并出现 1 个错误 (3s 644ms)
+退出代码: 2
+
+测试运行摘要: 失败!
+  总计: 6
+  失败: 1
+  成功: 5
+  已跳过: 0
+  持续时间: 3s 808ms
+已完成测试运行，但显示非成功退出代码: 2 (请参阅: https://aka.ms/testingplatform/exitcodes)
