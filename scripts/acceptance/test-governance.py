@@ -4,6 +4,7 @@
 This is a bounded test fixture, not a second development orchestration model.
 Secrets are generated in memory and output is sanitized before persistence.
 """
+import argparse
 import importlib.util
 import json
 import os
@@ -20,7 +21,7 @@ RUNTIME = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(RUNTIME)
 
 
-def main():
+def main(configuration="Debug", test_filter=None):
     name = 'wave2-governance-test-' + secrets.token_hex(6)
     database_password = secrets.token_urlsafe(40)
     env = os.environ.copy()
@@ -56,7 +57,7 @@ def main():
         env['ConnectionStrings__governance'] = env['G1_SEC_PG_CONNECTION']
         command(['dotnet', 'tool', 'restore'])
         module = 'backend/src/Modules/Governance/OntologyPlatform.Modules.Governance'
-        command(['dotnet', 'tool', 'run', 'dotnet-ef', 'database', 'update', '--project', module, '--startup-project', module, '--no-build'])
+        command(['dotnet', 'tool', 'run', 'dotnet-ef', 'database', 'update', '--project', module, '--startup-project', module, '--configuration', configuration, '--no-build'])
         # 临时身份服务只用于真实PAR测试，独立容器、随机密码、不访问开发栈。
         command(['docker', 'run', '--detach', '--name', identity_name,
                  '--env', 'KC_BOOTSTRAP_ADMIN_PASSWORD', '--env', 'KC_BOOTSTRAP_ADMIN_USERNAME=wave2-bootstrap',
@@ -85,7 +86,10 @@ def main():
         runtime_file = private / 'runtime.json'
         RUNTIME.private_json(runtime_file, {'realmFile': str(realm_file)})
         env['G1_SEC_OIDC_RUNTIME'] = str(runtime_file)
-        command(['dotnet', 'test', '--project', 'backend/tests/OntologyPlatform.SecurityTests', '--no-build', '--no-restore'])
+        test = ['dotnet', 'test', '--project', 'backend/tests/OntologyPlatform.SecurityTests', '--configuration', configuration, '--no-build', '--no-restore']
+        if test_filter:
+            test.extend(['--filter', test_filter])
+        command(test)
         print('PASS: real PostgreSQL tickets/revocation/expiry/audit and real Keycloak PAR security integration.')
         return 0
     except Exception as failure:
@@ -100,4 +104,8 @@ def main():
 
 
 if __name__ == '__main__':
-    sys.exit(main())
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--configuration', choices=['Debug', 'Release'], default='Debug')
+    parser.add_argument('--filter')
+    args = parser.parse_args()
+    sys.exit(main(args.configuration, args.filter))

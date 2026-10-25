@@ -1,11 +1,18 @@
 #!/usr/bin/env python3
 """Compare the actual Kestrel OpenAPI document against the frozen public contract."""
 import json
+import os
 from pathlib import Path
 import sys
 import urllib.request
 
 ROOT = Path(__file__).resolve().parents[2]
+# 默认保留历史入口；后续收口显式选择新证据目录，不覆盖历史事实。
+EVIDENCE = (ROOT / os.environ.get('PLATFORM_EVIDENCE_DIR', 'docs/evidence/G1-WAVE2/master')).resolve()
+if not EVIDENCE.is_relative_to((ROOT / 'docs/evidence').resolve()):
+    raise ValueError('Evidence must stay under repository docs/evidence')
+EVIDENCE.mkdir(parents=True, exist_ok=True)
+
 ERRORS = []
 
 
@@ -105,7 +112,7 @@ def main():
         with opener.open('http://localhost:15100/openapi/v1.json', timeout=10) as response:
             actual = json.load(response)
     errors = compare(expected, actual)
-    target = ROOT / 'docs/evidence/G1-WAVE2/master'
+    target = EVIDENCE
     (target / 'openapi-runtime-final.json').write_text(json.dumps(actual, ensure_ascii=False, indent=2) + '\n')
     (target / 'openapi-contract-check.json').write_text(json.dumps({'status': 'FAIL' if errors else 'PASS', 'command': 'python3 scripts/acceptance/verify-openapi.py', 'checked': ['paths', 'response-status-and-media', 'all-public-DTO-fields-types-required', 'error-schema', 'stable-operationIds', 'session-security', 'parameters-bounds', 'native-CSRF-form'], 'errors': errors}, ensure_ascii=False, indent=2) + '\n')
     print(json.dumps({'status': 'FAIL' if errors else 'PASS', 'errors': errors}, ensure_ascii=False))

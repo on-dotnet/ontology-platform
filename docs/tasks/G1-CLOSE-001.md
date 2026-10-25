@@ -64,3 +64,5 @@
 ## 恢复账本
 
 2026-10-25：本轮Base与origin/main一致，独立调查确认两根因；历史只读，六个.DS_Store用户现场保留。环境doctor观察pnpm11.28.8（不同于前次观察12，不执行全局修改）、Docker29.9.2。实现未开始，契约待独立Review。
+
+2026-10-25：新增结构化范围迁移1cbfcf3、真实PG migration红绿证据；新运行时wave2-a19529d4edb4专用卷/Realm仅忽略私有目录，core引导后受控停止。SelfTest首次缺PyYAML/console CR明确FAIL，原锁哈希隔离恢复与展示空白规范化后完整PASS35构包负例；未更改检查器。当前main仍Base。

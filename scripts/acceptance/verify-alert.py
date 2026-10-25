@@ -12,6 +12,12 @@ import urllib.error
 import urllib.request
 
 ROOT = Path(__file__).resolve().parents[2]
+# 默认保留历史入口；后续收口显式选择新证据目录，不覆盖历史事实。
+EVIDENCE = (ROOT / os.environ.get('PLATFORM_EVIDENCE_DIR', 'docs/evidence/G1-WAVE2/master')).resolve()
+if not EVIDENCE.is_relative_to((ROOT / 'docs/evidence').resolve()):
+    raise ValueError('Evidence must stay under repository docs/evidence')
+EVIDENCE.mkdir(parents=True, exist_ok=True)
+
 ALERT = '平台心跳停止'
 OPENER = urllib.request.build_opener(urllib.request.ProxyHandler({}))
 RECORDS = []
@@ -72,7 +78,7 @@ def main():
             break
     result = {'status': 'PASS' if fired and recovered else 'FAIL', 'fired': fired, 'recovered': recovered,
               'notification': 'local Prometheus rule/alert state only; no external recipients', 'records': RECORDS}
-    out = ROOT / 'docs/evidence/G1-WAVE2/master/alert-drill.json'
+    out = EVIDENCE / 'alert-drill.json'
     out.write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n')
     return 0 if fired and recovered else 1
 

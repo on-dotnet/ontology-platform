@@ -3,6 +3,7 @@
 import argparse
 import importlib.util
 import json
+import os
 from pathlib import Path
 import subprocess
 import time
@@ -11,6 +12,12 @@ import urllib.request
 
 STAGE = 'initialization'
 ROOT = Path(__file__).resolve().parents[2]
+# 默认保留历史入口；后续收口显式选择新证据目录，不覆盖历史事实。
+EVIDENCE = (ROOT / os.environ.get('PLATFORM_EVIDENCE_DIR', 'docs/evidence/G1-WAVE2/master')).resolve()
+if not EVIDENCE.is_relative_to((ROOT / 'docs/evidence').resolve()):
+    raise ValueError('Evidence must stay under repository docs/evidence')
+EVIDENCE.mkdir(parents=True, exist_ok=True)
+
 SPEC = importlib.util.spec_from_file_location('oidc', ROOT / 'infra/security/verify-oidc.py')
 OIDC = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(OIDC)
@@ -71,7 +78,7 @@ def main(path):
     print('Fault stage: ' + STAGE, flush=True)
     driver.logout_and_replay(cookie)
     result = {'status': 'PASS', 'traceId': trace, 'scope': 'one explicit dedicated PostgreSQL stop/start; no other volume touched', 'checks': driver.records}
-    (ROOT / 'docs/evidence/G1-WAVE2/master/dependency-fault.json').write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n')
+    (EVIDENCE / 'dependency-fault.json').write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n')
     print('PASS: dependency503, independent live200/ready503 and same-cookie recovery; error TraceId=' + trace)
 
 

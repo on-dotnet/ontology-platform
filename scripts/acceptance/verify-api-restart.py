@@ -8,6 +8,12 @@ from pathlib import Path
 import time
 
 ROOT = Path(__file__).resolve().parents[2]
+# 默认保留历史入口；后续收口显式选择新证据目录，不覆盖历史事实。
+EVIDENCE = (ROOT / os.environ.get('PLATFORM_EVIDENCE_DIR', 'docs/evidence/G1-WAVE2/master')).resolve()
+if not EVIDENCE.is_relative_to((ROOT / 'docs/evidence').resolve()):
+    raise ValueError('Evidence must stay under repository docs/evidence')
+EVIDENCE.mkdir(parents=True, exist_ok=True)
+
 SPEC = importlib.util.spec_from_file_location('oidc', ROOT / 'infra/security/verify-oidc.py')
 OIDC = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(OIDC)
@@ -41,7 +47,7 @@ def main(path):
         after, _ = driver.json_request(origin, '/api/v1/platform/me', 200, 'same-cookie-after-process-restart')
         driver.check('same-identity-after-process-restart', after == before)
     driver.logout_and_replay(cookie)
-    out = ROOT / 'docs/evidence/G1-WAVE2/master/api-process-restart.json'
+    out = EVIDENCE / 'api-process-restart.json'
     out.write_text(json.dumps({'status': 'PASS', 'scope': 'same in-memory real cookie across new AppHost and two API process IDs with persisted shared certificate/keyring and PostgreSQL', 'checks': driver.records}, ensure_ascii=False, indent=2) + '\n')
     print('PASS: same authenticated identity on both new API processes; logout/replay denied.', flush=True)
 

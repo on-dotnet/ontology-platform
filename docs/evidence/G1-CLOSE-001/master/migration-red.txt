@@ -1,0 +1,56 @@
+  OntologyPlatform.ServiceDefaults -> /Users/chasen/.codex/worktrees/g1-close-master/ontology-platform/backend/src/ServiceDefaults/bin/Debug/net10.0/OntologyPlatform.ServiceDefaults.dll
+  OntologyPlatform.Modules.Governance -> /Users/chasen/.codex/worktrees/g1-close-master/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/bin/Debug/net10.0/OntologyPlatform.Modules.Governance.dll
+  OntologyPlatform.Api -> /Users/chasen/.codex/worktrees/g1-close-master/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/bin/Debug/net10.0/OntologyPlatform.Api.dll
+  OntologyPlatform.SecurityTests -> /Users/chasen/.codex/worktrees/g1-close-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:00.71
+dad9e423ca406fe3841d040c705b1e1e242bc64bf6cd9bb762aee57b7cfc8ee8
+工具“dotnet-ef”(版本“10.0.13”)已还原。可用的命令: dotnet-ef
+
+还原成功。
+Failed executing DbCommand (7ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM governance."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261025062847_InitialGovernance'.
+Applying migration '20261025144246_AuditScopeSites'.
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Done.
+5b2d1d730f56e4a261b459f143680c7f850c54dd6a0d0803f794100707ab0d9c
+{"status": "CREATED", "realm": "wave2-7627ff202ee19cad", "identities": ["wave2-viewer-a", "wave2-viewer-b", "wave2-no-role-a", "wave2-operator-a", "wave2-auditor-a"], "secrets": "runtime-only"}
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g1-close-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+失败 ScopeMigrationPreservesLegacyAndRefusesDestructiveRollback (623ms)
+  从 /Users/chasen/.codex/worktrees/g1-close-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+  Assertion failed. Expected exception of exact type PostgresException but no exception was thrown.
+
+  Assert.ThrowsExactlyAsync<PostgresException>(() => migrator.MigrateAsync("20261025062847_InitialGovernance"))
+    在 Microsoft.VisualStudio.TestTools.UnitTesting.Assert.ThrowsExceptionAsync[TException](Func`1 action, Boolean isStrictType, String message, String actionExpression, String assertMethodName)
+    在 OntologyPlatform.SecurityTests.AuditScopeMigrationTests.ScopeMigrationPreservesLegacyAndRefusesDestructiveRollback() 位于 /Users/chasen/.codex/worktrees/g1-close-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/AuditScopeMigrationTests.cs:68
+    在 OntologyPlatform.SecurityTests.AuditScopeMigrationTests.ScopeMigrationPreservesLegacyAndRefusesDestructiveRollback() 位于 /Users/chasen/.codex/worktrees/g1-close-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/AuditScopeMigrationTests.cs:86
+    在 OntologyPlatform.SecurityTests.AuditScopeMigrationTests.ScopeMigrationPreservesLegacyAndRefusesDestructiveRollback() 位于 /Users/chasen/.codex/worktrees/g1-close-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/AuditScopeMigrationTests.cs:93
+    在 OntologyPlatform.SecurityTests.AuditScopeMigrationTests.ScopeMigrationPreservesLegacyAndRefusesDestructiveRollback() 位于 /Users/chasen/.codex/worktrees/g1-close-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/AuditScopeMigrationTests.cs:93
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+失败 RuntimeOpenApiDeclaresRedirectsAndCompleteErrors (184ms)
+  从 /Users/chasen/.codex/worktrees/g1-close-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+  CollectionAssert.AreEquivalent 失败。 集合中元素的数量不匹配。应为: <3>，实际为: <2>。get /auth/login
+    在 OntologyPlatform.SecurityTests.HttpSecurityTests.RuntimeOpenApiDeclaresRedirectsAndCompleteErrors() 位于 /Users/chasen/.codex/worktrees/g1-close-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/HttpSecurityTests.cs:167
+    在 OntologyPlatform.SecurityTests.HttpSecurityTests.RuntimeOpenApiDeclaresRedirectsAndCompleteErrors() 位于 /Users/chasen/.codex/worktrees/g1-close-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/HttpSecurityTests.cs:206
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+/Users/chasen/.codex/worktrees/g1-close-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64) 失败并出现 2 个错误 (5s 076ms)
+退出代码: 2
+
+测试运行摘要: 失败!
+  总计: 15
+  失败: 2
+  成功: 13
+  已跳过: 0
+  持续时间: 5s 806ms
+已完成测试运行，但显示非成功退出代码: 2 (请参阅: https://aka.ms/testingplatform/exitcodes)
+FAIL: real governance integration; details retained only after sanitization
+
+exitCode=1

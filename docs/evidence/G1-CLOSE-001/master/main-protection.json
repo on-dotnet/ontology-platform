@@ -1,0 +1,12 @@
+{
+  "command": [
+    "gh",
+    "api",
+    "repos/on-dotnet/ontology-platform/branches/main",
+    "--jq",
+    "{name,protected,sha:.commit.sha}"
+  ],
+  "exitCode": 0,
+  "stdout": "{\"name\":\"main\",\"protected\":false,\"sha\":\"d181f66e569e190a66b0f48b179f2fd9390b9467\"}\n",
+  "stderr": ""
+}

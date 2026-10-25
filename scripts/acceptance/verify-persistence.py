@@ -17,6 +17,12 @@ import urllib.parse
 import urllib.request
 
 ROOT = Path(__file__).resolve().parents[2]
+# 默认保留历史入口；后续收口显式选择新证据目录，不覆盖历史事实。
+EVIDENCE = (ROOT / os.environ.get('PLATFORM_EVIDENCE_DIR', 'docs/evidence/G1-WAVE2/master')).resolve()
+if not EVIDENCE.is_relative_to((ROOT / 'docs/evidence').resolve()):
+    raise ValueError('Evidence must stay under repository docs/evidence')
+EVIDENCE.mkdir(parents=True, exist_ok=True)
+
 SPEC = importlib.util.spec_from_file_location('oidc', ROOT / 'infra/security/verify-oidc.py')
 OIDC = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(OIDC)
@@ -86,7 +92,7 @@ def main(runtime_path):
         time.sleep(3)
     else:
         raise ValueError('Trace must exist before restart')
-    bindings = json.loads((ROOT / 'docs/evidence/G1-WAVE2/master/container-bindings.json').read_text())
+    bindings = json.loads((EVIDENCE / 'container-bindings.json').read_text())
     names = [row['container'] for row in bindings]
     check('bounded-container-set', len(names) == 7 and {name.split('-')[0] for name in names} == {'postgres', 'keycloak', 'alloy', 'loki', 'tempo', 'prometheus', 'grafana'})
     # PostgreSQL卷前缀再次验证，拒绝把历史或其他项目容器作为本轮fixture。
@@ -124,7 +130,7 @@ def main(runtime_path):
     check('keycloak-realm-user-login-survives', me['scopes'][0]['siteId'] == 'site-b')
     fresh.logout_and_replay(fresh_cookie)
     viewer.logout_and_replay(cookie)
-    (ROOT / 'docs/evidence/G1-WAVE2/master/persistence.json').write_text(json.dumps({'status': 'PASS', 'scope': 'seven explicit development containers; API process restart is separately checked', 'checks': CHECKS}, ensure_ascii=False, indent=2) + '\n')
+    (EVIDENCE / 'persistence.json').write_text(json.dumps({'status': 'PASS', 'scope': 'seven explicit development containers; API process restart is separately checked', 'checks': CHECKS}, ensure_ascii=False, indent=2) + '\n')
     return 0
 
 
@@ -135,6 +141,6 @@ if __name__ == '__main__':
     try:
         raise SystemExit(main(args.runtime_file))
     except Exception as failure:
-        (ROOT / 'docs/evidence/G1-WAVE2/master/persistence-failure.json').write_text(json.dumps({'status': 'PARTIAL', 'category': type(failure).__name__, 'checks': CHECKS}, ensure_ascii=False, indent=2) + '\n')
+        (EVIDENCE / 'persistence-failure.json').write_text(json.dumps({'status': 'PARTIAL', 'category': type(failure).__name__, 'checks': CHECKS}, ensure_ascii=False, indent=2) + '\n')
         print('PARTIAL: persistence; category=' + type(failure).__name__ + '; details suppressed')
         raise SystemExit(1)
