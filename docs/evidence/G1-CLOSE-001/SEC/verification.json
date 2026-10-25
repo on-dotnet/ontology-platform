@@ -1,0 +1,102 @@
+[
+  {
+    "command": [
+      "dotnet",
+      "restore",
+      "backend/OntologyPlatform.slnx",
+      "--locked-mode"
+    ],
+    "exitCode": 0,
+    "output": "  正在确定要还原的项目…\n  所有项目均是最新的，无法还原。\n"
+  },
+  {
+    "command": [
+      "dotnet",
+      "build",
+      "backend/OntologyPlatform.slnx",
+      "-c",
+      "Release",
+      "--no-restore"
+    ],
+    "exitCode": 0,
+    "output": "/Users/chasen/.nuget/packages/aspire.hosting.apphost/13.6.3/build/Aspire.Hosting.AppHost.targets(157,5): warning ASPIRE010: OntologyPlatform.AppHost is configured with AspireUseCliBundle=false. Some Aspire features require the Aspire CLI bundle. Set AspireUseCliBundle=true to enable those features, or suppress ASPIRE010 to continue without the bundle. See https://aka.ms/aspire/diagnostics/aspire010 for more information. [/Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/src/AppHost/OntologyPlatform.AppHost.csproj]\n  OntologyPlatform.ServiceDefaults -> /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/src/ServiceDefaults/bin/Release/net10.0/OntologyPlatform.ServiceDefaults.dll\n  OntologyPlatform.Modules.Governance -> /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/bin/Release/net10.0/OntologyPlatform.Modules.Governance.dll\n  OntologyPlatform.InfrastructureApi -> /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/src/Hosts/OntologyPlatform.InfrastructureApi/bin/Release/net10.0/OntologyPlatform.InfrastructureApi.dll\n  OntologyPlatform.Api -> /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/bin/Release/net10.0/OntologyPlatform.Api.dll\n  OntologyPlatform.InfrastructureTests -> /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/bin/Release/net10.0/OntologyPlatform.InfrastructureTests.dll\n  OntologyPlatform.AppHost -> /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/src/AppHost/bin/Release/net10.0/OntologyPlatform.AppHost.dll\n  OntologyPlatform.SecurityTests -> /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll\n\n已成功生成。\n\n/Users/chasen/.nuget/packages/aspire.hosting.apphost/13.6.3/build/Aspire.Hosting.AppHost.targets(157,5): warning ASPIRE010: OntologyPlatform.AppHost is configured with AspireUseCliBundle=false. Some Aspire features require the Aspire CLI bundle. Set AspireUseCliBundle=true to enable those features, or suppress ASPIRE010 to continue without the bundle. See https://aka.ms/aspire/diagnostics/aspire010 for more information. [/Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/src/AppHost/OntologyPlatform.AppHost.csproj]\n    1 个警告\n    0 个错误\n\n已用时间 00:00:00.92\n"
+  },
+  {
+    "command": [
+      "dotnet",
+      "format",
+      "backend/OntologyPlatform.slnx",
+      "--no-restore",
+      "--verify-no-changes"
+    ],
+    "exitCode": 2,
+    "output": "加载工作区时遇到警告。要记录警告，请将“详细级别”选项设置为“诊断”级别。\n/Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/AuditReadTests.cs(314,29): error WHITESPACE: 修复空格格式。 将 1 字符替换为 '\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s'。 [/Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/OntologyPlatform.SecurityTests.csproj]\n/Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/AuditReadTests.cs(315,34): error WHITESPACE: 修复空格格式。 将 1 字符替换为 '\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s'。 [/Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/OntologyPlatform.SecurityTests.csproj]\n/Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/AuditReadTests.cs(315,53): error WHITESPACE: 修复空格格式。 将 1 字符替换为 '\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s'。 [/Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/OntologyPlatform.SecurityTests.csproj]\n/Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/AuditReadTests.cs(315,81): error WHITESPACE: 修复空格格式。 将 1 字符替换为 '\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s'。 [/Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/OntologyPlatform.SecurityTests.csproj]\n/Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/AuditReadTests.cs(315,102): error WHITESPACE: 修复空格格式。 将 1 字符替换为 '\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s'。 [/Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/OntologyPlatform.SecurityTests.csproj]\n/Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/AuditReadTests.cs(316,52): error WHITESPACE: 修复空格格式。 将 1 字符替换为 '\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s'。 [/Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/OntologyPlatform.SecurityTests.csproj]\n"
+  },
+  {
+    "command": [
+      "pwsh",
+      "-NoProfile",
+      "-File",
+      "scripts/verify.ps1",
+      "-SelfTest"
+    ],
+    "exitCode": 1,
+    "output": "\nCheck             Status Message\n-----             ------ -------\nstructured-syntax FAIL   YAML/TOML解析失败或项目解析器不可用；请按requirements…\n\n"
+  },
+  {
+    "command": [
+      "dotnet",
+      "test",
+      "--project",
+      "backend/tests/OntologyPlatform.InfrastructureTests",
+      "--no-build",
+      "--no-restore"
+    ],
+    "exitCode": 0,
+    "output": "正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/bin/Debug/net10.0/OntologyPlatform.InfrastructureTests.dll (net10.0|arm64)\n/Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/bin/Debug/net10.0/OntologyPlatform.InfrastructureTests.dll (net10.0|arm64) 已通过 (1s 928ms)\n\n测试运行摘要: 已通过!\n  总计: 4\n  失败: 0\n  成功: 4\n  已跳过: 0\n  持续时间: 2s 706ms\n"
+  },
+  {
+    "command": [
+      "dotnet",
+      "format",
+      "backend/OntologyPlatform.slnx",
+      "--no-restore",
+      "--verify-no-changes"
+    ],
+    "exitCode": 0,
+    "output": "加载工作区时遇到警告。要记录警告，请将“详细级别”选项设置为“诊断”级别。\n"
+  },
+  {
+    "command": [
+      "pwsh",
+      "-NoProfile",
+      "-File",
+      "scripts/verify.ps1",
+      "-SelfTest"
+    ],
+    "exitCode": 0,
+    "output": "\nCheck             Status Message\n-----             ------ -------\nrepository-static PASS   检查632个文件：语法/格式/相对链接/有限机密模式/基线策…\n\nPASS: clean baseline accepted\nPASS: wrong package name rejected\nPASS: broken relative link rejected\nPASS: synthetic token rejected without printing value\nPASS: synthetic token in TypeScript rejected\nPASS: credential assignment in dot-env rejected\nPASS: unpinned action rejected\n\nCheck             Status Message\n-----             ------ -------\nrepository-static PASS   检查634个文件：语法/格式/相对链接/有限机密模式/基线策…\n\nNOT_RUN: .NET test：须显式追加-RunTests执行已批准测试项目。\nNOT_RUN: Web独立检查需真实目标及显式-RunNative。\nNOT_RUN: Web检查被显式-SkipWeb跳过，仅用于隔离工程检查器fixture或独立验收。\nNOT_RUN: 浏览器真实OIDC/E2E需独立受控联调，不隐式混入工程检查。\nPASS: 所选工程检查；范围以逐项输出为准，不表示业务、前端或整个G1通过。\nPASS: native commands resolve SDK and config from selected Root\nChecker tests: 8 passed; application tests: NOT_RUN.\nPASS: Doctor handles existing pnpm without Node as BLOCKED/2.\nPASS: Doctor discovers real macOS ARM64 Node from isolated path with spaces.\nPASS: YAML/TOML syntax, 1 files; runtime compatibility not implied.\nFAIL: structured syntax invalid.yml (ParserError)\nFAIL: structured syntax invalid.toml (TOMLDecodeError)\nPASS: structured parser 4 real positive/negative cases.\n\nCheck             Status Message\n-----             ------ -------\nrepository-static PASS   检查632个文件：语法/格式/相对链接/有限机密模式/基线策…\n\nPASS: verification preserves unset environment state for five process variables.\n\nCheck             Status Message\n-----             ------ -------\nrepository-static PASS   检查632个文件：语法/格式/相对链接/有限机密模式/基线策…\n\nPASS: verification preserves empty environment state for five process variables.\n\nCheck             Status Message\n-----             ------ -------\nrepository-static PASS   检查632个文件：语法/格式/相对链接/有限机密模式/基线策…\n\nPASS: verification preserves value environment state for five process variables.\nEnvironment regression: 3 state groups and structured-suite cleanup passed; native calls are synthetic, product tests NOT_RUN.\nPASS: toolchain archives accept two exact digests and reject two tampered byte cases.\nPASS: committed snapshot, Unicode, full diff and reopened ZIP\nPASS: color.ui always cannot contaminate machine-readable patch\nPASS: PASS requires real command evidence\nPASS: non-ancestor commits\nPASS: dirty tracked delivery\nPASS: untracked delivery\nPASS: forbidden committed member .env\nPASS: forbidden committed member .env.production\nPASS: forbidden committed member .ssh/id\nPASS: forbidden committed member .codex/auth.json\nPASS: forbidden committed member auth/config.json\nPASS: forbidden committed member cert.pem\nPASS: forbidden committed member nested/bin/output\nPASS: forbidden committed member .tools/sdk/file\nPASS: forbidden committed member models/weights.dat\nPASS: forbidden committed member state.db\nPASS: forbidden committed member .cache/item\nPASS: forbidden committed member node_modules/item\nPASS: synthetic token in source\nPASS: removed synthetic token retained in patch\nPASS: reopened archive rejects injected or changed member .git/config\nPASS: reopened archive rejects injected or changed member .env\nPASS: reopened archive rejects injected or changed member ../escape.txt\nPASS: reopened archive rejects injected or changed member source/app.txt\nPASS: git archive export-ignore cannot omit committed source\nPASS: git archive export-subst cannot rewrite committed source\nPASS: git symlink blob cannot silently become source\nPASS: committed submodule cannot be omitted by git archive\nPASS: complete patch rejects removed forbidden environment member\nPASS: reopened archive rejects payload tamper even after checksum rewrite\nPASS: missing checksum/member is rejected on reopen\nPASS: CI PASS cannot be inferred without run metadata\nPASS: explicit CI metadata avoids self-referential commit evidence\nPASS: existing delivery ZIP is preserved\nPASS: valid committed evidence preserves command and status\nReviewPackage: 35 tests, 0 failures; product/container tests NOT_RUN.\nNOT_RUN: .NET原生检查需显式-RunNative及对应任务授权。\nNOT_RUN: Web独立检查需真实目标及显式-RunNative。\nNOT_RUN: 浏览器真实OIDC/E2E需独立受控联调，不隐式混入工程检查。\nPASS: 所选工程检查；范围以逐项输出为准，不表示业务、前端或整个G1通过。\n"
+  },
+  {
+    "command": [
+      "dotnet",
+      "build",
+      "backend/OntologyPlatform.slnx",
+      "--no-restore"
+    ],
+    "exitCode": 0,
+    "output": "/Users/chasen/.nuget/packages/aspire.hosting.apphost/13.6.3/build/Aspire.Hosting.AppHost.targets(157,5): warning ASPIRE010: OntologyPlatform.AppHost is configured with AspireUseCliBundle=false. Some Aspire features require the Aspire CLI bundle. Set AspireUseCliBundle=true to enable those features, or suppress ASPIRE010 to continue without the bundle. See https://aka.ms/aspire/diagnostics/aspire010 for more information. [/Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/src/AppHost/OntologyPlatform.AppHost.csproj]\n  OntologyPlatform.Modules.Governance -> /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/bin/Debug/net10.0/OntologyPlatform.Modules.Governance.dll\n  OntologyPlatform.ServiceDefaults -> /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/src/ServiceDefaults/bin/Debug/net10.0/OntologyPlatform.ServiceDefaults.dll\n  OntologyPlatform.Api -> /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/bin/Debug/net10.0/OntologyPlatform.Api.dll\n  OntologyPlatform.InfrastructureApi -> /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/src/Hosts/OntologyPlatform.InfrastructureApi/bin/Debug/net10.0/OntologyPlatform.InfrastructureApi.dll\n  OntologyPlatform.AppHost -> /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/src/AppHost/bin/Debug/net10.0/OntologyPlatform.AppHost.dll\n  OntologyPlatform.InfrastructureTests -> /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/bin/Debug/net10.0/OntologyPlatform.InfrastructureTests.dll\n  OntologyPlatform.SecurityTests -> /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll\n\n已成功生成。\n\n/Users/chasen/.nuget/packages/aspire.hosting.apphost/13.6.3/build/Aspire.Hosting.AppHost.targets(157,5): warning ASPIRE010: OntologyPlatform.AppHost is configured with AspireUseCliBundle=false. Some Aspire features require the Aspire CLI bundle. Set AspireUseCliBundle=true to enable those features, or suppress ASPIRE010 to continue without the bundle. See https://aka.ms/aspire/diagnostics/aspire010 for more information. [/Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/src/AppHost/OntologyPlatform.AppHost.csproj]\n    1 个警告\n    0 个错误\n\n已用时间 00:00:00.98\n"
+  },
+  {
+    "command": [
+      "dotnet",
+      "build",
+      "backend/OntologyPlatform.slnx",
+      "-c",
+      "Release",
+      "--no-restore"
+    ],
+    "exitCode": 0,
+    "output": "  OntologyPlatform.Modules.Governance -> /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/bin/Release/net10.0/OntologyPlatform.Modules.Governance.dll\n  OntologyPlatform.ServiceDefaults -> /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/src/ServiceDefaults/bin/Release/net10.0/OntologyPlatform.ServiceDefaults.dll\n/Users/chasen/.nuget/packages/aspire.hosting.apphost/13.6.3/build/Aspire.Hosting.AppHost.targets(157,5): warning ASPIRE010: OntologyPlatform.AppHost is configured with AspireUseCliBundle=false. Some Aspire features require the Aspire CLI bundle. Set AspireUseCliBundle=true to enable those features, or suppress ASPIRE010 to continue without the bundle. See https://aka.ms/aspire/diagnostics/aspire010 for more information. [/Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/src/AppHost/OntologyPlatform.AppHost.csproj]\n  OntologyPlatform.InfrastructureApi -> /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/src/Hosts/OntologyPlatform.InfrastructureApi/bin/Release/net10.0/OntologyPlatform.InfrastructureApi.dll\n  OntologyPlatform.Api -> /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/bin/Release/net10.0/OntologyPlatform.Api.dll\n  OntologyPlatform.AppHost -> /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/src/AppHost/bin/Release/net10.0/OntologyPlatform.AppHost.dll\n  OntologyPlatform.SecurityTests -> /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll\n  OntologyPlatform.InfrastructureTests -> /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/bin/Release/net10.0/OntologyPlatform.InfrastructureTests.dll\n\n已成功生成。\n\n/Users/chasen/.nuget/packages/aspire.hosting.apphost/13.6.3/build/Aspire.Hosting.AppHost.targets(157,5): warning ASPIRE010: OntologyPlatform.AppHost is configured with AspireUseCliBundle=false. Some Aspire features require the Aspire CLI bundle. Set AspireUseCliBundle=true to enable those features, or suppress ASPIRE010 to continue without the bundle. See https://aka.ms/aspire/diagnostics/aspire010 for more information. [/Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/src/AppHost/OntologyPlatform.AppHost.csproj]\n    1 个警告\n    0 个错误\n\n已用时间 00:00:00.62\n"
+  }
+]

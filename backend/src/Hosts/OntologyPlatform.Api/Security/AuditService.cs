@@ -23,7 +23,7 @@ public sealed class AuditService
     /// <param name="action">受控事件代码。</param>
     /// <param name="resource">受控资源或路由。</param>
     /// <param name="outcome">固定允许或拒绝结果。</param>
-    /// <param name="siteId">本事件实际所属厂区，可空。</param>
+    /// <param name="siteId">已授权显式厂区；为空时使用全部可信厂区。</param>
     /// <returns>成功提交的审计标识。</returns>
     public async Task<string> WriteAsync(HttpContext context, string action, string resource, string outcome, string? siteId = null)
     {
@@ -41,10 +41,13 @@ public sealed class AuditService
     /// <param name="action">受控事件代码。</param>
     /// <param name="resource">受控资源标识。</param>
     /// <param name="outcome">固定审计结果。</param>
-    /// <param name="siteId">事件所属厂区。</param>
+    /// <param name="siteId">已授权显式厂区；为空时保留全部可信厂区。</param>
     /// <returns>尚未持久化的审计实体。</returns>
     public static AuditRecord Create(HttpContext? context, ClaimsPrincipal principal, string action, string resource, string outcome, string? siteId = null)
     {
+        // 显式厂区已由调用方授权；其余事件保留全部可信范围，不能任意归入首厂。
+        var sites = (siteId is null ? principal.FindAll("site_ids").Select(claim => claim.Value) : [siteId])
+            .Where(value => !string.IsNullOrWhiteSpace(value)).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal).ToArray();
         return new AuditRecord
         {
             Actor = principal.FindFirstValue("sub") ?? "anonymous",
@@ -52,7 +55,8 @@ public sealed class AuditService
             Resource = resource,
             Outcome = outcome,
             OrganizationId = principal.FindFirstValue("organization_id"),
-            SiteId = siteId ?? principal.FindAll("site_ids").Select(claim => claim.Value).FirstOrDefault(),
+            ScopeSiteIds = sites,
+            SiteId = sites.Length == 1 ? sites[0] : null,
             TraceId = Activity.Current?.TraceId.ToString() ?? context?.TraceIdentifier ?? Guid.NewGuid().ToString("N"),
             CorrelationId = context?.Items["CorrelationId"] as string ?? Guid.NewGuid().ToString("N")
         };

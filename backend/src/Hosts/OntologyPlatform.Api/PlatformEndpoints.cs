@@ -31,18 +31,22 @@ public static class PlatformEndpoints
                 ? Results.Challenge(new AuthenticationProperties { RedirectUri = destination }, [OpenIdConnectDefaults.AuthenticationScheme])
                 : PlatformProblem.Create(context, 400, "invalid_request");
         }).Produces(302)
-            .Produces<PlatformError>(400, contentType: "application/problem+json");
+            .Produces<PlatformError>(400, contentType: "application/problem+json")
+            .Produces<PlatformError>(500, contentType: "application/problem+json");
         app.MapGet("/auth/csrf", (HttpContext context, IAntiforgery antiforgery) =>
         {
             context.Response.Headers.CacheControl = "no-store";
             return Results.Ok(new CsrfResponse { RequestToken = antiforgery.GetAndStoreTokens(context).RequestToken! });
-        }).Produces<CsrfResponse>();
+        }).Produces<CsrfResponse>()
+            .Produces<PlatformError>(500, contentType: "application/problem+json");
         app.MapPost("/auth/logout", LogoutAsync)
             .Produces(302)
             .Produces<PlatformError>(401, contentType: "application/problem+json")
-            .Produces<PlatformError>(403, contentType: "application/problem+json");
+            .Produces<PlatformError>(403, contentType: "application/problem+json")
+            .Produces<PlatformError>(500, contentType: "application/problem+json");
         app.MapGet("/signin-oidc", (HttpContext context) => PlatformProblem.Create(context, 400, "oidc_callback_invalid"))
-            .Produces<PlatformError>(400, contentType: "application/problem+json");
+            .Produces<PlatformError>(400, contentType: "application/problem+json")
+            .Produces<PlatformError>(500, contentType: "application/problem+json");
         app.MapGet("/api/v1/platform/me", (HttpContext context) =>
             context.User.Identity?.IsAuthenticated == true
                 ? Results.Ok(ToIdentity(context.User))
@@ -50,28 +54,33 @@ public static class PlatformEndpoints
             .Produces<PlatformIdentity>()
             .Produces<PlatformError>(401, contentType: "application/problem+json")
             .Produces<PlatformError>(403, contentType: "application/problem+json")
-            .Produces<PlatformError>(503, contentType: "application/problem+json");
+            .Produces<PlatformError>(503, contentType: "application/problem+json")
+            .Produces<PlatformError>(500, contentType: "application/problem+json");
         app.MapGet("/api/v1/platform/resources", ReadResourcesAsync)
             .Produces<PlatformResourceList>()
             .Produces<PlatformError>(401, contentType: "application/problem+json")
             .Produces<PlatformError>(403, contentType: "application/problem+json")
-            .Produces<PlatformError>(503, contentType: "application/problem+json");
+            .Produces<PlatformError>(503, contentType: "application/problem+json")
+            .Produces<PlatformError>(500, contentType: "application/problem+json");
         app.MapGet("/api/v1/platform/resources/{id}", ReadResourceAsync)
             .Produces<PlatformResource>()
             .Produces<PlatformError>(401, contentType: "application/problem+json")
             .Produces<PlatformError>(403, contentType: "application/problem+json")
             .Produces<PlatformError>(404, contentType: "application/problem+json")
-            .Produces<PlatformError>(503, contentType: "application/problem+json");
+            .Produces<PlatformError>(503, contentType: "application/problem+json")
+            .Produces<PlatformError>(500, contentType: "application/problem+json");
         app.MapGet("/api/v1/platform/audit", ReadAuditAsync)
             .Produces<PlatformAuditEntry[]>()
             .Produces<PlatformError>(400, contentType: "application/problem+json")
             .Produces<PlatformError>(401, contentType: "application/problem+json")
             .Produces<PlatformError>(403, contentType: "application/problem+json")
-            .Produces<PlatformError>(503, contentType: "application/problem+json");
+            .Produces<PlatformError>(503, contentType: "application/problem+json")
+            .Produces<PlatformError>(500, contentType: "application/problem+json");
         app.MapGet("/health/live", (HttpContext context) => HasHealthKey(context, security)
             ? Results.Ok(new { status = "Healthy" }) : PlatformProblem.Create(context, 401, "unauthenticated"))
             .Produces(200)
-            .Produces<PlatformError>(401, contentType: "application/problem+json");
+            .Produces<PlatformError>(401, contentType: "application/problem+json")
+            .Produces<PlatformError>(500, contentType: "application/problem+json");
         app.MapGet("/health/ready", async (HttpContext context, GovernanceDbContext database) =>
         {
             if (!HasHealthKey(context, security))
@@ -85,7 +94,8 @@ public static class PlatformEndpoints
             return Results.Ok(new { status = "Healthy" });
         }).Produces(200)
             .Produces<PlatformError>(401, contentType: "application/problem+json")
-            .Produces<PlatformError>(503, contentType: "application/problem+json");
+            .Produces<PlatformError>(503, contentType: "application/problem+json")
+            .Produces<PlatformError>(500, contentType: "application/problem+json");
     }
 
     /// <summary>校验认证及内置CSRF后，先撤销服务器会话再完成OIDC退出。</summary>
@@ -198,10 +208,10 @@ public static class PlatformEndpoints
         });
     }
 
-    /// <summary>仅向审计角色返回同组织及同厂区的持久审计。</summary>
+    /// <summary>仅向审计角色返回同组织且完整厂区范围均获授权的持久审计。</summary>
     /// <param name="context">当前请求及已验证身份。</param>
     /// <param name="database">模块PG上下文。</param>
-    /// <param name="audit">拒绝事件写入器。</param>
+    /// <param name="audit">允许及拒绝事实的持久写入器。</param>
     /// <returns>范围过滤后的真实审计或明确错误。</returns>
     private static async Task<IResult> ReadAuditAsync(HttpContext context, GovernanceDbContext database, AuditService audit)
     {
@@ -223,10 +233,13 @@ public static class PlatformEndpoints
         // 可信组织及厂区条件与资源查询使用同一语义。
         var organization = context.User.FindFirstValue("organization_id");
         // 没有合法范围的审计身份只能读取空列表。
-        var sites = context.User.FindAll("site_ids").Select(claim => claim.Value).ToArray();
+        var sites = context.User.FindAll("site_ids").Select(claim => claim.Value)
+            .Where(value => !string.IsNullOrWhiteSpace(value)).Distinct(StringComparer.Ordinal).ToArray();
         // 服务端投影避免公开数据库或认证票据字段。
         var records = await database.AuditRecords.AsNoTracking()
-            .Where(record => record.OrganizationId == organization && record.SiteId != null && sites.Contains(record.SiteId))
+            .Where(record => !string.IsNullOrWhiteSpace(organization) && record.OrganizationId == organization
+                && record.ScopeSiteIds != null && record.ScopeSiteIds.Length > 0
+                && record.ScopeSiteIds.All(site => sites.Contains(site)))
             .OrderByDescending(record => record.OccurredAtUtc).Take(limit)
             .Select(record => new PlatformAuditEntry
             {
@@ -239,9 +252,12 @@ public static class PlatformEndpoints
                 TraceId = record.TraceId,
                 CorrelationId = record.CorrelationId,
                 OrganizationId = record.OrganizationId,
-                SiteId = record.SiteId
+                SiteId = record.SiteId,
+                ScopeSiteIds = record.ScopeSiteIds
             })
             .ToArrayAsync(context.RequestAborted);
+        // 先物化读取快照再唯一提交成功事件：本次结果不包含自身，写入失败不能返回200。
+        await audit.WriteAsync(context, "platform.audit.read", "platform.audit", "allowed");
         return Results.Ok(records);
     }
 
