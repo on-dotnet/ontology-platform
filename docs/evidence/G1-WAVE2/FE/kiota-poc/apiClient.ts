@@ -4,7 +4,7 @@
 // @ts-ignore
 import { ApiRequestBuilderNavigationMetadata, type ApiRequestBuilder } from './api/index.js';
 // @ts-ignore
-import { AuthRequestBuilderNavigationMetadata, type AuthRequestBuilder } from './auth/index.js';
+import { AuthRequestBuilderNavigationMetadata, type AuthRequestBuilder } from './authentication-routes/index.js';
 // @ts-ignore
 import { apiClientProxifier, ParseNodeFactoryRegistry, SerializationWriterFactoryRegistry, type BaseRequestBuilder, type KeysToExcludeForNavigationMetadata, type NavigationMetadata, type RequestAdapter } from '@microsoft/kiota-abstractions';
 // @ts-ignore

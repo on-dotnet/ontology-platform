@@ -50,3 +50,5 @@ SEC最终分支cecf43b00f4f5f12c9309640d68ed665f2643498，FE ce28552c3feb839eb2d
 最后生产Host核查发现“需显式AllowedHosts”的既有说明尚未落实启动校验，Master新增真实构造RED，修复缺失/空/通配/无关host失败关闭；完整14/14 PG+Keycloak套件复验成功。该增量已由独立最终复审核查，零Critical/Important/Minor。
 
 独立最终复审通过候选941cb92（review-final.md），CI40195271409同Head两个job成功，Linux x64真实14/14零跳过。Master已将该获审源码快进main并Push；本报告归档审查/CI事实后的最终文档增量也须同Head CI，再交唯一ZIP。
+
+构包前的真实路径检查曾拒绝Kiota PoC默认auth/models源码目录；未生成交付ZIP。Master仅重命名该证据目录及相对import，验证全部非import行及/auth URL模板逐字不变、相对依赖可解析；产品代码/依赖/构包拒绝规则完全不变，详见package-path-normalization.json。最终Head的CI与独立重开仍须实际通过。

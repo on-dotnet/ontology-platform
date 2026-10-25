@@ -5,3 +5,5 @@
 PoC产生导航构建器、模型序列化及SDK工厂，依赖 @microsoft/kiota-abstractions 和 JSON/Text/Form/Multipart序列化器等额外运行包；这些包没有加入产品清单。与当前仅me/resources/audit/csrf的同源BFF消费者相比，SSR显式Cookie、no-store、取消与统一401/403处理仍需适配层；增加预览运行依赖暂不具有维护优势。
 
 按冻结合同采用OpenAPI生成类型+内置fetch，保持生成类型与手写适配分离；6项实际Vitest覆盖取消信号、同源凭证、no-store、401/403/503、网络错误、厂区编码与空响应拒绝。没有引入Hey API。本PoC未安装/运行Kiota TypeScript运行包，其类型编译、浏览器运行和性能比较均NOT_RUN，不能声明SDK完整通过。kiota-lock.json仅生成器描述hash证据，不是共享pnpm锁。
+
+归档路径规范：标准审查包禁止名为auth/models的目录，Master将PoC源码目录分别重命名authentication-routes/contract-types，仅同步相对import；全部非import行（含实际/auth URL模板）逐字相同、相对依赖可解析。原生成命令/日志保留，不改产品SDK或构包规则。
