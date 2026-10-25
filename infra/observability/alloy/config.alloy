@@ -26,6 +26,10 @@ otelcol.processor.transform "boundary" {
     statements = [
       `keep_keys(resource.attributes, ["service.name", "service.version", "deployment.environment.name"])`,
       // body也可能包含框架格式化异常；固定正文，诊断值只走大小写精确白名单字段。
+      // 锁定.NET OTel 1.20.1把名称写到顶层event_name，数字ID默认不出口。
+      // 按唯一固定名称恢复既有1003合同，使Loki正文和精确元数据都能识别同一事件。
+      `set(attributes["EventName"], "PlatformRequestFault") where log.event_name == "PlatformRequestFault"`,
+      `set(attributes["EventId"], 1003) where log.event_name == "PlatformRequestFault"`,
       `set(body, "PlatformTelemetry")`,
       `set(body, "PlatformRequestFault") where attributes["EventName"] == "PlatformRequestFault" or attributes["EventId"] == 1003 or attributes["eventcode"] == 1003`,
       `keep_keys(attributes, ["eventcode", "EventId", "EventName", "OriginalFormat", "path", "status", "status_class", "method", "route", "traceId", "auditId", "correlationId", "TraceId", "AuditId", "CorrelationId", "Route", "Status", "ExceptionCategory", "Outcome", "Code", "PkceS256", "HasChallenge", "HasState", "HasNonce"])`,

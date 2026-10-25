@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Exercise the approved Alloy binary with OTLP input and capture its real exports."""
+import argparse
 import gzip
+import os
 import json
 from pathlib import Path
 import secrets
@@ -15,6 +17,8 @@ IMAGE = 'grafana/alloy:v1.21.2@sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4
 FROZEN_BASELINE = '1cbfcf3b3807a49003c0054fa618108a4c1a63a0'
 MARKER = 'synthetic-alloy-body-status-event-secret-marker'
 received = {}
+native_received = []
+alloy_endpoint = None
 
 
 class Sink(BaseHTTPRequestHandler):
@@ -22,7 +26,13 @@ class Sink(BaseHTTPRequestHandler):
         body = self.rfile.read(int(self.headers['Content-Length']))
         if self.headers.get('Content-Encoding') == 'gzip':
             body = gzip.decompress(body)
-        received[self.path] = body
+        if self.path == '/native/v1/logs':
+            native_received.append(body)
+            opener = build_opener(ProxyHandler({}))
+            with opener.open(Request(alloy_endpoint + '/v1/logs', body, {'Content-Type': 'application/x-protobuf'}), timeout=5) as response:
+                assert response.status == 200
+        else:
+            received.setdefault(self.path, []).append(body)
         self.send_response(200)
         self.send_header('Content-Type', 'application/x-protobuf')
         self.end_headers()
@@ -35,7 +45,66 @@ def attribute(key, value):
     return {'key': key, 'value': {'intValue': str(value)} if isinstance(value, int) else {'stringValue': value}}
 
 
+def wire_fields(data):
+    """Read bounded protobuf fields according to the official logs.proto wire schema."""
+    offset = 0
+
+    def varint():
+        nonlocal offset
+        value = 0
+        for shift in range(0, 70, 7):
+            byte = data[offset]
+            offset += 1
+            value |= (byte & 127) << shift
+            if byte < 128:
+                return value
+        raise ValueError('Invalid test protobuf varint')
+
+    while offset < len(data):
+        tag = varint()
+        wire = tag & 7
+        if wire == 0:
+            value = varint()
+        elif wire in (1, 2, 5):
+            length = varint() if wire == 2 else 8 if wire == 1 else 4
+            assert offset + length <= len(data)
+            value = data[offset:offset + length]
+            offset += length
+        else:
+            raise ValueError('Unsupported test protobuf wire type')
+        yield tag >> 3, value
+
+
+def subfields(data, number):
+    return [value for field, value in wire_fields(data) if field == number]
+
+
+def decode_logs(payloads):
+    """Decode real LogRecord event_name/body/attributes, retaining only test-safe views."""
+    records = []
+    for payload in payloads:
+        for resource in subfields(payload, 1):
+            for scope in subfields(resource, 2):
+                for record in subfields(scope, 2):
+                    attributes = {}
+                    for attribute_bytes in subfields(record, 6):
+                        key = subfields(attribute_bytes, 1)[0].decode()
+                        any_value = subfields(attribute_bytes, 2)[0]
+                        strings = subfields(any_value, 1)
+                        integers = subfields(any_value, 3)
+                        attributes[key] = strings[0].decode() if strings else integers[0] if integers else None
+                    event_names = subfields(record, 12)
+                    bodies = subfields(record, 5)
+                    body_strings = subfields(bodies[0], 1) if bodies else []
+                    records.append({'eventName': event_names[0].decode() if event_names else '', 'body': body_strings[0].decode() if body_strings else '', 'attributes': attributes})
+    return records
+
+
 def main():
+    global alloy_endpoint
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--output-json", default="docs/evidence/G1-CLOSE-001/OBS/alloy-event-identity.json")
+    options = parser.parse_args()
     server = ThreadingHTTPServer(('127.0.0.1', 0), Sink)
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
@@ -43,7 +112,7 @@ def main():
     host = 'http://host.docker.internal:' + str(server.server_port)
     checks = []
     output = {'image': IMAGE, 'configurationBaselineSha': FROZEN_BASELINE, 'checks': checks, 'status': 'FAIL'}
-    target = ROOT / 'docs/evidence/G1-CLOSE-001/OBS/alloy-runtime-baseline.json'
+    target = ROOT / options.output_json
     try:
         args = ['docker', 'run', '--detach', '--name', name, '--publish', '127.0.0.1::4318',
                 '--env', 'LOKI_OTLP_ENDPOINT=' + host + '/loki', '--env', 'TEMPO_OTLP_ENDPOINT=' + host + '/tempo',
@@ -52,6 +121,33 @@ def main():
                 IMAGE, 'run', '--disable-reporting', '/etc/alloy/config.alloy']
         subprocess.run(args, check=True, stdout=subprocess.DEVNULL)
         port = subprocess.check_output(['docker', 'port', name, '4318/tcp'], text=True).strip().rsplit(':', 1)[1]
+        alloy_endpoint = 'http://127.0.0.1:' + port
+        for attempt in range(40):
+            try:
+                with build_opener(ProxyHandler({})).open(Request(alloy_endpoint + '/v1/logs', b'{}', {'Content-Type': 'application/json'}), timeout=3):
+                    break
+            except OSError:
+                time.sleep(.25)
+        env = os.environ.copy()
+        env['G1_OBS_NATIVE_LOG_RELAY'] = 'http://127.0.0.1:' + str(server.server_port) + '/native'
+        result = subprocess.run(['dotnet', 'test', '--project', 'backend/tests/OntologyPlatform.SecurityTests', '--no-restore', '--filter', 'FullyQualifiedName~NativeOtlpExportContainsControlledFaultAndNoOriginalException'], cwd=ROOT, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        output['nativeTest'] = {'exitCode': result.returncode, 'output': result.stdout}
+        for attempt in range(80):
+            if any(record['eventName'] == 'PlatformRequestFault' for record in decode_logs(received.get('/loki/v1/logs', []))):
+                break
+            time.sleep(.25)
+        raw_faults = [record for record in decode_logs(native_received) if record['eventName'] == 'PlatformRequestFault']
+        exported_faults = [record for record in decode_logs(received.get('/loki/v1/logs', [])) if record['eventName'] == 'PlatformRequestFault']
+        output['nativeSchemaObserved'] = [{'eventName': record['eventName'], 'attributeKeys': sorted(record['attributes'])} for record in raw_faults]
+        output['safeExportedFaultIdentity'] = [{'eventName': record['eventName'], 'body': record['body'], 'EventName': record['attributes'].get('EventName'), 'EventId': record['attributes'].get('EventId')} for record in exported_faults]
+        checks += [
+            {'name': 'real-native-exporter-test-passed', 'pass': result.returncode == 0},
+            {'name': 'native-schema-is-top-level-event-name-without-legacy-event-attributes', 'pass': len(raw_faults) == 2 and all('EventName' not in record['attributes'] and 'EventId' not in record['attributes'] and 'logrecord.event.id' not in record['attributes'] for record in raw_faults)},
+            {'name': 'native-fault-through-alloy-retains-fixed-body-name-and-id', 'pass': len(exported_faults) == 2 and all(record['body'] == 'PlatformRequestFault' and record['attributes'].get('EventName') == 'PlatformRequestFault' and record['attributes'].get('EventId') == 1003 for record in exported_faults)},
+            {'name': 'native-fault-fields-remain-correlated', 'pass': len(exported_faults) == 2 and all(record['attributes'].get('Route') == '/api/obs-export/{kind}' and record['attributes'].get('ExceptionCategory') == 'unexpected_failure' and record['attributes'].get('Status') == 500 and len(record['attributes'].get('TraceId', '')) == 32 for record in exported_faults)},
+            {'name': 'native-alloy-export-has-no-sensitive-marker', 'pass': bool(exported_faults) and b'synthetic-obs-secret-password-token-marker' not in b''.join(received.get('/loki/v1/logs', []))},
+        ]
+        received.clear()
         resource = {'attributes': [attribute('service.name', 'ontology-platform-api'), attribute('deployment.environment.name', 'Development'), attribute('service.version', 'g1-close'), attribute('rogue.resource', MARKER)]}
         trace_id, span_id = secrets.token_hex(16), secrets.token_hex(8)
         now = time.time_ns()
@@ -80,8 +176,8 @@ def main():
             if '/loki/v1/logs' in received and '/tempo/v1/traces' in received:
                 break
             time.sleep(.25)
-        log_bytes = received.get('/loki/v1/logs', b'')
-        span_bytes = received.get('/tempo/v1/traces', b'')
+        log_bytes = b''.join(received.get('/loki/v1/logs', []))
+        span_bytes = b''.join(received.get('/tempo/v1/traces', []))
         checks += [
             {'name': 'actual-loki-export-received', 'pass': bool(log_bytes)},
             {'name': 'actual-tempo-export-received', 'pass': bool(span_bytes)},

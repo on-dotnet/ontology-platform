@@ -1,0 +1,113 @@
+{
+  "image": "grafana/alloy:v1.21.2@sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18",
+  "configurationBaselineSha": "1cbfcf3b3807a49003c0054fa618108a4c1a63a0",
+  "checks": [
+    {
+      "name": "real-native-exporter-test-passed",
+      "pass": true
+    },
+    {
+      "name": "native-schema-is-top-level-event-name-without-legacy-event-attributes",
+      "pass": true
+    },
+    {
+      "name": "native-fault-through-alloy-retains-fixed-body-name-and-id",
+      "pass": true
+    },
+    {
+      "name": "native-fault-fields-remain-correlated",
+      "pass": true
+    },
+    {
+      "name": "native-alloy-export-has-no-sensitive-marker",
+      "pass": true
+    },
+    {
+      "name": "logs-ingest-http200",
+      "pass": true
+    },
+    {
+      "name": "traces-ingest-http200",
+      "pass": true
+    },
+    {
+      "name": "actual-loki-export-received",
+      "pass": true
+    },
+    {
+      "name": "actual-tempo-export-received",
+      "pass": true
+    },
+    {
+      "name": "body-and-all-sensitive-markers-removed",
+      "pass": true
+    },
+    {
+      "name": "fault-body-and-exact-case-fields-retained",
+      "pass": true
+    },
+    {
+      "name": "wrong-case-fields-removed",
+      "pass": true
+    },
+    {
+      "name": "span-safe-category-retained",
+      "pass": true
+    },
+    {
+      "name": "span-event-normalized",
+      "pass": true
+    },
+    {
+      "name": "loki-index-configuration-unchanged-from-frozen-baseline",
+      "pass": true
+    }
+  ],
+  "status": "PASS",
+  "nativeTest": {
+    "exitCode": 0,
+    "output": "正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g1-close-obs/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)\n/Users/chasen/.codex/worktrees/g1-close-obs/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64) 已通过 (1s 602ms)\n\n测试运行摘要: 已通过!\n  总计: 1\n  失败: 0\n  成功: 1\n  已跳过: 0\n  持续时间: 1s 699ms\n"
+  },
+  "nativeSchemaObserved": [
+    {
+      "eventName": "PlatformRequestFault",
+      "attributeKeys": [
+        "ExceptionCategory",
+        "Outcome",
+        "ParentId",
+        "Route",
+        "SpanId",
+        "Status",
+        "TraceId",
+        "{OriginalFormat}"
+      ]
+    },
+    {
+      "eventName": "PlatformRequestFault",
+      "attributeKeys": [
+        "ExceptionCategory",
+        "Outcome",
+        "ParentId",
+        "Route",
+        "SpanId",
+        "Status",
+        "TraceId",
+        "{OriginalFormat}"
+      ]
+    }
+  ],
+  "safeExportedFaultIdentity": [
+    {
+      "eventName": "PlatformRequestFault",
+      "body": "PlatformRequestFault",
+      "EventName": "PlatformRequestFault",
+      "EventId": 1003
+    },
+    {
+      "eventName": "PlatformRequestFault",
+      "body": "PlatformRequestFault",
+      "EventName": "PlatformRequestFault",
+      "EventId": 1003
+    }
+  ]
+}

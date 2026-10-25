@@ -47,3 +47,27 @@ PROPOSED：用统一完整LGTM栈和本轮专用PG，先用真实登录Cookie调
 - 独立Reviewer、同Head CI、Master集成、唯一审查ZIP：NOT_VERIFIED，由Master执行；本分支仅DRAFT/PARTIAL备份。
 - Windows/Intel、生产拓扑/证书轮换、供应链完整CVE/SBOM/签名：NOT_RUN/NOT_VERIFIED，未扩大本轮授权。
 - 新增C#类型/成员/主构造参数已人工核查中文XML；局部变量与异常分类/取消边界有中文用途说明；成员空行、源生成日志方式保留。正式端点、AuditService、既有测试、DTO/PlatformProblem、ServiceDefaults、迁移、锁、CI均未编辑。
+
+
+## 2026-10-26 真实集成事件身份缺口补修
+
+Master真实LGTM在审计INSERT故障时得到503，Loki保留database_write/problem_returned/Route/Status/TraceId，却把故障正文降为PlatformTelemetry且没有EventName/EventId。原始安全证据位于Master的`closeout-loki-investigation.json`；本目录event-identity-investigation.json保存对应故障行与原文件SHA256，不覆盖初次失败。
+
+准确契约已按锁定[OTel 1.20.1官方序列化源码](https://github.com/open-telemetry/opentelemetry-dotnet/blob/core-1.20.1/src/OpenTelemetry.Exporter.OpenTelemetryProtocol/Implementation/Serializer/ProtobufOtlpLogSerializer.cs)及[官方logs.proto](https://github.com/open-telemetry/opentelemetry-proto/blob/v1.9.0/opentelemetry/proto/logs/v1/logs.proto)核对：EventId.Name写入顶层event_name（字段12），数字Id默认不导出，只有实验选项启用时成为logrecord.event.id。当前实际原生protobuf经字段级解析也确认：顶层eventName=PlatformRequestFault，attributes中无EventName/EventId/logrecord.event.id。旧回归只检查原生字节里存在名称，再用手工Legacy属性喂Alloy，未验证这两层之间的真实契约，故漏测本缺口。
+
+修复仅在Alloy将标准`log.event_name`精确等于PlatformRequestFault的记录映射成固定EventName=PlatformRequestFault及EventId=1003，再由既有条件输出固定安全正文；白名单已有这两个字段。数字1003来自这一已冻结名称的唯一平台事件合同映射，未启用实验开关、不把任意名称映成1003、不新增日志事件或原Exception。应用Host/Telemetry业务源码未改，指标及Loki配置索引白名单未改。
+
+增强现有原生OTLP测试和Alloy边界helper：正式Kestrel的普通异常与OnStarting二次写失败产生原生OTLP，测试内存中继把原始protobuf逐字节送入独立随机端口Alloy，再按官方wire schema解析实际出口。中继仅本机回环、只处理本测试日志、抑制中继自身递归遥测；未连接Master活跃完整栈。原始protobuf仍仅在内存，落盘仅受控字段摘要；历史17份stdout及此前Alloy红绿输出全部保留。
+
+| 真实命令/新证据 | Exit | 事实 |
+|---|---:|---|
+| 增强helper、修复前 / alloy-event-identity-red.json、alloy-event-identity-red.txt | 1 | 15项中14 PASS/1 FAIL；实际原生测试1/1 PASS，但两个实际故障穿过旧Alloy后body均PlatformTelemetry、EventName/EventId均null |
+| 同helper、最小Alloy修复后 / alloy-event-identity-green.json、alloy-event-identity-green.txt | 0 | 15/15 PASS；两个故障均保留固定body、EventName和数字1003，关联分类/状态及脱敏保持；原10项检查继续通过 |
+| 本次Release全后端构建 / event-identity-build.txt | 0 | 0 error，既有ASPIRE010 warning保留 |
+| 本次全后端format verify / event-identity-format.txt | 0 | 格式通过 |
+| 本次真实独立PG+Keycloak全Security / event-identity-governance.txt | 1（test子进程2） | 31项30 PASS/1 FAIL/0 skip；仍仅原分支SEC尚未补齐的OpenAPI500 metadata失败，不改只读端点或掩盖 |
+| 本次Infrastructure完整测试 / event-identity-infrastructure.txt | 0 | 4 PASS |
+| 本次标准SelfTest / event-identity-selftest.txt | 0 | ReviewPackage35项0失败；此前17份stdout SHA256均保持 |
+| 本次固定镜像Alloy validate / event-identity-alloy-validate.txt | 0 | 无stdout，最终配置真实语法通过 |
+
+此处证明原生exporter到实际Alloy出口，不冒充修复后真正Loki/Tempo查询。修复后完整LGTM由Master重载本次Alloy配置并复跑同一审计INSERT故障及恢复、Loki固定事件/同Trace/真实series和Tempo检查；当前此集成复验仍NOT_RUN。CI/独立复审仍由Master接续，分支保持DRAFT/PARTIAL。
