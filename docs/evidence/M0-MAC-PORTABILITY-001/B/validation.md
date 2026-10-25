@@ -102,3 +102,5 @@ Master实际收尾查询见cleanup-observed.json：docker ps -a exit0/无容器�
 B原树verify -SelfTest两次实际exit1：structured-syntax FAIL/项目parser不可用；外部PYTHONPATH被verify覆盖，本树没有Master新增requirements/锁。创建parser链接的调用随审批等待中断，无成功输出，不宣称恢复。最终完整组合验收由Master集成后真实执行并另存证据；B旧树失败保留前提说明，未降低解析器/哈希要求。
 
 B没有执行Linux CI、标准总ZIP或独立审查；Windows M0运行NOT_RUN、Linux容器运行NOT_RUN；生产/SEC/FE/OBS/G2未开展。状态PARTIAL等待独立Review与Master集成，不以本文Owner自报当独立批准。
+
+Master接管后的额外OBSERVED：.tools/pythonlibs实际已是指向Master已校验目录的符号链接（ls/readlink exit0）；此前中断调用可能已部分创建链接，不能把未取得完整输出推断为没有任何效果。Master在最终归档前实际运行 pwsh -NoProfile -File scripts/verify.ps1（不带SelfTest），exit0、131文件静态检查通过。没有把该次静态PASS替代此前B完整SelfTest失败或Master真实产品组合验收。

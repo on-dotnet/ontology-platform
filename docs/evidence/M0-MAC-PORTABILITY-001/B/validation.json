@@ -29,11 +29,18 @@
       "output": "HTTP200,returnedCount1,exact TraceId/parent/resource matched; missing-key negative HTTP401."
     },
     {
-      "name": "b-tree-legacy-selftest",
+      "name": "b-tree-earlier-selftest",
       "command": "pwsh -NoProfile -File scripts/verify.ps1 -SelfTest",
       "status": "BLOCKED",
       "exitCode": 1,
-      "output": "B tree lacks .tools/pythonlibs; both original and external PYTHONPATH attempts fail structured parser; no bypass. Master integrated suite separately verified."
+      "output": "Historical B run before observed parser link: structured parser unavailable, no bypass. Master later observed shared validated parser link and static verify exit0; integrated full suite is separate."
+    },
+    {
+      "name": "master-b-tree-final-static",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Master serial archive: 131 files static checks passed; shared validated pythonlibs link observed. Not a full native or self-test run."
     }
   ],
   "ci": {
