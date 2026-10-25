@@ -1,6 +1,6 @@
 # G1-FE-001 开发进度
 
-状态：PARTIAL / DRAFT，等待独立审查及真实 SEC/FE 联调。基线：87eb51a77bffe7468164a0e418bbbd2e101d95bc。树：/Users/chasen/.codex/worktrees/g1-wave2-fe/ontology-platform；分支 codex/G1-FE-001。
+状态：PARTIAL / DRAFT，真实 OIDC 浏览器两项已运行通过，等待独立审查与 Master 最终集成验收。基线：87eb51a77bffe7468164a0e418bbbd2e101d95bc。树：/Users/chasen/.codex/worktrees/g1-wave2-fe/ontology-platform；分支 codex/G1-FE-001。
 
 已读取根/目录 AGENTS、PLANS、当前授权、总/FE任务卡、冻结合同/OpenAPI、bootstrap冻结决策、授权V2第0/1/4/7/8/9/10节。执行前git clean且fetch成功。仅FE owned_paths写入。
 
@@ -35,3 +35,13 @@ Reviewer发现850px以下关闭侧栏仅transform屏外，隐藏菜单仍可Tab/
 首轮测试用Playwright角色选择器推断读屏隐藏，发现该选择器不排除inert节点（mobile-nav-ui-selector-failure.txt）；Tab行为当时已通过，改用Edge原生Accessibility.getFullAXTree检查浏览器真正暴露的无障碍节点后，全部UI5/5通过。build/lint/typecheck各exit0，客户端测试仍6/6。原负例保留，未删测试、未改共享配置。真实OIDC另记，不把此UI夹具算作身份闭环。
 
 本次SelfTest最终exit0/审查包35正反例通过，使用仅子进程有效的pnpm11.28.8 wrapper关闭自动安装。旧native正例在临时树没有node_modules，真实lint报command not found但其dotnet位置断言仍给PASS；该既有测试夹具缺口继续交Master，不将其当产品验证。产品lint/类型/构建/6单测/5UI已在真实FE树分别执行通过，详见mobile-nav-*.txt。
+
+## 真实 OIDC 浏览器收尾（2026-10-25）
+
+本轮在 Master 准备的隔离 Keycloak、正式 .NET/YARP BFF、PostgreSQL 与 Next 统一栈执行真实浏览器联调。`oidc-browser.txt` 为原始安全 reporter 输出，exit0、2/2：viewer 匿名跳转 Keycloak、登录回调、HttpOnly/Lax 会话与浏览器存储边界、同厂资源200且仅site-a、跨厂site-b403、审计拒绝、原生表单安全退出及退出后me401；无角色身份登录后资源403并退出后me401。身份与业务数据为本轮合成开发数据；认证/授权/数据库/代理链为真实运行，区别于此前15410 UI身份夹具。
+
+首次真实运行 `oidc-browser-initial.txt` exit1：旧 `getByText(site-a).first()` 命中隐藏的OPTION而非资源单元格；后改为资源API200/数据作用域断言与可见cell断言，保留原失败。`oidc-setup-shape.txt` 保留首次运行时身份结构不符的安全失败，不输出异常细节或私有配置。最终两项均到达logged-out-401，截图 `screenshots/oidc-viewer.png` 为登录后真实资源页；已逐图查看，只含合成开发身份、资源与审计/Trace关联ID，不含认证输入、URL查询、Cookie或Token。
+
+`run-oidc-tests.mjs` 只在内存解析 Master 指定本轮私有runtime/realm并注入子进程，禁止打印或提交这些文件。专用safe reporter只输出固定测试ID/阶段/状态，原始stderr丢弃，trace/HAR/视频/失败截图关闭，框架异常详情在自动产物前清除；runner发现error-context、trace压缩包、视频或HAR时删除产物并失败。`oidc-privacy-probe.txt` 为无需身份/网络的合成失败负探针，预期exit1、两项失败而只保留安全状态，无敏感产物；该负例不计产品失败也不代替真实登录测试。
+
+本次收尾复跑 lint/typecheck 各exit0，Vitest仍1文件6/6，见 `oidc-final-*.txt`；此前OIDC改动初验见 `oidc-lint.txt`、`oidc-typecheck.txt`、`oidc-test.txt`。UI夹具最新5/5及生产build在移动导航里程碑aaf8195验证；本次未启动Next或重跑统一栈。SelfTest历史输出与其中已识别的pnpm夹具缺口保持原样，本次收尾NOT_RUN；公共脚本修复与最终SelfTest由Master记录，不能用FE旧输出替代Master当前头验证。双实例/重放/审计持久化/遥测最终结论依赖SEC与Master的实际证据，远程CI同Head NOT_VERIFIED，Windows/Intel Mac NOT_RUN。专项独立Review及Master最终统一栈复跑待执行，总状态仍PARTIAL / DRAFT；不进入main、不另造ZIP、不进入G2。
