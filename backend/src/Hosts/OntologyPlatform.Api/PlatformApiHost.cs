@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using OntologyPlatform.Api.Contracts;
 using OntologyPlatform.Api.Security;
 using OntologyPlatform.Modules.Governance;
 using OntologyPlatform.ServiceDefaults;
@@ -107,7 +108,7 @@ public static class PlatformApiHost
         builder.Services.AddOptions<CookieAuthenticationOptions>(CookieAuthenticationDefaults.AuthenticationScheme)
             .Configure<PostgresTicketStore>((options, store) => options.SessionStore = store);
         builder.Services.AddAuthorization();
-        builder.Services.AddOpenApi();
+        builder.Services.AddOpenApi(options => options.AddPlatformContracts());
         builder.Services.AddReverseProxy().LoadFromMemory(
             [new RouteConfig { RouteId = "web", ClusterId = "next", Match = new RouteMatch { Path = "/{**webPath}" } }],
             [new ClusterConfig { ClusterId = "next", Destinations = new Dictionary<string, DestinationConfig>
