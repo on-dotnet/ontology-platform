@@ -52,3 +52,5 @@ SEC最终分支cecf43b00f4f5f12c9309640d68ed665f2643498，FE ce28552c3feb839eb2d
 独立最终复审通过候选941cb92（review-final.md），CI40195271409同Head两个job成功，Linux x64真实14/14零跳过。Master已将该获审源码快进main并Push；本报告归档审查/CI事实后的最终文档增量也须同Head CI，再交唯一ZIP。
 
 构包前的真实路径检查曾拒绝Kiota PoC默认auth/models源码目录；未生成交付ZIP。Master仅重命名该证据目录及相对import，验证全部非import行及/auth URL模板逐字不变、相对依赖可解析；产品代码/依赖/构包拒绝规则完全不变，详见package-path-normalization.json。最终Head的CI与独立重开仍须实际通过。
+
+同一构包预检还发现有限模式将bootstrap源码中的password键+变量引用误认作固定秘密；Master仅把相同四字段表单显式组装，运行payload不变，原本地HTTP正反例复验；规则不放宽，真实秘密仍只在环境/私有忽略文件。
