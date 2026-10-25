@@ -29,3 +29,13 @@ Important：组合执行 pwsh -NoProfile -File scripts/verify.ps1 -SelfTest -Run
 A修复固定范围a24edf72ab4ea2732af9f4bb507fda7160a3de2a至88e6f7a38a97b71c81a57d9c578994cb0ed17865，diff SHA256：926b808bebd11f0bdbaba4f0948047b381ff00865e7777e3ff704a70c3df4d76。Reviewer独立运行新版Environment.Tests exit0、完整临时布局旧verify RED exit1明确PYTHONPATH(unset)改变；第一次临时布局缺parser/依赖的夹具失败没有计作RED。三处仅null使用NullString，空值/普通值保持，finally仍有效。diff --check exit0，树干净，无新增依赖/秘密/权限/越界，允许合入Master；真实组合命令仍为main前置门禁。
 
 Master已合入修复并执行 pwsh -NoProfile -File scripts/verify.ps1 -SelfTest -RunNative -RunTests，exit0。checker8、doctor2、structured4、环境五变量三状态及结构化清理、ReviewPackage35/0失败，随后真实build0错误、format exit0、MTP4/4/0跳过，详见master/verify-final.txt。ASPIRE010原警告保留。此为Owner实际复验，最后由Reviewer核对提交证据后解除Important，不自批。
+
+## 最终原始运行与B文档复核
+
+Master固定9acab3fc5dbb5ff0f447c4c839f66766e71b69e4的独立临时快照在五相关变量初态unset时，受锁恢复后同一pwsh运行完整SelfTest/RunNative/RunTests exit0；build0错误、format0、MTP4/4且0跳过，ASPIRE010保留。该头全范围diff-check0，脚本与已审修复逐字节一致，原Important和Minor均解除；diff SHA256=52bc23c4892015b5d5397fe8cd5c41c639f7db9de8b6650ac0363d3995a0d021。
+
+B初审发现运行材料只是转录，不能作为独立运行PASS，以及“秘密不落盘”过度表述；Master没有以此进main。B固定8d4c6e04c43f35d6f3dfa2d2cc4c10e53ac7c292已限定秘密主动写入边界并明确Owner转录来源，Reviewer允许以PARTIAL文档归档合入Master，原B Minor解除。
+
+Master补原始运行证据固定182bc54bf418603b70c554ef33f636c74fb89a42。Reviewer独立核对实际执行源码、raw/records/HTTP JSON：平台/端口/卷/HTTP/Trace/子进程/cleanup均有真实失败判定，四资源原脚本持久化exit0原始输出一致；Trace JSON与raw全等，trace/parent/service/path15080/404匹配，401负例及认证200；四官方index摘要和ARM64输出匹配。没有Env dump；clean函数另用synthetic secret和URL token测试通过。首次DCP清理暂态FAIL保留，60秒有限等待不放宽退出0判定。
+
+Reviewer独立只读docker ps-a exit0空、最终专用3卷精确匹配、定向lsof exit1空；静态verify172文件exit0，diff-check0。AppHost/版本锁无额外修改。结论：当前Critical0/Important0/Minor0，Master容器运行门禁解除；允许在最终集成头Linux CI成功和收尾差异核对后由Master进入main，最终ZIP仍须重开审查。没有第三次重启资源或读取Env秘密。源码/运行证据审核不是全面供应链/生产审计。

@@ -1,6 +1,6 @@
 # M0 Mac Master 接管与跨平台兼容验收
 
-日期：2026-10-25（Asia/Shanghai）。总状态 **PARTIAL / IN_REVIEW**：Mac工程最低运行验收PASS；本轮Windows原生重跑、Intel Mac及其他开发宿主组合NOT_RUN，不能宣称所有平台全面PASS。正在完成B/最终集成独立审查与Linux CI门禁。BaseSha固定25eab6f5bfd944dc44c8c77b1a3cbd22ec9468e1；最终已提交HeadSha、main CI和归档校验以标准ZIP manifest及实际构包返回值为准，不编造自引用提交。
+日期：2026-10-25（Asia/Shanghai）。总状态 **PARTIAL / READY_FOR_REVIEW**：Mac工程最低运行验收PASS；本轮Windows原生重跑、Intel Mac及其他开发宿主组合NOT_RUN，不能宣称所有平台全面PASS。独立源码、组合入口及原始运行证据审查均通过；最终已提交集成头的Linux CI与main状态由ZIP manifest.runtimeCi和Git事实精确绑定。BaseSha固定25eab6f5bfd944dc44c8c77b1a3cbd22ec9468e1；最终已提交HeadSha、main CI和归档校验以标准ZIP manifest及实际构包返回值为准，不编造自引用提交。
 
 ## 授权与架构
 
@@ -37,7 +37,7 @@ B早期旧树SelfTest两次缺parser exit1，外部PYTHONPATH被入口覆盖；�
 
 构建保留ASPIRE010（当前官方NuGet DCP/Dashboard回退），format诊断0改动/21文件。运行保留未信任开发证书及DataProtection本机profile key未加密警告；本轮只回环开发，不外推生产。Docker/公开包有限漏洞查询未报告已知NuGet漏洞，不代表容器OS完整SBOM/全面供应链或生产安全审计。秘密值不主动写源码、日志、证据或独立秘密文件；Docker/服务内部存储按其机制处理，不能当日常稳定配置或生产备份。
 
-总PARTIAL来自真实平台覆盖边界，不是把未执行项升级为PASS；本轮Mac最低工程验收无剩余运行阻断，最终独立审查和CI结论见收尾记录。详细许可/官方来源见master/dependencies.md；Mac/Windows回退见开发手册。
+总PARTIAL来自真实平台覆盖边界，不是把未执行项升级为PASS；本轮Mac最低工程验收及独立Review无剩余阻断；未知平台仍NOT_RUN，最终CI结论见manifest。详细许可/官方来源见master/dependencies.md；Mac/Windows回退见开发手册。
 
 ## Git、审查与交付
 
@@ -53,4 +53,6 @@ Master分支codex/M0-master；A codex/M0-scripts；B codex/M0-containers。规�
 
 B运行转录未被Reviewer作为独立运行批准，Master另以新唯一前缀直接重跑并归档原始脱敏stdout/实际HTTP JSON/退出码。首次m0-mac-observed-17d4d914健康/平台/回环/持久化/Trace均过，但立即检查容器移除遇DCP异步暂态，验收器exit1；原日志runtime-first-cleanup-race.*保留。只为收尾观察加入60秒有界等待，再以m0-mac-observed-b37a079e完整重跑exit0，AppHost exit0，docker ps从四个逐步到零，三个专用卷保留、固定端口无监听。
 
-最终Marker=c0d935b02e854362bc886e679c491881；实际TraceId=df21dc432c6d28b16607dac68578aa9e、parent=5e5f3bf83e8fc263、span=2d988751304145fe、service=infrastructure-api，缺key401/带key200。运行器源码runtime-harness.py和raw输出同提交，原始记录可对照脚本断言与API JSON；不以转录替代原始输出。最终main集成仍等独立复核此证据和CI。
+最终Marker=c0d935b02e854362bc886e679c491881；实际TraceId=df21dc432c6d28b16607dac68578aa9e、parent=5e5f3bf83e8fc263、span=2d988751304145fe、service=infrastructure-api，缺key401/带key200。运行器源码runtime-harness.py和raw输出同提交，原始记录可对照脚本断言与API JSON；不以转录替代原始输出。该固定运行证据已获独立Reviewer通过；最终main的同Head Linux CI由包内runtimeCi记录。
+
+B最终归档头8d4c6e04c43f35d6f3dfa2d2cc4c10e53ac7c292已经独立批准合入Master；三树保留用于本次外部复审及可恢复修正，审查结束再归档，不保留运行容器。原主开发目录已准备校验过的隔离工具，不依赖临时Worktree链接。

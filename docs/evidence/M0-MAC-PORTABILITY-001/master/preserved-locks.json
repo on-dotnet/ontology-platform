@@ -1,0 +1,17 @@
+{
+  "command": [
+    "git",
+    "diff",
+    "--exit-code",
+    "25eab6f5bfd944dc44c8c77b1a3cbd22ec9468e1",
+    "HEAD",
+    "--",
+    "backend/src/AppHost/packages.win-x64.lock.json",
+    "backend/src/AppHost/packages.linux-x64.lock.json",
+    "backend/src/ServiceDefaults/packages.lock.json",
+    "backend/src/Hosts/OntologyPlatform.InfrastructureApi/packages.lock.json",
+    "backend/tests/OntologyPlatform.InfrastructureTests/packages.lock.json"
+  ],
+  "exitCode": 0,
+  "output": "Five original committed locks unchanged."
+}

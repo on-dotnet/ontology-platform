@@ -1,6 +1,6 @@
 # M0-MAC-PORTABILITY-001 · Mac Master 接管与兼容验收
 
-状态：EXECUTING。日期：2026-10-25（Asia/Shanghai）。BaseSha：25eab6f5bfd944dc44c8c77b1a3cbd22ec9468e1。
+状态：READY_FOR_REVIEW / PARTIAL（Mac最低工程验收及独立审查通过，其他平台覆盖边界保留；最终CI/ZIP以manifest为准）。日期：2026-10-25（Asia/Shanghai）。BaseSha：25eab6f5bfd944dc44c8c77b1a3cbd22ec9468e1。
 
 ## 授权与停止
 
@@ -45,3 +45,7 @@ Agent 不是唯一写者，Master 是 main 唯一集成者。其他人同时工�
 B已完成真实容器/持久化/Trace验收，两个AppHost会话exit0。后续归档工具等待审批随会话中断，未取得结果。Master暂停B所有工具/写入并接收完整只读回报，收回B树最终证据/手册写权，在原独立m0-containers分支串行归档并核实收尾状态；报告明确区分B实测与Master归档/复核，不伪称B已commit或未执行命令PASS。Reviewer仍独立审查固定B提交。
 
 独立B审查指出Owner转录不足以独立解除运行门禁。Master在master证据owned_paths内使用新增唯一开发卷前缀重跑原AppHost/持久化脚本，直接归档脱敏原始进程输出、实际HTTP JSON、退出码及资源快照；不改AppHost/infra实现、不读取凭证、不删除已有卷。B转录保留其来源，Reviewer据新固定头复核。
+
+## 收尾门禁
+
+A两固定里程碑、Master锁/完整组合入口、B来源文案及Master直接原始运行证据均已独立审查，无剩余Critical/Important/Minor。最终任务集成头先读取实际Linux CI成功，再由Master快进main并push；构包显式绑定同Head main CI实际run。Windows本轮NOT_RUN、未授权产品能力NOT_RUN；不将整体覆盖标为PASS。仅交付唯一标准ZIP并独立重开，随后停止等待人类复审。

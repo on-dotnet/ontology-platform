@@ -1,6 +1,6 @@
 # M0 当前授权增量（2026-10-25）
 
-当前执行：**M0-MAC-PORTABILITY-001**。人类在本会话正式批准 Mac Codex Master 接管与跨平台兼容验收，明确读取迁移合同第二节至文末并直接执行。允许项目隔离依赖恢复、开发容器与测试、多 Agent 独立 Worktree/任务分支、独立审查后 Master 集成 main、一个标准 Review ZIP。任务合同与验收矩阵见 [M0 任务卡](M0-MAC-PORTABILITY-001.md)。只批准 M0，不启动 G1 Wave 2 SEC/FE/OBS 或 G2；系统级改动、管理员权限、付费和不明凭证停止对应操作。下文为原 G1 历史索引，原状态不改写。
+当前关口：**M0-MAC-PORTABILITY-001，READY_FOR_REVIEW / PARTIAL**。Mac最低工程验收、独立审查已通过；Windows等未运行项保留，最终同Head CI/ZIP以manifest为准。仅允许本任务收尾/复审，不启动下一关口。人类在本会话正式批准 Mac Codex Master 接管与跨平台兼容验收，明确读取迁移合同第二节至文末并直接执行。允许项目隔离依赖恢复、开发容器与测试、多 Agent 独立 Worktree/任务分支、独立审查后 Master 集成 main、一个标准 Review ZIP。任务合同与验收矩阵见 [M0 任务卡](M0-MAC-PORTABILITY-001.md)。只批准 M0，不启动 G1 Wave 2 SEC/FE/OBS 或 G2；系统级改动、管理员权限、付费和不明凭证停止对应操作。下文为原 G1 历史索引，原状态不改写。
 
 ---
 

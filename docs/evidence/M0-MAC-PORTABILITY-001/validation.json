@@ -90,6 +90,20 @@
       "status": "PASS",
       "exitCode": 0,
       "output": "Raw sanitized stdout/HTTP JSON: four native linux/arm64 resources, six health endpoints before/after restart, loopback/network, persistent PG/Fuseki/S3/Keycloak probe, missing-key401/authenticated matching trace200, AppHost exit0 and async cleanup observed empty containers/ports. VolumePrefix m0-mac-observed-b37a079e; three probe volumes retained."
+    },
+    {
+      "name": "prior-platform-lock-preservation",
+      "command": "git diff --exit-code 25eab6f5bfd944dc44c8c77b1a3cbd22ec9468e1 HEAD -- (five original lock paths; preserved-locks.json)",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Five original Windows/Linux and other project locks unchanged; reviewer byte comparisons match."
+    },
+    {
+      "name": "native-image-manifest-output",
+      "command": "docker buildx imagetools inspect (four exact references in master/manifest-raw.json)",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Four original OCI indexes queried successfully with exact pinned digests and linux/arm64 variants."
     }
   ],
   "ci": {
