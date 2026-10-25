@@ -1,0 +1,19 @@
+COMMAND: dotnet test --project backend/tests/OntologyPlatform.SecurityTests --no-restore -- --filter FullyQualifiedName~RuntimeOpenApiDeclaresRedirectsAndCompleteErrors
+EXIT: 2
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+失败 RuntimeOpenApiDeclaresRedirectsAndCompleteErrors (414ms)
+  从 /Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+  CollectionAssert.AreEquivalent 失败。 集合中元素的数量不匹配。应为: <2>，实际为: <1>。get /auth/login
+    在 OntologyPlatform.SecurityTests.HttpSecurityTests.RuntimeOpenApiDeclaresRedirectsAndCompleteErrors() 位于 /Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/HttpSecurityTests.cs:148
+    在 OntologyPlatform.SecurityTests.HttpSecurityTests.RuntimeOpenApiDeclaresRedirectsAndCompleteErrors() 位于 /Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/HttpSecurityTests.cs:159
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+/Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64) 失败并出现 1 个错误 (2s 066ms)
+退出代码: 2
+
+测试运行摘要: 失败!
+  总计: 1
+  失败: 1
+  成功: 0
+  已跳过: 0
+  持续时间: 2s 439ms
+已完成测试运行，但显示非成功退出代码: 2 (请参阅: https://aka.ms/testingplatform/exitcodes)

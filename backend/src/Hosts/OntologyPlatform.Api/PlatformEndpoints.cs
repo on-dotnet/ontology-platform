@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using OntologyPlatform.Api.Contracts;
 using OntologyPlatform.Api.Security;
 using OntologyPlatform.Modules.Governance;
+using PlatformError = OntologyPlatform.Api.Contracts.PlatformProblem;
 
 namespace OntologyPlatform.Api;
 
@@ -29,27 +30,48 @@ public static class PlatformEndpoints
             return SecurityBoundary.IsLocalReturnUrl(destination)
                 ? Results.Challenge(new AuthenticationProperties { RedirectUri = destination }, [OpenIdConnectDefaults.AuthenticationScheme])
                 : PlatformProblem.Create(context, 400, "invalid_request");
-        });
+        }).Produces(302)
+            .Produces<PlatformError>(400, contentType: "application/problem+json");
         app.MapGet("/auth/csrf", (HttpContext context, IAntiforgery antiforgery) =>
         {
             context.Response.Headers.CacheControl = "no-store";
             return Results.Ok(new CsrfResponse { RequestToken = antiforgery.GetAndStoreTokens(context).RequestToken! });
         }).Produces<CsrfResponse>();
-        app.MapPost("/auth/logout", LogoutAsync);
-        app.MapGet("/signin-oidc", (HttpContext context) => PlatformProblem.Create(context, 400, "oidc_callback_invalid"));
+        app.MapPost("/auth/logout", LogoutAsync)
+            .Produces(302)
+            .Produces<PlatformError>(401, contentType: "application/problem+json")
+            .Produces<PlatformError>(403, contentType: "application/problem+json");
+        app.MapGet("/signin-oidc", (HttpContext context) => PlatformProblem.Create(context, 400, "oidc_callback_invalid"))
+            .Produces<PlatformError>(400, contentType: "application/problem+json");
         app.MapGet("/api/v1/platform/me", (HttpContext context) =>
             context.User.Identity?.IsAuthenticated == true
                 ? Results.Ok(ToIdentity(context.User))
                 : PlatformProblem.Create(context, 401, "unauthenticated"))
-            .Produces<PlatformIdentity>().ProducesProblem(401);
+            .Produces<PlatformIdentity>()
+            .Produces<PlatformError>(401, contentType: "application/problem+json")
+            .Produces<PlatformError>(403, contentType: "application/problem+json")
+            .Produces<PlatformError>(503, contentType: "application/problem+json");
         app.MapGet("/api/v1/platform/resources", ReadResourcesAsync)
-            .Produces<PlatformResourceList>().ProducesProblem(401).ProducesProblem(403).ProducesProblem(503);
+            .Produces<PlatformResourceList>()
+            .Produces<PlatformError>(401, contentType: "application/problem+json")
+            .Produces<PlatformError>(403, contentType: "application/problem+json")
+            .Produces<PlatformError>(503, contentType: "application/problem+json");
         app.MapGet("/api/v1/platform/resources/{id}", ReadResourceAsync)
-            .Produces<PlatformResource>().ProducesProblem(401).ProducesProblem(403).ProducesProblem(404).ProducesProblem(503);
+            .Produces<PlatformResource>()
+            .Produces<PlatformError>(401, contentType: "application/problem+json")
+            .Produces<PlatformError>(403, contentType: "application/problem+json")
+            .Produces<PlatformError>(404, contentType: "application/problem+json")
+            .Produces<PlatformError>(503, contentType: "application/problem+json");
         app.MapGet("/api/v1/platform/audit", ReadAuditAsync)
-            .Produces<PlatformAuditEntry[]>().ProducesProblem(400).ProducesProblem(401).ProducesProblem(403).ProducesProblem(503);
+            .Produces<PlatformAuditEntry[]>()
+            .Produces<PlatformError>(400, contentType: "application/problem+json")
+            .Produces<PlatformError>(401, contentType: "application/problem+json")
+            .Produces<PlatformError>(403, contentType: "application/problem+json")
+            .Produces<PlatformError>(503, contentType: "application/problem+json");
         app.MapGet("/health/live", (HttpContext context) => HasHealthKey(context, security)
-            ? Results.Ok(new { status = "Healthy" }) : PlatformProblem.Create(context, 401, "unauthenticated"));
+            ? Results.Ok(new { status = "Healthy" }) : PlatformProblem.Create(context, 401, "unauthenticated"))
+            .Produces(200)
+            .Produces<PlatformError>(401, contentType: "application/problem+json");
         app.MapGet("/health/ready", async (HttpContext context, GovernanceDbContext database) =>
         {
             if (!HasHealthKey(context, security))
@@ -61,7 +83,9 @@ public static class PlatformEndpoints
             await database.AuditRecords.AsNoTracking().Take(1).ToArrayAsync(context.RequestAborted);
             await database.Resources.AsNoTracking().Take(1).ToArrayAsync(context.RequestAborted);
             return Results.Ok(new { status = "Healthy" });
-        });
+        }).Produces(200)
+            .Produces<PlatformError>(401, contentType: "application/problem+json")
+            .Produces<PlatformError>(503, contentType: "application/problem+json");
     }
 
     /// <summary>校验认证及内置CSRF后，先撤销服务器会话再完成OIDC退出。</summary>
