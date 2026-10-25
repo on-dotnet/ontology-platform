@@ -1,0 +1,85 @@
+FEEEEEEE
+======================================================================
+ERROR: test_origin_rejects_path_query_fragment_and_credentials (test_bootstrap_keycloak.BootstrapBoundaryTests.test_origin_rejects_path_query_fragment_and_credentials) (origin='http://localhost/path')
+Only canonical loopback HTTP origins are supported by this dev helper.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/infra/security/test_bootstrap_keycloak.py", line 59, in test_origin_rejects_path_query_fragment_and_credentials
+    bootstrap.validate_origin(origin)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'bootstrap' has no attribute 'validate_origin'
+
+======================================================================
+ERROR: test_origin_rejects_path_query_fragment_and_credentials (test_bootstrap_keycloak.BootstrapBoundaryTests.test_origin_rejects_path_query_fragment_and_credentials) (origin='http://localhost?q=x')
+Only canonical loopback HTTP origins are supported by this dev helper.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/infra/security/test_bootstrap_keycloak.py", line 59, in test_origin_rejects_path_query_fragment_and_credentials
+    bootstrap.validate_origin(origin)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'bootstrap' has no attribute 'validate_origin'
+
+======================================================================
+ERROR: test_origin_rejects_path_query_fragment_and_credentials (test_bootstrap_keycloak.BootstrapBoundaryTests.test_origin_rejects_path_query_fragment_and_credentials) (origin='http://localhost/#x')
+Only canonical loopback HTTP origins are supported by this dev helper.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/infra/security/test_bootstrap_keycloak.py", line 59, in test_origin_rejects_path_query_fragment_and_credentials
+    bootstrap.validate_origin(origin)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'bootstrap' has no attribute 'validate_origin'
+
+======================================================================
+ERROR: test_origin_rejects_path_query_fragment_and_credentials (test_bootstrap_keycloak.BootstrapBoundaryTests.test_origin_rejects_path_query_fragment_and_credentials) (origin='http://user:pass@localhost')
+Only canonical loopback HTTP origins are supported by this dev helper.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/infra/security/test_bootstrap_keycloak.py", line 59, in test_origin_rejects_path_query_fragment_and_credentials
+    bootstrap.validate_origin(origin)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'bootstrap' has no attribute 'validate_origin'
+
+======================================================================
+ERROR: test_origin_rejects_path_query_fragment_and_credentials (test_bootstrap_keycloak.BootstrapBoundaryTests.test_origin_rejects_path_query_fragment_and_credentials) (origin='https://localhost')
+Only canonical loopback HTTP origins are supported by this dev helper.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/infra/security/test_bootstrap_keycloak.py", line 59, in test_origin_rejects_path_query_fragment_and_credentials
+    bootstrap.validate_origin(origin)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'bootstrap' has no attribute 'validate_origin'
+
+======================================================================
+ERROR: test_origin_rejects_path_query_fragment_and_credentials (test_bootstrap_keycloak.BootstrapBoundaryTests.test_origin_rejects_path_query_fragment_and_credentials)
+Only canonical loopback HTTP origins are supported by this dev helper.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/infra/security/test_bootstrap_keycloak.py", line 60, in test_origin_rejects_path_query_fragment_and_credentials
+    bootstrap.validate_origin("http://localhost:18080")
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'bootstrap' has no attribute 'validate_origin'
+
+======================================================================
+ERROR: test_runtime_output_cannot_be_written_to_source_tree (test_bootstrap_keycloak.BootstrapBoundaryTests.test_runtime_output_cannot_be_written_to_source_tree)
+A caller typo must not put newly generated passwords in tracked paths.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/infra/security/test_bootstrap_keycloak.py", line 52, in test_runtime_output_cannot_be_written_to_source_tree
+    bootstrap.validate_runtime_output(Path(directory) / "source.json")
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'bootstrap' has no attribute 'validate_runtime_output'
+
+======================================================================
+FAIL: test_credential_response_redirect_is_never_followed (test_bootstrap_keycloak.BootstrapBoundaryTests.test_credential_response_redirect_is_never_followed)
+A redirect must fail before credentials can reach another endpoint.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/infra/security/test_bootstrap_keycloak.py", line 41, in test_credential_response_redirect_is_never_followed
+    with self.assertRaises(urllib.error.HTTPError):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: HTTPError not raised
+
+----------------------------------------------------------------------
+Ran 3 tests in 4.448s
+
+FAILED (failures=1, errors=7)

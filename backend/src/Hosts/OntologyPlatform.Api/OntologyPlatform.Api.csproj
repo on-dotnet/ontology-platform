@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+    <PackageReference Include="Yarp.ReverseProxy" />
+    <ProjectReference Include="../../Modules/Governance/OntologyPlatform.Modules.Governance/OntologyPlatform.Modules.Governance.csproj" />
+    <ProjectReference Include="../../ServiceDefaults/OntologyPlatform.ServiceDefaults.csproj" />
+  </ItemGroup>
+</Project>
