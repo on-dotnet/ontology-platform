@@ -20,6 +20,13 @@
       "status": "NOT_RUN",
       "exitCode": null,
       "output": "Master and infrastructure Owner own native build/test, resource validation and integration."
+    },
+    {
+      "name": "environment-state-regression",
+      "command": "pwsh -NoProfile -File scripts/tests/Environment.Tests.ps1",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "3 groups: unset/empty/value preserved for PYTHONPATH and four .NET process variables; structured suite cleanup preserved unset. Native calls are synthetic; actual combined product gate is separate."
     }
   ],
   "ci": {

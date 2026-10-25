@@ -34,7 +34,7 @@ try {
     }
     Write-Output 'PASS: structured parser 4 real positive/negative cases.'
 } finally {
-    [Environment]::SetEnvironmentVariable('PYTHONPATH', $previousPythonPath, 'Process')
+    [Environment]::SetEnvironmentVariable('PYTHONPATH', ($previousPythonPath ?? [NullString]::Value), 'Process')
     if ((Split-Path $temporary -Leaf) -notmatch '^ontology-structured-[a-f0-9]{32}$') { throw 'Unsafe fixture cleanup' }
     if (Test-Path -LiteralPath $temporary) { Remove-Item -LiteralPath $temporary -Recurse -Force }
 }

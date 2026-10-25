@@ -1,0 +1,12 @@
+command: pwsh -NoProfile -File scripts/tests/Environment.Tests.ps1
+exitCode: 1
+
+Check             Status Message
+-----             ------ -------
+repository-static PASS   检查135个文件：语法/格式/相对链接/有限机密模式/基线策…
+
+Exception: /Users/chasen/.codex/worktrees/m0-scripts/ontology-platform/scripts/tests/Environment.Tests.ps1:31
+Line |
+  31 |  …             throw "Environment state changed: $environmentName ($stat …
+     |                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     | Environment state changed: PYTHONPATH (unset); values hidden
