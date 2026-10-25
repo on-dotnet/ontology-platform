@@ -68,3 +68,12 @@ Windows 原生与 Intel Mac 本轮 NOT_RUN；Windows 可在固定SDK下运行相
 `infra/security/verify-oidc.py --runtime-file <本轮私有runtime.json>` 消费 Master 生成的 `realmFile`，只对明确的 localhost 15100/15101/18080 origin 发请求，每次重定向和登录 form action 都重新检查目标。它使用真实 Keycloak 登录、PKCE/state/nonce challenge、回调、五身份角色/厂区、双实例Cookie、CSRF、注销与重放、真实API审计读取，输出仅有固定检查名/合成身份标签/状态码，不输出响应正文、密码、Cookie、token、回调URL或异常详情。此协议驱动不是浏览器交互验收，SSR/无障碍/Console仍由FE Playwright复验。无真实栈运行输出时明确NOT_RUN。
 
 代理日志也必须抑制：YARP 默认 Info/Error 正文可能包含完整上游 URI；正式 API 过滤 `Yarp.ReverseProxy` 并仅使用自定义路由模板/状态/关联ID安全日志。`ProxyQueryNeverEntersLogBody` 经真实HTTP与内存日志捕获验证，测试只用无效合成query标记。
+
+
+## 真实 PAR 与本轮联调观察（2026-10-25）
+
+.NET10 的默认 UseIfAvailable 会在 Keycloak discovery 提供 PAR endpoint 时先推送授权参数，再将浏览器重定向缩为 client_id/request_uri；不能因前端URL没有PKCE/state/nonce就判失败或关闭PAR。实现保持默认行为，`OnPushAuthorization` 的 LoggerMessage1002仅记录 code、pkceS256、hasChallenge、hasState、hasNonce五个布尔，不记录协议值、不HandlePush/SkipPush；框架仍自行执行真实推送与客户端认证。[官方10.0.13处理器源码](https://raw.githubusercontent.com/dotnet/aspnetcore/v10.0.13/src/Security/Authentication/OpenIdConnect/src/OpenIdConnectHandler.cs)可对照事件调用、PAR请求与前端参数收缩顺序。
+
+已通过真实独立Kestrel向本轮Keycloak推送验证五布尔全True，真实回调再证明框架完成协议验证。驱动区分PAR引用观察与普通授权URL参数检查。Python CookieJar默认不采用浏览器对HTTP localhost的Secure Cookie例外，曾造成KC登录会话Cookie未发送和400；仅驱动内`LoopbackCookiePolicy`在明确批准的localhost/127.0.0.1端口匹配时模拟该例外，其他origin仍拒绝，产品与Keycloak的Secure配置均保持。另将Cache-Control按指令集合判定，正确接受框架`no-cache, no-store`。
+
+本轮真实结果见[SEC联调证据](../evidence/G1-WAVE2/SEC/real-stack.md)：五身份310项HTTP检查成功；真实PG与PAR注入后C#11/11成功，零跳过。浏览器Playwright、PG/API重启与同Head Linux CI继续独立计数，不从协议成功推导通过。

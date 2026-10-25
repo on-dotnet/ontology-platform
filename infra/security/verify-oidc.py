@@ -33,6 +33,16 @@ def validate_destination(address, approved):
         raise ValueError('Unapproved protocol destination')
 
 
+def challenge_transport(query):
+    """Observe PAR reference separately; its secret parameters travel backchannel."""
+    if query.get('client_id') and len(query.get('request_uri', [])) == 1 and query['request_uri'][0].startswith('urn:ietf:params:oauth:request_uri:'):
+        return 'PAR'
+    if (query.get('response_type') == ['code'] and query.get('code_challenge_method') == ['S256']
+            and bool(query.get('code_challenge')) and bool(query.get('state')) and bool(query.get('nonce'))):
+        return 'authorization-code'
+    raise ValueError('Incomplete authorization challenge')
+
+
 class LoginForm(HTMLParser):
     """Extract only the dedicated Keycloak password-login form action."""
 
@@ -51,6 +61,21 @@ class LoginForm(HTMLParser):
         return self.actions[0]
 
 
+class LoopbackCookiePolicy(http.cookiejar.DefaultCookiePolicy):
+    """Match browsers' localhost secure-cookie exception only at approved origins."""
+
+    def __init__(self, approved):
+        super().__init__()
+        self.approved = approved
+
+    def return_ok_secure(self, cookie, request):
+        if super().return_ok_secure(cookie, request):
+            return True
+        parsed = urllib.parse.urlsplit(request.full_url)
+        origin = urllib.parse.urlunsplit((parsed.scheme, parsed.netloc, '', '', ''))
+        return parsed.hostname in ('localhost', '127.0.0.1') and origin in self.approved
+
+
 class ProtocolDriver:
     """Retain secrets in memory and produce only named, bounded result records."""
 
@@ -60,7 +85,7 @@ class ProtocolDriver:
         self.approved = {first, second, urllib.parse.urlunsplit(urllib.parse.urlsplit(authority)[:2] + ('', '', ''))}
         for origin in self.approved:
             validate_destination(origin, self.approved)
-        self.jar = http.cookiejar.CookieJar()
+        self.jar = http.cookiejar.CookieJar(policy=LoopbackCookiePolicy(self.approved))
         self.opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), NoRedirect(), urllib.request.HTTPCookieProcessor(self.jar))
         self.current_check = 'initialization'
         self.records = []
@@ -81,6 +106,7 @@ class ProtocolDriver:
     def check(self, label, condition, status=None):
         self.current_check = label
         if not condition:
+            self.records.append({'check': label, 'status': 'FAIL', **({'httpStatus': status} if status is not None else {})})
             raise AssertionError('Protocol assertion failed')
         self.records.append({'check': label, 'status': 'PASS', **({'httpStatus': status} if status is not None else {})})
 
@@ -105,9 +131,8 @@ class ProtocolDriver:
         destination = urllib.parse.urljoin(self.first, headers.get('Location', ''))
         validate_destination(destination, self.approved)
         query = urllib.parse.parse_qs(urllib.parse.urlsplit(destination).query)
-        self.check('oidc-code-pkce-state-nonce', query.get('response_type') == ['code']
-                   and query.get('code_challenge_method') == ['S256'] and bool(query.get('code_challenge'))
-                   and bool(query.get('state')) and bool(query.get('nonce')))
+        transport = challenge_transport(query)
+        self.check('oidc-par-reference-observed' if transport == 'PAR' else 'oidc-code-pkce-state-nonce', True)
         status, _, body = self.follow_until_bff(destination)
         self.check('keycloak-password-form', status == 200, status)
         parser = LoginForm()
@@ -122,11 +147,11 @@ class ProtocolDriver:
                    and session[0].get_nonstandard_attr('samesite', session[0].get_nonstandard_attr('SameSite', '')).lower() == 'lax')
         return copy.deepcopy(session[0])
 
-    def json_request(self, origin, path, expected, label, form=None):
+    def json_request(self, origin, path, expected, label, form=None, headers=None):
         self.current_check = label
-        status, headers, body = self.request(origin + path, form)
+        status, headers, body = self.request(origin + path, form, headers)
         self.check(label, status == expected, status)
-        self.check(label + '-no-store', headers.get('Cache-Control') == 'no-store')
+        self.check(label + '-no-store', 'no-store' in {directive.strip().lower() for directive in headers.get('Cache-Control', '').split(',')})
         self.check(label + '-trace', bool(headers.get('X-Trace-Id')) and bool(headers.get('X-Correlation-Id')))
         if expected >= 400:
             self.check(label + '-problem', headers.get_content_type() == 'application/problem+json')
@@ -160,7 +185,14 @@ def run(arguments):
         driver = ProtocolDriver(arguments.first_origin, arguments.second_origin, realm['authority'])
         try:
             driver.json_request(driver.first, '/api/v1/platform/me', 401, 'anonymous-denied')
+            driver.json_request(driver.first, '/signin-oidc?error=invalid_request', 400, 'bad-callback-rejected')
+            driver.json_request(driver.first, '/api/v1/platform/me', 400, 'forged-forwarded-rejected', headers={'X-Forwarded-Host': 'evil.invalid'})
             cookie = driver.login(realm['identities']['wave2-' + label])
+            tampered = copy.deepcopy(cookie)
+            tampered.value = 'synthetic-invalid-session-reference'
+            driver.jar.set_cookie(tampered)
+            driver.json_request(driver.first, '/api/v1/platform/me', 401, 'tampered-cookie-rejected')
+            driver.jar.set_cookie(cookie)
             me, _ = driver.json_request(driver.first, '/api/v1/platform/me', 200, 'authenticated-identity')
             driver.check('minimal-identity-schema', set(me) == {'subjectId', 'displayName', 'roles', 'scopes'})
             driver.check('trusted-site-scope', me['scopes'] == [{'organizationId': 'org-demo', 'siteId': site}])

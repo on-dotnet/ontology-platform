@@ -1,0 +1,14 @@
+...E
+======================================================================
+ERROR: test_secure_cookie_localhost_exception_is_limited_to_approved_origins (test_oidc_harness.OidcDriverBoundaryTests.test_secure_cookie_localhost_exception_is_limited_to_approved_origins)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/infra/security/test_oidc_harness.py", line 33, in test_secure_cookie_localhost_exception_is_limited_to_approved_origins
+    policy = module.LoopbackCookiePolicy({'http://localhost:18080'})
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'oidc_harness' has no attribute 'LoopbackCookiePolicy'
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.006s
+
+FAILED (errors=1)

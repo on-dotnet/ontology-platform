@@ -1,0 +1,25 @@
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+失败 PushedAuthorizationObservationContainsBooleansOnly (125ms)
+  从 /Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+  Assertion failed. 预期条件为 true。
+  正式事件必须保留安全布尔观察。
+
+  actual: false
+
+  Assert.IsTrue(logs.Messages.Any(value => value.Contains("PAR协议", StringComparison.Ordinal)))
+    在 OntologyPlatform.SecurityTests.HttpSecurityTests.PushedAuthorizationObservationContainsBooleansOnly() 位于 /Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/HttpSecurityTests.cs:135
+    在 OntologyPlatform.SecurityTests.HttpSecurityTests.PushedAuthorizationObservationContainsBooleansOnly() 位于 /Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/HttpSecurityTests.cs:139
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+已跳过 SharedEncryptedTicketRevocationAndExpiryUsePostgresFacts
+  Assert.Inconclusive。 NOT_RUN: G1_SEC_PG_CONNECTION未注入隔离PG；需要Master先应用Governance迁移。
+  从 /Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+/Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64) 失败并出现 1 个错误 (3s 595ms)
+退出代码: 2
+
+测试运行摘要: 失败!
+  总计: 10
+  失败: 1
+  成功: 8
+  已跳过: 1
+  持续时间: 4s 112ms
+已完成测试运行，但显示非成功退出代码: 2 (请参阅: https://aka.ms/testingplatform/exitcodes)
