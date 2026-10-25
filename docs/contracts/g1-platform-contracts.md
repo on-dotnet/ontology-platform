@@ -12,11 +12,11 @@
 | GET /signin-oidc | 标准OIDC回调，ResponseMode=query使开发HTTP的Lax关联Cookie可用；无效回调400通用ProblemDetails，无敏感远端错误 |
 | GET /signout-callback-oidc | 标准注销回调，返回/signed-out |
 | GET /auth/csrf | ASP.NET Antiforgery返回{requestToken}；仅用于CSRF，不是身份token；响应no-store |
-| POST /auth/logout | 认证+X-CSRF-TOKEN；撤销PG服务器会话、记录审计、清Cookie并完成Keycloak注销，最后/signed-out；缺CSRF=403 |
+| POST /auth/logout | 认证+内置Antiforgery表单字段__RequestVerificationToken（也接受X-CSRF-TOKEN）；必须原生form POST顶层导航以接收OIDC302，不能用fetch跟随跨源注销；撤销PG服务器会话、记录审计、清Cookie并完成Keycloak注销，最后/signed-out；缺CSRF=403 |
 | GET /api/v1/platform/me | 匿名/过期/坏Cookie401；已认证200，含subjectId/displayName/roles/scopes，不含JWT/认证属性/token/秘密Claim |
 | GET /api/v1/platform/resources?siteId=site-a | viewer或operator；只返回自身organization/site；显式请求越界site403，空合法作用域可为空列表 |
 | GET /api/v1/platform/resources/{id} | 同角色+行级组织/厂区检查；本轮已知样例跨厂403，未知id404；无角色403 |
-| GET /api/v1/platform/audit?limit=20 | auditor角色且按组织/厂区过滤，limit1..100；支持审计ID与TraceId关联，禁止匿名读取 |
+| GET /api/v1/platform/audit?limit=20 | auditor角色且按组织/厂区过滤，limit1..100，非法400 invalid_request；支持审计ID与TraceId关联，禁止匿名读取 |
 | GET /health/live、/health/ready | 正式API在Development/Production均有真实探针；仅有效X-Health-Key内部编排访问，错误key401；live不依赖PG，ready依赖真实PG，故障503且不泄露连接信息 |
 | GET /openapi/v1.json | OpenAPI3.1；开发回环可读供生成/校验，生产禁匿名；实际导出由Master与冻结schema核对 |
 
@@ -30,7 +30,7 @@ Web根页SSR遇/me401则重定向/auth/login?returnUrl=/；/signed-out为公开�
 
 DataProtection必须相同ApplicationName、共享显式持久keyring、X509证书加密，缺路径/证书/密码启动失败，不静默回落进程内Key或未加密文件。开发证书由本轮隔离工具新建，不安装系统信任；文件0700/0600、Git忽略；生产用外置证书/权限边界，文档说明轮换及保留旧证书解密。双实例从同一PG会话和共享加密keyring实测，不靠内存缓存模拟。
 
-默认不处理ForwardedHeaders；只有显式非通配可信代理列表才启用且ForwardLimit=1、校验对称和主机；回调外部origin来自验证配置，不由不可信Host/Forwarded头派生。默认拒绝，非法issuer/client/public origin/keyring/连接配置启动或验证失败。CSRF用内置Antiforgery，POST logout验证header；写操作不得使用GET。允许本轮认证/会话变更，不创建本体业务写入口。
+默认不处理ForwardedHeaders；只有显式非通配可信代理列表才启用且ForwardLimit=1、校验对称和主机；回调外部origin来自验证配置，不由不可信Host/Forwarded头派生。默认拒绝，非法issuer/client/public origin/keyring/连接配置启动或验证失败。CSRF用内置Antiforgery，POST logout验证内置表单字段或header（浏览器采用原生form，避免fetch跨源重定向）；写操作不得使用GET。允许本轮认证/会话变更，不创建本体业务写入口。
 
 ## 最小合成资源及审计
 
@@ -59,3 +59,5 @@ OBS资源建议固定开发端口：Grafana15330、Loki13100、Tempo13200、Prom
 ## 验收与变更
 
 真实Keycloak登录/回调/退出、Cookie坏例/过期/重放、CSRF、错误回调、伪造Forwarded、角色/跨厂区、双实例共享加密keyring/PG会话；PG审计、重启持久化。真实Web lint/typecheck/test/build+Playwright1280/宽屏/键盘/主题持久化/加载/网络错误和完整OIDC闭环；Console无水合/焦点错误。真实Loki/Tempo/Prometheus查询、中文Grafana、告警触发/恢复及持久化。原4项Infra测试保留。Windows本轮无主机则NOT_RUN并给复现命令，Linux现有CI必须不退化。任何核心失败总PARTIAL/BLOCKED，未跑不算PASS。
+
+独立契约审查修订：浏览器退出采用原生form POST及隐藏__RequestVerificationToken，允许内置header用于其他客户端但不能用fetch跟随OIDC跨源注销。错误媒体类型统一application/problem+json，type字段必须存在（默认about:blank）；audit limit非法明确400 invalid_request。本修订在任何产品并行写入前完成。
