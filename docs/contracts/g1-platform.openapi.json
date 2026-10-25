@@ -366,7 +366,7 @@
           }
         },
         "requestBody": {
-          "required": true,
+          "required": false,
           "content": {
             "application/x-www-form-urlencoded": {
               "schema": {
@@ -382,7 +382,8 @@
               }
             }
           }
-        }
+        },
+        "description": "必须提供有效header或表单CSRF token至少一项；浏览器必须原生form POST顶层导航，不能fetch跟随跨源OIDC注销。"
       }
     }
   },
