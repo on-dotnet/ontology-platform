@@ -38,6 +38,17 @@ public static partial class PlatformTelemetry
     /// <param name="status">HTTP状态。</param>
     /// <param name="traceId">当前跟踪标识，作为结构化字段而非索引标签。</param>
     /// <param name="auditId">已提交PG审计标识，可空。</param>
-    [LoggerMessage(1001, LogLevel.Information, "平台请求 route={Route} status={Status} traceId={TraceId} auditId={AuditId}")]
-    public static partial void RequestCompleted(ILogger logger, string route, int status, string traceId, string? auditId);
+    /// <param name="outcome">固定完成结果，不能由请求输入提供。</param>
+    [LoggerMessage(1001, LogLevel.Information, "平台请求 route={Route} status={Status} traceId={TraceId} auditId={AuditId} outcome={Outcome}")]
+    public static partial void RequestCompleted(ILogger logger, string route, int status, string traceId, string? auditId, string outcome);
+
+    /// <summary>记录受控请求故障，不接受原异常对象或任何异常原文。</summary>
+    /// <param name="logger">宿主结构化日志器。</param>
+    /// <param name="route">固定路由模板。</param>
+    /// <param name="exceptionCategory">白名单故障类别。</param>
+    /// <param name="outcome">固定失败完成结果。</param>
+    /// <param name="status">实际响应状态或受控取消状态。</param>
+    /// <param name="traceId">与实际请求Activity关联的跟踪标识。</param>
+    [LoggerMessage(1003, LogLevel.Error, "平台故障 route={Route} exceptionCategory={ExceptionCategory} outcome={Outcome} status={Status} traceId={TraceId}", EventName = "PlatformRequestFault")]
+    public static partial void PlatformRequestFault(ILogger logger, string route, string exceptionCategory, string outcome, int status, string traceId);
 }

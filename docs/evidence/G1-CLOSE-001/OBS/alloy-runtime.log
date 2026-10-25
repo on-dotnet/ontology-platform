@@ -1,0 +1,46 @@
+{
+  "image": "grafana/alloy:v1.21.2@sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18",
+  "checks": [
+    {
+      "name": "logs-ingest-http200",
+      "pass": true
+    },
+    {
+      "name": "traces-ingest-http200",
+      "pass": true
+    },
+    {
+      "name": "actual-loki-export-received",
+      "pass": true
+    },
+    {
+      "name": "actual-tempo-export-received",
+      "pass": true
+    },
+    {
+      "name": "body-and-all-sensitive-markers-removed",
+      "pass": true
+    },
+    {
+      "name": "fault-body-and-exact-case-fields-retained",
+      "pass": true
+    },
+    {
+      "name": "wrong-case-fields-removed",
+      "pass": true
+    },
+    {
+      "name": "span-safe-category-retained",
+      "pass": true
+    },
+    {
+      "name": "span-event-normalized",
+      "pass": true
+    },
+    {
+      "name": "three-loki-index-labels-unchanged",
+      "pass": true
+    }
+  ],
+  "status": "PASS"
+}
