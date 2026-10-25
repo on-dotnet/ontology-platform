@@ -1,0 +1,96 @@
+[
+  {
+    "command": [
+      "docker",
+      "run",
+      "--detach",
+      "--name",
+      "wave2-governance-test-d2dde7cd5cb8",
+      "--env",
+      "POSTGRES_PASSWORD",
+      "--env",
+      "POSTGRES_DB",
+      "--publish",
+      "127.0.0.1::5432",
+      "--tmpfs",
+      "/var/lib/postgresql",
+      "postgres:18.6-trixie@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6"
+    ],
+    "exitCode": 0,
+    "output": "4b27f31a0f1d2086a352257cfdf59cb0f79162e32d444cc891b52d14b4faa6d7\n"
+  },
+  {
+    "command": [
+      "dotnet",
+      "tool",
+      "restore"
+    ],
+    "exitCode": 0,
+    "output": "工具“dotnet-ef”(版本“10.0.13”)已还原。可用的命令: dotnet-ef\n\n还原成功。\n"
+  },
+  {
+    "command": [
+      "dotnet",
+      "tool",
+      "run",
+      "dotnet-ef",
+      "database",
+      "update",
+      "--project",
+      "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance",
+      "--startup-project",
+      "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance",
+      "--no-build"
+    ],
+    "exitCode": 0,
+    "output": "Failed executing DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']\nSELECT \"MigrationId\", \"ProductVersion\"\nFROM governance.\"__EFMigrationsHistory\"\nORDER BY \"MigrationId\";\nAcquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.\nApplying migration '20261025062847_InitialGovernance'.\nApplying migration '20261025144246_AuditScopeSites'.\nAcquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.\nDone.\n"
+  },
+  {
+    "command": [
+      "docker",
+      "run",
+      "--detach",
+      "--name",
+      "wave2-governance-test-d2dde7cd5cb8-keycloak",
+      "--env",
+      "KC_BOOTSTRAP_ADMIN_PASSWORD",
+      "--env",
+      "KC_BOOTSTRAP_ADMIN_USERNAME=wave2-bootstrap",
+      "--publish",
+      "127.0.0.1::8080",
+      "quay.io/keycloak/keycloak:26.8.1@sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b",
+      "start-dev"
+    ],
+    "exitCode": 0,
+    "output": "f1e1367aa8b64bbf935973a9cb637be414a2285ec99384eabca4a0957b16a1ae\n"
+  },
+  {
+    "command": [
+      "python3",
+      "infra/security/bootstrap-keycloak.py",
+      "--keycloak-origin",
+      "http://localhost:51226",
+      "--runtime-output",
+      "/Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/.tools/security/wave2-governance-test-d2dde7cd5cb8/realm.json"
+    ],
+    "exitCode": 0,
+    "output": "{\"status\": \"CREATED\", \"realm\": \"wave2-ee2ee54d4288f796\", \"identities\": [\"wave2-viewer-a\", \"wave2-viewer-b\", \"wave2-no-role-a\", \"wave2-operator-a\", \"wave2-auditor-a\"], \"secrets\": \"runtime-only\"}\n"
+  },
+  {
+    "command": [
+      "dotnet",
+      "test",
+      "--project",
+      "backend/tests/OntologyPlatform.SecurityTests",
+      "--no-build",
+      "--no-restore"
+    ],
+    "exitCode": 2,
+    "output": "正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)\n失败 SuccessfulRepeatedAndConcurrentReadsCommitExactlyOnceWithoutSelf (890ms)\n  从 /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)\n  Assertion failed. 预期条件为 true。\n  成功查询必须先提交审计并返回关联ID。\n\n  actual: false\n\n  Assert.IsTrue(response.Headers.Contains(\"X-Audit-Id\"))\n    在 OntologyPlatform.SecurityTests.AuditReadFixture.ReadAndAssertAsync(String previousId) 位于 /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/AuditReadTests.cs:311\n    在 OntologyPlatform.SecurityTests.AuditReadTests.SuccessfulRepeatedAndConcurrentReadsCommitExactlyOnceWithoutSelf() 位于 /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/AuditReadTests.cs:29\n    在 OntologyPlatform.SecurityTests.AuditReadTests.SuccessfulRepeatedAndConcurrentReadsCommitExactlyOnceWithoutSelf() 位于 /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/AuditReadTests.cs:40\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n失败 ScopeFilterRequiresNonemptyOrganizationAndCompleteArraySubset (\"site-a\",\"A\") (210ms)\n  从 /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)\n  CollectionAssert.AreEquivalent 失败。 集合中元素的数量不匹配。应为: <1>，实际为: <5>。\n    在 OntologyPlatform.SecurityTests.AuditReadTests.ScopeFilterRequiresNonemptyOrganizationAndCompleteArraySubset(String scope, String expected) 位于 /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/AuditReadTests.cs:65\n    在 OntologyPlatform.SecurityTests.AuditReadTests.ScopeFilterRequiresNonemptyOrganizationAndCompleteArraySubset(String scope, String expected) 位于 /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/AuditReadTests.cs:66\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n失败 ScopeFilterRequiresNonemptyOrganizationAndCompleteArraySubset (\"site-b\",\"B\") (147ms)\n  从 /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)\n  CollectionAssert.AreEquivalent 失败。 集合中元素的数量不匹配。应为: <1>，实际为: <0>。\n    在 OntologyPlatform.SecurityTests.AuditReadTests.ScopeFilterRequiresNonemptyOrganizationAndCompleteArraySubset(String scope, String expected) 位于 /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/AuditReadTests.cs:65\n    在 OntologyPlatform.SecurityTests.AuditReadTests.ScopeFilterRequiresNonemptyOrganizationAndCompleteArraySubset(String scope, String expected) 位于 /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/AuditReadTests.cs:66\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n失败 ScopeFilterRequiresNonemptyOrganizationAndCompleteArraySubset (\"site-a,site-b\",\"A,B,AB\") (180ms)\n  从 /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)\n  CollectionAssert.AreEquivalent 失败。 集合中元素的数量不匹配。应为: <3>，实际为: <5>。\n    在 OntologyPlatform.SecurityTests.AuditReadTests.ScopeFilterRequiresNonemptyOrganizationAndCompleteArraySubset(String scope, String expected) 位于 /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/AuditReadTests.cs:65\n    在 OntologyPlatform.SecurityTests.AuditReadTests.ScopeFilterRequiresNonemptyOrganizationAndCompleteArraySubset(String scope, String expected) 位于 /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/AuditReadTests.cs:66\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n失败 EmptyResultsAndMissingScopesStillCommitReadFact (\"valid\",True) (184ms)\n  从 /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)\n  Assertion failed. 预期值相等。\n\n  expected: 0\n  actual:   1\n\n  Assert.AreEqual(0, (await response.Content.ReadFromJsonAsync<PlatformAuditEntry[]>())!.Length)\n    在 OntologyPlatform.SecurityTests.AuditReadTests.EmptyResultsAndMissingScopesStillCommitReadFact(String organizationMode, Boolean hasSites) 位于 /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/AuditReadTests.cs:94\n    在 OntologyPlatform.SecurityTests.AuditReadTests.EmptyResultsAndMissingScopesStillCommitReadFact(String organizationMode, Boolean hasSites) 位于 /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/AuditReadTests.cs:99\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n失败 EmptyResultsAndMissingScopesStillCommitReadFact (\"valid\",False) (170ms)\n  从 /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)\n  Assertion failed. 预期条件为 true。\n\n  actual: false\n\n  Assert.IsTrue(response.Headers.Contains(\"X-Audit-Id\"))\n    在 OntologyPlatform.SecurityTests.AuditReadTests.EmptyResultsAndMissingScopesStillCommitReadFact(String organizationMode, Boolean hasSites) 位于 /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/AuditReadTests.cs:95\n    在 OntologyPlatform.SecurityTests.AuditReadTests.EmptyResultsAndMissingScopesStillCommitReadFact(String organizationMode, Boolean hasSites) 位于 /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/AuditReadTests.cs:99\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n失败 EmptyResultsAndMissingScopesStillCommitReadFact (\"missing\",True) (176ms)\n  从 /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)\n  Assertion failed. 预期值相等。\n\n  expected: 0\n  actual:   2\n\n  Assert.AreEqual(0, (await response.Content.ReadFromJsonAsync<PlatformAuditEntry[]>())!.Length)\n    在 OntologyPlatform.SecurityTests.AuditReadTests.EmptyResultsAndMissingScopesStillCommitReadFact(String organizationMode, Boolean hasSites) 位于 /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/AuditReadTests.cs:94\n    在 OntologyPlatform.SecurityTests.AuditReadTests.EmptyResultsAndMissingScopesStillCommitReadFact(String organizationMode, Boolean hasSites) 位于 /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/AuditReadTests.cs:99\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n失败 EmptyResultsAndMissingScopesStillCommitReadFact (\"empty\",True) (175ms)\n  从 /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)\n  Assertion failed. 预期值相等。\n\n  expected: 0\n  actual:   2\n\n  Assert.AreEqual(0, (await response.Content.ReadFromJsonAsync<PlatformAuditEntry[]>())!.Length)\n    在 OntologyPlatform.SecurityTests.AuditReadTests.EmptyResultsAndMissingScopesStillCommitReadFact(String organizationMode, Boolean hasSites) 位于 /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/AuditReadTests.cs:94\n    在 OntologyPlatform.SecurityTests.AuditReadTests.EmptyResultsAndMissingScopesStillCommitReadFact(String organizationMode, Boolean hasSites) 位于 /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/AuditReadTests.cs:99\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n失败 EmptyResultsAndMissingScopesStillCommitReadFact (\"blank\",True) (163ms)\n  从 /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)\n  Assertion failed. 预期值相等。\n\n  expected: 0\n  actual:   2\n\n  Assert.AreEqual(0, (await response.Content.ReadFromJsonAsync<PlatformAuditEntry[]>())!.Length)\n    在 OntologyPlatform.SecurityTests.AuditReadTests.EmptyResultsAndMissingScopesStillCommitReadFact(String organizationMode, Boolean hasSites) 位于 /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/AuditReadTests.cs:94\n    在 OntologyPlatform.SecurityTests.AuditReadTests.EmptyResultsAndMissingScopesStillCommitReadFact(String organizationMode, Boolean hasSites) 位于 /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/AuditReadTests.cs:99\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n失败 LimitAppliesAfterScopeFilterAndInvalidLimitDoesNotAuditSuccess (160ms)\n  从 /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)\n  Assertion failed. 预期字符串相等。\n  字符串长度相同(32)，且有 1 处不同。首次差异位于索引 0。\n\n  expected:   \"b97d4145a3ed48ed88f8b074d4239c2f\"\n  actual:     \"c6cb2f3214cf4dc2a5de1e40517cc7b6\"\n  difference: -^\n\n  Assert.AreEqual(allowed.Id, rows[0].Id)\n    在 OntologyPlatform.SecurityTests.AuditReadTests.LimitAppliesAfterScopeFilterAndInvalidLimitDoesNotAuditSuccess() 位于 /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/AuditReadTests.cs:143\n    在 OntologyPlatform.SecurityTests.AuditReadTests.LimitAppliesAfterScopeFilterAndInvalidLimitDoesNotAuditSuccess() 位于 /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/AuditReadTests.cs:150\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n失败 InsertOnlyFailureNeverReturnsSuccessOrAuditIdAndRecovers (152ms)\n  从 /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)\n  Assertion failed. 预期条件为 true。\n  成功查询必须先提交审计并返回关联ID。\n\n  actual: false\n\n  Assert.IsTrue(response.Headers.Contains(\"X-Audit-Id\"))\n    在 OntologyPlatform.SecurityTests.AuditReadFixture.ReadAndAssertAsync(String previousId) 位于 /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/AuditReadTests.cs:311\n    在 OntologyPlatform.SecurityTests.AuditReadTests.InsertOnlyFailureNeverReturnsSuccessOrAuditIdAndRecovers() 位于 /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/AuditReadTests.cs:161\n    在 OntologyPlatform.SecurityTests.AuditReadTests.InsertOnlyFailureNeverReturnsSuccessOrAuditIdAndRecovers() 位于 /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/AuditReadTests.cs:183\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n失败 ResourceReadAuditsTrustedFullScopeOrAuthorizedExplicitSite (194ms)\n  从 /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)\n  CollectionAssert.AreEqual 失败。\n    在 OntologyPlatform.SecurityTests.AuditReadTests.ResourceReadAuditsTrustedFullScopeOrAuthorizedExplicitSite() 位于 /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/AuditReadTests.cs:197\n    在 OntologyPlatform.SecurityTests.AuditReadTests.ResourceReadAuditsTrustedFullScopeOrAuthorizedExplicitSite() 位于 /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/AuditReadTests.cs:207\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n失败 RuntimeOpenApiDeclaresRedirectsAndCompleteErrors (204ms)\n  从 /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)\n  CollectionAssert.AreEquivalent 失败。 集合中元素的数量不匹配。应为: <3>，实际为: <2>。get /auth/login\n    在 OntologyPlatform.SecurityTests.HttpSecurityTests.RuntimeOpenApiDeclaresRedirectsAndCompleteErrors() 位于 /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/HttpSecurityTests.cs:167\n    在 OntologyPlatform.SecurityTests.HttpSecurityTests.RuntimeOpenApiDeclaresRedirectsAndCompleteErrors() 位于 /Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/HttpSecurityTests.cs:206\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n/Users/chasen/.codex/worktrees/g1-close-sec/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64) 失败并出现 13 个错误 (7s 457ms)\n退出代码: 2\n\n测试运行摘要: 失败!\n  总计: 27\n  失败: 13\n  成功: 14\n  已跳过: 0\n  持续时间: 8s 064ms\n已完成测试运行，但显示非成功退出代码: 2 (请参阅: https://aka.ms/testingplatform/exitcodes)\n"
+  },
+  {
+    "status": "FAIL",
+    "category": "RuntimeError",
+    "details": "suppressed"
+  }
+]
