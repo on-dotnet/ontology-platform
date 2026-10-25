@@ -1,0 +1,39 @@
+{
+  "checks": [
+    {
+      "name": "environment",
+      "command": "pwsh -NoProfile -Command \"$PSVersionTable.PSVersion.ToString(); [Runtime.InteropServices.RuntimeInformation]::RuntimeIdentifier; & dotnet --version; & node --version; & python3 --version; & gh --version; & codex --version\"",
+      "exitCode": 0,
+      "status": "PASS",
+      "output": "7.6.8\nosx-arm64\n10.0.402\nv24.22.1\nPython 3.13.17\ngh version 2.103.2 (2026-10-23)\nhttps://github.com/cli/cli/releases/tag/v2.103.2\ncodex-cli 0.164.0-alpha.11.1\n"
+    },
+    {
+      "name": "locked-restore",
+      "command": "dotnet restore backend/OntologyPlatform.slnx --locked-mode",
+      "exitCode": 0,
+      "status": "PASS",
+      "output": "  正在确定要还原的项目…\n  已还原 /Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/src/ServiceDefaults/OntologyPlatform.ServiceDefaults.csproj (用时 88 毫秒)。\n  已还原 /Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/src/Hosts/OntologyPlatform.InfrastructureApi/OntologyPlatform.InfrastructureApi.csproj (用时 88 毫秒)。\n  已还原 /Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/OntologyPlatform.InfrastructureTests.csproj (用时 88 毫秒)。\n  已还原 /Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/src/AppHost/OntologyPlatform.AppHost.csproj (用时 101 毫秒)。\n"
+    },
+    {
+      "name": "build",
+      "command": "dotnet build backend/OntologyPlatform.slnx --no-restore",
+      "exitCode": 0,
+      "status": "PASS",
+      "output": "/Users/chasen/.nuget/packages/aspire.hosting.apphost/13.6.3/build/Aspire.Hosting.AppHost.targets(157,5): warning ASPIRE010: OntologyPlatform.AppHost is configured with AspireUseCliBundle=false. Some Aspire features require the Aspire CLI bundle. Set AspireUseCliBundle=true to enable those features, or suppress ASPIRE010 to continue without the bundle. See https://aka.ms/aspire/diagnostics/aspire010 for more information. [/Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/src/AppHost/OntologyPlatform.AppHost.csproj]\n  OntologyPlatform.ServiceDefaults -> /Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/src/ServiceDefaults/bin/Debug/net10.0/OntologyPlatform.ServiceDefaults.dll\n  OntologyPlatform.InfrastructureApi -> /Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/src/Hosts/OntologyPlatform.InfrastructureApi/bin/Debug/net10.0/OntologyPlatform.InfrastructureApi.dll\n  OntologyPlatform.AppHost -> /Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/src/AppHost/bin/Debug/net10.0/OntologyPlatform.AppHost.dll\n  OntologyPlatform.InfrastructureTests -> /Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/bin/Debug/net10.0/OntologyPlatform.InfrastructureTests.dll\n\n已成功生成。\n\n/Users/chasen/.nuget/packages/aspire.hosting.apphost/13.6.3/build/Aspire.Hosting.AppHost.targets(157,5): warning ASPIRE010: OntologyPlatform.AppHost is configured with AspireUseCliBundle=false. Some Aspire features require the Aspire CLI bundle. Set AspireUseCliBundle=true to enable those features, or suppress ASPIRE010 to continue without the bundle. See https://aka.ms/aspire/diagnostics/aspire010 for more information. [/Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/src/AppHost/OntologyPlatform.AppHost.csproj]\n    1 个警告\n    0 个错误\n\n已用时间 00:00:01.68\n"
+    },
+    {
+      "name": "tests",
+      "command": "dotnet test --project backend/tests/OntologyPlatform.InfrastructureTests/OntologyPlatform.InfrastructureTests.csproj --no-build --no-restore",
+      "exitCode": 0,
+      "status": "PASS",
+      "output": "正在从以下位置运行测试 /Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/bin/Debug/net10.0/OntologyPlatform.InfrastructureTests.dll (net10.0|arm64)\n/Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/bin/Debug/net10.0/OntologyPlatform.InfrastructureTests.dll (net10.0|arm64) 已通过 (1s 429ms)\n\n测试运行摘要: 已通过!\n  总计: 4\n  失败: 0\n  成功: 4\n  已跳过: 0\n  持续时间: 1s 927ms\n"
+    },
+    {
+      "name": "format",
+      "command": "dotnet format backend/OntologyPlatform.slnx --verify-no-changes --no-restore",
+      "exitCode": 0,
+      "status": "PASS",
+      "output": "加载工作区时遇到警告。要记录警告，请将“详细级别”选项设置为“诊断”级别。\n"
+    }
+  ]
+}
