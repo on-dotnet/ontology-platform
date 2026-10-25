@@ -135,7 +135,7 @@ function Test-Repository {
     if ($pm -notmatch '^pnpm@\d+\.\d+\.\d+$') { Record 'package-policy' 'FAIL' '包管理器必须精确版本' }
     $workspacePath = Join-Path $base 'pnpm-workspace.yaml'
     if (Test-Path -LiteralPath $workspacePath) {
-        if ([IO.File]::ReadAllText($workspacePath).Trim() -ne "packages:`n  - apps/web") { Record 'workspace-policy' 'FAIL' 'ADR-001只允许apps/web工作区' }
+        if ([IO.File]::ReadAllText($workspacePath).Trim() -ne "packages:`n  - apps/web`nstrictDepBuilds: true`nallowBuilds:`n  unrs-resolver: false") { Record 'workspace-policy' 'FAIL' 'ADR-001只允许apps/web工作区' }
     }
     $workflowPath = Join-Path $base '.github/workflows/ci.yml'
     if (Test-Path -LiteralPath $workflowPath) {
@@ -167,6 +167,8 @@ try {
         & (Join-Path $PSScriptRoot 'tests/StructuredFiles.Tests.ps1')
         if (-not $?) { exit 1 }
         & (Join-Path $PSScriptRoot 'tests/Environment.Tests.ps1')
+        if (-not $?) { exit 1 }
+        & (Join-Path $PSScriptRoot 'tests/WebToolchain.Tests.ps1')
         if (-not $?) { exit 1 }
         if (Test-Path (Join-Path $PSScriptRoot 'tests/ReviewPackage.Tests.ps1')) {
             & (Join-Path $PSScriptRoot 'tests/ReviewPackage.Tests.ps1')
@@ -219,13 +221,11 @@ try {
         }
     } else { Write-Output 'NOT_RUN: .NET原生检查需显式-RunNative及对应任务授权。' }
     $web = Get-Content -Raw (Join-Path $Root 'apps/web/package.json') | ConvertFrom-Json -AsHashtable
-    foreach ($task in @('lint', 'typecheck', 'build', 'test', 'test:e2e')) {
-        if (-not $web.scripts -or -not $web.scripts.ContainsKey($task)) { Write-Output "NOT_RUN: Web $task：未建立实际目标。" }
-        elseif ($RunNative) {
-            & pnpm --dir (Join-Path $Root 'apps/web') run $task
-            if ($LASTEXITCODE -ne 0) { exit 1 }
-        } else { Write-Output "NOT_RUN: Web $task：需要显式-RunNative及对应授权。" }
-    }
+    if ($RunNative -and $web.scripts -and $web.scripts.ContainsKey('build')) {
+        & (Join-Path $PSScriptRoot 'verify-web.ps1') -Root $Root
+        if (-not $?) { exit 1 }
+    } else { Write-Output 'NOT_RUN: Web独立检查需真实目标及显式-RunNative。' }
+    Write-Output 'NOT_RUN: 浏览器真实OIDC/E2E需独立受控联调，不隐式混入工程检查。'
     Write-Output 'PASS: 所选工程检查；范围以逐项输出为准，不表示业务、前端或整个G1通过。'
     exit 0
 } catch {

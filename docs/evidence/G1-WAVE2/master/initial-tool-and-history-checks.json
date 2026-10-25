@@ -1,0 +1,65 @@
+{
+  "records": [
+    {
+      "command": [
+        ".tools/kiota/kiota",
+        "--version"
+      ],
+      "exitCode": 0,
+      "output": "1.36.1+fd3bf87790149b87f40f7eae1a5feb9016625943\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "tool",
+        "run",
+        "dotnet-ef",
+        "--version"
+      ],
+      "exitCode": 0,
+      "output": "Entity Framework Core .NET Command-line Tools\n10.0.13\n"
+    },
+    {
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "scripts/doctor.ps1",
+        "-CheckDocker"
+      ],
+      "exitCode": 0,
+      "output": "PASS: PowerShell 7.6.8，macOS 27.0.1\nPASS: SDK 10.0.402 已安装，入口=/usr/local/share/dotnet/dotnet\nPASS: node 24.22.1，入口=/opt/homebrew/opt/node@24/bin/node\nPASS: pnpm 11.28.8，入口=/Users/chasen/.codex/worktrees/g1-wave2-master/ontology-platform/.tools/pnpm/package/bin/pnpm.cjs\nWARN: codex-cli 0.164.0-alpha.11.1；仅版本观察，不代表自定义角色加载通过。\nWARN: Aspire入口存在，服务编排验证归后续任务。\nPASS: Docker daemon \"29.9.2\"\nNOT_RUN: 本命令不恢复局部EF或执行构建/测试/业务PoC；这些状态由对应实际命令记录，不调用全局EF9替代。\n"
+    },
+    {
+      "command": [
+        "git",
+        "status",
+        "--porcelain=v1",
+        "m0-master"
+      ],
+      "exitCode": 0,
+      "output": "clean"
+    },
+    {
+      "command": [
+        "git",
+        "status",
+        "--porcelain=v1",
+        "m0-scripts"
+      ],
+      "exitCode": 0,
+      "output": "clean"
+    },
+    {
+      "command": [
+        "git",
+        "status",
+        "--porcelain=v1",
+        "m0-containers"
+      ],
+      "exitCode": 0,
+      "output": "clean"
+    }
+  ],
+  "note": "dotnet tool install/restore reported skipping NuGet signature verification on this Mac; not disabled by task, signatures NOT_VERIFIED; exact versions official source, content hash/lock audit separately."
+}
