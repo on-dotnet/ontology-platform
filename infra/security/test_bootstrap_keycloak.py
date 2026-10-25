@@ -1,5 +1,11 @@
 """Exercise secret destination and transport boundaries without real credentials."""
 import importlib.util
+import contextlib
+import io
+import json
+import os
+import sys
+from unittest.mock import patch
 import tempfile
 import threading
 import unittest
@@ -14,6 +20,41 @@ spec.loader.exec_module(bootstrap)
 
 class BootstrapBoundaryTests(unittest.TestCase):
     """Use local fixtures only; never read developer credentials or token values."""
+
+    def test_success_creates_private_runtime_file_without_printing_secrets(self):
+        """Exercise actual helper HTTP and filesystem success using a local fixture."""
+        class BootstrapHandler(BaseHTTPRequestHandler):
+            def do_POST(self):
+                self.rfile.read(int(self.headers.get('Content-Length', '0')))
+                self.send_response(200 if self.path.endswith('/token') else 201)
+                self.end_headers()
+                if self.path.endswith('/token'):
+                    self.wfile.write(b'{"access_token":"synthetic-admin-marker"}')
+
+            def log_message(self, *_):
+                pass
+
+        runtime = Path(__file__).resolve().parents[2] / '.tools/security'
+        runtime.mkdir(parents=True, exist_ok=True, mode=0o700)
+        with tempfile.TemporaryDirectory(dir=runtime) as directory, ThreadingHTTPServer(('127.0.0.1', 0), BootstrapHandler) as server:
+            thread = threading.Thread(target=server.serve_forever, daemon=True)
+            thread.start()
+            output = Path(directory) / 'realm.json'
+            captured = io.StringIO()
+            try:
+                with patch.dict(os.environ, {'WAVE2_KEYCLOAK_ADMIN_PASSWORD': 'synthetic-unused'}), patch.object(sys, 'argv', [
+                        'bootstrap-keycloak.py', '--keycloak-origin', f'http://127.0.0.1:{server.server_port}',
+                        '--runtime-output', str(output)]), contextlib.redirect_stdout(captured):
+                    bootstrap.main()
+                private = json.loads(output.read_text())
+                self.assertEqual(len(private['identities']), 5)
+                self.assertEqual(output.stat().st_mode & 0o777, 0o600)
+                self.assertNotIn(private['clientSecret'], captured.getvalue())
+                self.assertTrue(all(identity['password'] not in captured.getvalue() for identity in private['identities'].values()))
+                self.assertEqual(json.loads(captured.getvalue())['status'], 'CREATED')
+            finally:
+                server.shutdown()
+                thread.join()
 
     def test_credential_response_redirect_is_never_followed(self):
         """A redirect must fail before credentials can reach another endpoint."""

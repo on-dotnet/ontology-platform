@@ -55,6 +55,8 @@ public static class PlatformApiHost
         builder.Logging.AddFilter("Microsoft.AspNetCore.Authentication", LogLevel.None);
         builder.Logging.AddFilter("Microsoft.IdentityModel", LogLevel.None);
         builder.Logging.AddFilter("System.Net.Http.HttpClient", LogLevel.None);
+        // YARP默认日志含完整上游URL及query；仅保留本宿主的固定路由安全日志。
+        builder.Logging.AddFilter("Yarp.ReverseProxy", LogLevel.None);
         builder.Logging.AddFilter("Microsoft.EntityFrameworkCore", LogLevel.None);
         builder.AddServiceDefaults();
         builder.Services.AddOpenTelemetry().WithMetrics(metrics => metrics.AddMeter("OntologyPlatform.Api"))
