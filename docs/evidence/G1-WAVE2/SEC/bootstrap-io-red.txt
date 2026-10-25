@@ -1,0 +1,18 @@
+...E
+======================================================================
+ERROR: test_success_creates_private_runtime_file_without_printing_secrets (test_bootstrap_keycloak.BootstrapBoundaryTests.test_success_creates_private_runtime_file_without_printing_secrets)
+Exercise actual helper HTTP and filesystem success using a local fixture.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/infra/security/test_bootstrap_keycloak.py", line 48, in test_success_creates_private_runtime_file_without_printing_secrets
+    bootstrap.main()
+    ~~~~~~~~~~~~~~^^
+  File "/Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/infra/security/bootstrap-keycloak.py", line 120, in main
+    with output.open("x", encoding="utf-8", opener=lambda path, flags: os.open(path, flags, 0o600)) as stream:
+         ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: Path.open() got an unexpected keyword argument 'opener'
+
+----------------------------------------------------------------------
+Ran 4 tests in 1.050s
+
+FAILED (errors=1)

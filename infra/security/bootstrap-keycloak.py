@@ -117,7 +117,7 @@ def main():
                           "attributes": {"pkce.code.challenge.method": "S256", "post.logout.redirect.uris": arguments.public_origin + "/signout-callback-oidc"},
                           "protocolMappers": mappers}], "users": users}
     request(arguments.keycloak_origin, "/admin/realms", realm, token)
-    with output.open("x", encoding="utf-8", opener=lambda path, flags: os.open(path, flags, 0o600)) as stream:
+    with open(output, "x", encoding="utf-8", opener=lambda path, flags: os.open(path, flags, 0o600)) as stream:
         json.dump({"authority": arguments.keycloak_origin + "/realms/" + realm_name,
                    "clientId": client_id, "clientSecret": generated_client_secret, "identities": identities}, stream)
     print(json.dumps({"status": "CREATED", "realm": realm_name, "identities": list(identities), "secrets": "runtime-only"}))

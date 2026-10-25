@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Net;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
@@ -103,6 +104,26 @@ public sealed class HttpSecurityTests
         Assert.AreEqual(HttpStatusCode.BadRequest, (await client.GetAsync("/health/live")).StatusCode);
     }
 
+    /// <summary>代理URL中的敏感查询标记不能进入任何框架或自定义日志正文。</summary>
+    /// <returns>真实代理请求和捕获日志检查任务。</returns>
+    [TestMethod]
+    public async Task ProxyQueryNeverEntersLogBody()
+    {
+        // 捕获宿主所有日志正文而不写Console或证据，使用固定无效合成标记。
+        using var logs = new CapturedLogs();
+        // 正式宿主保留真实YARP管道，目标Next未运行不影响日志边界检查。
+        using var fixture = new SecurityHostFixture();
+        // 将只读捕获器接入测试宿主，不改变生产日志配置。
+        await using var app = fixture.Create(logs: logs);
+        await app.StartAsync();
+        // 真实HTTP URL含合成敏感参数，错误正文也不应回显该值。
+        using var client = fixture.CreateClient(app);
+        // 合成标记仅用于验证日志泄露负例，不包含真实认证材料。
+        const string marker = "synthetic-query-confidential-marker";
+        await client.GetAsync("/?access_token=" + marker);
+        Assert.IsFalse(logs.Messages.Any(message => message.Contains(marker, StringComparison.Ordinal)), "代理请求的查询内容不得进入日志正文。");
+    }
+
     /// <summary>保留API/auth/health/openapi前缀的未知路径不可转发到Next。</summary>
     /// <returns>保留前缀负例验证任务。</returns>
     [TestMethod]
@@ -156,12 +177,17 @@ internal sealed class SecurityHostFixture : IDisposable
     /// <summary>创建真实平台API，PG连接指向确定未运行端口以验证失败关闭。</summary>
     /// <param name="environment">需要验证的正式环境名。</param>
     /// <param name="connection">可选本轮隔离PG连接；未指定时使用故障端口。</param>
+    /// <param name="logs">可选的测试日志捕获器。</param>
     /// <returns>未启动的正式API。</returns>
-    public WebApplication Create(string environment = "Development", string? connection = null)
+    public WebApplication Create(string environment = "Development", string? connection = null, ILoggerProvider? logs = null)
     {
         return PlatformApiHost.CreateApplication(["--environment", environment, "--urls", "http://127.0.0.1:0"], builder =>
         {
             builder.Logging.ClearProviders();
+            if (logs is not null)
+            {
+                builder.Logging.AddProvider(logs);
+            }
             builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
             {
                 ["Security:Authority"] = environment == "Development" ? "http://localhost:18999/realms/test" : "https://issuer.invalid/realms/test",
@@ -205,5 +231,45 @@ internal sealed class SecurityHostFixture : IDisposable
     public void Dispose()
     {
         Directory.Delete(root, true);
+    }
+}
+
+/// <summary>只在测试内存中捕获格式化日志，避免测试输出携带敏感请求。</summary>
+internal sealed class CapturedLogs : ILoggerProvider, ILogger
+{
+    /// <summary>当前测试捕获的日志正文，仅用于检查不进行输出。</summary>
+    public ConcurrentBag<string> Messages { get; } = [];
+
+    /// <summary>所有类别使用同一内存捕获器。</summary>
+    /// <param name="categoryName">框架日志类别。</param>
+    /// <returns>当前测试的捕获器。</returns>
+    public ILogger CreateLogger(string categoryName) => this;
+
+    /// <summary>测试日志不持久化作用域。</summary>
+    /// <typeparam name="TState">日志作用域状态类型。</typeparam>
+    /// <param name="state">未输出的作用域数据。</param>
+    /// <returns>无需释放的空作用域。</returns>
+    public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
+
+    /// <summary>捕获所有未被正式宿主过滤的日志。</summary>
+    /// <param name="logLevel">框架请求的日志级别。</param>
+    /// <returns>始终启用测试捕获。</returns>
+    public bool IsEnabled(LogLevel logLevel) => true;
+
+    /// <summary>仅将格式化正文放入测试内存，不输出异常或认证材料。</summary>
+    /// <typeparam name="TState">结构化状态类型。</typeparam>
+    /// <param name="logLevel">日志级别。</param>
+    /// <param name="eventId">事件编号。</param>
+    /// <param name="state">待格式化状态。</param>
+    /// <param name="exception">当前框架异常。</param>
+    /// <param name="formatter">框架格式化委托。</param>
+    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+    {
+        Messages.Add(formatter(state, exception));
+    }
+
+    /// <summary>测试结束不创建文件或额外资源。</summary>
+    public void Dispose()
+    {
     }
 }

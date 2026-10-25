@@ -1,0 +1,29 @@
+EE
+======================================================================
+ERROR: test_login_parser_rejects_multiple_credential_forms (test_oidc_harness.OidcDriverBoundaryTests.test_login_parser_rejects_multiple_credential_forms)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/infra/security/test_oidc_harness.py", line 23, in test_login_parser_rejects_multiple_credential_forms
+    spec.loader.exec_module(module)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "<frozen importlib._bootstrap_external>", line 1023, in exec_module
+  File "<frozen importlib._bootstrap_external>", line 1160, in get_code
+  File "<frozen importlib._bootstrap_external>", line 1218, in get_data
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/infra/security/verify-oidc.py'
+
+======================================================================
+ERROR: test_only_exact_approved_loopback_origins_can_receive_requests (test_oidc_harness.OidcDriverBoundaryTests.test_only_exact_approved_loopback_origins_can_receive_requests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/infra/security/test_oidc_harness.py", line 14, in test_only_exact_approved_loopback_origins_can_receive_requests
+    spec.loader.exec_module(module)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "<frozen importlib._bootstrap_external>", line 1023, in exec_module
+  File "<frozen importlib._bootstrap_external>", line 1160, in get_code
+  File "<frozen importlib._bootstrap_external>", line 1218, in get_data
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/infra/security/verify-oidc.py'
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.000s
+
+FAILED (errors=2)

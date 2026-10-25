@@ -62,3 +62,9 @@ SEC 分支尚无 Master 生成的新工程锁时，第一条在已有 ServiceDef
 PG 测试仅通过进程环境 `G1_SEC_PG_CONNECTION` 接受本轮专用连接，且要求 Master 先应用迁移；缺少前提明确 Inconclusive/NOT_RUN。它以两个独立正式宿主容器的真实票据存储器验证共享加密 keyring、PG密文、撤销/过期及PG审计，合成票据不冒充真实 OIDC 登录。真实 Keycloak 浏览器闭环、HTTP双实例Cookie、过期/重放/CSRF、资源作用域、PG重启与全链遥测由统一栈继续实测。
 
 Windows 原生与 Intel Mac 本轮 NOT_RUN；Windows 可在固定SDK下运行相同 PowerShell selftest、受锁 restore 和 `dotnet test --project ...`，不得将 ARM64 Mac 成功当作跨平台通过。
+
+## HTTP 协议验收驱动
+
+`infra/security/verify-oidc.py --runtime-file <本轮私有runtime.json>` 消费 Master 生成的 `realmFile`，只对明确的 localhost 15100/15101/18080 origin 发请求，每次重定向和登录 form action 都重新检查目标。它使用真实 Keycloak 登录、PKCE/state/nonce challenge、回调、五身份角色/厂区、双实例Cookie、CSRF、注销与重放、真实API审计读取，输出仅有固定检查名/合成身份标签/状态码，不输出响应正文、密码、Cookie、token、回调URL或异常详情。此协议驱动不是浏览器交互验收，SSR/无障碍/Console仍由FE Playwright复验。无真实栈运行输出时明确NOT_RUN。
+
+代理日志也必须抑制：YARP 默认 Info/Error 正文可能包含完整上游 URI；正式 API 过滤 `Yarp.ReverseProxy` 并仅使用自定义路由模板/状态/关联ID安全日志。`ProxyQueryNeverEntersLogBody` 经真实HTTP与内存日志捕获验证，测试只用无效合成query标记。
