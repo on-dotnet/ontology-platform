@@ -1,0 +1,8 @@
+$ pwsh -NoProfile -Command . ./scripts/verify.ps1 -Library; $checks = @(Test-Repository -RepositoryRoot (Get-Location).Path); $checks | Format-Table -AutoSize; if (@($checks | Where-Object Status -eq FAIL).Count -gt 0) { exit 1 }
+
+Check             Status Message
+-----             ------ -------
+repository-static PASS   检查249个文件：语法/格式/相对链接/有限机密模式/基线策…
+
+
+EXIT_CODE=0

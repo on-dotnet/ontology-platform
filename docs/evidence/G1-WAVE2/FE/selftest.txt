@@ -1,0 +1,249 @@
+$ pwsh -NoProfile -File scripts/verify.ps1 -SelfTest
+
+Check             Status Message
+-----             ------ -------
+repository-static PASS   检查246个文件：语法/格式/相对链接/有限机密模式/基线策…
+
+PASS: clean baseline accepted
+PASS: wrong package name rejected
+PASS: broken relative link rejected
+PASS: synthetic token rejected without printing value
+PASS: synthetic token in TypeScript rejected
+PASS: credential assignment in dot-env rejected
+PASS: unpinned action rejected
+
+Check             Status Message
+-----             ------ -------
+repository-static PASS   检查247个文件：语法/格式/相对链接/有限机密模式/基线策…
+
+NOT_RUN: .NET test：须显式追加-RunTests执行已批准测试项目。
+Scope: all 2 workspace projects
+../..                                    | Progress: resolved 1, reused 0, downloaded 0, added 0
+[WARN] deprecated eslint@9.39.5
+../..                                    | Progress: resolved 98, reused 0, downloaded 4, added 0
+../..                                    | Progress: resolved 232, reused 0, downloaded 124, added 0
+../..                                    | Progress: resolved 347, reused 0, downloaded 208, added 0
+../..                                    | Progress: resolved 438, reused 0, downloaded 300, added 0
+../..                                    | +390 ++++++++++++++++++++++++++++++++
+Packages are cloned from the content-addressable store to the virtual store.
+  Content-addressable store is at: /Users/chasen/Library/pnpm/store/v11
+  Virtual store is at:             ../../node_modules/.pnpm
+../..                                    | Progress: resolved 493, reused 0, downloaded 379, added 271
+../..                                    | Progress: resolved 493, reused 0, downloaded 389, added 382
+[WARN] Tarball download average speed 3 KiB/s (size 7 KiB) is below 50 KiB/s: https://registry.npmjs.org/side-channel/-/side-channel-1.1.1.tgz (GET)
+../..                                    | Progress: resolved 493, reused 0, downloaded 394, added 387
+../..                                    | Progress: resolved 493, reused 0, downloaded 395, added 388
+../..                                    | Progress: resolved 493, reused 0, downloaded 396, added 388
+../..                                    | Progress: resolved 493, reused 0, downloaded 396, added 389
+../..                                    | Progress: resolved 493, reused 0, downloaded 397, added 390, done
+
+dependencies:
++ @base-ui/react 1.9.0
++ next 16.4.3
++ react 19.3.1
++ react-dom 19.3.1
+
+devDependencies:
++ @playwright/test 1.64.1
++ @tailwindcss/postcss 4.3.3
++ @types/node 24.19.2 (26.6.5 is available)
++ @types/react 19.3.0
++ @types/react-dom 19.3.0
++ eslint 9.39.5 (10.13.0 is available) deprecated
++ eslint-config-next 16.4.3
++ tailwindcss 4.3.3
++ typescript 6.0.3 (7.0.2 is available)
++ vitest 5.0.5
+
+[ERR_PNPM_IGNORED_BUILDS] Ignored build scripts: unrs-resolver@1.12.2
+
+Run "pnpm approve-builds" to pick which dependencies should be allowed to run scripts.
+[WARN] The install that runs before scripts failed, so your node_modules may be out of sync with your lockfile. Set "verifyDepsBeforeRun: false" to skip this install.
+$ eslint .
+Scope: all 2 workspace projects
+✓ Lockfile passes supply-chain policies (verified 2s ago)
+
+[ERR_PNPM_IGNORED_BUILDS] Ignored build scripts: unrs-resolver@1.12.2
+
+Run "pnpm approve-builds" to pick which dependencies should be allowed to run scripts.
+[WARN] The install that runs before scripts failed, so your node_modules may be out of sync with your lockfile. Set "verifyDepsBeforeRun: false" to skip this install.
+$ tsc --noEmit
+Scope: all 2 workspace projects
+✓ Lockfile passes supply-chain policies (verified 4s ago)
+
+[ERR_PNPM_IGNORED_BUILDS] Ignored build scripts: unrs-resolver@1.12.2
+
+Run "pnpm approve-builds" to pick which dependencies should be allowed to run scripts.
+[WARN] The install that runs before scripts failed, so your node_modules may be out of sync with your lockfile. Set "verifyDepsBeforeRun: false" to skip this install.
+$ next build
+▲ Next.js 16.4.3 (Turbopack)
+✓ Running next.config.ts took 643ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 1141ms
+  Running TypeScript ...
+  Finished TypeScript in 918ms ...
+  Collecting page data using 6 workers ...
+  Generating static pages using 6 workers (0/4) ...
+  Generating static pages using 6 workers (1/4)
+  Generating static pages using 6 workers (2/4)
+  Generating static pages using 6 workers (3/4)
+✓ Generating static pages using 6 workers (4/4) in 134ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ƒ /
+├ ○ /_not-found
+├ ○ /icon.svg
+└ ○ /signed-out
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
+Scope: all 2 workspace projects
+✓ Lockfile passes supply-chain policies (verified 9s ago)
+
+[ERR_PNPM_IGNORED_BUILDS] Ignored build scripts: unrs-resolver@1.12.2
+
+Run "pnpm approve-builds" to pick which dependencies should be allowed to run scripts.
+[WARN] The install that runs before scripts failed, so your node_modules may be out of sync with your lockfile. Set "verifyDepsBeforeRun: false" to skip this install.
+$ vitest run
+
+ RUN  v5.0.5 /private/var/folders/8r/n2xjjrn90v7fplnwsjkft1sm0000gn/T/ontology-eng-check-9c1b9f5605234279afbfbac3114157e7/apps/web
+
+
+ Test Files  1 passed (1)
+      Tests  6 passed (6)
+   Start at  14:25:40
+   Duration  103ms (tests 42%, transform 35%, import 17%, worker 6%)
+
+Scope: all 2 workspace projects
+✓ Lockfile passes supply-chain policies (verified 10s ago)
+
+[ERR_PNPM_IGNORED_BUILDS] Ignored build scripts: unrs-resolver@1.12.2
+
+Run "pnpm approve-builds" to pick which dependencies should be allowed to run scripts.
+[WARN] The install that runs before scripts failed, so your node_modules may be out of sync with your lockfile. Set "verifyDepsBeforeRun: false" to skip this install.
+$ playwright test
+[WebServer] (node:91704) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:91711) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 4 tests using 1 worker
+
+(node:91720) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/ui/workspace.spec.ts:6:1 › 1280布局、键盘详情、浅色持久化和Console (505ms)
+  ✓  2 tests/ui/workspace.spec.ts:29:1 › 宽屏、移动导航、授权范围与搜索空状态 (849ms)
+  ✓  3 tests/ui/workspace.spec.ts:47:1 › 加载中、403、网络错误、空集合和会话过期各自准确 (320ms)
+  ✓  4 tests/ui/workspace.spec.ts:65:1 › 审计拒绝和公开注销面板 (293ms)
+
+  4 passed (3.1s)
+PASS: 所选工程检查；范围以逐项输出为准，不表示业务、前端或整个G1通过。
+PASS: native commands resolve SDK and config from selected Root
+Checker tests: 8 passed; application tests: NOT_RUN.
+PASS: Doctor handles existing pnpm without Node as BLOCKED/2.
+PASS: Doctor discovers real macOS ARM64 Node from isolated path with spaces.
+PASS: YAML/TOML syntax, 1 files; runtime compatibility not implied.
+FAIL: structured syntax invalid.yml (ParserError)
+FAIL: structured syntax invalid.toml (TOMLDecodeError)
+PASS: structured parser 4 real positive/negative cases.
+
+Check             Status Message
+-----             ------ -------
+repository-static PASS   检查246个文件：语法/格式/相对链接/有限机密模式/基线策…
+
+$ eslint .
+$ tsc --noEmit
+$ next build
+$ vitest run
+$ playwright test
+[WebServer] (node:92495) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:92496) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+(node:92497) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS: verification preserves unset environment state for five process variables.
+
+Check             Status Message
+-----             ------ -------
+repository-static PASS   检查247个文件：语法/格式/相对链接/有限机密模式/基线策…
+
+$ eslint .
+$ tsc --noEmit
+$ next build
+$ vitest run
+$ playwright test
+[WebServer] (node:92952) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:92953) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+(node:92954) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS: verification preserves empty environment state for five process variables.
+
+Check             Status Message
+-----             ------ -------
+repository-static PASS   检查247个文件：语法/格式/相对链接/有限机密模式/基线策…
+
+$ eslint .
+$ tsc --noEmit
+$ next build
+$ vitest run
+$ playwright test
+[WebServer] (node:93411) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:93412) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+(node:93413) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS: verification preserves value environment state for five process variables.
+Environment regression: 3 state groups and structured-suite cleanup passed; native calls are synthetic, product tests NOT_RUN.
+PASS: committed snapshot, Unicode, full diff and reopened ZIP
+PASS: color.ui always cannot contaminate machine-readable patch
+PASS: PASS requires real command evidence
+PASS: non-ancestor commits
+PASS: dirty tracked delivery
+PASS: untracked delivery
+PASS: forbidden committed member .env
+PASS: forbidden committed member .env.production
+PASS: forbidden committed member .ssh/id
+PASS: forbidden committed member .codex/auth.json
+PASS: forbidden committed member auth/config.json
+PASS: forbidden committed member cert.pem
+PASS: forbidden committed member nested/bin/output
+PASS: forbidden committed member .tools/sdk/file
+PASS: forbidden committed member models/weights.dat
+PASS: forbidden committed member state.db
+PASS: forbidden committed member .cache/item
+PASS: forbidden committed member node_modules/item
+PASS: synthetic token in source
+PASS: removed synthetic token retained in patch
+PASS: reopened archive rejects injected or changed member .git/config
+PASS: reopened archive rejects injected or changed member .env
+PASS: reopened archive rejects injected or changed member ../escape.txt
+PASS: reopened archive rejects injected or changed member source/app.txt
+PASS: git archive export-ignore cannot omit committed source
+PASS: git archive export-subst cannot rewrite committed source
+PASS: git symlink blob cannot silently become source
+PASS: committed submodule cannot be omitted by git archive
+PASS: complete patch rejects removed forbidden environment member
+PASS: reopened archive rejects payload tamper even after checksum rewrite
+PASS: missing checksum/member is rejected on reopen
+PASS: CI PASS cannot be inferred without run metadata
+PASS: explicit CI metadata avoids self-referential commit evidence
+PASS: existing delivery ZIP is preserved
+PASS: valid committed evidence preserves command and status
+ReviewPackage: 35 tests, 0 failures; product/container tests NOT_RUN.
+NOT_RUN: .NET原生检查需显式-RunNative及对应任务授权。
+NOT_RUN: Web lint：需要显式-RunNative及对应授权。
+NOT_RUN: Web typecheck：需要显式-RunNative及对应授权。
+NOT_RUN: Web build：需要显式-RunNative及对应授权。
+NOT_RUN: Web test：需要显式-RunNative及对应授权。
+NOT_RUN: Web test:e2e：需要显式-RunNative及对应授权。
+PASS: 所选工程检查；范围以逐项输出为准，不表示业务、前端或整个G1通过。
+
+EXIT_CODE=0

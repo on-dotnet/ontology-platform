@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { createPlatformClient, PlatformApiError } from "../lib/api/client";
@@ -8,11 +9,18 @@ export const dynamic = "force-dynamic";
 export default async function Home() {
   const cookieHeader = (await cookies()).toString();
   const client = createPlatformClient({ origin: getApiOrigin(), headers: { Cookie: cookieHeader } });
+  let identity;
   try {
-    const identity = await client.me();
-    return <Workspace identity={identity} />;
+    identity = await client.me();
   } catch (error) {
     if (error instanceof PlatformApiError && error.status === 401) redirect("/auth/login?returnUrl=/");
-    return <main id="main" className="standalone"><div className="brand-mark">O</div><p className="eyebrow">连接状态</p><h1>暂时无法连接平台</h1><p>身份服务当前不可用。请稍后重试，已有权限不会在浏览器中被替代。</p><a className="button primary" href="/">重新连接</a></main>;
+    return <main id="main" className="standalone">
+      <div className="brand-mark">O</div>
+      <p className="eyebrow">连接状态</p>
+      <h1>暂时无法连接平台</h1>
+      <p>身份服务当前不可用。请稍后重试，已有权限不会在浏览器中被替代。</p>
+      <Link className="button primary" href="/">重新连接</Link>
+    </main>;
   }
+  return <Workspace identity={identity} />;
 }

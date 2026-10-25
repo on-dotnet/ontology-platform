@@ -1,0 +1,19 @@
+$ node .tools/pnpm/package/bin/pnpm.cjs --config.verifyDepsBeforeRun=false --filter @ontology-platform/web test:e2e
+$ playwright test
+[WebServer] (node:89873) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:89874) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 4 tests using 1 worker
+
+(node:89882) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/ui/workspace.spec.ts:6:1 › 1280布局、键盘详情、浅色持久化和Console (576ms)
+  ✓  2 tests/ui/workspace.spec.ts:29:1 › 宽屏、移动导航、授权范围与搜索空状态 (777ms)
+  ✓  3 tests/ui/workspace.spec.ts:47:1 › 加载中、403、网络错误、空集合和会话过期各自准确 (394ms)
+  ✓  4 tests/ui/workspace.spec.ts:65:1 › 审计拒绝和公开注销面板 (303ms)
+
+  4 passed (2.9s)
+
+EXIT_CODE=0

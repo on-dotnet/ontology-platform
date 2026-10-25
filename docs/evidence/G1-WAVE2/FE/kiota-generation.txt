@@ -1,0 +1,33 @@
+Warning: the TypeScript language is in preview (Preview) some features are not fully supported and source breaking changes will happen with future updates.
+warn: Kiota.Builder.KiotaBuilder[0]
+      Unable to check for updates
+      System.Net.Http.HttpRequestException: The SSL connection could not be established, see inner exception.
+       ---> System.IO.IOException: Received an unexpected EOF or 0 bytes from the transport stream.
+         at System.Net.Security.SslStream.ReceiveHandshakeFrameAsync[TIOAdapter](CancellationToken cancellationToken)
+         at System.Net.Security.SslStream.ForceAuthenticationAsync[TIOAdapter](Boolean receiveFirst, Byte[] reAuthenticationData, CancellationToken cancellationToken)
+         at System.Net.Http.ConnectHelper.EstablishSslConnectionAsync(SslClientAuthenticationOptions sslOptions, HttpRequestMessage request, Boolean async, Stream stream, CancellationToken cancellationToken)
+         --- End of inner exception stack trace ---
+         at System.Net.Http.ConnectHelper.EstablishSslConnectionAsync(SslClientAuthenticationOptions sslOptions, HttpRequestMessage request, Boolean async, Stream stream, CancellationToken cancellationToken)
+         at System.Net.Http.HttpConnectionPool.ConnectAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+         at System.Net.Http.HttpConnectionPool.CreateHttp11ConnectionAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+         at System.Net.Http.HttpConnectionPool.InjectNewHttp11ConnectionAsync(QueueItem queueItem)
+         at System.Threading.Tasks.TaskCompletionSourceWithCancellation`1.WaitWithCancellationAsync(CancellationToken cancellationToken)
+         at System.Net.Http.HttpConnectionWaiter`1.WaitForConnectionWithTelemetryAsync(HttpRequestMessage request, HttpConnectionPool pool, Boolean async, CancellationToken requestCancellationToken)
+         at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+         at System.Net.Http.DiagnosticsHandler.SendAsyncCore(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+         at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+         at System.Net.Http.SocketsHttpHandler.<SendAsync>g__CreateHandlerAndSendAsync|118_0(HttpRequestMessage request, CancellationToken cancellationToken)
+         at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)
+         at Microsoft.Kiota.Http.HttpClientLibrary.HttpClientRequestAdapter.GetHttpResponseMessageAsync(RequestInformation requestInfo, CancellationToken cancellationToken, Activity activityForAttributes, String claims, Boolean isStreamResponse)
+         at Microsoft.Kiota.Http.HttpClientLibrary.HttpClientRequestAdapter.SendCollectionAsync[ModelType](RequestInformation requestInfo, ParsableFactory`1 factory, Dictionary`2 errorMapping, CancellationToken cancellationToken)
+         at Kiota.Builder.SearchProviders.GitHub.GitHubClient.Repos.Item.Item.Releases.ReleasesRequestBuilder.GetAsync(Action`1 requestConfiguration, CancellationToken cancellationToken) in D:\a\_work\1\s\src\Kiota.Builder\SearchProviders\GitHub\GitHubClient\Repos\Item\Item\Releases\ReleasesRequestBuilder.cs:line 58
+         at Kiota.Builder.UpdateService.GetUpdateMessageAsync(String currentVersion, CancellationToken cancellationToken) in D:\a\_work\1\s\src\Kiota.Builder\UpdateService.cs:line 42
+warn: Kiota.Builder.KiotaBuilder[534942631]
+      OpenAPI warning: #/ - A servers entry (v3) or host + basePath + schemes properties (v2) was not present in the OpenAPI description. The root URL will need to be set manually with the request adapter.
+Generation completed successfully
+
+Hint: use the info command to get the list of dependencies you need to add to your project.
+Example: kiota info -d "/Users/chasen/.codex/worktrees/g1-wave2-fe/ontology-platform/docs/contracts/g1-platform.openapi.json" -l TypeScript
+
+Hint: use the --include-path and --exclude-path options with glob patterns to filter the paths generated.
+Example: kiota generate --include-path "**/foo" -d "/Users/chasen/.codex/worktrees/g1-wave2-fe/ontology-platform/docs/contracts/g1-platform.openapi.json"
