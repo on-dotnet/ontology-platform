@@ -13,11 +13,11 @@ otelcol.receiver.otlp "api" {
 }
 otelcol.processor.transform "boundary" {
   error_mode = "propagate"
-  // 指标维度白名单：用户、厂区、审计/Trace标识不能成为时间序列标签。
+  // 指标保留受控实例身份，避免两个累计流合并；用户、厂区及Trace仍禁止作维度。
   metric_statements {
     context = "datapoint"
     statements = [
-      `keep_keys(resource.attributes, ["service.name", "service.version", "deployment.environment.name"])`,
+      `keep_keys(resource.attributes, ["service.name", "service.version", "deployment.environment.name", "service.instance.id"])`,
       `keep_keys(attributes, ["http.request.method", "http.route", "http.response.status_code", "method", "route", "status_class"])`,
     ]
   }

@@ -66,3 +66,28 @@ tests:
       - eval_time: 70s
         alertname: 观测依赖不可用
         exp_alerts: []
+  - name: 双实例累计指标分别保留并在查询时聚合
+    interval: 10s
+    input_series:
+      - series: 'platform_requests_total{service_name="ontology-platform-api",instance="platform-api-1"}'
+        values: '0+1x12'
+      - series: 'platform_requests_total{service_name="ontology-platform-api",instance="platform-api-2"}'
+        values: '0+2x12'
+    promql_expr_test:
+      - expr: 'count(platform_requests_total{service_name="ontology-platform-api"})'
+        eval_time: 60s
+        exp_samples:
+          - labels: '{}'
+            value: 2
+      - expr: 'sum(platform_requests_total{service_name="ontology-platform-api"})'
+        eval_time: 60s
+        exp_samples:
+          - labels: '{}'
+            value: 18
+      - expr: 'sum by(instance) (platform_requests_total{service_name="ontology-platform-api"})'
+        eval_time: 60s
+        exp_samples:
+          - labels: '{instance="platform-api-1"}'
+            value: 6
+          - labels: '{instance="platform-api-2"}'
+            value: 12

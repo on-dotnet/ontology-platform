@@ -35,7 +35,9 @@ PromQL: ALERTS{alertstate=~"pending|firing"}
 
 实际 OTLP 归一化后的指标名、标签与日志元数据以原始 API 查询证据为准。Grafana日志详情使用结构化元数据 `trace_id` 内链到Tempo；Trace→日志按service.name+TraceId查询。`auditId`/`traceId`/`correlationId`是可查询结构化元数据，不做Loki索引。不要把trace当Prometheus标签。API日志只允许固定安全模板/状态/事件码，不记录正文、查询字符串、Cookie、Token或秘密Claims；Collector白名单是额外边界，不能修复源头已经泄漏到body的秘密。
 
-Loki只索引service.name、deployment.environment.name、service.version。Prometheus只提升相同低基数资源字段；Alloy对应用指标数据点仅保留有限method/route/status属性。用户/厂区/炉次/TraceId/审计ID不能变成指标维度。路由必须是有限路由模板，不记录资源ID作route。
+Loki日志与Trace资源只保留service.name、deployment.environment.name、service.version，Loki只索引这三项。指标资源额外保留service.instance.id，Master为两个API明确注入platform-api-1/platform-api-2，实例值由编排受控且同一时刻唯一，不使用用户、请求或随机每请求值。Prometheus把它映射为instance，原promote_resource_attributes保持前三项，keep_identifying_resource_attributes=false不取消该身份映射；先保留各实例Counter/Histogram序列，再在PromQL用sum等显式聚合，不能先删身份把多个累计流混写。Alloy对应用指标数据点仅保留有限method/route/status属性。用户/厂区/炉次/TraceId/审计ID不能变成指标维度。路由必须是有限路由模板，不记录资源ID作route。
+
+依据[Prometheus官方OTLP身份映射](https://prometheus.io/docs/guides/opentelemetry/)和[OTel单写者原则](https://opentelemetry.io/docs/specs/otel/metrics/data-model/#single-writer)。两固定开发实例的身份仅在对应进程槽位内复用；扩缩容或资源身份变化需重新评审唯一性/基数预算，不把此两实例约定推广为生产身份设计。真实验收先确认instance=platform-api-1/2各有独立序列及累计值，再执行sum并检查实例重启后的reset行为；promtool的合成输入只验证查询语义，不能证明Alloy实际保留或真实双实例已到达。
 
 ## 故障演练与恢复
 

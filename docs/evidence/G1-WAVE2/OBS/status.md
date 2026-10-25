@@ -7,15 +7,16 @@
 | 五个官方稳定release/许可证/index+ARM64 manifest | OBSERVED：Alloy1.21.2、Loki3.7.9、Tempo3.1.1、Prometheus3.15.1、Grafana13.2.4；原始公开输出及命令exit0 | [官方依赖汇总](dependencies/summary.json)，各组件index.output.json/release.json/license.json/result.json |
 | 固定镜像pull | OBSERVED：五项成功；Alloy首轮DockerHub TLS handshake timeout，原错误保留，同摘要一次重试成功 | config-validation各pull.result.json；20261025T055244Z/alloy-pull.result.json |
 | 本机已拉取原生平台/用户 | OBSERVED：Linux ARM64；Loki10001、Tempo10001:10001、Prometheusnobody、Grafana472；Alloy平台在最终suite实查 | [镜像必要字段](pulled-image-platforms.json)，最终suite各platform.result.json |
-| Alloy/Loki/Tempo/Prometheus官方离线配置 | PASS：四项exit0，无网络、临时容器、固定摘要 | [最终校验](config-validation/20261025T055605Z/alloy-validate.result.json)、同目录其余validate.result.json |
-| Prometheus告警负例 | PASS：4场景/7次断言；新鲜不报、缺失/过期报、恢复清除、依赖停启/for窗口 | [最终规则校验](config-validation/20261025T055605Z/prometheus-alert-tests.result.json) |
+| Alloy/Loki/Tempo/Prometheus官方离线配置 | PASS：四项exit0，无网络、临时容器、固定摘要 | [最终校验](config-validation/20261025T063035Z/alloy-validate.result.json)、同目录其余validate.result.json |
+| Prometheus告警负例 | PASS：5场景，7条告警断言与3条双实例查询断言；新鲜不报、缺失/过期报、恢复清除、依赖停启/for窗口；合成双实例分别查询后sum | [最终规则校验](config-validation/20261025T063035Z/prometheus-alert-tests.result.json) |
 | 四中文仪表盘/数据源/告警/运行手册/行为事件schema | OBSERVED：配置即代码；JSON/YAML静态检查，未宣称真实面板数据 | [运行手册](../../../development/observability.md)；infra/observability |
-| Grafana真实provisioning/中文截图 | NOT_RUN：等待Master统一AppHost | [明确未运行记录](config-validation/20261025T055605Z/grafana-validation-status.json) |
+| Grafana真实provisioning/中文截图 | NOT_RUN：等待Master统一AppHost | [明确未运行记录](config-validation/20261025T063035Z/grafana-validation-status.json) |
 | 正式API→Alloy→Loki/Tempo/Prom查询/一致TraceId与审计ID | NOT_RUN：等待SEC+Master统一运行；未用Console或Running替代 | 后续联调追加原始脱敏JSON |
 | 实时故障告警状态/恢复与重启持久化 | NOT_RUN：规则单测不等于受控进程停启 | 后续联合演练 |
+| 双实例指标身份整改 | 配置完成：仅metric资源增加受控service.instance.id，Prom映射instance；日志/Trace原三项不动；真实两条series与sum仍NOT_RUN | [整改及复现](metric-identity-review.md) |
 | 真实series/index低基数检查 | NOT_RUN：当前仅白名单配置，未用静态配置冒充运行结果 | 后续标签API查询 |
 | 完整镜像CVE/SBOM/签名 | NOT_VERIFIED：官方稳定/固定摘要/ARM64不证明无漏洞 | [官方来源边界](dependencies/summary.json) |
-| 仓库SelfTest | PASS：exit0；检查器8项、结构化解析正反例4项、环境状态3组、ReviewPackage35项0失败；原生产品测试未运行 | [本次直接捕获](verify-config-milestone-resume.json)；先前记录verify-config-milestone.json保留 |
+| 仓库SelfTest | PASS：exit0；检查器8项、结构化解析正反例4项、环境状态3组、ReviewPackage35项0失败；原生产品测试未运行 | [指标身份整改后复验](verify-metric-identity.json)；先前两次SelfTest记录保留 |
 | 同Head CI/独立Review | NOT_VERIFIED：本次为DRAFT/PARTIAL专业分支 | Master后续统一审查/CI |
 | RustFS/S3兼容、生产HA/SLO、Windows/Intel | NOT_RUN；仅单节点本地卷，不作相关能力声明 | 运行手册范围 |
 

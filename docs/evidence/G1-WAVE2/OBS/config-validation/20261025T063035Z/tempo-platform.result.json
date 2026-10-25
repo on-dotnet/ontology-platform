@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "docker",
+    "image",
+    "inspect",
+    "grafana/tempo:3.1.1@sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044",
+    "--format",
+    "{{json .Os}} {{json .Architecture}} {{json .Config.User}}"
+  ],
+  "startedAtUtc": "2026-10-25T06:30:35.222123+00:00",
+  "exitCode": 0,
+  "stdout": "\"linux\" \"arm64\" \"10001:10001\"\n",
+  "stderr": ""
+}
