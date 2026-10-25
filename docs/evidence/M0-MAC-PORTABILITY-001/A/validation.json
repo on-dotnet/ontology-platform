@@ -1,0 +1,32 @@
+{
+  "checks": [
+    {
+      "name": "script-self-tests",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1 -SelfTest",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "49 real script cases: checker 8, doctor 2, structured 4, ReviewPackage 35; zero failures. Expected invalid YAML/TOML output is negative-case evidence."
+    },
+    {
+      "name": "doctor-native-mac",
+      "command": "pwsh -NoProfile -File scripts/doctor.ps1 -CheckDocker",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Outside sandbox: PowerShell 7.6.8, macOS 27.0.1 ARM64, SDK 10.0.402, Node 24.22.1, pnpm 11.28.8, Docker 29.9.2."
+    },
+    {
+      "name": "native-product-tests",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Master and infrastructure Owner own native build/test, resource validation and integration."
+    }
+  ],
+  "ci": {
+    "status": "NOT_VERIFIED",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  }
+}

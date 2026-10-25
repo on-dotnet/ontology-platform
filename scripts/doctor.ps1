@@ -20,7 +20,11 @@ try {
     # 项目并存安装优先；只读选择，不改变用户/机器默认工具或PATH。
     if (-not $ToolRoot) { $ToolRoot = Join-Path $Root '.tools' }
     $dotnetCandidate = Join-Path $ToolRoot $(if ($IsWindows) { 'dotnet/dotnet.exe' } else { 'dotnet/dotnet' })
-    $nodeCandidate = Join-Path $ToolRoot $(if ($IsWindows) { "node-v$nodeTarget-win-x64/node.exe" } else { "node-v$nodeTarget-linux-x64/bin/node" })
+    # Node发行目录按当前OS和原生架构选择；macOS ARM64不能借用linux-x64路径。
+    $nodePlatform = if ($IsWindows) { 'win' } elseif ($IsMacOS) { 'darwin' } else { 'linux' }
+    $nodeArchitecture = [Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString().ToLowerInvariant()
+    $nodeRelativePath = if ($IsWindows) { "node-v$nodeTarget-$nodePlatform-$nodeArchitecture/node.exe" } else { "node-v$nodeTarget-$nodePlatform-$nodeArchitecture/bin/node" }
+    $nodeCandidate = Join-Path $ToolRoot $nodeRelativePath
     $pnpmCandidate = Join-Path $ToolRoot 'pnpm/package/bin/pnpm.cjs'
     $dotnetCommand = if (Test-Path -LiteralPath $dotnetCandidate) { $dotnetCandidate } elseif (Get-Command dotnet -ErrorAction SilentlyContinue) { (Get-Command dotnet).Source } else { $null }
     $nodeCommand = if (Test-Path -LiteralPath $nodeCandidate) { $nodeCandidate } elseif (Get-Command node -ErrorAction SilentlyContinue) { (Get-Command node).Source } else { $null }
