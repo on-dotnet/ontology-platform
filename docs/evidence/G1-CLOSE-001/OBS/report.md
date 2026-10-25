@@ -18,7 +18,7 @@
 | `git fetch origin` | 0 | 冻结基线及origin/main已核对 |
 | `dotnet restore backend/OntologyPlatform.slnx --locked-mode` / restore.txt | 0 | 全后端受锁恢复；首次误用根solution路径MSB1009，已更正，没有依赖变更 |
 | 新OBS14红例 / red.txt | 2 | 14 FAIL；普通异常实际503而预期500，缺少受控事件及完成结果 |
-| 旧边界再红 / red-boundary.txt | 2 | 3 FAIL；取消、已开始、二次写回失败均观察到原marker进入日志边界 |
+| 旧边界再红 / red-boundary.txt | 2 | 3 FAIL；取消项在AssertFault中因缺少1003而失败，不能据此宣称该项marker泄漏；已开始和二次写回失败两项明确由AssertNoSensitiveData观察到marker进入日志边界 |
 | 首实现 / green-first.txt | 2 | 2 PASS/12 FAIL；发现清理响应丢Trace头、EF包装及Kestrel事件13出口 |
 | 第二实现 / green-second.txt | 2 | 13 PASS/1 FAIL；唯一剩余是Kestrel事件13泄漏，后已源头修复 |
 | 新OBS完整测试 / green.txt | 0 | 17 PASS/0 FAIL/0 skip，真实Kestrel包括开始后取消及已取消普通异常 |
@@ -29,7 +29,9 @@
 | `python3 scripts/acceptance/test-governance.py` / governance-integration.txt | 1（test子进程2） | 独立真实PG+Keycloak，31项中30 PASS/1 FAIL/0 skip；唯一FAIL是既有RuntimeOpenApiDeclaresRedirectsAndCompleteErrors：`get /auth/login`缺500 metadata。该路径由SEC负责，本分支不改/不掩盖 |
 | `pwsh -NoProfile -File scripts/verify.ps1 -SelfTest` / selftest-final.txt | 0 | 标准SelfTest；ReviewPackage35/35。首次因新日志行结束和未复用隔离PyYAML失败，修正LF并复用已批准隔离依赖后通过；工程SelfTest不代表产品全PASS |
 | 固定镜像`alloy validate` / alloy-validate.txt | 0 | 真实官方镜像语法验证；无stdout |
-| `python3 docs/evidence/G1-CLOSE-001/OBS/verify-alloy-boundary.py` / alloy-runtime.json、alloy-runtime.txt | 0 | 真实Alloy容器接收OTLP并实际导出到内存回环sink，10项PASS：body/状态/事件marker删除，精确字段及安全Span类别保留，错误大小写字段移除，Loki配置未变。此sink检查不代替真正Loki/Tempo查询 |
+| `python3 docs/evidence/G1-CLOSE-001/OBS/verify-alloy-boundary.py` / alloy-runtime.json、alloy-runtime.txt | 0 | 真实Alloy容器接收OTLP并实际导出到内存回环sink，10项PASS：body/状态/事件marker删除，精确字段及安全Span类别保留，错误大小写字段移除；该原始运行的Loki检查仅对比工作区，不证明相对冻结基线的配置不变。原始输出保留，冻结基线配置复验见下一行；此sink不验证实际Loki索引 |
+| 限定复审后同helper复跑 / alloy-runtime-baseline.json、alloy-runtime-baseline.txt | 0 | 固定Alloy真实运行10项PASS；Loki索引配置以完整冻结提交`1cbfcf3b3807a49003c0054fa618108a4c1a63a0`执行`git diff --exit-code`比较未变，仅证明配置与冻结基线相同；实际索引由Master另查Loki `/series`。原alloy-runtime.json/txt未覆盖 |
+| 限定证据修复后SelfTest / review-minor-selftest.txt | 0 | 标准SelfTest通过；ReviewPackage35项0失败。原17份stdout的SHA256均与rename-map.json一致，backend/infra源码无变更 |
 
 测试捕获器同时检查实际formatter正文、全部state、外部scopes、Exception对象、真实Activity标签/事件/status description；原生OTLP出口额外检查真实protobuf日志及Span字节。所有marker均固定无效合成值，原始异常和OTLP字节仅在测试内存，不落盘。测试注入路由仅在测试程序集MapGet注册；产品无故障路由。PG/Keycloak脚本使用本轮隔离容器及随机生成运行时配置，未读取历史凭据。
 
