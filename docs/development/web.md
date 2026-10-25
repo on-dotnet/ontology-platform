@@ -21,18 +21,18 @@ node .tools/pnpm/package/bin/pnpm.cjs --config.verifyDepsBeforeRun=false --filte
 pwsh -NoProfile -File scripts/verify.ps1 -SelfTest
 ```
 
-UI Playwright使用本机已安装Edge，独立127.0.0.1:15310 Next和15410合成身份夹具，仅验证呈现与交互，不代表身份验收。4项覆盖1280/1920/390、键盘详情与焦点、主题持久化、无权/加载/空/网络与会话过期。截图写FE专项证据，测试产物只写apps/web/artifacts，避免提交依赖/构建缓存。
+UI Playwright使用本机已安装Edge，独立127.0.0.1:15310 Next和15410合成身份夹具，仅验证呈现与交互，不代表身份验收。最新5项覆盖1280/1920/390、键盘详情与焦点、主题持久化、无权/加载/空/网络与会话过期。截图写FE专项证据，测试产物只写apps/web/artifacts，避免提交依赖/构建缓存。
 
 ## 真实 OIDC 联调
 
-Master准备本轮隔离Keycloak/API、BFF代理Next并将临时测试密码仅注入测试进程环境WAVE2_VIEWER_PASSWORD与WAVE2_NO_ROLE_PASSWORD。测试不得打印这些值，也不得读取旧项目凭证。默认BFF localhost:15100，可用PLATFORM_TEST_ORIGIN指定本轮源；当前suite预期隔离Keycloak localhost:18080。从apps/web运行：
+Master准备本轮隔离Keycloak/API、BFF代理Next，并仅向runner进程传入PLATFORM_TEST_RUNTIME本轮私有运行时文件路径。runner在内存读取该runtime指向的本轮realm身份，将临时密码仅注入测试子进程WAVE2_VIEWER_PASSWORD与WAVE2_NO_ROLE_PASSWORD，不打印值、不读取旧项目凭证。默认BFF localhost:15100，可用PLATFORM_TEST_ORIGIN指定本轮源；当前suite预期隔离Keycloak localhost:18080。从仓库根运行（所需环境由Master仅在本轮测试进程注入）：
 
 ```sh
-node ../../.tools/pnpm/package/bin/pnpm.cjs --config.verifyDepsBeforeRun=false exec playwright test --config playwright.oidc.config.ts
+node apps/web/scripts/run-oidc-tests.mjs
 ```
 
-真实suite验证匿名→Keycloak→认证后资源→跨厂403/审计无权→安全退出→me401，以及无角色身份403。HAR、trace、视频和自动失败截图全部关闭，防止认证材料进入产物；不要用UI合成夹具宣称这些流程通过。缺少隔离环境或临时身份时保持NOT_RUN，完整纵向验收还依赖Master/SEC双实例、审计及遥测证据。
+真实suite验证匿名→Keycloak→认证后资源200及site-a作用域→跨厂403/审计无权→安全退出→me401，以及无角色身份403后退出me401；检查HttpOnly/Lax和浏览器存储边界。2026-10-25原始安全日志记录2/2通过，登录后资源截图已人工查看，见FE证据oidc-browser.txt与screenshots/oidc-viewer.png。HAR、trace、视频和自动失败截图全部关闭；专用safe reporter及runner不打印异常详情/URL/认证输入，并阻断敏感附加产物。无需身份或网络的负探针为 `node apps/web/scripts/run-oidc-tests.mjs --privacy-probe`，预期exit1，仅检查失败路径产物隐私。缺少隔离环境或临时身份时保持NOT_RUN，完整纵向验收还依赖Master/SEC双实例、审计及遥测证据和最终统一栈复跑。
 
 ## 客户端与证据
 
-OpenAPI生成类型在src/lib/api/generated.ts，手写fetch适配在同目录client.ts；重新生成使用generate:types并审查差异。Kiota1.36.1真实生成PoC、依赖许可/兼容风险、测试输出及中文截图见[FE证据](../evidence/G1-WAVE2/FE/progress.md)。第三方签名/完整传递许可和真实联调未完成前总体PARTIAL，阶段ZIP由Master唯一生成。
+OpenAPI生成类型在src/lib/api/generated.ts，手写fetch适配在同目录client.ts；重新生成使用generate:types并审查差异。Kiota1.36.1真实生成PoC、依赖许可/兼容风险、测试输出及中文截图见[FE证据](../evidence/G1-WAVE2/FE/progress.md)。独立Review、Master最终集成与同Head CI未完成前总体PARTIAL，阶段ZIP由Master唯一生成。

@@ -1,0 +1,8 @@
+$ node apps/web/scripts/run-oidc-tests.mjs --privacy-probe
+OIDC_SAFE {"event":"test","caseId":"viewer","status":"failed","step":"setup","durationMs":118}
+OIDC_SAFE {"event":"test","caseId":"no-role","status":"failed","step":"setup","durationMs":125}
+OIDC_SAFE {"event":"end","status":"failed"}
+OIDC_SAFE {"event":"privacy","status":"no-sensitive-artifacts","exitCode":1}
+
+EXIT_CODE=1
+EXPECTED_EXIT_CODE=1 (synthetic privacy failure probe)
