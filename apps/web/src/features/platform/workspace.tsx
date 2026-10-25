@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import type { PlatformIdentity, PlatformResourceList, PlatformAuditEntry } from "../../lib/api/generated";
 import { createPlatformClient, PlatformApiError } from "../../lib/api/client";
 import { Icon } from "../../components/ui/icon";
@@ -9,11 +9,24 @@ import { ResourceDialog } from "../../components/ui/resource-dialog";
 /** 当前关口开放的三个平台视图，不包含尚未授权的业务入口。 */
 type View = "resources" | "audit" | "scope";
 const client = createPlatformClient();
+/** 与CSS的移动断点一致，窗口跨断点时同步无障碍可用状态。 */
+const mobileNavigationQuery = "(max-width: 850px)";
+/** 订阅移动布局变化，避免关闭态禁用影响桌面导航。 */
+function subscribeMobileNavigation(onChange: () => void) {
+  const query = window.matchMedia(mobileNavigationQuery);
+  query.addEventListener("change", onChange);
+  return () => query.removeEventListener("change", onChange);
+}
+/** 浏览器当前是否采用抽屉导航，服务端保守禁用关闭的导航直到水合。 */
+function getMobileNavigationSnapshot() { return window.matchMedia(mobileNavigationQuery).matches; }
+/** 服务端先保守禁用关闭态，客户端水合后按真实断点恢复桌面导航。 */
+function getServerNavigationSnapshot() { return true; }
 const views = [{ id: "resources" as const, title: "平台资源", icon: "grid", note: "授权资源工作区" }, { id: "audit" as const, title: "访问审计", icon: "activity", note: "事件与 Trace 关联" }, { id: "scope" as const, title: "授权范围", icon: "shield", note: "身份与访问边界" }];
 /** 仅保存真实请求结果；失败时清除旧数据并区分认证、无权和依赖故障。 */
 export function Workspace({ identity }: { identity: PlatformIdentity }) {
   const [view, setView] = useState<View>("resources");
   const [sidebar, setSidebar] = useState(false);
+  const mobileNavigation = useSyncExternalStore(subscribeMobileNavigation, getMobileNavigationSnapshot, getServerNavigationSnapshot);
   const [resources, setResources] = useState<PlatformResourceList | null>(null);
   const [audit, setAudit] = useState<PlatformAuditEntry[]>([]);
   const [pending, setPending] = useState(true);
@@ -52,7 +65,7 @@ export function Workspace({ identity }: { identity: PlatformIdentity }) {
   const items = resources?.items.filter(item => `${item.name} ${item.id} ${item.siteId}`.toLowerCase().includes(search.toLowerCase())) ?? [];
   return <div className="shell">
     {sidebar && <button className="sidebar-overlay" aria-label="关闭导航" onClick={() => setSidebar(false)} />}
-    <aside className={`sidebar ${sidebar ? "is-open" : ""}`} aria-label="主导航">
+    <aside id="platform-navigation" className={`sidebar ${sidebar ? "is-open" : ""}`} aria-label="主导航" inert={mobileNavigation && !sidebar}>
       <Link href="/" className="brand">
         <span className="brand-mark">O<span />
         </span>
@@ -86,7 +99,7 @@ export function Workspace({ identity }: { identity: PlatformIdentity }) {
     <div className="shell-body">
       <header className="topbar">
         <div className="topbar-left">
-          <button className="icon-button mobile-menu" aria-label="打开导航" onClick={() => setSidebar(true)}>
+          <button className="icon-button mobile-menu" aria-label="打开导航" aria-controls="platform-navigation" aria-expanded={sidebar} onClick={() => setSidebar(true)}>
             <Icon name="menu" />
           </button>
           <span className="breadcrumb">工作台</span>

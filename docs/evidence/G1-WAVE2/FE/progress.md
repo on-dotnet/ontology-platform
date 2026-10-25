@@ -27,3 +27,11 @@ PARTIAL / DRAFT，待独立Review与真实OIDC联调；前里程碑Head=59283841
 真实Keycloak匿名跳转/成功登录/资源/角色拒绝/跨厂区/注销、HttpOnly会话及双实例等完整SEC+FE联调 NOT_RUN，等待Master提供本轮新隔离Keycloak/API。已保留独立playwright.oidc.config.ts与2项真实suite，不以UI夹具替代。远程CI、Linux/Windows/Intel Mac本轮NOT_VERIFIED/NOT_RUN，独立Review待Master安排。本阶段不打ZIP、不改main、不进入G2。
 
 SelfTest最终exit0：静态检查、8项检查器正反例、Doctor/结构化语法/环境状态组和35项审查包正反例通过。首次因保存的Next输出尾随空白而exit1，规范证据文本后复验。SelfTest旧正例仅stub dotnet，未stub pnpm，新Web目标导致该隔离正例实际运行pnpm并自动恢复到用户默认store，还产生本树未跟踪根锁；已移入apps/web/artifacts保留，最终根锁不提交。此公共脚本隔离缺口已提议Master修复，不跨改。完整输出见selftest.txt，包含预期负例FAIL，不将其误报为本轮最终失败。
+
+## 独立Review移动导航Minor修复（2026-10-25）
+
+Reviewer发现850px以下关闭侧栏仅transform屏外，隐藏菜单仍可Tab/读屏访问。已先添加390px真实键盘负例，修复前明确失败（mobile-nav-red.txt）：skip-link后第二次Tab未聚焦打开导航按钮。实现matchMedia+useSyncExternalStore响应断点，仅移动关闭态aside inert，桌面可用；服务端保守禁用到水合，导航触发器有aria-controls/expanded。窗口390→1280→390及打开/选择后关闭均由Edge真实交互与原生AX树检查；未添加权限业务逻辑。
+
+首轮测试用Playwright角色选择器推断读屏隐藏，发现该选择器不排除inert节点（mobile-nav-ui-selector-failure.txt）；Tab行为当时已通过，改用Edge原生Accessibility.getFullAXTree检查浏览器真正暴露的无障碍节点后，全部UI5/5通过。build/lint/typecheck各exit0，客户端测试仍6/6。原负例保留，未删测试、未改共享配置。真实OIDC另记，不把此UI夹具算作身份闭环。
+
+本次SelfTest最终exit0/审查包35正反例通过，使用仅子进程有效的pnpm11.28.8 wrapper关闭自动安装。旧native正例在临时树没有node_modules，真实lint报command not found但其dotnet位置断言仍给PASS；该既有测试夹具缺口继续交Master，不将其当产品验证。产品lint/类型/构建/6单测/5UI已在真实FE树分别执行通过，详见mobile-nav-*.txt。

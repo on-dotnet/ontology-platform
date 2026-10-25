@@ -1,0 +1,48 @@
+$ node .tools/pnpm/package/bin/pnpm.cjs --config.verifyDepsBeforeRun=false --filter @ontology-platform/web test:e2e --grep 390关闭导航
+$ playwright test --grep '390关闭导航'
+[WebServer] (node:5538) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:5539) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:5540) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 tests/ui/workspace.spec.ts:75:1 › 390关闭导航跳过屏外Tab且响应式桌面菜单可用 (5.5s)
+
+
+  1) tests/ui/workspace.spec.ts:75:1 › 390关闭导航跳过屏外Tab且响应式桌面菜单可用 ────────────────────────────────────
+
+    Error: expect(locator).toBeFocused() failed
+
+    Locator:  getByRole('button', { name: '打开导航' })
+    Expected: focused
+    Received: inactive
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toBeFocused" getByRole('button', { name: '打开导航' }) with timeout 5000ms
+      - waiting for getByRole('button', { name: '打开导航' })
+        14 × locator resolved to <button aria-label="打开导航" class="icon-button mobile-menu">…</button>
+           - unexpected value "inactive"
+
+
+      80 |   await expect(page.getByRole("link", { name: "跳到主内容" })).toBeFocused();
+      81 |   await page.keyboard.press("Tab");
+    > 82 |   await expect(page.getByRole("button", { name: "打开导航" })).toBeFocused();
+         |                                                            ^
+      83 |   await expect(page.getByRole("complementary", { name: "主导航" })).toHaveCount(0);
+      84 |   await page.getByRole("button", { name: "打开导航" }).click();
+      85 |   await expect(page.getByRole("complementary", { name: "主导航" })).toHaveCount(1);
+        at /Users/chasen/.codex/worktrees/g1-wave2-fe/ontology-platform/apps/web/tests/ui/workspace.spec.ts:82:60
+
+    Error Context: artifacts/test-results/ui/workspace-390关闭导航跳过屏外Tab且响应式桌面菜单可用/error-context.md
+
+  1 failed
+    tests/ui/workspace.spec.ts:75:1 › 390关闭导航跳过屏外Tab且响应式桌面菜单可用 ─────────────────────────────────────
+/Users/chasen/.codex/worktrees/g1-wave2-fe/ontology-platform/apps/web:
+[ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL] @ontology-platform/web@0.1.0 test:e2e: `playwright test --grep '390关闭导航'`
+Exit status 1
+
+EXIT_CODE=1
