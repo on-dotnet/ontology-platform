@@ -104,3 +104,5 @@ B原树verify -SelfTest两次实际exit1：structured-syntax FAIL/项目parser�
 B没有执行Linux CI、标准总ZIP或独立审查；Windows M0运行NOT_RUN、Linux容器运行NOT_RUN；生产/SEC/FE/OBS/G2未开展。状态PARTIAL等待独立Review与Master集成，不以本文Owner自报当独立批准。
 
 Master接管后的额外OBSERVED：.tools/pythonlibs实际已是指向Master已校验目录的符号链接（ls/readlink exit0）；此前中断调用可能已部分创建链接，不能把未取得完整输出推断为没有任何效果。Master在最终归档前实际运行 pwsh -NoProfile -File scripts/verify.ps1（不带SelfTest），exit0、131文件静态检查通过。没有把该次静态PASS替代此前B完整SelfTest失败或Master真实产品组合验收。
+
+独立Reviewer证据边界：以上运行记录为B实测后Master转录，并非原始工具输出；Reviewer只独立重查停止状态、卷、静态规则和源码一致性，未独立重跑历史运行。Master将另以新专用卷直接归档原始运行输出以补齐总门禁。秘密仅进程注入不能保证操作系统或Docker/服务内部绝对不落盘；本报告只保证没有主动将秘密值写源码、日志、证据或独立秘密文件。

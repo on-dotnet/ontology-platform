@@ -92,4 +92,4 @@ macOS27.0.1/arm64，Docker29.9.2 linux/aarch64，四固定index真实提供ARM64
 
 Dashboard telemetry API默认保留ApiKey认证。可在启动AppHost的当前进程中设置随机AppHost__DashboardApiKey并以内存值发送X-API-Key header查询/api/telemetry/traces/{traceId}；不要把值放URL、命令记录、Git或审查包，不要关闭认证。M0已用真实404请求的traceparent核对Dashboard返回TraceId/parent/service.name；健康路径排除跟踪，不用/health测试请求Trace。完整LGTM仍归未授权OBS。
 
-本轮专用卷前缀m0-mac-b-20261025及m0-mac-b-trace-20261025仅保留随机测试数据，临时秘密不落盘；不要拿它们当可复用日常开发配置。正常日常卷用稳定本机秘密。AppHost停止后卷保留，重启探针不等于生产备份恢复。M0真实状态、限制和清理来源见上方证据，Windows本轮未重跑，历史结果不改写。
+本轮专用卷前缀m0-mac-b-20261025及m0-mac-b-trace-20261025仅保留随机测试数据，临时秘密值不主动写入源码、日志、证据或独立秘密文件；容器与运行时内部存储按Docker及服务机制处理；不要拿它们当可复用日常开发配置。正常日常卷用稳定本机秘密。AppHost停止后卷保留，重启探针不等于生产备份恢复。M0真实状态、限制和清理来源见上方证据，Windows本轮未重跑，历史结果不改写。
