@@ -1,3 +1,4 @@
+using System.Text.Json.Nodes;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi;
 
@@ -35,14 +36,68 @@ public static class PlatformOpenApi
                 // 公开登录及CSRF领取路由不假标为必须已认证。
                 var scheme = path.Key.StartsWith("/api/v1/platform/", StringComparison.Ordinal) || path.Key == "/auth/logout"
                     ? "session" : path.Key.StartsWith("/health/", StringComparison.Ordinal) ? "health" : null;
-                if (scheme is null || path.Value.Operations is null)
+                if (path.Value.Operations is null)
                 {
                     continue;
                 }
                 // 每个HTTP操作分别声明安全要求，避免继承全局误标公开入口。
                 foreach (var operation in path.Value.Operations.Values)
                 {
-                    operation.Security = [new OpenApiSecurityRequirement { [new OpenApiSecuritySchemeReference(scheme, document)] = [] }];
+                    operation.OperationId = path.Key switch
+                    {
+                        "/api/v1/platform/me" => "getPlatformMe",
+                        "/api/v1/platform/resources" => "listPlatformResources",
+                        "/api/v1/platform/resources/{id}" => "getPlatformResource",
+                        "/api/v1/platform/audit" => "listPlatformAudit",
+                        "/auth/csrf" => "getCsrfToken",
+                        "/auth/login" => "login",
+                        "/auth/logout" => "logout",
+                        _ => operation.OperationId
+                    };
+                    if (scheme is not null)
+                    {
+                        operation.Security = [new OpenApiSecurityRequirement { [new OpenApiSecuritySchemeReference(scheme, document)] = [] }];
+                    }
+                    if (path.Key == "/auth/logout")
+                    {
+                        operation.Description = "必须提供有效header或表单CSRF token至少一项；浏览器使用原生form POST顶层导航。";
+                        operation.Parameters ??= [];
+                        operation.Parameters.Add(new OpenApiParameter
+                        {
+                            Name = "X-CSRF-TOKEN",
+                            In = ParameterLocation.Header,
+                            Required = false,
+                            Schema = new OpenApiSchema { Type = JsonSchemaType.String }
+                        });
+                        operation.RequestBody = new OpenApiRequestBody
+                        {
+                            Required = false,
+                            Content = new Dictionary<string, OpenApiMediaType>
+                            {
+                                ["application/x-www-form-urlencoded"] = new()
+                                {
+                                    Schema = new OpenApiSchema
+                                    {
+                                        Type = JsonSchemaType.Object,
+                                        Required = new HashSet<string> { "__RequestVerificationToken" },
+                                        Properties = new Dictionary<string, IOpenApiSchema>
+                                        {
+                                            ["__RequestVerificationToken"] = new OpenApiSchema { Type = JsonSchemaType.String }
+                                        }
+                                    }
+                                }
+                            }
+                        };
+                    }
+                    if (path.Key == "/api/v1/platform/audit" && operation.Parameters is not null)
+                    {
+                        // 验证器实际拒绝范围外limit；生成文档明确相同的数值边界。
+                        var limit = operation.Parameters.FirstOrDefault(parameter => parameter.Name == "limit");
+                        if (limit is OpenApiParameter parameter)
+                        {
+                            parameter.Schema = new OpenApiSchema { Type = JsonSchemaType.Integer, Minimum = "1", Maximum = "100", Default = JsonValue.Create(20) };
+                        }
+                    }
                 }
             }
             return Task.CompletedTask;
