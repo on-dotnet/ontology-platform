@@ -1,0 +1,52 @@
+{
+  "status": "PASS",
+  "evaluationTime": "1792950457.721969",
+  "data": {
+    "instances": {
+      "status": "success",
+      "data": {
+        "resultType": "vector",
+        "result": [
+          {
+            "metric": {
+              "instance": "platform-api-1"
+            },
+            "value": [
+              1792950457.722,
+              "277"
+            ]
+          },
+          {
+            "metric": {
+              "instance": "platform-api-2"
+            },
+            "value": [
+              1792950457.722,
+              "27"
+            ]
+          }
+        ]
+      }
+    },
+    "total": {
+      "status": "success",
+      "data": {
+        "resultType": "vector",
+        "result": [
+          {
+            "metric": {},
+            "value": [
+              1792950457.722,
+              "304"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "checks": [
+    "two distinct bounded instance streams",
+    "same-time sum equals total",
+    "no actor/site/trace/audit metric dimensions (series recorded separately)"
+  ]
+}

@@ -50,16 +50,16 @@
 
 ## DAG与任务
 
-- [x] 0: 完读授权、fetch确认Base、全树状态和工具诊断；原checkout六个.DS_Store保留，各历史树干净，未清理。新建三个独立托管树/任务分支。
-- [x] 1a: 冻结契约8fdf242经独立Reviewer通过（0 P0/P1，一项路径P3已补全）；
-- [x] 1b: 模块模型/DTO/迁移、受锁restore/build及真实PG迁移拒绝丢失/前向恢复验证。
-- [x] 2: SEC写真实PG红例，再修复成功审计/数组权限/一次事件，含允许拒绝/过期/空/跨厂/多厂/失败写入/Trace/并发与脱敏；commit/push DRAFT。
-- [x] 3a: OBS写真实Kestrel红例，再改固定分类/取消/已开始/脱敏，官方Alloy语法和实际导出测试；commit/push DRAFT。
-- [ ] 4: 固定提交独立Review两线、Owner修复；Master集成，全部后端/format/SelfTest/Web/浏览器/OIDC/OpenAPI/真实LGTM正反回归。
-- [ ] 5: G1退出标准/14模块/未完项分期/只读G2接口样例DAG/生产拓扑ADR与只读保护规则评估，保留历史状态。
-- [ ] 6: 通过独立最终Review+任务分支同HeadCI后Master集成main/push；最终main同HeadCI；标准唯一ZIP+独立VerifyOnly/逐成员回验，输出G1_CLOSE_READY_FOR_REVIEW停止。
+- [x] 0: 完读授权/fetch预检与全树状态；新建Master/SEC/OBS独立托管树，保留历史及六个Finder文件。
+- [x] 1: 冻结契约8fdf242经独立Review、模型/DTO/唯一迁移1cbfcf3；真实PG红绿迁移恢复通过。
+- [x] 2: SEC 5d92109已push、独立0/0/0，真实PG27/27；合入Master。
+- [x] 3: OBS 19355e0已push，所有专项/限定Review闭环；原生出口15/15、真正LGTM16通过，合入Master。
+- [x] 4: 最终Mac Release45安全/4Infra、Web6/UI5/OIDC2、310协议、实际OpenAPI/故障恢复/七容器14项/告警/进程替换通过；原始红例保留。
+- [x] 5: G1退出矩阵/14模块/未完项分期、只读G2接口样例DAG、部署ADR与只读GitHub保护评估完成。
+- [ ] 6: 最终整体独立Review，任务分支同Head Linux CI；通过后Master集成main/push，再核最终main同Head CI。
+- [ ] 7: 标准唯一ZIP与独立VerifyOnly/逐成员重开，交付G1_CLOSE_READY_FOR_REVIEW后停止。
 
-验收入口沿用doctor、verify -SelfTest、Release restore/build/format、全部Infra/Security test-governance、verify-web -Restore、UI5/OIDC2、verify-openapi、五身份协议、proxy/PGfault/persistence、真实LGTM查询；增加本次故障/迁移测试。每次记录命令/退出码/计数，环境缺失明确标识。
+实际矩阵见本轮master/validation.json与delivery-report；最终Head/实际CI由包manifest绑定。用户批准方式已明确，不另询问执行方式。所有测试原始失败/修复/当前PASS及未运行分别保留。
 
 ## 恢复账本
 
@@ -68,3 +68,5 @@
 2026-10-25：新增结构化范围迁移1cbfcf3、真实PG migration红绿证据；新运行时wave2-a19529d4edb4专用卷/Realm仅忽略私有目录，core引导后受控停止。SelfTest首次缺PyYAML/console CR明确FAIL，原锁哈希隔离恢复与展示空白规范化后完整PASS35构包负例；未更改检查器。当前main仍Base。
 
 集成账本：SEC 5d92109经独立0/0/0审查在357345f合入Master；OBS240929c经0Critical/0Important/2Minor审查在Master合入，737c38d两个证据Minor限定复审已闭环，待同步。集成Release安全45/45无跳过、实际OpenAPI PASS。真正LGTM验收先9项事实/失败关闭/恢复PASS，但EventId/EventName出口缺失FAIL（trace22e6a80c6fc2a7c67630be18a37612e2）；已交OBS调查修复，不放宽断言。main仍Base，完整LGTM/CI/最终审查未完成。
+
+2026-10-26收口账本：OBS19355e0出口身份映射已独立0/0/0复审，Master集成重启专用Alloy后真正16项LGTM PASS；最终Release45/45/Infra4/4/Web6/UI5/OIDC2/协议310均PASS。原PG恢复脚本仅等API1导致API2旧池503已真实重现，双实例门禁加强后注销两401及七容器14项均PASS，服务端未改。告警触发恢复/实际四中文面板与两实例指标通过；旧Cookie跨三个全新PID通过。全部开发栈已正常停止，私有资产/六卷保留；main待整体Review+最终CI后集成。

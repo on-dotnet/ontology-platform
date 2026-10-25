@@ -1,0 +1,56 @@
+{
+  "status": "PARTIAL",
+  "category": "AssertionError",
+  "checks": [
+    {
+      "check": "before-pg-audit-visible",
+      "status": "PASS",
+      "detail": {
+        "auditId": "00a64c112c55445680e9403fa38da406",
+        "traceId": "e90a64315153bfe9d6c0ee002e65f640"
+      }
+    },
+    {
+      "check": "before-grafana-state-created",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "before-prometheus-history",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "bounded-container-set",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "dedicated-volume-guard",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "seven-container-restart",
+      "status": "PASS",
+      "detail": {
+        "count": 7,
+        "names": [
+          "alloy-kaddngew",
+          "grafana-rnbcxhmd",
+          "keycloak-kvzftvcz",
+          "postgres-kmjutzad",
+          "tempo-wypbvruz",
+          "loki-kxyemfbp",
+          "prometheus-qpyczwqs"
+        ],
+        "volumes": "preserved"
+      }
+    },
+    {
+      "check": "same-cookie-after-pg-kc-restart-15100",
+      "status": "PASS",
+      "detail": null
+    }
+  ]
+}

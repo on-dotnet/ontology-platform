@@ -1,6 +1,6 @@
 # ADR-008 G1收口审计范围与部署边界
 
-状态：审计范围 IMPLEMENTED_PENDING_VALIDATION；生产拓扑 PROPOSED，未授权实施。2026-10-25。依据G1-CLOSE-001，不调整原架构/依赖。
+状态：审计范围 IMPLEMENTED / VALIDATED_LOCAL；生产拓扑 PROPOSED，未授权实施。2026-10-25。依据G1-CLOSE-001，不调整原架构/依赖。
 
 ## 审计事实
 

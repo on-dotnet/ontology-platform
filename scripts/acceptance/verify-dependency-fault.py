@@ -11,6 +11,7 @@ import urllib.error
 import urllib.request
 
 STAGE = 'initialization'
+DRIVER = None
 ROOT = Path(__file__).resolve().parents[2]
 # 默认保留历史入口；后续收口显式选择新证据目录，不覆盖历史事实。
 EVIDENCE = (ROOT / os.environ.get('PLATFORM_EVIDENCE_DIR', 'docs/evidence/G1-WAVE2/master')).resolve()
@@ -24,10 +25,11 @@ SPEC.loader.exec_module(OIDC)
 
 
 def main(path):
-    global STAGE
+    global STAGE, DRIVER
     runtime = json.loads(Path(path).read_text())
     realm = json.loads(Path(runtime['realmFile']).read_text())
     driver = OIDC.ProtocolDriver('http://localhost:15100', 'http://localhost:15101', realm['authority'])
+    DRIVER = driver
     # 真实数据库断连可等待默认30秒命令超时，客户端留足75秒且不替换任何响应。
     original_open = driver.opener.open
     driver.opener.open = lambda operation, timeout=20: original_open(operation, timeout=75)
@@ -35,6 +37,7 @@ def main(path):
     print('Fault stage: ' + STAGE, flush=True)
     cookie = driver.login(realm['identities']['wave2-viewer-a'])
     driver.json_request(driver.first, '/api/v1/platform/me', 200, 'healthy-before-dependency-fault')
+    driver.json_request(driver.second, '/api/v1/platform/me', 200, 'healthy-twin-before-dependency-fault')
     found = subprocess.check_output(['docker', 'ps', '--filter', 'volume=' + runtime['volumePrefix'] + '-postgres-data', '--format', '{{.ID}}'], text=True).split()
     if len(found) != 1:
         raise ValueError('Expected exactly this run dedicated PostgreSQL')
@@ -64,20 +67,25 @@ def main(path):
         subprocess.run(['docker', 'start', target], check=True, stdout=subprocess.DEVNULL)
     STAGE = 'database-recovered'
     print('Fault stage: ' + STAGE, flush=True)
-    for _ in range(30):
-        try:
-            if driver.request(driver.first + '/api/v1/platform/me')[0] == 200:
-                break
-        except OSError:
-            pass
-        time.sleep(2)
-    else:
-        raise TimeoutError('Dedicated PostgreSQL recovery failed')
-    driver.json_request(driver.first, '/api/v1/platform/me', 200, 'same-cookie-after-dependency-recovery')
+    # 双实例各有独立Npgsql池；PG重启后第二实例首次查询也可能先清理旧断连。
+    recovery = []
+    for origin in [driver.first, driver.second]:
+        for _ in range(30):
+            try:
+                status = driver.request(origin + '/api/v1/platform/me')[0]
+                recovery.append({'instance': origin.rsplit(':', 1)[1], 'httpStatus': status})
+                if status == 200:
+                    break
+            except OSError:
+                recovery.append({'instance': origin.rsplit(':', 1)[1], 'httpStatus': None})
+            time.sleep(2)
+        else:
+            raise TimeoutError('Dedicated PostgreSQL recovery failed on an API instance')
+        driver.json_request(origin, '/api/v1/platform/me', 200, 'same-cookie-after-dependency-recovery-' + origin.rsplit(':', 1)[1])
     STAGE = 'logout-after-recovery'
     print('Fault stage: ' + STAGE, flush=True)
     driver.logout_and_replay(cookie)
-    result = {'status': 'PASS', 'traceId': trace, 'scope': 'one explicit dedicated PostgreSQL stop/start; no other volume touched', 'checks': driver.records}
+    result = {'status': 'PASS', 'traceId': trace, 'scope': 'one explicit dedicated PostgreSQL stop/start; no other volume touched', 'checks': driver.records, 'recoveryObservations': recovery}
     (EVIDENCE / 'dependency-fault.json').write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n')
     print('PASS: dependency503, independent live200/ready503 and same-cookie recovery; error TraceId=' + trace)
 
@@ -89,5 +97,6 @@ if __name__ == '__main__':
     try:
         main(args.runtime_file)
     except Exception as failure:
+        (EVIDENCE / 'dependency-fault-failure.json').write_text(json.dumps({'status': 'FAIL', 'stage': STAGE, 'category': type(failure).__name__, 'currentCheck': DRIVER.current_check if DRIVER else None, 'checks': DRIVER.records if DRIVER else []}, ensure_ascii=False, indent=2) + '\n')
         print('FAIL: dependency fault; stage=' + STAGE + '; category=' + type(failure).__name__ + '; details suppressed')
         raise SystemExit(1)

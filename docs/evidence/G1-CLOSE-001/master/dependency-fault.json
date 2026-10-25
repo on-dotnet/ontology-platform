@@ -1,0 +1,196 @@
+{
+  "status": "PASS",
+  "traceId": "6312295c837442c9fde116fb74ee3c69",
+  "scope": "one explicit dedicated PostgreSQL stop/start; no other volume touched",
+  "checks": [
+    {
+      "check": "oidc-challenge",
+      "status": "PASS",
+      "httpStatus": 302
+    },
+    {
+      "check": "oidc-par-reference-observed",
+      "status": "PASS"
+    },
+    {
+      "check": "keycloak-password-form",
+      "status": "PASS",
+      "httpStatus": 200
+    },
+    {
+      "check": "oidc-callback-completed",
+      "status": "PASS",
+      "httpStatus": 302
+    },
+    {
+      "check": "httponly-lax-server-session-cookie",
+      "status": "PASS"
+    },
+    {
+      "check": "healthy-before-dependency-fault",
+      "status": "PASS",
+      "httpStatus": 200
+    },
+    {
+      "check": "healthy-before-dependency-fault-no-store",
+      "status": "PASS"
+    },
+    {
+      "check": "healthy-before-dependency-fault-trace",
+      "status": "PASS"
+    },
+    {
+      "check": "healthy-twin-before-dependency-fault",
+      "status": "PASS",
+      "httpStatus": 200
+    },
+    {
+      "check": "healthy-twin-before-dependency-fault-no-store",
+      "status": "PASS"
+    },
+    {
+      "check": "healthy-twin-before-dependency-fault-trace",
+      "status": "PASS"
+    },
+    {
+      "check": "database-unavailable-is-503",
+      "status": "PASS",
+      "httpStatus": 503
+    },
+    {
+      "check": "database-unavailable-is-503-no-store",
+      "status": "PASS"
+    },
+    {
+      "check": "database-unavailable-is-503-trace",
+      "status": "PASS"
+    },
+    {
+      "check": "database-unavailable-is-503-problem",
+      "status": "PASS"
+    },
+    {
+      "check": "dependency-error-safe-code",
+      "status": "PASS"
+    },
+    {
+      "check": "dependency-fault-health-live",
+      "status": "PASS",
+      "httpStatus": 200
+    },
+    {
+      "check": "dependency-fault-health-ready",
+      "status": "PASS",
+      "httpStatus": 503
+    },
+    {
+      "check": "same-cookie-after-dependency-recovery-15100",
+      "status": "PASS",
+      "httpStatus": 200
+    },
+    {
+      "check": "same-cookie-after-dependency-recovery-15100-no-store",
+      "status": "PASS"
+    },
+    {
+      "check": "same-cookie-after-dependency-recovery-15100-trace",
+      "status": "PASS"
+    },
+    {
+      "check": "same-cookie-after-dependency-recovery-15101",
+      "status": "PASS",
+      "httpStatus": 200
+    },
+    {
+      "check": "same-cookie-after-dependency-recovery-15101-no-store",
+      "status": "PASS"
+    },
+    {
+      "check": "same-cookie-after-dependency-recovery-15101-trace",
+      "status": "PASS"
+    },
+    {
+      "check": "csrf-missing-rejected",
+      "status": "PASS",
+      "httpStatus": 403
+    },
+    {
+      "check": "csrf-missing-rejected-no-store",
+      "status": "PASS"
+    },
+    {
+      "check": "csrf-missing-rejected-trace",
+      "status": "PASS"
+    },
+    {
+      "check": "csrf-missing-rejected-problem",
+      "status": "PASS"
+    },
+    {
+      "check": "antiforgery-issued",
+      "status": "PASS",
+      "httpStatus": 200
+    },
+    {
+      "check": "antiforgery-issued-no-store",
+      "status": "PASS"
+    },
+    {
+      "check": "antiforgery-issued-trace",
+      "status": "PASS"
+    },
+    {
+      "check": "csrf-valid-logout",
+      "status": "PASS",
+      "httpStatus": 302
+    },
+    {
+      "check": "logout-cookie-replay-first",
+      "status": "PASS",
+      "httpStatus": 401
+    },
+    {
+      "check": "logout-cookie-replay-first-no-store",
+      "status": "PASS"
+    },
+    {
+      "check": "logout-cookie-replay-first-trace",
+      "status": "PASS"
+    },
+    {
+      "check": "logout-cookie-replay-first-problem",
+      "status": "PASS"
+    },
+    {
+      "check": "logout-cookie-replay-second",
+      "status": "PASS",
+      "httpStatus": 401
+    },
+    {
+      "check": "logout-cookie-replay-second-no-store",
+      "status": "PASS"
+    },
+    {
+      "check": "logout-cookie-replay-second-trace",
+      "status": "PASS"
+    },
+    {
+      "check": "logout-cookie-replay-second-problem",
+      "status": "PASS"
+    }
+  ],
+  "recoveryObservations": [
+    {
+      "instance": "15100",
+      "httpStatus": 200
+    },
+    {
+      "instance": "15101",
+      "httpStatus": 503
+    },
+    {
+      "instance": "15101",
+      "httpStatus": 200
+    }
+  ]
+}

@@ -1,0 +1,113 @@
+[
+  {
+    "container": "alloy-kaddngew",
+    "image": "grafana/alloy@sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18",
+    "ports": [
+      {
+        "containerPort": "12345/tcp",
+        "hostIp": "127.0.0.1",
+        "hostPort": "53652"
+      },
+      {
+        "containerPort": "4317/tcp",
+        "hostIp": "127.0.0.1",
+        "hostPort": "53653"
+      },
+      {
+        "containerPort": "4318/tcp",
+        "hostIp": "127.0.0.1",
+        "hostPort": "53651"
+      }
+    ],
+    "namedVolumes": [
+      "wave2-a19529d4edb4-alloy-data"
+    ]
+  },
+  {
+    "container": "grafana-rnbcxhmd",
+    "image": "grafana/grafana@sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f",
+    "ports": [
+      {
+        "containerPort": "3000/tcp",
+        "hostIp": "127.0.0.1",
+        "hostPort": "53654"
+      }
+    ],
+    "namedVolumes": [
+      "wave2-a19529d4edb4-grafana-data"
+    ]
+  },
+  {
+    "container": "keycloak-kvzftvcz",
+    "image": "quay.io/keycloak/keycloak@sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b",
+    "ports": [
+      {
+        "containerPort": "8080/tcp",
+        "hostIp": "127.0.0.1",
+        "hostPort": "53565"
+      },
+      {
+        "containerPort": "9000/tcp",
+        "hostIp": "127.0.0.1",
+        "hostPort": "53564"
+      }
+    ],
+    "namedVolumes": []
+  },
+  {
+    "container": "postgres-kmjutzad",
+    "image": "docker.io/library/postgres@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6",
+    "ports": [
+      {
+        "containerPort": "5432/tcp",
+        "hostIp": "127.0.0.1",
+        "hostPort": "53543"
+      }
+    ],
+    "namedVolumes": [
+      "wave2-a19529d4edb4-postgres-data"
+    ]
+  },
+  {
+    "container": "tempo-wypbvruz",
+    "image": "grafana/tempo@sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044",
+    "ports": [
+      {
+        "containerPort": "3200/tcp",
+        "hostIp": "127.0.0.1",
+        "hostPort": "53544"
+      }
+    ],
+    "namedVolumes": [
+      "wave2-a19529d4edb4-tempo-data"
+    ]
+  },
+  {
+    "container": "loki-kxyemfbp",
+    "image": "grafana/loki@sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28",
+    "ports": [
+      {
+        "containerPort": "3100/tcp",
+        "hostIp": "127.0.0.1",
+        "hostPort": "53545"
+      }
+    ],
+    "namedVolumes": [
+      "wave2-a19529d4edb4-loki-data"
+    ]
+  },
+  {
+    "container": "prometheus-qpyczwqs",
+    "image": "prom/prometheus@sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2",
+    "ports": [
+      {
+        "containerPort": "9090/tcp",
+        "hostIp": "127.0.0.1",
+        "hostPort": "53542"
+      }
+    ],
+    "namedVolumes": [
+      "wave2-a19529d4edb4-prometheus-data"
+    ]
+  }
+]

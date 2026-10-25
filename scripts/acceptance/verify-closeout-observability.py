@@ -109,7 +109,7 @@ def main(runtime_path):
         try:
             logs = fetch('http://localhost:13100', '/loki/api/v1/query_range?' + query)
             tempo = fetch('http://localhost:13200', '/api/traces/' + fault_trace)
-            if logs.get('data', {}).get('result') and any(value.get('key') == 'platform.exception.category' for value in walk(tempo)):
+            if 'PlatformRequestFault' in json.dumps(logs) and any(value.get('key') == 'platform.exception.category' for value in walk(tempo)):
                 break
         except (OSError, ValueError):
             pass
@@ -118,8 +118,9 @@ def main(runtime_path):
         raise TimeoutError('Actual Loki/Tempo correlation not ready')
     log_text = json.dumps(logs, ensure_ascii=False)
     tempo_text = json.dumps(tempo, ensure_ascii=False)
-    check('real-loki-fixed-event-and-fields', 'PlatformRequestFault' in log_text and 'database_write' in log_text and 'problem_returned' in log_text)
-    check('real-loki-fixed-route-status-trace', '/api/v1/platform/audit' in log_text and '503' in log_text and fault_trace in log_text)
+    fault_streams = [row for row in logs['data']['result'] if row['stream'].get('EventName') == 'PlatformRequestFault' and str(row['stream'].get('EventId')) == '1003' and any(value[1] == 'PlatformRequestFault' for value in row['values'])]
+    check('real-loki-fixed-event-and-fields', bool(fault_streams) and all(row['stream'].get('ExceptionCategory') == 'database_write' and row['stream'].get('Outcome') == 'problem_returned' for row in fault_streams))
+    check('real-loki-fixed-route-status-trace', all(row['stream'].get('Route') == '/api/v1/platform/audit' and str(row['stream'].get('Status')) == '503' and row['stream'].get('TraceId') == fault_trace for row in fault_streams))
     series = fetch('http://localhost:13100', '/loki/api/v1/series?' + urllib.parse.urlencode({'match[]': '{service_name="ontology-platform-api"}', 'start': str(time.time_ns() - 600_000_000_000)}))
     check('real-loki-only-three-index-labels', bool(series.get('data')) and all(set(stream) == {'service_name', 'deployment_environment_name', 'service_version'} for stream in series['data']))
     (EVIDENCE / 'closeout-loki-series.json').write_text(json.dumps(series, ensure_ascii=False, indent=2) + '\n')

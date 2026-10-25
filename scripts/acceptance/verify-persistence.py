@@ -59,7 +59,9 @@ def available(runtime):
                          ('http://localhost:18080', '/realms/master/.well-known/openid-configuration')]:
         if request(origin, path)[0] != 200:
             return False
-    return request('http://localhost:15100', '/health/ready', {'X-Health-Key': runtime['healthKey']})[0] == 200
+    # 两个API各自持有数据库池；七容器重启后的流量恢复必须逐实例等待真实三表查询。
+    return all(request(origin, '/health/ready', {'X-Health-Key': runtime['healthKey']})[0] == 200
+               for origin in ['http://localhost:15100', 'http://localhost:15101'])
 
 
 def main(runtime_path):
