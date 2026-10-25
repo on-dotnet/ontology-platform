@@ -2,11 +2,11 @@
 
 仓库：`on-dotnet/ontology-platform`。多行业AI Native本体与知识平台，基础工程统一`OntologyPlatform.*`。
 
-当前任务以[授权索引](docs/tasks/current-authorization.md)为准；G1-ENG-001保持历史PARTIAL，现已授权G1-INFRA-001 V2及独立Worktree并行。G0/G1-ENG是历史归档，不把空solution或零应用测试当作产品通过。
+当前任务以[授权索引](docs/tasks/current-authorization.md)为准；G1-ENG-001保持历史PARTIAL，当前正式授权M0-MAC-PORTABILITY-001 Mac接管及兼容验收（G1-INFRA为已交付历史）。G0/G1-ENG是历史归档，不把空solution或零应用测试当作产品通过。
 
 ## 检查入口
 
-使用PowerShell7；解析器代码要求Python3.11+，当前批准的安装哈希仅覆盖Windows CPython3.13 x64与Ubuntu CPython3.12 x64。V2完整语法门禁先按精确哈希隔离恢复小型解析器，不修改全局Python；其他组合需先核验发行物并登记哈希：
+使用PowerShell7；解析器代码要求Python3.11+，当前批准的安装哈希覆盖Windows CPython3.13 x64、Ubuntu CPython3.12 x64和macOS CPython3.13 arm64。V2完整语法门禁先按精确哈希隔离恢复小型解析器，不修改全局Python；其他组合需先核验发行物并登记哈希：
 
 ```powershell
 python -m pip install --index-url https://pypi.org/simple --only-binary=:all: --no-deps --require-hashes --target .tools/pythonlibs -r scripts/verification-requirements.txt
@@ -27,3 +27,5 @@ verify默认退出0仅代表工程静态检查通过，退出1表示失败；Sel
 G1-INFRA实现、真实验证和保留事项见[交付记录](docs/evidence/G1-INFRA-001/delivery-report.md)；开发资源启动见[操作手册](docs/development/local-infrastructure.md)。历史G1-ENG状态不因本次运行结果改写。
 
 任务完成后停止；任何其他G1任务或G2必须另行明确授权。
+
+Mac固定工具、项目隔离pnpm11.28.8、跨平台回退与Master恢复见[Mac开发手册](docs/development/macos-setup.md)。
