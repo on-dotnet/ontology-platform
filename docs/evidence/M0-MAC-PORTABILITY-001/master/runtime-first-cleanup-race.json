@@ -1,0 +1,298 @@
+{
+  "status": "FAIL",
+  "volumePrefix": "m0-mac-observed-17d4d914",
+  "command": [
+    "python3",
+    "runtime-harness.py",
+    "/Users/chasen/.codex/worktrees/m0-master/ontology-platform"
+  ],
+  "exitCode": 1,
+  "records": [
+    {
+      "command": [
+        "lsof",
+        "-nP",
+        "-iTCP:15888",
+        "-iTCP:15080",
+        "-iTCP:15432",
+        "-iTCP:13030",
+        "-iTCP:19000",
+        "-iTCP:19001",
+        "-iTCP:18080",
+        "-iTCP:19090",
+        "-iTCP:14317",
+        "-iTCP:18889",
+        "-sTCP:LISTEN"
+      ],
+      "exitCode": 1,
+      "output": ""
+    },
+    {
+      "command": [
+        "GET",
+        "http://localhost:15888/"
+      ],
+      "exitCode": 0,
+      "httpStatus": 200
+    },
+    {
+      "command": [
+        "GET",
+        "http://localhost:15080/health"
+      ],
+      "exitCode": 0,
+      "httpStatus": 200
+    },
+    {
+      "command": [
+        "GET",
+        "http://localhost:15080/alive"
+      ],
+      "exitCode": 0,
+      "httpStatus": 200
+    },
+    {
+      "command": [
+        "GET",
+        "http://localhost:13030/$/ping"
+      ],
+      "exitCode": 0,
+      "httpStatus": 200
+    },
+    {
+      "command": [
+        "GET",
+        "http://localhost:19000/health/ready"
+      ],
+      "exitCode": 0,
+      "httpStatus": 200
+    },
+    {
+      "command": [
+        "GET",
+        "http://localhost:19090/health/ready"
+      ],
+      "exitCode": 0,
+      "httpStatus": 200
+    },
+    {
+      "command": [
+        "docker",
+        "ps",
+        "--format",
+        "{{.Names}}"
+      ],
+      "exitCode": 0,
+      "output": "fuseki-mpsqmqse\nkeycloak-mkgsmugg\npostgres-ruphuyrw\nrustfs-cebrcdrw\n"
+    },
+    {
+      "command": [
+        "docker",
+        "inspect",
+        "--format",
+        "{\"image\":{{json .Config.Image}},\"imageId\":{{json .Image}},\"ports\":{{json .NetworkSettings.Ports}},\"networks\":{{json .NetworkSettings.Networks}},\"mounts\":{{json .Mounts}},\"restart\":{{json .HostConfig.RestartPolicy.Name}}}",
+        "postgres-ruphuyrw"
+      ],
+      "exitCode": 0,
+      "output": "{\"image\":\"docker.io/library/postgres@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6\",\"imageId\":\"sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6\",\"ports\":{\"5432/tcp\":[{\"HostIp\":\"127.0.0.1\",\"HostPort\":\"58601\"}]},\"networks\":{\"aspire-session-network-ywpbpuxm-OntologyPlatform\":{\"IPAMConfig\":null,\"Links\":null,\"Aliases\":[\"postgres\",\"postgres.dev.internal\"],\"DriverOpts\":null,\"GwPriority\":0,\"NetworkID\":\"ceaacdcbfc8bf9de0a34d175139f500ac17fdc957e261c526e5efa686abbc94d\",\"EndpointID\":\"e9b085b6b8cbcd4d3aa611d931e5869324c0571e902d7ee32bee16f4addcace9\",\"Gateway\":\"172.18.0.1\",\"IPAddress\":\"172.18.0.2\",\"MacAddress\":\"32:4e:90:23:bd:29\",\"IPPrefixLen\":16,\"IPv6Gateway\":\"\",\"GlobalIPv6Address\":\"\",\"GlobalIPv6PrefixLen\":0,\"DNSNames\":[\"postgres-ruphuyrw\",\"postgres\",\"postgres.dev.internal\",\"92824410c3a2\"]}},\"mounts\":[{\"Type\":\"volume\",\"Name\":\"m0-mac-observed-17d4d914-postgres-data\",\"Source\":\"/var/lib/docker/volumes/m0-mac-observed-17d4d914-postgres-data/_data\",\"Destination\":\"/var/lib/postgresql\",\"Driver\":\"local\",\"Mode\":\"z\",\"RW\":true,\"Propagation\":\"\"}],\"restart\":\"unless-stopped\"}\n"
+    },
+    {
+      "command": [
+        "docker",
+        "image",
+        "inspect",
+        "--format",
+        "{{.Os}}/{{.Architecture}}",
+        "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6"
+      ],
+      "exitCode": 0,
+      "output": "linux/arm64\n"
+    },
+    {
+      "command": [
+        "docker",
+        "inspect",
+        "--format",
+        "{\"image\":{{json .Config.Image}},\"imageId\":{{json .Image}},\"ports\":{{json .NetworkSettings.Ports}},\"networks\":{{json .NetworkSettings.Networks}},\"mounts\":{{json .Mounts}},\"restart\":{{json .HostConfig.RestartPolicy.Name}}}",
+        "fuseki-mpsqmqse"
+      ],
+      "exitCode": 0,
+      "output": "{\"image\":\"fuseki:573b0d3ee0cd4bfa61e25eccdf1738785ffe29aa\",\"imageId\":\"sha256:675390c4fdeed9150317e6684a4f9f35a3cf661d8b220bfc745e6c0d08a00cb3\",\"ports\":{\"3030/tcp\":[{\"HostIp\":\"127.0.0.1\",\"HostPort\":\"58634\"}]},\"networks\":{\"aspire-session-network-ywpbpuxm-OntologyPlatform\":{\"IPAMConfig\":null,\"Links\":null,\"Aliases\":[\"fuseki\",\"fuseki.dev.internal\"],\"DriverOpts\":null,\"GwPriority\":0,\"NetworkID\":\"ceaacdcbfc8bf9de0a34d175139f500ac17fdc957e261c526e5efa686abbc94d\",\"EndpointID\":\"ec46acb7c6b877c0bb176b422a7581fc9a993755d30fb638d518a45f88d8b82d\",\"Gateway\":\"172.18.0.1\",\"IPAddress\":\"172.18.0.5\",\"MacAddress\":\"b6:34:79:a4:df:52\",\"IPPrefixLen\":16,\"IPv6Gateway\":\"\",\"GlobalIPv6Address\":\"\",\"GlobalIPv6PrefixLen\":0,\"DNSNames\":[\"fuseki-mpsqmqse\",\"fuseki\",\"fuseki.dev.internal\",\"92aaac0fcf40\"]}},\"mounts\":[{\"Type\":\"volume\",\"Name\":\"m0-mac-observed-17d4d914-fuseki-data\",\"Source\":\"/var/lib/docker/volumes/m0-mac-observed-17d4d914-fuseki-data/_data\",\"Destination\":\"/fuseki/databases\",\"Driver\":\"local\",\"Mode\":\"z\",\"RW\":true,\"Propagation\":\"\"}],\"restart\":\"unless-stopped\"}\n"
+    },
+    {
+      "command": [
+        "docker",
+        "image",
+        "inspect",
+        "--format",
+        "{{.Os}}/{{.Architecture}}",
+        "sha256:675390c4fdeed9150317e6684a4f9f35a3cf661d8b220bfc745e6c0d08a00cb3"
+      ],
+      "exitCode": 0,
+      "output": "linux/arm64\n"
+    },
+    {
+      "command": [
+        "docker",
+        "inspect",
+        "--format",
+        "{\"image\":{{json .Config.Image}},\"imageId\":{{json .Image}},\"ports\":{{json .NetworkSettings.Ports}},\"networks\":{{json .NetworkSettings.Networks}},\"mounts\":{{json .Mounts}},\"restart\":{{json .HostConfig.RestartPolicy.Name}}}",
+        "rustfs-cebrcdrw"
+      ],
+      "exitCode": 0,
+      "output": "{\"image\":\"rustfs/rustfs@sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b\",\"imageId\":\"sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b\",\"ports\":{\"9000/tcp\":[{\"HostIp\":\"127.0.0.1\",\"HostPort\":\"58600\"}],\"9001/tcp\":[{\"HostIp\":\"127.0.0.1\",\"HostPort\":\"58599\"}]},\"networks\":{\"aspire-session-network-ywpbpuxm-OntologyPlatform\":{\"IPAMConfig\":null,\"Links\":null,\"Aliases\":[\"rustfs\",\"rustfs.dev.internal\"],\"DriverOpts\":null,\"GwPriority\":0,\"NetworkID\":\"ceaacdcbfc8bf9de0a34d175139f500ac17fdc957e261c526e5efa686abbc94d\",\"EndpointID\":\"627c098f372b4a2834035fdd7f35d2478c39f84881416013dccbb2855138a6b1\",\"Gateway\":\"172.18.0.1\",\"IPAddress\":\"172.18.0.3\",\"MacAddress\":\"26:9e:48:1e:bf:8b\",\"IPPrefixLen\":16,\"IPv6Gateway\":\"\",\"GlobalIPv6Address\":\"\",\"GlobalIPv6PrefixLen\":0,\"DNSNames\":[\"rustfs-cebrcdrw\",\"rustfs\",\"rustfs.dev.internal\",\"ee5874180e0d\"]}},\"mounts\":[{\"Type\":\"volume\",\"Name\":\"m0-mac-observed-17d4d914-rustfs-data\",\"Source\":\"/var/lib/docker/volumes/m0-mac-observed-17d4d914-rustfs-data/_data\",\"Destination\":\"/data\",\"Driver\":\"local\",\"Mode\":\"z\",\"RW\":true,\"Propagation\":\"\"}],\"restart\":\"unless-stopped\"}\n"
+    },
+    {
+      "command": [
+        "docker",
+        "image",
+        "inspect",
+        "--format",
+        "{{.Os}}/{{.Architecture}}",
+        "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b"
+      ],
+      "exitCode": 0,
+      "output": "linux/arm64\n"
+    },
+    {
+      "command": [
+        "docker",
+        "inspect",
+        "--format",
+        "{\"image\":{{json .Config.Image}},\"imageId\":{{json .Image}},\"ports\":{{json .NetworkSettings.Ports}},\"networks\":{{json .NetworkSettings.Networks}},\"mounts\":{{json .Mounts}},\"restart\":{{json .HostConfig.RestartPolicy.Name}}}",
+        "keycloak-mkgsmugg"
+      ],
+      "exitCode": 0,
+      "output": "{\"image\":\"quay.io/keycloak/keycloak@sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b\",\"imageId\":\"sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b\",\"ports\":{\"8080/tcp\":[{\"HostIp\":\"127.0.0.1\",\"HostPort\":\"58631\"}],\"9000/tcp\":[{\"HostIp\":\"127.0.0.1\",\"HostPort\":\"58632\"}]},\"networks\":{\"aspire-session-network-ywpbpuxm-OntologyPlatform\":{\"IPAMConfig\":null,\"Links\":null,\"Aliases\":[\"keycloak\",\"keycloak.dev.internal\"],\"DriverOpts\":null,\"GwPriority\":0,\"NetworkID\":\"ceaacdcbfc8bf9de0a34d175139f500ac17fdc957e261c526e5efa686abbc94d\",\"EndpointID\":\"3b49f140e21bed80599a39fdec238f66426efed2449bd17594b94c937783ad5d\",\"Gateway\":\"172.18.0.1\",\"IPAddress\":\"172.18.0.4\",\"MacAddress\":\"ca:ac:6d:21:f5:37\",\"IPPrefixLen\":16,\"IPv6Gateway\":\"\",\"GlobalIPv6Address\":\"\",\"GlobalIPv6PrefixLen\":0,\"DNSNames\":[\"keycloak-mkgsmugg\",\"keycloak\",\"keycloak.dev.internal\",\"5177446e6c67\"]}},\"mounts\":[],\"restart\":\"unless-stopped\"}\n"
+    },
+    {
+      "command": [
+        "docker",
+        "image",
+        "inspect",
+        "--format",
+        "{{.Os}}/{{.Architecture}}",
+        "sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b"
+      ],
+      "exitCode": 0,
+      "output": "linux/arm64\n"
+    },
+    {
+      "command": [
+        "lsof",
+        "-nP",
+        "-iTCP:15888",
+        "-iTCP:15080",
+        "-iTCP:15432",
+        "-iTCP:13030",
+        "-iTCP:19000",
+        "-iTCP:19001",
+        "-iTCP:18080",
+        "-iTCP:19090",
+        "-iTCP:14317",
+        "-iTCP:18889",
+        "-sTCP:LISTEN"
+      ],
+      "exitCode": 0,
+      "output": "COMMAND     PID   USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME\nOntologyP 45235 chasen  327u  IPv4 0x68812441652e519d      0t0  TCP 127.0.0.1:18889 (LISTEN)\nOntologyP 45235 chasen  328u  IPv6 0xbd7b6b4cfecb3bdf      0t0  TCP [::1]:18889 (LISTEN)\ndcp       45255 chasen   23u  IPv6  0x58dcb79bfe46bbe      0t0  TCP [::1]:15080 (LISTEN)\ndcp       45255 chasen   26u  IPv4 0x765abeb55822df6a      0t0  TCP 127.0.0.1:15080 (LISTEN)\ndcp       45255 chasen   28u  IPv6 0xbed274b459df1063      0t0  TCP [::1]:15432 (LISTEN)\ndcp       45255 chasen   30u  IPv6 0xbab7bc613790ec6b      0t0  TCP [::1]:19090 (LISTEN)\ndcp       45255 chasen   31u  IPv4 0x67f9d16556564fc5      0t0  TCP 127.0.0.1:15432 (LISTEN)\ndcp       45255 chasen   32u  IPv4 0x2a32de9ad8da54e9      0t0  TCP 127.0.0.1:19090 (LISTEN)\ndcp       45255 chasen   33u  IPv6 0xd27166b828b65356      0t0  TCP [::1]:19001 (LISTEN)\ndcp       45255 chasen   35u  IPv6 0x2f3489f2d699a490      0t0  TCP [::1]:14317 (LISTEN)\ndcp       45255 chasen   37u  IPv4 0x8ad7c1939e70b4e9      0t0  TCP 127.0.0.1:19001 (LISTEN)\ndcp       45255 chasen   39u  IPv4 0xfb4cdbdac3fcc884      0t0  TCP 127.0.0.1:14317 (LISTEN)\ndcp       45255 chasen   41u  IPv6 0x3648fb9784a4ab3e      0t0  TCP [::1]:15888 (LISTEN)\ndcp       45255 chasen   42u  IPv4 0xa2978e95c8a1796b      0t0  TCP 127.0.0.1:15888 (LISTEN)\ndcp       45255 chasen   45u  IPv6 0x472ea72f45686044      0t0  TCP [::1]:18080 (LISTEN)\ndcp       45255 chasen   46u  IPv4 0xef7936a73eeb3dd8      0t0  TCP 127.0.0.1:18080 (LISTEN)\ndcp       45255 chasen   47u  IPv6 0x90b31003ac02cc8a      0t0  TCP [::1]:13030 (LISTEN)\ndcp       45255 chasen   48u  IPv4 0x3e40e57d4efa54ad      0t0  TCP 127.0.0.1:13030 (LISTEN)\ndcp       45255 chasen   49u  IPv6  0xd9eb89cfc855bac      0t0  TCP [::1]:19000 (LISTEN)\ndcp       45255 chasen   50u  IPv4 0x1bc1ce8792c6bc35      0t0  TCP 127.0.0.1:19000 (LISTEN)\n"
+    },
+    {
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "/Users/chasen/.codex/worktrees/m0-master/ontology-platform/infra/development/test-resource-persistence.ps1",
+        "-VolumePrefix",
+        "m0-mac-observed-17d4d914",
+        "-PostgresContainer",
+        "postgres-ruphuyrw",
+        "-FusekiContainer",
+        "fuseki-mpsqmqse",
+        "-RustfsContainer",
+        "rustfs-cebrcdrw",
+        "-KeycloakContainer",
+        "keycloak-mkgsmugg"
+      ],
+      "exitCode": 0,
+      "output": "\nStatus     : PASS\nPostgreSql : 重启后随机标记保留，命名卷挂载符合PG18路径\nFuseki     : 重启后TDB2测试URN保留\nRustFS     : 重启后S3签名写入对象内容一致\nKeycloak   : 管理就绪恢复，外置库引导身份ID与重启前一致\nMarker     : f3bd4f2d873148f28579d4868394b24c\nCleanup    : 仅保留本次开发探针，不删除卷；不代表生产恢复或业务认证验收\n\n"
+    },
+    {
+      "command": [
+        "GET",
+        "http://localhost:15888/"
+      ],
+      "exitCode": 0,
+      "httpStatus": 200
+    },
+    {
+      "command": [
+        "GET",
+        "http://localhost:15080/health"
+      ],
+      "exitCode": 0,
+      "httpStatus": 200
+    },
+    {
+      "command": [
+        "GET",
+        "http://localhost:15080/alive"
+      ],
+      "exitCode": 0,
+      "httpStatus": 200
+    },
+    {
+      "command": [
+        "GET",
+        "http://localhost:13030/$/ping"
+      ],
+      "exitCode": 0,
+      "httpStatus": 200
+    },
+    {
+      "command": [
+        "GET",
+        "http://localhost:19000/health/ready"
+      ],
+      "exitCode": 0,
+      "httpStatus": 200
+    },
+    {
+      "command": [
+        "GET",
+        "http://localhost:19090/health/ready"
+      ],
+      "exitCode": 0,
+      "httpStatus": 200
+    },
+    {
+      "command": [
+        "GET",
+        "/api/telemetry/traces?limit=3",
+        "without-api-key"
+      ],
+      "exitCode": 0,
+      "httpStatus": 401
+    },
+    {
+      "command": [
+        "GET",
+        "/api/telemetry/resources",
+        "without-api-key"
+      ],
+      "exitCode": 0,
+      "httpStatus": 401
+    },
+    {
+      "command": [
+        "docker",
+        "ps",
+        "-a",
+        "--format",
+        "{{.Names}}"
+      ],
+      "exitCode": 0,
+      "output": "fuseki-mpsqmqse\nkeycloak-mkgsmugg\npostgres-ruphuyrw\nrustfs-cebrcdrw\n"
+    }
+  ],
+  "secretHandling": "Values generated in process and redacted; no claim of OS/Docker internal disk absence."
+}

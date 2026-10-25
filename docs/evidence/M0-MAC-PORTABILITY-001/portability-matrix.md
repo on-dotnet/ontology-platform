@@ -13,9 +13,9 @@
 | locked restore/build/MTP/format | 独立命令及Reviewer均PASS；MTP4/4/0跳过 | 原win-x64锁逐字节保留；M0 NOT_RUN | 原linux-x64锁保留，CI受锁构建/4项MTP/format |
 | SelfTest+RunNative组合 | PASS：保留原FAIL证据，修复unset/empty恢复后完整组合exit0 | 未运行，不外推通过 | 现有CI分进程入口通过，不代表组合入口通过 |
 | Docker镜像平台 | 四固定index提供linux/arm64，实际四容器原生运行 | M0 NOT_RUN | 镜像提供linux/amd64；本轮Linux容器运行NOT_RUN |
-| AppHost/健康/回环/网络 | B实际观察通过，等待固定头独立审查 | G1历史通过，M0 NOT_RUN | CI不启动容器，NOT_RUN |
-| 开发探针重启持久化 | B实际四资源标记保持，等待归档审查 | G1历史通过，M0 NOT_RUN | NOT_RUN |
-| Dashboard API Trace检索 | B认证查询实际200，真实Trace及resource匹配，等待归档审查 | M0 NOT_RUN | NOT_RUN |
+| AppHost/健康/回环/网络 | PASS：Master直接复验原始stdout与快照；等待固定头独立审查 | G1历史通过，M0 NOT_RUN | CI不启动容器，NOT_RUN |
+| 开发探针重启持久化 | PASS：Master复验四资源标记保持，原始输出已归档 | G1历史通过，M0 NOT_RUN | NOT_RUN |
+| Dashboard API Trace检索 | PASS：Master复验401负例及认证200，实际Trace JSON匹配 | M0 NOT_RUN | NOT_RUN |
 | Intel Mac / Linux ARM开发宿主 | NOT_RUN，无osx-x64/linux-arm64工程锁验收，不宣称支持通过 | Windows ARM亦NOT_RUN | Linux ARM64容器不代替宿主验收 |
 | 生产/SEC/FE/OBS/G2 | NOT_RUN，未授权 | NOT_RUN | NOT_RUN |
 

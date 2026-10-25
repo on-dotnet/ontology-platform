@@ -1,0 +1,225 @@
+{
+  "volumePrefix": "m0-mac-observed-b37a079e",
+  "resources": {
+    "postgres": {
+      "image": "docker.io/library/postgres@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6",
+      "imageId": "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6",
+      "ports": {
+        "5432/tcp": [
+          {
+            "HostIp": "127.0.0.1",
+            "HostPort": "58894"
+          }
+        ]
+      },
+      "networks": {
+        "aspire-session-network-gxkceswn-OntologyPlatform": {
+          "IPAMConfig": null,
+          "Links": null,
+          "Aliases": [
+            "postgres",
+            "postgres.dev.internal"
+          ],
+          "DriverOpts": null,
+          "GwPriority": 0,
+          "NetworkID": "b6ee0a4fab2cbff5cc32310e1f825e92013b5a46aa507a8d3e948eb33c050f7d",
+          "EndpointID": "f6fb21a652963e3a219990159005f8c8ecbc5d08c3fe14f62bd6d059a99439d5",
+          "Gateway": "172.18.0.1",
+          "IPAddress": "172.18.0.2",
+          "MacAddress": "fa:1a:68:9a:7e:ed",
+          "IPPrefixLen": 16,
+          "IPv6Gateway": "",
+          "GlobalIPv6Address": "",
+          "GlobalIPv6PrefixLen": 0,
+          "DNSNames": [
+            "postgres-tktaapxj",
+            "postgres",
+            "postgres.dev.internal",
+            "5763d8aadf53"
+          ]
+        }
+      },
+      "mounts": [
+        {
+          "Type": "volume",
+          "Name": "m0-mac-observed-b37a079e-postgres-data",
+          "Source": "/var/lib/docker/volumes/m0-mac-observed-b37a079e-postgres-data/_data",
+          "Destination": "/var/lib/postgresql",
+          "Driver": "local",
+          "Mode": "z",
+          "RW": true,
+          "Propagation": ""
+        }
+      ],
+      "restart": "unless-stopped",
+      "platform": "linux/arm64",
+      "container": "postgres-tktaapxj"
+    },
+    "fuseki": {
+      "image": "fuseki:b5e12217ef598361e190f32d4b41b94c3390958c",
+      "imageId": "sha256:868102816b13803cbc6696441161de243c0632e35ce0a33058008362e12b790c",
+      "ports": {
+        "3030/tcp": [
+          {
+            "HostIp": "127.0.0.1",
+            "HostPort": "58897"
+          }
+        ]
+      },
+      "networks": {
+        "aspire-session-network-gxkceswn-OntologyPlatform": {
+          "IPAMConfig": null,
+          "Links": null,
+          "Aliases": [
+            "fuseki",
+            "fuseki.dev.internal"
+          ],
+          "DriverOpts": null,
+          "GwPriority": 0,
+          "NetworkID": "b6ee0a4fab2cbff5cc32310e1f825e92013b5a46aa507a8d3e948eb33c050f7d",
+          "EndpointID": "5cd6040b612785643445a09e08d8ba23f47ddbbf1a600ba6c57b4c52b64f813f",
+          "Gateway": "172.18.0.1",
+          "IPAddress": "172.18.0.4",
+          "MacAddress": "be:24:68:36:e5:6d",
+          "IPPrefixLen": 16,
+          "IPv6Gateway": "",
+          "GlobalIPv6Address": "",
+          "GlobalIPv6PrefixLen": 0,
+          "DNSNames": [
+            "fuseki-xygrgfxg",
+            "fuseki",
+            "fuseki.dev.internal",
+            "615f418a765d"
+          ]
+        }
+      },
+      "mounts": [
+        {
+          "Type": "volume",
+          "Name": "m0-mac-observed-b37a079e-fuseki-data",
+          "Source": "/var/lib/docker/volumes/m0-mac-observed-b37a079e-fuseki-data/_data",
+          "Destination": "/fuseki/databases",
+          "Driver": "local",
+          "Mode": "z",
+          "RW": true,
+          "Propagation": ""
+        }
+      ],
+      "restart": "unless-stopped",
+      "platform": "linux/arm64",
+      "container": "fuseki-xygrgfxg"
+    },
+    "rustfs": {
+      "image": "rustfs/rustfs@sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+      "imageId": "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+      "ports": {
+        "9000/tcp": [
+          {
+            "HostIp": "127.0.0.1",
+            "HostPort": "58896"
+          }
+        ],
+        "9001/tcp": [
+          {
+            "HostIp": "127.0.0.1",
+            "HostPort": "58895"
+          }
+        ]
+      },
+      "networks": {
+        "aspire-session-network-gxkceswn-OntologyPlatform": {
+          "IPAMConfig": null,
+          "Links": null,
+          "Aliases": [
+            "rustfs",
+            "rustfs.dev.internal"
+          ],
+          "DriverOpts": null,
+          "GwPriority": 0,
+          "NetworkID": "b6ee0a4fab2cbff5cc32310e1f825e92013b5a46aa507a8d3e948eb33c050f7d",
+          "EndpointID": "6f35e1ba73556f972ca6e7212f26a345023dbe79db56649c05a256de3e5c018c",
+          "Gateway": "172.18.0.1",
+          "IPAddress": "172.18.0.3",
+          "MacAddress": "12:58:2c:16:f9:38",
+          "IPPrefixLen": 16,
+          "IPv6Gateway": "",
+          "GlobalIPv6Address": "",
+          "GlobalIPv6PrefixLen": 0,
+          "DNSNames": [
+            "rustfs-nzmucune",
+            "rustfs",
+            "rustfs.dev.internal",
+            "f67d9c394ef4"
+          ]
+        }
+      },
+      "mounts": [
+        {
+          "Type": "volume",
+          "Name": "m0-mac-observed-b37a079e-rustfs-data",
+          "Source": "/var/lib/docker/volumes/m0-mac-observed-b37a079e-rustfs-data/_data",
+          "Destination": "/data",
+          "Driver": "local",
+          "Mode": "z",
+          "RW": true,
+          "Propagation": ""
+        }
+      ],
+      "restart": "unless-stopped",
+      "platform": "linux/arm64",
+      "container": "rustfs-nzmucune"
+    },
+    "keycloak": {
+      "image": "quay.io/keycloak/keycloak@sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b",
+      "imageId": "sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b",
+      "ports": {
+        "8080/tcp": [
+          {
+            "HostIp": "127.0.0.1",
+            "HostPort": "58928"
+          }
+        ],
+        "9000/tcp": [
+          {
+            "HostIp": "127.0.0.1",
+            "HostPort": "58927"
+          }
+        ]
+      },
+      "networks": {
+        "aspire-session-network-gxkceswn-OntologyPlatform": {
+          "IPAMConfig": null,
+          "Links": null,
+          "Aliases": [
+            "keycloak",
+            "keycloak.dev.internal"
+          ],
+          "DriverOpts": null,
+          "GwPriority": 0,
+          "NetworkID": "b6ee0a4fab2cbff5cc32310e1f825e92013b5a46aa507a8d3e948eb33c050f7d",
+          "EndpointID": "5fabaef44b706e2d71bd81a4256fa9664dbeb8496f96c2e5dea7f205f5f3c315",
+          "Gateway": "172.18.0.1",
+          "IPAddress": "172.18.0.5",
+          "MacAddress": "0a:34:92:78:eb:ae",
+          "IPPrefixLen": 16,
+          "IPv6Gateway": "",
+          "GlobalIPv6Address": "",
+          "GlobalIPv6PrefixLen": 0,
+          "DNSNames": [
+            "keycloak-bucqseqa",
+            "keycloak",
+            "keycloak.dev.internal",
+            "a764ccf49391"
+          ]
+        }
+      },
+      "mounts": [],
+      "restart": "unless-stopped",
+      "platform": "linux/arm64",
+      "container": "keycloak-bucqseqa"
+    }
+  },
+  "sharedNetworks": [
+    "aspire-session-network-gxkceswn-OntologyPlatform"
+  ]
+}

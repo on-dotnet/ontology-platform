@@ -41,3 +41,7 @@ Agent 不是唯一写者，Master 是 main 唯一集成者。其他人同时工�
 ## 修复阶段写权调整（2026-10-25）
 
 组合入口实际失败后，A已定位null恢复为空字符串；为完成当前关口，Master暂停A worker的后续写入，收回A脚本修复写权，在同一独立m0-scripts树/codex/M0-scripts分支串行完成最小环境恢复修复和回归。A原里程碑仍由worker独立提交。Reviewer保持只读并复核修复固定头。没有并发抢写，不改变其他owned_paths。
+
+B已完成真实容器/持久化/Trace验收，两个AppHost会话exit0。后续归档工具等待审批随会话中断，未取得结果。Master暂停B所有工具/写入并接收完整只读回报，收回B树最终证据/手册写权，在原独立m0-containers分支串行归档并核实收尾状态；报告明确区分B实测与Master归档/复核，不伪称B已commit或未执行命令PASS。Reviewer仍独立审查固定B提交。
+
+独立B审查指出Owner转录不足以独立解除运行门禁。Master在master证据owned_paths内使用新增唯一开发卷前缀重跑原AppHost/持久化脚本，直接归档脱敏原始进程输出、实际HTTP JSON、退出码及资源快照；不改AppHost/infra实现、不读取凭证、不删除已有卷。B转录保留其来源，Reviewer据新固定头复核。
