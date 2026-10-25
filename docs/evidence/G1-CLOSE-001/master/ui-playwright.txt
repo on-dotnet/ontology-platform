@@ -1,0 +1,17 @@
+$ playwright test
+[WebServer] (node:74043) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:74046) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 5 tests using 1 worker
+
+(node:74061) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/ui/workspace.spec.ts:6:1 › 1280布局、键盘详情、浅色持久化和Console (586ms)
+  ✓  2 tests/ui/workspace.spec.ts:29:1 › 宽屏、移动导航、授权范围与搜索空状态 (389ms)
+  ✓  3 tests/ui/workspace.spec.ts:47:1 › 加载中、403、网络错误、空集合和会话过期各自准确 (346ms)
+  ✓  4 tests/ui/workspace.spec.ts:65:1 › 审计拒绝和公开注销面板 (285ms)
+  ✓  5 tests/ui/workspace.spec.ts:75:1 › 390关闭导航跳过屏外Tab且响应式桌面菜单可用 (695ms)
+
+  5 passed (3.4s)

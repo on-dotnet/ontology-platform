@@ -1,4 +1,6 @@
 import { expect, test } from "@playwright/test";
+/** 收口复验可显式隔离截图目录，默认保留原阶段入口。 */
+const screenshots = process.env.PLATFORM_SCREENSHOT_DIR ?? "../../docs/evidence/G1-WAVE2/FE/screenshots";
 const resources = { items: [{ id: "platform-site-a", name: "厂区 A · 开发合成资源", organizationId: "org-demo", siteId: "site-a", status: "SyntheticDevelopment" }], auditId: "ui-test-audit", traceId: "ui-test-trace" };
 test.beforeEach(async ({ page }) => {
   await page.route("**/api/v1/platform/resources*", route => route.fulfill({ json: resources }));
@@ -12,7 +14,7 @@ test("1280布局、键盘详情、浅色持久化和Console", async ({ page }) =
   await expect(page.getByRole("heading", { name: "平台资源", exact: true })).toBeVisible();
   await expect(page.getByText("厂区 A · 开发合成资源", { exact: true })).toBeVisible();
   await expect(page.getByText("ui-test-trace", { exact: true })).toBeVisible();
-  await page.screenshot({ path: "../../docs/evidence/G1-WAVE2/FE/screenshots/1280-dark.png", fullPage: true, animations: "disabled" });
+  await page.screenshot({ path: `${screenshots}/1280-dark.png`, fullPage: true, animations: "disabled" });
   await page.getByRole("button", { name: "查看详情" }).focus();
   await page.keyboard.press("Enter");
   await expect(page.getByRole("dialog")).toBeVisible();
@@ -23,14 +25,14 @@ test("1280布局、键盘详情、浅色持久化和Console", async ({ page }) =
   await page.reload();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-  await page.screenshot({ path: "../../docs/evidence/G1-WAVE2/FE/screenshots/1280-light.png", fullPage: true, animations: "disabled" });
+  await page.screenshot({ path: `${screenshots}/1280-light.png`, fullPage: true, animations: "disabled" });
   expect(errors).toEqual([]);
 });
 test("宽屏、移动导航、授权范围与搜索空状态", async ({ page }) => {
   await page.setViewportSize({ width: 1920, height: 1080 });
   await page.goto("/");
   await expect(page.getByText("厂区 A · 开发合成资源", { exact: true })).toBeVisible();
-  await page.screenshot({ path: "../../docs/evidence/G1-WAVE2/FE/screenshots/1920-dark.png", fullPage: true, animations: "disabled" });
+  await page.screenshot({ path: `${screenshots}/1920-dark.png`, fullPage: true, animations: "disabled" });
   await page.getByRole("textbox", { name: "搜索平台资源" }).fill("不存在的资源");
   await expect(page.getByRole("heading", { name: "没有匹配的资源" })).toBeVisible();
   await page.getByRole("button", { name: "授权范围" }).click();
@@ -41,7 +43,7 @@ test("宽屏、移动导航、授权范围与搜索空状态", async ({ page }) 
   await page.getByRole("button", { name: "平台资源", exact: true }).click();
   await expect(page.getByRole("heading", { name: "平台资源", exact: true })).toBeVisible();
   await expect(page.getByText("厂区 A · 开发合成资源", { exact: true })).toBeVisible();
-  await page.screenshot({ path: "../../docs/evidence/G1-WAVE2/FE/screenshots/390-dark.png", fullPage: true, animations: "disabled" });
+  await page.screenshot({ path: `${screenshots}/390-dark.png`, fullPage: true, animations: "disabled" });
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });
 test("加载中、403、网络错误、空集合和会话过期各自准确", async ({ page }) => {

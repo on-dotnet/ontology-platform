@@ -1,4 +1,6 @@
 import { expect, test } from "@playwright/test";
+/** 收口复验可显式隔离截图目录，默认保留原阶段入口。 */
+const screenshots = process.env.PLATFORM_SCREENSHOT_DIR ?? "../../docs/evidence/G1-WAVE2/FE/screenshots";
 /** 在框架生成error-context前移除异常详情，失败状态和固定步骤仍保留。 */
 test.afterEach(async ({ page }, testInfo) => {
   void page;
@@ -43,7 +45,7 @@ test("真实匿名→Keycloak→受限资源→角色拒绝→安全注销", asy
   expect(resourceList.items.length).toBeGreaterThan(0);
   expect(resourceList.items.every((item: { siteId: string }) => item.siteId === "site-a")).toBe(true);
   await expect(page.getByRole("cell").filter({ hasText: "site-a" }).first()).toBeVisible();
-  await page.screenshot({ path: "../../docs/evidence/G1-WAVE2/FE/screenshots/oidc-viewer.png", fullPage: true, animations: "disabled" });
+  await page.screenshot({ path: `${screenshots}/oidc-viewer.png`, fullPage: true, animations: "disabled" });
   step("cross-site-denied");
   const denied = await page.request.get("/api/v1/platform/resources?siteId=site-b");
   expect(denied.status()).toBe(403);

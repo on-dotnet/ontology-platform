@@ -1,0 +1,192 @@
+governance-integration	Real PostgreSQL security integration	﻿2026-10-25T14:55:32.6876788Z ##[group]Run python3 scripts/acceptance/test-governance.py
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:55:32.6877218Z ^[[36;1mpython3 scripts/acceptance/test-governance.py^[[0m
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:55:32.6904530Z shell: /usr/bin/pwsh -command ". '{0}'"
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:55:32.6904802Z env:
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:55:32.6904986Z   DOTNET_ROOT: /usr/share/dotnet
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:55:32.6905228Z ##[endgroup]
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6499801Z Unable to find image 'postgres:18.6-trixie@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6' locally
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6501061Z docker.io/library/postgres@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6: Pulling from library/postgres
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6501751Z f2be67225471: Pulling fs layer
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6502062Z 36f05ca1a259: Pulling fs layer
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6502402Z 92accee5624e: Pulling fs layer
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6504862Z 5bf0df4dfeec: Pulling fs layer
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6514169Z fc259989795e: Pulling fs layer
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6520353Z 33e59af3458c: Pulling fs layer
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6520853Z bea9e19f5a74: Pulling fs layer
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6521210Z 19f779d0bd48: Pulling fs layer
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6521630Z cf9efa127f85: Pulling fs layer
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6522011Z af1084bcb355: Pulling fs layer
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6525065Z 40ebd398ec37: Pulling fs layer
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6525455Z 00490e632b75: Pulling fs layer
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6525787Z 8ed0c854313a: Pulling fs layer
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6526100Z 5bf0df4dfeec: Waiting
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6526400Z fc259989795e: Waiting
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6526701Z 33e59af3458c: Waiting
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6527034Z bea9e19f5a74: Waiting
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6527336Z 19f779d0bd48: Waiting
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6527629Z cf9efa127f85: Waiting
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6527921Z af1084bcb355: Waiting
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6528213Z 40ebd398ec37: Waiting
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6528508Z 00490e632b75: Waiting
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6528797Z 8ed0c854313a: Waiting
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6529104Z 36f05ca1a259: Verifying Checksum
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6529444Z 36f05ca1a259: Download complete
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6529788Z 92accee5624e: Verifying Checksum
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6530125Z 92accee5624e: Download complete
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6530458Z f2be67225471: Verifying Checksum
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6530785Z f2be67225471: Download complete
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6531114Z 5bf0df4dfeec: Verifying Checksum
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6531450Z 5bf0df4dfeec: Download complete
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6531781Z fc259989795e: Download complete
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6532103Z bea9e19f5a74: Download complete
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6532429Z 33e59af3458c: Verifying Checksum
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6533157Z 33e59af3458c: Download complete
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6533900Z 19f779d0bd48: Verifying Checksum
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6534230Z 19f779d0bd48: Download complete
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6534558Z af1084bcb355: Verifying Checksum
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6534882Z af1084bcb355: Download complete
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6535210Z 40ebd398ec37: Download complete
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6535529Z 00490e632b75: Verifying Checksum
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6535865Z 00490e632b75: Download complete
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6536193Z 8ed0c854313a: Verifying Checksum
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6536523Z 8ed0c854313a: Download complete
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6536850Z cf9efa127f85: Verifying Checksum
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6537179Z cf9efa127f85: Download complete
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6537502Z f2be67225471: Pull complete
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6537879Z 36f05ca1a259: Pull complete
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6538200Z 92accee5624e: Pull complete
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6538529Z 5bf0df4dfeec: Pull complete
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6538851Z fc259989795e: Pull complete
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6539198Z 33e59af3458c: Pull complete
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6539509Z bea9e19f5a74: Pull complete
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6539816Z 19f779d0bd48: Pull complete
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6540125Z cf9efa127f85: Pull complete
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6540445Z af1084bcb355: Pull complete
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6540756Z 40ebd398ec37: Pull complete
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6541071Z 00490e632b75: Pull complete
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6541373Z 8ed0c854313a: Pull complete
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6542108Z Digest: sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6542830Z Status: Downloaded newer image for postgres@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6543647Z aed327d8b42634f439ff60a13078257a59df9d505b6027554cdcd9d4dd66fa3a
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6544191Z Tool 'dotnet-ef' (version '10.0.13') was restored. Available commands: dotnet-ef
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6544612Z
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6544814Z Restore was successful.
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6545448Z Failed executing DbCommand (18ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6545959Z SELECT "MigrationId", "ProductVersion"
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6546338Z FROM governance."__EFMigrationsHistory"
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6546693Z ORDER BY "MigrationId";
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6547380Z Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6548079Z Applying migration '20261025062847_InitialGovernance'.
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6548510Z Applying migration '20261025144246_AuditScopeSites'.
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6549245Z Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6549890Z Done.
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6550511Z Unable to find image 'quay.io/keycloak/keycloak:26.8.1@sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b' locally
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6551490Z quay.io/keycloak/keycloak@sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b: Pulling from keycloak/keycloak
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6552137Z 25582d7c77aa: Pulling fs layer
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6552480Z de1e8a46402a: Pulling fs layer
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6552815Z b069ba8c51be: Pulling fs layer
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6553836Z 573f8c6c6f89: Pulling fs layer
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6555546Z 573f8c6c6f89: Waiting
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6555889Z 25582d7c77aa: Verifying Checksum
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6556239Z 25582d7c77aa: Download complete
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6556586Z 573f8c6c6f89: Verifying Checksum
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6556929Z 573f8c6c6f89: Download complete
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6557268Z de1e8a46402a: Verifying Checksum
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6557608Z de1e8a46402a: Download complete
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6557952Z 25582d7c77aa: Pull complete
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6558283Z b069ba8c51be: Verifying Checksum
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6558625Z b069ba8c51be: Download complete
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6559021Z de1e8a46402a: Pull complete
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6559721Z b069ba8c51be: Pull complete
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6565361Z 573f8c6c6f89: Pull complete
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6565873Z Digest: sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6566644Z Status: Downloaded newer image for quay.io/keycloak/keycloak@sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6567334Z 810b15a74097f03511e4e69b93c8e9c718f8a361a2361064e79228f82a8f505b
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6568353Z {"status": "CREATED", "realm": "wave2-c8d5732c8ab6ee0f", "identities": ["wave2-viewer-a", "wave2-viewer-b", "wave2-no-role-a", "wave2-operator-a", "wave2-auditor-a"], "secrets": "runtime-only"}
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6569634Z Running tests from /home/runner/work/ontology-platform/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|x64)
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6570926Z ^[[31mfailed^[[m RuntimeOpenApiDeclaresRedirectsAndCompleteErrors ^[[90m(205ms)^[[m
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6571844Z   from /home/runner/work/ontology-platform/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|x64)
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6573184Z ^[[31m  CollectionAssert.AreEquivalent failed. The number of elements in the collections do not match. Expected:<3>. Actual:<2>.get /auth/login
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6574583Z ^[[m^[[90m    at OntologyPlatform.SecurityTests.HttpSecurityTests.RuntimeOpenApiDeclaresRedirectsAndCompleteErrors() in /_/backend/tests/OntologyPlatform.SecurityTests/HttpSecurityTests.cs:167^[[90m
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6576427Z     at OntologyPlatform.SecurityTests.HttpSecurityTests.RuntimeOpenApiDeclaresRedirectsAndCompleteErrors() in /_/backend/tests/OntologyPlatform.SecurityTests/HttpSecurityTests.cs:206^[[90m
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6578029Z     at Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6579717Z ^[[m^[[m/home/runner/work/ontology-platform/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|x64) ^[[31mfailed with 1 error(s)^[[m ^[[90m(5s 064ms)^[[m
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6580564Z [REDACTED: sensitive protocol field]
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6580732Z
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6580898Z ^[[31mTest run summary: Failed!
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6581138Z ^[[m  total: 15
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6581332Z ^[[31m  failed: 1
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6581545Z ^[[m  succeeded: 14
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6581735Z   skipped: 0
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6581944Z   duration: 5s 242ms
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6582166Z [REDACTED: sensitive protocol field]
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:40.6582552Z FAIL: real governance integration; details retained only after sanitization
+governance-integration	Real PostgreSQL security integration	2026-10-25T14:56:41.1607304Z ##[error]Process completed with exit code 1.
+engineering	Build format and real host security tests	﻿2026-10-25T14:56:47.9072985Z ##[group]Run ./scripts/verify.ps1 -RunNative -RunTests -SkipWeb
+engineering	Build format and real host security tests	2026-10-25T14:56:47.9073927Z ^[[36;1m./scripts/verify.ps1 -RunNative -RunTests -SkipWeb^[[0m
+engineering	Build format and real host security tests	2026-10-25T14:56:47.9108629Z shell: /usr/bin/pwsh -command ". '{0}'"
+engineering	Build format and real host security tests	2026-10-25T14:56:47.9109121Z env:
+engineering	Build format and real host security tests	2026-10-25T14:56:47.9109459Z   DOTNET_ROOT: /usr/share/dotnet
+engineering	Build format and real host security tests	2026-10-25T14:56:47.9109900Z ##[endgroup]
+engineering	Build format and real host security tests	2026-10-25T14:56:49.7501186Z
+engineering	Build format and real host security tests	2026-10-25T14:56:49.7512996Z ^[[32;1mCheck            ^[[0m^[[32;1m Status^[[0m^[[32;1m Message^[[0m
+engineering	Build format and real host security tests	2026-10-25T14:56:49.7514495Z ^[[32;1m-----            ^[[0m ^[[32;1m------^[[0m ^[[32;1m-------^[[0m
+engineering	Build format and real host security tests	2026-10-25T14:56:49.7516435Z repository-static PASS   检查653个文件：语法/格式/相对链接/有限机密模式/基线策…
+engineering	Build format and real host security tests	2026-10-25T14:56:49.7517309Z
+engineering	Build format and real host security tests	2026-10-25T14:56:51.7108404Z ##[warning]/home/runner/.nuget/packages/aspire.hosting.apphost/13.6.3/build/Aspire.Hosting.AppHost.targets(157,5): warning ASPIRE010: OntologyPlatform.AppHost is configured with AspireUseCliBundle=false. Some Aspire features require the Aspire CLI bundle. Set AspireUseCliBundle=true to enable those features, or suppress ASPIRE010 to continue without the bundle. See https://aka.ms/aspire/diagnostics/aspire010 for more information. [/home/runner/work/ontology-platform/ontology-platform/backend/src/AppHost/OntologyPlatform.AppHost.csproj]
+engineering	Build format and real host security tests	2026-10-25T14:56:56.0660175Z   OntologyPlatform.Modules.Governance -> /home/runner/work/ontology-platform/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/bin/Debug/net10.0/OntologyPlatform.Modules.Governance.dll
+engineering	Build format and real host security tests	2026-10-25T14:56:56.8561918Z   OntologyPlatform.ServiceDefaults -> /home/runner/work/ontology-platform/ontology-platform/backend/src/ServiceDefaults/bin/Debug/net10.0/OntologyPlatform.ServiceDefaults.dll
+engineering	Build format and real host security tests	2026-10-25T14:57:00.4337275Z   OntologyPlatform.Api -> /home/runner/work/ontology-platform/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/bin/Debug/net10.0/OntologyPlatform.Api.dll
+engineering	Build format and real host security tests	2026-10-25T14:57:02.9787240Z   OntologyPlatform.InfrastructureApi -> /home/runner/work/ontology-platform/ontology-platform/backend/src/Hosts/OntologyPlatform.InfrastructureApi/bin/Debug/net10.0/OntologyPlatform.InfrastructureApi.dll
+engineering	Build format and real host security tests	2026-10-25T14:57:03.1057247Z   OntologyPlatform.SecurityTests -> /home/runner/work/ontology-platform/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll
+engineering	Build format and real host security tests	2026-10-25T14:57:04.2093884Z   OntologyPlatform.AppHost -> /home/runner/work/ontology-platform/ontology-platform/backend/src/AppHost/bin/Debug/net10.0/OntologyPlatform.AppHost.dll
+engineering	Build format and real host security tests	2026-10-25T14:57:04.5673234Z   OntologyPlatform.InfrastructureTests -> /home/runner/work/ontology-platform/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/bin/Debug/net10.0/OntologyPlatform.InfrastructureTests.dll
+engineering	Build format and real host security tests	2026-10-25T14:57:04.6029281Z
+engineering	Build format and real host security tests	2026-10-25T14:57:04.6037838Z Build succeeded.
+engineering	Build format and real host security tests	2026-10-25T14:57:04.6038157Z
+engineering	Build format and real host security tests	2026-10-25T14:57:04.6060337Z ##[warning]/home/runner/.nuget/packages/aspire.hosting.apphost/13.6.3/build/Aspire.Hosting.AppHost.targets(157,5): warning ASPIRE010: OntologyPlatform.AppHost is configured with AspireUseCliBundle=false. Some Aspire features require the Aspire CLI bundle. Set AspireUseCliBundle=true to enable those features, or suppress ASPIRE010 to continue without the bundle. See https://aka.ms/aspire/diagnostics/aspire010 for more information. [/home/runner/work/ontology-platform/ontology-platform/backend/src/AppHost/OntologyPlatform.AppHost.csproj]
+engineering	Build format and real host security tests	2026-10-25T14:57:04.6065671Z     1 Warning(s)
+engineering	Build format and real host security tests	2026-10-25T14:57:04.6066045Z     0 Error(s)
+engineering	Build format and real host security tests	2026-10-25T14:57:04.6066264Z
+engineering	Build format and real host security tests	2026-10-25T14:57:04.6066488Z Time Elapsed 00:00:14.40
+engineering	Build format and real host security tests	2026-10-25T14:57:12.8306095Z Warnings were encountered while loading the workspace. Set the verbosity option to the 'diagnostic' level to log warnings.
+engineering	Build format and real host security tests	2026-10-25T14:57:25.7229164Z Running tests from /home/runner/work/ontology-platform/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/bin/Debug/net10.0/OntologyPlatform.InfrastructureTests.dll (net10.0|x64)
+engineering	Build format and real host security tests	2026-10-25T14:57:26.7072739Z ^[[m/home/runner/work/ontology-platform/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/bin/Debug/net10.0/OntologyPlatform.InfrastructureTests.dll (net10.0|x64) ^[[32mpassed^[[m ^[[90m(988ms)^[[m
+engineering	Build format and real host security tests	2026-10-25T14:57:26.7146162Z
+engineering	Build format and real host security tests	2026-10-25T14:57:26.7154593Z ^[[32mTest run summary: Passed!
+engineering	Build format and real host security tests	2026-10-25T14:57:26.7160723Z ^[[m  total: 4
+engineering	Build format and real host security tests	2026-10-25T14:57:26.7163229Z   failed: 0
+engineering	Build format and real host security tests	2026-10-25T14:57:26.7178358Z ^[[32m  succeeded: 4
+engineering	Build format and real host security tests	2026-10-25T14:57:26.7179252Z ^[[m  skipped: 0
+engineering	Build format and real host security tests	2026-10-25T14:57:26.7180432Z   duration: 1s 239ms
+engineering	Build format and real host security tests	2026-10-25T14:57:27.6567828Z Running tests from /home/runner/work/ontology-platform/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|x64)
+engineering	Build format and real host security tests	2026-10-25T14:57:27.9199308Z ^[[33mskipped^[[m ScopeMigrationPreservesLegacyAndRefusesDestructiveRollback
+engineering	Build format and real host security tests	2026-10-25T14:57:27.9215656Z   Assert.Inconclusive. NOT_RUN: 未注入本轮临时PG配置。
+engineering	Build format and real host security tests	2026-10-25T14:57:27.9227358Z   from /home/runner/work/ontology-platform/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|x64)
+engineering	Build format and real host security tests	2026-10-25T14:57:31.0506603Z ^[[31mfailed^[[m RuntimeOpenApiDeclaresRedirectsAndCompleteErrors ^[[90m(330ms)^[[m
+engineering	Build format and real host security tests	2026-10-25T14:57:31.0508650Z   from /home/runner/work/ontology-platform/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|x64)
+engineering	Build format and real host security tests	2026-10-25T14:57:31.0511025Z ^[[31m  CollectionAssert.AreEquivalent failed. The number of elements in the collections do not match. Expected:<3>. Actual:<2>.get /auth/login
+engineering	Build format and real host security tests	2026-10-25T14:57:31.0527071Z ^[[m^[[90m    at OntologyPlatform.SecurityTests.HttpSecurityTests.RuntimeOpenApiDeclaresRedirectsAndCompleteErrors() in /_/backend/tests/OntologyPlatform.SecurityTests/HttpSecurityTests.cs:167^[[90m
+engineering	Build format and real host security tests	2026-10-25T14:57:31.0530757Z     at OntologyPlatform.SecurityTests.HttpSecurityTests.RuntimeOpenApiDeclaresRedirectsAndCompleteErrors() in /_/backend/tests/OntologyPlatform.SecurityTests/HttpSecurityTests.cs:206^[[90m
+engineering	Build format and real host security tests	2026-10-25T14:57:31.0556906Z     at Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+engineering	Build format and real host security tests	2026-10-25T14:57:31.0559221Z ^[[m^[[33mskipped^[[m RealIssuerPushRetainsCodePkceStateAndNonce
+engineering	Build format and real host security tests	2026-10-25T14:57:31.0560114Z   Assert.Inconclusive. NOT_RUN: 未注入本轮专用Keycloak运行时配置。
+engineering	Build format and real host security tests	2026-10-25T14:57:31.0561868Z   from /home/runner/work/ontology-platform/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|x64)
+engineering	Build format and real host security tests	2026-10-25T14:57:31.8296222Z ^[[33mskipped^[[m ExpiredServerSessionCookieReturnsHttp401
+engineering	Build format and real host security tests	2026-10-25T14:57:31.8298694Z   Assert.Inconclusive. NOT_RUN: 未注入本轮隔离PG连接。
+engineering	Build format and real host security tests	2026-10-25T14:57:31.8300911Z   from /home/runner/work/ontology-platform/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|x64)
+engineering	Build format and real host security tests	2026-10-25T14:57:31.8333299Z ^[[33mskipped^[[m SharedEncryptedTicketRevocationAndExpiryUsePostgresFacts
+engineering	Build format and real host security tests	2026-10-25T14:57:31.8335890Z   Assert.Inconclusive. NOT_RUN: G1_SEC_PG_CONNECTION未注入隔离PG；需要Master先应用Governance迁移。
+engineering	Build format and real host security tests	2026-10-25T14:57:31.8340508Z   from /home/runner/work/ontology-platform/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|x64)
+engineering	Build format and real host security tests	2026-10-25T14:57:32.0982016Z ^[[m/home/runner/work/ontology-platform/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|x64) ^[[31mfailed with 1 error(s)^[[m ^[[90m(4s 446ms)^[[m
+[REDACTED: sensitive protocol field]
+engineering	Build format and real host security tests	2026-10-25T14:57:32.1054426Z
+engineering	Build format and real host security tests	2026-10-25T14:57:32.1059167Z ^[[31mTest run summary: Failed!
+engineering	Build format and real host security tests	2026-10-25T14:57:32.1066260Z ^[[m  total: 15
+engineering	Build format and real host security tests	2026-10-25T14:57:32.1067046Z ^[[31m  failed: 1
+engineering	Build format and real host security tests	2026-10-25T14:57:32.1067922Z ^[[m  succeeded: 10
+engineering	Build format and real host security tests	2026-10-25T14:57:32.1068509Z   skipped: 4
+engineering	Build format and real host security tests	2026-10-25T14:57:32.1069563Z   duration: 4s 701ms
+[REDACTED: sensitive protocol field]
+engineering	Build format and real host security tests	2026-10-25T14:57:32.1844650Z ##[error]Process completed with exit code 1.
+

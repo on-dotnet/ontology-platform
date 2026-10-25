@@ -90,7 +90,7 @@ def main(configuration="Debug", test_filter=None):
         if test_filter:
             test.extend(['--filter', test_filter])
         command(test)
-        print('PASS: real PostgreSQL tickets/revocation/expiry/audit and real Keycloak PAR security integration.')
+        print('PASS: selected real PostgreSQL/Keycloak integration filter; count is in actual test output.' if test_filter else 'PASS: real PostgreSQL tickets/revocation/expiry/audit and real Keycloak PAR security integration.')
         return 0
     except Exception as failure:
         record.append(dict(status='FAIL', category=type(failure).__name__, details='suppressed'))
