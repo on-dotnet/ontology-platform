@@ -1,0 +1,23 @@
+{
+  "observer": "Master; B worker paused, serial handoff",
+  "commands": [
+    {
+      "command": "docker ps -a --format \"{{.Names}} {{.Status}}\"",
+      "exitCode": 0,
+      "output": "",
+      "error": ""
+    },
+    {
+      "command": "docker volume ls --format {{.Name}} --filter name=m0-mac-b",
+      "exitCode": 0,
+      "output": "m0-mac-b-20261025-fuseki-data\nm0-mac-b-20261025-postgres-data\nm0-mac-b-20261025-rustfs-data\nm0-mac-b-trace-20261025-fuseki-data\nm0-mac-b-trace-20261025-postgres-data\nm0-mac-b-trace-20261025-rustfs-data",
+      "error": ""
+    },
+    {
+      "command": "lsof -nP -iTCP:15888 -iTCP:15080 -iTCP:15432 -iTCP:13030 -iTCP:19000 -iTCP:19001 -iTCP:18080 -iTCP:19090 -iTCP:14317 -iTCP:18889 -sTCP:LISTEN",
+      "exitCode": 1,
+      "output": "",
+      "error": ""
+    }
+  ]
+}

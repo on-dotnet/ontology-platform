@@ -1,6 +1,6 @@
 # G1-INFRA 本地开发基础设施
 
-当前交付状态见 [B 验证记录](../evidence/G1-INFRA-001/B/validation.md)。此编排仅用于本机开发。Keycloak 的 start-dev、不带认证的 Fuseki 开发数据集和非 TLS 内部端点不构成生产部署方案；不实现业务登录、业务表、语义发布、Web、MCP/Agent/SSE 或完整 LGTM。
+历史G1交付见 [原B验证记录](../evidence/G1-INFRA-001/B/validation.md)，Mac原生ARM64实测见 [M0容器验证](../evidence/M0-MAC-PORTABILITY-001/B/validation.md)。此编排仅用于本机开发。Keycloak 的 start-dev、不带认证的 Fuseki 开发数据集和非 TLS 内部端点不构成生产部署方案；不实现业务登录、业务表、语义发布、Web、MCP/Agent/SSE 或完整 LGTM。
 
 ## 工程与端口
 
@@ -84,4 +84,12 @@ pwsh -NoProfile -File infra/development/test-resource-persistence.ps1 -PostgresC
 
 本机HTTP profile显式设置ASPIRE_ALLOW_UNSECURED_TRANSPORT=true，仅允许回环开发明文传输，保留Dashboard默认认证。不要外推为生产或公网配置。资源容器后端与Aspire固定代理端口已实际核验仅绑定127.0.0.1/::1，见本阶段运行证据。
 
-AppHost官方NuGet回退工具包含平台专用Dashboard/DCP，当前锁定支持win-x64与linux-x64，分别使用packages.win-x64.lock.json/packages.linux-x64.lock.json。其他RID尚未提供锁图。Windows执行Linux包恢复不等于Linux运行成功，后者等待实际CI。
+AppHost官方NuGet回退工具包含平台专用Dashboard/DCP，当前锁定支持win-x64、linux-x64与osx-arm64，分别使用packages.win-x64.lock.json/packages.linux-x64.lock.json/packages.osx-arm64.lock.json（Mac锁由M0 Master生成并集成）。osx-x64及其他RID尚未验收。Windows执行Linux包恢复不等于Linux运行成功，后者等待实际CI。
+
+## M0 Mac 实测与遥测查询
+
+macOS27.0.1/arm64，Docker29.9.2 linux/aarch64，四固定index真实提供ARM64，实际四资源均linux/arm64；未使用amd64模拟或更换摘要。AppHost官方NuGet平台DCP/Dashboard实际启动，健康、会话网络、只回环监听和四资源重启持久化均已运行。开发证书/DataProtection警告保留，不能外推生产安全或灾备验收。
+
+Dashboard telemetry API默认保留ApiKey认证。可在启动AppHost的当前进程中设置随机AppHost__DashboardApiKey并以内存值发送X-API-Key header查询/api/telemetry/traces/{traceId}；不要把值放URL、命令记录、Git或审查包，不要关闭认证。M0已用真实404请求的traceparent核对Dashboard返回TraceId/parent/service.name；健康路径排除跟踪，不用/health测试请求Trace。完整LGTM仍归未授权OBS。
+
+本轮专用卷前缀m0-mac-b-20261025及m0-mac-b-trace-20261025仅保留随机测试数据，临时秘密值不主动写入源码、日志、证据或独立秘密文件；容器与运行时内部存储按Docker及服务机制处理；不要拿它们当可复用日常开发配置。正常日常卷用稳定本机秘密。AppHost停止后卷保留，重启探针不等于生产备份恢复。M0真实状态、限制和清理来源见上方证据，Windows本轮未重跑，历史结果不改写。
