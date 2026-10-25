@@ -16,20 +16,20 @@
 | 命令/证据 | Exit | 事实 |
 |---|---:|---|
 | `git fetch origin` | 0 | 冻结基线及origin/main已核对 |
-| `dotnet restore backend/OntologyPlatform.slnx --locked-mode` / restore.log | 0 | 全后端受锁恢复；首次误用根solution路径MSB1009，已更正，没有依赖变更 |
-| 新OBS14红例 / red.log | 2 | 14 FAIL；普通异常实际503而预期500，缺少受控事件及完成结果 |
-| 旧边界再红 / red-boundary.log | 2 | 3 FAIL；取消、已开始、二次写回失败均观察到原marker进入日志边界 |
-| 首实现 / green-first.log | 2 | 2 PASS/12 FAIL；发现清理响应丢Trace头、EF包装及Kestrel事件13出口 |
-| 第二实现 / green-second.log | 2 | 13 PASS/1 FAIL；唯一剩余是Kestrel事件13泄漏，后已源头修复 |
-| 新OBS完整测试 / green.log | 0 | 17 PASS/0 FAIL/0 skip，真实Kestrel包括开始后取消及已取消普通异常 |
-| 原生OTLP出口 / otlp-export.log | 0 | 1 PASS；正式ServiceDefaults exporter实际HTTP/protobuf日志及Span，无marker（也包含于17项） |
-| Release全后端build / build-release.log | 0 | 0 error；既有ASPIRE010 warning保留 |
-| `dotnet format ... --verify-no-changes` / format-final.log | 0 | 全后端；首次仅新文件导入顺序失败，已仅格式化owned C#修正 |
-| Infrastructure完整测试 / infrastructure.log | 0 | 4 PASS |
-| `python3 scripts/acceptance/test-governance.py` / governance-integration.log | 1（test子进程2） | 独立真实PG+Keycloak，31项中30 PASS/1 FAIL/0 skip；唯一FAIL是既有RuntimeOpenApiDeclaresRedirectsAndCompleteErrors：`get /auth/login`缺500 metadata。该路径由SEC负责，本分支不改/不掩盖 |
-| `pwsh -NoProfile -File scripts/verify.ps1 -SelfTest` / selftest-final.log | 0 | 标准SelfTest；ReviewPackage35/35。首次因新日志行结束和未复用隔离PyYAML失败，修正LF并复用已批准隔离依赖后通过；工程SelfTest不代表产品全PASS |
-| 固定镜像`alloy validate` / alloy-validate.log | 0 | 真实官方镜像语法验证；无stdout |
-| `python3 docs/evidence/G1-CLOSE-001/OBS/verify-alloy-boundary.py` / alloy-runtime.json、alloy-runtime.log | 0 | 真实Alloy容器接收OTLP并实际导出到内存回环sink，10项PASS：body/状态/事件marker删除，精确字段及安全Span类别保留，错误大小写字段移除，Loki配置未变。此sink检查不代替真正Loki/Tempo查询 |
+| `dotnet restore backend/OntologyPlatform.slnx --locked-mode` / restore.txt | 0 | 全后端受锁恢复；首次误用根solution路径MSB1009，已更正，没有依赖变更 |
+| 新OBS14红例 / red.txt | 2 | 14 FAIL；普通异常实际503而预期500，缺少受控事件及完成结果 |
+| 旧边界再红 / red-boundary.txt | 2 | 3 FAIL；取消、已开始、二次写回失败均观察到原marker进入日志边界 |
+| 首实现 / green-first.txt | 2 | 2 PASS/12 FAIL；发现清理响应丢Trace头、EF包装及Kestrel事件13出口 |
+| 第二实现 / green-second.txt | 2 | 13 PASS/1 FAIL；唯一剩余是Kestrel事件13泄漏，后已源头修复 |
+| 新OBS完整测试 / green.txt | 0 | 17 PASS/0 FAIL/0 skip，真实Kestrel包括开始后取消及已取消普通异常 |
+| 原生OTLP出口 / otlp-export.txt | 0 | 1 PASS；正式ServiceDefaults exporter实际HTTP/protobuf日志及Span，无marker（也包含于17项） |
+| Release全后端build / build-release.txt | 0 | 0 error；既有ASPIRE010 warning保留 |
+| `dotnet format ... --verify-no-changes` / format-final.txt | 0 | 全后端；首次仅新文件导入顺序失败，已仅格式化owned C#修正 |
+| Infrastructure完整测试 / infrastructure.txt | 0 | 4 PASS |
+| `python3 scripts/acceptance/test-governance.py` / governance-integration.txt | 1（test子进程2） | 独立真实PG+Keycloak，31项中30 PASS/1 FAIL/0 skip；唯一FAIL是既有RuntimeOpenApiDeclaresRedirectsAndCompleteErrors：`get /auth/login`缺500 metadata。该路径由SEC负责，本分支不改/不掩盖 |
+| `pwsh -NoProfile -File scripts/verify.ps1 -SelfTest` / selftest-final.txt | 0 | 标准SelfTest；ReviewPackage35/35。首次因新日志行结束和未复用隔离PyYAML失败，修正LF并复用已批准隔离依赖后通过；工程SelfTest不代表产品全PASS |
+| 固定镜像`alloy validate` / alloy-validate.txt | 0 | 真实官方镜像语法验证；无stdout |
+| `python3 docs/evidence/G1-CLOSE-001/OBS/verify-alloy-boundary.py` / alloy-runtime.json、alloy-runtime.txt | 0 | 真实Alloy容器接收OTLP并实际导出到内存回环sink，10项PASS：body/状态/事件marker删除，精确字段及安全Span类别保留，错误大小写字段移除，Loki配置未变。此sink检查不代替真正Loki/Tempo查询 |
 
 测试捕获器同时检查实际formatter正文、全部state、外部scopes、Exception对象、真实Activity标签/事件/status description；原生OTLP出口额外检查真实protobuf日志及Span字节。所有marker均固定无效合成值，原始异常和OTLP字节仅在测试内存，不落盘。测试注入路由仅在测试程序集MapGet注册；产品无故障路由。PG/Keycloak脚本使用本轮隔离容器及随机生成运行时配置，未读取历史凭据。
 
