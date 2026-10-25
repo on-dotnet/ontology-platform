@@ -22,6 +22,16 @@ public static partial class PlatformTelemetry
     public static readonly ObservableGauge<double> Heartbeat = Meter.CreateObservableGauge<double>(
         "platform.heartbeat", () => DateTimeOffset.UtcNow.ToUnixTimeSeconds());
 
+    /// <summary>仅观察PAR推送参数是否完整，不记录任何协议值。</summary>
+    /// <param name="logger">正式宿主日志器。</param>
+    /// <param name="code">是否使用授权码响应。</param>
+    /// <param name="pkceS256">是否要求S256挑战。</param>
+    /// <param name="hasChallenge">挑战是否存在。</param>
+    /// <param name="hasState">受保护状态是否存在。</param>
+    /// <param name="hasNonce">随机关联值是否存在。</param>
+    [LoggerMessage(1002, LogLevel.Information, "PAR协议 code={Code} pkceS256={PkceS256} hasChallenge={HasChallenge} hasState={HasState} hasNonce={HasNonce}")]
+    public static partial void AuthorizationPushed(ILogger logger, bool code, bool pkceS256, bool hasChallenge, bool hasState, bool hasNonce);
+
     /// <summary>只记录固定路由和关联标识，不写URL查询、请求头或正文。</summary>
     /// <param name="logger">宿主结构化日志器。</param>
     /// <param name="route">固定路由模板。</param>

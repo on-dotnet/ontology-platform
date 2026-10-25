@@ -281,6 +281,17 @@ public static class PlatformApiHost
         options.NonceCookie.SameSite = SameSiteMode.Lax;
         options.CorrelationCookie.SecurePolicy = development ? CookieSecurePolicy.SameAsRequest : CookieSecurePolicy.Always;
         options.NonceCookie.SecurePolicy = development ? CookieSecurePolicy.SameAsRequest : CookieSecurePolicy.Always;
+        options.Events.OnPushAuthorization = context =>
+        {
+            // PAR参数只观察存在性与算法，不输出state、nonce、challenge或认证材料。
+            var message = context.ProtocolMessage;
+            // 安全事件记录固定布尔结果，保留框架原有推送/客户端认证行为。
+            var logger = context.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger("OntologyPlatform.Api.Security");
+            PlatformTelemetry.AuthorizationPushed(logger, message.ResponseType == "code",
+                message.GetParameter("code_challenge_method") == "S256", !string.IsNullOrEmpty(message.GetParameter("code_challenge")),
+                !string.IsNullOrEmpty(message.State), !string.IsNullOrEmpty(message.Nonce));
+            return Task.CompletedTask;
+        };
         options.Events.OnRedirectToIdentityProvider = context =>
         {
             context.ProtocolMessage.RedirectUri = security.PublicOrigin.TrimEnd('/') + "/signin-oidc";

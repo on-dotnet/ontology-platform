@@ -1,0 +1,14 @@
+..E
+======================================================================
+ERROR: test_par_challenge_does_not_require_front_channel_secret_parameters (test_oidc_harness.OidcDriverBoundaryTests.test_par_challenge_does_not_require_front_channel_secret_parameters)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g1-wave2-sec/ontology-platform/infra/security/test_oidc_harness.py", line 24, in test_par_challenge_does_not_require_front_channel_secret_parameters
+    self.assertEqual(module.challenge_transport({'client_id': ['test'], 'request_uri': ['urn:ietf:params:oauth:request_uri:synthetic']}), 'PAR')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'oidc_harness' has no attribute 'challenge_transport'
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.027s
+
+FAILED (errors=1)

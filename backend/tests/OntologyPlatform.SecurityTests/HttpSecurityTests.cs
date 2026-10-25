@@ -4,13 +4,18 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
 using System.Xml.Linq;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OntologyPlatform.Api;
 
@@ -104,6 +109,79 @@ public sealed class HttpSecurityTests
         Assert.AreEqual(HttpStatusCode.BadRequest, (await client.GetAsync("/health/live")).StatusCode);
     }
 
+    /// <summary>向本轮真实Keycloak推送授权，记录五个安全布尔并观察前端仅含PAR引用。</summary>
+    /// <returns>正式宿主与真实签发者的推送验证任务。</returns>
+    [TestMethod]
+    public async Task RealIssuerPushRetainsCodePkceStateAndNonce()
+    {
+        // 只由显式环境变量消费本轮私有runtime，不打印配置或协议值。
+        var runtimePath = Environment.GetEnvironmentVariable("G1_SEC_OIDC_RUNTIME");
+        if (string.IsNullOrWhiteSpace(runtimePath))
+        {
+            Assert.Inconclusive("NOT_RUN: 未注入本轮专用Keycloak运行时配置。");
+        }
+        // runtime文件只在进程内解析，不能作为断言输出。
+        using var runtime = JsonDocument.Parse(await File.ReadAllTextAsync(runtimePath));
+        // 专用realm文件保存本轮随机客户端秘密，本测试只发PAR不读取用户密码。
+        using var realm = JsonDocument.Parse(await File.ReadAllTextAsync(runtime.RootElement.GetProperty("realmFile").GetString()!));
+        // 捕获所有本测试日志用于确保只存在安全布尔证据。
+        using var logs = new CapturedLogs();
+        // 证书和keyring仍使用测试隔离资产，不接触统一栈私钥。
+        using var fixture = new SecurityHostFixture();
+        // 仅覆盖正式OIDC所需配置，回调保持统一栈批准入口。
+        var issuer = new Dictionary<string, string?>
+        {
+            ["Security:Authority"] = realm.RootElement.GetProperty("authority").GetString(),
+            ["Security:ClientId"] = realm.RootElement.GetProperty("clientId").GetString(),
+            ["Security:ClientSecret"] = realm.RootElement.GetProperty("clientSecret").GetString()
+        };
+        // 实际Kestrel挑战将通过正式中间件向真实Keycloak发出PAR。
+        await using var app = fixture.Create(logs: logs, overrides: issuer);
+        await app.StartAsync();
+        // 不跟随登录页，本项只验证推送参数及实际request_uri响应。
+        using var client = fixture.CreateClient(app);
+        // 发起正式认证挑战，不使用测试协议处理替身。
+        using var response = await client.GetAsync("/auth/login?returnUrl=%2F");
+        Assert.AreEqual(HttpStatusCode.Redirect, response.StatusCode);
+        // 只检查字段存在，不把任何URL值传递给断言或日志。
+        var query = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(response.Headers.Location!.Query);
+        Assert.IsTrue(query.ContainsKey("request_uri"));
+        Assert.IsFalse(query.ContainsKey("state"));
+        Assert.IsFalse(query.ContainsKey("nonce"));
+        Assert.IsTrue(logs.Messages.Any(value => value.Contains("PAR协议 code=True pkceS256=True hasChallenge=True hasState=True hasNonce=True", StringComparison.Ordinal)), "真实推送必须观察到五个安全布尔为真。");
+        Assert.IsFalse(logs.Messages.Any(value => value.Contains(issuer["Security:ClientSecret"]!, StringComparison.Ordinal)), "客户端秘密不得进入日志。");
+    }
+
+    /// <summary>推送授权事件仅记录五个布尔结果，不改变框架PAR行为或输出协议值。</summary>
+    /// <returns>内置事件执行与安全日志检查任务。</returns>
+    [TestMethod]
+    public async Task PushedAuthorizationObservationContainsBooleansOnly()
+    {
+        // 捕获本宿主安全事件，合成协议值不应进入日志正文。
+        using var logs = new CapturedLogs();
+        // 证书及keyring仍为本测试临时资产。
+        using var fixture = new SecurityHostFixture();
+        // 读取正式配置而不模拟OnPushAuthorization委托。
+        await using var app = fixture.Create(logs: logs);
+        // 正式OIDC选项携带实际事件注册。
+        var options = app.Services.GetRequiredService<IOptionsMonitor<OpenIdConnectOptions>>().Get(OpenIdConnectDefaults.AuthenticationScheme);
+        // 仅无效合成值用于保证日志不回显nonce/state/PKCE。
+        const string marker = "synthetic-par-sensitive-marker";
+        // 事件在框架生成state/nonce/PKCE之后运行。
+        var message = new OpenIdConnectMessage { ResponseType = "code", State = marker, Nonce = marker };
+        message.SetParameter("code_challenge", marker);
+        message.SetParameter("code_challenge_method", "S256");
+        // 请求服务提供日志器；事件不会自行发网络或读取用户凭证。
+        var context = new PushedAuthorizationContext(new DefaultHttpContext { RequestServices = app.Services },
+            new AuthenticationScheme(OpenIdConnectDefaults.AuthenticationScheme, null, typeof(OpenIdConnectHandler)), options, message, new AuthenticationProperties());
+        await options.Events.PushAuthorization(context);
+        Assert.IsTrue(logs.Messages.Any(value => value.Contains("PAR协议", StringComparison.Ordinal)), "正式事件必须保留安全布尔观察。");
+        Assert.IsFalse(logs.Messages.Any(value => value.Contains(marker, StringComparison.Ordinal)), "协议秘密不得记录。");
+        Assert.IsFalse(context.HandledPush);
+        Assert.IsFalse(context.SkippedPush);
+        Assert.AreEqual(marker, message.State);
+    }
+
     /// <summary>代理URL中的敏感查询标记不能进入任何框架或自定义日志正文。</summary>
     /// <returns>真实代理请求和捕获日志检查任务。</returns>
     [TestMethod]
@@ -178,8 +256,9 @@ internal sealed class SecurityHostFixture : IDisposable
     /// <param name="environment">需要验证的正式环境名。</param>
     /// <param name="connection">可选本轮隔离PG连接；未指定时使用故障端口。</param>
     /// <param name="logs">可选的测试日志捕获器。</param>
+    /// <param name="overrides">可选的本轮真实签发者配置，仅用于显式集成测试。</param>
     /// <returns>未启动的正式API。</returns>
-    public WebApplication Create(string environment = "Development", string? connection = null, ILoggerProvider? logs = null)
+    public WebApplication Create(string environment = "Development", string? connection = null, ILoggerProvider? logs = null, IReadOnlyDictionary<string, string?>? overrides = null)
     {
         return PlatformApiHost.CreateApplication(["--environment", environment, "--urls", "http://127.0.0.1:0"], builder =>
         {
@@ -202,6 +281,10 @@ internal sealed class SecurityHostFixture : IDisposable
                 ["Web:Origin"] = "http://127.0.0.1:18997",
                 ["AllowedHosts"] = environment == "Development" ? "localhost;127.0.0.1" : "platform.invalid"
             });
+            if (overrides is not null)
+            {
+                builder.Configuration.AddInMemoryCollection(overrides);
+            }
         });
     }
 
