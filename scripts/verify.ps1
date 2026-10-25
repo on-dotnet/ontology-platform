@@ -116,7 +116,7 @@ function Test-Repository {
             $structuredOutput = @(& $python $parser $base 2>&1)
             if ($LASTEXITCODE -ne 0) { Record 'structured-syntax' 'FAIL' 'YAML/TOML解析失败或项目解析器不可用；请按requirements隔离恢复并在允许上下文运行。' }
         } catch { Record 'structured-syntax' 'FAIL' '缺少可运行Python3.11+解析环境。' }
-        finally { [Environment]::SetEnvironmentVariable('PYTHONPATH', $previousPythonPath, 'Process') }
+        finally { [Environment]::SetEnvironmentVariable('PYTHONPATH', ($previousPythonPath ?? [NullString]::Value), 'Process') }
     } else { Record 'structured-syntax' 'FAIL' '必要的YAML/TOML解析器缺失。' }
     $required = @('global.json', 'Directory.Build.props', 'Directory.Packages.props', 'NuGet.Config', '.config/dotnet-tools.json',
         'package.json', 'apps/web/package.json', 'pnpm-workspace.yaml', 'turbo.json', '.node-version',
@@ -166,6 +166,8 @@ try {
         if (-not $?) { exit 1 }
         & (Join-Path $PSScriptRoot 'tests/StructuredFiles.Tests.ps1')
         if (-not $?) { exit 1 }
+        & (Join-Path $PSScriptRoot 'tests/Environment.Tests.ps1')
+        if (-not $?) { exit 1 }
         if (Test-Path (Join-Path $PSScriptRoot 'tests/ReviewPackage.Tests.ps1')) {
             & (Join-Path $PSScriptRoot 'tests/ReviewPackage.Tests.ps1')
             if (-not $?) { exit 1 }
@@ -211,7 +213,8 @@ try {
                 }
             } else { Write-Output 'NOT_RUN: .NET test：须显式追加-RunTests执行已批准测试项目。' }
         } finally {
-            foreach ($name in $environmentNames) { [Environment]::SetEnvironmentVariable($name, $previousEnvironment[$name], 'Process') }
+            # .NET9+区分未设置和空字符串；NullString防止PowerShell把null转为空值。
+            foreach ($name in $environmentNames) { [Environment]::SetEnvironmentVariable($name, ($previousEnvironment[$name] ?? [NullString]::Value), 'Process') }
             Pop-Location
         }
     } else { Write-Output 'NOT_RUN: .NET原生检查需显式-RunNative及对应任务授权。' }

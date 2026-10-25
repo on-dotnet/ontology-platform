@@ -22,3 +22,11 @@ doctor 原先把全部非 Windows 隔离 Node 路径硬编码为 linux-x64，导
 Master 恢复的 .tools/pythonlibs 与 .tools/pnpm 在本树忽略目录中只读引用；未安装全局依赖或修改机器配置。第一次把正在写入的日志放进被扫描目录，静态检查按设计拒绝未完成文本（退出 1）；后续全部运行输出先写临时目录，完成后归档。
 
 macOS ARM64 原生回归在其他 OS 明确 NOT_RUN；原有缺工具负例仍跨平台执行。Windows/Linux 本专项实际运行 NOT_RUN，远程 CI NOT_VERIFIED。应用测试、真实构建、资源探针、Trace 与最终唯一标准 ZIP 由 Master/对应 Owner 验收；不以 49 个脚本测试代替产品通过。未合并 main，未自行进入下游关口。
+
+## 组合入口环境恢复修复 · Master 串行收尾
+
+Master在已合入A后实际运行 verify -SelfTest -RunNative -RunTests，原49项自测均通过但后续真实NuGet SDK解析失败exit1，完整失败保留master/verify-integrated.txt。A定位PowerShell/.NET10中普通null实参被转成空字符串，导致DOTNET_CLI_HOME等从unset变成empty；Master暂停worker写权后在本独立A树完成修复，任务卡增量记录交接，无并发抢写。
+
+新Environment.Tests.ps1只拦截dotnet调用观察恢复语义，不冒充真实构建，覆盖PYTHONPATH及四个.NET过程变量的unset/empty/value三组，并检查StructuredFiles.Tests自身finally。先在原代码实测exit1、明确PYTHONPATH(unset)被改变；最小修复为三处SetEnvironmentVariable使用NullString保留null，在主verify的SelfTest接入环境回归。environment-red.txt/green.txt为实际命令/退出码。开发夹具中曾修正计数作用域与字符串比较将null当empty的问题后才取得有效RED，未将夹具错误当产品缺陷证据。
+
+最终环境回归exit0，三组五变量及结构化脚本清理通过；完整SelfTest结果见self-test-after-env-fix.txt，实际原生组合入口仍由Master集成后重跑并交Reviewer复核。没有修改历史G1证据、全局环境或固定依赖。

@@ -1,0 +1,21 @@
+command: pwsh -NoProfile -File scripts/tests/Environment.Tests.ps1
+exitCode: 0
+
+Check             Status Message
+-----             ------ -------
+repository-static PASS   检查136个文件：语法/格式/相对链接/有限机密模式/基线策…
+
+PASS: verification preserves unset environment state for five process variables.
+
+Check             Status Message
+-----             ------ -------
+repository-static PASS   检查136个文件：语法/格式/相对链接/有限机密模式/基线策…
+
+PASS: verification preserves empty environment state for five process variables.
+
+Check             Status Message
+-----             ------ -------
+repository-static PASS   检查136个文件：语法/格式/相对链接/有限机密模式/基线策…
+
+PASS: verification preserves value environment state for five process variables.
+Environment regression: 3 state groups and structured-suite cleanup passed; native calls are synthetic, product tests NOT_RUN.
