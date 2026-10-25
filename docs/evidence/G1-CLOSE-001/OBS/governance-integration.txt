@@ -1,0 +1,33 @@
+b6fe64ebeda9e898bf670d77da5d36bca31f3080243905becaec93ad9ca1f2c5
+工具“dotnet-ef”(版本“10.0.13”)已还原。可用的命令: dotnet-ef
+
+还原成功。
+Failed executing DbCommand (7ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM governance."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261025062847_InitialGovernance'.
+Applying migration '20261025144246_AuditScopeSites'.
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Done.
+a5465f8c6332a802eb2e7ae34e05cdfe9233a08deaa39d8861325f78727e4e72
+{"status": "CREATED", "realm": "wave2-cf43a61f2c817f1a", "identities": ["wave2-viewer-a", "wave2-viewer-b", "wave2-no-role-a", "wave2-operator-a", "wave2-auditor-a"], "secrets": "runtime-only"}
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g1-close-obs/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+失败 RuntimeOpenApiDeclaresRedirectsAndCompleteErrors (223ms)
+  从 /Users/chasen/.codex/worktrees/g1-close-obs/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+  CollectionAssert.AreEquivalent 失败。 集合中元素的数量不匹配。应为: <3>，实际为: <2>。get /auth/login
+    在 OntologyPlatform.SecurityTests.HttpSecurityTests.RuntimeOpenApiDeclaresRedirectsAndCompleteErrors() 位于 /Users/chasen/.codex/worktrees/g1-close-obs/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/HttpSecurityTests.cs:167
+    在 OntologyPlatform.SecurityTests.HttpSecurityTests.RuntimeOpenApiDeclaresRedirectsAndCompleteErrors() 位于 /Users/chasen/.codex/worktrees/g1-close-obs/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/HttpSecurityTests.cs:206
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+/Users/chasen/.codex/worktrees/g1-close-obs/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64) 失败并出现 1 个错误 (8s 346ms)
+退出代码: 2
+
+测试运行摘要: 失败!
+  总计: 31
+  失败: 1
+  成功: 30
+  已跳过: 0
+  持续时间: 8s 529ms
+已完成测试运行，但显示非成功退出代码: 2 (请参阅: https://aka.ms/testingplatform/exitcodes)
+FAIL: real governance integration; details retained only after sanitization

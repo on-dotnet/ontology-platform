@@ -63,6 +63,8 @@ public static class PlatformApiHost
         }
         // 屏蔽可包含code/state/token的框架请求日志；自定义日志只含固定模板。
         builder.Logging.AddFilter("Microsoft.AspNetCore.Hosting.Diagnostics", LogLevel.None);
+        // Kestrel会在OnStarting失败时先记录原Exception再抛回中间件，必须在源头关闭该出口。
+        builder.Logging.AddFilter("Microsoft.AspNetCore.Server.Kestrel", LogLevel.None);
         builder.Logging.AddFilter("Microsoft.AspNetCore.Authentication", LogLevel.None);
         builder.Logging.AddFilter("Microsoft.IdentityModel", LogLevel.None);
         builder.Logging.AddFilter("System.Net.Http.HttpClient", LogLevel.None);
@@ -161,6 +163,8 @@ public static class PlatformApiHost
             context.Response.Headers["X-Content-Type-Options"] = "nosniff";
             // 记录耗时只用UTC无关的单调时钟。
             var started = Stopwatch.GetTimestamp();
+            // 完成结果覆盖正常完成、Problem输出以及不能继续写入的中止边界。
+            var outcome = "completed";
             try
             {
                 // 默认拒绝任何转发声明；显式代理也必须匹配真实对端IP。
@@ -174,10 +178,49 @@ public static class PlatformApiHost
                 }
                 await next(context);
             }
-            catch (Exception) when (!context.RequestAborted.IsCancellationRequested && !context.Response.HasStarted)
+            catch (Exception exception)
             {
-                // 异常细节可能包含认证或连接信息，只返回通用可关联错误。
-                await PlatformProblem.Create(context, 503, "dependency_unavailable").ExecuteAsync(context);
+                // 原始异常只用于有界类型分类，绝不传给ILogger、Activity或客户端。
+                var failure = PlatformFailure.Classify(exception, context.RequestAborted);
+                if (failure.Category == "request_cancelled" || context.RequestAborted.IsCancellationRequested || context.Response.HasStarted)
+                {
+                    outcome = failure.Category == "request_cancelled" ? "request_cancelled" : "response_aborted";
+                    if (!context.Response.HasStarted)
+                    {
+                        context.Response.StatusCode = failure.Status;
+                    }
+                    context.Abort();
+                }
+                else
+                {
+                    outcome = "problem_returned";
+                    try
+                    {
+                        // 响应未开始时清理潜在未提交内容，输出固定安全Problem合同。
+                        context.Response.Clear();
+                        context.Response.Headers["X-Correlation-Id"] = (string)context.Items["CorrelationId"]!;
+                        context.Response.Headers["X-Trace-Id"] = Activity.Current?.TraceId.ToString() ?? context.TraceIdentifier;
+                        context.Response.Headers.CacheControl = "no-store";
+                        context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+                        await PlatformProblem.Create(context, failure.Status, failure.Code).ExecuteAsync(context);
+                    }
+                    catch (Exception)
+                    {
+                        // 客户端断连或OnStarting再次失败也不能将任意原异常抛给开发异常页或OTel。
+                        outcome = "response_aborted";
+                        context.Abort();
+                    }
+                }
+                // 响应已经开始时保留真实状态，不追加JSON或伪造状态。
+                Activity.Current?.SetTag("platform.exception.category", failure.Category);
+                Activity.Current?.SetTag("platform.request.outcome", outcome);
+                Activity.Current?.SetTag("platform.response.status", context.Response.StatusCode);
+                Activity.Current?.SetStatus(ActivityStatusCode.Error);
+                // 只输出固定字段，不输出Exception、异常名称、连接串或消息。
+                PlatformTelemetry.PlatformRequestFault(app.Logger,
+                    (context.GetEndpoint() as RouteEndpoint)?.RoutePattern.RawText ?? "unmatched",
+                    failure.Category, outcome, context.Response.StatusCode,
+                    Activity.Current?.TraceId.ToString() ?? context.TraceIdentifier);
             }
             finally
             {
@@ -188,7 +231,7 @@ public static class PlatformApiHost
                 PlatformTelemetry.Requests.Add(1, tags);
                 PlatformTelemetry.Duration.Record(Stopwatch.GetElapsedTime(started).TotalSeconds, tags);
                 PlatformTelemetry.RequestCompleted(app.Logger, route, context.Response.StatusCode,
-                    Activity.Current?.TraceId.ToString() ?? context.TraceIdentifier, context.Response.Headers["X-Audit-Id"].FirstOrDefault());
+                    Activity.Current?.TraceId.ToString() ?? context.TraceIdentifier, context.Response.Headers["X-Audit-Id"].FirstOrDefault(), outcome);
             }
         });
         if (security.TrustedProxies.Length > 0)

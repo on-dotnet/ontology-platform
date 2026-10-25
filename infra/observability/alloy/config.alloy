@@ -25,14 +25,27 @@ otelcol.processor.transform "boundary" {
     context = "log"
     statements = [
       `keep_keys(resource.attributes, ["service.name", "service.version", "deployment.environment.name"])`,
-      `keep_keys(attributes, ["eventcode", "EventId", "EventName", "OriginalFormat", "path", "status", "status_class", "method", "route", "traceId", "auditId", "correlationId", "TraceId", "AuditId", "CorrelationId"])`,
+      // body也可能包含框架格式化异常；固定正文，诊断值只走大小写精确白名单字段。
+      `set(body, "PlatformTelemetry")`,
+      `set(body, "PlatformRequestFault") where attributes["EventName"] == "PlatformRequestFault" or attributes["EventId"] == 1003 or attributes["eventcode"] == 1003`,
+      `keep_keys(attributes, ["eventcode", "EventId", "EventName", "OriginalFormat", "path", "status", "status_class", "method", "route", "traceId", "auditId", "correlationId", "TraceId", "AuditId", "CorrelationId", "Route", "Status", "ExceptionCategory", "Outcome", "Code", "PkceS256", "HasChallenge", "HasState", "HasNonce"])`,
     ]
   }
   trace_statements {
     context = "span"
     statements = [
       `keep_keys(resource.attributes, ["service.name", "service.version", "deployment.environment.name"])`,
-      `delete_matching_keys(attributes, "(?i).*(cookie|authorization|token|password|secret|url\\.query|url\\.full|http\\.url|http\\.target|db\\.statement|db\\.query\\.text).*")`,
+      // OTLP的status.description对应OTTL status.message，原始异常描述不得出口。
+      `set(status.message, "")`,
+      `delete_matching_keys(attributes, "(?i)(^(exception|error)\\.|.*(cookie|authorization|token|password|secret|url\\.query|url\\.full|http\\.url|http\\.target|db\\.statement|db\\.query\\.text).*)")`,
+    ]
+  }
+  trace_statements {
+    context = "spanevent"
+    statements = [
+      // 异常事件的name和attributes均可能含任意原文；只留固定平台事实。
+      `set(name, "platform.event")`,
+      `keep_keys(attributes, ["platform.exception.category", "platform.request.outcome", "platform.response.status"])`,
     ]
   }
   output {

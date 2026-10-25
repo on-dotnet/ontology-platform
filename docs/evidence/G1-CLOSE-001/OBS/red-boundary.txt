@@ -1,0 +1,46 @@
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g1-close-obs/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+失败 UnwritableResponsesAbortWithoutEscapingOriginalFailure ("cancelled","request_cancelled","request_cancelled",499) (474ms)
+  从 /Users/chasen/.codex/worktrees/g1-close-obs/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+  测试方法 OntologyPlatform.SecurityTests.ObservabilityFailureTests。UnwritableResponsesAbortWithoutEscapingOriginalFailure 引发了异常:
+  System.InvalidOperationException: Sequence contains no matching element
+    在 System.Linq.ThrowHelper.ThrowNoMatchException()
+    在 System.Linq.Enumerable.Single[TSource](IEnumerable`1 source, Func`2 predicate)
+    在 OntologyPlatform.SecurityTests.ObservabilityCapture.AssertFault(String route, String category, String outcome, Int32 status, String traceId) 位于 /Users/chasen/.codex/worktrees/g1-close-obs/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/ObservabilityFailureTests.cs:217
+    在 OntologyPlatform.SecurityTests.ObservabilityFailureTests.UnwritableResponsesAbortWithoutEscapingOriginalFailure(String kind, String outcome, String category, Int32 status) 位于 /Users/chasen/.codex/worktrees/g1-close-obs/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/ObservabilityFailureTests.cs:126
+    在 OntologyPlatform.SecurityTests.ObservabilityFailureTests.UnwritableResponsesAbortWithoutEscapingOriginalFailure(String kind, String outcome, String category, Int32 status) 位于 /Users/chasen/.codex/worktrees/g1-close-obs/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/ObservabilityFailureTests.cs:126
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+
+失败 UnwritableResponsesAbortWithoutEscapingOriginalFailure ("started","response_aborted","unexpected_failure",200) (236ms)
+  从 /Users/chasen/.codex/worktrees/g1-close-obs/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+  Assertion failed. 预期条件为 false。
+  框架或应用日志的正文/state/scopes/exception泄漏敏感值。
+
+  actual: true
+
+  Assert.IsFalse(<condition>)
+    在 OntologyPlatform.SecurityTests.ObservabilityCapture.AssertNoSensitiveData(String marker) 位于 /Users/chasen/.codex/worktrees/g1-close-obs/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/ObservabilityFailureTests.cs:240
+    在 OntologyPlatform.SecurityTests.ObservabilityFailureTests.UnwritableResponsesAbortWithoutEscapingOriginalFailure(String kind, String outcome, String category, Int32 status) 位于 /Users/chasen/.codex/worktrees/g1-close-obs/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/ObservabilityFailureTests.cs:125
+    在 OntologyPlatform.SecurityTests.ObservabilityFailureTests.UnwritableResponsesAbortWithoutEscapingOriginalFailure(String kind, String outcome, String category, Int32 status) 位于 /Users/chasen/.codex/worktrees/g1-close-obs/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/ObservabilityFailureTests.cs:126
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+失败 UnwritableResponsesAbortWithoutEscapingOriginalFailure ("write_failure","response_aborted","unexpected_failure",500) (182ms)
+  从 /Users/chasen/.codex/worktrees/g1-close-obs/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+  Assertion failed. 预期条件为 false。
+  框架或应用日志的正文/state/scopes/exception泄漏敏感值。
+
+  actual: true
+
+  Assert.IsFalse(<condition>)
+    在 OntologyPlatform.SecurityTests.ObservabilityCapture.AssertNoSensitiveData(String marker) 位于 /Users/chasen/.codex/worktrees/g1-close-obs/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/ObservabilityFailureTests.cs:240
+    在 OntologyPlatform.SecurityTests.ObservabilityFailureTests.UnwritableResponsesAbortWithoutEscapingOriginalFailure(String kind, String outcome, String category, Int32 status) 位于 /Users/chasen/.codex/worktrees/g1-close-obs/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/ObservabilityFailureTests.cs:125
+    在 OntologyPlatform.SecurityTests.ObservabilityFailureTests.UnwritableResponsesAbortWithoutEscapingOriginalFailure(String kind, String outcome, String category, Int32 status) 位于 /Users/chasen/.codex/worktrees/g1-close-obs/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/ObservabilityFailureTests.cs:126
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+/Users/chasen/.codex/worktrees/g1-close-obs/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64) 失败并出现 3 个错误 (1s 935ms)
+退出代码: 2
+
+测试运行摘要: 失败!
+  总计: 3
+  失败: 3
+  成功: 0
+  已跳过: 0
+  持续时间: 2s 129ms
+已完成测试运行，但显示非成功退出代码: 2 (请参阅: https://aka.ms/testingplatform/exitcodes)
