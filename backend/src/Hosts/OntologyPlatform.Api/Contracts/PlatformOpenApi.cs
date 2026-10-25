@@ -29,6 +29,7 @@ public static class PlatformOpenApi
                 Name = "X-Health-Key",
                 Description = "仅由内部编排器持有的外置健康探针密钥。"
             };
+            // 遍历实际生成的路由，仅给受保护边界声明对应身份方案。
             foreach (var path in document.Paths)
             {
                 // 公开登录及CSRF领取路由不假标为必须已认证。
@@ -38,6 +39,7 @@ public static class PlatformOpenApi
                 {
                     continue;
                 }
+                // 每个HTTP操作分别声明安全要求，避免继承全局误标公开入口。
                 foreach (var operation in path.Value.Operations.Values)
                 {
                     operation.Security = [new OpenApiSecurityRequirement { [new OpenApiSecuritySchemeReference(scheme, document)] = [] }];
