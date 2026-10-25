@@ -1,0 +1,174 @@
+{
+  "uid": "platform-dependencies",
+  "title": "平台运维 · 依赖健康",
+  "schemaVersion": 41,
+  "version": 1,
+  "editable": false,
+  "tags": [
+    "平台运维",
+    "开发环境"
+  ],
+  "timezone": "browser",
+  "refresh": "10s",
+  "time": {
+    "from": "now-15m",
+    "to": "now"
+  },
+  "annotations": {
+    "list": []
+  },
+  "links": [
+    {
+      "title": "系统总览",
+      "type": "link",
+      "url": "/d/platform-overview",
+      "keepTime": true
+    },
+    {
+      "title": "API性能",
+      "type": "link",
+      "url": "/d/platform-api",
+      "keepTime": true
+    },
+    {
+      "title": "依赖健康",
+      "type": "link",
+      "url": "/d/platform-dependencies",
+      "keepTime": true
+    },
+    {
+      "title": "错误与Trace",
+      "type": "link",
+      "url": "/d/platform-errors",
+      "keepTime": true
+    }
+  ],
+  "templating": {
+    "list": []
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "采集目标实际健康（1=可抓取）",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "platform-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "up{job=~\"observability|grafana\"}",
+          "query": "up{job=~\"observability|grafana\"}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "platform-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 2,
+      "title": "采集耗时",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "platform-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 8,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "scrape_duration_seconds{job=\"observability\"}",
+          "query": "scrape_duration_seconds{job=\"observability\"}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "platform-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 3,
+      "title": "本地告警状态",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "platform-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 8,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "ALERTS{alertstate=~\"pending|firing\"}",
+          "query": "ALERTS{alertstate=~\"pending|firing\"}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "platform-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 4,
+      "title": "处置入口",
+      "type": "text",
+      "gridPos": {
+        "x": 0,
+        "y": 16,
+        "w": 24,
+        "h": 4
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "API ready 依赖真实 PostgreSQL，内部健康密钥由编排注入。Grafana/采集端口只回环与隔离网络；不要把探针密码复制到面板。若心跳过期，先确认 API 进程，再查 Alloy 管道和下游就绪。故障/恢复证据查询 Prometheus `/api/v1/alerts` 与 `ALERTS`。"
+      }
+    }
+  ]
+}

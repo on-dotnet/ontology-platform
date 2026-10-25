@@ -1,0 +1,23 @@
+{
+  "argv": [
+    "docker",
+    "run",
+    "--rm",
+    "--network",
+    "none",
+    "--mount",
+    "type=bind,src=/Users/chasen/.codex/worktrees/g1-wave2-obs/ontology-platform/infra/observability/prometheus/prometheus.yaml,dst=/etc/prometheus/prometheus.yaml,readonly",
+    "--mount",
+    "type=bind,src=/Users/chasen/.codex/worktrees/g1-wave2-obs/ontology-platform/infra/observability/prometheus/alerts.yaml,dst=/etc/prometheus/alerts.yaml,readonly",
+    "--entrypoint",
+    "/bin/promtool",
+    "prom/prometheus:v3.15.1@sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2",
+    "check",
+    "config",
+    "/etc/prometheus/prometheus.yaml"
+  ],
+  "startedAtUtc": "2026-10-25T05:52:41.998518+00:00",
+  "exitCode": 0,
+  "stdout": "Checking /etc/prometheus/prometheus.yaml\n  SUCCESS: 1 rule files found\n SUCCESS: /etc/prometheus/prometheus.yaml is valid prometheus config file syntax\n\nChecking /etc/prometheus/alerts.yaml\n  SUCCESS: 2 rules found\n\n",
+  "stderr": ""
+}

@@ -1,0 +1,68 @@
+{
+  "name": "alloy",
+  "version": "v1.21.2",
+  "image": "grafana/alloy:v1.21.2",
+  "license": {
+    "url": "https://raw.githubusercontent.com/grafana/alloy/v1.21.2/LICENSE",
+    "httpStatus": 200,
+    "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "firstLines": [
+      "",
+      "                                 Apache License",
+      "                           Version 2.0, January 2004",
+      "                        http://www.apache.org/licenses/",
+      ""
+    ]
+  },
+  "observedAtUtc": "2026-10-25T05:46:09.913108+00:00",
+  "fullImageCveScan": "NOT_VERIFIED",
+  "fullImageSbom": "NOT_VERIFIED",
+  "signatureVerification": "NOT_VERIFIED",
+  "release": {
+    "url": "https://api.github.com/repos/grafana/alloy/releases/tags/v1.21.2",
+    "httpStatus": 200,
+    "sha256": "20ea48d1585f54d1c16ce89dc60e24e1cfbee3c978368184a759f0d37af8c107",
+    "tag_name": "v1.21.2",
+    "html_url": "https://github.com/grafana/alloy/releases/tag/v1.21.2",
+    "published_at": "2026-10-22T23:47:12Z",
+    "prerelease": false,
+    "draft": false
+  },
+  "indexCommand": {
+    "argv": [
+      "docker",
+      "buildx",
+      "imagetools",
+      "inspect",
+      "grafana/alloy:v1.21.2",
+      "--raw"
+    ],
+    "exitCode": 0,
+    "stderr": ""
+  },
+  "arm64": [
+    {
+      "mediaType": "application/vnd.oci.image.manifest.v1+json",
+      "digest": "sha256:c760b7384b5f06f05cbd9a6e2cc3e5f60d5527d9437b03017dca0473df2d8c83",
+      "size": 1622,
+      "platform": {
+        "architecture": "arm64",
+        "os": "linux"
+      }
+    }
+  ],
+  "digestCommand": {
+    "argv": [
+      "docker",
+      "buildx",
+      "imagetools",
+      "inspect",
+      "grafana/alloy:v1.21.2",
+      "--format",
+      "{{.Manifest.Digest}}"
+    ],
+    "exitCode": 0,
+    "stderr": ""
+  },
+  "indexDigest": "sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18"
+}

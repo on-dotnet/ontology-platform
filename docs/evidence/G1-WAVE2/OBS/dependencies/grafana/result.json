@@ -1,0 +1,68 @@
+{
+  "name": "grafana",
+  "version": "v13.2.4",
+  "image": "grafana/grafana:13.2.4",
+  "license": {
+    "url": "https://raw.githubusercontent.com/grafana/grafana/v13.2.4/LICENSE",
+    "httpStatus": 200,
+    "sha256": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0",
+    "firstLines": [
+      "                    GNU AFFERO GENERAL PUBLIC LICENSE",
+      "                       Version 3, 19 November 2007",
+      "",
+      " Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/>",
+      " Everyone is permitted to copy and distribute verbatim copies"
+    ]
+  },
+  "observedAtUtc": "2026-10-25T05:46:09.913278+00:00",
+  "fullImageCveScan": "NOT_VERIFIED",
+  "fullImageSbom": "NOT_VERIFIED",
+  "signatureVerification": "NOT_VERIFIED",
+  "release": {
+    "url": "https://api.github.com/repos/grafana/grafana/releases/tags/v13.2.4",
+    "httpStatus": 200,
+    "sha256": "47ecb81efc709f5b0c6a30ac31d8a970465e7e2f93cd3b8ade49ca391485443b",
+    "tag_name": "v13.2.4",
+    "html_url": "https://github.com/grafana/grafana/releases/tag/v13.2.4",
+    "published_at": "2026-10-13T11:41:03Z",
+    "prerelease": false,
+    "draft": false
+  },
+  "indexCommand": {
+    "argv": [
+      "docker",
+      "buildx",
+      "imagetools",
+      "inspect",
+      "grafana/grafana:13.2.4",
+      "--raw"
+    ],
+    "exitCode": 0,
+    "stderr": ""
+  },
+  "arm64": [
+    {
+      "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+      "size": 2617,
+      "digest": "sha256:15254b507dd6da013d57af4fc7e902721110b70d37282ab9ae866290803bd752",
+      "platform": {
+        "architecture": "arm64",
+        "os": "linux"
+      }
+    }
+  ],
+  "digestCommand": {
+    "argv": [
+      "docker",
+      "buildx",
+      "imagetools",
+      "inspect",
+      "grafana/grafana:13.2.4",
+      "--format",
+      "{{.Manifest.Digest}}"
+    ],
+    "exitCode": 0,
+    "stderr": ""
+  },
+  "indexDigest": "sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f"
+}

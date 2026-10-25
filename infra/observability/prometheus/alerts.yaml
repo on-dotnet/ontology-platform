@@ -1,0 +1,23 @@
+# 本地Prometheus规则/API即为可验证通知记录，不配置外发收件人。
+groups:
+  - name: 平台开发依赖
+    interval: 10s
+    rules:
+      - alert: 观测依赖不可用
+        expr: up{job="observability"} == 0
+        for: 20s
+        labels:
+          severity: warning
+          environment: Development
+        annotations:
+          summary: "观测依赖 {{ $labels.instance }} 不可用"
+          description: "受控停启后观察pending/firing与恢复，禁止以Running代替数据就绪。"
+      - alert: 平台心跳停止
+        expr: (time() - max(platform_heartbeat{service_name="ontology-platform-api"}) > 25) or absent(max(platform_heartbeat{service_name="ontology-platform-api"}))
+        for: 20s
+        labels:
+          severity: warning
+          environment: Development
+        annotations:
+          summary: "平台API心跳过期或缺失"
+          description: "检查API进程与OTLP链路；开发心跳每5秒导出，超过25秒且持续20秒告警，非生产SLO。"

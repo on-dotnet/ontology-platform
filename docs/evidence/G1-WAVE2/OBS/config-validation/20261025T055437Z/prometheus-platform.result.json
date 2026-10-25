@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "docker",
+    "image",
+    "inspect",
+    "prom/prometheus:v3.15.1@sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2",
+    "--format",
+    "{{json .Os}} {{json .Architecture}} {{json .Config.User}}"
+  ],
+  "startedAtUtc": "2026-10-25T05:54:37.931728+00:00",
+  "exitCode": 0,
+  "stdout": "\"linux\" \"arm64\" \"nobody\"\n",
+  "stderr": ""
+}

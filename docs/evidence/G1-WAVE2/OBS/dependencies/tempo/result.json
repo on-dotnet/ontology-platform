@@ -1,0 +1,68 @@
+{
+  "name": "tempo",
+  "version": "v3.1.1",
+  "image": "grafana/tempo:3.1.1",
+  "license": {
+    "url": "https://raw.githubusercontent.com/grafana/tempo/v3.1.1/LICENSE",
+    "httpStatus": 200,
+    "sha256": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0",
+    "firstLines": [
+      "                    GNU AFFERO GENERAL PUBLIC LICENSE",
+      "                       Version 3, 19 November 2007",
+      "",
+      " Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/>",
+      " Everyone is permitted to copy and distribute verbatim copies"
+    ]
+  },
+  "observedAtUtc": "2026-10-25T05:46:09.913183+00:00",
+  "fullImageCveScan": "NOT_VERIFIED",
+  "fullImageSbom": "NOT_VERIFIED",
+  "signatureVerification": "NOT_VERIFIED",
+  "release": {
+    "url": "https://api.github.com/repos/grafana/tempo/releases/tags/v3.1.1",
+    "httpStatus": 200,
+    "sha256": "fdab53b53319f8a5c1da0dddc73792771e8987f7b33296e4c6373baa8ceeb2fd",
+    "tag_name": "v3.1.1",
+    "html_url": "https://github.com/grafana/tempo/releases/tag/v3.1.1",
+    "published_at": "2026-10-21T17:02:10Z",
+    "prerelease": false,
+    "draft": false
+  },
+  "indexCommand": {
+    "argv": [
+      "docker",
+      "buildx",
+      "imagetools",
+      "inspect",
+      "grafana/tempo:3.1.1",
+      "--raw"
+    ],
+    "exitCode": 0,
+    "stderr": ""
+  },
+  "arm64": [
+    {
+      "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+      "size": 3854,
+      "digest": "sha256:ef71057012c3135fce32cc227fb027d69b94b8d387f581242916f449199febc8",
+      "platform": {
+        "architecture": "arm64",
+        "os": "linux"
+      }
+    }
+  ],
+  "digestCommand": {
+    "argv": [
+      "docker",
+      "buildx",
+      "imagetools",
+      "inspect",
+      "grafana/tempo:3.1.1",
+      "--format",
+      "{{.Manifest.Digest}}"
+    ],
+    "exitCode": 0,
+    "stderr": ""
+  },
+  "indexDigest": "sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044"
+}

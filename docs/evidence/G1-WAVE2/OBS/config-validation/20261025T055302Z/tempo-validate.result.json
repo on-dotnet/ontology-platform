@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "docker",
+    "run",
+    "--rm",
+    "--network",
+    "none",
+    "--mount",
+    "type=bind,src=/Users/chasen/.codex/worktrees/g1-wave2-obs/ontology-platform/infra/observability/tempo/tempo.yaml,dst=/etc/tempo/tempo.yaml,readonly",
+    "grafana/tempo:3.1.1@sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044",
+    "-config.file=/etc/tempo/tempo.yaml",
+    "-config.verify=true"
+  ],
+  "startedAtUtc": "2026-10-25T05:53:02.033613+00:00",
+  "exitCode": 0,
+  "stdout": "",
+  "stderr": ""
+}

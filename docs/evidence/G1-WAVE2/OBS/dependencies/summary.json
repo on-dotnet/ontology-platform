@@ -1,0 +1,332 @@
+[
+  {
+    "name": "alloy",
+    "version": "v1.21.2",
+    "image": "grafana/alloy:v1.21.2",
+    "license": {
+      "url": "https://raw.githubusercontent.com/grafana/alloy/v1.21.2/LICENSE",
+      "httpStatus": 200,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "firstLines": [
+        "",
+        "                                 Apache License",
+        "                           Version 2.0, January 2004",
+        "                        http://www.apache.org/licenses/",
+        ""
+      ]
+    },
+    "observedAtUtc": "2026-10-25T05:46:09.913108+00:00",
+    "fullImageCveScan": "NOT_VERIFIED",
+    "fullImageSbom": "NOT_VERIFIED",
+    "signatureVerification": "NOT_VERIFIED",
+    "release": {
+      "url": "https://api.github.com/repos/grafana/alloy/releases/tags/v1.21.2",
+      "httpStatus": 200,
+      "sha256": "20ea48d1585f54d1c16ce89dc60e24e1cfbee3c978368184a759f0d37af8c107",
+      "tag_name": "v1.21.2",
+      "html_url": "https://github.com/grafana/alloy/releases/tag/v1.21.2",
+      "published_at": "2026-10-22T23:47:12Z",
+      "prerelease": false,
+      "draft": false
+    },
+    "indexCommand": {
+      "argv": [
+        "docker",
+        "buildx",
+        "imagetools",
+        "inspect",
+        "grafana/alloy:v1.21.2",
+        "--raw"
+      ],
+      "exitCode": 0
+    },
+    "arm64": [
+      {
+        "mediaType": "application/vnd.oci.image.manifest.v1+json",
+        "digest": "sha256:c760b7384b5f06f05cbd9a6e2cc3e5f60d5527d9437b03017dca0473df2d8c83",
+        "size": 1622,
+        "platform": {
+          "architecture": "arm64",
+          "os": "linux"
+        }
+      }
+    ],
+    "digestCommand": {
+      "argv": [
+        "docker",
+        "buildx",
+        "imagetools",
+        "inspect",
+        "grafana/alloy:v1.21.2",
+        "--format",
+        "{{.Manifest.Digest}}"
+      ],
+      "exitCode": 0
+    },
+    "indexDigest": "sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18"
+  },
+  {
+    "name": "loki",
+    "version": "v3.7.9",
+    "image": "grafana/loki:3.7.9",
+    "license": {
+      "url": "https://raw.githubusercontent.com/grafana/loki/v3.7.9/LICENSE",
+      "httpStatus": 200,
+      "sha256": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0",
+      "firstLines": [
+        "                    GNU AFFERO GENERAL PUBLIC LICENSE",
+        "                       Version 3, 19 November 2007",
+        "",
+        " Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/>",
+        " Everyone is permitted to copy and distribute verbatim copies"
+      ]
+    },
+    "observedAtUtc": "2026-10-25T05:46:09.912958+00:00",
+    "fullImageCveScan": "NOT_VERIFIED",
+    "fullImageSbom": "NOT_VERIFIED",
+    "signatureVerification": "NOT_VERIFIED",
+    "release": {
+      "url": "https://api.github.com/repos/grafana/loki/releases/tags/v3.7.9",
+      "httpStatus": 200,
+      "sha256": "a8a57c4caf967ad66c5a446ef4226b43347d2b4ae52be056681f90eed354ee7e",
+      "tag_name": "v3.7.9",
+      "html_url": "https://github.com/grafana/loki/releases/tag/v3.7.9",
+      "published_at": "2026-10-20T22:53:57Z",
+      "prerelease": false,
+      "draft": false
+    },
+    "indexCommand": {
+      "argv": [
+        "docker",
+        "buildx",
+        "imagetools",
+        "inspect",
+        "grafana/loki:3.7.9",
+        "--raw"
+      ],
+      "exitCode": 0
+    },
+    "arm64": [
+      {
+        "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+        "size": 4062,
+        "digest": "sha256:1a779c5f714e795ac698b125fc265ae97292f792a91535fa29726073d03d5580",
+        "platform": {
+          "architecture": "arm64",
+          "os": "linux"
+        }
+      }
+    ],
+    "digestCommand": {
+      "argv": [
+        "docker",
+        "buildx",
+        "imagetools",
+        "inspect",
+        "grafana/loki:3.7.9",
+        "--format",
+        "{{.Manifest.Digest}}"
+      ],
+      "exitCode": 0
+    },
+    "indexDigest": "sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28"
+  },
+  {
+    "name": "tempo",
+    "version": "v3.1.1",
+    "image": "grafana/tempo:3.1.1",
+    "license": {
+      "url": "https://raw.githubusercontent.com/grafana/tempo/v3.1.1/LICENSE",
+      "httpStatus": 200,
+      "sha256": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0",
+      "firstLines": [
+        "                    GNU AFFERO GENERAL PUBLIC LICENSE",
+        "                       Version 3, 19 November 2007",
+        "",
+        " Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/>",
+        " Everyone is permitted to copy and distribute verbatim copies"
+      ]
+    },
+    "observedAtUtc": "2026-10-25T05:46:09.913183+00:00",
+    "fullImageCveScan": "NOT_VERIFIED",
+    "fullImageSbom": "NOT_VERIFIED",
+    "signatureVerification": "NOT_VERIFIED",
+    "release": {
+      "url": "https://api.github.com/repos/grafana/tempo/releases/tags/v3.1.1",
+      "httpStatus": 200,
+      "sha256": "fdab53b53319f8a5c1da0dddc73792771e8987f7b33296e4c6373baa8ceeb2fd",
+      "tag_name": "v3.1.1",
+      "html_url": "https://github.com/grafana/tempo/releases/tag/v3.1.1",
+      "published_at": "2026-10-21T17:02:10Z",
+      "prerelease": false,
+      "draft": false
+    },
+    "indexCommand": {
+      "argv": [
+        "docker",
+        "buildx",
+        "imagetools",
+        "inspect",
+        "grafana/tempo:3.1.1",
+        "--raw"
+      ],
+      "exitCode": 0
+    },
+    "arm64": [
+      {
+        "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+        "size": 3854,
+        "digest": "sha256:ef71057012c3135fce32cc227fb027d69b94b8d387f581242916f449199febc8",
+        "platform": {
+          "architecture": "arm64",
+          "os": "linux"
+        }
+      }
+    ],
+    "digestCommand": {
+      "argv": [
+        "docker",
+        "buildx",
+        "imagetools",
+        "inspect",
+        "grafana/tempo:3.1.1",
+        "--format",
+        "{{.Manifest.Digest}}"
+      ],
+      "exitCode": 0
+    },
+    "indexDigest": "sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044"
+  },
+  {
+    "name": "prometheus",
+    "version": "v3.15.1",
+    "image": "prom/prometheus:v3.15.1",
+    "license": {
+      "url": "https://raw.githubusercontent.com/prometheus/prometheus/v3.15.1/LICENSE",
+      "httpStatus": 200,
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "firstLines": [
+        "                                 Apache License",
+        "                           Version 2.0, January 2004",
+        "                        http://www.apache.org/licenses/",
+        "",
+        "   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION"
+      ]
+    },
+    "observedAtUtc": "2026-10-25T05:46:09.913247+00:00",
+    "fullImageCveScan": "NOT_VERIFIED",
+    "fullImageSbom": "NOT_VERIFIED",
+    "signatureVerification": "NOT_VERIFIED",
+    "release": {
+      "url": "https://api.github.com/repos/prometheus/prometheus/releases/tags/v3.15.1",
+      "httpStatus": 200,
+      "sha256": "a4233379b892c8118bc8e159fe48dade71b55f7f121d5d56b2cb2e1714330320",
+      "tag_name": "v3.15.1",
+      "html_url": "https://github.com/prometheus/prometheus/releases/tag/v3.15.1",
+      "published_at": "2026-10-21T16:15:57Z",
+      "prerelease": false,
+      "draft": false
+    },
+    "indexCommand": {
+      "argv": [
+        "docker",
+        "buildx",
+        "imagetools",
+        "inspect",
+        "prom/prometheus:v3.15.1",
+        "--raw"
+      ],
+      "exitCode": 0
+    },
+    "arm64": [
+      {
+        "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+        "size": 2198,
+        "digest": "sha256:13020b7e520d56fef031135b91f5635888de441d6c4cfda3608bfbf6f4916dcb",
+        "platform": {
+          "architecture": "arm64",
+          "os": "linux"
+        }
+      }
+    ],
+    "digestCommand": {
+      "argv": [
+        "docker",
+        "buildx",
+        "imagetools",
+        "inspect",
+        "prom/prometheus:v3.15.1",
+        "--format",
+        "{{.Manifest.Digest}}"
+      ],
+      "exitCode": 0
+    },
+    "indexDigest": "sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2"
+  },
+  {
+    "name": "grafana",
+    "version": "v13.2.4",
+    "image": "grafana/grafana:13.2.4",
+    "license": {
+      "url": "https://raw.githubusercontent.com/grafana/grafana/v13.2.4/LICENSE",
+      "httpStatus": 200,
+      "sha256": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0",
+      "firstLines": [
+        "                    GNU AFFERO GENERAL PUBLIC LICENSE",
+        "                       Version 3, 19 November 2007",
+        "",
+        " Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/>",
+        " Everyone is permitted to copy and distribute verbatim copies"
+      ]
+    },
+    "observedAtUtc": "2026-10-25T05:46:09.913278+00:00",
+    "fullImageCveScan": "NOT_VERIFIED",
+    "fullImageSbom": "NOT_VERIFIED",
+    "signatureVerification": "NOT_VERIFIED",
+    "release": {
+      "url": "https://api.github.com/repos/grafana/grafana/releases/tags/v13.2.4",
+      "httpStatus": 200,
+      "sha256": "47ecb81efc709f5b0c6a30ac31d8a970465e7e2f93cd3b8ade49ca391485443b",
+      "tag_name": "v13.2.4",
+      "html_url": "https://github.com/grafana/grafana/releases/tag/v13.2.4",
+      "published_at": "2026-10-13T11:41:03Z",
+      "prerelease": false,
+      "draft": false
+    },
+    "indexCommand": {
+      "argv": [
+        "docker",
+        "buildx",
+        "imagetools",
+        "inspect",
+        "grafana/grafana:13.2.4",
+        "--raw"
+      ],
+      "exitCode": 0
+    },
+    "arm64": [
+      {
+        "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+        "size": 2617,
+        "digest": "sha256:15254b507dd6da013d57af4fc7e902721110b70d37282ab9ae866290803bd752",
+        "platform": {
+          "architecture": "arm64",
+          "os": "linux"
+        }
+      }
+    ],
+    "digestCommand": {
+      "argv": [
+        "docker",
+        "buildx",
+        "imagetools",
+        "inspect",
+        "grafana/grafana:13.2.4",
+        "--format",
+        "{{.Manifest.Digest}}"
+      ],
+      "exitCode": 0
+    },
+    "indexDigest": "sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f"
+  }
+]

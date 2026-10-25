@@ -1,0 +1,195 @@
+{
+  "uid": "platform-api",
+  "title": "平台运维 · API性能",
+  "schemaVersion": 41,
+  "version": 1,
+  "editable": false,
+  "tags": [
+    "平台运维",
+    "开发环境"
+  ],
+  "timezone": "browser",
+  "refresh": "10s",
+  "time": {
+    "from": "now-15m",
+    "to": "now"
+  },
+  "annotations": {
+    "list": []
+  },
+  "links": [
+    {
+      "title": "系统总览",
+      "type": "link",
+      "url": "/d/platform-overview",
+      "keepTime": true
+    },
+    {
+      "title": "API性能",
+      "type": "link",
+      "url": "/d/platform-api",
+      "keepTime": true
+    },
+    {
+      "title": "依赖健康",
+      "type": "link",
+      "url": "/d/platform-dependencies",
+      "keepTime": true
+    },
+    {
+      "title": "错误与Trace",
+      "type": "link",
+      "url": "/d/platform-errors",
+      "keepTime": true
+    }
+  ],
+  "templating": {
+    "list": []
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "按状态类别请求速率",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "platform-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (status_class) (rate(platform_requests_total{service_name=\"ontology-platform-api\"}[1m]))",
+          "query": "sum by (status_class) (rate(platform_requests_total{service_name=\"ontology-platform-api\"}[1m]))",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "platform-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 2,
+      "title": "HTTP P95耗时",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "platform-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(http_server_request_duration_seconds_bucket{service_name=\"ontology-platform-api\"}[2m])))",
+          "query": "histogram_quantile(0.95, sum by (le) (rate(http_server_request_duration_seconds_bucket{service_name=\"ontology-platform-api\"}[2m])))",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "platform-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 3,
+      "title": "平台操作P95耗时",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "platform-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 8,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(platform_request_duration_seconds_bucket{service_name=\"ontology-platform-api\"}[2m])))",
+          "query": "histogram_quantile(0.95, sum by (le) (rate(platform_request_duration_seconds_bucket{service_name=\"ontology-platform-api\"}[2m])))",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "platform-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 4,
+      "title": "按路由/方法请求（有限路由模板）",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "platform-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 8,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (http_route, http_request_method) (rate(http_server_request_duration_seconds_count{service_name=\"ontology-platform-api\"}[2m]))",
+          "query": "sum by (http_route, http_request_method) (rate(http_server_request_duration_seconds_count{service_name=\"ontology-platform-api\"}[2m]))",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "platform-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "options": {}
+    }
+  ]
+}
