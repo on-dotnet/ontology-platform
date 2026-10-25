@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Npgsql;
+using OpenTelemetry;
 
 namespace OntologyPlatform.SecurityTests;
 
@@ -214,6 +215,8 @@ public sealed class ObservabilityFailureTests
             }
             capture.AssertNoSensitiveData(SensitiveMarker);
             Assert.IsTrue(sink.Payloads.Any(payload => payload.Signal == "logs" && payload.Text.Contains("PlatformRequestFault", StringComparison.Ordinal)), "原生OTLP必须实际发送受控故障事件。");
+            // logs.proto字段12的LEN标签0x62与长度20精确定位event_name，不把body中的同名字符串当事件身份。
+            Assert.IsTrue(sink.Payloads.Any(payload => payload.Signal == "logs" && payload.Text.Contains("b\u0014PlatformRequestFault", StringComparison.Ordinal)), "实际OTLP顶层event_name必须保留正式LoggerMessage事件名称。");
             Assert.IsTrue(sink.Payloads.Any(payload => payload.Signal == "traces" && payload.Text.Contains("platform.exception.category", StringComparison.Ordinal)), "原生OTLP必须实际发送真实请求Span分类。");
             Assert.IsFalse(sink.Payloads.Any(payload => payload.Text.Contains(SensitiveMarker, StringComparison.Ordinal)), "OTLP原始protobuf出口包含合成秘密。");
         }
@@ -375,7 +378,7 @@ internal sealed class ObservabilityExportSink : IAsyncDisposable
     /// <summary>本测试独占的回环HTTP接收宿主。</summary>
     private readonly WebApplication app;
 
-    /// <summary>实际收到的日志、Span及指标protobuf字节的无损UTF8检索视图。</summary>
+    /// <summary>实际收到的日志、Span及指标protobuf字节的UTF8字符串检索视图。</summary>
     public ConcurrentBag<(string Signal, string Text)> Payloads { get; } = [];
 
     /// <summary>仅本测试进程使用的OTLP动态回环地址。</summary>
@@ -395,12 +398,31 @@ internal sealed class ObservabilityExportSink : IAsyncDisposable
         // 官方exporter按标准路径发送每个信号。
         var sink = new ObservabilityExportSink(builder.Build());
         sink.app.Urls.Add("http://127.0.0.1:0");
+        // 可选中继仅供独立Alloy边界fixture使用，限定本机回环，不访问完整栈或外部服务。
+        var relay = Environment.GetEnvironmentVariable("G1_OBS_NATIVE_LOG_RELAY");
+        if (relay is not null && (!Uri.TryCreate(relay, UriKind.Absolute, out var address) || !address.IsLoopback || address.Scheme != "http"))
+        {
+            throw new InvalidOperationException("测试中继必须是独立回环HTTP接收器。");
+        }
         sink.app.MapPost("/v1/{signal}", async (HttpContext context, string signal) =>
         {
             // 完整保留本测试合成protobuf，仅在内存检测秘密，绝不输出原始字节。
             using var bytes = new MemoryStream();
             await context.Request.Body.CopyToAsync(bytes);
             sink.Payloads.Add((signal, Encoding.UTF8.GetString(bytes.ToArray())));
+            if (signal == "logs" && relay is not null)
+            {
+                // 中继HTTP不能产生递归遥测；原始字节只在测试内存经独立Alloy处理。
+                using var suppression = SuppressInstrumentationScope.Begin();
+                // 每次fixture使用独立短生命周期连接，不复用产品客户端或凭据。
+                using var client = new HttpClient();
+                // 保持官方exporter实际protobuf字节，不重建或补造事件字段。
+                using var content = new ByteArrayContent(bytes.ToArray());
+                content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/x-protobuf");
+                // Python回环中继将相同字节送入随机端口Alloy，并只保存安全字段摘要。
+                using var response = await client.PostAsync(relay + "/v1/logs", content);
+                response.EnsureSuccessStatusCode();
+            }
             context.Response.ContentType = "application/x-protobuf";
             context.Response.StatusCode = 200;
         });

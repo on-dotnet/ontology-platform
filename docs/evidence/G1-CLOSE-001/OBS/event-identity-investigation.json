@@ -1,0 +1,35 @@
+{
+  "phase": "OBSERVED Master full LGTM failure before fix",
+  "sourcePath": "docs/evidence/G1-CLOSE-001/master/closeout-loki-investigation.json",
+  "sourceSha256": "357b850f430ef74bf02895cec5f8141cc0c1e901031e111b03c53744d66e665a",
+  "traceId": "22e6a80c6fc2a7c67630be18a37612e2",
+  "faultRecords": [
+    {
+      "stream": {
+        "ExceptionCategory": "database_write",
+        "Outcome": "problem_returned",
+        "Route": "/api/v1/platform/audit",
+        "Status": "503",
+        "TraceId": "22e6a80c6fc2a7c67630be18a37612e2",
+        "deployment_environment_name": "development",
+        "detected_level": "error",
+        "flags": "1",
+        "observed_timestamp": "1792941050007341000",
+        "scope_name": "OntologyPlatform.Api",
+        "service_name": "ontology-platform-api",
+        "service_version": "G1-WAVE2",
+        "severity_number": "17",
+        "severity_text": "Error",
+        "span_id": "d7fa7a3b10234e9b",
+        "trace_id": "22e6a80c6fc2a7c67630be18a37612e2"
+      },
+      "values": [
+        [
+          "1792941050007341000",
+          "PlatformTelemetry"
+        ]
+      ]
+    }
+  ],
+  "observation": "Fault status/category/outcome present; fixed event body and EventName/EventId metadata absent."
+}
