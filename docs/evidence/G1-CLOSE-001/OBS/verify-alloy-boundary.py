@@ -12,6 +12,7 @@ from urllib.request import Request, build_opener, ProxyHandler
 
 ROOT = Path(__file__).resolve().parents[4]
 IMAGE = 'grafana/alloy:v1.21.2@sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18'
+FROZEN_BASELINE = '1cbfcf3b3807a49003c0054fa618108a4c1a63a0'
 MARKER = 'synthetic-alloy-body-status-event-secret-marker'
 received = {}
 
@@ -41,8 +42,8 @@ def main():
     name = 'g1-close-obs-alloy-' + secrets.token_hex(5)
     host = 'http://host.docker.internal:' + str(server.server_port)
     checks = []
-    output = {'image': IMAGE, 'checks': checks, 'status': 'FAIL'}
-    target = ROOT / 'docs/evidence/G1-CLOSE-001/OBS/alloy-runtime.json'
+    output = {'image': IMAGE, 'configurationBaselineSha': FROZEN_BASELINE, 'checks': checks, 'status': 'FAIL'}
+    target = ROOT / 'docs/evidence/G1-CLOSE-001/OBS/alloy-runtime-baseline.json'
     try:
         args = ['docker', 'run', '--detach', '--name', name, '--publish', '127.0.0.1::4318',
                 '--env', 'LOKI_OTLP_ENDPOINT=' + host + '/loki', '--env', 'TEMPO_OTLP_ENDPOINT=' + host + '/tempo',
@@ -89,7 +90,7 @@ def main():
             {'name': 'wrong-case-fields-removed', 'pass': b'routeWrongCase' not in log_bytes},
             {'name': 'span-safe-category-retained', 'pass': b'platform.exception.category' in span_bytes and b'database_connection' in span_bytes},
             {'name': 'span-event-normalized', 'pass': b'platform.event' in span_bytes and b'exception.stacktrace' not in span_bytes},
-            {'name': 'three-loki-index-labels-unchanged', 'pass': subprocess.run(['git', 'diff', '--exit-code', '--', 'infra/observability/loki/loki.yaml'], cwd=ROOT, stdout=subprocess.DEVNULL).returncode == 0}
+            {'name': 'loki-index-configuration-unchanged-from-frozen-baseline', 'pass': subprocess.run(['git', 'diff', '--exit-code', FROZEN_BASELINE, '--', 'infra/observability/loki/loki.yaml'], cwd=ROOT, stdout=subprocess.DEVNULL).returncode == 0}
         ]
         output['status'] = 'PASS' if all(check['pass'] for check in checks) else 'FAIL'
         print(json.dumps(output, ensure_ascii=False, indent=2))
