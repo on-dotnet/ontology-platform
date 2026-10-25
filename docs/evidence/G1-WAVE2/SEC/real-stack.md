@@ -27,6 +27,7 @@
 | `dotnet test --project backend/tests/OntologyPlatform.SecurityTests/OntologyPlatform.SecurityTests.csproj --no-restore`（显式注入PG和Keycloak本轮配置） | exit0，**11/11 PASS，0跳过**；real-pg-par-tests.txt |
 | 正式OnPushAuthorization真实网络验证 | 独立正式Kestrel向本轮真实KC发PAR，安全内存捕获确认五布尔全True；302有request_uri无state/nonce；不HandlePush/SkipPush、不替换网络。单元合成标记不入日志；par-csharp-red.txt为新增事件RED |
 | PG票据/共享keyring/审计 | 两个独立服务容器用同测试共享证书与keyring，无内存会话缓存；真实PG密文不含合成token、最长30分钟、撤销后不可读且renew不复活、过期不可读、登录/注销审计实际存在。清理仅测试创建的会话与合成审计；不冒充OIDC或容器重启 |
+| HTTP过期Cookie增量 | 独立随机端口PG18容器，使用Master已生成迁移；正式Kestrel和内置Cookie处理器先返回200，随后仅以本测试store key更新PG失效时间，同一仍可解密Cookie返回401/application/problem+json、no-store与trace/correlation。PostgresSessionTests 2/2、零跳过，exit0；expired-cookie-http.txt；format/SelfTest exit0分别见expired-cookie-format.txt、expired-cookie-selftest.txt。测试只清自身行/合成审计，容器已删除，无共享服务或会话更改；不冒充OIDC过期浏览器验收。 |
 | Python离线/helper测试 | exit0，8/8；含bootstrap真实本地HTTP/0600文件正例、目标/redirect/form边界、PAR引用、Secure-localhost例外范围；par-python-green.txt |
 | format / SelfTest | 实际输出分别par-format.txt / real-stack-selftest.txt；最终状态以输出为准 |
 
