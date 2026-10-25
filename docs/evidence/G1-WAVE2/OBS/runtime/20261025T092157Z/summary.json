@@ -1,0 +1,129 @@
+{
+  "atUtc": "2026-10-25T09:22:17.071489+00:00",
+  "capture": "integration",
+  "traceIds": [
+    "3fa54963b5df943e4cb65823d28313dd",
+    "d8d80b8732fc319df53c2aa83e681741"
+  ],
+  "checks": [
+    {
+      "check": "loki-ready",
+      "status": "PASS",
+      "detail": {
+        "httpStatus": 200
+      }
+    },
+    {
+      "check": "tempo-ready",
+      "status": "PASS",
+      "detail": {
+        "httpStatus": 200
+      }
+    },
+    {
+      "check": "prometheus-ready",
+      "status": "PASS",
+      "detail": {
+        "httpStatus": 200
+      }
+    },
+    {
+      "check": "grafana-ready",
+      "status": "PASS",
+      "detail": {
+        "httpStatus": 200
+      }
+    },
+    {
+      "check": "api-1-actual-request",
+      "status": "PASS",
+      "detail": {
+        "httpStatus": 401,
+        "traceId": "3fa54963b5df943e4cb65823d28313dd",
+        "audit": "NOT_RUN: anonymous me has no resource audit"
+      }
+    },
+    {
+      "check": "api-2-actual-request",
+      "status": "PASS",
+      "detail": {
+        "httpStatus": 401,
+        "traceId": "d8d80b8732fc319df53c2aa83e681741",
+        "audit": "NOT_RUN: anonymous me has no resource audit"
+      }
+    },
+    {
+      "check": "loki-same-trace-3fa54963b5df943e4cb65823d28313dd",
+      "status": "FAIL",
+      "error": "Unexpected index labels: TraceId,detected_level,flags,observed_timestamp,scope_name,severity_number,severity_text,span_id,trace_id"
+    },
+    {
+      "check": "tempo-same-trace-3fa54963b5df943e4cb65823d28313dd",
+      "status": "PASS",
+      "detail": {
+        "traceId": "3fa54963b5df943e4cb65823d28313dd"
+      }
+    },
+    {
+      "check": "loki-same-trace-d8d80b8732fc319df53c2aa83e681741",
+      "status": "FAIL",
+      "error": "Unexpected index labels: TraceId,detected_level,flags,observed_timestamp,scope_name,severity_number,severity_text,span_id,trace_id"
+    },
+    {
+      "check": "tempo-same-trace-d8d80b8732fc319df53c2aa83e681741",
+      "status": "PASS",
+      "detail": {
+        "traceId": "d8d80b8732fc319df53c2aa83e681741"
+      }
+    },
+    {
+      "check": "prometheus-low-cardinality",
+      "status": "PASS",
+      "detail": {
+        "seriesCount": 954,
+        "labelNames": [
+          "__name__",
+          "deployment_environment_name",
+          "http_request_method",
+          "http_response_status_code",
+          "http_route",
+          "instance",
+          "job",
+          "le",
+          "route",
+          "service_name",
+          "service_version",
+          "status_class"
+        ]
+      }
+    },
+    {
+      "check": "prometheus-two-instances-then-sum",
+      "status": "PASS",
+      "detail": {
+        "instanceTotals": {
+          "platform-api-1": 107.0,
+          "platform-api-2": 12.0
+        },
+        "sum": 119.0,
+        "sampleTime": "1792920136.06764"
+      }
+    },
+    {
+      "check": "prometheus-alert-snapshot",
+      "status": "PASS",
+      "detail": {
+        "alerts": [],
+        "faultInjection": "NOT_RUN: Master owns lifecycle"
+      }
+    },
+    {
+      "check": "grafana-authenticated-provisioning",
+      "status": "NOT_RUN",
+      "reason": "Master must inject process-only WAVE2_GRAFANA_PASSWORD"
+    }
+  ],
+  "screenshots": "NOT_RUN",
+  "persistence": "NOT_RUN",
+  "status": "PARTIAL"
+}

@@ -1,0 +1,120 @@
+{
+  "atUtc": "2026-10-25T09:22:49.091921+00:00",
+  "method": "POST",
+  "url": "http://localhost:15330/api/ds/query",
+  "httpStatus": 200,
+  "responseHeaders": {
+    "Content-Type": "application/json"
+  },
+  "response": {
+    "results": {
+      "A": {
+        "status": 200,
+        "frames": [
+          {
+            "schema": {
+              "refId": "A",
+              "meta": {
+                "type": "numeric-multi",
+                "typeVersion": [
+                  0,
+                  1
+                ],
+                "custom": {
+                  "calculatedMinStep": 10000,
+                  "resultType": "vector"
+                },
+                "executedQueryString": "Expr: sum by (instance) (platform_requests_total{service_name=\"ontology-platform-api\"})\nStep: 10s"
+              },
+              "fields": [
+                {
+                  "name": "Time",
+                  "type": "time",
+                  "typeInfo": {
+                    "frame": "time.Time"
+                  },
+                  "config": {
+                    "interval": 10000
+                  }
+                },
+                {
+                  "name": "Value",
+                  "type": "number",
+                  "typeInfo": {
+                    "frame": "float64"
+                  },
+                  "labels": {
+                    "instance": "platform-api-1"
+                  },
+                  "config": {
+                    "displayNameFromDS": "{instance=\"platform-api-1\"}"
+                  }
+                }
+              ]
+            },
+            "data": {
+              "values": [
+                [
+                  1792920169091
+                ],
+                [
+                  108
+                ]
+              ]
+            }
+          },
+          {
+            "schema": {
+              "refId": "A",
+              "meta": {
+                "type": "numeric-multi",
+                "typeVersion": [
+                  0,
+                  1
+                ],
+                "custom": {
+                  "resultType": "vector"
+                }
+              },
+              "fields": [
+                {
+                  "name": "Time",
+                  "type": "time",
+                  "typeInfo": {
+                    "frame": "time.Time"
+                  },
+                  "config": {
+                    "interval": 10000
+                  }
+                },
+                {
+                  "name": "Value",
+                  "type": "number",
+                  "typeInfo": {
+                    "frame": "float64"
+                  },
+                  "labels": {
+                    "instance": "platform-api-2"
+                  },
+                  "config": {
+                    "displayNameFromDS": "{instance=\"platform-api-2\"}"
+                  }
+                }
+              ]
+            },
+            "data": {
+              "values": [
+                [
+                  1792920169091
+                ],
+                [
+                  13
+                ]
+              ]
+            }
+          }
+        ]
+      }
+    }
+  }
+}

@@ -63,3 +63,7 @@ pwsh -NoProfile -File scripts/verify.ps1 -SelfTest
 ## 行为事件与 Faro 边界
 
 行为事件合同见[独立事件Schema](../../infra/observability/events/behavior-event.schema.json)：eventId/eventType/schemaVersion/occurredAtUtc/consent/scope/traceId。只有显式同意后采集，scope只包含获授权组织/厂区，不携带真实身份/业务正文/输入文本/完整URL或秘密；未同意时丢弃。未来Faro接收器必须由.NET授权、限流、同意/撤回与留存策略共同约束，使用专门分析存储及幂等eventId，不写普通运行日志冒充可靠Product Analytics。本轮只冻结接口，不实现Faro接收、完整分析或本体业务运维中心。
+
+## 真实查询证据入口
+
+统一AppHost运行后，使用 `python3 infra/observability/query-runtime.py --capture integration` 捕获真实匿名API请求与LGTM回查；查询既有Trace使用 `--capture query --trace-id 实际32位TraceId`。Master可仅向子进程注入 `WAVE2_GRAFANA_PASSWORD`，helper不会读秘密文件或保存认证头。运行目录不可覆盖，具体边界、退出码和未运行项见[查询计划](../evidence/G1-WAVE2/OBS/runtime-query-plan.md)。回归命令为 `PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s infra/observability/tests -v`。所选查询通过不代表截图、故障恢复、持久化或整个G1已通过。

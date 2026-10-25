@@ -1,0 +1,218 @@
+{
+  "atUtc": "2026-10-25T09:22:49.055093+00:00",
+  "method": "GET",
+  "url": "http://localhost:15330/api/dashboards/uid/platform-dependencies",
+  "httpStatus": 200,
+  "responseHeaders": {
+    "Content-Type": "application/json"
+  },
+  "response": {
+    "meta": {
+      "type": "db",
+      "canSave": true,
+      "canEdit": true,
+      "canAdmin": true,
+      "canStar": true,
+      "canDelete": true,
+      "slug": "2a00782",
+      "url": "/d/platform-dependencies/2a00782",
+      "expires": "0001-01-01T00:00:00Z",
+      "created": "2026-10-25T06:42:38Z",
+      "updated": "2026-10-25T06:42:38Z",
+      "updatedBy": "Anonymous",
+      "createdBy": "Anonymous",
+      "version": 1,
+      "hasAcl": false,
+      "isFolder": false,
+      "apiVersion": "v0alpha1",
+      "folderId": 2058011899867136,
+      "folderUid": "cg29pqosam5moa",
+      "folderTitle": "平台运维",
+      "folderUrl": "/dashboards/f/cg29pqosam5moa/e5b9b3-e58fb0-e8bf90-e7bbb4",
+      "provisioned": true,
+      "provisionedExternalId": "platform-dependencies.json",
+      "annotationsPermissions": {
+        "dashboard": {
+          "canAdd": true,
+          "canEdit": true,
+          "canDelete": true
+        }
+      }
+    },
+    "dashboard": {
+      "annotations": {
+        "list": []
+      },
+      "editable": false,
+      "id": 2058012273561600,
+      "links": [
+        {
+          "keepTime": true,
+          "title": "系统总览",
+          "type": "link",
+          "url": "/d/platform-overview"
+        },
+        {
+          "keepTime": true,
+          "title": "API性能",
+          "type": "link",
+          "url": "/d/platform-api"
+        },
+        {
+          "keepTime": true,
+          "title": "依赖健康",
+          "type": "link",
+          "url": "/d/platform-dependencies"
+        },
+        {
+          "keepTime": true,
+          "title": "错误与Trace",
+          "type": "link",
+          "url": "/d/platform-errors"
+        }
+      ],
+      "panels": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "platform-prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 0
+          },
+          "id": 1,
+          "options": {},
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "platform-prometheus"
+              },
+              "expr": "up{job=~\"observability|grafana\"}",
+              "query": "up{job=~\"observability|grafana\"}",
+              "refId": "A"
+            }
+          ],
+          "title": "采集目标实际健康（1=可抓取）",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "platform-prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "unit": "s"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 8
+          },
+          "id": 2,
+          "options": {},
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "platform-prometheus"
+              },
+              "expr": "scrape_duration_seconds{job=\"observability\"}",
+              "query": "scrape_duration_seconds{job=\"observability\"}",
+              "refId": "A"
+            }
+          ],
+          "title": "采集耗时",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "platform-prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 8
+          },
+          "id": 3,
+          "options": {},
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "platform-prometheus"
+              },
+              "expr": "ALERTS{alertstate=~\"pending|firing\"}",
+              "query": "ALERTS{alertstate=~\"pending|firing\"}",
+              "refId": "A"
+            }
+          ],
+          "title": "本地告警状态",
+          "type": "timeseries"
+        },
+        {
+          "gridPos": {
+            "h": 4,
+            "w": 24,
+            "x": 0,
+            "y": 16
+          },
+          "id": 4,
+          "options": {
+            "content": "API ready 依赖真实 PostgreSQL，内部健康密钥由编排注入。Grafana/采集端口只回环与隔离网络；不要把探针密码复制到面板。若心跳过期，先确认 API 进程，再查 Alloy 管道和下游就绪。故障/恢复证据查询 Prometheus `/api/v1/alerts` 与 `ALERTS`。",
+            "mode": "markdown"
+          },
+          "title": "处置入口",
+          "type": "text"
+        }
+      ],
+      "refresh": "10s",
+      "schemaVersion": 41,
+      "tags": [
+        "平台运维",
+        "开发环境"
+      ],
+      "templating": {
+        "list": []
+      },
+      "time": {
+        "from": "now-15m",
+        "to": "now"
+      },
+      "timezone": "browser",
+      "title": "平台运维 · 依赖健康",
+      "uid": "platform-dependencies",
+      "version": 1
+    }
+  }
+}

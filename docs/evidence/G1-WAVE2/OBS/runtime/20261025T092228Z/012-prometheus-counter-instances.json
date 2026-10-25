@@ -1,0 +1,273 @@
+{
+  "atUtc": "2026-10-25T09:22:49.024444+00:00",
+  "method": "GET",
+  "url": "http://localhost:19095/api/v1/query?query=platform_requests_total%7Bservice_name%3D%22ontology-platform-api%22%7D&time=1792920168.024399",
+  "httpStatus": 200,
+  "responseHeaders": {
+    "Content-Type": "application/json"
+  },
+  "response": {
+    "status": "success",
+    "data": {
+      "resultType": "vector",
+      "result": [
+        {
+          "metric": {
+            "__name__": "platform_requests_total",
+            "deployment_environment_name": "development",
+            "instance": "platform-api-1",
+            "job": "ontology-platform-api",
+            "route": "/api/v1/platform/me",
+            "service_name": "ontology-platform-api",
+            "service_version": "G1-WAVE2",
+            "status_class": "4xx"
+          },
+          "value": [
+            1792920168.024,
+            "29"
+          ]
+        },
+        {
+          "metric": {
+            "__name__": "platform_requests_total",
+            "deployment_environment_name": "development",
+            "instance": "platform-api-1",
+            "job": "ontology-platform-api",
+            "route": "/auth/login",
+            "service_name": "ontology-platform-api",
+            "service_version": "G1-WAVE2",
+            "status_class": "3xx"
+          },
+          "value": [
+            1792920168.024,
+            "13"
+          ]
+        },
+        {
+          "metric": {
+            "__name__": "platform_requests_total",
+            "deployment_environment_name": "development",
+            "instance": "platform-api-1",
+            "job": "ontology-platform-api",
+            "route": "/signin-oidc",
+            "service_name": "ontology-platform-api",
+            "service_version": "G1-WAVE2",
+            "status_class": "4xx"
+          },
+          "value": [
+            1792920168.024,
+            "7"
+          ]
+        },
+        {
+          "metric": {
+            "__name__": "platform_requests_total",
+            "deployment_environment_name": "development",
+            "instance": "platform-api-2",
+            "job": "ontology-platform-api",
+            "route": "/api/v1/platform/me",
+            "service_name": "ontology-platform-api",
+            "service_version": "G1-WAVE2",
+            "status_class": "2xx"
+          },
+          "value": [
+            1792920168.024,
+            "6"
+          ]
+        },
+        {
+          "metric": {
+            "__name__": "platform_requests_total",
+            "deployment_environment_name": "development",
+            "instance": "platform-api-1",
+            "job": "ontology-platform-api",
+            "route": "/signin-oidc",
+            "service_name": "ontology-platform-api",
+            "service_version": "G1-WAVE2",
+            "status_class": "3xx"
+          },
+          "value": [
+            1792920168.024,
+            "6"
+          ]
+        },
+        {
+          "metric": {
+            "__name__": "platform_requests_total",
+            "deployment_environment_name": "development",
+            "instance": "platform-api-1",
+            "job": "ontology-platform-api",
+            "route": "/api/v1/platform/me",
+            "service_name": "ontology-platform-api",
+            "service_version": "G1-WAVE2",
+            "status_class": "2xx"
+          },
+          "value": [
+            1792920168.024,
+            "6"
+          ]
+        },
+        {
+          "metric": {
+            "__name__": "platform_requests_total",
+            "deployment_environment_name": "development",
+            "instance": "platform-api-1",
+            "job": "ontology-platform-api",
+            "route": "/api/v1/platform/resources",
+            "service_name": "ontology-platform-api",
+            "service_version": "G1-WAVE2",
+            "status_class": "2xx"
+          },
+          "value": [
+            1792920168.024,
+            "4"
+          ]
+        },
+        {
+          "metric": {
+            "__name__": "platform_requests_total",
+            "deployment_environment_name": "development",
+            "instance": "platform-api-1",
+            "job": "ontology-platform-api",
+            "route": "/api/v1/platform/resources",
+            "service_name": "ontology-platform-api",
+            "service_version": "G1-WAVE2",
+            "status_class": "4xx"
+          },
+          "value": [
+            1792920168.024,
+            "6"
+          ]
+        },
+        {
+          "metric": {
+            "__name__": "platform_requests_total",
+            "deployment_environment_name": "development",
+            "instance": "platform-api-1",
+            "job": "ontology-platform-api",
+            "route": "/api/v1/platform/resources/{id}",
+            "service_name": "ontology-platform-api",
+            "service_version": "G1-WAVE2",
+            "status_class": "4xx"
+          },
+          "value": [
+            1792920168.024,
+            "8"
+          ]
+        },
+        {
+          "metric": {
+            "__name__": "platform_requests_total",
+            "deployment_environment_name": "development",
+            "instance": "platform-api-1",
+            "job": "ontology-platform-api",
+            "route": "/api/v1/platform/audit",
+            "service_name": "ontology-platform-api",
+            "service_version": "G1-WAVE2",
+            "status_class": "4xx"
+          },
+          "value": [
+            1792920168.024,
+            "6"
+          ]
+        },
+        {
+          "metric": {
+            "__name__": "platform_requests_total",
+            "deployment_environment_name": "development",
+            "instance": "platform-api-1",
+            "job": "ontology-platform-api",
+            "route": "/auth/logout",
+            "service_name": "ontology-platform-api",
+            "service_version": "G1-WAVE2",
+            "status_class": "4xx"
+          },
+          "value": [
+            1792920168.024,
+            "6"
+          ]
+        },
+        {
+          "metric": {
+            "__name__": "platform_requests_total",
+            "deployment_environment_name": "development",
+            "instance": "platform-api-1",
+            "job": "ontology-platform-api",
+            "route": "/auth/csrf",
+            "service_name": "ontology-platform-api",
+            "service_version": "G1-WAVE2",
+            "status_class": "2xx"
+          },
+          "value": [
+            1792920168.024,
+            "6"
+          ]
+        },
+        {
+          "metric": {
+            "__name__": "platform_requests_total",
+            "deployment_environment_name": "development",
+            "instance": "platform-api-2",
+            "job": "ontology-platform-api",
+            "route": "/api/v1/platform/me",
+            "service_name": "ontology-platform-api",
+            "service_version": "G1-WAVE2",
+            "status_class": "4xx"
+          },
+          "value": [
+            1792920168.024,
+            "7"
+          ]
+        },
+        {
+          "metric": {
+            "__name__": "platform_requests_total",
+            "deployment_environment_name": "development",
+            "instance": "platform-api-1",
+            "job": "ontology-platform-api",
+            "route": "/auth/logout",
+            "service_name": "ontology-platform-api",
+            "service_version": "G1-WAVE2",
+            "status_class": "3xx"
+          },
+          "value": [
+            1792920168.024,
+            "5"
+          ]
+        },
+        {
+          "metric": {
+            "__name__": "platform_requests_total",
+            "deployment_environment_name": "development",
+            "instance": "platform-api-1",
+            "job": "ontology-platform-api",
+            "route": "/{**webPath}",
+            "service_name": "ontology-platform-api",
+            "service_version": "G1-WAVE2",
+            "status_class": "3xx"
+          },
+          "value": [
+            1792920168.024,
+            "5"
+          ]
+        },
+        {
+          "metric": {
+            "__name__": "platform_requests_total",
+            "deployment_environment_name": "development",
+            "instance": "platform-api-1",
+            "job": "ontology-platform-api",
+            "route": "/api/v1/platform/audit",
+            "service_name": "ontology-platform-api",
+            "service_version": "G1-WAVE2",
+            "status_class": "2xx"
+          },
+          "value": [
+            1792920168.024,
+            "1"
+          ]
+        }
+      ]
+    }
+  }
+}
