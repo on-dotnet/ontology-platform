@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "pwsh",
+    "-NoProfile",
+    "-File",
+    "scripts/verify.ps1",
+    "-SelfTest",
+    "-ToolRoot",
+    "/Users/chasen/Developer/repos/ontology-platform"
+  ],
+  "observedAtUtc": "2026-10-25T05:48:28.589435+00:00",
+  "exitCode": 1,
+  "stdout": "\nCheck       Status Message\n-----       ------ -------\ntext-format FAIL   docs/evidence/G1-WAVE2/OBS/dependencies/alloy/digest.stdout\u2026\ntext-format FAIL   docs/evidence/G1-WAVE2/OBS/dependencies/alloy/index.stdout.\u2026\ntext-format FAIL   docs/evidence/G1-WAVE2/OBS/dependencies/grafana/digest.stdo\u2026\ntext-format FAIL   docs/evidence/G1-WAVE2/OBS/dependencies/grafana/index.stdou\u2026\ntext-format FAIL   docs/evidence/G1-WAVE2/OBS/dependencies/loki/digest.stdout.\u2026\ntext-format FAIL   docs/evidence/G1-WAVE2/OBS/dependencies/loki/index.stdout.j\u2026\ntext-format FAIL   docs/evidence/G1-WAVE2/OBS/dependencies/prometheus/digest.s\u2026\ntext-format FAIL   docs/evidence/G1-WAVE2/OBS/dependencies/prometheus/index.st\u2026\ntext-format FAIL   docs/evidence/G1-WAVE2/OBS/dependencies/tempo/digest.stdout\u2026\ntext-format FAIL   docs/evidence/G1-WAVE2/OBS/dependencies/tempo/index.stdout.\u2026\n\n",
+  "stderr": ""
+}

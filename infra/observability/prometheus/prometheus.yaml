@@ -1,0 +1,19 @@
+# 所有目标为AppHost同一隔离容器网络的明确别名；不跨公网抓取。
+global:
+  scrape_interval: 10s
+  evaluation_interval: 10s
+rule_files:
+  - /etc/prometheus/alerts.yaml
+scrape_configs:
+  - job_name: observability
+    static_configs:
+      - targets: [alloy:12345, loki:3100, tempo:3200, prometheus:9090]
+  - job_name: grafana
+    static_configs:
+      - targets: [grafana:3000]
+otlp:
+  promote_resource_attributes:
+    - service.name
+    - service.version
+    - deployment.environment.name
+  keep_identifying_resource_attributes: false

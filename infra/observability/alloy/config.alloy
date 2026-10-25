@@ -1,0 +1,60 @@
+// 唯一应用遥测入口；上游必须使用固定安全日志模板，不发送查询正文或认证材料。
+logging {
+  level = "warn"
+}
+otelcol.receiver.otlp "api" {
+  grpc { endpoint = "0.0.0.0:4317" }
+  http { endpoint = "0.0.0.0:4318" }
+  output {
+    logs = [otelcol.processor.transform.boundary.input]
+    traces = [otelcol.processor.transform.boundary.input]
+    metrics = [otelcol.processor.transform.boundary.input]
+  }
+}
+otelcol.processor.transform "boundary" {
+  error_mode = "propagate"
+  // 指标维度白名单：用户、厂区、审计/Trace标识不能成为时间序列标签。
+  metric_statements {
+    context = "datapoint"
+    statements = [
+      `keep_keys(attributes, ["http.request.method", "http.route", "http.response.status_code", "method", "route", "status_class"])`,
+    ]
+  }
+  log_statements {
+    context = "log"
+    statements = [
+      `keep_keys(attributes, ["eventcode", "EventId", "EventName", "OriginalFormat", "path", "status", "status_class", "method", "route", "traceId", "auditId", "correlationId", "TraceId", "AuditId", "CorrelationId"])`,
+    ]
+  }
+  trace_statements {
+    context = "span"
+    statements = [
+      `delete_matching_keys(attributes, "(?i).*(cookie|authorization|token|password|secret|url\\.query|url\\.full|http\\.url|http\\.target|db\\.statement|db\\.query\\.text).*")`,
+    ]
+  }
+  output {
+    logs = [otelcol.processor.batch.api.input]
+    traces = [otelcol.processor.batch.api.input]
+    metrics = [otelcol.processor.batch.api.input]
+  }
+}
+otelcol.processor.batch "api" {
+  timeout = "2s"
+  send_batch_size = 256
+  output {
+    logs = [otelcol.exporter.otlphttp.loki.input]
+    traces = [otelcol.exporter.otlphttp.tempo.input]
+    metrics = [otelcol.exporter.otlphttp.prometheus.input]
+  }
+}
+otelcol.exporter.otlphttp "loki" {
+  client { endpoint = sys.env("LOKI_OTLP_ENDPOINT") }
+}
+otelcol.exporter.otlphttp "tempo" {
+  client { endpoint = sys.env("TEMPO_OTLP_ENDPOINT") }
+}
+otelcol.exporter.otlphttp "prometheus" {
+  client {
+    endpoint = sys.env("PROMETHEUS_OTLP_ENDPOINT")
+  }
+}

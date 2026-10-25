@@ -1,0 +1,68 @@
+{
+  "name": "loki",
+  "version": "v3.7.9",
+  "image": "grafana/loki:3.7.9",
+  "license": {
+    "url": "https://raw.githubusercontent.com/grafana/loki/v3.7.9/LICENSE",
+    "httpStatus": 200,
+    "sha256": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0",
+    "firstLines": [
+      "                    GNU AFFERO GENERAL PUBLIC LICENSE",
+      "                       Version 3, 19 November 2007",
+      "",
+      " Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/>",
+      " Everyone is permitted to copy and distribute verbatim copies"
+    ]
+  },
+  "observedAtUtc": "2026-10-25T05:46:09.912958+00:00",
+  "fullImageCveScan": "NOT_VERIFIED",
+  "fullImageSbom": "NOT_VERIFIED",
+  "signatureVerification": "NOT_VERIFIED",
+  "release": {
+    "url": "https://api.github.com/repos/grafana/loki/releases/tags/v3.7.9",
+    "httpStatus": 200,
+    "sha256": "a8a57c4caf967ad66c5a446ef4226b43347d2b4ae52be056681f90eed354ee7e",
+    "tag_name": "v3.7.9",
+    "html_url": "https://github.com/grafana/loki/releases/tag/v3.7.9",
+    "published_at": "2026-10-20T22:53:57Z",
+    "prerelease": false,
+    "draft": false
+  },
+  "indexCommand": {
+    "argv": [
+      "docker",
+      "buildx",
+      "imagetools",
+      "inspect",
+      "grafana/loki:3.7.9",
+      "--raw"
+    ],
+    "exitCode": 0,
+    "stderr": ""
+  },
+  "arm64": [
+    {
+      "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+      "size": 4062,
+      "digest": "sha256:1a779c5f714e795ac698b125fc265ae97292f792a91535fa29726073d03d5580",
+      "platform": {
+        "architecture": "arm64",
+        "os": "linux"
+      }
+    }
+  ],
+  "digestCommand": {
+    "argv": [
+      "docker",
+      "buildx",
+      "imagetools",
+      "inspect",
+      "grafana/loki:3.7.9",
+      "--format",
+      "{{.Manifest.Digest}}"
+    ],
+    "exitCode": 0,
+    "stderr": ""
+  },
+  "indexDigest": "sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28"
+}

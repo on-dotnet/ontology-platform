@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "docker",
+    "pull",
+    "grafana/alloy:v1.21.2@sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18"
+  ],
+  "startedAtUtc": "2026-10-25T05:47:23.031022+00:00",
+  "exitCode": 1,
+  "stdout": "",
+  "stderr": "Error response from daemon: failed to resolve reference \"docker.io/grafana/alloy@sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18\": failed to authorize: failed to fetch anonymous token: Get \"https://auth.docker.io/token?scope=repository%3Agrafana%2Falloy%3Apull&service=registry.docker.io\": net/http: TLS handshake timeout\n"
+}
