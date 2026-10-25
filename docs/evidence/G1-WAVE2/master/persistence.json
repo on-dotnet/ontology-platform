@@ -1,0 +1,93 @@
+{
+  "status": "PASS",
+  "scope": "seven explicit development containers; API process restart is separately checked",
+  "checks": [
+    {
+      "check": "before-pg-audit-visible",
+      "status": "PASS",
+      "detail": {
+        "auditId": "284e5689216744278ae7a2b8ff06ca5d",
+        "traceId": "1b2443981c775cd48963728d6276d457"
+      }
+    },
+    {
+      "check": "before-grafana-state-created",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "before-prometheus-history",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "bounded-container-set",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "dedicated-volume-guard",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "seven-container-restart",
+      "status": "PASS",
+      "detail": {
+        "count": 7,
+        "names": [
+          "alloy-yssmbqrr",
+          "grafana-cdsenupu",
+          "keycloak-nfvzpbzd",
+          "postgres-qyradnuj",
+          "loki-pbbzkyum",
+          "prometheus-ujjpxeac",
+          "tempo-qfkqebnt"
+        ],
+        "volumes": "preserved"
+      }
+    },
+    {
+      "check": "same-cookie-after-pg-kc-restart-15100",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "same-cookie-after-pg-kc-restart-15101",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "pg-audit-record-survives",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "tempo-trace-survives",
+      "status": "PASS",
+      "detail": {
+        "traceId": "1b2443981c775cd48963728d6276d457"
+      }
+    },
+    {
+      "check": "loki-same-trace-survives",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "prometheus-historical-sample-survives",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "grafana-state-survives",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "keycloak-realm-user-login-survives",
+      "status": "PASS",
+      "detail": null
+    }
+  ]
+}

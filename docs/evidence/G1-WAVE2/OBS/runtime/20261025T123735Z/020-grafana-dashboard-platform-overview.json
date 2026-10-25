@@ -1,0 +1,320 @@
+{
+  "atUtc": "2026-10-25T12:37:55.790263+00:00",
+  "method": "GET",
+  "url": "http://localhost:15330/api/dashboards/uid/platform-overview",
+  "httpStatus": 200,
+  "responseHeaders": {
+    "Content-Type": "application/json"
+  },
+  "response": {
+    "meta": {
+      "type": "db",
+      "canSave": true,
+      "canEdit": true,
+      "canAdmin": true,
+      "canStar": true,
+      "canDelete": true,
+      "slug": "83062d7",
+      "url": "/d/platform-overview/83062d7",
+      "expires": "0001-01-01T00:00:00Z",
+      "created": "2026-10-25T06:42:38Z",
+      "updated": "2026-10-25T06:42:38Z",
+      "updatedBy": "Anonymous",
+      "createdBy": "Anonymous",
+      "version": 1,
+      "hasAcl": false,
+      "isFolder": false,
+      "apiVersion": "v0alpha1",
+      "folderId": 2058011899867136,
+      "folderUid": "cg29pqosam5moa",
+      "folderTitle": "平台运维",
+      "folderUrl": "/dashboards/f/cg29pqosam5moa/e5b9b3-e58fb0-e8bf90-e7bbb4",
+      "provisioned": true,
+      "provisionedExternalId": "platform-overview.json",
+      "annotationsPermissions": {
+        "dashboard": {
+          "canAdd": true,
+          "canEdit": true,
+          "canDelete": true
+        }
+      }
+    },
+    "dashboard": {
+      "annotations": {
+        "list": []
+      },
+      "editable": false,
+      "id": 2058012235812864,
+      "links": [
+        {
+          "keepTime": true,
+          "title": "系统总览",
+          "type": "link",
+          "url": "/d/platform-overview"
+        },
+        {
+          "keepTime": true,
+          "title": "API性能",
+          "type": "link",
+          "url": "/d/platform-api"
+        },
+        {
+          "keepTime": true,
+          "title": "依赖健康",
+          "type": "link",
+          "url": "/d/platform-dependencies"
+        },
+        {
+          "keepTime": true,
+          "title": "错误与Trace",
+          "type": "link",
+          "url": "/d/platform-errors"
+        }
+      ],
+      "panels": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "platform-prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 8,
+            "x": 0,
+            "y": 0
+          },
+          "id": 1,
+          "options": {
+            "colorMode": "background",
+            "graphMode": "area",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "platform-prometheus"
+              },
+              "expr": "sum(up{job=\"observability\"})",
+              "query": "sum(up{job=\"observability\"})",
+              "refId": "A"
+            }
+          ],
+          "title": "观测依赖在线数",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "platform-prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "unit": "s"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 8,
+            "x": 8,
+            "y": 0
+          },
+          "id": 2,
+          "options": {
+            "colorMode": "background",
+            "graphMode": "area",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "platform-prometheus"
+              },
+              "expr": "time() - max(platform_heartbeat{service_name=\"ontology-platform-api\"})",
+              "query": "time() - max(platform_heartbeat{service_name=\"ontology-platform-api\"})",
+              "refId": "A"
+            }
+          ],
+          "title": "API心跳距今（秒）",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "platform-prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "unit": "reqps"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 8,
+            "x": 16,
+            "y": 0
+          },
+          "id": 3,
+          "options": {
+            "colorMode": "background",
+            "graphMode": "area",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "platform-prometheus"
+              },
+              "expr": "sum(rate(platform_requests_total{service_name=\"ontology-platform-api\"}[1m]))",
+              "query": "sum(rate(platform_requests_total{service_name=\"ontology-platform-api\"}[1m]))",
+              "refId": "A"
+            }
+          ],
+          "title": "API请求速率",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "platform-prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "unit": "reqps"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 5
+          },
+          "id": 4,
+          "options": {},
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "platform-prometheus"
+              },
+              "expr": "sum by (method, status_class) (rate(platform_requests_total{service_name=\"ontology-platform-api\"}[1m]))",
+              "query": "sum by (method, status_class) (rate(platform_requests_total{service_name=\"ontology-platform-api\"}[1m]))",
+              "refId": "A"
+            }
+          ],
+          "title": "真实请求趋势",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "platform-prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 5
+          },
+          "id": 5,
+          "options": {},
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "platform-prometheus"
+              },
+              "expr": "ALERTS{alertstate=~\"pending|firing\"}",
+              "query": "ALERTS{alertstate=~\"pending|firing\"}",
+              "refId": "A"
+            }
+          ],
+          "title": "本地告警状态（1=当前）",
+          "type": "timeseries"
+        },
+        {
+          "gridPos": {
+            "h": 4,
+            "w": 24,
+            "x": 0,
+            "y": 13
+          },
+          "id": 6,
+          "options": {
+            "content": "本页来自本机真实 API → Alloy → Loki / Tempo / Prometheus。无数据时显示无数据，不填充示例成功值。仅开发基础；告警阈值不是生产 SLO。审计事实保存在 PostgreSQL，使用有权限的 `/api/v1/platform/audit` 获取 TraceId / 审计ID。",
+            "mode": "markdown"
+          },
+          "title": "开发范围与数据来源",
+          "type": "text"
+        }
+      ],
+      "refresh": "10s",
+      "schemaVersion": 41,
+      "tags": [
+        "平台运维",
+        "开发环境"
+      ],
+      "templating": {
+        "list": []
+      },
+      "time": {
+        "from": "now-15m",
+        "to": "now"
+      },
+      "timezone": "browser",
+      "title": "平台运维 · 系统总览",
+      "uid": "platform-overview",
+      "version": 1
+    }
+  }
+}

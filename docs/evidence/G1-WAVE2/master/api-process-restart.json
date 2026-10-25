@@ -1,0 +1,158 @@
+{
+  "status": "PASS",
+  "scope": "same in-memory real cookie across new AppHost and two API process IDs with persisted shared certificate/keyring and PostgreSQL",
+  "checks": [
+    {
+      "check": "oidc-challenge",
+      "status": "PASS",
+      "httpStatus": 302
+    },
+    {
+      "check": "oidc-par-reference-observed",
+      "status": "PASS"
+    },
+    {
+      "check": "keycloak-password-form",
+      "status": "PASS",
+      "httpStatus": 200
+    },
+    {
+      "check": "oidc-callback-completed",
+      "status": "PASS",
+      "httpStatus": 302
+    },
+    {
+      "check": "httponly-lax-server-session-cookie",
+      "status": "PASS"
+    },
+    {
+      "check": "before-process-restart",
+      "status": "PASS",
+      "httpStatus": 200
+    },
+    {
+      "check": "before-process-restart-no-store",
+      "status": "PASS"
+    },
+    {
+      "check": "before-process-restart-trace",
+      "status": "PASS"
+    },
+    {
+      "check": "before-twin",
+      "status": "PASS",
+      "httpStatus": 200
+    },
+    {
+      "check": "before-twin-no-store",
+      "status": "PASS"
+    },
+    {
+      "check": "before-twin-trace",
+      "status": "PASS"
+    },
+    {
+      "check": "same-cookie-after-process-restart",
+      "status": "PASS",
+      "httpStatus": 200
+    },
+    {
+      "check": "same-cookie-after-process-restart-no-store",
+      "status": "PASS"
+    },
+    {
+      "check": "same-cookie-after-process-restart-trace",
+      "status": "PASS"
+    },
+    {
+      "check": "same-identity-after-process-restart",
+      "status": "PASS"
+    },
+    {
+      "check": "same-cookie-after-process-restart",
+      "status": "PASS",
+      "httpStatus": 200
+    },
+    {
+      "check": "same-cookie-after-process-restart-no-store",
+      "status": "PASS"
+    },
+    {
+      "check": "same-cookie-after-process-restart-trace",
+      "status": "PASS"
+    },
+    {
+      "check": "same-identity-after-process-restart",
+      "status": "PASS"
+    },
+    {
+      "check": "csrf-missing-rejected",
+      "status": "PASS",
+      "httpStatus": 403
+    },
+    {
+      "check": "csrf-missing-rejected-no-store",
+      "status": "PASS"
+    },
+    {
+      "check": "csrf-missing-rejected-trace",
+      "status": "PASS"
+    },
+    {
+      "check": "csrf-missing-rejected-problem",
+      "status": "PASS"
+    },
+    {
+      "check": "antiforgery-issued",
+      "status": "PASS",
+      "httpStatus": 200
+    },
+    {
+      "check": "antiforgery-issued-no-store",
+      "status": "PASS"
+    },
+    {
+      "check": "antiforgery-issued-trace",
+      "status": "PASS"
+    },
+    {
+      "check": "csrf-valid-logout",
+      "status": "PASS",
+      "httpStatus": 302
+    },
+    {
+      "check": "logout-cookie-replay-first",
+      "status": "PASS",
+      "httpStatus": 401
+    },
+    {
+      "check": "logout-cookie-replay-first-no-store",
+      "status": "PASS"
+    },
+    {
+      "check": "logout-cookie-replay-first-trace",
+      "status": "PASS"
+    },
+    {
+      "check": "logout-cookie-replay-first-problem",
+      "status": "PASS"
+    },
+    {
+      "check": "logout-cookie-replay-second",
+      "status": "PASS",
+      "httpStatus": 401
+    },
+    {
+      "check": "logout-cookie-replay-second-no-store",
+      "status": "PASS"
+    },
+    {
+      "check": "logout-cookie-replay-second-trace",
+      "status": "PASS"
+    },
+    {
+      "check": "logout-cookie-replay-second-problem",
+      "status": "PASS"
+    }
+  ]
+}

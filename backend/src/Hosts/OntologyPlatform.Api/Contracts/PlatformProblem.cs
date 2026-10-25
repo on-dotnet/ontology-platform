@@ -15,6 +15,7 @@ public sealed class PlatformProblem
 
     /// <summary>与实际HTTP响应相同的状态码。</summary>
     [JsonRequired]
+    [JsonNumberHandling(JsonNumberHandling.Strict)]
     public int Status { get; init; }
 
     /// <summary>客户端分支判断使用的稳定平台错误码。</summary>
@@ -30,7 +31,7 @@ public sealed class PlatformProblem
     public string CorrelationId { get; init; } = string.Empty;
 
     /// <summary>可选的安全错误说明，禁止放入原始异常。</summary>
-    public string? Detail { get; init; }
+    public string Detail { get; init; } = string.Empty;
 
     /// <summary>可选的问题实例引用，不包含请求查询或秘密。</summary>
     public string? Instance { get; init; }

@@ -1,0 +1,239 @@
+{
+  "atUtc": "2026-10-25T12:37:55.803666+00:00",
+  "method": "GET",
+  "url": "http://localhost:15330/api/dashboards/uid/platform-api",
+  "httpStatus": 200,
+  "responseHeaders": {
+    "Content-Type": "application/json"
+  },
+  "response": {
+    "meta": {
+      "type": "db",
+      "canSave": true,
+      "canEdit": true,
+      "canAdmin": true,
+      "canStar": true,
+      "canDelete": true,
+      "slug": "e5b9b3-e58fb0-e8bf90-e7bbb4-c2b7-apie680a7-e883bd",
+      "url": "/d/platform-api/e5b9b3-e58fb0-e8bf90-e7bbb4-c2b7-apie680a7-e883bd",
+      "expires": "0001-01-01T00:00:00Z",
+      "created": "2026-10-25T06:42:38Z",
+      "updated": "2026-10-25T06:42:38Z",
+      "updatedBy": "Anonymous",
+      "createdBy": "Anonymous",
+      "version": 1,
+      "hasAcl": false,
+      "isFolder": false,
+      "apiVersion": "v0alpha1",
+      "folderId": 2058011899867136,
+      "folderUid": "cg29pqosam5moa",
+      "folderTitle": "平台运维",
+      "folderUrl": "/dashboards/f/cg29pqosam5moa/e5b9b3-e58fb0-e8bf90-e7bbb4",
+      "provisioned": true,
+      "provisionedExternalId": "platform-api.json",
+      "annotationsPermissions": {
+        "dashboard": {
+          "canAdd": true,
+          "canEdit": true,
+          "canDelete": true
+        }
+      }
+    },
+    "dashboard": {
+      "annotations": {
+        "list": []
+      },
+      "editable": false,
+      "id": 2058012252590080,
+      "links": [
+        {
+          "keepTime": true,
+          "title": "系统总览",
+          "type": "link",
+          "url": "/d/platform-overview"
+        },
+        {
+          "keepTime": true,
+          "title": "API性能",
+          "type": "link",
+          "url": "/d/platform-api"
+        },
+        {
+          "keepTime": true,
+          "title": "依赖健康",
+          "type": "link",
+          "url": "/d/platform-dependencies"
+        },
+        {
+          "keepTime": true,
+          "title": "错误与Trace",
+          "type": "link",
+          "url": "/d/platform-errors"
+        }
+      ],
+      "panels": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "platform-prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "unit": "reqps"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 0
+          },
+          "id": 1,
+          "options": {},
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "platform-prometheus"
+              },
+              "expr": "sum by (status_class) (rate(platform_requests_total{service_name=\"ontology-platform-api\"}[1m]))",
+              "query": "sum by (status_class) (rate(platform_requests_total{service_name=\"ontology-platform-api\"}[1m]))",
+              "refId": "A"
+            }
+          ],
+          "title": "按状态类别请求速率",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "platform-prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "unit": "s"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 0
+          },
+          "id": 2,
+          "options": {},
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "platform-prometheus"
+              },
+              "expr": "histogram_quantile(0.95, sum by (le) (rate(http_server_request_duration_seconds_bucket{service_name=\"ontology-platform-api\"}[2m])))",
+              "query": "histogram_quantile(0.95, sum by (le) (rate(http_server_request_duration_seconds_bucket{service_name=\"ontology-platform-api\"}[2m])))",
+              "refId": "A"
+            }
+          ],
+          "title": "HTTP P95耗时",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "platform-prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "unit": "s"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 8
+          },
+          "id": 3,
+          "options": {},
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "platform-prometheus"
+              },
+              "expr": "histogram_quantile(0.95, sum by (le) (rate(platform_request_duration_seconds_bucket{service_name=\"ontology-platform-api\"}[2m])))",
+              "query": "histogram_quantile(0.95, sum by (le) (rate(platform_request_duration_seconds_bucket{service_name=\"ontology-platform-api\"}[2m])))",
+              "refId": "A"
+            }
+          ],
+          "title": "平台操作P95耗时",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "platform-prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "unit": "reqps"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 8
+          },
+          "id": 4,
+          "options": {},
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "platform-prometheus"
+              },
+              "expr": "sum by (http_route, http_request_method) (rate(http_server_request_duration_seconds_count{service_name=\"ontology-platform-api\"}[2m]))",
+              "query": "sum by (http_route, http_request_method) (rate(http_server_request_duration_seconds_count{service_name=\"ontology-platform-api\"}[2m]))",
+              "refId": "A"
+            }
+          ],
+          "title": "按路由/方法请求（有限路由模板）",
+          "type": "timeseries"
+        }
+      ],
+      "refresh": "10s",
+      "schemaVersion": 41,
+      "tags": [
+        "平台运维",
+        "开发环境"
+      ],
+      "templating": {
+        "list": []
+      },
+      "time": {
+        "from": "now-15m",
+        "to": "now"
+      },
+      "timezone": "browser",
+      "title": "平台运维 · API性能",
+      "uid": "platform-api",
+      "version": 1
+    }
+  }
+}

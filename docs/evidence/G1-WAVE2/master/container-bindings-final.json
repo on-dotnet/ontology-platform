@@ -1,0 +1,97 @@
+[
+  {
+    "container": "alloy-yrgggfjn",
+    "ports": {
+      "12345/tcp": [
+        {
+          "HostIp": "127.0.0.1",
+          "HostPort": "58620"
+        }
+      ],
+      "4317/tcp": [
+        {
+          "HostIp": "127.0.0.1",
+          "HostPort": "58621"
+        }
+      ],
+      "4318/tcp": [
+        {
+          "HostIp": "127.0.0.1",
+          "HostPort": "58622"
+        }
+      ]
+    }
+  },
+  {
+    "container": "grafana-jckrddmm",
+    "ports": {
+      "3000/tcp": [
+        {
+          "HostIp": "127.0.0.1",
+          "HostPort": "58623"
+        }
+      ]
+    }
+  },
+  {
+    "container": "keycloak-rdcxuyfk",
+    "ports": {
+      "8080/tcp": [
+        {
+          "HostIp": "127.0.0.1",
+          "HostPort": "58553"
+        }
+      ],
+      "9000/tcp": [
+        {
+          "HostIp": "127.0.0.1",
+          "HostPort": "58554"
+        }
+      ]
+    }
+  },
+  {
+    "container": "postgres-xbjusdwn",
+    "ports": {
+      "5432/tcp": [
+        {
+          "HostIp": "127.0.0.1",
+          "HostPort": "60406"
+        }
+      ]
+    }
+  },
+  {
+    "container": "tempo-pkugttcu",
+    "ports": {
+      "3200/tcp": [
+        {
+          "HostIp": "127.0.0.1",
+          "HostPort": "58531"
+        }
+      ]
+    }
+  },
+  {
+    "container": "loki-pkpprdyf",
+    "ports": {
+      "3100/tcp": [
+        {
+          "HostIp": "127.0.0.1",
+          "HostPort": "58529"
+        }
+      ]
+    }
+  },
+  {
+    "container": "prometheus-utjuhctm",
+    "ports": {
+      "9090/tcp": [
+        {
+          "HostIp": "127.0.0.1",
+          "HostPort": "58532"
+        }
+      ]
+    }
+  }
+]

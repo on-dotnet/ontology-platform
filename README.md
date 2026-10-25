@@ -2,7 +2,7 @@
 
 仓库：`on-dotnet/ontology-platform`。多行业AI Native本体与知识平台，基础工程统一`OntologyPlatform.*`。
 
-当前任务以[授权索引](docs/tasks/current-authorization.md)为准；G1-ENG-001保持历史PARTIAL，当前正式授权M0-MAC-PORTABILITY-001 Mac接管及兼容验收（G1-INFRA为已交付历史）。G0/G1-ENG是历史归档，不把空solution或零应用测试当作产品通过。
+当前任务以[授权索引](docs/tasks/current-authorization.md)为准；G1-ENG-001保持历史PARTIAL，当前G1-WAVE2 Mac SEC/FE/OBS已进入复审交付，M0/G1-INFRA为已交付历史。G0/G1-ENG是历史归档，不把空solution或零应用测试当作产品通过。
 
 ## 检查入口
 
@@ -16,11 +16,11 @@ pwsh -NoProfile -File scripts/doctor.ps1
 
 verify默认退出0仅代表工程静态检查通过，退出1表示失败；SelfTest在受控临时目录跑正反例并清理，包含审查ZIP测试。显式`-RunNative -RunTests`才执行真实.NET构建、格式和MTP测试，先按项目锁恢复；默认优先根`.tools/dotnet`，Worktree可用`-ToolRoot`指向已准备工具目录。有限机密模式扫描不是完整安全审计。doctor只读，退出0为必要工具版本满足、2为环境BLOCKED、1为异常，不安装或启动资源。CI使用同一入口；远程CI只按实际run ID/URL/commit/结论记录。
 
-工具目标：SDK10.0.402、Node24.22.1、pnpm11.28.8，详见[本阶段工具登记](docs/evidence/G1-INFRA-001/toolchain.md)。本机不满足时保持目标并报告，不升级OS/用户全局工具。真实.NET依赖恢复后提交项目锁，前端只有清单时不创建空锁文件，Turbo配置待实际前端任务落地后接入。
+工具目标：SDK10.0.402、Node24.22.1、pnpm11.28.8，详见[本阶段工具登记](docs/evidence/G1-INFRA-001/toolchain.md)。本机不满足时保持目标并报告，不升级OS/用户全局工具。真实.NET依赖恢复后提交项目锁，真实Web与pnpm锁已建立，固定工具/冻结恢复和四项独立检查见[Wave2操作手册](docs/development/wave2-local-development.md)。
 
 ## 工程边界
 
-前端`apps/web`、`@ontology-platform/web`；后端入口`backend/OntologyPlatform.slnx`。ServiceDefaults仅宿主默认设置，BuildingBlocks仅必要技术合同，运行时MAF与研发Agent分开。最小健康API和基础设施测试不代表业务或Web已实现；没有实际Web目标时其检查均NOT_RUN。
+前端`apps/web`、`@ontology-platform/web`；后端入口`backend/OntologyPlatform.slnx`。ServiceDefaults仅宿主默认设置，BuildingBlocks仅必要技术合同，运行时MAF与研发Agent分开。原InfrastructureApi仍为技术探针；正式Api、Next Shell、PG会话/审计和LGTM真实验收见[Wave2交付报告](docs/evidence/G1-WAVE2/master/delivery-report.md)。
 
 [研发约定](AGENTS.md) · [计划与交接](PLANS.md) · [G0审查记录](docs/planning/10-g0-review-record.md) · [目录ADR](docs/adr/ADR-001-design-system-location.md)
 

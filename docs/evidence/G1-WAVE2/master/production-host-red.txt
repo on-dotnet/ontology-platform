@@ -1,0 +1,28 @@
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g1-wave2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+失败 ProductionRequiresExplicitMatchingAllowedHosts (252ms)
+  从 /Users/chasen/.codex/worktrees/g1-wave2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+  Assertion failed. Expected exception of exact type InvalidOperationException but no exception was thrown.
+
+  Assert.ThrowsExactly<InvalidOperationException>(<action>)
+    在 OntologyPlatform.SecurityTests.HttpSecurityTests.ProductionRequiresExplicitMatchingAllowedHosts() 位于 /Users/chasen/.codex/worktrees/g1-wave2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/HttpSecurityTests.cs:37
+    在 System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+    在 System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+已跳过 RealIssuerPushRetainsCodePkceStateAndNonce
+  Assert.Inconclusive。 NOT_RUN: 未注入本轮专用Keycloak运行时配置。
+  从 /Users/chasen/.codex/worktrees/g1-wave2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已跳过 ExpiredServerSessionCookieReturnsHttp401
+  Assert.Inconclusive。 NOT_RUN: 未注入本轮隔离PG连接。
+  从 /Users/chasen/.codex/worktrees/g1-wave2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已跳过 SharedEncryptedTicketRevocationAndExpiryUsePostgresFacts
+  Assert.Inconclusive。 NOT_RUN: G1_SEC_PG_CONNECTION未注入隔离PG；需要Master先应用Governance迁移。
+  从 /Users/chasen/.codex/worktrees/g1-wave2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+/Users/chasen/.codex/worktrees/g1-wave2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64) 失败并出现 1 个错误 (3s 359ms)
+退出代码: 2
+
+测试运行摘要: 失败!
+  总计: 14
+  失败: 1
+  成功: 10
+  已跳过: 3
+  持续时间: 3s 938ms
+已完成测试运行，但显示非成功退出代码: 2 (请参阅: https://aka.ms/testingplatform/exitcodes)

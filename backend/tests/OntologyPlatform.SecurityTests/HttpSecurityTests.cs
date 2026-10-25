@@ -25,6 +25,23 @@ namespace OntologyPlatform.SecurityTests;
 [TestClass]
 public sealed class HttpSecurityTests
 {
+    /// <summary>生产入口必须显式绑定可信主机，缺失、通配和无关主机配置在启动前失败。</summary>
+    [TestMethod]
+    public void ProductionRequiresExplicitMatchingAllowedHosts()
+    {
+        // 复用本测试的临时证书，错误配置不得启动监听或读取其他会话。
+        using var fixture = new SecurityHostFixture();
+        // 覆盖所有非法主机边界，避免默认通配策略被误认为显式授权。
+        foreach (var hosts in new string?[] { null, "", "*", "*.invalid", "other.invalid" })
+        {
+            Assert.ThrowsExactly<InvalidOperationException>(() =>
+            {
+                // 正式构造路径必须先校验Host边界；若意外通过也立即释放。
+                using var app = fixture.Create("Production", overrides: new Dictionary<string, string?> { ["AllowedHosts"] = hosts });
+            });
+        }
+    }
+
     /// <summary>匿名及坏Cookie只得到401，伪造身份头不能建立权限。</summary>
     /// <returns>真实请求和宿主释放任务。</returns>
     [TestMethod]

@@ -1,6 +1,6 @@
 # G1-WAVE2 · Mac SEC/FE/OBS并行总任务
 
-状态：EXECUTING / PARTIAL。日期2026-10-25。BaseSha=e930935749bcb88d51abb94db4a41695bbbe6717。人类正式批准附件V2全部Wave2范围，原文见[授权](../evidence/G1-WAVE2/authorization-v2.md)，不进入G2。当前新授权覆盖历史任务停止条款，不篡改M0/G1历史。
+状态：READY_FOR_REVIEW / PARTIAL。本机批准范围纵向验收PASS；独立最终门禁/同Head CI与ZIP见交付报告及manifest。日期2026-10-25。BaseSha=e930935749bcb88d51abb94db4a41695bbbe6717。人类正式批准附件V2全部Wave2范围，原文见[授权](../evidence/G1-WAVE2/authorization-v2.md)，不进入G2。当前新授权覆盖历史任务停止条款，不篡改M0/G1历史。
 
 ## 冻结分工
 
@@ -27,3 +27,5 @@
 只Wave2，不做本体发布/MCP/MAF/G2/生产连接器，不调用付费模型或修改GitHub保护规则，不改全局工具/管理员/机器PATH。必要批准技术栈依赖先登记官方精确版本/许可/用途；非内置同等替代选型按合同Review；不擅自引入额外第三方框架。只本地隔离开发资源/随机身份，不读取旧凭证/卷或改已有Keycloak。密钥/密码/Cookie/token不提交、不记录、截图和Playwright输出脱敏，不打包node_modules/.tools/bin/obj/卷。
 
 验收命令：doctor -CheckDocker、verify -SelfTest -RunNative -RunTests、受锁restore/format、真实Web lint/typecheck/test/build/Playwright、PG审计查询、双实例OIDC/CSRF/重放/转发头负例、Alloy→Loki/Tempo/Prometheus原始查询、Grafana截图/告警触发恢复/重启。每项命令/退出码/版本/测试数写证据，缺前提BLOCKED/未执行NOT_RUN，核心流程不通过总PARTIAL/BLOCKED；单纯Running或旧CI不能PASS。
+
+最终证据：[集成交付报告](../evidence/G1-WAVE2/master/delivery-report.md)。Windows/Intel和完整镜像安全扫描保留未运行/未验证，不进入G2。

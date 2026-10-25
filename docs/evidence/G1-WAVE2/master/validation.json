@@ -1,0 +1,155 @@
+{
+  "taskId": "G1-WAVE2",
+  "status": "PARTIAL",
+  "functionalScope": "MacSEC/FE/OBS vertical acceptance PASS",
+  "checks": [
+    {
+      "name": "mac-locked-build",
+      "command": "dotnet restore backend/OntologyPlatform.slnx --locked-mode; dotnet build backend/OntologyPlatform.slnx --no-restore",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Locked restore and build exit0; ASPIRE010 retained; final-restore.txt/final-policy-build.txt"
+    },
+    {
+      "name": "native-format",
+      "command": "dotnet format backend/OntologyPlatform.slnx --verify-no-changes --no-restore",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Exit0 after import ordering fix; final-format.txt"
+    },
+    {
+      "name": "infrastructure-host-tests",
+      "command": "dotnet test --project backend/tests/OntologyPlatform.InfrastructureTests --no-build --no-restore",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Original 4/4 passed; infrastructure-tests.txt"
+    },
+    {
+      "name": "real-security-pg-keycloak",
+      "command": "python3 scripts/acceptance/test-governance.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Final14/14 zero skipped against real dedicated PG and Keycloak; final-security-complete.txt"
+    },
+    {
+      "name": "web-four-targets",
+      "command": "pwsh -NoProfile -File scripts/verify-web.ps1 -Restore",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Frozen restore, lint/typecheck/Vitest6/build exit0; final-web.txt"
+    },
+    {
+      "name": "real-oidc-protocol",
+      "command": "python3 infra/security/verify-oidc.py --runtime-file <private-runtime>",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Five identities310 checks; SEC/oidc-par-third.json"
+    },
+    {
+      "name": "real-browser-oidc",
+      "command": "PLATFORM_TEST_RUNTIME=<private-runtime> node apps/web/scripts/run-oidc-tests.mjs",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Viewer/no-role both passed; logout401; no sensitive artifacts; final-browser-oidc.txt"
+    },
+    {
+      "name": "ui-fixture-a11y",
+      "command": "node .tools/pnpm/package/bin/pnpm.cjs --dir apps/web exec playwright test --config playwright.config.ts",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "5 UI cases, mobile Tab/AX and themes/layout/error/console; FE/mobile-nav-ui.txt; fixtures are not identity proof"
+    },
+    {
+      "name": "runtime-openapi-contract",
+      "command": "python3 scripts/acceptance/verify-openapi.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "ActualKestrelOpenAPI3.1 all paths/status/media/required/type/security/nativeform/params/operationIds semantic compare passed; openapi-contract-check.json"
+    },
+    {
+      "name": "actual-lgtm-correlation",
+      "command": "python3 infra/observability/query-runtime.py --capture integration --trace-id <actual-error-trace> --trace-id <actual-proxy-trace>",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Final19 selected checks passed; Loki3 index labels, Tempo503 ERROR and proxy2spans, two metric instances54+4=58 same timestamp, Grafana4dashboard/3health/2frames; OBS/runtime/20261025T123735Z"
+    },
+    {
+      "name": "grafana-chinese-screenshots",
+      "command": "node scripts/acceptance/capture-grafana.mjs",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Four actual authenticated local dashboards captured; grafana/capture.json; no fabricated panels"
+    },
+    {
+      "name": "heartbeat-alert-firing-recovery",
+      "command": "python3 scripts/acceptance/verify-alert.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Inactive→pending→firing→inactive using exactly two checkout APIs; alert-drill.json"
+    },
+    {
+      "name": "seven-container-persistence",
+      "command": "python3 scripts/acceptance/verify-persistence.py --runtime-file <private-runtime>",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Cookie/PG audit/KC fresh login/Loki Tempo/Prom old sample/Grafana persisted annotation survive7container restart; persistence.json"
+    },
+    {
+      "name": "api-process-session-recovery",
+      "command": "python3 scripts/acceptance/verify-api-restart.py --runtime-file <private-runtime>",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Same in-memory real Cookie across new AppHost/two API processes, logout/replay401; api-process-restart.json"
+    },
+    {
+      "name": "dependency-fault-health",
+      "command": "python3 scripts/acceptance/verify-dependency-fault.py --runtime-file <private-runtime>",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "DB unavailable503,live200,ready503, recovery accepts originalCookie; dependency-fault.json; premature client timeouts retained"
+    },
+    {
+      "name": "public-dependency-audit",
+      "command": "dotnet list backend/OntologyPlatform.slnx package --vulnerable --include-transitive --format json; node .tools/pnpm/package/bin/pnpm.cjs audit --json",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "No known vulnerabilities returned by public NuGet/npm audits; npm493 resolved graph; license inventories390installed npm/159NuGet; dependencies/"
+    },
+    {
+      "name": "windows-native",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "No Windows host; preserve locked graph and reproducible PowerShell regression commands"
+    },
+    {
+      "name": "intel-macos-native",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "No IntelMac host; do not infer native success fromARM64 Docker"
+    },
+    {
+      "name": "container-complete-cve-sbom-signature",
+      "command": null,
+      "status": "NOT_VERIFIED",
+      "exitCode": null,
+      "output": "Official sources/license/index digests verified; full imageCVE/SBOM/signatures not completed; no paid/unapproved service"
+    },
+    {
+      "name": "production-certificate-rotation-and-operating-targets",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Shared encrypted keyring and restart passed; full production cert rotation/SLO/RPO/retention/compliance require later authorization"
+    }
+  ],
+  "ci": {
+    "status": "NOT_VERIFIED",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  },
+  "ciNote": "Final actual sameHead CI supplied as manifest.runtimeCi to avoid self-referential report commit; candidate40180209973 success only coversb57f6f3."
+}

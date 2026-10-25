@@ -1,0 +1,200 @@
+{
+  "atUtc": "2026-10-25T12:37:55.842831+00:00",
+  "capture": "integration",
+  "traceIds": [
+    "d612c034a07e8322922458ce84faa3f2",
+    "20f7ad8ec5a193c9a9b5b0e74899b344",
+    "e0c866c4ef747802d0abe088837c746c",
+    "81852ae486722861ab17aa9cefcb63e8"
+  ],
+  "checks": [
+    {
+      "check": "loki-ready",
+      "status": "PASS",
+      "detail": {
+        "httpStatus": 200
+      }
+    },
+    {
+      "check": "tempo-ready",
+      "status": "PASS",
+      "detail": {
+        "httpStatus": 200
+      }
+    },
+    {
+      "check": "prometheus-ready",
+      "status": "PASS",
+      "detail": {
+        "httpStatus": 200
+      }
+    },
+    {
+      "check": "grafana-ready",
+      "status": "PASS",
+      "detail": {
+        "httpStatus": 200
+      }
+    },
+    {
+      "check": "api-1-actual-request",
+      "status": "PASS",
+      "detail": {
+        "httpStatus": 401,
+        "traceId": "e0c866c4ef747802d0abe088837c746c",
+        "audit": "NOT_RUN: anonymous me has no resource audit"
+      }
+    },
+    {
+      "check": "api-2-actual-request",
+      "status": "PASS",
+      "detail": {
+        "httpStatus": 401,
+        "traceId": "81852ae486722861ab17aa9cefcb63e8",
+        "audit": "NOT_RUN: anonymous me has no resource audit"
+      }
+    },
+    {
+      "check": "loki-same-trace-d612c034a07e8322922458ce84faa3f2",
+      "status": "PASS",
+      "detail": {
+        "traceId": "d612c034a07e8322922458ce84faa3f2",
+        "streams": 3
+      }
+    },
+    {
+      "check": "tempo-same-trace-d612c034a07e8322922458ce84faa3f2",
+      "status": "PASS",
+      "detail": {
+        "traceId": "d612c034a07e8322922458ce84faa3f2"
+      }
+    },
+    {
+      "check": "loki-same-trace-20f7ad8ec5a193c9a9b5b0e74899b344",
+      "status": "PASS",
+      "detail": {
+        "traceId": "20f7ad8ec5a193c9a9b5b0e74899b344",
+        "streams": 3
+      }
+    },
+    {
+      "check": "tempo-same-trace-20f7ad8ec5a193c9a9b5b0e74899b344",
+      "status": "PASS",
+      "detail": {
+        "traceId": "20f7ad8ec5a193c9a9b5b0e74899b344"
+      }
+    },
+    {
+      "check": "loki-same-trace-e0c866c4ef747802d0abe088837c746c",
+      "status": "PASS",
+      "detail": {
+        "traceId": "e0c866c4ef747802d0abe088837c746c",
+        "streams": 5
+      }
+    },
+    {
+      "check": "tempo-same-trace-e0c866c4ef747802d0abe088837c746c",
+      "status": "PASS",
+      "detail": {
+        "traceId": "e0c866c4ef747802d0abe088837c746c"
+      }
+    },
+    {
+      "check": "loki-same-trace-81852ae486722861ab17aa9cefcb63e8",
+      "status": "PASS",
+      "detail": {
+        "traceId": "81852ae486722861ab17aa9cefcb63e8",
+        "streams": 5
+      }
+    },
+    {
+      "check": "tempo-same-trace-81852ae486722861ab17aa9cefcb63e8",
+      "status": "PASS",
+      "detail": {
+        "traceId": "81852ae486722861ab17aa9cefcb63e8"
+      }
+    },
+    {
+      "check": "loki-index-low-cardinality",
+      "status": "PASS",
+      "detail": {
+        "streamCount": 1,
+        "indexLabels": [
+          "deployment_environment_name",
+          "service_name",
+          "service_version"
+        ]
+      }
+    },
+    {
+      "check": "prometheus-low-cardinality",
+      "status": "PASS",
+      "detail": {
+        "seriesCount": 869,
+        "labelNames": [
+          "__name__",
+          "deployment_environment_name",
+          "http_request_method",
+          "http_response_status_code",
+          "http_route",
+          "instance",
+          "job",
+          "le",
+          "route",
+          "service_name",
+          "service_version",
+          "status_class"
+        ]
+      }
+    },
+    {
+      "check": "prometheus-two-instances-then-sum",
+      "status": "PASS",
+      "detail": {
+        "instanceTotals": {
+          "platform-api-1": 54.0,
+          "platform-api-2": 4.0
+        },
+        "sum": 58.0,
+        "sampleTime": "1792931874.785982"
+      }
+    },
+    {
+      "check": "prometheus-alert-snapshot",
+      "status": "PASS",
+      "detail": {
+        "alerts": [],
+        "faultInjection": "NOT_RUN: Master owns lifecycle"
+      }
+    },
+    {
+      "check": "grafana-chinese-provisioning-and-live-data",
+      "status": "PASS",
+      "detail": {
+        "dashboards": [
+          {
+            "uid": "platform-overview",
+            "title": "平台运维 · 系统总览"
+          },
+          {
+            "uid": "platform-api",
+            "title": "平台运维 · API性能"
+          },
+          {
+            "uid": "platform-dependencies",
+            "title": "平台运维 · 依赖健康"
+          },
+          {
+            "uid": "platform-errors",
+            "title": "平台运维 · 错误与Trace关联"
+          }
+        ],
+        "liveFrames": 2,
+        "screenshot": "NOT_RUN: requires safe browser capture"
+      }
+    }
+  ],
+  "screenshots": "NOT_RUN",
+  "persistence": "NOT_RUN",
+  "status": "PASS_SELECTED_QUERIES"
+}

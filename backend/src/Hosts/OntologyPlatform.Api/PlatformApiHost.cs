@@ -38,6 +38,16 @@ public static class PlatformApiHost
         // 模块连接只从宿主配置提供，设计时无密码回退不用于运行时。
         var connection = builder.Configuration.GetConnectionString("governance");
         security.Validate(builder.Environment.IsDevelopment(), connection);
+        if (!builder.Environment.IsDevelopment())
+        {
+            // 生产配置不能继承HostFiltering的默认通配，入口域名来自可信配置。
+            var hosts = builder.Configuration["AllowedHosts"]?.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            if (hosts is null || hosts.Length == 0 || hosts.Any(host => host.Contains('*') || host.Any(char.IsControl))
+                || !hosts.Contains(new Uri(security.PublicOrigin).Host, StringComparer.OrdinalIgnoreCase))
+            {
+                throw new InvalidOperationException("生产AllowedHosts必须显式包含可信公共入口，禁止缺失或通配。");
+            }
+        }
         // Web代理目标必须显式为内部回环源，不能从请求Host推导。
         var webOrigin = builder.Configuration["Web:Origin"];
         if (!Uri.TryCreate(webOrigin, UriKind.Absolute, out var webAddress) || !webAddress.IsLoopback

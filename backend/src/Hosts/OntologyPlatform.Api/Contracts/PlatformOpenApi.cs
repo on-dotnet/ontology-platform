@@ -89,13 +89,30 @@ public static class PlatformOpenApi
                             }
                         };
                     }
-                    if (path.Key == "/api/v1/platform/audit" && operation.Parameters is not null)
+                    if (path.Key == "/api/v1/platform/audit")
                     {
-                        // 验证器实际拒绝范围外limit；生成文档明确相同的数值边界。
+                        operation.Parameters ??= [];
+                        // 运行端点直接读取查询集合，显式补入实际校验的limit参数。
                         var limit = operation.Parameters.FirstOrDefault(parameter => parameter.Name == "limit");
+                        if (limit is null)
+                        {
+                            limit = new OpenApiParameter { Name = "limit", In = ParameterLocation.Query, Required = false };
+                            operation.Parameters.Add(limit);
+                        }
+                        // 已解析的参数定义使用与运行校验相同的1..100边界和默认20。
                         if (limit is OpenApiParameter parameter)
                         {
                             parameter.Schema = new OpenApiSchema { Type = JsonSchemaType.Integer, Minimum = "1", Maximum = "100", Default = JsonValue.Create(20) };
+                        }
+                    }
+                    if (path.Key == "/auth/login")
+                    {
+                        // 实际登录在returnUrl缺失时使用本站根路径。
+                        var destination = operation.Parameters?.FirstOrDefault(parameter => parameter.Name == "returnUrl");
+                        // 这里只描述默认值，不扩大服务器允许的跳转目标。
+                        if (destination is OpenApiParameter parameter)
+                        {
+                            parameter.Schema = new OpenApiSchema { Type = JsonSchemaType.String, Default = JsonValue.Create("/") };
                         }
                     }
                 }

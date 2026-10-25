@@ -1,0 +1,359 @@
+{
+  "status": "PASS",
+  "fired": true,
+  "recovered": true,
+  "notification": "local Prometheus rule/alert state only; no external recipients",
+  "records": [
+    {
+      "atUtc": "2026-10-25T10:51:30.372206+00:00",
+      "phase": "baseline",
+      "state": "firing",
+      "rule": {
+        "state": "firing",
+        "name": "平台心跳停止",
+        "query": "(time() - max(platform_heartbeat{service_name=\"ontology-platform-api\"}) > 25) or absent(max(platform_heartbeat{service_name=\"ontology-platform-api\"}))",
+        "duration": 20,
+        "keepFiringFor": 0,
+        "labels": {
+          "environment": "Development",
+          "severity": "warning"
+        },
+        "annotations": {
+          "description": "检查API进程与OTLP链路；开发心跳每5秒导出，超过25秒且持续20秒告警，非生产SLO。",
+          "summary": "平台API心跳过期或缺失"
+        },
+        "alerts": [
+          {
+            "labels": {
+              "alertname": "平台心跳停止",
+              "environment": "Development",
+              "severity": "warning"
+            },
+            "annotations": {
+              "description": "检查API进程与OTLP链路；开发心跳每5秒导出，超过25秒且持续20秒告警，非生产SLO。",
+              "summary": "平台API心跳过期或缺失"
+            },
+            "state": "firing",
+            "activeAt": "2026-10-25T10:49:29.729097233Z",
+            "value": "2.6272900009155273e+02"
+          }
+        ],
+        "health": "ok",
+        "evaluationTime": 0.000624666,
+        "lastEvaluation": "2026-10-25T10:51:29.732529546Z",
+        "type": "alerting"
+      }
+    },
+    {
+      "atUtc": "2026-10-25T10:51:35.381681+00:00",
+      "phase": "baseline",
+      "state": "firing",
+      "rule": {
+        "state": "firing",
+        "name": "平台心跳停止",
+        "query": "(time() - max(platform_heartbeat{service_name=\"ontology-platform-api\"}) > 25) or absent(max(platform_heartbeat{service_name=\"ontology-platform-api\"}))",
+        "duration": 20,
+        "keepFiringFor": 0,
+        "labels": {
+          "environment": "Development",
+          "severity": "warning"
+        },
+        "annotations": {
+          "description": "检查API进程与OTLP链路；开发心跳每5秒导出，超过25秒且持续20秒告警，非生产SLO。",
+          "summary": "平台API心跳过期或缺失"
+        },
+        "alerts": [
+          {
+            "labels": {
+              "alertname": "平台心跳停止",
+              "environment": "Development",
+              "severity": "warning"
+            },
+            "annotations": {
+              "description": "检查API进程与OTLP链路；开发心跳每5秒导出，超过25秒且持续20秒告警，非生产SLO。",
+              "summary": "平台API心跳过期或缺失"
+            },
+            "state": "firing",
+            "activeAt": "2026-10-25T10:49:29.729097233Z",
+            "value": "2.6272900009155273e+02"
+          }
+        ],
+        "health": "ok",
+        "evaluationTime": 0.000624666,
+        "lastEvaluation": "2026-10-25T10:51:29.732529546Z",
+        "type": "alerting"
+      }
+    },
+    {
+      "atUtc": "2026-10-25T10:51:40.391150+00:00",
+      "phase": "baseline",
+      "state": "inactive",
+      "rule": {
+        "state": "inactive",
+        "name": "平台心跳停止",
+        "query": "(time() - max(platform_heartbeat{service_name=\"ontology-platform-api\"}) > 25) or absent(max(platform_heartbeat{service_name=\"ontology-platform-api\"}))",
+        "duration": 20,
+        "keepFiringFor": 0,
+        "labels": {
+          "environment": "Development",
+          "severity": "warning"
+        },
+        "annotations": {
+          "description": "检查API进程与OTLP链路；开发心跳每5秒导出，超过25秒且持续20秒告警，非生产SLO。",
+          "summary": "平台API心跳过期或缺失"
+        },
+        "alerts": [],
+        "health": "ok",
+        "evaluationTime": 0.000259125,
+        "lastEvaluation": "2026-10-25T10:51:39.731945259Z",
+        "type": "alerting"
+      }
+    },
+    {
+      "phase": "fault",
+      "method": "SIGSTOP",
+      "target": "exact two APIs in this checkout",
+      "processCount": 2
+    },
+    {
+      "atUtc": "2026-10-25T10:51:50.399619+00:00",
+      "phase": "suspended",
+      "state": "inactive",
+      "rule": {
+        "state": "inactive",
+        "name": "平台心跳停止",
+        "query": "(time() - max(platform_heartbeat{service_name=\"ontology-platform-api\"}) > 25) or absent(max(platform_heartbeat{service_name=\"ontology-platform-api\"}))",
+        "duration": 20,
+        "keepFiringFor": 0,
+        "labels": {
+          "environment": "Development",
+          "severity": "warning"
+        },
+        "annotations": {
+          "description": "检查API进程与OTLP链路；开发心跳每5秒导出，超过25秒且持续20秒告警，非生产SLO。",
+          "summary": "平台API心跳过期或缺失"
+        },
+        "alerts": [],
+        "health": "ok",
+        "evaluationTime": 0.000165666,
+        "lastEvaluation": "2026-10-25T10:51:49.734351583Z",
+        "type": "alerting"
+      }
+    },
+    {
+      "atUtc": "2026-10-25T10:52:00.408628+00:00",
+      "phase": "suspended",
+      "state": "inactive",
+      "rule": {
+        "state": "inactive",
+        "name": "平台心跳停止",
+        "query": "(time() - max(platform_heartbeat{service_name=\"ontology-platform-api\"}) > 25) or absent(max(platform_heartbeat{service_name=\"ontology-platform-api\"}))",
+        "duration": 20,
+        "keepFiringFor": 0,
+        "labels": {
+          "environment": "Development",
+          "severity": "warning"
+        },
+        "annotations": {
+          "description": "检查API进程与OTLP链路；开发心跳每5秒导出，超过25秒且持续20秒告警，非生产SLO。",
+          "summary": "平台API心跳过期或缺失"
+        },
+        "alerts": [],
+        "health": "ok",
+        "evaluationTime": 0.000137542,
+        "lastEvaluation": "2026-10-25T10:51:59.73369413Z",
+        "type": "alerting"
+      }
+    },
+    {
+      "atUtc": "2026-10-25T10:52:10.414390+00:00",
+      "phase": "suspended",
+      "state": "pending",
+      "rule": {
+        "state": "pending",
+        "name": "平台心跳停止",
+        "query": "(time() - max(platform_heartbeat{service_name=\"ontology-platform-api\"}) > 25) or absent(max(platform_heartbeat{service_name=\"ontology-platform-api\"}))",
+        "duration": 20,
+        "keepFiringFor": 0,
+        "labels": {
+          "environment": "Development",
+          "severity": "warning"
+        },
+        "annotations": {
+          "description": "检查API进程与OTLP链路；开发心跳每5秒导出，超过25秒且持续20秒告警，非生产SLO。",
+          "summary": "平台API心跳过期或缺失"
+        },
+        "alerts": [
+          {
+            "labels": {
+              "alertname": "平台心跳停止",
+              "environment": "Development",
+              "severity": "warning"
+            },
+            "annotations": {
+              "description": "检查API进程与OTLP链路；开发心跳每5秒导出，超过25秒且持续20秒告警，非生产SLO。",
+              "summary": "平台API心跳过期或缺失"
+            },
+            "state": "pending",
+            "activeAt": "2026-10-25T10:52:09.729097233Z",
+            "value": "3.2729000091552734e+01"
+          }
+        ],
+        "health": "ok",
+        "evaluationTime": 0.000483042,
+        "lastEvaluation": "2026-10-25T10:52:09.733472968Z",
+        "type": "alerting"
+      }
+    },
+    {
+      "atUtc": "2026-10-25T10:52:20.422545+00:00",
+      "phase": "suspended",
+      "state": "pending",
+      "rule": {
+        "state": "pending",
+        "name": "平台心跳停止",
+        "query": "(time() - max(platform_heartbeat{service_name=\"ontology-platform-api\"}) > 25) or absent(max(platform_heartbeat{service_name=\"ontology-platform-api\"}))",
+        "duration": 20,
+        "keepFiringFor": 0,
+        "labels": {
+          "environment": "Development",
+          "severity": "warning"
+        },
+        "annotations": {
+          "description": "检查API进程与OTLP链路；开发心跳每5秒导出，超过25秒且持续20秒告警，非生产SLO。",
+          "summary": "平台API心跳过期或缺失"
+        },
+        "alerts": [
+          {
+            "labels": {
+              "alertname": "平台心跳停止",
+              "environment": "Development",
+              "severity": "warning"
+            },
+            "annotations": {
+              "description": "检查API进程与OTLP链路；开发心跳每5秒导出，超过25秒且持续20秒告警，非生产SLO。",
+              "summary": "平台API心跳过期或缺失"
+            },
+            "state": "pending",
+            "activeAt": "2026-10-25T10:52:09.729097233Z",
+            "value": "4.2729000091552734e+01"
+          }
+        ],
+        "health": "ok",
+        "evaluationTime": 0.000462041,
+        "lastEvaluation": "2026-10-25T10:52:19.734949458Z",
+        "type": "alerting"
+      }
+    },
+    {
+      "atUtc": "2026-10-25T10:52:30.430493+00:00",
+      "phase": "suspended",
+      "state": "firing",
+      "rule": {
+        "state": "firing",
+        "name": "平台心跳停止",
+        "query": "(time() - max(platform_heartbeat{service_name=\"ontology-platform-api\"}) > 25) or absent(max(platform_heartbeat{service_name=\"ontology-platform-api\"}))",
+        "duration": 20,
+        "keepFiringFor": 0,
+        "labels": {
+          "environment": "Development",
+          "severity": "warning"
+        },
+        "annotations": {
+          "description": "检查API进程与OTLP链路；开发心跳每5秒导出，超过25秒且持续20秒告警，非生产SLO。",
+          "summary": "平台API心跳过期或缺失"
+        },
+        "alerts": [
+          {
+            "labels": {
+              "alertname": "平台心跳停止",
+              "environment": "Development",
+              "severity": "warning"
+            },
+            "annotations": {
+              "description": "检查API进程与OTLP链路；开发心跳每5秒导出，超过25秒且持续20秒告警，非生产SLO。",
+              "summary": "平台API心跳过期或缺失"
+            },
+            "state": "firing",
+            "activeAt": "2026-10-25T10:52:09.729097233Z",
+            "value": "5.2729000091552734e+01"
+          }
+        ],
+        "health": "ok",
+        "evaluationTime": 0.00034825,
+        "lastEvaluation": "2026-10-25T10:52:29.735712963Z",
+        "type": "alerting"
+      }
+    },
+    {
+      "phase": "restore",
+      "method": "SIGCONT",
+      "processCount": 2
+    },
+    {
+      "atUtc": "2026-10-25T10:52:35.436245+00:00",
+      "phase": "restored",
+      "state": "firing",
+      "rule": {
+        "state": "firing",
+        "name": "平台心跳停止",
+        "query": "(time() - max(platform_heartbeat{service_name=\"ontology-platform-api\"}) > 25) or absent(max(platform_heartbeat{service_name=\"ontology-platform-api\"}))",
+        "duration": 20,
+        "keepFiringFor": 0,
+        "labels": {
+          "environment": "Development",
+          "severity": "warning"
+        },
+        "annotations": {
+          "description": "检查API进程与OTLP链路；开发心跳每5秒导出，超过25秒且持续20秒告警，非生产SLO。",
+          "summary": "平台API心跳过期或缺失"
+        },
+        "alerts": [
+          {
+            "labels": {
+              "alertname": "平台心跳停止",
+              "environment": "Development",
+              "severity": "warning"
+            },
+            "annotations": {
+              "description": "检查API进程与OTLP链路；开发心跳每5秒导出，超过25秒且持续20秒告警，非生产SLO。",
+              "summary": "平台API心跳过期或缺失"
+            },
+            "state": "firing",
+            "activeAt": "2026-10-25T10:52:09.729097233Z",
+            "value": "5.2729000091552734e+01"
+          }
+        ],
+        "health": "ok",
+        "evaluationTime": 0.00034825,
+        "lastEvaluation": "2026-10-25T10:52:29.735712963Z",
+        "type": "alerting"
+      }
+    },
+    {
+      "atUtc": "2026-10-25T10:52:40.443599+00:00",
+      "phase": "restored",
+      "state": "inactive",
+      "rule": {
+        "state": "inactive",
+        "name": "平台心跳停止",
+        "query": "(time() - max(platform_heartbeat{service_name=\"ontology-platform-api\"}) > 25) or absent(max(platform_heartbeat{service_name=\"ontology-platform-api\"}))",
+        "duration": 20,
+        "keepFiringFor": 0,
+        "labels": {
+          "environment": "Development",
+          "severity": "warning"
+        },
+        "annotations": {
+          "description": "检查API进程与OTLP链路；开发心跳每5秒导出，超过25秒且持续20秒告警，非生产SLO。",
+          "summary": "平台API心跳过期或缺失"
+        },
+        "alerts": [],
+        "health": "ok",
+        "evaluationTime": 0.0003345,
+        "lastEvaluation": "2026-10-25T10:52:39.736373926Z",
+        "type": "alerting"
+      }
+    }
+  ]
+}

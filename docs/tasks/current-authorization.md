@@ -1,6 +1,6 @@
 # G1 Wave2 当前授权增量（2026-10-25）
 
-当前：**G1-WAVE2 Mac V2，SEC/FE/OBS正式授权执行**。用户在本会话明确批准附件全部任务，由Master先冻结公共契约，再三线独立Worktree并行、审查、集成/Push和验收；最后唯一Review ZIP并停等复审，不进G2。附件已完整读取并归档在G1-WAVE2证据。任务合同见[G1-WAVE2](G1-WAVE2.md)；三个子卡分别SEC/FE/OBS。新授权覆盖历史停止条款，M0仍保留Mac基础PASS/跨平台总体PARTIAL，Windows/Intel未运行，不改历史证据。系统级/管理员/付费/生产凭证只停止对应操作，不扩大技术选型和生产权限。
+当前：**G1-WAVE2 Mac V2，READY_FOR_REVIEW / PARTIAL**。本机SEC/FE/OBS纵向功能已验收；总状态保留跨平台/供应链/生产未验证项，报告及最终CI见[交付记录](../evidence/G1-WAVE2/master/delivery-report.md)。交付唯一ZIP后停止，不进G2。用户在本会话明确批准附件全部任务，由Master先冻结公共契约，再三线独立Worktree并行、审查、集成/Push和验收；最后唯一Review ZIP并停等复审，不进G2。附件已完整读取并归档在G1-WAVE2证据。任务合同见[G1-WAVE2](G1-WAVE2.md)；三个子卡分别SEC/FE/OBS。新授权覆盖历史停止条款，M0仍保留Mac基础PASS/跨平台总体PARTIAL，Windows/Intel未运行，不改历史证据。系统级/管理员/付费/生产凭证只停止对应操作，不扩大技术选型和生产权限。
 
 ---
 

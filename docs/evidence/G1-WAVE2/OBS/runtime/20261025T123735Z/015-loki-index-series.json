@@ -1,0 +1,19 @@
+{
+  "atUtc": "2026-10-25T12:37:55.771210+00:00",
+  "method": "GET",
+  "url": "http://localhost:13100/loki/api/v1/series?match%5B%5D=%7Bservice_name%3D%22ontology-platform-api%22%7D&start=1792930955683294976",
+  "httpStatus": 200,
+  "responseHeaders": {
+    "Content-Type": "application/json; charset=UTF-8"
+  },
+  "response": {
+    "status": "success",
+    "data": [
+      {
+        "deployment_environment_name": "development",
+        "service_name": "ontology-platform-api",
+        "service_version": "G1-WAVE2"
+      }
+    ]
+  }
+}

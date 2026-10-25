@@ -1,0 +1,160 @@
+{
+  "atUtc": "2026-10-25T12:37:55.748859+00:00",
+  "method": "GET",
+  "url": "http://localhost:13200/api/traces/20f7ad8ec5a193c9a9b5b0e74899b344",
+  "httpStatus": 200,
+  "responseHeaders": {
+    "Content-Type": "application/json"
+  },
+  "response": {
+    "batches": [
+      {
+        "resource": {
+          "attributes": [
+            {
+              "key": "deployment.environment.name",
+              "value": {
+                "stringValue": "development"
+              }
+            },
+            {
+              "key": "service.version",
+              "value": {
+                "stringValue": "G1-WAVE2"
+              }
+            },
+            {
+              "key": "service.name",
+              "value": {
+                "stringValue": "ontology-platform-api"
+              }
+            }
+          ]
+        },
+        "scopeSpans": [
+          {
+            "scope": {
+              "name": "System.Net.Http"
+            },
+            "spans": [
+              {
+                "traceId": "IPetjsWhk8mptbDnSJmzRA==",
+                "spanId": "6Yd+ikfEv/M=",
+                "parentSpanId": "hWzm/fCXJMk=",
+                "name": "GET",
+                "kind": "SPAN_KIND_CLIENT",
+                "startTimeUnixNano": "1792931855580360000",
+                "endTimeUnixNano": "1792931855584893000",
+                "attributes": [
+                  {
+                    "key": "network.protocol.version",
+                    "value": {
+                      "stringValue": "1.1"
+                    }
+                  },
+                  {
+                    "key": "http.request.method",
+                    "value": {
+                      "stringValue": "GET"
+                    }
+                  },
+                  {
+                    "key": "http.response.status_code",
+                    "value": {
+                      "intValue": "200"
+                    }
+                  },
+                  {
+                    "key": "server.address",
+                    "value": {
+                      "stringValue": "127.0.0.1"
+                    }
+                  },
+                  {
+                    "key": "server.port",
+                    "value": {
+                      "intValue": "15300"
+                    }
+                  }
+                ],
+                "status": {}
+              }
+            ]
+          },
+          {
+            "scope": {
+              "name": "Microsoft.AspNetCore"
+            },
+            "spans": [
+              {
+                "traceId": "IPetjsWhk8mptbDnSJmzRA==",
+                "spanId": "hWzm/fCXJMk=",
+                "name": "GET /{**webPath}",
+                "kind": "SPAN_KIND_SERVER",
+                "startTimeUnixNano": "1792931855579372000",
+                "endTimeUnixNano": "1792931855587073000",
+                "attributes": [
+                  {
+                    "key": "user_agent.original",
+                    "value": {
+                      "stringValue": "Python-urllib/3.13"
+                    }
+                  },
+                  {
+                    "key": "url.scheme",
+                    "value": {
+                      "stringValue": "http"
+                    }
+                  },
+                  {
+                    "key": "network.protocol.version",
+                    "value": {
+                      "stringValue": "1.1"
+                    }
+                  },
+                  {
+                    "key": "http.request.method",
+                    "value": {
+                      "stringValue": "GET"
+                    }
+                  },
+                  {
+                    "key": "http.response.status_code",
+                    "value": {
+                      "intValue": "200"
+                    }
+                  },
+                  {
+                    "key": "url.path",
+                    "value": {
+                      "stringValue": "/"
+                    }
+                  },
+                  {
+                    "key": "server.address",
+                    "value": {
+                      "stringValue": "localhost"
+                    }
+                  },
+                  {
+                    "key": "server.port",
+                    "value": {
+                      "intValue": "15100"
+                    }
+                  },
+                  {
+                    "key": "http.route",
+                    "value": {
+                      "stringValue": "/{**webPath}"
+                    }
+                  }
+                ],
+                "status": {}
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

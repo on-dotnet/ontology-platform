@@ -1,0 +1,119 @@
+{
+  "atUtc": "2026-10-25T12:37:55.714325+00:00",
+  "method": "GET",
+  "url": "http://localhost:13200/api/traces/d612c034a07e8322922458ce84faa3f2",
+  "httpStatus": 200,
+  "responseHeaders": {
+    "Content-Type": "application/json"
+  },
+  "response": {
+    "batches": [
+      {
+        "resource": {
+          "attributes": [
+            {
+              "key": "deployment.environment.name",
+              "value": {
+                "stringValue": "development"
+              }
+            },
+            {
+              "key": "service.version",
+              "value": {
+                "stringValue": "G1-WAVE2"
+              }
+            },
+            {
+              "key": "service.name",
+              "value": {
+                "stringValue": "ontology-platform-api"
+              }
+            }
+          ]
+        },
+        "scopeSpans": [
+          {
+            "scope": {
+              "name": "Microsoft.AspNetCore"
+            },
+            "spans": [
+              {
+                "traceId": "1hLANKB+gyKSJFjOhPqj8g==",
+                "spanId": "7PXYmuZ/UMw=",
+                "name": "GET /api/v1/platform/me",
+                "kind": "SPAN_KIND_SERVER",
+                "startTimeUnixNano": "1792931675905798000",
+                "endTimeUnixNano": "1792931675906856000",
+                "attributes": [
+                  {
+                    "key": "user_agent.original",
+                    "value": {
+                      "stringValue": "Python-urllib/3.13"
+                    }
+                  },
+                  {
+                    "key": "url.scheme",
+                    "value": {
+                      "stringValue": "http"
+                    }
+                  },
+                  {
+                    "key": "network.protocol.version",
+                    "value": {
+                      "stringValue": "1.1"
+                    }
+                  },
+                  {
+                    "key": "error.type",
+                    "value": {
+                      "stringValue": "503"
+                    }
+                  },
+                  {
+                    "key": "http.request.method",
+                    "value": {
+                      "stringValue": "GET"
+                    }
+                  },
+                  {
+                    "key": "http.response.status_code",
+                    "value": {
+                      "intValue": "503"
+                    }
+                  },
+                  {
+                    "key": "url.path",
+                    "value": {
+                      "stringValue": "/api/v1/platform/me"
+                    }
+                  },
+                  {
+                    "key": "server.address",
+                    "value": {
+                      "stringValue": "localhost"
+                    }
+                  },
+                  {
+                    "key": "server.port",
+                    "value": {
+                      "intValue": "15100"
+                    }
+                  },
+                  {
+                    "key": "http.route",
+                    "value": {
+                      "stringValue": "/api/v1/platform/me"
+                    }
+                  }
+                ],
+                "status": {
+                  "code": "STATUS_CODE_ERROR"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

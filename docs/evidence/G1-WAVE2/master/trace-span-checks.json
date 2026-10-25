@@ -1,0 +1,68 @@
+[
+  {
+    "evidence": "docs/evidence/G1-WAVE2/OBS/runtime/20261025T123735Z/002-tempo-health.json",
+    "spanCount": 0,
+    "spans": []
+  },
+  {
+    "evidence": "docs/evidence/G1-WAVE2/OBS/runtime/20261025T123735Z/012-tempo-e0c866c4ef747802d0abe088837c746c.json",
+    "spanCount": 1,
+    "spans": [
+      {
+        "name": "GET /api/v1/platform/me",
+        "kind": "SPAN_KIND_SERVER",
+        "status": {},
+        "spanId": "rZpGYiVvVaM=",
+        "parentSpanId": "Nd51tc2e+4M="
+      }
+    ]
+  },
+  {
+    "evidence": "docs/evidence/G1-WAVE2/OBS/runtime/20261025T123735Z/014-tempo-81852ae486722861ab17aa9cefcb63e8.json",
+    "spanCount": 1,
+    "spans": [
+      {
+        "name": "GET /api/v1/platform/me",
+        "kind": "SPAN_KIND_SERVER",
+        "status": {},
+        "spanId": "QuE1OjriiG8=",
+        "parentSpanId": "fbJkQ6N5Wdc="
+      }
+    ]
+  },
+  {
+    "evidence": "docs/evidence/G1-WAVE2/OBS/runtime/20261025T123735Z/010-tempo-20f7ad8ec5a193c9a9b5b0e74899b344.json",
+    "spanCount": 2,
+    "spans": [
+      {
+        "name": "GET",
+        "kind": "SPAN_KIND_CLIENT",
+        "status": {},
+        "spanId": "6Yd+ikfEv/M=",
+        "parentSpanId": "hWzm/fCXJMk="
+      },
+      {
+        "name": "GET /{**webPath}",
+        "kind": "SPAN_KIND_SERVER",
+        "status": {},
+        "spanId": "hWzm/fCXJMk=",
+        "parentSpanId": null
+      }
+    ]
+  },
+  {
+    "evidence": "docs/evidence/G1-WAVE2/OBS/runtime/20261025T123735Z/008-tempo-d612c034a07e8322922458ce84faa3f2.json",
+    "spanCount": 1,
+    "spans": [
+      {
+        "name": "GET /api/v1/platform/me",
+        "kind": "SPAN_KIND_SERVER",
+        "status": {
+          "code": "STATUS_CODE_ERROR"
+        },
+        "spanId": "7PXYmuZ/UMw=",
+        "parentSpanId": null
+      }
+    ]
+  }
+]

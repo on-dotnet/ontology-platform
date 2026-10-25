@@ -1,6 +1,6 @@
 # G1 平台公共契约 V1
 
-状态：FROZEN_PENDING_REVIEW，2026-10-25。人类正式批准Wave2 Mac V2全范围；本契约由Master单写，独立Review通过的提交为三线实现基线，变更先提议Master。BaseSha=e930935749bcb88d51abb94db4a41695bbbe6717。M0历史PARTIAL不改写，G2未授权。
+状态：FROZEN（实施前87eb51a独立契约审查通过，运行时语义门禁已补），2026-10-25。人类正式批准Wave2 Mac V2全范围；本契约由Master单写，独立Review通过的提交为三线实现基线，变更先提议Master。BaseSha=e930935749bcb88d51abb94db4a41695bbbe6717。M0历史PARTIAL不改写，G2未授权。
 
 ## 入口和路由
 

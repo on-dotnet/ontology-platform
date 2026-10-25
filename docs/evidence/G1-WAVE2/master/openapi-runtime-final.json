@@ -1,0 +1,754 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "OntologyPlatform.Api | v1",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:15100/"
+    }
+  ],
+  "paths": {
+    "/auth/login": {
+      "get": {
+        "tags": [
+          "OntologyPlatform.Api"
+        ],
+        "operationId": "login",
+        "parameters": [
+          {
+            "name": "returnUrl",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "/"
+            }
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "Found"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/csrf": {
+      "get": {
+        "tags": [
+          "OntologyPlatform.Api"
+        ],
+        "operationId": "getCsrfToken",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CsrfResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": [
+          "PlatformEndpoints"
+        ],
+        "description": "必须提供有效header或表单CSRF token至少一项；浏览器使用原生form POST顶层导航。",
+        "operationId": "logout",
+        "parameters": [
+          {
+            "name": "X-CSRF-TOKEN",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "required": [
+                  "__RequestVerificationToken"
+                ],
+                "type": "object",
+                "properties": {
+                  "__RequestVerificationToken": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "302": {
+            "description": "Found"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/signin-oidc": {
+      "get": {
+        "tags": [
+          "OntologyPlatform.Api"
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/platform/me": {
+      "get": {
+        "tags": [
+          "OntologyPlatform.Api"
+        ],
+        "operationId": "getPlatformMe",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformIdentity"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/v1/platform/resources": {
+      "get": {
+        "tags": [
+          "PlatformEndpoints"
+        ],
+        "operationId": "listPlatformResources",
+        "parameters": [
+          {
+            "name": "siteId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformResourceList"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/v1/platform/resources/{id}": {
+      "get": {
+        "tags": [
+          "PlatformEndpoints"
+        ],
+        "operationId": "getPlatformResource",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformResource"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/v1/platform/audit": {
+      "get": {
+        "tags": [
+          "PlatformEndpoints"
+        ],
+        "operationId": "listPlatformAudit",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PlatformAuditEntry"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/health/live": {
+      "get": {
+        "tags": [
+          "OntologyPlatform.Api"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "health": []
+          }
+        ]
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "tags": [
+          "OntologyPlatform.Api"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "health": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CsrfResponse": {
+        "required": [
+          "requestToken"
+        ],
+        "type": "object",
+        "properties": {
+          "requestToken": {
+            "type": "string",
+            "description": "同源写请求需要回传的CSRF请求值。"
+          }
+        },
+        "description": "返回内置Antiforgery请求令牌，不作为身份认证令牌。"
+      },
+      "PlatformAuditEntry": {
+        "required": [
+          "id",
+          "occurredAtUtc",
+          "actor",
+          "action",
+          "resource",
+          "outcome",
+          "traceId",
+          "correlationId",
+          "organizationId",
+          "siteId"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "不可变审计事件标识。"
+          },
+          "occurredAtUtc": {
+            "type": "string",
+            "description": "审计发生的UTC时间。",
+            "format": "date-time"
+          },
+          "actor": {
+            "type": "string",
+            "description": "服务端解析的主体或anonymous标识。"
+          },
+          "action": {
+            "type": "string",
+            "description": "固定语义的审计操作代码。"
+          },
+          "resource": {
+            "type": "string",
+            "description": "被访问的平台资源标识或受控路径。"
+          },
+          "outcome": {
+            "type": "string",
+            "description": "允许、拒绝或失败的固定结果代码。"
+          },
+          "traceId": {
+            "type": "string",
+            "description": "与运行日志和Trace关联的标识。"
+          },
+          "correlationId": {
+            "type": "string",
+            "description": "经过格式验证的请求关联标识。"
+          },
+          "organizationId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "事件适用的组织范围，匿名时可空。"
+          },
+          "siteId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "事件适用的厂区范围，匿名时可空。"
+          }
+        },
+        "description": "公开给有权限审计员的最小审计关联数据。"
+      },
+      "PlatformIdentity": {
+        "required": [
+          "subjectId",
+          "displayName",
+          "roles",
+          "scopes"
+        ],
+        "type": "object",
+        "properties": {
+          "subjectId": {
+            "type": "string",
+            "description": "身份提供者验证通过的主体标识。"
+          },
+          "displayName": {
+            "type": "string",
+            "description": "界面显示名，不承载秘密声明。"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "服务器认可的平台角色集合。"
+          },
+          "scopes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlatformScope"
+            },
+            "description": "服务器认可的组织与厂区范围。"
+          }
+        },
+        "description": "公开给同源Web的最小已认证身份，不包含认证票据或令牌。"
+      },
+      "PlatformProblem": {
+        "required": [
+          "type",
+          "title",
+          "status",
+          "code",
+          "traceId",
+          "correlationId"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "稳定问题类型URI，默认遵循RFC的about:blank。"
+          },
+          "title": {
+            "type": "string",
+            "description": "安全且固定的错误标题。"
+          },
+          "status": {
+            "type": "integer",
+            "description": "与实际HTTP响应相同的状态码。",
+            "format": "int32"
+          },
+          "code": {
+            "type": "string",
+            "description": "客户端分支判断使用的稳定平台错误码。"
+          },
+          "traceId": {
+            "type": "string",
+            "description": "用于运维检索的当前分布式跟踪标识。"
+          },
+          "correlationId": {
+            "type": "string",
+            "description": "格式受限且由服务器确认的请求关联标识。"
+          },
+          "detail": {
+            "type": "string",
+            "description": "可选的安全错误说明，禁止放入原始异常。"
+          },
+          "instance": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "可选的问题实例引用，不包含请求查询或秘密。"
+          }
+        },
+        "description": "描述平台标准ProblemDetails的必要公开字段，不承载异常或认证协议值。"
+      },
+      "PlatformResource": {
+        "required": [
+          "id",
+          "name",
+          "organizationId",
+          "siteId",
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "资源稳定标识。"
+          },
+          "name": {
+            "type": "string",
+            "description": "资源中文显示名称。"
+          },
+          "organizationId": {
+            "type": "string",
+            "description": "资源所属组织。"
+          },
+          "siteId": {
+            "type": "string",
+            "description": "资源所属厂区。"
+          },
+          "status": {
+            "type": "string",
+            "description": "明确说明资源为开发合成样例的状态。"
+          }
+        },
+        "description": "表示用于G1真实授权验证的已标记合成平台资源。"
+      },
+      "PlatformResourceList": {
+        "required": [
+          "items",
+          "auditId",
+          "traceId"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlatformResource"
+            },
+            "description": "本次真正获准读取的资源。"
+          },
+          "auditId": {
+            "type": "string",
+            "description": "已经提交的PG访问审计标识。"
+          },
+          "traceId": {
+            "type": "string",
+            "description": "当前请求的分布式跟踪标识。"
+          }
+        },
+        "description": "返回经过服务端作用域过滤且关联PG审计的资源列表。"
+      },
+      "PlatformScope": {
+        "required": [
+          "organizationId",
+          "siteId"
+        ],
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "type": "string",
+            "description": "组织范围标识。"
+          },
+          "siteId": {
+            "type": "string",
+            "description": "厂区范围标识。"
+          }
+        },
+        "description": "表示可信身份可读取的单一组织与厂区范围。"
+      }
+    },
+    "securitySchemes": {
+      "session": {
+        "type": "apiKey",
+        "description": "仅包含受保护随机引用的HttpOnly BFF会话Cookie；令牌只留在服务器加密票据。",
+        "name": ".OntologyPlatform.Session",
+        "in": "cookie"
+      },
+      "health": {
+        "type": "apiKey",
+        "description": "仅由内部编排器持有的外置健康探针密钥。",
+        "name": "X-Health-Key",
+        "in": "header"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "OntologyPlatform.Api"
+    },
+    {
+      "name": "PlatformEndpoints"
+    }
+  ]
+}
