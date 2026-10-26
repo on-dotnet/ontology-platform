@@ -1,3 +1,5 @@
+using OntologyPlatform.Api.G2;
+
 namespace OntologyPlatform.Api;
 
 /// <summary>正式平台API宿主的进程入口。</summary>
@@ -11,6 +13,7 @@ public static class Program
         // 宿主独立于开发InfraAPI，正式提供身份、资源和探针。
         await using var app = PlatformApiHost.CreateApplication(args);
         await PlatformApiHost.InitializeDevelopmentAsync(app);
+        await G2Composition.InitializeG2DevelopmentAsync(app);
         await app.RunAsync();
     }
 }

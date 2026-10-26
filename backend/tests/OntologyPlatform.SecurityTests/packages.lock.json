@@ -266,6 +266,8 @@
           "Microsoft.AspNetCore.OpenApi": "[10.0.13, )",
           "OntologyPlatform.Contracts": "[1.0.0, )",
           "OntologyPlatform.Modules.Governance": "[1.0.0, )",
+          "OntologyPlatform.Modules.Ontology": "[1.0.0, )",
+          "OntologyPlatform.Modules.Publishing": "[1.0.0, )",
           "OntologyPlatform.ServiceDefaults": "[1.0.0, )",
           "Yarp.ReverseProxy": "[2.3.0, )"
         }
@@ -279,6 +281,36 @@
           "Microsoft.EntityFrameworkCore": "[10.0.13, )",
           "Microsoft.EntityFrameworkCore.Relational": "[10.0.13, )",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.3, )",
+          "OntologyPlatform.Contracts": "[1.0.0, )"
+        }
+      },
+      "ontologyplatform.modules.ontology": {
+        "type": "Project",
+        "dependencies": {
+          "Microsoft.EntityFrameworkCore.Relational": "[10.0.13, )",
+          "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.3, )",
+          "OntologyPlatform.Contracts": "[1.0.0, )",
+          "OntologyPlatform.Modules.Ontology.Domain": "[1.0.0, )"
+        }
+      },
+      "ontologyplatform.modules.ontology.domain": {
+        "type": "Project",
+        "dependencies": {
+          "OntologyPlatform.Contracts": "[1.0.0, )"
+        }
+      },
+      "ontologyplatform.modules.publishing": {
+        "type": "Project",
+        "dependencies": {
+          "Microsoft.EntityFrameworkCore.Relational": "[10.0.13, )",
+          "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.3, )",
+          "OntologyPlatform.Contracts": "[1.0.0, )",
+          "OntologyPlatform.Modules.Publishing.Domain": "[1.0.0, )"
+        }
+      },
+      "ontologyplatform.modules.publishing.domain": {
+        "type": "Project",
+        "dependencies": {
           "OntologyPlatform.Contracts": "[1.0.0, )"
         }
       },

@@ -34,7 +34,7 @@ public static class PlatformOpenApi
             foreach (var path in document.Paths)
             {
                 // 公开登录及CSRF领取路由不假标为必须已认证。
-                var scheme = path.Key.StartsWith("/api/v1/platform/", StringComparison.Ordinal) || path.Key == "/auth/logout"
+                var scheme = path.Key.StartsWith("/api/v1/", StringComparison.Ordinal) || path.Key == "/auth/logout"
                     ? "session" : path.Key.StartsWith("/health/", StringComparison.Ordinal) ? "health" : null;
                 if (path.Value.Operations is null)
                 {
@@ -119,6 +119,6 @@ public static class PlatformOpenApi
             }
             return Task.CompletedTask;
         });
-        return options;
+        return OntologyPlatform.Api.G2.G2OpenApi.AddG2Contracts(options);
     }
 }

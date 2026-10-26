@@ -16,6 +16,7 @@ RUN set -eu; \
     chown -R fuseki:fuseki /fuseki
 
 COPY --chmod=0555 entrypoint.sh /opt/fuseki/entrypoint.sh
+COPY --chmod=0444 g2-config.ttl g2-log4j2.properties /opt/fuseki/
 
 ENV FUSEKI_BASE=/fuseki
 WORKDIR /fuseki

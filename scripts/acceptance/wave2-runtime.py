@@ -38,9 +38,9 @@ def load_runtime(path):
     return path, json.loads(path.read_text())
 
 
-def prepare():
+def prepare(profile="wave2"):
     """Prepare one new volume prefix, random passwords and shared encrypted PFX."""
-    directory = ROOT / '.tools/security' / ('wave2-' + secrets.token_hex(6))
+    directory = ROOT / '.tools/security' / (profile + '-' + secrets.token_hex(6))
     directory.mkdir(parents=True, mode=0o700)
     directory.chmod(0o700)
     keyring = directory / 'keyring'
@@ -50,6 +50,8 @@ def prepare():
                    certificatePassword=secrets.token_urlsafe(40), healthKey=secrets.token_urlsafe(40),
                    certificatePath=str(directory / 'keyring.pfx'), keyRingPath=str(keyring),
                    realmFile=str(directory / 'realm.json'))
+    if profile == 'g2':
+        runtime.update(rustfsAccessKey=secrets.token_hex(10), rustfsSecretKey=secrets.token_urlsafe(40))
     path = directory / 'runtime.json'
     private_json(path, runtime)
     subprocess.run(['pwsh', '-NoProfile', '-File', str(ROOT / 'scripts/acceptance/new-wave2-certificate.ps1'),
@@ -81,7 +83,7 @@ def sanitize(line, sensitive):
     return line.rstrip() + '\n'
 
 
-def run(path, mode):
+def run(path, mode, profile="wave2", configuration="Debug"):
     """Launch AppHost using process-local parameters; preserve named volumes on exit."""
     path, runtime = load_runtime(path)
     env = os.environ.copy()
@@ -90,6 +92,9 @@ def run(path, mode):
                 'Parameters__postgres-password': runtime['postgresPassword'],
                 'Parameters__keycloak-admin-password': runtime['keycloakPassword'],
                 'Parameters__grafana-admin-password': runtime['grafanaPassword']})
+    if profile == 'g2':
+        env.update({'G2__Enabled': 'true', 'Parameters__rustfs-access-key': runtime['rustfsAccessKey'],
+                    'Parameters__rustfs-secret-key': runtime['rustfsSecretKey']})
     if mode == 'full':
         realm = json.loads(Path(runtime['realmFile']).read_text())
         runtime['realm'] = realm
@@ -104,7 +109,7 @@ def run(path, mode):
     evidence = EVIDENCE / 'runtime'
     evidence.mkdir(parents=True, exist_ok=True)
     log = evidence / (datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M%SZ') + '-' + mode + '.txt')
-    command = ['dotnet', 'run', '--project', 'backend/src/AppHost', '--no-build', '--no-restore']
+    command = ['dotnet', 'run', '--project', 'backend/src/AppHost', '--no-build', '--no-restore', '--configuration', configuration]
     with log.open('x', encoding='utf-8') as stream:
         process = subprocess.Popen(command, cwd=ROOT, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
         try:
@@ -121,12 +126,12 @@ def run(path, mode):
     return result
 
 
-def bootstrap(path):
+def bootstrap(path, profile="wave2"):
     """Supply only the new bootstrap password to the reviewed SEC helper."""
     _, runtime = load_runtime(path)
     env = os.environ.copy()
     env['WAVE2_KEYCLOAK_ADMIN_PASSWORD'] = runtime['keycloakPassword']
-    return subprocess.run(['python3', 'infra/security/bootstrap-keycloak.py', '--runtime-output', runtime['realmFile']], cwd=ROOT, env=env).returncode
+    return subprocess.run(['python3', 'infra/security/bootstrap-keycloak.py', '--runtime-output', runtime['realmFile'], '--profile', profile], cwd=ROOT, env=env).returncode
 
 
 def main():

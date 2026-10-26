@@ -155,8 +155,13 @@ public sealed class WireContractTests
         // 固定seq和eventId验证实际重放字节可以再次输入，不重新读取active。
         var value = new ExecutionEvent
         {
-            RunId = "run-test", Seq = 1, EventId = "run-test:1", EventType = kind,
-            SchemaVersion = 1, Snapshot = new AssetVersionSnapshot(), Payload = payload
+            RunId = "run-test",
+            Seq = 1,
+            EventId = "run-test:1",
+            EventType = kind,
+            SchemaVersion = 1,
+            Snapshot = new AssetVersionSnapshot(),
+            Payload = payload
         };
         // 实际宿主命名策略。
         var options = new JsonSerializerOptions(JsonSerializerDefaults.Web);

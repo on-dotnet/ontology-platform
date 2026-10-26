@@ -65,6 +65,7 @@ def request(origin, path, payload=None, token=None, form=False):
 def main():
     """Bootstrap only a freshly named realm and persist new synthetic credentials."""
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--profile", choices=("wave2", "g2"), default="wave2")
     parser.add_argument("--keycloak-origin", default="http://localhost:18080")
     parser.add_argument("--public-origin", default="http://localhost:15100")
     parser.add_argument("--runtime-output", required=True)
@@ -78,22 +79,26 @@ def main():
     admin_form = {"grant_type": "password", "client_id": "admin-cli", "username": admin_username}
     admin_form.update(password=admin_password)
     token = request(arguments.keycloak_origin, "/realms/master/protocol/openid-connect/token", admin_form, form=True)["access_token"]
-    realm_name = "wave2-" + secrets.token_hex(8)
+    realm_name = arguments.profile + "-" + secrets.token_hex(8)
     client_id = realm_name + "-bff"
     generated_client_secret = secrets.token_urlsafe(48)
     identities = {}
     users = []
-    for label, role, site in (("viewer-a", "platform.viewer", "site-a"),
+    identity_specs = [("viewer-a", "platform.viewer", "site-a"),
                               ("viewer-b", "platform.viewer", "site-b"),
                               ("no-role-a", None, "site-a"),
                               ("operator-a", "platform.operator", "site-a"),
-                              ("auditor-a", "platform.auditor", "site-a")):
-        username = "wave2-" + label
+                              ("auditor-a", "platform.auditor", "site-a")]
+    if arguments.profile == "g2":
+        identity_specs.extend((label + "-ab", "platform." + label, ["site-a", "site-b"])
+                              for label in ("viewer", "operator", "auditor"))
+    for label, role, site in identity_specs:
+        username = arguments.profile + "-" + label
         generated_password = secrets.token_urlsafe(30)
         identities[username] = {"username": username, "password": generated_password}
         users.append({"username": username, "enabled": True, "emailVerified": True,
                       "firstName": "合成开发身份", "lastName": label, "email": label + "@example.invalid",
-                      "attributes": {"organization_id": ["org-demo"], "site_ids": [site]},
+                      "attributes": {"organization_id": ["org-demo"], "site_ids": site if isinstance(site, list) else [site]},
                       "realmRoles": [role] if role else [],
                       "credentials": [{"type": "password", "value": generated_password, "temporary": False}]})
     mappers = []

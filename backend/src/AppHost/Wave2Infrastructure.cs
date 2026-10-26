@@ -14,9 +14,9 @@ internal static class Wave2Infrastructure
     {
         // 每轮验收显式指定新卷前缀，禁止误用历史开发数据。
         var prefix = Required(builder, "DevelopmentInfrastructure:VolumePrefix");
-        if (!System.Text.RegularExpressions.Regex.IsMatch(prefix, "^wave2-[a-z0-9-]{1,40}$"))
+        if (!System.Text.RegularExpressions.Regex.IsMatch(prefix, "^(?:wave2|g2)-[a-z0-9-]{1,40}$"))
         {
-            throw new ArgumentException("Wave2必须使用独立wave2-卷前缀。");
+            throw new ArgumentException("纵向验收必须使用独立wave2-或g2-卷前缀。");
         }
         // 参数标记secret，Aspire仪表盘与环境模型不显示密码明文。
         var postgresPassword = builder.AddParameter("postgres-password", secret: true);
@@ -58,6 +58,10 @@ internal static class Wave2Infrastructure
         }
         // 只在完整阶段读取已审OBS清单，首次身份引导不启动产品服务。
         var observation = AddObservation(builder, prefix);
+        // 只有本次G2显式开启才增加真实语义和制品资源，历史Wave2模型不变。
+        var g2Enabled = builder.Configuration.GetValue<bool>("G2:Enabled");
+        // 未启用时不创建任何额外容器或读取参数。
+        var semantics = g2Enabled ? builder.AddG2SemanticResources(prefix) : default;
         // Next使用精确项目工具路径，无全局pnpm与浏览器令牌。
         var web = builder.AddExecutable("web", Required(builder, "Wave2:NodePath"), "../../../apps/web",
                 "node_modules/next/dist/bin/next", "start", "--hostname", "127.0.0.1", "--port", "15300")
@@ -75,8 +79,11 @@ internal static class Wave2Infrastructure
             // 第二实例在同一主机不同端口，模拟同一公共源后的两个服务节点。
             var port = instance == 1 ? 15100 : 15101;
             // 固定两个实例维度，避免累计指标被聚合成同一写入流。
-            var resourceAttributes = $"service.version=G1-WAVE2,deployment.environment.name=development,service.instance.id=platform-api-{instance}";
-            builder.AddProject<Projects.OntologyPlatform_Api>($"platform-api-{instance}", launchProfileName: null)
+            // 历史G1验收保留阶段名，仅G2开关启用后使用本轮版本。
+            var version = g2Enabled ? "G2-THIN-SLICE-001" : "G1-WAVE2";
+            // 每实例保持独立指标流。
+            var resourceAttributes = $"service.version={version},deployment.environment.name=development,service.instance.id=platform-api-{instance}";
+            var api = builder.AddProject<Projects.OntologyPlatform_Api>($"platform-api-{instance}", launchProfileName: null)
                 .WithEnvironment("ASPNETCORE_ENVIRONMENT", "Development")
                 .WithEnvironment("AllowedHosts", "localhost")
                 .WithEnvironment("Security__Authority", Required(builder, "Wave2:Authority"))
@@ -101,6 +108,18 @@ internal static class Wave2Infrastructure
                 .WaitFor(keycloak)
                 .WaitFor(web)
                 .WaitFor(observation);
+            if (g2Enabled)
+            {
+                api.WithEnvironment("G2__Enabled", "true")
+                    .WithEnvironment("G2__ApplyMigrations", instance == 1 ? "true" : "false")
+                    .WithEnvironment("Semantics__ValidationOrigin", ReferenceExpression.Create($"{semantics.Jena.GetEndpoint("http")}/validation"))
+                    .WithEnvironment("Semantics__PublishedOrigin", ReferenceExpression.Create($"{semantics.Jena.GetEndpoint("http")}/ontology"))
+                    .WithEnvironment("Publishing__S3Endpoint", ReferenceExpression.Create($"http://127.0.0.1:{semantics.RustFs.GetEndpoint("s3").Property(EndpointProperty.Port)}"))
+                    .WithEnvironment("Publishing__AccessKey", semantics.AccessKey)
+                    .WithEnvironment("Publishing__SecretKey", semantics.SecretKey)
+                    .WithEnvironment("Publishing__Bucket", "ontology-releases")
+                    .WaitFor(semantics.Jena).WaitFor(semantics.RustFs);
+            }
         }
     }
 

@@ -1,0 +1,44 @@
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.30kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/eclipse-temurin:21.0.12.1_1-jre-jammy@sha256:affcab5356e1270ac35d2361ee83135af2f03e8d580eca78a6d5d6fdbf048db0
+#2 DONE 0.0s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 106B done
+#3 DONE 0.0s
+
+#4 [1/5] FROM docker.io/library/eclipse-temurin:21.0.12.1_1-jre-jammy@sha256:affcab5356e1270ac35d2361ee83135af2f03e8d580eca78a6d5d6fdbf048db0
+#4 resolve docker.io/library/eclipse-temurin:21.0.12.1_1-jre-jammy@sha256:affcab5356e1270ac35d2361ee83135af2f03e8d580eca78a6d5d6fdbf048db0 done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 1.35kB done
+#5 DONE 0.0s
+
+#6 [2/5] RUN set -eu;     curl --fail --location --retry 3 --output /tmp/fuseki.tar.gz "https://archive.apache.org/dist/jena/binaries/apache-jena-fuseki-6.2.0.tar.gz";     printf '%s  %s\n' "ba65f5867d2d4741b2ed9e2af5a0d4fbb447909894ab2a0c6bc4dac8997f4fe339c87b13c48d45d054977769f0f8bf763ea346b1f7792d5cdc458041bd43a132" /tmp/fuseki.tar.gz | sha512sum --check --strict;     mkdir -p /opt/fuseki /fuseki/databases;     tar -xzf /tmp/fuseki.tar.gz --strip-components=1 -C /opt/fuseki;     rm /tmp/fuseki.tar.gz;     groupadd --gid 10001 fuseki;     useradd --uid 10001 --gid fuseki --no-create-home --home-dir /fuseki fuseki;     chown -R fuseki:fuseki /fuseki
+#6 CACHED
+
+#7 [3/5] COPY --chmod=0555 entrypoint.sh /opt/fuseki/entrypoint.sh
+#7 CACHED
+
+#8 [4/5] COPY --chmod=0444 g2-config.ttl g2-log4j2.properties /opt/fuseki/
+#8 DONE 0.0s
+
+#9 [5/5] WORKDIR /fuseki
+#9 DONE 0.0s
+
+#10 exporting to image
+#10 exporting layers 0.0s done
+#10 exporting manifest sha256:3ddb862b501a39efbb9038a74efcc9727d7f680abc3d9108ab44e2b433eef071 done
+#10 exporting config sha256:6dd4d18e02a279e898961cba70c0f2d75e9ce94b166eaebb0c8603f08422105d done
+#10 exporting attestation manifest sha256:1f2b4781ae9eed9b444f820adebb7ee814aa1b6d8d1c03e58f1bdfce1be8c5c1 done
+#10 exporting manifest list sha256:6cd40ff063db802d36a082fda07849fef3289d974b48d5c44fc9a82c41a1e826 done
+#10 naming to docker.io/library/ontology-platform-g2-fuseki:6.2.0 done
+#10 unpacking to docker.io/library/ontology-platform-g2-fuseki:6.2.0 done
+#10 DONE 0.0s
+
+View build details: docker-desktop://dashboard/build/desktop-linux/desktop-linux/07hrath9f7wuhcetgybgh8422
