@@ -29,9 +29,10 @@ def main(test_filter=None, postgres=False, label='semantic-roundtrip'):
 
     def run(args, required=True):
         result = subprocess.run(args, cwd=ROOT, env=env, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        output = result.stdout.replace(secret, '[REDACTED]')
+        output = result.stdout
         if connection:
             output = output.replace(connection, '[CONNECTION]')
+        output = output.replace(secret, '[REDACTED]')
         records.append(dict(command=args, exitCode=result.returncode, output=output))
         print(output, end='', flush=True)
         if required and result.returncode:
@@ -72,7 +73,7 @@ def main(test_filter=None, postgres=False, label='semantic-roundtrip'):
                 raise TimeoutError('Isolated Fuseki startup failed')
             env.update(G2_SEM_JENA_ORIGIN=origin, G2_SEM_SAMPLES=str(ROOT / 'samples/g2'))
             if postgres:
-                run(['docker', 'run', '--detach', '--name', name + '-pg', '--publish', '127.0.0.1::5432', '--env', 'POSTGRES_PASSWORD', '--env', 'POSTGRES_DB', '--tmpfs', '/var/lib/postgresql', PG])
+                run(['docker', 'run', '--detach', '--name', name + '-pg', '--publish', '127.0.0.1::5432', '--env', 'POSTGRES_PASSWORD', '--env', 'POSTGRES_DB', '--memory', '512m', '--cpus', '1', '--tmpfs', '/var/lib/postgresql', PG])
                 pgport = run(['docker', 'port', name + '-pg', '5432/tcp']).stdout.strip().rsplit(':', 1)[1]
                 for _ in range(60):
                     if subprocess.run(['docker', 'exec', name + '-pg', 'pg_isready', '-U', 'postgres', '-d', 'governance'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode == 0:
@@ -81,9 +82,10 @@ def main(test_filter=None, postgres=False, label='semantic-roundtrip'):
                 connection = f'Host=127.0.0.1;Port={pgport};Database=governance;Username=postgres;Password={secret}'
                 env['ConnectionStrings__governance'] = connection
                 env['G2_SEM_PG_CONNECTION'] = connection
-                module = 'backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology'
+                run(['dotnet', 'build', 'backend/tests/OntologyPlatform.SemanticTests', '--no-restore'])
                 run(['dotnet', 'tool', 'restore'])
-                run(['dotnet', 'tool', 'run', 'dotnet-ef', 'database', 'update', '--project', module, '--startup-project', module, '--no-build'])
+                for module in ['backend/src/Modules/Governance/OntologyPlatform.Modules.Governance', 'backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology']:
+                    run(['dotnet', 'tool', 'run', 'dotnet-ef', 'database', 'update', '--project', module, '--startup-project', module, '--no-build'])
             command = ['dotnet', 'test', '--project', 'backend/tests/OntologyPlatform.SemanticTests', '--no-restore']
             if test_filter:
                 command += ['--', '--filter', test_filter]

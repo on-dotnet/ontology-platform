@@ -1,0 +1,71 @@
+{
+  "exitCode": 8,
+  "records": [
+    {
+      "command": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g2-sem-007cbb2920fe",
+        "--publish",
+        "127.0.0.1::3030",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--mount",
+        "type=bind,src=/private/tmp/g2-sem-007cbb2920feitpdh5h_,dst=/fixture,readonly",
+        "--entrypoint",
+        "java",
+        "fuseki:8b85cd963ab3910a87ff4d69819a814fcc536d5f",
+        "-Xmx384m",
+        "-Dlog4j.configurationFile=/fixture/log4j2.properties",
+        "-jar",
+        "/opt/fuseki/fuseki-server.jar",
+        "--config=/fixture/config.ttl"
+      ],
+      "exitCode": 0,
+      "output": "f75877d97223056c417e0ca7ae4189c2289bff13496c9b6caf31c2b92d4cbf64\n"
+    },
+    {
+      "command": [
+        "docker",
+        "port",
+        "g2-sem-007cbb2920fe",
+        "3030/tcp"
+      ],
+      "exitCode": 0,
+      "output": "127.0.0.1:50901\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "test",
+        "--project",
+        "backend/tests/OntologyPlatform.SemanticTests",
+        "--no-restore",
+        "--",
+        "--filter",
+        "*/ShaclTests/*"
+      ],
+      "exitCode": 8,
+      "output": "正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n/Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64) 运行了零个测试 (1s 120ms)\n退出代码: 8\n\n测试运行摘要: 运行了零个测试\n  错误: 1\n\n  总计: 0\n  失败: 0\n  成功: 0\n  已跳过: 0\n  持续时间: 1s 495ms\n已完成测试运行，但显示非成功退出代码: 8 (请参阅: https://aka.ms/testingplatform/exitcodes)\n"
+    },
+    {
+      "check": "all temporary graph triples removed",
+      "count": 0,
+      "status": "PASS"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g2-sem-007cbb2920fe"
+      ],
+      "exitCode": 0,
+      "output": "g2-sem-007cbb2920fe\n"
+    }
+  ]
+}

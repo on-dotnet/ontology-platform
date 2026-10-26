@@ -1,4 +1,5 @@
 using System.Data.Common;
+using System.Diagnostics;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -10,6 +11,9 @@ namespace OntologyPlatform.Modules.Ontology;
 /// <summary>持久源历史、精确修订CAS与Governance审计同物理事务的草稿用例。</summary>
 public sealed class OntologyService : IOntologyService, IDraftPublicationReader
 {
+    /// <summary>草稿命令只记录固定动作、内容散列与结果，不输出源正文或理由。</summary>
+    private static readonly ActivitySource Activities = new("OntologyPlatform.Ontology");
+
     /// <summary>只写ontology表的上下文。</summary>
     private readonly OntologyDbContext database;
 
@@ -22,17 +26,22 @@ public sealed class OntologyService : IOntologyService, IDraftPublicationReader
     /// <summary>单一事实时间来源。</summary>
     private readonly TimeProvider clock;
 
+    /// <summary>可选正式发布目录；S1没有发布模块时普通新资产仍能创建。</summary>
+    private readonly IReleaseCatalog? releases;
+
     /// <summary>构造模块用例，不在构造过程中访问外部资源。</summary>
     /// <param name="database">专属模块上下文。</param>
     /// <param name="runtime">受控语义运行时。</param>
     /// <param name="audit">同事务审计边界。</param>
     /// <param name="clock">真实时间提供者。</param>
-    public OntologyService(OntologyDbContext database, ISemanticRuntime runtime, ITransactionalAuditWriter audit, TimeProvider clock)
+    /// <param name="releases">正式发布目录，仅从BaseRelease创建新草稿时必需。</param>
+    public OntologyService(OntologyDbContext database, ISemanticRuntime runtime, ITransactionalAuditWriter audit, TimeProvider clock, IReleaseCatalog? releases = null)
     {
         this.database = database;
         this.runtime = runtime;
         this.audit = audit;
         this.clock = clock;
+        this.releases = releases;
     }
 
     /// <summary>只返回完整scope获准的真实草稿，不按首厂扩大权限。</summary>
@@ -59,13 +68,26 @@ public sealed class OntologyService : IOntologyService, IDraftPublicationReader
         // 已提交回执不依赖Jena当前可用性，重试直接返回同一业务事实。
         var replay = await ReplayAsync<OntologyDraft>(actor, scope, "ontology.create", request.Command, request with { Scope = scope }, cancellationToken);
         if (replay is not null) return replay;
-        if (request.BaseReleaseId is not null) throw new SemanticOperationException(503, "release_catalog_unavailable");
+        // 首次资产身份只能由服务器生成；clone只允许继承经重新授权的正式目录事实。
+        var assetId = Guid.NewGuid().ToString("N");
+        if (request.BaseReleaseId is not null)
+        {
+            if (releases is null) throw new SemanticOperationException(503, "release_catalog_unavailable");
+            // 目录根据releaseId重新授权，而非从客户端推断assetId或第一厂区。
+            var basis = await releases.ReadAsync(actor, request.BaseReleaseId, cancellationToken);
+            // 完整且规范化的历史scope不得被clone请求缩小或扩大。
+            var originalScope = Normalize(basis.Manifest.Scope);
+            DemandScope(actor, originalScope);
+            if (basis.Manifest.ReleaseId != request.BaseReleaseId || basis.Status is not (ReleaseStatus.Active or ReleaseStatus.Superseded)) throw new SemanticOperationException(409, "base_release_not_formal");
+            if (scope.OrganizationId != originalScope.OrganizationId || !scope.SiteIds.SequenceEqual(originalScope.SiteIds, StringComparer.Ordinal)) throw new SemanticOperationException(403, "asset_scope_immutable");
+            assetId = basis.Manifest.AssetId;
+        }
         // 解析在PG短事务之前完成，外部请求不会持有草稿/审计表锁。
         var analysis = await runtime.AnalyzeAsync(request.Sources, 1, cancellationToken);
         return await WriteAsync<OntologyDraft>(actor, scope, "ontology.create", request.Command, request with { Scope = scope }, async token =>
         {
             // 新资产和草稿ID完全由服务器创建，客户端不能改变既有资产scope。
-            var row = new DraftRecord { DraftId = Guid.NewGuid().ToString("N"), AssetId = Guid.NewGuid().ToString("N"), OrganizationId = scope.OrganizationId, SiteIds = scope.SiteIds, Name = request.Name, OwnerSubjectId = actor.SubjectId, UpdatedAtUtc = clock.GetUtcNow() };
+            var row = new DraftRecord { DraftId = Guid.NewGuid().ToString("N"), AssetId = assetId, BaseReleaseId = request.BaseReleaseId, OrganizationId = scope.OrganizationId, SiteIds = scope.SiteIds, Name = request.Name, OwnerSubjectId = actor.SubjectId, UpdatedAtUtc = clock.GetUtcNow() };
             database.Drafts.Add(row);
             database.Revisions.Add(Revision(row, request.Sources, analysis));
             return (Map(row, request.Sources, analysis), row.DraftId);
@@ -202,6 +224,9 @@ public sealed class OntologyService : IOntologyService, IDraftPublicationReader
     /// <summary>同事务锁定幂等键，业务/回执/Governance审计全部成功后才commit。</summary>
     private async Task<T> WriteAsync<T>(ActorContext actor, ResourceScope scope, string action, CommandContext command, object payload, Func<CancellationToken, Task<(T Result, string Resource)>> mutation, CancellationToken token) where T : class
     {
+        // Trace通过当前Activity自动关联，禁止将组织/主体作为低基数指标标签。
+        using var activity = Activities.StartActivity("ontology.command");
+        activity?.SetTag("ontology.operation", action);
         // 完整规范scope和固定操作参与幂等键，不使用第一厂区替代。
         var key = CommandKey(scope, action, command.IdempotencyKey);
         // 完整命令含reason/revision与载荷散列，异payload重放明确409。
@@ -224,6 +249,8 @@ public sealed class OntologyService : IOntologyService, IDraftPublicationReader
             await database.SaveChangesAsync(token);
             await audit.WriteAsync(actor, new AuditCommand { Action = action, Resource = result.Resource, Outcome = "allowed", Scope = scope }, database.Database.GetDbConnection(), transaction.GetDbTransaction(), token);
             await transaction.CommitAsync(token);
+            activity?.SetTag("ontology.outcome", "committed");
+            activity?.SetStatus(ActivityStatusCode.Ok);
             return result.Result;
         }
         catch (DbUpdateConcurrencyException) { throw new SemanticOperationException(409, "draft_revision_conflict"); }
