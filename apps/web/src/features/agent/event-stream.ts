@@ -1,6 +1,7 @@
 import type { ExecutionEvent } from "../../lib/api/g2-generated";
 /** 事件判别只接受唯一冻结协议；未知事件必须回读Run快照。 */
 function decode(data: string, runId: string): ExecutionEvent {
+  if (new TextEncoder().encode(data).byteLength > 131072) throw new Error("event_budget_exceeded");
   const event = JSON.parse(data) as ExecutionEvent;
   const known = ["run.started", "tool.started", "tool.completed", "evidence.added", "message.delta", "approval.required", "run.completed", "run.failed", "run.cancelled"];
   if (!event || event.runId !== runId || event.schemaVersion !== 1 || !Number.isSafeInteger(event.seq) || event.seq < 1 || event.eventId !== `${runId}:${event.seq}` || !known.includes(event.eventType) || event.payload?.kind !== event.eventType || !event.snapshot?.releaseId) throw new Error("unsupported_event_schema");

@@ -2,10 +2,11 @@
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { PlatformIdentity } from "../../lib/api/generated";
-import type { DraftDiff, OntologyDraft, SemanticValidationReport, SourceBundle, RdfTermKind, SaveDraftRequest } from "../../lib/api/g2-generated";
+import type { DraftDiff, OntologyDraft, SemanticValidationReport, SourceBundle, SaveDraftRequest } from "../../lib/api/g2-generated";
 import { command, createG2Client } from "../../lib/api/g2-client";
 import { SemanticError, Trace } from "../../components/ui/semantic-feedback";
 import { draftState, isDirty, updateSource, type DraftState } from "./draft-state";
+import { StructuralForm } from "./structural-form";
 import { SourceEditor } from "./source-editor";
 import "./workspace.css";
 const client = createG2Client();
@@ -31,9 +32,6 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
   const [diff, setDiff] = useState<DraftDiff | null>(null);
   const [fromRevision, setFromRevision] = useState(1);
   const [selected, setSelected] = useState("");
-  const [tripleIndex, setTripleIndex] = useState("0");
-  const [objectKind, setObjectKind] = useState<RdfTermKind>("literal");
-  const [objectValue, setObjectValue] = useState("");
   const [reason, setReason] = useState("");
   const [retry, setRetry] = useState<SaveDraftRequest | null>(null);
   const lifetime = useRef<AbortController | null>(null);
@@ -67,7 +65,6 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
     setRetry(payload);
     void execute(async signal => { const saved = await client.saveDraft(state.draft.draftId, payload, signal); accept(saved); setNotice(`已保存 revision ${saved.revision}`); });
   }
-  const editableTriples = state?.draft.projection.triples.filter(triple => triple.subject.kind === "iri" && triple.object.kind !== "blank" && (!selected || triple.subject.value === selected)) ?? [];
   return <div className="g2-workspace">
     <div className="g2-heading"><div><p className="eyebrow">ONTOLOGY STUDIO</p><h1>本体资产与草稿</h1><p>原始 Turtle 是权威源 · 真实 RIOT / SHACL · Synthetic 开发事实</p></div><span className="tag violet">G2 · 源码与结构</span></div>
     {error !== null && <SemanticError error={error} />}{notice && <p role="status" className="g2-notice">{notice}</p>}
@@ -91,7 +88,7 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
       <section className={`g2-panel g2-stack g2-inspector ${tab !== "inspect" ? "g2-mobile-hidden" : ""}`} aria-label="结构与验证">
         {state ? <><SemanticGraph projection={state.draft.projection} stale={dirty} onSelect={chooseNode} />
           {state.draft.projection.diagnostics.map((diagnostic, index) => <p className="g2-notice" key={index}>{diagnostic.code} · {diagnostic.message}</p>)}
-          <section className="g2-stack"><h3>结构表单</h3><p className="g2-hash">{selected || "选择图节点或下方三元组"}</p>{!state.draft.projection.structuralEditAllowed && <p className="g2-notice">存在未知/复杂公理或空白节点；结构编辑已阻断，原始源完整保留。</p>}<label>已确认三元组<select value={tripleIndex} onChange={event => setTripleIndex(event.target.value)} aria-label="结构编辑三元组">{editableTriples.map((triple, index) => <option key={index} value={index}>{triple.subject.value} · {triple.predicate} → {triple.object.value}</option>)}</select></label><label>新对象类型<select value={objectKind} onChange={event => setObjectKind(event.target.value as RdfTermKind)}><option value="literal">literal</option><option value="iri">IRI</option></select></label><label>新对象值<input value={objectValue} onChange={event => setObjectValue(event.target.value)} /></label><button className="button" disabled={busy || dirty || !canEdit || !state.draft.projection.structuralEditAllowed || !editableTriples[Number(tripleIndex)] || !objectValue.trim() || !reason.trim()} onClick={() => void execute(async signal => { const triple = editableTriples[Number(tripleIndex)]; accept(await client.editDraft(state.draft.draftId, { edit: { subjectIri: triple.subject.value, predicateIri: triple.predicate, oldObject: triple.object, newObject: { kind: objectKind, value: objectValue, datatype: objectKind === "literal" && triple.object.kind === "literal" ? triple.object.datatype : null, language: objectKind === "literal" && triple.object.kind === "literal" ? triple.object.language : null } }, command: command(state.draft.revision, reason) }, signal)); setNotice("结构编辑已由服务端保存为新修订"); })}>提交真实结构编辑</button></section>
+          <StructuralForm projection={state.draft.projection} selected={selected} blocked={busy || dirty || !canEdit || !reason.trim()} onEdit={edit => void execute(async signal => { accept(await client.editDraft(state.draft.draftId, { edit, command: command(state.draft.revision, reason) }, signal)); setNotice("结构编辑已由服务端保存为新修订"); })} />
           <section className="g2-stack"><div className="g2-row"><h3>SHACL 与支持子集</h3><button className="button" disabled={busy || dirty || !canEdit || !reason.trim()} onClick={() => void execute(async signal => setReport(await client.validateDraft(state.draft.draftId, { revision: state.draft.revision, hashes: state.draft.hashes, command: command(state.draft.revision, reason) }, signal)))}>验证已保存修订</button></div>{dirty && <p className="muted">保存后才能验证当前文本。</p>}{report && <><strong className="g2-status">{report.kind} · {report.conforms ? "符合" : "不符合"} · revision {report.revision}</strong><p className="g2-hash">{report.hashes.bundleHash}</p>{report.issues.map((issue, index) => <article className="g2-notice" key={index}><strong>{issue.severity} · {issue.message}</strong><p>{issue.focusNode?.value} · {issue.path}</p><small>{issue.constraintComponent} · {issue.sourceId}</small></article>)}<Trace traceId={report.traceId} /><p className="muted">OWL 逻辑推理：NOT_RUN</p><button className="button primary" disabled={busy || dirty || !report.conforms || report.revision !== state.draft.revision || report.hashes.bundleHash !== state.draft.hashes.bundleHash || !reason.trim() || !canEdit} onClick={() => void execute(async signal => { const proposal = await client.createProposal({ kind: "PUBLISH", draftId: state.draft.draftId, draftRevision: state.draft.revision, hashes: state.draft.hashes, validationReportId: report.reportId, targetReleaseId: null, targetManifestHash: null, command: command(state.draft.revision, reason) }, signal); setNotice(`真实发布提案已提交 ${proposal.proposalId}，请由其他主体在发布治理中审核。`); })}>提交异人发布审核</button></>}</section>
           <section className="g2-stack"><h3>固定修订 Diff</h3><label>基准修订<input type="number" min={1} max={state.draft.revision} value={fromRevision} onChange={event => setFromRevision(Number(event.target.value))} /></label><button className="button" disabled={busy || !Number.isSafeInteger(fromRevision) || fromRevision < 1 || fromRevision > state.draft.revision} onClick={() => void execute(async signal => setDiff(await client.diff(state.draft.draftId, fromRevision, signal)))}>读取真实 Diff</button>{diff && <><p>revision {diff.baseRevision} → {diff.targetRevision} · +{diff.addedTriples.length} / −{diff.removedTriples.length} triples</p><pre className="g2-pre">{diff.sourceDiff}</pre>{diff.unsupportedDiagnostics.map((item, index) => <p key={index}>{item.code} · {item.message}</p>)}</>}</section>
         </> : <><h2>语义检查器</h2><p className="muted">选择或创建真实草稿后，显示相同 revision / hash 的投影、结构表单、SHACL 与 Diff。</p></>}

@@ -22,3 +22,13 @@ describe("G2同源传输", () => {
     await expect(client.drafts(controller.signal)).rejects.toMatchObject({ code: "invalid_response" }); expect(observed?.signal).toBe(controller.signal);
   });
 });
+describe("G2持久事件订阅", () => {
+  it("用Last-Event-ID和真实fetch流续订，取消信号不变", async () => {
+    const controller = new AbortController(); let observed: RequestInit | undefined;
+    const stream = new ReadableStream<Uint8Array>({ start(c) { c.close(); } });
+    const client = createG2Client({ fetch: async (_url, init) => { observed = init; return new Response(stream, { headers: { "Content-Type": "text/event-stream" } }); } });
+    expect(await client.events("run-1", "run-1:7", controller.signal)).toBe(stream);
+    expect(new Headers(observed?.headers).get("Last-Event-ID")).toBe("run-1:7");
+    expect(observed).toMatchObject({ signal: controller.signal, credentials: "same-origin", cache: "no-store", redirect: "error" });
+  });
+});

@@ -73,3 +73,26 @@ test("加载/503/403/404准确显示，不虚构成功数据", async ({ page }) 
   await expect(page.locator(".g2-notice[role=alert]")).toContainText("依赖暂时不可用");
   for (const status of [403, 404]) { await page.route("**/api/v1/ontology-drafts", route => route.fulfill({ status, json: { code: "safe" } })); await page.getByRole("button", { name: "刷新", exact: true }).click(); await expect(page.locator(".g2-notice[role=alert]")).toContainText(`HTTP ${status}`); }
 });
+test("结构新增Class发送唯一SemanticEdit，不浏览器重建本体", async ({ page }) => {
+  let edit: unknown = null;
+  await page.route("**/api/v1/ontology-drafts/draft-ui/edits", route => { edit = route.request().postDataJSON(); return route.fulfill({ json: { ...draft, revision: 2, etag: '"2"', projection: { ...draft.projection, revision: 2 } } }); });
+  await page.goto("/ontologies"); await page.getByRole("button", { name: /Synthetic 本体草稿/ }).click();
+  await page.getByRole("textbox", { name: "变更理由" }).fill("新增合成Class");
+  await page.getByRole("combobox", { name: "结构操作" }).selectOption("add");
+  await page.getByRole("textbox", { name: "主体IRI" }).fill("urn:synthetic:Added");
+  await page.getByRole("combobox", { name: "标准声明快捷填入" }).selectOption("http://www.w3.org/2002/07/owl#Class");
+  await page.getByRole("button", { name: "提交真实结构编辑" }).click();
+  await expect.poll(() => edit).toMatchObject({ edit: { subjectIri: "urn:synthetic:Added", predicateIri: "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", oldObject: null, newObject: { kind: "iri", value: "http://www.w3.org/2002/07/owl#Class" } }, command: { expectedRevision: 1 } });
+});
+test("dirty阻断验证/结构编辑，图布局不产生语义写入", async ({ page }) => {
+  let writes = 0;
+  await page.route("**/api/v1/ontology-drafts/draft-ui/**", route => { if (route.request().method() !== "GET") writes++; return route.fulfill({ status: 503, json: { code: "not_expected" } }); });
+  await page.goto("/ontologies"); await page.getByRole("button", { name: /Synthetic 本体草稿/ }).click();
+  await page.getByRole("button", { name: "重新布局" }).click();
+  await page.getByRole("textbox", { name: "变更理由" }).fill("合成编辑理由");
+  await page.getByRole("textbox", { name: "本体 · OWL源码" }).fill("unsaved local text");
+  await expect(page.getByRole("button", { name: "验证已保存修订" })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "提交真实结构编辑" })).toBeDisabled();
+  await expect(page.getByText("本地源码未保存，下图保留上次服务器确认版本。")).toBeVisible();
+  expect(writes).toBe(0);
+});
