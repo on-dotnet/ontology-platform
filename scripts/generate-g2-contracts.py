@@ -58,6 +58,9 @@ schemas['SemanticDatum'] = {'oneOf': [dict(type='object', required=list(fields),
 fields = schemas['ExecutionEvent']['properties']
 schemas['ExecutionEvent'] = {'oneOf': [dict(type='object', required=list(fields), additionalProperties=False, properties={key: ({'type': 'string', 'const': kind} if key == 'eventType' else {'type': 'integer', 'const': 1} if key == 'schemaVersion' else {'$ref': '#/components/schemas/' + payload} if key == 'payload' else value) for key, value in fields.items()}) for payload, kind in SCHEMA['payloadDiscriminators'].items()], 'discriminator': {'propertyName': 'eventType'}}
 
+# 始终生成独立Schema来源，运行端点快照导出不反向覆盖唯一模型合同。
+(ROOT / 'docs/contracts/g2-schemas.openapi.json').write_text(json.dumps({'openapi': '3.1.0', 'info': {'title': 'Generated G2 DTO schemas; not runtime route evidence', 'version': '1.0.0'}, 'paths': {}, 'components': {'schemas': schemas}}, ensure_ascii=False, indent=2) + '\n')
+
 # 只在产品端点首次导出前提供标明来源的合同schema；不得用此空paths证明实际OpenAPI已验收。
 openapi_path = ROOT / 'docs/contracts/g2-platform.openapi.json'
 if not openapi_path.exists() or 'x-contract-source' in json.loads(openapi_path.read_text()):
