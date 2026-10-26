@@ -67,7 +67,7 @@ internal sealed class AgentFixture : IDisposable
     internal Action<HttpRequestMessage, HttpResponseMessage>? CorruptResponse { get; set; }
 
     /// <summary>在真实Catalog完成后插入故障或活动版本变更，保持此前真实验证路径。</summary>
-    internal ISemanticGateway AfterResolve(Func<Task> callback) => new SemanticGateway(new CatalogCheckpoint(Catalog, callback), scope.ServiceProvider.GetRequiredService<ISemanticRuntime>(), scope.ServiceProvider.GetRequiredService<CapabilityRegistry>(), scope.ServiceProvider.GetRequiredService<IAuditTrail>(), Clock);
+    internal ISemanticGateway AfterResolve(Func<Task> callback) => new SemanticGateway(new CatalogCheckpoint(Catalog, callback), scope.ServiceProvider.GetRequiredService<ISemanticRuntime>(), scope.ServiceProvider.GetRequiredService<CapabilityRegistry>(), scope.ServiceProvider.GetRequiredService<IAuditTrail>(), Clock, scope.ServiceProvider.GetRequiredService<VerifiedReleaseSources>());
 
     /// <summary>通过环境获取本轮新建资源，不读取历史凭证文件。</summary>
     internal AgentFixture(bool development = true)
