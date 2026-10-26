@@ -1,0 +1,26 @@
+using OntologyPlatform.Contracts;
+
+namespace OntologyPlatform.AgentTests;
+
+/// <summary>临时诊断上游最小Unicode标签；仅输出固定状态和机器码，不作为分片回归测试。</summary>
+[TestClass]
+public sealed class UnicodeSemanticProbe
+{
+    /// <summary>单个非BMP字符标签经过正式草稿验证的实际结果。</summary>
+    [TestMethod]
+    public async Task ObserveSingleEmojiLabel()
+    {
+        // 仍使用本次脚本新建隔离服务。
+        using var fixture = new AgentFixture();
+        // 唯一变化为业务标签及来源断言中的字面值，不改身份或任何配置。
+        var sources = fixture.Sources();
+        try
+        {
+            await fixture.PublishAsync(sources with { DataTurtle = sources.DataTurtle.Replace("炉次heat-1", "😀", StringComparison.Ordinal) });
+        }
+        catch (SemanticOperationException failure)
+        {
+            Assert.Fail($"OBSERVED_SEM_UNICODE status={failure.Status}; code={failure.Code}; type=SemanticOperationException");
+        }
+    }
+}
