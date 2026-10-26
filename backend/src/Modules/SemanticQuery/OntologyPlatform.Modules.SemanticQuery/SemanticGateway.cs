@@ -12,6 +12,9 @@ public sealed class SemanticGateway : ISemanticGateway
     /// <summary>受控真实Jena读取。</summary>
     private readonly ISemanticRuntime runtime;
 
+    /// <summary>恢复与清单严格绑定的真实不可变源字节。</summary>
+    private readonly VerifiedReleaseSources sources;
+
     /// <summary>唯一机器Schema能力登记。</summary>
     private readonly CapabilityRegistry registry;
 
@@ -22,13 +25,14 @@ public sealed class SemanticGateway : ISemanticGateway
     private readonly TimeProvider clock;
 
     /// <summary>消费其他模块公共合同，不直接读写其表。</summary>
-    public SemanticGateway(IReleaseCatalog catalog, ISemanticRuntime runtime, CapabilityRegistry registry, IAuditTrail audit, TimeProvider clock)
+    public SemanticGateway(IReleaseCatalog catalog, ISemanticRuntime runtime, CapabilityRegistry registry, IAuditTrail audit, TimeProvider clock, VerifiedReleaseSources sources)
     {
         this.catalog = catalog;
         this.runtime = runtime;
         this.registry = registry;
         this.audit = audit;
         this.clock = clock;
+        this.sources = sources;
     }
 
     /// <summary>返回三个实际能力和完整Schema版本。</summary>
@@ -41,50 +45,59 @@ public sealed class SemanticGateway : ISemanticGateway
         using var activity = QueryRules.Activities.StartActivity("semantic.query");
         // 无可信快照时不能构造假release和hash。
         ReleaseManifest? manifest = null;
-        // 预算涵盖Catalog与图读取，外部取消仍向上传播。
+        // 同一deadline覆盖Catalog、源GET、正式图批次验证及成功或失败审计，不额外重置预算。
         using var budget = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        budget.CancelAfter(plan.TimeoutMs is >= 100 and <= 5000 ? plan.TimeoutMs : 1000);
+        // 成功结果只有完成同一预算内的真实审计后才可以公开。
+        SemanticQueryResult result;
         try
         {
             QueryRules.Validate(actor, plan);
             registry.Resolve(plan);
-            budget.CancelAfter(plan.TimeoutMs);
             manifest = (await catalog.ResolveAsync(actor, plan.AssetId, plan.ReleaseId, budget.Token)).Manifest;
             if (!QueryRules.Covers(actor, manifest.Scope)) throw new SemanticOperationException(403, "scope_denied");
             if (!manifest.Snapshot.CapabilityVersions.Any(value => value.AssetId == plan.CapabilityId && value.Version == plan.CapabilityVersion)) throw new SemanticOperationException(409, "release_capability_mismatch");
-            // 所有后续操作只使用一次固定的正式图。
-            var graph = new PublishedGraph(manifest, await runtime.ReadPublishedAsync(manifest.Snapshot, budget.Token), budget.Token);
+            // 每项源按manifest槽位和hash真实GET，不能仅凭Catalog之前某一批图验证结果。
+            var verifiedSources = await sources.ReadAsync(manifest, budget.Token);
+            // 唯一SEM返回的正是与这些源精确对账后的同一批实际图；之后不再ReadPublished。
+            var graph = new PublishedGraph(manifest, await runtime.ReadVerifiedPublishedAsync(manifest, verifiedSources, budget.Token), budget.Token);
             if (plan.RelationshipIris.Any(value => !graph.Relationships.Contains(value)) || plan.EntityType is not null && !graph.Description.ClassIris.Contains(plan.EntityType, StringComparer.Ordinal)) throw new SemanticOperationException(422, "query_path_invalid");
-            // 实体和关系都从正式标准断言派生。
-            var result = Evaluate(actor, plan, manifest, graph, budget.Token);
+            result = Evaluate(actor, plan, manifest, graph, budget.Token);
             budget.Token.ThrowIfCancellationRequested();
-            await QueryRules.AuditAsync(audit, actor, "semantic.query", result.Status == SemanticQueryStatus.Unauthorized ? "denied" : "allowed", cancellationToken);
-            QueryRules.Queries.Add(1, new KeyValuePair<string, object?>("capability", plan.CapabilityId), new KeyValuePair<string, object?>("status", result.Status.ToString()));
-            return result;
         }
         catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
         {
-            await QueryRules.AuditAsync(audit, actor, "semantic.query", "failure", cancellationToken);
+            await QueryRules.AuditWithinBudgetAsync(audit, actor, "semantic.query", "failure", budget.Token, cancellationToken);
             if (manifest is null) throw new SemanticOperationException(503, "query_timeout");
-            return Result(actor, manifest, SemanticQueryStatus.Unavailable, diagnostics: [QueryRules.Diagnostic("query_timeout")]);
+            return Complete(plan.CapabilityId, Result(actor, manifest, SemanticQueryStatus.Unavailable, diagnostics: [QueryRules.Diagnostic("query_timeout")]));
         }
         catch (SemanticOperationException failure)
         {
-            await QueryRules.AuditAsync(audit, actor, "semantic.query", failure.Status == 403 ? "denied" : "failure", cancellationToken);
+            await QueryRules.AuditWithinBudgetAsync(audit, actor, "semantic.query", failure.Status == 403 ? "denied" : "failure", budget.Token, cancellationToken);
             if (manifest is null || failure.Status != 503) throw;
-            return Result(actor, manifest, SemanticQueryStatus.Unavailable, diagnostics: [QueryRules.Diagnostic("source_unavailable")]);
+            return Complete(plan.CapabilityId, Result(actor, manifest, SemanticQueryStatus.Unavailable, diagnostics: [QueryRules.Diagnostic("source_unavailable")]));
         }
         catch (DbException)
         {
-            // Catalog数据库不可用时无可信snapshot；治理失败同样保持明确503。
-            await QueryRules.AuditAsync(audit, actor, "semantic.query", "failure", cancellationToken);
+            await QueryRules.AuditWithinBudgetAsync(audit, actor, "semantic.query", "failure", budget.Token, cancellationToken);
             throw new SemanticOperationException(503, "source_unavailable");
         }
         catch (HttpRequestException)
         {
-            await QueryRules.AuditAsync(audit, actor, "semantic.query", "failure", cancellationToken);
+            await QueryRules.AuditWithinBudgetAsync(audit, actor, "semantic.query", "failure", budget.Token, cancellationToken);
             if (manifest is null) throw new SemanticOperationException(503, "source_unavailable");
-            return Result(actor, manifest, SemanticQueryStatus.Unavailable, diagnostics: [QueryRules.Diagnostic("source_unavailable")]);
+            return Complete(plan.CapabilityId, Result(actor, manifest, SemanticQueryStatus.Unavailable, diagnostics: [QueryRules.Diagnostic("source_unavailable")]));
         }
+        // 审计置于处理catch之外，真实审计错误不被重试为另一条貌似成功的失败审计。
+        await QueryRules.AuditWithinBudgetAsync(audit, actor, "semantic.query", result.Status == SemanticQueryStatus.Unauthorized ? "denied" : "allowed", budget.Token, cancellationToken);
+        return Complete(plan.CapabilityId, result);
+    }
+
+    /// <summary>全部真实返回六态都只经过此处计数一次，含已完成审计的catch不可用结果。</summary>
+    private static SemanticQueryResult Complete(string capability, SemanticQueryResult result)
+    {
+        QueryRules.Queries.Add(1, new KeyValuePair<string, object?>("capability", capability), new KeyValuePair<string, object?>("status", result.Status.ToString()));
+        return result;
     }
 
     /// <summary>图内等值匹配和有界遍历，不拼接SPARQL或猜测关系。</summary>

@@ -98,6 +98,7 @@ def main():
             jenaport = run(['docker', 'port', names[-1], '3030/tcp']).stdout.strip().rsplit(':', 1)[1]
             env['G2_QRY_JENA'] = 'http://127.0.0.1:' + jenaport
             env['G2_QRY_SAMPLES'] = str(ROOT / 'samples/g2')
+            env['G2_QRY_TIMINGS'] = str(path / 'timings.jsonl')
             wait_url(env['G2_QRY_JENA'] + '/$/ping')
             run(['dotnet', 'build', 'backend/tests/OntologyPlatform.QueryTests', '--no-restore'])
             if not args.artifact_only:
@@ -120,7 +121,7 @@ def main():
             source_files = [*ROOT.glob('backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/*.cs'), *ROOT.glob('backend/tests/OntologyPlatform.QueryTests/*.cs'), ROOT / 'backend/src/Hosts/OntologyPlatform.Api/G2/SemanticEndpoints.cs', ROOT / 'docs/contracts/g2-schemas.openapi.json', Path(__file__).resolve()]
             source_hashes = {str(file.relative_to(ROOT)): hashlib.sha256(file.read_bytes()).hexdigest() for file in sorted(source_files)}
             dirty = bool(subprocess.run(['git', 'status', '--porcelain'], cwd=ROOT, text=True, capture_output=True).stdout)
-            (EVIDENCE / (args.label + '.json')).write_text(json.dumps(dict(sourceSha=sha, workingTreeChanges=dirty, sourceHashes=source_hashes, exitCode=code, records=records), ensure_ascii=False, indent=2) + '\n')
+            (EVIDENCE / (args.label + '.json')).write_text(json.dumps(dict(sourceSha=sha, workingTreeChanges=dirty, sourceHashes=source_hashes, exitCode=code, timings=[json.loads(line) for line in (path / 'timings.jsonl').read_text().splitlines()] if (path / 'timings.jsonl').exists() else [], records=records), ensure_ascii=False, indent=2) + '\n')
     return code
 
 

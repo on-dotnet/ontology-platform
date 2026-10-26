@@ -34,10 +34,10 @@ public sealed class CapabilityRegistry
                 Type = "object",
                 AdditionalProperties = false,
                 Required = ["assetId", "depth", "maxRows", "timeoutMs"],
-                Properties = [Parameter("assetId", "string", "正式资产标识"), Parameter("releaseId", "string", "可选历史正式发布"), Parameter("entityType", "string", "正式类IRI"), Parameter("entityIri", "string", "实体完整IRI"), Parameter("externalId", "string", "业务外部号"), Parameter("siteId", "string", "授权厂区"), Parameter("relationshipIris", "array", "正式对象属性路径"), Parameter("depth", "integer", "遍历深度", 1, 5), Parameter("maxRows", "integer", "最大返回行数", 1, 100), Parameter("timeoutMs", "integer", "毫秒预算", 1, 5000)]
+                Properties = [Parameter("assetId", "string", "正式资产标识"), Parameter("releaseId", "string", "可选历史正式发布"), Parameter("entityType", "string", "正式类IRI"), Parameter("entityIri", "string", "实体完整IRI"), Parameter("externalId", "string", "业务外部号"), Parameter("siteId", "string", "授权厂区"), Parameter("relationshipIris", "array", "正式对象属性路径"), Parameter("depth", "integer", "遍历深度", 1, 5), Parameter("maxRows", "integer", "最大返回行数", 1, 100), Parameter("timeoutMs", "integer", "毫秒预算", 100, 5000)]
             };
             // 执行器语义标识纳入散列；代码语义变化必须推进此标识。
-            var executor = "semantic-query/" + item.Item1 + "/3";
+            var executor = "semantic-query/" + item.Item1 + "/4";
             // 序列化属性顺序确定，输出组件和定义按序排列，因此同构建跨进程稳定。
             var version = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new { input, output, executor }))));
             return new SemanticCapability { Id = item.Item1, Version = version, InputSchema = input, OutputSchema = output, Meaning = item.Item2, Policy = "semantic.read", ExecutorId = executor, Budgets = new CapabilityBudget { MaxDepth = 5, MaxRows = 100, TimeoutMs = 5000, MaxToolCalls = 3 } };

@@ -1,0 +1,124 @@
+[
+  {
+    "command": [
+      "dotnet",
+      "format",
+      "src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery",
+      "--no-restore"
+    ],
+    "cwd": "/Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend",
+    "exitCode": 0,
+    "output": ""
+  },
+  {
+    "command": [
+      "dotnet",
+      "format",
+      "tests/OntologyPlatform.QueryTests",
+      "--no-restore"
+    ],
+    "cwd": "/Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend",
+    "exitCode": 0,
+    "output": ""
+  },
+  {
+    "command": [
+      "dotnet",
+      "format",
+      "src/Hosts/OntologyPlatform.Api",
+      "--no-restore",
+      "--include",
+      "src/Hosts/OntologyPlatform.Api/G2/SemanticEndpoints.cs"
+    ],
+    "cwd": "/Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend",
+    "exitCode": 0,
+    "output": ""
+  },
+  {
+    "command": [
+      "dotnet",
+      "format",
+      "src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery",
+      "--no-restore",
+      "--verify-no-changes"
+    ],
+    "cwd": "/Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend",
+    "exitCode": 0,
+    "output": ""
+  },
+  {
+    "command": [
+      "dotnet",
+      "format",
+      "tests/OntologyPlatform.QueryTests",
+      "--no-restore",
+      "--verify-no-changes"
+    ],
+    "cwd": "/Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend",
+    "exitCode": 0,
+    "output": ""
+  },
+  {
+    "command": [
+      "dotnet",
+      "format",
+      "src/Hosts/OntologyPlatform.Api",
+      "--no-restore",
+      "--verify-no-changes",
+      "--include",
+      "src/Hosts/OntologyPlatform.Api/G2/SemanticEndpoints.cs"
+    ],
+    "cwd": "/Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend",
+    "exitCode": 0,
+    "output": ""
+  },
+  {
+    "command": [
+      "dotnet",
+      "build",
+      "backend/tests/OntologyPlatform.QueryTests",
+      "-c",
+      "Release",
+      "--no-restore"
+    ],
+    "cwd": "/Users/chasen/.codex/worktrees/g2-query/ontology-platform",
+    "exitCode": 0,
+    "output": "  OntologyPlatform.Contracts -> /Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/bin/Release/net10.0/OntologyPlatform.Contracts.dll\n  OntologyPlatform.Modules.Publishing.Domain -> /Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/bin/Release/net10.0/OntologyPlatform.Modules.Publishing.Domain.dll\n  OntologyPlatform.Modules.Ontology.Domain -> /Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/bin/Release/net10.0/OntologyPlatform.Modules.Ontology.Domain.dll\n  OntologyPlatform.Modules.Governance -> /Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/bin/Release/net10.0/OntologyPlatform.Modules.Governance.dll\n  OntologyPlatform.ServiceDefaults -> /Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/src/ServiceDefaults/bin/Release/net10.0/OntologyPlatform.ServiceDefaults.dll\n  OntologyPlatform.Modules.SemanticQuery -> /Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/bin/Release/net10.0/OntologyPlatform.Modules.SemanticQuery.dll\n  OntologyPlatform.Modules.Publishing -> /Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/bin/Release/net10.0/OntologyPlatform.Modules.Publishing.dll\n  OntologyPlatform.Modules.Ontology -> /Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/bin/Release/net10.0/OntologyPlatform.Modules.Ontology.dll\n/Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/G2/G2EndpointGuard.cs(57,215): warning CS1573: 参数“requiresCommand”在“G2EndpointGuard.ExecuteAsync<T>(HttpContext, string, CommandContext?, Func<ActorContext, CancellationToken, Task<T>>, bool, bool, bool)”的 XML 注释中没有匹配的 param 标记(但其他参数有) [/Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/OntologyPlatform.Api.csproj]\n  OntologyPlatform.Api -> /Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/bin/Release/net10.0/OntologyPlatform.Api.dll\n  OntologyPlatform.QueryTests -> /Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Release/net10.0/OntologyPlatform.QueryTests.dll\n\n已成功生成。\n\n/Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/G2/G2EndpointGuard.cs(57,215): warning CS1573: 参数“requiresCommand”在“G2EndpointGuard.ExecuteAsync<T>(HttpContext, string, CommandContext?, Func<ActorContext, CancellationToken, Task<T>>, bool, bool, bool)”的 XML 注释中没有匹配的 param 标记(但其他参数有) [/Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/OntologyPlatform.Api.csproj]\n    1 个警告\n    0 个错误\n\n已用时间 00:00:00.91\n"
+  },
+  {
+    "command": [
+      "dotnet",
+      "build",
+      "backend/src/Hosts/OntologyPlatform.Api",
+      "-c",
+      "Release",
+      "--no-restore"
+    ],
+    "cwd": "/Users/chasen/.codex/worktrees/g2-query/ontology-platform",
+    "exitCode": 0,
+    "output": "  OntologyPlatform.Contracts -> /Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/bin/Release/net10.0/OntologyPlatform.Contracts.dll\n  OntologyPlatform.ServiceDefaults -> /Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/src/ServiceDefaults/bin/Release/net10.0/OntologyPlatform.ServiceDefaults.dll\n  OntologyPlatform.Modules.Governance -> /Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/bin/Release/net10.0/OntologyPlatform.Modules.Governance.dll\n  OntologyPlatform.Api -> /Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/bin/Release/net10.0/OntologyPlatform.Api.dll\n\n已成功生成。\n    0 个警告\n    0 个错误\n\n已用时间 00:00:00.33\n"
+  },
+  {
+    "command": [
+      "pwsh",
+      "-NoProfile",
+      "-File",
+      "scripts/verify.ps1",
+      "-SelfTest"
+    ],
+    "cwd": "/Users/chasen/.codex/worktrees/g2-query/ontology-platform",
+    "exitCode": 0,
+    "output": "\nCheck             Status Message\n-----             ------ -------\nrepository-static PASS   检查1058个文件：语法/格式/相对链接/有限机密模式/基线…\n\nPASS: clean baseline accepted\nPASS: wrong package name rejected\nPASS: broken relative link rejected\nPASS: synthetic token rejected without printing value\nPASS: synthetic token in TypeScript rejected\nPASS: credential assignment in dot-env rejected\nPASS: unpinned action rejected\n\nCheck             Status Message\n-----             ------ -------\nrepository-static PASS   检查1061个文件：语法/格式/相对链接/有限机密模式/基线…\n\nNOT_RUN: .NET test：须显式追加-RunTests执行已批准测试项目。\nNOT_RUN: Web独立检查需真实目标及显式-RunNative。\nNOT_RUN: Web检查被显式-SkipWeb跳过，仅用于隔离工程检查器fixture或独立验收。\nNOT_RUN: 浏览器真实OIDC/E2E需独立受控联调，不隐式混入工程检查。\nPASS: 所选工程检查；范围以逐项输出为准，不表示业务、前端或整个G1通过。\nPASS: native commands resolve SDK and config from selected Root\nChecker tests: 8 passed; application tests: NOT_RUN.\nPASS: Doctor handles existing pnpm without Node as BLOCKED/2.\nPASS: Doctor discovers real macOS ARM64 Node from isolated path with spaces.\nPASS: YAML/TOML syntax, 1 files; runtime compatibility not implied.\nFAIL: structured syntax invalid.yml (ParserError)\nFAIL: structured syntax invalid.toml (TOMLDecodeError)\nPASS: structured parser 4 real positive/negative cases.\n\nCheck             Status Message\n-----             ------ -------\nrepository-static PASS   检查1058个文件：语法/格式/相对链接/有限机密模式/基线…\n\nPASS: verification preserves unset environment state for five process variables.\n\nCheck             Status Message\n-----             ------ -------\nrepository-static PASS   检查1058个文件：语法/格式/相对链接/有限机密模式/基线…\n\nPASS: verification preserves empty environment state for five process variables.\n\nCheck             Status Message\n-----             ------ -------\nrepository-static PASS   检查1058个文件：语法/格式/相对链接/有限机密模式/基线…\n\nPASS: verification preserves value environment state for five process variables.\nEnvironment regression: 3 state groups and structured-suite cleanup passed; native calls are synthetic, product tests NOT_RUN.\nPASS: toolchain archives accept two exact digests and reject two tampered byte cases.\nPASS: committed snapshot, Unicode, full diff and reopened ZIP\nPASS: color.ui always cannot contaminate machine-readable patch\nPASS: PASS requires real command evidence\nPASS: non-ancestor commits\nPASS: dirty tracked delivery\nPASS: untracked delivery\nPASS: forbidden committed member .env\nPASS: forbidden committed member .env.production\nPASS: forbidden committed member .ssh/id\nPASS: forbidden committed member .codex/auth.json\nPASS: forbidden committed member auth/config.json\nPASS: forbidden committed member cert.pem\nPASS: forbidden committed member nested/bin/output\nPASS: forbidden committed member .tools/sdk/file\nPASS: forbidden committed member models/weights.dat\nPASS: forbidden committed member state.db\nPASS: forbidden committed member .cache/item\nPASS: forbidden committed member node_modules/item\nPASS: synthetic token in source\nPASS: removed synthetic token retained in patch\nPASS: reopened archive rejects injected or changed member .git/config\nPASS: reopened archive rejects injected or changed member .env\nPASS: reopened archive rejects injected or changed member ../escape.txt\nPASS: reopened archive rejects injected or changed member source/app.txt\nPASS: git archive export-ignore cannot omit committed source\nPASS: git archive export-subst cannot rewrite committed source\nPASS: git symlink blob cannot silently become source\nPASS: committed submodule cannot be omitted by git archive\nPASS: complete patch rejects removed forbidden environment member\nPASS: reopened archive rejects payload tamper even after checksum rewrite\nPASS: missing checksum/member is rejected on reopen\nPASS: CI PASS cannot be inferred without run metadata\nPASS: explicit CI metadata avoids self-referential commit evidence\nPASS: existing delivery ZIP is preserved\nPASS: valid committed evidence preserves command and status\nReviewPackage: 35 tests, 0 failures; product/container tests NOT_RUN.\nNOT_RUN: .NET原生检查需显式-RunNative及对应任务授权。\nNOT_RUN: Web独立检查需真实目标及显式-RunNative。\nNOT_RUN: 浏览器真实OIDC/E2E需独立受控联调，不隐式混入工程检查。\nPASS: 所选工程检查；范围以逐项输出为准，不表示业务、前端或整个G1通过。\n"
+  },
+  {
+    "command": [
+      "git",
+      "diff",
+      "--check",
+      "b1d2a51feea5b27bf91e2470fe87f3aea697fcb3"
+    ],
+    "cwd": "/Users/chasen/.codex/worktrees/g2-query/ontology-platform",
+    "exitCode": 0,
+    "output": ""
+  }
+]
