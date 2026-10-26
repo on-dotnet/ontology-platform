@@ -1,0 +1,7 @@
+PASS: eight output redaction negatives and runtime path boundary
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/scripts/tests/Wave2Runtime.Tests.py", line 16, in <module>
+    assert 'SYNTHETIC_ACCESS_ONLY' not in m.sanitize(line, list(m.secret_values(synthetic)))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+exitCode=1

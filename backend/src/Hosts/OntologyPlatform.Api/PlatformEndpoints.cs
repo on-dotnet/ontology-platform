@@ -88,13 +88,20 @@ public static class PlatformEndpoints
             {
                 return PlatformProblem.Create(context, 401, "unauthenticated");
             }
-            // 真实查询三张模块表，缺迁移或PG断开不能冒充就绪。
-            await database.Sessions.AsNoTracking().Take(1).ToArrayAsync(context.RequestAborted);
-            await database.AuditRecords.AsNoTracking().Take(1).ToArrayAsync(context.RequestAborted);
-            await database.Resources.AsNoTracking().Take(1).ToArrayAsync(context.RequestAborted);
-            if (app.Configuration.GetValue<bool>("G2:Enabled") && !await G2Readiness.CheckAsync(context.RequestServices, context.RequestAborted))
+            if (app.Configuration.GetValue<bool>("G2:Enabled"))
             {
-                return PlatformProblem.Create(context, 503, "g2_dependency_unavailable");
+                // G2所有依赖（包括Governance前置查询）只消费一次整体两秒预算。
+                if (!await G2Readiness.CheckAsync(context.RequestServices, context.RequestAborted))
+                {
+                    return PlatformProblem.Create(context, 503, "g2_dependency_unavailable");
+                }
+            }
+            else
+            {
+                // 未启用G2时保留G1真实三表查询及原始请求取消语义。
+                await database.Sessions.AsNoTracking().Take(1).ToArrayAsync(context.RequestAborted);
+                await database.AuditRecords.AsNoTracking().Take(1).ToArrayAsync(context.RequestAborted);
+                await database.Resources.AsNoTracking().Take(1).ToArrayAsync(context.RequestAborted);
             }
             return Results.Ok(new { status = "Healthy" });
         }).Produces(200)
