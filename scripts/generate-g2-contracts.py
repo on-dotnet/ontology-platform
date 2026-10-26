@@ -21,12 +21,12 @@ for name, kind in SCHEMA['payloadDiscriminators'].items():
     lines += ['[JsonDerivedType(typeof('+name+'), "'+kind+'")]']
 lines += ['public abstract record ExecutionPayload;', '']
 for name, definition in SCHEMA['models'].items():
-    lines += ['/// <summary>'+escape(definition['description'])+'</summary>', '[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]', 'public sealed record '+name+(' : '+definition['base'] if definition['base'] else ''), '{']
+    lines += ['/// <summary>'+escape(definition['description'])+'</summary>', '[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]', 'public sealed record '+name+(' : '+definition['base']+', IJsonOnDeserialized, IJsonOnSerializing' if definition['base'] else ' : IJsonOnDeserialized, IJsonOnSerializing'), '{']
     for field in definition['fields']:
         t = field['type']
         default = '[]' if t.endswith('[]') else 'null' if t.endswith('?') else 'string.Empty' if t == 'string' else 'default' if t in ['int','long','bool','double','DateTimeOffset','System.Text.Json.JsonElement'] or t in SCHEMA['enums'] else 'default!'
         lines += ['    /// <summary>'+escape(field['description'])+'</summary>', '    [JsonRequired]', '    public '+t+' '+field['name']+' { get; init; } = '+default+';', '']
-    lines += ['}', '']
+    lines += ['    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>', '    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);', '', '    /// <summary>持久化或输出前检查同一个合同边界。</summary>', '    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);', '}', '']
 (TARGET/'G2Models.g.cs').write_text('\n'.join(lines))
 print('Generated canonical DTOs:',len(SCHEMA['models']))
 
@@ -45,9 +45,19 @@ schemas = {name: {'type': 'string', 'enum': values} for name, values in SCHEMA['
 schemas['ExecutionPayload'] = {'oneOf': [{'$ref': '#/components/schemas/' + name} for name in SCHEMA['payloadDiscriminators']], 'discriminator': {'propertyName': 'kind', 'mapping': {kind: '#/components/schemas/' + name for name, kind in SCHEMA['payloadDiscriminators'].items()}}}
 for name, definition in SCHEMA['models'].items():
     fields = {field['name'][:1].lower() + field['name'][1:]: dict(openapi_field(field['type']), description=field['description']) for field in definition['fields']}
+    for field in definition['fields']:
+        if 'const' in field:
+            fields[field['name'][:1].lower()+field['name'][1:]] = {'type': 'string', 'const': field['const']}
     if name in SCHEMA['payloadDiscriminators']:
         fields = {'kind': {'type': 'string', 'const': SCHEMA['payloadDiscriminators'][name]}, **fields}
     schemas[name] = {'type': 'object', 'description': definition['description'], 'required': list(fields), 'properties': fields, 'additionalProperties': False}
+
+# 标准Schema必须表达与C#运行时同样的精确分支约束。
+fields = schemas['SemanticDatum']['properties']
+schemas['SemanticDatum'] = {'oneOf': [dict(type='object', required=list(fields), additionalProperties=False, properties={key: ({'type': 'string', 'const': branch} if key == 'kind' else {'$ref': '#/components/schemas/' + {'ontology': 'OntologyDescription', 'entity': 'SemanticEntity', 'relationship': 'SemanticRelationship'}[key]} if key == branch else {'type': 'null'}) for key in fields}) for branch in ['ontology', 'entity', 'relationship']], 'discriminator': {'propertyName': 'kind'}}
+fields = schemas['ExecutionEvent']['properties']
+schemas['ExecutionEvent'] = {'oneOf': [dict(type='object', required=list(fields), additionalProperties=False, properties={key: ({'type': 'string', 'const': kind} if key == 'eventType' else {'type': 'integer', 'const': 1} if key == 'schemaVersion' else {'$ref': '#/components/schemas/' + payload} if key == 'payload' else value) for key, value in fields.items()}) for payload, kind in SCHEMA['payloadDiscriminators'].items()], 'discriminator': {'propertyName': 'eventType'}}
+
 # 只在产品端点首次导出前提供标明来源的合同schema；不得用此空paths证明实际OpenAPI已验收。
 openapi_path = ROOT / 'docs/contracts/g2-platform.openapi.json'
 if not openapi_path.exists() or 'x-contract-source' in json.loads(openapi_path.read_text()):
