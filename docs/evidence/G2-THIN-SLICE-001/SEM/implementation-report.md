@@ -174,3 +174,17 @@ Master明确派工继续已批准RDF语义兼容修复。基线`01c404c85f6ae722
 验证命令及完整cwd/退出码/输出记录bom-source-verification.json：backend cwd精准两测试文件`dotnet format OntologyPlatform.slnx --no-restore --include tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs --verify-no-changes`；`dotnet build backend/tests/OntologyPlatform.SemanticTests --no-restore`；`pwsh -NoProfile -File scripts/verify.ps1 -SelfTest`；`git diff --check`；`git diff --exit-code 75f9ce84a71578bf126eb5ebb228f145cb8847a4 -- backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology`证明生产实现保持原样。上述五项均exit0。SelfTest检查器不计入67项产品测试。
 
 继续DRAFT，供Master将Unicode源码与此BOM回归一起限定独立Review；其他跨模块集成/监控/CI与唯一ZIP由Master负责，此报告不越界宣称完成。只提交必要测试和证据，完成后停止。
+
+## Native夹具前提修复 round1（仅测试基础设施）
+
+Master真实one-key native阶段暴露两项Unicode测试先调用Sources，而该方法在没有G2_SEM_SAMPLES时抛InvalidOperationException，尚未到Runtime既有Assert.Inconclusive前提检查。已读取Master原始`/tmp/g2-final-one-key-cold.txt`相关失败与67项摘要，并在本树`8d19d94590663818f3cf1b42a1d0a365da849bc5`重现相同计数；重读指定fix-loop，修改前fetch exit0/树干净。本轮唯一源码改动为owned SemanticFixture.cs的Sources前提判断及准确中文文档：环境变量未注入时明确`Assert.Inconclusive("NOT_RUN: ...")`，与Runtime一致；已配置但样例不可读仍抛真实文件错误。未删除/放宽任何Unicode或产品断言，生产源码、共享锁、CI、迁移、runner保持原样。
+
+同一修复后SemanticFixture.cs SHA256为`86f205ab93d384d41315bca0d00afdf128198bb8c2e01ede4533567f2b4c8916`；下述native与真实集成测试之间没有改动该源码，验证文件记录相同hash。
+
+- 修前：对子进程显式去掉`G2_SEM_SAMPLES/G2_SEM_JENA_ORIGIN/G2_SEM_PG_CONNECTION`，执行`dotnet test --project backend/tests/OntologyPlatform.SemanticTests --no-restore`，exit2，67总计=2通过+63跳过+2失败，恰为😀/𠀀两个SyntheticNonBmpLabelSurvivesValidationAndPublication。完整原始命令、环境变量名（无值）、输出保存在native-fixture-red.json。
+- 修后同一native命令、相同缺夹具环境：exit0，67总计=**2纯检查通过+65明确NOT_RUN/跳过+0失败**，见native-fixture-not-run.json。两个纯检查仅运行时类型存在及旧接口默认fail-closed，**不代表67产品通过，更不代表Jena/PG已验收**。
+- 反向保护：显式提供临时空样例目录，执行`dotnet test --project backend/tests/OntologyPlatform.SemanticTests --no-restore -- --filter FullyQualifiedName~SyntheticNonBmpLabelSurvivesValidationAndPublication`：真实FileNotFound导致exit2，2失败/0跳过，见native-fixture-bad-config.json。证明错误的已配置fixture仍失败，未用catch-all跳过隐藏配置或产品错误；临时目录已自动删除。
+- 相同修复源码的真实集成：`python3 scripts/acceptance/semantic-roundtrip.py --postgres --label native-fixture-real-green`：exit0，**67/67通过、0跳过**，实际交付迁移、隔离PG/Jena RIOT/SHACL/TDB2全部执行；暂存图三元组0、两个临时容器删除，见native-fixture-real-green.json。此记录才是本轮67项真实产品路径回归证据，native跳过不计入。
+- 精准format（backend cwd，仅SemanticFixture.cs）与`dotnet build backend/tests/OntologyPlatform.SemanticTests --no-restore`均exit0，0构建warning/error。规定`pwsh -NoProfile -File scripts/verify.ps1 -SelfTest`、diff检查及与基线生产源码/VerifiedReadTests不变核验也均exit0，记录于native-fixture-verification.json；不把检查器正反例计入67产品测试。
+
+本轮只修测试前提状态，不修改任何聚合/CI门禁。Master独立限定Review后重新运行one-key与CI；本分支不宣称聚合已恢复或同Head CI已通过，继续DRAFT并完成后停止。
