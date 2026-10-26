@@ -177,3 +177,5 @@ ActorContext.Roles保留G1已验证的完整platform.viewer/platform.operator/pl
 正式releaseId为服务端GuidN；图urn:ontology-platform:release:{releaseId}:ontology与:data。RDF四份源的隐含默认文档基址固定https://ontology.invalid/source/{0..3}/（顺序ontology/shapes/vocabulary/data），显式BASE优先，解析/编辑/SHACL/部署同策略，不网络获取。该默认值只保证文档内相对IRI跨请求稳定，不赋予组织/厂区身份；Synthetic事实采用绝对含org/site/source的IRI，Gateway按固定graph/scope授权，不跨asset按同IRI/外部号猜合并。
 
 C#唯一DTO在输入和输出都执行非空及判别校验，避免JsonRequired仅检查存在的缺口；标准Schema和TS保留互斥分支、终态literal与事件版本1。真实运行OpenAPI仍须按此边界输出，不因本轮schema-only bootstrap已生成就标实际API通过。
+
+验证绑定修订：正式消费新增ISemanticRuntime.ReadVerifiedPublishedAsync(ReleaseManifest,SourceBundle,CancellationToken)。Query与Evidence先按已授权manifest逐对象GET核hash，恢复原四源（可选vocabulary absent），再由唯一SEM解析权威源并将同一次实际正式图读取得到的数组逐项对账，仅返回这一批数组供应用使用。方法检查manifest/snapshot/source hashes及固定图、保持typed literal精确；图删除/篡改（包括Catalog校验后发生）必须503/UNAVAILABLE，不返回带旧hash的EMPTY。不得以“再Verify后再Read”替代同批绑定。旧低层ReadPublishedAsync只作内部受控读取，不单独构成完整性证明；未实现新方法的旧测试适配器默认固定503，禁止回退到未核验读。无新RDF引擎/依赖/业务范围。此接口实施差异仍独立Review。
