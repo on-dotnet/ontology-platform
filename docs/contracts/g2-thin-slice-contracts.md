@@ -182,3 +182,5 @@ C#唯一DTO在输入和输出都执行非空及判别校验，避免JsonRequired
 接口对齐：GET /semantic/discover?assetId={id}&releaseId?固定返回SemanticQueryResult，与describe_ontology同一Gateway（data.kind=ontology），同时包含版本/来源/Trace；GET /capabilities返回SemanticCapability[]；证据GET返回重新授权EvidenceRef。ReleaseActivation/ReleaseSummary/ExecutionRun补实际持久TraceId，供记录页专业诊断，不猜测Trace。
 
 PUB测试新工程及其私有锁由G2-PUB卡明确转交唯一Owner，仅允许既有MSTest与批准ProjectReferences；其他公共项目/锁/迁移不变。这避免先交空测试破坏CI，不降低依赖/零测试策略。capabilityVersions在QRY未实现时为空并明确absent，完整G2演示须在真实registry存在后发布绑定能力版本的R1/R2，不用早期absent快照冒充查询闭环。
+
+验证绑定修订：正式消费新增ISemanticRuntime.ReadVerifiedPublishedAsync(ReleaseManifest,SourceBundle,CancellationToken)。Query与Evidence先按已授权manifest逐对象GET核hash，恢复原四源（可选vocabulary absent），再由唯一SEM解析权威源并将同一次实际正式图读取得到的数组逐项对账，仅返回这一批数组供应用使用。方法检查manifest/snapshot/source hashes及固定图、保持typed literal精确；图删除/篡改（包括Catalog校验后发生）必须503/UNAVAILABLE，不返回带旧hash的EMPTY。不得以“再Verify后再Read”替代同批绑定。旧低层ReadPublishedAsync只作内部受控读取，不单独构成完整性证明；未实现新方法的旧测试适配器默认固定503，禁止回退到未核验读。无新RDF引擎/依赖/业务范围。此接口实施差异仍独立Review。
