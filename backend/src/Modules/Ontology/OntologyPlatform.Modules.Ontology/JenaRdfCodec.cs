@@ -17,7 +17,9 @@ internal static class JenaRdfCodec
     internal const string Owl = "http://www.w3.org/2002/07/owl#";
 
     /// <summary>从真实Jena RDF/JSON映射完整三元组，保留词法/语言/空白节点。</summary>
-    internal static RdfTriple[] Parse(string json)
+    /// <param name="json">受上游字节预算限制的真实RDF/JSON响应。</param>
+    /// <param name="allowTemporaryMarker">仅内部源解析图可额外容纳一条随后必须核验并剔除的随机标记。</param>
+    internal static RdfTriple[] Parse(string json, bool allowTemporaryMarker = false)
     {
         // 文档仅在当前映射周期有效，不把JsonElement跨作用域暴露。
         using var document = JsonDocument.Parse(json);
@@ -41,7 +43,7 @@ internal static class JenaRdfCodec
                             Language = term.TryGetProperty("lang", out var language) ? language.GetString() : null
                         }
                     });
-                    if (triples.Count > 5000) throw new SemanticOperationException(422, "rdf_triple_budget");
+                    if (triples.Count > (allowTemporaryMarker ? 5001 : 5000)) throw new SemanticOperationException(422, "rdf_triple_budget");
                 }
             }
         }
