@@ -27,11 +27,12 @@ internal static class SemanticFixture
         return new JenaSemanticRuntime(services.BuildServiceProvider().GetRequiredService<IHttpClientFactory>(), config, TimeProvider.System);
     }
 
-    /// <summary>从版本化源码加载五类合成样例。</summary>
+    /// <summary>从显式夹具加载五类合成样例；未注入为未运行，已配置但读取失败仍为测试失败。</summary>
     internal static SourceBundle Sources()
     {
         // 脚本显式传入源码目录，避免依赖测试工作目录偶然性。
-        var root = Environment.GetEnvironmentVariable("G2_SEM_SAMPLES") ?? throw new InvalidOperationException("缺少样例目录。");
+        var root = Environment.GetEnvironmentVariable("G2_SEM_SAMPLES");
+        if (root is null) Assert.Inconclusive("NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。");
         return new SourceBundle
         {
             OntologyTurtle = File.ReadAllText(Path.Combine(root, "ontology.ttl")),
