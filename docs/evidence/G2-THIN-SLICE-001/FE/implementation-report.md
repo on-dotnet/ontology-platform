@@ -104,3 +104,13 @@ Master已准备新隔离Host环境，本Owner按指令等待可用通知后开�
 最新本树验证：生产Next build0、lint0、typecheck0、Vitest53/53、G2 Edge31/31（新增1条覆盖六组合及resize）、原G1 Edge5/5。SelfTest输出亦保存。Master此前真实OIDC/HTTP及S1业务操作通过的事实仍归Master证据，本树夹具不计真实服务E2E；待Master将本修复集成后重跑真实S1完整页面，并安排限定独立复审。Monaco保持暂停，任务整体仍DRAFT/PARTIAL。
 
 限定布局修复SourceSha=`d52acc0aeef55a58189194708822233952dac620`；本行仅文档绑定，未改变已验证CSS/测试。
+
+## 真实Trace定位链接的限定改进
+
+Base=`a47455d336cb4c1c283febf4750f0f01d45daeae`；仅semantic-feedback组件、对应单测及trace-*证据/本节追加。按Master明确授权，把原固定Grafana首页改为Explore的platform-tempo专用查询；仅非零32位ASCII hex TraceId进入query并规范为小写。无效标识不生成导航、保留文本和复制入口，原剪贴板失败恢复提示保持。URL不读取或携带身份、凭证、CSRF、源文本等秘密，不改变真实worker独立Trace设计。
+
+查证与限制见[官方格式核实](trace-format.md)：已实际读取官方latest13.2 Explore URL文档和可取v12.3.0 Tempo源码，采用schemaVersion1/panes/UID与traceql纯hex到TraceId的已证实路径；部署13.2.4同tag源码URL404已明确记录。没有声称精确部署版本或真实Tempo查询已PASS，该端到端验收由Master完成。
+
+实际RED14/14（原组件打开首页、无效输入仍可导航）；实现后全量Vitest **67/67（7 suites）**、lint/typecheck均exit0；SelfTest exit0（工程8、结构正负4、环境3组、ReviewPackage35/0），各项输出见trace-red.txt、trace-vitest.txt、trace-lint.txt、trace-typecheck.txt、trace-selftest.txt。日志仅统一LF/移除行尾空白。该组只验证真实组件生成链接的正负行为，不把SSR渲染单测当作真实Grafana/Tempo验收。当前轮未重跑build/浏览器E2E，CI NOT_VERIFIED，独立Review及集成待Master。
+
+保持d52acc0/a47455d CSS基线，未修改Tokens/锁/合同/Host/生成DTO或原G1断言；Monaco继续PAUSED BY HUMAN，无安装/import/override。任务整体仍DRAFT/PARTIAL；唯一标准Review ZIP由Master阶段收口。
