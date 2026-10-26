@@ -22,7 +22,7 @@
 
 ## 执行关口
 
-- [ ] H1：只读Git/Worktree/Docker/ZIP/缓存盘点，逐项风险/归属/体积/保护依据，保存删除前清单；实际main/CI与原G2状态。
+- [x] H1：只读Git/Worktree/Docker/ZIP/缓存盘点，逐项风险/归属/体积/保护依据，保存删除前清单；实际main/CI与原G2状态。
 - [ ] H2：先扩展真实Git fixture（默认V2、V1兼容、二进制/rename/大量历史证据、无重复、完整索引与篡改拒绝、同HeadCI）；观察RED，再实现V2及只读资源脚本，跑GREEN/SelfTest，独立Review；commit/push、同HeadCI后集成main。
 - [ ] H3：只处理H1中可证明安全候选；旧ZIP先归档生成metadata、manifest、回执，保存SHA与恢复入口；新有效包独立重开后才删除准确旧ZIP；分支/树/卷疑义保留。日志记录命令/退出码/前后/回收量。
 - [ ] H4：生命周期规范/根DoD/交接/风险矩阵/validation固化，独立Review、本地SelfTest、Mac真实fixture及Linux同HeadCI；main集成push；从最终提交生成唯一紧凑包并独立重开，交付READY_FOR_REVIEW后停止。

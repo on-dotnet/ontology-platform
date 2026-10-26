@@ -17,6 +17,7 @@ param(
     [string]$CiRunUrl,
     [string]$CiCommit,
     [ValidateSet('success', 'failure', 'cancelled', 'timed_out', 'action_required')][string]$CiConclusion,
+    [ValidateSet(1, 2)][int]$SchemaVersion = 2,
     [switch]$VerifyOnly,
     [string]$PackagePath
 )
@@ -32,7 +33,7 @@ function Invoke-ReviewGit {
     $info.UseShellExecute = $false
     $info.RedirectStandardOutput = $true
     $info.RedirectStandardError = $true
-    foreach ($argument in @('-c', 'core.autocrlf=false', '-c', 'core.quotePath=false', '-c', 'color.ui=false') + $Arguments) { $info.ArgumentList.Add($argument) }
+    foreach ($argument in @('--no-optional-locks', '-c', 'core.autocrlf=false', '-c', 'core.quotePath=false', '-c', 'color.ui=false') + $Arguments) { $info.ArgumentList.Add($argument) }
     $process = [Diagnostics.Process]::new()
     $process.StartInfo = $info
     $buffer = [IO.MemoryStream]::new()
@@ -93,7 +94,7 @@ function Get-ReviewHash {
 }
 
 function Get-ReviewSnapshot {
-    param([string]$Repository, [string]$Base, [string]$Head)
+    param([string]$Repository, [string]$Base, [string]$Head, [int]$Version = 1, [string]$WorkItem = '')
     foreach ($sha in @($Base, $Head)) {
         if ($sha -notmatch '^[0-9a-f]{40}$') { throw 'COMMIT_REQUIRED: explicit full lowercase 40-character commit SHA required' }
         $resolved = Invoke-ReviewGit $Repository @('rev-parse', '--verify', "$sha^{commit}")
@@ -122,6 +123,9 @@ function Get-ReviewSnapshot {
     $members = [Collections.Generic.Dictionary[string,byte[]]]::new([StringComparer]::Ordinal)
     $mapping = [Collections.Generic.List[object]]::new()
     $seen = [Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+    $payloads = [Collections.Generic.Dictionary[string,string]]::new([StringComparer]::Ordinal)
+    $evidenceIndex = [Collections.Generic.List[object]]::new()
+    $gitBytes = [Collections.Generic.Dictionary[string,byte[]]]::new([StringComparer]::Ordinal)
     try {
         foreach ($entry in $archive.Entries) {
             if ($entry.FullName.EndsWith('/')) { continue }
@@ -136,30 +140,87 @@ function Get-ReviewSnapshot {
             $blobHash = [Convert]::ToHexString([Security.Cryptography.SHA1]::HashData([byte[]]($prefix + $bytes))).ToLowerInvariant()
             if ($blobHash -cne $blobs[$path]) { throw 'SNAPSHOT_MISMATCH: Git archive content differs from committed blob' }
             Assert-ReviewContent $bytes 'committed source'
-            # source保留完整仓库相对结构，确保源码中的文档导航可用；顶层docs/evidence是便捷副本。
-            $destinations = @('source/' + $path)
-            if ($path.StartsWith('docs/evidence/')) { $destinations += 'evidence/' + $path.Substring(14) }
-            elseif ($path.StartsWith('docs/')) { $destinations += $path }
-            foreach ($destination in $destinations) {
-                Assert-ReviewPath $destination
-                $members.Add($destination, $bytes)
-                $mapping.Add([ordered]@{ gitPath = $path; archivePath = $destination; sha256 = Get-ReviewHash $bytes })
+            $gitBytes.Add($path, $bytes)
+            $hash = Get-ReviewHash $bytes
+            if ($Version -eq 1) {
+                $destinations = @('source/' + $path)
+                if ($path.StartsWith('docs/evidence/')) { $destinations += 'evidence/' + $path.Substring(14) }
+                elseif ($path.StartsWith('docs/')) { $destinations += $path }
+                foreach ($destination in $destinations) {
+                    Assert-ReviewPath $destination
+                    $members.Add($destination, $bytes)
+                    $mapping.Add([ordered]@{ gitPath = $path; archivePath = $destination; sha256 = $hash })
+                }
+            } else {
+                $isEvidence = $path.StartsWith('docs/evidence/', [StringComparison]::Ordinal)
+                $include = -not $isEvidence -or $path.StartsWith("docs/evidence/$WorkItem/", [StringComparison]::Ordinal)
+                $destination = $null
+                if ($include) {
+                    $destination = if ($isEvidence) { 'review-evidence/' + $path.Substring(14) } else { 'source/' + $path }
+                    if ($payloads.ContainsKey($hash)) { $destination = $payloads[$hash] }
+                    else { $payloads.Add($hash, $destination); $members.Add($destination, $bytes) }
+                    $mapping.Add([ordered]@{ gitPath = $path; archivePath = $destination; blobOid = $blobs[$path]; sha256 = $hash; sizeBytes = $bytes.Length })
+                }
+                if ($isEvidence) {
+                    $evidenceIndex.Add([ordered]@{
+                        gitPath = $path; commit = $Head; blobOid = $blobs[$path]; sha256 = $hash; sizeBytes = $bytes.Length
+                        archivePath = $destination; testScope = $path.Substring(14).Split('/')[0]
+                        recovery = "git show ${Head}:$path (raw Git blob); https://github.com/on-dotnet/ontology-platform/blob/$Head/$([uri]::EscapeDataString($path).Replace('%2F', '/'))"
+                        retention = $(if ($include) { 'Included once in this package and retained in Git.' } else { 'Historical evidence retained in Git; requires access to this repository at the explicit commit. Not a standalone offline audit archive.' })
+                    })
+                }
             }
         }
     } finally { $archive.Dispose(); $memory.Dispose() }
     if ($seen.Count -ne $blobs.Count) { throw 'SNAPSHOT_MISMATCH: git archive omitted tracked delivery; check export-ignore attributes' }
-    $diff = Invoke-ReviewGit $Repository @('diff', '--no-color', '--binary', '--full-index', '--no-ext-diff', '--no-textconv', '--no-renames', $Base, $Head, '--')
-    Assert-ReviewContent $diff.Bytes 'complete patch including removed lines'
+    $diffOptions = @('diff', '--no-color', '--full-index', '--no-ext-diff', '--no-textconv', '--no-renames')
+    if ($Version -eq 1) { $diffOptions += '--binary' }
+    $diff = if ($Version -eq 1) { Invoke-ReviewGit $Repository ($diffOptions + @($Base, $Head, '--')) } else { @{ Bytes = [byte[]]::new(0) } }
+    Assert-ReviewContent $diff.Bytes 'complete text patch including removed lines'
+    if ($Version -eq 2) {
+        # 对所有变更的两侧原始blob做路径/秘密检查；二进制省略不能绕过已删除内容检查。
+        $raw = Invoke-ReviewGit $Repository @('diff', '--raw', '-z', '--no-color', '--no-ext-diff', '--no-textconv', '--find-renames', '--abbrev=40', $Base, $Head, '--')
+        $parts = $raw.Text.Split([char]0, [StringSplitOptions]::RemoveEmptyEntries)
+        $changes = [Collections.Generic.List[object]]::new()
+        for ($i = 0; $i -lt $parts.Count; $i++) {
+            if ($parts[$i] -notmatch '^:([0-7]{6}) ([0-7]{6}) ([0-9a-f]{40}) ([0-9a-f]{40}) ([A-Z][0-9]*)$') { throw 'DIFF_INVALID: unexpected raw diff record' }
+            $oldMode = $Matches[1]; $newMode = $Matches[2]; $oldOid = $Matches[3]; $newOid = $Matches[4]; $kind = $Matches[5]
+            $i++; $oldPath = $parts[$i]; $newPath = $oldPath
+            if ($kind.StartsWith('R') -or $kind.StartsWith('C')) { $i++; $newPath = $parts[$i] }
+            Assert-ReviewPath $oldPath; Assert-ReviewPath $newPath
+            $sides = @{}; $binary = $false
+            foreach ($side in @('base', 'head')) {
+                $oid = if ($side -eq 'base') { $oldOid } else { $newOid }
+                $mode = if ($side -eq 'base') { $oldMode } else { $newMode }
+                $sidePath = if ($side -eq 'base') { $oldPath } else { $newPath }
+                if ($oid -eq ('0' * 40)) { $sides[$side] = $null; continue }
+                if ($mode -notin @('100644', '100755')) { throw 'UNSUPPORTED_TREE: changed symlink/submodule rejected' }
+                $data = (Invoke-ReviewGit $Repository @('cat-file', 'blob', $oid)).Bytes
+                Assert-ReviewContent $data 'changed Base/Head blob'
+                if ([Array]::IndexOf($data, [byte]0, 0, [Math]::Min(8000, $data.Length)) -ge 0) { $binary = $true }
+                $sides[$side] = [ordered]@{ path = $sidePath; blobOid = $oid; sha256 = Get-ReviewHash $data; sizeBytes = $data.Length; mode = $mode }
+            }
+            $changes.Add([ordered]@{ path = $newPath; previousPath = $(if ($oldPath -cne $newPath) { $oldPath } else { $null }); changeType = $kind; isBinary = $binary; base = $sides.base; head = $sides.head; recovery = 'git cat-file blob <base.blobOid or head.blobOid>; requires controlled repository access.' })
+        }
+        # 文本集合由原始blob判定，强制--text，避免已提交或本地attributes把文本差异隐藏成binary。
+        $textPaths = @($changes | Where-Object { -not $_.isBinary } | ForEach-Object { $_.path; if ($_.previousPath) { $_.previousPath } } | Sort-Object -Unique -CaseSensitive | ForEach-Object { ':(literal)' + $_ })
+        if ($textPaths.Count -gt 0) { $diff = Invoke-ReviewGit $Repository ($diffOptions + @('--text', $Base, $Head, '--') + $textPaths) }
+        Assert-ReviewContent $diff.Bytes 'complete text patch including removed lines'
+        $members.Add('git/changed-files.json', $script:utf8.GetBytes((ConvertTo-Json -InputObject $changes.ToArray() -Depth 12) + "`n"))
+        $members.Add('evidence-index.json', $script:utf8.GetBytes((ConvertTo-Json -InputObject $evidenceIndex.ToArray() -Depth 12) + "`n"))
+    }
     $changed = Invoke-ReviewGit $Repository @('diff', '--no-color', '--name-status', '--no-renames', $Base, $Head, '--')
     $commits = Invoke-ReviewGit $Repository @('log', '--no-color', '--format=fuller', '--no-decorate', "$Base..$Head")
     Assert-ReviewContent $commits.Bytes 'commit messages'
     $check = Invoke-ReviewGit $Repository @('diff', '--no-color', '--check', $Base, $Head, '--') -AllowFailure
-    $members.Add('git/diff.patch', $diff.Bytes)
-    $members.Add('git/changed-files.txt', $changed.Bytes)
+    if ($Version -eq 1) {
+        $members.Add('git/diff.patch', $diff.Bytes)
+        $members.Add('git/changed-files.txt', $changed.Bytes)
+    } else { $members.Add('git/diff-text.patch', $diff.Bytes) }
     $members.Add('git/commits.txt', $commits.Bytes)
     $members.Add('git/status.txt', $script:utf8.GetBytes("OBSERVED: clean tracked and untracked delivery at packaging time.`nIgnored paths excluded; see manifest.excludedIgnoredPaths.`n"))
     $members.Add('git/diff-check.txt', $script:utf8.GetBytes("exitCode=$($check.ExitCode)`n" + $check.Text))
-    return @{ Members = $members; Mapping = $mapping.ToArray(); Ignored = $ignoredPaths; DiffCheckExit = $check.ExitCode }
+    return @{ Members = $members; Mapping = $mapping.ToArray(); Ignored = $ignoredPaths; DiffCheckExit = $check.ExitCode; GitBytes = $gitBytes }
 }
 
 function Get-ReviewEvidence {
@@ -167,9 +228,9 @@ function Get-ReviewEvidence {
     $evidence = @{ checks = @(@{ name = 'task-validation'; command = $null; status = 'NOT_RUN'; exitCode = $null; output = 'No committed evidence input supplied.' }); ci = @{ status = 'NOT_VERIFIED'; runId = $null; url = $null; commit = $null; conclusion = $null } }
     if ($Path) {
         Assert-ReviewPath $Path
-        $item = @($Snapshot.Mapping | Where-Object { $_.archivePath -ceq ('source/' + $Path) })
-        if ($item.Count -ne 1) { throw 'EVIDENCE_REQUIRED: EvidencePath must be an exact committed Git path in HeadSha' }
-        $evidence = $script:utf8.GetString($Snapshot.Members[$item[0].archivePath]) | ConvertFrom-Json -AsHashtable
+        $item = @($Snapshot.Mapping | Where-Object { $_.gitPath -ceq $Path })
+        if (-not $Snapshot.GitBytes.ContainsKey($Path)) { throw 'EVIDENCE_REQUIRED: EvidencePath must be an exact committed Git path in HeadSha' }
+        $evidence = $script:utf8.GetString($Snapshot.GitBytes[$Path]) | ConvertFrom-Json -AsHashtable
         if (-not $evidence.ContainsKey('checks') -or -not $evidence.ContainsKey('ci') -or @($evidence.checks).Count -eq 0) { throw 'EVIDENCE_REQUIRED: checks and ci objects required' }
     }
     if ($null -ne $RuntimeCi) { $evidence.ci = $RuntimeCi }
@@ -205,23 +266,34 @@ function Test-ReviewArchive {
             $actual.Add($entry.FullName, $bytes)
         }
     } finally { $archive.Dispose() }
-    foreach ($required in @('manifest.json', 'SHA256SUMS.txt', 'REVIEW_SUMMARY.md', 'evidence/validation.json')) {
+    foreach ($required in @('manifest.json', 'SHA256SUMS.txt', 'REVIEW_SUMMARY.md')) {
         if (-not $actual.ContainsKey($required)) { throw 'ARCHIVE_MISSING: required metadata absent' }
     }
     $manifest = $script:utf8.GetString($actual['manifest.json']) | ConvertFrom-Json -AsHashtable
-    if ($manifest.schemaVersion -ne 1 -or $manifest.taskId -notmatch '^[A-Z0-9][A-Z0-9-]{0,79}$' -or $manifest.status -notin @('PASS', 'PARTIAL', 'BLOCKED', 'NOT_RUN')) { throw 'MANIFEST_INVALID: invalid identity/status' }
-    $snapshot = Get-ReviewSnapshot $Repository $manifest.baseSha $manifest.headSha
+    if ($manifest.schemaVersion -notin @(1, 2) -or $manifest.taskId -notmatch '^[A-Z0-9][A-Z0-9-]{0,79}$' -or $manifest.status -notin @('PASS', 'PARTIAL', 'BLOCKED', 'NOT_RUN')) { throw 'MANIFEST_INVALID: invalid identity/status' }
+    $snapshot = Get-ReviewSnapshot $Repository $manifest.baseSha $manifest.headSha $manifest.schemaVersion $manifest.taskId
     $evidence = Get-ReviewEvidence $snapshot $manifest.evidencePath $manifest.status $manifest.runtimeCi
-    if ($manifest.status -eq 'PASS' -and $evidence.ci.commit -cne $manifest.headSha) { throw 'CI_EVIDENCE: PASS CI commit must equal HeadSha' }
-    # 比较语义JSON，避免字典键序差异；包内状态必须来自已提交证据或显式CI参数。
-    $recordedEvidence = $script:utf8.GetString($actual['evidence/validation.json'])
+    if (($manifest.status -eq 'PASS' -or ($manifest.schemaVersion -eq 2 -and $evidence.ci.status -in @('PASS', 'FAIL'))) -and $evidence.ci.commit -cne $manifest.headSha) { throw 'CI_EVIDENCE: PASS CI commit must equal HeadSha' }
+    # 证据与CI从提交/显式输入重算；V2原始validation仅存在映射的一个位置。
     $expectedEvidence = $evidence | ConvertTo-Json -Depth 16 -Compress
     $recordedManifestEvidence = @{ checks = $manifest.checks; ci = $manifest.ci } | ConvertTo-Json -Depth 16 -Compress
     $expectedNode = [Text.Json.Nodes.JsonNode]::Parse($expectedEvidence)
-    if (-not [Text.Json.Nodes.JsonNode]::DeepEquals([Text.Json.Nodes.JsonNode]::Parse($recordedEvidence), $expectedNode) -or
-        -not [Text.Json.Nodes.JsonNode]::DeepEquals([Text.Json.Nodes.JsonNode]::Parse($recordedManifestEvidence), $expectedNode)) { throw 'EVIDENCE_MISMATCH: recorded statuses differ from evidence input' }
+    if (-not [Text.Json.Nodes.JsonNode]::DeepEquals([Text.Json.Nodes.JsonNode]::Parse($recordedManifestEvidence), $expectedNode)) { throw 'EVIDENCE_MISMATCH: recorded statuses differ from evidence input' }
+    $metadataNames = @('manifest.json', 'SHA256SUMS.txt', 'REVIEW_SUMMARY.md')
+    if ($manifest.schemaVersion -eq 1) {
+        $metadataNames += 'evidence/validation.json'
+        if (-not $actual.ContainsKey('evidence/validation.json') -or -not [Text.Json.Nodes.JsonNode]::DeepEquals([Text.Json.Nodes.JsonNode]::Parse($script:utf8.GetString($actual['evidence/validation.json'])), $expectedNode)) { throw 'EVIDENCE_MISMATCH: normalized evidence differs' }
+    } else {
+        if ($manifest.evidencePath -and -not $manifest.evidencePath.StartsWith("docs/evidence/$($manifest.taskId)/", [StringComparison]::Ordinal)) { throw 'EVIDENCE_REQUIRED: compact evidence must belong to current task' }
+        $metadataNames += 'git/ci.json'
+        if (-not $actual.ContainsKey('git/ci.json') -or -not [Text.Json.Nodes.JsonNode]::DeepEquals([Text.Json.Nodes.JsonNode]::Parse($script:utf8.GetString($actual['git/ci.json'])), [Text.Json.Nodes.JsonNode]::Parse(($evidence.ci | ConvertTo-Json -Depth 8)))) { throw 'CI_EVIDENCE: CI metadata mismatch' }
+        if (-not $manifest.evidencePath) {
+            $metadataNames += 'review-evidence/validation.json'
+            if (-not $actual.ContainsKey('review-evidence/validation.json') -or -not [Text.Json.Nodes.JsonNode]::DeepEquals([Text.Json.Nodes.JsonNode]::Parse($script:utf8.GetString($actual['review-evidence/validation.json'])), $expectedNode)) { throw 'EVIDENCE_MISMATCH: absent evidence status differs' }
+        }
+    }
     if ($manifest.diffCheck.exitCode -ne $snapshot.DiffCheckExit -or $manifest.diffCheck.status -ne $(if ($snapshot.DiffCheckExit -eq 0) { 'PASS' } else { 'FAIL' })) { throw 'EVIDENCE_MISMATCH: diff-check status differs from Git result' }
-    $expectedPaths = @($snapshot.Members.Keys) + @('manifest.json', 'SHA256SUMS.txt', 'REVIEW_SUMMARY.md', 'evidence/validation.json')
+    $expectedPaths = @($snapshot.Members.Keys) + $metadataNames
     if ($actual.Count -ne $expectedPaths.Count) { throw 'ARCHIVE_MEMBERS: unexpected or missing archive member' }
     foreach ($name in $expectedPaths) { if (-not $actual.ContainsKey($name)) { throw 'ARCHIVE_MEMBERS: unexpected or missing archive member' } }
     foreach ($name in $snapshot.Members.Keys) {
@@ -250,31 +322,39 @@ try {
         exit 0
     }
     if (-not $Status -or $TaskId -notmatch '^[A-Z0-9][A-Z0-9-]{0,79}$') { throw 'PARAMETERS_REQUIRED: explicit TaskId and Status required' }
-    $snapshot = Get-ReviewSnapshot $Root $BaseSha $HeadSha
+    $snapshot = Get-ReviewSnapshot $Root $BaseSha $HeadSha $SchemaVersion $TaskId
     $runtimeCi = $null
     if ($CiRunId -or $CiRunUrl -or $CiCommit -or $CiConclusion) {
         if (-not $CiRunId -or -not $CiRunUrl -or -not $CiCommit -or -not $CiConclusion) { throw 'CI_EVIDENCE: all four explicit CI parameters required together' }
         $runtimeCi = [ordered]@{ status = $(if ($CiConclusion -eq 'success') { 'PASS' } else { 'FAIL' }); runId = $CiRunId; url = $CiRunUrl; commit = $CiCommit; conclusion = $CiConclusion }
     }
     $evidence = Get-ReviewEvidence $snapshot $EvidencePath $Status $runtimeCi
-    if ($Status -eq 'PASS' -and $evidence.ci.commit -cne $HeadSha) { throw 'CI_EVIDENCE: PASS CI commit must equal HeadSha' }
+    if (($Status -eq 'PASS' -or ($SchemaVersion -eq 2 -and $evidence.ci.status -in @('PASS', 'FAIL'))) -and $evidence.ci.commit -cne $HeadSha) { throw 'CI_EVIDENCE: PASS CI commit must equal HeadSha' }
     $branch = (Invoke-ReviewGit $Root @('rev-parse', '--abbrev-ref', 'HEAD')).Text.Trim()
     $gitVersion = (Invoke-ReviewGit $Root @('--version')).Text.Trim()
     $manifest = [ordered]@{
-        schemaVersion = 1; taskId = $TaskId; baseSha = $BaseSha; headSha = $HeadSha; branch = $branch
+        schemaVersion = $SchemaVersion; taskId = $TaskId; baseSha = $BaseSha; headSha = $HeadSha; branch = $branch
         date = [DateTime]::UtcNow.ToString('o'); status = $Status; evidencePath = $EvidencePath; runtimeCi = $runtimeCi
         checks = $evidence.checks; ci = $evidence.ci; commands = $script:commands.ToArray()
         environment = @{ powershell = $PSVersionTable.PSVersion.ToString(); git = $gitVersion; os = [Runtime.InteropServices.RuntimeInformation]::OSDescription }
         diffCheck = @{ status = $(if ($snapshot.DiffCheckExit -eq 0) { 'PASS' } else { 'FAIL' }); exitCode = $snapshot.DiffCheckExit }
         sourceMembers = $snapshot.Mapping; excludedIgnoredPaths = $snapshot.Ignored
-        snapshotPolicy = 'Full repository under source, git archive checked against ls-tree and blob hashes; docs and evidence are additional convenience copies.'
+        snapshotPolicy = $(if ($SchemaVersion -eq 1) { 'Full repository under source, git archive checked against ls-tree and blob hashes; docs and evidence are additional convenience copies.' } else { 'All current non-evidence sources and current-task evidence, each payload once; historical evidence indexed against Head blobs; full text diff and Base/Head binary metadata; repository access required for omitted bytes.' })
         security = @{ status = 'PARTIAL'; scope = 'Finite path and UTF8/UTF16 pattern checks of committed source, complete patch, commit messages and reopened members. No guarantee of absence of secrets or private/production data; independent human review required.' }
         archiveVerification = @{ status = 'NOT_VERIFIED'; reason = 'Cannot embed its own post-close result; successful CLI JSON reports actual post-close verification.' }
     }
     $members = $snapshot.Members
     $members.Add('manifest.json', $script:utf8.GetBytes(($manifest | ConvertTo-Json -Depth 16) + "`n"))
-    $members.Add('evidence/validation.json', $script:utf8.GetBytes(($evidence | ConvertTo-Json -Depth 12) + "`n"))
+    if ($SchemaVersion -eq 1) { $members.Add('evidence/validation.json', $script:utf8.GetBytes(($evidence | ConvertTo-Json -Depth 12) + "`n")) }
+    else {
+        if ($EvidencePath -and -not $EvidencePath.StartsWith("docs/evidence/$TaskId/", [StringComparison]::Ordinal)) { throw 'EVIDENCE_REQUIRED: compact evidence must belong to current task' }
+        $members.Add('git/ci.json', $script:utf8.GetBytes(($evidence.ci | ConvertTo-Json -Depth 8) + "`n"))
+        if (-not $EvidencePath) { $members.Add('review-evidence/validation.json', $script:utf8.GetBytes(($evidence | ConvertTo-Json -Depth 12) + "`n")) }
+    }
     $summary = "# $TaskId 审查摘要`n`n状态：$Status。BaseSha：$BaseSha；HeadSha：$HeadSha；分支：$branch。`n`n范围：Head中完整已提交常规文件和Base至Head完整差异；不使用origin/main..HEAD。source保留完整仓库相对结构；顶层docs/evidence提供文档和证据副本。`n`n验证：逐项命令/退出码见manifest.json与evidence/validation.json；CI为$($evidence.ci.status)。空证据不是PASS。静态构包成功不表示产品或整个阶段通过。`n`n阻断与未运行项：以checks/ci和任务证据为准；未提供真实运行证据的项目保持NOT_RUN/NOT_VERIFIED。忽略文件不读取、不交付，路径排除清单在manifest。`n`n安全限制：有限模式检查不能证明全面防泄露，独立审查仍需检查私有数据和未知秘密。发现可疑值时停止且不输出原值。`n`n后续：独立Reviewer审查并由Master处理集成；到当前关口停止，不自动进入下一阶段。`n"
+    if ($SchemaVersion -eq 2) {
+        $summary = "# $TaskId 审查摘要`n`n状态：$Status。BaseSha：$BaseSha；HeadSha：$HeadSha；分支：$branch。`n`n范围：source为全部现行非证据源码/配置/测试/合同/ADR；review-evidence为本任务已提交证据。相同内容只保留一个payload，映射见manifest.sourceMembers。原始validation见映射，实际CI见git/ci.json与manifest。`n`n差异：git/diff-text.patch保留全部文本差异；git/changed-files.json记录每项变更的Base/Head原始blob OID、SHA256、大小、路径、类型；二进制不内嵌补丁。evidence-index.json完整列出历史证据与恢复方式。省略字节需要访问受控Git仓库，不能把此包声称为完整离线审计归档。`n`n验证：逐项命令/退出码见manifest与任务validation；CI为$($evidence.ci.status)，CI成功/失败元数据均要求同Head。空证据不是PASS；构包/重开仅证明有限完整性检查。`n`n安全与限制：已提交源、变更两侧原blob、文本补丁和成员做有限凭证检查；不包含ignored私有配置/凭证/缓存/数据库。不代替完整安全审计。被保留资源、未运行平台及实际回收量见本任务delivery-report。`n`n后续：停在当前关口，等待复审，不自动开始G3或下一阶段。`n"
+    }
     $members.Add('REVIEW_SUMMARY.md', $script:utf8.GetBytes($summary))
     $lines = foreach ($name in @($members.Keys | Sort-Object -CaseSensitive)) { Assert-ReviewPath $name; Assert-ReviewContent $members[$name] 'generated member'; (Get-ReviewHash $members[$name]) + '  ' + $name }
     $members.Add('SHA256SUMS.txt', $script:utf8.GetBytes(($lines -join "`n") + "`n"))

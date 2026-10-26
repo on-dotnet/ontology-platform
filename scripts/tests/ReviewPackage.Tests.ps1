@@ -42,8 +42,9 @@ function New-Fixture {
     $script:head = Commit-Fixture
 }
 function Invoke-Package {
-    param([string[]]$Extra = @(), [switch]$Verify, [string]$DeclaredStatus = 'PARTIAL')
+    param([string[]]$Extra = @(), [switch]$Verify, [switch]$Compact, [string]$DeclaredStatus = 'PARTIAL')
     $arguments = @('-NoProfile', '-File', $PackageScript, '-Root', $script:repo)
+    if (-not $Verify -and -not $Compact) { $arguments += @('-SchemaVersion', '1') }
     if (-not $Verify) { $arguments += @('-BaseSha', $script:base, '-HeadSha', $script:head, '-TaskId', 'TEST-001', '-Status', $DeclaredStatus) }
     $output = & pwsh @arguments @Extra 2>&1
     return [pscustomobject]@{ Exit = $LASTEXITCODE; Output = ($output -join "`n") }
@@ -66,6 +67,203 @@ function Case {
 }
 try {
     $null = New-Item -ItemType Directory -Force $fixtureRoot
+    function Read-ZipText($Archive, [string]$Name) {
+        $reader = [IO.StreamReader]::new($Archive.GetEntry($Name).Open())
+        try { return $reader.ReadToEnd() } finally { $reader.Dispose() }
+    }
+    function Open-Compact {
+        $actual = Invoke-Package -Compact
+        Assert-True ($actual.Exit -eq 0) "Compact creation failed: $($actual.Output)"
+        return @(Get-ChildItem (Join-Path $script:repo 'artifacts/reviews') -Filter '*.zip')[0].FullName
+    }
+    Case 'compact default is V2 with complete source and historical evidence index' {
+        $path = Open-Compact
+        $archive = [IO.Compression.ZipFile]::OpenRead($path)
+        try {
+            $manifest = Read-ZipText $archive 'manifest.json' | ConvertFrom-Json
+            $index = @(Read-ZipText $archive 'evidence-index.json' | ConvertFrom-Json)
+            Assert-True ($manifest.schemaVersion -eq 2) 'Default must be compact schema2'
+            foreach ($name in @('source/app.txt', 'source/docs/tasks/TEST-001.md', 'git/diff-text.patch', 'git/changed-files.json', 'git/ci.json', 'review-evidence/TEST-001/result.txt')) {
+                Assert-True ($null -ne $archive.GetEntry($name)) "Missing compact member $name"
+            }
+            Assert-True ($null -eq $archive.GetEntry('source/docs/evidence/TEST-001/result.txt')) 'Evidence copied twice'
+            Assert-True ($index.Count -eq 1 -and $index[0].gitPath -eq 'docs/evidence/TEST-001/result.txt' -and $index[0].commit -eq $script:head -and $index[0].sha256.Length -eq 64 -and $index[0].blobOid.Length -eq 40 -and $index[0].sizeBytes -gt 0 -and $index[0].testScope -and $index[0].recovery -and $index[0].retention) 'Evidence index lacks provenance'
+        } finally { $archive.Dispose() }
+        $verified = Invoke-Package -Verify -Extra @('-VerifyOnly', '-PackagePath', $path)
+        Assert-True ($verified.Exit -eq 0) "Compact reopen failed: $($verified.Output)"
+    }
+    Case 'compact binary add modify delete rename and historical screenshot reduction' {
+        $random = [Random]::new(42)
+        $bytes = [byte[]]::new(32768); $random.NextBytes($bytes); $bytes[0] = 0
+        Write-Fixture 'docs/evidence/OLD-001/samples/one.png' ''
+        [IO.File]::WriteAllBytes((Join-Path $script:repo 'docs/evidence/OLD-001/samples/one.png'), $bytes)
+        [IO.File]::WriteAllBytes((Join-Path $script:repo 'remove.png'), $bytes)
+        Write-Fixture 'rename.txt' "rename source with sufficient unchanged text for Git detection`n"
+        $script:base = Commit-Fixture
+        $bytes[10] = $bytes[10] -bxor 1
+        [IO.File]::WriteAllBytes((Join-Path $script:repo 'docs/evidence/OLD-001/samples/one.png'), $bytes)
+        for ($i = 0; $i -lt 24; $i++) {
+            $bytes = [byte[]]::new(32768); $random.NextBytes($bytes); $bytes[0] = 0
+            [IO.File]::WriteAllBytes((Join-Path $script:repo "docs/evidence/OLD-001/samples/new-$i.png"), $bytes)
+        }
+        $null = Git @('rm', 'remove.png'); $null = Git @('mv', 'rename.txt', 'renamed.txt')
+        Write-Fixture 'new.txt' "new text`n"
+        $script:head = Commit-Fixture
+        $path = Open-Compact
+        $archive = [IO.Compression.ZipFile]::OpenRead($path)
+        try {
+            $diff = Read-ZipText $archive 'git/diff-text.patch'
+            $changed = @(Read-ZipText $archive 'git/changed-files.json' | ConvertFrom-Json)
+            $index = @(Read-ZipText $archive 'evidence-index.json' | ConvertFrom-Json)
+            Assert-True (-not $diff.Contains('GIT binary patch') -and $diff.Contains('new text')) 'Binary encoded patch or missing text diff'
+            Assert-True (@($changed | Where-Object isBinary).Count -eq 26) 'Binary changes missing'
+            Assert-True (@($changed | Where-Object { $_.changeType -like 'R*' }).Count -eq 1) 'Rename missing'
+            $deleted = @($changed | Where-Object path -EQ 'remove.png')[0]
+            Assert-True ($deleted.base.blobOid.Length -eq 40 -and $deleted.base.sha256.Length -eq 64 -and $deleted.base.sizeBytes -eq 32768 -and $null -eq $deleted.head) 'Deleted binary recovery metadata missing'
+            Assert-True (@($index | Where-Object { $_.gitPath -like 'docs/evidence/OLD-001/*' -and $null -eq $_.archivePath }).Count -eq 25) 'Historical evidence not fully indexed/omitted'
+            Assert-True (@($archive.Entries | Where-Object FullName -Like '*OLD-001/samples/*').Count -eq 0) 'Historical screenshots copied'
+        } finally { $archive.Dispose() }
+        # 同一个已提交Head显式生成V1比较实际压缩大小，旧包先改名保留，不覆盖。
+        $compactSize = (Get-Item $path).Length
+        Move-Item -LiteralPath $path -Destination ($path + '.compact')
+        $legacy = Invoke-Package
+        Assert-True ($legacy.Exit -eq 0) "Legacy comparison failed: $($legacy.Output)"
+        $legacySize = (Get-Item $path).Length
+        Assert-True ($compactSize -lt ($legacySize / 3)) "Compact did not shrink: compact=$compactSize legacy=$legacySize"
+        Write-Output "OBSERVED compactBytes=$compactSize legacyBytes=$legacySize"
+        $verified = Invoke-Package -Verify -Extra @('-VerifyOnly', '-PackagePath', ($path + '.compact'))
+        Assert-True ($verified.Exit -eq 0) "Binary compact reopen failed: $($verified.Output)"
+    }
+    Case 'compact text diff cannot be hidden by committed attributes' {
+        Write-Fixture '.gitattributes' "app.txt -diff`n"
+        $script:base = Commit-Fixture
+        Write-Fixture 'app.txt' "critical changed text`n"
+        $script:head = Commit-Fixture
+        $path = Open-Compact
+        $archive = [IO.Compression.ZipFile]::OpenRead($path)
+        try {
+            $patch = Read-ZipText $archive 'git/diff-text.patch'
+            Assert-True ($patch.Contains('-当前源码') -and $patch.Contains('+critical changed text')) 'Text diff hidden by attributes'
+        } finally { $archive.Dispose() }
+        $verified = Invoke-Package -Verify -Extra @('-VerifyOnly', '-PackagePath', $path)
+        Assert-True ($verified.Exit -eq 0) 'Attribute-independent text diff reopen failed'
+    }
+    Case 'compact duplicate payload maps to one physical member' {
+        Write-Fixture 'duplicate.txt' "当前源码`n"
+        Write-Fixture 'docs/evidence/TEST-001/duplicate.txt' "当前源码`n"
+        $script:head = Commit-Fixture
+        $path = Open-Compact
+        $archive = [IO.Compression.ZipFile]::OpenRead($path)
+        try {
+            $manifest = Read-ZipText $archive 'manifest.json' | ConvertFrom-Json
+            $mappings = @($manifest.sourceMembers | Where-Object gitPath -In @('app.txt', 'duplicate.txt', 'docs/evidence/TEST-001/duplicate.txt'))
+            Assert-True ($mappings.Count -eq 3 -and @($mappings.archivePath | Select-Object -Unique).Count -eq 1) 'Duplicate content retained'
+        } finally { $archive.Dispose() }
+    }
+    Case 'compact index tamper with rewritten checksum is rejected' {
+        $path = Open-Compact
+        $archive = [IO.Compression.ZipFile]::Open($path, [IO.Compression.ZipArchiveMode]::Update)
+        try {
+            $index = @(Read-ZipText $archive 'evidence-index.json' | ConvertFrom-Json)
+            $index[0].sha256 = '0' * 64
+            $bytes = [Text.Encoding]::UTF8.GetBytes(($index | ConvertTo-Json -AsArray -Depth 12))
+            $archive.GetEntry('evidence-index.json').Delete()
+            $stream = $archive.CreateEntry('evidence-index.json').Open()
+            try { $stream.Write($bytes) } finally { $stream.Dispose() }
+            $sums = Read-ZipText $archive 'SHA256SUMS.txt'
+            $hash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes)).ToLowerInvariant()
+            $sums = $sums -replace '(?m)^[a-f0-9]{64}  evidence-index.json$', ($hash + '  evidence-index.json')
+            $archive.GetEntry('SHA256SUMS.txt').Delete()
+            $writer = [IO.StreamWriter]::new($archive.CreateEntry('SHA256SUMS.txt').Open())
+            try { $writer.Write($sums) } finally { $writer.Dispose() }
+        } finally { $archive.Dispose() }
+        $verified = Invoke-Package -Verify -Extra @('-VerifyOnly', '-PackagePath', $path)
+        Assert-True ($verified.Exit -ne 0 -and $verified.Output.Contains('HEAD_MISMATCH')) 'Forged index accepted'
+    }
+    Case 'compact rejects CI success from different Head even with PARTIAL task' {
+        $actual = Invoke-Package -Compact -Extra @('-CiRunId', '123', '-CiRunUrl', 'https://github.com/on-dotnet/ontology-platform/actions/runs/123', '-CiCommit', $script:base, '-CiConclusion', 'success')
+        Assert-True ($actual.Exit -ne 0 -and $actual.Output.Contains('CI_EVIDENCE')) 'Old CI success reused'
+    }
+    Case 'compact rejects case-colliding committed paths' {
+        $blob = Git @('hash-object', 'app.txt')
+        $null = Git @('update-index', '--add', '--cacheinfo', "100644,$blob,APP.txt")
+        $null = Git @('commit', '-qm', 'case collision')
+        $script:head = Git @('rev-parse', 'HEAD')
+        $null = Git @('checkout', '-q', $script:base)
+        $actual = Invoke-Package -Compact
+        Assert-True ($actual.Exit -ne 0 -and $actual.Output.Contains('SNAPSHOT_MISMATCH')) 'Case collision accepted'
+    }
+    foreach ($negative in @('dirty', 'untracked', 'forbidden', 'removed-secret', 'symlink', 'path-traversal', 'case-member', 'duplicate-member', 'linked-member', 'hash-forgery')) {
+        $scenario = $negative
+        Case "compact safety $scenario" {
+            switch ($scenario) {
+                'dirty' { Write-Fixture 'app.txt' "dirty`n" }
+                'untracked' { Write-Fixture 'untracked.txt' "pending`n" }
+                'forbidden' { Write-Fixture '.env' "synthetic safe placeholder`n"; $script:head = Commit-Fixture }
+                'removed-secret' {
+                    Write-Fixture 'removed.txt' (('gh' + 'p_' + ('Z' * 36)) + "`n"); $script:base = Commit-Fixture
+                    $null = Git @('rm', 'removed.txt'); $script:head = Commit-Fixture
+                }
+                'symlink' {
+                    $blob = Git @('hash-object', 'app.txt')
+                    $null = Git @('update-index', '--add', '--cacheinfo', "120000,$blob,linked")
+                    $null = Git @('commit', '-qm', 'synthetic symlink'); $script:head = Git @('rev-parse', 'HEAD')
+                    $null = Git @('checkout', '-q', $script:base)
+                }
+                default {
+                    $path = Open-Compact
+                    $archive = [IO.Compression.ZipFile]::Open($path, [IO.Compression.ZipArchiveMode]::Update)
+                    try {
+                        $name = switch ($scenario) { 'path-traversal' { '../escape.txt' }; 'case-member' { 'source/APP.txt' }; default { 'source/app.txt' } }
+                        if ($scenario -eq 'hash-forgery') {
+                            $sums = (Read-ZipText $archive 'SHA256SUMS.txt') -replace '(?m)^[a-f0-9]{64}  source/app.txt$', (('0' * 64) + '  source/app.txt')
+                            $archive.GetEntry('SHA256SUMS.txt').Delete(); $entry = $archive.CreateEntry('SHA256SUMS.txt')
+                            $writer = [IO.StreamWriter]::new($entry.Open()); try { $writer.Write($sums) } finally { $writer.Dispose() }
+                        } else {
+                            $entry = $archive.CreateEntry($name)
+                            if ($scenario -eq 'linked-member') { $entry.ExternalAttributes = [int](0xA000 -shl 16) }
+                            $writer = [IO.StreamWriter]::new($entry.Open()); try { $writer.Write('synthetic tamper') } finally { $writer.Dispose() }
+                        }
+                    } finally { $archive.Dispose() }
+                    $verified = Invoke-Package -Verify -Extra @('-VerifyOnly', '-PackagePath', $path)
+                    Assert-True ($verified.Exit -ne 0) "Compact accepted unsafe archive $scenario"
+                    return
+                }
+            }
+            $actual = Invoke-Package -Compact
+            Assert-True ($actual.Exit -ne 0) "Compact accepted unsafe Git input $scenario"
+        }
+    }
+    Case 'compact committed validation kept once with runtime CI recorded separately' {
+        Write-Fixture 'docs/evidence/TEST-001/validation.json' (@{ checks = @(@{ name = 'fixture'; command = 'fixture'; status = 'PASS'; exitCode = 0; output = 'isolated fixture only' }); ci = @{ status = 'NOT_VERIFIED' } } | ConvertTo-Json -Depth 6)
+        $script:head = Commit-Fixture
+        $actual = Invoke-Package -Compact -Extra @('-EvidencePath', 'docs/evidence/TEST-001/validation.json', '-CiRunId', '123', '-CiRunUrl', 'https://github.com/on-dotnet/ontology-platform/actions/runs/123', '-CiCommit', $script:head, '-CiConclusion', 'success')
+        Assert-True ($actual.Exit -eq 0) "Validation compact failed: $($actual.Output)"
+        $path = @(Get-ChildItem (Join-Path $script:repo 'artifacts/reviews') -Filter '*.zip')[0].FullName
+        $archive = [IO.Compression.ZipFile]::OpenRead($path)
+        try {
+            $raw = Read-ZipText $archive 'review-evidence/TEST-001/validation.json' | ConvertFrom-Json
+            $ci = Read-ZipText $archive 'git/ci.json' | ConvertFrom-Json
+            Assert-True ($raw.ci.status -eq 'NOT_VERIFIED' -and $ci.status -eq 'PASS' -and $ci.commit -eq $script:head -and $null -eq $archive.GetEntry('review-evidence/validation.json')) 'Raw validation duplicated or rewritten'
+        } finally { $archive.Dispose() }
+        $verified = Invoke-Package -Verify -Extra @('-VerifyOnly', '-PackagePath', $path)
+        Assert-True ($verified.Exit -eq 0) "Raw validation reopen failed: $($verified.Output)"
+    }
+    Case 'resource inspector is read only and default Docker NOT_RUN' {
+        $null = Git @('update-ref', 'refs/remotes/origin/main', $script:head)
+        Write-Fixture 'untracked.txt' "pending untouched`n"
+        $before = Git @('status', '--porcelain=v1', '-uall')
+        $beforeRefs = Git @('show-ref')
+        $inspector = Join-Path (Split-Path $PackageScript -Parent) 'maintenance/inspect-resources.ps1'
+        $indexPath = Join-Path $script:repo '.git/index'
+        (Get-Item (Join-Path $script:repo 'app.txt')).LastWriteTimeUtc = [DateTime]::UtcNow.AddSeconds(-60)
+        $indexBefore = (Get-FileHash -LiteralPath $indexPath -Algorithm SHA256).Hash
+        $output = & pwsh -NoProfile -File $inspector -Root $script:repo 2>&1
+        Assert-True ($LASTEXITCODE -eq 0) "Inspector failed: $($output -join ' ')"
+        Assert-True ((Get-FileHash -LiteralPath $indexPath -Algorithm SHA256).Hash -ceq $indexBefore) 'Read-only inspector rewrote index cache'
+        $inventory = ($output -join "`n") | ConvertFrom-Json
+        Assert-True ($inventory.mode -eq 'READ_ONLY' -and $inventory.docker.status -eq 'NOT_RUN' -and @($inventory.mutations).Count -eq 0 -and (Git @('status', '--porcelain=v1', '-uall')) -eq $before -and (Git @('show-ref')) -eq $beforeRefs) 'Inspector changed files or refs'
+    }
     Case 'committed snapshot, Unicode, full diff and reopened ZIP' {
         $actual = Invoke-Package
         Assert-True ($actual.Exit -eq 0) "Positive fixture failed: $($actual.Output)"

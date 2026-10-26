@@ -1,0 +1,46 @@
+{
+  "checks": [
+    {
+      "name": "mac-review-package-real-git-fixtures",
+      "command": "pwsh -NoProfile -File scripts/tests/ReviewPackage.Tests.ps1",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "54 tests, 0 failures; actual sameHead binary fixture compact 12101 / legacy 2517609 bytes; see review-package-54-green.txt. Product tests NOT_RUN by this suite."
+    },
+    {
+      "name": "repository-selftest",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1 -SelfTest",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Static 1639 files, environment/toolchain positives-negatives and 54 ReviewPackage fixtures all pass; see selftest-h2-green.txt. Native .NET/Web/browser NOT_RUN locally."
+    },
+    {
+      "name": "resource-inventory",
+      "command": "pwsh -NoProfile -File scripts/maintenance/inspect-resources.ps1 -Root <project-main-checkout> -IncludeDocker",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Actual before metadata: 17 trees, 24 local /25 remote branches, Docker reachable 2 stopped containers/48 volumes/23 images/3 networks; zero mutations. Exact commands/exits in resources-before.json."
+    },
+    {
+      "name": "resource-disposal-eligibility",
+      "command": "Read-only independent Git/ZIP/Docker evidence review",
+      "status": "PARTIAL",
+      "exitCode": 0,
+      "output": "Only 4 original ZIPs and 3 archived M0 receipts are candidates after new package independent reopen. Branches/worktrees/Docker/private caches DEFERRED, uniqueness/cross-machine refs not proven."
+    },
+    {
+      "name": "windows-intel-native",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "No Windows or Intel execution environment. PowerShell syntax cross-platform fixture is not native platform acceptance."
+    }
+  ],
+  "ci": {
+    "status": "NOT_VERIFIED",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  }
+}

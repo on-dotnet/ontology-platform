@@ -1,4 +1,38 @@
-# 标准审查包合同
+# 标准审查包合同 V2
+
+本次由PRE-G3-HYGIENE-001授权升级；默认schemaVersion=2 compact reviewer package。schemaVersion=1的历史格式、原ZIP和历史SHA不改，VerifyOnly按manifest版本分派，创建V1需显式`-SchemaVersion 1`。无新增直接依赖。构包成功仅证明有限完整性检查。
+
+## V2 创建、重开和结构
+
+先提交全部交付，使实施树tracked/untracked干净，明确40位Base/Head且Base为祖先：
+
+```powershell
+pwsh -NoProfile -File scripts/create-review-package.ps1 -BaseSha <40位Base> -HeadSha <40位Head> -TaskId PRE-G3-HYGIENE-001 -Status PARTIAL -EvidencePath docs/evidence/PRE-G3-HYGIENE-001/validation.json -CiRunId <实际runId> -CiRunUrl <实际runURL> -CiCommit <同Head> -CiConclusion success
+pwsh -NoProfile -File scripts/create-review-package.ps1 -Root <干净实施树> -VerifyOnly -PackagePath <ZIP绝对路径>
+pwsh -NoProfile -File scripts/tests/ReviewPackage.Tests.ps1
+```
+
+包含REVIEW_SUMMARY.md、manifest.json、SHA256SUMS.txt、git/commits.txt、git/changed-files.json、git/diff-text.patch、git/diff-check.txt、git/status.txt、git/ci.json、source/、review-evidence/、evidence-index.json。
+
+source收集Head全部非docs/evidence文件（真实源码、配置、测试、合同、ADR、任务与交接），review-evidence收集`docs/evidence/<TaskId>/`全部已提交证据。其他历史证据原文不复制。源payload按SHA256去重，多个gitPath可映射同一个archivePath；导航应查manifest.sourceMembers，不能假设每个Git路径有独立成员。每条映射有gitPath/archivePath/blobOid/SHA256/sizeBytes。完整Head常规树先经git archive与ls-tree/blob校验，省略原文的历史证据也检查原始字节及禁止项。
+
+evidence-index逐个历史及当前证据记录gitPath、commit、blobOid、SHA256、sizeBytes、所属任务testScope、archivePath或null、恢复命令/稳定仓库链接和保留策略。testScope是证据路径的所属任务范围，不把路径名称当真实测试PASS。代表样本可通过当前任务经审核引用/提交；本任务原证据全保留。省略原文必须能从明确Git对象恢复，Git访问不可用时不能声称这是完整离线审计归档。
+
+git/diff-text.patch保留Base..Head全部文本差异，根据变更双侧原始blob判定文本集合，对其强制--text生成无binary编码的patch，防止attributes隐藏文本差异；git/changed-files.json含全部文本/二进制变更、增删/rename类型、前后路径与每侧blobOid/SHA256/size/mode。空侧为null。二进制标识按Git首8000字节NUL规则判断；已提交或本地gitattributes的-diff不能隐藏纯文本变更。被删/替换资产必须从受控Git对象恢复；不能从ZIP凭空恢复已省略二进制。变更两侧原始blob均做有限凭证扫描，不能以省略binary绕过被删秘密检测。
+
+原始validation只保留在本任务映射位置，不另复制规范化JSON；未提供证据才生成review-evidence/validation.json明确NOT_RUN。实际规范化checks/ci在manifest，CI另见git/ci.json；运行时CI覆盖原始证据CI，不改写原提交字节。V2任何CI PASS/FAIL都要求commit=Head（包括总体PARTIAL），旧阶段CI不能复用为本轮CI。工具不主动查询GitHub，Master必须实际查询run和两个job，真实同Head事实再作为参数提供。
+
+从已提交Head读取；脏树/未跟踪、非祖先、非commit、路径穿越、重复/大小写冲突、符号链接/submodule、禁止成员/机密、重算hash的payload或index伪造均拒绝。成员集合、源码blob、文本diff、binary/index JSON、原始validation与checks/ci重开后重算比较；V1也继续严格验证。有限扫描不等于全面防泄露。输出仍固定ignored artifacts/reviews，partial通过后原子发布，已有同名包拒绝覆盖；失败不替换最后有效包。
+
+软门槛建议10MiB，超过15MiB须逐项记录大型内容必要性，不为缩包丢失关键实现/失败证据。Review ZIP不入Git，不上传第三方网盘。最终仅交一个compact ZIP；旧包先归档不可再生事实、核实恢复、再在新包独立校验后按白名单清理。详见[资源生命周期](resource-lifecycle.md)。
+
+回归使用真实临时Git：保留V1原35正反例；新增V2默认、完整source/历史索引、增删改rename/大量截图、同Head实际大小比较、去重/篡改/CI/路径/符号链接/伪造hash和只读盘点副作用；本地Mac与现有LinuxCI运行，Windows专用脚本不改且原生未跑则NOT_RUN。
+
+---
+
+## V1 历史兼容合同（以下仅适用schemaVersion=1）
+
+### 原合同
 
 适用当前及后续已授权阶段。构包成功仅证明此工具执行的完整性检查成功，不表示任务、产品、CI或全面安全审计通过。Owner为工作项A；根verify和CI由Master接入。没有新增第三方依赖，仅使用PowerShell7、Git和.NET内置ZIP/散列API。
 
@@ -7,7 +41,7 @@
 先提交全部交付内容，使工作树与未跟踪资料干净，然后使用完整40位小写提交SHA：
 
 ```powershell
-pwsh -NoProfile -File scripts/create-review-package.ps1 -BaseSha <完整Base提交SHA> -HeadSha <完整Head提交SHA> -TaskId G1-INFRA-001 -Status PARTIAL -EvidencePath docs/evidence/G1-INFRA-001/validation.json
+pwsh -NoProfile -File scripts/create-review-package.ps1 -SchemaVersion 1 -BaseSha <完整Base提交SHA> -HeadSha <完整Head提交SHA> -TaskId G1-INFRA-001 -Status PARTIAL -EvidencePath docs/evidence/G1-INFRA-001/validation.json
 pwsh -NoProfile -File scripts/create-review-package.ps1 -Root <仓库根目录> -VerifyOnly -PackagePath <ZIP绝对路径>
 pwsh -NoProfile -File scripts/tests/ReviewPackage.Tests.ps1
 ```
