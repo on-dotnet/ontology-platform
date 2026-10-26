@@ -4,7 +4,7 @@
 **授权类型：明确的实施授权（Mac Codex Local，普通执行模式），不是 Plan Only。**
 
 - 项目：`/Users/chasen/Developer/repos/ontology-platform`，GitHub：`on-dotnet/ontology-platform`。
-- 已交付基线：`de2c020c486df5557b1b17f6b62c1befd96312f2`；开工时务必 `git fetch` 并核对真实 `origin/main`，不允许强制回退。 
+- 已交付基线：`de2c020c486df5557b1b17f6b62c1befd96312f2`；开工时务必 `git fetch` 并核对真实 `origin/main`，不允许强制回退。
 - **推荐模型：GPT-6.1 Sol，High。** 资源归属调查子 Agent 可用 Medium；独立 Reviewer 推荐 GPT-6 Astra，High。若 Codex 不允许逐个设置则 Master 使用 Sol/High。
 - 本轮任务仅修复资源治理缺口，不实施 G3 业务功能；允许在确认的安全白名单内清理**已结束的本项目开发/测试资源**，无须每项重复审批。绝不触碰生产、其他仓库、全局 Codex、未知来源或无法恢复的业务数据。
 - 必须遵守根 `AGENTS.md`、`PLANS.md`、当前授权索引、资源生命周期规范、Git Worktree 及审查包 V2 规则。本文件作为用户新的明确授权，覆盖旧文档中将全部 Git/Docker 一概 `KEEP/DEFERRED` 的限制，但不覆盖安全防护。
