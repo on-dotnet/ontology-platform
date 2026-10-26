@@ -106,6 +106,105 @@ public sealed class RoundtripTests
         Assert.AreEqual(ValidationKind.ShaclCore, report.Kind);
     }
 
+    /// <summary>仅注释、空白或prefix仍由真实RIOT解析为空图，原文和散列保持不变。</summary>
+    [TestMethod]
+    [DataRow("# comment\n")]
+    [DataRow(" \t\r\n")]
+    [DataRow("@prefix ex: <urn:empty:> .\n")]
+    public async Task LegalEmptyDocumentsKeepExactHashesAndProduceEmptyGraph(string ontology)
+    {
+        // 同时覆盖仅prefix的Shapes及其他两类合法空文档。
+        var source = new SourceBundle { OntologyTurtle = ontology, ShapesTurtle = "@prefix sh: <http://www.w3.org/ns/shacl#> .\n", VocabularyTurtle = "# vocabulary", DataTurtle = " \n" };
+        // 每个请求必须真实执行RIOT，而不是猜测源码关键字。
+        var runtime = SemanticFixture.Runtime();
+        // 权威hash始终依据调用方完整原文。
+        var analysis = await runtime.AnalyzeAsync(source, 1, CancellationToken.None);
+        Assert.AreEqual(0, analysis.Projection.Triples.Length);
+        Assert.AreEqual(OntologyPlatform.Modules.Ontology.Domain.OntologyRules.Hash(ontology), analysis.Hashes.OntologyHash);
+        Assert.AreEqual(OntologyPlatform.Modules.Ontology.Domain.OntologyRules.Hash(source.ShapesTurtle), analysis.Hashes.ShapesHash);
+        // 官方SHACL真实返回空图符合，不生成伪造报告。
+        var report = await runtime.ValidateAsync(source, CancellationToken.None);
+        Assert.IsTrue(report.Conforms);
+        Assert.AreEqual(analysis.Hashes, report.Hashes);
+        Assert.AreEqual(ontology, source.OntologyTurtle);
+        Assert.AreEqual("@prefix sh: <http://www.w3.org/ns/shacl#> .\n", source.ShapesTurtle);
+    }
+
+    /// <summary>空图上的真实新增只能导出业务三元组，解析辅助内容不得泄漏。</summary>
+    [TestMethod]
+    public async Task EditingLegalEmptyDocumentExportsOnlyRequestedTriple()
+    {
+        // 空文档保留注释到首次真正业务变更为止。
+        var source = new SourceBundle { OntologyTurtle = "# comment\n", ShapesTurtle = "@prefix sh: <http://www.w3.org/ns/shacl#> .\n" };
+        // 使用真实RIOT和正式编辑服务路径。
+        var runtime = SemanticFixture.Runtime();
+        // 单一新增是最终图中的唯一三元组。
+        var edited = await runtime.ApplyEditAsync(source, new SemanticEdit { SubjectIri = "urn:empty:C", PredicateIri = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", NewObject = new RdfTerm { Kind = RdfTermKind.Iri, Value = "http://www.w3.org/2002/07/owl#Class" } }, CancellationToken.None);
+        Assert.AreEqual("<urn:empty:C> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .\n", edited.OntologyTurtle);
+        Assert.AreEqual(source.ShapesTurtle, edited.ShapesTurtle);
+        // 再解析不能出现额外投影节点或内部三元组。
+        var analysis = await runtime.AnalyzeAsync(edited, 2, CancellationToken.None);
+        Assert.AreEqual(1, analysis.Projection.Triples.Length);
+    }
+
+    /// <summary>真实临时图丢失或被替换必须503，不能把运行时重启等故障当合法空图。</summary>
+    [TestMethod]
+    [DataRow(false)]
+    [DataRow(true)]
+    public async Task LostOrReplacedTemporaryGraphRemainsUnavailable(bool replace)
+    {
+        // 在真实PUT之后、首次GET之前注入真实图删除或替换。
+        var intercepted = 0;
+        // 测试钩子不伪造响应，实际引擎决定随后GET结果。
+        var runtime = SemanticFixture.RuntimeWithGate(async (request, token) =>
+        {
+            if (request.Method != HttpMethod.Get || Interlocked.Exchange(ref intercepted, 1) != 0) return;
+            // 仅操作本次运行时生成的临时图，不触碰其他请求或正式图。
+            using var client = new HttpClient(new HttpClientHandler { AllowAutoRedirect = false, UseProxy = false });
+            // 替换场景留下可读的真实图，验证存在性之外的完整性检查。
+            using var change = new HttpRequestMessage(replace ? HttpMethod.Put : HttpMethod.Delete, request.RequestUri);
+            if (replace) change.Content = new StringContent("<urn:replaced> <urn:p> 1 .", System.Text.Encoding.UTF8, "text/turtle");
+            // 真实GSP成功才可继续检验生产回读。
+            using var response = await client.SendAsync(change, token);
+            response.EnsureSuccessStatusCode();
+        });
+        // 非空文档确保旧实现也会走真实GSP回读。
+        var error = await Assert.ThrowsAsync<SemanticOperationException>(() => runtime.AnalyzeAsync(new SourceBundle { OntologyTurtle = "<urn:original> <urn:p> 1 ." }, 1, CancellationToken.None));
+        Assert.AreEqual(503, error.Status);
+        Assert.AreEqual(1, intercepted);
+    }
+
+    /// <summary>正式非空图被删除时仍明确不可用，临时空文档支持不放宽正式回读。</summary>
+    [TestMethod]
+    public async Task MissingPublishedGraphRemainsUnavailable()
+    {
+        // 使用真实临时TDB2部署两个非空正式图。
+        var runtime = SemanticFixture.Runtime();
+        // 业务源不存在空图歧义。
+        var source = new SourceBundle { OntologyTurtle = "<urn:C> a <http://www.w3.org/2002/07/owl#Class> .", DataTurtle = "<urn:i> a <urn:C> ." };
+        // 散列来自实际源解析。
+        var analysis = await runtime.AnalyzeAsync(source, 1, CancellationToken.None);
+        // 服务端派生独立发布ID，测试不激活版本。
+        var id = Guid.NewGuid().ToString("N");
+        // 真实部署和回读共享同一不可变图名。
+        var snapshot = new AssetVersionSnapshot { ReleaseId = id, OntologyGraphIri = "urn:ontology-platform:release:" + id + ":ontology", DataGraphIri = "urn:ontology-platform:release:" + id + ":data" };
+        // 精确源绑定保持正式部署的原有合同。
+        var manifest = new ReleaseManifest { ReleaseId = id, Hashes = analysis.Hashes, OntologyGraphIri = snapshot.OntologyGraphIri, DataGraphIri = snapshot.DataGraphIri, Snapshot = snapshot };
+        await runtime.DeployAsync(manifest, source, CancellationToken.None);
+        Assert.AreEqual(1, (await runtime.ReadPublishedAsync(snapshot, CancellationToken.None)).DataTriples.Length);
+        // 只删除刚部署的该测试专属数据图，模拟正式存储图丢失。
+        using var client = new HttpClient(new HttpClientHandler { AllowAutoRedirect = false, UseProxy = false });
+        // 地址仅来自脚本的独占随机端口，绝不读取历史环境。
+        using var response = await client.DeleteAsync(Environment.GetEnvironmentVariable("G2_SEM_JENA_ORIGIN") + "/ontology/data?graph=" + Uri.EscapeDataString(snapshot.DataGraphIri));
+        response.EnsureSuccessStatusCode();
+        // 正式查询与部署回验都不能吞掉404。
+        var readError = await Assert.ThrowsAsync<SemanticOperationException>(() => runtime.ReadPublishedAsync(snapshot, CancellationToken.None));
+        Assert.AreEqual(503, readError.Status);
+        // Verify必须失败关闭而不是宣称空图正确。
+        var verifyError = await Assert.ThrowsAsync<SemanticOperationException>(() => runtime.VerifyAsync(manifest, source, CancellationToken.None));
+        Assert.AreEqual(503, verifyError.Status);
+    }
+
     /// <summary>正式回验必须包含本体中的subClassOf，不能只校验data图而漏掉继承目标。</summary>
     [TestMethod]
     public async Task PublishedShaclUsesTheSameOntologyContext()

@@ -1,0 +1,71 @@
+{
+  "exitCode": 2,
+  "records": [
+    {
+      "command": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g2-sem-9eafb147c18c",
+        "--publish",
+        "127.0.0.1::3030",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--mount",
+        "type=bind,src=/private/tmp/g2-sem-9eafb147c18chvl5u_mr,dst=/fixture,readonly",
+        "--entrypoint",
+        "java",
+        "fuseki:8b85cd963ab3910a87ff4d69819a814fcc536d5f",
+        "-Xmx384m",
+        "-Dlog4j.configurationFile=/fixture/log4j2.properties",
+        "-jar",
+        "/opt/fuseki/fuseki-server.jar",
+        "--config=/fixture/config.ttl"
+      ],
+      "exitCode": 0,
+      "output": "cdaba4c74fc54c2c96be32ba1bbeccf95789694bdd9e20b079c35c71073bd687\n"
+    },
+    {
+      "command": [
+        "docker",
+        "port",
+        "g2-sem-9eafb147c18c",
+        "3030/tcp"
+      ],
+      "exitCode": 0,
+      "output": "127.0.0.1:55636\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "test",
+        "--project",
+        "backend/tests/OntologyPlatform.SemanticTests",
+        "--no-restore",
+        "--",
+        "--filter",
+        "FullyQualifiedName~LegalEmpty|FullyQualifiedName~LostOrReplaced|FullyQualifiedName~MissingPublished"
+      ],
+      "exitCode": 2,
+      "output": "正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n失败 LegalEmptyDocumentsKeepExactHashesAndProduceEmptyGraph (\"# comment\\n\") (55ms)\n  从 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  测试方法 OntologyPlatform.SemanticTests.RoundtripTests。LegalEmptyDocumentsKeepExactHashesAndProduceEmptyGraph 引发了异常: \n  OntologyPlatform.Contracts.SemanticOperationException: 语义操作未满足受控合同。\n    在 OntologyPlatform.Modules.Ontology.JenaSemanticRuntime.SendAsync(Uri origin, String path, HttpMethod method, String body, String accept, CancellationToken token) 位于 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaSemanticRuntime.cs:272\n    在 OntologyPlatform.Modules.Ontology.JenaSemanticRuntime.ReadGraphAsync(Uri origin, String graph, CancellationToken token) 位于 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaSemanticRuntime.cs:258\n    在 OntologyPlatform.Modules.Ontology.JenaSemanticRuntime.ParseSourcesAsync(SourceBundle sources, List`1 graphs, CancellationToken token) 位于 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaSemanticRuntime.cs:236\n    在 OntologyPlatform.Modules.Ontology.JenaSemanticRuntime.<>c__DisplayClass9_0.<<AnalyzeAsync>b__0>d.MoveNext() 位于 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaSemanticRuntime.cs:57\n    --- End of stack trace from previous location ---\n    在 OntologyPlatform.Modules.Ontology.JenaSemanticRuntime.Execute[T](Func`3 operation, CancellationToken cancellationToken, String phase) 位于 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaSemanticRuntime.cs:196\n    在 OntologyPlatform.Modules.Ontology.JenaSemanticRuntime.Execute[T](Func`3 operation, CancellationToken cancellationToken, String phase) 位于 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaSemanticRuntime.cs:219\n    在 OntologyPlatform.SemanticTests.RoundtripTests.LegalEmptyDocumentsKeepExactHashesAndProduceEmptyGraph(String ontology) 位于 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/RoundtripTests.cs:121\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n    \n失败 LegalEmptyDocumentsKeepExactHashesAndProduceEmptyGraph (\" \\t\\r\\n\") (4ms)\n  从 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  测试方法 OntologyPlatform.SemanticTests.RoundtripTests。LegalEmptyDocumentsKeepExactHashesAndProduceEmptyGraph 引发了异常: \n  OntologyPlatform.Contracts.SemanticOperationException: 语义操作未满足受控合同。\n    在 OntologyPlatform.Modules.Ontology.JenaSemanticRuntime.SendAsync(Uri origin, String path, HttpMethod method, String body, String accept, CancellationToken token) 位于 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaSemanticRuntime.cs:272\n    在 OntologyPlatform.Modules.Ontology.JenaSemanticRuntime.ReadGraphAsync(Uri origin, String graph, CancellationToken token) 位于 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaSemanticRuntime.cs:258\n    在 OntologyPlatform.Modules.Ontology.JenaSemanticRuntime.ParseSourcesAsync(SourceBundle sources, List`1 graphs, CancellationToken token) 位于 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaSemanticRuntime.cs:236\n    在 OntologyPlatform.Modules.Ontology.JenaSemanticRuntime.<>c__DisplayClass9_0.<<AnalyzeAsync>b__0>d.MoveNext() 位于 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaSemanticRuntime.cs:57\n    --- End of stack trace from previous location ---\n    在 OntologyPlatform.Modules.Ontology.JenaSemanticRuntime.Execute[T](Func`3 operation, CancellationToken cancellationToken, String phase) 位于 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaSemanticRuntime.cs:196\n    在 OntologyPlatform.Modules.Ontology.JenaSemanticRuntime.Execute[T](Func`3 operation, CancellationToken cancellationToken, String phase) 位于 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaSemanticRuntime.cs:219\n    在 OntologyPlatform.SemanticTests.RoundtripTests.LegalEmptyDocumentsKeepExactHashesAndProduceEmptyGraph(String ontology) 位于 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/RoundtripTests.cs:121\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n    \n失败 LegalEmptyDocumentsKeepExactHashesAndProduceEmptyGraph (\"@prefix ex: <urn:empty:> .\\n\") (5ms)\n  从 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  测试方法 OntologyPlatform.SemanticTests.RoundtripTests。LegalEmptyDocumentsKeepExactHashesAndProduceEmptyGraph 引发了异常: \n  OntologyPlatform.Contracts.SemanticOperationException: 语义操作未满足受控合同。\n    在 OntologyPlatform.Modules.Ontology.JenaSemanticRuntime.SendAsync(Uri origin, String path, HttpMethod method, String body, String accept, CancellationToken token) 位于 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaSemanticRuntime.cs:272\n    在 OntologyPlatform.Modules.Ontology.JenaSemanticRuntime.ReadGraphAsync(Uri origin, String graph, CancellationToken token) 位于 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaSemanticRuntime.cs:258\n    在 OntologyPlatform.Modules.Ontology.JenaSemanticRuntime.ParseSourcesAsync(SourceBundle sources, List`1 graphs, CancellationToken token) 位于 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaSemanticRuntime.cs:236\n    在 OntologyPlatform.Modules.Ontology.JenaSemanticRuntime.<>c__DisplayClass9_0.<<AnalyzeAsync>b__0>d.MoveNext() 位于 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaSemanticRuntime.cs:57\n    --- End of stack trace from previous location ---\n    在 OntologyPlatform.Modules.Ontology.JenaSemanticRuntime.Execute[T](Func`3 operation, CancellationToken cancellationToken, String phase) 位于 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaSemanticRuntime.cs:196\n    在 OntologyPlatform.Modules.Ontology.JenaSemanticRuntime.Execute[T](Func`3 operation, CancellationToken cancellationToken, String phase) 位于 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaSemanticRuntime.cs:219\n    在 OntologyPlatform.SemanticTests.RoundtripTests.LegalEmptyDocumentsKeepExactHashesAndProduceEmptyGraph(String ontology) 位于 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/RoundtripTests.cs:121\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n    \n失败 EditingLegalEmptyDocumentExportsOnlyRequestedTriple (3ms)\n  从 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  测试方法 OntologyPlatform.SemanticTests.RoundtripTests。EditingLegalEmptyDocumentExportsOnlyRequestedTriple 引发了异常: \n  OntologyPlatform.Contracts.SemanticOperationException: 语义操作未满足受控合同。\n    在 OntologyPlatform.Modules.Ontology.JenaSemanticRuntime.SendAsync(Uri origin, String path, HttpMethod method, String body, String accept, CancellationToken token) 位于 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaSemanticRuntime.cs:272\n    在 OntologyPlatform.Modules.Ontology.JenaSemanticRuntime.ReadGraphAsync(Uri origin, String graph, CancellationToken token) 位于 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaSemanticRuntime.cs:258\n    在 OntologyPlatform.Modules.Ontology.JenaSemanticRuntime.ParseSourcesAsync(SourceBundle sources, List`1 graphs, CancellationToken token) 位于 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaSemanticRuntime.cs:236\n    在 OntologyPlatform.Modules.Ontology.JenaSemanticRuntime.<>c__DisplayClass11_0.<<ApplyEditAsync>b__0>d.MoveNext() 位于 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaSemanticRuntime.cs:111\n    --- End of stack trace from previous location ---\n    在 OntologyPlatform.Modules.Ontology.JenaSemanticRuntime.Execute[T](Func`3 operation, CancellationToken cancellationToken, String phase) 位于 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaSemanticRuntime.cs:196\n    在 OntologyPlatform.Modules.Ontology.JenaSemanticRuntime.Execute[T](Func`3 operation, CancellationToken cancellationToken, String phase) 位于 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaSemanticRuntime.cs:219\n    在 OntologyPlatform.SemanticTests.RoundtripTests.EditingLegalEmptyDocumentExportsOnlyRequestedTriple() 位于 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/RoundtripTests.cs:142\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n    \n失败 LostOrReplacedTemporaryGraphRemainsUnavailable (True) (12ms)\n  从 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  Assertion failed. Expected exception of type SemanticOperationException (or derived) but no exception was thrown.\n  \n  Assert.ThrowsAsync<SemanticOperationException>(() => runtime.AnalyzeAsync(new SourceBundle { OntologyTurtle = \"<urn:original> <urn:p> 1 .\" }, 1, CancellationToken.None))\n    在 Microsoft.VisualStudio.TestTools.UnitTesting.Assert.ThrowsExceptionAsync[TException](Func`1 action, Boolean isStrictType, String message, String actionExpression, String assertMethodName)\n    在 OntologyPlatform.SemanticTests.RoundtripTests.LostOrReplacedTemporaryGraphRemainsUnavailable(Boolean replace) 位于 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/RoundtripTests.cs:172\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n/Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64) 失败并出现 5 个错误 (1s 283ms)\n退出代码: 2\n\n测试运行摘要: 失败!\n  总计: 7\n  失败: 5\n  成功: 2\n  已跳过: 0\n  持续时间: 1s 797ms\n已完成测试运行，但显示非成功退出代码: 2 (请参阅: https://aka.ms/testingplatform/exitcodes)\n"
+    },
+    {
+      "check": "all temporary graph triples removed",
+      "count": 0,
+      "status": "PASS"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g2-sem-9eafb147c18c"
+      ],
+      "exitCode": 0,
+      "output": "g2-sem-9eafb147c18c\n"
+    }
+  ]
+}

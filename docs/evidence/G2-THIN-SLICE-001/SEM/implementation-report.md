@@ -89,3 +89,19 @@ Master指定的共享提交已顺序同步，无冲突且不手改共享文件�
 其余最终检查：whole-solution build exit0；G2ContractTests 19/19 PASS、0跳过、exit0；SelfTest exit0（35 ReviewPackage等检查器正反例，不冒充产品测试）。AppHost格式加载ASPIRE010和生成迁移namespace建议为已记录warning，没有擅改共享配置或迁移。Master修复共享格式后需整体重新verify；当前不把whole-solution format标PASS。
 
 最终已格式化自有源码再次执行`python3 scripts/acceptance/semantic-roundtrip.py --postgres --label formatted-final-green`：33/33 PASS、0跳过、exit0；真实暂存三元组0，临时Jena/PG容器均已删除，见formatted-final-green.json。仅源码格式调整后复验，没有把旧未格式化运行冒充最终快照验证。
+
+## 限定复审后的合法空文档与路由授权元数据修复
+
+本批修复基于已推送 `13cba4fcb07743458f946627ced0b9300c3f58a5`。Master转述原2I/1M已全部ADDRESSED，新增Minor仍应修复后限定复验；本批仍DRAFT，不自行合main或扩大当前关口。修改前`git fetch origin` exit0、工作树干净。只改自有JenaSemanticRuntime、OntologyEndpoints、RoundtripTests与本证据目录。
+
+根因：RIOT接受注释/空白/prefix-only文档并产生零三元组，但Fuseki不保留对应空named graph；随后GSP GET404被正确的通用依赖错误映射为503，因而合法源无法保存。不能从字符串关键词猜测Turtle是否为空，也不能全局把404当空图。
+
+处理：仅在`ParseSourcesAsync`的独占临时解析图前置随机GuidN生成的全绝对IRI三元组。RIOT完整解析原始文档，实际回读必须精确包含本次marker，随后仅剔除该完整三元组。前置位置保证用户BASE/prefix/末尾注释不能改变marker或补齐非法语法；随机marker从未进入权威SourceBundle、原文hash、业务投影、Shape安全检查、预算、编辑序列化或正式图。不得按命名空间广泛过滤，以免丢失用户公理。GSP404仍是503；即使200而marker缺失，也返回503/temporary_graph_incomplete，避免Jena重启/临时图替换被误当成合法空图。原有独立finally清理保持不变。
+
+- 红灯实际命令：`python3 scripts/acceptance/semantic-roundtrip.py --filter 'FullyQualifiedName~LegalEmpty|FullyQualifiedName~LostOrReplaced|FullyQualifiedName~MissingPublished' --label empty-documents-red`，exit2，7项中5失败/2通过/0跳过。三种合法空本体（`# comment\n`、纯空白、仅prefix）连同仅prefix Shapes均复现503；空图新增编辑同样失败；实际替换临时图时旧代码没有检查回读完整性。真实删除临时图和正式图两个既有失败关闭场景已通过。见empty-documents-red.json。
+- 绿灯全量命令：`python3 scripts/acceptance/semantic-roundtrip.py --postgres --label empty-documents-full-green`，exit0，40/40通过、0跳过；覆盖原33项及新7项。真实PG先应用交付迁移，真实Jena RIOT/SHACL/TDB2运行；测试结束查询暂存图三元组总数0，两临时容器已删除。见empty-documents-full-green.json。
+- 新回归核对空图投影0条、原文hash准确、Shapes原文和hash不变、官方SHACL报告符合；对空源新增Class的导出必须恰好一条指定业务三元组，后续RIOT投影也只能一条。临时图删除/替换是通过真实GSP在PUT之后GET之前操作，没有伪造引擎响应。正式测试先真实部署两个非空图，再删除数据图，ReadPublished与Verify都明确503。
+- 本体7路由补`.RequireAuthorization`：3个GET使用`semantic.read`，4个POST/PUT使用`ontology.edit`，与各自guard相同策略。认证授权中间件可在body绑定前处理策略；原guard继续CSRF/scope/If-Match/业务错误边界。未修改Host或共同guard。最终匿名/不允许角色+坏body的HTTP与拒绝审计验收由Master真实Host集成验证，本批不宣称该HTTP链路已运行。
+- `empty-documents-verification.json`保存真实cwd、命令、完整输出和退出码：backend cwd精确三文件`dotnet format OntologyPlatform.slnx --no-restore --include ... --verify-no-changes`；`dotnet build backend/OntologyPlatform.slnx --no-restore`；规定SelfTest；`git diff --check`，四项均exit0。SelfTest中的35项ReviewPackage及其他检查器正反例不是业务测试。全量构建仍有既存ASPIRE010 warning，不改共享配置。
+
+40总计仍含1项类型存在检查和1项明确catalog替身消费边界，不能称40个独立端到端场景。其他真实链路与未运行边界见前文；同Head CI、Master认证HTTP/FE集成、唯一ZIP仍NOT_VERIFIED/NOT_RUN，待Master限定复验与集成。
