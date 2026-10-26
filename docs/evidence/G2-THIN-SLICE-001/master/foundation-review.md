@@ -1,0 +1,7 @@
+# 公共基础独立审查及修复账本
+
+独立Reviewer=g2_foundation_review（quality_reviewer/SolHigh），固定2ac9ec4472afb44e721399c8ef7156e96eb9c2da..bd52431b31d560a3b83f4b2e705cea9a0fb40c4d；完整patch SHA256933a053cc7ac9476dd267197e3e16ac05d4d602fbddc5729ef75bd76a7a2b205。首次0Critical/4Important/1Minor，CHANGES_REQUIRED，未主线集成。
+
+I1：SemanticDatum全空/多个分支/错kind可表达；I2：ExecutionEvent类型/版本与payload独立，终态status可错；I3：四个空测试工程触发原verify真实MTP exit8；I4：JsonRequired只检查存在，非nullable引用null可穿透；M1：node:test未被正式Vitest/CI发现。
+
+Owner Master真实复现：新增7测试中4失败/3通过，原空PublishingTests实际0测试exit8；不是只读推断。G2生成DTO统一输入/输出回调执行非null、精确SemanticDatum分支、eventType/payload/schemaVersion/游标、终态规则，OpenAPI/TS同步精确联合/literal，不改G1全局JSON。全部三种合法数据与九事件往返及原负例合计19/19、0skip。生成器3项移入Vitest正式src发现路径，连原6项共9/9；typecheck/lint0。I3将通过撤下空工程、真实测试源码到位后再恢复注册关闭，不删除或弱化零测试门禁。此文件为Owner复现记录，限定独立复审尚待运行，不自称审查通过。

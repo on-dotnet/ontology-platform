@@ -1359,7 +1359,8 @@
           "description": "仅relationship判别非空。"
         }
       ],
-      "base": null
+      "base": null,
+      "wireRule": "exactly-one-branch"
     },
     "EntityCandidate": {
       "description": "只包含已授权不同IRI的身份歧义候选。",
@@ -1846,7 +1847,8 @@
         {
           "name": "Status",
           "type": "ExecutionStatus",
-          "description": "仅COMPLETED。"
+          "description": "仅COMPLETED。",
+          "const": "COMPLETED"
         },
         {
           "name": "TotalToolCalls",
@@ -1859,7 +1861,8 @@
           "description": "最后实际结果状态。"
         }
       ],
-      "base": "ExecutionPayload"
+      "base": "ExecutionPayload",
+      "wireRule": "fixed-terminal-status"
     },
     "RunFailedPayload": {
       "description": "由真实持久事件类型run.failed确定的唯一载荷。",
@@ -1867,7 +1870,8 @@
         {
           "name": "Status",
           "type": "ExecutionStatus",
-          "description": "仅FAILED。"
+          "description": "仅FAILED。",
+          "const": "FAILED"
         },
         {
           "name": "Code",
@@ -1880,7 +1884,8 @@
           "description": "真实工具次数。"
         }
       ],
-      "base": "ExecutionPayload"
+      "base": "ExecutionPayload",
+      "wireRule": "fixed-terminal-status"
     },
     "RunCancelledPayload": {
       "description": "由真实持久事件类型run.cancelled确定的唯一载荷。",
@@ -1888,12 +1893,14 @@
         {
           "name": "Status",
           "type": "ExecutionStatus",
-          "description": "仅CANCELLED。"
+          "description": "仅CANCELLED。",
+          "const": "CANCELLED"
         },
         {
           "name": "Code",
           "type": "string",
-          "description": "固定cancelled。"
+          "description": "固定cancelled。",
+          "const": "cancelled"
         },
         {
           "name": "TotalToolCalls",
@@ -1901,7 +1908,8 @@
           "description": "真实工具次数。"
         }
       ],
-      "base": "ExecutionPayload"
+      "base": "ExecutionPayload",
+      "wireRule": "fixed-terminal-status"
     },
     "ExecutionEvent": {
       "description": "先PG提交后由SSE重放发送的唯一执行事件。",
@@ -1947,7 +1955,8 @@
           "description": "强类型判别联合，禁止任意业务字典。"
         }
       ],
-      "base": null
+      "base": null,
+      "wireRule": "event-payload-kind-and-version"
     },
     "CreateDraftRequest": {
       "description": "拒绝未登记字段并包含明确幂等/修订的受保护命令。",

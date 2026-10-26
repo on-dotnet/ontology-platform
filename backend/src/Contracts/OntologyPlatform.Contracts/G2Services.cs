@@ -134,6 +134,14 @@ public interface ISemanticRuntime
 /// <summary>以完整范围再次授权正式版本，供网关与运行固定快照。</summary>
 public interface IReleaseCatalog
 {
+    /// <summary>只按服务器查回的发布身份重新授权，供不含assetId的草稿克隆使用。</summary>
+    /// <param name="actor">可信主体。</param>
+    /// <param name="releaseId">已存在的正式发布ID。</param>
+    /// <param name="cancellationToken">取消信号。</param>
+    /// <returns>包含权威assetId及唯一scope的正式清单。</returns>
+    Task<ReleaseSummary> ReadAsync(ActorContext actor, string releaseId, CancellationToken cancellationToken);
+
+
     /// <summary>一次解析当前活动或显式历史正式版本，禁止半准备版本。</summary>
     /// <param name="actor">可信主体。</param>
     /// <param name="assetId">永久唯一范围资产。</param>

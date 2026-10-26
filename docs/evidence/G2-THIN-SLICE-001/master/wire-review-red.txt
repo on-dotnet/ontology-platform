@@ -1,0 +1,43 @@
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g2-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Release/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64)
+失败 SemanticDatumRejectsEmptyMismatchedAndMultipleBranches (4ms)
+  从 /Users/chasen/.codex/worktrees/g2-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Release/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64)
+  Assertion failed. Expected exception of type JsonException (or derived) but no exception was thrown.
+
+  Assert.Throws<JsonException>(() => JsonSerializer.Deserialize<SemanticDatum>(empty, new JsonSerializerOptions(JsonSerializerDefaults.Web)))
+    在 OntologyPlatform.G2ContractTests.WireContractTests.SemanticDatumRejectsEmptyMismatchedAndMultipleBranches() 位于 /Users/chasen/.codex/worktrees/g2-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/WireContractTests.cs:49
+    在 System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+    在 System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+失败 EventEnvelopeRejectsMismatchedPayloadAndUnsupportedVersion (2ms)
+  从 /Users/chasen/.codex/worktrees/g2-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Release/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64)
+  Assertion failed. Expected exception of type JsonException (or derived) but no exception was thrown.
+
+  Assert.Throws<JsonException>(() => JsonSerializer.Serialize(value))
+    在 OntologyPlatform.G2ContractTests.WireContractTests.EventEnvelopeRejectsMismatchedPayloadAndUnsupportedVersion() 位于 /Users/chasen/.codex/worktrees/g2-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/WireContractTests.cs:78
+    在 System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+    在 System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+失败 TerminalPayloadRejectsOtherExecutionStates (0ms)
+  从 /Users/chasen/.codex/worktrees/g2-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Release/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64)
+  Assertion failed. Expected exception of type JsonException (or derived) but no exception was thrown.
+
+  Assert.Throws<JsonException>(() => JsonSerializer.Serialize(new RunCompletedPayload { Status = ExecutionStatus.Running }))
+    在 OntologyPlatform.G2ContractTests.WireContractTests.TerminalPayloadRejectsOtherExecutionStates() 位于 /Users/chasen/.codex/worktrees/g2-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/WireContractTests.cs:86
+    在 System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+    在 System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+失败 RequiredReferenceCannotBeNullButNullableFieldCan (0ms)
+  从 /Users/chasen/.codex/worktrees/g2-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Release/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64)
+  Assertion failed. Expected exception of type JsonException (or derived) but no exception was thrown.
+
+  Assert.Throws<JsonException>(() => JsonSerializer.Deserialize<SourceBundle>(invalid, options))
+    在 OntologyPlatform.G2ContractTests.WireContractTests.RequiredReferenceCannotBeNullButNullableFieldCan() 位于 /Users/chasen/.codex/worktrees/g2-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/WireContractTests.cs:99
+    在 System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+    在 System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+/Users/chasen/.codex/worktrees/g2-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Release/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64) 失败并出现 4 个错误 (1s 150ms)
+退出代码: 2
+
+测试运行摘要: 失败!
+  总计: 7
+  失败: 4
+  成功: 3
+  已跳过: 0
+  持续时间: 1s 668ms
+已完成测试运行，但显示非成功退出代码: 2 (请参阅: https://aka.ms/testingplatform/exitcodes)
