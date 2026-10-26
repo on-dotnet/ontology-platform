@@ -122,6 +122,63 @@ public sealed class DraftRevisionTests
         Assert.AreEqual(request.Sources, JsonSerializer.Deserialize<SourceBundle>(original.SourcesJson));
     }
 
+    /// <summary>真实PG创建和保存相同含BOM源码后，各修订原文/hash不被临时解析视图覆盖。</summary>
+    [TestMethod]
+    public async Task LeadingBomCreateSaveAndNoOpKeepExactSourceHistory()
+    {
+        // 真实交付迁移后的PG上下文，与其他用例草稿隔离。
+        await using var database = Database();
+        // 原请求含完整Synthetic四源，不访问历史runtime或私有数据。
+        var request = Request();
+        request = request with
+        {
+            Sources = request.Sources with
+            {
+                OntologyTurtle = "\uFEFF" + request.Sources.OntologyTurtle,
+                ShapesTurtle = "\uFEFF" + request.Sources.ShapesTurtle,
+                VocabularyTurtle = "\uFEFF" + request.Sources.VocabularyTurtle,
+                DataTurtle = "\uFEFF" + request.Sources.DataTurtle.Replace("炉次heat-1", "炉\uFEFF次heat-1", StringComparison.Ordinal)
+            }
+        };
+        // 服务使用实际RIOT及真实Governance事务writer。
+        var service = Service(database);
+        // 操作者拥有全部请求scope。
+        var actor = Actor();
+        // 初次持久化必须使用完整原文的四个源hash。
+        var created = await service.CreateAsync(actor, request, CancellationToken.None);
+        Assert.AreEqual(request.Sources, created.Sources);
+        Assert.AreEqual(OntologyPlatform.Modules.Ontology.Domain.OntologyRules.Hash(request.Sources.OntologyTurtle), created.Hashes.OntologyHash);
+        Assert.AreEqual(OntologyPlatform.Modules.Ontology.Domain.OntologyRules.Hash(request.Sources.ShapesTurtle), created.Hashes.ShapesHash);
+        Assert.AreEqual(OntologyPlatform.Modules.Ontology.Domain.OntologyRules.Hash(request.Sources.VocabularyTurtle!), created.Hashes.VocabularyHash);
+        Assert.AreEqual(OntologyPlatform.Modules.Ontology.Domain.OntologyRules.Hash(request.Sources.DataTurtle), created.Hashes.DataHash);
+        // 相同源保存仍产生受控修订，但不因BOM规范化改变原文/hash。
+        var saved = await service.SaveAsync(actor, created.DraftId, new SaveDraftRequest { Sources = request.Sources, Command = Command(1) }, CancellationToken.None);
+        Assert.AreEqual(2L, saved.Revision);
+        Assert.AreEqual(created.Hashes, saved.Hashes);
+        Assert.AreEqual(request.Sources, saved.Sources);
+        // 从真实投影取精确对象做no-op，不能通过重新导出丢掉BOM。
+        var label = saved.Projection.Triples.First(triple => triple.Predicate == "http://www.w3.org/2000/01/rdf-schema#label");
+        // no-op生产服务结果仍应引用含BOM的相同完整源。
+        var unchanged = await service.EditAsync(actor, saved.DraftId, new EditDraftRequest { Edit = new SemanticEdit { SubjectIri = label.Subject.Value, PredicateIri = label.Predicate, OldObject = label.Object, NewObject = label.Object }, Command = Command(2) }, CancellationToken.None);
+        Assert.AreEqual(created.Hashes, unchanged.Hashes);
+        Assert.AreEqual(request.Sources, unchanged.Sources);
+        // 全部实际历史修订都应保留用户源，不假定no-op一定新建修订。
+        var history = await database.Revisions.Where(row => row.DraftId == created.DraftId).ToArrayAsync();
+        Assert.IsTrue(history.Length >= 2);
+        Assert.IsTrue(history.All(row => JsonSerializer.Deserialize<SourceBundle>(row.SourcesJson) == request.Sources));
+        // 新上下文重新加载，排除仅返回内存对象未实际保存的假阳性。
+        await using var reopened = Database();
+        // 实际数据库读回的DTO用于核验持久原文与hash。
+        var loaded = await Service(reopened).ReadAsync(actor, created.DraftId, CancellationToken.None);
+        Assert.AreEqual(request.Sources, loaded.Sources);
+        Assert.AreEqual(created.Hashes, loaded.Hashes);
+        // 相同语义且相同源的Diff必须为空，不把临时BOM去除误报为业务编辑。
+        var difference = await service.DiffAsync(actor, created.DraftId, 1, CancellationToken.None);
+        Assert.AreEqual("", difference.SourceDiff);
+        Assert.AreEqual(0, difference.AddedTriples.Length);
+        Assert.AreEqual(0, difference.RemovedTriples.Length);
+    }
+
     /// <summary>真实并发不同载荷只有一个revision CAS胜出，失败方不留审计或源修订。</summary>
     [TestMethod]
     public async Task ConcurrentSaveHasOneWinnerAndNoLostUpdate()

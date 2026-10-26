@@ -354,6 +354,55 @@ public sealed class VerifiedReadTests
         Assert.AreEqual("rdf_literal_invalid", error.Code);
     }
 
+    /// <summary>四源leading BOM只影响临时解析视图，原文hash、no-op及literal内FEFF都必须保留。</summary>
+    [TestMethod]
+    [DataRow(true)]
+    [DataRow(false)]
+    public async Task LeadingBomSourcesKeepExactBytesAndRelativeIris(bool vocabularyOnlyBom)
+    {
+        // 全部四源带BOM，optional词汇分别覆盖仅BOM空图与含业务字面量。
+        var source = new SourceBundle
+        {
+            OntologyTurtle = "\uFEFF# 本体原注释\n<#C> a <http://www.w3.org/2002/07/owl#Class> ; <http://www.w3.org/2000/01/rdf-schema#label> \"中\uFEFF文😀𠀀\"@zh .\n",
+            ShapesTurtle = "\uFEFF@prefix sh: <http://www.w3.org/ns/shacl#> .\n",
+            VocabularyTurtle = vocabularyOnlyBom ? "\uFEFF" : "\uFEFF<#term> <urn:label> \"词\uFEFF汇\" .\n",
+            DataTurtle = "\uFEFF<#i> a <https://ontology.invalid/source/0/#C> ; <urn:value> \"数\uFEFF据\" .\n"
+        };
+        // 固定清单散列根据包含BOM的完整原始UTF8计算。
+        var manifest = Manifest(source);
+        // 唯一生产解析器必须接受合法leading BOM而非将其移到BASE之后。
+        ISemanticRuntime runtime = SemanticFixture.Runtime();
+        // 两次随机暂存图解析仍必须得到稳定默认文档基址。
+        var first = await runtime.AnalyzeAsync(source, 1, CancellationToken.None);
+        // 第二次真实解析必须保持相同默认文档IRI，不含随机暂存身份。
+        var second = await runtime.AnalyzeAsync(source, 1, CancellationToken.None);
+        Assert.AreEqual(manifest.Hashes, first.Hashes);
+        CollectionAssert.AreEquivalent(first.Projection.Triples, second.Projection.Triples);
+        Assert.AreEqual(2, first.Projection.Triples.Length);
+        Assert.IsTrue(first.Projection.Triples.All(triple => triple.Subject.Value == "https://ontology.invalid/source/0/#C"));
+        // 中间FEFF是合法词法内容，不能随leading BOM处理被全局删除。
+        var label = first.Projection.Triples.Single(triple => triple.Predicate == "http://www.w3.org/2000/01/rdf-schema#label");
+        Assert.AreEqual("中\uFEFF文😀𠀀", label.Object.Value);
+        // no-op编辑应原样返回全部SourceBundle，包括四个起始BOM与注释。
+        Assert.AreEqual(source, await runtime.ApplyEditAsync(source, new SemanticEdit { SubjectIri = label.Subject.Value, PredicateIri = label.Predicate, OldObject = label.Object, NewObject = label.Object }, CancellationToken.None));
+        // SHACL的Shapes请求也经同一SourceDocument，须直接证明真实执行成功。
+        var report = await runtime.ValidateAsync(source, CancellationToken.None);
+        Assert.IsTrue(report.Conforms);
+        Assert.AreEqual(manifest.Hashes, report.Hashes);
+        await runtime.DeployAsync(manifest, source, CancellationToken.None);
+        Assert.IsTrue(await runtime.VerifyAsync(manifest, source, CancellationToken.None));
+        // 正式同批读保留各自默认base及literal词法，不从原文BOM生成业务三元组。
+        var result = await runtime.ReadVerifiedPublishedAsync(manifest, source, CancellationToken.None);
+        Assert.AreEqual(vocabularyOnlyBom ? 2 : 3, result.OntologyTriples.Length);
+        Assert.IsTrue(result.DataTriples.All(triple => triple.Subject.Value == "https://ontology.invalid/source/3/#i"));
+        Assert.IsTrue(result.DataTriples.Any(triple => triple.Object.Value == "数\uFEFF据"));
+        if (!vocabularyOnlyBom) Assert.IsTrue(result.OntologyTriples.Any(triple => triple.Subject.Value == "https://ontology.invalid/source/2/#term" && triple.Object.Value == "词\uFEFF汇"));
+        Assert.IsTrue(source.OntologyTurtle.StartsWith('\uFEFF'));
+        Assert.IsTrue(source.ShapesTurtle.StartsWith('\uFEFF'));
+        Assert.IsTrue(source.VocabularyTurtle!.StartsWith('\uFEFF'));
+        Assert.IsTrue(source.DataTurtle.StartsWith('\uFEFF'));
+    }
+
     /// <summary>精确字节散列的测试清单不依赖生产序列化器构造期望值。</summary>
     private static ReleaseManifest Manifest(SourceBundle source)
     {
