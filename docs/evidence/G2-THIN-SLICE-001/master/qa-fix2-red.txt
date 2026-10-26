@@ -1,0 +1,114 @@
+CONTROL_PLANE_ONLY: substituted processes and telemetry I/O; real product NOT_RUN
+test_remaining_timeout_reaches_real_http_opener (__main__.FetchBudgetTests.test_remaining_timeout_reaches_real_http_opener) ... ERROR
+test_atomic_success_report_replacement_failure_retains_fail (__main__.ObservabilityStatusTests.test_atomic_success_report_replacement_failure_retains_fail) ... ok
+test_complete_synthetic_io_path_is_the_only_pass (__main__.ObservabilityStatusTests.test_complete_synthetic_io_path_is_the_only_pass) ... ok
+test_fetch_failure_cannot_leave_stale_pass (__main__.ObservabilityStatusTests.test_fetch_failure_cannot_leave_stale_pass) ... ok
+test_initial_report_persistence_failure_cannot_leave_stale_pass (__main__.ObservabilityStatusTests.test_initial_report_persistence_failure_cannot_leave_stale_pass) ... ok
+test_never_visible_metric_expires_and_persists_fail (__main__.ObservabilityStatusTests.test_never_visible_metric_expires_and_persists_fail) ... FAIL
+test_never_visible_search_expires_and_persists_fail (__main__.ObservabilityStatusTests.test_never_visible_search_expires_and_persists_fail) ... FAIL
+test_non_temporary_http_errors_fail_without_polling (__main__.ObservabilityStatusTests.test_non_temporary_http_errors_fail_without_polling) ... ok
+test_one_deadline_covers_distinct_visibility_stages (__main__.ObservabilityStatusTests.test_one_deadline_covers_distinct_visibility_stages) ... FAIL
+test_pending_response_privacy_violation_fails_before_retry (__main__.ObservabilityStatusTests.test_pending_response_privacy_violation_fails_before_retry) ... FAIL
+test_pending_trace_search_logs_and_metrics_eventually_become_visible (__main__.ObservabilityStatusTests.test_pending_trace_search_logs_and_metrics_eventually_become_visible) ... FAIL
+test_persistent_report_write_failure_removes_stale_pass (__main__.ObservabilityStatusTests.test_persistent_report_write_failure_removes_stale_pass) ... ok
+test_privacy_failure_prevents_all_raw_exports (__main__.ObservabilityStatusTests.test_privacy_failure_prevents_all_raw_exports) ... ok
+test_raw_export_failure_after_all_assertions_cannot_report_pass (__main__.ObservabilityStatusTests.test_raw_export_failure_after_all_assertions_cannot_report_pass) ... ok
+test_response_after_shared_deadline_cannot_pass (__main__.ObservabilityStatusTests.test_response_after_shared_deadline_cannot_pass) ... FAIL
+test_success_report_persistence_failure_cannot_leave_pass (__main__.ObservabilityStatusTests.test_success_report_persistence_failure_cannot_leave_pass) ... ok
+test_temporary_network_and_503_are_retried (__main__.ObservabilityStatusTests.test_temporary_network_and_503_are_retried) ...
+  test_temporary_network_and_503_are_retried (__main__.ObservabilityStatusTests.test_temporary_network_and_503_are_retried) (fault='http503') ... FAIL
+  test_temporary_network_and_503_are_retried (__main__.ObservabilityStatusTests.test_temporary_network_and_503_are_retried) (fault='network') ... FAIL
+test_wrong_association_and_metric_contract_fail_without_retry (__main__.ObservabilityStatusTests.test_wrong_association_and_metric_contract_fail_without_retry) ... ok
+test_all_six_required_gates_run_with_exact_project_node (__main__.OrchestrationTests.test_all_six_required_gates_run_with_exact_project_node) ... ok
+test_core_bootstrap_then_full_launcher_cleanup_is_preserved (__main__.OrchestrationTests.test_core_bootstrap_then_full_launcher_cleanup_is_preserved) ... ok
+test_each_child_failure_propagates_and_stops_later_gates (__main__.OrchestrationTests.test_each_child_failure_propagates_and_stops_later_gates) ... ok
+test_owned_full_launcher_survives_until_failure_and_is_stopped (__main__.OrchestrationTests.test_owned_full_launcher_survives_until_failure_and_is_stopped) ... ok
+
+======================================================================
+ERROR: test_remaining_timeout_reaches_real_http_opener (__main__.FetchBudgetTests.test_remaining_timeout_reaches_real_http_opener)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/folders/8r/n2xjjrn90v7fplnwsjkft1sm0000gn/T/g2-qa2-baseline-_txqt6pt/scripts/tests/G2Acceptance.Tests.py", line 354, in test_remaining_timeout_reaches_real_http_opener
+    self.assertEqual(module.fetch('http://localhost:13200', '/api/search', timeout=0.25), {})
+                     ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: fetch() got an unexpected keyword argument 'timeout'
+
+======================================================================
+FAIL: test_never_visible_metric_expires_and_persists_fail (__main__.ObservabilityStatusTests.test_never_visible_metric_expires_and_persists_fail)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/folders/8r/n2xjjrn90v7fplnwsjkft1sm0000gn/T/g2-qa2-baseline-_txqt6pt/scripts/tests/G2Acceptance.Tests.py", line 258, in test_never_visible_metric_expires_and_persists_fail
+    self.assertIsInstance(caught, TimeoutError)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: AssertionError('Actual G2 telemetry check failed') is not an instance of <class 'TimeoutError'>
+
+======================================================================
+FAIL: test_never_visible_search_expires_and_persists_fail (__main__.ObservabilityStatusTests.test_never_visible_search_expires_and_persists_fail)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/folders/8r/n2xjjrn90v7fplnwsjkft1sm0000gn/T/g2-qa2-baseline-_txqt6pt/scripts/tests/G2Acceptance.Tests.py", line 237, in test_never_visible_search_expires_and_persists_fail
+    self.assertIsInstance(caught, TimeoutError)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: AssertionError('Actual G2 telemetry check failed') is not an instance of <class 'TimeoutError'>
+
+======================================================================
+FAIL: test_one_deadline_covers_distinct_visibility_stages (__main__.ObservabilityStatusTests.test_one_deadline_covers_distinct_visibility_stages)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/folders/8r/n2xjjrn90v7fplnwsjkft1sm0000gn/T/g2-qa2-baseline-_txqt6pt/scripts/tests/G2Acceptance.Tests.py", line 247, in test_one_deadline_covers_distinct_visibility_stages
+    self.assertIsInstance(caught, TimeoutError)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: AssertionError('Actual G2 telemetry check failed') is not an instance of <class 'TimeoutError'>
+
+======================================================================
+FAIL: test_pending_response_privacy_violation_fails_before_retry (__main__.ObservabilityStatusTests.test_pending_response_privacy_violation_fails_before_retry)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/folders/8r/n2xjjrn90v7fplnwsjkft1sm0000gn/T/g2-qa2-baseline-_txqt6pt/scripts/tests/G2Acceptance.Tests.py", line 298, in test_pending_response_privacy_violation_fails_before_retry
+    self.assertEqual(report['checks'][-1], {'check': 'actual_export_contains_no_prompt_source_or_private_runtime_values', 'status': 'FAIL'})
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'check': 'worker_real_separate_trace_associated_to_[23 chars]AIL'} != {'check': 'actual_export_contains_no_prompt_source_o[39 chars]AIL'}
+- {'check': 'worker_real_separate_trace_associated_to_creation', 'status': 'FAIL'}
++ {'check': 'actual_export_contains_no_prompt_source_or_private_runtime_values',
++  'status': 'FAIL'}
+
+======================================================================
+FAIL: test_pending_trace_search_logs_and_metrics_eventually_become_visible (__main__.ObservabilityStatusTests.test_pending_trace_search_logs_and_metrics_eventually_become_visible)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/folders/8r/n2xjjrn90v7fplnwsjkft1sm0000gn/T/g2-qa2-baseline-_txqt6pt/scripts/tests/G2Acceptance.Tests.py", line 225, in test_pending_trace_search_logs_and_metrics_eventually_become_visible
+    self.assertEqual(code, 0)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^
+AssertionError: 1 != 0
+
+======================================================================
+FAIL: test_response_after_shared_deadline_cannot_pass (__main__.ObservabilityStatusTests.test_response_after_shared_deadline_cannot_pass)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/folders/8r/n2xjjrn90v7fplnwsjkft1sm0000gn/T/g2-qa2-baseline-_txqt6pt/scripts/tests/G2Acceptance.Tests.py", line 266, in test_response_after_shared_deadline_cannot_pass
+    self.assertEqual(code, 1)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^
+AssertionError: 0 != 1
+
+======================================================================
+FAIL: test_temporary_network_and_503_are_retried (__main__.ObservabilityStatusTests.test_temporary_network_and_503_are_retried) (fault='http503')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/folders/8r/n2xjjrn90v7fplnwsjkft1sm0000gn/T/g2-qa2-baseline-_txqt6pt/scripts/tests/G2Acceptance.Tests.py", line 276, in test_temporary_network_and_503_are_retried
+    self.assertEqual(code, 0)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^
+AssertionError: 1 != 0
+
+======================================================================
+FAIL: test_temporary_network_and_503_are_retried (__main__.ObservabilityStatusTests.test_temporary_network_and_503_are_retried) (fault='network')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/folders/8r/n2xjjrn90v7fplnwsjkft1sm0000gn/T/g2-qa2-baseline-_txqt6pt/scripts/tests/G2Acceptance.Tests.py", line 276, in test_temporary_network_and_503_are_retried
+    self.assertEqual(code, 0)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^
+AssertionError: 1 != 0
+
+----------------------------------------------------------------------
+Ran 22 tests in 0.676s
+
+FAILED (failures=8, errors=1)

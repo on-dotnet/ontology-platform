@@ -1,0 +1,24 @@
+{
+  "status": "DRAFT/PARTIAL",
+  "scope": "CONTROL_PLANE_ONLY; simulated clock and telemetry I/O; real cold product acceptance NOT_RUN",
+  "baseSha": "e5f33264b7226c3c9b962f53bf65b28a0884d8c9",
+  "implementationSha": "ca5c63de8c6150a772d579ec2f4403bb00d874b3",
+  "branch": "codex/G2-QA-FIX",
+  "commands": [
+    {"command": "python3 scripts/tests/G2Acceptance.Tests.py (final tests against git-show round1 BaseSha sources in isolated copy)", "exitCode": 1, "tests": 22, "failuresIncludingSubtests": 8, "errors": 1, "evidence": "qa-fix2-red.txt"},
+    {"command": "python3 scripts/tests/G2Acceptance.Tests.py", "exitCode": 0, "tests": 22, "failures": 0, "evidence": "qa-fix2-green.txt"},
+    {"command": "pwsh -NoProfile -File scripts/verify.ps1 -SelfTest", "exitCode": 0, "evidence": "qa-fix2-selftest.txt"},
+    {"command": "python3 scripts/tests/Wave2Runtime.Tests.py", "exitCode": 0, "evidence": "qa-fix2-wave2.txt"},
+    {"command": "py_compile.compile both changed Python sources with cfile in temporary directory", "exitCode": 0, "evidence": "qa-fix2-syntax.txt"},
+    {"command": "git diff --check", "exitCode": 0}
+  ],
+  "sourceSha256": {
+    "scripts/acceptance/g2-observability.py": "90d3c82984764fd64150c0d55cc5e87132589bc50391dc39ccea0c8de052b628",
+    "scripts/tests/G2Acceptance.Tests.py": "9dd8447042bde5f11733695359f93e709e2b798f008c8da73d1a45d583b3336e"
+  },
+  "environment": {"os": "macOS ARM64", "python": "3.13.17", "powershell": "7.6.8", "dependencies": "existing approved read-only pythonlibs link reused; no installation"},
+  "notRun": ["real cold aggregate acceptance; Master owns fresh cold run", "real local LGTM/Tempo/Prometheus in this QA tree", "native product build and product integration in this round", "paid/cloud model", "Windows/Intel/production"],
+  "ci": "NOT_VERIFIED",
+  "independentReview": "PENDING; original independent QA reviewer performs scoped re-review",
+  "monaco": "PAUSED_BY_USER"
+}
