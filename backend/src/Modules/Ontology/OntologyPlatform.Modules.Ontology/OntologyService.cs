@@ -154,7 +154,10 @@ public sealed class OntologyService : IOntologyService, IDraftPublicationReader
         var blanks = projection.Triples.Concat(current.Projection.Triples).Any(triple => triple.Subject.Kind == RdfTermKind.Blank || triple.Object.Kind == RdfTermKind.Blank);
         return new DraftDiff
         {
-            BaseRevision = fromRevision, TargetRevision = current.Revision, BaseHashes = projection.Hashes, TargetHashes = current.Hashes,
+            BaseRevision = fromRevision,
+            TargetRevision = current.Revision,
+            BaseHashes = projection.Hashes,
+            TargetHashes = current.Hashes,
             AddedTriples = blanks ? [] : current.Projection.Triples.Except(projection.Triples).ToArray(),
             RemovedTriples = blanks ? [] : projection.Triples.Except(current.Projection.Triples).ToArray(),
             SourceDiff = old.SourcesJson == JsonSerializer.Serialize(current.Sources) ? "" : JsonSerializer.Serialize(new { before = JsonSerializer.Deserialize<SourceBundle>(old.SourcesJson), after = current.Sources }),
@@ -284,15 +287,28 @@ public sealed class OntologyService : IOntologyService, IDraftPublicationReader
     /// <summary>明确映射草稿头和同修订源/投影，不隐式生成领域属性。</summary>
     private static OntologyDraft Map(DraftRecord row, SourceBundle sources, SemanticAnalysis analysis) => new()
     {
-        DraftId = row.DraftId, AssetId = row.AssetId, Scope = Scope(row), BaseReleaseId = row.BaseReleaseId, Revision = row.Revision,
-        Etag = "\"" + row.Revision.ToString(System.Globalization.CultureInfo.InvariantCulture) + "\"", Name = row.Name, Sources = sources,
-        Hashes = analysis.Hashes, OwnerSubjectId = row.OwnerSubjectId, UpdatedAtUtc = row.UpdatedAtUtc, Projection = analysis.Projection
+        DraftId = row.DraftId,
+        AssetId = row.AssetId,
+        Scope = Scope(row),
+        BaseReleaseId = row.BaseReleaseId,
+        Revision = row.Revision,
+        Etag = "\"" + row.Revision.ToString(System.Globalization.CultureInfo.InvariantCulture) + "\"",
+        Name = row.Name,
+        Sources = sources,
+        Hashes = analysis.Hashes,
+        OwnerSubjectId = row.OwnerSubjectId,
+        UpdatedAtUtc = row.UpdatedAtUtc,
+        Projection = analysis.Projection
     };
 
     /// <summary>生成永久保存的完整源修订记录。</summary>
     private static DraftRevisionRecord Revision(DraftRecord row, SourceBundle sources, SemanticAnalysis analysis) => new()
     {
-        DraftId = row.DraftId, Revision = row.Revision, SourcesJson = JsonSerializer.Serialize(sources), HashesJson = JsonSerializer.Serialize(analysis.Hashes), ProjectionJson = JsonSerializer.Serialize(analysis.Projection)
+        DraftId = row.DraftId,
+        Revision = row.Revision,
+        SourcesJson = JsonSerializer.Serialize(sources),
+        HashesJson = JsonSerializer.Serialize(analysis.Hashes),
+        ProjectionJson = JsonSerializer.Serialize(analysis.Projection)
     };
 
     /// <summary>头记录完整范围，无任何首厂简化。</summary>

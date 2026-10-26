@@ -1,6 +1,6 @@
 # G2-SEM-001 实施账本
 
-状态：DRAFT / PARTIAL，S1进行中，不能以当前编译或Jena通过代表PG/HTTP/发布闭环通过。
+当前状态：SEM实现已提交分段里程碑，33项真实范围测试通过，准备独立复审；总体仍DRAFT / PARTIAL，不能把此结果扩大为认证HTTP/FE/完整Publishing闭环通过。下方早期账本保留当时事实，最新验证以末尾“PG集成与交付边界”为准。
 
 - 独立树：`/Users/chasen/.codex/worktrees/g2-sem/ontology-platform`；分支`codex/G2-SEM-001`。
 - Common Base：`bd52431b31d560a3b83f4b2e705cea9a0fb40c4d`；write-start Base：`39bf3afac3c41afed09fda3940721e244bde20b3`，开工fetch成功后ff-only同步。默认沙箱首轮fetch因Git worktree元数据权限拒绝，按授权升级后成功。
@@ -52,3 +52,40 @@ NOT_RUN：PG并发CAS/审计回滚/幂等/旧报告绑定、正式Jena TDB发布
 新增`OntologyPlatform.Ontology` ActivitySource/Meter只含固定operation/phase/outcome与耗时，不含源码、理由、主体/厂区标签。Host注册由Master负责，端到端OTel导出NOT_RUN。owned HTTP adapter已按实际SEC guard签名绑定，等待共享guard/Host引用后编译与联调；此保存点整体仍DRAFT/PARTIAL。
 
 `python3 scripts/acceptance/shacl-validate.py`首次使用错误树形筛选返回零测试exit8，保留shacl-validate-red-filter.json；改为MSTest实际`FullyQualifiedName~ShaclTests`后12/12通过、exit0，shacl-validate.json。绝不把零测试当PASS。draft-revision入口已准备真实两个模块迁移、临时PG内存/CPU限制和整连接串脱敏；PG测试源码在临时草稿等待共享引用后移入owned目录，未将其当已运行。
+
+## PG集成与交付边界
+
+Master指定的共享提交已顺序同步，无冲突且不手改共享文件：`95d9c37452e6fa096359570a3484dc184f059737`、`5525f71cec05aa8814dbf367d0c2c87d5b12d276`、`8971ea6f09dce63ad31302a8c7c20edf0df7e66e`、`4eeaa56c3a6c3e10ccc54b84cf779f5cbd7570d5`、`3f96b25c194654651812a3024ff38f509d001b2f`、`3f7771416856ad0a0ff6d963847663de15db3094`、`18877aee3a4d6ce26058720555a61100b7f128f2`；共享同步本地Head为`d39a5e1`。SEM自己的HTTP/clone/诊断保存点为`8308340`；之前两个可复检语义Head为`e4f6ade`与`7e24d873c56be50030c3f5aa583330c67424973c`。
+
+### 真运行命令、失败和结果
+
+- `dotnet restore backend/tests/OntologyPlatform.SemanticTests --locked-mode`、`dotnet build backend/tests/OntologyPlatform.SemanticTests --no-restore`：exit0，0 warnings/0 errors。
+- `python3 scripts/acceptance/draft-revision.py`：首轮exit0，30/30通过、0跳过。真实应用Governance两迁移与Master生成的InitialOntology迁移，未用EnsureCreated。启动新库先查询尚不存在的migration history产生的SELECT提示属于EF的首次建库路径，随后迁移命令exit0；不隐去该输出。
+- `python3 scripts/acceptance/semantic-roundtrip.py --postgres --filter FullyQualifiedName~CommittedCreateAndSaveReplayWithoutJena --label idempotency-mutation-red`：暂时禁用create/save前置回执返回后，真实PG已提交create在不可达Jena下重试失败，1/1 FAIL、exit2；变异在finally恢复，未提交变异代码。
+- 同一命令`--label save-replay-mutation-red`：仅禁用save前置回执返回，create重放成功后save在不可达Jena下重试失败，1/1 FAIL、exit2；同样finally恢复。
+- 同一命令`--label replay-restored-green`：恢复生产实现后create/save重放1/1 PASS、exit0，源修订及审计均不重复，异载荷409。
+- `python3 scripts/acceptance/semantic-roundtrip.py --postgres --label draft-revision-green`：新增并发幂等/Down保护后，第一次33项中32通过、1失败。真实Down已正确55P03拒绝并发锁，但测试误以为PostgresException直接抛出；实际Npgsql包装InvalidOperationException。失败保存在migration-down-red-wrapper.json；修改测试明确核查InnerException的真实SQLSTATE后再次运行33/33 PASS、0跳过、exit0，见draft-revision-green.json。
+- 同scope相同幂等键并发实际只有1草稿/1回执/1审计；相同载荷返回相同固定结果，异载荷只有1成功+1个409。不同键相同旧revision的并发保存只有1个CAS成功，另一409，无丢失更新。
+- 审计故障注入先调用生产Governance writer真正写入同物理事务，再抛异常，真实验证草稿/回执/审计全回滚；并非用“返回固定审计ID”模拟成功。
+- 发布读取锁使用真实同一Npgsql连接/DbTransaction，当前revision/hash/真实SHACL报告一致才返回；源修改后旧report/revision409。此项证明Ontology边界，未宣称完整Publishing审批状态机已运行。
+- 三个完整platform角色均真实可读；只有platform.operator可写；短名/未知role拒绝。双厂资源对单厂/异组织403、目录不泄露、不存在404，非法Turtle422且源修订不变。
+- clone测试的PG/Jena/审计为真实实现，但IReleaseCatalog是**明确的合同替身**：只验证消费端继承asset及完全一致scope，缩小到首厂仍拒绝。真实Publishing目录/审批clone联调NOT_RUN，不用此测试冒充。
+- Master迁移Down在真实业务行锁存在时55P03拒绝，释放锁但仍有历史时P0001拒绝；源字节、当前草稿和migration history实际仍存在。
+- 整个`backend/OntologyPlatform.slnx`受锁restore/build和三个owned范围format命令全部exit0，见integrated-build-format.json。初次误用根目录不存在的solution路径exit1保存在integrated-build-red-path.json；修正真实路径后执行成功。HTTP adapter已随真实API工程编译，尚未代表宿主已挂载或认证HTTP验收。
+
+33总计包含1个生产类型存在检查、1个明确catalog替身消费边界；其余为真实Jena/PG或对真实执行路径的安全/资源/故障验证，不宣称33个独立端到端场景。所有临时容器使用已批准固定镜像、随机回环端口和独立存储，用完删除；不读历史runtime/认证材料，证据不含生成密码或连接串。样例文件大小和真实SHA256见sample-hashes.json。
+
+### Master下一步集成点与准确未验证项
+
+- 已实现入口：`services.AddOntologyModule(configuration)`；`app.MapOntologyEndpoints()`，`Semantics:ValidationOrigin/PublishedOrigin`由Master配置，PG使用ConnectionStrings:governance。宿主应注册ActivitySource/Meter `OntologyPlatform.Ontology`。配置/Host/迁移/锁均为Master唯一写入。
+- IReleaseCatalog建议由独立只读实现提供；若Publishing同一服务反向依赖IDraftPublicationReader并实现catalog，需避免DI循环。当前两个公共接口无变更，后续由Master协调实际组合。
+- 当前分支不自行main或生成第二份Review ZIP。独立复审、认证HTTP/CSRF+ETag与FE完整S1集成、真正Publishing审批/激活/回滚/clone、导出OTel的端到端验证、正式性能基线、同Head CI和唯一Review ZIP由Master后续关口完成，当前标NOT_RUN/NOT_VERIFIED。
+- OWL逻辑推理、收费/真实LLM、Windows/Intel/生产继续NOT_RUN；不自动进入G3–G8。
+
+### 最终格式诊断的适用范围
+
+全solution无过滤format首次exit2发现自有初始化器/导入格式与共享WireContractTests格式。随后两轮按repo根cwd的相对/绝对`--include`虽然exit0却未实际选择文件，不能当格式已修的证据（final-verification.json前两条仅保留真实命令事实）。诊断确认应在`backend` cwd使用相对该目录的`src/...`、`tests/...`路径。以此实际格式化自有JenaSemanticRuntime、OntologyService、SemanticFixture，owned精确清单verify exit0；不带include的whole-solution verify确认只剩Master-owned WireContractTests.cs:158–159的WHITESPACE（exit2），已报告Master，不跨写。详format-root-corrected.json。
+
+其余最终检查：whole-solution build exit0；G2ContractTests 19/19 PASS、0跳过、exit0；SelfTest exit0（35 ReviewPackage等检查器正反例，不冒充产品测试）。AppHost格式加载ASPIRE010和生成迁移namespace建议为已记录warning，没有擅改共享配置或迁移。Master修复共享格式后需整体重新verify；当前不把whole-solution format标PASS。
+
+最终已格式化自有源码再次执行`python3 scripts/acceptance/semantic-roundtrip.py --postgres --label formatted-final-green`：33/33 PASS、0跳过、exit0；真实暂存三元组0，临时Jena/PG容器均已删除，见formatted-final-green.json。仅源码格式调整后复验，没有把旧未格式化运行冒充最终快照验证。

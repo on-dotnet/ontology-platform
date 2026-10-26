@@ -18,7 +18,8 @@ internal static class SemanticFixture
         // 此容器配置分别提供内存验证及临时TDB2正式dataset。
         var config = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
         {
-            ["Semantics:ValidationOrigin"] = origin + "/validation/", ["Semantics:PublishedOrigin"] = origin + "/ontology/"
+            ["Semantics:ValidationOrigin"] = origin + "/validation/",
+            ["Semantics:PublishedOrigin"] = origin + "/ontology/"
         }).Build();
         // 真实工厂禁用重定向，任何外部URL不可能被跟随。
         var services = new ServiceCollection();
@@ -49,7 +50,8 @@ internal static class SemanticFixture
         // 所有响应都来自实际引擎，gate不提供任何模拟RDF或SHACL结果。
         var config = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
         {
-            ["Semantics:ValidationOrigin"] = origin + "/validation/", ["Semantics:PublishedOrigin"] = origin + "/ontology/"
+            ["Semantics:ValidationOrigin"] = origin + "/validation/",
+            ["Semantics:PublishedOrigin"] = origin + "/ontology/"
         }).Build();
         return new JenaSemanticRuntime(new TimingFactory(gate), config, TimeProvider.System);
     }
