@@ -66,7 +66,7 @@ public sealed class RollbackBoundaryTests
         // 正式manifest来自真实成功事务。
         var first = await fixture.Service.ActivateAsync(fixture.Author, PublishingFixture.Activation(await fixture.ApproveAsync(item.Proposal)), default);
         // 草稿推进不应阻止合法回滚，负例只针对审核边界。
-        await fixture.Ontology.SaveAsync(fixture.Author, item.Draft.DraftId, new SaveDraftRequest { Sources = item.Draft.Sources with { DataTurtle = item.Draft.Sources.DataTurtle + "\n# draft advanced\n" }, Command = PublishingFixture.Command(1) }, default);
+        await fixture.Ontology.SaveAsync(fixture.Author, item.Draft.DraftId, new SaveDraftRequest { Name = item.Draft.Name, Sources = item.Draft.Sources with { DataTurtle = item.Draft.Sources.DataTurtle + "\n# draft advanced\n" }, Command = PublishingFixture.Command(1) }, default);
         // 独立回滚提案固定旧完整manifest，所有draft字段保持null。
         var proposal = await fixture.Service.CreateProposalAsync(fixture.Author, new CreateProposalRequest { Kind = ProposalKind.Rollback, TargetReleaseId = first.ReleaseId, TargetManifestHash = first.ManifestHash, Command = PublishingFixture.Command() }, default);
         if (condition == "self")
@@ -109,7 +109,7 @@ public sealed class RollbackBoundaryTests
         // 固定旧版本manifest供回滚。
         var old = await fixture.Service.ActivateAsync(fixture.Author, PublishingFixture.Activation(await fixture.ApproveAsync(item.Proposal)), default);
         // 当前草稿推进后重新真实发布R2。
-        var updated = await fixture.Ontology.SaveAsync(fixture.Author, item.Draft.DraftId, new SaveDraftRequest { Sources = item.Draft.Sources with { OntologyTurtle = item.Draft.Sources.OntologyTurtle + "\n# rollback failure scenario\n" }, Command = PublishingFixture.Command(1) }, default);
+        var updated = await fixture.Ontology.SaveAsync(fixture.Author, item.Draft.DraftId, new SaveDraftRequest { Name = item.Draft.Name, Sources = item.Draft.Sources with { OntologyTurtle = item.Draft.Sources.OntologyTurtle + "\n# rollback failure scenario\n" }, Command = PublishingFixture.Command(1) }, default);
         // R2是回滚失败时必须保留的活动事实。
         var current = await fixture.Service.ActivateAsync(fixture.Author, PublishingFixture.Activation(await fixture.ApproveAsync(await fixture.ProposalForAsync(updated)), old), default);
         // 针对旧R1创建全新独立批准。

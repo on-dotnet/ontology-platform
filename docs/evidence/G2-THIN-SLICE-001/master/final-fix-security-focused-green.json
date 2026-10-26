@@ -1,0 +1,95 @@
+{
+  "exitCode": 0,
+  "sourceHashes": {
+    "backend/src/Hosts/OntologyPlatform.Api/G2/ExecutionEndpoints.cs": "9df32ebcc54440f92f8572b680415d0ae906ec3cce086c33a1519cc6e92db6f7",
+    "backend/src/Hosts/OntologyPlatform.Api/G2/G2Authorization.cs": "71446ac89d5f04fde80dbc243141c3041575111dd450498ec3b3b893e84bcbb9",
+    "backend/src/Hosts/OntologyPlatform.Api/G2/G2AuthorizationResultHandler.cs": "ad0144633647eddc7867aec68b6dc5cd49b8f14fddf85e56bdd87873c8a15185",
+    "backend/src/Hosts/OntologyPlatform.Api/G2/G2Composition.cs": "5a9c45b38153c098dae3ce181fbde42c903f03382d45436cc37dc5bf7db155f3",
+    "backend/src/Hosts/OntologyPlatform.Api/G2/G2EndpointGuard.cs": "c540b6430dacefe2090d68cb2532ef7b25e0dae017e80553f62ab4fb2400bd01",
+    "backend/src/Hosts/OntologyPlatform.Api/G2/G2OpenApi.cs": "f042e06cb2eb5962234acee6d9a118482439e47056aeda6e56942a2af42db0b6",
+    "backend/src/Hosts/OntologyPlatform.Api/G2/G2Readiness.cs": "6b6e6dc336192b6970ff56cb8d84a99e76e26af928f3a78ed5ca0aaa152b62f5",
+    "backend/src/Hosts/OntologyPlatform.Api/G2/G2StreamSession.cs": "802cb86a4f5807e9f900d1b6210a23e6e0eb0dda152e0cf72b480c212234874b",
+    "backend/src/Hosts/OntologyPlatform.Api/G2/McpEndpoints.cs": "15fe4fdfc5b579b64c2063486b1b16b1c90eaebbea700d4766c2ab32f4422f78",
+    "backend/src/Hosts/OntologyPlatform.Api/G2/OntologyEndpoints.cs": "4ef52e1201e9f005df5816c12ecb97f669064ac9a3462d2cdea33260ceb67d55",
+    "backend/src/Hosts/OntologyPlatform.Api/G2/PublishingEndpoints.cs": "51f189c7186c50b5171eb493e882e50bcc55e12e45fe3cecb3baa4896289b2bd",
+    "backend/src/Hosts/OntologyPlatform.Api/G2/SemanticEndpoints.cs": "83dc73bd3be7f3a2853e634b75730672e9620b14747cd1e97e428b8fb8b00842",
+    "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyService.cs": "2eee5c50520c17f3176f71a9f378e2e57dac4c318554b7db3a4daa4f3e00f223",
+    "backend/tests/OntologyPlatform.SecurityTests/G2AuditTransactionTests.cs": "a97664e0457c66c91164440db9028663ad878ff7f6c6dac897e67439e71c47c2",
+    "backend/tests/OntologyPlatform.SecurityTests/G2CompositionTests.cs": "2fc1fd2451f746b9d16d1f5fea5ef53057dc782c8093769116ccddca45e25682",
+    "backend/tests/OntologyPlatform.SecurityTests/G2ExecutionEndpointTests.cs": "042769e8033ecde51be223a25405b8c5078ab6292875d79f01f440be31b364fe",
+    "backend/tests/OntologyPlatform.SecurityTests/G2OpenApiSchemaTests.cs": "0d13aa49862afe4ce3f103117b5cf0fe51233a4f3d7eaa05ea2be502ff5f3abb",
+    "backend/tests/OntologyPlatform.SecurityTests/G2PublishingAuthorizationTests.cs": "8bd9b9d98fdaa8332cb63caf4dc719c323fd030d073784b2171f0480f7fc5859",
+    "backend/tests/OntologyPlatform.SecurityTests/G2ReadinessBudgetTests.cs": "1392a1f9ebb388963d3bbdcc2b7fc3c795bbd8dee1c7cb2872994af0a554237a",
+    "backend/tests/OntologyPlatform.SecurityTests/G2ReadinessGssTests.cs": "4847e571a302c1490b114610ff6472632045dac896716a9bafb41b36e80fb7c6",
+    "backend/tests/OntologyPlatform.SecurityTests/G2ReadinessPostgresTests.cs": "59954880e85278e381ef8e3cdc1ab4012212855e13d178bac651e94fe4edde4f",
+    "backend/tests/OntologyPlatform.SecurityTests/G2ReadinessTests.cs": "d3928693006f3a1d7aee28a42bf52e6b67edb03b360ec8c51e70e1f1e501b697",
+    "backend/tests/OntologyPlatform.SecurityTests/G2SecurityTests.cs": "970a3c93ab356d99b4c0b5612a81089dc9428389e09988dcf8148c2e50319154",
+    "backend/tests/OntologyPlatform.SecurityTests/G2TransportTests.cs": "e22be18a9545d8c1134fb283d8d60ebaa7367268c05119cbb82ceba12e503adc"
+  },
+  "records": [
+    {
+      "command": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g2-final-security-6ed5bfc17e50",
+        "--publish",
+        "127.0.0.1::5432",
+        "--env",
+        "POSTGRES_PASSWORD",
+        "--env",
+        "POSTGRES_DB",
+        "--tmpfs",
+        "/var/lib/postgresql",
+        "postgres:18.6-trixie@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6"
+      ],
+      "exitCode": 0,
+      "output": "06b543369e475f45181eeff8c9805d5900e84f89bd8075fd5f4a3cfc1c071caa\n"
+    },
+    {
+      "command": [
+        "docker",
+        "port",
+        "g2-final-security-6ed5bfc17e50",
+        "5432/tcp"
+      ],
+      "exitCode": 0,
+      "output": "127.0.0.1:65403\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "build",
+        "backend/tests/OntologyPlatform.SecurityTests",
+        "--no-restore"
+      ],
+      "exitCode": 0,
+      "output": "  OntologyPlatform.Contracts -> /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/bin/Debug/net10.0/OntologyPlatform.Contracts.dll\n  OntologyPlatform.ServiceDefaults -> /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/ServiceDefaults/bin/Debug/net10.0/OntologyPlatform.ServiceDefaults.dll\n  OntologyPlatform.Modules.Governance -> /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/bin/Debug/net10.0/OntologyPlatform.Modules.Governance.dll\n  OntologyPlatform.Modules.Ontology.Domain -> /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.Domain.dll\n  OntologyPlatform.Modules.Publishing.Domain -> /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/bin/Debug/net10.0/OntologyPlatform.Modules.Publishing.Domain.dll\n  OntologyPlatform.Modules.SemanticQuery -> /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/bin/Debug/net10.0/OntologyPlatform.Modules.SemanticQuery.dll\n  OntologyPlatform.Modules.Agents -> /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/bin/Debug/net10.0/OntologyPlatform.Modules.Agents.dll\n  OntologyPlatform.Modules.Ontology -> /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.dll\n  OntologyPlatform.Modules.Publishing -> /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/bin/Debug/net10.0/OntologyPlatform.Modules.Publishing.dll\n  OntologyPlatform.Api -> /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/bin/Debug/net10.0/OntologyPlatform.Api.dll\n  OntologyPlatform.SecurityTests -> /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll\n\n已成功生成。\n    0 个警告\n    0 个错误\n\n已用时间 00:00:00.72\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "test",
+        "--project",
+        "backend/tests/OntologyPlatform.SecurityTests",
+        "--no-build",
+        "--no-restore",
+        "--filter",
+        "FullyQualifiedName~G2PublishingAuthorizationTests|FullyQualifiedName~G2OpenApiSchemaTests|FullyQualifiedName~G2ExecutionEndpointTests"
+      ],
+      "exitCode": 0,
+      "output": "正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)\n/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64) 已通过 (2s 815ms)\n\n测试运行摘要: 已通过!\n  总计: 6\n  失败: 0\n  成功: 6\n  已跳过: 0\n  持续时间: 3s 501ms\n"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g2-final-security-6ed5bfc17e50"
+      ],
+      "exitCode": 0,
+      "output": "g2-final-security-6ed5bfc17e50\n"
+    }
+  ]
+}

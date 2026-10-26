@@ -1,0 +1,41 @@
+{
+  "exitCode": 0,
+  "records": [
+    {
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-Command",
+        ". ./scripts/verify.ps1 -Library; $checks = @(Test-Repository -RepositoryRoot (Get-Location).Path); $checks | Format-List | Out-String -Width 240 | Write-Output; if (@($checks | Where-Object Status -eq 'FAIL').Count -gt 0) { exit 1 }"
+      ],
+      "exitCode": 0,
+      "output": "\nCheck   : repository-static\nStatus  : PASS\nMessage : 检查1528个文件：语法/格式/相对链接/有限机密模式/基线策略通过\n\n\n"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "check": "delivered source remains byte-identical to final verified source",
+      "exitCode": 0
+    }
+  ],
+  "evidenceHashes": {
+    "docs/evidence/G2-THIN-SLICE-001/master/final-fix-path-boundaries.json": "21d23138bbf220d41a644f15bb9d68ad6b6cb25f3e8c98519437c9edde1c9464",
+    "docs/evidence/G2-THIN-SLICE-001/master/final-fix-pub-green.json": "c0e295b27fd883529a1bc4e9e931c51875e016d2d9b2b6e909fa724d1c95ed83",
+    "docs/evidence/G2-THIN-SLICE-001/master/final-fix-query-green.json": "bacf65d28881a2359dba12e73020e93fc28e20136e90ebff373bfe69dc0c86d1",
+    "docs/evidence/G2-THIN-SLICE-001/master/final-fix-raw-outputs.json": "113c11c36bbad5fe9e176d3a342451f4b7a736e89c0393d211e32bdf2b79b199",
+    "docs/evidence/G2-THIN-SLICE-001/master/final-fix-report.md": "6946a81a6c2c2f8c37201d01e2f30d618922ce4f630cc463b082042074d93a1e",
+    "docs/evidence/G2-THIN-SLICE-001/master/final-fix-security-focused-green.json": "8a2a6fb340d247acaaaef1f808e232d235f4837fd040831060ec43ffee37a0cc",
+    "docs/evidence/G2-THIN-SLICE-001/master/final-fix-security-green.json": "71c7d7b95052cc78a8ded8b81c2fb438b35803451550c366edd4873dd0305fce",
+    "docs/evidence/G2-THIN-SLICE-001/master/final-fix-security-red.json": "67e76cf62f194a52c03df67a8429fe66d5f70f541f48163e5934431a3e8ac2c0",
+    "docs/evidence/G2-THIN-SLICE-001/master/final-fix-sem-green.json": "73fa7a726e0ee6d8877d7ffb0a396a14bf04a0f267b5e5a4415b79237a88f038",
+    "docs/evidence/G2-THIN-SLICE-001/master/final-fix-sem-red.json": "cb04d669a0c703aed2e1cfd8d966819cea0ead1ad66ac8ce2c924d90b5e48f54",
+    "docs/evidence/G2-THIN-SLICE-001/master/final-fix-verification.json": "abae6baae6366845b791b68a475a56b9fa8d448e92876d91a7797cd5e3afbfa1"
+  }
+}

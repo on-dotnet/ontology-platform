@@ -1,13 +1,14 @@
 /** 真实OIDC/BFF纵向检查；不保存浏览器网络、Cookie、凭证或登录页面截图。 */
 import { createRequire } from 'node:module';
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
-import { resolve, relative, sep } from 'node:path';
+import { resolve, relative, sep, isAbsolute } from 'node:path';
 import { randomUUID, createHash } from 'node:crypto';
 const root = resolve(import.meta.dirname, '../..');
 const require = createRequire(resolve(root, 'apps/web/package.json'));
 const { chromium } = require('@playwright/test');
 const runtimePath = resolve(process.argv[2] ?? '');
-if (relative(resolve(root, '.tools/security'), runtimePath).startsWith('..' + sep)) throw new Error('runtime_path_denied');
+const runtimeRelative = relative(resolve(root, '.tools/security'), runtimePath);
+if (!runtimeRelative || runtimeRelative === '..' || runtimeRelative.startsWith('..' + sep) || isAbsolute(runtimeRelative)) throw new Error('runtime_path_denied');
 const runtime = JSON.parse(await readFile(runtimePath, 'utf8'));
 const realm = JSON.parse(await readFile(runtime.realmFile, 'utf8'));
 const origin = 'http://localhost:15100';
@@ -42,6 +43,10 @@ try {
   const anonymous = await browser.newContext();
   const denied = await anonymous.request.post(origin + '/api/v1/ontology-drafts', { data: '{', headers: { 'Content-Type': 'application/json' } });
   check('anonymous_authorization_before_malformed_binding', denied.status() === 401);
+  for (const [label, path] of [['proposal','/api/v1/release-proposals'], ['decision','/api/v1/approvals/synthetic/decisions'], ['activation','/api/v1/release-activations']]) {
+    const response = await anonymous.request.post(origin + path, { data: '{', headers: { 'Content-Type': 'application/json' } });
+    check('anonymous_publication_' + label + '_prebinding_401', response.status() === 401, response.status());
+  }
   await anonymous.close();
   const operator = await identity('operator-ab');
   phase = 'draft_create';
@@ -73,10 +78,15 @@ try {
   check('authorized_full_scope_read', (await viewer.api.get(origin + '/api/v1/ontology-drafts/' + draft.draftId)).status() === 200);
   const wrongRole = await viewer.api.post(origin + '/api/v1/ontology-drafts', { data: '{', headers: { 'Content-Type': 'application/json' } });
   check('role_authorization_before_malformed_binding', wrongRole.status() === 403);
+  for (const [label, path] of [['proposal','/api/v1/release-proposals'], ['decision','/api/v1/approvals/synthetic/decisions'], ['activation','/api/v1/release-activations']]) {
+    const response = await viewer.api.post(origin + path, { data: '{', headers: { 'Content-Type': 'application/json' } });
+    check('viewer_publication_' + label + '_prebinding_403', response.status() === 403, response.status());
+  }
   const audit = await identity('auditor-ab');
   const facts = await audit.api.get(origin + '/api/v1/platform/audit?limit=100');
   check('actual_auditor_reads_governance_audit', facts.status() === 200);
   const entries = await facts.json();
+  check('publication_role_denials_have_committed_audit', entries.filter(value => value.action === 'authorization.denied' && value.outcome === 'denied').length >= 4);
   check('success_and_denial_audits_persisted', entries.some(value => value.action === 'ontology.create' && value.outcome === 'allowed') && entries.some(value => value.outcome === 'denied'));
   phase = 'real_ui_source_import';
   const page = operator.page;
@@ -117,7 +127,7 @@ try {
   await editor.fill(localText);
   const remoteResponse = await operator.api.put(origin + '/api/v1/ontology-drafts/' + edited.draftId, { data: { name: edited.name, sources: { ...edited.sources, ontologyTurtle: edited.sources.ontologyTurtle + '\n# Synthetic concurrent remote\n' }, command: command(edited.revision) }, headers: { ...operator.headers, 'If-Match': '"' + edited.revision + '"' } });
   check('ui_concurrent_real_remote_save', remoteResponse.status() === 200, remoteResponse.status());
-  const remote = await remoteResponse.json();
+  let remote = await remoteResponse.json();
   const conflictResult = page.waitForResponse(response => response.url().endsWith('/' + edited.draftId) && response.request().method() === 'PUT');
   await page.getByRole('button', { name: '保存新修订', exact: true }).click();
   check('ui_stale_revision_real_409', (await conflictResult).status() === 409);
@@ -128,6 +138,19 @@ try {
   check('ui_remote_compare_preserves_local_text', await editor.inputValue() === localText);
   await page.getByRole('button', { name: '丢弃本地内容并载入此远端版本', exact: true }).click();
   check('ui_explicit_discard_loads_remote', await editor.inputValue() === remote.sources.ontologyTurtle);
+  phase = 'real_ui_name_save';
+  const renamedName = uiName + ' renamed';
+  await page.getByRole('textbox', { name: '资产名称', exact: true }).fill(renamedName);
+  const renameResult = page.waitForResponse(response => response.url() === origin + '/api/v1/ontology-drafts/' + remote.draftId && response.request().method() === 'PUT');
+  await page.getByRole('button', { name: '保存新修订', exact: true }).click();
+  const renameResponse = await renameResult;
+  check('ui_name_save_real_put_200', renameResponse.status() === 200, renameResponse.status());
+  const renamed = await renameResponse.json();
+  check('ui_name_save_returns_new_name', renamed.name === renamedName && renamed.revision === remote.revision + 1);
+  check('ui_name_save_preserves_source_and_hashes', JSON.stringify(renamed.sources) === JSON.stringify(remote.sources) && JSON.stringify(renamed.hashes) === JSON.stringify(remote.hashes));
+  const renamedRead = await operator.api.get(origin + '/api/v1/ontology-drafts/' + remote.draftId);
+  check('ui_name_save_persistent_get', renamedRead.status() === 200 && (await renamedRead.json()).name === renamedName);
+  remote = renamed;
   phase = 'real_ui_shacl_and_diff';
   const validatedResult = page.waitForResponse(response => response.url().endsWith('/' + edited.draftId + '/validations') && response.request().method() === 'POST');
   await page.getByRole('button', { name: '验证已保存修订', exact: true }).click();

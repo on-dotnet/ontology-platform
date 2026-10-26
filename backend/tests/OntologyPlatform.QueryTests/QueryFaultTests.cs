@@ -125,7 +125,7 @@ public sealed class QueryFaultTests
         // 当前草稿按真实revision推进。
         var draft = await fixture.Ontology.ReadAsync(fixture.Author, first.Manifest.DraftId, default);
         // 注释改变源字节和hash但不假造业务事实。
-        var updated = await fixture.Ontology.SaveAsync(fixture.Author, draft.DraftId, new SaveDraftRequest { Sources = draft.Sources with { DataTurtle = draft.Sources.DataTurtle + "\n# revision two\n" }, Command = QueryFixture.Command(draft.Revision) }, default);
+        var updated = await fixture.Ontology.SaveAsync(fixture.Author, draft.DraftId, new SaveDraftRequest { Name = draft.Name, Sources = draft.Sources with { DataTurtle = draft.Sources.DataTurtle + "\n# revision two\n" }, Command = QueryFixture.Command(draft.Revision) }, default);
         // 异人审批第二版准备好，在查询固定之后激活。
         var proposal = await fixture.ApproveAsync(await fixture.ProposalForAsync(updated));
         // 确定活动指针CAS前提。
