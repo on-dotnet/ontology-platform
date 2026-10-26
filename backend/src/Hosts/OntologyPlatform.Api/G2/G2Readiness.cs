@@ -80,9 +80,18 @@ public static class G2Readiness
             Pooling = false,
             Multiplexing = false
         };
-        // Prefer模式会在取消握手失败后重连一次；探针直接使用原TLS策略，禁用可选GSS协商重试。
-        // Require代表管理员明确要求GSS，必须保留，不能为了健康检查降级该要求。
-        if (connection.GssEncryptionMode == GssEncryptionMode.Prefer) connection.GssEncryptionMode = GssEncryptionMode.Disable;
+        // 先沿用驱动的显式连接串值；getter默认Prefer不能代表环境中的有效加密要求。
+        var gssMode = connection.GssEncryptionMode;
+        // Keys只枚举实际写入的规范键；ContainsKey/TryGetValue也会识别未显式赋值的支持键。
+        if (!connection.Keys.Cast<string>().Contains("GSS Encryption Mode", StringComparer.OrdinalIgnoreCase))
+        {
+            // 与锁定驱动相同：未显式配置时才解析PGGSSENCMODE，非法环境值回到属性默认值。
+            var environmentMode = Environment.GetEnvironmentVariable("PGGSSENCMODE");
+            // 忽略大小写解析保持官方驱动的环境优先级，不改写当前进程环境。
+            if (Enum.TryParse<GssEncryptionMode>(environmentMode, ignoreCase: true, out var configuredMode)) gssMode = configuredMode;
+        }
+        // 仅有效Prefer允许跳过可选重试；显式或环境Require必须保留，原TLS策略不变。
+        connection.GssEncryptionMode = gssMode == GssEncryptionMode.Prefer ? GssEncryptionMode.Disable : gssMode;
         // typed options复制保留各模块模型及既有EF配置，UseNpgsql仅替换这份副本的连接参数。
         var options = new DbContextOptionsBuilder<T>(services.GetRequiredService<DbContextOptions<T>>());
         return options.UseNpgsql(connection.ConnectionString).Options;

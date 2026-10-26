@@ -65,3 +65,26 @@ G2健康专用上下文复制各模块typed options，保留模型/拦截器，�
 | `pwsh -NoProfile -File scripts/verify.ps1 -SelfTest` | exit0；含ReviewPackage35项/0失败，保留各自产品/容器NOT_RUN边界 | [SelfTest](fix1-round2-selftest.txt) |
 
 [本轮源码绑定](fix1-round2-source-bindings.json)包含全部五个变化源码/runner散列。实际Docker按专用前缀检查零残留。本轮未访问/暂停Master容器、私有runtime或其他历史数据；未改业务连接配置、公共项目/依赖/锁、平台默认G1分支。Master产品真实PG/Jena/RustFS八项全链、独立复审和同Head CI仍为下游门禁，本Worker不自报它们通过。
+
+## Fix round 3/5：GSS有效Require、Linux冷启动夹具和imports
+
+BaseSha：`732589744b85d3c7a13c6ffe55197eada6f44541`。原Reviewer新增Important成立：前轮只检查builder getter的Prefer，没有处理环境继承的Require。[锁定Npgsql10.0.3解析顺序](https://github.com/npgsql/npgsql/blob/v10.0.3/src/Npgsql/Internal/NpgsqlConnector.cs#L994)为显式连接串→可解析的PGGSSENCMODE→属性默认。前轮“Require保留”验证只覆盖显式配置，不能证明环境要求保留；历史记录不改写。本轮仍**PARTIAL / 待限定独立复审**，I1 OpenAPI、M1脱敏和原I2真实预算不重新打开。
+
+生产仅改`G2Readiness.ProbeOptions`：枚举Npgsql实际已写入的规范Keys区分显式GSS值，不用也会返回支持键/默认值的ContainsKey或TryGetValue；未显式设置时按驱动相同的大小写无关Enum.TryParse读取环境，非法值回到默认。只对**有效Prefer**作既有可选重试优化，有效Require（来自连接串或环境）原样冻结为Require。没有写进程环境或更改TLS，也没有增加依赖、反射或网络认证到产品实现。
+
+新增`G2ReadinessGssTests.cs`从真实生产健康options的Npgsql连接入口截取参数，调用锁定驱动的真实纯内存GetGssEncMode解析器断言；不在测试复制另一套模式算法。八种配置各用独立dotnet子进程，PGGSSENCMODE在驱动初始化前只设置在该子进程环境：环境require、显式Disable/Require/Prefer的优先级、环境prefer、非法环境默认回退、未设置环境默认、规范化属性别名。逐项核有效模式、TLS VerifyFull、原业务options不变、超时/池化设置保留；父进程环境前后相同。测试无需Kerberos网络或凭证，不称真实GSS认证已验收。
+
+Master随后传入[既有Linux CI 40270277957](https://github.com/on-dotnet/ontology-platform/actions/runs/40270277957)（Head `6521262`，109项中107通过/2失败）：本Worker新PG用例在故障注入前setup.OpenAsync出现EOF/reset，另有G2Transport imports排序失败。CI原始摘录由Master持久化，本Worker未独立读取整份CI。官方[Postgres entrypoint](https://github.com/docker-library/postgres/blob/master/docker-entrypoint.sh#L264)初始化临时服务器只开放Unix socket，原默认Unix pg_isready不能证明主机映射TCP已就绪。fixture现以实际映射端口的Npgsql.OpenAsync及SELECT 1成功为唯一启动条件，启动窗口30秒、单次原生连接/命令短超时；仅重试故障注入前的驱动/传输启动错误。后续pause预算、标准503、宿主退出和恢复断言完全保留。本机三次冷启动均实际需要3次TCP尝试，分别约556/514/514ms才成功。`G2TransportTests.cs`只调整两行using顺序。
+
+| 实际命令 | 结果 | 安全原始输出 |
+|---|---|---|
+| `dotnet test --project backend/tests/OntologyPlatform.SecurityTests --no-restore --filter 'FullyQualifiedName~G2ReadinessGssTests' --output Detailed`，修复前 | exit2；真实环境Require经生产options后被驱动解析为Disable，断言明确失败 | [GSS RED](fix1-round3-gss-red.txt) |
+| 同上，修复后 | exit0；1顶层测试内8独立子进程各1项/0跳过，所有优先级断言通过 | [GSS GREEN](fix1-round3-gss-green.txt) |
+| `dotnet restore backend/OntologyPlatform.slnx --locked-mode`；最终`dotnet build backend/OntologyPlatform.slnx -c Release --no-restore` | 均exit0；0错误、1既有ASPIRE010；项目及锁未改 | [恢复](fix1-round3-locked-restore.txt)、[最终构建](fix1-round3-build.txt) |
+| `dotnet test --project backend/tests/OntologyPlatform.SecurityTests --configuration Release --no-build --no-restore --filter 'FullyQualifiedName~G2&FullyQualifiedName!~G2AuditTransactionTests&FullyQualifiedName!~MiddlewarePersistsForbiddenAuditBeforeMalformedBodyBinding&FullyQualifiedName!~MiddlewareAuditFailurePropagatesWithoutFalse403' --minimum-expected-tests 54 --output Detailed`，含启动夹具最终修复 | exit0；54/54、0跳过，含8个GSS子进程和原三项真实PG暂停；新连接/已连接/调用方宿主退出1006/2006/1049ms，全部恢复200；累计HTTP预算约2秒仍503 | [最终Release覆盖](fix1-round3-focused.txt) |
+| `dotnet format backend/tests/OntologyPlatform.SecurityTests/OntologyPlatform.SecurityTests.csproj --no-restore --include` 本轮四个C#路径，随后同命令`--verify-no-changes` | 均exit0，含G2Transport imports | [格式](fix1-round3-format.txt)、[本轮格式复核](fix1-round3-scope-format-verify.txt) |
+| 额外`dotnet format backend/OntologyPlatform.slnx --no-restore --verify-no-changes` | exit2；独立树三份既有Initial*.cs的IDE0161（file-scoped namespace）。与本轮Base逐路径diff均exit0。未跨权修改；Master已确认迁移唯一Owner接手，只作namespace/缩进修正并负责最终全solution验证 | [全树格式原始失败](fix1-round3-solution-format-baseline.txt)、[基线未改证明](fix1-round3-unchanged-migrations.txt) |
+| `pwsh -NoProfile -File scripts/verify.ps1 -SelfTest`，最终代码 | exit0；含ReviewPackage35/0失败，产品/容器NOT_RUN字样仅对应工程检查器自身范围 | [最终SelfTest](fix1-round3-selftest.txt) |
+| `git diff --check`、四份源码SHA256绑定 | exit0；所有修改均在原宿主/测试/证据所有权内 | [差异检查](fix1-round3-diff-check.txt)、[本轮绑定](fix1-round3-source-bindings.json) |
+
+本轮未访问Master运行时或暂停其容器；自建PG已清理。全量Governance/Keycloak、最终产品八项故障恢复、Linux CI新Head、全solution生成迁移格式修正和独立复审仍由Master负责。此前CI失败不改称通过，也不以本机54项替代Linux重跑或真实Kerberos认证。

@@ -1,0 +1,17 @@
+{
+  "baseSha": "732589744b85d3c7a13c6ffe55197eada6f44541",
+  "branch": "codex/G2-HOST-FIX",
+  "status": "PARTIAL / PENDING_INDEPENDENT_REVIEW",
+  "sources": {
+    "backend/src/Hosts/OntologyPlatform.Api/G2/G2Readiness.cs": "6b6e6dc336192b6970ff56cb8d84a99e76e26af928f3a78ed5ca0aaa152b62f5",
+    "backend/tests/OntologyPlatform.SecurityTests/G2ReadinessGssTests.cs": "4847e571a302c1490b114610ff6472632045dac896716a9bafb41b36e80fb7c6",
+    "backend/tests/OntologyPlatform.SecurityTests/G2ReadinessPostgresTests.cs": "59954880e85278e381ef8e3cdc1ab4012212855e13d178bac651e94fe4edde4f",
+    "backend/tests/OntologyPlatform.SecurityTests/G2TransportTests.cs": "e22be18a9545d8c1134fb283d8d60ebaa7367268c05119cbb82ceba12e503adc"
+  },
+  "testEnvironment": "PGGSSENCMODE altered only via child ProcessStartInfo.Environment before Npgsql initialization; parent process unchanged",
+  "kerberosNetwork": "NOT_RUN; actual health options observed before connection opening; locked Npgsql resolver invoked in memory",
+  "realPostgres": "three fresh approved random loopback tmpfs containers, actual TCP OpenAsync plus SELECT 1 before fault injection; pause budget unchanged",
+  "fullSolutionFormat": "exit2: three unchanged baseline Initial* migrations IDE0161; Master exclusively owns corrections and final solution verification",
+  "ci": "final head NOT_VERIFIED; Master supplied prior Linux run 40270277957 at head 6521262 with two PG startup fixture failures and transport imports order failure",
+  "evidenceNormalization": "safe stdout/stderr preserved except LF and trailing whitespace normalization"
+}
