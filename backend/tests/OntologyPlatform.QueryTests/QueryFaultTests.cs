@@ -103,8 +103,8 @@ public sealed class QueryFaultTests
             return Task.CompletedTask;
         });
         // 预算计时器实际取消等待，不只是比较输入数字。
-        var result = await gateway.ExecuteAsync(fixture.Author, fixture.Plan(release) with { TimeoutMs = 1000 }, default);
-        Assert.AreEqual(SemanticQueryStatus.Unavailable, result.Status);
+        var failure = await Assert.ThrowsAsync<SemanticOperationException>(() => gateway.ExecuteAsync(fixture.Author, fixture.Plan(release) with { TimeoutMs = 1000 }, default));
+        Assert.AreEqual(503, failure.Status);
         Assert.IsTrue(observedCancellation);
         fixture.Gate = null;
         // 显式用户取消与内部预算超时保持不同语义。

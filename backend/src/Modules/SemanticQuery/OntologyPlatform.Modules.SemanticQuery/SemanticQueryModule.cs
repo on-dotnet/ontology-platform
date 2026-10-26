@@ -12,6 +12,7 @@ public static class SemanticQueryModule
     {
         ArgumentNullException.ThrowIfNull(configuration);
         services.AddSingleton<CapabilityRegistry>();
+        services.AddScoped<VerifiedReleaseSources>();
         services.AddScoped<ISemanticGateway, SemanticGateway>();
         services.AddScoped<IEvidenceService, EvidenceService>();
         return services;

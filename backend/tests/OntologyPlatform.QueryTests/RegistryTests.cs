@@ -24,6 +24,7 @@ public sealed class RegistryTests
         Assert.IsTrue(services.Any(value => value.ServiceType == typeof(ISemanticGateway)));
         Assert.IsTrue(services.Any(value => value.ServiceType == typeof(IEvidenceService)));
     }
+
     /// <summary>输出Schema保留全部真实定义、联合、null和严格未知字段边界。</summary>
     [TestMethod]
     public void SchemaUsesCompleteGeneratedClosureAndStableVersions()
@@ -37,6 +38,7 @@ public sealed class RegistryTests
         foreach (var capability in first)
         {
             Assert.HasCount(64, capability.Version);
+            Assert.AreEqual(100, capability.InputSchema.Properties.Single(value => value.Name == "timeoutMs").Minimum);
             // 原始Schema必须有唯一完整结果及其嵌套联合。
             var definitions = capability.OutputSchema.GetProperty("$defs");
             Assert.IsTrue(definitions.TryGetProperty("SemanticQueryResult", out _));
