@@ -6,7 +6,7 @@
       "status": "PASS"
     },
     {
-      "check": "actual_tempo_trace_c8573ea9d669f4a246723b2b0b20ee15",
+      "check": "actual_tempo_trace_5356a1f8ce8bb4179fcb4fffbc046dd6",
       "status": "PASS"
     },
     {
@@ -14,7 +14,7 @@
       "status": "PASS"
     },
     {
-      "check": "actual_tempo_trace_33a3526349660f532dc93daae98ad08d",
+      "check": "actual_tempo_trace_a521bac7274987ac655240047a0f47fc",
       "status": "PASS"
     },
     {
@@ -22,7 +22,7 @@
       "status": "PASS"
     },
     {
-      "check": "actual_tempo_trace_972320e60d27a69f4bd80211af6128b1",
+      "check": "actual_tempo_trace_be0df0bf71d7cab5b6e9a64cc0b458ab",
       "status": "PASS"
     },
     {
@@ -30,7 +30,7 @@
       "status": "PASS"
     },
     {
-      "check": "actual_tempo_trace_f31a9437c06c1b6121fa3ca00d1d2915",
+      "check": "actual_tempo_trace_9600ab3b6dc4a78e5b138aaf453af376",
       "status": "PASS"
     },
     {
@@ -38,7 +38,7 @@
       "status": "PASS"
     },
     {
-      "check": "actual_tempo_trace_f2ee41c867eff9c6fda33c1f623d6062",
+      "check": "actual_tempo_trace_042f4662579ebdaa7b757a5adc59c59c",
       "status": "PASS"
     },
     {
@@ -102,6 +102,92 @@
       "status": "PASS"
     }
   ],
+  "visibility": {
+    "budgetSeconds": 90,
+    "pollIntervalSeconds": 1,
+    "pollCount": 33,
+    "elapsedSeconds": 20.469,
+    "requests": [
+      {
+        "check": "actual_tempo_trace_5356a1f8ce8bb4179fcb4fffbc046dd6",
+        "polls": 1,
+        "elapsedSeconds": 0.013,
+        "state": "visible"
+      },
+      {
+        "check": "actual_tempo_trace_a521bac7274987ac655240047a0f47fc",
+        "polls": 1,
+        "elapsedSeconds": 0.005,
+        "state": "visible"
+      },
+      {
+        "check": "actual_tempo_trace_be0df0bf71d7cab5b6e9a64cc0b458ab",
+        "polls": 1,
+        "elapsedSeconds": 0.003,
+        "state": "visible"
+      },
+      {
+        "check": "actual_tempo_trace_9600ab3b6dc4a78e5b138aaf453af376",
+        "polls": 1,
+        "elapsedSeconds": 0.005,
+        "state": "visible"
+      },
+      {
+        "check": "actual_tempo_trace_042f4662579ebdaa7b757a5adc59c59c",
+        "polls": 1,
+        "elapsedSeconds": 0.003,
+        "state": "visible"
+      },
+      {
+        "check": "worker_search",
+        "polls": 21,
+        "elapsedSeconds": 20.283,
+        "state": "visible"
+      },
+      {
+        "check": "worker_trace",
+        "polls": 1,
+        "elapsedSeconds": 0.024,
+        "state": "visible"
+      },
+      {
+        "check": "g2_loki_entries",
+        "polls": 1,
+        "elapsedSeconds": 0.108,
+        "state": "visible"
+      },
+      {
+        "check": "g2_loki_series",
+        "polls": 1,
+        "elapsedSeconds": 0.003,
+        "state": "visible"
+      },
+      {
+        "check": "product_meter_ontology_semantic_duration_milliseconds_count",
+        "polls": 1,
+        "elapsedSeconds": 0.001,
+        "state": "visible"
+      },
+      {
+        "check": "product_meter_publishing_operations_total",
+        "polls": 1,
+        "elapsedSeconds": 0.001,
+        "state": "visible"
+      },
+      {
+        "check": "product_meter_semantic_query_count_total",
+        "polls": 1,
+        "elapsedSeconds": 0.001,
+        "state": "visible"
+      },
+      {
+        "check": "product_meter_agents_run_count_total",
+        "polls": 1,
+        "elapsedSeconds": 0.001,
+        "state": "visible"
+      }
+    ]
+  },
   "workerTraceDesign": "actual independent execution.run trace with persisted creation_trace_id tag; never a fabricated parent span",
   "officialSearchApi": "https://grafana.com/docs/tempo/latest/api_docs/",
   "scope": "actual product emissions, own local synthetic stack; no model calls or production data"

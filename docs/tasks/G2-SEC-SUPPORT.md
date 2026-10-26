@@ -13,3 +13,8 @@ G2EndpointGuard的冻结调用签名：ReadAsync<T>(HttpContext,string policy,Fu
 真实测试：同一PG外层业务探针+Governance audit双context共享txn，commit二者全有、rollback二者全无、audit失败整个业务不commit、multi-site完整数组。探针仅测试自己临时schema，不能改生产业务；G1_SEC_PG_CONNECTION由既有test-governance.py临时PG提供，缺配置明确Inconclusive/NOT_RUN。真实Kestrel/原生Antiforgery/固定可信fixture身份做401/403/Origin/CSRF/If-Match/409/428边界，错误不含秘密；受控测试身份只在测试宿主，不加产品测试登录头或端点。
 
 按TDD保留真实红绿、命令/退出码/测试数；中文XML全部手写成员、局部用途注释/Allman。及时commit/push独立任务分支，不main/不派子Agent。提交前自测和报告；Master另审后集成。代码没有注册到产品Host前不能声称产品G2安全验收通过。
+
+
+## Master集成回执（2026-10-26）
+
+本卡对应源码/已批准模块范围已独立复审并纳入Master真实整体验收；实际命令/计数与原始失败保留于本轮master/validation.json、delivery-report.md及模块报告，不把原DRAFT提交推送等同已通过。首次main快进推送b1ff0a68915c272846038af96a00da3acbb95538；最终文档Head/CI/唯一ZIP按封包manifest和独立回执确认。总体PARTIAL，Monaco按人类暂停/真实模型与跨平台生产未运行等例外不变；本轮交付后等复审，不扩展下游。

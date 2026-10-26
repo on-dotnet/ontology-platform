@@ -16,3 +16,5 @@ QA/CI初审g2_qa_ci_review（Sol/high），6effefb..fd6634b：C0I1M0 Spec/Qualit
 QA fix1 6521262..e5f3326，g2_qa_ci_review独立Spec/Quality PASS C0I0M0：六门串联/任一非零fail-fast/自有launcher finally、OBS原始导出或终态落盘异常不再误PASS，二者均ADDRESSED。12控制面同套Base12failure→修复12PASS，三源码hash及原始记录核实；不冒充产品。patchSHA e9dffd0d5ea35c18f10998a3926a7e82e5ec9f98d2bd55d50ce40a98e9e5e3cb。
 
 Host round3 732589744..44f45bb7：g2_root_host_review独立Spec/Quality PASS C0I0M0。GSS有效Require优先级与八子进程控制ADDRESSED；Linux初始TCP夹具等待ADDRESSED，故障预算不放宽。四源码hash、54/54零skip与三真实PG原始结果核实；最终CI/聚合仍待Master，三迁移仅namespace格式修复另记。
+
+QA runtime round2 e5f3326..e4b5bdee：g2_qa_ci_review独立ADDRESSED、Spec/Quality PASS C0I0M0；共享90秒/HTTP剩余timeout/迟到成功拒绝，隐私/错关联/坏指标/非暂时4xx立即失败，22控制面原8failure+1error→全绿。patch cc9cc8d8fb9be29f1f934b6e84f4f69e5a9e9746200203bff532c2469a3db5f3。Root真实全新cold完整一键exit0，Trace索引worker_search21次/20.283秒后可见、全部33poll/20.469秒；原25实际断言及后续Trace4/readiness8/性能26均过。这是实测本机可见性，不是生产SLO。

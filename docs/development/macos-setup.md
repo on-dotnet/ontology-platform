@@ -67,3 +67,8 @@ Windows卷不迁移，本机初始化测试数据；保留真实数据时须另�
 任务合同冻结Single Writer与路径所有权，独立树使用明确分支和规范化绝对路径。自定义explorer/platform_worker/quality_reviewer已按实际工具派发；只读角色是指令约束，OS权限仍由宿主决定。未集成果保留树；只有独立审查、Mac真实验收和Linux CI门禁通过才进入main。恢复资料见 [Master交接](../handoffs/2026-10-25-mac-master.md)。
 
 M0发现并修复PowerShell/.NET环境恢复差异：未设置变量不能恢复成空字符串；现在以NullString保留unset，完整组合入口已实际验证。原因参照[.NET9环境变量行为变更](https://learn.microsoft.com/en-us/dotnet/core/compatibility/core-libraries/9.0/empty-env-variable)，回归覆盖五过程变量的unset/empty/value，不修改用户或机器环境。
+
+
+## G2 Mac增量（2026-10-26）
+
+G2完整一键/独立新Realm与新卷/恢复语义见[g2操作手册](g2-local-development-and-operations.md)。本轮Mac arm64实际113项OIDC浏览器、PG/Jena/RustFS工具链及全部cold门禁通过，固定SDK/Node/项目pnpm目标保持；未改变全局pnpm12或系统PATH/SDK选择。Linux两job只按最终完整Head真实CI回执确认；Windows原生/Intel Mac仍NOT_RUN，不把26项POSIX/Win32纯字符串路径检查升级平台PASS。Monaco按人类暂停、不应用override，真实模型不调用。原M0/G1历史状态保留。

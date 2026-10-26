@@ -2,7 +2,7 @@
 
 仓库：`on-dotnet/ontology-platform`。多行业AI Native本体与知识平台，基础工程统一`OntologyPlatform.*`。
 
-当前任务以[授权索引](docs/tasks/current-authorization.md)为准；G1-ENG-001保持历史PARTIAL，当前G1-WAVE2 Mac SEC/FE/OBS已进入复审交付，M0/G1-INFRA为已交付历史。G0/G1-ENG是历史归档，不把空solution或零应用测试当作产品通过。
+当前任务以[授权索引](docs/tasks/current-authorization.md)为准；本轮G2-THIN-SLICE-001源码、Mac完整cold工具链和Linux验证已进入复审交付，整体PARTIAL（Monaco按人类暂停，真实模型/Windows/Intel/生产未验）。新[开发运维手册](docs/development/g2-local-development-and-operations.md)与[验收报告](docs/evidence/G2-THIN-SLICE-001/master/delivery-report.md)区分实际范围；最终Head/CI/唯一ZIP以实际manifest回执为准。G0、M0、G1各阶段保持原历史，不把空solution、零测试或配置存在当产品通过。
 
 ## 检查入口
 
@@ -26,6 +26,6 @@ verify默认退出0仅代表工程静态检查通过，退出1表示失败；Sel
 
 G1-INFRA实现、真实验证和保留事项见[交付记录](docs/evidence/G1-INFRA-001/delivery-report.md)；开发资源启动见[操作手册](docs/development/local-infrastructure.md)。历史G1-ENG状态不因本次运行结果改写。
 
-任务完成后停止；任何其他G1任务或G2必须另行明确授权。
+本轮只按已批准G2执行，交付后停止等待复审；G3–G8及任何新的业务范围必须另行明确授权。
 
 Mac固定工具、项目隔离pnpm11.28.8、跨平台回退与Master恢复见[Mac开发手册](docs/development/macos-setup.md)。

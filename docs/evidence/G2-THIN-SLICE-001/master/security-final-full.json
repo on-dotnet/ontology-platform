@@ -1,0 +1,95 @@
+[
+  {
+    "command": [
+      "docker",
+      "run",
+      "--detach",
+      "--name",
+      "wave2-governance-test-8d7969884aaa",
+      "--env",
+      "POSTGRES_PASSWORD",
+      "--env",
+      "POSTGRES_DB",
+      "--publish",
+      "127.0.0.1::5432",
+      "--tmpfs",
+      "/var/lib/postgresql",
+      "postgres:18.6-trixie@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6"
+    ],
+    "exitCode": 0,
+    "output": "3c7d4781e9fa4df29651e7a0bdef9832a9ec8c0459c028a9707272b68469a54d\n"
+  },
+  {
+    "command": [
+      "dotnet",
+      "tool",
+      "restore"
+    ],
+    "exitCode": 0,
+    "output": "工具“dotnet-ef”(版本“10.0.13”)已还原。可用的命令: dotnet-ef\n\n还原成功。\n"
+  },
+  {
+    "command": [
+      "dotnet",
+      "tool",
+      "run",
+      "dotnet-ef",
+      "database",
+      "update",
+      "--project",
+      "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance",
+      "--startup-project",
+      "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance",
+      "--configuration",
+      "Debug",
+      "--no-build"
+    ],
+    "exitCode": 0,
+    "output": "Failed executing DbCommand (7ms) [Parameters=[], CommandType='Text', CommandTimeout='30']\nSELECT \"MigrationId\", \"ProductVersion\"\nFROM governance.\"__EFMigrationsHistory\"\nORDER BY \"MigrationId\";\nAcquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.\nApplying migration '20261025062847_InitialGovernance'.\nApplying migration '20261025144246_AuditScopeSites'.\nAcquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.\nDone.\n"
+  },
+  {
+    "command": [
+      "docker",
+      "run",
+      "--detach",
+      "--name",
+      "wave2-governance-test-8d7969884aaa-keycloak",
+      "--env",
+      "KC_BOOTSTRAP_ADMIN_PASSWORD",
+      "--env",
+      "KC_BOOTSTRAP_ADMIN_USERNAME=wave2-bootstrap",
+      "--publish",
+      "127.0.0.1::8080",
+      "quay.io/keycloak/keycloak:26.8.1@sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b",
+      "start-dev"
+    ],
+    "exitCode": 0,
+    "output": "6fe04f2bb0daeb59127e82fa4becac3e27a5f5937a62dfda927002cb06f4afe6\n"
+  },
+  {
+    "command": [
+      "python3",
+      "infra/security/bootstrap-keycloak.py",
+      "--keycloak-origin",
+      "http://localhost:53077",
+      "--runtime-output",
+      "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/.tools/security/wave2-governance-test-8d7969884aaa/realm.json"
+    ],
+    "exitCode": 0,
+    "output": "{\"status\": \"CREATED\", \"realm\": \"wave2-e026868fe2e1c2a4\", \"identities\": [\"wave2-viewer-a\", \"wave2-viewer-b\", \"wave2-no-role-a\", \"wave2-operator-a\", \"wave2-auditor-a\"], \"secrets\": \"runtime-only\"}\n"
+  },
+  {
+    "command": [
+      "dotnet",
+      "test",
+      "--project",
+      "backend/tests/OntologyPlatform.SecurityTests",
+      "--configuration",
+      "Debug",
+      "--no-build",
+      "--no-restore"
+    ],
+    "exitCode": 0,
+    "output": "正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)\n/Users/chasen/.codex/worktrees/g2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64) 已通过 (42s 800ms)\n\n测试运行摘要: 已通过!\n  总计: 114\n  失败: 0\n  成功: 114\n  已跳过: 0\n  持续时间: 42s 958ms\n"
+  }
+]

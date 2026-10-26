@@ -1,7 +1,7 @@
 {
   "status": "PASS",
   "scope": "Observed local synthetic engineering baseline; no production SLO or load certification",
-  "summarizedAtUtc": "2026-10-26T04:29:50.097550+00:00",
+  "summarizedAtUtc": "2026-10-26T05:58:55.966219+00:00",
   "mode": "existing actual run summary",
   "environment": "local macOS arm64, real isolated Docker/Aspire, headless Edge; no production SLO",
   "inputBytes": {
@@ -19,59 +19,59 @@
   "operations": {
     "/api/v1/approvals/{id}/decisions": {
       "count": 4,
-      "minMs": 11.653207999999722,
-      "medianMs": 1130.9376874999998,
-      "maxMs": 1162.4748749999999,
-      "p95NearestRankMs": 1162.4748749999999
+      "minMs": 7.185707999999977,
+      "medianMs": 1219.7212705000002,
+      "maxMs": 1450.0989580000005,
+      "p95NearestRankMs": 1450.0989580000005
     },
     "/api/v1/execution-runs": {
       "count": 2,
-      "minMs": 72.22441600000093,
-      "medianMs": 94.88050000000021,
-      "maxMs": 117.5365839999995,
-      "p95NearestRankMs": 117.5365839999995
+      "minMs": 64.27195799999936,
+      "medianMs": 95.83768699999928,
+      "maxMs": 127.4034159999992,
+      "p95NearestRankMs": 127.4034159999992
     },
     "/api/v1/ontology-drafts/{id}/validations": {
       "count": 1,
-      "minMs": 41.09991599999921,
-      "medianMs": 41.09991599999921,
-      "maxMs": 41.09991599999921,
-      "p95NearestRankMs": 41.09991599999921
+      "minMs": 41.67316700000083,
+      "medianMs": 41.67316700000083,
+      "maxMs": 41.67316700000083,
+      "p95NearestRankMs": 41.67316700000083
     },
     "/api/v1/release-activations": {
       "count": 4,
-      "minMs": 10.609832999999526,
-      "medianMs": 1208.1513960000002,
-      "maxMs": 1321.111167000001,
-      "p95NearestRankMs": 1321.111167000001
+      "minMs": 13.981374999999389,
+      "medianMs": 1392.6786670000001,
+      "maxMs": 1692.932917,
+      "p95NearestRankMs": 1692.932917
     },
     "/api/v1/release-proposals": {
       "count": 3,
-      "minMs": 7.090041999999812,
-      "medianMs": 69.9621249999991,
-      "maxMs": 1026.9573339999988,
-      "p95NearestRankMs": 1026.9573339999988
+      "minMs": 7.292499999999563,
+      "medianMs": 85.56037500000002,
+      "maxMs": 1027.811958000002,
+      "p95NearestRankMs": 1027.811958000002
     },
     "/api/v1/semantic/queries": {
       "count": 6,
-      "minMs": 97.9755830000031,
-      "medianMs": 127.9311459999999,
-      "maxMs": 1015.9837919999991,
-      "p95NearestRankMs": 1015.9837919999991
+      "minMs": 88.58129199999894,
+      "medianMs": 123.3062289999998,
+      "maxMs": 1056.7974170000016,
+      "p95NearestRankMs": 1056.7974170000016
     },
     "Jena SPARQL fixed formal data graph count": {
       "count": 5,
-      "minMs": 2.993000000000393,
-      "medianMs": 3.7879589999993186,
-      "maxMs": 10.551583000000392,
-      "p95NearestRankMs": 10.551583000000392
+      "minMs": 2.44933299999866,
+      "medianMs": 2.782666999999492,
+      "maxMs": 20.708708999998635,
+      "p95NearestRankMs": 20.708708999998635
     },
     "browser native SSE creation-to-observed-terminal": {
       "count": 1,
-      "minMs": 782.1437080000014,
-      "medianMs": 782.1437080000014,
-      "maxMs": 782.1437080000014,
-      "p95NearestRankMs": 782.1437080000014
+      "minMs": 785.3026250000003,
+      "medianMs": 785.3026250000003,
+      "maxMs": 785.3026250000003,
+      "p95NearestRankMs": 785.3026250000003
     }
   }
 }

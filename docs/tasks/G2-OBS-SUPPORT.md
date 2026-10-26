@@ -11,3 +11,8 @@ owned_paths：infra/observability/alloy/config.alloy；全新scripts/acceptance/
 先以实际锁定Alloy容器构造有意义RED：发送同一真实OTLP metrics，固定有效维度应该出口但当前丢失；非法值/secret-like标记/高基数键应始终不出口。再最小OTTL修复，实际容器validate及同出口GREEN。使用既有批准Alloy/Prometheus镜像精确摘要与标准库测试工具，可沿用G1原生OTLP二进制sink/真实Prometheus小fixture；禁止加SDK/validator包、全局工具或复制旧凭证。临时资源随机新名、回环端口、限内存/CPU，finally只清本人新资源，不能Docker prune。若test夹具仅合成OTLP而非真实产品meter，必须明确界限，Master后续真实全栈产品再验证。
 
 记录实际命令/退出码/数据点/有限值正反计数、config SHA、容器版本/清理与NOT_RUN，先红后绿，format/仓库SelfTest（可ignored symlink Master既有.tools/pythonlibs复用PyYAML6.0.3，不新安装）；及时源码commit/push DRAFT，独立证据与implementation-report.md后释放slot。最终产品G1/G2同Trace/Loki/Tempo/Prometheus/非泄露/series索引由Master实际验收，不能从此局部绿宣布整体PASS。
+
+
+## Master集成回执（2026-10-26）
+
+本卡对应源码/已批准模块范围已独立复审并纳入Master真实整体验收；实际命令/计数与原始失败保留于本轮master/validation.json、delivery-report.md及模块报告，不把原DRAFT提交推送等同已通过。首次main快进推送b1ff0a68915c272846038af96a00da3acbb95538；最终文档Head/CI/唯一ZIP按封包manifest和独立回执确认。总体PARTIAL，Monaco按人类暂停/真实模型与跨平台生产未运行等例外不变；本轮交付后等复审，不扩展下游。

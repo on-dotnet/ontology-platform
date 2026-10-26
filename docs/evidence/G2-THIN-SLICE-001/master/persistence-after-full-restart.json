@@ -1,0 +1,31 @@
+{
+  "status": "PASS",
+  "checks": [
+    {
+      "name": "persisted_formal_releases_reauthorized",
+      "status": "PASS"
+    },
+    {
+      "name": "rollback_pointer_and_history_survive_full_stack_restart",
+      "status": "PASS"
+    },
+    {
+      "name": "persisted_owner_run_same_snapshot_and_trace",
+      "status": "PASS"
+    },
+    {
+      "name": "persisted_native_events_replay_after_restart",
+      "status": "PASS"
+    },
+    {
+      "name": "real_s3_and_jena_persisted_bytes_graphs_match_active_r1",
+      "status": "PASS"
+    },
+    {
+      "name": "renamed_draft_survives_full_stack_restart",
+      "status": "PASS"
+    }
+  ],
+  "scope": "own just-created cold profile stopped by fail-fast and restarted with its same named PG/Keycloak/Jena/RustFS volumes; actual OIDC and unchanged full-chain identifiers",
+  "sourceSha": "fac0490528e9cc110cf99f1a41cb003b31a7852f"
+}

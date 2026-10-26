@@ -45,7 +45,7 @@ RED config SHA256=0983213699a64af5f2dc8134ad7a45d34545ce7fade6dafdd1cdd82912b3ad
 - [仓库检查](repository-checks.json)：pwsh -NoProfile -File scripts/verify.ps1 -SelfTest exit0；工程检查器8项、结构化文件4项、环境3组、toolchain4个摘要正反例、ReviewPackage35项0失败；Doctor两个边界通过。内部“invalid.yml/TOML”输出是预期负例。Python AST和git diff --check均exit0。没有修改或弱化既有门禁。
 - [官方格式检查](format-check-final.json) fmt --test exit0；每轮真实Alloy validate exit0。初次fmt --test exit1后只格式化owned配置，[原始失败](format-check.json)和[格式化命令](format-apply.json)保留。
 - [夹具首次启动失败](setup-failure/result.json)：Docker --internal网络不发布回环端口，未发送OTLP；只清本人资源后改为独立普通网络、仍仅随机回环端口。最终所有目的地是本人新容器或容器回环不可用日志/trace出口，无外部请求。
-- SelfTest首次重定向到仓库内正在写入的log造成自扫描失败，改为subprocess内存捕获、结束后写证据；[失败命令](setup-failure/self-test-inplace-command.json)与[失败输出](setup-failure/self-test-inplace.log)保留。最初shell包装使用zsh只读变量status导致包装退出1；验证后续使用任务专属变量/标准库捕获，没有修改shell全局配置。
+- SelfTest首次重定向到仓库内正在写入的log造成自扫描失败，改为subprocess内存捕获、结束后写证据；[失败命令](setup-failure/self-test-inplace-command.json)与[失败输出](setup-failure/self-test-inplace.txt)保留。最初shell包装使用zsh只读变量status导致包装退出1；验证后续使用任务专属变量/标准库捕获，没有修改shell全局配置。
 - 每个容器限256MiB、1CPU、128PID，Prometheus临时TSDB tmpfs96MiB、Alloy临时数据tmpfs32MiB，独立随机网络/名称/回环端口，无旧volume或runtime。finally只删本人新资源，所有真实轮次ownContainersRemaining=[]，网络删除exit0，未Docker prune。
 
 ## 限制与下一责任人
@@ -54,3 +54,5 @@ RED config SHA256=0983213699a64af5f2dc8134ad7a45d34545ce7fade6dafdd1cdd82912b3ad
 - NOT_RUN：本任务没有运行.NET/Web编译或产品测试、真实模型/生产/Windows/Intel；配置与stdlib脚本变更使用实际collector链路验收，产品门禁由Master最终集成覆盖。
 - NOT_VERIFIED：本任务分支CI没有查询运行，不推断空status；需要最终集成Head CI run ID/URL及结论。
 - 独立Review待Master另派；Owner不派子Agent、不自任Reviewer。唯一标准审查ZIP由Master在最终提交与CI核验后构建并重开验证，本子任务不另出ZIP、不合并main。完成证据提交后停止，释放slot。
+
+Master审查包预检：标准包禁止.log后缀，现将该次自测命令输出同字节移动为setup-failure/self-test-inplace.txt，未删除失败内容或改写原始命令。原历史路径/提交仍可追踪，映射及SHA见master/review-package-path-normalization.json。

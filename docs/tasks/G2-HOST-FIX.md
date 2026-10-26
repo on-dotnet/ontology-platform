@@ -9,3 +9,8 @@
 轮2 `72fff701..732589744`：Master真实PG pause使原实现八秒仍无返回，禁止以EF拦截夹具冒充真实取消。健康副本配置、取消握手预留与真实PG三项，53/53。独立复审确认超时ADDRESSED，但发现连接串缺省时PGGSSENCMODE=require被覆盖的新Important，进入轮3；不入main。
 
 轮3：最小保留Npgsql官方有效连接串/环境优先级与GSS Require，TLS与业务配置保持；补环境/显式配置控制、真实PG预算及异常清理验证，独立限定复审后由Master再实测完整八项与全链。未闭环前状态PARTIAL。禁止放弃后台EF任务、降低业务认证、系统安装、收费、生产或新依赖。所有实际证据见master/host/fix1-report.md；独立回执见master/independent-integration-reviews.md及后续追加。
+
+
+## Master集成回执（2026-10-26）
+
+本卡对应源码/已批准模块范围已独立复审并纳入Master真实整体验收；实际命令/计数与原始失败保留于本轮master/validation.json、delivery-report.md及模块报告，不把原DRAFT提交推送等同已通过。首次main快进推送b1ff0a68915c272846038af96a00da3acbb95538；最终文档Head/CI/唯一ZIP按封包manifest和独立回执确认。总体PARTIAL，Monaco按人类暂停/真实模型与跨平台生产未运行等例外不变；本轮交付后等复审，不扩展下游。

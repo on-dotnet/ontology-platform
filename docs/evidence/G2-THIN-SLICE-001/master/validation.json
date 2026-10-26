@@ -1,0 +1,165 @@
+{
+  "taskId": "G2-THIN-SLICE-001",
+  "status": "PARTIAL",
+  "baseSha": "6154ebb3703031a49cf0c555c9f0c3596e3b7726",
+  "actualFullColdCandidate": "b1ff0a68915c272846038af96a00da3acbb95538",
+  "checks": [
+    {
+      "name": "repository-selftest",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1 -SelfTest",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "one-key-final-cold-pass.txt: static/8 engineering cases/structured4/environment3/ReviewPackage35 real positive-negative tests passed; not product certification"
+    },
+    {
+      "name": "locked-dotnet-web-build-format",
+      "command": "pwsh -NoProfile -File scripts/acceptance/g2-thin-slice.ps1 -StartRuntime",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "one-key-final-cold-pass.txt actual exit0: locked solution restore/build/whole format; exact Node24.22.1/pnpm11.28.8 frozen install, lint/typecheck/Vitest77/build; ASPIRE010 warning retained"
+    },
+    {
+      "name": "semantic-draft-pg-jena",
+      "command": "python3 scripts/acceptance/semantic-roundtrip.py --postgres --label ci-semantic",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "SEM/ci-semantic.json actual69/69 zero skip on final tested candidate, source/hash/Unicode/BOM/name/CAS/audit/SHACL/verified graph/Down guards"
+    },
+    {
+      "name": "publishing-real-faults",
+      "command": "python3 scripts/acceptance/release-faults.py --label ci-release-faults",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "PUB/ci-release-faults.json actual50/50 zero skip on own PG/RustFS/Jena, independent approvals and rollback"
+    },
+    {
+      "name": "query-real-six-states",
+      "command": "python3 scripts/acceptance/query-plan.py --label ci-query-plan",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "QRY/ci-query-plan.json actual49/49 zero skip, published source integrity, budgets and evidence reauthorization"
+    },
+    {
+      "name": "sdk-maf-mcp-native-sse",
+      "command": "python3 scripts/acceptance/mcp-agent.py --label ci-mcp-agent",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "AI/ci-mcp-agent.json actual33/33 zero skip; native SSE replay/slow-client/cancel/expiry and real SDK; Ajv common-keywords positive3 negative6 only"
+    },
+    {
+      "name": "security-governance-g1",
+      "command": "python3 scripts/acceptance/test-governance.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "security-final-full.json actual114/114 zero skip with fresh PG and Keycloak; real PAR, audit atomicity, prebinding policy, GSS and pause tests"
+    },
+    {
+      "name": "strict-wire-contract",
+      "command": "dotnet test --project backend/tests/OntologyPlatform.G2ContractTests --no-build --no-restore",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "one-key-final-cold-pass.txt 19/19 zero skip, same completed native stage; integration tests missing env explicitly NOT_RUN separately"
+    },
+    {
+      "name": "real-browser-all-chain",
+      "command": "python3 scripts/acceptance/full-g2-e2e.py --runtime-file <own-new-private-runtime>",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "full-g2-e2e.json actual113 PASS, new8 identities/realm, source/name/CAS/SHACL/diff/approve/R1R2/MCP/MAF/SSE/evidence/rollback; screenshots exclude authentication"
+    },
+    {
+      "name": "real-g1-oidc-lgtm",
+      "command": "python3 scripts/acceptance/g1-regression.py --runtime-file <own-new-private-runtime> --runtime-only",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "g1-regression.json actual both steps exit0, real role/OIDC/CSRF/two instances/logout; closeout-observability.json audit fault/recovery and actual Loki/Tempo"
+    },
+    {
+      "name": "real-product-observability",
+      "command": "python3 scripts/acceptance/g2-observability.py --runtime-file <own-new-private-runtime>",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "g2-observability.json original25 PASS; actual33 polls20.469s, worker_search21 polls20.283s; privacy/finite actual metrics; 90s total engineering observation budget, not production SLO"
+    },
+    {
+      "name": "deployed-grafana-trace",
+      "command": "<exact-project-node> scripts/acceptance/g2-trace-browser.mjs <own-new-private-runtime>",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "trace-browser.json 4 PASS from real release UI link to nonempty same Trace in deployed Grafana; screenshot visually inspected"
+    },
+    {
+      "name": "real-dependency-stalls",
+      "command": "python3 scripts/acceptance/g2-readiness-fault.py --runtime-file <own-new-private-runtime>",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "readiness-real-faults.json actual8 PASS, Jena2016ms/RustFS2006ms/PG1008ms503 and recovery200; each own container finally unpaused"
+    },
+    {
+      "name": "full-stack-persistence",
+      "command": "<exact-project-node> <committed persistence-check-source.mjs> <root> <own-new-private-runtime>",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "persistence-after-full-restart.json 6 PASS for same prior identifiers after own-stack stop/restart; first suffix typo preserved, no product change"
+    },
+    {
+      "name": "actual-openapi-and-repro-types",
+      "command": "python3 scripts/acceptance/verify-openapi.py; node apps/web/scripts/generate-types.mjs --check",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "openapi-final-runtime-reproduction.json exact28 paths/96schemas; full runtime equals committed snapshot, 97types regenerated zero drift and Vitest exact equality"
+    },
+    {
+      "name": "actual-performance-baseline",
+      "command": "python3 scripts/acceptance/performance-baseline.py --from-observed-run",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "performance-baseline.json real26 observations; SHACL/SPARQL/publication/SSE covered with input bytes and environment, no production threshold"
+    },
+    {
+      "name": "qa-control-plane",
+      "command": "python3 scripts/tests/G2Acceptance.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "qa-fix2-green.txt and qa2-master-control-green.txt actual22 PASS; control plane only"
+    },
+    {
+      "name": "dependency-known-advisories-license",
+      "command": "dotnet package list --project backend/OntologyPlatform.slnx --no-restore --vulnerable --include-transitive --format json; pnpm audit --prod --json",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "nuget-final-vulnerability-all-projects.json19 projects with no listed hits; pnpm-final-vulnerability.json zero all severities; 13 necessary new NuGet closure license records MIT/Apache2/BSD3, no Preview; bounded advisory check"
+    },
+    {
+      "name": "monaco",
+      "command": "human explicitly paused Monaco",
+      "status": "BLOCKED",
+      "exitCode": null,
+      "output": "PAUSED_BY_USER; no override applied, vulnerable dependency graph absent from final product lock"
+    },
+    {
+      "name": "real-paid-model",
+      "command": null,
+      "status": "BLOCKED",
+      "exitCode": null,
+      "output": "No approved usable real provider or paid call; genuine SDK deterministic pipeline separately passed"
+    },
+    {
+      "name": "windows-intel-production",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Windows native/Intel Mac/production images/HA/five real production sources/formal SLO not certified"
+    }
+  ],
+  "ci": {
+    "status": "NOT_VERIFIED",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  },
+  "ciNote": "Final committed Head CI is supplied from actual jobs API as create-review-package explicit runtimeCi parameters to avoid self-reference; previous b1 success separately archived. No empty status inferred success.",
+  "archiveVerification": "NOT_VERIFIED: creation and independent reopen occur after this source commit",
+  "review": "whole-review-final.md and independent-integration-reviews.md; no open C/I/M in reviewed source or QA fixes"
+}

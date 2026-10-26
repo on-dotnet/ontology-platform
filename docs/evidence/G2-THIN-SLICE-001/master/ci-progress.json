@@ -1,5 +1,5 @@
 {
-  "status": "IN_PROGRESS",
+  "status": "SOURCE_CI_PASS_FINAL_DOCUMENT_HEAD_PENDING",
   "runs": [
     {
       "id": 40260902743,
@@ -19,8 +19,24 @@
         ],
         "diagnosis": "candidate strict canonical DTO callbacks reject incomplete fixture OntologyDraft; local Release regression reproduced 8pass/2fail from10, Owner confirming and fixing fixture only"
       }
+    },
+    {
+      "id": 40274308272,
+      "headSha": "fac0490528e9cc110cf99f1a41cb003b31a7852f",
+      "url": "https://github.com/on-dotnet/ontology-platform/actions/runs/40274308272",
+      "conclusion": "success",
+      "engineering": "completed/success (actual jobs API)",
+      "governanceIntegration": "completed/success (actual jobs API)"
+    },
+    {
+      "id": 40276538198,
+      "headSha": "b1ff0a68915c272846038af96a00da3acbb95538",
+      "url": "https://github.com/on-dotnet/ontology-platform/actions/runs/40276538198",
+      "conclusion": "success",
+      "engineering": "completed/success (actual jobs API)",
+      "governanceIntegration": "completed/success (actual jobs API)"
     }
   ],
-  "finalSameHeadCI": "NOT_RUN",
+  "finalSameHeadCI": "Final documentation Head CI must be verified after commit and supplied through runtimeCi in the final package; prior source success is not reused as final Head success.",
   "notes": "No GitHub protection/billing/resource settings changed; old failing CI not hidden."
 }
