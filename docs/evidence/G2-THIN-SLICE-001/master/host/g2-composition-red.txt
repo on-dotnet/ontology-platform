@@ -2,10 +2,10 @@
 失败 G2GuardUsesValidatedSecurityConfiguration (69ms)
   从 /Users/chasen/.codex/worktrees/g2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
   Assertion failed. Expected both values to refer to the same object.
-  
+
   expected: OntologyPlatform.Api.Security.PlatformSecurityOptions (hash: 0x2A60B61)
   actual:   OntologyPlatform.Api.Security.PlatformSecurityOptions (hash: 0x330001E)
-  
+
   Assert.AreSame(validated, provider.GetRequiredService<IOptions<PlatformSecurityOptions>>().Value)
     在 OntologyPlatform.SecurityTests.G2CompositionTests.G2GuardUsesValidatedSecurityConfiguration() 位于 /Users/chasen/.codex/worktrees/g2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2CompositionTests.cs:27
     在 System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
