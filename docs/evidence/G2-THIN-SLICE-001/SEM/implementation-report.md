@@ -125,3 +125,18 @@ Master指定的共享提交已顺序同步，无冲突且不手改共享文件�
 - backend cwd：`dotnet format OntologyPlatform.slnx --no-restore --include src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaSemanticRuntime.cs tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs --verify-no-changes`：exit0，精确选择自有两文件。`dotnet build backend/OntologyPlatform.slnx --no-restore`：exit0，既存ASPIRE010 warning保留。`pwsh -NoProfile -File scripts/verify.ps1 -SelfTest`与`git diff --check`均exit0，实际输出一并存verified-read-verification.json，未把检查器正反例计入50产品测试。
 
 新方法源提交与证据提交分离，供Master和QRY Owner独立消费和限定复审。整体继续DRAFT/PARTIAL；QRY读取不可变对象+本新方法+真实HTTP六态/证据链的跨模块联调、同Head CI、唯一审查ZIP由Master组织，本SEM专项不宣称这些链路已运行。原空文档修复8b9bd188及本修复等待Master组合限定复核，无main合并。
+
+## 限定复审M1：内部marker不占业务三元组预算
+
+Master限定复审确认旧空文档Minor已ADDRESSED，同批读主路径C0/I0；新增M1为合法单源5000条业务三元组加marker后在RDF/JSON映射层误超5000。按Master本轮明确修复指令执行，已重读指定SDD fix-loop。基线为`85bf03ca26590551a96ad4b74e156d7b7141ceeb`，修改前fetch exit0/工作树干净。仅修改自有JenaSemanticRuntime/JenaRdfCodec/VerifiedReadTests与SEM证据；Linux runner已由Master接手，本轮完全未改runner、共享文件或依赖。
+
+源码小提交：`c2ca4c3279eb8b57e9d022b1c2890e0adbb702d3`。JenaRdfCodec.Parse新增默认false的内部marker许可，只能额外容纳一条。唯一显式true调用位于ParseSourcesAsync本次带随机marker的临时GSP响应映射；随后仍要求精确marker出现一次、剔除后按四源合计严格5000检查。正常正式图ReadGraphAsync、SHACL响应等所有其他调用仍使用默认5000，不一般放宽到5001。没有新解析器、无源/hash改写、无正式图marker、无清理/取消策略变化。
+
+覆盖测试仍在`VerifiedReadTests.cs`：新增7项，单源4999/5000成功且源hash准确、5001拒绝；正式已验证读取四源合计4999/5000成功并恰好两次正式GET，5001在正式读取前503；实际注入5001条正式图后，旧底层读仍422/rdf_triple_budget、新消费边界503。测试图用同主体/同谓词/短literal避开节点、边与字节限额。正式正控用ontology一条与data余下条数，两图非空，明确测合计预算；单源5000边界由Analyze真实RIOT测试直接覆盖，不把空正式图缺失当成功。
+
+- 红灯：`python3 scripts/acceptance/semantic-roundtrip.py --filter 'FullyQualifiedName~TemporaryMarkerDoesNotConsume|FullyQualifiedName~VerifiedReadRetainsAggregate|FullyQualifiedName~PublishedGraphDoesNotReceive' --label marker-budget-red`，exit2，7项中1失败/6通过/0跳过；唯一失败为单源5000，真实堆栈JenaRdfCodec.Parse原第44行，符合Review根因。原始输出见marker-budget-red.json。
+- 绿灯：`python3 scripts/acceptance/semantic-roundtrip.py --postgres --label marker-budget-full-green`，exit0，57/57通过/0跳过（原50+新7）；实际PG交付迁移/真实Jena RIOT/SHACL/TDB2，旧同批2次读取、各hash/snapshot绑定、取消与超时清理均继续通过。全部暂存图三元组0，两临时容器已删除。见marker-budget-full-green.json。
+- backend cwd精确三文件`dotnet format OntologyPlatform.slnx --no-restore --include src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaSemanticRuntime.cs src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaRdfCodec.cs tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs --verify-no-changes`：exit0。
+- `dotnet build backend/OntologyPlatform.slnx --no-restore`：exit0，既存ASPIRE010 warning保留。`pwsh -NoProfile -File scripts/verify.ps1 -SelfTest`与`git diff --check`均exit0，记录在marker-budget-verification.json（完整命令/cwd/退出码/输出）；不把SelfTest检查器正反例混入57项产品测试。
+
+本轮仍DRAFT，源码/证据分提交push，等待Master限定独立复核。57项中依旧包含生产类型存在和旧适配器默认行为检查、明确catalog替身消费边界，不称57独立端到端场景。跨模块QRY/Host/FE与同Head CI、唯一ZIP由Master总集成确认；未合main、未派Agent、未读历史runtime或认证材料，完成即停止。
