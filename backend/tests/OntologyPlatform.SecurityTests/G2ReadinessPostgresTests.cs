@@ -154,13 +154,35 @@ public sealed class G2ReadinessPostgresTests
                 var port = (await RunAsync(["port", fixture.Container, "5432/tcp"])).Output.Trim().Split(':')[^1];
                 // 原始业务配置使用驱动默认超时，回归断言探针副本不会改变它。
                 fixture.Connection = new NpgsqlConnectionStringBuilder { Host = "127.0.0.1", Port = int.Parse(port), Database = "readiness", Username = "postgres", Password = password }.ConnectionString;
-                // 轮询真实PG入口，次数限制只用于fixture启动，不模拟产品超时。
-                for (var attempt = 0; attempt < 120; attempt++)
+                // 官方镜像初始化临时服务器只开放Unix socket；必须从主机映射TCP验证实际驱动握手和查询。
+                var startup = Stopwatch.StartNew();
+                // 启动重试有总期限，每次原生连接/查询也有短超时；不影响后续pause预算断言。
+                for (var attempt = 0; attempt < 120 && startup.Elapsed < TimeSpan.FromSeconds(30); attempt++)
                 {
-                    if ((await RunAsync(["exec", fixture.Container, "pg_isready", "-U", "postgres", "-d", "readiness"], requireSuccess: false)).Code == 0) return fixture;
+                    try
+                    {
+                        // 只为fixture启动使用独立短连接，业务默认配置及健康探针配置均不改写。
+                        await using var probe = new NpgsqlConnection(new NpgsqlConnectionStringBuilder(fixture.Connection)
+                        {
+                            Timeout = 1,
+                            CommandTimeout = 1,
+                            CancellationTimeout = -1,
+                            Pooling = false
+                        }.ConnectionString);
+                        await probe.OpenAsync();
+                        // 实际SQL成功保证不是只接受TCP而尚未完成PostgreSQL协议或认证。
+                        await using var ready = new NpgsqlCommand("SELECT 1", probe);
+                        Assert.AreEqual(1, (int)(await ready.ExecuteScalarAsync())!);
+                        Console.WriteLine($"Real PostgreSQL startup: mappedTcpHandshake=True; select1=True; attempts={attempt + 1}; elapsedMs={startup.Elapsed.TotalMilliseconds:F0}");
+                        return fixture;
+                    }
+                    catch (Exception failure) when (failure is NpgsqlException or IOException or TimeoutException or OperationCanceledException)
+                    {
+                        // 初始化重启阶段的EOF/reset只在故障注入前重试，绝不吞掉后续预算或恢复失败。
+                    }
                     await Task.Delay(250);
                 }
-                throw new AssertFailedException("本轮随机PG未在30秒内就绪。");
+                throw new AssertFailedException("本轮随机PG映射TCP在30秒内未完成真实Npgsql握手和SELECT 1。");
             }
             catch
             {

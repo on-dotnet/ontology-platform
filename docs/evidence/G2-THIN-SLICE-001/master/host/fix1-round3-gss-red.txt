@@ -1,0 +1,50 @@
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+失败 HealthOptionsPreserveEffectiveGssRequirement (2s 379ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+  Assertion failed. 预期值相等。
+  独立GSS用例environment-require失败。
+
+  expected: 0
+  actual:   2
+
+  Assert.AreEqual(0, process.ExitCode)
+    在 OntologyPlatform.SecurityTests.G2ReadinessGssTests.HealthOptionsPreserveEffectiveGssRequirement() 位于 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2ReadinessGssTests.cs:88
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+  标准输出
+    失败 HealthOptionsPreserveEffectiveGssRequirement (1s 032ms)
+      Assertion failed. 预期值相等。
+
+      expected: Require
+      actual:   Disable
+
+      Assert.AreEqual(item.After, DriverMode(observer.Seen))
+      预期
+        Require
+      实际
+        Disable
+        在 OntologyPlatform.SecurityTests.G2ReadinessGssTests.HealthOptionsPreserveEffectiveGssRequirement() 位于 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2ReadinessGssTests.cs:54
+        在 OntologyPlatform.SecurityTests.G2ReadinessGssTests.HealthOptionsPreserveEffectiveGssRequirement() 位于 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2ReadinessGssTests.cs:62
+        在 OntologyPlatform.SecurityTests.G2ReadinessGssTests.HealthOptionsPreserveEffectiveGssRequirement() 位于 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2ReadinessGssTests.cs:62
+        在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+
+    测试运行摘要: 失败! - /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+      总计: 1
+      失败: 1
+      成功: 0
+      已跳过: 0
+      持续时间: 1s 203ms
+
+
+
+  错误输出
+/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64) 失败并出现 1 个错误 (3s 977ms)
+退出代码: 2
+
+测试运行摘要: 失败!
+  总计: 1
+  失败: 1
+  成功: 0
+  已跳过: 0
+  持续时间: 4s 504ms
+已完成测试运行，但显示非成功退出代码: 2 (请参阅: https://aka.ms/testingplatform/exitcodes)
+exitCode=2
