@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using OntologyPlatform.Contracts;
 
 namespace OntologyPlatform.Api.G2;
@@ -19,6 +20,7 @@ public static class G2Authorization
             options.AddPolicy("release.approve", policy => policy.RequireAuthenticatedUser().RequireRole("platform.auditor"));
             options.AddPolicy("release.activate", policy => policy.RequireAuthenticatedUser().RequireRole("platform.operator"));
         });
+        services.AddSingleton<IAuthorizationMiddlewareResultHandler, G2AuthorizationResultHandler>();
         return services;
     }
 
