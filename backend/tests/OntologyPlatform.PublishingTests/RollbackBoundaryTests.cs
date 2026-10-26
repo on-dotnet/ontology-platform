@@ -8,6 +8,50 @@ namespace OntologyPlatform.PublishingTests;
 [TestClass]
 public sealed class RollbackBoundaryTests
 {
+    /// <summary>回滚提案响应丢失后从PG恢复，同时重核完整范围、主体和载荷。</summary>
+    [TestMethod]
+    [DataRow("replay")]
+    [DataRow("payload")]
+    [DataRow("scope")]
+    [DataRow("subject")]
+    public async Task RollbackProposalReceiptSurvivesExternalOutage(string scenario)
+    {
+        // 成功前置流程始终访问本轮真实PG、RustFS及Jena。
+        using var fixture = new PublishingFixture();
+        // 原始草稿取得真实验证报告。
+        var item = await fixture.ProposalAsync();
+        // 发布正式目标，避免用伪造目录或未发布行验证回执。
+        var release = await fixture.Service.ActivateAsync(fixture.Author, PublishingFixture.Activation(await fixture.ApproveAsync(item.Proposal)), default);
+        // 保存完整原命令以模拟客户端没有收到提交成功响应。
+        var request = new CreateProposalRequest { Kind = ProposalKind.Rollback, TargetReleaseId = release.ReleaseId, TargetManifestHash = release.ManifestHash, Command = PublishingFixture.Command() };
+        // 此结果只作为测试断言的已提交事实，后续重试不访问外部制品。
+        var committed = await fixture.Service.CreateProposalAsync(fixture.Author, request, default);
+        fixture.Gate = (_, _) => throw new HttpRequestException("isolated external outage after proposal commit");
+        if (scenario == "replay")
+        {
+            // 完整相同命令必须恢复精确原提案，含原时间与标识。
+            var replay = await fixture.Service.CreateProposalAsync(fixture.Author, request, default);
+            Assert.AreEqual(JsonSerializer.Serialize(committed), JsonSerializer.Serialize(replay));
+            // 新命令仍必须完整回验Catalog，不能把PG中存在目标误当作可用。
+            var unavailable = await Assert.ThrowsAsync<SemanticOperationException>(() => fixture.Service.CreateProposalAsync(fixture.Author, request with { Command = PublishingFixture.Command() }, default));
+            Assert.AreEqual(503, unavailable.Status);
+        }
+        else
+        {
+            // 缩减scope或更换主体不能恢复原始提交者的回执。
+            var actor = scenario == "scope" ? fixture.Author with { SiteIds = ["site-a"] } : scenario == "subject" ? fixture.Author with { SubjectId = "different-author" } : fixture.Author;
+            // 改动原因也属于完整载荷冲突，而不是相同幂等命令。
+            var retry = scenario == "payload" ? request with { Command = request.Command with { Reason = "changed reason" } } : request;
+            // 必须先按PG事实拒绝，不应泄漏为外部故障503。
+            var failure = await Assert.ThrowsAsync<SemanticOperationException>(() => fixture.Service.CreateProposalAsync(actor, retry, default));
+            Assert.AreEqual(scenario == "scope" ? 403 : 409, failure.Status);
+        }
+        Assert.AreEqual(2, await fixture.Database.Proposals.CountAsync(row => row.OrganizationId == fixture.Author.OrganizationId));
+        // 原始PUBLISH与ROLLBACK各一次；所有重试都不能追加成功审计。
+        var audits = await fixture.Database.Database.SqlQuery<int>($"SELECT COUNT(*)::int AS \"Value\" FROM governance.audit_records WHERE \"OrganizationId\"={fixture.Author.OrganizationId} AND \"Action\"='release.proposal.create'").SingleAsync();
+        Assert.AreEqual(2, audits);
+    }
+
     /// <summary>真实旧版本回滚对自批、过期和数据库目标内容篡改均失败关闭。</summary>
     [TestMethod]
     [DataRow("self")]

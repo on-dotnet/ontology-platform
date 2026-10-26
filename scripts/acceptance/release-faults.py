@@ -12,7 +12,7 @@ import urllib.request
 
 ROOT = Path(__file__).resolve().parents[2]
 EVIDENCE = ROOT / 'docs/evidence/G2-THIN-SLICE-001/PUB'
-JENA = 'fuseki:8b85cd963ab3910a87ff4d69819a814fcc536d5f'
+JENA = os.environ.get('G2_TEST_JENA_IMAGE', 'ontology-platform-g2-fuseki:6.2.0')
 PG = 'postgres:18.6-trixie@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6'
 S3 = 'rustfs/rustfs:1.0.3@sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b'
 
@@ -56,7 +56,7 @@ def main():
                 time.sleep(.25)
         raise TimeoutError('Isolated service startup failed')
 
-    with tempfile.TemporaryDirectory(prefix=name, dir='/private/tmp') as directory:
+    with tempfile.TemporaryDirectory(prefix=name, dir='/tmp') as directory:
         path = Path(directory)
         config = '''@prefix fuseki: <http://jena.apache.org/fuseki#> .
 @prefix ja: <http://jena.hpl.hp.com/2005/11/Assembler#> .
@@ -92,6 +92,8 @@ def main():
             wait_url(env['G2_PUB_S3'] + '/health/ready')
             names.append(name + '-jena')
             run(['docker', 'run', '--detach', '--name', names[-1], '--memory', '768m', '--cpus', '1', '--publish', '127.0.0.1::3030', '--mount', f'type=bind,src={path},dst=/fixture,readonly', '--entrypoint', 'java', JENA, '-Xmx384m', '-Dlog4j.configurationFile=/fixture/log4j2.properties', '-jar', '/opt/fuseki/fuseki-server.jar', '--config=/fixture/config.ttl'])
+            run(['docker', 'image', 'inspect', JENA, '--format', '{{.Id}} {{json .RepoDigests}}'])
+            run(['docker', 'exec', names[-1], 'java', '-jar', '/opt/fuseki/fuseki-server.jar', '--version'])
             jenaport = run(['docker', 'port', names[-1], '3030/tcp']).stdout.strip().rsplit(':', 1)[1]
             env['G2_PUB_JENA'] = 'http://127.0.0.1:' + jenaport
             env['G2_PUB_SAMPLES'] = str(ROOT / 'samples/g2')

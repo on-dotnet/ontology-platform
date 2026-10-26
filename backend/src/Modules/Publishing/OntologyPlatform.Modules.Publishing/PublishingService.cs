@@ -76,12 +76,12 @@ public sealed partial class PublishingService : IPublishingService
         // 回滚不能夹带草稿或报告字段把两条授权分支混合。
         var validRollback = request.Kind == ProposalKind.Rollback && request.DraftId is null && request.DraftRevision is null && request.Hashes is null && request.ValidationReportId is null && !string.IsNullOrWhiteSpace(request.TargetReleaseId) && IsHash(request.TargetManifestHash);
         if (!validPublish && !validRollback) throw new SemanticOperationException(422, "proposal_payload_invalid");
-        // 发布草稿由Ontology授权；回滚则只从独立正式目录取得权威scope。
+        // 发布草稿由Ontology授权；回滚范围先从PG正式版本事实取得。
         var draft = request.Kind == ProposalKind.Publish ? await ontology.ReadAsync(actor, request.DraftId!, cancellationToken) : null;
-        // 回滚不读取当前草稿，也不要求当前修订与历史版本相等。
-        var target = request.Kind == ProposalKind.Rollback ? await catalog.ReadAsync(actor, request.TargetReleaseId!, cancellationToken) : null;
+        // 回执恢复不依赖外部制品可用性，但目标必须是PG中真实已发布的版本。
+        var target = request.Kind == ProposalKind.Rollback ? await database.Releases.AsNoTracking().SingleOrDefaultAsync(row => row.ReleaseId == request.TargetReleaseId && row.Published, cancellationToken) ?? throw new SemanticOperationException(404, "release_not_found") : null;
         // 真实源唯一确定资产和范围，客户端不能指定新asset或scope。
-        var scope = draft?.Scope ?? target!.Manifest.Scope;
+        var scope = draft?.Scope ?? new ResourceScope { OrganizationId = target!.OrganizationId, SiteIds = target.SiteIds };
         PublishingRules.DemandScope(actor, scope);
         return await WriteAsync(actor, scope, "release.proposal.create", request.Command, request, async token =>
         {
@@ -90,9 +90,11 @@ public sealed partial class PublishingService : IPublishingService
                 if (request.Command.ExpectedRevision != request.DraftRevision) throw new SemanticOperationException(409, "draft_revision_conflict");
                 await LockDraftAsync(actor, request.DraftId!, request.DraftRevision!.Value, request.Hashes!, request.ValidationReportId!, token);
             }
-            else if (target!.ManifestHash != request.TargetManifestHash)
+            else
             {
-                throw new SemanticOperationException(409, "rollback_binding_conflict");
+                // 仅首次命令完整回验外部对象与图；已提交回执已在WriteAsync中核对主体和完整载荷。
+                var verified = await catalog.ReadAsync(actor, target!.ReleaseId, token);
+                if (verified.ManifestHash != request.TargetManifestHash) throw new SemanticOperationException(409, "rollback_binding_conflict");
             }
             // 固定24小时期限，所有审批和激活都以服务器时间再次判断。
             var now = clock.GetUtcNow();
@@ -101,7 +103,7 @@ public sealed partial class PublishingService : IPublishingService
             {
                 ProposalId = Guid.NewGuid().ToString("N"),
                 Kind = request.Kind,
-                AssetId = draft?.AssetId ?? target!.Manifest.AssetId,
+                AssetId = draft?.AssetId ?? target!.AssetId,
                 Scope = scope,
                 DraftId = request.DraftId,
                 DraftRevision = request.DraftRevision,
