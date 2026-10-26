@@ -1,0 +1,58 @@
+[
+  {
+    "command": [
+      "dotnet",
+      "restore",
+      "backend/OntologyPlatform.slnx",
+      "--locked-mode"
+    ],
+    "exitCode": 0,
+    "output": "  正在确定要还原的项目…\n  已还原 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/OntologyPlatform.Modules.Publishing.Domain.csproj (用时 45 毫秒)。\n  已还原 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/OntologyPlatform.Modules.SemanticQuery.csproj (用时 45 毫秒)。\n  已还原 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/ServiceDefaults/OntologyPlatform.ServiceDefaults.csproj (用时 94 毫秒)。\n  已还原 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/OntologyPlatform.G2ContractTests.csproj (用时 82 毫秒)。\n  已还原 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Hosts/OntologyPlatform.InfrastructureApi/OntologyPlatform.InfrastructureApi.csproj (用时 94 毫秒)。\n  已还原 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/OntologyPlatform.InfrastructureTests.csproj (用时 82 毫秒)。\n  已还原 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/OntologyPlatform.Api.csproj (用时 94 毫秒)。\n  已还原 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/OntologyPlatform.SecurityTests.csproj (用时 95 毫秒)。\n  已还原 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/OntologyPlatform.Modules.Agents.csproj (用时 118 毫秒)。\n  已还原 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/OntologyPlatform.Modules.Publishing.csproj (用时 118 毫秒)。\n  已还原 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/AppHost/OntologyPlatform.AppHost.csproj (用时 170 毫秒)。\n  5 个项目(共 16 个)是最新的，无法还原。\n"
+  },
+  {
+    "command": [
+      "dotnet",
+      "build",
+      "backend/OntologyPlatform.slnx",
+      "--no-restore"
+    ],
+    "exitCode": 0,
+    "output": "/Users/chasen/.nuget/packages/aspire.hosting.apphost/13.6.3/build/Aspire.Hosting.AppHost.targets(157,5): warning ASPIRE010: OntologyPlatform.AppHost is configured with AspireUseCliBundle=false. Some Aspire features require the Aspire CLI bundle. Set AspireUseCliBundle=true to enable those features, or suppress ASPIRE010 to continue without the bundle. See https://aka.ms/aspire/diagnostics/aspire010 for more information. [/Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/AppHost/OntologyPlatform.AppHost.csproj]\n  OntologyPlatform.Contracts -> /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/bin/Debug/net10.0/OntologyPlatform.Contracts.dll\n  OntologyPlatform.Modules.Agents -> /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/bin/Debug/net10.0/OntologyPlatform.Modules.Agents.dll\n  OntologyPlatform.ServiceDefaults -> /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/ServiceDefaults/bin/Debug/net10.0/OntologyPlatform.ServiceDefaults.dll\n  OntologyPlatform.G2ContractTests -> /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Debug/net10.0/OntologyPlatform.G2ContractTests.dll\n  OntologyPlatform.Modules.Governance -> /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/bin/Debug/net10.0/OntologyPlatform.Modules.Governance.dll\n  OntologyPlatform.Modules.Ontology.Domain -> /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.Domain.dll\n  OntologyPlatform.Modules.Publishing.Domain -> /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/bin/Debug/net10.0/OntologyPlatform.Modules.Publishing.Domain.dll\n  OntologyPlatform.Modules.SemanticQuery -> /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/bin/Debug/net10.0/OntologyPlatform.Modules.SemanticQuery.dll\n  OntologyPlatform.InfrastructureApi -> /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Hosts/OntologyPlatform.InfrastructureApi/bin/Debug/net10.0/OntologyPlatform.InfrastructureApi.dll\n  OntologyPlatform.Modules.Ontology -> /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.dll\n  OntologyPlatform.InfrastructureTests -> /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/bin/Debug/net10.0/OntologyPlatform.InfrastructureTests.dll\n  OntologyPlatform.Modules.Publishing -> /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/bin/Debug/net10.0/OntologyPlatform.Modules.Publishing.dll\n  OntologyPlatform.SemanticTests -> /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll\n  OntologyPlatform.Api -> /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/bin/Debug/net10.0/OntologyPlatform.Api.dll\n  OntologyPlatform.AppHost -> /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/AppHost/bin/Debug/net10.0/OntologyPlatform.AppHost.dll\n  OntologyPlatform.SecurityTests -> /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll\n\n已成功生成。\n\n/Users/chasen/.nuget/packages/aspire.hosting.apphost/13.6.3/build/Aspire.Hosting.AppHost.targets(157,5): warning ASPIRE010: OntologyPlatform.AppHost is configured with AspireUseCliBundle=false. Some Aspire features require the Aspire CLI bundle. Set AspireUseCliBundle=true to enable those features, or suppress ASPIRE010 to continue without the bundle. See https://aka.ms/aspire/diagnostics/aspire010 for more information. [/Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/AppHost/OntologyPlatform.AppHost.csproj]\n    1 个警告\n    0 个错误\n\n已用时间 00:00:01.21\n"
+  },
+  {
+    "command": [
+      "dotnet",
+      "format",
+      "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyPlatform.Modules.Ontology.csproj",
+      "--no-restore",
+      "--include",
+      "backend/src/Modules/Ontology"
+    ],
+    "exitCode": 0,
+    "output": ""
+  },
+  {
+    "command": [
+      "dotnet",
+      "format",
+      "backend/tests/OntologyPlatform.SemanticTests/OntologyPlatform.SemanticTests.csproj",
+      "--no-restore",
+      "--include",
+      "backend/tests/OntologyPlatform.SemanticTests"
+    ],
+    "exitCode": 0,
+    "output": ""
+  },
+  {
+    "command": [
+      "dotnet",
+      "format",
+      "backend/src/Hosts/OntologyPlatform.Api/OntologyPlatform.Api.csproj",
+      "--no-restore",
+      "--include",
+      "backend/src/Hosts/OntologyPlatform.Api/G2/OntologyEndpoints.cs"
+    ],
+    "exitCode": 0,
+    "output": ""
+  }
+]
