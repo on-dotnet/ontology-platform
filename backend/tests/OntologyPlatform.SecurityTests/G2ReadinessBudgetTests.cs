@@ -30,7 +30,7 @@ public sealed class G2ReadinessBudgetTests
         var queries = new DelayedQueries();
         // 隔离网络连接，所有实际等待都发生在可取消的命令/HTTP传输入口。
         var connections = new SuppressedConnections();
-        // 两个HTTP请求分别消耗750毫秒，连同八次100毫秒查询超过整体两秒。
+        // 两个HTTP请求分别消耗850毫秒，连同八次70毫秒查询超过整体两秒。
         var http = new DelayedHttp();
         // 生产路由与真实模块上下文保持不变，仅外部I/O由可控传输适配。
         var builder = WebApplication.CreateBuilder();
@@ -58,7 +58,7 @@ public sealed class G2ReadinessBudgetTests
         client.DefaultRequestHeaders.Add("X-Health-Key", "synthetic-readiness-test");
         // 记录含HTTP及EF等待的实际墙钟时间。
         var elapsed = Stopwatch.StartNew();
-        // 若每阶段重新计时，这个请求会在约2.3秒返回200，违反整体预算。
+        // 若每阶段重新计时，这个请求会在约2.26秒返回200，违反整体预算。
         using var response = await client.GetAsync("/health/ready");
         Assert.AreEqual(HttpStatusCode.ServiceUnavailable, response.StatusCode);
         Assert.AreEqual(8, queries.Count);
@@ -103,7 +103,7 @@ public sealed class G2ReadinessBudgetTests
         public override async ValueTask<InterceptionResult<DbDataReader>> ReaderExecutingAsync(DbCommand command, CommandEventData eventData, InterceptionResult<DbDataReader> result, CancellationToken cancellationToken = default)
         {
             Count++;
-            await Task.Delay(TimeSpan.FromMilliseconds(100), cancellationToken);
+            await Task.Delay(TimeSpan.FromMilliseconds(70), cancellationToken);
             return InterceptionResult<DbDataReader>.SuppressWithResult(new DataTable().CreateDataReader());
         }
     }
@@ -117,7 +117,7 @@ public sealed class G2ReadinessBudgetTests
         /// <summary>最后一个依赖是否收到整体预算取消。</summary>
         internal bool Cancelled { get; private set; }
 
-        /// <summary>每个端点等待750毫秒，最后一个必须被剩余预算中断。</summary>
+        /// <summary>每个端点等待850毫秒，最后一个必须被剩余预算中断。</summary>
         /// <param name="request">真实生产客户端发出的固定健康请求。</param>
         /// <param name="cancellationToken">HTTP客户端收到的剩余预算令牌。</param>
         /// <returns>预算足够时返回合成成功，否则传播取消。</returns>
@@ -126,7 +126,7 @@ public sealed class G2ReadinessBudgetTests
             Paths.Add(request.RequestUri!.AbsolutePath);
             try
             {
-                await Task.Delay(TimeSpan.FromMilliseconds(750), cancellationToken);
+                await Task.Delay(TimeSpan.FromMilliseconds(850), cancellationToken);
             }
             catch (OperationCanceledException)
             {

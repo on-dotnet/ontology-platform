@@ -1,0 +1,66 @@
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+失败 PausedPostgresCannotOutliveHealthBudget (False,False) (8s 667ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+  测试方法 OntologyPlatform.SecurityTests.G2ReadinessPostgresTests。PausedPostgresCannotOutliveHealthBudget 引发了异常:
+  System.Threading.Tasks.TaskCanceledException: The request was canceled due to the configured HttpClient.Timeout of 8 seconds elapsing. ---> System.TimeoutException: The operation was canceled. ---> System.Threading.Tasks.TaskCanceledException: The operation was canceled. ---> System.Net.Http.HttpIOException: The response ended prematurely. (ResponseEnded)
+    在 System.Net.Http.HttpConnection.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+    ---内部异常堆栈跟踪结束---
+    在 System.Net.Http.HttpConnection.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+    在 System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+    在 System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+    在 System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)
+    ---内部异常堆栈跟踪结束---
+    在 System.Net.Http.HttpClient.HandleFailure(Exception e, Boolean telemetryStarted, HttpResponseMessage response, CancellationTokenSource cts, CancellationToken cancellationToken, CancellationTokenSource pendingRequestsCts)
+    在 System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)
+    在 OntologyPlatform.SecurityTests.G2ReadinessPostgresTests.PausedPostgresCannotOutliveHealthBudget(Boolean duringQuery, Boolean cancelCaller) 位于 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2ReadinessPostgresTests.cs:92
+    在 OntologyPlatform.SecurityTests.G2ReadinessPostgresTests.PausedPostgresCannotOutliveHealthBudget(Boolean duringQuery, Boolean cancelCaller) 位于 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2ReadinessPostgresTests.cs:103
+    在 OntologyPlatform.SecurityTests.G2ReadinessPostgresTests.PausedPostgresCannotOutliveHealthBudget(Boolean duringQuery, Boolean cancelCaller) 位于 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2ReadinessPostgresTests.cs:111
+    在 OntologyPlatform.SecurityTests.G2ReadinessPostgresTests.PausedPostgresCannotOutliveHealthBudget(Boolean duringQuery, Boolean cancelCaller) 位于 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2ReadinessPostgresTests.cs:111
+    在 OntologyPlatform.SecurityTests.G2ReadinessPostgresTests.PausedPostgresCannotOutliveHealthBudget(Boolean duringQuery, Boolean cancelCaller) 位于 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2ReadinessPostgresTests.cs:111
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+
+失败 PausedPostgresCannotOutliveHealthBudget (True,False) (8s 132ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+  测试方法 OntologyPlatform.SecurityTests.G2ReadinessPostgresTests。PausedPostgresCannotOutliveHealthBudget 引发了异常:
+  System.Threading.Tasks.TaskCanceledException: The request was canceled due to the configured HttpClient.Timeout of 8 seconds elapsing. ---> System.TimeoutException: The operation was canceled. ---> System.Threading.Tasks.TaskCanceledException: The operation was canceled. ---> System.IO.IOException: Unable to read data from the transport connection: Operation canceled. ---> System.Net.Sockets.SocketException: Operation canceled
+    在 System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.ThrowException(SocketError error, CancellationToken cancellationToken)
+    在 System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.System.Threading.Tasks.Sources.IValueTaskSource<System.Int32>.GetResult(Int16 token)
+    在 System.Net.Http.HttpConnection.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+    ---内部异常堆栈跟踪结束---
+    在 System.Net.Http.HttpConnection.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+    在 System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+    在 System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+    在 System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)
+    ---内部异常堆栈跟踪结束---
+    在 System.Net.Http.HttpClient.HandleFailure(Exception e, Boolean telemetryStarted, HttpResponseMessage response, CancellationTokenSource cts, CancellationToken cancellationToken, CancellationTokenSource pendingRequestsCts)
+    在 System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)
+    在 OntologyPlatform.SecurityTests.G2ReadinessPostgresTests.PausedPostgresCannotOutliveHealthBudget(Boolean duringQuery, Boolean cancelCaller) 位于 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2ReadinessPostgresTests.cs:92
+    在 OntologyPlatform.SecurityTests.G2ReadinessPostgresTests.PausedPostgresCannotOutliveHealthBudget(Boolean duringQuery, Boolean cancelCaller) 位于 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2ReadinessPostgresTests.cs:103
+    在 OntologyPlatform.SecurityTests.G2ReadinessPostgresTests.PausedPostgresCannotOutliveHealthBudget(Boolean duringQuery, Boolean cancelCaller) 位于 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2ReadinessPostgresTests.cs:111
+    在 OntologyPlatform.SecurityTests.G2ReadinessPostgresTests.PausedPostgresCannotOutliveHealthBudget(Boolean duringQuery, Boolean cancelCaller) 位于 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2ReadinessPostgresTests.cs:111
+    在 OntologyPlatform.SecurityTests.G2ReadinessPostgresTests.PausedPostgresCannotOutliveHealthBudget(Boolean duringQuery, Boolean cancelCaller) 位于 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2ReadinessPostgresTests.cs:111
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+
+失败 PausedPostgresCannotOutliveHealthBudget (True,True) (3s 170ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+  测试方法 OntologyPlatform.SecurityTests.G2ReadinessPostgresTests。PausedPostgresCannotOutliveHealthBudget 引发了异常:
+  System.TimeoutException: The operation has timed out.
+    在 OntologyPlatform.SecurityTests.G2ReadinessPostgresTests.PausedPostgresCannotOutliveHealthBudget(Boolean duringQuery, Boolean cancelCaller) 位于 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2ReadinessPostgresTests.cs:95
+    在 OntologyPlatform.SecurityTests.G2ReadinessPostgresTests.PausedPostgresCannotOutliveHealthBudget(Boolean duringQuery, Boolean cancelCaller) 位于 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2ReadinessPostgresTests.cs:103
+    在 OntologyPlatform.SecurityTests.G2ReadinessPostgresTests.PausedPostgresCannotOutliveHealthBudget(Boolean duringQuery, Boolean cancelCaller) 位于 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2ReadinessPostgresTests.cs:111
+    在 OntologyPlatform.SecurityTests.G2ReadinessPostgresTests.PausedPostgresCannotOutliveHealthBudget(Boolean duringQuery, Boolean cancelCaller) 位于 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2ReadinessPostgresTests.cs:111
+    在 OntologyPlatform.SecurityTests.G2ReadinessPostgresTests.PausedPostgresCannotOutliveHealthBudget(Boolean duringQuery, Boolean cancelCaller) 位于 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2ReadinessPostgresTests.cs:111
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+
+/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64) 失败并出现 3 个错误 (21s 528ms)
+退出代码: 2
+
+测试运行摘要: 失败!
+  总计: 3
+  失败: 3
+  成功: 0
+  已跳过: 0
+  持续时间: 22s 057ms
+已完成测试运行，但显示非成功退出代码: 2 (请参阅: https://aka.ms/testingplatform/exitcodes)
+
+exitCode=2

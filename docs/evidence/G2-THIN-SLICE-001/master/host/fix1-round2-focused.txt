@@ -1,0 +1,136 @@
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 G2GuardUsesValidatedSecurityConfiguration (69ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 ActualRunRoutesDescribeResponsesAndNativeEventStream (311ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 RuntimeSchemaPreservesWireUnionsAndWriteHeaders (63ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 DatabaseAndBothHttpDependenciesShareRemainingBudget (2s 082ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+  标准输出
+    Synthetic dependency budget: queries=8; http=2; elapsedMs=2040; status=503; storageCancelled=True
+
+  错误输出
+已通过 PausedPostgresCannotOutliveHealthBudget (False,False) (2s 249ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+  标准输出
+    Real PostgreSQL pause: duringQuery=False; callerCancellation=False; requestEnded=True; elapsedMs=1005
+
+  错误输出
+已通过 PausedPostgresCannotOutliveHealthBudget (True,False) (3s 125ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+  标准输出
+    Real PostgreSQL pause: duringQuery=True; callerCancellation=False; requestEnded=True; elapsedMs=2007
+
+  错误输出
+已通过 PausedPostgresCannotOutliveHealthBudget (True,True) (2s 228ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+  标准输出
+    Real PostgreSQL pause: duringQuery=True; callerCancellation=True; requestEnded=True; elapsedMs=1050
+
+  错误输出
+已通过 G2BudgetIncludesFirstGovernanceConnection (1s 062ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+  标准输出
+    Synthetic blocked Governance: elapsedMs=1010; status=503; cancelled=True
+
+  错误输出
+已通过 CallerCancellationStillReachesGovernance (True) (57ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 CallerCancellationStillReachesGovernance (False) (68ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 IdentityBoundaryRejectsBeforeBusiness (null,401) (62ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 IdentityBoundaryRejectsBeforeBusiness ("platform.viewer",403) (57ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 SharedPoliciesMatchApprovedRoles ("platform.viewer","semantic.read",200) (46ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 SharedPoliciesMatchApprovedRoles ("platform.operator","semantic.read",200) (46ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 SharedPoliciesMatchApprovedRoles ("platform.auditor","semantic.read",200) (42ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 SharedPoliciesMatchApprovedRoles ("platform.operator","ontology.edit",200) (45ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 SharedPoliciesMatchApprovedRoles ("platform.auditor","ontology.edit",403) (43ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 SharedPoliciesMatchApprovedRoles ("platform.auditor","release.approve",200) (41ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 SharedPoliciesMatchApprovedRoles ("platform.operator","release.approve",403) (41ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 SharedPoliciesMatchApprovedRoles ("platform.operator","release.activate",200) (47ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 SharedPoliciesMatchApprovedRoles ("platform.auditor","release.activate",403) (44ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 OriginMustBeExactOrigin ("https://external.invalid") (50ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 OriginMustBeExactOrigin ("null") (48ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 OriginMustBeExactOrigin ("http://platform.test/path") (55ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 OriginMustBeExactOrigin ("http://platform.test.evil.invalid") (62ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 OriginMustBeExactOrigin ("http://platform.test,http://platform.test") (51ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 NativeCsrfRejectsMissingOrInvalidToken (null) (48ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 NativeCsrfRejectsMissingOrInvalidToken ("synthetic-secret-marker") (44ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 RevisionPreconditionMatchesCommand (null,428) (50ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 RevisionPreconditionMatchesCommand ("W/\"2\"",400) (52ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 RevisionPreconditionMatchesCommand ("*",400) (44ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 RevisionPreconditionMatchesCommand ("\"-1\"",400) (46ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 RevisionPreconditionMatchesCommand ("\"02\"",400) (47ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 RevisionPreconditionMatchesCommand ("\"2\", \"3\"",400) (49ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 RevisionPreconditionMatchesCommand ("\"3\"",409) (46ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 RevisionPreconditionMatchesCommand ("\"2\"",200) (48ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 InvalidCommandsNeverInvokeBusiness ("command") (54ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 InvalidCommandsNeverInvokeBusiness ("key") (45ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 InvalidCommandsNeverInvokeBusiness ("reason") (45ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 InvalidCommandsNeverInvokeBusiness ("revision") (45ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 ActorIgnoresClientIdentityHeaders (43ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 MiddlewareRejectsAnonymousBeforeMalformedBodyBinding (48ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 MiddlewareSuccessContinuesToNativeBindingAndGuard (True) (54ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 MiddlewareSuccessContinuesToNativeBindingAndGuard (False) (56ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 MiddlewareCancellationPropagatesBeforeResponseStarts (59ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 MiddlewareUnexpectedAuditFailurePropagatesUnchanged (48ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 ControlledFailuresMapAndUnknownFailuresPropagate (48ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 NativeTransportPreservesBoundaryAndResult (null,"semantic.read",False,null,401) (42ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 NativeTransportPreservesBoundaryAndResult ("platform.viewer","ontology.edit",False,null,403) (44ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 NativeTransportPreservesBoundaryAndResult ("platform.viewer","semantic.read",False,null,202) (41ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 NativeTransportPreservesBoundaryAndResult ("platform.viewer","semantic.read",True,"http://platform.test",403) (38ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 NativeTransportPreservesBoundaryAndResult ("platform.viewer","semantic.read",True,"http://untrusted.invalid",403) (41ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已通过 NativeTransportPreservesBoundaryAndResult ("platform.viewer","semantic.read",True,"http://platform.test",202) (46ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64) 已通过 (14s 676ms)
+
+测试运行摘要: 已通过!
+  总计: 53
+  失败: 0
+  成功: 53
+  已跳过: 0
+  持续时间: 15s 398ms
+exitCode=0
