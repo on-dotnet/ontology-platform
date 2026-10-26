@@ -24,7 +24,7 @@ public sealed class CapabilityRegistry
         // 输出来自嵌入的机器生成组件闭包，保留所有联合与空值约束。
         var output = OutputSchema();
         // 每项受控能力的固定ID与中文含义。
-        var definitions = new[] { ("describe_ontology", "读取正式本体类与属性"), ("resolve_entity", "按全局身份或厂区业务号定位实体"), ("traverse_relationships", "沿正式对象属性读取有界关系子图") };
+        var definitions = new[] { ("describe_ontology", "读取正式本体类与属性"), ("resolve_entity", "按全局身份或厂区业务号定位实体"), ("traverse_relationships", "沿正式对象属性双向追溯有界关系子图") };
         return definitions.Select(item =>
         {
             // 服务器按工具ID补入能力身份，用户输入仅为以下受控参数。
@@ -37,7 +37,7 @@ public sealed class CapabilityRegistry
                 Properties = [Parameter("assetId", "string", "正式资产标识"), Parameter("releaseId", "string", "可选历史正式发布"), Parameter("entityType", "string", "正式类IRI"), Parameter("entityIri", "string", "实体完整IRI"), Parameter("externalId", "string", "业务外部号"), Parameter("siteId", "string", "授权厂区"), Parameter("relationshipIris", "array", "正式对象属性路径"), Parameter("depth", "integer", "遍历深度", 1, 5), Parameter("maxRows", "integer", "最大返回行数", 1, 100), Parameter("timeoutMs", "integer", "毫秒预算", 1, 5000)]
             };
             // 执行器语义标识纳入散列；代码语义变化必须推进此标识。
-            var executor = "semantic-query/" + item.Item1 + "/1";
+            var executor = "semantic-query/" + item.Item1 + "/3";
             // 序列化属性顺序确定，输出组件和定义按序排列，因此同构建跨进程稳定。
             var version = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new { input, output, executor }))));
             return new SemanticCapability { Id = item.Item1, Version = version, InputSchema = input, OutputSchema = output, Meaning = item.Item2, Policy = "semantic.read", ExecutorId = executor, Budgets = new CapabilityBudget { MaxDepth = 5, MaxRows = 100, TimeoutMs = 5000, MaxToolCalls = 3 } };
@@ -86,10 +86,12 @@ public sealed class CapabilityRegistry
                 pending.Enqueue(name);
                 map["$ref"] = "#/$defs/" + name;
             }
+            // 每个对象子Schema继续保留其所有关键字和引用。
             foreach (var child in map.Select(value => value.Value).OfType<JsonNode>()) Rewrite(child, pending);
         }
         else if (node is JsonArray list)
         {
+            // 数组中的oneOf/枚举/元组项也必须完整处理。
             foreach (var child in list.OfType<JsonNode>()) Rewrite(child, pending);
         }
     }

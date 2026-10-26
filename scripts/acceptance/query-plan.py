@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Run approved Query tests on disposable random-loopback PG, RustFS and Jena."""
 import argparse
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -12,7 +13,7 @@ import urllib.request
 
 ROOT = Path(__file__).resolve().parents[2]
 EVIDENCE = ROOT / 'docs/evidence/G2-THIN-SLICE-001/QRY'
-JENA = 'fuseki:8b85cd963ab3910a87ff4d69819a814fcc536d5f'
+JENA = os.environ.get('G2_TEST_JENA_IMAGE', 'ontology-platform-g2-fuseki:6.2.0')
 PG = 'postgres:18.6-trixie@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6'
 S3 = 'rustfs/rustfs:1.0.3@sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b'
 
@@ -56,7 +57,7 @@ def main():
                 time.sleep(.25)
         raise TimeoutError('Isolated service startup failed')
 
-    with tempfile.TemporaryDirectory(prefix=name, dir='/private/tmp') as directory:
+    with tempfile.TemporaryDirectory(prefix=name, dir='/private/tmp' if Path('/private/tmp').is_dir() else None) as directory:
         path = Path(directory)
         config = '''@prefix fuseki: <http://jena.apache.org/fuseki#> .
 @prefix ja: <http://jena.hpl.hp.com/2005/11/Assembler#> .
@@ -73,6 +74,8 @@ def main():
         (path / 'config.ttl').write_text(config)
         (path / 'log4j2.properties').write_text('status=error\nrootLogger.level=OFF\n')
         try:
+            run(['docker', 'image', 'inspect', '--format', '{{.Id}}', JENA])
+            run(['dotnet', 'restore', 'backend/tests/OntologyPlatform.QueryTests', '--locked-mode'])
             names.append(name + '-pg')
             run(['docker', 'run', '--detach', '--name', names[-1], '--memory', '256m', '--cpus', '1', '--publish', '127.0.0.1::5432', '--env', 'POSTGRES_PASSWORD', '--env', 'POSTGRES_DB', '--tmpfs', '/var/lib/postgresql', PG])
             pgport = run(['docker', 'port', names[-1], '5432/tcp']).stdout.strip().rsplit(':', 1)[1]
@@ -114,7 +117,10 @@ def main():
                 run(['docker', 'rm', '--force', container], False)
             EVIDENCE.mkdir(parents=True, exist_ok=True)
             sha = subprocess.run(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True, capture_output=True).stdout.strip()
-            (EVIDENCE / (args.label + '.json')).write_text(json.dumps(dict(sourceSha=sha, workingTreeChanges=True, exitCode=code, records=records), ensure_ascii=False, indent=2) + '\n')
+            source_files = [*ROOT.glob('backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/*.cs'), *ROOT.glob('backend/tests/OntologyPlatform.QueryTests/*.cs'), ROOT / 'backend/src/Hosts/OntologyPlatform.Api/G2/SemanticEndpoints.cs', ROOT / 'docs/contracts/g2-schemas.openapi.json', Path(__file__).resolve()]
+            source_hashes = {str(file.relative_to(ROOT)): hashlib.sha256(file.read_bytes()).hexdigest() for file in sorted(source_files)}
+            dirty = bool(subprocess.run(['git', 'status', '--porcelain'], cwd=ROOT, text=True, capture_output=True).stdout)
+            (EVIDENCE / (args.label + '.json')).write_text(json.dumps(dict(sourceSha=sha, workingTreeChanges=dirty, sourceHashes=source_hashes, exitCode=code, records=records), ensure_ascii=False, indent=2) + '\n')
     return code
 
 

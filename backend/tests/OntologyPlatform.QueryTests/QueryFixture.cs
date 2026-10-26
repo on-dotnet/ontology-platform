@@ -51,6 +51,12 @@ internal sealed class QueryFixture : IDisposable
     /// <summary>在真实HTTP传输前后仅注入失败，不伪造成功结果。</summary>
     internal Func<HttpRequestMessage, CancellationToken, Task>? Gate { get; set; }
 
+    /// <summary>只在真实HTTP响应到达后注入字节损坏，不构造假成功响应。</summary>
+    internal Action<HttpRequestMessage, HttpResponseMessage>? CorruptResponse { get; set; }
+
+    /// <summary>在真实Catalog完成后插入故障或活动版本变更，保持此前真实验证路径。</summary>
+    internal ISemanticGateway AfterResolve(Func<Task> callback) => new SemanticGateway(new CatalogCheckpoint(Catalog, callback), scope.ServiceProvider.GetRequiredService<ISemanticRuntime>(), scope.ServiceProvider.GetRequiredService<CapabilityRegistry>(), scope.ServiceProvider.GetRequiredService<IAuditTrail>(), Clock);
+
     /// <summary>通过环境获取本轮新建资源，不读取历史凭证文件。</summary>
     internal QueryFixture()
     {
@@ -165,7 +171,25 @@ internal sealed class QueryFixture : IDisposable
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken token)
         {
             if (fixture.Gate is not null) await fixture.Gate(request, token);
-            return await base.SendAsync(request, token);
+            // 从真实服务取得响应后才允许测试注入字节损坏。
+            var response = await base.SendAsync(request, token);
+            fixture.CorruptResponse?.Invoke(request, response);
+            return response;
+        }
+    }
+    /// <summary>故障注入检查点仅包装真实Catalog，不提供任何合成成功发布。</summary>
+    private sealed class CatalogCheckpoint(IReleaseCatalog inner, Func<Task> callback) : IReleaseCatalog
+    {
+        /// <summary>历史读取直接交真实发布目录。</summary>
+        public Task<ReleaseSummary> ReadAsync(ActorContext actor, string releaseId, CancellationToken cancellationToken) => inner.ReadAsync(actor, releaseId, cancellationToken);
+
+        /// <summary>完整真实发布验证后触发当前测试限定故障。</summary>
+        public async Task<ReleaseSummary> ResolveAsync(ActorContext actor, string assetId, string? releaseId, CancellationToken cancellationToken)
+        {
+            // 真正PG/S3/Jena返回的结果不能由检查点修改。
+            var result = await inner.ResolveAsync(actor, assetId, releaseId, cancellationToken);
+            await callback();
+            return result;
         }
     }
 }
