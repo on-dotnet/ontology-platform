@@ -1,0 +1,22 @@
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+失败 ModuleRegistersSharedContracts (7ms)
+  从 /Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+  Assertion failed. 预期值不应为 null。
+  正式Query模块尚未实现
+
+  actual: null
+
+  Assert.IsNotNull(method)
+    在 OntologyPlatform.QueryTests.RegistryTests.ModuleRegistersSharedContracts() 位于 /Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/tests/OntologyPlatform.QueryTests/RegistryTests.cs:18
+    在 System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+    在 System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+/Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64) 失败并出现 1 个错误 (1s 079ms)
+退出代码: 2
+
+测试运行摘要: 失败!
+  总计: 1
+  失败: 1
+  成功: 0
+  已跳过: 0
+  持续时间: 1s 473ms
+已完成测试运行，但显示非成功退出代码: 2 (请参阅: https://aka.ms/testingplatform/exitcodes)

@@ -1,0 +1,227 @@
+{
+  "sourceSha": "6652f25af157e2db63a84765a1893035cf9b8f0c",
+  "workingTreeChanges": true,
+  "exitCode": 2,
+  "records": [
+    {
+      "command": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g2-query-d0f680ecac2f-pg",
+        "--memory",
+        "256m",
+        "--cpus",
+        "1",
+        "--publish",
+        "127.0.0.1::5432",
+        "--env",
+        "POSTGRES_PASSWORD",
+        "--env",
+        "POSTGRES_DB",
+        "--tmpfs",
+        "/var/lib/postgresql",
+        "postgres:18.6-trixie@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6"
+      ],
+      "exitCode": 0,
+      "output": "f5e68a2530f60791cd4c8dcfd720cdaebc56b24f8b1e14bf921406750126fa42\n"
+    },
+    {
+      "command": [
+        "docker",
+        "port",
+        "g2-query-d0f680ecac2f-pg",
+        "5432/tcp"
+      ],
+      "exitCode": 0,
+      "output": "127.0.0.1:58749\n"
+    },
+    {
+      "command": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g2-query-d0f680ecac2f-s3",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--publish",
+        "127.0.0.1::9000",
+        "--env",
+        "RUSTFS_ACCESS_KEY",
+        "--env",
+        "RUSTFS_SECRET_KEY",
+        "--env",
+        "RUSTFS_CONSOLE_ENABLE=false",
+        "--tmpfs",
+        "/data:mode=1777",
+        "rustfs/rustfs:1.0.3@sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+        "/data"
+      ],
+      "exitCode": 0,
+      "output": "43e3e78fb49c592981faca371e94eaecf2da8e823143a46bc6ebed9e692a3967\n"
+    },
+    {
+      "command": [
+        "docker",
+        "port",
+        "g2-query-d0f680ecac2f-s3",
+        "9000/tcp"
+      ],
+      "exitCode": 0,
+      "output": "127.0.0.1:58750\n"
+    },
+    {
+      "command": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g2-query-d0f680ecac2f-jena",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--publish",
+        "127.0.0.1::3030",
+        "--mount",
+        "type=bind,src=/private/tmp/g2-query-d0f680ecac2f97xuk056,dst=/fixture,readonly",
+        "--entrypoint",
+        "java",
+        "fuseki:8b85cd963ab3910a87ff4d69819a814fcc536d5f",
+        "-Xmx384m",
+        "-Dlog4j.configurationFile=/fixture/log4j2.properties",
+        "-jar",
+        "/opt/fuseki/fuseki-server.jar",
+        "--config=/fixture/config.ttl"
+      ],
+      "exitCode": 0,
+      "output": "842691fd8ec38618f5fd3d630c4fbec5678238d10f7ea50939079d05ce11a5b0\n"
+    },
+    {
+      "command": [
+        "docker",
+        "port",
+        "g2-query-d0f680ecac2f-jena",
+        "3030/tcp"
+      ],
+      "exitCode": 0,
+      "output": "127.0.0.1:58754\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "build",
+        "backend/tests/OntologyPlatform.QueryTests",
+        "--no-restore"
+      ],
+      "exitCode": 0,
+      "output": "  OntologyPlatform.Contracts -> /Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/bin/Debug/net10.0/OntologyPlatform.Contracts.dll\n  OntologyPlatform.Modules.Governance -> /Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/bin/Debug/net10.0/OntologyPlatform.Modules.Governance.dll\n  OntologyPlatform.Modules.Ontology.Domain -> /Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.Domain.dll\n  OntologyPlatform.Modules.Publishing.Domain -> /Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/bin/Debug/net10.0/OntologyPlatform.Modules.Publishing.Domain.dll\n  OntologyPlatform.Modules.SemanticQuery -> /Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/bin/Debug/net10.0/OntologyPlatform.Modules.SemanticQuery.dll\n  OntologyPlatform.Modules.Ontology -> /Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.dll\n  OntologyPlatform.Modules.Publishing -> /Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/bin/Debug/net10.0/OntologyPlatform.Modules.Publishing.dll\n  OntologyPlatform.QueryTests -> /Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll\n\n已成功生成。\n    0 个警告\n    0 个错误\n\n已用时间 00:00:00.44\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "tool",
+        "restore"
+      ],
+      "exitCode": 0,
+      "output": "工具“dotnet-ef”(版本“10.0.13”)已还原。可用的命令: dotnet-ef\n\n还原成功。\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "tool",
+        "run",
+        "dotnet-ef",
+        "database",
+        "update",
+        "--project",
+        "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance",
+        "--startup-project",
+        "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance",
+        "--no-build"
+      ],
+      "exitCode": 0,
+      "output": "Failed executing DbCommand (8ms) [Parameters=[], CommandType='Text', CommandTimeout='30']\nSELECT \"MigrationId\", \"ProductVersion\"\nFROM governance.\"__EFMigrationsHistory\"\nORDER BY \"MigrationId\";\nAcquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.\nApplying migration '20261025062847_InitialGovernance'.\nApplying migration '20261025144246_AuditScopeSites'.\nAcquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.\nDone.\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "tool",
+        "run",
+        "dotnet-ef",
+        "database",
+        "update",
+        "--project",
+        "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology",
+        "--startup-project",
+        "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology",
+        "--no-build"
+      ],
+      "exitCode": 0,
+      "output": "Failed executing DbCommand (7ms) [Parameters=[], CommandType='Text', CommandTimeout='30']\nSELECT \"MigrationId\", \"ProductVersion\"\nFROM ontology.\"__EFMigrationsHistory\"\nORDER BY \"MigrationId\";\nAcquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.\nApplying migration '20261026003221_InitialOntology'.\nDone.\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "tool",
+        "run",
+        "dotnet-ef",
+        "database",
+        "update",
+        "--project",
+        "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing",
+        "--startup-project",
+        "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing",
+        "--no-build"
+      ],
+      "exitCode": 0,
+      "output": "Failed executing DbCommand (7ms) [Parameters=[], CommandType='Text', CommandTimeout='30']\nSELECT \"MigrationId\", \"ProductVersion\"\nFROM publishing.\"__EFMigrationsHistory\"\nORDER BY \"MigrationId\";\nAcquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.\nApplying migration '20261026015031_InitialPublishing'.\nDone.\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "test",
+        "--project",
+        "backend/tests/OntologyPlatform.QueryTests",
+        "--no-restore",
+        "--no-build"
+      ],
+      "exitCode": 2,
+      "output": "正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)\n失败 FoundEvidenceSurvivesNewServiceInstance (661ms)\n  从 /Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)\n  Assertion failed. 预期值相等。\n  \n  expected: EvidenceRef { EvidenceId = 5acd30b79dc7424ba15248558af601cc.dfe8907dcbdfdcc7c6bd40cfa3d391a8dfc82707c63ffefb61e6e60c9ecde09f, ReleaseId = 5acd30b79dc7424ba15248558af601cc, Scope = ResourceScope { OrganizationId = query-0b7526cf22e84f04a96df5e3c3121aed, SiteIds = System.String[] }, GraphIri = urn:ontology-platform:release:5acd30b79dc7424ba15248558af601cc:data, SubjectIri = urn:synthetic:query-0b7526cf22e84f04a96df5e3c3121aed:site-a:local:heat-1, PredicateIri = urn:ontology-platform:vocabulary:organizationId, ObjectTerm = RdfTerm { Kind = Literal, Value = query-0b7526cf22e84f04a96df5e3c3121aed, Datatype = , Language =  }, SourceId = local-synthetic, SourceRecordId = assertion-2, SourceObjectKey = releases/5acd30b79dc7424ba15248558af601cc/source-3-815483ccee064c705896e517e06dc1461b49e713c7a26756976cc70d10821a7b.ttl, ContentHash = 815483ccee064c705896e517e06dc1461b49e713c7a26756976cc70d10821a7b, ValidFromUtc = 2026/10/1 00:00:00 +00:00, ValidToUtc = , ObservedAtUtc = 2026/10/26 00:00:00 +00:00, ModelVersion = 5acd30b79dc7424ba15248558af601cc, MappingVersion = , Synthetic = True }\n  actual:   EvidenceRef { EvidenceId = 5acd30b79dc7424ba15248558af601cc.dfe8907dcbdfdcc7c6bd40cfa3d391a8dfc82707c63ffefb61e6e60c9ecde09f, ReleaseId = 5acd30b79dc7424ba15248558af601cc, Scope = ResourceScope { OrganizationId = query-0b7526cf22e84f04a96df5e3c3121aed, SiteIds = System.String[] }, GraphIri = urn:ontology-platform:release:5acd30b79dc7424ba15248558af601cc:data, SubjectIri = urn:synthetic:query-0b7526cf22e84f04a96df5e3c3121aed:site-a:local:heat-1, PredicateIri = urn:ontology-platform:vocabulary:organizationId, ObjectTerm = RdfTerm { Kind = Literal, Value = query-0b7526cf22e84f04a96df5e3c3121aed, Datatype = , Language =  }, SourceId = local-synthetic, SourceRecordId = assertion-2, SourceObjectKey = releases/5acd30b79dc7424ba15248558af601cc/source-3-815483ccee064c705896e517e06dc1461b49e713c7a26756976cc70d10821a7b.ttl, ContentHash = 815483ccee064c705896e517e06dc1461b49e713c7a26756976cc70d10821a7b, ValidFromUtc = 2026/10/1 00:00:00 +00:00, ValidToUtc = , ObservedAtUtc = 2026/10/26 00:00:00 +00:00, ModelVersion = 5acd30b79dc7424ba15248558af601cc, MappingVersion = , Synthetic = True }\n  \n  Assert.AreEqual(result.Evidence[0], evidence)\n    在 OntologyPlatform.QueryTests.GatewayTests.FoundEvidenceSurvivesNewServiceInstance() 位于 /Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/tests/OntologyPlatform.QueryTests/GatewayTests.cs:45\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n/Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64) 失败并出现 1 个错误 (6s 415ms)\n退出代码: 2\n\n测试运行摘要: 失败!\n  总计: 11\n  失败: 1\n  成功: 10\n  已跳过: 0\n  持续时间: 6s 683ms\n已完成测试运行，但显示非成功退出代码: 2 (请参阅: https://aka.ms/testingplatform/exitcodes)\n"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g2-query-d0f680ecac2f-jena"
+      ],
+      "exitCode": 0,
+      "output": "g2-query-d0f680ecac2f-jena\n"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g2-query-d0f680ecac2f-s3"
+      ],
+      "exitCode": 0,
+      "output": "g2-query-d0f680ecac2f-s3\n"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g2-query-d0f680ecac2f-pg"
+      ],
+      "exitCode": 0,
+      "output": "g2-query-d0f680ecac2f-pg\n"
+    }
+  ]
+}
