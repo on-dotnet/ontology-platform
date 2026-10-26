@@ -1,0 +1,15 @@
+# C3 可执行清理器独立审查
+
+独立只读Reviewer cleanup_review；三文件候选0a920f4原27 tests独立PASS，但额外真实tmp fixture发现C0/I4/M2，Master未放行真实Apply：keep后代随整树删除；current/protected/locked缓存绕过；ls-remote到push的tip竞态；effective insteadOf/pushInsteadOf导向外项目；合法history Dockerfile路径被拒；history删除后null响应未记failed日志。
+
+Owner在独立g2-observability工具树仅修改owned engine/tests修复，提交357d99a546124ab73d843b929d432ac265ec42dd；Master直接FF而非cherry-pick。精确RED日志与33test GREEN已归档。
+
+Reviewer实际独立33/33 PASS（75.758s），额外9个tmp边界全部exit1正确拒绝并保留目标/后续资源，C0/I0/M0、原4I/2M关闭：keep祖先/后代、current/protected/locked cache；push时tip变化由精确delete lease拒绝，新tip保留；fetch/push实际URL重写拒绝；history删除后null严格记before+failed，实际CLI exit0/after NOT_VERIFIED/无Traceback、后续停止。18条实际history安全7字段兼容，Dockerfile两已批准形式均通过。无真实资源Apply、无工程/refs写入。
+
+固定文件SHA256：wrapper b3ba0ae232a6044209193336b279ae0ddf68493e3ab58b2e8ae40f38e97909a7；engine39fa2844f639a7b7d376b13fa2cc6895762f23499b934d87a81656ad23a547a4；tests28b8cfa1444fd5aaa5dead39e92cde829c269f11beadcc43026e5558cb6e55b2。Root/CLI兼容入口跨平台；cache安全删除依POSIX nofollow，缺能力的平台明确REFUSED，不用不安全fallback。
+
+此为工具不可变提交审查，不替代Master整合inspector/公开检查/实际计划与真实Apply独立验收；仍须实际同HeadCI后才执行。
+
+## 精确公开缓存例外 ad2b70c
+
+独立cleanup_review在ad2b70cc60efd4eb5a95e4bc9bbe9394f8af8a76实际35/35 PASS（77.625s）及8额外正反场景PASS，C0/I0/M0；原4I未回归。唯一精确language-subtag-registry@0.3.23公开22bytes、固定SHA、regular/nofollow例外；不同位置/内容/大小/链接、额外.env/PFX均拒绝；失效完整元数据fingerprint在读取公开内容之前拒绝。官方来源由Master独立SHA512 tar校验见public-cache-asset-proof.json，Reviewer额外网络重取TLS超时，不计PASS。engine SHA256248552a10cee148daa8f97976fb609ebf93f8cb7353418be768a80b7455462fe，tests28f2e7a205627b36af1fb3111959f77b834e66dffdbcfdcbccfa80045da3558d。

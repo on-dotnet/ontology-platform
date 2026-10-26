@@ -4,7 +4,7 @@
 
 - 授权：[原文](../evidence/PRE-G3-CLEANUP-FIX-002/authorization-v1.md)；BaseSha=`de2c020c486df5557b1b17f6b62c1befd96312f2`，fetch后origin/main同值。
 - Master唯一main集成/公共文件写者，分支`codex/PRE-G3-CLEANUP-FIX-002`，复用当前pre-g3-hygiene托管树；不启动G3、不改G2业务/合同/锁/运行配置、不调用付费模型。
-- Master owned_paths：根AGENTS/PLANS、docs/development/resource-lifecycle.md、docs/tasks/PRE-G3-CLEANUP-FIX-002.md、docs/tasks/current-authorization.md、docs/evidence/PRE-G3-CLEANUP-FIX-002/**、docs/handoffs/2026-10-26-pre-g3-cleanup-fix.md、scripts/maintenance/inspect-resources.ps1、scripts/maintenance/audit-public-history.py、scripts/tests/PublicHistory.Tests.py、scripts/verify.ps1（仅新真实清理测试接入）。
+- Master owned_paths：根AGENTS/PLANS、docs/development/resource-lifecycle.md、docs/tasks/PRE-G3-CLEANUP-FIX-002.md、docs/tasks/current-authorization.md、docs/evidence/PRE-G3-CLEANUP-FIX-002/**、docs/handoffs/2026-10-26-pre-g3-cleanup-fix.md、scripts/maintenance/inspect-resources.ps1、scripts/maintenance/audit-public-history.py、scripts/tests/PublicHistory.Tests.py、scripts/tests/InspectorResources.Tests.py、scripts/verify.ps1（仅新真实清理测试接入）。
 - 工具Owner cleanup_implementer：独立复用已闭合g2-observability托管树，切新任务枝`codex/PRE-G3-CLEANUP-FIX-002-tools`；仅 owned_paths=`scripts/maintenance/cleanup-resources.ps1`、`scripts/maintenance/cleanup_resources.py`、`scripts/tests/CleanupResources.Tests.py`。原OBS枝/提交保留，ignored只读复用、不碰其他路径；该树在Owner释放且集成Review/CI前从清理候选暂时排除。新建树不是必要，避免无依据影响历史树。
 - read_only_dependencies：业务backend/apps/semantic、合同、原Review V2构包器、历史证据/ADR、所有私有runtime/凭证。Git/Docker调查Agent只读，不共享索引写入；所有实际Apply由Master串行执行。
 

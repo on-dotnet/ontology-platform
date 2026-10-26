@@ -4,9 +4,9 @@
 
 ## 归属与分类
 
-任务合同冻结Owner、Reviewer、Base、分支/规范Worktree、owned_paths及公共文件Single Writer。Master唯一集成main；独立写Agent保持独立托管Worktree与任务分支，不能为减少数量改回共用main串行开发。默认只读命令：`pwsh -NoProfile -File scripts/maintenance/inspect-resources.ps1`；Docker明确加`-IncludeDocker`。脚本仅stdout，不提供Apply/删除入口，兼容PowerShell7/macOS/Windows，不硬编码用户路径，不读取凭证/env/卷内容。
+任务合同冻结Owner、Reviewer、Base、分支/规范Worktree、owned_paths及公共文件Single Writer。Master唯一集成main；独立写Agent保持独立托管Worktree与任务分支，不能为减少数量改回共用main串行开发。默认只读命令：`pwsh -NoProfile -File scripts/maintenance/inspect-resources.ps1`；Docker明确加`-IncludeDocker`。盘点脚本仅stdout；执行器另用cleanup-resources.ps1，默认DryRun、显式Apply，兼容PowerShell7/macOS/Windows入口，不硬编码用户路径，不读取凭证/env/卷内容。安全cache删除依赖POSIX nofollow描述符，缺能力的平台明确REFUSED/NOT_RUN，不用不安全fallback。
 
-逐资源记录准确ID/原tip、归属依据、阶段/CI/审查、状态、体积估算、风险和动作。状态ACTIVE、KEEP、SAFE_CANDIDATE、AMBIGUOUS、ORPHANED_METADATA；无法确认跨机器/旧聊天引用时保留，给复查触发条件。Git祖先只是必要证据之一；非祖先需git cherry/稳定patch-id、最终tree/路径差异及PR/提交说明，不能仅凭年龄/前缀/merged列表删除。
+逐资源记录准确ID/原tip、归属依据、阶段/CI/审查、状态、体积估算、风险和动作。状态ACTIVE、KEEP、SAFE_CANDIDATE、AMBIGUOUS、ORPHANED_METADATA；阶段已由人类确认关闭后，不再以无法证明历史聊天不存在一概保留；当前任务/实际锁定、未整合独特提交、具体私有runtime/PFX/唯一证据才构成保留事实，逐项列准确对象和解除条件。Git祖先只是必要证据之一；非祖先需git cherry/稳定patch-id、最终tree/路径差异及PR/提交说明，不能仅凭年龄/前缀/merged列表删除。
 
 ## 顺序与边界
 
@@ -22,3 +22,13 @@
 ## DoD 与交接
 
 输出实际before/after数量/容量、成功动作、未清理原因和复查触发条件；保留开发环境抽查与工程验证证据。任务/ADR/失败分析/历史Git不删。交接写明确提交、测试/CI/run、恢复入口、未运行平台与新Master开始时动态fetch的origin/main；不让旧SHA成为未来固定基线。阶段结束交一个从已提交Head生成并独立复检的V2包，停在当前复审关口，不自动开始下一阶段Plan或功能。
+
+## 实际清理门禁（PRE-G3-CLEANUP-FIX-002）
+
+已确认安全候选必须按期真实Apply；存在安全候选但实际0删除=FAIL，不能以PARTIAL或统一KEEP/DEFERRED替代整改。仅当准确命令/资源级错误证明不可越过时该项BLOCKED，其它安全项继续推进。所有阶段关闭事实以当前明确授权/验收记录为准，不追索无法取得的历史聊天不存在证明。
+
+执行器：`pwsh -NoProfile -File scripts/maintenance/cleanup-resources.ps1 -Root <本项目干净任务树> -PlanPath <已审JSON白名单>`默认DryRun，须输出具体WOULD_DELETE或拒绝原因；只有明确`-Apply -LogPath <新JSONL路径>`才删除。白名单包含project、仓库Root/commonDir/原始及有效origin、expectedMainSha、带时区created/expires、准确IDs/tips、protectedWorktrees/keep、每项已提交CLOSED合成/可再生证据、cache metadata fingerprint及Docker版本/引用/状态。计划过期、资源替换、脏/锁定/保护路径、PR/外项目/未知私有资料均fail closed。Git远端删除使用准确expectedTip原子lease作为compare-and-delete约束：只收紧已授权删除，不推新commit、不覆盖历史，不使用无条件--force。
+
+默认网络不提供删除操作；全局Docker cache不提供prune。history按具体短Ref/固定builder删除，须保留失败构建摘要；history删除不等于cache释放。保留一套真实可复用开发环境，额外保留须写明准确runtime/PFX/唯一恢复绑定，不以所有测试样例可能唯一为通用理由。闭合且具任务/夹具/归档证据的合成测试组可删除，无需逐条证明合成数据无价值。
+
+新增验收必须包含真实临时Git和mock Docker的safe Apply与拒绝误删、项目实际before/after、逐条删除日志、KEEP集合完整和健康探针或具体限制；ReviewPackage回归不能替代资源回收。公开仓库另做全部可达history/任务refs/已提交证据有限秘密检查；只记录路径/类别，辅助本地refs不自动等同已公开，私有路径metadata-only，不擅自改远端历史。所有未运行平台/语义隐私/任意混淆仍NOT_VERIFIED。GitHub CI必须同Head真实成功才标PASS。

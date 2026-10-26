@@ -20,3 +20,7 @@
 ## 阶段收尾与资源生命周期（PRE-G3-HYGIENE-001）
 
 每里程碑获审后按[生命周期规范](docs/development/resource-lifecycle.md)记录分支/Worktree、Docker、ZIP和ignored目录归属，核实集成与跨机器活跃引用；先commit/push、独立Review及同Head CI，再做白名单安全回收。保护活跃/锁定/旧Master树、未集成代码、私有工具与持久数据，疑义保留并写明复查条件；不触碰全局codex/其他项目/生产。记录before/after数量、容量、准确命令/退出码、实际回收及DEFERRED理由，提交测试恢复入口写下一阶段交接。维护多Agent独立托管Worktree并行能力，Master唯一集成main；不为减少资源恢复共用main串行开发。无需每个安全小步骤再询问，但有歧义/不可逆/生产/跨项目操作暂停对应项。Review ZIP默认采用[V2合同](docs/development/review-package-spec.md)，全部现行非证据源码和当前任务证据各存一次、历史证据/blob/二进制变更完整索引；只交一个已提交Head且独立重开的compact包，旧包校验兼容，不改历史SHA。交付后停等当前关口复审，不自动进入下阶段。
+
+## 实际回收纠偏（PRE-G3-CLEANUP-FIX-002）
+
+阶段已确认关闭且精确安全候选满足条件时，Master必须使用已审白名单实际清理，不再用不可取得的旧聊天证明或统一DEFERRED掩盖缺口。存在安全候选却0删除=FAIL；具体锁定/独特未整合提交/私有runtime/PFX/唯一数据或命令故障逐项列对象、证据、解除条件，其它安全项继续。执行器默认DryRun，Apply需精确ID/期望版本/目录边界/过期拒绝/重验及before-command-exit-after日志；当前/locked/keep路径及后代保护，远端expectedTip用原子compare-and-delete，不覆盖Git历史。阶段DoD必须包含真实资源回收验收与开发环境保留验证；构包54测试不能替代清理测试。公开Git history/任务refs/证据检查只报路径/类别、不泄漏原秘密，不改远端历史。多Agent独立Worktree和Master唯一main集成规则保持，禁止跨项目/全局清理和自动G3。详见生命周期规范及FIX-002任务合同。

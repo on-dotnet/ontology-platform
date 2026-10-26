@@ -1,0 +1,323 @@
+# 已批准的准确安全资源候选
+
+本表是 PRE-G3-CLEANUP-FIX-002 资源归属审核证据。原 G0/G1/M0/G2/PRE-G3-HYGIENE 阶段人类确认 CLOSED / 已关闭；仅下列精确资源证明属于本项目已验收 synthetic / 合成测试或可再生工具产物。不能把名称前缀单独当证明。C3工具子任务仅在独立审查、同HeadCI与Master集成通过后 CLOSED；Apply计划须引用本表已提交的SHA并重新读取真实资源。
+
+Git提交/无PR/patch-id/ignored元数据详见git-before-classification；Docker精确依赖和版本详见docker-before。M0四组准确创建记录和合成持久化验收见M0 evidence/runtime-resource-snapshot等；Wave2两组见G1 Wave2/closeout交接、container-bindings、runtime-stop与wave2-runtime的随机身份测试夹具。两个容器docker diff仅生成Quarkus/JVM临时目录和PG运行目录，数据存独立合成PG卷，不用-v删容器。13镜像经本项目Buildx history OCI附件到image-ID映射审查，当前无容器引用；保留最新AppHost+固定测试镜像及固定依赖。18history的VCS/context/记录状态均属本项目，失败日志摘要先归档。
+
+## 准确白名单
+
+- cache | /Users/chasen/.codex/worktrees/m0-containers/ontology-platform/.tools/pythonlibs | M0-MAC-PORTABILITY-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- worktree | /Users/chasen/.codex/worktrees/m0-containers/ontology-platform | M0-MAC-PORTABILITY-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/m0-scripts/ontology-platform/.tools/pnpm | M0-MAC-PORTABILITY-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/m0-scripts/ontology-platform/.tools/pythonlibs | M0-MAC-PORTABILITY-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- worktree | /Users/chasen/.codex/worktrees/m0-scripts/ontology-platform | M0-MAC-PORTABILITY-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-fe/ontology-platform/.tools/pythonlibs | G2-FE-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-fe/ontology-platform/apps/web/.next | G2-FE-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-fe/ontology-platform/apps/web/node_modules | G2-FE-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-fe/ontology-platform/node_modules | G2-FE-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-fe/ontology-platform/apps/web/artifacts/test-results/g2/.last-run.json | G2-FE-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-fe/ontology-platform/apps/web/artifacts/test-results/ui/.last-run.json | G2-FE-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-fe/ontology-platform/apps/web/tsconfig.tsbuildinfo | G2-FE-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- worktree | /Users/chasen/.codex/worktrees/g2-fe/ontology-platform | G2-FE-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/.tools/pnpm-store | G2-FINAL-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/.tools/pythonlibs | G2-FINAL-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/apps/web/.next | G2-FINAL-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/apps/web/node_modules | G2-FINAL-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/AppHost/bin | G2-FINAL-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/AppHost/obj | G2-FINAL-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/bin | G2-FINAL-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/obj | G2-FINAL-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/bin | G2-FINAL-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/obj | G2-FINAL-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Hosts/OntologyPlatform.InfrastructureApi/bin | G2-FINAL-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Hosts/OntologyPlatform.InfrastructureApi/obj | G2-FINAL-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/bin | G2-FINAL-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/obj | G2-FINAL-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/bin | G2-FINAL-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/obj | G2-FINAL-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/bin | G2-FINAL-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/obj | G2-FINAL-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/bin | G2-FINAL-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/obj | G2-FINAL-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/bin | G2-FINAL-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/obj | G2-FINAL-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/bin | G2-FINAL-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/obj | G2-FINAL-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/bin | G2-FINAL-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/obj | G2-FINAL-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/ServiceDefaults/bin | G2-FINAL-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/ServiceDefaults/obj | G2-FINAL-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin | G2-FINAL-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.AgentTests/obj | G2-FINAL-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin | G2-FINAL-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/obj | G2-FINAL-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/bin | G2-FINAL-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/obj | G2-FINAL-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin | G2-FINAL-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/obj | G2-FINAL-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin | G2-FINAL-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.QueryTests/obj | G2-FINAL-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin | G2-FINAL-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/obj | G2-FINAL-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin | G2-FINAL-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/obj | G2-FINAL-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/node_modules | G2-FINAL-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/scripts/acceptance/__pycache__ | G2-FINAL-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/apps/web/tsconfig.tsbuildinfo | G2-FINAL-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/artifacts/governance-integration.json | G2-FINAL-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- worktree | /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform | G2-FINAL-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/.tools/pythonlibs | G2-HOST-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/AppHost/bin | G2-HOST-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/AppHost/obj | G2-HOST-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/bin | G2-HOST-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/obj | G2-HOST-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/bin | G2-HOST-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/obj | G2-HOST-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/Hosts/OntologyPlatform.InfrastructureApi/bin | G2-HOST-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/Hosts/OntologyPlatform.InfrastructureApi/obj | G2-HOST-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/bin | G2-HOST-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/obj | G2-HOST-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/bin | G2-HOST-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/obj | G2-HOST-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/bin | G2-HOST-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/obj | G2-HOST-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/bin | G2-HOST-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/obj | G2-HOST-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/bin | G2-HOST-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/obj | G2-HOST-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/bin | G2-HOST-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/obj | G2-HOST-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/bin | G2-HOST-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/obj | G2-HOST-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/ServiceDefaults/bin | G2-HOST-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/ServiceDefaults/obj | G2-HOST-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin | G2-HOST-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.AgentTests/obj | G2-HOST-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin | G2-HOST-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/obj | G2-HOST-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/bin | G2-HOST-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/obj | G2-HOST-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin | G2-HOST-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/obj | G2-HOST-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin | G2-HOST-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.QueryTests/obj | G2-HOST-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin | G2-HOST-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/obj | G2-HOST-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin | G2-HOST-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/obj | G2-HOST-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/scripts/acceptance/__pycache__ | G2-HOST-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- worktree | /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform | G2-HOST-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-observability/ontology-platform/.tools/pythonlibs | PRE-G3-CLEANUP-FIX-002-tools | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-observability/ontology-platform/scripts/acceptance/__pycache__ | PRE-G3-CLEANUP-FIX-002-tools | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- worktree | /Users/chasen/.codex/worktrees/g2-observability/ontology-platform | PRE-G3-CLEANUP-FIX-002-tools | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-pub/ontology-platform/.tools/pythonlibs | G2-PUB-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/AppHost/obj | G2-PUB-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/bin | G2-PUB-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/obj | G2-PUB-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/bin | G2-PUB-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/obj | G2-PUB-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/Hosts/OntologyPlatform.InfrastructureApi/obj | G2-PUB-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/obj | G2-PUB-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/bin | G2-PUB-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/obj | G2-PUB-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/bin | G2-PUB-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/obj | G2-PUB-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/bin | G2-PUB-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/obj | G2-PUB-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/bin | G2-PUB-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/obj | G2-PUB-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/bin | G2-PUB-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/obj | G2-PUB-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/obj | G2-PUB-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/ServiceDefaults/bin | G2-PUB-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/ServiceDefaults/obj | G2-PUB-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/obj | G2-PUB-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/obj | G2-PUB-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin | G2-PUB-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/obj | G2-PUB-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/obj | G2-PUB-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/obj | G2-PUB-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- worktree | /Users/chasen/.codex/worktrees/g2-pub/ontology-platform | G2-PUB-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-qa-fix/ontology-platform/.tools/pythonlibs | G2-QA-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- worktree | /Users/chasen/.codex/worktrees/g2-qa-fix/ontology-platform | G2-QA-FIX | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/.tools/pythonlibs | G2-READINESS-TEST | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/AppHost/bin | G2-READINESS-TEST | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/AppHost/obj | G2-READINESS-TEST | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/bin | G2-READINESS-TEST | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/obj | G2-READINESS-TEST | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/bin | G2-READINESS-TEST | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/obj | G2-READINESS-TEST | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/Hosts/OntologyPlatform.InfrastructureApi/bin | G2-READINESS-TEST | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/Hosts/OntologyPlatform.InfrastructureApi/obj | G2-READINESS-TEST | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/bin | G2-READINESS-TEST | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/obj | G2-READINESS-TEST | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/bin | G2-READINESS-TEST | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/obj | G2-READINESS-TEST | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/bin | G2-READINESS-TEST | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/obj | G2-READINESS-TEST | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/bin | G2-READINESS-TEST | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/obj | G2-READINESS-TEST | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/bin | G2-READINESS-TEST | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/obj | G2-READINESS-TEST | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/bin | G2-READINESS-TEST | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/obj | G2-READINESS-TEST | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/bin | G2-READINESS-TEST | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/obj | G2-READINESS-TEST | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/ServiceDefaults/bin | G2-READINESS-TEST | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/ServiceDefaults/obj | G2-READINESS-TEST | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin | G2-READINESS-TEST | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/tests/OntologyPlatform.AgentTests/obj | G2-READINESS-TEST | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin | G2-READINESS-TEST | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/obj | G2-READINESS-TEST | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/bin | G2-READINESS-TEST | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/obj | G2-READINESS-TEST | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin | G2-READINESS-TEST | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/obj | G2-READINESS-TEST | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin | G2-READINESS-TEST | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/tests/OntologyPlatform.QueryTests/obj | G2-READINESS-TEST | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin | G2-READINESS-TEST | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/obj | G2-READINESS-TEST | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin | G2-READINESS-TEST | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/obj | G2-READINESS-TEST | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- worktree | /Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform | G2-READINESS-TEST | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/m0-master/ontology-platform/.tools/pnpm | M0-MAC-PORTABILITY-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/m0-master/ontology-platform/.tools/pythonlibs | M0-MAC-PORTABILITY-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/src/AppHost/bin | M0-MAC-PORTABILITY-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/src/AppHost/obj | M0-MAC-PORTABILITY-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/src/Hosts/OntologyPlatform.InfrastructureApi/bin | M0-MAC-PORTABILITY-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/src/Hosts/OntologyPlatform.InfrastructureApi/obj | M0-MAC-PORTABILITY-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/src/ServiceDefaults/bin | M0-MAC-PORTABILITY-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/src/ServiceDefaults/obj | M0-MAC-PORTABILITY-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/bin | M0-MAC-PORTABILITY-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- cache | /Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/obj | M0-MAC-PORTABILITY-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- worktree | /Users/chasen/.codex/worktrees/m0-master/ontology-platform | M0-MAC-PORTABILITY-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- git-local-branch | codex/G1-CLOSE-001-master | G1-CLOSE-001-master | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- git-local-branch | codex/G1-CLOSE-OBS | G1-CLOSE-OBS | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- git-local-branch | codex/G1-CLOSE-SEC | G1-CLOSE-SEC | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- git-local-branch | codex/G1-FE-001 | G1-FE-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- git-local-branch | codex/G1-OBS-001 | G1-OBS-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- git-local-branch | codex/G1-WAVE2-master | G1-WAVE2-master | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- git-local-branch | codex/M0-containers | M0-MAC-PORTABILITY-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- git-local-branch | codex/M0-master | M0-MAC-PORTABILITY-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- git-local-branch | codex/M0-scripts | M0-MAC-PORTABILITY-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- git-local-branch | codex/PRE-G3-HYGIENE-001 | PRE-G3-HYGIENE-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- git-local-branch | codex/PRE-G3-CLEANUP-FIX-002-tools | PRE-G3-CLEANUP-FIX-002-tools | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- git-remote-branch | codex/G1-CLOSE-001-master | G1-CLOSE-001-master | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- git-remote-branch | codex/G1-CLOSE-OBS | G1-CLOSE-OBS | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- git-remote-branch | codex/G1-CLOSE-SEC | G1-CLOSE-SEC | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- git-remote-branch | codex/G1-FE-001 | G1-FE-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- git-remote-branch | codex/G1-OBS-001 | G1-OBS-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- git-remote-branch | codex/G1-WAVE2-master | G1-WAVE2-master | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- git-remote-branch | codex/M0-containers | M0-MAC-PORTABILITY-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- git-remote-branch | codex/M0-master | M0-MAC-PORTABILITY-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- git-remote-branch | codex/M0-scripts | M0-MAC-PORTABILITY-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- git-remote-branch | codex/PRE-G3-HYGIENE-001 | PRE-G3-HYGIENE-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- git-remote-branch | codex/g1-infra-001-aspire | G1-INFRA-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- git-remote-branch | codex/g1-infra-001-review-pack | G1-INFRA-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- git-remote-branch | codex/PRE-G3-CLEANUP-FIX-002-tools | PRE-G3-CLEANUP-FIX-002-tools | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-container | 18a8b1844db808716aa4479539dd51745df1c3da88c884dd7cfc0e87ec3299a1 | G1-WAVE2 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-container | 731a3eb86c2b32ce493c928e52f3c3f544203ebd8229c1122e8c1f2361509ab9 | G1-WAVE2 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-volume | m0-mac-b-20261025-fuseki-data | M0-MAC-PORTABILITY-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-volume | m0-mac-b-20261025-postgres-data | M0-MAC-PORTABILITY-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-volume | m0-mac-b-20261025-rustfs-data | M0-MAC-PORTABILITY-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-volume | m0-mac-b-trace-20261025-fuseki-data | M0-MAC-PORTABILITY-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-volume | m0-mac-b-trace-20261025-postgres-data | M0-MAC-PORTABILITY-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-volume | m0-mac-b-trace-20261025-rustfs-data | M0-MAC-PORTABILITY-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-volume | m0-mac-observed-17d4d914-fuseki-data | M0-MAC-PORTABILITY-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-volume | m0-mac-observed-17d4d914-postgres-data | M0-MAC-PORTABILITY-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-volume | m0-mac-observed-17d4d914-rustfs-data | M0-MAC-PORTABILITY-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-volume | m0-mac-observed-b37a079e-fuseki-data | M0-MAC-PORTABILITY-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-volume | m0-mac-observed-b37a079e-postgres-data | M0-MAC-PORTABILITY-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-volume | m0-mac-observed-b37a079e-rustfs-data | M0-MAC-PORTABILITY-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-volume | wave2-a5431c01414a-alloy-data | G1-WAVE2 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-volume | wave2-a5431c01414a-grafana-data | G1-WAVE2 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-volume | wave2-a5431c01414a-loki-data | G1-WAVE2 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-volume | wave2-a5431c01414a-postgres-data | G1-WAVE2 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-volume | wave2-a5431c01414a-prometheus-data | G1-WAVE2 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-volume | wave2-a5431c01414a-tempo-data | G1-WAVE2 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-volume | wave2-a19529d4edb4-alloy-data | G1-WAVE2 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-volume | wave2-a19529d4edb4-grafana-data | G1-WAVE2 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-volume | wave2-a19529d4edb4-loki-data | G1-WAVE2 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-volume | wave2-a19529d4edb4-postgres-data | G1-WAVE2 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-volume | wave2-a19529d4edb4-prometheus-data | G1-WAVE2 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-volume | wave2-a19529d4edb4-tempo-data | G1-WAVE2 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-image | sha256:24e1d917e37b5ba1b9421a4b0e5a2bb91c25e83adad2e3e0946002aceb519776 | G2-THIN-SLICE-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-image | sha256:56e4431d4fcded645035ad120070d06437d2785ae1bf10dd788e1ad7e979b224 | G2-THIN-SLICE-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-image | sha256:59f3801d866d6349e7f66b75109d6e15c86beb7e15a478aaafe98bf72a3a901d | G2-THIN-SLICE-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-image | sha256:648cf618fef451847f3e8117c4dfa9c71ede24bbb89103fd7299601f98937ce3 | G2-THIN-SLICE-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-image | sha256:6662114156e78418a3bd46b1a15d5041ea1d0cd4f6706dac36e277fe3d89e678 | G2-THIN-SLICE-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-image | sha256:675390c4fdeed9150317e6684a4f9f35a3cf661d8b220bfc745e6c0d08a00cb3 | G2-THIN-SLICE-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-image | sha256:7c9396626b8794ef2604ece4dea733a7f3d407e34646d8b9f2093c97d67f1974 | G2-THIN-SLICE-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-image | sha256:838f6b7e22c0daa92ceb2481a1673a47923dc44d19a963243e7efb3737a432f5 | G2-THIN-SLICE-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-image | sha256:868102816b13803cbc6696441161de243c0632e35ce0a33058008362e12b790c | G2-THIN-SLICE-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-image | sha256:97c745b6e0107d25d060b164527ec0cbde47d27fc80c3baddff383a961f80faf | G2-THIN-SLICE-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-image | sha256:a2d1eeece49406d089b42137334f99be5e6e1c39120c5190a1a54666f1999c24 | G2-THIN-SLICE-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-image | sha256:b414ad0d1bcd7e6d8dceb41462b4b16d2209d26f0d38a0f46c09c4d3e0b866c2 | G2-THIN-SLICE-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-image | sha256:ce4c9eaa37ed309737b8dd438bb44e027f8a58835e3e3c85110a8accdcb8ccfe | G2-THIN-SLICE-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-history | tqd6xilgezautwa15exusnc0i | G2-THIN-SLICE-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-history | 8eoav2lsmbdodq5zcocw9fk0g | G2-THIN-SLICE-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-history | lm4mju36p53alxm5sjikkmjd0 | G2-THIN-SLICE-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-history | 0gbrzldln4ju6rajgnf8lpai0 | G2-THIN-SLICE-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-history | sw7gm5rh39dhmbtnwqttksufo | G2-THIN-SLICE-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-history | q3nyzqz7dc2ve8zg0s4le025q | G2-THIN-SLICE-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-history | v0adsatiylrmjgbhqb5xxirxg | G2-THIN-SLICE-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-history | j5dn47c0cb2tcwce9c9geibeg | G2-THIN-SLICE-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-history | wyqyudo9ml4su6lwv42572k9f | G2-THIN-SLICE-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-history | wfy618td2fr5z0o43n19g51mg | G2-THIN-SLICE-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-history | xlro0rjcajs31jba7yffq0lmq | G2-THIN-SLICE-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-history | jytynl3c1hcqe65an0uksmwuw | G2-THIN-SLICE-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-history | 07hrath9f7wuhcetgybgh8422 | G2-THIN-SLICE-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-history | 15wxkh2jyaa5kzejl8yhksph5 | G2-THIN-SLICE-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-history | oig58wowfr1qz3tn8rlcp99di | M0-MAC-PORTABILITY-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-history | zo1g9e3r86l3buadw1j9aok18 | M0-MAC-PORTABILITY-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-history | 9f3v88w973zdi6d2pz5zl7bhf | M0-MAC-PORTABILITY-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+- docker-history | 1qb12xansacxsmjbx9qwq66df | M0-MAC-PORTABILITY-001 | CLOSED / 已关闭 | synthetic / 合成 / 可再生
+
+## 必须保留的具体对象
+
+- /Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform：当前Master/主checkout，或具体私有runtime/未等价集成成果保护（见JSON逐项原因）。
+- /Users/chasen/Developer/repos/ontology-platform：当前Master/主checkout，或具体私有runtime/未等价集成成果保护（见JSON逐项原因）。
+- /Users/chasen/.codex/worktrees/g2-master/ontology-platform：当前Master/主checkout，或具体私有runtime/未等价集成成果保护（见JSON逐项原因）。
+- /Users/chasen/.codex/worktrees/g2-query/ontology-platform：当前Master/主checkout，或具体私有runtime/未等价集成成果保护（见JSON逐项原因）。
+- /Users/chasen/.codex/worktrees/g2-security/ontology-platform：当前Master/主checkout，或具体私有runtime/未等价集成成果保护（见JSON逐项原因）。
+- /Users/chasen/.codex/worktrees/g2-sem/ontology-platform：当前Master/主checkout，或具体私有runtime/未等价集成成果保护（见JSON逐项原因）。
+- g2-712190660deb-alloy-data：对应g2-master三个准确私有runtime/PFX/realm恢复组；ef979为选定可复用环境，另两组依附件暂保留。
+- g2-712190660deb-fuseki-data：对应g2-master三个准确私有runtime/PFX/realm恢复组；ef979为选定可复用环境，另两组依附件暂保留。
+- g2-712190660deb-grafana-data：对应g2-master三个准确私有runtime/PFX/realm恢复组；ef979为选定可复用环境，另两组依附件暂保留。
+- g2-712190660deb-loki-data：对应g2-master三个准确私有runtime/PFX/realm恢复组；ef979为选定可复用环境，另两组依附件暂保留。
+- g2-712190660deb-postgres-data：对应g2-master三个准确私有runtime/PFX/realm恢复组；ef979为选定可复用环境，另两组依附件暂保留。
+- g2-712190660deb-prometheus-data：对应g2-master三个准确私有runtime/PFX/realm恢复组；ef979为选定可复用环境，另两组依附件暂保留。
+- g2-712190660deb-rustfs-data：对应g2-master三个准确私有runtime/PFX/realm恢复组；ef979为选定可复用环境，另两组依附件暂保留。
+- g2-712190660deb-tempo-data：对应g2-master三个准确私有runtime/PFX/realm恢复组；ef979为选定可复用环境，另两组依附件暂保留。
+- g2-b59e68191ca0-alloy-data：对应g2-master三个准确私有runtime/PFX/realm恢复组；ef979为选定可复用环境，另两组依附件暂保留。
+- g2-b59e68191ca0-fuseki-data：对应g2-master三个准确私有runtime/PFX/realm恢复组；ef979为选定可复用环境，另两组依附件暂保留。
+- g2-b59e68191ca0-grafana-data：对应g2-master三个准确私有runtime/PFX/realm恢复组；ef979为选定可复用环境，另两组依附件暂保留。
+- g2-b59e68191ca0-loki-data：对应g2-master三个准确私有runtime/PFX/realm恢复组；ef979为选定可复用环境，另两组依附件暂保留。
+- g2-b59e68191ca0-postgres-data：对应g2-master三个准确私有runtime/PFX/realm恢复组；ef979为选定可复用环境，另两组依附件暂保留。
+- g2-b59e68191ca0-prometheus-data：对应g2-master三个准确私有runtime/PFX/realm恢复组；ef979为选定可复用环境，另两组依附件暂保留。
+- g2-b59e68191ca0-rustfs-data：对应g2-master三个准确私有runtime/PFX/realm恢复组；ef979为选定可复用环境，另两组依附件暂保留。
+- g2-b59e68191ca0-tempo-data：对应g2-master三个准确私有runtime/PFX/realm恢复组；ef979为选定可复用环境，另两组依附件暂保留。
+- g2-ef979bd04cc0-alloy-data：对应g2-master三个准确私有runtime/PFX/realm恢复组；ef979为选定可复用环境，另两组依附件暂保留。
+- g2-ef979bd04cc0-fuseki-data：对应g2-master三个准确私有runtime/PFX/realm恢复组；ef979为选定可复用环境，另两组依附件暂保留。
+- g2-ef979bd04cc0-grafana-data：对应g2-master三个准确私有runtime/PFX/realm恢复组；ef979为选定可复用环境，另两组依附件暂保留。
+- g2-ef979bd04cc0-loki-data：对应g2-master三个准确私有runtime/PFX/realm恢复组；ef979为选定可复用环境，另两组依附件暂保留。
+- g2-ef979bd04cc0-postgres-data：对应g2-master三个准确私有runtime/PFX/realm恢复组；ef979为选定可复用环境，另两组依附件暂保留。
+- g2-ef979bd04cc0-prometheus-data：对应g2-master三个准确私有runtime/PFX/realm恢复组；ef979为选定可复用环境，另两组依附件暂保留。
+- g2-ef979bd04cc0-rustfs-data：对应g2-master三个准确私有runtime/PFX/realm恢复组；ef979为选定可复用环境，另两组依附件暂保留。
+- g2-ef979bd04cc0-tempo-data：对应g2-master三个准确私有runtime/PFX/realm恢复组；ef979为选定可复用环境，另两组依附件暂保留。
+- sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28：固定版本依赖或最新G2 AppHost/固定集成镜像。
+- sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044：固定版本依赖或最新G2 AppHost/固定集成镜像。
+- sha256:6746df3002ba9a25011baaa43b4bf4175c53d00d06ed4ca07ac7b5ae995c58e2：固定版本依赖或最新G2 AppHost/固定集成镜像。
+- sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18：固定版本依赖或最新G2 AppHost/固定集成镜像。
+- sha256:8e28b3a01e16230451343afcfd3997c625b04806b9f3b1960de5915ecf3d01fa：固定版本依赖或最新G2 AppHost/固定集成镜像。
+- sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b：固定版本依赖或最新G2 AppHost/固定集成镜像。
+- sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b：固定版本依赖或最新G2 AppHost/固定集成镜像。
+- sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f：固定版本依赖或最新G2 AppHost/固定集成镜像。
+- sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6：固定版本依赖或最新G2 AppHost/固定集成镜像。
+- sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2：固定版本依赖或最新G2 AppHost/固定集成镜像。
+
+Build cache13项是Docker Desktop全局共享，无法按项目隔离；本轮只删准确history，不prune全局cache，不把history删除等同cache释放。默认bridge/host/none不改。上述保留不阻碍本表其它安全资源实际Apply。
+
+## 外部状态变化
+
+g2-ai树在初始17树盘点后、Master任何Apply之前被外部移除；实时16树，原30 cache+1 worktree操作撤回，不计本Master实际删除或释放。原始before仍保留，非祖先AI任务ref仍保留。其它安全候选继续。

@@ -171,6 +171,14 @@ try {
         if (-not $?) { exit 1 }
         & (Join-Path $PSScriptRoot 'tests/WebToolchain.Tests.ps1')
         if (-not $?) { exit 1 }
+        # 资源回收必须运行专属真实Git/模拟Docker正负例，不能用构包54项代替。
+        $maintenancePython = if ($IsWindows) { 'python' } else { 'python3' }
+        foreach ($maintenanceTest in @('CleanupResources.Tests.py', 'PublicHistory.Tests.py', 'InspectorResources.Tests.py')) {
+            $maintenancePath = Join-Path $PSScriptRoot ('tests/' + $maintenanceTest)
+            if (-not (Test-Path -LiteralPath $maintenancePath)) { throw 'Required maintenance regression test missing.' }
+            & $maintenancePython $maintenancePath
+            if ($LASTEXITCODE -ne 0) { throw ('Maintenance regression failed: ' + $maintenanceTest) }
+        }
         if (Test-Path (Join-Path $PSScriptRoot 'tests/ReviewPackage.Tests.ps1')) {
             & (Join-Path $PSScriptRoot 'tests/ReviewPackage.Tests.ps1')
             if (-not $?) { exit 1 }

@@ -1,0 +1,51 @@
+test_approved_closed_clean_tree_and_refs_are_candidates (__main__.InspectorTests.test_approved_closed_clean_tree_and_refs_are_candidates) ... ok
+test_current_tree_symlink_alias_is_protected (__main__.InspectorTests.test_current_tree_symlink_alias_is_protected) ... FAIL
+test_keep_descendant_blocks_tree_and_refs (__main__.InspectorTests.test_keep_descendant_blocks_tree_and_refs) ... ok
+test_locked_tree_protection_propagates_to_refs (__main__.InspectorTests.test_locked_tree_protection_propagates_to_refs) ... ok
+test_private_cache_segments_block_tree_and_refs (__main__.InspectorTests.test_private_cache_segments_block_tree_and_refs) ...
+  test_private_cache_segments_block_tree_and_refs (__main__.InspectorTests.test_private_cache_segments_block_tree_and_refs) (segment='.runtime') ... FAIL
+  test_private_cache_segments_block_tree_and_refs (__main__.InspectorTests.test_private_cache_segments_block_tree_and_refs) (segment='.ssh') ... FAIL
+  test_private_cache_segments_block_tree_and_refs (__main__.InspectorTests.test_private_cache_segments_block_tree_and_refs) (segment='.aws') ... FAIL
+test_private_ignored_file_blocks_tree_and_refs (__main__.InspectorTests.test_private_ignored_file_blocks_tree_and_refs) ... ok
+test_protected_ancestor_propagates_to_tree_and_refs (__main__.InspectorTests.test_protected_ancestor_propagates_to_tree_and_refs) ... ok
+
+======================================================================
+FAIL: test_current_tree_symlink_alias_is_protected (__main__.InspectorTests.test_current_tree_symlink_alias_is_protected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform/scripts/tests/InspectorResources.Tests.py", line 84, in test_current_tree_symlink_alias_is_protected
+    self.assertNotEqual(tree['classification'], 'SAFE_CANDIDATE')
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'SAFE_CANDIDATE' == 'SAFE_CANDIDATE'
+
+======================================================================
+FAIL: test_private_cache_segments_block_tree_and_refs (__main__.InspectorTests.test_private_cache_segments_block_tree_and_refs) (segment='.runtime')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform/scripts/tests/InspectorResources.Tests.py", line 95, in test_private_cache_segments_block_tree_and_refs
+    self.assertNotEqual(tree['classification'], 'SAFE_CANDIDATE')
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'SAFE_CANDIDATE' == 'SAFE_CANDIDATE'
+
+======================================================================
+FAIL: test_private_cache_segments_block_tree_and_refs (__main__.InspectorTests.test_private_cache_segments_block_tree_and_refs) (segment='.ssh')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform/scripts/tests/InspectorResources.Tests.py", line 95, in test_private_cache_segments_block_tree_and_refs
+    self.assertNotEqual(tree['classification'], 'SAFE_CANDIDATE')
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'SAFE_CANDIDATE' == 'SAFE_CANDIDATE'
+
+======================================================================
+FAIL: test_private_cache_segments_block_tree_and_refs (__main__.InspectorTests.test_private_cache_segments_block_tree_and_refs) (segment='.aws')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform/scripts/tests/InspectorResources.Tests.py", line 95, in test_private_cache_segments_block_tree_and_refs
+    self.assertNotEqual(tree['classification'], 'SAFE_CANDIDATE')
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'SAFE_CANDIDATE' == 'SAFE_CANDIDATE'
+
+----------------------------------------------------------------------
+Ran 7 tests in 6.613s
+
+FAILED (failures=4)

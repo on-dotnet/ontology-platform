@@ -1,0 +1,23 @@
+test_annotated_tag_message_is_scanned_without_values (__main__.PublicHistoryTests.test_annotated_tag_message_is_scanned_without_values) ... ok
+test_auxiliary_snapshot_commit_private_runtime_is_metadata_only (__main__.PublicHistoryTests.test_auxiliary_snapshot_commit_private_runtime_is_metadata_only) ... FAIL
+test_clean_full_history_and_ignored_credentials_are_not_read (__main__.PublicHistoryTests.test_clean_full_history_and_ignored_credentials_are_not_read) ... ok
+test_deleted_secret_and_task_branch_secret_are_detected_without_values (__main__.PublicHistoryTests.test_deleted_secret_and_task_branch_secret_are_detected_without_values) ... ok
+test_direct_blob_and_tree_refs_are_scanned_with_paths (__main__.PublicHistoryTests.test_direct_blob_and_tree_refs_are_scanned_with_paths) ... ok
+test_nested_annotated_tag_message_is_scanned (__main__.PublicHistoryTests.test_nested_annotated_tag_message_is_scanned) ... ok
+test_private_endpoint_is_review_candidate_not_confirmed_production (__main__.PublicHistoryTests.test_private_endpoint_is_review_candidate_not_confirmed_production) ... ok
+test_sensitive_path_is_reported_even_with_reused_normal_blob (__main__.PublicHistoryTests.test_sensitive_path_is_reported_even_with_reused_normal_blob) ... ok
+test_utf16_secret_is_detected_without_printing_value (__main__.PublicHistoryTests.test_utf16_secret_is_detected_without_printing_value) ... ok
+
+======================================================================
+FAIL: test_auxiliary_snapshot_commit_private_runtime_is_metadata_only (__main__.PublicHistoryTests.test_auxiliary_snapshot_commit_private_runtime_is_metadata_only)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform/scripts/tests/PublicHistory.Tests.py", line 113, in test_auxiliary_snapshot_commit_private_runtime_is_metadata_only
+    self.assertFalse(any(f['category'] == 'github-token-like' for f in report['findings']))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+----------------------------------------------------------------------
+Ran 9 tests in 1.123s
+
+FAILED (failures=1)
