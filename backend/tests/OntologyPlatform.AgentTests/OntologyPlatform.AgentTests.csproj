@@ -1,0 +1,13 @@
+<Project Sdk="MSTest.Sdk/4.5.1">
+  <PropertyGroup><TestingExtensionsProfile>None</TestingExtensionsProfile></PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <ProjectReference Include="../../src/Contracts/OntologyPlatform.Contracts/OntologyPlatform.Contracts.csproj" />
+    <ProjectReference Include="../../src/Modules/Agents/OntologyPlatform.Modules.Agents/OntologyPlatform.Modules.Agents.csproj" />
+    <ProjectReference Include="../../src/Modules/Governance/OntologyPlatform.Modules.Governance/OntologyPlatform.Modules.Governance.csproj" />
+    <ProjectReference Include="../../src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/OntologyPlatform.Modules.SemanticQuery.csproj" />
+    <ProjectReference Include="../../src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyPlatform.Modules.Ontology.csproj" />
+    <ProjectReference Include="../../src/Modules/Publishing/OntologyPlatform.Modules.Publishing/OntologyPlatform.Modules.Publishing.csproj" />
+    <ProjectReference Include="../../src/Hosts/OntologyPlatform.Api/OntologyPlatform.Api.csproj" />
+  </ItemGroup>
+</Project>
