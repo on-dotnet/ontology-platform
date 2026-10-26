@@ -1,0 +1,127 @@
+{
+  "advisories": {
+    "1240621": {
+      "findings": [
+        {
+          "version": "3.4.15",
+          "paths": [
+            "apps__web>monaco-editor>dompurify"
+          ],
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        }
+      ],
+      "id": 1240621,
+      "title": "DOMPurify: IN_PLACE: node-removing afterSanitize hook leaves detached subtree event handlers armed, causing DOM XSS",
+      "module_name": "dompurify",
+      "vulnerable_versions": ">=3.4.13 <=3.4.15",
+      "patched_versions": ">=3.4.16",
+      "severity": "low",
+      "cwe": "CWE-79",
+      "github_advisory_id": "GHSA-p98j-92pf-mc4p",
+      "url": "https://github.com/advisories/GHSA-p98j-92pf-mc4p"
+    },
+    "1241204": {
+      "findings": [
+        {
+          "version": "3.4.15",
+          "paths": [
+            "apps__web>monaco-editor>dompurify"
+          ],
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        }
+      ],
+      "id": 1241204,
+      "title": "DOMPurify: IN_PLACE returns a force-removed rawtext root whose text carries attacker markup — pure HTML reparse executes",
+      "module_name": "dompurify",
+      "vulnerable_versions": "<=3.4.15",
+      "patched_versions": ">=3.4.16",
+      "severity": "low",
+      "cwe": "CWE-79",
+      "github_advisory_id": "GHSA-6688-9rhm-gjv2",
+      "url": "https://github.com/advisories/GHSA-6688-9rhm-gjv2"
+    },
+    "1242880": {
+      "findings": [
+        {
+          "version": "3.4.15",
+          "paths": [
+            "apps__web>monaco-editor>dompurify"
+          ],
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        }
+      ],
+      "id": 1242880,
+      "title": "DOMPurify SAFE_FOR_TEMPLATES bypass: split template expressions survive in attached shadow root content on DOM output modes",
+      "module_name": "dompurify",
+      "vulnerable_versions": ">=3.4.4 <=3.4.16",
+      "patched_versions": ">=3.4.17",
+      "severity": "critical",
+      "cwe": "CWE-79",
+      "github_advisory_id": "GHSA-cg2g-xh64-v4q7",
+      "url": "https://github.com/advisories/GHSA-cg2g-xh64-v4q7"
+    },
+    "1242881": {
+      "findings": [
+        {
+          "version": "3.4.15",
+          "paths": [
+            "apps__web>monaco-editor>dompurify"
+          ],
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        }
+      ],
+      "id": 1242881,
+      "title": "DOMPurify IN_PLACE: hook that removes a parent or sibling leaves the detached subtree's event handlers armed (incomplete fix for GHSA-p98j-92pf-mc4p)",
+      "module_name": "dompurify",
+      "vulnerable_versions": "<=3.4.16",
+      "patched_versions": ">=3.4.17",
+      "severity": "high",
+      "cwe": "CWE-79, CWE-693",
+      "github_advisory_id": "GHSA-mrv2-3pqr-j5jr",
+      "url": "https://github.com/advisories/GHSA-mrv2-3pqr-j5jr"
+    },
+    "1242882": {
+      "findings": [
+        {
+          "version": "3.4.15",
+          "paths": [
+            "apps__web>monaco-editor>dompurify"
+          ],
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        }
+      ],
+      "id": 1242882,
+      "title": "DOMPurify: SMIL attributeName=href guard is skipped when PARSER_MEDIA_TYPE is application/xhtml+xml",
+      "module_name": "dompurify",
+      "vulnerable_versions": "<=3.4.16",
+      "patched_versions": ">=3.4.17",
+      "severity": "low",
+      "cwe": "CWE-79",
+      "github_advisory_id": "GHSA-c6gr-qvv4-5v3f",
+      "url": "https://github.com/advisories/GHSA-c6gr-qvv4-5v3f"
+    }
+  },
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 3,
+      "moderate": 0,
+      "high": 1,
+      "critical": 1
+    },
+    "dependencies": 68,
+    "devDependencies": 392,
+    "optionalDependencies": 115,
+    "totalDependencies": 498
+  }
+}

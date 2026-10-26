@@ -1,0 +1,2241 @@
+{
+  "schemaVersion": 1,
+  "namespace": "OntologyPlatform.Contracts",
+  "enums": {
+    "RdfTermKind": [
+      "iri",
+      "blank",
+      "literal"
+    ],
+    "DiagnosticSeverity": [
+      "info",
+      "warning",
+      "error"
+    ],
+    "SemanticNodeKind": [
+      "class",
+      "objectProperty",
+      "datatypeProperty",
+      "individual"
+    ],
+    "ValidationKind": [
+      "RDF_PARSE",
+      "SHACL_CORE",
+      "OWL_SUPPORT"
+    ],
+    "ProposalKind": [
+      "PUBLISH",
+      "ROLLBACK"
+    ],
+    "ApprovalDecision": [
+      "approve",
+      "reject"
+    ],
+    "ProposalStatus": [
+      "PENDING",
+      "APPROVED",
+      "REJECTED",
+      "EXPIRED",
+      "INVALIDATED"
+    ],
+    "ReleaseStatus": [
+      "PREPARING",
+      "ARTIFACTS_VERIFIED",
+      "GRAPH_DEPLOYED",
+      "GRAPH_VERIFIED",
+      "ACTIVE",
+      "SUPERSEDED",
+      "FAILED_RETRYABLE",
+      "FAILED_FINAL"
+    ],
+    "SemanticQueryStatus": [
+      "FOUND",
+      "EMPTY",
+      "PARTIAL",
+      "UNAVAILABLE",
+      "UNAUTHORIZED",
+      "AMBIGUOUS"
+    ],
+    "SemanticDatumKind": [
+      "ontology",
+      "entity",
+      "relationship"
+    ],
+    "SubSourceStatus": [
+      "AVAILABLE",
+      "EMPTY",
+      "PARTIAL",
+      "UNAVAILABLE",
+      "UNAUTHORIZED"
+    ],
+    "ExecutionStatus": [
+      "QUEUED",
+      "RUNNING",
+      "COMPLETED",
+      "FAILED",
+      "CANCELLED"
+    ],
+    "ProviderMode": [
+      "disabled",
+      "deterministic",
+      "approved_model"
+    ]
+  },
+  "payloadDiscriminators": {
+    "RunStartedPayload": "run.started",
+    "ToolStartedPayload": "tool.started",
+    "ToolCompletedPayload": "tool.completed",
+    "EvidenceAddedPayload": "evidence.added",
+    "MessageDeltaPayload": "message.delta",
+    "ApprovalRequiredPayload": "approval.required",
+    "RunCompletedPayload": "run.completed",
+    "RunFailedPayload": "run.failed",
+    "RunCancelledPayload": "run.cancelled"
+  },
+  "models": {
+    "ResourceScope": {
+      "description": "不可由客户端扩大的资源组织与完整厂区范围。",
+      "fields": [
+        {
+          "name": "OrganizationId",
+          "type": "string",
+          "description": "资源所属组织。"
+        },
+        {
+          "name": "SiteIds",
+          "type": "string[]",
+          "description": "完整且规范化的非空厂区集合。"
+        }
+      ],
+      "base": null
+    },
+    "ActorContext": {
+      "description": "仅由已验证服务器身份构造的调用上下文。",
+      "fields": [
+        {
+          "name": "SubjectId",
+          "type": "string",
+          "description": "已验证主体标识。"
+        },
+        {
+          "name": "OrganizationId",
+          "type": "string",
+          "description": "已签发组织标识。"
+        },
+        {
+          "name": "SiteIds",
+          "type": "string[]",
+          "description": "已签发厂区权限。"
+        },
+        {
+          "name": "Roles",
+          "type": "string[]",
+          "description": "已认可平台角色。"
+        },
+        {
+          "name": "TraceId",
+          "type": "string",
+          "description": "当前可信跟踪标识。"
+        },
+        {
+          "name": "CorrelationId",
+          "type": "string",
+          "description": "经过格式校验的请求关联标识。"
+        }
+      ],
+      "base": null
+    },
+    "CommandContext": {
+      "description": "用于明确修订与幂等语义的受控命令上下文。",
+      "fields": [
+        {
+          "name": "CommandId",
+          "type": "string",
+          "description": "本次命令标识。"
+        },
+        {
+          "name": "IdempotencyKey",
+          "type": "string",
+          "description": "同范围与操作内唯一的幂等键。"
+        },
+        {
+          "name": "ExpectedRevision",
+          "type": "long",
+          "description": "期望修订；创建时为零。"
+        },
+        {
+          "name": "Reason",
+          "type": "string",
+          "description": "仅存业务审计的操作理由，不写普通日志。"
+        }
+      ],
+      "base": null
+    },
+    "SourceBundle": {
+      "description": "本体、约束、词汇与合成事实的唯一权威UTF8源码。",
+      "fields": [
+        {
+          "name": "OntologyTurtle",
+          "type": "string",
+          "description": "完整OWL本体Turtle原文。"
+        },
+        {
+          "name": "ShapesTurtle",
+          "type": "string",
+          "description": "完整SHACL Core源码。"
+        },
+        {
+          "name": "VocabularyTurtle",
+          "type": "string?",
+          "description": "可选SKOS词汇源码，未实现为空。"
+        },
+        {
+          "name": "DataTurtle",
+          "type": "string",
+          "description": "仅Local/Synthetic的事实与来源源码。"
+        }
+      ],
+      "base": null
+    },
+    "SourceHashes": {
+      "description": "按明确UTF8字节计算的独立源散列与组合散列。",
+      "fields": [
+        {
+          "name": "OntologyHash",
+          "type": "string",
+          "description": "本体源码SHA256。"
+        },
+        {
+          "name": "ShapesHash",
+          "type": "string",
+          "description": "Shape源码SHA256。"
+        },
+        {
+          "name": "VocabularyHash",
+          "type": "string?",
+          "description": "可选词汇源码SHA256。"
+        },
+        {
+          "name": "DataHash",
+          "type": "string",
+          "description": "合成事实源码SHA256。"
+        },
+        {
+          "name": "BundleHash",
+          "type": "string",
+          "description": "按合同顺序和absent标记组合的SHA256。"
+        }
+      ],
+      "base": null
+    },
+    "RdfTerm": {
+      "description": "标准RDF项，保留IRI、空白节点与字面量词法信息。",
+      "fields": [
+        {
+          "name": "Kind",
+          "type": "RdfTermKind",
+          "description": "标准项类别。"
+        },
+        {
+          "name": "Value",
+          "type": "string",
+          "description": "完整IRI、空白标识或字面量词法值。"
+        },
+        {
+          "name": "Datatype",
+          "type": "string?",
+          "description": "字面量数据类型IRI。"
+        },
+        {
+          "name": "Language",
+          "type": "string?",
+          "description": "可选语言标签。"
+        }
+      ],
+      "base": null
+    },
+    "RdfTriple": {
+      "description": "标准RDF三元组，不替代权威源码。",
+      "fields": [
+        {
+          "name": "Subject",
+          "type": "RdfTerm",
+          "description": "主体项。"
+        },
+        {
+          "name": "Predicate",
+          "type": "string",
+          "description": "谓词完整IRI。"
+        },
+        {
+          "name": "Object",
+          "type": "RdfTerm",
+          "description": "客体项。"
+        }
+      ],
+      "base": null
+    },
+    "SemanticDiagnostic": {
+      "description": "仅包含受控中文消息的语义诊断。",
+      "fields": [
+        {
+          "name": "Code",
+          "type": "string",
+          "description": "固定机器诊断代码。"
+        },
+        {
+          "name": "Severity",
+          "type": "DiagnosticSeverity",
+          "description": "诊断严重度。"
+        },
+        {
+          "name": "Message",
+          "type": "string",
+          "description": "不拼接敏感输入的中文说明。"
+        },
+        {
+          "name": "FocusNode",
+          "type": "RdfTerm?",
+          "description": "实际问题焦点。"
+        },
+        {
+          "name": "Path",
+          "type": "string?",
+          "description": "实际谓词路径IRI。"
+        }
+      ],
+      "base": null
+    },
+    "SemanticNode": {
+      "description": "由真实RDF图投影的可访问节点。",
+      "fields": [
+        {
+          "name": "Id",
+          "type": "string",
+          "description": "节点完整IRI。"
+        },
+        {
+          "name": "Kind",
+          "type": "SemanticNodeKind",
+          "description": "类、属性或个体类别。"
+        },
+        {
+          "name": "Label",
+          "type": "string",
+          "description": "实际标签或安全显示标识。"
+        },
+        {
+          "name": "TypeIris",
+          "type": "string[]",
+          "description": "真实类型IRI集合。"
+        }
+      ],
+      "base": null
+    },
+    "SemanticEdge": {
+      "description": "由实际RDF对象关系投影的边。",
+      "fields": [
+        {
+          "name": "Id",
+          "type": "string",
+          "description": "规范三元组散列稳定标识。"
+        },
+        {
+          "name": "Source",
+          "type": "string",
+          "description": "源节点IRI。"
+        },
+        {
+          "name": "PredicateIri",
+          "type": "string",
+          "description": "关系谓词IRI。"
+        },
+        {
+          "name": "Target",
+          "type": "string",
+          "description": "目标节点IRI。"
+        },
+        {
+          "name": "Label",
+          "type": "string",
+          "description": "关系显示标签。"
+        }
+      ],
+      "base": null
+    },
+    "SemanticProjection": {
+      "description": "明确绑定草稿修订与源散列的完整读投影。",
+      "fields": [
+        {
+          "name": "Revision",
+          "type": "long",
+          "description": "投影对应修订。"
+        },
+        {
+          "name": "Hashes",
+          "type": "SourceHashes",
+          "description": "对应的全部源散列。"
+        },
+        {
+          "name": "Triples",
+          "type": "RdfTriple[]",
+          "description": "有界的实际本体三元组。"
+        },
+        {
+          "name": "Nodes",
+          "type": "SemanticNode[]",
+          "description": "可视节点。"
+        },
+        {
+          "name": "Edges",
+          "type": "SemanticEdge[]",
+          "description": "实际关系边。"
+        },
+        {
+          "name": "StructuralEditAllowed",
+          "type": "bool",
+          "description": "未知或复杂公理存在时禁止结构编辑。"
+        },
+        {
+          "name": "Diagnostics",
+          "type": "SemanticDiagnostic[]",
+          "description": "支持边界和解析诊断。"
+        }
+      ],
+      "base": null
+    },
+    "OntologyDraft": {
+      "description": "具有独立作用域和CAS修订的持久本体草稿。",
+      "fields": [
+        {
+          "name": "DraftId",
+          "type": "string",
+          "description": "草稿标识。"
+        },
+        {
+          "name": "AssetId",
+          "type": "string",
+          "description": "永久绑定唯一范围的资产标识。"
+        },
+        {
+          "name": "Scope",
+          "type": "ResourceScope",
+          "description": "完整资源范围。"
+        },
+        {
+          "name": "BaseReleaseId",
+          "type": "string?",
+          "description": "可选基础正式发布。"
+        },
+        {
+          "name": "Revision",
+          "type": "long",
+          "description": "单调草稿修订。"
+        },
+        {
+          "name": "Etag",
+          "type": "string",
+          "description": "带双引号的修订ETag。"
+        },
+        {
+          "name": "Name",
+          "type": "string",
+          "description": "中文优先资产名称。"
+        },
+        {
+          "name": "Sources",
+          "type": "SourceBundle",
+          "description": "完整权威源码。"
+        },
+        {
+          "name": "Hashes",
+          "type": "SourceHashes",
+          "description": "精确源码散列。"
+        },
+        {
+          "name": "OwnerSubjectId",
+          "type": "string",
+          "description": "草稿创建者。"
+        },
+        {
+          "name": "UpdatedAtUtc",
+          "type": "DateTimeOffset",
+          "description": "最近持久修改时间。"
+        },
+        {
+          "name": "Projection",
+          "type": "SemanticProjection",
+          "description": "真实解析生成且同修订的读投影。"
+        }
+      ],
+      "base": null
+    },
+    "SemanticEdit": {
+      "description": "只修改批准谓词的显式标准RDF编辑。",
+      "fields": [
+        {
+          "name": "SubjectIri",
+          "type": "string",
+          "description": "受控主体IRI。"
+        },
+        {
+          "name": "PredicateIri",
+          "type": "string",
+          "description": "白名单谓词IRI。"
+        },
+        {
+          "name": "OldObject",
+          "type": "RdfTerm?",
+          "description": "需精确移除的旧客体。"
+        },
+        {
+          "name": "NewObject",
+          "type": "RdfTerm?",
+          "description": "需精确增加的新客体。"
+        }
+      ],
+      "base": null
+    },
+    "ValidationIssue": {
+      "description": "真实Jena标准报告中的定位问题。",
+      "fields": [
+        {
+          "name": "Severity",
+          "type": "DiagnosticSeverity",
+          "description": "标准严重度。"
+        },
+        {
+          "name": "FocusNode",
+          "type": "RdfTerm?",
+          "description": "焦点RDF节点。"
+        },
+        {
+          "name": "Path",
+          "type": "string?",
+          "description": "单IRI属性路径。"
+        },
+        {
+          "name": "Value",
+          "type": "RdfTerm?",
+          "description": "失败的实际值。"
+        },
+        {
+          "name": "SourceShape",
+          "type": "RdfTerm?",
+          "description": "来源Shape。"
+        },
+        {
+          "name": "ConstraintComponent",
+          "type": "string?",
+          "description": "标准约束组件IRI。"
+        },
+        {
+          "name": "Message",
+          "type": "string",
+          "description": "校验报告可在受保护业务UI显示的说明。"
+        },
+        {
+          "name": "SourceId",
+          "type": "string",
+          "description": "本体、Shape或Synthetic数据来源。"
+        }
+      ],
+      "base": null
+    },
+    "SemanticValidationReport": {
+      "description": "绑定精确修订与源码的真实语义校验报告。",
+      "fields": [
+        {
+          "name": "ReportId",
+          "type": "string",
+          "description": "校验事实标识。"
+        },
+        {
+          "name": "DraftId",
+          "type": "string",
+          "description": "对应草稿。"
+        },
+        {
+          "name": "Revision",
+          "type": "long",
+          "description": "被验证的精确修订。"
+        },
+        {
+          "name": "Hashes",
+          "type": "SourceHashes",
+          "description": "被验证源散列。"
+        },
+        {
+          "name": "Kind",
+          "type": "ValidationKind",
+          "description": "解析、SHACL或支持边界校验类型。"
+        },
+        {
+          "name": "Conforms",
+          "type": "bool",
+          "description": "仅表示实际执行范围是否符合。"
+        },
+        {
+          "name": "Issues",
+          "type": "ValidationIssue[]",
+          "description": "标准定位问题。"
+        },
+        {
+          "name": "RawReportHash",
+          "type": "string",
+          "description": "实际原始报告SHA256。"
+        },
+        {
+          "name": "ValidatedAtUtc",
+          "type": "DateTimeOffset",
+          "description": "真实校验时间。"
+        },
+        {
+          "name": "TraceId",
+          "type": "string",
+          "description": "校验跟踪标识。"
+        }
+      ],
+      "base": null
+    },
+    "DraftDiff": {
+      "description": "固定历史修订间的源码与标准语义差异。",
+      "fields": [
+        {
+          "name": "BaseRevision",
+          "type": "long",
+          "description": "基础修订。"
+        },
+        {
+          "name": "TargetRevision",
+          "type": "long",
+          "description": "目标修订。"
+        },
+        {
+          "name": "BaseHashes",
+          "type": "SourceHashes",
+          "description": "基础源散列。"
+        },
+        {
+          "name": "TargetHashes",
+          "type": "SourceHashes",
+          "description": "目标源散列。"
+        },
+        {
+          "name": "AddedTriples",
+          "type": "RdfTriple[]",
+          "description": "实际新增三元组。"
+        },
+        {
+          "name": "RemovedTriples",
+          "type": "RdfTriple[]",
+          "description": "实际移除三元组。"
+        },
+        {
+          "name": "SourceDiff",
+          "type": "string",
+          "description": "完整源差异文本。"
+        },
+        {
+          "name": "UnsupportedDiagnostics",
+          "type": "SemanticDiagnostic[]",
+          "description": "无法保证空白节点对应等差异边界。"
+        }
+      ],
+      "base": null
+    },
+    "AssetVersion": {
+      "description": "确已存在的关联资产版本，不填虚构版本。",
+      "fields": [
+        {
+          "name": "AssetId",
+          "type": "string",
+          "description": "关联资产标识。"
+        },
+        {
+          "name": "Version",
+          "type": "string",
+          "description": "真实版本或Schema散列。"
+        }
+      ],
+      "base": null
+    },
+    "AssetVersionSnapshot": {
+      "description": "每个查询与运行固定的完整不可变发布快照。",
+      "fields": [
+        {
+          "name": "ReleaseId",
+          "type": "string",
+          "description": "正式发布标识。"
+        },
+        {
+          "name": "OntologyHash",
+          "type": "string",
+          "description": "本体源散列。"
+        },
+        {
+          "name": "ShapesHash",
+          "type": "string",
+          "description": "约束源散列。"
+        },
+        {
+          "name": "VocabularyHash",
+          "type": "string?",
+          "description": "可选词汇散列。"
+        },
+        {
+          "name": "DataHash",
+          "type": "string",
+          "description": "固定Synthetic数据源散列。"
+        },
+        {
+          "name": "OntologyGraphIri",
+          "type": "string",
+          "description": "正式本体隔离命名图。"
+        },
+        {
+          "name": "DataGraphIri",
+          "type": "string",
+          "description": "正式事实隔离命名图。"
+        },
+        {
+          "name": "MappingVersions",
+          "type": "AssetVersion[]",
+          "description": "未实现映射资产为空。"
+        },
+        {
+          "name": "MetricVersions",
+          "type": "AssetVersion[]",
+          "description": "未实现指标资产为空。"
+        },
+        {
+          "name": "RuleVersions",
+          "type": "AssetVersion[]",
+          "description": "未实现规则资产为空。"
+        },
+        {
+          "name": "CapabilityVersions",
+          "type": "AssetVersion[]",
+          "description": "真实能力Schema版本。"
+        }
+      ],
+      "base": null
+    },
+    "ArtifactObject": {
+      "description": "经回读散列确认的不可变对象引用。",
+      "fields": [
+        {
+          "name": "ObjectKey",
+          "type": "string",
+          "description": "服务器受控且含发布标识的对象键。"
+        },
+        {
+          "name": "Hash",
+          "type": "string",
+          "description": "精确对象字节SHA256。"
+        },
+        {
+          "name": "SizeBytes",
+          "type": "long",
+          "description": "实际字节数。"
+        },
+        {
+          "name": "ContentType",
+          "type": "string",
+          "description": "固定媒体类型。"
+        }
+      ],
+      "base": null
+    },
+    "ImportLock": {
+      "description": "已锁定且可回验的本体导入引用。",
+      "fields": [
+        {
+          "name": "OntologyIri",
+          "type": "string",
+          "description": "导入本体IRI。"
+        },
+        {
+          "name": "Hash",
+          "type": "string",
+          "description": "已批准导入字节散列。"
+        },
+        {
+          "name": "ObjectKey",
+          "type": "string",
+          "description": "不可变来源对象键。"
+        }
+      ],
+      "base": null
+    },
+    "ReleaseManifest": {
+      "description": "准备与回验完成后固定的正式发布清单。",
+      "fields": [
+        {
+          "name": "SchemaVersion",
+          "type": "int",
+          "description": "清单版本一。"
+        },
+        {
+          "name": "ReleaseId",
+          "type": "string",
+          "description": "不可变发布标识。"
+        },
+        {
+          "name": "AssetId",
+          "type": "string",
+          "description": "唯一作用域资产。"
+        },
+        {
+          "name": "Scope",
+          "type": "ResourceScope",
+          "description": "完整发布范围。"
+        },
+        {
+          "name": "DraftId",
+          "type": "string",
+          "description": "原始草稿标识。"
+        },
+        {
+          "name": "Revision",
+          "type": "long",
+          "description": "原始精确草稿修订。"
+        },
+        {
+          "name": "Hashes",
+          "type": "SourceHashes",
+          "description": "完整权威源散列。"
+        },
+        {
+          "name": "OntologyGraphIri",
+          "type": "string",
+          "description": "隔离本体图。"
+        },
+        {
+          "name": "DataGraphIri",
+          "type": "string",
+          "description": "隔离事实图。"
+        },
+        {
+          "name": "ImportLocks",
+          "type": "ImportLock[]",
+          "description": "本轮未锁定导入必须阻断。"
+        },
+        {
+          "name": "Snapshot",
+          "type": "AssetVersionSnapshot",
+          "description": "唯一关联资产快照。"
+        },
+        {
+          "name": "ArtifactObjects",
+          "type": "ArtifactObject[]",
+          "description": "所有经验证的不可变源对象。"
+        },
+        {
+          "name": "CreatedAtUtc",
+          "type": "DateTimeOffset",
+          "description": "清单创建时间。"
+        }
+      ],
+      "base": null
+    },
+    "ApprovalRecord": {
+      "description": "与精确提案内容和独立审核主体绑定的决定。",
+      "fields": [
+        {
+          "name": "ApprovedBy",
+          "type": "string",
+          "description": "决定主体，必须不同于提交者。"
+        },
+        {
+          "name": "Decision",
+          "type": "ApprovalDecision",
+          "description": "批准或拒绝。"
+        },
+        {
+          "name": "DecidedAtUtc",
+          "type": "DateTimeOffset",
+          "description": "持久决定时间。"
+        },
+        {
+          "name": "BindingHash",
+          "type": "string",
+          "description": "完整提案绑定参数散列。"
+        }
+      ],
+      "base": null
+    },
+    "ReleaseProposal": {
+      "description": "明确区分当前草稿发布和旧完整版本回滚的受控提案。",
+      "fields": [
+        {
+          "name": "ProposalId",
+          "type": "string",
+          "description": "提案标识也是审批ID。"
+        },
+        {
+          "name": "Kind",
+          "type": "ProposalKind",
+          "description": "发布或回滚判别。"
+        },
+        {
+          "name": "AssetId",
+          "type": "string",
+          "description": "被批准资产。"
+        },
+        {
+          "name": "Scope",
+          "type": "ResourceScope",
+          "description": "固定完整范围。"
+        },
+        {
+          "name": "DraftId",
+          "type": "string?",
+          "description": "仅发布提案包含草稿。"
+        },
+        {
+          "name": "DraftRevision",
+          "type": "long?",
+          "description": "仅发布提案精确修订。"
+        },
+        {
+          "name": "Hashes",
+          "type": "SourceHashes?",
+          "description": "仅发布提案完整源散列。"
+        },
+        {
+          "name": "ValidationReportId",
+          "type": "string?",
+          "description": "仅发布提案成功校验记录。"
+        },
+        {
+          "name": "TargetReleaseId",
+          "type": "string?",
+          "description": "仅回滚提案目标正式发布。"
+        },
+        {
+          "name": "TargetManifestHash",
+          "type": "string?",
+          "description": "仅回滚提案目标清单字节散列。"
+        },
+        {
+          "name": "SubmittedBy",
+          "type": "string",
+          "description": "提案提交者。"
+        },
+        {
+          "name": "SubmittedAtUtc",
+          "type": "DateTimeOffset",
+          "description": "提交时间。"
+        },
+        {
+          "name": "ExpiresAtUtc",
+          "type": "DateTimeOffset",
+          "description": "审批授权有效期限。"
+        },
+        {
+          "name": "Status",
+          "type": "ProposalStatus",
+          "description": "提案审批状态。"
+        },
+        {
+          "name": "Revision",
+          "type": "long",
+          "description": "审批决定的CAS修订。"
+        },
+        {
+          "name": "Approval",
+          "type": "ApprovalRecord?",
+          "description": "已提交审核决定。"
+        }
+      ],
+      "base": null
+    },
+    "ReleaseActivation": {
+      "description": "同PG事务激活成功后的事实回执。",
+      "fields": [
+        {
+          "name": "ActivationId",
+          "type": "string",
+          "description": "激活事务事实标识。"
+        },
+        {
+          "name": "ActivationRevision",
+          "type": "long",
+          "description": "单调活动指针修订。"
+        },
+        {
+          "name": "ReleaseId",
+          "type": "string",
+          "description": "实际激活发布。"
+        },
+        {
+          "name": "PreviousReleaseId",
+          "type": "string?",
+          "description": "前一个活动发布。"
+        },
+        {
+          "name": "ManifestHash",
+          "type": "string",
+          "description": "实际清单字节散列。"
+        },
+        {
+          "name": "Manifest",
+          "type": "ReleaseManifest",
+          "description": "经回验的完整清单。"
+        },
+        {
+          "name": "AuditId",
+          "type": "string",
+          "description": "同事务已提交治理审计。"
+        },
+        {
+          "name": "OutboxEventId",
+          "type": "string",
+          "description": "同事务已提交Outbox事件。"
+        },
+        {
+          "name": "ActivatedAtUtc",
+          "type": "DateTimeOffset",
+          "description": "提交的激活时间。"
+        }
+      ],
+      "base": null
+    },
+    "ReleaseSummary": {
+      "description": "可访问正式历史版本和活动状态。",
+      "fields": [
+        {
+          "name": "Manifest",
+          "type": "ReleaseManifest",
+          "description": "不可变清单。"
+        },
+        {
+          "name": "ManifestHash",
+          "type": "string",
+          "description": "清单字节散列。"
+        },
+        {
+          "name": "IsActive",
+          "type": "bool",
+          "description": "当前是否活动。"
+        },
+        {
+          "name": "ActivationRevision",
+          "type": "long",
+          "description": "当前活动指针修订。"
+        },
+        {
+          "name": "Status",
+          "type": "ReleaseStatus",
+          "description": "真实准备或活动状态。"
+        }
+      ],
+      "base": null
+    },
+    "SemanticQueryPlan": {
+      "description": "只允许登记能力与正式版本的有界语义计划。",
+      "fields": [
+        {
+          "name": "CapabilityId",
+          "type": "string",
+          "description": "唯一已登记能力ID。"
+        },
+        {
+          "name": "CapabilityVersion",
+          "type": "string",
+          "description": "真实能力Schema版本。"
+        },
+        {
+          "name": "AssetId",
+          "type": "string",
+          "description": "查询资产。"
+        },
+        {
+          "name": "ReleaseId",
+          "type": "string?",
+          "description": "为空时一次固定当前活动发布。"
+        },
+        {
+          "name": "EntityType",
+          "type": "string?",
+          "description": "可选正式类IRI。"
+        },
+        {
+          "name": "EntityIri",
+          "type": "string?",
+          "description": "可选实体完整IRI。"
+        },
+        {
+          "name": "ExternalId",
+          "type": "string?",
+          "description": "外部业务号，不是全局身份。"
+        },
+        {
+          "name": "SiteId",
+          "type": "string?",
+          "description": "可选且必须授权厂区。"
+        },
+        {
+          "name": "RelationshipIris",
+          "type": "string[]",
+          "description": "正式允许对象属性路径。"
+        },
+        {
+          "name": "Depth",
+          "type": "int",
+          "description": "一至五的查询深度。"
+        },
+        {
+          "name": "MaxRows",
+          "type": "int",
+          "description": "一至一百的结果预算。"
+        },
+        {
+          "name": "TimeoutMs",
+          "type": "int",
+          "description": "一百至五千毫秒预算。"
+        }
+      ],
+      "base": null
+    },
+    "TemporalExtent": {
+      "description": "业务断言有效时间，独立于采集与资产版本。",
+      "fields": [
+        {
+          "name": "FromUtc",
+          "type": "DateTimeOffset",
+          "description": "有效起点。"
+        },
+        {
+          "name": "ToUtc",
+          "type": "DateTimeOffset?",
+          "description": "可选有效终点。"
+        }
+      ],
+      "base": null
+    },
+    "EvidenceRef": {
+      "description": "可重新授权并核验标准图与源对象的证据引用。",
+      "fields": [
+        {
+          "name": "EvidenceId",
+          "type": "string",
+          "description": "服务器可定位的稳定证据标识。"
+        },
+        {
+          "name": "ReleaseId",
+          "type": "string",
+          "description": "固定发布。"
+        },
+        {
+          "name": "Scope",
+          "type": "ResourceScope",
+          "description": "真实断言适用范围。"
+        },
+        {
+          "name": "GraphIri",
+          "type": "string",
+          "description": "正式事实命名图。"
+        },
+        {
+          "name": "SubjectIri",
+          "type": "string",
+          "description": "来源断言主体。"
+        },
+        {
+          "name": "PredicateIri",
+          "type": "string",
+          "description": "来源断言谓词。"
+        },
+        {
+          "name": "ObjectTerm",
+          "type": "RdfTerm",
+          "description": "来源断言客体。"
+        },
+        {
+          "name": "SourceId",
+          "type": "string",
+          "description": "Synthetic来源标识。"
+        },
+        {
+          "name": "SourceRecordId",
+          "type": "string",
+          "description": "源记录标识。"
+        },
+        {
+          "name": "SourceObjectKey",
+          "type": "string",
+          "description": "不可变事实对象键。"
+        },
+        {
+          "name": "ContentHash",
+          "type": "string",
+          "description": "精确源对象散列。"
+        },
+        {
+          "name": "ValidFromUtc",
+          "type": "DateTimeOffset",
+          "description": "业务有效起点。"
+        },
+        {
+          "name": "ValidToUtc",
+          "type": "DateTimeOffset?",
+          "description": "业务有效终点。"
+        },
+        {
+          "name": "ObservedAtUtc",
+          "type": "DateTimeOffset",
+          "description": "实际观察时间。"
+        },
+        {
+          "name": "ModelVersion",
+          "type": "string",
+          "description": "适用模型发布。"
+        },
+        {
+          "name": "MappingVersion",
+          "type": "string?",
+          "description": "未实施映射时为空。"
+        },
+        {
+          "name": "Synthetic",
+          "type": "bool",
+          "description": "本轮必须明确为合成。"
+        }
+      ],
+      "base": null
+    },
+    "SemanticPropertyValue": {
+      "description": "具有真实标准值与适用证据引用的属性。",
+      "fields": [
+        {
+          "name": "PredicateIri",
+          "type": "string",
+          "description": "实际谓词IRI。"
+        },
+        {
+          "name": "Value",
+          "type": "RdfTerm",
+          "description": "完整RDF值。"
+        },
+        {
+          "name": "EvidenceIds",
+          "type": "string[]",
+          "description": "适用且获准的证据引用。"
+        }
+      ],
+      "base": null
+    },
+    "SemanticEntity": {
+      "description": "未按外部编号误合并的获准实体。",
+      "fields": [
+        {
+          "name": "Iri",
+          "type": "string",
+          "description": "全局稳定IRI。"
+        },
+        {
+          "name": "TypeIris",
+          "type": "string[]",
+          "description": "正式模型类型。"
+        },
+        {
+          "name": "Label",
+          "type": "string",
+          "description": "显示标签。"
+        },
+        {
+          "name": "ExternalId",
+          "type": "string",
+          "description": "不保证跨厂唯一的业务号。"
+        },
+        {
+          "name": "OrganizationId",
+          "type": "string",
+          "description": "真实所属组织。"
+        },
+        {
+          "name": "SiteId",
+          "type": "string",
+          "description": "真实所属厂区。"
+        },
+        {
+          "name": "Synthetic",
+          "type": "bool",
+          "description": "明确合成数据。"
+        },
+        {
+          "name": "Properties",
+          "type": "SemanticPropertyValue[]",
+          "description": "有来源的实际属性。"
+        }
+      ],
+      "base": null
+    },
+    "SemanticRelationship": {
+      "description": "允许多对多且附有来源的实际关系。",
+      "fields": [
+        {
+          "name": "SourceIri",
+          "type": "string",
+          "description": "获准来源实体。"
+        },
+        {
+          "name": "PredicateIri",
+          "type": "string",
+          "description": "正式对象属性。"
+        },
+        {
+          "name": "TargetIri",
+          "type": "string",
+          "description": "获准目标实体。"
+        },
+        {
+          "name": "EvidenceIds",
+          "type": "string[]",
+          "description": "实际断言证据引用。"
+        }
+      ],
+      "base": null
+    },
+    "OntologyDescription": {
+      "description": "从正式本体图读取的概念和关系说明。",
+      "fields": [
+        {
+          "name": "ClassIris",
+          "type": "string[]",
+          "description": "正式类IRI。"
+        },
+        {
+          "name": "ObjectPropertyIris",
+          "type": "string[]",
+          "description": "正式对象属性IRI。"
+        },
+        {
+          "name": "DatatypePropertyIris",
+          "type": "string[]",
+          "description": "正式数据属性IRI。"
+        },
+        {
+          "name": "Labels",
+          "type": "SemanticPropertyValue[]",
+          "description": "实际标准标签。"
+        },
+        {
+          "name": "SupportedAxioms",
+          "type": "string[]",
+          "description": "明确支持子集。"
+        },
+        {
+          "name": "Diagnostics",
+          "type": "SemanticDiagnostic[]",
+          "description": "未支持语义边界。"
+        }
+      ],
+      "base": null
+    },
+    "SemanticDatum": {
+      "description": "由kind约束恰好一个非空值的唯一查询数据项。",
+      "fields": [
+        {
+          "name": "Kind",
+          "type": "SemanticDatumKind",
+          "description": "本体、实体或关系判别。"
+        },
+        {
+          "name": "Ontology",
+          "type": "OntologyDescription?",
+          "description": "仅ontology判别非空。"
+        },
+        {
+          "name": "Entity",
+          "type": "SemanticEntity?",
+          "description": "仅entity判别非空。"
+        },
+        {
+          "name": "Relationship",
+          "type": "SemanticRelationship?",
+          "description": "仅relationship判别非空。"
+        }
+      ],
+      "base": null
+    },
+    "EntityCandidate": {
+      "description": "只包含已授权不同IRI的身份歧义候选。",
+      "fields": [
+        {
+          "name": "EntityIri",
+          "type": "string",
+          "description": "候选完整IRI。"
+        },
+        {
+          "name": "EntityTypeIris",
+          "type": "string[]",
+          "description": "实际类型。"
+        },
+        {
+          "name": "ExternalId",
+          "type": "string",
+          "description": "重复外部业务号。"
+        },
+        {
+          "name": "OrganizationId",
+          "type": "string",
+          "description": "组织。"
+        },
+        {
+          "name": "SiteId",
+          "type": "string",
+          "description": "厂区。"
+        },
+        {
+          "name": "Label",
+          "type": "string",
+          "description": "显示名称。"
+        },
+        {
+          "name": "EvidenceIds",
+          "type": "string[]",
+          "description": "适用身份来源证据。"
+        }
+      ],
+      "base": null
+    },
+    "SemanticSubSource": {
+      "description": "真实源状态与该源数据版本，不把不可用当空。",
+      "fields": [
+        {
+          "name": "SourceId",
+          "type": "string",
+          "description": "受控来源ID。"
+        },
+        {
+          "name": "Status",
+          "type": "SubSourceStatus",
+          "description": "实际读取结果。"
+        },
+        {
+          "name": "ReleaseId",
+          "type": "string",
+          "description": "固定发布。"
+        },
+        {
+          "name": "DataHash",
+          "type": "string",
+          "description": "该源实际数据散列。"
+        },
+        {
+          "name": "ObservedAtUtc",
+          "type": "DateTimeOffset",
+          "description": "本次真实读取时间。"
+        },
+        {
+          "name": "Code",
+          "type": "string?",
+          "description": "有限故障或部分结果代码。"
+        }
+      ],
+      "base": null
+    },
+    "SemanticQueryResult": {
+      "description": "REST、MCP和Agent共享的唯一六态结果。",
+      "fields": [
+        {
+          "name": "Status",
+          "type": "SemanticQueryStatus",
+          "description": "六态实际结果。"
+        },
+        {
+          "name": "Data",
+          "type": "SemanticDatum[]",
+          "description": "有界真实数据。"
+        },
+        {
+          "name": "Candidates",
+          "type": "EntityCandidate[]",
+          "description": "获准歧义候选。"
+        },
+        {
+          "name": "Evidence",
+          "type": "EvidenceRef[]",
+          "description": "可信且可重新授权证据。"
+        },
+        {
+          "name": "Snapshot",
+          "type": "AssetVersionSnapshot",
+          "description": "固定完整发布。"
+        },
+        {
+          "name": "SubSources",
+          "type": "SemanticSubSource[]",
+          "description": "真实源读取状态。"
+        },
+        {
+          "name": "ValidTime",
+          "type": "TemporalExtent?",
+          "description": "实际结果有效时间。"
+        },
+        {
+          "name": "ObservedAtUtc",
+          "type": "DateTimeOffset",
+          "description": "实际读取时间。"
+        },
+        {
+          "name": "TraceId",
+          "type": "string",
+          "description": "业务跟踪关联。"
+        },
+        {
+          "name": "Limited",
+          "type": "bool",
+          "description": "结果是否受预算截断。"
+        },
+        {
+          "name": "Diagnostics",
+          "type": "SemanticDiagnostic[]",
+          "description": "安全固定诊断。"
+        }
+      ],
+      "base": null
+    },
+    "CapabilityParameter": {
+      "description": "仅用于本轮已知能力输入的有限参数描述。",
+      "fields": [
+        {
+          "name": "Name",
+          "type": "string",
+          "description": "输入字段。"
+        },
+        {
+          "name": "Type",
+          "type": "string",
+          "description": "标准输入原始类型。"
+        },
+        {
+          "name": "Description",
+          "type": "string",
+          "description": "业务意义。"
+        },
+        {
+          "name": "EnumValues",
+          "type": "string[]",
+          "description": "允许值。"
+        },
+        {
+          "name": "Minimum",
+          "type": "int?",
+          "description": "整数最小值。"
+        },
+        {
+          "name": "Maximum",
+          "type": "int?",
+          "description": "整数最大值。"
+        },
+        {
+          "name": "ItemsType",
+          "type": "string?",
+          "description": "可选数组项类型。"
+        }
+      ],
+      "base": null
+    },
+    "CapabilityInputSchema": {
+      "description": "仅生成工具输入标准JSON Schema的有限描述。",
+      "fields": [
+        {
+          "name": "SchemaVersion",
+          "type": "int",
+          "description": "描述版本一。"
+        },
+        {
+          "name": "Type",
+          "type": "string",
+          "description": "固定object。"
+        },
+        {
+          "name": "Required",
+          "type": "string[]",
+          "description": "必需字段。"
+        },
+        {
+          "name": "Properties",
+          "type": "CapabilityParameter[]",
+          "description": "本轮已知输入参数。"
+        },
+        {
+          "name": "AdditionalProperties",
+          "type": "bool",
+          "description": "固定false，拒绝未登记输入。"
+        }
+      ],
+      "base": null
+    },
+    "CapabilityBudget": {
+      "description": "登记能力的有限资源预算。",
+      "fields": [
+        {
+          "name": "MaxDepth",
+          "type": "int",
+          "description": "最大关系深度。"
+        },
+        {
+          "name": "MaxRows",
+          "type": "int",
+          "description": "最大行数。"
+        },
+        {
+          "name": "TimeoutMs",
+          "type": "int",
+          "description": "最长执行毫秒。"
+        },
+        {
+          "name": "MaxToolCalls",
+          "type": "int",
+          "description": "每Run最多调用次数。"
+        }
+      ],
+      "base": null
+    },
+    "SemanticCapability": {
+      "description": "唯一能力登记，输出标准Schema来自真实强类型合同。",
+      "fields": [
+        {
+          "name": "Id",
+          "type": "string",
+          "description": "稳定能力ID。"
+        },
+        {
+          "name": "Version",
+          "type": "string",
+          "description": "真实输入输出Schema散列版本。"
+        },
+        {
+          "name": "InputSchema",
+          "type": "CapabilityInputSchema",
+          "description": "有限输入描述，映射标准Schema。"
+        },
+        {
+          "name": "OutputSchema",
+          "type": "System.Text.Json.JsonElement",
+          "description": "从唯一SemanticQueryResult/OpenAPI派生的完整标准JSON Schema文档。"
+        },
+        {
+          "name": "Meaning",
+          "type": "string",
+          "description": "中文业务意义。"
+        },
+        {
+          "name": "Policy",
+          "type": "string",
+          "description": "共享授权策略名。"
+        },
+        {
+          "name": "ExecutorId",
+          "type": "string",
+          "description": "受控执行器标识。"
+        },
+        {
+          "name": "Budgets",
+          "type": "CapabilityBudget",
+          "description": "唯一执行预算。"
+        }
+      ],
+      "base": null
+    },
+    "ExecutionRun": {
+      "description": "固定完整版本并由PG租约和fencing保护的持久运行。",
+      "fields": [
+        {
+          "name": "RunId",
+          "type": "string",
+          "description": "运行标识。"
+        },
+        {
+          "name": "OwnerSubjectId",
+          "type": "string",
+          "description": "创建主体。"
+        },
+        {
+          "name": "Scope",
+          "type": "ResourceScope",
+          "description": "固定合法范围。"
+        },
+        {
+          "name": "Snapshot",
+          "type": "AssetVersionSnapshot",
+          "description": "运行开始时固定的完整发布。"
+        },
+        {
+          "name": "Status",
+          "type": "ExecutionStatus",
+          "description": "持久运行状态。"
+        },
+        {
+          "name": "ProviderMode",
+          "type": "ProviderMode",
+          "description": "明确真实模型或离线harness。"
+        },
+        {
+          "name": "CreatedAtUtc",
+          "type": "DateTimeOffset",
+          "description": "创建时间。"
+        },
+        {
+          "name": "UpdatedAtUtc",
+          "type": "DateTimeOffset",
+          "description": "最近状态时间。"
+        },
+        {
+          "name": "LastSeq",
+          "type": "long",
+          "description": "最后已提交事件序号。"
+        },
+        {
+          "name": "CancelRequested",
+          "type": "bool",
+          "description": "已持久取消请求。"
+        },
+        {
+          "name": "LeaseOwner",
+          "type": "string?",
+          "description": "当前执行者标识。"
+        },
+        {
+          "name": "LeaseUntil",
+          "type": "DateTimeOffset?",
+          "description": "租约期限。"
+        },
+        {
+          "name": "FencingToken",
+          "type": "long",
+          "description": "防过期执行者提交的单调标识。"
+        }
+      ],
+      "base": null
+    },
+    "RunStartedPayload": {
+      "description": "由真实持久事件类型run.started确定的唯一载荷。",
+      "fields": [
+        {
+          "name": "ProviderMode",
+          "type": "ProviderMode",
+          "description": "实际提供者模式。"
+        },
+        {
+          "name": "CapabilityIds",
+          "type": "string[]",
+          "description": "批准可调用能力。"
+        },
+        {
+          "name": "MaxToolCalls",
+          "type": "int",
+          "description": "最大工具次数。"
+        },
+        {
+          "name": "TimeoutMs",
+          "type": "int",
+          "description": "运行总超时。"
+        }
+      ],
+      "base": "ExecutionPayload"
+    },
+    "ToolStartedPayload": {
+      "description": "由真实持久事件类型tool.started确定的唯一载荷。",
+      "fields": [
+        {
+          "name": "InvocationId",
+          "type": "string",
+          "description": "工具调用标识。"
+        },
+        {
+          "name": "CapabilityId",
+          "type": "string",
+          "description": "真实登记能力。"
+        },
+        {
+          "name": "CapabilityVersion",
+          "type": "string",
+          "description": "真实Schema版本。"
+        },
+        {
+          "name": "Plan",
+          "type": "SemanticQueryPlan",
+          "description": "经过授权与预算的计划。"
+        }
+      ],
+      "base": "ExecutionPayload"
+    },
+    "ToolCompletedPayload": {
+      "description": "由真实持久事件类型tool.completed确定的唯一载荷。",
+      "fields": [
+        {
+          "name": "InvocationId",
+          "type": "string",
+          "description": "同一次工具调用。"
+        },
+        {
+          "name": "Result",
+          "type": "SemanticQueryResult",
+          "description": "真正Gateway六态结果。"
+        },
+        {
+          "name": "DurationMs",
+          "type": "double",
+          "description": "实际执行耗时毫秒。"
+        }
+      ],
+      "base": "ExecutionPayload"
+    },
+    "EvidenceAddedPayload": {
+      "description": "由真实持久事件类型evidence.added确定的唯一载荷。",
+      "fields": [
+        {
+          "name": "Evidence",
+          "type": "EvidenceRef",
+          "description": "实际返回并获授权的证据。"
+        }
+      ],
+      "base": "ExecutionPayload"
+    },
+    "MessageDeltaPayload": {
+      "description": "由真实持久事件类型message.delta确定的唯一载荷。",
+      "fields": [
+        {
+          "name": "Text",
+          "type": "string",
+          "description": "受保护事件正文，不能输出到普通遥测。"
+        }
+      ],
+      "base": "ExecutionPayload"
+    },
+    "ApprovalRequiredPayload": {
+      "description": "由真实持久事件类型approval.required确定的唯一载荷。",
+      "fields": [
+        {
+          "name": "ApprovalId",
+          "type": "string",
+          "description": "实际待审ID。"
+        },
+        {
+          "name": "ProposalId",
+          "type": "string",
+          "description": "实际提案。"
+        },
+        {
+          "name": "Operation",
+          "type": "ProposalKind",
+          "description": "实际人工动作。"
+        },
+        {
+          "name": "Scope",
+          "type": "ResourceScope",
+          "description": "审批适用范围。"
+        },
+        {
+          "name": "ExpiresAtUtc",
+          "type": "DateTimeOffset",
+          "description": "实际授权期限。"
+        }
+      ],
+      "base": "ExecutionPayload"
+    },
+    "RunCompletedPayload": {
+      "description": "由真实持久事件类型run.completed确定的唯一载荷。",
+      "fields": [
+        {
+          "name": "Status",
+          "type": "ExecutionStatus",
+          "description": "仅COMPLETED。"
+        },
+        {
+          "name": "TotalToolCalls",
+          "type": "int",
+          "description": "真实工具次数。"
+        },
+        {
+          "name": "LastResultStatus",
+          "type": "SemanticQueryStatus?",
+          "description": "最后实际结果状态。"
+        }
+      ],
+      "base": "ExecutionPayload"
+    },
+    "RunFailedPayload": {
+      "description": "由真实持久事件类型run.failed确定的唯一载荷。",
+      "fields": [
+        {
+          "name": "Status",
+          "type": "ExecutionStatus",
+          "description": "仅FAILED。"
+        },
+        {
+          "name": "Code",
+          "type": "string",
+          "description": "固定安全故障代码。"
+        },
+        {
+          "name": "TotalToolCalls",
+          "type": "int",
+          "description": "真实工具次数。"
+        }
+      ],
+      "base": "ExecutionPayload"
+    },
+    "RunCancelledPayload": {
+      "description": "由真实持久事件类型run.cancelled确定的唯一载荷。",
+      "fields": [
+        {
+          "name": "Status",
+          "type": "ExecutionStatus",
+          "description": "仅CANCELLED。"
+        },
+        {
+          "name": "Code",
+          "type": "string",
+          "description": "固定cancelled。"
+        },
+        {
+          "name": "TotalToolCalls",
+          "type": "int",
+          "description": "真实工具次数。"
+        }
+      ],
+      "base": "ExecutionPayload"
+    },
+    "ExecutionEvent": {
+      "description": "先PG提交后由SSE重放发送的唯一执行事件。",
+      "fields": [
+        {
+          "name": "RunId",
+          "type": "string",
+          "description": "所属运行。"
+        },
+        {
+          "name": "Seq",
+          "type": "long",
+          "description": "单调持久事件序号。"
+        },
+        {
+          "name": "EventId",
+          "type": "string",
+          "description": "runId冒号seq。"
+        },
+        {
+          "name": "EventType",
+          "type": "string",
+          "description": "与payload判别一致的固定事件类型。"
+        },
+        {
+          "name": "SchemaVersion",
+          "type": "int",
+          "description": "事件版本一。"
+        },
+        {
+          "name": "OccurredAtUtc",
+          "type": "DateTimeOffset",
+          "description": "实际持久时间。"
+        },
+        {
+          "name": "Snapshot",
+          "type": "AssetVersionSnapshot",
+          "description": "运行固定的同一个完整快照。"
+        },
+        {
+          "name": "Payload",
+          "type": "ExecutionPayload",
+          "description": "强类型判别联合，禁止任意业务字典。"
+        }
+      ],
+      "base": null
+    },
+    "CreateDraftRequest": {
+      "description": "拒绝未登记字段并包含明确幂等/修订的受保护命令。",
+      "fields": [
+        {
+          "name": "Name",
+          "type": "string",
+          "description": "草稿名称。"
+        },
+        {
+          "name": "Scope",
+          "type": "ResourceScope",
+          "description": "用户请求且必须服务端授权的完整范围。"
+        },
+        {
+          "name": "Sources",
+          "type": "SourceBundle",
+          "description": "真正权威源。"
+        },
+        {
+          "name": "BaseReleaseId",
+          "type": "string?",
+          "description": "可选同范围正式基础版本。"
+        },
+        {
+          "name": "Command",
+          "type": "CommandContext",
+          "description": "幂等、修订和审计理由。"
+        }
+      ],
+      "base": null
+    },
+    "SaveDraftRequest": {
+      "description": "拒绝未登记字段并包含明确幂等/修订的受保护命令。",
+      "fields": [
+        {
+          "name": "Name",
+          "type": "string",
+          "description": "新名称。"
+        },
+        {
+          "name": "Sources",
+          "type": "SourceBundle",
+          "description": "新权威源。"
+        },
+        {
+          "name": "Command",
+          "type": "CommandContext",
+          "description": "幂等、修订和审计理由。"
+        }
+      ],
+      "base": null
+    },
+    "EditDraftRequest": {
+      "description": "拒绝未登记字段并包含明确幂等/修订的受保护命令。",
+      "fields": [
+        {
+          "name": "Edit",
+          "type": "SemanticEdit",
+          "description": "显式标准RDF变更。"
+        },
+        {
+          "name": "Command",
+          "type": "CommandContext",
+          "description": "幂等、修订和审计理由。"
+        }
+      ],
+      "base": null
+    },
+    "ValidateDraftRequest": {
+      "description": "拒绝未登记字段并包含明确幂等/修订的受保护命令。",
+      "fields": [
+        {
+          "name": "Revision",
+          "type": "long",
+          "description": "要验证的精确修订。"
+        },
+        {
+          "name": "Hashes",
+          "type": "SourceHashes",
+          "description": "要验证的完整源散列。"
+        },
+        {
+          "name": "Command",
+          "type": "CommandContext",
+          "description": "幂等、修订和审计理由。"
+        }
+      ],
+      "base": null
+    },
+    "CreateProposalRequest": {
+      "description": "拒绝未登记字段并包含明确幂等/修订的受保护命令。",
+      "fields": [
+        {
+          "name": "Kind",
+          "type": "ProposalKind",
+          "description": "发布或回滚。"
+        },
+        {
+          "name": "DraftId",
+          "type": "string?",
+          "description": "发布时必需。"
+        },
+        {
+          "name": "DraftRevision",
+          "type": "long?",
+          "description": "发布精确修订。"
+        },
+        {
+          "name": "Hashes",
+          "type": "SourceHashes?",
+          "description": "发布完整源散列。"
+        },
+        {
+          "name": "ValidationReportId",
+          "type": "string?",
+          "description": "发布成功验证。"
+        },
+        {
+          "name": "TargetReleaseId",
+          "type": "string?",
+          "description": "回滚目标。"
+        },
+        {
+          "name": "TargetManifestHash",
+          "type": "string?",
+          "description": "回滚完整目标清单散列。"
+        },
+        {
+          "name": "Command",
+          "type": "CommandContext",
+          "description": "幂等、修订和审计理由。"
+        }
+      ],
+      "base": null
+    },
+    "ApprovalDecisionRequest": {
+      "description": "拒绝未登记字段并包含明确幂等/修订的受保护命令。",
+      "fields": [
+        {
+          "name": "Decision",
+          "type": "ApprovalDecision",
+          "description": "实际审核决定。"
+        },
+        {
+          "name": "Command",
+          "type": "CommandContext",
+          "description": "幂等、修订和审计理由。"
+        }
+      ],
+      "base": null
+    },
+    "ActivateReleaseRequest": {
+      "description": "拒绝未登记字段并包含明确幂等/修订的受保护命令。",
+      "fields": [
+        {
+          "name": "ProposalId",
+          "type": "string",
+          "description": "已批准提案。"
+        },
+        {
+          "name": "ExpectedActivationRevision",
+          "type": "long",
+          "description": "CAS活动指针修订。"
+        },
+        {
+          "name": "ExpectedActiveReleaseId",
+          "type": "string?",
+          "description": "期望当前发布，首次为空。"
+        },
+        {
+          "name": "Command",
+          "type": "CommandContext",
+          "description": "幂等、修订和审计理由。"
+        }
+      ],
+      "base": null
+    },
+    "CreateRunRequest": {
+      "description": "拒绝未登记字段并包含明确幂等/修订的受保护命令。",
+      "fields": [
+        {
+          "name": "Prompt",
+          "type": "string",
+          "description": "仅受保护Run存储的用户正文。"
+        },
+        {
+          "name": "Plan",
+          "type": "SemanticQueryPlan",
+          "description": "显式受控工具计划。"
+        },
+        {
+          "name": "ProviderMode",
+          "type": "ProviderMode",
+          "description": "默认不调用真实模型。"
+        },
+        {
+          "name": "Command",
+          "type": "CommandContext",
+          "description": "幂等、修订和审计理由。"
+        }
+      ],
+      "base": null
+    },
+    "CancelRunRequest": {
+      "description": "拒绝未登记字段并包含明确幂等/修订的受保护命令。",
+      "fields": [
+        {
+          "name": "Command",
+          "type": "CommandContext",
+          "description": "幂等、修订和审计理由。"
+        }
+      ],
+      "base": null
+    },
+    "SemanticAnalysis": {
+      "description": "内部真实解析及支持边界结果。",
+      "fields": [
+        {
+          "name": "Hashes",
+          "type": "SourceHashes",
+          "description": "实际源散列。"
+        },
+        {
+          "name": "Projection",
+          "type": "SemanticProjection",
+          "description": "完整有界读投影。"
+        }
+      ],
+      "base": null
+    },
+    "DraftPublicationSnapshot": {
+      "description": "Ontology自己锁定读取并核验的正式发布准备源。",
+      "fields": [
+        {
+          "name": "Draft",
+          "type": "OntologyDraft",
+          "description": "被锁定的精确草稿。"
+        },
+        {
+          "name": "Validation",
+          "type": "SemanticValidationReport",
+          "description": "同修订真实成功校验。"
+        }
+      ],
+      "base": null
+    },
+    "PublishedRdfData": {
+      "description": "仅从固定正式版本图取得的真实RDF读取结果。",
+      "fields": [
+        {
+          "name": "OntologyTriples",
+          "type": "RdfTriple[]",
+          "description": "正式本体三元组。"
+        },
+        {
+          "name": "DataTriples",
+          "type": "RdfTriple[]",
+          "description": "正式事实与PROV来源三元组。"
+        }
+      ],
+      "base": null
+    },
+    "AuditCommand": {
+      "description": "由模块用例提交给Governance拥有写入器的受控审计事实。",
+      "fields": [
+        {
+          "name": "Action",
+          "type": "string",
+          "description": "固定审计操作。"
+        },
+        {
+          "name": "Resource",
+          "type": "string",
+          "description": "受控资源ID。"
+        },
+        {
+          "name": "Outcome",
+          "type": "string",
+          "description": "固定结果。"
+        },
+        {
+          "name": "Scope",
+          "type": "ResourceScope",
+          "description": "已授权完整资源范围。"
+        }
+      ],
+      "base": null
+    }
+  }
+}

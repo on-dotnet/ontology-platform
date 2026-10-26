@@ -1,0 +1,709 @@
+[
+  {
+    "name": "Microsoft.Agents.AI",
+    "version": "1.26.0.0",
+    "types": [
+      {
+        "type": "Microsoft.Agents.AI.ChatClientAgent",
+        "constructors": [
+          "Void .ctor(Microsoft.Extensions.AI.IChatClient, System.String, System.String, System.String, System.Collections.Generic.IList\u00601[Microsoft.Extensions.AI.AITool], Microsoft.Extensions.Logging.ILoggerFactory, System.IServiceProvider)",
+          "Void .ctor(Microsoft.Extensions.AI.IChatClient, Microsoft.Agents.AI.ChatClientAgentOptions, Microsoft.Extensions.Logging.ILoggerFactory, System.IServiceProvider)"
+        ],
+        "methods": [
+          "Microsoft.Extensions.AI.IChatClient get_ChatClient()",
+          "Microsoft.Agents.AI.ChatHistoryProvider get_ChatHistoryProvider()",
+          "System.Collections.Generic.IReadOnlyList\u00601[Microsoft.Agents.AI.AIContextProvider] get_AIContextProviders()",
+          "System.String get_Name()",
+          "System.String get_Description()",
+          "System.String get_Instructions()",
+          "System.Object GetService(System.Type, System.Object)",
+          "System.Threading.Tasks.ValueTask\u00601[Microsoft.Agents.AI.AgentSession] CreateSessionAsync(System.String, System.Threading.CancellationToken)",
+          "System.Threading.Tasks.Task\u00601[Microsoft.Agents.AI.AgentResponse] RunAsync(Microsoft.Agents.AI.AgentSession, Microsoft.Agents.AI.ChatClientAgentRunOptions, System.Threading.CancellationToken)",
+          "System.Threading.Tasks.Task\u00601[Microsoft.Agents.AI.AgentResponse] RunAsync(System.String, Microsoft.Agents.AI.AgentSession, Microsoft.Agents.AI.ChatClientAgentRunOptions, System.Threading.CancellationToken)",
+          "System.Threading.Tasks.Task\u00601[Microsoft.Agents.AI.AgentResponse] RunAsync(Microsoft.Extensions.AI.ChatMessage, Microsoft.Agents.AI.AgentSession, Microsoft.Agents.AI.ChatClientAgentRunOptions, System.Threading.CancellationToken)",
+          "System.Threading.Tasks.Task\u00601[Microsoft.Agents.AI.AgentResponse] RunAsync(System.Collections.Generic.IEnumerable\u00601[Microsoft.Extensions.AI.ChatMessage], Microsoft.Agents.AI.AgentSession, Microsoft.Agents.AI.ChatClientAgentRunOptions, System.Threading.CancellationToken)",
+          "System.Collections.Generic.IAsyncEnumerable\u00601[Microsoft.Agents.AI.AgentResponseUpdate] RunStreamingAsync(Microsoft.Agents.AI.AgentSession, Microsoft.Agents.AI.ChatClientAgentRunOptions, System.Threading.CancellationToken)",
+          "System.Collections.Generic.IAsyncEnumerable\u00601[Microsoft.Agents.AI.AgentResponseUpdate] RunStreamingAsync(System.String, Microsoft.Agents.AI.AgentSession, Microsoft.Agents.AI.ChatClientAgentRunOptions, System.Threading.CancellationToken)",
+          "System.Collections.Generic.IAsyncEnumerable\u00601[Microsoft.Agents.AI.AgentResponseUpdate] RunStreamingAsync(Microsoft.Extensions.AI.ChatMessage, Microsoft.Agents.AI.AgentSession, Microsoft.Agents.AI.ChatClientAgentRunOptions, System.Threading.CancellationToken)",
+          "System.Collections.Generic.IAsyncEnumerable\u00601[Microsoft.Agents.AI.AgentResponseUpdate] RunStreamingAsync(System.Collections.Generic.IEnumerable\u00601[Microsoft.Extensions.AI.ChatMessage], Microsoft.Agents.AI.AgentSession, Microsoft.Agents.AI.ChatClientAgentRunOptions, System.Threading.CancellationToken)",
+          "System.Threading.Tasks.Task\u00601[Microsoft.Agents.AI.AgentResponse\u00601[T]] RunAsync[T](Microsoft.Agents.AI.AgentSession, System.Text.Json.JsonSerializerOptions, Microsoft.Agents.AI.ChatClientAgentRunOptions, System.Threading.CancellationToken)",
+          "System.Threading.Tasks.Task\u00601[Microsoft.Agents.AI.AgentResponse\u00601[T]] RunAsync[T](System.String, Microsoft.Agents.AI.AgentSession, System.Text.Json.JsonSerializerOptions, Microsoft.Agents.AI.ChatClientAgentRunOptions, System.Threading.CancellationToken)",
+          "System.Threading.Tasks.Task\u00601[Microsoft.Agents.AI.AgentResponse\u00601[T]] RunAsync[T](Microsoft.Extensions.AI.ChatMessage, Microsoft.Agents.AI.AgentSession, System.Text.Json.JsonSerializerOptions, Microsoft.Agents.AI.ChatClientAgentRunOptions, System.Threading.CancellationToken)",
+          "System.Threading.Tasks.Task\u00601[Microsoft.Agents.AI.AgentResponse\u00601[T]] RunAsync[T](System.Collections.Generic.IEnumerable\u00601[Microsoft.Extensions.AI.ChatMessage], Microsoft.Agents.AI.AgentSession, System.Text.Json.JsonSerializerOptions, Microsoft.Agents.AI.ChatClientAgentRunOptions, System.Threading.CancellationToken)"
+        ]
+      },
+      {
+        "type": "Microsoft.Agents.AI.ChatClientAgentOptions",
+        "constructors": [
+          "Void .ctor()"
+        ],
+        "methods": [
+          "System.String get_Id()",
+          "Void set_Id(System.String)",
+          "System.String get_Name()",
+          "Void set_Name(System.String)",
+          "System.String get_Description()",
+          "Void set_Description(System.String)",
+          "Microsoft.Extensions.AI.ChatOptions get_ChatOptions()",
+          "Void set_ChatOptions(Microsoft.Extensions.AI.ChatOptions)",
+          "Microsoft.Agents.AI.ChatHistoryProvider get_ChatHistoryProvider()",
+          "Void set_ChatHistoryProvider(Microsoft.Agents.AI.ChatHistoryProvider)",
+          "System.Collections.Generic.IEnumerable\u00601[Microsoft.Agents.AI.AIContextProvider] get_AIContextProviders()",
+          "Void set_AIContextProviders(System.Collections.Generic.IEnumerable\u00601[Microsoft.Agents.AI.AIContextProvider])",
+          "Boolean get_UseProvidedChatClientAsIs()",
+          "Void set_UseProvidedChatClientAsIs(Boolean)",
+          "Boolean get_AllowConcurrentInvocation()",
+          "Void set_AllowConcurrentInvocation(Boolean)",
+          "Boolean get_ClearOnChatHistoryProviderConflict()",
+          "Void set_ClearOnChatHistoryProviderConflict(Boolean)",
+          "Boolean get_WarnOnChatHistoryProviderConflict()",
+          "Void set_WarnOnChatHistoryProviderConflict(Boolean)",
+          "Boolean get_ThrowOnChatHistoryProviderConflict()",
+          "Void set_ThrowOnChatHistoryProviderConflict(Boolean)",
+          "Boolean get_RequirePerServiceCallChatHistoryPersistence()",
+          "Void set_RequirePerServiceCallChatHistoryPersistence(Boolean)",
+          "Boolean get_EnableMessageInjection()",
+          "Void set_EnableMessageInjection(Boolean)",
+          "Boolean get_DisableApprovalNotRequiredFunctionBypassing()",
+          "Void set_DisableApprovalNotRequiredFunctionBypassing(Boolean)",
+          "Boolean get_DisableApprovalResponseBinding()",
+          "Void set_DisableApprovalResponseBinding(Boolean)",
+          "Boolean get_EnableInvocableFunctionBypassing()",
+          "Void set_EnableInvocableFunctionBypassing(Boolean)",
+          "Microsoft.Agents.AI.ChatClientAgentOptions Clone()"
+        ]
+      },
+      {
+        "type": "Microsoft.Agents.AI.ChatClientAgentRunOptions",
+        "constructors": [
+          "Void .ctor(Microsoft.Extensions.AI.ChatOptions)"
+        ],
+        "methods": [
+          "Microsoft.Extensions.AI.ChatOptions get_ChatOptions()",
+          "Void set_ChatOptions(Microsoft.Extensions.AI.ChatOptions)",
+          "System.Func\u00602[Microsoft.Extensions.AI.IChatClient,Microsoft.Extensions.AI.IChatClient] get_ChatClientFactory()",
+          "Void set_ChatClientFactory(System.Func\u00602[Microsoft.Extensions.AI.IChatClient,Microsoft.Extensions.AI.IChatClient])",
+          "Microsoft.Agents.AI.AgentRunOptions Clone()"
+        ]
+      },
+      {
+        "type": "Microsoft.Agents.AI.ChatClientAgentSession",
+        "constructors": [],
+        "methods": [
+          "System.String get_ConversationId()"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Microsoft.Agents.AI.Abstractions",
+    "version": "1.26.0.0",
+    "types": [
+      {
+        "type": "Microsoft.Agents.AI.AIAgent",
+        "constructors": [],
+        "methods": [
+          "System.String get_Id()",
+          "System.String get_Name()",
+          "System.String get_Description()",
+          "System.Object GetService(System.Type, System.Object)",
+          "TService GetService[TService](System.Object)",
+          "System.Threading.Tasks.ValueTask\u00601[Microsoft.Agents.AI.AgentSession] CreateSessionAsync(System.Threading.CancellationToken)",
+          "System.Threading.Tasks.ValueTask\u00601[System.Text.Json.JsonElement] SerializeSessionAsync(Microsoft.Agents.AI.AgentSession, System.Text.Json.JsonSerializerOptions, System.Threading.CancellationToken)",
+          "System.Threading.Tasks.ValueTask\u00601[Microsoft.Agents.AI.AgentSession] DeserializeSessionAsync(System.Text.Json.JsonElement, System.Text.Json.JsonSerializerOptions, System.Threading.CancellationToken)",
+          "System.Threading.Tasks.Task\u00601[Microsoft.Agents.AI.AgentResponse] RunAsync(Microsoft.Agents.AI.AgentSession, Microsoft.Agents.AI.AgentRunOptions, System.Threading.CancellationToken)",
+          "System.Threading.Tasks.Task\u00601[Microsoft.Agents.AI.AgentResponse] RunAsync(System.String, Microsoft.Agents.AI.AgentSession, Microsoft.Agents.AI.AgentRunOptions, System.Threading.CancellationToken)",
+          "System.Threading.Tasks.Task\u00601[Microsoft.Agents.AI.AgentResponse] RunAsync(Microsoft.Extensions.AI.ChatMessage, Microsoft.Agents.AI.AgentSession, Microsoft.Agents.AI.AgentRunOptions, System.Threading.CancellationToken)",
+          "System.Threading.Tasks.Task\u00601[Microsoft.Agents.AI.AgentResponse] RunAsync(System.Collections.Generic.IEnumerable\u00601[Microsoft.Extensions.AI.ChatMessage], Microsoft.Agents.AI.AgentSession, Microsoft.Agents.AI.AgentRunOptions, System.Threading.CancellationToken)",
+          "System.Collections.Generic.IAsyncEnumerable\u00601[Microsoft.Agents.AI.AgentResponseUpdate] RunStreamingAsync(Microsoft.Agents.AI.AgentSession, Microsoft.Agents.AI.AgentRunOptions, System.Threading.CancellationToken)",
+          "System.Collections.Generic.IAsyncEnumerable\u00601[Microsoft.Agents.AI.AgentResponseUpdate] RunStreamingAsync(System.String, Microsoft.Agents.AI.AgentSession, Microsoft.Agents.AI.AgentRunOptions, System.Threading.CancellationToken)",
+          "System.Collections.Generic.IAsyncEnumerable\u00601[Microsoft.Agents.AI.AgentResponseUpdate] RunStreamingAsync(Microsoft.Extensions.AI.ChatMessage, Microsoft.Agents.AI.AgentSession, Microsoft.Agents.AI.AgentRunOptions, System.Threading.CancellationToken)",
+          "System.Collections.Generic.IAsyncEnumerable\u00601[Microsoft.Agents.AI.AgentResponseUpdate] RunStreamingAsync(System.Collections.Generic.IEnumerable\u00601[Microsoft.Extensions.AI.ChatMessage], Microsoft.Agents.AI.AgentSession, Microsoft.Agents.AI.AgentRunOptions, System.Threading.CancellationToken)",
+          "System.Threading.Tasks.Task\u00601[Microsoft.Agents.AI.AgentResponse\u00601[T]] RunAsync[T](Microsoft.Agents.AI.AgentSession, System.Text.Json.JsonSerializerOptions, Microsoft.Agents.AI.AgentRunOptions, System.Threading.CancellationToken)",
+          "System.Threading.Tasks.Task\u00601[Microsoft.Agents.AI.AgentResponse\u00601[T]] RunAsync[T](System.String, Microsoft.Agents.AI.AgentSession, System.Text.Json.JsonSerializerOptions, Microsoft.Agents.AI.AgentRunOptions, System.Threading.CancellationToken)",
+          "System.Threading.Tasks.Task\u00601[Microsoft.Agents.AI.AgentResponse\u00601[T]] RunAsync[T](Microsoft.Extensions.AI.ChatMessage, Microsoft.Agents.AI.AgentSession, System.Text.Json.JsonSerializerOptions, Microsoft.Agents.AI.AgentRunOptions, System.Threading.CancellationToken)",
+          "System.Threading.Tasks.Task\u00601[Microsoft.Agents.AI.AgentResponse\u00601[T]] RunAsync[T](System.Collections.Generic.IEnumerable\u00601[Microsoft.Extensions.AI.ChatMessage], Microsoft.Agents.AI.AgentSession, System.Text.Json.JsonSerializerOptions, Microsoft.Agents.AI.AgentRunOptions, System.Threading.CancellationToken)"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Microsoft.Extensions.AI",
+    "version": "10.11.0.0",
+    "types": []
+  },
+  {
+    "name": "Microsoft.Extensions.AI.Abstractions",
+    "version": "10.11.0.0",
+    "types": [
+      {
+        "type": "Microsoft.Extensions.AI.ChatResponseUpdate",
+        "constructors": [
+          "Void .ctor()",
+          "Void .ctor(System.Nullable\u00601[Microsoft.Extensions.AI.ChatRole], System.String)",
+          "Void .ctor(System.Nullable\u00601[Microsoft.Extensions.AI.ChatRole], System.Collections.Generic.IList\u00601[Microsoft.Extensions.AI.AIContent])"
+        ],
+        "methods": [
+          "Microsoft.Extensions.AI.ChatResponseUpdate Clone()",
+          "System.String get_AuthorName()",
+          "Void set_AuthorName(System.String)",
+          "System.Nullable\u00601[Microsoft.Extensions.AI.ChatRole] get_Role()",
+          "Void set_Role(System.Nullable\u00601[Microsoft.Extensions.AI.ChatRole])",
+          "System.String get_Text()",
+          "System.Collections.Generic.IList\u00601[Microsoft.Extensions.AI.AIContent] get_Contents()",
+          "Void set_Contents(System.Collections.Generic.IList\u00601[Microsoft.Extensions.AI.AIContent])",
+          "System.Object get_RawRepresentation()",
+          "Void set_RawRepresentation(System.Object)",
+          "Microsoft.Extensions.AI.AdditionalPropertiesDictionary get_AdditionalProperties()",
+          "Void set_AdditionalProperties(Microsoft.Extensions.AI.AdditionalPropertiesDictionary)",
+          "System.String get_ResponseId()",
+          "Void set_ResponseId(System.String)",
+          "System.String get_MessageId()",
+          "Void set_MessageId(System.String)",
+          "System.String get_ConversationId()",
+          "Void set_ConversationId(System.String)",
+          "System.Nullable\u00601[System.DateTimeOffset] get_CreatedAt()",
+          "Void set_CreatedAt(System.Nullable\u00601[System.DateTimeOffset])",
+          "System.Nullable\u00601[Microsoft.Extensions.AI.ChatFinishReason] get_FinishReason()",
+          "Void set_FinishReason(System.Nullable\u00601[Microsoft.Extensions.AI.ChatFinishReason])",
+          "System.String get_ModelId()",
+          "Void set_ModelId(System.String)",
+          "System.String ToString()",
+          "Microsoft.Extensions.AI.ResponseContinuationToken get_ContinuationToken()",
+          "Void set_ContinuationToken(Microsoft.Extensions.AI.ResponseContinuationToken)"
+        ]
+      },
+      {
+        "type": "Microsoft.Extensions.AI.IChatClient",
+        "constructors": [],
+        "methods": [
+          "System.Threading.Tasks.Task\u00601[Microsoft.Extensions.AI.ChatResponse] GetResponseAsync(System.Collections.Generic.IEnumerable\u00601[Microsoft.Extensions.AI.ChatMessage], Microsoft.Extensions.AI.ChatOptions, System.Threading.CancellationToken)",
+          "System.Collections.Generic.IAsyncEnumerable\u00601[Microsoft.Extensions.AI.ChatResponseUpdate] GetStreamingResponseAsync(System.Collections.Generic.IEnumerable\u00601[Microsoft.Extensions.AI.ChatMessage], Microsoft.Extensions.AI.ChatOptions, System.Threading.CancellationToken)",
+          "System.Object GetService(System.Type, System.Object)"
+        ]
+      },
+      {
+        "type": "Microsoft.Extensions.AI.McpServerToolCallContent",
+        "constructors": [
+          "Void .ctor(System.String, System.String, System.String)"
+        ],
+        "methods": [
+          "System.String get_Name()",
+          "System.String get_ServerName()",
+          "System.Collections.Generic.IDictionary\u00602[System.String,System.Object] get_Arguments()",
+          "Void set_Arguments(System.Collections.Generic.IDictionary\u00602[System.String,System.Object])"
+        ]
+      },
+      {
+        "type": "Microsoft.Extensions.AI.McpServerToolResultContent",
+        "constructors": [
+          "Void .ctor(System.String)"
+        ],
+        "methods": [
+          "System.Collections.Generic.IList\u00601[Microsoft.Extensions.AI.AIContent] get_Outputs()",
+          "Void set_Outputs(System.Collections.Generic.IList\u00601[Microsoft.Extensions.AI.AIContent])"
+        ]
+      },
+      {
+        "type": "Microsoft.Extensions.AI.HostedMcpServerToolAlwaysRequireApprovalMode",
+        "constructors": [
+          "Void .ctor()"
+        ],
+        "methods": [
+          "Boolean Equals(System.Object)",
+          "Int32 GetHashCode()"
+        ]
+      },
+      {
+        "type": "Microsoft.Extensions.AI.HostedMcpServerToolApprovalMode",
+        "constructors": [],
+        "methods": []
+      },
+      {
+        "type": "Microsoft.Extensions.AI.HostedMcpServerToolNeverRequireApprovalMode",
+        "constructors": [
+          "Void .ctor()"
+        ],
+        "methods": [
+          "Boolean Equals(System.Object)",
+          "Int32 GetHashCode()"
+        ]
+      },
+      {
+        "type": "Microsoft.Extensions.AI.HostedMcpServerToolRequireSpecificApprovalMode",
+        "constructors": [
+          "Void .ctor(System.Collections.Generic.IList\u00601[System.String], System.Collections.Generic.IList\u00601[System.String])"
+        ],
+        "methods": [
+          "System.Collections.Generic.IList\u00601[System.String] get_AlwaysRequireApprovalToolNames()",
+          "Void set_AlwaysRequireApprovalToolNames(System.Collections.Generic.IList\u00601[System.String])",
+          "System.Collections.Generic.IList\u00601[System.String] get_NeverRequireApprovalToolNames()",
+          "Void set_NeverRequireApprovalToolNames(System.Collections.Generic.IList\u00601[System.String])",
+          "Boolean Equals(System.Object)",
+          "Int32 GetHashCode()"
+        ]
+      },
+      {
+        "type": "Microsoft.Extensions.AI.HostedMcpServerTool",
+        "constructors": [
+          "Void .ctor(System.String, System.String)",
+          "Void .ctor(System.String, System.String, System.Collections.Generic.IReadOnlyDictionary\u00602[System.String,System.Object])",
+          "Void .ctor(System.String, System.Uri)",
+          "Void .ctor(System.String, System.Uri, System.Collections.Generic.IReadOnlyDictionary\u00602[System.String,System.Object])"
+        ],
+        "methods": [
+          "System.String get_Name()",
+          "System.Collections.Generic.IReadOnlyDictionary\u00602[System.String,System.Object] get_AdditionalProperties()",
+          "System.String get_ServerName()",
+          "System.String get_ServerAddress()",
+          "System.String get_ServerDescription()",
+          "Void set_ServerDescription(System.String)",
+          "System.Collections.Generic.IList\u00601[System.String] get_AllowedTools()",
+          "Void set_AllowedTools(System.Collections.Generic.IList\u00601[System.String])",
+          "Microsoft.Extensions.AI.HostedMcpServerToolApprovalMode get_ApprovalMode()",
+          "Void set_ApprovalMode(Microsoft.Extensions.AI.HostedMcpServerToolApprovalMode)",
+          "System.Collections.Generic.IDictionary\u00602[System.String,System.String] get_Headers()",
+          "Void set_Headers(System.Collections.Generic.IDictionary\u00602[System.String,System.String])"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "ModelContextProtocol",
+    "version": "2.3.0.0",
+    "types": [
+      {
+        "type": "Microsoft.Extensions.DependencyInjection.IMcpServerBuilder",
+        "constructors": [],
+        "methods": [
+          "Microsoft.Extensions.DependencyInjection.IServiceCollection get_Services()"
+        ]
+      },
+      {
+        "type": "Microsoft.Extensions.DependencyInjection.McpServerBuilderExtensions",
+        "constructors": [],
+        "methods": []
+      },
+      {
+        "type": "Microsoft.Extensions.DependencyInjection.McpServerServiceCollectionExtensions",
+        "constructors": [],
+        "methods": []
+      }
+    ]
+  },
+  {
+    "name": "ModelContextProtocol.Core",
+    "version": "2.3.0.0",
+    "types": [
+      {
+        "type": "ModelContextProtocol.Server.DelegatingMcpServerPrompt",
+        "constructors": [],
+        "methods": [
+          "ModelContextProtocol.Protocol.Prompt get_ProtocolPrompt()",
+          "System.Collections.Generic.IReadOnlyList\u00601[System.Object] get_Metadata()",
+          "System.Threading.Tasks.ValueTask\u00601[ModelContextProtocol.Protocol.GetPromptResult] GetAsync(ModelContextProtocol.Server.RequestContext\u00601[ModelContextProtocol.Protocol.GetPromptRequestParams], System.Threading.CancellationToken)",
+          "System.String ToString()"
+        ]
+      },
+      {
+        "type": "ModelContextProtocol.Server.DelegatingMcpServerResource",
+        "constructors": [],
+        "methods": [
+          "ModelContextProtocol.Protocol.Resource get_ProtocolResource()",
+          "ModelContextProtocol.Protocol.ResourceTemplate get_ProtocolResourceTemplate()",
+          "System.Collections.Generic.IReadOnlyList\u00601[System.Object] get_Metadata()",
+          "Boolean IsMatch(System.String)",
+          "System.Threading.Tasks.ValueTask\u00601[ModelContextProtocol.Protocol.ReadResourceResult] ReadAsync(ModelContextProtocol.Server.RequestContext\u00601[ModelContextProtocol.Protocol.ReadResourceRequestParams], System.Threading.CancellationToken)",
+          "System.String ToString()"
+        ]
+      },
+      {
+        "type": "ModelContextProtocol.Server.DelegatingMcpServerTool",
+        "constructors": [],
+        "methods": [
+          "ModelContextProtocol.Protocol.Tool get_ProtocolTool()",
+          "System.Collections.Generic.IReadOnlyList\u00601[System.Object] get_Metadata()",
+          "System.Threading.Tasks.ValueTask\u00601[ModelContextProtocol.Protocol.CallToolResult] InvokeAsync(ModelContextProtocol.Server.RequestContext\u00601[ModelContextProtocol.Protocol.CallToolRequestParams], System.Threading.CancellationToken)",
+          "System.String ToString()"
+        ]
+      },
+      {
+        "type": "ModelContextProtocol.Server.IMcpServerPrimitive",
+        "constructors": [],
+        "methods": [
+          "System.String get_Id()",
+          "System.Collections.Generic.IReadOnlyList\u00601[System.Object] get_Metadata()"
+        ]
+      },
+      {
+        "type": "ModelContextProtocol.Server.McpServer",
+        "constructors": [],
+        "methods": [
+          "ModelContextProtocol.Protocol.ClientCapabilities get_ClientCapabilities()",
+          "ModelContextProtocol.Protocol.Implementation get_ClientInfo()",
+          "ModelContextProtocol.Server.McpServerOptions get_ServerOptions()",
+          "System.IServiceProvider get_Services()",
+          "System.Nullable\u00601[ModelContextProtocol.Protocol.LoggingLevel] get_LoggingLevel()",
+          "Boolean get_IsMrtrSupported()",
+          "System.Threading.Tasks.Task RunAsync(System.Threading.CancellationToken)",
+          "ModelContextProtocol.Server.McpServer WithOutgoingRequestInterceptor(System.Func\u00604[System.String,System.Text.Json.Nodes.JsonNode,System.Threading.CancellationToken,System.Threading.Tasks.ValueTask\u00601[System.Text.Json.Nodes.JsonNode]])",
+          "System.Threading.Tasks.ValueTask\u00601[ModelContextProtocol.Protocol.CreateMessageResult] SampleAsync(ModelContextProtocol.Protocol.CreateMessageRequestParams, System.Threading.CancellationToken)",
+          "System.Threading.Tasks.Task\u00601[Microsoft.Extensions.AI.ChatResponse] SampleAsync(System.Collections.Generic.IEnumerable\u00601[Microsoft.Extensions.AI.ChatMessage], Microsoft.Extensions.AI.ChatOptions, System.Text.Json.JsonSerializerOptions, System.Threading.CancellationToken)",
+          "Microsoft.Extensions.AI.IChatClient AsSamplingChatClient(System.Text.Json.JsonSerializerOptions)",
+          "Microsoft.Extensions.Logging.ILoggerProvider AsClientLoggerProvider()",
+          "System.Threading.Tasks.ValueTask\u00601[ModelContextProtocol.Protocol.ListRootsResult] RequestRootsAsync(ModelContextProtocol.Protocol.ListRootsRequestParams, System.Threading.CancellationToken)",
+          "System.Threading.Tasks.ValueTask\u00601[ModelContextProtocol.Protocol.ElicitResult] ElicitAsync(ModelContextProtocol.Protocol.ElicitRequestParams, System.Threading.CancellationToken)",
+          "System.Threading.Tasks.ValueTask\u00601[ModelContextProtocol.Protocol.ElicitResult\u00601[T]] ElicitAsync[T](System.String, ModelContextProtocol.RequestOptions, System.Threading.CancellationToken)"
+        ]
+      },
+      {
+        "type": "ModelContextProtocol.Server.McpServerFilters",
+        "constructors": [
+          "Void .ctor()"
+        ],
+        "methods": [
+          "ModelContextProtocol.Server.McpMessageFilters get_Message()",
+          "Void set_Message(ModelContextProtocol.Server.McpMessageFilters)",
+          "ModelContextProtocol.Server.McpRequestFilters get_Request()",
+          "Void set_Request(ModelContextProtocol.Server.McpRequestFilters)"
+        ]
+      },
+      {
+        "type": "ModelContextProtocol.Server.McpServerHandlers",
+        "constructors": [
+          "Void .ctor()"
+        ],
+        "methods": [
+          "ModelContextProtocol.Server.McpRequestHandler\u00602[ModelContextProtocol.Protocol.ListToolsRequestParams,ModelContextProtocol.Protocol.ListToolsResult] get_ListToolsHandler()",
+          "Void set_ListToolsHandler(ModelContextProtocol.Server.McpRequestHandler\u00602[ModelContextProtocol.Protocol.ListToolsRequestParams,ModelContextProtocol.Protocol.ListToolsResult])",
+          "ModelContextProtocol.Server.McpRequestHandler\u00602[ModelContextProtocol.Protocol.CallToolRequestParams,ModelContextProtocol.Protocol.CallToolResult] get_CallToolHandler()",
+          "Void set_CallToolHandler(ModelContextProtocol.Server.McpRequestHandler\u00602[ModelContextProtocol.Protocol.CallToolRequestParams,ModelContextProtocol.Protocol.CallToolResult])",
+          "ModelContextProtocol.Server.McpRequestHandler\u00602[ModelContextProtocol.Protocol.CallToolRequestParams,ModelContextProtocol.Protocol.ResultOrAlternate\u00601[ModelContextProtocol.Protocol.CallToolResult]] get_CallToolWithAlternateHandler()",
+          "Void set_CallToolWithAlternateHandler(ModelContextProtocol.Server.McpRequestHandler\u00602[ModelContextProtocol.Protocol.CallToolRequestParams,ModelContextProtocol.Protocol.ResultOrAlternate\u00601[ModelContextProtocol.Protocol.CallToolResult]])",
+          "ModelContextProtocol.Server.McpRequestHandler\u00602[ModelContextProtocol.Protocol.ListPromptsRequestParams,ModelContextProtocol.Protocol.ListPromptsResult] get_ListPromptsHandler()",
+          "Void set_ListPromptsHandler(ModelContextProtocol.Server.McpRequestHandler\u00602[ModelContextProtocol.Protocol.ListPromptsRequestParams,ModelContextProtocol.Protocol.ListPromptsResult])",
+          "ModelContextProtocol.Server.McpRequestHandler\u00602[ModelContextProtocol.Protocol.GetPromptRequestParams,ModelContextProtocol.Protocol.GetPromptResult] get_GetPromptHandler()",
+          "Void set_GetPromptHandler(ModelContextProtocol.Server.McpRequestHandler\u00602[ModelContextProtocol.Protocol.GetPromptRequestParams,ModelContextProtocol.Protocol.GetPromptResult])",
+          "ModelContextProtocol.Server.McpRequestHandler\u00602[ModelContextProtocol.Protocol.ListResourceTemplatesRequestParams,ModelContextProtocol.Protocol.ListResourceTemplatesResult] get_ListResourceTemplatesHandler()",
+          "Void set_ListResourceTemplatesHandler(ModelContextProtocol.Server.McpRequestHandler\u00602[ModelContextProtocol.Protocol.ListResourceTemplatesRequestParams,ModelContextProtocol.Protocol.ListResourceTemplatesResult])",
+          "ModelContextProtocol.Server.McpRequestHandler\u00602[ModelContextProtocol.Protocol.ListResourcesRequestParams,ModelContextProtocol.Protocol.ListResourcesResult] get_ListResourcesHandler()",
+          "Void set_ListResourcesHandler(ModelContextProtocol.Server.McpRequestHandler\u00602[ModelContextProtocol.Protocol.ListResourcesRequestParams,ModelContextProtocol.Protocol.ListResourcesResult])",
+          "ModelContextProtocol.Server.McpRequestHandler\u00602[ModelContextProtocol.Protocol.ReadResourceRequestParams,ModelContextProtocol.Protocol.ReadResourceResult] get_ReadResourceHandler()",
+          "Void set_ReadResourceHandler(ModelContextProtocol.Server.McpRequestHandler\u00602[ModelContextProtocol.Protocol.ReadResourceRequestParams,ModelContextProtocol.Protocol.ReadResourceResult])",
+          "ModelContextProtocol.Server.McpRequestHandler\u00602[ModelContextProtocol.Protocol.CompleteRequestParams,ModelContextProtocol.Protocol.CompleteResult] get_CompleteHandler()",
+          "Void set_CompleteHandler(ModelContextProtocol.Server.McpRequestHandler\u00602[ModelContextProtocol.Protocol.CompleteRequestParams,ModelContextProtocol.Protocol.CompleteResult])",
+          "ModelContextProtocol.Server.McpRequestHandler\u00602[ModelContextProtocol.Protocol.SubscribeRequestParams,ModelContextProtocol.Protocol.EmptyResult] get_SubscribeToResourcesHandler()",
+          "Void set_SubscribeToResourcesHandler(ModelContextProtocol.Server.McpRequestHandler\u00602[ModelContextProtocol.Protocol.SubscribeRequestParams,ModelContextProtocol.Protocol.EmptyResult])",
+          "ModelContextProtocol.Server.McpRequestHandler\u00602[ModelContextProtocol.Protocol.UnsubscribeRequestParams,ModelContextProtocol.Protocol.EmptyResult] get_UnsubscribeFromResourcesHandler()",
+          "Void set_UnsubscribeFromResourcesHandler(ModelContextProtocol.Server.McpRequestHandler\u00602[ModelContextProtocol.Protocol.UnsubscribeRequestParams,ModelContextProtocol.Protocol.EmptyResult])",
+          "ModelContextProtocol.Server.McpRequestHandler\u00602[ModelContextProtocol.Protocol.SubscriptionsListenRequestParams,ModelContextProtocol.Protocol.EmptyResult] get_SubscriptionsListenHandler()",
+          "Void set_SubscriptionsListenHandler(ModelContextProtocol.Server.McpRequestHandler\u00602[ModelContextProtocol.Protocol.SubscriptionsListenRequestParams,ModelContextProtocol.Protocol.EmptyResult])",
+          "ModelContextProtocol.Server.McpRequestHandler\u00602[ModelContextProtocol.Protocol.SetLevelRequestParams,ModelContextProtocol.Protocol.EmptyResult] get_SetLoggingLevelHandler()",
+          "Void set_SetLoggingLevelHandler(ModelContextProtocol.Server.McpRequestHandler\u00602[ModelContextProtocol.Protocol.SetLevelRequestParams,ModelContextProtocol.Protocol.EmptyResult])",
+          "System.Collections.Generic.IEnumerable\u00601[System.Collections.Generic.KeyValuePair\u00602[System.String,System.Func\u00603[ModelContextProtocol.Protocol.JsonRpcNotification,System.Threading.CancellationToken,System.Threading.Tasks.ValueTask]]] get_NotificationHandlers()",
+          "Void set_NotificationHandlers(System.Collections.Generic.IEnumerable\u00601[System.Collections.Generic.KeyValuePair\u00602[System.String,System.Func\u00603[ModelContextProtocol.Protocol.JsonRpcNotification,System.Threading.CancellationToken,System.Threading.Tasks.ValueTask]]])"
+        ]
+      },
+      {
+        "type": "ModelContextProtocol.Server.McpServerOptions",
+        "constructors": [
+          "Void .ctor()"
+        ],
+        "methods": [
+          "ModelContextProtocol.Protocol.Implementation get_ServerInfo()",
+          "Void set_ServerInfo(ModelContextProtocol.Protocol.Implementation)",
+          "ModelContextProtocol.Protocol.ServerCapabilities get_Capabilities()",
+          "Void set_Capabilities(ModelContextProtocol.Protocol.ServerCapabilities)",
+          "System.String get_ProtocolVersion()",
+          "Void set_ProtocolVersion(System.String)",
+          "System.TimeSpan get_InitializationTimeout()",
+          "Void set_InitializationTimeout(System.TimeSpan)",
+          "System.String get_ServerInstructions()",
+          "Void set_ServerInstructions(System.String)",
+          "Boolean get_ScopeRequests()",
+          "Void set_ScopeRequests(Boolean)",
+          "ModelContextProtocol.Protocol.Implementation get_KnownClientInfo()",
+          "Void set_KnownClientInfo(ModelContextProtocol.Protocol.Implementation)",
+          "ModelContextProtocol.Protocol.ClientCapabilities get_KnownClientCapabilities()",
+          "Void set_KnownClientCapabilities(ModelContextProtocol.Protocol.ClientCapabilities)",
+          "ModelContextProtocol.Server.McpServerHandlers get_Handlers()",
+          "Void set_Handlers(ModelContextProtocol.Server.McpServerHandlers)",
+          "ModelContextProtocol.Server.McpServerFilters get_Filters()",
+          "Void set_Filters(ModelContextProtocol.Server.McpServerFilters)",
+          "ModelContextProtocol.Server.McpServerPrimitiveCollection\u00601[ModelContextProtocol.Server.McpServerTool] get_ToolCollection()",
+          "Void set_ToolCollection(ModelContextProtocol.Server.McpServerPrimitiveCollection\u00601[ModelContextProtocol.Server.McpServerTool])",
+          "ModelContextProtocol.Server.McpServerResourceCollection get_ResourceCollection()",
+          "Void set_ResourceCollection(ModelContextProtocol.Server.McpServerResourceCollection)",
+          "ModelContextProtocol.Server.McpServerPrimitiveCollection\u00601[ModelContextProtocol.Server.McpServerPrompt] get_PromptCollection()",
+          "Void set_PromptCollection(ModelContextProtocol.Server.McpServerPrimitiveCollection\u00601[ModelContextProtocol.Server.McpServerPrompt])",
+          "Int32 get_MaxSamplingOutputTokens()",
+          "Void set_MaxSamplingOutputTokens(Int32)",
+          "System.Collections.Generic.IList\u00601[ModelContextProtocol.Server.McpServerRequestHandler] get_RequestHandlers()",
+          "Void set_RequestHandlers(System.Collections.Generic.IList\u00601[ModelContextProtocol.Server.McpServerRequestHandler])"
+        ]
+      },
+      {
+        "type": "ModelContextProtocol.Server.McpServerPrimitiveCollection\u00601",
+        "constructors": [
+          "Void .ctor(System.Collections.Generic.IEqualityComparer\u00601[System.String])"
+        ],
+        "methods": [
+          "Void add_Changed(System.EventHandler)",
+          "Void remove_Changed(System.EventHandler)",
+          "Int32 get_Count()",
+          "Boolean get_IsEmpty()",
+          "System.IDisposable DeferChangedEvents()",
+          "T get_Item(System.String)",
+          "Void Clear()",
+          "Void Add(T)",
+          "Boolean TryAdd(T)",
+          "Boolean Remove(T)",
+          "Boolean TryGetPrimitive(System.String, T ByRef)",
+          "Boolean Contains(T)",
+          "System.Collections.Generic.ICollection\u00601[System.String] get_PrimitiveNames()",
+          "T[] ToArray()",
+          "Void CopyTo(T[], Int32)",
+          "System.Collections.Generic.IEnumerator\u00601[T] GetEnumerator()"
+        ]
+      },
+      {
+        "type": "ModelContextProtocol.Server.McpServerPrompt",
+        "constructors": [],
+        "methods": [
+          "ModelContextProtocol.Protocol.Prompt get_ProtocolPrompt()",
+          "System.Collections.Generic.IReadOnlyList\u00601[System.Object] get_Metadata()",
+          "System.Threading.Tasks.ValueTask\u00601[ModelContextProtocol.Protocol.GetPromptResult] GetAsync(ModelContextProtocol.Server.RequestContext\u00601[ModelContextProtocol.Protocol.GetPromptRequestParams], System.Threading.CancellationToken)",
+          "System.String ToString()"
+        ]
+      },
+      {
+        "type": "ModelContextProtocol.Server.McpServerPromptAttribute",
+        "constructors": [
+          "Void .ctor()"
+        ],
+        "methods": [
+          "System.String get_Name()",
+          "Void set_Name(System.String)",
+          "System.String get_Title()",
+          "Void set_Title(System.String)",
+          "System.String get_IconSource()",
+          "Void set_IconSource(System.String)"
+        ]
+      },
+      {
+        "type": "ModelContextProtocol.Server.McpServerPromptCreateOptions",
+        "constructors": [
+          "Void .ctor()"
+        ],
+        "methods": [
+          "System.IServiceProvider get_Services()",
+          "Void set_Services(System.IServiceProvider)",
+          "System.String get_Name()",
+          "Void set_Name(System.String)",
+          "System.String get_Title()",
+          "Void set_Title(System.String)",
+          "System.String get_Description()",
+          "Void set_Description(System.String)",
+          "System.Text.Json.JsonSerializerOptions get_SerializerOptions()",
+          "Void set_SerializerOptions(System.Text.Json.JsonSerializerOptions)",
+          "Microsoft.Extensions.AI.AIJsonSchemaCreateOptions get_SchemaCreateOptions()",
+          "Void set_SchemaCreateOptions(Microsoft.Extensions.AI.AIJsonSchemaCreateOptions)",
+          "System.Collections.Generic.IReadOnlyList\u00601[System.Object] get_Metadata()",
+          "Void set_Metadata(System.Collections.Generic.IReadOnlyList\u00601[System.Object])",
+          "System.Collections.Generic.IList\u00601[ModelContextProtocol.Protocol.Icon] get_Icons()",
+          "Void set_Icons(System.Collections.Generic.IList\u00601[ModelContextProtocol.Protocol.Icon])",
+          "System.Text.Json.Nodes.JsonObject get_Meta()",
+          "Void set_Meta(System.Text.Json.Nodes.JsonObject)"
+        ]
+      },
+      {
+        "type": "ModelContextProtocol.Server.McpServerPromptTypeAttribute",
+        "constructors": [
+          "Void .ctor()"
+        ],
+        "methods": []
+      },
+      {
+        "type": "ModelContextProtocol.Server.McpServerRequestHandler",
+        "constructors": [
+          "Void .ctor()"
+        ],
+        "methods": [
+          "System.String get_Method()",
+          "Void set_Method(System.String)",
+          "System.String get_RoutingNameParameter()",
+          "Void set_RoutingNameParameter(System.String)",
+          "System.Func\u00603[ModelContextProtocol.Protocol.JsonRpcRequest,System.Threading.CancellationToken,System.Threading.Tasks.ValueTask\u00601[System.Text.Json.Nodes.JsonNode]] get_Handler()",
+          "Void set_Handler(System.Func\u00603[ModelContextProtocol.Protocol.JsonRpcRequest,System.Threading.CancellationToken,System.Threading.Tasks.ValueTask\u00601[System.Text.Json.Nodes.JsonNode]])"
+        ]
+      },
+      {
+        "type": "ModelContextProtocol.Server.McpServerResource",
+        "constructors": [],
+        "methods": [
+          "Boolean get_IsTemplated()",
+          "ModelContextProtocol.Protocol.ResourceTemplate get_ProtocolResourceTemplate()",
+          "ModelContextProtocol.Protocol.Resource get_ProtocolResource()",
+          "System.Collections.Generic.IReadOnlyList\u00601[System.Object] get_Metadata()",
+          "Boolean IsMatch(System.String)",
+          "System.Threading.Tasks.ValueTask\u00601[ModelContextProtocol.Protocol.ReadResourceResult] ReadAsync(ModelContextProtocol.Server.RequestContext\u00601[ModelContextProtocol.Protocol.ReadResourceRequestParams], System.Threading.CancellationToken)",
+          "System.String ToString()"
+        ]
+      },
+      {
+        "type": "ModelContextProtocol.Server.McpServerResourceAttribute",
+        "constructors": [
+          "Void .ctor()"
+        ],
+        "methods": [
+          "System.String get_UriTemplate()",
+          "Void set_UriTemplate(System.String)",
+          "System.String get_Name()",
+          "Void set_Name(System.String)",
+          "System.String get_Title()",
+          "Void set_Title(System.String)",
+          "System.String get_MimeType()",
+          "Void set_MimeType(System.String)",
+          "System.String get_IconSource()",
+          "Void set_IconSource(System.String)"
+        ]
+      },
+      {
+        "type": "ModelContextProtocol.Server.McpServerResourceCollection",
+        "constructors": [
+          "Void .ctor()"
+        ],
+        "methods": []
+      },
+      {
+        "type": "ModelContextProtocol.Server.McpServerResourceCreateOptions",
+        "constructors": [
+          "Void .ctor()"
+        ],
+        "methods": [
+          "System.IServiceProvider get_Services()",
+          "Void set_Services(System.IServiceProvider)",
+          "System.String get_UriTemplate()",
+          "Void set_UriTemplate(System.String)",
+          "System.String get_Name()",
+          "Void set_Name(System.String)",
+          "System.String get_Title()",
+          "Void set_Title(System.String)",
+          "System.String get_Description()",
+          "Void set_Description(System.String)",
+          "System.String get_MimeType()",
+          "Void set_MimeType(System.String)",
+          "System.Text.Json.JsonSerializerOptions get_SerializerOptions()",
+          "Void set_SerializerOptions(System.Text.Json.JsonSerializerOptions)",
+          "Microsoft.Extensions.AI.AIJsonSchemaCreateOptions get_SchemaCreateOptions()",
+          "Void set_SchemaCreateOptions(Microsoft.Extensions.AI.AIJsonSchemaCreateOptions)",
+          "System.Collections.Generic.IReadOnlyList\u00601[System.Object] get_Metadata()",
+          "Void set_Metadata(System.Collections.Generic.IReadOnlyList\u00601[System.Object])",
+          "System.Collections.Generic.IList\u00601[ModelContextProtocol.Protocol.Icon] get_Icons()",
+          "Void set_Icons(System.Collections.Generic.IList\u00601[ModelContextProtocol.Protocol.Icon])",
+          "System.Text.Json.Nodes.JsonObject get_Meta()",
+          "Void set_Meta(System.Text.Json.Nodes.JsonObject)"
+        ]
+      },
+      {
+        "type": "ModelContextProtocol.Server.McpServerResourceTypeAttribute",
+        "constructors": [
+          "Void .ctor()"
+        ],
+        "methods": []
+      },
+      {
+        "type": "ModelContextProtocol.Server.McpServerTool",
+        "constructors": [],
+        "methods": [
+          "ModelContextProtocol.Protocol.Tool get_ProtocolTool()",
+          "System.Collections.Generic.IReadOnlyList\u00601[System.Object] get_Metadata()",
+          "System.Threading.Tasks.ValueTask\u00601[ModelContextProtocol.Protocol.CallToolResult] InvokeAsync(ModelContextProtocol.Server.RequestContext\u00601[ModelContextProtocol.Protocol.CallToolRequestParams], System.Threading.CancellationToken)",
+          "System.String ToString()"
+        ]
+      },
+      {
+        "type": "ModelContextProtocol.Server.McpServerToolAttribute",
+        "constructors": [
+          "Void .ctor()"
+        ],
+        "methods": [
+          "System.String get_Name()",
+          "Void set_Name(System.String)",
+          "System.String get_Title()",
+          "Void set_Title(System.String)",
+          "Boolean get_Destructive()",
+          "Void set_Destructive(Boolean)",
+          "Boolean get_Idempotent()",
+          "Void set_Idempotent(Boolean)",
+          "Boolean get_OpenWorld()",
+          "Void set_OpenWorld(Boolean)",
+          "Boolean get_ReadOnly()",
+          "Void set_ReadOnly(Boolean)",
+          "Boolean get_UseStructuredContent()",
+          "Void set_UseStructuredContent(Boolean)",
+          "System.Type get_OutputSchemaType()",
+          "Void set_OutputSchemaType(System.Type)",
+          "System.String get_IconSource()",
+          "Void set_IconSource(System.String)"
+        ]
+      },
+      {
+        "type": "ModelContextProtocol.Server.McpServerToolCreateOptions",
+        "constructors": [
+          "Void .ctor()"
+        ],
+        "methods": [
+          "System.IServiceProvider get_Services()",
+          "Void set_Services(System.IServiceProvider)",
+          "System.String get_Name()",
+          "Void set_Name(System.String)",
+          "System.String get_Description()",
+          "Void set_Description(System.String)",
+          "System.String get_Title()",
+          "Void set_Title(System.String)",
+          "System.Nullable\u00601[System.Boolean] get_Destructive()",
+          "Void set_Destructive(System.Nullable\u00601[System.Boolean])",
+          "System.Nullable\u00601[System.Boolean] get_Idempotent()",
+          "Void set_Idempotent(System.Nullable\u00601[System.Boolean])",
+          "System.Nullable\u00601[System.Boolean] get_OpenWorld()",
+          "Void set_OpenWorld(System.Nullable\u00601[System.Boolean])",
+          "System.Nullable\u00601[System.Boolean] get_ReadOnly()",
+          "Void set_ReadOnly(System.Nullable\u00601[System.Boolean])",
+          "Boolean get_UseStructuredContent()",
+          "Void set_UseStructuredContent(Boolean)",
+          "System.Nullable\u00601[System.Text.Json.JsonElement] get_OutputSchema()",
+          "Void set_OutputSchema(System.Nullable\u00601[System.Text.Json.JsonElement])",
+          "System.Text.Json.JsonSerializerOptions get_SerializerOptions()",
+          "Void set_SerializerOptions(System.Text.Json.JsonSerializerOptions)",
+          "Microsoft.Extensions.AI.AIJsonSchemaCreateOptions get_SchemaCreateOptions()",
+          "Void set_SchemaCreateOptions(Microsoft.Extensions.AI.AIJsonSchemaCreateOptions)",
+          "System.Collections.Generic.IReadOnlyList\u00601[System.Object] get_Metadata()",
+          "Void set_Metadata(System.Collections.Generic.IReadOnlyList\u00601[System.Object])",
+          "System.Collections.Generic.IList\u00601[ModelContextProtocol.Protocol.Icon] get_Icons()",
+          "Void set_Icons(System.Collections.Generic.IList\u00601[ModelContextProtocol.Protocol.Icon])",
+          "System.Text.Json.Nodes.JsonObject get_Meta()",
+          "Void set_Meta(System.Text.Json.Nodes.JsonObject)"
+        ]
+      },
+      {
+        "type": "ModelContextProtocol.Server.McpServerToolTypeAttribute",
+        "constructors": [
+          "Void .ctor()"
+        ],
+        "methods": []
+      }
+    ]
+  },
+  {
+    "name": "ModelContextProtocol.AspNetCore",
+    "version": "2.3.0.0",
+    "types": [
+      {
+        "type": "Microsoft.Extensions.DependencyInjection.HttpMcpServerBuilderExtensions",
+        "constructors": [],
+        "methods": []
+      }
+    ]
+  }
+]

@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design"><PrivateAssets>all</PrivateAssets><IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets></PackageReference>
+    <ProjectReference Include="../OntologyPlatform.Modules.Ontology.Domain/OntologyPlatform.Modules.Ontology.Domain.csproj" />
+    <ProjectReference Include="../../../Contracts/OntologyPlatform.Contracts/OntologyPlatform.Contracts.csproj" />
+  </ItemGroup>
+</Project>

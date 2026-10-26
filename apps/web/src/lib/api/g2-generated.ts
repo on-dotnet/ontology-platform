@@ -1,0 +1,159 @@
+// 从g2-platform.openapi.json自动生成；运行pnpm generate:types，禁止手工编辑。
+
+export type JsonValue = null | boolean | number | string | JsonValue[] | { [key: string]: JsonValue };
+
+export type RdfTermKind = "iri" | "blank" | "literal";
+
+export type DiagnosticSeverity = "info" | "warning" | "error";
+
+export type SemanticNodeKind = "class" | "objectProperty" | "datatypeProperty" | "individual";
+
+export type ValidationKind = "RDF_PARSE" | "SHACL_CORE" | "OWL_SUPPORT";
+
+export type ProposalKind = "PUBLISH" | "ROLLBACK";
+
+export type ApprovalDecision = "approve" | "reject";
+
+export type ProposalStatus = "PENDING" | "APPROVED" | "REJECTED" | "EXPIRED" | "INVALIDATED";
+
+export type ReleaseStatus = "PREPARING" | "ARTIFACTS_VERIFIED" | "GRAPH_DEPLOYED" | "GRAPH_VERIFIED" | "ACTIVE" | "SUPERSEDED" | "FAILED_RETRYABLE" | "FAILED_FINAL";
+
+export type SemanticQueryStatus = "FOUND" | "EMPTY" | "PARTIAL" | "UNAVAILABLE" | "UNAUTHORIZED" | "AMBIGUOUS";
+
+export type SemanticDatumKind = "ontology" | "entity" | "relationship";
+
+export type SubSourceStatus = "AVAILABLE" | "EMPTY" | "PARTIAL" | "UNAVAILABLE" | "UNAUTHORIZED";
+
+export type ExecutionStatus = "QUEUED" | "RUNNING" | "COMPLETED" | "FAILED" | "CANCELLED";
+
+export type ProviderMode = "disabled" | "deterministic" | "approved_model";
+
+export type ExecutionPayload = RunStartedPayload | ToolStartedPayload | ToolCompletedPayload | EvidenceAddedPayload | MessageDeltaPayload | ApprovalRequiredPayload | RunCompletedPayload | RunFailedPayload | RunCancelledPayload;
+
+export type ResourceScope = { "organizationId": string; "siteIds": Array<string> };
+
+export type ActorContext = { "subjectId": string; "organizationId": string; "siteIds": Array<string>; "roles": Array<string>; "traceId": string; "correlationId": string };
+
+export type CommandContext = { "commandId": string; "idempotencyKey": string; "expectedRevision": number; "reason": string };
+
+export type SourceBundle = { "ontologyTurtle": string; "shapesTurtle": string; "vocabularyTurtle": string | null; "dataTurtle": string };
+
+export type SourceHashes = { "ontologyHash": string; "shapesHash": string; "vocabularyHash": string | null; "dataHash": string; "bundleHash": string };
+
+export type RdfTerm = { "kind": RdfTermKind; "value": string; "datatype": string | null; "language": string | null };
+
+export type RdfTriple = { "subject": RdfTerm; "predicate": string; "object": RdfTerm };
+
+export type SemanticDiagnostic = { "code": string; "severity": DiagnosticSeverity; "message": string; "focusNode": RdfTerm | null; "path": string | null };
+
+export type SemanticNode = { "id": string; "kind": SemanticNodeKind; "label": string; "typeIris": Array<string> };
+
+export type SemanticEdge = { "id": string; "source": string; "predicateIri": string; "target": string; "label": string };
+
+export type SemanticProjection = { "revision": number; "hashes": SourceHashes; "triples": Array<RdfTriple>; "nodes": Array<SemanticNode>; "edges": Array<SemanticEdge>; "structuralEditAllowed": boolean; "diagnostics": Array<SemanticDiagnostic> };
+
+export type OntologyDraft = { "draftId": string; "assetId": string; "scope": ResourceScope; "baseReleaseId": string | null; "revision": number; "etag": string; "name": string; "sources": SourceBundle; "hashes": SourceHashes; "ownerSubjectId": string; "updatedAtUtc": string; "projection": SemanticProjection };
+
+export type SemanticEdit = { "subjectIri": string; "predicateIri": string; "oldObject": RdfTerm | null; "newObject": RdfTerm | null };
+
+export type ValidationIssue = { "severity": DiagnosticSeverity; "focusNode": RdfTerm | null; "path": string | null; "value": RdfTerm | null; "sourceShape": RdfTerm | null; "constraintComponent": string | null; "message": string; "sourceId": string };
+
+export type SemanticValidationReport = { "reportId": string; "draftId": string; "revision": number; "hashes": SourceHashes; "kind": ValidationKind; "conforms": boolean; "issues": Array<ValidationIssue>; "rawReportHash": string; "validatedAtUtc": string; "traceId": string };
+
+export type DraftDiff = { "baseRevision": number; "targetRevision": number; "baseHashes": SourceHashes; "targetHashes": SourceHashes; "addedTriples": Array<RdfTriple>; "removedTriples": Array<RdfTriple>; "sourceDiff": string; "unsupportedDiagnostics": Array<SemanticDiagnostic> };
+
+export type AssetVersion = { "assetId": string; "version": string };
+
+export type AssetVersionSnapshot = { "releaseId": string; "ontologyHash": string; "shapesHash": string; "vocabularyHash": string | null; "dataHash": string; "ontologyGraphIri": string; "dataGraphIri": string; "mappingVersions": Array<AssetVersion>; "metricVersions": Array<AssetVersion>; "ruleVersions": Array<AssetVersion>; "capabilityVersions": Array<AssetVersion> };
+
+export type ArtifactObject = { "objectKey": string; "hash": string; "sizeBytes": number; "contentType": string };
+
+export type ImportLock = { "ontologyIri": string; "hash": string; "objectKey": string };
+
+export type ReleaseManifest = { "schemaVersion": number; "releaseId": string; "assetId": string; "scope": ResourceScope; "draftId": string; "revision": number; "hashes": SourceHashes; "ontologyGraphIri": string; "dataGraphIri": string; "importLocks": Array<ImportLock>; "snapshot": AssetVersionSnapshot; "artifactObjects": Array<ArtifactObject>; "createdAtUtc": string };
+
+export type ApprovalRecord = { "approvedBy": string; "decision": ApprovalDecision; "decidedAtUtc": string; "bindingHash": string };
+
+export type ReleaseProposal = { "proposalId": string; "kind": ProposalKind; "assetId": string; "scope": ResourceScope; "draftId": string | null; "draftRevision": number | null; "hashes": SourceHashes | null; "validationReportId": string | null; "targetReleaseId": string | null; "targetManifestHash": string | null; "submittedBy": string; "submittedAtUtc": string; "expiresAtUtc": string; "status": ProposalStatus; "revision": number; "approval": ApprovalRecord | null };
+
+export type ReleaseActivation = { "activationId": string; "activationRevision": number; "releaseId": string; "previousReleaseId": string | null; "manifestHash": string; "manifest": ReleaseManifest; "auditId": string; "outboxEventId": string; "activatedAtUtc": string };
+
+export type ReleaseSummary = { "manifest": ReleaseManifest; "manifestHash": string; "isActive": boolean; "activationRevision": number; "status": ReleaseStatus };
+
+export type SemanticQueryPlan = { "capabilityId": string; "capabilityVersion": string; "assetId": string; "releaseId": string | null; "entityType": string | null; "entityIri": string | null; "externalId": string | null; "siteId": string | null; "relationshipIris": Array<string>; "depth": number; "maxRows": number; "timeoutMs": number };
+
+export type TemporalExtent = { "fromUtc": string; "toUtc": string | null };
+
+export type EvidenceRef = { "evidenceId": string; "releaseId": string; "scope": ResourceScope; "graphIri": string; "subjectIri": string; "predicateIri": string; "objectTerm": RdfTerm; "sourceId": string; "sourceRecordId": string; "sourceObjectKey": string; "contentHash": string; "validFromUtc": string; "validToUtc": string | null; "observedAtUtc": string; "modelVersion": string; "mappingVersion": string | null; "synthetic": boolean };
+
+export type SemanticPropertyValue = { "predicateIri": string; "value": RdfTerm; "evidenceIds": Array<string> };
+
+export type SemanticEntity = { "iri": string; "typeIris": Array<string>; "label": string; "externalId": string; "organizationId": string; "siteId": string; "synthetic": boolean; "properties": Array<SemanticPropertyValue> };
+
+export type SemanticRelationship = { "sourceIri": string; "predicateIri": string; "targetIri": string; "evidenceIds": Array<string> };
+
+export type OntologyDescription = { "classIris": Array<string>; "objectPropertyIris": Array<string>; "datatypePropertyIris": Array<string>; "labels": Array<SemanticPropertyValue>; "supportedAxioms": Array<string>; "diagnostics": Array<SemanticDiagnostic> };
+
+export type SemanticDatum = { "kind": SemanticDatumKind; "ontology": OntologyDescription | null; "entity": SemanticEntity | null; "relationship": SemanticRelationship | null };
+
+export type EntityCandidate = { "entityIri": string; "entityTypeIris": Array<string>; "externalId": string; "organizationId": string; "siteId": string; "label": string; "evidenceIds": Array<string> };
+
+export type SemanticSubSource = { "sourceId": string; "status": SubSourceStatus; "releaseId": string; "dataHash": string; "observedAtUtc": string; "code": string | null };
+
+export type SemanticQueryResult = { "status": SemanticQueryStatus; "data": Array<SemanticDatum>; "candidates": Array<EntityCandidate>; "evidence": Array<EvidenceRef>; "snapshot": AssetVersionSnapshot; "subSources": Array<SemanticSubSource>; "validTime": TemporalExtent | null; "observedAtUtc": string; "traceId": string; "limited": boolean; "diagnostics": Array<SemanticDiagnostic> };
+
+export type CapabilityParameter = { "name": string; "type": string; "description": string; "enumValues": Array<string>; "minimum": number | null; "maximum": number | null; "itemsType": string | null };
+
+export type CapabilityInputSchema = { "schemaVersion": number; "type": string; "required": Array<string>; "properties": Array<CapabilityParameter>; "additionalProperties": boolean };
+
+export type CapabilityBudget = { "maxDepth": number; "maxRows": number; "timeoutMs": number; "maxToolCalls": number };
+
+export type SemanticCapability = { "id": string; "version": string; "inputSchema": CapabilityInputSchema; "outputSchema": JsonValue; "meaning": string; "policy": string; "executorId": string; "budgets": CapabilityBudget };
+
+export type ExecutionRun = { "runId": string; "ownerSubjectId": string; "scope": ResourceScope; "snapshot": AssetVersionSnapshot; "status": ExecutionStatus; "providerMode": ProviderMode; "createdAtUtc": string; "updatedAtUtc": string; "lastSeq": number; "cancelRequested": boolean; "leaseOwner": string | null; "leaseUntil": string | null; "fencingToken": number };
+
+export type RunStartedPayload = { "kind": "run.started"; "providerMode": ProviderMode; "capabilityIds": Array<string>; "maxToolCalls": number; "timeoutMs": number };
+
+export type ToolStartedPayload = { "kind": "tool.started"; "invocationId": string; "capabilityId": string; "capabilityVersion": string; "plan": SemanticQueryPlan };
+
+export type ToolCompletedPayload = { "kind": "tool.completed"; "invocationId": string; "result": SemanticQueryResult; "durationMs": number };
+
+export type EvidenceAddedPayload = { "kind": "evidence.added"; "evidence": EvidenceRef };
+
+export type MessageDeltaPayload = { "kind": "message.delta"; "text": string };
+
+export type ApprovalRequiredPayload = { "kind": "approval.required"; "approvalId": string; "proposalId": string; "operation": ProposalKind; "scope": ResourceScope; "expiresAtUtc": string };
+
+export type RunCompletedPayload = { "kind": "run.completed"; "status": ExecutionStatus; "totalToolCalls": number; "lastResultStatus": SemanticQueryStatus | null };
+
+export type RunFailedPayload = { "kind": "run.failed"; "status": ExecutionStatus; "code": string; "totalToolCalls": number };
+
+export type RunCancelledPayload = { "kind": "run.cancelled"; "status": ExecutionStatus; "code": string; "totalToolCalls": number };
+
+export type ExecutionEvent = { "runId": string; "seq": number; "eventId": string; "eventType": string; "schemaVersion": number; "occurredAtUtc": string; "snapshot": AssetVersionSnapshot; "payload": ExecutionPayload };
+
+export type CreateDraftRequest = { "name": string; "scope": ResourceScope; "sources": SourceBundle; "baseReleaseId": string | null; "command": CommandContext };
+
+export type SaveDraftRequest = { "name": string; "sources": SourceBundle; "command": CommandContext };
+
+export type EditDraftRequest = { "edit": SemanticEdit; "command": CommandContext };
+
+export type ValidateDraftRequest = { "revision": number; "hashes": SourceHashes; "command": CommandContext };
+
+export type CreateProposalRequest = { "kind": ProposalKind; "draftId": string | null; "draftRevision": number | null; "hashes": SourceHashes | null; "validationReportId": string | null; "targetReleaseId": string | null; "targetManifestHash": string | null; "command": CommandContext };
+
+export type ApprovalDecisionRequest = { "decision": ApprovalDecision; "command": CommandContext };
+
+export type ActivateReleaseRequest = { "proposalId": string; "expectedActivationRevision": number; "expectedActiveReleaseId": string | null; "command": CommandContext };
+
+export type CreateRunRequest = { "prompt": string; "plan": SemanticQueryPlan; "providerMode": ProviderMode; "command": CommandContext };
+
+export type CancelRunRequest = { "command": CommandContext };
+
+export type SemanticAnalysis = { "hashes": SourceHashes; "projection": SemanticProjection };
+
+export type DraftPublicationSnapshot = { "draft": OntologyDraft; "validation": SemanticValidationReport };
+
+export type PublishedRdfData = { "ontologyTriples": Array<RdfTriple>; "dataTriples": Array<RdfTriple> };
+
+export type AuditCommand = { "action": string; "resource": string; "outcome": string; "scope": ResourceScope };

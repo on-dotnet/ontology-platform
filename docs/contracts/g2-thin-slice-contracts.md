@@ -1,6 +1,6 @@
 # G2 Thin Slice 公共执行合同 V1
 
-状态：DRAFT_FOR_INDEPENDENT_REVIEW。2026-10-26，Master单写；通过独立契约审查的具体提交才成为产品并行实现基线。本合同具体化G1规划中的唯一CommandContext/EvidenceRef/AssetVersionSnapshot/ExecutionRun，不创建第二套Result或万能共享实体。授权以G2 V1及本会话2026-10-26精确依赖批准为准；历史G1仍PARTIAL。
+状态：FROZEN（独立审查修订基线`2ac9ec4472afb44e721399c8ef7156e96eb9c2da`通过，实际DTO落实和后续变更仍独立Review）。2026-10-26，Master单写；通过独立契约审查的具体提交才成为产品并行实现基线。本合同具体化G1规划中的唯一CommandContext/EvidenceRef/AssetVersionSnapshot/ExecutionRun，不创建第二套Result或万能共享实体。授权以G2 V1及本会话2026-10-26精确依赖批准为准；历史G1仍PARTIAL。
 
 ## 1. 模块、组合与唯一合同
 

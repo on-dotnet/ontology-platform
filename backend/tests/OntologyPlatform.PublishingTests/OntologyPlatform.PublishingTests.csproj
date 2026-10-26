@@ -1,0 +1,8 @@
+<Project Sdk="MSTest.Sdk/4.5.1">
+  <PropertyGroup><TestingExtensionsProfile>None</TestingExtensionsProfile></PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <ProjectReference Include="../../src/Contracts/OntologyPlatform.Contracts/OntologyPlatform.Contracts.csproj" />
+    <ProjectReference Include="../../src/Modules/Publishing/OntologyPlatform.Modules.Publishing/OntologyPlatform.Modules.Publishing.csproj" />
+  </ItemGroup>
+</Project>

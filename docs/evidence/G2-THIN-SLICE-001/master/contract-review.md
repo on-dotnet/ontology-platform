@@ -1,0 +1,12 @@
+# G2共享合同独立审查
+
+Reviewer: g2_contract_review（独立quality_reviewer、GPT-6 Astra/High，只读）。固定首次range6154ebb3703031a49cf0c555c9f0c3596e3b7726..de5f09fb5e83f5ec09e4fba9a2793579505a0060：授权符合；0Critical/2Important/2Minor，CHANGES_REQUIRED。
+
+Important1：ROLLBACK旧manifest与当前draft修订绑定冲突；修正PUBLISH/ROLLBACK分支、审批字段/锁顺序及旧draft推进回滚正反例。
+Important2：跨模块projection/query/SSE载荷缺具体schema；补§10唯一字段/nullable/判别与eventType映射。
+Minor1：Governance-owned事务writer无明确路径Owner；Master显式拥有TransactionalAuditWriter.cs和合同。
+Minor2：assetId/完整scope活动查找不确定；永久绑定唯一scope，服务器查回。
+
+复审de5f09f..e7964ace088d0aab57b5459bb89d485ad7933aaf：原四项全ADDRESSED；修订引入输出Schema有限类型表达不足Important。修正有限模型仅inputSchema，outputSchema直接由唯一强类型SemanticQueryResult/OpenAPI派生保留nested/nullable/enum/union/ref。
+
+最终限定复审e7964ac..2ac9ec4472afb44e721399c8ef7156e96eb9c2da：最后Important ADDRESSED，无新增Critical/Important；合同可冻结并按依赖/owned_paths派写。最终0Critical/0Important/0Minor未解决。Reviewer独立解析已提交9项真实Jena PoC事实，未重新启动服务，不把静态/PoC当产品通过。三轮原始消息由Master准确落此记录；本文件不是Reviewer写入行为。Master所有对应verify静态门禁/完整diff-check均exit0。

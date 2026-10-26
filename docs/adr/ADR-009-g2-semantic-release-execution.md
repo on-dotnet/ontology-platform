@@ -1,6 +1,6 @@
 # ADR-009 G2语义、发布与执行一致性
 
-状态：PROPOSED_FOR_INDEPENDENT_REVIEW；2026-10-26。对应用户明确授权G2-THIN-SLICE-001与精确依赖批准，非架构扩展/生产授权。
+状态：ACCEPTED_WITHIN_G2（契约独立审查至2ac9ec4全部关闭）；2026-10-26。对应用户明确授权G2-THIN-SLICE-001与精确依赖批准，非架构扩展/生产授权。
 
 ## 决定与备选
 

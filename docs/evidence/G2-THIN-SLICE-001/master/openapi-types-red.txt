@@ -1,0 +1,85 @@
+✖ six-state enums and nullable unions stay precise (0.52475ms)
+✖ inline objects, dictionaries and required fields cannot become unknown (0.065542ms)
+✖ event discriminators survive each typed payload and root union (0.148708ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 0
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 32.909459
+
+✖ failing tests:
+
+test at apps/web/scripts/openapi-types.test.mjs:5:1
+✖ six-state enums and nullable unions stay precise (0.52475ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + 'string'
+  - '"FOUND" | "EMPTY" | "UNAVAILABLE"'
+
+      at TestContext.<anonymous> (file:///Users/chasen/.codex/worktrees/g2-master/ontology-platform/apps/web/scripts/openapi-types.test.mjs:6:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'string',
+    expected: '"FOUND" | "EMPTY" | "UNAVAILABLE"',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at apps/web/scripts/openapi-types.test.mjs:10:1
+✖ inline objects, dictionaries and required fields cannot become unknown (0.065542ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + 'unknown'
+  - '{ "seq": number; "text"?: string }'
+
+      at TestContext.<anonymous> (file:///Users/chasen/.codex/worktrees/g2-master/ontology-platform/apps/web/scripts/openapi-types.test.mjs:11:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'unknown',
+    expected: '{ "seq": number; "text"?: string }',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at apps/web/scripts/openapi-types.test.mjs:15:1
+✖ event discriminators survive each typed payload and root union (0.148708ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /"kind": "message.delta"/. Input:
+
+  'export interface Delta {\n' +
+    '  kind: unknown;\n' +
+    '  text: string;\n' +
+    '}\n' +
+    '\n' +
+    'export interface EventPayload {\n' +
+    '\n' +
+    '}'
+
+      at TestContext.<anonymous> (file:///Users/chasen/.codex/worktrees/g2-master/ontology-platform/apps/web/scripts/openapi-types.test.mjs:18:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'export interface Delta {\n  kind: unknown;\n  text: string;\n}\n\nexport interface EventPayload {\n\n}',
+    expected: /"kind": "message.delta"/,
+    operator: 'match',
+    diff: 'simple'
+  }
