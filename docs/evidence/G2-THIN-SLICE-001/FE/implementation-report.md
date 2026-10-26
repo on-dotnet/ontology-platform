@@ -102,3 +102,5 @@ Master已准备新隔离Host环境，本Owner按指令等待可用通知后开�
 实际最终几何：1440×dark/light均scrollWidth1440、子section375；1280均1280、子section678；390均390、子section328。六张新安全Synthetic截图已重开检查，所有几何/RED/命令输出见`logs/long-layout-*`。
 
 最新本树验证：生产Next build0、lint0、typecheck0、Vitest53/53、G2 Edge31/31（新增1条覆盖六组合及resize）、原G1 Edge5/5。SelfTest输出亦保存。Master此前真实OIDC/HTTP及S1业务操作通过的事实仍归Master证据，本树夹具不计真实服务E2E；待Master将本修复集成后重跑真实S1完整页面，并安排限定独立复审。Monaco保持暂停，任务整体仍DRAFT/PARTIAL。
+
+限定布局修复SourceSha=`d52acc0aeef55a58189194708822233952dac620`；本行仅文档绑定，未改变已验证CSS/测试。
