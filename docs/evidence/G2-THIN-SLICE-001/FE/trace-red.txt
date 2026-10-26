@@ -1,0 +1,244 @@
+COMMAND: /opt/homebrew/opt/node@24/bin/node node_modules/vitest/vitest.mjs run src/components/ui/semantic-feedback.test.ts
+
+ RUN  v5.0.5 /Users/chasen/.codex/worktrees/g2-fe/ontology-platform/apps/web
+
+ ❯ src/components/ui/semantic-feedback.test.ts (14 tests | 14 failed) 8ms
+   ❯ 真实关联标识的本地Tempo定位入口 (14)
+     × 有效32位十六进制标识打开对应Trace查询：0123456789abcdef0123456789abcdef 4ms
+     × 有效32位十六进制标识打开对应Trace查询：0123456789ABCDEF0123456789ABCDEF 0ms
+     × 无效标识不产生任何Grafana导航： 1ms
+     × 无效标识不产生任何Grafana导航：00000000000000000000000000000000 0ms
+     × 无效标识不产生任何Grafana导航：aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa 0ms
+     × 无效标识不产生任何Grafana导航：aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa 0ms
+     × 无效标识不产生任何Grafana导航：gggggggggggggggggggggggggggggggg 0ms
+     × 无效标识不产生任何Grafana导航： 0123456789abcdef0123456789abcdef 0ms
+     × 无效标识不产生任何Grafana导航：0123456789abcdef0123456789abcdef
+ 0ms
+     × 无效标识不产生任何Grafana导航：0123456789abcdef0123456789abcdef?token=synthetic 0ms
+     × 无效标识不产生任何Grafana导航：https://example.invalid/trace 0ms
+     × 无效标识不产生任何Grafana导航：0123456789abcdef0123456789abcdef"><script> 0ms
+     × 无效标识不产生任何Grafana导航：%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30 0ms
+     × 无效标识不产生任何Grafana导航：ＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡ 0ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 14 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/components/ui/semantic-feedback.test.ts > 真实关联标识的本地Tempo定位入口 > 有效32位十六进制标识打开对应Trace查询：0123456789abcdef0123456789abcdef
+ FAIL  src/components/ui/semantic-feedback.test.ts > 真实关联标识的本地Tempo定位入口 > 有效32位十六进制标识打开对应Trace查询：0123456789ABCDEF0123456789ABCDEF
+AssertionError: expected '/' to be '/explore' // Object.is equality
+
+Expected: "/explore"
+Received: "/"
+
+ ❯ src/components/ui/semantic-feedback.test.ts:16:26
+     14|     const url = new URL(href!);
+     15|     expect(url.origin).toBe("http://localhost:15330");
+     16|     expect(url.pathname).toBe("/explore");
+       |                          ^
+     17|     expect(url.username).toBe("");
+     18|     expect(url.password).toBe("");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/14]⎯
+
+ FAIL  src/components/ui/semantic-feedback.test.ts > 真实关联标识的本地Tempo定位入口 > 无效标识不产生任何Grafana导航：
+AssertionError: expected '<span class="g2-trace">Trace <code></…' not to contain 'href='
+
+Expected: "href="
+Received: "<span class="g2-trace">Trace <code></code> <button class="text-button">复制关联标识</button> <a href="http://localhost:15330" target="_blank" rel="noreferrer">打开本地 Grafana</a></span>"
+
+ ❯ src/components/ui/semantic-feedback.test.ts:48:22
+     46|   ])("无效标识不产生任何Grafana导航：%s", traceId => {
+     47|     const html = renderToStaticMarkup(createElement(Trace, { traceId }…
+     48|     expect(html).not.toContain("href=");
+       |                      ^
+     49|     expect(html).toContain("关联标识格式无效，无法定位链路");
+     50|     expect(html).toContain("复制关联标识");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/14]⎯
+
+ FAIL  src/components/ui/semantic-feedback.test.ts > 真实关联标识的本地Tempo定位入口 > 无效标识不产生任何Grafana导航：00000000000000000000000000000000
+AssertionError: expected '<span class="g2-trace">Trace <code>00…' not to contain 'href='
+
+Expected: "href="
+Received: "<span class="g2-trace">Trace <code>00000000000000000000000000000000</code> <button class="text-button">复制关联标识</button> <a href="http://localhost:15330" target="_blank" rel="noreferrer">打开本地 Grafana</a></span>"
+
+ ❯ src/components/ui/semantic-feedback.test.ts:48:22
+     46|   ])("无效标识不产生任何Grafana导航：%s", traceId => {
+     47|     const html = renderToStaticMarkup(createElement(Trace, { traceId }…
+     48|     expect(html).not.toContain("href=");
+       |                      ^
+     49|     expect(html).toContain("关联标识格式无效，无法定位链路");
+     50|     expect(html).toContain("复制关联标识");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/14]⎯
+
+ FAIL  src/components/ui/semantic-feedback.test.ts > 真实关联标识的本地Tempo定位入口 > 无效标识不产生任何Grafana导航：aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+AssertionError: expected '<span class="g2-trace">Trace <code>aa…' not to contain 'href='
+
+Expected: "href="
+Received: "<span class="g2-trace">Trace <code>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</code> <button class="text-button">复制关联标识</button> <a href="http://localhost:15330" target="_blank" rel="noreferrer">打开本地 Grafana</a></span>"
+
+ ❯ src/components/ui/semantic-feedback.test.ts:48:22
+     46|   ])("无效标识不产生任何Grafana导航：%s", traceId => {
+     47|     const html = renderToStaticMarkup(createElement(Trace, { traceId }…
+     48|     expect(html).not.toContain("href=");
+       |                      ^
+     49|     expect(html).toContain("关联标识格式无效，无法定位链路");
+     50|     expect(html).toContain("复制关联标识");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/14]⎯
+
+ FAIL  src/components/ui/semantic-feedback.test.ts > 真实关联标识的本地Tempo定位入口 > 无效标识不产生任何Grafana导航：aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+AssertionError: expected '<span class="g2-trace">Trace <code>aa…' not to contain 'href='
+
+Expected: "href="
+Received: "<span class="g2-trace">Trace <code>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</code> <button class="text-button">复制关联标识</button> <a href="http://localhost:15330" target="_blank" rel="noreferrer">打开本地 Grafana</a></span>"
+
+ ❯ src/components/ui/semantic-feedback.test.ts:48:22
+     46|   ])("无效标识不产生任何Grafana导航：%s", traceId => {
+     47|     const html = renderToStaticMarkup(createElement(Trace, { traceId }…
+     48|     expect(html).not.toContain("href=");
+       |                      ^
+     49|     expect(html).toContain("关联标识格式无效，无法定位链路");
+     50|     expect(html).toContain("复制关联标识");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/14]⎯
+
+ FAIL  src/components/ui/semantic-feedback.test.ts > 真实关联标识的本地Tempo定位入口 > 无效标识不产生任何Grafana导航：gggggggggggggggggggggggggggggggg
+AssertionError: expected '<span class="g2-trace">Trace <code>gg…' not to contain 'href='
+
+Expected: "href="
+Received: "<span class="g2-trace">Trace <code>gggggggggggggggggggggggggggggggg</code> <button class="text-button">复制关联标识</button> <a href="http://localhost:15330" target="_blank" rel="noreferrer">打开本地 Grafana</a></span>"
+
+ ❯ src/components/ui/semantic-feedback.test.ts:48:22
+     46|   ])("无效标识不产生任何Grafana导航：%s", traceId => {
+     47|     const html = renderToStaticMarkup(createElement(Trace, { traceId }…
+     48|     expect(html).not.toContain("href=");
+       |                      ^
+     49|     expect(html).toContain("关联标识格式无效，无法定位链路");
+     50|     expect(html).toContain("复制关联标识");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/14]⎯
+
+ FAIL  src/components/ui/semantic-feedback.test.ts > 真实关联标识的本地Tempo定位入口 > 无效标识不产生任何Grafana导航： 0123456789abcdef0123456789abcdef
+AssertionError: expected '<span class="g2-trace">Trace <code> 0…' not to contain 'href='
+
+Expected: "href="
+Received: "<span class="g2-trace">Trace <code> 0123456789abcdef0123456789abcdef</code> <button class="text-button">复制关联标识</button> <a href="http://localhost:15330" target="_blank" rel="noreferrer">打开本地 Grafana</a></span>"
+
+ ❯ src/components/ui/semantic-feedback.test.ts:48:22
+     46|   ])("无效标识不产生任何Grafana导航：%s", traceId => {
+     47|     const html = renderToStaticMarkup(createElement(Trace, { traceId }…
+     48|     expect(html).not.toContain("href=");
+       |                      ^
+     49|     expect(html).toContain("关联标识格式无效，无法定位链路");
+     50|     expect(html).toContain("复制关联标识");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/14]⎯
+
+ FAIL  src/components/ui/semantic-feedback.test.ts > 真实关联标识的本地Tempo定位入口 > 无效标识不产生任何Grafana导航：0123456789abcdef0123456789abcdef
+
+AssertionError: expected '<span class="g2-trace">Trace <code>01…' not to contain 'href='
+
+- Expected
++ Received
+
+- href=
++ <span class="g2-trace">Trace <code>0123456789abcdef0123456789abcdef
++ </code> <button class="text-button">复制关联标识</button> <a href="http://localhost:15330" target="_blank" rel="noreferrer">打开本地 Grafana</a></span>
+
+ ❯ src/components/ui/semantic-feedback.test.ts:48:22
+     46|   ])("无效标识不产生任何Grafana导航：%s", traceId => {
+     47|     const html = renderToStaticMarkup(createElement(Trace, { traceId }…
+     48|     expect(html).not.toContain("href=");
+       |                      ^
+     49|     expect(html).toContain("关联标识格式无效，无法定位链路");
+     50|     expect(html).toContain("复制关联标识");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/14]⎯
+
+ FAIL  src/components/ui/semantic-feedback.test.ts > 真实关联标识的本地Tempo定位入口 > 无效标识不产生任何Grafana导航：0123456789abcdef0123456789abcdef?token=synthetic
+AssertionError: expected '<span class="g2-trace">Trace <code>01…' not to contain 'href='
+
+Expected: "href="
+Received: "<span class="g2-trace">Trace <code>0123456789abcdef0123456789abcdef?token=synthetic</code> <button class="text-button">复制关联标识</button> <a href="http://localhost:15330" target="_blank" rel="noreferrer">打开本地 Grafana</a></span>"
+
+ ❯ src/components/ui/semantic-feedback.test.ts:48:22
+     46|   ])("无效标识不产生任何Grafana导航：%s", traceId => {
+     47|     const html = renderToStaticMarkup(createElement(Trace, { traceId }…
+     48|     expect(html).not.toContain("href=");
+       |                      ^
+     49|     expect(html).toContain("关联标识格式无效，无法定位链路");
+     50|     expect(html).toContain("复制关联标识");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/14]⎯
+
+ FAIL  src/components/ui/semantic-feedback.test.ts > 真实关联标识的本地Tempo定位入口 > 无效标识不产生任何Grafana导航：https://example.invalid/trace
+AssertionError: expected '<span class="g2-trace">Trace <code>ht…' not to contain 'href='
+
+Expected: "href="
+Received: "<span class="g2-trace">Trace <code>https://example.invalid/trace</code> <button class="text-button">复制关联标识</button> <a href="http://localhost:15330" target="_blank" rel="noreferrer">打开本地 Grafana</a></span>"
+
+ ❯ src/components/ui/semantic-feedback.test.ts:48:22
+     46|   ])("无效标识不产生任何Grafana导航：%s", traceId => {
+     47|     const html = renderToStaticMarkup(createElement(Trace, { traceId }…
+     48|     expect(html).not.toContain("href=");
+       |                      ^
+     49|     expect(html).toContain("关联标识格式无效，无法定位链路");
+     50|     expect(html).toContain("复制关联标识");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/14]⎯
+
+ FAIL  src/components/ui/semantic-feedback.test.ts > 真实关联标识的本地Tempo定位入口 > 无效标识不产生任何Grafana导航：0123456789abcdef0123456789abcdef"><script>
+AssertionError: expected '<span class="g2-trace">Trace <code>01…' not to contain 'href='
+
+Expected: "href="
+Received: "<span class="g2-trace">Trace <code>0123456789abcdef0123456789abcdef&quot;&gt;&lt;script&gt;</code> <button class="text-button">复制关联标识</button> <a href="http://localhost:15330" target="_blank" rel="noreferrer">打开本地 Grafana</a></span>"
+
+ ❯ src/components/ui/semantic-feedback.test.ts:48:22
+     46|   ])("无效标识不产生任何Grafana导航：%s", traceId => {
+     47|     const html = renderToStaticMarkup(createElement(Trace, { traceId }…
+     48|     expect(html).not.toContain("href=");
+       |                      ^
+     49|     expect(html).toContain("关联标识格式无效，无法定位链路");
+     50|     expect(html).toContain("复制关联标识");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/14]⎯
+
+ FAIL  src/components/ui/semantic-feedback.test.ts > 真实关联标识的本地Tempo定位入口 > 无效标识不产生任何Grafana导航：%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30
+AssertionError: expected '<span class="g2-trace">Trace <code>%3…' not to contain 'href='
+
+Expected: "href="
+Received: "<span class="g2-trace">Trace <code>%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30</code> <button class="text-button">复制关联标识</button> <a href="http://localhost:15330" target="_blank" rel="noreferrer">打开本地 Grafana</a></span>"
+
+ ❯ src/components/ui/semantic-feedback.test.ts:48:22
+     46|   ])("无效标识不产生任何Grafana导航：%s", traceId => {
+     47|     const html = renderToStaticMarkup(createElement(Trace, { traceId }…
+     48|     expect(html).not.toContain("href=");
+       |                      ^
+     49|     expect(html).toContain("关联标识格式无效，无法定位链路");
+     50|     expect(html).toContain("复制关联标识");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/14]⎯
+
+ FAIL  src/components/ui/semantic-feedback.test.ts > 真实关联标识的本地Tempo定位入口 > 无效标识不产生任何Grafana导航：ＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡ
+AssertionError: expected '<span class="g2-trace">Trace <code>ＡＡ…' not to contain 'href='
+
+Expected: "href="
+Received: "<span class="g2-trace">Trace <code>ＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡＡ</code> <button class="text-button">复制关联标识</button> <a href="http://localhost:15330" target="_blank" rel="noreferrer">打开本地 Grafana</a></span>"
+
+ ❯ src/components/ui/semantic-feedback.test.ts:48:22
+     46|   ])("无效标识不产生任何Grafana导航：%s", traceId => {
+     47|     const html = renderToStaticMarkup(createElement(Trace, { traceId }…
+     48|     expect(html).not.toContain("href=");
+       |                      ^
+     49|     expect(html).toContain("关联标识格式无效，无法定位链路");
+     50|     expect(html).toContain("复制关联标识");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/14]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  14 failed (14)
+   Start at  12:08:55
+   Duration  115ms (import 38%, transform 34%, tests 24%, worker 4%)
+EXIT_CODE=1
