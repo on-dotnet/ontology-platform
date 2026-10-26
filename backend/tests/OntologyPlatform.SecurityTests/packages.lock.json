@@ -264,17 +264,22 @@
         "dependencies": {
           "Microsoft.AspNetCore.Authentication.OpenIdConnect": "[10.0.13, )",
           "Microsoft.AspNetCore.OpenApi": "[10.0.13, )",
+          "OntologyPlatform.Contracts": "[1.0.0, )",
           "OntologyPlatform.Modules.Governance": "[1.0.0, )",
           "OntologyPlatform.ServiceDefaults": "[1.0.0, )",
           "Yarp.ReverseProxy": "[2.3.0, )"
         }
+      },
+      "ontologyplatform.contracts": {
+        "type": "Project"
       },
       "ontologyplatform.modules.governance": {
         "type": "Project",
         "dependencies": {
           "Microsoft.EntityFrameworkCore": "[10.0.13, )",
           "Microsoft.EntityFrameworkCore.Relational": "[10.0.13, )",
-          "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.3, )"
+          "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.3, )",
+          "OntologyPlatform.Contracts": "[1.0.0, )"
         }
       },
       "ontologyplatform.servicedefaults": {
