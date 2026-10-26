@@ -59,6 +59,9 @@ def main():
 
     with tempfile.TemporaryDirectory(prefix=name, dir='/private/tmp' if Path('/private/tmp').is_dir() else None) as directory:
         path = Path(directory)
+        fixture = path / 'fixture'
+        fixture.mkdir(mode=0o755)
+        fixture.chmod(0o755)
         config = '''@prefix fuseki: <http://jena.apache.org/fuseki#> .
 @prefix ja: <http://jena.hpl.hp.com/2005/11/Assembler#> .
 @prefix tdb2: <http://jena.apache.org/2016/tdb#> .
@@ -71,9 +74,15 @@ def main():
  fuseki:endpoint [ fuseki:operation fuseki:shacl ; fuseki:name "shacl" ] .
 '''
         config += '<#memory> a ja:MemoryDataset .\n<#tdb> a tdb2:DatasetTDB2 ; tdb2:location "/tmp/query-tdb" .\n'
-        (path / 'config.ttl').write_text(config)
-        (path / 'log4j2.properties').write_text('status=error\nrootLogger.level=OFF\n')
+        (fixture / 'config.ttl').write_text(config)
+        (fixture / 'log4j2.properties').write_text('status=error\nrootLogger.level=OFF\n')
+        for public_file in fixture.iterdir():
+            public_file.chmod(0o644)
         try:
+            modes = {'fixture': oct(fixture.stat().st_mode & 0o777), **{file.name: oct(file.stat().st_mode & 0o777) for file in fixture.iterdir()}}
+            if modes != {'fixture': '0o755', 'config.ttl': '0o644', 'log4j2.properties': '0o644'}:
+                raise RuntimeError('Public Jena fixture permission check failed')
+            records.append(dict(check='public-jena-fixture-modes', exitCode=0, modes=modes))
             run(['docker', 'image', 'inspect', '--format', '{{.Id}}', JENA])
             run(['dotnet', 'restore', 'backend/tests/OntologyPlatform.QueryTests', '--locked-mode'])
             names.append(name + '-pg')
@@ -94,7 +103,7 @@ def main():
             env['G2_QRY_S3'] = 'http://127.0.0.1:' + s3port
             wait_url(env['G2_QRY_S3'] + '/health/ready')
             names.append(name + '-jena')
-            run(['docker', 'run', '--detach', '--name', names[-1], '--memory', '768m', '--cpus', '1', '--publish', '127.0.0.1::3030', '--mount', f'type=bind,src={path},dst=/fixture,readonly', '--entrypoint', 'java', JENA, '-Xmx384m', '-Dlog4j.configurationFile=/fixture/log4j2.properties', '-jar', '/opt/fuseki/fuseki-server.jar', '--config=/fixture/config.ttl'])
+            run(['docker', 'run', '--detach', '--name', names[-1], '--memory', '768m', '--cpus', '1', '--publish', '127.0.0.1::3030', '--mount', f'type=bind,src={fixture},dst=/fixture,readonly', '--entrypoint', 'java', JENA, '-Xmx384m', '-Dlog4j.configurationFile=/fixture/log4j2.properties', '-jar', '/opt/fuseki/fuseki-server.jar', '--config=/fixture/config.ttl'])
             jenaport = run(['docker', 'port', names[-1], '3030/tcp']).stdout.strip().rsplit(':', 1)[1]
             env['G2_QRY_JENA'] = 'http://127.0.0.1:' + jenaport
             env['G2_QRY_SAMPLES'] = str(ROOT / 'samples/g2')

@@ -72,3 +72,7 @@ NOT_RUN / NOT_VERIFIED：本树正式Host服务组合与实际runtime OpenAPI导
 NOT_RUN / NOT_VERIFIED：完整正式Host组合的runtime OpenAPI安全声明/单一Schema比对由Master最终固定Head执行，本树仍旧共享Host依赖（PlatformOpenApi旧转换仅platform路径），未另造QRY转换器。原生真实HTTP已通过，但真实OIDC、REST/MCP/MAF/SSE浏览器全链、同Head Linux CI、Windows/Intel、真正进程重启仍不宣称通过。SEM独立50/50同批验证证据由SEM/Master提供，本QRY回执只申报自己实际49项。shared Guard旧版CS1573警告保留准确边界，Master已有f0a54ed修复，本树未越权改共享文件。当前状态为READY_FOR_LIMITED_REREVIEW / PARTIAL，交同一独立Reviewer限定复审本轮修复及关联回归。
 
 本轮工程命令实际全部exit0：三范围format及verify-no-changes、QueryTests Release、Api Release、pwsh SelfTest、git diff --check b1d2a51feea5b27bf91e2470fe87f3aea697fcb3。完成固定源码提交后追加精确SHA回执。
+
+固定业务源码及首轮证据提交：`b8dc13cf7956ce4abbfa0c072ce81a91c202b45d`，已push。其完整`git diff --check b1d2a51feea5b27bf91e2470fe87f3aea697fcb3 HEAD`真实exit0。后续仅按Master批准调整owned runner跨Linux权限：随机0700父目录下新建只含公开Jena config/logging的0755 fixture子目录，两个文件显式0644并真实stat校验，容器只读bind该子目录，不用root、不扩大凭证目录。`python3 scripts/acceptance/query-plan.py --label review-1-portable-final`实际49/49、0skip、exit0；JSON首项记录0755/0644/0644，17个最终源码散列重开全部相符。本次真实审计耗时1011ms和1006ms仍均503；当前Mac实跑不能代替Linux CI结论。Release QueryTests构建1项已知共享Guard CS1573，Api增量构建0警告，未将增量结果冒称全树零警告。
+
+最后权限与文档改动后的`pwsh -NoProfile -File scripts/verify.ps1 -SelfTest`实际exit0，回执review-1-final-self-test.json；工程SelfTest中的合成checker/ZIP负例不计入49项真实产品测试。
