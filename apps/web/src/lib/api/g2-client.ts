@@ -42,10 +42,10 @@ export function createG2Client(options: { fetch?: typeof fetch } = {}) {
     diff: (draftId: string, fromRevision: number, signal?: AbortSignal) => read<G2.DraftDiff>(`/ontology-drafts/${id(draftId)}/diff?fromRevision=${fromRevision}`, signal),
     proposals: (signal?: AbortSignal) => read<G2.ReleaseProposal[]>("/release-proposals", signal),
     createProposal: (body: G2.CreateProposalRequest, signal?: AbortSignal) => write<G2.ReleaseProposal>("/release-proposals", body, "POST", undefined, signal),
-    decide: (proposalId: string, body: G2.ApprovalDecisionRequest, signal?: AbortSignal) => write<G2.ReleaseProposal>(`/approvals/${id(proposalId)}/decisions`, body, "POST", undefined, signal),
+    decide: (proposalId: string, body: G2.ApprovalDecisionRequest, signal?: AbortSignal) => write<G2.ReleaseProposal>(`/approvals/${id(proposalId)}/decisions`, body, "POST", body.command.expectedRevision, signal),
     releases: (signal?: AbortSignal) => read<G2.ReleaseSummary[]>("/releases", signal),
     release: (releaseId: string, signal?: AbortSignal) => read<G2.ReleaseSummary>(`/releases/${id(releaseId)}`, signal),
-    activate: (body: G2.ActivateReleaseRequest, signal?: AbortSignal) => write<G2.ReleaseActivation>("/release-activations", body, "POST", undefined, signal),
+    activate: (body: G2.ActivateReleaseRequest, signal?: AbortSignal) => write<G2.ReleaseActivation>("/release-activations", body, "POST", body.command.expectedRevision, signal),
     capabilities: (signal?: AbortSignal) => read<G2.SemanticCapability[]>("/capabilities", signal),
     discover: (assetId: string, releaseId: string | null, signal?: AbortSignal) => read<G2.SemanticQueryResult>(`/semantic/discover?assetId=${id(assetId)}${releaseId ? `&releaseId=${id(releaseId)}` : ""}`, signal),
     query: (body: G2.SemanticQueryPlan, signal?: AbortSignal) => write<G2.SemanticQueryResult>("/semantic/queries", body, "POST", undefined, signal),
@@ -53,7 +53,7 @@ export function createG2Client(options: { fetch?: typeof fetch } = {}) {
     runs: (signal?: AbortSignal) => read<G2.ExecutionRun[]>("/execution-runs", signal),
     run: (runId: string, signal?: AbortSignal) => read<G2.ExecutionRun>(`/execution-runs/${id(runId)}`, signal),
     createRun: (body: G2.CreateRunRequest, signal?: AbortSignal) => write<G2.ExecutionRun>("/execution-runs", body, "POST", undefined, signal),
-    cancelRun: (runId: string, body: G2.CancelRunRequest, signal?: AbortSignal) => write<G2.ExecutionRun>(`/execution-runs/${id(runId)}/cancel`, body, "POST", undefined, signal),
+    cancelRun: (runId: string, body: G2.CancelRunRequest, signal?: AbortSignal) => write<G2.ExecutionRun>(`/execution-runs/${id(runId)}/cancel`, body, "POST", body.command.expectedRevision, signal),
     events: async (runId: string, lastEventId: string | null, signal: AbortSignal) => {
       const headers = new Headers({ Accept: "text/event-stream" });
       if (lastEventId) headers.set("Last-Event-ID", lastEventId);
