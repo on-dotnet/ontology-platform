@@ -68,3 +68,5 @@ Master需完成受保护的G2 Host composition、真实迁移/PG与Jena资源及
 真实验收需使用既有批准的合成OIDC身份流程，完成四源导入→revision2→结构/验证/Diff→异人审批→发布→正式六态/证据→deterministic Run事件/续订/取消与真实服务故障；本轮界面夹具全部不能代替这些事实。没有读取、展示或打包Cookie、凭证、登录HAR或生产数据。付费模型、生产访问、跨平台/完整OWL推理仍不在本轮已验证事实内。
 
 独立Review、真实后端E2E、同Head CI、Master main集成和唯一标准ZIP仍待后续，当前分支不自行合并main。
+
+最终本轮实施SourceSha=`46b05f073aa9c425bf5c11c3da0160806d73a134`（全部产品源码/测试/截图/日志已在该提交；后续此行仅文档关联提交，不改变已验证源码）。
