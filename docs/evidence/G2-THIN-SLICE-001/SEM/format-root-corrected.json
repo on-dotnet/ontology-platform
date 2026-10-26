@@ -1,0 +1,75 @@
+[
+  {
+    "command": [
+      "dotnet",
+      "format",
+      "OntologyPlatform.slnx",
+      "--no-restore",
+      "--include",
+      "src/Modules/Ontology/OntologyPlatform.Modules.Ontology/DraftRevisionRecord.cs",
+      "src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyService.cs",
+      "src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyDbContext.cs",
+      "src/Modules/Ontology/OntologyPlatform.Modules.Ontology/CommandRecord.cs",
+      "src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaSemanticRuntime.cs",
+      "src/Modules/Ontology/OntologyPlatform.Modules.Ontology/ShapePolicy.cs",
+      "src/Modules/Ontology/OntologyPlatform.Modules.Ontology/ValidationRecord.cs",
+      "src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyDesignTimeFactory.cs",
+      "src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaRdfCodec.cs",
+      "src/Modules/Ontology/OntologyPlatform.Modules.Ontology/DraftRecord.cs",
+      "src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyModule.cs",
+      "src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/OntologyRules.cs",
+      "tests/OntologyPlatform.SemanticTests/ShaclTests.cs",
+      "tests/OntologyPlatform.SemanticTests/RoundtripTests.cs",
+      "tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+      "tests/OntologyPlatform.SemanticTests/SemanticFixture.cs",
+      "src/Hosts/OntologyPlatform.Api/G2/OntologyEndpoints.cs",
+      "--verbosity",
+      "normal"
+    ],
+    "cwd": "backend",
+    "exitCode": 0,
+    "output": "正在设置工作区“/Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/OntologyPlatform.slnx”中代码文件的格式。\n加载工作区时遇到警告。要记录警告，请将“详细级别”选项设置为“诊断”级别。\n已将代码文件“/Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyService.cs”格式化。\n已将代码文件“/Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/SemanticFixture.cs”格式化。\n将在 3941 毫秒后完成格式化。\n"
+  },
+  {
+    "command": [
+      "dotnet",
+      "format",
+      "OntologyPlatform.slnx",
+      "--no-restore",
+      "--verify-no-changes",
+      "--include",
+      "src/Modules/Ontology/OntologyPlatform.Modules.Ontology/DraftRevisionRecord.cs",
+      "src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyService.cs",
+      "src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyDbContext.cs",
+      "src/Modules/Ontology/OntologyPlatform.Modules.Ontology/CommandRecord.cs",
+      "src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaSemanticRuntime.cs",
+      "src/Modules/Ontology/OntologyPlatform.Modules.Ontology/ShapePolicy.cs",
+      "src/Modules/Ontology/OntologyPlatform.Modules.Ontology/ValidationRecord.cs",
+      "src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyDesignTimeFactory.cs",
+      "src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaRdfCodec.cs",
+      "src/Modules/Ontology/OntologyPlatform.Modules.Ontology/DraftRecord.cs",
+      "src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyModule.cs",
+      "src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/OntologyRules.cs",
+      "tests/OntologyPlatform.SemanticTests/ShaclTests.cs",
+      "tests/OntologyPlatform.SemanticTests/RoundtripTests.cs",
+      "tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+      "tests/OntologyPlatform.SemanticTests/SemanticFixture.cs",
+      "src/Hosts/OntologyPlatform.Api/G2/OntologyEndpoints.cs"
+    ],
+    "cwd": "backend",
+    "exitCode": 0,
+    "output": "加载工作区时遇到警告。要记录警告，请将“详细级别”选项设置为“诊断”级别。\n"
+  },
+  {
+    "command": [
+      "dotnet",
+      "format",
+      "OntologyPlatform.slnx",
+      "--no-restore",
+      "--verify-no-changes"
+    ],
+    "cwd": "backend",
+    "exitCode": 2,
+    "output": "加载工作区时遇到警告。要记录警告，请将“详细级别”选项设置为“诊断”级别。\n/Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/WireContractTests.cs(158,32): error WHITESPACE: 修复空格格式。 将 1 字符替换为 '\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s'。 [/Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/OntologyPlatform.G2ContractTests.csproj]\n/Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/WireContractTests.cs(158,41): error WHITESPACE: 修复空格格式。 将 1 字符替换为 '\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s'。 [/Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/OntologyPlatform.G2ContractTests.csproj]\n/Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/WireContractTests.cs(158,65): error WHITESPACE: 修复空格格式。 将 1 字符替换为 '\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s'。 [/Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/OntologyPlatform.G2ContractTests.csproj]\n/Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/WireContractTests.cs(159,31): error WHITESPACE: 修复空格格式。 将 1 字符替换为 '\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s'。 [/Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/OntologyPlatform.G2ContractTests.csproj]\n/Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/WireContractTests.cs(159,70): error WHITESPACE: 修复空格格式。 将 1 字符替换为 '\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s'。 [/Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/OntologyPlatform.G2ContractTests.csproj]\n/Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/Migrations/20261026003221_InitialOntology.cs(6,11): warning IDE0161: 转换为文件范围限定的 namespace [/Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyPlatform.Modules.Ontology.csproj]\n"
+  }
+]
