@@ -129,11 +129,27 @@ public interface ISemanticRuntime
     /// <param name="cancellationToken">取消信号。</param>
     /// <returns>有界真实三元组。</returns>
     Task<PublishedRdfData> ReadPublishedAsync(AssetVersionSnapshot snapshot, CancellationToken cancellationToken);
+
+    /// <summary>将实际返回的同一批正式RDF与经过不可变对象hash验证的权威源精确对账，拒绝验证后重读窗口。</summary>
+    /// <param name="manifest">已经重新授权的正式发布清单。</param>
+    /// <param name="sources">按清单逐对象核验hash及UTF8字节后组装的完整权威源。</param>
+    /// <param name="cancellationToken">覆盖解析、读取和对账的同一预算。</param>
+    /// <returns>仅与源和清单匹配的实际读取批次；旧适配器不支持时失败关闭。</returns>
+    Task<PublishedRdfData> ReadVerifiedPublishedAsync(ReleaseManifest manifest, SourceBundle sources, CancellationToken cancellationToken)
+        => Task.FromException<PublishedRdfData>(new SemanticOperationException(503, "verified_runtime_unavailable"));
 }
 
 /// <summary>以完整范围再次授权正式版本，供网关与运行固定快照。</summary>
 public interface IReleaseCatalog
 {
+    /// <summary>只按服务器查回的发布身份重新授权，供不含assetId的草稿克隆使用。</summary>
+    /// <param name="actor">可信主体。</param>
+    /// <param name="releaseId">已存在的正式发布ID。</param>
+    /// <param name="cancellationToken">取消信号。</param>
+    /// <returns>包含权威assetId及唯一scope的正式清单。</returns>
+    Task<ReleaseSummary> ReadAsync(ActorContext actor, string releaseId, CancellationToken cancellationToken);
+
+
     /// <summary>一次解析当前活动或显式历史正式版本，禁止半准备版本。</summary>
     /// <param name="actor">可信主体。</param>
     /// <param name="assetId">永久唯一范围资产。</param>
@@ -196,4 +212,43 @@ public interface IAuditTrail
     /// <param name="cancellationToken">取消信号。</param>
     /// <returns>已提交审计标识。</returns>
     Task<string> WriteAsync(ActorContext actor, AuditCommand command, CancellationToken cancellationToken);
+}
+
+/// <summary>经异人审批的不可变发布、回滚及活动指针用例。</summary>
+public interface IPublishingService
+{
+    /// <summary>列出当前主体完整范围获准的真实提案。</summary>
+    /// <param name="actor">可信主体。</param>
+    /// <param name="cancellationToken">取消信号。</param>
+    /// <returns>可访问提案。</returns>
+    Task<ReleaseProposal[]> ListProposalsAsync(ActorContext actor, CancellationToken cancellationToken);
+
+    /// <summary>固定当前校验草稿或旧完整manifest，创建受控提案。</summary>
+    /// <param name="actor">可信提交者。</param>
+    /// <param name="request">精确发布或回滚绑定。</param>
+    /// <param name="cancellationToken">取消信号。</param>
+    /// <returns>已持久提案。</returns>
+    Task<ReleaseProposal> CreateProposalAsync(ActorContext actor, CreateProposalRequest request, CancellationToken cancellationToken);
+
+    /// <summary>由不同主体对精确提案作独立决定。</summary>
+    /// <param name="actor">可信审核者。</param>
+    /// <param name="proposalId">固定提案。</param>
+    /// <param name="request">决定与修订命令。</param>
+    /// <param name="cancellationToken">取消信号。</param>
+    /// <returns>实际决定后的提案。</returns>
+    Task<ReleaseProposal> DecideAsync(ActorContext actor, string proposalId, ApprovalDecisionRequest request, CancellationToken cancellationToken);
+
+    /// <summary>真实外部回验后，在同PG事务CAS活动指针、审计和Outbox。</summary>
+    /// <param name="actor">可信激活主体。</param>
+    /// <param name="request">已批准提案与活动指针CAS。</param>
+    /// <param name="cancellationToken">取消信号。</param>
+    /// <returns>已提交且可幂等恢复的激活事实。</returns>
+    Task<ReleaseActivation> ActivateAsync(ActorContext actor, ActivateReleaseRequest request, CancellationToken cancellationToken);
+
+    /// <summary>读取可访问的正式发布历史，不返回半准备草稿。</summary>
+    /// <param name="actor">可信主体。</param>
+    /// <param name="assetId">可选资产过滤。</param>
+    /// <param name="cancellationToken">取消信号。</param>
+    /// <returns>真实历史与活动状态。</returns>
+    Task<ReleaseSummary[]> ListReleasesAsync(ActorContext actor, string? assetId, CancellationToken cancellationToken);
 }

@@ -306,7 +306,7 @@ public abstract record ExecutionPayload;
 
 /// <summary>不可由客户端扩大的资源组织与完整厂区范围。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record ResourceScope
+public sealed record ResourceScope : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>资源所属组织。</summary>
     [JsonRequired]
@@ -316,11 +316,16 @@ public sealed record ResourceScope
     [JsonRequired]
     public string[] SiteIds { get; init; } = [];
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>仅由已验证服务器身份构造的调用上下文。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record ActorContext
+public sealed record ActorContext : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>已验证主体标识。</summary>
     [JsonRequired]
@@ -346,11 +351,16 @@ public sealed record ActorContext
     [JsonRequired]
     public string CorrelationId { get; init; } = string.Empty;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>用于明确修订与幂等语义的受控命令上下文。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record CommandContext
+public sealed record CommandContext : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>本次命令标识。</summary>
     [JsonRequired]
@@ -368,11 +378,16 @@ public sealed record CommandContext
     [JsonRequired]
     public string Reason { get; init; } = string.Empty;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>本体、约束、词汇与合成事实的唯一权威UTF8源码。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record SourceBundle
+public sealed record SourceBundle : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>完整OWL本体Turtle原文。</summary>
     [JsonRequired]
@@ -390,11 +405,16 @@ public sealed record SourceBundle
     [JsonRequired]
     public string DataTurtle { get; init; } = string.Empty;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>按明确UTF8字节计算的独立源散列与组合散列。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record SourceHashes
+public sealed record SourceHashes : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>本体源码SHA256。</summary>
     [JsonRequired]
@@ -416,11 +436,16 @@ public sealed record SourceHashes
     [JsonRequired]
     public string BundleHash { get; init; } = string.Empty;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>标准RDF项，保留IRI、空白节点与字面量词法信息。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record RdfTerm
+public sealed record RdfTerm : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>标准项类别。</summary>
     [JsonRequired]
@@ -438,11 +463,16 @@ public sealed record RdfTerm
     [JsonRequired]
     public string? Language { get; init; } = null;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>标准RDF三元组，不替代权威源码。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record RdfTriple
+public sealed record RdfTriple : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>主体项。</summary>
     [JsonRequired]
@@ -456,11 +486,16 @@ public sealed record RdfTriple
     [JsonRequired]
     public RdfTerm Object { get; init; } = default!;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>仅包含受控中文消息的语义诊断。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record SemanticDiagnostic
+public sealed record SemanticDiagnostic : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>固定机器诊断代码。</summary>
     [JsonRequired]
@@ -482,11 +517,16 @@ public sealed record SemanticDiagnostic
     [JsonRequired]
     public string? Path { get; init; } = null;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>由真实RDF图投影的可访问节点。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record SemanticNode
+public sealed record SemanticNode : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>节点完整IRI。</summary>
     [JsonRequired]
@@ -504,11 +544,16 @@ public sealed record SemanticNode
     [JsonRequired]
     public string[] TypeIris { get; init; } = [];
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>由实际RDF对象关系投影的边。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record SemanticEdge
+public sealed record SemanticEdge : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>规范三元组散列稳定标识。</summary>
     [JsonRequired]
@@ -530,11 +575,16 @@ public sealed record SemanticEdge
     [JsonRequired]
     public string Label { get; init; } = string.Empty;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>明确绑定草稿修订与源散列的完整读投影。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record SemanticProjection
+public sealed record SemanticProjection : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>投影对应修订。</summary>
     [JsonRequired]
@@ -564,11 +614,16 @@ public sealed record SemanticProjection
     [JsonRequired]
     public SemanticDiagnostic[] Diagnostics { get; init; } = [];
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>具有独立作用域和CAS修订的持久本体草稿。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record OntologyDraft
+public sealed record OntologyDraft : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>草稿标识。</summary>
     [JsonRequired]
@@ -618,11 +673,16 @@ public sealed record OntologyDraft
     [JsonRequired]
     public SemanticProjection Projection { get; init; } = default!;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>只修改批准谓词的显式标准RDF编辑。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record SemanticEdit
+public sealed record SemanticEdit : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>受控主体IRI。</summary>
     [JsonRequired]
@@ -640,11 +700,16 @@ public sealed record SemanticEdit
     [JsonRequired]
     public RdfTerm? NewObject { get; init; } = null;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>真实Jena标准报告中的定位问题。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record ValidationIssue
+public sealed record ValidationIssue : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>标准严重度。</summary>
     [JsonRequired]
@@ -678,11 +743,16 @@ public sealed record ValidationIssue
     [JsonRequired]
     public string SourceId { get; init; } = string.Empty;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>绑定精确修订与源码的真实语义校验报告。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record SemanticValidationReport
+public sealed record SemanticValidationReport : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>校验事实标识。</summary>
     [JsonRequired]
@@ -724,11 +794,16 @@ public sealed record SemanticValidationReport
     [JsonRequired]
     public string TraceId { get; init; } = string.Empty;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>固定历史修订间的源码与标准语义差异。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record DraftDiff
+public sealed record DraftDiff : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>基础修订。</summary>
     [JsonRequired]
@@ -762,11 +837,16 @@ public sealed record DraftDiff
     [JsonRequired]
     public SemanticDiagnostic[] UnsupportedDiagnostics { get; init; } = [];
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>确已存在的关联资产版本，不填虚构版本。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record AssetVersion
+public sealed record AssetVersion : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>关联资产标识。</summary>
     [JsonRequired]
@@ -776,11 +856,16 @@ public sealed record AssetVersion
     [JsonRequired]
     public string Version { get; init; } = string.Empty;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>每个查询与运行固定的完整不可变发布快照。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record AssetVersionSnapshot
+public sealed record AssetVersionSnapshot : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>正式发布标识。</summary>
     [JsonRequired]
@@ -826,11 +911,16 @@ public sealed record AssetVersionSnapshot
     [JsonRequired]
     public AssetVersion[] CapabilityVersions { get; init; } = [];
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>经回读散列确认的不可变对象引用。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record ArtifactObject
+public sealed record ArtifactObject : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>服务器受控且含发布标识的对象键。</summary>
     [JsonRequired]
@@ -848,11 +938,16 @@ public sealed record ArtifactObject
     [JsonRequired]
     public string ContentType { get; init; } = string.Empty;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>已锁定且可回验的本体导入引用。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record ImportLock
+public sealed record ImportLock : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>导入本体IRI。</summary>
     [JsonRequired]
@@ -866,11 +961,16 @@ public sealed record ImportLock
     [JsonRequired]
     public string ObjectKey { get; init; } = string.Empty;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>准备与回验完成后固定的正式发布清单。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record ReleaseManifest
+public sealed record ReleaseManifest : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>清单版本一。</summary>
     [JsonRequired]
@@ -924,11 +1024,16 @@ public sealed record ReleaseManifest
     [JsonRequired]
     public DateTimeOffset CreatedAtUtc { get; init; } = default;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>与精确提案内容和独立审核主体绑定的决定。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record ApprovalRecord
+public sealed record ApprovalRecord : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>决定主体，必须不同于提交者。</summary>
     [JsonRequired]
@@ -946,11 +1051,16 @@ public sealed record ApprovalRecord
     [JsonRequired]
     public string BindingHash { get; init; } = string.Empty;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>明确区分当前草稿发布和旧完整版本回滚的受控提案。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record ReleaseProposal
+public sealed record ReleaseProposal : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>提案标识也是审批ID。</summary>
     [JsonRequired]
@@ -1016,11 +1126,16 @@ public sealed record ReleaseProposal
     [JsonRequired]
     public ApprovalRecord? Approval { get; init; } = null;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>同PG事务激活成功后的事实回执。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record ReleaseActivation
+public sealed record ReleaseActivation : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>激活事务事实标识。</summary>
     [JsonRequired]
@@ -1058,11 +1173,20 @@ public sealed record ReleaseActivation
     [JsonRequired]
     public DateTimeOffset ActivatedAtUtc { get; init; } = default;
 
+    /// <summary>激活事务实际Trace，用于审计与专业诊断关联。</summary>
+    [JsonRequired]
+    public string TraceId { get; init; } = string.Empty;
+
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>可访问正式历史版本和活动状态。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record ReleaseSummary
+public sealed record ReleaseSummary : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>不可变清单。</summary>
     [JsonRequired]
@@ -1084,11 +1208,20 @@ public sealed record ReleaseSummary
     [JsonRequired]
     public ReleaseStatus Status { get; init; } = default;
 
+    /// <summary>该正式版本最近一次激活的持久Trace，不猜测运行标识。</summary>
+    [JsonRequired]
+    public string TraceId { get; init; } = string.Empty;
+
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>只允许登记能力与正式版本的有界语义计划。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record SemanticQueryPlan
+public sealed record SemanticQueryPlan : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>唯一已登记能力ID。</summary>
     [JsonRequired]
@@ -1138,11 +1271,16 @@ public sealed record SemanticQueryPlan
     [JsonRequired]
     public int TimeoutMs { get; init; } = default;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>业务断言有效时间，独立于采集与资产版本。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record TemporalExtent
+public sealed record TemporalExtent : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>有效起点。</summary>
     [JsonRequired]
@@ -1152,11 +1290,16 @@ public sealed record TemporalExtent
     [JsonRequired]
     public DateTimeOffset? ToUtc { get; init; } = null;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>可重新授权并核验标准图与源对象的证据引用。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record EvidenceRef
+public sealed record EvidenceRef : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>服务器可定位的稳定证据标识。</summary>
     [JsonRequired]
@@ -1226,11 +1369,16 @@ public sealed record EvidenceRef
     [JsonRequired]
     public bool Synthetic { get; init; } = default;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>具有真实标准值与适用证据引用的属性。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record SemanticPropertyValue
+public sealed record SemanticPropertyValue : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>实际谓词IRI。</summary>
     [JsonRequired]
@@ -1244,11 +1392,16 @@ public sealed record SemanticPropertyValue
     [JsonRequired]
     public string[] EvidenceIds { get; init; } = [];
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>未按外部编号误合并的获准实体。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record SemanticEntity
+public sealed record SemanticEntity : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>全局稳定IRI。</summary>
     [JsonRequired]
@@ -1282,11 +1435,16 @@ public sealed record SemanticEntity
     [JsonRequired]
     public SemanticPropertyValue[] Properties { get; init; } = [];
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>允许多对多且附有来源的实际关系。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record SemanticRelationship
+public sealed record SemanticRelationship : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>获准来源实体。</summary>
     [JsonRequired]
@@ -1304,11 +1462,16 @@ public sealed record SemanticRelationship
     [JsonRequired]
     public string[] EvidenceIds { get; init; } = [];
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>从正式本体图读取的概念和关系说明。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record OntologyDescription
+public sealed record OntologyDescription : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>正式类IRI。</summary>
     [JsonRequired]
@@ -1334,11 +1497,16 @@ public sealed record OntologyDescription
     [JsonRequired]
     public SemanticDiagnostic[] Diagnostics { get; init; } = [];
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>由kind约束恰好一个非空值的唯一查询数据项。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record SemanticDatum
+public sealed record SemanticDatum : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>本体、实体或关系判别。</summary>
     [JsonRequired]
@@ -1356,11 +1524,16 @@ public sealed record SemanticDatum
     [JsonRequired]
     public SemanticRelationship? Relationship { get; init; } = null;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>只包含已授权不同IRI的身份歧义候选。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record EntityCandidate
+public sealed record EntityCandidate : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>候选完整IRI。</summary>
     [JsonRequired]
@@ -1390,11 +1563,16 @@ public sealed record EntityCandidate
     [JsonRequired]
     public string[] EvidenceIds { get; init; } = [];
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>真实源状态与该源数据版本，不把不可用当空。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record SemanticSubSource
+public sealed record SemanticSubSource : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>受控来源ID。</summary>
     [JsonRequired]
@@ -1420,11 +1598,16 @@ public sealed record SemanticSubSource
     [JsonRequired]
     public string? Code { get; init; } = null;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>REST、MCP和Agent共享的唯一六态结果。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record SemanticQueryResult
+public sealed record SemanticQueryResult : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>六态实际结果。</summary>
     [JsonRequired]
@@ -1470,11 +1653,16 @@ public sealed record SemanticQueryResult
     [JsonRequired]
     public SemanticDiagnostic[] Diagnostics { get; init; } = [];
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>仅用于本轮已知能力输入的有限参数描述。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record CapabilityParameter
+public sealed record CapabilityParameter : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>输入字段。</summary>
     [JsonRequired]
@@ -1504,11 +1692,16 @@ public sealed record CapabilityParameter
     [JsonRequired]
     public string? ItemsType { get; init; } = null;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>仅生成工具输入标准JSON Schema的有限描述。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record CapabilityInputSchema
+public sealed record CapabilityInputSchema : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>描述版本一。</summary>
     [JsonRequired]
@@ -1530,11 +1723,16 @@ public sealed record CapabilityInputSchema
     [JsonRequired]
     public bool AdditionalProperties { get; init; } = default;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>登记能力的有限资源预算。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record CapabilityBudget
+public sealed record CapabilityBudget : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>最大关系深度。</summary>
     [JsonRequired]
@@ -1552,11 +1750,16 @@ public sealed record CapabilityBudget
     [JsonRequired]
     public int MaxToolCalls { get; init; } = default;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>唯一能力登记，输出标准Schema来自真实强类型合同。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record SemanticCapability
+public sealed record SemanticCapability : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>稳定能力ID。</summary>
     [JsonRequired]
@@ -1590,11 +1793,16 @@ public sealed record SemanticCapability
     [JsonRequired]
     public CapabilityBudget Budgets { get; init; } = default!;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>固定完整版本并由PG租约和fencing保护的持久运行。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record ExecutionRun
+public sealed record ExecutionRun : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>运行标识。</summary>
     [JsonRequired]
@@ -1648,11 +1856,20 @@ public sealed record ExecutionRun
     [JsonRequired]
     public long FencingToken { get; init; } = default;
 
+    /// <summary>创建时固定且由执行链关联的实际Trace。</summary>
+    [JsonRequired]
+    public string TraceId { get; init; } = string.Empty;
+
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>由真实持久事件类型run.started确定的唯一载荷。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record RunStartedPayload : ExecutionPayload
+public sealed record RunStartedPayload : ExecutionPayload, IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>实际提供者模式。</summary>
     [JsonRequired]
@@ -1670,11 +1887,16 @@ public sealed record RunStartedPayload : ExecutionPayload
     [JsonRequired]
     public int TimeoutMs { get; init; } = default;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>由真实持久事件类型tool.started确定的唯一载荷。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record ToolStartedPayload : ExecutionPayload
+public sealed record ToolStartedPayload : ExecutionPayload, IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>工具调用标识。</summary>
     [JsonRequired]
@@ -1692,11 +1914,16 @@ public sealed record ToolStartedPayload : ExecutionPayload
     [JsonRequired]
     public SemanticQueryPlan Plan { get; init; } = default!;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>由真实持久事件类型tool.completed确定的唯一载荷。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record ToolCompletedPayload : ExecutionPayload
+public sealed record ToolCompletedPayload : ExecutionPayload, IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>同一次工具调用。</summary>
     [JsonRequired]
@@ -1710,31 +1937,46 @@ public sealed record ToolCompletedPayload : ExecutionPayload
     [JsonRequired]
     public double DurationMs { get; init; } = default;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>由真实持久事件类型evidence.added确定的唯一载荷。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record EvidenceAddedPayload : ExecutionPayload
+public sealed record EvidenceAddedPayload : ExecutionPayload, IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>实际返回并获授权的证据。</summary>
     [JsonRequired]
     public EvidenceRef Evidence { get; init; } = default!;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>由真实持久事件类型message.delta确定的唯一载荷。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record MessageDeltaPayload : ExecutionPayload
+public sealed record MessageDeltaPayload : ExecutionPayload, IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>受保护事件正文，不能输出到普通遥测。</summary>
     [JsonRequired]
     public string Text { get; init; } = string.Empty;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>由真实持久事件类型approval.required确定的唯一载荷。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record ApprovalRequiredPayload : ExecutionPayload
+public sealed record ApprovalRequiredPayload : ExecutionPayload, IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>实际待审ID。</summary>
     [JsonRequired]
@@ -1756,11 +1998,16 @@ public sealed record ApprovalRequiredPayload : ExecutionPayload
     [JsonRequired]
     public DateTimeOffset ExpiresAtUtc { get; init; } = default;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>由真实持久事件类型run.completed确定的唯一载荷。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record RunCompletedPayload : ExecutionPayload
+public sealed record RunCompletedPayload : ExecutionPayload, IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>仅COMPLETED。</summary>
     [JsonRequired]
@@ -1774,11 +2021,16 @@ public sealed record RunCompletedPayload : ExecutionPayload
     [JsonRequired]
     public SemanticQueryStatus? LastResultStatus { get; init; } = null;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>由真实持久事件类型run.failed确定的唯一载荷。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record RunFailedPayload : ExecutionPayload
+public sealed record RunFailedPayload : ExecutionPayload, IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>仅FAILED。</summary>
     [JsonRequired]
@@ -1792,11 +2044,16 @@ public sealed record RunFailedPayload : ExecutionPayload
     [JsonRequired]
     public int TotalToolCalls { get; init; } = default;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>由真实持久事件类型run.cancelled确定的唯一载荷。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record RunCancelledPayload : ExecutionPayload
+public sealed record RunCancelledPayload : ExecutionPayload, IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>仅CANCELLED。</summary>
     [JsonRequired]
@@ -1810,11 +2067,16 @@ public sealed record RunCancelledPayload : ExecutionPayload
     [JsonRequired]
     public int TotalToolCalls { get; init; } = default;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>先PG提交后由SSE重放发送的唯一执行事件。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record ExecutionEvent
+public sealed record ExecutionEvent : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>所属运行。</summary>
     [JsonRequired]
@@ -1848,11 +2110,16 @@ public sealed record ExecutionEvent
     [JsonRequired]
     public ExecutionPayload Payload { get; init; } = default!;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>拒绝未登记字段并包含明确幂等/修订的受保护命令。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record CreateDraftRequest
+public sealed record CreateDraftRequest : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>草稿名称。</summary>
     [JsonRequired]
@@ -1874,11 +2141,16 @@ public sealed record CreateDraftRequest
     [JsonRequired]
     public CommandContext Command { get; init; } = default!;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>拒绝未登记字段并包含明确幂等/修订的受保护命令。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record SaveDraftRequest
+public sealed record SaveDraftRequest : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>新名称。</summary>
     [JsonRequired]
@@ -1892,11 +2164,16 @@ public sealed record SaveDraftRequest
     [JsonRequired]
     public CommandContext Command { get; init; } = default!;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>拒绝未登记字段并包含明确幂等/修订的受保护命令。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record EditDraftRequest
+public sealed record EditDraftRequest : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>显式标准RDF变更。</summary>
     [JsonRequired]
@@ -1906,11 +2183,16 @@ public sealed record EditDraftRequest
     [JsonRequired]
     public CommandContext Command { get; init; } = default!;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>拒绝未登记字段并包含明确幂等/修订的受保护命令。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record ValidateDraftRequest
+public sealed record ValidateDraftRequest : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>要验证的精确修订。</summary>
     [JsonRequired]
@@ -1924,11 +2206,16 @@ public sealed record ValidateDraftRequest
     [JsonRequired]
     public CommandContext Command { get; init; } = default!;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>拒绝未登记字段并包含明确幂等/修订的受保护命令。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record CreateProposalRequest
+public sealed record CreateProposalRequest : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>发布或回滚。</summary>
     [JsonRequired]
@@ -1962,11 +2249,16 @@ public sealed record CreateProposalRequest
     [JsonRequired]
     public CommandContext Command { get; init; } = default!;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>拒绝未登记字段并包含明确幂等/修订的受保护命令。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record ApprovalDecisionRequest
+public sealed record ApprovalDecisionRequest : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>实际审核决定。</summary>
     [JsonRequired]
@@ -1976,11 +2268,16 @@ public sealed record ApprovalDecisionRequest
     [JsonRequired]
     public CommandContext Command { get; init; } = default!;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>拒绝未登记字段并包含明确幂等/修订的受保护命令。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record ActivateReleaseRequest
+public sealed record ActivateReleaseRequest : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>已批准提案。</summary>
     [JsonRequired]
@@ -1998,11 +2295,16 @@ public sealed record ActivateReleaseRequest
     [JsonRequired]
     public CommandContext Command { get; init; } = default!;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>拒绝未登记字段并包含明确幂等/修订的受保护命令。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record CreateRunRequest
+public sealed record CreateRunRequest : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>仅受保护Run存储的用户正文。</summary>
     [JsonRequired]
@@ -2020,21 +2322,31 @@ public sealed record CreateRunRequest
     [JsonRequired]
     public CommandContext Command { get; init; } = default!;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>拒绝未登记字段并包含明确幂等/修订的受保护命令。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record CancelRunRequest
+public sealed record CancelRunRequest : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>幂等、修订和审计理由。</summary>
     [JsonRequired]
     public CommandContext Command { get; init; } = default!;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>内部真实解析及支持边界结果。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record SemanticAnalysis
+public sealed record SemanticAnalysis : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>实际源散列。</summary>
     [JsonRequired]
@@ -2044,11 +2356,16 @@ public sealed record SemanticAnalysis
     [JsonRequired]
     public SemanticProjection Projection { get; init; } = default!;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>Ontology自己锁定读取并核验的正式发布准备源。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record DraftPublicationSnapshot
+public sealed record DraftPublicationSnapshot : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>被锁定的精确草稿。</summary>
     [JsonRequired]
@@ -2058,11 +2375,16 @@ public sealed record DraftPublicationSnapshot
     [JsonRequired]
     public SemanticValidationReport Validation { get; init; } = default!;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>仅从固定正式版本图取得的真实RDF读取结果。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record PublishedRdfData
+public sealed record PublishedRdfData : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>正式本体三元组。</summary>
     [JsonRequired]
@@ -2072,11 +2394,16 @@ public sealed record PublishedRdfData
     [JsonRequired]
     public RdfTriple[] DataTriples { get; init; } = [];
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
 
 /// <summary>由模块用例提交给Governance拥有写入器的受控审计事实。</summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
-public sealed record AuditCommand
+public sealed record AuditCommand : IJsonOnDeserialized, IJsonOnSerializing
 {
     /// <summary>固定审计操作。</summary>
     [JsonRequired]
@@ -2094,4 +2421,9 @@ public sealed record AuditCommand
     [JsonRequired]
     public ResourceScope Scope { get; init; } = default!;
 
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
