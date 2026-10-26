@@ -114,7 +114,8 @@ def main():
                 run(['docker', 'rm', '--force', container], False)
             EVIDENCE.mkdir(parents=True, exist_ok=True)
             sha = subprocess.run(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True, capture_output=True).stdout.strip()
-            (EVIDENCE / (args.label + '.json')).write_text(json.dumps(dict(sourceSha=sha, workingTreeChanges=True, exitCode=code, records=records), ensure_ascii=False, indent=2) + '\n')
+            changes = subprocess.run(['git', 'status', '--porcelain', '--untracked-files=all'], cwd=ROOT, text=True, capture_output=True).stdout.strip()
+            (EVIDENCE / (args.label + '.json')).write_text(json.dumps(dict(sourceSha=sha, workingTreeChanges=bool(changes), exitCode=code, records=records), ensure_ascii=False, indent=2) + '\n')
     return code
 
 

@@ -36,6 +36,7 @@ public sealed class ReleaseVerifier
         // 固定位置完整源与清单每个内容对象逐一回验。
         var expected = SourceContents(sources);
         if (manifest.ArtifactObjects.Length != expected.Length) throw new SemanticOperationException(503, "artifact_binding_mismatch");
+        // 同位置对象与权威源逐项匹配，不能仅验证各自内部hash。
         for (var index = 0; index < expected.Length; index++)
         {
             // 同位置真实字节必须与固定源完全一致，不仅检查对象自报hash。

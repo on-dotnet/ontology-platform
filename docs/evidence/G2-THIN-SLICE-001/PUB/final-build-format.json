@@ -1,0 +1,41 @@
+[
+  {
+    "command": [
+      "dotnet",
+      "build",
+      "backend/src/Hosts/OntologyPlatform.Api",
+      "-c",
+      "Release",
+      "--no-restore"
+    ],
+    "cwd": ".",
+    "exitCode": 0,
+    "output": "  OntologyPlatform.ServiceDefaults -> /Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/ServiceDefaults/bin/Release/net10.0/OntologyPlatform.ServiceDefaults.dll\n  OntologyPlatform.Contracts -> /Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/bin/Release/net10.0/OntologyPlatform.Contracts.dll\n  OntologyPlatform.Modules.Governance -> /Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/bin/Release/net10.0/OntologyPlatform.Modules.Governance.dll\n  OntologyPlatform.Api -> /Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/bin/Release/net10.0/OntologyPlatform.Api.dll\n\n已成功生成。\n    0 个警告\n    0 个错误\n\n已用时间 00:00:00.60\n"
+  },
+  {
+    "command": [
+      "dotnet",
+      "build",
+      "backend/tests/OntologyPlatform.PublishingTests",
+      "-c",
+      "Release",
+      "--no-restore"
+    ],
+    "cwd": ".",
+    "exitCode": 0,
+    "output": "  OntologyPlatform.Contracts -> /Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/bin/Release/net10.0/OntologyPlatform.Contracts.dll\n  OntologyPlatform.Modules.Governance -> /Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/bin/Release/net10.0/OntologyPlatform.Modules.Governance.dll\n  OntologyPlatform.Modules.Publishing.Domain -> /Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/bin/Release/net10.0/OntologyPlatform.Modules.Publishing.Domain.dll\n  OntologyPlatform.Modules.Ontology.Domain -> /Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/bin/Release/net10.0/OntologyPlatform.Modules.Ontology.Domain.dll\n  OntologyPlatform.Modules.Publishing -> /Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/bin/Release/net10.0/OntologyPlatform.Modules.Publishing.dll\n  OntologyPlatform.Modules.Ontology -> /Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/bin/Release/net10.0/OntologyPlatform.Modules.Ontology.dll\n  OntologyPlatform.PublishingTests -> /Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Release/net10.0/OntologyPlatform.PublishingTests.dll\n\n已成功生成。\n    0 个警告\n    0 个错误\n\n已用时间 00:00:00.53\n"
+  },
+  {
+    "command": [
+      "dotnet",
+      "format",
+      "whitespace",
+      "OntologyPlatform.slnx",
+      "--no-restore",
+      "--verify-no-changes"
+    ],
+    "cwd": "backend",
+    "exitCode": 2,
+    "output": "加载工作区时遇到警告。要记录警告，请将“详细级别”选项设置为“诊断”级别。\n/Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/WireContractTests.cs(158,32): error WHITESPACE: 修复空格格式。 将 1 字符替换为 '\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s'。 [/Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/OntologyPlatform.G2ContractTests.csproj]\n/Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/WireContractTests.cs(158,41): error WHITESPACE: 修复空格格式。 将 1 字符替换为 '\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s'。 [/Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/OntologyPlatform.G2ContractTests.csproj]\n/Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/WireContractTests.cs(158,65): error WHITESPACE: 修复空格格式。 将 1 字符替换为 '\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s'。 [/Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/OntologyPlatform.G2ContractTests.csproj]\n/Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/WireContractTests.cs(159,31): error WHITESPACE: 修复空格格式。 将 1 字符替换为 '\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s'。 [/Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/OntologyPlatform.G2ContractTests.csproj]\n/Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/WireContractTests.cs(159,70): error WHITESPACE: 修复空格格式。 将 1 字符替换为 '\\n\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s\\s'。 [/Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/OntologyPlatform.G2ContractTests.csproj]\n"
+  }
+]

@@ -34,6 +34,7 @@ public sealed class RustfsArtifactStore : IReleaseArtifactStore
         this.clients = clients;
         this.clock = clock;
         endpoint = new Uri(configuration["Publishing:S3Endpoint"] ?? throw new InvalidOperationException("缺少发布对象存储配置。"));
+        // 解析出的数字地址用于拒绝DNS重绑定和非回环网络目的地。
         if (endpoint.Scheme != "http" || !IPAddress.TryParse(endpoint.Host, out var address) || !IPAddress.IsLoopback(address) || endpoint.AbsolutePath != "/" || endpoint.Query.Length != 0 || endpoint.Fragment.Length != 0 || endpoint.UserInfo.Length != 0) throw new InvalidOperationException("对象存储仅允许固定数字回环地址。");
         accessKey = configuration["Publishing:AccessKey"] ?? throw new InvalidOperationException("缺少对象存储签名配置。");
         signingSecret = configuration["Publishing:SecretKey"] ?? throw new InvalidOperationException("缺少对象存储签名配置。");
@@ -42,7 +43,11 @@ public sealed class RustfsArtifactStore : IReleaseArtifactStore
     }
 
     /// <summary>条件PUT原子拒绝覆盖，412或409后仍必须GET核对精确字节。</summary>
-    public async Task<ArtifactObject> PutImmutableAsync(string objectKey, ReadOnlyMemory<byte> content, string contentType, CancellationToken cancellationToken)
+    public Task<ArtifactObject> PutImmutableAsync(string objectKey, ReadOnlyMemory<byte> content, string contentType, CancellationToken cancellationToken) =>
+        WithBudgetAsync(token => PutCoreAsync(objectKey, content, contentType, token), cancellationToken);
+
+    /// <summary>在一次总预算内执行条件写及回验，读取响应体同样受限。</summary>
+    private async Task<ArtifactObject> PutCoreAsync(string objectKey, ReadOnlyMemory<byte> content, string contentType, CancellationToken cancellationToken)
     {
         ValidateKey(objectKey);
         if (content.Length > 1024 * 1024) throw new SemanticOperationException(413, "artifact_too_large");
@@ -54,12 +59,16 @@ public sealed class RustfsArtifactStore : IReleaseArtifactStore
         // 条件头也纳入签名，不能被中间层去掉而变成覆盖写。
         using var response = await SendAsync(HttpMethod.Put, objectKey, content, contentType, true, cancellationToken);
         if (!response.IsSuccessStatusCode && response.StatusCode is not HttpStatusCode.PreconditionFailed and not HttpStatusCode.Conflict) throw new SemanticOperationException(503, "artifact_write_failed");
-        await ReadVerifiedAsync(artifact, cancellationToken);
+        await ReadCoreAsync(artifact, cancellationToken);
         return artifact;
     }
 
     /// <summary>流式读取最多一MiB，长度及SHA256都匹配才返回。</summary>
-    public async Task<byte[]> ReadVerifiedAsync(ArtifactObject artifact, CancellationToken cancellationToken)
+    public Task<byte[]> ReadVerifiedAsync(ArtifactObject artifact, CancellationToken cancellationToken) =>
+        WithBudgetAsync(token => ReadCoreAsync(artifact, token), cancellationToken);
+
+    /// <summary>在调用方同一个总预算中完成精确有界流式读取。</summary>
+    private async Task<byte[]> ReadCoreAsync(ArtifactObject artifact, CancellationToken cancellationToken)
     {
         ValidateKey(artifact.ObjectKey);
         // 固定GET只读该清单对象；不跟随服务重定向。
@@ -124,7 +133,26 @@ public sealed class RustfsArtifactStore : IReleaseArtifactStore
         {
             return await clients.CreateClient("publishing-s3").SendAsync(request, HttpCompletionOption.ResponseHeadersRead, token);
         }
-        catch (HttpRequestException) { throw new SemanticOperationException(503, "artifact_store_unavailable"); }
+        catch (HttpRequestException)
+        {
+            throw new SemanticOperationException(503, "artifact_store_unavailable");
+        }
+    }
+
+    /// <summary>完整S3操作和响应体共享五秒预算，调用者取消与依赖超时明确区分。</summary>
+    private static async Task<T> WithBudgetAsync<T>(Func<CancellationToken, Task<T>> operation, CancellationToken cancellationToken)
+    {
+        // ResponseHeadersRead不自动覆盖后续body流，显式预算必须传递到每次Read。
+        using var budget = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        budget.CancelAfter(TimeSpan.FromSeconds(5));
+        try
+        {
+            return await operation(budget.Token);
+        }
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            throw new SemanticOperationException(503, "artifact_store_timeout");
+        }
     }
 
     /// <summary>HMAC中间值只在内存存活，不进入异常或遥测。</summary>
