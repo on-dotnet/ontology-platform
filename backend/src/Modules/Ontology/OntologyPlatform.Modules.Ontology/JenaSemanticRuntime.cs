@@ -231,9 +231,17 @@ public sealed class JenaSemanticRuntime : ISemanticRuntime
         foreach (var source in new[] { sources.OntologyTurtle, sources.ShapesTurtle, sources.VocabularyTurtle, sources.DataTurtle })
         {
             if (string.IsNullOrEmpty(source)) { result.Add([]); sourceIndex++; continue; }
-            // 所有输入首先经过真实RIOT，形状检查只处理标准解析结果。
-            var graph = await LoadAsync(SourceDocument(source, sourceIndex++), graphs, token);
-            result.Add(await ReadGraphAsync(validation, graph, token));
+            // 仅临时解析图携带不可猜的完整三元组，令合法零三元组文档也可通过GSP回读。
+            var markerIri = "urn:ontology-platform:parse-marker:" + Guid.NewGuid().ToString("N");
+            // 全绝对IRI且前置于文档，用户BASE/prefix/末尾注释不能改变标记语义或修复坏语法。
+            var marker = new RdfTriple { Subject = new RdfTerm { Kind = RdfTermKind.Iri, Value = markerIri }, Predicate = markerIri, Object = new RdfTerm { Kind = RdfTermKind.Iri, Value = markerIri } };
+            // 原文仅用于本次RIOT请求，绝不改写权威源码或其散列。
+            var graph = await LoadAsync(JenaRdfCodec.Triple(marker) + "\n" + SourceDocument(source, sourceIndex++), graphs, token);
+            // 丢图仍由GSP返回503；即使回读200也必须包含本次标记，不能把重启/替换当空图。
+            var parsed = await ReadGraphAsync(validation, graph, token);
+            if (parsed.Count(triple => triple == marker) != 1) throw new SemanticOperationException(503, "temporary_graph_incomplete");
+            // 精确剔除本次标记后才做预算、Shape、投影、编辑与正式部署，不按命名空间丢业务公理。
+            result.Add(parsed.Where(triple => triple != marker).ToArray());
         }
         if (result.Sum(triples => triples.Length) > 5000) throw new SemanticOperationException(422, "rdf_triple_budget");
         ShapePolicy.Check(result[1]);
