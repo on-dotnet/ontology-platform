@@ -1,0 +1,116 @@
+{
+  "checks": [
+    {
+      "name": "environment",
+      "command": "pwsh -NoProfile -Command \"$PSVersionTable.PSVersion.ToString(); [Runtime.InteropServices.RuntimeInformation]::RuntimeIdentifier; & dotnet --version; & node --version; & python3 --version; & gh --version; & codex --version\"",
+      "exitCode": 0,
+      "status": "PASS",
+      "output": "7.6.8\nosx-arm64\n10.0.402\nv24.22.1\nPython 3.13.17\ngh version 2.103.2 (2026-10-23)\nhttps://github.com/cli/cli/releases/tag/v2.103.2\ncodex-cli 0.164.0-alpha.11.1\n"
+    },
+    {
+      "name": "locked-restore",
+      "command": "dotnet restore backend/OntologyPlatform.slnx --locked-mode",
+      "exitCode": 0,
+      "status": "PASS",
+      "output": "  正在确定要还原的项目…\n  已还原 /Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/src/ServiceDefaults/OntologyPlatform.ServiceDefaults.csproj (用时 88 毫秒)。\n  已还原 /Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/src/Hosts/OntologyPlatform.InfrastructureApi/OntologyPlatform.InfrastructureApi.csproj (用时 88 毫秒)。\n  已还原 /Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/OntologyPlatform.InfrastructureTests.csproj (用时 88 毫秒)。\n  已还原 /Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/src/AppHost/OntologyPlatform.AppHost.csproj (用时 101 毫秒)。\n"
+    },
+    {
+      "name": "build",
+      "command": "dotnet build backend/OntologyPlatform.slnx --no-restore",
+      "exitCode": 0,
+      "status": "PASS",
+      "output": "/Users/chasen/.nuget/packages/aspire.hosting.apphost/13.6.3/build/Aspire.Hosting.AppHost.targets(157,5): warning ASPIRE010: OntologyPlatform.AppHost is configured with AspireUseCliBundle=false. Some Aspire features require the Aspire CLI bundle. Set AspireUseCliBundle=true to enable those features, or suppress ASPIRE010 to continue without the bundle. See https://aka.ms/aspire/diagnostics/aspire010 for more information. [/Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/src/AppHost/OntologyPlatform.AppHost.csproj]\n  OntologyPlatform.ServiceDefaults -> /Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/src/ServiceDefaults/bin/Debug/net10.0/OntologyPlatform.ServiceDefaults.dll\n  OntologyPlatform.InfrastructureApi -> /Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/src/Hosts/OntologyPlatform.InfrastructureApi/bin/Debug/net10.0/OntologyPlatform.InfrastructureApi.dll\n  OntologyPlatform.AppHost -> /Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/src/AppHost/bin/Debug/net10.0/OntologyPlatform.AppHost.dll\n  OntologyPlatform.InfrastructureTests -> /Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/bin/Debug/net10.0/OntologyPlatform.InfrastructureTests.dll\n\n已成功生成。\n\n/Users/chasen/.nuget/packages/aspire.hosting.apphost/13.6.3/build/Aspire.Hosting.AppHost.targets(157,5): warning ASPIRE010: OntologyPlatform.AppHost is configured with AspireUseCliBundle=false. Some Aspire features require the Aspire CLI bundle. Set AspireUseCliBundle=true to enable those features, or suppress ASPIRE010 to continue without the bundle. See https://aka.ms/aspire/diagnostics/aspire010 for more information. [/Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/src/AppHost/OntologyPlatform.AppHost.csproj]\n    1 个警告\n    0 个错误\n\n已用时间 00:00:01.68\n"
+    },
+    {
+      "name": "tests",
+      "command": "dotnet test --project backend/tests/OntologyPlatform.InfrastructureTests/OntologyPlatform.InfrastructureTests.csproj --no-build --no-restore",
+      "exitCode": 0,
+      "status": "PASS",
+      "output": "正在从以下位置运行测试 /Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/bin/Debug/net10.0/OntologyPlatform.InfrastructureTests.dll (net10.0|arm64)\n/Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/bin/Debug/net10.0/OntologyPlatform.InfrastructureTests.dll (net10.0|arm64) 已通过 (1s 429ms)\n\n测试运行摘要: 已通过!\n  总计: 4\n  失败: 0\n  成功: 4\n  已跳过: 0\n  持续时间: 1s 927ms\n"
+    },
+    {
+      "name": "format",
+      "command": "dotnet format backend/OntologyPlatform.slnx --verify-no-changes --no-restore",
+      "exitCode": 0,
+      "status": "PASS",
+      "output": "加载工作区时遇到警告。要记录警告，请将“详细级别”选项设置为“诊断”级别。\n"
+    },
+    {
+      "name": "pnpm-integrity-and-version",
+      "command": "node .tools/pnpm/package/bin/pnpm.cjs --version; official SHA512 verified",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "11.28.8; official tarball SHA512 exactly matches registry integrity; global pnpm preserved."
+    },
+    {
+      "name": "python-hashed-restore",
+      "command": "python3 -m pip install --index-url https://pypi.org/simple --only-binary=:all: --no-deps --require-hashes --disable-pip-version-check --target .tools/pythonlibs -r scripts/verification-requirements.txt",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Successfully installed PyYAML-6.0.3 CPython3.13 macOS arm64 wheel with official SHA256."
+    },
+    {
+      "name": "combined-engineering-gate",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1 -SelfTest -RunNative -RunTests",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "All checker/doctor/structured/environment/35 ReviewPackage cases pass, then real build/format and MTP4/4; independent reviewer repeated same-process full command from unset environment."
+    },
+    {
+      "name": "doctor-docker",
+      "command": "pwsh -NoProfile -File scripts/doctor.ps1 -CheckDocker",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "SDK10.0.402 Node24.22.1 pnpm11.28.8 Docker29.9.2 daemon verified."
+    },
+    {
+      "name": "windows-m0-runtime",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "No Windows host in this run; original win-x64 lock and historical G1 evidence preserved."
+    },
+    {
+      "name": "other-development-hosts",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Intel Mac, Windows ARM and Linux ARM .NET developer hosts not executed; no compatibility PASS inferred."
+    },
+    {
+      "name": "product-downstream",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Web, SEC/FE/OBS/G2 and production recovery outside authorization."
+    },
+    {
+      "name": "direct-observed-runtime",
+      "command": "python3 docs/evidence/M0-MAC-PORTABILITY-001/master/runtime-harness.py /Users/chasen/.codex/worktrees/m0-master/ontology-platform",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Raw sanitized stdout/HTTP JSON: four native linux/arm64 resources, six health endpoints before/after restart, loopback/network, persistent PG/Fuseki/S3/Keycloak probe, missing-key401/authenticated matching trace200, AppHost exit0 and async cleanup observed empty containers/ports. VolumePrefix m0-mac-observed-b37a079e; three probe volumes retained."
+    },
+    {
+      "name": "prior-platform-lock-preservation",
+      "command": "git diff --exit-code 25eab6f5bfd944dc44c8c77b1a3cbd22ec9468e1 HEAD -- (five original lock paths; preserved-locks.json)",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Five original Windows/Linux and other project locks unchanged; reviewer byte comparisons match."
+    },
+    {
+      "name": "native-image-manifest-output",
+      "command": "docker buildx imagetools inspect (four exact references in master/manifest-raw.json)",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Four original OCI indexes queried successfully with exact pinned digests and linux/arm64 variants."
+    }
+  ],
+  "ci": {
+    "status": "PASS",
+    "runId": "40155680950",
+    "url": "https://github.com/on-dotnet/ontology-platform/actions/runs/40155680950",
+    "commit": "e930935749bcb88d51abb94db4a41695bbbe6717",
+    "conclusion": "success"
+  }
+}

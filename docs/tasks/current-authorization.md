@@ -1,3 +1,9 @@
+# PRE-G3-HYGIENE-001 当前授权增量（2026-10-26）
+
+当前：**EXECUTING / PARTIAL**。人类正式批准[附件V1全部任务](../evidence/PRE-G3-HYGIENE-001/authorization-v1.md)，由本轮Master从main `46c7a6de70b1b97c032b12a19bc27c1c54e70f4c`实施资源只读盘点、安全分类、Review ZIP V2、符合条件的回收、DoD、独立Review/验证、Git集成Push与唯一轻量ZIP。唯一分支`codex/PRE-G3-HYGIENE-001`，任务见[合同与计划](PRE-G3-HYGIENE-001.md)。保护活跃/旧G2 Master与未集成树、持久数据、凭证及跨项目资源；疑义DEFERRED。不调用付费模型、不安装依赖、不实施G3、不启动G3 Plan；交PRE_G3_HYGIENE_READY_FOR_REVIEW后停止。历史审批/未运行状态全部保留。
+
+---
+
 # G2-THIN-SLICE-001 当前授权增量（2026-10-26）
 
 当前：**G2-THIN-SLICE-001 / READY_FOR_REVIEW / PARTIAL**。Mac完整新cold一键exit0及业务/SDK/原生SSE/真实LGTM、独立全分支修复均已验；源码候选b1ff0a68915c272846038af96a00da3acbb95538已在同Head Linux双job成功后由Master快进main并push。Monaco按人类暂停、真实模型BLOCKED、Windows/Intel/生产未运行，详见本轮交付矩阵。最终文档Head/同HeadCI/唯一ZIP以实际封包manifest与独立重开回执为准，未静态预填成功。人类在本会话正式授权V1全部任务；Master先冻结并独立复审共享契约，再按依赖通过独立Worktree组织多Agent开发、Review、持续提交推送、真实验收和唯一标准Review ZIP。BaseSha=`6154ebb3703031a49cf0c555c9f0c3596e3b7726`，开工fetch后origin/main同值。授权原文见[本轮依据](../evidence/G2-THIN-SLICE-001/authorization-v1.md)，任务见[G2总卡](G2-THIN-SLICE-001.md)。本次明确授权覆盖历史G1停止于G2前的条款，历史PARTIAL/NOT_RUN保持不变。只本轮G2，不自动进入G3–G8；不调用收费模型/生产，不做系统管理员修改。第三方精确依赖和实质架构扩展依合同先登记/核实及必要批准，未批准链路停止但继续无关工作。

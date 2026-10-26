@@ -1,0 +1,256 @@
+{
+  "schemaVersion": 1,
+  "taskId": "G1-WAVE2",
+  "baseSha": "e930935749bcb88d51abb94db4a41695bbbe6717",
+  "headSha": "d181f66e569e190a66b0f48b179f2fd9390b9467",
+  "branch": "main",
+  "date": "2026-10-25T13:51:19.0788920Z",
+  "status": "PARTIAL",
+  "evidencePath": "docs/evidence/G1-WAVE2/master/validation.json",
+  "runtimeCi": {
+    "status": "PASS",
+    "runId": "40199269314",
+    "url": "https://github.com/on-dotnet/ontology-platform/actions/runs/40199269314",
+    "commit": "d181f66e569e190a66b0f48b179f2fd9390b9467",
+    "conclusion": "success"
+  },
+  "checks": [
+    {
+      "name": "mac-locked-build",
+      "command": "dotnet restore backend/OntologyPlatform.slnx --locked-mode; dotnet build backend/OntologyPlatform.slnx --no-restore",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Locked restore and build exit0; ASPIRE010 retained; final-restore.txt/final-policy-build.txt"
+    },
+    {
+      "name": "native-format",
+      "command": "dotnet format backend/OntologyPlatform.slnx --verify-no-changes --no-restore",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Exit0 after import ordering fix; final-format.txt"
+    },
+    {
+      "name": "infrastructure-host-tests",
+      "command": "dotnet test --project backend/tests/OntologyPlatform.InfrastructureTests --no-build --no-restore",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Original 4/4 passed; infrastructure-tests.txt"
+    },
+    {
+      "name": "real-security-pg-keycloak",
+      "command": "python3 scripts/acceptance/test-governance.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Final14/14 zero skipped against real dedicated PG and Keycloak; final-security-complete.txt"
+    },
+    {
+      "name": "web-four-targets",
+      "command": "pwsh -NoProfile -File scripts/verify-web.ps1 -Restore",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Frozen restore, lint/typecheck/Vitest6/build exit0; final-web.txt"
+    },
+    {
+      "name": "real-oidc-protocol",
+      "command": "python3 infra/security/verify-oidc.py --runtime-file <private-runtime>",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Five identities310 checks; SEC/oidc-par-third.json"
+    },
+    {
+      "name": "real-browser-oidc",
+      "command": "PLATFORM_TEST_RUNTIME=<private-runtime> node apps/web/scripts/run-oidc-tests.mjs",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Viewer/no-role both passed; logout401; no sensitive artifacts; final-browser-oidc.txt"
+    },
+    {
+      "name": "ui-fixture-a11y",
+      "command": "node .tools/pnpm/package/bin/pnpm.cjs --dir apps/web exec playwright test --config playwright.config.ts",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "5 UI cases, mobile Tab/AX and themes/layout/error/console; FE/mobile-nav-ui.txt; fixtures are not identity proof"
+    },
+    {
+      "name": "runtime-openapi-contract",
+      "command": "python3 scripts/acceptance/verify-openapi.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "ActualKestrelOpenAPI3.1 all paths/status/media/required/type/security/nativeform/params/operationIds semantic compare passed; openapi-contract-check.json"
+    },
+    {
+      "name": "actual-lgtm-correlation",
+      "command": "python3 infra/observability/query-runtime.py --capture integration --trace-id <actual-error-trace> --trace-id <actual-proxy-trace>",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Final19 selected checks passed; Loki3 index labels, Tempo503 ERROR and proxy2spans, two metric instances54+4=58 same timestamp, Grafana4dashboard/3health/2frames; OBS/runtime/20261025T123735Z"
+    },
+    {
+      "name": "grafana-chinese-screenshots",
+      "command": "node scripts/acceptance/capture-grafana.mjs",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Four actual authenticated local dashboards captured; grafana/capture.json; no fabricated panels"
+    },
+    {
+      "name": "heartbeat-alert-firing-recovery",
+      "command": "python3 scripts/acceptance/verify-alert.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Inactive→pending→firing→inactive using exactly two checkout APIs; alert-drill.json"
+    },
+    {
+      "name": "seven-container-persistence",
+      "command": "python3 scripts/acceptance/verify-persistence.py --runtime-file <private-runtime>",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Cookie/PG audit/KC fresh login/Loki Tempo/Prom old sample/Grafana persisted annotation survive7container restart; persistence.json"
+    },
+    {
+      "name": "api-process-session-recovery",
+      "command": "python3 scripts/acceptance/verify-api-restart.py --runtime-file <private-runtime>",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Same in-memory real Cookie across new AppHost/two API processes, logout/replay401; api-process-restart.json"
+    },
+    {
+      "name": "dependency-fault-health",
+      "command": "python3 scripts/acceptance/verify-dependency-fault.py --runtime-file <private-runtime>",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "DB unavailable503,live200,ready503, recovery accepts originalCookie; dependency-fault.json; premature client timeouts retained"
+    },
+    {
+      "name": "public-dependency-audit",
+      "command": "dotnet list backend/OntologyPlatform.slnx package --vulnerable --include-transitive --format json; node .tools/pnpm/package/bin/pnpm.cjs audit --json",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "No known vulnerabilities returned by public NuGet/npm audits; npm493 resolved graph; license inventories390installed npm/159NuGet; dependencies/"
+    },
+    {
+      "name": "windows-native",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "No Windows host; preserve locked graph and reproducible PowerShell regression commands"
+    },
+    {
+      "name": "intel-macos-native",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "No IntelMac host; do not infer native success fromARM64 Docker"
+    },
+    {
+      "name": "container-complete-cve-sbom-signature",
+      "command": null,
+      "status": "NOT_VERIFIED",
+      "exitCode": null,
+      "output": "Official sources/license/index digests verified; full imageCVE/SBOM/signatures not completed; no paid/unapproved service"
+    },
+    {
+      "name": "production-certificate-rotation-and-operating-targets",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Shared encrypted keyring and restart passed; full production cert rotation/SLO/RPO/retention/compliance require later authorization"
+    }
+  ],
+  "ci": {
+    "status": "PASS",
+    "runId": "40199269314",
+    "url": "https://github.com/on-dotnet/ontology-platform/actions/runs/40199269314",
+    "commit": "d181f66e569e190a66b0f48b179f2fd9390b9467",
+    "conclusion": "success"
+  },
+  "commands": [
+    {
+      "command": "git rev-parse --verify e930935749bcb88d51abb94db4a41695bbbe6717^{commit}",
+      "exitCode": 0
+    },
+    {
+      "command": "git rev-parse --verify d181f66e569e190a66b0f48b179f2fd9390b9467^{commit}",
+      "exitCode": 0
+    },
+    {
+      "command": "git merge-base --is-ancestor e930935749bcb88d51abb94db4a41695bbbe6717 d181f66e569e190a66b0f48b179f2fd9390b9467",
+      "exitCode": 0
+    },
+    {
+      "command": "git status --porcelain=v1 --untracked-files=all",
+      "exitCode": 0
+    },
+    {
+      "command": "git ls-files --others --ignored --exclude-standard -z",
+      "exitCode": 0
+    },
+    {
+      "command": "git diff --no-color --name-only -z --no-renames e930935749bcb88d51abb94db4a41695bbbe6717 d181f66e569e190a66b0f48b179f2fd9390b9467 --",
+      "exitCode": 0
+    },
+    {
+      "command": "git ls-tree -r -z d181f66e569e190a66b0f48b179f2fd9390b9467",
+      "exitCode": 0
+    },
+    {
+      "command": "git archive --format=zip d181f66e569e190a66b0f48b179f2fd9390b9467",
+      "exitCode": 0
+    },
+    {
+      "command": "git diff --no-color --binary --full-index --no-ext-diff --no-textconv --no-renames e930935749bcb88d51abb94db4a41695bbbe6717 d181f66e569e190a66b0f48b179f2fd9390b9467 --",
+      "exitCode": 0
+    },
+    {
+      "command": "git diff --no-color --name-status --no-renames e930935749bcb88d51abb94db4a41695bbbe6717 d181f66e569e190a66b0f48b179f2fd9390b9467 --",
+      "exitCode": 0
+    },
+    {
+      "command": "git log --no-color --format=fuller --no-decorate e930935749bcb88d51abb94db4a41695bbbe6717..d181f66e569e190a66b0f48b179f2fd9390b9467",
+      "exitCode": 0
+    },
+    {
+      "command": "git diff --no-color --check e930935749bcb88d51abb94db4a41695bbbe6717 d181f66e569e190a66b0f48b179f2fd9390b9467 --",
+      "exitCode": 0
+    },
+    {
+      "command": "git rev-parse --abbrev-ref HEAD",
+      "exitCode": 0
+    },
+    {
+      "command": "git --version",
+      "exitCode": 0
+    }
+  ],
+  "environment": {
+    "git": "git version 2.56.0",
+    "powershell": "7.6.8",
+    "os": "macOS 27.0.1"
+  },
+  "diffCheck": {
+    "exitCode": 0,
+    "status": "PASS"
+  },
+  "sourceMembers": {
+    "count": 1081,
+    "canonicalSha256": "50695ed00d91897b5284d3f5ede2724604fe2aa9bcb894dfa8543ea43bc26a39",
+    "recovery": "Reconstruct mapping from Head full ls-tree using schema1 committed script. Original manifest facts except repetitive mappings retained."
+  },
+  "excludedIgnoredPaths": {
+    "count": 910,
+    "canonicalSha256": "8bd0875b9fd868043d917b29dbef10a2f3a207a57d6dd98c7156af900e918a83",
+    "groups": {
+      ".tools": 498,
+      "artifacts": 5,
+      "backend": 407
+    }
+  },
+  "snapshotPolicy": "Full repository under source, git archive checked against ls-tree and blob hashes; docs and evidence are additional convenience copies.",
+  "security": {
+    "status": "PARTIAL",
+    "scope": "Finite path and UTF8/UTF16 pattern checks of committed source, complete patch, commit messages and reopened members. No guarantee of absence of secrets or private/production data; independent human review required."
+  },
+  "archiveVerification": {
+    "status": "NOT_VERIFIED",
+    "reason": "Cannot embed its own post-close result; successful CLI JSON reports actual post-close verification."
+  }
+}

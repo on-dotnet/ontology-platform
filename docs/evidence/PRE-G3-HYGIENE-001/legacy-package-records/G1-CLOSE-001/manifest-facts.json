@@ -1,0 +1,295 @@
+{
+  "schemaVersion": 1,
+  "taskId": "G1-CLOSE-001",
+  "baseSha": "d181f66e569e190a66b0f48b179f2fd9390b9467",
+  "headSha": "6154ebb3703031a49cf0c555c9f0c3596e3b7726",
+  "branch": "codex/G1-CLOSE-001-master",
+  "date": "2026-10-25T18:32:34.6599120Z",
+  "status": "PARTIAL",
+  "evidencePath": "docs/evidence/G1-CLOSE-001/master/validation.json",
+  "runtimeCi": {
+    "status": "PASS",
+    "runId": "40221202302",
+    "url": "https://github.com/on-dotnet/ontology-platform/actions/runs/40221202302",
+    "commit": "6154ebb3703031a49cf0c555c9f0c3596e3b7726",
+    "conclusion": "success"
+  },
+  "checks": [
+    {
+      "name": "locked-restore",
+      "command": "dotnet restore backend/OntologyPlatform.slnx --locked-mode",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "受锁恢复成功，无锁/依赖变更；baseline-restore.txt"
+    },
+    {
+      "name": "release-build",
+      "command": "dotnet build backend/OntologyPlatform.slnx --configuration Release --no-restore",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "最新迁移并发修复源码Release build 0错误，保留ASPIRE010；race-green-build.txt"
+    },
+    {
+      "name": "real-security-and-migration",
+      "command": "python3 scripts/acceptance/test-governance.py --configuration Release",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "46/46无跳过；原14+SEC13+OBS17+迁移2；race-green-full.txt"
+    },
+    {
+      "name": "infrastructure-tests",
+      "command": "dotnet test --project backend/tests/OntologyPlatform.InfrastructureTests --configuration Release --no-build --no-restore",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "4/4无跳过；final-infrastructure.txt"
+    },
+    {
+      "name": "format",
+      "command": "dotnet format backend/OntologyPlatform.slnx --verify-no-changes --no-restore",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "最新全后端实际exit0，工作区加载警告保留；race-final-format.txt"
+    },
+    {
+      "name": "policy-selftest",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1 -SelfTest",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "原语法/策略/正反例及标准ReviewPackage35项0失败；after-review-policy.txt"
+    },
+    {
+      "name": "web-gates",
+      "command": "pwsh -NoProfile -File scripts/verify-web.ps1",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "精确Node24.22.1/pnpm11.28.8，lint/typecheck/Vitest6/build均通过，恢复显式执行过"
+    },
+    {
+      "name": "ui-playwright",
+      "command": "PLATFORM_SCREENSHOT_DIR=../../docs/evidence/G1-CLOSE-001/master/ui node .tools/pnpm/package/bin/pnpm.cjs --config.verifyDepsBeforeRun=error --dir apps/web run test:e2e",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "5/5，布局/键盘/主题/空错拒绝；安全截图在本轮ui目录"
+    },
+    {
+      "name": "browser-oidc",
+      "command": "PLATFORM_TEST_RUNTIME=<本轮忽略私有运行时> node apps/web/scripts/run-oidc-tests.mjs",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "2/2真实Edge OIDC，安全reporter无敏感产物；browser-oidc.txt"
+    },
+    {
+      "name": "oidc-five-identities",
+      "command": "python3 infra/security/verify-oidc.py --runtime-file <本轮忽略私有运行时>",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "310项0失败，范围/CSRF/双实例/注销重放/伪造头/坏Cookie等；oidc-protocol.json"
+    },
+    {
+      "name": "runtime-openapi",
+      "command": "PLATFORM_EVIDENCE_DIR=docs/evidence/G1-CLOSE-001/master python3 scripts/acceptance/verify-openapi.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "实际Kestrel导出，所有DTO/完整scope数组/500错误/安全参数等语义检查无差异"
+    },
+    {
+      "name": "migration-red-green",
+      "command": "python3 scripts/acceptance/test-governance.py --filter FullyQualifiedName~ScopeMigrationPreservesLegacyAndRefusesDestructiveRollback",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "原Down守卫红绿及新增pg_locks确定性并发红绿均通过；最新完整Release46/46含两迁移用例，race-green-full.txt；旧并发删列FAIL完整保留"
+    },
+    {
+      "name": "native-otlp-alloy",
+      "command": "python3 docs/evidence/G1-CLOSE-001/OBS/verify-alloy-boundary.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "原生exporter→真实随机Alloy→实际出口15/15；先14PASS1FAIL，原始值仅内存；OBS/alloy-event-identity-green.json"
+    },
+    {
+      "name": "live-audit-fault-lgtm",
+      "command": "PLATFORM_EVIDENCE_DIR=docs/evidence/G1-CLOSE-001/master python3 scripts/acceptance/verify-closeout-observability.py --runtime-file <本轮私有运行时>",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "真实仅INSERT故障/恢复与Loki1003名称字段、三实际索引、同Trace Tempo Error/脱敏16项通过；首真实失败完整保留"
+    },
+    {
+      "name": "database-stop-recovery",
+      "command": "PLATFORM_EVIDENCE_DIR=docs/evidence/G1-CLOSE-001/master python3 scripts/acceptance/verify-dependency-fault.py --runtime-file <本轮私有运行时>",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "503/live200/ready503，双实例同Cookie恢复200后注销重放两401；原失败及API2过渡503保留"
+    },
+    {
+      "name": "seven-container-persistence",
+      "command": "PLATFORM_EVIDENCE_DIR=docs/evidence/G1-CLOSE-001/master python3 scripts/acceptance/verify-persistence.py --runtime-file <本轮私有运行时>",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "14项PASS，7容器/6卷、同Cookie/PG审计/KC新登录/Tempo/Loki/Prom历史/Grafana新状态；首失败保留"
+    },
+    {
+      "name": "api-process-replacement",
+      "command": "PLATFORM_EVIDENCE_DIR=docs/evidence/G1-CLOSE-001/master python3 scripts/acceptance/verify-api-restart.py --runtime-file <本轮私有运行时>",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "内存同Cookie跨全新AppHost及双API PID，持久证书keyring/PG，注销重放401；PID前后证据真实"
+    },
+    {
+      "name": "alert-and-grafana",
+      "command": "python3 scripts/acceptance/verify-alert.py; node scripts/acceptance/capture-grafana.mjs",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "当前树精确API进程SIGSTOP/CONT，inactive/pending/firing/inactive；4张真实中文面板截图，通知仅本地"
+    },
+    {
+      "name": "proxy-metrics",
+      "command": "python3 scripts/acceptance/verify-proxy.py and actual Prometheus instant/series queries",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "真实YARP/Next SSR同Trace；两实例同时间求和一致，无actor/site/trace/audit指标标签"
+    },
+    {
+      "name": "windows-native",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "无本轮Windows宿主；Linux不能替代"
+    },
+    {
+      "name": "intel-mac-native",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "无Intel Mac宿主"
+    },
+    {
+      "name": "image-cve-sbom-signatures",
+      "command": null,
+      "status": "NOT_VERIFIED",
+      "exitCode": null,
+      "output": "官方固定镜像不代表完整OS层扫描/SBOM/签名验证"
+    },
+    {
+      "name": "production-cert-ha-slo-rpo-rto",
+      "command": null,
+      "status": "NOT_VERIFIED",
+      "exitCode": null,
+      "output": "生产证书轮换、HA跨主机SSR、SLO/RPO/RTO未验证"
+    },
+    {
+      "name": "outbox-faro-full-operations",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "通用发布Outbox、Faro行为闭环、完整中文业务运维尚未实施，阶段矩阵明确分期"
+    },
+    {
+      "name": "g2-product-runtime",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "仅文档接口/合成样例/DAG准备，无G2源码或进程"
+    }
+  ],
+  "ci": {
+    "status": "PASS",
+    "runId": "40221202302",
+    "url": "https://github.com/on-dotnet/ontology-platform/actions/runs/40221202302",
+    "commit": "6154ebb3703031a49cf0c555c9f0c3596e3b7726",
+    "conclusion": "success"
+  },
+  "commands": [
+    {
+      "command": "git rev-parse --verify d181f66e569e190a66b0f48b179f2fd9390b9467^{commit}",
+      "exitCode": 0
+    },
+    {
+      "command": "git rev-parse --verify 6154ebb3703031a49cf0c555c9f0c3596e3b7726^{commit}",
+      "exitCode": 0
+    },
+    {
+      "command": "git merge-base --is-ancestor d181f66e569e190a66b0f48b179f2fd9390b9467 6154ebb3703031a49cf0c555c9f0c3596e3b7726",
+      "exitCode": 0
+    },
+    {
+      "command": "git status --porcelain=v1 --untracked-files=all",
+      "exitCode": 0
+    },
+    {
+      "command": "git ls-files --others --ignored --exclude-standard -z",
+      "exitCode": 0
+    },
+    {
+      "command": "git diff --no-color --name-only -z --no-renames d181f66e569e190a66b0f48b179f2fd9390b9467 6154ebb3703031a49cf0c555c9f0c3596e3b7726 --",
+      "exitCode": 0
+    },
+    {
+      "command": "git ls-tree -r -z 6154ebb3703031a49cf0c555c9f0c3596e3b7726",
+      "exitCode": 0
+    },
+    {
+      "command": "git archive --format=zip 6154ebb3703031a49cf0c555c9f0c3596e3b7726",
+      "exitCode": 0
+    },
+    {
+      "command": "git diff --no-color --binary --full-index --no-ext-diff --no-textconv --no-renames d181f66e569e190a66b0f48b179f2fd9390b9467 6154ebb3703031a49cf0c555c9f0c3596e3b7726 --",
+      "exitCode": 0
+    },
+    {
+      "command": "git diff --no-color --name-status --no-renames d181f66e569e190a66b0f48b179f2fd9390b9467 6154ebb3703031a49cf0c555c9f0c3596e3b7726 --",
+      "exitCode": 0
+    },
+    {
+      "command": "git log --no-color --format=fuller --no-decorate d181f66e569e190a66b0f48b179f2fd9390b9467..6154ebb3703031a49cf0c555c9f0c3596e3b7726",
+      "exitCode": 0
+    },
+    {
+      "command": "git diff --no-color --check d181f66e569e190a66b0f48b179f2fd9390b9467 6154ebb3703031a49cf0c555c9f0c3596e3b7726 --",
+      "exitCode": 0
+    },
+    {
+      "command": "git rev-parse --abbrev-ref HEAD",
+      "exitCode": 0
+    },
+    {
+      "command": "git --version",
+      "exitCode": 0
+    }
+  ],
+  "environment": {
+    "git": "git version 2.56.0",
+    "os": "macOS 27.0.1",
+    "powershell": "7.6.8"
+  },
+  "diffCheck": {
+    "status": "PASS",
+    "exitCode": 0
+  },
+  "sourceMembers": {
+    "count": 1412,
+    "canonicalSha256": "de9f58217e6a179a2109dace53fa3f2145b6fc469cbb0d10ad8cae59fdcb9bec",
+    "recovery": "Reconstruct mapping from Head full ls-tree using schema1 committed script. Original manifest facts except repetitive mappings retained."
+  },
+  "excludedIgnoredPaths": {
+    "count": 51750,
+    "canonicalSha256": "d6d0c9773d0ecc281728f22be6967051db41b9793fe36d7ac48b4af9a8e477a9",
+    "groups": {
+      ".tools": 22656,
+      "apps": 239,
+      "artifacts": 1,
+      "backend": 1497,
+      "infra": 1,
+      "node_modules": 27347,
+      "scripts": 9
+    }
+  },
+  "snapshotPolicy": "Full repository under source, git archive checked against ls-tree and blob hashes; docs and evidence are additional convenience copies.",
+  "security": {
+    "status": "PARTIAL",
+    "scope": "Finite path and UTF8/UTF16 pattern checks of committed source, complete patch, commit messages and reopened members. No guarantee of absence of secrets or private/production data; independent human review required."
+  },
+  "archiveVerification": {
+    "status": "NOT_VERIFIED",
+    "reason": "Cannot embed its own post-close result; successful CLI JSON reports actual post-close verification."
+  }
+}

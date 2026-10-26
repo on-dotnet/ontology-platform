@@ -1,0 +1,275 @@
+{
+  "schemaVersion": 1,
+  "taskId": "G2-THIN-SLICE-001",
+  "baseSha": "6154ebb3703031a49cf0c555c9f0c3596e3b7726",
+  "headSha": "46c7a6de70b1b97c032b12a19bc27c1c54e70f4c",
+  "branch": "codex/G2-THIN-SLICE-001-master",
+  "date": "2026-10-26T07:14:19.0234480Z",
+  "status": "PARTIAL",
+  "evidencePath": "docs/evidence/G2-THIN-SLICE-001/master/validation.json",
+  "runtimeCi": {
+    "status": "PASS",
+    "runId": "40283523824",
+    "url": "https://github.com/on-dotnet/ontology-platform/actions/runs/40283523824",
+    "commit": "46c7a6de70b1b97c032b12a19bc27c1c54e70f4c",
+    "conclusion": "success"
+  },
+  "checks": [
+    {
+      "name": "repository-selftest",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1 -SelfTest",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "one-key-final-cold-pass.txt: static/8 engineering cases/structured4/environment3/ReviewPackage35 real positive-negative tests passed; not product certification"
+    },
+    {
+      "name": "locked-dotnet-web-build-format",
+      "command": "pwsh -NoProfile -File scripts/acceptance/g2-thin-slice.ps1 -StartRuntime",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "one-key-final-cold-pass.txt actual exit0: locked solution restore/build/whole format; exact Node24.22.1/pnpm11.28.8 frozen install, lint/typecheck/Vitest77/build; ASPIRE010 warning retained"
+    },
+    {
+      "name": "semantic-draft-pg-jena",
+      "command": "python3 scripts/acceptance/semantic-roundtrip.py --postgres --label ci-semantic",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "SEM/ci-semantic.json actual69/69 zero skip on final tested candidate, source/hash/Unicode/BOM/name/CAS/audit/SHACL/verified graph/Down guards"
+    },
+    {
+      "name": "publishing-real-faults",
+      "command": "python3 scripts/acceptance/release-faults.py --label ci-release-faults",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "PUB/ci-release-faults.json actual50/50 zero skip on own PG/RustFS/Jena, independent approvals and rollback"
+    },
+    {
+      "name": "query-real-six-states",
+      "command": "python3 scripts/acceptance/query-plan.py --label ci-query-plan",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "QRY/ci-query-plan.json actual49/49 zero skip, published source integrity, budgets and evidence reauthorization"
+    },
+    {
+      "name": "sdk-maf-mcp-native-sse",
+      "command": "python3 scripts/acceptance/mcp-agent.py --label ci-mcp-agent",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "AI/ci-mcp-agent.json actual33/33 zero skip; native SSE replay/slow-client/cancel/expiry and real SDK; Ajv common-keywords positive3 negative6 only"
+    },
+    {
+      "name": "security-governance-g1",
+      "command": "python3 scripts/acceptance/test-governance.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "security-final-full.json actual114/114 zero skip with fresh PG and Keycloak; real PAR, audit atomicity, prebinding policy, GSS and pause tests"
+    },
+    {
+      "name": "strict-wire-contract",
+      "command": "dotnet test --project backend/tests/OntologyPlatform.G2ContractTests --no-build --no-restore",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "one-key-final-cold-pass.txt 19/19 zero skip, same completed native stage; integration tests missing env explicitly NOT_RUN separately"
+    },
+    {
+      "name": "real-browser-all-chain",
+      "command": "python3 scripts/acceptance/full-g2-e2e.py --runtime-file <own-new-private-runtime>",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "full-g2-e2e.json actual113 PASS, new8 identities/realm, source/name/CAS/SHACL/diff/approve/R1R2/MCP/MAF/SSE/evidence/rollback; screenshots exclude authentication"
+    },
+    {
+      "name": "real-g1-oidc-lgtm",
+      "command": "python3 scripts/acceptance/g1-regression.py --runtime-file <own-new-private-runtime> --runtime-only",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "g1-regression.json actual both steps exit0, real role/OIDC/CSRF/two instances/logout; closeout-observability.json audit fault/recovery and actual Loki/Tempo"
+    },
+    {
+      "name": "real-product-observability",
+      "command": "python3 scripts/acceptance/g2-observability.py --runtime-file <own-new-private-runtime>",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "g2-observability.json original25 PASS; actual33 polls20.469s, worker_search21 polls20.283s; privacy/finite actual metrics; 90s total engineering observation budget, not production SLO"
+    },
+    {
+      "name": "deployed-grafana-trace",
+      "command": "<exact-project-node> scripts/acceptance/g2-trace-browser.mjs <own-new-private-runtime>",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "trace-browser.json 4 PASS from real release UI link to nonempty same Trace in deployed Grafana; screenshot visually inspected"
+    },
+    {
+      "name": "real-dependency-stalls",
+      "command": "python3 scripts/acceptance/g2-readiness-fault.py --runtime-file <own-new-private-runtime>",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "readiness-real-faults.json actual8 PASS, Jena2016ms/RustFS2006ms/PG1008ms503 and recovery200; each own container finally unpaused"
+    },
+    {
+      "name": "full-stack-persistence",
+      "command": "<exact-project-node> <committed persistence-check-source.mjs> <root> <own-new-private-runtime>",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "persistence-after-full-restart.json 6 PASS for same prior identifiers after own-stack stop/restart; first suffix typo preserved, no product change"
+    },
+    {
+      "name": "actual-openapi-and-repro-types",
+      "command": "python3 scripts/acceptance/verify-openapi.py; node apps/web/scripts/generate-types.mjs --check",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "openapi-final-runtime-reproduction.json exact28 paths/96schemas; full runtime equals committed snapshot, 97types regenerated zero drift and Vitest exact equality"
+    },
+    {
+      "name": "actual-performance-baseline",
+      "command": "python3 scripts/acceptance/performance-baseline.py --from-observed-run",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "performance-baseline.json real26 observations; SHACL/SPARQL/publication/SSE covered with input bytes and environment, no production threshold"
+    },
+    {
+      "name": "qa-control-plane",
+      "command": "python3 scripts/tests/G2Acceptance.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "qa-fix2-green.txt and qa2-master-control-green.txt actual22 PASS; control plane only"
+    },
+    {
+      "name": "dependency-known-advisories-license",
+      "command": "dotnet package list --project backend/OntologyPlatform.slnx --no-restore --vulnerable --include-transitive --format json; pnpm audit --prod --json",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "nuget-final-vulnerability-all-projects.json19 projects with no listed hits; pnpm-final-vulnerability.json zero all severities; 13 necessary new NuGet closure license records MIT/Apache2/BSD3, no Preview; bounded advisory check"
+    },
+    {
+      "name": "monaco",
+      "command": "human explicitly paused Monaco",
+      "status": "BLOCKED",
+      "exitCode": null,
+      "output": "PAUSED_BY_USER; no override applied, vulnerable dependency graph absent from final product lock"
+    },
+    {
+      "name": "real-paid-model",
+      "command": null,
+      "status": "BLOCKED",
+      "exitCode": null,
+      "output": "No approved usable real provider or paid call; genuine SDK deterministic pipeline separately passed"
+    },
+    {
+      "name": "windows-intel-production",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Windows native/Intel Mac/production images/HA/five real production sources/formal SLO not certified"
+    },
+    {
+      "name": "cold-jit-readiness-test-fixture",
+      "command": "DOTNET_TieredCompilation=0 dotnet test --project backend/tests/OntologyPlatform.SecurityTests --no-restore --filter FullyQualifiedName~G2ReadinessBudgetTests --output Detailed; pwsh -NoProfile -File scripts/verify.ps1 -RunNative -RunTests",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "readiness-test: original cold-full-JIT RED preserved; fixed 2036ms/8queries/2HTTP/503/cancel; Security114=84pass30skip0fail; native338=123pass215skip0fail. Test-only initialization warmup, production and all original measured assertions unchanged. Missing dependency cases NOT_RUN."
+    }
+  ],
+  "ci": {
+    "status": "PASS",
+    "runId": "40283523824",
+    "url": "https://github.com/on-dotnet/ontology-platform/actions/runs/40283523824",
+    "commit": "46c7a6de70b1b97c032b12a19bc27c1c54e70f4c",
+    "conclusion": "success"
+  },
+  "commands": [
+    {
+      "command": "git rev-parse --verify 6154ebb3703031a49cf0c555c9f0c3596e3b7726^{commit}",
+      "exitCode": 0
+    },
+    {
+      "command": "git rev-parse --verify 46c7a6de70b1b97c032b12a19bc27c1c54e70f4c^{commit}",
+      "exitCode": 0
+    },
+    {
+      "command": "git merge-base --is-ancestor 6154ebb3703031a49cf0c555c9f0c3596e3b7726 46c7a6de70b1b97c032b12a19bc27c1c54e70f4c",
+      "exitCode": 0
+    },
+    {
+      "command": "git status --porcelain=v1 --untracked-files=all",
+      "exitCode": 0
+    },
+    {
+      "command": "git ls-files --others --ignored --exclude-standard -z",
+      "exitCode": 0
+    },
+    {
+      "command": "git diff --no-color --name-only -z --no-renames 6154ebb3703031a49cf0c555c9f0c3596e3b7726 46c7a6de70b1b97c032b12a19bc27c1c54e70f4c --",
+      "exitCode": 0
+    },
+    {
+      "command": "git ls-tree -r -z 46c7a6de70b1b97c032b12a19bc27c1c54e70f4c",
+      "exitCode": 0
+    },
+    {
+      "command": "git archive --format=zip 46c7a6de70b1b97c032b12a19bc27c1c54e70f4c",
+      "exitCode": 0
+    },
+    {
+      "command": "git diff --no-color --binary --full-index --no-ext-diff --no-textconv --no-renames 6154ebb3703031a49cf0c555c9f0c3596e3b7726 46c7a6de70b1b97c032b12a19bc27c1c54e70f4c --",
+      "exitCode": 0
+    },
+    {
+      "command": "git diff --no-color --name-status --no-renames 6154ebb3703031a49cf0c555c9f0c3596e3b7726 46c7a6de70b1b97c032b12a19bc27c1c54e70f4c --",
+      "exitCode": 0
+    },
+    {
+      "command": "git log --no-color --format=fuller --no-decorate 6154ebb3703031a49cf0c555c9f0c3596e3b7726..46c7a6de70b1b97c032b12a19bc27c1c54e70f4c",
+      "exitCode": 0
+    },
+    {
+      "command": "git diff --no-color --check 6154ebb3703031a49cf0c555c9f0c3596e3b7726 46c7a6de70b1b97c032b12a19bc27c1c54e70f4c --",
+      "exitCode": 0
+    },
+    {
+      "command": "git rev-parse --abbrev-ref HEAD",
+      "exitCode": 0
+    },
+    {
+      "command": "git --version",
+      "exitCode": 0
+    }
+  ],
+  "environment": {
+    "powershell": "7.6.8",
+    "os": "macOS 27.0.1",
+    "git": "git version 2.56.0"
+  },
+  "diffCheck": {
+    "exitCode": 0,
+    "status": "PASS"
+  },
+  "sourceMembers": {
+    "count": 2826,
+    "canonicalSha256": "12a792ebc0666f109ae9e5212812afa81ca09c6e3b5c78a72f9469e866d8be17",
+    "recovery": "Reconstruct mapping from Head full ls-tree using schema1 committed script. Original manifest facts except repetitive mappings retained."
+  },
+  "excludedIgnoredPaths": {
+    "count": 34685,
+    "canonicalSha256": "5ede5368eaea4bacb3d6d63695af93c00ac7f46699de57d2eb4d99f56d45b9b7",
+    "groups": {
+      ".superpowers": 13,
+      ".tools": 564,
+      "apps": 329,
+      "artifacts": 1,
+      "backend": 4183,
+      "infra": 2,
+      "node_modules": 29569,
+      "scripts": 24
+    }
+  },
+  "snapshotPolicy": "Full repository under source, git archive checked against ls-tree and blob hashes; docs and evidence are additional convenience copies.",
+  "security": {
+    "scope": "Finite path and UTF8/UTF16 pattern checks of committed source, complete patch, commit messages and reopened members. No guarantee of absence of secrets or private/production data; independent human review required.",
+    "status": "PARTIAL"
+  },
+  "archiveVerification": {
+    "reason": "Cannot embed its own post-close result; successful CLI JSON reports actual post-close verification.",
+    "status": "NOT_VERIFIED"
+  }
+}

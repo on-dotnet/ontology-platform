@@ -1,0 +1,28 @@
+{
+  "baseline": {
+    "command": "pwsh -NoProfile -File scripts/tests/ReviewPackage.Tests.ps1",
+    "exitCode": 0,
+    "tests": 35,
+    "failures": 0
+  },
+  "red": {
+    "command": "pwsh -NoProfile -File scripts/tests/ReviewPackage.Tests.ps1 -CaseFilter 'compact*'",
+    "exitCode": 1,
+    "tests": 6,
+    "failures": 5,
+    "output": "旧实现缺V2索引/去重，允许不同Head CI；5个新合同回归失败，原大小写安全项仍通过。"
+  },
+  "implementationDiagnostic": {
+    "exitCode": 1,
+    "reason": "Git不支持--no-binary，直接最小命令复现exit129；V2使用默认无binary编码的diff，V1显式--binary。"
+  },
+  "focusedGreen": {
+    "exitCode": 0,
+    "tests": 6,
+    "failures": 0,
+    "compactBytes": 13040,
+    "legacyBytes": 2517611,
+    "output": "同Head真实临时Git fixture，24张新增截图、二进制改删与rename；省略项完整索引，独立重开通过。"
+  },
+  "scope": "实际构包器fixture结果；不代表产品/容器/跨平台完成。"
+}
