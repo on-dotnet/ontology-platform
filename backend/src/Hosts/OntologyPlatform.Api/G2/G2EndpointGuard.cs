@@ -117,6 +117,7 @@ public static class G2EndpointGuard
             {
                 context.Response.Headers.ETag = draft.Etag;
             }
+            // 原生传输保留自身状态和媒体类型，普通DTO才由JSON响应包装。
             return result is IResult native ? native : Results.Ok(result);
         }
         catch (SemanticOperationException failure)

@@ -16,3 +16,5 @@ Governance writer/middleware47项通过限定独立审查C0/I0/M0（18877ae..d25
 
 追加：Host可信接线修复后真实Edge/OIDC S1 HTTP22/22全部通过，摘要live-s1-http.json；此前失败仍保留。FrontEnd fix1已独立Spec/Quality PASS(C0I0M0)后集成至5444163，Master精确工具Web lint/typecheck/53Vitest/build通过。真实页面联调待做。
 新增原生TransportAsync仅复用同一guard的身份/策略/Origin/Antiforgery/拒绝审计，标准MCP不伪造业务Command、SSE不被Results.Ok包裹。真实原生防伪负例与成功控制、角色/身份、非JSON202媒体类型6项；将结果恢复旧Results.Ok包装实际红4pass2fail，再恢复原生IResult绿6/6。Test principal是夹具，不等真实MCP/注销SSE。SEC support已结束，Master明确收回共同Guard唯一写权，AI只读。
+
+最终模块组合DRAFT：Query/Agents/MCP及其Source/Meter全部注册，同开发开关下应用agents独立迁移；default模型disabled，显式AppHost Development验收才开启deterministic harness。新受原X-Health-Key保护的G2 readiness真实读三模块关键表并探测Jena/RustFS，整体2秒；是否可用仍须实际环境正反验收。原G1未启用G2的路径保持。完整build首次出现AgentTests旧构造调用缺VerifiedReleaseSources参数（CS7036），未跳过或删测试；Owner单行DI适配47826ae后全solution重新构建。API单独构建0warning/0error，原生Schema/选项/Transport8/8，源码格式实际命中均成功。完整环境/UI/G1/LGTM/故障/同HeadCI继续进行。

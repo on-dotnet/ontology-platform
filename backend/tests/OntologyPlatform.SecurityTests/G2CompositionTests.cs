@@ -17,7 +17,7 @@ public sealed class G2CompositionTests
     {
         // 不启动数据库或OIDC，此项仅复现实际组合根的选项注册缺口。
         var builder = WebApplication.CreateBuilder();
-        builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?> { ["G2:Enabled"] = "true" });
+        builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?> { ["G2:Enabled"] = "true", ["ConnectionStrings:governance"] = "Host=127.0.0.1;Database=g2_composition" });
         // 生产宿主先验证再注册此对象，本夹具只给无秘密入口值。
         var validated = new PlatformSecurityOptions { PublicOrigin = "http://localhost:15100" };
         builder.Services.AddSingleton(validated);

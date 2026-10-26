@@ -2,9 +2,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using OntologyPlatform.Api.Security;
 using OntologyPlatform.Contracts;
+using OntologyPlatform.Modules.Agents;
 using OntologyPlatform.Modules.Governance;
 using OntologyPlatform.Modules.Ontology;
 using OntologyPlatform.Modules.Publishing;
+using OntologyPlatform.Modules.SemanticQuery;
 
 namespace OntologyPlatform.Api.G2;
 
@@ -31,9 +33,13 @@ public static class G2Composition
         builder.Services.AddScoped<IAuditTrail>(provider => provider.GetRequiredService<TransactionalAuditWriter>());
         builder.Services.AddOntologyModule(builder.Configuration);
         builder.Services.AddPublishingModule(builder.Configuration);
+        builder.Services.AddSemanticQueryModule(builder.Configuration);
+        builder.Services.AddAgentsModule(builder.Configuration);
+        builder.Services.AddSemanticMcpEndpoints();
+        builder.Services.AddHttpClient("g2-readiness").ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false, UseProxy = false });
         builder.Services.AddOpenTelemetry()
-            .WithTracing(tracing => tracing.AddSource("OntologyPlatform.Ontology", "OntologyPlatform.Publishing"))
-            .WithMetrics(metrics => metrics.AddMeter("OntologyPlatform.Ontology", "OntologyPlatform.Publishing"));
+            .WithTracing(tracing => tracing.AddSource("OntologyPlatform.Ontology", "OntologyPlatform.Publishing", "OntologyPlatform.SemanticQuery", "OntologyPlatform.Agents"))
+            .WithMetrics(metrics => metrics.AddMeter("OntologyPlatform.Ontology", "OntologyPlatform.Publishing", "OntologyPlatform.SemanticQuery", "OntologyPlatform.Agents"));
     }
 
     /// <summary>只挂载当前真实模块路由，S2/S3随各自实现和集成门禁加入。</summary>
@@ -44,6 +50,9 @@ public static class G2Composition
         {
             app.MapOntologyEndpoints();
             app.MapPublishingEndpoints();
+            app.MapSemanticEndpoints();
+            app.MapExecutionEndpoints();
+            app.MapMcpEndpoints();
         }
     }
 
@@ -65,5 +74,8 @@ public static class G2Composition
         // 发布模块独立迁移且保留其历史，不跨写其他schema。
         var publishing = scope.ServiceProvider.GetRequiredService<PublishingDbContext>();
         await publishing.Database.MigrateAsync();
+        // 持久Run和事件也由自己的模块迁移，另一个实例只读取共享结果。
+        var agents = scope.ServiceProvider.GetRequiredService<AgentsDbContext>();
+        await agents.Database.MigrateAsync();
     }
 }

@@ -112,6 +112,7 @@ internal static class Wave2Infrastructure
             {
                 api.WithEnvironment("G2__Enabled", "true")
                     .WithEnvironment("G2__ApplyMigrations", instance == 1 ? "true" : "false")
+                    .WithEnvironment("Agents__EnableDeterministicHarness", "true")
                     .WithEnvironment("Semantics__ValidationOrigin", ReferenceExpression.Create($"{semantics.Jena.GetEndpoint("http")}/validation"))
                     .WithEnvironment("Semantics__PublishedOrigin", ReferenceExpression.Create($"{semantics.Jena.GetEndpoint("http")}/ontology"))
                     .WithEnvironment("Publishing__S3Endpoint", ReferenceExpression.Create($"http://127.0.0.1:{semantics.RustFs.GetEndpoint("s3").Property(EndpointProperty.Port)}"))

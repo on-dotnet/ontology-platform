@@ -28,10 +28,12 @@ public static class G2OpenApi
             }
             document.Components ??= new OpenApiComponents();
             document.Components.Schemas ??= new Dictionary<string, IOpenApiSchema>();
+            // 逐个保留唯一生成组件，框架已有引用按同名组件输出。
             foreach (var schema in parsed.Document.Components.Schemas)
             {
                 document.Components.Schemas[schema.Key] = schema.Value;
             }
+            // 这里只检查实际发现的路由，不从静态Schema生成任何产品入口。
             foreach (var route in document.Paths)
             {
                 if (!route.Key.StartsWith("/api/v1/", StringComparison.Ordinal) || route.Key.StartsWith("/api/v1/platform/", StringComparison.Ordinal)
@@ -39,6 +41,7 @@ public static class G2OpenApi
                 {
                     continue;
                 }
+                // 每种写入方法独立声明与运行边界一致的防伪要求。
                 foreach (var operation in route.Value.Operations)
                 {
                     if (operation.Key == HttpMethod.Post || operation.Key == HttpMethod.Put || operation.Key == HttpMethod.Delete || operation.Key == HttpMethod.Patch)

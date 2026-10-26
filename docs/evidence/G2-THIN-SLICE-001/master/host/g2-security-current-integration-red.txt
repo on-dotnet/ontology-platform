@@ -1,0 +1,33 @@
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+失败 RevisionPreconditionMatchesCommand ("\"2\"",200) (48ms)
+  从 /Users/chasen/.codex/worktrees/g2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+  Assertion failed. 预期值相等。
+
+  expected: 200
+  actual:   500
+
+  Assert.AreEqual(status, (int)response.StatusCode)
+    在 OntologyPlatform.SecurityTests.G2SecurityTests.RevisionPreconditionMatchesCommand(String etag, Int32 status) 位于 /Users/chasen/.codex/worktrees/g2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2SecurityTests.cs:143
+    在 OntologyPlatform.SecurityTests.G2SecurityTests.RevisionPreconditionMatchesCommand(String etag, Int32 status) 位于 /Users/chasen/.codex/worktrees/g2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2SecurityTests.cs:148
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+失败 MiddlewareSuccessContinuesToNativeBindingAndGuard (False) (44ms)
+  从 /Users/chasen/.codex/worktrees/g2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+  Assertion failed. 预期值相等。
+
+  expected: OK
+  actual:   InternalServerError
+
+  Assert.AreEqual(malformed ? HttpStatusCode.BadRequest : HttpStatusCode.OK, response.StatusCode)
+    在 OntologyPlatform.SecurityTests.G2SecurityTests.MiddlewareSuccessContinuesToNativeBindingAndGuard(Boolean malformed) 位于 /Users/chasen/.codex/worktrees/g2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2SecurityTests.cs:300
+    在 OntologyPlatform.SecurityTests.G2SecurityTests.MiddlewareSuccessContinuesToNativeBindingAndGuard(Boolean malformed) 位于 /Users/chasen/.codex/worktrees/g2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2SecurityTests.cs:302
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+/Users/chasen/.codex/worktrees/g2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64) 失败并出现 2 个错误 (1s 607ms)
+退出代码: 2
+
+测试运行摘要: 失败!
+  总计: 10
+  失败: 2
+  成功: 8
+  已跳过: 0
+  持续时间: 2s 212ms
+已完成测试运行，但显示非成功退出代码: 2 (请参阅: https://aka.ms/testingplatform/exitcodes)

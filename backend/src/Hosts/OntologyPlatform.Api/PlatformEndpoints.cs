@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.EntityFrameworkCore;
 using OntologyPlatform.Api.Contracts;
+using OntologyPlatform.Api.G2;
 using OntologyPlatform.Api.Security;
 using OntologyPlatform.Modules.Governance;
 using PlatformError = OntologyPlatform.Api.Contracts.PlatformProblem;
@@ -91,6 +92,10 @@ public static class PlatformEndpoints
             await database.Sessions.AsNoTracking().Take(1).ToArrayAsync(context.RequestAborted);
             await database.AuditRecords.AsNoTracking().Take(1).ToArrayAsync(context.RequestAborted);
             await database.Resources.AsNoTracking().Take(1).ToArrayAsync(context.RequestAborted);
+            if (app.Configuration.GetValue<bool>("G2:Enabled") && !await G2Readiness.CheckAsync(context.RequestServices, context.RequestAborted))
+            {
+                return PlatformProblem.Create(context, 503, "g2_dependency_unavailable");
+            }
             return Results.Ok(new { status = "Healthy" });
         }).Produces(200)
             .Produces<PlatformError>(401, contentType: "application/problem+json")
