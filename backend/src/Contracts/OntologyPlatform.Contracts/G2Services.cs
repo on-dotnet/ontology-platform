@@ -129,6 +129,14 @@ public interface ISemanticRuntime
     /// <param name="cancellationToken">取消信号。</param>
     /// <returns>有界真实三元组。</returns>
     Task<PublishedRdfData> ReadPublishedAsync(AssetVersionSnapshot snapshot, CancellationToken cancellationToken);
+
+    /// <summary>将实际返回的同一批正式RDF与经过不可变对象hash验证的权威源精确对账，拒绝验证后重读窗口。</summary>
+    /// <param name="manifest">已经重新授权的正式发布清单。</param>
+    /// <param name="sources">按清单逐对象核验hash及UTF8字节后组装的完整权威源。</param>
+    /// <param name="cancellationToken">覆盖解析、读取和对账的同一预算。</param>
+    /// <returns>仅与源和清单匹配的实际读取批次；旧适配器不支持时失败关闭。</returns>
+    Task<PublishedRdfData> ReadVerifiedPublishedAsync(ReleaseManifest manifest, SourceBundle sources, CancellationToken cancellationToken)
+        => Task.FromException<PublishedRdfData>(new SemanticOperationException(503, "verified_runtime_unavailable"));
 }
 
 /// <summary>以完整范围再次授权正式版本，供网关与运行固定快照。</summary>
