@@ -1,6 +1,6 @@
 # G2-PUB-001 实施证据
 
-当前状态：**DRAFT / READY_FOR_REVIEW候选，整体G2仍PARTIAL**。BaseSha=457911442aaa12f3ba170ee43c70343b64581f39。PUB独立应用实现及真实三依赖矩阵已完成：43项全套及3项新增回滚故障均通过；正在绑定冻结源码提交复验完整46项。独立Review、Master集成及真实HTTP/FE/QRY闭环仍由Master执行，本分支不代表完整G2通过。
+当前状态：**DRAFT / READY_FOR_REVIEW候选，整体G2仍PARTIAL**。BaseSha=457911442aaa12f3ba170ee43c70343b64581f39。PUB独立应用实现及真实三依赖矩阵已完成：冻结源码930c2239b2df9065be75b79cf576e803d965c86d在干净工作树上完整46/46通过，0 skip、exit0。独立Review、Master集成及真实HTTP/FE/QRY闭环仍由Master执行，本分支不代表完整G2通过。
 
 ## 初始模型里程碑（历史证据）
 
@@ -65,3 +65,12 @@ API编译证明新PublishingEndpoints适配原G2EndpointGuard签名，不代表H
 所有测试仅使用本脚本新建随机回环容器、tmpfs/临时TDB及随机隔离数据库；认证随机值只由当前进程环境注入并对输出遮蔽，不读取历史runtime、realm、卷或凭证。每次finally删除且只删除本次名字的容器/临时数据库，真实清理命令与结果在JSON中。
 
 最终整solution只读format检查：exit2，唯一共享问题为backend/tests/OntologyPlatform.G2ContractTests/WireContractTests.cs行159的5项WHITESPACE。PUB owned路径与独立测试工程format exit0；未跨写。Master回执表示已在其树修正，待公共Host提交，此分支不把别树尚未消费的修复当作自己的通过证据。Release API及PublishingTests build均exit0、0warning/0error。
+
+
+## 固定源码最终回执
+
+- SourceSha：`930c2239b2df9065be75b79cf576e803d965c86d`（已push）。最终证据仅追加文档，不改变此源码。
+- 命令：`python3 scripts/acceptance/release-faults.py --label committed-source-46`；`committed-source-46.json`实际记录workingTreeChanges=false、sourceSha上述值、exitCode=0，46 tests / 46 passed / 0 failed / 0 skipped，测试执行约21秒；三容器及迁移Up/Down/故障/真实清理均在原输出中。
+- 同源码`pwsh -NoProfile -File scripts/verify.ps1 -SelfTest`再次exit0，见committed-selftest.txt。
+- API与PublishingTests Release构建0warnings/0errors；owned格式exit0。整solution共享WireContractTests格式问题仍以本树实际exit2记账，Master已接手修复。
+- Owner停止在独立审查/集成关口。PublishingTests新csproj和私有lock已完成并移交Master。CI、HTTP/浏览器与能力绑定的新R1/R2总体G2验收不由这些本地用例代替；保留上述NOT_VERIFIED/NOT_RUN边界。
