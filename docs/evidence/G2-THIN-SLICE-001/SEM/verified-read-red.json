@@ -1,0 +1,71 @@
+{
+  "exitCode": 2,
+  "records": [
+    {
+      "command": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g2-sem-b2fef62fd096",
+        "--publish",
+        "127.0.0.1::3030",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--mount",
+        "type=bind,src=/private/tmp/g2-sem-b2fef62fd096yvyg8yp0,dst=/fixture,readonly",
+        "--entrypoint",
+        "java",
+        "fuseki:8b85cd963ab3910a87ff4d69819a814fcc536d5f",
+        "-Xmx384m",
+        "-Dlog4j.configurationFile=/fixture/log4j2.properties",
+        "-jar",
+        "/opt/fuseki/fuseki-server.jar",
+        "--config=/fixture/config.ttl"
+      ],
+      "exitCode": 0,
+      "output": "a3dbaaa1ffe03f16821bb1dc2fecbca2ba9f8dd225000fdb82a09952f1f91980\n"
+    },
+    {
+      "command": [
+        "docker",
+        "port",
+        "g2-sem-b2fef62fd096",
+        "3030/tcp"
+      ],
+      "exitCode": 0,
+      "output": "127.0.0.1:62809\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "test",
+        "--project",
+        "backend/tests/OntologyPlatform.SemanticTests",
+        "--no-restore",
+        "--",
+        "--filter",
+        "FullyQualifiedName~VerifiedReadTests"
+      ],
+      "exitCode": 2,
+      "output": "正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n失败 VerifiedReadReturnsExactlyTheComparedBatch (193ms)\n  从 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  测试方法 OntologyPlatform.SemanticTests.VerifiedReadTests。VerifiedReadReturnsExactlyTheComparedBatch 引发了异常: \n  OntologyPlatform.Contracts.SemanticOperationException: 语义操作未满足受控合同。\n    在 OntologyPlatform.SemanticTests.VerifiedReadTests.VerifiedReadReturnsExactlyTheComparedBatch() 位于 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs:46\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n    \n失败 EveryManifestSnapshotAndSourceBindingIsChecked (34ms)\n  从 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  测试方法 OntologyPlatform.SemanticTests.VerifiedReadTests。EveryManifestSnapshotAndSourceBindingIsChecked 引发了异常: \n  OntologyPlatform.Contracts.SemanticOperationException: 语义操作未满足受控合同。\n    在 OntologyPlatform.SemanticTests.VerifiedReadTests.EveryManifestSnapshotAndSourceBindingIsChecked() 位于 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs:95\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n    \n失败 OptionalVocabularyAndMissingBindingFailClosed (31ms)\n  从 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  测试方法 OntologyPlatform.SemanticTests.VerifiedReadTests。OptionalVocabularyAndMissingBindingFailClosed 引发了异常: \n  OntologyPlatform.Contracts.SemanticOperationException: 语义操作未满足受控合同。\n    在 OntologyPlatform.SemanticTests.VerifiedReadTests.OptionalVocabularyAndMissingBindingFailClosed() 位于 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs:138\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n    \n失败 VerifiedReadCancellationAndTimeoutCleanTemporaryGraphs (True) (36ms)\n  从 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  Assertion failed. Expected exception of type OperationCanceledException (or derived) but caught SemanticOperationException.\n  \n  expected type:    System.OperationCanceledException (or derived)\n  actual exception: OntologyPlatform.Contracts.SemanticOperationException: 语义操作未满足受控合同。\n                       at Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsThrowsAsyncFailingAsync[TException](Func`1 action, Boolean isStrictType)\n  \n  Assert.ThrowsAsync<OperationCanceledException>(() => task)\n    在 Microsoft.VisualStudio.TestTools.UnitTesting.Assert.ThrowsExceptionAsync[TException](Func`1 action, Boolean isStrictType, String message, String actionExpression, String assertMethodName)\n    在 OntologyPlatform.SemanticTests.VerifiedReadTests.VerifiedReadCancellationAndTimeoutCleanTemporaryGraphs(Boolean callerCancels) 位于 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs:171\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n失败 VerifiedReadCancellationAndTimeoutCleanTemporaryGraphs (False) (33ms)\n  从 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  Assertion failed. 预期字符串相等。\n  字符串长度不同(预期: 16，实际: 28)，且有 1 处不同。首次差异位于索引 0。\n  \n  expected:   \"semantic_timeout\"\n  actual:     \"verified_runtime_unavailable\"\n  difference: -^\n  \n  Assert.AreEqual(\"semantic_timeout\", error.Code)\n    在 OntologyPlatform.SemanticTests.VerifiedReadTests.VerifiedReadCancellationAndTimeoutCleanTemporaryGraphs(Boolean callerCancels) 位于 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs:177\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n/Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64) 失败并出现 5 个错误 (1s 681ms)\n退出代码: 2\n\n测试运行摘要: 失败!\n  总计: 10\n  失败: 5\n  成功: 5\n  已跳过: 0\n  持续时间: 2s 104ms\n已完成测试运行，但显示非成功退出代码: 2 (请参阅: https://aka.ms/testingplatform/exitcodes)\n"
+    },
+    {
+      "check": "all temporary graph triples removed",
+      "count": 0,
+      "status": "PASS"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g2-sem-b2fef62fd096"
+      ],
+      "exitCode": 0,
+      "output": "g2-sem-b2fef62fd096\n"
+    }
+  ]
+}

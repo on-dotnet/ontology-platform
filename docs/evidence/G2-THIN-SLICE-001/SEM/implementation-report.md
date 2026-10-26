@@ -105,3 +105,23 @@ Master指定的共享提交已顺序同步，无冲突且不手改共享文件�
 - `empty-documents-verification.json`保存真实cwd、命令、完整输出和退出码：backend cwd精确三文件`dotnet format OntologyPlatform.slnx --no-restore --include ... --verify-no-changes`；`dotnet build backend/OntologyPlatform.slnx --no-restore`；规定SelfTest；`git diff --check`，四项均exit0。SelfTest中的35项ReviewPackage及其他检查器正反例不是业务测试。全量构建仍有既存ASPIRE010 warning，不改共享配置。
 
 40总计仍含1项类型存在检查和1项明确catalog替身消费边界，不能称40个独立端到端场景。其他真实链路与未运行边界见前文；同Head CI、Master认证HTTP/FE集成、唯一ZIP仍NOT_VERIFIED/NOT_RUN，待Master限定复验与集成。
+
+## 正式读取同批完整性绑定修复（QRY Review缺口）
+
+当前修复授权来自Master限定派工：仍属G2原Ontology owned范围，修复Catalog Verify之后再ReadPublished的二读窗口，不扩展业务或依赖。读取了适用AGENTS/原任务卡/Task2 brief及指定SDD `subagent-driven-development/references/fix-loop.md`；复用原实施报告保存真实修复证据，不派子Agent、不手改公共配置。源代码独立提交已push：`21ed0172fc207db55164985f3c97fd2a640f1519`，仅JenaSemanticRuntime及新增owned VerifiedReadTests.cs（新增测试文件已通知Master）。
+
+共享接口由Master冻结`0e970f948aede10be0a86570a05d958d135a2761`，本树cherry为`098418c`。G2Services自动合并；冻结doc因本树缺少Master中间追加段发生上下文冲突，按Master明确批准保留本树原文、只精确追加0e970f9新增条款。未自行修改合同语义，Master集成时应使用自身完整上游合同，无须重复cherry本树共享提交。
+
+实现仅新增`ReadVerifiedPublishedAsync`和私有绑定检查：先核清单SchemaVersion1、服务端GuidN release/固定graph关系、manifest完整五hash（四源+BundleHash），以及snapshot release/两个graph/四源hash逐项与清单一致；再经唯一ParseSourcesAsync真实RIOT及Shape/支持边界解析完整原文。每个正式图仅GET一次，将这两批实际数组与源规范三元组逐项精确比较，返回**同两批数组**。不调用Verify后再Read，不重新发GET，不新建解析器。词汇源并入正式ontology图，可选词汇absent仍按null参与hash。所有源/清单错版、坏语法/预算、缺图/篡图和typed lexical不一致失败503；并发429和用户取消保持共享Execute原语义，内部五秒超时固定semantic_timeout503，finally仍独立清理暂存图。此方法验证所返回批次与不可变源一致，不承诺返回后外部存储永远不再变动。
+
+覆盖文件：`backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs`；原40项SemanticTests保持完整回归。新增10项包括旧接口默认fail-closed正控、同批真实读取、四种图篡改/删除/01词法变化、16种单字段错版+源码注释错版、可选词汇/缺失绑定、调用者取消与内部5秒超时。旧适配器测试仅验证默认接口不调用旧入口，明确不是引擎调用；其他故障注入通过真实临时Jena GSP改变测试独占图，未伪造RDF响应。新方法不承担Catalog授权、对象存储逐字节核验或QRY六态映射，它们仍由对应Owner真实集成。
+
+实际命令与结果：
+
+- `python3 scripts/acceptance/semantic-roundtrip.py --filter FullyQualifiedName~VerifiedReadTests --label verified-read-red`：exit2，10项中5失败、5通过、0跳过。生产尚无新实现，默认503导致合法读取/同批返回/optional词汇/取消超时路径真实红灯；初始默认503下的故障正控通过不能单独证明生产实现，后续完整绿灯和变异为补充证据。
+- `python3 scripts/acceptance/semantic-roundtrip.py --postgres --label verified-read-full-green`：exit0，50/50通过、0跳过（原40+新10）。真实应用治理和本体交付迁移、真实RIOT/SHACL/TDB2；运行完临时named graph三元组总数0，两容器均删除。见verified-read-full-green.json。
+- `python3 scripts/acceptance/semantic-roundtrip.py --filter FullyQualifiedName~VerifiedReadReturnsExactlyTheComparedBatch --label verified-read-reread-mutation-red`：只把生产新方法返回数组临时变异为比较后重新GET；真实第一次本体GET后、data GET前修改正式ontology图，测试exit2/1项失败，发现正式读取次数实际4而期望2。变异脚本finally恢复原源码，未提交变异。测试同时断言返回原正确ontology/vocabulary/data和下一次读取篡改图必须503；该变异证明能检测实际二读窗口。
+- `python3 scripts/acceptance/semantic-roundtrip.py --filter FullyQualifiedName~VerifiedReadTests --label verified-read-restored-green`：恢复原实现后exit0，10/10通过、0跳过，暂存图零残留，容器已删除。
+- backend cwd：`dotnet format OntologyPlatform.slnx --no-restore --include src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaSemanticRuntime.cs tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs --verify-no-changes`：exit0，精确选择自有两文件。`dotnet build backend/OntologyPlatform.slnx --no-restore`：exit0，既存ASPIRE010 warning保留。`pwsh -NoProfile -File scripts/verify.ps1 -SelfTest`与`git diff --check`均exit0，实际输出一并存verified-read-verification.json，未把检查器正反例计入50产品测试。
+
+新方法源提交与证据提交分离，供Master和QRY Owner独立消费和限定复审。整体继续DRAFT/PARTIAL；QRY读取不可变对象+本新方法+真实HTTP六态/证据链的跨模块联调、同Head CI、唯一审查ZIP由Master组织，本SEM专项不宣称这些链路已运行。原空文档修复8b9bd188及本修复等待Master组合限定复核，无main合并。
