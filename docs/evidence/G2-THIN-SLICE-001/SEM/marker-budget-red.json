@@ -1,0 +1,71 @@
+{
+  "exitCode": 2,
+  "records": [
+    {
+      "command": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g2-sem-8b60f024a070",
+        "--publish",
+        "127.0.0.1::3030",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--mount",
+        "type=bind,src=/private/tmp/g2-sem-8b60f024a070098ouf64,dst=/fixture,readonly",
+        "--entrypoint",
+        "java",
+        "fuseki:8b85cd963ab3910a87ff4d69819a814fcc536d5f",
+        "-Xmx384m",
+        "-Dlog4j.configurationFile=/fixture/log4j2.properties",
+        "-jar",
+        "/opt/fuseki/fuseki-server.jar",
+        "--config=/fixture/config.ttl"
+      ],
+      "exitCode": 0,
+      "output": "0d054366592dcba56210f33e4ce465074fe078bb25c6a032aa605a13fb386fcf\n"
+    },
+    {
+      "command": [
+        "docker",
+        "port",
+        "g2-sem-8b60f024a070",
+        "3030/tcp"
+      ],
+      "exitCode": 0,
+      "output": "127.0.0.1:52857\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "test",
+        "--project",
+        "backend/tests/OntologyPlatform.SemanticTests",
+        "--no-restore",
+        "--",
+        "--filter",
+        "FullyQualifiedName~TemporaryMarkerDoesNotConsume|FullyQualifiedName~VerifiedReadRetainsAggregate|FullyQualifiedName~PublishedGraphDoesNotReceive"
+      ],
+      "exitCode": 2,
+      "output": "正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n失败 TemporaryMarkerDoesNotConsumeBusinessTripleBudget (5000) (199ms)\n  从 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  测试方法 OntologyPlatform.SemanticTests.VerifiedReadTests。TemporaryMarkerDoesNotConsumeBusinessTripleBudget 引发了异常: \n  OntologyPlatform.Contracts.SemanticOperationException: 语义操作未满足受控合同。\n    在 OntologyPlatform.Modules.Ontology.JenaRdfCodec.Parse(String json) 位于 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaRdfCodec.cs:44\n    在 OntologyPlatform.Modules.Ontology.JenaSemanticRuntime.ReadGraphAsync(Uri origin, String graph, CancellationToken token) 位于 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaSemanticRuntime.cs:312\n    在 OntologyPlatform.Modules.Ontology.JenaSemanticRuntime.ParseSourcesAsync(SourceBundle sources, List`1 graphs, CancellationToken token) 位于 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaSemanticRuntime.cs:287\n    在 OntologyPlatform.Modules.Ontology.JenaSemanticRuntime.<>c__DisplayClass9_0.<<AnalyzeAsync>b__0>d.MoveNext() 位于 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaSemanticRuntime.cs:57\n    --- End of stack trace from previous location ---\n    在 OntologyPlatform.Modules.Ontology.JenaSemanticRuntime.Execute[T](Func`3 operation, CancellationToken cancellationToken, String phase) 位于 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaSemanticRuntime.cs:242\n    在 OntologyPlatform.Modules.Ontology.JenaSemanticRuntime.Execute[T](Func`3 operation, CancellationToken cancellationToken, String phase) 位于 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaSemanticRuntime.cs:265\n    在 OntologyPlatform.SemanticTests.VerifiedReadTests.TemporaryMarkerDoesNotConsumeBusinessTripleBudget(Int32 count) 位于 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs:196\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n    \n/Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64) 失败并出现 1 个错误 (3s 483ms)\n退出代码: 2\n\n测试运行摘要: 失败!\n  总计: 7\n  失败: 1\n  成功: 6\n  已跳过: 0\n  持续时间: 3s 997ms\n已完成测试运行，但显示非成功退出代码: 2 (请参阅: https://aka.ms/testingplatform/exitcodes)\n"
+    },
+    {
+      "check": "all temporary graph triples removed",
+      "count": 0,
+      "status": "PASS"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g2-sem-8b60f024a070"
+      ],
+      "exitCode": 0,
+      "output": "g2-sem-8b60f024a070\n"
+    }
+  ]
+}
