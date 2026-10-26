@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Optionally launch the real isolated AppHost, then run browser, G1 and performance acceptance."""
+"""Optionally launch isolated AppHost, then run every required real G2 runtime gate."""
 import argparse
 import json
 import os
@@ -78,7 +78,16 @@ def main():
                 stop(process)
             process = launch('full')
         wait_for('http://localhost:15100/health/ready',{'X-Health-Key':runtime['healthKey']})
-        commands = [[sys.executable,'scripts/acceptance/full-g2-e2e.py','--runtime-file',str(runtime_file)], [sys.executable,'scripts/acceptance/g1-regression.py','--runtime-file',str(runtime_file),'--runtime-only'], [sys.executable,'scripts/acceptance/performance-baseline.py','--from-observed-run']]
+        tools = json.loads(subprocess.check_output(['pwsh','-NoProfile','-File','scripts/bootstrap-web-tools.ps1'],cwd=ROOT,text=True))
+        # Keep the owned stack alive across all gates; a failed gate must stop acceptance.
+        commands = [
+            [sys.executable,'scripts/acceptance/full-g2-e2e.py','--runtime-file',str(runtime_file)],
+            [sys.executable,'scripts/acceptance/g1-regression.py','--runtime-file',str(runtime_file),'--runtime-only'],
+            [sys.executable,'scripts/acceptance/g2-observability.py','--runtime-file',str(runtime_file)],
+            [tools['nodePath'],'scripts/acceptance/g2-trace-browser.mjs',str(runtime_file)],
+            [sys.executable,'scripts/acceptance/g2-readiness-fault.py','--runtime-file',str(runtime_file)],
+            [sys.executable,'scripts/acceptance/performance-baseline.py','--from-observed-run'],
+        ]
         for command in commands:
             result = subprocess.run(command,cwd=ROOT)
             if result.returncode:

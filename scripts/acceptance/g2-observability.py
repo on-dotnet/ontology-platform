@@ -36,21 +36,36 @@ def main():
     path = Path(args.runtime_file).resolve()
     if not path.is_relative_to((ROOT / '.tools/security').resolve()):
         parser.error('Only current checkout private runtime accepted')
-    runtime = json.loads(path.read_text())
-    realm = json.loads(Path(runtime['realmFile']).read_text())
-    identities = json.loads((EVIDENCE / 'full-chain-identifiers.json').read_text())
     checks = []
     raw = {}
+    completed = False
+    report_path = EVIDENCE / 'g2-observability.json'
+    def persist_report(status):
+        # Atomic replacement keeps a failed PASS write from truncating the persisted FAIL.
+        report = {'status':status,'checks':checks,'workerTraceDesign':'actual independent execution.run trace with persisted creation_trace_id tag; never a fabricated parent span','officialSearchApi':'https://grafana.com/docs/tempo/latest/api_docs/','scope':'actual product emissions, own local synthetic stack; no model calls or production data'}
+        temporary = report_path.with_suffix('.json.tmp')
+        try:
+            temporary.write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
+            temporary.replace(report_path)
+        except BaseException:
+            temporary.unlink(missing_ok=True)
+            raise
     def check(name,value):
         checks.append({'check':name,'status':'PASS' if value else 'FAIL'})
         if not value:
             raise AssertionError('Actual G2 telemetry check failed')
-    forbidden = [runtime[key] for key in ['postgresPassword','keycloakPassword','grafanaPassword','certificatePassword','healthKey','rustfsAccessKey','rustfsSecretKey']]
-    forbidden += [realm['clientSecret'],'G2_PROMPT_MUST_NOT_LEAK_','# 人工合成，两个厂区外部号相同']
     def privacy(value):
         text = json.dumps(value,ensure_ascii=False)
         check('actual_export_contains_no_prompt_source_or_private_runtime_values',all(secret not in text for secret in forbidden))
     try:
+        # Invalidate an earlier run before any I/O can fail; never leave a stale PASS.
+        report_path.unlink(missing_ok=True)
+        persist_report('FAIL')
+        runtime = json.loads(path.read_text())
+        realm = json.loads(Path(runtime['realmFile']).read_text())
+        identities = json.loads((EVIDENCE / 'full-chain-identifiers.json').read_text())
+        forbidden = [runtime[key] for key in ['postgresPassword','keycloakPassword','grafanaPassword','certificatePassword','healthKey','rustfsAccessKey','rustfsSecretKey']]
+        forbidden += [realm['clientSecret'],'G2_PROMPT_MUST_NOT_LEAK_','# 人工合成，两个厂区外部号相同']
         traces = identities['traces']
         check('only_real_valid_persisted_trace_ids',len(traces)>=5 and all(re.fullmatch('[a-f0-9]{32}',value) and value != '0'*32 for value in traces))
         for trace in traces:
@@ -90,11 +105,13 @@ def main():
         privacy(all_series)
         for name,value in raw.items():
             (EVIDENCE / (name+'.json')).write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n')
+        persist_report('PASS')
+        completed = True
         return 0
     finally:
-        report = {'status':'PASS' if checks and all(item['status']=='PASS' for item in checks) and 'metric-agents_run_count_total' in raw else 'FAIL','checks':checks,'workerTraceDesign':'actual independent execution.run trace with persisted creation_trace_id tag; never a fabricated parent span','officialSearchApi':'https://grafana.com/docs/tempo/latest/api_docs/','scope':'actual product emissions, own local synthetic stack; no model calls or production data'}
-        (EVIDENCE / 'g2-observability.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
-        print(json.dumps({'status':report['status'],'checks':len(checks)}))
+        if not completed:
+            persist_report('FAIL')
+        print(json.dumps({'status':'PASS' if completed else 'FAIL','checks':len(checks)}))
 
 
 if __name__ == '__main__':
