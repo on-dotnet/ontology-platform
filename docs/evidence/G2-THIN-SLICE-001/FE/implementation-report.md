@@ -88,3 +88,17 @@ Master需完成受保护的G2 Host composition、真实迁移/PG与Jena资源及
 Master已准备新隔离Host环境，本Owner按指令等待可用通知后开始真实服务联调；本轮所有夹具依然不代表PG/Jena/Keycloak/RustFS/MAF真实G2 E2E。CI NOT_VERIFIED。新增同owned feature helper已向Master登记，审查/集成责任仍在Master。
 
 第一轮修复SourceSha=`9b0e0d1ed18edb90231fe0b46273da7c1f101f91`；本行仅文档关联，不改变该提交已验证源码。
+
+## S1真实布局缺陷的限定修复
+
+修复Base=`037cab14cfbeb1511c3f6f368216beef2bbd64c7`。Master提供真实Synthetic页面红证据：1440 viewport、scrollWidth1684，inspector面板417但隐式grid列及所有子section678。读取其明确提供的JSON/截图和后续computed/CSSOM证据，未读取private runtime/凭证，未改Root QA脚本。
+
+根因和红绿：首版从1440起步的长IRI夹具未复现，保留`long-layout-first-not-reproduced.txt`，不伪称RED。按Master补充的真实时序，在1280两列完成结构新增Class、SHACL、长JSON Diff后，同页首次切1440三列，精确复现scrollWidth1684/子section678，`long-layout-red.txt`实际exit1；原始红几何保存在`long-layout-1440-dark-red-observed.json`。Cytoscape已初始化的画布宽度参与隐式auto列min-content，断点收窄后锁住旧宽度。
+
+产品修改仅局部`features/ontology/workspace.css`三组约束：g2-stack显式minmax(0,1fr)、其直接子项min-width0、Cytoscape生成wrapper/canvas的max-width100%。前两组消除持久锁宽；观察到图resize回调前仍可能瞬时溢出1683，第三组防止旧画布绘制区域在回调前越界。没有新增overflow hidden/clip、裁切内容、修改global tokens或业务源码；原有全文换行和键盘节点列表保留。
+
+有界浏览器新增用例`tests/g2/long-layout.spec.ts`：标准5类/4关系/5数据属性的27条IRI断言，加Class后15节点/28条，hash按实际UTF8计算；模拟结构命令/SHACL/Diff接口，不在产品中解析OWL。按1280完成→1440→1280→390同页变换，六种深浅组合均验证双rAF即无横向溢出、后续canvas正确resize、完整IRI/Diff可读、节点/重布局按钮可键盘访问；多次布局与resize不产生语义写入（只有结构和验证两次POST，revision保持3）。没有以隐藏overflow满足测试。
+
+实际最终几何：1440×dark/light均scrollWidth1440、子section375；1280均1280、子section678；390均390、子section328。六张新安全Synthetic截图已重开检查，所有几何/RED/命令输出见`logs/long-layout-*`。
+
+最新本树验证：生产Next build0、lint0、typecheck0、Vitest53/53、G2 Edge31/31（新增1条覆盖六组合及resize）、原G1 Edge5/5。SelfTest输出亦保存。Master此前真实OIDC/HTTP及S1业务操作通过的事实仍归Master证据，本树夹具不计真实服务E2E；待Master将本修复集成后重跑真实S1完整页面，并安排限定独立复审。Monaco保持暂停，任务整体仍DRAFT/PARTIAL。

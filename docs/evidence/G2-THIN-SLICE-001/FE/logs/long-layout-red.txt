@@ -1,0 +1,37 @@
+COMMAND: /opt/homebrew/opt/node@24/bin/node node_modules/@playwright/test/cli.js test --config tests/g2/playwright.config.ts --grep 真实规模长IRI
+[WebServer] (node:84154) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:84155) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:84156) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 tests/g2/long-layout.spec.ts:33:1 › 真实规模长IRI/28三元组/SHACL/Diff在1440/1280/390深浅主题不撑开面板 (7.3s)
+
+
+  1) tests/g2/long-layout.spec.ts:33:1 › 真实规模长IRI/28三元组/SHACL/Diff在1440/1280/390深浅主题不撑开面板 ──────────
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+    Call Log:
+    - Timeout 5000ms exceeded while waiting on the predicate
+
+      60 |       writeFileSync(resolve(`../../docs/evidence/G2-THIN-SLICE-001/FE/logs/long-layout-${width}-${theme}-observed.json`), JSON.stringify(measured, null, 2) + "\n");
+      61 |       if (measured.scrollWidth > width) await page.screenshot({ path: `../../docs/evidence/G2-THIN-SLICE-001/FE/screenshots/long-layout-${width}-${theme}-red.png`, fullPage: true, animations: "disabled" });
+    > 62 |       await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+         |                                                                                                        ^
+      63 |       await expect.poll(() => page.locator(".g2-graph").evaluate(element => { const canvas = element.querySelector("canvas"); return !!canvas && canvas.getBoundingClientRect().width <= element.getBoundingClientRect().width && canvas.getBoundingClientRect().width >= element.clientWidth - 2; })).toBe(true);
+      64 |       const details = page.locator(".g2-inspector details"); if (!await details.evaluate(element => (element as HTMLDetailsElement).open)) { await details.locator("summary").focus(); await page.keyboard.press("Enter"); }
+      65 |       const node = page.getByRole("button", { name: addedIri, exact: true }); await node.focus(); await expect(node).toBeFocused(); await page.keyboard.press("Enter");
+        at /Users/chasen/.codex/worktrees/g2-fe/ontology-platform/apps/web/tests/g2/long-layout.spec.ts:62:104
+
+    Error Context: artifacts/test-results/g2/long-layout-真实规模长IRI-28三元组-SHACL-Diff在1440-1280-390深浅主题不撑开面板/error-context.md
+
+  1 failed
+    tests/g2/long-layout.spec.ts:33:1 › 真实规模长IRI/28三元组/SHACL/Diff在1440/1280/390深浅主题不撑开面板 ───────────
+EXIT_CODE=1

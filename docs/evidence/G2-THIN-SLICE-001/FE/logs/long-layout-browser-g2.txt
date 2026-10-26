@@ -1,0 +1,44 @@
+COMMAND: /opt/homebrew/opt/node@24/bin/node node_modules/@playwright/test/cli.js test --config tests/g2/playwright.config.ts
+[WebServer] (node:89297) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:89298) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 31 tests using 1 worker
+
+(node:89299) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 tests/g2/lifecycle.spec.ts:19:3 › 真实展示六态 FOUND，不执行HTML且证据再次授权 (403ms)
+  ✓   2 tests/g2/lifecycle.spec.ts:19:3 › 真实展示六态 EMPTY，不执行HTML且证据再次授权 (250ms)
+  ✓   3 tests/g2/lifecycle.spec.ts:19:3 › 真实展示六态 PARTIAL，不执行HTML且证据再次授权 (308ms)
+  ✓   4 tests/g2/lifecycle.spec.ts:19:3 › 真实展示六态 UNAVAILABLE，不执行HTML且证据再次授权 (252ms)
+  ✓   5 tests/g2/lifecycle.spec.ts:19:3 › 真实展示六态 UNAUTHORIZED，不执行HTML且证据再次授权 (264ms)
+  ✓   6 tests/g2/lifecycle.spec.ts:19:3 › 真实展示六态 AMBIGUOUS，不执行HTML且证据再次授权 (265ms)
+  ✓   7 tests/g2/lifecycle.spec.ts:31:1 › 提案自批禁止/异人批准/激活固定当前CAS (1.8s)
+  ✓   8 tests/g2/lifecycle.spec.ts:46:1 › 持久Run重放文本事件与终态，显示harness标识 (686ms)
+  ✓   9 tests/g2/lifecycle.spec.ts:57:1 › SSE续订发送持久游标且重复事件不重复展示 (1.5s)
+  ✓  10 tests/g2/lifecycle.spec.ts:69:1 › 断开订阅不发送取消，独立持久取消才POST (415ms)
+  ✓  11 tests/g2/lifecycle.spec.ts:80:1 › 不支持事件版本停止接收且回读Run快照 (232ms)
+  ✓  12 tests/g2/lifecycle.spec.ts:90:3 › 1440发布与查询Run工作区深浅主题/无溢出/键盘/水合 (506ms)
+  ✓  13 tests/g2/lifecycle.spec.ts:90:3 › 1280发布与查询Run工作区深浅主题/无溢出/键盘/水合 (508ms)
+  ✓  14 tests/g2/lifecycle.spec.ts:90:3 › 390发布与查询Run工作区深浅主题/无溢出/键盘/水合 (497ms)
+  ✓  15 tests/g2/lifecycle.spec.ts:108:1 › 默认Active查询交由服务端固定当次快照，不锁旧Active ID (285ms)
+  ✓  16 tests/g2/lifecycle.spec.ts:114:1 › 收到事件即推进取消CAS序号，不等待下一次快照读取 (393ms)
+  ✓  17 tests/g2/lifecycle.spec.ts:127:3 › I1 unknown-datum停止展示并回读真实Run快照 (247ms)
+  ✓  18 tests/g2/lifecycle.spec.ts:127:3 › I1 conflicting-snapshot停止展示并回读真实Run快照 (250ms)
+  ✓  19 tests/g2/long-layout.spec.ts:33:1 › 真实规模长IRI/28三元组/SHACL/Diff在1440/1280/390深浅主题不撑开面板 (4.3s)
+  ✓  20 tests/g2/workspace.spec.ts:16:3 › 1440深浅主题/ARIA/键盘/SSR水合无错误 (669ms)
+  ✓  21 tests/g2/workspace.spec.ts:16:3 › 1280深浅主题/ARIA/键盘/SSR水合无错误 (680ms)
+  ✓  22 tests/g2/workspace.spec.ts:16:3 › 390深浅主题/ARIA/键盘/SSR水合无错误 (346ms)
+  ✓  23 tests/g2/workspace.spec.ts:40:1 › 409保留dirty文本并显式加载/对比远端版本 (821ms)
+  ✓  24 tests/g2/workspace.spec.ts:56:1 › 上传真实四份标准源且scope默认不扩大 (1.2s)
+  ✓  25 tests/g2/workspace.spec.ts:68:1 › 加载/503/403/404准确显示，不虚构成功数据 (318ms)
+  ✓  26 tests/g2/workspace.spec.ts:76:1 › 结构新增Class发送唯一SemanticEdit，不浏览器重建本体 (1.3s)
+  ✓  27 tests/g2/workspace.spec.ts:87:1 › dirty阻断验证/结构编辑，图布局不产生语义写入 (1.0s)
+  ✓  28 tests/g2/workspace.spec.ts:99:1 › dirty草稿阻止内部导航，显式丢弃后才离开 (378ms)
+  ✓  29 tests/g2/workspace.spec.ts:108:1 › M1原始UTF8 BOM与CRLF导入导出逐字节保留 (179ms)
+  ✓  30 tests/g2/workspace.spec.ts:116:1 › M1非法UTF8明确拒绝且不替换原始缓冲 (186ms)
+  ✓  31 tests/g2/workspace.spec.ts:122:1 › M1可选absent源保持缺省且不能伪造空文件导出 (158ms)
+
+  31 passed (21.6s)
+EXIT_CODE=0
