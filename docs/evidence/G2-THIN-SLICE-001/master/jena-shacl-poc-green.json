@@ -1,0 +1,169 @@
+[
+  {
+    "command": [
+      "docker",
+      "run",
+      "--detach",
+      "--name",
+      "g2-shacl-poc-b27c951d58",
+      "--publish",
+      "127.0.0.1::3030",
+      "--memory",
+      "512m",
+      "--cpus",
+      "1",
+      "--mount",
+      "type=bind,src=/private/tmp/g2-shacl-poc-b27c951d58,dst=/poc,readonly",
+      "--entrypoint",
+      "java",
+      "fuseki:8b85cd963ab3910a87ff4d69819a814fcc536d5f",
+      "-Xmx256m",
+      "-jar",
+      "/opt/fuseki/fuseki-server.jar",
+      "--config=/poc/config.ttl"
+    ],
+    "exitCode": 0,
+    "output": "56a90af35e4707612081c0b9fd0307ce78f3a5a23f12878779fbc554f618f779\n"
+  },
+  {
+    "command": [
+      "docker",
+      "port",
+      "g2-shacl-poc-b27c951d58",
+      "3030/tcp"
+    ],
+    "exitCode": 0,
+    "output": "127.0.0.1:64376\n"
+  },
+  {
+    "check": "RIOT accepts UTF8 Turtle",
+    "status": "PASS",
+    "detail": null
+  },
+  {
+    "check": "real SHACL conforming standard RDF report",
+    "status": "PASS",
+    "detail": {
+      "_:fd8286cf-0b02-444c-bed3-0466bd608f34": {
+        "http://www.w3.org/ns/shacl#conforms": [
+          {
+            "type": "literal",
+            "value": "true",
+            "datatype": "http://www.w3.org/2001/XMLSchema#boolean"
+          }
+        ],
+        "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": [
+          {
+            "type": "uri",
+            "value": "http://www.w3.org/ns/shacl#ValidationReport"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "check": "memory graph preserves typed lexical form",
+    "status": "PASS",
+    "detail": "PREFIX ex:  <urn:g2:poc:>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nex:heat  a          ex:Heat;\n        ex:key      \"炉次一\"@zh;\n        ex:unknown  [ ex:note  \"保留\"@zh ];\n        ex:value    01 .\n"
+  },
+  {
+    "check": "unknown blank-node assertion preserved",
+    "status": "PASS",
+    "detail": null
+  },
+  {
+    "check": "nonconforming also HTTP200 and false",
+    "status": "PASS",
+    "detail": {
+      "_:fe67177c-7d6c-4fc1-9101-ad20e97a2ad5": {
+        "http://www.w3.org/ns/shacl#sourceShape": [
+          {
+            "type": "bnode",
+            "value": "_:c54ba2ff6461bd8a33263dd557e9b233"
+          }
+        ],
+        "http://www.w3.org/ns/shacl#sourceConstraintComponent": [
+          {
+            "type": "uri",
+            "value": "http://www.w3.org/ns/shacl#MinCountConstraintComponent"
+          }
+        ],
+        "http://www.w3.org/ns/shacl#resultPath": [
+          {
+            "type": "uri",
+            "value": "urn:g2:poc:key"
+          }
+        ],
+        "http://www.w3.org/ns/shacl#resultMessage": [
+          {
+            "type": "literal",
+            "value": "缺业务键",
+            "lang": "zh"
+          }
+        ],
+        "http://www.w3.org/ns/shacl#resultSeverity": [
+          {
+            "type": "uri",
+            "value": "http://www.w3.org/ns/shacl#Violation"
+          }
+        ],
+        "http://www.w3.org/ns/shacl#focusNode": [
+          {
+            "type": "uri",
+            "value": "urn:g2:poc:heat"
+          }
+        ],
+        "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": [
+          {
+            "type": "uri",
+            "value": "http://www.w3.org/ns/shacl#ValidationResult"
+          }
+        ]
+      },
+      "_:8a25bc22-39b1-4255-9f0e-1dc47ff51cd2": {
+        "http://www.w3.org/ns/shacl#result": [
+          {
+            "type": "bnode",
+            "value": "_:fe67177c-7d6c-4fc1-9101-ad20e97a2ad5"
+          }
+        ],
+        "http://www.w3.org/ns/shacl#conforms": [
+          {
+            "type": "literal",
+            "value": "false",
+            "datatype": "http://www.w3.org/2001/XMLSchema#boolean"
+          }
+        ],
+        "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": [
+          {
+            "type": "uri",
+            "value": "http://www.w3.org/ns/shacl#ValidationReport"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "check": "negative has focusNode",
+    "status": "PASS",
+    "detail": null
+  },
+  {
+    "check": "negative has resultPath",
+    "status": "PASS",
+    "detail": null
+  },
+  {
+    "check": "negative has resultMessage",
+    "status": "PASS",
+    "detail": null
+  },
+  {
+    "check": "invalid Turtle rejected by RIOT",
+    "status": "PASS",
+    "detail": null
+  },
+  {
+    "containerLog": "[2026-10-25 23:56:25] Fuseki     INFO  Apache Jena Fuseki 6.2.0\n[2026-10-25 23:56:25] Config     INFO  Fuseki Base = /fuseki\n[2026-10-25 23:56:25] Config     INFO  Database: /validation\n[2026-10-25 23:56:25] Config     INFO  UI Base: fuseki-server.jar\n[2026-10-25 23:56:25] Shiro      INFO  Shiro configuration: file:/fuseki/shiro.ini\n[2026-10-25 23:56:25] Server     INFO  Path = /validation\n[2026-10-25 23:56:25] Server     INFO  System\n[2026-10-25 23:56:25] Server     INFO    Memory: 247.5 MiB\n[2026-10-25 23:56:25] Server     INFO    PID:    1\n[2026-10-25 23:56:25] Server     INFO    Port:   http=3030\n[2026-10-25 23:56:25] Server     INFO  Start Fuseki\n[2026-10-25 23:56:25] Fuseki     INFO  [1] PUT http://127.0.0.1:64376/validation/data?graph=urn%3Ag2%3Apoc%3Avalidation\n[2026-10-25 23:56:25] Fuseki     INFO  [1] Body: Content-Length=189, Content-Type=text/turtle, Charset=utf-8 => Turtle : Count=5 Triples=5 Quads=0\n[2026-10-25 23:56:25] Fuseki     INFO  [1] 201 Created (6 ms)\n[2026-10-25 23:56:25] Fuseki     INFO  [2] POST http://127.0.0.1:64376/validation/shacl?graph=urn%3Ag2%3Apoc%3Avalidation\n[2026-10-25 23:56:25] Fuseki     INFO  [2] shacl: conforms\n[2026-10-25 23:56:25] Fuseki     INFO  [2] 200 OK (10 ms)\n[2026-10-25 23:56:25] Fuseki     INFO  [3] GET http://127.0.0.1:64376/validation/data?graph=urn%3Ag2%3Apoc%3Avalidation\n[2026-10-25 23:56:25] Fuseki     INFO  [3] 200 OK (45 ms)\n[2026-10-25 23:56:25] Fuseki     INFO  [4] GET http://127.0.0.1:64376/validation/query?query=SELECT%20%3Fnote%20WHERE%20%7B%20GRAPH%20%3Curn%3Ag2%3Apoc%3Avalidation%3E%20%7B%20%3Curn%3Ag2%3Apoc%3Aheat%3E%20%3Curn%3Ag2%3Apoc%3Aunknown%3E%20%3Fb%20.%20%3Fb%20%3Curn%3Ag2%3Apoc%3Anote%3E%20%3Fnote%20%7D%20%7D\n[2026-10-25 23:56:25] Fuseki     INFO  [4] Query = SELECT ?note WHERE { GRAPH <urn:g2:poc:validation> { <urn:g2:poc:heat> <urn:g2:poc:unknown> ?b . ?b <urn:g2:poc:note> ?note } }\n[2026-10-25 23:56:25] Fuseki     INFO  [4] 200 OK (4 ms)\n[2026-10-25 23:56:25] Fuseki     INFO  [5] PUT http://127.0.0.1:64376/validation/data?graph=urn%3Ag2%3Apoc%3Avalidation\n[2026-10-25 23:56:25] Fuseki     INFO  [5] Body: Content-Length=47, Content-Type=text/turtle, Charset=utf-8 => Turtle : Count=1 Triples=1 Quads=0\n[2026-10-25 23:56:25] Fuseki     INFO  [5] 200 OK (1 ms)\n[2026-10-25 23:56:25] Fuseki     INFO  [6] POST http://127.0.0.1:64376/validation/shacl?graph=urn%3Ag2%3Apoc%3Avalidation\n[2026-10-25 23:56:25] Fuseki     INFO  [6] shacl: 1 validation errors\n[2026-10-25 23:56:25] Fuseki     INFO  [6] 200 OK (3 ms)\n[2026-10-25 23:56:25] Fuseki     INFO  [7] PUT http://127.0.0.1:64376/validation/data?graph=urn%3Ag2%3Apoc%3Avalidation\n[2026-10-25 23:56:25] Fuseki     ERROR [line: 1, col: 1 ] Out of place: [KEYWORD:this]\n[2026-10-25 23:56:25] Fuseki     INFO  [7] 400 Bad Request (0 ms)\n"
+  }
+]

@@ -1,0 +1,9 @@
+@prefix fuseki: <http://jena.apache.org/fuseki#> .
+@prefix ja: <http://jena.hpl.hp.com/2005/11/Assembler#> .
+[] a fuseki:Server ; fuseki:services ( <#validation> ) .
+<#validation> a fuseki:Service ; fuseki:name "validation" ;
+ fuseki:dataset <#memory> ;
+ fuseki:endpoint [ fuseki:operation fuseki:query ; fuseki:name "query" ] ;
+ fuseki:endpoint [ fuseki:operation fuseki:gsp-rw ; fuseki:name "data" ] ;
+ fuseki:endpoint [ fuseki:operation fuseki:shacl ; fuseki:name "shacl" ] .
+<#memory> a ja:MemoryDataset .

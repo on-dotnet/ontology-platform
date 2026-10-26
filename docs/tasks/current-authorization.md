@@ -1,3 +1,9 @@
+# G2-THIN-SLICE-001 当前授权增量（2026-10-26）
+
+当前：**G2-THIN-SLICE-001 / IN_PROGRESS**。人类在本会话正式授权V1全部任务；Master先冻结并独立复审共享契约，再按依赖通过独立Worktree组织多Agent开发、Review、持续提交推送、真实验收和唯一标准Review ZIP。BaseSha=`6154ebb3703031a49cf0c555c9f0c3596e3b7726`，开工fetch后origin/main同值。授权原文见[本轮依据](../evidence/G2-THIN-SLICE-001/authorization-v1.md)，任务见[G2总卡](G2-THIN-SLICE-001.md)。本次明确授权覆盖历史G1停止于G2前的条款，历史PARTIAL/NOT_RUN保持不变。只本轮G2，不自动进入G3–G8；不调用收费模型/生产，不做系统管理员修改。第三方精确依赖和实质架构扩展依合同先登记/核实及必要批准，未批准链路停止但继续无关工作。
+
+---
+
 # G1-CLOSE-001 当前授权增量（2026-10-25）
 
 当前：**G1-CLOSE-001 / READY_FOR_REVIEW / PARTIAL**（2026-10-26收口；Mac两P1修复和46安全/完整纵向实测、独立审查已完成；最终main/同Head CI/唯一ZIP以交付manifest及回执为准）。人类明确批准收口授权V1全部任务，原文见[授权](../evidence/G1-CLOSE-001/authorization-v1.md)。BaseSha=`d181f66e569e190a66b0f48b179f2fd9390b9467`。只修复审计成功事实/真实多厂范围和安全结构化异常诊断，完成G1阶段矩阵、只读G2准备、独立Review、真实回归、CI、Master集成Push及唯一Review ZIP后停止。独立SEC/OBS托管Worktree；公共合同/迁移/CI/主线Master单写者。历史PARTIAL和未运行项不改写。禁止G2功能/进程、生产/系统管理员/付费操作，不修改GitHub规则。详细任务与冻结合同见[G1-CLOSE-001](G1-CLOSE-001.md)。

@@ -1,0 +1,77 @@
+[
+  {
+    "command": [
+      "docker",
+      "run",
+      "--detach",
+      "--name",
+      "g2-shacl-poc-8a00094d72",
+      "--publish",
+      "127.0.0.1::3030",
+      "--memory",
+      "512m",
+      "--cpus",
+      "1",
+      "--mount",
+      "type=bind,src=/private/tmp/g2-shacl-poc-8a00094d72,dst=/poc,readonly",
+      "--entrypoint",
+      "java",
+      "fuseki:8b85cd963ab3910a87ff4d69819a814fcc536d5f",
+      "-Xmx256m",
+      "-jar",
+      "/opt/fuseki/fuseki-server.jar",
+      "--config=/poc/config.ttl"
+    ],
+    "exitCode": 0,
+    "output": "1e6ad92fda60769fd7ab90a6f64c5f009ac46307d1576dfba9b6887d17eda3e5\n"
+  },
+  {
+    "command": [
+      "docker",
+      "port",
+      "g2-shacl-poc-8a00094d72",
+      "3030/tcp"
+    ],
+    "exitCode": 0,
+    "output": "127.0.0.1:64342\n"
+  },
+  {
+    "check": "RIOT accepts UTF8 Turtle",
+    "status": "PASS",
+    "detail": null
+  },
+  {
+    "check": "real SHACL conforming standard RDF report",
+    "status": "PASS",
+    "detail": {
+      "_:6a450ae2-10b3-4256-8130-37f5fb2b6bff": {
+        "http://www.w3.org/ns/shacl#conforms": [
+          {
+            "type": "literal",
+            "value": "true",
+            "datatype": "http://www.w3.org/2001/XMLSchema#boolean"
+          }
+        ],
+        "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": [
+          {
+            "type": "uri",
+            "value": "http://www.w3.org/ns/shacl#ValidationReport"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "check": "memory graph preserves typed lexical form",
+    "status": "PASS",
+    "detail": "PREFIX ex:  <urn:g2:poc:>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nex:heat  a          ex:Heat;\n        ex:key      \"炉次一\"@zh;\n        ex:unknown  [ ex:note  \"保留\"@zh ];\n        ex:value    01 .\n"
+  },
+  {
+    "status": "FAIL",
+    "category": "HTTPError",
+    "detail": "HTTP Error 415: Unsupported Media Type"
+  },
+  {
+    "containerLog": "[2026-10-25 23:55:44] Fuseki     INFO  Apache Jena Fuseki 6.2.0\n[2026-10-25 23:55:44] Config     INFO  Fuseki Base = /fuseki\n[2026-10-25 23:55:44] Config     INFO  Database: /validation\n[2026-10-25 23:55:44] Config     INFO  UI Base: fuseki-server.jar\n[2026-10-25 23:55:44] Shiro      INFO  Shiro configuration: file:/fuseki/shiro.ini\n[2026-10-25 23:55:45] Server     INFO  Path = /validation\n[2026-10-25 23:55:45] Server     INFO  System\n[2026-10-25 23:55:45] Server     INFO    Memory: 247.5 MiB\n[2026-10-25 23:55:45] Server     INFO    PID:    1\n[2026-10-25 23:55:45] Server     INFO    Port:   http=3030\n[2026-10-25 23:55:45] Server     INFO  Start Fuseki\n[2026-10-25 23:55:45] Fuseki     INFO  [1] PUT http://127.0.0.1:64342/validation/data?graph=urn%3Ag2%3Apoc%3Avalidation\n[2026-10-25 23:55:45] Fuseki     INFO  [1] Body: Content-Length=189, Content-Type=text/turtle, Charset=utf-8 => Turtle : Count=5 Triples=5 Quads=0\n[2026-10-25 23:55:45] Fuseki     INFO  [1] 201 Created (6 ms)\n[2026-10-25 23:55:45] Fuseki     INFO  [2] POST http://127.0.0.1:64342/validation/shacl?graph=urn%3Ag2%3Apoc%3Avalidation\n[2026-10-25 23:55:45] Fuseki     INFO  [2] shacl: conforms\n[2026-10-25 23:55:45] Fuseki     INFO  [2] 200 OK (9 ms)\n[2026-10-25 23:55:45] Fuseki     INFO  [3] GET http://127.0.0.1:64342/validation/data?graph=urn%3Ag2%3Apoc%3Avalidation\n[2026-10-25 23:55:45] Fuseki     INFO  [3] 200 OK (3 ms)\n[2026-10-25 23:55:45] Fuseki     INFO  [4] GET http://127.0.0.1:64342/validation/query?query=SELECT%20%3Fnote%20WHERE%20%7B%20GRAPH%20%3Curn%3Ag2%3Apoc%3Avalidation%3E%20%7B%20%3Curn%3Ag2%3Apoc%3Aheat%3E%20%3Curn%3Ag2%3Apoc%3Aunknown%3E%20%3Fb%20.%20%3Fb%20%3Curn%3Ag2%3Apoc%3Anote%3E%20%3Fnote%20%7D%20%7D\n[2026-10-25 23:55:45] Fuseki     INFO  [4] 415 Unsupported Media Type (0 ms)\n"
+  }
+]
