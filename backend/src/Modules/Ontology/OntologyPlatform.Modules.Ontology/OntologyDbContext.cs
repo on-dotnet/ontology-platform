@@ -7,7 +7,9 @@ public sealed class OntologyDbContext : DbContext
 {
     /// <summary>接收宿主或发布事务提供的显式连接选项。</summary>
     /// <param name="options">本模块数据库选项。</param>
-    public OntologyDbContext(DbContextOptions<OntologyDbContext> options) : base(options) { }
+    public OntologyDbContext(DbContextOptions<OntologyDbContext> options) : base(options)
+    {
+    }
 
     /// <summary>当前草稿CAS头。</summary>
     public DbSet<DraftRecord> Drafts => Set<DraftRecord>();
