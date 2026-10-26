@@ -127,3 +127,6 @@ Master：`codex/G2-THIN-SLICE-001-master`，`/Users/chasen/.codex/worktrees/g2-m
 Master将手写Governance TransactionalAuditWriter.cs、API/G2/{G2Authorization,G2EndpointGuard}.cs及新G2SecurityTests/G2AuditTransactionTests临时明确转给唯一Owner g2_security_support；独立树/分支/精确路径见G2-SEC-SUPPORT卡。Master不同时写这些文件；唯一Contracts/项目/锁/迁移/Host/CI仍Master。
 
 SEM模型fffb1af经独立0Critical/0Important/1格式Minor审查，已在Master以fcd7190 DRAFT集成，仅供真实迁移与后续S1测试，不main。Master局部EF10.0.13已成功生成InitialOntology迁移，未应用PG。SEM服务端新assetId必须服务端生成，clone通过唯一IReleaseCatalog.ReadAsync按releaseId重新授权取权威asset/scope；Save/Edit不能改变scope。正式graph规则冻结releaseId=GuidN，urn:ontology-platform:release:{releaseId}:ontology及:data。语义元数据命名空间urn:ontology-platform:vocabulary:，标准RDF reification/PROV-O带sourceId/sourceRecordId/validFromUtc/observedAtUtc/modelVersion/mappingStatus=absent；模型适用性还需正式manifest精确hash绑定，不能将合成模板版本冒充发布版本。
+
+
+FE transport所有权调整：Master明确将全新lib/api/g2-client.ts及其测试单写权交FE；原G1 client/生成types/生成器/Tokens不交叉写。业务DTO/安全合同不变；这是独立文件所有权调整，不是新架构/依赖。当前FE写起点在Master同期已提交树（派发消息记录精确SHA），此前bd52431为共同合同基线。SEC40/40及限定独立0/0/0已经在29bff98集成任务树，尚未注册产品Host/主线。
