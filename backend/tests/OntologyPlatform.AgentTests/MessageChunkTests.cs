@@ -55,6 +55,32 @@ public sealed class MessageChunkTests
         Assert.AreEqual(JsonSerializer.Serialize(events), JsonSerializer.Serialize(await RunFlowTests.AllAsync(fixture, run.RunId)));
     }
 
+    /// <summary>最终SEM依赖下，单个非BMP标签从真实发布到Gateway与MAF持久消息全程无替身。</summary>
+    [TestMethod]
+    [DataRow("😀")]
+    [DataRow("𠀀")]
+    public async Task PublishedUnicodeLabelSurvivesRealGatewayAndMaf(string label)
+    {
+        // 使用当前脚本新建服务和独立Synthetic组织。
+        using var fixture = new AgentFixture();
+        // 只改变样例业务标签及对应来源断言，保留全部真实SHACL和发布检查。
+        var sources = fixture.Sources();
+        // 字面量原样进入真实草稿、验证、异人审批、部署和读回核验。
+        var release = await fixture.PublishAsync(sources with { DataTurtle = sources.DataTurtle.Replace("炉次heat-1", label, StringComparison.Ordinal) });
+        // 本用例使用原注册Executor与Gateway，没有边界标签装饰器。
+        var run = await fixture.Runs.CreateAsync(fixture.Author, RunFlowTests.Request(fixture.Plan(release)), default);
+        await fixture.Executor.RunOneAsync("published-unicode", default);
+        // 从PG重放实际工具与消息，验证最终用户可见字符串仍等于发布原文。
+        var events = await RunFlowTests.AllAsync(fixture, run.RunId);
+        Assert.IsInstanceOfType<RunCompletedPayload>(events.Last().Payload);
+        Assert.AreEqual(label, events.Select(value => value.Payload).OfType<ToolCompletedPayload>().Single().Result.Data.Single().Entity!.Label);
+        // 答案正文必须包含原样标签，FFFD不能被成功终态掩盖。
+        var text = string.Concat(events.Select(value => value.Payload).OfType<MessageDeltaPayload>().Select(value => value.Text));
+        Assert.IsTrue(text.Contains(label, StringComparison.Ordinal));
+        Assert.IsFalse(text.Contains('\uFFFD'));
+        Assert.AreEqual(JsonSerializer.Serialize(events), JsonSerializer.Serialize(await RunFlowTests.AllAsync(fixture, run.RunId)));
+    }
+
     /// <summary>空文本不生成事件；ASCII在边界内外均不丢字符且段长不超过合同上限。</summary>
     [TestMethod]
     [DataRow(0, 0)]
