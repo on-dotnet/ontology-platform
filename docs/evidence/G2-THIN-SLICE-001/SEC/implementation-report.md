@@ -54,3 +54,23 @@ HTTP先写测试后实现；PG事务回归另做真实可逆变异红绿证明�
 - **唯一标准Review ZIP：由Master统一构建并复验**，本子项不另制竞争ZIP。源码/完整diff/本报告及红绿证据供最终唯一包纳入。
 
 完成本子项后停止，保留独立Worktree供固定SHA审查，不自行合并main或开始后续关口。
+
+## 独立审查修复轮1/5：连接前置失败也必须整笔回滚
+
+独立Review针对源码 `4eeaa56c3a6c3e10ccc54b84cf779f5cbd7570d5` 和证据 `3f96b25c194654651812a3024ff38f509d001b2f` 返回 **REQUEST_CHANGES（C0/I1/M0）**。原writer的连接已打开/物理身份校验位于try之外：原事务写入业务后，若传另一物理连接，调用者能捕获校验异常并成功提交无审计业务。原测试主动Rollback，不能证明writer本身已经阻止该提交。此前38项PASS没有覆盖这一前置失败漏洞，不能替代此次独立审查。
+
+本轮仅改变两个owned C#文件：把连接前置检查移入现有整笔Rollback的try/catch；原物理连接测试改为尝试Commit并断言已失效；新增参数化真实PG用例分别覆盖另一已打开物理连接和另一未打开连接。两种用例都先在原事务实际写业务，捕获审计前置失败后不主动Rollback，再尝试Commit并从独立连接核对业务/审计均为零。无Host、公共合同、依赖、迁移或其他源码变更。
+
+修复源码SHA：`3f7771416856ad0a0ff6d963847663de15db3094`，已推送 `origin/codex/G2-SEC-SUPPORT`；本轮实施基线为 `3f96b25c194654651812a3024ff38f509d001b2f`。后续仅追加本节与命令证据，不修改源码；修复仍待Master限定独立复审。
+
+| 命令 | 退出码 | 实测结果与证据 |
+|---|---:|---|
+| `python3 docs/evidence/G2-THIN-SLICE-001/SEC/run-isolated-pg.py`，只新增测试且未改writer | 2 | 40发现、38通过、2失败、0跳过；两个新用例在Commit应失败处得到实际成功。见fix1-red-precondition.txt。 |
+| 相同命令，修复writer回滚边界后 | 0 | 原38项与新2项共40/40通过，0跳过。见fix1-green.txt。 |
+| `dotnet build backend/tests/OntologyPlatform.SecurityTests --no-restore` | 0 | 0警告、0错误。见fix1-build.txt。 |
+| `pwsh -NoProfile -File scripts/verify.ps1 -SelfTest` | 0 | 静态及检查器负例通过，含ReviewPackage35测试。见fix1-selftest.txt。 |
+| `dotnet format whitespace backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/OntologyPlatform.Modules.Governance.csproj --no-restore --verify-no-changes --include backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs` | 0 | 无输出、无格式诊断。 |
+| `dotnet format whitespace backend/tests/OntologyPlatform.SecurityTests/OntologyPlatform.SecurityTests.csproj --no-restore --verify-no-changes --include backend/tests/OntologyPlatform.SecurityTests/G2AuditTransactionTests.cs` | 0 | 无输出、无格式诊断。 |
+| `git diff --cached --check`，源码提交前 | 0 | 精确两个owned文件，无空白错误。 |
+
+本轮继续使用原专用临时PG runner，无历史容器/卷/realm或真实凭证访问。证据仅规范化LF和尾随空白，保留真实失败/计数/退出码。状态为 **FIXED_PENDING_REVIEW / PARTIAL**；同Head CI、产品集成及最终唯一ZIP仍由Master负责，没有据本轮自测宣称独立复审已通过。
