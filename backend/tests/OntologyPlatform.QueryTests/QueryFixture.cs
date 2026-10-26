@@ -55,7 +55,13 @@ internal sealed class QueryFixture : IDisposable
     internal Action<HttpRequestMessage, HttpResponseMessage>? CorruptResponse { get; set; }
 
     /// <summary>在真实Catalog完成后插入故障或活动版本变更，保持此前真实验证路径。</summary>
-    internal ISemanticGateway AfterResolve(Func<Task> callback) => new SemanticGateway(new CatalogCheckpoint(Catalog, callback), scope.ServiceProvider.GetRequiredService<ISemanticRuntime>(), scope.ServiceProvider.GetRequiredService<CapabilityRegistry>(), scope.ServiceProvider.GetRequiredService<IAuditTrail>(), Clock);
+    internal ISemanticGateway AfterResolve(Func<Task> callback) => new SemanticGateway(new CatalogCheckpoint(Catalog, callback), scope.ServiceProvider.GetRequiredService<ISemanticRuntime>(), scope.ServiceProvider.GetRequiredService<CapabilityRegistry>(), scope.ServiceProvider.GetRequiredService<IAuditTrail>(), Clock, scope.ServiceProvider.GetRequiredService<VerifiedReleaseSources>());
+
+    /// <summary>证据真实Catalog读取完成后插入受控窗口故障。</summary>
+    internal IEvidenceService AfterRead(Func<Task> callback) => new EvidenceService(new CatalogCheckpoint(Catalog, callback), scope.ServiceProvider.GetRequiredService<ISemanticRuntime>(), scope.ServiceProvider.GetRequiredService<VerifiedReleaseSources>(), scope.ServiceProvider.GetRequiredService<IAuditTrail>());
+
+    /// <summary>共享正式治理审计供真实HTTP夹具使用。</summary>
+    internal IAuditTrail Audit => scope.ServiceProvider.GetRequiredService<IAuditTrail>();
 
     /// <summary>通过环境获取本轮新建资源，不读取历史凭证文件。</summary>
     internal QueryFixture()
@@ -177,11 +183,18 @@ internal sealed class QueryFixture : IDisposable
             return response;
         }
     }
+
     /// <summary>故障注入检查点仅包装真实Catalog，不提供任何合成成功发布。</summary>
     private sealed class CatalogCheckpoint(IReleaseCatalog inner, Func<Task> callback) : IReleaseCatalog
     {
         /// <summary>历史读取直接交真实发布目录。</summary>
-        public Task<ReleaseSummary> ReadAsync(ActorContext actor, string releaseId, CancellationToken cancellationToken) => inner.ReadAsync(actor, releaseId, cancellationToken);
+        public async Task<ReleaseSummary> ReadAsync(ActorContext actor, string releaseId, CancellationToken cancellationToken)
+        {
+            // 保留真实Catalog返回值，仅在验证后的窗口执行测试操作。
+            var result = await inner.ReadAsync(actor, releaseId, cancellationToken);
+            await callback();
+            return result;
+        }
 
         /// <summary>完整真实发布验证后触发当前测试限定故障。</summary>
         public async Task<ReleaseSummary> ResolveAsync(ActorContext actor, string assetId, string? releaseId, CancellationToken cancellationToken)

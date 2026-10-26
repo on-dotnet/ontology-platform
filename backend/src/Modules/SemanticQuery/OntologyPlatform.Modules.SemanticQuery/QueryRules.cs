@@ -31,7 +31,7 @@ internal static class QueryRules
     {
         DemandActor(actor);
         if (plan.SiteId is not null && !actor.SiteIds.Contains(plan.SiteId, StringComparer.Ordinal)) throw new SemanticOperationException(403, "scope_denied");
-        if (string.IsNullOrWhiteSpace(plan.AssetId) || plan.AssetId.Length > 128 || plan.Depth is < 1 or > 5 || plan.MaxRows is < 1 or > 100 || plan.TimeoutMs is < 1 or > 5000 || plan.RelationshipIris is null || plan.RelationshipIris.Length > 16 || plan.ExternalId?.Length > 256 || plan.SiteId?.Length > 128 || plan.ReleaseId?.Length > 64) throw new SemanticOperationException(422, "query_budget_invalid");
+        if (string.IsNullOrWhiteSpace(plan.AssetId) || plan.AssetId.Length > 128 || plan.Depth is < 1 or > 5 || plan.MaxRows is < 1 or > 100 || plan.TimeoutMs is < 100 or > 5000 || plan.RelationshipIris is null || plan.RelationshipIris.Length > 16 || plan.ExternalId?.Length > 256 || plan.SiteId?.Length > 128 || plan.ReleaseId?.Length > 64) throw new SemanticOperationException(422, "query_budget_invalid");
         if (plan.EntityIri is not null && !IsIri(plan.EntityIri) || plan.EntityType is not null && !IsIri(plan.EntityType) || plan.RelationshipIris.Any(value => !IsIri(value))) throw new SemanticOperationException(422, "query_iri_invalid");
         if (plan.CapabilityId != "describe_ontology" && string.IsNullOrWhiteSpace(plan.EntityIri) && string.IsNullOrWhiteSpace(plan.ExternalId)) throw new SemanticOperationException(422, "query_identity_required");
     }
@@ -42,6 +42,23 @@ internal static class QueryRules
     /// <summary>固定诊断不回显输入、源正文或依赖异常。</summary>
     internal static SemanticDiagnostic Diagnostic(string code) => new() { Code = code, Severity = DiagnosticSeverity.Warning, Message = code switch { "evidence_missing" => "部分事实缺少可验证来源。", "query_limited" => "结果达到批准预算。", "scope_denied" => "目标不在可访问范围内。", _ => "正式语义依赖暂不可用。" } };
 
+    /// <summary>成功与失败审计都使用当前请求剩余预算；到期失败关闭，外部取消保持原始取消语义。</summary>
+    internal static async Task AuditWithinBudgetAsync(IAuditTrail audit, ActorContext actor, string action, string outcome, CancellationToken budget, CancellationToken caller)
+    {
+        try
+        {
+            budget.ThrowIfCancellationRequested();
+            await AuditAsync(audit, actor, action, outcome, budget);
+            // 提交返回时也检查deadline，绝不在超时后公开可信完成结果。
+            budget.ThrowIfCancellationRequested();
+        }
+        catch (OperationCanceledException) when (!caller.IsCancellationRequested)
+        {
+            // 没有审计成功回执时不延长预算补写，保留数据库真实已提交事实。
+            throw new SemanticOperationException(503, "audit_timeout");
+        }
+    }
+
     /// <summary>所有读取和拒绝通过Governance独立持久审计，失败不得返回成功。</summary>
     internal static async Task<string> AuditAsync(IAuditTrail audit, ActorContext actor, string action, string outcome, CancellationToken token)
     {
@@ -51,6 +68,8 @@ internal static class QueryRules
         }
         catch (Exception failure) when (failure is DbException || failure.InnerException is DbException)
         {
+            // 驱动可将服务器取消包装为数据库异常；优先传播当前真实取消，不能误报不可用。
+            token.ThrowIfCancellationRequested();
             // 模块不依赖EF/Npgsql实现类型；仅处理标准数据库故障，不能透出原始正文。
             throw new SemanticOperationException(503, "audit_unavailable");
         }
