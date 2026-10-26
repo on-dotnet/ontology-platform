@@ -81,6 +81,47 @@ public sealed class DraftRevisionTests
         Assert.IsTrue(audits.All(row => row.Outcome == "allowed" && row.ScopeSiteIds!.SequenceEqual(draft.Scope.SiteIds) && row.SiteId is null));
     }
 
+    /// <summary>非BMP结构编辑写入真实PG修订，旧源码字节保持不变且Diff如实包含导出格式变化。</summary>
+    [TestMethod]
+    public async Task UnicodeEditPersistsExactHistoryAndHonestSourceDiff()
+    {
+        // 使用交付迁移创建的真实独立PG上下文。
+        await using var database = Database();
+        // 可信操作者拥有请求的完整scope。
+        var actor = Actor();
+        // 生产服务使用实际RIOT和真实事务审计写入器。
+        var service = Service(database);
+        // 原文注释用于证明历史没有被新导出格式覆盖。
+        var request = Request();
+        request = request with { Sources = request.Sources with { OntologyTurtle = "# 保留原文😀𠀀\n" + request.Sources.OntologyTurtle } };
+        // 首次保存保留原文的UTF8散列。
+        var draft = await service.CreateAsync(actor, request, CancellationToken.None);
+        Assert.AreEqual(OntologyPlatform.Modules.Ontology.Domain.OntologyRules.Hash(request.Sources.OntologyTurtle), draft.Hashes.OntologyHash);
+        // 从完整真实投影选取一个已有语言标签，不猜IRI或词法。
+        var label = draft.Projection.Triples.First(triple => triple.Predicate == "http://www.w3.org/2000/01/rdf-schema#label");
+        // Unicode仅作为新业务词法，语言/datatype保持旧项。
+        var replacement = label.Object with { Value = "修改后😀𠀀" };
+        // 编辑必须真正提交新修订且保持旧版本源历史。
+        var edited = await service.EditAsync(actor, draft.DraftId, new EditDraftRequest { Edit = new SemanticEdit { SubjectIri = label.Subject.Value, PredicateIri = label.Predicate, OldObject = label.Object, NewObject = replacement }, Command = Command(1) }, CancellationToken.None);
+        Assert.AreEqual(2L, edited.Revision);
+        Assert.AreNotEqual(draft.Hashes.OntologyHash, edited.Hashes.OntologyHash);
+        // Diff的源字段保留完整before/after，不能把导出格式变化隐藏为原文未变。
+        var difference = await service.DiffAsync(actor, draft.DraftId, 1, CancellationToken.None);
+        // 解码真实源差异载荷以核对两个完整SourceBundle，而非只检查文本含emoji。
+        using var rawDiff = JsonDocument.Parse(difference.SourceDiff);
+        Assert.AreEqual(request.Sources, rawDiff.RootElement.GetProperty("before").Deserialize<SourceBundle>());
+        Assert.AreEqual(edited.Sources, rawDiff.RootElement.GetProperty("after").Deserialize<SourceBundle>());
+        Assert.AreEqual(1, difference.AddedTriples.Length);
+        Assert.AreEqual("修改后😀𠀀", difference.AddedTriples[0].Object.Value);
+        Assert.AreEqual(1, difference.RemovedTriples.Length);
+        // 新上下文读回证明真实持久化，而非本次服务对象缓存。
+        await using var reopened = Database();
+        Assert.AreEqual(edited.Sources, (await Service(reopened).ReadAsync(actor, draft.DraftId, CancellationToken.None)).Sources);
+        // 原修订仍保存用户提供的全部注释和Unicode源字节。
+        var original = await reopened.Revisions.SingleAsync(row => row.DraftId == draft.DraftId && row.Revision == 1);
+        Assert.AreEqual(request.Sources, JsonSerializer.Deserialize<SourceBundle>(original.SourcesJson));
+    }
+
     /// <summary>真实并发不同载荷只有一个revision CAS胜出，失败方不留审计或源修订。</summary>
     [TestMethod]
     public async Task ConcurrentSaveHasOneWinnerAndNoLostUpdate()
