@@ -1,0 +1,50 @@
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+失败 ActualRunRoutesDescribeResponsesAndNativeEventStream (354ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+  Assertion failed. 预期值不应为 null。
+  get /api/v1/execution-runs 缺少application/json响应Schema。
+
+  actual: null
+
+  Assert.IsNotNull(success)
+    在 OntologyPlatform.SecurityTests.G2ExecutionEndpointTests.ActualRunRoutesDescribeResponsesAndNativeEventStream() 位于 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2ExecutionEndpointTests.cs:59
+    在 OntologyPlatform.SecurityTests.G2ExecutionEndpointTests.ActualRunRoutesDescribeResponsesAndNativeEventStream() 位于 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2ExecutionEndpointTests.cs:76
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+失败 G2BudgetIncludesFirstGovernanceConnection (126ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+  Assertion failed. 预期值相等。
+
+  expected: ServiceUnavailable
+  actual:   InternalServerError
+
+  Assert.AreEqual(HttpStatusCode.ServiceUnavailable, response.StatusCode)
+    在 OntologyPlatform.SecurityTests.G2ReadinessTests.G2BudgetIncludesFirstGovernanceConnection() 位于 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2ReadinessTests.cs:38
+    在 OntologyPlatform.SecurityTests.G2ReadinessTests.G2BudgetIncludesFirstGovernanceConnection() 位于 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2ReadinessTests.cs:43
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+失败 CallerCancellationStillReachesGovernance (True) (4s 048ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+  测试方法 OntologyPlatform.SecurityTests.G2ReadinessTests。CallerCancellationStillReachesGovernance 引发了异常:
+  System.TimeoutException: The operation has timed out.
+    在 OntologyPlatform.SecurityTests.G2ReadinessTests.CallerCancellationStillReachesGovernance(Boolean enabled) 位于 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2ReadinessTests.cs:66
+    在 OntologyPlatform.SecurityTests.G2ReadinessTests.CallerCancellationStillReachesGovernance(Boolean enabled) 位于 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2ReadinessTests.cs:70
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+
+失败 CallerCancellationStillReachesGovernance (False) (4s 073ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+  测试方法 OntologyPlatform.SecurityTests.G2ReadinessTests。CallerCancellationStillReachesGovernance 引发了异常:
+  System.TimeoutException: The operation has timed out.
+    在 OntologyPlatform.SecurityTests.G2ReadinessTests.CallerCancellationStillReachesGovernance(Boolean enabled) 位于 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2ReadinessTests.cs:66
+    在 OntologyPlatform.SecurityTests.G2ReadinessTests.CallerCancellationStillReachesGovernance(Boolean enabled) 位于 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2ReadinessTests.cs:70
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+
+/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64) 失败并出现 4 个错误 (10s 029ms)
+退出代码: 2
+
+测试运行摘要: 失败!
+  总计: 4
+  失败: 4
+  成功: 0
+  已跳过: 0
+  持续时间: 10s 161ms
+已完成测试运行，但显示非成功退出代码: 2 (请参阅: https://aka.ms/testingplatform/exitcodes)
+exitCode=2

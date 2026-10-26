@@ -63,7 +63,7 @@ def secret_values(value):
     """Enumerate only secret-bearing values already generated for this run."""
     if isinstance(value, dict):
         for key, child in value.items():
-            if any(word in key.lower() for word in ('password', 'secret', 'healthkey')) and isinstance(child, str):
+            if any(word in key.lower() for word in ('password', 'secret', 'healthkey', 'accesskey')) and isinstance(child, str):
                 yield child
             yield from secret_values(child)
     elif isinstance(value, list):
@@ -73,7 +73,7 @@ def secret_values(value):
 
 def sanitize(line, sensitive):
     """Remove credentials and URL queries before any observable persistence."""
-    if re.search(r'''(?i)["']?(password|client_secret|access_token|id_token|refresh_token|authorization|set-cookie|cookie|token|state|nonce|code)["']?\s*[:=]''', line):
+    if re.search(r'''(?i)["']?(password|client_secret|access_token|id_token|refresh_token|authorization|set-cookie|cookie|token|state|nonce|code|rustfs[_-]?access[_-]?key)["']?\s*[:=]''', line):
         return '[REDACTED: sensitive protocol field]\n'
     for value in sensitive:
         line = line.replace(value, '[REDACTED]')

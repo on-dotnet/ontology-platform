@@ -1,6 +1,7 @@
 using System.Data.Common;
 using Microsoft.EntityFrameworkCore;
 using OntologyPlatform.Modules.Agents;
+using OntologyPlatform.Modules.Governance;
 using OntologyPlatform.Modules.Ontology;
 using OntologyPlatform.Modules.Publishing;
 
@@ -9,7 +10,7 @@ namespace OntologyPlatform.Api.G2;
 /// <summary>受原健康密钥保护的G2技术就绪探针，不读取模型凭证或业务正文。</summary>
 public static class G2Readiness
 {
-    /// <summary>有界核实三个模块实际表及本轮固定Jena/RustFS依赖，不以静态配置宣称健康。</summary>
+    /// <summary>以同一个两秒预算核实Governance、三个模块及固定Jena/RustFS依赖。</summary>
     /// <param name="services">当前请求作用域，不跨请求共享上下文。</param>
     /// <param name="cancellationToken">客户端取消继续传播。</param>
     /// <returns>全部真实技术探针成功时为真；不要求已存在发布或已配置付费模型。</returns>
@@ -20,6 +21,11 @@ public static class G2Readiness
         budget.CancelAfter(TimeSpan.FromSeconds(2));
         try
         {
+            // Governance同样属于G2整体就绪边界，首个连接等待就必须受同一预算约束。
+            var governance = services.GetRequiredService<GovernanceDbContext>();
+            await governance.Sessions.AsNoTracking().Select(_ => 1).Take(1).ToArrayAsync(budget.Token);
+            await governance.AuditRecords.AsNoTracking().Select(_ => 1).Take(1).ToArrayAsync(budget.Token);
+            await governance.Resources.AsNoTracking().Select(_ => 1).Take(1).ToArrayAsync(budget.Token);
             // 只查询常量投影以验证表存在，不读取或输出任何持久业务正文。
             var ontology = services.GetRequiredService<OntologyDbContext>();
             await ontology.Drafts.AsNoTracking().Select(_ => 1).Take(1).ToArrayAsync(budget.Token);

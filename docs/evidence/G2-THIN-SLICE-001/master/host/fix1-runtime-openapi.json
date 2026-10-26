@@ -1,0 +1,5225 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "OntologyPlatform.SecurityTests | v1",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:58403/"
+    }
+  ],
+  "paths": {
+    "/api/v1/execution-runs": {
+      "get": {
+        "tags": [
+          "OntologyPlatform.SecurityTests"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ExecutionRun"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": [ ]
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "OntologyPlatform.SecurityTests"
+        ],
+        "parameters": [
+          {
+            "name": "X-CSRF-TOKEN",
+            "in": "header",
+            "description": "从同源/auth/csrf领取并与会话关联的防伪令牌。",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRunRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionRun"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/execution-runs/{id}": {
+      "get": {
+        "tags": [
+          "OntologyPlatform.SecurityTests"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionRun"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/execution-runs/{id}/cancel": {
+      "post": {
+        "tags": [
+          "OntologyPlatform.SecurityTests"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-CSRF-TOKEN",
+            "in": "header",
+            "description": "从同源/auth/csrf领取并与会话关联的防伪令牌。",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelRunRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionRun"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "428": {
+            "description": "Precondition Required",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/execution-runs/{id}/events": {
+      "get": {
+        "tags": [
+          "OntologyPlatform.SecurityTests"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionEvent"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/ontology-drafts": {
+      "get": {
+        "tags": [
+          "Ontology"
+        ],
+        "operationId": "ListOntologyDrafts",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OntologyDraft"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": [ ]
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Ontology"
+        ],
+        "operationId": "CreateOntologyDraft",
+        "parameters": [
+          {
+            "name": "X-CSRF-TOKEN",
+            "in": "header",
+            "description": "从同源/auth/csrf领取并与会话关联的防伪令牌。",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDraftRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OntologyDraft"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Payload Too Large",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/ontology-drafts/{id}": {
+      "get": {
+        "tags": [
+          "Ontology"
+        ],
+        "operationId": "ReadOntologyDraft",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OntologyDraft"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": [ ]
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Ontology"
+        ],
+        "operationId": "SaveOntologyDraft",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-CSRF-TOKEN",
+            "in": "header",
+            "description": "从同源/auth/csrf领取并与会话关联的防伪令牌。",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveDraftRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OntologyDraft"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Payload Too Large",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "428": {
+            "description": "Precondition Required",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/ontology-drafts/{id}/edits": {
+      "post": {
+        "tags": [
+          "Ontology"
+        ],
+        "operationId": "EditOntologyDraft",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-CSRF-TOKEN",
+            "in": "header",
+            "description": "从同源/auth/csrf领取并与会话关联的防伪令牌。",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditDraftRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OntologyDraft"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Payload Too Large",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "428": {
+            "description": "Precondition Required",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/ontology-drafts/{id}/diff": {
+      "get": {
+        "tags": [
+          "Ontology"
+        ],
+        "operationId": "DiffOntologyDraft",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "fromRevision",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DraftDiff"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/ontology-drafts/{id}/validations": {
+      "post": {
+        "tags": [
+          "Ontology"
+        ],
+        "operationId": "ValidateOntologyDraft",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-CSRF-TOKEN",
+            "in": "header",
+            "description": "从同源/auth/csrf领取并与会话关联的防伪令牌。",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidateDraftRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SemanticValidationReport"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Payload Too Large",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": [ ]
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ActivateReleaseRequest": {
+        "required": [
+          "proposalId",
+          "expectedActivationRevision",
+          "expectedActiveReleaseId",
+          "command"
+        ],
+        "type": "object",
+        "properties": {
+          "proposalId": {
+            "type": "string",
+            "description": "已批准提案。"
+          },
+          "expectedActivationRevision": {
+            "type": "integer",
+            "description": "CAS活动指针修订。",
+            "format": "int64"
+          },
+          "expectedActiveReleaseId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "期望当前发布，首次为空。"
+          },
+          "command": {
+            "description": "幂等、修订和审计理由。",
+            "$ref": "#/components/schemas/CommandContext"
+          }
+        },
+        "additionalProperties": false,
+        "description": "拒绝未登记字段并包含明确幂等/修订的受保护命令。"
+      },
+      "ActorContext": {
+        "required": [
+          "subjectId",
+          "organizationId",
+          "siteIds",
+          "roles",
+          "traceId",
+          "correlationId"
+        ],
+        "type": "object",
+        "properties": {
+          "subjectId": {
+            "type": "string",
+            "description": "已验证主体标识。"
+          },
+          "organizationId": {
+            "type": "string",
+            "description": "已签发组织标识。"
+          },
+          "siteIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "已签发厂区权限。"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "已认可平台角色。"
+          },
+          "traceId": {
+            "type": "string",
+            "description": "当前可信跟踪标识。"
+          },
+          "correlationId": {
+            "type": "string",
+            "description": "经过格式校验的请求关联标识。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "仅由已验证服务器身份构造的调用上下文。"
+      },
+      "ApprovalDecision": {
+        "enum": [
+          "approve",
+          "reject"
+        ],
+        "type": "string"
+      },
+      "ApprovalDecisionRequest": {
+        "required": [
+          "decision",
+          "command"
+        ],
+        "type": "object",
+        "properties": {
+          "decision": {
+            "description": "实际审核决定。",
+            "$ref": "#/components/schemas/ApprovalDecision"
+          },
+          "command": {
+            "description": "幂等、修订和审计理由。",
+            "$ref": "#/components/schemas/CommandContext"
+          }
+        },
+        "additionalProperties": false,
+        "description": "拒绝未登记字段并包含明确幂等/修订的受保护命令。"
+      },
+      "ApprovalRecord": {
+        "required": [
+          "approvedBy",
+          "decision",
+          "decidedAtUtc",
+          "bindingHash"
+        ],
+        "type": "object",
+        "properties": {
+          "approvedBy": {
+            "type": "string",
+            "description": "决定主体，必须不同于提交者。"
+          },
+          "decision": {
+            "description": "批准或拒绝。",
+            "$ref": "#/components/schemas/ApprovalDecision"
+          },
+          "decidedAtUtc": {
+            "type": "string",
+            "description": "持久决定时间。",
+            "format": "date-time"
+          },
+          "bindingHash": {
+            "type": "string",
+            "description": "完整提案绑定参数散列。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "与精确提案内容和独立审核主体绑定的决定。"
+      },
+      "ApprovalRequiredPayload": {
+        "required": [
+          "kind",
+          "approvalId",
+          "proposalId",
+          "operation",
+          "scope",
+          "expiresAtUtc"
+        ],
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "approval.required",
+            "type": "string"
+          },
+          "approvalId": {
+            "type": "string",
+            "description": "实际待审ID。"
+          },
+          "proposalId": {
+            "type": "string",
+            "description": "实际提案。"
+          },
+          "operation": {
+            "description": "实际人工动作。",
+            "$ref": "#/components/schemas/ProposalKind"
+          },
+          "scope": {
+            "description": "审批适用范围。",
+            "$ref": "#/components/schemas/ResourceScope"
+          },
+          "expiresAtUtc": {
+            "type": "string",
+            "description": "实际授权期限。",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false,
+        "description": "由真实持久事件类型approval.required确定的唯一载荷。"
+      },
+      "ArtifactObject": {
+        "required": [
+          "objectKey",
+          "hash",
+          "sizeBytes",
+          "contentType"
+        ],
+        "type": "object",
+        "properties": {
+          "objectKey": {
+            "type": "string",
+            "description": "服务器受控且含发布标识的对象键。"
+          },
+          "hash": {
+            "type": "string",
+            "description": "精确对象字节SHA256。"
+          },
+          "sizeBytes": {
+            "type": "integer",
+            "description": "实际字节数。",
+            "format": "int64"
+          },
+          "contentType": {
+            "type": "string",
+            "description": "固定媒体类型。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "经回读散列确认的不可变对象引用。"
+      },
+      "AssetVersion": {
+        "required": [
+          "assetId",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "assetId": {
+            "type": "string",
+            "description": "关联资产标识。"
+          },
+          "version": {
+            "type": "string",
+            "description": "真实版本或Schema散列。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "确已存在的关联资产版本，不填虚构版本。"
+      },
+      "AssetVersionSnapshot": {
+        "required": [
+          "releaseId",
+          "ontologyHash",
+          "shapesHash",
+          "vocabularyHash",
+          "dataHash",
+          "ontologyGraphIri",
+          "dataGraphIri",
+          "mappingVersions",
+          "metricVersions",
+          "ruleVersions",
+          "capabilityVersions"
+        ],
+        "type": "object",
+        "properties": {
+          "releaseId": {
+            "type": "string",
+            "description": "正式发布标识。"
+          },
+          "ontologyHash": {
+            "type": "string",
+            "description": "本体源散列。"
+          },
+          "shapesHash": {
+            "type": "string",
+            "description": "约束源散列。"
+          },
+          "vocabularyHash": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "可选词汇散列。"
+          },
+          "dataHash": {
+            "type": "string",
+            "description": "固定Synthetic数据源散列。"
+          },
+          "ontologyGraphIri": {
+            "type": "string",
+            "description": "正式本体隔离命名图。"
+          },
+          "dataGraphIri": {
+            "type": "string",
+            "description": "正式事实隔离命名图。"
+          },
+          "mappingVersions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssetVersion"
+            },
+            "description": "未实现映射资产为空。"
+          },
+          "metricVersions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssetVersion"
+            },
+            "description": "未实现指标资产为空。"
+          },
+          "ruleVersions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssetVersion"
+            },
+            "description": "未实现规则资产为空。"
+          },
+          "capabilityVersions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssetVersion"
+            },
+            "description": "真实能力Schema版本。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "每个查询与运行固定的完整不可变发布快照。"
+      },
+      "AuditCommand": {
+        "required": [
+          "action",
+          "resource",
+          "outcome",
+          "scope"
+        ],
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "description": "固定审计操作。"
+          },
+          "resource": {
+            "type": "string",
+            "description": "受控资源ID。"
+          },
+          "outcome": {
+            "type": "string",
+            "description": "固定结果。"
+          },
+          "scope": {
+            "description": "已授权完整资源范围。",
+            "$ref": "#/components/schemas/ResourceScope"
+          }
+        },
+        "additionalProperties": false,
+        "description": "由模块用例提交给Governance拥有写入器的受控审计事实。"
+      },
+      "CancelRunRequest": {
+        "required": [
+          "command"
+        ],
+        "type": "object",
+        "properties": {
+          "command": {
+            "description": "幂等、修订和审计理由。",
+            "$ref": "#/components/schemas/CommandContext"
+          }
+        },
+        "additionalProperties": false,
+        "description": "拒绝未登记字段并包含明确幂等/修订的受保护命令。"
+      },
+      "CapabilityBudget": {
+        "required": [
+          "maxDepth",
+          "maxRows",
+          "timeoutMs",
+          "maxToolCalls"
+        ],
+        "type": "object",
+        "properties": {
+          "maxDepth": {
+            "type": "integer",
+            "description": "最大关系深度。",
+            "format": "int32"
+          },
+          "maxRows": {
+            "type": "integer",
+            "description": "最大行数。",
+            "format": "int32"
+          },
+          "timeoutMs": {
+            "type": "integer",
+            "description": "最长执行毫秒。",
+            "format": "int32"
+          },
+          "maxToolCalls": {
+            "type": "integer",
+            "description": "每Run最多调用次数。",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false,
+        "description": "登记能力的有限资源预算。"
+      },
+      "CapabilityInputSchema": {
+        "required": [
+          "schemaVersion",
+          "type",
+          "required",
+          "properties",
+          "additionalProperties"
+        ],
+        "type": "object",
+        "properties": {
+          "schemaVersion": {
+            "type": "integer",
+            "description": "描述版本一。",
+            "format": "int32"
+          },
+          "type": {
+            "type": "string",
+            "description": "固定object。"
+          },
+          "required": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "必需字段。"
+          },
+          "properties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CapabilityParameter"
+            },
+            "description": "本轮已知输入参数。"
+          },
+          "additionalProperties": {
+            "type": "boolean",
+            "description": "固定false，拒绝未登记输入。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "仅生成工具输入标准JSON Schema的有限描述。"
+      },
+      "CapabilityParameter": {
+        "required": [
+          "name",
+          "type",
+          "description",
+          "enumValues",
+          "minimum",
+          "maximum",
+          "itemsType"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "输入字段。"
+          },
+          "type": {
+            "type": "string",
+            "description": "标准输入原始类型。"
+          },
+          "description": {
+            "type": "string",
+            "description": "业务意义。"
+          },
+          "enumValues": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "允许值。"
+          },
+          "minimum": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "format": "int32"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "整数最小值。"
+          },
+          "maximum": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "format": "int32"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "整数最大值。"
+          },
+          "itemsType": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "可选数组项类型。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "仅用于本轮已知能力输入的有限参数描述。"
+      },
+      "CommandContext": {
+        "required": [
+          "commandId",
+          "idempotencyKey",
+          "expectedRevision",
+          "reason"
+        ],
+        "type": "object",
+        "properties": {
+          "commandId": {
+            "type": "string",
+            "description": "本次命令标识。"
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "description": "同范围与操作内唯一的幂等键。"
+          },
+          "expectedRevision": {
+            "type": "integer",
+            "description": "期望修订；创建时为零。",
+            "format": "int64"
+          },
+          "reason": {
+            "type": "string",
+            "description": "仅存业务审计的操作理由，不写普通日志。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "用于明确修订与幂等语义的受控命令上下文。"
+      },
+      "CreateDraftRequest": {
+        "required": [
+          "name",
+          "scope",
+          "sources",
+          "baseReleaseId",
+          "command"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "草稿名称。"
+          },
+          "scope": {
+            "description": "用户请求且必须服务端授权的完整范围。",
+            "$ref": "#/components/schemas/ResourceScope"
+          },
+          "sources": {
+            "description": "真正权威源。",
+            "$ref": "#/components/schemas/SourceBundle"
+          },
+          "baseReleaseId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "可选同范围正式基础版本。"
+          },
+          "command": {
+            "description": "幂等、修订和审计理由。",
+            "$ref": "#/components/schemas/CommandContext"
+          }
+        },
+        "additionalProperties": false,
+        "description": "拒绝未登记字段并包含明确幂等/修订的受保护命令。"
+      },
+      "CreateProposalRequest": {
+        "required": [
+          "kind",
+          "draftId",
+          "draftRevision",
+          "hashes",
+          "validationReportId",
+          "targetReleaseId",
+          "targetManifestHash",
+          "command"
+        ],
+        "type": "object",
+        "properties": {
+          "kind": {
+            "description": "发布或回滚。",
+            "$ref": "#/components/schemas/ProposalKind"
+          },
+          "draftId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "发布时必需。"
+          },
+          "draftRevision": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "format": "int64"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "发布精确修订。"
+          },
+          "hashes": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SourceHashes"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "发布完整源散列。"
+          },
+          "validationReportId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "发布成功验证。"
+          },
+          "targetReleaseId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "回滚目标。"
+          },
+          "targetManifestHash": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "回滚完整目标清单散列。"
+          },
+          "command": {
+            "description": "幂等、修订和审计理由。",
+            "$ref": "#/components/schemas/CommandContext"
+          }
+        },
+        "additionalProperties": false,
+        "description": "拒绝未登记字段并包含明确幂等/修订的受保护命令。"
+      },
+      "CreateRunRequest": {
+        "required": [
+          "prompt",
+          "plan",
+          "providerMode",
+          "command"
+        ],
+        "type": "object",
+        "properties": {
+          "prompt": {
+            "type": "string",
+            "description": "仅受保护Run存储的用户正文。"
+          },
+          "plan": {
+            "description": "显式受控工具计划。",
+            "$ref": "#/components/schemas/SemanticQueryPlan"
+          },
+          "providerMode": {
+            "description": "默认不调用真实模型。",
+            "$ref": "#/components/schemas/ProviderMode"
+          },
+          "command": {
+            "description": "幂等、修订和审计理由。",
+            "$ref": "#/components/schemas/CommandContext"
+          }
+        },
+        "additionalProperties": false,
+        "description": "拒绝未登记字段并包含明确幂等/修订的受保护命令。"
+      },
+      "DiagnosticSeverity": {
+        "enum": [
+          "info",
+          "warning",
+          "error"
+        ],
+        "type": "string"
+      },
+      "DraftDiff": {
+        "required": [
+          "baseRevision",
+          "targetRevision",
+          "baseHashes",
+          "targetHashes",
+          "addedTriples",
+          "removedTriples",
+          "sourceDiff",
+          "unsupportedDiagnostics"
+        ],
+        "type": "object",
+        "properties": {
+          "baseRevision": {
+            "type": "integer",
+            "description": "基础修订。",
+            "format": "int64"
+          },
+          "targetRevision": {
+            "type": "integer",
+            "description": "目标修订。",
+            "format": "int64"
+          },
+          "baseHashes": {
+            "description": "基础源散列。",
+            "$ref": "#/components/schemas/SourceHashes"
+          },
+          "targetHashes": {
+            "description": "目标源散列。",
+            "$ref": "#/components/schemas/SourceHashes"
+          },
+          "addedTriples": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RdfTriple"
+            },
+            "description": "实际新增三元组。"
+          },
+          "removedTriples": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RdfTriple"
+            },
+            "description": "实际移除三元组。"
+          },
+          "sourceDiff": {
+            "type": "string",
+            "description": "完整源差异文本。"
+          },
+          "unsupportedDiagnostics": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SemanticDiagnostic"
+            },
+            "description": "无法保证空白节点对应等差异边界。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "固定历史修订间的源码与标准语义差异。"
+      },
+      "DraftPublicationSnapshot": {
+        "required": [
+          "draft",
+          "validation"
+        ],
+        "type": "object",
+        "properties": {
+          "draft": {
+            "description": "被锁定的精确草稿。",
+            "$ref": "#/components/schemas/OntologyDraft"
+          },
+          "validation": {
+            "description": "同修订真实成功校验。",
+            "$ref": "#/components/schemas/SemanticValidationReport"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Ontology自己锁定读取并核验的正式发布准备源。"
+      },
+      "EditDraftRequest": {
+        "required": [
+          "edit",
+          "command"
+        ],
+        "type": "object",
+        "properties": {
+          "edit": {
+            "description": "显式标准RDF变更。",
+            "$ref": "#/components/schemas/SemanticEdit"
+          },
+          "command": {
+            "description": "幂等、修订和审计理由。",
+            "$ref": "#/components/schemas/CommandContext"
+          }
+        },
+        "additionalProperties": false,
+        "description": "拒绝未登记字段并包含明确幂等/修订的受保护命令。"
+      },
+      "EntityCandidate": {
+        "required": [
+          "entityIri",
+          "entityTypeIris",
+          "externalId",
+          "organizationId",
+          "siteId",
+          "label",
+          "evidenceIds"
+        ],
+        "type": "object",
+        "properties": {
+          "entityIri": {
+            "type": "string",
+            "description": "候选完整IRI。"
+          },
+          "entityTypeIris": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "实际类型。"
+          },
+          "externalId": {
+            "type": "string",
+            "description": "重复外部业务号。"
+          },
+          "organizationId": {
+            "type": "string",
+            "description": "组织。"
+          },
+          "siteId": {
+            "type": "string",
+            "description": "厂区。"
+          },
+          "label": {
+            "type": "string",
+            "description": "显示名称。"
+          },
+          "evidenceIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "适用身份来源证据。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "只包含已授权不同IRI的身份歧义候选。"
+      },
+      "EvidenceAddedPayload": {
+        "required": [
+          "kind",
+          "evidence"
+        ],
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "evidence.added",
+            "type": "string"
+          },
+          "evidence": {
+            "description": "实际返回并获授权的证据。",
+            "$ref": "#/components/schemas/EvidenceRef"
+          }
+        },
+        "additionalProperties": false,
+        "description": "由真实持久事件类型evidence.added确定的唯一载荷。"
+      },
+      "EvidenceRef": {
+        "required": [
+          "evidenceId",
+          "releaseId",
+          "scope",
+          "graphIri",
+          "subjectIri",
+          "predicateIri",
+          "objectTerm",
+          "sourceId",
+          "sourceRecordId",
+          "sourceObjectKey",
+          "contentHash",
+          "validFromUtc",
+          "validToUtc",
+          "observedAtUtc",
+          "modelVersion",
+          "mappingVersion",
+          "synthetic"
+        ],
+        "type": "object",
+        "properties": {
+          "evidenceId": {
+            "type": "string",
+            "description": "服务器可定位的稳定证据标识。"
+          },
+          "releaseId": {
+            "type": "string",
+            "description": "固定发布。"
+          },
+          "scope": {
+            "description": "真实断言适用范围。",
+            "$ref": "#/components/schemas/ResourceScope"
+          },
+          "graphIri": {
+            "type": "string",
+            "description": "正式事实命名图。"
+          },
+          "subjectIri": {
+            "type": "string",
+            "description": "来源断言主体。"
+          },
+          "predicateIri": {
+            "type": "string",
+            "description": "来源断言谓词。"
+          },
+          "objectTerm": {
+            "description": "来源断言客体。",
+            "$ref": "#/components/schemas/RdfTerm"
+          },
+          "sourceId": {
+            "type": "string",
+            "description": "Synthetic来源标识。"
+          },
+          "sourceRecordId": {
+            "type": "string",
+            "description": "源记录标识。"
+          },
+          "sourceObjectKey": {
+            "type": "string",
+            "description": "不可变事实对象键。"
+          },
+          "contentHash": {
+            "type": "string",
+            "description": "精确源对象散列。"
+          },
+          "validFromUtc": {
+            "type": "string",
+            "description": "业务有效起点。",
+            "format": "date-time"
+          },
+          "validToUtc": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "业务有效终点。"
+          },
+          "observedAtUtc": {
+            "type": "string",
+            "description": "实际观察时间。",
+            "format": "date-time"
+          },
+          "modelVersion": {
+            "type": "string",
+            "description": "适用模型发布。"
+          },
+          "mappingVersion": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "未实施映射时为空。"
+          },
+          "synthetic": {
+            "type": "boolean",
+            "description": "本轮必须明确为合成。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "可重新授权并核验标准图与源对象的证据引用。"
+      },
+      "ExecutionEvent": {
+        "oneOf": [
+          {
+            "required": [
+              "runId",
+              "seq",
+              "eventId",
+              "eventType",
+              "schemaVersion",
+              "occurredAtUtc",
+              "snapshot",
+              "payload"
+            ],
+            "type": "object",
+            "properties": {
+              "runId": {
+                "type": "string",
+                "description": "所属运行。"
+              },
+              "seq": {
+                "type": "integer",
+                "description": "单调持久事件序号。",
+                "format": "int64"
+              },
+              "eventId": {
+                "type": "string",
+                "description": "runId冒号seq。"
+              },
+              "eventType": {
+                "const": "run.started",
+                "type": "string"
+              },
+              "schemaVersion": {
+                "enum": [
+                  1
+                ],
+                "type": "integer"
+              },
+              "occurredAtUtc": {
+                "type": "string",
+                "description": "实际持久时间。",
+                "format": "date-time"
+              },
+              "snapshot": {
+                "description": "运行固定的同一个完整快照。",
+                "$ref": "#/components/schemas/AssetVersionSnapshot"
+              },
+              "payload": {
+                "$ref": "#/components/schemas/RunStartedPayload"
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "required": [
+              "runId",
+              "seq",
+              "eventId",
+              "eventType",
+              "schemaVersion",
+              "occurredAtUtc",
+              "snapshot",
+              "payload"
+            ],
+            "type": "object",
+            "properties": {
+              "runId": {
+                "type": "string",
+                "description": "所属运行。"
+              },
+              "seq": {
+                "type": "integer",
+                "description": "单调持久事件序号。",
+                "format": "int64"
+              },
+              "eventId": {
+                "type": "string",
+                "description": "runId冒号seq。"
+              },
+              "eventType": {
+                "const": "tool.started",
+                "type": "string"
+              },
+              "schemaVersion": {
+                "enum": [
+                  1
+                ],
+                "type": "integer"
+              },
+              "occurredAtUtc": {
+                "type": "string",
+                "description": "实际持久时间。",
+                "format": "date-time"
+              },
+              "snapshot": {
+                "description": "运行固定的同一个完整快照。",
+                "$ref": "#/components/schemas/AssetVersionSnapshot"
+              },
+              "payload": {
+                "$ref": "#/components/schemas/ToolStartedPayload"
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "required": [
+              "runId",
+              "seq",
+              "eventId",
+              "eventType",
+              "schemaVersion",
+              "occurredAtUtc",
+              "snapshot",
+              "payload"
+            ],
+            "type": "object",
+            "properties": {
+              "runId": {
+                "type": "string",
+                "description": "所属运行。"
+              },
+              "seq": {
+                "type": "integer",
+                "description": "单调持久事件序号。",
+                "format": "int64"
+              },
+              "eventId": {
+                "type": "string",
+                "description": "runId冒号seq。"
+              },
+              "eventType": {
+                "const": "tool.completed",
+                "type": "string"
+              },
+              "schemaVersion": {
+                "enum": [
+                  1
+                ],
+                "type": "integer"
+              },
+              "occurredAtUtc": {
+                "type": "string",
+                "description": "实际持久时间。",
+                "format": "date-time"
+              },
+              "snapshot": {
+                "description": "运行固定的同一个完整快照。",
+                "$ref": "#/components/schemas/AssetVersionSnapshot"
+              },
+              "payload": {
+                "$ref": "#/components/schemas/ToolCompletedPayload"
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "required": [
+              "runId",
+              "seq",
+              "eventId",
+              "eventType",
+              "schemaVersion",
+              "occurredAtUtc",
+              "snapshot",
+              "payload"
+            ],
+            "type": "object",
+            "properties": {
+              "runId": {
+                "type": "string",
+                "description": "所属运行。"
+              },
+              "seq": {
+                "type": "integer",
+                "description": "单调持久事件序号。",
+                "format": "int64"
+              },
+              "eventId": {
+                "type": "string",
+                "description": "runId冒号seq。"
+              },
+              "eventType": {
+                "const": "evidence.added",
+                "type": "string"
+              },
+              "schemaVersion": {
+                "enum": [
+                  1
+                ],
+                "type": "integer"
+              },
+              "occurredAtUtc": {
+                "type": "string",
+                "description": "实际持久时间。",
+                "format": "date-time"
+              },
+              "snapshot": {
+                "description": "运行固定的同一个完整快照。",
+                "$ref": "#/components/schemas/AssetVersionSnapshot"
+              },
+              "payload": {
+                "$ref": "#/components/schemas/EvidenceAddedPayload"
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "required": [
+              "runId",
+              "seq",
+              "eventId",
+              "eventType",
+              "schemaVersion",
+              "occurredAtUtc",
+              "snapshot",
+              "payload"
+            ],
+            "type": "object",
+            "properties": {
+              "runId": {
+                "type": "string",
+                "description": "所属运行。"
+              },
+              "seq": {
+                "type": "integer",
+                "description": "单调持久事件序号。",
+                "format": "int64"
+              },
+              "eventId": {
+                "type": "string",
+                "description": "runId冒号seq。"
+              },
+              "eventType": {
+                "const": "message.delta",
+                "type": "string"
+              },
+              "schemaVersion": {
+                "enum": [
+                  1
+                ],
+                "type": "integer"
+              },
+              "occurredAtUtc": {
+                "type": "string",
+                "description": "实际持久时间。",
+                "format": "date-time"
+              },
+              "snapshot": {
+                "description": "运行固定的同一个完整快照。",
+                "$ref": "#/components/schemas/AssetVersionSnapshot"
+              },
+              "payload": {
+                "$ref": "#/components/schemas/MessageDeltaPayload"
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "required": [
+              "runId",
+              "seq",
+              "eventId",
+              "eventType",
+              "schemaVersion",
+              "occurredAtUtc",
+              "snapshot",
+              "payload"
+            ],
+            "type": "object",
+            "properties": {
+              "runId": {
+                "type": "string",
+                "description": "所属运行。"
+              },
+              "seq": {
+                "type": "integer",
+                "description": "单调持久事件序号。",
+                "format": "int64"
+              },
+              "eventId": {
+                "type": "string",
+                "description": "runId冒号seq。"
+              },
+              "eventType": {
+                "const": "approval.required",
+                "type": "string"
+              },
+              "schemaVersion": {
+                "enum": [
+                  1
+                ],
+                "type": "integer"
+              },
+              "occurredAtUtc": {
+                "type": "string",
+                "description": "实际持久时间。",
+                "format": "date-time"
+              },
+              "snapshot": {
+                "description": "运行固定的同一个完整快照。",
+                "$ref": "#/components/schemas/AssetVersionSnapshot"
+              },
+              "payload": {
+                "$ref": "#/components/schemas/ApprovalRequiredPayload"
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "required": [
+              "runId",
+              "seq",
+              "eventId",
+              "eventType",
+              "schemaVersion",
+              "occurredAtUtc",
+              "snapshot",
+              "payload"
+            ],
+            "type": "object",
+            "properties": {
+              "runId": {
+                "type": "string",
+                "description": "所属运行。"
+              },
+              "seq": {
+                "type": "integer",
+                "description": "单调持久事件序号。",
+                "format": "int64"
+              },
+              "eventId": {
+                "type": "string",
+                "description": "runId冒号seq。"
+              },
+              "eventType": {
+                "const": "run.completed",
+                "type": "string"
+              },
+              "schemaVersion": {
+                "enum": [
+                  1
+                ],
+                "type": "integer"
+              },
+              "occurredAtUtc": {
+                "type": "string",
+                "description": "实际持久时间。",
+                "format": "date-time"
+              },
+              "snapshot": {
+                "description": "运行固定的同一个完整快照。",
+                "$ref": "#/components/schemas/AssetVersionSnapshot"
+              },
+              "payload": {
+                "$ref": "#/components/schemas/RunCompletedPayload"
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "required": [
+              "runId",
+              "seq",
+              "eventId",
+              "eventType",
+              "schemaVersion",
+              "occurredAtUtc",
+              "snapshot",
+              "payload"
+            ],
+            "type": "object",
+            "properties": {
+              "runId": {
+                "type": "string",
+                "description": "所属运行。"
+              },
+              "seq": {
+                "type": "integer",
+                "description": "单调持久事件序号。",
+                "format": "int64"
+              },
+              "eventId": {
+                "type": "string",
+                "description": "runId冒号seq。"
+              },
+              "eventType": {
+                "const": "run.failed",
+                "type": "string"
+              },
+              "schemaVersion": {
+                "enum": [
+                  1
+                ],
+                "type": "integer"
+              },
+              "occurredAtUtc": {
+                "type": "string",
+                "description": "实际持久时间。",
+                "format": "date-time"
+              },
+              "snapshot": {
+                "description": "运行固定的同一个完整快照。",
+                "$ref": "#/components/schemas/AssetVersionSnapshot"
+              },
+              "payload": {
+                "$ref": "#/components/schemas/RunFailedPayload"
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "required": [
+              "runId",
+              "seq",
+              "eventId",
+              "eventType",
+              "schemaVersion",
+              "occurredAtUtc",
+              "snapshot",
+              "payload"
+            ],
+            "type": "object",
+            "properties": {
+              "runId": {
+                "type": "string",
+                "description": "所属运行。"
+              },
+              "seq": {
+                "type": "integer",
+                "description": "单调持久事件序号。",
+                "format": "int64"
+              },
+              "eventId": {
+                "type": "string",
+                "description": "runId冒号seq。"
+              },
+              "eventType": {
+                "const": "run.cancelled",
+                "type": "string"
+              },
+              "schemaVersion": {
+                "enum": [
+                  1
+                ],
+                "type": "integer"
+              },
+              "occurredAtUtc": {
+                "type": "string",
+                "description": "实际持久时间。",
+                "format": "date-time"
+              },
+              "snapshot": {
+                "description": "运行固定的同一个完整快照。",
+                "$ref": "#/components/schemas/AssetVersionSnapshot"
+              },
+              "payload": {
+                "$ref": "#/components/schemas/RunCancelledPayload"
+              }
+            },
+            "additionalProperties": false
+          }
+        ],
+        "discriminator": {
+          "propertyName": "eventType"
+        }
+      },
+      "ExecutionPayload": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/RunStartedPayload"
+          },
+          {
+            "$ref": "#/components/schemas/ToolStartedPayload"
+          },
+          {
+            "$ref": "#/components/schemas/ToolCompletedPayload"
+          },
+          {
+            "$ref": "#/components/schemas/EvidenceAddedPayload"
+          },
+          {
+            "$ref": "#/components/schemas/MessageDeltaPayload"
+          },
+          {
+            "$ref": "#/components/schemas/ApprovalRequiredPayload"
+          },
+          {
+            "$ref": "#/components/schemas/RunCompletedPayload"
+          },
+          {
+            "$ref": "#/components/schemas/RunFailedPayload"
+          },
+          {
+            "$ref": "#/components/schemas/RunCancelledPayload"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "kind",
+          "mapping": {
+            "run.started": "#/components/schemas/RunStartedPayload",
+            "tool.started": "#/components/schemas/ToolStartedPayload",
+            "tool.completed": "#/components/schemas/ToolCompletedPayload",
+            "evidence.added": "#/components/schemas/EvidenceAddedPayload",
+            "message.delta": "#/components/schemas/MessageDeltaPayload",
+            "approval.required": "#/components/schemas/ApprovalRequiredPayload",
+            "run.completed": "#/components/schemas/RunCompletedPayload",
+            "run.failed": "#/components/schemas/RunFailedPayload",
+            "run.cancelled": "#/components/schemas/RunCancelledPayload"
+          }
+        }
+      },
+      "ExecutionPayloadApprovalRequiredPayload": {
+        "required": [
+          "approvalId",
+          "proposalId",
+          "operation",
+          "scope",
+          "expiresAtUtc"
+        ],
+        "properties": {
+          "kind": {
+            "enum": [
+              "approval.required"
+            ],
+            "type": "string"
+          },
+          "approvalId": {
+            "type": "string"
+          },
+          "proposalId": {
+            "type": "string"
+          },
+          "operation": {
+            "$ref": "#/components/schemas/ProposalKind"
+          },
+          "scope": {
+            "$ref": "#/components/schemas/ResourceScope"
+          },
+          "expiresAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ExecutionPayloadEvidenceAddedPayload": {
+        "required": [
+          "evidence"
+        ],
+        "properties": {
+          "kind": {
+            "enum": [
+              "evidence.added"
+            ],
+            "type": "string"
+          },
+          "evidence": {
+            "$ref": "#/components/schemas/EvidenceRef"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ExecutionPayloadMessageDeltaPayload": {
+        "required": [
+          "text"
+        ],
+        "properties": {
+          "kind": {
+            "enum": [
+              "message.delta"
+            ],
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ExecutionPayloadRunCancelledPayload": {
+        "required": [
+          "status",
+          "code",
+          "totalToolCalls"
+        ],
+        "properties": {
+          "kind": {
+            "enum": [
+              "run.cancelled"
+            ],
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ExecutionStatus"
+          },
+          "code": {
+            "type": "string"
+          },
+          "totalToolCalls": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ExecutionPayloadRunCompletedPayload": {
+        "required": [
+          "status",
+          "totalToolCalls",
+          "lastResultStatus"
+        ],
+        "properties": {
+          "kind": {
+            "enum": [
+              "run.completed"
+            ],
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ExecutionStatus"
+          },
+          "totalToolCalls": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "lastResultStatus": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/SemanticQueryStatus"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "ExecutionPayloadRunFailedPayload": {
+        "required": [
+          "status",
+          "code",
+          "totalToolCalls"
+        ],
+        "properties": {
+          "kind": {
+            "enum": [
+              "run.failed"
+            ],
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ExecutionStatus"
+          },
+          "code": {
+            "type": "string"
+          },
+          "totalToolCalls": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ExecutionPayloadRunStartedPayload": {
+        "required": [
+          "providerMode",
+          "capabilityIds",
+          "maxToolCalls",
+          "timeoutMs"
+        ],
+        "properties": {
+          "kind": {
+            "enum": [
+              "run.started"
+            ],
+            "type": "string"
+          },
+          "providerMode": {
+            "$ref": "#/components/schemas/ProviderMode"
+          },
+          "capabilityIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "maxToolCalls": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "timeoutMs": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ExecutionPayloadToolCompletedPayload": {
+        "required": [
+          "invocationId",
+          "result",
+          "durationMs"
+        ],
+        "properties": {
+          "kind": {
+            "enum": [
+              "tool.completed"
+            ],
+            "type": "string"
+          },
+          "invocationId": {
+            "type": "string"
+          },
+          "result": {
+            "$ref": "#/components/schemas/SemanticQueryResult"
+          },
+          "durationMs": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ExecutionPayloadToolStartedPayload": {
+        "required": [
+          "invocationId",
+          "capabilityId",
+          "capabilityVersion",
+          "plan"
+        ],
+        "properties": {
+          "kind": {
+            "enum": [
+              "tool.started"
+            ],
+            "type": "string"
+          },
+          "invocationId": {
+            "type": "string"
+          },
+          "capabilityId": {
+            "type": "string"
+          },
+          "capabilityVersion": {
+            "type": "string"
+          },
+          "plan": {
+            "$ref": "#/components/schemas/SemanticQueryPlan"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ExecutionRun": {
+        "required": [
+          "runId",
+          "ownerSubjectId",
+          "scope",
+          "snapshot",
+          "status",
+          "providerMode",
+          "createdAtUtc",
+          "updatedAtUtc",
+          "lastSeq",
+          "cancelRequested",
+          "leaseOwner",
+          "leaseUntil",
+          "fencingToken",
+          "traceId"
+        ],
+        "type": "object",
+        "properties": {
+          "runId": {
+            "type": "string",
+            "description": "运行标识。"
+          },
+          "ownerSubjectId": {
+            "type": "string",
+            "description": "创建主体。"
+          },
+          "scope": {
+            "description": "固定合法范围。",
+            "$ref": "#/components/schemas/ResourceScope"
+          },
+          "snapshot": {
+            "description": "运行开始时固定的完整发布。",
+            "$ref": "#/components/schemas/AssetVersionSnapshot"
+          },
+          "status": {
+            "description": "持久运行状态。",
+            "$ref": "#/components/schemas/ExecutionStatus"
+          },
+          "providerMode": {
+            "description": "明确真实模型或离线harness。",
+            "$ref": "#/components/schemas/ProviderMode"
+          },
+          "createdAtUtc": {
+            "type": "string",
+            "description": "创建时间。",
+            "format": "date-time"
+          },
+          "updatedAtUtc": {
+            "type": "string",
+            "description": "最近状态时间。",
+            "format": "date-time"
+          },
+          "lastSeq": {
+            "type": "integer",
+            "description": "最后已提交事件序号。",
+            "format": "int64"
+          },
+          "cancelRequested": {
+            "type": "boolean",
+            "description": "已持久取消请求。"
+          },
+          "leaseOwner": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "当前执行者标识。"
+          },
+          "leaseUntil": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "租约期限。"
+          },
+          "fencingToken": {
+            "type": "integer",
+            "description": "防过期执行者提交的单调标识。",
+            "format": "int64"
+          },
+          "traceId": {
+            "type": "string",
+            "description": "创建时固定且由执行链关联的实际Trace。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "固定完整版本并由PG租约和fencing保护的持久运行。"
+      },
+      "ExecutionStatus": {
+        "enum": [
+          "QUEUED",
+          "RUNNING",
+          "COMPLETED",
+          "FAILED",
+          "CANCELLED"
+        ],
+        "type": "string"
+      },
+      "ImportLock": {
+        "required": [
+          "ontologyIri",
+          "hash",
+          "objectKey"
+        ],
+        "type": "object",
+        "properties": {
+          "ontologyIri": {
+            "type": "string",
+            "description": "导入本体IRI。"
+          },
+          "hash": {
+            "type": "string",
+            "description": "已批准导入字节散列。"
+          },
+          "objectKey": {
+            "type": "string",
+            "description": "不可变来源对象键。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "已锁定且可回验的本体导入引用。"
+      },
+      "MessageDeltaPayload": {
+        "required": [
+          "kind",
+          "text"
+        ],
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "message.delta",
+            "type": "string"
+          },
+          "text": {
+            "type": "string",
+            "description": "受保护事件正文，不能输出到普通遥测。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "由真实持久事件类型message.delta确定的唯一载荷。"
+      },
+      "OntologyDescription": {
+        "required": [
+          "classIris",
+          "objectPropertyIris",
+          "datatypePropertyIris",
+          "labels",
+          "supportedAxioms",
+          "diagnostics"
+        ],
+        "type": "object",
+        "properties": {
+          "classIris": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "正式类IRI。"
+          },
+          "objectPropertyIris": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "正式对象属性IRI。"
+          },
+          "datatypePropertyIris": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "正式数据属性IRI。"
+          },
+          "labels": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SemanticPropertyValue"
+            },
+            "description": "实际标准标签。"
+          },
+          "supportedAxioms": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "明确支持子集。"
+          },
+          "diagnostics": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SemanticDiagnostic"
+            },
+            "description": "未支持语义边界。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "从正式本体图读取的概念和关系说明。"
+      },
+      "OntologyDraft": {
+        "required": [
+          "draftId",
+          "assetId",
+          "scope",
+          "baseReleaseId",
+          "revision",
+          "etag",
+          "name",
+          "sources",
+          "hashes",
+          "ownerSubjectId",
+          "updatedAtUtc",
+          "projection"
+        ],
+        "type": "object",
+        "properties": {
+          "draftId": {
+            "type": "string",
+            "description": "草稿标识。"
+          },
+          "assetId": {
+            "type": "string",
+            "description": "永久绑定唯一范围的资产标识。"
+          },
+          "scope": {
+            "description": "完整资源范围。",
+            "$ref": "#/components/schemas/ResourceScope"
+          },
+          "baseReleaseId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "可选基础正式发布。"
+          },
+          "revision": {
+            "type": "integer",
+            "description": "单调草稿修订。",
+            "format": "int64"
+          },
+          "etag": {
+            "type": "string",
+            "description": "带双引号的修订ETag。"
+          },
+          "name": {
+            "type": "string",
+            "description": "中文优先资产名称。"
+          },
+          "sources": {
+            "description": "完整权威源码。",
+            "$ref": "#/components/schemas/SourceBundle"
+          },
+          "hashes": {
+            "description": "精确源码散列。",
+            "$ref": "#/components/schemas/SourceHashes"
+          },
+          "ownerSubjectId": {
+            "type": "string",
+            "description": "草稿创建者。"
+          },
+          "updatedAtUtc": {
+            "type": "string",
+            "description": "最近持久修改时间。",
+            "format": "date-time"
+          },
+          "projection": {
+            "description": "真实解析生成且同修订的读投影。",
+            "$ref": "#/components/schemas/SemanticProjection"
+          }
+        },
+        "additionalProperties": false,
+        "description": "具有独立作用域和CAS修订的持久本体草稿。"
+      },
+      "PlatformProblem": {
+        "required": [
+          "type",
+          "title",
+          "status",
+          "code",
+          "traceId",
+          "correlationId"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "code": {
+            "type": "string"
+          },
+          "traceId": {
+            "type": "string"
+          },
+          "correlationId": {
+            "type": "string"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "instance": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "detail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "instance": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "ProposalKind": {
+        "enum": [
+          "PUBLISH",
+          "ROLLBACK"
+        ],
+        "type": "string"
+      },
+      "ProposalStatus": {
+        "enum": [
+          "PENDING",
+          "APPROVED",
+          "REJECTED",
+          "EXPIRED",
+          "INVALIDATED"
+        ],
+        "type": "string"
+      },
+      "ProviderMode": {
+        "enum": [
+          "disabled",
+          "deterministic",
+          "approved_model"
+        ],
+        "type": "string"
+      },
+      "PublishedRdfData": {
+        "required": [
+          "ontologyTriples",
+          "dataTriples"
+        ],
+        "type": "object",
+        "properties": {
+          "ontologyTriples": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RdfTriple"
+            },
+            "description": "正式本体三元组。"
+          },
+          "dataTriples": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RdfTriple"
+            },
+            "description": "正式事实与PROV来源三元组。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "仅从固定正式版本图取得的真实RDF读取结果。"
+      },
+      "RdfTerm": {
+        "required": [
+          "kind",
+          "value",
+          "datatype",
+          "language"
+        ],
+        "type": "object",
+        "properties": {
+          "kind": {
+            "description": "标准项类别。",
+            "$ref": "#/components/schemas/RdfTermKind"
+          },
+          "value": {
+            "type": "string",
+            "description": "完整IRI、空白标识或字面量词法值。"
+          },
+          "datatype": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "字面量数据类型IRI。"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "可选语言标签。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "标准RDF项，保留IRI、空白节点与字面量词法信息。"
+      },
+      "RdfTermKind": {
+        "enum": [
+          "iri",
+          "blank",
+          "literal"
+        ],
+        "type": "string"
+      },
+      "RdfTriple": {
+        "required": [
+          "subject",
+          "predicate",
+          "object"
+        ],
+        "type": "object",
+        "properties": {
+          "subject": {
+            "description": "主体项。",
+            "$ref": "#/components/schemas/RdfTerm"
+          },
+          "predicate": {
+            "type": "string",
+            "description": "谓词完整IRI。"
+          },
+          "object": {
+            "description": "客体项。",
+            "$ref": "#/components/schemas/RdfTerm"
+          }
+        },
+        "additionalProperties": false,
+        "description": "标准RDF三元组，不替代权威源码。"
+      },
+      "ReleaseActivation": {
+        "required": [
+          "activationId",
+          "activationRevision",
+          "releaseId",
+          "previousReleaseId",
+          "manifestHash",
+          "manifest",
+          "auditId",
+          "outboxEventId",
+          "activatedAtUtc",
+          "traceId"
+        ],
+        "type": "object",
+        "properties": {
+          "activationId": {
+            "type": "string",
+            "description": "激活事务事实标识。"
+          },
+          "activationRevision": {
+            "type": "integer",
+            "description": "单调活动指针修订。",
+            "format": "int64"
+          },
+          "releaseId": {
+            "type": "string",
+            "description": "实际激活发布。"
+          },
+          "previousReleaseId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "前一个活动发布。"
+          },
+          "manifestHash": {
+            "type": "string",
+            "description": "实际清单字节散列。"
+          },
+          "manifest": {
+            "description": "经回验的完整清单。",
+            "$ref": "#/components/schemas/ReleaseManifest"
+          },
+          "auditId": {
+            "type": "string",
+            "description": "同事务已提交治理审计。"
+          },
+          "outboxEventId": {
+            "type": "string",
+            "description": "同事务已提交Outbox事件。"
+          },
+          "activatedAtUtc": {
+            "type": "string",
+            "description": "提交的激活时间。",
+            "format": "date-time"
+          },
+          "traceId": {
+            "type": "string",
+            "description": "激活事务实际Trace，用于审计与专业诊断关联。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "同PG事务激活成功后的事实回执。"
+      },
+      "ReleaseManifest": {
+        "required": [
+          "schemaVersion",
+          "releaseId",
+          "assetId",
+          "scope",
+          "draftId",
+          "revision",
+          "hashes",
+          "ontologyGraphIri",
+          "dataGraphIri",
+          "importLocks",
+          "snapshot",
+          "artifactObjects",
+          "createdAtUtc"
+        ],
+        "type": "object",
+        "properties": {
+          "schemaVersion": {
+            "type": "integer",
+            "description": "清单版本一。",
+            "format": "int32"
+          },
+          "releaseId": {
+            "type": "string",
+            "description": "不可变发布标识。"
+          },
+          "assetId": {
+            "type": "string",
+            "description": "唯一作用域资产。"
+          },
+          "scope": {
+            "description": "完整发布范围。",
+            "$ref": "#/components/schemas/ResourceScope"
+          },
+          "draftId": {
+            "type": "string",
+            "description": "原始草稿标识。"
+          },
+          "revision": {
+            "type": "integer",
+            "description": "原始精确草稿修订。",
+            "format": "int64"
+          },
+          "hashes": {
+            "description": "完整权威源散列。",
+            "$ref": "#/components/schemas/SourceHashes"
+          },
+          "ontologyGraphIri": {
+            "type": "string",
+            "description": "隔离本体图。"
+          },
+          "dataGraphIri": {
+            "type": "string",
+            "description": "隔离事实图。"
+          },
+          "importLocks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ImportLock"
+            },
+            "description": "本轮未锁定导入必须阻断。"
+          },
+          "snapshot": {
+            "description": "唯一关联资产快照。",
+            "$ref": "#/components/schemas/AssetVersionSnapshot"
+          },
+          "artifactObjects": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ArtifactObject"
+            },
+            "description": "所有经验证的不可变源对象。"
+          },
+          "createdAtUtc": {
+            "type": "string",
+            "description": "清单创建时间。",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false,
+        "description": "准备与回验完成后固定的正式发布清单。"
+      },
+      "ReleaseProposal": {
+        "required": [
+          "proposalId",
+          "kind",
+          "assetId",
+          "scope",
+          "draftId",
+          "draftRevision",
+          "hashes",
+          "validationReportId",
+          "targetReleaseId",
+          "targetManifestHash",
+          "submittedBy",
+          "submittedAtUtc",
+          "expiresAtUtc",
+          "status",
+          "revision",
+          "approval"
+        ],
+        "type": "object",
+        "properties": {
+          "proposalId": {
+            "type": "string",
+            "description": "提案标识也是审批ID。"
+          },
+          "kind": {
+            "description": "发布或回滚判别。",
+            "$ref": "#/components/schemas/ProposalKind"
+          },
+          "assetId": {
+            "type": "string",
+            "description": "被批准资产。"
+          },
+          "scope": {
+            "description": "固定完整范围。",
+            "$ref": "#/components/schemas/ResourceScope"
+          },
+          "draftId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "仅发布提案包含草稿。"
+          },
+          "draftRevision": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "format": "int64"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "仅发布提案精确修订。"
+          },
+          "hashes": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SourceHashes"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "仅发布提案完整源散列。"
+          },
+          "validationReportId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "仅发布提案成功校验记录。"
+          },
+          "targetReleaseId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "仅回滚提案目标正式发布。"
+          },
+          "targetManifestHash": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "仅回滚提案目标清单字节散列。"
+          },
+          "submittedBy": {
+            "type": "string",
+            "description": "提案提交者。"
+          },
+          "submittedAtUtc": {
+            "type": "string",
+            "description": "提交时间。",
+            "format": "date-time"
+          },
+          "expiresAtUtc": {
+            "type": "string",
+            "description": "审批授权有效期限。",
+            "format": "date-time"
+          },
+          "status": {
+            "description": "提案审批状态。",
+            "$ref": "#/components/schemas/ProposalStatus"
+          },
+          "revision": {
+            "type": "integer",
+            "description": "审批决定的CAS修订。",
+            "format": "int64"
+          },
+          "approval": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ApprovalRecord"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "已提交审核决定。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "明确区分当前草稿发布和旧完整版本回滚的受控提案。"
+      },
+      "ReleaseStatus": {
+        "enum": [
+          "PREPARING",
+          "ARTIFACTS_VERIFIED",
+          "GRAPH_DEPLOYED",
+          "GRAPH_VERIFIED",
+          "ACTIVE",
+          "SUPERSEDED",
+          "FAILED_RETRYABLE",
+          "FAILED_FINAL"
+        ],
+        "type": "string"
+      },
+      "ReleaseSummary": {
+        "required": [
+          "manifest",
+          "manifestHash",
+          "isActive",
+          "activationRevision",
+          "status",
+          "traceId"
+        ],
+        "type": "object",
+        "properties": {
+          "manifest": {
+            "description": "不可变清单。",
+            "$ref": "#/components/schemas/ReleaseManifest"
+          },
+          "manifestHash": {
+            "type": "string",
+            "description": "清单字节散列。"
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "当前是否活动。"
+          },
+          "activationRevision": {
+            "type": "integer",
+            "description": "当前活动指针修订。",
+            "format": "int64"
+          },
+          "status": {
+            "description": "真实准备或活动状态。",
+            "$ref": "#/components/schemas/ReleaseStatus"
+          },
+          "traceId": {
+            "type": "string",
+            "description": "该正式版本最近一次激活的持久Trace，不猜测运行标识。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "可访问正式历史版本和活动状态。"
+      },
+      "ResourceScope": {
+        "required": [
+          "organizationId",
+          "siteIds"
+        ],
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "type": "string",
+            "description": "资源所属组织。"
+          },
+          "siteIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "完整且规范化的非空厂区集合。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "不可由客户端扩大的资源组织与完整厂区范围。"
+      },
+      "RunCancelledPayload": {
+        "required": [
+          "kind",
+          "status",
+          "code",
+          "totalToolCalls"
+        ],
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "run.cancelled",
+            "type": "string"
+          },
+          "status": {
+            "const": "CANCELLED",
+            "type": "string"
+          },
+          "code": {
+            "const": "cancelled",
+            "type": "string"
+          },
+          "totalToolCalls": {
+            "type": "integer",
+            "description": "真实工具次数。",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false,
+        "description": "由真实持久事件类型run.cancelled确定的唯一载荷。"
+      },
+      "RunCompletedPayload": {
+        "required": [
+          "kind",
+          "status",
+          "totalToolCalls",
+          "lastResultStatus"
+        ],
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "run.completed",
+            "type": "string"
+          },
+          "status": {
+            "const": "COMPLETED",
+            "type": "string"
+          },
+          "totalToolCalls": {
+            "type": "integer",
+            "description": "真实工具次数。",
+            "format": "int32"
+          },
+          "lastResultStatus": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SemanticQueryStatus"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "最后实际结果状态。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "由真实持久事件类型run.completed确定的唯一载荷。"
+      },
+      "RunFailedPayload": {
+        "required": [
+          "kind",
+          "status",
+          "code",
+          "totalToolCalls"
+        ],
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "run.failed",
+            "type": "string"
+          },
+          "status": {
+            "const": "FAILED",
+            "type": "string"
+          },
+          "code": {
+            "type": "string",
+            "description": "固定安全故障代码。"
+          },
+          "totalToolCalls": {
+            "type": "integer",
+            "description": "真实工具次数。",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false,
+        "description": "由真实持久事件类型run.failed确定的唯一载荷。"
+      },
+      "RunStartedPayload": {
+        "required": [
+          "kind",
+          "providerMode",
+          "capabilityIds",
+          "maxToolCalls",
+          "timeoutMs"
+        ],
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "run.started",
+            "type": "string"
+          },
+          "providerMode": {
+            "description": "实际提供者模式。",
+            "$ref": "#/components/schemas/ProviderMode"
+          },
+          "capabilityIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "批准可调用能力。"
+          },
+          "maxToolCalls": {
+            "type": "integer",
+            "description": "最大工具次数。",
+            "format": "int32"
+          },
+          "timeoutMs": {
+            "type": "integer",
+            "description": "运行总超时。",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false,
+        "description": "由真实持久事件类型run.started确定的唯一载荷。"
+      },
+      "SaveDraftRequest": {
+        "required": [
+          "name",
+          "sources",
+          "command"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "新名称。"
+          },
+          "sources": {
+            "description": "新权威源。",
+            "$ref": "#/components/schemas/SourceBundle"
+          },
+          "command": {
+            "description": "幂等、修订和审计理由。",
+            "$ref": "#/components/schemas/CommandContext"
+          }
+        },
+        "additionalProperties": false,
+        "description": "拒绝未登记字段并包含明确幂等/修订的受保护命令。"
+      },
+      "SemanticAnalysis": {
+        "required": [
+          "hashes",
+          "projection"
+        ],
+        "type": "object",
+        "properties": {
+          "hashes": {
+            "description": "实际源散列。",
+            "$ref": "#/components/schemas/SourceHashes"
+          },
+          "projection": {
+            "description": "完整有界读投影。",
+            "$ref": "#/components/schemas/SemanticProjection"
+          }
+        },
+        "additionalProperties": false,
+        "description": "内部真实解析及支持边界结果。"
+      },
+      "SemanticCapability": {
+        "required": [
+          "id",
+          "version",
+          "inputSchema",
+          "outputSchema",
+          "meaning",
+          "policy",
+          "executorId",
+          "budgets"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "稳定能力ID。"
+          },
+          "version": {
+            "type": "string",
+            "description": "真实输入输出Schema散列版本。"
+          },
+          "inputSchema": {
+            "description": "有限输入描述，映射标准Schema。",
+            "$ref": "#/components/schemas/CapabilityInputSchema"
+          },
+          "outputSchema": {
+            "description": "从唯一SemanticQueryResult/OpenAPI派生的完整标准JSON Schema文档。"
+          },
+          "meaning": {
+            "type": "string",
+            "description": "中文业务意义。"
+          },
+          "policy": {
+            "type": "string",
+            "description": "共享授权策略名。"
+          },
+          "executorId": {
+            "type": "string",
+            "description": "受控执行器标识。"
+          },
+          "budgets": {
+            "description": "唯一执行预算。",
+            "$ref": "#/components/schemas/CapabilityBudget"
+          }
+        },
+        "additionalProperties": false,
+        "description": "唯一能力登记，输出标准Schema来自真实强类型合同。"
+      },
+      "SemanticDatum": {
+        "oneOf": [
+          {
+            "required": [
+              "kind",
+              "ontology",
+              "entity",
+              "relationship"
+            ],
+            "type": "object",
+            "properties": {
+              "kind": {
+                "const": "ontology",
+                "type": "string"
+              },
+              "ontology": {
+                "$ref": "#/components/schemas/OntologyDescription"
+              },
+              "entity": {
+                "type": "null"
+              },
+              "relationship": {
+                "type": "null"
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "required": [
+              "kind",
+              "ontology",
+              "entity",
+              "relationship"
+            ],
+            "type": "object",
+            "properties": {
+              "kind": {
+                "const": "entity",
+                "type": "string"
+              },
+              "ontology": {
+                "type": "null"
+              },
+              "entity": {
+                "$ref": "#/components/schemas/SemanticEntity"
+              },
+              "relationship": {
+                "type": "null"
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "required": [
+              "kind",
+              "ontology",
+              "entity",
+              "relationship"
+            ],
+            "type": "object",
+            "properties": {
+              "kind": {
+                "const": "relationship",
+                "type": "string"
+              },
+              "ontology": {
+                "type": "null"
+              },
+              "entity": {
+                "type": "null"
+              },
+              "relationship": {
+                "$ref": "#/components/schemas/SemanticRelationship"
+              }
+            },
+            "additionalProperties": false
+          }
+        ],
+        "discriminator": {
+          "propertyName": "kind"
+        }
+      },
+      "SemanticDatumKind": {
+        "enum": [
+          "ontology",
+          "entity",
+          "relationship"
+        ],
+        "type": "string"
+      },
+      "SemanticDiagnostic": {
+        "required": [
+          "code",
+          "severity",
+          "message",
+          "focusNode",
+          "path"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "固定机器诊断代码。"
+          },
+          "severity": {
+            "description": "诊断严重度。",
+            "$ref": "#/components/schemas/DiagnosticSeverity"
+          },
+          "message": {
+            "type": "string",
+            "description": "不拼接敏感输入的中文说明。"
+          },
+          "focusNode": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RdfTerm"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "实际问题焦点。"
+          },
+          "path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "实际谓词路径IRI。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "仅包含受控中文消息的语义诊断。"
+      },
+      "SemanticEdge": {
+        "required": [
+          "id",
+          "source",
+          "predicateIri",
+          "target",
+          "label"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "规范三元组散列稳定标识。"
+          },
+          "source": {
+            "type": "string",
+            "description": "源节点IRI。"
+          },
+          "predicateIri": {
+            "type": "string",
+            "description": "关系谓词IRI。"
+          },
+          "target": {
+            "type": "string",
+            "description": "目标节点IRI。"
+          },
+          "label": {
+            "type": "string",
+            "description": "关系显示标签。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "由实际RDF对象关系投影的边。"
+      },
+      "SemanticEdit": {
+        "required": [
+          "subjectIri",
+          "predicateIri",
+          "oldObject",
+          "newObject"
+        ],
+        "type": "object",
+        "properties": {
+          "subjectIri": {
+            "type": "string",
+            "description": "受控主体IRI。"
+          },
+          "predicateIri": {
+            "type": "string",
+            "description": "白名单谓词IRI。"
+          },
+          "oldObject": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RdfTerm"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "需精确移除的旧客体。"
+          },
+          "newObject": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RdfTerm"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "需精确增加的新客体。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "只修改批准谓词的显式标准RDF编辑。"
+      },
+      "SemanticEntity": {
+        "required": [
+          "iri",
+          "typeIris",
+          "label",
+          "externalId",
+          "organizationId",
+          "siteId",
+          "synthetic",
+          "properties"
+        ],
+        "type": "object",
+        "properties": {
+          "iri": {
+            "type": "string",
+            "description": "全局稳定IRI。"
+          },
+          "typeIris": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "正式模型类型。"
+          },
+          "label": {
+            "type": "string",
+            "description": "显示标签。"
+          },
+          "externalId": {
+            "type": "string",
+            "description": "不保证跨厂唯一的业务号。"
+          },
+          "organizationId": {
+            "type": "string",
+            "description": "真实所属组织。"
+          },
+          "siteId": {
+            "type": "string",
+            "description": "真实所属厂区。"
+          },
+          "synthetic": {
+            "type": "boolean",
+            "description": "明确合成数据。"
+          },
+          "properties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SemanticPropertyValue"
+            },
+            "description": "有来源的实际属性。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "未按外部编号误合并的获准实体。"
+      },
+      "SemanticNode": {
+        "required": [
+          "id",
+          "kind",
+          "label",
+          "typeIris"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "节点完整IRI。"
+          },
+          "kind": {
+            "description": "类、属性或个体类别。",
+            "$ref": "#/components/schemas/SemanticNodeKind"
+          },
+          "label": {
+            "type": "string",
+            "description": "实际标签或安全显示标识。"
+          },
+          "typeIris": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "真实类型IRI集合。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "由真实RDF图投影的可访问节点。"
+      },
+      "SemanticNodeKind": {
+        "enum": [
+          "class",
+          "objectProperty",
+          "datatypeProperty",
+          "individual"
+        ],
+        "type": "string"
+      },
+      "SemanticProjection": {
+        "required": [
+          "revision",
+          "hashes",
+          "triples",
+          "nodes",
+          "edges",
+          "structuralEditAllowed",
+          "diagnostics"
+        ],
+        "type": "object",
+        "properties": {
+          "revision": {
+            "type": "integer",
+            "description": "投影对应修订。",
+            "format": "int64"
+          },
+          "hashes": {
+            "description": "对应的全部源散列。",
+            "$ref": "#/components/schemas/SourceHashes"
+          },
+          "triples": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RdfTriple"
+            },
+            "description": "有界的实际本体三元组。"
+          },
+          "nodes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SemanticNode"
+            },
+            "description": "可视节点。"
+          },
+          "edges": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SemanticEdge"
+            },
+            "description": "实际关系边。"
+          },
+          "structuralEditAllowed": {
+            "type": "boolean",
+            "description": "未知或复杂公理存在时禁止结构编辑。"
+          },
+          "diagnostics": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SemanticDiagnostic"
+            },
+            "description": "支持边界和解析诊断。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "明确绑定草稿修订与源散列的完整读投影。"
+      },
+      "SemanticPropertyValue": {
+        "required": [
+          "predicateIri",
+          "value",
+          "evidenceIds"
+        ],
+        "type": "object",
+        "properties": {
+          "predicateIri": {
+            "type": "string",
+            "description": "实际谓词IRI。"
+          },
+          "value": {
+            "description": "完整RDF值。",
+            "$ref": "#/components/schemas/RdfTerm"
+          },
+          "evidenceIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "适用且获准的证据引用。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "具有真实标准值与适用证据引用的属性。"
+      },
+      "SemanticQueryPlan": {
+        "required": [
+          "capabilityId",
+          "capabilityVersion",
+          "assetId",
+          "releaseId",
+          "entityType",
+          "entityIri",
+          "externalId",
+          "siteId",
+          "relationshipIris",
+          "depth",
+          "maxRows",
+          "timeoutMs"
+        ],
+        "type": "object",
+        "properties": {
+          "capabilityId": {
+            "type": "string",
+            "description": "唯一已登记能力ID。"
+          },
+          "capabilityVersion": {
+            "type": "string",
+            "description": "真实能力Schema版本。"
+          },
+          "assetId": {
+            "type": "string",
+            "description": "查询资产。"
+          },
+          "releaseId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "为空时一次固定当前活动发布。"
+          },
+          "entityType": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "可选正式类IRI。"
+          },
+          "entityIri": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "可选实体完整IRI。"
+          },
+          "externalId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "外部业务号，不是全局身份。"
+          },
+          "siteId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "可选且必须授权厂区。"
+          },
+          "relationshipIris": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "正式允许对象属性路径。"
+          },
+          "depth": {
+            "type": "integer",
+            "description": "一至五的查询深度。",
+            "format": "int32"
+          },
+          "maxRows": {
+            "type": "integer",
+            "description": "一至一百的结果预算。",
+            "format": "int32"
+          },
+          "timeoutMs": {
+            "type": "integer",
+            "description": "一百至五千毫秒预算。",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false,
+        "description": "只允许登记能力与正式版本的有界语义计划。"
+      },
+      "SemanticQueryResult": {
+        "required": [
+          "status",
+          "data",
+          "candidates",
+          "evidence",
+          "snapshot",
+          "subSources",
+          "validTime",
+          "observedAtUtc",
+          "traceId",
+          "limited",
+          "diagnostics"
+        ],
+        "type": "object",
+        "properties": {
+          "status": {
+            "description": "六态实际结果。",
+            "$ref": "#/components/schemas/SemanticQueryStatus"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SemanticDatum"
+            },
+            "description": "有界真实数据。"
+          },
+          "candidates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EntityCandidate"
+            },
+            "description": "获准歧义候选。"
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EvidenceRef"
+            },
+            "description": "可信且可重新授权证据。"
+          },
+          "snapshot": {
+            "description": "固定完整发布。",
+            "$ref": "#/components/schemas/AssetVersionSnapshot"
+          },
+          "subSources": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SemanticSubSource"
+            },
+            "description": "真实源读取状态。"
+          },
+          "validTime": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TemporalExtent"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "实际结果有效时间。"
+          },
+          "observedAtUtc": {
+            "type": "string",
+            "description": "实际读取时间。",
+            "format": "date-time"
+          },
+          "traceId": {
+            "type": "string",
+            "description": "业务跟踪关联。"
+          },
+          "limited": {
+            "type": "boolean",
+            "description": "结果是否受预算截断。"
+          },
+          "diagnostics": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SemanticDiagnostic"
+            },
+            "description": "安全固定诊断。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "REST、MCP和Agent共享的唯一六态结果。"
+      },
+      "SemanticQueryStatus": {
+        "enum": [
+          "FOUND",
+          "EMPTY",
+          "PARTIAL",
+          "UNAVAILABLE",
+          "UNAUTHORIZED",
+          "AMBIGUOUS"
+        ],
+        "type": "string"
+      },
+      "SemanticRelationship": {
+        "required": [
+          "sourceIri",
+          "predicateIri",
+          "targetIri",
+          "evidenceIds"
+        ],
+        "type": "object",
+        "properties": {
+          "sourceIri": {
+            "type": "string",
+            "description": "获准来源实体。"
+          },
+          "predicateIri": {
+            "type": "string",
+            "description": "正式对象属性。"
+          },
+          "targetIri": {
+            "type": "string",
+            "description": "获准目标实体。"
+          },
+          "evidenceIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "实际断言证据引用。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "允许多对多且附有来源的实际关系。"
+      },
+      "SemanticSubSource": {
+        "required": [
+          "sourceId",
+          "status",
+          "releaseId",
+          "dataHash",
+          "observedAtUtc",
+          "code"
+        ],
+        "type": "object",
+        "properties": {
+          "sourceId": {
+            "type": "string",
+            "description": "受控来源ID。"
+          },
+          "status": {
+            "description": "实际读取结果。",
+            "$ref": "#/components/schemas/SubSourceStatus"
+          },
+          "releaseId": {
+            "type": "string",
+            "description": "固定发布。"
+          },
+          "dataHash": {
+            "type": "string",
+            "description": "该源实际数据散列。"
+          },
+          "observedAtUtc": {
+            "type": "string",
+            "description": "本次真实读取时间。",
+            "format": "date-time"
+          },
+          "code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "有限故障或部分结果代码。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "真实源状态与该源数据版本，不把不可用当空。"
+      },
+      "SemanticValidationReport": {
+        "required": [
+          "reportId",
+          "draftId",
+          "revision",
+          "hashes",
+          "kind",
+          "conforms",
+          "issues",
+          "rawReportHash",
+          "validatedAtUtc",
+          "traceId"
+        ],
+        "type": "object",
+        "properties": {
+          "reportId": {
+            "type": "string",
+            "description": "校验事实标识。"
+          },
+          "draftId": {
+            "type": "string",
+            "description": "对应草稿。"
+          },
+          "revision": {
+            "type": "integer",
+            "description": "被验证的精确修订。",
+            "format": "int64"
+          },
+          "hashes": {
+            "description": "被验证源散列。",
+            "$ref": "#/components/schemas/SourceHashes"
+          },
+          "kind": {
+            "description": "解析、SHACL或支持边界校验类型。",
+            "$ref": "#/components/schemas/ValidationKind"
+          },
+          "conforms": {
+            "type": "boolean",
+            "description": "仅表示实际执行范围是否符合。"
+          },
+          "issues": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ValidationIssue"
+            },
+            "description": "标准定位问题。"
+          },
+          "rawReportHash": {
+            "type": "string",
+            "description": "实际原始报告SHA256。"
+          },
+          "validatedAtUtc": {
+            "type": "string",
+            "description": "真实校验时间。",
+            "format": "date-time"
+          },
+          "traceId": {
+            "type": "string",
+            "description": "校验跟踪标识。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "绑定精确修订与源码的真实语义校验报告。"
+      },
+      "SourceBundle": {
+        "required": [
+          "ontologyTurtle",
+          "shapesTurtle",
+          "vocabularyTurtle",
+          "dataTurtle"
+        ],
+        "type": "object",
+        "properties": {
+          "ontologyTurtle": {
+            "type": "string",
+            "description": "完整OWL本体Turtle原文。"
+          },
+          "shapesTurtle": {
+            "type": "string",
+            "description": "完整SHACL Core源码。"
+          },
+          "vocabularyTurtle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "可选SKOS词汇源码，未实现为空。"
+          },
+          "dataTurtle": {
+            "type": "string",
+            "description": "仅Local/Synthetic的事实与来源源码。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "本体、约束、词汇与合成事实的唯一权威UTF8源码。"
+      },
+      "SourceHashes": {
+        "required": [
+          "ontologyHash",
+          "shapesHash",
+          "vocabularyHash",
+          "dataHash",
+          "bundleHash"
+        ],
+        "type": "object",
+        "properties": {
+          "ontologyHash": {
+            "type": "string",
+            "description": "本体源码SHA256。"
+          },
+          "shapesHash": {
+            "type": "string",
+            "description": "Shape源码SHA256。"
+          },
+          "vocabularyHash": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "可选词汇源码SHA256。"
+          },
+          "dataHash": {
+            "type": "string",
+            "description": "合成事实源码SHA256。"
+          },
+          "bundleHash": {
+            "type": "string",
+            "description": "按合同顺序和absent标记组合的SHA256。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "按明确UTF8字节计算的独立源散列与组合散列。"
+      },
+      "SubSourceStatus": {
+        "enum": [
+          "AVAILABLE",
+          "EMPTY",
+          "PARTIAL",
+          "UNAVAILABLE",
+          "UNAUTHORIZED"
+        ],
+        "type": "string"
+      },
+      "TemporalExtent": {
+        "required": [
+          "fromUtc",
+          "toUtc"
+        ],
+        "type": "object",
+        "properties": {
+          "fromUtc": {
+            "type": "string",
+            "description": "有效起点。",
+            "format": "date-time"
+          },
+          "toUtc": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "可选有效终点。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "业务断言有效时间，独立于采集与资产版本。"
+      },
+      "ToolCompletedPayload": {
+        "required": [
+          "kind",
+          "invocationId",
+          "result",
+          "durationMs"
+        ],
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "tool.completed",
+            "type": "string"
+          },
+          "invocationId": {
+            "type": "string",
+            "description": "同一次工具调用。"
+          },
+          "result": {
+            "description": "真正Gateway六态结果。",
+            "$ref": "#/components/schemas/SemanticQueryResult"
+          },
+          "durationMs": {
+            "type": "number",
+            "description": "实际执行耗时毫秒。",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false,
+        "description": "由真实持久事件类型tool.completed确定的唯一载荷。"
+      },
+      "ToolStartedPayload": {
+        "required": [
+          "kind",
+          "invocationId",
+          "capabilityId",
+          "capabilityVersion",
+          "plan"
+        ],
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "tool.started",
+            "type": "string"
+          },
+          "invocationId": {
+            "type": "string",
+            "description": "工具调用标识。"
+          },
+          "capabilityId": {
+            "type": "string",
+            "description": "真实登记能力。"
+          },
+          "capabilityVersion": {
+            "type": "string",
+            "description": "真实Schema版本。"
+          },
+          "plan": {
+            "description": "经过授权与预算的计划。",
+            "$ref": "#/components/schemas/SemanticQueryPlan"
+          }
+        },
+        "additionalProperties": false,
+        "description": "由真实持久事件类型tool.started确定的唯一载荷。"
+      },
+      "ValidateDraftRequest": {
+        "required": [
+          "revision",
+          "hashes",
+          "command"
+        ],
+        "type": "object",
+        "properties": {
+          "revision": {
+            "type": "integer",
+            "description": "要验证的精确修订。",
+            "format": "int64"
+          },
+          "hashes": {
+            "description": "要验证的完整源散列。",
+            "$ref": "#/components/schemas/SourceHashes"
+          },
+          "command": {
+            "description": "幂等、修订和审计理由。",
+            "$ref": "#/components/schemas/CommandContext"
+          }
+        },
+        "additionalProperties": false,
+        "description": "拒绝未登记字段并包含明确幂等/修订的受保护命令。"
+      },
+      "ValidationIssue": {
+        "required": [
+          "severity",
+          "focusNode",
+          "path",
+          "value",
+          "sourceShape",
+          "constraintComponent",
+          "message",
+          "sourceId"
+        ],
+        "type": "object",
+        "properties": {
+          "severity": {
+            "description": "标准严重度。",
+            "$ref": "#/components/schemas/DiagnosticSeverity"
+          },
+          "focusNode": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RdfTerm"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "焦点RDF节点。"
+          },
+          "path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "单IRI属性路径。"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RdfTerm"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "失败的实际值。"
+          },
+          "sourceShape": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RdfTerm"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "来源Shape。"
+          },
+          "constraintComponent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "标准约束组件IRI。"
+          },
+          "message": {
+            "type": "string",
+            "description": "校验报告可在受保护业务UI显示的说明。"
+          },
+          "sourceId": {
+            "type": "string",
+            "description": "本体、Shape或Synthetic数据来源。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "真实Jena标准报告中的定位问题。"
+      },
+      "ValidationKind": {
+        "enum": [
+          "RDF_PARSE",
+          "SHACL_CORE",
+          "OWL_SUPPORT"
+        ],
+        "type": "string"
+      }
+    },
+    "securitySchemes": {
+      "session": {
+        "type": "apiKey",
+        "description": "仅包含受保护随机引用的HttpOnly BFF会话Cookie；令牌只留在服务器加密票据。",
+        "name": ".OntologyPlatform.Session",
+        "in": "cookie"
+      },
+      "health": {
+        "type": "apiKey",
+        "description": "仅由内部编排器持有的外置健康探针密钥。",
+        "name": "X-Health-Key",
+        "in": "header"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "OntologyPlatform.SecurityTests"
+    },
+    {
+      "name": "Ontology"
+    }
+  ]
+}
