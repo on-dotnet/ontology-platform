@@ -1,0 +1,71 @@
+{
+  "exitCode": 2,
+  "records": [
+    {
+      "command": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g2-sem-ca556c7b68e4",
+        "--publish",
+        "127.0.0.1::3030",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--mount",
+        "type=bind,src=/private/tmp/g2-sem-ca556c7b68e45t94obvd,dst=/fixture,readonly",
+        "--entrypoint",
+        "java",
+        "fuseki:8b85cd963ab3910a87ff4d69819a814fcc536d5f",
+        "-Xmx384m",
+        "-Dlog4j.configurationFile=/fixture/log4j2.properties",
+        "-jar",
+        "/opt/fuseki/fuseki-server.jar",
+        "--config=/fixture/config.ttl"
+      ],
+      "exitCode": 0,
+      "output": "9dbb5712bfaafbceac4d29e3609713d59cf2de44fe336966d39c59b8f3990991\n"
+    },
+    {
+      "command": [
+        "docker",
+        "port",
+        "g2-sem-ca556c7b68e4",
+        "3030/tcp"
+      ],
+      "exitCode": 0,
+      "output": "127.0.0.1:54811\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "test",
+        "--project",
+        "backend/tests/OntologyPlatform.SemanticTests",
+        "--no-restore",
+        "--",
+        "--filter",
+        "FullyQualifiedName~InvalidSurrogateLiteral"
+      ],
+      "exitCode": 2,
+      "output": "正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n失败 InvalidSurrogateLiteralIsRejectedWithoutReplacement (True) (84ms)\n  从 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  Assertion failed. Expected exception of type SemanticOperationException (or derived) but no exception was thrown.\n  \n  Assert.ThrowsAsync<SemanticOperationException>(() => runtime.ApplyEditAsync(Sources(), new SemanticEdit { SubjectIri = \"urn:verified:C\", PredicateIri = \"http://www.w3.org/2000/01/rdf-schema#label\", NewObject = new RdfTerm { Kind = RdfTermKind.Literal, Value = value } }, CancellationToken.None))\n    在 Microsoft.VisualStudio.TestTools.UnitTesting.Assert.ThrowsExceptionAsync[TException](Func`1 action, Boolean isStrictType, String message, String actionExpression, String assertMethodName)\n    在 OntologyPlatform.SemanticTests.VerifiedReadTests.InvalidSurrogateLiteralIsRejectedWithoutReplacement(Boolean highSurrogate) 位于 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs:352\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n失败 InvalidSurrogateLiteralIsRejectedWithoutReplacement (False) (24ms)\n  从 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  Assertion failed. Expected exception of type SemanticOperationException (or derived) but no exception was thrown.\n  \n  Assert.ThrowsAsync<SemanticOperationException>(() => runtime.ApplyEditAsync(Sources(), new SemanticEdit { SubjectIri = \"urn:verified:C\", PredicateIri = \"http://www.w3.org/2000/01/rdf-schema#label\", NewObject = new RdfTerm { Kind = RdfTermKind.Literal, Value = value } }, CancellationToken.None))\n    在 Microsoft.VisualStudio.TestTools.UnitTesting.Assert.ThrowsExceptionAsync[TException](Func`1 action, Boolean isStrictType, String message, String actionExpression, String assertMethodName)\n    在 OntologyPlatform.SemanticTests.VerifiedReadTests.InvalidSurrogateLiteralIsRejectedWithoutReplacement(Boolean highSurrogate) 位于 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs:352\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n/Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64) 失败并出现 2 个错误 (1s 236ms)\n退出代码: 2\n\n测试运行摘要: 失败!\n  总计: 2\n  失败: 2\n  成功: 0\n  已跳过: 0\n  持续时间: 1s 398ms\n已完成测试运行，但显示非成功退出代码: 2 (请参阅: https://aka.ms/testingplatform/exitcodes)\n"
+    },
+    {
+      "check": "all temporary graph triples removed",
+      "count": 0,
+      "status": "PASS"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g2-sem-ca556c7b68e4"
+      ],
+      "exitCode": 0,
+      "output": "g2-sem-ca556c7b68e4\n"
+    }
+  ]
+}

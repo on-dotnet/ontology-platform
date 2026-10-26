@@ -1,0 +1,71 @@
+{
+  "exitCode": 2,
+  "records": [
+    {
+      "command": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g2-sem-9cdf837fa75c",
+        "--publish",
+        "127.0.0.1::3030",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--mount",
+        "type=bind,src=/private/tmp/g2-sem-9cdf837fa75cjoq3aak3,dst=/fixture,readonly",
+        "--entrypoint",
+        "java",
+        "fuseki:8b85cd963ab3910a87ff4d69819a814fcc536d5f",
+        "-Xmx384m",
+        "-Dlog4j.configurationFile=/fixture/log4j2.properties",
+        "-jar",
+        "/opt/fuseki/fuseki-server.jar",
+        "--config=/fixture/config.ttl"
+      ],
+      "exitCode": 0,
+      "output": "36c03a64024f9f0e88866ab50e8d85d9660a70d76f8a9a77639893652c3dedb1\n"
+    },
+    {
+      "command": [
+        "docker",
+        "port",
+        "g2-sem-9cdf837fa75c",
+        "3030/tcp"
+      ],
+      "exitCode": 0,
+      "output": "127.0.0.1:54838\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "test",
+        "--project",
+        "backend/tests/OntologyPlatform.SemanticTests",
+        "--no-restore",
+        "--",
+        "--filter",
+        "FullyQualifiedName~SyntheticNonBmp|FullyQualifiedName~NonBmpLiteralEdit|FullyQualifiedName~InvalidSurrogateLiteral"
+      ],
+      "exitCode": 2,
+      "output": "正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n失败 NonBmpLiteralEditIsLosslessAndCannotInjectTriples (True) (182ms)\n  从 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  测试方法 OntologyPlatform.SemanticTests.VerifiedReadTests。NonBmpLiteralEditIsLosslessAndCannotInjectTriples 引发了异常: \n  System.InvalidOperationException: Sequence contains more than one matching element\n    在 System.Linq.ThrowHelper.ThrowMoreThanOneMatchException()\n    在 System.Linq.Enumerable.TryGetSingle[TSource](IEnumerable`1 source, Func`2 predicate, Boolean& found)\n    在 System.Linq.Enumerable.Single[TSource](IEnumerable`1 source, Func`2 predicate)\n    在 OntologyPlatform.SemanticTests.VerifiedReadTests.NonBmpLiteralEditIsLosslessAndCannotInjectTriples(Boolean languageTagged) 位于 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs:337\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n    \n失败 NonBmpLiteralEditIsLosslessAndCannotInjectTriples (False) (102ms)\n  从 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  测试方法 OntologyPlatform.SemanticTests.VerifiedReadTests。NonBmpLiteralEditIsLosslessAndCannotInjectTriples 引发了异常: \n  System.InvalidOperationException: Sequence contains more than one matching element\n    在 System.Linq.ThrowHelper.ThrowMoreThanOneMatchException()\n    在 System.Linq.Enumerable.TryGetSingle[TSource](IEnumerable`1 source, Func`2 predicate, Boolean& found)\n    在 System.Linq.Enumerable.Single[TSource](IEnumerable`1 source, Func`2 predicate)\n    在 OntologyPlatform.SemanticTests.VerifiedReadTests.NonBmpLiteralEditIsLosslessAndCannotInjectTriples(Boolean languageTagged) 位于 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs:337\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n    \n/Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64) 失败并出现 2 个错误 (3s 031ms)\n退出代码: 2\n\n测试运行摘要: 失败!\n  总计: 6\n  失败: 2\n  成功: 4\n  已跳过: 0\n  持续时间: 3s 206ms\n已完成测试运行，但显示非成功退出代码: 2 (请参阅: https://aka.ms/testingplatform/exitcodes)\n"
+    },
+    {
+      "check": "all temporary graph triples removed",
+      "count": 0,
+      "status": "PASS"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g2-sem-9cdf837fa75c"
+      ],
+      "exitCode": 0,
+      "output": "g2-sem-9cdf837fa75c\n"
+    }
+  ]
+}
