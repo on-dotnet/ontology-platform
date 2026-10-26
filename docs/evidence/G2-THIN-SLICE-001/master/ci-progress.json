@@ -1,5 +1,5 @@
 {
-  "status": "SOURCE_CI_PASS_FINAL_DOCUMENT_HEAD_PENDING",
+  "status": "FINAL_HEAD_PENDING_AFTER_TEST_ONLY_COLD_JIT_FIX",
   "runs": [
     {
       "id": 40260902743,
@@ -35,8 +35,16 @@
       "conclusion": "success",
       "engineering": "completed/success (actual jobs API)",
       "governanceIntegration": "completed/success (actual jobs API)"
+    },
+    {
+      "id": 40279318064,
+      "headSha": "4d5709cc4c529ce3f91a4f9977b2ecbda56371ee",
+      "url": "https://github.com/on-dotnet/ontology-platform/actions/runs/40279318064",
+      "conclusion": "failure",
+      "engineering": "1 synthetic readiness cold-JIT budget fixture failure; raw summary archived; original assertions preserved in independent test-only fix",
+      "governanceIntegration": "completed/success (actual jobs API)"
     }
   ],
-  "finalSameHeadCI": "Final documentation Head CI must be verified after commit and supplied through runtimeCi in the final package; prior source success is not reused as final Head success.",
+  "finalSameHeadCI": "Pending actual final commit; package runtimeCi will record actual jobs success/failure with exact final Head. No prior run is substituted.",
   "notes": "No GitHub protection/billing/resource settings changed; old failing CI not hidden."
 }

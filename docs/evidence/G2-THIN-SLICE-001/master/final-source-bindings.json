@@ -1,7 +1,7 @@
 {
-  "evidenceCommitParent": "77b67e3b1b0d8a69ef7ab65bc20409f7c61cedf9",
+  "evidenceCommitParent": "5a54c5d0599e75edf2e07e0684015e938391f661",
   "actualTestedCandidate": "b1ff0a68915c272846038af96a00da3acbb95538",
-  "scope": "All tracked runtime/frontend/infra/scripts files; QA evidence commit changes docs only, product blobs unchanged; current acceptance files match tested candidate except docs-only additions",
+  "scope": "Tracked source fingerprint at final evidence preparation. Runtime/frontend/infra/scripts/product dependencies equal actual cold candidate b1ff0a6; only G2ReadinessBudgetTests.cs differs, independently reviewed test-only warmup. Full native suites and final same-Head CI validate this fixture revision.",
   "files": {
     "Directory.Build.props": "720ef39405d3a628d3b26c6e0688329cdd02ca08e454f35545e36881ae663b8f",
     "Directory.Packages.props": "f73a1444263faf31bb1419ad5112d748475be0b73f63e5ac6f03e0b8c8643221",
@@ -244,7 +244,7 @@
     "backend/tests/OntologyPlatform.SecurityTests/G2ExecutionEndpointTests.cs": "042769e8033ecde51be223a25405b8c5078ab6292875d79f01f440be31b364fe",
     "backend/tests/OntologyPlatform.SecurityTests/G2OpenApiSchemaTests.cs": "0d13aa49862afe4ce3f103117b5cf0fe51233a4f3d7eaa05ea2be502ff5f3abb",
     "backend/tests/OntologyPlatform.SecurityTests/G2PublishingAuthorizationTests.cs": "8bd9b9d98fdaa8332cb63caf4dc719c323fd030d073784b2171f0480f7fc5859",
-    "backend/tests/OntologyPlatform.SecurityTests/G2ReadinessBudgetTests.cs": "1392a1f9ebb388963d3bbdcc2b7fc3c795bbd8dee1c7cb2872994af0a554237a",
+    "backend/tests/OntologyPlatform.SecurityTests/G2ReadinessBudgetTests.cs": "b511579fdbe1795eb802f4bd2df3e4da7486187041e45442b81503b63fe34cfc",
     "backend/tests/OntologyPlatform.SecurityTests/G2ReadinessGssTests.cs": "4847e571a302c1490b114610ff6472632045dac896716a9bafb41b36e80fb7c6",
     "backend/tests/OntologyPlatform.SecurityTests/G2ReadinessPostgresTests.cs": "59954880e85278e381ef8e3cdc1ab4012212855e13d178bac651e94fe4edde4f",
     "backend/tests/OntologyPlatform.SecurityTests/G2ReadinessTests.cs": "d3928693006f3a1d7aee28a42bf52e6b67edb03b360ec8c51e70e1f1e501b697",
@@ -342,5 +342,15 @@
     "scripts/verification-requirements.txt": "29a0e3047d5474b4ddc08517c181d29d9bc621d4b5db4e769fc734e896a075c0",
     "scripts/verify-web.ps1": "4c85a3319f960fdf88da342c4dfd1ddec1754a615938484534bf834354250216",
     "scripts/verify.ps1": "06d581a9295dcdc5d499a1f1993ec6d3a8f66e506334d2efe3b683e3da1410bc"
-  }
+  },
+  "testOnlyChanges": [
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/G2ReadinessBudgetTests.cs",
+      "coldCandidateSha256": "1392a1f9ebb388963d3bbdcc2b7fc3c795bbd8dee1c7cb2872994af0a554237a",
+      "currentSha256": "b511579fdbe1795eb802f4bd2df3e4da7486187041e45442b81503b63fe34cfc",
+      "originalCommit": "a02d6da7297b254ce153628f29cf765de10af77c",
+      "integratedCommit": "5a54c5d0599e75edf2e07e0684015e938391f661",
+      "productionChanged": false
+    }
+  ]
 }

@@ -150,6 +150,13 @@
       "status": "NOT_RUN",
       "exitCode": null,
       "output": "Windows native/Intel Mac/production images/HA/five real production sources/formal SLO not certified"
+    },
+    {
+      "name": "cold-jit-readiness-test-fixture",
+      "command": "DOTNET_TieredCompilation=0 dotnet test --project backend/tests/OntologyPlatform.SecurityTests --no-restore --filter FullyQualifiedName~G2ReadinessBudgetTests --output Detailed; pwsh -NoProfile -File scripts/verify.ps1 -RunNative -RunTests",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "readiness-test: original cold-full-JIT RED preserved; fixed 2036ms/8queries/2HTTP/503/cancel; Security114=84pass30skip0fail; native338=123pass215skip0fail. Test-only initialization warmup, production and all original measured assertions unchanged. Missing dependency cases NOT_RUN."
     }
   ],
   "ci": {
@@ -161,5 +168,6 @@
   },
   "ciNote": "Final committed Head CI is supplied from actual jobs API as create-review-package explicit runtimeCi parameters to avoid self-reference; previous b1 success separately archived. No empty status inferred success.",
   "archiveVerification": "NOT_VERIFIED: creation and independent reopen occur after this source commit",
-  "review": "whole-review-final.md and independent-integration-reviews.md; no open C/I/M in reviewed source or QA fixes"
+  "review": "whole-review-final.md and independent-integration-reviews.md; no open C/I/M in reviewed source or QA fixes",
+  "monacoSecurityInvestigation": "monaco-embedded-security-review.md: official bundled3.4.15 verified; no Monaco in current301 Next artifacts; old override proposal rejected; official fixed Monaco absent, future patch is design-only. All repair-specific XSS/SSR/worker/CI tests NOT_RUN; BLOCKED persists."
 }

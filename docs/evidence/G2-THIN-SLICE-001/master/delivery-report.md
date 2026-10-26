@@ -56,3 +56,13 @@ MAF与MCP实用批准SDK，不把deterministic harness称为模型推理；真�
 最终自动标准ZIP必须来自已提交Head全树与明确Base..Head完整diff，含本报告、任务/ADR/合同/完整原始证据/实际CI。ZIP不入Git；排除.git/认证/PFX/密钥、.tools/缓存/bin/obj/node_modules、数据库/卷、模型与私有数据。构包与独立重开分别验证安全路径、成员、SHA、源码blob、patch和CI同Head。有限扫描不是完整安全认证。末次回执记录唯一ZIP字节数/SHA256与最终Base/Head/main，交付后停在G2等待ChatGPT复审，不自动开展下阶段。
 
 末次真实cold：Trace可见性等待20.469秒/33poll（worker_search21次/20.283秒），全部25原断言不变通过；Trace4、故障8、性能26随后通过。main第一次快进在最终文档/构包/独立包验证之前完成；未按最初建议三次独立main里程碑拆分，因真实集成重要缺口合并前关闭，保留此过程偏差，不虚称已分三次。模块分支持续可追踪push与独立Review均保留。最终交接记录附所有工作树/分支/完整SHA。
+
+## 收尾CI与Monaco安全调查增量
+
+文档Head4d5709c的Linux run40279318064：governance-integration真实PG和G2模块通过，engineering仅合成readiness预算测试失败（1.032s、8queries但未到两HTTP）。未隐藏红例或无条件重跑；原始摘要在ci-4d5709c-readiness-red.json。独立任务树已复现原cold full-JIT提前耗尽1s数据库子预算，修正仅预热测试夹具后清零记录；原70/850ms、503/8query/两路径/取消/1.5–4秒断言保留。该修正的Review/集成及最终同HeadCI以末次回执为准；不改生产1s/2s预算。
+
+人类补充的Monaco内嵌DOMPurify调查已由独立安全Agent完成，官方归档证实相对导入内嵌3.4.15，旧override提案已明确否决为单独修复。官方Issue5517仍Open且无已核实正式修复版；当前301份Next.js产物与产品锁均未发现相关代码，本机残留缓存排除打包。详细散列、官方链接、未实施patch设计及XSS/SSR/worker/修复CI全部NOT_RUN见monaco-embedded-security-review.md和dependencies.md。原审查员复核C0/I0/M0，Monaco仍BLOCKED，基础控件保留正式OWL子集/SHACL门禁。
+
+收尾测试修复原a02d6da7297b254ce153628f29cf765de10af77c已由Master集成为5a54c5d（完整SHA在Git记录）；独立限定审查C0/I0/M0、Spec/Quality PASS，见readiness-test-independent-review.md。生产131文件完全不变，最终源指纹仅单测试文件与cold候选不同并显式登记。该测试修订native338项中123成功/215缺环境跳过，另安全114项84成功/30跳过；不将其计成此前真实114/114或模块零skip验收。最终CI尚待实际查询。
+
+Master集成同一fixture源码full-JIT复验实际exit0：8queries/2HTTP/2014ms/503/storageCancelled，见master-readiness-final.txt；最终集成SelfTest exit0且ReviewPackage35/0。安全调查和测试修复独立原审查均已关闭，最终提交CI与封包仍后验。

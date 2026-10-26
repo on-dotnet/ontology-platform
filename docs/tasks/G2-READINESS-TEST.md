@@ -23,3 +23,5 @@
 - 原缺parser与证据空白规范前置失败保留；Master批准ignored只读parser缓存复用，无新增依赖。
 - 验证和生产零变更证据见 `../evidence/G2-THIN-SLICE-001/readiness-test/verification.json` 与 `production-boundary.json`。生产源逐文件对比基线完全一致。
 - 独立Review、Master集成、最终同Head Linux CI、唯一Review ZIP待Master完成；不得宣称本分支已满足集成条件。
+
+Master集成回执：原a02d6da7297b254ce153628f29cf765de10af77c已cherry-pick -x到Master，限定独立审查C0/I0/M0，生产无变更。最终同HeadCI/ZIP由末次实际manifest及独立回执闭合。

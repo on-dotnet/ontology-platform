@@ -1,0 +1,18 @@
+{
+  "runId": 40279318064,
+  "headSha": "4d5709cc4c529ce3f91a4f9977b2ecbda56371ee",
+  "url": "https://github.com/on-dotnet/ontology-platform/actions/runs/40279318064",
+  "engineering": "failure",
+  "governanceIntegration": "success",
+  "failingTest": "DatabaseAndBothHttpDependenciesShareRemainingBudget",
+  "failure": "CollectionAssert.AreEqual failed. Different number of elements.",
+  "source": "G2ReadinessBudgetTests.cs:65",
+  "elapsedMs": 1032,
+  "nativeSecuritySummary": {
+    "total": 114,
+    "failed": 1,
+    "succeeded": 83,
+    "skipped": 30
+  },
+  "note": "Native test missing PG explicitly skipped; separate real governance job passed. Preserve failure rather than silently rerun."
+}
