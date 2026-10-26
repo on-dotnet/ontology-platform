@@ -46,6 +46,7 @@ export function RunWorkspace({ plan }: { plan: SemanticQueryPlan | null }) {
       } catch (cause) {
         if (!controller.signal.aborted) {
           setConnected(false); setError(cause);
+          if (cause instanceof Error && ["unsupported_event_schema", "event_sequence_gap", "incomplete_event_stream", "event_budget_exceeded"].includes(cause.message)) setNotice("事件协议或序列不受支持，已停止答案接收并回读持久Run快照。");
           client.run(runId!, controller.signal).then(snapshot => { if (!controller.signal.aborted) setRun(snapshot); }).catch(() => {});
         }
       }

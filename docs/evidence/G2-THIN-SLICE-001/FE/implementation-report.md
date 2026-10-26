@@ -38,3 +38,15 @@ GET semantic/discover按Master即时明确对齐：assetId必需、releaseId可�
 - SelfTest首次缺本树PyYAML失败，复用Master已有批准隔离parser路径后重跑exit0：工程自测8、结构解析正负4、环境状态3组、ReviewPackage35/0。工具环境软链位于Git忽略.tools，不改系统环境/包锁。
 - 修复创建缓冲保护、503未读取不显示假空集合、图形主题切换订阅及dispose清理；G2页不额外读取隐藏的G1资源。
 - 截图内容仅合成界面身份/合成源，无Cookie/token/HAR/登录材料。无Monaco，Monaco/worker保持PAUSED BY HUMAN。
+
+## S2/S3 UI行为与结构新增里程碑
+
+实施源码起点`7ff7fd53335923661e8b2fa62ad51f0ec12a712c`。
+
+- 结构表单扩展为标准Class/ObjectProperty/DatatypeProperty/NamedIndividual声明、subClassOf/domain/range/label/comment及已声明属性的精确新增/替换/删除；仅发送唯一SemanticEdit，完整源编辑由服务端负责。新增Class浏览器先RED（缺结构操作入口），实现后GREEN。
+- 真实Edge有界UI套件16/16 PASS：前述6项加六态、XSS文本、不执行HTML、证据重新授权403、提交者自批禁用、异人审核、激活绑定真实当前CAS、Run确定性标记/真实格式事件重放/唯一终态、结构新增及dirty阻断验证/结构写入、布局无语义写请求。
+- 原G1 UI测试5/5 PASS，原断言完全未改；截图隔离到临时目录，不改历史证据。
+- Vitest26/26 PASS（新增Last-Event-ID真实fetch流/取消传播测试）；typecheck/lint/build全部exit0。生产Next构建真实路由/客户端chunk成功。
+- SSE已知事件缺字段也拒绝、单事件128KiB字节预算、512序列上限；未知协议显式提示并回读持久Run快照。断开订阅/持久取消是独立动作。
+- 六张最新界面截图已重开目视检查，1440三栏与390图/校验面板、深浅Tokens正确；不包含真实认证材料。
+- 这些测试的API为有界夹具，所有PG/Jena/Keycloak/RustFS/MAF真实G2全链仍NOT_RUN；不能将测试名称中的“真实展示/持久事件”解释为后端验收PASS。CI仍NOT_VERIFIED，独立Review待Master。
