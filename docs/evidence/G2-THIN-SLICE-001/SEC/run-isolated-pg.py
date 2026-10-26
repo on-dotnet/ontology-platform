@@ -6,6 +6,7 @@ password and connection string stay in child environment/in-memory redaction.
 No Keycloak, historical runtime, retained volume, or credential file is read.
 """
 from pathlib import Path
+import argparse
 import os
 import secrets
 import subprocess
@@ -16,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[4]
 IMAGE = "postgres:18.6-trixie@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6"
 
 
-def main():
+def main(configuration="Debug", test_filter="FullyQualifiedName~G2SecurityTests|FullyQualifiedName~G2AuditTransactionTests"):
     name = "g2-sec-test-" + secrets.token_hex(6)
     database_password = secrets.token_urlsafe(40)
     env = os.environ.copy()
@@ -33,7 +34,7 @@ def main():
             raise TimeoutError("temporary PostgreSQL readiness")
         connection = f"Host=127.0.0.1;Port={port};Database=governance;Username=postgres;Password={database_password}"
         env["G1_SEC_PG_CONNECTION"] = connection
-        command = ["dotnet", "test", "--project", "backend/tests/OntologyPlatform.SecurityTests", "--no-restore", "--filter", "FullyQualifiedName~G2SecurityTests|FullyQualifiedName~G2AuditTransactionTests"]
+        command = ["dotnet", "test", "--project", "backend/tests/OntologyPlatform.SecurityTests", "--configuration", configuration, "--no-restore", "--filter", test_filter]
         result = subprocess.run(command, cwd=ROOT, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
         print(result.stdout.replace(connection, "[REDACTED_CONNECTION]").replace(database_password, "[REDACTED_PASSWORD]"))
         print(f"SEC isolated PG test exitCode={result.returncode}")
@@ -46,4 +47,8 @@ def main():
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--configuration", choices=["Debug", "Release"], default="Debug")
+    parser.add_argument("--filter", default="FullyQualifiedName~G2SecurityTests|FullyQualifiedName~G2AuditTransactionTests")
+    args = parser.parse_args()
+    sys.exit(main(args.configuration, args.filter))

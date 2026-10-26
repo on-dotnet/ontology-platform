@@ -100,3 +100,27 @@ SEM端点Owner负责在端点增加与guard相同的 `.RequireAuthorization(name
 | `git diff --cached --check`，源码提交前 | 0 | 只有三个获明确转移的owned文件，无空白错误。 |
 
 当前为 **DRAFT / PARTIAL，待本增量限定独立Review**。产品Host注册与SEM端点元数据集成、全G1回归、同Head CI及唯一ZIP仍由Master组织，不能从本47项fixture测试推断已全部完成。停止本子项，不进入其他功能关口。
+
+## 严格DTO集成回归：仅修复完整Synthetic响应夹具
+
+Master报告Linux CI `40260902743`（`f0a54ed`）FullSecurity为99/101，失败为 `RevisionPreconditionMatchesCommand("2",200)` 与 `MiddlewareSuccessContinuesToNativeBindingAndGuard(false)`；以上CI数值为Master回执，本Owner未重新读取该run详情，不能据本地结果宣称Linux复跑通过。Master作为公共合同唯一写者在本独立树提交 `42c95db04eecd66a83721adf9957ea25fa6e6e9f`，同步其Root `0e970f9` 的canonical严格DTO callbacks。本轮以该精确提交为Base，未手改或放松任何Contracts、Guard、Authorization、Writer、Host、项目、锁或迁移。
+
+限定源码修复提交：`275f79b266ffd3292b20f1a2143c117fed0c4498`，已推送 `origin/codex/G2-SEC-SUPPORT`，**只有G2SecurityTests.cs一个源码文件**。该提交可单独cherry-pick，Master已拥有的公共合同同步提交不应重复集成。
+
+真实Release红例确认两条成功路径均因 `JsonException` 返回500：旧夹具的三处响应仅初始化Revision/Etag，Scope、Sources、Hashes和Projection仍为null，canonical输出callback正确拒绝它们。新增断言诊断只打印宿主异常类型，不记录异常原文；HTTP状态、强ETag、401/403、CSRF、取消、故障边界的原期望全部保留。
+
+修复由同一 `SyntheticDraft()` helper供 `/write`、`/revise`、`/protected-write` 使用：必需标识与名称非空；完整org-demo双厂范围和fixture-subject；明确未绑定发布与未实现词汇为null；OWL单类声明、SHACL NodeShape及显式synthetic=true事实源码；各源散列实际由完整UTF8计算SHA256，BundleHash按ontology/shapes/absent/data的LF序列计算；草稿Revision=3、ETag=`"3"`、Projection.Revision=3且共享同一完整散列。固定投影逐项对应夹具的一条OWL类声明，合法空关系/诊断数组不伪造关系；更新时间为固定UTC。
+
+这是**固定principal的HTTP安全测试夹具**，不是OIDC登录、真实本体持久化、Jena解析/SHACL或业务闭环PASS。只补全当前严格合同，不禁用callbacks、不降低断言、不捕获JsonException装作成功。SEC证据runner只增加标准库CLI选项 `--configuration`/`--filter` 以复现Release与指定PG回归，默认仍为原Debug/47项；无新依赖、凭证复制或历史运行时访问。
+
+| 命令 | 退出码 | 真实结果与证据 |
+|---|---:|---|
+| `dotnet test --project backend/tests/OntologyPlatform.SecurityTests --configuration Release --no-restore --filter 'FullyQualifiedName~RevisionPreconditionMatchesCommand\|FullyQualifiedName~MiddlewareSuccessContinuesToNativeBindingAndGuard'`，canonical合同+旧响应 | 2 | 10发现、8通过、2失败、0跳过；两项明确记录宿主异常类型JsonException、期望200实际500。见canonical-fixture-red.txt。 |
+| 同命令，完整Synthetic响应后 | 0 | 10/10通过、0跳过。见canonical-fixture-green.txt。 |
+| `python3 docs/evidence/G2-THIN-SLICE-001/SEC/run-isolated-pg.py --configuration Release --filter 'FullyQualifiedName~G2SecurityTests\|FullyQualifiedName~G2AuditTransactionTests\|FullyQualifiedName~AuditScopeMigrationTests'` | 0 | 49/49通过、0跳过：原47项全部保留，另含2项真实PG审计范围迁移/并发保护回归。见canonical-fixture-pg-green.txt。 |
+| `dotnet build backend/tests/OntologyPlatform.SecurityTests --configuration Release --no-restore` | 0 | 0警告、0错误。见canonical-fixture-build.txt。 |
+| `dotnet format whitespace backend/tests/OntologyPlatform.SecurityTests/OntologyPlatform.SecurityTests.csproj --no-restore --verify-no-changes --include backend/tests/OntologyPlatform.SecurityTests/G2SecurityTests.cs` | 0 | 无输出、无格式诊断。 |
+| `pwsh -NoProfile -File scripts/verify.ps1 -SelfTest` | 0 | 静态/检查器负例通过，含ReviewPackage35测试；见canonical-fixture-selftest.txt。 |
+| `git diff --cached --check`，源码提交前 | 0 | 仅获授权测试文件，无空白错误。 |
+
+本轮验证为macOS ARM64/Release，临时PG固定批准镜像及随机回环/数据库生命周期沿用原runner；不是Linux CI的新结论。状态 **FIXED_PENDING_REVIEW / PARTIAL**，待Master限定独立Review、集成与同Head Linux CI。完成后停止，不派子Agent或合并main。
