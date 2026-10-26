@@ -1,4 +1,7 @@
 using System.Net;
+using System.Diagnostics;
+using System.Diagnostics.Metrics;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using Microsoft.Extensions.Configuration;
@@ -10,6 +13,15 @@ namespace OntologyPlatform.Modules.Ontology;
 /// <summary>复用官方Fuseki RIOT/GSP/SHACL端点的受控适配器，不接受用户查询或URL。</summary>
 public sealed class JenaSemanticRuntime : ISemanticRuntime
 {
+    /// <summary>只记录固定阶段与状态，不记录用户源或查询文本。</summary>
+    private static readonly ActivitySource Activities = new("OntologyPlatform.Ontology");
+
+    /// <summary>低基数运行时指标，不以主体/厂区/实体作为标签。</summary>
+    private static readonly Meter Metrics = new("OntologyPlatform.Ontology");
+
+    /// <summary>操作实际耗时，单位毫秒，标签仅固定操作和结果。</summary>
+    private static readonly Histogram<double> Duration = Metrics.CreateHistogram<double>("ontology.semantic.duration", "ms");
+
     /// <summary>整进程最多两个语义操作同时占用运行时。</summary>
     private static readonly SemaphoreSlim Slots = new(2, 2);
 
@@ -163,15 +175,28 @@ public sealed class JenaSemanticRuntime : ISemanticRuntime
         }, cancellationToken);
 
     /// <summary>外层并发和总时限预算覆盖完整操作，取消后仍有独立清理预算。</summary>
-    private async Task<T> Execute<T>(Func<List<string>, CancellationToken, Task<T>> operation, CancellationToken cancellationToken)
+    private async Task<T> Execute<T>(Func<List<string>, CancellationToken, Task<T>> operation, CancellationToken cancellationToken, [CallerMemberName] string phase = "")
     {
         if (!await Slots.WaitAsync(0, cancellationToken)) throw new SemanticOperationException(429, "semantic_busy");
+        // 只有固定公共方法名可成为阶段标签，不接受用户提供的phase。
+        using var activity = Activities.StartActivity("ontology.semantic");
+        activity?.SetTag("ontology.phase", phase);
+        // 单调时钟用于真实延迟，不把墙钟跳变算作性能数据。
+        var started = Stopwatch.GetTimestamp();
+        // 默认失败，只有操作真正完成才记录成功状态。
+        var outcome = "failed";
         // 当前请求独占图只存在本次操作内，finally一定尝试删除。
         var graphs = new List<string>();
         // 整个操作最多五秒，不按每个HTTP请求重新给予五秒。
         using var budget = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         budget.CancelAfter(TimeSpan.FromSeconds(5));
-        try { return await operation(graphs, budget.Token); }
+        try
+        {
+            // 真实执行结果先完成，后标记成功；清理仍在finally执行。
+            var result = await operation(graphs, budget.Token);
+            outcome = "completed";
+            return result;
+        }
         catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested) { throw new SemanticOperationException(503, "semantic_timeout"); }
         catch (HttpRequestException) { throw new SemanticOperationException(503, "semantic_unavailable"); }
         catch (JsonException) { throw new SemanticOperationException(503, "rdf_response_invalid"); }
@@ -185,7 +210,12 @@ public sealed class JenaSemanticRuntime : ISemanticRuntime
                     await SendAsync(validation, "data?graph=" + Uri.EscapeDataString(graph), HttpMethod.Delete, null, "text/plain", cleanup.Token);
             }
             catch (Exception exception) when (exception is HttpRequestException or OperationCanceledException or SemanticOperationException) { /* 依赖故障时内存暂存图等待运行时重启清理，不能泄露源码到日志。 */ }
-            finally { Slots.Release(); }
+            finally
+            {
+                activity?.SetStatus(outcome == "completed" ? ActivityStatusCode.Ok : ActivityStatusCode.Error);
+                Duration.Record(Stopwatch.GetElapsedTime(started).TotalMilliseconds, new KeyValuePair<string, object?>("operation", phase), new KeyValuePair<string, object?>("outcome", outcome));
+                Slots.Release();
+            }
         }
     }
 
