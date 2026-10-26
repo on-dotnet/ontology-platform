@@ -13,6 +13,58 @@ namespace OntologyPlatform.SecurityTests;
 [TestClass]
 public sealed class G2OpenApiSchemaTests
 {
+    /// <summary>完整正式宿主导出要求五个CAS入口声明强If-Match，并准确公开发布错误。</summary>
+    [TestMethod]
+    public async Task ProductionHostDocumentsStrongRevisionAndPublishingProblems()
+    {
+        // 本fixture自建证书和临时密钥目录，不读取现有开发runtime。
+        using var fixture = new SecurityHostFixture();
+        // 全部路由由正式组合根发现；只使用明确不可达的回环依赖配置。
+        await using var app = fixture.Create(overrides: new Dictionary<string, string?> { ["G2:Enabled"] = "true" });
+        await app.StartAsync();
+        // 公开文档不需OIDC或业务写入，本测试也不宣称那些链路通过。
+        using var client = fixture.CreateClient(app);
+        client.DefaultRequestHeaders.Host = "localhost:15100";
+        // 原始实际运行文档保留为公开协议导出供生成与审查。
+        var content = await client.GetStringAsync("/openapi/v1.json");
+        await File.WriteAllTextAsync(Path.Combine(Path.GetTempPath(), "g2-final-production.openapi.json"), content);
+        Assert.AreEqual(content, await client.GetStringAsync("/openapi/v1.json"));
+        // 逐个验证生产路径，不从静态表生成伪路由。
+        var document = JsonNode.Parse(content)!;
+        // 路径和方法只用于断言真实文档，不参与生成运行路由。
+        foreach (var (path, method) in new[]
+        {
+            ("/api/v1/ontology-drafts/{id}", "put"),
+            ("/api/v1/ontology-drafts/{id}/edits", "post"),
+            ("/api/v1/approvals/{id}/decisions", "post"),
+            ("/api/v1/release-activations", "post"),
+            ("/api/v1/execution-runs/{id}/cancel", "post")
+        })
+        {
+            // 每个CAS操作必须公开强ETag格式和缺失/冲突错误。
+            var operation = document["paths"]![path]![method]!;
+            // 只接受唯一必需请求头，不能把弱标签或body revision描述为等价。
+            var header = operation["parameters"]!.AsArray().SingleOrDefault(value => value!["name"]!.GetValue<string>() == "If-Match");
+            Assert.IsNotNull(header, path);
+            Assert.IsTrue(header["required"]!.GetValue<bool>());
+            Assert.AreEqual("^\"[0-9]+\"$", header["schema"]!["pattern"]!.GetValue<string>());
+            // 两种前置失败都必须保留平台错误的关联字段。
+            foreach (var status in new[] { 409, 428 })
+            {
+                Assert.AreEqual("#/components/schemas/PlatformProblem", operation["responses"]?[status.ToString()]?["content"]?["application/problem+json"]?["schema"]?["$ref"]?.GetValue<string>(), path);
+            }
+        }
+        // 两个发布CAS端点必须描述全部实际安全和业务失败。
+        foreach (var path in new[] { "/api/v1/approvals/{id}/decisions", "/api/v1/release-activations" })
+        {
+            // 状态码逐项取自共同guard和对应应用服务。
+            foreach (var status in new[] { 400, 401, 403, 404, 409, 422, 428, 500, 503 })
+            {
+                Assert.AreEqual("#/components/schemas/PlatformProblem", document["paths"]![path]!["post"]!["responses"]?[status.ToString()]?["content"]?["application/problem+json"]?["schema"]?["$ref"]?.GetValue<string>(), path);
+            }
+        }
+    }
+
     /// <summary>实际文档必须拒绝数据混合分支和事件版本漂移，并公开写入防伪要求。</summary>
     /// <returns>真实HTTP导出检查任务。</returns>
     [TestMethod]

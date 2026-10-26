@@ -1,12 +1,13 @@
 /** 验证真实发布页给出的Trace链接，在本地Grafana部署中实际返回该Trace；不截取认证页。 */
 import { createRequire } from 'node:module';
 import { readFile, writeFile } from 'node:fs/promises';
-import { resolve } from 'node:path';
+import { resolve, relative, sep, isAbsolute } from 'node:path';
 const root = resolve(import.meta.dirname, '../..');
 const require = createRequire(resolve(root,'apps/web/package.json'));
 const { chromium } = require('@playwright/test');
 const runtimePath = resolve(process.argv[2] ?? '');
-if (!runtimePath.startsWith(resolve(root,'.tools/security') + '/')) throw new Error('runtime_path_denied');
+const runtimeRelative = relative(resolve(root, '.tools/security'), runtimePath);
+if (!runtimeRelative || runtimeRelative === '..' || runtimeRelative.startsWith('..' + sep) || isAbsolute(runtimeRelative)) throw new Error('runtime_path_denied');
 const runtime = JSON.parse(await readFile(runtimePath,'utf8'));
 const realm = JSON.parse(await readFile(runtime.realmFile,'utf8'));
 const browser = await chromium.launch({ channel:'msedge',headless:true });

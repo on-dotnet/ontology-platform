@@ -25,7 +25,7 @@ public sealed class PublicationFaultTests
         // 正式R1确实包含S3对象及Jena图。
         var old = await fixture.Service.ActivateAsync(fixture.Author, PublishingFixture.Activation(await fixture.ApproveAsync(first.Proposal)), default);
         // 第二版需要独立草稿修订与审批。
-        var updated = await fixture.Ontology.SaveAsync(fixture.Author, first.Draft.DraftId, new SaveDraftRequest { Sources = first.Draft.Sources with { DataTurtle = first.Draft.Sources.DataTurtle + "\n# second publication\n" }, Command = PublishingFixture.Command(1) }, default);
+        var updated = await fixture.Ontology.SaveAsync(fixture.Author, first.Draft.DraftId, new SaveDraftRequest { Name = first.Draft.Name, Sources = first.Draft.Sources with { DataTurtle = first.Draft.Sources.DataTurtle + "\n# second publication\n" }, Command = PublishingFixture.Command(1) }, default);
         // 新命令固定当前R1和修订1。
         var request = PublishingFixture.Activation(await fixture.ApproveAsync(await fixture.ProposalForAsync(updated)), old);
         // 在明确外部阶段注入真实客户端传输失败，不伪造成功结果。

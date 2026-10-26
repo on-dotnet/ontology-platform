@@ -109,6 +109,8 @@ public sealed class OntologyService : IOntologyService, IDraftPublicationReader
     {
         DemandRole(actor, true);
         ValidateCommand(request.Command);
+        // 名称与创建采用同一边界，不能把成功保存后的输入静默丢失。
+        if (string.IsNullOrWhiteSpace(request.Name) || request.Name.Length > 200) throw new SemanticOperationException(422, "draft_request_invalid");
         // 持久头提供真实范围；保存不能改asset/scope。
         var row = await FindAsync(draftId, false, cancellationToken);
         DemandScope(actor, Scope(row));
@@ -117,7 +119,7 @@ public sealed class OntologyService : IOntologyService, IDraftPublicationReader
         if (replay is not null) return replay;
         // Jena在事务外验证，锁定后仍重新比较期望修订防止TOCTOU。
         var analysis = await runtime.AnalyzeAsync(request.Sources, request.Command.ExpectedRevision + 1, cancellationToken);
-        return await SaveCoreAsync(actor, row, request.Command, request.Sources, analysis, "ontology.save", request, cancellationToken);
+        return await SaveCoreAsync(actor, row, request.Command, request.Sources, analysis, "ontology.save", request, cancellationToken, request.Name);
     }
 
     /// <summary>对当前完整图执行精确编辑，再以相同期望修订CAS持久提交。</summary>
@@ -211,13 +213,15 @@ public sealed class OntologyService : IOntologyService, IDraftPublicationReader
     }
 
     /// <summary>保存/结构编辑共用CAS追加实现，不允许跨模块写入或原地覆盖源历史。</summary>
-    private Task<OntologyDraft> SaveCoreAsync(ActorContext actor, DraftRecord known, CommandContext command, SourceBundle sources, SemanticAnalysis analysis, string action, object request, CancellationToken cancellationToken) =>
+    private Task<OntologyDraft> SaveCoreAsync(ActorContext actor, DraftRecord known, CommandContext command, SourceBundle sources, SemanticAnalysis analysis, string action, object request, CancellationToken cancellationToken, string? name = null) =>
         WriteAsync<OntologyDraft>(actor, Scope(known), action, command, new { draftId = known.DraftId, request }, async token =>
         {
             // 事务内最新头是唯一CAS依据，事务外预读仅用于解析和授权。
             var row = await FindAsync(known.DraftId, true, token);
             DemandScope(actor, Scope(row));
             if (row.Revision != command.ExpectedRevision) throw new SemanticOperationException(409, "draft_revision_conflict");
+            // 名称与源修订共享同一CAS及审计事务；结构编辑未提供名称时保留当前值。
+            if (name is not null) row.Name = name;
             row.Revision++;
             row.UpdatedAtUtc = clock.GetUtcNow();
             database.Revisions.Add(Revision(row, sources, analysis));

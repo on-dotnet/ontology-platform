@@ -1,0 +1,199 @@
+{
+  "baseSha": "96db23bb17627cfa37efbba113c1641906b931d1",
+  "state": "DRAFT/PARTIAL pending Master OIDC/cold/CI/independent review",
+  "exitCode": 0,
+  "sourceHashes": {
+    "apps/web/scripts/generate-types.mjs": "9402cc3e0e7dfdd66b9ca10638b49a37e3c8e64eeb060bb800f9d05faaed6fe1",
+    "apps/web/src/lib/api/g2-generated.ts": "987497bbaa1797389d8a96f8778171eab9d1f1e2653428eeb3a7d2bbccbefe2b",
+    "apps/web/src/lib/api/openapi-types.test.ts": "c63b6217828d5663307186420c8ef819f16a6780772a567a4bb420cd28975984",
+    "backend/src/Hosts/OntologyPlatform.Api/G2/G2OpenApi.cs": "f042e06cb2eb5962234acee6d9a118482439e47056aeda6e56942a2af42db0b6",
+    "backend/src/Hosts/OntologyPlatform.Api/G2/PublishingEndpoints.cs": "51f189c7186c50b5171eb493e882e50bcc55e12e45fe3cecb3baa4896289b2bd",
+    "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyService.cs": "2eee5c50520c17f3176f71a9f378e2e57dac4c318554b7db3a4daa4f3e00f223",
+    "backend/tests/OntologyPlatform.PublishingTests/PublicationFaultTests.cs": "ca9e9b96b4b8cb43dde30b9352523eea8c464821d471119e15f8159a5e867270",
+    "backend/tests/OntologyPlatform.PublishingTests/PublishingFlowTests.cs": "40d003e29326d173f4de24192ffca74997bb2b6594b62b1deef1d8b9c8d6f2e0",
+    "backend/tests/OntologyPlatform.PublishingTests/RollbackBoundaryTests.cs": "93f390ecc6abb27d6f71b0f4755cec479431cc46e1a271d81a49b2d17d96bb49",
+    "backend/tests/OntologyPlatform.QueryTests/QueryFaultTests.cs": "10227b3d232fe1ee0c999014e33c0667eab8e63a66632485cd99c92f1e36bc78",
+    "backend/tests/OntologyPlatform.SecurityTests/G2OpenApiSchemaTests.cs": "0d13aa49862afe4ce3f103117b5cf0fe51233a4f3d7eaa05ea2be502ff5f3abb",
+    "backend/tests/OntologyPlatform.SecurityTests/G2PublishingAuthorizationTests.cs": "8bd9b9d98fdaa8332cb63caf4dc719c323fd030d073784b2171f0480f7fc5859",
+    "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs": "a827804c28496ef89092345ef89af627ab12790c9833e395a3cd134bfb1b4d61",
+    "docs/contracts/g2-platform.openapi.json": "406c300bea90f259c0167f1dcca58a42a404b2bab57e0a9e7bf9d7ab342350ca",
+    "scripts/acceptance/g2-live-browser.mjs": "fef10abedbc5a68ff314feb4173165189d47212db3d221f627db451dcf773956",
+    "scripts/acceptance/g2-trace-browser.mjs": "3786009ed823fafa9c4af2dc99302e000b5436681cecf885aa7ff0ffc86a72a2"
+  },
+  "records": [
+    {
+      "command": [
+        "dotnet",
+        "build",
+        "backend/OntologyPlatform.slnx",
+        "--configuration",
+        "Release",
+        "--no-restore"
+      ],
+      "exitCode": 0,
+      "output": "  OntologyPlatform.ServiceDefaults -> /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/ServiceDefaults/bin/Release/net10.0/OntologyPlatform.ServiceDefaults.dll\n  OntologyPlatform.Contracts -> /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/bin/Release/net10.0/OntologyPlatform.Contracts.dll\n/Users/chasen/.nuget/packages/aspire.hosting.apphost/13.6.3/build/Aspire.Hosting.AppHost.targets(157,5): warning ASPIRE010: OntologyPlatform.AppHost is configured with AspireUseCliBundle=false. Some Aspire features require the Aspire CLI bundle. Set AspireUseCliBundle=true to enable those features, or suppress ASPIRE010 to continue without the bundle. See https://aka.ms/aspire/diagnostics/aspire010 for more information. [/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/AppHost/OntologyPlatform.AppHost.csproj]\n  OntologyPlatform.Modules.Publishing.Domain -> /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/bin/Release/net10.0/OntologyPlatform.Modules.Publishing.Domain.dll\n  OntologyPlatform.Modules.SemanticQuery -> /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/bin/Release/net10.0/OntologyPlatform.Modules.SemanticQuery.dll\n  OntologyPlatform.Modules.Governance -> /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/bin/Release/net10.0/OntologyPlatform.Modules.Governance.dll\n  OntologyPlatform.Modules.Agents -> /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/bin/Release/net10.0/OntologyPlatform.Modules.Agents.dll\n  OntologyPlatform.InfrastructureApi -> /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Hosts/OntologyPlatform.InfrastructureApi/bin/Release/net10.0/OntologyPlatform.InfrastructureApi.dll\n  OntologyPlatform.Modules.Publishing -> /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/bin/Release/net10.0/OntologyPlatform.Modules.Publishing.dll\n  OntologyPlatform.G2ContractTests -> /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Release/net10.0/OntologyPlatform.G2ContractTests.dll\n  OntologyPlatform.Modules.Ontology.Domain -> /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/bin/Release/net10.0/OntologyPlatform.Modules.Ontology.Domain.dll\n  OntologyPlatform.InfrastructureTests -> /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/bin/Release/net10.0/OntologyPlatform.InfrastructureTests.dll\n  OntologyPlatform.Modules.Ontology -> /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/bin/Release/net10.0/OntologyPlatform.Modules.Ontology.dll\n  OntologyPlatform.SemanticTests -> /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Release/net10.0/OntologyPlatform.SemanticTests.dll\n  OntologyPlatform.PublishingTests -> /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Release/net10.0/OntologyPlatform.PublishingTests.dll\n  OntologyPlatform.Api -> /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/bin/Release/net10.0/OntologyPlatform.Api.dll\n  OntologyPlatform.AppHost -> /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/AppHost/bin/Release/net10.0/OntologyPlatform.AppHost.dll\n  OntologyPlatform.AgentTests -> /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Release/net10.0/OntologyPlatform.AgentTests.dll\n  OntologyPlatform.QueryTests -> /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Release/net10.0/OntologyPlatform.QueryTests.dll\n  OntologyPlatform.SecurityTests -> /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll\n\n已成功生成。\n\n/Users/chasen/.nuget/packages/aspire.hosting.apphost/13.6.3/build/Aspire.Hosting.AppHost.targets(157,5): warning ASPIRE010: OntologyPlatform.AppHost is configured with AspireUseCliBundle=false. Some Aspire features require the Aspire CLI bundle. Set AspireUseCliBundle=true to enable those features, or suppress ASPIRE010 to continue without the bundle. See https://aka.ms/aspire/diagnostics/aspire010 for more information. [/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/AppHost/OntologyPlatform.AppHost.csproj]\n    1 个警告\n    0 个错误\n\n已用时间 00:00:01.48\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "test",
+        "--project",
+        "backend/tests/OntologyPlatform.G2ContractTests",
+        "--no-restore"
+      ],
+      "exitCode": 0,
+      "output": "正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Debug/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64)\n/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Debug/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64) 已通过 (1s 559ms)\n\n测试运行摘要: 已通过!\n  总计: 19\n  失败: 0\n  成功: 19\n  已跳过: 0\n  持续时间: 1s 960ms\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "format",
+        "whitespace",
+        "backend/OntologyPlatform.slnx",
+        "--include",
+        "backend/src/Hosts/OntologyPlatform.Api/G2/G2OpenApi.cs",
+        "backend/src/Hosts/OntologyPlatform.Api/G2/PublishingEndpoints.cs",
+        "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyService.cs",
+        "backend/tests/OntologyPlatform.PublishingTests/PublicationFaultTests.cs",
+        "backend/tests/OntologyPlatform.PublishingTests/PublishingFlowTests.cs",
+        "backend/tests/OntologyPlatform.PublishingTests/RollbackBoundaryTests.cs",
+        "backend/tests/OntologyPlatform.QueryTests/QueryFaultTests.cs",
+        "backend/tests/OntologyPlatform.SecurityTests/G2OpenApiSchemaTests.cs",
+        "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+        "backend/tests/OntologyPlatform.SecurityTests/G2PublishingAuthorizationTests.cs",
+        "--verify-no-changes",
+        "--no-restore"
+      ],
+      "exitCode": 0,
+      "output": "加载工作区时遇到警告。要记录警告，请将“详细级别”选项设置为“诊断”级别。\n"
+    },
+    {
+      "command": [
+        "/opt/homebrew/opt/node@24/bin/node",
+        "/Users/chasen/Developer/repos/ontology-platform/.tools/pnpm/package/bin/pnpm.cjs",
+        "--dir",
+        "apps/web",
+        "lint"
+      ],
+      "exitCode": 0,
+      "output": "$ eslint .\n"
+    },
+    {
+      "command": [
+        "/opt/homebrew/opt/node@24/bin/node",
+        "/Users/chasen/Developer/repos/ontology-platform/.tools/pnpm/package/bin/pnpm.cjs",
+        "--dir",
+        "apps/web",
+        "typecheck"
+      ],
+      "exitCode": 0,
+      "output": "$ tsc --noEmit\n"
+    },
+    {
+      "command": [
+        "/opt/homebrew/opt/node@24/bin/node",
+        "/Users/chasen/Developer/repos/ontology-platform/.tools/pnpm/package/bin/pnpm.cjs",
+        "--dir",
+        "apps/web",
+        "test"
+      ],
+      "exitCode": 0,
+      "output": "$ vitest run\n\n RUN  v5.0.5 /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/apps/web\n\n\n Test Files  7 passed (7)\n      Tests  77 passed (77)\n   Start at  13:20:03\n   Duration  501ms (tests 88%, import 7%, transform 3%, worker 2%)\n\n"
+    },
+    {
+      "command": [
+        "/opt/homebrew/opt/node@24/bin/node",
+        "/Users/chasen/Developer/repos/ontology-platform/.tools/pnpm/package/bin/pnpm.cjs",
+        "--dir",
+        "apps/web",
+        "build"
+      ],
+      "exitCode": 0,
+      "output": "$ next build\n▲ Next.js 16.4.3 (Turbopack)\n✓ Running next.config.ts took 9ms\n\n  Creating an optimized production build ...\n✓ Compiled successfully in 87ms\n  Running TypeScript ...\n  Finished TypeScript in 576ms ...\n  Collecting page data using 9 workers ...\n  Generating static pages using 9 workers (0/4) ...\n  Generating static pages using 9 workers (1/4) \n  Generating static pages using 9 workers (2/4) \n  Generating static pages using 9 workers (3/4) \n✓ Generating static pages using 9 workers (4/4) in 124ms\n  Finalizing page optimization ...\n\nRoute (app)\n┌ ƒ /\n├ ○ /_not-found\n├ ƒ /analysis\n├ ○ /icon.svg\n├ ƒ /ontologies\n├ ƒ /releases\n└ ○ /signed-out\n\n\n○  (Static)   prerendered as static content\nƒ  (Dynamic)  server-rendered on demand\n\n"
+    },
+    {
+      "command": [
+        "/opt/homebrew/opt/node@24/bin/node",
+        "--check",
+        "scripts/acceptance/g2-live-browser.mjs"
+      ],
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "command": [
+        "/opt/homebrew/opt/node@24/bin/node",
+        "--check",
+        "scripts/acceptance/g2-trace-browser.mjs"
+      ],
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "command": [
+        "/opt/homebrew/opt/node@24/bin/node",
+        "apps/web/scripts/generate-types.mjs",
+        "--check"
+      ],
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "command": [
+        "/opt/homebrew/opt/node@24/bin/node",
+        "apps/web/scripts/generate-types.mjs"
+      ],
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "command": [
+        "/opt/homebrew/opt/node@24/bin/node",
+        "apps/web/scripts/generate-types.mjs"
+      ],
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "command": [
+        "/opt/homebrew/opt/node@24/bin/node",
+        "apps/web/scripts/generate-types.mjs",
+        "--check"
+      ],
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "scripts/verify.ps1",
+        "-SelfTest"
+      ],
+      "exitCode": 0,
+      "output": "\nCheck             Status Message\n-----             ------ -------\nrepository-static PASS   检查1522个文件：语法/格式/相对链接/有限机密模式/基线…\n\nPASS: clean baseline accepted\nPASS: wrong package name rejected\nPASS: broken relative link rejected\nPASS: synthetic token rejected without printing value\nPASS: synthetic token in TypeScript rejected\nPASS: credential assignment in dot-env rejected\nPASS: unpinned action rejected\n\nCheck             Status Message\n-----             ------ -------\nrepository-static PASS   检查1520个文件：语法/格式/相对链接/有限机密模式/基线…\n\nNOT_RUN: .NET test：须显式追加-RunTests执行已批准测试项目。\nNOT_RUN: Web独立检查需真实目标及显式-RunNative。\nNOT_RUN: Web检查被显式-SkipWeb跳过，仅用于隔离工程检查器fixture或独立验收。\nNOT_RUN: 浏览器真实OIDC/E2E需独立受控联调，不隐式混入工程检查。\nPASS: 所选工程检查；范围以逐项输出为准，不表示业务、前端或整个G1通过。\nPASS: native commands resolve SDK and config from selected Root\nChecker tests: 8 passed; application tests: NOT_RUN.\nPASS: Doctor handles existing pnpm without Node as BLOCKED/2.\nPASS: Doctor discovers real macOS ARM64 Node from isolated path with spaces.\nPASS: YAML/TOML syntax, 1 files; runtime compatibility not implied.\nFAIL: structured syntax invalid.yml (ParserError)\nFAIL: structured syntax invalid.toml (TOMLDecodeError)\nPASS: structured parser 4 real positive/negative cases.\n\nCheck             Status Message\n-----             ------ -------\nrepository-static PASS   检查1524个文件：语法/格式/相对链接/有限机密模式/基线…\n\nPASS: verification preserves unset environment state for five process variables.\n\nCheck             Status Message\n-----             ------ -------\nrepository-static PASS   检查1524个文件：语法/格式/相对链接/有限机密模式/基线…\n\nPASS: verification preserves empty environment state for five process variables.\n\nCheck             Status Message\n-----             ------ -------\nrepository-static PASS   检查1524个文件：语法/格式/相对链接/有限机密模式/基线…\n\nPASS: verification preserves value environment state for five process variables.\nEnvironment regression: 3 state groups and structured-suite cleanup passed; native calls are synthetic, product tests NOT_RUN.\nPASS: toolchain archives accept two exact digests and reject two tampered byte cases.\nPASS: committed snapshot, Unicode, full diff and reopened ZIP\nPASS: color.ui always cannot contaminate machine-readable patch\nPASS: PASS requires real command evidence\nPASS: non-ancestor commits\nPASS: dirty tracked delivery\nPASS: untracked delivery\nPASS: forbidden committed member .env\nPASS: forbidden committed member .env.production\nPASS: forbidden committed member .ssh/id\nPASS: forbidden committed member .codex/auth.json\nPASS: forbidden committed member auth/config.json\nPASS: forbidden committed member cert.pem\nPASS: forbidden committed member nested/bin/output\nPASS: forbidden committed member .tools/sdk/file\nPASS: forbidden committed member models/weights.dat\nPASS: forbidden committed member state.db\nPASS: forbidden committed member .cache/item\nPASS: forbidden committed member node_modules/item\nPASS: synthetic token in source\nPASS: removed synthetic token retained in patch\nPASS: reopened archive rejects injected or changed member .git/config\nPASS: reopened archive rejects injected or changed member .env\nPASS: reopened archive rejects injected or changed member ../escape.txt\nPASS: reopened archive rejects injected or changed member source/app.txt\nPASS: git archive export-ignore cannot omit committed source\nPASS: git archive export-subst cannot rewrite committed source\nPASS: git symlink blob cannot silently become source\nPASS: committed submodule cannot be omitted by git archive\nPASS: complete patch rejects removed forbidden environment member\nPASS: reopened archive rejects payload tamper even after checksum rewrite\nPASS: missing checksum/member is rejected on reopen\nPASS: CI PASS cannot be inferred without run metadata\nPASS: explicit CI metadata avoids self-referential commit evidence\nPASS: existing delivery ZIP is preserved\nPASS: valid committed evidence preserves command and status\nReviewPackage: 35 tests, 0 failures; product/container tests NOT_RUN.\nNOT_RUN: .NET原生检查需显式-RunNative及对应任务授权。\nNOT_RUN: Web独立检查需真实目标及显式-RunNative。\nNOT_RUN: 浏览器真实OIDC/E2E需独立受控联调，不隐式混入工程检查。\nPASS: 所选工程检查；范围以逐项输出为准，不表示业务、前端或整个G1通过。\n"
+    },
+    {
+      "check": "canonical snapshot equals actual production-host HTTP export after JSON whitespace normalization",
+      "exitCode": 0,
+      "rawSha256": "b391b856682d90379464dc483f88ccd957e8e0a1e2c66369fd244d54ba8a0cbd",
+      "canonicalSha256": "406c300bea90f259c0167f1dcca58a42a404b2bab57e0a9e7bf9d7ab342350ca",
+      "routes": 28,
+      "schemas": 96
+    },
+    {
+      "check": "all bound source hashes unchanged across commands and repeated generation",
+      "exitCode": 0
+    }
+  ]
+}

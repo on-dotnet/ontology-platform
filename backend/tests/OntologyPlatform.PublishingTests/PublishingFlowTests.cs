@@ -29,7 +29,7 @@ public sealed class PublishingFlowTests
         Assert.AreEqual(fixture.Author.TraceId, r1.TraceId);
         Assert.AreEqual(0, r1.Manifest.Snapshot.CapabilityVersions.Length);
         // 当前草稿发生真实新修订；原始源注释变化也有不同字节hash。
-        var draft2 = await fixture.Ontology.SaveAsync(fixture.Author, first.Draft.DraftId, new SaveDraftRequest { Sources = first.Draft.Sources with { OntologyTurtle = first.Draft.Sources.OntologyTurtle + "\n# revision two\n" }, Command = PublishingFixture.Command(1) }, default);
+        var draft2 = await fixture.Ontology.SaveAsync(fixture.Author, first.Draft.DraftId, new SaveDraftRequest { Name = first.Draft.Name, Sources = first.Draft.Sources with { OntologyTurtle = first.Draft.Sources.OntologyTurtle + "\n# revision two\n" }, Command = PublishingFixture.Command(1) }, default);
         // R2必须重新真实验证和异人批准。
         var second = await fixture.ApproveAsync(await fixture.ProposalForAsync(draft2));
         // 新版本使用R1的完整活动CAS。
@@ -110,7 +110,7 @@ public sealed class PublishingFlowTests
         // pending负例保留原状态，其他负例取得实际审核决定。
         var proposal = condition == "pending" ? item.Proposal : await fixture.Service.DecideAsync(fixture.Reviewer, item.Proposal.ProposalId, new ApprovalDecisionRequest { Decision = condition == "rejected" ? ApprovalDecision.Reject : ApprovalDecision.Approve, Command = PublishingFixture.Command(1) }, default);
         if (condition == "expiry") fixture.Clock.Offset = TimeSpan.FromHours(25);
-        if (condition == "changed") await fixture.Ontology.SaveAsync(fixture.Author, item.Draft.DraftId, new SaveDraftRequest { Sources = item.Draft.Sources with { DataTurtle = item.Draft.Sources.DataTurtle + "\n# advanced\n" }, Command = PublishingFixture.Command(1) }, default);
+        if (condition == "changed") await fixture.Ontology.SaveAsync(fixture.Author, item.Draft.DraftId, new SaveDraftRequest { Name = item.Draft.Name, Sources = item.Draft.Sources with { DataTurtle = item.Draft.Sources.DataTurtle + "\n# advanced\n" }, Command = PublishingFixture.Command(1) }, default);
         // 错误活动修订必须在最终事务CAS时拒绝。
         var request = PublishingFixture.Activation(proposal) with { ExpectedActivationRevision = condition == "cas" ? 9 : 0 };
         // 每个负例都有明确409，外部服务正常不掩盖业务结果。

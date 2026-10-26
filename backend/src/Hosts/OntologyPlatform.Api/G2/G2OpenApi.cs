@@ -44,6 +44,36 @@ public static class G2OpenApi
                 // 每种写入方法独立声明与运行边界一致的防伪要求。
                 foreach (var operation in route.Value.Operations)
                 {
+                    // 只有实际guard要求CAS的五个操作才声明强修订前置条件。
+                    var requiresRevision = (operation.Key == HttpMethod.Put && route.Key == "/api/v1/ontology-drafts/{id}")
+                        || (operation.Key == HttpMethod.Post && route.Key is "/api/v1/ontology-drafts/{id}/edits" or "/api/v1/approvals/{id}/decisions" or "/api/v1/release-activations" or "/api/v1/execution-runs/{id}/cancel");
+                    if (requiresRevision)
+                    {
+                        operation.Value.Parameters ??= [];
+                        operation.Value.Parameters.Add(new OpenApiParameter
+                        {
+                            Name = "If-Match",
+                            In = ParameterLocation.Header,
+                            Required = true,
+                            Description = "必需的强ETag，格式为带双引号的十进制修订，必须与Command.expectedRevision相同；缺失428，旧值或不匹配409。",
+                            Schema = new OpenApiSchema { Type = JsonSchemaType.String, Pattern = "^\"[0-9]+\"$" }
+                        });
+                    }
+                    // G2实际安全边界返回平台Problem，不能公开仅含原生ProblemDetails的弱化结构。
+                    if (operation.Value.Responses is not null)
+                    {
+                        // 状态解析只消费真实响应元数据；逐项绑定同一安全错误结构。
+                        foreach (var response in operation.Value.Responses.Where(item => int.TryParse(item.Key, out var status) && status >= 400))
+                        {
+                            if (response.Value is OpenApiResponse concrete)
+                            {
+                                concrete.Content = new Dictionary<string, OpenApiMediaType>
+                                {
+                                    ["application/problem+json"] = new() { Schema = new OpenApiSchemaReference("PlatformProblem", document) }
+                                };
+                            }
+                        }
+                    }
                     if (operation.Key == HttpMethod.Post || operation.Key == HttpMethod.Put || operation.Key == HttpMethod.Delete || operation.Key == HttpMethod.Patch)
                     {
                         operation.Value.Parameters ??= [];

@@ -17,6 +17,78 @@ namespace OntologyPlatform.SemanticTests;
 [TestClass]
 public sealed class DraftRevisionTests
 {
+    /// <summary>重命名与源修订同事务提交，重放和结构编辑保留名称及源历史。</summary>
+    [TestMethod]
+    public async Task RenamePersistsThroughReopenListReplayAndStructuralEdit()
+    {
+        // 独立真实PG上下文承载本次草稿。
+        await using var database = Database();
+        // 可信双厂操作者不来自客户端输入。
+        var actor = Actor();
+        // 生产服务执行真实Jena解析与事务审计。
+        var service = Service(database);
+        // 原始四份源码作为字节保真基线。
+        var created = await service.CreateAsync(actor, Request(), CancellationToken.None);
+        // 仅名称变化仍必须提交可重放的新修订。
+        var request = new SaveDraftRequest { Name = "重命名后的资产😀", Sources = created.Sources, Command = Command(1) };
+        // 返回值必须包含事务内持久化的新名称。
+        var saved = await service.SaveAsync(actor, created.DraftId, request, CancellationToken.None);
+        Assert.AreEqual(request.Name, saved.Name);
+        Assert.AreEqual(2L, saved.Revision);
+        Assert.AreEqual(created.Sources, saved.Sources);
+        Assert.AreEqual(created.Hashes, saved.Hashes);
+        Assert.AreEqual(JsonSerializer.Serialize(saved), JsonSerializer.Serialize(await service.SaveAsync(actor, created.DraftId, request, CancellationToken.None)));
+        // 独立上下文排除EF跟踪缓存导致的虚假持久化。
+        await using var reopened = Database();
+        // 新服务的读回和目录均必须显示同一名称。
+        var reader = Service(reopened);
+        Assert.AreEqual(request.Name, (await reader.ReadAsync(actor, created.DraftId, CancellationToken.None)).Name);
+        Assert.AreEqual(request.Name, (await reader.ListAsync(actor, CancellationToken.None)).Single(row => row.DraftId == created.DraftId).Name);
+        Assert.AreEqual(2, await reopened.Revisions.CountAsync(row => row.DraftId == created.DraftId));
+        // 结构编辑只修改三元组，不能重置资产名称。
+        var label = saved.Projection.Triples.First(triple => triple.Predicate == "http://www.w3.org/2000/01/rdf-schema#label");
+        // 使用真实投影中的完整旧客体，避免猜测词法。
+        var edited = await reader.EditAsync(actor, saved.DraftId, new EditDraftRequest { Edit = new SemanticEdit { SubjectIri = label.Subject.Value, PredicateIri = label.Predicate, OldObject = label.Object, NewObject = label.Object with { Value = "重命名后结构编辑" } }, Command = Command(2) }, CancellationToken.None);
+        Assert.AreEqual(request.Name, edited.Name);
+        // 历史原文仍逐字保存，不因重命名重新导出源码。
+        var original = await reopened.Revisions.SingleAsync(row => row.DraftId == created.DraftId && row.Revision == 1);
+        Assert.AreEqual(created.Sources, JsonSerializer.Deserialize<SourceBundle>(original.SourcesJson));
+    }
+
+    /// <summary>旧修订、审计失败及非法名称不能留下重命名或新源历史。</summary>
+    [TestMethod]
+    public async Task RenameFailureAndNameBoundsLeaveCommittedNameUnchanged()
+    {
+        // 真实临时PG中的独立草稿用于观察失败后的状态。
+        await using var database = Database();
+        // 当前可信双厂主体。
+        var actor = Actor();
+        // 生产服务先提交有效基线。
+        var service = Service(database);
+        // 初始草稿名称必须在全部失败后保持不变。
+        var created = await service.CreateAsync(actor, Request(), CancellationToken.None);
+        Assert.AreEqual(409, (await Assert.ThrowsAsync<SemanticOperationException>(() => service.SaveAsync(actor, created.DraftId, new SaveDraftRequest { Name = "旧修订不能覆盖", Sources = created.Sources, Command = Command(0) }, CancellationToken.None))).Status);
+        // 故障发生在真实审计写入后，名称也必须随同事务回滚。
+        var failing = new OntologyService(database, SemanticFixture.Runtime(), new FailAfterAudit(Writer()), TimeProvider.System);
+        Assert.AreEqual(503, (await Assert.ThrowsAsync<SemanticOperationException>(() => failing.SaveAsync(actor, created.DraftId, new SaveDraftRequest { Name = "审计失败不能覆盖", Sources = created.Sources, Command = Command(1) }, CancellationToken.None))).Status);
+        // 空白及超长名称与创建采用相同限制，不能被默认空串掩盖。
+        foreach (var name in new[] { "", "  ", new string('名', 201) })
+        {
+            Assert.AreEqual(422, (await Assert.ThrowsAsync<SemanticOperationException>(() => service.SaveAsync(actor, created.DraftId, new SaveDraftRequest { Name = name, Sources = created.Sources, Command = Command(1) }, CancellationToken.None))).Status);
+        }
+        // 新上下文验证失败没有污染已提交头或历史。
+        await using var reopened = Database();
+        Assert.AreEqual(created.Name, (await Service(reopened).ReadAsync(actor, created.DraftId, CancellationToken.None)).Name);
+        Assert.AreEqual(1, await reopened.Revisions.CountAsync(row => row.DraftId == created.DraftId));
+        Assert.AreEqual(1, await reopened.Commands.CountAsync(row => row.SubjectId == actor.SubjectId));
+        // 独立治理读回证明失败没有留下额外审计事实。
+        await using var governance = Governance();
+        Assert.AreEqual(1, await governance.AuditRecords.CountAsync(row => row.Actor == actor.SubjectId));
+        // 与创建一致的200字符上界可成功提交。
+        var maximum = await service.SaveAsync(actor, created.DraftId, new SaveDraftRequest { Name = new string('名', 200), Sources = created.Sources, Command = Command(1) }, CancellationToken.None);
+        Assert.AreEqual(new string('名', 200), maximum.Name);
+    }
+
     /// <summary>保存历史、真实校验、无损读回和旧发布校验绑定必须同时成立。</summary>
     [TestMethod]
     public async Task SourceHistoryValidationAndPublicationBindingAreReal()
@@ -51,7 +123,7 @@ public sealed class DraftRevisionTests
         // 只新增源码注释仍保存独立原文历史，语义图保持相同。
         var changed = request.Sources with { OntologyTurtle = request.Sources.OntologyTurtle + "\n# 修订二完整原文\n" };
         // 期望修订来自先前返回值，不覆盖其他写入。
-        var saved = await service.SaveAsync(actor, draft.DraftId, new SaveDraftRequest { Sources = changed, Command = Command(1) }, CancellationToken.None);
+        var saved = await service.SaveAsync(actor, draft.DraftId, new SaveDraftRequest { Name = draft.Name, Sources = changed, Command = Command(1) }, CancellationToken.None);
         Assert.AreEqual(2L, saved.Revision);
         Assert.AreEqual(draft.AssetId, saved.AssetId);
         Assert.AreEqual(draft.Scope.OrganizationId, saved.Scope.OrganizationId);
@@ -152,7 +224,7 @@ public sealed class DraftRevisionTests
         Assert.AreEqual(OntologyPlatform.Modules.Ontology.Domain.OntologyRules.Hash(request.Sources.VocabularyTurtle!), created.Hashes.VocabularyHash);
         Assert.AreEqual(OntologyPlatform.Modules.Ontology.Domain.OntologyRules.Hash(request.Sources.DataTurtle), created.Hashes.DataHash);
         // 相同源保存仍产生受控修订，但不因BOM规范化改变原文/hash。
-        var saved = await service.SaveAsync(actor, created.DraftId, new SaveDraftRequest { Sources = request.Sources, Command = Command(1) }, CancellationToken.None);
+        var saved = await service.SaveAsync(actor, created.DraftId, new SaveDraftRequest { Name = created.Name, Sources = request.Sources, Command = Command(1) }, CancellationToken.None);
         Assert.AreEqual(2L, saved.Revision);
         Assert.AreEqual(created.Hashes, saved.Hashes);
         Assert.AreEqual(request.Sources, saved.Sources);
@@ -223,7 +295,7 @@ public sealed class DraftRevisionTests
         var unavailable = Service(database, UnavailableRuntime());
         Assert.AreEqual(JsonSerializer.Serialize(created), JsonSerializer.Serialize(await unavailable.CreateAsync(actor, request, CancellationToken.None)));
         // 初次保存使用正常运行时，随后同一请求在故障运行时重放。
-        var save = new SaveDraftRequest { Sources = request.Sources with { OntologyTurtle = request.Sources.OntologyTurtle + "\n# 重放\n" }, Command = Command(1) };
+        var save = new SaveDraftRequest { Name = created.Name, Sources = request.Sources with { OntologyTurtle = request.Sources.OntologyTurtle + "\n# 重放\n" }, Command = Command(1) };
         // 保存真实revision2。
         var saved = await Service(database).SaveAsync(actor, created.DraftId, save, CancellationToken.None);
         Assert.AreEqual(JsonSerializer.Serialize(saved), JsonSerializer.Serialize(await unavailable.SaveAsync(actor, created.DraftId, save, CancellationToken.None)));
@@ -274,7 +346,7 @@ public sealed class DraftRevisionTests
             var reader = actor with { Roles = [role] };
             Assert.AreEqual(draft.DraftId, (await service.ReadAsync(reader, draft.DraftId, CancellationToken.None)).DraftId);
             Assert.IsTrue((await service.ListAsync(reader, CancellationToken.None)).Any(row => row.DraftId == draft.DraftId));
-            if (role != "platform.operator") Assert.AreEqual(403, (await Assert.ThrowsAsync<SemanticOperationException>(() => service.SaveAsync(reader, draft.DraftId, new SaveDraftRequest { Sources = draft.Sources, Command = Command(1) }, CancellationToken.None))).Status);
+            if (role != "platform.operator") Assert.AreEqual(403, (await Assert.ThrowsAsync<SemanticOperationException>(() => service.SaveAsync(reader, draft.DraftId, new SaveDraftRequest { Name = draft.Name, Sources = draft.Sources, Command = Command(1) }, CancellationToken.None))).Status);
         }
         foreach (var role in new[] { "operator", "viewer", "auditor", "platform.unknown" })
             Assert.AreEqual(403, (await Assert.ThrowsAsync<SemanticOperationException>(() => service.ListAsync(actor with { Roles = [role] }, CancellationToken.None))).Status);
@@ -298,8 +370,8 @@ public sealed class DraftRevisionTests
         var service = Service(database);
         // 已提交revision1。
         var draft = await service.CreateAsync(actor, Request(), CancellationToken.None);
-        Assert.AreEqual(422, (await Assert.ThrowsAsync<SemanticOperationException>(() => service.SaveAsync(actor, draft.DraftId, new SaveDraftRequest { Sources = draft.Sources with { OntologyTurtle = "not Turtle" }, Command = Command(1) }, CancellationToken.None))).Status);
-        Assert.AreEqual(409, (await Assert.ThrowsAsync<SemanticOperationException>(() => service.SaveAsync(actor, draft.DraftId, new SaveDraftRequest { Sources = draft.Sources, Command = Command(0) }, CancellationToken.None))).Status);
+        Assert.AreEqual(422, (await Assert.ThrowsAsync<SemanticOperationException>(() => service.SaveAsync(actor, draft.DraftId, new SaveDraftRequest { Name = draft.Name, Sources = draft.Sources with { OntologyTurtle = "not Turtle" }, Command = Command(1) }, CancellationToken.None))).Status);
+        Assert.AreEqual(409, (await Assert.ThrowsAsync<SemanticOperationException>(() => service.SaveAsync(actor, draft.DraftId, new SaveDraftRequest { Name = draft.Name, Sources = draft.Sources, Command = Command(0) }, CancellationToken.None))).Status);
         Assert.AreEqual(draft.Sources, (await service.ReadAsync(actor, draft.DraftId, CancellationToken.None)).Sources);
         Assert.AreEqual(1, await database.Revisions.CountAsync(row => row.DraftId == draft.DraftId));
     }
@@ -407,7 +479,7 @@ public sealed class DraftRevisionTests
     {
         try
         {
-            await service.SaveAsync(actor, draft.DraftId, new SaveDraftRequest { Sources = draft.Sources with { OntologyTurtle = draft.Sources.OntologyTurtle + "\n# " + marker }, Command = Command(1) }, CancellationToken.None);
+            await service.SaveAsync(actor, draft.DraftId, new SaveDraftRequest { Name = draft.Name, Sources = draft.Sources with { OntologyTurtle = draft.Sources.OntologyTurtle + "\n# " + marker }, Command = Command(1) }, CancellationToken.None);
             return 200;
         }
         catch (SemanticOperationException exception) { return exception.Status; }

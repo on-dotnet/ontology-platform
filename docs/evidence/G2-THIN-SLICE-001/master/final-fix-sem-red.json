@@ -1,0 +1,177 @@
+{
+  "exitCode": 2,
+  "records": [
+    {
+      "check": "public-jena-fixture-modes",
+      "exitCode": 0,
+      "modes": {
+        "fixture": "0o755",
+        "config.ttl": "0o644",
+        "log4j2.properties": "0o644"
+      }
+    },
+    {
+      "command": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g2-sem-f0c0884c8f82",
+        "--publish",
+        "127.0.0.1::3030",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--mount",
+        "type=bind,src=/private/tmp/g2-sem-f0c0884c8f820_byzn80/fixture,dst=/fixture,readonly",
+        "--entrypoint",
+        "java",
+        "ontology-platform-g2-fuseki:6.2.0",
+        "-Xmx384m",
+        "-Dlog4j.configurationFile=/fixture/log4j2.properties",
+        "-jar",
+        "/opt/fuseki/fuseki-server.jar",
+        "--config=/fixture/config.ttl"
+      ],
+      "exitCode": 0,
+      "output": "728f64dcfa0a4e2a4cbff7b75491003f8f25871978e24c57d063761a78943a1e\n"
+    },
+    {
+      "command": [
+        "docker",
+        "port",
+        "g2-sem-f0c0884c8f82",
+        "3030/tcp"
+      ],
+      "exitCode": 0,
+      "output": "127.0.0.1:64052\n"
+    },
+    {
+      "command": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g2-sem-f0c0884c8f82-pg",
+        "--publish",
+        "127.0.0.1::5432",
+        "--env",
+        "POSTGRES_PASSWORD",
+        "--env",
+        "POSTGRES_DB",
+        "--memory",
+        "512m",
+        "--cpus",
+        "1",
+        "--tmpfs",
+        "/var/lib/postgresql",
+        "postgres:18.6-trixie@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6"
+      ],
+      "exitCode": 0,
+      "output": "08bd4a1407915d9434a1765014b6df2f31ef66ba48964b9f66362c391692554e\n"
+    },
+    {
+      "command": [
+        "docker",
+        "port",
+        "g2-sem-f0c0884c8f82-pg",
+        "5432/tcp"
+      ],
+      "exitCode": 0,
+      "output": "127.0.0.1:64059\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "build",
+        "backend/tests/OntologyPlatform.SemanticTests",
+        "--no-restore"
+      ],
+      "exitCode": 0,
+      "output": "  OntologyPlatform.Contracts -> /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/bin/Debug/net10.0/OntologyPlatform.Contracts.dll\n  OntologyPlatform.Modules.Governance -> /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/bin/Debug/net10.0/OntologyPlatform.Modules.Governance.dll\n  OntologyPlatform.Modules.Ontology.Domain -> /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.Domain.dll\n  OntologyPlatform.Modules.Ontology -> /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.dll\n  OntologyPlatform.SemanticTests -> /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll\n\n已成功生成。\n    0 个警告\n    0 个错误\n\n已用时间 00:00:00.33\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "tool",
+        "restore"
+      ],
+      "exitCode": 0,
+      "output": "工具“dotnet-ef”(版本“10.0.13”)已还原。可用的命令: dotnet-ef\n\n还原成功。\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "tool",
+        "run",
+        "dotnet-ef",
+        "database",
+        "update",
+        "--project",
+        "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance",
+        "--startup-project",
+        "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance",
+        "--no-build"
+      ],
+      "exitCode": 0,
+      "output": "Failed executing DbCommand (7ms) [Parameters=[], CommandType='Text', CommandTimeout='30']\nSELECT \"MigrationId\", \"ProductVersion\"\nFROM governance.\"__EFMigrationsHistory\"\nORDER BY \"MigrationId\";\nAcquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.\nApplying migration '20261025062847_InitialGovernance'.\nApplying migration '20261025144246_AuditScopeSites'.\nAcquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.\nDone.\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "tool",
+        "run",
+        "dotnet-ef",
+        "database",
+        "update",
+        "--project",
+        "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology",
+        "--startup-project",
+        "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology",
+        "--no-build"
+      ],
+      "exitCode": 0,
+      "output": "Failed executing DbCommand (7ms) [Parameters=[], CommandType='Text', CommandTimeout='30']\nSELECT \"MigrationId\", \"ProductVersion\"\nFROM ontology.\"__EFMigrationsHistory\"\nORDER BY \"MigrationId\";\nAcquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.\nApplying migration '20261026003221_InitialOntology'.\nDone.\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "test",
+        "--project",
+        "backend/tests/OntologyPlatform.SemanticTests",
+        "--no-restore",
+        "--",
+        "--filter",
+        "FullyQualifiedName~Rename"
+      ],
+      "exitCode": 2,
+      "output": "正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n失败 RenamePersistsThroughReopenListReplayAndStructuralEdit (1s 637ms)\n  从 /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  Assertion failed. 预期字符串相等。\n  字符串长度不同(预期: 9，实际: 37)，且有 1 处不同。首次差异位于索引 0。\n  \n  expected:    \"重命名后的资产😀\"\n  actual:      \"合成草稿-4a99c055508645e7b8115c1a2156a306\"\n  difference:  -^\n  code points: expected U+91CD; actual U+5408\n  \n  Assert.AreEqual(request.Name, saved.Name)\n    在 OntologyPlatform.SemanticTests.DraftRevisionTests.RenamePersistsThroughReopenListReplayAndStructuralEdit() 位于 /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs:36\n    在 OntologyPlatform.SemanticTests.DraftRevisionTests.RenamePersistsThroughReopenListReplayAndStructuralEdit() 位于 /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs:55\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n失败 RenameFailureAndNameBoundsLeaveCommittedNameUnchanged (723ms)\n  从 /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  Assertion failed. Expected exception of type SemanticOperationException (or derived) but no exception was thrown.\n  \n  Assert.ThrowsAsync<SemanticOperationException>(() => service.SaveAsync(actor, created.DraftId, new SaveDraftRequest { Name = name, Sources = created.Sources, Command = Command(1) }, CancellationToken.None))\n    在 Microsoft.VisualStudio.TestTools.UnitTesting.Assert.ThrowsExceptionAsync[TException](Func`1 action, Boolean isStrictType, String message, String actionExpression, String assertMethodName)\n    在 OntologyPlatform.SemanticTests.DraftRevisionTests.RenameFailureAndNameBoundsLeaveCommittedNameUnchanged() 位于 /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs:76\n    在 OntologyPlatform.SemanticTests.DraftRevisionTests.RenameFailureAndNameBoundsLeaveCommittedNameUnchanged() 位于 /Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs:84\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64) 失败并出现 2 个错误 (3s 854ms)\n退出代码: 2\n\n测试运行摘要: 失败!\n  总计: 2\n  失败: 2\n  成功: 0\n  已跳过: 0\n  持续时间: 3s 971ms\n已完成测试运行，但显示非成功退出代码: 2 (请参阅: https://aka.ms/testingplatform/exitcodes)\n"
+    },
+    {
+      "check": "all temporary graph triples removed",
+      "count": 0,
+      "status": "PASS"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g2-sem-f0c0884c8f82"
+      ],
+      "exitCode": 0,
+      "output": "g2-sem-f0c0884c8f82\n"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g2-sem-f0c0884c8f82-pg"
+      ],
+      "exitCode": 0,
+      "output": "g2-sem-f0c0884c8f82-pg\n"
+    }
+  ]
+}

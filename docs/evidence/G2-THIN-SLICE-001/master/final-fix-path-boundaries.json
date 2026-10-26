@@ -1,0 +1,218 @@
+{
+  "scope": "Actual extracted guards only; synthetic path strings; no runtime/cookie/credential file opened; Windows path semantics checked on Mac, Windows runtime NOT_RUN",
+  "exitCode": 0,
+  "sourceHashes": {
+    "g2-live-browser.mjs": "fef10abedbc5a68ff314feb4173165189d47212db3d221f627db451dcf773956",
+    "g2-trace-browser.mjs": "3786009ed823fafa9c4af2dc99302e000b5436681cecf885aa7ff0ffc86a72a2"
+  },
+  "records": [
+    {
+      "script": "g2-live-browser.mjs",
+      "style": "posix",
+      "path": "/synthetic/repo/.tools/security/runtime.json",
+      "expected": true,
+      "accepted": true,
+      "status": "PASS"
+    },
+    {
+      "script": "g2-live-browser.mjs",
+      "style": "posix",
+      "path": "/synthetic/repo/.tools/security/sub/runtime.json",
+      "expected": true,
+      "accepted": true,
+      "status": "PASS"
+    },
+    {
+      "script": "g2-live-browser.mjs",
+      "style": "posix",
+      "path": "/synthetic/repo/.tools",
+      "expected": false,
+      "accepted": false,
+      "status": "PASS"
+    },
+    {
+      "script": "g2-live-browser.mjs",
+      "style": "posix",
+      "path": "/synthetic/repo/.tools/security",
+      "expected": false,
+      "accepted": false,
+      "status": "PASS"
+    },
+    {
+      "script": "g2-live-browser.mjs",
+      "style": "posix",
+      "path": "/synthetic/repo/.tools/security-other/runtime.json",
+      "expected": false,
+      "accepted": false,
+      "status": "PASS"
+    },
+    {
+      "script": "g2-live-browser.mjs",
+      "style": "posix",
+      "path": "/synthetic/repo/.tools/security/../../outside.json",
+      "expected": false,
+      "accepted": false,
+      "status": "PASS"
+    },
+    {
+      "script": "g2-live-browser.mjs",
+      "style": "win32",
+      "path": "C:\\synthetic\\repo\\.tools\\security\\runtime.json",
+      "expected": true,
+      "accepted": true,
+      "status": "PASS"
+    },
+    {
+      "script": "g2-live-browser.mjs",
+      "style": "win32",
+      "path": "C:\\synthetic\\repo\\.tools\\security\\sub\\runtime.json",
+      "expected": true,
+      "accepted": true,
+      "status": "PASS"
+    },
+    {
+      "script": "g2-live-browser.mjs",
+      "style": "win32",
+      "path": "C:\\synthetic\\repo\\.tools",
+      "expected": false,
+      "accepted": false,
+      "status": "PASS"
+    },
+    {
+      "script": "g2-live-browser.mjs",
+      "style": "win32",
+      "path": "C:\\synthetic\\repo\\.tools\\security",
+      "expected": false,
+      "accepted": false,
+      "status": "PASS"
+    },
+    {
+      "script": "g2-live-browser.mjs",
+      "style": "win32",
+      "path": "C:\\synthetic\\repo\\.tools\\security-other\\runtime.json",
+      "expected": false,
+      "accepted": false,
+      "status": "PASS"
+    },
+    {
+      "script": "g2-live-browser.mjs",
+      "style": "win32",
+      "path": "D:\\synthetic\\runtime.json",
+      "expected": false,
+      "accepted": false,
+      "status": "PASS"
+    },
+    {
+      "script": "g2-live-browser.mjs",
+      "style": "win32",
+      "path": "C:\\synthetic\\repo\\.tools\\security\\..\\..\\outside.json",
+      "expected": false,
+      "accepted": false,
+      "status": "PASS"
+    },
+    {
+      "script": "g2-trace-browser.mjs",
+      "style": "posix",
+      "path": "/synthetic/repo/.tools/security/runtime.json",
+      "expected": true,
+      "accepted": true,
+      "status": "PASS"
+    },
+    {
+      "script": "g2-trace-browser.mjs",
+      "style": "posix",
+      "path": "/synthetic/repo/.tools/security/sub/runtime.json",
+      "expected": true,
+      "accepted": true,
+      "status": "PASS"
+    },
+    {
+      "script": "g2-trace-browser.mjs",
+      "style": "posix",
+      "path": "/synthetic/repo/.tools",
+      "expected": false,
+      "accepted": false,
+      "status": "PASS"
+    },
+    {
+      "script": "g2-trace-browser.mjs",
+      "style": "posix",
+      "path": "/synthetic/repo/.tools/security",
+      "expected": false,
+      "accepted": false,
+      "status": "PASS"
+    },
+    {
+      "script": "g2-trace-browser.mjs",
+      "style": "posix",
+      "path": "/synthetic/repo/.tools/security-other/runtime.json",
+      "expected": false,
+      "accepted": false,
+      "status": "PASS"
+    },
+    {
+      "script": "g2-trace-browser.mjs",
+      "style": "posix",
+      "path": "/synthetic/repo/.tools/security/../../outside.json",
+      "expected": false,
+      "accepted": false,
+      "status": "PASS"
+    },
+    {
+      "script": "g2-trace-browser.mjs",
+      "style": "win32",
+      "path": "C:\\synthetic\\repo\\.tools\\security\\runtime.json",
+      "expected": true,
+      "accepted": true,
+      "status": "PASS"
+    },
+    {
+      "script": "g2-trace-browser.mjs",
+      "style": "win32",
+      "path": "C:\\synthetic\\repo\\.tools\\security\\sub\\runtime.json",
+      "expected": true,
+      "accepted": true,
+      "status": "PASS"
+    },
+    {
+      "script": "g2-trace-browser.mjs",
+      "style": "win32",
+      "path": "C:\\synthetic\\repo\\.tools",
+      "expected": false,
+      "accepted": false,
+      "status": "PASS"
+    },
+    {
+      "script": "g2-trace-browser.mjs",
+      "style": "win32",
+      "path": "C:\\synthetic\\repo\\.tools\\security",
+      "expected": false,
+      "accepted": false,
+      "status": "PASS"
+    },
+    {
+      "script": "g2-trace-browser.mjs",
+      "style": "win32",
+      "path": "C:\\synthetic\\repo\\.tools\\security-other\\runtime.json",
+      "expected": false,
+      "accepted": false,
+      "status": "PASS"
+    },
+    {
+      "script": "g2-trace-browser.mjs",
+      "style": "win32",
+      "path": "D:\\synthetic\\runtime.json",
+      "expected": false,
+      "accepted": false,
+      "status": "PASS"
+    },
+    {
+      "script": "g2-trace-browser.mjs",
+      "style": "win32",
+      "path": "C:\\synthetic\\repo\\.tools\\security\\..\\..\\outside.json",
+      "expected": false,
+      "accepted": false,
+      "status": "PASS"
+    }
+  ]
+}
