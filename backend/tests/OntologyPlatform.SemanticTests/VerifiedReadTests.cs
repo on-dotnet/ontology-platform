@@ -179,6 +179,93 @@ public sealed class VerifiedReadTests
         Assert.AreEqual(1, blocked);
     }
 
+    /// <summary>单源业务三元组边界不包含内部marker，4999和5000合法，5001明确拒绝。</summary>
+    [TestMethod]
+    [DataRow(4999)]
+    [DataRow(5000)]
+    [DataRow(5001)]
+    public async Task TemporaryMarkerDoesNotConsumeBusinessTripleBudget(int count)
+    {
+        // 同主体同谓词短literal避免无关节点、边和字节预算掩盖三元组边界。
+        var source = new SourceBundle { OntologyTurtle = BoundedTriples(count) };
+        // 计数来自真实RIOT而非预置JSON。
+        var runtime = SemanticFixture.Runtime();
+        if (count <= 5000)
+        {
+            // 投影必须包含全部业务三元组，既不少一条也不包含marker。
+            var analysis = await runtime.AnalyzeAsync(source, 1, CancellationToken.None);
+            Assert.AreEqual(count, analysis.Projection.Triples.Length);
+            Assert.AreEqual(OntologyRules.Hash(source.OntologyTurtle), analysis.Hashes.OntologyHash);
+        }
+        else
+        {
+            // 超过业务上限仍返回明确拒绝，不因多容纳内部marker而放宽业务图。
+            var error = await Assert.ThrowsAsync<SemanticOperationException>(() => runtime.AnalyzeAsync(source, 1, CancellationToken.None));
+            Assert.AreEqual(422, error.Status);
+            Assert.AreEqual("rdf_triple_budget", error.Code);
+        }
+    }
+
+    /// <summary>正式同批读维持四源合计预算，合法总量4999/5000成功、5001失败且不访问正式图。</summary>
+    [TestMethod]
+    [DataRow(4999)]
+    [DataRow(5000)]
+    [DataRow(5001)]
+    public async Task VerifiedReadRetainsAggregateBusinessTripleBudget(int count)
+    {
+        // ontology一条且data非空，避免空正式图缺失规则干扰合计预算测试。
+        var source = Sources() with { VocabularyTurtle = null, DataTurtle = BoundedTriples(count - 1) };
+        // 全部hash与snapshot都精确绑定当前合成源。
+        var manifest = Manifest(source);
+        // 统计实际正式GET，合法路径仍只能读取每图一次。
+        var formalReads = 0;
+        // 只计数真实HTTP请求，不拦截或伪造响应。
+        ISemanticRuntime runtime = SemanticFixture.RuntimeWithGate((request, _) =>
+        {
+            if (request.Method == HttpMethod.Get && request.RequestUri!.AbsolutePath == "/ontology/data") Interlocked.Increment(ref formalReads);
+            return Task.CompletedTask;
+        });
+        if (count <= 5000)
+        {
+            await runtime.DeployAsync(manifest, source, CancellationToken.None);
+            // 正式读返回同批完整业务三元组，不能由内部marker挤占一条。
+            var result = await runtime.ReadVerifiedPublishedAsync(manifest, source, CancellationToken.None);
+            Assert.AreEqual(count, result.OntologyTriples.Length + result.DataTriples.Length);
+            Assert.AreEqual(2, formalReads);
+        }
+        else
+        {
+            // 两个单源各自不过限但合计5001，必须在正式访问前失败关闭。
+            var error = await Assert.ThrowsAsync<SemanticOperationException>(() => runtime.ReadVerifiedPublishedAsync(manifest, source, CancellationToken.None));
+            Assert.AreEqual(503, error.Status);
+            Assert.AreEqual(0, formalReads);
+        }
+    }
+
+    /// <summary>5001条真实正式图读取仍受原5000上限约束，临时marker许可不能泄漏到正式读。</summary>
+    [TestMethod]
+    public async Task PublishedGraphDoesNotReceiveTemporaryMarkerAllowance()
+    {
+        // 合法源总计5000且两个正式图都非空。
+        var source = Sources() with { VocabularyTurtle = null, DataTurtle = BoundedTriples(4999) };
+        // 当前清单严格绑定源，而后续故障注入只改变真实正式data图。
+        var manifest = Manifest(source);
+        // 生产运行时走真实部署与读回。
+        ISemanticRuntime runtime = SemanticFixture.Runtime();
+        await runtime.DeployAsync(manifest, source, CancellationToken.None);
+        await ChangeGraphAsync(manifest.DataGraphIri, BoundedTriples(5001), CancellationToken.None);
+        // 原受控低层读也不得一般性接受额外一条业务数据。
+        var direct = await Assert.ThrowsAsync<SemanticOperationException>(() => runtime.ReadPublishedAsync(manifest.Snapshot, CancellationToken.None));
+        Assert.AreEqual(422, direct.Status);
+        Assert.AreEqual("rdf_triple_budget", direct.Code);
+        // 消费边界把损坏正式资产映射不可用，不返回截断成功。
+        var verified = await Assert.ThrowsAsync<SemanticOperationException>(() => runtime.ReadVerifiedPublishedAsync(manifest, source, CancellationToken.None));
+        Assert.AreEqual(503, verified.Status);
+    }
+
+    /// <summary>生成一个主体和短字面量组成的指定数量业务三元组，不触发其他资源上限。</summary>
+    private static string BoundedTriples(int count) => string.Join('\n', Enumerable.Range(0, count).Select(index => $"<urn:s> <urn:p> \"{index}\" ."));
+
     /// <summary>精确字节散列的测试清单不依赖生产序列化器构造期望值。</summary>
     private static ReleaseManifest Manifest(SourceBundle source)
     {

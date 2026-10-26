@@ -283,8 +283,8 @@ public sealed class JenaSemanticRuntime : ISemanticRuntime
             var marker = new RdfTriple { Subject = new RdfTerm { Kind = RdfTermKind.Iri, Value = markerIri }, Predicate = markerIri, Object = new RdfTerm { Kind = RdfTermKind.Iri, Value = markerIri } };
             // 原文仅用于本次RIOT请求，绝不改写权威源码或其散列。
             var graph = await LoadAsync(JenaRdfCodec.Triple(marker) + "\n" + SourceDocument(source, sourceIndex++), graphs, token);
-            // 丢图仍由GSP返回503；即使回读200也必须包含本次标记，不能把重启/替换当空图。
-            var parsed = await ReadGraphAsync(validation, graph, token);
+            // 仅本次内部读取额外容纳一条marker；丢图仍503，回读必须含本次标记，不能把重启/替换当空图。
+            var parsed = JenaRdfCodec.Parse(await SendAsync(validation, "data?graph=" + Uri.EscapeDataString(graph), HttpMethod.Get, null, "application/rdf+json", token), allowTemporaryMarker: true);
             if (parsed.Count(triple => triple == marker) != 1) throw new SemanticOperationException(503, "temporary_graph_incomplete");
             // 精确剔除本次标记后才做预算、Shape、投影、编辑与正式部署，不按命名空间丢业务公理。
             result.Add(parsed.Where(triple => triple != marker).ToArray());
