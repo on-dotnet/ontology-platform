@@ -160,3 +160,17 @@ Master明确派工继续已批准RDF语义兼容修复。基线`01c404c85f6ae722
 - backend cwd三文件`dotnet format OntologyPlatform.slnx --no-restore --include src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaRdfCodec.cs tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs --verify-no-changes`：exit0；`dotnet build backend/OntologyPlatform.slnx --no-restore`：exit0，既存ASPIRE010 warning不改。`pwsh -NoProfile -File scripts/verify.ps1 -SelfTest`与`git diff --check`均exit0，完整输出见unicode-literal-verification.json；SelfTest检查器正反例不计入64项产品测试。
 
 源码已通知Master和AI Owner供其原AI Unicode长边界联调；AI分片、QRY/Host跨模块集成及同Head CI/唯一ZIP不由本次SEM测试替代。整体继续DRAFT、等待限定独立复核；64项仍含原有类型存在、旧接口默认行为与catalog替身消费边界，不宣称64个独立端到端场景。源码/证据分提交，完成即停止，不合main或派Agent。
+
+## BOM现有保护的真实回归验证（无生产修复）
+
+本批初始派工怀疑前置BASE把原BOM移到文档中间；Master提供的三对照探针真实显示原文起始BOM可解析、BASE后接BOM失败。但核对当前SEM64基线后发现SourceDocument早已在**临时解析视图**调用`source.TrimStart('\uFEFF')`，根因条件未出现在当前生产实现。Master确认并收回“当前生产缺口”的未证实判断，更新授权为只做四源/PG保真验证，不为单枚措辞扩大多BOM行为，不修改生产或伪造RED。此轮基线`accb82a38e7ceae0ce6216317586da2990351b7f`；Unicode生产源码仍完整保持`75f9ce84a71578bf126eb5ebb228f145cb8847a4`。
+
+只新增VerifiedReadTests两种可选词汇用例与DraftRevisionTests一个持久化用例，无代码修复/依赖/合同/迁移/runner变更。四源都有前导BOM：本体和数据含相对IRI、literal中间有FEFF及😀𠀀，Shapes仅prefix带BOM，vocabulary分别仅BOM及含相对IRI/中间FEFF。真实Analyze两次保持固定文档base与原文hash；no-op编辑返回完全相同SourceBundle；Validate、Deploy、Verify、ReadVerified全部成功；only-BOM词汇形成空业务图，其他literal中间FEFF保留，ontology/vocabulary/data仍各用0/2/3默认base。原始四源前导BOM在SourceBundle中保留，从未被临时视图写回。
+
+真实PG测试创建完整Synthetic四源BOM源并在数据literal内部保留FEFF；四hash逐项等于含BOM原始UTF8散列。Save相同源推进revision2但hash/原文不变，随后no-op Edit仍保留全源；全部真实历史修订均等于原始SourceBundle，新上下文读回一致，Diff源为空且三元组0增/0删。不假设no-op服务一定新建修订，不把返回对象缓存冒充持久历史。
+
+实际命令：`python3 scripts/acceptance/semantic-roundtrip.py --postgres --label bom-source-baseline-green`：exit0，67/67通过、0跳过（原64+新增3），生产源码没有变化。真实交付PG迁移、RIOT/SHACL/TDB2，暂存图三元组0，两个临时容器均删除。见bom-source-baseline-green.json。此结果是**当前已有保护的PASS证据，不是修复前失败后通过**；未制造不存在的基线红灯，也未运行不必要的临时变异。
+
+验证命令及完整cwd/退出码/输出记录bom-source-verification.json：backend cwd精准两测试文件`dotnet format OntologyPlatform.slnx --no-restore --include tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs --verify-no-changes`；`dotnet build backend/tests/OntologyPlatform.SemanticTests --no-restore`；`pwsh -NoProfile -File scripts/verify.ps1 -SelfTest`；`git diff --check`；`git diff --exit-code 75f9ce84a71578bf126eb5ebb228f145cb8847a4 -- backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology`证明生产实现保持原样。上述五项均exit0。SelfTest检查器不计入67项产品测试。
+
+继续DRAFT，供Master将Unicode源码与此BOM回归一起限定独立Review；其他跨模块集成/监控/CI与唯一ZIP由Master负责，此报告不越界宣称完成。只提交必要测试和证据，完成后停止。
