@@ -177,3 +177,8 @@ ActorContext.Roles保留G1已验证的完整platform.viewer/platform.operator/pl
 正式releaseId为服务端GuidN；图urn:ontology-platform:release:{releaseId}:ontology与:data。RDF四份源的隐含默认文档基址固定https://ontology.invalid/source/{0..3}/（顺序ontology/shapes/vocabulary/data），显式BASE优先，解析/编辑/SHACL/部署同策略，不网络获取。该默认值只保证文档内相对IRI跨请求稳定，不赋予组织/厂区身份；Synthetic事实采用绝对含org/site/source的IRI，Gateway按固定graph/scope授权，不跨asset按同IRI/外部号猜合并。
 
 C#唯一DTO在输入和输出都执行非空及判别校验，避免JsonRequired仅检查存在的缺口；标准Schema和TS保留互斥分支、终态literal与事件版本1。真实运行OpenAPI仍须按此边界输出，不因本轮schema-only bootstrap已生成就标实际API通过。
+
+
+接口对齐：GET /semantic/discover?assetId={id}&releaseId?固定返回SemanticQueryResult，与describe_ontology同一Gateway（data.kind=ontology），同时包含版本/来源/Trace；GET /capabilities返回SemanticCapability[]；证据GET返回重新授权EvidenceRef。ReleaseActivation/ReleaseSummary/ExecutionRun补实际持久TraceId，供记录页专业诊断，不猜测Trace。
+
+PUB测试新工程及其私有锁由G2-PUB卡明确转交唯一Owner，仅允许既有MSTest与批准ProjectReferences；其他公共项目/锁/迁移不变。这避免先交空测试破坏CI，不降低依赖/零测试策略。capabilityVersions在QRY未实现时为空并明确absent，完整G2演示须在真实registry存在后发布绑定能力版本的R1/R2，不用早期absent快照冒充查询闭环。

@@ -998,6 +998,11 @@
           "name": "ActivatedAtUtc",
           "type": "DateTimeOffset",
           "description": "提交的激活时间。"
+        },
+        {
+          "name": "TraceId",
+          "type": "string",
+          "description": "激活事务实际Trace，用于审计与专业诊断关联。"
         }
       ],
       "base": null
@@ -1029,6 +1034,11 @@
           "name": "Status",
           "type": "ReleaseStatus",
           "description": "真实准备或活动状态。"
+        },
+        {
+          "name": "TraceId",
+          "type": "string",
+          "description": "该正式版本最近一次激活的持久Trace，不猜测运行标识。"
         }
       ],
       "base": null
@@ -1711,6 +1721,11 @@
           "name": "FencingToken",
           "type": "long",
           "description": "防过期执行者提交的单调标识。"
+        },
+        {
+          "name": "TraceId",
+          "type": "string",
+          "description": "创建时固定且由执行链关联的实际Trace。"
         }
       ],
       "base": null

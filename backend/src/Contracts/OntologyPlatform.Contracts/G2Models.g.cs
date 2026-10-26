@@ -1173,6 +1173,10 @@ public sealed record ReleaseActivation : IJsonOnDeserialized, IJsonOnSerializing
     [JsonRequired]
     public DateTimeOffset ActivatedAtUtc { get; init; } = default;
 
+    /// <summary>激活事务实际Trace，用于审计与专业诊断关联。</summary>
+    [JsonRequired]
+    public string TraceId { get; init; } = string.Empty;
+
     /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
     void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
 
@@ -1203,6 +1207,10 @@ public sealed record ReleaseSummary : IJsonOnDeserialized, IJsonOnSerializing
     /// <summary>真实准备或活动状态。</summary>
     [JsonRequired]
     public ReleaseStatus Status { get; init; } = default;
+
+    /// <summary>该正式版本最近一次激活的持久Trace，不猜测运行标识。</summary>
+    [JsonRequired]
+    public string TraceId { get; init; } = string.Empty;
 
     /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
     void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
@@ -1847,6 +1855,10 @@ public sealed record ExecutionRun : IJsonOnDeserialized, IJsonOnSerializing
     /// <summary>防过期执行者提交的单调标识。</summary>
     [JsonRequired]
     public long FencingToken { get; init; } = default;
+
+    /// <summary>创建时固定且由执行链关联的实际Trace。</summary>
+    [JsonRequired]
+    public string TraceId { get; init; } = string.Empty;
 
     /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
     void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
