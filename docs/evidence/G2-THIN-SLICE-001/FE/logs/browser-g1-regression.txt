@@ -1,0 +1,19 @@
+COMMAND: /opt/homebrew/opt/node@24/bin/node node_modules/@playwright/test/cli.js test --config playwright.config.ts
+[WebServer] (node:33187) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:33188) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 5 tests using 1 worker
+
+(node:33189) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/ui/workspace.spec.ts:8:1 › 1280布局、键盘详情、浅色持久化和Console (442ms)
+  ✓  2 tests/ui/workspace.spec.ts:31:1 › 宽屏、移动导航、授权范围与搜索空状态 (640ms)
+  ✓  3 tests/ui/workspace.spec.ts:49:1 › 加载中、403、网络错误、空集合和会话过期各自准确 (366ms)
+  ✓  4 tests/ui/workspace.spec.ts:67:1 › 审计拒绝和公开注销面板 (217ms)
+  ✓  5 tests/ui/workspace.spec.ts:77:1 › 390关闭导航跳过屏外Tab且响应式桌面菜单可用 (695ms)
+
+  5 passed (3.1s)
+
+EXIT_CODE=0

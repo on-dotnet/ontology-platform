@@ -47,7 +47,15 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
   useEffect(() => {
     if (!dirty) return;
     const beforeUnload = (event: BeforeUnloadEvent) => { event.preventDefault(); };
-    window.addEventListener("beforeunload", beforeUnload); return () => window.removeEventListener("beforeunload", beforeUnload);
+    /** Next客户端导航不触发beforeunload；捕获同源导航以保留本地缓冲。 */
+    const beforeNavigate = (event: MouseEvent) => {
+      const anchor = event.target instanceof Element ? event.target.closest<HTMLAnchorElement>("a[href]") : null;
+      if (!anchor || anchor.download || anchor.target === "_blank" || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+      const target = new URL(anchor.href, location.href);
+      if (target.origin === location.origin && target.pathname !== location.pathname) { event.preventDefault(); event.stopPropagation(); setNotice("当前草稿有未保存内容，已保留本地文本。请先保存或显式丢弃，再切换工作区。"); }
+    };
+    window.addEventListener("beforeunload", beforeUnload); document.addEventListener("click", beforeNavigate, true);
+    return () => { window.removeEventListener("beforeunload", beforeUnload); document.removeEventListener("click", beforeNavigate, true); };
   }, [dirty]);
   /** 用户显式操作才发送写请求；卸载传播取消，不创建重复命令。 */
   async function execute(action: (signal: AbortSignal) => Promise<void>) {
@@ -81,6 +89,7 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
         {!state ? <><label>授权组织 / 默认单厂范围<select aria-label="创建资产作用域" value={scopeIndex} disabled={busy} onChange={event => { setScopeIndex(event.target.value); setExtraSites([]); }}>{identity.scopes.map((scope, index) => <option key={`${scope.organizationId}/${scope.siteId}`} value={index}>{scope.organizationId} / {scope.siteId}</option>)}</select></label>{selectedScope && identity.scopes.filter(scope => scope.organizationId === selectedScope.organizationId && scope.siteId !== selectedScope.siteId).map(scope => <label key={scope.siteId} className="g2-row"><span>额外授权厂区 {scope.siteId}</span><input type="checkbox" checked={extraSites.includes(scope.siteId)} disabled={busy} onChange={event => setExtraSites(items => event.target.checked ? [...items, scope.siteId] : items.filter(site => site !== scope.siteId))} /></label>)}<p className="muted">选择仓库 samples/g2 的四份 .ttl 原文件，或直接输入合成源。额外厂区须明确勾选，服务端再次校验。</p></> : <><p className="g2-hash">{state.draft.assetId} · {state.draft.scope.organizationId} / {state.draft.scope.siteIds.join(" / ")}</p><p className="g2-hash">bundle {state.draft.hashes.bundleHash}</p></>}
         <SourceEditor sources={state?.sources ?? sources} field={field} onField={setField} readOnly={busy || !canEdit} onChange={(key, value) => { if (state) setState(updateSource(state, key, value)); else setSources(current => ({ ...current, [key]: value })); setRetry(null); }} />
         <label>变更理由（必填，≤500字符）<input aria-label="变更理由" value={reason} onChange={event => { setReason(event.target.value); setRetry(null); }} maxLength={500} disabled={busy || !canEdit} /></label>
+        {dirty && <button className="button" disabled={busy} onClick={() => { if (state) setState(draftState(state.draft)); else { setName(""); setSources({ ...emptySources }); } setRemote(null); setRetry(null); setNotice("已显式丢弃未保存修改；服务端草稿未改变。"); }}>丢弃未保存修改</button>}
         <div className="g2-row">{state ? <><button className="button primary" disabled={busy || !dirty || !reason.trim() || !canEdit} onClick={() => save()}>保存新修订</button>{retry && <button className="button" disabled={busy} onClick={() => save(true)}>重试原保存命令</button>}<button className="button" disabled={busy} onClick={() => void execute(async signal => { const next = await client.draft(state.draft.draftId, signal); if (dirty) { setRemote(next); setNotice("远端版本已加载供对比，本地文本保留。仅显式丢弃才覆盖。"); } else accept(next); })}>读取远端版本</button></> : <button className="button primary" disabled={busy || !name.trim() || !reason.trim() || !selectedScope || !canEdit} onClick={() => void execute(async signal => { const draft = await client.createDraft({ name, sources, scope: { organizationId: selectedScope.organizationId, siteIds: [selectedScope.siteId, ...extraSites].sort() }, baseReleaseId: null, command: command(0, reason) }, signal); accept(draft); setNotice("草稿已创建并通过服务端解析"); })}>创建真实草稿</button>}</div>
         {!canEdit && <p className="g2-notice">当前身份仅可读取。编辑要求 platform.operator，最终授权由服务端执行。</p>}
         {remote && <section className="g2-stack"><h3>远端 revision {remote.revision} 与本地文本对比</h3><p className="g2-hash">远端 bundle {remote.hashes.bundleHash}</p><pre className="g2-pre">{remote.sources[field]}</pre><button className="button" disabled={busy} onClick={() => { accept(remote); setNotice("已显式丢弃本地内容并载入远端版本"); }}>丢弃本地内容并载入此远端版本</button></section>}
