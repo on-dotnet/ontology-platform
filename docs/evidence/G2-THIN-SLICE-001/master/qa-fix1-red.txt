@@ -1,0 +1,193 @@
+CONTROL_PLANE_ONLY: substituted processes and telemetry I/O; real product NOT_RUN
+test_atomic_success_report_replacement_failure_retains_fail (__main__.ObservabilityStatusTests.test_atomic_success_report_replacement_failure_retains_fail) ... FAIL
+test_complete_synthetic_io_path_is_the_only_pass (__main__.ObservabilityStatusTests.test_complete_synthetic_io_path_is_the_only_pass) ... ok
+test_fetch_failure_cannot_leave_stale_pass (__main__.ObservabilityStatusTests.test_fetch_failure_cannot_leave_stale_pass) ... ok
+test_initial_report_persistence_failure_cannot_leave_stale_pass (__main__.ObservabilityStatusTests.test_initial_report_persistence_failure_cannot_leave_stale_pass) ... FAIL
+test_persistent_report_write_failure_removes_stale_pass (__main__.ObservabilityStatusTests.test_persistent_report_write_failure_removes_stale_pass) ... FAIL
+test_privacy_failure_prevents_all_raw_exports (__main__.ObservabilityStatusTests.test_privacy_failure_prevents_all_raw_exports) ... ok
+test_raw_export_failure_after_all_assertions_cannot_report_pass (__main__.ObservabilityStatusTests.test_raw_export_failure_after_all_assertions_cannot_report_pass) ... FAIL
+test_success_report_persistence_failure_cannot_leave_pass (__main__.ObservabilityStatusTests.test_success_report_persistence_failure_cannot_leave_pass) ... FAIL
+test_all_six_required_gates_run_with_exact_project_node (__main__.OrchestrationTests.test_all_six_required_gates_run_with_exact_project_node) ... FAIL
+test_core_bootstrap_then_full_launcher_cleanup_is_preserved (__main__.OrchestrationTests.test_core_bootstrap_then_full_launcher_cleanup_is_preserved) ... FAIL
+test_each_child_failure_propagates_and_stops_later_gates (__main__.OrchestrationTests.test_each_child_failure_propagates_and_stops_later_gates) ...
+  test_each_child_failure_propagates_and_stops_later_gates (__main__.OrchestrationTests.test_each_child_failure_propagates_and_stops_later_gates) (gate='g2-observability.py') ... FAIL
+  test_each_child_failure_propagates_and_stops_later_gates (__main__.OrchestrationTests.test_each_child_failure_propagates_and_stops_later_gates) (gate='g2-trace-browser.mjs') ... FAIL
+  test_each_child_failure_propagates_and_stops_later_gates (__main__.OrchestrationTests.test_each_child_failure_propagates_and_stops_later_gates) (gate='g2-readiness-fault.py') ... FAIL
+  test_each_child_failure_propagates_and_stops_later_gates (__main__.OrchestrationTests.test_each_child_failure_propagates_and_stops_later_gates) (gate='performance-baseline.py') ... FAIL
+test_owned_full_launcher_survives_until_failure_and_is_stopped (__main__.OrchestrationTests.test_owned_full_launcher_survives_until_failure_and_is_stopped) ... FAIL
+
+======================================================================
+FAIL: test_atomic_success_report_replacement_failure_retains_fail (__main__.ObservabilityStatusTests.test_atomic_success_report_replacement_failure_retains_fail)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/folders/8r/n2xjjrn90v7fplnwsjkft1sm0000gn/T/g2-qa-baseline-fjas2isz/scripts/tests/G2Acceptance.Tests.py", line 212, in test_atomic_success_report_replacement_failure_retains_fail
+    self.assert_failure('report-replace')
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/var/folders/8r/n2xjjrn90v7fplnwsjkft1sm0000gn/T/g2-qa-baseline-fjas2isz/scripts/tests/G2Acceptance.Tests.py", line 226, in assert_failure
+    self.assertEqual(code, 1)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^
+AssertionError: 0 != 1
+
+======================================================================
+FAIL: test_initial_report_persistence_failure_cannot_leave_stale_pass (__main__.ObservabilityStatusTests.test_initial_report_persistence_failure_cannot_leave_stale_pass)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/folders/8r/n2xjjrn90v7fplnwsjkft1sm0000gn/T/g2-qa-baseline-fjas2isz/scripts/tests/G2Acceptance.Tests.py", line 209, in test_initial_report_persistence_failure_cannot_leave_stale_pass
+    self.assert_failure('initial-write')
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/var/folders/8r/n2xjjrn90v7fplnwsjkft1sm0000gn/T/g2-qa-baseline-fjas2isz/scripts/tests/G2Acceptance.Tests.py", line 228, in assert_failure
+    self.assertTrue(report is None or report['status'] == 'FAIL', report)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : {'status': 'PASS', 'checks': [{'check': 'only_real_valid_persisted_trace_ids', 'status': 'PASS'}, {'check': 'actual_tempo_trace_11111111111111111111111111111111', 'status': 'PASS'}, {'check': 'actual_export_contains_no_prompt_source_or_private_runtime_values', 'status': 'PASS'}, {'check': 'actual_tempo_trace_22222222222222222222222222222222', 'status': 'PASS'}, {'check': 'actual_export_contains_no_prompt_source_or_private_runtime_values', 'status': 'PASS'}, {'check': 'actual_tempo_trace_33333333333333333333333333333333', 'status': 'PASS'}, {'check': 'actual_export_contains_no_prompt_source_or_private_runtime_values', 'status': 'PASS'}, {'check': 'actual_tempo_trace_44444444444444444444444444444444', 'status': 'PASS'}, {'check': 'actual_export_contains_no_prompt_source_or_private_runtime_values', 'status': 'PASS'}, {'check': 'actual_tempo_trace_55555555555555555555555555555555', 'status': 'PASS'}, {'check': 'actual_export_contains_no_prompt_source_or_private_runtime_values', 'status': 'PASS'}, {'check': 'worker_real_separate_trace_associated_to_creation', 'status': 'PASS'}, {'check': 'actual_maf_worker_and_gateway_spans', 'status': 'PASS'}, {'check': 'actual_worker_creation_link_tag', 'status': 'PASS'}, {'check': 'actual_export_contains_no_prompt_source_or_private_runtime_values', 'status': 'PASS'}, {'check': 'actual_g2_loki_entries', 'status': 'PASS'}, {'check': 'actual_export_contains_no_prompt_source_or_private_runtime_values', 'status': 'PASS'}, {'check': 'actual_loki_only_three_index_dimensions', 'status': 'PASS'}, {'check': 'actual_product_meter_ontology_semantic_duration_milliseconds_count', 'status': 'PASS'}, {'check': 'actual_product_meter_publishing_operations_total', 'status': 'PASS'}, {'check': 'actual_product_meter_semantic_query_count_total', 'status': 'PASS'}, {'check': 'actual_product_meter_agents_run_count_total', 'status': 'PASS'}, {'check': 'product_metrics_no_identity_prompt_or_source_dimensions', 'status': 'PASS'}, {'check': 'product_metric_values_respect_actual_finite_contract', 'status': 'PASS'}, {'check': 'actual_export_contains_no_prompt_source_or_private_runtime_values', 'status': 'PASS'}], 'workerTraceDesign': 'actual independent execution.run trace with persisted creation_trace_id tag; never a fabricated parent span', 'officialSearchApi': 'https://grafana.com/docs/tempo/latest/api_docs/', 'scope': 'actual product emissions, own local synthetic stack; no model calls or production data'}
+
+======================================================================
+FAIL: test_persistent_report_write_failure_removes_stale_pass (__main__.ObservabilityStatusTests.test_persistent_report_write_failure_removes_stale_pass)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/folders/8r/n2xjjrn90v7fplnwsjkft1sm0000gn/T/g2-qa-baseline-fjas2isz/scripts/tests/G2Acceptance.Tests.py", line 215, in test_persistent_report_write_failure_removes_stale_pass
+    self.assert_failure('persistent-write')
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/var/folders/8r/n2xjjrn90v7fplnwsjkft1sm0000gn/T/g2-qa-baseline-fjas2isz/scripts/tests/G2Acceptance.Tests.py", line 228, in assert_failure
+    self.assertTrue(report is None or report['status'] == 'FAIL', report)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : {'status': 'PASS', 'stale': True}
+
+======================================================================
+FAIL: test_raw_export_failure_after_all_assertions_cannot_report_pass (__main__.ObservabilityStatusTests.test_raw_export_failure_after_all_assertions_cannot_report_pass)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/folders/8r/n2xjjrn90v7fplnwsjkft1sm0000gn/T/g2-qa-baseline-fjas2isz/scripts/tests/G2Acceptance.Tests.py", line 203, in test_raw_export_failure_after_all_assertions_cannot_report_pass
+    self.assert_failure('raw-write')
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/var/folders/8r/n2xjjrn90v7fplnwsjkft1sm0000gn/T/g2-qa-baseline-fjas2isz/scripts/tests/G2Acceptance.Tests.py", line 228, in assert_failure
+    self.assertTrue(report is None or report['status'] == 'FAIL', report)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : {'status': 'PASS', 'checks': [{'check': 'only_real_valid_persisted_trace_ids', 'status': 'PASS'}, {'check': 'actual_tempo_trace_11111111111111111111111111111111', 'status': 'PASS'}, {'check': 'actual_export_contains_no_prompt_source_or_private_runtime_values', 'status': 'PASS'}, {'check': 'actual_tempo_trace_22222222222222222222222222222222', 'status': 'PASS'}, {'check': 'actual_export_contains_no_prompt_source_or_private_runtime_values', 'status': 'PASS'}, {'check': 'actual_tempo_trace_33333333333333333333333333333333', 'status': 'PASS'}, {'check': 'actual_export_contains_no_prompt_source_or_private_runtime_values', 'status': 'PASS'}, {'check': 'actual_tempo_trace_44444444444444444444444444444444', 'status': 'PASS'}, {'check': 'actual_export_contains_no_prompt_source_or_private_runtime_values', 'status': 'PASS'}, {'check': 'actual_tempo_trace_55555555555555555555555555555555', 'status': 'PASS'}, {'check': 'actual_export_contains_no_prompt_source_or_private_runtime_values', 'status': 'PASS'}, {'check': 'worker_real_separate_trace_associated_to_creation', 'status': 'PASS'}, {'check': 'actual_maf_worker_and_gateway_spans', 'status': 'PASS'}, {'check': 'actual_worker_creation_link_tag', 'status': 'PASS'}, {'check': 'actual_export_contains_no_prompt_source_or_private_runtime_values', 'status': 'PASS'}, {'check': 'actual_g2_loki_entries', 'status': 'PASS'}, {'check': 'actual_export_contains_no_prompt_source_or_private_runtime_values', 'status': 'PASS'}, {'check': 'actual_loki_only_three_index_dimensions', 'status': 'PASS'}, {'check': 'actual_product_meter_ontology_semantic_duration_milliseconds_count', 'status': 'PASS'}, {'check': 'actual_product_meter_publishing_operations_total', 'status': 'PASS'}, {'check': 'actual_product_meter_semantic_query_count_total', 'status': 'PASS'}, {'check': 'actual_product_meter_agents_run_count_total', 'status': 'PASS'}, {'check': 'product_metrics_no_identity_prompt_or_source_dimensions', 'status': 'PASS'}, {'check': 'product_metric_values_respect_actual_finite_contract', 'status': 'PASS'}, {'check': 'actual_export_contains_no_prompt_source_or_private_runtime_values', 'status': 'PASS'}], 'workerTraceDesign': 'actual independent execution.run trace with persisted creation_trace_id tag; never a fabricated parent span', 'officialSearchApi': 'https://grafana.com/docs/tempo/latest/api_docs/', 'scope': 'actual product emissions, own local synthetic stack; no model calls or production data'}
+
+======================================================================
+FAIL: test_success_report_persistence_failure_cannot_leave_pass (__main__.ObservabilityStatusTests.test_success_report_persistence_failure_cannot_leave_pass)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/folders/8r/n2xjjrn90v7fplnwsjkft1sm0000gn/T/g2-qa-baseline-fjas2isz/scripts/tests/G2Acceptance.Tests.py", line 206, in test_success_report_persistence_failure_cannot_leave_pass
+    self.assert_failure('report-write')
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/var/folders/8r/n2xjjrn90v7fplnwsjkft1sm0000gn/T/g2-qa-baseline-fjas2isz/scripts/tests/G2Acceptance.Tests.py", line 228, in assert_failure
+    self.assertTrue(report is None or report['status'] == 'FAIL', report)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : {'status': 'PASS', 'stale': True}
+
+======================================================================
+FAIL: test_all_six_required_gates_run_with_exact_project_node (__main__.OrchestrationTests.test_all_six_required_gates_run_with_exact_project_node)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/folders/8r/n2xjjrn90v7fplnwsjkft1sm0000gn/T/g2-qa-baseline-fjas2isz/scripts/tests/G2Acceptance.Tests.py", line 93, in test_all_six_required_gates_run_with_exact_project_node
+    self.assertEqual([Path(call[1]).name for call in calls], GATES)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ['ful[30 chars]y', 'performance-baseline.py'] != ['ful[30 chars]y', 'g2-observability.py', 'g2-trace-browser.m[51 chars].py']
+
+First differing element 2:
+'performance-baseline.py'
+'g2-observability.py'
+
+Second list contains 3 additional elements.
+First extra element 3:
+'g2-trace-browser.mjs'
+
+- ['full-g2-e2e.py', 'g1-regression.py', 'performance-baseline.py']
++ ['full-g2-e2e.py',
++  'g1-regression.py',
++  'g2-observability.py',
++  'g2-trace-browser.mjs',
++  'g2-readiness-fault.py',
++  'performance-baseline.py']
+
+======================================================================
+FAIL: test_core_bootstrap_then_full_launcher_cleanup_is_preserved (__main__.OrchestrationTests.test_core_bootstrap_then_full_launcher_cleanup_is_preserved)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/folders/8r/n2xjjrn90v7fplnwsjkft1sm0000gn/T/g2-qa-baseline-fjas2isz/scripts/tests/G2Acceptance.Tests.py", line 120, in test_core_bootstrap_then_full_launcher_cleanup_is_preserved
+    self.assertEqual([Path(call[1]).name for call in calls[1:]], GATES)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ['ful[30 chars]y', 'performance-baseline.py'] != ['ful[30 chars]y', 'g2-observability.py', 'g2-trace-browser.m[51 chars].py']
+
+First differing element 2:
+'performance-baseline.py'
+'g2-observability.py'
+
+Second list contains 3 additional elements.
+First extra element 3:
+'g2-trace-browser.mjs'
+
+- ['full-g2-e2e.py', 'g1-regression.py', 'performance-baseline.py']
++ ['full-g2-e2e.py',
++  'g1-regression.py',
++  'g2-observability.py',
++  'g2-trace-browser.mjs',
++  'g2-readiness-fault.py',
++  'performance-baseline.py']
+
+======================================================================
+FAIL: test_each_child_failure_propagates_and_stops_later_gates (__main__.OrchestrationTests.test_each_child_failure_propagates_and_stops_later_gates) (gate='g2-observability.py')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/folders/8r/n2xjjrn90v7fplnwsjkft1sm0000gn/T/g2-qa-baseline-fjas2isz/scripts/tests/G2Acceptance.Tests.py", line 105, in test_each_child_failure_propagates_and_stops_later_gates
+    self.assertEqual(code, 23)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^
+AssertionError: 0 != 23
+
+======================================================================
+FAIL: test_each_child_failure_propagates_and_stops_later_gates (__main__.OrchestrationTests.test_each_child_failure_propagates_and_stops_later_gates) (gate='g2-trace-browser.mjs')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/folders/8r/n2xjjrn90v7fplnwsjkft1sm0000gn/T/g2-qa-baseline-fjas2isz/scripts/tests/G2Acceptance.Tests.py", line 105, in test_each_child_failure_propagates_and_stops_later_gates
+    self.assertEqual(code, 23)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^
+AssertionError: 0 != 23
+
+======================================================================
+FAIL: test_each_child_failure_propagates_and_stops_later_gates (__main__.OrchestrationTests.test_each_child_failure_propagates_and_stops_later_gates) (gate='g2-readiness-fault.py')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/folders/8r/n2xjjrn90v7fplnwsjkft1sm0000gn/T/g2-qa-baseline-fjas2isz/scripts/tests/G2Acceptance.Tests.py", line 105, in test_each_child_failure_propagates_and_stops_later_gates
+    self.assertEqual(code, 23)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^
+AssertionError: 0 != 23
+
+======================================================================
+FAIL: test_each_child_failure_propagates_and_stops_later_gates (__main__.OrchestrationTests.test_each_child_failure_propagates_and_stops_later_gates) (gate='performance-baseline.py')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/folders/8r/n2xjjrn90v7fplnwsjkft1sm0000gn/T/g2-qa-baseline-fjas2isz/scripts/tests/G2Acceptance.Tests.py", line 106, in test_each_child_failure_propagates_and_stops_later_gates
+    self.assertEqual([Path(call[1]).name for call in calls], GATES[:index + 1])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ['ful[30 chars]y', 'performance-baseline.py'] != ['ful[30 chars]y', 'g2-observability.py', 'g2-trace-browser.m[51 chars].py']
+
+First differing element 2:
+'performance-baseline.py'
+'g2-observability.py'
+
+Second list contains 3 additional elements.
+First extra element 3:
+'g2-trace-browser.mjs'
+
+- ['full-g2-e2e.py', 'g1-regression.py', 'performance-baseline.py']
++ ['full-g2-e2e.py',
++  'g1-regression.py',
++  'g2-observability.py',
++  'g2-trace-browser.mjs',
++  'g2-readiness-fault.py',
++  'performance-baseline.py']
+
+======================================================================
+FAIL: test_owned_full_launcher_survives_until_failure_and_is_stopped (__main__.OrchestrationTests.test_owned_full_launcher_survives_until_failure_and_is_stopped)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/folders/8r/n2xjjrn90v7fplnwsjkft1sm0000gn/T/g2-qa-baseline-fjas2isz/scripts/tests/G2Acceptance.Tests.py", line 110, in test_owned_full_launcher_survives_until_failure_and_is_stopped
+    self.assertEqual(code, 23)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^
+AssertionError: 0 != 23
+
+----------------------------------------------------------------------
+Ran 12 tests in 0.448s
+
+FAILED (failures=12)

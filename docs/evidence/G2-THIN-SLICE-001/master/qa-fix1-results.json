@@ -1,0 +1,25 @@
+{
+  "status": "DRAFT/PARTIAL",
+  "scope": "CONTROL_PLANE_ONLY; substituted child processes and telemetry I/O; real G2 products NOT_RUN",
+  "baseSha": "65212620c36650dc52df299b618de6e2e838f51e",
+  "implementationSha": "369bb61d8c4e0eebfcff7e2bd3b9ef9188ecaed3",
+  "branch": "codex/G2-QA-FIX",
+  "environment": {"os": "macOS ARM64", "python": "3.13.17", "powershell": "7.6.8"},
+  "commands": [
+    {"command": "python3 scripts/tests/G2Acceptance.Tests.py (final tests against git-show BaseSha source in isolated temporary copy)", "exitCode": 1, "tests": 12, "failuresIncludingSubtests": 12, "evidence": "qa-fix1-red.txt"},
+    {"command": "python3 scripts/tests/G2Acceptance.Tests.py", "exitCode": 0, "tests": 12, "failures": 0, "evidence": "qa-fix1-green.txt"},
+    {"command": "pwsh -NoProfile -File scripts/verify.ps1 -SelfTest", "exitCode": 0, "evidence": "qa-fix1-selftest.txt"},
+    {"command": "python3 scripts/tests/Wave2Runtime.Tests.py", "exitCode": 0, "evidence": "qa-fix1-wave2.txt"},
+    {"command": "py_compile.compile three changed Python sources with cfile in isolated temporary directory", "exitCode": 0, "evidence": "qa-fix1-syntax.txt"},
+    {"command": "git diff --check", "exitCode": 0}
+  ],
+  "sourceSha256": {
+    "scripts/acceptance/g2-acceptance-runtime.py": "187e92412c18555ccb75c4526be40a776399b3dac658b26e433d896731aac76f",
+    "scripts/acceptance/g2-observability.py": "c6a955400dd72b5ff895355fdaf307dcdad29814a9e6b1ddee96e8189d444e0a",
+    "scripts/tests/G2Acceptance.Tests.py": "789864bb2971c9b36adfed556b8635e15909d255abf05fea45c278c87094309e"
+  },
+  "notRun": ["real aggregate G2 runtime acceptance; Master owns this run", "real LGTM/Trace/readiness faults/performance in this QA worktree", "native .NET/Web build and product integration", "paid or cloud model", "Windows/Intel/production"],
+  "ci": "NOT_VERIFIED; no CI run claimed for this branch",
+  "independentReview": "PENDING; Master assigns a separate reviewer",
+  "monaco": "PAUSED_BY_USER"
+}
