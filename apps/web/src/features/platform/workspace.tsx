@@ -23,7 +23,7 @@ function getMobileNavigationSnapshot() { return window.matchMedia(mobileNavigati
 function getServerNavigationSnapshot() { return true; }
 const views = [{ id: "resources" as const, title: "平台资源", icon: "grid", note: "授权资源工作区" }, { id: "audit" as const, title: "访问审计", icon: "activity", note: "事件与 Trace 关联" }, { id: "scope" as const, title: "授权范围", icon: "shield", note: "身份与访问边界" }];
 /** 仅保存真实请求结果；失败时清除旧数据并区分认证、无权和依赖故障。 */
-export function Workspace({ identity }: { identity: PlatformIdentity }) {
+export function Workspace({ identity, children, section }: { identity: PlatformIdentity; children?: React.ReactNode; section?: "ontologies" | "releases" | "analysis" }) {
   const [view, setView] = useState<View>("resources");
   const [sidebar, setSidebar] = useState(false);
   const mobileNavigation = useSyncExternalStore(subscribeMobileNavigation, getMobileNavigationSnapshot, getServerNavigationSnapshot);
@@ -37,9 +37,9 @@ export function Workspace({ identity }: { identity: PlatformIdentity }) {
   const [csrf, setCsrf] = useState("");
   const [logoutError, setLogoutError] = useState(false);
   const logoutForm = useRef<HTMLFormElement>(null);
-  const currentView = views.find(item => item.id === view)!;
+  const currentView = section ? { title: { ontologies: "本体资产", releases: "发布治理", analysis: "语义分析" }[section], note: "G2 真实语义工作区" } : views.find(item => item.id === view)!;
   useEffect(() => {
-    if (view === "scope") return;
+    if (section || view === "scope") return;
     const controller = new AbortController();
     const request = view === "audit" ? client.audit(controller.signal) : client.resources(site || undefined, controller.signal);
     request.then(result => { if (controller.signal.aborted) return; if (Array.isArray(result)) setAudit(result); else setResources(result); }).catch(cause => {
@@ -47,7 +47,7 @@ export function Workspace({ identity }: { identity: PlatformIdentity }) {
       setError(cause instanceof PlatformApiError ? { status: cause.status, traceId: cause.traceId } : { status: 0 });
     }).finally(() => { if (!controller.signal.aborted) setPending(false); });
     return () => controller.abort();
-  }, [view, site, revision]);
+  }, [view, site, revision, section]);
   useEffect(() => { if (csrf) logoutForm.current?.submit(); }, [csrf]);
   /** 先取得同源防伪令牌，再由原生表单完成顶层OIDC注销导航。 */
   async function prepareLogout() {
@@ -81,7 +81,7 @@ export function Workspace({ identity }: { identity: PlatformIdentity }) {
         <span className="tiny-dot" />
       </div>
       <p className="nav-caption">工作台</p>
-      <nav>{views.map(item => <button key={item.id} className={`nav-item ${view === item.id ? "active" : ""}`} onClick={() => changeView(item.id)} aria-current={view === item.id ? "page" : undefined}>
+      <nav>{[{ href: "/ontologies", title: "本体资产", id: "ontologies" }, { href: "/releases", title: "发布治理", id: "releases" }, { href: "/analysis", title: "语义分析", id: "analysis" }].map(item => <Link key={item.id} href={item.href} className={`nav-item ${section === item.id ? "active" : ""}`} aria-current={section === item.id ? "page" : undefined}><Icon name="box" /><span>{item.title}</span></Link>)}{section && <Link href="/" className="nav-item"><Icon name="grid" /><span>平台治理</span></Link>}{!section && views.map(item => <button key={item.id} className={`nav-item ${view === item.id ? "active" : ""}`} onClick={() => changeView(item.id)} aria-current={view === item.id ? "page" : undefined}>
         <Icon name={item.icon} />
         <span>{item.title}</span>{view === item.id && <span className="nav-indicator" />}</button>)}</nav>
       <div className="sidebar-bottom">
@@ -118,6 +118,7 @@ export function Workspace({ identity }: { identity: PlatformIdentity }) {
         </div>
       </header>
       <main id="main" className="workspace-main">
+        {children ?? <>
         <div className="page-heading">
           <div>
             <p className="eyebrow">PLATFORM WORKSPACE</p>
@@ -261,6 +262,7 @@ export function Workspace({ identity }: { identity: PlatformIdentity }) {
             </div>
           </div>
         </section>}
+        </>}
         <footer className="workspace-footer">
           <span>Ontology Platform <span className="footer-dot">·</span> 可信语义，连接未来</span>
           <button className="text-button muted" onClick={prepareLogout}>
