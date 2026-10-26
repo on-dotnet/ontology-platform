@@ -56,4 +56,22 @@ public sealed class ShaclTests
         Assert.AreEqual(422, error.Status);
         Assert.AreEqual("shape_unsupported", error.Code);
     }
+
+    /// <summary>有限枚举列表最多128项且不能循环，列表预算不依赖Jena超时。</summary>
+    [TestMethod]
+    public async Task EnumerationListIsBoundedAndAcyclic()
+    {
+        // 真实Shape解析后才检查标准RDF列表结构。
+        var runtime = SemanticFixture.Runtime();
+        // 129项枚举必须在执行前拒绝。
+        var values = string.Join(' ', Enumerable.Range(0, 129));
+        // 合法Turtle不能绕过独立列表预算。
+        var large = "@prefix sh: <http://www.w3.org/ns/shacl#> . <urn:s> sh:in (" + values + ") .";
+        // 固定机器码不包含原始Shape。
+        var error = await Assert.ThrowsAsync<SemanticOperationException>(() => runtime.ValidateAsync(new SourceBundle { ShapesTurtle = large }, CancellationToken.None));
+        Assert.AreEqual("shape_unsupported", error.Code);
+        // 显式rdf:rest循环同样在执行前拒绝。
+        var cyclic = "@prefix sh: <http://www.w3.org/ns/shacl#> . @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> . <urn:s> sh:in _:a . _:a rdf:first 1 ; rdf:rest _:a .";
+        Assert.AreEqual("shape_unsupported", (await Assert.ThrowsAsync<SemanticOperationException>(() => runtime.ValidateAsync(new SourceBundle { ShapesTurtle = cyclic }, CancellationToken.None))).Code);
+    }
 }

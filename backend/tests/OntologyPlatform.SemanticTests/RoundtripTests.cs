@@ -59,4 +59,190 @@ public sealed class RoundtripTests
         var error = await Assert.ThrowsAsync<SemanticOperationException>(() => runtime.AnalyzeAsync(source with { OntologyTurtle = "invalid Turtle" }, 1, CancellationToken.None));
         Assert.AreEqual(422, error.Status);
     }
+
+    /// <summary>真实TDB2按隔离版本部署和回读，验证词法规范化不能悄悄宣称相同。</summary>
+    [TestMethod]
+    public async Task PublishedGraphsAreIsolatedAndLexicalMismatchIsRejected()
+    {
+        // 测试脚本提供真实临时TDB2且结束后删除整个容器。
+        var runtime = SemanticFixture.Runtime();
+        // 使用规范字面量的最小版本不依赖行业特定逻辑。
+        var sources = new SourceBundle { OntologyTurtle = "<urn:test:C> a <http://www.w3.org/2002/07/owl#Class> .", DataTurtle = "<urn:test:i> a <urn:test:C> ; <urn:test:n> 1 ." };
+        // 实际解析散列用于绑定发布清单。
+        var analysis = await runtime.AnalyzeAsync(sources, 1, CancellationToken.None);
+        // 正式图仅按服务端GuidN派生。
+        var id = Guid.NewGuid().ToString("N");
+        // 快照和清单必须使用同一不可变版本。
+        var snapshot = new AssetVersionSnapshot { ReleaseId = id, OntologyHash = analysis.Hashes.OntologyHash, ShapesHash = analysis.Hashes.ShapesHash, DataHash = analysis.Hashes.DataHash, OntologyGraphIri = "urn:ontology-platform:release:" + id + ":ontology", DataGraphIri = "urn:ontology-platform:release:" + id + ":data" };
+        // 清单中的hash由真实源派生，不能客户端自行编写。
+        var manifest = new ReleaseManifest { ReleaseId = id, Hashes = analysis.Hashes, OntologyGraphIri = snapshot.OntologyGraphIri, DataGraphIri = snapshot.DataGraphIri, Snapshot = snapshot };
+        await runtime.DeployAsync(manifest, sources, CancellationToken.None);
+        Assert.IsTrue(await runtime.VerifyAsync(manifest, sources, CancellationToken.None));
+        // 正式读确实返回当前版本图数据。
+        var published = await runtime.ReadPublishedAsync(snapshot, CancellationToken.None);
+        Assert.IsTrue(published.DataTriples.Any(triple => triple.Predicate == "urn:test:n" && triple.Object.Value == "1"));
+        // 第二版本包含TDB2可能规范化的原始typed lexical，不能改变第一图。
+        var lexical = sources with { DataTurtle = "<urn:test:i> a <urn:test:C> ; <urn:test:n> \"01\"^^<http://www.w3.org/2001/XMLSchema#integer> ." };
+        // 第二图与第一个版本完全隔离。
+        var second = Guid.NewGuid().ToString("N");
+        // 保存权威字节散列，即使图规范化也不可篡改。
+        var lexicalAnalysis = await runtime.AnalyzeAsync(lexical, 2, CancellationToken.None);
+        // 使用新的图名，绝不覆盖旧发布。
+        var secondManifest = manifest with { ReleaseId = second, Hashes = lexicalAnalysis.Hashes, OntologyGraphIri = "urn:ontology-platform:release:" + second + ":ontology", DataGraphIri = "urn:ontology-platform:release:" + second + ":data" };
+        await runtime.DeployAsync(secondManifest, lexical, CancellationToken.None);
+        Assert.IsFalse(await runtime.VerifyAsync(secondManifest, lexical, CancellationToken.None));
+        Assert.IsTrue(await runtime.VerifyAsync(manifest, sources, CancellationToken.None));
+    }
+
+    /// <summary>完全空图的标准SHACL验证也应有真实报告，而非错误503。</summary>
+    [TestMethod]
+    public async Task EmptyGraphStillProducesRealShaclReport()
+    {
+        // 空源码是有效的Turtle文档，不能假称依赖故障。
+        var runtime = SemanticFixture.Runtime();
+        // Jena实际空图报告必须仍有标准conforms和报告hash。
+        var report = await runtime.ValidateAsync(new SourceBundle(), CancellationToken.None);
+        Assert.IsTrue(report.Conforms);
+        Assert.AreEqual(ValidationKind.ShaclCore, report.Kind);
+    }
+
+    /// <summary>正式回验必须包含本体中的subClassOf，不能只校验data图而漏掉继承目标。</summary>
+    [TestMethod]
+    public async Task PublishedShaclUsesTheSameOntologyContext()
+    {
+        // 真实隔离运行时使用实际RDFS目标继承行为。
+        var runtime = SemanticFixture.Runtime();
+        // 子类事实缺少父类Shape所要求的字段。
+        var source = new SourceBundle
+        {
+            OntologyTurtle = "<urn:C> a <http://www.w3.org/2002/07/owl#Class> ; <http://www.w3.org/2000/01/rdf-schema#subClassOf> <urn:P> . <urn:P> a <http://www.w3.org/2002/07/owl#Class> .",
+            DataTurtle = "<urn:i> a <urn:C> .",
+            ShapesTurtle = "@prefix sh: <http://www.w3.org/ns/shacl#> . <urn:S> a sh:NodeShape ; sh:targetClass <urn:P> ; sh:property [ sh:path <urn:key> ; sh:minCount 1 ] ."
+        };
+        // 内存草稿校验应真实发现父类约束缺失。
+        var report = await runtime.ValidateAsync(source, CancellationToken.None);
+        Assert.IsFalse(report.Conforms);
+        // 服务器生成独占测试图，测试不能激活版本。
+        var id = Guid.NewGuid().ToString("N");
+        // 精确绑定当前源散列，回验必须复现同一约束结果。
+        var manifest = new ReleaseManifest { ReleaseId = id, Hashes = report.Hashes, OntologyGraphIri = "urn:ontology-platform:release:" + id + ":ontology", DataGraphIri = "urn:ontology-platform:release:" + id + ":data" };
+        await runtime.DeployAsync(manifest, source, CancellationToken.None);
+        Assert.IsFalse(await runtime.VerifyAsync(manifest, source, CancellationToken.None));
+    }
+
+    /// <summary>相对IRI解析必须使用稳定文档基址，不能包含随机暂存图身份。</summary>
+    [TestMethod]
+    public async Task RelativeIriAndExactEditPreserveRemainingGraph()
+    {
+        // 连续独立操作必须得到相同IRI集合。
+        var runtime = SemanticFixture.Runtime();
+        // 无显式base时也允许标准相对IRI源码，其他三元组不可丢失。
+        var sources = new SourceBundle { OntologyTurtle = "<#C> a <http://www.w3.org/2002/07/owl#Class> ; <http://www.w3.org/2000/01/rdf-schema#label> \"旧标签\"@zh ; <urn:retained> \"保留\" ." };
+        // 两次实际RIOT解析使用不同临时图。
+        var first = await runtime.AnalyzeAsync(sources, 1, CancellationToken.None);
+        // 第二次解析不能偷偷改写实体身份。
+        var second = await runtime.AnalyzeAsync(sources, 1, CancellationToken.None);
+        CollectionAssert.AreEquivalent(first.Projection.Triples, second.Projection.Triples);
+        // 从真实投影选择精确旧三元组，非no-op编辑只改变这一值。
+        var label = first.Projection.Triples.Single(triple => triple.Predicate.EndsWith("#label", StringComparison.Ordinal));
+        // 新源来自完整图精确编辑，余下图必须保留。
+        var changed = await runtime.ApplyEditAsync(sources, new SemanticEdit { SubjectIri = label.Subject.Value, PredicateIri = label.Predicate, OldObject = label.Object, NewObject = label.Object with { Value = "新标签" } }, CancellationToken.None);
+        // 新源码再经真实RIOT解析，不只检查字符串包含。
+        var edited = await runtime.AnalyzeAsync(changed, 2, CancellationToken.None);
+        Assert.AreEqual(first.Projection.Triples.Length, edited.Projection.Triples.Length);
+        Assert.IsTrue(edited.Projection.Triples.Any(triple => triple.Object.Value == "保留"));
+        Assert.IsTrue(edited.Projection.Triples.Any(triple => triple.Object.Value == "新标签"));
+        Assert.IsFalse(edited.Projection.Triples.Any(triple => triple.Object.Value == "旧标签"));
+    }
+
+    /// <summary>源码、三元组和可视投影预算都由真实运行时拒绝，不能静默截断。</summary>
+    [TestMethod]
+    public async Task SourceTripleAndProjectionBudgetsFailExplicitly()
+    {
+        // 只有字节超限在网络前拒绝，其他限制对真实RIOT结果生效。
+        var runtime = SemanticFixture.Runtime();
+        // 字节预算以UTF8长度判断，不用字符数冒充。
+        var bytes = await Assert.ThrowsAsync<SemanticOperationException>(() => runtime.AnalyzeAsync(new SourceBundle { OntologyTurtle = new string('中', 90000) }, 1, CancellationToken.None));
+        Assert.AreEqual(413, bytes.Status);
+        // 单源小于256KiB但包含5001条不同真实三元组。
+        var graph = string.Join('\n', Enumerable.Range(0, 5001).Select(index => $"<urn:s{index}> <urn:p> 1 ."));
+        // 超过RDF预算拒绝，而非返回5000条假完整图。
+        var triples = await Assert.ThrowsAsync<SemanticOperationException>(() => runtime.AnalyzeAsync(new SourceBundle { OntologyTurtle = graph }, 1, CancellationToken.None));
+        Assert.AreEqual("rdf_triple_budget", triples.Code);
+        // 可视节点限制小于RDF完整图限制。
+        var nodes = string.Join('\n', Enumerable.Range(0, 1001).Select(index => $"<urn:s{index}> <urn:p> 1 ."));
+        // 单独证明节点限制，不依赖三元组限制触发。
+        var projection = await Assert.ThrowsAsync<SemanticOperationException>(() => runtime.AnalyzeAsync(new SourceBundle { OntologyTurtle = nodes }, 1, CancellationToken.None));
+        Assert.AreEqual("projection_budget", projection.Code);
+        // 同一主体上2001条不同IRI边，不增加主体节点数量。
+        var edges = string.Join('\n', Enumerable.Range(0, 2001).Select(index => $"<urn:s> <urn:p> <urn:o{index}> ."));
+        // 边超限也保持固定明确错误。
+        var edgeBudget = await Assert.ThrowsAsync<SemanticOperationException>(() => runtime.AnalyzeAsync(new SourceBundle { OntologyTurtle = edges }, 1, CancellationToken.None));
+        Assert.AreEqual("projection_budget", edgeBudget.Code);
+    }
+
+    /// <summary>两个真实操作占用槽位时第三个立即429，释放后前两个正常完成。</summary>
+    [TestMethod]
+    public async Task ThirdConcurrentOperationIsRejected()
+    {
+        // 两个请求到达发送边界后才触发第三请求，避免依赖偶然网络速度。
+        var ready = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        // 时序门只延迟请求，释放后仍真正调用Jena。
+        var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        // 原子计数用于等待前两次PUT确实占有槽位。
+        var count = 0;
+        // 不构造假响应，所有成功操作仍来自真正RIOT。
+        var runtime = SemanticFixture.RuntimeWithGate(async (request, token) =>
+        {
+            if (request.Method == HttpMethod.Put)
+            {
+                if (Interlocked.Increment(ref count) == 2) ready.TrySetResult();
+                await release.Task.WaitAsync(token);
+            }
+        });
+        // 最小真实图保持测试只测资源槽位。
+        var source = new SourceBundle { OntologyTurtle = "<urn:s> <urn:p> 1 ." };
+        // 第一个真实任务进入槽位。
+        var first = runtime.AnalyzeAsync(source, 1, CancellationToken.None);
+        // 第二个真实任务进入槽位。
+        var second = runtime.AnalyzeAsync(source, 1, CancellationToken.None);
+        try
+        {
+            await ready.Task.WaitAsync(TimeSpan.FromSeconds(2));
+            // 第三个不能绕过统一进程预算。
+            var error = await Assert.ThrowsAsync<SemanticOperationException>(() => runtime.AnalyzeAsync(source, 1, CancellationToken.None));
+            Assert.AreEqual(429, error.Status);
+        }
+        finally { release.TrySetResult(); }
+        await Task.WhenAll(first, second);
+    }
+
+    /// <summary>已有真实暂存图后取消或超时，finally必须仍能删除图；脚本另外查询零残留。</summary>
+    [TestMethod]
+    [DataRow(true)]
+    [DataRow(false)]
+    public async Task CancellationAndTimeoutDoNotLeaveTemporaryGraphs(bool callerCancels)
+    {
+        // 只阻塞第一次GET，因此先前PUT已在真实Jena创建独占暂存图。
+        var blocked = 0;
+        // 删除请求不会被阻塞，使清理使用独立取消预算。
+        var runtime = SemanticFixture.RuntimeWithGate(async (request, token) =>
+        {
+            if (request.Method == HttpMethod.Get && Interlocked.Exchange(ref blocked, 1) == 0)
+                await Task.Delay(Timeout.InfiniteTimeSpan, token);
+        });
+        // 用户取消与服务内部五秒超时使用不同可观察结果。
+        using var cancellation = new CancellationTokenSource();
+        if (callerCancels) cancellation.CancelAfter(TimeSpan.FromMilliseconds(150));
+        // 最小图使PUT在进入GET时已真实成功。
+        var operation = runtime.AnalyzeAsync(new SourceBundle { OntologyTurtle = "<urn:s> <urn:p> 1 ." }, 1, cancellation.Token);
+        if (callerCancels) await Assert.ThrowsAsync<OperationCanceledException>(() => operation);
+        else
+        {
+            // 服务器预算映射固定503而不吞掉客户端取消。
+            var error = await Assert.ThrowsAsync<SemanticOperationException>(() => operation);
+            Assert.AreEqual("semantic_timeout", error.Code);
+        }
+        Assert.AreEqual(1, blocked);
+    }
 }

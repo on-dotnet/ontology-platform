@@ -1,0 +1,68 @@
+{
+  "exitCode": 2,
+  "records": [
+    {
+      "command": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g2-sem-b13090565ee8",
+        "--publish",
+        "127.0.0.1::3030",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--mount",
+        "type=bind,src=/private/tmp/g2-sem-b13090565ee8g39c7pkx,dst=/fixture,readonly",
+        "--entrypoint",
+        "java",
+        "fuseki:8b85cd963ab3910a87ff4d69819a814fcc536d5f",
+        "-Xmx384m",
+        "-Dlog4j.configurationFile=/fixture/log4j2.properties",
+        "-jar",
+        "/opt/fuseki/fuseki-server.jar",
+        "--config=/fixture/config.ttl"
+      ],
+      "exitCode": 0,
+      "output": "da185dc33d13e8baf521513abdfc2f9350d91913f22e702690bcb642e8298288\n"
+    },
+    {
+      "command": [
+        "docker",
+        "port",
+        "g2-sem-b13090565ee8",
+        "3030/tcp"
+      ],
+      "exitCode": 0,
+      "output": "127.0.0.1:50061\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "test",
+        "--project",
+        "backend/tests/OntologyPlatform.SemanticTests",
+        "--no-restore"
+      ],
+      "exitCode": 2,
+      "output": "正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n失败 RelativeIriAndExactEditPreserveRemainingGraph (10ms)\n  从 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  CollectionAssert.AreEquivalent 失败。 所需集合包含 <RdfTriple { Subject = RdfTerm { Kind = Iri, Value = http://127.0.0.1:50061/validation/data?graph=urn%3Aontology-platform%3Atemporary%3A9d5f91316227414ebc49ae7646be3c00#C, Datatype = , Language =  }, Predicate = urn:retained, Object = RdfTerm { Kind = Literal, Value = 保留, Datatype = , Language =  } }> 的 1 个匹配项。实际集合包含 0 个匹配项。\n    在 OntologyPlatform.SemanticTests.RoundtripTests.RelativeIriAndExactEditPreserveRemainingGraph() 位于 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/RoundtripTests.cs:145\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n/Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64) 失败并出现 1 个错误 (3s 577ms)\n退出代码: 2\n\n测试运行摘要: 失败!\n  总计: 20\n  失败: 1\n  成功: 19\n  已跳过: 0\n  持续时间: 4s 231ms\n已完成测试运行，但显示非成功退出代码: 2 (请参阅: https://aka.ms/testingplatform/exitcodes)\n"
+    },
+    {
+      "check": "all temporary graph triples removed",
+      "count": 0,
+      "status": "PASS"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g2-sem-b13090565ee8"
+      ],
+      "exitCode": 0,
+      "output": "g2-sem-b13090565ee8\n"
+    }
+  ]
+}

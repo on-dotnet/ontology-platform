@@ -1,0 +1,68 @@
+{
+  "exitCode": 2,
+  "records": [
+    {
+      "command": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g2-sem-1d80588fcd5a",
+        "--publish",
+        "127.0.0.1::3030",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--mount",
+        "type=bind,src=/private/tmp/g2-sem-1d80588fcd5aqtvvqjur,dst=/fixture,readonly",
+        "--entrypoint",
+        "java",
+        "fuseki:8b85cd963ab3910a87ff4d69819a814fcc536d5f",
+        "-Xmx384m",
+        "-Dlog4j.configurationFile=/fixture/log4j2.properties",
+        "-jar",
+        "/opt/fuseki/fuseki-server.jar",
+        "--config=/fixture/config.ttl"
+      ],
+      "exitCode": 0,
+      "output": "8fc6b4fff76e5af31c42412614b05a0a8d819134c2d5d97a9a4250cdaf69863f\n"
+    },
+    {
+      "command": [
+        "docker",
+        "port",
+        "g2-sem-1d80588fcd5a",
+        "3030/tcp"
+      ],
+      "exitCode": 0,
+      "output": "127.0.0.1:49691\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "test",
+        "--project",
+        "backend/tests/OntologyPlatform.SemanticTests",
+        "--no-restore"
+      ],
+      "exitCode": 2,
+      "output": "正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n失败 PublishedShaclUsesTheSameOntologyContext (98ms)\n  从 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  Assertion failed. 预期条件为 false。\n  \n  actual: true\n  \n  Assert.IsFalse(await runtime.VerifyAsync(manifest, source, CancellationToken.None))\n    在 OntologyPlatform.SemanticTests.RoundtripTests.PublishedShaclUsesTheSameOntologyContext() 位于 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/RoundtripTests.cs:130\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n/Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64) 失败并出现 1 个错误 (1s 960ms)\n退出代码: 2\n\n测试运行摘要: 失败!\n  总计: 17\n  失败: 1\n  成功: 16\n  已跳过: 0\n  持续时间: 2s 265ms\n已完成测试运行，但显示非成功退出代码: 2 (请参阅: https://aka.ms/testingplatform/exitcodes)\n"
+    },
+    {
+      "check": "all temporary graph triples removed",
+      "count": 0,
+      "status": "PASS"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g2-sem-1d80588fcd5a"
+      ],
+      "exitCode": 0,
+      "output": "g2-sem-1d80588fcd5a\n"
+    }
+  ]
+}
