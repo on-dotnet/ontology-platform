@@ -1,0 +1,41 @@
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+失败 SelfApprovalDenied (7ms)
+  从 /Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+  Assertion failed. 预期条件为 false。
+
+  actual: true
+
+  Assert.IsFalse(PublishingPolicy.CanApprove("author", ["platform.auditor", "platform.operator"], "author", DateTimeOffset.UnixEpoch, DateTimeOffset.UnixEpoch.AddHours(1)))
+    在 OntologyPlatform.PublishingTests.ApprovalPolicyTests.SelfApprovalDenied() 位于 /Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/ApprovalPolicyTests.cs:11
+    在 System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+    在 System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+失败 ShortRoleDenied (0ms)
+  从 /Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+  Assertion failed. 预期条件为 false。
+
+  actual: true
+
+  Assert.IsFalse(PublishingPolicy.CanApprove("reviewer", ["auditor"], "author", DateTimeOffset.UnixEpoch, DateTimeOffset.UnixEpoch.AddHours(1)))
+    在 OntologyPlatform.PublishingTests.ApprovalPolicyTests.ShortRoleDenied() 位于 /Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/ApprovalPolicyTests.cs:15
+    在 System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+    在 System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+失败 ExactExpiryDenied (0ms)
+  从 /Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+  Assertion failed. 预期条件为 false。
+
+  actual: true
+
+  Assert.IsFalse(PublishingPolicy.CanApprove("reviewer", ["platform.auditor"], "author", DateTimeOffset.UnixEpoch, DateTimeOffset.UnixEpoch))
+    在 OntologyPlatform.PublishingTests.ApprovalPolicyTests.ExactExpiryDenied() 位于 /Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/ApprovalPolicyTests.cs:19
+    在 System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+    在 System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+/Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64) 失败并出现 3 个错误 (1s 123ms)
+退出代码: 2
+
+测试运行摘要: 失败!
+  总计: 4
+  失败: 3
+  成功: 1
+  已跳过: 0
+  持续时间: 1s 643ms
+已完成测试运行，但显示非成功退出代码: 2 (请参阅: https://aka.ms/testingplatform/exitcodes)
