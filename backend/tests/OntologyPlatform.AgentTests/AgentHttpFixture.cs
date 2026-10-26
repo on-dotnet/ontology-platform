@@ -28,6 +28,12 @@ internal sealed class AgentHttpFixture : IAsyncDisposable
     /// <summary>当前测试服务。</summary>
     internal WebApplication App { get; }
 
+    /// <summary>观察服务器实际结束首条SSE请求，验证慢客户端不占用无限连接。</summary>
+    internal Task StreamStopped { get; }
+
+    /// <summary>仅记录MCP实际媒体类型，不记录消息、令牌或正文。</summary>
+    internal System.Collections.Concurrent.ConcurrentBag<string> McpMediaTypes { get; } = [];
+
     /// <summary>内存Cookie容器，不保存认证材料到文件。</summary>
     internal HttpClient Client { get; }
 
@@ -35,10 +41,11 @@ internal sealed class AgentHttpFixture : IAsyncDisposable
     internal string Csrf { get; private set; } = string.Empty;
 
     /// <summary>关闭自动重定向避免401被登录页掩盖。</summary>
-    private AgentHttpFixture(WebApplication app)
+    private AgentHttpFixture(WebApplication app, Task streamStopped)
     {
         App = app;
-        Client = new HttpClient(new HttpClientHandler { CookieContainer = new CookieContainer(), AllowAutoRedirect = false, UseProxy = false }) { BaseAddress = new Uri(app.Urls.Single()), Timeout = TimeSpan.FromSeconds(35) };
+        StreamStopped = streamStopped;
+        Client = new HttpClient(new MediaRecorder(this)) { BaseAddress = new Uri(app.Urls.Single()), Timeout = TimeSpan.FromSeconds(35) };
     }
 
     /// <summary>复用实际Run/Gateway/审计及真实PostgresTicketStore，不复制业务或安全实现。</summary>
@@ -73,6 +80,13 @@ internal sealed class AgentHttpFixture : IAsyncDisposable
         builder.Services.AddSingleton<IOptions<PlatformSecurityOptions>>(Options.Create(security));
         // 构建真实应用，所有生产端点均来自Api工程。
         var app = builder.Build();
+        // 测试观测请求实际退出，不只以客户端等待超时假称服务已关闭。
+        var streamStopped = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        app.Use(async (context, next) =>
+        {
+            try { await next(context); }
+            finally { if (context.Request.Path.Value?.EndsWith("/events", StringComparison.Ordinal) == true) streamStopped.TrySetResult(); }
+        });
         app.UseAuthentication();
         app.UseAuthorization();
         app.MapExecutionEndpoints();
@@ -86,6 +100,14 @@ internal sealed class AgentHttpFixture : IAsyncDisposable
             return Results.NoContent();
         });
         app.MapGet("/fixture/csrf", (HttpContext context, IAntiforgery antiforgery) => Results.Json(antiforgery.GetAndStoreTokens(context).RequestToken)).RequireAuthorization();
+        app.MapPost("/fixture/restrict", async (HttpContext context, IAntiforgery antiforgery) =>
+        {
+            await antiforgery.ValidateRequestAsync(context);
+            // 通过原生同session续写更新可信范围，旧连接仍携带相同受保护引用。
+            var principal = new ClaimsPrincipal(new ClaimsIdentity(context.User.Claims.Where(value => value.Type != "site_ids" || value.Value == "site-a"), CookieAuthenticationDefaults.AuthenticationScheme));
+            await context.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+            return Results.NoContent();
+        }).RequireAuthorization();
         app.MapPost("/fixture/logout", async (HttpContext context, IAntiforgery antiforgery) =>
         {
             await antiforgery.ValidateRequestAsync(context);
@@ -94,7 +116,7 @@ internal sealed class AgentHttpFixture : IAsyncDisposable
         }).RequireAuthorization();
         await app.StartAsync();
         security.PublicOrigin = app.Urls.Single();
-        return new AgentHttpFixture(app);
+        return new AgentHttpFixture(app, streamStopped.Task);
     }
 
     /// <summary>真实SignIn建立PG票据和Cookie，之后获取原生防伪令牌。</summary>
@@ -106,6 +128,26 @@ internal sealed class AgentHttpFixture : IAsyncDisposable
         Csrf = (await Client.GetFromJsonAsync<string>("/fixture/csrf"))!;
         Client.DefaultRequestHeaders.Add("X-CSRF-TOKEN", Csrf);
         Client.DefaultRequestHeaders.Add("Origin", Client.BaseAddress!.GetLeftPart(UriPartial.Authority));
+    }
+
+    /// <summary>透明观察SDK实际传输类型，不替换任何HTTP响应。</summary>
+    private sealed class MediaRecorder : DelegatingHandler
+    {
+        /// <summary>只用于当前测试断言的媒体类型收集器。</summary>
+        private readonly AgentHttpFixture fixture;
+
+        /// <summary>使用真实CookieContainer和真实回环网络。</summary>
+        internal MediaRecorder(AgentHttpFixture fixture) : base(new HttpClientHandler { CookieContainer = new CookieContainer(), AllowAutoRedirect = false, UseProxy = false }) => this.fixture = fixture;
+
+        /// <summary>仅读取公开Content-Type，绝不复制请求认证头或正文。</summary>
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken token)
+        {
+            // 响应由真实Kestrel产生，观测不改变消息内容。
+            var response = await base.SendAsync(request, token);
+            if (request.RequestUri?.AbsolutePath == "/api/v1/mcp" && response.Content.Headers.ContentType?.MediaType is { } media)
+                fixture.McpMediaTypes.Add(media);
+            return response;
+        }
     }
 
     /// <summary>关闭当前Kestrel和内存Cookie，不留下票据文件。</summary>

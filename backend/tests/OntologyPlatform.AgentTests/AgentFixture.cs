@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Hosting.Internal;
 using OntologyPlatform.Contracts;
 using OntologyPlatform.Modules.Agents;
 using OntologyPlatform.Modules.Governance;
@@ -68,7 +70,7 @@ internal sealed class AgentFixture : IDisposable
     internal ISemanticGateway AfterResolve(Func<Task> callback) => new SemanticGateway(new CatalogCheckpoint(Catalog, callback), scope.ServiceProvider.GetRequiredService<ISemanticRuntime>(), scope.ServiceProvider.GetRequiredService<CapabilityRegistry>(), scope.ServiceProvider.GetRequiredService<IAuditTrail>(), Clock);
 
     /// <summary>通过环境获取本轮新建资源，不读取历史凭证文件。</summary>
-    internal AgentFixture()
+    internal AgentFixture(bool development = true)
     {
         // 缺少显式隔离环境应标NOT_RUN，而不是调用历史运行资源。
         var connection = Environment.GetEnvironmentVariable("G2_AI_PG");
@@ -90,6 +92,7 @@ internal sealed class AgentFixture : IDisposable
         // 保持实际生产模块组合，ValidateOnBuild也验证没有Catalog依赖环。
         var services = new ServiceCollection();
         services.AddSingleton<IConfiguration>(configuration);
+        services.AddSingleton<IHostEnvironment>(new HostingEnvironment { EnvironmentName = development ? Environments.Development : Environments.Production });
         services.AddSingleton<TimeProvider>(Clock);
         services.AddDbContextFactory<GovernanceDbContext>(options => options.UseNpgsql(connection, database => database.MigrationsHistoryTable("__EFMigrationsHistory", "governance")));
         services.AddSingleton<ITransactionalAuditWriter, TransactionalAuditWriter>();

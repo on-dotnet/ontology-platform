@@ -18,6 +18,45 @@ PG = 'postgres:18.6-trixie@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05
 S3 = 'rustfs/rustfs:1.0.3@sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b'
 
 
+# Repo-locked transitive Ajv6 is used only for the observed common validation-keyword subset.
+# This does not certify the entire JSON Schema 2020-12 dialect or install any new dependency.
+SCHEMA_CHECK = r"""
+const fs = require('fs');
+const Ajv = require(process.argv[2]);
+const bundle = JSON.parse(fs.readFileSync(process.argv[1], 'utf8'));
+const allowed = new Set(['$schema','$ref','$defs','type','properties','required','additionalProperties','items','enum','oneOf','anyOf','allOf','not','description','format','minimum','maximum','minLength','maxLength','const','discriminator']);
+const keywords = new Set();
+function scan(schema) {
+  if (typeof schema === 'boolean') return;
+  for (const [key, value] of Object.entries(schema)) {
+    if (!allowed.has(key)) throw new Error('Unsupported schema keyword: ' + key);
+    keywords.add(key);
+    if (key === '$defs' || key === 'properties') Object.values(value).forEach(scan);
+    if (['oneOf','anyOf','allOf'].includes(key)) value.forEach(scan);
+    if (['items','not','additionalProperties'].includes(key) && typeof value === 'object') scan(value);
+  }
+}
+scan(bundle.schema);
+const ajv = new Ajv({validateSchema:false, allErrors:true, unknownFormats:'ignore', logger:false});
+const validate = ajv.compile(bundle.schema);
+if (!validate(bundle.result)) throw new Error('Actual MCP payload failed output contract: ' + JSON.stringify(validate.errors));
+for (const result of bundle.additionalResults || []) if (!validate(result)) throw new Error('Another actual MCP tool failed output contract');
+const mutations = [
+  value => { delete value.status; },
+  value => { value.status = 'INVENTED'; },
+  value => { value.injectedActor = 'admin'; },
+  value => { value.snapshot = null; },
+  value => { value.evidence = null; },
+  value => { value.data[0].ontology = {classIris:[],objectPropertyIris:[],datatypePropertyIris:[],labels:[],supportedAxioms:[],diagnostics:[]}; }
+];
+for (const mutate of mutations) {
+  const value = structuredClone(bundle.result);
+  mutate(value);
+  if (validate(value)) throw new Error('Invalid MCP payload unexpectedly passed output contract');
+}
+console.log(JSON.stringify({status:'PASS', validator:'repo-locked ajv6.15.0', scope:'observed common keyword subset; not full 2020-12 dialect certification', schemaKeywords:[...keywords].sort(), positive:1+(bundle.additionalResults||[]).length, negative:mutations.length, mediaTypes:bundle.mediaTypes}));
+"""
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--label', default='mcp-agent')
@@ -59,6 +98,7 @@ def main():
 
     with tempfile.TemporaryDirectory(prefix=name, dir='/private/tmp' if Path('/private/tmp').is_dir() else None) as directory:
         path = Path(directory)
+        env['G2_AI_SCHEMA_OUTPUT'] = str(path / 'schema-result.json')
         config = '''@prefix fuseki: <http://jena.apache.org/fuseki#> .
 @prefix ja: <http://jena.hpl.hp.com/2005/11/Assembler#> .
 @prefix tdb2: <http://jena.apache.org/2016/tdb#> .
@@ -109,7 +149,13 @@ def main():
             if args.filter:
                 command += ['--', '--filter', args.filter]
             code = run(command, False).returncode
+            if code == 0 and (path / 'schema-result.json').exists():
+                ajv = Path(env.get('G2_AI_AJV', str(ROOT / 'node_modules/.pnpm/ajv@6.15.0/node_modules/ajv')))
+                if not ajv.is_dir():
+                    raise RuntimeError('NOT_RUN: set G2_AI_AJV to existing repo-locked ajv6.15.0; no install is performed')
+                run(['node', '-e', SCHEMA_CHECK, str(path / 'schema-result.json'), str(ajv)])
         except Exception as failure:
+            code = 1
             records.append(dict(status='FAIL', category=type(failure).__name__))
             print(type(failure).__name__, flush=True)
         finally:

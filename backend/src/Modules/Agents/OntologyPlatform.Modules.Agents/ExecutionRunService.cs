@@ -5,6 +5,7 @@ using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using OntologyPlatform.Contracts;
 
 namespace OntologyPlatform.Modules.Agents;
@@ -34,40 +35,48 @@ public sealed class ExecutionRunService
     private readonly TimeProvider clock;
 
     /// <summary>只接收模块边界，不自行复制查询或跨模块表写入。</summary>
-    public ExecutionRunService(IDbContextFactory<AgentsDbContext> factory, ITransactionalAuditWriter audit, IReleaseCatalog catalog, ISemanticGateway gateway, IConfiguration configuration, TimeProvider clock)
+    public ExecutionRunService(IDbContextFactory<AgentsDbContext> factory, ITransactionalAuditWriter audit, IReleaseCatalog catalog, ISemanticGateway gateway, IConfiguration configuration, TimeProvider clock, IHostEnvironment? environment = null)
     {
         this.factory = factory;
         this.audit = audit;
         this.catalog = catalog;
         this.gateway = gateway;
-        deterministicEnabled = configuration.GetValue<bool>("Agents:EnableDeterministicHarness");
+        deterministicEnabled = environment?.IsDevelopment() == true && configuration.GetValue<bool>("Agents:EnableDeterministicHarness");
         this.clock = clock;
     }
+
+    /// <summary>当前宿主仍为Development且明确启用harness时才允许worker执行。</summary>
+    internal bool DeterministicEnabled => deterministicEnabled;
 
     /// <summary>验证提供者及受控计划、固定正式快照，原子提交运行与幂等回执。</summary>
     public async Task<ExecutionRun> CreateAsync(ActorContext actor, CreateRunRequest request, CancellationToken token)
     {
         DemandActor(actor);
         _ = Encode(request);
+        DemandCommand(request.Command);
+        // 散列完整请求，包含正文、计划、提供者及全部命令字段。
+        var hash = Hash(Encode(request));
+        // 每次调用使用自己的连接与事务，不持有跨外部调用的行锁。
+        await using var database = await factory.CreateDbContextAsync(token);
+        // 精确payload重试先定位同owner/组织的回执，随后必须重新授权完整持久scope。
+        // 此路径不读取active、当前工具版本或模型配置，响应丢失后仍可恢复真实已提交事实。
+        var prior = await database.Commands.AsNoTracking().Where(command => command.PayloadHash == hash
+            && database.Runs.Any(run => run.RunId == command.RunId && run.OwnerSubjectId == actor.SubjectId && run.OrganizationId == actor.OrganizationId))
+            .FirstOrDefaultAsync(token);
+        if (prior is not null) return await ReplayAsync(database, actor, prior, hash, token);
         if (request.ProviderMode == ProviderMode.ApprovedModel || request.ProviderMode == ProviderMode.Deterministic && !deterministicEnabled)
             throw new SemanticOperationException(503, "provider_not_configured");
         if (Encoding.UTF8.GetByteCount(request.Prompt) > 256 * 1024 || request.Plan.TimeoutMs is < 100 or > 5000
             || request.Plan.Depth is < 1 or > 5 || request.Plan.MaxRows is < 1 or > 100
             || !gateway.GetCapabilities().Any(value => value.Id == request.Plan.CapabilityId && value.Version == request.Plan.CapabilityVersion))
             throw new SemanticOperationException(422, "run_plan_invalid");
-        DemandCommand(request.Command);
-        // 幂等范围包含可信主体及其完整当前授权集合，撤权不能恢复旧回执。
-        var key = CommandKey(actor, "create", request.Command.IdempotencyKey);
-        // 散列完整请求，包含正文、计划、提供者及全部命令字段。
-        var hash = Hash(Encode(request));
-        // 每次调用使用自己的连接与事务，不持有跨外部调用的行锁。
-        await using var database = await factory.CreateDbContextAsync(token);
-        // 重试先恢复原回执，不重新读取active或执行工具。
-        var prior = await database.Commands.AsNoTracking().SingleOrDefaultAsync(value => value.Key == key, token);
-        if (prior is not null) return await ReplayAsync(database, actor, prior, hash, token);
         // 正式目录本身再次授权并验证真实不可变发布。
         var release = await catalog.ResolveAsync(actor, request.Plan.AssetId, request.Plan.ReleaseId, token);
         DemandScope(actor, release.Manifest.Scope);
+        // 幂等键绑定正式资源的完整范围，不绑定可变化的调用者授权超集。
+        var scopeKey = Hash(Encode(new ResourceScope { OrganizationId = release.Manifest.Scope.OrganizationId, SiteIds = release.Manifest.Scope.SiteIds.Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal).ToArray() }));
+        // 同scope同操作同键仍绑定完整payload；不同payload的重用明确409。
+        var key = CommandKey(actor, "create:" + scopeKey, request.Command.IdempotencyKey);
         // 计划中的版本只能来自正式目录，不接受客户端快照。
         var plan = request.Plan with { ReleaseId = release.Manifest.Snapshot.ReleaseId };
         // 唯一服务器时间关联创建与初始状态。
@@ -75,11 +84,18 @@ public sealed class ExecutionRunService
         // 新运行的所有身份和范围均来源于服务器可信值。
         var row = new RunRecord
         {
-            RunId = Guid.NewGuid().ToString("N"), OwnerSubjectId = actor.SubjectId,
-            OrganizationId = release.Manifest.Scope.OrganizationId, SiteIds = release.Manifest.Scope.SiteIds.Order(StringComparer.Ordinal).Distinct(StringComparer.Ordinal).ToArray(),
-            SnapshotJson = Encode(release.Manifest.Snapshot), ActorJson = Encode(actor), PlanJson = Encode(plan), SourcePrompt = request.Prompt,
+            RunId = Guid.NewGuid().ToString("N"),
+            OwnerSubjectId = actor.SubjectId,
+            OrganizationId = release.Manifest.Scope.OrganizationId,
+            SiteIds = release.Manifest.Scope.SiteIds.Order(StringComparer.Ordinal).Distinct(StringComparer.Ordinal).ToArray(),
+            SnapshotJson = Encode(release.Manifest.Snapshot),
+            ActorJson = Encode(actor),
+            PlanJson = Encode(plan),
+            SourcePrompt = request.Prompt,
             ProviderMode = request.ProviderMode == ProviderMode.Deterministic ? "deterministic" : "disabled",
-            CreatedAtUtc = now, UpdatedAtUtc = now, TraceId = actor.TraceId
+            CreatedAtUtc = now,
+            UpdatedAtUtc = now,
+            TraceId = actor.TraceId
         };
         // 同幂等键的并发创建以PG advisory事务锁串行化，绝不依赖进程锁。
         await using var transaction = await database.Database.BeginTransactionAsync(token);
@@ -94,7 +110,7 @@ public sealed class ExecutionRunService
         return result;
     }
 
-    /// <summary>只列出owner及完整范围可访问的运行，不读取任何Prompt。</summary>
+    /// <summary>只列出owner及完整范围可访问的运行，不返回任何Prompt。</summary>
     public async Task<ExecutionRun[]> ListAsync(ActorContext actor, CancellationToken token)
     {
         DemandActor(actor);
@@ -215,6 +231,8 @@ public sealed class ExecutionRunService
         // 读取当前行，不能用claim时的跟踪副本判定租约。
         var row = await FindAsync(database, runId, true, token);
         if (row.Status != "RUNNING" || row.CancelRequested || row.LeaseOwner != owner || row.FencingToken != fence || row.LeaseUntil <= clock.GetUtcNow()) return false;
+        // 返回值表示调用者原事件被接受；内部预算改写为失败不能授权后续工具继续。
+        var requestedPayload = payload;
         if (row.DeadlineUtc <= clock.GetUtcNow() && payload is not RunFailedPayload)
             payload = new RunFailedPayload { Status = ExecutionStatus.Failed, Code = "run_timeout", TotalToolCalls = row.ToolCalls };
         if (payload is ToolStartedPayload)
@@ -224,7 +242,8 @@ public sealed class ExecutionRunService
         }
         AddEvent(database, row, payload);
         await CommitAsync(database, Decode<ActorContext>(row.ActorJson), row, row.Status switch { "FAILED" => "execution.run.fail", "COMPLETED" => "execution.run.complete", _ => "execution.run.tool" }, token);
-        return !Terminal(row.Status) || payload is RunCompletedPayload or RunFailedPayload;
+        return !Terminal(row.Status) || ReferenceEquals(payload, requestedPayload)
+            && (payload is RunCompletedPayload && row.Status == "COMPLETED" || payload is RunFailedPayload && row.Status == "FAILED");
     }
 
     /// <summary>严格解析Last-Event-ID，拒绝其他Run及非规范十进制序号。</summary>
@@ -253,10 +272,20 @@ public sealed class ExecutionRunService
     /// <summary>映射唯一公共运行合同，禁止返回内部身份或正文列。</summary>
     private static ExecutionRun Map(RunRecord row) => new()
     {
-        RunId = row.RunId, OwnerSubjectId = row.OwnerSubjectId, Scope = Scope(row), Snapshot = Decode<AssetVersionSnapshot>(row.SnapshotJson),
-        Status = Enum.Parse<ExecutionStatus>(row.Status, true), ProviderMode = row.ProviderMode == "deterministic" ? ProviderMode.Deterministic : ProviderMode.Disabled,
-        CreatedAtUtc = row.CreatedAtUtc, UpdatedAtUtc = row.UpdatedAtUtc, LastSeq = row.LastSeq, CancelRequested = row.CancelRequested,
-        LeaseOwner = row.LeaseOwner, LeaseUntil = row.LeaseUntil, FencingToken = row.FencingToken, TraceId = row.TraceId
+        RunId = row.RunId,
+        OwnerSubjectId = row.OwnerSubjectId,
+        Scope = Scope(row),
+        Snapshot = Decode<AssetVersionSnapshot>(row.SnapshotJson),
+        Status = Enum.Parse<ExecutionStatus>(row.Status, true),
+        ProviderMode = row.ProviderMode == "deterministic" ? ProviderMode.Deterministic : ProviderMode.Disabled,
+        CreatedAtUtc = row.CreatedAtUtc,
+        UpdatedAtUtc = row.UpdatedAtUtc,
+        LastSeq = row.LastSeq,
+        CancelRequested = row.CancelRequested,
+        LeaseOwner = row.LeaseOwner,
+        LeaseUntil = row.LeaseUntil,
+        FencingToken = row.FencingToken,
+        TraceId = row.TraceId
     };
 
     /// <summary>可信平台角色在直接调用和HTTP之间保持一致。</summary>
@@ -290,7 +319,7 @@ public sealed class ExecutionRunService
     }
 
     /// <summary>规范身份范围及操作的无碰撞结构化键。</summary>
-    private static string CommandKey(ActorContext actor, string operation, string key) => Hash(Encode(new { actor.SubjectId, actor.OrganizationId, Sites = actor.SiteIds.Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal).ToArray(), Operation = operation, Key = key }));
+    private static string CommandKey(ActorContext actor, string operation, string key) => Hash(Encode(new { actor.SubjectId, actor.OrganizationId, Operation = operation, Key = key }));
 
     /// <summary>SHA256只用于内部幂等绑定，不输出正文。</summary>
     private static string Hash(string text) => Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(text)));
@@ -335,15 +364,24 @@ public sealed class ExecutionRunService
         row.LastSeq = seq;
         row.UpdatedAtUtc = envelope.OccurredAtUtc;
         row.Status = payload switch { RunFailedPayload => "FAILED", RunCompletedPayload => "COMPLETED", RunCancelledPayload => "CANCELLED", _ => row.Status };
-        if (Terminal(row.Status)) { row.LeaseOwner = null; row.LeaseUntil = null; }
+        if (Terminal(row.Status))
+        {
+            row.LeaseOwner = null;
+            row.LeaseUntil = null;
+        }
         database.Events.Add(new RunEventRecord { RunId = row.RunId, Seq = seq, EventId = envelope.EventId, EnvelopeJson = serialized });
     }
 
     /// <summary>事件类型只能从唯一强类型载荷导出，固定相同snapshot。</summary>
     private ExecutionEvent Envelope(RunRecord row, ExecutionPayload payload, long seq) => new()
     {
-        RunId = row.RunId, Seq = seq, EventId = row.RunId + ":" + seq.ToString(CultureInfo.InvariantCulture), SchemaVersion = 1,
-        OccurredAtUtc = clock.GetUtcNow(), Snapshot = Decode<AssetVersionSnapshot>(row.SnapshotJson), Payload = payload,
+        RunId = row.RunId,
+        Seq = seq,
+        EventId = row.RunId + ":" + seq.ToString(CultureInfo.InvariantCulture),
+        SchemaVersion = 1,
+        OccurredAtUtc = clock.GetUtcNow(),
+        Snapshot = Decode<AssetVersionSnapshot>(row.SnapshotJson),
+        Payload = payload,
         EventType = payload switch { RunStartedPayload => "run.started", ToolStartedPayload => "tool.started", ToolCompletedPayload => "tool.completed", EvidenceAddedPayload => "evidence.added", MessageDeltaPayload => "message.delta", RunCompletedPayload => "run.completed", RunFailedPayload => "run.failed", RunCancelledPayload => "run.cancelled", _ => throw new InvalidOperationException("未授权事件类型。") }
     };
 

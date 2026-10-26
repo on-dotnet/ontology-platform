@@ -1,5 +1,7 @@
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using OntologyPlatform.Contracts;
 using OntologyPlatform.Modules.Agents;
 
@@ -41,6 +43,39 @@ public sealed class RunFlowTests
         Assert.AreEqual(JsonSerializer.Serialize(events), JsonSerializer.Serialize(await AllAsync(fixture, run.RunId)));
     }
 
+    /// <summary>显式harness开关也不能在非Development宿主启用。</summary>
+    [TestMethod]
+    public async Task DeterministicModeRequiresDevelopmentHost()
+    {
+        // 只模拟宿主环境名；所有资源仍是当前临时Synthetic测试容器。
+        using var fixture = new AgentFixture(development: false);
+        // 正式发布用于排除不存在版本等无关拒绝原因。
+        var release = await fixture.PublishAsync();
+        await RejectAsync(503, () => fixture.Runs.CreateAsync(fixture.Author, Request(fixture.Plan(release)), default));
+    }
+
+    /// <summary>授权扩大或提供者配置关闭不改变已提交幂等回执；关闭后的worker不能执行旧harness任务。</summary>
+    [TestMethod]
+    public async Task CommittedRunReplaysAfterGrantOrProviderConfigChange()
+    {
+        // 真实正式版本保证不同失败只来自幂等与提供者边界。
+        using var fixture = new AgentFixture();
+        // 先创建一个确定性运行，但不执行它。
+        var release = await fixture.PublishAsync();
+        // 完整请求保持不变，只有当前授权或宿主配置变化。
+        var request = Request(fixture.Plan(release));
+        // 原提交回执为持久幂等恢复的唯一真相。
+        var original = await fixture.Runs.CreateAsync(fixture.Author, request, default);
+        // 增加无关第三厂权限不能让同一个资源scope的命令变成新Run。
+        var replay = await fixture.Runs.CreateAsync(fixture.Author with { SiteIds = ["site-a", "site-b", "site-c"] }, request, default);
+        Assert.AreEqual(original.RunId, replay.RunId);
+        // 新进程关闭harness后仍可读取已提交回执，但不能执行遗留确定性任务。
+        var disabled = new ExecutionRunService(fixture.RunFactory, fixture.Provider.GetRequiredService<ITransactionalAuditWriter>(), fixture.Catalog, fixture.Gateway, new ConfigurationBuilder().Build(), fixture.Clock);
+        Assert.AreEqual(original.RunId, (await disabled.CreateAsync(fixture.Author, request, default)).RunId);
+        await new AgentRunExecutor(disabled, fixture.Gateway, fixture.Clock).RunOneAsync("disabled-recovery", default);
+        Assert.IsTrue((await AllAsync(fixture, original.RunId)).Last().Payload is RunFailedPayload { Code: "provider_not_configured" });
+    }
+
     /// <summary>默认禁用提供者必须持久FAILED且不产生任何工具成功事件。</summary>
     [TestMethod]
     public async Task DisabledProviderCannotPretendCompletion()
@@ -69,6 +104,9 @@ public sealed class RunFlowTests
         // 基准请求用于完整payload幂等检查。
         var request = Request(fixture.Plan(release));
         await RejectAsync(503, () => fixture.Runs.CreateAsync(fixture.Author, request with { ProviderMode = ProviderMode.ApprovedModel }, default));
+        // 未显式启用harness的默认配置不得被请求ProviderMode绕过。
+        var defaultService = new ExecutionRunService(fixture.RunFactory, fixture.Provider.GetRequiredService<ITransactionalAuditWriter>(), fixture.Catalog, fixture.Gateway, new ConfigurationBuilder().Build(), fixture.Clock);
+        await RejectAsync(503, () => defaultService.CreateAsync(fixture.Author, request, default));
         // 先提交合法运行，再测试相同幂等键换正文。
         var run = await fixture.Runs.CreateAsync(fixture.Author, request, default);
         await RejectAsync(409, () => fixture.Runs.CreateAsync(fixture.Author, request with { Prompt = "different" }, default));
@@ -169,6 +207,41 @@ public sealed class RunFlowTests
         foreach (var cursor in new[] { "other:0", run.RunId + ":-1", run.RunId + ":01", run.RunId + ":9999999999999999999999" })
             Assert.Throws<SemanticOperationException>(() => ExecutionRunService.ParseCursor(run.RunId, cursor));
         await fixture.Runs.CancelAsync(fixture.Author, run.RunId, new CancelRunRequest { Command = AgentFixture.Command(0) }, default);
+    }
+
+    /// <summary>R1/R2实际发布和回滚之后旧Run继续重放原snapshot，不依赖当前active或外部图可用性。</summary>
+    [TestMethod]
+    public async Task OldRunKeepsSnapshotAcrossNewPublishAndRollback()
+    {
+        // 同一资产先完成真实R1发布。
+        using var fixture = new AgentFixture();
+        // 原始正式版本用于旧Run绑定。
+        var first = await fixture.PublishAsync();
+        // 运行在R1活动时固定snapshot，尚未执行工具。
+        var oldRun = await fixture.Runs.CreateAsync(fixture.Author, Request(fixture.Plan(first)), default);
+        // 源码真实推进到第二修订，不能复用旧批准。
+        var draft = await fixture.Ontology.ReadAsync(fixture.Author, first.Manifest.DraftId, default);
+        // 改注释仍改变原始字节hash，保留完整语义合法性。
+        var changed = await fixture.Ontology.SaveAsync(fixture.Author, draft.DraftId, new SaveDraftRequest { Name = draft.Name, Sources = draft.Sources with { OntologyTurtle = draft.Sources.OntologyTurtle + "\n# next release\n" }, Command = AgentFixture.Command(draft.Revision) }, default);
+        // 新修订重新SHACL、异人审核和激活。
+        var proposal = await fixture.ApproveAsync(await fixture.ProposalForAsync(changed));
+        // 实际R2活动CAS绑定当前R1。
+        var second = await fixture.Service.ActivateAsync(fixture.Author, new ActivateReleaseRequest { ProposalId = proposal.ProposalId, ExpectedActivationRevision = first.ActivationRevision, ExpectedActiveReleaseId = first.Manifest.ReleaseId, Command = AgentFixture.Command(proposal.Revision) }, default);
+        // R1已非active，但旧Run的MAF仍必须读取R1固定版本。
+        await fixture.Executor.RunOneAsync("snapshot-worker", default);
+        Assert.IsTrue((await AllAsync(fixture, oldRun.RunId)).All(value => value.Snapshot.ReleaseId == first.Manifest.ReleaseId));
+        // 在R2活动时创建新Run应固定R2。
+        var newRun = await fixture.Runs.CreateAsync(fixture.Author, Request(fixture.Plan(first)), default);
+        Assert.AreEqual(second.ReleaseId, newRun.Snapshot.ReleaseId);
+        // 回滚需要独立正式提案与异人审批。
+        var rollback = await fixture.ApproveAsync(await fixture.Service.CreateProposalAsync(fixture.Author, new CreateProposalRequest { Kind = ProposalKind.Rollback, TargetReleaseId = first.Manifest.ReleaseId, TargetManifestHash = first.ManifestHash, Command = AgentFixture.Command() }, default));
+        await fixture.Service.ActivateAsync(fixture.Author, AgentFixture.Activation(rollback, second), default);
+        // 旧Run重放在外部依赖故障时仍完全可读，不会重新执行工具。
+        fixture.Gate = (_, _) => throw new HttpRequestException("fixture dependency offline");
+        Assert.AreEqual(first.Manifest.ReleaseId, (await fixture.Runs.ReadAsync(fixture.Author, oldRun.RunId, default)).Snapshot.ReleaseId);
+        Assert.IsTrue((await AllAsync(fixture, oldRun.RunId)).All(value => value.Snapshot.ReleaseId == first.Manifest.ReleaseId));
+        Assert.AreEqual(second.ReleaseId, (await fixture.Runs.ReadAsync(fixture.Author, newRun.RunId, default)).Snapshot.ReleaseId);
+        await fixture.Runs.CancelAsync(fixture.Author, newRun.RunId, new CancelRunRequest { Command = AgentFixture.Command(0) }, default);
     }
 
     /// <summary>按真实计划构造明确确定性请求，不填写任何客户端scope或snapshot。</summary>

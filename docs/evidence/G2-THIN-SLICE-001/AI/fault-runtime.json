@@ -1,0 +1,288 @@
+{
+  "sourceSha": "6f52feadc34b593f1e7a8a579177bc1596c6d0e0",
+  "workingTreeChanges": true,
+  "sourceHashes": {
+    "backend/src/Hosts/OntologyPlatform.Api/G2/ExecutionEndpoints.cs": "e210474c90474555154387a1cd2dbecd5cb283afa16df8c67b7a99b5ebfabba3",
+    "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/AgentRunExecutor.cs": "16b256d16da08f57d8d3f233d1c8298003bfc7da7fb6d17ec58fccbbd4af68d8",
+    "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/AgentsDbContext.cs": "a25b18db08e6e6825ddbfc863b26d0cb2f59f94a605af4d082b445f4945b89f1",
+    "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/AgentsDesignTimeFactory.cs": "1a42d36ca8046890fded46e993a577264b3447eea08ce30128914b17508d9f70",
+    "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/AgentsModule.cs": "52cfd4b4a88d752981db982296434b42bf05128468adb589b9691c96accef992",
+    "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/DeterministicRunClient.cs": "3024b1d9c6551a761e3822e710eaf7aecbc8df0e72a9f5d497b5da4c94dc68a7",
+    "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/ExecutionRunService.cs": "b64d79daab67760901289a68f19743f90596e6816ac1180ee1fc29ad76f71073",
+    "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/RunCommandRecord.cs": "b394e7831a195c0c254681c3fb3ef35943b2d6645155614998a8132a22b4dc39",
+    "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/RunEventRecord.cs": "58fcf68a164a257d969342866d394454c22f13d5d614d074dcbac0d89f8f2a31",
+    "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/RunRecord.cs": "643ea34acbf568c6f69c8cb68dc39b5fb945f895c747828688abd7da99477a75",
+    "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/SemanticMcpTools.cs": "a595673253e24880a5010057fc485efa117ae4ff22aeef21cd33ea2f8ffcb821",
+    "backend/tests/OntologyPlatform.AgentTests/AgentFixture.cs": "71cce946a96442252d98c418c5f79806275268bb928bf7446696be48b9ef1008",
+    "backend/tests/OntologyPlatform.AgentTests/AgentHttpFixture.cs": "1a4c669823ee11743b0eb95da6e1a95aaac68b42ff4949ca45317bb26833feab",
+    "backend/tests/OntologyPlatform.AgentTests/AgentMigrationTests.cs": "835c8dfc77af155d0431ded1fb738b32fbcdf6f2856e3a6a8b367e7505e2efc7",
+    "backend/tests/OntologyPlatform.AgentTests/PersistenceTests.cs": "dda6f6b873c988a56e284754043e8967ec69f5f091ceaa8705ae9d1c244d39b0",
+    "backend/tests/OntologyPlatform.AgentTests/RunFaultTests.cs": "db92617ca43f85ba9d08c92080c1a6f0517308238054851afdc099b75a2af9ec",
+    "backend/tests/OntologyPlatform.AgentTests/RunFlowTests.cs": "b0e9d414db7295c620ef0a2414d47922a6e7968a8abd02a38cb237e0c7b3c11f",
+    "backend/tests/OntologyPlatform.AgentTests/TransportTests.cs": "2b4c4606102f6ec8b4796a5f4cc329284932c2558e8e4f2cca1415ebb1e8555d",
+    "docs/contracts/g2-schemas.openapi.json": "35f249d0aa1992234c3df7640d9dd1250b3c588f61d0c7d67339ff6b065eae5b",
+    "scripts/acceptance/mcp-agent.py": "23a2a7aa58c392388fc8c55247d6ef019781acf122122b78000a4b9e371480f5"
+  },
+  "exitCode": 2,
+  "records": [
+    {
+      "command": [
+        "docker",
+        "image",
+        "inspect",
+        "--format",
+        "{{.Id}}",
+        "ontology-platform-g2-fuseki:6.2.0"
+      ],
+      "exitCode": 0,
+      "output": "sha256:6cd40ff063db802d36a082fda07849fef3289d974b48d5c44fc9a82c41a1e826\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "restore",
+        "backend/tests/OntologyPlatform.AgentTests",
+        "--locked-mode"
+      ],
+      "exitCode": 0,
+      "output": "  正在确定要还原的项目…\n  所有项目均是最新的，无法还原。\n"
+    },
+    {
+      "command": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g2-agent-b88a1abcd6cc-pg",
+        "--memory",
+        "256m",
+        "--cpus",
+        "1",
+        "--publish",
+        "127.0.0.1::5432",
+        "--env",
+        "POSTGRES_PASSWORD",
+        "--env",
+        "POSTGRES_DB",
+        "--tmpfs",
+        "/var/lib/postgresql",
+        "postgres:18.6-trixie@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6"
+      ],
+      "exitCode": 0,
+      "output": "38919e512bc8b93c9c034a7d209435e07293dbcd242b5c5395b57ba7a1318a26\n"
+    },
+    {
+      "command": [
+        "docker",
+        "port",
+        "g2-agent-b88a1abcd6cc-pg",
+        "5432/tcp"
+      ],
+      "exitCode": 0,
+      "output": "127.0.0.1:64272\n"
+    },
+    {
+      "command": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g2-agent-b88a1abcd6cc-s3",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--publish",
+        "127.0.0.1::9000",
+        "--env",
+        "RUSTFS_ACCESS_KEY",
+        "--env",
+        "RUSTFS_SECRET_KEY",
+        "--env",
+        "RUSTFS_CONSOLE_ENABLE=false",
+        "--tmpfs",
+        "/data:mode=1777",
+        "rustfs/rustfs:1.0.3@sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+        "/data"
+      ],
+      "exitCode": 0,
+      "output": "184ca9098d31c740968ff45d609956c1890edab323211e93a46597550e499ae1\n"
+    },
+    {
+      "command": [
+        "docker",
+        "port",
+        "g2-agent-b88a1abcd6cc-s3",
+        "9000/tcp"
+      ],
+      "exitCode": 0,
+      "output": "127.0.0.1:64275\n"
+    },
+    {
+      "command": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g2-agent-b88a1abcd6cc-jena",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--publish",
+        "127.0.0.1::3030",
+        "--mount",
+        "type=bind,src=/private/tmp/g2-agent-b88a1abcd6ccfeb66sza,dst=/fixture,readonly",
+        "--entrypoint",
+        "java",
+        "ontology-platform-g2-fuseki:6.2.0",
+        "-Xmx384m",
+        "-Dlog4j.configurationFile=/fixture/log4j2.properties",
+        "-jar",
+        "/opt/fuseki/fuseki-server.jar",
+        "--config=/fixture/config.ttl"
+      ],
+      "exitCode": 0,
+      "output": "a0a7a200eb36b65d8ef07af108be19094363e6303679578221d22c41078d14b0\n"
+    },
+    {
+      "command": [
+        "docker",
+        "port",
+        "g2-agent-b88a1abcd6cc-jena",
+        "3030/tcp"
+      ],
+      "exitCode": 0,
+      "output": "127.0.0.1:64280\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "build",
+        "backend/tests/OntologyPlatform.AgentTests",
+        "--no-restore"
+      ],
+      "exitCode": 0,
+      "output": "  OntologyPlatform.Contracts -> /Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/bin/Debug/net10.0/OntologyPlatform.Contracts.dll\n  OntologyPlatform.ServiceDefaults -> /Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/src/ServiceDefaults/bin/Debug/net10.0/OntologyPlatform.ServiceDefaults.dll\n  OntologyPlatform.Modules.Ontology.Domain -> /Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.Domain.dll\n  OntologyPlatform.Modules.Governance -> /Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/bin/Debug/net10.0/OntologyPlatform.Modules.Governance.dll\n  OntologyPlatform.Modules.SemanticQuery -> /Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/bin/Debug/net10.0/OntologyPlatform.Modules.SemanticQuery.dll\n  OntologyPlatform.Modules.Agents -> /Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/bin/Debug/net10.0/OntologyPlatform.Modules.Agents.dll\n  OntologyPlatform.Modules.Publishing.Domain -> /Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/bin/Debug/net10.0/OntologyPlatform.Modules.Publishing.Domain.dll\n  OntologyPlatform.Modules.Ontology -> /Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.dll\n  OntologyPlatform.Modules.Publishing -> /Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/bin/Debug/net10.0/OntologyPlatform.Modules.Publishing.dll\n/Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/G2/G2EndpointGuard.cs(57,215): warning CS1573: 参数“requiresCommand”在“G2EndpointGuard.ExecuteAsync<T>(HttpContext, string, CommandContext?, Func<ActorContext, CancellationToken, Task<T>>, bool, bool, bool)”的 XML 注释中没有匹配的 param 标记(但其他参数有) [/Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/OntologyPlatform.Api.csproj]\n  OntologyPlatform.Api -> /Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/bin/Debug/net10.0/OntologyPlatform.Api.dll\n/Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/tests/OntologyPlatform.AgentTests/RunFaultTests.cs(25,33): warning EF1002: Method 'ExecuteSqlRawAsync' inserts interpolated strings directly into the SQL, without any protection against SQL injection. Consider using 'ExecuteSqlAsync' instead, which protects against SQL injection, or make sure that the value is sanitized and suppress the warning. [/Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/tests/OntologyPlatform.AgentTests/OntologyPlatform.AgentTests.csproj]\n/Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/tests/OntologyPlatform.AgentTests/RunFaultTests.cs(36,37): warning EF1002: Method 'ExecuteSqlRawAsync' inserts interpolated strings directly into the SQL, without any protection against SQL injection. Consider using 'ExecuteSqlAsync' instead, which protects against SQL injection, or make sure that the value is sanitized and suppress the warning. [/Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/tests/OntologyPlatform.AgentTests/OntologyPlatform.AgentTests.csproj]\n  OntologyPlatform.AgentTests -> /Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll\n\n已成功生成。\n\n/Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/G2/G2EndpointGuard.cs(57,215): warning CS1573: 参数“requiresCommand”在“G2EndpointGuard.ExecuteAsync<T>(HttpContext, string, CommandContext?, Func<ActorContext, CancellationToken, Task<T>>, bool, bool, bool)”的 XML 注释中没有匹配的 param 标记(但其他参数有) [/Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/OntologyPlatform.Api.csproj]\n/Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/tests/OntologyPlatform.AgentTests/RunFaultTests.cs(25,33): warning EF1002: Method 'ExecuteSqlRawAsync' inserts interpolated strings directly into the SQL, without any protection against SQL injection. Consider using 'ExecuteSqlAsync' instead, which protects against SQL injection, or make sure that the value is sanitized and suppress the warning. [/Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/tests/OntologyPlatform.AgentTests/OntologyPlatform.AgentTests.csproj]\n/Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/tests/OntologyPlatform.AgentTests/RunFaultTests.cs(36,37): warning EF1002: Method 'ExecuteSqlRawAsync' inserts interpolated strings directly into the SQL, without any protection against SQL injection. Consider using 'ExecuteSqlAsync' instead, which protects against SQL injection, or make sure that the value is sanitized and suppress the warning. [/Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/tests/OntologyPlatform.AgentTests/OntologyPlatform.AgentTests.csproj]\n    3 个警告\n    0 个错误\n\n已用时间 00:00:00.98\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "tool",
+        "restore"
+      ],
+      "exitCode": 0,
+      "output": "工具“dotnet-ef”(版本“10.0.13”)已还原。可用的命令: dotnet-ef\n\n还原成功。\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "tool",
+        "run",
+        "dotnet-ef",
+        "database",
+        "update",
+        "--project",
+        "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance",
+        "--startup-project",
+        "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance",
+        "--no-build"
+      ],
+      "exitCode": 0,
+      "output": "Failed executing DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']\nSELECT \"MigrationId\", \"ProductVersion\"\nFROM governance.\"__EFMigrationsHistory\"\nORDER BY \"MigrationId\";\nAcquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.\nApplying migration '20261025062847_InitialGovernance'.\nApplying migration '20261025144246_AuditScopeSites'.\nAcquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.\nDone.\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "tool",
+        "run",
+        "dotnet-ef",
+        "database",
+        "update",
+        "--project",
+        "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology",
+        "--startup-project",
+        "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology",
+        "--no-build"
+      ],
+      "exitCode": 0,
+      "output": "Failed executing DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']\nSELECT \"MigrationId\", \"ProductVersion\"\nFROM ontology.\"__EFMigrationsHistory\"\nORDER BY \"MigrationId\";\nAcquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.\nApplying migration '20261026003221_InitialOntology'.\nDone.\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "tool",
+        "run",
+        "dotnet-ef",
+        "database",
+        "update",
+        "--project",
+        "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing",
+        "--startup-project",
+        "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing",
+        "--no-build"
+      ],
+      "exitCode": 0,
+      "output": "Failed executing DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']\nSELECT \"MigrationId\", \"ProductVersion\"\nFROM publishing.\"__EFMigrationsHistory\"\nORDER BY \"MigrationId\";\nAcquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.\nApplying migration '20261026015031_InitialPublishing'.\nDone.\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "tool",
+        "run",
+        "dotnet-ef",
+        "database",
+        "update",
+        "--project",
+        "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents",
+        "--startup-project",
+        "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents",
+        "--no-build"
+      ],
+      "exitCode": 0,
+      "output": "Failed executing DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']\nSELECT \"MigrationId\", \"ProductVersion\"\nFROM agents.\"__EFMigrationsHistory\"\nORDER BY \"MigrationId\";\nAcquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.\nApplying migration '20261026024046_InitialAgents'.\nDone.\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "test",
+        "--project",
+        "backend/tests/OntologyPlatform.AgentTests",
+        "--no-restore",
+        "--no-build"
+      ],
+      "exitCode": 2,
+      "output": "正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll (net10.0|arm64)\n失败 AuditFailureRollsBackRunAndIdempotencyReceipt (1s 120ms)\n  从 /Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll (net10.0|arm64)\n  测试方法 OntologyPlatform.AgentTests.RunFaultTests。AuditFailureRollsBackRunAndIdempotencyReceipt 引发了异常: \n  Npgsql.PostgresException: 42P01: relation \"governance.AuditRecords\" does not exist\n    在 Npgsql.Internal.NpgsqlConnector.ReadMessageLong(Boolean async, DataRowLoadingMode dataRowLoadingMode, Boolean readingNotifications, Boolean isReadingPrependedMessage)\n    在 System.Runtime.CompilerServices.PoolingAsyncValueTaskMethodBuilder`1.StateMachineBox`1.System.Threading.Tasks.Sources.IValueTaskSource<TResult>.GetResult(Int16 token)\n    在 Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)\n    在 Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)\n    在 Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)\n    在 Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)\n    在 Npgsql.NpgsqlCommand.ExecuteNonQuery(Boolean async, CancellationToken cancellationToken)\n    在 Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)\n    在 Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)\n    在 Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)\n    在 Microsoft.EntityFrameworkCore.RelationalDatabaseFacadeExtensions.ExecuteSqlRawAsync(DatabaseFacade databaseFacade, String sql, IEnumerable`1 parameters, CancellationToken cancellationToken)\n    在 OntologyPlatform.AgentTests.RunFaultTests.AuditFailureRollsBackRunAndIdempotencyReceipt() 位于 /Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/tests/OntologyPlatform.AgentTests/RunFaultTests.cs:25\n    在 OntologyPlatform.AgentTests.RunFaultTests.AuditFailureRollsBackRunAndIdempotencyReceipt() 位于 /Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/tests/OntologyPlatform.AgentTests/RunFaultTests.cs:40\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n    \n失败 ConcurrentCreateHasSingleCommittedRun (548ms)\n  从 /Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll (net10.0|arm64)\n  测试方法 OntologyPlatform.AgentTests.RunFaultTests。ConcurrentCreateHasSingleCommittedRun 引发了异常: \n  System.InvalidOperationException: A second operation was started on this context instance before a previous operation completed. This is usually caused by different threads concurrently using the same instance of DbContext. For more information on how to avoid threading issues with DbContext, see https://go.microsoft.com/fwlink/?linkid=2097913.\n    在 Microsoft.EntityFrameworkCore.Infrastructure.Internal.ConcurrencyDetector.EnterCriticalSection()\n    在 Microsoft.EntityFrameworkCore.Query.Internal.SingleQueryingEnumerable`1.AsyncEnumerator.MoveNextAsync()\n    在 Microsoft.EntityFrameworkCore.Query.ShapedQueryCompilingExpressionVisitor.SingleOrDefaultAsync[TSource](IAsyncEnumerable`1 asyncEnumerable, CancellationToken cancellationToken)\n    在 Microsoft.EntityFrameworkCore.Query.ShapedQueryCompilingExpressionVisitor.SingleOrDefaultAsync[TSource](IAsyncEnumerable`1 asyncEnumerable, CancellationToken cancellationToken)\n    在 OntologyPlatform.Modules.Publishing.PublishingCatalog.ResolveAsync(ActorContext actor, String assetId, String releaseId, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/PublishingCatalog.cs:44\n    在 OntologyPlatform.Modules.Agents.ExecutionRunService.CreateAsync(ActorContext actor, CreateRunRequest request, CancellationToken token) 位于 /Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/ExecutionRunService.cs:69\n    在 OntologyPlatform.Modules.Agents.ExecutionRunService.CreateAsync(ActorContext actor, CreateRunRequest request, CancellationToken token) 位于 /Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/ExecutionRunService.cs:94\n    在 OntologyPlatform.AgentTests.RunFaultTests.ConcurrentCreateHasSingleCommittedRun() 位于 /Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/tests/OntologyPlatform.AgentTests/RunFaultTests.cs:54\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n    \n失败 ToolAndAbsoluteTimeBudgetsFailClosed (568ms)\n  从 /Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll (net10.0|arm64)\n  Assertion failed. 预期条件为 true。\n  \n  actual: false\n  \n  Assert.IsTrue(await fixture.Runs.AppendAsync(run.RunId, \"tool-budget\", claim.FencingToken, new ToolStartedPayload { InvocationId = Guid.NewGuid().ToString(\"N\"), CapabilityId = plan.CapabilityId, CapabilityVersion = plan.CapabilityVersion, Plan = plan }, default))\n    在 OntologyPlatform.AgentTests.RunFaultTests.ToolAndAbsoluteTimeBudgetsFailClosed() 位于 /Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/tests/OntologyPlatform.AgentTests/RunFaultTests.cs:77\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n失败 OversizedToolEventPersistsOnlySafeFailure (478ms)\n  从 /Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll (net10.0|arm64)\n  测试方法 OntologyPlatform.AgentTests.RunFaultTests。OversizedToolEventPersistsOnlySafeFailure 引发了异常: \n  System.InvalidOperationException: Sequence contains no elements\n    在 System.Linq.ThrowHelper.ThrowNoElementsException()\n    在 System.Linq.Enumerable.Last[TSource](IEnumerable`1 source)\n    在 OntologyPlatform.AgentTests.RunFaultTests.OversizedToolEventPersistsOnlySafeFailure() 位于 /Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/tests/OntologyPlatform.AgentTests/RunFaultTests.cs:109\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n    \n失败 PersistentCancelPropagatesToDownstreamToken (4s 387ms)\n  从 /Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll (net10.0|arm64)\n  测试方法 OntologyPlatform.AgentTests.RunFaultTests。PersistentCancelPropagatesToDownstreamToken 引发了异常: \n  System.TimeoutException: The operation has timed out.\n    在 OntologyPlatform.AgentTests.RunFaultTests.PersistentCancelPropagatesToDownstreamToken() 位于 /Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/tests/OntologyPlatform.AgentTests/RunFaultTests.cs:138\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n    \n失败 LeaseTakeoverRejectsStaleFencingToken (272ms)\n  从 /Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll (net10.0|arm64)\n  Assertion failed. 预期条件为 true。\n  \n  actual: false\n  \n  Assert.IsTrue(await fixture.Runs.AppendAsync(run.RunId, \"worker-two\", second.FencingToken, new RunFailedPayload { Status = ExecutionStatus.Failed, Code = \"test_failure\" }, default))\n    在 OntologyPlatform.AgentTests.RunFlowTests.LeaseTakeoverRejectsStaleFencingToken() 位于 /Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/tests/OntologyPlatform.AgentTests/RunFlowTests.cs:128\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n/Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll (net10.0|arm64) 失败并出现 6 个错误 (13s 298ms)\n退出代码: 2\n\n测试运行摘要: 失败!\n  总计: 19\n  失败: 6\n  成功: 13\n  已跳过: 0\n  持续时间: 13s 738ms\n已完成测试运行，但显示非成功退出代码: 2 (请参阅: https://aka.ms/testingplatform/exitcodes)\n"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g2-agent-b88a1abcd6cc-jena"
+      ],
+      "exitCode": 0,
+      "output": "g2-agent-b88a1abcd6cc-jena\n"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g2-agent-b88a1abcd6cc-s3"
+      ],
+      "exitCode": 0,
+      "output": "g2-agent-b88a1abcd6cc-s3\n"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g2-agent-b88a1abcd6cc-pg"
+      ],
+      "exitCode": 0,
+      "output": "g2-agent-b88a1abcd6cc-pg\n"
+    }
+  ]
+}
