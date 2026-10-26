@@ -74,3 +74,17 @@ API编译证明新PublishingEndpoints适配原G2EndpointGuard签名，不代表H
 - 同源码`pwsh -NoProfile -File scripts/verify.ps1 -SelfTest`再次exit0，见committed-selftest.txt。
 - API与PublishingTests Release构建0warnings/0errors；owned格式exit0。整solution共享WireContractTests格式问题仍以本树实际exit2记账，Master已接手修复。
 - Owner停止在独立审查/集成关口。PublishingTests新csproj和私有lock已完成并移交Master。CI、HTTP/浏览器与能力绑定的新R1/R2总体G2验收不由这些本地用例代替；保留上述NOT_VERIFIED/NOT_RUN边界。
+
+
+## 独立审查 Minor 限定修复（2026-10-26）
+
+独立PUB审查C0/I0/M1，核心Spec/Quality通过。此次仅修复ROLLBACK提案已提交但响应丢失时，外部S3/Jena故障阻止读取PG回执的问题；不改变激活、审批或迁移合同。
+
+- 源码提交：`5f11a85eeb45a92def0dcd77839a6678b9ab8bb5`，基于已交付`8c9240b`，仅PublishingService、既有RollbackBoundaryTests及release-faults.py三个owned文件。
+- 先从PG的Published目标行取得权威完整scope并重做角色/范围授权，再由既有WriteAsync锁定命令，核对主体及完整请求payloadHash。已提交命令恢复原提案；只有首次命令进入完整Catalog对象/图回验和提案写入。客户端不能指定scope；更改reason仍409，缩减scope403，更换主体409。新命令断网仍503，不能用目标行存在替代真实回验。
+- 实际先红后绿：`python3 scripts/acceptance/release-faults.py --label review-replay-red --filter FullyQualifiedName~RollbackProposalReceiptSurvivesExternalOutage`，4项/失败3/成功1/跳过0，exit2；重放被503阻止、错payload及错subject误返回503，跨scope原本403。原始输出见review-replay-red.json。
+- 相同filter的`--label review-replay-green`实际4/4、0skip、exit0；同时检查不新增提案/成功审计及首次命令必须回验。
+- 全项目命令`python3 scripts/acceptance/release-faults.py --label review-full-50`实际50/50、0failed、0skip、exit0，约22秒，含原46项真实故障/迁移/回滚/Outbox矩阵；见review-full-50.json。此运行在提交前的最终patch上完成，runner原始sourceSha保留8c9240b且workingTreeChanges=true；随后原样提交5f11a85，未改源码。review-fix-source-binding.json给出三个变更文件SHA256及与提交字节相等的核验，不把预提交记录伪写成clean-source运行。
+- review-fix-checks.json保存真实命令/输出/exit：从backend cwd对两个owned C#文件分别format及verify-no-changes均exit0；Release PublishingTests构建0警告/0错误；仓库SelfTest exit0。format有既存工作区加载提示，未跨写共享文件。未重复既知共享WireContractTests整solution格式失败，仍由Master负责。
+- Linux runner交接：读取G2_TEST_JENA_IMAGE，默认ontology-platform-g2-fuseki:6.2.0；临时挂载目录改为Mac/Linux均支持的/tmp。保留固定批准Dockerfile/JRE/Jena选型，无新依赖。每次记录image ID/RepoDigests和容器内真实Jena --version；绿测及50项回归实际使用sha256:6cd40ff063db802d36a082fda07849fef3289d974b48d5c44fc9a82c41a1e826、Apache Jena6.2.0。Linux CI由Master先按infra/development/fuseki/Dockerfile构建同名镜像；本机只证明Mac ARM64真实运行，Linux CI仍NOT_VERIFIED。
+- 所有资源均为本次随机回环新PG/RustFS/Jena，真实迁移后运行、finally仅清理本次容器。无旧runtime/凭证、无公共文件/迁移修改、无子Agent/main/ZIP。Owner交回同Reviewer限定复审并停止。
