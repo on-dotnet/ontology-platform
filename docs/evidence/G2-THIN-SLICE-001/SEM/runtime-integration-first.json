@@ -1,0 +1,56 @@
+{
+  "exitCode": 1,
+  "records": [
+    {
+      "command": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g2-sem-d743ffcc6d2a",
+        "--publish",
+        "127.0.0.1::3030",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--mount",
+        "type=bind,src=/private/tmp/g2-sem-d743ffcc6d2aziswu7nn,dst=/fixture,readonly",
+        "--entrypoint",
+        "java",
+        "fuseki:8b85cd963ab3910a87ff4d69819a814fcc536d5f",
+        "-Xmx384m",
+        "-Dlog4j.configurationFile=/fixture/log4j2.properties",
+        "-jar",
+        "/opt/fuseki/fuseki-server.jar",
+        "--config=/fixture/config.ttl"
+      ],
+      "exitCode": 0,
+      "output": "2dffb9dfc15588dec8a48fcb69548467536f319542d53fcae337376513369afe\n"
+    },
+    {
+      "command": [
+        "docker",
+        "port",
+        "g2-sem-d743ffcc6d2a",
+        "3030/tcp"
+      ],
+      "exitCode": 0,
+      "output": "127.0.0.1:49163\n"
+    },
+    {
+      "status": "FAIL",
+      "category": "UnboundLocalError"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g2-sem-d743ffcc6d2a"
+      ],
+      "exitCode": 0,
+      "output": "g2-sem-d743ffcc6d2a\n"
+    }
+  ]
+}
