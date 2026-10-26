@@ -74,3 +74,29 @@ HTTP先写测试后实现；PG事务回归另做真实可逆变异红绿证明�
 | `git diff --cached --check`，源码提交前 | 0 | 精确两个owned文件，无空白错误。 |
 
 本轮继续使用原专用临时PG runner，无历史容器/卷/realm或真实凭证访问。证据仅规范化LF和尾随空白，保留真实失败/计数/退出码。状态为 **FIXED_PENDING_REVIEW / PARTIAL**；同Head CI、产品集成及最终唯一ZIP仍由Master负责，没有据本轮自测宣称独立复审已通过。
+
+## Task1窄范围集成增量：绑定正文之前的授权结果处理
+
+Master在本次任务消息明确追加唯一owned路径 `backend/src/Hosts/OntologyPlatform.Api/G2/G2AuthorizationResultHandler.cs`，允许修改原owned的G2Authorization及G2SecurityTests，并要求真实中间件/畸形JSON/PG拒绝审计红绿。本项属于G2 Task1安全支持，不新增DTO、依赖或业务。Master回执前一轮I1已独立复审0/0/0；本增量需要新的限定独立审查，不能沿用前一轮结论。
+
+增量BaseSha：`18877aee3a4d6ce26058720555a61100b7f128f2`；源码SHA：`a0e1ccc64aae02d29c036f17d9f1fc08ff70d642`，已推送 `origin/codex/G2-SEC-SUPPORT`。代码提交只含新增handler、注册入口及新测试三个文件；未修改writer/事务回归、Host、端点映射、合同、项目、锁、迁移或CI。报告与日志随后独立docs-only提交。
+
+`G2AuthorizationResultHandler`实现原生 `IAuthorizationMiddlewareResultHandler`，由 `AddG2Authorization`注册为无状态singleton。它先传播已取消请求，统一no-store；成功调用next，保持原生正文绑定与guard；挑战返回相同安全401 Problem；Forbidden使用与guard同一CreateActor可信投影，调用正式IAuditTrail写 `authorization.denied / g2.api / denied` 和完整组织/厂区数组，只有持久调用返回后才发送403 Problem。不读取正文、身份请求头或原始路径作为审计资源，不输出原始错误。没有catch吞掉未知/依赖异常或取消，交原Host边界处理。审计失败前未启动403。
+
+SEM端点Owner负责在端点增加与guard相同的 `.RequireAuthorization(namedPolicy)`，使授权中间件运行于最小API正文绑定之前；Master仅在G2启用时调用注册入口。现有无授权元数据的内联G1端点不进入本结果处理器。本树真实测试增加具有此metadata的 `/protected-write` 测试路由；固定身份只由测试服务端提供，产品没有测试登录头或测试端点。原生Cookie及Antiforgery使用fixture内存DataProtection，不读取/写入用户持久密钥环。
+
+新增7例与原40例一起运行：匿名畸形JSON返回具有code/correlationId的401 Problem；错误角色畸形JSON返回403 Problem且独立PG连接已能读取唯一拒绝记录（包含两个厂、SiteId=null）；PG触发器注入真实拒绝审计故障，异常类型传播到测试宿主安全边界后返回500、无403伪成功、无审计持久行或业务调用；授权成功分别继续至原生400绑定拒绝和合法防伪业务200；直接调用实际注册处理器确认已取消请求与未知审计异常传播，未开始响应。测试宿主安全异常观察仅保留异常类型，输出原平台Problem格式；它不能替代产品Host集成验收。
+
+| 命令 | 退出码 | 真实结果与证据 |
+|---|---:|---|
+| `python3 docs/evidence/G2-THIN-SLICE-001/SEC/run-isolated-pg.py`，首次只添加测试 | 2 | 47发现、42通过、5失败；其中默认处理器缺IAuthenticationService，属于测试宿主认证基础未配置，不能单独作为语义红例。原始证据保留middleware-red.txt。 |
+| 同runner，补齐原生Cookie服务，仍未实现handler | 2 | 47发现、42通过、5失败、0跳过。默认401/403缺统一Problem及拒绝审计；真实审计故障未被调用仍返回403；取消/未知异常未按目标传播。有效行为红例见middleware-native-red.txt。 |
+| 同runner，添加handler及正式注册后 | 0 | 47/47通过、0跳过，见middleware-green.txt。 |
+| 同runner，测试密钥改为fixture内存生命周期后最终复验 | 0 | 47/47通过、0跳过；原40项保留。见middleware-final-green.txt。 |
+| `dotnet build backend/tests/OntologyPlatform.SecurityTests --no-restore` | 0 | 0警告、0错误；见middleware-build.txt。 |
+| `pwsh -NoProfile -File scripts/verify.ps1 -SelfTest` | 0 | 静态及检查器真实负例通过，含ReviewPackage35测试；见middleware-selftest.txt。 |
+| `dotnet format whitespace backend/src/Hosts/OntologyPlatform.Api/OntologyPlatform.Api.csproj --no-restore --verify-no-changes --include backend/src/Hosts/OntologyPlatform.Api/G2/G2Authorization.cs backend/src/Hosts/OntologyPlatform.Api/G2/G2AuthorizationResultHandler.cs` | 0 | 无输出、无格式诊断。 |
+| `dotnet format whitespace backend/tests/OntologyPlatform.SecurityTests/OntologyPlatform.SecurityTests.csproj --no-restore --verify-no-changes --include backend/tests/OntologyPlatform.SecurityTests/G2SecurityTests.cs` | 0 | 无输出、无格式诊断。 |
+| `git diff --cached --check`，源码提交前 | 0 | 只有三个获明确转移的owned文件，无空白错误。 |
+
+当前为 **DRAFT / PARTIAL，待本增量限定独立Review**。产品Host注册与SEM端点元数据集成、全G1回归、同Head CI及唯一ZIP仍由Master组织，不能从本47项fixture测试推断已全部完成。停止本子项，不进入其他功能关口。
