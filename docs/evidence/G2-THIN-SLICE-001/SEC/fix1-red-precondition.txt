@@ -1,0 +1,37 @@
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g2-security/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+失败 InvalidConnectionPreconditionInvalidatesExistingBusinessTransaction (True) (161ms)
+  从 /Users/chasen/.codex/worktrees/g2-security/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+  Assertion failed. Expected exception of exact type InvalidOperationException but no exception was thrown.
+
+  Assert.ThrowsExactlyAsync<InvalidOperationException>(() => transaction.CommitAsync())
+    在 Microsoft.VisualStudio.TestTools.UnitTesting.Assert.ThrowsExceptionAsync[TException](Func`1 action, Boolean isStrictType, String message, String actionExpression, String assertMethodName)
+    在 OntologyPlatform.SecurityTests.G2AuditTransactionTests.InvalidConnectionPreconditionInvalidatesExistingBusinessTransaction(Boolean openForeignConnection) 位于 /Users/chasen/.codex/worktrees/g2-security/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2AuditTransactionTests.cs:138
+    在 OntologyPlatform.SecurityTests.G2AuditTransactionTests.InvalidConnectionPreconditionInvalidatesExistingBusinessTransaction(Boolean openForeignConnection) 位于 /Users/chasen/.codex/worktrees/g2-security/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2AuditTransactionTests.cs:140
+    在 OntologyPlatform.SecurityTests.G2AuditTransactionTests.InvalidConnectionPreconditionInvalidatesExistingBusinessTransaction(Boolean openForeignConnection) 位于 /Users/chasen/.codex/worktrees/g2-security/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2AuditTransactionTests.cs:140
+    在 OntologyPlatform.SecurityTests.G2AuditTransactionTests.InvalidConnectionPreconditionInvalidatesExistingBusinessTransaction(Boolean openForeignConnection) 位于 /Users/chasen/.codex/worktrees/g2-security/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2AuditTransactionTests.cs:140
+    在 OntologyPlatform.SecurityTests.G2AuditTransactionTests.InvalidConnectionPreconditionInvalidatesExistingBusinessTransaction(Boolean openForeignConnection) 位于 /Users/chasen/.codex/worktrees/g2-security/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2AuditTransactionTests.cs:140
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+失败 InvalidConnectionPreconditionInvalidatesExistingBusinessTransaction (False) (67ms)
+  从 /Users/chasen/.codex/worktrees/g2-security/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+  Assertion failed. Expected exception of exact type InvalidOperationException but no exception was thrown.
+
+  Assert.ThrowsExactlyAsync<InvalidOperationException>(() => transaction.CommitAsync())
+    在 Microsoft.VisualStudio.TestTools.UnitTesting.Assert.ThrowsExceptionAsync[TException](Func`1 action, Boolean isStrictType, String message, String actionExpression, String assertMethodName)
+    在 OntologyPlatform.SecurityTests.G2AuditTransactionTests.InvalidConnectionPreconditionInvalidatesExistingBusinessTransaction(Boolean openForeignConnection) 位于 /Users/chasen/.codex/worktrees/g2-security/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2AuditTransactionTests.cs:138
+    在 OntologyPlatform.SecurityTests.G2AuditTransactionTests.InvalidConnectionPreconditionInvalidatesExistingBusinessTransaction(Boolean openForeignConnection) 位于 /Users/chasen/.codex/worktrees/g2-security/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2AuditTransactionTests.cs:140
+    在 OntologyPlatform.SecurityTests.G2AuditTransactionTests.InvalidConnectionPreconditionInvalidatesExistingBusinessTransaction(Boolean openForeignConnection) 位于 /Users/chasen/.codex/worktrees/g2-security/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2AuditTransactionTests.cs:140
+    在 OntologyPlatform.SecurityTests.G2AuditTransactionTests.InvalidConnectionPreconditionInvalidatesExistingBusinessTransaction(Boolean openForeignConnection) 位于 /Users/chasen/.codex/worktrees/g2-security/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2AuditTransactionTests.cs:140
+    在 OntologyPlatform.SecurityTests.G2AuditTransactionTests.InvalidConnectionPreconditionInvalidatesExistingBusinessTransaction(Boolean openForeignConnection) 位于 /Users/chasen/.codex/worktrees/g2-security/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2AuditTransactionTests.cs:140
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+/Users/chasen/.codex/worktrees/g2-security/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64) 失败并出现 2 个错误 (3s 513ms)
+退出代码: 2
+
+测试运行摘要: 失败!
+  总计: 40
+  失败: 2
+  成功: 38
+  已跳过: 0
+  持续时间: 4s 035ms
+已完成测试运行，但显示非成功退出代码: 2 (请参阅: https://aka.ms/testingplatform/exitcodes)
+
+SEC isolated PG test exitCode=2
