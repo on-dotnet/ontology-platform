@@ -115,7 +115,9 @@ foreach ($block in ($treeResult.text.Trim() -split "\r?\n\r?\n")) {
             $top = $name.Split('/')[0]
             if (-not $groups.ContainsKey($top)) { $groups[$top] = 0 }; $groups[$top]++
             $publicAsset = $name -ceq 'node_modules/.pnpm/language-subtag-registry@0.3.23/node_modules/language-subtag-registry/data/json/private-use.json'
-            if (-not $publicAsset -and ($name -match '(?i)(^|/)(\.env(?:\.|$)|(?:private|secrets?|credentials?)(?:[._-]|$)|\.(?:runtime|ssh|aws)(?:/|$)|auth\.json$)' -or $name -match '(?i)\.(pfx|p12|pem|key|crt|dump|db|sqlite3?)$' -or $name -match '^\.tools/security/')) { $privatePaths += $name }
+            # 与Apply的PRIVATE按路径segment规则一致；公开credential-management.js和包存储index.db不是私有资料。
+            $privateSegment = @($name.Split('/') | Where-Object { $_ -match '(?i)(^\.env($|\.)|\.pfx$|\.p12$|\.pem$|\.key$|\.crt$|^credentials?$|^secrets?$|^private($|[-_.])|^\.runtime$|^auth\.json$|^\.ssh$|^\.aws$)' }).Count -gt 0
+            if (-not $publicAsset -and ($privateSegment -or $name -match '^\.tools/security/')) { $privatePaths += $name }
             $covered = $false
             if ($null -ne $approval) {
                 foreach ($cache in @($approval.operations | Where-Object { $_.type -ceq 'cache' -and $_.treeRoot -ceq $path -and $_.expectedTip -ceq $record.HEAD })) {

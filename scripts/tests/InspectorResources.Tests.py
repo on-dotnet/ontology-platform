@@ -111,6 +111,13 @@ class InspectorTests(unittest.TestCase):
         self.assertNotEqual(tree['classification'], 'SAFE_CANDIDATE')
         self.assertTrue(all(r['classification'] != 'SAFE_CANDIDATE' for r in refs))
 
+    def test_public_package_names_do_not_imply_private_data(self):
+        (self.tree / 'bin/credential-management.js').write_text('public synthetic feature fixture\n')
+        (self.tree / 'bin/index.db').write_text('synthetic regenerable package index\n')
+        tree, refs = self.inspect()
+        self.assertEqual(tree['classification'], 'SAFE_CANDIDATE')
+        self.assertTrue(all(r['classification'] == 'SAFE_CANDIDATE' for r in refs))
+
     def test_keep_descendant_blocks_tree_and_refs(self):
         self.approval['keep'] = [str(self.tree / 'app.txt')]
         tree, refs = self.inspect()
