@@ -1,14 +1,14 @@
 正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
 失败 RuntimeSchemaPreservesWireUnionsAndWriteHeaders (241ms)
   从 /Users/chasen/.codex/worktrees/g2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
-  测试方法 OntologyPlatform.SecurityTests.G2OpenApiSchemaTests。RuntimeSchemaPreservesWireUnionsAndWriteHeaders 引发了异常: 
+  测试方法 OntologyPlatform.SecurityTests.G2OpenApiSchemaTests。RuntimeSchemaPreservesWireUnionsAndWriteHeaders 引发了异常:
   System.InvalidOperationException: An element of type 'String' cannot be converted to a 'System.Int32'.
     在 System.Text.Json.ThrowHelper.ThrowInvalidOperationException_NodeUnableToConvertElement(JsonValueKind valueKind, Type destinationType)
     在 System.Text.Json.Nodes.JsonValueOfElement.GetValue[TypeToConvert]()
     在 OntologyPlatform.SecurityTests.G2OpenApiSchemaTests.RuntimeSchemaPreservesWireUnionsAndWriteHeaders() 位于 /Users/chasen/.codex/worktrees/g2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2OpenApiSchemaTests.cs:46
     在 OntologyPlatform.SecurityTests.G2OpenApiSchemaTests.RuntimeSchemaPreservesWireUnionsAndWriteHeaders() 位于 /Users/chasen/.codex/worktrees/g2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2OpenApiSchemaTests.cs:50
     在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
-    
+
 /Users/chasen/.codex/worktrees/g2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64) 失败并出现 1 个错误 (1s 309ms)
 退出代码: 2
 
