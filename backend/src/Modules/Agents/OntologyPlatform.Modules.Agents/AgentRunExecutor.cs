@@ -101,9 +101,9 @@ public sealed class AgentRunExecutor
             // 真正交框架执行；正文不进入日志或指标。
             var response = await agent.RunAsync(claim.SourcePrompt, session, cancellationToken: cancellation.Token);
             if (calls != 1 || resultStatus is null) throw new InvalidOperationException("MAF未完成真实工具调用。");
-            // 按字符有界分片保留全部文本，不截断大答案为成功。
-            for (var offset = 0; offset < response.Text.Length; offset += 4096)
-                await AppendAsync(claim, new MessageDeltaPayload { Text = response.Text.Substring(offset, Math.Min(4096, response.Text.Length - offset)) }, cancellation.Token);
+            // 按UTF16长度有界分片并保持代理对完整，防止JSON序列化悄然替换非BMP字符。
+            foreach (var chunk in ChunkMessageText(response.Text))
+                await AppendAsync(claim, new MessageDeltaPayload { Text = chunk }, cancellation.Token);
             await AppendAsync(claim, new RunCompletedPayload { Status = ExecutionStatus.Completed, TotalToolCalls = claim.ToolCalls + calls, LastResultStatus = resultStatus }, cancellation.Token);
             Runs.Add(1, new KeyValuePair<string, object?>("outcome", "completed"), new KeyValuePair<string, object?>("capability", plan.CapabilityId));
         }
@@ -118,6 +118,21 @@ public sealed class AgentRunExecutor
         {
             await cancellation.CancelAsync();
             await monitor;
+        }
+    }
+
+    /// <summary>每段不超过4096个UTF16单元；切点落在代理对中间时将整对留给下一段。</summary>
+    private static IEnumerable<string> ChunkMessageText(string text)
+    {
+        // 偏移只按实际已发长度推进，收缩切点不会丢失或重复字符。
+        var offset = 0;
+        while (offset < text.Length)
+        {
+            // 合同使用String.Length上限，而非Unicode标量个数。
+            var length = Math.Min(4096, text.Length - offset);
+            if (offset + length < text.Length && char.IsSurrogatePair(text[offset + length - 1], text[offset + length])) length--;
+            yield return text.Substring(offset, length);
+            offset += length;
         }
     }
 
