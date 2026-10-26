@@ -50,3 +50,21 @@ GET semantic/discover按Master即时明确对齐：assetId必需、releaseId可�
 - SSE已知事件缺字段也拒绝、单事件128KiB字节预算、512序列上限；未知协议显式提示并回读持久Run快照。断开订阅/持久取消是独立动作。
 - 六张最新界面截图已重开目视检查，1440三栏与390图/校验面板、深浅Tokens正确；不包含真实认证材料。
 - 这些测试的API为有界夹具，所有PG/Jena/Keycloak/RustFS/MAF真实G2全链仍NOT_RUN；不能将测试名称中的“真实展示/持久事件”解释为后端验收PASS。CI仍NOT_VERIFIED，独立Review待Master。
+
+## 当前前端可独立实施部分收口
+
+状态仍DRAFT / PARTIAL。当前新增源码与证据将在任务分支持续提交；本节不是S1/S2/S3集成或产品E2E通过声明。
+
+- 最新实测：G2 Edge有界UI **24/24**，G1原Edge回归 **5/5**，Vitest **26/26**；lint/typecheck/生产build全部exit0；SelfTest exit0。完整实际进程输出保存在[日志目录说明](logs/README.md)，保留RED摘录与首次日志格式失败，没有改检查器。
+- 三页面×1440/1280/390×dark/light共18张安全合成截图。真实浏览器执行键盘交互、无横向溢出、console/pageerror与SSR水合检查；截图已重开目视检查。Monaco/worker始终PAUSED BY HUMAN，不计PASS。
+- 新增内部导航dirty保留/显式丢弃；真实SSE格式的游标续订、去重、断开不取消、独立持久取消、未知schema停止文本并回读快照，均有真实浏览器行为测试。
+- 发现默认Active查询绑定已加载releaseId的问题，浏览器先RED（实际releaseId为旧ID），再修为Active发送null由服务端当次固定snapshot；显式历史版继续发ID。Run继承同一受控计划。
+- Trace复制失败安全显示提示；固定本地Grafana入口可打开，但精确Tempo trace query仍NOT_VERIFIED，未伪称专业深链已验收。
+
+### 真实服务续接前提
+
+Master需完成受保护的G2 Host composition、真实迁移/PG与Jena资源及同源BFF转发。先交付`/api/v1/ontology-drafts`真实S1入口，再滚动开放release-proposals/approvals/releases/release-activations和capabilities/semantic/evidence/execution-runs/events。端点必须复用可信会话、完整scope、CSRF、If-Match/Command和原ProblemDetails。共享DTO更新（Release/Run真实TraceId）仅由Master生成，本Owner再消费，不手改生成文件。
+
+真实验收需使用既有批准的合成OIDC身份流程，完成四源导入→revision2→结构/验证/Diff→异人审批→发布→正式六态/证据→deterministic Run事件/续订/取消与真实服务故障；本轮界面夹具全部不能代替这些事实。没有读取、展示或打包Cookie、凭证、登录HAR或生产数据。付费模型、生产访问、跨平台/完整OWL推理仍不在本轮已验证事实内。
+
+独立Review、真实后端E2E、同Head CI、Master main集成和唯一标准ZIP仍待后续，当前分支不自行合并main。

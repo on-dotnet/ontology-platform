@@ -1,0 +1,3 @@
+# 验证输出
+
+实际命令stdout/stderr，仅规范化LF及行尾空白以满足仓库格式检查；没有删减失败或警告。带EXIT_CODE的日志记录实际进程退出码。red-evidence.md是首轮实际输出摘录转录，明确不是完整原始stdout。verify-selftest-logformat-red.txt保留首次直接保存进仓库时因Next/PowerShell输出尾随空白及自扫描输出文件触发的格式失败；后续改为进程完成后规范化写入，没有修改检查器或放宽断言。所有浏览器API为有界Synthetic夹具，绝不代表真实后端E2E。

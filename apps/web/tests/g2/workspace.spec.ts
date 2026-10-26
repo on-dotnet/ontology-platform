@@ -96,3 +96,12 @@ test("dirty阻断验证/结构编辑，图布局不产生语义写入", async ({
   await expect(page.getByText("本地源码未保存，下图保留上次服务器确认版本。")).toBeVisible();
   expect(writes).toBe(0);
 });
+test("dirty草稿阻止内部导航，显式丢弃后才离开", async ({ page }) => {
+  await page.goto("/ontologies"); await page.getByRole("button", { name: /Synthetic 本体草稿/ }).click();
+  await page.getByRole("textbox", { name: "本体 · OWL源码" }).fill("keep this local draft");
+  await page.getByRole("link", { name: "发布治理", exact: true }).click();
+  await expect(page).toHaveURL(/\/ontologies$/);
+  await expect(page.getByRole("textbox", { name: "本体 · OWL源码" })).toHaveValue("keep this local draft");
+  await page.getByRole("button", { name: "丢弃未保存修改", exact: true }).click();
+  await expect(page.getByRole("textbox", { name: "本体 · OWL源码" })).toHaveValue(sources.ontologyTurtle);
+});

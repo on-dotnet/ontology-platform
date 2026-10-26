@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import { PlatformApiError } from "../../lib/api/client";
 /** 只显示安全状态与关联标识，远端detail和异常原文不进入页面。 */
 export function SemanticError({ error }: { error: unknown }) {
@@ -7,4 +8,9 @@ export function SemanticError({ error }: { error: unknown }) {
   return <div className="g2-notice error" role="alert"><strong>{titles[status] ?? "请求未完成，请检查连接并显式重试"}</strong>{status > 0 && <span> HTTP {status}</span>}{error instanceof PlatformApiError && error.traceId && <Trace traceId={error.traceId} />}{status === 401 && <a href="/auth/login?returnUrl=/ontologies" className="button">重新登录</a>}</div>;
 }
 /** 关联标识来自实际响应；审计入口保持服务端重新授权。 */
-export function Trace({ traceId }: { traceId: string }) { return <span className="g2-trace">Trace <code>{traceId}</code> <button className="text-button" onClick={() => void navigator.clipboard.writeText(traceId)}>复制关联标识</button> <a href="http://localhost:15330" target="_blank" rel="noreferrer">打开本地 Grafana</a></span>; }
+export function Trace({ traceId }: { traceId: string }) {
+  const [copyStatus, setCopyStatus] = useState("");
+  /** 浏览器拒绝剪贴板时显示可恢复提示，不产生未处理Promise错误。 */
+  async function copy() { try { await navigator.clipboard.writeText(traceId); setCopyStatus("已复制关联标识"); } catch { setCopyStatus("复制不可用，请手动选择上方标识"); } }
+  return <span className="g2-trace">Trace <code>{traceId}</code> <button className="text-button" onClick={() => void copy()}>复制关联标识</button> <a href="http://localhost:15330" target="_blank" rel="noreferrer">打开本地 Grafana</a>{copyStatus && <small role="status">{copyStatus}</small>}</span>;
+}
