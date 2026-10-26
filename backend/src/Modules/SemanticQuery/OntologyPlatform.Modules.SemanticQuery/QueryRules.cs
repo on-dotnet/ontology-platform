@@ -1,3 +1,4 @@
+using System.Data.Common;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using OntologyPlatform.Contracts;
@@ -42,5 +43,16 @@ internal static class QueryRules
     internal static SemanticDiagnostic Diagnostic(string code) => new() { Code = code, Severity = DiagnosticSeverity.Warning, Message = code switch { "evidence_missing" => "部分事实缺少可验证来源。", "query_limited" => "结果达到批准预算。", "scope_denied" => "目标不在可访问范围内。", _ => "正式语义依赖暂不可用。" } };
 
     /// <summary>所有读取和拒绝通过Governance独立持久审计，失败不得返回成功。</summary>
-    internal static Task<string> AuditAsync(IAuditTrail audit, ActorContext actor, string action, string outcome, CancellationToken token) => audit.WriteAsync(actor, new AuditCommand { Action = action, Resource = "semantic.gateway", Outcome = outcome, Scope = new ResourceScope { OrganizationId = actor.OrganizationId, SiteIds = actor.SiteIds } }, token);
+    internal static async Task<string> AuditAsync(IAuditTrail audit, ActorContext actor, string action, string outcome, CancellationToken token)
+    {
+        try
+        {
+            return await audit.WriteAsync(actor, new AuditCommand { Action = action, Resource = "semantic.gateway", Outcome = outcome, Scope = new ResourceScope { OrganizationId = actor.OrganizationId, SiteIds = actor.SiteIds } }, token);
+        }
+        catch (Exception failure) when (failure is DbException || failure.InnerException is DbException)
+        {
+            // 模块不依赖EF/Npgsql实现类型；仅处理标准数据库故障，不能透出原始正文。
+            throw new SemanticOperationException(503, "audit_unavailable");
+        }
+    }
 }

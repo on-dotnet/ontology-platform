@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using OntologyPlatform.Contracts;
 
 namespace OntologyPlatform.Modules.SemanticQuery;
@@ -52,11 +53,12 @@ internal sealed class PublishedGraph
             ClassIris = Declarations(data.OntologyTriples, Owl + "Class"),
             ObjectPropertyIris = Declarations(data.OntologyTriples, Owl + "ObjectProperty"),
             DatatypePropertyIris = Declarations(data.OntologyTriples, Owl + "DatatypeProperty"),
-            Labels = data.OntologyTriples.Where(value => value.Predicate == Label).Select(value => new SemanticPropertyValue { PredicateIri = value.Subject.Value, Value = value.Object }).ToArray(),
+            Labels = data.OntologyTriples.Where(value => value.Predicate == Label).Select(value => new SemanticPropertyValue { PredicateIri = value.Predicate, Value = value.Object }).ToArray(),
             SupportedAxioms = ["rdf:type", "rdfs:subClassOf", "rdfs:domain", "rdfs:range", "owl:Class", "owl:ObjectProperty", "owl:DatatypeProperty"]
         };
         Relationships = Description.ObjectPropertyIris.ToHashSet(StringComparer.Ordinal);
         Entities = new Dictionary<string, SemanticEntity>(StringComparer.Ordinal);
+        // 每个真实主语分别验证类型与唯一范围，禁止按外部号合并。
         foreach (var group in subjects)
         {
             token.ThrowIfCancellationRequested();
@@ -72,6 +74,7 @@ internal sealed class PublishedGraph
             if (organization is null || site is null || external is null || Literal(group.Key, Vocabulary + "synthetic") is not ("true" or "1")) continue;
             Entities.Add(group.Key, new SemanticEntity { Iri = group.Key, TypeIris = types, OrganizationId = organization, SiteId = site, ExternalId = external, Label = Literal(group.Key, Label) ?? external, Synthetic = true });
         }
+        // 逐个标准来源声明核对事实、时间和正式对象绑定。
         foreach (var assertion in Triples.Where(value => value.Predicate == Rdf + "type" && value.Object.Kind == RdfTermKind.Iri && value.Object.Value == Rdf + "Statement"))
         {
             token.ThrowIfCancellationRequested();
@@ -133,7 +136,8 @@ internal sealed class PublishedGraph
         // 数据源引用由正式manifest散列唯一选择，不能构造未经发布的对象键。
         var artifacts = manifest.ArtifactObjects.Where(item => item.Hash == manifest.Snapshot.DataHash).ToArray();
         if (artifacts.Length != 1) return null;
-        return new EvidenceRef { EvidenceId = manifest.ReleaseId + "." + Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(assertion))), ReleaseId = manifest.ReleaseId, Scope = new ResourceScope { OrganizationId = entity.OrganizationId, SiteIds = sites.Order(StringComparer.Ordinal).ToArray() }, GraphIri = manifest.DataGraphIri, SubjectIri = subject.Value, PredicateIri = predicate.Value, ObjectTerm = value, SourceId = source, SourceRecordId = record, SourceObjectKey = artifacts[0].ObjectKey, ContentHash = artifacts[0].Hash, ValidFromUtc = validFrom, ValidToUtc = validTo, ObservedAtUtc = observed, ModelVersion = manifest.ReleaseId, MappingVersion = null, Synthetic = true };
+        // 定位散列来自标准断言及来源内容，不依赖可在导出时改名的空白节点标签。
+        return new EvidenceRef { EvidenceId = manifest.ReleaseId + "." + Convert.ToHexStringLower(SHA256.HashData(JsonSerializer.SerializeToUtf8Bytes(new { subject = subject.Value, predicate = predicate.Value, value, source, record, validFrom, validTo, observed, derived = derived.Value }))), ReleaseId = manifest.ReleaseId, Scope = new ResourceScope { OrganizationId = entity.OrganizationId, SiteIds = sites.Order(StringComparer.Ordinal).ToArray() }, GraphIri = manifest.DataGraphIri, SubjectIri = subject.Value, PredicateIri = predicate.Value, ObjectTerm = value, SourceId = source, SourceRecordId = record, SourceObjectKey = artifacts[0].ObjectKey, ContentHash = artifacts[0].Hash, ValidFromUtc = validFrom, ValidToUtc = validTo, ObservedAtUtc = observed, ModelVersion = manifest.ReleaseId, MappingVersion = null, Synthetic = true };
     }
 
     /// <summary>标准xsd:dateTime必须包含UTC偏移，避免依赖机器本地时区。</summary>

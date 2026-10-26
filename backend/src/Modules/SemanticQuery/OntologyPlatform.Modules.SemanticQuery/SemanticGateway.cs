@@ -1,3 +1,4 @@
+using System.Data.Common;
 using OntologyPlatform.Contracts;
 
 namespace OntologyPlatform.Modules.SemanticQuery;
@@ -55,6 +56,7 @@ public sealed class SemanticGateway : ISemanticGateway
             if (plan.RelationshipIris.Any(value => !graph.Relationships.Contains(value)) || plan.EntityType is not null && !graph.Description.ClassIris.Contains(plan.EntityType, StringComparer.Ordinal)) throw new SemanticOperationException(422, "query_path_invalid");
             // 实体和关系都从正式标准断言派生。
             var result = Evaluate(actor, plan, manifest, graph, budget.Token);
+            budget.Token.ThrowIfCancellationRequested();
             await QueryRules.AuditAsync(audit, actor, "semantic.query", result.Status == SemanticQueryStatus.Unauthorized ? "denied" : "allowed", cancellationToken);
             QueryRules.Queries.Add(1, new KeyValuePair<string, object?>("capability", plan.CapabilityId), new KeyValuePair<string, object?>("status", result.Status.ToString()));
             return result;
@@ -70,6 +72,12 @@ public sealed class SemanticGateway : ISemanticGateway
             await QueryRules.AuditAsync(audit, actor, "semantic.query", failure.Status == 403 ? "denied" : "failure", cancellationToken);
             if (manifest is null || failure.Status != 503) throw;
             return Result(actor, manifest, SemanticQueryStatus.Unavailable, diagnostics: [QueryRules.Diagnostic("source_unavailable")]);
+        }
+        catch (DbException)
+        {
+            // Catalog数据库不可用时无可信snapshot；治理失败同样保持明确503。
+            await QueryRules.AuditAsync(audit, actor, "semantic.query", "failure", cancellationToken);
+            throw new SemanticOperationException(503, "source_unavailable");
         }
         catch (HttpRequestException)
         {
@@ -111,18 +119,26 @@ public sealed class SemanticGateway : ISemanticGateway
             while (queue.TryDequeue(out var current))
             {
                 token.ThrowIfCancellationRequested();
-                if (current.Depth >= plan.Depth) continue;
-                foreach (var edge in graph.Triples.Where(value => value.Subject.Value == current.Entity.Iri && graph.Relationships.Contains(value.Predicate) && (plan.RelationshipIris.Length == 0 || plan.RelationshipIris.Contains(value.Predicate, StringComparer.Ordinal))).OrderBy(value => value.Predicate, StringComparer.Ordinal).ThenBy(value => value.Object.Value, StringComparer.Ordinal))
+                // 同一正式对象属性的入边和出边均可追溯，输出仍保持原方向。
+                foreach (var edge in graph.Triples.Where(value => (value.Subject.Value == current.Entity.Iri || value.Object.Kind == RdfTermKind.Iri && value.Object.Value == current.Entity.Iri) && graph.Relationships.Contains(value.Predicate) && (plan.RelationshipIris.Length == 0 || plan.RelationshipIris.Contains(value.Predicate, StringComparer.Ordinal))).OrderBy(value => value.Predicate, StringComparer.Ordinal).ThenBy(value => value.Object.Value, StringComparer.Ordinal))
                 {
                     token.ThrowIfCancellationRequested();
-                    if (edge.Object.Kind != RdfTermKind.Iri || !graph.Entities.TryGetValue(edge.Object.Value, out var target) || !graph.Visible(actor, target, plan.SiteId) || !seenEdges.Add(edge)) continue;
+                    // 邻接遍历可追溯上游，但输出关系仍保持真实RDF原方向。
+                    var neighbor = edge.Subject.Value == current.Entity.Iri ? edge.Object.Value : edge.Subject.Value;
+                    if (edge.Object.Kind != RdfTermKind.Iri || !graph.Entities.TryGetValue(neighbor, out var target) || !graph.Visible(actor, target, plan.SiteId) || seenEdges.Contains(edge)) continue;
+                    if (current.Depth >= plan.Depth)
+                    {
+                        limited = true;
+                        continue;
+                    }
+                    seenEdges.Add(edge);
                     if (rows.Count + (included.Contains(target.Iri) ? 1 : 2) > plan.MaxRows)
                     {
                         limited = true;
                         continue;
                     }
                     if (!included.Contains(target.Iri)) AddEntity(target, current.Depth + 1);
-                    rows.Add(new SemanticDatum { Kind = SemanticDatumKind.Relationship, Relationship = new SemanticRelationship { SourceIri = current.Entity.Iri, PredicateIri = edge.Predicate, TargetIri = target.Iri, EvidenceIds = graph.For(actor, edge).Select(value => value.EvidenceId).ToArray() } });
+                    rows.Add(new SemanticDatum { Kind = SemanticDatumKind.Relationship, Relationship = new SemanticRelationship { SourceIri = edge.Subject.Value, PredicateIri = edge.Predicate, TargetIri = edge.Object.Value, EvidenceIds = graph.For(actor, edge).Select(value => value.EvidenceId).ToArray() } });
                 }
             }
         }

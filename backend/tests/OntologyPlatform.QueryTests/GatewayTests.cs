@@ -95,11 +95,11 @@ public sealed class GatewayTests
         var release = await fixture.PublishAsync();
         // 从板坯读取实际三层多对多子图。
         var plan = fixture.Plan(release, "traverse_relationships") with { ExternalId = "slab-1" };
-        // 预算充足时真实五个实体与五条关系。
+        // 预算充足时包含上游和下游共七个实体与七条原始关系。
         var result = await fixture.Gateway.ExecuteAsync(fixture.Author, plan, default);
         Assert.AreEqual(SemanticQueryStatus.Found, result.Status);
-        Assert.HasCount(5, result.Data.Where(value => value.Entity is not null).ToArray());
-        Assert.HasCount(5, result.Data.Where(value => value.Relationship is not null).ToArray());
+        Assert.HasCount(7, result.Data.Where(value => value.Entity is not null).ToArray());
+        Assert.HasCount(7, result.Data.Where(value => value.Relationship is not null).ToArray());
         Assert.IsTrue(result.Data.Where(value => value.Relationship is not null).All(value => result.Data.Any(node => node.Entity?.Iri == value.Relationship!.TargetIri)));
         // 同一版本小预算不能被实体与关系分组绕过。
         var partial = await fixture.Gateway.ExecuteAsync(fixture.Author, plan with { MaxRows = 2 }, default);

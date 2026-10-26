@@ -1,0 +1,230 @@
+{
+  "sourceSha": "cfcfa12a43d3be33fb3c98af33fbec8fa5a6813a",
+  "workingTreeChanges": true,
+  "exitCode": 2,
+  "records": [
+    {
+      "command": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g2-query-28838e60c782-pg",
+        "--memory",
+        "256m",
+        "--cpus",
+        "1",
+        "--publish",
+        "127.0.0.1::5432",
+        "--env",
+        "POSTGRES_PASSWORD",
+        "--env",
+        "POSTGRES_DB",
+        "--tmpfs",
+        "/var/lib/postgresql",
+        "postgres:18.6-trixie@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6"
+      ],
+      "exitCode": 0,
+      "output": "de6cb77ed82f228c7a1254652dd42984d0d4b64852a34841cba707195f3e91fb\n"
+    },
+    {
+      "command": [
+        "docker",
+        "port",
+        "g2-query-28838e60c782-pg",
+        "5432/tcp"
+      ],
+      "exitCode": 0,
+      "output": "127.0.0.1:60922\n"
+    },
+    {
+      "command": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g2-query-28838e60c782-s3",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--publish",
+        "127.0.0.1::9000",
+        "--env",
+        "RUSTFS_ACCESS_KEY",
+        "--env",
+        "RUSTFS_SECRET_KEY",
+        "--env",
+        "RUSTFS_CONSOLE_ENABLE=false",
+        "--tmpfs",
+        "/data:mode=1777",
+        "rustfs/rustfs:1.0.3@sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+        "/data"
+      ],
+      "exitCode": 0,
+      "output": "b055e21b78fb159b790ef85f40b8826b7c70e1a7d1fcf20b4839cd0ec030ff72\n"
+    },
+    {
+      "command": [
+        "docker",
+        "port",
+        "g2-query-28838e60c782-s3",
+        "9000/tcp"
+      ],
+      "exitCode": 0,
+      "output": "127.0.0.1:60924\n"
+    },
+    {
+      "command": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g2-query-28838e60c782-jena",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--publish",
+        "127.0.0.1::3030",
+        "--mount",
+        "type=bind,src=/private/tmp/g2-query-28838e60c782ztnhek5s,dst=/fixture,readonly",
+        "--entrypoint",
+        "java",
+        "fuseki:8b85cd963ab3910a87ff4d69819a814fcc536d5f",
+        "-Xmx384m",
+        "-Dlog4j.configurationFile=/fixture/log4j2.properties",
+        "-jar",
+        "/opt/fuseki/fuseki-server.jar",
+        "--config=/fixture/config.ttl"
+      ],
+      "exitCode": 0,
+      "output": "d8f3b12bcdbadbd098cc531da1c569adf79497f92be015bde1c7ed55026a2431\n"
+    },
+    {
+      "command": [
+        "docker",
+        "port",
+        "g2-query-28838e60c782-jena",
+        "3030/tcp"
+      ],
+      "exitCode": 0,
+      "output": "127.0.0.1:60928\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "build",
+        "backend/tests/OntologyPlatform.QueryTests",
+        "--no-restore"
+      ],
+      "exitCode": 0,
+      "output": "  OntologyPlatform.Contracts -> /Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/bin/Debug/net10.0/OntologyPlatform.Contracts.dll\n  OntologyPlatform.Modules.Ontology.Domain -> /Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.Domain.dll\n  OntologyPlatform.Modules.Publishing.Domain -> /Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/bin/Debug/net10.0/OntologyPlatform.Modules.Publishing.Domain.dll\n  OntologyPlatform.Modules.Governance -> /Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/bin/Debug/net10.0/OntologyPlatform.Modules.Governance.dll\n  OntologyPlatform.Modules.SemanticQuery -> /Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/bin/Debug/net10.0/OntologyPlatform.Modules.SemanticQuery.dll\n  OntologyPlatform.Modules.Ontology -> /Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.dll\n  OntologyPlatform.Modules.Publishing -> /Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/bin/Debug/net10.0/OntologyPlatform.Modules.Publishing.dll\n/Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/tests/OntologyPlatform.QueryTests/QueryFaultTests.cs(238,41): warning EF1003: Method 'ExecuteSqlRawAsync' inserts concatenated strings directly into the SQL, without any protection against SQL injection. Consider using 'ExecuteSqlAsync' instead, which protects against SQL injection, or make sure that the value is sanitized and suppress the warning. [/Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/tests/OntologyPlatform.QueryTests/OntologyPlatform.QueryTests.csproj]\n  OntologyPlatform.QueryTests -> /Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll\n\n已成功生成。\n\n/Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/tests/OntologyPlatform.QueryTests/QueryFaultTests.cs(238,41): warning EF1003: Method 'ExecuteSqlRawAsync' inserts concatenated strings directly into the SQL, without any protection against SQL injection. Consider using 'ExecuteSqlAsync' instead, which protects against SQL injection, or make sure that the value is sanitized and suppress the warning. [/Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/tests/OntologyPlatform.QueryTests/OntologyPlatform.QueryTests.csproj]\n    1 个警告\n    0 个错误\n\n已用时间 00:00:00.42\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "tool",
+        "restore"
+      ],
+      "exitCode": 0,
+      "output": "工具“dotnet-ef”(版本“10.0.13”)已还原。可用的命令: dotnet-ef\n\n还原成功。\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "tool",
+        "run",
+        "dotnet-ef",
+        "database",
+        "update",
+        "--project",
+        "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance",
+        "--startup-project",
+        "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance",
+        "--no-build"
+      ],
+      "exitCode": 0,
+      "output": "Failed executing DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']\nSELECT \"MigrationId\", \"ProductVersion\"\nFROM governance.\"__EFMigrationsHistory\"\nORDER BY \"MigrationId\";\nAcquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.\nApplying migration '20261025062847_InitialGovernance'.\nApplying migration '20261025144246_AuditScopeSites'.\nAcquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.\nDone.\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "tool",
+        "run",
+        "dotnet-ef",
+        "database",
+        "update",
+        "--project",
+        "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology",
+        "--startup-project",
+        "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology",
+        "--no-build"
+      ],
+      "exitCode": 0,
+      "output": "Failed executing DbCommand (7ms) [Parameters=[], CommandType='Text', CommandTimeout='30']\nSELECT \"MigrationId\", \"ProductVersion\"\nFROM ontology.\"__EFMigrationsHistory\"\nORDER BY \"MigrationId\";\nAcquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.\nApplying migration '20261026003221_InitialOntology'.\nDone.\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "tool",
+        "run",
+        "dotnet-ef",
+        "database",
+        "update",
+        "--project",
+        "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing",
+        "--startup-project",
+        "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing",
+        "--no-build"
+      ],
+      "exitCode": 0,
+      "output": "Failed executing DbCommand (7ms) [Parameters=[], CommandType='Text', CommandTimeout='30']\nSELECT \"MigrationId\", \"ProductVersion\"\nFROM publishing.\"__EFMigrationsHistory\"\nORDER BY \"MigrationId\";\nAcquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.\nApplying migration '20261026015031_InitialPublishing'.\nDone.\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "test",
+        "--project",
+        "backend/tests/OntologyPlatform.QueryTests",
+        "--no-restore",
+        "--no-build",
+        "--",
+        "--filter",
+        "FullyQualifiedName~DepthBudget|FullyQualifiedName~AuditFailure"
+      ],
+      "exitCode": 2,
+      "output": "正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)\n失败 DepthBudgetReportsIncompleteGraph (1s 633ms)\n  从 /Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)\n  Assertion failed. 预期值相等。\n  \n  expected: Partial\n  actual:   Found\n  \n  Assert.AreEqual(SemanticQueryStatus.Partial, result.Status)\n    在 OntologyPlatform.QueryTests.QueryFaultTests.DepthBudgetReportsIncompleteGraph() 位于 /Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/tests/OntologyPlatform.QueryTests/QueryFaultTests.cs:225\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n失败 AuditFailureIsUnavailableAndRecovers (584ms)\n  从 /Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)\n  Assertion failed. Expected exception of type SemanticOperationException (or derived) but caught DbUpdateException.\n  \n  expected type:    OntologyPlatform.Contracts.SemanticOperationException (or derived)\n  actual exception: Microsoft.EntityFrameworkCore.DbUpdateException: An error occurred while saving the entity changes. See the inner exception for details.\n                     ---> Npgsql.PostgresException (0x80004005): P0001: isolated sensitive diagnostic\n                       at Npgsql.Internal.NpgsqlConnector.ReadMessageLong(Boolean async, DataRowLoadingMode dataRowLoadingMode, Boolean readingNotifications, Boolean isReadingPrependedMessage)\n                       at System.Runtime.CompilerServices.PoolingAsyncValueTaskMethodBuilder`1.StateMachineBox`1.System.Threading.Tasks.Sources.IValueTaskSource<TResult>.GetResult(Int16 token)\n                       at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)\n                       at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)\n                       at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)\n                       at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)\n                       at Npgsql.NpgsqlCommand.ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)\n                       at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)\n                       at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)\n                       at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.ExecuteAsync(IRelationalConnection connection, CancellationToken cancellationToken)\n                      Exception data:\n                        Severity: ERROR\n                        SqlState: P0001\n                        MessageText: isolated sensitive diagnostic\n                        Where: PL/pgSQL function governance.query_fail() line 1 at RAISE\n                        File: pl_exec.c\n                        Line: 3909\n                        Routine: exec_stmt_raise\n                       --- End of inner exception stack trace ---\n                       at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.ExecuteAsync(IRelationalConnection connection, CancellationToken cancellationToken)\n                       at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)\n                       at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)\n                       at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)\n                       at Microsoft.EntityFrameworkCore.Storage.RelationalDatabase.SaveChangesAsync(IList`1 entries, CancellationToken cancellationToken)\n                       at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChangesAsync(IList`1 entriesToSave, CancellationToken cancellationToken)\n                       at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChangesAsync(StateManager stateManager, Boolean acceptAllChangesOnSuccess, CancellationToken cancellationToken)\n                       at Npgsql.EntityFrameworkCore.PostgreSQL.Storage.Internal.NpgsqlExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)\n                       at Microsoft.EntityFrameworkCore.DbContext.SaveChangesAsync(Boolean acceptAllChangesOnSuccess, CancellationToken cancellationToken)\n                       at Microsoft.EntityFrameworkCore.DbContext.SaveChangesAsync(Boolean acceptAllChangesOnSuccess, CancellationToken cancellationToken)\n                       at OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, CancellationToken cancellationToken) in /Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:line 78\n                       at OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, CancellationToken cancellationToken) in /Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:line 80\n                       at OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, CancellationToken cancellationToken) in /Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:line 80\n                       at OntologyPlatform.Modules.SemanticQuery.SemanticGateway.ExecuteAsync(ActorContext actor, SemanticQueryPlan plan, CancellationToken cancellationToken) in /Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/SemanticGateway.cs:line 58\n                       at Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsThrowsAsyncFailingAsync[TException](Func`1 action, Boolean isStrictType)\n  \n  Assert.ThrowsAsync<SemanticOperationException>(() => fixture.Gateway.ExecuteAsync(fixture.Author, fixture.Plan(release), default))\n    在 Microsoft.VisualStudio.TestTools.UnitTesting.Assert.ThrowsExceptionAsync[TException](Func`1 action, Boolean isStrictType, String message, String actionExpression, String assertMethodName)\n    在 OntologyPlatform.QueryTests.QueryFaultTests.AuditFailureIsUnavailableAndRecovers() 位于 /Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/tests/OntologyPlatform.QueryTests/QueryFaultTests.cs:243\n    在 OntologyPlatform.QueryTests.QueryFaultTests.AuditFailureIsUnavailableAndRecovers() 位于 /Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/tests/OntologyPlatform.QueryTests/QueryFaultTests.cs:250\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n/Users/chasen/.codex/worktrees/g2-query/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64) 失败并出现 2 个错误 (3s 462ms)\n退出代码: 2\n\n测试运行摘要: 失败!\n  总计: 2\n  失败: 2\n  成功: 0\n  已跳过: 0\n  持续时间: 3s 715ms\n已完成测试运行，但显示非成功退出代码: 2 (请参阅: https://aka.ms/testingplatform/exitcodes)\n"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g2-query-28838e60c782-jena"
+      ],
+      "exitCode": 0,
+      "output": "g2-query-28838e60c782-jena\n"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g2-query-28838e60c782-s3"
+      ],
+      "exitCode": 0,
+      "output": "g2-query-28838e60c782-s3\n"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g2-query-28838e60c782-pg"
+      ],
+      "exitCode": 0,
+      "output": "g2-query-28838e60c782-pg\n"
+    }
+  ]
+}
