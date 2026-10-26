@@ -1,0 +1,37 @@
+[
+  {
+    "label": "self-test",
+    "argv": [
+      "pwsh",
+      "-NoProfile",
+      "-File",
+      "scripts/verify.ps1",
+      "-SelfTest"
+    ],
+    "exitCode": 0,
+    "stdout": "\nCheck             Status Message\n-----             ------ -------\nrepository-static PASS   \u68c0\u67e51251\u4e2a\u6587\u4ef6\uff1a\u8bed\u6cd5/\u683c\u5f0f/\u76f8\u5bf9\u94fe\u63a5/\u6709\u9650\u673a\u5bc6\u6a21\u5f0f/\u57fa\u7ebf\u2026\n\nPASS: clean baseline accepted\nPASS: wrong package name rejected\nPASS: broken relative link rejected\nPASS: synthetic token rejected without printing value\nPASS: synthetic token in TypeScript rejected\nPASS: credential assignment in dot-env rejected\nPASS: unpinned action rejected\n\nCheck             Status Message\n-----             ------ -------\nrepository-static PASS   \u68c0\u67e51252\u4e2a\u6587\u4ef6\uff1a\u8bed\u6cd5/\u683c\u5f0f/\u76f8\u5bf9\u94fe\u63a5/\u6709\u9650\u673a\u5bc6\u6a21\u5f0f/\u57fa\u7ebf\u2026\n\nNOT_RUN: .NET test\uff1a\u987b\u663e\u5f0f\u8ffd\u52a0-RunTests\u6267\u884c\u5df2\u6279\u51c6\u6d4b\u8bd5\u9879\u76ee\u3002\nNOT_RUN: Web\u72ec\u7acb\u68c0\u67e5\u9700\u771f\u5b9e\u76ee\u6807\u53ca\u663e\u5f0f-RunNative\u3002\nNOT_RUN: Web\u68c0\u67e5\u88ab\u663e\u5f0f-SkipWeb\u8df3\u8fc7\uff0c\u4ec5\u7528\u4e8e\u9694\u79bb\u5de5\u7a0b\u68c0\u67e5\u5668fixture\u6216\u72ec\u7acb\u9a8c\u6536\u3002\nNOT_RUN: \u6d4f\u89c8\u5668\u771f\u5b9eOIDC/E2E\u9700\u72ec\u7acb\u53d7\u63a7\u8054\u8c03\uff0c\u4e0d\u9690\u5f0f\u6df7\u5165\u5de5\u7a0b\u68c0\u67e5\u3002\nPASS: \u6240\u9009\u5de5\u7a0b\u68c0\u67e5\uff1b\u8303\u56f4\u4ee5\u9010\u9879\u8f93\u51fa\u4e3a\u51c6\uff0c\u4e0d\u8868\u793a\u4e1a\u52a1\u3001\u524d\u7aef\u6216\u6574\u4e2aG1\u901a\u8fc7\u3002\nPASS: native commands resolve SDK and config from selected Root\nChecker tests: 8 passed; application tests: NOT_RUN.\nPASS: Doctor handles existing pnpm without Node as BLOCKED/2.\nPASS: Doctor discovers real macOS ARM64 Node from isolated path with spaces.\nPASS: YAML/TOML syntax, 1 files; runtime compatibility not implied.\nFAIL: structured syntax invalid.yml (ParserError)\nFAIL: structured syntax invalid.toml (TOMLDecodeError)\nPASS: structured parser 4 real positive/negative cases.\n\nCheck             Status Message\n-----             ------ -------\nrepository-static PASS   \u68c0\u67e51251\u4e2a\u6587\u4ef6\uff1a\u8bed\u6cd5/\u683c\u5f0f/\u76f8\u5bf9\u94fe\u63a5/\u6709\u9650\u673a\u5bc6\u6a21\u5f0f/\u57fa\u7ebf\u2026\n\nPASS: verification preserves unset environment state for five process variables.\n\nCheck             Status Message\n-----             ------ -------\nrepository-static PASS   \u68c0\u67e51251\u4e2a\u6587\u4ef6\uff1a\u8bed\u6cd5/\u683c\u5f0f/\u76f8\u5bf9\u94fe\u63a5/\u6709\u9650\u673a\u5bc6\u6a21\u5f0f/\u57fa\u7ebf\u2026\n\nPASS: verification preserves empty environment state for five process variables.\n\nCheck             Status Message\n-----             ------ -------\nrepository-static PASS   \u68c0\u67e51251\u4e2a\u6587\u4ef6\uff1a\u8bed\u6cd5/\u683c\u5f0f/\u76f8\u5bf9\u94fe\u63a5/\u6709\u9650\u673a\u5bc6\u6a21\u5f0f/\u57fa\u7ebf\u2026\n\nPASS: verification preserves value environment state for five process variables.\nEnvironment regression: 3 state groups and structured-suite cleanup passed; native calls are synthetic, product tests NOT_RUN.\nPASS: toolchain archives accept two exact digests and reject two tampered byte cases.\nPASS: committed snapshot, Unicode, full diff and reopened ZIP\nPASS: color.ui always cannot contaminate machine-readable patch\nPASS: PASS requires real command evidence\nPASS: non-ancestor commits\nPASS: dirty tracked delivery\nPASS: untracked delivery\nPASS: forbidden committed member .env\nPASS: forbidden committed member .env.production\nPASS: forbidden committed member .ssh/id\nPASS: forbidden committed member .codex/auth.json\nPASS: forbidden committed member auth/config.json\nPASS: forbidden committed member cert.pem\nPASS: forbidden committed member nested/bin/output\nPASS: forbidden committed member .tools/sdk/file\nPASS: forbidden committed member models/weights.dat\nPASS: forbidden committed member state.db\nPASS: forbidden committed member .cache/item\nPASS: forbidden committed member node_modules/item\nPASS: synthetic token in source\nPASS: removed synthetic token retained in patch\nPASS: reopened archive rejects injected or changed member .git/config\nPASS: reopened archive rejects injected or changed member .env\nPASS: reopened archive rejects injected or changed member ../escape.txt\nPASS: reopened archive rejects injected or changed member source/app.txt\nPASS: git archive export-ignore cannot omit committed source\nPASS: git archive export-subst cannot rewrite committed source\nPASS: git symlink blob cannot silently become source\nPASS: committed submodule cannot be omitted by git archive\nPASS: complete patch rejects removed forbidden environment member\nPASS: reopened archive rejects payload tamper even after checksum rewrite\nPASS: missing checksum/member is rejected on reopen\nPASS: CI PASS cannot be inferred without run metadata\nPASS: explicit CI metadata avoids self-referential commit evidence\nPASS: existing delivery ZIP is preserved\nPASS: valid committed evidence preserves command and status\nReviewPackage: 35 tests, 0 failures; product/container tests NOT_RUN.\nNOT_RUN: .NET\u539f\u751f\u68c0\u67e5\u9700\u663e\u5f0f-RunNative\u53ca\u5bf9\u5e94\u4efb\u52a1\u6388\u6743\u3002\nNOT_RUN: Web\u72ec\u7acb\u68c0\u67e5\u9700\u771f\u5b9e\u76ee\u6807\u53ca\u663e\u5f0f-RunNative\u3002\nNOT_RUN: \u6d4f\u89c8\u5668\u771f\u5b9eOIDC/E2E\u9700\u72ec\u7acb\u53d7\u63a7\u8054\u8c03\uff0c\u4e0d\u9690\u5f0f\u6df7\u5165\u5de5\u7a0b\u68c0\u67e5\u3002\nPASS: \u6240\u9009\u5de5\u7a0b\u68c0\u67e5\uff1b\u8303\u56f4\u4ee5\u9010\u9879\u8f93\u51fa\u4e3a\u51c6\uff0c\u4e0d\u8868\u793a\u4e1a\u52a1\u3001\u524d\u7aef\u6216\u6574\u4e2aG1\u901a\u8fc7\u3002\n",
+    "stderr": ""
+  },
+  {
+    "label": "diff-check",
+    "argv": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "label": "python-syntax",
+    "argv": [
+      "python3",
+      "-c",
+      "import ast;from pathlib import Path;ast.parse(Path(\"scripts/acceptance/g2-metric-boundary.py\").read_text());print(\"PASS: Python syntax\")"
+    ],
+    "exitCode": 0,
+    "stdout": "PASS: Python syntax\n",
+    "stderr": ""
+  }
+]

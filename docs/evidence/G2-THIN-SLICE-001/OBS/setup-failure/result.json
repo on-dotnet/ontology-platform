@@ -1,0 +1,199 @@
+{
+  "status": "FAIL",
+  "scope": "Synthetic OTLP -> real pinned Alloy -> real pinned Prometheus; product Meter E2E NOT_RUN here",
+  "configSha256": "0983213699a64af5f2dc8134ad7a45d34545ce7fade6dafdd1cdd82912b3ad83",
+  "checks": [],
+  "commands": [
+    {
+      "label": "docker-version",
+      "argv": [
+        "docker",
+        "version",
+        "--format",
+        "{{.Server.Version}}"
+      ],
+      "exitCode": 0,
+      "stdout": "29.9.2\n",
+      "stderr": ""
+    },
+    {
+      "label": "alloy-image",
+      "argv": [
+        "docker",
+        "image",
+        "inspect",
+        "grafana/alloy:v1.21.2@sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18",
+        "--format",
+        "{{json .RepoDigests}} {{.Architecture}}"
+      ],
+      "exitCode": 0,
+      "stdout": "[\"grafana/alloy@sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18\"] arm64\n",
+      "stderr": ""
+    },
+    {
+      "label": "prometheus-image",
+      "argv": [
+        "docker",
+        "image",
+        "inspect",
+        "prom/prometheus:v3.15.1@sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2",
+        "--format",
+        "{{json .RepoDigests}} {{.Architecture}}"
+      ],
+      "exitCode": 0,
+      "stdout": "[\"prom/prometheus@sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2\"] arm64\n",
+      "stderr": ""
+    },
+    {
+      "label": "alloy-validate",
+      "argv": [
+        "docker",
+        "run",
+        "--pull=never",
+        "--rm",
+        "--network=none",
+        "--memory=256m",
+        "--cpus=1",
+        "--pids-limit=128",
+        "--mount",
+        "type=bind,src=/Users/chasen/.codex/worktrees/g2-observability/ontology-platform/infra/observability/alloy/config.alloy,dst=/etc/alloy/config.alloy,readonly",
+        "-e",
+        "LOKI_OTLP_ENDPOINT=http://127.0.0.1:9/otlp",
+        "-e",
+        "TEMPO_OTLP_ENDPOINT=http://127.0.0.1:9",
+        "-e",
+        "PROMETHEUS_OTLP_ENDPOINT=http://prometheus:9090/api/v1/otlp",
+        "grafana/alloy:v1.21.2@sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18",
+        "validate",
+        "/etc/alloy/config.alloy"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "label": "network-create",
+      "argv": [
+        "docker",
+        "network",
+        "create",
+        "--internal",
+        "g2-metric-0603026fab37-network"
+      ],
+      "exitCode": 0,
+      "stdout": "5a9c3f9e9904388c9c22ea792b60adfb1b9c557ad24317eebaae23ceeab93d48\n",
+      "stderr": ""
+    },
+    {
+      "label": "prometheus-start",
+      "argv": [
+        "docker",
+        "run",
+        "-d",
+        "--pull=never",
+        "--name",
+        "g2-metric-0603026fab37-prometheus",
+        "--network",
+        "g2-metric-0603026fab37-network",
+        "--network-alias",
+        "prometheus",
+        "-p",
+        "127.0.0.1::9090",
+        "--read-only",
+        "--tmpfs",
+        "/prometheus:rw,size=96m,uid=65534,gid=65534",
+        "--mount",
+        "type=bind,src=/var/folders/8r/n2xjjrn90v7fplnwsjkft1sm0000gn/T/g2-metric-0603026fab37-jylg6ety/prometheus.yaml,dst=/etc/prometheus/prometheus.yaml,readonly",
+        "--memory=256m",
+        "--cpus=1",
+        "--pids-limit=128",
+        "prom/prometheus:v3.15.1@sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2",
+        "--config.file=/etc/prometheus/prometheus.yaml",
+        "--storage.tsdb.path=/prometheus",
+        "--storage.tsdb.retention.time=15m",
+        "--web.enable-otlp-receiver"
+      ],
+      "exitCode": 0,
+      "stdout": "83f0de3af1397091115a36df101f200b5facf99e7c0ec10b445a241ad2a8b213\n",
+      "stderr": ""
+    },
+    {
+      "label": "g2-metric-0603026fab37-prometheus-port",
+      "argv": [
+        "docker",
+        "port",
+        "g2-metric-0603026fab37-prometheus",
+        "9090"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "no public port '9090' published for g2-metric-0603026fab37-prometheus\n"
+    },
+    {
+      "label": "g2-metric-0603026fab37-prometheus-logs",
+      "argv": [
+        "docker",
+        "logs",
+        "--tail=100",
+        "g2-metric-0603026fab37-prometheus"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "time=2026-10-26T03:41:12.656Z level=INFO source=main.go:1770 msg=\"updated GOGC\" old=100 new=75\ntime=2026-10-26T03:41:12.656Z level=INFO source=main.go:824 msg=\"Updating GOMAXPROCS=1: determined from CPU quota\" component=automaxprocs\ntime=2026-10-26T03:41:12.657Z level=INFO source=memlimit.go:198 msg=\"GOMEMLIMIT is updated\" component=automemlimit package=github.com/KimMachineGun/automemlimit/memlimit GOMEMLIMIT=241591910 previous=9223372036854775807\ntime=2026-10-26T03:41:12.657Z level=INFO source=main.go:933 msg=\"Starting Prometheus Server\" mode=server version=\"(version=3.15.1, branch=HEAD, revision=bae3eced0a5369e050e83ea73bc381d7c4b1a719)\"\ntime=2026-10-26T03:41:12.657Z level=INFO source=main.go:938 msg=\"operational information\" build_context=\"(go=go1.27.3, platform=linux/arm64, user=root@03bc6b0f3ef7, date=20261021-13:34:13, tags=netgo,builtinassets)\" host_details=\"(Linux 7.0.14-linuxkit #1 SMP PREEMPT Fri Oct 16 11:55:50 UTC 2026 aarch64 83f0de3af139 (none))\" fd_limits=\"(soft=1048576, hard=1048576)\" vm_limits=\"(soft=unlimited, hard=unlimited)\"\ntime=2026-10-26T03:41:12.723Z level=INFO source=web.go:727 msg=\"Start listening for connections\" component=web address=0.0.0.0:9090\ntime=2026-10-26T03:41:12.726Z level=INFO source=main.go:1499 msg=\"Starting TSDB ...\"\ntime=2026-10-26T03:41:12.729Z level=INFO source=head.go:753 msg=\"Replaying on-disk memory mappable chunks if any\" component=tsdb\ntime=2026-10-26T03:41:12.729Z level=INFO source=head.go:838 msg=\"On-disk memory mappable chunks replay completed\" component=tsdb duration=666ns\ntime=2026-10-26T03:41:12.729Z level=INFO source=head.go:846 msg=\"Replaying WAL, this may take a while\" component=tsdb\ntime=2026-10-26T03:41:12.730Z level=INFO source=tls_config.go:381 msg=\"Listening on\" component=web address=[::]:9090\ntime=2026-10-26T03:41:12.730Z level=INFO source=tls_config.go:384 msg=\"TLS is disabled.\" component=web http2=false address=[::]:9090\ntime=2026-10-26T03:41:12.730Z level=INFO source=head.go:941 msg=\"WAL segment loaded\" component=tsdb segment=0 maxSegment=0 duration=501.875\u00b5s\ntime=2026-10-26T03:41:12.730Z level=INFO source=head.go:978 msg=\"WAL replay completed\" component=tsdb checkpoint_replay_duration=7.458\u00b5s wal_replay_duration=510.333\u00b5s wbl_replay_duration=41ns chunk_snapshot_load_duration=0s mmap_chunk_replay_duration=666ns total_replay_duration=524.5\u00b5s\ntime=2026-10-26T03:41:12.730Z level=INFO source=main.go:1520 msg=\"filesystem information\" fs_type=TMPFS_MAGIC\ntime=2026-10-26T03:41:12.730Z level=INFO source=main.go:1523 msg=\"TSDB started\"\ntime=2026-10-26T03:41:12.730Z level=INFO source=main.go:1721 msg=\"Loading configuration file\" filename=/etc/prometheus/prometheus.yaml\ntime=2026-10-26T03:41:12.731Z level=INFO source=main.go:1137 msg=\"TSDB retention updated\" duration=15m size=0B percentage=0\ntime=2026-10-26T03:41:12.731Z level=INFO source=main.go:1763 msg=\"Completed loading of configuration file\" db_storage=12.708\u00b5s remote_storage=959ns web_handler=208ns query_engine=500ns scrape=72.292\u00b5s scrape_sd=791ns notify=459ns notify_sd=292ns rules=917ns tracing=5.792\u00b5s filename=/etc/prometheus/prometheus.yaml totalDuration=327.708\u00b5s\ntime=2026-10-26T03:41:12.731Z level=INFO source=main.go:1484 msg=\"Server is ready to receive web requests.\"\ntime=2026-10-26T03:41:12.731Z level=INFO source=manager.go:235 msg=\"Starting rule manager...\" component=\"rule manager\"\n"
+    },
+    {
+      "label": "g2-metric-0603026fab37-prometheus-cleanup",
+      "argv": [
+        "docker",
+        "rm",
+        "-f",
+        "-v",
+        "g2-metric-0603026fab37-prometheus"
+      ],
+      "exitCode": 0,
+      "stdout": "g2-metric-0603026fab37-prometheus\n",
+      "stderr": ""
+    },
+    {
+      "label": "network-cleanup",
+      "argv": [
+        "docker",
+        "network",
+        "rm",
+        "g2-metric-0603026fab37-network"
+      ],
+      "exitCode": 0,
+      "stdout": "g2-metric-0603026fab37-network\n",
+      "stderr": ""
+    },
+    {
+      "label": "cleanup-check",
+      "argv": [
+        "docker",
+        "ps",
+        "-a",
+        "--filter",
+        "name=g2-metric-0603026fab37",
+        "--format",
+        "{{.Names}}"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "images": {
+    "alloy": "grafana/alloy:v1.21.2@sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18",
+    "prometheus": "prom/prometheus:v3.15.1@sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2"
+  },
+  "error": {
+    "type": "RuntimeError",
+    "message": "g2-metric-0603026fab37-prometheus-port failed"
+  },
+  "cleanup": {
+    "ownContainersRemaining": [],
+    "checkedPrefix": "g2-metric-0603026fab37",
+    "onlyOwnNewResources": true
+  },
+  "recordedAtUtc": "2026-10-26T03:41:18.878338+00:00"
+}
