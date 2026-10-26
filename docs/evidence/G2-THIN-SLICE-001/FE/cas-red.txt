@@ -1,0 +1,87 @@
+COMMAND: /opt/homebrew/opt/node@24/bin/node node_modules/vitest/vitest.mjs run src/lib/api/g2-client.test.ts
+
+ RUN  v5.0.5 /Users/chasen/.codex/worktrees/g2-fe/ontology-platform/apps/web
+
+ ❯ src/lib/api/g2-client.test.ts (17 tests | 9 failed) 15ms
+   ❯ 审核、激活与取消的强修订前置条件 (9)
+     × decide精确发送Command修订0，HTTPundefined 2ms
+     × decide精确发送Command修订7，HTTPundefined 0ms
+     × decide精确发送Command修订42，HTTPundefined 0ms
+     × activate精确发送Command修订0，HTTPundefined 0ms
+     × activate精确发送Command修订7，HTTPundefined 1ms
+     × activate精确发送Command修订42，HTTPundefined 0ms
+     × cancelRun精确发送Command修订0，HTTPundefined 0ms
+     × cancelRun精确发送Command修订7，HTTPundefined 0ms
+     × cancelRun精确发送Command修订42，HTTPundefined 0ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 9 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/api/g2-client.test.ts > 审核、激活与取消的强修订前置条件 > decide精确发送Command修订0，HTTPundefined
+ FAIL  src/lib/api/g2-client.test.ts > 审核、激活与取消的强修订前置条件 > activate精确发送Command修订0，HTTPundefined
+ FAIL  src/lib/api/g2-client.test.ts > 审核、激活与取消的强修订前置条件 > cancelRun精确发送Command修订0，HTTPundefined
+AssertionError: expected null to be '"0"' // Object.is equality
+
+- Expected:
+"\"0\""
+
++ Received:
+null
+
+ ❯ src/lib/api/g2-client.test.ts:73:67
+     71|       expect(calls[1].url).toBe(operation.path);
+     72|       expect(calls[1].init).toMatchObject({ method: "POST", credential…
+     73|       expect(new Headers(calls[1].init?.headers).get("If-Match")).toBe…
+       |                                                                   ^
+     74|       expect(new Headers(calls[1].init?.headers).get("X-CSRF-TOKEN")).…
+     75|       expect(JSON.parse(String(calls[1].init?.body)).command).toEqual(…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/9]⎯
+
+ FAIL  src/lib/api/g2-client.test.ts > 审核、激活与取消的强修订前置条件 > decide精确发送Command修订7，HTTPundefined
+ FAIL  src/lib/api/g2-client.test.ts > 审核、激活与取消的强修订前置条件 > activate精确发送Command修订7，HTTPundefined
+ FAIL  src/lib/api/g2-client.test.ts > 审核、激活与取消的强修订前置条件 > cancelRun精确发送Command修订7，HTTPundefined
+AssertionError: expected null to be '"7"' // Object.is equality
+
+- Expected:
+"\"7\""
+
++ Received:
+null
+
+ ❯ src/lib/api/g2-client.test.ts:73:67
+     71|       expect(calls[1].url).toBe(operation.path);
+     72|       expect(calls[1].init).toMatchObject({ method: "POST", credential…
+     73|       expect(new Headers(calls[1].init?.headers).get("If-Match")).toBe…
+       |                                                                   ^
+     74|       expect(new Headers(calls[1].init?.headers).get("X-CSRF-TOKEN")).…
+     75|       expect(JSON.parse(String(calls[1].init?.body)).command).toEqual(…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/9]⎯
+
+ FAIL  src/lib/api/g2-client.test.ts > 审核、激活与取消的强修订前置条件 > decide精确发送Command修订42，HTTPundefined
+ FAIL  src/lib/api/g2-client.test.ts > 审核、激活与取消的强修订前置条件 > activate精确发送Command修订42，HTTPundefined
+ FAIL  src/lib/api/g2-client.test.ts > 审核、激活与取消的强修订前置条件 > cancelRun精确发送Command修订42，HTTPundefined
+AssertionError: expected null to be '"42"' // Object.is equality
+
+- Expected:
+"\"42\""
+
++ Received:
+null
+
+ ❯ src/lib/api/g2-client.test.ts:73:67
+     71|       expect(calls[1].url).toBe(operation.path);
+     72|       expect(calls[1].init).toMatchObject({ method: "POST", credential…
+     73|       expect(new Headers(calls[1].init?.headers).get("If-Match")).toBe…
+       |                                                                   ^
+     74|       expect(new Headers(calls[1].init?.headers).get("X-CSRF-TOKEN")).…
+     75|       expect(JSON.parse(String(calls[1].init?.body)).command).toEqual(…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/9]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  9 failed | 8 passed (17)
+   Start at  12:14:10
+   Duration  89ms (tests 47%, transform 32%, import 16%, worker 5%)
+EXIT_CODE=1

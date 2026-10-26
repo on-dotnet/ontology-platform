@@ -114,3 +114,19 @@ Base=`a47455d336cb4c1c283febf4750f0f01d45daeae`；仅semantic-feedback组件、�
 实际RED14/14（原组件打开首页、无效输入仍可导航）；实现后全量Vitest **67/67（7 suites）**、lint/typecheck均exit0；SelfTest exit0（工程8、结构正负4、环境3组、ReviewPackage35/0），各项输出见trace-red.txt、trace-vitest.txt、trace-lint.txt、trace-typecheck.txt、trace-selftest.txt。日志仅统一LF/移除行尾空白。该组只验证真实组件生成链接的正负行为，不把SSR渲染单测当作真实Grafana/Tempo验收。当前轮未重跑build/浏览器E2E，CI NOT_VERIFIED，独立Review及集成待Master。
 
 保持d52acc0/a47455d CSS基线，未修改Tokens/锁/合同/Host/生成DTO或原G1断言；Monaco继续PAUSED BY HUMAN，无安装/import/override。任务整体仍DRAFT/PARTIAL；唯一标准Review ZIP由Master阶段收口。
+
+## Root S2真实联调缺口修复第一轮（1/5）：三个写入口缺CAS头
+
+Fix Base=`b31573acd59a60ea0214fff22f1469e8370825d7`。按Master新增明确owned_paths，仅本Owner修改`src/lib/api/g2-client.ts`及原对应测试，追加本节和cas-*证据；已读superpowers的`subagent-driven-development/references/fix-loop.md`，原实现者修复并等待Master限定再审，没有派新Agent。
+
+真实依据：Master的`master/full-g2-e2e-missing-cas-header-red.json`记录45项PASS后`http_release-activations_2`为HTTP428；该轮S2/S3未完成。只读核对g2-master当前Host：PublishingEndpoints对decide/activate启用requiresRevision，ExecutionEndpoints对cancel同样启用；G2EndpointGuard强制存在If-Match并与Command.expectedRevision相等。原FE三入口传write的revision为undefined；save/edit此前已正确，是本次直接参照。
+
+最小产品差异仅3行：decide、activate、cancelRun均把`body.command.expectedRevision`传给原write，复用现有强ETag编码和CSRF路径。activate的`expectedActivationRevision`仍是业务独立CAS字段，不替代HTTP头来源；没有降低Host guard、改合同、改请求体、加重试或扩展业务。
+
+覆盖测试文件：`apps/web/src/lib/api/g2-client.test.ts`。三个入口分别以CommandRevision 0/7/42验证强If-Match精确为双引号0/7/42；activate额外固定不同的expectedActivationRevision=91，防止错误取该字段。HTTP428/409/503错误逐一原样保留，每次显式调用仅1个CSRF+1个业务POST、命令/幂等键保持，无自动重试。
+
+实际RED：新增9/9失败，均为If-Match实际null（原8例通过），见[原始RED](cas-red.txt)。首轮测试标题的status占位符粘连中文显示undefined；只修标题边界后重复9/9失败，见[清晰命名RED](cas-red-named.txt)，没有改变行为断言。最小修复后[针对性运行](cas-targeted.txt)17/17、[全量Vitest](cas-vitest.txt)76/76（7 suites），[lint](cas-lint.txt)/[typecheck](cas-typecheck.txt)均exit0。以上使用已批准Node24.22.1和本树已安装工具，未恢复或改依赖。日志仅统一LF及行尾空白。
+
+真实异人审核/激活UI和运行取消仍由Master复跑后限定re-review；本树transport单元测试不宣称PG/Jena/OIDC/S2或完整G2 PASS。CI NOT_VERIFIED，任务整体DRAFT/PARTIAL。共享Tokens/锁/合同/Host、Trace及d52acc0/a47455d CSS保持，Monaco仍PAUSED BY HUMAN。
+
+本轮`pwsh -NoProfile -File scripts/verify.ps1 -SelfTest`实际exit0，工程8/结构正负4/环境3组/ReviewPackage35且0失败，完整输出见[CAS工程自测](cas-selftest.txt)。本轮不计真实浏览器S2/S3通过。
