@@ -1,5 +1,5 @@
 {
-  "status": "FINAL_HEAD_PENDING_AFTER_TEST_ONLY_COLD_JIT_FIX",
+  "status": "SOURCE_AND_COLD_JIT_FIX_CI_PASS_FINAL_EVIDENCE_INPUT_HEAD_PENDING",
   "runs": [
     {
       "id": 40260902743,
@@ -43,8 +43,16 @@
       "conclusion": "failure",
       "engineering": "1 synthetic readiness cold-JIT budget fixture failure; raw summary archived; original assertions preserved in independent test-only fix",
       "governanceIntegration": "completed/success (actual jobs API)"
+    },
+    {
+      "id": 40282095211,
+      "headSha": "6a736b602935c12113c34330429f27606079661a",
+      "url": "https://github.com/on-dotnet/ontology-platform/actions/runs/40282095211",
+      "conclusion": "success",
+      "engineering": "completed/success",
+      "governanceIntegration": "completed/success; actual114/69/50/49/33 zero failures and zero skips"
     }
   ],
-  "finalSameHeadCI": "Pending actual final commit; package runtimeCi will record actual jobs success/failure with exact final Head. No prior run is substituted.",
+  "finalSameHeadCI": "Canonical evidence-input documentation commit requires its own actual CI; final package runtimeCi supplies exact final commit/run.",
   "notes": "No GitHub protection/billing/resource settings changed; old failing CI not hidden."
 }

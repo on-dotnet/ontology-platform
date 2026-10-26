@@ -1,8 +1,4 @@
 {
-  "taskId": "G2-THIN-SLICE-001",
-  "status": "PARTIAL",
-  "baseSha": "6154ebb3703031a49cf0c555c9f0c3596e3b7726",
-  "actualFullColdCandidate": "b1ff0a68915c272846038af96a00da3acbb95538",
   "checks": [
     {
       "name": "repository-selftest",
@@ -165,9 +161,5 @@
     "url": null,
     "commit": null,
     "conclusion": null
-  },
-  "ciNote": "Final committed Head CI is supplied from actual jobs API as create-review-package explicit runtimeCi parameters to avoid self-reference; previous b1 success separately archived. No empty status inferred success.",
-  "archiveVerification": "NOT_VERIFIED: creation and independent reopen occur after this source commit",
-  "review": "whole-review-final.md and independent-integration-reviews.md; no open C/I/M in reviewed source or QA fixes",
-  "monacoSecurityInvestigation": "monaco-embedded-security-review.md: official bundled3.4.15 verified; no Monaco in current301 Next artifacts; old override proposal rejected; official fixed Monaco absent, future patch is design-only. All repair-specific XSS/SSR/worker/CI tests NOT_RUN; BLOCKED persists."
+  }
 }

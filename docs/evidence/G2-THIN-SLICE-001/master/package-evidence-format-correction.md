@@ -1,0 +1,11 @@
+# 标准封包证据输入规范化
+
+实际命令：create-review-package.ps1，Base6154ebb3703031a49cf0c555c9f0c3596e3b7726，Head6a736b602935c12113c34330429f27606079661a，显式实际CI40282095211 success。命令exit1，实际输出EVIDENCE_MISMATCH: recorded statuses differ from evidence input。工具在原子发布前拒绝，自己创建的partial已由finally清理，没有生成最终ZIP。
+
+根因：Get-ReviewEvidence返回输入整个JSON，而manifest只记录checks/ci。此前validation.json附带taskId/status/coldCandidate/说明等元数据，重开时语义JSON严格比较发现集合不同。并非源码、散列或产品测试失败。
+
+修正仅规范证据输入为标准checks和ci两个对象；原额外元数据完整保留为validation-context.json。实际全部check对象/命令/退出码/结果不变，ci仍保留NOT_VERIFIED并由封包显式实际run参数覆盖，避免自身SHA循环。标准封包器/测试/安全约束未改动，也没有跳过或放宽重开验证。
+
+6a同Head双job实际success仍为历史事实；新文档提交CI必须重新实际成功，再快进main后以新完整Head生成唯一ZIP，不复用旧CI。
+
+独立quality_reviewer限定复核C0/I0/M0，可提交。亲读Get-ReviewEvidence及双DeepEquals路径，确认根因。Python独立比较22项check/ci精确不变，context恰好保留全部删除元字段，两者合并完全重建原JSON；标准脚本/测试/生产/CI无diff。未生成ZIP，最终重开仍后验。

@@ -66,3 +66,5 @@ MAF与MCP实用批准SDK，不把deterministic harness称为模型推理；真�
 收尾测试修复原a02d6da7297b254ce153628f29cf765de10af77c已由Master集成为5a54c5d（完整SHA在Git记录）；独立限定审查C0/I0/M0、Spec/Quality PASS，见readiness-test-independent-review.md。生产131文件完全不变，最终源指纹仅单测试文件与cold候选不同并显式登记。该测试修订native338项中123成功/215缺环境跳过，另安全114项84成功/30跳过；不将其计成此前真实114/114或模块零skip验收。最终CI尚待实际查询。
 
 Master集成同一fixture源码full-JIT复验实际exit0：8queries/2HTTP/2014ms/503/storageCancelled，见master-readiness-final.txt；最终集成SelfTest exit0且ReviewPackage35/0。安全调查和测试修复独立原审查均已关闭，最终提交CI与封包仍后验。
+
+封包输入增量：6a736b6同Head实际双jobCI40282095211成功并快进main后，标准封包器严格重开因证据额外元数据拒绝（exit1，未发布ZIP）。现将validation.json保持规范checks/ci结构，全部check不变，额外说明完整移至validation-context.json；不改封包器或放宽安全校验。新文档Head仍要求新CI及最终实际ZIP回执，见package-evidence-format-correction.md。
