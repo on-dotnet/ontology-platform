@@ -143,11 +143,11 @@ S1语义/草稿+FE→S2审批/发布/故障/回滚→S3正式查询/MCP/MAF/SSE/
 | SemanticSubSource | sourceId:string、status:AVAILABLE/EMPTY/PARTIAL/UNAVAILABLE/UNAUTHORIZED、releaseId:string、dataHash:string、observedAtUtc:datetime、code:string?（固定类别） |
 | SemanticQueryResult | status:六态enum、data:SemanticDatum[]、candidates:EntityCandidate[]、evidence:EvidenceRef[]、snapshot:AssetVersionSnapshot、subSources:SemanticSubSource[]、validTime:TemporalExtent?、observedAtUtc:datetime、traceId:string、limited:boolean、diagnostics:SemanticDiagnostic[] |
 | TemporalExtent | fromUtc:datetime、toUtc:datetime?；来自实际断言时间，不以采集时间替代 |
-| CapabilitySchema | schemaVersion:int（1）、type:object、required:string[]、properties:CapabilityParameter[]、additionalProperties:boolean（false） |
+| CapabilityInputSchema | 仅inputSchema的有限参数描述：schemaVersion:int（1）、type:object、required:string[]、properties:CapabilityParameter[]、additionalProperties:boolean（false） |
 | CapabilityParameter | name:string、type:string/integer/array、description:string、enumValues:string[]、minimum:int?、maximum:int?、itemsType:string?；只需要本轮实际字段，不开放用户自定义schema |
 | CapabilityBudget | maxDepth:int、maxRows:int、timeoutMs:int、maxToolCalls:int |
 
-三能力的唯一输出：describe_ontology的data包含一个kind=ontology（OntologyDescription真实正式图）；resolve_entity仅kind=entity，歧义在candidates列出且status=AMBIGUOUS；traverse_relationships/trace_material返回kind=entity和kind=relationship的有限路径子图，关系引用本次已授权节点，不伪造一对一。全部返回同一SemanticQueryResult，Evidence使用唯一EvidenceRef。diagnostics安全消息不拼接用户输入/查询/异常；SourceUnavailable等机器码来自有限常量集合。Capability Registry可把上述有限参数模型显式映射为标准JSON Schema给MCP，不建立第二套能力定义。
+三能力的唯一输出：describe_ontology的data包含一个kind=ontology（OntologyDescription真实正式图）；resolve_entity仅kind=entity，歧义在candidates列出且status=AMBIGUOUS；traverse_relationships/trace_material返回kind=entity和kind=relationship的有限路径子图，关系引用本次已授权节点，不伪造一对一。全部返回同一SemanticQueryResult，Evidence使用唯一EvidenceRef。diagnostics安全消息不拼接用户输入/查询/异常；SourceUnavailable等机器码来自有限常量集合。Capability Registry仅将上述CapabilityInputSchema有限参数模型显式映射为三工具inputSchema标准JSON Schema。outputSchema直接从唯一强类型SemanticQueryResult及其嵌套DTO的真实OpenAPI Schema生成标准JSON Schema，保留object/boolean/nullable/enum/判别联合/引用；outputSchema是该机器生成的标准Schema文档，不受有限输入参数类型限制，不另造输出业务模型或手写弱化Schema。实际MCP输出与REST同一DTO验证。
 
 ExecutionEvent.payload为以下已知具名类型的判别联合，由eventType确定；不允许任意字典/JsonElement替代已知跨团队合同。实现可用System.Text.Json显式多态/转换器，但实际OpenAPI与TS必须保留精确联合及kind，不能退unknown。
 
