@@ -31,3 +31,16 @@
 ## 尚未验证/交接
 
 NOT_RUN：PG并发CAS/审计回滚/幂等/旧报告绑定、正式Jena TDB发布回读、HTTP安全guard与OpenAPI、审批失效交叉测试、浏览器、性能基线。CI：NOT_VERIFIED；独立最终Review与唯一标准ZIP由Master组织，此分支不自行main。真实模型/Windows/Intel/生产维持NOT_RUN。继续当前Task2授权，不进入下一阶段。
+
+## e4f6ade独立审查后修复与真实扩展
+
+独立Review（Master报告）：0 Critical / 2 Important / 1 Minor，仅可DRAFT集成，不满足S1。I1短role不匹配真实Claims，已改完整`platform.operator/platform.viewer/platform.auditor`；成功审计改`allowed`。I2已提交create/save回执应先于Jena分析，已添加前置Replay，数据库+依赖故障实际证明仍等待Master共享迁移/writer。M1 selftest.txt文件末尾多空行已修。
+
+- `python3 scripts/acceptance/semantic-roundtrip.py --label published-roundtrip-first`：exit 0，15/15测试通过（含一个实现类型存在检查）。真实临时TDB2证明隔离两版本、规范词法回读通过、01 typed lexical规范化回读失败且旧图仍通过。
+- `--label empty-shacl-regression`：exit 2，16项中1失败，空有效Turtle因Fuseki不保留空named graph而503。`--label empty-shacl-green`：exit 0，16/16通过；官方`graph=default`用于空输入，但必须先真实读取证明default为空，应用永不向default写入，不混用其他暂存图。官方依据：[Jena SHACL Fuseki集成](https://jena.apache.org/documentation/shacl/index.html)。
+- `--label published-subclass-red`：exit 2，17项中1失败；只验证正式data图漏掉本体父类target。`--label published-subclass-green`：exit 0，17/17通过；正式ontology/data真实回读先逐项对账，再把实际回读合并到独占验证图执行同一Shapes，绝不拿原始源冒充回读内容。
+- `--label relative-iri-red`：exit 2，20项中1失败；相对fragment默认解析成含随机暂存IRI的请求URL。`--label relative-iri-green`：exit 0，20/20通过；Master批准稳定文档base `https://ontology.invalid/source/{0..3}/`（ontology/shapes/vocabulary/data顺序），显式BASE优先，不网络抓取。解析、Shapes执行、编辑后再解析和正式部署保持同一语义；原始UTF8源/hash完全不变。该基址不自动提供组织/厂区身份，样例业务IRI继续绝对含org/site/source。
+- 同一边界组实际证明非no-op精确编辑其余图不丢失、UTF8单源预算、5001三元组、1001节点、2001边、129项枚举与rdf:rest环拒绝。
+- `--label concurrency-cancellation-green`：exit 0，23/23通过；两个真实请求在受控时序门占槽，第三个429；gate只延迟真实HTTP、不返回模拟RDF；调用者取消保留OperationCanceledException，内部五秒预算固定503/semantic_timeout；已有真实PUT后的finally删除，脚本查询所有暂存三元组0。
+
+截至此里程碑真实测试总数23，其中1项只是生产类型实现边界存在，不能把总数写成23次独立引擎执行。PG/HTTP及跨模块审批仍NOT_RUN。新增正式图与安全边界测试没有替代最终PG/端到端验证。

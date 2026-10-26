@@ -66,9 +66,14 @@ public sealed class JenaSemanticRuntime : ISemanticRuntime
                     ValidatedAtUtc = clock.GetUtcNow()
                 };
             // 图在内存独占暂存，用完整已解析三元组合并，完全不触发imports网络请求。
-            var graph = await LoadAsync(string.Join('\n', parsed[0].Concat(parsed[2]).Concat(parsed[3]).Select(JenaRdfCodec.Triple)), graphs, token);
+            var combined = parsed[0].Concat(parsed[2]).Concat(parsed[3]).ToArray();
+            // Fuseki不保留空命名图；仅在核实从不写入的默认图为空时使用官方default目标。
+            var graph = "default";
+            if (combined.Length > 0) graph = await LoadAsync(string.Join('\n', combined.Select(JenaRdfCodec.Triple)), graphs, token);
+            else if (JenaRdfCodec.Parse(await SendAsync(validation, "data?default", HttpMethod.Get, null, "application/rdf+json", token)).Length != 0)
+                throw new SemanticOperationException(503, "validation_default_not_empty");
             // 原始标准报告字节参与散列，定位字段由真实报告映射。
-            var raw = await SendAsync(validation, "shacl?graph=" + Uri.EscapeDataString(graph), HttpMethod.Post, sources.ShapesTurtle, "application/rdf+json", token);
+            var raw = await SendAsync(validation, "shacl?graph=" + Uri.EscapeDataString(graph), HttpMethod.Post, SourceDocument(sources.ShapesTurtle, 1), "application/rdf+json", token);
             // RDF报告不按HTTP成功猜测，而明确读取标准conforms谓词。
             var report = JenaRdfCodec.Parse(raw);
             // 必须恰好一个报告布尔结果，坏响应作为依赖故障关闭。
@@ -122,7 +127,7 @@ public sealed class JenaSemanticRuntime : ISemanticRuntime
             var parsed = await ParseSourcesAsync(sources, graphs, token);
             if (Support(parsed[0].Concat(parsed[2]).Concat(parsed[3]).ToArray()).Length != 0) throw new SemanticOperationException(422, "publication_unsupported");
             await SendAsync(published, "data?graph=" + Uri.EscapeDataString(manifest.OntologyGraphIri), HttpMethod.Put, string.Join('\n', parsed[0].Concat(parsed[2]).Select(JenaRdfCodec.Triple)), "text/plain", token);
-            await SendAsync(published, "data?graph=" + Uri.EscapeDataString(manifest.DataGraphIri), HttpMethod.Put, sources.DataTurtle, "text/plain", token);
+            await SendAsync(published, "data?graph=" + Uri.EscapeDataString(manifest.DataGraphIri), HttpMethod.Put, string.Join('\n', parsed[3].Select(JenaRdfCodec.Triple)), "text/plain", token);
             return true;
         }, cancellationToken);
 
@@ -138,8 +143,10 @@ public sealed class JenaSemanticRuntime : ISemanticRuntime
             // 数据图与本体图独立对账。
             var data = await ReadGraphAsync(published, manifest.DataGraphIri, token);
             if (JenaRdfCodec.Canonical(ontology) != JenaRdfCodec.Canonical(parsed[0].Concat(parsed[2]).Distinct().ToArray()) || JenaRdfCodec.Canonical(data) != JenaRdfCodec.Canonical(parsed[3])) return false;
-            // 对正式图真正运行相同Shapes；正式dataset必须启用官方shacl操作。
-            var raw = await SendAsync(published, "shacl?graph=" + Uri.EscapeDataString(manifest.DataGraphIri), HttpMethod.Post, sources.ShapesTurtle, "application/rdf+json", token);
+            // 使用实际回读的正式本体和事实合并验证，避免漏掉subClassOf等父类target。
+            var verificationGraph = await LoadAsync(string.Join('\n', ontology.Concat(data).Select(JenaRdfCodec.Triple)), graphs, token);
+            // 此图内容来自正式TDB2实际回读，绝不拿原始源替代验证中的事实。
+            var raw = await SendAsync(validation, "shacl?graph=" + Uri.EscapeDataString(verificationGraph), HttpMethod.Post, SourceDocument(sources.ShapesTurtle, 1), "application/rdf+json", token);
             return JenaRdfCodec.Parse(raw).Any(triple => triple.Predicate == ShapePolicy.Sh + "conforms" && triple.Object.Value == "true");
         }, cancellationToken);
 
@@ -185,21 +192,26 @@ public sealed class JenaSemanticRuntime : ISemanticRuntime
     /// <summary>分别由RIOT解析四类源并执行Shape安全检查，计算总三元组预算。</summary>
     private async Task<RdfTriple[][]> ParseSourcesAsync(SourceBundle sources, List<string> graphs, CancellationToken token)
     {
-        if (sources.OntologyTurtle is null || sources.ShapesTurtle is null || sources.DataTurtle is null || !OntologyRules.WithinSourceBudget(sources.OntologyTurtle, sources.ShapesTurtle, sources.VocabularyTurtle, sources.DataTurtle))
+        if (sources is null || sources.OntologyTurtle is null || sources.ShapesTurtle is null || sources.DataTurtle is null || !OntologyRules.WithinSourceBudget(sources.OntologyTurtle, sources.ShapesTurtle, sources.VocabularyTurtle, sources.DataTurtle))
             throw new SemanticOperationException(413, "source_byte_budget");
         // 各源数组顺序与公共SourceBundle一致。
         var result = new List<RdfTriple[]>();
+        // 稳定文档索引定义未显式BASE源码的相对IRI基址，不包含随机端口或图ID。
+        var sourceIndex = 0;
         foreach (var source in new[] { sources.OntologyTurtle, sources.ShapesTurtle, sources.VocabularyTurtle, sources.DataTurtle })
         {
-            if (string.IsNullOrEmpty(source)) { result.Add([]); continue; }
+            if (string.IsNullOrEmpty(source)) { result.Add([]); sourceIndex++; continue; }
             // 所有输入首先经过真实RIOT，形状检查只处理标准解析结果。
-            var graph = await LoadAsync(source, graphs, token);
+            var graph = await LoadAsync(SourceDocument(source, sourceIndex++), graphs, token);
             result.Add(await ReadGraphAsync(validation, graph, token));
         }
         if (result.Sum(triples => triples.Length) > 5000) throw new SemanticOperationException(422, "rdf_triple_budget");
         ShapePolicy.Check(result[1]);
         return result.ToArray();
     }
+
+    /// <summary>提供固定的解析文档基址；用户显式BASE仍按Turtle规范覆盖，不进行网络抓取。</summary>
+    private static string SourceDocument(string source, int index) => "@base <https://ontology.invalid/source/" + index.ToString(System.Globalization.CultureInfo.InvariantCulture) + "/> .\n" + source.TrimStart('\uFEFF');
 
     /// <summary>使用随机服务器IRI创建暂存图，登记早于写入以便失败也清理。</summary>
     private async Task<string> LoadAsync(string source, List<string> graphs, CancellationToken token)

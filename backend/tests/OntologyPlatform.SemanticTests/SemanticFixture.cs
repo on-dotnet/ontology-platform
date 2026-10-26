@@ -39,4 +39,54 @@ internal static class SemanticFixture
             DataTurtle = File.ReadAllText(Path.Combine(root, "data.ttl"))
         };
     }
+
+    /// <summary>保留真实HTTP传输，只在指定阶段注入可取消延迟以验证并发/超时。</summary>
+    internal static JenaSemanticRuntime RuntimeWithGate(Func<HttpRequestMessage, CancellationToken, Task> gate)
+    {
+        // 随机回环地址仍由同一临时真实Jena提供。
+        var origin = Environment.GetEnvironmentVariable("G2_SEM_JENA_ORIGIN");
+        if (origin is null) Assert.Inconclusive("NOT_RUN: 缺少隔离Jena。");
+        // 所有响应都来自实际引擎，gate不提供任何模拟RDF或SHACL结果。
+        var config = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            ["Semantics:ValidationOrigin"] = origin + "/validation/", ["Semantics:PublishedOrigin"] = origin + "/ontology/"
+        }).Build();
+        return new JenaSemanticRuntime(new TimingFactory(gate), config, TimeProvider.System);
+    }
+
+    /// <summary>为真实引擎连接增加确定性时序控制，绝不替换业务响应。</summary>
+    private sealed class TimingFactory : IHttpClientFactory
+    {
+        /// <summary>发送前时序钩子。</summary>
+        private readonly Func<HttpRequestMessage, CancellationToken, Task> gate;
+
+        /// <summary>保存当前测试的时序钩子。</summary>
+        public TimingFactory(Func<HttpRequestMessage, CancellationToken, Task> gate)
+        {
+            this.gate = gate;
+        }
+
+        /// <summary>返回禁用重定向的真实网络客户端。</summary>
+        public HttpClient CreateClient(string name) => new(new TimingHandler(gate) { InnerHandler = new HttpClientHandler { AllowAutoRedirect = false, UseProxy = false } });
+    }
+
+    /// <summary>延迟真实请求，取消仍传到实际传输和清理。</summary>
+    private sealed class TimingHandler : DelegatingHandler
+    {
+        /// <summary>发送前时序钩子。</summary>
+        private readonly Func<HttpRequestMessage, CancellationToken, Task> gate;
+
+        /// <summary>保存当前测试的时序钩子。</summary>
+        public TimingHandler(Func<HttpRequestMessage, CancellationToken, Task> gate)
+        {
+            this.gate = gate;
+        }
+
+        /// <summary>执行时序控制后直接转发真实请求和真实响应。</summary>
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            await gate(request, cancellationToken);
+            return await base.SendAsync(request, cancellationToken);
+        }
+    }
 }

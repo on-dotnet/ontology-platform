@@ -1,0 +1,68 @@
+{
+  "exitCode": 0,
+  "records": [
+    {
+      "command": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g2-sem-894c8b80ce9c",
+        "--publish",
+        "127.0.0.1::3030",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--mount",
+        "type=bind,src=/private/tmp/g2-sem-894c8b80ce9cxmamawss,dst=/fixture,readonly",
+        "--entrypoint",
+        "java",
+        "fuseki:8b85cd963ab3910a87ff4d69819a814fcc536d5f",
+        "-Xmx384m",
+        "-Dlog4j.configurationFile=/fixture/log4j2.properties",
+        "-jar",
+        "/opt/fuseki/fuseki-server.jar",
+        "--config=/fixture/config.ttl"
+      ],
+      "exitCode": 0,
+      "output": "76fdfe38d1b663d1b0434ad769bc11d3db12fc64e2a937a189362ac55265aedb\n"
+    },
+    {
+      "command": [
+        "docker",
+        "port",
+        "g2-sem-894c8b80ce9c",
+        "3030/tcp"
+      ],
+      "exitCode": 0,
+      "output": "127.0.0.1:49750\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "test",
+        "--project",
+        "backend/tests/OntologyPlatform.SemanticTests",
+        "--no-restore"
+      ],
+      "exitCode": 0,
+      "output": "正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n/Users/chasen/.codex/worktrees/g2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64) 已通过 (1s 827ms)\n\n测试运行摘要: 已通过!\n  总计: 17\n  失败: 0\n  成功: 17\n  已跳过: 0\n  持续时间: 1s 913ms\n"
+    },
+    {
+      "check": "all temporary graph triples removed",
+      "count": 0,
+      "status": "PASS"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g2-sem-894c8b80ce9c"
+      ],
+      "exitCode": 0,
+      "output": "g2-sem-894c8b80ce9c\n"
+    }
+  ]
+}

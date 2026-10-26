@@ -56,6 +56,9 @@ public sealed class OntologyService : IOntologyService, IDraftPublicationReader
         var scope = Normalize(request.Scope);
         DemandScope(actor, scope);
         if (request.Command.ExpectedRevision != 0 || string.IsNullOrWhiteSpace(request.Name) || request.Name.Length > 200) throw new SemanticOperationException(422, "draft_request_invalid");
+        // 已提交回执不依赖Jena当前可用性，重试直接返回同一业务事实。
+        var replay = await ReplayAsync<OntologyDraft>(actor, scope, "ontology.create", request.Command, request with { Scope = scope }, cancellationToken);
+        if (replay is not null) return replay;
         if (request.BaseReleaseId is not null) throw new SemanticOperationException(503, "release_catalog_unavailable");
         // 解析在PG短事务之前完成，外部请求不会持有草稿/审计表锁。
         var analysis = await runtime.AnalyzeAsync(request.Sources, 1, cancellationToken);
@@ -87,6 +90,9 @@ public sealed class OntologyService : IOntologyService, IDraftPublicationReader
         // 持久头提供真实范围；保存不能改asset/scope。
         var row = await FindAsync(draftId, false, cancellationToken);
         DemandScope(actor, Scope(row));
+        // 保存重放也不重新调用Jena，已提交的同一命令保持可恢复。
+        var replay = await ReplayAsync<OntologyDraft>(actor, Scope(row), "ontology.save", request.Command, new { draftId, request }, cancellationToken);
+        if (replay is not null) return replay;
         // Jena在事务外验证，锁定后仍重新比较期望修订防止TOCTOU。
         var analysis = await runtime.AnalyzeAsync(request.Sources, request.Command.ExpectedRevision + 1, cancellationToken);
         return await SaveCoreAsync(actor, row, request.Command, request.Sources, analysis, "ontology.save", request, cancellationToken);
@@ -216,7 +222,7 @@ public sealed class OntologyService : IOntologyService, IDraftPublicationReader
             var result = await mutation(token);
             database.Commands.Add(new CommandRecord { Key = key, PayloadHash = payloadHash, SubjectId = actor.SubjectId, ResultJson = JsonSerializer.Serialize(result.Result) });
             await database.SaveChangesAsync(token);
-            await audit.WriteAsync(actor, new AuditCommand { Action = action, Resource = result.Resource, Outcome = "success", Scope = scope }, database.Database.GetDbConnection(), transaction.GetDbTransaction(), token);
+            await audit.WriteAsync(actor, new AuditCommand { Action = action, Resource = result.Resource, Outcome = "allowed", Scope = scope }, database.Database.GetDbConnection(), transaction.GetDbTransaction(), token);
             await transaction.CommitAsync(token);
             return result.Result;
         }
@@ -281,7 +287,7 @@ public sealed class OntologyService : IOntologyService, IDraftPublicationReader
     /// <summary>REST之外的应用调用同样强制角色边界。</summary>
     private static void DemandRole(ActorContext actor, bool write)
     {
-        if (string.IsNullOrWhiteSpace(actor.SubjectId) || (write ? !actor.Roles.Contains("operator", StringComparer.Ordinal) : !actor.Roles.Any(role => role is "viewer" or "operator" or "auditor"))) throw new SemanticOperationException(403, "role_denied");
+        if (string.IsNullOrWhiteSpace(actor.SubjectId) || (write ? !actor.Roles.Contains("platform.operator", StringComparer.Ordinal) : !actor.Roles.Any(role => role is "platform.viewer" or "platform.operator" or "platform.auditor"))) throw new SemanticOperationException(403, "role_denied");
     }
 
     /// <summary>命令标识与理由使用固定预算，不记录正文。</summary>
