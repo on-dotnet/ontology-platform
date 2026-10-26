@@ -53,3 +53,28 @@ ActivitySource/Meter均为OntologyPlatform.Agents；指标仅固定结果/能力
 - Master接入：AddAgentsModule、AddSemanticMcpEndpoints；MapExecutionEndpoints、MapMcpEndpoints；开发迁移AgentsDbContext；订阅Agents的OTel source/meter；仅Development验收显式打开harness。
 
 本轮没有修改main、公共合同、AppHost、共享锁或CI，没有调用外部模型。提交推送后停止实施，等待独立审查反馈。
+
+
+## 独立审查M1限定修复（2026-10-26）
+
+Master转述独立审查C0/I0/M1，原Spec/Quality核心通过；唯一M1为AgentRunExecutor原固定4096 UTF16 Substring切断代理对，JSON序列化成FFFD而仍COMPLETED。本轮已读指定SDD fix-loop；虽然该通用skill默认延期Minor，Master明确要求修复，因此按当前明确授权实施并交原Reviewer限定复核，不自行认定审查通过。
+
+Fix Base=`3533251eaf844a2357daccb6cd9901e391b2ae14`；源码/测试小提交=`cedee6bc7a7c59b3bf1f563e319905b3a0a3afd5`，已push。只改`AgentRunExecutor.cs`和新增`MessageChunkTests.cs`；共享合同、SEM/QRY、迁移、依赖均未改。分片迭代器仍以`String.Length ≤ 4096`为界，切点处若为完整代理对，则本段缩短一个UTF16单元，偏移按实际长度推进；既有原子append、128KiB/512events/lease/fence预算保持原路径。空文本零分片。
+
+覆盖文件`backend/tests/OntologyPlatform.AgentTests/MessageChunkTests.cs`：emoji😀与扩展汉字𠀀各覆盖连续两次代理对边界，真实MAF标准function loop、PG存储后读取、逐字符标签一致、无FFFD、seq/eventId连续、每段长度、事件字节预算、二次分页重放一致；空/ASCII 0、4096、4097、8193长度四个控制通过私有生产迭代器反射调用及JSON往返，不新增公共测试接口。两个集成边界用例明确仅在真实Gateway完成后以测试装饰器替换实体标签；真实正式版本/scope/查询/证据执行、MAF及PG仍实际运行，不能把注入标签称作完整发布Unicode标签验收。
+
+| 真实命令与证据 | exit / 数量 | 结论 |
+|---|---|---|
+| `python3 scripts/acceptance/mcp-agent.py --label unicode-boundary-red --filter FullyQualifiedName~MessageChunkTests` | 2；2失败/0通过 | 首次真实长Unicode标签在上游SEM Load失败，未触达分片，**不是有效M1红例**；[完整记录](unicode-boundary-red.json) |
+| `python3 scripts/acceptance/mcp-agent.py --label unicode-message-red --filter FullyQualifiedName~MessageChunkTests` | 2；2失败/0通过/0跳过；4.432秒 | 装饰器仅注入标签后，真实MAF/PG均Completed但持久消息损坏；emoji/扩展汉字均在字符保真断言失败；[有效红例](unicode-message-red.json) |
+| `G2_AI_AJV=/Users/chasen/.codex/worktrees/g2-master/ontology-platform/node_modules/.pnpm/ajv@6.15.0/node_modules/ajv python3 scripts/acceptance/mcp-agent.py --label unicode-message-green` | 0；31通过/0失败/0跳过；40.134秒 | 原25项加新增6项全部通过；真实MCP Ajv子集3正例/6负例通过；[完整绿例](unicode-message-green.json) |
+| backend目录 `dotnet format OntologyPlatform.slnx --no-restore --verify-no-changes --include src/Modules/Agents/OntologyPlatform.Modules.Agents/AgentRunExecutor.cs --verbosity diagnostic` | 0 | [限定源格式](unicode-format-source.json)，实际Agents分析器执行 |
+| AgentTests目录 `dotnet format OntologyPlatform.AgentTests.csproj --no-restore --verify-no-changes --include MessageChunkTests.cs --verbosity diagnostic` | 0 | [限定测试格式](unicode-format-tests.json) |
+| `pwsh -NoProfile -File scripts/verify.ps1 -SelfTest` | 0；ReviewPackage35/0失败 | [真实SelfTest](unicode-selftest.json) |
+| `git diff --check` | 0 | 本轮变更无空白错误 |
+
+全套绿色执行时源码未提交；[源绑定](unicode-source-binding.json)逐项核验21个被测源码hash与固定源码提交相同，mismatches为空。锁定恢复、真实build、四模块迁移均0；仍有本AI旧基线共享Guard原CS1573警告，由Master已有修复处理，未越权手改。所有容器均本脚本随机新建并finally清理，无付费模型/新依赖。
+
+应Master进一步请求，将首次SEM失败缩减为原Synthetic `data.ttl`中业务标签及来源断言的`炉次heat-1`替换为**单个😀**，其余不改。临时探针执行命令 `python3 scripts/acceptance/mcp-agent.py --label unicode-sem-minimal-diagnostic --filter FullyQualifiedName~UnicodeSemanticProbe`，exit2、1项失败、0跳过、2.255秒；仅安全输出`OBSERVED_SEM_UNICODE status=422; code=rdf_parse_invalid; type=SemanticOperationException`，未记录Jena响应正文。真实调用路径PublishAsync→ValidateAsync→LoadAsync→SendAsync。源码见[探针](unicode-sem-probe.cs.txt)，[原始诊断记录](unicode-sem-minimal-diagnostic.json)。探针临时复制到owned测试目录运行后删除，不混入31项固定回归或声称绿色；证据保存复现步骤。旧基线JenaRdfCodec.Term以JsonSerializer.Serialize生成字面量是待原SEM Owner核验的疑点；本轮未改SEM，未证明最终SEM修订仍有该缺陷。已准确交Master协调。
+
+本次只交原Reviewer限定复核M1。Master最终SEM/QRY整合及同Head重跑仍待执行；真实模型、浏览器E2E、CI与唯一ZIP的既有NOT_RUN/NOT_VERIFIED保持不变。完成后停止写入并释放slot。
