@@ -118,3 +118,12 @@ Master：`codex/G2-THIN-SLICE-001-master`，`/Users/chasen/.codex/worktrees/g2-m
 
 
 2026-10-26 契约初审：de5f09f授权范围符合，0Critical/2Important/2Minor；未派产品写任务。已核实并修正回滚与当前草稿修订冲突（PUBLISH/ROLLBACK分支），补齐跨模块投影/查询/SSE载荷精确类型，明确Master治理事务writer路径和assetId永久唯一scope。兼容PoC实际恢复/编译/加载MAF1.26.0、AI10.11.0与MCP2.3.0，NuGet全传递已知漏洞查询未报告命中；完整许可登记与实际工具调用仍待验收。修正提交后限定复审，冻结后再派写。
+
+
+2026-10-26实施增量：公共基础bd52431独立Review0Critical/4Important/1Minor：数据联合/事件封套与终态/null边界/空测试CI缺口及生成器测试发现路径。真实补例先7项中4失败，空工程实际exit8；修正G2专属序列化回调和标准Schema后19/19、生成器纳入Vitest9/9、typecheck/lint通过。移除四个空测试工程，真正测试源码到位才由Master恢复注册，不弱化既有门禁。原G1JSON全局行为不改变。公共输出Bootstrap仍schema-only不称真实端点验收。
+
+用户明确继续暂停Monaco；未应用安全override，移除漏洞传递图，Cytoscape和其余工作继续。FE可实现原生备用能力但Monaco独立BLOCKED/PAUSED_BY_USER，不换第三方编辑器或冒充通过。
+
+Master将手写Governance TransactionalAuditWriter.cs、API/G2/{G2Authorization,G2EndpointGuard}.cs及新G2SecurityTests/G2AuditTransactionTests临时明确转给唯一Owner g2_security_support；独立树/分支/精确路径见G2-SEC-SUPPORT卡。Master不同时写这些文件；唯一Contracts/项目/锁/迁移/Host/CI仍Master。
+
+SEM模型fffb1af经独立0Critical/0Important/1格式Minor审查，已在Master以fcd7190 DRAFT集成，仅供真实迁移与后续S1测试，不main。Master局部EF10.0.13已成功生成InitialOntology迁移，未应用PG。SEM服务端新assetId必须服务端生成，clone通过唯一IReleaseCatalog.ReadAsync按releaseId重新授权取权威asset/scope；Save/Edit不能改变scope。正式graph规则冻结releaseId=GuidN，urn:ontology-platform:release:{releaseId}:ontology及:data。语义元数据命名空间urn:ontology-platform:vocabulary:，标准RDF reification/PROV-O带sourceId/sourceRecordId/validFromUtc/observedAtUtc/modelVersion/mappingStatus=absent；模型适用性还需正式manifest精确hash绑定，不能将合成模板版本冒充发布版本。

@@ -25,3 +25,7 @@ OBSERVED：pnpm11.28.8实际恢复monaco-editor0.57.0/cytoscape3.34.4成功，�
 Critical GHSA-cg2g-xh64-v4q7、High GHSA-mrv2-3pqr-j5jr；官方advisory给修复>=3.4.17，官方3.4.17发布存在。最小提案：保留已批Monaco0.57.0，仅经明确批准后使用项目pnpm overrides将monaco-editor@0.57.0>dompurify固定3.4.17，不新加直接依赖，不浮动版本。此为偏离上游exact依赖的安全覆盖，需独立兼容/真实前端测试/audit/许可复核；批准前不应用。真实原始结果见master/web-dependency-audit-red.json和dompurify-patch-metadata.json。
 
 官方来源：https://github.com/advisories/GHSA-cg2g-xh64-v4q7 、https://github.com/advisories/GHSA-mrv2-3pqr-j5jr 、https://github.com/cure53/DOMPurify/releases/tag/3.4.17 。完整软件/镜像供应链不是仅audit零命中就PASS。
+
+## 人类安全门禁决定：继续暂停Monaco（2026-10-26）
+
+用户明确选择“继续暂停Monaco，推进其他任务”。未应用任何pnpm override；移除Monaco及DOMPurify/marked等本次带来的传递图，不将漏洞依赖提交产品锁。Cytoscape3.34.4继续按原批准执行。Monaco功能状态PAUSED_BY_USER/BLOCKED，原生源码备用编辑仅作为真实备用能力，不计Monaco验收PASS；其余SEM/PUB/QRY/MCP/MAF/SSE与FE继续。后续若重启Monaco依赖需新的安全修复批准/核实，不以当前普通执行授权覆盖暂停决定。

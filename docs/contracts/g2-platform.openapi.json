@@ -1841,54 +1841,86 @@
         "additionalProperties": false
       },
       "SemanticDatum": {
-        "type": "object",
-        "description": "由kind约束恰好一个非空值的唯一查询数据项。",
-        "required": [
-          "kind",
-          "ontology",
-          "entity",
-          "relationship"
-        ],
-        "properties": {
-          "kind": {
-            "$ref": "#/components/schemas/SemanticDatumKind",
-            "description": "本体、实体或关系判别。"
-          },
-          "ontology": {
-            "anyOf": [
-              {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": [
+              "kind",
+              "ontology",
+              "entity",
+              "relationship"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "kind": {
+                "type": "string",
+                "const": "ontology"
+              },
+              "ontology": {
                 "$ref": "#/components/schemas/OntologyDescription"
               },
-              {
+              "entity": {
+                "type": "null"
+              },
+              "relationship": {
                 "type": "null"
               }
-            ],
-            "description": "仅ontology判别非空。"
+            }
           },
-          "entity": {
-            "anyOf": [
-              {
+          {
+            "type": "object",
+            "required": [
+              "kind",
+              "ontology",
+              "entity",
+              "relationship"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "kind": {
+                "type": "string",
+                "const": "entity"
+              },
+              "ontology": {
+                "type": "null"
+              },
+              "entity": {
                 "$ref": "#/components/schemas/SemanticEntity"
               },
-              {
+              "relationship": {
                 "type": "null"
               }
-            ],
-            "description": "仅entity判别非空。"
+            }
           },
-          "relationship": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/SemanticRelationship"
-              },
-              {
-                "type": "null"
-              }
+          {
+            "type": "object",
+            "required": [
+              "kind",
+              "ontology",
+              "entity",
+              "relationship"
             ],
-            "description": "仅relationship判别非空。"
+            "additionalProperties": false,
+            "properties": {
+              "kind": {
+                "type": "string",
+                "const": "relationship"
+              },
+              "ontology": {
+                "type": "null"
+              },
+              "entity": {
+                "type": "null"
+              },
+              "relationship": {
+                "$ref": "#/components/schemas/SemanticRelationship"
+              }
+            }
           }
-        },
-        "additionalProperties": false
+        ],
+        "discriminator": {
+          "propertyName": "kind"
+        }
       },
       "EntityCandidate": {
         "type": "object",
@@ -2555,8 +2587,8 @@
             "const": "run.completed"
           },
           "status": {
-            "$ref": "#/components/schemas/ExecutionStatus",
-            "description": "仅COMPLETED。"
+            "type": "string",
+            "const": "COMPLETED"
           },
           "totalToolCalls": {
             "type": "integer",
@@ -2592,8 +2624,8 @@
             "const": "run.failed"
           },
           "status": {
-            "$ref": "#/components/schemas/ExecutionStatus",
-            "description": "仅FAILED。"
+            "type": "string",
+            "const": "FAILED"
           },
           "code": {
             "type": "string",
@@ -2622,12 +2654,12 @@
             "const": "run.cancelled"
           },
           "status": {
-            "$ref": "#/components/schemas/ExecutionStatus",
-            "description": "仅CANCELLED。"
+            "type": "string",
+            "const": "CANCELLED"
           },
           "code": {
             "type": "string",
-            "description": "固定cancelled。"
+            "const": "cancelled"
           },
           "totalToolCalls": {
             "type": "integer",
@@ -2638,56 +2670,452 @@
         "additionalProperties": false
       },
       "ExecutionEvent": {
-        "type": "object",
-        "description": "先PG提交后由SSE重放发送的唯一执行事件。",
-        "required": [
-          "runId",
-          "seq",
-          "eventId",
-          "eventType",
-          "schemaVersion",
-          "occurredAtUtc",
-          "snapshot",
-          "payload"
-        ],
-        "properties": {
-          "runId": {
-            "type": "string",
-            "description": "所属运行。"
+        "oneOf": [
+          {
+            "type": "object",
+            "required": [
+              "runId",
+              "seq",
+              "eventId",
+              "eventType",
+              "schemaVersion",
+              "occurredAtUtc",
+              "snapshot",
+              "payload"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "runId": {
+                "type": "string",
+                "description": "所属运行。"
+              },
+              "seq": {
+                "type": "integer",
+                "format": "int64",
+                "description": "单调持久事件序号。"
+              },
+              "eventId": {
+                "type": "string",
+                "description": "runId冒号seq。"
+              },
+              "eventType": {
+                "type": "string",
+                "const": "run.started"
+              },
+              "schemaVersion": {
+                "type": "integer",
+                "const": 1
+              },
+              "occurredAtUtc": {
+                "type": "string",
+                "format": "date-time",
+                "description": "实际持久时间。"
+              },
+              "snapshot": {
+                "$ref": "#/components/schemas/AssetVersionSnapshot",
+                "description": "运行固定的同一个完整快照。"
+              },
+              "payload": {
+                "$ref": "#/components/schemas/RunStartedPayload"
+              }
+            }
           },
-          "seq": {
-            "type": "integer",
-            "format": "int64",
-            "description": "单调持久事件序号。"
+          {
+            "type": "object",
+            "required": [
+              "runId",
+              "seq",
+              "eventId",
+              "eventType",
+              "schemaVersion",
+              "occurredAtUtc",
+              "snapshot",
+              "payload"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "runId": {
+                "type": "string",
+                "description": "所属运行。"
+              },
+              "seq": {
+                "type": "integer",
+                "format": "int64",
+                "description": "单调持久事件序号。"
+              },
+              "eventId": {
+                "type": "string",
+                "description": "runId冒号seq。"
+              },
+              "eventType": {
+                "type": "string",
+                "const": "tool.started"
+              },
+              "schemaVersion": {
+                "type": "integer",
+                "const": 1
+              },
+              "occurredAtUtc": {
+                "type": "string",
+                "format": "date-time",
+                "description": "实际持久时间。"
+              },
+              "snapshot": {
+                "$ref": "#/components/schemas/AssetVersionSnapshot",
+                "description": "运行固定的同一个完整快照。"
+              },
+              "payload": {
+                "$ref": "#/components/schemas/ToolStartedPayload"
+              }
+            }
           },
-          "eventId": {
-            "type": "string",
-            "description": "runId冒号seq。"
+          {
+            "type": "object",
+            "required": [
+              "runId",
+              "seq",
+              "eventId",
+              "eventType",
+              "schemaVersion",
+              "occurredAtUtc",
+              "snapshot",
+              "payload"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "runId": {
+                "type": "string",
+                "description": "所属运行。"
+              },
+              "seq": {
+                "type": "integer",
+                "format": "int64",
+                "description": "单调持久事件序号。"
+              },
+              "eventId": {
+                "type": "string",
+                "description": "runId冒号seq。"
+              },
+              "eventType": {
+                "type": "string",
+                "const": "tool.completed"
+              },
+              "schemaVersion": {
+                "type": "integer",
+                "const": 1
+              },
+              "occurredAtUtc": {
+                "type": "string",
+                "format": "date-time",
+                "description": "实际持久时间。"
+              },
+              "snapshot": {
+                "$ref": "#/components/schemas/AssetVersionSnapshot",
+                "description": "运行固定的同一个完整快照。"
+              },
+              "payload": {
+                "$ref": "#/components/schemas/ToolCompletedPayload"
+              }
+            }
           },
-          "eventType": {
-            "type": "string",
-            "description": "与payload判别一致的固定事件类型。"
+          {
+            "type": "object",
+            "required": [
+              "runId",
+              "seq",
+              "eventId",
+              "eventType",
+              "schemaVersion",
+              "occurredAtUtc",
+              "snapshot",
+              "payload"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "runId": {
+                "type": "string",
+                "description": "所属运行。"
+              },
+              "seq": {
+                "type": "integer",
+                "format": "int64",
+                "description": "单调持久事件序号。"
+              },
+              "eventId": {
+                "type": "string",
+                "description": "runId冒号seq。"
+              },
+              "eventType": {
+                "type": "string",
+                "const": "evidence.added"
+              },
+              "schemaVersion": {
+                "type": "integer",
+                "const": 1
+              },
+              "occurredAtUtc": {
+                "type": "string",
+                "format": "date-time",
+                "description": "实际持久时间。"
+              },
+              "snapshot": {
+                "$ref": "#/components/schemas/AssetVersionSnapshot",
+                "description": "运行固定的同一个完整快照。"
+              },
+              "payload": {
+                "$ref": "#/components/schemas/EvidenceAddedPayload"
+              }
+            }
           },
-          "schemaVersion": {
-            "type": "integer",
-            "format": "int32",
-            "description": "事件版本一。"
+          {
+            "type": "object",
+            "required": [
+              "runId",
+              "seq",
+              "eventId",
+              "eventType",
+              "schemaVersion",
+              "occurredAtUtc",
+              "snapshot",
+              "payload"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "runId": {
+                "type": "string",
+                "description": "所属运行。"
+              },
+              "seq": {
+                "type": "integer",
+                "format": "int64",
+                "description": "单调持久事件序号。"
+              },
+              "eventId": {
+                "type": "string",
+                "description": "runId冒号seq。"
+              },
+              "eventType": {
+                "type": "string",
+                "const": "message.delta"
+              },
+              "schemaVersion": {
+                "type": "integer",
+                "const": 1
+              },
+              "occurredAtUtc": {
+                "type": "string",
+                "format": "date-time",
+                "description": "实际持久时间。"
+              },
+              "snapshot": {
+                "$ref": "#/components/schemas/AssetVersionSnapshot",
+                "description": "运行固定的同一个完整快照。"
+              },
+              "payload": {
+                "$ref": "#/components/schemas/MessageDeltaPayload"
+              }
+            }
           },
-          "occurredAtUtc": {
-            "type": "string",
-            "format": "date-time",
-            "description": "实际持久时间。"
+          {
+            "type": "object",
+            "required": [
+              "runId",
+              "seq",
+              "eventId",
+              "eventType",
+              "schemaVersion",
+              "occurredAtUtc",
+              "snapshot",
+              "payload"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "runId": {
+                "type": "string",
+                "description": "所属运行。"
+              },
+              "seq": {
+                "type": "integer",
+                "format": "int64",
+                "description": "单调持久事件序号。"
+              },
+              "eventId": {
+                "type": "string",
+                "description": "runId冒号seq。"
+              },
+              "eventType": {
+                "type": "string",
+                "const": "approval.required"
+              },
+              "schemaVersion": {
+                "type": "integer",
+                "const": 1
+              },
+              "occurredAtUtc": {
+                "type": "string",
+                "format": "date-time",
+                "description": "实际持久时间。"
+              },
+              "snapshot": {
+                "$ref": "#/components/schemas/AssetVersionSnapshot",
+                "description": "运行固定的同一个完整快照。"
+              },
+              "payload": {
+                "$ref": "#/components/schemas/ApprovalRequiredPayload"
+              }
+            }
           },
-          "snapshot": {
-            "$ref": "#/components/schemas/AssetVersionSnapshot",
-            "description": "运行固定的同一个完整快照。"
+          {
+            "type": "object",
+            "required": [
+              "runId",
+              "seq",
+              "eventId",
+              "eventType",
+              "schemaVersion",
+              "occurredAtUtc",
+              "snapshot",
+              "payload"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "runId": {
+                "type": "string",
+                "description": "所属运行。"
+              },
+              "seq": {
+                "type": "integer",
+                "format": "int64",
+                "description": "单调持久事件序号。"
+              },
+              "eventId": {
+                "type": "string",
+                "description": "runId冒号seq。"
+              },
+              "eventType": {
+                "type": "string",
+                "const": "run.completed"
+              },
+              "schemaVersion": {
+                "type": "integer",
+                "const": 1
+              },
+              "occurredAtUtc": {
+                "type": "string",
+                "format": "date-time",
+                "description": "实际持久时间。"
+              },
+              "snapshot": {
+                "$ref": "#/components/schemas/AssetVersionSnapshot",
+                "description": "运行固定的同一个完整快照。"
+              },
+              "payload": {
+                "$ref": "#/components/schemas/RunCompletedPayload"
+              }
+            }
           },
-          "payload": {
-            "$ref": "#/components/schemas/ExecutionPayload",
-            "description": "强类型判别联合，禁止任意业务字典。"
+          {
+            "type": "object",
+            "required": [
+              "runId",
+              "seq",
+              "eventId",
+              "eventType",
+              "schemaVersion",
+              "occurredAtUtc",
+              "snapshot",
+              "payload"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "runId": {
+                "type": "string",
+                "description": "所属运行。"
+              },
+              "seq": {
+                "type": "integer",
+                "format": "int64",
+                "description": "单调持久事件序号。"
+              },
+              "eventId": {
+                "type": "string",
+                "description": "runId冒号seq。"
+              },
+              "eventType": {
+                "type": "string",
+                "const": "run.failed"
+              },
+              "schemaVersion": {
+                "type": "integer",
+                "const": 1
+              },
+              "occurredAtUtc": {
+                "type": "string",
+                "format": "date-time",
+                "description": "实际持久时间。"
+              },
+              "snapshot": {
+                "$ref": "#/components/schemas/AssetVersionSnapshot",
+                "description": "运行固定的同一个完整快照。"
+              },
+              "payload": {
+                "$ref": "#/components/schemas/RunFailedPayload"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "runId",
+              "seq",
+              "eventId",
+              "eventType",
+              "schemaVersion",
+              "occurredAtUtc",
+              "snapshot",
+              "payload"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "runId": {
+                "type": "string",
+                "description": "所属运行。"
+              },
+              "seq": {
+                "type": "integer",
+                "format": "int64",
+                "description": "单调持久事件序号。"
+              },
+              "eventId": {
+                "type": "string",
+                "description": "runId冒号seq。"
+              },
+              "eventType": {
+                "type": "string",
+                "const": "run.cancelled"
+              },
+              "schemaVersion": {
+                "type": "integer",
+                "const": 1
+              },
+              "occurredAtUtc": {
+                "type": "string",
+                "format": "date-time",
+                "description": "实际持久时间。"
+              },
+              "snapshot": {
+                "$ref": "#/components/schemas/AssetVersionSnapshot",
+                "description": "运行固定的同一个完整快照。"
+              },
+              "payload": {
+                "$ref": "#/components/schemas/RunCancelledPayload"
+              }
+            }
           }
-        },
-        "additionalProperties": false
+        ],
+        "discriminator": {
+          "propertyName": "eventType"
+        }
       },
       "CreateDraftRequest": {
         "type": "object",

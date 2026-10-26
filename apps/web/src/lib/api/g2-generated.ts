@@ -94,7 +94,7 @@ export type SemanticRelationship = { "sourceIri": string; "predicateIri": string
 
 export type OntologyDescription = { "classIris": Array<string>; "objectPropertyIris": Array<string>; "datatypePropertyIris": Array<string>; "labels": Array<SemanticPropertyValue>; "supportedAxioms": Array<string>; "diagnostics": Array<SemanticDiagnostic> };
 
-export type SemanticDatum = { "kind": SemanticDatumKind; "ontology": OntologyDescription | null; "entity": SemanticEntity | null; "relationship": SemanticRelationship | null };
+export type SemanticDatum = { "kind": "ontology"; "ontology": OntologyDescription; "entity": null; "relationship": null } | { "kind": "entity"; "ontology": null; "entity": SemanticEntity; "relationship": null } | { "kind": "relationship"; "ontology": null; "entity": null; "relationship": SemanticRelationship };
 
 export type EntityCandidate = { "entityIri": string; "entityTypeIris": Array<string>; "externalId": string; "organizationId": string; "siteId": string; "label": string; "evidenceIds": Array<string> };
 
@@ -124,13 +124,13 @@ export type MessageDeltaPayload = { "kind": "message.delta"; "text": string };
 
 export type ApprovalRequiredPayload = { "kind": "approval.required"; "approvalId": string; "proposalId": string; "operation": ProposalKind; "scope": ResourceScope; "expiresAtUtc": string };
 
-export type RunCompletedPayload = { "kind": "run.completed"; "status": ExecutionStatus; "totalToolCalls": number; "lastResultStatus": SemanticQueryStatus | null };
+export type RunCompletedPayload = { "kind": "run.completed"; "status": "COMPLETED"; "totalToolCalls": number; "lastResultStatus": SemanticQueryStatus | null };
 
-export type RunFailedPayload = { "kind": "run.failed"; "status": ExecutionStatus; "code": string; "totalToolCalls": number };
+export type RunFailedPayload = { "kind": "run.failed"; "status": "FAILED"; "code": string; "totalToolCalls": number };
 
-export type RunCancelledPayload = { "kind": "run.cancelled"; "status": ExecutionStatus; "code": string; "totalToolCalls": number };
+export type RunCancelledPayload = { "kind": "run.cancelled"; "status": "CANCELLED"; "code": "cancelled"; "totalToolCalls": number };
 
-export type ExecutionEvent = { "runId": string; "seq": number; "eventId": string; "eventType": string; "schemaVersion": number; "occurredAtUtc": string; "snapshot": AssetVersionSnapshot; "payload": ExecutionPayload };
+export type ExecutionEvent = { "runId": string; "seq": number; "eventId": string; "eventType": "run.started"; "schemaVersion": 1; "occurredAtUtc": string; "snapshot": AssetVersionSnapshot; "payload": RunStartedPayload } | { "runId": string; "seq": number; "eventId": string; "eventType": "tool.started"; "schemaVersion": 1; "occurredAtUtc": string; "snapshot": AssetVersionSnapshot; "payload": ToolStartedPayload } | { "runId": string; "seq": number; "eventId": string; "eventType": "tool.completed"; "schemaVersion": 1; "occurredAtUtc": string; "snapshot": AssetVersionSnapshot; "payload": ToolCompletedPayload } | { "runId": string; "seq": number; "eventId": string; "eventType": "evidence.added"; "schemaVersion": 1; "occurredAtUtc": string; "snapshot": AssetVersionSnapshot; "payload": EvidenceAddedPayload } | { "runId": string; "seq": number; "eventId": string; "eventType": "message.delta"; "schemaVersion": 1; "occurredAtUtc": string; "snapshot": AssetVersionSnapshot; "payload": MessageDeltaPayload } | { "runId": string; "seq": number; "eventId": string; "eventType": "approval.required"; "schemaVersion": 1; "occurredAtUtc": string; "snapshot": AssetVersionSnapshot; "payload": ApprovalRequiredPayload } | { "runId": string; "seq": number; "eventId": string; "eventType": "run.completed"; "schemaVersion": 1; "occurredAtUtc": string; "snapshot": AssetVersionSnapshot; "payload": RunCompletedPayload } | { "runId": string; "seq": number; "eventId": string; "eventType": "run.failed"; "schemaVersion": 1; "occurredAtUtc": string; "snapshot": AssetVersionSnapshot; "payload": RunFailedPayload } | { "runId": string; "seq": number; "eventId": string; "eventType": "run.cancelled"; "schemaVersion": 1; "occurredAtUtc": string; "snapshot": AssetVersionSnapshot; "payload": RunCancelledPayload };
 
 export type CreateDraftRequest = { "name": string; "scope": ResourceScope; "sources": SourceBundle; "baseReleaseId": string | null; "command": CommandContext };
 

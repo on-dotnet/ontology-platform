@@ -166,3 +166,14 @@ ExecutionEvent.payload为以下已知具名类型的判别联合，由eventType�
 每个payload显式kind且等于eventType；event envelope schemaVersion固定1。Run事件每个序列化UTF8≤128KiB、总事件≤512，超过预算持久run.failed固定code=event_budget_exceeded，不把大响应悄悄截断成成功；message.delta每段≤4096字符。完整snapshot只复制同一个不可变值，不能在重放时重新解析active。前端遇不认识kind/schemaVersion显示不支持并读取snapshot，不当作有效答案。SSE事件重连只重放相同eventId/seq及原始payload，不重新执行工具。
 
 独立Review要求的具体正反例：草稿从revision1推进revision2并发布两版后，针对R1的合法ROLLBACK成功；targetReleaseId/manifestHash被改、过期或自批失败。所有SemanticDatum单非null判别、每类payload.kind/eventType、六态数据字段/nullable、生成TS对enum/联合的语义均有契约测试。
+
+
+## 11. 实施对齐增量（Master Single Writer）
+
+ActorContext.Roles保留G1已验证的完整platform.viewer/platform.operator/platform.auditor；模块不得按operator等短名另判。PG审计Outcome固定allowed/denied/failure；语义动作ontology.create/save/edit/validate/read/list/diff，发布release.proposal.create/release.approval.decide/release.activate/release.rollback，查询semantic.query/semantic.evidence.read，执行execution.run.create/start/tool/complete/fail/cancel与execution.events.read。资源只来自服务器受控ID/固定路由，不允许将正文仅凭字符格式当安全。
+
+新assetId只服务端生成；从BaseReleaseId克隆通过IReleaseCatalog.ReadAsync(actor,releaseId,ct)取权威正式manifest/asset/scope，要求请求scope完全相等。Save/Edit不改assetId/scope；不接受客户端补assetId来绕过缺口。
+
+正式releaseId为服务端GuidN；图urn:ontology-platform:release:{releaseId}:ontology与:data。RDF四份源的隐含默认文档基址固定https://ontology.invalid/source/{0..3}/（顺序ontology/shapes/vocabulary/data），显式BASE优先，解析/编辑/SHACL/部署同策略，不网络获取。该默认值只保证文档内相对IRI跨请求稳定，不赋予组织/厂区身份；Synthetic事实采用绝对含org/site/source的IRI，Gateway按固定graph/scope授权，不跨asset按同IRI/外部号猜合并。
+
+C#唯一DTO在输入和输出都执行非空及判别校验，避免JsonRequired仅检查存在的缺口；标准Schema和TS保留互斥分支、终态literal与事件版本1。真实运行OpenAPI仍须按此边界输出，不因本轮schema-only bootstrap已生成就标实际API通过。

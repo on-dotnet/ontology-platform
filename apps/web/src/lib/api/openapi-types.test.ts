@@ -1,6 +1,6 @@
-import { test } from "node:test";
+import { test } from "vitest";
 import assert from "node:assert/strict";
-import { schemaType, declarationsFor } from "./openapi-types.mjs";
+import { schemaType, declarationsFor } from "../../../scripts/openapi-types.mjs";
 
 test("six-state enums and nullable unions stay precise", () => {
   assert.equal(schemaType({ type: "string", enum: ["FOUND", "EMPTY", "UNAVAILABLE"] }), '"FOUND" | "EMPTY" | "UNAVAILABLE"');
