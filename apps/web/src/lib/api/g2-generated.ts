@@ -76,9 +76,9 @@ export type ApprovalRecord = { "approvedBy": string; "decision": ApprovalDecisio
 
 export type ReleaseProposal = { "proposalId": string; "kind": ProposalKind; "assetId": string; "scope": ResourceScope; "draftId": string | null; "draftRevision": number | null; "hashes": SourceHashes | null; "validationReportId": string | null; "targetReleaseId": string | null; "targetManifestHash": string | null; "submittedBy": string; "submittedAtUtc": string; "expiresAtUtc": string; "status": ProposalStatus; "revision": number; "approval": ApprovalRecord | null };
 
-export type ReleaseActivation = { "activationId": string; "activationRevision": number; "releaseId": string; "previousReleaseId": string | null; "manifestHash": string; "manifest": ReleaseManifest; "auditId": string; "outboxEventId": string; "activatedAtUtc": string };
+export type ReleaseActivation = { "activationId": string; "activationRevision": number; "releaseId": string; "previousReleaseId": string | null; "manifestHash": string; "manifest": ReleaseManifest; "auditId": string; "outboxEventId": string; "activatedAtUtc": string; "traceId": string };
 
-export type ReleaseSummary = { "manifest": ReleaseManifest; "manifestHash": string; "isActive": boolean; "activationRevision": number; "status": ReleaseStatus };
+export type ReleaseSummary = { "manifest": ReleaseManifest; "manifestHash": string; "isActive": boolean; "activationRevision": number; "status": ReleaseStatus; "traceId": string };
 
 export type SemanticQueryPlan = { "capabilityId": string; "capabilityVersion": string; "assetId": string; "releaseId": string | null; "entityType": string | null; "entityIri": string | null; "externalId": string | null; "siteId": string | null; "relationshipIris": Array<string>; "depth": number; "maxRows": number; "timeoutMs": number };
 
@@ -110,7 +110,7 @@ export type CapabilityBudget = { "maxDepth": number; "maxRows": number; "timeout
 
 export type SemanticCapability = { "id": string; "version": string; "inputSchema": CapabilityInputSchema; "outputSchema": JsonValue; "meaning": string; "policy": string; "executorId": string; "budgets": CapabilityBudget };
 
-export type ExecutionRun = { "runId": string; "ownerSubjectId": string; "scope": ResourceScope; "snapshot": AssetVersionSnapshot; "status": ExecutionStatus; "providerMode": ProviderMode; "createdAtUtc": string; "updatedAtUtc": string; "lastSeq": number; "cancelRequested": boolean; "leaseOwner": string | null; "leaseUntil": string | null; "fencingToken": number };
+export type ExecutionRun = { "runId": string; "ownerSubjectId": string; "scope": ResourceScope; "snapshot": AssetVersionSnapshot; "status": ExecutionStatus; "providerMode": ProviderMode; "createdAtUtc": string; "updatedAtUtc": string; "lastSeq": number; "cancelRequested": boolean; "leaseOwner": string | null; "leaseUntil": string | null; "fencingToken": number; "traceId": string };
 
 export type RunStartedPayload = { "kind": "run.started"; "providerMode": ProviderMode; "capabilityIds": Array<string>; "maxToolCalls": number; "timeoutMs": number };
 

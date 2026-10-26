@@ -1334,7 +1334,8 @@
           "manifest",
           "auditId",
           "outboxEventId",
-          "activatedAtUtc"
+          "activatedAtUtc",
+          "traceId"
         ],
         "properties": {
           "activationId": {
@@ -1381,6 +1382,10 @@
             "type": "string",
             "format": "date-time",
             "description": "提交的激活时间。"
+          },
+          "traceId": {
+            "type": "string",
+            "description": "激活事务实际Trace，用于审计与专业诊断关联。"
           }
         },
         "additionalProperties": false
@@ -1393,7 +1398,8 @@
           "manifestHash",
           "isActive",
           "activationRevision",
-          "status"
+          "status",
+          "traceId"
         ],
         "properties": {
           "manifest": {
@@ -1416,6 +1422,10 @@
           "status": {
             "$ref": "#/components/schemas/ReleaseStatus",
             "description": "真实准备或活动状态。"
+          },
+          "traceId": {
+            "type": "string",
+            "description": "该正式版本最近一次激活的持久Trace，不猜测运行标识。"
           }
         },
         "additionalProperties": false
@@ -2314,7 +2324,8 @@
           "cancelRequested",
           "leaseOwner",
           "leaseUntil",
-          "fencingToken"
+          "fencingToken",
+          "traceId"
         ],
         "properties": {
           "runId": {
@@ -2387,6 +2398,10 @@
             "type": "integer",
             "format": "int64",
             "description": "防过期执行者提交的单调标识。"
+          },
+          "traceId": {
+            "type": "string",
+            "description": "创建时固定且由执行链关联的实际Trace。"
           }
         },
         "additionalProperties": false
