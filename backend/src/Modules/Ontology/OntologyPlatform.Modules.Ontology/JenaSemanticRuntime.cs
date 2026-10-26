@@ -174,6 +174,52 @@ public sealed class JenaSemanticRuntime : ISemanticRuntime
             };
         }, cancellationToken);
 
+    /// <summary>核对权威源、清单和快照后，只返回同一次实际读取且逐项对账成功的正式图。</summary>
+    /// <param name="manifest">已经重新授权的不可变发布清单。</param>
+    /// <param name="sources">调用方已逐对象核验的完整权威源。</param>
+    /// <param name="cancellationToken">覆盖解析和正式读取的取消信号。</param>
+    /// <returns>精确匹配权威源的实际读取数组，不再重新读取正式图。</returns>
+    public Task<PublishedRdfData> ReadVerifiedPublishedAsync(ReleaseManifest manifest, SourceBundle sources, CancellationToken cancellationToken) =>
+        Execute(async (graphs, token) =>
+        {
+            try
+            {
+                CheckVerifiedBinding(manifest, sources);
+                // 复用唯一真实RIOT解析、Shape安全边界和全源预算，不能用新解析器猜测期望事实。
+                var parsed = await ParseSourcesAsync(sources, graphs, token);
+                if (Support(parsed[0].Concat(parsed[2]).Concat(parsed[3]).ToArray()).Length != 0)
+                    throw new SemanticOperationException(503, "published_source_unsupported");
+                // 每个正式图仅读取一次，这两个数组就是稍后返回给应用的完整实际批次。
+                var ontology = await ReadGraphAsync(published, manifest.OntologyGraphIri, token);
+                // 图缺失仍由GSP失败关闭；不能将404转换成空结果。
+                var data = await ReadGraphAsync(published, manifest.DataGraphIri, token);
+                if (JenaRdfCodec.Canonical(ontology) != JenaRdfCodec.Canonical(parsed[0].Concat(parsed[2]).Distinct().ToArray()) ||
+                    JenaRdfCodec.Canonical(data) != JenaRdfCodec.Canonical(parsed[3]))
+                    throw new SemanticOperationException(503, "published_graph_mismatch");
+                return new PublishedRdfData { OntologyTriples = ontology, DataTriples = data };
+            }
+            catch (SemanticOperationException exception) when (exception.Status is 409 or 413 or 422)
+            {
+                // 正式消费中的源/清单错误是不可用事实，不将损坏资产映射为客户端可修复的草稿错误。
+                throw new SemanticOperationException(503, "published_binding_invalid");
+            }
+        }, cancellationToken);
+
+    /// <summary>逐字段核验快照与清单、原文散列和固定图名的同一版本关系。</summary>
+    private static void CheckVerifiedBinding(ReleaseManifest manifest, SourceBundle sources)
+    {
+        if (manifest is null || manifest.SchemaVersion != 1 || manifest.Snapshot is null || manifest.Hashes is null ||
+            sources is null || sources.OntologyTurtle is null || sources.ShapesTurtle is null || sources.DataTurtle is null)
+            throw new SemanticOperationException(503, "published_binding_invalid");
+        CheckManifest(manifest, sources);
+        // 快照是下游证据携带的身份，不能仅相信清单自身已经通过源hash核验。
+        var snapshot = manifest.Snapshot;
+        if (snapshot.ReleaseId != manifest.ReleaseId || snapshot.OntologyGraphIri != manifest.OntologyGraphIri || snapshot.DataGraphIri != manifest.DataGraphIri ||
+            snapshot.OntologyHash != manifest.Hashes.OntologyHash || snapshot.ShapesHash != manifest.Hashes.ShapesHash ||
+            snapshot.VocabularyHash != manifest.Hashes.VocabularyHash || snapshot.DataHash != manifest.Hashes.DataHash)
+            throw new SemanticOperationException(503, "published_binding_invalid");
+    }
+
     /// <summary>外层并发和总时限预算覆盖完整操作，取消后仍有独立清理预算。</summary>
     private async Task<T> Execute<T>(Func<List<string>, CancellationToken, Task<T>> operation, CancellationToken cancellationToken, [CallerMemberName] string phase = "")
     {
