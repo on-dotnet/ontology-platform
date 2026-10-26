@@ -140,3 +140,23 @@ Master限定复审确认旧空文档Minor已ADDRESSED，同批读主路径C0/I0�
 - `dotnet build backend/OntologyPlatform.slnx --no-restore`：exit0，既存ASPIRE010 warning保留。`pwsh -NoProfile -File scripts/verify.ps1 -SelfTest`与`git diff --check`均exit0，记录在marker-budget-verification.json（完整命令/cwd/退出码/输出）；不把SelfTest检查器正反例混入57项产品测试。
 
 本轮仍DRAFT，源码/证据分提交push，等待Master限定独立复核。57项中依旧包含生产类型存在和旧适配器默认行为检查、明确catalog替身消费边界，不称57独立端到端场景。跨模块QRY/Host/FE与同Head CI、唯一ZIP由Master总集成确认；未合main、未派Agent、未读历史runtime或认证材料，完成即停止。
+
+## 非BMP字面量导出修复（AI真实Unicode探针）
+
+Master明确派工继续已批准RDF语义兼容修复。基线`01c404c85f6ae72269a262fe5c9c82656b890718`为原57项最终SEM；修改前fetch exit0/树干净。读取适用AGENTS/任务卡、systematic-debugging与指定fix-loop，先阅读AI的unicode-sem-probe.cs.txt与真实unicode-sem-minimal-diagnostic.json，再在当前SEM基线上复现，没有把AI旧基线失败或推测当本树结论。仅修改owned JenaRdfCodec和两个SemanticTests手写文件及证据；未改合同、锁、迁移、runner或样例原文，无新依赖。
+
+源码小提交已push：`75f9ce84a71578bf126eb5ebb228f145cb8847a4`。根因是Term用JsonSerializer.Serialize导出RDF lexical：原始Unicode合法，真实RIOT首轮解析成功，但JSON UTF16代理项转义在后续N-Triples/Turtle Load中不能表示有效的独立Unicode标量，导致422/rdf_parse_invalid。编辑产生的导出源也同样失效。现以Rune.DecodeFromUtf16逐标量导出，完整非BMP按实际字符写出；引号、反斜线与标准短控制转义按N-Triples转义，其余C0/C1用合法四位scalar转义。每个反斜线独立转义，输入中的字面`\u`/`\U`文本绝不被二次解释。无效孤立高/低代理项明确422/rdf_literal_invalid，不能经默认替换变成U+FFFD后假称无损成功。语言/datatype后缀仍走原受控校验。
+
+官方依据：[W3C RDF 1.1 N-Triples，literal与Unicode grammar](https://www.w3.org/TR/n-triples/#grammar-production-STRING_LITERAL_QUOTE)；[Microsoft Rune.DecodeFromUtf16](https://learn.microsoft.com/en-us/dotnet/api/system.text.rune.decodefromutf16?view=net-10.0)。这是已有标准RDF writer中词法编码的修复，不是新增RDF parser。权威SourceBundle在未编辑时字节/hash保持原值；真正结构编辑按既有完整图导出规则改变格式，新旧源与hash变化由真实修订/Diff如实反映，不重写旧历史。
+
+真实命令与结果：
+
+- `python3 scripts/acceptance/semantic-roundtrip.py --filter 'FullyQualifiedName~SyntheticNonBmp|FullyQualifiedName~NonBmpLiteralEdit' --label unicode-literal-red`：exit2，4/4失败、0跳过。Synthetic所有“炉次heat-1”同时替换为😀或𠀀（含业务标签和来源断言），Analyze成功但Validate合并图Load失败；另外语言标签与datatype两种编辑输入在导出再Analyze时失败。见unicode-literal-red.json。
+- `python3 scripts/acceptance/semantic-roundtrip.py --filter FullyQualifiedName~InvalidSurrogateLiteral --label unicode-invalid-surrogate-red`：exit2，2/2失败，旧编辑导出对孤立高/低代理项未抛异常，不能保证无损。见unicode-invalid-surrogate-red.json。
+- 首轮修复后专项`--filter 'FullyQualifiedName~SyntheticNonBmp|FullyQualifiedName~NonBmpLiteralEdit|FullyQualifiedName~InvalidSurrogateLiteral' --label unicode-literal-green`：exit2，6项中4通过/2失败。生产Unicode链路已通过，最后测试按predicate Single忽略正式ontology图还合并了vocabulary的第二个label，导致测试自己的多条匹配异常。只修测试为完整subject+predicate选择，未再改生产实现；原始文件保留为unicode-literal-first-green-test-selection-red.json，不把此次失败标PASS。
+- `python3 scripts/acceptance/semantic-roundtrip.py --postgres --label unicode-literal-full-green`：exit0，64/64通过、0跳过（原57+新增7）。实际交付PG迁移、RIOT、SHACL、TDB2，全部暂存图三元组0，两临时容器删除。新增覆盖Analyze/Edit/Validate/Deploy/Verify/ReadVerified，既有同批数组/两次正式GET、typed lexical/预算/取消清理回归保持通过。
+- 两个编辑用例同时含😀𠀀、引号、反斜线、完整C0/C1控制字符、字面`\uD83D\uDE00\U0001F600`文本和恶意三元组分隔文本；真实再解析精确值相等、图条数不增加、urn:injected主体不存在，语言/datatype不丢。no-op再编辑保留新源完整字节。Synthetic两例真实返回业务和来源断言中的标签，不是仅验证一个字符串。
+- `UnicodeEditPersistsExactHistoryAndHonestSourceDiff`使用真实PG/Jena/事务writer：原文含非BMP注释，创建hash等于原文UTF8 hash；精确编辑标签后revision2及新hash不同，Diff源码JSON的before/after分别等于完整旧/新SourceBundle，真实三元组只1增/1删；新上下文读回新源一致，revision1原始源和注释完整保留。
+- backend cwd三文件`dotnet format OntologyPlatform.slnx --no-restore --include src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaRdfCodec.cs tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs --verify-no-changes`：exit0；`dotnet build backend/OntologyPlatform.slnx --no-restore`：exit0，既存ASPIRE010 warning不改。`pwsh -NoProfile -File scripts/verify.ps1 -SelfTest`与`git diff --check`均exit0，完整输出见unicode-literal-verification.json；SelfTest检查器正反例不计入64项产品测试。
+
+源码已通知Master和AI Owner供其原AI Unicode长边界联调；AI分片、QRY/Host跨模块集成及同Head CI/唯一ZIP不由本次SEM测试替代。整体继续DRAFT、等待限定独立复核；64项仍含原有类型存在、旧接口默认行为与catalog替身消费边界，不宣称64个独立端到端场景。源码/证据分提交，完成即停止，不合main或派Agent。
