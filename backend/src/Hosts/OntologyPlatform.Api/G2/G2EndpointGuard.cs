@@ -34,6 +34,17 @@ public static class G2EndpointGuard
         return ExecuteAsync(context, policy, command, operation, true, requiresRevision);
     }
 
+    /// <summary>为原生MCP与SSE复用身份、角色和可选POST防伪，标准传输不伪造业务CommandContext。</summary>
+    /// <param name="context">已认证宿主请求上下文。</param>
+    /// <param name="policy">同一具名策略。</param>
+    /// <param name="operation">返回原生传输结果的适配委托。</param>
+    /// <param name="validateCsrf">MCP的POST/DELETE为真，SSE的GET为假。</param>
+    /// <returns>保留原生媒体类型与状态的结果。</returns>
+    public static Task<IResult> TransportAsync(HttpContext context, string policy, Func<ActorContext, CancellationToken, Task<IResult>> operation, bool validateCsrf)
+    {
+        return ExecuteAsync(context, policy, null, operation, validateCsrf, false, requiresCommand: false);
+    }
+
     /// <summary>按身份、角色、来源、防伪、修订的顺序失败关闭，再映射受控业务结果。</summary>
     /// <typeparam name="T">应用响应类型。</typeparam>
     /// <param name="context">当前请求。</param>
@@ -43,7 +54,7 @@ public static class G2EndpointGuard
     /// <param name="write">是否为写边界。</param>
     /// <param name="requiresRevision">是否要求强修订条件。</param>
     /// <returns>未提前发送的最终响应。</returns>
-    private static async Task<IResult> ExecuteAsync<T>(HttpContext context, string policy, CommandContext? command, Func<ActorContext, CancellationToken, Task<T>> operation, bool write, bool requiresRevision)
+    private static async Task<IResult> ExecuteAsync<T>(HttpContext context, string policy, CommandContext? command, Func<ActorContext, CancellationToken, Task<T>> operation, bool write, bool requiresRevision, bool requiresCommand = true)
     {
         context.Response.Headers.CacheControl = "no-store";
         context.RequestAborted.ThrowIfCancellationRequested();
@@ -74,8 +85,8 @@ public static class G2EndpointGuard
             {
                 return await DenyAsync(context, actor, "csrf.denied", "csrf_rejected");
             }
-            if (command is null || !HasLength(command.CommandId, 64) || !HasLength(command.IdempotencyKey, 64)
-                || !HasLength(command.Reason, 500) || command.ExpectedRevision < 0)
+            if (requiresCommand && (command is null || !HasLength(command.CommandId, 64) || !HasLength(command.IdempotencyKey, 64)
+                || !HasLength(command.Reason, 500) || command.ExpectedRevision < 0))
             {
                 return PlatformProblem.Create(context, 400, "invalid_command");
             }
@@ -91,7 +102,7 @@ public static class G2EndpointGuard
                 {
                     return PlatformProblem.Create(context, 400, "invalid_revision");
                 }
-                if (revision != command.ExpectedRevision)
+                if (revision != command!.ExpectedRevision)
                 {
                     return PlatformProblem.Create(context, 409, "revision_conflict");
                 }
@@ -105,7 +116,7 @@ public static class G2EndpointGuard
             {
                 context.Response.Headers.ETag = draft.Etag;
             }
-            return Results.Ok(result);
+            return result is IResult native ? native : Results.Ok(result);
         }
         catch (SemanticOperationException failure)
         {

@@ -1,6 +1,6 @@
 {
   "stage": "S1_HTTP_REAL_OIDC",
-  "status": "FAIL",
+  "status": "PASS",
   "overallG2": "PARTIAL",
   "checks": [
     {
@@ -17,15 +17,84 @@
     },
     {
       "name": "operator_missing_csrf_denied",
-      "status": "FAIL",
-      "observedStatus": 500
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "operator_real_draft_created",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "persisted_initial_sources_exact",
+      "status": "PASS"
+    },
+    {
+      "name": "all_four_utf8_hashes_match",
+      "status": "PASS"
+    },
+    {
+      "name": "real_noop_save",
+      "status": "PASS"
+    },
+    {
+      "name": "no_op_preserves_complete_source",
+      "status": "PASS"
+    },
+    {
+      "name": "persistent_readback",
+      "status": "PASS"
+    },
+    {
+      "name": "live_jena_shacl",
+      "status": "PASS"
+    },
+    {
+      "name": "viewer-a_real_http_only_session",
+      "status": "PASS"
+    },
+    {
+      "name": "viewer-a_csrf",
+      "status": "PASS"
+    },
+    {
+      "name": "full_multisite_scope_required",
+      "status": "PASS"
+    },
+    {
+      "name": "viewer-ab_real_http_only_session",
+      "status": "PASS"
+    },
+    {
+      "name": "viewer-ab_csrf",
+      "status": "PASS"
+    },
+    {
+      "name": "authorized_full_scope_read",
+      "status": "PASS"
+    },
+    {
+      "name": "role_authorization_before_malformed_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "auditor-ab_real_http_only_session",
+      "status": "PASS"
+    },
+    {
+      "name": "auditor-ab_csrf",
+      "status": "PASS"
+    },
+    {
+      "name": "actual_auditor_reads_governance_audit",
+      "status": "PASS"
+    },
+    {
+      "name": "success_and_denial_audits_persisted",
+      "status": "PASS"
     }
   ],
-  "failure": {
-    "phase": "draft_create",
-    "category": "Error",
-    "details": "SUPPRESSED"
-  },
+  "failure": null,
   "notRun": [
     "G2 UI source interaction",
     "S2 publishing browser",
