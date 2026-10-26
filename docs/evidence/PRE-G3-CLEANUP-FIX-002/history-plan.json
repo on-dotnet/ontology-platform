@@ -1,0 +1,390 @@
+{
+  "schemaVersion": 1,
+  "taskId": "PRE-G3-CLEANUP-FIX-002",
+  "project": "on-dotnet/ontology-platform",
+  "repositoryRoot": "/Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform",
+  "gitCommonDir": "/Users/chasen/Developer/repos/ontology-platform/.git",
+  "originUrl": "https://github.com/on-dotnet/ontology-platform.git",
+  "expectedMainSha": "e40b1be2cf823358db5aba714551a96ec177fb4c",
+  "createdAt": "2026-10-26T17:21:33.881145+00:00",
+  "expiresAt": "2026-10-26T21:21:33.881145+00:00",
+  "allowedWorktreeRoots": [
+    "/Users/chasen/.codex/worktrees/g2-fe",
+    "/Users/chasen/.codex/worktrees/g2-final-fix",
+    "/Users/chasen/.codex/worktrees/g2-host-fix",
+    "/Users/chasen/.codex/worktrees/g2-observability",
+    "/Users/chasen/.codex/worktrees/g2-pub",
+    "/Users/chasen/.codex/worktrees/g2-qa-fix",
+    "/Users/chasen/.codex/worktrees/g2-readiness-test",
+    "/Users/chasen/.codex/worktrees/m0-containers",
+    "/Users/chasen/.codex/worktrees/m0-master",
+    "/Users/chasen/.codex/worktrees/m0-scripts"
+  ],
+  "protectedWorktrees": [
+    "/Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform",
+    "/Users/chasen/Developer/repos/ontology-platform",
+    "/Users/chasen/.codex/worktrees/g2-master/ontology-platform",
+    "/Users/chasen/.codex/worktrees/g2-query/ontology-platform",
+    "/Users/chasen/.codex/worktrees/g2-security/ontology-platform",
+    "/Users/chasen/.codex/worktrees/g2-sem/ontology-platform"
+  ],
+  "keep": [
+    "g2-712190660deb-alloy-data",
+    "g2-712190660deb-fuseki-data",
+    "g2-712190660deb-grafana-data",
+    "g2-712190660deb-loki-data",
+    "g2-712190660deb-postgres-data",
+    "g2-712190660deb-prometheus-data",
+    "g2-712190660deb-rustfs-data",
+    "g2-712190660deb-tempo-data",
+    "g2-b59e68191ca0-alloy-data",
+    "g2-b59e68191ca0-fuseki-data",
+    "g2-b59e68191ca0-grafana-data",
+    "g2-b59e68191ca0-loki-data",
+    "g2-b59e68191ca0-postgres-data",
+    "g2-b59e68191ca0-prometheus-data",
+    "g2-b59e68191ca0-rustfs-data",
+    "g2-b59e68191ca0-tempo-data",
+    "g2-ef979bd04cc0-alloy-data",
+    "g2-ef979bd04cc0-fuseki-data",
+    "g2-ef979bd04cc0-grafana-data",
+    "g2-ef979bd04cc0-loki-data",
+    "g2-ef979bd04cc0-postgres-data",
+    "g2-ef979bd04cc0-prometheus-data",
+    "g2-ef979bd04cc0-rustfs-data",
+    "g2-ef979bd04cc0-tempo-data",
+    "sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28",
+    "sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044",
+    "sha256:6746df3002ba9a25011baaa43b4bf4175c53d00d06ed4ca07ac7b5ae995c58e2",
+    "sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18",
+    "sha256:8e28b3a01e16230451343afcfd3997c625b04806b9f3b1960de5915ecf3d01fa",
+    "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+    "sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b",
+    "sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f",
+    "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6",
+    "sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2",
+    "main",
+    "bridge",
+    "host",
+    "none",
+    "codex/PRE-G3-CLEANUP-FIX-002",
+    "codex/G2-THIN-SLICE-001-master"
+  ],
+  "historyBackend": {
+    "context": "desktop-linux",
+    "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016",
+    "bridgeId": "48a09c31166f136c7b631f2215bd9ca0cd130048e4f72594a9f20981a68bf494",
+    "buildxVersion": "github.com/docker/buildx v0.38.1 0dbe87f36ed472fe36b6796c3f70b4210a731fc5",
+    "buildkitVersion": "v0.34.0",
+    "driver": "docker",
+    "nodeName": "desktop-linux"
+  },
+  "operations": [
+    {
+      "type": "docker-history",
+      "target": "tqd6xilgezautwa15exusnc0i",
+      "builder": "desktop-linux",
+      "expectedContext": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+      "expectedVcs": "https://github.com/on-dotnet/ontology-platform.git",
+      "expectedRevision": "b1ff0a68915c272846038af96a00da3acbb95538",
+      "expectedStatus": "completed",
+      "ownershipEvidence": {
+        "commit": "e40b1be2cf823358db5aba714551a96ec177fb4c",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-THIN-SLICE-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "36e3caf8e3408458ceae3355c860b3910ccc8e25856e6b3bc3c7a4571c99a8f2"
+    },
+    {
+      "type": "docker-history",
+      "target": "8eoav2lsmbdodq5zcocw9fk0g",
+      "builder": "desktop-linux",
+      "expectedContext": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+      "expectedVcs": "https://github.com/on-dotnet/ontology-platform.git",
+      "expectedRevision": "b1ff0a68915c272846038af96a00da3acbb95538",
+      "expectedStatus": "completed",
+      "ownershipEvidence": {
+        "commit": "e40b1be2cf823358db5aba714551a96ec177fb4c",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-THIN-SLICE-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "84f5f289ddf9148a0c8e9d6e307312aa4e0c02a0942246c10b31220bc921f7ca"
+    },
+    {
+      "type": "docker-history",
+      "target": "lm4mju36p53alxm5sjikkmjd0",
+      "builder": "desktop-linux",
+      "expectedContext": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+      "expectedVcs": "https://github.com/on-dotnet/ontology-platform.git",
+      "expectedRevision": "fac0490528e9cc110cf99f1a41cb003b31a7852f",
+      "expectedStatus": "completed",
+      "ownershipEvidence": {
+        "commit": "e40b1be2cf823358db5aba714551a96ec177fb4c",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-THIN-SLICE-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "8f79ec2787d8ed0ea97be2c8a688bfa80e746f11b878fc490f5d84db3197ee8c"
+    },
+    {
+      "type": "docker-history",
+      "target": "0gbrzldln4ju6rajgnf8lpai0",
+      "builder": "desktop-linux",
+      "expectedContext": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+      "expectedVcs": "https://github.com/on-dotnet/ontology-platform.git",
+      "expectedRevision": "fac0490528e9cc110cf99f1a41cb003b31a7852f",
+      "expectedStatus": "completed",
+      "ownershipEvidence": {
+        "commit": "e40b1be2cf823358db5aba714551a96ec177fb4c",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-THIN-SLICE-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "e3bc6a0d1e1790a44a4bf5aaaeb2c6091bf960465e799f2a9870bdc08719f5ef"
+    },
+    {
+      "type": "docker-history",
+      "target": "sw7gm5rh39dhmbtnwqttksufo",
+      "builder": "desktop-linux",
+      "expectedContext": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+      "expectedVcs": "https://github.com/on-dotnet/ontology-platform.git",
+      "expectedRevision": "fac0490528e9cc110cf99f1a41cb003b31a7852f",
+      "expectedStatus": "completed",
+      "ownershipEvidence": {
+        "commit": "e40b1be2cf823358db5aba714551a96ec177fb4c",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-THIN-SLICE-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "906d51ad2990519d20b9f17fd4bd9cbddc8253cd6f1547c48d731d634a190105"
+    },
+    {
+      "type": "docker-history",
+      "target": "q3nyzqz7dc2ve8zg0s4le025q",
+      "builder": "desktop-linux",
+      "expectedContext": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+      "expectedVcs": "https://github.com/on-dotnet/ontology-platform.git",
+      "expectedRevision": "65212620c36650dc52df299b618de6e2e838f51e",
+      "expectedStatus": "completed",
+      "ownershipEvidence": {
+        "commit": "e40b1be2cf823358db5aba714551a96ec177fb4c",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-THIN-SLICE-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "2d5236b095e30f1efe6ca81984e0099c52b50fd0391f2a750834366c28ad1433"
+    },
+    {
+      "type": "docker-history",
+      "target": "v0adsatiylrmjgbhqb5xxirxg",
+      "builder": "desktop-linux",
+      "expectedContext": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+      "expectedVcs": "https://github.com/on-dotnet/ontology-platform.git",
+      "expectedRevision": "6effefb1279e2495744b714de10eb2c1ba41b8c1",
+      "expectedStatus": "completed",
+      "ownershipEvidence": {
+        "commit": "e40b1be2cf823358db5aba714551a96ec177fb4c",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-THIN-SLICE-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "c83d2ea32d296b21df19afd70ec9129a00245179f2fe01d09d69ac533fccc20e"
+    },
+    {
+      "type": "docker-history",
+      "target": "j5dn47c0cb2tcwce9c9geibeg",
+      "builder": "desktop-linux",
+      "expectedContext": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+      "expectedVcs": "https://github.com/on-dotnet/ontology-platform.git",
+      "expectedRevision": "0449cec8d217c2c5261a71085e9dd375e0d9e060",
+      "expectedStatus": "completed",
+      "ownershipEvidence": {
+        "commit": "e40b1be2cf823358db5aba714551a96ec177fb4c",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-THIN-SLICE-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "84129d2c04dd0de353f2491d9464f83913ad32694c3efba9fbb8c9d67a0b9ff8"
+    },
+    {
+      "type": "docker-history",
+      "target": "wyqyudo9ml4su6lwv42572k9f",
+      "builder": "desktop-linux",
+      "expectedContext": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+      "expectedVcs": "https://github.com/on-dotnet/ontology-platform.git",
+      "expectedRevision": "c1e4dd0af6af4258f39c3c8a360c60e0709b8915",
+      "expectedStatus": "completed",
+      "ownershipEvidence": {
+        "commit": "e40b1be2cf823358db5aba714551a96ec177fb4c",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-THIN-SLICE-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "cb8e7c250b32b8dae5160fbd26efb480c660eff303f92c7baa6999e809dcf3d0"
+    },
+    {
+      "type": "docker-history",
+      "target": "wfy618td2fr5z0o43n19g51mg",
+      "builder": "desktop-linux",
+      "expectedContext": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+      "expectedVcs": "https://github.com/on-dotnet/ontology-platform.git",
+      "expectedRevision": "0e970f948aede10be0a86570a05d958d135a2761",
+      "expectedStatus": "completed",
+      "ownershipEvidence": {
+        "commit": "e40b1be2cf823358db5aba714551a96ec177fb4c",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-THIN-SLICE-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "e1bf59546356f30f1335087b9e4e3dd7fd91f8d4a0489c296c473aea88acc750"
+    },
+    {
+      "type": "docker-history",
+      "target": "xlro0rjcajs31jba7yffq0lmq",
+      "builder": "desktop-linux",
+      "expectedContext": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+      "expectedVcs": "https://github.com/on-dotnet/ontology-platform.git",
+      "expectedRevision": "707ef7dcb5034d15ddd4761cba54cb33ce39da06",
+      "expectedStatus": "completed",
+      "ownershipEvidence": {
+        "commit": "e40b1be2cf823358db5aba714551a96ec177fb4c",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-THIN-SLICE-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "bdcff5a76d40206fb8096f033f8950cba4b975b1749c1252d5331d22429c275c"
+    },
+    {
+      "type": "docker-history",
+      "target": "jytynl3c1hcqe65an0uksmwuw",
+      "builder": "desktop-linux",
+      "expectedContext": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+      "expectedVcs": "https://github.com/on-dotnet/ontology-platform.git",
+      "expectedRevision": "8223101ec607e25f0499081f49aa053b1100d152",
+      "expectedStatus": "completed",
+      "ownershipEvidence": {
+        "commit": "e40b1be2cf823358db5aba714551a96ec177fb4c",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-THIN-SLICE-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "cd72a961ec29cd0fe528016fa635618ac348c951fcda9152e67f46cf41b2610e"
+    },
+    {
+      "type": "docker-history",
+      "target": "07hrath9f7wuhcetgybgh8422",
+      "builder": "desktop-linux",
+      "expectedContext": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+      "expectedVcs": "https://github.com/on-dotnet/ontology-platform.git",
+      "expectedRevision": "a30ede7241c077dcf5188e9bf3857494caf0471a",
+      "expectedStatus": "completed",
+      "ownershipEvidence": {
+        "commit": "e40b1be2cf823358db5aba714551a96ec177fb4c",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-THIN-SLICE-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "8345ff333d60caed74b0a733ebbb1983d9a842338f383a83a773a4964fd7ad39"
+    },
+    {
+      "type": "docker-history",
+      "target": "15wxkh2jyaa5kzejl8yhksph5",
+      "builder": "desktop-linux",
+      "expectedContext": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+      "expectedVcs": "https://github.com/on-dotnet/ontology-platform.git",
+      "expectedRevision": "a30ede7241c077dcf5188e9bf3857494caf0471a",
+      "expectedStatus": "failed",
+      "ownershipEvidence": {
+        "commit": "e40b1be2cf823358db5aba714551a96ec177fb4c",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-THIN-SLICE-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "f369397b2c89bf6b3b9797484c962100ec46cb21b72373da0578f812d6565200"
+    },
+    {
+      "type": "docker-history",
+      "target": "oig58wowfr1qz3tn8rlcp99di",
+      "builder": "desktop-linux",
+      "expectedContext": "/Users/chasen/.codex/worktrees/m0-master/ontology-platform/infra/development/fuseki",
+      "expectedVcs": "https://github.com/on-dotnet/ontology-platform.git",
+      "expectedRevision": "9acab3fc5dbb5ff0f447c4c839f66766e71b69e4",
+      "expectedStatus": "completed",
+      "ownershipEvidence": {
+        "commit": "e40b1be2cf823358db5aba714551a96ec177fb4c",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "M0-MAC-PORTABILITY-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "b2517007505e749e4b2c1f1d6e1185e2f431a2b786d47ff0b1ea018a57f0398c"
+    },
+    {
+      "type": "docker-history",
+      "target": "zo1g9e3r86l3buadw1j9aok18",
+      "builder": "desktop-linux",
+      "expectedContext": "/Users/chasen/.codex/worktrees/m0-master/ontology-platform/infra/development/fuseki",
+      "expectedVcs": "https://github.com/on-dotnet/ontology-platform.git",
+      "expectedRevision": "9acab3fc5dbb5ff0f447c4c839f66766e71b69e4",
+      "expectedStatus": "completed",
+      "ownershipEvidence": {
+        "commit": "e40b1be2cf823358db5aba714551a96ec177fb4c",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "M0-MAC-PORTABILITY-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "63cad52ab4d2124ff238702a3c9e81ccf5fc0fe12b341389b9c4a42bfb5f6030"
+    },
+    {
+      "type": "docker-history",
+      "target": "9f3v88w973zdi6d2pz5zl7bhf",
+      "builder": "desktop-linux",
+      "expectedContext": "/Users/chasen/.codex/worktrees/m0-master/ontology-platform/infra/development/fuseki",
+      "expectedVcs": "https://github.com/on-dotnet/ontology-platform.git",
+      "expectedRevision": "c8f09f09de9e415de220e01c49ec319693411957",
+      "expectedStatus": "completed",
+      "ownershipEvidence": {
+        "commit": "e40b1be2cf823358db5aba714551a96ec177fb4c",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "M0-MAC-PORTABILITY-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "dd4ff4f1990a4aa80abca81ae84f9b8abfc5b4b6ceebc9322e84dbb37d4a6bbb"
+    },
+    {
+      "type": "docker-history",
+      "target": "1qb12xansacxsmjbx9qwq66df",
+      "builder": "desktop-linux",
+      "expectedContext": "/Users/chasen/.codex/worktrees/m0-master/ontology-platform/infra/development/fuseki",
+      "expectedVcs": "https://github.com/on-dotnet/ontology-platform.git",
+      "expectedRevision": "e3f0b9694412f7a91b6075be9d7e8d4fac4b890b",
+      "expectedStatus": "completed",
+      "ownershipEvidence": {
+        "commit": "e40b1be2cf823358db5aba714551a96ec177fb4c",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "M0-MAC-PORTABILITY-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "6ccbc6ee24fbfdd1739846a8b05548a84018912c00e01d6bf2d22a9b2fbc5b79"
+    }
+  ]
+}

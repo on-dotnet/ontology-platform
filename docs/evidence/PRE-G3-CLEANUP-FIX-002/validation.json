@@ -1,0 +1,89 @@
+{
+  "checks": [
+    {
+      "name": "actual-nonhistory248",
+      "command": "Original exact Apply apply-plan.json + final reconciliation-entry.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "248 nonhistory operations remain effective;175cache10WT11local13remote2oldcontainers24volumes13images. Current exact15local15remote6WT/0container24vol11image."
+    },
+    {
+      "name": "initial-history-volatile-correction",
+      "command": "Original Apply history18 then postreview same CLI recheck",
+      "status": "PARTIAL",
+      "exitCode": 0,
+      "output": "Original CLI0/listabsence did not prove durable deletion.18 records reappeared after natural VM generation; root cause confirmed from official fixed-tag source, original532 rows and snapshots preserved;18 completion withdrawn until retry."
+    },
+    {
+      "name": "durable-history18-retry",
+      "command": "pwsh -NoProfile -File scripts/maintenance/cleanup-resources.ps1 -Root <exactRoot> -PlanPath history-plan.json -Apply -LogPath history-apply.jsonl",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "e40 sameHeadCI40365150329 success/mainFF before freshDryRun18/0 and Apply18/18;36 exact before/after, no failed or expanded targets;versioned backend generation pinned."
+    },
+    {
+      "name": "strong-db-absence",
+      "command": "python3 /private/tmp/fix002-history-strong-check.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "18 exact identifiers each returned only expected no-record stderr, stdoutempty and diagnostic exit1; tombstones/unknown errors are not absence. Controller exact source included."
+    },
+    {
+      "name": "natural-generation-persistence",
+      "command": "python3 /private/tmp/fix002-history-persistence-probe.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Idle>6min no localDockerAPI; firstblankRef RPC VM0->1, newbridge48a->212a, sameEngine/CLI/context, onlyprobe history1 and original18 absent. cleanup_review executed strong after all18;package_review verified blankRef/offset remaining record,newgeneration and keep sets. Both independent I1 closed."
+    },
+    {
+      "name": "actual-final-reconciliation",
+      "command": "python3 /private/tmp/fix002-final-reconcile.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "266unique,284 resource-changing attempts,568 log rows;exact Git/Docker differences/keep sets/cache IDs/protected paths verified. No physical disk reclamation promise."
+    },
+    {
+      "name": "retained-environment-health-t1",
+      "command": "python3 /private/tmp/fix002-after-probe.py via trusted existing runtime",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "T1 after data/cache/branch cleanup:PG pg_isready0,Jena/RustFS/Keycloak HTTP200. Beforealso4/4. Onlyownverifiedlauncher SIGINT/exit0,9probe containers/session network removed normally;24 named volumes kept. No later AppHost restart claimed."
+    },
+    {
+      "name": "complete-fixed-tool-local-selftest",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1 -SelfTest",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "history-selftest.txt actualexit0:Cleanup40/PublicHistory9/Inspector9/ReviewPackage54 plus policy/doctor fixtures. Independent40suite+15extra and another9history专项mock PASS;real data acceptance separate."
+    },
+    {
+      "name": "fixed-code-samehead-ci",
+      "command": "gh run view 40365150329 --json headSha,status,conclusion,jobs",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "e40b1be2cf823358db5aba714551a96ec177fb4c completed/success engineering121720722601/governance121720722507;main integrated before18 retry. FinalexactHeadCI supplied runtime duringpackaging."
+    },
+    {
+      "name": "public-history-scan-triage",
+      "command": "python3 scripts/maintenance/audit-public-history.py then independent/manual original6 triage",
+      "status": "PARTIAL",
+      "exitCode": 2,
+      "output": "Postfix290 commits2278blobs48032661 bytes6samehits0unscanned;exit2 REVIEW_REQUIRED correctly triaged known variables/generators/syntheticfixtures, not converted to scanner exit0. Finite patterns/privacy limits retained."
+    },
+    {
+      "name": "unrun-platform-and-physical-space",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Windows/Intel/production/physicalAPFS/unknownsemanticprivacy not verified;POSIXnofollow unavailable platforms refuse cacheApply;only auditedBuildx0.38.1/BuildKit0.34.0 singleDesktopNode history contract."
+    }
+  ],
+  "ci": {
+    "status": "NOT_VERIFIED",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  },
+  "ciPolicy": "Final real exactHeadCI supplied as runtimeCi in manifest/git-ci;sourcecannotself-referenceitsfuturecommit. FinalsameHeadlocalSelfTest/ZIPhash/oldpackageunlinkinexternaldeliveryreceipt."
+}

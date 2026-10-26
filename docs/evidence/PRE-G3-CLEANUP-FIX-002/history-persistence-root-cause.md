@@ -20,3 +20,7 @@ Docker调查和独立cleanup_review均核验官方tag源码：[BuildKit v0.34.0 
 4. 当前已污染内存无普通安全CLI清键入口。不造RPC/流时序竞态、不碰内部DB、不主动全局restart/update/prune/配置。代码/CI期间暂停本地Docker读取/streams以保留已有自然idle机制；之后只有实际观察新的VM generation才能按仅原18子计划重验。时间经过不是成功。最后还需自然generation变化后的只读持久检查。
 
 新增mock实现在内存deleted过滤与持久DB分离，精确复现原工具CLI0/list absent却重启后回现。真实tmp/mock全40 tests，旧工具RED9处失败；GREEN及独立Review/实际二次18计划结果随后补充，不预填完成。
+
+## 实际闭环
+
+e40修复同HeadCI40365150329双job success并mainFF/push后，仅原18新子计划fresh DryRun/Apply全部成功；36新日志及18精确DB无记录诊断通过。空闲>6分钟后blankRef RPC实际VM0→1，bridge48a→212a，仍只1新恢复history，旧18不回现。最终独立现场复核见后续审查；不把自然等待时间当作成功。原日志/回现纠正文件原样保留，唯一资源266、命令尝试284。

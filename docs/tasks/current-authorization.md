@@ -1,6 +1,6 @@
 # PRE-G3-CLEANUP-FIX-002 当前授权增量（2026-10-26）
 
-当前 **EXECUTING / HISTORY_PERSISTENCE_REPAIR**。原266CLI操作exit0与即时快照真实成立，但后验18history在VM自然生命周期后回现，持久删除尚未完成；其余248项实际效力和保留环境健康已独立确认。正在同范围修复工具/RED-GREEN/新CI后仅原18重验，不通过修改默认网络、全局配置或强制清理绕过；最终同HeadCI/唯一ZIP/旧包后置回收读取真实manifest及交付回执，不在Git预填未来事实。人类正式批准[整改附件V1](../evidence/PRE-G3-CLEANUP-FIX-002/authorization-v1.md)全部执行，上一轮Review V2通过、实际Git/Worktree/Docker清理缺口由本任务整改。已关闭阶段不再要求无法获得的旧聊天不存在证明；保护当前任务、私有资料与真实独特未集成成果，逐项列阻断。允许精确安全白名单真实Apply、工具/测试、公开history只读检查、独立Review/同HeadCI、Master集成main/push与唯一ZIP。具体见[任务卡](PRE-G3-CLEANUP-FIX-002.md)。Base de2c020c486df5557b1b17f6b62c1befd96312f2。存在安全候选却0删除为FAIL。不改G2业务、不进入G3、不重写Git历史/全局清理/付费调用。此新授权覆盖先前统一KEEP/DEFERRED的推定，历史事实仍保留。
+当前 **READY_FOR_REVIEW / PARTIAL**。266唯一资源已实际回收，284次资源变更命令尝试、568日志；后验18history内存tombstone已由e40修复、40回归/新同HeadCI、原18精确重验和实际自然新代际无回现闭环。其余248项实效保持；保留环境T1四项健康通过，T3仅保留集/元数据核验且未再次启动AppHost，未改默认网络/全局配置/内部DB；最终同HeadCI/唯一ZIP/旧包后置回收读取真实manifest及交付回执，不在Git预填未来事实。人类正式批准[整改附件V1](../evidence/PRE-G3-CLEANUP-FIX-002/authorization-v1.md)全部执行，上一轮Review V2通过、实际Git/Worktree/Docker清理缺口由本任务整改。已关闭阶段不再要求无法获得的旧聊天不存在证明；保护当前任务、私有资料与真实独特未集成成果，逐项列阻断。允许精确安全白名单真实Apply、工具/测试、公开history只读检查、独立Review/同HeadCI、Master集成main/push与唯一ZIP。具体见[任务卡](PRE-G3-CLEANUP-FIX-002.md)。Base de2c020c486df5557b1b17f6b62c1befd96312f2。存在安全候选却0删除为FAIL。不改G2业务、不进入G3、不重写Git历史/全局清理/付费调用。此新授权覆盖先前统一KEEP/DEFERRED的推定，历史事实仍保留。
 
 ---
 

@@ -29,3 +29,7 @@
 ## 后验BuildKit持久删除纠偏（同一FIX002范围）
 
 最终复核发现BuildKit v0.34.0单Ref查询零计数键导致history rm仅内存tombstone、VM自然生命周期后原18记录回现。原工具Owner已释放且工作树已实际移除；Master从此串行接手cleanup-resources.ps1/cleanup_resources.py/CleanupResources.Tests.py三个owned_paths，无并行写者，不扩大业务权限。保留原日志/时点快照，撤回18history持久完成结论；补RED/GREEN、独立Review和同HeadCI后仅原18精确子计划重验。禁止RPC竞态、全局restart/update/prune/配置变更；自然idle不能当成功，须实际观察generation并验证强absence。
+
+## 持久history整改已实测闭环
+
+e40b1be同HeadCI40365150329双job success→Master mainFF/push→新自然代际48a→仅原18fresh DryRun/Apply18/18→18精确DB无记录→闲置后自然VM0→1/newbridge212a仍1history，原18无回现。266唯一资源、284资源变更命令尝试、568日志，不重复计回收；原532即时快照与后验回现证据原样保留。最终CI/ZIP收口仍以最终已提交Head的真实交付回执为准，不进G3。

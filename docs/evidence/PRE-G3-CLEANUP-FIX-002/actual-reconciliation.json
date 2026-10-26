@@ -1,0 +1,117 @@
+{
+  "observedAt": "2026-10-26T17:35:16.734477+00:00",
+  "status": "PASS_SCOPED_MAC_ACTUAL_RESOURCES_WITH_DURABLE_HISTORY",
+  "uniqueEffectiveResources": 266,
+  "commandAttempts": 284,
+  "originalImmediateAttempts": 266,
+  "correctedVolatileHistoryAttempts": 18,
+  "retryDurableHistoryAttempts": 18,
+  "loggedRows": 568,
+  "originalLogsPreserved": true,
+  "logSha256": {
+    "apply-001.jsonl": "ca45ef67c680c7bdf0feeef2cdec0714bcc4fea1e2602af4a5176e3f65b75e5e",
+    "history-apply.jsonl": "3c2faa57f3303875c82c0f4dadebae26ca74b3552da28d436b908f3e4b835fb1"
+  },
+  "effectiveOperations": {
+    "cache": 175,
+    "worktree": 10,
+    "git-local-branch": 11,
+    "git-remote-branch": 13,
+    "docker-container": 2,
+    "docker-volume": 24,
+    "docker-image": 13,
+    "docker-history": 18
+  },
+  "gitBefore": {
+    "localBranches": 26,
+    "remoteBranches": 28,
+    "worktrees": 16
+  },
+  "gitAfter": {
+    "localBranches": 15,
+    "remoteBranches": 15,
+    "worktrees": 6
+  },
+  "dockerInitial": {
+    "containers": 2,
+    "volumes": 48,
+    "images": 23,
+    "buildHistory": 18
+  },
+  "dockerPreApply": {
+    "containers": 11,
+    "volumes": 48,
+    "images": 24,
+    "buildHistory": 19
+  },
+  "dockerFinal": {
+    "containers": 0,
+    "volumes": 24,
+    "images": 11,
+    "buildHistory": 1
+  },
+  "cacheLogicalBytes": 2530247461,
+  "volumeEngineInitial": 3771503801,
+  "volumeEngineFinal": 1840304068,
+  "volumeEngineNetReduction": 1931199733,
+  "volumeCandidateLogicalBytes": 1939386960,
+  "imageLayersPreApply": 5747353542,
+  "imageLayersFinal": 5747294286,
+  "imageLayersNetReduction": 59256,
+  "oldStoppedContainerRwBytes": 177119232,
+  "keepProtectedTrees": [
+    "/Users/chasen/.codex/worktrees/g2-master/ontology-platform",
+    "/Users/chasen/.codex/worktrees/g2-query/ontology-platform",
+    "/Users/chasen/.codex/worktrees/g2-security/ontology-platform",
+    "/Users/chasen/.codex/worktrees/g2-sem/ontology-platform",
+    "/Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform",
+    "/Users/chasen/Developer/repos/ontology-platform"
+  ],
+  "keepVolumeNames": [
+    "g2-712190660deb-alloy-data",
+    "g2-712190660deb-fuseki-data",
+    "g2-712190660deb-grafana-data",
+    "g2-712190660deb-loki-data",
+    "g2-712190660deb-postgres-data",
+    "g2-712190660deb-prometheus-data",
+    "g2-712190660deb-rustfs-data",
+    "g2-712190660deb-tempo-data",
+    "g2-b59e68191ca0-alloy-data",
+    "g2-b59e68191ca0-fuseki-data",
+    "g2-b59e68191ca0-grafana-data",
+    "g2-b59e68191ca0-loki-data",
+    "g2-b59e68191ca0-postgres-data",
+    "g2-b59e68191ca0-prometheus-data",
+    "g2-b59e68191ca0-rustfs-data",
+    "g2-b59e68191ca0-tempo-data",
+    "g2-ef979bd04cc0-alloy-data",
+    "g2-ef979bd04cc0-fuseki-data",
+    "g2-ef979bd04cc0-grafana-data",
+    "g2-ef979bd04cc0-loki-data",
+    "g2-ef979bd04cc0-postgres-data",
+    "g2-ef979bd04cc0-prometheus-data",
+    "g2-ef979bd04cc0-rustfs-data",
+    "g2-ef979bd04cc0-tempo-data"
+  ],
+  "keepSharedCacheIds": [
+    "9ps57q51cxsb93afm52vkj3em",
+    "e6jc9b1q8gmh87dd0nbmywbzy",
+    "ewk9svasi6fnram76609wm4v6",
+    "gv4hro3gkgleb154wipw0e4l0",
+    "j7p20on71k1xzi48sfnfw82at",
+    "k2nu5zzwwgb5684dhnk1x4qr1",
+    "k69m501cgn7tmtdmz3ce5u3rz",
+    "k80vo9jwximo27dn3tew76krh",
+    "nisjoatf7lkhmgnj85rttnckd",
+    "qfv1txx0qs8w2btgyyyv75yuc",
+    "snjlqumzjtwnxasoxfgjt3q6n",
+    "uxtr0h6w1ojbn4gqy5y6cdb73",
+    "w06xag2aijqm5anekuduy0juk"
+  ],
+  "historyPersistentAcrossObservedNaturalGeneration": true,
+  "historyStrongMissingDiagnostics": 18,
+  "noExplicitDockerRestartConfigOrNetworkMutation": true,
+  "initialAndNaturalNetworkDriftDocumented": true,
+  "physicalDiskReclaimed": "NOT_VERIFIED",
+  "reviewZipPostCommitReceiptRequired": true
+}
