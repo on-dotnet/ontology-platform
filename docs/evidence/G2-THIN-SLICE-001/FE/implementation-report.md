@@ -86,3 +86,5 @@ Master需完成受保护的G2 Host composition、真实迁移/PG与Jena资源及
 实际命令/退出码/输出见`logs/review-round1-*`：`tsc --noEmit`0、ESLint0、Vitest **53/53（6 suites）**、生产Next build0、G2 Edge有界UI **30/30**、原G1 Edge回归 **5/5**、`pwsh -NoProfile -File scripts/verify.ps1 -SelfTest`0（ReviewPackage35/0）。RED完整SSE输出与M1/CAS/EOF真实观察单独保留；日志仅规范化LF/行尾空白。没有修改旧G1断言、生成器、包锁或Tokens；Monaco无安装/import/override。
 
 Master已准备新隔离Host环境，本Owner按指令等待可用通知后开始真实服务联调；本轮所有夹具依然不代表PG/Jena/Keycloak/RustFS/MAF真实G2 E2E。CI NOT_VERIFIED。新增同owned feature helper已向Master登记，审查/集成责任仍在Master。
+
+第一轮修复SourceSha=`9b0e0d1ed18edb90231fe0b46273da7c1f101f91`；本行仅文档关联，不改变该提交已验证源码。
