@@ -1,0 +1,299 @@
+{
+  "sourceSha": "6f52feadc34b593f1e7a8a579177bc1596c6d0e0",
+  "workingTreeChanges": true,
+  "sourceHashes": {
+    "backend/src/Hosts/OntologyPlatform.Api/G2/ExecutionEndpoints.cs": "e210474c90474555154387a1cd2dbecd5cb283afa16df8c67b7a99b5ebfabba3",
+    "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/AgentRunExecutor.cs": "175e1f1e57fd9a3d3134df236ba44d096f4f6dceca873785739b1e11e0a9b6a5",
+    "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/AgentsDbContext.cs": "a25b18db08e6e6825ddbfc863b26d0cb2f59f94a605af4d082b445f4945b89f1",
+    "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/AgentsDesignTimeFactory.cs": "1a42d36ca8046890fded46e993a577264b3447eea08ce30128914b17508d9f70",
+    "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/AgentsModule.cs": "52cfd4b4a88d752981db982296434b42bf05128468adb589b9691c96accef992",
+    "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/DeterministicRunClient.cs": "3024b1d9c6551a761e3822e710eaf7aecbc8df0e72a9f5d497b5da4c94dc68a7",
+    "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/ExecutionRunService.cs": "e4c5671e8f1581d24fc494e52e1dd339a02546fa62e3ec7faf2da7ad6f17977b",
+    "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/RunCommandRecord.cs": "b394e7831a195c0c254681c3fb3ef35943b2d6645155614998a8132a22b4dc39",
+    "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/RunEventRecord.cs": "58fcf68a164a257d969342866d394454c22f13d5d614d074dcbac0d89f8f2a31",
+    "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/RunRecord.cs": "643ea34acbf568c6f69c8cb68dc39b5fb945f895c747828688abd7da99477a75",
+    "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/SemanticMcpTools.cs": "09d7adb4aa3a55417e225853ec8a773e46f6ddcab9697505da6ad4430d95946c",
+    "backend/tests/OntologyPlatform.AgentTests/AgentFixture.cs": "710c4990f46d09168f48f11bf8a755c90862ec13f2b65d0957ae81e41b58f47b",
+    "backend/tests/OntologyPlatform.AgentTests/AgentHttpFixture.cs": "ae999ba48b4538a9644a8412787e78a47afbd1e1ec73ed2b7ca34edb831e6638",
+    "backend/tests/OntologyPlatform.AgentTests/AgentMigrationTests.cs": "835c8dfc77af155d0431ded1fb738b32fbcdf6f2856e3a6a8b367e7505e2efc7",
+    "backend/tests/OntologyPlatform.AgentTests/PersistenceTests.cs": "dda6f6b873c988a56e284754043e8967ec69f5f091ceaa8705ae9d1c244d39b0",
+    "backend/tests/OntologyPlatform.AgentTests/RunFaultTests.cs": "a38f431149f3d1707c90ad16f212341d70fb5c64b711e97bb3160988ab2fab64",
+    "backend/tests/OntologyPlatform.AgentTests/RunFlowTests.cs": "256360db706a6685bee82227caf43be6ef9c60a7d88bd50f1f4bf13f61256267",
+    "backend/tests/OntologyPlatform.AgentTests/TransportTests.cs": "ffb174bc1c099e4de6171995679f40087662f447100d720f8b7c3dd31913f68a",
+    "docs/contracts/g2-schemas.openapi.json": "35f249d0aa1992234c3df7640d9dd1250b3c588f61d0c7d67339ff6b065eae5b",
+    "scripts/acceptance/mcp-agent.py": "ec63e9b5e30c58fd66b9bce0694be901e299a82a375f90c08cb88c767ca68acd"
+  },
+  "exitCode": 0,
+  "records": [
+    {
+      "command": [
+        "docker",
+        "image",
+        "inspect",
+        "--format",
+        "{{.Id}}",
+        "ontology-platform-g2-fuseki:6.2.0"
+      ],
+      "exitCode": 0,
+      "output": "sha256:6cd40ff063db802d36a082fda07849fef3289d974b48d5c44fc9a82c41a1e826\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "restore",
+        "backend/tests/OntologyPlatform.AgentTests",
+        "--locked-mode"
+      ],
+      "exitCode": 0,
+      "output": "  正在确定要还原的项目…\n  所有项目均是最新的，无法还原。\n"
+    },
+    {
+      "command": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g2-agent-20f1310b48f6-pg",
+        "--memory",
+        "256m",
+        "--cpus",
+        "1",
+        "--publish",
+        "127.0.0.1::5432",
+        "--env",
+        "POSTGRES_PASSWORD",
+        "--env",
+        "POSTGRES_DB",
+        "--tmpfs",
+        "/var/lib/postgresql",
+        "postgres:18.6-trixie@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6"
+      ],
+      "exitCode": 0,
+      "output": "14081fabf08c1cf41f8d917bb66fdcceaa4b4e1d2f43783ed942d2e331a697af\n"
+    },
+    {
+      "command": [
+        "docker",
+        "port",
+        "g2-agent-20f1310b48f6-pg",
+        "5432/tcp"
+      ],
+      "exitCode": 0,
+      "output": "127.0.0.1:51805\n"
+    },
+    {
+      "command": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g2-agent-20f1310b48f6-s3",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--publish",
+        "127.0.0.1::9000",
+        "--env",
+        "RUSTFS_ACCESS_KEY",
+        "--env",
+        "RUSTFS_SECRET_KEY",
+        "--env",
+        "RUSTFS_CONSOLE_ENABLE=false",
+        "--tmpfs",
+        "/data:mode=1777",
+        "rustfs/rustfs:1.0.3@sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+        "/data"
+      ],
+      "exitCode": 0,
+      "output": "f737958bc4ff75075425cc901d3cfd90d0067c5fba445e8babfed0af18557e0c\n"
+    },
+    {
+      "command": [
+        "docker",
+        "port",
+        "g2-agent-20f1310b48f6-s3",
+        "9000/tcp"
+      ],
+      "exitCode": 0,
+      "output": "127.0.0.1:51808\n"
+    },
+    {
+      "command": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g2-agent-20f1310b48f6-jena",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--publish",
+        "127.0.0.1::3030",
+        "--mount",
+        "type=bind,src=/private/tmp/g2-agent-20f1310b48f6ll4r54z6,dst=/fixture,readonly",
+        "--entrypoint",
+        "java",
+        "ontology-platform-g2-fuseki:6.2.0",
+        "-Xmx384m",
+        "-Dlog4j.configurationFile=/fixture/log4j2.properties",
+        "-jar",
+        "/opt/fuseki/fuseki-server.jar",
+        "--config=/fixture/config.ttl"
+      ],
+      "exitCode": 0,
+      "output": "390cc5bdfe1798901a909a601644ef35539d50b0fbcaf055fa8c0830baa7a127\n"
+    },
+    {
+      "command": [
+        "docker",
+        "port",
+        "g2-agent-20f1310b48f6-jena",
+        "3030/tcp"
+      ],
+      "exitCode": 0,
+      "output": "127.0.0.1:51813\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "build",
+        "backend/tests/OntologyPlatform.AgentTests",
+        "--no-restore"
+      ],
+      "exitCode": 0,
+      "output": "  OntologyPlatform.Contracts -> /Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/bin/Debug/net10.0/OntologyPlatform.Contracts.dll\n  OntologyPlatform.Modules.Governance -> /Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/bin/Debug/net10.0/OntologyPlatform.Modules.Governance.dll\n  OntologyPlatform.Modules.Ontology.Domain -> /Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.Domain.dll\n  OntologyPlatform.Modules.SemanticQuery -> /Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/bin/Debug/net10.0/OntologyPlatform.Modules.SemanticQuery.dll\n  OntologyPlatform.ServiceDefaults -> /Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/src/ServiceDefaults/bin/Debug/net10.0/OntologyPlatform.ServiceDefaults.dll\n  OntologyPlatform.Modules.Agents -> /Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/bin/Debug/net10.0/OntologyPlatform.Modules.Agents.dll\n  OntologyPlatform.Modules.Publishing.Domain -> /Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/bin/Debug/net10.0/OntologyPlatform.Modules.Publishing.Domain.dll\n  OntologyPlatform.Modules.Ontology -> /Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.dll\n  OntologyPlatform.Modules.Publishing -> /Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/bin/Debug/net10.0/OntologyPlatform.Modules.Publishing.dll\n/Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/G2/G2EndpointGuard.cs(57,215): warning CS1573: 参数“requiresCommand”在“G2EndpointGuard.ExecuteAsync<T>(HttpContext, string, CommandContext?, Func<ActorContext, CancellationToken, Task<T>>, bool, bool, bool)”的 XML 注释中没有匹配的 param 标记(但其他参数有) [/Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/OntologyPlatform.Api.csproj]\n  OntologyPlatform.Api -> /Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/bin/Debug/net10.0/OntologyPlatform.Api.dll\n  OntologyPlatform.AgentTests -> /Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll\n\n已成功生成。\n\n/Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/G2/G2EndpointGuard.cs(57,215): warning CS1573: 参数“requiresCommand”在“G2EndpointGuard.ExecuteAsync<T>(HttpContext, string, CommandContext?, Func<ActorContext, CancellationToken, Task<T>>, bool, bool, bool)”的 XML 注释中没有匹配的 param 标记(但其他参数有) [/Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/OntologyPlatform.Api.csproj]\n    1 个警告\n    0 个错误\n\n已用时间 00:00:01.15\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "tool",
+        "restore"
+      ],
+      "exitCode": 0,
+      "output": "工具“dotnet-ef”(版本“10.0.13”)已还原。可用的命令: dotnet-ef\n\n还原成功。\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "tool",
+        "run",
+        "dotnet-ef",
+        "database",
+        "update",
+        "--project",
+        "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance",
+        "--startup-project",
+        "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance",
+        "--no-build"
+      ],
+      "exitCode": 0,
+      "output": "Failed executing DbCommand (7ms) [Parameters=[], CommandType='Text', CommandTimeout='30']\nSELECT \"MigrationId\", \"ProductVersion\"\nFROM governance.\"__EFMigrationsHistory\"\nORDER BY \"MigrationId\";\nAcquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.\nApplying migration '20261025062847_InitialGovernance'.\nApplying migration '20261025144246_AuditScopeSites'.\nAcquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.\nDone.\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "tool",
+        "run",
+        "dotnet-ef",
+        "database",
+        "update",
+        "--project",
+        "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology",
+        "--startup-project",
+        "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology",
+        "--no-build"
+      ],
+      "exitCode": 0,
+      "output": "Failed executing DbCommand (8ms) [Parameters=[], CommandType='Text', CommandTimeout='30']\nSELECT \"MigrationId\", \"ProductVersion\"\nFROM ontology.\"__EFMigrationsHistory\"\nORDER BY \"MigrationId\";\nAcquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.\nApplying migration '20261026003221_InitialOntology'.\nDone.\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "tool",
+        "run",
+        "dotnet-ef",
+        "database",
+        "update",
+        "--project",
+        "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing",
+        "--startup-project",
+        "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing",
+        "--no-build"
+      ],
+      "exitCode": 0,
+      "output": "Failed executing DbCommand (7ms) [Parameters=[], CommandType='Text', CommandTimeout='30']\nSELECT \"MigrationId\", \"ProductVersion\"\nFROM publishing.\"__EFMigrationsHistory\"\nORDER BY \"MigrationId\";\nAcquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.\nApplying migration '20261026015031_InitialPublishing'.\nDone.\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "tool",
+        "run",
+        "dotnet-ef",
+        "database",
+        "update",
+        "--project",
+        "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents",
+        "--startup-project",
+        "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents",
+        "--no-build"
+      ],
+      "exitCode": 0,
+      "output": "Failed executing DbCommand (7ms) [Parameters=[], CommandType='Text', CommandTimeout='30']\nSELECT \"MigrationId\", \"ProductVersion\"\nFROM agents.\"__EFMigrationsHistory\"\nORDER BY \"MigrationId\";\nAcquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.\nApplying migration '20261026024046_InitialAgents'.\nDone.\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "test",
+        "--project",
+        "backend/tests/OntologyPlatform.AgentTests",
+        "--no-restore",
+        "--no-build"
+      ],
+      "exitCode": 0,
+      "output": "正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll (net10.0|arm64)\n/Users/chasen/.codex/worktrees/g2-ai/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll (net10.0|arm64) 已通过 (41s 324ms)\n\n测试运行摘要: 已通过!\n  总计: 24\n  失败: 0\n  成功: 24\n  已跳过: 0\n  持续时间: 41s 743ms\n"
+    },
+    {
+      "command": [
+        "node",
+        "-e",
+        "\nconst fs = require('fs');\nconst Ajv = require(process.argv[2]);\nconst bundle = JSON.parse(fs.readFileSync(process.argv[1], 'utf8'));\nconst allowed = new Set(['$schema','$ref','$defs','type','properties','required','additionalProperties','items','enum','oneOf','anyOf','allOf','not','description','format','minimum','maximum','minLength','maxLength','const','discriminator']);\nconst keywords = new Set();\nfunction scan(schema) {\n  if (typeof schema === 'boolean') return;\n  for (const [key, value] of Object.entries(schema)) {\n    if (!allowed.has(key)) throw new Error('Unsupported schema keyword: ' + key);\n    keywords.add(key);\n    if (key === '$defs' || key === 'properties') Object.values(value).forEach(scan);\n    if (['oneOf','anyOf','allOf'].includes(key)) value.forEach(scan);\n    if (['items','not','additionalProperties'].includes(key) && typeof value === 'object') scan(value);\n  }\n}\nscan(bundle.schema);\nconst ajv = new Ajv({validateSchema:false, allErrors:true, unknownFormats:'ignore', logger:false});\nconst validate = ajv.compile(bundle.schema);\nif (!validate(bundle.result)) throw new Error('Actual MCP payload failed output contract: ' + JSON.stringify(validate.errors));\nfor (const result of bundle.additionalResults || []) if (!validate(result)) throw new Error('Another actual MCP tool failed output contract');\nconst mutations = [\n  value => { delete value.status; },\n  value => { value.status = 'INVENTED'; },\n  value => { value.injectedActor = 'admin'; },\n  value => { value.snapshot = null; },\n  value => { value.evidence = null; },\n  value => { value.data[0].ontology = {classIris:[],objectPropertyIris:[],datatypePropertyIris:[],labels:[],supportedAxioms:[],diagnostics:[]}; }\n];\nfor (const mutate of mutations) {\n  const value = structuredClone(bundle.result);\n  mutate(value);\n  if (validate(value)) throw new Error('Invalid MCP payload unexpectedly passed output contract');\n}\nconsole.log(JSON.stringify({status:'PASS', validator:'repo-locked ajv6.15.0', scope:'observed common keyword subset; not full 2020-12 dialect certification', schemaKeywords:[...keywords].sort(), positive:1+(bundle.additionalResults||[]).length, negative:mutations.length, mediaTypes:bundle.mediaTypes}));\n",
+        "/private/tmp/g2-agent-20f1310b48f6ll4r54z6/schema-result.json",
+        "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/node_modules/.pnpm/ajv@6.15.0/node_modules/ajv"
+      ],
+      "exitCode": 0,
+      "output": "{\"status\":\"PASS\",\"validator\":\"repo-locked ajv6.15.0\",\"scope\":\"observed common keyword subset; not full 2020-12 dialect certification\",\"schemaKeywords\":[\"$defs\",\"$ref\",\"$schema\",\"additionalProperties\",\"anyOf\",\"const\",\"description\",\"discriminator\",\"enum\",\"format\",\"items\",\"oneOf\",\"properties\",\"required\",\"type\"],\"positive\":3,\"negative\":6,\"mediaTypes\":[\"text/event-stream\"]}\n"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g2-agent-20f1310b48f6-jena"
+      ],
+      "exitCode": 0,
+      "output": "g2-agent-20f1310b48f6-jena\n"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g2-agent-20f1310b48f6-s3"
+      ],
+      "exitCode": 0,
+      "output": "g2-agent-20f1310b48f6-s3\n"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g2-agent-20f1310b48f6-pg"
+      ],
+      "exitCode": 0,
+      "output": "g2-agent-20f1310b48f6-pg\n"
+    }
+  ]
+}

@@ -27,8 +27,28 @@ public static class ExecutionEndpoints
             await service.EventsAsync(actor, id, cursor, token);
             await context.RequestServices.GetRequiredService<IAuditTrail>().WriteAsync(actor, new AuditCommand { Action = "execution.events.read", Resource = id, Outcome = "allowed", Scope = (await service.ReadAsync(actor, id, token)).Scope }, token);
             context.Response.Headers["X-Accel-Buffering"] = "no";
-            return TypedResults.ServerSentEvents(StreamAsync(context, service, id, cursor, token));
+            return new BoundedStreamResult(TypedResults.ServerSentEvents(StreamAsync(context, service, id, cursor, token)));
         }, validateCsrf: false));
+    }
+
+    /// <summary>限制真实HTTP写入期限，慢客户端阻塞写也不能无限占有连接。</summary>
+    private sealed class BoundedStreamResult : IResult
+    {
+        /// <summary>原生.NET SSE结果保持事件编码协议。</summary>
+        private readonly IResult stream;
+
+        /// <summary>接收原生流结果，不另写自定义SSE编码器。</summary>
+        internal BoundedStreamResult(IResult stream) => this.stream = stream;
+
+        /// <summary>绝对连接期限到达时终止底层HTTP写；客户端按最后收到的eventId恢复。</summary>
+        public async Task ExecuteAsync(HttpContext context)
+        {
+            // 定时器独立于枚举推进，故慢客户端卡住Flush时仍能中止连接。
+            using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(25));
+            // 仅终止订阅请求，不对Run发出任何业务cancel命令。
+            using var registration = deadline.Token.Register(context.Abort);
+            await stream.ExecuteAsync(context);
+        }
     }
 
     /// <summary>每批真实复验会话与完整scope，读PG分页无订阅丢窗；断流只取消枚举。</summary>

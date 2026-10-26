@@ -48,9 +48,9 @@ public sealed class AgentRunExecutor
     /// <summary>执行claim绑定的版本与工具，旧fence永远不能提交事件。</summary>
     public async Task ExecuteAsync(RunRecord claim, CancellationToken stoppingToken)
     {
-        // 创建时固定的实际Trace作为父链，不输出正文或高基数指标。
-        using var activity = Activities.StartActivity("execution.run", ActivityKind.Internal,
-            ActivityContext.TryParse(claim.TraceId, null, out var parent) ? parent : default);
+        // 后台执行创建实际新span；持久合同只保存traceId，不能伪造不存在的父span。
+        using var activity = Activities.StartActivity("execution.run", ActivityKind.Internal);
+        activity?.SetTag("execution.creation_trace_id", claim.TraceId);
         // 使用剩余绝对预算，接管不能重新获得三十秒。
         using var cancellation = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
         // 首次claim已经设置deadline，失效预算直接进入失败终态。
@@ -68,7 +68,7 @@ public sealed class AgentRunExecutor
         SemanticQueryStatus? resultStatus = null;
         try
         {
-            if (claim.ProviderMode != "deterministic")
+            if (claim.ProviderMode != "deterministic" || !runs.DeterministicEnabled)
             {
                 await AppendAsync(claim, new RunFailedPayload { Status = ExecutionStatus.Failed, Code = "provider_not_configured", TotalToolCalls = claim.ToolCalls }, stoppingToken);
                 return;
@@ -87,6 +87,7 @@ public sealed class AgentRunExecutor
                 var result = await gateway.ExecuteAsync(actor, plan, token);
                 resultStatus = result.Status;
                 await AppendAsync(claim, new ToolCompletedPayload { InvocationId = invocation, Result = result, DurationMs = timer.Elapsed.TotalMilliseconds }, token);
+                // 每条真实证据单独持久化，所有事件保持同一个正式snapshot。
                 foreach (var evidence in result.Evidence)
                     await AppendAsync(claim, new EvidenceAddedPayload { Evidence = evidence }, token);
                 return ExecutionRunService.Encode(result);

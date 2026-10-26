@@ -17,7 +17,10 @@ public sealed class SemanticMcpTools
     /// <summary>只公开显式白名单，身份从服务器传入，不进入工具Schema。</summary>
     public Tool[] List() => gateway.GetCapabilities().Where(value => Allowed(value.Id)).Select(value => new Tool
     {
-        Name = value.Id, Description = value.Meaning, InputSchema = InputSchema(value.InputSchema), OutputSchema = value.OutputSchema,
+        Name = value.Id,
+        Description = value.Meaning,
+        InputSchema = InputSchema(value.InputSchema),
+        OutputSchema = value.OutputSchema,
         Annotations = new ToolAnnotations { ReadOnlyHint = true, DestructiveHint = false, IdempotentHint = true, OpenWorldHint = false }
     }).ToArray();
 
@@ -33,6 +36,7 @@ public sealed class SemanticMcpTools
             var values = arguments ?? new Dictionary<string, JsonElement>();
             if (values.Keys.Any(key => !capability.InputSchema.Properties.Any(value => value.Name == key))
                 || capability.InputSchema.Required.Any(key => !values.ContainsKey(key))) throw new SemanticOperationException(422, "tool_arguments_invalid");
+            // 逐项执行唯一登记字段的类型及数值预算。
             foreach (var parameter in capability.InputSchema.Properties)
             {
                 if (!values.TryGetValue(parameter.Name, out var value)) continue;
@@ -44,11 +48,18 @@ public sealed class SemanticMcpTools
             // 由受控字段显式构造唯一计划，其他未提供可选字段保持null/空数组。
             var plan = new SemanticQueryPlan
             {
-                CapabilityId = capability.Id, CapabilityVersion = capability.Version, AssetId = values["assetId"].GetString()!,
-                ReleaseId = String(values, "releaseId"), EntityType = String(values, "entityType"), EntityIri = String(values, "entityIri"),
-                ExternalId = String(values, "externalId"), SiteId = String(values, "siteId"),
+                CapabilityId = capability.Id,
+                CapabilityVersion = capability.Version,
+                AssetId = values["assetId"].GetString()!,
+                ReleaseId = String(values, "releaseId"),
+                EntityType = String(values, "entityType"),
+                EntityIri = String(values, "entityIri"),
+                ExternalId = String(values, "externalId"),
+                SiteId = String(values, "siteId"),
                 RelationshipIris = values.TryGetValue("relationshipIris", out var relationships) ? relationships.EnumerateArray().Select(value => value.GetString()!).ToArray() : [],
-                Depth = values["depth"].GetInt32(), MaxRows = values["maxRows"].GetInt32(), TimeoutMs = values["timeoutMs"].GetInt32()
+                Depth = values["depth"].GetInt32(),
+                MaxRows = values["maxRows"].GetInt32(),
+                TimeoutMs = values["timeoutMs"].GetInt32()
             };
             if (plan.TimeoutMs < 100) throw new SemanticOperationException(422, "tool_arguments_invalid");
             // 请求级独立绝对预算，同时传播真实传输取消。

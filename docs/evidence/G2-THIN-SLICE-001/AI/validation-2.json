@@ -1,0 +1,12 @@
+{
+  "cwd": ".",
+  "command": [
+    "pwsh",
+    "-NoProfile",
+    "-File",
+    "scripts/verify.ps1",
+    "-SelfTest"
+  ],
+  "exitCode": 1,
+  "output": "\nCheck       Status Message\n-----       ------ -------\ntext-format FAIL   docs/evidence/G2-THIN-SLICE-001/master/host/g2-composition-…\ntext-format FAIL   docs/evidence/G2-THIN-SLICE-001/master/host/g2-integrated-w…\ntext-format FAIL   docs/evidence/G2-THIN-SLICE-001/master/host/g2-master-web-b…\ntext-format FAIL   docs/evidence/G2-THIN-SLICE-001/master/host/g2-openapi-gree…\ntext-format FAIL   docs/evidence/G2-THIN-SLICE-001/master/host/g2-openapi-red3…\ntext-format FAIL   docs/evidence/G2-THIN-SLICE-001/master/host/g2-openapi-red4…\ntext-format FAIL   docs/evidence/G2-THIN-SLICE-001/master/host/g2-transport-re…\n\n"
+}
