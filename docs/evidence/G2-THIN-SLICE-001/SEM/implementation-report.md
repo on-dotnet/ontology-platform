@@ -44,3 +44,11 @@ NOT_RUN：PG并发CAS/审计回滚/幂等/旧报告绑定、正式Jena TDB发布
 - `--label concurrency-cancellation-green`：exit 0，23/23通过；两个真实请求在受控时序门占槽，第三个429；gate只延迟真实HTTP、不返回模拟RDF；调用者取消保留OperationCanceledException，内部五秒预算固定503/semantic_timeout；已有真实PUT后的finally删除，脚本查询所有暂存三元组0。
 
 截至此里程碑真实测试总数23，其中1项只是生产类型实现边界存在，不能把总数写成23次独立引擎执行。PG/HTTP及跨模块审批仍NOT_RUN。新增正式图与安全边界测试没有替代最终PG/端到端验证。
+
+## 共享依赖同步前保存点
+
+共享合同`749cfa86d23a2189c4e63fa3c6889a0ecf5ee228`已cherry-pick为本树`1bfa868`。clone已通过新增`IReleaseCatalog.ReadAsync`消费重新授权的正式清单，只继承assetId和完全相同scope，非Active/Superseded拒绝；S1没有目录时BaseRelease明确503，普通新建不受影响。模块及SemanticTests编译exit0/0 warnings。
+
+新增`OntologyPlatform.Ontology` ActivitySource/Meter只含固定operation/phase/outcome与耗时，不含源码、理由、主体/厂区标签。Host注册由Master负责，端到端OTel导出NOT_RUN。owned HTTP adapter已按实际SEC guard签名绑定，等待共享guard/Host引用后编译与联调；此保存点整体仍DRAFT/PARTIAL。
+
+`python3 scripts/acceptance/shacl-validate.py`首次使用错误树形筛选返回零测试exit8，保留shacl-validate-red-filter.json；改为MSTest实际`FullyQualifiedName~ShaclTests`后12/12通过、exit0，shacl-validate.json。绝不把零测试当PASS。draft-revision入口已准备真实两个模块迁移、临时PG内存/CPU限制和整连接串脱敏；PG测试源码在临时草稿等待共享引用后移入owned目录，未将其当已运行。
