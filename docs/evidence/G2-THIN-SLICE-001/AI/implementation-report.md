@@ -78,3 +78,23 @@ Fix Base=`3533251eaf844a2357daccb6cd9901e391b2ae14`；源码/测试小提交=`ce
 应Master进一步请求，将首次SEM失败缩减为原Synthetic `data.ttl`中业务标签及来源断言的`炉次heat-1`替换为**单个😀**，其余不改。临时探针执行命令 `python3 scripts/acceptance/mcp-agent.py --label unicode-sem-minimal-diagnostic --filter FullyQualifiedName~UnicodeSemanticProbe`，exit2、1项失败、0跳过、2.255秒；仅安全输出`OBSERVED_SEM_UNICODE status=422; code=rdf_parse_invalid; type=SemanticOperationException`，未记录Jena响应正文。真实调用路径PublishAsync→ValidateAsync→LoadAsync→SendAsync。源码见[探针](unicode-sem-probe.cs.txt)，[原始诊断记录](unicode-sem-minimal-diagnostic.json)。探针临时复制到owned测试目录运行后删除，不混入31项固定回归或声称绿色；证据保存复现步骤。旧基线JenaRdfCodec.Term以JsonSerializer.Serialize生成字面量是待原SEM Owner核验的疑点；本轮未改SEM，未证明最终SEM修订仍有该缺陷。已准确交Master协调。
 
 本次只交原Reviewer限定复核M1。Master最终SEM/QRY整合及同Head重跑仍待执行；真实模型、浏览器E2E、CI与唯一ZIP的既有NOT_RUN/NOT_VERIFIED保持不变。完成后停止写入并释放slot。
+
+
+## 最终SEM/QRY依赖组合与夹具适配（2026-10-26）
+
+Master明确授权依次消费`0e970f9`（受核验源合同）、`21ed017`（SEM同批读取）、`b8dc13c`/`3fc61d6`（QRY /4、来源/预算/100ms及runner）、`c2ca4c3`（marker预算）、`75f9ce84`（SEM Unicode标量导出）。本树顺序cherry-pick为`91d1887`、`2740d67`、`4434199`、`43bc76b`、`0decfb4`、`89b78e9`，全无冲突；完整原/消费SHA见[源绑定](final-dependencies-source-binding.json)。这些是Master指定依赖副本，不是AI新写实现，也不应在Master重复集成。
+
+唯一夹具适配提交`47826ae12fe77c315e71e2ce73cb7a7c4b7570ed`只改`AgentFixture.AfterResolve`一行：从已有相同scope的DI取得`VerifiedReleaseSources`传给新版`SemanticGateway`，继续使用真实制品存储。未改业务Gateway、共享合同或锁。真实构建先以CS7036缺sources参数失败exit1（[红例](final-dependencies-build-red.json)），适配后同`dotnet build backend/tests/OntologyPlatform.AgentTests --no-restore`为exit0（[绿例](final-dependencies-build-green.json)）。该增量build0warning；后续完整脚本build仍观察到本AI基线Guard已知CS1573一条，未擅改共享文件。
+
+另有明确获准的两个全真实Unicode正例提交`e06688b4997e76d749e0466748a5be8120cffd4e`，仅`MessageChunkTests.PublishedUnicodeLabelSurvivesRealGatewayAndMaf`新增😀/𠀀两行参数化测试。样例业务标签和对应来源断言原样替换后，走真实草稿/SHACL/异人审批/发布部署与校验、最终Gateway、MAF、PG事件与重放，无标签装饰器；真实ToolCompleted标签及用户可见消息均保留原始非BMP字符。此前明确记录的旧SEM最小emoji失败现由该最终依赖组合实际转绿，不改写先前失败证据。原边界装饰器两项仍如实只证明消息分片，未混淆其边界。
+
+| 实际命令 | exit / 数量 | 证据 |
+|---|---|---|
+| `G2_AI_AJV=/Users/chasen/.codex/worktrees/g2-master/ontology-platform/node_modules/.pnpm/ajv@6.15.0/node_modules/ajv python3 scripts/acceptance/mcp-agent.py --label final-dependencies-green` | 0；33通过/0失败/0跳过；41.815秒（原31+全真实Unicode2） | [完整实际记录](final-dependencies-green.json) |
+| 上述locked restore/build及四模块EF migration | 均0；锁未变化、无新依赖 | 同上；真实隔离随机回环PG/Jena/RustFS，结束清理本次容器 |
+| 实际MCP Schema传输比对和Ajv共同关键字子集 | 0；3正例/6负例；mediaTypes=text/event-stream | 同上；仍不是完整2020-12方言认证 |
+| AgentTests目录 `dotnet format OntologyPlatform.AgentTests.csproj --no-restore --verify-no-changes --include AgentFixture.cs MessageChunkTests.cs --verbosity diagnostic` | 0 | [实际AgentTests分析器执行](final-dependencies-format.json) |
+| `pwsh -NoProfile -File scripts/verify.ps1 -SelfTest` | 0；ReviewPackage35/0失败 | [SelfTest](final-dependencies-selftest.json) |
+| `git diff --check` | 0 | 无空白错误 |
+
+全套运行时源码基准为47826ae加新增测试；21个被测源码hash已逐项匹配固定`e06688b`提交，mismatches为空。Master可只消费本次两个owned提交及证据提交，其余六个指定依赖已经拥有。这里证明最终指定SEM/QRY依赖下AI集成通过，不声称重新执行了整个SEM64/QRY49独立套件。Master自身最终Host/健康/观测组合、同Head CI和唯一ZIP仍归Master；真实付费模型、浏览器全链等既有NOT_RUN保持。完成后停止，供限定夹具复核与集成。
