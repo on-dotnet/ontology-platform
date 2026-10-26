@@ -1,3 +1,9 @@
+# PRE-G3-CLEANUP-FIX-002 当前授权增量（2026-10-26）
+
+当前 **EXECUTING**。人类正式批准[整改附件V1](../evidence/PRE-G3-CLEANUP-FIX-002/authorization-v1.md)全部执行，上一轮Review V2通过、实际Git/Worktree/Docker清理缺口由本任务整改。已关闭阶段不再要求无法获得的旧聊天不存在证明；保护当前任务、私有资料与真实独特未集成成果，逐项列阻断。允许精确安全白名单真实Apply、工具/测试、公开history只读检查、独立Review/同HeadCI、Master集成main/push与唯一ZIP。具体见[任务卡](PRE-G3-CLEANUP-FIX-002.md)。Base de2c020c486df5557b1b17f6b62c1befd96312f2。存在安全候选却0删除为FAIL。不改G2业务、不进入G3、不重写Git历史/全局清理/付费调用。此新授权覆盖先前统一KEEP/DEFERRED的推定，历史事实仍保留。
+
+---
+
 # PRE-G3-HYGIENE-001 当前授权增量（2026-10-26）
 
 当前：**READY_FOR_REVIEW / PARTIAL**。人类正式批准[附件V1全部任务](../evidence/PRE-G3-HYGIENE-001/authorization-v1.md)，由本轮Master从main `46c7a6de70b1b97c032b12a19bc27c1c54e70f4c`实施资源只读盘点、安全分类、Review ZIP V2、符合条件的回收、DoD、独立Review/验证、Git集成Push与唯一轻量ZIP。唯一分支`codex/PRE-G3-HYGIENE-001`，任务见[合同与计划](PRE-G3-HYGIENE-001.md)。保护活跃/旧G2 Master与未集成树、持久数据、凭证及跨项目资源；疑义DEFERRED。不调用付费模型、不安装依赖、不实施G3、不启动G3 Plan；交PRE_G3_HYGIENE_READY_FOR_REVIEW后停止。历史审批/未运行状态全部保留。
