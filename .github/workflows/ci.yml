@@ -46,7 +46,7 @@ jobs:
         run: Write-Output 'Web checks ran separately above; real browser OIDC/LGTM acceptance is recorded separately. Governance container tests run in the mandatory integration job.'
   governance-integration:
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -64,3 +64,6 @@ jobs:
       - name: Real PostgreSQL security integration
         shell: pwsh
         run: python3 scripts/acceptance/test-governance.py
+      - name: Real G2 semantic publishing query MCP MAF and native SSE integration
+        shell: pwsh
+        run: ./scripts/acceptance/g2-integration.ps1

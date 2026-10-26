@@ -50,14 +50,14 @@ def walk(value):
             yield from walk(child)
 
 
-def main(runtime_path):
+def main(runtime_path, identity_prefix='wave2'):
     path = Path(runtime_path).resolve()
     if not path.is_relative_to((ROOT / '.tools/security').resolve()) or (os.name != 'nt' and path.stat().st_mode & 0o077):
         raise ValueError('Expected this checkout private runtime')
     runtime = json.loads(path.read_text())
     realm = json.loads(Path(runtime['realmFile']).read_text())
     driver = OIDC.ProtocolDriver('http://localhost:15100', 'http://localhost:15101', realm['authority'])
-    cookie = driver.login(realm['identities']['wave2-auditor-a'])
+    cookie = driver.login(realm['identities'][identity_prefix + '-auditor-a'])
     identity, _ = driver.json_request(driver.first, '/api/v1/platform/me', 200, 'real-auditor-identity')
     subject = identity['subjectId']
     if not re.fullmatch(r'[a-fA-F0-9-]{16,64}', subject):
@@ -142,9 +142,10 @@ def main(runtime_path):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--runtime-file', required=True)
+    parser.add_argument('--identity-prefix', choices=['wave2','g2'], default='wave2')
     args = parser.parse_args()
     try:
-        main(args.runtime_file)
+        main(args.runtime_file, args.identity_prefix)
     except Exception as failure:
         (EVIDENCE / 'closeout-observability-failure.json').write_text(json.dumps({'status': 'FAIL', 'category': type(failure).__name__, 'checks': CHECKS}, ensure_ascii=False, indent=2) + '\n')
         print('FAIL: closeout runtime acceptance; category=' + type(failure).__name__ + '; details suppressed')

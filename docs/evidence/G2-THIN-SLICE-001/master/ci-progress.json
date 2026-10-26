@@ -1,0 +1,26 @@
+{
+  "status": "IN_PROGRESS",
+  "runs": [
+    {
+      "id": 40260902743,
+      "headSha": "f0a54eda74d3bb8e5c20c9a9d717257278dfd453",
+      "url": "https://github.com/on-dotnet/ontology-platform/actions/runs/40260902743",
+      "conclusion": "failure",
+      "engineering": "Repository policy step failed; current G2 logs have trailing whitespace, now normalized with SHA record",
+      "governanceIntegration": {
+        "status": "FAIL",
+        "tests": 101,
+        "passed": 99,
+        "failed": 2,
+        "skipped": 0,
+        "failures": [
+          "RevisionPreconditionMatchesCommand strong ETag success expected200 actual500",
+          "MiddlewareSuccessContinuesToNativeBindingAndGuard valid request expected200 actual500"
+        ],
+        "diagnosis": "candidate strict canonical DTO callbacks reject incomplete fixture OntologyDraft; local Release regression reproduced 8pass/2fail from10, Owner confirming and fixing fixture only"
+      }
+    }
+  ],
+  "finalSameHeadCI": "NOT_RUN",
+  "notes": "No GitHub protection/billing/resource settings changed; old failing CI not hidden."
+}

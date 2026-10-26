@@ -1,6 +1,6 @@
 /** 真实OIDC/BFF纵向检查；不保存浏览器网络、Cookie、凭证或登录页面截图。 */
 import { createRequire } from 'node:module';
-import { readFile, writeFile } from 'node:fs/promises';
+import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { resolve, relative, sep } from 'node:path';
 import { randomUUID, createHash } from 'node:crypto';
 const root = resolve(import.meta.dirname, '../..');
@@ -78,13 +78,115 @@ try {
   check('actual_auditor_reads_governance_audit', facts.status() === 200);
   const entries = await facts.json();
   check('success_and_denial_audits_persisted', entries.some(value => value.action === 'ontology.create' && value.outcome === 'allowed') && entries.some(value => value.outcome === 'denied'));
+  phase = 'real_ui_source_import';
+  const page = operator.page;
+  const uiErrors = [];
+  page.on('pageerror', () => uiErrors.push('pageerror'));
+  await page.goto(origin + '/ontologies');
+  await page.getByRole('heading', { name: '本体资产与草稿', exact: true }).waitFor();
+  const uiName = 'Synthetic live UI ' + randomUUID().slice(0,8);
+  await page.getByRole('textbox', { name: '资产名称', exact: true }).fill(uiName);
+  await page.getByLabel('额外授权厂区 site-b').check();
+  for (const [key,file] of [['ontologyTurtle','ontology.ttl'],['shapesTurtle','shapes.ttl'],['vocabularyTurtle','vocabulary.ttl'],['dataTurtle','data.ttl']]) {
+    await page.getByRole('combobox', { name: '选择源文档', exact: true }).selectOption(key);
+    await page.getByLabel('载入' + file, { exact: true }).setInputFiles(resolve(root, 'samples/g2', file));
+  }
+  await page.getByRole('textbox', { name: '变更理由', exact: true }).fill('Synthetic real browser source acceptance');
+  const createResult = page.waitForResponse(response => response.url() === origin + '/api/v1/ontology-drafts' && response.request().method() === 'POST');
+  await page.getByRole('button', { name: '创建真实草稿', exact: true }).click();
+  const uiCreatedResponse = await createResult;
+  check('ui_four_real_file_import_create', uiCreatedResponse.status() === 200, uiCreatedResponse.status());
+  const uiCreated = await uiCreatedResponse.json();
+  check('ui_full_scope_and_source_exact', JSON.stringify(uiCreated.sources) === JSON.stringify(sources) && JSON.stringify(uiCreated.scope.siteIds) === JSON.stringify(['site-a','site-b']));
+  await page.getByRole('heading', { name: 'RDF 结构投影', exact: true }).waitFor();
+  phase = 'real_ui_structural_edit';
+  await page.getByRole('combobox', { name: '结构操作', exact: true }).selectOption('add');
+  const addedIri = 'urn:synthetic:live:Class:' + randomUUID();
+  await page.getByRole('textbox', { name: '主体IRI', exact: true }).fill(addedIri);
+  await page.getByRole('combobox', { name: '标准声明快捷填入', exact: true }).selectOption('http://www.w3.org/2002/07/owl#Class');
+  const editResult = page.waitForResponse(response => response.url().endsWith('/' + uiCreated.draftId + '/edits') && response.request().method() === 'POST');
+  await page.getByRole('button', { name: '提交真实结构编辑', exact: true }).click();
+  const editedResponse = await editResult;
+  check('ui_real_structural_edit', editedResponse.status() === 200, editedResponse.status());
+  const edited = await editedResponse.json();
+  check('ui_projection_tracks_saved_revision', edited.revision === 2 && edited.projection.revision === edited.revision && edited.projection.nodes.some(node => node.id === addedIri));
+  phase = 'real_ui_concurrent_cas';
+  await page.getByRole('combobox', { name: '选择源文档', exact: true }).selectOption('ontologyTurtle');
+  const localText = edited.sources.ontologyTurtle + '\n# Synthetic local pending\n';
+  const editor = page.getByRole('textbox', { name: '本体 · OWL源码', exact: true });
+  await editor.fill(localText);
+  const remoteResponse = await operator.api.put(origin + '/api/v1/ontology-drafts/' + edited.draftId, { data: { name: edited.name, sources: { ...edited.sources, ontologyTurtle: edited.sources.ontologyTurtle + '\n# Synthetic concurrent remote\n' }, command: command(edited.revision) }, headers: { ...operator.headers, 'If-Match': '"' + edited.revision + '"' } });
+  check('ui_concurrent_real_remote_save', remoteResponse.status() === 200, remoteResponse.status());
+  const remote = await remoteResponse.json();
+  const conflictResult = page.waitForResponse(response => response.url().endsWith('/' + edited.draftId) && response.request().method() === 'PUT');
+  await page.getByRole('button', { name: '保存新修订', exact: true }).click();
+  check('ui_stale_revision_real_409', (await conflictResult).status() === 409);
+  await page.getByRole('alert').filter({ hasText: '版本冲突' }).waitFor();
+  check('ui_409_preserves_local_text', await editor.inputValue() === localText);
+  await page.getByRole('button', { name: '读取远端版本', exact: true }).click();
+  await page.getByRole('heading', { name: '远端 revision ' + remote.revision + ' 与本地文本对比', exact: true }).waitFor();
+  check('ui_remote_compare_preserves_local_text', await editor.inputValue() === localText);
+  await page.getByRole('button', { name: '丢弃本地内容并载入此远端版本', exact: true }).click();
+  check('ui_explicit_discard_loads_remote', await editor.inputValue() === remote.sources.ontologyTurtle);
+  phase = 'real_ui_shacl_and_diff';
+  const validatedResult = page.waitForResponse(response => response.url().endsWith('/' + edited.draftId + '/validations') && response.request().method() === 'POST');
+  await page.getByRole('button', { name: '验证已保存修订', exact: true }).click();
+  const validatedResponse = await validatedResult;
+  check('ui_real_shacl_conforms', validatedResponse.status() === 200 && (await validatedResponse.json()).conforms === true);
+  const diffResult = page.waitForResponse(response => response.url().includes('/' + edited.draftId + '/diff?'));
+  await page.getByRole('button', { name: '读取真实 Diff', exact: true }).click();
+  const diffResponse = await diffResult;
+  const uiDiff = await diffResponse.json();
+  check('ui_real_diff_revisions_and_triple', diffResponse.status() === 200 && uiDiff.baseRevision === 1 && uiDiff.targetRevision === remote.revision && uiDiff.addedTriples.some(triple => triple.subject.value === addedIri));
+  phase = 'real_ui_export';
+  const downloadResult = page.waitForEvent('download');
+  await page.getByRole('button', { name: '导出原始源', exact: true }).click();
+  const downloaded = await downloadResult;
+  check('ui_export_exact_server_source_bytes', (await readFile(await downloaded.path())).equals(Buffer.from(remote.sources.ontologyTurtle, 'utf8')));
+  phase = 'real_ui_layouts';
+  await mkdir(resolve(root, 'docs/evidence/G2-THIN-SLICE-001/master/screenshots'), { recursive: true });
+  for (const width of [1440,1280,390]) {
+    await page.setViewportSize({ width, height: 1000 });
+    if (width === 390) await page.getByRole('button', { name: '图与校验', exact: true }).click();
+    for (const theme of ['dark','light']) {
+      if ((await page.evaluate(() => document.documentElement.dataset.theme ?? 'dark')) !== theme) await page.getByRole('button', { name: '切换深浅主题', exact: true }).click();
+      const layout = await page.evaluate(() => ({ width: innerWidth, scrollWidth: document.documentElement.scrollWidth, overflowing: [...document.querySelectorAll('body *')].filter(element => element.getBoundingClientRect().right > innerWidth + 1).slice(0,30).map(element => ({ tag: element.tagName, className: typeof element.className === 'string' ? element.className : '', width: Math.round(element.getBoundingClientRect().width), right: Math.round(element.getBoundingClientRect().right) })) }));
+      if (layout.scrollWidth > layout.width) {
+        layout.computed = await page.evaluate(() => [...document.querySelectorAll('.g2-inspector, .g2-inspector > section, .g2-inspector label, .g2-inspector select, .g2-graph, .g2-graph > div')].slice(0,35).map(element => {
+          const style = getComputedStyle(element);
+          return { tag: element.tagName, className: element.className, width: style.width, minWidth: style.minWidth, maxWidth: style.maxWidth, display: style.display, gridTemplateColumns: style.gridTemplateColumns, overflowWrap: style.overflowWrap, whiteSpace: style.whiteSpace, position: style.position, rectWidth: Math.round(element.getBoundingClientRect().width) };
+        }));
+        layout.g2Styles = await page.evaluate(() => {
+          const result = [];
+          function inspect(rules) { for (const rule of rules) { if (rule.selectorText?.includes('.g2-')) result.push(rule.cssText); if (rule.cssRules) inspect(rule.cssRules); } }
+          for (const sheet of document.styleSheets) { try { inspect(sheet.cssRules); } catch { } }
+          return result;
+        });
+        layout.cssAssets = [];
+        for (const asset of await page.evaluate(() => [...document.querySelectorAll('link[rel=stylesheet]')].map(value => value.href))) {
+          const body = await operator.api.get(asset);
+          const bytes = await body.body();
+          layout.cssAssets.push({ url: asset, status: body.status(), size: bytes.length, sha256: createHash('sha256').update(bytes).digest('hex') });
+        }
+        await writeFile(resolve(root, 'docs/evidence/G2-THIN-SLICE-001/master/live-layout-red.json'), JSON.stringify(layout,null,2) + '\n');
+        await page.screenshot({ path: resolve(root, 'docs/evidence/G2-THIN-SLICE-001/master/screenshots/live-s1-' + width + '-' + theme + '-red.png'), fullPage: true, animations: 'disabled' });
+      }
+      check('ui_' + width + '_' + theme + '_no_horizontal_overflow', layout.scrollWidth <= layout.width);
+      await page.screenshot({ path: resolve(root, 'docs/evidence/G2-THIN-SLICE-001/master/screenshots/live-s1-' + width + '-' + theme + '.png'), fullPage: true, animations: 'disabled' });
+    }
+  }
+  check('ui_no_uncaught_hydration_errors', uiErrors.length === 0);
+  if (process.argv.includes('--full')) {
+    const { fullChain } = await import('./g2-full-chain.mjs');
+    await fullChain({ root, origin, operator, audit, single, viewer, draft: remote, check, command, setPhase: value => { phase = value; } });
+  }
   for (const user of [operator, single, viewer, audit]) await user.context.close();
 } catch (error) {
   failure = { phase, category: error?.name ?? 'Error', details: 'SUPPRESSED' };
 } finally {
   await browser?.close();
-  const report = { stage: 'S1_HTTP_REAL_OIDC', status: failure ? 'FAIL' : 'PASS', overallG2: 'PARTIAL', checks, failure, notRun: ['G2 UI source interaction','S2 publishing browser','S3 gateway MCP MAF SSE','final regression and CI'] };
-  await writeFile(resolve(root, 'docs/evidence/G2-THIN-SLICE-001/master/live-s1-http.json'), JSON.stringify(report,null,2) + '\n');
+  const report = { stage: process.argv.includes('--full') ? 'FULL_G2_REAL_OIDC' : 'S1_HTTP_UI_REAL_OIDC', status: failure ? 'FAIL' : 'PASS', overallG2: 'PARTIAL', checks, failure, notRun: process.argv.includes('--full') ? (failure ? ['remaining steps after ' + phase, 'final sameHead CI'] : ['final sameHead CI', 'real model BLOCKED', 'Monaco PAUSED_BY_USER', 'Windows/Intel/production NOT_RUN']) : ['S2 publishing browser','S3 gateway MCP MAF SSE','final regression and CI'] };
+  await writeFile(resolve(root, 'docs/evidence/G2-THIN-SLICE-001/master/' + (process.argv.includes('--full') ? 'full-g2-e2e.json' : 'live-s1-http.json')), JSON.stringify(report,null,2) + '\n');
   console.log(JSON.stringify({ stage: report.stage, status: report.status, passed: checks.filter(value => value.status === 'PASS').length, failure }));
   if (failure) process.exitCode = 1;
 }

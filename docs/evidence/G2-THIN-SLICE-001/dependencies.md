@@ -1,6 +1,6 @@
 # G2 精确依赖登记与实施前门禁
 
-2026-10-26；状态APPROVED_FOR_PROJECT_USE / COMPATIBILITY_PENDING；2026-10-26人类在本会话明确批准下述精确五组及核实的必要传递依赖，尚未安装或改产品锁。授权V1已确认技术方向，但第1.9/3/7节要求精确第三方版本、许可、安全/商用及用途先登记核实；本表不是兼容运行PASS。
+2026-10-26；状态PROJECT_INSTALLED / PARTIAL；初始登记表为实施前快照，实际进展以末节为准。2026-10-26人类在本会话明确批准下述精确五组及核实的必要传递依赖，现已在项目锁中实施获批安全闭包，Monaco例外继续暂停。授权V1已确认技术方向，但第1.9/3/7节要求精确第三方版本、许可、安全/商用及用途先登记核实；本表不是兼容运行PASS。
 
 | 精确包 | 维护者/官方来源 | 许可/商用 | 用途与边界 | 当前安全与兼容状态 |
 |---|---|---|---|---|
@@ -29,3 +29,9 @@ Critical GHSA-cg2g-xh64-v4q7、High GHSA-mrv2-3pqr-j5jr；官方advisory给修�
 ## 人类安全门禁决定：继续暂停Monaco（2026-10-26）
 
 用户明确选择“继续暂停Monaco，推进其他任务”。未应用任何pnpm override；移除Monaco及DOMPurify/marked等本次带来的传递图，不将漏洞依赖提交产品锁。Cytoscape3.34.4继续按原批准执行。Monaco功能状态PAUSED_BY_USER/BLOCKED，原生源码备用编辑仅作为真实备用能力，不计Monaco验收PASS；其余SEM/PUB/QRY/MCP/MAF/SSE与FE继续。后续若重启Monaco依赖需新的安全修复批准/核实，不以当前普通执行授权覆盖暂停决定。
+
+## 已锁定闭包与实际兼容（实施更新）
+
+实际产品直接包仅Microsoft.Agents.AI1.26.0、Microsoft.Extensions.AI10.11.0、ModelContextProtocol.AspNetCore2.3.0；Web仅新增cytoscape3.34.4，无runtime传递包。Monaco不在产品package/锁，未用override。NuGet CPM、Agents/Api/Test锁均精确版本，实际必要新增传递（相对Base全部backend锁）13项机器清单见master/nuget-new-dependency-licenses.json；包括MCP主/Core及Microsoft.Agents.AI.Abstractions、AI.Abstractions10.11.0、AI.Evaluation10.10.0、Compliance/VectorData.Abstractions10.10.0、ML.Tokenizers2.0.0、Tensors10.0.13、Google.Protobuf3.30.2。这些为批准SDK正常解析的必要传递，不新增直接MAF扩展。SPDX全部MIT/Apache-2.0/BSD-3-Clause，未发现Preview或许可冲突；来源为受控恢复的官方NuGet nuspec，保留官方许可/仓库归属元数据，不打包缓存/认证材料。
+
+实际NuGet新依赖闭包已知漏洞查询master/nuget-final-vulnerability.json来自api.nuget.org；无报告命中仅代表该时间数据库查询，不是供应链全认证。标准包分发许可证保留义务继续适用，Review源码包不包含重分发NuGet/npm二进制缓存。Cytoscape真实SSR客户端懒加载、实际1440/1280/390深浅主题和正式RDF工作区已通过41项真实OIDC浏览器检查，FE76/76单测及构建通过；MCP2.3/MAF1.26+AI10.11真实SDK+Gateway+PG33/33与完整浏览器102/102工具链通过。以上仍不是付费真实模型或Monaco验收；最终Head CI继续等待，不把早期兼容PoC算产品全通过。

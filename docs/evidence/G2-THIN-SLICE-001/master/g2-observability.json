@@ -1,0 +1,108 @@
+{
+  "status": "PASS",
+  "checks": [
+    {
+      "check": "only_real_valid_persisted_trace_ids",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_tempo_trace_c8573ea9d669f4a246723b2b0b20ee15",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_export_contains_no_prompt_source_or_private_runtime_values",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_tempo_trace_33a3526349660f532dc93daae98ad08d",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_export_contains_no_prompt_source_or_private_runtime_values",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_tempo_trace_972320e60d27a69f4bd80211af6128b1",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_export_contains_no_prompt_source_or_private_runtime_values",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_tempo_trace_f31a9437c06c1b6121fa3ca00d1d2915",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_export_contains_no_prompt_source_or_private_runtime_values",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_tempo_trace_f2ee41c867eff9c6fda33c1f623d6062",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_export_contains_no_prompt_source_or_private_runtime_values",
+      "status": "PASS"
+    },
+    {
+      "check": "worker_real_separate_trace_associated_to_creation",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_maf_worker_and_gateway_spans",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_worker_creation_link_tag",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_export_contains_no_prompt_source_or_private_runtime_values",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_g2_loki_entries",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_export_contains_no_prompt_source_or_private_runtime_values",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_loki_only_three_index_dimensions",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_product_meter_ontology_semantic_duration_milliseconds_count",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_product_meter_publishing_operations_total",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_product_meter_semantic_query_count_total",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_product_meter_agents_run_count_total",
+      "status": "PASS"
+    },
+    {
+      "check": "product_metrics_no_identity_prompt_or_source_dimensions",
+      "status": "PASS"
+    },
+    {
+      "check": "product_metric_values_respect_actual_finite_contract",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_export_contains_no_prompt_source_or_private_runtime_values",
+      "status": "PASS"
+    }
+  ],
+  "workerTraceDesign": "actual independent execution.run trace with persisted creation_trace_id tag; never a fabricated parent span",
+  "officialSearchApi": "https://grafana.com/docs/tempo/latest/api_docs/",
+  "scope": "actual product emissions, own local synthetic stack; no model calls or production data"
+}

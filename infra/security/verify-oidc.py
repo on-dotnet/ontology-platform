@@ -187,7 +187,7 @@ def run(arguments):
             driver.json_request(driver.first, '/api/v1/platform/me', 401, 'anonymous-denied')
             driver.json_request(driver.first, '/signin-oidc?error=invalid_request', 400, 'bad-callback-rejected')
             driver.json_request(driver.first, '/api/v1/platform/me', 400, 'forged-forwarded-rejected', headers={'X-Forwarded-Host': 'evil.invalid'})
-            cookie = driver.login(realm['identities']['wave2-' + label])
+            cookie = driver.login(realm['identities'][getattr(arguments, 'identity_prefix', 'wave2') + '-' + label])
             tampered = copy.deepcopy(cookie)
             tampered.value = 'synthetic-invalid-session-reference'
             driver.jar.set_cookie(tampered)
@@ -226,6 +226,7 @@ def run(arguments):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--runtime-file', required=True)
+    parser.add_argument('--identity-prefix', choices=['wave2','g2'], default='wave2')
     parser.add_argument('--first-origin', default='http://localhost:15100')
     parser.add_argument('--second-origin', default='http://localhost:15101')
     arguments = parser.parse_args()

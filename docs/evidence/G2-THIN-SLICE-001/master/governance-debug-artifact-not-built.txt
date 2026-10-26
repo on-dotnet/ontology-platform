@@ -1,0 +1,33 @@
+18598b06b013bdf6e309b4d9f26dc696bc9497299819036a8538a5af52e8f2fb
+工具“dotnet-ef”(版本“10.0.13”)已还原。可用的命令: dotnet-ef
+
+还原成功。
+Failed executing DbCommand (7ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM governance."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261025062847_InitialGovernance'.
+Applying migration '20261025144246_AuditScopeSites'.
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Done.
+d0488029af1bb00ea1bbc3aed394e255e5c6ee8b6b936087b6a6a999bc494d5a
+{"status": "CREATED", "realm": "wave2-9095de1ba23573e5", "identities": ["wave2-viewer-a", "wave2-viewer-b", "wave2-no-role-a", "wave2-operator-a", "wave2-auditor-a"], "secrets": "runtime-only"}
+使用 RunCommand ‘/Users/chasen/.codex/worktrees/g2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests’ 和 RunArguments ‘’ 运行测试模块时发生以下异常:
+
+System.ComponentModel.Win32Exception (2): An error occurred trying to start process '/Users/chasen/.codex/worktrees/g2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests' with working directory '/Users/chasen/.codex/worktrees/g2-master/ontology-platform'. No such file or directory
+   at System.Diagnostics.Process.ForkAndExecProcess(ProcessStartInfo startInfo, String resolvedFilename, String[] argv, String[] envp, String cwd, Boolean setCredentials, UInt32 userId, UInt32 groupId, UInt32[] groups, Int32& stdinFd, Int32& stdoutFd, Int32& stderrFd, Boolean usesTerminal, Boolean throwOnNoExec)
+   at System.Diagnostics.Process.StartCore(ProcessStartInfo startInfo)
+   at System.Diagnostics.Process.Start(ProcessStartInfo startInfo)
+   at Microsoft.DotNet.Cli.Commands.Test.TestApplication.RunAsync()
+   at Microsoft.DotNet.Cli.Commands.Test.TestApplication.RunAsync()
+   at Microsoft.DotNet.Cli.Commands.Test.TestApplicationActionQueue.Read(BuildOptions buildOptions, TestOptions testOptions, TestResultsDirectoryResolver resultsDirectoryResolver, TerminalTestReporter output, Action`1 onHelpRequested)
+
+测试运行摘要: 运行了零个测试
+  总计: 0
+  失败: 0
+  成功: 0
+  已跳过: 0
+  持续时间: 5ms
+已完成测试运行，但显示非成功退出代码: 1 (请参阅: https://aka.ms/testingplatform/exitcodes)
+FAIL: real governance integration; details retained only after sanitization

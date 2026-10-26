@@ -1,0 +1,25 @@
+225edf5d9720a3b13c2466831264413b13134eeb44556d1a8a28ea5d9d64a1d0
+工具“dotnet-ef”(版本“10.0.13”)已还原。可用的命令: dotnet-ef
+
+还原成功。
+Failed executing DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM governance."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261025062847_InitialGovernance'.
+Applying migration '20261025144246_AuditScopeSites'.
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Done.
+bc0914bb590a1e66ec5f06c790545834c2e603b5d58af5c4aabb611142457af5
+{"status": "CREATED", "realm": "wave2-1f6661512ab3fca1", "identities": ["wave2-viewer-a", "wave2-viewer-b", "wave2-no-role-a", "wave2-operator-a", "wave2-auditor-a"], "secrets": "runtime-only"}
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+/Users/chasen/.codex/worktrees/g2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64) 已通过 (14s 088ms)
+
+测试运行摘要: 已通过!
+  总计: 101
+  失败: 0
+  成功: 101
+  已跳过: 0
+  持续时间: 14s 823ms
+PASS: real PostgreSQL tickets/revocation/expiry/audit and real Keycloak PAR security integration.

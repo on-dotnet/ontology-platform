@@ -1,0 +1,209 @@
+{
+  "stage": "FULL_G2_REAL_OIDC",
+  "status": "FAIL",
+  "overallG2": "PARTIAL",
+  "checks": [
+    {
+      "name": "anonymous_authorization_before_malformed_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "operator-ab_real_http_only_session",
+      "status": "PASS"
+    },
+    {
+      "name": "operator-ab_csrf",
+      "status": "PASS"
+    },
+    {
+      "name": "operator_missing_csrf_denied",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "operator_real_draft_created",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "persisted_initial_sources_exact",
+      "status": "PASS"
+    },
+    {
+      "name": "all_four_utf8_hashes_match",
+      "status": "PASS"
+    },
+    {
+      "name": "real_noop_save",
+      "status": "PASS"
+    },
+    {
+      "name": "no_op_preserves_complete_source",
+      "status": "PASS"
+    },
+    {
+      "name": "persistent_readback",
+      "status": "PASS"
+    },
+    {
+      "name": "live_jena_shacl",
+      "status": "PASS"
+    },
+    {
+      "name": "viewer-a_real_http_only_session",
+      "status": "PASS"
+    },
+    {
+      "name": "viewer-a_csrf",
+      "status": "PASS"
+    },
+    {
+      "name": "full_multisite_scope_required",
+      "status": "PASS"
+    },
+    {
+      "name": "viewer-ab_real_http_only_session",
+      "status": "PASS"
+    },
+    {
+      "name": "viewer-ab_csrf",
+      "status": "PASS"
+    },
+    {
+      "name": "authorized_full_scope_read",
+      "status": "PASS"
+    },
+    {
+      "name": "role_authorization_before_malformed_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "auditor-ab_real_http_only_session",
+      "status": "PASS"
+    },
+    {
+      "name": "auditor-ab_csrf",
+      "status": "PASS"
+    },
+    {
+      "name": "actual_auditor_reads_governance_audit",
+      "status": "PASS"
+    },
+    {
+      "name": "success_and_denial_audits_persisted",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_four_real_file_import_create",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "ui_full_scope_and_source_exact",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_real_structural_edit",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "ui_projection_tracks_saved_revision",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_concurrent_real_remote_save",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "ui_stale_revision_real_409",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_409_preserves_local_text",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_remote_compare_preserves_local_text",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_explicit_discard_loads_remote",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_real_shacl_conforms",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_real_diff_revisions_and_triple",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_export_exact_server_source_bytes",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_1440_dark_no_horizontal_overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_1440_light_no_horizontal_overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_1280_dark_no_horizontal_overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_1280_light_no_horizontal_overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_390_dark_no_horizontal_overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_390_light_no_horizontal_overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_no_uncaught_hydration_errors",
+      "status": "PASS"
+    },
+    {
+      "name": "actual_three_capability_registry",
+      "status": "PASS"
+    },
+    {
+      "name": "executor_v4_and_exact_tools",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_command_0",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "http_decisions_1",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "http_release-activations_2",
+      "status": "FAIL",
+      "observedStatus": 428
+    }
+  ],
+  "failure": {
+    "phase": "s2_ui_proposal",
+    "category": "Error",
+    "details": "SUPPRESSED"
+  },
+  "notRun": [
+    "S2 publishing browser",
+    "S3 gateway MCP MAF SSE",
+    "final regression and CI"
+  ]
+}

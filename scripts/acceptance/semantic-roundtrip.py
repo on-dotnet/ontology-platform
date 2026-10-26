@@ -13,7 +13,7 @@ import urllib.parse
 
 ROOT = Path(__file__).resolve().parents[2]
 EVIDENCE = ROOT / 'docs/evidence/G2-THIN-SLICE-001/SEM'
-JENA = 'fuseki:8b85cd963ab3910a87ff4d69819a814fcc536d5f'
+JENA = os.environ.get('G2_TEST_JENA_IMAGE', 'ontology-platform-g2-fuseki:6.2.0')
 PG = 'postgres:18.6-trixie@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6'
 
 
@@ -39,8 +39,12 @@ def main(test_filter=None, postgres=False, label='semantic-roundtrip'):
             raise RuntimeError('SEM command failed; see recorded exit code')
         return result
 
-    with tempfile.TemporaryDirectory(prefix=name, dir='/private/tmp') as directory:
+    with tempfile.TemporaryDirectory(prefix=name, dir='/private/tmp' if Path('/private/tmp').is_dir() else None) as directory:
         path = Path(directory)
+        # 仅无秘密的Jena配置子目录对容器UID可读，私有父目录仍由临时目录机制保护。
+        fixture = path / 'fixture'
+        fixture.mkdir(mode=0o755)
+        fixture.chmod(0o755)
         config = '''@prefix fuseki: <http://jena.apache.org/fuseki#> .
 @prefix ja: <http://jena.hpl.hp.com/2005/11/Assembler#> .
 @prefix tdb2: <http://jena.apache.org/2016/tdb#> .
@@ -53,12 +57,18 @@ def main(test_filter=None, postgres=False, label='semantic-roundtrip'):
  fuseki:endpoint [ fuseki:operation fuseki:shacl ; fuseki:name "shacl" ] .
 '''
         config += '<#memory> a ja:MemoryDataset .\n<#tdb> a tdb2:DatasetTDB2 ; tdb2:location "/tmp/sem-tdb" .\n'
-        (path / 'config.ttl').write_text(config)
+        (fixture / 'config.ttl').write_text(config)
         # Disable request, parser and query plaintext outlets, including failure paths.
-        (path / 'log4j2.properties').write_text('status=error\nrootLogger.level=OFF\n')
+        (fixture / 'log4j2.properties').write_text('status=error\nrootLogger.level=OFF\n')
+        for public_file in fixture.iterdir():
+            public_file.chmod(0o644)
         try:
+            modes = {'fixture': oct(fixture.stat().st_mode & 0o777), **{file.name: oct(file.stat().st_mode & 0o777) for file in fixture.iterdir()}}
+            if modes != {'fixture': '0o755', 'config.ttl': '0o644', 'log4j2.properties': '0o644'}:
+                raise RuntimeError('Public Jena fixture permission check failed')
+            records.append(dict(check='public-jena-fixture-modes', exitCode=0, modes=modes))
             run(['docker', 'run', '--detach', '--name', name, '--publish', '127.0.0.1::3030', '--memory', '768m', '--cpus', '1',
-                 '--mount', f'type=bind,src={path},dst=/fixture,readonly', '--entrypoint', 'java', JENA,
+                 '--mount', f'type=bind,src={fixture},dst=/fixture,readonly', '--entrypoint', 'java', JENA,
                  '-Xmx384m', '-Dlog4j.configurationFile=/fixture/log4j2.properties', '-jar', '/opt/fuseki/fuseki-server.jar', '--config=/fixture/config.ttl'])
             port = run(['docker', 'port', name, '3030/tcp']).stdout.strip().rsplit(':', 1)[1]
             origin = 'http://127.0.0.1:' + port

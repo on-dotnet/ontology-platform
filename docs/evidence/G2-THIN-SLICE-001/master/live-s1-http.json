@@ -1,5 +1,5 @@
 {
-  "stage": "S1_HTTP_REAL_OIDC",
+  "stage": "S1_HTTP_UI_REAL_OIDC",
   "status": "PASS",
   "overallG2": "PARTIAL",
   "checks": [
@@ -92,11 +92,89 @@
     {
       "name": "success_and_denial_audits_persisted",
       "status": "PASS"
+    },
+    {
+      "name": "ui_four_real_file_import_create",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "ui_full_scope_and_source_exact",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_real_structural_edit",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "ui_projection_tracks_saved_revision",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_concurrent_real_remote_save",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "ui_stale_revision_real_409",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_409_preserves_local_text",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_remote_compare_preserves_local_text",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_explicit_discard_loads_remote",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_real_shacl_conforms",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_real_diff_revisions_and_triple",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_export_exact_server_source_bytes",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_1440_dark_no_horizontal_overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_1440_light_no_horizontal_overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_1280_dark_no_horizontal_overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_1280_light_no_horizontal_overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_390_dark_no_horizontal_overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_390_light_no_horizontal_overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_no_uncaught_hydration_errors",
+      "status": "PASS"
     }
   ],
   "failure": null,
   "notRun": [
-    "G2 UI source interaction",
     "S2 publishing browser",
     "S3 gateway MCP MAF SSE",
     "final regression and CI"

@@ -1,0 +1,33 @@
+{
+  "exitCode": 0,
+  "runtimeOnly": true,
+  "notRun": [
+    "engineering/native/container suites in this invocation"
+  ],
+  "records": [
+    {
+      "command": [
+        "python3",
+        "infra/security/verify-oidc.py",
+        "--runtime-file",
+        "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/.tools/security/g2-712190660deb/runtime.json",
+        "--identity-prefix",
+        "g2"
+      ],
+      "exitCode": 0,
+      "output": "docs/evidence/G2-THIN-SLICE-001/master/g1-regression-0.txt"
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/acceptance/verify-closeout-observability.py",
+        "--runtime-file",
+        "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/.tools/security/g2-712190660deb/runtime.json",
+        "--identity-prefix",
+        "g2"
+      ],
+      "exitCode": 0,
+      "output": "docs/evidence/G2-THIN-SLICE-001/master/g1-regression-1.txt"
+    }
+  ]
+}

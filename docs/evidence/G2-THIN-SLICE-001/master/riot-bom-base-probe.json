@@ -1,0 +1,17 @@
+{
+  "scope": "actual current development Jena GSP; new random memory graphs removed; no product/API acceptance claim",
+  "checks": [
+    {
+      "case": "no_bom",
+      "status": 201
+    },
+    {
+      "case": "bom_at_document_start",
+      "status": 201
+    },
+    {
+      "case": "base_then_bom",
+      "status": 500
+    }
+  ]
+}

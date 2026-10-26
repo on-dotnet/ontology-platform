@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "command": "python3 scripts/acceptance/verify-openapi.py",
+  "checked": [
+    "paths",
+    "response-status-and-media",
+    "all-public-DTO-fields-types-required",
+    "error-schema",
+    "stable-operationIds",
+    "session-security",
+    "parameters-bounds",
+    "native-CSRF-form"
+  ],
+  "errors": []
+}
