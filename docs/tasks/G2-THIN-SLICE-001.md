@@ -32,7 +32,7 @@
 
 ## 初始所有权
 
-Master：`codex/G2-THIN-SLICE-001-master`，`/Users/chasen/.codex/worktrees/g2-master/ontology-platform`。公共合同/目录项目注册/中央包与全部锁/迁移/CI/AppHost/Design Tokens/授权和总证据唯一Owner。SEM/FE/PUB/QRY/AI具体owned_paths、接口、任务树和Reviewer在共享契约冻结时建立，未建立前仅只读调查。
+Master：`codex/G2-THIN-SLICE-001-master`，`/Users/chasen/.codex/worktrees/g2-master/ontology-platform`。公共合同/目录项目注册/中央包与全部锁/迁移/CI/AppHost/Design Tokens/授权和总证据唯一Owner。SEM/FE已建立独立树`/Users/chasen/.codex/worktrees/g2-sem/ontology-platform`/`codex/G2-SEM-001`与`/Users/chasen/.codex/worktrees/g2-fe/ontology-platform`/`codex/G2-FE-001`；owned_paths见下具体任务。PUB/QRY/AI在前置门通过后分别创建同名g2-pub/g2-qry/g2-ai托管树及codex/G2-PUB-001、codex/G2-QRY-001、codex/G2-AI-001分支，实际创建回执再登记，不虚称已存在。每项Reviewer由Master另派独立quality_reviewer（实现者无审查自身写入权）；首个契约Reviewer=g2_contract_review。未冻结前仅调查/批准的隔离兼容PoC，无产品写任务。
 
 ## 恢复账本
 
@@ -42,7 +42,7 @@ Master：`codex/G2-THIN-SLICE-001-master`，`/Users/chasen/.codex/worktrees/g2-m
 
 ### Task 1: Master合同、运行组合与共享基础
 
-**Files:** `docs/contracts/g2-thin-slice-contracts.md`、ADR-009、唯一`backend/src/Contracts/OntologyPlatform.Contracts/**`；所有项目/solution/CPM/lock/迁移；`Api/G2/G2Authorization.cs`、`G2EndpointGuard.cs`、宿主原文件；AppHost/Fuseki配置；TS生成器/client及Design Tokens。
+**Files:** `docs/contracts/g2-thin-slice-contracts.md`、ADR-009、唯一`backend/src/Contracts/OntologyPlatform.Contracts/**`；所有项目/solution/CPM/lock/迁移；`Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs`及其专属合同；`Api/G2/G2Authorization.cs`、`G2EndpointGuard.cs`、宿主原文件；AppHost/Fuseki配置；TS生成器/client及Design Tokens。
 **Interfaces:** 具体化合同§3–7的唯一DTO与显式用例接口，全部Owner消费同一项目。Master持有运行开关与安全组合，无G2配置的历史G1测试保持原路由能力；启用G2时严格配置与真实探针，不悄悄fallback。所有新依赖仅批准精确包和安全闭包。
 
 - [ ] 1. 对完整合同/Task DAG/Single Writer进行独立固定提交审查，P0/P1关闭才冻结。
@@ -78,7 +78,7 @@ Master：`codex/G2-THIN-SLICE-001-master`，`/Users/chasen/.codex/worktrees/g2-m
 **Files:** owned `backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/**/*.cs`、`.../OntologyPlatform.Modules.Publishing/**/*.cs`（排除Migrations）、`Api/G2/PublishingEndpoints.cs`、`backend/tests/OntologyPlatform.PublishingTests/**/*.cs`、`scripts/acceptance/release-faults.py`、`docs/evidence/G2-THIN-SLICE-001/PUB/**`。共享合同/迁移/项目/锁/Host只读。
 **Interfaces:** 消费Ontology固定revision/验证/受控runtime、Governance-owned enlisted审计、唯一Manifest/Snapshot/Proposal；产出`PublishingService`提案/异人审批/准备/激活/回滚/manifest读取与`PublishingDbContext`、`ReleaseOutboxDispatcher`。Master注册DI/迁移。正式graph和不可变object供QRY固定snapshot读取。
 
-- [ ] 1. S1最小验证通过后先真实负例：无批准/自批/角色/过期/修改revision；RustFS/Jena写及回验/PG/CAS/审计/Outbox逐点故障、响应丢失、并发发布/ABA与幂等payload冲突。
+- [ ] 1. S1最小验证通过后先真实负例：无批准/自批/角色/过期/修改revision；RustFS/Jena写及回验/PG/CAS/审计/Outbox逐点故障、响应丢失、并发发布/ABA与幂等payload冲突；草稿已推进到revision2后ROLLBACK到R1正例，以及篡改目标manifest/过期/自批负例。
 - [ ] 2. .NET内置受控S3 SigV4适配精确所需子集，不新增AWS包；不可变源/manifest GET hash回验；隔离版本图/真实SHACL及正式查询一致后才能短事务激活。
 - [ ] 3. 用同物理PG连接/txn、模块owned writer和固定锁顺序原子CAS+audit+Outbox，失败旧active保持；dispatch至少一次/去重/fencing及调和真正执行，不只建空表。
 - [ ] 4. 异人审核的旧完整版本回滚、历史图保留、Run旧snapshot不混版，缺制品UNAVAILABLE；记录真实故障/恢复/幂等证据。
@@ -115,3 +115,6 @@ Master：`codex/G2-THIN-SLICE-001-master`，`/Users/chasen/.codex/worktrees/g2-m
 - [ ] 3. 独立语义/授权/发布一致性/工具安全/总体Review，重要缺口关闭后受锁构建/测试/同Head Linux CI。原CI和门禁不减。
 - [ ] 4. Master唯一集成main并push，实际确认远端SHA及同Head CI；报告命令/退出码/未完原因/分支树/精确SHA。
 - [ ] 5. 标准构包脚本生成唯一Review ZIP，独立VerifyOnly/逐成员散列/固定Git源/diff安全路径检查，交付绝对路径/size/SHA256和G2_THIN_SLICE_READY_FOR_REVIEW后停止。
+
+
+2026-10-26 契约初审：de5f09f授权范围符合，0Critical/2Important/2Minor；未派产品写任务。已核实并修正回滚与当前草稿修订冲突（PUBLISH/ROLLBACK分支），补齐跨模块投影/查询/SSE载荷精确类型，明确Master治理事务writer路径和assetId永久唯一scope。兼容PoC实际恢复/编译/加载MAF1.26.0、AI10.11.0与MCP2.3.0，NuGet全传递已知漏洞查询未报告命中；完整许可登记与实际工具调用仍待验收。修正提交后限定复审，冻结后再派写。

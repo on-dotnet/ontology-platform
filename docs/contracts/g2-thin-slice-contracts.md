@@ -28,7 +28,7 @@
 
 - `SourceBundle(ontologyTurtle, shapesTurtle, vocabularyTurtle?, dataTurtle)`：明确UTF8源，PG保存原始字符串，SHA256按Encoding.UTF8完整字节；无修改导出完全一致。data只Synthetic，本轮不访问真实五源。
 - `SourceHashes(ontologyHash, shapesHash, vocabularyHash?, dataHash, bundleHash)`：四项字节hash；bundleHash为各hash按字段顺序以LF拼接再SHA256，vocabulary absent用固定`absent`。不从TDB2回读重建权威源。
-- `OntologyDraft(draftId, assetId, scope, baseReleaseId?, revision, etag, name, sources, hashes, ownerSubjectId, updatedAtUtc, projection)`。Create选择自身合法scope；从旧release创建新draft时继承assetId/scope。revision从1单调增，每次语义源保存CAS+审计；布局位置不算语义修改。
+- `OntologyDraft(draftId, assetId, scope, baseReleaseId?, revision, etag, name, sources, hashes, ownerSubjectId, updatedAtUtc, projection)`。Create选择自身合法scope；从旧release创建新draft时继承assetId/scope。revision从1单调增，每次语义源保存CAS+审计；布局位置不算语义修改。assetId在首次创建时永久绑定唯一organization及完整scope，后续同assetId草稿/发布不得改变scope；只可新建另一个assetId。按assetId由服务器查回唯一scope和active，不按调用者厂区集合/首厂推测。
 - `RdfTerm(kind, value, datatype?, language?)`：kind为iri/blank/literal；`RdfTriple(subject,predicate,object)`和`SemanticProjection(revision,hashes,triples[],nodes[],edges[],structuralEditAllowed,diagnostics[])`是标准RDF的读模型，绝不取代Turtle权威。
 - `SemanticEdit(subjectIri, predicateIri, oldObject?, newObject?)`：仅服务器白名单RDF/OWL基本编辑。Class/subClassOf/object/datatype property/domain/range/label/comment/individual type与简单断言；全图未知/复杂公理或空白节点存在时先阻断结构编辑，源码仍完整保留可导出，源码修改须真实RIOT再保存。不得把投影重建为完整本体。
 - 支持子集/未知公理/import必须明确显示。无解析/锁定的owl:imports仅保留声明但阻断发布；不联网抓取。复杂OWL源码可保留、查看、Diff，本轮不宣称完整推理/一致性证明；发布只支持已声明可验证子集，不能默默忽略未支持公理。
@@ -49,7 +49,7 @@ Fuseki默认请求/解析日志可能含用户源码/查询，G2配置必须关�
 
 ## 5. 不可变发布、审批、激活与恢复
 
-`ReleaseProposal(proposalId,draftId,draftRevision,hashes,scope,submittedBy,submittedAt,expiresAt,status,approval?)`绑定完整sourceBundleHash和验证报告。有效期24小时；提交必须当前精确revision验证成功。审核PENDING→APPROVED/REJECTED，任何修改使旧批准不能用于当前draft；发布前短事务复核当前draft revision/hash/合法范围/未过期/独立sub。审核决定是独立REST命令，SSE不审批。
+`ReleaseProposal(proposalId,kind,assetId,scope,draftId?,draftRevision?,hashes?,validationReportId?,targetReleaseId?,targetManifestHash?,submittedBy,submittedAtUtc,expiresAtUtc,status,approval?)`明确判别`kind=PUBLISH|ROLLBACK`。有效期均24小时；审核PENDING→APPROVED/REJECTED，独立主体/角色/scope/有效期对两类完全相同。PUBLISH要求draftId/revision/hashes/成功validation，target字段必须null；提交及激活短事务中复核当前draft精确revision/hash，修改使旧批准失效。ROLLBACK要求targetReleaseId+targetManifestHash，draft/validation字段全部null；目标必须是同assetId/唯一scope已有不可变正式版本，审批固定目标manifest全部字节hash，激活回读核验旧图/制品及manifest。ROLLBACK不要求当前草稿等于旧版本，也不能借回滚绕过目标审核/过期/scope。审核决定为独立REST Command，SSE不审批。
 
 `ReleaseManifest(schemaVersion=1,releaseId,assetId,scope,draftId,revision,hashes,ontologyGraphIri,dataGraphIri,importLocks[],snapshot,artifactObjects[],createdAtUtc)`；artifactObjects含固定objectKey/hash/size/contentType。SourceBundle四类源分别不可变对象，manifest也回读hash；key包含releaseId/contenthash，不覆盖不同字节。RustFS先验证已有对象完全相等再视为幂等。批准的基础ontology/Shacl/SKOS；mapping/metric/rule未实现的数组为空且明确absent。
 
@@ -57,11 +57,11 @@ Fuseki默认请求/解析日志可能含用户源码/查询，G2配置必须关�
 
 发布状态：PREPARING→ARTIFACTS_VERIFIED→GRAPH_DEPLOYED→GRAPH_VERIFIED→ACTIVE；失败FAILED_RETRYABLE或FAILED_FINAL，保留已准备制品/图供幂等恢复，不误报已激活。准备时持久proposal/release/idempotency key，外部逐点上传/GET hash/隔离命名图加载/SHACL与受控查询回验后才进入短PG激活事务。图IRI服务器按releaseId确定，与其他release完全隔离。active键为organization+assetId+完整scope，不用首厂替代。
 
-**同数据库跨模块显式事务：** Publishing协调同一物理Npgsql连接及DbTransaction。Publishing上下文只写本模块active CAS/activation/idempotency/Outbox；Governance提供其自己拥有的enlisted审计写入器；Ontology提供其自己拥有的当前revision锁定读取用例。上下文显式UseTransaction，共享连接而不是只共享连接串。锁顺序draft→proposal→active，激活CAS包含activationRevision（每次激活/回滚递增，避免ABA）、expectedActiveReleaseId和scope；首次active也有唯一约束。任一步/审计/Outbox失败全回滚。commit后才返回X-Audit-Id/成功；不在事务后另WriteAsync假称原子。
+**同数据库跨模块显式事务：** Publishing协调同一物理Npgsql连接及DbTransaction。Publishing上下文只写本模块active CAS/activation/idempotency/Outbox；Governance提供其自己拥有的enlisted审计写入器；Ontology提供其自己拥有的当前revision锁定读取用例。上下文显式UseTransaction，共享连接而不是只共享连接串。PUBLISH锁顺序draft→proposal→active；ROLLBACK不锁当前draft，而按proposal→不可变目标release→active顺序复核目标manifest/approval。两种操作均不在持有active锁后反向获取proposal/draft锁。激活CAS包含activationRevision（每次激活/回滚递增，避免ABA）、expectedActiveReleaseId和scope；首次active也有唯一约束。任一步/审计/Outbox失败全回滚。commit后才返回X-Audit-Id/成功；不在事务后另WriteAsync假称原子。
 
 `OutboxMessage(eventId,releaseId,activationRevision,eventType,payloadHash,createdAtUtc,attempts,nextAttemptAt,dispatchedAt?,lease/fencing)`与active/审计同事务；BackgroundService至少一次调和，消费者按eventId唯一去重。事件通知不承担版本正确性，查询直接固定PG active/manifest；缓存若有只按releaseId，不靠通知失效。POST-ACTIVATION实测对象/图仍可读；丢失时新查询UNAVAILABLE，告警/调和，不悄悄切别版。无生产GC策略，不删历史/被Run引用制品。
 
-响应丢失以(scope,operation,idempotencyKey,payloadHash)读回真实activation；相同命令已提交返回相同release/activation，不重复审计/Outbox。并发不同内容仅一个CAS成功，另一409，旧active不指向半制品。回滚需针对目标完整旧manifest另行异人审核；重新验证旧制品/图，递增activationRevision，以相同CAS+审计+Outbox路径激活，不删除历史图/对象。
+响应丢失以(scope,operation,idempotencyKey,payloadHash)读回真实activation；相同命令已提交返回相同release/activation，不重复审计/Outbox。并发不同内容仅一个CAS成功，另一409，旧active不指向半制品。回滚需按ROLLBACK分支针对目标完整旧manifest另行异人审核，与当前draft revision无相等要求；重新验证旧制品/图及审批绑定manifest hash，递增activationRevision，以相同CAS+审计+Outbox路径激活，不删除历史图/对象。
 
 ## 6. 正式查询、能力、合成来源与证据
 
@@ -98,7 +98,7 @@ MCP2.3.0直接包仅AspNetCore，显式注册三能力工具，禁止程序集�
 | POST /ontology-drafts/{id}/edits | SemanticEdit+CommandContext/If-Match→新修订与真实投影 |
 | GET /ontology-drafts/{id}/diff?fromRevision= | 同scope两修订真实差异 |
 | POST /ontology-drafts/{id}/validations | 固定revision/hashes→SemanticValidationReport，失败422或报告conforms=false，依赖503 |
-| GET/POST /release-proposals | 可访问提案列表/精确草稿revision创建；回滚提案另带targetReleaseId |
+| GET/POST /release-proposals | 可访问提案列表；PUBLISH绑定精确当前草稿revision，ROLLBACK绑定targetReleaseId+targetManifestHash且draft字段为null |
 | POST /approvals/{id}/decisions | approvalId=proposalId；decision approve/reject+CommandContext→真实决定 |
 | GET /releases、GET /releases/{id} | 可访问正式manifest与active/历史状态 |
 | POST /release-activations | proposalId+expectedActivationRevision+expectedActiveReleaseId+CommandContext→activation及manifest；回滚复用已批准目标提案 |
@@ -123,3 +123,46 @@ S1语义/草稿+FE→S2审批/发布/故障/回滚→S3正式查询/MCP/MAF/SSE/
 新增业务诊断使用固定phase/route/status/outcome/hash/version/Trace，Telemetry不记录用户源/Prompt/异常原文/连接串。低基数指标仅固定能力ID/结果类别，不加主体/厂区/实体/trace标签；PG审计独立持久。API/SHACL/SPARQL/发布/SSE性能真实样本记录，不编生产SLO。
 
 最终仅唯一标准Review ZIP，Base精确6154ebb3703031a49cf0c555c9f0c3596e3b7726到最终已提交Head，全源码/diff/真实十类证据/同Head CI/独立审查/逐成员复验。总体状态按真实事实，保留G1跨平台/生产未运行，交付G2_THIN_SLICE_READY_FOR_REVIEW后停止，不进G3–G8。
+
+
+## 10. 派写前固定的载荷字段与判别规则
+
+本节补齐§3/6/7中所有跨SEM/FE/QRY/AI读模型，Master唯一维护。下表`?`表示字段存在但值可null，`[]`允许空数组；未列字段不接受，不用unknown/任意object吞掉合同。每个DTO在唯一Contracts精确落C#类型与OpenAPI。时间统一DateTimeOffset/RFC3339，数量/序号int64，hash为64位小写hex。
+
+| 类型 | 精确字段（JSON名:类型） |
+|---|---|
+| SemanticNode | id:string（完整IRI）、kind:class/objectProperty/datatypeProperty/individual、label:string、typeIris:string[] |
+| SemanticEdge | id:string（SHA256规范triple）、source:string（IRI）、predicateIri:string、target:string（IRI）、label:string |
+| SemanticDiagnostic | code:string（固定机器码）、severity:info/warning/error、message:string（安全中文）、focusNode:RdfTerm?、path:string? |
+| SemanticPropertyValue | predicateIri:string、value:RdfTerm、evidenceIds:string[] |
+| SemanticEntity | iri:string、typeIris:string[]、label:string、externalId:string、organizationId:string、siteId:string、synthetic:boolean（必须true）、properties:SemanticPropertyValue[] |
+| SemanticRelationship | sourceIri:string、predicateIri:string、targetIri:string、evidenceIds:string[] |
+| OntologyDescription | classIris:string[]、objectPropertyIris:string[]、datatypePropertyIris:string[]、labels:SemanticPropertyValue[]、supportedAxioms:string[]、diagnostics:SemanticDiagnostic[] |
+| SemanticDatum | kind:ontology/entity/relationship、ontology:OntologyDescription?、entity:SemanticEntity?、relationship:SemanticRelationship?；必须恰好一个字段非null且与kind同名 |
+| EntityCandidate | entityIri:string、entityTypeIris:string[]、externalId:string、organizationId:string、siteId:string、label:string、evidenceIds:string[]；仅实际获授权候选 |
+| SemanticSubSource | sourceId:string、status:AVAILABLE/EMPTY/PARTIAL/UNAVAILABLE/UNAUTHORIZED、releaseId:string、dataHash:string、observedAtUtc:datetime、code:string?（固定类别） |
+| SemanticQueryResult | status:六态enum、data:SemanticDatum[]、candidates:EntityCandidate[]、evidence:EvidenceRef[]、snapshot:AssetVersionSnapshot、subSources:SemanticSubSource[]、validTime:TemporalExtent?、observedAtUtc:datetime、traceId:string、limited:boolean、diagnostics:SemanticDiagnostic[] |
+| TemporalExtent | fromUtc:datetime、toUtc:datetime?；来自实际断言时间，不以采集时间替代 |
+| CapabilitySchema | schemaVersion:int（1）、type:object、required:string[]、properties:CapabilityParameter[]、additionalProperties:boolean（false） |
+| CapabilityParameter | name:string、type:string/integer/array、description:string、enumValues:string[]、minimum:int?、maximum:int?、itemsType:string?；只需要本轮实际字段，不开放用户自定义schema |
+| CapabilityBudget | maxDepth:int、maxRows:int、timeoutMs:int、maxToolCalls:int |
+
+三能力的唯一输出：describe_ontology的data包含一个kind=ontology（OntologyDescription真实正式图）；resolve_entity仅kind=entity，歧义在candidates列出且status=AMBIGUOUS；traverse_relationships/trace_material返回kind=entity和kind=relationship的有限路径子图，关系引用本次已授权节点，不伪造一对一。全部返回同一SemanticQueryResult，Evidence使用唯一EvidenceRef。diagnostics安全消息不拼接用户输入/查询/异常；SourceUnavailable等机器码来自有限常量集合。Capability Registry可把上述有限参数模型显式映射为标准JSON Schema给MCP，不建立第二套能力定义。
+
+ExecutionEvent.payload为以下已知具名类型的判别联合，由eventType确定；不允许任意字典/JsonElement替代已知跨团队合同。实现可用System.Text.Json显式多态/转换器，但实际OpenAPI与TS必须保留精确联合及kind，不能退unknown。
+
+| eventType / payload.kind | 唯一payload类型与字段 |
+|---|---|
+| run.started / run.started | RunStartedPayload(providerMode:disabled/deterministic/approved_model、capabilityIds:string[]、maxToolCalls:int、timeoutMs:int) |
+| tool.started / tool.started | ToolStartedPayload(invocationId:string、capabilityId:string、capabilityVersion:string、plan:SemanticQueryPlan) |
+| tool.completed / tool.completed | ToolCompletedPayload(invocationId:string、result:SemanticQueryResult、durationMs:double) |
+| evidence.added / evidence.added | EvidenceAddedPayload(evidence:EvidenceRef) |
+| message.delta / message.delta | MessageDeltaPayload(text:string)；只React文本渲染，不宣称有真实模型 |
+| approval.required / approval.required | ApprovalRequiredPayload(approvalId:string、proposalId:string、operation:PUBLISH/ROLLBACK、scope:ResourceScope、expiresAtUtc:datetime)；只在确有真实待审提案的人类动作时发送 |
+| run.completed / run.completed | RunCompletedPayload(status:COMPLETED、totalToolCalls:int、lastResultStatus:六态enum?) |
+| run.failed / run.failed | RunFailedPayload(status:FAILED、code:string固定机器码、totalToolCalls:int) |
+| run.cancelled / run.cancelled | RunCancelledPayload(status:CANCELLED、code:cancelled、totalToolCalls:int) |
+
+每个payload显式kind且等于eventType；event envelope schemaVersion固定1。Run事件每个序列化UTF8≤128KiB、总事件≤512，超过预算持久run.failed固定code=event_budget_exceeded，不把大响应悄悄截断成成功；message.delta每段≤4096字符。完整snapshot只复制同一个不可变值，不能在重放时重新解析active。前端遇不认识kind/schemaVersion显示不支持并读取snapshot，不当作有效答案。SSE事件重连只重放相同eventId/seq及原始payload，不重新执行工具。
+
+独立Review要求的具体正反例：草稿从revision1推进revision2并发布两版后，针对R1的合法ROLLBACK成功；targetReleaseId/manifestHash被改、过期或自批失败。所有SemanticDatum单非null判别、每类payload.kind/eventType、六态数据字段/nullable、生成TS对enum/联合的语义均有契约测试。
