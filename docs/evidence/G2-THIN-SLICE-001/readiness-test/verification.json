@@ -1,0 +1,74 @@
+{
+  "status": "READY_FOR_REVIEW / PARTIAL",
+  "baseSha": "4d5709cc4c529ce3f91a4f9977b2ecbda56371ee",
+  "taskBranch": "codex/G2-READINESS-TEST",
+  "environment": {
+    "platform": "macOS arm64",
+    "sdk": "10.0.402"
+  },
+  "checks": {
+    "restore": {
+      "exit": 0
+    },
+    "original_default_jit": {
+      "exit": 0,
+      "passed": 1,
+      "elapsedMs": 2071
+    },
+    "original_full_cold_jit": {
+      "exit": 2,
+      "failed": 1,
+      "queries": 6,
+      "expectedQueries": 8
+    },
+    "fixed_full_cold_jit": {
+      "exit": 0,
+      "passed": 1,
+      "queries": 8,
+      "http": 2,
+      "elapsedMs": 2036,
+      "status": 503,
+      "storageCancelled": true
+    },
+    "security_all": {
+      "exit": 0,
+      "total": 114,
+      "passed": 84,
+      "skipped": 30,
+      "failed": 0
+    },
+    "selftest": {
+      "exit": 0
+    },
+    "format": {
+      "exit": 0,
+      "warnings": [
+        "workspace load warning retained"
+      ]
+    },
+    "native_all": {
+      "exit": 0,
+      "projects": 7,
+      "total": 338,
+      "failed": 0,
+      "passed": 123,
+      "skipped": 215,
+      "warnings": [
+        "existing ASPIRE010 AspireUseCliBundle=false",
+        "workspace load warning retained"
+      ]
+    }
+  },
+  "not_run": [
+    "real database/service integration in this task",
+    "browser",
+    "paid models",
+    "production"
+  ],
+  "not_verified": [
+    "independent review",
+    "final integrated Head Linux CI",
+    "Master final unique review ZIP"
+  ],
+  "normalization": "Only UTF-8 BOM/LF/trailing whitespace normalization; semantic output and exit codes retained"
+}
