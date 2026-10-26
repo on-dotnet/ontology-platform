@@ -105,3 +105,23 @@ test("dirty草稿阻止内部导航，显式丢弃后才离开", async ({ page }
   await page.getByRole("button", { name: "丢弃未保存修改", exact: true }).click();
   await expect(page.getByRole("textbox", { name: "本体 · OWL源码" })).toHaveValue(sources.ontologyTurtle);
 });
+test("M1原始UTF8 BOM与CRLF导入导出逐字节保留", async ({ page }) => {
+  await page.goto("/ontologies");
+  const bytes = Buffer.from("\uFEFF# Synthetic\r\n", "utf8");
+  await page.getByLabel("载入ontology.ttl", { exact: true }).setInputFiles({ name: "bom.ttl", mimeType: "text/turtle", buffer: bytes });
+  await expect.poll(() => page.getByRole("textbox", { name: "本体 · OWL源码" }).inputValue()).toContain("# Synthetic");
+  const download = page.waitForEvent("download"); await page.getByRole("button", { name: "导出原始源" }).click(); const path = await (await download).path();
+  expect(readFileSync(path!)).toEqual(bytes);
+});
+test("M1非法UTF8明确拒绝且不替换原始缓冲", async ({ page }) => {
+  await page.goto("/ontologies"); await page.getByRole("button", { name: /Synthetic 本体草稿/ }).click();
+  await page.getByLabel("载入ontology.ttl", { exact: true }).setInputFiles({ name: "invalid.ttl", mimeType: "text/turtle", buffer: Buffer.from([0xc3, 0x28]) });
+  await expect(page.locator(".g2-source [role=alert]")).toContainText("UTF8");
+  await expect(page.getByRole("textbox", { name: "本体 · OWL源码" })).toHaveValue(sources.ontologyTurtle);
+});
+test("M1可选absent源保持缺省且不能伪造空文件导出", async ({ page }) => {
+  await page.goto("/ontologies"); await page.getByRole("button", { name: /Synthetic 本体草稿/ }).click();
+  await page.getByRole("combobox", { name: "选择源文档" }).selectOption("vocabularyTurtle");
+  await expect(page.getByRole("button", { name: "导出原始源" })).toBeDisabled();
+  await expect(page.getByText(/可选术语源未提供/)).toBeVisible();
+});

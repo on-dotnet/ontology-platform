@@ -4,11 +4,11 @@ const hash = "b".repeat(64);
 const scope = { organizationId: "org-demo", siteIds: ["site-a", "site-b"] };
 const snapshot: AssetVersionSnapshot = { releaseId: "release-ui", ontologyHash: hash, shapesHash: hash, vocabularyHash: null, dataHash: hash, ontologyGraphIri: "urn:release:ontology", dataGraphIri: "urn:release:data", mappingVersions: [], metricVersions: [], ruleVersions: [], capabilityVersions: [{ assetId: "resolve_entity", version: hash }] };
 const manifest: ReleaseManifest = { schemaVersion: 1, releaseId: "release-ui", assetId: "asset-ui", scope, draftId: "draft-ui", revision: 2, hashes: { ontologyHash: hash, shapesHash: hash, vocabularyHash: null, dataHash: hash, bundleHash: hash }, ontologyGraphIri: snapshot.ontologyGraphIri, dataGraphIri: snapshot.dataGraphIri, importLocks: [], snapshot, artifactObjects: [], createdAtUtc: "2026-10-26T00:00:00Z" };
-const release: ReleaseSummary = { manifest, manifestHash: hash, isActive: true, activationRevision: 1, status: "ACTIVE" };
+const release: ReleaseSummary = { manifest, manifestHash: hash, isActive: true, activationRevision: 1, status: "ACTIVE", traceId: "release-safe-trace" };
 const capability: SemanticCapability = { id: "resolve_entity", version: hash, inputSchema: { schemaVersion: 1, type: "object", required: ["assetId"], properties: [], additionalProperties: false }, outputSchema: {}, meaning: "解析正式Synthetic实体", policy: "semantic.read", executorId: "registered", budgets: { maxDepth: 5, maxRows: 100, timeoutMs: 5000, maxToolCalls: 3 } };
 const evidence: EvidenceRef = { evidenceId: "evidence-ui", releaseId: "release-ui", scope, graphIri: "urn:release:data", subjectIri: "urn:synthetic:entity", predicateIri: "urn:synthetic:value", objectTerm: { kind: "literal", value: "Synthetic", datatype: null, language: null }, sourceId: "Synthetic", sourceRecordId: "record-ui", sourceObjectKey: "immutable-key", contentHash: hash, validFromUtc: "2026-10-25T00:00:00Z", validToUtc: null, observedAtUtc: "2026-10-26T00:00:00Z", modelVersion: hash, mappingVersion: null, synthetic: true };
 const baseResult: SemanticQueryResult = { status: "FOUND", data: [{ kind: "entity", ontology: null, relationship: null, entity: { iri: "urn:synthetic:entity", typeIris: ["urn:synthetic:Class"], label: "<img src=x onerror=alert(1)>", externalId: "record-ui", organizationId: "org-demo", siteId: "site-a", synthetic: true, properties: [] } }], candidates: [], evidence: [evidence], snapshot, subSources: [{ sourceId: "Synthetic", status: "AVAILABLE", releaseId: "release-ui", dataHash: hash, observedAtUtc: "2026-10-26T00:00:00Z", code: null }], validTime: null, observedAtUtc: "2026-10-26T00:00:00Z", traceId: "fixture-safe-trace", limited: false, diagnostics: [] };
-const baseRun: ExecutionRun = { runId: "run-ui", ownerSubjectId: "g2-ui-fixture", scope, snapshot, status: "RUNNING", providerMode: "deterministic", createdAtUtc: "2026-10-26T00:00:00Z", updatedAtUtc: "2026-10-26T00:00:00Z", lastSeq: 0, cancelRequested: false, leaseOwner: null, leaseUntil: null, fencingToken: 1 };
+const baseRun: ExecutionRun = { runId: "run-ui", ownerSubjectId: "g2-ui-fixture", scope, snapshot, status: "RUNNING", providerMode: "deterministic", createdAtUtc: "2026-10-26T00:00:00Z", updatedAtUtc: "2026-10-26T00:00:00Z", lastSeq: 0, cancelRequested: false, leaseOwner: null, leaseUntil: null, fencingToken: 1, traceId: "run-safe-trace" };
 test.beforeEach(async ({ page }) => {
   await page.route("**/auth/csrf", route => route.fulfill({ json: { requestToken: "bounded-ui" } }));
   await page.route("**/api/v1/releases", route => route.fulfill({ json: [release] }));
@@ -34,7 +34,7 @@ test("提案自批禁止/异人批准/激活固定当前CAS", async ({ page }) =
   let decision: unknown = null; let activation: unknown = null;
   await page.route("**/api/v1/release-proposals", route => route.fulfill({ json: [proposal, own] }));
   await page.route("**/api/v1/approvals/proposal-other/decisions", route => { decision = route.request().postDataJSON(); proposal.status = "APPROVED"; proposal.revision = 2; return route.fulfill({ json: proposal }); });
-  await page.route("**/api/v1/release-activations", route => { activation = route.request().postDataJSON(); return route.fulfill({ json: { activationId: "a-ui", activationRevision: 2, releaseId: "release-next", previousReleaseId: "release-ui", manifestHash: hash, manifest, auditId: "audit-ui", outboxEventId: "outbox-ui", activatedAtUtc: "2026-10-26T00:00:00Z" } }); });
+  await page.route("**/api/v1/release-activations", route => { activation = route.request().postDataJSON(); return route.fulfill({ json: { activationId: "a-ui", activationRevision: 2, releaseId: "release-next", previousReleaseId: "release-ui", manifestHash: hash, manifest, auditId: "audit-ui", outboxEventId: "outbox-ui", traceId: "activation-safe-trace", activatedAtUtc: "2026-10-26T00:00:00Z" } }); });
   await page.goto("/releases"); await page.getByRole("textbox", { name: "审核操作理由" }).fill("合成异人审核");
   const other = page.locator("article").filter({ hasText: "proposal-other / 1" }); const self = page.locator("article").filter({ hasText: "proposal-own / 1" });
   await expect(self.getByRole("button", { name: "异人批准" })).toBeDisabled(); await other.getByRole("button", { name: "异人批准" }).click();
@@ -111,3 +111,27 @@ test("默认Active查询交由服务端固定当次快照，不锁旧Active ID",
   await page.goto("/analysis"); await page.getByRole("textbox", { name: "实体外部编号" }).fill("record-ui"); await page.getByRole("button", { name: "执行真实查询" }).click();
   await expect.poll(() => plan).toMatchObject({ assetId: "asset-ui", releaseId: null });
 });
+test("收到事件即推进取消CAS序号，不等待下一次快照读取", async ({ page }) => {
+  let reads = 0; let releaseRead: (() => void) | undefined; let cancelBody: unknown = null;
+  const gate = new Promise<void>(resolveGate => { releaseRead = resolveGate; });
+  await page.route("**/api/v1/execution-runs", route => route.fulfill({ json: [baseRun] }));
+  await page.route("**/api/v1/execution-runs/run-ui", async route => { reads++; if (reads > 1) await gate; await route.fulfill({ json: { ...baseRun, lastSeq: reads > 1 ? 1 : 0 } }); });
+  const event = { runId: "run-ui", seq: 1, eventId: "run-ui:1", eventType: "message.delta", schemaVersion: 1, occurredAtUtc: "2026-10-26T00:00:00Z", snapshot, payload: { kind: "message.delta", text: "已持久化序列1" } };
+  await page.route("**/api/v1/execution-runs/run-ui/events", route => route.fulfill({ contentType: "text/event-stream", body: `data: ${JSON.stringify(event)}\n\n` }));
+  await page.route("**/api/v1/execution-runs/run-ui/cancel", route => { cancelBody = route.request().postDataJSON(); return route.fulfill({ json: { ...baseRun, lastSeq: 1, cancelRequested: true } }); });
+  await page.goto("/analysis"); await page.getByRole("button", { name: /RUNNING · deterministic/ }).click();
+  await expect(page.getByText("已持久化序列1", { exact: true })).toBeVisible(); await page.getByRole("button", { name: "持久取消 Run" }).click();
+  try { await expect.poll(() => cancelBody).toMatchObject({ command: { expectedRevision: 1 } }); } finally { releaseRead!(); }
+});
+for (const invalid of ["unknown-datum", "conflicting-snapshot"]) {
+  test(`I1 ${invalid}停止展示并回读真实Run快照`, async ({ page }) => {
+    let reads = 0;
+    await page.route("**/api/v1/execution-runs", route => route.fulfill({ json: [baseRun] }));
+    await page.route("**/api/v1/execution-runs/run-ui", route => { reads++; return route.fulfill({ json: baseRun }); });
+    const event = { runId: "run-ui", seq: 1, eventId: "run-ui:1", eventType: "tool.completed", schemaVersion: 1, occurredAtUtc: "2026-10-26T00:00:00Z", snapshot: invalid === "conflicting-snapshot" ? { ...snapshot, releaseId: "wrong-release" } : snapshot, payload: { kind: "tool.completed", invocationId: "i", durationMs: 1, result: invalid === "unknown-datum" ? { ...baseResult, data: [{ kind: "unknown" }] } : baseResult } };
+    await page.route("**/api/v1/execution-runs/run-ui/events", route => route.fulfill({ contentType: "text/event-stream", body: `data: ${JSON.stringify(event)}\n\n` }));
+    await page.goto("/analysis"); await page.getByRole("button", { name: /RUNNING · deterministic/ }).click();
+    await expect(page.getByText("事件协议或序列不受支持，已停止答案接收并回读持久Run快照。")).toBeVisible();
+    await expect(page.getByRole("list", { name: "真实持久运行事件" }).getByRole("listitem")).toHaveCount(0); expect(reads).toBeGreaterThanOrEqual(2);
+  });
+}

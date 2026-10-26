@@ -1,0 +1,517 @@
+COMMAND: /opt/homebrew/opt/node@24/bin/node node_modules/vitest/vitest.mjs run src/features/agent/event-stream.test.ts
+
+ RUN  v5.0.5 /Users/chasen/.codex/worktrees/g2-fe/ontology-platform/apps/web
+
+ ❯ src/features/agent/event-stream.test.ts (17 tests | 8 failed) 10ms
+   ❯ SSE解码 (17)
+     × I1拒绝不完整/冲突snapshot与未知/不完整/非互斥SemanticDatum 1ms
+     × I1拒绝不完整/冲突snapshot与未知/不完整/非互斥SemanticDatum 0ms
+     × I1拒绝不完整/冲突snapshot与未知/不完整/非互斥SemanticDatum 0ms
+     × I1拒绝不完整/冲突snapshot与未知/不完整/非互斥SemanticDatum 0ms
+     × I1拒绝不完整/冲突snapshot与未知/不完整/非互斥SemanticDatum 0ms
+     × I1拒绝不完整/冲突snapshot与未知/不完整/非互斥SemanticDatum 0ms
+     × I1拒绝不完整/冲突snapshot与未知/不完整/非互斥SemanticDatum 1ms
+     × I2同一70帧流单字节/多chunk/单一大chunk结果一致 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 8 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/features/agent/event-stream.test.ts > SSE解码 > I1拒绝不完整/冲突snapshot与未知/不完整/非互斥SemanticDatum
+AssertionError: promise resolved "[ { runId: 'r1', seq: 1, …(6) } ]" instead of rejecting
+
+- Expected:
+Error {
+  "message": "rejected promise",
+}
+
++ Received:
+[
+  {
+    "eventId": "r1:1",
+    "eventType": "message.delta",
+    "occurredAtUtc": "2026-10-26T00:00:00Z",
+    "payload": {
+      "kind": "message.delta",
+      "text": "<script>中文</script>",
+    },
+    "runId": "r1",
+    "schemaVersion": 1,
+    "seq": 1,
+    "snapshot": {
+      "releaseId": "r",
+    },
+  },
+]
+
+ ❯ src/features/agent/event-stream.test.ts:40:77
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/8]⎯
+
+ FAIL  src/features/agent/event-stream.test.ts > SSE解码 > I1拒绝不完整/冲突snapshot与未知/不完整/非互斥SemanticDatum
+AssertionError: promise resolved "[ { runId: 'r1', seq: 1, …(6) } ]" instead of rejecting
+
+- Expected:
+Error {
+  "message": "rejected promise",
+}
+
++ Received:
+[
+  {
+    "eventId": "r1:1",
+    "eventType": "message.delta",
+    "occurredAtUtc": "2026-10-26T00:00:00Z",
+    "payload": {
+      "kind": "message.delta",
+      "text": "<script>中文</script>",
+    },
+    "runId": "r1",
+    "schemaVersion": 1,
+    "seq": 1,
+    "snapshot": {
+      "capabilityVersions": [
+        {
+          "assetId": "resolve_entity",
+          "version": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        },
+      ],
+      "dataGraphIri": "urn:r:data",
+      "dataHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "mappingVersions": [],
+      "metricVersions": [],
+      "ontologyGraphIri": "urn:r:ontology",
+      "ontologyHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "releaseId": "wrong-release",
+      "ruleVersions": [],
+      "shapesHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "vocabularyHash": null,
+    },
+  },
+]
+
+ ❯ src/features/agent/event-stream.test.ts:40:77
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/8]⎯
+
+ FAIL  src/features/agent/event-stream.test.ts > SSE解码 > I1拒绝不完整/冲突snapshot与未知/不完整/非互斥SemanticDatum
+AssertionError: promise resolved "[ { runId: 'r1', seq: 1, …(6) } ]" instead of rejecting
+
+- Expected:
+Error {
+  "message": "rejected promise",
+}
+
++ Received:
+[
+  {
+    "eventId": "r1:1",
+    "eventType": "message.delta",
+    "occurredAtUtc": "2026-10-26T00:00:00Z",
+    "payload": {
+      "kind": "message.delta",
+      "text": "<script>中文</script>",
+    },
+    "runId": "r1",
+    "schemaVersion": 1,
+    "seq": 1,
+    "snapshot": {
+      "capabilityVersions": [
+        {
+          "assetId": "resolve_entity",
+          "version": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        },
+      ],
+      "dataGraphIri": "urn:r:data",
+      "dataHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "mappingVersions": [],
+      "metricVersions": [],
+      "ontologyGraphIri": "urn:r:ontology",
+      "ontologyHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "releaseId": "r",
+      "ruleVersions": [],
+      "shapesHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "vocabularyHash": null,
+    },
+  },
+]
+
+ ❯ src/features/agent/event-stream.test.ts:40:77
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/8]⎯
+
+ FAIL  src/features/agent/event-stream.test.ts > SSE解码 > I1拒绝不完整/冲突snapshot与未知/不完整/非互斥SemanticDatum
+AssertionError: promise resolved "[ { runId: 'r1', seq: 1, …(6) } ]" instead of rejecting
+
+- Expected:
+Error {
+  "message": "rejected promise",
+}
+
++ Received:
+[
+  {
+    "eventId": "r1:1",
+    "eventType": "tool.completed",
+    "occurredAtUtc": "2026-10-26T00:00:00Z",
+    "payload": {
+      "durationMs": 1,
+      "invocationId": "i",
+      "kind": "tool.completed",
+      "result": {
+        "candidates": [],
+        "data": [
+          {
+            "kind": "unknown",
+          },
+        ],
+        "diagnostics": [],
+        "evidence": [],
+        "limited": false,
+        "observedAtUtc": "2026-10-26T00:00:00Z",
+        "snapshot": {
+          "capabilityVersions": [
+            {
+              "assetId": "resolve_entity",
+              "version": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            },
+          ],
+          "dataGraphIri": "urn:r:data",
+          "dataHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "mappingVersions": [],
+          "metricVersions": [],
+          "ontologyGraphIri": "urn:r:ontology",
+          "ontologyHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "releaseId": "r",
+          "ruleVersions": [],
+          "shapesHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "vocabularyHash": null,
+        },
+        "status": "FOUND",
+        "subSources": [],
+        "traceId": "safe",
+        "validTime": null,
+      },
+    },
+    "runId": "r1",
+    "schemaVersion": 1,
+    "seq": 1,
+    "snapshot": {
+      "capabilityVersions": [
+        {
+          "assetId": "resolve_entity",
+          "version": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        },
+      ],
+      "dataGraphIri": "urn:r:data",
+      "dataHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "mappingVersions": [],
+      "metricVersions": [],
+      "ontologyGraphIri": "urn:r:ontology",
+      "ontologyHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "releaseId": "r",
+      "ruleVersions": [],
+      "shapesHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "vocabularyHash": null,
+    },
+  },
+]
+
+ ❯ src/features/agent/event-stream.test.ts:40:77
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/8]⎯
+
+ FAIL  src/features/agent/event-stream.test.ts > SSE解码 > I1拒绝不完整/冲突snapshot与未知/不完整/非互斥SemanticDatum
+AssertionError: promise resolved "[ { runId: 'r1', seq: 1, …(6) } ]" instead of rejecting
+
+- Expected:
+Error {
+  "message": "rejected promise",
+}
+
++ Received:
+[
+  {
+    "eventId": "r1:1",
+    "eventType": "tool.completed",
+    "occurredAtUtc": "2026-10-26T00:00:00Z",
+    "payload": {
+      "durationMs": 1,
+      "invocationId": "i",
+      "kind": "tool.completed",
+      "result": {
+        "candidates": [],
+        "data": [
+          {
+            "entity": null,
+            "kind": "ontology",
+            "ontology": {
+              "classIris": [],
+              "datatypePropertyIris": [],
+              "diagnostics": [],
+              "labels": [],
+              "objectPropertyIris": [],
+              "supportedAxioms": [],
+            },
+            "relationship": null,
+          },
+        ],
+        "diagnostics": [],
+        "evidence": [],
+        "limited": false,
+        "observedAtUtc": "2026-10-26T00:00:00Z",
+        "snapshot": {
+          "capabilityVersions": [
+            {
+              "assetId": "resolve_entity",
+              "version": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            },
+          ],
+          "dataGraphIri": "urn:r:data",
+          "dataHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "mappingVersions": [],
+          "metricVersions": [],
+          "ontologyGraphIri": "urn:r:ontology",
+          "ontologyHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "releaseId": "different-release",
+          "ruleVersions": [],
+          "shapesHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "vocabularyHash": null,
+        },
+        "status": "FOUND",
+        "subSources": [],
+        "traceId": "safe",
+        "validTime": null,
+      },
+    },
+    "runId": "r1",
+    "schemaVersion": 1,
+    "seq": 1,
+    "snapshot": {
+      "capabilityVersions": [
+        {
+          "assetId": "resolve_entity",
+          "version": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        },
+      ],
+      "dataGraphIri": "urn:r:data",
+      "dataHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "mappingVersions": [],
+      "metricVersions": [],
+      "ontologyGraphIri": "urn:r:ontology",
+      "ontologyHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "releaseId": "r",
+      "ruleVersions": [],
+      "shapesHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "vocabularyHash": null,
+    },
+  },
+]
+
+ ❯ src/features/agent/event-stream.test.ts:40:77
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/8]⎯
+
+ FAIL  src/features/agent/event-stream.test.ts > SSE解码 > I1拒绝不完整/冲突snapshot与未知/不完整/非互斥SemanticDatum
+AssertionError: promise resolved "[ { runId: 'r1', seq: 1, …(6) } ]" instead of rejecting
+
+- Expected:
+Error {
+  "message": "rejected promise",
+}
+
++ Received:
+[
+  {
+    "eventId": "r1:1",
+    "eventType": "tool.completed",
+    "occurredAtUtc": "2026-10-26T00:00:00Z",
+    "payload": {
+      "durationMs": 1,
+      "invocationId": "i",
+      "kind": "tool.completed",
+      "result": {
+        "candidates": [],
+        "data": [
+          {
+            "entity": {
+              "iri": "x",
+            },
+            "kind": "entity",
+            "ontology": null,
+            "relationship": null,
+          },
+        ],
+        "diagnostics": [],
+        "evidence": [],
+        "limited": false,
+        "observedAtUtc": "2026-10-26T00:00:00Z",
+        "snapshot": {
+          "capabilityVersions": [
+            {
+              "assetId": "resolve_entity",
+              "version": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            },
+          ],
+          "dataGraphIri": "urn:r:data",
+          "dataHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "mappingVersions": [],
+          "metricVersions": [],
+          "ontologyGraphIri": "urn:r:ontology",
+          "ontologyHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "releaseId": "r",
+          "ruleVersions": [],
+          "shapesHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "vocabularyHash": null,
+        },
+        "status": "FOUND",
+        "subSources": [],
+        "traceId": "safe",
+        "validTime": null,
+      },
+    },
+    "runId": "r1",
+    "schemaVersion": 1,
+    "seq": 1,
+    "snapshot": {
+      "capabilityVersions": [
+        {
+          "assetId": "resolve_entity",
+          "version": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        },
+      ],
+      "dataGraphIri": "urn:r:data",
+      "dataHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "mappingVersions": [],
+      "metricVersions": [],
+      "ontologyGraphIri": "urn:r:ontology",
+      "ontologyHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "releaseId": "r",
+      "ruleVersions": [],
+      "shapesHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "vocabularyHash": null,
+    },
+  },
+]
+
+ ❯ src/features/agent/event-stream.test.ts:40:77
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/8]⎯
+
+ FAIL  src/features/agent/event-stream.test.ts > SSE解码 > I1拒绝不完整/冲突snapshot与未知/不完整/非互斥SemanticDatum
+AssertionError: promise resolved "[ { runId: 'r1', seq: 1, …(6) } ]" instead of rejecting
+
+- Expected:
+Error {
+  "message": "rejected promise",
+}
+
++ Received:
+[
+  {
+    "eventId": "r1:1",
+    "eventType": "tool.completed",
+    "occurredAtUtc": "2026-10-26T00:00:00Z",
+    "payload": {
+      "durationMs": 1,
+      "invocationId": "i",
+      "kind": "tool.completed",
+      "result": {
+        "candidates": [],
+        "data": [
+          {
+            "entity": {},
+            "kind": "ontology",
+            "ontology": {
+              "classIris": [],
+              "datatypePropertyIris": [],
+              "diagnostics": [],
+              "labels": [],
+              "objectPropertyIris": [],
+              "supportedAxioms": [],
+            },
+            "relationship": null,
+          },
+        ],
+        "diagnostics": [],
+        "evidence": [],
+        "limited": false,
+        "observedAtUtc": "2026-10-26T00:00:00Z",
+        "snapshot": {
+          "capabilityVersions": [
+            {
+              "assetId": "resolve_entity",
+              "version": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            },
+          ],
+          "dataGraphIri": "urn:r:data",
+          "dataHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "mappingVersions": [],
+          "metricVersions": [],
+          "ontologyGraphIri": "urn:r:ontology",
+          "ontologyHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "releaseId": "r",
+          "ruleVersions": [],
+          "shapesHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "vocabularyHash": null,
+        },
+        "status": "FOUND",
+        "subSources": [],
+        "traceId": "safe",
+        "validTime": null,
+      },
+    },
+    "runId": "r1",
+    "schemaVersion": 1,
+    "seq": 1,
+    "snapshot": {
+      "capabilityVersions": [
+        {
+          "assetId": "resolve_entity",
+          "version": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        },
+      ],
+      "dataGraphIri": "urn:r:data",
+      "dataHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "mappingVersions": [],
+      "metricVersions": [],
+      "ontologyGraphIri": "urn:r:ontology",
+      "ontologyHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "releaseId": "r",
+      "ruleVersions": [],
+      "shapesHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "vocabularyHash": null,
+    },
+  },
+]
+
+ ❯ src/features/agent/event-stream.test.ts:40:77
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/8]⎯
+
+ FAIL  src/features/agent/event-stream.test.ts > SSE解码 > I2同一70帧流单字节/多chunk/单一大chunk结果一致
+Error: event_budget_exceeded
+ ❯ readExecutionEvents src/features/agent/event-stream.ts:37:41
+     35|       signal?.throwIfAborted();
+     36|       buffer += decoder.decode(value, { stream: !done });
+     37|       if (buffer.length > 262144) throw new Error("event_budget_exceed…
+       |                                         ^
+     38|       let boundary: RegExpExecArray | null;
+     39|       while ((boundary = /\r?\n\r?\n/.exec(buffer))) {
+ ❯ collect src/features/agent/event-stream.test.ts:10:141
+ ❯ src/features/agent/event-stream.test.ts:49:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/8]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  8 failed | 9 passed (17)
+   Start at  10:09:26
+   Duration  79ms (tests 60%, import 23%, transform 10%, worker 7%)
+
+EXIT_CODE=1

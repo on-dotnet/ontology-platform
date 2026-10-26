@@ -70,3 +70,19 @@ Master需完成受保护的G2 Host composition、真实迁移/PG与Jena资源及
 独立Review、真实后端E2E、同Head CI、Master main集成和唯一标准ZIP仍待后续，当前分支不自行合并main。
 
 最终本轮实施SourceSha=`46b05f073aa9c425bf5c11c3da0160806d73a134`（全部产品源码/测试/截图/日志已在该提交；后续此行仅文档关联提交，不改变已验证源码）。
+
+## 独立Review修复第一轮（1/5）
+
+固定Review Base=`575b41f91844d543662c2423be91fd35e8675888`。本轮由原Owner实施，未派Agent；实现方复验完成，等待原Reviewer限定再审，整体仍DRAFT / PARTIAL。
+
+共享依赖按Master明确指令引入原提交`457911442aaa12f3ba170ee43c70343b64581f39`，本树cherry-pick为`c06f94a`；两者stable patch-id均`265786f489fb762c7d3d4b08cb5e935836d79bca`。该祖先提交包含Master拥有的生成DTO/合同/服务接口和PUB任务卡，属于明确导入，不是FE越权重写；之后共享路径无手工差异。限定审查FE修复可用`c06f94a..修复Head`，全轮仍保留`575b41f..Head`及该依赖说明。
+
+- **I1**：新增`features/agent/event-schema.ts`只验证唯一生成DTO的完整字段/类型/互斥SemanticDatum/全部9类事件payload；完整snapshot包括四源hash、图及所有版本数组，事件与tool.result必须等于所选Run固定snapshot。未知/不完整/冲突载荷不进入答案列表，明确不支持并实际回读Run快照。7个实际错误accepted红例已转绿，另验证全部合法payload及ontology/entity/relationship正分支。
+- **I2**：先消费每个完整SSE帧，再检查未完整帧预算；JSON单事件仍限制128KiB UTF8，独立传输帧/残留帧缓冲256KiB，不按多事件网络chunk累计误拒绝。同一70×4096ASCII流以单字节、37B、单一大chunk输入所得70事件完全一致；单事件真正超128KiB在单/多chunk均拒绝。
+- **M1**：文件使用arrayBuffer与严格UTF8 decoder（fatal、保留BOM），无替代字符；BOM/CRLF/中文/空源roundtrip逐字节一致。非法UTF8保留旧缓冲并明确报错。optional vocabulary absent保持null并禁用伪空文件导出；显式导入空文件仍是合法空源。
+- **M2**：只删除历史红日志多余EOF空行，原失败内容保留。原实施Base69e2ed7和本轮Base575b41f的diff --check均exit0。
+- **集成待办**：每次接受持久事件即推进本地run.lastSeq，取消CAS不再等待下一次GET；浏览器红例expectedRevision0→1已转绿。ReleaseSummary/ReleaseActivation/ExecutionRun消费Master真实TraceId，缺失显示未关联，固定Grafana入口不伪造Tempo深链。
+
+实际命令/退出码/输出见`logs/review-round1-*`：`tsc --noEmit`0、ESLint0、Vitest **53/53（6 suites）**、生产Next build0、G2 Edge有界UI **30/30**、原G1 Edge回归 **5/5**、`pwsh -NoProfile -File scripts/verify.ps1 -SelfTest`0（ReviewPackage35/0）。RED完整SSE输出与M1/CAS/EOF真实观察单独保留；日志仅规范化LF/行尾空白。没有修改旧G1断言、生成器、包锁或Tokens；Monaco无安装/import/override。
+
+Master已准备新隔离Host环境，本Owner按指令等待可用通知后开始真实服务联调；本轮所有夹具依然不代表PG/Jena/Keycloak/RustFS/MAF真实G2 E2E。CI NOT_VERIFIED。新增同owned feature helper已向Master登记，审查/集成责任仍在Master。
