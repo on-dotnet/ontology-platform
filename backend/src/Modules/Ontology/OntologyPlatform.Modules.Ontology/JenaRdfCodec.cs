@@ -1,3 +1,6 @@
+using System.Buffers;
+using System.Globalization;
+using System.Text;
 using System.Text.Json;
 using OntologyPlatform.Contracts;
 using OntologyPlatform.Modules.Ontology.Domain;
@@ -71,7 +74,40 @@ internal static class JenaRdfCodec
         if (term.Kind != RdfTermKind.Literal) throw new SemanticOperationException(422, "blank_edit_unsupported");
         if (term.Language is not null && !System.Text.RegularExpressions.Regex.IsMatch(term.Language, "^[a-zA-Z]+(-[a-zA-Z0-9]+)*$"))
             throw new SemanticOperationException(422, "rdf_term_invalid");
-        return JsonSerializer.Serialize(term.Value) + (term.Language is not null ? "@" + term.Language : term.Datatype is not null ? "^^<" + Iri(term.Datatype) + ">" : "");
+        return Literal(term.Value) + (term.Language is not null ? "@" + term.Language : term.Datatype is not null ? "^^<" + Iri(term.Datatype) + ">" : "");
+    }
+
+    /// <summary>按Unicode标量导出标准N-Triples字面量，不使用JSON的代理项转义或静默替换。</summary>
+    /// <param name="value">必须无损保留的RDF词法值。</param>
+    /// <returns>包含引号及必要转义的合法字面量，不包含语言或datatype后缀。</returns>
+    private static string Literal(string value)
+    {
+        // 仅当前字面量的导出缓冲区，权威SourceBundle从未在此改写。
+        var output = new StringBuilder("\"");
+        // 逐Unicode标量推进，不能把有效非BMP拆成两个独立代理项。
+        var remaining = value.AsSpan();
+        while (!remaining.IsEmpty)
+        {
+            // 解码失败必须拒绝，不能沿用Rune枚举器默认的U+FFFD替换行为。
+            if (Rune.DecodeFromUtf16(remaining, out var scalar, out var consumed) != OperationStatus.Done)
+                throw new SemanticOperationException(422, "rdf_literal_invalid");
+            remaining = remaining[consumed..];
+            switch (scalar.Value)
+            {
+                case '"': output.Append("\\\""); break;
+                case '\\': output.Append("\\\\"); break;
+                case '\n': output.Append("\\n"); break;
+                case '\r': output.Append("\\r"); break;
+                case '\t': output.Append("\\t"); break;
+                case '\b': output.Append("\\b"); break;
+                case '\f': output.Append("\\f"); break;
+                default:
+                    if (Rune.IsControl(scalar)) output.Append("\\u").Append(scalar.Value.ToString("X4", CultureInfo.InvariantCulture));
+                    else output.Append(scalar.ToString());
+                    break;
+            }
+        }
+        return output.Append('"').ToString();
     }
 
     /// <summary>阻断会破坏受控IRI项的字符，绝不把任意输入拼接为查询代码。</summary>
