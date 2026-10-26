@@ -1,0 +1,16 @@
+{
+  "baseSha": "72fff701e6fde10c3d9984cca06173b645e814c0",
+  "branch": "codex/G2-HOST-FIX",
+  "status": "PARTIAL / PENDING_INDEPENDENT_REVIEW",
+  "sources": {
+    "backend/src/Hosts/OntologyPlatform.Api/G2/G2Readiness.cs": "39f1b919a01c1430bceb19e369a16b9f79ec42b2476311cda10f009ae67e442d",
+    "backend/tests/OntologyPlatform.SecurityTests/G2ReadinessTests.cs": "d3928693006f3a1d7aee28a42bf52e6b67edb03b360ec8c51e70e1f1e501b697",
+    "backend/tests/OntologyPlatform.SecurityTests/G2ReadinessBudgetTests.cs": "1392a1f9ebb388963d3bbdcc2b7fc3c795bbd8dee1c7cb2872994af0a554237a",
+    "backend/tests/OntologyPlatform.SecurityTests/G2ReadinessPostgresTests.cs": "59c55322154c0299e26c84f5c869e5b72dddf9d745772879f15fc46fbc7b0bbf",
+    "docs/evidence/G2-THIN-SLICE-001/master/host/fix1-pg-runner.py": "ed26ac03c91680e29f5333f55c4eebca2f68428f1c6d9737fb8c0d82908e914d"
+  },
+  "red": "original source with newly introduced real-PG test, three actual runtime failures; initial runner supplied one own random container in memory",
+  "green": "final tests each create and dispose their own approved random loopback tmpfs PG; HTTP dependencies are explicit test adapters, not real Jena/RustFS",
+  "normalization": "safe stdout/stderr retained, LF and trailing whitespace normalized",
+  "ci": "NOT_VERIFIED; Master owns final same-head CI"
+}

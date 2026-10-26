@@ -36,3 +36,32 @@ BaseSha：`c1e4dd0af6af4258f39c3c8a360c60e0709b8915`；独立分支`codex/G2-HOS
 ## 保留边界
 
 真实PG阻塞/断开、Jena故障与恢复由Master在自己的私有运行时执行；本Worker全部NOT_RUN。真实OIDC、浏览器全链、正式SSE重放/MAF/MCP和G1运行回归未由本Worker重跑；真实付费模型、生产、Windows/Intel同样NOT_RUN。当前CI为NOT_VERIFIED，由Master负责最终同Head CI及唯一Review ZIP。本分支不集成main、不自动进入下一关口。
+
+## Fix round 2/5：真实PG暂停与驱动取消握手
+
+BaseSha：`72fff701e6fde10c3d9984cca06173b645e814c0`。Master真实环境在round1发现PG暂停超过urllib八秒，Jena/RustFS分别约2019/2007ms返回503且恢复200。本轮承认round1 EF拦截夹具无法证明驱动取消握手受预算约束；原历史证据保持原样，最终真实八项故障验收由Master复跑。本轮状态：实现与覆盖验证完成，**独立复审/主运行时回归仍待Master**。
+
+### 根因与有界方案
+
+[Npgsql官方参数](https://www.npgsql.org/doc/connection-string-parameters.html)表明连接默认15秒、命令30秒、CancellationTimeout默认2000ms；-1跳过取消响应等待。[10.0.3驱动实现](https://github.com/npgsql/npgsql/blob/v10.0.3/src/Npgsql/Internal/NpgsqlConnector.cs#L1966)进一步显示，用户取消先同步创建连接发送CancelRequest，使用连接Timeout；GSS=Prefer在失败后还会再连接一次。因此仅linked token或仅CancellationTimeout=-1均不能兑现整体界限。
+
+G2健康专用上下文复制各模块typed options，保留模型/拦截器，独立连接使用Timeout=1、CommandTimeout=1、CancellationTimeout=-1、Pooling=false、Multiplexing=false。原业务注册options及其池不变。健康副本仅在GSS=Prefer时跳过可选GSS协商重试，直接使用原TLS策略；明确要求GSS=Require仍保留，TLS要求不修改。整个两秒linked预算内，全部八次DB探针共享一次一秒执行截止，为至多一秒驱动取消握手预留余量；两个HTTP继续使用同一个原两秒截止。没有逐依赖重置，没有Task.Run/WaitAsync超时丢弃数据库任务，所有查询和上下文释放仍被await。EF将瞬时Npgsql连接异常包装的InvalidOperationException只在InnerException为DbException时映射依赖503；调用方取消不被吞掉。G1禁用分支未改。
+
+这会使PG连接握手阻塞更早（约一秒）返回503，是为整个请求最多约两秒保留关闭时间。八次正常SQL共用前一秒，不能把每张表都拖满一秒。可控累计预算测试的单次DB延迟由100调整为70ms、每次HTTP由750调整为850ms，仍验证累计>2秒时在RustFS阶段取消；首连接拦截夹具的下界调整为0.8秒，反映取消预留，真实驱动测试始终断言宿主退出<3秒。
+
+### 覆盖、原始输出与限制
+
+新增`backend/tests/OntologyPlatform.SecurityTests/G2ReadinessPostgresTests.cs`：每用例自行创建固定批准PG18.6镜像、随机专用容器名、回环随机端口、tmpfs、内存随机密码。只建SELECT常量需要的技术空表，不冒充正式迁移验收。在真实Npgsql连接打开前或查询执行前pause；不以Task.Delay伪造数据库阻塞。调用方取消用例额外等待实际宿主中间件退出，不能仅观察HttpClient本地取消。finally先unpause，fixture完整释放连接后删除自己容器。健康前后均要求200；原业务连接默认Timeout15/CancellationTimeout2000/Pooling=true内存断言未变。HTTP依赖在此测试明确为固定成功适配，不称真实Jena/RustFS验收。
+
+| 命令与版本 | 结果 | 原始输出 |
+|---|---|---|
+| `python3 docs/evidence/G2-THIN-SLICE-001/master/host/fix1-pg-runner.py`，round1生产源码+新真实测试 | exit2；3/3失败：前两项均超过八秒，客户端取消后宿主超过3秒仍未退出。初始runner只在内存向测试提供自己的随机容器；最终测试改为每项自建fixture | [真实PG RED](fix1-round2-real-pg-red.txt) |
+| 第一候选（独立超时+一秒预留，尚未禁用Prefer重复协商） | exit2；1通过/2失败：新连接500为EF包装异常；已打开连接约3024ms超过3秒 | [第一候选](fix1-round2-driver-first-attempt.txt) |
+| 禁用健康可选GSS重复协商，安全诊断仅输出异常类型 | exit2；2通过/1失败：已连接2032ms、调用方1044ms；新连接剩EF包装500 | [定位记录](fix1-round2-driver-gss-investigation.txt) |
+| 最终精确映射EF驱动包装异常，独立真实PG测试 | exit0；3/3、0跳过。新连接暂停1015ms，已连接暂停2016ms，调用方取消宿主退出1050ms，全部恢复200 | [独立PG GREEN](fix1-round2-real-pg-green.txt) |
+| `dotnet restore backend/OntologyPlatform.slnx --locked-mode`；`dotnet build backend/OntologyPlatform.slnx -c Release --no-restore` | 均exit0；0错误、1既有ASPIRE010警告，项目及锁未改 | [恢复](fix1-round2-locked-restore.txt)、[构建](fix1-round2-build.txt) |
+| `dotnet test --project backend/tests/OntologyPlatform.SecurityTests --configuration Release --no-build --no-restore --filter 'FullyQualifiedName~G2&FullyQualifiedName!~G2AuditTransactionTests&FullyQualifiedName!~MiddlewarePersistsForbiddenAuditBeforeMalformedBodyBinding&FullyQualifiedName!~MiddlewareAuditFailurePropagatesWithoutFalse403' --minimum-expected-tests 53 --output Detailed` | exit0；53/53、0跳过，含三项真实PG。最终Release观测1005/2007/1050ms；原累计HTTP预算2040ms返回503 | [Release覆盖](fix1-round2-focused.txt) |
+| `dotnet format backend/tests/OntologyPlatform.SecurityTests/OntologyPlatform.SecurityTests.csproj --no-restore --include` 本轮四个C#路径，随后同命令`--verify-no-changes` | 均exit0 | [格式](fix1-round2-format.txt)、[复核](fix1-round2-format-verify.txt) |
+| `pwsh -NoProfile -File scripts/verify.ps1 -SelfTest` | exit0；含ReviewPackage35项/0失败，保留各自产品/容器NOT_RUN边界 | [SelfTest](fix1-round2-selftest.txt) |
+
+[本轮源码绑定](fix1-round2-source-bindings.json)包含全部五个变化源码/runner散列。实际Docker按专用前缀检查零残留。本轮未访问/暂停Master容器、私有runtime或其他历史数据；未改业务连接配置、公共项目/依赖/锁、平台默认G1分支。Master产品真实PG/Jena/RustFS八项全链、独立复审和同Head CI仍为下游门禁，本Worker不自报它们通过。

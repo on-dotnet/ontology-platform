@@ -18,7 +18,7 @@ namespace OntologyPlatform.SecurityTests;
 [TestClass]
 public sealed class G2ReadinessTests
 {
-    /// <summary>首个Governance连接阻塞时，G2应在两秒预算内结束并返回标准503。</summary>
+    /// <summary>首个Governance连接阻塞时，应在数据库预算内结束，为真实驱动取消握手保留余量。</summary>
     /// <returns>真实Kestrel健康请求验证任务。</returns>
     [TestMethod]
     public async Task G2BudgetIncludesFirstGovernanceConnection()
@@ -36,7 +36,7 @@ public sealed class G2ReadinessTests
         // 真实响应必须在预算耗尽时形成标准依赖不可用结果。
         using var response = await client.GetAsync("/health/ready");
         Assert.AreEqual(HttpStatusCode.ServiceUnavailable, response.StatusCode);
-        Assert.IsTrue(elapsed.Elapsed >= TimeSpan.FromSeconds(1.5) && elapsed.Elapsed < TimeSpan.FromSeconds(4), $"实际等待{elapsed.Elapsed.TotalSeconds:F3}秒。");
+        Assert.IsTrue(elapsed.Elapsed >= TimeSpan.FromSeconds(0.8) && elapsed.Elapsed < TimeSpan.FromSeconds(4), $"实际等待{elapsed.Elapsed.TotalSeconds:F3}秒。");
         Assert.IsTrue(blocker.Cancelled);
         Console.WriteLine($"Synthetic blocked Governance: elapsedMs={elapsed.Elapsed.TotalMilliseconds:F0}; status={(int)response.StatusCode}; cancelled={blocker.Cancelled}");
         // 机器码区分依赖失败和内部错误，不暴露连接信息。

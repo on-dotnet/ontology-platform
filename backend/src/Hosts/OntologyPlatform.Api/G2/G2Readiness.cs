@@ -1,5 +1,6 @@
 using System.Data.Common;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using OntologyPlatform.Modules.Agents;
 using OntologyPlatform.Modules.Governance;
 using OntologyPlatform.Modules.Ontology;
@@ -19,24 +20,27 @@ public static class G2Readiness
         // 单次健康检查整体最多两秒，不能因每个依赖重置超时而无限等待。
         using var budget = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         budget.CancelAfter(TimeSpan.FromSeconds(2));
+        // Npgsql取消会另建连接发送CancelRequest；为该握手预留最多一秒，不能等主预算耗尽才开始。
+        using var databaseBudget = CancellationTokenSource.CreateLinkedTokenSource(budget.Token);
+        databaseBudget.CancelAfter(TimeSpan.FromSeconds(1));
         try
         {
             // Governance同样属于G2整体就绪边界，首个连接等待就必须受同一预算约束。
-            var governance = services.GetRequiredService<GovernanceDbContext>();
-            await governance.Sessions.AsNoTracking().Select(_ => 1).Take(1).ToArrayAsync(budget.Token);
-            await governance.AuditRecords.AsNoTracking().Select(_ => 1).Take(1).ToArrayAsync(budget.Token);
-            await governance.Resources.AsNoTracking().Select(_ => 1).Take(1).ToArrayAsync(budget.Token);
+            await using var governance = new GovernanceDbContext(ProbeOptions<GovernanceDbContext>(services));
+            await governance.Sessions.AsNoTracking().Select(_ => 1).Take(1).ToArrayAsync(databaseBudget.Token);
+            await governance.AuditRecords.AsNoTracking().Select(_ => 1).Take(1).ToArrayAsync(databaseBudget.Token);
+            await governance.Resources.AsNoTracking().Select(_ => 1).Take(1).ToArrayAsync(databaseBudget.Token);
             // 只查询常量投影以验证表存在，不读取或输出任何持久业务正文。
-            var ontology = services.GetRequiredService<OntologyDbContext>();
-            await ontology.Drafts.AsNoTracking().Select(_ => 1).Take(1).ToArrayAsync(budget.Token);
+            await using var ontology = new OntologyDbContext(ProbeOptions<OntologyDbContext>(services));
+            await ontology.Drafts.AsNoTracking().Select(_ => 1).Take(1).ToArrayAsync(databaseBudget.Token);
             // 活动指针和Outbox均为真实发布路径所必需。
-            var publishing = services.GetRequiredService<PublishingDbContext>();
-            await publishing.ActiveReleases.AsNoTracking().Select(_ => 1).Take(1).ToArrayAsync(budget.Token);
-            await publishing.Outbox.AsNoTracking().Select(_ => 1).Take(1).ToArrayAsync(budget.Token);
+            await using var publishing = new PublishingDbContext(ProbeOptions<PublishingDbContext>(services));
+            await publishing.ActiveReleases.AsNoTracking().Select(_ => 1).Take(1).ToArrayAsync(databaseBudget.Token);
+            await publishing.Outbox.AsNoTracking().Select(_ => 1).Take(1).ToArrayAsync(databaseBudget.Token);
             // 运行和事件必须同时可用，模型disabled是产品策略而非依赖故障。
-            var agents = services.GetRequiredService<AgentsDbContext>();
-            await agents.Runs.AsNoTracking().Select(_ => 1).Take(1).ToArrayAsync(budget.Token);
-            await agents.Events.AsNoTracking().Select(_ => 1).Take(1).ToArrayAsync(budget.Token);
+            await using var agents = new AgentsDbContext(ProbeOptions<AgentsDbContext>(services));
+            await agents.Runs.AsNoTracking().Select(_ => 1).Take(1).ToArrayAsync(databaseBudget.Token);
+            await agents.Events.AsNoTracking().Select(_ => 1).Take(1).ToArrayAsync(databaseBudget.Token);
             // URI只从可信启动配置读取，不能由健康请求输入覆盖。
             var configuration = services.GetRequiredService<IConfiguration>();
             // 同一固定Jena进程的健康端点不接触用户图或SPARQL正文。
@@ -55,5 +59,32 @@ public static class G2Readiness
         catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested) { return false; }
         catch (HttpRequestException) { return false; }
         catch (DbException) when (!cancellationToken.IsCancellationRequested) { return false; }
+        // EF默认执行策略会将驱动瞬时连接错误包装为InvalidOperationException，仍是依赖失败。
+        catch (InvalidOperationException failure) when (failure.InnerException is DbException && !cancellationToken.IsCancellationRequested) { return false; }
+    }
+
+    /// <summary>复制各模块配置建立健康专用连接，不改变业务options、连接池或数据库写入边界。</summary>
+    /// <typeparam name="T">本次技术探针对应的模块上下文。</typeparam>
+    /// <param name="services">当前请求作用域的原始只读配置来源。</param>
+    /// <returns>保留模型/拦截器的独立配置，驱动连接/命令/取消握手均有原生超时。</returns>
+    private static DbContextOptions<T> ProbeOptions<T>(IServiceProvider services) where T : DbContext
+    {
+        // 原上下文只用于取得受信连接配置，不在其连接上运行或修改探针。
+        var original = services.GetRequiredService<T>();
+        // 取消握手使用连接Timeout，-1只跳过取消响应等待，二者必须同时限制。
+        var connection = new NpgsqlConnectionStringBuilder(original.Database.GetConnectionString())
+        {
+            Timeout = 1,
+            CommandTimeout = 1,
+            CancellationTimeout = -1,
+            Pooling = false,
+            Multiplexing = false
+        };
+        // Prefer模式会在取消握手失败后重连一次；探针直接使用原TLS策略，禁用可选GSS协商重试。
+        // Require代表管理员明确要求GSS，必须保留，不能为了健康检查降级该要求。
+        if (connection.GssEncryptionMode == GssEncryptionMode.Prefer) connection.GssEncryptionMode = GssEncryptionMode.Disable;
+        // typed options复制保留各模块模型及既有EF配置，UseNpgsql仅替换这份副本的连接参数。
+        var options = new DbContextOptionsBuilder<T>(services.GetRequiredService<DbContextOptions<T>>());
+        return options.UseNpgsql(connection.ConnectionString).Options;
     }
 }

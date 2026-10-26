@@ -1,0 +1,41 @@
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+失败 PausedPostgresCannotOutliveHealthBudget (False,False) (1s 651ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+  Assertion failed. 预期值相等。
+
+  expected: ServiceUnavailable
+  actual:   InternalServerError
+
+  Assert.AreEqual(HttpStatusCode.ServiceUnavailable, response.StatusCode)
+    在 OntologyPlatform.SecurityTests.G2ReadinessPostgresTests.PausedPostgresCannotOutliveHealthBudget(Boolean duringQuery, Boolean cancelCaller) 位于 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2ReadinessPostgresTests.cs:93
+    在 OntologyPlatform.SecurityTests.G2ReadinessPostgresTests.PausedPostgresCannotOutliveHealthBudget(Boolean duringQuery, Boolean cancelCaller) 位于 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2ReadinessPostgresTests.cs:103
+    在 OntologyPlatform.SecurityTests.G2ReadinessPostgresTests.PausedPostgresCannotOutliveHealthBudget(Boolean duringQuery, Boolean cancelCaller) 位于 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2ReadinessPostgresTests.cs:111
+    在 OntologyPlatform.SecurityTests.G2ReadinessPostgresTests.PausedPostgresCannotOutliveHealthBudget(Boolean duringQuery, Boolean cancelCaller) 位于 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2ReadinessPostgresTests.cs:111
+    在 OntologyPlatform.SecurityTests.G2ReadinessPostgresTests.PausedPostgresCannotOutliveHealthBudget(Boolean duringQuery, Boolean cancelCaller) 位于 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2ReadinessPostgresTests.cs:111
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+已通过 PausedPostgresCannotOutliveHealthBudget (True,False) (2s 211ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+  标准输出
+    Real PostgreSQL pause: duringQuery=True; callerCancellation=False; requestEnded=True; elapsedMs=2032
+
+  错误输出
+已通过 PausedPostgresCannotOutliveHealthBudget (True,True) (1s 229ms)
+  从 /Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+  标准输出
+    Real PostgreSQL pause: duringQuery=True; callerCancellation=True; requestEnded=True; elapsedMs=1044
+
+  错误输出
+/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64) 失败并出现 1 个错误 (6s 435ms)
+退出代码: 2
+  标准输出: Safe failure category=InvalidOperationException; innerCategory=NpgsqlException
+  Safe failure category=OperationCanceledException; innerCategory=TimeoutException
+
+测试运行摘要: 失败!
+  总计: 3
+  失败: 1
+  成功: 2
+  已跳过: 0
+  持续时间: 6s 748ms
+已完成测试运行，但显示非成功退出代码: 2 (请参阅: https://aka.ms/testingplatform/exitcodes)
+
+exitCode=2
