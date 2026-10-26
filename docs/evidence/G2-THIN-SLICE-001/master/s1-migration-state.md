@@ -1,0 +1,5 @@
+# S1迁移与测试注册事实
+
+Master局部EF10.0.13生成20261026003221_InitialOntology及Designer/Snapshot，命令exit0；完整Release构建exit0，0errors，仅历史ASPIRE010。生成尚未等于真实数据库迁移验收；PG正反由随后SEM实际测试，当前NOT_RUN。Down追加同事务ACCESS EXCLUSIVE NOWAIT，存在任意Drafts/Revisions/Validations/Commands事实则明确拒绝，不能删除源码历史；活跃事务时拒绝而非强行等待。
+
+此前三个未来空Agent/Publishing/Query测试工程撤下；不加假测试、不改verify零测试规则。SemanticTests只有真实23项源码到位后才保留注册，并加入Governance引用用于真审计事务；没有Jena环境的独立build不称S1通过。Root脚本生成器改动曾漏入749暂存，本提交补齐，实际重新生成两产物before/after SHA完全相等；不以旧工作区运行成功假称此前提交可重生成。

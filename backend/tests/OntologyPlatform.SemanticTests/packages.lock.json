@@ -87,6 +87,15 @@
       "ontologyplatform.contracts": {
         "type": "Project"
       },
+      "ontologyplatform.modules.governance": {
+        "type": "Project",
+        "dependencies": {
+          "Microsoft.EntityFrameworkCore": "[10.0.13, )",
+          "Microsoft.EntityFrameworkCore.Relational": "[10.0.13, )",
+          "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.3, )",
+          "OntologyPlatform.Contracts": "[1.0.0, )"
+        }
+      },
       "ontologyplatform.modules.ontology": {
         "type": "Project",
         "dependencies": {
