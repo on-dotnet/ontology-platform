@@ -30,7 +30,7 @@ public sealed class G2ReadinessBudgetTests
         var queries = new DelayedQueries();
         // 隔离网络连接，所有实际等待都发生在可取消的命令/HTTP传输入口。
         var connections = new SuppressedConnections();
-        // 两个HTTP请求分别消耗850毫秒，连同八次70毫秒查询超过整体两秒。
+        // 预热时不注入等待；测量时两个850毫秒HTTP等待连同八次70毫秒查询超过整体两秒。
         var http = new DelayedHttp();
         // 生产路由与真实模块上下文保持不变，仅外部I/O由可控传输适配。
         var builder = WebApplication.CreateBuilder();
@@ -56,16 +56,25 @@ public sealed class G2ReadinessBudgetTests
         // 客户端保险期限大于预算，不能代替生产取消机制。
         using var client = new HttpClient { BaseAddress = new Uri(app.Urls.Single()), Timeout = TimeSpan.FromSeconds(5) };
         client.DefaultRequestHeaders.Add("X-Health-Key", "synthetic-readiness-test");
+        // 首次EF模型、查询编译和真实宿主路由初始化不属于本例要注入的依赖延迟。
+        // 先在相同路由完成八个真实EF命令入口及两个HTTP入口，避免冷启动挤占一秒数据库子预算。
+        using var warmup = await client.GetAsync("/health/ready");
+        Assert.AreEqual(HttpStatusCode.OK, warmup.StatusCode, "无注入延迟的真实健康路由必须完成预热。");
+        Assert.AreEqual(8, queries.Count);
+        CollectionAssert.AreEqual(new[] { "/$/ping", "/health/ready" }, http.Paths.ToArray());
+        // 预热记录完全清零后才启用延迟，后续断言只观察一个新的真实健康请求。
+        queries.BeginMeasurement();
+        http.BeginMeasurement();
         // 记录含HTTP及EF等待的实际墙钟时间。
         var elapsed = Stopwatch.StartNew();
         // 若每阶段重新计时，这个请求会在约2.26秒返回200，违反整体预算。
         using var response = await client.GetAsync("/health/ready");
+        Console.WriteLine($"Synthetic dependency budget: queries={queries.Count}; http={http.Paths.Count}; elapsedMs={elapsed.Elapsed.TotalMilliseconds:F0}; status={(int)response.StatusCode}; storageCancelled={http.Cancelled}");
         Assert.AreEqual(HttpStatusCode.ServiceUnavailable, response.StatusCode);
         Assert.AreEqual(8, queries.Count);
         CollectionAssert.AreEqual(new[] { "/$/ping", "/health/ready" }, http.Paths.ToArray());
         Assert.IsTrue(http.Cancelled);
         Assert.IsTrue(elapsed.Elapsed >= TimeSpan.FromSeconds(1.5) && elapsed.Elapsed < TimeSpan.FromSeconds(4));
-        Console.WriteLine($"Synthetic dependency budget: queries={queries.Count}; http={http.Paths.Count}; elapsedMs={elapsed.Elapsed.TotalMilliseconds:F0}; status={(int)response.StatusCode}; storageCancelled={http.Cancelled}");
     }
 
     /// <summary>注册原生Npgsql及测试I/O拦截，不引入新的EF提供程序或产品依赖。</summary>
@@ -94,6 +103,16 @@ public sealed class G2ReadinessBudgetTests
         /// <summary>实际进入执行入口的技术探针数量。</summary>
         internal int Count { get; private set; }
 
+        /// <summary>是否已完成真实路由预热并进入计时验证。</summary>
+        private bool measuring;
+
+        /// <summary>清除预热查询记录，为下一次真实请求启用原有每查询70毫秒等待。</summary>
+        internal void BeginMeasurement()
+        {
+            Count = 0;
+            measuring = true;
+        }
+
         /// <summary>在真实EF异步命令入口等待，再返回无业务记录的读取器。</summary>
         /// <param name="command">本次EF生成的只读命令。</param>
         /// <param name="eventData">本次命令上下文。</param>
@@ -103,7 +122,7 @@ public sealed class G2ReadinessBudgetTests
         public override async ValueTask<InterceptionResult<DbDataReader>> ReaderExecutingAsync(DbCommand command, CommandEventData eventData, InterceptionResult<DbDataReader> result, CancellationToken cancellationToken = default)
         {
             Count++;
-            await Task.Delay(TimeSpan.FromMilliseconds(70), cancellationToken);
+            if (measuring) await Task.Delay(TimeSpan.FromMilliseconds(70), cancellationToken);
             return InterceptionResult<DbDataReader>.SuppressWithResult(new DataTable().CreateDataReader());
         }
     }
@@ -117,7 +136,18 @@ public sealed class G2ReadinessBudgetTests
         /// <summary>最后一个依赖是否收到整体预算取消。</summary>
         internal bool Cancelled { get; private set; }
 
-        /// <summary>每个端点等待850毫秒，最后一个必须被剩余预算中断。</summary>
+        /// <summary>是否已完成真实路由预热并进入计时验证。</summary>
+        private bool measuring;
+
+        /// <summary>清除两个预热HTTP入口记录，仅在下一次请求中施加原有850毫秒等待。</summary>
+        internal void BeginMeasurement()
+        {
+            Paths.Clear();
+            Cancelled = false;
+            measuring = true;
+        }
+
+        /// <summary>测量时每个端点等待850毫秒，最后一个必须被剩余预算中断。</summary>
         /// <param name="request">真实生产客户端发出的固定健康请求。</param>
         /// <param name="cancellationToken">HTTP客户端收到的剩余预算令牌。</param>
         /// <returns>预算足够时返回合成成功，否则传播取消。</returns>
@@ -126,7 +156,7 @@ public sealed class G2ReadinessBudgetTests
             Paths.Add(request.RequestUri!.AbsolutePath);
             try
             {
-                await Task.Delay(TimeSpan.FromMilliseconds(850), cancellationToken);
+                if (measuring) await Task.Delay(TimeSpan.FromMilliseconds(850), cancellationToken);
             }
             catch (OperationCanceledException)
             {

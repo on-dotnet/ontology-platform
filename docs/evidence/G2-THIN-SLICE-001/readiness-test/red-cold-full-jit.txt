@@ -1,0 +1,24 @@
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+失败 DatabaseAndBothHttpDependenciesShareRemainingBudget (1s 203ms)
+  从 /Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+  Assertion failed. 预期值相等。
+
+  expected: 8
+  actual:   6
+
+  Assert.AreEqual(8, queries.Count)
+    在 OntologyPlatform.SecurityTests.G2ReadinessBudgetTests.DatabaseAndBothHttpDependenciesShareRemainingBudget() 位于 /Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2ReadinessBudgetTests.cs:64
+    在 OntologyPlatform.SecurityTests.G2ReadinessBudgetTests.DatabaseAndBothHttpDependenciesShareRemainingBudget() 位于 /Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G2ReadinessBudgetTests.cs:68
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64) 失败并出现 1 个错误 (2s 561ms)
+退出代码: 2
+
+测试运行摘要: 失败!
+  总计: 1
+  失败: 1
+  成功: 0
+  已跳过: 0
+  持续时间: 2s 794ms
+已完成测试运行，但显示非成功退出代码: 2 (请参阅: https://aka.ms/testingplatform/exitcodes)
+
+EXIT_CODE=2
