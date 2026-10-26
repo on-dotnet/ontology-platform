@@ -266,6 +266,94 @@ public sealed class VerifiedReadTests
     /// <summary>生成一个主体和短字面量组成的指定数量业务三元组，不触发其他资源上限。</summary>
     private static string BoundedTriples(int count) => string.Join('\n', Enumerable.Range(0, count).Select(index => $"<urn:s> <urn:p> \"{index}\" ."));
 
+    /// <summary>仓库Synthetic标签与来源断言中的非BMP字符必须通过真实校验和正式同批读取。</summary>
+    [TestMethod]
+    [DataRow("😀")]
+    [DataRow("𠀀")]
+    public async Task SyntheticNonBmpLabelSurvivesValidationAndPublication(string label)
+    {
+        // 原样复现AI的唯一变更：同时替换业务标签和来源断言里的同一字面值。
+        var source = SemanticFixture.Sources();
+        source = source with { DataTurtle = source.DataTurtle.Replace("炉次heat-1", label, StringComparison.Ordinal) };
+        // 保存原始字节事实，运行时不得为了兼容而重写权威源。
+        var originalData = source.DataTurtle;
+        // 全链均使用脚本创建的真实Jena。
+        ISemanticRuntime runtime = SemanticFixture.Runtime();
+        // 清单与快照hash严格来自原始UTF8源。
+        var manifest = Manifest(source);
+        Assert.AreEqual(manifest.Hashes, (await runtime.AnalyzeAsync(source, 1, CancellationToken.None)).Hashes);
+        // 此步会经由完整图导出再Load，是旧Unicode错误的实际触发点。
+        var report = await runtime.ValidateAsync(source, CancellationToken.None);
+        Assert.IsTrue(report.Conforms);
+        Assert.AreEqual(manifest.Hashes, report.Hashes);
+        await runtime.DeployAsync(manifest, source, CancellationToken.None);
+        Assert.IsTrue(await runtime.VerifyAsync(manifest, source, CancellationToken.None));
+        // 真正正式回读不能把非BMP字符丢掉或替换成replacement character。
+        var result = await runtime.ReadVerifiedPublishedAsync(manifest, source, CancellationToken.None);
+        Assert.IsTrue(result.DataTriples.Count(triple => triple.Object.Kind == RdfTermKind.Literal && triple.Object.Value == label) >= 2);
+        Assert.AreEqual(originalData, source.DataTurtle);
+        Assert.AreEqual(OntologyRules.Hash(originalData), manifest.Hashes.DataHash);
+    }
+
+    /// <summary>编辑导出的标准literal应完整保留所有控制字符、引号、反斜线、字面转义与非BMP，且无法注入三元组。</summary>
+    [TestMethod]
+    [DataRow(true)]
+    [DataRow(false)]
+    public async Task NonBmpLiteralEditIsLosslessAndCannotInjectTriples(bool languageTagged)
+    {
+        // ontology源保留注释，真正结构变更后格式变化允许但必须有实际内容差异。
+        var source = Sources() with { OntologyTurtle = "# 原始注释\n<urn:verified:C> a <http://www.w3.org/2002/07/owl#Class> ; <http://www.w3.org/2000/01/rdf-schema#label> \"旧标签\" .\n" };
+        // 全C0/C1控制字符与恶意分隔符均作为数据值，不能变成RDF语法。
+        var value = "😀𠀀 引号\" 反斜线\\ 字面\\uD83D\\uDE00\\U0001F600 \" . <urn:injected> <urn:p> <urn:o> . #\n" + string.Concat(Enumerable.Range(0, 32).Concat(Enumerable.Range(127, 33)).Select(code => (char)code));
+        // 语言和datatype两个分支都必须保留精确词法。
+        var replacement = new RdfTerm { Kind = RdfTermKind.Literal, Value = value, Language = languageTagged ? "zh" : null, Datatype = languageTagged ? null : "urn:unicode:literal" };
+        // 真实RIOT给出旧对象的完整类型信息，避免凭字符串猜测类型。
+        ISemanticRuntime runtime = SemanticFixture.Runtime();
+        // 取真实源三元组进行一次精确编辑。
+        var analysis = await runtime.AnalyzeAsync(source, 1, CancellationToken.None);
+        // 唯一label是待编辑目标，其余图必须完整保留。
+        var oldLabel = analysis.Projection.Triples.Single(triple => triple.Predicate == "http://www.w3.org/2000/01/rdf-schema#label");
+        // 新源码来自生产Term导出，不能使用测试自行转义来掩盖错误。
+        var edited = await runtime.ApplyEditAsync(source, new SemanticEdit { SubjectIri = oldLabel.Subject.Value, PredicateIri = oldLabel.Predicate, OldObject = oldLabel.Object, NewObject = replacement }, CancellationToken.None);
+        Assert.AreNotEqual(source.OntologyTurtle, edited.OntologyTurtle);
+        Assert.AreNotEqual(analysis.Hashes.OntologyHash, OntologyRules.Hash(edited.OntologyTurtle));
+        // 导出再交给真实RIOT，检验值而非仅比较序列化字符串。
+        var reparsed = await runtime.AnalyzeAsync(edited, 2, CancellationToken.None);
+        Assert.AreEqual(2, reparsed.Projection.Triples.Length);
+        Assert.IsFalse(reparsed.Projection.Triples.Any(triple => triple.Subject.Value == "urn:injected"));
+        // 语言字面量会由标准RIOT补rdf:langString，分别核对语义字段。
+        var actual = reparsed.Projection.Triples.Single(triple => triple.Predicate == oldLabel.Predicate).Object;
+        Assert.AreEqual(value, actual.Value);
+        Assert.AreEqual(replacement.Language, actual.Language);
+        if (!languageTagged) Assert.AreEqual(replacement.Datatype, actual.Datatype);
+        Assert.AreEqual(edited, await runtime.ApplyEditAsync(edited, new SemanticEdit { SubjectIri = oldLabel.Subject.Value, PredicateIri = oldLabel.Predicate, OldObject = actual, NewObject = actual }, CancellationToken.None));
+        Assert.IsTrue((await runtime.ValidateAsync(edited, CancellationToken.None)).Conforms);
+        // 正式发布及同批读取不能在二次导出时再次损失Unicode或控制字符。
+        var manifest = Manifest(edited);
+        await runtime.DeployAsync(manifest, edited, CancellationToken.None);
+        Assert.IsTrue(await runtime.VerifyAsync(manifest, edited, CancellationToken.None));
+        // 返回数组的字面量词法必须与调用方给定的新值逐字符一致。
+        var published = await runtime.ReadVerifiedPublishedAsync(manifest, edited, CancellationToken.None);
+        Assert.AreEqual(value, published.OntologyTriples.Single(triple => triple.Subject == oldLabel.Subject && triple.Predicate == oldLabel.Predicate).Object.Value);
+        Assert.AreEqual(2, published.OntologyTriples.Count(triple => triple.Subject.Value == "urn:verified:C"));
+    }
+
+    /// <summary>不完整UTF16代理项不能被导出器悄悄替换成另一个RDF字面量。</summary>
+    [TestMethod]
+    [DataRow(true)]
+    [DataRow(false)]
+    public async Task InvalidSurrogateLiteralIsRejectedWithoutReplacement(bool highSurrogate)
+    {
+        // 通过真实RIOT解析合法原图，只将编辑输入的新字面量设为不完整代理项。
+        var runtime = SemanticFixture.Runtime();
+        // 构造无合法Unicode标量对应的单独高/低代理项，不把有效非BMP误判无效。
+        var value = new string((char)(highSurrogate ? 0xD800 : 0xDC00), 1);
+        // 生产导出器必须拒绝，而非替换成U+FFFD并返回看似成功的新源码。
+        var error = await Assert.ThrowsAsync<SemanticOperationException>(() => runtime.ApplyEditAsync(Sources(), new SemanticEdit { SubjectIri = "urn:verified:C", PredicateIri = "http://www.w3.org/2000/01/rdf-schema#label", NewObject = new RdfTerm { Kind = RdfTermKind.Literal, Value = value } }, CancellationToken.None));
+        Assert.AreEqual(422, error.Status);
+        Assert.AreEqual("rdf_literal_invalid", error.Code);
+    }
+
     /// <summary>精确字节散列的测试清单不依赖生产序列化器构造期望值。</summary>
     private static ReleaseManifest Manifest(SourceBundle source)
     {
