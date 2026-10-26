@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Antiforgery;
@@ -140,7 +141,7 @@ public sealed class G2SecurityTests
         fixture.Client.DefaultRequestHeaders.Add("Origin", "http://platform.test");
         // 真实HTTP响应仅用于状态和公开错误边界断言。
         using var response = await fixture.Client.PostAsJsonAsync("/revise", G2HttpFixture.Command());
-        Assert.AreEqual(status, (int)response.StatusCode);
+        Assert.AreEqual(status, (int)response.StatusCode, "宿主异常类型：" + fixture.PropagatedFailureType?.Name);
         Assert.AreEqual(status == 200 ? 1 : 0, fixture.BusinessCalls);
         if (status == 200)
         {
@@ -297,7 +298,7 @@ public sealed class G2SecurityTests
         using var response = malformed
             ? await fixture.Client.PostAsync("/protected-write", new StringContent("{", Encoding.UTF8, "application/json"))
             : await fixture.Client.PostAsJsonAsync("/protected-write", G2HttpFixture.Command());
-        Assert.AreEqual(malformed ? HttpStatusCode.BadRequest : HttpStatusCode.OK, response.StatusCode);
+        Assert.AreEqual(malformed ? HttpStatusCode.BadRequest : HttpStatusCode.OK, response.StatusCode, "宿主异常类型：" + fixture.PropagatedFailureType?.Name);
         Assert.AreEqual(malformed ? 0 : 1, fixture.BusinessCalls);
         Assert.AreEqual(0, fixture.Audit.Commands.Count);
     }
@@ -420,22 +421,91 @@ internal sealed class G2HttpFixture : IAsyncDisposable
         fixture.App.MapPost("/write", (HttpContext context, CommandContext command) => G2EndpointGuard.WriteAsync(context, "ontology.edit", command, (_, _) =>
         {
             fixture.BusinessCalls++;
-            return Task.FromResult(new OntologyDraft { Revision = 3, Etag = "\"3\"" });
+            return Task.FromResult(SyntheticDraft());
         }));
         fixture.App.MapPost("/revise", (HttpContext context, CommandContext command) => G2EndpointGuard.WriteAsync(context, "ontology.edit", command, (_, _) =>
         {
             fixture.BusinessCalls++;
-            return Task.FromResult(new OntologyDraft { Revision = 3, Etag = "\"3\"" });
+            return Task.FromResult(SyntheticDraft());
         }, requiresRevision: true));
         fixture.App.MapPost("/protected-write", (HttpContext context, CommandContext command) => G2EndpointGuard.WriteAsync(context, "ontology.edit", command, (_, _) =>
         {
             fixture.BusinessCalls++;
-            return Task.FromResult(new OntologyDraft { Revision = 3, Etag = "\"3\"" });
+            return Task.FromResult(SyntheticDraft());
         })).RequireAuthorization("ontology.edit");
         await fixture.App.StartAsync();
         fixture.Client = new HttpClient { BaseAddress = new Uri(fixture.App.Services.GetRequiredService<IServer>().Features.Get<IServerAddressesFeature>()!.Addresses.Single()) };
         return fixture;
     }
+
+    /// <summary>构造完整合成草稿供HTTP安全夹具输出，不能代表真实本体持久化或解析验收。</summary>
+    /// <returns>源码、实际散列、修订及手工固定单三元组投影一致的测试草稿。</returns>
+    private static OntologyDraft SyntheticDraft()
+    {
+        // 本体只声明一个合成类，使固定投影可与整份本体源码逐项对应。
+        const string classIri = "urn:fixture:Thing";
+        // 标准RDF类型谓词用于唯一的类声明三元组。
+        const string typeIri = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
+        // 标准OWL类标识同时用于源三元组和节点类型。
+        const string owlClassIri = "http://www.w3.org/2002/07/owl#Class";
+        // 数据显式标记Synthetic；未实现的可选词汇保持null，不伪造资产。
+        var sources = new SourceBundle
+        {
+            OntologyTurtle = $"<{classIri}> <{typeIri}> <{owlClassIri}> .\n",
+            ShapesTurtle = "@prefix sh: <http://www.w3.org/ns/shacl#> .\n<urn:fixture:ThingShape> a sh:NodeShape; sh:targetClass <urn:fixture:Thing> .\n",
+            VocabularyTurtle = null,
+            DataTurtle = "<urn:fixture:org-demo:site-a:sample> a <urn:fixture:Thing>; <urn:fixture:synthetic> true .\n"
+        };
+        // 三个必需来源散列直接取对应UTF8字节，不使用占位常量。
+        var ontologyHash = HashSyntheticSource(sources.OntologyTurtle);
+        // Shape散列对应完整合成SHACL源码。
+        var shapesHash = HashSyntheticSource(sources.ShapesTurtle);
+        // 数据散列对应显式Synthetic事实源码。
+        var dataHash = HashSyntheticSource(sources.DataTurtle);
+        // 组合散列严格采用ontology、shapes、vocabulary/absent、data的LF顺序。
+        var hashes = new SourceHashes
+        {
+            OntologyHash = ontologyHash,
+            ShapesHash = shapesHash,
+            VocabularyHash = null,
+            DataHash = dataHash,
+            BundleHash = HashSyntheticSource($"{ontologyHash}\n{shapesHash}\nabsent\n{dataHash}")
+        };
+        return new OntologyDraft
+        {
+            DraftId = "fixture-draft",
+            AssetId = "fixture-asset",
+            Scope = new ResourceScope { OrganizationId = "org-demo", SiteIds = ["site-a", "site-b"] },
+            BaseReleaseId = null,
+            Revision = 3,
+            Etag = "\"3\"",
+            Name = "合成安全测试草稿",
+            Sources = sources,
+            Hashes = hashes,
+            OwnerSubjectId = "fixture-subject",
+            UpdatedAtUtc = new DateTimeOffset(2026, 10, 26, 0, 0, 0, TimeSpan.Zero),
+            Projection = new SemanticProjection
+            {
+                Revision = 3,
+                Hashes = hashes,
+                Triples = [new RdfTriple
+                {
+                    Subject = new RdfTerm { Kind = RdfTermKind.Iri, Value = classIri },
+                    Predicate = typeIri,
+                    Object = new RdfTerm { Kind = RdfTermKind.Iri, Value = owlClassIri }
+                }],
+                Nodes = [new SemanticNode { Id = classIri, Kind = SemanticNodeKind.Class, Label = classIri, TypeIris = [owlClassIri] }],
+                Edges = [],
+                StructuralEditAllowed = true,
+                Diagnostics = []
+            }
+        };
+    }
+
+    /// <summary>按冻结合同为合成源码的完整UTF8字节计算小写SHA256。</summary>
+    /// <param name="value">仅由本测试生成的完整源码或规范组合散列文本。</param>
+    /// <returns>64位小写十六进制散列。</returns>
+    private static string HashSyntheticSource(string value) => Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(value)));
 
     /// <summary>生成与G1验证后结构相同的服务器身份，不读取请求输入。</summary>
     /// <param name="role">服务器测试配置角色。</param>
