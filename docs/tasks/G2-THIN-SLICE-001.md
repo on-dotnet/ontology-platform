@@ -116,7 +116,7 @@ Master：`codex/G2-THIN-SLICE-001-master`，`/Users/chasen/.codex/worktrees/g2-m
 - [x] 2. 实际API/Jena SHACL/SPARQL/发布/SSE样本耗时分布/输入规模/环境，记录无生产SLO，模型/Windows/Intel/生产专项真实NOT_RUN/BLOCKED。
 - [x] 3. 独立语义/授权/发布一致性/工具安全/总体Review，重要缺口关闭后受锁构建/测试/同Head Linux CI。原CI和门禁不减。
 - [x] 4. Master唯一集成main并push，实际确认远端SHA及同Head CI；报告命令/退出码/未完原因/分支树/精确SHA。
-- [x] 5. 标准构包脚本生成唯一Review ZIP，独立VerifyOnly/逐成员散列/固定Git源/diff安全路径检查，交付绝对路径/size/SHA256和G2_THIN_SLICE_READY_FOR_REVIEW后停止。
+- [ ] 5. 标准构包脚本生成唯一Review ZIP，独立VerifyOnly/逐成员散列/固定Git源/diff安全路径检查，交付绝对路径/size/SHA256和G2_THIN_SLICE_READY_FOR_REVIEW后停止。此项在最终提交后的实际封包与独立回执闭合，不事前勾选。
 
 
 2026-10-26 契约初审：de5f09f授权范围符合，0Critical/2Important/2Minor；未派产品写任务。已核实并修正回滚与当前草稿修订冲突（PUBLISH/ROLLBACK分支），补齐跨模块投影/查询/SSE载荷精确类型，明确Master治理事务writer路径和assetId永久唯一scope。兼容PoC实际恢复/编译/加载MAF1.26.0、AI10.11.0与MCP2.3.0，NuGet全传递已知漏洞查询未报告命中；完整许可登记与实际工具调用仍待验收。修正提交后限定复审，冻结后再派写。
