@@ -1,0 +1,698 @@
+{
+  "status": "PASS",
+  "scope": "Synthetic OTLP -> real pinned Alloy -> real pinned Prometheus; product Meter E2E NOT_RUN here",
+  "configSha256": "8c6bd202721ca0250e88edf172ce012791b4cfa4301ae57e9693dbb8e828d2ee",
+  "checks": [
+    {
+      "check": "finite-capability-describe_ontology",
+      "status": "PASS",
+      "group": "finite"
+    },
+    {
+      "check": "finite-capability-resolve_entity",
+      "status": "PASS",
+      "group": "finite"
+    },
+    {
+      "check": "finite-capability-traverse_relationships",
+      "status": "PASS",
+      "group": "finite"
+    },
+    {
+      "check": "invalid-capability-unknown",
+      "status": "PASS",
+      "group": "negative"
+    },
+    {
+      "check": "invalid-capability-body",
+      "status": "PASS",
+      "group": "negative"
+    },
+    {
+      "check": "invalid-capability-empty",
+      "status": "PASS",
+      "group": "negative"
+    },
+    {
+      "check": "invalid-capability-case",
+      "status": "PASS",
+      "group": "negative"
+    },
+    {
+      "check": "invalid-capability-integer",
+      "status": "PASS",
+      "group": "negative"
+    },
+    {
+      "check": "invalid-capability-boolean",
+      "status": "PASS",
+      "group": "negative"
+    },
+    {
+      "check": "invalid-capability-array",
+      "status": "PASS",
+      "group": "negative"
+    },
+    {
+      "check": "invalid-capability-map",
+      "status": "PASS",
+      "group": "negative"
+    },
+    {
+      "check": "finite-status-Found",
+      "status": "PASS",
+      "group": "finite"
+    },
+    {
+      "check": "finite-status-Empty",
+      "status": "PASS",
+      "group": "finite"
+    },
+    {
+      "check": "finite-status-Partial",
+      "status": "PASS",
+      "group": "finite"
+    },
+    {
+      "check": "finite-status-Unavailable",
+      "status": "PASS",
+      "group": "finite"
+    },
+    {
+      "check": "finite-status-Unauthorized",
+      "status": "PASS",
+      "group": "finite"
+    },
+    {
+      "check": "finite-status-Ambiguous",
+      "status": "PASS",
+      "group": "finite"
+    },
+    {
+      "check": "finite-status-allowed",
+      "status": "PASS",
+      "group": "finite"
+    },
+    {
+      "check": "finite-status-failure",
+      "status": "PASS",
+      "group": "finite"
+    },
+    {
+      "check": "invalid-status-unknown",
+      "status": "PASS",
+      "group": "negative"
+    },
+    {
+      "check": "invalid-status-body",
+      "status": "PASS",
+      "group": "negative"
+    },
+    {
+      "check": "invalid-status-empty",
+      "status": "PASS",
+      "group": "negative"
+    },
+    {
+      "check": "invalid-status-case",
+      "status": "PASS",
+      "group": "negative"
+    },
+    {
+      "check": "invalid-status-integer",
+      "status": "PASS",
+      "group": "negative"
+    },
+    {
+      "check": "invalid-status-boolean",
+      "status": "PASS",
+      "group": "negative"
+    },
+    {
+      "check": "invalid-status-array",
+      "status": "PASS",
+      "group": "negative"
+    },
+    {
+      "check": "invalid-status-map",
+      "status": "PASS",
+      "group": "negative"
+    },
+    {
+      "check": "finite-operation-AnalyzeAsync",
+      "status": "PASS",
+      "group": "finite"
+    },
+    {
+      "check": "finite-operation-ValidateAsync",
+      "status": "PASS",
+      "group": "finite"
+    },
+    {
+      "check": "finite-operation-ApplyEditAsync",
+      "status": "PASS",
+      "group": "finite"
+    },
+    {
+      "check": "finite-operation-DeployAsync",
+      "status": "PASS",
+      "group": "finite"
+    },
+    {
+      "check": "finite-operation-VerifyAsync",
+      "status": "PASS",
+      "group": "finite"
+    },
+    {
+      "check": "finite-operation-ReadPublishedAsync",
+      "status": "PASS",
+      "group": "finite"
+    },
+    {
+      "check": "finite-operation-ReadVerifiedPublishedAsync",
+      "status": "PASS",
+      "group": "finite"
+    },
+    {
+      "check": "finite-operation-publish",
+      "status": "PASS",
+      "group": "finite"
+    },
+    {
+      "check": "finite-operation-rollback",
+      "status": "PASS",
+      "group": "finite"
+    },
+    {
+      "check": "finite-operation-outbox",
+      "status": "PASS",
+      "group": "finite"
+    },
+    {
+      "check": "invalid-operation-unknown",
+      "status": "PASS",
+      "group": "negative"
+    },
+    {
+      "check": "invalid-operation-body",
+      "status": "PASS",
+      "group": "negative"
+    },
+    {
+      "check": "invalid-operation-empty",
+      "status": "PASS",
+      "group": "negative"
+    },
+    {
+      "check": "invalid-operation-case",
+      "status": "PASS",
+      "group": "negative"
+    },
+    {
+      "check": "invalid-operation-integer",
+      "status": "PASS",
+      "group": "negative"
+    },
+    {
+      "check": "invalid-operation-boolean",
+      "status": "PASS",
+      "group": "negative"
+    },
+    {
+      "check": "invalid-operation-array",
+      "status": "PASS",
+      "group": "negative"
+    },
+    {
+      "check": "invalid-operation-map",
+      "status": "PASS",
+      "group": "negative"
+    },
+    {
+      "check": "finite-outcome-completed",
+      "status": "PASS",
+      "group": "finite"
+    },
+    {
+      "check": "finite-outcome-failed",
+      "status": "PASS",
+      "group": "finite"
+    },
+    {
+      "check": "invalid-outcome-unknown",
+      "status": "PASS",
+      "group": "negative"
+    },
+    {
+      "check": "invalid-outcome-body",
+      "status": "PASS",
+      "group": "negative"
+    },
+    {
+      "check": "invalid-outcome-empty",
+      "status": "PASS",
+      "group": "negative"
+    },
+    {
+      "check": "invalid-outcome-case",
+      "status": "PASS",
+      "group": "negative"
+    },
+    {
+      "check": "invalid-outcome-integer",
+      "status": "PASS",
+      "group": "negative"
+    },
+    {
+      "check": "invalid-outcome-boolean",
+      "status": "PASS",
+      "group": "negative"
+    },
+    {
+      "check": "invalid-outcome-array",
+      "status": "PASS",
+      "group": "negative"
+    },
+    {
+      "check": "invalid-outcome-map",
+      "status": "PASS",
+      "group": "negative"
+    },
+    {
+      "check": "finite-phase-lease",
+      "status": "PASS",
+      "group": "finite"
+    },
+    {
+      "check": "finite-phase-verify",
+      "status": "PASS",
+      "group": "finite"
+    },
+    {
+      "check": "finite-phase-consume",
+      "status": "PASS",
+      "group": "finite"
+    },
+    {
+      "check": "finite-phase-commit",
+      "status": "PASS",
+      "group": "finite"
+    },
+    {
+      "check": "finite-phase-prepare_or_commit",
+      "status": "PASS",
+      "group": "finite"
+    },
+    {
+      "check": "invalid-phase-unknown",
+      "status": "PASS",
+      "group": "negative"
+    },
+    {
+      "check": "invalid-phase-body",
+      "status": "PASS",
+      "group": "negative"
+    },
+    {
+      "check": "invalid-phase-empty",
+      "status": "PASS",
+      "group": "negative"
+    },
+    {
+      "check": "invalid-phase-case",
+      "status": "PASS",
+      "group": "negative"
+    },
+    {
+      "check": "invalid-phase-integer",
+      "status": "PASS",
+      "group": "negative"
+    },
+    {
+      "check": "invalid-phase-boolean",
+      "status": "PASS",
+      "group": "negative"
+    },
+    {
+      "check": "invalid-phase-array",
+      "status": "PASS",
+      "group": "negative"
+    },
+    {
+      "check": "invalid-phase-map",
+      "status": "PASS",
+      "group": "negative"
+    },
+    {
+      "check": "product-shape-ontology.semantic.duration",
+      "status": "PASS",
+      "group": "product-shape"
+    },
+    {
+      "check": "product-shape-publishing.operations",
+      "status": "PASS",
+      "group": "product-shape"
+    },
+    {
+      "check": "product-shape-semantic.query.count",
+      "status": "PASS",
+      "group": "product-shape"
+    },
+    {
+      "check": "product-shape-agents.run.count",
+      "status": "PASS",
+      "group": "product-shape"
+    },
+    {
+      "check": "g1-http-and-instance-a",
+      "status": "PASS",
+      "group": "g1"
+    },
+    {
+      "check": "g1-http-and-instance-b",
+      "status": "PASS",
+      "group": "g1"
+    },
+    {
+      "check": "private-marker-never-exits",
+      "status": "PASS",
+      "group": "privacy"
+    },
+    {
+      "check": "private-keys-never-exit-series",
+      "status": "PASS",
+      "group": "privacy"
+    },
+    {
+      "check": "series-labels-only-known-finite-or-existing-g1",
+      "status": "PASS",
+      "group": "privacy"
+    }
+  ],
+  "commands": [
+    {
+      "label": "docker-version",
+      "argv": [
+        "docker",
+        "version",
+        "--format",
+        "{{.Server.Version}}"
+      ],
+      "exitCode": 0,
+      "stdout": "29.9.2\n",
+      "stderr": ""
+    },
+    {
+      "label": "alloy-image",
+      "argv": [
+        "docker",
+        "image",
+        "inspect",
+        "grafana/alloy:v1.21.2@sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18",
+        "--format",
+        "{{json .RepoDigests}} {{.Architecture}}"
+      ],
+      "exitCode": 0,
+      "stdout": "[\"grafana/alloy@sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18\"] arm64\n",
+      "stderr": ""
+    },
+    {
+      "label": "prometheus-image",
+      "argv": [
+        "docker",
+        "image",
+        "inspect",
+        "prom/prometheus:v3.15.1@sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2",
+        "--format",
+        "{{json .RepoDigests}} {{.Architecture}}"
+      ],
+      "exitCode": 0,
+      "stdout": "[\"prom/prometheus@sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2\"] arm64\n",
+      "stderr": ""
+    },
+    {
+      "label": "alloy-validate",
+      "argv": [
+        "docker",
+        "run",
+        "--pull=never",
+        "--rm",
+        "--network=none",
+        "--memory=256m",
+        "--cpus=1",
+        "--pids-limit=128",
+        "--mount",
+        "type=bind,src=/Users/chasen/.codex/worktrees/g2-observability/ontology-platform/infra/observability/alloy/config.alloy,dst=/etc/alloy/config.alloy,readonly",
+        "-e",
+        "LOKI_OTLP_ENDPOINT=http://127.0.0.1:9/otlp",
+        "-e",
+        "TEMPO_OTLP_ENDPOINT=http://127.0.0.1:9",
+        "-e",
+        "PROMETHEUS_OTLP_ENDPOINT=http://prometheus:9090/api/v1/otlp",
+        "grafana/alloy:v1.21.2@sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18",
+        "validate",
+        "/etc/alloy/config.alloy"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "label": "network-create",
+      "argv": [
+        "docker",
+        "network",
+        "create",
+        "g2-metric-8f1620cfa53c-network"
+      ],
+      "exitCode": 0,
+      "stdout": "d79285e9ebb24983bd97d0bc7f14f2389855cab1b3eea6f7d919c388be160735\n",
+      "stderr": ""
+    },
+    {
+      "label": "prometheus-start",
+      "argv": [
+        "docker",
+        "run",
+        "-d",
+        "--pull=never",
+        "--name",
+        "g2-metric-8f1620cfa53c-prometheus",
+        "--network",
+        "g2-metric-8f1620cfa53c-network",
+        "--network-alias",
+        "prometheus",
+        "-p",
+        "127.0.0.1::9090",
+        "--read-only",
+        "--tmpfs",
+        "/prometheus:rw,size=96m,uid=65534,gid=65534",
+        "--mount",
+        "type=bind,src=/var/folders/8r/n2xjjrn90v7fplnwsjkft1sm0000gn/T/g2-metric-8f1620cfa53c-zhfb5f2r/prometheus.yaml,dst=/etc/prometheus/prometheus.yaml,readonly",
+        "--memory=256m",
+        "--cpus=1",
+        "--pids-limit=128",
+        "prom/prometheus:v3.15.1@sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2",
+        "--config.file=/etc/prometheus/prometheus.yaml",
+        "--storage.tsdb.path=/prometheus",
+        "--storage.tsdb.retention.time=15m",
+        "--web.enable-otlp-receiver"
+      ],
+      "exitCode": 0,
+      "stdout": "844841fb1fba545691d5c9f08f7d4bb5ec0164c2684b2b7796da6727fe1bc1a9\n",
+      "stderr": ""
+    },
+    {
+      "label": "g2-metric-8f1620cfa53c-prometheus-port",
+      "argv": [
+        "docker",
+        "port",
+        "g2-metric-8f1620cfa53c-prometheus",
+        "9090"
+      ],
+      "exitCode": 0,
+      "stdout": "127.0.0.1:54488\n",
+      "stderr": ""
+    },
+    {
+      "label": "alloy-start",
+      "argv": [
+        "docker",
+        "run",
+        "-d",
+        "--pull=never",
+        "--name",
+        "g2-metric-8f1620cfa53c-alloy",
+        "--network",
+        "g2-metric-8f1620cfa53c-network",
+        "-p",
+        "127.0.0.1::4318",
+        "-p",
+        "127.0.0.1::12345",
+        "--read-only",
+        "--tmpfs",
+        "/var/lib/alloy:rw,size=32m",
+        "--memory=256m",
+        "--cpus=1",
+        "--pids-limit=128",
+        "--mount",
+        "type=bind,src=/Users/chasen/.codex/worktrees/g2-observability/ontology-platform/infra/observability/alloy/config.alloy,dst=/etc/alloy/config.alloy,readonly",
+        "-e",
+        "LOKI_OTLP_ENDPOINT=http://127.0.0.1:9/otlp",
+        "-e",
+        "TEMPO_OTLP_ENDPOINT=http://127.0.0.1:9",
+        "-e",
+        "PROMETHEUS_OTLP_ENDPOINT=http://prometheus:9090/api/v1/otlp",
+        "grafana/alloy:v1.21.2@sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18",
+        "run",
+        "--server.http.listen-addr=0.0.0.0:12345",
+        "--storage.path=/var/lib/alloy/data",
+        "--disable-reporting",
+        "/etc/alloy/config.alloy"
+      ],
+      "exitCode": 0,
+      "stdout": "7964aa590cffbf99d6ab2067ad5819b2395b6da475e3c10addd6e969ce713c22\n",
+      "stderr": ""
+    },
+    {
+      "label": "g2-metric-8f1620cfa53c-alloy-port",
+      "argv": [
+        "docker",
+        "port",
+        "g2-metric-8f1620cfa53c-alloy",
+        "4318"
+      ],
+      "exitCode": 0,
+      "stdout": "127.0.0.1:54492\n",
+      "stderr": ""
+    },
+    {
+      "label": "g2-metric-8f1620cfa53c-alloy-port",
+      "argv": [
+        "docker",
+        "port",
+        "g2-metric-8f1620cfa53c-alloy",
+        "12345"
+      ],
+      "exitCode": 0,
+      "stdout": "127.0.0.1:54491\n",
+      "stderr": ""
+    },
+    {
+      "label": "g2-metric-8f1620cfa53c-alloy-logs",
+      "argv": [
+        "docker",
+        "logs",
+        "--tail=100",
+        "g2-metric-8f1620cfa53c-alloy"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "label": "g2-metric-8f1620cfa53c-alloy-cleanup",
+      "argv": [
+        "docker",
+        "rm",
+        "-f",
+        "-v",
+        "g2-metric-8f1620cfa53c-alloy"
+      ],
+      "exitCode": 0,
+      "stdout": "g2-metric-8f1620cfa53c-alloy\n",
+      "stderr": ""
+    },
+    {
+      "label": "g2-metric-8f1620cfa53c-prometheus-logs",
+      "argv": [
+        "docker",
+        "logs",
+        "--tail=100",
+        "g2-metric-8f1620cfa53c-prometheus"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "time=2026-10-26T03:42:30.490Z level=INFO source=main.go:1770 msg=\"updated GOGC\" old=100 new=75\ntime=2026-10-26T03:42:30.490Z level=INFO source=main.go:824 msg=\"Updating GOMAXPROCS=1: determined from CPU quota\" component=automaxprocs\ntime=2026-10-26T03:42:30.491Z level=INFO source=memlimit.go:198 msg=\"GOMEMLIMIT is updated\" component=automemlimit package=github.com/KimMachineGun/automemlimit/memlimit GOMEMLIMIT=241591910 previous=9223372036854775807\ntime=2026-10-26T03:42:30.491Z level=INFO source=main.go:933 msg=\"Starting Prometheus Server\" mode=server version=\"(version=3.15.1, branch=HEAD, revision=bae3eced0a5369e050e83ea73bc381d7c4b1a719)\"\ntime=2026-10-26T03:42:30.491Z level=INFO source=main.go:938 msg=\"operational information\" build_context=\"(go=go1.27.3, platform=linux/arm64, user=root@03bc6b0f3ef7, date=20261021-13:34:13, tags=netgo,builtinassets)\" host_details=\"(Linux 7.0.14-linuxkit #1 SMP PREEMPT Fri Oct 16 11:55:50 UTC 2026 aarch64 844841fb1fba (none))\" fd_limits=\"(soft=1048576, hard=1048576)\" vm_limits=\"(soft=unlimited, hard=unlimited)\"\ntime=2026-10-26T03:42:30.549Z level=INFO source=web.go:727 msg=\"Start listening for connections\" component=web address=0.0.0.0:9090\ntime=2026-10-26T03:42:30.551Z level=INFO source=main.go:1499 msg=\"Starting TSDB ...\"\ntime=2026-10-26T03:42:30.553Z level=INFO source=head.go:753 msg=\"Replaying on-disk memory mappable chunks if any\" component=tsdb\ntime=2026-10-26T03:42:30.553Z level=INFO source=head.go:838 msg=\"On-disk memory mappable chunks replay completed\" component=tsdb duration=709ns\ntime=2026-10-26T03:42:30.553Z level=INFO source=head.go:846 msg=\"Replaying WAL, this may take a while\" component=tsdb\ntime=2026-10-26T03:42:30.553Z level=INFO source=tls_config.go:381 msg=\"Listening on\" component=web address=[::]:9090\ntime=2026-10-26T03:42:30.553Z level=INFO source=tls_config.go:384 msg=\"TLS is disabled.\" component=web http2=false address=[::]:9090\ntime=2026-10-26T03:42:30.554Z level=INFO source=head.go:941 msg=\"WAL segment loaded\" component=tsdb segment=0 maxSegment=0 duration=723.875\u00b5s\ntime=2026-10-26T03:42:30.554Z level=INFO source=head.go:978 msg=\"WAL replay completed\" component=tsdb checkpoint_replay_duration=5.125\u00b5s wal_replay_duration=730.959\u00b5s wbl_replay_duration=41ns chunk_snapshot_load_duration=0s mmap_chunk_replay_duration=709ns total_replay_duration=742.834\u00b5s\ntime=2026-10-26T03:42:30.554Z level=INFO source=main.go:1520 msg=\"filesystem information\" fs_type=TMPFS_MAGIC\ntime=2026-10-26T03:42:30.554Z level=INFO source=main.go:1523 msg=\"TSDB started\"\ntime=2026-10-26T03:42:30.554Z level=INFO source=main.go:1721 msg=\"Loading configuration file\" filename=/etc/prometheus/prometheus.yaml\ntime=2026-10-26T03:42:30.554Z level=INFO source=main.go:1137 msg=\"TSDB retention updated\" duration=15m size=0B percentage=0\ntime=2026-10-26T03:42:30.555Z level=INFO source=main.go:1763 msg=\"Completed loading of configuration file\" db_storage=12\u00b5s remote_storage=1.042\u00b5s web_handler=83ns query_engine=292ns scrape=58.458\u00b5s scrape_sd=500ns notify=583ns notify_sd=83ns rules=625ns tracing=1.792\u00b5s filename=/etc/prometheus/prometheus.yaml totalDuration=295.791\u00b5s\ntime=2026-10-26T03:42:30.555Z level=INFO source=main.go:1484 msg=\"Server is ready to receive web requests.\"\ntime=2026-10-26T03:42:30.555Z level=INFO source=manager.go:235 msg=\"Starting rule manager...\" component=\"rule manager\"\n"
+    },
+    {
+      "label": "g2-metric-8f1620cfa53c-prometheus-cleanup",
+      "argv": [
+        "docker",
+        "rm",
+        "-f",
+        "-v",
+        "g2-metric-8f1620cfa53c-prometheus"
+      ],
+      "exitCode": 0,
+      "stdout": "g2-metric-8f1620cfa53c-prometheus\n",
+      "stderr": ""
+    },
+    {
+      "label": "network-cleanup",
+      "argv": [
+        "docker",
+        "network",
+        "rm",
+        "g2-metric-8f1620cfa53c-network"
+      ],
+      "exitCode": 0,
+      "stdout": "g2-metric-8f1620cfa53c-network\n",
+      "stderr": ""
+    },
+    {
+      "label": "cleanup-check",
+      "argv": [
+        "docker",
+        "ps",
+        "-a",
+        "--filter",
+        "name=g2-metric-8f1620cfa53c",
+        "--format",
+        "{{.Names}}"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "images": {
+    "alloy": "grafana/alloy:v1.21.2@sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18",
+    "prometheus": "prom/prometheus:v3.15.1@sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2"
+  },
+  "inputSha256": "b60648a2a7f64ae726271459842c5800cea6911a57220bb582ca6d2a60a98af7",
+  "inputDatapoints": 74,
+  "otlpResponse": {
+    "partialSuccess": {}
+  },
+  "outputSeries": 79,
+  "queriedSeries": 77,
+  "counts": {
+    "finite": {
+      "total": 28,
+      "passed": 28
+    },
+    "negative": {
+      "total": 40,
+      "passed": 40
+    },
+    "product-shape": {
+      "total": 4,
+      "passed": 4
+    },
+    "g1": {
+      "total": 2,
+      "passed": 2
+    },
+    "privacy": {
+      "total": 3,
+      "passed": 3
+    }
+  },
+  "cleanup": {
+    "ownContainersRemaining": [],
+    "checkedPrefix": "g2-metric-8f1620cfa53c",
+    "onlyOwnNewResources": true
+  },
+  "recordedAtUtc": "2026-10-26T03:42:33.514092+00:00"
+}

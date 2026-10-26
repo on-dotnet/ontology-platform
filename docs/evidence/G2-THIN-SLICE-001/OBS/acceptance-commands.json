@@ -1,0 +1,32 @@
+{
+  "commands": [
+    {
+      "label": "red",
+      "argv": [
+        "python3",
+        "scripts/acceptance/g2-metric-boundary.py",
+        "--evidence",
+        "docs/evidence/G2-THIN-SLICE-001/OBS/red"
+      ],
+      "exitCode": 1,
+      "expectedFailure": "28 finite and 4 product-shape label checks fail; all 45 existing privacy/G1/invalid checks pass",
+      "configSha256": "0983213699a64af5f2dc8134ad7a45d34545ce7fade6dafdd1cdd82912b3ad83"
+    },
+    {
+      "label": "green-formatted",
+      "argv": [
+        "python3",
+        "scripts/acceptance/g2-metric-boundary.py",
+        "--input",
+        "docs/evidence/G2-THIN-SLICE-001/OBS/red/input.synthetic-otlp.json",
+        "--evidence",
+        "docs/evidence/G2-THIN-SLICE-001/OBS/green-formatted"
+      ],
+      "exitCode": 0,
+      "configSha256": "ece43d2e118aa18138f2cfc66e8f06a1077f19dbf0983e5900668e7d76e4b6a7"
+    }
+  ],
+  "samePayloadCanonicalSha256": "b60648a2a7f64ae726271459842c5800cea6911a57220bb582ca6d2a60a98af7",
+  "observedChecks": 77,
+  "CI": "NOT_VERIFIED: independent task branch CI not queried; Master final integrated Head CI required"
+}
