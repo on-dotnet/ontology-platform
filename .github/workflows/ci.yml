@@ -38,6 +38,9 @@ jobs:
       - name: Runtime output boundary negatives
         shell: pwsh
         run: python3 scripts/tests/Wave2Runtime.Tests.py
+      - name: G2 acceptance orchestration positive and negative checks
+        shell: pwsh
+        run: python3 scripts/tests/G2Acceptance.Tests.py
       - name: Build format and real host security tests
         shell: pwsh
         run: ./scripts/verify.ps1 -RunNative -RunTests -SkipWeb

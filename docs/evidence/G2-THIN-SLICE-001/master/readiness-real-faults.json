@@ -5,7 +5,7 @@
       "check": "health_key_required",
       "status": "PASS",
       "httpStatus": 401,
-      "elapsedMs": 44.10016699694097,
+      "elapsedMs": 54.67800000042189,
       "maximumObservedEnvelopeMs": 3000,
       "internalBudgetMs": 2000
     },
@@ -13,7 +13,7 @@
       "check": "all_real_modules_dependencies_ready",
       "status": "PASS",
       "httpStatus": 200,
-      "elapsedMs": 40.87699999945471,
+      "elapsedMs": 75.07804199849488,
       "maximumObservedEnvelopeMs": 3000,
       "internalBudgetMs": 2000
     },
@@ -21,7 +21,7 @@
       "check": "jena_stall_fails_closed",
       "status": "PASS",
       "httpStatus": 503,
-      "elapsedMs": 2019.832874997519,
+      "elapsedMs": 2021.2315829994623,
       "maximumObservedEnvelopeMs": 3000,
       "internalBudgetMs": 2000
     },
@@ -29,7 +29,7 @@
       "check": "jena_recovered",
       "status": "PASS",
       "httpStatus": 200,
-      "elapsedMs": 9.423791001609061,
+      "elapsedMs": 51.43599999428261,
       "maximumObservedEnvelopeMs": 3000,
       "internalBudgetMs": 2000
     },
@@ -37,7 +37,7 @@
       "check": "rustfs_stall_fails_closed",
       "status": "PASS",
       "httpStatus": 503,
-      "elapsedMs": 2007.7982920047361,
+      "elapsedMs": 2005.518124999071,
       "maximumObservedEnvelopeMs": 3000,
       "internalBudgetMs": 2000
     },
@@ -45,10 +45,26 @@
       "check": "rustfs_recovered",
       "status": "PASS",
       "httpStatus": 200,
-      "elapsedMs": 10.791082997457124,
+      "elapsedMs": 45.494209000025876,
+      "maximumObservedEnvelopeMs": 3000,
+      "internalBudgetMs": 2000
+    },
+    {
+      "check": "governance_postgres_stall_fails_closed",
+      "status": "PASS",
+      "httpStatus": 503,
+      "elapsedMs": 1010.2977499991539,
+      "maximumObservedEnvelopeMs": 3000,
+      "internalBudgetMs": 2000
+    },
+    {
+      "check": "governance_postgres_recovered",
+      "status": "PASS",
+      "httpStatus": 200,
+      "elapsedMs": 46.02383299788926,
       "maximumObservedEnvelopeMs": 3000,
       "internalBudgetMs": 2000
     }
   ],
-  "status": "FAIL"
+  "status": "PASS"
 }

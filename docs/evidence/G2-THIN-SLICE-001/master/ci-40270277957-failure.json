@@ -1,0 +1,165 @@
+{
+  "runId": 40270277957,
+  "headSha": "65212620c36650dc52df299b618de6e2e838f51e",
+  "url": "https://github.com/on-dotnet/ontology-platform/actions/runs/40270277957",
+  "conclusion": "failure",
+  "jobs": {
+    "jobs": [
+      {
+        "id": 121401401010,
+        "name": "engineering",
+        "status": "completed",
+        "conclusion": "failure",
+        "run_id": 40270277957,
+        "logs_url": null,
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1
+          },
+          {
+            "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2
+          },
+          {
+            "name": "Prepare isolated verification parser",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3
+          },
+          {
+            "name": "Repository policy and positive-negative checks",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4
+          },
+          {
+            "name": "Run actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5
+          },
+          {
+            "name": "Restore exact committed platform graph",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 6
+          },
+          {
+            "name": "Frozen Web restore and separate lint typecheck test build",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 7
+          },
+          {
+            "name": "Runtime output boundary negatives",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 8
+          },
+          {
+            "name": "Build format and real host security tests",
+            "status": "completed",
+            "conclusion": "failure",
+            "number": 9
+          },
+          {
+            "name": "Scope notice",
+            "status": "completed",
+            "conclusion": "skipped",
+            "number": 10
+          },
+          {
+            "name": "Post Run actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68",
+            "status": "completed",
+            "conclusion": "skipped",
+            "number": 19
+          },
+          {
+            "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 20
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 21
+          }
+        ]
+      },
+      {
+        "id": 121401401253,
+        "name": "governance-integration",
+        "status": "completed",
+        "conclusion": "failure",
+        "run_id": 40270277957,
+        "logs_url": null,
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1
+          },
+          {
+            "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2
+          },
+          {
+            "name": "Run actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3
+          },
+          {
+            "name": "Frozen restore and backend build",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4
+          },
+          {
+            "name": "Real PostgreSQL security integration",
+            "status": "completed",
+            "conclusion": "failure",
+            "number": 5
+          },
+          {
+            "name": "Real G2 semantic publishing query MCP MAF and native SSE integration",
+            "status": "completed",
+            "conclusion": "skipped",
+            "number": 6
+          },
+          {
+            "name": "Post Run actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68",
+            "status": "completed",
+            "conclusion": "skipped",
+            "number": 11
+          },
+          {
+            "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 12
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 13
+          }
+        ]
+      }
+    ]
+  },
+  "engineeringFailure": "G2TransportTests.cs import ordering; full formatter caught on Linux",
+  "governanceFailure": "109 total,107 success,2 failures,0 skipped; new readiness fixture initial Npgsql connection before fault injection resets stream; owner investigating actual TCP readiness",
+  "safeTestExcerpt": "2026-10-26T04:43:24.0791867Z Running tests from /home/runner/work/ontology-platform/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|x64)\n2026-10-26T04:43:24.0794114Z failed PausedPostgresCannotOutliveHealthBudget (False,False) (1s 987ms)\n2026-10-26T04:43:24.0796494Z   from /home/runner/work/ontology-platform/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|x64)\n2026-10-26T04:43:24.0800140Z   Test method OntologyPlatform.SecurityTests.G2ReadinessPostgresTests.PausedPostgresCannotOutliveHealthBudget threw exception:\n2026-10-26T04:43:24.0803152Z   Npgsql.NpgsqlException: Exception while reading from stream ---> System.IO.EndOfStreamException: Attempted to read past the end of the stream.\n2026-10-26T04:43:24.0806107Z     at Npgsql.Internal.NpgsqlReadBuffer.<Ensure>g__EnsureLong|54_0(NpgsqlReadBuffer buffer, Int32 count, Boolean async, Boolean readingNotifications)\n2026-10-26T04:43:24.0808077Z     --- End of inner exception stack trace ---\n2026-10-26T04:43:24.0810009Z     at Npgsql.Internal.NpgsqlReadBuffer.<Ensure>g__EnsureLong|54_0(NpgsqlReadBuffer buffer, Int32 count, Boolean async, Boolean readingNotifications)\n2026-10-26T04:43:24.0812448Z     at System.Runtime.CompilerServices.PoolingAsyncValueTaskMethodBuilder`1.StateMachineBox`1.System.Threading.Tasks.Sources.IValueTaskSource.GetResult(Int16 token)\n2026-10-26T04:43:24.0815401Z     at Npgsql.Internal.NpgsqlConnector.SetupEncryption(SslMode sslMode, GssEncryptionMode gssEncryptionMode, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)\n2026-10-26T04:43:24.0818305Z     at Npgsql.Internal.NpgsqlConnector.<Open>g__OpenCore|209_0(NpgsqlConnector conn, String username, SslMode sslMode, GssEncryptionMode gssEncMode, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)\n2026-10-26T04:43:24.0822043Z     at Npgsql.Internal.NpgsqlConnector.<Open>g__OpenCore|209_0(NpgsqlConnector conn, String username, SslMode sslMode, GssEncryptionMode gssEncMode, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)\n2026-10-26T04:43:24.0824532Z     at Npgsql.Internal.NpgsqlConnector.Open(NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)\n2026-10-26T04:43:24.0826765Z     at Npgsql.PoolingDataSource.OpenNewConnector(NpgsqlConnection conn, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)\n2026-10-26T04:43:24.0828827Z     at Npgsql.PoolingDataSource.<Get>g__RentAsync|33_0(NpgsqlConnection conn, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)\n2026-10-26T04:43:24.0830540Z     at Npgsql.NpgsqlConnection.<Open>g__OpenAsync|42_0(Boolean async, CancellationToken cancellationToken)\n2026-10-26T04:43:24.0833722Z     at OntologyPlatform.SecurityTests.G2ReadinessPostgresTests.PausedPostgresCannotOutliveHealthBudget(Boolean duringQuery, Boolean cancelCaller) in /_/backend/tests/OntologyPlatform.SecurityTests/G2ReadinessPostgresTests.cs:42\n2026-10-26T04:43:24.0837975Z     at OntologyPlatform.SecurityTests.G2ReadinessPostgresTests.PausedPostgresCannotOutliveHealthBudget(Boolean duringQuery, Boolean cancelCaller) in /_/backend/tests/OntologyPlatform.SecurityTests/G2ReadinessPostgresTests.cs:110\n2026-10-26T04:43:24.0842149Z     at OntologyPlatform.SecurityTests.G2ReadinessPostgresTests.PausedPostgresCannotOutliveHealthBudget(Boolean duringQuery, Boolean cancelCaller) in /_/backend/tests/OntologyPlatform.SecurityTests/G2ReadinessPostgresTests.cs:110\n2026-10-26T04:43:24.0845585Z     at Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n2026-10-26T04:43:24.0847418Z \n2026-10-26T04:43:24.0848346Z failed PausedPostgresCannotOutliveHealthBudget (True,True) (1s 307ms)\n2026-10-26T04:43:24.0850254Z   from /home/runner/work/ontology-platform/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|x64)\n2026-10-26T04:43:24.0853306Z   Test method OntologyPlatform.SecurityTests.G2ReadinessPostgresTests.PausedPostgresCannotOutliveHealthBudget threw exception:\n2026-10-26T04:43:24.0858655Z   Npgsql.NpgsqlException: Exception while reading from stream ---> System.IO.IOException: Unable to read data from the transport connection: Connection reset by peer. ---> System.Net.Sockets.SocketException: Connection reset by peer\n2026-10-26T04:43:24.0861834Z     at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.ThrowException(SocketError error, CancellationToken cancellationToken)\n2026-10-26T04:43:24.0864117Z     at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.System.Threading.Tasks.Sources.IValueTaskSource<System.Int32>.GetResult(Int16 token)\n2026-10-26T04:43:24.0865390Z     at Npgsql.Internal.NpgsqlReadBuffer.<Ensure>g__EnsureLong|54_0(NpgsqlReadBuffer buffer, Int32 count, Boolean async, Boolean readingNotifications)\n2026-10-26T04:43:24.0866732Z     --- End of inner exception stack trace ---\n2026-10-26T04:43:24.0868428Z     at Npgsql.Internal.NpgsqlReadBuffer.<Ensure>g__EnsureLong|54_0(NpgsqlReadBuffer buffer, Int32 count, Boolean async, Boolean readingNotifications)\n2026-10-26T04:43:24.0870931Z     at System.Runtime.CompilerServices.PoolingAsyncValueTaskMethodBuilder`1.StateMachineBox`1.System.Threading.Tasks.Sources.IValueTaskSource.GetResult(Int16 token)\n2026-10-26T04:43:24.0873392Z     at Npgsql.Internal.NpgsqlConnector.SetupEncryption(SslMode sslMode, GssEncryptionMode gssEncryptionMode, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)\n2026-10-26T04:43:24.0876561Z     at Npgsql.Internal.NpgsqlConnector.<Open>g__OpenCore|209_0(NpgsqlConnector conn, String username, SslMode sslMode, GssEncryptionMode gssEncMode, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)\n2026-10-26T04:43:24.0880279Z     at Npgsql.Internal.NpgsqlConnector.<Open>g__OpenCore|209_0(NpgsqlConnector conn, String username, SslMode sslMode, GssEncryptionMode gssEncMode, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)\n2026-10-26T04:43:24.0882646Z     at Npgsql.Internal.NpgsqlConnector.Open(NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)\n2026-10-26T04:43:24.0884542Z     at Npgsql.PoolingDataSource.OpenNewConnector(NpgsqlConnection conn, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)\n2026-10-26T04:43:24.0886933Z     at Npgsql.PoolingDataSource.<Get>g__RentAsync|33_0(NpgsqlConnection conn, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)\n2026-10-26T04:43:24.0888745Z     at Npgsql.NpgsqlConnection.<Open>g__OpenAsync|42_0(Boolean async, CancellationToken cancellationToken)\n2026-10-26T04:43:24.0891827Z     at OntologyPlatform.SecurityTests.G2ReadinessPostgresTests.PausedPostgresCannotOutliveHealthBudget(Boolean duringQuery, Boolean cancelCaller) in /_/backend/tests/OntologyPlatform.SecurityTests/G2ReadinessPostgresTests.cs:42\n2026-10-26T04:43:24.0896270Z     at OntologyPlatform.SecurityTests.G2ReadinessPostgresTests.PausedPostgresCannotOutliveHealthBudget(Boolean duringQuery, Boolean cancelCaller) in /_/backend/tests/OntologyPlatform.SecurityTests/G2ReadinessPostgresTests.cs:110\n2026-10-26T04:43:24.0899111Z     at OntologyPlatform.SecurityTests.G2ReadinessPostgresTests.PausedPostgresCannotOutliveHealthBudget(Boolean duringQuery, Boolean cancelCaller) in /_/backend/tests/OntologyPlatform.SecurityTests/G2ReadinessPostgresTests.cs:110\n2026-10-26T04:43:24.0904811Z     at Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n2026-10-26T04:43:24.0913550Z \n2026-10-26T04:43:24.0915431Z /home/runner/work/ontology-platform/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|x64) failed with 2 error(s) (31s 462ms)\n2026-10-26T04:43:24.0917368Z [REDACTED: sensitive protocol field]\n2026-10-26T04:43:24.0917668Z \n2026-10-26T04:43:24.0917983Z Test run summary: Failed!\n2026-10-26T04:43:24.0918420Z   total: 109\n2026-10-26T04:43:24.0918784Z   failed: 2\n2026-10-26T04:43:24.0919194Z   succeeded: 107\n2026-10-26T04:43:24.0919777Z   skipped: 0\n2026-10-26T04:43:24.0920188Z   duration: 31s 737ms\n2026-10-26T04:43:24.0920661Z [REDACTED: sensitive protocol field]\n2026-10-26T04:43:24.3869530Z FAIL: real governance integration; details retained only after sanitization\n2026-10-26T04:43:25.0830248Z ##[error]Process completed with exit code 1."
+}
