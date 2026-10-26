@@ -53,6 +53,7 @@ public static class G2EndpointGuard
     /// <param name="operation">业务委托。</param>
     /// <param name="write">是否为写边界。</param>
     /// <param name="requiresRevision">是否要求强修订条件。</param>
+    /// <param name="requiresCommand">业务写入必须具备命令，标准只读传输仅复用身份和防伪。</param>
     /// <returns>未提前发送的最终响应。</returns>
     private static async Task<IResult> ExecuteAsync<T>(HttpContext context, string policy, CommandContext? command, Func<ActorContext, CancellationToken, Task<T>> operation, bool write, bool requiresRevision, bool requiresCommand = true)
     {
