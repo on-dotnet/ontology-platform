@@ -1,0 +1,112 @@
+{
+  "observedAt": "2026-10-26T16:32:10.720995+00:00",
+  "status": "PASS_SCOPED_MAC_RESOURCE_ACCEPTANCE",
+  "operations": {
+    "cache": 175,
+    "worktree": 10,
+    "git-local-branch": 11,
+    "git-remote-branch": 13,
+    "docker-container": 2,
+    "docker-volume": 24,
+    "docker-image": 13,
+    "docker-history": 18
+  },
+  "exactCompleted": 266,
+  "logSha256": "ca45ef67c680c7bdf0feeef2cdec0714bcc4fea1e2602af4a5176e3f65b75e5e",
+  "noFailedEvents": true,
+  "noUnapprovedGitOrDockerDeletion": true,
+  "protectedTreesPreserved": [
+    "/Users/chasen/.codex/worktrees/g2-master/ontology-platform",
+    "/Users/chasen/.codex/worktrees/g2-query/ontology-platform",
+    "/Users/chasen/.codex/worktrees/g2-security/ontology-platform",
+    "/Users/chasen/.codex/worktrees/g2-sem/ontology-platform",
+    "/Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform",
+    "/Users/chasen/Developer/repos/ontology-platform"
+  ],
+  "cacheLogicalBytes": 2530247461,
+  "gitBefore": {
+    "localBranches": 26,
+    "remoteBranches": 28,
+    "worktrees": 16
+  },
+  "gitAfter": {
+    "localBranches": 15,
+    "remoteBranches": 15,
+    "worktrees": 6
+  },
+  "dockerInitial": {
+    "containers": 2,
+    "volumes": 48,
+    "images": 23,
+    "buildHistory": 18
+  },
+  "dockerPreApply": {
+    "containers": 11,
+    "volumes": 48,
+    "images": 24,
+    "buildHistory": 19
+  },
+  "dockerAfterApplyLive": {
+    "containers": 9,
+    "volumes": 24,
+    "images": 11,
+    "buildHistory": 1
+  },
+  "dockerFinal": {
+    "containers": 0,
+    "volumes": 24,
+    "images": 11,
+    "buildHistory": 1
+  },
+  "probeCreatedContainers": [
+    "4a4974610396d8ef5ba9cf61924145d9e45655d39e3f5cabd4f797301fb8a9fb",
+    "6367e667687e974d95888d0f684bc183137d1ab17d1fd43b8347c96a7f9b6720",
+    "9a1a7124a815e9c9435fd277e914b0ba08410b1c994101d34b26d825a82b224c",
+    "a6933fc187497781100b64e87282dc1c9ba9e2ff0313660b3222e1e3cfa3b2e2",
+    "aa8a09791e007097297c5453d987e802c7ce7d64db1a4290e372f6b82650d71a",
+    "d873840b9283b91ea4ba902dbb119be2f68c99e0bd7d1845a592a40be33c8dd0",
+    "f41fa3195b1cf8e153c270c74967eb24c57a77332c14ec8d0fd50550dc361bf3",
+    "f7b2c767fc57d141a7ebae807bd3f3f3cf9991aa89b4c6c1172a633d58001697",
+    "fbe061f739ed0c4412e0a8c9cd2d2eadc7729898bda2f96a179fc6198fc69a98"
+  ],
+  "probeShutdown": "Normal trusted AppHost termination removed only its nine transient containers; named volumes retained.",
+  "volumesCandidateLogicalBytes": 1939386960,
+  "volumeEngineBefore": 3771503801,
+  "volumeEngineAfter": 1840304068,
+  "volumeEngineNetReduction": 1931199733,
+  "imageLayersPreApply": 5747353542,
+  "imageLayersAfter": 5747294286,
+  "imageLayersNetReduction": 59256,
+  "oldStoppedContainerRwBytes": 177119232,
+  "buildCacheIdsRetained": [
+    "9ps57q51cxsb93afm52vkj3em",
+    "e6jc9b1q8gmh87dd0nbmywbzy",
+    "ewk9svasi6fnram76609wm4v6",
+    "gv4hro3gkgleb154wipw0e4l0",
+    "j7p20on71k1xzi48sfnfw82at",
+    "k2nu5zzwwgb5684dhnk1x4qr1",
+    "k69m501cgn7tmtdmz3ce5u3rz",
+    "k80vo9jwximo27dn3tew76krh",
+    "nisjoatf7lkhmgnj85rttnckd",
+    "qfv1txx0qs8w2btgyyyv75yuc",
+    "snjlqumzjtwnxasoxfgjt3q6n",
+    "uxtr0h6w1ojbn4gqy5y6cdb73",
+    "w06xag2aijqm5anekuduy0juk"
+  ],
+  "defaultNetworksPreservedAcrossApplyAndShutdown": true,
+  "initialToPreApplyNetworkDrift": {
+    "bridge": {
+      "initial": [
+        "210e5297f65e498e09e873cc441b717627066d53d31d715a37173a121fd21c4b",
+        "bridge"
+      ],
+      "preApply": [
+        "de218450706eb86169c7ff111f3b7e0b7e9cb8b195203f3357b0a9977262e377",
+        "bridge"
+      ],
+      "cause": "NOT_VERIFIED; observed before Apply, no network mutation commands"
+    }
+  },
+  "physicalDiskReclaimed": "NOT_VERIFIED",
+  "oldZip": "Pending exact hash deletion only after final committed ZIP independently reopens; final external delivery receipt records actual effect without Git self-reference."
+}

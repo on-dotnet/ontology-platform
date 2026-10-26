@@ -1,0 +1,157 @@
+test_apply_requires_new_log (__main__.CleanupTests.test_apply_requires_new_log) ... ok
+test_archived_small_file_requires_exact_committed_bytes (__main__.CleanupTests.test_archived_small_file_requires_exact_committed_bytes) ... ok
+test_cache_current_protected_or_locked_tree_refuses_deletion (__main__.CleanupTests.test_cache_current_protected_or_locked_tree_refuses_deletion) ... ok
+test_cache_fingerprint_change_after_preflight_stops (__main__.CleanupTests.test_cache_fingerprint_change_after_preflight_stops) ... ok
+test_cache_nested_symlink_preserves_external_bytes (__main__.CleanupTests.test_cache_nested_symlink_preserves_external_bytes) ... ok
+test_cache_parent_symlink_refused (__main__.CleanupTests.test_cache_parent_symlink_refused) ... ok
+test_cache_rejects_private_parent_link_and_outside (__main__.CleanupTests.test_cache_rejects_private_parent_link_and_outside) ... ok
+test_cache_symlink_unlinks_never_follows (__main__.CleanupTests.test_cache_symlink_unlinks_never_follows) ... ok
+test_cache_then_worktree_deletes_only_exact_regenerable_cache (__main__.CleanupTests.test_cache_then_worktree_deletes_only_exact_regenerable_cache) ... ok
+test_dirty_locked_protected_worktrees_reject (__main__.CleanupTests.test_dirty_locked_protected_worktrees_reject) ... ok
+test_docker_after_reports_remaining_resource (__main__.CleanupTests.test_docker_after_reports_remaining_resource) ... ok
+test_docker_exact_whitelist_and_dryrun (__main__.CleanupTests.test_docker_exact_whitelist_and_dryrun) ... ok
+test_docker_history_project_boundary (__main__.CleanupTests.test_docker_history_project_boundary) ... ok
+test_docker_keep_replaced_name_and_active_refs_reject (__main__.CleanupTests.test_docker_keep_replaced_name_and_active_refs_reject) ... ok
+test_dryrun_has_zero_repository_byte_changes (__main__.CleanupTests.test_dryrun_has_zero_repository_byte_changes) ... ok
+test_effective_origin_rewrite_is_refused (__main__.CleanupTests.test_effective_origin_rewrite_is_refused) ... ok
+test_exact_public_pnpm_asset_allows_closed_cache_cleanup (__main__.CleanupTests.test_exact_public_pnpm_asset_allows_closed_cache_cleanup) ... ok
+test_expired_changed_tip_keep_duplicate_and_active_reject (__main__.CleanupTests.test_expired_changed_tip_keep_duplicate_and_active_reject) ... ok
+test_expired_plan_is_rechecked_after_preflight (__main__.CleanupTests.test_expired_plan_is_rechecked_after_preflight) ... ok
+test_history_absence_diagnostic_rejects_other_errors_and_wrong_ref (__main__.CleanupTests.test_history_absence_diagnostic_rejects_other_errors_and_wrong_ref) ...
+  test_history_absence_diagnostic_rejects_other_errors_and_wrong_ref (__main__.CleanupTests.test_history_absence_diagnostic_rejects_other_errors_and_wrong_ref) (error='ERROR: transport sentinel-private-value') ... FAIL
+  test_history_absence_diagnostic_rejects_other_errors_and_wrong_ref (__main__.CleanupTests.test_history_absence_diagnostic_rejects_other_errors_and_wrong_ref) (error='ERROR: permission denied') ... FAIL
+  test_history_absence_diagnostic_rejects_other_errors_and_wrong_ref (__main__.CleanupTests.test_history_absence_diagnostic_rejects_other_errors_and_wrong_ref) (error='ERROR: no record found for ref "other123"') ... FAIL
+  test_history_absence_diagnostic_rejects_other_errors_and_wrong_ref (__main__.CleanupTests.test_history_absence_diagnostic_rejects_other_errors_and_wrong_ref) (error='ERROR: no record found for ref "hist123" extra') ... FAIL
+test_history_backend_generation_mismatch_refuses_before_delete (__main__.CleanupTests.test_history_backend_generation_mismatch_refuses_before_delete) ... FAIL
+test_history_dockerfile_accepts_only_two_exact_project_forms (__main__.CleanupTests.test_history_dockerfile_accepts_only_two_exact_project_forms) ... ok
+test_history_existing_pin_tombstone_fails_and_stops_later_operations (__main__.CleanupTests.test_history_existing_pin_tombstone_fails_and_stops_later_operations) ... FAIL
+test_history_offset_movement_or_range_error_refuses_before_delete (__main__.CleanupTests.test_history_offset_movement_or_range_error_refuses_before_delete) ...
+  test_history_offset_movement_or_range_error_refuses_before_delete (__main__.CleanupTests.test_history_offset_movement_or_range_error_refuses_before_delete) (flag='offsetMoved') ... FAIL
+  test_history_offset_movement_or_range_error_refuses_before_delete (__main__.CleanupTests.test_history_offset_movement_or_range_error_refuses_before_delete) (flag='offsetMissing') ... FAIL
+test_history_offset_prevents_zero_ref_tombstone_and_database_survives_restart (__main__.CleanupTests.test_history_offset_prevents_zero_ref_tombstone_and_database_survives_restart) ... FAIL
+test_history_rejects_foreign_running_changed_fingerprint (__main__.CleanupTests.test_history_rejects_foreign_running_changed_fingerprint) ... ok
+test_invalid_schema_repository_main_and_ttl_are_refused (__main__.CleanupTests.test_invalid_schema_repository_main_and_ttl_are_refused) ... ok
+test_local_and_remote_ancestor_delete_exactly (__main__.CleanupTests.test_local_and_remote_ancestor_delete_exactly) ... ok
+test_log_records_exact_nonzero_command_exit_and_stops (__main__.CleanupTests.test_log_records_exact_nonzero_command_exit_and_stops) ... ok
+test_malformed_history_after_is_logged_and_later_branch_kept (__main__.CleanupTests.test_malformed_history_after_is_logged_and_later_branch_kept) ... ok
+test_midrun_tip_change_refuses_before_delete (__main__.CleanupTests.test_midrun_tip_change_refuses_before_delete) ... ok
+test_nonancestor_fails_before_any_deletion (__main__.CleanupTests.test_nonancestor_fails_before_any_deletion) ... ok
+test_open_prs_prevent_all_mutations (__main__.CleanupTests.test_open_prs_prevent_all_mutations) ... ok
+test_origin_change_after_preflight_rejects_mutation (__main__.CleanupTests.test_origin_change_after_preflight_rejects_mutation) ... ok
+test_permission_or_cli_failure_is_closed (__main__.CleanupTests.test_permission_or_cli_failure_is_closed) ... ok
+test_private_ignored_data_blocks_worktree (__main__.CleanupTests.test_private_ignored_data_blocks_worktree) ... ok
+test_public_asset_exception_rejects_wrong_path_bytes_size_link_and_stale_fingerprint (__main__.CleanupTests.test_public_asset_exception_rejects_wrong_path_bytes_size_link_and_stale_fingerprint) ... ok
+test_registered_clean_worktree_removed_without_force (__main__.CleanupTests.test_registered_clean_worktree_removed_without_force) ... ok
+test_remote_delete_compare_and_delete_preserves_concurrent_tip (__main__.CleanupTests.test_remote_delete_compare_and_delete_preserves_concurrent_tip) ... ok
+test_worktree_keep_descendant_or_ancestor_refuses_removal (__main__.CleanupTests.test_worktree_keep_descendant_or_ancestor_refuses_removal) ... ok
+
+======================================================================
+FAIL: test_history_absence_diagnostic_rejects_other_errors_and_wrong_ref (__main__.CleanupTests.test_history_absence_diagnostic_rejects_other_errors_and_wrong_ref) (error='ERROR: transport sentinel-private-value')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform/scripts/tests/CleanupResources.Tests.py", line 348, in test_history_absence_diagnostic_rejects_other_errors_and_wrong_ref
+    result=self.run_engine(True);self.assertNotEqual(result.returncode,0)
+                                 ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 == 0
+
+======================================================================
+FAIL: test_history_absence_diagnostic_rejects_other_errors_and_wrong_ref (__main__.CleanupTests.test_history_absence_diagnostic_rejects_other_errors_and_wrong_ref) (error='ERROR: permission denied')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform/scripts/tests/CleanupResources.Tests.py", line 350, in test_history_absence_diagnostic_rejects_other_errors_and_wrong_ref
+    self.assertTrue(self.git('show-ref','--verify','refs/heads/codex/old').stdout)
+                    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform/scripts/tests/CleanupResources.Tests.py", line 64, in git
+    self.assertEqual(r.returncode, 0, r.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 128 != 0 : fatal: 'refs/heads/codex/old' - not a valid ref
+
+
+======================================================================
+FAIL: test_history_absence_diagnostic_rejects_other_errors_and_wrong_ref (__main__.CleanupTests.test_history_absence_diagnostic_rejects_other_errors_and_wrong_ref) (error='ERROR: no record found for ref "other123"')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform/scripts/tests/CleanupResources.Tests.py", line 350, in test_history_absence_diagnostic_rejects_other_errors_and_wrong_ref
+    self.assertTrue(self.git('show-ref','--verify','refs/heads/codex/old').stdout)
+                    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform/scripts/tests/CleanupResources.Tests.py", line 64, in git
+    self.assertEqual(r.returncode, 0, r.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 128 != 0 : fatal: 'refs/heads/codex/old' - not a valid ref
+
+
+======================================================================
+FAIL: test_history_absence_diagnostic_rejects_other_errors_and_wrong_ref (__main__.CleanupTests.test_history_absence_diagnostic_rejects_other_errors_and_wrong_ref) (error='ERROR: no record found for ref "hist123" extra')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform/scripts/tests/CleanupResources.Tests.py", line 350, in test_history_absence_diagnostic_rejects_other_errors_and_wrong_ref
+    self.assertTrue(self.git('show-ref','--verify','refs/heads/codex/old').stdout)
+                    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform/scripts/tests/CleanupResources.Tests.py", line 64, in git
+    self.assertEqual(r.returncode, 0, r.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 128 != 0 : fatal: 'refs/heads/codex/old' - not a valid ref
+
+
+======================================================================
+FAIL: test_history_backend_generation_mismatch_refuses_before_delete (__main__.CleanupTests.test_history_backend_generation_mismatch_refuses_before_delete)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform/scripts/tests/CleanupResources.Tests.py", line 355, in test_history_backend_generation_mismatch_refuses_before_delete
+    result=self.run_engine(True);self.assertNotEqual(result.returncode,0)
+                                 ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 == 0
+
+======================================================================
+FAIL: test_history_existing_pin_tombstone_fails_and_stops_later_operations (__main__.CleanupTests.test_history_existing_pin_tombstone_fails_and_stops_later_operations)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform/scripts/tests/CleanupResources.Tests.py", line 330, in test_history_existing_pin_tombstone_fails_and_stops_later_operations
+    result=self.run_engine(True);self.assertNotEqual(result.returncode,0)
+                                 ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 == 0
+
+======================================================================
+FAIL: test_history_offset_movement_or_range_error_refuses_before_delete (__main__.CleanupTests.test_history_offset_movement_or_range_error_refuses_before_delete) (flag='offsetMoved')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform/scripts/tests/CleanupResources.Tests.py", line 340, in test_history_offset_movement_or_range_error_refuses_before_delete
+    result=self.run_engine(True);self.assertNotEqual(result.returncode,0)
+                                 ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 == 0
+
+======================================================================
+FAIL: test_history_offset_movement_or_range_error_refuses_before_delete (__main__.CleanupTests.test_history_offset_movement_or_range_error_refuses_before_delete) (flag='offsetMissing')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform/scripts/tests/CleanupResources.Tests.py", line 342, in test_history_offset_movement_or_range_error_refuses_before_delete
+    self.assertFalse((self.base/'apply.jsonl').exists())
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_history_offset_prevents_zero_ref_tombstone_and_database_survives_restart (__main__.CleanupTests.test_history_offset_prevents_zero_ref_tombstone_and_database_survives_restart)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform/scripts/tests/CleanupResources.Tests.py", line 322, in test_history_offset_prevents_zero_ref_tombstone_and_database_survives_restart
+    state=json.loads(self.state_path.read_text());self.assertEqual(state['history'],[], 'CLI success/list absence must not hide retained database records')
+                                                  ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [{'Ref': 'hist123', 'Name': 'infra/develop[249 chars]ed'}] != []
+
+First list contains 1 additional elements.
+First extra element 0:
+{'Ref': 'hist123', 'Name': 'infra/development/fuseki', 'Dockerfile': 'Dockerfile', 'Context': '/repo/ontology-platform/infra/development/fuseki', 'VCSRepository': 'https://github.com/on-dotnet/ontology-platform', 'VCSRevision': '5452ca93f65027c388e0b66dffd4ab5ddecb8069', 'Status': 'completed'}
+
++ []
+- [{'Context': '/repo/ontology-platform/infra/development/fuseki',
+-   'Dockerfile': 'Dockerfile',
+-   'Name': 'infra/development/fuseki',
+-   'Ref': 'hist123',
+-   'Status': 'completed',
+-   'VCSRepository': 'https://github.com/on-dotnet/ontology-platform',
+-   'VCSRevision': '5452ca93f65027c388e0b66dffd4ab5ddecb8069'}] : CLI success/list absence must not hide retained database records
+
+----------------------------------------------------------------------
+Ran 40 tests in 86.967s
+
+FAILED (failures=9)

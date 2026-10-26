@@ -1,0 +1,1202 @@
+{
+  "observedAt": "2026-10-26T16:06:19.587064+00:00",
+  "containers": [
+    {
+      "Id": "9a1a7124a815e9c9435fd277e914b0ba08410b1c994101d34b26d825a82b224c",
+      "Name": "/alloy-yaktsrsh",
+      "ImageId": "sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18",
+      "Image": "grafana/alloy@sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18",
+      "State": "running",
+      "Mounts": [
+        {
+          "Type": "bind",
+          "Name": null,
+          "Source": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/observability/alloy/config.alloy",
+          "Destination": "/etc/alloy/config.alloy",
+          "RW": false
+        },
+        {
+          "Type": "volume",
+          "Name": "g2-ef979bd04cc0-alloy-data",
+          "Source": "/var/lib/docker/volumes/g2-ef979bd04cc0-alloy-data/_data",
+          "Destination": "/var/lib/alloy/data",
+          "RW": true
+        }
+      ],
+      "Created": "2026-10-26T16:05:25.207374421Z"
+    },
+    {
+      "Id": "d873840b9283b91ea4ba902dbb119be2f68c99e0bd7d1845a592a40be33c8dd0",
+      "Name": "/grafana-ttzasdsk",
+      "ImageId": "sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f",
+      "Image": "grafana/grafana@sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f",
+      "State": "running",
+      "Mounts": [
+        {
+          "Type": "bind",
+          "Name": null,
+          "Source": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/observability/grafana/grafana.ini",
+          "Destination": "/etc/grafana/grafana.ini",
+          "RW": false
+        },
+        {
+          "Type": "bind",
+          "Name": null,
+          "Source": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/observability/grafana/provisioning",
+          "Destination": "/etc/grafana/provisioning",
+          "RW": false
+        },
+        {
+          "Type": "volume",
+          "Name": "g2-ef979bd04cc0-grafana-data",
+          "Source": "/var/lib/docker/volumes/g2-ef979bd04cc0-grafana-data/_data",
+          "Destination": "/var/lib/grafana",
+          "RW": true
+        },
+        {
+          "Type": "bind",
+          "Name": null,
+          "Source": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/observability/grafana/dashboards",
+          "Destination": "/var/lib/grafana/dashboards",
+          "RW": false
+        }
+      ],
+      "Created": "2026-10-26T16:05:25.205810005Z"
+    },
+    {
+      "Id": "4a4974610396d8ef5ba9cf61924145d9e45655d39e3f5cabd4f797301fb8a9fb",
+      "Name": "/fuseki-jbuzcdjb",
+      "ImageId": "sha256:a807095b91ef054c4ad772ac9d70a5268f8f48616fca197e3de2e618a2f5c837",
+      "Image": "fuseki:76af01fbdc917cf3952d1cae0db6d497accb2c65",
+      "State": "running",
+      "Mounts": [
+        {
+          "Type": "volume",
+          "Name": "g2-ef979bd04cc0-fuseki-data",
+          "Source": "/var/lib/docker/volumes/g2-ef979bd04cc0-fuseki-data/_data",
+          "Destination": "/fuseki/databases",
+          "RW": true
+        }
+      ],
+      "Created": "2026-10-26T16:05:10.50436497Z"
+    },
+    {
+      "Id": "aa8a09791e007097297c5453d987e802c7ce7d64db1a4290e372f6b82650d71a",
+      "Name": "/keycloak-xwrmjdzj",
+      "ImageId": "sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b",
+      "Image": "quay.io/keycloak/keycloak@sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b",
+      "State": "running",
+      "Mounts": [],
+      "Created": "2026-10-26T16:05:10.228079012Z"
+    },
+    {
+      "Id": "f41fa3195b1cf8e153c270c74967eb24c57a77332c14ec8d0fd50550dc361bf3",
+      "Name": "/postgres-bmfpdvmd",
+      "ImageId": "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6",
+      "Image": "docker.io/library/postgres@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6",
+      "State": "running",
+      "Mounts": [
+        {
+          "Type": "volume",
+          "Name": "g2-ef979bd04cc0-postgres-data",
+          "Source": "/var/lib/docker/volumes/g2-ef979bd04cc0-postgres-data/_data",
+          "Destination": "/var/lib/postgresql",
+          "RW": true
+        }
+      ],
+      "Created": "2026-10-26T16:05:08.975269428Z"
+    },
+    {
+      "Id": "fbe061f739ed0c4412e0a8c9cd2d2eadc7729898bda2f96a179fc6198fc69a98",
+      "Name": "/tempo-mwaspvgw",
+      "ImageId": "sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044",
+      "Image": "grafana/tempo@sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044",
+      "State": "running",
+      "Mounts": [
+        {
+          "Type": "volume",
+          "Name": "g2-ef979bd04cc0-tempo-data",
+          "Source": "/var/lib/docker/volumes/g2-ef979bd04cc0-tempo-data/_data",
+          "Destination": "/var/tempo",
+          "RW": true
+        },
+        {
+          "Type": "bind",
+          "Name": null,
+          "Source": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/observability/tempo/tempo.yaml",
+          "Destination": "/etc/tempo/tempo.yaml",
+          "RW": false
+        }
+      ],
+      "Created": "2026-10-26T16:05:08.972845094Z"
+    },
+    {
+      "Id": "a6933fc187497781100b64e87282dc1c9ba9e2ff0313660b3222e1e3cfa3b2e2",
+      "Name": "/loki-zfuyyype",
+      "ImageId": "sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28",
+      "Image": "grafana/loki@sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28",
+      "State": "running",
+      "Mounts": [
+        {
+          "Type": "volume",
+          "Name": "g2-ef979bd04cc0-loki-data",
+          "Source": "/var/lib/docker/volumes/g2-ef979bd04cc0-loki-data/_data",
+          "Destination": "/loki",
+          "RW": true
+        },
+        {
+          "Type": "bind",
+          "Name": null,
+          "Source": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/observability/loki/loki.yaml",
+          "Destination": "/etc/loki/loki.yaml",
+          "RW": false
+        }
+      ],
+      "Created": "2026-10-26T16:05:08.972479344Z"
+    },
+    {
+      "Id": "f7b2c767fc57d141a7ebae807bd3f3f3cf9991aa89b4c6c1172a633d58001697",
+      "Name": "/prometheus-qwczhutq",
+      "ImageId": "sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2",
+      "Image": "prom/prometheus@sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2",
+      "State": "running",
+      "Mounts": [
+        {
+          "Type": "volume",
+          "Name": "g2-ef979bd04cc0-prometheus-data",
+          "Source": "/var/lib/docker/volumes/g2-ef979bd04cc0-prometheus-data/_data",
+          "Destination": "/prometheus",
+          "RW": true
+        },
+        {
+          "Type": "bind",
+          "Name": null,
+          "Source": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/observability/prometheus/alerts.yaml",
+          "Destination": "/etc/prometheus/alerts.yaml",
+          "RW": false
+        },
+        {
+          "Type": "bind",
+          "Name": null,
+          "Source": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/observability/prometheus/prometheus.yaml",
+          "Destination": "/etc/prometheus/prometheus.yaml",
+          "RW": false
+        }
+      ],
+      "Created": "2026-10-26T16:05:08.971663594Z"
+    },
+    {
+      "Id": "6367e667687e974d95888d0f684bc183137d1ab17d1fd43b8347c96a7f9b6720",
+      "Name": "/rustfs-gekwjgxa",
+      "ImageId": "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+      "Image": "rustfs/rustfs@sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+      "State": "running",
+      "Mounts": [
+        {
+          "Type": "volume",
+          "Name": "g2-ef979bd04cc0-rustfs-data",
+          "Source": "/var/lib/docker/volumes/g2-ef979bd04cc0-rustfs-data/_data",
+          "Destination": "/data",
+          "RW": true
+        }
+      ],
+      "Created": "2026-10-26T16:05:08.968457428Z"
+    },
+    {
+      "Id": "18a8b1844db808716aa4479539dd51745df1c3da88c884dd7cfc0e87ec3299a1",
+      "Name": "/keycloak-twmfcnfj",
+      "ImageId": "sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b",
+      "Image": "quay.io/keycloak/keycloak@sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b",
+      "State": "exited",
+      "Mounts": [],
+      "Created": "2026-10-25T06:30:53.767733883Z"
+    },
+    {
+      "Id": "731a3eb86c2b32ce493c928e52f3c3f544203ebd8229c1122e8c1f2361509ab9",
+      "Name": "/postgres-pcwxyytq",
+      "ImageId": "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6",
+      "Image": "docker.io/library/postgres@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6",
+      "State": "exited",
+      "Mounts": [
+        {
+          "Type": "volume",
+          "Name": "wave2-a5431c01414a-postgres-data",
+          "Source": "/var/lib/docker/volumes/wave2-a5431c01414a-postgres-data/_data",
+          "Destination": "/var/lib/postgresql",
+          "RW": true
+        }
+      ],
+      "Created": "2026-10-25T06:30:51.522449507Z"
+    }
+  ],
+  "volumes": [
+    {
+      "Name": "g2-712190660deb-alloy-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T02:05:13Z"
+    },
+    {
+      "Name": "g2-712190660deb-fuseki-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T02:05:13Z"
+    },
+    {
+      "Name": "g2-712190660deb-grafana-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T02:05:13Z"
+    },
+    {
+      "Name": "g2-712190660deb-loki-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T02:05:13Z"
+    },
+    {
+      "Name": "g2-712190660deb-postgres-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T02:01:32Z"
+    },
+    {
+      "Name": "g2-712190660deb-prometheus-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T02:05:13Z"
+    },
+    {
+      "Name": "g2-712190660deb-rustfs-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T02:05:13Z"
+    },
+    {
+      "Name": "g2-712190660deb-tempo-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T02:05:13Z"
+    },
+    {
+      "Name": "g2-b59e68191ca0-alloy-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T05:33:21Z"
+    },
+    {
+      "Name": "g2-b59e68191ca0-fuseki-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T05:33:21Z"
+    },
+    {
+      "Name": "g2-b59e68191ca0-grafana-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T05:33:21Z"
+    },
+    {
+      "Name": "g2-b59e68191ca0-loki-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T05:33:22Z"
+    },
+    {
+      "Name": "g2-b59e68191ca0-postgres-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T05:32:57Z"
+    },
+    {
+      "Name": "g2-b59e68191ca0-prometheus-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T05:33:21Z"
+    },
+    {
+      "Name": "g2-b59e68191ca0-rustfs-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T05:33:21Z"
+    },
+    {
+      "Name": "g2-b59e68191ca0-tempo-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T05:33:21Z"
+    },
+    {
+      "Name": "g2-ef979bd04cc0-alloy-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T05:57:39Z"
+    },
+    {
+      "Name": "g2-ef979bd04cc0-fuseki-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T05:57:39Z"
+    },
+    {
+      "Name": "g2-ef979bd04cc0-grafana-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T05:57:39Z"
+    },
+    {
+      "Name": "g2-ef979bd04cc0-loki-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T05:57:39Z"
+    },
+    {
+      "Name": "g2-ef979bd04cc0-postgres-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T05:57:23Z"
+    },
+    {
+      "Name": "g2-ef979bd04cc0-prometheus-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T05:57:39Z"
+    },
+    {
+      "Name": "g2-ef979bd04cc0-rustfs-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T05:57:39Z"
+    },
+    {
+      "Name": "g2-ef979bd04cc0-tempo-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T05:57:39Z"
+    },
+    {
+      "Name": "m0-mac-b-20261025-fuseki-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-25T02:05:37Z"
+    },
+    {
+      "Name": "m0-mac-b-20261025-postgres-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-25T02:05:37Z"
+    },
+    {
+      "Name": "m0-mac-b-20261025-rustfs-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-25T02:05:37Z"
+    },
+    {
+      "Name": "m0-mac-b-trace-20261025-fuseki-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-25T02:09:34Z"
+    },
+    {
+      "Name": "m0-mac-b-trace-20261025-postgres-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-25T02:09:34Z"
+    },
+    {
+      "Name": "m0-mac-b-trace-20261025-rustfs-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-25T02:09:34Z"
+    },
+    {
+      "Name": "m0-mac-observed-17d4d914-fuseki-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-25T02:37:07Z"
+    },
+    {
+      "Name": "m0-mac-observed-17d4d914-postgres-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-25T02:37:07Z"
+    },
+    {
+      "Name": "m0-mac-observed-17d4d914-rustfs-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-25T02:37:07Z"
+    },
+    {
+      "Name": "m0-mac-observed-b37a079e-fuseki-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-25T02:38:07Z"
+    },
+    {
+      "Name": "m0-mac-observed-b37a079e-postgres-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-25T02:38:07Z"
+    },
+    {
+      "Name": "m0-mac-observed-b37a079e-rustfs-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-25T02:38:07Z"
+    },
+    {
+      "Name": "wave2-a5431c01414a-alloy-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-25T06:42:19Z"
+    },
+    {
+      "Name": "wave2-a5431c01414a-grafana-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-25T06:42:19Z"
+    },
+    {
+      "Name": "wave2-a5431c01414a-loki-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-25T06:42:19Z"
+    },
+    {
+      "Name": "wave2-a5431c01414a-postgres-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-25T06:30:51Z"
+    },
+    {
+      "Name": "wave2-a5431c01414a-prometheus-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-25T06:42:19Z"
+    },
+    {
+      "Name": "wave2-a5431c01414a-tempo-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-25T06:42:19Z"
+    },
+    {
+      "Name": "wave2-a19529d4edb4-alloy-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-25T15:10:01Z"
+    },
+    {
+      "Name": "wave2-a19529d4edb4-grafana-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-25T15:10:01Z"
+    },
+    {
+      "Name": "wave2-a19529d4edb4-loki-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-25T15:10:01Z"
+    },
+    {
+      "Name": "wave2-a19529d4edb4-postgres-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-25T14:51:39Z"
+    },
+    {
+      "Name": "wave2-a19529d4edb4-prometheus-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-25T15:10:01Z"
+    },
+    {
+      "Name": "wave2-a19529d4edb4-tempo-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-25T15:10:01Z"
+    }
+  ],
+  "images": [
+    {
+      "Id": "sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28",
+      "RepoTags": [
+        "grafana/loki@sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28"
+      ],
+      "RepoDigests": [
+        "grafana/loki@sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28"
+      ],
+      "Size": 191210306
+    },
+    {
+      "Id": "sha256:24e1d917e37b5ba1b9421a4b0e5a2bb91c25e83adad2e3e0946002aceb519776",
+      "RepoTags": [
+        "fuseki:44727e8778c88a3e1ad51e2c401e7cea2ffd29a2"
+      ],
+      "RepoDigests": [
+        "fuseki@sha256:24e1d917e37b5ba1b9421a4b0e5a2bb91c25e83adad2e3e0946002aceb519776"
+      ],
+      "Size": 503312838
+    },
+    {
+      "Id": "sha256:56e4431d4fcded645035ad120070d06437d2785ae1bf10dd788e1ad7e979b224",
+      "RepoTags": [
+        "fuseki:009749b201b660deb650916be8c9011565a930c0"
+      ],
+      "RepoDigests": [
+        "fuseki@sha256:56e4431d4fcded645035ad120070d06437d2785ae1bf10dd788e1ad7e979b224"
+      ],
+      "Size": 503312838
+    },
+    {
+      "Id": "sha256:59f3801d866d6349e7f66b75109d6e15c86beb7e15a478aaafe98bf72a3a901d",
+      "RepoTags": [
+        "fuseki:8b85cd963ab3910a87ff4d69819a814fcc536d5f"
+      ],
+      "RepoDigests": [
+        "fuseki@sha256:59f3801d866d6349e7f66b75109d6e15c86beb7e15a478aaafe98bf72a3a901d"
+      ],
+      "Size": 503291143
+    },
+    {
+      "Id": "sha256:648cf618fef451847f3e8117c4dfa9c71ede24bbb89103fd7299601f98937ce3",
+      "RepoTags": [
+        "fuseki:dbcdef86a04ca9ffcc497dc8c5ef421206a8bfce"
+      ],
+      "RepoDigests": [
+        "fuseki@sha256:648cf618fef451847f3e8117c4dfa9c71ede24bbb89103fd7299601f98937ce3"
+      ],
+      "Size": 503291143
+    },
+    {
+      "Id": "sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044",
+      "RepoTags": [
+        "grafana/tempo@sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044"
+      ],
+      "RepoDigests": [
+        "grafana/tempo@sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044"
+      ],
+      "Size": 161272866
+    },
+    {
+      "Id": "sha256:6662114156e78418a3bd46b1a15d5041ea1d0cd4f6706dac36e277fe3d89e678",
+      "RepoTags": [
+        "fuseki:3169eee7c813cb51c0d2f64f4b16e44eb8418d2d"
+      ],
+      "RepoDigests": [
+        "fuseki@sha256:6662114156e78418a3bd46b1a15d5041ea1d0cd4f6706dac36e277fe3d89e678"
+      ],
+      "Size": 503312838
+    },
+    {
+      "Id": "sha256:6746df3002ba9a25011baaa43b4bf4175c53d00d06ed4ca07ac7b5ae995c58e2",
+      "RepoTags": [
+        "ontology-platform-g2-fuseki:6.2.0"
+      ],
+      "RepoDigests": [
+        "ontology-platform-g2-fuseki@sha256:6746df3002ba9a25011baaa43b4bf4175c53d00d06ed4ca07ac7b5ae995c58e2"
+      ],
+      "Size": 503312701
+    },
+    {
+      "Id": "sha256:675390c4fdeed9150317e6684a4f9f35a3cf661d8b220bfc745e6c0d08a00cb3",
+      "RepoTags": [
+        "fuseki:573b0d3ee0cd4bfa61e25eccdf1738785ffe29aa"
+      ],
+      "RepoDigests": [
+        "fuseki@sha256:675390c4fdeed9150317e6684a4f9f35a3cf661d8b220bfc745e6c0d08a00cb3"
+      ],
+      "Size": 503291143
+    },
+    {
+      "Id": "sha256:7c9396626b8794ef2604ece4dea733a7f3d407e34646d8b9f2093c97d67f1974",
+      "RepoTags": [
+        "fuseki:aee70ad98dd4424c8051d2e52110edba5a026c3f"
+      ],
+      "RepoDigests": [
+        "fuseki@sha256:7c9396626b8794ef2604ece4dea733a7f3d407e34646d8b9f2093c97d67f1974"
+      ],
+      "Size": 503312838
+    },
+    {
+      "Id": "sha256:838f6b7e22c0daa92ceb2481a1673a47923dc44d19a963243e7efb3737a432f5",
+      "RepoTags": [
+        "fuseki:f575c64e3c609538e6cc92509dcee8e19f504df0"
+      ],
+      "RepoDigests": [
+        "fuseki@sha256:838f6b7e22c0daa92ceb2481a1673a47923dc44d19a963243e7efb3737a432f5"
+      ],
+      "Size": 503312838
+    },
+    {
+      "Id": "sha256:868102816b13803cbc6696441161de243c0632e35ce0a33058008362e12b790c",
+      "RepoTags": [
+        "fuseki:b5e12217ef598361e190f32d4b41b94c3390958c"
+      ],
+      "RepoDigests": [
+        "fuseki@sha256:868102816b13803cbc6696441161de243c0632e35ce0a33058008362e12b790c"
+      ],
+      "Size": 503291143
+    },
+    {
+      "Id": "sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18",
+      "RepoTags": [
+        "grafana/alloy@sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18"
+      ],
+      "RepoDigests": [
+        "grafana/alloy@sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18"
+      ],
+      "Size": 928130986
+    },
+    {
+      "Id": "sha256:8e28b3a01e16230451343afcfd3997c625b04806b9f3b1960de5915ecf3d01fa",
+      "RepoTags": [
+        "fuseki:ce0f9d44ff3f59b2083f5a9179df41fa9b64b942"
+      ],
+      "RepoDigests": [
+        "fuseki@sha256:8e28b3a01e16230451343afcfd3997c625b04806b9f3b1960de5915ecf3d01fa"
+      ],
+      "Size": 503312838
+    },
+    {
+      "Id": "sha256:97c745b6e0107d25d060b164527ec0cbde47d27fc80c3baddff383a961f80faf",
+      "RepoTags": [
+        "fuseki:916821ada98d9c8379c7f0dfca65261799164ae4"
+      ],
+      "RepoDigests": [
+        "fuseki@sha256:97c745b6e0107d25d060b164527ec0cbde47d27fc80c3baddff383a961f80faf"
+      ],
+      "Size": 503312838
+    },
+    {
+      "Id": "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+      "RepoTags": [
+        "rustfs/rustfs@sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b"
+      ],
+      "RepoDigests": [
+        "rustfs/rustfs@sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b"
+      ],
+      "Size": 370600042
+    },
+    {
+      "Id": "sha256:a2d1eeece49406d089b42137334f99be5e6e1c39120c5190a1a54666f1999c24",
+      "RepoTags": [
+        "fuseki:c6fba8168a4ce1d2e60a506e417d912bb289a6d1"
+      ],
+      "RepoDigests": [
+        "fuseki@sha256:a2d1eeece49406d089b42137334f99be5e6e1c39120c5190a1a54666f1999c24"
+      ],
+      "Size": 503312838
+    },
+    {
+      "Id": "sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b",
+      "RepoTags": [
+        "quay.io/keycloak/keycloak@sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b"
+      ],
+      "RepoDigests": [
+        "quay.io/keycloak/keycloak@sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b"
+      ],
+      "Size": 750213594
+    },
+    {
+      "Id": "sha256:a807095b91ef054c4ad772ac9d70a5268f8f48616fca197e3de2e618a2f5c837",
+      "RepoTags": [
+        "fuseki:76af01fbdc917cf3952d1cae0db6d497accb2c65"
+      ],
+      "RepoDigests": [
+        "fuseki@sha256:a807095b91ef054c4ad772ac9d70a5268f8f48616fca197e3de2e618a2f5c837"
+      ],
+      "Size": 503312838
+    },
+    {
+      "Id": "sha256:b414ad0d1bcd7e6d8dceb41462b4b16d2209d26f0d38a0f46c09c4d3e0b866c2",
+      "RepoTags": [
+        "fuseki:2b315beaaff200b9c54ab89f27f5636f6c72a2bd"
+      ],
+      "RepoDigests": [
+        "fuseki@sha256:b414ad0d1bcd7e6d8dceb41462b4b16d2209d26f0d38a0f46c09c4d3e0b866c2"
+      ],
+      "Size": 503312838
+    },
+    {
+      "Id": "sha256:ce4c9eaa37ed309737b8dd438bb44e027f8a58835e3e3c85110a8accdcb8ccfe",
+      "RepoTags": [
+        "fuseki:6076b644f3e56351421b86f254b64c5eb5a364a6"
+      ],
+      "RepoDigests": [
+        "fuseki@sha256:ce4c9eaa37ed309737b8dd438bb44e027f8a58835e3e3c85110a8accdcb8ccfe"
+      ],
+      "Size": 503312838
+    },
+    {
+      "Id": "sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f",
+      "RepoTags": [
+        "grafana/grafana@sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f"
+      ],
+      "RepoDigests": [
+        "grafana/grafana@sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f"
+      ],
+      "Size": 1813270111
+    },
+    {
+      "Id": "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6",
+      "RepoTags": [
+        "postgres@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6"
+      ],
+      "RepoDigests": [
+        "postgres@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6"
+      ],
+      "Size": 665862903
+    },
+    {
+      "Id": "sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2",
+      "RepoTags": [
+        "prom/prometheus@sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2"
+      ],
+      "RepoDigests": [
+        "prom/prometheus@sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2"
+      ],
+      "Size": 356657988
+    }
+  ],
+  "buildHistory": [
+    {
+      "Ref": "k6dmkqgacrtu4qh46qhy5x12n",
+      "Name": "infra/development/fuseki",
+      "Context": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+      "Dockerfile": "Dockerfile",
+      "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+      "VCSRevision": "46c7a6de70b1b97c032b12a19bc27c1c54e70f4c",
+      "Status": "completed"
+    },
+    {
+      "Ref": "tqd6xilgezautwa15exusnc0i",
+      "Name": "infra/development/fuseki",
+      "Context": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+      "Dockerfile": "Dockerfile",
+      "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+      "VCSRevision": "b1ff0a68915c272846038af96a00da3acbb95538",
+      "Status": "completed"
+    },
+    {
+      "Ref": "8eoav2lsmbdodq5zcocw9fk0g",
+      "Name": "infra/development/fuseki",
+      "Context": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+      "Dockerfile": "infra/development/fuseki/Dockerfile",
+      "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+      "VCSRevision": "b1ff0a68915c272846038af96a00da3acbb95538",
+      "Status": "completed"
+    },
+    {
+      "Ref": "lm4mju36p53alxm5sjikkmjd0",
+      "Name": "infra/development/fuseki",
+      "Context": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+      "Dockerfile": "Dockerfile",
+      "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+      "VCSRevision": "fac0490528e9cc110cf99f1a41cb003b31a7852f",
+      "Status": "completed"
+    },
+    {
+      "Ref": "0gbrzldln4ju6rajgnf8lpai0",
+      "Name": "infra/development/fuseki",
+      "Context": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+      "Dockerfile": "Dockerfile",
+      "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+      "VCSRevision": "fac0490528e9cc110cf99f1a41cb003b31a7852f",
+      "Status": "completed"
+    },
+    {
+      "Ref": "sw7gm5rh39dhmbtnwqttksufo",
+      "Name": "infra/development/fuseki",
+      "Context": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+      "Dockerfile": "infra/development/fuseki/Dockerfile",
+      "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+      "VCSRevision": "fac0490528e9cc110cf99f1a41cb003b31a7852f",
+      "Status": "completed"
+    },
+    {
+      "Ref": "q3nyzqz7dc2ve8zg0s4le025q",
+      "Name": "infra/development/fuseki",
+      "Context": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+      "Dockerfile": "Dockerfile",
+      "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+      "VCSRevision": "65212620c36650dc52df299b618de6e2e838f51e",
+      "Status": "completed"
+    },
+    {
+      "Ref": "v0adsatiylrmjgbhqb5xxirxg",
+      "Name": "infra/development/fuseki",
+      "Context": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+      "Dockerfile": "Dockerfile",
+      "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+      "VCSRevision": "6effefb1279e2495744b714de10eb2c1ba41b8c1",
+      "Status": "completed"
+    },
+    {
+      "Ref": "j5dn47c0cb2tcwce9c9geibeg",
+      "Name": "infra/development/fuseki",
+      "Context": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+      "Dockerfile": "Dockerfile",
+      "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+      "VCSRevision": "0449cec8d217c2c5261a71085e9dd375e0d9e060",
+      "Status": "completed"
+    },
+    {
+      "Ref": "wyqyudo9ml4su6lwv42572k9f",
+      "Name": "infra/development/fuseki",
+      "Context": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+      "Dockerfile": "Dockerfile",
+      "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+      "VCSRevision": "c1e4dd0af6af4258f39c3c8a360c60e0709b8915",
+      "Status": "completed"
+    },
+    {
+      "Ref": "wfy618td2fr5z0o43n19g51mg",
+      "Name": "infra/development/fuseki",
+      "Context": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+      "Dockerfile": "Dockerfile",
+      "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+      "VCSRevision": "0e970f948aede10be0a86570a05d958d135a2761",
+      "Status": "completed"
+    },
+    {
+      "Ref": "xlro0rjcajs31jba7yffq0lmq",
+      "Name": "infra/development/fuseki",
+      "Context": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+      "Dockerfile": "Dockerfile",
+      "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+      "VCSRevision": "707ef7dcb5034d15ddd4761cba54cb33ce39da06",
+      "Status": "completed"
+    },
+    {
+      "Ref": "jytynl3c1hcqe65an0uksmwuw",
+      "Name": "infra/development/fuseki",
+      "Context": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+      "Dockerfile": "Dockerfile",
+      "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+      "VCSRevision": "8223101ec607e25f0499081f49aa053b1100d152",
+      "Status": "completed"
+    },
+    {
+      "Ref": "07hrath9f7wuhcetgybgh8422",
+      "Name": "infra/development/fuseki",
+      "Context": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+      "Dockerfile": "infra/development/fuseki/Dockerfile",
+      "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+      "VCSRevision": "a30ede7241c077dcf5188e9bf3857494caf0471a",
+      "Status": "completed"
+    },
+    {
+      "Ref": "15wxkh2jyaa5kzejl8yhksph5",
+      "Name": "infra/development/fuseki",
+      "Context": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+      "Dockerfile": "Dockerfile",
+      "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+      "VCSRevision": "a30ede7241c077dcf5188e9bf3857494caf0471a",
+      "Status": "failed"
+    },
+    {
+      "Ref": "oig58wowfr1qz3tn8rlcp99di",
+      "Name": "infra/development/fuseki",
+      "Context": "/Users/chasen/.codex/worktrees/m0-master/ontology-platform/infra/development/fuseki",
+      "Dockerfile": "Dockerfile",
+      "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+      "VCSRevision": "9acab3fc5dbb5ff0f447c4c839f66766e71b69e4",
+      "Status": "completed"
+    },
+    {
+      "Ref": "zo1g9e3r86l3buadw1j9aok18",
+      "Name": "infra/development/fuseki",
+      "Context": "/Users/chasen/.codex/worktrees/m0-master/ontology-platform/infra/development/fuseki",
+      "Dockerfile": "Dockerfile",
+      "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+      "VCSRevision": "9acab3fc5dbb5ff0f447c4c839f66766e71b69e4",
+      "Status": "completed"
+    },
+    {
+      "Ref": "9f3v88w973zdi6d2pz5zl7bhf",
+      "Name": "infra/development/fuseki",
+      "Context": "/Users/chasen/.codex/worktrees/m0-master/ontology-platform/infra/development/fuseki",
+      "Dockerfile": "Dockerfile",
+      "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+      "VCSRevision": "c8f09f09de9e415de220e01c49ec319693411957",
+      "Status": "completed"
+    },
+    {
+      "Ref": "1qb12xansacxsmjbx9qwq66df",
+      "Name": "infra/development/fuseki",
+      "Context": "/Users/chasen/.codex/worktrees/m0-master/ontology-platform/infra/development/fuseki",
+      "Dockerfile": "Dockerfile",
+      "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+      "VCSRevision": "e3f0b9694412f7a91b6075be9d7e8d4fac4b890b",
+      "Status": "completed"
+    }
+  ],
+  "buildxDu": "ID                           RECLAIMABLE   SIZE       LAST ACCESSED\nk2nu5zzwwgb5684dhnk1x4qr1    true          4.128kB*   37 hours ago\nk69m501cgn7tmtdmz3ce5u3rz    true          4.128kB*   About a minute ago\nqfv1txx0qs8w2btgyyyv75yuc*   true          8.192kB    About a minute ago\nsnjlqumzjtwnxasoxfgjt3q6n*   true          8.192kB    About a minute ago\newk9svasi6fnram76609wm4v6    true          12.45kB*   38 hours ago\ngv4hro3gkgleb154wipw0e4l0    true          14.75kB*   38 hours ago\nk80vo9jwximo27dn3tew76krh*   true          16.38kB    About a minute ago\n9ps57q51cxsb93afm52vkj3em    true          20.82kB*   38 hours ago\nnisjoatf7lkhmgnj85rttnckd    true          25.36kB*   14 hours ago\nj7p20on71k1xzi48sfnfw82at    true          66.06MB*   38 hours ago\nw06xag2aijqm5anekuduy0juk    true          107.2MB*   38 hours ago\nuxtr0h6w1ojbn4gqy5y6cdb73    true          108.8MB*   38 hours ago\ne6jc9b1q8gmh87dd0nbmywbzy    true          217.9MB*   38 hours ago\nShared:\t\t500.1MB\nPrivate:\t32.77kB\nReclaimable:\t500.1MB\nTotal:\t\t500.1MB\n",
+  "systemDf": "{\"Active\":\"19\",\"Reclaimable\":\"23.44kB (0%)\",\"Size\":\"5.747GB\",\"TotalCount\":\"24\",\"Type\":\"Images\"}\n{\"Active\":\"9\",\"Reclaimable\":\"177.1MB (49%)\",\"Size\":\"354.4MB\",\"TotalCount\":\"11\",\"Type\":\"Containers\"}\n{\"Active\":\"9\",\"Reclaimable\":\"3.103GB (82%)\",\"Size\":\"3.773GB\",\"TotalCount\":\"48\",\"Type\":\"Local Volumes\"}\n{\"Active\":\"0\",\"Reclaimable\":\"32.77kB\",\"Size\":\"500.1MB\",\"TotalCount\":\"13\",\"Type\":\"Build Cache\"}\n",
+  "systemDfVerbose": "Images space usage:\n\nREPOSITORY                    TAG                                        IMAGE ID       CREATED        SIZE      SHARED SIZE   UNIQUE SIZE   CONTAINERS\nfuseki                        3169eee7c813cb51c0d2f64f4b16e44eb8418d2d   6662114156e7   14 hours ago   503MB     503.3MB       2.61kB        1\nfuseki                        6076b644f3e56351421b86f254b64c5eb5a364a6   ce4c9eaa37ed   14 hours ago   503MB     503.3MB       2.609kB       1\nfuseki                        916821ada98d9c8379c7f0dfca65261799164ae4   97c745b6e010   14 hours ago   503MB     503.3MB       2.61kB        1\nfuseki                        f575c64e3c609538e6cc92509dcee8e19f504df0   838f6b7e22c0   14 hours ago   503MB     503.3MB       2.61kB        1\nfuseki                        2b315beaaff200b9c54ab89f27f5636f6c72a2bd   b414ad0d1bcd   14 hours ago   503MB     503.3MB       2.61kB        1\nfuseki                        76af01fbdc917cf3952d1cae0db6d497accb2c65   a807095b91ef   14 hours ago   503MB     503.3MB       2.61kB        1\nfuseki                        ce0f9d44ff3f59b2083f5a9179df41fa9b64b942   8e28b3a01e16   14 hours ago   503MB     503.3MB       2.61kB        1\nfuseki                        c6fba8168a4ce1d2e60a506e417d912bb289a6d1   a2d1eeece494   14 hours ago   503MB     503.3MB       2.61kB        1\nfuseki                        aee70ad98dd4424c8051d2e52110edba5a026c3f   7c9396626b87   14 hours ago   503MB     503.3MB       2.61kB        1\nontology-platform-g2-fuseki   6.2.0                                      6746df3002ba   14 hours ago   503MB     503.3MB       13kB          0\nfuseki                        44727e8778c88a3e1ad51e2c401e7cea2ffd29a2   24e1d917e37b   14 hours ago   503MB     503.3MB       2.61kB        1\nfuseki                        009749b201b660deb650916be8c9011565a930c0   56e4431d4fcd   14 hours ago   503MB     503.3MB       2.608kB       1\nfuseki                        b5e12217ef598361e190f32d4b41b94c3390958c   868102816b13   38 hours ago   503MB     503.3MB       2.61kB        0\nfuseki                        573b0d3ee0cd4bfa61e25eccdf1738785ffe29aa   675390c4fdee   38 hours ago   503MB     503.3MB       2.609kB       0\nfuseki                        dbcdef86a04ca9ffcc497dc8c5ef421206a8bfce   648cf618fef4   38 hours ago   503MB     503.3MB       2.61kB        0\nfuseki                        8b85cd963ab3910a87ff4d69819a814fcc536d5f   59f3801d866d   38 hours ago   503MB     503.3MB       2.609kB       0\n<none>                        <none>                                     a78d6b795721   3 days ago     750MB     2B            750.2MB       2\n<none>                        <none>                                     89a5a3201683   3 days ago     928MB     2B            928.1MB       1\n<none>                        <none>                                     64e2fbd56d9c   5 days ago     161MB     0B            161.3MB       1\n<none>                        <none>                                     fa3302279710   5 days ago     357MB     0B            356.7MB       1\n<none>                        <none>                                     edb0c08dc33b   5 days ago     672MB     0B            671.9MB       2\n<none>                        <none>                                     0db216b630ae   5 days ago     191MB     0B            191.2MB       1\n<none>                        <none>                                     9ca9559533b5   9 days ago     371MB     34B           371.3MB       1\n<none>                        <none>                                     dbbc38ea2110   2 weeks ago    1.81GB    32B           1.813GB       1\n\nContainers space usage:\n\nCONTAINER ID   IMAGE                                             COMMAND                  LOCAL VOLUMES   SIZE      CREATED              STATUS                      NAMES\n9a1a7124a815   89a5a3201683                                      \"/bin/alloy run --se…\"   1               16.4kB    54 seconds ago       Up 54 seconds               alloy-yaktsrsh\nd873840b9283   dbbc38ea2110                                      \"/run.sh\"                1               8.19kB    54 seconds ago       Up 54 seconds               grafana-ttzasdsk\n4a4974610396   fuseki:76af01fbdc917cf3952d1cae0db6d497accb2c65   \"java -Xmx512m -Dlog…\"   1               106kB     About a minute ago   Up About a minute           fuseki-jbuzcdjb\naa8a09791e00   a78d6b795721                                      \"/opt/keycloak/bin/k…\"   0               177MB     About a minute ago   Up About a minute           keycloak-xwrmjdzj\nf41fa3195b1c   edb0c08dc33b                                      \"docker-entrypoint.s…\"   1               20.5kB    About a minute ago   Up About a minute           postgres-bmfpdvmd\nfbe061f739ed   64e2fbd56d9c                                      \"/tempo -config.file…\"   1               12.3kB    About a minute ago   Up About a minute           tempo-mwaspvgw\na6933fc18749   0db216b630ae                                      \"/usr/bin/loki -conf…\"   1               16.4kB    About a minute ago   Up About a minute           loki-zfuyyype\nf7b2c767fc57   fa3302279710                                      \"/bin/prometheus --c…\"   1               16.4kB    About a minute ago   Up About a minute           prometheus-qwczhutq\n6367e667687e   9ca9559533b5                                      \"/entrypoint.sh /data\"   1               12.3kB    About a minute ago   Up About a minute           rustfs-gekwjgxa\n18a8b1844db8   a78d6b795721                                      \"/opt/keycloak/bin/k…\"   0               177MB     34 hours ago         Exited (143) 33 hours ago   keycloak-twmfcnfj\n731a3eb86c2b   edb0c08dc33b                                      \"docker-entrypoint.s…\"   1               16.4kB    34 hours ago         Exited (0) 33 hours ago     postgres-pcwxyytq\n\nLocal Volumes space usage:\n\nVOLUME NAME                              LINKS     SIZE\nm0-mac-b-trace-20261025-fuseki-data      0         201.3MB\ng2-712190660deb-fuseki-data              0         201.3MB\ng2-712190660deb-grafana-data             0         302.5MB\ng2-b59e68191ca0-grafana-data             0         302.6MB\ng2-ef979bd04cc0-loki-data                1         1.101MB\nwave2-a19529d4edb4-grafana-data          0         302.5MB\ng2-b59e68191ca0-loki-data                0         344.2kB\ng2-ef979bd04cc0-alloy-data               1         112B\nm0-mac-b-20261025-postgres-data          0         79.66MB\nm0-mac-b-trace-20261025-rustfs-data      0         7.252kB\nm0-mac-observed-17d4d914-fuseki-data     0         201.3MB\ng2-712190660deb-loki-data                0         531.7kB\ng2-ef979bd04cc0-tempo-data               1         635.8kB\nm0-mac-b-20261025-fuseki-data            0         201.3MB\nm0-mac-observed-b37a079e-fuseki-data     0         201.3MB\nwave2-a19529d4edb4-loki-data             0         334.9kB\nwave2-a19529d4edb4-prometheus-data       0         11.19MB\nwave2-a5431c01414a-loki-data             0         238.8kB\ng2-712190660deb-prometheus-data          0         55.46MB\ng2-b59e68191ca0-rustfs-data              0         158.9kB\ng2-ef979bd04cc0-rustfs-data              1         169.4kB\nm0-mac-observed-b37a079e-postgres-data   0         79.16MB\nwave2-a19529d4edb4-alloy-data            0         112B\nwave2-a19529d4edb4-postgres-data         0         80.51MB\ng2-b59e68191ca0-postgres-data            0         81.87MB\ng2-712190660deb-rustfs-data              0         373.1kB\ng2-b59e68191ca0-alloy-data               0         112B\ng2-ef979bd04cc0-grafana-data             1         302.5MB\nm0-mac-b-trace-20261025-postgres-data    0         79.62MB\nm0-mac-observed-17d4d914-postgres-data   0         79.16MB\nwave2-a5431c01414a-tempo-data            0         6.463MB\ng2-712190660deb-alloy-data               0         112B\ng2-b59e68191ca0-fuseki-data              0         201.3MB\ng2-ef979bd04cc0-postgres-data            1         81.37MB\ng2-ef979bd04cc0-prometheus-data          1         2.771MB\nwave2-a5431c01414a-postgres-data         1         80.47MB\nwave2-a5431c01414a-prometheus-data       0         25.71MB\ng2-712190660deb-postgres-data            0         83.65MB\ng2-712190660deb-tempo-data               0         7.765MB\ng2-b59e68191ca0-tempo-data               0         2.382MB\ng2-ef979bd04cc0-fuseki-data              1         201.3MB\nm0-mac-observed-17d4d914-rustfs-data     0         21.12kB\nm0-mac-observed-b37a079e-rustfs-data     0         21.13kB\nwave2-a19529d4edb4-tempo-data            0         6.409MB\nwave2-a5431c01414a-grafana-data          0         302.6MB\ng2-b59e68191ca0-prometheus-data          0         3.559MB\nm0-mac-b-20261025-rustfs-data            0         21.18kB\nwave2-a5431c01414a-alloy-data            0         112B\n\nBuild cache usage: 500.1MB\n\nCACHE ID       CACHE TYPE     SIZE      CREATED        LAST USED            USAGE     SHARED\nw06xag2aijqm   regular        107MB     38 hours ago   38 hours ago         1         true\nj7p20on71k1x   regular        66.1MB    38 hours ago   38 hours ago         1         true\ne6jc9b1q8gmh   regular        218MB     38 hours ago   38 hours ago         1         true\newk9svasi6fn   regular        12.4kB    38 hours ago   38 hours ago         1         true\nuxtr0h6w1ojb   regular        109MB     38 hours ago   38 hours ago         1         true\ngv4hro3gkgle   regular        14.8kB    38 hours ago   38 hours ago         1         true\n9ps57q51cxsb   regular        20.8kB    38 hours ago   38 hours ago         1         true\nk2nu5zzwwgb5   regular        4.13kB    38 hours ago   37 hours ago         4         true\nnisjoatf7lkh   regular        25.4kB    14 hours ago   14 hours ago         1         true\nqfv1txx0qs8w   source.local   8.19kB    38 hours ago   About a minute ago   19        false\nk80vo9jwximo   source.local   16.4kB    38 hours ago   About a minute ago   19        false\nk69m501cgn7t   regular        4.13kB    14 hours ago   About a minute ago   14        true\nsnjlqumzjtwn   source.local   8.19kB    38 hours ago   About a minute ago   19        false\n",
+  "networks": "16defb444c3807a7cdf221d1a854f9b01bcbbe726e927f28f46f715ed81a18ef\taspire-session-network-jjjvhpyx-OntologyPlatform\tbridge\nde218450706eb86169c7ff111f3b7e0b7e9cb8b195203f3357b0a9977262e377\tbridge\tbridge\n80ac07a0bfc7ad5bdedefec78a3a66c97c4c74093c4a8533f05f4cb96bcbc4d0\thost\thost\ne66d65cfe0714eb9fde22ab801d77393aeb653344362c0faac45292d829dab8e\tnone\tnull\n",
+  "exactUsage": {
+    "imageLayersSizeBytes": 5747353542,
+    "volumes": [
+      {
+        "Name": "g2-712190660deb-postgres-data",
+        "Size": 83654159,
+        "RefCount": 0
+      },
+      {
+        "Name": "g2-712190660deb-tempo-data",
+        "Size": 7764540,
+        "RefCount": 0
+      },
+      {
+        "Name": "g2-b59e68191ca0-tempo-data",
+        "Size": 2381641,
+        "RefCount": 0
+      },
+      {
+        "Name": "g2-ef979bd04cc0-fuseki-data",
+        "Size": 201335214,
+        "RefCount": 1
+      },
+      {
+        "Name": "m0-mac-observed-17d4d914-rustfs-data",
+        "Size": 21123,
+        "RefCount": 0
+      },
+      {
+        "Name": "m0-mac-observed-b37a079e-rustfs-data",
+        "Size": 21131,
+        "RefCount": 0
+      },
+      {
+        "Name": "wave2-a19529d4edb4-tempo-data",
+        "Size": 6408601,
+        "RefCount": 0
+      },
+      {
+        "Name": "wave2-a5431c01414a-grafana-data",
+        "Size": 302554233,
+        "RefCount": 0
+      },
+      {
+        "Name": "g2-b59e68191ca0-prometheus-data",
+        "Size": 3558945,
+        "RefCount": 0
+      },
+      {
+        "Name": "m0-mac-b-20261025-rustfs-data",
+        "Size": 21176,
+        "RefCount": 0
+      },
+      {
+        "Name": "wave2-a5431c01414a-alloy-data",
+        "Size": 112,
+        "RefCount": 0
+      },
+      {
+        "Name": "m0-mac-b-trace-20261025-fuseki-data",
+        "Size": 201326916,
+        "RefCount": 0
+      },
+      {
+        "Name": "g2-712190660deb-fuseki-data",
+        "Size": 201335856,
+        "RefCount": 0
+      },
+      {
+        "Name": "g2-712190660deb-grafana-data",
+        "Size": 302541706,
+        "RefCount": 0
+      },
+      {
+        "Name": "g2-b59e68191ca0-grafana-data",
+        "Size": 302553994,
+        "RefCount": 0
+      },
+      {
+        "Name": "g2-ef979bd04cc0-loki-data",
+        "Size": 1100921,
+        "RefCount": 1
+      },
+      {
+        "Name": "wave2-a19529d4edb4-grafana-data",
+        "Size": 302541706,
+        "RefCount": 0
+      },
+      {
+        "Name": "g2-b59e68191ca0-loki-data",
+        "Size": 344231,
+        "RefCount": 0
+      },
+      {
+        "Name": "g2-ef979bd04cc0-alloy-data",
+        "Size": 112,
+        "RefCount": 1
+      },
+      {
+        "Name": "m0-mac-b-20261025-postgres-data",
+        "Size": 79657273,
+        "RefCount": 0
+      },
+      {
+        "Name": "m0-mac-b-trace-20261025-rustfs-data",
+        "Size": 7252,
+        "RefCount": 0
+      },
+      {
+        "Name": "m0-mac-observed-17d4d914-fuseki-data",
+        "Size": 201327068,
+        "RefCount": 0
+      },
+      {
+        "Name": "g2-712190660deb-loki-data",
+        "Size": 531742,
+        "RefCount": 0
+      },
+      {
+        "Name": "g2-ef979bd04cc0-tempo-data",
+        "Size": 635841,
+        "RefCount": 1
+      },
+      {
+        "Name": "m0-mac-b-20261025-fuseki-data",
+        "Size": 201327068,
+        "RefCount": 0
+      },
+      {
+        "Name": "m0-mac-observed-b37a079e-fuseki-data",
+        "Size": 201327068,
+        "RefCount": 0
+      },
+      {
+        "Name": "wave2-a19529d4edb4-loki-data",
+        "Size": 334860,
+        "RefCount": 0
+      },
+      {
+        "Name": "wave2-a19529d4edb4-prometheus-data",
+        "Size": 11191361,
+        "RefCount": 0
+      },
+      {
+        "Name": "wave2-a5431c01414a-loki-data",
+        "Size": 238806,
+        "RefCount": 0
+      },
+      {
+        "Name": "g2-712190660deb-prometheus-data",
+        "Size": 55464078,
+        "RefCount": 0
+      },
+      {
+        "Name": "g2-b59e68191ca0-rustfs-data",
+        "Size": 158915,
+        "RefCount": 0
+      },
+      {
+        "Name": "g2-ef979bd04cc0-rustfs-data",
+        "Size": 169379,
+        "RefCount": 1
+      },
+      {
+        "Name": "m0-mac-observed-b37a079e-postgres-data",
+        "Size": 79155161,
+        "RefCount": 0
+      },
+      {
+        "Name": "wave2-a19529d4edb4-alloy-data",
+        "Size": 112,
+        "RefCount": 0
+      },
+      {
+        "Name": "wave2-a19529d4edb4-postgres-data",
+        "Size": 80509437,
+        "RefCount": 0
+      },
+      {
+        "Name": "g2-b59e68191ca0-postgres-data",
+        "Size": 81867604,
+        "RefCount": 0
+      },
+      {
+        "Name": "g2-712190660deb-rustfs-data",
+        "Size": 373116,
+        "RefCount": 0
+      },
+      {
+        "Name": "g2-b59e68191ca0-alloy-data",
+        "Size": 112,
+        "RefCount": 0
+      },
+      {
+        "Name": "g2-ef979bd04cc0-grafana-data",
+        "Size": 302545802,
+        "RefCount": 1
+      },
+      {
+        "Name": "m0-mac-b-trace-20261025-postgres-data",
+        "Size": 79621709,
+        "RefCount": 0
+      },
+      {
+        "Name": "m0-mac-observed-17d4d914-postgres-data",
+        "Size": 79155161,
+        "RefCount": 0
+      },
+      {
+        "Name": "wave2-a5431c01414a-tempo-data",
+        "Size": 6463477,
+        "RefCount": 0
+      },
+      {
+        "Name": "g2-712190660deb-alloy-data",
+        "Size": 112,
+        "RefCount": 0
+      },
+      {
+        "Name": "g2-b59e68191ca0-fuseki-data",
+        "Size": 201335214,
+        "RefCount": 0
+      },
+      {
+        "Name": "g2-ef979bd04cc0-postgres-data",
+        "Size": 81369738,
+        "RefCount": 1
+      },
+      {
+        "Name": "g2-ef979bd04cc0-prometheus-data",
+        "Size": 2771370,
+        "RefCount": 1
+      },
+      {
+        "Name": "wave2-a5431c01414a-postgres-data",
+        "Size": 80467830,
+        "RefCount": 1
+      },
+      {
+        "Name": "wave2-a5431c01414a-prometheus-data",
+        "Size": 25708319,
+        "RefCount": 0
+      }
+    ],
+    "containers": [
+      {
+        "Id": "9a1a7124a815e9c9435fd277e914b0ba08410b1c994101d34b26d825a82b224c",
+        "SizeRw": 16384,
+        "SizeRootFs": 721334272
+      },
+      {
+        "Id": "d873840b9283b91ea4ba902dbb119be2f68c99e0bd7d1845a592a40be33c8dd0",
+        "SizeRw": 8192,
+        "SizeRootFs": 1368166400
+      },
+      {
+        "Id": "4a4974610396d8ef5ba9cf61924145d9e45655d39e3f5cabd4f797301fb8a9fb",
+        "SizeRw": 106496,
+        "SizeRootFs": 355971072
+      },
+      {
+        "Id": "aa8a09791e007097297c5453d987e802c7ce7d64db1a4290e372f6b82650d71a",
+        "SizeRw": 177098752,
+        "SizeRootFs": 663515136
+      },
+      {
+        "Id": "f41fa3195b1cf8e153c270c74967eb24c57a77332c14ec8d0fd50550dc361bf3",
+        "SizeRw": 20480,
+        "SizeRootFs": 504791040
+      },
+      {
+        "Id": "fbe061f739ed0c4412e0a8c9cd2d2eadc7729898bda2f96a179fc6198fc69a98",
+        "SizeRw": 12288,
+        "SizeRootFs": 125337600
+      },
+      {
+        "Id": "a6933fc187497781100b64e87282dc1c9ba9e2ff0313660b3222e1e3cfa3b2e2",
+        "SizeRw": 16384,
+        "SizeRootFs": 148426752
+      },
+      {
+        "Id": "f7b2c767fc57d141a7ebae807bd3f3f3cf9991aa89b4c6c1172a633d58001697",
+        "SizeRw": 16384,
+        "SizeRootFs": 251842560
+      },
+      {
+        "Id": "6367e667687e974d95888d0f684bc183137d1ab17d1fd43b8347c96a7f9b6720",
+        "SizeRw": 12288,
+        "SizeRootFs": 261435392
+      },
+      {
+        "Id": "18a8b1844db808716aa4479539dd51745df1c3da88c884dd7cfc0e87ec3299a1",
+        "SizeRw": 177102848,
+        "SizeRootFs": 663519232
+      },
+      {
+        "Id": "731a3eb86c2b32ce493c928e52f3c3f544203ebd8229c1122e8c1f2361509ab9",
+        "SizeRw": 16384,
+        "SizeRootFs": 504786944
+      }
+    ]
+  },
+  "counts": {
+    "containers": 11,
+    "volumes": 48,
+    "images": 24,
+    "buildHistory": 19
+  },
+  "policy": "Read-only fixed metadata projections. No environment, BuildArgs, private runtime or volume data read. Default networks untouched. Physical disk attribution NOT_VERIFIED."
+}

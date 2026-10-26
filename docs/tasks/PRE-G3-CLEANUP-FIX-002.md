@@ -15,9 +15,17 @@
 ## 关口与验证
 
 - [x] C0：完整读取整改授权、当前规则/既有工具，fetch核基线；重新Git/PR/Docker调查，阶段关闭由新人类授权确认，保留项必须具体。
-- [ ] C3：先真实Git+模拟Docker RED，工具实现GREEN（safe ancestor删除、非祖先/dirty/active/项目越界/同名资源ID/权限/过期/变更拒绝、DryRun零副作用、Apply精确白名单）；独立Review，SelfTest接入；commit/push/同HeadCI/早期main集成后才真实Apply。
-- [ ] C1/C2：保存精确Git/Docker before和审核白名单；逐项正常删除，保留main/当前树/私有G2及具体独特提交；重验并记录实际after和Engine容量，健康探针或明确限制。
-- [ ] C4：只读公开仓库全部reachable history/refs/blob/证据秘密及潜在私有地址检查，只报路径/类别，不输出值；不改Git历史。更新永久DoD、风险矩阵和交接。
-- [ ] 最终：独立逐条审查删除日志；Mac SelfTest/清理专属测试和最终同HeadLinuxCI/main push；唯一轻量包独立重开后才回收旧包，输出PRE_G3_CLEANUP_FIX_READY_FOR_REVIEW并停止。
+- [x] C3：先真实Git+模拟Docker RED，工具实现GREEN（safe ancestor删除、非祖先/dirty/active/项目越界/同名资源ID/权限/过期/变更拒绝、DryRun零副作用、Apply精确白名单）；独立Review，SelfTest接入；commit/push/同HeadCI/早期main集成后才真实Apply。
+- [x] C1/C2：保存精确Git/Docker before和审核白名单；逐项正常删除，保留main/当前树/私有G2及具体独特提交；重验并记录实际after和Engine容量，健康探针或明确限制。
+- [x] C4：只读公开仓库全部reachable history/refs/blob/证据秘密及潜在私有地址检查，只报路径/类别，不输出值；不改Git历史。更新永久DoD、风险矩阵和交接。
+- 交付后置关口：独立逐条实际删除审查已通过，最终main Head的Mac SelfTest/同HeadLinuxCI、唯一轻量包重开、旧包精确回收只按提交后真实manifest与delivery-receipt收口，不在生成它们的Git提交中预填结果；全部完成后输出PRE_G3_CLEANUP_FIX_READY_FOR_REVIEW并停止。
 
 必须有实际候选删除。已知安全候选但0删除=FAIL；只有逐项不可越过失败才能BLOCKED，不再用无法证明历史聊天不存在统一保留。任务研究已确认12远端/10本地/11历史树候选；工具树占用期间排除1树。Docker实际候选2停止容器/24M0-Wave2卷/13重复Fuseki镜像/18项目history；24G2卷具体绑定3套G2 Master runtime/PFX，保护理由逐组列明。Build cache共享归属受限，不全局prune。数量以执行前后真实清单更新。
+
+## 已实施结果
+
+266项CLI操作全部exit0，10树/11本地枝/13远端枝/2容器/24卷/13镜像及175cache实效保持；其中18history只有即时缺席，后验回现，持久完成结论已撤回。175cache逻辑2,530,247,461 bytes。6保护树、24G2卷、12非祖先refs保留，4/4清理后健康探针通过。最终同HeadCI/唯一ZIP/旧包后置回收取实际manifest与外部delivery-receipt，不在Git预填未来结果；阶段交付报告见本任务evidence/delivery-report。
+
+## 后验BuildKit持久删除纠偏（同一FIX002范围）
+
+最终复核发现BuildKit v0.34.0单Ref查询零计数键导致history rm仅内存tombstone、VM自然生命周期后原18记录回现。原工具Owner已释放且工作树已实际移除；Master从此串行接手cleanup-resources.ps1/cleanup_resources.py/CleanupResources.Tests.py三个owned_paths，无并行写者，不扩大业务权限。保留原日志/时点快照，撤回18history持久完成结论；补RED/GREEN、独立Review和同HeadCI后仅原18精确子计划重验。禁止RPC竞态、全局restart/update/prune/配置变更；自然idle不能当成功，须实际观察generation并验证强absence。

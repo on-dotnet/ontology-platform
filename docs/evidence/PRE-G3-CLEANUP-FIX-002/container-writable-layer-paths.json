@@ -1,0 +1,48 @@
+{
+  "observedAt": "2026-10-26T16:13:40.920664+00:00",
+  "rows": [
+    {
+      "target": "18a8b1844db808716aa4479539dd51745df1c3da88c884dd7cfc0e87ec3299a1",
+      "command": [
+        "docker",
+        "diff",
+        "18a8b1844db808716aa4479539dd51745df1c3da88c884dd7cfc0e87ec3299a1"
+      ],
+      "exitCode": 0,
+      "changedPaths": [
+        "C /tmp",
+        "A /tmp/uploads",
+        "A /tmp/vertx-cache",
+        "A /tmp/vertx-cache/-6965017636551370042",
+        "A /tmp/hsperfdata_keycloak",
+        "A /tmp/hsperfdata_keycloak/1",
+        "C /opt",
+        "C /opt/keycloak",
+        "C /opt/keycloak/data",
+        "A /opt/keycloak/data/transaction-logs",
+        "A /opt/keycloak/data/transaction-logs/ShadowNoFileLockStore",
+        "A /opt/keycloak/data/transaction-logs/ShadowNoFileLockStore/defaultStore",
+        "C /opt/keycloak/lib",
+        "C /opt/keycloak/lib/quarkus",
+        "C /opt/keycloak/lib/quarkus/build-system.properties",
+        "C /opt/keycloak/lib/quarkus/generated-bytecode.jar",
+        "C /opt/keycloak/lib/quarkus/quarkus-application.dat",
+        "C /opt/keycloak/lib/quarkus/transformed-bytecode.jar"
+      ]
+    },
+    {
+      "target": "731a3eb86c2b32ce493c928e52f3c3f544203ebd8229c1122e8c1f2361509ab9",
+      "command": [
+        "docker",
+        "diff",
+        "731a3eb86c2b32ce493c928e52f3c3f544203ebd8229c1122e8c1f2361509ab9"
+      ],
+      "exitCode": 0,
+      "changedPaths": [
+        "C /run",
+        "C /run/postgresql"
+      ]
+    }
+  ],
+  "policy": "Metadata paths only, not file contents; no database transaction/H2 files. Persisted identity is external synthetic PostgreSQL."
+}

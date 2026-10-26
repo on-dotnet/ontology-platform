@@ -1,0 +1,3796 @@
+{
+  "schemaVersion": 1,
+  "taskId": "PRE-G3-CLEANUP-FIX-002",
+  "project": "on-dotnet/ontology-platform",
+  "repositoryRoot": "/Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform",
+  "gitCommonDir": "/Users/chasen/Developer/repos/ontology-platform/.git",
+  "originUrl": "https://github.com/on-dotnet/ontology-platform.git",
+  "expectedMainSha": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+  "createdAt": "2026-10-26T16:17:07.031768+00:00",
+  "expiresAt": "2026-10-27T00:17:07.031768+00:00",
+  "allowedWorktreeRoots": [
+    "/Users/chasen/.codex/worktrees/g2-fe",
+    "/Users/chasen/.codex/worktrees/g2-final-fix",
+    "/Users/chasen/.codex/worktrees/g2-host-fix",
+    "/Users/chasen/.codex/worktrees/g2-observability",
+    "/Users/chasen/.codex/worktrees/g2-pub",
+    "/Users/chasen/.codex/worktrees/g2-qa-fix",
+    "/Users/chasen/.codex/worktrees/g2-readiness-test",
+    "/Users/chasen/.codex/worktrees/m0-containers",
+    "/Users/chasen/.codex/worktrees/m0-master",
+    "/Users/chasen/.codex/worktrees/m0-scripts"
+  ],
+  "protectedWorktrees": [
+    "/Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform",
+    "/Users/chasen/Developer/repos/ontology-platform",
+    "/Users/chasen/.codex/worktrees/g2-master/ontology-platform",
+    "/Users/chasen/.codex/worktrees/g2-query/ontology-platform",
+    "/Users/chasen/.codex/worktrees/g2-security/ontology-platform",
+    "/Users/chasen/.codex/worktrees/g2-sem/ontology-platform"
+  ],
+  "keep": [
+    "g2-712190660deb-alloy-data",
+    "g2-712190660deb-fuseki-data",
+    "g2-712190660deb-grafana-data",
+    "g2-712190660deb-loki-data",
+    "g2-712190660deb-postgres-data",
+    "g2-712190660deb-prometheus-data",
+    "g2-712190660deb-rustfs-data",
+    "g2-712190660deb-tempo-data",
+    "g2-b59e68191ca0-alloy-data",
+    "g2-b59e68191ca0-fuseki-data",
+    "g2-b59e68191ca0-grafana-data",
+    "g2-b59e68191ca0-loki-data",
+    "g2-b59e68191ca0-postgres-data",
+    "g2-b59e68191ca0-prometheus-data",
+    "g2-b59e68191ca0-rustfs-data",
+    "g2-b59e68191ca0-tempo-data",
+    "g2-ef979bd04cc0-alloy-data",
+    "g2-ef979bd04cc0-fuseki-data",
+    "g2-ef979bd04cc0-grafana-data",
+    "g2-ef979bd04cc0-loki-data",
+    "g2-ef979bd04cc0-postgres-data",
+    "g2-ef979bd04cc0-prometheus-data",
+    "g2-ef979bd04cc0-rustfs-data",
+    "g2-ef979bd04cc0-tempo-data",
+    "sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28",
+    "sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044",
+    "sha256:6746df3002ba9a25011baaa43b4bf4175c53d00d06ed4ca07ac7b5ae995c58e2",
+    "sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18",
+    "sha256:8e28b3a01e16230451343afcfd3997c625b04806b9f3b1960de5915ecf3d01fa",
+    "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+    "sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b",
+    "sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f",
+    "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6",
+    "sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2",
+    "main",
+    "bridge",
+    "host",
+    "none",
+    "codex/PRE-G3-CLEANUP-FIX-002",
+    "codex/G2-THIN-SLICE-001-master"
+  ],
+  "operations": [
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/m0-containers/ontology-platform/.tools/pythonlibs",
+      "treeRoot": "/Users/chasen/.codex/worktrees/m0-containers/ontology-platform",
+      "expectedTip": "8d4c6e04c43f35d6f3dfa2d2cc4c10e53ac7c292",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "M0-MAC-PORTABILITY-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "27df19e2c8c6daeaf10d5564655f4754a0d9d8f1cb49f105e3972ea72532ae21",
+      "linktarget": "/Users/chasen/.codex/worktrees/m0-master/ontology-platform/.tools/pythonlibs"
+    },
+    {
+      "type": "worktree",
+      "target": "/Users/chasen/.codex/worktrees/m0-containers/ontology-platform",
+      "expectedTip": "8d4c6e04c43f35d6f3dfa2d2cc4c10e53ac7c292",
+      "expectedBranch": "codex/M0-containers",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "M0-MAC-PORTABILITY-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/m0-scripts/ontology-platform/.tools/pnpm",
+      "treeRoot": "/Users/chasen/.codex/worktrees/m0-scripts/ontology-platform",
+      "expectedTip": "88e6f7a38a97b71c81a57d9c578994cb0ed17865",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "M0-MAC-PORTABILITY-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "3b89dcd25a1735fbd3337db6a5df4e1b41eb388d7749552b761f838a5daeb565",
+      "linktarget": "/Users/chasen/.codex/worktrees/m0-master/ontology-platform/.tools/pnpm"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/m0-scripts/ontology-platform/.tools/pythonlibs",
+      "treeRoot": "/Users/chasen/.codex/worktrees/m0-scripts/ontology-platform",
+      "expectedTip": "88e6f7a38a97b71c81a57d9c578994cb0ed17865",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "M0-MAC-PORTABILITY-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "ed2a863989a3ca750a67cdd35f27d09e5397c9502686966dd7dbe556a6dfa1ad",
+      "linktarget": "/Users/chasen/.codex/worktrees/m0-master/ontology-platform/.tools/pythonlibs"
+    },
+    {
+      "type": "worktree",
+      "target": "/Users/chasen/.codex/worktrees/m0-scripts/ontology-platform",
+      "expectedTip": "88e6f7a38a97b71c81a57d9c578994cb0ed17865",
+      "expectedBranch": "codex/M0-scripts",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "M0-MAC-PORTABILITY-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-fe/ontology-platform/.tools/pythonlibs",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-fe/ontology-platform",
+      "expectedTip": "068878b9312c9d39430945677f0835fb2e48fae0",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FE-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "453a53ef461fc664ddd2d1acdc47bac72ce4eb855681c26c842b39d48f8cff4d",
+      "linktarget": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/.tools/pythonlibs"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-fe/ontology-platform/apps/web/.next",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-fe/ontology-platform",
+      "expectedTip": "068878b9312c9d39430945677f0835fb2e48fae0",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FE-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "707f99934f04260ddcc019a81f67018d5c74eb00a948b9fb359a9d7f0dfb750f"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-fe/ontology-platform/apps/web/node_modules",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-fe/ontology-platform",
+      "expectedTip": "068878b9312c9d39430945677f0835fb2e48fae0",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FE-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "cfcb15a54b7b364bec87999bf557ce2fcecb830e0407383917baa4f8a517ff61"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-fe/ontology-platform/node_modules",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-fe/ontology-platform",
+      "expectedTip": "068878b9312c9d39430945677f0835fb2e48fae0",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FE-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "51e0ab017e0bbf267b048fe8fe8d93f6a92adab126037da890655de3b7766faf"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-fe/ontology-platform/apps/web/artifacts/test-results/g2/.last-run.json",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-fe/ontology-platform",
+      "expectedTip": "068878b9312c9d39430945677f0835fb2e48fae0",
+      "expectedFileSha256": "91d1c43004802cd49950d78eb11c8fa7d05da8ffffe219a8b13b2f561bc00903",
+      "archiveCommittedPath": "docs/evidence/PRE-G3-CLEANUP-FIX-002/archived-small-artifacts/g2-fe-g2-last-run.fixture",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FE-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "07a7b299417352587015a48ba41a70a68d65a3ebeb32feb0da81b6f4f392917f"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-fe/ontology-platform/apps/web/artifacts/test-results/ui/.last-run.json",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-fe/ontology-platform",
+      "expectedTip": "068878b9312c9d39430945677f0835fb2e48fae0",
+      "expectedFileSha256": "91d1c43004802cd49950d78eb11c8fa7d05da8ffffe219a8b13b2f561bc00903",
+      "archiveCommittedPath": "docs/evidence/PRE-G3-CLEANUP-FIX-002/archived-small-artifacts/g2-fe-ui-last-run.fixture",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FE-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "815bc30955bbcd8a55268ce0dcb2e5b9075ec3fdcf0bb2c76735cd6715d6692e"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-fe/ontology-platform/apps/web/tsconfig.tsbuildinfo",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-fe/ontology-platform",
+      "expectedTip": "068878b9312c9d39430945677f0835fb2e48fae0",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FE-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "6673f11ec24d0c41f8f17e35e1421e200f32b1c07cfe54c0abcf0ac722cef1f7"
+    },
+    {
+      "type": "worktree",
+      "target": "/Users/chasen/.codex/worktrees/g2-fe/ontology-platform",
+      "expectedTip": "068878b9312c9d39430945677f0835fb2e48fae0",
+      "expectedBranch": "codex/G2-FE-001",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FE-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/.tools/pnpm-store",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform",
+      "expectedTip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FINAL-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "cf41c8e1efc9b0f341013ae884631c2c1b6ae1f3de1b7a0369182ce4ee8d8429"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/.tools/pythonlibs",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform",
+      "expectedTip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FINAL-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "46a4893f8fc188958b27a27d0a55b54c20b3486c664a13a5c999398500d89fef",
+      "linktarget": "/Users/chasen/Developer/repos/ontology-platform/.tools/pythonlibs"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/apps/web/.next",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform",
+      "expectedTip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FINAL-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "5996929bc21a39011f9119f51b7acb2cddf79ff2550858e8182d433753daeaf8"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/apps/web/node_modules",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform",
+      "expectedTip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FINAL-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "2398351f4ad51933db55598959aee291ba889e9e423d635b5bc32864f82267d0"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/AppHost/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform",
+      "expectedTip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FINAL-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "6d406d103e5f6e610dadbdc0d3ec661463a92a198d3b241189ab1abe6c346ab4"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/AppHost/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform",
+      "expectedTip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FINAL-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "3ed69381ef54909998e565efa2a371d149cf2eebc80b1c8cd76b54c34585caf4"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform",
+      "expectedTip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FINAL-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "8c31a89b49b57fb915d138a2a58ba5520452f05156f3b0f582c4c3380d0dfdb9"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform",
+      "expectedTip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FINAL-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "bac6419fe545951f459c4bcd23c02ecfe608f04f73b8d4bb51e511702f79937d"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform",
+      "expectedTip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FINAL-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "acc2bd31d6ddcee1cbac75139099827b416e9cfa93ec9a2915598d34fd3045c3"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform",
+      "expectedTip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FINAL-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "c48f76083829026cb43d77ecb210ad504fe497ad6a045399916b9a9f1e02e6eb"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Hosts/OntologyPlatform.InfrastructureApi/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform",
+      "expectedTip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FINAL-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "a20b5adbc8ebf0ba0e18e8a668d7a062112568f2f668382ec3b2c88349b1155d"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Hosts/OntologyPlatform.InfrastructureApi/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform",
+      "expectedTip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FINAL-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "3f9aa1404ce5d1461b82b7f7557b1f8bc6bbb3ed76bbab73869969d18fa8c2df"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform",
+      "expectedTip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FINAL-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "4a60872eeec3767f3307af1aa49aab4954feaf1cfe71eb0e941d224df6c5dddc"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform",
+      "expectedTip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FINAL-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "f9fb910aa6ff0f9f5be49ee2604126c509c3b4368c1566629a7c026fb59bba27"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform",
+      "expectedTip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FINAL-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "0730d2fc2dbdf70736097297e99381e53cdd6e59b469a2bf25667f221d5adbaa"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform",
+      "expectedTip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FINAL-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "41719eb27669eb5fcff856c8ea5e9141372085678d66cf1f6564f25a11a73512"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform",
+      "expectedTip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FINAL-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "e9dfd7eb76d77964b2063211ed7992f3601a70719353514fe0ee2e40732a8910"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform",
+      "expectedTip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FINAL-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "4b64921876c224e68c76289d12ff0a6286b73f4536289399a602c71d49e193a4"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform",
+      "expectedTip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FINAL-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "c600339615ded3ed13ca02c2419adadfc833d8179ae7286d4bec1ce97bb1c210"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform",
+      "expectedTip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FINAL-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "cec1c7dad37e5482b613e7566bc32029ab1334964fd83449a769fb6ffd705493"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform",
+      "expectedTip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FINAL-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "9dc94c4570cd0e360f9fa753da2712a420d46f311ac9178baa9d61ef67c1b3a4"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform",
+      "expectedTip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FINAL-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "af4186271508366678f13310358cd31614d49b453c61aa062ad85f781001f852"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform",
+      "expectedTip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FINAL-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "0f68c74bd0d7301f66580a9942faf8e1c73c9a1232155dd30d23af75912e1393"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform",
+      "expectedTip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FINAL-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "a4b58a6a1737224b6613d33cfb1c40dfc6b4d9e31f55208ac882ef272f87e6a7"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform",
+      "expectedTip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FINAL-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "fef97ed8353a4653bf32de25c098926559020331b5e17d6a52ce10f0e236c10a"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform",
+      "expectedTip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FINAL-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "406748635093997869dc5e30b43a1d88a925b1a8c90c086b5f69d3b461754bc8"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/ServiceDefaults/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform",
+      "expectedTip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FINAL-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "ac55798e55954f014e4de1215140f7c001379ec4fb599bd39cfb3c1ca5e73d76"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/src/ServiceDefaults/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform",
+      "expectedTip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FINAL-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "2872cc46735292d047680b0b12046631b9ec15ba2c9d96bafef19c034558ef9f"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform",
+      "expectedTip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FINAL-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "aabea370a9e451b1fe1384746cc378d49f3ed2dad19dc325f81646f9c748e22c"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.AgentTests/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform",
+      "expectedTip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FINAL-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "3dc7a06ed373984f2a6d4934338ec8682dc60b4aacb0be7c6b6e38b133b2f483"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform",
+      "expectedTip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FINAL-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "344efb2f9196fc597b80733432ff440c8a99e1962d84c365efc5b91a85cf7b82"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform",
+      "expectedTip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FINAL-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "0c6d211bc7d1604313beebbd1351b71ae77cdf2b0ccadf7ca7840eef11c8ec09"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform",
+      "expectedTip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FINAL-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "a88974a954c9d85e529e06e0ae58ef96e8ad28e029c1eadd0b7ef12fb15dce7c"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform",
+      "expectedTip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FINAL-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "86cf0166d90adc75da0319d3ee03d1893e6097c3a1c195921f397dcf3c2f493e"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform",
+      "expectedTip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FINAL-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "765ffa0a19aa3a9153788260d8753f57b267d33157118359bd809e277fc42c6e"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform",
+      "expectedTip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FINAL-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "73934d054c05dd05fd9e2aa99f5774afab889c4160059521aa121f62b847782c"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform",
+      "expectedTip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FINAL-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "c9bba655ffd4fcb465a55fe1afe3ff7b079b2d089c234d3a808d24c8e621ae93"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.QueryTests/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform",
+      "expectedTip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FINAL-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "546b14b6f1acd96030b4d8530a4437b4586c0df7521c5d7d69e902225dc2bfae"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform",
+      "expectedTip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FINAL-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "be7e9873e221a13752e8dcbfcd421b7d6770dc2127d46bc48da6cbecc621dd17"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform",
+      "expectedTip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FINAL-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "b515fbd8d96aa00d421b36bedab0ffdb059c67c877dce8b17f6a4712b9c0f579"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform",
+      "expectedTip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FINAL-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "04ef1f05387601b4b71747bfe61b9b73632998b16f8c9bad958babbdb56c0081"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform",
+      "expectedTip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FINAL-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "cf6a24a02cabf6499114d27d3dc4f4cfe0b83ebe719f3d7a47ee8647614b6058"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/node_modules",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform",
+      "expectedTip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FINAL-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "14afc7645711c00a173bbba3c99b84611d1a1ccbc2986e10527fb2fc4f2d8cfd"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/scripts/acceptance/__pycache__",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform",
+      "expectedTip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FINAL-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "17e98364f9418d3baeb1c7d11d2cc1cb34222070fb514e92a0646c7adcd8dac4"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/apps/web/tsconfig.tsbuildinfo",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform",
+      "expectedTip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FINAL-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "c91d60db612224f867f57da4aeb241323fa1e698f40933ec04880d339167303c"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform/artifacts/governance-integration.json",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform",
+      "expectedTip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "expectedFileSha256": "71c7d7b95052cc78a8ded8b81c2fb438b35803451550c366edd4873dd0305fce",
+      "archiveCommittedPath": "docs/evidence/PRE-G3-CLEANUP-FIX-002/archived-small-artifacts/g2-final-fix-governance.fixture",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FINAL-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "9419c6d56857f248e96b1c06bdb5d4e9356509a89a35586d0002be34ff953830"
+    },
+    {
+      "type": "worktree",
+      "target": "/Users/chasen/.codex/worktrees/g2-final-fix/ontology-platform",
+      "expectedTip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "expectedBranch": "codex/G2-FINAL-FIX",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-FINAL-FIX",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/.tools/pythonlibs",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform",
+      "expectedTip": "44f45bb7ef9d5f5c840bdcb4e5073ebbb8f2e152",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-HOST-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "220ee0aa4215bbb1923b188570f80d4002268976772be94d0e125cccba9fb3c4",
+      "linktarget": "/Users/chasen/Developer/repos/ontology-platform/.tools/pythonlibs"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/AppHost/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform",
+      "expectedTip": "44f45bb7ef9d5f5c840bdcb4e5073ebbb8f2e152",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-HOST-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "c69a9a552121aa909427e4a3c0520d973c7a4c5ce1b1440251895a62ac86c725"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/AppHost/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform",
+      "expectedTip": "44f45bb7ef9d5f5c840bdcb4e5073ebbb8f2e152",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-HOST-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "788ffebf12b1972f13c03e45b909c0812449e79cb1ccd7e166da3f8a1ddf27bc"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform",
+      "expectedTip": "44f45bb7ef9d5f5c840bdcb4e5073ebbb8f2e152",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-HOST-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "1417a27b39973de3b1e25bd5d4659d09c0a1aeb8be9ec817463339bc352c5216"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform",
+      "expectedTip": "44f45bb7ef9d5f5c840bdcb4e5073ebbb8f2e152",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-HOST-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "9309a85706fefcd6a47a442b0c1788e1df753f0d95c2720c2c6f003b1ec211ff"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform",
+      "expectedTip": "44f45bb7ef9d5f5c840bdcb4e5073ebbb8f2e152",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-HOST-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "0cae3b345bdbaac40632b3480daa9ee31259cd66e7abe9ba4512d5b7b7d61f46"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform",
+      "expectedTip": "44f45bb7ef9d5f5c840bdcb4e5073ebbb8f2e152",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-HOST-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "59ca65dc3fe65d9dbf5f7711b613ba7e3d71df1182b5e265a71e3b287fc424fa"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/Hosts/OntologyPlatform.InfrastructureApi/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform",
+      "expectedTip": "44f45bb7ef9d5f5c840bdcb4e5073ebbb8f2e152",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-HOST-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "ccf3037d061516fb9dbb7c9710c9056ecba6e94aa4becddedeafe52c4f1bcde4"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/Hosts/OntologyPlatform.InfrastructureApi/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform",
+      "expectedTip": "44f45bb7ef9d5f5c840bdcb4e5073ebbb8f2e152",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-HOST-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "edd181109c376cd0d665c6f22b88eaae274c596d982a8f2282f2fbacdddc0853"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform",
+      "expectedTip": "44f45bb7ef9d5f5c840bdcb4e5073ebbb8f2e152",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-HOST-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "4f3f3d8452a5078ef90cac961c6d4c4602cfc586061e2b90ca77933e48ceca65"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform",
+      "expectedTip": "44f45bb7ef9d5f5c840bdcb4e5073ebbb8f2e152",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-HOST-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "4141d86587c678181f75fbc0e95935de086cceb30541d0ece5c7b2321218ef4d"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform",
+      "expectedTip": "44f45bb7ef9d5f5c840bdcb4e5073ebbb8f2e152",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-HOST-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "dc6e63fac449d9604982d22f67625bf69b7a62a6788b64a7d93079e8165fdc92"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform",
+      "expectedTip": "44f45bb7ef9d5f5c840bdcb4e5073ebbb8f2e152",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-HOST-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "3580d3e81cc9d7efb9928fc93a30aa7e7d73875e4f396243d0ca977d111e5181"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform",
+      "expectedTip": "44f45bb7ef9d5f5c840bdcb4e5073ebbb8f2e152",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-HOST-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "9f0dd35111446c11f3f4abc981d0adbf23d7a111b7101df1f561c5a3df9c15b9"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform",
+      "expectedTip": "44f45bb7ef9d5f5c840bdcb4e5073ebbb8f2e152",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-HOST-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "e91087705384b6dfc46ddd943dc99cd45fef8009572820985ad590843159dbeb"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform",
+      "expectedTip": "44f45bb7ef9d5f5c840bdcb4e5073ebbb8f2e152",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-HOST-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "d37ff555a718d449142374615e58cd76b2cfc541af0522489d00284812c653bb"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform",
+      "expectedTip": "44f45bb7ef9d5f5c840bdcb4e5073ebbb8f2e152",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-HOST-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "5c79fc20eacc7b09edae4fda2481f2c77307892f9a8ac9b0e5f76fd2c52540c5"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform",
+      "expectedTip": "44f45bb7ef9d5f5c840bdcb4e5073ebbb8f2e152",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-HOST-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "cc74ada42ba0c562a2d06bb3e44f2716419e8a160c2f19e23f41cbd1e7a553fb"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform",
+      "expectedTip": "44f45bb7ef9d5f5c840bdcb4e5073ebbb8f2e152",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-HOST-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "ec502ddfb0362eabb2949a63da76a5ff104a6071e713c0cd1ecc3fb044879b25"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform",
+      "expectedTip": "44f45bb7ef9d5f5c840bdcb4e5073ebbb8f2e152",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-HOST-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "dec0899c24fdd7998ce005e813487197356b0dbbad692eeee1dc6e116d1762e0"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform",
+      "expectedTip": "44f45bb7ef9d5f5c840bdcb4e5073ebbb8f2e152",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-HOST-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "62b26394b07b34a9163158b10cdc267ad29ebd57446d5d8a1281312f447d475d"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform",
+      "expectedTip": "44f45bb7ef9d5f5c840bdcb4e5073ebbb8f2e152",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-HOST-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "badcef9954ab8bc6804b45cc03939bcffb4ac03540e33b945819457f6b750461"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform",
+      "expectedTip": "44f45bb7ef9d5f5c840bdcb4e5073ebbb8f2e152",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-HOST-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "c1fc0b08ffcfdb65d0d1657e4d47b655bd82a8d3d8a10b3f422acae635b8d297"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/ServiceDefaults/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform",
+      "expectedTip": "44f45bb7ef9d5f5c840bdcb4e5073ebbb8f2e152",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-HOST-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "51bdaf71daa896a912b51ac02d8e88280fa3472e940cbcd09e288fa5483cdab7"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/src/ServiceDefaults/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform",
+      "expectedTip": "44f45bb7ef9d5f5c840bdcb4e5073ebbb8f2e152",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-HOST-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "4d2288d7b7309a8e78d74e248d432d7cb3193a2f0021924d5f32122b65bae011"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform",
+      "expectedTip": "44f45bb7ef9d5f5c840bdcb4e5073ebbb8f2e152",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-HOST-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "13b8e336f12b13b0fc758930cc12ddc18db5e460ad9ef4f58e03c108527cec00"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.AgentTests/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform",
+      "expectedTip": "44f45bb7ef9d5f5c840bdcb4e5073ebbb8f2e152",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-HOST-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "507bcc9e0567110b8491f2e869868b83a22987b47a2e62273d8667b961e7ae9e"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform",
+      "expectedTip": "44f45bb7ef9d5f5c840bdcb4e5073ebbb8f2e152",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-HOST-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "408e8b8bfa38045eca37f7cc28d55c44351f4e4b3d061f9646effdd52dfe432c"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform",
+      "expectedTip": "44f45bb7ef9d5f5c840bdcb4e5073ebbb8f2e152",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-HOST-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "73585c7fda58b06cc9942a62b56e0540bece5bc5f79ada08735f132252617153"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform",
+      "expectedTip": "44f45bb7ef9d5f5c840bdcb4e5073ebbb8f2e152",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-HOST-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "c476b7d3d8594a6f61ecee8644feadea5876629b10cca944f90590b8cdb67405"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform",
+      "expectedTip": "44f45bb7ef9d5f5c840bdcb4e5073ebbb8f2e152",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-HOST-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "76f66dde3e656ab619a603e24b70c7d6f4411d740a65e2e21da3875d6d7a9c52"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform",
+      "expectedTip": "44f45bb7ef9d5f5c840bdcb4e5073ebbb8f2e152",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-HOST-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "56dcb221e4cbad1ae6385c1f40caa296b57aef55693a3285e8b438691f961161"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform",
+      "expectedTip": "44f45bb7ef9d5f5c840bdcb4e5073ebbb8f2e152",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-HOST-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "cdd0a8ca8e675a4791473d89984617ad139b51b9a610d026ef4305c57e681ea3"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform",
+      "expectedTip": "44f45bb7ef9d5f5c840bdcb4e5073ebbb8f2e152",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-HOST-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "60113bb87bdb304bc01b3bb7143f9675cead020c813201dfcf2d2c20283f368f"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.QueryTests/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform",
+      "expectedTip": "44f45bb7ef9d5f5c840bdcb4e5073ebbb8f2e152",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-HOST-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "9f827acc6922ca1ea6418ce1984be1c959060401840be1523fbf6dae6ec73902"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform",
+      "expectedTip": "44f45bb7ef9d5f5c840bdcb4e5073ebbb8f2e152",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-HOST-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "08182f122b00e71e86e2f65845d2d385c5d76ec7601f062eb5e4936e4973bd95"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform",
+      "expectedTip": "44f45bb7ef9d5f5c840bdcb4e5073ebbb8f2e152",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-HOST-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "791751e1a043461dcef75646e0b6c9b1d6aa96320e112c550bbe2d99e1be3800"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform",
+      "expectedTip": "44f45bb7ef9d5f5c840bdcb4e5073ebbb8f2e152",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-HOST-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "c1528ade9280348d511d7783276908b3fa16897c9c5654a214fb20c02b297825"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform",
+      "expectedTip": "44f45bb7ef9d5f5c840bdcb4e5073ebbb8f2e152",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-HOST-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "22386e95a7efb9e8e2d97850997228c51dfe75055459fe763e4e40bdccb0ab63"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform/scripts/acceptance/__pycache__",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform",
+      "expectedTip": "44f45bb7ef9d5f5c840bdcb4e5073ebbb8f2e152",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-HOST-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "9d297695785ae6041c4ab209fb7ed4158bee935ab4cb311667e7bc1826df0d20"
+    },
+    {
+      "type": "worktree",
+      "target": "/Users/chasen/.codex/worktrees/g2-host-fix/ontology-platform",
+      "expectedTip": "44f45bb7ef9d5f5c840bdcb4e5073ebbb8f2e152",
+      "expectedBranch": "codex/G2-HOST-FIX",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-HOST-FIX",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-observability/ontology-platform/.tools/pythonlibs",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-observability/ontology-platform",
+      "expectedTip": "ad2b70cc60efd4eb5a95e4bc9bbe9394f8af8a76",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "PRE-G3-CLEANUP-FIX-002-tools",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "67f5db57fae31fa2bb9908623d09d3889aca0d791c3074495a1ea063cbae1312",
+      "linktarget": "/Users/chasen/Developer/repos/ontology-platform/.tools/pythonlibs"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-observability/ontology-platform/scripts/acceptance/__pycache__",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-observability/ontology-platform",
+      "expectedTip": "ad2b70cc60efd4eb5a95e4bc9bbe9394f8af8a76",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "PRE-G3-CLEANUP-FIX-002-tools",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "28daa25a181baa2a66133b8d762ee17d41c09746dd7f724dce59b9a47206c7f1"
+    },
+    {
+      "type": "worktree",
+      "target": "/Users/chasen/.codex/worktrees/g2-observability/ontology-platform",
+      "expectedTip": "ad2b70cc60efd4eb5a95e4bc9bbe9394f8af8a76",
+      "expectedBranch": "codex/PRE-G3-CLEANUP-FIX-002-tools",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "PRE-G3-CLEANUP-FIX-002-tools",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform/.tools/pythonlibs",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform",
+      "expectedTip": "83d25cca70b41cea8de19bdac79d805a76957a21",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-PUB-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "3bba614128445c1766e5dd10a3fc867a63a8f18996ee3470e48bf03f46429c16"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/AppHost/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform",
+      "expectedTip": "83d25cca70b41cea8de19bdac79d805a76957a21",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-PUB-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "091feaa4f124ba1ec212c03586e8cc9aa2a43f5f96ca30c660e55fb4ab258edc"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform",
+      "expectedTip": "83d25cca70b41cea8de19bdac79d805a76957a21",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-PUB-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "3a1b4af84f88b833d9db0e63aedb341ff40d84baefbe9170e8b2eba07c475030"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform",
+      "expectedTip": "83d25cca70b41cea8de19bdac79d805a76957a21",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-PUB-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "475fca340ec9fdcda72a9efed0fe9c2c4838a5a5356d675adfcabc12f93c4050"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform",
+      "expectedTip": "83d25cca70b41cea8de19bdac79d805a76957a21",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-PUB-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "092491c155162e26682d7308137a43ad8cd2f8e4eb7ed2ca28ce3305abfe634d"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform",
+      "expectedTip": "83d25cca70b41cea8de19bdac79d805a76957a21",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-PUB-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "e739c7dfe93bd8c6d83b96e2461da565a28fe50168a2e8888f06c70af10e3e3f"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/Hosts/OntologyPlatform.InfrastructureApi/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform",
+      "expectedTip": "83d25cca70b41cea8de19bdac79d805a76957a21",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-PUB-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "fecf5b21f1543052b791f82837aa5e4ad65854cdb6890f7133df7f436d03962a"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform",
+      "expectedTip": "83d25cca70b41cea8de19bdac79d805a76957a21",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-PUB-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "7f4eec1d346f0dbe50749db34db42fe828eb06ad3f7d955e769828433c7c1fa7"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform",
+      "expectedTip": "83d25cca70b41cea8de19bdac79d805a76957a21",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-PUB-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "c4bc3c94c7e11c31a3f437e3e5142b600e092e88e1ecbf1ede731626fd87dcd7"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform",
+      "expectedTip": "83d25cca70b41cea8de19bdac79d805a76957a21",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-PUB-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "2e7ef364b0109d536a4f5d7290c9355dd9d6431543f980ce2e4cce293872d899"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform",
+      "expectedTip": "83d25cca70b41cea8de19bdac79d805a76957a21",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-PUB-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "fc3a1aace2eff6886a88662b8dc57077e2814dcbecd2cc14ab0cb65e777c7472"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform",
+      "expectedTip": "83d25cca70b41cea8de19bdac79d805a76957a21",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-PUB-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "e12383173a11825d77dbc0270f2550abfe07255269084b296d983e5841f965a4"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform",
+      "expectedTip": "83d25cca70b41cea8de19bdac79d805a76957a21",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-PUB-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "2987a61c02d1e5fd1e9645c13cf4c8b46021a9fdaff95023d9bc223d6fce30a0"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform",
+      "expectedTip": "83d25cca70b41cea8de19bdac79d805a76957a21",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-PUB-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "ea5bbd846402464e701ab08a984f805b2846dc26ea6bb3594b4e9d98e5e59f87"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform",
+      "expectedTip": "83d25cca70b41cea8de19bdac79d805a76957a21",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-PUB-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "2ea3d03466ff5efaf2a4de18314d4fefd5cf30669cd11133b659f844821d709f"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform",
+      "expectedTip": "83d25cca70b41cea8de19bdac79d805a76957a21",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-PUB-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "e91266fa0532f3b51151f4da5fcbe05601e6616b40b128e9ecb3c644943fa250"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform",
+      "expectedTip": "83d25cca70b41cea8de19bdac79d805a76957a21",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-PUB-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "7e9ba3309ff7892e48b1e9f35aa67bef77bb4e1234591921d6abd221d4d54385"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform",
+      "expectedTip": "83d25cca70b41cea8de19bdac79d805a76957a21",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-PUB-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "9096641fa02b71d97e540b6ac86d7e0829c0c2da0afd498b8da7447f00555710"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform",
+      "expectedTip": "83d25cca70b41cea8de19bdac79d805a76957a21",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-PUB-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "6800232d01faf92dc5f15654291af894df3a3103549953a0b69fcaa40bac38a9"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/ServiceDefaults/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform",
+      "expectedTip": "83d25cca70b41cea8de19bdac79d805a76957a21",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-PUB-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "c3583a6bb074cfb07bfe71b47c38eb9f939b6793c1d0464a1e7020586e8c92c5"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/src/ServiceDefaults/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform",
+      "expectedTip": "83d25cca70b41cea8de19bdac79d805a76957a21",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-PUB-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "58ddc8d0f928e7f0ce98c2160b6d082343d952ec1dd42d91a84032fb7e6274e8"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform",
+      "expectedTip": "83d25cca70b41cea8de19bdac79d805a76957a21",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-PUB-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "963c594f8515f24f24587b3f68d6e271d976a4aebb2ce98a0975d9a06d61930c"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform",
+      "expectedTip": "83d25cca70b41cea8de19bdac79d805a76957a21",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-PUB-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "b616ca37612a484019fe195393acf9c6f5a550b4b2a8286dab28eeb023d270f8"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform",
+      "expectedTip": "83d25cca70b41cea8de19bdac79d805a76957a21",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-PUB-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "0752ecf43e15f7fc6e35bd2d7d14f19e2e94a4214a1739b74533ff37bbfb5332"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform",
+      "expectedTip": "83d25cca70b41cea8de19bdac79d805a76957a21",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-PUB-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "fc7f1999342932fdcfa7548dcd37b261389b29b9ee0aa570f8a7340eb890b92e"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform",
+      "expectedTip": "83d25cca70b41cea8de19bdac79d805a76957a21",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-PUB-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "030f6722b0ad27d668ef986d412708b9f7a5e0f044b4d730cfb7a496195fcbb8"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform",
+      "expectedTip": "83d25cca70b41cea8de19bdac79d805a76957a21",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-PUB-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "27f46eac81948c78a492aa16d2043ff17dad6b4746cdfcc5f0c86d1c3dcea803"
+    },
+    {
+      "type": "worktree",
+      "target": "/Users/chasen/.codex/worktrees/g2-pub/ontology-platform",
+      "expectedTip": "83d25cca70b41cea8de19bdac79d805a76957a21",
+      "expectedBranch": "codex/G2-PUB-001",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-PUB-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-qa-fix/ontology-platform/.tools/pythonlibs",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-qa-fix/ontology-platform",
+      "expectedTip": "e4b5bdee6508b747cda17136534c03e023c3d99f",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-QA-FIX",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "9892a1daf3e63f92b1d93337503a9c6699faab0824c7afabc2fab5b8f5514fcd",
+      "linktarget": "/Users/chasen/Developer/repos/ontology-platform/.tools/pythonlibs"
+    },
+    {
+      "type": "worktree",
+      "target": "/Users/chasen/.codex/worktrees/g2-qa-fix/ontology-platform",
+      "expectedTip": "e4b5bdee6508b747cda17136534c03e023c3d99f",
+      "expectedBranch": "codex/G2-QA-FIX",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-QA-FIX",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/.tools/pythonlibs",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform",
+      "expectedTip": "a02d6da7297b254ce153628f29cf765de10af77c",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-READINESS-TEST",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "47aa9d8eb3c740e581f25e959c4bd9a696593621d8f86661c3080de4ad2f3e79",
+      "linktarget": "/Users/chasen/Developer/repos/ontology-platform/.tools/pythonlibs"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/AppHost/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform",
+      "expectedTip": "a02d6da7297b254ce153628f29cf765de10af77c",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-READINESS-TEST",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "59da58701c4c35fff4aacae2268f83854980b070c962180df38d23aee45a1987"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/AppHost/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform",
+      "expectedTip": "a02d6da7297b254ce153628f29cf765de10af77c",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-READINESS-TEST",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "ff20c900b2446ba097c89cc1844cb386777ebe807f79254510481fbf99178a96"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform",
+      "expectedTip": "a02d6da7297b254ce153628f29cf765de10af77c",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-READINESS-TEST",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "246f7bfd6ac3f46c778bfe46ee5789a32f895592be2c9aea727b1b74a35e0e9d"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform",
+      "expectedTip": "a02d6da7297b254ce153628f29cf765de10af77c",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-READINESS-TEST",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "b0b97e531906b2dbec4e7e9344dbfa453723381b17dd83ed5fd1ea654f14c3be"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform",
+      "expectedTip": "a02d6da7297b254ce153628f29cf765de10af77c",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-READINESS-TEST",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "8f12816fb09f1eb62b55ebc8e4099b5e6f4e1e2a6b1d6189b346d50395f74925"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform",
+      "expectedTip": "a02d6da7297b254ce153628f29cf765de10af77c",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-READINESS-TEST",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "39c8d914e42f641dac8937ca9a52506d74b2fd83f069754f1fe28d648f576a49"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/Hosts/OntologyPlatform.InfrastructureApi/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform",
+      "expectedTip": "a02d6da7297b254ce153628f29cf765de10af77c",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-READINESS-TEST",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "db7d98b5c9dafb396340d9f5a4b4f74c9a153a64d92dccb1ae162d7f93d9506a"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/Hosts/OntologyPlatform.InfrastructureApi/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform",
+      "expectedTip": "a02d6da7297b254ce153628f29cf765de10af77c",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-READINESS-TEST",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "7900b36943884aef77f0bd13ec32a2b2cf954d3d91a5d8f23bbb4d2f4662ede8"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform",
+      "expectedTip": "a02d6da7297b254ce153628f29cf765de10af77c",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-READINESS-TEST",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "afc4811336d71f3b46d27a873897ed25965458c71222e7102984a4955993753e"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform",
+      "expectedTip": "a02d6da7297b254ce153628f29cf765de10af77c",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-READINESS-TEST",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "9022588d027d5235b811de731a11551cceb3f9a775e4a77fc82aa96cf9c8eaba"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform",
+      "expectedTip": "a02d6da7297b254ce153628f29cf765de10af77c",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-READINESS-TEST",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "cbb97767c7c3a4fcd7fb31e383b72e52118d59701d4aeaf16fde2c0fe5a2f5c0"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform",
+      "expectedTip": "a02d6da7297b254ce153628f29cf765de10af77c",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-READINESS-TEST",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "402a473d3a47567204fc55b52dc3d3e543955c1375164fd3eb98c3197e22e7b0"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform",
+      "expectedTip": "a02d6da7297b254ce153628f29cf765de10af77c",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-READINESS-TEST",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "9052b65be1948f7f6ca7c0416bdc7507067510a827d10fb7747b0761530910a5"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform",
+      "expectedTip": "a02d6da7297b254ce153628f29cf765de10af77c",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-READINESS-TEST",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "c06121c881580d2a441c7949bceb18bb1f349a2cc12b45ea7f71d9049116f0ce"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform",
+      "expectedTip": "a02d6da7297b254ce153628f29cf765de10af77c",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-READINESS-TEST",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "f7d23d4128ec569fc3ad9d127f6d2a76ab7c23ff450e4acb00108756844d5c25"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform",
+      "expectedTip": "a02d6da7297b254ce153628f29cf765de10af77c",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-READINESS-TEST",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "55ecf1ecc86e5884bc16c80d5068dc009460c5545a91a2bf44c8a273046b1c2b"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform",
+      "expectedTip": "a02d6da7297b254ce153628f29cf765de10af77c",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-READINESS-TEST",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "3345c704de533949e7aef7b2d202f2e5ea804209d95c8e5099e91a9ffb742fe0"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform",
+      "expectedTip": "a02d6da7297b254ce153628f29cf765de10af77c",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-READINESS-TEST",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "911561a76865939a2503778a139c9d676e9e8c0f5417fc3674a3353547fee3e4"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform",
+      "expectedTip": "a02d6da7297b254ce153628f29cf765de10af77c",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-READINESS-TEST",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "5d775220eabf34f894fed734be4c1b2f09b58ee5aaa93d7017cc6c924114f324"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform",
+      "expectedTip": "a02d6da7297b254ce153628f29cf765de10af77c",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-READINESS-TEST",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "9c723009a83a0bd5ad9a4ad15d8f398ef0a11cf8ca5f27d2871ceca1b9e49e98"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform",
+      "expectedTip": "a02d6da7297b254ce153628f29cf765de10af77c",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-READINESS-TEST",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "1ca7af6163ca16648160d8f3bf6c3b25e9270304cdd1bfa73c4b79d3c3e8b88e"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform",
+      "expectedTip": "a02d6da7297b254ce153628f29cf765de10af77c",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-READINESS-TEST",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "911ce9b419fa8669d71ad1ee4ed67d1e80c388371f66233328cfe311d5a667ae"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/ServiceDefaults/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform",
+      "expectedTip": "a02d6da7297b254ce153628f29cf765de10af77c",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-READINESS-TEST",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "749faa357168d0ce904bb8d3b788e7b821b6d4e0fa3839145763762e83ba3f84"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/src/ServiceDefaults/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform",
+      "expectedTip": "a02d6da7297b254ce153628f29cf765de10af77c",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-READINESS-TEST",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "9af5bb59763ba9bb0b8c2120c9259e5f05fef7c004d2815a6e63308aad59f2f1"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform",
+      "expectedTip": "a02d6da7297b254ce153628f29cf765de10af77c",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-READINESS-TEST",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "ea4addbb158bef5e9662fda68fecd4a0d3dbd784c29eef6f369aea9783995bc0"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/tests/OntologyPlatform.AgentTests/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform",
+      "expectedTip": "a02d6da7297b254ce153628f29cf765de10af77c",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-READINESS-TEST",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "ceaf6129ec152d02b902e0512af7c4c200deb087268c76d823e0854626888ed8"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform",
+      "expectedTip": "a02d6da7297b254ce153628f29cf765de10af77c",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-READINESS-TEST",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "d9bb88c5d670641dac2527a8918ad66a1333ac544661011be905feee50cb7ddc"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform",
+      "expectedTip": "a02d6da7297b254ce153628f29cf765de10af77c",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-READINESS-TEST",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "f90d7e0dc2f4ccdd9a20e49608c7be93e89dafa958abe7cc73551ea3bb806c6c"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform",
+      "expectedTip": "a02d6da7297b254ce153628f29cf765de10af77c",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-READINESS-TEST",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "71e26c8760f7d57408166a9cee619f210c7f2348c13cea37d5d2b1fecc447012"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform",
+      "expectedTip": "a02d6da7297b254ce153628f29cf765de10af77c",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-READINESS-TEST",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "41f72e30553a9345aff351447fd68c779d43100a018f8033cca8b9bca5ed3630"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform",
+      "expectedTip": "a02d6da7297b254ce153628f29cf765de10af77c",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-READINESS-TEST",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "5bb7c23cc57c635277d2a98ceb46adb8589c2292d8bfa9e0e862c4d01b456780"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform",
+      "expectedTip": "a02d6da7297b254ce153628f29cf765de10af77c",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-READINESS-TEST",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "80ea8a017ee8b2d4d29eaebdd3693943177ec2a107c68c1ff3a9b0e5a9b746b2"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform",
+      "expectedTip": "a02d6da7297b254ce153628f29cf765de10af77c",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-READINESS-TEST",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "855f21a87d607b534ebd78f9a22377984aef59f166f4a243fe82455609e2eaab"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/tests/OntologyPlatform.QueryTests/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform",
+      "expectedTip": "a02d6da7297b254ce153628f29cf765de10af77c",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-READINESS-TEST",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "8a640411bd7eb8e0d4322dd8f355f566c61a980b15d3327ef51064223e21591b"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform",
+      "expectedTip": "a02d6da7297b254ce153628f29cf765de10af77c",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-READINESS-TEST",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "4356ca9c1cedee6a4b60fbd58f4066eccaa12ac4138ca5452263920b6e8faf35"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform",
+      "expectedTip": "a02d6da7297b254ce153628f29cf765de10af77c",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-READINESS-TEST",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "bdf52e3f0665c6eac4ac8712ec83f7dccbf5b47200eaf64957f8f9b86293267d"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform",
+      "expectedTip": "a02d6da7297b254ce153628f29cf765de10af77c",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-READINESS-TEST",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "912331c5f35b924cc78ad95b479e9325c7d5d86a49f45b9412fa276fb56eff5f"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform",
+      "expectedTip": "a02d6da7297b254ce153628f29cf765de10af77c",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-READINESS-TEST",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "76fbcad0e9c2ff0026548e123f57a17d2277a55373f633361047257e91fbb43c"
+    },
+    {
+      "type": "worktree",
+      "target": "/Users/chasen/.codex/worktrees/g2-readiness-test/ontology-platform",
+      "expectedTip": "a02d6da7297b254ce153628f29cf765de10af77c",
+      "expectedBranch": "codex/G2-READINESS-TEST",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-READINESS-TEST",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/m0-master/ontology-platform/.tools/pnpm",
+      "treeRoot": "/Users/chasen/.codex/worktrees/m0-master/ontology-platform",
+      "expectedTip": "e930935749bcb88d51abb94db4a41695bbbe6717",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "M0-MAC-PORTABILITY-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "e7202ca84986b79e4ee476afe5aeb6e70cc270b9c195b0bb31dcf9bf3672bba5"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/m0-master/ontology-platform/.tools/pythonlibs",
+      "treeRoot": "/Users/chasen/.codex/worktrees/m0-master/ontology-platform",
+      "expectedTip": "e930935749bcb88d51abb94db4a41695bbbe6717",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "M0-MAC-PORTABILITY-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "8c10349fa51b2f7fcb04fb4ef88778e7651b4c5cab998f033ede35061abadc5f"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/src/AppHost/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/m0-master/ontology-platform",
+      "expectedTip": "e930935749bcb88d51abb94db4a41695bbbe6717",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "M0-MAC-PORTABILITY-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "f6bdd5afa9c01f191ee219ffa035968bc6f1d02837c6e762b4791a4cf230eda3"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/src/AppHost/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/m0-master/ontology-platform",
+      "expectedTip": "e930935749bcb88d51abb94db4a41695bbbe6717",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "M0-MAC-PORTABILITY-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "cf34b736ee8fafb86390c53e48418120f5203d15ebb4a07b73731f48c7c02cb0"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/src/Hosts/OntologyPlatform.InfrastructureApi/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/m0-master/ontology-platform",
+      "expectedTip": "e930935749bcb88d51abb94db4a41695bbbe6717",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "M0-MAC-PORTABILITY-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "071b9cdc19ddb4a4dd98c1716048c6ee51c56911fb1ef082ca8c6dd5ac4b7441"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/src/Hosts/OntologyPlatform.InfrastructureApi/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/m0-master/ontology-platform",
+      "expectedTip": "e930935749bcb88d51abb94db4a41695bbbe6717",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "M0-MAC-PORTABILITY-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "5b5b75d57fe8446e308d96f086311aaf89506a6a9ebdca28f05304ce0d266d9d"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/src/ServiceDefaults/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/m0-master/ontology-platform",
+      "expectedTip": "e930935749bcb88d51abb94db4a41695bbbe6717",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "M0-MAC-PORTABILITY-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "27c63f6f9bca6645c6149b3403bb11d26b22427c28aa538e29c43501e24e2c57"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/src/ServiceDefaults/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/m0-master/ontology-platform",
+      "expectedTip": "e930935749bcb88d51abb94db4a41695bbbe6717",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "M0-MAC-PORTABILITY-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "060d533043599e99b7fdceabd4f7167d924debdd6e107d1aa96378a075fac89f"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/bin",
+      "treeRoot": "/Users/chasen/.codex/worktrees/m0-master/ontology-platform",
+      "expectedTip": "e930935749bcb88d51abb94db4a41695bbbe6717",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "M0-MAC-PORTABILITY-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "c43dba75e4e52d5fa28728e87730966b3eb20416ef245ddb65ce1c8a57197bdf"
+    },
+    {
+      "type": "cache",
+      "target": "/Users/chasen/.codex/worktrees/m0-master/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/obj",
+      "treeRoot": "/Users/chasen/.codex/worktrees/m0-master/ontology-platform",
+      "expectedTip": "e930935749bcb88d51abb94db4a41695bbbe6717",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "M0-MAC-PORTABILITY-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "d80cd2f4ff826f149df1b2d8a1acabdae2ad0edee68a0c5df05296367d01f687"
+    },
+    {
+      "type": "worktree",
+      "target": "/Users/chasen/.codex/worktrees/m0-master/ontology-platform",
+      "expectedTip": "e930935749bcb88d51abb94db4a41695bbbe6717",
+      "expectedBranch": "codex/M0-master",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "M0-MAC-PORTABILITY-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "git-local-branch",
+      "target": "codex/G1-CLOSE-001-master",
+      "expectedTip": "6154ebb3703031a49cf0c555c9f0c3596e3b7726",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G1-CLOSE-001-master",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "git-local-branch",
+      "target": "codex/G1-CLOSE-OBS",
+      "expectedTip": "19355e0919d5f4368b1218524af075da57e9dd1d",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G1-CLOSE-OBS",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "git-local-branch",
+      "target": "codex/G1-CLOSE-SEC",
+      "expectedTip": "5d92109064980e61fb7ac5a74cc98624c7219f0c",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G1-CLOSE-SEC",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "git-local-branch",
+      "target": "codex/G1-FE-001",
+      "expectedTip": "ce28552c3feb839eb2d9b447b4f25975bd439244",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G1-FE-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "git-local-branch",
+      "target": "codex/G1-OBS-001",
+      "expectedTip": "a52dc13c46abbc79776c86d4f8d4dcfa801cc99b",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G1-OBS-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "git-local-branch",
+      "target": "codex/G1-WAVE2-master",
+      "expectedTip": "d181f66e569e190a66b0f48b179f2fd9390b9467",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G1-WAVE2-master",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "git-local-branch",
+      "target": "codex/M0-containers",
+      "expectedTip": "8d4c6e04c43f35d6f3dfa2d2cc4c10e53ac7c292",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "M0-MAC-PORTABILITY-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "git-local-branch",
+      "target": "codex/M0-master",
+      "expectedTip": "e930935749bcb88d51abb94db4a41695bbbe6717",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "M0-MAC-PORTABILITY-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "git-local-branch",
+      "target": "codex/M0-scripts",
+      "expectedTip": "88e6f7a38a97b71c81a57d9c578994cb0ed17865",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "M0-MAC-PORTABILITY-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "git-local-branch",
+      "target": "codex/PRE-G3-HYGIENE-001",
+      "expectedTip": "de2c020c486df5557b1b17f6b62c1befd96312f2",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "PRE-G3-HYGIENE-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "git-local-branch",
+      "target": "codex/PRE-G3-CLEANUP-FIX-002-tools",
+      "expectedTip": "ad2b70cc60efd4eb5a95e4bc9bbe9394f8af8a76",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "PRE-G3-CLEANUP-FIX-002-tools",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "git-remote-branch",
+      "target": "codex/G1-CLOSE-001-master",
+      "expectedTip": "6154ebb3703031a49cf0c555c9f0c3596e3b7726",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G1-CLOSE-001-master",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "git-remote-branch",
+      "target": "codex/G1-CLOSE-OBS",
+      "expectedTip": "19355e0919d5f4368b1218524af075da57e9dd1d",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G1-CLOSE-OBS",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "git-remote-branch",
+      "target": "codex/G1-CLOSE-SEC",
+      "expectedTip": "5d92109064980e61fb7ac5a74cc98624c7219f0c",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G1-CLOSE-SEC",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "git-remote-branch",
+      "target": "codex/G1-FE-001",
+      "expectedTip": "ce28552c3feb839eb2d9b447b4f25975bd439244",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G1-FE-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "git-remote-branch",
+      "target": "codex/G1-OBS-001",
+      "expectedTip": "a52dc13c46abbc79776c86d4f8d4dcfa801cc99b",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G1-OBS-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "git-remote-branch",
+      "target": "codex/G1-WAVE2-master",
+      "expectedTip": "d181f66e569e190a66b0f48b179f2fd9390b9467",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G1-WAVE2-master",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "git-remote-branch",
+      "target": "codex/M0-containers",
+      "expectedTip": "8d4c6e04c43f35d6f3dfa2d2cc4c10e53ac7c292",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "M0-MAC-PORTABILITY-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "git-remote-branch",
+      "target": "codex/M0-master",
+      "expectedTip": "e930935749bcb88d51abb94db4a41695bbbe6717",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "M0-MAC-PORTABILITY-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "git-remote-branch",
+      "target": "codex/M0-scripts",
+      "expectedTip": "88e6f7a38a97b71c81a57d9c578994cb0ed17865",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "M0-MAC-PORTABILITY-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "git-remote-branch",
+      "target": "codex/PRE-G3-HYGIENE-001",
+      "expectedTip": "de2c020c486df5557b1b17f6b62c1befd96312f2",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "PRE-G3-HYGIENE-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "git-remote-branch",
+      "target": "codex/g1-infra-001-aspire",
+      "expectedTip": "c120b5ff5128346b7709191589f6e5889d671ccd",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G1-INFRA-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "git-remote-branch",
+      "target": "codex/g1-infra-001-review-pack",
+      "expectedTip": "d96f1f5b226c750d7beda270b36b8de7a091da78",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G1-INFRA-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "git-remote-branch",
+      "target": "codex/PRE-G3-CLEANUP-FIX-002-tools",
+      "expectedTip": "ad2b70cc60efd4eb5a95e4bc9bbe9394f8af8a76",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "PRE-G3-CLEANUP-FIX-002-tools",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-container",
+      "target": "18a8b1844db808716aa4479539dd51745df1c3da88c884dd7cfc0e87ec3299a1",
+      "expectedName": "/keycloak-twmfcnfj",
+      "expectedImage": "sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b",
+      "expectedState": "exited",
+      "expectedMounts": [],
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G1-WAVE2",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-container",
+      "target": "731a3eb86c2b32ce493c928e52f3c3f544203ebd8229c1122e8c1f2361509ab9",
+      "expectedName": "/postgres-pcwxyytq",
+      "expectedImage": "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6",
+      "expectedState": "exited",
+      "expectedMounts": [
+        {
+          "Type": "volume",
+          "Name": "wave2-a5431c01414a-postgres-data",
+          "Source": "/var/lib/docker/volumes/wave2-a5431c01414a-postgres-data/_data",
+          "Destination": "/var/lib/postgresql",
+          "RW": true
+        }
+      ],
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G1-WAVE2",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "m0-mac-b-20261025-fuseki-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-25T02:05:37Z",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "M0-MAC-PORTABILITY-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "m0-mac-b-20261025-postgres-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-25T02:05:37Z",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "M0-MAC-PORTABILITY-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "m0-mac-b-20261025-rustfs-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-25T02:05:37Z",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "M0-MAC-PORTABILITY-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "m0-mac-b-trace-20261025-fuseki-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-25T02:09:34Z",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "M0-MAC-PORTABILITY-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "m0-mac-b-trace-20261025-postgres-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-25T02:09:34Z",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "M0-MAC-PORTABILITY-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "m0-mac-b-trace-20261025-rustfs-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-25T02:09:34Z",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "M0-MAC-PORTABILITY-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "m0-mac-observed-17d4d914-fuseki-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-25T02:37:07Z",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "M0-MAC-PORTABILITY-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "m0-mac-observed-17d4d914-postgres-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-25T02:37:07Z",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "M0-MAC-PORTABILITY-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "m0-mac-observed-17d4d914-rustfs-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-25T02:37:07Z",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "M0-MAC-PORTABILITY-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "m0-mac-observed-b37a079e-fuseki-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-25T02:38:07Z",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "M0-MAC-PORTABILITY-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "m0-mac-observed-b37a079e-postgres-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-25T02:38:07Z",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "M0-MAC-PORTABILITY-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "m0-mac-observed-b37a079e-rustfs-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-25T02:38:07Z",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "M0-MAC-PORTABILITY-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "wave2-a5431c01414a-alloy-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-25T06:42:19Z",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G1-WAVE2",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "wave2-a5431c01414a-grafana-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-25T06:42:19Z",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G1-WAVE2",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "wave2-a5431c01414a-loki-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-25T06:42:19Z",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G1-WAVE2",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "wave2-a5431c01414a-postgres-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-25T06:30:51Z",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G1-WAVE2",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "wave2-a5431c01414a-prometheus-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-25T06:42:19Z",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G1-WAVE2",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "wave2-a5431c01414a-tempo-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-25T06:42:19Z",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G1-WAVE2",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "wave2-a19529d4edb4-alloy-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-25T15:10:01Z",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G1-WAVE2",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "wave2-a19529d4edb4-grafana-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-25T15:10:01Z",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G1-WAVE2",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "wave2-a19529d4edb4-loki-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-25T15:10:01Z",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G1-WAVE2",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "wave2-a19529d4edb4-postgres-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-25T14:51:39Z",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G1-WAVE2",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "wave2-a19529d4edb4-prometheus-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-25T15:10:01Z",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G1-WAVE2",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "wave2-a19529d4edb4-tempo-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-25T15:10:01Z",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G1-WAVE2",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-image",
+      "target": "sha256:24e1d917e37b5ba1b9421a4b0e5a2bb91c25e83adad2e3e0946002aceb519776",
+      "expectedTags": [
+        "fuseki:44727e8778c88a3e1ad51e2c401e7cea2ffd29a2"
+      ],
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-THIN-SLICE-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-image",
+      "target": "sha256:56e4431d4fcded645035ad120070d06437d2785ae1bf10dd788e1ad7e979b224",
+      "expectedTags": [
+        "fuseki:009749b201b660deb650916be8c9011565a930c0"
+      ],
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-THIN-SLICE-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-image",
+      "target": "sha256:59f3801d866d6349e7f66b75109d6e15c86beb7e15a478aaafe98bf72a3a901d",
+      "expectedTags": [
+        "fuseki:8b85cd963ab3910a87ff4d69819a814fcc536d5f"
+      ],
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-THIN-SLICE-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-image",
+      "target": "sha256:648cf618fef451847f3e8117c4dfa9c71ede24bbb89103fd7299601f98937ce3",
+      "expectedTags": [
+        "fuseki:dbcdef86a04ca9ffcc497dc8c5ef421206a8bfce"
+      ],
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-THIN-SLICE-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-image",
+      "target": "sha256:6662114156e78418a3bd46b1a15d5041ea1d0cd4f6706dac36e277fe3d89e678",
+      "expectedTags": [
+        "fuseki:3169eee7c813cb51c0d2f64f4b16e44eb8418d2d"
+      ],
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-THIN-SLICE-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-image",
+      "target": "sha256:675390c4fdeed9150317e6684a4f9f35a3cf661d8b220bfc745e6c0d08a00cb3",
+      "expectedTags": [
+        "fuseki:573b0d3ee0cd4bfa61e25eccdf1738785ffe29aa"
+      ],
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-THIN-SLICE-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-image",
+      "target": "sha256:7c9396626b8794ef2604ece4dea733a7f3d407e34646d8b9f2093c97d67f1974",
+      "expectedTags": [
+        "fuseki:aee70ad98dd4424c8051d2e52110edba5a026c3f"
+      ],
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-THIN-SLICE-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-image",
+      "target": "sha256:838f6b7e22c0daa92ceb2481a1673a47923dc44d19a963243e7efb3737a432f5",
+      "expectedTags": [
+        "fuseki:f575c64e3c609538e6cc92509dcee8e19f504df0"
+      ],
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-THIN-SLICE-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-image",
+      "target": "sha256:868102816b13803cbc6696441161de243c0632e35ce0a33058008362e12b790c",
+      "expectedTags": [
+        "fuseki:b5e12217ef598361e190f32d4b41b94c3390958c"
+      ],
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-THIN-SLICE-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-image",
+      "target": "sha256:97c745b6e0107d25d060b164527ec0cbde47d27fc80c3baddff383a961f80faf",
+      "expectedTags": [
+        "fuseki:916821ada98d9c8379c7f0dfca65261799164ae4"
+      ],
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-THIN-SLICE-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-image",
+      "target": "sha256:a2d1eeece49406d089b42137334f99be5e6e1c39120c5190a1a54666f1999c24",
+      "expectedTags": [
+        "fuseki:c6fba8168a4ce1d2e60a506e417d912bb289a6d1"
+      ],
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-THIN-SLICE-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-image",
+      "target": "sha256:b414ad0d1bcd7e6d8dceb41462b4b16d2209d26f0d38a0f46c09c4d3e0b866c2",
+      "expectedTags": [
+        "fuseki:2b315beaaff200b9c54ab89f27f5636f6c72a2bd"
+      ],
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-THIN-SLICE-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-image",
+      "target": "sha256:ce4c9eaa37ed309737b8dd438bb44e027f8a58835e3e3c85110a8accdcb8ccfe",
+      "expectedTags": [
+        "fuseki:6076b644f3e56351421b86f254b64c5eb5a364a6"
+      ],
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-THIN-SLICE-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-history",
+      "target": "tqd6xilgezautwa15exusnc0i",
+      "builder": "desktop-linux",
+      "expectedContext": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+      "expectedVcs": "https://github.com/on-dotnet/ontology-platform.git",
+      "expectedRevision": "b1ff0a68915c272846038af96a00da3acbb95538",
+      "expectedStatus": "completed",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-THIN-SLICE-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "36e3caf8e3408458ceae3355c860b3910ccc8e25856e6b3bc3c7a4571c99a8f2"
+    },
+    {
+      "type": "docker-history",
+      "target": "8eoav2lsmbdodq5zcocw9fk0g",
+      "builder": "desktop-linux",
+      "expectedContext": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+      "expectedVcs": "https://github.com/on-dotnet/ontology-platform.git",
+      "expectedRevision": "b1ff0a68915c272846038af96a00da3acbb95538",
+      "expectedStatus": "completed",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-THIN-SLICE-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "84f5f289ddf9148a0c8e9d6e307312aa4e0c02a0942246c10b31220bc921f7ca"
+    },
+    {
+      "type": "docker-history",
+      "target": "lm4mju36p53alxm5sjikkmjd0",
+      "builder": "desktop-linux",
+      "expectedContext": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+      "expectedVcs": "https://github.com/on-dotnet/ontology-platform.git",
+      "expectedRevision": "fac0490528e9cc110cf99f1a41cb003b31a7852f",
+      "expectedStatus": "completed",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-THIN-SLICE-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "8f79ec2787d8ed0ea97be2c8a688bfa80e746f11b878fc490f5d84db3197ee8c"
+    },
+    {
+      "type": "docker-history",
+      "target": "0gbrzldln4ju6rajgnf8lpai0",
+      "builder": "desktop-linux",
+      "expectedContext": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+      "expectedVcs": "https://github.com/on-dotnet/ontology-platform.git",
+      "expectedRevision": "fac0490528e9cc110cf99f1a41cb003b31a7852f",
+      "expectedStatus": "completed",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-THIN-SLICE-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "e3bc6a0d1e1790a44a4bf5aaaeb2c6091bf960465e799f2a9870bdc08719f5ef"
+    },
+    {
+      "type": "docker-history",
+      "target": "sw7gm5rh39dhmbtnwqttksufo",
+      "builder": "desktop-linux",
+      "expectedContext": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+      "expectedVcs": "https://github.com/on-dotnet/ontology-platform.git",
+      "expectedRevision": "fac0490528e9cc110cf99f1a41cb003b31a7852f",
+      "expectedStatus": "completed",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-THIN-SLICE-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "906d51ad2990519d20b9f17fd4bd9cbddc8253cd6f1547c48d731d634a190105"
+    },
+    {
+      "type": "docker-history",
+      "target": "q3nyzqz7dc2ve8zg0s4le025q",
+      "builder": "desktop-linux",
+      "expectedContext": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+      "expectedVcs": "https://github.com/on-dotnet/ontology-platform.git",
+      "expectedRevision": "65212620c36650dc52df299b618de6e2e838f51e",
+      "expectedStatus": "completed",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-THIN-SLICE-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "2d5236b095e30f1efe6ca81984e0099c52b50fd0391f2a750834366c28ad1433"
+    },
+    {
+      "type": "docker-history",
+      "target": "v0adsatiylrmjgbhqb5xxirxg",
+      "builder": "desktop-linux",
+      "expectedContext": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+      "expectedVcs": "https://github.com/on-dotnet/ontology-platform.git",
+      "expectedRevision": "6effefb1279e2495744b714de10eb2c1ba41b8c1",
+      "expectedStatus": "completed",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-THIN-SLICE-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "c83d2ea32d296b21df19afd70ec9129a00245179f2fe01d09d69ac533fccc20e"
+    },
+    {
+      "type": "docker-history",
+      "target": "j5dn47c0cb2tcwce9c9geibeg",
+      "builder": "desktop-linux",
+      "expectedContext": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+      "expectedVcs": "https://github.com/on-dotnet/ontology-platform.git",
+      "expectedRevision": "0449cec8d217c2c5261a71085e9dd375e0d9e060",
+      "expectedStatus": "completed",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-THIN-SLICE-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "84129d2c04dd0de353f2491d9464f83913ad32694c3efba9fbb8c9d67a0b9ff8"
+    },
+    {
+      "type": "docker-history",
+      "target": "wyqyudo9ml4su6lwv42572k9f",
+      "builder": "desktop-linux",
+      "expectedContext": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+      "expectedVcs": "https://github.com/on-dotnet/ontology-platform.git",
+      "expectedRevision": "c1e4dd0af6af4258f39c3c8a360c60e0709b8915",
+      "expectedStatus": "completed",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-THIN-SLICE-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "cb8e7c250b32b8dae5160fbd26efb480c660eff303f92c7baa6999e809dcf3d0"
+    },
+    {
+      "type": "docker-history",
+      "target": "wfy618td2fr5z0o43n19g51mg",
+      "builder": "desktop-linux",
+      "expectedContext": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+      "expectedVcs": "https://github.com/on-dotnet/ontology-platform.git",
+      "expectedRevision": "0e970f948aede10be0a86570a05d958d135a2761",
+      "expectedStatus": "completed",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-THIN-SLICE-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "e1bf59546356f30f1335087b9e4e3dd7fd91f8d4a0489c296c473aea88acc750"
+    },
+    {
+      "type": "docker-history",
+      "target": "xlro0rjcajs31jba7yffq0lmq",
+      "builder": "desktop-linux",
+      "expectedContext": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+      "expectedVcs": "https://github.com/on-dotnet/ontology-platform.git",
+      "expectedRevision": "707ef7dcb5034d15ddd4761cba54cb33ce39da06",
+      "expectedStatus": "completed",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-THIN-SLICE-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "bdcff5a76d40206fb8096f033f8950cba4b975b1749c1252d5331d22429c275c"
+    },
+    {
+      "type": "docker-history",
+      "target": "jytynl3c1hcqe65an0uksmwuw",
+      "builder": "desktop-linux",
+      "expectedContext": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+      "expectedVcs": "https://github.com/on-dotnet/ontology-platform.git",
+      "expectedRevision": "8223101ec607e25f0499081f49aa053b1100d152",
+      "expectedStatus": "completed",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-THIN-SLICE-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "cd72a961ec29cd0fe528016fa635618ac348c951fcda9152e67f46cf41b2610e"
+    },
+    {
+      "type": "docker-history",
+      "target": "07hrath9f7wuhcetgybgh8422",
+      "builder": "desktop-linux",
+      "expectedContext": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+      "expectedVcs": "https://github.com/on-dotnet/ontology-platform.git",
+      "expectedRevision": "a30ede7241c077dcf5188e9bf3857494caf0471a",
+      "expectedStatus": "completed",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-THIN-SLICE-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "8345ff333d60caed74b0a733ebbb1983d9a842338f383a83a773a4964fd7ad39"
+    },
+    {
+      "type": "docker-history",
+      "target": "15wxkh2jyaa5kzejl8yhksph5",
+      "builder": "desktop-linux",
+      "expectedContext": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+      "expectedVcs": "https://github.com/on-dotnet/ontology-platform.git",
+      "expectedRevision": "a30ede7241c077dcf5188e9bf3857494caf0471a",
+      "expectedStatus": "failed",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "G2-THIN-SLICE-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "f369397b2c89bf6b3b9797484c962100ec46cb21b72373da0578f812d6565200"
+    },
+    {
+      "type": "docker-history",
+      "target": "oig58wowfr1qz3tn8rlcp99di",
+      "builder": "desktop-linux",
+      "expectedContext": "/Users/chasen/.codex/worktrees/m0-master/ontology-platform/infra/development/fuseki",
+      "expectedVcs": "https://github.com/on-dotnet/ontology-platform.git",
+      "expectedRevision": "9acab3fc5dbb5ff0f447c4c839f66766e71b69e4",
+      "expectedStatus": "completed",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "M0-MAC-PORTABILITY-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "b2517007505e749e4b2c1f1d6e1185e2f431a2b786d47ff0b1ea018a57f0398c"
+    },
+    {
+      "type": "docker-history",
+      "target": "zo1g9e3r86l3buadw1j9aok18",
+      "builder": "desktop-linux",
+      "expectedContext": "/Users/chasen/.codex/worktrees/m0-master/ontology-platform/infra/development/fuseki",
+      "expectedVcs": "https://github.com/on-dotnet/ontology-platform.git",
+      "expectedRevision": "9acab3fc5dbb5ff0f447c4c839f66766e71b69e4",
+      "expectedStatus": "completed",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "M0-MAC-PORTABILITY-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "63cad52ab4d2124ff238702a3c9e81ccf5fc0fe12b341389b9c4a42bfb5f6030"
+    },
+    {
+      "type": "docker-history",
+      "target": "9f3v88w973zdi6d2pz5zl7bhf",
+      "builder": "desktop-linux",
+      "expectedContext": "/Users/chasen/.codex/worktrees/m0-master/ontology-platform/infra/development/fuseki",
+      "expectedVcs": "https://github.com/on-dotnet/ontology-platform.git",
+      "expectedRevision": "c8f09f09de9e415de220e01c49ec319693411957",
+      "expectedStatus": "completed",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "M0-MAC-PORTABILITY-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "dd4ff4f1990a4aa80abca81ae84f9b8abfc5b4b6ceebc9322e84dbb37d4a6bbb"
+    },
+    {
+      "type": "docker-history",
+      "target": "1qb12xansacxsmjbx9qwq66df",
+      "builder": "desktop-linux",
+      "expectedContext": "/Users/chasen/.codex/worktrees/m0-master/ontology-platform/infra/development/fuseki",
+      "expectedVcs": "https://github.com/on-dotnet/ontology-platform.git",
+      "expectedRevision": "e3f0b9694412f7a91b6075be9d7e8d4fac4b890b",
+      "expectedStatus": "completed",
+      "ownershipEvidence": {
+        "commit": "b9322e599aabac6fac8ed8a6f4ceeae767d1323b",
+        "path": "docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.md",
+        "taskId": "M0-MAC-PORTABILITY-001",
+        "closed": true,
+        "synthetic": true
+      },
+      "fingerprint": "6ccbc6ee24fbfdd1739846a8b05548a84018912c00e01d6bf2d22a9b2fbc5b79"
+    }
+  ]
+}

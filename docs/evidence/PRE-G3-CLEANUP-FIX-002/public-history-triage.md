@@ -14,3 +14,7 @@ GitHub实际visibility=PUBLIC，当前open PR=[]。扫描全可达commit/tree/bl
 独立实际重扫在工具中间Head0a920f4：285commits/2194blobs/46128151 bytes、6原命中、0omission、13aux refs。后续新增纯治理提交需按真实Head重扫或明确scope，不把初始数量当最终数量。没有真实风险轮换建议；若后续发现真实值，只报位置/类别并提轮换/历史处置，不擅自改历史。
 
 结论：PASS（限定有限扫描+人工triage），不等于全库语义隐私、任意混淆、未获取远端/不可达对象的安全认证；这些NOT_VERIFIED。readOnly字段不是OS沙箱。
+
+## C3最新独立覆盖
+
+public_history_review在b9322e599aabac6fac8ed8a6f4ceeae767d1323b独立重跑：289 commits、2235 unique blobs、46,825,908 bytes、原6项相同blob/path/category、unscanned0，C0/I0/M0，无新增候选。15本地Codex辅助refs不等于公开证据；原6项not_actionable/high结论保持。精确报告public-history-c3.json SHA256bddb20335b1a672fe117c95ba79836317494f0ac78ba3a7ecb2ec172cda553e9。扫描exit2表示需人工triage而非发现真实秘密；未重写历史。语义隐私/任意混淆/未获取远端对象仍NOT_VERIFIED。

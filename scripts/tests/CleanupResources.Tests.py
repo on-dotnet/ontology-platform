@@ -228,26 +228,50 @@ class CleanupTests(unittest.TestCase):
         self.assert_rejected()
 
     def docker_fixture(self):
+        self.plan['historyBackend'] = dict(context='desktop-linux', engineId='fixture-engine-id', bridgeId='2'*64, buildxVersion='github.com/docker/buildx v0.38.1 0dbe87f36ed472fe36b6796c3f70b4210a731fc5', buildkitVersion='v0.34.0', driver='docker', nodeName='desktop-linux')
         self.state_path = self.base / 'docker-state.json'
         self.state_path.write_text(json.dumps(dict(containers=[dict(Id='a'*64, Name='/test-container', Image='sha256:'+'b'*64, State='exited', Mounts=[])], volumes=[dict(Name='test-volume', Driver='local', CreatedAt='2026-01-01T00:00:00Z')], images=[dict(Id='sha256:'+'b'*64, RepoTags=['fuseki:'+'c'*40])], history=[dict(Ref='hist123', Name='infra/development/fuseki', Dockerfile='Dockerfile', Context='/repo/ontology-platform/infra/development/fuseki', VCSRepository='https://github.com/on-dotnet/ontology-platform', VCSRevision=self.main, Status='completed')], calls=[])))
         self.make_cli('docker', '''import json,sys
 from pathlib import Path
 p=Path(''' + repr(str(self.state_path)) + ''')
 s=json.loads(p.read_text()); a=sys.argv[1:]; s['calls'].append(a)
+def fail(message):
+ p.write_text(json.dumps(s)); print(message,file=sys.stderr); sys.exit(1)
 try:
- if a[:2]==['volume','ls']: print('\\n'.join(x['Name'] for x in s['volumes']))
+ if a==['context','show']: print('desktop-linux')
+ elif a[:1]==['info']: print('fixture-engine-id')
+ elif a[:2]==['network','inspect']: print(('3' if s.get('backendChanged') else '2')*64)
+ elif a==['buildx','version']: print('github.com/docker/buildx v0.38.1 0dbe87f36ed472fe36b6796c3f70b4210a731fc5')
+ elif a[:2]==['buildx','inspect']: print('Name: desktop-linux\\nDriver: docker\\nNodes:\\nName: desktop-linux\\nEndpoint: desktop-linux\\nBuildKit version: v0.34.0')
+ elif a[:2]==['volume','ls']: print('\\n'.join(x['Name'] for x in s['volumes']))
  elif a[:2]==['image','ls']: print('\\n'.join(x['Id'] for x in s['images']))
- elif a[:3]==['buildx','history','ls']: print('\\n'.join(json.dumps({'ref':x['Ref']}) for x in s['history']))
+ elif a[:3]==['buildx','history','ls']:
+  visible=[x for x in s['history'] if x['Ref'] not in s.get('deleted',[])]
+  if a[-1]=='json': print('\\n'.join(json.dumps({'ref':x['Ref']}) for x in visible))
+  else: print('\\n'.join(x['Ref'] for x in visible))
  elif a[:2]==['container','ls']: print('\\n'.join(x['Id'] for x in s['containers']))
  elif a[:2]==['container','inspect']:
   x=next(x for x in s['containers'] if x['Id']==a[-1]); print(json.dumps({**x,'State':{'Status':x['State']}}))
  elif a[:2]==['volume','inspect']: print(json.dumps(next(x for x in s['volumes'] if x['Name']==a[-1])))
  elif a[:2]==['image','inspect']: print(json.dumps(next(x for x in s['images'] if x['Id']==a[-1])))
- elif a[:3]==['buildx','history','inspect']: print(json.dumps(next(x for x in s['history'] if x['Ref']==a[-1])))
+ elif a[:3]==['buildx','history','inspect']:
+  ref=a[-1]; visible=[x for x in s['history'] if x['Ref'] not in s.get('deleted',[])]
+  if ref.startswith('^'):
+   index=int(ref[1:])+(1 if s.get('offsetMoved') else 0)
+   if s.get('offsetMissing') or index>=len(visible): fail('ERROR: no record found for ref "'+ref+'"')
+   print(json.dumps(visible[index]))
+  else:
+   if ref in s.get('deleted',[]): fail('ERROR: ref '+ref+' is deleted')
+   record=next((x for x in s['history'] if x['Ref']==ref),None)
+   if record is None: fail(s.get('afterError','ERROR: no record found for ref "'+ref+'"'))
+   if s.get('pinBug'): s.setdefault('pinned',[]).append(ref)
+   print(json.dumps(record))
  elif a[:2]==['container','rm']: s['containers']=[x for x in s['containers'] if x['Id']!=a[-1]]
  elif a[:2]==['volume','rm']: s['volumes']=[x for x in s['volumes'] if x['Name']!=a[-1]]
  elif a[:2]==['image','rm']: s['images']=[x for x in s['images'] if x['Id']!=a[-1]]
- elif a[:3]==['buildx','history','rm']: s['history']=[x for x in s['history'] if x['Ref']!=a[-1]]
+ elif a[:3]==['buildx','history','rm']:
+  if s.get('pinBug') and a[-1] in s.get('pinned',[]): s.setdefault('deleted',[]).append(a[-1])
+  else: s['history']=[x for x in s['history'] if x['Ref']!=a[-1]]
  else: raise ValueError('unsupported command')
 except (StopIteration,ValueError): p.write_text(json.dumps(s)); sys.exit(1)
 p.write_text(json.dumps(s))
@@ -286,6 +310,50 @@ p.write_text(json.dumps(s))
                 self.assertFalse(any('rm' in x for x in json.loads(self.state_path.read_text())['calls']))
                 self.plan['keep']=[]
                 (self.base / 'apply.jsonl').unlink(missing_ok=True)
+
+    def history_plan(self, later_branch=False):
+        state=json.loads(self.state_path.read_text());h=state['history'][0]
+        op=self.op('docker-history',h['Ref'],builder='desktop-linux',expectedContext=h['Context'],expectedVcs=h['VCSRepository'],expectedRevision=h['VCSRevision'],expectedStatus=h['Status'],fingerprint=hashlib.sha256(json.dumps(h,sort_keys=True,separators=(',',':')).encode()).hexdigest())
+        self.plan['operations']=[op]+([self.op(expectedTip=self.main)] if later_branch else [])
+
+    def test_history_offset_prevents_zero_ref_tombstone_and_database_survives_restart(self):
+        self.docker_fixture();state=json.loads(self.state_path.read_text());state['pinBug']=True;self.state_path.write_text(json.dumps(state));self.history_plan()
+        result=self.run_engine(True);self.assertEqual(result.returncode,0,result.stderr)
+        state=json.loads(self.state_path.read_text());self.assertEqual(state['history'],[], 'CLI success/list absence must not hide retained database records')
+        rm=next(i for i,c in enumerate(state['calls']) if c[:3]==['buildx','history','rm'])
+        self.assertTrue(all(c[-1].startswith('^') for c in state['calls'][:rm] if c[:3]==['buildx','history','inspect']))
+        state['deleted']=[];state['pinned']=[]
+        self.assertEqual(state['history'],[], 'Engine memory reset must not resurrect deleted database records')
+
+    def test_history_existing_pin_tombstone_fails_and_stops_later_operations(self):
+        self.docker_fixture();state=json.loads(self.state_path.read_text());state.update(pinBug=True,pinned=['hist123']);self.state_path.write_text(json.dumps(state));self.history_plan(True)
+        result=self.run_engine(True);self.assertNotEqual(result.returncode,0)
+        rows=[json.loads(x) for x in (self.base/'apply.jsonl').read_text().splitlines()]
+        self.assertEqual(rows[-1]['phase'],'failed');self.assertEqual(rows[-1]['exit'],0)
+        self.assertEqual(len(json.loads(self.state_path.read_text())['history']),1)
+        self.assertTrue(self.git('show-ref','--verify','refs/heads/codex/old').stdout)
+
+    def test_history_offset_movement_or_range_error_refuses_before_delete(self):
+        for flag in ('offsetMoved','offsetMissing'):
+            with self.subTest(flag=flag):
+                self.docker_fixture();state=json.loads(self.state_path.read_text());second=dict(state['history'][0],Ref='hist456');state['history'].append(second);state[flag]=True;self.state_path.write_text(json.dumps(state));self.history_plan()
+                result=self.run_engine(True);self.assertNotEqual(result.returncode,0)
+                self.assertFalse(any(c[:3]==['buildx','history','rm'] for c in json.loads(self.state_path.read_text())['calls']))
+                self.assertFalse((self.base/'apply.jsonl').exists())
+
+    def test_history_absence_diagnostic_rejects_other_errors_and_wrong_ref(self):
+        for error in ('ERROR: transport sentinel-private-value', 'ERROR: permission denied', 'ERROR: no record found for ref "other123"', 'ERROR: no record found for ref "hist123" extra'):
+            with self.subTest(error=error):
+                self.docker_fixture();state=json.loads(self.state_path.read_text());state['afterError']=error;self.state_path.write_text(json.dumps(state));self.history_plan(True)
+                result=self.run_engine(True);self.assertNotEqual(result.returncode,0)
+                self.assertNotIn('sentinel-private-value',result.stderr)
+                self.assertTrue(self.git('show-ref','--verify','refs/heads/codex/old').stdout)
+                (self.base/'apply.jsonl').unlink(missing_ok=True)
+
+    def test_history_backend_generation_mismatch_refuses_before_delete(self):
+        self.docker_fixture();state=json.loads(self.state_path.read_text());state['backendChanged']=True;self.state_path.write_text(json.dumps(state));self.history_plan()
+        result=self.run_engine(True);self.assertNotEqual(result.returncode,0)
+        self.assertFalse(any(c[:3]==['buildx','history','rm'] for c in json.loads(self.state_path.read_text())['calls']))
 
     def test_docker_history_project_boundary(self):
         self.docker_fixture()
@@ -545,7 +613,7 @@ p.write_text(json.dumps(s))
                 self.docker_fixture()
                 h=json.loads(self.state_path.read_text())['history'][0]
                 script=(self.bin/'docker').read_text()
-                script=script.replace("print('\\n'.join(json.dumps({'ref':x['Ref']}) for x in s['history']))", 'print('+repr(bad)+')')
+                script=script.replace("print('\\n'.join(json.dumps({'ref':x['Ref']}) for x in visible))", 'print('+repr(bad)+')')
                 # The replacement operates on the actual generated CLI script, not engine code.
                 self.assertIn('print('+repr(bad)+')',script)
                 (self.bin/'docker').write_text(script)

@@ -32,3 +32,7 @@
 默认网络不提供删除操作；全局Docker cache不提供prune。history按具体短Ref/固定builder删除，须保留失败构建摘要；history删除不等于cache释放。保留一套真实可复用开发环境，额外保留须写明准确runtime/PFX/唯一恢复绑定，不以所有测试样例可能唯一为通用理由。闭合且具任务/夹具/归档证据的合成测试组可删除，无需逐条证明合成数据无价值。
 
 新增验收必须包含真实临时Git和mock Docker的safe Apply与拒绝误删、项目实际before/after、逐条删除日志、KEEP集合完整和健康探针或具体限制；ReviewPackage回归不能替代资源回收。公开仓库另做全部可达history/任务refs/已提交证据有限秘密检查；只记录路径/类别，辅助本地refs不自动等同已公开，私有路径metadata-only，不擅自改远端历史。所有未运行平台/语义隐私/任意混淆仍NOT_VERIFIED。GitHub CI必须同Head真实成功才标PASS。
+
+## Build history持久删除门禁
+
+BuildKit v0.34.0的单Ref inspect可能留下零计数引用，使rm仅写内存deleted；列表缺席不能当DB持久删除。当前已审核Buildx0.38.1/BuildKit0.34.0单desktop-linux docker节点：historyBackend计划冻结context/EngineID/bridge generation/完整CLI与server版本/节点；用ref-only列表定位^offset读取原允许字段，必须返回Ref与完整版本指纹吻合。删除后除了列表缺席，还仅接受固定客户端精确的准确ID no-record诊断，deleted/transport/权限/错误Ref一律NOT_VERIFIED/failed。前后generation变化拒绝，raw stderr不输出。旧计划是对应旧提交的历史事实，不能当新工具可重放计划。不得为绕过持久化问题全局restart/update/prune/改内部DB；只在原精确范围重新审查，记录自然生命周期后的实际持久检查。

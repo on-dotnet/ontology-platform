@@ -11,6 +11,11 @@ history containing the exact target/taskId and CLOSED/已关闭 and synthetic/�
 可再生 markers. Approval must be reviewed before plan creation; text markers are
 an auditable assertion, not a replacement for independent human review.
 
+History operations additionally require historyBackend={context,engineId,bridgeId,
+buildxVersion,buildkitVersion,driver,nodeName}; audited client v0.38.1 and server
+v0.34.0 only. Offset inspection avoids the server zero-reference tombstone bug;
+strong post-delete diagnosis distinguishes durable absence from an in-memory mark.
+
 Types and additional fields:
  git-local-branch / git-remote-branch: expectedTip
  worktree: expectedTip, expectedBranch
@@ -237,6 +242,18 @@ def metadata_fingerprint(path):
     return digest(metadata_entries(Path(path)))
 
 
+def history_refs(builder='desktop-linux'):
+    """Read a ref-only list; a blank server ref does not pin individual records."""
+    require(builder=='desktop-linux','Unsupported history builder')
+    output=run(['docker','buildx','history','ls','--builder',builder,'--format','{{.Ref}}']).stdout
+    refs=[]
+    for line in output.splitlines():
+        require(re.fullmatch(r'(?:desktop-linux/desktop-linux/)?[a-z0-9]{6,64}',line),'Invalid history ref list')
+        refs.append(line.split('/')[-1])
+    require(len(refs)==len(set(refs)),'Ambiguous duplicate history refs')
+    return refs
+
+
 def safe_docker_snapshot(kind, target, builder='desktop-linux'):
     """Public planner API; inspect only whitelisted, non-secret Docker fields."""
     if kind == 'docker-container':
@@ -254,7 +271,14 @@ def safe_docker_snapshot(kind, target, builder='desktop-linux'):
         require(isinstance(value, dict), 'Invalid image schema')
         return dict(Id=value.get('Id'), RepoTags=sorted(value.get('RepoTags') or []))
     require(kind == 'docker-history' and builder == 'desktop-linux', 'Unsupported Docker snapshot')
-    value = read_json(run(['docker', 'buildx', 'history', 'inspect', '--builder', builder, '--format', HISTORY_FORMAT, target]).stdout)
+    require(re.fullmatch(r'[a-z0-9]{6,64}',target),'Invalid history target')
+    refs=history_refs(builder)
+    require(target in refs,'History target not listed')
+    # Buildx maps ^offset to a blank server Ref. An exact Ref would create a
+    # zero-count key in BuildKit v0.34.0 and make later deletion memory-only.
+    offset='^'+str(refs.index(target))
+    value = read_json(run(['docker', 'buildx', 'history', 'inspect', '--builder', builder, '--format', HISTORY_FORMAT, offset]).stdout)
+    require(isinstance(value,dict) and value.get('Ref')==target,'History offset moved or selected another record')
     require(isinstance(value, dict) and all(isinstance(value.get(k), str) for k in HISTORY_FIELDS), 'Unsupported history CLI schema')
     return {k: value[k] for k in HISTORY_FIELDS}
 
@@ -362,6 +386,21 @@ class Cleaner:
         self.main_unchanged()
         for op in self.ops:
             self.check(op, preflight=True)
+
+    def history_backend(self):
+        """Pin the reviewed single-node daemon generation and diagnostic contract."""
+        expected=self.plan.get('historyBackend')
+        require(isinstance(expected,dict) and set(expected)=={'context','engineId','bridgeId','buildxVersion','buildkitVersion','driver','nodeName'},'Exact reviewed history backend required')
+        require(expected['context']=='desktop-linux' and expected['driver']=='docker' and expected['nodeName']=='desktop-linux' and expected['buildkitVersion']=='v0.34.0','Unaudited history backend')
+        require(isinstance(expected['buildxVersion'],str) and re.fullmatch(r'github\.com/docker/buildx v0\.38\.1 [0-9a-f]{40}',expected['buildxVersion']),'Unaudited history diagnostic version')
+        require(isinstance(expected['engineId'],str) and re.fullmatch(r'[A-Za-z0-9-]{6,100}',expected['engineId']) and isinstance(expected['bridgeId'],str) and HEX64.fullmatch(expected['bridgeId']),'Invalid history daemon identity')
+        require(run(['docker','context','show']).stdout.strip()==expected['context'],'History Docker context changed')
+        require(run(['docker','info','--format','{{.ID}}']).stdout.strip()==expected['engineId'],'History daemon ID changed')
+        require(run(['docker','network','inspect','bridge','--format','{{.Id}}']).stdout.strip()==expected['bridgeId'],'History daemon generation changed')
+        require(run(['docker','buildx','version']).stdout.strip()==expected['buildxVersion'],'History CLI version changed')
+        topology=run(['docker','buildx','inspect','desktop-linux']).stdout
+        values=lambda key:[line.split(':',1)[1].strip() for line in topology.splitlines() if line.startswith(key+':')]
+        require(values('Name')==['desktop-linux','desktop-linux'] and values('Driver')==['docker'] and values('Endpoint')==['desktop-linux'] and values('BuildKit version')==[expected['buildkitVersion']],'History builder topology/version changed')
 
     def check_tip(self, op, tip):
         require(isinstance(op.get('expectedTip'),str) and SHA.fullmatch(op['expectedTip']) and op['expectedTip'] == tip, 'Target tip changed')
@@ -522,6 +561,7 @@ class Cleaner:
             image['references']=self.references(op,preflight)
             return image
         require(typ=='docker-history' and op.get('builder')=='desktop-linux' and re.fullmatch(r'[a-z0-9]{6,64}',target),'Invalid history identity/builder')
+        self.history_backend()
         h=safe_docker_snapshot(typ,target)
         require(h['Ref']==target and h['Context']==op.get('expectedContext') and h['VCSRepository']==op.get('expectedVcs') and h['VCSRevision']==op.get('expectedRevision') and h['Status']==op.get('expectedStatus'),'Build history identity changed')
         require(h['Status'] in ('completed','failed') and SHA.fullmatch(h['VCSRevision']),'Running or invalid history revision')
@@ -595,6 +635,10 @@ class Cleaner:
                     require(isinstance(value,dict) and isinstance(value.get('ref'),str) and re.fullmatch(r'(?:desktop-linux/desktop-linux/)?[a-z0-9]{6,64}',value['ref']),'Invalid history after schema')
                     refs.append(value['ref'].split('/')[-1])
                 require(target not in refs,'Build history remains')
+                self.history_backend()
+                result=run(['docker','buildx','history','inspect','--builder','desktop-linux','--format',HISTORY_FORMAT,target],acceptable=(0,1))
+                require(result.returncode==1 and not result.stdout and result.stderr.strip()=='ERROR: no record found for ref "'+target+'"','Durable history absence not verified; tombstone or unexpected backend response')
+                self.history_backend()
             else:
                 values=[value for value in output.splitlines() if value]
                 pattern=IMAGE if typ=='docker-image' else re.compile(r'[A-Za-z0-9][A-Za-z0-9_.-]{0,150}\Z')

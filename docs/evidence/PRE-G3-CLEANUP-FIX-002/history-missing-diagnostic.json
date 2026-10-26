@@ -1,0 +1,17 @@
+{
+  "observedAt": "2026-10-26T16:49:50.333167+00:00",
+  "command": [
+    "docker",
+    "buildx",
+    "history",
+    "inspect",
+    "--builder",
+    "desktop-linux",
+    "cleanupfix002missing",
+    "--format",
+    "{\"Ref\":{{printf \"%q\" .Ref}}}"
+  ],
+  "exitCode": 1,
+  "stderr": "ERROR: no record found for ref \"cleanupfix002missing\"\n",
+  "policy": "Only deliberately nonexistent synthetic identifier; no record/log/env data."
+}

@@ -1,0 +1,30 @@
+{
+  "observedAt": "2026-10-26T16:29:53.799596+00:00",
+  "prefix": "g2-ef979bd04cc0",
+  "mode": "existing-runtime/no-prepare/no-bootstrap",
+  "probes": {
+    "jena": {
+      "httpStatus": 200,
+      "path": "http://127.0.0.1:13030/$/ping"
+    },
+    "rustfs": {
+      "httpStatus": 200,
+      "path": "http://127.0.0.1:19000/health/ready"
+    },
+    "keycloak": {
+      "httpStatus": 200,
+      "path": "http://127.0.0.1:19090/health/ready"
+    },
+    "postgres": {
+      "command": [
+        "docker",
+        "exec",
+        "f41fa3195b1cf8e153c270c74967eb24c57a77332c14ec8d0fd50550dc361bf3",
+        "pg_isready",
+        "-U",
+        "postgres"
+      ],
+      "exitCode": 0
+    }
+  }
+}

@@ -1,0 +1,370 @@
+{
+  "taskId": "PRE-G3-HYGIENE-001",
+  "taskStatus": "READY_FOR_REVIEW / PARTIAL",
+  "baseSha": "46c7a6de70b1b97c032b12a19bc27c1c54e70f4c",
+  "headSha": "de2c020c486df5557b1b17f6b62c1befd96312f2",
+  "mainSha": "de2c020c486df5557b1b17f6b62c1befd96312f2",
+  "packagePath": "/Users/chasen/Developer/repos/ontology-platform/artifacts/reviews/OntologyPlatform-Review-PRE-G3-HYGIENE-001-de2c020c486d.zip",
+  "sizeBytes": 2021459,
+  "sha256": "0e06b72d176018e07464eeb2f934e4167bb740560dd557c22c0af9e427e13ab7",
+  "ci": {
+    "conclusion": "success",
+    "databaseId": 40303314669,
+    "headSha": "de2c020c486df5557b1b17f6b62c1befd96312f2",
+    "jobs": [
+      {
+        "completedAt": "2026-10-26T09:59:59Z",
+        "conclusion": "success",
+        "databaseId": 121506210425,
+        "name": "engineering",
+        "startedAt": "2026-10-26T09:55:23Z",
+        "status": "completed",
+        "steps": [
+          {
+            "completedAt": "2026-10-26T09:55:25Z",
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "startedAt": "2026-10-26T09:55:24Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-26T09:55:28Z",
+            "conclusion": "success",
+            "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "number": 2,
+            "startedAt": "2026-10-26T09:55:25Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-26T09:55:31Z",
+            "conclusion": "success",
+            "name": "Prepare isolated verification parser",
+            "number": 3,
+            "startedAt": "2026-10-26T09:55:28Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-26T09:56:40Z",
+            "conclusion": "success",
+            "name": "Repository policy and positive-negative checks",
+            "number": 4,
+            "startedAt": "2026-10-26T09:55:31Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-26T09:56:52Z",
+            "conclusion": "success",
+            "name": "Run actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68",
+            "number": 5,
+            "startedAt": "2026-10-26T09:56:40Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-26T09:57:10Z",
+            "conclusion": "success",
+            "name": "Restore exact committed platform graph",
+            "number": 6,
+            "startedAt": "2026-10-26T09:56:52Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-26T09:57:52Z",
+            "conclusion": "success",
+            "name": "Frozen Web restore and separate lint typecheck test build",
+            "number": 7,
+            "startedAt": "2026-10-26T09:57:10Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-26T09:57:53Z",
+            "conclusion": "success",
+            "name": "Runtime output boundary negatives",
+            "number": 8,
+            "startedAt": "2026-10-26T09:57:52Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-26T09:57:55Z",
+            "conclusion": "success",
+            "name": "G2 acceptance orchestration positive and negative checks",
+            "number": 9,
+            "startedAt": "2026-10-26T09:57:53Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-26T09:59:55Z",
+            "conclusion": "success",
+            "name": "Build format and real host security tests",
+            "number": 10,
+            "startedAt": "2026-10-26T09:57:55Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-26T09:59:55Z",
+            "conclusion": "success",
+            "name": "Scope notice",
+            "number": 11,
+            "startedAt": "2026-10-26T09:59:55Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-26T09:59:55Z",
+            "conclusion": "success",
+            "name": "Post Run actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68",
+            "number": 21,
+            "startedAt": "2026-10-26T09:59:55Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-26T09:59:56Z",
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "number": 22,
+            "startedAt": "2026-10-26T09:59:55Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-26T09:59:56Z",
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 23,
+            "startedAt": "2026-10-26T09:59:56Z",
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/on-dotnet/ontology-platform/actions/runs/40303314669/job/121506210425"
+      },
+      {
+        "completedAt": "2026-10-26T10:08:59Z",
+        "conclusion": "success",
+        "databaseId": 121506212166,
+        "name": "governance-integration",
+        "startedAt": "2026-10-26T09:55:23Z",
+        "status": "completed",
+        "steps": [
+          {
+            "completedAt": "2026-10-26T09:55:25Z",
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "startedAt": "2026-10-26T09:55:23Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-26T09:55:28Z",
+            "conclusion": "success",
+            "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "number": 2,
+            "startedAt": "2026-10-26T09:55:25Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-26T09:55:44Z",
+            "conclusion": "success",
+            "name": "Run actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68",
+            "number": 3,
+            "startedAt": "2026-10-26T09:55:28Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-26T09:56:25Z",
+            "conclusion": "success",
+            "name": "Frozen restore and backend build",
+            "number": 4,
+            "startedAt": "2026-10-26T09:55:44Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-26T09:58:07Z",
+            "conclusion": "success",
+            "name": "Real PostgreSQL security integration",
+            "number": 5,
+            "startedAt": "2026-10-26T09:56:25Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-26T10:08:57Z",
+            "conclusion": "success",
+            "name": "Real G2 semantic publishing query MCP MAF and native SSE integration",
+            "number": 6,
+            "startedAt": "2026-10-26T09:58:07Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-26T10:08:57Z",
+            "conclusion": "success",
+            "name": "Post Run actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68",
+            "number": 11,
+            "startedAt": "2026-10-26T10:08:57Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-26T10:08:57Z",
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "number": 12,
+            "startedAt": "2026-10-26T10:08:57Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-26T10:08:57Z",
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 13,
+            "startedAt": "2026-10-26T10:08:57Z",
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/on-dotnet/ontology-platform/actions/runs/40303314669/job/121506212166"
+      }
+    ],
+    "status": "completed",
+    "url": "https://github.com/on-dotnet/ontology-platform/actions/runs/40303314669"
+  },
+  "packagerOutput": {
+    "packagePath": "/Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform/artifacts/reviews/OntologyPlatform-Review-PRE-G3-HYGIENE-001-de2c020c486d.zip",
+    "sizeBytes": 2021459,
+    "sha256": "0e06b72d176018e07464eeb2f934e4167bb740560dd557c22c0af9e427e13ab7",
+    "taskStatus": "PARTIAL",
+    "verification": {
+      "status": "PASS",
+      "checks": [
+        "reopen",
+        "paths",
+        "forbidden-members",
+        "finite-secret-patterns",
+        "complete-member-set",
+        "member-sha256",
+        "source-blob-and-head",
+        "full-base-head-diff"
+      ],
+      "memberCount": 493
+    }
+  },
+  "canonicalPathVerify": {
+    "status": "PASS",
+    "checks": [
+      "reopen",
+      "paths",
+      "forbidden-members",
+      "finite-secret-patterns",
+      "complete-member-set",
+      "member-sha256",
+      "source-blob-and-head",
+      "full-base-head-diff"
+    ],
+    "memberCount": 493
+  },
+  "independentFinalReview": {
+    "status": "PASS",
+    "reviewer": "cleanup_review / independent read-only quality_reviewer",
+    "critical": 0,
+    "important": 0,
+    "minor": 0,
+    "packageSizeBytes": 2021459,
+    "sha256": "0e06b72d176018e07464eeb2f934e4167bb740560dd557c22c0af9e427e13ab7",
+    "memberCount": 493,
+    "sourceMappings": 494,
+    "evidenceIndexEntries": 1228,
+    "stageTextChanges": 71,
+    "stageBinaryChanges": 0,
+    "reconstructedHeadTree": "75a6c9278edcbcc15e55ec63daf78a350f26a3c3",
+    "verifyOnlyExitCode": 0,
+    "remoteMain": "de2c020c486df5557b1b17f6b62c1befd96312f2",
+    "actualMainCiRunId": 40303314669,
+    "engineeringJobId": 121506210425,
+    "governanceIntegrationJobId": 121506212166,
+    "bothJobs": "completed/success",
+    "checks": [
+      "Independent full ZIP paths/case/link/member SHA256",
+      "Every source/index Git path/OID/hash/size/raw bytes",
+      "71-file text patch independently applied in memory to Base and exact final Head tree reconstructed",
+      "Actual remote main and actual GitHub main CI, package CI same Head",
+      "H3 actual cleanup log, independent reviews, handoff, DEFERRED/NOT_RUN and bridge drift included"
+    ],
+    "reviewerMutations": false,
+    "scope": "Final canonical immutable ZIP. Approval permits only exact hashes of this task own comparison/intermediate/duplicate copies to be removed; existing trees/branches/Docker/cache protected."
+  },
+  "finalSameHeadComparison": {
+    "headSha": "de2c020c486df5557b1b17f6b62c1befd96312f2",
+    "schema1Bytes": 35461654,
+    "schema1Sha256": "b38f8986c454547fbbd76f18e5f3a4c011e942f5f8adc846c1727f21440f9a76",
+    "schema2Bytes": 2021459,
+    "schema2Sha256": "0e06b72d176018e07464eeb2f934e4167bb740560dd557c22c0af9e427e13ab7",
+    "reductionPercent": 94.3,
+    "scope": "Both actual packages built/reopened from exact final committed Head; legacy comparison is temporary and not delivered."
+  },
+  "ownTransientCleanup": {
+    "operations": [
+      {
+        "target": "/Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform/artifacts/review-comparison/schema1-OntologyPlatform-Review-PRE-G3-HYGIENE-001-3b51ef70888d.zip",
+        "sha256": "ec4edcb36cc48f9fe624ed849abdff5e397641044346ce49a275e68020bda3fe",
+        "sizeBytes": 35377295,
+        "basis": "This task generated exact comparison/intermediate/duplicate copy; canonical final ZIP independently approved and retained.",
+        "command": "Path.unlink exact allowlisted regular file",
+        "exitCode": 0,
+        "afterExists": false
+      },
+      {
+        "target": "/Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform/artifacts/review-comparison/schema2-OntologyPlatform-Review-PRE-G3-HYGIENE-001-3b51ef70888d.zip",
+        "sha256": "3fb1ec4de0c3c85ddcb82ece12e78fb7825b5bbf863eb8db03328448fae6549b",
+        "sizeBytes": 1964426,
+        "basis": "This task generated exact comparison/intermediate/duplicate copy; canonical final ZIP independently approved and retained.",
+        "command": "Path.unlink exact allowlisted regular file",
+        "exitCode": 0,
+        "afterExists": false
+      },
+      {
+        "target": "/Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform/artifacts/review-comparison/final-schema1-OntologyPlatform-Review-PRE-G3-HYGIENE-001-de2c020c486d.zip",
+        "sha256": "b38f8986c454547fbbd76f18e5f3a4c011e942f5f8adc846c1727f21440f9a76",
+        "sizeBytes": 35461654,
+        "basis": "This task generated exact comparison/intermediate/duplicate copy; canonical final ZIP independently approved and retained.",
+        "command": "Path.unlink exact allowlisted regular file",
+        "exitCode": 0,
+        "afterExists": false
+      },
+      {
+        "target": "/Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform/artifacts/reviews/OntologyPlatform-Review-PRE-G3-HYGIENE-001-3b51ef70888d.zip",
+        "sha256": "1c35bde8969d50681f4bf1b8a3b0a6b36b2f8df3dbe6c6cb99068a8e24ad607f",
+        "sizeBytes": 1964550,
+        "basis": "This task generated exact comparison/intermediate/duplicate copy; canonical final ZIP independently approved and retained.",
+        "command": "Path.unlink exact allowlisted regular file",
+        "exitCode": 0,
+        "afterExists": false
+      },
+      {
+        "target": "/Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform/artifacts/reviews/OntologyPlatform-Review-PRE-G3-HYGIENE-001-de2c020c486d.zip",
+        "sha256": "0e06b72d176018e07464eeb2f934e4167bb740560dd557c22c0af9e427e13ab7",
+        "sizeBytes": 2021459,
+        "basis": "This task generated exact comparison/intermediate/duplicate copy; canonical final ZIP independently approved and retained.",
+        "command": "Path.unlink exact allowlisted regular file",
+        "exitCode": 0,
+        "afterExists": false
+      }
+    ],
+    "removedLogicalBytes": 76789384,
+    "countedAsPreexistingResourceSavings": false
+  },
+  "finalState": {
+    "taskWorktreeTrackedAndUntracked": "CLEAN",
+    "mainTracked": "CLEAN",
+    "mainProtectedBaselineUntracked": [
+      "?? .DS_Store",
+      "?? backend/.DS_Store",
+      "?? backend/src/.DS_Store",
+      "?? docs/.DS_Store",
+      "?? docs/evidence/.DS_Store",
+      "?? infra/.DS_Store"
+    ],
+    "canonicalReviewZipCount": 1,
+    "retainedReviewDirectoryMetadata": ".DS_Store DEFERRED; pre-existing filesystem metadata not read/deleted",
+    "mainSha": "de2c020c486df5557b1b17f6b62c1befd96312f2",
+    "taskWorktreeAndBranch": "KEEP ACTIVE: current review/recovery workspace; no global Codex archive or cleanup",
+    "g3Started": false,
+    "preexistingFilesReclaimedLogicalBytes": 66400665,
+    "physicalDiskReclaimed": "NOT_VERIFIED"
+  },
+  "completedAt": "2026-10-26T10:15:12.351771+00:00",
+  "completionMarker": "PRE_G3_HYGIENE_READY_FOR_REVIEW"
+}

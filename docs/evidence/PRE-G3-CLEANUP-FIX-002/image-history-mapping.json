@@ -1,0 +1,337 @@
+{
+  "observedAt": "2026-10-26T16:09:23.537276+00:00",
+  "command": [
+    "docker",
+    "buildx",
+    "history",
+    "inspect",
+    "--builder",
+    "desktop-linux",
+    "<exact listed short Ref>",
+    "--format",
+    "{\"Ref\":{{printf \"%q\" .Ref}},\"Name\":{{printf \"%q\" .Name}},\"Context\":{{printf \"%q\" .Context}},\"Dockerfile\":{{printf \"%q\" .Dockerfile}},\"VCSRepository\":{{printf \"%q\" .VCSRepository}},\"VCSRevision\":{{printf \"%q\" .VCSRevision}},\"Status\":{{printf \"%q\" .Status}},\"ImageIndexes\":[{{$first := true}}{{range .Attachments}}{{if eq .Type \"application/vnd.oci.image.index.v1+json\"}}{{if not $first}},{{end}}{{printf \"%q\" .Digest}}{{$first = false}}{{end}}{{end}}]}"
+  ],
+  "expectedImages": [
+    "sha256:24e1d917e37b5ba1b9421a4b0e5a2bb91c25e83adad2e3e0946002aceb519776",
+    "sha256:56e4431d4fcded645035ad120070d06437d2785ae1bf10dd788e1ad7e979b224",
+    "sha256:59f3801d866d6349e7f66b75109d6e15c86beb7e15a478aaafe98bf72a3a901d",
+    "sha256:648cf618fef451847f3e8117c4dfa9c71ede24bbb89103fd7299601f98937ce3",
+    "sha256:6662114156e78418a3bd46b1a15d5041ea1d0cd4f6706dac36e277fe3d89e678",
+    "sha256:675390c4fdeed9150317e6684a4f9f35a3cf661d8b220bfc745e6c0d08a00cb3",
+    "sha256:7c9396626b8794ef2604ece4dea733a7f3d407e34646d8b9f2093c97d67f1974",
+    "sha256:838f6b7e22c0daa92ceb2481a1673a47923dc44d19a963243e7efb3737a432f5",
+    "sha256:868102816b13803cbc6696441161de243c0632e35ce0a33058008362e12b790c",
+    "sha256:97c745b6e0107d25d060b164527ec0cbde47d27fc80c3baddff383a961f80faf",
+    "sha256:a2d1eeece49406d089b42137334f99be5e6e1c39120c5190a1a54666f1999c24",
+    "sha256:b414ad0d1bcd7e6d8dceb41462b4b16d2209d26f0d38a0f46c09c4d3e0b866c2",
+    "sha256:ce4c9eaa37ed309737b8dd438bb44e027f8a58835e3e3c85110a8accdcb8ccfe"
+  ],
+  "coveredImages": [
+    "sha256:24e1d917e37b5ba1b9421a4b0e5a2bb91c25e83adad2e3e0946002aceb519776",
+    "sha256:56e4431d4fcded645035ad120070d06437d2785ae1bf10dd788e1ad7e979b224",
+    "sha256:59f3801d866d6349e7f66b75109d6e15c86beb7e15a478aaafe98bf72a3a901d",
+    "sha256:648cf618fef451847f3e8117c4dfa9c71ede24bbb89103fd7299601f98937ce3",
+    "sha256:6662114156e78418a3bd46b1a15d5041ea1d0cd4f6706dac36e277fe3d89e678",
+    "sha256:675390c4fdeed9150317e6684a4f9f35a3cf661d8b220bfc745e6c0d08a00cb3",
+    "sha256:7c9396626b8794ef2604ece4dea733a7f3d407e34646d8b9f2093c97d67f1974",
+    "sha256:838f6b7e22c0daa92ceb2481a1673a47923dc44d19a963243e7efb3737a432f5",
+    "sha256:868102816b13803cbc6696441161de243c0632e35ce0a33058008362e12b790c",
+    "sha256:97c745b6e0107d25d060b164527ec0cbde47d27fc80c3baddff383a961f80faf",
+    "sha256:a2d1eeece49406d089b42137334f99be5e6e1c39120c5190a1a54666f1999c24",
+    "sha256:b414ad0d1bcd7e6d8dceb41462b4b16d2209d26f0d38a0f46c09c4d3e0b866c2",
+    "sha256:ce4c9eaa37ed309737b8dd438bb44e027f8a58835e3e3c85110a8accdcb8ccfe"
+  ],
+  "rows": [
+    {
+      "snapshot": {
+        "Ref": "tqd6xilgezautwa15exusnc0i",
+        "Name": "infra/development/fuseki",
+        "Context": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+        "Dockerfile": "Dockerfile",
+        "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+        "VCSRevision": "b1ff0a68915c272846038af96a00da3acbb95538",
+        "Status": "completed",
+        "ImageIndexes": [
+          "sha256:8e28b3a01e16230451343afcfd3997c625b04806b9f3b1960de5915ecf3d01fa"
+        ]
+      },
+      "exitCode": 0
+    },
+    {
+      "snapshot": {
+        "Ref": "8eoav2lsmbdodq5zcocw9fk0g",
+        "Name": "infra/development/fuseki",
+        "Context": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+        "Dockerfile": "infra/development/fuseki/Dockerfile",
+        "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+        "VCSRevision": "b1ff0a68915c272846038af96a00da3acbb95538",
+        "Status": "completed",
+        "ImageIndexes": [
+          "sha256:6746df3002ba9a25011baaa43b4bf4175c53d00d06ed4ca07ac7b5ae995c58e2"
+        ]
+      },
+      "exitCode": 0
+    },
+    {
+      "snapshot": {
+        "Ref": "lm4mju36p53alxm5sjikkmjd0",
+        "Name": "infra/development/fuseki",
+        "Context": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+        "Dockerfile": "Dockerfile",
+        "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+        "VCSRevision": "fac0490528e9cc110cf99f1a41cb003b31a7852f",
+        "Status": "completed",
+        "ImageIndexes": [
+          "sha256:7c9396626b8794ef2604ece4dea733a7f3d407e34646d8b9f2093c97d67f1974"
+        ]
+      },
+      "exitCode": 0
+    },
+    {
+      "snapshot": {
+        "Ref": "0gbrzldln4ju6rajgnf8lpai0",
+        "Name": "infra/development/fuseki",
+        "Context": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+        "Dockerfile": "Dockerfile",
+        "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+        "VCSRevision": "fac0490528e9cc110cf99f1a41cb003b31a7852f",
+        "Status": "completed",
+        "ImageIndexes": [
+          "sha256:a2d1eeece49406d089b42137334f99be5e6e1c39120c5190a1a54666f1999c24"
+        ]
+      },
+      "exitCode": 0
+    },
+    {
+      "snapshot": {
+        "Ref": "sw7gm5rh39dhmbtnwqttksufo",
+        "Name": "infra/development/fuseki",
+        "Context": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+        "Dockerfile": "infra/development/fuseki/Dockerfile",
+        "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+        "VCSRevision": "fac0490528e9cc110cf99f1a41cb003b31a7852f",
+        "Status": "completed",
+        "ImageIndexes": [
+          "sha256:d86741ccf4298c7552b6ad2caf5aabd0e79013b615f93aac4c6d6dfbccb37e6b"
+        ]
+      },
+      "exitCode": 0
+    },
+    {
+      "snapshot": {
+        "Ref": "q3nyzqz7dc2ve8zg0s4le025q",
+        "Name": "infra/development/fuseki",
+        "Context": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+        "Dockerfile": "Dockerfile",
+        "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+        "VCSRevision": "65212620c36650dc52df299b618de6e2e838f51e",
+        "Status": "completed",
+        "ImageIndexes": [
+          "sha256:24e1d917e37b5ba1b9421a4b0e5a2bb91c25e83adad2e3e0946002aceb519776"
+        ]
+      },
+      "exitCode": 0
+    },
+    {
+      "snapshot": {
+        "Ref": "v0adsatiylrmjgbhqb5xxirxg",
+        "Name": "infra/development/fuseki",
+        "Context": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+        "Dockerfile": "Dockerfile",
+        "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+        "VCSRevision": "6effefb1279e2495744b714de10eb2c1ba41b8c1",
+        "Status": "completed",
+        "ImageIndexes": [
+          "sha256:ce4c9eaa37ed309737b8dd438bb44e027f8a58835e3e3c85110a8accdcb8ccfe"
+        ]
+      },
+      "exitCode": 0
+    },
+    {
+      "snapshot": {
+        "Ref": "j5dn47c0cb2tcwce9c9geibeg",
+        "Name": "infra/development/fuseki",
+        "Context": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+        "Dockerfile": "Dockerfile",
+        "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+        "VCSRevision": "0449cec8d217c2c5261a71085e9dd375e0d9e060",
+        "Status": "completed",
+        "ImageIndexes": [
+          "sha256:838f6b7e22c0daa92ceb2481a1673a47923dc44d19a963243e7efb3737a432f5"
+        ]
+      },
+      "exitCode": 0
+    },
+    {
+      "snapshot": {
+        "Ref": "wyqyudo9ml4su6lwv42572k9f",
+        "Name": "infra/development/fuseki",
+        "Context": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+        "Dockerfile": "Dockerfile",
+        "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+        "VCSRevision": "c1e4dd0af6af4258f39c3c8a360c60e0709b8915",
+        "Status": "completed",
+        "ImageIndexes": [
+          "sha256:6662114156e78418a3bd46b1a15d5041ea1d0cd4f6706dac36e277fe3d89e678"
+        ]
+      },
+      "exitCode": 0
+    },
+    {
+      "snapshot": {
+        "Ref": "wfy618td2fr5z0o43n19g51mg",
+        "Name": "infra/development/fuseki",
+        "Context": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+        "Dockerfile": "Dockerfile",
+        "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+        "VCSRevision": "0e970f948aede10be0a86570a05d958d135a2761",
+        "Status": "completed",
+        "ImageIndexes": [
+          "sha256:56e4431d4fcded645035ad120070d06437d2785ae1bf10dd788e1ad7e979b224"
+        ]
+      },
+      "exitCode": 0
+    },
+    {
+      "snapshot": {
+        "Ref": "xlro0rjcajs31jba7yffq0lmq",
+        "Name": "infra/development/fuseki",
+        "Context": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+        "Dockerfile": "Dockerfile",
+        "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+        "VCSRevision": "707ef7dcb5034d15ddd4761cba54cb33ce39da06",
+        "Status": "completed",
+        "ImageIndexes": [
+          "sha256:97c745b6e0107d25d060b164527ec0cbde47d27fc80c3baddff383a961f80faf"
+        ]
+      },
+      "exitCode": 0
+    },
+    {
+      "snapshot": {
+        "Ref": "jytynl3c1hcqe65an0uksmwuw",
+        "Name": "infra/development/fuseki",
+        "Context": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+        "Dockerfile": "Dockerfile",
+        "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+        "VCSRevision": "8223101ec607e25f0499081f49aa053b1100d152",
+        "Status": "completed",
+        "ImageIndexes": [
+          "sha256:b414ad0d1bcd7e6d8dceb41462b4b16d2209d26f0d38a0f46c09c4d3e0b866c2"
+        ]
+      },
+      "exitCode": 0
+    },
+    {
+      "snapshot": {
+        "Ref": "07hrath9f7wuhcetgybgh8422",
+        "Name": "infra/development/fuseki",
+        "Context": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+        "Dockerfile": "infra/development/fuseki/Dockerfile",
+        "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+        "VCSRevision": "a30ede7241c077dcf5188e9bf3857494caf0471a",
+        "Status": "completed",
+        "ImageIndexes": [
+          "sha256:6cd40ff063db802d36a082fda07849fef3289d974b48d5c44fc9a82c41a1e826"
+        ]
+      },
+      "exitCode": 0
+    },
+    {
+      "snapshot": {
+        "Ref": "15wxkh2jyaa5kzejl8yhksph5",
+        "Name": "infra/development/fuseki",
+        "Context": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+        "Dockerfile": "Dockerfile",
+        "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+        "VCSRevision": "a30ede7241c077dcf5188e9bf3857494caf0471a",
+        "Status": "failed",
+        "ImageIndexes": []
+      },
+      "exitCode": 0
+    },
+    {
+      "snapshot": {
+        "Ref": "oig58wowfr1qz3tn8rlcp99di",
+        "Name": "infra/development/fuseki",
+        "Context": "/Users/chasen/.codex/worktrees/m0-master/ontology-platform/infra/development/fuseki",
+        "Dockerfile": "Dockerfile",
+        "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+        "VCSRevision": "9acab3fc5dbb5ff0f447c4c839f66766e71b69e4",
+        "Status": "completed",
+        "ImageIndexes": [
+          "sha256:868102816b13803cbc6696441161de243c0632e35ce0a33058008362e12b790c"
+        ]
+      },
+      "exitCode": 0
+    },
+    {
+      "snapshot": {
+        "Ref": "zo1g9e3r86l3buadw1j9aok18",
+        "Name": "infra/development/fuseki",
+        "Context": "/Users/chasen/.codex/worktrees/m0-master/ontology-platform/infra/development/fuseki",
+        "Dockerfile": "Dockerfile",
+        "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+        "VCSRevision": "9acab3fc5dbb5ff0f447c4c839f66766e71b69e4",
+        "Status": "completed",
+        "ImageIndexes": [
+          "sha256:675390c4fdeed9150317e6684a4f9f35a3cf661d8b220bfc745e6c0d08a00cb3"
+        ]
+      },
+      "exitCode": 0
+    },
+    {
+      "snapshot": {
+        "Ref": "9f3v88w973zdi6d2pz5zl7bhf",
+        "Name": "infra/development/fuseki",
+        "Context": "/Users/chasen/.codex/worktrees/m0-master/ontology-platform/infra/development/fuseki",
+        "Dockerfile": "Dockerfile",
+        "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+        "VCSRevision": "c8f09f09de9e415de220e01c49ec319693411957",
+        "Status": "completed",
+        "ImageIndexes": [
+          "sha256:59f3801d866d6349e7f66b75109d6e15c86beb7e15a478aaafe98bf72a3a901d"
+        ]
+      },
+      "exitCode": 0
+    },
+    {
+      "snapshot": {
+        "Ref": "1qb12xansacxsmjbx9qwq66df",
+        "Name": "infra/development/fuseki",
+        "Context": "/Users/chasen/.codex/worktrees/m0-master/ontology-platform/infra/development/fuseki",
+        "Dockerfile": "Dockerfile",
+        "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+        "VCSRevision": "e3f0b9694412f7a91b6075be9d7e8d4fac4b890b",
+        "Status": "completed",
+        "ImageIndexes": [
+          "sha256:648cf618fef451847f3e8117c4dfa9c71ede24bbb89103fd7299601f98937ce3"
+        ]
+      },
+      "exitCode": 0
+    }
+  ],
+  "policy": "Project VCS/context and OCI index attachment proves exact image IDs, safe projection only; no Env/BuildArgs/config/full logs.",
+  "independentReview": {
+    "agent": "docker_inventory",
+    "actualRepeated": 13,
+    "matchingImages": 13,
+    "exitCodes": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "newRecoveryBuildExcluded": true,
+    "mutations": false
+  }
+}

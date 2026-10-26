@@ -24,3 +24,5 @@
 ## 实际回收纠偏（PRE-G3-CLEANUP-FIX-002）
 
 阶段已确认关闭且精确安全候选满足条件时，Master必须使用已审白名单实际清理，不再用不可取得的旧聊天证明或统一DEFERRED掩盖缺口。存在安全候选却0删除=FAIL；具体锁定/独特未整合提交/私有runtime/PFX/唯一数据或命令故障逐项列对象、证据、解除条件，其它安全项继续。执行器默认DryRun，Apply需精确ID/期望版本/目录边界/过期拒绝/重验及before-command-exit-after日志；当前/locked/keep路径及后代保护，远端expectedTip用原子compare-and-delete，不覆盖Git历史。阶段DoD必须包含真实资源回收验收与开发环境保留验证；构包54测试不能替代清理测试。公开Git history/任务refs/证据检查只报路径/类别、不泄漏原秘密，不改远端历史。多Agent独立Worktree和Master唯一main集成规则保持，禁止跨项目/全局清理和自动G3。详见生命周期规范及FIX-002任务合同。
+
+Build history回收不能只凭rm exit0/list缺席；须避免单Ref查询零计数陷阱，冻结已审核单节点后端版本/代际，严格验证准确ID持久无记录诊断，并记录自然生命周期后的实测。内存tombstone或后验回现须撤回该项完成结论，保留原时点日志，不主动全局重启/升级/改DB绕过。

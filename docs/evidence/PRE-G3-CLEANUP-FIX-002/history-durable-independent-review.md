@@ -1,0 +1,9 @@
+# 持久history修复候选独立审查
+
+cleanup_review仅候选代码门禁PASS，C0/I0/M0；真实18记录持久删除在该时点仍NOT_VERIFIED，不据此恢复总PASS。
+
+独立实际40/40 suite（89.007s）与15额外tmp/mock案例：精确backend正例；wrong context/engine/bridge/client revision/server version/driver/extra node/endpoint/missing node全部拒绝；强after正确诊断附stdout、正确诊断exit0、rm后generation变、诊断后generation变、已有volatile tombstone均正确failed，原CLI exit0准确记录且后续ref保留。原4I及公开22bytes例外未回归。
+
+^offset会使server Ref为空；v0.38.1的ls .Ref()完整短Ref不被truncate，强返回Ref匹配和全fingerprint能拒绝顺序位移。精确无记录诊断来源与已识别单节点版本已核。
+
+冻结engine SHA2568f6ee6bdcf63a7a39671d79158646c4ed3ad9eda87783d3e517bea10322fc710，tests64860643c62030b71b7dc6bdab2e8d208de29da8e6764aed038f3005468bd017。结束再次hash未变，diff-check0。Reviewer无本机Docker API调用，仅fixture CLI，未干扰自然idle。须实际同HeadCI后仅原18子计划、新generation实测冻结、fresh DryRun/Apply与持久重检。
