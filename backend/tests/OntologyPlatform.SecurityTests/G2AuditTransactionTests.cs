@@ -106,7 +106,38 @@ public sealed class G2AuditTransactionTests
         await using var transaction = await first.Database.BeginTransactionAsync();
         await second.Database.OpenConnectionAsync();
         await Assert.ThrowsExactlyAsync<InvalidOperationException>(() => fixture.Writer.WriteAsync(G2PgFixture.Actor(), G2PgFixture.Command(), second.Database.GetDbConnection(), transaction.GetDbTransaction(), CancellationToken.None));
-        await transaction.RollbackAsync();
+        // writer已使外层事务整体失效，测试不能主动回滚替其掩盖前置失败。
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(() => transaction.CommitAsync());
+        Assert.AreEqual(0, await fixture.AuditCountAsync());
+    }
+
+    /// <summary>连接前置条件失败后调用方捕获异常也不能提交已经写入的业务。</summary>
+    /// <param name="openForeignConnection">是否打开另一物理连接；否则覆盖连接未打开的前置失败。</param>
+    /// <returns>真实业务写入、连接拒绝与整笔回滚的验证任务。</returns>
+    [TestMethod]
+    [DataRow(true)]
+    [DataRow(false)]
+    public async Task InvalidConnectionPreconditionInvalidatesExistingBusinessTransaction(bool openForeignConnection)
+    {
+        // 全部写入限定于本次临时PG的新建随机数据库。
+        await using var fixture = await G2PgFixture.CreateAsync();
+        // 原连接与事务拥有真实业务探针，不是空事务测试。
+        await using var business = fixture.CreateProbe();
+        // 另一上下文只有相同连接串，没有共享原事务的物理连接。
+        await using var foreign = fixture.CreateProbe();
+        // 此事务已经写入业务，因此审计的任何前置失败都必须使其不可提交。
+        await using var transaction = await business.Database.BeginTransactionAsync();
+        business.Probes.Add(new G2Probe { Id = "invalid-connection-precondition" });
+        await business.SaveChangesAsync();
+        if (openForeignConnection)
+        {
+            await foreign.Database.OpenConnectionAsync();
+        }
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(() => fixture.Writer.WriteAsync(
+            G2PgFixture.Actor(), G2PgFixture.Command(), foreign.Database.GetDbConnection(), transaction.GetDbTransaction(), CancellationToken.None));
+        // 不主动回滚替writer掩盖缺陷；尝试提交必须失败，两表在独立连接中均为空。
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(() => transaction.CommitAsync());
+        Assert.AreEqual(0, await fixture.ProbeCountAsync());
         Assert.AreEqual(0, await fixture.AuditCountAsync());
     }
 

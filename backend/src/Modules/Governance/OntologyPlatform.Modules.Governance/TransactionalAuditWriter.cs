@@ -36,12 +36,13 @@ public sealed class TransactionalAuditWriter : ITransactionalAuditWriter, IAudit
     /// <returns>尚未提交的审计标识，外层提交之前不得公开。</returns>
     public async Task<string> WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken)
     {
-        if (connection.State != ConnectionState.Open || !ReferenceEquals(transaction.Connection, connection))
-        {
-            throw new InvalidOperationException("审计必须加入调用方同一已打开物理连接与事务。");
-        }
         try
         {
+            // 连接前置失败也必须使调用方事务失效，不能留下可单独提交的业务写入。
+            if (connection.State != ConnectionState.Open || !ReferenceEquals(transaction.Connection, connection))
+            {
+                throw new InvalidOperationException("审计必须加入调用方同一已打开物理连接与事务。");
+            }
             // 工厂保留治理模型配置；替换连接后不取得调用方连接所有权。
             await using var database = await factory.CreateDbContextAsync(cancellationToken);
             database.Database.SetDbConnection(connection, contextOwnsConnection: false);
