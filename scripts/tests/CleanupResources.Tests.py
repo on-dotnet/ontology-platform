@@ -1,4 +1,5 @@
 """Real isolated Git fixtures and bounded Docker CLI regression tests."""
+import base64
 import copy
 import datetime as dt
 import hashlib
@@ -35,8 +36,8 @@ class CleanupTests(unittest.TestCase):
         self.git('config', 'user.email', 'fixture@example.invalid')
         self.git('config', 'user.name', 'Fixture')
         self.git('remote', 'add', 'origin', 'https://github.com/on-dotnet/ontology-platform.git')
-        (self.root / '.gitignore').write_text('bin/\n.tools/\nartifacts/\n')
-        cache_targets=' '.join(str(self.base/'old-tree'/x) for x in ('bin','.tools/pythonlibs','linked/bin','artifacts/governance-integration.json'))
+        (self.root / '.gitignore').write_text('bin/\n.tools/\nartifacts/\nnode_modules/\n')
+        cache_targets=' '.join(str(self.base/'old-tree'/x) for x in ('bin','node_modules','.tools/pythonlibs','linked/bin','artifacts/governance-integration.json'))
         (self.root / 'proof.txt').write_text(cache_targets+' CLOSED synthetic TASK-OLD codex/old codex/bad ' + str(self.base / 'old-tree') + ' ' + str(self.base / 'old-tree' / 'bin') + ' ' + str(self.root / 'bin') + ' ' + str(self.root / 'linked' / 'bin') + ' ' + str(self.root / 'artifacts' / 'governance-integration.json') + ' ' + str(self.root / '.tools' / 'pythonlibs') + ' ' + 'a'*64 + ' test-volume sha256:' + 'b'*64 + ' hist123\n')
         self.git('add', '.')
         self.git('commit', '-m', 'fixture')
@@ -556,6 +557,40 @@ p.write_text(json.dumps(s))
                 self.assertNotIn('Traceback',result.stderr)
                 self.assertEqual(json.loads(self.state_path.read_text())['history'],[])
                 self.assertTrue(self.git('show-ref','--verify','refs/heads/codex/old').stdout)
+                (self.base/'apply.jsonl').unlink(missing_ok=True)
+
+
+    def test_exact_public_pnpm_asset_allows_closed_cache_cleanup(self):
+        tree=self.cache_tree()
+        cache=tree/'node_modules'
+        asset=cache/'.pnpm/language-subtag-registry@0.3.23/node_modules/language-subtag-registry/data/json/private-use.json'
+        asset.parent.mkdir(parents=True)
+        asset.write_bytes(base64.b64decode('ewoJInFhYS4ucXR6IjogNTc2Ngp9Cg=='))
+        self.plan['operations']=[self.op('cache',str(cache),treeRoot=str(tree),expectedTip=self.main,fingerprint=self.fingerprint(cache))]
+        result=self.run_engine(True)
+        self.assertEqual(result.returncode,0,result.stderr)
+        self.assertFalse(cache.exists())
+
+    def test_public_asset_exception_rejects_wrong_path_bytes_size_link_and_stale_fingerprint(self):
+        tree=self.cache_tree()
+        cache=tree/'node_modules'
+        expected=cache/'.pnpm/language-subtag-registry@0.3.23/node_modules/language-subtag-registry/data/json/private-use.json'
+        raw=base64.b64decode('ewoJInFhYS4ucXR6IjogNTc2Ngp9Cg==')
+        for mutation in ('location','content','size','symlink','stale'):
+            with self.subTest(mutation=mutation):
+                asset=cache/'other/private-use.json' if mutation=='location' else expected
+                asset.parent.mkdir(parents=True,exist_ok=True)
+                if mutation=='symlink':
+                    external=self.base/'public-sentinel.json'
+                    external.write_bytes(raw)
+                    asset.symlink_to(external)
+                else: asset.write_bytes((b'x'+raw[1:]) if mutation=='content' else (raw+b'x') if mutation=='size' else raw)
+                self.plan['operations']=[self.op('cache',str(cache),treeRoot=str(tree),expectedTip=self.main,fingerprint='0'*64 if mutation=='stale' else self.fingerprint(cache))]
+                result=self.assert_rejected()
+                if mutation=='stale': self.assertIn('Cache metadata changed',result.stderr)
+                self.assertTrue(asset.exists())
+                if mutation=='symlink': self.assertEqual(external.read_bytes(),raw)
+                shutil.rmtree(cache)
                 (self.base/'apply.jsonl').unlink(missing_ok=True)
 
 

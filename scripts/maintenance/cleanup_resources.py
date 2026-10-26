@@ -212,6 +212,26 @@ def remove_exact_cache(path, expected):
         os.close(parent)
 
 
+def approved_public_cache_asset(tree, cache, entry):
+    """Match one official CC0 npm asset; never exempt a generic private filename."""
+    target=cache / entry['path']
+    approved='node_modules/.pnpm/language-subtag-registry@0.3.23/node_modules/language-subtag-registry/data/json/private-use.json'
+    if target.relative_to(tree).as_posix()!=approved or entry['size']!=22 or not stat.S_ISREG(entry['mode']):
+        return False
+    parent=secure_parent(target)
+    descriptor=None
+    try:
+        descriptor=os.open(target.name,os.O_RDONLY|os.O_NOFOLLOW,dir_fd=parent)
+        require(metadata_entry(os.fstat(descriptor),entry['path'],None)==entry,'Approved public asset changed before read')
+        raw=os.read(descriptor,23)
+        require(metadata_entry(os.fstat(descriptor),entry['path'],None)==entry and metadata_entry(os.stat(target.name,dir_fd=parent,follow_symlinks=False),entry['path'],None)==entry,'Approved public asset changed during read')
+        require(len(raw)==22 and hashlib.sha256(raw).hexdigest()=='74989640a41c9c1c4a7bfab371b4e6f30a4e81f3a848381faa0ed622ae400cca','Approved public asset bytes changed')
+        return True
+    finally:
+        if descriptor is not None: os.close(descriptor)
+        os.close(parent)
+
+
 def metadata_fingerprint(path):
     """Public read-only planner API: SHA256 of lstat metadata, including link text."""
     return digest(metadata_entries(Path(path)))
@@ -397,8 +417,11 @@ class Cleaner:
         require(ordinary or archived, 'Cache path not an approved regenerable category')
         require(not any(PRIVATE.search(x) for x in parts), 'Private cache path refused')
         entries=metadata_entries(path)
-        require(all(not any(PRIVATE.search(part) for part in PurePosixPath(x['path']).parts) for x in entries), 'Private-looking file inside cache')
         require(isinstance(op.get('fingerprint'),str) and HEX64.fullmatch(op['fingerprint']) and digest(entries) == op['fingerprint'], 'Cache metadata changed')
+        # Validate the whole metadata snapshot before reading the one approved public asset.
+        for entry in entries:
+            if any(PRIVATE.search(part) for part in PurePosixPath(entry['path']).parts):
+                require(approved_public_cache_asset(tree,path,entry),'Private-looking file inside cache')
         if path.is_symlink():
             require(op.get('linktarget') == os.readlink(path), 'Cache linktarget changed')
         tracked=self.git('ls-files','-z','--',rel,cwd=tree).stdout
