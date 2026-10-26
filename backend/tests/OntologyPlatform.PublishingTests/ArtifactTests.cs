@@ -36,8 +36,14 @@ public sealed class ArtifactTests
         // 捕获每个实际写入结果，不人为串行化S3请求。
         async Task<ArtifactObject?> Write(string value)
         {
-            try { return await fixture.Artifacts.PutImmutableAsync(key, Encoding.UTF8.GetBytes(value), "text/turtle", default); }
-            catch (SemanticOperationException) { return null; }
+            try
+            {
+                return await fixture.Artifacts.PutImmutableAsync(key, Encoding.UTF8.GetBytes(value), "text/turtle", default);
+            }
+            catch (SemanticOperationException)
+            {
+                return null;
+            }
         }
         // 真正并发执行原子条件写。
         var results = await Task.WhenAll(Write("first"), Write("second"));
@@ -56,4 +62,30 @@ public sealed class ArtifactTests
         await Assert.ThrowsAsync<SemanticOperationException>(() => fixture.Artifacts.ReadVerifiedAsync(artifact with { Hash = new string('0', 64) }, default));
         await Assert.ThrowsAsync<SemanticOperationException>(() => fixture.Artifacts.ReadVerifiedAsync(artifact with { ObjectKey = "releases/" + Guid.NewGuid().ToString("N") + "/missing.ttl" }, default));
     }
+
+    /// <summary>依赖超时映射为明确503，整个实际请求受五秒预算控制。</summary>
+    [TestMethod]
+    public async Task SlowDependencyBecomesUnavailable()
+    {
+        // 真实请求在测试网络门暂停，只注入延迟而非成功响应。
+        using var fixture = new PublishingFixture();
+        fixture.Gate = (_, token) => Task.Delay(TimeSpan.FromSeconds(30), token);
+        // 真正HttpClient与模块总预算共同取消停滞请求。
+        var failure = await Assert.ThrowsAsync<SemanticOperationException>(() => fixture.Artifacts.PutImmutableAsync("releases/" + Guid.NewGuid().ToString("N") + "/slow.ttl", Encoding.UTF8.GetBytes("source"), "text/turtle", default));
+        Assert.AreEqual(503, failure.Status);
+        Assert.AreEqual("artifact_store_timeout", failure.Code);
+    }
+
+    /// <summary>调用者取消保持取消语义，不伪装依赖故障或成功。</summary>
+    [TestMethod]
+    public async Task CallerCancellationPropagates()
+    {
+        // 当前fixture仍绑定实际回环资源。
+        using var fixture = new PublishingFixture();
+        fixture.Gate = (_, token) => Task.Delay(TimeSpan.FromSeconds(30), token);
+        // 明确取消仅作用当前请求。
+        using var cancellation = new CancellationTokenSource(TimeSpan.FromMilliseconds(50));
+        await Assert.ThrowsAsync<OperationCanceledException>(() => fixture.Artifacts.PutImmutableAsync("releases/" + Guid.NewGuid().ToString("N") + "/cancel.ttl", Encoding.UTF8.GetBytes("source"), "text/turtle", cancellation.Token));
+    }
+
 }

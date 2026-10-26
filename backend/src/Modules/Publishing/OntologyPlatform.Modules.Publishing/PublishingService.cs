@@ -71,6 +71,11 @@ public sealed partial class PublishingService : IPublishingService
         PublishingRules.Command(request.Command);
         // 唯一合同检查发布/回滚互斥分支；应用调用不能绕过HTTP判别。
         ValidateWire(request);
+        // 可空字段在共享传输合同中保留，业务层仍必须强制互斥分支与完整绑定。
+        var validPublish = request.Kind == ProposalKind.Publish && !string.IsNullOrWhiteSpace(request.DraftId) && request.DraftRevision > 0 && request.Hashes is not null && !string.IsNullOrWhiteSpace(request.ValidationReportId) && request.TargetReleaseId is null && request.TargetManifestHash is null;
+        // 回滚不能夹带草稿或报告字段把两条授权分支混合。
+        var validRollback = request.Kind == ProposalKind.Rollback && request.DraftId is null && request.DraftRevision is null && request.Hashes is null && request.ValidationReportId is null && !string.IsNullOrWhiteSpace(request.TargetReleaseId) && IsHash(request.TargetManifestHash);
+        if (!validPublish && !validRollback) throw new SemanticOperationException(422, "proposal_payload_invalid");
         // 发布草稿由Ontology授权；回滚则只从独立正式目录取得权威scope。
         var draft = request.Kind == ProposalKind.Publish ? await ontology.ReadAsync(actor, request.DraftId!, cancellationToken) : null;
         // 回滚不读取当前草稿，也不要求当前修订与历史版本相等。
@@ -151,6 +156,7 @@ public sealed partial class PublishingService : IPublishingService
         var rows = await database.Releases.AsNoTracking().Where(row => row.Published && row.OrganizationId == actor.OrganizationId && (assetId == null || row.AssetId == assetId)).ToArrayAsync(cancellationToken);
         // 每个正式版本复用唯一只读Catalog的授权和真实回验。
         var result = new List<ReleaseSummary>();
+        // 每个已获完整范围授权的正式历史行都真实回验。
         foreach (var row in rows.Where(row => PublishingRules.Covers(actor, new ResourceScope { OrganizationId = row.OrganizationId, SiteIds = row.SiteIds })))
         {
             result.Add(await catalog.ReadAsync(actor, row.ReleaseId, cancellationToken));
@@ -165,6 +171,7 @@ public sealed partial class PublishingService : IPublishingService
         var key = PublishingRules.Key(scope, action, command.IdempotencyKey);
         // 原样完整请求及command参与绑定，修改reason也不是相同命令。
         var hash = PublishingRules.Hash(JsonSerializer.Serialize(payload));
+        // 此事务将本模块事实、幂等回执及治理审计绑定成一次提交。
         await using var transaction = await database.Database.BeginTransactionAsync(token);
         await LockKeyAsync(key, token);
         // 相同命令在锁后只返回实际提交的持久回执。
@@ -184,7 +191,10 @@ public sealed partial class PublishingService : IPublishingService
             await transaction.CommitAsync(token);
             return result.Result;
         }
-        finally { database.ChangeTracker.Clear(); }
+        finally
+        {
+            database.ChangeTracker.Clear();
+        }
     }
 
     /// <summary>由Ontology在当前同物理PG事务内只读锁定草稿，不跨模块写表。</summary>
@@ -206,10 +216,19 @@ public sealed partial class PublishingService : IPublishingService
     /// <summary>真实提案存储的完整资源范围。</summary>
     private static ResourceScope Scope(ProposalRecord row) => new() { OrganizationId = row.OrganizationId, SiteIds = row.SiteIds };
 
-    /// <summary>对非HTTP调用也执行唯一DTO的严格分支校验。</summary>
+    /// <summary>固定清单SHA256必须为64位小写十六进制。</summary>
+    private static bool IsHash(string? hash) => hash is { Length: 64 } && hash.All(value => char.IsAsciiDigit(value) || value is >= 'a' and <= 'f');
+
+    /// <summary>对非HTTP调用也执行唯一DTO的严格非空和枚举校验。</summary>
     private static void ValidateWire<T>(T request)
     {
-        try { JsonSerializer.Serialize(request); }
-        catch (JsonException) { throw new SemanticOperationException(422, "proposal_payload_invalid"); }
+        try
+        {
+            JsonSerializer.Serialize(request);
+        }
+        catch (JsonException)
+        {
+            throw new SemanticOperationException(422, "proposal_payload_invalid");
+        }
     }
 }

@@ -17,6 +17,7 @@ public sealed partial class PublishingService
         PublishingRules.DemandRole(actor, "platform.operator");
         PublishingRules.Command(request.Command);
         ValidateWire(request);
+        if (string.IsNullOrWhiteSpace(request.ProposalId) || request.ExpectedActivationRevision < 0) throw new SemanticOperationException(422, "activation_payload_invalid");
         // 即使重放也先重新授权当前可信主体的完整范围。
         var known = await FindProposalAsync(request.ProposalId, false, cancellationToken);
         PublishingRules.DemandScope(actor, Scope(known));
@@ -50,6 +51,7 @@ public sealed partial class PublishingService
                 var manifest = JsonSerializer.Deserialize<ReleaseManifest>(prepared.ManifestJson)!;
                 // 源顺序由共享校验器定义，保持所有阶段一致。
                 var contents = ReleaseVerifier.SourceContents(sources);
+                // 索引绑定固定源对象顺序，防止回验时交换内容。
                 for (var index = 0; index < contents.Length; index++)
                 {
                     await artifacts.PutImmutableAsync(manifest.ArtifactObjects[index].ObjectKey, Encoding.UTF8.GetBytes(contents[index]), "text/turtle", cancellationToken);
@@ -76,8 +78,13 @@ public sealed partial class PublishingService
             // 保留真实准备制品用于重试；失败标记不覆盖已经激活的并发成功事实。
             if (!prepared.Published)
             {
-                try { await StateAsync(prepared.ReleaseId, "FAILED_RETRYABLE", CancellationToken.None); }
-                catch (Exception failure) when (failure is DbUpdateException or System.Data.Common.DbException) { }
+                try
+                {
+                    await StateAsync(prepared.ReleaseId, "FAILED_RETRYABLE", CancellationToken.None);
+                }
+                catch (Exception failure) when (failure is DbUpdateException or System.Data.Common.DbException)
+                {
+                }
             }
             throw;
         }
@@ -86,6 +93,7 @@ public sealed partial class PublishingService
     /// <summary>短预留事务按draft→proposal固定内容；不在事务内等待S3/Jena。</summary>
     private async Task<ReleaseRecord> PrepareAsync(ActorContext actor, ActivateReleaseRequest request, ReleaseProposal known, string key, string payloadHash, CancellationToken token)
     {
+        // 当前短事务显式协调发布表与同物理连接的其他模块writer。
         await using var transaction = await database.Database.BeginTransactionAsync(token);
         await LockKeyAsync(key, token);
         // 预留必须同主体同完整请求，不能把不同命令粘到已有制品。
@@ -130,6 +138,7 @@ public sealed partial class PublishingService
     private async Task<ReleaseActivation> CommitActivationAsync(ActorContext actor, ActivateReleaseRequest request, ReleaseProposal known, ReleaseRecord prepared, string key, string payloadHash, string action, CancellationToken token)
     {
         database.ChangeTracker.Clear();
+        // 当前短事务显式协调发布表与同物理连接的其他模块writer。
         await using var transaction = await database.Database.BeginTransactionAsync(token);
         await LockKeyAsync(key, token);
         // 锁内先恢复并发同命令成功结果，避免重复审核消费及重复审计。
@@ -182,7 +191,10 @@ public sealed partial class PublishingService
             await transaction.CommitAsync(token);
             return result;
         }
-        finally { database.ChangeTracker.Clear(); }
+        finally
+        {
+            database.ChangeTracker.Clear();
+        }
     }
 
     /// <summary>从已锁草稿生成一次不可变清单，能力版本只来自已注册真实网关。</summary>

@@ -30,6 +30,7 @@ public sealed class OutboxTests
         Assert.AreEqual(1, await fixture.Database.Receipts.CountAsync(row => row.EventId == activation.OutboxEventId));
         // 已消费事件再次可见模拟至少一次重派，唯一eventId防止重复持久消费。
         await fixture.Database.Outbox.Where(row => row.EventId == activation.OutboxEventId).ExecuteUpdateAsync(update => update.SetProperty(row => row.DispatchedAtUtc, (DateTimeOffset?)null).SetProperty(row => row.NextAttemptAtUtc, DateTimeOffset.UtcNow.AddSeconds(-1)));
+        // 新worker实例体现进程重启后的持久去重，而不是内存记忆。
         using var restarted = new ReleaseOutboxDispatcher(fixture.Provider.GetRequiredService<IServiceScopeFactory>(), fixture.Clock);
         Assert.IsTrue(await restarted.DispatchOnceAsync(default));
         Assert.AreEqual(1, await fixture.Database.Receipts.CountAsync(row => row.EventId == activation.OutboxEventId));

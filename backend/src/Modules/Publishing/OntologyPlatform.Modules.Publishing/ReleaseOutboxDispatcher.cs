@@ -32,7 +32,10 @@ public sealed class ReleaseOutboxDispatcher : BackgroundService
             {
                 if (!await DispatchOnceAsync(stoppingToken)) await Task.Delay(TimeSpan.FromSeconds(1), clock, stoppingToken);
             }
-            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested) { break; }
+            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+            {
+                break;
+            }
             catch (Exception)
             {
                 // 固定计数不记录底层异常、正文或连接信息。
@@ -53,6 +56,7 @@ public sealed class ReleaseOutboxDispatcher : BackgroundService
         var now = clock.GetUtcNow();
         // 固定事件快照携带本次租约fence。
         OutboxRecord? item;
+        // 短事务仅保护租约或消费事实，不持锁等待外部HTTP。
         await using (var transaction = await database.Database.BeginTransactionAsync(token))
         {
             // SKIP LOCKED让多worker分工，锁只覆盖租约领取。
@@ -76,12 +80,16 @@ public sealed class ReleaseOutboxDispatcher : BackgroundService
             await scope.ServiceProvider.GetRequiredService<ReleaseVerifier>().VerifyAsync(release, token);
             verified = true;
         }
-        catch (OperationCanceledException) when (token.IsCancellationRequested) { throw; }
+        catch (OperationCanceledException) when (token.IsCancellationRequested)
+        {
+            throw;
+        }
         catch (Exception)
         {
             // 无法回验仅退避，不变更active、不生成成功回执。
             PublishingTelemetry.Record("outbox", "failure", "verify");
         }
+        // 短事务仅保护租约或消费事实，不持锁等待外部HTTP。
         await using (var transaction = await database.Database.BeginTransactionAsync(token))
         {
             // 提交时检查fence和租约，过期worker无权写回。
