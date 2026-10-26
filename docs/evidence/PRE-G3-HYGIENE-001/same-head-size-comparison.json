@@ -1,0 +1,57 @@
+{
+  "headSha": "3b51ef70888da6367c1f9b77a8b18124ff0fdce9",
+  "baseSha": "46c7a6de70b1b97c032b12a19bc27c1c54e70f4c",
+  "schema1Bytes": 35377295,
+  "schema2Bytes": 1964426,
+  "reductionPercent": 94.447,
+  "physicalMembers": 476,
+  "includedSourceMappings": 477,
+  "physicalPayloads": 466,
+  "historicalEvidenceOmittedCount": 1167,
+  "historicalEvidenceOmittedBytes": 26856723,
+  "allEvidenceIndexedCount": 1212,
+  "policy": "全部非证据现行源码+全部当前任务证据；历史原文保留受控Git，完整索引含commit/blob/hash/size/testScope/recovery/retention。不是完整离线审计归档。",
+  "receipts": {
+    "1": {
+      "packagePath": "/Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform/artifacts/reviews/OntologyPlatform-Review-PRE-G3-HYGIENE-001-3b51ef70888d.zip",
+      "sizeBytes": 35377295,
+      "sha256": "ec4edcb36cc48f9fe624ed849abdff5e397641044346ce49a275e68020bda3fe",
+      "taskStatus": "PARTIAL",
+      "verification": {
+        "status": "PASS",
+        "checks": [
+          "reopen",
+          "paths",
+          "forbidden-members",
+          "finite-secret-patterns",
+          "complete-member-set",
+          "member-sha256",
+          "source-blob-and-head",
+          "full-base-head-diff"
+        ],
+        "memberCount": 2930
+      }
+    },
+    "2": {
+      "packagePath": "/Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform/artifacts/reviews/OntologyPlatform-Review-PRE-G3-HYGIENE-001-3b51ef70888d.zip",
+      "sizeBytes": 1964426,
+      "sha256": "3fb1ec4de0c3c85ddcb82ece12e78fb7825b5bbf863eb8db03328448fae6549b",
+      "taskStatus": "PARTIAL",
+      "verification": {
+        "status": "PASS",
+        "checks": [
+          "reopen",
+          "paths",
+          "forbidden-members",
+          "finite-secret-patterns",
+          "complete-member-set",
+          "member-sha256",
+          "source-blob-and-head",
+          "full-base-head-diff"
+        ],
+        "memberCount": 476
+      }
+    }
+  },
+  "ciAtComparison": "NOT_VERIFIED honestly recorded; separate actual H2 CI package was created after CI success."
+}

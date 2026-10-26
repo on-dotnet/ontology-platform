@@ -1,0 +1,105 @@
+{
+  "startedAt": "2026-10-26T09:31:38.419486+00:00",
+  "headSha": "3b51ef70888da6367c1f9b77a8b18124ff0fdce9",
+  "ciRun": 40298045855,
+  "verifiedNewPackage": {
+    "packagePath": "/Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform/artifacts/reviews/OntologyPlatform-Review-PRE-G3-HYGIENE-001-3b51ef70888d.zip",
+    "sizeBytes": 1964550,
+    "sha256": "1c35bde8969d50681f4bf1b8a3b0a6b36b2f8df3dbe6c6cb99068a8e24ad607f",
+    "taskStatus": "PARTIAL",
+    "verification": {
+      "status": "PASS",
+      "checks": [
+        "reopen",
+        "paths",
+        "forbidden-members",
+        "finite-secret-patterns",
+        "complete-member-set",
+        "member-sha256",
+        "source-blob-and-head",
+        "full-base-head-diff"
+      ],
+      "memberCount": 476
+    }
+  },
+  "independentReview": "Read-only cleanup_review approved precise candidates; its return archived at H4.",
+  "operations": [
+    {
+      "target": "/Users/chasen/Developer/repos/ontology-platform/artifacts/reviews/OntologyPlatform-Review-G1-CLOSE-001-6154ebb37030.zip",
+      "beforeSha256": "140a924a1229a19ceb03c60cdf01c6c46e9427ce7d9760e549787318162afb0e",
+      "beforeBytes": 11194694,
+      "basis": "ZIP source/diff recoverable from committed Base/Head; non-reproducible review facts archived; new sameHeadCI V2 independently checked.",
+      "command": "Python pathlib.Path.unlink on this exact allowlisted regular file; no recursive traversal",
+      "exitCode": 0,
+      "afterExists": false
+    },
+    {
+      "target": "/Users/chasen/Developer/repos/ontology-platform/artifacts/reviews/OntologyPlatform-Review-G1-WAVE2-d181f66e569e.zip",
+      "beforeSha256": "00ce77ab05c32c97824194456ccaedf1eb4f52318258627a4969918c978ca9a4",
+      "beforeBytes": 6530531,
+      "basis": "ZIP source/diff recoverable from committed Base/Head; non-reproducible review facts archived; new sameHeadCI V2 independently checked.",
+      "command": "Python pathlib.Path.unlink on this exact allowlisted regular file; no recursive traversal",
+      "exitCode": 0,
+      "afterExists": false
+    },
+    {
+      "target": "/Users/chasen/Developer/repos/ontology-platform/artifacts/reviews/OntologyPlatform-Review-G2-THIN-SLICE-001-46c7a6de70b1.zip",
+      "beforeSha256": "d8347e225b120b81b9826970761db9e1d7a5ae5a8c968098c8b43bcb3009bb9a",
+      "beforeBytes": 47953189,
+      "basis": "ZIP source/diff recoverable from committed Base/Head; non-reproducible review facts archived; new sameHeadCI V2 independently checked.",
+      "command": "Python pathlib.Path.unlink on this exact allowlisted regular file; no recursive traversal",
+      "exitCode": 0,
+      "afterExists": false
+    },
+    {
+      "target": "/Users/chasen/Developer/repos/ontology-platform/artifacts/reviews/OntologyPlatform-Review-M0-MAC-PORTABILITY-001-e930935749bc.zip",
+      "beforeSha256": "86b8f69b59f002cf970f2e55e0286d9b2c9f42f143af8755ff3260d6b71fb6f4",
+      "beforeBytes": 708877,
+      "basis": "ZIP source/diff recoverable from committed Base/Head; non-reproducible review facts archived; new sameHeadCI V2 independently checked.",
+      "command": "Python pathlib.Path.unlink on this exact allowlisted regular file; no recursive traversal",
+      "exitCode": 0,
+      "afterExists": false
+    },
+    {
+      "target": "/Users/chasen/Developer/repos/ontology-platform/artifacts/reviews/M0-main-acceptance.json",
+      "beforeSha256": "834106a608ad81446cfdcdeafa560fe34e9de935b551c58c0091517da1e8d08a",
+      "beforeBytes": 9189,
+      "basis": "Exact unique local receipt bytes now committed in task evidence.",
+      "command": "Python pathlib.Path.unlink on this exact allowlisted regular file; no recursive traversal",
+      "exitCode": 0,
+      "afterExists": false
+    },
+    {
+      "target": "/Users/chasen/Developer/repos/ontology-platform/artifacts/reviews/M0-main-ci.json",
+      "beforeSha256": "0bd97abc8f400bebce4d82c5dbed82b1620b1b16bcc528fcd6b43b4cc911b78d",
+      "beforeBytes": 3609,
+      "basis": "Exact unique local receipt bytes now committed in task evidence.",
+      "command": "Python pathlib.Path.unlink on this exact allowlisted regular file; no recursive traversal",
+      "exitCode": 0,
+      "afterExists": false
+    },
+    {
+      "target": "/Users/chasen/Developer/repos/ontology-platform/artifacts/reviews/M0-package-receipt.json",
+      "beforeSha256": "3b6547706e48fbfb3526367363776efe831e3425a979a69da2a052d62323f976",
+      "beforeBytes": 576,
+      "basis": "Exact unique local receipt bytes now committed in task evidence.",
+      "command": "Python pathlib.Path.unlink on this exact allowlisted regular file; no recursive traversal",
+      "exitCode": 0,
+      "afterExists": false
+    }
+  ],
+  "reclaimedLogicalBytes": 66400665,
+  "physicalDiskReclaimed": "NOT_VERIFIED: APFS allocation/shared blocks not measured",
+  "gitDeleted": 0,
+  "worktreeDeleted": 0,
+  "dockerDeleted": 0,
+  "afterDirectory": [
+    {
+      "name": ".DS_Store",
+      "sizeBytes": 6148,
+      "classification": "KEEP",
+      "reason": "Pre-existing user filesystem metadata; not read/deleted."
+    }
+  ],
+  "finishedAt": "2026-10-26T09:31:38.425422+00:00"
+}

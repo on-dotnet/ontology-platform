@@ -1,0 +1,11 @@
+# H4 文档与资源闭合独立审查
+
+Reviewer：只读quality_reviewer package_review；H2已提交Head3b51ef70888da6367c1f9b77a8b18124ff0fdce9之上的H4未提交文档候选，三个工具SHA均与independent-tool-review相同。最终结论C0/I0/M0，允许提交本候选。
+
+独立核对：七项cleanup字节和66400665；三个M0收据归档字节数/原SHA吻合；前后17树路径相同，无ref删除；容器/卷清单相同，详细df的23个image IDs相同。实际网络查询远端main=H2，run40298045855同Head双job completed/success。相对阶段Base业务/infra/合同/CI/锁/公共构建/.codex零diff，diff-check通过。V1示例Minor已关闭，原G2BLOCKED/NOT_RUN与G3未授权边界保持。
+
+新增Important证据问题及修正：原validation早期摘要称网络IDs全未变，实际默认bridge9f14564aa5e1→abc425df5858；网络数仍3。Master也独立逐行比对发现，修正validation/resource-after-summary/ledger/report/handoff为来源NOT_VERIFIED/DEFERRED，不推断本任务删网。末句明确“本任务未重启runtime；外部Docker生命周期未验证”。Reviewer最后重新读取最新validation并关闭该Important，不宣称外部环境从未重启。
+
+SelfTest原输出54/54，原生.NET/Web/浏览器NOT_RUN明示；Linux实际工程与治理完整验证另有H2真实CI。报告诚实区分H2已验与最终H4后验事项。
+
+限制：此回执不预知其所在最终提交SHA，不替代最终同HeadCI/唯一ZIP重开；最终门禁仍由包后独立回执及manifest明确事实闭合。

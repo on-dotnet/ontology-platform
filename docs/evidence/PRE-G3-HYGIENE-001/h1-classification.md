@@ -25,3 +25,5 @@ Keycloak exited容器18a8b1844db8没有挂卷，其177MB可写层是否有独有
 四旧包共66,387,291字节。逐个sourceMembers原字节与明确Head Git archive/blob全部一致；完整binary patch由固定Base..Head命令重算逐字节一致。非再生检查/CI/日期/环境/审批事实与本地三个M0独有收据已先归档legacy-package-records；原包SHA/metadata SHA、size和恢复策略均记录。庞大manifest的重复source映射与ignored路径清单只保留计数/分类/规范JSON hash，其事实可从对应Head/schema1规则及保留工作树核验；不承诺原ZIP逐字节复造。审批/CI/测试信息不丢失。
 
 四ZIP仅SAFE_CANDIDATE，必须在本轮已提交轻量包成功构建且独立重开后才允许准确路径删除。新包失败时保留全部旧包。三个M0本地JSON已归档后可按确切hash删除；DS_Store不读不删。ZIP目录最终如保留文件，必须写DEFERRED及理由。
+
+规范JSON hash算法：UTF-8编码，无BOM/末尾换行，json.dumps(ensure_ascii=False, sort_keys=True, separators=(逗号,冒号))；递归排序对象键，数组顺序保持原样。sourceMembers与ignored路径列表均按此算法核验。

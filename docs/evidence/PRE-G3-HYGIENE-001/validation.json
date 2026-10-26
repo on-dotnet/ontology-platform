@@ -34,6 +34,41 @@
       "status": "NOT_RUN",
       "exitCode": null,
       "output": "No Windows or Intel execution environment. PowerShell syntax cross-platform fixture is not native platform acceptance."
+    },
+    {
+      "name": "h2-linux-both-jobs-and-main-integration",
+      "command": "gh run view 40298045855 --json headSha,conclusion,jobs; git ls-remote origin refs/heads/main",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Head3b51ef70888da6367c1f9b77a8b18124ff0fdce9 same in remote main, engineering and real governance-integration success; h2-ci.json and h2-linux-test-summary.txt. Final H4 CI is supplied separately as actual sameHead runtimeCi."
+    },
+    {
+      "name": "h3-exact-file-cleanup",
+      "command": "python3 project-specific temporary allowlist executor; exact target/hash checks and Path.unlink",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "7 regular files removed after independent sameHeadCI new package gate; 66400665 logical bytes; every command/target/hash/exit/after-state in cleanup-execution.json. Worktree/branches/Docker zero deleted."
+    },
+    {
+      "name": "real-stage-diff-reconstructs-head",
+      "command": "git read-tree Base; git apply --cached --check; git apply --cached; git write-tree (isolated temporary index/object directory)",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "H2 all-text stage patch independently reconstructs exact Head tree26316507ebfe245f542a359db8b06ccdb19c7cbd without touching repository index/objects; real-stage-text-patch-apply.json."
+    },
+    {
+      "name": "preserved-development-metadata-check",
+      "command": "pwsh -NoProfile -File scripts/doctor.ps1 -CheckDocker; scripts/maintenance/inspect-resources.ps1 -IncludeDocker",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Exact toolchain and Docker reachable; containers/volumes metadata unchanged, 23 images/3 default networks retained. Default bridge ID differs before/after, external cause NOT_VERIFIED/DEFERRED; this task issued no Docker mutations. This task did not read environment/volume contents or restart runtime; external Docker lifecycle is NOT_VERIFIED. doctor-after/resources-after/resource-after-summary."
+    },
+    {
+      "name": "final-mac-selftest",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1 -SelfTest",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Final H4 local suite exit0: repository syntax/format/links/finite patterns, environment/toolchain fixtures and ReviewPackage54/54. Full output selftest-final-green.txt; final documentation-only corrections followed by separate static verification."
     }
   ],
   "ci": {

@@ -1,0 +1,15 @@
+# H1/H3 独立资源与真实包审查
+
+Reviewer：fresh-context只读quality_reviewer cleanup_review，不写工程文件/refs、不执行清理。审查依据为批准附件、H1逐项清单和H2提交3b51ef70888da6367c1f9b77a8b18124ff0fdce9。C0/I0，canonical算法可读性建议已由Master补在h1-classification。
+
+独立四旧包核验：原SHA/size吻合zip-before；全部5612 source映射逐字节等于各自明确Head Git archive；非源码成员全部枚举，没有未知未归档成员。manifest除两重复列表外所有键/值均与manifest-facts相等，sourceMembers/excludedIgnoredPaths缩减count/hash已独立重算。六类不可再生metadata原字节保留；四binary patch和commit log由原Git命令精确重建；三个M0独有收据与本地原件/归档文件/已提交blob逐字节相等，没有新增重要唯一payload。
+
+实际同Head比较V2：1964426bytes，SHA256=3fb1ec4de0c3c85ddcb82ece12e78fb7825b5bbf863eb8db03328448fae6549b；476成员、477源码映射、1212证据索引。独立Python核全部路径/链接/大小写/checksum、source/index完整Git路径集合/OID/字节/SHA，PowerShell VerifyOnly也exit0。该比较包CI明确NOT_VERIFIED，不单独满足清理门禁。
+
+后续真实CI门禁：Reviewer独立网络执行git ls-remote origin refs/heads/main，远端main=3b51ef70888da6367c1f9b77a8b18124ff0fdce9，本地HEAD/main/origin-main同值。实际gh run view40298045855 exit0，run completed/success且同Head；engineering job121488937575、governance-integration job121488937711均completed/success，匹配原始回执。
+
+带准确CI新包：artifacts/reviews/OntologyPlatform-Review-PRE-G3-HYGIENE-001-3b51ef70888d.zip；1964550bytes；SHA256=1c35bde8969d50681f4bf1b8a3b0a6b36b2f8df3dbe6c6cb99068a8e24ad607f。独立重开476成员全部散列PASS，只有manifest/git-ci/summary/checksums与已核比较包变化，全部源码/index/diff原字节不变；VerifyOnly exit0，三处CI一致为同Head真实run成功。
+
+Reviewer再次逐个核七候选普通文件非symlink/原SHA/归档字节，明确回收前置门禁现已满足，仅适用四个已列名旧ZIP和三个已归档M0 JSON。树/枝/Docker/cache/DS_Store继续保护，不由此扩大删除范围。此后Master实际执行日志另见cleanup-execution.json。
+
+范围限制：本回执是H2实际包与H3前置审核，不冒充最终H4 Head/CI/ZIP；最终包仍需实际独立重开后外部回执闭合。

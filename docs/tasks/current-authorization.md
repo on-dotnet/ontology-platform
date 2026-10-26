@@ -1,6 +1,6 @@
 # PRE-G3-HYGIENE-001 当前授权增量（2026-10-26）
 
-当前：**EXECUTING / PARTIAL**。人类正式批准[附件V1全部任务](../evidence/PRE-G3-HYGIENE-001/authorization-v1.md)，由本轮Master从main `46c7a6de70b1b97c032b12a19bc27c1c54e70f4c`实施资源只读盘点、安全分类、Review ZIP V2、符合条件的回收、DoD、独立Review/验证、Git集成Push与唯一轻量ZIP。唯一分支`codex/PRE-G3-HYGIENE-001`，任务见[合同与计划](PRE-G3-HYGIENE-001.md)。保护活跃/旧G2 Master与未集成树、持久数据、凭证及跨项目资源；疑义DEFERRED。不调用付费模型、不安装依赖、不实施G3、不启动G3 Plan；交PRE_G3_HYGIENE_READY_FOR_REVIEW后停止。历史审批/未运行状态全部保留。
+当前：**READY_FOR_REVIEW / PARTIAL**。人类正式批准[附件V1全部任务](../evidence/PRE-G3-HYGIENE-001/authorization-v1.md)，由本轮Master从main `46c7a6de70b1b97c032b12a19bc27c1c54e70f4c`实施资源只读盘点、安全分类、Review ZIP V2、符合条件的回收、DoD、独立Review/验证、Git集成Push与唯一轻量ZIP。唯一分支`codex/PRE-G3-HYGIENE-001`，任务见[合同与计划](PRE-G3-HYGIENE-001.md)。保护活跃/旧G2 Master与未集成树、持久数据、凭证及跨项目资源；疑义DEFERRED。不调用付费模型、不安装依赖、不实施G3、不启动G3 Plan；交PRE_G3_HYGIENE_READY_FOR_REVIEW后停止。历史审批/未运行状态全部保留。
 
 ---
 

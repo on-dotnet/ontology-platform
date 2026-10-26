@@ -1,0 +1,80 @@
+{
+  "gitBranchesDeleted": 0,
+  "worktreesDeleted": 0,
+  "dockerResourcesDeleted": 0,
+  "protected": {
+    "currentWorktreeCount": 17,
+    "mainCheckoutBaselineUntrackedDSStore": 6,
+    "dockerContainers": 2,
+    "dockerVolumes": 48,
+    "dockerNetworks": 3,
+    "dockerImages": 23
+  },
+  "oldZipCountBefore": 4,
+  "oldZipCountAfter": 0,
+  "oldZipBytesRemoved": 66387291,
+  "uniqueReceiptFilesRemovedAfterExactGitArchival": 3,
+  "reclaimedLogicalFileBytes": 66400665,
+  "physicalDiskBytes": "NOT_VERIFIED",
+  "additionalOwnComparisonPackages": "Retained until final valid compact independently reopened, then exact-ID cleanup recorded in external delivery receipt.",
+  "deferred": [
+    {
+      "scope": "all historical local/remote branches and worktrees",
+      "reason": "active/old chats, .tools/private runtime, cherry-pick and cross-machine refs not proven",
+      "recheck": "Owner confirms no active references, ignored data classified, exact tip ancestor and acceptance/PR evidence complete."
+    },
+    {
+      "scope": "all Docker volumes/containers/images/default networks/global build cache",
+      "reason": "unique persistent audit/Run/identity/recovery data or shared ownership not disproven",
+      "recheck": "Exact resource ownership plus data recovery/no-unique-data proof and no active references, then scoped authorization."
+    },
+    {
+      "scope": "ignored tools/build caches and six DS_Store plus reviews/.DS_Store",
+      "reason": "private/shared tool links or baseline filesystem metadata; not clearly disposable project output",
+      "recheck": "Owner confirms data purpose and safe bounded regeneration; do not scan user-global caches."
+    },
+    {
+      "scope": "seven missing old G1 worktree records",
+      "reason": "changed between initial list and native create; cause NOT_VERIFIED, no deletion issued by this task",
+      "recheck": "Only via project managed-artifact UI/owner evidence if requested; not a global codex cleanup."
+    },
+    {
+      "scope": "Docker default bridge ID drift",
+      "reason": "Default bridge ID differs between before/after; this task issued no Docker mutation, cause NOT_VERIFIED.",
+      "recheck": "If operationally needed, owner reviews Docker lifecycle history; do not stop/recreate networks as part of this task."
+    }
+  ],
+  "beforeAfterCounts": {
+    "worktrees": {
+      "before": 17,
+      "after": 17,
+      "deletedByThisTask": 0
+    },
+    "localBranches": {
+      "before": 24,
+      "after": 24,
+      "deletedByThisTask": 0
+    },
+    "remoteBranches": {
+      "before": 25,
+      "after": 26,
+      "deletedByThisTask": 0,
+      "reason": "Only new authorized task branch push adds one remote ref."
+    },
+    "dockerCapacityBefore": "{\"Active\":\"2\",\"Reclaimable\":\"3.822GB (66%)\",\"Size\":\"5.747GB\",\"TotalCount\":\"23\",\"Type\":\"Images\"}\n{\"Active\":\"0\",\"Reclaimable\":\"177.1MB (100%)\",\"Size\":\"177.1MB\",\"TotalCount\":\"2\",\"Type\":\"Containers\"}\n{\"Active\":\"1\",\"Reclaimable\":\"3.691GB (97%)\",\"Size\":\"3.772GB\",\"TotalCount\":\"48\",\"Type\":\"Local Volumes\"}\n{\"Active\":\"0\",\"Reclaimable\":\"32.77kB\",\"Size\":\"500.1MB\",\"TotalCount\":\"13\",\"Type\":\"Build Cache\"}\n",
+    "dockerCapacityAfter": "{\"Active\":\"2\",\"Reclaimable\":\"3.822GB (66%)\",\"Size\":\"5.747GB\",\"TotalCount\":\"23\",\"Type\":\"Images\"}\n{\"Active\":\"0\",\"Reclaimable\":\"177.1MB (100%)\",\"Size\":\"177.1MB\",\"TotalCount\":\"2\",\"Type\":\"Containers\"}\n{\"Active\":\"1\",\"Reclaimable\":\"3.691GB (97%)\",\"Size\":\"3.772GB\",\"TotalCount\":\"48\",\"Type\":\"Local Volumes\"}\n{\"Active\":\"0\",\"Reclaimable\":\"32.77kB\",\"Size\":\"500.1MB\",\"TotalCount\":\"13\",\"Type\":\"Build Cache\"}\n",
+    "exactDockerListsUnchanged": {
+      "containers": true,
+      "volumes": true,
+      "networks": false
+    }
+  },
+  "externalDockerNetworkDrift": {
+    "beforeBridgeId": "9f14564aa5e1",
+    "afterBridgeId": "abc425df5858",
+    "networkCountBefore": 3,
+    "networkCountAfter": 3,
+    "cause": "NOT_VERIFIED",
+    "action": "DEFERRED; only read-only Docker commands issued by this task; do not attribute network recreation or capacity to task cleanup."
+  }
+}
