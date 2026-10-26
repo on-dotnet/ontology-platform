@@ -8,6 +8,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import urllib.error
 from unittest.mock import patch
 
 
@@ -123,7 +124,7 @@ class OrchestrationTests(unittest.TestCase):
 class ObservabilityStatusTests(unittest.TestCase):
     """Exercise actual checks/reporting with synthetic telemetry I/O; no LGTM product claim."""
 
-    def exercise(self, fault=None):
+    def exercise(self, fault=None, pending=None, observed=None):
         module = load('g2-observability')
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -143,12 +144,40 @@ class ObservabilityStatusTests(unittest.TestCase):
             real_write = Path.write_text
             real_replace = Path.replace
             failed = False
+            clock = [0.0]
+            observed = observed if observed is not None else {}
+            observed.update(calls=[], sleeps=[])
+            counts = {}
 
-            def fetch(origin, path, parameters=None):
+            def sleep(seconds):
+                observed['sleeps'].append(seconds)
+                clock[0] += seconds
+
+            def fetch(origin, path, parameters=None, timeout=10):
+                key = ('trace-' + path.rsplit('/', 1)[1]) if path.startswith('/api/traces/') else path
+                if path == '/api/v1/series' and parameters and 'match[]' in parameters:
+                    key += ':' + parameters['match[]']
+                counts[key] = counts.get(key, 0) + 1
+                observed['calls'].append({'key': key, 'timeout': timeout, 'at': clock[0]})
+                observed['elapsed'] = clock[0]
+                if fault == 'late-success' and path == '/api/search':
+                    clock[0] += 91
+                if fault in ['http401', 'http404', 'http503', 'network'] and path == '/api/search':
+                    if fault == 'network' and counts[key] <= 2:
+                        raise urllib.error.URLError('synthetic-private-network')
+                    if fault != 'network' and (fault != 'http503' or counts[key] <= 2):
+                        raise urllib.error.HTTPError('http://localhost', int(fault[4:]), 'synthetic-private-http', {}, None)
+                if counts[key] <= (pending or {}).get(key, 0):
+                    if path == '/api/search':
+                        return {'traces': [], 'extra': secrets['healthKey'] if fault == 'pending-privacy' else 'safe'}
+                    if path.startswith('/api/traces/'):
+                        return {'batches': []}
+                    return {'status': 'success', 'data': {'result': []} if path.endswith('query_range') else []}
+
                 if fault == 'fetch' and parameters and parameters.get('match[]') == 'agents_run_count_total':
                     raise OSError('synthetic-private-fetch-detail')
                 if path == '/api/search':
-                    return {'traces': [{'traceID': '6' * 32}]}
+                    return {'traces': [{'traceID': traces[2] if fault == 'association' else '6' * 32}]}
                 if path.startswith('/api/traces/'):
                     spans = [{'spanId': 'synthetic-span', 'name': 'execution.run', 'attributes': [{'key': 'execution.creation_trace_id', 'value': {'stringValue': traces[2]}}]}, {'spanId': 'synthetic-gateway-span', 'name': 'semantic.query'}]
                     return {'batches': [{'scopeSpans': [{'spans': spans}]}]}
@@ -157,7 +186,7 @@ class ObservabilityStatusTests(unittest.TestCase):
                 if path == '/loki/api/v1/series':
                     return {'data': [{'service_name': 'ontology-platform-api', 'service_version': 'G2-THIN-SLICE-001', 'deployment_environment_name': 'Development'}]}
                 if path == '/api/v1/series':
-                    return {'status': 'success', 'data': [{'__name__': parameters['match[]'], 'operation': 'publish', 'status': 'Found'}]}
+                    return {'status': 'error' if fault == 'metric-status' else 'success', 'data': [{'__name__': parameters['match[]'], 'operation': 'invalid-operation' if fault == 'metric-contract' else 'publish', 'status': 'Found'}]}
                 raise AssertionError('unexpected substituted fetch')
 
             def write(path, text, *args, **kwargs):
@@ -179,7 +208,7 @@ class ObservabilityStatusTests(unittest.TestCase):
 
             output = io.StringIO()
             caught = None
-            with patch.object(module, 'ROOT', root), patch.object(module, 'EVIDENCE', evidence), patch.object(module, 'fetch', side_effect=fetch), patch.object(sys, 'argv', ['g2-observability.py', '--runtime-file', str(runtime_file)]), patch.object(Path, 'write_text', new=write), patch.object(Path, 'replace', new=replace), contextlib.redirect_stdout(output):
+            with patch.object(module, 'ROOT', root), patch.object(module, 'EVIDENCE', evidence), patch.object(module, 'fetch', side_effect=fetch), patch.object(module.time, 'monotonic', side_effect=lambda: clock[0]), patch.object(module.time, 'sleep', side_effect=sleep), patch.object(sys, 'argv', ['g2-observability.py', '--runtime-file', str(runtime_file)]), patch.object(Path, 'write_text', new=write), patch.object(Path, 'replace', new=replace), contextlib.redirect_stdout(output):
                 try:
                     code = module.main()
                 except Exception as failure:
@@ -188,6 +217,94 @@ class ObservabilityStatusTests(unittest.TestCase):
             report = json.loads(report_path.read_text()) if report_path.exists() else None
             exported = {path.name: path.read_text() for path in evidence.iterdir()}
             return code, caught, report, exported, output.getvalue()
+
+    def test_pending_trace_search_logs_and_metrics_eventually_become_visible(self):
+        observed = {}
+        pending = {'trace-' + '1' * 32: 2, '/api/search': 2, '/loki/api/v1/query_range': 2, '/loki/api/v1/series': 2, '/api/v1/series:agents_run_count_total': 2}
+        code, caught, report, _, _ = self.exercise(pending=pending, observed=observed)
+        self.assertEqual(code, 0)
+        self.assertIsNone(caught)
+        self.assertEqual(report['status'], 'PASS')
+        self.assertEqual(report['visibility']['budgetSeconds'], 90)
+        self.assertEqual(report['visibility']['elapsedSeconds'], 10)
+        self.assertEqual(report['visibility']['pollCount'], len(observed['calls']))
+        self.assertEqual(sum(observed['sleeps']), 10)
+
+    def test_never_visible_search_expires_and_persists_fail(self):
+        observed = {}
+        code, caught, report, _, _ = self.exercise(pending={'/api/search': 1000}, observed=observed)
+        self.assertEqual(code, 1)
+        self.assertIsInstance(caught, TimeoutError)
+        self.assertEqual(report['status'], 'FAIL')
+        self.assertEqual(report['visibility']['elapsedSeconds'], 90)
+        self.assertEqual(sum(observed['sleeps']), 90)
+        self.assertLessEqual(len(observed['calls']), 96)
+
+    def test_one_deadline_covers_distinct_visibility_stages(self):
+        observed = {}
+        code, caught, report, _, _ = self.exercise(pending={'trace-' + '1' * 32: 60, '/api/search': 60}, observed=observed)
+        self.assertEqual(code, 1)
+        self.assertIsInstance(caught, TimeoutError)
+        self.assertEqual(report['visibility']['elapsedSeconds'], 90)
+        self.assertEqual(sum(observed['sleeps']), 90)
+        requests = [call for call in observed['calls'] if call['key'] == '/api/search']
+        self.assertEqual(len(requests), 30)
+        self.assertEqual(requests[-1]['timeout'], 1)
+
+    def test_never_visible_metric_expires_and_persists_fail(self):
+        observed = {}
+        code, caught, report, _, _ = self.exercise(pending={'/api/v1/series:agents_run_count_total': 1000}, observed=observed)
+        self.assertEqual(code, 1)
+        self.assertIsInstance(caught, TimeoutError)
+        self.assertEqual(report['status'], 'FAIL')
+        self.assertEqual(report['visibility']['elapsedSeconds'], 90)
+        self.assertEqual(sum(observed['sleeps']), 90)
+
+    def test_response_after_shared_deadline_cannot_pass(self):
+        observed = {}
+        code, caught, report, _, _ = self.exercise('late-success', observed=observed)
+        self.assertEqual(code, 1)
+        self.assertIsInstance(caught, TimeoutError)
+        self.assertEqual(report['status'], 'FAIL')
+        self.assertEqual(observed['sleeps'], [])
+
+    def test_temporary_network_and_503_are_retried(self):
+        for fault in ['http503', 'network']:
+            with self.subTest(fault=fault):
+                observed = {}
+                code, _, report, _, _ = self.exercise(fault, observed=observed)
+                self.assertEqual(code, 0)
+                self.assertEqual(report['visibility']['elapsedSeconds'], 2)
+                self.assertEqual(sum(observed['sleeps']), 2)
+
+    def test_non_temporary_http_errors_fail_without_polling(self):
+        for fault in ['http401', 'http404']:
+            with self.subTest(fault=fault):
+                observed = {}
+                code, caught, report, _, _ = self.exercise(fault, observed=observed)
+                self.assertEqual(code, 1)
+                self.assertIsInstance(caught, urllib.error.HTTPError)
+                self.assertEqual(report['status'], 'FAIL')
+                self.assertEqual(observed['sleeps'], [])
+
+    def test_pending_response_privacy_violation_fails_before_retry(self):
+        observed = {}
+        code, caught, report, exported, _ = self.exercise('pending-privacy', pending={'/api/search': 2}, observed=observed)
+        self.assertEqual(code, 1)
+        self.assertIsInstance(caught, AssertionError)
+        self.assertEqual(report['status'], 'FAIL')
+        self.assertEqual(observed['sleeps'], [])
+        self.assertEqual(set(exported), {'full-chain-identifiers.json', 'g2-observability.json'})
+        self.assertEqual(report['checks'][-1], {'check': 'actual_export_contains_no_prompt_source_or_private_runtime_values', 'status': 'FAIL'})
+
+    def test_wrong_association_and_metric_contract_fail_without_retry(self):
+        for fault in ['association', 'metric-status', 'metric-contract']:
+            with self.subTest(fault=fault):
+                observed = {}
+                code, _, report, _, _ = self.exercise(fault, observed=observed)
+                self.assertEqual(code, 1)
+                self.assertEqual(report['status'], 'FAIL')
+                self.assertEqual(observed['sleeps'], [])
 
     def test_complete_synthetic_io_path_is_the_only_pass(self):
         code, caught, report, exported, _ = self.exercise()
@@ -228,6 +345,14 @@ class ObservabilityStatusTests(unittest.TestCase):
         self.assertTrue(report is None or report['status'] == 'FAIL', report)
         self.assertNotIn('"status": "PASS"', output)
         self.assertNotIn('synthetic-private-', ''.join(exported.values()) + output)
+
+
+class FetchBudgetTests(unittest.TestCase):
+    def test_remaining_timeout_reaches_real_http_opener(self):
+        module = load('g2-observability')
+        with patch.object(module.OPENER, 'open', return_value=contextlib.nullcontext(io.StringIO('{}'))) as opened:
+            self.assertEqual(module.fetch('http://localhost:13200', '/api/search', timeout=0.25), {})
+        self.assertEqual(opened.call_args.kwargs['timeout'], 0.25)
 
 
 if __name__ == '__main__':
