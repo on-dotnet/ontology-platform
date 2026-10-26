@@ -1,80 +1,107 @@
 // 唯一应用遥测入口；上游必须使用固定安全日志模板，不发送查询正文或认证材料。
 logging {
-  level = "warn"
+	level = "warn"
 }
+
 otelcol.receiver.otlp "api" {
-  grpc { endpoint = "0.0.0.0:4317" }
-  http { endpoint = "0.0.0.0:4318" }
-  output {
-    logs = [otelcol.processor.transform.boundary.input]
-    traces = [otelcol.processor.transform.boundary.input]
-    metrics = [otelcol.processor.transform.boundary.input]
-  }
+	grpc {
+		endpoint = "0.0.0.0:4317"
+	}
+
+	http {
+		endpoint = "0.0.0.0:4318"
+	}
+
+	output {
+		logs    = [otelcol.processor.transform.boundary.input]
+		traces  = [otelcol.processor.transform.boundary.input]
+		metrics = [otelcol.processor.transform.boundary.input]
+	}
 }
+
 otelcol.processor.transform "boundary" {
-  error_mode = "propagate"
-  // 指标保留受控实例身份，避免两个累计流合并；用户、厂区及Trace仍禁止作维度。
-  metric_statements {
-    context = "datapoint"
-    statements = [
-      `keep_keys(resource.attributes, ["service.name", "service.version", "deployment.environment.name", "service.instance.id"])`,
-      `keep_keys(attributes, ["http.request.method", "http.route", "http.response.status_code", "method", "route", "status_class"])`,
-    ]
-  }
-  log_statements {
-    context = "log"
-    statements = [
-      `keep_keys(resource.attributes, ["service.name", "service.version", "deployment.environment.name"])`,
-      // body也可能包含框架格式化异常；固定正文，诊断值只走大小写精确白名单字段。
-      // 锁定.NET OTel 1.20.1把名称写到顶层event_name，数字ID默认不出口。
-      // 按唯一固定名称恢复既有1003合同，使Loki正文和精确元数据都能识别同一事件。
-      `set(attributes["EventName"], "PlatformRequestFault") where log.event_name == "PlatformRequestFault"`,
-      `set(attributes["EventId"], 1003) where log.event_name == "PlatformRequestFault"`,
-      `set(body, "PlatformTelemetry")`,
-      `set(body, "PlatformRequestFault") where attributes["EventName"] == "PlatformRequestFault" or attributes["EventId"] == 1003 or attributes["eventcode"] == 1003`,
-      `keep_keys(attributes, ["eventcode", "EventId", "EventName", "OriginalFormat", "path", "status", "status_class", "method", "route", "traceId", "auditId", "correlationId", "TraceId", "AuditId", "CorrelationId", "Route", "Status", "ExceptionCategory", "Outcome", "Code", "PkceS256", "HasChallenge", "HasState", "HasNonce"])`,
-    ]
-  }
-  trace_statements {
-    context = "span"
-    statements = [
-      `keep_keys(resource.attributes, ["service.name", "service.version", "deployment.environment.name"])`,
-      // OTLP的status.description对应OTTL status.message，原始异常描述不得出口。
-      `set(status.message, "")`,
-      `delete_matching_keys(attributes, "(?i)(^(exception|error)\\.|.*(cookie|authorization|token|password|secret|url\\.query|url\\.full|http\\.url|http\\.target|db\\.statement|db\\.query\\.text).*)")`,
-    ]
-  }
-  trace_statements {
-    context = "spanevent"
-    statements = [
-      // 异常事件的name和attributes均可能含任意原文；只留固定平台事实。
-      `set(name, "platform.event")`,
-      `keep_keys(attributes, ["platform.exception.category", "platform.request.outcome", "platform.response.status"])`,
-    ]
-  }
-  output {
-    logs = [otelcol.processor.batch.api.input]
-    traces = [otelcol.processor.batch.api.input]
-    metrics = [otelcol.processor.batch.api.input]
-  }
+	error_mode = "propagate"
+	// 指标保留受控实例身份，避免两个累计流合并；用户、厂区及Trace仍禁止作维度。
+	metric_statements {
+		context    = "datapoint"
+		statements = [
+			`keep_keys(resource.attributes, ["service.name", "service.version", "deployment.environment.name", "service.instance.id"])`,
+			`keep_keys(attributes, ["http.request.method", "http.route", "http.response.status_code", "method", "route", "status_class", "capability", "status", "operation", "outcome", "phase"])`,
+			// G2实际发射器的固定值；新键不能承载任意正文、身份或高基数ID。
+			`delete_key(attributes, "capability") where attributes["capability"] != "describe_ontology" and attributes["capability"] != "resolve_entity" and attributes["capability"] != "traverse_relationships"`,
+			`delete_key(attributes, "status") where attributes["status"] != "Found" and attributes["status"] != "Empty" and attributes["status"] != "Partial" and attributes["status"] != "Unavailable" and attributes["status"] != "Unauthorized" and attributes["status"] != "Ambiguous" and attributes["status"] != "allowed" and attributes["status"] != "failure"`,
+			`delete_key(attributes, "operation") where attributes["operation"] != "AnalyzeAsync" and attributes["operation"] != "ValidateAsync" and attributes["operation"] != "ApplyEditAsync" and attributes["operation"] != "DeployAsync" and attributes["operation"] != "VerifyAsync" and attributes["operation"] != "ReadPublishedAsync" and attributes["operation"] != "ReadVerifiedPublishedAsync" and attributes["operation"] != "publish" and attributes["operation"] != "rollback" and attributes["operation"] != "outbox"`,
+			`delete_key(attributes, "outcome") where attributes["outcome"] != "completed" and attributes["outcome"] != "failed"`,
+			`delete_key(attributes, "phase") where attributes["phase"] != "lease" and attributes["phase"] != "verify" and attributes["phase"] != "consume" and attributes["phase"] != "commit" and attributes["phase"] != "prepare_or_commit"`,
+		]
+	}
+
+	log_statements {
+		context    = "log"
+		statements = [
+			`keep_keys(resource.attributes, ["service.name", "service.version", "deployment.environment.name"])`,
+			// body也可能包含框架格式化异常；固定正文，诊断值只走大小写精确白名单字段。
+			// 锁定.NET OTel 1.20.1把名称写到顶层event_name，数字ID默认不出口。
+			// 按唯一固定名称恢复既有1003合同，使Loki正文和精确元数据都能识别同一事件。
+			`set(attributes["EventName"], "PlatformRequestFault") where log.event_name == "PlatformRequestFault"`,
+			`set(attributes["EventId"], 1003) where log.event_name == "PlatformRequestFault"`,
+			`set(body, "PlatformTelemetry")`,
+			`set(body, "PlatformRequestFault") where attributes["EventName"] == "PlatformRequestFault" or attributes["EventId"] == 1003 or attributes["eventcode"] == 1003`,
+			`keep_keys(attributes, ["eventcode", "EventId", "EventName", "OriginalFormat", "path", "status", "status_class", "method", "route", "traceId", "auditId", "correlationId", "TraceId", "AuditId", "CorrelationId", "Route", "Status", "ExceptionCategory", "Outcome", "Code", "PkceS256", "HasChallenge", "HasState", "HasNonce"])`,
+		]
+	}
+
+	trace_statements {
+		context    = "span"
+		statements = [
+			`keep_keys(resource.attributes, ["service.name", "service.version", "deployment.environment.name"])`,
+			// OTLP的status.description对应OTTL status.message，原始异常描述不得出口。
+			`set(status.message, "")`,
+			`delete_matching_keys(attributes, "(?i)(^(exception|error)\\.|.*(cookie|authorization|token|password|secret|url\\.query|url\\.full|http\\.url|http\\.target|db\\.statement|db\\.query\\.text).*)")`,
+		]
+	}
+
+	trace_statements {
+		context    = "spanevent"
+		statements = [
+			// 异常事件的name和attributes均可能含任意原文；只留固定平台事实。
+			`set(name, "platform.event")`,
+			`keep_keys(attributes, ["platform.exception.category", "platform.request.outcome", "platform.response.status"])`,
+		]
+	}
+
+	output {
+		logs    = [otelcol.processor.batch.api.input]
+		traces  = [otelcol.processor.batch.api.input]
+		metrics = [otelcol.processor.batch.api.input]
+	}
 }
+
 otelcol.processor.batch "api" {
-  timeout = "2s"
-  send_batch_size = 256
-  output {
-    logs = [otelcol.exporter.otlphttp.loki.input]
-    traces = [otelcol.exporter.otlphttp.tempo.input]
-    metrics = [otelcol.exporter.otlphttp.prometheus.input]
-  }
+	timeout         = "2s"
+	send_batch_size = 256
+
+	output {
+		logs    = [otelcol.exporter.otlphttp.loki.input]
+		traces  = [otelcol.exporter.otlphttp.tempo.input]
+		metrics = [otelcol.exporter.otlphttp.prometheus.input]
+	}
 }
+
 otelcol.exporter.otlphttp "loki" {
-  client { endpoint = sys.env("LOKI_OTLP_ENDPOINT") }
+	client {
+		endpoint = sys.env("LOKI_OTLP_ENDPOINT")
+	}
 }
+
 otelcol.exporter.otlphttp "tempo" {
-  client { endpoint = sys.env("TEMPO_OTLP_ENDPOINT") }
+	client {
+		endpoint = sys.env("TEMPO_OTLP_ENDPOINT")
+	}
 }
+
 otelcol.exporter.otlphttp "prometheus" {
-  client {
-    endpoint = sys.env("PROMETHEUS_OTLP_ENDPOINT")
-  }
+	client {
+		endpoint = sys.env("PROMETHEUS_OTLP_ENDPOINT")
+	}
 }
