@@ -29,21 +29,27 @@ class CleanupTests(unittest.TestCase):
         self.remote = self.base / 'origin.git'
         self.bin = self.base / 'bin'
         self.bin.mkdir()
+        self.real_git=shutil.which('git')
         self.git('init', '--bare', self.remote, cwd=self.base)
         self.git('init', '-b', 'main', self.root, cwd=self.base)
         self.git('config', 'user.email', 'fixture@example.invalid')
         self.git('config', 'user.name', 'Fixture')
         self.git('remote', 'add', 'origin', 'https://github.com/on-dotnet/ontology-platform.git')
-        self.git('config', f'url.{self.remote}.insteadOf', 'https://github.com/on-dotnet/ontology-platform.git')
         (self.root / '.gitignore').write_text('bin/\n.tools/\nartifacts/\n')
-        (self.root / 'proof.txt').write_text('CLOSED synthetic TASK-OLD codex/old codex/bad ' + str(self.base / 'old-tree') + ' ' + str(self.base / 'old-tree' / 'bin') + ' ' + str(self.root / 'bin') + ' ' + str(self.root / 'linked' / 'bin') + ' ' + str(self.root / 'artifacts' / 'governance-integration.json') + ' ' + str(self.root / '.tools' / 'pythonlibs') + ' ' + 'a'*64 + ' test-volume sha256:' + 'b'*64 + ' hist123\n')
+        cache_targets=' '.join(str(self.base/'old-tree'/x) for x in ('bin','.tools/pythonlibs','linked/bin','artifacts/governance-integration.json'))
+        (self.root / 'proof.txt').write_text(cache_targets+' CLOSED synthetic TASK-OLD codex/old codex/bad ' + str(self.base / 'old-tree') + ' ' + str(self.base / 'old-tree' / 'bin') + ' ' + str(self.root / 'bin') + ' ' + str(self.root / 'linked' / 'bin') + ' ' + str(self.root / 'artifacts' / 'governance-integration.json') + ' ' + str(self.root / '.tools' / 'pythonlibs') + ' ' + 'a'*64 + ' test-volume sha256:' + 'b'*64 + ' hist123\n')
         self.git('add', '.')
         self.git('commit', '-m', 'fixture')
         self.main = self.git('rev-parse', 'HEAD').stdout.strip()
         self.git('push', '-u', 'origin', 'main')
+        self.git('update-ref','refs/remotes/origin/main',self.main)
         self.git('branch', 'codex/old')
         self.git('push', 'origin', 'codex/old')
         self.make_cli('gh', "import json; print('[]')\n")
+        self.transport=self.base/'git-fixture-transport'
+        self.transport.write_text('#!'+sys.executable+'\nimport subprocess,sys\na=sys.argv[1:]\nif "push" in a or "ls-remote" in a: a=['+repr(str(self.remote))+' if x=="origin" else x for x in a]\nsys.exit(subprocess.run(['+repr(self.real_git)+']+a).returncode)\n')
+        self.transport.chmod(0o755)
+        self.make_cli('git','import os,sys\nos.execv('+repr(str(self.transport))+',['+repr(str(self.transport))+']+sys.argv[1:])\n')
         self.env = dict(os.environ, PATH=str(self.bin) + os.pathsep + os.environ['PATH'])
         now = dt.datetime.now(dt.timezone.utc)
         self.plan = dict(schemaVersion=1, taskId='PRE-G3-CLEANUP-FIX-002', project='on-dotnet/ontology-platform', repositoryRoot=str(self.root), gitCommonDir=str(self.root / '.git'), originUrl='https://github.com/on-dotnet/ontology-platform.git', expectedMainSha=self.main, createdAt=(now-dt.timedelta(minutes=1)).isoformat(), expiresAt=(now+dt.timedelta(hours=1)).isoformat(), allowedWorktreeRoots=[str(self.base)], protectedWorktrees=[str(self.root)], keep=[], operations=[])
@@ -52,7 +58,8 @@ class CleanupTests(unittest.TestCase):
         self.tmp.cleanup()
 
     def git(self, *args, cwd=None):
-        r = command(['git', *args], cwd=cwd or self.root)
+        transport_args=[str(self.remote) if x=='origin' else x for x in args] if args and args[0] in ('push','ls-remote') else args
+        r = command([self.real_git,*transport_args], cwd=cwd or self.root)
         self.assertEqual(r.returncode, 0, r.stderr)
         return r
 
@@ -147,6 +154,10 @@ class CleanupTests(unittest.TestCase):
         self.git('worktree', 'add', tree, 'codex/old')
         return tree
 
+    def cache_tree(self):
+        tree=self.base/'old-tree'
+        return tree if tree.exists() else self.add_tree()
+
     def tree_op(self, tree):
         return self.op('worktree', str(tree), expectedTip=self.main, expectedBranch='codex/old')
 
@@ -192,22 +203,22 @@ class CleanupTests(unittest.TestCase):
         external = self.base / 'sentinel'
         external.mkdir()
         (external / 'keep').write_text('external')
-        tools = self.root / '.tools'
+        tools = self.cache_tree() / '.tools'
         tools.mkdir()
         p = tools / 'pythonlibs'
         p.symlink_to(external, target_is_directory=True)
-        self.plan['operations'] = [self.op('cache', str(p), treeRoot=str(self.root), expectedTip=self.main, fingerprint=self.fingerprint(p), linktarget=str(external))]
+        self.plan['operations'] = [self.op('cache', str(p), treeRoot=str(self.cache_tree()), expectedTip=self.main, fingerprint=self.fingerprint(p), linktarget=str(external))]
         r = self.run_engine(True)
         self.assertEqual(r.returncode, 0, r.stderr)
         self.assertFalse(p.is_symlink())
         self.assertEqual((external / 'keep').read_text(), 'external')
 
     def test_cache_rejects_private_parent_link_and_outside(self):
-        p = self.root / 'bin'
+        p = self.cache_tree() / 'bin'
         p.mkdir()
         private = p / '.env'
         private.write_text('private')
-        self.plan['operations'] = [self.op('cache', str(p), treeRoot=str(self.root), expectedTip=self.main, fingerprint=self.fingerprint(p))]
+        self.plan['operations'] = [self.op('cache', str(p), treeRoot=str(self.cache_tree()), expectedTip=self.main, fingerprint=self.fingerprint(p))]
         self.assert_rejected()
         private.unlink()
         self.plan['operations'][0]['fingerprint'] = '0'*64
@@ -297,7 +308,7 @@ p.write_text(json.dumps(s))
         return mod
 
     def test_log_records_exact_nonzero_command_exit_and_stops(self):
-        real_git = shutil.which('git')
+        real_git = str(self.transport)
         self.make_cli('git', 'import subprocess,sys\na=sys.argv[1:]\nif "branch" in a and "-d" in a: sys.exit(13)\nsys.exit(subprocess.run([' + repr(real_git) + ']+a).returncode)\n')
         self.plan['operations'] = [self.op(expectedTip=self.main), self.op('git-remote-branch', expectedTip=self.main)]
         self.assert_rejected()
@@ -322,13 +333,13 @@ p.write_text(json.dumps(s))
         self.assertFalse(any(json.loads(x)['phase']=='after' for x in (self.base/'apply.jsonl').read_text().splitlines()))
 
     def test_cache_nested_symlink_preserves_external_bytes(self):
-        p=self.root/'bin'
+        p=self.cache_tree()/'bin'
         p.mkdir()
         external=self.base/'external'
         external.mkdir()
         (external/'sentinel').write_bytes(b'never remove')
         (p/'junction').symlink_to(external,target_is_directory=True)
-        self.plan['operations']=[self.op('cache',str(p),treeRoot=str(self.root),expectedTip=self.main,fingerprint=self.fingerprint(p))]
+        self.plan['operations']=[self.op('cache',str(p),treeRoot=str(self.cache_tree()),expectedTip=self.main,fingerprint=self.fingerprint(p))]
         r=self.run_engine(True)
         self.assertEqual(r.returncode,0,r.stderr)
         self.assertEqual((external/'sentinel').read_bytes(),b'never remove')
@@ -340,9 +351,9 @@ p.write_text(json.dumps(s))
         p=external/'bin'
         p.mkdir()
         (p/'sentinel').write_text('keep')
-        (self.root/'linked').symlink_to(external,target_is_directory=True)
-        target=self.root/'linked'/'bin'
-        self.plan['operations']=[self.op('cache',str(target),treeRoot=str(self.root),expectedTip=self.main,fingerprint=self.fingerprint(p))]
+        (self.cache_tree()/'linked').symlink_to(external,target_is_directory=True)
+        target=self.cache_tree()/'linked'/'bin'
+        self.plan['operations']=[self.op('cache',str(target),treeRoot=str(self.cache_tree()),expectedTip=self.main,fingerprint=self.fingerprint(p))]
         self.assert_rejected()
         self.assertTrue((p/'sentinel').exists())
 
@@ -391,10 +402,10 @@ p.write_text(json.dumps(s))
 
     def test_cache_fingerprint_change_after_preflight_stops(self):
         module=self.load_engine()
-        p=self.root/'bin'
+        p=self.cache_tree()/'bin'
         p.mkdir()
         (p/'fixture').write_text('one')
-        self.plan['operations']=[self.op('cache',str(p),treeRoot=str(self.root),expectedTip=self.main,fingerprint=self.fingerprint(p))]
+        self.plan['operations']=[self.op('cache',str(p),treeRoot=str(self.cache_tree()),expectedTip=self.main,fingerprint=self.fingerprint(p))]
         saved_path=os.environ['PATH']
         try:
             os.environ['PATH']=self.env['PATH']
@@ -419,7 +430,7 @@ p.write_text(json.dumps(s))
 
 
     def test_archived_small_file_requires_exact_committed_bytes(self):
-        p=self.root/'artifacts'/'governance-integration.json'
+        p=self.cache_tree()/'artifacts'/'governance-integration.json'
         p.parent.mkdir()
         raw=b'{"result":"passed"}\n'
         p.write_bytes(raw)
@@ -428,7 +439,7 @@ p.write_text(json.dumps(s))
         self.git('add','archive.json')
         self.git('commit','-m','archive fixture')
         tip=self.git('rev-parse','HEAD').stdout.strip()
-        self.plan['operations']=[self.op('cache',str(p),treeRoot=str(self.root),expectedTip=tip,fingerprint=self.fingerprint(p),expectedFileSha256=hashlib.sha256(raw).hexdigest(),archiveCommittedPath='archive.json')]
+        self.plan['operations']=[self.op('cache',str(p),treeRoot=str(self.cache_tree()),expectedTip=self.main,fingerprint=self.fingerprint(p),expectedFileSha256=hashlib.sha256(raw).hexdigest(),archiveCommittedPath='archive.json')]
         r=self.run_engine(True)
         self.assertEqual(r.returncode,0,r.stderr)
         self.assertFalse(p.exists())
@@ -453,6 +464,99 @@ p.write_text(json.dumps(s))
         finally:
             os.environ['PATH']=saved_path
         self.assertTrue(self.git('show-ref','--verify','refs/heads/codex/old').stdout)
+
+
+    def test_worktree_keep_descendant_or_ancestor_refuses_removal(self):
+        tree=self.add_tree()
+        self.plan['operations']=[self.tree_op(tree)]
+        for kept in (tree/'proof.txt', self.base):
+            with self.subTest(kept=str(kept)):
+                self.plan['keep']=[str(kept)]
+                result=self.run_engine(True)
+                self.assertNotEqual(result.returncode,0,result.stdout)
+                self.assertTrue((tree/'proof.txt').exists())
+                (self.base/'apply.jsonl').unlink(missing_ok=True)
+
+    def test_cache_current_protected_or_locked_tree_refuses_deletion(self):
+        tree=self.add_tree()
+        for state,root in (('current',self.root),('protected',tree),('locked',tree)):
+            with self.subTest(state=state):
+                p=root/'bin'
+                p.mkdir(exist_ok=True)
+                (p/'sentinel').write_text('retain')
+                self.plan['operations']=[self.op('cache',str(p),treeRoot=str(root),expectedTip=self.main,fingerprint=self.fingerprint(p))]
+                self.plan['protectedWorktrees']=[str(self.root)]+([str(tree)] if state=='protected' else [])
+                if state=='locked': self.git('worktree','lock',tree)
+                try:
+                    result=self.run_engine(True)
+                    self.assertNotEqual(result.returncode,0,result.stdout)
+                    self.assertTrue((p/'sentinel').exists())
+                finally:
+                    if state=='locked': self.git('worktree','unlock',tree)
+                    (self.base/'apply.jsonl').unlink(missing_ok=True)
+
+    def test_remote_delete_compare_and_delete_preserves_concurrent_tip(self):
+        self.git('switch','-c','codex/bad')
+        (self.root/'unique').write_text('unique concurrent work')
+        self.git('add','unique')
+        self.git('commit','-m','unique concurrent work')
+        newtip=self.git('rev-parse','HEAD').stdout.strip()
+        self.git('push','origin','codex/bad')
+        self.git('switch','main')
+        real_git=str(self.transport)
+        self.make_cli('git','import subprocess,sys\na=sys.argv[1:]\nif "push" in a and "--delete" in a: subprocess.run(['+repr(real_git)+',"--git-dir",'+repr(str(self.remote))+',"update-ref","refs/heads/codex/old",'+repr(newtip)+'],check=True)\nsys.exit(subprocess.run(['+repr(real_git)+']+a).returncode)\n')
+        self.plan['operations']=[self.op('git-remote-branch',expectedTip=self.main),self.op(expectedTip=self.main)]
+        result=self.run_engine(True)
+        self.assertNotEqual(result.returncode,0,result.stdout)
+        self.assertEqual(self.git('ls-remote','--heads','origin','refs/heads/codex/old').stdout.split()[0],newtip)
+        self.assertTrue(self.git('show-ref','--verify','refs/heads/codex/old').stdout)
+        records=[json.loads(x) for x in (self.base/'apply.jsonl').read_text().splitlines()]
+        self.assertEqual(records[-1]['phase'],'failed')
+        self.assertFalse(any(r['phase']=='after' for r in records))
+
+    def test_history_dockerfile_accepts_only_two_exact_project_forms(self):
+        for dockerfile,allowed in [('Dockerfile',True),('infra/development/fuseki/Dockerfile',True),('../Dockerfile',False),('other/Dockerfile',False)]:
+            with self.subTest(dockerfile=dockerfile):
+                self.docker_fixture()
+                state=json.loads(self.state_path.read_text())
+                h=state['history'][0]
+                h['Dockerfile']=dockerfile
+                self.state_path.write_text(json.dumps(state))
+                self.plan['operations']=[self.op('docker-history','hist123',builder='desktop-linux',expectedContext=h['Context'],expectedVcs=h['VCSRepository'],expectedRevision=h['VCSRevision'],expectedStatus=h['Status'],fingerprint=hashlib.sha256(json.dumps(h,sort_keys=True,separators=(',',':')).encode()).hexdigest())]
+                result=self.run_engine(True)
+                self.assertEqual(result.returncode==0,allowed,result.stderr)
+                if allowed: self.assertEqual(json.loads(self.state_path.read_text())['history'],[])
+                else: self.assertEqual(len(json.loads(self.state_path.read_text())['history']),1)
+                (self.base/'apply.jsonl').unlink(missing_ok=True)
+
+
+    def test_effective_origin_rewrite_is_refused(self):
+        self.git('config',f'url.{self.remote}.insteadOf',self.plan['originUrl'])
+        self.plan['operations']=[self.op('git-remote-branch',expectedTip=self.main)]
+        result=self.run_engine(True)
+        self.assertNotEqual(result.returncode,0,result.stdout)
+        self.assertEqual(self.git('ls-remote','--heads','origin','refs/heads/codex/old').stdout.split()[0],self.main)
+        self.assertFalse((self.base/'apply.jsonl').exists())
+
+    def test_malformed_history_after_is_logged_and_later_branch_kept(self):
+        for bad in ('null','not-json', '{"ref":null}'):
+            with self.subTest(bad=bad):
+                self.docker_fixture()
+                h=json.loads(self.state_path.read_text())['history'][0]
+                script=(self.bin/'docker').read_text()
+                script=script.replace("print('\\n'.join(json.dumps({'ref':x['Ref']}) for x in s['history']))", 'print('+repr(bad)+')')
+                # The replacement operates on the actual generated CLI script, not engine code.
+                self.assertIn('print('+repr(bad)+')',script)
+                (self.bin/'docker').write_text(script)
+                self.plan['operations']=[self.op('docker-history','hist123',builder='desktop-linux',expectedContext=h['Context'],expectedVcs=h['VCSRepository'],expectedRevision=h['VCSRevision'],expectedStatus=h['Status'],fingerprint=hashlib.sha256(json.dumps(h,sort_keys=True,separators=(',',':')).encode()).hexdigest()),self.op(expectedTip=self.main)]
+                result=self.run_engine(True)
+                self.assertNotEqual(result.returncode,0,result.stdout)
+                records=[json.loads(x) for x in (self.base/'apply.jsonl').read_text().splitlines()]
+                self.assertEqual(records[-1]['phase'],'failed')
+                self.assertNotIn('Traceback',result.stderr)
+                self.assertEqual(json.loads(self.state_path.read_text())['history'],[])
+                self.assertTrue(self.git('show-ref','--verify','refs/heads/codex/old').stdout)
+                (self.base/'apply.jsonl').unlink(missing_ok=True)
 
 
 if __name__ == '__main__':

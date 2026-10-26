@@ -25,8 +25,9 @@ Types and additional fields:
 
 Keep identifiers apply across operations; paths also protect descendants and
 ancestors. SHA/image/container/ref formats are exact. Only explicit operation
-commands exist. No shell, force, prune, environment inspection, or network
-resource deletion is supported. DryRun performs read-only CLI preflight with
+commands exist. No shell, force update, prune, environment inspection, or network
+resource deletion is supported. Remote branch deletion uses an exact old-tip
+lease with --delete: this is compare-and-delete, never a commit/history update. DryRun performs read-only CLI preflight with
 GIT_OPTIONAL_LOCKS=0; Apply creates a new JSONL log only after all preflights pass,
 revalidates each step and stops at the first failure. Filesystem metadata is
 fingerprinted without reading private file bytes or following links. Cache
@@ -261,6 +262,8 @@ class Cleaner:
             raise Refused('Invalid plan times') from ex
 
     def main_unchanged(self):
+        require(self.git('remote','get-url','--all','origin').stdout.splitlines() == [self.plan['originUrl']],'Effective origin fetch URL changed')
+        require(self.git('remote','get-url','--push','--all','origin').stdout.splitlines() == [self.plan['originUrl']],'Effective origin push URL changed')
         require(self.git('config','--get-all','remote.origin.url').stdout.strip() == self.plan['originUrl'],'Origin URL changed')
         require(self.git('config','--get-all','remote.origin.pushurl',acceptable=(0,1)).stdout.strip() in ('',self.plan['originUrl']),'Origin push URL changed')
         require(self.git('rev-parse', 'refs/remotes/origin/main').stdout.strip() == self.plan['expectedMainSha'], 'origin/main changed')
@@ -371,22 +374,28 @@ class Cleaner:
         raw=self.git('ls-files','--others','--ignored','--exclude-standard','-z',cwd=tree).stdout
         return [tree / x for x in raw.split('\0') if x]
 
+    def protect_path(self, path):
+        """An exact keep path protects both its contents and containing removal."""
+        for keep in self.keep:
+            if Path(keep).is_absolute():
+                kept=absolute(keep)
+                require(not under(kept,path) and not under(path,kept),'Removal overlaps keep path')
+
     def cache_state(self, op):
         tree=self.worktree_path(op.get('treeRoot'))
         path=absolute(op['target'])
         require(path != tree and under(path,tree), 'Cache outside tree')
         no_parent_links(path,tree)
-        self.tree_state(tree,op)
+        require(not any(under(tree,Path(p)) or under(Path(p),tree) for p in self.protected),'Protected cache worktree')
+        record=self.tree_state(tree,op)
+        require(not any(flag in record for flag in ('locked','prunable','bare')) and record.get('branch')!='refs/heads/main','Locked, main, or invalid cache worktree')
+        self.protect_path(path)
         rel=path.relative_to(tree).as_posix()
         parts=PurePosixPath(rel).parts
         ordinary = any(x in ('bin','obj','node_modules','.next','.turbo','__pycache__') for x in parts) or rel in ('.tools/nuget','.tools/pnpm','.tools/pnpm-store','.tools/pythonlibs','apps/web/tsconfig.tsbuildinfo')
         archived = rel in ('apps/web/artifacts/test-results/g2/.last-run.json','apps/web/artifacts/test-results/ui/.last-run.json','artifacts/governance-integration.json')
         require(ordinary or archived, 'Cache path not an approved regenerable category')
         require(not any(PRIVATE.search(x) for x in parts), 'Private cache path refused')
-        for keep in self.keep:
-            if Path(keep).is_absolute():
-                k=absolute(keep)
-                require(not under(k,path) and not under(path,k), 'Cache overlaps keep path')
         entries=metadata_entries(path)
         require(all(not any(PRIVATE.search(part) for part in PurePosixPath(x['path']).parts) for x in entries), 'Private-looking file inside cache')
         require(isinstance(op.get('fingerprint'),str) and HEX64.fullmatch(op['fingerprint']) and digest(entries) == op['fingerprint'], 'Cache metadata changed')
@@ -450,7 +459,8 @@ class Cleaner:
             return dict(tip=tip)
         if typ=='worktree':
             tree=self.worktree_path(target)
-            require(str(tree) not in self.protected,'Protected worktree')
+            require(not any(under(tree,Path(p)) or under(Path(p),tree) for p in self.protected),'Protected worktree')
+            self.protect_path(tree)
             record=self.tree_state(tree,op)
             require('locked' not in record and 'prunable' not in record and 'bare' not in record,'Locked or invalid worktree')
             branch=op.get('expectedBranch')
@@ -493,7 +503,7 @@ class Cleaner:
         require(h['Ref']==target and h['Context']==op.get('expectedContext') and h['VCSRepository']==op.get('expectedVcs') and h['VCSRevision']==op.get('expectedRevision') and h['Status']==op.get('expectedStatus'),'Build history identity changed')
         require(h['Status'] in ('completed','failed') and SHA.fullmatch(h['VCSRevision']),'Running or invalid history revision')
         require(re.fullmatch(r'https://github\.com/on-dotnet/ontology-platform(?:\.git)?',h['VCSRepository']),'Other project history refused')
-        require(h['Name']=='infra/development/fuseki' and h['Dockerfile']=='Dockerfile' and Path(h['Context']).is_absolute() and h['Context'].endswith('/ontology-platform/infra/development/fuseki'),'History context outside project')
+        require(h['Name']=='infra/development/fuseki' and h['Dockerfile'] in ('Dockerfile','infra/development/fuseki/Dockerfile') and Path(h['Context']).is_absolute() and h['Context'].endswith('/ontology-platform/infra/development/fuseki'),'History context outside project')
         require(op.get('fingerprint')==digest(h),'History metadata changed')
         return h
 
@@ -512,7 +522,7 @@ class Cleaner:
         descriptor=os.open(path,os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600)
         with os.fdopen(descriptor,'w',encoding='utf-8') as self.log:
             for op in self.ops:
-                before, args = None, None
+                before, args, command_exit = None, None, None
                 try:
                     self.validate_time()
                     require(self.git('rev-parse','HEAD').stdout.strip() == self.root_head,'Current root HEAD changed')
@@ -521,7 +531,9 @@ class Cleaner:
                     before=self.check(op)
                     typ,target=op['type'],op['target']
                     if typ=='git-local-branch': args=['git','--no-optional-locks','-C',str(self.root),'branch','-d','--',target]
-                    elif typ=='git-remote-branch': args=['git','--no-optional-locks','-C',str(self.root),'push','origin','--delete',target]
+                    elif typ=='git-remote-branch':
+                        # A deletion-only old-tip lease is CAS; no commit is pushed and no --force update is allowed.
+                        args=['git','--no-optional-locks','-C',str(self.root),'push','origin','--delete',target,'--force-with-lease=refs/heads/'+target+':'+op['expectedTip']]
                     elif typ=='worktree': args=['git','--no-optional-locks','-C',str(self.root),'worktree','remove',target]
                     elif typ=='cache': args=['filesystem-unlink-exact-cache',target]
                     elif typ=='docker-history': args=['docker','buildx','history','rm','--builder','desktop-linux',target]
@@ -532,10 +544,11 @@ class Cleaner:
                         require(digest(entries)==op['fingerprint'],'Cache changed immediately before deletion')
                         remove_exact_cache(absolute(target),entries)
                     else: run(args,cwd=self.root)
+                    command_exit=0
                     self.write_log('after',op,command=args,exit=0,after=self.after(op),logicalBytes=before.get('logicalBytes',0))
                     self.done.add((typ,target))
-                except (Refused,OSError,ValueError) as ex:
-                    self.write_log('failed',op,before=before,command=getattr(ex,'command',args),exit=getattr(ex,'exit_code',1),after={'status':'not_verified'},error=type(ex).__name__)
+                except (Refused,OSError,ValueError,TypeError,KeyError,AttributeError) as ex:
+                    self.write_log('failed',op,before=before,command=getattr(ex,'command',args),exit=getattr(ex,'exit_code',command_exit if command_exit is not None else 1),after={'status':'not_verified'},error=type(ex).__name__)
                     raise
 
     def after(self, op):
@@ -552,9 +565,18 @@ class Cleaner:
             else: args=['docker','buildx','history','ls','--builder','desktop-linux','--format','json']
             output=run(args).stdout
             if typ=='docker-history':
-                refs=[read_json(line).get('ref','').split('/')[-1] for line in output.splitlines() if line.strip()]
+                refs=[]
+                for line in output.splitlines():
+                    if not line.strip(): continue
+                    value=read_json(line)
+                    require(isinstance(value,dict) and isinstance(value.get('ref'),str) and re.fullmatch(r'(?:desktop-linux/desktop-linux/)?[a-z0-9]{6,64}',value['ref']),'Invalid history after schema')
+                    refs.append(value['ref'].split('/')[-1])
                 require(target not in refs,'Build history remains')
-            else: require(target not in output.splitlines(),'Docker resource remains')
+            else:
+                values=[value for value in output.splitlines() if value]
+                pattern=IMAGE if typ=='docker-image' else re.compile(r'[A-Za-z0-9][A-Za-z0-9_.-]{0,150}\Z')
+                require(all(pattern.fullmatch(value) for value in values),'Invalid Docker after schema')
+                require(target not in values,'Docker resource remains')
         return dict(absent=True)
 
 
@@ -576,7 +598,7 @@ def main(argv=None):
             cleaner.execute(args.log_path)
         print(canonical_json(dict(mode='Apply' if args.apply else 'DryRun',validated=len(cleaner.ops),completed=len(cleaner.done))))
         return 0
-    except (Refused,OSError,ValueError,KeyError,TypeError) as ex:
+    except (Refused,OSError,ValueError,KeyError,TypeError,AttributeError) as ex:
         # No raw CLI stderr, file contents, environment, or secret-bearing exception text.
         message=str(ex) if isinstance(ex,Refused) else type(ex).__name__
         print('REFUSED: '+message,file=sys.stderr)
