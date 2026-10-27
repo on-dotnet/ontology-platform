@@ -170,7 +170,9 @@ export async function runM1Checks({ root, origin, operator, viewer, single, chec
           await page.getByRole("button", { name: "切换深浅主题", exact: true }).click();
         }
         observed("m1_ui_" + width + "_" + theme, await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
-        await page.screenshot({ path: resolve(evidence, "screenshots/m1-" + width + "-" + theme + ".png"), fullPage: true });
+        await page.screenshot({ path: resolve(evidence, "screenshots/m1-" + width + "-" + theme + ".png"), fullPage: true, animations: "disabled" });
+        if (width === 390) observed("m1_ui_sidebar_settled_" + theme,
+          await page.locator(".sidebar").evaluate(sidebar => sidebar.getBoundingClientRect().right <= 0.5));
       }
     }
     observed("m1_ui_no_hydration", uiErrors.length === 0);
