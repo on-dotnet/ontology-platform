@@ -1,0 +1,715 @@
+{
+  "schemaVersion": 1,
+  "taskId": "G3-M1-CLOSEOUT-002",
+  "project": "on-dotnet/ontology-platform",
+  "repositoryRoot": "/Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform",
+  "gitCommonDir": "/Users/chasen/Developer/repos/ontology-platform/.git",
+  "originUrl": "https://github.com/on-dotnet/ontology-platform.git",
+  "expectedMainSha": "47935fb2eda3d708e628a1b23ccd897e2250ff33",
+  "createdAt": "2026-10-27T09:45:12.846180+00:00",
+  "expiresAt": "2026-10-27T21:45:12.846180+00:00",
+  "allowedWorktreeRoots": [
+    "/Users/chasen/.codex/worktrees"
+  ],
+  "protectedWorktrees": [
+    "/Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform",
+    "/Users/chasen/Developer/repos/ontology-platform",
+    "/Users/chasen/.codex/worktrees/g2-master/ontology-platform",
+    "/Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform"
+  ],
+  "keep": [
+    "g2-ef979bd04cc0-alloy-data",
+    "g2-ef979bd04cc0-fuseki-data",
+    "g2-ef979bd04cc0-grafana-data",
+    "g2-ef979bd04cc0-loki-data",
+    "g2-ef979bd04cc0-postgres-data",
+    "g2-ef979bd04cc0-prometheus-data",
+    "g2-ef979bd04cc0-rustfs-data",
+    "g2-ef979bd04cc0-tempo-data",
+    "sha256:05040926259ace989082fac0fb2f52d33f4a8122a9a85cb617eb76965b484a39",
+    "ontology-platform-fuseki:context-6bc72da7b5570e60b43cb978965e096fa512befca1e80dbf76ef0710fa681018",
+    "sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28",
+    "grafana/loki@sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28",
+    "sha256:401e1fbc58c27b08c3103e00c86b22bd175a1cdd8f8a7d61965133f27a24437f",
+    "ontology-platform-g2-fuseki:6.2.0",
+    "sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044",
+    "grafana/tempo@sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044",
+    "sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18",
+    "grafana/alloy@sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18",
+    "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+    "rustfs/rustfs@sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+    "sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b",
+    "quay.io/keycloak/keycloak@sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b",
+    "sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f",
+    "grafana/grafana@sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f",
+    "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6",
+    "postgres@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6",
+    "sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2",
+    "prom/prometheus@sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2"
+  ],
+  "operations": [
+    {
+      "type": "docker-volume",
+      "target": "g2-712190660deb-alloy-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-26T02:05:13Z",
+      "fingerprint": "cf21f868b221424320954231976a07b80488047abc4c3b405c033022191aac1c",
+      "expectedReferences": [],
+      "ownershipEvidence": {
+        "commit": "6b517cc059ded513cd66f8c0df62170f473845bd",
+        "path": "docs/evidence/G3-M1-CLOSEOUT-002/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-CLOSEOUT-002",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g2-712190660deb-fuseki-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-26T02:05:13Z",
+      "fingerprint": "965add56730ce96f07037080dde96368237e0be02468d051394f066a5ea1018f",
+      "expectedReferences": [],
+      "ownershipEvidence": {
+        "commit": "6b517cc059ded513cd66f8c0df62170f473845bd",
+        "path": "docs/evidence/G3-M1-CLOSEOUT-002/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-CLOSEOUT-002",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g2-712190660deb-grafana-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-26T02:05:13Z",
+      "fingerprint": "5428774002b4f001c6b577ac143807371f28a7631bb326c3b451f9d9dfa08f8e",
+      "expectedReferences": [],
+      "ownershipEvidence": {
+        "commit": "6b517cc059ded513cd66f8c0df62170f473845bd",
+        "path": "docs/evidence/G3-M1-CLOSEOUT-002/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-CLOSEOUT-002",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g2-712190660deb-loki-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-26T02:05:13Z",
+      "fingerprint": "20974d773f28d4afa9a3b3d37ba559f5d14a682b491695d8c0f74ff64e36dbd5",
+      "expectedReferences": [],
+      "ownershipEvidence": {
+        "commit": "6b517cc059ded513cd66f8c0df62170f473845bd",
+        "path": "docs/evidence/G3-M1-CLOSEOUT-002/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-CLOSEOUT-002",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g2-712190660deb-postgres-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-26T02:01:32Z",
+      "fingerprint": "50a094ca78d53bed3ca71df1d4f0e8df3ecf4a987ce0e360db3bd96880d4037a",
+      "expectedReferences": [],
+      "ownershipEvidence": {
+        "commit": "6b517cc059ded513cd66f8c0df62170f473845bd",
+        "path": "docs/evidence/G3-M1-CLOSEOUT-002/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-CLOSEOUT-002",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g2-712190660deb-prometheus-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-26T02:05:13Z",
+      "fingerprint": "6e23214904b3e0c06ea63b17c5cba316b259378afc7c50f9f387815ab09f3418",
+      "expectedReferences": [],
+      "ownershipEvidence": {
+        "commit": "6b517cc059ded513cd66f8c0df62170f473845bd",
+        "path": "docs/evidence/G3-M1-CLOSEOUT-002/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-CLOSEOUT-002",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g2-712190660deb-rustfs-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-26T02:05:13Z",
+      "fingerprint": "b825a5527c6ca83da7c655926d67104806af135195f4b5f4e591ccc3aee0e5c0",
+      "expectedReferences": [],
+      "ownershipEvidence": {
+        "commit": "6b517cc059ded513cd66f8c0df62170f473845bd",
+        "path": "docs/evidence/G3-M1-CLOSEOUT-002/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-CLOSEOUT-002",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g2-712190660deb-tempo-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-26T02:05:13Z",
+      "fingerprint": "f000b1ed651f5576862a6805ef535d81be865cc5a69b6c85ed8d011c3e94174c",
+      "expectedReferences": [],
+      "ownershipEvidence": {
+        "commit": "6b517cc059ded513cd66f8c0df62170f473845bd",
+        "path": "docs/evidence/G3-M1-CLOSEOUT-002/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-CLOSEOUT-002",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g2-b59e68191ca0-alloy-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-26T05:33:21Z",
+      "fingerprint": "a6cb5467c69eff5dc81b983ad85f5c4fb84c2993b0baa54e464b974f87a732c5",
+      "expectedReferences": [],
+      "ownershipEvidence": {
+        "commit": "6b517cc059ded513cd66f8c0df62170f473845bd",
+        "path": "docs/evidence/G3-M1-CLOSEOUT-002/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-CLOSEOUT-002",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g2-b59e68191ca0-fuseki-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-26T05:33:21Z",
+      "fingerprint": "5b4dd5a0d0714c3e71f1a8b3e9ab49b4b616106b269bdf6c680fa1dcf2839708",
+      "expectedReferences": [],
+      "ownershipEvidence": {
+        "commit": "6b517cc059ded513cd66f8c0df62170f473845bd",
+        "path": "docs/evidence/G3-M1-CLOSEOUT-002/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-CLOSEOUT-002",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g2-b59e68191ca0-grafana-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-26T05:33:21Z",
+      "fingerprint": "92d3ee111432ee80c7fecc7140d4ad6032b3beb3d184af4c8991a2c9b2a46538",
+      "expectedReferences": [],
+      "ownershipEvidence": {
+        "commit": "6b517cc059ded513cd66f8c0df62170f473845bd",
+        "path": "docs/evidence/G3-M1-CLOSEOUT-002/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-CLOSEOUT-002",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g2-b59e68191ca0-loki-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-26T05:33:22Z",
+      "fingerprint": "f16859d2f1d96a4f0cf98b5cb5d2d150347a991ba061221c818246c952de5218",
+      "expectedReferences": [],
+      "ownershipEvidence": {
+        "commit": "6b517cc059ded513cd66f8c0df62170f473845bd",
+        "path": "docs/evidence/G3-M1-CLOSEOUT-002/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-CLOSEOUT-002",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g2-b59e68191ca0-postgres-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-26T05:32:57Z",
+      "fingerprint": "f26472d6078cfcb97e53f43fd3e7808d84ba5fdb3c2e384287f75cd1b1f92865",
+      "expectedReferences": [],
+      "ownershipEvidence": {
+        "commit": "6b517cc059ded513cd66f8c0df62170f473845bd",
+        "path": "docs/evidence/G3-M1-CLOSEOUT-002/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-CLOSEOUT-002",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g2-b59e68191ca0-prometheus-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-26T05:33:21Z",
+      "fingerprint": "5c29967f9a070a413747843873a7b511cefca6b39c36ef35a09331899fa1143f",
+      "expectedReferences": [],
+      "ownershipEvidence": {
+        "commit": "6b517cc059ded513cd66f8c0df62170f473845bd",
+        "path": "docs/evidence/G3-M1-CLOSEOUT-002/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-CLOSEOUT-002",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g2-b59e68191ca0-rustfs-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-26T05:33:21Z",
+      "fingerprint": "8f2631a6c2cbb002aad81fa7f5488629059a36d0a0765620bf3540e8fa9aba5a",
+      "expectedReferences": [],
+      "ownershipEvidence": {
+        "commit": "6b517cc059ded513cd66f8c0df62170f473845bd",
+        "path": "docs/evidence/G3-M1-CLOSEOUT-002/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-CLOSEOUT-002",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g2-b59e68191ca0-tempo-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-26T05:33:21Z",
+      "fingerprint": "006fdf853f0bdec95fe1b092b5b68daa4188b240afce64416868c98df990bde6",
+      "expectedReferences": [],
+      "ownershipEvidence": {
+        "commit": "6b517cc059ded513cd66f8c0df62170f473845bd",
+        "path": "docs/evidence/G3-M1-CLOSEOUT-002/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-CLOSEOUT-002",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-image",
+      "target": "sha256:24b640093c5fc240b2b4b93573ad0cc5b2a4237c7a3997957ebed7c41321adc4",
+      "expectedTags": [
+        "fuseki:0abac99e7c3d755e0b3ce01d70479b62af9ba1f0"
+      ],
+      "fingerprint": "df6543783604af5eadc8e0693c0d549c9ad78534c3aac5dc4655b4bbef325d4c",
+      "expectedReferences": [],
+      "ownershipEvidence": {
+        "commit": "6b517cc059ded513cd66f8c0df62170f473845bd",
+        "path": "docs/evidence/G3-M1-CLOSEOUT-002/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-CLOSEOUT-002",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-image",
+      "target": "sha256:24d5809ca76fae4bca1484d7a914eb0786bd124f0aa5d246b4bc8aea26c711da",
+      "expectedTags": [
+        "fuseki:2ceba08b9ba775d9d3d4c110c5b63b13faecbe63"
+      ],
+      "fingerprint": "dc3ac10a1d068e15f852fbfefb19e73c0908c3ca65f3a58c7c7ae3466da93b6f",
+      "expectedReferences": [],
+      "ownershipEvidence": {
+        "commit": "6b517cc059ded513cd66f8c0df62170f473845bd",
+        "path": "docs/evidence/G3-M1-CLOSEOUT-002/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-CLOSEOUT-002",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-image",
+      "target": "sha256:2f786d9e8fdeebd5b36f8a70c77131f073ade597106b016a281f44fbdc95d955",
+      "expectedTags": [
+        "fuseki:ba230101bb9080e2b78215c713b5dbb7b2a55243"
+      ],
+      "fingerprint": "8d4b2acac8ed2057b9707285933ebab9244625cd2d510689166eab833c02bcd2",
+      "expectedReferences": [],
+      "ownershipEvidence": {
+        "commit": "6b517cc059ded513cd66f8c0df62170f473845bd",
+        "path": "docs/evidence/G3-M1-CLOSEOUT-002/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-CLOSEOUT-002",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-image",
+      "target": "sha256:3f46ed2c2a7edbc2497e8830478582ecfd2747dd9baff8b3759fdb744d86382a",
+      "expectedTags": [
+        "fuseki:31fbd43bc559bfdabc82d8e21853c3de804d6598"
+      ],
+      "fingerprint": "95771a0df16f1390250ed73a8edd64677fbb73a25cf1668168d07f4630addaaa",
+      "expectedReferences": [],
+      "ownershipEvidence": {
+        "commit": "6b517cc059ded513cd66f8c0df62170f473845bd",
+        "path": "docs/evidence/G3-M1-CLOSEOUT-002/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-CLOSEOUT-002",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-image",
+      "target": "sha256:87bc6e0550c64cad9265c867e8926777cca68c2d996f243982c4e9f00d5d0590",
+      "expectedTags": [
+        "fuseki:3bd73d575e3045367f86c6192c361a43feb672d9"
+      ],
+      "fingerprint": "0de1f9685ca87b6c937eaadc62799f4f09d4628a8a6add9c59e93daae28e490c",
+      "expectedReferences": [],
+      "ownershipEvidence": {
+        "commit": "6b517cc059ded513cd66f8c0df62170f473845bd",
+        "path": "docs/evidence/G3-M1-CLOSEOUT-002/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-CLOSEOUT-002",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-image",
+      "target": "sha256:8e28b3a01e16230451343afcfd3997c625b04806b9f3b1960de5915ecf3d01fa",
+      "expectedTags": [
+        "fuseki:ce0f9d44ff3f59b2083f5a9179df41fa9b64b942"
+      ],
+      "fingerprint": "afb3bd03b67048928bc356d82faaa1d8fb58ba3e7add94735df303ad0ee6d04a",
+      "expectedReferences": [],
+      "ownershipEvidence": {
+        "commit": "6b517cc059ded513cd66f8c0df62170f473845bd",
+        "path": "docs/evidence/G3-M1-CLOSEOUT-002/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-CLOSEOUT-002",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-image",
+      "target": "sha256:a807095b91ef054c4ad772ac9d70a5268f8f48616fca197e3de2e618a2f5c837",
+      "expectedTags": [
+        "fuseki:76af01fbdc917cf3952d1cae0db6d497accb2c65"
+      ],
+      "fingerprint": "b830714edb8205f106e37d465ea7e0c7e2fe3d202d7d9a0af1798f596a1f64c6",
+      "expectedReferences": [],
+      "ownershipEvidence": {
+        "commit": "6b517cc059ded513cd66f8c0df62170f473845bd",
+        "path": "docs/evidence/G3-M1-CLOSEOUT-002/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-CLOSEOUT-002",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-image",
+      "target": "sha256:ba4babd073e3a44bcfe6b3a92b00299d2fe37130ab9642e0c9a04ebee2793aad",
+      "expectedTags": [
+        "fuseki:a331244c76c8c5fd27cec3da702733fddeb9b3bd"
+      ],
+      "fingerprint": "be5074d83a07051f91ef8a29955f8c0382551885c906bc8421f7f34be79d61fc",
+      "expectedReferences": [],
+      "ownershipEvidence": {
+        "commit": "6b517cc059ded513cd66f8c0df62170f473845bd",
+        "path": "docs/evidence/G3-M1-CLOSEOUT-002/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-CLOSEOUT-002",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-history",
+      "target": "67640w3xkq2m9d34grtxvh3h0",
+      "builder": "desktop-linux",
+      "expectedContext": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+      "expectedVcs": "https://github.com/on-dotnet/ontology-platform.git",
+      "expectedRevision": "46c7a6de70b1b97c032b12a19bc27c1c54e70f4c",
+      "expectedStatus": "completed",
+      "historySnapshot": {
+        "Ref": "67640w3xkq2m9d34grtxvh3h0",
+        "Name": "infra/development/fuseki",
+        "Context": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+        "Dockerfile": "Dockerfile",
+        "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+        "VCSRevision": "46c7a6de70b1b97c032b12a19bc27c1c54e70f4c",
+        "Status": "completed"
+      },
+      "fingerprint": "01e27be2caeb0b94d7a5879f179dca9d841afd68b8fb8bd6c252877f1ac3b75f",
+      "ownershipEvidence": {
+        "commit": "6b517cc059ded513cd66f8c0df62170f473845bd",
+        "path": "docs/evidence/G3-M1-CLOSEOUT-002/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-CLOSEOUT-002",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-history",
+      "target": "ezgaz081sj0glsz63lwrladex",
+      "builder": "desktop-linux",
+      "expectedContext": "/Users/chasen/.codex/worktrees/g3-m1-closeout-resources/ontology-platform/infra/development/fuseki",
+      "expectedVcs": "https://github.com/on-dotnet/ontology-platform.git",
+      "expectedRevision": "47935fb2eda3d708e628a1b23ccd897e2250ff33",
+      "expectedStatus": "completed",
+      "historySnapshot": {
+        "Ref": "ezgaz081sj0glsz63lwrladex",
+        "Name": "infra/development/fuseki",
+        "Context": "/Users/chasen/.codex/worktrees/g3-m1-closeout-resources/ontology-platform/infra/development/fuseki",
+        "Dockerfile": "infra/development/fuseki/Dockerfile",
+        "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+        "VCSRevision": "47935fb2eda3d708e628a1b23ccd897e2250ff33",
+        "Status": "completed"
+      },
+      "fingerprint": "c758789771a9044d5db0e46fe25c0290d896b149da27a341da831fbca215e193",
+      "ownershipEvidence": {
+        "commit": "6b517cc059ded513cd66f8c0df62170f473845bd",
+        "path": "docs/evidence/G3-M1-CLOSEOUT-002/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-CLOSEOUT-002",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-history",
+      "target": "nkanrr4x3dno77mfigejmo9ap",
+      "builder": "desktop-linux",
+      "expectedContext": "/Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform/infra/development/fuseki",
+      "expectedVcs": "https://github.com/on-dotnet/ontology-platform.git",
+      "expectedRevision": "dc5a5c3240464ab0692052707e933e35ae9d93af",
+      "expectedStatus": "completed",
+      "historySnapshot": {
+        "Ref": "nkanrr4x3dno77mfigejmo9ap",
+        "Name": "infra/development/fuseki",
+        "Context": "/Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform/infra/development/fuseki",
+        "Dockerfile": "Dockerfile",
+        "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+        "VCSRevision": "dc5a5c3240464ab0692052707e933e35ae9d93af",
+        "Status": "completed"
+      },
+      "fingerprint": "572fe78a8ef946af624d7204d488b545866d3c5eeb601ba95d4ea16e02f68982",
+      "ownershipEvidence": {
+        "commit": "6b517cc059ded513cd66f8c0df62170f473845bd",
+        "path": "docs/evidence/G3-M1-CLOSEOUT-002/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-CLOSEOUT-002",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-history",
+      "target": "rbknq2eyl3ze0p4ssiz3f7k4z",
+      "builder": "desktop-linux",
+      "expectedContext": "/Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform/infra/development/fuseki",
+      "expectedVcs": "https://github.com/on-dotnet/ontology-platform.git",
+      "expectedRevision": "59c7875430c92443ffd8ab7463d11012e4461f68",
+      "expectedStatus": "completed",
+      "historySnapshot": {
+        "Ref": "rbknq2eyl3ze0p4ssiz3f7k4z",
+        "Name": "infra/development/fuseki",
+        "Context": "/Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform/infra/development/fuseki",
+        "Dockerfile": "Dockerfile",
+        "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+        "VCSRevision": "59c7875430c92443ffd8ab7463d11012e4461f68",
+        "Status": "completed"
+      },
+      "fingerprint": "a89078e4750fb0331225a66fda2aa9215433e269cc9f99c3d42aa6940ae34bcf",
+      "ownershipEvidence": {
+        "commit": "6b517cc059ded513cd66f8c0df62170f473845bd",
+        "path": "docs/evidence/G3-M1-CLOSEOUT-002/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-CLOSEOUT-002",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-history",
+      "target": "jycu16bu1tx4tkl41e3v0ep2f",
+      "builder": "desktop-linux",
+      "expectedContext": "/Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform/infra/development/fuseki",
+      "expectedVcs": "https://github.com/on-dotnet/ontology-platform.git",
+      "expectedRevision": "24f6379bdfdb012a296d88e15c4beb9f1d8d5061",
+      "expectedStatus": "completed",
+      "historySnapshot": {
+        "Ref": "jycu16bu1tx4tkl41e3v0ep2f",
+        "Name": "infra/development/fuseki",
+        "Context": "/Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform/infra/development/fuseki",
+        "Dockerfile": "Dockerfile",
+        "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+        "VCSRevision": "24f6379bdfdb012a296d88e15c4beb9f1d8d5061",
+        "Status": "completed"
+      },
+      "fingerprint": "219d817f263b66978070f0f4097ee9307d421eee40e7bde90d3ec5e06dba6511",
+      "ownershipEvidence": {
+        "commit": "6b517cc059ded513cd66f8c0df62170f473845bd",
+        "path": "docs/evidence/G3-M1-CLOSEOUT-002/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-CLOSEOUT-002",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-history",
+      "target": "gro8fj6y8t0t394ulylmtrvpb",
+      "builder": "desktop-linux",
+      "expectedContext": "/Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform/infra/development/fuseki",
+      "expectedVcs": "https://github.com/on-dotnet/ontology-platform.git",
+      "expectedRevision": "24f6379bdfdb012a296d88e15c4beb9f1d8d5061",
+      "expectedStatus": "completed",
+      "historySnapshot": {
+        "Ref": "gro8fj6y8t0t394ulylmtrvpb",
+        "Name": "infra/development/fuseki",
+        "Context": "/Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform/infra/development/fuseki",
+        "Dockerfile": "infra/development/fuseki/Dockerfile",
+        "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+        "VCSRevision": "24f6379bdfdb012a296d88e15c4beb9f1d8d5061",
+        "Status": "completed"
+      },
+      "fingerprint": "16e5a9f719f1749657aeb4e9787448e72c707ca2fe2d5f93fd1def02e488321c",
+      "ownershipEvidence": {
+        "commit": "6b517cc059ded513cd66f8c0df62170f473845bd",
+        "path": "docs/evidence/G3-M1-CLOSEOUT-002/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-CLOSEOUT-002",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-history",
+      "target": "1pf0ezzhu4o3ftzu5wb58r5h5",
+      "builder": "desktop-linux",
+      "expectedContext": "/Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform/infra/development/fuseki",
+      "expectedVcs": "https://github.com/on-dotnet/ontology-platform.git",
+      "expectedRevision": "02763a1144f25d30cdac42c907859a8784226f49",
+      "expectedStatus": "completed",
+      "historySnapshot": {
+        "Ref": "1pf0ezzhu4o3ftzu5wb58r5h5",
+        "Name": "infra/development/fuseki",
+        "Context": "/Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform/infra/development/fuseki",
+        "Dockerfile": "Dockerfile",
+        "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+        "VCSRevision": "02763a1144f25d30cdac42c907859a8784226f49",
+        "Status": "completed"
+      },
+      "fingerprint": "4d99695aeb41a6b86d57e2be75793c326ed8b7bc2d8a0811f6c03541266597d8",
+      "ownershipEvidence": {
+        "commit": "6b517cc059ded513cd66f8c0df62170f473845bd",
+        "path": "docs/evidence/G3-M1-CLOSEOUT-002/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-CLOSEOUT-002",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-history",
+      "target": "3t2h2x1svpe4z48xhmrc4mkm7",
+      "builder": "desktop-linux",
+      "expectedContext": "/Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform/infra/development/fuseki",
+      "expectedVcs": "https://github.com/on-dotnet/ontology-platform.git",
+      "expectedRevision": "6a1c76cd41e2b926f82ccd4ddd9b750dce5b7c44",
+      "expectedStatus": "completed",
+      "historySnapshot": {
+        "Ref": "3t2h2x1svpe4z48xhmrc4mkm7",
+        "Name": "infra/development/fuseki",
+        "Context": "/Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform/infra/development/fuseki",
+        "Dockerfile": "Dockerfile",
+        "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+        "VCSRevision": "6a1c76cd41e2b926f82ccd4ddd9b750dce5b7c44",
+        "Status": "completed"
+      },
+      "fingerprint": "e3dc8429a7c75215ed8a22737e61411c50367bc49e859afb6bf4bf9317dc2c3f",
+      "ownershipEvidence": {
+        "commit": "6b517cc059ded513cd66f8c0df62170f473845bd",
+        "path": "docs/evidence/G3-M1-CLOSEOUT-002/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-CLOSEOUT-002",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-history",
+      "target": "npkohc639rmrlcdeh1bngkggk",
+      "builder": "desktop-linux",
+      "expectedContext": "/Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform/infra/development/fuseki",
+      "expectedVcs": "https://github.com/on-dotnet/ontology-platform.git",
+      "expectedRevision": "6a1c76cd41e2b926f82ccd4ddd9b750dce5b7c44",
+      "expectedStatus": "completed",
+      "historySnapshot": {
+        "Ref": "npkohc639rmrlcdeh1bngkggk",
+        "Name": "infra/development/fuseki",
+        "Context": "/Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform/infra/development/fuseki",
+        "Dockerfile": "infra/development/fuseki/Dockerfile",
+        "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+        "VCSRevision": "6a1c76cd41e2b926f82ccd4ddd9b750dce5b7c44",
+        "Status": "completed"
+      },
+      "fingerprint": "39f1c215c715b36445f8e7c45693314e43741ea643a366ce23964ae670a59ab1",
+      "ownershipEvidence": {
+        "commit": "6b517cc059ded513cd66f8c0df62170f473845bd",
+        "path": "docs/evidence/G3-M1-CLOSEOUT-002/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-CLOSEOUT-002",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-history",
+      "target": "5fbah5gxqpe91txf3onpjy1v8",
+      "builder": "desktop-linux",
+      "expectedContext": "/Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform/infra/development/fuseki",
+      "expectedVcs": "https://github.com/on-dotnet/ontology-platform.git",
+      "expectedRevision": "5df0765775ad9a91c07ae05835057c0eaa4cb49c",
+      "expectedStatus": "completed",
+      "historySnapshot": {
+        "Ref": "5fbah5gxqpe91txf3onpjy1v8",
+        "Name": "infra/development/fuseki",
+        "Context": "/Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform/infra/development/fuseki",
+        "Dockerfile": "infra/development/fuseki/Dockerfile",
+        "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+        "VCSRevision": "5df0765775ad9a91c07ae05835057c0eaa4cb49c",
+        "Status": "completed"
+      },
+      "fingerprint": "ee18993c4592b8f70f6363c19fcc4a24bece91f6aa21059cb187c2f22e1ea930",
+      "ownershipEvidence": {
+        "commit": "6b517cc059ded513cd66f8c0df62170f473845bd",
+        "path": "docs/evidence/G3-M1-CLOSEOUT-002/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-CLOSEOUT-002",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-history",
+      "target": "k6dmkqgacrtu4qh46qhy5x12n",
+      "builder": "desktop-linux",
+      "expectedContext": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+      "expectedVcs": "https://github.com/on-dotnet/ontology-platform.git",
+      "expectedRevision": "46c7a6de70b1b97c032b12a19bc27c1c54e70f4c",
+      "expectedStatus": "completed",
+      "historySnapshot": {
+        "Ref": "k6dmkqgacrtu4qh46qhy5x12n",
+        "Name": "infra/development/fuseki",
+        "Context": "/Users/chasen/.codex/worktrees/g2-master/ontology-platform/infra/development/fuseki",
+        "Dockerfile": "Dockerfile",
+        "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+        "VCSRevision": "46c7a6de70b1b97c032b12a19bc27c1c54e70f4c",
+        "Status": "completed"
+      },
+      "fingerprint": "e5407cf3f29cacfbd7c0e360760651b3925140dbf75add6387c0281ae0af81eb",
+      "ownershipEvidence": {
+        "commit": "6b517cc059ded513cd66f8c0df62170f473845bd",
+        "path": "docs/evidence/G3-M1-CLOSEOUT-002/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-CLOSEOUT-002",
+        "closed": true,
+        "synthetic": true
+      }
+    }
+  ],
+  "historyBackend": {
+    "context": "desktop-linux",
+    "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016",
+    "bridgeId": "de96191d2074392220c31738e29b4cad4fe74cf66a8c56abba46ae7a244e86d5",
+    "buildxVersion": "github.com/docker/buildx v0.38.1 0dbe87f36ed472fe36b6796c3f70b4210a731fc5",
+    "buildkitVersion": "v0.34.0",
+    "driver": "docker",
+    "nodeName": "desktop-linux"
+  }
+}
