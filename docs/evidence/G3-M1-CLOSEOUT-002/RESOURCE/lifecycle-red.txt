@@ -1,0 +1,74 @@
+test_existing_private_runtime_is_not_rewritten (__main__.LifecycleTests.test_existing_private_runtime_is_not_rewritten) ... ERROR
+test_mismatched_label_or_socket_never_claims_observed (__main__.LifecycleTests.test_mismatched_label_or_socket_never_claims_observed) ... ERROR
+test_real_prepare_persists_nonsecret_prepared_manifest (__main__.LifecycleTests.test_real_prepare_persists_nonsecret_prepared_manifest) ... ERROR
+test_run_passes_identity_and_records_exit_without_secrets (__main__.LifecycleTests.test_run_passes_identity_and_records_exit_without_secrets) ... ERROR
+test_snapshot_reads_only_double_label_containers_and_exact_volumes (__main__.LifecycleTests.test_snapshot_reads_only_double_label_containers_and_exact_volumes) ... ERROR
+test_unsafe_identity_refuses_before_persistence (__main__.LifecycleTests.test_unsafe_identity_refuses_before_persistence) ... ERROR
+
+======================================================================
+ERROR: test_existing_private_runtime_is_not_rewritten (__main__.LifecycleTests.test_existing_private_runtime_is_not_rewritten)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m1-closeout-resources/ontology-platform/scripts/tests/ResourceLifecycle.Tests.py", line 42, in test_existing_private_runtime_is_not_rewritten
+    path,value=self.prepare();value.pop('resourceLifecycle');path.write_text(json.dumps(value))
+               ~~~~~~~~~~~~^^
+  File "/Users/chasen/.codex/worktrees/g3-m1-closeout-resources/ontology-platform/scripts/tests/ResourceLifecycle.Tests.py", line 28, in prepare
+    m.prepare('g2',task_id='TASK-123',run_id='run-123')
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: prepare() got an unexpected keyword argument 'task_id'
+
+======================================================================
+ERROR: test_mismatched_label_or_socket_never_claims_observed (__main__.LifecycleTests.test_mismatched_label_or_socket_never_claims_observed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m1-closeout-resources/ontology-platform/scripts/tests/ResourceLifecycle.Tests.py", line 67, in test_mismatched_label_or_socket_never_claims_observed
+    meta=m.lifecycle_identity({'volumePrefix':'g2-test'},'g2')
+         ^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'lifecycle_runtime' has no attribute 'lifecycle_identity'
+
+======================================================================
+ERROR: test_real_prepare_persists_nonsecret_prepared_manifest (__main__.LifecycleTests.test_real_prepare_persists_nonsecret_prepared_manifest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m1-closeout-resources/ontology-platform/scripts/tests/ResourceLifecycle.Tests.py", line 32, in test_real_prepare_persists_nonsecret_prepared_manifest
+    path,value=self.prepare()
+               ~~~~~~~~~~~~^^
+  File "/Users/chasen/.codex/worktrees/g3-m1-closeout-resources/ontology-platform/scripts/tests/ResourceLifecycle.Tests.py", line 28, in prepare
+    m.prepare('g2',task_id='TASK-123',run_id='run-123')
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: prepare() got an unexpected keyword argument 'task_id'
+
+======================================================================
+ERROR: test_run_passes_identity_and_records_exit_without_secrets (__main__.LifecycleTests.test_run_passes_identity_and_records_exit_without_secrets)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m1-closeout-resources/ontology-platform/scripts/tests/ResourceLifecycle.Tests.py", line 73, in test_run_passes_identity_and_records_exit_without_secrets
+    path,value=self.prepare()
+               ~~~~~~~~~~~~^^
+  File "/Users/chasen/.codex/worktrees/g3-m1-closeout-resources/ontology-platform/scripts/tests/ResourceLifecycle.Tests.py", line 28, in prepare
+    m.prepare('g2',task_id='TASK-123',run_id='run-123')
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: prepare() got an unexpected keyword argument 'task_id'
+
+======================================================================
+ERROR: test_snapshot_reads_only_double_label_containers_and_exact_volumes (__main__.LifecycleTests.test_snapshot_reads_only_double_label_containers_and_exact_volumes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m1-closeout-resources/ontology-platform/scripts/tests/ResourceLifecycle.Tests.py", line 52, in test_snapshot_reads_only_double_label_containers_and_exact_volumes
+    meta=m.lifecycle_identity({'volumePrefix':'g2-test','resourceLifecycle':{'taskId':'TASK-123','runId':'run-123'}},'g2')
+         ^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'lifecycle_runtime' has no attribute 'lifecycle_identity'
+
+======================================================================
+ERROR: test_unsafe_identity_refuses_before_persistence (__main__.LifecycleTests.test_unsafe_identity_refuses_before_persistence)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m1-closeout-resources/ontology-platform/scripts/tests/ResourceLifecycle.Tests.py", line 49, in test_unsafe_identity_refuses_before_persistence
+    with self.assertRaises(ValueError):m.lifecycle_identity({'volumePrefix':'g2-test','resourceLifecycle':{'taskId':task,'runId':'run-123'}},'g2')
+                                       ^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'lifecycle_runtime' has no attribute 'lifecycle_identity'
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.002s
+
+FAILED (errors=6)
