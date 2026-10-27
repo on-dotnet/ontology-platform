@@ -1,0 +1,576 @@
+{
+  "schemaVersion": 1,
+  "taskId": "G3-M1-001",
+  "project": "on-dotnet/ontology-platform",
+  "repositoryRoot": "/Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform",
+  "gitCommonDir": "/Users/chasen/Developer/repos/ontology-platform/.git",
+  "originUrl": "https://github.com/on-dotnet/ontology-platform.git",
+  "expectedMainSha": "59c7875430c92443ffd8ab7463d11012e4461f68",
+  "createdAt": "2026-10-27T05:42:21.380169+00:00",
+  "expiresAt": "2026-10-27T09:42:21.380169+00:00",
+  "allowedWorktreeRoots": [
+    "/Users/chasen/.codex/worktrees/g3-m1-master"
+  ],
+  "protectedWorktrees": [
+    "/Users/chasen/Developer/repos/ontology-platform",
+    "/Users/chasen/.codex/worktrees/g2-master/ontology-platform",
+    "/Users/chasen/.codex/worktrees/g2-query/ontology-platform",
+    "/Users/chasen/.codex/worktrees/g2-security/ontology-platform",
+    "/Users/chasen/.codex/worktrees/g2-sem/ontology-platform",
+    "/Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform",
+    "/Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform"
+  ],
+  "keep": [
+    "g2-712190660deb-alloy-data",
+    "g2-712190660deb-fuseki-data",
+    "g2-712190660deb-grafana-data",
+    "g2-712190660deb-loki-data",
+    "g2-712190660deb-postgres-data",
+    "g2-712190660deb-prometheus-data",
+    "g2-712190660deb-rustfs-data",
+    "g2-712190660deb-tempo-data",
+    "g2-b59e68191ca0-alloy-data",
+    "g2-b59e68191ca0-fuseki-data",
+    "g2-b59e68191ca0-grafana-data",
+    "g2-b59e68191ca0-loki-data",
+    "g2-b59e68191ca0-postgres-data",
+    "g2-b59e68191ca0-prometheus-data",
+    "g2-b59e68191ca0-rustfs-data",
+    "g2-b59e68191ca0-tempo-data",
+    "g2-ef979bd04cc0-alloy-data",
+    "g2-ef979bd04cc0-fuseki-data",
+    "g2-ef979bd04cc0-grafana-data",
+    "g2-ef979bd04cc0-loki-data",
+    "g2-ef979bd04cc0-postgres-data",
+    "g2-ef979bd04cc0-prometheus-data",
+    "g2-ef979bd04cc0-rustfs-data",
+    "g2-ef979bd04cc0-tempo-data",
+    "main",
+    "codex/g3-m1-master",
+    "codex/g3-m1-sem",
+    "codex/g3-m1-web",
+    "codex/g3-m1-fix"
+  ],
+  "operations": [
+    {
+      "type": "docker-volume",
+      "target": "g3-m1-5a1b45006425-alloy-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-27T05:08:00Z",
+      "ownershipEvidence": {
+        "commit": "51bcef9a23571f3f53440f75ecc91dcd76be96d1",
+        "path": "docs/evidence/G3-M1-001/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g3-m1-5a1b45006425-fuseki-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-27T05:08:00Z",
+      "ownershipEvidence": {
+        "commit": "51bcef9a23571f3f53440f75ecc91dcd76be96d1",
+        "path": "docs/evidence/G3-M1-001/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g3-m1-5a1b45006425-grafana-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-27T05:08:00Z",
+      "ownershipEvidence": {
+        "commit": "51bcef9a23571f3f53440f75ecc91dcd76be96d1",
+        "path": "docs/evidence/G3-M1-001/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g3-m1-5a1b45006425-loki-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-27T05:08:00Z",
+      "ownershipEvidence": {
+        "commit": "51bcef9a23571f3f53440f75ecc91dcd76be96d1",
+        "path": "docs/evidence/G3-M1-001/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g3-m1-5a1b45006425-postgres-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-27T05:07:41Z",
+      "ownershipEvidence": {
+        "commit": "51bcef9a23571f3f53440f75ecc91dcd76be96d1",
+        "path": "docs/evidence/G3-M1-001/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g3-m1-5a1b45006425-prometheus-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-27T05:08:00Z",
+      "ownershipEvidence": {
+        "commit": "51bcef9a23571f3f53440f75ecc91dcd76be96d1",
+        "path": "docs/evidence/G3-M1-001/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g3-m1-5a1b45006425-rustfs-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-27T05:08:00Z",
+      "ownershipEvidence": {
+        "commit": "51bcef9a23571f3f53440f75ecc91dcd76be96d1",
+        "path": "docs/evidence/G3-M1-001/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g3-m1-5a1b45006425-tempo-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-27T05:08:00Z",
+      "ownershipEvidence": {
+        "commit": "51bcef9a23571f3f53440f75ecc91dcd76be96d1",
+        "path": "docs/evidence/G3-M1-001/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g3-m1-774eafb4dda9-alloy-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-27T04:33:38Z",
+      "ownershipEvidence": {
+        "commit": "51bcef9a23571f3f53440f75ecc91dcd76be96d1",
+        "path": "docs/evidence/G3-M1-001/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g3-m1-774eafb4dda9-fuseki-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-27T04:33:38Z",
+      "ownershipEvidence": {
+        "commit": "51bcef9a23571f3f53440f75ecc91dcd76be96d1",
+        "path": "docs/evidence/G3-M1-001/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g3-m1-774eafb4dda9-grafana-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-27T04:33:38Z",
+      "ownershipEvidence": {
+        "commit": "51bcef9a23571f3f53440f75ecc91dcd76be96d1",
+        "path": "docs/evidence/G3-M1-001/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g3-m1-774eafb4dda9-loki-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-27T04:33:38Z",
+      "ownershipEvidence": {
+        "commit": "51bcef9a23571f3f53440f75ecc91dcd76be96d1",
+        "path": "docs/evidence/G3-M1-001/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g3-m1-774eafb4dda9-postgres-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-27T04:33:20Z",
+      "ownershipEvidence": {
+        "commit": "51bcef9a23571f3f53440f75ecc91dcd76be96d1",
+        "path": "docs/evidence/G3-M1-001/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g3-m1-774eafb4dda9-prometheus-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-27T04:33:38Z",
+      "ownershipEvidence": {
+        "commit": "51bcef9a23571f3f53440f75ecc91dcd76be96d1",
+        "path": "docs/evidence/G3-M1-001/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g3-m1-774eafb4dda9-rustfs-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-27T04:33:38Z",
+      "ownershipEvidence": {
+        "commit": "51bcef9a23571f3f53440f75ecc91dcd76be96d1",
+        "path": "docs/evidence/G3-M1-001/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g3-m1-774eafb4dda9-tempo-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-27T04:33:38Z",
+      "ownershipEvidence": {
+        "commit": "51bcef9a23571f3f53440f75ecc91dcd76be96d1",
+        "path": "docs/evidence/G3-M1-001/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g3-m1-b0af968ac10e-alloy-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-27T04:30:12Z",
+      "ownershipEvidence": {
+        "commit": "51bcef9a23571f3f53440f75ecc91dcd76be96d1",
+        "path": "docs/evidence/G3-M1-001/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g3-m1-b0af968ac10e-fuseki-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-27T04:30:12Z",
+      "ownershipEvidence": {
+        "commit": "51bcef9a23571f3f53440f75ecc91dcd76be96d1",
+        "path": "docs/evidence/G3-M1-001/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g3-m1-b0af968ac10e-grafana-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-27T04:30:12Z",
+      "ownershipEvidence": {
+        "commit": "51bcef9a23571f3f53440f75ecc91dcd76be96d1",
+        "path": "docs/evidence/G3-M1-001/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g3-m1-b0af968ac10e-loki-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-27T04:30:12Z",
+      "ownershipEvidence": {
+        "commit": "51bcef9a23571f3f53440f75ecc91dcd76be96d1",
+        "path": "docs/evidence/G3-M1-001/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g3-m1-b0af968ac10e-postgres-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-27T04:29:53Z",
+      "ownershipEvidence": {
+        "commit": "51bcef9a23571f3f53440f75ecc91dcd76be96d1",
+        "path": "docs/evidence/G3-M1-001/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g3-m1-b0af968ac10e-prometheus-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-27T04:30:12Z",
+      "ownershipEvidence": {
+        "commit": "51bcef9a23571f3f53440f75ecc91dcd76be96d1",
+        "path": "docs/evidence/G3-M1-001/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g3-m1-b0af968ac10e-rustfs-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-27T04:30:12Z",
+      "ownershipEvidence": {
+        "commit": "51bcef9a23571f3f53440f75ecc91dcd76be96d1",
+        "path": "docs/evidence/G3-M1-001/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g3-m1-b0af968ac10e-tempo-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-27T04:30:12Z",
+      "ownershipEvidence": {
+        "commit": "51bcef9a23571f3f53440f75ecc91dcd76be96d1",
+        "path": "docs/evidence/G3-M1-001/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g3-m1-bb5e3661b605-alloy-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-27T05:20:21Z",
+      "ownershipEvidence": {
+        "commit": "51bcef9a23571f3f53440f75ecc91dcd76be96d1",
+        "path": "docs/evidence/G3-M1-001/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g3-m1-bb5e3661b605-fuseki-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-27T05:20:21Z",
+      "ownershipEvidence": {
+        "commit": "51bcef9a23571f3f53440f75ecc91dcd76be96d1",
+        "path": "docs/evidence/G3-M1-001/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g3-m1-bb5e3661b605-grafana-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-27T05:20:21Z",
+      "ownershipEvidence": {
+        "commit": "51bcef9a23571f3f53440f75ecc91dcd76be96d1",
+        "path": "docs/evidence/G3-M1-001/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g3-m1-bb5e3661b605-loki-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-27T05:20:22Z",
+      "ownershipEvidence": {
+        "commit": "51bcef9a23571f3f53440f75ecc91dcd76be96d1",
+        "path": "docs/evidence/G3-M1-001/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g3-m1-bb5e3661b605-postgres-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-27T05:20:00Z",
+      "ownershipEvidence": {
+        "commit": "51bcef9a23571f3f53440f75ecc91dcd76be96d1",
+        "path": "docs/evidence/G3-M1-001/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g3-m1-bb5e3661b605-prometheus-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-27T05:20:21Z",
+      "ownershipEvidence": {
+        "commit": "51bcef9a23571f3f53440f75ecc91dcd76be96d1",
+        "path": "docs/evidence/G3-M1-001/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g3-m1-bb5e3661b605-rustfs-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-27T05:20:21Z",
+      "ownershipEvidence": {
+        "commit": "51bcef9a23571f3f53440f75ecc91dcd76be96d1",
+        "path": "docs/evidence/G3-M1-001/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g3-m1-bb5e3661b605-tempo-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-27T05:20:21Z",
+      "ownershipEvidence": {
+        "commit": "51bcef9a23571f3f53440f75ecc91dcd76be96d1",
+        "path": "docs/evidence/G3-M1-001/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g3-m1-ff712e0c29b1-alloy-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-27T05:12:09Z",
+      "ownershipEvidence": {
+        "commit": "51bcef9a23571f3f53440f75ecc91dcd76be96d1",
+        "path": "docs/evidence/G3-M1-001/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g3-m1-ff712e0c29b1-fuseki-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-27T05:12:09Z",
+      "ownershipEvidence": {
+        "commit": "51bcef9a23571f3f53440f75ecc91dcd76be96d1",
+        "path": "docs/evidence/G3-M1-001/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g3-m1-ff712e0c29b1-grafana-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-27T05:12:09Z",
+      "ownershipEvidence": {
+        "commit": "51bcef9a23571f3f53440f75ecc91dcd76be96d1",
+        "path": "docs/evidence/G3-M1-001/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g3-m1-ff712e0c29b1-loki-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-27T05:12:09Z",
+      "ownershipEvidence": {
+        "commit": "51bcef9a23571f3f53440f75ecc91dcd76be96d1",
+        "path": "docs/evidence/G3-M1-001/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g3-m1-ff712e0c29b1-postgres-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-27T05:11:48Z",
+      "ownershipEvidence": {
+        "commit": "51bcef9a23571f3f53440f75ecc91dcd76be96d1",
+        "path": "docs/evidence/G3-M1-001/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g3-m1-ff712e0c29b1-prometheus-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-27T05:12:09Z",
+      "ownershipEvidence": {
+        "commit": "51bcef9a23571f3f53440f75ecc91dcd76be96d1",
+        "path": "docs/evidence/G3-M1-001/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g3-m1-ff712e0c29b1-rustfs-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-27T05:12:09Z",
+      "ownershipEvidence": {
+        "commit": "51bcef9a23571f3f53440f75ecc91dcd76be96d1",
+        "path": "docs/evidence/G3-M1-001/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-001",
+        "closed": true,
+        "synthetic": true
+      }
+    },
+    {
+      "type": "docker-volume",
+      "target": "g3-m1-ff712e0c29b1-tempo-data",
+      "expectedDriver": "local",
+      "expectedCreatedAt": "2026-10-27T05:12:09Z",
+      "ownershipEvidence": {
+        "commit": "51bcef9a23571f3f53440f75ecc91dcd76be96d1",
+        "path": "docs/evidence/G3-M1-001/master/closed-resource-ownership.md",
+        "taskId": "G3-M1-001",
+        "closed": true,
+        "synthetic": true
+      }
+    }
+  ]
+}

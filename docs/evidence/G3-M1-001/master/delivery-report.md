@@ -1,8 +1,8 @@
 # G3-M1-001 交付报告
 
-状态：IMPLEMENTED / CLOSURE_IN_PROGRESS，整体PARTIAL；最终main同HeadCI、实际资源回收和唯一包以后置回执为准。本报告不代表ChatGPT已验收M1。只M1，M2–M5未启动。
+状态：READY_FOR_REVIEW / PARTIAL。M1源码/真实验收/独立审查/实际资源收尾已完成；最终文档Head的main同HeadCI和唯一包读取后置交付回执。本报告不代表ChatGPT已验收M1。只M1，M2–M5未启动。
 
-Base=d6aab6b47e63c9d5deadfa480f6659c62c5ed138；开工及首次集成前均重新fetch，未退回旧main。核心源码59c7875430c92443ffd8ab7463d11012e4461f68经非作者独立审查及同Head双job成功后，已首次快进main/push；main重跑CI40455145345当前待实际结论。原主树六个.DS_Store保持。最终文档Head、CI和ZIP由最终manifest精确绑定，不自引用未来SHA。
+Base=d6aab6b47e63c9d5deadfa480f6659c62c5ed138；开工及首次集成前均重新fetch，未退回旧main。核心源码59c7875430c92443ffd8ab7463d11012e4461f68经非作者独立审查及同Head双job成功后，已首次快进main/push；main重跑CI40455145345已实际双job成功，51收尾检查点CI40456545828亦双job成功；具体计划经独立审查后才Apply。原主树六个.DS_Store保持。最终文档Head、CI和ZIP由最终manifest精确绑定，不自引用未来SHA。
 
 ## 完成的M1切片
 
@@ -23,7 +23,7 @@ Base=d6aab6b47e63c9d5deadfa480f6659c62c5ed138；开工及首次集成前均重�
 |dc5a5c3仅截图时序|实际七门禁exit0，M1浏览器56；390两主题侧栏结束态、稳定图像抽查|stable-visual-runtime*；runtime/g3-m1-bb5e3661b605/e2a597356fa846319cd8a368263a91d7；visual-qa.md|
 |写前/写后兼容reader|5df0765构建冻结126文件、清单hash固定；写前1/1及实际API导出V2回读1/1，0skip，整个依赖集不变|各run prewrite/compatibility证据；最终V2原字节base64封套及SHA；不作为旧应用降级认证|
 |独立审查|whole review初C0/I4/M1；唯一统一fix wave后全部ADDRESSED，Spec/Quality PASS、C0/I0/M0|whole-branch-review-initial/final.md及FIX目录；不是第二GitHub用户批准|
-|核心CI/首次集成|分支40453901949，59c7875，engineering与governance-integration实际success；Master FF main/push，main同Head新run后置|core-ci-59.json，实际mainCI回执后续归档|
+|核心CI/首次集成|分支40453901949，59c7875，engineering与governance-integration实际success；Master FF main/push，main同Head新run40455145345已双job成功|core-ci-59.json、main-first-ci.json、closure-checkpoint-ci.json|
 
 24..dc的backend/apps差异为空；后续仅验收记录/异常路径和截图选项，不把增量说成在新Head重复全部原生测试。所有最终代码仍须最终Head实际CI。每条能力的精确测试方法与未独立变异组合见backend-coverage.md；未导入私有真实G2备份或升级前Run/Event库，历史协议夹具不能外推为生产迁移演练。
 
@@ -31,9 +31,9 @@ Base=d6aab6b47e63c9d5deadfa480f6659c62c5ed138；开工及首次集成前均重�
 
 ## 资源、限制与恢复
 
-具体清理候选：40个本任务g3-m1合成命名卷、3个本任务worker托管树；每个执行会话已停止且原证据归档。只读pre-apply为10树/38refs、64卷（24保护+40候选）；3worker ignored普通文件逻辑字节约2.235GB（未硬链接去重），无未解决私有候选，唯一公开CC0 22字节资产按既有精确例外验证。actual Apply/native archive及after尚待门禁，不预填回收成功；见closed-resource-ownership.md及worker-ignored-prearchive.json。
+具体清理候选：40个本任务g3-m1合成命名卷、3个本任务worker托管树；每个执行会话已停止且原证据归档。只读pre-apply为10树/38refs、64卷（24保护+40候选）；3worker ignored普通文件逻辑字节约2.235GB（未硬链接去重），无未解决私有候选，唯一公开CC0 22字节资产按既有精确例外验证。实际Apply已exit0删除40卷，原生3树已归档并在FS/Git消失；after为7树/24保护卷/38refs，历史tips和worker refs保持。独立具体计划/图像核验PASS，保留reader严格1/1及126不变、doctor和只读reconcile均exit0。完整日志/容量/保护与保留理由见resource-closeout-report.md。
 
-原6历史树/24G2卷/历史refs、Master活跃树、私有runtime/PFX和共享镜像/cache/history保护；不全局prune、不改DB内部/引擎/默认工具、不删历史。物理APFS/SSD回收NOT_VERIFIED。回收后保留集、doctor与恢复入口逐项后验，不把已停止的旧G2数据集称为再次健康启动。恢复一律动态fetch，再用fresh g3-governance -M1 -StartRuntime；已删除合成卷的旧private runtime不可当作仍有效的恢复入口。
+原6历史树/24G2卷/历史refs、Master活跃树、私有runtime/PFX和共享镜像/cache/history保护；不全局prune、不改DB内部/引擎/默认工具、不删历史。物理APFS/SSD回收NOT_VERIFIED。回收后保留集/doctor/二进制入口已实际后验，不把已停止的旧G2数据集称为再次健康启动。恢复一律动态fetch，再用fresh g3-governance -M1 -StartRuntime；已删除合成卷的旧private runtime不可当作仍有效的恢复入口。
 
 Monaco保持BLOCKED/PAUSED_BY_USER；真实LLM未配置且未调用收费模型；完整OWL推理、五真实源、Windows/Intel、生产HA/证书轮换/SLO-RPO-RTO、完整供应链与语义隐私认证均未完成。SHACL合并图诊断使用bundle/hash及null行列，不声称OWL一致性或精确SHACL源行列。详细风险见retention-risk-matrix.md。
 

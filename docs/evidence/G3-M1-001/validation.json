@@ -124,14 +124,14 @@
       "command": "python3 scripts/maintenance/audit-public-history.py",
       "status": "PARTIAL",
       "exitCode": 2,
-      "output": "Source checkpoint5df:336commits/2569blobs/6same prior triaged candidates/0omissions. Original REVIEW_REQUIRED retained, no new candidate then; not semantic privacy/unreachable-object certification. Final receipt may add an external fixed-Head check."
+      "output": "At committed51:347commits/2855blobs/96394871bytes,6 same prior triaged blob/path/category candidates,0omissions. exit2 REVIEW_REQUIRED retained; no new candidate. Finite scan is not privacy/unreachable-object certification."
     },
     {
       "name": "m1-exact-resource-apply",
-      "command": null,
-      "status": "NOT_RUN",
-      "exitCode": null,
-      "output": "40 exact own synthetic volumes and3 native worker trees inspected/owned; awaiting main same-HeadCI and fresh independently reviewed whitelist. No deletion preclaimed."
+      "command": "pwsh -NoProfile -File scripts/maintenance/cleanup-resources.ps1 -Root /Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform -PlanPath /private/tmp/g3-m1-closeout-plan-51bcef9.json -Apply -LogPath /private/tmp/g3-m1-closeout-apply-51bcef9.jsonl",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "40 exact named synthetic volumes actually removed;40before/40after, all commands exit0/absent true. Same51 branch and main59 dual CI plus concrete independent whitelist review preceded Apply; no oldG2/production volume removed."
     },
     {
       "name": "monaco",
@@ -153,6 +153,34 @@
       "status": "NOT_VERIFIED",
       "exitCode": null,
       "output": "Windows/Intel,productionHA/certificate rotation/SLO-RPO-RTO/full supplychain/semanticprivacy/physicalSSD recovery are not certified."
+    },
+    {
+      "name": "actual-resource-retention-reconciliation",
+      "command": "python3 docs/evidence/G3-M1-001/master/reconcile-closeout.py --root /Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "40 volumes/3 native archives verified;WT10->7,vol64->24,refs38->38;old6trees/24G2volumes and historical tips kept. Native API has no CLI exit code; completed archived attachments, filesystem and Git absence checked separately."
+    },
+    {
+      "name": "post-cleanup-toolchain-doctor",
+      "command": "pwsh -NoProfile -File scripts/doctor.ps1 -CheckDocker",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Approved SDK/Node/pnpm and DockerEngine respond after cleanup; only environment metadata, oldG2 data services were not restarted."
+    },
+    {
+      "name": "retained-binary-after-cleanup",
+      "command": "G3_READER_IDENTITY_SHA=f379b6c7f9ef339c6e8f242dcfd2e33601e78006228da8046e68ec6cae225669 PLATFORM_EVIDENCE_DIR=docs/evidence/G3-M1-001/closeout-restoration python3 scripts/acceptance/g3-compatibility.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Strict1 actualV2 test passed,0skip,126 binary/dependency members unchanged; no access to deleted synthetic services. Not a G2 application downgrade certification."
+    },
+    {
+      "name": "final-documentation-selftest",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1 -SelfTest",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Final resource/documentation round completed all selected engineering positive/negative checks, including cleanup42 and ReviewPackage54; not a new product/container run."
     }
   ],
   "ci": {

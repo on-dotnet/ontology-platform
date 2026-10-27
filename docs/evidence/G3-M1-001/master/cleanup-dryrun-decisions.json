@@ -1,0 +1,254 @@
+{
+  "observedAtUtc": "2026-10-27T05:43:55.129169+00:00",
+  "command": "pwsh -NoProfile -File scripts/maintenance/cleanup-resources.ps1 -Root <Master> -PlanPath /private/tmp/g3-m1-closeout-plan-51bcef9.json",
+  "cliExitCode": 0,
+  "cliResult": {
+    "completed": 0,
+    "mode": "DryRun",
+    "validated": 40
+  },
+  "planSha256": "67320ed3dbb10b1c9807d0f5e6533821da44ce05d63bb27bc50b7db127f17131",
+  "decisions": [
+    {
+      "action": "WOULD_DELETE",
+      "type": "docker-volume",
+      "target": "g3-m1-5a1b45006425-alloy-data",
+      "expectedCreatedAt": "2026-10-27T05:08:00Z"
+    },
+    {
+      "action": "WOULD_DELETE",
+      "type": "docker-volume",
+      "target": "g3-m1-5a1b45006425-fuseki-data",
+      "expectedCreatedAt": "2026-10-27T05:08:00Z"
+    },
+    {
+      "action": "WOULD_DELETE",
+      "type": "docker-volume",
+      "target": "g3-m1-5a1b45006425-grafana-data",
+      "expectedCreatedAt": "2026-10-27T05:08:00Z"
+    },
+    {
+      "action": "WOULD_DELETE",
+      "type": "docker-volume",
+      "target": "g3-m1-5a1b45006425-loki-data",
+      "expectedCreatedAt": "2026-10-27T05:08:00Z"
+    },
+    {
+      "action": "WOULD_DELETE",
+      "type": "docker-volume",
+      "target": "g3-m1-5a1b45006425-postgres-data",
+      "expectedCreatedAt": "2026-10-27T05:07:41Z"
+    },
+    {
+      "action": "WOULD_DELETE",
+      "type": "docker-volume",
+      "target": "g3-m1-5a1b45006425-prometheus-data",
+      "expectedCreatedAt": "2026-10-27T05:08:00Z"
+    },
+    {
+      "action": "WOULD_DELETE",
+      "type": "docker-volume",
+      "target": "g3-m1-5a1b45006425-rustfs-data",
+      "expectedCreatedAt": "2026-10-27T05:08:00Z"
+    },
+    {
+      "action": "WOULD_DELETE",
+      "type": "docker-volume",
+      "target": "g3-m1-5a1b45006425-tempo-data",
+      "expectedCreatedAt": "2026-10-27T05:08:00Z"
+    },
+    {
+      "action": "WOULD_DELETE",
+      "type": "docker-volume",
+      "target": "g3-m1-774eafb4dda9-alloy-data",
+      "expectedCreatedAt": "2026-10-27T04:33:38Z"
+    },
+    {
+      "action": "WOULD_DELETE",
+      "type": "docker-volume",
+      "target": "g3-m1-774eafb4dda9-fuseki-data",
+      "expectedCreatedAt": "2026-10-27T04:33:38Z"
+    },
+    {
+      "action": "WOULD_DELETE",
+      "type": "docker-volume",
+      "target": "g3-m1-774eafb4dda9-grafana-data",
+      "expectedCreatedAt": "2026-10-27T04:33:38Z"
+    },
+    {
+      "action": "WOULD_DELETE",
+      "type": "docker-volume",
+      "target": "g3-m1-774eafb4dda9-loki-data",
+      "expectedCreatedAt": "2026-10-27T04:33:38Z"
+    },
+    {
+      "action": "WOULD_DELETE",
+      "type": "docker-volume",
+      "target": "g3-m1-774eafb4dda9-postgres-data",
+      "expectedCreatedAt": "2026-10-27T04:33:20Z"
+    },
+    {
+      "action": "WOULD_DELETE",
+      "type": "docker-volume",
+      "target": "g3-m1-774eafb4dda9-prometheus-data",
+      "expectedCreatedAt": "2026-10-27T04:33:38Z"
+    },
+    {
+      "action": "WOULD_DELETE",
+      "type": "docker-volume",
+      "target": "g3-m1-774eafb4dda9-rustfs-data",
+      "expectedCreatedAt": "2026-10-27T04:33:38Z"
+    },
+    {
+      "action": "WOULD_DELETE",
+      "type": "docker-volume",
+      "target": "g3-m1-774eafb4dda9-tempo-data",
+      "expectedCreatedAt": "2026-10-27T04:33:38Z"
+    },
+    {
+      "action": "WOULD_DELETE",
+      "type": "docker-volume",
+      "target": "g3-m1-b0af968ac10e-alloy-data",
+      "expectedCreatedAt": "2026-10-27T04:30:12Z"
+    },
+    {
+      "action": "WOULD_DELETE",
+      "type": "docker-volume",
+      "target": "g3-m1-b0af968ac10e-fuseki-data",
+      "expectedCreatedAt": "2026-10-27T04:30:12Z"
+    },
+    {
+      "action": "WOULD_DELETE",
+      "type": "docker-volume",
+      "target": "g3-m1-b0af968ac10e-grafana-data",
+      "expectedCreatedAt": "2026-10-27T04:30:12Z"
+    },
+    {
+      "action": "WOULD_DELETE",
+      "type": "docker-volume",
+      "target": "g3-m1-b0af968ac10e-loki-data",
+      "expectedCreatedAt": "2026-10-27T04:30:12Z"
+    },
+    {
+      "action": "WOULD_DELETE",
+      "type": "docker-volume",
+      "target": "g3-m1-b0af968ac10e-postgres-data",
+      "expectedCreatedAt": "2026-10-27T04:29:53Z"
+    },
+    {
+      "action": "WOULD_DELETE",
+      "type": "docker-volume",
+      "target": "g3-m1-b0af968ac10e-prometheus-data",
+      "expectedCreatedAt": "2026-10-27T04:30:12Z"
+    },
+    {
+      "action": "WOULD_DELETE",
+      "type": "docker-volume",
+      "target": "g3-m1-b0af968ac10e-rustfs-data",
+      "expectedCreatedAt": "2026-10-27T04:30:12Z"
+    },
+    {
+      "action": "WOULD_DELETE",
+      "type": "docker-volume",
+      "target": "g3-m1-b0af968ac10e-tempo-data",
+      "expectedCreatedAt": "2026-10-27T04:30:12Z"
+    },
+    {
+      "action": "WOULD_DELETE",
+      "type": "docker-volume",
+      "target": "g3-m1-bb5e3661b605-alloy-data",
+      "expectedCreatedAt": "2026-10-27T05:20:21Z"
+    },
+    {
+      "action": "WOULD_DELETE",
+      "type": "docker-volume",
+      "target": "g3-m1-bb5e3661b605-fuseki-data",
+      "expectedCreatedAt": "2026-10-27T05:20:21Z"
+    },
+    {
+      "action": "WOULD_DELETE",
+      "type": "docker-volume",
+      "target": "g3-m1-bb5e3661b605-grafana-data",
+      "expectedCreatedAt": "2026-10-27T05:20:21Z"
+    },
+    {
+      "action": "WOULD_DELETE",
+      "type": "docker-volume",
+      "target": "g3-m1-bb5e3661b605-loki-data",
+      "expectedCreatedAt": "2026-10-27T05:20:22Z"
+    },
+    {
+      "action": "WOULD_DELETE",
+      "type": "docker-volume",
+      "target": "g3-m1-bb5e3661b605-postgres-data",
+      "expectedCreatedAt": "2026-10-27T05:20:00Z"
+    },
+    {
+      "action": "WOULD_DELETE",
+      "type": "docker-volume",
+      "target": "g3-m1-bb5e3661b605-prometheus-data",
+      "expectedCreatedAt": "2026-10-27T05:20:21Z"
+    },
+    {
+      "action": "WOULD_DELETE",
+      "type": "docker-volume",
+      "target": "g3-m1-bb5e3661b605-rustfs-data",
+      "expectedCreatedAt": "2026-10-27T05:20:21Z"
+    },
+    {
+      "action": "WOULD_DELETE",
+      "type": "docker-volume",
+      "target": "g3-m1-bb5e3661b605-tempo-data",
+      "expectedCreatedAt": "2026-10-27T05:20:21Z"
+    },
+    {
+      "action": "WOULD_DELETE",
+      "type": "docker-volume",
+      "target": "g3-m1-ff712e0c29b1-alloy-data",
+      "expectedCreatedAt": "2026-10-27T05:12:09Z"
+    },
+    {
+      "action": "WOULD_DELETE",
+      "type": "docker-volume",
+      "target": "g3-m1-ff712e0c29b1-fuseki-data",
+      "expectedCreatedAt": "2026-10-27T05:12:09Z"
+    },
+    {
+      "action": "WOULD_DELETE",
+      "type": "docker-volume",
+      "target": "g3-m1-ff712e0c29b1-grafana-data",
+      "expectedCreatedAt": "2026-10-27T05:12:09Z"
+    },
+    {
+      "action": "WOULD_DELETE",
+      "type": "docker-volume",
+      "target": "g3-m1-ff712e0c29b1-loki-data",
+      "expectedCreatedAt": "2026-10-27T05:12:09Z"
+    },
+    {
+      "action": "WOULD_DELETE",
+      "type": "docker-volume",
+      "target": "g3-m1-ff712e0c29b1-postgres-data",
+      "expectedCreatedAt": "2026-10-27T05:11:48Z"
+    },
+    {
+      "action": "WOULD_DELETE",
+      "type": "docker-volume",
+      "target": "g3-m1-ff712e0c29b1-prometheus-data",
+      "expectedCreatedAt": "2026-10-27T05:12:09Z"
+    },
+    {
+      "action": "WOULD_DELETE",
+      "type": "docker-volume",
+      "target": "g3-m1-ff712e0c29b1-rustfs-data",
+      "expectedCreatedAt": "2026-10-27T05:12:09Z"
+    },
+    {
+      "action": "WOULD_DELETE",
+      "type": "docker-volume",
+      "target": "g3-m1-ff712e0c29b1-tempo-data",
+      "expectedCreatedAt": "2026-10-27T05:12:09Z"
+    }
+  ],
+  "scope": "Named projection of exactly the unchanged plan successfully validated by the read-only executor; not Apply."
+}
