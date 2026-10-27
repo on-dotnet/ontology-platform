@@ -16,8 +16,11 @@ public static class OntologyModule
     {
         services.AddDbContext<OntologyDbContext>(options => options.UseNpgsql(configuration.GetConnectionString("governance"), database => database.MigrationsHistoryTable("__EFMigrationsHistory", "ontology")));
         services.AddHttpClient("ontology-jena").ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false, UseProxy = false });
-        services.AddSingleton<ISemanticRuntime, JenaSemanticRuntime>();
+        services.AddSingleton<JenaSemanticRuntime>();
+        services.AddSingleton<ISemanticRuntime>(provider => provider.GetRequiredService<JenaSemanticRuntime>());
+        services.AddSingleton<IG3SemanticRuntime>(provider => provider.GetRequiredService<JenaSemanticRuntime>());
         services.AddScoped<OntologyService>();
+        services.AddScoped<IG3OntologyService>(provider => provider.GetRequiredService<OntologyService>());
         services.AddScoped<IOntologyService>(provider => provider.GetRequiredService<OntologyService>());
         services.AddScoped<IDraftPublicationReader>(provider => provider.GetRequiredService<OntologyService>());
         return services;
