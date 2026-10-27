@@ -15,3 +15,5 @@ UTC命令区间：2026-10-27T14:27–14:34Z为实现/测试；工时UNKNOWN，�
 建议真实闭环：打开资产→填写变更理由→左树选择已声明Class→新增→equivalentClass或disjointWith→受控主体与对象→提交→确认revision、真实Diff及重读；对象属性以inverseOf同样验证。再切换节点/修订验证对象重置；选择语言label三元组执行remove并核对旧对象datatype/language；源码dirty关闭结构与发布→保存→重评估。复杂图仍可源码编辑/原文导出但结构只读；诊断只按可靠来源跳转。
 
 资源：没有Docker/运行时资源；本树node_modules约537MiB、apps/web/.next约45MiB均可由锁定pnpm离线install及build再生；.tools/pythonlibs仅指向Master同任务既有批准隔离解析包。KEEP至当前独立Review、同HeadCI及Master确认集成，之后按主任务精确白名单处理。未清旧树或共享store。
+
+后置实测：2026-10-27T14:38Z，恢复隔离PyYAML后的完整 `pwsh -NoProfile -File scripts/verify.ps1 -SelfTest` exit0，证据ui-selftest-restored.txt。清理执行器44项通过，ReviewPackage 96项0失败；其余checker/orchestration/结构化解析回归以实际日志为准。首次工具资产失败保留ui-selftest.txt；未把工程检查当浏览器业务或.NET产品测试。此后只有证据更新，源码保持第二切片8d93a7844f4b9b1bcb91044866ccb0366ff007f5。
