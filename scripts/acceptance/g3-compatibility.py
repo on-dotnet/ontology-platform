@@ -40,9 +40,9 @@ def main():
     parser.add_argument('--freeze', action='store_true')
     args = parser.parse_args()
     artifact = ROOT / 'artifacts/g3-m1'
-    directory = artifact / 'fallback-reader-v3'
+    directory = artifact / 'fallback-reader-v4'
     reader = directory / 'OntologyPlatform.G2ContractTests.dll'
-    identity_path = artifact / 'fallback-reader-v3.identity.json'
+    identity_path = artifact / 'fallback-reader-v4.identity.json'
     manifest = artifact / 'actual-v2-manifest.json'
     evidence = evidence_directory(ROOT, 'docs/evidence/G3-M1-001/runtime')
     evidence.mkdir(parents=True, exist_ok=True)
@@ -51,7 +51,13 @@ def main():
             identity = json.loads(identity_path.read_text())
             verify_binary_set(directory, identity['members'])
         else:
-            identity = {'members': snapshot_binary_set(directory), 'scope': 'M1 pre-write retained compatible reader'}
+            source_status = subprocess.check_output(['git', 'status', '--porcelain', '--untracked-files=all', '--',
+                                                     'backend/src/Contracts', 'backend/tests/OntologyPlatform.G2ContractTests',
+                                                     'Directory.Build.props', 'Directory.Packages.props'], cwd=ROOT, text=True)
+            if source_status.strip():
+                raise RuntimeError('Reader source must be committed before freezing its identity')
+            identity = {'members': snapshot_binary_set(directory), 'scope': 'M1 pre-write retained compatible reader',
+                        'sourceHead': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()}
         # Probe the unchanged directory before accepting its frozen identity; real artifact follows later.
         probe = subprocess.run(['dotnet', str(reader), '--filter', 'FullyQualifiedName~V2RoundtripRetainsExactAssessmentBinding',
                                 '--output', 'Detailed', '--zero-tests-policy', 'strict', '--minimum-expected-tests', '1'],
