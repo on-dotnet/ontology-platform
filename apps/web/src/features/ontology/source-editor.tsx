@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { decodeSourceBytes, preserveEditorSource } from "./source-bytes";
+import type { SourceImportHandle } from "./source-import";
 import type { SourceBundle } from "../../lib/api/g2-generated";
 
 /** 四个原始权威文档；导入和导出不经过浏览器RDF重建。 */
@@ -12,12 +13,13 @@ export const sourceFields: Array<{ key: keyof SourceBundle; title: string; file:
 ];
 
 /** 保留未修改的原始UTF8表示；实际编辑只更新当前文档。 */
-export function SourceEditor({ sources, field, onField, onChange, onAbsent, readOnly = false }: {
+export function SourceEditor({ sources, field, onField, onChange, onAbsent, onBeginImport, readOnly = false }: {
   sources: SourceBundle;
   field: keyof SourceBundle;
   onField: (field: keyof SourceBundle) => void;
   onChange: (field: keyof SourceBundle, value: string) => void;
   onAbsent: () => void;
+  onBeginImport: (field: keyof SourceBundle) => SourceImportHandle;
   readOnly?: boolean;
 }) {
   const [loadError, setLoadError] = useState("");
@@ -61,18 +63,19 @@ export function SourceEditor({ sources, field, onField, onChange, onAbsent, read
             const input = event.currentTarget;
             const file = input.files?.[0];
             if (!file) return;
+            // 选择之后立即清空input，旧读取的finally不能清除后发文件选择。
+            input.value = "";
+            const operation = onBeginImport(field);
             setLoadError("");
             if (file.size > 262144) {
               setLoadError("源文件超过256 KiB，未载入。");
-              input.value = "";
               return;
             }
             try {
-              onChange(field, decodeSourceBytes(await file.arrayBuffer()));
+              const bytes = await file.arrayBuffer();
+              if (operation.isCurrent()) operation.commit(decodeSourceBytes(bytes));
             } catch {
-              setLoadError("源文件不是有效UTF8或无法读取，未载入且原始缓冲保持不变。");
-            } finally {
-              input.value = "";
+              if (operation.isCurrent()) setLoadError("源文件不是有效UTF8或无法读取，未载入且原始缓冲保持不变。");
             }
           }}
         />

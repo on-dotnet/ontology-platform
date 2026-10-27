@@ -55,7 +55,7 @@ describe("M1 实际组件输出与四源往返", () => {
   it("absent术语源禁用导出和textarea，但可显式创建空源", () => {
     const html = renderToStaticMarkup(createElement(SourceEditor, {
       sources: { ...sources, vocabularyTurtle: null }, field: "vocabularyTurtle",
-      onField: noop, onChange: noop, onAbsent: noop,
+      onField: noop, onChange: noop, onAbsent: noop, onBeginImport: () => ({ isCurrent: () => false, commit: noop }),
     }));
     expect(html).toContain("absent");
     expect(html).toMatch(/disabled=""[^>]*>导出原始源/);
@@ -64,7 +64,7 @@ describe("M1 实际组件输出与四源往返", () => {
   });
   it("只读角色不能载入文件或编辑源码", () => {
     const html = renderToStaticMarkup(createElement(SourceEditor, {
-      sources, field: "ontologyTurtle", onField: noop, onChange: noop, onAbsent: noop, readOnly: true,
+      sources, field: "ontologyTurtle", onField: noop, onChange: noop, onAbsent: noop, onBeginImport: () => ({ isCurrent: () => false, commit: noop }), readOnly: true,
     }));
     expect(html).toMatch(/type="file"[^>]*disabled=""/);
     expect(html).toMatch(/readonly=""/i);
