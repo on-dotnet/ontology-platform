@@ -1,0 +1,120 @@
+{
+  "stage": "M2_API_PG_JENA_REAL_OIDC",
+  "status": "PASS",
+  "overallG2": "PARTIAL",
+  "checks": [
+    {
+      "name": "anonymous_authorization_before_malformed_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "anonymous_publication_proposal_prebinding_401",
+      "status": "PASS",
+      "observedStatus": 401
+    },
+    {
+      "name": "anonymous_publication_decision_prebinding_401",
+      "status": "PASS",
+      "observedStatus": 401
+    },
+    {
+      "name": "anonymous_publication_activation_prebinding_401",
+      "status": "PASS",
+      "observedStatus": 401
+    },
+    {
+      "name": "operator-ab_real_http_only_session",
+      "status": "PASS"
+    },
+    {
+      "name": "operator-ab_csrf",
+      "status": "PASS"
+    },
+    {
+      "name": "viewer-ab_real_http_only_session",
+      "status": "PASS"
+    },
+    {
+      "name": "viewer-ab_csrf",
+      "status": "PASS"
+    },
+    {
+      "name": "viewer-a_real_http_only_session",
+      "status": "PASS"
+    },
+    {
+      "name": "viewer-a_csrf",
+      "status": "PASS"
+    },
+    {
+      "name": "m2_current_profile_v2",
+      "status": "PASS"
+    },
+    {
+      "name": "m2_http_1",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m2_http_2",
+      "status": "PASS",
+      "observedStatus": 428
+    },
+    {
+      "name": "m2_http_3",
+      "status": "PASS",
+      "observedStatus": 409
+    },
+    {
+      "name": "m2_http_4",
+      "status": "PASS",
+      "observedStatus": 400
+    },
+    {
+      "name": "m2_http_5",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "m2_http_6",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "m2_rejections_preserve_revision_hash",
+      "status": "PASS"
+    },
+    {
+      "name": "m2_http_8",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m2_api_named_edit_persisted",
+      "status": "PASS"
+    },
+    {
+      "name": "m2_api_other_sources_exact",
+      "status": "PASS"
+    },
+    {
+      "name": "m2_http_11",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m2_api_real_assessment_current_bound",
+      "status": "PASS"
+    },
+    {
+      "name": "m2_api_real_pg_revision_read",
+      "status": "PASS"
+    }
+  ],
+  "failure": null,
+  "notRun": [
+    "S2 publishing browser",
+    "S3 gateway MCP MAF SSE",
+    "final regression and CI"
+  ]
+}

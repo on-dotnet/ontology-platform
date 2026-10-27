@@ -1,0 +1,39 @@
+test_actual_process_start_failure_marks_current_failed_and_later_not_run (__main__.M1OrchestrationTests.test_actual_process_start_failure_marks_current_failed_and_later_not_run) ... ok
+test_all_real_gate_selections_include_m1_and_regressions (__main__.M1OrchestrationTests.test_all_real_gate_selections_include_m1_and_regressions) ... ok
+test_each_child_failure_stops_later_gates (__main__.M1OrchestrationTests.test_each_child_failure_stops_later_gates) ... ok
+test_failed_attempt_cannot_consume_or_certify_stale_pass (__main__.M1OrchestrationTests.test_failed_attempt_cannot_consume_or_certify_stale_pass) ... ok
+test_first_m2_integration_selects_real_api_only_without_claiming_full_gates (__main__.M1OrchestrationTests.test_first_m2_integration_selects_real_api_only_without_claiming_full_gates) ... ok
+test_m2_cannot_reuse_m1_runtime_or_enable_m3 (__main__.M1OrchestrationTests.test_m2_cannot_reuse_m1_runtime_or_enable_m3) ... usage: g3-acceptance-runtime.py [-h] [--runtime-file RUNTIME_FILE]
+                                [--start-runtime] [--milestone {M1,M2}]
+                                [--api-only] [--ui-only]
+g3-acceptance-runtime.py: error: Protected G2 or unrelated runtime refused
+usage: g3-acceptance-runtime.py [-h] [--runtime-file RUNTIME_FILE]
+                                [--start-runtime] [--milestone {M1,M2}]
+                                [--api-only] [--ui-only]
+g3-acceptance-runtime.py: error: argument --milestone: invalid choice: 'M3' (choose from 'M1', 'M2')
+ok
+test_m2_selects_its_own_runtime_evidence_and_authenticated_checks (__main__.M1OrchestrationTests.test_m2_selects_its_own_runtime_evidence_and_authenticated_checks) ... ok
+test_protected_g2_runtime_is_refused (__main__.M1OrchestrationTests.test_protected_g2_runtime_is_refused) ... usage: g3-acceptance-runtime.py [-h] [--runtime-file RUNTIME_FILE]
+                                [--start-runtime] [--milestone {M1,M2}]
+                                [--api-only] [--ui-only]
+g3-acceptance-runtime.py: error: Protected G2 or unrelated runtime refused
+ok
+test_second_m2_integration_selects_only_real_ui_checkpoint (__main__.M1OrchestrationTests.test_second_m2_integration_selects_only_real_ui_checkpoint) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.718s
+
+OK
+{"status": "FAIL", "runId": "a42596762dda457a949710c8a0eb3305", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/a42596762dda457a949710c8a0eb3305"}
+{"status": "PASS", "runId": "9278ed7ae9574e33a6aedc3da5a05226", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/9278ed7ae9574e33a6aedc3da5a05226"}
+{"status": "FAIL", "runId": "d609fbc652f14cfaa2d157cfa8467ec5", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/d609fbc652f14cfaa2d157cfa8467ec5"}
+{"status": "FAIL", "runId": "91030bd62ae64786ad5f8eb65c414f3d", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/91030bd62ae64786ad5f8eb65c414f3d"}
+{"status": "FAIL", "runId": "0fb665d28cb84f6f9dfc5524cb7582d5", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/0fb665d28cb84f6f9dfc5524cb7582d5"}
+{"status": "FAIL", "runId": "96311516810247ed9de354dbb8c2e1e4", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/96311516810247ed9de354dbb8c2e1e4"}
+{"status": "FAIL", "runId": "d2a62d2a835548ea9c04d0e2d1571826", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/d2a62d2a835548ea9c04d0e2d1571826"}
+{"status": "FAIL", "runId": "63abd03558d549bebd233b6d61311bcd", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/63abd03558d549bebd233b6d61311bcd"}
+{"status": "FAIL", "runId": "a1c41fd5e04b42b69188039ab462b6a2", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/a1c41fd5e04b42b69188039ab462b6a2"}
+{"status": "FAIL", "runId": "2bbdae34d32f40f6ae87b4e29fbf9464", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/2bbdae34d32f40f6ae87b4e29fbf9464"}
+{"status": "PASS", "runId": "2d41239c7022406c823b5a300d32c48e", "evidenceDirectory": "docs/evidence/G3-M2-001/runtime/g3-m2-control/2d41239c7022406c823b5a300d32c48e"}
+{"status": "PASS", "runId": "9c3665631ee745ea95be0b66311573bc", "evidenceDirectory": "docs/evidence/G3-M2-001/runtime/g3-m2-control/9c3665631ee745ea95be0b66311573bc"}
+{"status": "PASS", "runId": "0db814f1903b4551aec748182bc9bade", "evidenceDirectory": "docs/evidence/G3-M2-001/runtime/g3-m2-control/0db814f1903b4551aec748182bc9bade"}

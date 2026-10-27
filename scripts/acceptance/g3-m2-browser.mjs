@@ -116,6 +116,8 @@ export async function runM2Checks(context) {
     await treeNode.focus();
     await page.keyboard.press("Enter");
     observe("tree_keyboard_select", await treeNode.getAttribute("aria-pressed") === "true");
+    await page.getByRole("button", { name: "图视图", exact: true }).click();
+    await page.locator(".g2-graph canvas").first().waitFor();
     await mkdir(resolve(evidence, "screenshots"), { recursive: true });
     for (const width of [1440, 390]) {
       await page.setViewportSize({ width, height: 1000 });
@@ -129,6 +131,7 @@ export async function runM2Checks(context) {
       }
     }
     await page.setViewportSize({ width: 1440, height: 1000 });
+    if (context.uiOnly) { status = "PASS"; return; }
     step("edited_asset_publish_query_rollback");
     // 同一编辑后的资产复用既有异人审批/正式RustFS/Jena/查询/Run/SSE/回滚链，非另一套服务。
     await fullChain({ ...context, draft, check: observe, setPhase: step });
@@ -167,8 +170,8 @@ export async function runM2Checks(context) {
     status = "PASS";
   } finally {
     const report = { status, phase, startedAtUtc, completedAtUtc: new Date().toISOString(), checks,
-      sourceHead: execFileSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).trim(), scope: context.apiOnly ? "API_ONLY: real OIDC/API/PG/Jena exact edit and assessment" : "real M2 UI/API/PG/Jena/RustFS with retained G2 chain", notRun: [...(context.apiOnly ? ["UI editing/layout/keyboard", "publication/formal query/rollback", "compatibility and other six runtime gates"] : []), "real LLM", "full OWL reasoning", "Windows/Intel native", "production HA/SLO"] };
-    await writeFile(resolve(evidence, context.apiOnly ? "m2-api.json" : "m2-browser.json"), JSON.stringify(report, null, 2) + "\n");
+      sourceHead: execFileSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).trim(), scope: context.apiOnly ? "API_ONLY: real OIDC/API/PG/Jena exact edit and assessment" : context.uiOnly ? "UI_ONLY: real UI/API exact editing and persistence" : "real M2 UI/API/PG/Jena/RustFS with retained G2 chain", notRun: [...(context.apiOnly || context.uiOnly ? [...(context.apiOnly ? ["UI editing/layout/keyboard"] : []), "publication/formal query/rollback", "compatibility and other six runtime gates"] : []), "real LLM", "full OWL reasoning", "Windows/Intel native", "production HA/SLO"] };
+    await writeFile(resolve(evidence, context.apiOnly ? "m2-api.json" : context.uiOnly ? "m2-ui.json" : "m2-browser.json"), JSON.stringify(report, null, 2) + "\n");
     if (status !== "PASS" || checks.length === 0) process.exitCode = 1;
   }
 }

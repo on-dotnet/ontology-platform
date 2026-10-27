@@ -22,10 +22,13 @@ def run_attempt():
     parser.add_argument('--start-runtime', action='store_true')
     parser.add_argument('--milestone', choices=['M1', 'M2'], default='M1')
     parser.add_argument('--api-only', action='store_true')
+    parser.add_argument('--ui-only', action='store_true')
     args = parser.parse_args()
     if not args.runtime_file and not args.start_runtime:
         parser.error('Choose an owned runtime or explicitly start a new M1 stack')
-    if args.api_only and args.milestone != 'M2':
+    if args.api_only and args.ui_only:
+        parser.error('Choose one integration checkpoint')
+    if (args.api_only or args.ui_only) and args.milestone != 'M2':
         parser.error('API integration checkpoint is authorized only for M2')
     task_id = 'G3-' + args.milestone + '-001'
     task_evidence = 'docs/evidence/' + task_id + '/runtime'
@@ -53,10 +56,10 @@ def run_attempt():
     source_head = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
     gate_names = ['full-g2-e2e.py', 'g3-compatibility.py', 'g1-regression.py', 'g2-observability.py',
                   'g2-trace-browser.mjs', 'g2-readiness-fault.py', 'performance-baseline.py']
-    if args.api_only:
+    if args.api_only or args.ui_only:
         gate_names = gate_names[:1]
     acceptance = {'runId': run_id, 'sourceHead': source_head, 'volumePrefix': runtime['volumePrefix'],
-                  'scope': 'API_ONLY' if args.api_only else 'FULL', 'milestone': args.milestone,
+                  'scope': 'API_ONLY' if args.api_only else 'UI_ONLY' if args.ui_only else 'FULL', 'milestone': args.milestone,
                   'evidenceDirectory': str(evidence.relative_to(ROOT.resolve())), 'status': 'RUNNING',
                   'startedAtUtc': datetime.datetime.now(datetime.timezone.utc).isoformat(),
                   'gates': [{'name': name, 'status': 'NOT_RUN', 'exitCode': None} for name in gate_names]}
@@ -106,8 +109,8 @@ def run_attempt():
             [sys.executable, 'scripts/acceptance/performance-baseline.py', '--from-observed-run'],
         ]
         if args.milestone == 'M2':
-            commands[0].append('--m2-api-only' if args.api_only else '--m2')
-        if args.api_only:
+            commands[0].append('--m2-api-only' if args.api_only else '--m2-ui-only' if args.ui_only else '--m2')
+        if args.api_only or args.ui_only:
             commands = commands[:1]
         for index, command in enumerate(commands):
             acceptance['gates'][index]['status'] = 'RUNNING'

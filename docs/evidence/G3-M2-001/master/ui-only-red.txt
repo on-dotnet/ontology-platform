@@ -1,0 +1,66 @@
+test_actual_process_start_failure_marks_current_failed_and_later_not_run (__main__.M1OrchestrationTests.test_actual_process_start_failure_marks_current_failed_and_later_not_run) ... ok
+test_all_real_gate_selections_include_m1_and_regressions (__main__.M1OrchestrationTests.test_all_real_gate_selections_include_m1_and_regressions) ... ok
+test_each_child_failure_stops_later_gates (__main__.M1OrchestrationTests.test_each_child_failure_stops_later_gates) ... ok
+test_failed_attempt_cannot_consume_or_certify_stale_pass (__main__.M1OrchestrationTests.test_failed_attempt_cannot_consume_or_certify_stale_pass) ... ok
+test_first_m2_integration_selects_real_api_only_without_claiming_full_gates (__main__.M1OrchestrationTests.test_first_m2_integration_selects_real_api_only_without_claiming_full_gates) ... ok
+test_m2_cannot_reuse_m1_runtime_or_enable_m3 (__main__.M1OrchestrationTests.test_m2_cannot_reuse_m1_runtime_or_enable_m3) ... usage: g3-acceptance-runtime.py [-h] [--runtime-file RUNTIME_FILE]
+                                [--start-runtime] [--milestone {M1,M2}]
+                                [--api-only]
+g3-acceptance-runtime.py: error: Protected G2 or unrelated runtime refused
+usage: g3-acceptance-runtime.py [-h] [--runtime-file RUNTIME_FILE]
+                                [--start-runtime] [--milestone {M1,M2}]
+                                [--api-only]
+g3-acceptance-runtime.py: error: argument --milestone: invalid choice: 'M3' (choose from 'M1', 'M2')
+ok
+test_m2_selects_its_own_runtime_evidence_and_authenticated_checks (__main__.M1OrchestrationTests.test_m2_selects_its_own_runtime_evidence_and_authenticated_checks) ... ok
+test_protected_g2_runtime_is_refused (__main__.M1OrchestrationTests.test_protected_g2_runtime_is_refused) ... usage: g3-acceptance-runtime.py [-h] [--runtime-file RUNTIME_FILE]
+                                [--start-runtime] [--milestone {M1,M2}]
+                                [--api-only]
+g3-acceptance-runtime.py: error: Protected G2 or unrelated runtime refused
+ok
+test_second_m2_integration_selects_only_real_ui_checkpoint (__main__.M1OrchestrationTests.test_second_m2_integration_selects_only_real_ui_checkpoint) ... usage: g3-acceptance-runtime.py [-h] [--runtime-file RUNTIME_FILE]
+                                [--start-runtime] [--milestone {M1,M2}]
+                                [--api-only]
+g3-acceptance-runtime.py: error: unrecognized arguments: --ui-only
+ERROR
+
+======================================================================
+ERROR: test_second_m2_integration_selects_only_real_ui_checkpoint (__main__.M1OrchestrationTests.test_second_m2_integration_selects_only_real_ui_checkpoint)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/scripts/tests/G3Acceptance.Tests.py", line 100, in test_second_m2_integration_selects_only_real_ui_checkpoint
+    code,calls,proof,_,_=self.exercise(prefix='g3-m2-control',milestone='M2',ui_only=True)
+                         ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/scripts/tests/G3Acceptance.Tests.py", line 64, in exercise
+    code = module.main()
+  File "/Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/scripts/acceptance/g3-acceptance-runtime.py", line 153, in main
+    return run_attempt()
+  File "/Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/scripts/acceptance/g3-acceptance-runtime.py", line 25, in run_attempt
+    args = parser.parse_args()
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/argparse.py", line 1930, in parse_args
+    self.error(msg)
+    ~~~~~~~~~~^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/argparse.py", line 2686, in error
+    self.exit(2, _('%(prog)s: error: %(message)s\n') % args)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/argparse.py", line 2673, in exit
+    _sys.exit(status)
+    ~~~~~~~~~^^^^^^^^
+SystemExit: 2
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.705s
+
+FAILED (errors=1)
+{"status": "FAIL", "runId": "6f89e2faba004500907872eb0bc5dfbb", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/6f89e2faba004500907872eb0bc5dfbb"}
+{"status": "PASS", "runId": "680cf028fc6a41ae8593b3b2756cc2de", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/680cf028fc6a41ae8593b3b2756cc2de"}
+{"status": "FAIL", "runId": "4d837803f439452fa748318115ff8d3c", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/4d837803f439452fa748318115ff8d3c"}
+{"status": "FAIL", "runId": "8d1e4b9a4d37456e99f66ee26b9f0324", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/8d1e4b9a4d37456e99f66ee26b9f0324"}
+{"status": "FAIL", "runId": "8322693375f74fa49130e3b2edcaf109", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/8322693375f74fa49130e3b2edcaf109"}
+{"status": "FAIL", "runId": "4b4cf68019a240778c7c86bf399db2c0", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/4b4cf68019a240778c7c86bf399db2c0"}
+{"status": "FAIL", "runId": "2546f63f76d648cbb367ec1f56df78d8", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/2546f63f76d648cbb367ec1f56df78d8"}
+{"status": "FAIL", "runId": "b2d0f1c1f8e144c784ee93c39c521ed1", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/b2d0f1c1f8e144c784ee93c39c521ed1"}
+{"status": "FAIL", "runId": "6c01c5eeaae0456c9d6d32560dad79b2", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/6c01c5eeaae0456c9d6d32560dad79b2"}
+{"status": "FAIL", "runId": "70a3b34d8f4741bfb36db89b1e4bb02d", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/70a3b34d8f4741bfb36db89b1e4bb02d"}
+{"status": "PASS", "runId": "d4cd770ef13a4ad7b27398ce838e77f1", "evidenceDirectory": "docs/evidence/G3-M2-001/runtime/g3-m2-control/d4cd770ef13a4ad7b27398ce838e77f1"}
+{"status": "PASS", "runId": "242def92b1894467a00b9a737a1761d3", "evidenceDirectory": "docs/evidence/G3-M2-001/runtime/g3-m2-control/242def92b1894467a00b9a737a1761d3"}
