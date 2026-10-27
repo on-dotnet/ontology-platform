@@ -1,0 +1,45 @@
+RUN  v5.0.5 /Users/chasen/.codex/worktrees/g3-m1-web/ontology-platform/apps/web
+
+ ❯ src/features/ontology/m1-behavior.test.ts (23 tests | 2 failed) 4ms
+   ❯ M1 字节与不确定性边界 (23)
+     × 缺失OWL阶段不能猜测为NOT_RUN 1ms
+     × 未识别推理模式明确UNKNOWN，不能沿用asserted-only资格 0ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/features/ontology/m1-behavior.test.ts > M1 字节与不确定性边界 > 缺失OWL阶段不能猜测为NOT_RUN
+AssertionError: expected 'ELIGIBLE' not to be 'ELIGIBLE' // Object.is equality
+ ❯ src/features/ontology/m1-behavior.test.ts:61:94
+     59|   it("缺失OWL阶段不能猜测为NOT_RUN", () => {
+     60|     const stages = assessment.stages.filter(stage => stage.name !== "O…
+     61|     expect(assessmentEligibility({ ...assessment, stages }, draft, pro…
+       |                                                                                              ^
+     62|   });
+     63|   it("未识别推理模式明确UNKNOWN，不能沿用asserted-only资格", () => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/features/ontology/m1-behavior.test.ts > M1 字节与不确定性边界 > 未识别推理模式明确UNKNOWN，不能沿用asserted-only资格
+AssertionError: expected 'ELIGIBLE' to match /UNKNOWN/
+
+- Expected:
+/UNKNOWN/
+
++ Received:
+"ELIGIBLE"
+
+ ❯ src/features/ontology/m1-behavior.test.ts:64:113
+     62|   });
+     63|   it("未识别推理模式明确UNKNOWN，不能沿用asserted-only资格", () => {
+     64|     expect(assessmentEligibility(assessment, draft, { ...profile, reas…
+       |                                                                                                                 ^
+     65|   });
+     66|   it("dirty源不沿用已保存修订的资格", () => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 21 passed (23)
+   Start at  11:29:11
+   Duration  77ms (transform 51%, import 24%, tests 18%, worker 7%)
