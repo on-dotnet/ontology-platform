@@ -23,7 +23,7 @@ G3-M1-001复用执行器时只准本任务已提交CLOSED合成归属证明的`g
 
 ## DoD 与交接
 
-输出实际before/after数量/容量、成功动作、未清理原因和复查触发条件；保留开发环境抽查与工程验证证据。任务/ADR/失败分析/历史Git不删。交接写明确提交、测试/CI/run、恢复入口、未运行平台与新Master开始时动态fetch的origin/main；不让旧SHA成为未来固定基线。阶段结束交一个从已提交Head生成并独立复检的V2包，停在当前复审关口，不自动开始下一阶段Plan或功能。
+输出实际before/after数量/容量、成功动作、未清理原因和复查触发条件；保留开发环境抽查与工程验证证据。任务/ADR/失败分析/历史Git不删。交接写明确提交、测试/CI/run、恢复入口、未运行平台与新Master开始时动态fetch的origin/main；不让旧SHA成为未来固定基线。阶段结束交一个从已提交Head生成并独立复检的V3包，停在当前复审关口，不自动开始下一阶段Plan或功能。
 
 ## 实际清理门禁（PRE-G3-CLEANUP-FIX-002）
 
@@ -38,3 +38,14 @@ G3-M1-001复用执行器时只准本任务已提交CLOSED合成归属证明的`g
 ## Build history持久删除门禁
 
 BuildKit v0.34.0的单Ref inspect可能留下零计数引用，使rm仅写内存deleted；列表缺席不能当DB持久删除。当前已审核Buildx0.38.1/BuildKit0.34.0单desktop-linux docker节点：historyBackend计划冻结context/EngineID/bridge generation/完整CLI与server版本/节点；用ref-only列表定位^offset读取原允许字段，必须返回Ref与完整版本指纹吻合。删除后除了列表缺席，还仅接受固定客户端精确的准确ID no-record诊断，deleted/transport/权限/错误Ref一律NOT_VERIFIED/failed。前后generation变化拒绝，raw stderr不输出。旧计划是对应旧提交的历史事实，不能当新工具可重放计划。不得为绕过持久化问题全局restart/update/prune/改内部DB；只在原精确范围重新审查，记录自然生命周期后的实际持久检查。
+
+
+## CLOSEOUT-002 创建即治理与真实收尾
+
+本轮明确授权处理经逐项归属验证的旧G2测试卷、重复Fuseki image及已关闭history；不复用旧任务身份。创建资源必须登记project、TaskId、RunId、资源前缀/环境、创建时间、canonical image/context哈希、准确ID和恢复入口。历史无label资源以已提交来源和当前metadata交叉证明，不能从名称或<none>推断。
+
+分类为KEEP_PRIMARY_DEV、KEEP_UNIQUE_RECOVERY、SAFE_CANDIDATE、AMBIGUOUS、UNREFERENCED_IMAGE、EXPIRED_BUILD_HISTORY。每个保留对象写准确ID/关联runtime路径metadata/挂载、保留理由、解除条件和复核触发，不复制runtime、env、PFX或卷内容。日常保留一套，其他合成环境以已验证可再生入口或完整可验证备份通过独立审查后清理；私有runtime存在本身不证明全部数据唯一。
+
+Apply必须精确白名单、24h内有效期、实际Engine/context/builder版本与代际、资源指纹、无容器/manifest引用、已提交关闭/合成来源证据及前后逐项日志。逻辑大小、共享层、history metadata、cache、容器stdout与Loki/Tempo卷分别报告，不能叠加显示容量冒充回收。APFS/VM sparse disk没有实测就NOT_VERIFIED。history按现行强无记录诊断并在自然生命周期后再核对；没有发生自然代际时明确NOT_VERIFIED，不主动重启。
+
+验收先隔离fixture真实Docker资源再项目Apply；mock只能验证拒绝路径。必须保留开发环境集合并做健康探针或具体说明限制。稳定Head同CI、唯一默认V3包独立重开后交付；[效率规则](ai-development-efficiency.md)约束新Master和换机器恢复入口。

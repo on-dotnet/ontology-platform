@@ -19,10 +19,19 @@
 
 ## 阶段收尾与资源生命周期（PRE-G3-HYGIENE-001）
 
-每里程碑获审后按[生命周期规范](docs/development/resource-lifecycle.md)记录分支/Worktree、Docker、ZIP和ignored目录归属，核实集成与跨机器活跃引用；先commit/push、独立Review及同Head CI，再做白名单安全回收。保护活跃/锁定/旧Master树、未集成代码、私有工具与持久数据，疑义保留并写明复查条件；不触碰全局codex/其他项目/生产。记录before/after数量、容量、准确命令/退出码、实际回收及DEFERRED理由，提交测试恢复入口写下一阶段交接。维护多Agent独立托管Worktree并行能力，Master唯一集成main；不为减少资源恢复共用main串行开发。无需每个安全小步骤再询问，但有歧义/不可逆/生产/跨项目操作暂停对应项。Review ZIP默认采用[V2合同](docs/development/review-package-spec.md)，全部现行非证据源码和当前任务证据各存一次、历史证据/blob/二进制变更完整索引；只交一个已提交Head且独立重开的compact包，旧包校验兼容，不改历史SHA。交付后停等当前关口复审，不自动进入下阶段。
+每里程碑获审后按[生命周期规范](docs/development/resource-lifecycle.md)记录分支/Worktree、Docker、ZIP和ignored目录归属，核实集成与跨机器活跃引用；先commit/push、独立Review及同Head CI，再做白名单安全回收。保护活跃/锁定/旧Master树、未集成代码、私有工具与持久数据，疑义保留并写明复查条件；不触碰全局codex/其他项目/生产。记录before/after数量、容量、准确命令/退出码、实际回收及DEFERRED理由，提交测试恢复入口写下一阶段交接。维护多Agent独立托管Worktree并行能力，Master唯一集成main；不为减少资源恢复共用main串行开发。无需每个安全小步骤再询问，但有歧义/不可逆/生产/跨项目操作暂停对应项。Review ZIP默认采用[V3合同](docs/development/review-package-spec.md)，全部现行非证据源码和当前任务证据各存一次、历史证据/blob/二进制变更完整索引；只交一个已提交Head且独立重开的compact包，旧包校验兼容，不改历史SHA。交付后停等当前关口复审，不自动进入下阶段。
 
 ## 实际回收纠偏（PRE-G3-CLEANUP-FIX-002）
 
 阶段已确认关闭且精确安全候选满足条件时，Master必须使用已审白名单实际清理，不再用不可取得的旧聊天证明或统一DEFERRED掩盖缺口。存在安全候选却0删除=FAIL；具体锁定/独特未整合提交/私有runtime/PFX/唯一数据或命令故障逐项列对象、证据、解除条件，其它安全项继续。执行器默认DryRun，Apply需精确ID/期望版本/目录边界/过期拒绝/重验及before-command-exit-after日志；当前/locked/keep路径及后代保护，远端expectedTip用原子compare-and-delete，不覆盖Git历史。阶段DoD必须包含真实资源回收验收与开发环境保留验证；构包54测试不能替代清理测试。公开Git history/任务refs/证据检查只报路径/类别、不泄漏原秘密，不改远端历史。多Agent独立Worktree和Master唯一main集成规则保持，禁止跨项目/全局清理和自动G3。详见生命周期规范及FIX-002任务合同。
 
 Build history回收不能只凭rm exit0/list缺席；须避免单Ref查询零计数陷阱，冻结已审核单节点后端版本/代际，严格验证准确ID持久无记录诊断，并记录自然生命周期后的实测。内存tombstone或后验回现须撤回该项完成结论，保留原时点日志，不主动全局重启/升级/改DB绕过。
+
+
+## G3-M1-CLOSEOUT-002 永久效率与交付入口
+
+新Master及子Agent开工必须从最新origin/main读取当前授权、任务/交接、资源清单、[效率规则](docs/development/ai-development-efficiency.md)、[Review V3合同](docs/development/review-package-spec.md)和[生命周期规范](docs/development/resource-lifecycle.md)。先Preflight、后冻结公共合同与正反测试，再独立Worktree并行；公共契约Single Writer。失败先廉价分层定位，不重复无关完整验收；稳定Head必须实际完整同HeadCI。
+
+交付冻结顺序固定：源码/格式 → 测试 → 独立Review → 提交 → 同HeadCI → 唯一V3构包 → 独立重开 → 回执。最终diff-check必须exit0，历史失败仍保留。代表截图最多12张、PNG压缩目标3MiB，过程证据从精确Git对象恢复；ignored只入聚合索引。>10MiB报分类体积，>15MiB默认阻断。V1/V2历史VerifyOnly兼容且不改历史SHA。
+
+Fuseki只使用canonical内容寻址构建入口及已校验共享镜像，AppHost不另建随机镜像。资源创建即记录TaskId/RunId/标签/清单；阶段关闭准确白名单回收自身资源，跨任务旧环境保留一套日常开发，其余必须有可再生或可验证备份依据。每个KEEP写准确对象、理由及解除条件；无socket不能标Docker PASS，禁止全局prune/restart/改DB。永久回归由verify -SelfTest及同HeadCI执行，不把静态规则测试当产品测试。
