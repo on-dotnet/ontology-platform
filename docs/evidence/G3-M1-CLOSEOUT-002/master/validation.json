@@ -97,6 +97,13 @@
       "status": "PASS",
       "exitCode": 0,
       "output": "Affected10 tests0 failures plus complete static gate PASS; timeout/nonzero failures retained in safe atomic receipts and recoverable CI stderr, no secrets, locks released, budget/source unchanged; independent scoped review PASS."
+    },
+    {
+      "name": "review-evidence-normalization",
+      "command": "pwsh -NoProfile -File scripts/tests/ReviewPackage.Tests.ps1; pwsh -NoProfile -File scripts/tests/ReviewPackage.Tests.ps1 -CaseFilter 'validation metadata*'",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Author full96/0 + Master affected6/0 and repository static PASS; V1/V2/V3 unknown metadata original bytes preserved, normalized onlychecks/ci, FAIL and strict PASS/CI guards unchanged; independent scoped reviewPASS. Original production EVIDENCE_MISMATCH retained; no ZIPpublished."
     }
   ],
   "ci": {

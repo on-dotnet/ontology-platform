@@ -30,3 +30,12 @@ Master拥有公共规则/CI/脚本集成；PACKAGE独立树g3-m1-closeout-packag
 仅失败job在相同Head复跑一次（attempt2），已实际completed/success且两个job成功，见ci-previous-candidate-attempt2.json；首次失败仍保留，不从复跑成功反推具体网络根因，也不把旧Head成功复用为诊断修复后新Head成功。未增加超时预算或自动无限retry。该事件暴露H5诊断缺口：旧helper丢弃原始输出后没有安全阶段receipt，已用唯一受限修复波a3d263b+f319717补齐（Master cherry为ba578fc+c8b75ff）。失败时仅持久化/输出严格安全命令、Task/Run/context、退出或TIMEOUT、耗时、hash/size、最多12静态阶段与固定错误类别，原始secret/env/buildargs不入证据；CI stderr保留同一摘要以免临时runner销毁丢证据。成功输出、600秒预算、Dockerfile、已批准镜像内容不变。
 
 独立限定审查两段均Spec/Quality PASS、C0/I0/M0；Master受影响增量10单测/2真实reuse/完整静态门禁均PASS，本地10镜像/0history不增长。不重跑无关业务；最终新Head必须重新跑完整双jobCI，再构唯一正式V3，不将旧failed候选的结果当新Head成功。
+
+
+## 真实正式构包后验失败与规范化修复
+
+c520f4dbc236f6f8e8e427addc0a649f36de72b3已实际通过同HeadCI40491424804 attempt1两个job，并由Master安全FFmain/push，保护原6个未跟踪.DS_Store。随后正式默认V3内部重开返回EVIDENCE_MISMATCH，无ZIP发布、partial自动删除、无有效包覆盖，原命令/退出/短日志/CI/后验见package-attempt1-failure-index.json及txt，旧CI全事实见ci-c520-before-package.json。未伪造PASS或交临时Slim。
+
+根因是原始validation顶层note/context被Get-ReviewEvidence一并返回，而manifest规范化只有checks/ci。最小修复原6b0ec74（Master dcf7b17）只投影checks/ci，原始note/context及失败证据完整字节/OID/hash原样保留，所有原状态/CI/秘密/散列/路径检查不变；合同明确附加metadata无状态权限。新6项RED→GREEN，完整96/0；Master相关6/0+静态PASS；独立限定Spec/Quality PASS、C0/I0/M0。未重做业务、Docker或UI，所有资源35真实清理和跨自然代际证据仍有效。
+
+最小修复后新的最终Head必须重新完整同HeadCI，不能复用c520成功；再由正式工具发布唯一默认V3，并独立重开，后置结果以实际manifest/回执读取。至今没有发布本任务任何Review ZIP，也没有修改历史ZIP字节。原始顶层note未为封包而删除。

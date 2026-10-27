@@ -1,0 +1,7 @@
+# 正式生产构包边界的限定独立复审
+
+Reviewer=whole_review，非作者只读。冻结源码SHA256 c442424cc35e2f718b9b207993df1186ec2c21e7636855fca1e72da2a04fc2be；测试SHA b43471bb2ab826f5555a344d77509463301468fd02907757b20be90acdef52ae；合同SHA fa46331a70c2cdf7bbe62a8885da975c8db461adc83a485c6151ada84da49f8a均实核一致，diff-check0。Spec PASS / Quality PASS，C0/I0/M0。
+
+正式函数仅在所有原状态/DeclaredPASS/CI/安全校验后return投影checks/ci。未知顶层note/context没有状态权限；原JSON字节仍在Git snapshot，V2/V3单份payload与OID/hash/size恢复，原CI不被规范化对象改写。六真实Git/ZIP回归分别覆盖V1/V2/V3原文/嵌套metadata/独立重开、FAIL不被extraPASS掩盖、DeclaredPASS拒绝、前有效PARTIAL包SHA不变。原RED6项准确EVIDENCE_MISMATCH，GREEN6通过。未删原Master note、改状态或降低门禁。
+
+Author完整96/0实际exit0在PACKAGE/normalization-fix/full-regression.txt；Master cherry为dcf7b17后相关6/0及完整静态门禁独立exit0。原生产失败保留且无ZIP发布，partial已安全清理。旧c520CI成功不可用于修复后的Head；最终新Head完整同Head双job/唯一V3重开仍须实际执行。

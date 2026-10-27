@@ -1,0 +1,17 @@
+{
+  "observedAt": "2026-10-27T11:12:38.882912+00:00",
+  "base": "47935fb2eda3d708e628a1b23ccd897e2250ff33",
+  "head": "c520f4dbc236f6f8e8e427addc0a649f36de72b3",
+  "schemaVersion": 3,
+  "taskId": "G3-M1-CLOSEOUT-002",
+  "ciRunId": 40491424804,
+  "ciJobs": "engineering/governance-integration both actualsuccess before creation",
+  "command": "pwsh -NoProfile -File scripts/create-review-package.ps1 -Root <Master> -BaseSha 47935fb2eda3d708e628a1b23ccd897e2250ff33 -HeadSha c520f4dbc236f6f8e8e427addc0a649f36de72b3 -TaskId G3-M1-CLOSEOUT-002 -Status PARTIAL -EvidencePath docs/evidence/G3-M1-CLOSEOUT-002/master/validation.json -CiRunId 40491424804 -CiRunUrl https://github.com/on-dotnet/ontology-platform/actions/runs/40491424804 -CiCommit c520f4dbc236f6f8e8e427addc0a649f36de72b3 -CiConclusion success",
+  "exitCode": 1,
+  "error": "FAIL: EVIDENCE_MISMATCH: recorded statuses differ from evidence input",
+  "publishedZipCount": 0,
+  "partialCountAfterFailure": 0,
+  "existingValidZipOverwritten": false,
+  "failureLogSha256": "e8a5ccb17935d736899f210f8ac87896c06ee952dda66907c3af18615c152a8e",
+  "rootCause": "Get-ReviewEvidence returned non-authoritative top-level note/context while manifest records onlychecks/ci; internal reopen comparemismatch. Raw committed evidence must stayunchanged; fix normalizedprojection and testallversions, nobypass."
+}

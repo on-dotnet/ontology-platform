@@ -1,0 +1,9 @@
+
+Check             Status Message
+-----             ------ -------
+repository-static PASS   检查2313个文件：语法/格式/相对链接/有限机密模式/基线…
+
+NOT_RUN: .NET原生检查需显式-RunNative及对应任务授权。
+NOT_RUN: Web独立检查需真实目标及显式-RunNative。
+NOT_RUN: 浏览器真实OIDC/E2E需独立受控联调，不隐式混入工程检查。
+PASS: 所选工程检查；范围以逐项输出为准，不表示业务、前端或整个G1通过。

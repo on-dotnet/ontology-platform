@@ -30,3 +30,6 @@ Master实际35项Docker Apply成功、保留8卷四服务前后健康通过；�
 
 
 最终CI唯一修复波：fdafb的run40487172435 attempt1在镜像获取600秒超时（非业务测试失败），保留日志与未知内部阶段。RESOURCE相同owned_paths补canonical失败脱敏receipt/CI摘要及10项回归，原a3d263b+f319717，Master ba578fc+c8b75ff，whole_review两段限定复审PASS。Master增量10/2real/static通过；不改Dockerfile/600预算/依赖/业务。新最终Head CI与唯一包必须实际后置读取，不复用旧Head结果。
+
+
+正式构包真实后验修复：c520完整同Head双job成功并FFmain后正式V3 fail-closed EVIDENCE_MISMATCH，无ZIP发布。PACKAGE原6b0ec74/Master dcf7b17仅规范化checks/ci，原note/context字节保留；新6RED→GREEN、完整96/0、Master6/0+static、独立限定PASS。新最终Head再完整CI/唯一ZIP/独立重开，不复用旧成功、不删除失败证据或原note。

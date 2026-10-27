@@ -35,6 +35,26 @@
       "attempt": 2,
       "status": "success",
       "scope": "one failed-job retry; not reused as diagnostic-repair Head CI"
+    },
+    {
+      "runId": 40491424804,
+      "head": "c520f4dbc236f6f8e8e427addc0a649f36de72b3",
+      "attempt": 1,
+      "status": "success",
+      "scope": "fullCI before actual production package EVIDENCE_MISMATCH; subsequent normalization Head requires newCI"
+    }
+  ],
+  "normalizationEvidenceFreezeUtc": "2026-10-27T11:22:26.022744+00:00",
+  "packageEvents": [
+    {
+      "head": "c520f4dbc236f6f8e8e427addc0a649f36de72b3",
+      "status": "FAIL",
+      "exitCode": 1,
+      "phase": "internal reopen authoritative evidence mismatch",
+      "published": false,
+      "partialRetained": false,
+      "rootCause": "non-authoritative top-level metadata included in expected status object",
+      "evidence": "package-attempt1-failure-index.json"
     }
   ]
 }
