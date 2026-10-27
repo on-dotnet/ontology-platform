@@ -1,0 +1,16 @@
+Scope: all 2 workspace projects
+Already up to date
+Done in 140ms using pnpm v11.28.8
+$ eslint .
+
+/Users/chasen/.codex/worktrees/g3-m1-fix/ontology-platform/apps/web/src/features/ontology/source-import-race.test.ts
+  18:7  error  Unexpected aliasing of 'this' to local variable  @typescript-eslint/no-this-alias
+
+✖ 1 problem (1 error, 0 warnings)
+
+[ELIFECYCLE] Command failed with exit code 1.
+Exception: /Users/chasen/.codex/worktrees/g3-m1-fix/ontology-platform/scripts/verify-web.ps1:19
+Line |
+  19 |              if ($LASTEXITCODE -ne 0) { throw "Web $task failed" }
+     |                                         ~~~~~~~~~~~~~~~~~~~~~~~~
+     | Web lint failed
