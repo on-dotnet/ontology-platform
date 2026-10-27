@@ -1,0 +1,21 @@
+test_all_real_gate_selections_include_m1_and_regressions (__main__.M1OrchestrationTests.test_all_real_gate_selections_include_m1_and_regressions) ... ok
+test_each_child_failure_stops_later_gates (__main__.M1OrchestrationTests.test_each_child_failure_stops_later_gates) ... ok
+test_failed_attempt_cannot_consume_or_certify_stale_pass (__main__.M1OrchestrationTests.test_failed_attempt_cannot_consume_or_certify_stale_pass) ... FAIL
+test_protected_g2_runtime_is_refused (__main__.M1OrchestrationTests.test_protected_g2_runtime_is_refused) ... usage: g3-acceptance-runtime.py [-h] [--runtime-file RUNTIME_FILE]
+                                [--start-runtime]
+g3-acceptance-runtime.py: error: Protected G2 or unrelated runtime refused
+ok
+
+======================================================================
+FAIL: test_failed_attempt_cannot_consume_or_certify_stale_pass (__main__.M1OrchestrationTests.test_failed_attempt_cannot_consume_or_certify_stale_pass)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform/scripts/tests/G3Acceptance.Tests.py", line 85, in test_failed_attempt_cannot_consume_or_certify_stale_pass
+    self.assertIsNotNone(proof, 'Every attempt needs its own actual completion manifest')
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: unexpectedly None : Every attempt needs its own actual completion manifest
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.548s
+
+FAILED (failures=1)

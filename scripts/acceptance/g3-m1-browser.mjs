@@ -80,6 +80,7 @@ export async function runM1Checks({ root, origin, operator, viewer, single, chec
     await page.getByRole("button").filter({ has: page.locator("strong", { hasText: name }) }).click();
     await page.getByRole("region", { name: "20项能力矩阵，可横向滚动" }).waitFor();
     observed("m1_ui_twenty_rows", await page.locator(".g3-profile-table tbody tr").count() === 20);
+    await page.getByRole("textbox", { name: "变更理由", exact: true }).fill("Synthetic M1 browser assessment");
     async function importAndWait(file, bytes) {
       const label = "载入" + file;
       await page.getByLabel(label, { exact: true }).setInputFiles({ name: file, mimeType: "text/turtle", buffer: bytes });
@@ -95,6 +96,7 @@ export async function runM1Checks({ root, origin, operator, viewer, single, chec
       observed("m1_ui_export_" + key, bytes.equals(Buffer.from(sources[key], "utf8")));
       const modified = Buffer.concat([bytes, Buffer.from("\r\n# Synthetic M1 import completion\r\n", "utf8")]);
       await importAndWait(file, modified);
+      observed("m1_ui_import_dirty_marker_" + key, await page.getByText("未保存 · 投影过期", { exact: true }).isVisible());
       observed("m1_ui_import_dirty_" + key, await page.getByRole("button", { name: "保存新修订", exact: true }).isEnabled());
       const changedDownload = page.waitForEvent("download");
       await page.getByRole("button", { name: "导出原始源", exact: true }).click();
@@ -102,7 +104,6 @@ export async function runM1Checks({ root, origin, operator, viewer, single, chec
       await importAndWait(file, bytes);
       observed("m1_ui_reimport_clean_" + key, await page.getByRole("button", { name: "保存新修订", exact: true }).isDisabled());
     }
-    await page.getByRole("textbox", { name: "变更理由", exact: true }).fill("Synthetic M1 browser assessment");
     const response = page.waitForResponse(value => value.url().endsWith("/assessments") && value.request().method() === "POST");
     await page.getByRole("button", { name: "评估发布资格", exact: true }).click();
     observed("m1_ui_real_assessment", (await response).status() === 200);

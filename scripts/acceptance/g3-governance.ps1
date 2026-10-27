@@ -14,6 +14,9 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Frozen restore failed' }
     & ./scripts/verify-web.ps1 -Restore
     if ($LASTEXITCODE -ne 0) { throw 'Web checks failed' }
+    $tools = & ./scripts/bootstrap-web-tools.ps1 | ConvertFrom-Json
+    & $tools.nodePath --test scripts/tests/G3ReadBackpressure.Tests.mjs
+    if ($LASTEXITCODE -ne 0) { throw 'Read backpressure harness boundaries failed' }
     & ./scripts/verify.ps1 -RunNative -RunTests -SkipWeb
     if ($LASTEXITCODE -ne 0) { throw 'Native checks failed' }
     dotnet build backend/OntologyPlatform.slnx --configuration Release --no-restore

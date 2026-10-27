@@ -1,0 +1,52 @@
+✖ real semantic_busy response waits and reissues only the read (10.333708ms)
+✖ semantic_busy exhaustion stays failed with five recorded attempts (3.138083ms)
+✔ a write is never retried even with the same busy code (0.953166ms)
+✔ unknown 429 code is not retried or echoed (1.125834ms)
+✔ malformed 429 body is not retried (0.696625ms)
+✔ non-busy service failure is not retried (0.587417ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 4
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 69.291667
+
+✖ failing tests:
+
+test at scripts/tests/G3ReadBackpressure.Tests.mjs:29:1
+✖ real semantic_busy response waits and reissues only the read (10.333708ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  429 !== 200
+
+      at TestContext.<anonymous> (file:///Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform/scripts/tests/G3ReadBackpressure.Tests.mjs:31:10)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 429,
+    expected: 200,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at scripts/tests/G3ReadBackpressure.Tests.mjs:39:1
+✖ semantic_busy exhaustion stays failed with five recorded attempts (3.138083ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  1 !== 5
+
+      at TestContext.<anonymous> (file:///Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform/scripts/tests/G3ReadBackpressure.Tests.mjs:42:10)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 5,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

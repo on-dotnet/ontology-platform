@@ -39,6 +39,12 @@ jobs:
       - name: Runtime output boundary negatives
         shell: pwsh
         run: python3 scripts/tests/Wave2Runtime.Tests.py
+      - name: M1 read backpressure harness boundaries
+        shell: pwsh
+        run: |
+          $tools = & ./scripts/bootstrap-web-tools.ps1 | ConvertFrom-Json
+          & $tools.nodePath --test scripts/tests/G3ReadBackpressure.Tests.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: G2 acceptance orchestration positive and negative checks
         shell: pwsh
         run: python3 scripts/tests/G2Acceptance.Tests.py

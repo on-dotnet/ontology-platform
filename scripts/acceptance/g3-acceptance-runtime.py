@@ -1,5 +1,6 @@
 """Own one fresh M1 AppHost throughout genuine browser, semantic and operational acceptance."""
 import argparse
+import datetime
 import importlib.util
 import json
 import os
@@ -7,6 +8,7 @@ from pathlib import Path
 import subprocess
 import sys
 import urllib.error
+import uuid
 
 ROOT = Path(__file__).resolve().parents[2]
 spec = importlib.util.spec_from_file_location('g2_acceptance', Path(__file__).with_name('g2-acceptance-runtime.py'))
@@ -14,7 +16,7 @@ shared = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(shared)
 
 
-def main():
+def run_attempt():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--runtime-file')
     parser.add_argument('--start-runtime', action='store_true')
@@ -32,11 +34,27 @@ def main():
     runtime = json.loads(runtime_file.read_text())
     if not runtime['volumePrefix'].startswith('g3-m1-') or runtime_file.parent.name != runtime['volumePrefix']:
         parser.error('Protected G2 or unrelated runtime refused')
-    # 只记录新合成环境归属元数据，绝不复制配置或认证值到证据。
+    # 每次调用独占新目录，后续步骤不可能消费前一轮残留的成功文件。
+    run_id = uuid.uuid4().hex
+    os.environ['PLATFORM_EVIDENCE_DIR'] = 'docs/evidence/G3-M1-001/runtime/' + runtime['volumePrefix'] + '/' + run_id
     from evidence_paths import evidence_directory
     evidence = evidence_directory(ROOT, 'docs/evidence/G3-M1-001/runtime')
-    evidence.mkdir(parents=True, exist_ok=True)
+    evidence.mkdir(parents=True, exist_ok=False)
+    source_head = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
+    gate_names = ['full-g2-e2e.py', 'g3-compatibility.py', 'g1-regression.py', 'g2-observability.py',
+                  'g2-trace-browser.mjs', 'g2-readiness-fault.py', 'performance-baseline.py']
+    acceptance = {'runId': run_id, 'sourceHead': source_head, 'volumePrefix': runtime['volumePrefix'],
+                  'evidenceDirectory': str(evidence.relative_to(ROOT.resolve())), 'status': 'RUNNING',
+                  'startedAtUtc': datetime.datetime.now(datetime.timezone.utc).isoformat(),
+                  'gates': [{'name': name, 'status': 'NOT_RUN', 'exitCode': None} for name in gate_names]}
+
+    def save_acceptance():
+        (evidence / 'acceptance.json').write_text(json.dumps(acceptance, indent=2) + '\n')
+
+    save_acceptance()
+    # 只记录本轮归属元数据，绝不复制配置或认证值到证据。
     ownership = {'volumePrefix': runtime['volumePrefix'], 'runtimePath': str(runtime_file),
+                 'runId': run_id, 'sourceHead': source_head, 'launcherOwned': args.start_runtime,
                  'scope': 'G3-M1-001 freshly generated Synthetic test environment; protected G2 volumes excluded',
                  'launcherStarted': False, 'launcherStopped': False}
     (evidence / 'owned-runtime.json').write_text(json.dumps(ownership, indent=2) + '\n')
@@ -74,16 +92,43 @@ def main():
             [sys.executable, 'scripts/acceptance/g2-readiness-fault.py', '--runtime-file', str(runtime_file)],
             [sys.executable, 'scripts/acceptance/performance-baseline.py', '--from-observed-run'],
         ]
-        for command in commands:
+        for index, command in enumerate(commands):
+            acceptance['gates'][index]['status'] = 'RUNNING'
+            save_acceptance()
             result = subprocess.run(command, cwd=ROOT)
+            acceptance['gates'][index].update(status='PASS' if result.returncode == 0 else 'FAIL', exitCode=result.returncode)
+            save_acceptance()
             if result.returncode:
+                acceptance['status'] = 'FAIL'
                 return result.returncode
+        acceptance['status'] = 'PASS'
         return 0
     finally:
-        shared.stop(process)
-        ownership['launcherStopped'] = process is None or process.poll() is not None
-        ownership['launcherExitCode'] = None if process is None else process.returncode
-        (evidence / 'owned-runtime.json').write_text(json.dumps(ownership, indent=2) + '\n')
+        try:
+            shared.stop(process)
+        finally:
+            ownership['launcherStopped'] = process is None or process.poll() is not None
+            ownership['launcherExitCode'] = None if process is None else process.returncode
+            (evidence / 'owned-runtime.json').write_text(json.dumps(ownership, indent=2) + '\n')
+            if acceptance['status'] == 'RUNNING' or not ownership['launcherStopped']:
+                acceptance['status'] = 'FAIL'
+            acceptance['completedAtUtc'] = datetime.datetime.now(datetime.timezone.utc).isoformat()
+            save_acceptance()
+            print(json.dumps({'status': acceptance['status'], 'runId': run_id,
+                              'evidenceDirectory': acceptance['evidenceDirectory']}))
+        if not ownership['launcherStopped']:
+            raise RuntimeError('Owned launcher did not stop')
+
+
+def main():
+    before = os.environ.get('PLATFORM_EVIDENCE_DIR')
+    try:
+        return run_attempt()
+    finally:
+        if before is None:
+            os.environ.pop('PLATFORM_EVIDENCE_DIR', None)
+        else:
+            os.environ['PLATFORM_EVIDENCE_DIR'] = before
 
 
 if __name__ == '__main__':

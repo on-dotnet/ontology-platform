@@ -1,4 +1,5 @@
 import { evidenceDirectory } from "./evidence-paths.mjs";
+import { postSemanticRead } from "./g3-read-backpressure.mjs";
 /** 真实浏览器上下文中续接S1，验证异人发布、统一查询、原生MCP/SSE与版本回滚。 */
 import { randomUUID } from 'node:crypto';
 import { writeFile } from 'node:fs/promises';
@@ -9,10 +10,14 @@ export async function fullChain({ root, origin, operator, audit, single, viewer,
   const ids = {};
   const traces = [];
   const marks = [];
+  const readBackpressureAttempts = [];
   /** 同源真实HTTP调用记录观察耗时，有限样本不是生产SLO。 */
   async function post(user, path, data, expected = 200) {
     const start = performance.now();
-    const response = await user.api.post(origin + path, { data, headers: { ...user.headers, ...(data?.command ? { 'If-Match': '"' + data.command.expectedRevision + '"' } : {}) } });
+    const options = { data, headers: { ...user.headers, ...(data?.command ? { 'If-Match': '"' + data.command.expectedRevision + '"' } : {}) } };
+    const response = path === '/api/v1/semantic/queries'
+      ? await postSemanticRead(user.api, origin + path, options, fact => readBackpressureAttempts.push({ operation: path, ...fact }))
+      : await user.api.post(origin + path, options);
     samples.push({ operation: path.replace(/[a-f0-9]{32}/g, '{id}'), category: path.endsWith('/validations') ? 'shacl' : path.endsWith('/semantic/queries') ? 'gateway' : path.endsWith('/release-activations') ? 'publication' : 'api', elapsedMs: performance.now() - start, status: response.status() });
     check('http_' + path.split('/').filter(Boolean).at(-1) + '_' + marks.length++, response.status() === expected, response.status());
     return response.json();
@@ -180,6 +185,6 @@ export async function fullChain({ root, origin, operator, audit, single, viewer,
     await writeFile(resolve(evidenceDirectory(root),'live-full-chain-ui-state.json'),JSON.stringify(state,null,2)+'\n');
   }
   await writeFile(resolve(evidenceDirectory(root),'full-chain-identifiers.json'), JSON.stringify({ ids, traces: traces.filter(Boolean), model: 'BLOCKED: no paid or real model calls authorized', oldRunConcurrencyScope: 'historical persisted Run checked across later activation; in-flight fencing races independently covered by native tests' },null,2)+'\n');
-  await writeFile(resolve(evidenceDirectory(root),'performance-observations.json'), JSON.stringify({ environment: 'local macOS arm64, real isolated Docker/Aspire, headless Edge; no production SLO', sourceUtf8Bytes: Object.fromEntries(Object.entries(draft.sources).map(([key,value]) => [key,value===null?0:Buffer.byteLength(value)])), samples },null,2)+'\n');
+  await writeFile(resolve(evidenceDirectory(root),'performance-observations.json'), JSON.stringify({ environment: 'local macOS arm64, real isolated Docker/Aspire, headless Edge; no production SLO', sourceUtf8Bytes: Object.fromEntries(Object.entries(draft.sources).map(([key,value]) => [key,value===null?0:Buffer.byteLength(value)])), samples, readBackpressureAttempts },null,2)+'\n');
   }
 }

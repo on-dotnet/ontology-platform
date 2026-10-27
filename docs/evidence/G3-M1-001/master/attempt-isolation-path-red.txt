@@ -1,0 +1,66 @@
+test_all_real_gate_selections_include_m1_and_regressions (__main__.M1OrchestrationTests.test_all_real_gate_selections_include_m1_and_regressions) ... ERROR
+test_each_child_failure_stops_later_gates (__main__.M1OrchestrationTests.test_each_child_failure_stops_later_gates) ... ERROR
+test_failed_attempt_cannot_consume_or_certify_stale_pass (__main__.M1OrchestrationTests.test_failed_attempt_cannot_consume_or_certify_stale_pass) ... ERROR
+test_protected_g2_runtime_is_refused (__main__.M1OrchestrationTests.test_protected_g2_runtime_is_refused) ... usage: g3-acceptance-runtime.py [-h] [--runtime-file RUNTIME_FILE]
+                                [--start-runtime]
+g3-acceptance-runtime.py: error: Protected G2 or unrelated runtime refused
+ok
+
+======================================================================
+ERROR: test_all_real_gate_selections_include_m1_and_regressions (__main__.M1OrchestrationTests.test_all_real_gate_selections_include_m1_and_regressions)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform/scripts/tests/G3Acceptance.Tests.py", line 66, in test_all_real_gate_selections_include_m1_and_regressions
+    code, calls, *_ = self.exercise()
+                      ~~~~~~~~~~~~~^^
+  File "/Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform/scripts/tests/G3Acceptance.Tests.py", line 59, in exercise
+    code = module.main()
+  File "/Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform/scripts/acceptance/g3-acceptance-runtime.py", line 126, in main
+    return run_attempt()
+  File "/Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform/scripts/acceptance/g3-acceptance-runtime.py", line 47, in run_attempt
+    'evidenceDirectory': str(evidence.relative_to(ROOT)), 'status': 'RUNNING',
+                             ~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/pathlib/_local.py", line 385, in relative_to
+    raise ValueError(f"{str(self)!r} is not in the subpath of {str(other)!r}")
+ValueError: '/private/var/folders/8r/n2xjjrn90v7fplnwsjkft1sm0000gn/T/tmprrbfwvm_/docs/evidence/G3-M1-001/runtime/g3-m1-control/0a535ef7159d491faf7d384250eef63c' is not in the subpath of '/var/folders/8r/n2xjjrn90v7fplnwsjkft1sm0000gn/T/tmprrbfwvm_'
+
+======================================================================
+ERROR: test_each_child_failure_stops_later_gates (__main__.M1OrchestrationTests.test_each_child_failure_stops_later_gates)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform/scripts/tests/G3Acceptance.Tests.py", line 72, in test_each_child_failure_stops_later_gates
+    code, calls, *_ = self.exercise(gate)
+                      ~~~~~~~~~~~~~^^^^^^
+  File "/Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform/scripts/tests/G3Acceptance.Tests.py", line 59, in exercise
+    code = module.main()
+  File "/Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform/scripts/acceptance/g3-acceptance-runtime.py", line 126, in main
+    return run_attempt()
+  File "/Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform/scripts/acceptance/g3-acceptance-runtime.py", line 47, in run_attempt
+    'evidenceDirectory': str(evidence.relative_to(ROOT)), 'status': 'RUNNING',
+                             ~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/pathlib/_local.py", line 385, in relative_to
+    raise ValueError(f"{str(self)!r} is not in the subpath of {str(other)!r}")
+ValueError: '/private/var/folders/8r/n2xjjrn90v7fplnwsjkft1sm0000gn/T/tmp7jww59lr/docs/evidence/G3-M1-001/runtime/g3-m1-control/5754be4dba3f4c0ea98f6ee5b3ba745c' is not in the subpath of '/var/folders/8r/n2xjjrn90v7fplnwsjkft1sm0000gn/T/tmp7jww59lr'
+
+======================================================================
+ERROR: test_failed_attempt_cannot_consume_or_certify_stale_pass (__main__.M1OrchestrationTests.test_failed_attempt_cannot_consume_or_certify_stale_pass)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform/scripts/tests/G3Acceptance.Tests.py", line 82, in test_failed_attempt_cannot_consume_or_certify_stale_pass
+    code, calls, proof, selected, old = self.exercise('full-g2-e2e.py')
+                                        ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform/scripts/tests/G3Acceptance.Tests.py", line 59, in exercise
+    code = module.main()
+  File "/Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform/scripts/acceptance/g3-acceptance-runtime.py", line 126, in main
+    return run_attempt()
+  File "/Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform/scripts/acceptance/g3-acceptance-runtime.py", line 47, in run_attempt
+    'evidenceDirectory': str(evidence.relative_to(ROOT)), 'status': 'RUNNING',
+                             ~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/pathlib/_local.py", line 385, in relative_to
+    raise ValueError(f"{str(self)!r} is not in the subpath of {str(other)!r}")
+ValueError: '/private/var/folders/8r/n2xjjrn90v7fplnwsjkft1sm0000gn/T/tmp_lpweolv/docs/evidence/G3-M1-001/runtime/g3-m1-control/e42c1e7409cd468bbc9f4b06cb1222e9' is not in the subpath of '/var/folders/8r/n2xjjrn90v7fplnwsjkft1sm0000gn/T/tmp_lpweolv'
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.036s
+
+FAILED (errors=3)
