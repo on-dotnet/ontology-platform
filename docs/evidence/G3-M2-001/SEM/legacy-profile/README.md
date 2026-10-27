@@ -1,0 +1,17 @@
+# 历史M1 profile v1 / Manifest schema2 真实兼容覆盖
+
+仅新增PublishingTests覆盖，生产文件不变。Base为5158b78a177b5552988b10371e65f0ba27e547e4。原G3LegacyTests两个V1测试默认行为及G3_M1_MANIFEST_OUTPUT原始输出保持；SeedLegacyAsync仅增加显式withM1Profile可选分支，默认false，不改历史SHA或旧证据。
+
+历史M1评估事实由真实Ontology.CreateAsync及AssessAsync生成：实际RIOT/SHACL、PG报告、阶段、诊断、预算、时间、源hash与PublishEligible均沿用生产计算。仅隔离测试导入时，将此完整事实的profile身份明确登记为LegacyM1 v1/golden hash并重新计算完整AssessmentHash，写回当前fixture的对应AssessmentRecord；Manifest/Proposal引用相同实际报告、草稿、修订、hash及评估身份。v1/v2发布语义同为冻结的asserted-only子集；测试没有硬填eligible、任意AssessmentHash或新增生产PUBLISH旁路。
+
+新增测试HistoricalM1ProfileV1ManifestV2ReadsAndRollsBackAfterCurrentProfileUpgrade：真实写PG/Jena/RustFS→Catalog完整回验历史schema2/profile1/golden→原清单字节及hash核验→实际当前profile2评估、异人审核、CAS替换发布→当前草稿推进并使当前评估过期→当前PUBLISH拒绝→新回滚提案、异人审核、错误CAS拒绝且active不变→正确CAS真实回验并恢复旧profile1，activationRevision=3。最后再次核验PG及RustFS历史manifest原始字节/hash不变。profile hash篡改仅在调用参数副本发生，真实运行时以release_profile_unsupported拒绝，原历史对象未修改。
+
+执行前先实际调用evidence_directory，只读证明PLATFORM_EVIDENCE_DIR优先于runner默认G2目录，解析严格为docs/evidence/G3-M2-001/SEM/legacy-profile；见evidence-path-proof.json。随后按该明确覆盖运行已获批准的真实入口，未写旧G2证据。Master修复后canonical镜像仅只读inspect复核准确Id/标签并复用，未构建，见image-identity.json。
+
+```sh
+PLATFORM_EVIDENCE_DIR=docs/evidence/G3-M2-001/SEM/legacy-profile G2_TEST_JENA_IMAGE=ontology-platform-fuseki:context-1e45f836d9837cbc75d23adb3ad37b0ff79a545ef06102a87aa246feea9cc1e5 PYTHONDONTWRITEBYTECODE=1 python3 -B scripts/acceptance/release-faults.py --label legacy-m1-profile --filter 'FullyQualifiedName~G3LegacyTests'
+```
+
+实际结果：3 PASS、0 FAIL、0 skip，exit0，包含两个原V1测试及新增M1策略V2测试；详见legacy-m1-profile.json。没有伪造RED或重跑无关整栈。format实际exit0，workspace warning保留；随后仅补测试辅助XML/用途注释，不改逻辑。3个本次fixture容器准确ID、成功删除及精确重验不存在见resource-lifecycle.json；未碰旧G2资源或共享镜像。
+
+当前提交的非作者Review、同HeadCI和main集成由Master后置实际执行，当前NOT_VERIFIED，不使用旧CI冒称新Head验证。历史V1/V2兼容产物与旧SHA保持原记录。
