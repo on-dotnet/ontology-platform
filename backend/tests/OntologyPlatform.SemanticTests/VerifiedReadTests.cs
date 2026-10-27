@@ -365,8 +365,8 @@ public sealed class VerifiedReadTests
         {
             OntologyTurtle = "\uFEFF# 本体原注释\n<#C> a <http://www.w3.org/2002/07/owl#Class> ; <http://www.w3.org/2000/01/rdf-schema#label> \"中\uFEFF文😀𠀀\"@zh .\n",
             ShapesTurtle = "\uFEFF@prefix sh: <http://www.w3.org/ns/shacl#> .\n",
-            VocabularyTurtle = vocabularyOnlyBom ? "\uFEFF" : "\uFEFF<#term> <urn:label> \"词\uFEFF汇\" .\n",
-            DataTurtle = "\uFEFF<#i> a <https://ontology.invalid/source/0/#C> ; <urn:value> \"数\uFEFF据\" .\n"
+            VocabularyTurtle = vocabularyOnlyBom ? "\uFEFF" : "\uFEFF<#term> <http://www.w3.org/2000/01/rdf-schema#label> \"词\uFEFF汇\" .\n",
+            DataTurtle = "\uFEFF<#i> a <https://ontology.invalid/source/0/#C> ; <http://www.w3.org/2000/01/rdf-schema#comment> \"数\uFEFF据\" .\n"
         };
         // 固定清单散列根据包含BOM的完整原始UTF8计算。
         var manifest = Manifest(source);
@@ -417,7 +417,7 @@ public sealed class VerifiedReadTests
     }
 
     /// <summary>四源只用标准RDF，不依赖行业类或外部网络。</summary>
-    private static SourceBundle Sources() => new() { OntologyTurtle = "<urn:verified:C> a <http://www.w3.org/2002/07/owl#Class> .", ShapesTurtle = "@prefix sh: <http://www.w3.org/ns/shacl#> .\n", VocabularyTurtle = "<urn:verified:vocabulary> <http://www.w3.org/2000/01/rdf-schema#label> \"词汇\"@zh .", DataTurtle = "<urn:verified:i> a <urn:verified:C> ; <urn:verified:n> 1 ." };
+    private static SourceBundle Sources() => new() { OntologyTurtle = "<urn:verified:C> a <http://www.w3.org/2002/07/owl#Class> .", ShapesTurtle = "@prefix sh: <http://www.w3.org/ns/shacl#> .\n", VocabularyTurtle = "<urn:verified:vocabulary> <http://www.w3.org/2000/01/rdf-schema#label> \"词汇\"@zh .", DataTurtle = "<urn:verified:i> a <urn:verified:C> ; <http://www.w3.org/2000/01/rdf-schema#comment> 1 ." };
 
     /// <summary>只改变当前fixture内指定的正式测试图，响应仍由实际GSP产生。</summary>
     private static async Task ChangeGraphAsync(string graph, string? source, CancellationToken token)

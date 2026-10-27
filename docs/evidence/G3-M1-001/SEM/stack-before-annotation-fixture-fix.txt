@@ -1,0 +1,109 @@
+6531af656e95f76c03c02a37054836261b7b30521ae36f3493e722262a0c1a0c
+127.0.0.1:62801
+60328a7c1614e4899ae17a387c33df6256a73ac8260542af1bd0e90d0d8bd5bd
+127.0.0.1:62803
+42095ce05e225293dbc03bab5ab189440c583eefef5793032c22d01d5b52c882
+sha256:6746df3002ba9a25011baaa43b4bf4175c53d00d06ed4ca07ac7b5ae995c58e2 ["ontology-platform-g2-fuseki@sha256:6746df3002ba9a25011baaa43b4bf4175c53d00d06ed4ca07ac7b5ae995c58e2"]
+[2026-10-27 03:35:40] Fuseki     INFO  Apache Jena Fuseki 6.2.0
+Apache Jena version 6.2.0
+127.0.0.1:62808
+  OntologyPlatform.Contracts -> /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/bin/Debug/net10.0/OntologyPlatform.Contracts.dll
+  OntologyPlatform.Modules.Publishing.Domain -> /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/bin/Debug/net10.0/OntologyPlatform.Modules.Publishing.Domain.dll
+  OntologyPlatform.Modules.Ontology.Domain -> /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.Domain.dll
+  OntologyPlatform.Modules.Governance -> /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/bin/Debug/net10.0/OntologyPlatform.Modules.Governance.dll
+  OntologyPlatform.Modules.Publishing -> /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/bin/Debug/net10.0/OntologyPlatform.Modules.Publishing.dll
+  OntologyPlatform.Modules.Ontology -> /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.dll
+  OntologyPlatform.PublishingTests -> /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:00.50
+工具“dotnet-ef”(版本“10.0.13”)已还原。可用的命令: dotnet-ef
+
+还原成功。
+Failed executing DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM governance."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261025062847_InitialGovernance'.
+Applying migration '20261025144246_AuditScopeSites'.
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Done.
+Failed executing DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM ontology."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261026003221_InitialOntology'.
+Applying migration '20261027032135_G3Assessments'.
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Done.
+Failed executing DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM publishing."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261026015031_InitialPublishing'.
+Done.
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+失败 NonBmpLiteralEditIsLosslessAndCannotInjectTriples (True) (33ms)
+  从 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+  Assertion failed. 预期条件为 true。
+
+  actual: false
+
+  Assert.IsTrue((await runtime.ValidateAsync(edited, CancellationToken.None)).Conforms)
+    在 OntologyPlatform.SemanticTests.VerifiedReadTests.NonBmpLiteralEditIsLosslessAndCannotInjectTriples(Boolean languageTagged) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs:330
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+失败 NonBmpLiteralEditIsLosslessAndCannotInjectTriples (False) (22ms)
+  从 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+  Assertion failed. 预期条件为 true。
+
+  actual: false
+
+  Assert.IsTrue((await runtime.ValidateAsync(edited, CancellationToken.None)).Conforms)
+    在 OntologyPlatform.SemanticTests.VerifiedReadTests.NonBmpLiteralEditIsLosslessAndCannotInjectTriples(Boolean languageTagged) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs:330
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+失败 LeadingBomSourcesKeepExactBytesAndRelativeIris (True) (88ms)
+  从 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+  Assertion failed. 预期条件为 true。
+
+  actual: false
+
+  Assert.IsTrue(report.Conforms)
+    在 OntologyPlatform.SemanticTests.VerifiedReadTests.LeadingBomSourcesKeepExactBytesAndRelativeIris(Boolean vocabularyOnlyBom) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs:390
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+失败 LeadingBomSourcesKeepExactBytesAndRelativeIris (False) (33ms)
+  从 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+  Assertion failed. 预期条件为 true。
+
+  actual: false
+
+  Assert.IsTrue(report.Conforms)
+    在 OntologyPlatform.SemanticTests.VerifiedReadTests.LeadingBomSourcesKeepExactBytesAndRelativeIris(Boolean vocabularyOnlyBom) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs:390
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+/Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64) 失败并出现 4 个错误 (22s 950ms)
+退出代码: 2
+
+测试运行摘要: 失败!
+  总计: 85
+  失败: 4
+  成功: 81
+  已跳过: 0
+  持续时间: 23s 367ms
+已完成测试运行，但显示非成功退出代码: 2 (请参阅: https://aka.ms/testingplatform/exitcodes)
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+/Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64) 已通过 (20s 313ms)
+
+测试运行摘要: 已通过!
+  总计: 53
+  失败: 0
+  成功: 53
+  已跳过: 0
+  持续时间: 20s 741ms
+g3-m1-sem-stack-bee95a5c569b-jena
+g3-m1-sem-stack-bee95a5c569b-s3
+g3-m1-sem-stack-bee95a5c569b-pg

@@ -139,6 +139,7 @@ public sealed partial class PublishingService : IPublishingService
         {
             // 先锁draft再锁proposal，与创建及激活统一顺序；auditor只做只读核验。
             var original = JsonSerializer.Deserialize<ReleaseProposal>(known.ProposalJson)!;
+            if (original.Kind == ProposalKind.Publish && original.Semantics is null) throw new SemanticOperationException(409, "assessment_required");
             // 回滚保留旧绑定算法并不依赖当前草稿。
             var snapshot = original.Kind == ProposalKind.Publish ? await LockDraftAsync(actor, original.DraftId!, original.DraftRevision!.Value, original.Hashes!, original.ValidationReportId!, token) : null;
             var row = await FindProposalAsync(proposalId, true, token);

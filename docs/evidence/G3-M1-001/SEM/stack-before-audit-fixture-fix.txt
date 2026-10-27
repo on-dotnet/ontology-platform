@@ -1,0 +1,197 @@
+2fd9cf1e8e072e01e766c4845cf8eb590d41dace44e3c9be1b460a7154e0ed7d
+127.0.0.1:62352
+9e5f582983472940a1a9defe7d7a0402a1318649be2f235514746bfd1c503456
+127.0.0.1:62354
+0885a1aa21e4904a8f75fb2c7246aafa63783fc39ca02000567ddcffb2771c5b
+sha256:6746df3002ba9a25011baaa43b4bf4175c53d00d06ed4ca07ac7b5ae995c58e2 ["ontology-platform-g2-fuseki@sha256:6746df3002ba9a25011baaa43b4bf4175c53d00d06ed4ca07ac7b5ae995c58e2"]
+[2026-10-27 03:32:55] Fuseki     INFO  Apache Jena Fuseki 6.2.0
+Apache Jena version 6.2.0
+127.0.0.1:62359
+  OntologyPlatform.Contracts -> /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/bin/Debug/net10.0/OntologyPlatform.Contracts.dll
+  OntologyPlatform.Modules.Publishing.Domain -> /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/bin/Debug/net10.0/OntologyPlatform.Modules.Publishing.Domain.dll
+  OntologyPlatform.Modules.Ontology.Domain -> /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.Domain.dll
+  OntologyPlatform.Modules.Governance -> /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/bin/Debug/net10.0/OntologyPlatform.Modules.Governance.dll
+  OntologyPlatform.Modules.Publishing -> /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/bin/Debug/net10.0/OntologyPlatform.Modules.Publishing.dll
+  OntologyPlatform.Modules.Ontology -> /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.dll
+  OntologyPlatform.PublishingTests -> /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:00.50
+工具“dotnet-ef”(版本“10.0.13”)已还原。可用的命令: dotnet-ef
+
+还原成功。
+Failed executing DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM governance."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261025062847_InitialGovernance'.
+Applying migration '20261025144246_AuditScopeSites'.
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Done.
+Failed executing DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM ontology."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261026003221_InitialOntology'.
+Applying migration '20261027032135_G3Assessments'.
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Done.
+Failed executing DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM publishing."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261026015031_InitialPublishing'.
+Done.
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+失败 MigrationDownRefusesConcurrentAndNonemptyHistory (80ms)
+  从 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+  测试方法 OntologyPlatform.SemanticTests.DraftRevisionTests。MigrationDownRefusesConcurrentAndNonemptyHistory 引发了异常:
+  System.InvalidOperationException: 审计元数据未满足固定事件和完整范围合同。
+    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.CreateRecord(ActorContext actor, AuditCommand command) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:97
+    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:51
+    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:54
+    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:60
+    在 OntologyPlatform.Modules.Ontology.OntologyService.WriteAsync[T](ActorContext actor, ResourceScope scope, String action, CommandContext command, Object payload, Func`2 mutation, CancellationToken token) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyService.cs:254
+    在 OntologyPlatform.Modules.Ontology.OntologyService.WriteAsync[T](ActorContext actor, ResourceScope scope, String action, CommandContext command, Object payload, Func`2 mutation, CancellationToken token) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyService.cs:261
+    在 OntologyPlatform.Modules.Ontology.OntologyService.AssessCoreAsync[T](ActorContext actor, String draftId, ValidateDraftRequest request, String action, Func`3 select, CancellationToken token) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyAssessment.cs:69
+    在 OntologyPlatform.SemanticTests.DraftRevisionTests.MigrationDownRefusesConcurrentAndNonemptyHistory() 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs:420
+    在 OntologyPlatform.SemanticTests.DraftRevisionTests.MigrationDownRefusesConcurrentAndNonemptyHistory() 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs:435
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+
+失败 G3AssessmentPersistsReplaysAndReauthorizesWholeScope (70ms)
+  从 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+  测试方法 OntologyPlatform.SemanticTests.DraftRevisionTests。G3AssessmentPersistsReplaysAndReauthorizesWholeScope 引发了异常:
+  System.InvalidOperationException: 审计元数据未满足固定事件和完整范围合同。
+    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.CreateRecord(ActorContext actor, AuditCommand command) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:97
+    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:51
+    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:54
+    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:60
+    在 OntologyPlatform.Modules.Ontology.OntologyService.WriteAsync[T](ActorContext actor, ResourceScope scope, String action, CommandContext command, Object payload, Func`2 mutation, CancellationToken token) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyService.cs:254
+    在 OntologyPlatform.Modules.Ontology.OntologyService.WriteAsync[T](ActorContext actor, ResourceScope scope, String action, CommandContext command, Object payload, Func`2 mutation, CancellationToken token) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyService.cs:261
+    在 OntologyPlatform.Modules.Ontology.OntologyService.AssessCoreAsync[T](ActorContext actor, String draftId, ValidateDraftRequest request, String action, Func`3 select, CancellationToken token) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyAssessment.cs:69
+    在 OntologyPlatform.SemanticTests.DraftRevisionTests.G3AssessmentPersistsReplaysAndReauthorizesWholeScope() 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs:486
+    在 OntologyPlatform.SemanticTests.DraftRevisionTests.G3AssessmentPersistsReplaysAndReauthorizesWholeScope() 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs:508
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+
+失败 G3AssessmentLockRejectsInvalidPersistentFacts ("expired","assessment_expired") (66ms)
+  从 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+  测试方法 OntologyPlatform.SemanticTests.DraftRevisionTests。G3AssessmentLockRejectsInvalidPersistentFacts 引发了异常:
+  System.InvalidOperationException: 审计元数据未满足固定事件和完整范围合同。
+    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.CreateRecord(ActorContext actor, AuditCommand command) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:97
+    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:51
+    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:54
+    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:60
+    在 OntologyPlatform.Modules.Ontology.OntologyService.WriteAsync[T](ActorContext actor, ResourceScope scope, String action, CommandContext command, Object payload, Func`2 mutation, CancellationToken token) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyService.cs:254
+    在 OntologyPlatform.Modules.Ontology.OntologyService.WriteAsync[T](ActorContext actor, ResourceScope scope, String action, CommandContext command, Object payload, Func`2 mutation, CancellationToken token) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyService.cs:261
+    在 OntologyPlatform.Modules.Ontology.OntologyService.AssessCoreAsync[T](ActorContext actor, String draftId, ValidateDraftRequest request, String action, Func`3 select, CancellationToken token) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyAssessment.cs:69
+    在 OntologyPlatform.SemanticTests.DraftRevisionTests.G3AssessmentLockRejectsInvalidPersistentFacts(String scenario, String expectedCode) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs:533
+    在 OntologyPlatform.SemanticTests.DraftRevisionTests.G3AssessmentLockRejectsInvalidPersistentFacts(String scenario, String expectedCode) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs:552
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+
+失败 G3AssessmentLockRejectsInvalidPersistentFacts ("profile","assessment_binding_conflict") (93ms)
+  从 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+  测试方法 OntologyPlatform.SemanticTests.DraftRevisionTests。G3AssessmentLockRejectsInvalidPersistentFacts 引发了异常:
+  System.InvalidOperationException: 审计元数据未满足固定事件和完整范围合同。
+    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.CreateRecord(ActorContext actor, AuditCommand command) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:97
+    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:51
+    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:54
+    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:60
+    在 OntologyPlatform.Modules.Ontology.OntologyService.WriteAsync[T](ActorContext actor, ResourceScope scope, String action, CommandContext command, Object payload, Func`2 mutation, CancellationToken token) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyService.cs:254
+    在 OntologyPlatform.Modules.Ontology.OntologyService.WriteAsync[T](ActorContext actor, ResourceScope scope, String action, CommandContext command, Object payload, Func`2 mutation, CancellationToken token) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyService.cs:261
+    在 OntologyPlatform.Modules.Ontology.OntologyService.AssessCoreAsync[T](ActorContext actor, String draftId, ValidateDraftRequest request, String action, Func`3 select, CancellationToken token) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyAssessment.cs:69
+    在 OntologyPlatform.SemanticTests.DraftRevisionTests.G3AssessmentLockRejectsInvalidPersistentFacts(String scenario, String expectedCode) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs:533
+    在 OntologyPlatform.SemanticTests.DraftRevisionTests.G3AssessmentLockRejectsInvalidPersistentFacts(String scenario, String expectedCode) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs:552
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+
+失败 G3AssessmentLockRejectsInvalidPersistentFacts ("tampered","assessment_binding_conflict") (68ms)
+  从 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+  测试方法 OntologyPlatform.SemanticTests.DraftRevisionTests。G3AssessmentLockRejectsInvalidPersistentFacts 引发了异常:
+  System.InvalidOperationException: 审计元数据未满足固定事件和完整范围合同。
+    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.CreateRecord(ActorContext actor, AuditCommand command) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:97
+    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:51
+    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:54
+    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:60
+    在 OntologyPlatform.Modules.Ontology.OntologyService.WriteAsync[T](ActorContext actor, ResourceScope scope, String action, CommandContext command, Object payload, Func`2 mutation, CancellationToken token) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyService.cs:254
+    在 OntologyPlatform.Modules.Ontology.OntologyService.WriteAsync[T](ActorContext actor, ResourceScope scope, String action, CommandContext command, Object payload, Func`2 mutation, CancellationToken token) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyService.cs:261
+    在 OntologyPlatform.Modules.Ontology.OntologyService.AssessCoreAsync[T](ActorContext actor, String draftId, ValidateDraftRequest request, String action, Func`3 select, CancellationToken token) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyAssessment.cs:69
+    在 OntologyPlatform.SemanticTests.DraftRevisionTests.G3AssessmentLockRejectsInvalidPersistentFacts(String scenario, String expectedCode) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs:533
+    在 OntologyPlatform.SemanticTests.DraftRevisionTests.G3AssessmentLockRejectsInvalidPersistentFacts(String scenario, String expectedCode) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs:552
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+
+失败 G3AssessmentLockRejectsInvalidPersistentFacts ("legacy","assessment_required") (67ms)
+  从 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+  测试方法 OntologyPlatform.SemanticTests.DraftRevisionTests。G3AssessmentLockRejectsInvalidPersistentFacts 引发了异常:
+  System.InvalidOperationException: 审计元数据未满足固定事件和完整范围合同。
+    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.CreateRecord(ActorContext actor, AuditCommand command) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:97
+    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:51
+    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:54
+    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:60
+    在 OntologyPlatform.Modules.Ontology.OntologyService.WriteAsync[T](ActorContext actor, ResourceScope scope, String action, CommandContext command, Object payload, Func`2 mutation, CancellationToken token) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyService.cs:254
+    在 OntologyPlatform.Modules.Ontology.OntologyService.WriteAsync[T](ActorContext actor, ResourceScope scope, String action, CommandContext command, Object payload, Func`2 mutation, CancellationToken token) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyService.cs:261
+    在 OntologyPlatform.Modules.Ontology.OntologyService.AssessCoreAsync[T](ActorContext actor, String draftId, ValidateDraftRequest request, String action, Func`3 select, CancellationToken token) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyAssessment.cs:69
+    在 OntologyPlatform.SemanticTests.DraftRevisionTests.G3AssessmentLockRejectsInvalidPersistentFacts(String scenario, String expectedCode) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs:533
+    在 OntologyPlatform.SemanticTests.DraftRevisionTests.G3AssessmentLockRejectsInvalidPersistentFacts(String scenario, String expectedCode) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs:552
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+
+失败 G3AssessmentLockRejectsInvalidPersistentFacts ("ineligible","assessment_not_eligible") (15ms)
+  从 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+  测试方法 OntologyPlatform.SemanticTests.DraftRevisionTests。G3AssessmentLockRejectsInvalidPersistentFacts 引发了异常:
+  System.InvalidOperationException: 审计元数据未满足固定事件和完整范围合同。
+    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.CreateRecord(ActorContext actor, AuditCommand command) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:97
+    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:51
+    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:54
+    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:60
+    在 OntologyPlatform.Modules.Ontology.OntologyService.WriteAsync[T](ActorContext actor, ResourceScope scope, String action, CommandContext command, Object payload, Func`2 mutation, CancellationToken token) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyService.cs:254
+    在 OntologyPlatform.Modules.Ontology.OntologyService.WriteAsync[T](ActorContext actor, ResourceScope scope, String action, CommandContext command, Object payload, Func`2 mutation, CancellationToken token) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyService.cs:261
+    在 OntologyPlatform.Modules.Ontology.OntologyService.AssessCoreAsync[T](ActorContext actor, String draftId, ValidateDraftRequest request, String action, Func`3 select, CancellationToken token) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyAssessment.cs:69
+    在 OntologyPlatform.SemanticTests.DraftRevisionTests.G3AssessmentLockRejectsInvalidPersistentFacts(String scenario, String expectedCode) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs:533
+    在 OntologyPlatform.SemanticTests.DraftRevisionTests.G3AssessmentLockRejectsInvalidPersistentFacts(String scenario, String expectedCode) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs:552
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+
+/Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64) 失败并出现 7 个错误 (23s 083ms)
+退出代码: 2
+
+测试运行摘要: 失败!
+  总计: 84
+  失败: 7
+  成功: 77
+  已跳过: 0
+  持续时间: 23s 411ms
+已完成测试运行，但显示非成功退出代码: 2 (请参阅: https://aka.ms/testingplatform/exitcodes)
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+失败 LegacyV1ReadsAndRollsBackWithoutCurrentDraftAssessment (1s 130ms)
+  从 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+  测试方法 OntologyPlatform.PublishingTests.G3LegacyTests。LegacyV1ReadsAndRollsBackWithoutCurrentDraftAssessment 引发了异常:
+  OntologyPlatform.Contracts.SemanticOperationException: 语义操作未满足受控合同。
+    在 OntologyPlatform.Modules.Publishing.RustfsArtifactStore.ReadCoreAsync(ArtifactObject artifact, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/RustfsArtifactStore.cs:76
+    在 OntologyPlatform.Modules.Publishing.RustfsArtifactStore.WithBudgetAsync[T](Func`2 operation, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/RustfsArtifactStore.cs:150
+    在 OntologyPlatform.Modules.Publishing.ReleaseVerifier.VerifyArtifactsAsync(ReleaseRecord row, CancellationToken token) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/ReleaseVerifier.cs:30
+    在 OntologyPlatform.Modules.Publishing.ReleaseVerifier.VerifyAsync(ReleaseRecord row, CancellationToken token) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/ReleaseVerifier.cs:53
+    在 OntologyPlatform.Modules.Publishing.PublishingCatalog.ReadAsync(ActorContext actor, String releaseId, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/PublishingCatalog.cs:31
+    在 OntologyPlatform.Modules.Publishing.PublishingService.<>c__DisplayClass19_0.<<CreateProposalAsync>b__1>d.MoveNext() 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/PublishingService.cs:99
+    --- End of stack trace from previous location ---
+    在 OntologyPlatform.Modules.Publishing.PublishingService.WriteAsync[T](ActorContext actor, ResourceScope scope, String action, CommandContext command, Object payload, Func`2 mutation, CancellationToken token) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/PublishingService.cs:198
+    在 OntologyPlatform.Modules.Publishing.PublishingService.WriteAsync[T](ActorContext actor, ResourceScope scope, String action, CommandContext command, Object payload, Func`2 mutation, CancellationToken token) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/PublishingService.cs:208
+    在 OntologyPlatform.Modules.Publishing.PublishingService.CreateProposalAsync(ActorContext actor, CreateProposalRequest request, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/PublishingService.cs:86
+    在 OntologyPlatform.PublishingTests.G3LegacyTests.LegacyV1ReadsAndRollsBackWithoutCurrentDraftAssessment() 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/G3LegacyTests.cs:48
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+
+/Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64) 失败并出现 1 个错误 (20s 244ms)
+退出代码: 2
+
+测试运行摘要: 失败!
+  总计: 53
+  失败: 1
+  成功: 52
+  已跳过: 0
+  持续时间: 20s 438ms
+已完成测试运行，但显示非成功退出代码: 2 (请参阅: https://aka.ms/testingplatform/exitcodes)
+g3-m1-sem-stack-68c3d6175d12-jena
+g3-m1-sem-stack-68c3d6175d12-s3
+g3-m1-sem-stack-68c3d6175d12-pg

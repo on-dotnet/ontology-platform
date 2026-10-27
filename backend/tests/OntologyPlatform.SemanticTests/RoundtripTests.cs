@@ -236,7 +236,7 @@ public sealed class RoundtripTests
         // 连续独立操作必须得到相同IRI集合。
         var runtime = SemanticFixture.Runtime();
         // 无显式base时也允许标准相对IRI源码，其他三元组不可丢失。
-        var sources = new SourceBundle { OntologyTurtle = "<#C> a <http://www.w3.org/2002/07/owl#Class> ; <http://www.w3.org/2000/01/rdf-schema#label> \"旧标签\"@zh ; <urn:retained> \"保留\" ." };
+        var sources = new SourceBundle { OntologyTurtle = "<#C> a <http://www.w3.org/2002/07/owl#Class> ; <http://www.w3.org/2000/01/rdf-schema#label> \"旧标签\"@zh ; <urn:retained> \"保留\" . <urn:retained> a <http://www.w3.org/2002/07/owl#AnnotationProperty> ." };
         // 两次实际RIOT解析使用不同临时图。
         var first = await runtime.AnalyzeAsync(sources, 1, CancellationToken.None);
         // 第二次解析不能偷偷改写实体身份。

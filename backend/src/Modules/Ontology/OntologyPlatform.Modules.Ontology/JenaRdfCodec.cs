@@ -21,19 +21,24 @@ internal static class JenaRdfCodec
 
     /// <summary>从真实Jena RDF/JSON映射完整三元组，保留词法/语言/空白节点。</summary>
     /// <param name="json">受上游字节预算限制的真实RDF/JSON响应。</param>
+    /// <param name="cancellationToken">覆盖响应逐项映射的共享预算信号。</param>
     /// <param name="allowTemporaryMarker">仅内部源解析图可额外容纳一条随后必须核验并剔除的随机标记。</param>
-    internal static RdfTriple[] Parse(string json, bool allowTemporaryMarker = false)
+    internal static RdfTriple[] Parse(string json, bool allowTemporaryMarker = false, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         // 文档仅在当前映射周期有效，不把JsonElement跨作用域暴露。
         using var document = JsonDocument.Parse(json);
         // 完整结果受到上游字节预算及此处三元组预算约束。
         var triples = new List<RdfTriple>();
         foreach (var subject in document.RootElement.EnumerateObject())
         {
+            cancellationToken.ThrowIfCancellationRequested();
             foreach (var predicate in subject.Value.EnumerateObject())
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 foreach (var term in predicate.Value.EnumerateArray())
                 {
+                    cancellationToken.ThrowIfCancellationRequested();
                     triples.Add(new RdfTriple
                     {
                         Subject = new RdfTerm { Kind = subject.Name.StartsWith("_:", StringComparison.Ordinal) ? RdfTermKind.Blank : RdfTermKind.Iri, Value = subject.Name },

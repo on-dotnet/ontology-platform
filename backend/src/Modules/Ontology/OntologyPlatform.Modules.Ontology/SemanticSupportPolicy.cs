@@ -18,6 +18,16 @@ public sealed partial class JenaSemanticRuntime
     {
         // 声明的属性允许简单断言；AnnotationProperty明确作为普通注释而非推理能力。
         var properties = triples.Where(triple => triple.Subject.Kind == RdfTermKind.Iri && triple.Predicate == JenaRdfCodec.Type && triple.Object.Kind == RdfTermKind.Iri && triple.Object.Value is JenaRdfCodec.Owl + "ObjectProperty" or JenaRdfCodec.Owl + "DatatypeProperty" or JenaRdfCodec.Owl + "AnnotationProperty").Select(triple => triple.Subject.Value).ToHashSet(StringComparer.Ordinal);
+        // 属性种类按显式声明判定；不把literal关系猜成annotation，也不做隐式推理。
+        var objectProperties = triples.Where(triple => triple.Predicate == JenaRdfCodec.Type && triple.Object.Value == JenaRdfCodec.Owl + "ObjectProperty").Select(triple => triple.Subject.Value).ToHashSet(StringComparer.Ordinal);
+        // 数据属性简单断言必须保持literal词法项。
+        var datatypeProperties = triples.Where(triple => triple.Predicate == JenaRdfCodec.Type && triple.Object.Value == JenaRdfCodec.Owl + "DatatypeProperty").Select(triple => triple.Subject.Value).ToHashSet(StringComparer.Ordinal);
+        // 平台原G2来源字段是明确普通元数据，避免把任意自定义谓词放宽成注释。
+        var metadata = new[] { "sourceId", "sourceRecordId", "validFromUtc", "observedAtUtc", "modelVersion", "mappingStatus" }.Select(name => "urn:ontology-platform:vocabulary:" + name).ToHashSet(StringComparer.Ordinal);
+        // SKOS明确登记的标签/说明及关系仍仅按原始显式事实处理。
+        var skos = new[] { "prefLabel", "altLabel", "hiddenLabel", "notation", "definition", "scopeNote", "note", "broader", "narrower", "related", "inScheme", "topConceptOf", "hasTopConcept", "exactMatch", "closeMatch", "broadMatch", "narrowMatch", "relatedMatch" }.Select(name => "http://www.w3.org/2004/02/skos/core#" + name).ToHashSet(StringComparer.Ordinal);
+        // PROV只保留明确登记的来源关系和时间元数据，不宣称PROV推理。
+        var provenance = new[] { "wasDerivedFrom", "wasGeneratedBy", "wasAttributedTo", "generatedAtTime", "startedAtTime", "endedAtTime" }.Select(name => "http://www.w3.org/ns/prov#" + name).ToHashSet(StringComparer.Ordinal);
         // 只允许这些显式声明，不把未知OWL或RDFS内建类型当普通业务类型。
         var owlDeclarations = new[] { "Class", "ObjectProperty", "DatatypeProperty", "NamedIndividual", "Ontology", "AnnotationProperty" }.Select(name => JenaRdfCodec.Owl + name).ToHashSet(StringComparer.Ordinal);
         // 有限命名IRI对仅表达原始公理，不执行闭包或一致性证明。
@@ -49,8 +59,10 @@ public sealed partial class JenaSemanticRuntime
             }
             else
             {
-                // 普通literal注释及显式SKOS/PROV来源不是OWL推理；任意未声明IRI关系仍阻断。
-                blocked |= !properties.Contains(triple.Predicate) && triple.Object.Kind != RdfTermKind.Literal && !triple.Predicate.StartsWith("http://www.w3.org/2004/02/skos/core#", StringComparison.Ordinal) && !triple.Predicate.StartsWith("http://www.w3.org/ns/prov#", StringComparison.Ordinal);
+                // 普通annotation需明确声明或登记；任意未声明literal/IRI关系均不能猜作注释。
+                blocked |= !properties.Contains(triple.Predicate) && !(metadata.Contains(triple.Predicate) && triple.Object.Kind == RdfTermKind.Literal) && !skos.Contains(triple.Predicate) && !provenance.Contains(triple.Predicate);
+                if (objectProperties.Contains(triple.Predicate)) blocked |= triple.Object.Kind != RdfTermKind.Iri;
+                if (datatypeProperties.Contains(triple.Predicate)) blocked |= triple.Object.Kind != RdfTermKind.Literal;
             }
             // M1未实现OWL-Time，声明及谓词都不得绕过SOURCE/BLOCKED矩阵。
             blocked |= triple.Predicate.StartsWith("http://www.w3.org/2006/time#", StringComparison.Ordinal) || (triple.Predicate == JenaRdfCodec.Type && triple.Object.Value.StartsWith("http://www.w3.org/2006/time#", StringComparison.Ordinal));

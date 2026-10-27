@@ -95,7 +95,8 @@ internal sealed class ExactGraphComparison
             {
                 Check();
                 if (used.Contains(candidate)) continue;
-                if (++VisitedNodes > 100000) throw new ComparisonLimitException("search_node_budget");
+                if (VisitedNodes >= 100000) throw new ComparisonLimitException("search_node_budget");
+                VisitedNodes++;
                 mapping.Add(order[depth], candidate);
                 used.Add(candidate);
                 // 已完全映射的边立即剪枝；未映射边保留给后续搜索，不能过早判异。
