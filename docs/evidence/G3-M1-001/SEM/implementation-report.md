@@ -18,7 +18,7 @@
 |PublishingTests真实PG/Jena/RustFS|55/55 PASS，0跳过；含既有validToUtc兼容正反|g3-sem-metadata-green.txt|
 |QueryTests真实发布/授权/查询/同批读取|49/49 PASS，0跳过|g3-sem-query-final-run.txt|
 |AgentTests原Run/SSE/deterministic兼容|33/33 PASS，0跳过；不代表真实LLM|g3-sem-query-agent-run.txt|
-|verify.ps1 -SelfTest|最终exit0，含构包54/54及维护正反例；原生/浏览器项明确NOT_RUN|g3-sem-selftest-final-head.txt|
+|verify.ps1 -SelfTest|前轮完整exit0，含构包54/54及维护正反例；后续metadata轮因原manifest缺LF而exit1，封套纠正后静态exit0；最后完整同Head门禁由Master执行|g3-sem-selftest-final-head.txt、manifest-text-format-fail.txt、manifest-envelope-static-verification.txt|
 |全部owned改动C#按所属项目dotnet format|6项目全部exit0|format-final-head.json|
 
 以上为233项模块用例的最新真实覆盖；Publishing55已在validToUtc精确兼容修复后完整运行，Query/Agent成功早于随后诊断映射、validToUtc兼容与import格式修复；未冒充最终整合Head的全栈CI。SEM96在已提交fad4387修复上运行；4ef97f2只有Publishing测试import顺序。原始执行脚本已按实际运行内容存executed-harnesses，均输出到本任务/private/tmp，从未执行硬编码旧G2证据目录runner。Master仍须对最终整合Head执行组合验收和CI。
@@ -39,6 +39,6 @@ Master已生成f1cd505并以b48a68a修复forward-only Down；新表和原报告�
 
 ## 资源与未决项
 
-精确回收本SEM创建的33个临时容器，逐一container inspect确认无记录；未删镜像、卷、历史refs/旧树或私有runtime。唯一保留Jena匹配本任务fixture挂载后按不可变ID删除；公开fixture目录与最后SelfTest完成后的/tmp隔离PyYAML/toolbin已真实删除。命令、退出码、容量与after见resource-lifecycle.json。分支、Worktree及构建缓存为活跃待审成果保留，避免清理未整合代码；实际V1/V2公开合成manifest以compatibility-fixtures内带LF的base64封套无损归档；恢复器按原大小/hash核验并拒绝覆盖，供独立reader读取恢复后的原始字节。直接原始JSON缺末尾LF曾使文本门禁FAIL，记录manifest-text-format-fail.txt；此次只纠正证据容器，不修改原字节/hash或重跑业务。
+精确回收本SEM创建的33个临时容器，逐一container inspect确认无记录；未删镜像、卷、历史refs/旧树或私有runtime。唯一保留Jena匹配本任务fixture挂载后按不可变ID删除；公开fixture目录与各轮SelfTest退出后的/tmp隔离PyYAML/toolbin已真实删除。命令、退出码、容量与after见resource-lifecycle.json。分支、Worktree及构建缓存为活跃待审成果保留，避免清理未整合代码；实际V1/V2公开合成manifest以compatibility-fixtures内带LF的base64封套无损归档；恢复器按原大小/hash核验并拒绝覆盖，供独立reader读取恢复后的原始字节。直接原始JSON缺末尾LF曾使文本门禁FAIL，记录manifest-text-format-fail.txt；此次只纠正证据容器，不修改原字节/hash或重跑业务。
 
 独立Astra最终结论、Master HTTP/OpenAPI/Web组合验收、最终同Head CI与唯一V2 Review ZIP仍由Master记录；本报告不代替其PASS。最终提交/推送本证据后等待当前关口复审，不自动进入下阶段。
