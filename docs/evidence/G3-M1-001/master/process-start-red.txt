@@ -1,0 +1,35 @@
+test_actual_process_start_failure_marks_current_failed_and_later_not_run (__main__.M1OrchestrationTests.test_actual_process_start_failure_marks_current_failed_and_later_not_run) ... FAIL
+test_all_real_gate_selections_include_m1_and_regressions (__main__.M1OrchestrationTests.test_all_real_gate_selections_include_m1_and_regressions) ... ok
+test_each_child_failure_stops_later_gates (__main__.M1OrchestrationTests.test_each_child_failure_stops_later_gates) ... ok
+test_failed_attempt_cannot_consume_or_certify_stale_pass (__main__.M1OrchestrationTests.test_failed_attempt_cannot_consume_or_certify_stale_pass) ... ok
+test_protected_g2_runtime_is_refused (__main__.M1OrchestrationTests.test_protected_g2_runtime_is_refused) ... usage: g3-acceptance-runtime.py [-h] [--runtime-file RUNTIME_FILE]
+                                [--start-runtime]
+g3-acceptance-runtime.py: error: Protected G2 or unrelated runtime refused
+ok
+
+======================================================================
+FAIL: test_actual_process_start_failure_marks_current_failed_and_later_not_run (__main__.M1OrchestrationTests.test_actual_process_start_failure_marks_current_failed_and_later_not_run)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform/scripts/tests/G3Acceptance.Tests.py", line 108, in test_actual_process_start_failure_marks_current_failed_and_later_not_run
+    self.assertEqual(proof['gates'][0]['status'], 'FAIL')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'RUNNING' != 'FAIL'
+- RUNNING
++ FAIL
+
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.566s
+
+FAILED (failures=1)
+{"status": "FAIL", "runId": "80cfb104da57450c8060012600beed4b", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/80cfb104da57450c8060012600beed4b"}
+{"status": "PASS", "runId": "75f41c8569ac4292a978ea21bfac23c9", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/75f41c8569ac4292a978ea21bfac23c9"}
+{"status": "FAIL", "runId": "7c384a865c8841e2ab0b7f1a17f887d3", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/7c384a865c8841e2ab0b7f1a17f887d3"}
+{"status": "FAIL", "runId": "2f8100fd90a04af48cef8b2e523a4b56", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/2f8100fd90a04af48cef8b2e523a4b56"}
+{"status": "FAIL", "runId": "ca82df19c01d4801acf4f059d57eceef", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/ca82df19c01d4801acf4f059d57eceef"}
+{"status": "FAIL", "runId": "e483197cd7c541319984bfc95419df8d", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/e483197cd7c541319984bfc95419df8d"}
+{"status": "FAIL", "runId": "de2ddee4d08f4c929e8786b4898b21c1", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/de2ddee4d08f4c929e8786b4898b21c1"}
+{"status": "FAIL", "runId": "f0d0d8a55d604d6db5e8db702a78b78b", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/f0d0d8a55d604d6db5e8db702a78b78b"}
+{"status": "FAIL", "runId": "155d7ddfd3a44d97a4252a9f87ac00b5", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/155d7ddfd3a44d97a4252a9f87ac00b5"}
+{"status": "FAIL", "runId": "8264ff0a1ac74dd7a7ab8d28b0a6c974", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/8264ff0a1ac74dd7a7ab8d28b0a6c974"}

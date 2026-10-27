@@ -18,7 +18,7 @@ GATES = ['full-g2-e2e.py', 'g3-compatibility.py', 'g1-regression.py', 'g2-observ
 class M1OrchestrationTests(unittest.TestCase):
     """Keep gate selection/order/failure propagation real, isolate external services only."""
 
-    def exercise(self, fail_gate=None, prefix='g3-m1-control'):
+    def exercise(self, fail_gate=None, prefix='g3-m1-control', launch_failure=False):
         spec = importlib.util.spec_from_file_location('m1_orchestrator', SCRIPT)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
@@ -42,6 +42,8 @@ class M1OrchestrationTests(unittest.TestCase):
                 gate = Path(command[1]).name
                 if gate == 'full-g2-e2e.py':
                     self.assertIn('--m1', command, 'M1 checks must run in the existing authenticated harness')
+                if gate == fail_gate and launch_failure:
+                    return original([str(root / 'actual-missing-gate-executable')], cwd=root)
                 return original([sys.executable, str(child), str(log), *command, '23' if gate == fail_gate else '0'], cwd=root)
 
             def output(command, **kwargs):
@@ -56,8 +58,13 @@ class M1OrchestrationTests(unittest.TestCase):
                 stack.enter_context(patch.dict(os.environ, {'PLATFORM_EVIDENCE_DIR': 'docs/evidence/G3-M1-001/runtime'}))
                 stack.enter_context(patch.object(module.subprocess, 'check_output', side_effect=output))
                 stack.enter_context(patch.object(module.subprocess, 'run', side_effect=run))
-                code = module.main()
-            calls = [json.loads(line) for line in log.read_text().splitlines()]
+                try:
+                    code = module.main()
+                except OSError:
+                    if not launch_failure:
+                        raise
+                    code = 1
+            calls = [json.loads(line) for line in log.read_text().splitlines()] if log.exists() else []
             manifests = list(stale.parent.rglob('acceptance.json'))
             proof = json.loads(manifests[0].read_text()) if len(manifests) == 1 else None
             return code, [Path(call[1]).name for call in calls], proof, evidence_seen, stale.read_text()
@@ -92,6 +99,16 @@ class M1OrchestrationTests(unittest.TestCase):
         self.assertNotEqual(selected[0], 'docs/evidence/G3-M1-001/runtime')
         self.assertIn(proof['runId'], selected[0])
         self.assertEqual(json.loads(old), {'status': 'PASS', 'runId': 'old-run'})
+
+    def test_actual_process_start_failure_marks_current_failed_and_later_not_run(self):
+        code, calls, proof, *_ = self.exercise('full-g2-e2e.py', launch_failure=True)
+        self.assertEqual(code, 1)
+        self.assertEqual(calls, [])
+        self.assertEqual(proof['status'], 'FAIL')
+        self.assertEqual(proof['gates'][0]['status'], 'FAIL')
+        self.assertIsNone(proof['gates'][0]['exitCode'])
+        self.assertEqual(proof['gates'][0]['failureCategory'], 'FileNotFoundError')
+        self.assertTrue(all(item['status'] == 'NOT_RUN' for item in proof['gates'][1:]))
 
 
 if __name__ == '__main__':

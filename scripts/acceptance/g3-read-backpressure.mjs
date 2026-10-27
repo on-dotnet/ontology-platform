@@ -12,11 +12,14 @@ export async function postSemanticRead(api, url, options, observe = () => {}) {
     const waitMs = busy && attempt < 5 ? 250 * 2 ** (attempt - 1) : 0;
     const fact = { attempt, status: response.status(), code: busy ? "semantic_busy" : null,
       waitMs, observedWaitMs: waitMs ? null : 0, elapsedMs };
-    observe(fact);
-    if (!waitMs) return response;
+    if (!waitMs) {
+      observe(fact);
+      return response;
+    }
     const waiting = performance.now();
     await new Promise(resolve => setTimeout(resolve, waitMs));
     fact.observedWaitMs = performance.now() - waiting;
+    observe(fact);
   }
   throw new Error("unreachable_bounded_read_loop");
 }

@@ -1,0 +1,52 @@
+✖ real semantic_busy response waits and reissues only the read (280.05325ms)
+✖ semantic_busy exhaustion stays failed with five recorded attempts (3781.12925ms)
+✔ a write is never retried even with the same busy code (4.344833ms)
+✔ unknown 429 code is not retried or echoed (2.99625ms)
+✔ malformed 429 body is not retried (2.948167ms)
+✔ non-busy service failure is not retried (2.915125ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 4
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4122.269459
+
+✖ failing tests:
+
+test at scripts/tests/G3ReadBackpressure.Tests.mjs:29:1
+✖ real semantic_busy response waits and reissues only the read (280.05325ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+    assert.ok(Number.isFinite(result.attempts[0].observedWaitMs))
+
+      at TestContext.<anonymous> (file:///Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform/scripts/tests/G3ReadBackpressure.Tests.mjs:36:10)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at scripts/tests/G3ReadBackpressure.Tests.mjs:41:1
+✖ semantic_busy exhaustion stays failed with five recorded attempts (3781.12925ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+    assert.ok(result.attempts.every(item => Number.isFinite(item.observedWaitMs)))
+
+      at TestContext.<anonymous> (file:///Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform/scripts/tests/G3ReadBackpressure.Tests.mjs:46:10)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

@@ -106,10 +106,20 @@ def run_attempt():
                 return result.returncode
         acceptance['status'] = 'PASS'
         return 0
+    except Exception as failure:
+        acceptance['failureCategory'] = type(failure).__name__
+        raise
     finally:
         try:
             shared.stop(process)
+        except Exception as failure:
+            acceptance['status'] = 'FAIL'
+            acceptance['failureCategory'] = type(failure).__name__
+            raise
         finally:
+            for gate in acceptance['gates']:
+                if gate['status'] == 'RUNNING':
+                    gate.update(status='FAIL', failureCategory=acceptance.get('failureCategory', 'gate_interrupted'))
             ownership['launcherStopped'] = process is None or process.poll() is not None
             ownership['launcherExitCode'] = None if process is None else process.returncode
             (evidence / 'owned-runtime.json').write_text(json.dumps(ownership, indent=2) + '\n')

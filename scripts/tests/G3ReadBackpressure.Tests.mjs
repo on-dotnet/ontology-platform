@@ -19,7 +19,7 @@ async function exercise(responses, path = "/api/v1/semantic/queries") {
       return { status: () => response.status, json: () => response.clone().json() };
     } };
     const response = await postSemanticRead(api, "http://127.0.0.1:" + server.address().port + path,
-      { data: { synthetic: true } }, attempt => attempts.push(attempt));
+      { data: { synthetic: true } }, attempt => attempts.push({ ...attempt }));
     return { status: response.status(), count, attempts };
   } finally {
     await new Promise(resolve => server.close(resolve));
@@ -33,6 +33,8 @@ test("real semantic_busy response waits and reissues only the read", async () =>
   assert.deepEqual(result.attempts.map(item => item.status), [429, 200]);
   assert.equal(result.attempts[0].code, "semantic_busy");
   assert.equal(result.attempts[0].waitMs, 250);
+  assert.ok(Number.isFinite(result.attempts[0].observedWaitMs));
+  assert.ok(result.attempts[0].observedWaitMs >= 200);
   assert.equal(result.attempts[1].waitMs, 0);
 });
 
@@ -41,6 +43,7 @@ test("semantic_busy exhaustion stays failed with five recorded attempts", async 
   assert.equal(result.status, 429);
   assert.equal(result.count, 5);
   assert.deepEqual(result.attempts.map(item => item.waitMs), [250, 500, 1000, 2000, 0]);
+  assert.ok(result.attempts.every(item => Number.isFinite(item.observedWaitMs)));
 });
 
 test("a write is never retried even with the same busy code", async () => {
