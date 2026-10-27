@@ -1,0 +1,83 @@
+$ vitest run src/features/ontology/m2-diagnostics.test.ts
+
+ RUN  v5.0.5 /Users/chasen/.codex/worktrees/g3-m2-web/ontology-platform/apps/web
+
+ ❯ src/features/ontology/m2-diagnostics.test.ts (5 tests | 5 failed) 2ms
+   ❯ M2 诊断只能定位当前来源 (5)
+     × 同源hash匹配才给源文档与确实存在的focus节点，未知行列不猜测 1ms
+     × 过期hash或dirty拒绝定位 0ms
+     × bundle不对应单源，未知sourceId及不存在focus不伪造节点 0ms
+     × blank sourceShape不产生原文位置，即使外层附带行列 0ms
+     × 只有服务器正整数且在当前源实际边界内才保留行列 0ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/features/ontology/m2-diagnostics.test.ts > M2 诊断只能定位当前来源 > 同源hash匹配才给源文档与确实存在的focus节点，未知行列不猜测
+TypeError: diagnosticLocation is not a function
+ ❯ src/features/ontology/m2-diagnostics.test.ts:18:12
+     16| describe("M2 诊断只能定位当前来源", () => {
+     17|   it("同源hash匹配才给源文档与确实存在的focus节点，未知行列不猜测", () => {
+     18|     expect(diagnosticLocation(item, draft, false)).toEqual({ field: "o…
+       |            ^
+     19|   });
+     20|   it("过期hash或dirty拒绝定位", () => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  src/features/ontology/m2-diagnostics.test.ts > M2 诊断只能定位当前来源 > 过期hash或dirty拒绝定位
+TypeError: diagnosticLocation is not a function
+ ❯ src/features/ontology/m2-diagnostics.test.ts:21:12
+     19|   });
+     20|   it("过期hash或dirty拒绝定位", () => {
+     21|     expect(diagnosticLocation({ ...item, sourceHash: "old" }, draft, f…
+       |            ^
+     22|     expect(diagnosticLocation(item, draft, true)).toBeNull();
+     23|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  src/features/ontology/m2-diagnostics.test.ts > M2 诊断只能定位当前来源 > bundle不对应单源，未知sourceId及不存在focus不伪造节点
+TypeError: diagnosticLocation is not a function
+ ❯ src/features/ontology/m2-diagnostics.test.ts:25:12
+     23|   });
+     24|   it("bundle不对应单源，未知sourceId及不存在focus不伪造节点", () => {
+     25|     expect(diagnosticLocation({ ...item, sourceId: "bundle", sourceHas…
+       |            ^
+     26|     expect(diagnosticLocation({ ...item, sourceId: "unknown" }, draft,…
+     27|     const diagnostic = { ...item.diagnostic, focusNode: { kind: "iri" …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  src/features/ontology/m2-diagnostics.test.ts > M2 诊断只能定位当前来源 > blank sourceShape不产生原文位置，即使外层附带行列
+TypeError: diagnosticLocation is not a function
+ ❯ src/features/ontology/m2-diagnostics.test.ts:33:12
+     31|     const blank = { ...item, sourceId: "shapes", sourceHash: "s", line…
+     32|       sourceShape: { kind: "blank" as const, value: "b0", datatype: nu…
+     33|     expect(diagnosticLocation(blank, draft, false)).toMatchObject({ fi…
+       |            ^
+     34|   });
+     35|   it("只有服务器正整数且在当前源实际边界内才保留行列", () => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  src/features/ontology/m2-diagnostics.test.ts > M2 诊断只能定位当前来源 > 只有服务器正整数且在当前源实际边界内才保留行列
+TypeError: diagnosticLocation is not a function
+ ❯ src/features/ontology/m2-diagnostics.test.ts:36:12
+     34|   });
+     35|   it("只有服务器正整数且在当前源实际边界内才保留行列", () => {
+     36|     expect(diagnosticLocation({ ...item, line: 1, column: 2 }, draft, …
+       |            ^
+     37|     expect(diagnosticLocation({ ...item, line: 99, column: 2 }, draft,…
+     38|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  5 failed (5)
+   Start at  22:27:51
+   Duration  81ms (transform 51%, import 27%, tests 13%, worker 9%)
+
+/Users/chasen/.codex/worktrees/g3-m2-web/ontology-platform/apps/web:
+[ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL] @ontology-platform/web@0.1.0 test: `vitest run src/features/ontology/m2-diagnostics.test.ts`
+Exit status 1

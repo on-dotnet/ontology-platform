@@ -1,4 +1,4 @@
-import type { OntologyDraft, SemanticAssessment, SemanticSupportProfile } from "../../lib/api/g2-generated";
+import type { AssessmentDiagnostic, SourceBundle, OntologyDraft, SemanticAssessment, SemanticSupportProfile } from "../../lib/api/g2-generated";
 
 /** 客户端仅提示当前修订资格；服务器仍须执行权限、散列和事务绑定核验。 */
 export function assessmentEligibility(
@@ -39,4 +39,29 @@ export function comparisonLabel(status: string): string {
   if (status === "DIFFERENT") return "DIFFERENT · RDF图不同";
   if (status === "INDETERMINATE") return "INDETERMINATE · 图比较未确定，不能认定无差异";
   return "UNKNOWN · 未识别比较状态";
+}
+
+/** 诊断只绑定当前实际单源；不从focus/path或blank shape反推源码行列。 */
+export function diagnosticLocation(item: AssessmentDiagnostic, draft: OntologyDraft, dirty: boolean): {
+  field: keyof SourceBundle; focus: string | null; line: number | null; column: number | null;
+} | null {
+  const sourceMap = {
+    ontology: ["ontologyTurtle", "ontologyHash"], shapes: ["shapesTurtle", "shapesHash"],
+    vocabulary: ["vocabularyTurtle", "vocabularyHash"], data: ["dataTurtle", "dataHash"],
+  } as const;
+  const mapping = sourceMap[item.sourceId as keyof typeof sourceMap];
+  if (dirty || !mapping || !item.sourceHash || draft.hashes[mapping[1]] !== item.sourceHash) return null;
+  const field = mapping[0];
+  const source = draft.sources[field];
+  if (source === null) return null;
+  const focusTerm = item.diagnostic.focusNode;
+  const focus = focusTerm?.kind === "iri" && draft.projection.nodes.some(node => node.id === focusTerm.value)
+    ? focusTerm.value : null;
+  const lines = source.split(/\r\n|\r|\n/);
+  const validLine = item.sourceShape?.kind !== "blank" && Number.isSafeInteger(item.line)
+    && item.line! > 0 && item.line! <= lines.length;
+  const line = validLine ? item.line : null;
+  const validColumn = line !== null && Number.isSafeInteger(item.column)
+    && item.column! > 0 && item.column! <= lines[line - 1].length + 1;
+  return { field, focus, line, column: validColumn ? item.column : null };
 }

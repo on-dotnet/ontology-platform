@@ -1,14 +1,15 @@
 "use client";
 import { useEffect, useState } from "react";
 import { command, createG2Client } from "../../lib/api/g2-client";
-import type { OntologyDraft, SemanticAssessment, SemanticSupportProfile, SemanticValidationReport } from "../../lib/api/g2-generated";
+import type { OntologyDraft, SemanticAssessment, SemanticSupportProfile, SemanticValidationReport, SourceBundle } from "../../lib/api/g2-generated";
 import { Trace } from "../../components/ui/semantic-feedback";
+import { DiagnosticCard } from "./diagnostic-card";
 import { assessmentEligibility } from "./semantic-status";
 
 const client = createG2Client();
 
 /** 保留G2校验报告，同时用服务器assessment绑定当前修订的发布资格。 */
-export function AssessmentPanel({ draft, profile, dirty, busy, canEdit, reason, execute, onNotice }: {
+export function AssessmentPanel({ draft, profile, dirty, busy, canEdit, reason, execute, onNotice, onLocate }: {
   draft: OntologyDraft;
   profile: SemanticSupportProfile | null;
   dirty: boolean;
@@ -17,6 +18,7 @@ export function AssessmentPanel({ draft, profile, dirty, busy, canEdit, reason, 
   reason: string;
   execute: (action: (signal: AbortSignal) => Promise<void>) => Promise<void>;
   onNotice: (message: string) => void;
+  onLocate?: (field: keyof SourceBundle, focus: string | null) => void;
 }) {
   const [report, setReport] = useState<SemanticValidationReport | null>(null);
   const [assessment, setAssessment] = useState<SemanticAssessment | null>(null);
@@ -45,6 +47,19 @@ export function AssessmentPanel({ draft, profile, dirty, busy, canEdit, reason, 
 
   return (
     <section className="g2-stack" aria-label="校验与发布资格">
+      <section className="g3-model-status" aria-label="建模能力四状态">
+        <h3>建模能力四状态</h3>
+        <dl className="g2-detail">
+          <div><dt>可保存</dt><dd>{!canEdit ? "只读 · 无编辑权限" : busy ? "请求处理中"
+            : dirty ? "可提交保存 · 保存时由服务端解析校验" : "已保存 · 当前修订无需保存"}</dd></div>
+          <div><dt>可结构编辑</dt><dd>{!profile ? "UNKNOWN · 支持档案未取得" : !canEdit ? "只读 · 无编辑权限"
+            : !draft.projection.structuralEditAllowed ? "只读 · 原始图含未支持语义"
+            : dirty ? "暂停 · 请先保存源码" : !profile.capabilities.some(item => item.edit === "BASIC")
+              ? "UNKNOWN · 档案未提供基础编辑能力" : "BASIC · 依服务器投影与支持档案"}</dd></div>
+          <div><dt>可发布</dt><dd>{eligibility}</dd></div>
+          <div><dt>可推理</dt><dd>OWL_REASONING · NOT_RUN</dd></div>
+        </dl>
+      </section>
       <h3>SHACL 与支持子集</h3>
       <div className="g2-row">
         <button className="button" disabled={blocked} onClick={() => void execute(async signal => {
@@ -83,12 +98,7 @@ export function AssessmentPanel({ draft, profile, dirty, busy, canEdit, reason, 
             {assessment.stages.map(stage => <li key={stage.name}>{stage.name} · {stage.status} · {stage.code}</li>)}
           </ul>
           {assessment.diagnostics.map((item, index) => (
-            <article className="g2-notice" key={index}>
-              <strong>{item.diagnostic.severity} · {item.diagnostic.code} · {item.diagnostic.message}</strong>
-              <p>source {item.sourceId} · 行 {item.line ?? "UNKNOWN"} / 列 {item.column ?? "UNKNOWN"}</p>
-              <p className="g2-hash">source hash {item.sourceHash}</p>
-              <p>{item.diagnostic.focusNode?.value} · {item.diagnostic.path}</p>
-            </article>
+            <DiagnosticCard key={index} item={item} index={index} draft={draft} dirty={dirty} onLocate={onLocate} />
           ))}
           <button className="button" disabled={busy} onClick={() => void execute(async signal => {
             const result = await client.assessment(assessment.assessmentId, signal);

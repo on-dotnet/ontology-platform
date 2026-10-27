@@ -2,10 +2,11 @@
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { PlatformIdentity } from "../../lib/api/generated";
-import type { OntologyDraft, SemanticSupportProfile, SourceBundle, SaveDraftRequest } from "../../lib/api/g2-generated";
+import type { OntologyDraft, SemanticSupportProfile, SourceBundle, SaveDraftRequest, DraftDiff } from "../../lib/api/g2-generated";
 import { command, createG2Client } from "../../lib/api/g2-client";
 import { SemanticError } from "../../components/ui/semantic-feedback";
 import { draftState, isDirty, isNewDraftDirty, updateSource, type DraftState } from "./draft-state";
+import { EntityTree, EntityProperties } from "./entity-tree";
 import { StructuralForm } from "./structural-form";
 import { SourceEditor } from "./source-editor";
 import { SourceImportSession, type SourceImportHandle } from "./source-import";
@@ -27,6 +28,7 @@ const tabs = [{ id: "catalog", title: "资产" }, { id: "source", title: "源码
 export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) {
   const [drafts, setDrafts] = useState<OntologyDraft[] | null>(null);
   const [state, setState] = useState<DraftState | null>(null);
+  const [structuralDiff, setStructuralDiff] = useState<DraftDiff | null>(null);
   const [remote, setRemote] = useState<OntologyDraft | null>(null);
   const [sources, setSources] = useState<SourceBundle>({ ...emptySources });
   const [name, setName] = useState("");
@@ -34,6 +36,7 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
   const [extraSites, setExtraSites] = useState<string[]>([]);
   const [field, setField] = useState<keyof SourceBundle>("ontologyTurtle");
   const [tab, setTab] = useState("catalog");
+  const [centerView, setCenterView] = useState("source");
   const [error, setError] = useState<unknown>(null);
   const [notice, setNotice] = useState("");
   const [loading, setLoading] = useState(true);
@@ -124,6 +127,7 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
   function accept(draft: OntologyDraft) {
     sourceImports.current.invalidate();
     setState(draftState(draft));
+    setStructuralDiff(null);
     setRemote(null);
     setRetry(null);
     setDrafts(items => [draft, ...(items ?? []).filter(item => item.draftId !== draft.draftId)]);
@@ -186,7 +190,7 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
           <h1>本体资产与草稿</h1>
           <p>原始 Turtle 是权威源 · 真实 RIOT / SHACL · Synthetic 开发事实</p>
         </div>
-        <span className="tag violet">G3 M1 · 源码与支持</span>
+        <span className="tag violet">G3 M2 · 基础建模</span>
       </div>
       {error !== null && <SemanticError error={error} />}
       {notice && <p role="status" className="g2-notice">{notice}</p>}
@@ -227,6 +231,7 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
             setRemote(null);
             setTab("source");
           }}>新建 / 导入资产</button>
+          {state && <EntityTree projection={state.draft.projection} selected={selected} onSelect={chooseNode} />}
         </aside>
         <section className={`g2-panel g2-stack ${tab !== "source" ? "g2-mobile-hidden" : ""}`} aria-label="草稿源码">
           <div className="g2-row">
@@ -235,145 +240,177 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
               {state ? dirty ? "未保存 · 投影过期" : `revision ${state.draft.revision}` : "待创建"}
             </span>
           </div>
-          <label>资产名称
-            <input
-              aria-label="资产名称" value={state?.name ?? name} disabled={busy || !canEdit} maxLength={200}
-              onChange={event => {
-                const nextName = event.target.value;
-                if (state) setState(current => current ? { ...current, name: nextName } : current);
-                else setName(nextName);
-                setRetry(null);
-              }}
-            />
-          </label>
-          {!state ? (
-            <>
-              <label>授权组织 / 默认单厂范围
-                <select aria-label="创建资产作用域" value={scopeIndex} disabled={busy || !canEdit} onChange={event => {
-                  setScopeIndex(event.target.value);
-                  setExtraSites([]);
-                }}>
-                  {identity.scopes.map((scope, index) => (
-                    <option key={`${scope.organizationId}/${scope.siteId}`} value={index}>{scope.organizationId} / {scope.siteId}</option>
-                  ))}
-                </select>
-              </label>
-              {selectedScope && identity.scopes
-                .filter(scope => scope.organizationId === selectedScope.organizationId && scope.siteId !== selectedScope.siteId)
-                .map(scope => (
-                  <label key={scope.siteId} className="g2-row">
-                    <span>额外授权厂区 {scope.siteId}</span>
-                    <input
-                      type="checkbox" checked={extraSites.includes(scope.siteId)} disabled={busy || !canEdit}
-                      onChange={event => setExtraSites(items => event.target.checked ? [...items, scope.siteId] : items.filter(site => site !== scope.siteId))}
-                    />
-                  </label>
-                ))}
-              <p className="muted">载入四份 .ttl 原文件，或直接输入合成源。额外厂区须明确勾选，服务端再次校验。</p>
-            </>
-          ) : (
-            <>
-              <p className="g2-hash">{state.draft.assetId} · {state.draft.scope.organizationId} / {state.draft.scope.siteIds.join(" / ")}</p>
-              <p className="g2-hash">bundle {state.draft.hashes.bundleHash}</p>
-            </>
-          )}
-          <SourceEditor
-            sources={state?.sources ?? sources} field={field} onField={setField} readOnly={busy || !canEdit}
-            onBeginImport={beginImport}
-            onAbsent={() => {
-              sourceImports.current.invalidate("vocabularyTurtle");
-              if (state) setState(current => current ? { ...current, sources: { ...current.sources, vocabularyTurtle: null } } : current);
-              else setSources(current => ({ ...current, vocabularyTurtle: null }));
-              setRetry(null);
-            }}
-            onChange={(key, value) => {
-              sourceImports.current.invalidate(key);
-              if (state) setState(current => current ? updateSource(current, key, value) : current);
-              else setSources(current => ({ ...current, [key]: value }));
-              setRetry(null);
-            }}
-          />
           <label>变更理由（必填，≤500字符）
             <input aria-label="变更理由" value={reason} maxLength={500} disabled={busy || !canEdit} onChange={event => {
               setReason(event.target.value);
               setRetry(null);
             }} />
           </label>
-          {dirty && (
-            <button className="button" disabled={busy} onClick={() => {
-              sourceImports.current.invalidate();
-              if (state) setState(current => current ? draftState(current.draft) : current);
-              else { setName(""); setSources({ ...emptySources }); }
-              setRemote(null);
-              setRetry(null);
-              setNotice("已显式丢弃未保存修改；服务端草稿未改变。");
-            }}>丢弃未保存修改</button>
+          {state && (
+            <div className="g2-tabs" aria-label="中间建模视图">
+              <button className="button" aria-pressed={centerView === "graph"} onClick={() => setCenterView("graph")}>图视图</button>
+              <button className="button" aria-pressed={centerView === "source"} onClick={() => setCenterView("source")}>源码视图</button>
+            </div>
           )}
-          <div className="g2-row">
-            {state ? (
+          {state && centerView === "graph" && (
+            <SemanticGraph projection={state.draft.projection} selected={selected} stale={dirty} onSelect={chooseNode} />
+          )}
+          <div className="g2-stack" hidden={Boolean(state && centerView !== "source")}>
+            <label>资产名称
+              <input
+                aria-label="资产名称" value={state?.name ?? name} disabled={busy || !canEdit} maxLength={200}
+                onChange={event => {
+                  const nextName = event.target.value;
+                  if (state) setState(current => current ? { ...current, name: nextName } : current);
+                  else setName(nextName);
+                  setRetry(null);
+                }}
+              />
+            </label>
+            {!state ? (
               <>
-                <button className="button primary" disabled={busy || !dirty || !reason.trim() || !canEdit} onClick={() => save()}>保存新修订</button>
-                {retry && <button className="button" disabled={busy || !canEdit} onClick={() => save(true)}>重试原保存命令</button>}
-                <button className="button" disabled={busy} onClick={() => void execute(async signal => {
-                  const next = await client.draft(state.draft.draftId, signal);
-                  if (dirty) {
-                    setRemote(next);
-                    setNotice("远端版本已加载供对比，本地文本保留。仅显式丢弃才覆盖。");
-                  } else accept(next);
-                })}>读取远端版本</button>
+                <label>授权组织 / 默认单厂范围
+                  <select aria-label="创建资产作用域" value={scopeIndex} disabled={busy || !canEdit} onChange={event => {
+                    setScopeIndex(event.target.value);
+                    setExtraSites([]);
+                  }}>
+                    {identity.scopes.map((scope, index) => (
+                      <option key={`${scope.organizationId}/${scope.siteId}`} value={index}>{scope.organizationId} / {scope.siteId}</option>
+                    ))}
+                  </select>
+                </label>
+                {selectedScope && identity.scopes
+                  .filter(scope => scope.organizationId === selectedScope.organizationId && scope.siteId !== selectedScope.siteId)
+                  .map(scope => (
+                    <label key={scope.siteId} className="g2-row">
+                      <span>额外授权厂区 {scope.siteId}</span>
+                      <input
+                        type="checkbox" checked={extraSites.includes(scope.siteId)} disabled={busy || !canEdit}
+                        onChange={event => setExtraSites(items => event.target.checked ? [...items, scope.siteId] : items.filter(site => site !== scope.siteId))}
+                      />
+                    </label>
+                  ))}
+                <p className="muted">载入四份 .ttl 原文件，或直接输入合成源。额外厂区须明确勾选，服务端再次校验。</p>
               </>
             ) : (
-              <button
-                className="button primary" disabled={busy || !name.trim() || !reason.trim() || !selectedScope || !canEdit}
-                onClick={() => void execute(async signal => {
-                  const draft = await client.createDraft({
-                    name, sources,
-                    scope: { organizationId: selectedScope.organizationId, siteIds: [selectedScope.siteId, ...extraSites].sort() },
-                    baseReleaseId: null, command: command(0, reason),
-                  }, signal);
-                  accept(draft);
-                  setName("");
-                  setSources({ ...emptySources });
-                  setNotice("草稿已创建并通过服务端解析");
-                })}
-              >创建真实草稿</button>
+              <>
+                <p className="g2-hash">{state.draft.assetId} · {state.draft.scope.organizationId} / {state.draft.scope.siteIds.join(" / ")}</p>
+                <p className="g2-hash">bundle {state.draft.hashes.bundleHash}</p>
+              </>
+            )}
+            <SourceEditor
+              sources={state?.sources ?? sources} field={field} onField={setField} readOnly={busy || !canEdit}
+              onBeginImport={beginImport}
+              onAbsent={() => {
+                sourceImports.current.invalidate("vocabularyTurtle");
+                if (state) setState(current => current ? { ...current, sources: { ...current.sources, vocabularyTurtle: null } } : current);
+                else setSources(current => ({ ...current, vocabularyTurtle: null }));
+                setRetry(null);
+              }}
+              onChange={(key, value) => {
+                sourceImports.current.invalidate(key);
+                if (state) setState(current => current ? updateSource(current, key, value) : current);
+                else setSources(current => ({ ...current, [key]: value }));
+                setRetry(null);
+              }}
+            />
+
+            {dirty && (
+              <button className="button" disabled={busy} onClick={() => {
+                sourceImports.current.invalidate();
+                if (state) setState(current => current ? draftState(current.draft) : current);
+                else { setName(""); setSources({ ...emptySources }); }
+                setRemote(null);
+                setRetry(null);
+                setNotice("已显式丢弃未保存修改；服务端草稿未改变。");
+              }}>丢弃未保存修改</button>
+            )}
+            <div className="g2-row">
+              {state ? (
+                <>
+                  <button className="button primary" disabled={busy || !dirty || !reason.trim() || !canEdit} onClick={() => save()}>保存新修订</button>
+                  {retry && <button className="button" disabled={busy || !canEdit} onClick={() => save(true)}>重试原保存命令</button>}
+                  <button className="button" disabled={busy} onClick={() => void execute(async signal => {
+                    const next = await client.draft(state.draft.draftId, signal);
+                    if (dirty) {
+                      setRemote(next);
+                      setNotice("远端版本已加载供对比，本地文本保留。仅显式丢弃才覆盖。");
+                    } else accept(next);
+                  })}>读取远端版本</button>
+                </>
+              ) : (
+                <button
+                  className="button primary" disabled={busy || !name.trim() || !reason.trim() || !selectedScope || !canEdit}
+                  onClick={() => void execute(async signal => {
+                    const draft = await client.createDraft({
+                      name, sources,
+                      scope: { organizationId: selectedScope.organizationId, siteIds: [selectedScope.siteId, ...extraSites].sort() },
+                      baseReleaseId: null, command: command(0, reason),
+                    }, signal);
+                    accept(draft);
+                    setName("");
+                    setSources({ ...emptySources });
+                    setNotice("草稿已创建并通过服务端解析");
+                  })}
+                >创建真实草稿</button>
+              )}
+            </div>
+            {!canEdit && <p className="g2-notice">当前身份仅可读取。编辑要求 platform.operator，最终授权由服务端执行。</p>}
+            {remote && (
+              <section className="g2-stack">
+                <h3>远端 revision {remote.revision} 与本地文本对比</h3>
+                <p className="g2-hash">远端 bundle {remote.hashes.bundleHash}</p>
+                <pre className="g2-pre">{remote.sources[field] ?? "absent · 未提供"}</pre>
+                <button className="button" disabled={busy} onClick={() => {
+                  accept(remote);
+                  setNotice("已显式丢弃本地内容并载入远端版本");
+                }}>丢弃本地内容并载入此远端版本</button>
+              </section>
             )}
           </div>
-          {!canEdit && <p className="g2-notice">当前身份仅可读取。编辑要求 platform.operator，最终授权由服务端执行。</p>}
-          {remote && (
-            <section className="g2-stack">
-              <h3>远端 revision {remote.revision} 与本地文本对比</h3>
-              <p className="g2-hash">远端 bundle {remote.hashes.bundleHash}</p>
-              <pre className="g2-pre">{remote.sources[field] ?? "absent · 未提供"}</pre>
-              <button className="button" disabled={busy} onClick={() => {
-                accept(remote);
-                setNotice("已显式丢弃本地内容并载入远端版本");
-              }}>丢弃本地内容并载入此远端版本</button>
-            </section>
-          )}
         </section>
         <section className={`g2-panel g2-stack g2-inspector ${tab !== "inspect" ? "g2-mobile-hidden" : ""}`} aria-label="结构与验证">
-          <SupportProfile profile={profile} loading={profileLoading} failed={profileFailed} onRefresh={() => {
-            const signal = lifetime.current?.signal;
-            if (signal) void loadProfile(signal);
-          }} />
           {state ? (
             <>
-              <SemanticGraph projection={state.draft.projection} stale={dirty} onSelect={chooseNode} />
+              <EntityProperties projection={state.draft.projection} selected={selected} />
               {state.draft.projection.diagnostics.map((diagnostic, index) => (
                 <p className="g2-notice" key={index}>{diagnostic.code} · {diagnostic.message}</p>
               ))}
               <StructuralForm
-                projection={state.draft.projection} selected={selected} blocked={busy || dirty || !canEdit || !reason.trim()}
+                key={`structure/${state.draft.draftId}/${state.draft.revision}`}
+                projection={state.draft.projection} selected={selected}
+                blocked={busy || dirty || !canEdit || !reason.trim() || !profile?.capabilities.some(item => item.edit === "BASIC")}
                 onEdit={edit => void execute(async signal => {
-                  accept(await client.editDraft(state.draft.draftId, { edit, command: command(state.draft.revision, reason) }, signal));
-                  setNotice("结构编辑已由服务端保存为新修订");
+                  const previousRevision = state.draft.revision;
+                  const next = await client.editDraft(state.draft.draftId, { edit, command: command(previousRevision, reason) }, signal);
+                  accept(next);
+                  setNotice(`结构编辑已由服务端保存为新修订 revision ${next.revision}；正在读取真实 Diff。`);
+                  const diff = await client.diff(next.draftId, previousRevision, signal);
+                  if (signal.aborted) return;
+                  if (diff.targetRevision === next.revision && diff.targetHashes.bundleHash === next.hashes.bundleHash) {
+                    setStructuralDiff(diff);
+                    setNotice(`结构编辑已由服务端保存为新修订 revision ${next.revision}，已展示真实源码 Diff。`);
+                  } else setNotice("结构编辑已保存；远端 Diff 已对应其他修订，请在版本比较中读取固定修订。");
                 })}
               />
+              {structuralDiff && (
+                <section className="g2-stack" aria-label="结构编辑 Diff">
+                  <h3>本次结构编辑源码 Diff</h3>
+                  <p>revision {structuralDiff.baseRevision} → {structuralDiff.targetRevision}</p>
+                  <pre className="g2-pre">{structuralDiff.sourceDiff}</pre>
+                </section>
+              )}
               <AssessmentPanel
                 key={`assessment/${state.draft.draftId}/${state.draft.revision}`}
                 draft={state.draft} profile={profile} dirty={dirty} busy={busy} canEdit={canEdit}
                 reason={reason} execute={execute} onNotice={setNotice}
+                onLocate={(nextField, focus) => {
+                  setField(nextField);
+                  setSelected(focus ?? "");
+                  setCenterView("source");
+                  setTab("source");
+                  setNotice("已选择当前 hash 对应源码；未知行列保持 UNKNOWN。请依据 focusNode / path / sourceShape 查看原文。");
+                }}
               />
               <VersionComparison
                 key={`comparison/${state.draft.draftId}/${state.draft.revision}`}
@@ -386,6 +423,10 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
               <p className="muted">选择或创建真实草稿后，显示相同 revision / hash 的投影、结构表单、SHACL 与 Diff。</p>
             </>
           )}
+          <SupportProfile profile={profile} loading={profileLoading} failed={profileFailed} onRefresh={() => {
+            const signal = lifetime.current?.signal;
+            if (signal) void loadProfile(signal);
+          }} />
         </section>
       </div>
     </div>
