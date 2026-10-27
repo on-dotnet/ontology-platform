@@ -33,6 +33,13 @@ export function createG2Client(options: { fetch?: typeof fetch } = {}) {
   }
   const id = encodeURIComponent;
   return {
+    supportProfile: (signal?: AbortSignal) => read<G2.SemanticSupportProfile>("/semantic/support-profile", signal),
+    assessDraft: (draftId: string, body: G2.ValidateDraftRequest, signal?: AbortSignal) =>
+      write<G2.SemanticAssessment>(`/ontology-drafts/${id(draftId)}/assessments`, body, "POST", body.command.expectedRevision, signal),
+    assessment: (assessmentId: string, signal?: AbortSignal) =>
+      read<G2.SemanticAssessment>(`/semantic-assessments/${id(assessmentId)}`, signal),
+    compareVersions: (body: G2.CompareVersionsRequest, signal?: AbortSignal) =>
+      write<G2.SourceComparison[]>("/ontology-comparisons", body, "POST", undefined, signal),
     drafts: (signal?: AbortSignal) => read<G2.OntologyDraft[]>("/ontology-drafts", signal),
     draft: (draftId: string, signal?: AbortSignal) => read<G2.OntologyDraft>(`/ontology-drafts/${id(draftId)}`, signal),
     createDraft: (body: G2.CreateDraftRequest, signal?: AbortSignal) => write<G2.OntologyDraft>("/ontology-drafts", body, "POST", undefined, signal),
