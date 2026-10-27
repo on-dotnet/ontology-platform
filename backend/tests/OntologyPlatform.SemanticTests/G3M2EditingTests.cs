@@ -117,6 +117,42 @@ public sealed class G3M2EditingTests
         Assert.AreEqual(1, (await runtime.AnalyzeAsync(removed, 3, default)).Projection.Triples.Length);
     }
 
+    /// <summary>RDF同一literal的合法表示变化属于no-op，旧对象仍须精确复制服务投影。</summary>
+    [TestMethod]
+    [DataRow("language-datatype", false)]
+    [DataRow("language-datatype", true)]
+    [DataRow("plain-string", false)]
+    [DataRow("plain-string", true)]
+    [DataRow("language-case", false)]
+    [DataRow("language-case", true)]
+    public async Task EquivalentLiteralRepresentationsPreserveExactSourceBytes(string representation, bool replace)
+    {
+        // 所有投影与RDF比较都由真实RIOT解析产生。
+        var runtime = SemanticFixture.Runtime();
+        // plain literal与语言literal使用各自合法的标准Turtle表示。
+        var suffix = representation == "plain-string" ? "" : "@zh-Hans";
+        // 注释、prefix及CRLF确保任何不必要重写都可被字节断言捕获。
+        var sources = new SourceBundle { OntologyTurtle = $"# no-op保留注释\r\n@prefix ex: <urn:noop:> .\r\nex:C a <{Owl}Class> ; <{Label}> \"中文😀\"{suffix} .\r\n", ShapesTurtle = "# shapes\r\n", VocabularyTurtle = "# vocabulary\n", DataTurtle = "# data\r\n" };
+        // 旧对象的datatype及语言完全来自服务投影。
+        var analysis = await runtime.AnalyzeAsync(sources, 1, default);
+        // 同值同语言的两种datatype表示不得触发原文导出。
+        var original = analysis.Projection.Triples.Single(item => item.Predicate == Label).Object;
+        // 新对象允许在RDF语义等价的标准表示之间选择，typed lexical数值不在本例归一化。
+        var alternative = representation switch
+        {
+            "language-datatype" => original with { Datatype = original.Datatype is null ? LangString : null },
+            "plain-string" => original with { Datatype = original.Datatype is null ? "http://www.w3.org/2001/XMLSchema#string" : null },
+            _ => original with { Language = original.Language!.ToUpperInvariant() }
+        };
+        Assert.AreNotEqual(original, alternative, "必须实际覆盖两种不同DTO表示。");
+        // 先以精确旧对象执行替换，或按图集合语义重复新增。
+        var changed = await runtime.ApplyEditAsync(sources, new SemanticEdit { SubjectIri = "urn:noop:C", PredicateIri = Label, OldObject = replace ? original : null, NewObject = alternative }, default);
+        Assert.AreEqual(sources, changed, "RDF未变化时不能重写注释、prefix或CRLF。");
+        Assert.AreEqual(analysis.Hashes, (await runtime.AnalyzeAsync(changed, 2, default)).Hashes);
+        // 合法新对象的等价表示不能反向放宽oldObject精确匹配合同。
+        Assert.AreEqual("edit_source_conflict", (await Assert.ThrowsAsync<SemanticOperationException>(() => runtime.ApplyEditAsync(sources, new SemanticEdit { SubjectIri = "urn:noop:C", PredicateIri = Label, OldObject = alternative, NewObject = original }, default))).Code);
+    }
+
     /// <summary>构造不带literal字段的命名IRI项。</summary>
     private static RdfTerm Iri(string value) => new() { Kind = RdfTermKind.Iri, Value = value };
 

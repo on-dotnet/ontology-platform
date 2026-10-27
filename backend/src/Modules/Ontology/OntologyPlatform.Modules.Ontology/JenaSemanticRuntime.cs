@@ -133,7 +133,8 @@ public sealed partial class JenaSemanticRuntime : ISemanticRuntime, IG3SemanticR
             if (edit.OldObject == edit.NewObject) return sources;
             // 重复新增也为no-op，不丢掉注释或改变权威源码字节。
             var result = triples.Distinct().ToArray();
-            if (result.ToHashSet().SetEquals(parsed[0])) return sources;
+            // no-op依据RDF项语义；只比较规范副本，不放宽oldObject的精确移除或改变实际导出项。
+            if (result.Select(EditNoOpTriple).ToHashSet().SetEquals(parsed[0].Select(EditNoOpTriple))) return sources;
             RequireNamedAxiomTypes(result);
             if (Support(result, structural: true).Length != 0) throw new SemanticOperationException(422, "structural_edit_unsupported");
             return sources with { OntologyTurtle = JenaRdfCodec.Canonical(result) + "\n" };
@@ -404,6 +405,16 @@ public sealed partial class JenaSemanticRuntime : ISemanticRuntime, IG3SemanticR
                 (triple.Object.Kind == RdfTermKind.Iri && triple.Object.Value.StartsWith(JenaRdfCodec.Owl, StringComparison.Ordinal) && !allowedOwl.Contains(triple.Object.Value)))
             .Select(triple => new SemanticDiagnostic { Code = triple.Predicate == JenaRdfCodec.Owl + "imports" ? "import_unlocked" : "axiom_unsupported", Severity = DiagnosticSeverity.Error, Message = "源码已完整保留；此公理尚未支持结构编辑或发布，OWL逻辑推理未运行。", FocusNode = triple.Subject, Path = triple.Predicate }).ToArray();
     }
+
+    /// <summary>仅为编辑no-op判等统一RDF1.1字符串类型与语言大小写，不归一化typed词法或改写权威源。</summary>
+    private static RdfTriple EditNoOpTriple(RdfTriple triple) => triple.Object.Kind != RdfTermKind.Literal ? triple : triple with
+    {
+        Object = triple.Object with
+        {
+            Datatype = triple.Object.Language is not null ? "http://www.w3.org/1999/02/22-rdf-syntax-ns#langString" : triple.Object.Datatype ?? "http://www.w3.org/2001/XMLSchema#string",
+            Language = triple.Object.Language?.ToLowerInvariant()
+        }
+    };
 
     /// <summary>编辑标准基本谓词或本图实际声明的对象/数据属性。</summary>
     private static bool EditablePredicate(string predicate, RdfTriple[] triples) =>

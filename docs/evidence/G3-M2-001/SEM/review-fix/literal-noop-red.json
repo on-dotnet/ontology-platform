@@ -1,0 +1,80 @@
+{
+  "exitCode": 2,
+  "records": [
+    {
+      "check": "public-jena-fixture-modes",
+      "exitCode": 0,
+      "modes": {
+        "fixture": "0o755",
+        "config.ttl": "0o644",
+        "log4j2.properties": "0o644"
+      }
+    },
+    {
+      "command": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g2-sem-85cf7ac7af76",
+        "--publish",
+        "127.0.0.1::3030",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--mount",
+        "type=bind,src=/private/tmp/g2-sem-85cf7ac7af76uemphm56/fixture,dst=/fixture,readonly",
+        "--entrypoint",
+        "java",
+        "ontology-platform-fuseki:context-6bc72da7b5570e60b43cb978965e096fa512befca1e80dbf76ef0710fa681018",
+        "-Xmx384m",
+        "-Dlog4j.configurationFile=/fixture/log4j2.properties",
+        "-jar",
+        "/opt/fuseki/fuseki-server.jar",
+        "--config=/fixture/config.ttl"
+      ],
+      "exitCode": 0,
+      "output": "528a2bd7cc7025848c6d53f34a8b21811a6196ad261eef1e076ae2f6eca69baa\n"
+    },
+    {
+      "command": [
+        "docker",
+        "port",
+        "g2-sem-85cf7ac7af76",
+        "3030/tcp"
+      ],
+      "exitCode": 0,
+      "output": "127.0.0.1:59455\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "test",
+        "--project",
+        "backend/tests/OntologyPlatform.SemanticTests",
+        "--no-restore",
+        "--",
+        "--filter",
+        "FullyQualifiedName~EquivalentLiteralRepresentations"
+      ],
+      "exitCode": 2,
+      "output": "正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g3-m2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n失败 EquivalentLiteralRepresentationsPreserveExactSourceBytes (\"language-datatype\",False) (171ms)\n  从 /Users/chasen/.codex/worktrees/g3-m2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  Assertion failed. 预期值相等。\n  RDF未变化时不能重写注释、prefix或CRLF。\n  \n  expected: SourceBundle { OntologyTurtle = # no-op保留注释\n            @prefix ex: <urn:noop:> .\n            ex:C a <http://www.w3.org/2002/07/owl#Class> ; <http://www.w3.org/2000/01/rdf-schema#label> \"中文😀\"@zh-Hans .\n            , ShapesTurtle = # shapes\n            , VocabularyTurtle = # vocabulary\n            , DataTurtle = # data\n             }\n  actual:   SourceBundle { OntologyTurtle = <urn:noop:C> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .\n            <urn:noop:C> <http://www.w3.org/2000/01/rdf-schema#label> \"中文😀\"@zh-Hans .\n            <urn:noop:C> <http://www.w3.org/2000/01/rdf-schema#label> \"中文😀\"@zh-Hans .\n            , ShapesTurtle = # shapes\n            , VocabularyTurtle = # vocabulary\n            , DataTurtle = # data\n             }\n  \n  Assert.AreEqual(sources, changed)\n    在 OntologyPlatform.SemanticTests.G3M2EditingTests.EquivalentLiteralRepresentationsPreserveExactSourceBytes(String representation, Boolean replace) 位于 /Users/chasen/.codex/worktrees/g3-m2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M2EditingTests.cs:150\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n失败 EquivalentLiteralRepresentationsPreserveExactSourceBytes (\"language-datatype\",True) (52ms)\n  从 /Users/chasen/.codex/worktrees/g3-m2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  Assertion failed. 预期值相等。\n  RDF未变化时不能重写注释、prefix或CRLF。\n  \n  expected: SourceBundle { OntologyTurtle = # no-op保留注释\n            @prefix ex: <urn:noop:> .\n            ex:C a <http://www.w3.org/2002/07/owl#Class> ; <http://www.w3.org/2000/01/rdf-schema#label> \"中文😀\"@zh-Hans .\n            , ShapesTurtle = # shapes\n            , VocabularyTurtle = # vocabulary\n            , DataTurtle = # data\n             }\n  actual:   SourceBundle { OntologyTurtle = <urn:noop:C> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .\n            <urn:noop:C> <http://www.w3.org/2000/01/rdf-schema#label> \"中文😀\"@zh-Hans .\n            , ShapesTurtle = # shapes\n            , VocabularyTurtle = # vocabulary\n            , DataTurtle = # data\n             }\n  \n  Assert.AreEqual(sources, changed)\n    在 OntologyPlatform.SemanticTests.G3M2EditingTests.EquivalentLiteralRepresentationsPreserveExactSourceBytes(String representation, Boolean replace) 位于 /Users/chasen/.codex/worktrees/g3-m2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M2EditingTests.cs:150\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n失败 EquivalentLiteralRepresentationsPreserveExactSourceBytes (\"plain-string\",False) (26ms)\n  从 /Users/chasen/.codex/worktrees/g3-m2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  Assertion failed. 预期值相等。\n  RDF未变化时不能重写注释、prefix或CRLF。\n  \n  expected: SourceBundle { OntologyTurtle = # no-op保留注释\n            @prefix ex: <urn:noop:> .\n            ex:C a <http://www.w3.org/2002/07/owl#Class> ; <http://www.w3.org/2000/01/rdf-schema#label> \"中文😀\" .\n            , ShapesTurtle = # shapes\n            , VocabularyTurtle = # vocabulary\n            , DataTurtle = # data\n             }\n  actual:   SourceBundle { OntologyTurtle = <urn:noop:C> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .\n            <urn:noop:C> <http://www.w3.org/2000/01/rdf-schema#label> \"中文😀\" .\n            <urn:noop:C> <http://www.w3.org/2000/01/rdf-schema#label> \"中文😀\"^^<http://www.w3.org/2001/XMLSchema#string> .\n            , ShapesTurtle = # shapes\n            , VocabularyTurtle = # vocabulary\n            , DataTurtle = # data\n             }\n  \n  Assert.AreEqual(sources, changed)\n    在 OntologyPlatform.SemanticTests.G3M2EditingTests.EquivalentLiteralRepresentationsPreserveExactSourceBytes(String representation, Boolean replace) 位于 /Users/chasen/.codex/worktrees/g3-m2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M2EditingTests.cs:150\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n失败 EquivalentLiteralRepresentationsPreserveExactSourceBytes (\"plain-string\",True) (78ms)\n  从 /Users/chasen/.codex/worktrees/g3-m2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  Assertion failed. 预期值相等。\n  RDF未变化时不能重写注释、prefix或CRLF。\n  \n  expected: SourceBundle { OntologyTurtle = # no-op保留注释\n            @prefix ex: <urn:noop:> .\n            ex:C a <http://www.w3.org/2002/07/owl#Class> ; <http://www.w3.org/2000/01/rdf-schema#label> \"中文😀\" .\n            , ShapesTurtle = # shapes\n            , VocabularyTurtle = # vocabulary\n            , DataTurtle = # data\n             }\n  actual:   SourceBundle { OntologyTurtle = <urn:noop:C> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .\n            <urn:noop:C> <http://www.w3.org/2000/01/rdf-schema#label> \"中文😀\"^^<http://www.w3.org/2001/XMLSchema#string> .\n            , ShapesTurtle = # shapes\n            , VocabularyTurtle = # vocabulary\n            , DataTurtle = # data\n             }\n  \n  Assert.AreEqual(sources, changed)\n    在 OntologyPlatform.SemanticTests.G3M2EditingTests.EquivalentLiteralRepresentationsPreserveExactSourceBytes(String representation, Boolean replace) 位于 /Users/chasen/.codex/worktrees/g3-m2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M2EditingTests.cs:150\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n失败 EquivalentLiteralRepresentationsPreserveExactSourceBytes (\"language-case\",False) (21ms)\n  从 /Users/chasen/.codex/worktrees/g3-m2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  Assertion failed. 预期值相等。\n  RDF未变化时不能重写注释、prefix或CRLF。\n  \n  expected: SourceBundle { OntologyTurtle = # no-op保留注释\n            @prefix ex: <urn:noop:> .\n            ex:C a <http://www.w3.org/2002/07/owl#Class> ; <http://www.w3.org/2000/01/rdf-schema#label> \"中文😀\"@zh-Hans .\n            , ShapesTurtle = # shapes\n            , VocabularyTurtle = # vocabulary\n            , DataTurtle = # data\n             }\n  actual:   SourceBundle { OntologyTurtle = <urn:noop:C> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .\n            <urn:noop:C> <http://www.w3.org/2000/01/rdf-schema#label> \"中文😀\"@ZH-HANS .\n            <urn:noop:C> <http://www.w3.org/2000/01/rdf-schema#label> \"中文😀\"@zh-Hans .\n            , ShapesTurtle = # shapes\n            , VocabularyTurtle = # vocabulary\n            , DataTurtle = # data\n             }\n  \n  Assert.AreEqual(sources, changed)\n    在 OntologyPlatform.SemanticTests.G3M2EditingTests.EquivalentLiteralRepresentationsPreserveExactSourceBytes(String representation, Boolean replace) 位于 /Users/chasen/.codex/worktrees/g3-m2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M2EditingTests.cs:150\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n失败 EquivalentLiteralRepresentationsPreserveExactSourceBytes (\"language-case\",True) (25ms)\n  从 /Users/chasen/.codex/worktrees/g3-m2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  Assertion failed. 预期值相等。\n  RDF未变化时不能重写注释、prefix或CRLF。\n  \n  expected: SourceBundle { OntologyTurtle = # no-op保留注释\n            @prefix ex: <urn:noop:> .\n            ex:C a <http://www.w3.org/2002/07/owl#Class> ; <http://www.w3.org/2000/01/rdf-schema#label> \"中文😀\"@zh-Hans .\n            , ShapesTurtle = # shapes\n            , VocabularyTurtle = # vocabulary\n            , DataTurtle = # data\n             }\n  actual:   SourceBundle { OntologyTurtle = <urn:noop:C> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .\n            <urn:noop:C> <http://www.w3.org/2000/01/rdf-schema#label> \"中文😀\"@ZH-HANS .\n            , ShapesTurtle = # shapes\n            , VocabularyTurtle = # vocabulary\n            , DataTurtle = # data\n             }\n  \n  Assert.AreEqual(sources, changed)\n    在 OntologyPlatform.SemanticTests.G3M2EditingTests.EquivalentLiteralRepresentationsPreserveExactSourceBytes(String representation, Boolean replace) 位于 /Users/chasen/.codex/worktrees/g3-m2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M2EditingTests.cs:150\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n/Users/chasen/.codex/worktrees/g3-m2-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64) 失败并出现 6 个错误 (3s 558ms)\n退出代码: 2\n\n测试运行摘要: 失败!\n  总计: 6\n  失败: 6\n  成功: 0\n  已跳过: 0\n  持续时间: 4s 105ms\n已完成测试运行，但显示非成功退出代码: 2 (请参阅: https://aka.ms/testingplatform/exitcodes)\n"
+    },
+    {
+      "check": "all temporary graph triples removed",
+      "count": 0,
+      "status": "PASS"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g2-sem-85cf7ac7af76"
+      ],
+      "exitCode": 0,
+      "output": "g2-sem-85cf7ac7af76\n"
+    }
+  ]
+}
