@@ -80,13 +80,26 @@ export async function runM1Checks({ root, origin, operator, viewer, single, chec
     await page.getByRole("button").filter({ has: page.locator("strong", { hasText: name }) }).click();
     await page.getByRole("region", { name: "20项能力矩阵，可横向滚动" }).waitFor();
     observed("m1_ui_twenty_rows", await page.locator(".g3-profile-table tbody tr").count() === 20);
+    async function importAndWait(file, bytes) {
+      const label = "载入" + file;
+      await page.getByLabel(label, { exact: true }).setInputFiles({ name: file, mimeType: "text/turtle", buffer: bytes });
+      // SourceEditor在异步解码/状态更新后清空input，等待它完成再检查dirty与导出。
+      await page.waitForFunction(name => [...document.querySelectorAll("input[type=file]")]
+        .find(input => input.getAttribute("aria-label") === name)?.files?.length === 0, label);
+    }
     for (const [key, file] of fields) {
       await page.getByRole("combobox", { name: "选择源文档" }).selectOption(key);
       const waiting = page.waitForEvent("download");
       await page.getByRole("button", { name: "导出原始源", exact: true }).click();
       const bytes = await readFile(await (await waiting).path());
       observed("m1_ui_export_" + key, bytes.equals(Buffer.from(sources[key], "utf8")));
-      await page.getByLabel("载入" + file, { exact: true }).setInputFiles({ name: file, mimeType: "text/turtle", buffer: bytes });
+      const modified = Buffer.concat([bytes, Buffer.from("\r\n# Synthetic M1 import completion\r\n", "utf8")]);
+      await importAndWait(file, modified);
+      observed("m1_ui_import_dirty_" + key, await page.getByRole("button", { name: "保存新修订", exact: true }).isEnabled());
+      const changedDownload = page.waitForEvent("download");
+      await page.getByRole("button", { name: "导出原始源", exact: true }).click();
+      observed("m1_ui_import_export_" + key, (await readFile(await (await changedDownload).path())).equals(modified));
+      await importAndWait(file, bytes);
       observed("m1_ui_reimport_clean_" + key, await page.getByRole("button", { name: "保存新修订", exact: true }).isDisabled());
     }
     await page.getByRole("textbox", { name: "变更理由", exact: true }).fill("Synthetic M1 browser assessment");
