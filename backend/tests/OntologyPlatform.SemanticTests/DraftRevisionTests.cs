@@ -738,6 +738,100 @@ public sealed class DraftRevisionTests
         Assert.AreEqual(3, await reopened.Revisions.CountAsync(row => row.DraftId == created.DraftId));
     }
 
+    /// <summary>M2基础建模逐步通过真实PG保存、独立重读及最终评估，三份未编辑源和所有旧修订保持原文。</summary>
+    [TestMethod]
+    public async Task M2BasicModelingSequencePersistsEachRevisionAndKeepsOtherSourcesExact()
+    {
+        // 真实数据库只用来创建本测试独立草稿，后续每步另开上下文排除跟踪缓存。
+        await using var database = Database();
+        // 双厂可信身份沿用现有生产授权合同。
+        var actor = Actor();
+        // 原四源包含既有有效SHACL和业务事实，新命名空间不触发既有Heat等target。
+        var sources = SemanticFixture.Sources();
+        sources = sources with { OntologyTurtle = "# M2建模原始注释\r\n" + sources.OntologyTurtle };
+        // 初始提交保留完整四源字节，后续只有ontology源允许变化。
+        var current = await Service(database).CreateAsync(actor, Request() with { Sources = sources }, default);
+        // 四源初始散列作为所有后续步骤的不变断言基线。
+        var originalHashes = current.Hashes;
+        // 标准类型谓词不采用自定义类型模型。
+        const string rdfType = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
+        // 标准OWL声明与受控命名公理共用正式命名空间。
+        const string owl = "http://www.w3.org/2002/07/owl#";
+        // subclass、domain/range和注释使用正式RDFS谓词。
+        const string rdfs = "http://www.w3.org/2000/01/rdf-schema#";
+        // 顺序先声明类型，再编辑依赖这些声明的命名公理及简单断言。
+        SemanticEdit[] edits =
+        [
+            new() { SubjectIri = "urn:m2:basic:A", PredicateIri = rdfType, NewObject = new RdfTerm { Kind = RdfTermKind.Iri, Value = owl + "Class" } },
+            new() { SubjectIri = "urn:m2:basic:B", PredicateIri = rdfType, NewObject = new RdfTerm { Kind = RdfTermKind.Iri, Value = owl + "Class" } },
+            new() { SubjectIri = "urn:m2:basic:C", PredicateIri = rdfType, NewObject = new RdfTerm { Kind = RdfTermKind.Iri, Value = owl + "Class" } },
+            new() { SubjectIri = "urn:m2:basic:p", PredicateIri = rdfType, NewObject = new RdfTerm { Kind = RdfTermKind.Iri, Value = owl + "ObjectProperty" } },
+            new() { SubjectIri = "urn:m2:basic:q", PredicateIri = rdfType, NewObject = new RdfTerm { Kind = RdfTermKind.Iri, Value = owl + "ObjectProperty" } },
+            new() { SubjectIri = "urn:m2:basic:d", PredicateIri = rdfType, NewObject = new RdfTerm { Kind = RdfTermKind.Iri, Value = owl + "DatatypeProperty" } },
+            new() { SubjectIri = "urn:m2:basic:i", PredicateIri = rdfType, NewObject = new RdfTerm { Kind = RdfTermKind.Iri, Value = owl + "NamedIndividual" } },
+            new() { SubjectIri = "urn:m2:basic:j", PredicateIri = rdfType, NewObject = new RdfTerm { Kind = RdfTermKind.Iri, Value = owl + "NamedIndividual" } },
+            new() { SubjectIri = "urn:m2:basic:i", PredicateIri = rdfType, NewObject = new RdfTerm { Kind = RdfTermKind.Iri, Value = "urn:m2:basic:A" } },
+            new() { SubjectIri = "urn:m2:basic:j", PredicateIri = rdfType, NewObject = new RdfTerm { Kind = RdfTermKind.Iri, Value = "urn:m2:basic:B" } },
+            new() { SubjectIri = "urn:m2:basic:A", PredicateIri = rdfs + "subClassOf", NewObject = new RdfTerm { Kind = RdfTermKind.Iri, Value = "urn:m2:basic:B" } },
+            new() { SubjectIri = "urn:m2:basic:p", PredicateIri = rdfs + "domain", NewObject = new RdfTerm { Kind = RdfTermKind.Iri, Value = "urn:m2:basic:A" } },
+            new() { SubjectIri = "urn:m2:basic:p", PredicateIri = rdfs + "range", NewObject = new RdfTerm { Kind = RdfTermKind.Iri, Value = "urn:m2:basic:B" } },
+            new() { SubjectIri = "urn:m2:basic:q", PredicateIri = rdfs + "domain", NewObject = new RdfTerm { Kind = RdfTermKind.Iri, Value = "urn:m2:basic:B" } },
+            new() { SubjectIri = "urn:m2:basic:q", PredicateIri = rdfs + "range", NewObject = new RdfTerm { Kind = RdfTermKind.Iri, Value = "urn:m2:basic:A" } },
+            new() { SubjectIri = "urn:m2:basic:d", PredicateIri = rdfs + "domain", NewObject = new RdfTerm { Kind = RdfTermKind.Iri, Value = "urn:m2:basic:A" } },
+            new() { SubjectIri = "urn:m2:basic:d", PredicateIri = rdfs + "range", NewObject = new RdfTerm { Kind = RdfTermKind.Iri, Value = "http://www.w3.org/2001/XMLSchema#string" } },
+            new() { SubjectIri = "urn:m2:basic:A", PredicateIri = rdfs + "label", NewObject = new RdfTerm { Kind = RdfTermKind.Literal, Value = "基础类甲😀", Language = "zh" } },
+            new() { SubjectIri = "urn:m2:basic:A", PredicateIri = rdfs + "comment", NewObject = new RdfTerm { Kind = RdfTermKind.Literal, Value = "Synthetic modeling example", Language = "en" } },
+            new() { SubjectIri = "urn:m2:basic:p", PredicateIri = owl + "inverseOf", NewObject = new RdfTerm { Kind = RdfTermKind.Iri, Value = "urn:m2:basic:q" } },
+            new() { SubjectIri = "urn:m2:basic:A", PredicateIri = owl + "disjointWith", NewObject = new RdfTerm { Kind = RdfTermKind.Iri, Value = "urn:m2:basic:C" } },
+            new() { SubjectIri = "urn:m2:basic:i", PredicateIri = "urn:m2:basic:p", NewObject = new RdfTerm { Kind = RdfTermKind.Iri, Value = "urn:m2:basic:j" } },
+            new() { SubjectIri = "urn:m2:basic:j", PredicateIri = "urn:m2:basic:q", NewObject = new RdfTerm { Kind = RdfTermKind.Iri, Value = "urn:m2:basic:i" } },
+            new() { SubjectIri = "urn:m2:basic:i", PredicateIri = "urn:m2:basic:d", NewObject = new RdfTerm { Kind = RdfTermKind.Literal, Value = "样例文本" } }
+        ];
+        // 按已声明顺序逐项提交，当前循环项只代表一个精确三元组新增命令。
+        foreach (var edit in edits)
+        {
+            // 真实前一提交是本步CAS与历史保真基线，不使用客户端虚构revision。
+            var previous = current;
+            // 每步独立写上下文调用真实应用服务及事务审计。
+            await using var writer = Database();
+            current = await Service(writer).EditAsync(actor, current.DraftId, new EditDraftRequest { Edit = edit, Command = Command(previous.Revision) }, default);
+            Assert.AreEqual(previous.Revision + 1, current.Revision);
+            Assert.AreNotEqual(previous.Hashes.OntologyHash, current.Hashes.OntologyHash);
+            Assert.AreEqual(sources with { OntologyTurtle = current.Sources.OntologyTurtle }, current.Sources);
+            Assert.AreEqual(originalHashes.ShapesHash, current.Hashes.ShapesHash);
+            Assert.AreEqual(originalHashes.VocabularyHash, current.Hashes.VocabularyHash);
+            Assert.AreEqual(originalHashes.DataHash, current.Hashes.DataHash);
+            Assert.IsTrue(current.Projection.StructuralEditAllowed);
+            // 完整服务投影必须出现本步实际提交的IRI或语言字面量。
+            var added = current.Projection.Triples.Single(triple => triple.Subject.Value == edit.SubjectIri && triple.Predicate == edit.PredicateIri && triple.Object.Kind == edit.NewObject!.Kind && triple.Object.Value == edit.NewObject.Value);
+            Assert.IsTrue(StringComparer.OrdinalIgnoreCase.Equals(edit.NewObject!.Language, added.Object.Language));
+            // 独立读上下文排除EF跟踪缓存，证明每一步已持久提交。
+            await using var reopened = Database();
+            // 重读同时复核投影来自实际保存的原文和散列。
+            var read = await Service(reopened).ReadAsync(actor, current.DraftId, default);
+            Assert.AreEqual(current.Revision, read.Revision);
+            Assert.AreEqual(current.Sources, read.Sources);
+            Assert.AreEqual(current.Hashes, read.Hashes);
+            Assert.AreEqual(current.Revision, await reopened.Revisions.LongCountAsync(row => row.DraftId == current.DraftId));
+            // 每一旧修订原文在下一步写入之后仍精确不变。
+            var historical = await reopened.Revisions.SingleAsync(row => row.DraftId == current.DraftId && row.Revision == previous.Revision);
+            Assert.AreEqual(previous.Sources, JsonSerializer.Deserialize<SourceBundle>(historical.SourcesJson));
+        }
+        // 最终评估同样用新上下文，不能复用任意旧报告或内存布尔值。
+        await using var assessmentDatabase = Database();
+        // 全部24次真实编辑后的最新assessment绑定修订和完整四源散列。
+        var assessment = await Service(assessmentDatabase).AssessAsync(actor, current.DraftId, new ValidateDraftRequest { Revision = current.Revision, Hashes = current.Hashes, Command = Command(current.Revision) }, default);
+        Assert.AreEqual(25L, current.Revision);
+        Assert.AreEqual(current.Revision, assessment.Revision);
+        Assert.AreEqual(current.Hashes, assessment.Hashes);
+        Assert.AreEqual("2", assessment.ProfileVersion);
+        Assert.AreEqual(SemanticProfile.Current().Hash, assessment.ProfileHash);
+        Assert.IsTrue(assessment.PublishEligible);
+        Assert.IsTrue(assessment.Stages.Any(stage => stage.Name == "SHACL_CORE" && stage.Status == AssessmentStageStatus.Pass));
+        Assert.IsTrue(assessment.Stages.Any(stage => stage.Name == "OWL_REASONING" && stage.Status == AssessmentStageStatus.NotRun));
+        Assert.AreEqual(sources, JsonSerializer.Deserialize<SourceBundle>((await assessmentDatabase.Revisions.SingleAsync(row => row.DraftId == current.DraftId && row.Revision == 1)).SourcesJson));
+    }
+
     /// <summary>评估有效期测试专用局部时钟。</summary>
     private sealed class AssessmentClock : TimeProvider
     {
