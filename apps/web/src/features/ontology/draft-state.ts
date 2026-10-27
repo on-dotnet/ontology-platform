@@ -9,3 +9,9 @@ export function isDirty(state: DraftState) { return state.name !== state.draft.n
 export function updateSource(state: DraftState, field: keyof SourceBundle, value: string): DraftState { return { ...state, sources: { ...state.sources, [field]: value } }; }
 /** 默认拒绝覆盖dirty；只有明确丢弃或保存成功才应用远端修订。 */
 export function receiveDraft(state: DraftState, draft: OntologyDraft, discard = false): DraftState { return isDirty(state) && !discard ? state : draftState(draft); }
+
+/** 新建草稿也必须区分未提供术语源与已提供的空文件。 */
+export function isNewDraftDirty(name: string, sources: SourceBundle): boolean {
+  return name !== "" || sources.ontologyTurtle !== "" || sources.shapesTurtle !== ""
+    || sources.dataTurtle !== "" || sources.vocabularyTurtle !== null;
+}
