@@ -29,6 +29,8 @@ pwsh -NoProfile -File scripts/create-review-package.ps1 -Root <干净实施树> 
 pwsh -NoProfile -File scripts/tests/ReviewPackage.Tests.ps1
 ```
 
+原始 `EvidencePath` JSON中只有顶层 `checks` 和 `ci` 进入规范化状态对象，参与manifest状态与重开比较；所有现行校验仍检查原checks/ci，实际查询的同HeadCI只覆盖规范化ci。未知顶层字段（如note、嵌套context）是非权威metadata，不进入规范化状态、不影响PASS/FAIL。原始JSON完整字节及其附加metadata仍从Head按原blob/hash/size保留：V2/V3以单份payload映射恢复，V1继续历史source/证据便捷副本合同；不能通过删除原文metadata使构包偶然成功。V1的 `evidence/validation.json` 只存规范化checks/ci。FAIL检查不会被metadata中的PASS文字掩盖，总体PASS仍要求全部检查、diff-check及同HeadCI满足既有门禁。
+
 V3要求Base为Head祖先、tracked/untracked干净、完整Base..Head `git diff --check` exit0。拒绝不安全路径、大小写冲突、链接/submodule、秘密模式命中、被删秘密、伪造CI/散列/索引；独立重开重新推导源码blob、证据索引、二进制元数据和完整文本diff，不接受重新计算ZIP校验和后的篡改。原子`.partial`通过复检后才发布，失败移除自身partial并保留上一有效ZIP。
 
 软目标≤10MiB；超10MiB的CLI JSON必须输出按source/review-evidence/git/metadata-and-index分类的实际压缩/原始字节和ZIP开销。默认硬门禁15MiB，超过即拒绝发布和V3重开，不静默放宽；当前实现无绕过开关。若后续任务需要特例，先记录经独立审查的具体合同和受限工具变更，再实施。唯一ZIP仍在ignored `artifacts/reviews`，不提交Git。

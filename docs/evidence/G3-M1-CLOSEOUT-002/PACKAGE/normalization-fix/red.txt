@@ -1,0 +1,12 @@
+FAIL: validation metadata V1 raw bytes remain recoverable with normalized checks and ci -- Metadata V1 creation failed: FAIL: EVIDENCE_MISMATCH: recorded statuses differ from evidence input
+FAIL: validation metadata V1 cannot mask FAIL checks or allow overall PASS -- FAIL metadata V1 PARTIAL creation failed: FAIL: EVIDENCE_MISMATCH: recorded statuses differ from evidence input
+FAIL: validation metadata V2 raw bytes remain recoverable with normalized checks and ci -- Metadata V2 creation failed: FAIL: EVIDENCE_MISMATCH: recorded statuses differ from evidence input
+FAIL: validation metadata V2 cannot mask FAIL checks or allow overall PASS -- FAIL metadata V2 PARTIAL creation failed: FAIL: EVIDENCE_MISMATCH: recorded statuses differ from evidence input
+FAIL: validation metadata V3 raw bytes remain recoverable with normalized checks and ci -- Metadata V3 creation failed: FAIL: EVIDENCE_MISMATCH: recorded statuses differ from evidence input
+FAIL: validation metadata V3 cannot mask FAIL checks or allow overall PASS -- FAIL metadata V3 PARTIAL creation failed: FAIL: EVIDENCE_MISMATCH: recorded statuses differ from evidence input
+ReviewPackage: 6 tests, 6 failures; product/container tests NOT_RUN.
+Exception: /Users/chasen/.codex/worktrees/g3-m1-closeout-package/ontology-platform/scripts/tests/ReviewPackage.Tests.ps1:817
+Line |
+ 817 |  if ($failed -gt 0) { throw 'Review package self-tests failed' }
+     |                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     | Review package self-tests failed

@@ -116,6 +116,80 @@ print(json.dumps(dict(databaseId=123,headSha=h,url='https://github.com/on-dotnet
         $writer = [IO.StreamWriter]::new($Archive.CreateEntry('SHA256SUMS.txt').Open())
         try { $writer.Write($sums) } finally { $writer.Dispose() }
     }
+    foreach ($version in @(1, 2, 3)) {
+        $schema = $version
+        Case "validation metadata V$schema raw bytes remain recoverable with normalized checks and ci" {
+            $evidencePath = 'docs/evidence/TEST-001/metadata-validation.json'
+            $rawText = @'
+{
+ "checks": [{"name":"actual-check","command":"fixture actual command","status":"PASS","exitCode":0,"output":"one actual assertion passed"}],
+ "ci": {"status":"NOT_VERIFIED"},
+ "note": "non-authoritative source metadata must remain unchanged",
+ "context": {"owner":"fixture", "nested":{"status":"UNKNOWN","checks":["context only"]}}
+}
+'@
+            Write-Fixture $evidencePath ($rawText + "`n"); $script:head = Commit-Fixture
+            $options = @{}
+            if ($schema -eq 2) { $options.Compact = $true }
+            if ($schema -eq 3) { $options.V3 = $true }
+            $actual = Invoke-Package @options -Extra @('-EvidencePath', $evidencePath)
+            Assert-True ($actual.Exit -eq 0) "Metadata V$schema creation failed: $($actual.Output)"
+            $path = @(Get-ChildItem (Join-Path $script:repo 'artifacts/reviews') -Filter '*.zip')[0].FullName
+            $archive = [IO.Compression.ZipFile]::OpenRead($path)
+            try {
+                $m = Read-ZipText $archive 'manifest.json' | ConvertFrom-Json -AsHashtable
+                Assert-True (-not $m.ContainsKey('note') -and -not $m.ContainsKey('context') -and $m.checks[0].status -eq 'PASS') 'Non-authoritative metadata entered normalized statuses'
+                $mapping = @($m.sourceMembers | Where-Object { $_.gitPath -ceq $evidencePath })
+                Assert-True ($mapping.Count -gt 0) 'Raw validation missing from source mapping'
+                $rawBytes = [IO.File]::ReadAllBytes((Join-Path $script:repo $evidencePath))
+                $hash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($rawBytes)).ToLowerInvariant()
+                $entry = $archive.GetEntry($mapping[0].archivePath)
+                $buffer = [IO.MemoryStream]::new(); $stream = $entry.Open()
+                try { $stream.CopyTo($buffer); $stored = $buffer.ToArray() } finally { $stream.Dispose(); $buffer.Dispose() }
+                Assert-True ([Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($stored)).ToLowerInvariant() -eq $hash -and $stored.Length -eq $rawBytes.Length) 'Original metadata validation bytes were rewritten'
+                $raw = [Text.Encoding]::UTF8.GetString($stored) | ConvertFrom-Json -AsHashtable
+                Assert-True ($raw.note -eq 'non-authoritative source metadata must remain unchanged' -and $raw.context.nested.status -eq 'UNKNOWN' -and $raw.ci.status -eq 'NOT_VERIFIED') 'Original note/context/CI metadata lost'
+                $oid = Git @('rev-parse', ($script:head + ':' + $evidencePath))
+                if ($schema -ge 2) {
+                    Assert-True ($mapping.Count -eq 1 -and $mapping[0].blobOid -eq $oid) 'Raw metadata duplicated or Git recovery OID differs'
+                    $sameSize = @($archive.Entries | Where-Object { $_.Length -eq $rawBytes.Length })
+                    $copies = 0
+                    foreach ($candidate in $sameSize) {
+                        $stream = $candidate.Open(); $sha = [Security.Cryptography.SHA256]::Create()
+                        try { if ([Convert]::ToHexString($sha.ComputeHash($stream)).ToLowerInvariant() -eq $hash) { $copies++ } } finally { $sha.Dispose(); $stream.Dispose() }
+                    }
+                    Assert-True ($copies -eq 1) 'Raw validation payload must appear once in compact schemas'
+                } else {
+                    $normalized = Read-ZipText $archive 'evidence/validation.json' | ConvertFrom-Json -AsHashtable
+                    Assert-True ($normalized.get_Count() -eq 2 -and $normalized.ContainsKey('checks') -and $normalized.ContainsKey('ci')) 'V1 normalized validation included non-authoritative metadata'
+                }
+            } finally { $archive.Dispose() }
+            $verified = Invoke-Package -Verify -Extra @('-VerifyOnly', '-PackagePath', $path)
+            Assert-True ($verified.Exit -eq 0) "Metadata V$schema independent reopen failed: $($verified.Output)"
+        }
+        Case "validation metadata V$schema cannot mask FAIL checks or allow overall PASS" {
+            $evidencePath = 'docs/evidence/TEST-001/failed-validation.json'
+            Write-Fixture $evidencePath (@{ checks = @(@{ name = 'actual-failure'; command = 'fixture fails'; status = 'FAIL'; exitCode = 1; output = 'actual failure is retained' }); ci = @{ status = 'NOT_VERIFIED' }; note = 'PASS is merely text here'; context = @{ status = 'PASS'; checks = @(@{ status = 'PASS' }) } } | ConvertTo-Json -Depth 8)
+            $script:head = Commit-Fixture
+            $options = @{}
+            if ($schema -eq 2) { $options.Compact = $true }
+            if ($schema -eq 3) { $options.V3 = $true }
+            $actual = Invoke-Package @options -Extra @('-EvidencePath', $evidencePath)
+            Assert-True ($actual.Exit -eq 0) "FAIL metadata V$schema PARTIAL creation failed: $($actual.Output)"
+            $path = @(Get-ChildItem (Join-Path $script:repo 'artifacts/reviews') -Filter '*.zip')[0].FullName
+            $before = (Get-FileHash $path -Algorithm SHA256).Hash
+            $archive = [IO.Compression.ZipFile]::OpenRead($path)
+            try {
+                $m = Read-ZipText $archive 'manifest.json' | ConvertFrom-Json
+                Assert-True ($m.checks[0].status -eq 'FAIL' -and $m.checks[0].exitCode -eq 1 -and $m.checks[0].output -eq 'actual failure is retained') 'FAIL check changed by extra metadata'
+            } finally { $archive.Dispose() }
+            $verified = Invoke-Package -Verify -Extra @('-VerifyOnly', '-PackagePath', $path)
+            Assert-True ($verified.Exit -eq 0) "FAIL metadata V$schema reopen failed: $($verified.Output)"
+            $rejected = Invoke-Package @options -DeclaredStatus PASS -Extra @('-EvidencePath', $evidencePath)
+            Assert-True ($rejected.Exit -ne 0 -and $rejected.Output.Contains('EVIDENCE_REQUIRED')) 'Extra metadata allowed overall PASS despite FAIL check'
+            Assert-True ((Get-FileHash $path -Algorithm SHA256).Hash -eq $before) 'Rejected PASS changed valid PARTIAL archive'
+        }
+    }
     Case 'V3 53 PNG and 55256 ignored paths compact fixture with recoverable index' {
         # 标准库生成53张真实可解码、不同像素的PNG，而非扩展名伪装或随机尾随字节。
         $pngProgram = @'

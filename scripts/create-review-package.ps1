@@ -393,7 +393,8 @@ function Get-ReviewEvidence {
         if (($evidence.ci.status -eq 'PASS') -ne ($evidence.ci.conclusion -eq 'success')) { throw 'CI_EVIDENCE: status and conclusion disagree' }
     }
     if ($DeclaredStatus -eq 'PASS' -and (@($evidence.checks | Where-Object status -NE 'PASS').Count -gt 0 -or $evidence.ci.status -ne 'PASS' -or $Snapshot.DiffCheckExit -ne 0)) { throw ("EVIDENCE_REQUIRED: overall PASS requires all checks, diff-check and observed CI PASS; checkFailures={0}; ci={1}; diffExit={2}" -f @($evidence.checks | Where-Object status -NE 'PASS').Count, $evidence.ci.status, $Snapshot.DiffCheckExit) }
-    return $evidence
+    # 仅checks/ci是规范化状态；note/context等附加字段只在原始Git/ZIP证据保留，不参与状态比较。
+    return @{ checks = $evidence.checks; ci = $evidence.ci }
 }
 
 function Test-ReviewArchive {
