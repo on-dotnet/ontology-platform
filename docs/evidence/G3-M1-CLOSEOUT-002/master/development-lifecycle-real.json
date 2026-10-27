@@ -1,0 +1,2604 @@
+{
+  "schemaVersion": 1,
+  "project": "on-dotnet/ontology-platform",
+  "taskId": "G3-M1-CLOSEOUT-002",
+  "runId": "g2-ef979bd04cc0",
+  "volumePrefix": "g2-ef979bd04cc0",
+  "profile": "g2",
+  "expectedServices": [
+    "postgres",
+    "keycloak",
+    "grafana",
+    "loki",
+    "tempo",
+    "prometheus",
+    "alloy",
+    "fuseki",
+    "rustfs"
+  ],
+  "expectedVolumes": [
+    "g2-ef979bd04cc0-postgres-data",
+    "g2-ef979bd04cc0-grafana-data",
+    "g2-ef979bd04cc0-loki-data",
+    "g2-ef979bd04cc0-tempo-data",
+    "g2-ef979bd04cc0-prometheus-data",
+    "g2-ef979bd04cc0-alloy-data",
+    "g2-ef979bd04cc0-fuseki-data",
+    "g2-ef979bd04cc0-rustfs-data"
+  ],
+  "observedContainerIds": [
+    "021d0706842db358436a21aa9580c93813a6ba9e22da02b33f7af0637789d77e",
+    "146ecbb826f00ce5fe6430ea36538ab84baef9d33d5166e0a8b5911b2598d01b",
+    "345cc23fbbfc64212225391985054dbbb743004b10af2b736a451c9ac3e85169",
+    "3f9f598649fb4a091d66c6efa5e99164e7327b05aaaac9302450eedc8289abdc",
+    "45bc1be55e6ae7714ef572620cf33a69ca64d24d015e8c714269271a3965e4af",
+    "609c1ff561494931748ca438c17718a9d9c240b2d0db34367ca7d2c2d2a3906f",
+    "ba17291b6fb309ccedda1ec32338b209c5cfa0acfa55e0fd1d6e2626de67f496",
+    "cf6337f57719c187404538ea5846f443e144b37db2c30470e05ef50b5ad5f869",
+    "df81578fdde7daad1b877d38a7954b6056dda88415a59176b46b302295ac4955"
+  ],
+  "observedVolumeNames": [
+    "g2-ef979bd04cc0-alloy-data",
+    "g2-ef979bd04cc0-fuseki-data",
+    "g2-ef979bd04cc0-grafana-data",
+    "g2-ef979bd04cc0-loki-data",
+    "g2-ef979bd04cc0-postgres-data",
+    "g2-ef979bd04cc0-prometheus-data",
+    "g2-ef979bd04cc0-rustfs-data",
+    "g2-ef979bd04cc0-tempo-data"
+  ],
+  "state": "EXITED",
+  "observedAt": "2026-10-27T10:05:42.340869+00:00",
+  "observations": [
+    {
+      "status": "OBSERVED",
+      "observedAt": "2026-10-27T10:04:50.951607+00:00",
+      "containers": [],
+      "volumes": [
+        {
+          "Name": "g2-ef979bd04cc0-postgres-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:23Z",
+          "Labels": {},
+          "references": []
+        },
+        {
+          "Name": "g2-ef979bd04cc0-grafana-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": []
+        },
+        {
+          "Name": "g2-ef979bd04cc0-loki-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": []
+        },
+        {
+          "Name": "g2-ef979bd04cc0-tempo-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": []
+        },
+        {
+          "Name": "g2-ef979bd04cc0-prometheus-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": []
+        },
+        {
+          "Name": "g2-ef979bd04cc0-alloy-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": []
+        },
+        {
+          "Name": "g2-ef979bd04cc0-fuseki-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": []
+        },
+        {
+          "Name": "g2-ef979bd04cc0-rustfs-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": []
+        }
+      ]
+    },
+    {
+      "status": "OBSERVED",
+      "observedAt": "2026-10-27T10:04:56.202342+00:00",
+      "containers": [
+        {
+          "Id": "3f9f598649fb4a091d66c6efa5e99164e7327b05aaaac9302450eedc8289abdc",
+          "Name": "/keycloak-ccvhbqqr",
+          "Image": "sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "keycloak",
+          "Mounts": []
+        },
+        {
+          "Id": "45bc1be55e6ae7714ef572620cf33a69ca64d24d015e8c714269271a3965e4af",
+          "Name": "/postgres-pjdztyqd",
+          "Image": "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "postgres",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-postgres-data",
+              "Destination": "/var/lib/postgresql",
+              "RW": true
+            }
+          ]
+        },
+        {
+          "Id": "ba17291b6fb309ccedda1ec32338b209c5cfa0acfa55e0fd1d6e2626de67f496",
+          "Name": "/loki-yhbdtusy",
+          "Image": "sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "loki",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-loki-data",
+              "Destination": "/loki",
+              "RW": true
+            },
+            {
+              "Type": "bind",
+              "Destination": "/etc/loki/loki.yaml",
+              "RW": false
+            }
+          ]
+        },
+        {
+          "Id": "345cc23fbbfc64212225391985054dbbb743004b10af2b736a451c9ac3e85169",
+          "Name": "/tempo-qmfbqrfa",
+          "Image": "sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "tempo",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-tempo-data",
+              "Destination": "/var/tempo",
+              "RW": true
+            },
+            {
+              "Type": "bind",
+              "Destination": "/etc/tempo/tempo.yaml",
+              "RW": false
+            }
+          ]
+        },
+        {
+          "Id": "146ecbb826f00ce5fe6430ea36538ab84baef9d33d5166e0a8b5911b2598d01b",
+          "Name": "/prometheus-ukfmxjdx",
+          "Image": "sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "prometheus",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-prometheus-data",
+              "Destination": "/prometheus",
+              "RW": true
+            },
+            {
+              "Type": "bind",
+              "Destination": "/etc/prometheus/alerts.yaml",
+              "RW": false
+            },
+            {
+              "Type": "bind",
+              "Destination": "/etc/prometheus/prometheus.yaml",
+              "RW": false
+            }
+          ]
+        },
+        {
+          "Id": "021d0706842db358436a21aa9580c93813a6ba9e22da02b33f7af0637789d77e",
+          "Name": "/fuseki-xhezkycu",
+          "Image": "sha256:05040926259ace989082fac0fb2f52d33f4a8122a9a85cb617eb76965b484a39",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "fuseki",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-fuseki-data",
+              "Destination": "/fuseki/databases",
+              "RW": true
+            }
+          ]
+        },
+        {
+          "Id": "609c1ff561494931748ca438c17718a9d9c240b2d0db34367ca7d2c2d2a3906f",
+          "Name": "/rustfs-nmqrgybb",
+          "Image": "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "rustfs",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-rustfs-data",
+              "Destination": "/data",
+              "RW": true
+            }
+          ]
+        }
+      ],
+      "volumes": [
+        {
+          "Name": "g2-ef979bd04cc0-postgres-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:23Z",
+          "Labels": {},
+          "references": [
+            "45bc1be55e6ae7714ef572620cf33a69ca64d24d015e8c714269271a3965e4af"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-grafana-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": []
+        },
+        {
+          "Name": "g2-ef979bd04cc0-loki-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "ba17291b6fb309ccedda1ec32338b209c5cfa0acfa55e0fd1d6e2626de67f496"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-tempo-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "345cc23fbbfc64212225391985054dbbb743004b10af2b736a451c9ac3e85169"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-prometheus-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "146ecbb826f00ce5fe6430ea36538ab84baef9d33d5166e0a8b5911b2598d01b"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-alloy-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": []
+        },
+        {
+          "Name": "g2-ef979bd04cc0-fuseki-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "021d0706842db358436a21aa9580c93813a6ba9e22da02b33f7af0637789d77e"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-rustfs-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "609c1ff561494931748ca438c17718a9d9c240b2d0db34367ca7d2c2d2a3906f"
+          ]
+        }
+      ]
+    },
+    {
+      "status": "OBSERVED",
+      "observedAt": "2026-10-27T10:05:01.491985+00:00",
+      "containers": [
+        {
+          "Id": "3f9f598649fb4a091d66c6efa5e99164e7327b05aaaac9302450eedc8289abdc",
+          "Name": "/keycloak-ccvhbqqr",
+          "Image": "sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "keycloak",
+          "Mounts": []
+        },
+        {
+          "Id": "45bc1be55e6ae7714ef572620cf33a69ca64d24d015e8c714269271a3965e4af",
+          "Name": "/postgres-pjdztyqd",
+          "Image": "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "postgres",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-postgres-data",
+              "Destination": "/var/lib/postgresql",
+              "RW": true
+            }
+          ]
+        },
+        {
+          "Id": "ba17291b6fb309ccedda1ec32338b209c5cfa0acfa55e0fd1d6e2626de67f496",
+          "Name": "/loki-yhbdtusy",
+          "Image": "sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "loki",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-loki-data",
+              "Destination": "/loki",
+              "RW": true
+            },
+            {
+              "Type": "bind",
+              "Destination": "/etc/loki/loki.yaml",
+              "RW": false
+            }
+          ]
+        },
+        {
+          "Id": "345cc23fbbfc64212225391985054dbbb743004b10af2b736a451c9ac3e85169",
+          "Name": "/tempo-qmfbqrfa",
+          "Image": "sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "tempo",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-tempo-data",
+              "Destination": "/var/tempo",
+              "RW": true
+            },
+            {
+              "Type": "bind",
+              "Destination": "/etc/tempo/tempo.yaml",
+              "RW": false
+            }
+          ]
+        },
+        {
+          "Id": "146ecbb826f00ce5fe6430ea36538ab84baef9d33d5166e0a8b5911b2598d01b",
+          "Name": "/prometheus-ukfmxjdx",
+          "Image": "sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "prometheus",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-prometheus-data",
+              "Destination": "/prometheus",
+              "RW": true
+            },
+            {
+              "Type": "bind",
+              "Destination": "/etc/prometheus/alerts.yaml",
+              "RW": false
+            },
+            {
+              "Type": "bind",
+              "Destination": "/etc/prometheus/prometheus.yaml",
+              "RW": false
+            }
+          ]
+        },
+        {
+          "Id": "021d0706842db358436a21aa9580c93813a6ba9e22da02b33f7af0637789d77e",
+          "Name": "/fuseki-xhezkycu",
+          "Image": "sha256:05040926259ace989082fac0fb2f52d33f4a8122a9a85cb617eb76965b484a39",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "fuseki",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-fuseki-data",
+              "Destination": "/fuseki/databases",
+              "RW": true
+            }
+          ]
+        },
+        {
+          "Id": "609c1ff561494931748ca438c17718a9d9c240b2d0db34367ca7d2c2d2a3906f",
+          "Name": "/rustfs-nmqrgybb",
+          "Image": "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "rustfs",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-rustfs-data",
+              "Destination": "/data",
+              "RW": true
+            }
+          ]
+        }
+      ],
+      "volumes": [
+        {
+          "Name": "g2-ef979bd04cc0-postgres-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:23Z",
+          "Labels": {},
+          "references": [
+            "45bc1be55e6ae7714ef572620cf33a69ca64d24d015e8c714269271a3965e4af"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-grafana-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": []
+        },
+        {
+          "Name": "g2-ef979bd04cc0-loki-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "ba17291b6fb309ccedda1ec32338b209c5cfa0acfa55e0fd1d6e2626de67f496"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-tempo-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "345cc23fbbfc64212225391985054dbbb743004b10af2b736a451c9ac3e85169"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-prometheus-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "146ecbb826f00ce5fe6430ea36538ab84baef9d33d5166e0a8b5911b2598d01b"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-alloy-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": []
+        },
+        {
+          "Name": "g2-ef979bd04cc0-fuseki-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "021d0706842db358436a21aa9580c93813a6ba9e22da02b33f7af0637789d77e"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-rustfs-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "609c1ff561494931748ca438c17718a9d9c240b2d0db34367ca7d2c2d2a3906f"
+          ]
+        }
+      ]
+    },
+    {
+      "status": "OBSERVED",
+      "observedAt": "2026-10-27T10:05:06.735477+00:00",
+      "containers": [
+        {
+          "Id": "3f9f598649fb4a091d66c6efa5e99164e7327b05aaaac9302450eedc8289abdc",
+          "Name": "/keycloak-ccvhbqqr",
+          "Image": "sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "keycloak",
+          "Mounts": []
+        },
+        {
+          "Id": "45bc1be55e6ae7714ef572620cf33a69ca64d24d015e8c714269271a3965e4af",
+          "Name": "/postgres-pjdztyqd",
+          "Image": "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "postgres",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-postgres-data",
+              "Destination": "/var/lib/postgresql",
+              "RW": true
+            }
+          ]
+        },
+        {
+          "Id": "ba17291b6fb309ccedda1ec32338b209c5cfa0acfa55e0fd1d6e2626de67f496",
+          "Name": "/loki-yhbdtusy",
+          "Image": "sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "loki",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-loki-data",
+              "Destination": "/loki",
+              "RW": true
+            },
+            {
+              "Type": "bind",
+              "Destination": "/etc/loki/loki.yaml",
+              "RW": false
+            }
+          ]
+        },
+        {
+          "Id": "345cc23fbbfc64212225391985054dbbb743004b10af2b736a451c9ac3e85169",
+          "Name": "/tempo-qmfbqrfa",
+          "Image": "sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "tempo",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-tempo-data",
+              "Destination": "/var/tempo",
+              "RW": true
+            },
+            {
+              "Type": "bind",
+              "Destination": "/etc/tempo/tempo.yaml",
+              "RW": false
+            }
+          ]
+        },
+        {
+          "Id": "146ecbb826f00ce5fe6430ea36538ab84baef9d33d5166e0a8b5911b2598d01b",
+          "Name": "/prometheus-ukfmxjdx",
+          "Image": "sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "prometheus",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-prometheus-data",
+              "Destination": "/prometheus",
+              "RW": true
+            },
+            {
+              "Type": "bind",
+              "Destination": "/etc/prometheus/alerts.yaml",
+              "RW": false
+            },
+            {
+              "Type": "bind",
+              "Destination": "/etc/prometheus/prometheus.yaml",
+              "RW": false
+            }
+          ]
+        },
+        {
+          "Id": "021d0706842db358436a21aa9580c93813a6ba9e22da02b33f7af0637789d77e",
+          "Name": "/fuseki-xhezkycu",
+          "Image": "sha256:05040926259ace989082fac0fb2f52d33f4a8122a9a85cb617eb76965b484a39",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "fuseki",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-fuseki-data",
+              "Destination": "/fuseki/databases",
+              "RW": true
+            }
+          ]
+        },
+        {
+          "Id": "609c1ff561494931748ca438c17718a9d9c240b2d0db34367ca7d2c2d2a3906f",
+          "Name": "/rustfs-nmqrgybb",
+          "Image": "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "rustfs",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-rustfs-data",
+              "Destination": "/data",
+              "RW": true
+            }
+          ]
+        }
+      ],
+      "volumes": [
+        {
+          "Name": "g2-ef979bd04cc0-postgres-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:23Z",
+          "Labels": {},
+          "references": [
+            "45bc1be55e6ae7714ef572620cf33a69ca64d24d015e8c714269271a3965e4af"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-grafana-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": []
+        },
+        {
+          "Name": "g2-ef979bd04cc0-loki-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "ba17291b6fb309ccedda1ec32338b209c5cfa0acfa55e0fd1d6e2626de67f496"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-tempo-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "345cc23fbbfc64212225391985054dbbb743004b10af2b736a451c9ac3e85169"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-prometheus-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "146ecbb826f00ce5fe6430ea36538ab84baef9d33d5166e0a8b5911b2598d01b"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-alloy-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": []
+        },
+        {
+          "Name": "g2-ef979bd04cc0-fuseki-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "021d0706842db358436a21aa9580c93813a6ba9e22da02b33f7af0637789d77e"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-rustfs-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "609c1ff561494931748ca438c17718a9d9c240b2d0db34367ca7d2c2d2a3906f"
+          ]
+        }
+      ]
+    },
+    {
+      "status": "OBSERVED",
+      "observedAt": "2026-10-27T10:05:12.079058+00:00",
+      "containers": [
+        {
+          "Id": "cf6337f57719c187404538ea5846f443e144b37db2c30470e05ef50b5ad5f869",
+          "Name": "/alloy-jrjqgrmf",
+          "Image": "sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "alloy",
+          "Mounts": [
+            {
+              "Type": "bind",
+              "Destination": "/etc/alloy/config.alloy",
+              "RW": false
+            },
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-alloy-data",
+              "Destination": "/var/lib/alloy/data",
+              "RW": true
+            }
+          ]
+        },
+        {
+          "Id": "df81578fdde7daad1b877d38a7954b6056dda88415a59176b46b302295ac4955",
+          "Name": "/grafana-egwmqaph",
+          "Image": "sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "grafana",
+          "Mounts": [
+            {
+              "Type": "bind",
+              "Destination": "/etc/grafana/grafana.ini",
+              "RW": false
+            },
+            {
+              "Type": "bind",
+              "Destination": "/etc/grafana/provisioning",
+              "RW": false
+            },
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-grafana-data",
+              "Destination": "/var/lib/grafana",
+              "RW": true
+            },
+            {
+              "Type": "bind",
+              "Destination": "/var/lib/grafana/dashboards",
+              "RW": false
+            }
+          ]
+        },
+        {
+          "Id": "3f9f598649fb4a091d66c6efa5e99164e7327b05aaaac9302450eedc8289abdc",
+          "Name": "/keycloak-ccvhbqqr",
+          "Image": "sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "keycloak",
+          "Mounts": []
+        },
+        {
+          "Id": "45bc1be55e6ae7714ef572620cf33a69ca64d24d015e8c714269271a3965e4af",
+          "Name": "/postgres-pjdztyqd",
+          "Image": "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "postgres",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-postgres-data",
+              "Destination": "/var/lib/postgresql",
+              "RW": true
+            }
+          ]
+        },
+        {
+          "Id": "ba17291b6fb309ccedda1ec32338b209c5cfa0acfa55e0fd1d6e2626de67f496",
+          "Name": "/loki-yhbdtusy",
+          "Image": "sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "loki",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-loki-data",
+              "Destination": "/loki",
+              "RW": true
+            },
+            {
+              "Type": "bind",
+              "Destination": "/etc/loki/loki.yaml",
+              "RW": false
+            }
+          ]
+        },
+        {
+          "Id": "345cc23fbbfc64212225391985054dbbb743004b10af2b736a451c9ac3e85169",
+          "Name": "/tempo-qmfbqrfa",
+          "Image": "sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "tempo",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-tempo-data",
+              "Destination": "/var/tempo",
+              "RW": true
+            },
+            {
+              "Type": "bind",
+              "Destination": "/etc/tempo/tempo.yaml",
+              "RW": false
+            }
+          ]
+        },
+        {
+          "Id": "146ecbb826f00ce5fe6430ea36538ab84baef9d33d5166e0a8b5911b2598d01b",
+          "Name": "/prometheus-ukfmxjdx",
+          "Image": "sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "prometheus",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-prometheus-data",
+              "Destination": "/prometheus",
+              "RW": true
+            },
+            {
+              "Type": "bind",
+              "Destination": "/etc/prometheus/alerts.yaml",
+              "RW": false
+            },
+            {
+              "Type": "bind",
+              "Destination": "/etc/prometheus/prometheus.yaml",
+              "RW": false
+            }
+          ]
+        },
+        {
+          "Id": "021d0706842db358436a21aa9580c93813a6ba9e22da02b33f7af0637789d77e",
+          "Name": "/fuseki-xhezkycu",
+          "Image": "sha256:05040926259ace989082fac0fb2f52d33f4a8122a9a85cb617eb76965b484a39",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "fuseki",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-fuseki-data",
+              "Destination": "/fuseki/databases",
+              "RW": true
+            }
+          ]
+        },
+        {
+          "Id": "609c1ff561494931748ca438c17718a9d9c240b2d0db34367ca7d2c2d2a3906f",
+          "Name": "/rustfs-nmqrgybb",
+          "Image": "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "rustfs",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-rustfs-data",
+              "Destination": "/data",
+              "RW": true
+            }
+          ]
+        }
+      ],
+      "volumes": [
+        {
+          "Name": "g2-ef979bd04cc0-postgres-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:23Z",
+          "Labels": {},
+          "references": [
+            "45bc1be55e6ae7714ef572620cf33a69ca64d24d015e8c714269271a3965e4af"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-grafana-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "df81578fdde7daad1b877d38a7954b6056dda88415a59176b46b302295ac4955"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-loki-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "ba17291b6fb309ccedda1ec32338b209c5cfa0acfa55e0fd1d6e2626de67f496"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-tempo-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "345cc23fbbfc64212225391985054dbbb743004b10af2b736a451c9ac3e85169"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-prometheus-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "146ecbb826f00ce5fe6430ea36538ab84baef9d33d5166e0a8b5911b2598d01b"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-alloy-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "cf6337f57719c187404538ea5846f443e144b37db2c30470e05ef50b5ad5f869"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-fuseki-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "021d0706842db358436a21aa9580c93813a6ba9e22da02b33f7af0637789d77e"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-rustfs-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "609c1ff561494931748ca438c17718a9d9c240b2d0db34367ca7d2c2d2a3906f"
+          ]
+        }
+      ]
+    },
+    {
+      "status": "OBSERVED",
+      "observedAt": "2026-10-27T10:05:17.357413+00:00",
+      "containers": [
+        {
+          "Id": "cf6337f57719c187404538ea5846f443e144b37db2c30470e05ef50b5ad5f869",
+          "Name": "/alloy-jrjqgrmf",
+          "Image": "sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "alloy",
+          "Mounts": [
+            {
+              "Type": "bind",
+              "Destination": "/etc/alloy/config.alloy",
+              "RW": false
+            },
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-alloy-data",
+              "Destination": "/var/lib/alloy/data",
+              "RW": true
+            }
+          ]
+        },
+        {
+          "Id": "df81578fdde7daad1b877d38a7954b6056dda88415a59176b46b302295ac4955",
+          "Name": "/grafana-egwmqaph",
+          "Image": "sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "grafana",
+          "Mounts": [
+            {
+              "Type": "bind",
+              "Destination": "/etc/grafana/grafana.ini",
+              "RW": false
+            },
+            {
+              "Type": "bind",
+              "Destination": "/etc/grafana/provisioning",
+              "RW": false
+            },
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-grafana-data",
+              "Destination": "/var/lib/grafana",
+              "RW": true
+            },
+            {
+              "Type": "bind",
+              "Destination": "/var/lib/grafana/dashboards",
+              "RW": false
+            }
+          ]
+        },
+        {
+          "Id": "3f9f598649fb4a091d66c6efa5e99164e7327b05aaaac9302450eedc8289abdc",
+          "Name": "/keycloak-ccvhbqqr",
+          "Image": "sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "keycloak",
+          "Mounts": []
+        },
+        {
+          "Id": "45bc1be55e6ae7714ef572620cf33a69ca64d24d015e8c714269271a3965e4af",
+          "Name": "/postgres-pjdztyqd",
+          "Image": "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "postgres",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-postgres-data",
+              "Destination": "/var/lib/postgresql",
+              "RW": true
+            }
+          ]
+        },
+        {
+          "Id": "ba17291b6fb309ccedda1ec32338b209c5cfa0acfa55e0fd1d6e2626de67f496",
+          "Name": "/loki-yhbdtusy",
+          "Image": "sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "loki",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-loki-data",
+              "Destination": "/loki",
+              "RW": true
+            },
+            {
+              "Type": "bind",
+              "Destination": "/etc/loki/loki.yaml",
+              "RW": false
+            }
+          ]
+        },
+        {
+          "Id": "345cc23fbbfc64212225391985054dbbb743004b10af2b736a451c9ac3e85169",
+          "Name": "/tempo-qmfbqrfa",
+          "Image": "sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "tempo",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-tempo-data",
+              "Destination": "/var/tempo",
+              "RW": true
+            },
+            {
+              "Type": "bind",
+              "Destination": "/etc/tempo/tempo.yaml",
+              "RW": false
+            }
+          ]
+        },
+        {
+          "Id": "146ecbb826f00ce5fe6430ea36538ab84baef9d33d5166e0a8b5911b2598d01b",
+          "Name": "/prometheus-ukfmxjdx",
+          "Image": "sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "prometheus",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-prometheus-data",
+              "Destination": "/prometheus",
+              "RW": true
+            },
+            {
+              "Type": "bind",
+              "Destination": "/etc/prometheus/alerts.yaml",
+              "RW": false
+            },
+            {
+              "Type": "bind",
+              "Destination": "/etc/prometheus/prometheus.yaml",
+              "RW": false
+            }
+          ]
+        },
+        {
+          "Id": "021d0706842db358436a21aa9580c93813a6ba9e22da02b33f7af0637789d77e",
+          "Name": "/fuseki-xhezkycu",
+          "Image": "sha256:05040926259ace989082fac0fb2f52d33f4a8122a9a85cb617eb76965b484a39",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "fuseki",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-fuseki-data",
+              "Destination": "/fuseki/databases",
+              "RW": true
+            }
+          ]
+        },
+        {
+          "Id": "609c1ff561494931748ca438c17718a9d9c240b2d0db34367ca7d2c2d2a3906f",
+          "Name": "/rustfs-nmqrgybb",
+          "Image": "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "rustfs",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-rustfs-data",
+              "Destination": "/data",
+              "RW": true
+            }
+          ]
+        }
+      ],
+      "volumes": [
+        {
+          "Name": "g2-ef979bd04cc0-postgres-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:23Z",
+          "Labels": {},
+          "references": [
+            "45bc1be55e6ae7714ef572620cf33a69ca64d24d015e8c714269271a3965e4af"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-grafana-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "df81578fdde7daad1b877d38a7954b6056dda88415a59176b46b302295ac4955"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-loki-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "ba17291b6fb309ccedda1ec32338b209c5cfa0acfa55e0fd1d6e2626de67f496"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-tempo-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "345cc23fbbfc64212225391985054dbbb743004b10af2b736a451c9ac3e85169"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-prometheus-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "146ecbb826f00ce5fe6430ea36538ab84baef9d33d5166e0a8b5911b2598d01b"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-alloy-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "cf6337f57719c187404538ea5846f443e144b37db2c30470e05ef50b5ad5f869"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-fuseki-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "021d0706842db358436a21aa9580c93813a6ba9e22da02b33f7af0637789d77e"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-rustfs-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "609c1ff561494931748ca438c17718a9d9c240b2d0db34367ca7d2c2d2a3906f"
+          ]
+        }
+      ]
+    },
+    {
+      "status": "OBSERVED",
+      "observedAt": "2026-10-27T10:05:22.612764+00:00",
+      "containers": [
+        {
+          "Id": "cf6337f57719c187404538ea5846f443e144b37db2c30470e05ef50b5ad5f869",
+          "Name": "/alloy-jrjqgrmf",
+          "Image": "sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "alloy",
+          "Mounts": [
+            {
+              "Type": "bind",
+              "Destination": "/etc/alloy/config.alloy",
+              "RW": false
+            },
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-alloy-data",
+              "Destination": "/var/lib/alloy/data",
+              "RW": true
+            }
+          ]
+        },
+        {
+          "Id": "df81578fdde7daad1b877d38a7954b6056dda88415a59176b46b302295ac4955",
+          "Name": "/grafana-egwmqaph",
+          "Image": "sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "grafana",
+          "Mounts": [
+            {
+              "Type": "bind",
+              "Destination": "/etc/grafana/grafana.ini",
+              "RW": false
+            },
+            {
+              "Type": "bind",
+              "Destination": "/etc/grafana/provisioning",
+              "RW": false
+            },
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-grafana-data",
+              "Destination": "/var/lib/grafana",
+              "RW": true
+            },
+            {
+              "Type": "bind",
+              "Destination": "/var/lib/grafana/dashboards",
+              "RW": false
+            }
+          ]
+        },
+        {
+          "Id": "3f9f598649fb4a091d66c6efa5e99164e7327b05aaaac9302450eedc8289abdc",
+          "Name": "/keycloak-ccvhbqqr",
+          "Image": "sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "keycloak",
+          "Mounts": []
+        },
+        {
+          "Id": "45bc1be55e6ae7714ef572620cf33a69ca64d24d015e8c714269271a3965e4af",
+          "Name": "/postgres-pjdztyqd",
+          "Image": "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "postgres",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-postgres-data",
+              "Destination": "/var/lib/postgresql",
+              "RW": true
+            }
+          ]
+        },
+        {
+          "Id": "ba17291b6fb309ccedda1ec32338b209c5cfa0acfa55e0fd1d6e2626de67f496",
+          "Name": "/loki-yhbdtusy",
+          "Image": "sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "loki",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-loki-data",
+              "Destination": "/loki",
+              "RW": true
+            },
+            {
+              "Type": "bind",
+              "Destination": "/etc/loki/loki.yaml",
+              "RW": false
+            }
+          ]
+        },
+        {
+          "Id": "345cc23fbbfc64212225391985054dbbb743004b10af2b736a451c9ac3e85169",
+          "Name": "/tempo-qmfbqrfa",
+          "Image": "sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "tempo",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-tempo-data",
+              "Destination": "/var/tempo",
+              "RW": true
+            },
+            {
+              "Type": "bind",
+              "Destination": "/etc/tempo/tempo.yaml",
+              "RW": false
+            }
+          ]
+        },
+        {
+          "Id": "146ecbb826f00ce5fe6430ea36538ab84baef9d33d5166e0a8b5911b2598d01b",
+          "Name": "/prometheus-ukfmxjdx",
+          "Image": "sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "prometheus",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-prometheus-data",
+              "Destination": "/prometheus",
+              "RW": true
+            },
+            {
+              "Type": "bind",
+              "Destination": "/etc/prometheus/alerts.yaml",
+              "RW": false
+            },
+            {
+              "Type": "bind",
+              "Destination": "/etc/prometheus/prometheus.yaml",
+              "RW": false
+            }
+          ]
+        },
+        {
+          "Id": "021d0706842db358436a21aa9580c93813a6ba9e22da02b33f7af0637789d77e",
+          "Name": "/fuseki-xhezkycu",
+          "Image": "sha256:05040926259ace989082fac0fb2f52d33f4a8122a9a85cb617eb76965b484a39",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "fuseki",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-fuseki-data",
+              "Destination": "/fuseki/databases",
+              "RW": true
+            }
+          ]
+        },
+        {
+          "Id": "609c1ff561494931748ca438c17718a9d9c240b2d0db34367ca7d2c2d2a3906f",
+          "Name": "/rustfs-nmqrgybb",
+          "Image": "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "rustfs",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-rustfs-data",
+              "Destination": "/data",
+              "RW": true
+            }
+          ]
+        }
+      ],
+      "volumes": [
+        {
+          "Name": "g2-ef979bd04cc0-postgres-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:23Z",
+          "Labels": {},
+          "references": [
+            "45bc1be55e6ae7714ef572620cf33a69ca64d24d015e8c714269271a3965e4af"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-grafana-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "df81578fdde7daad1b877d38a7954b6056dda88415a59176b46b302295ac4955"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-loki-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "ba17291b6fb309ccedda1ec32338b209c5cfa0acfa55e0fd1d6e2626de67f496"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-tempo-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "345cc23fbbfc64212225391985054dbbb743004b10af2b736a451c9ac3e85169"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-prometheus-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "146ecbb826f00ce5fe6430ea36538ab84baef9d33d5166e0a8b5911b2598d01b"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-alloy-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "cf6337f57719c187404538ea5846f443e144b37db2c30470e05ef50b5ad5f869"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-fuseki-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "021d0706842db358436a21aa9580c93813a6ba9e22da02b33f7af0637789d77e"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-rustfs-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "609c1ff561494931748ca438c17718a9d9c240b2d0db34367ca7d2c2d2a3906f"
+          ]
+        }
+      ]
+    },
+    {
+      "status": "OBSERVED",
+      "observedAt": "2026-10-27T10:05:27.868226+00:00",
+      "containers": [
+        {
+          "Id": "cf6337f57719c187404538ea5846f443e144b37db2c30470e05ef50b5ad5f869",
+          "Name": "/alloy-jrjqgrmf",
+          "Image": "sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "alloy",
+          "Mounts": [
+            {
+              "Type": "bind",
+              "Destination": "/etc/alloy/config.alloy",
+              "RW": false
+            },
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-alloy-data",
+              "Destination": "/var/lib/alloy/data",
+              "RW": true
+            }
+          ]
+        },
+        {
+          "Id": "df81578fdde7daad1b877d38a7954b6056dda88415a59176b46b302295ac4955",
+          "Name": "/grafana-egwmqaph",
+          "Image": "sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "grafana",
+          "Mounts": [
+            {
+              "Type": "bind",
+              "Destination": "/etc/grafana/grafana.ini",
+              "RW": false
+            },
+            {
+              "Type": "bind",
+              "Destination": "/etc/grafana/provisioning",
+              "RW": false
+            },
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-grafana-data",
+              "Destination": "/var/lib/grafana",
+              "RW": true
+            },
+            {
+              "Type": "bind",
+              "Destination": "/var/lib/grafana/dashboards",
+              "RW": false
+            }
+          ]
+        },
+        {
+          "Id": "3f9f598649fb4a091d66c6efa5e99164e7327b05aaaac9302450eedc8289abdc",
+          "Name": "/keycloak-ccvhbqqr",
+          "Image": "sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "keycloak",
+          "Mounts": []
+        },
+        {
+          "Id": "45bc1be55e6ae7714ef572620cf33a69ca64d24d015e8c714269271a3965e4af",
+          "Name": "/postgres-pjdztyqd",
+          "Image": "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "postgres",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-postgres-data",
+              "Destination": "/var/lib/postgresql",
+              "RW": true
+            }
+          ]
+        },
+        {
+          "Id": "ba17291b6fb309ccedda1ec32338b209c5cfa0acfa55e0fd1d6e2626de67f496",
+          "Name": "/loki-yhbdtusy",
+          "Image": "sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "loki",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-loki-data",
+              "Destination": "/loki",
+              "RW": true
+            },
+            {
+              "Type": "bind",
+              "Destination": "/etc/loki/loki.yaml",
+              "RW": false
+            }
+          ]
+        },
+        {
+          "Id": "345cc23fbbfc64212225391985054dbbb743004b10af2b736a451c9ac3e85169",
+          "Name": "/tempo-qmfbqrfa",
+          "Image": "sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "tempo",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-tempo-data",
+              "Destination": "/var/tempo",
+              "RW": true
+            },
+            {
+              "Type": "bind",
+              "Destination": "/etc/tempo/tempo.yaml",
+              "RW": false
+            }
+          ]
+        },
+        {
+          "Id": "146ecbb826f00ce5fe6430ea36538ab84baef9d33d5166e0a8b5911b2598d01b",
+          "Name": "/prometheus-ukfmxjdx",
+          "Image": "sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "prometheus",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-prometheus-data",
+              "Destination": "/prometheus",
+              "RW": true
+            },
+            {
+              "Type": "bind",
+              "Destination": "/etc/prometheus/alerts.yaml",
+              "RW": false
+            },
+            {
+              "Type": "bind",
+              "Destination": "/etc/prometheus/prometheus.yaml",
+              "RW": false
+            }
+          ]
+        },
+        {
+          "Id": "021d0706842db358436a21aa9580c93813a6ba9e22da02b33f7af0637789d77e",
+          "Name": "/fuseki-xhezkycu",
+          "Image": "sha256:05040926259ace989082fac0fb2f52d33f4a8122a9a85cb617eb76965b484a39",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "fuseki",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-fuseki-data",
+              "Destination": "/fuseki/databases",
+              "RW": true
+            }
+          ]
+        },
+        {
+          "Id": "609c1ff561494931748ca438c17718a9d9c240b2d0db34367ca7d2c2d2a3906f",
+          "Name": "/rustfs-nmqrgybb",
+          "Image": "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "rustfs",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-rustfs-data",
+              "Destination": "/data",
+              "RW": true
+            }
+          ]
+        }
+      ],
+      "volumes": [
+        {
+          "Name": "g2-ef979bd04cc0-postgres-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:23Z",
+          "Labels": {},
+          "references": [
+            "45bc1be55e6ae7714ef572620cf33a69ca64d24d015e8c714269271a3965e4af"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-grafana-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "df81578fdde7daad1b877d38a7954b6056dda88415a59176b46b302295ac4955"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-loki-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "ba17291b6fb309ccedda1ec32338b209c5cfa0acfa55e0fd1d6e2626de67f496"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-tempo-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "345cc23fbbfc64212225391985054dbbb743004b10af2b736a451c9ac3e85169"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-prometheus-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "146ecbb826f00ce5fe6430ea36538ab84baef9d33d5166e0a8b5911b2598d01b"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-alloy-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "cf6337f57719c187404538ea5846f443e144b37db2c30470e05ef50b5ad5f869"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-fuseki-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "021d0706842db358436a21aa9580c93813a6ba9e22da02b33f7af0637789d77e"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-rustfs-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "609c1ff561494931748ca438c17718a9d9c240b2d0db34367ca7d2c2d2a3906f"
+          ]
+        }
+      ]
+    },
+    {
+      "status": "OBSERVED",
+      "observedAt": "2026-10-27T10:05:33.163275+00:00",
+      "containers": [
+        {
+          "Id": "cf6337f57719c187404538ea5846f443e144b37db2c30470e05ef50b5ad5f869",
+          "Name": "/alloy-jrjqgrmf",
+          "Image": "sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "alloy",
+          "Mounts": [
+            {
+              "Type": "bind",
+              "Destination": "/etc/alloy/config.alloy",
+              "RW": false
+            },
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-alloy-data",
+              "Destination": "/var/lib/alloy/data",
+              "RW": true
+            }
+          ]
+        },
+        {
+          "Id": "df81578fdde7daad1b877d38a7954b6056dda88415a59176b46b302295ac4955",
+          "Name": "/grafana-egwmqaph",
+          "Image": "sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "grafana",
+          "Mounts": [
+            {
+              "Type": "bind",
+              "Destination": "/etc/grafana/grafana.ini",
+              "RW": false
+            },
+            {
+              "Type": "bind",
+              "Destination": "/etc/grafana/provisioning",
+              "RW": false
+            },
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-grafana-data",
+              "Destination": "/var/lib/grafana",
+              "RW": true
+            },
+            {
+              "Type": "bind",
+              "Destination": "/var/lib/grafana/dashboards",
+              "RW": false
+            }
+          ]
+        },
+        {
+          "Id": "3f9f598649fb4a091d66c6efa5e99164e7327b05aaaac9302450eedc8289abdc",
+          "Name": "/keycloak-ccvhbqqr",
+          "Image": "sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "keycloak",
+          "Mounts": []
+        },
+        {
+          "Id": "45bc1be55e6ae7714ef572620cf33a69ca64d24d015e8c714269271a3965e4af",
+          "Name": "/postgres-pjdztyqd",
+          "Image": "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "postgres",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-postgres-data",
+              "Destination": "/var/lib/postgresql",
+              "RW": true
+            }
+          ]
+        },
+        {
+          "Id": "ba17291b6fb309ccedda1ec32338b209c5cfa0acfa55e0fd1d6e2626de67f496",
+          "Name": "/loki-yhbdtusy",
+          "Image": "sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "loki",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-loki-data",
+              "Destination": "/loki",
+              "RW": true
+            },
+            {
+              "Type": "bind",
+              "Destination": "/etc/loki/loki.yaml",
+              "RW": false
+            }
+          ]
+        },
+        {
+          "Id": "345cc23fbbfc64212225391985054dbbb743004b10af2b736a451c9ac3e85169",
+          "Name": "/tempo-qmfbqrfa",
+          "Image": "sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "tempo",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-tempo-data",
+              "Destination": "/var/tempo",
+              "RW": true
+            },
+            {
+              "Type": "bind",
+              "Destination": "/etc/tempo/tempo.yaml",
+              "RW": false
+            }
+          ]
+        },
+        {
+          "Id": "146ecbb826f00ce5fe6430ea36538ab84baef9d33d5166e0a8b5911b2598d01b",
+          "Name": "/prometheus-ukfmxjdx",
+          "Image": "sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "prometheus",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-prometheus-data",
+              "Destination": "/prometheus",
+              "RW": true
+            },
+            {
+              "Type": "bind",
+              "Destination": "/etc/prometheus/alerts.yaml",
+              "RW": false
+            },
+            {
+              "Type": "bind",
+              "Destination": "/etc/prometheus/prometheus.yaml",
+              "RW": false
+            }
+          ]
+        },
+        {
+          "Id": "021d0706842db358436a21aa9580c93813a6ba9e22da02b33f7af0637789d77e",
+          "Name": "/fuseki-xhezkycu",
+          "Image": "sha256:05040926259ace989082fac0fb2f52d33f4a8122a9a85cb617eb76965b484a39",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "fuseki",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-fuseki-data",
+              "Destination": "/fuseki/databases",
+              "RW": true
+            }
+          ]
+        },
+        {
+          "Id": "609c1ff561494931748ca438c17718a9d9c240b2d0db34367ca7d2c2d2a3906f",
+          "Name": "/rustfs-nmqrgybb",
+          "Image": "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "rustfs",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-rustfs-data",
+              "Destination": "/data",
+              "RW": true
+            }
+          ]
+        }
+      ],
+      "volumes": [
+        {
+          "Name": "g2-ef979bd04cc0-postgres-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:23Z",
+          "Labels": {},
+          "references": [
+            "45bc1be55e6ae7714ef572620cf33a69ca64d24d015e8c714269271a3965e4af"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-grafana-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "df81578fdde7daad1b877d38a7954b6056dda88415a59176b46b302295ac4955"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-loki-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "ba17291b6fb309ccedda1ec32338b209c5cfa0acfa55e0fd1d6e2626de67f496"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-tempo-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "345cc23fbbfc64212225391985054dbbb743004b10af2b736a451c9ac3e85169"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-prometheus-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "146ecbb826f00ce5fe6430ea36538ab84baef9d33d5166e0a8b5911b2598d01b"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-alloy-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "cf6337f57719c187404538ea5846f443e144b37db2c30470e05ef50b5ad5f869"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-fuseki-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "021d0706842db358436a21aa9580c93813a6ba9e22da02b33f7af0637789d77e"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-rustfs-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "609c1ff561494931748ca438c17718a9d9c240b2d0db34367ca7d2c2d2a3906f"
+          ]
+        }
+      ]
+    },
+    {
+      "status": "OBSERVED",
+      "observedAt": "2026-10-27T10:05:38.429657+00:00",
+      "containers": [
+        {
+          "Id": "cf6337f57719c187404538ea5846f443e144b37db2c30470e05ef50b5ad5f869",
+          "Name": "/alloy-jrjqgrmf",
+          "Image": "sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "alloy",
+          "Mounts": [
+            {
+              "Type": "bind",
+              "Destination": "/etc/alloy/config.alloy",
+              "RW": false
+            },
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-alloy-data",
+              "Destination": "/var/lib/alloy/data",
+              "RW": true
+            }
+          ]
+        },
+        {
+          "Id": "df81578fdde7daad1b877d38a7954b6056dda88415a59176b46b302295ac4955",
+          "Name": "/grafana-egwmqaph",
+          "Image": "sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "grafana",
+          "Mounts": [
+            {
+              "Type": "bind",
+              "Destination": "/etc/grafana/grafana.ini",
+              "RW": false
+            },
+            {
+              "Type": "bind",
+              "Destination": "/etc/grafana/provisioning",
+              "RW": false
+            },
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-grafana-data",
+              "Destination": "/var/lib/grafana",
+              "RW": true
+            },
+            {
+              "Type": "bind",
+              "Destination": "/var/lib/grafana/dashboards",
+              "RW": false
+            }
+          ]
+        },
+        {
+          "Id": "3f9f598649fb4a091d66c6efa5e99164e7327b05aaaac9302450eedc8289abdc",
+          "Name": "/keycloak-ccvhbqqr",
+          "Image": "sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "keycloak",
+          "Mounts": []
+        },
+        {
+          "Id": "45bc1be55e6ae7714ef572620cf33a69ca64d24d015e8c714269271a3965e4af",
+          "Name": "/postgres-pjdztyqd",
+          "Image": "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "postgres",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-postgres-data",
+              "Destination": "/var/lib/postgresql",
+              "RW": true
+            }
+          ]
+        },
+        {
+          "Id": "ba17291b6fb309ccedda1ec32338b209c5cfa0acfa55e0fd1d6e2626de67f496",
+          "Name": "/loki-yhbdtusy",
+          "Image": "sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "loki",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-loki-data",
+              "Destination": "/loki",
+              "RW": true
+            },
+            {
+              "Type": "bind",
+              "Destination": "/etc/loki/loki.yaml",
+              "RW": false
+            }
+          ]
+        },
+        {
+          "Id": "345cc23fbbfc64212225391985054dbbb743004b10af2b736a451c9ac3e85169",
+          "Name": "/tempo-qmfbqrfa",
+          "Image": "sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "tempo",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-tempo-data",
+              "Destination": "/var/tempo",
+              "RW": true
+            },
+            {
+              "Type": "bind",
+              "Destination": "/etc/tempo/tempo.yaml",
+              "RW": false
+            }
+          ]
+        },
+        {
+          "Id": "146ecbb826f00ce5fe6430ea36538ab84baef9d33d5166e0a8b5911b2598d01b",
+          "Name": "/prometheus-ukfmxjdx",
+          "Image": "sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "prometheus",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-prometheus-data",
+              "Destination": "/prometheus",
+              "RW": true
+            },
+            {
+              "Type": "bind",
+              "Destination": "/etc/prometheus/alerts.yaml",
+              "RW": false
+            },
+            {
+              "Type": "bind",
+              "Destination": "/etc/prometheus/prometheus.yaml",
+              "RW": false
+            }
+          ]
+        },
+        {
+          "Id": "021d0706842db358436a21aa9580c93813a6ba9e22da02b33f7af0637789d77e",
+          "Name": "/fuseki-xhezkycu",
+          "Image": "sha256:05040926259ace989082fac0fb2f52d33f4a8122a9a85cb617eb76965b484a39",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "fuseki",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-fuseki-data",
+              "Destination": "/fuseki/databases",
+              "RW": true
+            }
+          ]
+        },
+        {
+          "Id": "609c1ff561494931748ca438c17718a9d9c240b2d0db34367ca7d2c2d2a3906f",
+          "Name": "/rustfs-nmqrgybb",
+          "Image": "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "rustfs",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-rustfs-data",
+              "Destination": "/data",
+              "RW": true
+            }
+          ]
+        }
+      ],
+      "volumes": [
+        {
+          "Name": "g2-ef979bd04cc0-postgres-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:23Z",
+          "Labels": {},
+          "references": [
+            "45bc1be55e6ae7714ef572620cf33a69ca64d24d015e8c714269271a3965e4af"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-grafana-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "df81578fdde7daad1b877d38a7954b6056dda88415a59176b46b302295ac4955"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-loki-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "ba17291b6fb309ccedda1ec32338b209c5cfa0acfa55e0fd1d6e2626de67f496"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-tempo-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "345cc23fbbfc64212225391985054dbbb743004b10af2b736a451c9ac3e85169"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-prometheus-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "146ecbb826f00ce5fe6430ea36538ab84baef9d33d5166e0a8b5911b2598d01b"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-alloy-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "cf6337f57719c187404538ea5846f443e144b37db2c30470e05ef50b5ad5f869"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-fuseki-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "021d0706842db358436a21aa9580c93813a6ba9e22da02b33f7af0637789d77e"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-rustfs-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "609c1ff561494931748ca438c17718a9d9c240b2d0db34367ca7d2c2d2a3906f"
+          ]
+        }
+      ]
+    },
+    {
+      "status": "OBSERVED",
+      "observedAt": "2026-10-27T10:05:42.340536+00:00",
+      "containers": [
+        {
+          "Id": "cf6337f57719c187404538ea5846f443e144b37db2c30470e05ef50b5ad5f869",
+          "Name": "/alloy-jrjqgrmf",
+          "Image": "sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "alloy",
+          "Mounts": [
+            {
+              "Type": "bind",
+              "Destination": "/etc/alloy/config.alloy",
+              "RW": false
+            },
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-alloy-data",
+              "Destination": "/var/lib/alloy/data",
+              "RW": true
+            }
+          ]
+        },
+        {
+          "Id": "df81578fdde7daad1b877d38a7954b6056dda88415a59176b46b302295ac4955",
+          "Name": "/grafana-egwmqaph",
+          "Image": "sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "grafana",
+          "Mounts": [
+            {
+              "Type": "bind",
+              "Destination": "/etc/grafana/grafana.ini",
+              "RW": false
+            },
+            {
+              "Type": "bind",
+              "Destination": "/etc/grafana/provisioning",
+              "RW": false
+            },
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-grafana-data",
+              "Destination": "/var/lib/grafana",
+              "RW": true
+            },
+            {
+              "Type": "bind",
+              "Destination": "/var/lib/grafana/dashboards",
+              "RW": false
+            }
+          ]
+        },
+        {
+          "Id": "3f9f598649fb4a091d66c6efa5e99164e7327b05aaaac9302450eedc8289abdc",
+          "Name": "/keycloak-ccvhbqqr",
+          "Image": "sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "keycloak",
+          "Mounts": []
+        },
+        {
+          "Id": "45bc1be55e6ae7714ef572620cf33a69ca64d24d015e8c714269271a3965e4af",
+          "Name": "/postgres-pjdztyqd",
+          "Image": "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "postgres",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-postgres-data",
+              "Destination": "/var/lib/postgresql",
+              "RW": true
+            }
+          ]
+        },
+        {
+          "Id": "ba17291b6fb309ccedda1ec32338b209c5cfa0acfa55e0fd1d6e2626de67f496",
+          "Name": "/loki-yhbdtusy",
+          "Image": "sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "loki",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-loki-data",
+              "Destination": "/loki",
+              "RW": true
+            },
+            {
+              "Type": "bind",
+              "Destination": "/etc/loki/loki.yaml",
+              "RW": false
+            }
+          ]
+        },
+        {
+          "Id": "345cc23fbbfc64212225391985054dbbb743004b10af2b736a451c9ac3e85169",
+          "Name": "/tempo-qmfbqrfa",
+          "Image": "sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "tempo",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-tempo-data",
+              "Destination": "/var/tempo",
+              "RW": true
+            },
+            {
+              "Type": "bind",
+              "Destination": "/etc/tempo/tempo.yaml",
+              "RW": false
+            }
+          ]
+        },
+        {
+          "Id": "146ecbb826f00ce5fe6430ea36538ab84baef9d33d5166e0a8b5911b2598d01b",
+          "Name": "/prometheus-ukfmxjdx",
+          "Image": "sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "prometheus",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-prometheus-data",
+              "Destination": "/prometheus",
+              "RW": true
+            },
+            {
+              "Type": "bind",
+              "Destination": "/etc/prometheus/alerts.yaml",
+              "RW": false
+            },
+            {
+              "Type": "bind",
+              "Destination": "/etc/prometheus/prometheus.yaml",
+              "RW": false
+            }
+          ]
+        },
+        {
+          "Id": "021d0706842db358436a21aa9580c93813a6ba9e22da02b33f7af0637789d77e",
+          "Name": "/fuseki-xhezkycu",
+          "Image": "sha256:05040926259ace989082fac0fb2f52d33f4a8122a9a85cb617eb76965b484a39",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "fuseki",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-fuseki-data",
+              "Destination": "/fuseki/databases",
+              "RW": true
+            }
+          ]
+        },
+        {
+          "Id": "609c1ff561494931748ca438c17718a9d9c240b2d0db34367ca7d2c2d2a3906f",
+          "Name": "/rustfs-nmqrgybb",
+          "Image": "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+          "State": "running",
+          "TaskId": "G3-M1-CLOSEOUT-002",
+          "RunId": "g2-ef979bd04cc0",
+          "Service": "rustfs",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g2-ef979bd04cc0-rustfs-data",
+              "Destination": "/data",
+              "RW": true
+            }
+          ]
+        }
+      ],
+      "volumes": [
+        {
+          "Name": "g2-ef979bd04cc0-postgres-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:23Z",
+          "Labels": {},
+          "references": [
+            "45bc1be55e6ae7714ef572620cf33a69ca64d24d015e8c714269271a3965e4af"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-grafana-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "df81578fdde7daad1b877d38a7954b6056dda88415a59176b46b302295ac4955"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-loki-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "ba17291b6fb309ccedda1ec32338b209c5cfa0acfa55e0fd1d6e2626de67f496"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-tempo-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "345cc23fbbfc64212225391985054dbbb743004b10af2b736a451c9ac3e85169"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-prometheus-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "146ecbb826f00ce5fe6430ea36538ab84baef9d33d5166e0a8b5911b2598d01b"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-alloy-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "cf6337f57719c187404538ea5846f443e144b37db2c30470e05ef50b5ad5f869"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-fuseki-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "021d0706842db358436a21aa9580c93813a6ba9e22da02b33f7af0637789d77e"
+          ]
+        },
+        {
+          "Name": "g2-ef979bd04cc0-rustfs-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {},
+          "references": [
+            "609c1ff561494931748ca438c17718a9d9c240b2d0db34367ca7d2c2d2a3906f"
+          ]
+        }
+      ]
+    }
+  ],
+  "exitCode": 0
+}

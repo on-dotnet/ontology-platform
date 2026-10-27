@@ -1,6 +1,6 @@
 # G3-M1-CLOSEOUT-002 当前授权增量（2026-10-27）
 
-状态：IN_PROGRESS。人类正式授权[附件V1](../evidence/G3-M1-CLOSEOUT-002/authorization-v1.md)全部任务；最新明确授权覆盖旧M1禁止处理旧G2卷/history/image的范围限制，但保留历史事实。Base=47935fb2eda3d708e628a1b23ccd897e2250ff33，开工fetch核实。Master独立托管Worktree，两个worker独立树；公共合同/规则/CI单写，非作者独立审查。
+状态：READY_FOR_REVIEW / PARTIAL（最终同HeadCI/唯一V3包须以提交后实际回执核对）。人类正式授权[附件V1](../evidence/G3-M1-CLOSEOUT-002/authorization-v1.md)全部任务；最新明确授权覆盖旧M1禁止处理旧G2卷/history/image的范围限制，但保留历史事实。Base=47935fb2eda3d708e628a1b23ccd897e2250ff33，开工fetch核实。Master独立托管Worktree，两个worker独立树；公共合同/规则/CI单写，非作者独立审查。
 
 仅正式Review ZIP V3、Fuseki单一构建来源、真实Mac Docker白名单清理、EOF修复及永久效率规则/自动回归；不重做M1业务、不启M2、不改历史、不跨项目/生产、无付费模型调用。任务见[G3-M1-CLOSEOUT-002](G3-M1-CLOSEOUT-002.md)。必须读[效率规则](../development/ai-development-efficiency.md)、[构包合同](../development/review-package-spec.md)、[生命周期](../development/resource-lifecycle.md)。最终同Head双job、唯一ZIP独立重开及实际Docker before/after后输出G3_M1_CLOSEOUT_READY_FOR_REVIEW并停止。
 

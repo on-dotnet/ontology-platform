@@ -1,0 +1,627 @@
+{
+  "observedAt": "2026-10-27T10:03:22.287741+00:00",
+  "context": "desktop-linux",
+  "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016",
+  "bridgeId": "e5a1d4e4ccbef3998f00d1f1f578933f8e5eccd35983750211f3599225819821",
+  "version": {
+    "Client": {
+      "Version": "29.9.2",
+      "ApiVersion": "1.56",
+      "DefaultAPIVersion": "1.56",
+      "GitCommit": "a82e528",
+      "GoVersion": "go1.26.10",
+      "Os": "darwin",
+      "Arch": "arm64",
+      "BuildTime": "Tue Oct 20 18:43:59 2026",
+      "Context": "desktop-linux"
+    },
+    "Server": {
+      "Platform": {
+        "Name": "Docker Desktop 4.96.3 (244472)"
+      },
+      "Version": "29.9.2",
+      "ApiVersion": "1.56",
+      "MinAPIVersion": "1.40",
+      "Os": "linux",
+      "Arch": "arm64",
+      "Components": [
+        {
+          "Name": "Engine",
+          "Version": "29.9.2",
+          "Details": {
+            "ApiVersion": "1.56",
+            "Arch": "arm64",
+            "BuildTime": "Tue Oct 20 18:44:14 2026",
+            "Experimental": "false",
+            "GitCommit": "0367cbe",
+            "GoVersion": "go1.26.10",
+            "KernelVersion": "7.0.14-linuxkit",
+            "MinAPIVersion": "1.40",
+            "Module": "github.com/moby/moby/v2",
+            "ModuleVersion": "v2.0.0+unknown",
+            "Os": "linux"
+          }
+        },
+        {
+          "Name": "containerd",
+          "Version": "v2.4.2",
+          "Details": {
+            "GitCommit": "b7a25261e029d68978bbf290df0a62fc819b3c51"
+          }
+        },
+        {
+          "Name": "runc",
+          "Version": "1.5.2",
+          "Details": {
+            "GitCommit": "v1.5.2-0-g29dd3dc2"
+          }
+        },
+        {
+          "Name": "docker-init",
+          "Version": "0.19.0",
+          "Details": {
+            "GitCommit": "de40ad0"
+          }
+        }
+      ],
+      "GitCommit": "0367cbe",
+      "GoVersion": "go1.26.10",
+      "KernelVersion": "7.0.14-linuxkit",
+      "BuildTime": "2026-10-20T18:44:14.000000000+00:00"
+    }
+  },
+  "buildxVersion": "github.com/docker/buildx v0.38.1 0dbe87f36ed472fe36b6796c3f70b4210a731fc5",
+  "builder": "Name:          desktop-linux\nDriver:        docker\nLast Activity: 2026-10-27 09:42:21 +0000 UTC\n\nNodes:\nName:             desktop-linux\nEndpoint:         desktop-linux\nStatus:           running\nBuildKit version: v0.34.0\nPlatforms:        linux/arm64, linux/amd64, linux/amd64/v2, linux/riscv64, linux/ppc64le, linux/s390x, linux/386\nLabels:\n org.mobyproject.buildkit.worker.containerd.namespace: moby\n org.mobyproject.buildkit.worker.containerd.uuid:      c943f7ae-b2dc-482e-bdb4-28fee25f5502\n org.mobyproject.buildkit.worker.executor:             containerd\n org.mobyproject.buildkit.worker.hostname:             docker-desktop\n org.mobyproject.buildkit.worker.moby.host-gateway-ip: 192.168.65.254\n org.mobyproject.buildkit.worker.network:              host\n org.mobyproject.buildkit.worker.selinux.enabled:      false\n org.mobyproject.buildkit.worker.snapshotter:          overlayfs\nDevices:\n Name:                  docker.com/gpu=webgpu\n Automatically allowed: false\nGC Policy rule#0:\n All:            false\n Filters:        type==source.local type==exec.cachemount type==source.git.checkout\n Keep Duration:  48h0m0s\n Max Used Space: 2.764GiB\nGC Policy rule#1:\n All:            false\n Keep Duration:  1440h0m0s\n Reserved Space: 20GiB\nGC Policy rule#2:\n All:            false\n Reserved Space: 20GiB\nGC Policy rule#3:\n All:            true\n Reserved Space: 20GiB",
+  "containers": [],
+  "volumes": [
+    {
+      "Name": "g2-ef979bd04cc0-alloy-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T05:57:39Z",
+      "Labels": null,
+      "references": []
+    },
+    {
+      "Name": "g2-ef979bd04cc0-fuseki-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T05:57:39Z",
+      "Labels": null,
+      "references": []
+    },
+    {
+      "Name": "g2-ef979bd04cc0-grafana-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T05:57:39Z",
+      "Labels": null,
+      "references": []
+    },
+    {
+      "Name": "g2-ef979bd04cc0-loki-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T05:57:39Z",
+      "Labels": null,
+      "references": []
+    },
+    {
+      "Name": "g2-ef979bd04cc0-postgres-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T05:57:23Z",
+      "Labels": null,
+      "references": []
+    },
+    {
+      "Name": "g2-ef979bd04cc0-prometheus-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T05:57:39Z",
+      "Labels": null,
+      "references": []
+    },
+    {
+      "Name": "g2-ef979bd04cc0-rustfs-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T05:57:39Z",
+      "Labels": null,
+      "references": []
+    },
+    {
+      "Name": "g2-ef979bd04cc0-tempo-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T05:57:39Z",
+      "Labels": null,
+      "references": []
+    }
+  ],
+  "images": [
+    {
+      "Id": "sha256:05040926259ace989082fac0fb2f52d33f4a8122a9a85cb617eb76965b484a39",
+      "RepoTags": [
+        "ontology-platform-fuseki:context-6bc72da7b5570e60b43cb978965e096fa512befca1e80dbf76ef0710fa681018"
+      ],
+      "RepoDigests": [
+        "ontology-platform-fuseki@sha256:05040926259ace989082fac0fb2f52d33f4a8122a9a85cb617eb76965b484a39"
+      ],
+      "Size": 503312996,
+      "Created": "2026-10-26T02:07:21.88926401Z",
+      "references": []
+    },
+    {
+      "Id": "sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28",
+      "RepoTags": [
+        "grafana/loki@sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28"
+      ],
+      "RepoDigests": [
+        "grafana/loki@sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28"
+      ],
+      "Size": 191210306,
+      "Created": "2026-10-20T21:45:42.003100377Z",
+      "references": []
+    },
+    {
+      "Id": "sha256:401e1fbc58c27b08c3103e00c86b22bd175a1cdd8f8a7d61965133f27a24437f",
+      "RepoTags": [
+        "ontology-platform-g2-fuseki:6.2.0"
+      ],
+      "RepoDigests": [
+        "ontology-platform-g2-fuseki@sha256:401e1fbc58c27b08c3103e00c86b22bd175a1cdd8f8a7d61965133f27a24437f"
+      ],
+      "Size": 503312701,
+      "Created": "2026-10-26T02:07:21.88926401Z",
+      "references": []
+    },
+    {
+      "Id": "sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044",
+      "RepoTags": [
+        "grafana/tempo@sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044"
+      ],
+      "RepoDigests": [
+        "grafana/tempo@sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044"
+      ],
+      "Size": 161272866,
+      "Created": "2026-10-21T15:59:43.480129578Z",
+      "references": []
+    },
+    {
+      "Id": "sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18",
+      "RepoTags": [
+        "grafana/alloy@sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18"
+      ],
+      "RepoDigests": [
+        "grafana/alloy@sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18"
+      ],
+      "Size": 928130986,
+      "Created": "2026-10-22T21:40:39.803475393Z",
+      "references": []
+    },
+    {
+      "Id": "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+      "RepoTags": [
+        "rustfs/rustfs@sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b"
+      ],
+      "RepoDigests": [
+        "rustfs/rustfs@sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b"
+      ],
+      "Size": 370600042,
+      "Created": "2026-10-17T15:51:53.128165122Z",
+      "references": []
+    },
+    {
+      "Id": "sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b",
+      "RepoTags": [
+        "quay.io/keycloak/keycloak@sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b"
+      ],
+      "RepoDigests": [
+        "quay.io/keycloak/keycloak@sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b"
+      ],
+      "Size": 750213594,
+      "Created": "2026-10-23T09:46:28.703859825Z",
+      "references": []
+    },
+    {
+      "Id": "sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f",
+      "RepoTags": [
+        "grafana/grafana@sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f"
+      ],
+      "RepoDigests": [
+        "grafana/grafana@sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f"
+      ],
+      "Size": 1813270111,
+      "Created": "2026-10-12T12:57:33Z",
+      "references": []
+    },
+    {
+      "Id": "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6",
+      "RepoTags": [
+        "postgres@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6"
+      ],
+      "RepoDigests": [
+        "postgres@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6"
+      ],
+      "Size": 665862903,
+      "Created": "2026-10-21T00:40:08.591593073Z",
+      "references": []
+    },
+    {
+      "Id": "sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2",
+      "RepoTags": [
+        "prom/prometheus@sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2"
+      ],
+      "RepoDigests": [
+        "prom/prometheus@sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2"
+      ],
+      "Size": 356657988,
+      "Created": "2026-10-21T14:04:19.591943962Z",
+      "references": []
+    }
+  ],
+  "history": [],
+  "networks": [
+    {
+      "Id": "e5a1d4e4ccbef3998f00d1f1f578933f8e5eccd35983750211f3599225819821",
+      "Name": "bridge",
+      "Driver": "bridge",
+      "Labels": {},
+      "Containers": {}
+    },
+    {
+      "Id": "80ac07a0bfc7ad5bdedefec78a3a66c97c4c74093c4a8533f05f4cb96bcbc4d0",
+      "Name": "host",
+      "Driver": "host",
+      "Labels": {},
+      "Containers": {}
+    },
+    {
+      "Id": "e66d65cfe0714eb9fde22ab801d77393aeb653344362c0faac45292d829dab8e",
+      "Name": "none",
+      "Driver": "null",
+      "Labels": {},
+      "Containers": {}
+    }
+  ],
+  "capacity": "{\"Active\":\"0\",\"Reclaimable\":\"5.244GB (91%)\",\"Size\":\"5.747GB\",\"TotalCount\":\"10\",\"Type\":\"Images\"}\n{\"Active\":\"0\",\"Reclaimable\":\"0B\",\"Size\":\"0B\",\"TotalCount\":\"0\",\"Type\":\"Containers\"}\n{\"Active\":\"0\",\"Reclaimable\":\"624MB (100%)\",\"Size\":\"624MB\",\"TotalCount\":\"8\",\"Type\":\"Local Volumes\"}\n{\"Active\":\"0\",\"Reclaimable\":\"36.9kB\",\"Size\":\"500.1MB\",\"TotalCount\":\"13\",\"Type\":\"Build Cache\"}",
+  "detailedCapacity": "Images space usage:\n\nREPOSITORY                    TAG                                                                        IMAGE ID       CREATED        SIZE      SHARED SIZE   UNIQUE SIZE   CONTAINERS\nontology-platform-fuseki      context-6bc72da7b5570e60b43cb978965e096fa512befca1e80dbf76ef0710fa681018   05040926259a   32 hours ago   503MB     503.3MB       13.36kB       0\nontology-platform-g2-fuseki   6.2.0                                                                      401e1fbc58c2   32 hours ago   503MB     503.3MB       13kB          0\n<none>                        <none>                                                                     a78d6b795721   4 days ago     750MB     2B            750.2MB       0\n<none>                        <none>                                                                     89a5a3201683   4 days ago     928MB     2B            928.1MB       0\n<none>                        <none>                                                                     64e2fbd56d9c   5 days ago     161MB     0B            161.3MB       0\n<none>                        <none>                                                                     fa3302279710   5 days ago     357MB     0B            356.7MB       0\n<none>                        <none>                                                                     edb0c08dc33b   6 days ago     672MB     0B            671.9MB       0\n<none>                        <none>                                                                     0db216b630ae   6 days ago     191MB     0B            191.2MB       0\n<none>                        <none>                                                                     9ca9559533b5   9 days ago     371MB     34B           371.3MB       0\n<none>                        <none>                                                                     dbbc38ea2110   2 weeks ago    1.81GB    32B           1.813GB       0\n\nContainers space usage:\n\nCONTAINER ID   IMAGE     COMMAND   LOCAL VOLUMES   SIZE      CREATED   STATUS    NAMES\n\nLocal Volumes space usage:\n\nVOLUME NAME                       LINKS     SIZE\ng2-ef979bd04cc0-prometheus-data   0         11MB\ng2-ef979bd04cc0-tempo-data        0         279.1kB\ng2-ef979bd04cc0-alloy-data        0         112B\ng2-ef979bd04cc0-fuseki-data       0         201.3MB\ng2-ef979bd04cc0-grafana-data      0         329.4MB\ng2-ef979bd04cc0-rustfs-data       0         158.9kB\ng2-ef979bd04cc0-loki-data         0         151.3kB\ng2-ef979bd04cc0-postgres-data     0         81.66MB\n\nBuild cache usage: 500.1MB\n\nCACHE ID       CACHE TYPE     SIZE      CREATED        LAST USED        USAGE     SHARED\nw06xag2aijqm   regular        107MB     2 days ago     2 days ago       1         true\nj7p20on71k1x   regular        66.1MB    2 days ago     2 days ago       1         true\ne6jc9b1q8gmh   regular        218MB     2 days ago     2 days ago       1         true\newk9svasi6fn   regular        12.4kB    2 days ago     2 days ago       1         true\nuxtr0h6w1ojb   regular        109MB     2 days ago     2 days ago       1         true\ngv4hro3gkgle   regular        14.8kB    2 days ago     2 days ago       1         true\n9ps57q51cxsb   regular        20.8kB    2 days ago     2 days ago       1         true\nk2nu5zzwwgb5   regular        4.13kB    2 days ago     2 days ago       4         false\nnisjoatf7lkh   regular        25.4kB    32 hours ago   32 hours ago     1         true\nk69m501cgn7t   regular        4.13kB    32 hours ago   21 minutes ago   24        true\nsnjlqumzjtwn   source.local   8.19kB    2 days ago     21 minutes ago   29        false\nk80vo9jwximo   source.local   16.4kB    2 days ago     21 minutes ago   29        false\nqfv1txx0qs8w   source.local   8.19kB    2 days ago     21 minutes ago   29        false",
+  "commands": [
+    {
+      "command": [
+        "docker",
+        "ps",
+        "-aq",
+        "--no-trunc"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "volume",
+        "ls",
+        "-q"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "volume",
+        "inspect",
+        "g2-ef979bd04cc0-alloy-data",
+        "--format",
+        "{\"Name\":{{json .Name}},\"Driver\":{{json .Driver}},\"CreatedAt\":{{json .CreatedAt}},\"Labels\":{{json .Labels}}}"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "volume",
+        "inspect",
+        "g2-ef979bd04cc0-fuseki-data",
+        "--format",
+        "{\"Name\":{{json .Name}},\"Driver\":{{json .Driver}},\"CreatedAt\":{{json .CreatedAt}},\"Labels\":{{json .Labels}}}"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "volume",
+        "inspect",
+        "g2-ef979bd04cc0-grafana-data",
+        "--format",
+        "{\"Name\":{{json .Name}},\"Driver\":{{json .Driver}},\"CreatedAt\":{{json .CreatedAt}},\"Labels\":{{json .Labels}}}"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "volume",
+        "inspect",
+        "g2-ef979bd04cc0-loki-data",
+        "--format",
+        "{\"Name\":{{json .Name}},\"Driver\":{{json .Driver}},\"CreatedAt\":{{json .CreatedAt}},\"Labels\":{{json .Labels}}}"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "volume",
+        "inspect",
+        "g2-ef979bd04cc0-postgres-data",
+        "--format",
+        "{\"Name\":{{json .Name}},\"Driver\":{{json .Driver}},\"CreatedAt\":{{json .CreatedAt}},\"Labels\":{{json .Labels}}}"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "volume",
+        "inspect",
+        "g2-ef979bd04cc0-prometheus-data",
+        "--format",
+        "{\"Name\":{{json .Name}},\"Driver\":{{json .Driver}},\"CreatedAt\":{{json .CreatedAt}},\"Labels\":{{json .Labels}}}"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "volume",
+        "inspect",
+        "g2-ef979bd04cc0-rustfs-data",
+        "--format",
+        "{\"Name\":{{json .Name}},\"Driver\":{{json .Driver}},\"CreatedAt\":{{json .CreatedAt}},\"Labels\":{{json .Labels}}}"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "volume",
+        "inspect",
+        "g2-ef979bd04cc0-tempo-data",
+        "--format",
+        "{\"Name\":{{json .Name}},\"Driver\":{{json .Driver}},\"CreatedAt\":{{json .CreatedAt}},\"Labels\":{{json .Labels}}}"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "image",
+        "ls",
+        "-aq",
+        "--no-trunc"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "image",
+        "inspect",
+        "sha256:05040926259ace989082fac0fb2f52d33f4a8122a9a85cb617eb76965b484a39",
+        "--format",
+        "{\"Id\":{{json .Id}},\"RepoTags\":{{json .RepoTags}},\"RepoDigests\":{{json .RepoDigests}},\"Size\":{{json .Size}},\"Created\":{{json .Created}}}"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "image",
+        "inspect",
+        "sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28",
+        "--format",
+        "{\"Id\":{{json .Id}},\"RepoTags\":{{json .RepoTags}},\"RepoDigests\":{{json .RepoDigests}},\"Size\":{{json .Size}},\"Created\":{{json .Created}}}"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "image",
+        "inspect",
+        "sha256:401e1fbc58c27b08c3103e00c86b22bd175a1cdd8f8a7d61965133f27a24437f",
+        "--format",
+        "{\"Id\":{{json .Id}},\"RepoTags\":{{json .RepoTags}},\"RepoDigests\":{{json .RepoDigests}},\"Size\":{{json .Size}},\"Created\":{{json .Created}}}"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "image",
+        "inspect",
+        "sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044",
+        "--format",
+        "{\"Id\":{{json .Id}},\"RepoTags\":{{json .RepoTags}},\"RepoDigests\":{{json .RepoDigests}},\"Size\":{{json .Size}},\"Created\":{{json .Created}}}"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "image",
+        "inspect",
+        "sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18",
+        "--format",
+        "{\"Id\":{{json .Id}},\"RepoTags\":{{json .RepoTags}},\"RepoDigests\":{{json .RepoDigests}},\"Size\":{{json .Size}},\"Created\":{{json .Created}}}"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "image",
+        "inspect",
+        "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+        "--format",
+        "{\"Id\":{{json .Id}},\"RepoTags\":{{json .RepoTags}},\"RepoDigests\":{{json .RepoDigests}},\"Size\":{{json .Size}},\"Created\":{{json .Created}}}"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "image",
+        "inspect",
+        "sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b",
+        "--format",
+        "{\"Id\":{{json .Id}},\"RepoTags\":{{json .RepoTags}},\"RepoDigests\":{{json .RepoDigests}},\"Size\":{{json .Size}},\"Created\":{{json .Created}}}"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "image",
+        "inspect",
+        "sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f",
+        "--format",
+        "{\"Id\":{{json .Id}},\"RepoTags\":{{json .RepoTags}},\"RepoDigests\":{{json .RepoDigests}},\"Size\":{{json .Size}},\"Created\":{{json .Created}}}"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "image",
+        "inspect",
+        "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6",
+        "--format",
+        "{\"Id\":{{json .Id}},\"RepoTags\":{{json .RepoTags}},\"RepoDigests\":{{json .RepoDigests}},\"Size\":{{json .Size}},\"Created\":{{json .Created}}}"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "image",
+        "inspect",
+        "sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2",
+        "--format",
+        "{\"Id\":{{json .Id}},\"RepoTags\":{{json .RepoTags}},\"RepoDigests\":{{json .RepoDigests}},\"Size\":{{json .Size}},\"Created\":{{json .Created}}}"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "network",
+        "ls",
+        "-q",
+        "--no-trunc"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "network",
+        "inspect",
+        "e5a1d4e4ccbef3998f00d1f1f578933f8e5eccd35983750211f3599225819821",
+        "--format",
+        "{\"Id\":{{json .Id}},\"Name\":{{json .Name}},\"Driver\":{{json .Driver}},\"Labels\":{{json .Labels}},\"Containers\":{{json .Containers}}}"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "network",
+        "inspect",
+        "80ac07a0bfc7ad5bdedefec78a3a66c97c4c74093c4a8533f05f4cb96bcbc4d0",
+        "--format",
+        "{\"Id\":{{json .Id}},\"Name\":{{json .Name}},\"Driver\":{{json .Driver}},\"Labels\":{{json .Labels}},\"Containers\":{{json .Containers}}}"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "network",
+        "inspect",
+        "e66d65cfe0714eb9fde22ab801d77393aeb653344362c0faac45292d829dab8e",
+        "--format",
+        "{\"Id\":{{json .Id}},\"Name\":{{json .Name}},\"Driver\":{{json .Driver}},\"Labels\":{{json .Labels}},\"Containers\":{{json .Containers}}}"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "context",
+        "show"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "info",
+        "--format",
+        "{{.ID}}"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "network",
+        "inspect",
+        "bridge",
+        "--format",
+        "{{.Id}}"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "version",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "buildx",
+        "version"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "buildx",
+        "inspect",
+        "desktop-linux"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "system",
+        "df",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "system",
+        "df",
+        "-v"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "physicalReclaimedBytes": "NOT_VERIFIED"
+}

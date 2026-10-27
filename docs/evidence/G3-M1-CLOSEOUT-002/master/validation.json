@@ -1,0 +1,103 @@
+{
+  "checks": [
+    {
+      "name": "preflight",
+      "command": "pwsh -NoProfile -File scripts/doctor.ps1 -Root <Master> -ToolRoot <project M1 tools> -CheckDocker",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Exact locked SDK/Node/pnpm and actual Mac Docker available."
+    },
+    {
+      "name": "engineering-selftest",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1 -SelfTest",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Full integrated SelfTest PASS; ReviewPackage90, Cleanup44, Inspector9, Canonical6, ResourceLifecycle8, CloseoutGovernance4 plus existing gates; final-selftest.txt."
+    },
+    {
+      "name": "backend-release-build",
+      "command": "dotnet build backend/OntologyPlatform.slnx --no-restore --configuration Release",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "0 errors; pre-existing ASPIRE010 warning; final-build.txt."
+    },
+    {
+      "name": "real-semantic-integration",
+      "command": "PLATFORM_EVIDENCE_DIR=docs/evidence/G3-M1-CLOSEOUT-002/master/integration pwsh -NoProfile -File scripts/acceptance/g2-integration.ps1",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Real PG/Jena/RustFS semantic, release faults, query, MCP/MAF/native SSE PASS; canonical-integration.txt and four exact receipts."
+    },
+    {
+      "name": "canonical-no-growth",
+      "command": "python3 scripts/tests/CanonicalFuseki.Real.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "2 consecutive actual cache-hit checks: exact image/history sets unchanged; RESOURCE/canonical-real-reuse.json."
+    },
+    {
+      "name": "docker-exact-dryrun",
+      "command": "pwsh -NoProfile -File scripts/maintenance/cleanup-resources.ps1 -Root <Master> -PlanPath master/apply-plan-generation2.json",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Validated35 completed0; independently repeated by resource_review; plan SHA1639be5deff0fe19a758e0567727e80effb9ab6024a9108a90bdf064e947069b."
+    },
+    {
+      "name": "docker-real-apply",
+      "command": "pwsh -NoProfile -File scripts/maintenance/cleanup-resources.ps1 -Root <Master> -PlanPath master/apply-plan-generation2.json -Apply -LogPath master/apply-log-generation2.jsonl",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Validated/completed35:16 old volumes/8 duplicate images/11 history;70 before/after lines; every accurate absence verified."
+    },
+    {
+      "name": "development-retention-health",
+      "command": "trusted runtime before/after probe with exact original runtime loader; pg_isready and three HTTP readiness probes",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Before4/4,after4/4; actual labelled9 containers observed then EXITED0;8 volumes retained,10 image IDs,0 containers/history,3 networks."
+    },
+    {
+      "name": "independent-task-review",
+      "command": "inventory_review/resource_review task reviews; whole_review immutable full patch and natural-evidence scoped review",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Task reviews and whole-branch Spec/Quality PASS, C0/I0/M0; twoP2 fixed/rereviewed; natural11Ref scoped evidence review PASS; exact plan independently approved."
+    },
+    {
+      "name": "diff-check",
+      "command": "git diff 47935fb2eda3d708e628a1b23ccd897e2250ff33 --check",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Full task text range and current staged/unstaged diff-check exit0; SEM historical FAIL bytes retained except EOF blank."
+    },
+    {
+      "name": "physical-capacity",
+      "command": "Docker system df metadata; physical APFS/VM bytes not measurable by this task",
+      "status": "NOT_VERIFIED",
+      "exitCode": null,
+      "output": "Volume logical reduction approx1.244GB using rounded Engine report; shared image total5.747GB/cache500.1MB retained; no physical reclamation claim."
+    },
+    {
+      "name": "history-natural-generation",
+      "command": "python3 docs/evidence/G3-M1-CLOSEOUT-002/master/history-natural-postverify.py <Master>",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Actual natural bridge generation e5a1d4... -> c71c286...; audited backend unchanged;11/11 exact supported no-record in new stable generation; no restart/reset/upgrade/prune/DB edits."
+    },
+    {
+      "name": "platforms-and-new-business",
+      "command": "Windows/Intel/production/new M1 business/browser whole-stack visual rerun",
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Out of this closeout scope; unchanged Web will run full sameHeadCI; no M2."
+    }
+  ],
+  "ci": {
+    "status": "NOT_VERIFIED",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  },
+  "note": "Final committed Head CI must be actually queried by V3 creator and VerifyOnly; no self-referential future success here."
+}

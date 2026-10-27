@@ -1,0 +1,5 @@
+# 精确Apply独立复审
+
+resource_review非作者独立复核generation2计划SHA256 1639be5deff0fe19a758e0567727e80effb9ab6024a9108a90bdf064e947069b。只bridge generation、created/expires变化；35操作/归属/fingerprint/keep未变。当前真实DryRun exit0 validated35/completed0，版本/代际/引用/远端身份检查通过，准许准确范围Apply，仍须执行时重验。Reviewer未删除资源。
+
+Master随后真实Apply exit0 completed35，70逐项日志和全量after快照另见实际文件。原代际拒绝仍保留，不改旧日志或计划。

@@ -1,0 +1,366 @@
+{
+  "observedAt": "2026-10-27T10:12:36.257263+00:00",
+  "status": "PASS",
+  "priorObservedAt": "2026-10-27T10:06:45.868025+00:00",
+  "priorGeneration": "e5a1d4e4ccbef3998f00d1f1f578933f8e5eccd35983750211f3599225819821",
+  "observedNaturalGenerationChange": true,
+  "generationUnchangedDuringVerification": true,
+  "auditedBackendContractMatched": true,
+  "generation": {
+    "context": "desktop-linux",
+    "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016",
+    "bridgeId": "c71c28617c4ea7cbfb800bdcadba6d52ff2a866e6db514039481827065ddcd8a",
+    "buildxVersion": "github.com/docker/buildx v0.38.1 0dbe87f36ed472fe36b6796c3f70b4210a731fc5",
+    "builder": "Name:          desktop-linux\nDriver:        docker\nLast Activity: 2026-10-27 09:42:21 +0000 UTC\n\nNodes:\nName:             desktop-linux\nEndpoint:         desktop-linux\nStatus:           running\nBuildKit version: v0.34.0\nPlatforms:        linux/arm64, linux/amd64, linux/amd64/v2, linux/riscv64, linux/ppc64le, linux/s390x, linux/386\nLabels:\n org.mobyproject.buildkit.worker.containerd.namespace: moby\n org.mobyproject.buildkit.worker.containerd.uuid:      c943f7ae-b2dc-482e-bdb4-28fee25f5502\n org.mobyproject.buildkit.worker.executor:             containerd\n org.mobyproject.buildkit.worker.hostname:             docker-desktop\n org.mobyproject.buildkit.worker.moby.host-gateway-ip: 192.168.65.254\n org.mobyproject.buildkit.worker.network:              host\n org.mobyproject.buildkit.worker.selinux.enabled:      false\n org.mobyproject.buildkit.worker.snapshotter:          overlayfs\nDevices:\n Name:                  docker.com/gpu=webgpu\n Automatically allowed: false\nGC Policy rule#0:\n All:            false\n Filters:        type==source.local type==exec.cachemount type==source.git.checkout\n Keep Duration:  48h0m0s\n Max Used Space: 2.764GiB\nGC Policy rule#1:\n All:            false\n Keep Duration:  1440h0m0s\n Reserved Space: 20GiB\nGC Policy rule#2:\n All:            false\n Reserved Space: 20GiB\nGC Policy rule#3:\n All:            true\n Reserved Space: 20GiB"
+  },
+  "records": [
+    {
+      "ref": "67640w3xkq2m9d34grtxvh3h0",
+      "listed": false,
+      "inspectExitCode": 1,
+      "exactSupportedNoRecordDiagnostic": true,
+      "rawStderrSuppressed": true,
+      "status": "PASS"
+    },
+    {
+      "ref": "ezgaz081sj0glsz63lwrladex",
+      "listed": false,
+      "inspectExitCode": 1,
+      "exactSupportedNoRecordDiagnostic": true,
+      "rawStderrSuppressed": true,
+      "status": "PASS"
+    },
+    {
+      "ref": "nkanrr4x3dno77mfigejmo9ap",
+      "listed": false,
+      "inspectExitCode": 1,
+      "exactSupportedNoRecordDiagnostic": true,
+      "rawStderrSuppressed": true,
+      "status": "PASS"
+    },
+    {
+      "ref": "rbknq2eyl3ze0p4ssiz3f7k4z",
+      "listed": false,
+      "inspectExitCode": 1,
+      "exactSupportedNoRecordDiagnostic": true,
+      "rawStderrSuppressed": true,
+      "status": "PASS"
+    },
+    {
+      "ref": "jycu16bu1tx4tkl41e3v0ep2f",
+      "listed": false,
+      "inspectExitCode": 1,
+      "exactSupportedNoRecordDiagnostic": true,
+      "rawStderrSuppressed": true,
+      "status": "PASS"
+    },
+    {
+      "ref": "gro8fj6y8t0t394ulylmtrvpb",
+      "listed": false,
+      "inspectExitCode": 1,
+      "exactSupportedNoRecordDiagnostic": true,
+      "rawStderrSuppressed": true,
+      "status": "PASS"
+    },
+    {
+      "ref": "1pf0ezzhu4o3ftzu5wb58r5h5",
+      "listed": false,
+      "inspectExitCode": 1,
+      "exactSupportedNoRecordDiagnostic": true,
+      "rawStderrSuppressed": true,
+      "status": "PASS"
+    },
+    {
+      "ref": "3t2h2x1svpe4z48xhmrc4mkm7",
+      "listed": false,
+      "inspectExitCode": 1,
+      "exactSupportedNoRecordDiagnostic": true,
+      "rawStderrSuppressed": true,
+      "status": "PASS"
+    },
+    {
+      "ref": "npkohc639rmrlcdeh1bngkggk",
+      "listed": false,
+      "inspectExitCode": 1,
+      "exactSupportedNoRecordDiagnostic": true,
+      "rawStderrSuppressed": true,
+      "status": "PASS"
+    },
+    {
+      "ref": "5fbah5gxqpe91txf3onpjy1v8",
+      "listed": false,
+      "inspectExitCode": 1,
+      "exactSupportedNoRecordDiagnostic": true,
+      "rawStderrSuppressed": true,
+      "status": "PASS"
+    },
+    {
+      "ref": "k6dmkqgacrtu4qh46qhy5x12n",
+      "listed": false,
+      "inspectExitCode": 1,
+      "exactSupportedNoRecordDiagnostic": true,
+      "rawStderrSuppressed": true,
+      "status": "PASS"
+    }
+  ],
+  "commands": [
+    {
+      "command": [
+        "docker",
+        "context",
+        "show"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "info",
+        "--format",
+        "{{.ID}}"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "network",
+        "inspect",
+        "bridge",
+        "--format",
+        "{{.Id}}"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "buildx",
+        "version"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "buildx",
+        "inspect",
+        "desktop-linux"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "buildx",
+        "history",
+        "ls",
+        "--builder",
+        "desktop-linux",
+        "--format",
+        "{{.Ref}}"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "buildx",
+        "history",
+        "inspect",
+        "--builder",
+        "desktop-linux",
+        "--format",
+        "{\"Ref\":{{printf \"%q\" .Ref}},\"Name\":{{printf \"%q\" .Name}},\"Context\":{{printf \"%q\" .Context}},\"Dockerfile\":{{printf \"%q\" .Dockerfile}},\"VCSRepository\":{{printf \"%q\" .VCSRepository}},\"VCSRevision\":{{printf \"%q\" .VCSRevision}},\"Status\":{{printf \"%q\" .Status}}}",
+        "67640w3xkq2m9d34grtxvh3h0"
+      ],
+      "exitCode": 1
+    },
+    {
+      "command": [
+        "docker",
+        "buildx",
+        "history",
+        "inspect",
+        "--builder",
+        "desktop-linux",
+        "--format",
+        "{\"Ref\":{{printf \"%q\" .Ref}},\"Name\":{{printf \"%q\" .Name}},\"Context\":{{printf \"%q\" .Context}},\"Dockerfile\":{{printf \"%q\" .Dockerfile}},\"VCSRepository\":{{printf \"%q\" .VCSRepository}},\"VCSRevision\":{{printf \"%q\" .VCSRevision}},\"Status\":{{printf \"%q\" .Status}}}",
+        "ezgaz081sj0glsz63lwrladex"
+      ],
+      "exitCode": 1
+    },
+    {
+      "command": [
+        "docker",
+        "buildx",
+        "history",
+        "inspect",
+        "--builder",
+        "desktop-linux",
+        "--format",
+        "{\"Ref\":{{printf \"%q\" .Ref}},\"Name\":{{printf \"%q\" .Name}},\"Context\":{{printf \"%q\" .Context}},\"Dockerfile\":{{printf \"%q\" .Dockerfile}},\"VCSRepository\":{{printf \"%q\" .VCSRepository}},\"VCSRevision\":{{printf \"%q\" .VCSRevision}},\"Status\":{{printf \"%q\" .Status}}}",
+        "nkanrr4x3dno77mfigejmo9ap"
+      ],
+      "exitCode": 1
+    },
+    {
+      "command": [
+        "docker",
+        "buildx",
+        "history",
+        "inspect",
+        "--builder",
+        "desktop-linux",
+        "--format",
+        "{\"Ref\":{{printf \"%q\" .Ref}},\"Name\":{{printf \"%q\" .Name}},\"Context\":{{printf \"%q\" .Context}},\"Dockerfile\":{{printf \"%q\" .Dockerfile}},\"VCSRepository\":{{printf \"%q\" .VCSRepository}},\"VCSRevision\":{{printf \"%q\" .VCSRevision}},\"Status\":{{printf \"%q\" .Status}}}",
+        "rbknq2eyl3ze0p4ssiz3f7k4z"
+      ],
+      "exitCode": 1
+    },
+    {
+      "command": [
+        "docker",
+        "buildx",
+        "history",
+        "inspect",
+        "--builder",
+        "desktop-linux",
+        "--format",
+        "{\"Ref\":{{printf \"%q\" .Ref}},\"Name\":{{printf \"%q\" .Name}},\"Context\":{{printf \"%q\" .Context}},\"Dockerfile\":{{printf \"%q\" .Dockerfile}},\"VCSRepository\":{{printf \"%q\" .VCSRepository}},\"VCSRevision\":{{printf \"%q\" .VCSRevision}},\"Status\":{{printf \"%q\" .Status}}}",
+        "jycu16bu1tx4tkl41e3v0ep2f"
+      ],
+      "exitCode": 1
+    },
+    {
+      "command": [
+        "docker",
+        "buildx",
+        "history",
+        "inspect",
+        "--builder",
+        "desktop-linux",
+        "--format",
+        "{\"Ref\":{{printf \"%q\" .Ref}},\"Name\":{{printf \"%q\" .Name}},\"Context\":{{printf \"%q\" .Context}},\"Dockerfile\":{{printf \"%q\" .Dockerfile}},\"VCSRepository\":{{printf \"%q\" .VCSRepository}},\"VCSRevision\":{{printf \"%q\" .VCSRevision}},\"Status\":{{printf \"%q\" .Status}}}",
+        "gro8fj6y8t0t394ulylmtrvpb"
+      ],
+      "exitCode": 1
+    },
+    {
+      "command": [
+        "docker",
+        "buildx",
+        "history",
+        "inspect",
+        "--builder",
+        "desktop-linux",
+        "--format",
+        "{\"Ref\":{{printf \"%q\" .Ref}},\"Name\":{{printf \"%q\" .Name}},\"Context\":{{printf \"%q\" .Context}},\"Dockerfile\":{{printf \"%q\" .Dockerfile}},\"VCSRepository\":{{printf \"%q\" .VCSRepository}},\"VCSRevision\":{{printf \"%q\" .VCSRevision}},\"Status\":{{printf \"%q\" .Status}}}",
+        "1pf0ezzhu4o3ftzu5wb58r5h5"
+      ],
+      "exitCode": 1
+    },
+    {
+      "command": [
+        "docker",
+        "buildx",
+        "history",
+        "inspect",
+        "--builder",
+        "desktop-linux",
+        "--format",
+        "{\"Ref\":{{printf \"%q\" .Ref}},\"Name\":{{printf \"%q\" .Name}},\"Context\":{{printf \"%q\" .Context}},\"Dockerfile\":{{printf \"%q\" .Dockerfile}},\"VCSRepository\":{{printf \"%q\" .VCSRepository}},\"VCSRevision\":{{printf \"%q\" .VCSRevision}},\"Status\":{{printf \"%q\" .Status}}}",
+        "3t2h2x1svpe4z48xhmrc4mkm7"
+      ],
+      "exitCode": 1
+    },
+    {
+      "command": [
+        "docker",
+        "buildx",
+        "history",
+        "inspect",
+        "--builder",
+        "desktop-linux",
+        "--format",
+        "{\"Ref\":{{printf \"%q\" .Ref}},\"Name\":{{printf \"%q\" .Name}},\"Context\":{{printf \"%q\" .Context}},\"Dockerfile\":{{printf \"%q\" .Dockerfile}},\"VCSRepository\":{{printf \"%q\" .VCSRepository}},\"VCSRevision\":{{printf \"%q\" .VCSRevision}},\"Status\":{{printf \"%q\" .Status}}}",
+        "npkohc639rmrlcdeh1bngkggk"
+      ],
+      "exitCode": 1
+    },
+    {
+      "command": [
+        "docker",
+        "buildx",
+        "history",
+        "inspect",
+        "--builder",
+        "desktop-linux",
+        "--format",
+        "{\"Ref\":{{printf \"%q\" .Ref}},\"Name\":{{printf \"%q\" .Name}},\"Context\":{{printf \"%q\" .Context}},\"Dockerfile\":{{printf \"%q\" .Dockerfile}},\"VCSRepository\":{{printf \"%q\" .VCSRepository}},\"VCSRevision\":{{printf \"%q\" .VCSRevision}},\"Status\":{{printf \"%q\" .Status}}}",
+        "5fbah5gxqpe91txf3onpjy1v8"
+      ],
+      "exitCode": 1
+    },
+    {
+      "command": [
+        "docker",
+        "buildx",
+        "history",
+        "inspect",
+        "--builder",
+        "desktop-linux",
+        "--format",
+        "{\"Ref\":{{printf \"%q\" .Ref}},\"Name\":{{printf \"%q\" .Name}},\"Context\":{{printf \"%q\" .Context}},\"Dockerfile\":{{printf \"%q\" .Dockerfile}},\"VCSRepository\":{{printf \"%q\" .VCSRepository}},\"VCSRevision\":{{printf \"%q\" .VCSRevision}},\"Status\":{{printf \"%q\" .Status}}}",
+        "k6dmkqgacrtu4qh46qhy5x12n"
+      ],
+      "exitCode": 1
+    },
+    {
+      "command": [
+        "docker",
+        "context",
+        "show"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "info",
+        "--format",
+        "{{.ID}}"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "network",
+        "inspect",
+        "bridge",
+        "--format",
+        "{{.Id}}"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "buildx",
+        "version"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "buildx",
+        "inspect",
+        "desktop-linux"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "scope": "Strong exact no-record in an actually different natural bridge generation; no restart/reset/upgrade/prune/database edits invoked. Time elapsed alone is not proof."
+}

@@ -1,0 +1,23 @@
+{
+  "observedAt": "2026-10-27T10:05:09.304304+00:00",
+  "prefix": "g2-ef979bd04cc0",
+  "mode": "current canonical AppHost; original trusted runtime helper; no prepare/bootstrap",
+  "probes": {
+    "jena": {
+      "httpStatus": 200,
+      "url": "http://127.0.0.1:13030/$/ping"
+    },
+    "rustfs": {
+      "httpStatus": 200,
+      "url": "http://127.0.0.1:19000/health/ready"
+    },
+    "keycloak": {
+      "httpStatus": 200,
+      "url": "http://127.0.0.1:19090/health/ready"
+    },
+    "postgres": {
+      "containerId": "45bc1be55e6ae7714ef572620cf33a69ca64d24d015e8c714269271a3965e4af",
+      "exitCode": 0
+    }
+  }
+}

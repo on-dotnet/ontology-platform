@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "command": "cleanup-resources.ps1 -Root <Master> -PlanPath master/apply-plan-generation2.json -Apply -LogPath master/apply-log-generation2.jsonl",
+  "exitCode": 0,
+  "validated": 35,
+  "completed": 35,
+  "logLines": 70,
+  "deletedByType": {
+    "docker-volume": 16,
+    "docker-image": 8,
+    "docker-history": 11
+  },
+  "postcondition": "every after absent=true; history also exact supported no-record diagnostic",
+  "originalGenerationAttemptExitCode": 1,
+  "originalGenerationAttemptDeleted": 0,
+  "physicalReclaimedBytes": "NOT_VERIFIED"
+}

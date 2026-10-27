@@ -1,0 +1,42 @@
+{
+  "taskId": "G3-M1-CLOSEOUT-002",
+  "initial": {
+    "containers": 0,
+    "volumes": 24,
+    "images": 16,
+    "history": 9,
+    "networks": 3
+  },
+  "preApply": {
+    "containers": 0,
+    "volumes": 24,
+    "images": 18,
+    "history": 11,
+    "networks": 3
+  },
+  "afterHealth": {
+    "containers": 0,
+    "volumes": 8,
+    "images": 10,
+    "history": 0,
+    "networks": 3
+  },
+  "actuallyDeleted": {
+    "volumes": 16,
+    "imageIds": 8,
+    "historyRefs": 11
+  },
+  "naturalProbeResources": "9 containers and project network created/removed by trusted AppHost, not counted as historical reclamation",
+  "capacityAsReported": {
+    "initial": "{\"Active\":\"0\",\"Reclaimable\":\"5.244GB (91%)\",\"Size\":\"5.747GB\",\"TotalCount\":\"16\",\"Type\":\"Images\"}\n{\"Active\":\"0\",\"Reclaimable\":\"0B\",\"Size\":\"0B\",\"TotalCount\":\"0\",\"Type\":\"Containers\"}\n{\"Active\":\"0\",\"Reclaimable\":\"1.84GB (100%)\",\"Size\":\"1.84GB\",\"TotalCount\":\"24\",\"Type\":\"Local Volumes\"}\n{\"Active\":\"0\",\"Reclaimable\":\"36.9kB\",\"Size\":\"500.1MB\",\"TotalCount\":\"13\",\"Type\":\"Build Cache\"}",
+    "preApply": "{\"Active\":\"0\",\"Reclaimable\":\"5.244GB (91%)\",\"Size\":\"5.747GB\",\"TotalCount\":\"18\",\"Type\":\"Images\"}\n{\"Active\":\"0\",\"Reclaimable\":\"0B\",\"Size\":\"0B\",\"TotalCount\":\"0\",\"Type\":\"Containers\"}\n{\"Active\":\"0\",\"Reclaimable\":\"1.868GB (100%)\",\"Size\":\"1.868GB\",\"TotalCount\":\"24\",\"Type\":\"Local Volumes\"}\n{\"Active\":\"0\",\"Reclaimable\":\"36.9kB\",\"Size\":\"500.1MB\",\"TotalCount\":\"13\",\"Type\":\"Build Cache\"}",
+    "afterApply": "{\"Active\":\"0\",\"Reclaimable\":\"5.244GB (91%)\",\"Size\":\"5.747GB\",\"TotalCount\":\"10\",\"Type\":\"Images\"}\n{\"Active\":\"0\",\"Reclaimable\":\"0B\",\"Size\":\"0B\",\"TotalCount\":\"0\",\"Type\":\"Containers\"}\n{\"Active\":\"0\",\"Reclaimable\":\"624MB (100%)\",\"Size\":\"624MB\",\"TotalCount\":\"8\",\"Type\":\"Local Volumes\"}\n{\"Active\":\"0\",\"Reclaimable\":\"36.9kB\",\"Size\":\"500.1MB\",\"TotalCount\":\"13\",\"Type\":\"Build Cache\"}",
+    "afterHealth": "{\"Active\":\"0\",\"Reclaimable\":\"5.244GB (91%)\",\"Size\":\"5.747GB\",\"TotalCount\":\"10\",\"Type\":\"Images\"}\n{\"Active\":\"0\",\"Reclaimable\":\"0B\",\"Size\":\"0B\",\"TotalCount\":\"0\",\"Type\":\"Containers\"}\n{\"Active\":\"0\",\"Reclaimable\":\"619.3MB (100%)\",\"Size\":\"619.3MB\",\"TotalCount\":\"8\",\"Type\":\"Local Volumes\"}\n{\"Active\":\"0\",\"Reclaimable\":\"36.9kB\",\"Size\":\"500.1MB\",\"TotalCount\":\"13\",\"Type\":\"Build Cache\"}"
+  },
+  "logicalVolumeReductionAtApply": "approximately 1.244 GB, based on rounded Docker Engine 1.868GB -> 624MB",
+  "imageBytesReclaimed": "NOT_VERIFIED; Engine total remains5.747GB; shared layers retained; no8x503MB sum",
+  "buildCache": "13 entries / 500.1MB unchanged; no prune",
+  "physicalReclaimedBytes": "NOT_VERIFIED",
+  "historyCrossNaturalGeneration": "PASS; actually changed bridge e5a1d4... -> c71c286...,11 exact supported no-record diagnostics in stable current audited backend; history-natural-postverify.json",
+  "guardRefusalPreserved": true
+}

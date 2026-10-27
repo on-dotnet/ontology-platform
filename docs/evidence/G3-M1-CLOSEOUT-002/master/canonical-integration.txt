@@ -1,0 +1,277 @@
+Scope: all 2 workspace projects
+✓ Lockfile passes supply-chain policies (verified 1d ago)
+Lockfile is up to date, resolution step is skipped
+Progress: resolved 1, reused 0, downloaded 0, added 0
+Packages: +391
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Packages are cloned from the content-addressable store to the virtual store.
+  Content-addressable store is at: /Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform/.tools/pnpm-store/v11
+  Virtual store is at:             node_modules/.pnpm
+Progress: resolved 391, reused 0, downloaded 15, added 15
+Update available! 11.28.8 → 12.15.0.
+Changelog: https://pnpm.io/v/12.15.0
+To update, run: curl -fsSL https://get.pnpm.io/install.sh | sh -
+Progress: resolved 391, reused 0, downloaded 76, added 76
+Progress: resolved 391, reused 0, downloaded 163, added 162
+Progress: resolved 391, reused 0, downloaded 271, added 269
+[WARN] Tarball download average speed 12 KiB/s (size 16 KiB) is below 50 KiB/s: https://registry.npmjs.org/debug/-/debug-3.2.7.tgz (GET)
+Progress: resolved 391, reused 0, downloaded 373, added 373
+Progress: resolved 391, reused 0, downloaded 384, added 384
+Progress: resolved 391, reused 0, downloaded 386, added 386
+Progress: resolved 391, reused 0, downloaded 388, added 388
+Progress: resolved 391, reused 0, downloaded 389, added 388
+Progress: resolved 391, reused 0, downloaded 389, added 389
+Progress: resolved 391, reused 0, downloaded 390, added 389
+Progress: resolved 391, reused 0, downloaded 391, added 391, done
+
+Done in 32.3s using pnpm v11.28.8
+ee659dd01b1dfc77b66cedca87bcade73ba7884ebc9095942c346745b088f0fb
+127.0.0.1:49990
+3b7c5fa4e14b8269672947074797c14793bcb41643a32297ded6cdebad867a48
+127.0.0.1:49997
+  OntologyPlatform.Contracts -> /Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/bin/Debug/net10.0/OntologyPlatform.Contracts.dll
+  OntologyPlatform.Modules.Ontology.Domain -> /Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.Domain.dll
+  OntologyPlatform.Modules.Governance -> /Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/bin/Debug/net10.0/OntologyPlatform.Modules.Governance.dll
+  OntologyPlatform.Modules.Ontology -> /Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.dll
+  OntologyPlatform.SemanticTests -> /Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:00.44
+工具“dotnet-ef”(版本“10.0.13”)已还原。可用的命令: dotnet-ef
+
+还原成功。
+Failed executing DbCommand (8ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM governance."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261025062847_InitialGovernance'.
+Applying migration '20261025144246_AuditScopeSites'.
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Done.
+Failed executing DbCommand (7ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM ontology."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261026003221_InitialOntology'.
+Applying migration '20261027032135_G3Assessments'.
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Done.
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+/Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64) 已通过 (29s 835ms)
+
+测试运行摘要: 已通过!
+  总计: 96
+  失败: 0
+  成功: 96
+  已跳过: 0
+  持续时间: 30s 227ms
+g2-sem-deff32cdff92
+g2-sem-deff32cdff92-pg
+a726fd2691fb90771b63e60bf060f7635db2dce69e535436069cc56b268b2ae6
+127.0.0.1:50284
+ba0653e9b956a63ad6e80d2317ddbefc6f3f43886881062261e441dee5a2e0c9
+127.0.0.1:50285
+07a092669485ac627d49a3e367cca7a818a63e459dab4bdb06b561a036dfced7
+sha256:05040926259ace989082fac0fb2f52d33f4a8122a9a85cb617eb76965b484a39 ["ontology-platform-fuseki@sha256:05040926259ace989082fac0fb2f52d33f4a8122a9a85cb617eb76965b484a39"]
+[2026-10-27 09:50:13] Fuseki     INFO  Apache Jena Fuseki 6.2.0
+Apache Jena version 6.2.0
+127.0.0.1:50290
+  OntologyPlatform.Contracts -> /Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/bin/Debug/net10.0/OntologyPlatform.Contracts.dll
+  OntologyPlatform.Modules.Ontology.Domain -> /Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.Domain.dll
+  OntologyPlatform.Modules.Publishing.Domain -> /Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/bin/Debug/net10.0/OntologyPlatform.Modules.Publishing.Domain.dll
+  OntologyPlatform.Modules.Governance -> /Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/bin/Debug/net10.0/OntologyPlatform.Modules.Governance.dll
+  OntologyPlatform.Modules.Publishing -> /Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/bin/Debug/net10.0/OntologyPlatform.Modules.Publishing.dll
+  OntologyPlatform.Modules.Ontology -> /Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.dll
+  OntologyPlatform.PublishingTests -> /Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:00.41
+工具“dotnet-ef”(版本“10.0.13”)已还原。可用的命令: dotnet-ef
+
+还原成功。
+Failed executing DbCommand (7ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM governance."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261025062847_InitialGovernance'.
+Applying migration '20261025144246_AuditScopeSites'.
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Done.
+Failed executing DbCommand (7ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM ontology."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261026003221_InitialOntology'.
+Applying migration '20261027032135_G3Assessments'.
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Done.
+Failed executing DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM publishing."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261026015031_InitialPublishing'.
+Done.
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+/Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64) 已通过 (23s 888ms)
+
+测试运行摘要: 已通过!
+  总计: 55
+  失败: 0
+  成功: 55
+  已跳过: 0
+  持续时间: 24s 357ms
+g2-pub-4c6068e471df-jena
+g2-pub-4c6068e471df-s3
+g2-pub-4c6068e471df-pg
+sha256:05040926259ace989082fac0fb2f52d33f4a8122a9a85cb617eb76965b484a39
+  正在确定要还原的项目…
+  所有项目均是最新的，无法还原。
+e5cf8c403a77d9a7d06cd96b38ec11564ccb4cc7bd48bab221a9c9ab44963969
+127.0.0.1:50478
+79534607ae15b1f3e7960bbb1da01847274ff2252f0b8efc32cfb154eaaf9266
+127.0.0.1:50479
+c1c886e9911f2aef028dc6d18c511f0f131d2b72e25f4cfac87aff2e6f30e92e
+127.0.0.1:50483
+  OntologyPlatform.ServiceDefaults -> /Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform/backend/src/ServiceDefaults/bin/Debug/net10.0/OntologyPlatform.ServiceDefaults.dll
+  OntologyPlatform.Contracts -> /Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/bin/Debug/net10.0/OntologyPlatform.Contracts.dll
+  OntologyPlatform.Modules.Ontology.Domain -> /Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.Domain.dll
+  OntologyPlatform.Modules.Governance -> /Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/bin/Debug/net10.0/OntologyPlatform.Modules.Governance.dll
+  OntologyPlatform.Modules.SemanticQuery -> /Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform/backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/bin/Debug/net10.0/OntologyPlatform.Modules.SemanticQuery.dll
+  OntologyPlatform.Modules.Agents -> /Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform/backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/bin/Debug/net10.0/OntologyPlatform.Modules.Agents.dll
+  OntologyPlatform.Modules.Publishing.Domain -> /Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/bin/Debug/net10.0/OntologyPlatform.Modules.Publishing.Domain.dll
+  OntologyPlatform.Modules.Ontology -> /Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.dll
+  OntologyPlatform.Modules.Publishing -> /Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/bin/Debug/net10.0/OntologyPlatform.Modules.Publishing.dll
+  OntologyPlatform.Api -> /Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/bin/Debug/net10.0/OntologyPlatform.Api.dll
+  OntologyPlatform.QueryTests -> /Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:00.56
+工具“dotnet-ef”(版本“10.0.13”)已还原。可用的命令: dotnet-ef
+
+还原成功。
+Failed executing DbCommand (7ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM governance."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261025062847_InitialGovernance'.
+Applying migration '20261025144246_AuditScopeSites'.
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Done.
+Failed executing DbCommand (7ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM ontology."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261026003221_InitialOntology'.
+Applying migration '20261027032135_G3Assessments'.
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Done.
+Failed executing DbCommand (7ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM publishing."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261026015031_InitialPublishing'.
+Done.
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+/Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64) 已通过 (23s 107ms)
+
+测试运行摘要: 已通过!
+  总计: 49
+  失败: 0
+  成功: 49
+  已跳过: 0
+  持续时间: 23s 581ms
+g2-query-9db8cc5c1fd4-jena
+g2-query-9db8cc5c1fd4-s3
+g2-query-9db8cc5c1fd4-pg
+sha256:05040926259ace989082fac0fb2f52d33f4a8122a9a85cb617eb76965b484a39
+  正在确定要还原的项目…
+  所有项目均是最新的，无法还原。
+c985d23ce5ca4f49e1a177c76f935aebdd6ff2e0350c3630048766e19eb6f8d0
+127.0.0.1:50703
+988b877757cd6090959bb0c4daecdd0a762a9137c3c184027af3c98f8b1973f6
+127.0.0.1:50704
+5bff8cd49ead0c843c4a4846ae3bb827c83466aa8572e11cde50f0dfe0e97cec
+127.0.0.1:50710
+  OntologyPlatform.ServiceDefaults -> /Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform/backend/src/ServiceDefaults/bin/Debug/net10.0/OntologyPlatform.ServiceDefaults.dll
+  OntologyPlatform.Contracts -> /Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/bin/Debug/net10.0/OntologyPlatform.Contracts.dll
+  OntologyPlatform.Modules.Ontology.Domain -> /Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.Domain.dll
+  OntologyPlatform.Modules.Governance -> /Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/bin/Debug/net10.0/OntologyPlatform.Modules.Governance.dll
+  OntologyPlatform.Modules.Publishing.Domain -> /Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/bin/Debug/net10.0/OntologyPlatform.Modules.Publishing.Domain.dll
+  OntologyPlatform.Modules.Agents -> /Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform/backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/bin/Debug/net10.0/OntologyPlatform.Modules.Agents.dll
+  OntologyPlatform.Modules.SemanticQuery -> /Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform/backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/bin/Debug/net10.0/OntologyPlatform.Modules.SemanticQuery.dll
+  OntologyPlatform.Modules.Publishing -> /Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/bin/Debug/net10.0/OntologyPlatform.Modules.Publishing.dll
+  OntologyPlatform.Modules.Ontology -> /Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.dll
+  OntologyPlatform.Api -> /Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/bin/Debug/net10.0/OntologyPlatform.Api.dll
+  OntologyPlatform.AgentTests -> /Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:00.59
+工具“dotnet-ef”(版本“10.0.13”)已还原。可用的命令: dotnet-ef
+
+还原成功。
+Failed executing DbCommand (8ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM governance."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261025062847_InitialGovernance'.
+Applying migration '20261025144246_AuditScopeSites'.
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Done.
+Failed executing DbCommand (7ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM ontology."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261026003221_InitialOntology'.
+Applying migration '20261027032135_G3Assessments'.
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Done.
+Failed executing DbCommand (8ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM publishing."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261026015031_InitialPublishing'.
+Done.
+Failed executing DbCommand (7ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM agents."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261026024046_InitialAgents'.
+Done.
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll (net10.0|arm64)
+/Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll (net10.0|arm64) 已通过 (44s 051ms)
+
+测试运行摘要: 已通过!
+  总计: 33
+  失败: 0
+  成功: 33
+  已跳过: 0
+  持续时间: 44s 555ms
+{"status":"PASS","validator":"repo-locked ajv6.15.0","scope":"observed common keyword subset; not full 2020-12 dialect certification","schemaKeywords":["$defs","$ref","$schema","additionalProperties","anyOf","const","description","discriminator","enum","format","items","oneOf","properties","required","type"],"positive":3,"negative":6,"mediaTypes":["text/event-stream"]}
+g2-agent-6cf8bbe0b4c9-jena
+g2-agent-6cf8bbe0b4c9-s3
+g2-agent-6cf8bbe0b4c9-pg
+PASS: real PG/Jena/RustFS semantic, release faults, gateway, MCP/MAF and native SSE suites. Browser OIDC and LGTM are separate local acceptance.

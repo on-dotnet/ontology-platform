@@ -1,0 +1,38 @@
+{
+  "command": "cleanup-resources.ps1 -Root <Master> -PlanPath master/apply-plan.json -Apply -LogPath master/apply-log.jsonl",
+  "exitCode": 1,
+  "error": "REFUSED: History daemon generation changed",
+  "deletionLogExists": false,
+  "resourcesDeleted": 0,
+  "beforeGeneration": "de96191d2074392220c31738e29b4cad4fe74cf66a8c56abba46ae7a244e86d5",
+  "observedGeneration": "e5a1d4e4ccbef3998f00d1f1f578933f8e5eccd35983750211f3599225819821",
+  "engineIdUnchanged": true,
+  "counts": {
+    "containers": {
+      "beforeCount": 0,
+      "nowCount": 0,
+      "equal": true
+    },
+    "volumes": {
+      "beforeCount": 24,
+      "nowCount": 24,
+      "equal": true
+    },
+    "images": {
+      "beforeCount": 18,
+      "nowCount": 18,
+      "equal": true
+    },
+    "history": {
+      "beforeCount": 11,
+      "nowCount": 11,
+      "equal": true
+    },
+    "networks": {
+      "beforeCount": 3,
+      "nowCount": 3,
+      "equal": false
+    }
+  },
+  "policy": "No restart/reset/database edits performed; regenerate exact plan and independently review."
+}
