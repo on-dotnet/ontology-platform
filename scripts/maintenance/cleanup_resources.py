@@ -10,6 +10,10 @@ true,synthetic:true}. Evidence must be a text blob in the current committed
 history containing the exact target/taskId and CLOSED/已关闭 and synthetic/合成/
 可再生 markers. Approval must be reviewed before plan creation; text markers are
 an auditable assertion, not a replacement for independent human review.
+The legacy PRE-G3 task keeps its existing operation contract. G3-M1-001 accepts
+only its own g3-m1- named volumes with same-task committed ownership; it cannot
+delete Git/history/images or legacy volumes. Managed worker trees use native
+archive_worktree after separate review and ignored-data inspection.
 
 History operations additionally require historyBackend={context,engineId,bridgeId,
 buildxVersion,buildkitVersion,driver,nodeName}; audited client v0.38.1 and server
@@ -351,7 +355,7 @@ class Cleaner:
         require(isinstance(p, dict), 'Plan must be object')
         required = {'schemaVersion','taskId','project','repositoryRoot','gitCommonDir','originUrl','expectedMainSha','createdAt','expiresAt','allowedWorktreeRoots','protectedWorktrees','keep','operations'}
         require(required <= p.keys(), 'Missing plan fields')
-        require(type(p['schemaVersion']) is int and p['schemaVersion'] == 1 and p['project'] == PROJECT and p['taskId'] == 'PRE-G3-CLEANUP-FIX-002', 'Plan identity mismatch')
+        require(type(p['schemaVersion']) is int and p['schemaVersion'] == 1 and p['project'] == PROJECT and p['taskId'] in ('PRE-G3-CLEANUP-FIX-002', 'G3-M1-001'), 'Plan identity mismatch')
         require(absolute(p['repositoryRoot']).resolve() == self.root, 'Repository root mismatch')
         require(self.git('rev-parse', '--show-toplevel').stdout.strip() == str(self.root), 'Root must be Git toplevel')
         common = Path(self.git('rev-parse', '--path-format=absolute', '--git-common-dir').stdout.strip()).resolve()
@@ -376,6 +380,11 @@ class Cleaner:
             require(key not in ids, 'Duplicate operation')
             ids.add(key)
             require(op['target'] not in self.keep, 'Keep target refused')
+            if p['taskId'] == 'G3-M1-001':
+                require(op['type'] == 'docker-volume' and op['target'].startswith('g3-m1-')
+                        and isinstance(op.get('ownershipEvidence'), dict)
+                        and op['ownershipEvidence'].get('taskId') == 'G3-M1-001',
+                        'M1 cleanup only accepts own named volumes')
             self.ownership(op)
             if op['type'] == 'cache':
                 for earlier in self.ops[:i]:

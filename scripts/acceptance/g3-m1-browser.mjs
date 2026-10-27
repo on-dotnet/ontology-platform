@@ -84,9 +84,9 @@ export async function runM1Checks({ root, origin, operator, viewer, single, chec
     async function importAndWait(file, bytes) {
       const label = "载入" + file;
       await page.getByLabel(label, { exact: true }).setInputFiles({ name: file, mimeType: "text/turtle", buffer: bytes });
-      // SourceEditor在异步解码/状态更新后清空input，等待它完成再检查dirty与导出。
-      await page.waitForFunction(name => [...document.querySelectorAll("input[type=file]")]
-        .find(input => input.getAttribute("aria-label") === name)?.files?.length === 0, label);
+      // textarea按HTML规范展示LF；真正的字节证明继续使用实际下载文件。
+      await page.waitForFunction(expected => document.querySelector("textarea.g2-code")?.value === expected,
+        bytes.toString("utf8").replace(/\r\n?/g, "\n"));
     }
     for (const [key, file] of fields) {
       await page.getByRole("combobox", { name: "选择源文档" }).selectOption(key);
@@ -104,6 +104,52 @@ export async function runM1Checks({ root, origin, operator, viewer, single, chec
       await importAndWait(file, bytes);
       observed("m1_ui_reimport_clean_" + key, await page.getByRole("button", { name: "保存新修订", exact: true }).isDisabled());
     }
+    step("ui_delayed_import_race");
+    await page.evaluate(() => {
+      const original = File.prototype.arrayBuffer;
+      const held = new Map();
+      window.__g3ImportRace = {
+        pending: () => [...held.keys()], release: name => held.get(name)?.(),
+        restore: () => { File.prototype.arrayBuffer = original; delete window.__g3ImportRace; },
+      };
+      File.prototype.arrayBuffer = function () {
+        const bytes = original.call(this);
+        if (!this.name.startsWith("g3-race-")) return bytes;
+        return bytes.then(value => new Promise(resolve => {
+          held.set(this.name, () => { held.delete(this.name); resolve(value); });
+        }));
+      };
+    });
+    try {
+      await page.getByRole("combobox", { name: "选择源文档" }).selectOption("ontologyTurtle");
+      const late = Buffer.from(sources.ontologyTurtle + "\r\n# Synthetic delayed ontology import\r\n", "utf8");
+      await page.getByLabel("载入ontology.ttl", { exact: true }).setInputFiles({ name: "g3-race-a.ttl", mimeType: "text/turtle", buffer: late });
+      await page.waitForFunction(() => window.__g3ImportRace.pending().includes("g3-race-a.ttl"));
+      await page.getByRole("textbox", { name: "资产名称", exact: true }).fill(name + " newer name");
+      await page.getByRole("combobox", { name: "选择源文档" }).selectOption("dataTurtle");
+      const editor = page.locator("textarea.g2-code");
+      await editor.fill((await editor.inputValue()) + "\n# Synthetic newer data edit\n");
+      const newerData = await editor.inputValue();
+      await page.evaluate(() => window.__g3ImportRace.release("g3-race-a.ttl"));
+      await page.getByRole("combobox", { name: "选择源文档" }).selectOption("ontologyTurtle");
+      await page.waitForFunction(expected => document.querySelector("textarea.g2-code")?.value === expected,
+        late.toString("utf8").replace(/\r\n?/g, "\n"));
+      observed("m1_ui_delayed_import_preserves_new_name", await page.getByRole("textbox", { name: "资产名称", exact: true }).inputValue() === name + " newer name");
+      const lateDownload = page.waitForEvent("download");
+      await page.getByRole("button", { name: "导出原始源", exact: true }).click();
+      observed("m1_ui_delayed_import_exact_target_bytes", (await readFile(await (await lateDownload).path())).equals(late));
+      await page.getByRole("combobox", { name: "选择源文档" }).selectOption("dataTurtle");
+      observed("m1_ui_delayed_import_preserves_other_source", await editor.inputValue() === newerData);
+    } finally {
+      await page.evaluate(() => window.__g3ImportRace?.restore());
+    }
+    await page.getByRole("textbox", { name: "资产名称", exact: true }).fill(name);
+    for (const [key, file] of fields) {
+      await page.getByRole("combobox", { name: "选择源文档" }).selectOption(key);
+      await importAndWait(file, Buffer.from(sources[key], "utf8"));
+    }
+    observed("m1_ui_race_restore_original_clean", await page.getByRole("button", { name: "保存新修订", exact: true }).isDisabled());
+    step("ui_real_assessment");
     const response = page.waitForResponse(value => value.url().endsWith("/assessments") && value.request().method() === "POST");
     await page.getByRole("button", { name: "评估发布资格", exact: true }).click();
     observed("m1_ui_real_assessment", (await response).status() === 200);

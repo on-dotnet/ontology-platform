@@ -23,7 +23,7 @@ def run_attempt():
     args = parser.parse_args()
     if not args.runtime_file and not args.start_runtime:
         parser.error('Choose an owned runtime or explicitly start a new M1 stack')
-    os.environ['PLATFORM_EVIDENCE_DIR'] = 'docs/evidence/G3-M1-001/runtime'
+    os.environ.setdefault('PLATFORM_EVIDENCE_DIR', 'docs/evidence/G3-M1-001/runtime')
     if args.runtime_file:
         runtime_file = Path(args.runtime_file).resolve()
     else:
@@ -36,8 +36,11 @@ def run_attempt():
         parser.error('Protected G2 or unrelated runtime refused')
     # 每次调用独占新目录，后续步骤不可能消费前一轮残留的成功文件。
     run_id = uuid.uuid4().hex
-    os.environ['PLATFORM_EVIDENCE_DIR'] = 'docs/evidence/G3-M1-001/runtime/' + runtime['volumePrefix'] + '/' + run_id
     from evidence_paths import evidence_directory
+    base_evidence = evidence_directory(ROOT, 'docs/evidence/G3-M1-001/runtime')
+    if not base_evidence.is_relative_to((ROOT / 'docs/evidence/G3-M1-001/runtime').resolve()):
+        parser.error('Only this task M1 runtime evidence root is accepted')
+    os.environ['PLATFORM_EVIDENCE_DIR'] = str((base_evidence / runtime['volumePrefix'] / run_id).relative_to(ROOT.resolve()))
     evidence = evidence_directory(ROOT, 'docs/evidence/G3-M1-001/runtime')
     evidence.mkdir(parents=True, exist_ok=False)
     source_head = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()

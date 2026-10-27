@@ -1,0 +1,56 @@
+test_m1_only_own_volume_dryrun_and_exact_apply (__main__.CleanupTests.test_m1_only_own_volume_dryrun_and_exact_apply) ... FAIL
+test_m1_cannot_expand_to_m2_git_history_or_legacy_volumes (__main__.CleanupTests.test_m1_cannot_expand_to_m2_git_history_or_legacy_volumes) ...
+  test_m1_cannot_expand_to_m2_git_history_or_legacy_volumes (__main__.CleanupTests.test_m1_cannot_expand_to_m2_git_history_or_legacy_volumes) (mutation='M2') ... FAIL
+  test_m1_cannot_expand_to_m2_git_history_or_legacy_volumes (__main__.CleanupTests.test_m1_cannot_expand_to_m2_git_history_or_legacy_volumes) (mutation='git') ... FAIL
+  test_m1_cannot_expand_to_m2_git_history_or_legacy_volumes (__main__.CleanupTests.test_m1_cannot_expand_to_m2_git_history_or_legacy_volumes) (mutation='legacy') ... FAIL
+  test_m1_cannot_expand_to_m2_git_history_or_legacy_volumes (__main__.CleanupTests.test_m1_cannot_expand_to_m2_git_history_or_legacy_volumes) (mutation='wrong-owner') ... FAIL
+
+======================================================================
+FAIL: test_m1_only_own_volume_dryrun_and_exact_apply (__main__.CleanupTests.test_m1_only_own_volume_dryrun_and_exact_apply)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform/scripts/tests/CleanupResources.Tests.py", line 316, in test_m1_only_own_volume_dryrun_and_exact_apply
+    self.assertEqual(result.returncode, 0, result.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 :
+
+======================================================================
+FAIL: test_m1_cannot_expand_to_m2_git_history_or_legacy_volumes (__main__.CleanupTests.test_m1_cannot_expand_to_m2_git_history_or_legacy_volumes) (mutation='M2')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform/scripts/tests/CleanupResources.Tests.py", line 337, in test_m1_cannot_expand_to_m2_git_history_or_legacy_volumes
+    self.assertIn('Plan identity mismatch' if mutation == 'M2' else 'M1 cleanup only accepts own named volumes', result.stdout)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'Plan identity mismatch' not found in ''
+
+======================================================================
+FAIL: test_m1_cannot_expand_to_m2_git_history_or_legacy_volumes (__main__.CleanupTests.test_m1_cannot_expand_to_m2_git_history_or_legacy_volumes) (mutation='git')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform/scripts/tests/CleanupResources.Tests.py", line 337, in test_m1_cannot_expand_to_m2_git_history_or_legacy_volumes
+    self.assertIn('Plan identity mismatch' if mutation == 'M2' else 'M1 cleanup only accepts own named volumes', result.stdout)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'M1 cleanup only accepts own named volumes' not found in ''
+
+======================================================================
+FAIL: test_m1_cannot_expand_to_m2_git_history_or_legacy_volumes (__main__.CleanupTests.test_m1_cannot_expand_to_m2_git_history_or_legacy_volumes) (mutation='legacy')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform/scripts/tests/CleanupResources.Tests.py", line 337, in test_m1_cannot_expand_to_m2_git_history_or_legacy_volumes
+    self.assertIn('Plan identity mismatch' if mutation == 'M2' else 'M1 cleanup only accepts own named volumes', result.stdout)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'M1 cleanup only accepts own named volumes' not found in ''
+
+======================================================================
+FAIL: test_m1_cannot_expand_to_m2_git_history_or_legacy_volumes (__main__.CleanupTests.test_m1_cannot_expand_to_m2_git_history_or_legacy_volumes) (mutation='wrong-owner')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform/scripts/tests/CleanupResources.Tests.py", line 337, in test_m1_cannot_expand_to_m2_git_history_or_legacy_volumes
+    self.assertIn('Plan identity mismatch' if mutation == 'M2' else 'M1 cleanup only accepts own named volumes', result.stdout)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'M1 cleanup only accepts own named volumes' not found in ''
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.469s
+
+FAILED (failures=5)
