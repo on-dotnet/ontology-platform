@@ -5,7 +5,7 @@ import type { PlatformIdentity } from "../../lib/api/generated";
 import type { OntologyDraft, SemanticSupportProfile, SourceBundle, SaveDraftRequest } from "../../lib/api/g2-generated";
 import { command, createG2Client } from "../../lib/api/g2-client";
 import { SemanticError } from "../../components/ui/semantic-feedback";
-import { draftState, isDirty, updateSource, type DraftState } from "./draft-state";
+import { draftState, isDirty, isNewDraftDirty, updateSource, type DraftState } from "./draft-state";
 import { StructuralForm } from "./structural-form";
 import { SourceEditor } from "./source-editor";
 import { SupportProfile } from "./support-profile";
@@ -44,7 +44,7 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
   const [reason, setReason] = useState("");
   const [retry, setRetry] = useState<SaveDraftRequest | null>(null);
   const lifetime = useRef<AbortController | null>(null);
-  const dirty = state ? isDirty(state) : Boolean(name || Object.values(sources).some(Boolean));
+  const dirty = state ? isDirty(state) : isNewDraftDirty(name, sources);
   const canEdit = identity.roles.includes("platform.operator");
   const selectedScope = identity.scopes[Number(scopeIndex)];
   const chooseNode = useCallback((iri: string) => setSelected(iri), []);

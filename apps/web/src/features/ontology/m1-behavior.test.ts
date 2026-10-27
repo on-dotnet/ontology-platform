@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { isNewDraftDirty } from "./draft-state";
 import { preserveEditorSource } from "./source-bytes";
 import { assessmentEligibility, comparisonLabel } from "./semantic-status";
 import type { OntologyDraft, SemanticAssessment, SemanticSupportProfile } from "../../lib/api/g2-generated";
@@ -16,6 +17,11 @@ const assessment: SemanticAssessment = {
 };
 
 describe("M1 字节与不确定性边界", () => {
+  it("新建缓冲把absent转为空术语源也标dirty，避免导航静默丢弃", () => {
+    const sources = { ontologyTurtle: "", shapesTurtle: "", vocabularyTurtle: null, dataTurtle: "" };
+    expect(isNewDraftDirty("", sources)).toBe(false);
+    expect(isNewDraftDirty("", { ...sources, vocabularyTurtle: "" })).toBe(true);
+  });
   it("textarea仅规范化换行时保持BOM、混合换行、非BMP原始字节", () => {
     const original = "\uFEFF# 🏭\r\n<urn:a> <urn:b> <urn:c> .\r# end\n";
     expect(preserveEditorSource(original, original.replace(/\r\n?/g, "\n"))).toBe(original);
