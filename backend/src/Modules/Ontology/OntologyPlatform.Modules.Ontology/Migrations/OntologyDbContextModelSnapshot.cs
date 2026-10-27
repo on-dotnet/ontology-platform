@@ -23,6 +23,36 @@ namespace OntologyPlatform.Modules.Ontology.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("OntologyPlatform.Modules.Ontology.AssessmentRecord", b =>
+                {
+                    b.Property<string>("AssessmentId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("AssessmentJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("DraftId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long>("Revision")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ValidationReportId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("AssessmentId");
+
+                    b.HasIndex("ValidationReportId")
+                        .IsUnique();
+
+                    b.HasIndex("DraftId", "Revision");
+
+                    b.ToTable("Assessments", "ontology");
+                });
+
             modelBuilder.Entity("OntologyPlatform.Modules.Ontology.CommandRecord", b =>
                 {
                     b.Property<string>("Key")
@@ -140,6 +170,21 @@ namespace OntologyPlatform.Modules.Ontology.Migrations
                     b.HasIndex("DraftId", "Revision");
 
                     b.ToTable("Validations", "ontology");
+                });
+
+            modelBuilder.Entity("OntologyPlatform.Modules.Ontology.AssessmentRecord", b =>
+                {
+                    b.HasOne("OntologyPlatform.Modules.Ontology.ValidationRecord", null)
+                        .WithOne()
+                        .HasForeignKey("OntologyPlatform.Modules.Ontology.AssessmentRecord", "ValidationReportId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("OntologyPlatform.Modules.Ontology.DraftRevisionRecord", null)
+                        .WithMany()
+                        .HasForeignKey("DraftId", "Revision")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("OntologyPlatform.Modules.Ontology.DraftRevisionRecord", b =>
