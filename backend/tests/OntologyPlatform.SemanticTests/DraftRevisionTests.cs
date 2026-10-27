@@ -404,35 +404,81 @@ public sealed class DraftRevisionTests
         Assert.AreEqual(1, await database.Drafts.CountAsync(row => row.AssetId == assetId));
     }
 
-    /// <summary>真实Down必须拒绝并发访问及非空历史，不能删除已经提交的源事实。</summary>
+    /// <summary>G3增量只前进，回退拒绝后评估、报告、源历史和迁移记录均保持。</summary>
     [TestMethod]
     public async Task MigrationDownRefusesConcurrentAndNonemptyHistory()
     {
-        // 使用本轮临时PG与实际Master迁移，绝不访问历史数据库。
+        // 真实迁移保护评估及与其一对一的原始验证报告。
         await using var database = Database();
-        // 真实源历史是回退保护对象。
+        // 当前可信完整范围操作者。
         var actor = Actor();
-        // 保证此用例独立执行时数据库也不是空状态。
-        var draft = await Service(database).CreateAsync(actor, Request(), CancellationToken.None);
-        // 第二条物理连接模拟仍有业务持有草稿行锁。
+        // 真实源历史是回退保护对象。
+        var service = Service(database);
+        // 创建并真实评估，证明拒绝回退不能仅保持空表。
+        var draft = await service.CreateAsync(actor, Request(), default);
+        // 报告与assessment同事务持久。
+        var assessment = await service.AssessAsync(actor, draft.DraftId, new ValidateDraftRequest { Revision = 1, Hashes = draft.Hashes, Command = Command(1) }, default);
+        // 第二物理连接模拟当前仍有真实业务持锁。
         await using var busy = Database();
-        // 活跃事务不能被迁移无限等待或绕过。
+        // Forward-only迁移甚至在开始数据库删表前就拒绝。
         await using (var transaction = await busy.Database.BeginTransactionAsync())
         {
             await busy.Drafts.FromSqlInterpolated($"SELECT * FROM ontology.\"Drafts\" WHERE \"DraftId\"={draft.DraftId} FOR UPDATE").SingleAsync();
-            // NOWAIT必须给出锁不可用，而不是继续删除表。
-            var concurrent = await Assert.ThrowsAsync<InvalidOperationException>(() => database.GetService<IMigrator>().MigrateAsync("0"));
-            // Npgsql执行策略把瞬时55P03包装一层，必须核查真实内层SQLSTATE。
-            var postgres = concurrent.InnerException as PostgresException;
-            Assert.IsNotNull(postgres);
-            Assert.AreEqual("55P03", postgres.SqlState);
+            await Assert.ThrowsAsync<NotSupportedException>(() => database.GetService<IMigrator>().MigrateAsync("0"));
             await transaction.RollbackAsync();
         }
-        // 没有并发锁时也仍不能抹除已存在的任何源历史。
-        var nonempty = await Assert.ThrowsAsync<PostgresException>(() => database.GetService<IMigrator>().MigrateAsync("0"));
-        Assert.AreEqual("P0001", nonempty.SqlState);
-        Assert.AreEqual(draft.Sources, (await Service(database).ReadAsync(actor, draft.DraftId, CancellationToken.None)).Sources);
-        Assert.IsTrue((await database.Database.GetAppliedMigrationsAsync()).Contains("20261026003221_InitialOntology"));
+        // 无并发锁也绝不执行DropTable，不以删除数据实现应用回退。
+        await Assert.ThrowsAsync<NotSupportedException>(() => database.GetService<IMigrator>().MigrateAsync("0"));
+        Assert.AreEqual(assessment.AssessmentId, (await database.Assessments.AsNoTracking().SingleAsync(row => row.AssessmentId == assessment.AssessmentId)).AssessmentId);
+        Assert.AreEqual(assessment.ValidationReportId, (await database.Validations.AsNoTracking().SingleAsync(row => row.ReportId == assessment.ValidationReportId)).ReportId);
+        Assert.AreEqual(draft.Sources, (await service.ReadAsync(actor, draft.DraftId, default)).Sources);
+        Assert.IsTrue((await database.Database.GetAppliedMigrationsAsync()).Contains("20261027032135_G3Assessments"));
+    }
+
+    /// <summary>仅应用Initial的独立空库仍验证原55P03与非空P0001，不绕过G3禁止降级。</summary>
+    [TestMethod]
+    public async Task InitialOnlyDatabaseKeepsOriginalLockAndNonemptyDownGuards()
+    {
+        // 仅在当前测试进程新建的隔离PG中创建随机子库。
+        await using var admin = new NpgsqlConnection(Connection());
+        await admin.OpenAsync();
+        // 数据库名只能由固定前缀加服务器Guid组成。
+        var name = "g3_initial_guard_" + Guid.NewGuid().ToString("N");
+        await using (var create = new NpgsqlCommand("CREATE DATABASE \"" + name + "\"", admin)) await create.ExecuteNonQueryAsync();
+        try
+        {
+            // 不启用连接池，finally可准确回收当前方法拥有的子库。
+            var connection = new NpgsqlConnectionStringBuilder(Connection()) { Database = name, Pooling = false };
+            // 只应用历史Initial，未应用G3不存在逆向删除评估表的路径。
+            var options = new DbContextOptionsBuilder<OntologyDbContext>().UseNpgsql(connection.ConnectionString, database => database.MigrationsHistoryTable("__EFMigrationsHistory", "ontology")).Options;
+            // 独立上下文执行真实旧迁移SQL。
+            await using var initial = new OntologyDbContext(options);
+            await initial.GetService<IMigrator>().MigrateAsync("20261026003221_InitialOntology");
+            initial.Drafts.Add(new DraftRecord { DraftId = "guarded", AssetId = "guarded-asset", OrganizationId = "guarded-org", SiteIds = ["guarded-site"], Name = "Initial guard" });
+            await initial.SaveChangesAsync();
+            // 第二物理连接持真实行锁，旧Down必须NOWAIT拒绝。
+            await using var busy = new OntologyDbContext(options);
+            await using (var transaction = await busy.Database.BeginTransactionAsync())
+            {
+                await busy.Drafts.FromSqlRaw("SELECT * FROM ontology.\"Drafts\" WHERE \"DraftId\"='guarded' FOR UPDATE").SingleAsync();
+                // 保留旧负例精确SQLSTATE，不用泛化异常冒充通过。
+                var error = await Assert.ThrowsAsync<InvalidOperationException>(() => initial.GetService<IMigrator>().MigrateAsync("0"));
+                Assert.IsInstanceOfType<PostgresException>(error.InnerException);
+                Assert.AreEqual("55P03", ((PostgresException)error.InnerException!).SqlState);
+                await transaction.RollbackAsync();
+            }
+            // 无锁但存在事实时旧Down同样拒绝，数据与迁移记录保持。
+            var nonempty = await Assert.ThrowsAsync<PostgresException>(() => initial.GetService<IMigrator>().MigrateAsync("0"));
+            Assert.AreEqual("P0001", nonempty.SqlState);
+            Assert.AreEqual(1, await initial.Drafts.CountAsync());
+            Assert.AreEqual(1, (await initial.Database.GetAppliedMigrationsAsync()).Count());
+        }
+        finally
+        {
+            // 仅删除本方法创建的随机子库，不触碰主测试governance库或外部资源。
+            await using var drop = new NpgsqlCommand("DROP DATABASE \"" + name + "\" WITH (FORCE)", admin);
+            await drop.ExecuteNonQueryAsync();
+        }
     }
 
     /// <summary>相同幂等键真实并发只提交一次；不同载荷不允许共享回执。</summary>
@@ -465,6 +511,128 @@ public sealed class DraftRevisionTests
         // Governance独立读回证明没有重复success审计。
         await using var governance = Governance();
         Assert.AreEqual(1, await governance.AuditRecords.CountAsync(row => row.Actor == actor.SubjectId));
+    }
+
+
+    /// <summary>真实assessment与报告/幂等/审计原子关联，重放不刷新时间。</summary>
+    [TestMethod]
+    public async Task G3AssessmentPersistsReplaysAndReauthorizesWholeScope()
+    {
+        // 使用Master生成的真实迁移和当前隔离PG。
+        await using var database = Database();
+        // 完整双厂可信主体。
+        var actor = Actor();
+        // 真实生产服务而非评估替身。
+        var service = Service(database);
+        // 初始源通过RIOT并保留原始字节。
+        var draft = await service.CreateAsync(actor, Request(), default);
+        // 相同命令在重放时必须返回相同AssessmentId和时间。
+        var request = new ValidateDraftRequest { Revision = draft.Revision, Hashes = draft.Hashes, Command = Command(draft.Revision) };
+        // 真正Jena报告与持久评估。
+        var assessed = await service.AssessAsync(actor, draft.DraftId, request, default);
+        Assert.AreEqual(assessed.AssessedAtUtc.AddHours(24), assessed.ExpiresAtUtc);
+        Assert.AreEqual(SemanticProfile.AssessmentHash(assessed), assessed.AssessmentHash);
+        Assert.IsTrue(assessed.PublishEligible);
+        Assert.AreEqual(AssessmentStageStatus.NotRun, assessed.Stages.Single(stage => stage.Name == "OWL_REASONING").Status);
+        Assert.AreEqual(1, await database.Assessments.CountAsync(row => row.DraftId == draft.DraftId));
+        Assert.AreEqual(1, await database.Validations.CountAsync(row => row.DraftId == draft.DraftId));
+        Assert.AreEqual(JsonSerializer.Serialize(assessed), JsonSerializer.Serialize(await Service(database, UnavailableRuntime()).AssessAsync(actor, draft.DraftId, request, default)));
+        Assert.AreEqual(JsonSerializer.Serialize(assessed), JsonSerializer.Serialize(await service.ReadAssessmentAsync(actor with { Roles = ["platform.auditor"] }, assessed.AssessmentId, default)));
+        Assert.AreEqual(403, (await Assert.ThrowsAsync<SemanticOperationException>(() => service.ReadAssessmentAsync(actor with { SiteIds = ["site-a"] }, assessed.AssessmentId, default))).Status);
+        Assert.AreEqual(404, (await Assert.ThrowsAsync<SemanticOperationException>(() => service.ReadAssessmentAsync(actor, Guid.NewGuid().ToString("N"), default))).Status);
+        Assert.AreEqual(403, (await Assert.ThrowsAsync<SemanticOperationException>(() => service.AssessAsync(actor with { Roles = ["platform.auditor"] }, draft.DraftId, request with { Command = Command(1) }, default))).Status);
+        // 原Validate响应不改形状，但同样生成一对一关联评估。
+        var report = await service.ValidateAsync(actor, draft.DraftId, request with { Command = Command(1) }, default);
+        Assert.IsNotNull(await database.Assessments.SingleOrDefaultAsync(row => row.ValidationReportId == report.ReportId));
+        Assert.AreEqual(2, await database.Assessments.CountAsync(row => row.DraftId == draft.DraftId));
+        // 故障在真实审计writer写入之后，报告与评估均须回滚。
+        var failing = new OntologyService(database, SemanticFixture.Runtime(), new FailAfterAudit(Writer()), TimeProvider.System);
+        await Assert.ThrowsAsync<SemanticOperationException>(() => failing.AssessAsync(actor, draft.DraftId, request with { Command = Command(1) }, default));
+        Assert.AreEqual(2, await database.Assessments.CountAsync(row => row.DraftId == draft.DraftId));
+        Assert.AreEqual(2, await database.Validations.CountAsync(row => row.DraftId == draft.DraftId));
+        await using var governance = Governance();
+        Assert.AreEqual(3, await governance.AuditRecords.CountAsync(row => row.Actor == actor.SubjectId));
+    }
+
+    /// <summary>审核只读锁允许auditor，过期/profile/内容篡改/旧报告全部失败关闭。</summary>
+    [TestMethod]
+    [DataRow("expired", "assessment_expired")]
+    [DataRow("profile", "assessment_binding_conflict")]
+    [DataRow("tampered", "assessment_binding_conflict")]
+    [DataRow("legacy", "assessment_required")]
+    [DataRow("ineligible", "assessment_not_eligible")]
+    public async Task G3AssessmentLockRejectsInvalidPersistentFacts(string scenario, string expectedCode)
+    {
+        // 每用例独立真实草稿与评估。
+        await using var database = Database();
+        // 只偏移本次服务时钟，不改系统时间。
+        var clock = new AssessmentClock();
+        // 真实引擎与事务writer。
+        var service = new OntologyService(database, SemanticFixture.Runtime(), Writer(), clock);
+        // 当前完整操作者。
+        var actor = Actor();
+        // 不支持公理也能源码保留，但不能获得发布资格。
+        var request = scenario == "ineligible" ? Request() with { Sources = new SourceBundle { OntologyTurtle = "<urn:a> <http://www.w3.org/2002/07/owl#sameAs> <urn:b> ." } } : Request();
+        // 真实创建准确修订。
+        var draft = await service.CreateAsync(actor, request, default);
+        // 全部失败基于真实报告，不能客户端伪造正文。
+        var assessment = await service.AssessAsync(actor, draft.DraftId, new ValidateDraftRequest { Revision = draft.Revision, Hashes = draft.Hashes, Command = Command(1) }, default);
+        if (scenario == "expired") clock.Offset = TimeSpan.FromHours(25);
+        if (scenario is "profile" or "tampered")
+        {
+            // 精确改变当前测试评估JSON，profile变体重新散列证明仍有独立策略绑定。
+            var changed = scenario == "profile" ? assessment with { ProfileHash = new string('0', 64) } : assessment with { PublishEligible = !assessment.PublishEligible };
+            if (scenario == "profile") changed = changed with { AssessmentHash = SemanticProfile.AssessmentHash(changed) };
+            await database.Assessments.Where(row => row.AssessmentId == assessment.AssessmentId).ExecuteUpdateAsync(update => update.SetProperty(row => row.AssessmentJson, JsonSerializer.Serialize(changed)));
+        }
+        if (scenario == "legacy") await database.Assessments.Where(row => row.AssessmentId == assessment.AssessmentId).ExecuteDeleteAsync();
+        // 发布方拥有同物理事务；auditor在此边界仅有只读核验权限。
+        await using var connection = new NpgsqlConnection(Connection());
+        await connection.OpenAsync();
+        // 失败锁不能提交业务事实。
+        await using var transaction = await connection.BeginTransactionAsync();
+        // 本检查是实际数据库锁与评估读回，不是内存布尔替身。
+        var error = await Assert.ThrowsAsync<SemanticOperationException>(() => service.LockForPublicationAsync(actor with { Roles = ["platform.auditor"] }, draft.DraftId, draft.Revision, draft.Hashes, assessment.ValidationReportId, connection, transaction, default));
+        Assert.AreEqual(expectedCode, error.Code);
+        Assert.AreEqual(scenario == "ineligible" ? 422 : 409, error.Status);
+        await transaction.RollbackAsync();
+    }
+
+    /// <summary>四源BOM/CRLF/注释原始字节跨保存、旧修订与同构比较均保持。</summary>
+    [TestMethod]
+    public async Task G3FourSourceBytesAndFixedRevisionComparisonRemainExact()
+    {
+        // 真实PG存储不重建任何四源文本。
+        await using var database = Database();
+        // 可信完整scope。
+        var actor = Actor();
+        // 生产实现复用当前Jena。
+        var service = Service(database);
+        // 每个源都含BOM、CRLF和中文注释，prefix独立。
+        var sources = new SourceBundle { OntologyTurtle = "\uFEFF# 本体\r\n<urn:C> a <http://www.w3.org/2002/07/owl#Class> .\r\n", ShapesTurtle = "\uFEFF# 形状\r\n@prefix sh: <http://www.w3.org/ns/shacl#> .\r\n", VocabularyTurtle = "\uFEFF# 词汇\r\n", DataTurtle = "\uFEFF# 数据\r\n<urn:i> a <urn:C> .\r\n" };
+        // 初次导入直接持久权威字符串，不读写文本文件造成BOM丢失。
+        var created = await service.CreateAsync(actor, Request() with { Sources = sources }, default);
+        // no-op保存仍保留完整字节和hash，不从投影导出。
+        var saved = await service.SaveAsync(actor, created.DraftId, new SaveDraftRequest { Name = created.Name, Sources = sources, Command = Command(1) }, default);
+        Assert.AreEqual(sources, saved.Sources);
+        Assert.AreEqual(created.Hashes, saved.Hashes);
+        Assert.AreEqual(sources, JsonSerializer.Deserialize<SourceBundle>((await database.Revisions.SingleAsync(row => row.DraftId == created.DraftId && row.Revision == 1)).SourcesJson));
+        // 指定两个固定revision后解析比较，不能偷偷比较当前头两次。
+        var comparison = await service.CompareAsync(actor, new CompareVersionsRequest { From = new VersionRef { Kind = VersionRefKind.Draft, Id = created.DraftId, Revision = 1 }, To = new VersionRef { Kind = VersionRefKind.Draft, Id = created.DraftId, Revision = 2 } }, default);
+        Assert.IsTrue(comparison.All(item => !item.SourceChanged && item.Graph.Status == GraphComparisonStatus.Equivalent));
+        // 跨资产即使scope相同也不能用比较泄露或混淆身份。
+        var other = await service.CreateAsync(actor, Request(), default);
+        Assert.AreEqual(403, (await Assert.ThrowsAsync<SemanticOperationException>(() => service.CompareAsync(actor, new CompareVersionsRequest { From = new VersionRef { Kind = VersionRefKind.Draft, Id = created.DraftId, Revision = 1 }, To = new VersionRef { Kind = VersionRefKind.Draft, Id = other.DraftId, Revision = 1 } }, default))).Status);
+    }
+
+    /// <summary>评估有效期测试专用局部时钟。</summary>
+    private sealed class AssessmentClock : TimeProvider
+    {
+        /// <summary>仅当前实例的可控偏移。</summary>
+        internal TimeSpan Offset { get; set; }
+
+        /// <summary>真实UTC加当前实例偏移。</summary>
+        public override DateTimeOffset GetUtcNow() => DateTimeOffset.UtcNow + Offset;
     }
 
     /// <summary>保留并发创建的真实结果或固定业务状态，不吞掉意外异常。</summary>

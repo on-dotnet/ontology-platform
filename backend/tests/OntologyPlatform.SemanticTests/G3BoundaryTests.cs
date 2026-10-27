@@ -133,4 +133,90 @@ public sealed class G3BoundaryTests
         Assert.AreEqual(422, (await Assert.ThrowsAsync<SemanticOperationException>(() => runtime.CompareSourcesAsync(new SourceBundle { OntologyTurtle = "invalid turtle" }, new SourceBundle { OntologyTurtle = "invalid turtle" }, default))).Status);
     }
 
+    /// <summary>未声明的自定义关系不能冒称普通注释；显式AnnotationProperty仍允许。</summary>
+    [TestMethod]
+    public async Task UndeclaredCustomFactsRequireAnExplicitPropertyOrAnnotation()
+    {
+        // 唯一真实RIOT/SHACL运行时。
+        var runtime = SemanticFixture.Runtime();
+        // 任意literal并不能证明该谓词是普通annotation。
+        var unknown = new SourceBundle { OntologyTurtle = "<urn:s> <urn:unknown> \"value\" ." };
+        Assert.IsFalse((await runtime.ValidateAsync(unknown, default)).Conforms);
+        // 声明的普通注释只表达原始事实，不提供OWL推理。
+        var declared = unknown with { OntologyTurtle = "<urn:unknown> a <http://www.w3.org/2002/07/owl#AnnotationProperty> . " + unknown.OntologyTurtle };
+        Assert.IsTrue((await runtime.ValidateAsync(declared, default)).Conforms);
+    }
+
+    /// <summary>解析已开始后取消仍撤回四源结论，128节点边界允许精确比较。</summary>
+    [TestMethod]
+    public async Task CancellationDuringRiotParsingAndExact128BlankBoundary()
+    {
+        // 真正创建临时图后，在回读RIOT结果阶段取消。
+        using var cancellation = new CancellationTokenSource();
+        // 时序钩子不替换任何实际网络响应。
+        var runtime = SemanticFixture.RuntimeWithGate(async (request, token) =>
+        {
+            if (request.Method == HttpMethod.Get)
+            {
+                cancellation.Cancel();
+                await Task.Delay(Timeout.InfiniteTimeSpan, token);
+            }
+        });
+        // 非空源确保实际PUT发生，取消不是预先短路。
+        var source = new SourceBundle { OntologyTurtle = "<urn:a> <urn:p> 1 ." };
+        // 运行时捕获自身比较取消，保持应用读取完成后的明确INDETERMINATE合同。
+        var cancelled = await ((IG3SemanticRuntime)(object)runtime).CompareSourcesAsync(source, source, cancellation.Token);
+        Assert.IsTrue(cancelled.All(item => item.Graph.Status == GraphComparisonStatus.Indeterminate && item.Graph.Code == "comparison_cancelled"));
+        // 128个空白节点各自允许，不改变G2生产预算。
+        var boundary = source with { OntologyTurtle = string.Join('\n', Enumerable.Range(0, 128).Select(index => $"_:left{index} <urn:p> 1 .")) };
+        // 独立标签完全重命名仍有实际双射，不按label相等判等。
+        var renamed = boundary with { OntologyTurtle = boundary.OntologyTurtle.Replace("_:left", "_:right", StringComparison.Ordinal) };
+        Assert.AreEqual(GraphComparisonStatus.Equivalent, (await ((IG3SemanticRuntime)(object)SemanticFixture.Runtime()).CompareSourcesAsync(boundary, renamed, default))[0].Graph.Status);
+    }
+
+    /// <summary>各源解析的小延迟累计超过5秒时，四源整体失败关闭而非每源刷新时限。</summary>
+    [TestMethod]
+    public async Task ParsingAcrossAllFourSourcesSharesOneFiveSecondBudget()
+    {
+        // 每个真实PUT延迟650毫秒，八次源解析共同超过一次五秒预算。
+        var runtime = SemanticFixture.RuntimeWithGate(async (request, token) =>
+        {
+            if (request.Method == HttpMethod.Put) await Task.Delay(TimeSpan.FromMilliseconds(650), token);
+        });
+        // 四个文档各自非空且语法独立，比较不执行Shape约束。
+        var sources = new SourceBundle { OntologyTurtle = "<urn:a> <urn:p> 1 .", ShapesTurtle = "<urn:b> <urn:p> 1 .", VocabularyTurtle = "<urn:c> <urn:p> 1 .", DataTurtle = "<urn:d> <urn:p> 1 ." };
+        // 左右都实际解析，不能给每个文档独立五秒。
+        var result = await ((IG3SemanticRuntime)(object)runtime).CompareSourcesAsync(sources, sources, default);
+        Assert.IsTrue(result.All(item => item.Graph.Status == GraphComparisonStatus.Indeterminate && item.Graph.Code == "comparison_timeout"));
+    }
+
+    /// <summary>同度数的对称不等价图必须穷尽或触发共享搜索预算，不能近似判等。</summary>
+    [TestMethod]
+    public async Task SymmetricNonIsomorphicGraphsExhaustTheSharedSearchBudget()
+    {
+        // 八个三环与六个三环加一个六环具有相同节点数、边数和每点度数。
+        var left = new SourceBundle { OntologyTurtle = Cycles([3, 3, 3, 3, 3, 3, 3, 3]) };
+        // 颜色细化不能区分该结构，必须由实际双射搜索判定。
+        var right = new SourceBundle { OntologyTurtle = Cycles([3, 3, 3, 3, 3, 3, 6]) };
+        // 实际RIOT产生图后进入生产精确比较算法。
+        var results = await ((IG3SemanticRuntime)(object)SemanticFixture.Runtime()).CompareSourcesAsync(left, right, default);
+        Assert.IsTrue(results.All(item => item.Graph.Status == GraphComparisonStatus.Indeterminate && item.Graph.Code == "search_node_budget"));
+        Assert.AreEqual(100000L, results[0].Graph.VisitedNodes);
+    }
+
+    /// <summary>只生成测试Turtle环，不提供解析或同构替身。</summary>
+    private static string Cycles(int[] lengths)
+    {
+        // 每个环分配互不重叠的空白节点编号。
+        var offset = 0;
+        // 原始文本随后必须交真实RIOT解析。
+        var triples = new List<string>();
+        foreach (var length in lengths)
+        {
+            for (var index = 0; index < length; index++) triples.Add($"_:b{offset + index} <urn:p> _:b{offset + (index + 1) % length} .");
+            offset += length;
+        }
+        return string.Join('\n', triples);
+    }
+
 }

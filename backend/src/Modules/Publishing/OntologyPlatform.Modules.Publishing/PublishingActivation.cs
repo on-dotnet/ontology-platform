@@ -107,6 +107,7 @@ public sealed partial class PublishingService
                 return await database.Releases.AsNoTracking().SingleAsync(row => row.ReleaseId == command.ReleaseId, token);
             }
         }
+        if (known.Kind == ProposalKind.Publish && known.Semantics is null) throw new SemanticOperationException(409, "assessment_required");
         // PUBLISH先由Ontology锁当前精确修订；ROLLBACK完全不触碰当前draft。
         var snapshot = known.Kind == ProposalKind.Publish ? await LockDraftAsync(actor, known.DraftId!, known.DraftRevision!.Value, known.Hashes!, known.ValidationReportId!, token) : null;
         // 既有提案锁保证不同command也不会生成不同releaseId。

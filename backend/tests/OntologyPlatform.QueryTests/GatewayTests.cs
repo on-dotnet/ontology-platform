@@ -117,7 +117,7 @@ public sealed class GatewayTests
         // 原始synthetic样例可安全变换后重新真实发布。
         var source = fixture.Sources();
         // 只移除一个来源必需字段，SHACL业务约束仍有效。
-        var changed = source with { DataTurtle = source.DataTurtle.Replace("op:sourceRecordId \"assertion-0\"", "op:unknownRecord \"assertion-0\"", StringComparison.Ordinal) };
+        var changed = source with { DataTurtle = source.DataTurtle.Replace("op:sourceRecordId \"assertion-0\" ;", "", StringComparison.Ordinal) };
         // 缺来源的发布也必须真实通过发布流程。
         var release = await fixture.PublishAsync(changed);
         // Gateway必须看出类型断言来源不完整。
