@@ -10,6 +10,7 @@ export function assessmentEligibility(
 ): string {
   if (dirty) return "STALE · 本地源码未保存";
   if (!assessment || !profile) return "UNKNOWN · 尚未取得当前评估与支持档案";
+  if (profile.reasoningMode !== "ASSERTED_ONLY") return "UNKNOWN · 未识别推理模式";
   if (assessment.draftId !== draft.draftId || assessment.revision !== draft.revision) return "STALE · 修订不匹配";
   const hashKeys = ["ontologyHash", "shapesHash", "vocabularyHash", "dataHash", "bundleHash"] as const;
   if (hashKeys.some(key => assessment.hashes[key] !== draft.hashes[key])) return "STALE · 源散列不匹配";
@@ -20,6 +21,9 @@ export function assessmentEligibility(
   const required = ["PARSE", "SUPPORT", "SHACL_CORE", "GOVERNANCE"];
   if (required.some(name => assessment.stages.filter(stage => stage.name === name && stage.status === "PASS").length !== 1)) {
     return "BLOCKED · 必需阶段未全部通过";
+  }
+  if (assessment.stages.filter(stage => stage.name === "OWL_REASONING" && stage.status === "NOT_RUN").length !== 1) {
+    return "UNKNOWN · OWL阶段缺失或未按asserted-only记录";
   }
   const uncertainStage = assessment.stages.some(stage => stage.name === "OWL_REASONING"
     ? stage.status !== "NOT_RUN"

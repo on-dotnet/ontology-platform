@@ -12,7 +12,10 @@ const assessment: SemanticAssessment = {
   assessmentId: "assessment", validationReportId: "report", draftId: "draft", revision: 3, hashes,
   profileVersion: "1", profileHash: "profile", assessmentHash: "assessment-hash",
   assessedAtUtc: "2026-10-27T02:00:00Z", expiresAtUtc: "2026-10-28T02:00:00Z", executorVersion: "1",
-  stages: ["PARSE", "SUPPORT", "SHACL_CORE", "GOVERNANCE"].map(name => ({ name, status: "PASS", code: "complete" })),
+  stages: [
+    ...["PARSE", "SUPPORT", "SHACL_CORE", "GOVERNANCE"].map(name => ({ name, status: "PASS" as const, code: "complete" })),
+    { name: "OWL_REASONING", status: "NOT_RUN", code: "asserted_only" },
+  ],
   publishEligible: true, diagnostics: [], budgetStatus: "COMPLETE",
 };
 
@@ -53,11 +56,18 @@ describe("M1 字节与不确定性边界", () => {
     const stages = [...assessment.stages, { name: "PARSE", status: "FAIL" as const, code: "failed" }];
     expect(assessmentEligibility({ ...assessment, stages }, draft, profile, false, now)).not.toBe("ELIGIBLE");
   });
+  it("缺失OWL阶段不能猜测为NOT_RUN", () => {
+    const stages = assessment.stages.filter(stage => stage.name !== "OWL_REASONING");
+    expect(assessmentEligibility({ ...assessment, stages }, draft, profile, false, now)).not.toBe("ELIGIBLE");
+  });
+  it("未识别推理模式明确UNKNOWN，不能沿用asserted-only资格", () => {
+    expect(assessmentEligibility(assessment, draft, { ...profile, reasoningMode: "UNRECOGNIZED" }, false, now)).toMatch(/UNKNOWN/);
+  });
   it("dirty源不沿用已保存修订的资格", () => {
     expect(assessmentEligibility(assessment, draft, profile, true, now)).not.toBe("ELIGIBLE");
   });
   it("OWL推理NOT_RUN在asserted-only下显式保留", () => {
-    const stages = [...assessment.stages, { name: "OWL_REASONING", status: "NOT_RUN" as const, code: "asserted_only" }];
+    const stages = assessment.stages;
     expect(assessmentEligibility({ ...assessment, stages }, draft, profile, false, now)).toBe("ELIGIBLE");
   });
   it("预算耗尽不能被表述为零差异", () => {
