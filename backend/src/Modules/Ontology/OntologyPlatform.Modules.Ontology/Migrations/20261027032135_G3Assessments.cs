@@ -54,12 +54,12 @@ namespace OntologyPlatform.Modules.Ontology.Migrations
                 unique: true);
         }
 
-        /// <inheritdoc />
+        /// <summary>本迁移仅向前兼容；应用回退保留评估事实，禁止降级删除已持久数据。</summary>
+        /// <param name="migrationBuilder">不执行删除操作的迁移构建器。</param>
+        /// <exception cref="NotSupportedException">任何降级请求都必须显式拒绝。</exception>
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "Assessments",
-                schema: "ontology");
+            throw new NotSupportedException("G3评估迁移只允许向前升级，禁止降级删除评估事实。");
         }
     }
 }
