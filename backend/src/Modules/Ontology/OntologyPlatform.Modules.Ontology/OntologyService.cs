@@ -9,7 +9,7 @@ using OntologyPlatform.Modules.Ontology.Domain;
 namespace OntologyPlatform.Modules.Ontology;
 
 /// <summary>持久源历史、精确修订CAS与Governance审计同物理事务的草稿用例。</summary>
-public sealed class OntologyService : IOntologyService, IDraftPublicationReader
+public sealed partial class OntologyService : IOntologyService, IDraftPublicationReader, IG3OntologyService
 {
     /// <summary>草稿命令只记录固定动作、内容散列与结果，不输出源正文或理由。</summary>
     private static readonly ActivitySource Activities = new("OntologyPlatform.Ontology");
@@ -29,19 +29,24 @@ public sealed class OntologyService : IOntologyService, IDraftPublicationReader
     /// <summary>可选正式发布目录；S1没有发布模块时普通新资产仍能创建。</summary>
     private readonly IReleaseCatalog? releases;
 
+    /// <summary>比较正式版本时读取经过Catalog授权的不可变原始字节。</summary>
+    private readonly IReleaseArtifactStore? artifacts;
+
     /// <summary>构造模块用例，不在构造过程中访问外部资源。</summary>
     /// <param name="database">专属模块上下文。</param>
     /// <param name="runtime">受控语义运行时。</param>
     /// <param name="audit">同事务审计边界。</param>
     /// <param name="clock">真实时间提供者。</param>
     /// <param name="releases">正式发布目录，仅从BaseRelease创建新草稿时必需。</param>
-    public OntologyService(OntologyDbContext database, ISemanticRuntime runtime, ITransactionalAuditWriter audit, TimeProvider clock, IReleaseCatalog? releases = null)
+    /// <param name="artifacts">正式四源对象只读边界。</param>
+    public OntologyService(OntologyDbContext database, ISemanticRuntime runtime, ITransactionalAuditWriter audit, TimeProvider clock, IReleaseCatalog? releases = null, IReleaseArtifactStore? artifacts = null)
     {
         this.database = database;
         this.runtime = runtime;
         this.audit = audit;
         this.clock = clock;
         this.releases = releases;
+        this.artifacts = artifacts;
     }
 
     /// <summary>只返回完整scope获准的真实草稿，不按首厂扩大权限。</summary>
@@ -167,33 +172,15 @@ public sealed class OntologyService : IOntologyService, IDraftPublicationReader
         };
     }
 
-    /// <summary>报告绑定真实revision/hash，短事务再次核查后与审计一并持久。</summary>
-    public async Task<SemanticValidationReport> ValidateAsync(ActorContext actor, string draftId, ValidateDraftRequest request, CancellationToken cancellationToken)
-    {
-        DemandRole(actor, true);
-        ValidateCommand(request.Command);
-        // 读取与授权必须先于依赖执行，不能借验证泄露其他草稿。
-        var current = await ReadAsync(actor, draftId, cancellationToken);
-        // 已提交的同一校验命令返回同一报告，不重复外部验证/审计。
-        var replay = await ReplayAsync<SemanticValidationReport>(actor, current.Scope, "ontology.validate", request.Command, new { draftId, request }, cancellationToken);
-        if (replay is not null) return replay;
-        if (request.Revision != current.Revision || request.Command.ExpectedRevision != current.Revision || request.Hashes != current.Hashes) throw new SemanticOperationException(409, "draft_revision_conflict");
-        // 真实报告可含业务定位正文，但不会写普通遥测。
-        var report = (await runtime.ValidateAsync(current.Sources, cancellationToken)) with { DraftId = draftId, Revision = current.Revision, Hashes = current.Hashes, TraceId = actor.TraceId };
-        return await WriteAsync<SemanticValidationReport>(actor, current.Scope, "ontology.validate", request.Command, new { draftId, request }, async token =>
-        {
-            // 锁与CAS确保校验期间修改不能把旧报告登记为当前成功。
-            var row = await FindAsync(draftId, true, token);
-            if (row.Revision != current.Revision) throw new SemanticOperationException(409, "draft_revision_conflict");
-            database.Validations.Add(new ValidationRecord { ReportId = report.ReportId, DraftId = draftId, Revision = report.Revision, BundleHash = report.Hashes.BundleHash, Conforms = report.Conforms, ReportJson = JsonSerializer.Serialize(report) });
-            return (report, draftId);
-        }, cancellationToken);
-    }
+    /// <summary>保留G2报告响应，同时在相同事务生成关联M1评估。</summary>
+    public Task<SemanticValidationReport> ValidateAsync(ActorContext actor, string draftId, ValidateDraftRequest request, CancellationToken cancellationToken) =>
+        AssessCoreAsync(actor, draftId, request, "ontology.validate", static (report, assessment) => report, cancellationToken);
 
     /// <summary>由Ontology在发布方同物理事务中锁定，只读核验当前修订与成功报告。</summary>
     public async Task<DraftPublicationSnapshot> LockForPublicationAsync(ActorContext actor, string draftId, long revision, SourceHashes hashes, string reportId, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken)
     {
-        DemandRole(actor, true);
+        DemandRole(actor, false);
+        if (!actor.Roles.Any(role => role is "platform.operator" or "platform.auditor")) throw new SemanticOperationException(403, "role_denied");
         if (transaction.Connection != connection) throw new SemanticOperationException(409, "transaction_connection_mismatch");
         // 独立上下文使用同一已打开物理连接，不创建第二条连接或提交调用方事务。
         var options = new DbContextOptionsBuilder<OntologyDbContext>().UseNpgsql(connection).Options;
@@ -209,7 +196,14 @@ public sealed class OntologyService : IOntologyService, IDraftPublicationReader
         // 校验报告必须精确匹配当前源，不使用客户端conforms字段。
         var validation = await enlisted.Validations.AsNoTracking().SingleOrDefaultAsync(record => record.ReportId == reportId && record.DraftId == draftId && record.Revision == revision, cancellationToken);
         if (JsonSerializer.Deserialize<SourceHashes>(source.HashesJson) != hashes || validation is null || !validation.Conforms || validation.BundleHash != hashes.BundleHash) throw new SemanticOperationException(409, "validation_binding_conflict");
-        return new DraftPublicationSnapshot { Draft = Map(row, source), Validation = JsonSerializer.Deserialize<SemanticValidationReport>(validation.ReportJson)! };
+        // 新PUBLISH与审核只相信同事务持久的服务器评估，旧报告不能自动升级。
+        var record = await enlisted.Assessments.AsNoTracking().SingleOrDefaultAsync(item => item.ValidationReportId == reportId, cancellationToken)
+            ?? throw new SemanticOperationException(409, "assessment_required");
+        // 权威源字节重新散列，不能仅信任持久的hash列或客户端输入。
+        var sources = JsonSerializer.Deserialize<SourceBundle>(source.SourcesJson)!;
+        var assessment = JsonSerializer.Deserialize<SemanticAssessment>(record.AssessmentJson)!;
+        CheckAssessment(assessment, record, row, hashes, reportId, sources);
+        return new DraftPublicationSnapshot { Draft = Map(row, source), Validation = JsonSerializer.Deserialize<SemanticValidationReport>(validation.ReportJson)!, Semantics = new PublicationSemantics { ProfileVersion = assessment.ProfileVersion, ProfileHash = assessment.ProfileHash, AssessmentId = assessment.AssessmentId, AssessmentHash = assessment.AssessmentHash } };
     }
 
     /// <summary>保存/结构编辑共用CAS追加实现，不允许跨模块写入或原地覆盖源历史。</summary>

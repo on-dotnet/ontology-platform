@@ -11,7 +11,7 @@ using OntologyPlatform.Modules.Ontology.Domain;
 namespace OntologyPlatform.Modules.Ontology;
 
 /// <summary>复用官方Fuseki RIOT/GSP/SHACL端点的受控适配器，不接受用户查询或URL。</summary>
-public sealed class JenaSemanticRuntime : ISemanticRuntime
+public sealed partial class JenaSemanticRuntime : ISemanticRuntime, IG3SemanticRuntime
 {
     /// <summary>只记录固定阶段与状态，不记录用户源或查询文本。</summary>
     private static readonly ActivitySource Activities = new("OntologyPlatform.Ontology");
@@ -266,7 +266,7 @@ public sealed class JenaSemanticRuntime : ISemanticRuntime
     }
 
     /// <summary>分别由RIOT解析四类源并执行Shape安全检查，计算总三元组预算。</summary>
-    private async Task<RdfTriple[][]> ParseSourcesAsync(SourceBundle sources, List<string> graphs, CancellationToken token)
+    private async Task<RdfTriple[][]> ParseSourcesAsync(SourceBundle sources, List<string> graphs, CancellationToken token, bool checkShapes = true)
     {
         if (sources is null || sources.OntologyTurtle is null || sources.ShapesTurtle is null || sources.DataTurtle is null || !OntologyRules.WithinSourceBudget(sources.OntologyTurtle, sources.ShapesTurtle, sources.VocabularyTurtle, sources.DataTurtle))
             throw new SemanticOperationException(413, "source_byte_budget");
@@ -290,7 +290,7 @@ public sealed class JenaSemanticRuntime : ISemanticRuntime
             result.Add(parsed.Where(triple => triple != marker).ToArray());
         }
         if (result.Sum(triples => triples.Length) > 5000) throw new SemanticOperationException(422, "rdf_triple_budget");
-        ShapePolicy.Check(result[1]);
+        if (checkShapes) ShapePolicy.Check(result[1]);
         return result.ToArray();
     }
 

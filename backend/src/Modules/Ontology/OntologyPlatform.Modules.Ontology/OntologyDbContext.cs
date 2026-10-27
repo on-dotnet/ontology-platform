@@ -20,6 +20,9 @@ public sealed class OntologyDbContext : DbContext
     /// <summary>绑定修订的真实校验事实。</summary>
     public DbSet<ValidationRecord> Validations => Set<ValidationRecord>();
 
+    /// <summary>与报告同事务产生的不可变评估。</summary>
+    public DbSet<AssessmentRecord> Assessments => Set<AssessmentRecord>();
+
     /// <summary>与业务和审计同时提交的幂等回执。</summary>
     public DbSet<CommandRecord> Commands => Set<CommandRecord>();
 
@@ -45,6 +48,14 @@ public sealed class OntologyDbContext : DbContext
         {
             entity.ToTable("Validations");
             entity.HasKey(row => row.ReportId);
+            entity.HasOne<DraftRevisionRecord>().WithMany().HasForeignKey(row => new { row.DraftId, row.Revision }).OnDelete(DeleteBehavior.Restrict);
+        });
+        modelBuilder.Entity<AssessmentRecord>(entity =>
+        {
+            entity.ToTable("Assessments");
+            entity.HasKey(row => row.AssessmentId);
+            entity.HasIndex(row => row.ValidationReportId).IsUnique();
+            entity.HasOne<ValidationRecord>().WithOne().HasForeignKey<AssessmentRecord>(row => row.ValidationReportId).OnDelete(DeleteBehavior.Restrict);
             entity.HasOne<DraftRevisionRecord>().WithMany().HasForeignKey(row => new { row.DraftId, row.Revision }).OnDelete(DeleteBehavior.Restrict);
         });
         modelBuilder.Entity<CommandRecord>(entity =>
