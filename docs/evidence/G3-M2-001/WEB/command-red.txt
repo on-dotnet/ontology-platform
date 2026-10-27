@@ -1,0 +1,29 @@
+$ vitest run src/features/ontology/m2-structure.test.ts
+
+ RUN  v5.0.5 /Users/chasen/.codex/worktrees/g3-m2-web/ontology-platform/apps/web
+
+ ❯ src/features/ontology/m2-structure.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/features/ontology/m2-structure.test.ts [ src/features/ontology/m2-structure.test.ts ]
+Error: Cannot find module './structural-edit' imported from /Users/chasen/.codex/worktrees/g3-m2-web/ontology-platform/apps/web/src/features/ontology/m2-structure.test.ts
+ ❯ src/features/ontology/m2-structure.test.ts:4:1
+      2| import { renderToStaticMarkup } from "react-dom/server";
+      3| import { describe, expect, it } from "vitest";
+      4| import { exactEdit, namedAxiomCandidates, structuralContext } from "./…
+       | ^
+      5| import { StructuralForm } from "./structural-form";
+      6| import type { RdfTerm, SemanticProjection } from "../../lib/api/g2-gen…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  22:19:15
+   Duration  70ms (worker 96%, environment 4%)
+
+/Users/chasen/.codex/worktrees/g3-m2-web/ontology-platform/apps/web:
+[ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL] @ontology-platform/web@0.1.0 test: `vitest run src/features/ontology/m2-structure.test.ts`
+Exit status 1

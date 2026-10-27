@@ -1,0 +1,86 @@
+$ vitest run src/features/ontology/m2-structure.test.ts
+
+ RUN  v5.0.5 /Users/chasen/.codex/worktrees/g3-m2-web/ontology-platform/apps/web
+
+ ❯ src/features/ontology/m2-structure.test.ts (4 tests | 4 failed) 8ms
+   ❯ M2 当前节点绑定的结构表单 (4)
+     × 首个精确对象随当前节点初始化，不沿用空值或另一节点对象 6ms
+     × 受控命名公理包含equivalent/disjoint/inverse三个登记谓词 1ms
+     × 语言字面量初始保留规范rdf:langString并允许精确操作 0ms
+     × 复杂图明确结构只读且禁用表单输入 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/features/ontology/m2-structure.test.ts > M2 当前节点绑定的结构表单 > 首个精确对象随当前节点初始化，不沿用空值或另一节点对象
+AssertionError: expected '<section class="g2-stack"><h3>结构表单</h…' to contain 'value="http://www.w3.org/2002/07/owl#…'
+
+Expected: "value="http://www.w3.org/2002/07/owl#Class""
+Received: "<section class="g2-stack"><h3>结构表单</h3><p class="g2-hash">urn:A</p><label>结构操作<select aria-label="结构操作"><option value="replace" selected="">替换精确对象</option><option value="add">新增标准声明 / 简单断言</option><option value="remove">删除精确三元组</option></select></label><label>已确认三元组<select aria-label="结构编辑三元组"><option value="0" selected="">urn:A · http://www.w3.org/1999/02/22-rdf-syntax-ns#type → http://www.w3.org/2002/07/owl#Class</option><option value="1">urn:A · http://www.w3.org/2000/01/rdf-schema#label → 中文标签</option></select></label><label>新对象类型<select aria-label="新对象类型"><option value="iri" selected="">IRI</option><option value="literal">literal</option></select></label><label>新对象值<input aria-label="新对象值" value=""/></label><button class="button" disabled="">提交真实结构编辑</button><p class="muted">仅支持登记的RDF/OWL基本编辑。旧修订源码完整保留，结构修改的新格式通过Diff明示。</p></section>"
+
+ ❯ src/features/ontology/m2-structure.test.ts:33:27
+     31| describe("M2 当前节点绑定的结构表单", () => {
+     32|   it("首个精确对象随当前节点初始化，不沿用空值或另一节点对象", () => {
+     33|     expect(form("urn:A")).toContain(`value="${owl}Class"`);
+       |                           ^
+     34|     expect(form("urn:p")).toContain(`value="${owl}ObjectProperty"`);
+     35|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  src/features/ontology/m2-structure.test.ts > M2 当前节点绑定的结构表单 > 受控命名公理包含equivalent/disjoint/inverse三个登记谓词
+AssertionError: expected '<section class="g2-stack"><h3>结构表单</h…' to contain 'http://www.w3.org/2002/07/owl#equival…'
+
+Expected: "http://www.w3.org/2002/07/owl#equivalentClass"
+Received: "<section class="g2-stack"><h3>结构表单</h3><p class="g2-hash">urn:A</p><label>结构操作<select aria-label="结构操作"><option value="replace" selected="">替换精确对象</option><option value="add">新增标准声明 / 简单断言</option><option value="remove">删除精确三元组</option></select></label><label>已确认三元组<select aria-label="结构编辑三元组"><option value="0" selected="">urn:A · http://www.w3.org/1999/02/22-rdf-syntax-ns#type → http://www.w3.org/2002/07/owl#Class</option><option value="1">urn:A · http://www.w3.org/2000/01/rdf-schema#label → 中文标签</option></select></label><label>新对象类型<select aria-label="新对象类型"><option value="iri" selected="">IRI</option><option value="literal">literal</option></select></label><label>新对象值<input aria-label="新对象值" value=""/></label><button class="button" disabled="">提交真实结构编辑</button><p class="muted">仅支持登记的RDF/OWL基本编辑。旧修订源码完整保留，结构修改的新格式通过Diff明示。</p></section>"
+
+ ❯ src/features/ontology/m2-structure.test.ts:37:96
+     35|   });
+     36|   it("受控命名公理包含equivalent/disjoint/inverse三个登记谓词", () => {
+     37|     for (const name of ["equivalentClass", "disjointWith", "inverseOf"…
+       |                                                                                                ^
+     38|   });
+     39|   it("语言字面量初始保留规范rdf:langString并允许精确操作", () => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  src/features/ontology/m2-structure.test.ts > M2 当前节点绑定的结构表单 > 语言字面量初始保留规范rdf:langString并允许精确操作
+AssertionError: expected '<section class="g2-stack"><h3>结构表单</h…' to contain 'value="中文标签"'
+
+Expected: "value="中文标签""
+Received: "<section class="g2-stack"><h3>结构表单</h3><p class="g2-hash">urn:A</p><label>结构操作<select aria-label="结构操作"><option value="replace" selected="">替换精确对象</option><option value="add">新增标准声明 / 简单断言</option><option value="remove">删除精确三元组</option></select></label><label>已确认三元组<select aria-label="结构编辑三元组"><option value="0" selected="">urn:A · http://www.w3.org/2000/01/rdf-schema#label → 中文标签</option></select></label><label>新对象类型<select aria-label="新对象类型"><option value="iri" selected="">IRI</option><option value="literal">literal</option></select></label><label>新对象值<input aria-label="新对象值" value=""/></label><button class="button" disabled="">提交真实结构编辑</button><p class="muted">仅支持登记的RDF/OWL基本编辑。旧修订源码完整保留，结构修改的新格式通过Diff明示。</p></section>"
+
+ ❯ src/features/ontology/m2-structure.test.ts:42:18
+     40|     const source = { ...projection, triples: projection.triples.filter…
+     41|     const html = form("urn:A", source);
+     42|     expect(html).toContain('value="中文标签"');
+       |                  ^
+     43|     expect(html).toContain('value="zh"');
+     44|     expect(html).not.toMatch(/disabled=""[^>]*>提交真实结构编辑/);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  src/features/ontology/m2-structure.test.ts > M2 当前节点绑定的结构表单 > 复杂图明确结构只读且禁用表单输入
+AssertionError: expected '<section class="g2-stack"><h3>结构表单</h…' to contain '源码保存和原文导出仍可使用'
+
+Expected: "源码保存和原文导出仍可使用"
+Received: "<section class="g2-stack"><h3>结构表单</h3><p class="g2-hash">urn:A</p><p class="g2-notice">存在未知/复杂公理或空白节点；结构编辑已阻断，原始源完整保留。</p><label>结构操作<select aria-label="结构操作"><option value="replace" selected="">替换精确对象</option><option value="add">新增标准声明 / 简单断言</option><option value="remove">删除精确三元组</option></select></label><label>已确认三元组<select aria-label="结构编辑三元组"><option value="0" selected="">urn:A · http://www.w3.org/1999/02/22-rdf-syntax-ns#type → http://www.w3.org/2002/07/owl#Class</option><option value="1">urn:A · http://www.w3.org/2000/01/rdf-schema#label → 中文标签</option></select></label><label>新对象类型<select aria-label="新对象类型"><option value="iri" selected="">IRI</option><option value="literal">literal</option></select></label><label>新对象值<input aria-label="新对象值" value=""/></label><button class="button" disabled="">提交真实结构编辑</button><p class="muted">仅支持登记的RDF/OWL基本编辑。旧修订源码完整保留，结构修改的新格式通过Diff明示。</p></section>"
+
+ ❯ src/features/ontology/m2-structure.test.ts:48:18
+     46|   it("复杂图明确结构只读且禁用表单输入", () => {
+     47|     const html = form("urn:A", { ...projection, structuralEditAllowed:…
+     48|     expect(html).toContain("源码保存和原文导出仍可使用");
+       |                  ^
+     49|     expect(html).toMatch(/aria-label="结构操作"[^>]*disabled=""/);
+     50|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed (4)
+   Start at  22:18:55
+   Duration  310ms (transform 37%, import 36%, tests 21%, worker 5%)
+
+/Users/chasen/.codex/worktrees/g3-m2-web/ontology-platform/apps/web:
+[ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL] @ontology-platform/web@0.1.0 test: `vitest run src/features/ontology/m2-structure.test.ts`
+Exit status 1
