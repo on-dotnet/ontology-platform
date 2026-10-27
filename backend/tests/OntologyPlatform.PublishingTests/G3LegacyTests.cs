@@ -4,8 +4,8 @@ using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using OntologyPlatform.Contracts;
-using OntologyPlatform.Modules.Publishing;
 using OntologyPlatform.Modules.Ontology;
+using OntologyPlatform.Modules.Publishing;
 
 namespace OntologyPlatform.PublishingTests;
 
