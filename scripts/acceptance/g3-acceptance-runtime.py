@@ -32,6 +32,14 @@ def main():
     runtime = json.loads(runtime_file.read_text())
     if not runtime['volumePrefix'].startswith('g3-m1-') or runtime_file.parent.name != runtime['volumePrefix']:
         parser.error('Protected G2 or unrelated runtime refused')
+    # 只记录新合成环境归属元数据，绝不复制配置或认证值到证据。
+    from evidence_paths import evidence_directory
+    evidence = evidence_directory(ROOT, 'docs/evidence/G3-M1-001/runtime')
+    evidence.mkdir(parents=True, exist_ok=True)
+    ownership = {'volumePrefix': runtime['volumePrefix'], 'runtimePath': str(runtime_file),
+                 'scope': 'G3-M1-001 freshly generated Synthetic test environment; protected G2 volumes excluded',
+                 'launcherStarted': False, 'launcherStopped': False}
+    (evidence / 'owned-runtime.json').write_text(json.dumps(ownership, indent=2) + '\n')
     process = None
     flags = subprocess.CREATE_NEW_PROCESS_GROUP if os.name == 'nt' else 0
 
@@ -54,6 +62,7 @@ def main():
                 subprocess.run([sys.executable, 'scripts/acceptance/g3-runtime.py', 'bootstrap', '--runtime-file', str(runtime_file)], cwd=ROOT, check=True)
                 shared.stop(process)
             process = launch('full')
+            ownership['launcherStarted'] = True
         shared.wait_for('http://localhost:15100/health/ready', {'X-Health-Key': runtime['healthKey']})
         tools = json.loads(subprocess.check_output(['pwsh', '-NoProfile', '-File', 'scripts/bootstrap-web-tools.ps1'], cwd=ROOT, text=True))
         commands = [
@@ -72,6 +81,9 @@ def main():
         return 0
     finally:
         shared.stop(process)
+        ownership['launcherStopped'] = process is None or process.poll() is not None
+        ownership['launcherExitCode'] = None if process is None else process.returncode
+        (evidence / 'owned-runtime.json').write_text(json.dumps(ownership, indent=2) + '\n')
 
 
 if __name__ == '__main__':

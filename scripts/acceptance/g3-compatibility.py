@@ -12,13 +12,14 @@ ROOT = Path(__file__).resolve().parents[2]
 
 def main():
     artifact = ROOT / 'artifacts/g3-m1'
-    reader = artifact / 'fallback-reader/OntologyPlatform.G2ContractTests.dll'
+    reader = artifact / 'fallback-reader-v2/OntologyPlatform.G2ContractTests.dll'
     manifest = artifact / 'actual-v2-manifest.json'
     if not reader.is_file() or not manifest.is_file():
         raise RuntimeError('Pre-write reader binary or real V2 artifact missing')
     before = hashlib.sha256(reader.read_bytes()).hexdigest()
     result = subprocess.run(['dotnet', str(reader), '--filter', 'FullyQualifiedName~CompatibilityBinaryReadsActualV2Manifest',
-                             '--output', 'Detailed'], cwd=ROOT, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                             '--output', 'Detailed', '--zero-tests-policy', 'strict', '--minimum-expected-tests', '1'],
+                            cwd=ROOT, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     after = hashlib.sha256(reader.read_bytes()).hexdigest()
     evidence = evidence_directory(ROOT, 'docs/evidence/G3-M1-001/runtime')
     evidence.mkdir(parents=True, exist_ok=True)

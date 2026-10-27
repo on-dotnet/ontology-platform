@@ -20,12 +20,12 @@ try {
     # 正式栈写V2前先运行兼容reader，再保留独立二进制供真实制品后验读取。
     dotnet test --project backend/tests/OntologyPlatform.G2ContractTests --filter 'FullyQualifiedName~G3ManifestContractTests.V2RoundtripRetainsExactAssessmentBinding' --output Detailed
     if ($LASTEXITCODE -ne 0) { throw 'Pre-write V2 compatible binary failed' }
-    $reader = Join-Path $root 'artifacts/g3-m1/fallback-reader'
+    $reader = Join-Path $root 'artifacts/g3-m1/fallback-reader-v2'
     if (-not (Test-Path -LiteralPath $reader)) {
         $null = New-Item -ItemType Directory -Path $reader -Force
         Copy-Item -Path (Join-Path $root 'backend/tests/OntologyPlatform.G2ContractTests/bin/Debug/net10.0/*') -Destination $reader -Recurse
     }
-    dotnet (Join-Path $reader 'OntologyPlatform.G2ContractTests.dll') --filter 'FullyQualifiedName~G3ManifestContractTests.V2RoundtripRetainsExactAssessmentBinding' --output Detailed
+    dotnet (Join-Path $reader 'OntologyPlatform.G2ContractTests.dll') --filter 'FullyQualifiedName~G3ManifestContractTests.V2RoundtripRetainsExactAssessmentBinding' --output Detailed --zero-tests-policy strict --minimum-expected-tests 1
     if ($LASTEXITCODE -ne 0) { throw 'Retained fallback reader failed before V2 writes' }
     node apps/web/scripts/generate-types.mjs --check
     if ($LASTEXITCODE -ne 0) { throw 'Generated types drifted' }

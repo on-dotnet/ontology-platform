@@ -98,8 +98,9 @@ export async function runM1Checks({ root, origin, operator, viewer, single, chec
     await page.getByText("四源比较已返回；逐源查看状态。", { exact: true }).waitFor();
     observed("m1_ui_four_comparisons", await page.locator("section[aria-label='版本源比较'] article").count() === 4);
     await page.getByRole("button", { name: "精确比较四源", exact: true }).focus();
-    await page.keyboard.press("Tab");
-    observed("m1_ui_keyboard", await page.evaluate(() => document.activeElement !== document.body));
+    const keyboardResponse = page.waitForResponse(value => value.url().endsWith("/ontology-comparisons") && value.request().method() === "POST");
+    await page.keyboard.press("Enter");
+    observed("m1_ui_keyboard_executes_real_comparison", (await keyboardResponse).status() === 200);
     await mkdir(resolve(evidence, "screenshots"), { recursive: true });
     for (const width of [1440, 390]) {
       await page.setViewportSize({ width, height: 1000 });

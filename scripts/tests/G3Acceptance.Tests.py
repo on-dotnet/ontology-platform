@@ -39,6 +39,7 @@ class M1OrchestrationTests(unittest.TestCase):
                 return original([sys.executable, str(child), str(log), *command, '23' if gate == fail_gate else '0'], cwd=root)
 
             with contextlib.ExitStack() as stack:
+                stack.enter_context(patch.object(sys, 'path', [str(SCRIPT.parent), *sys.path]))
                 stack.enter_context(patch.object(module, 'ROOT', root))
                 stack.enter_context(patch.object(sys, 'argv', [str(SCRIPT), '--runtime-file', str(runtime)]))
                 stack.enter_context(patch.object(module.shared, 'wait_for'))
