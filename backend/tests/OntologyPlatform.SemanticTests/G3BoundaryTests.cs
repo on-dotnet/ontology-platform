@@ -1,8 +1,8 @@
 using System.Text.Json;
-using OntologyPlatform.Modules.Ontology.Domain;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OntologyPlatform.Contracts;
 using OntologyPlatform.Modules.Ontology;
+using OntologyPlatform.Modules.Ontology.Domain;
 
 namespace OntologyPlatform.SemanticTests;
 
