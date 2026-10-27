@@ -75,7 +75,7 @@ public sealed class RoundtripTests
         // 快照和清单必须使用同一不可变版本。
         var snapshot = new AssetVersionSnapshot { ReleaseId = id, OntologyHash = analysis.Hashes.OntologyHash, ShapesHash = analysis.Hashes.ShapesHash, DataHash = analysis.Hashes.DataHash, OntologyGraphIri = "urn:ontology-platform:release:" + id + ":ontology", DataGraphIri = "urn:ontology-platform:release:" + id + ":data" };
         // 清单中的hash由真实源派生，不能客户端自行编写。
-        var manifest = new ReleaseManifest { ReleaseId = id, Hashes = analysis.Hashes, OntologyGraphIri = snapshot.OntologyGraphIri, DataGraphIri = snapshot.DataGraphIri, Snapshot = snapshot };
+        var manifest = new ReleaseManifest { SchemaVersion = 1, ReleaseId = id, Hashes = analysis.Hashes, OntologyGraphIri = snapshot.OntologyGraphIri, DataGraphIri = snapshot.DataGraphIri, Snapshot = snapshot };
         await runtime.DeployAsync(manifest, sources, CancellationToken.None);
         Assert.IsTrue(await runtime.VerifyAsync(manifest, sources, CancellationToken.None));
         // 正式读确实返回当前版本图数据。
@@ -189,7 +189,7 @@ public sealed class RoundtripTests
         // 真实部署和回读共享同一不可变图名。
         var snapshot = new AssetVersionSnapshot { ReleaseId = id, OntologyGraphIri = "urn:ontology-platform:release:" + id + ":ontology", DataGraphIri = "urn:ontology-platform:release:" + id + ":data" };
         // 精确源绑定保持正式部署的原有合同。
-        var manifest = new ReleaseManifest { ReleaseId = id, Hashes = analysis.Hashes, OntologyGraphIri = snapshot.OntologyGraphIri, DataGraphIri = snapshot.DataGraphIri, Snapshot = snapshot };
+        var manifest = new ReleaseManifest { SchemaVersion = 1, ReleaseId = id, Hashes = analysis.Hashes, OntologyGraphIri = snapshot.OntologyGraphIri, DataGraphIri = snapshot.DataGraphIri, Snapshot = snapshot };
         await runtime.DeployAsync(manifest, source, CancellationToken.None);
         Assert.AreEqual(1, (await runtime.ReadPublishedAsync(snapshot, CancellationToken.None)).DataTriples.Length);
         // 只删除刚部署的该测试专属数据图，模拟正式存储图丢失。
@@ -224,7 +224,7 @@ public sealed class RoundtripTests
         // 服务器生成独占测试图，测试不能激活版本。
         var id = Guid.NewGuid().ToString("N");
         // 精确绑定当前源散列，回验必须复现同一约束结果。
-        var manifest = new ReleaseManifest { ReleaseId = id, Hashes = report.Hashes, OntologyGraphIri = "urn:ontology-platform:release:" + id + ":ontology", DataGraphIri = "urn:ontology-platform:release:" + id + ":data" };
+        var manifest = new ReleaseManifest { SchemaVersion = 1, ReleaseId = id, Hashes = report.Hashes, OntologyGraphIri = "urn:ontology-platform:release:" + id + ":ontology", DataGraphIri = "urn:ontology-platform:release:" + id + ":data" };
         await runtime.DeployAsync(manifest, source, CancellationToken.None);
         Assert.IsFalse(await runtime.VerifyAsync(manifest, source, CancellationToken.None));
     }

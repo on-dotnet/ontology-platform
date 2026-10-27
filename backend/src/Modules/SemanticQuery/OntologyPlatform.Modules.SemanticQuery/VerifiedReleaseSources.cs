@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using OntologyPlatform.Contracts;
 
 namespace OntologyPlatform.Modules.SemanticQuery;
@@ -20,7 +21,9 @@ public sealed class VerifiedReleaseSources
     public async Task<SourceBundle> ReadAsync(ReleaseManifest manifest, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        if (manifest is null || manifest.SchemaVersion != 1 || !Guid.TryParseExact(manifest.ReleaseId, "N", out _) || manifest.Snapshot is null || manifest.Hashes is null || manifest.ArtifactObjects is null) throw InvalidBinding();
+        if (manifest is null || manifest.SchemaVersion is not (1 or 2) || !Guid.TryParseExact(manifest.ReleaseId, "N", out _) || manifest.Snapshot is null || manifest.Hashes is null || manifest.ArtifactObjects is null) throw InvalidBinding();
+        try { ReleaseManifestCompatibility.Validate(manifest); }
+        catch (JsonException) { throw InvalidBinding(); }
         // 快照字段是结果对外宣称的版本，不能仅校验ArtifactObject自报hash。
         var snapshot = manifest.Snapshot;
         // manifest和snapshot必须指向同一组固定服务器命名图及源hash。

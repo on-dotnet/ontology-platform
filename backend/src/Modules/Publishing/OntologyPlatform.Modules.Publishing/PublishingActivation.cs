@@ -113,6 +113,7 @@ public sealed partial class PublishingService
         var proposalRow = await FindProposalAsync(request.ProposalId, true, token);
         // 重新从锁定数据库事实校验审批，不信任事务前副本。
         var proposal = JsonSerializer.Deserialize<ReleaseProposal>(proposalRow.ProposalJson)!;
+        CheckPublicationSemantics(proposal, snapshot);
         DemandApproved(actor, proposalRow, proposal, request.Command.ExpectedRevision);
         // 一个发布提案永远只有一个准备版本；回滚则取得原版本行锁。
         var release = proposal.Kind == ProposalKind.Publish
@@ -145,11 +146,13 @@ public sealed partial class PublishingService
         var command = await database.Commands.SingleAsync(row => row.Key == key, token);
         CheckReplay(command, actor, payloadHash);
         if (command.ResultJson is not null) return JsonSerializer.Deserialize<ReleaseActivation>(command.ResultJson)!;
-        if (known.Kind == ProposalKind.Publish) await LockDraftAsync(actor, known.DraftId!, known.DraftRevision!.Value, known.Hashes!, known.ValidationReportId!, token);
+        // 与审核/准备保持相同锁顺序，外部操作耗时不能延长assessment有效期。
+        var snapshot = known.Kind == ProposalKind.Publish ? await LockDraftAsync(actor, known.DraftId!, known.DraftRevision!.Value, known.Hashes!, known.ValidationReportId!, token) : null;
         // 严格保持draft→proposal→active或proposal→旧release→active顺序。
         var proposalRow = await FindProposalAsync(request.ProposalId, true, token);
         // 事务内重核审批绑定和到期时间，外部准备耗时不能延长授权。
         var proposal = JsonSerializer.Deserialize<ReleaseProposal>(proposalRow.ProposalJson)!;
+        CheckPublicationSemantics(proposal, snapshot);
         DemandApproved(actor, proposalRow, proposal, request.Command.ExpectedRevision);
         // 正式版本行在active之前锁，回滚不得绕过目标hash绑定。
         var release = await database.Releases.FromSqlInterpolated($"SELECT * FROM publishing.\"Releases\" WHERE \"ReleaseId\"={prepared.ReleaseId} FOR UPDATE").SingleAsync(token);
@@ -211,7 +214,7 @@ public sealed partial class PublishingService
         // 未实现mapping/metric/rule保持空；未注册QRY时不虚构capability版本。
         var snapshot = new AssetVersionSnapshot { ReleaseId = id, OntologyHash = draft.Hashes.OntologyHash, ShapesHash = draft.Hashes.ShapesHash, VocabularyHash = draft.Hashes.VocabularyHash, DataHash = draft.Hashes.DataHash, OntologyGraphIri = ontologyGraph, DataGraphIri = dataGraph, CapabilityVersions = gateway?.GetCapabilities().OrderBy(value => value.Id, StringComparer.Ordinal).Select(value => new AssetVersion { AssetId = value.Id, Version = value.Version }).ToArray() ?? [] };
         // 固定创建时间及序列化字节在所有重试中保留不变。
-        var manifest = new ReleaseManifest { SchemaVersion = 1, ReleaseId = id, AssetId = draft.AssetId, Scope = draft.Scope, DraftId = draft.DraftId, Revision = draft.Revision, Hashes = draft.Hashes, OntologyGraphIri = ontologyGraph, DataGraphIri = dataGraph, Snapshot = snapshot, ArtifactObjects = objects, CreatedAtUtc = clock.GetUtcNow() };
+        var manifest = new ReleaseManifest { SchemaVersion = 2, Semantics = proposal.Semantics ?? throw new SemanticOperationException(409, "assessment_required"), ReleaseId = id, AssetId = draft.AssetId, Scope = draft.Scope, DraftId = draft.DraftId, Revision = draft.Revision, Hashes = draft.Hashes, OntologyGraphIri = ontologyGraph, DataGraphIri = dataGraph, Snapshot = snapshot, ArtifactObjects = objects, CreatedAtUtc = clock.GetUtcNow() };
         // 清单hash仅在PG和独立对象引用中保存，避免自包含循环。
         var json = JsonSerializer.Serialize(manifest);
         // 权威UTF8字节hash用于回滚审批和对象回验。

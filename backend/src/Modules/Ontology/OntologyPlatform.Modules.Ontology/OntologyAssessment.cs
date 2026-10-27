@@ -103,6 +103,7 @@ public sealed partial class OntologyService
     {
         DemandRole(actor, false);
         // DTO严格检查同时用于非HTTP应用调用，客户端hash和任意地址不存在入口。
+        if (request?.From is null || request.To is null) throw new SemanticOperationException(422, "comparison_reference_invalid");
         try { JsonSerializer.Serialize(request); }
         catch (JsonException) { throw new SemanticOperationException(422, "comparison_reference_invalid"); }
         // 两端均先完成授权和原始源核验，之后才能解析比较。

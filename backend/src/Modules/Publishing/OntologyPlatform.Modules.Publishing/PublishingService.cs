@@ -85,10 +85,13 @@ public sealed partial class PublishingService : IPublishingService
         PublishingRules.DemandScope(actor, scope);
         return await WriteAsync(actor, scope, "release.proposal.create", request.Command, request, async token =>
         {
+            // 新发布资格只取Ontology锁读的持久assessment，回滚完全不锁draft。
+            DraftPublicationSnapshot? publication = null;
             if (draft is not null)
             {
                 if (request.Command.ExpectedRevision != request.DraftRevision) throw new SemanticOperationException(409, "draft_revision_conflict");
-                await LockDraftAsync(actor, request.DraftId!, request.DraftRevision!.Value, request.Hashes!, request.ValidationReportId!, token);
+                publication = await LockDraftAsync(actor, request.DraftId!, request.DraftRevision!.Value, request.Hashes!, request.ValidationReportId!, token);
+                if (publication.Semantics is null) throw new SemanticOperationException(409, "assessment_required");
             }
             else
             {
@@ -109,6 +112,7 @@ public sealed partial class PublishingService : IPublishingService
                 DraftRevision = request.DraftRevision,
                 Hashes = request.Hashes,
                 ValidationReportId = request.ValidationReportId,
+                Semantics = publication?.Semantics,
                 TargetReleaseId = request.TargetReleaseId,
                 TargetManifestHash = request.TargetManifestHash,
                 SubmittedBy = actor.SubjectId,
@@ -133,10 +137,14 @@ public sealed partial class PublishingService : IPublishingService
         PublishingRules.DemandScope(actor, Scope(known));
         return await WriteAsync(actor, Scope(known), "release.approval.decide", request.Command, new { proposalId, request }, async token =>
         {
-            // 审核不取草稿锁，只改变提案；激活阶段再严格重核当前草稿。
+            // 先锁draft再锁proposal，与创建及激活统一顺序；auditor只做只读核验。
+            var original = JsonSerializer.Deserialize<ReleaseProposal>(known.ProposalJson)!;
+            // 回滚保留旧绑定算法并不依赖当前草稿。
+            var snapshot = original.Kind == ProposalKind.Publish ? await LockDraftAsync(actor, original.DraftId!, original.DraftRevision!.Value, original.Hashes!, original.ValidationReportId!, token) : null;
             var row = await FindProposalAsync(proposalId, true, token);
             // 审批资格与内容均从真实记录取得。
             var proposal = JsonSerializer.Deserialize<ReleaseProposal>(row.ProposalJson)!;
+            CheckPublicationSemantics(proposal, snapshot);
             if (row.Revision != request.Command.ExpectedRevision || proposal.Status != ProposalStatus.Pending || row.Activated) throw new SemanticOperationException(409, "proposal_revision_conflict");
             if (proposal.ExpiresAtUtc <= clock.GetUtcNow()) throw new SemanticOperationException(409, "proposal_expired");
             if (!PublishingPolicy.CanApprove(actor.SubjectId, actor.Roles, proposal.SubmittedBy, clock.GetUtcNow(), proposal.ExpiresAtUtc)) throw new SemanticOperationException(403, "independent_approval_required");
@@ -201,6 +209,14 @@ public sealed partial class PublishingService : IPublishingService
 
     /// <summary>由Ontology在当前同物理PG事务内只读锁定草稿，不跨模块写表。</summary>
     private Task<DraftPublicationSnapshot> LockDraftAsync(ActorContext actor, string draftId, long revision, SourceHashes hashes, string reportId, CancellationToken token) => drafts.LockForPublicationAsync(actor, draftId, revision, hashes, reportId, database.Database.GetDbConnection(), database.Database.CurrentTransaction!.GetDbTransaction(), token);
+
+    /// <summary>每个发布阶段重新比较锁读的评估绑定，旧提案不能直接新激活。</summary>
+    private static void CheckPublicationSemantics(ReleaseProposal proposal, DraftPublicationSnapshot? snapshot)
+    {
+        if (proposal.Kind != ProposalKind.Publish) return;
+        if (proposal.Semantics is null || snapshot?.Semantics is null) throw new SemanticOperationException(409, "assessment_required");
+        if (proposal.Semantics != snapshot.Semantics) throw new SemanticOperationException(409, "assessment_binding_conflict");
+    }
 
     /// <summary>仅参数化主键取锁，锁定顺序由调用用例明确安排。</summary>
     private async Task<ProposalRecord> FindProposalAsync(string proposalId, bool locked, CancellationToken token) => await

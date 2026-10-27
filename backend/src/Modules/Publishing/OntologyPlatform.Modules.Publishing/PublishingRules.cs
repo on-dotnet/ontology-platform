@@ -39,5 +39,7 @@ internal static class PublishingRules
     internal static string Key(ResourceScope scope, string operation, string key) => Hash(JsonSerializer.Serialize(new { scope = scope with { SiteIds = scope.SiteIds.Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal).ToArray() }, operation, key }));
 
     /// <summary>审核绑定只取不可变提案内容，排除审核本身和状态避免循环。</summary>
-    internal static string Binding(ReleaseProposal proposal) => Hash(JsonSerializer.Serialize(new { proposal.ProposalId, proposal.Kind, proposal.AssetId, proposal.Scope, proposal.DraftId, proposal.DraftRevision, proposal.Hashes, proposal.ValidationReportId, proposal.TargetReleaseId, proposal.TargetManifestHash, proposal.SubmittedBy, proposal.SubmittedAtUtc, proposal.ExpiresAtUtc }));
+    internal static string Binding(ReleaseProposal proposal) => proposal.Semantics is null
+        ? Hash(JsonSerializer.Serialize(new { proposal.ProposalId, proposal.Kind, proposal.AssetId, proposal.Scope, proposal.DraftId, proposal.DraftRevision, proposal.Hashes, proposal.ValidationReportId, proposal.TargetReleaseId, proposal.TargetManifestHash, proposal.SubmittedBy, proposal.SubmittedAtUtc, proposal.ExpiresAtUtc }))
+        : Hash(JsonSerializer.Serialize(new { proposal.ProposalId, proposal.Kind, proposal.AssetId, proposal.Scope, proposal.DraftId, proposal.DraftRevision, proposal.Hashes, proposal.ValidationReportId, proposal.TargetReleaseId, proposal.TargetManifestHash, proposal.SubmittedBy, proposal.SubmittedAtUtc, proposal.ExpiresAtUtc, proposal.Semantics }));
 }

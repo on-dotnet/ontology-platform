@@ -73,7 +73,7 @@ public sealed partial class JenaSemanticRuntime : ISemanticRuntime, IG3SemanticR
                     Hashes = JenaRdfCodec.Hashes(sources),
                     Kind = ValidationKind.OwlSupport,
                     Conforms = false,
-                    Issues = diagnostics.Select(diagnostic => new ValidationIssue { Severity = DiagnosticSeverity.Error, Message = diagnostic.Message, FocusNode = diagnostic.FocusNode, Path = diagnostic.Path, SourceId = "ontology" }).ToArray(),
+                    Issues = diagnostics.Select(diagnostic => new ValidationIssue { Severity = DiagnosticSeverity.Error, Message = diagnostic.Message, FocusNode = diagnostic.FocusNode, Path = diagnostic.Path, SourceId = DiagnosticSource(parsed, diagnostic) }).ToArray(),
                     RawReportHash = OntologyRules.Hash(JsonSerializer.Serialize(diagnostics)),
                     ValidatedAtUtc = clock.GetUtcNow()
                 };
@@ -109,7 +109,7 @@ public sealed partial class JenaSemanticRuntime : ISemanticRuntime, IG3SemanticR
         {
             // 使用真正RDF解析后的完整图，不从节点/边投影重建本体。
             var parsed = await ParseSourcesAsync(sources, graphs, token);
-            if (Support(parsed[0]).Length != 0) throw new SemanticOperationException(422, "structural_edit_unsupported");
+            if (Support(parsed[0], structural: true).Length != 0) throw new SemanticOperationException(422, "structural_edit_unsupported");
             JenaRdfCodec.Iri(edit.SubjectIri);
             JenaRdfCodec.Iri(edit.PredicateIri);
             if (edit.OldObject?.Kind == RdfTermKind.Blank || edit.NewObject?.Kind == RdfTermKind.Blank || (edit.OldObject is null && edit.NewObject is null))
@@ -126,7 +126,7 @@ public sealed partial class JenaSemanticRuntime : ISemanticRuntime, IG3SemanticR
             // 重复新增也为no-op，不丢掉注释或改变权威源码字节。
             var result = triples.Distinct().ToArray();
             if (result.ToHashSet().SetEquals(parsed[0])) return sources;
-            if (Support(result).Length != 0) throw new SemanticOperationException(422, "structural_edit_unsupported");
+            if (Support(result, structural: true).Length != 0) throw new SemanticOperationException(422, "structural_edit_unsupported");
             return sources with { OntologyTurtle = JenaRdfCodec.Canonical(result) + "\n" };
         }, cancellationToken);
 
@@ -137,7 +137,7 @@ public sealed partial class JenaSemanticRuntime : ISemanticRuntime, IG3SemanticR
             CheckManifest(manifest, sources);
             // 部署前在内存真实解析，未知复杂公理不进入正式发布。
             var parsed = await ParseSourcesAsync(sources, graphs, token);
-            if (Support(parsed[0].Concat(parsed[2]).Concat(parsed[3]).ToArray()).Length != 0) throw new SemanticOperationException(422, "publication_unsupported");
+            if (PublicationSupport(manifest, parsed[0].Concat(parsed[2]).Concat(parsed[3]).ToArray()).Length != 0) throw new SemanticOperationException(422, "publication_unsupported");
             await SendAsync(published, "data?graph=" + Uri.EscapeDataString(manifest.OntologyGraphIri), HttpMethod.Put, string.Join('\n', parsed[0].Concat(parsed[2]).Select(JenaRdfCodec.Triple)), "text/plain", token);
             await SendAsync(published, "data?graph=" + Uri.EscapeDataString(manifest.DataGraphIri), HttpMethod.Put, string.Join('\n', parsed[3].Select(JenaRdfCodec.Triple)), "text/plain", token);
             return true;
@@ -150,6 +150,7 @@ public sealed partial class JenaSemanticRuntime : ISemanticRuntime, IG3SemanticR
             CheckManifest(manifest, sources);
             // 权威源重新解析用于实际图语义对账。
             var parsed = await ParseSourcesAsync(sources, graphs, token);
+            if (PublicationSupport(manifest, parsed[0].Concat(parsed[2]).Concat(parsed[3]).ToArray()).Length != 0) return false;
             // 正式图通过固定GSP读取，任何缺失不视为空成功。
             var ontology = await ReadGraphAsync(published, manifest.OntologyGraphIri, token);
             // 数据图与本体图独立对账。
@@ -187,7 +188,7 @@ public sealed partial class JenaSemanticRuntime : ISemanticRuntime, IG3SemanticR
                 CheckVerifiedBinding(manifest, sources);
                 // 复用唯一真实RIOT解析、Shape安全边界和全源预算，不能用新解析器猜测期望事实。
                 var parsed = await ParseSourcesAsync(sources, graphs, token);
-                if (Support(parsed[0].Concat(parsed[2]).Concat(parsed[3]).ToArray()).Length != 0)
+                if (PublicationSupport(manifest, parsed[0].Concat(parsed[2]).Concat(parsed[3]).ToArray()).Length != 0)
                     throw new SemanticOperationException(503, "published_source_unsupported");
                 // 每个正式图仅读取一次，这两个数组就是稍后返回给应用的完整实际批次。
                 var ontology = await ReadGraphAsync(published, manifest.OntologyGraphIri, token);
@@ -208,7 +209,7 @@ public sealed partial class JenaSemanticRuntime : ISemanticRuntime, IG3SemanticR
     /// <summary>逐字段核验快照与清单、原文散列和固定图名的同一版本关系。</summary>
     private static void CheckVerifiedBinding(ReleaseManifest manifest, SourceBundle sources)
     {
-        if (manifest is null || manifest.SchemaVersion != 1 || manifest.Snapshot is null || manifest.Hashes is null ||
+        if (manifest is null || manifest.SchemaVersion is not (1 or 2) || manifest.Snapshot is null || manifest.Hashes is null ||
             sources is null || sources.OntologyTurtle is null || sources.ShapesTurtle is null || sources.DataTurtle is null)
             throw new SemanticOperationException(503, "published_binding_invalid");
         CheckManifest(manifest, sources);
@@ -358,6 +359,9 @@ public sealed partial class JenaSemanticRuntime : ISemanticRuntime, IG3SemanticR
     /// <summary>发布清单必须绑定完整源散列及服务器派生图名。</summary>
     private static void CheckManifest(ReleaseManifest manifest, SourceBundle sources)
     {
+        try { ReleaseManifestCompatibility.Validate(manifest); }
+        catch (JsonException) { throw new SemanticOperationException(409, "manifest_schema_invalid"); }
+        if (manifest.SchemaVersion == 2 && !SemanticProfile.Matches(manifest.Semantics!)) throw new SemanticOperationException(409, "release_profile_unsupported");
         CheckGraphs(manifest.ReleaseId, manifest.OntologyGraphIri, manifest.DataGraphIri);
         if (manifest.Hashes != JenaRdfCodec.Hashes(sources)) throw new SemanticOperationException(409, "source_hash_conflict");
     }
@@ -381,7 +385,7 @@ public sealed partial class JenaSemanticRuntime : ISemanticRuntime, IG3SemanticR
     private static RdfTerm? Value(RdfTriple[] report, RdfTerm subject, string predicate) => report.FirstOrDefault(triple => triple.Subject == subject && triple.Predicate == ShapePolicy.Sh + predicate)?.Object;
 
     /// <summary>明确标识未验证OWL公理及空白节点；保存和导出不丢失它们。</summary>
-    private static SemanticDiagnostic[] Support(RdfTriple[] triples)
+    private static SemanticDiagnostic[] LegacySupport(RdfTriple[] triples)
     {
         // 只列出已支持的OWL类/属性声明，未知公理保守阻断。
         var allowedOwl = new[] { "Class", "ObjectProperty", "DatatypeProperty", "NamedIndividual", "Ontology" }.Select(name => JenaRdfCodec.Owl + name).ToHashSet(StringComparer.Ordinal);
@@ -403,7 +407,7 @@ public sealed partial class JenaSemanticRuntime : ISemanticRuntime, IG3SemanticR
         // 散列始终取权威源UTF8，不取Jena重新序列化文本。
         var hashes = JenaRdfCodec.Hashes(sources);
         // 支持诊断决定结构编辑边界，不把未知项悄悄过滤掉。
-        var diagnostics = Support(triples);
+        var diagnostics = Support(triples, structural: true);
         // 所有有IRI主体的声明节点由真实类型和标签生成。
         var nodes = triples.Where(triple => triple.Subject.Kind == RdfTermKind.Iri).GroupBy(triple => triple.Subject.Value)
             .Select(group => new SemanticNode

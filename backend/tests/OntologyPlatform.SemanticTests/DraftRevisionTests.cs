@@ -389,7 +389,7 @@ public sealed class DraftRevisionTests
         // 目录资产身份不能由请求自己决定。
         var assetId = Guid.NewGuid().ToString("N");
         // 此替身只用于Ontology边界测试，不宣称存在真实Publishing发布。
-        var catalog = new PinnedCatalog(new ReleaseSummary { Status = ReleaseStatus.Active, Manifest = new ReleaseManifest { ReleaseId = releaseId, AssetId = assetId, Scope = new ResourceScope { OrganizationId = "org-demo", SiteIds = ["site-a", "site-b"] } } });
+        var catalog = new PinnedCatalog(new ReleaseSummary { Status = ReleaseStatus.Active, Manifest = new ReleaseManifest { SchemaVersion = 1, ReleaseId = releaseId, AssetId = assetId, Scope = new ResourceScope { OrganizationId = "org-demo", SiteIds = ["site-a", "site-b"] } } });
         // 唯一应用服务通过公共catalog接口继承scope，不跨模块读写表。
         var service = new OntologyService(database, SemanticFixture.Runtime(), Writer(), TimeProvider.System, catalog);
         // 请求引用正式目录ID，而非自行传入assetId。

@@ -195,15 +195,18 @@ public sealed partial class OntologyService : IOntologyService, IDraftPublicatio
         var source = await enlisted.Revisions.AsNoTracking().SingleAsync(record => record.DraftId == draftId && record.Revision == revision, cancellationToken);
         // 校验报告必须精确匹配当前源，不使用客户端conforms字段。
         var validation = await enlisted.Validations.AsNoTracking().SingleOrDefaultAsync(record => record.ReportId == reportId && record.DraftId == draftId && record.Revision == revision, cancellationToken);
-        if (JsonSerializer.Deserialize<SourceHashes>(source.HashesJson) != hashes || validation is null || !validation.Conforms || validation.BundleHash != hashes.BundleHash) throw new SemanticOperationException(409, "validation_binding_conflict");
+        if (JsonSerializer.Deserialize<SourceHashes>(source.HashesJson) != hashes || validation is null || validation.BundleHash != hashes.BundleHash) throw new SemanticOperationException(409, "validation_binding_conflict");
         // 新PUBLISH与审核只相信同事务持久的服务器评估，旧报告不能自动升级。
         var record = await enlisted.Assessments.AsNoTracking().SingleOrDefaultAsync(item => item.ValidationReportId == reportId, cancellationToken)
             ?? throw new SemanticOperationException(409, "assessment_required");
         // 权威源字节重新散列，不能仅信任持久的hash列或客户端输入。
         var sources = JsonSerializer.Deserialize<SourceBundle>(source.SourcesJson)!;
         var assessment = JsonSerializer.Deserialize<SemanticAssessment>(record.AssessmentJson)!;
+        // 报告JSON、索引列与assessment必须来自同一精确验证，拒绝持久内容被篡改。
+        var report = JsonSerializer.Deserialize<SemanticValidationReport>(validation.ReportJson)!;
+        if (report.ReportId != reportId || report.DraftId != draftId || report.Revision != revision || report.Hashes != hashes || report.Conforms != validation.Conforms || (assessment.PublishEligible && (!report.Conforms || report.Kind != ValidationKind.ShaclCore))) throw new SemanticOperationException(409, "assessment_binding_conflict");
         CheckAssessment(assessment, record, row, hashes, reportId, sources);
-        return new DraftPublicationSnapshot { Draft = Map(row, source), Validation = JsonSerializer.Deserialize<SemanticValidationReport>(validation.ReportJson)!, Semantics = new PublicationSemantics { ProfileVersion = assessment.ProfileVersion, ProfileHash = assessment.ProfileHash, AssessmentId = assessment.AssessmentId, AssessmentHash = assessment.AssessmentHash } };
+        return new DraftPublicationSnapshot { Draft = Map(row, source), Validation = report, Semantics = new PublicationSemantics { ProfileVersion = assessment.ProfileVersion, ProfileHash = assessment.ProfileHash, AssessmentId = assessment.AssessmentId, AssessmentHash = assessment.AssessmentHash } };
     }
 
     /// <summary>保存/结构编辑共用CAS追加实现，不允许跨模块写入或原地覆盖源历史。</summary>
