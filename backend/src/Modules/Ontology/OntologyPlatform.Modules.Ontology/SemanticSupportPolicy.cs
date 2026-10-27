@@ -23,7 +23,7 @@ public sealed partial class JenaSemanticRuntime
         // 数据属性简单断言必须保持literal词法项。
         var datatypeProperties = triples.Where(triple => triple.Predicate == JenaRdfCodec.Type && triple.Object.Value == JenaRdfCodec.Owl + "DatatypeProperty").Select(triple => triple.Subject.Value).ToHashSet(StringComparer.Ordinal);
         // 平台原G2来源字段是明确普通元数据，避免把任意自定义谓词放宽成注释。
-        var metadata = new[] { "sourceId", "sourceRecordId", "validFromUtc", "observedAtUtc", "modelVersion", "mappingStatus" }.Select(name => "urn:ontology-platform:vocabulary:" + name).ToHashSet(StringComparer.Ordinal);
+        var metadata = new[] { "sourceId", "sourceRecordId", "validFromUtc", "validToUtc", "observedAtUtc", "modelVersion", "mappingStatus" }.Select(name => "urn:ontology-platform:vocabulary:" + name).ToHashSet(StringComparer.Ordinal);
         // SKOS明确登记的标签/说明及关系仍仅按原始显式事实处理。
         var skos = new[] { "prefLabel", "altLabel", "hiddenLabel", "notation", "definition", "scopeNote", "note", "broader", "narrower", "related", "inScheme", "topConceptOf", "hasTopConcept", "exactMatch", "closeMatch", "broadMatch", "narrowMatch", "relatedMatch" }.Select(name => "http://www.w3.org/2004/02/skos/core#" + name).ToHashSet(StringComparer.Ordinal);
         // PROV只保留明确登记的来源关系和时间元数据，不宣称PROV推理。
