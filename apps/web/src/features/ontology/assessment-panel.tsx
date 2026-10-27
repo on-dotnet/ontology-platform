@@ -76,6 +76,7 @@ export function AssessmentPanel({ draft, profile, dirty, busy, canEdit, reason, 
           <p className="g2-hash">{report.hashes.bundleHash}</p>
           {report.issues.map((issue, index) => (
             <article className="g2-notice" key={index}>
+              <p>当前修订的已登记语义/数据约束返回诊断；源码已保留，请结合评估阶段与诊断原文判断。</p>
               <strong>{issue.severity} · {issue.message}</strong>
               <p>{issue.focusNode?.value} · {issue.path}</p>
               <small>{issue.constraintComponent} · {issue.sourceId}</small>
