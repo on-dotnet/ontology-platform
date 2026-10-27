@@ -514,6 +514,64 @@ public sealed class DraftRevisionTests
     }
 
 
+    /// <summary>合并图SHACL不能把仅本体或词汇的focus误标成空data源。</summary>
+    [TestMethod]
+    [DataRow("ontology")]
+    [DataRow("vocabulary")]
+    [DataRow("data")]
+    [DataRow("ambiguous")]
+    public async Task G3MergedShaclDiagnosticNeverGuessesDataSource(string focusSource)
+    {
+        // 本轮真实PG持久评估与Jena标准SHACL报告。
+        await using var database = Database();
+        // 完整可信操作者和生产服务。
+        var actor = Actor();
+        // 唯一真实RIOT/SHACL服务，不在测试伪造Issue来源。
+        var service = Service(database);
+        // 分别覆盖ontology-only/vocabulary-only/data-only及同一focus跨三源歧义，不能从合并报告猜来源。
+        var sources = new SourceBundle { OntologyTurtle = focusSource is "ontology" or "ambiguous" ? "<urn:focus> a <urn:C> ." : "", VocabularyTurtle = focusSource is "vocabulary" or "ambiguous" ? "<urn:focus> a <urn:C> ." : null, DataTurtle = focusSource is "data" or "ambiguous" ? "<urn:focus> a <urn:C> ." : "", ShapesTurtle = "@prefix sh: <http://www.w3.org/ns/shacl#> . <urn:shape> a sh:NodeShape ; sh:targetClass <urn:C> ; sh:property [ sh:path <urn:required> ; sh:minCount 1 ] ." };
+        // 真实保存后才能评估准确修订，语法与完整源均由服务器确认。
+        var draft = await service.CreateAsync(actor, Request() with { Sources = sources }, default);
+        // Jena在合并图实际产生focus定位，旧Issue合同仍标synthetic-data。
+        var assessment = await service.AssessAsync(actor, draft.DraftId, new ValidateDraftRequest { Revision = 1, Hashes = draft.Hashes, Command = Command(1) }, default);
+        Assert.IsFalse(assessment.PublishEligible);
+        Assert.IsNotEmpty(assessment.Diagnostics);
+        Assert.IsTrue(assessment.Diagnostics.Any(item => item.Diagnostic.FocusNode?.Value == "urn:focus"));
+        Assert.IsTrue(assessment.Diagnostics.All(item => item.SourceId == "bundle" && item.SourceHash == draft.Hashes.BundleHash));
+        Assert.IsTrue(assessment.Diagnostics.All(item => item.Line is null && item.Column is null));
+        // 不修改历史report的wire shape或虚构具体data来源。
+        var report = JsonSerializer.Deserialize<SemanticValidationReport>((await database.Validations.SingleAsync(row => row.ReportId == assessment.ValidationReportId)).ReportJson)!;
+        Assert.IsTrue(report.Issues.All(issue => issue.SourceId == "synthetic-data"));
+    }
+
+    /// <summary>支持策略诊断根据实际解析来源唯一匹配时保留准确单源hash。</summary>
+    [TestMethod]
+    [DataRow("ontology")]
+    [DataRow("vocabulary")]
+    [DataRow("data")]
+    public async Task G3SupportDiagnosticRetainsProvenSingleSourceHash(string sourceId)
+    {
+        // 当前真实PG、RIOT和审计边界。
+        await using var database = Database();
+        // 完整可信操作者。
+        var actor = Actor();
+        // 当前生产应用服务，诊断由实际源码生成。
+        var service = Service(database);
+        // 只有一个文档含未支持身份公理，服务器能够证明来源。
+        var sources = new SourceBundle { OntologyTurtle = sourceId == "ontology" ? "<urn:a> <http://www.w3.org/2002/07/owl#sameAs> <urn:b> ." : "", VocabularyTurtle = sourceId == "vocabulary" ? "<urn:a> <http://www.w3.org/2002/07/owl#sameAs> <urn:b> ." : null, DataTurtle = sourceId == "data" ? "<urn:a> <http://www.w3.org/2002/07/owl#sameAs> <urn:b> ." : "" };
+        // 源码保留不表示发布支持。
+        var draft = await service.CreateAsync(actor, Request() with { Sources = sources }, default);
+        // 支持阶段实际失败，SHACL明确未执行。
+        var assessment = await service.AssessAsync(actor, draft.DraftId, new ValidateDraftRequest { Revision = 1, Hashes = draft.Hashes, Command = Command(1) }, default);
+        Assert.IsFalse(assessment.PublishEligible);
+        // hash必须属于真实单一源，不因SHACL保守修复把支持诊断全部降成bundle。
+        var expectedHash = sourceId switch { "ontology" => draft.Hashes.OntologyHash, "vocabulary" => draft.Hashes.VocabularyHash, _ => draft.Hashes.DataHash };
+        Assert.IsNotEmpty(assessment.Diagnostics);
+        Assert.IsTrue(assessment.Diagnostics.All(item => item.SourceId == sourceId && item.SourceHash == expectedHash));
+        Assert.AreEqual(AssessmentStageStatus.NotSupported, assessment.Stages.Single(stage => stage.Name == "SUPPORT").Status);
+        Assert.AreEqual(AssessmentStageStatus.NotRun, assessment.Stages.Single(stage => stage.Name == "SHACL_CORE").Status);
+    }
+
     /// <summary>真实assessment与报告/幂等/审计原子关联，重放不刷新时间。</summary>
     [TestMethod]
     public async Task G3AssessmentPersistsReplaysAndReauthorizesWholeScope()

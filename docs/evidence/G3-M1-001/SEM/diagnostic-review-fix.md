@@ -1,0 +1,7 @@
+# 独立审查：SHACL合并图来源纠正
+
+旧SemanticValidationReport的synthetic-data表示ontology/vocabulary/data合并图，不能当作data源证明。真实PG/Jena负例最初ontology-only/vocabulary-only两例2/2失败；精确修复新assessment包装映射后2/2通过。
+
+扩展回归7/7通过：SHACL focus分别仅ontology、仅vocabulary、仅data、同focus跨三源歧义，均使用SourceId=bundle与BundleHash，Line/Column=null；不声称已有精确源行列。原report.Issues.SourceId仍synthetic-data，历史wire不改。另三例支持策略诊断可由实际解析唯一证明来源，仍分别使用ontology/vocabulary/data与对应准确单源hash。未把保守定位的SHACL升级成伪精确位置。
+
+变更只涉及OntologyAssessment.WrapDiagnostic与必要真实测试，不新增依赖或模型迁移。

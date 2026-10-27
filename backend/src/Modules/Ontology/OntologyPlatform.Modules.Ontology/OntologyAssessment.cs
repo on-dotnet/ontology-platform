@@ -92,8 +92,8 @@ public sealed partial class OntologyService
     /// <summary>将旧报告诊断包装成可精确核对来源hash的新合同。</summary>
     private static AssessmentDiagnostic WrapDiagnostic(ValidationIssue issue, SourceHashes hashes)
     {
-        // 只有真实报告标明的来源可使用单源hash，其余使用组合hash。
-        var source = issue.SourceId switch { "ontology" => "ontology", "shapes" => "shapes", "vocabulary" => "vocabulary", "data" or "synthetic-data" => "data", _ => "bundle" };
+        // 只有真实支持诊断证明的来源可使用单源hash；旧synthetic-data表示合并图，必须使用bundle，不能猜成data。
+        var source = issue.SourceId switch { "ontology" => "ontology", "shapes" => "shapes", "vocabulary" => "vocabulary", "data" => "data", "synthetic-data" => "bundle", _ => "bundle" };
         return new AssessmentDiagnostic { SourceId = source, SourceHash = source switch { "ontology" => hashes.OntologyHash, "shapes" => hashes.ShapesHash, "vocabulary" => hashes.VocabularyHash ?? hashes.BundleHash, "data" => hashes.DataHash, _ => hashes.BundleHash }, Diagnostic = new SemanticDiagnostic { Code = "validation_issue", Severity = issue.Severity, Message = issue.Message, FocusNode = issue.FocusNode, Path = issue.Path }, Line = null, Column = null };
     }
 
