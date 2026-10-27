@@ -4,7 +4,7 @@
 
 ## 实现
 
-- 固定20行profile、四维精确状态、ASSERTED_ONLY、按声明顺序JSON且自身hash置空的SHA256。BASIC只指既有精确编辑；命名equivalent/disjoint/inverse只有SOURCE，不运行OWL推理。未知OWL/RDFS、复杂表达式、身份、imports、OWL-Time等保留原文并阻断发布；普通annotation须明确声明/登记，未声明literal关系不能猜作注释。Shapes继续独立合法property/list blank策略。
+- 固定20行profile、四维精确状态、ASSERTED_ONLY、按声明顺序JSON且自身hash置空的SHA256。BASIC只指既有精确编辑；命名equivalent/disjoint/inverse只有SOURCE，不运行OWL推理。未知OWL/RDFS、复杂表达式、身份、imports、OWL-Time等保留原文并阻断发布；普通annotation须明确声明/登记，未声明literal关系不能猜作注释。独立审查补核G2既有可选validToUtc来源元数据后仅补该词，真实V1原策略接受、新V2可发布且未知validUntilUtc仍阻断；不扩OWL-Time/M4。Shapes继续独立合法property/list blank策略。
 - 新IG3OntologyService与IG3SemanticRuntime；真实RIOT/SHACL生成assessment，报告/assessment/幂等回执/审计同PG物理事务，Validate保持原响应并生成关联评估。同命令重放不刷新时间。新发布创建、审核、准备、最终激活再次锁读并核验准确revision/四源hash/当前profile/24h有效期/自身散列/eligible。
 - auditor在IDraftPublicationReader只有完整scope的只读核验权，写操作仍需operator。审核与激活统一draft→proposal锁顺序；旧Release回滚不锁当前草稿。
 - 四源原字节/hash与旧修订保留；比较采用真实RIOT、集合去重、分区细化、空白双射搜索及最终全集核验。左右bundle各总5000条、每源256KiB/合计1MiB、每源两图各128 blank、四源共享5s与100000搜索节点。任何总预算/取消撤回四个结果为INDETERMINATE，非法Turtle仍422。G2生产预算未放宽。
@@ -15,13 +15,13 @@
 |项目|实际结果|证据|
 |---|---|---|
 |最终已提交诊断修复Head的SemanticTests|96/96 PASS，0跳过；暂存图0残留|g3-sem-final-head-run.txt|
-|PublishingTests真实PG/Jena/RustFS|53/53 PASS，0跳过|g3-sem-stack-complete-run.txt|
+|PublishingTests真实PG/Jena/RustFS|55/55 PASS，0跳过；含既有validToUtc兼容正反|g3-sem-metadata-green.txt|
 |QueryTests真实发布/授权/查询/同批读取|49/49 PASS，0跳过|g3-sem-query-final-run.txt|
 |AgentTests原Run/SSE/deterministic兼容|33/33 PASS，0跳过；不代表真实LLM|g3-sem-query-agent-run.txt|
 |verify.ps1 -SelfTest|最终exit0，含构包54/54及维护正反例；原生/浏览器项明确NOT_RUN|g3-sem-selftest-final-head.txt|
 |全部owned改动C#按所属项目dotnet format|6项目全部exit0|format-final-head.json|
 
-以上为231项模块用例的最新真实覆盖；Publishing/Query/Agent成功早于随后仅诊断映射与import格式修复，未冒充最终整合Head的全栈CI。SEM96在已提交fad4387修复上运行；4ef97f2只有Publishing测试import顺序。原始执行脚本已按实际运行内容存executed-harnesses，均输出到本任务/private/tmp，从未执行硬编码旧G2证据目录runner。Master仍须对最终整合Head执行组合验收和CI。
+以上为233项模块用例的最新真实覆盖；Publishing55已在validToUtc精确兼容修复后完整运行，Query/Agent成功早于随后诊断映射、validToUtc兼容与import格式修复；未冒充最终整合Head的全栈CI。SEM96在已提交fad4387修复上运行；4ef97f2只有Publishing测试import顺序。原始执行脚本已按实际运行内容存executed-harnesses，均输出到本任务/private/tmp，从未执行硬编码旧G2证据目录runner。Master仍须对最终整合Head执行组合验收和CI。
 
 红绿证据保留：新增生产边界/profile初始失败、20语料09初始失败、Binding遗漏assessment初始失败、未声明annotation初始失败。真实迁移Down曾先删assessment表后被旧保护拒绝；Master改为forward-only后重新fresh库通过，旧Initial-only独立库仍精确验证55P03/P0001。ontology.assess审计登记缺失、签名时钟夹具误偏移、旧未声明注释fixture等真实失败和修正均保留，不重写为成功。
 
@@ -39,6 +39,6 @@ Master已生成f1cd505并以b48a68a修复forward-only Down；新表和原报告�
 
 ## 资源与未决项
 
-精确回收本SEM创建的27个临时容器，逐一container inspect确认无记录；未删镜像、卷、历史refs/旧树或私有runtime。唯一保留Jena匹配本任务fixture挂载后按不可变ID删除；公开fixture目录与最后SelfTest完成后的/tmp隔离PyYAML/toolbin已真实删除。命令、退出码、容量与after见resource-lifecycle.json。分支、Worktree及构建缓存为活跃待审成果保留，避免清理未整合代码；实际V1/V2公开合成manifest字节已归档compatibility-fixtures供独立reader复查。
+精确回收本SEM创建的33个临时容器，逐一container inspect确认无记录；未删镜像、卷、历史refs/旧树或私有runtime。唯一保留Jena匹配本任务fixture挂载后按不可变ID删除；公开fixture目录与最后SelfTest完成后的/tmp隔离PyYAML/toolbin已真实删除。命令、退出码、容量与after见resource-lifecycle.json。分支、Worktree及构建缓存为活跃待审成果保留，避免清理未整合代码；实际V1/V2公开合成manifest字节已归档compatibility-fixtures供独立reader复查。
 
 独立Astra最终结论、Master HTTP/OpenAPI/Web组合验收、最终同Head CI与唯一V2 Review ZIP仍由Master记录；本报告不代替其PASS。最终提交/推送本证据后等待当前关口复审，不自动进入下阶段。

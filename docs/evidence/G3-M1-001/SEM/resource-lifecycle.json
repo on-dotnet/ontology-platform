@@ -1,7 +1,7 @@
 {
   "task": "G3-M1-SEM",
   "scope": "only exact disposable containers created by these test invocations; no images or volumes removed",
-  "createdContainerCount": 27,
+  "createdContainerCount": 33,
   "afterContainerCount": 0,
   "fixtures": [
     {
@@ -701,6 +701,168 @@
         "postgres:18.6-trixie@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6"
       ],
       "createExitCode": 0
+    },
+    {
+      "evidence": "valid-to-red.json",
+      "name": "g3-m1-sem-metadata-c0e8558bdf2c-pg",
+      "createCommand": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g3-m1-sem-metadata-c0e8558bdf2c-pg",
+        "--memory",
+        "256m",
+        "--cpus",
+        "1",
+        "--publish",
+        "127.0.0.1::5432",
+        "--env",
+        "POSTGRES_PASSWORD",
+        "--env",
+        "POSTGRES_DB",
+        "--tmpfs",
+        "/var/lib/postgresql",
+        "postgres:18.6-trixie@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6"
+      ],
+      "createExitCode": 0
+    },
+    {
+      "evidence": "valid-to-red.json",
+      "name": "g3-m1-sem-metadata-c0e8558bdf2c-s3",
+      "createCommand": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g3-m1-sem-metadata-c0e8558bdf2c-s3",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--publish",
+        "127.0.0.1::9000",
+        "--env",
+        "RUSTFS_ACCESS_KEY",
+        "--env",
+        "RUSTFS_SECRET_KEY",
+        "--env",
+        "RUSTFS_CONSOLE_ENABLE=false",
+        "--tmpfs",
+        "/data:mode=1777",
+        "rustfs/rustfs:1.0.3@sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+        "/data"
+      ],
+      "createExitCode": 0
+    },
+    {
+      "evidence": "valid-to-red.json",
+      "name": "g3-m1-sem-metadata-c0e8558bdf2c-jena",
+      "createCommand": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g3-m1-sem-metadata-c0e8558bdf2c-jena",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--publish",
+        "127.0.0.1::3030",
+        "--mount",
+        "type=bind,src=/private/tmp/g3-m1-sem-metadata-c0e8558bdf2cs6jf0fsb/fixture,dst=/fixture,readonly",
+        "--entrypoint",
+        "java",
+        "ontology-platform-g2-fuseki:6.2.0",
+        "-Xmx384m",
+        "-Dlog4j.configurationFile=/fixture/log4j2.properties",
+        "-jar",
+        "/opt/fuseki/fuseki-server.jar",
+        "--config=/fixture/config.ttl"
+      ],
+      "createExitCode": 0
+    },
+    {
+      "evidence": "valid-to-publishing-green.json",
+      "name": "g3-m1-sem-metadata-09dfecc6f3e4-pg",
+      "createCommand": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g3-m1-sem-metadata-09dfecc6f3e4-pg",
+        "--memory",
+        "256m",
+        "--cpus",
+        "1",
+        "--publish",
+        "127.0.0.1::5432",
+        "--env",
+        "POSTGRES_PASSWORD",
+        "--env",
+        "POSTGRES_DB",
+        "--tmpfs",
+        "/var/lib/postgresql",
+        "postgres:18.6-trixie@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6"
+      ],
+      "createExitCode": 0
+    },
+    {
+      "evidence": "valid-to-publishing-green.json",
+      "name": "g3-m1-sem-metadata-09dfecc6f3e4-s3",
+      "createCommand": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g3-m1-sem-metadata-09dfecc6f3e4-s3",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--publish",
+        "127.0.0.1::9000",
+        "--env",
+        "RUSTFS_ACCESS_KEY",
+        "--env",
+        "RUSTFS_SECRET_KEY",
+        "--env",
+        "RUSTFS_CONSOLE_ENABLE=false",
+        "--tmpfs",
+        "/data:mode=1777",
+        "rustfs/rustfs:1.0.3@sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+        "/data"
+      ],
+      "createExitCode": 0
+    },
+    {
+      "evidence": "valid-to-publishing-green.json",
+      "name": "g3-m1-sem-metadata-09dfecc6f3e4-jena",
+      "createCommand": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g3-m1-sem-metadata-09dfecc6f3e4-jena",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--publish",
+        "127.0.0.1::3030",
+        "--mount",
+        "type=bind,src=/private/tmp/g3-m1-sem-metadata-09dfecc6f3e40bsk0za3/fixture,dst=/fixture,readonly",
+        "--entrypoint",
+        "java",
+        "ontology-platform-g2-fuseki:6.2.0",
+        "-Xmx384m",
+        "-Dlog4j.configurationFile=/fixture/log4j2.properties",
+        "-jar",
+        "/opt/fuseki/fuseki-server.jar",
+        "--config=/fixture/config.ttl"
+      ],
+      "createExitCode": 0
     }
   ],
   "commands": [
@@ -993,6 +1155,66 @@
       "beforeBytes": 970,
       "exitCode": 0,
       "afterExists": false
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g3-m1-sem-metadata-c0e8558bdf2c-jena"
+      ],
+      "exitCode": 0,
+      "origin": "metadata-fixture-finally"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g3-m1-sem-metadata-c0e8558bdf2c-s3"
+      ],
+      "exitCode": 0,
+      "origin": "metadata-fixture-finally"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g3-m1-sem-metadata-c0e8558bdf2c-pg"
+      ],
+      "exitCode": 0,
+      "origin": "metadata-fixture-finally"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g3-m1-sem-metadata-09dfecc6f3e4-jena"
+      ],
+      "exitCode": 0,
+      "origin": "metadata-fixture-finally"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g3-m1-sem-metadata-09dfecc6f3e4-s3"
+      ],
+      "exitCode": 0,
+      "origin": "metadata-fixture-finally"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g3-m1-sem-metadata-09dfecc6f3e4-pg"
+      ],
+      "exitCode": 0,
+      "origin": "metadata-fixture-finally"
     }
   ],
   "after": [
@@ -1343,6 +1565,84 @@
         "--format",
         "{{.Id}}",
         "g3-m1-sem-stack-bee95a5c569b-s3"
+      ],
+      "exitCode": 1,
+      "absent": true
+    },
+    {
+      "name": "g3-m1-sem-metadata-09dfecc6f3e4-jena",
+      "command": [
+        "docker",
+        "container",
+        "inspect",
+        "--format",
+        "{{.Id}}",
+        "g3-m1-sem-metadata-09dfecc6f3e4-jena"
+      ],
+      "exitCode": 1,
+      "absent": true
+    },
+    {
+      "name": "g3-m1-sem-metadata-09dfecc6f3e4-pg",
+      "command": [
+        "docker",
+        "container",
+        "inspect",
+        "--format",
+        "{{.Id}}",
+        "g3-m1-sem-metadata-09dfecc6f3e4-pg"
+      ],
+      "exitCode": 1,
+      "absent": true
+    },
+    {
+      "name": "g3-m1-sem-metadata-09dfecc6f3e4-s3",
+      "command": [
+        "docker",
+        "container",
+        "inspect",
+        "--format",
+        "{{.Id}}",
+        "g3-m1-sem-metadata-09dfecc6f3e4-s3"
+      ],
+      "exitCode": 1,
+      "absent": true
+    },
+    {
+      "name": "g3-m1-sem-metadata-c0e8558bdf2c-jena",
+      "command": [
+        "docker",
+        "container",
+        "inspect",
+        "--format",
+        "{{.Id}}",
+        "g3-m1-sem-metadata-c0e8558bdf2c-jena"
+      ],
+      "exitCode": 1,
+      "absent": true
+    },
+    {
+      "name": "g3-m1-sem-metadata-c0e8558bdf2c-pg",
+      "command": [
+        "docker",
+        "container",
+        "inspect",
+        "--format",
+        "{{.Id}}",
+        "g3-m1-sem-metadata-c0e8558bdf2c-pg"
+      ],
+      "exitCode": 1,
+      "absent": true
+    },
+    {
+      "name": "g3-m1-sem-metadata-c0e8558bdf2c-s3",
+      "command": [
+        "docker",
+        "container",
+        "inspect",
+        "--format",
+        "{{.Id}}",
+        "g3-m1-sem-metadata-c0e8558bdf2c-s3"
       ],
       "exitCode": 1,
       "absent": true
