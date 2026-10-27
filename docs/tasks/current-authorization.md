@@ -1,3 +1,9 @@
+# G3-M2-001 当前授权增量（2026-10-27）
+
+状态：IN_PROGRESS。人类在本会话正式授权附件全部M2任务，并指定Master、共享合同冻结后独立Worktree前后端并行、早集成/早构包、真实分层测试/同HeadCI/V3唯一包/资源生命周期。Base fetch实测f0712e9174d1bff82b5f6959e0a61e723585be88。仅M2，不启动M3–M5。任务见[G3-M2-001](G3-M2-001.md)，授权原文见[附件V1](../evidence/G3-M2-001/authorization-v1.md)，当前合同见[G3-M2](../contracts/g3-m2-contracts.md)。Master托管树g3-m2-master，独立Reviewer通过后才SEM/WEB并行；不新增直接依赖、不收费调用、不绕过Monaco、不清旧G2资源。以下历史授权事实保留。
+
+---
+
 # G3-M1-CLOSEOUT-002 当前授权增量（2026-10-27）
 
 状态：READY_FOR_REVIEW / PARTIAL（最终同HeadCI/唯一V3包须以提交后实际回执核对）。人类正式授权[附件V1](../evidence/G3-M1-CLOSEOUT-002/authorization-v1.md)全部任务；最新明确授权覆盖旧M1禁止处理旧G2卷/history/image的范围限制，但保留历史事实。Base=47935fb2eda3d708e628a1b23ccd897e2250ff33，开工fetch核实。Master独立托管Worktree，两个worker独立树；公共合同/规则/CI单写，非作者独立审查。

@@ -3605,6 +3605,17 @@
               }
             ],
             "description": "无法可靠定位时为空。"
+          },
+          "sourceShape": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RdfTerm"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "真实SHACL来源Shape；旧诊断缺席时保持原序列化字节，不伪造定位。"
           }
         },
         "additionalProperties": false,

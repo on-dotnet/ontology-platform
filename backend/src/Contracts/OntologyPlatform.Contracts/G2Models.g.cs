@@ -2642,6 +2642,10 @@ public sealed record AssessmentDiagnostic : IJsonOnDeserialized, IJsonOnSerializ
     [JsonRequired]
     public int? Column { get; init; } = null;
 
+    /// <summary>真实SHACL来源Shape；旧诊断缺席时保持原序列化字节，不伪造定位。</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public RdfTerm? SourceShape { get; init; } = null;
+
     /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
     void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
 

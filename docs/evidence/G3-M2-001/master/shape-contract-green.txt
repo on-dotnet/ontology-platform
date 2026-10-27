@@ -1,0 +1,28 @@
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Debug/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64)
+失败 AssessmentShapeIsOptionalAndRoundtripsWithoutChangingLegacyBytes (12ms)
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Debug/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64)
+  Assertion failed. 预期字符串相等。
+  字符串长度不同(预期: 173，实际: 193)，且有 1 处不同。首次差异位于索引 111。
+
+  expected near: "...n_issue\",\"severity\":\"error\",\"message\":\"约束不符\",\"focusNode\":null,\"path\":null},\"lin..."
+  actual near:   "...n_issue\",\"severity\":\"error\",\"message\":\"\\u7EA6\\u675F\\u4E0D\\u7B26\",\"focusNode\":n..."
+  difference:    ---------------------------------------------------^
+  code points:   expected U+7EA6; actual U+005C
+
+  expected: "{\"sourceId\":\"shapes\",\"sourceHash\":\"hash\",\"diagnostic\":{\"code\":\"validation_issue\",\"severity\":\"error\",\"message\":\"约束不符\",\"focusNode\":null,\"path\":null},\"line\":null,\"column\":null}"
+  actual:   "{\"sourceId\":\"shapes\",\"sourceHash\":\"hash\",\"diagnostic\":{\"code\":\"validation_issue\",\"severity\":\"error\",\"message\":\"\\u7EA6\\u675F\\u4E0D\\u7B26\",\"focusNode\":null,\"path\":null},\"line\":null,\"column\":null}"
+
+  Assert.AreEqual(legacy, JsonSerializer.Serialize(JsonSerializer.Deserialize<AssessmentDiagnostic>(legacy, Options), Options))
+    在 OntologyPlatform.G2ContractTests.G3M2EditContractTests.AssessmentShapeIsOptionalAndRoundtripsWithoutChangingLegacyBytes() 位于 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/G3M2EditContractTests.cs:68
+    在 System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+    在 System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+/Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Debug/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64) 失败并出现 1 个错误 (3s 231ms)
+退出代码: 2
+
+测试运行摘要: 失败!
+  总计: 9
+  失败: 1
+  成功: 8
+  已跳过: 0
+  持续时间: 3s 418ms
+已完成测试运行，但显示非成功退出代码: 2 (请参阅: https://aka.ms/testingplatform/exitcodes)

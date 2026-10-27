@@ -16,7 +16,7 @@ export type ApprovalRequiredPayload = { "kind": "approval.required"; "approvalId
 
 export type ArtifactObject = { "objectKey": string; "hash": string; "sizeBytes": number; "contentType": string };
 
-export type AssessmentDiagnostic = { "sourceId": string; "sourceHash": string; "diagnostic": SemanticDiagnostic; "line": number | null; "column": number | null };
+export type AssessmentDiagnostic = { "sourceId": string; "sourceHash": string; "diagnostic": SemanticDiagnostic; "line": number | null; "column": number | null; "sourceShape"?: RdfTerm | null };
 
 export type AssessmentStage = { "name": string; "status": AssessmentStageStatus; "code": string };
 

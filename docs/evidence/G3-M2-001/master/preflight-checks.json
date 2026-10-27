@@ -1,0 +1,82 @@
+{
+  "observedAtUtc": "2026-10-27T14:12:04.711467+00:00",
+  "baseSha": "f0712e9174d1bff82b5f6959e0a61e723585be88",
+  "checks": [
+    {
+      "name": "doctor",
+      "command": "pwsh -NoProfile -File scripts/doctor.ps1 -CheckDocker",
+      "exitCode": 0,
+      "status": "PASS",
+      "output": "SDK10.0.402/Node24.22.1/pnpm11.28.8/Docker29.9.2"
+    },
+    {
+      "name": "Release build",
+      "command": "dotnet build backend/OntologyPlatform.slnx --configuration Release --no-restore",
+      "exitCode": 0,
+      "status": "PASS",
+      "output": "0 errors, 1 existing ASPIRE010 warning"
+    },
+    {
+      "name": "Web lint",
+      "command": "pnpm --dir apps/web lint",
+      "exitCode": 0,
+      "status": "PASS",
+      "output": "eslint exit0"
+    },
+    {
+      "name": "Web typecheck",
+      "command": "pnpm --dir apps/web typecheck",
+      "exitCode": 0,
+      "status": "PASS",
+      "output": "tsc exit0"
+    },
+    {
+      "name": "generated TS",
+      "command": "node apps/web/scripts/generate-types.mjs --check",
+      "exitCode": 0,
+      "status": "PASS",
+      "output": "no drift"
+    },
+    {
+      "name": "early V3 fixture",
+      "command": "pwsh -NoProfile -File scripts/tests/ReviewPackage.Tests.ps1 -CaseFilter 'V3 default*'",
+      "exitCode": 0,
+      "status": "PASS",
+      "output": "actual command CaseFilter=\"V3 default*\"; 1 real fixture,0 failures; includes create/independent reopen/legacy V2"
+    },
+    {
+      "name": "strict edit DTO",
+      "command": "dotnet test --project backend/tests/OntologyPlatform.G2ContractTests --filter FullyQualifiedName~G3M2EditContractTests",
+      "exitCode": 0,
+      "status": "PASS",
+      "output": "8 passed/0 skipped"
+    },
+    {
+      "name": "real HTTP edit preconditions",
+      "command": "dotnet test --project backend/tests/OntologyPlatform.SecurityTests --filter FullyQualifiedName~G3M2EndpointTests",
+      "exitCode": 0,
+      "status": "PASS",
+      "output": "5 passed/0 skipped"
+    },
+    {
+      "name": "SourceShape contract + unknown kind",
+      "command": "dotnet test --project backend/tests/OntologyPlatform.G2ContractTests --filter FullyQualifiedName~G3M2EditContractTests",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "11 passed/0 skipped; SourceShape RED exit2, initial fixture Unicode mismatch preserved, then GREEN"
+    },
+    {
+      "name": "HTTP edits + real Host OpenAPI export",
+      "command": "dotnet test --project backend/tests/OntologyPlatform.SecurityTests --filter FullyQualifiedName~G2OpenApiSchemaTests|FullyQualifiedName~G3M2EndpointTests",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "7 passed/0 skipped; actual export generated TS; node --check + Web typecheck exit0"
+    }
+  ],
+  "failuresPreserved": [
+    "live selftest output captured under scanned source path; moved live capture to ignored artifacts before rerun",
+    "Web frozen restore registry ECONNRESET/UND_ERR_SOCKET; same invocation completed after bounded package-manager retries"
+  ],
+  "selfTest": "PASS exit0; ReviewPackage96/0, cleanup44/0, and other suites in selftest-isolated.txt",
+  "activeHours": "UNKNOWN"
+}
