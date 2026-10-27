@@ -43,3 +43,5 @@ Master新增契约测试：G2ContractTests/G3M2EditContractTests.cs与SecurityTe
 ## Canonical 下载修订（M2 环境关口，FROZEN / 独立限定审查PASS）
 
 9bac/SEM/point1三个实际CI检查点在canonical RUN阶段超时600s，业务未启动，旧失败保留。Master新增owned_paths=infra/development/fuseki/Dockerfile、.dockerignore、fetch-fuseki.sh、scripts/tests/CanonicalFuseki.Tests.py、g2-integration与CI；其余Owner不写这些路径。版本6.2.0、SHA512、基础镜像摘要、许可证不变，无新直接依赖。官网https://jena.apache.org/download/与官方.sha512核对匹配原锁。唯一Dockerfile调用有界下载helper：固定dlcdn primary/archive fallback，每次connect15/max180/无retry/HTTPS/最多3重定向，下载成功后的坏SHA立即失败，不fallback；校验在tar前。canonical外层600不变，context hash自然变化，旧镜像不重标。CI冷构建前置于应用restore，集成处必须cache hit并输出实际image/context/reused receipt。真实Linux冷构建/同HeadCI仍待验证，不把本机HEAD/Range或shell fixture当Linux成功。
+
+后置实际核验：3d57255同Head CI40529681102与dfce2df同Head CI40537316476双job均success；实际Linux冷构建与后续cache hit已验，旧600s失败仍保留。完整Mac真实模块121/113/56/49/33均零失败/跳过；浏览器显式图/源码切换的旧验收假设已修，7runtime gates通过，未改变产品合同或超时预算。

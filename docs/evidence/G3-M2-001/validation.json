@@ -1,0 +1,82 @@
+{
+  "checks": [
+    {
+      "name": "preflight",
+      "command": "pwsh -NoProfile -File scripts/doctor.ps1 -CheckDocker",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "实际SDK/Node/pnpm/Docker入口已核验，见master/preflight-checks.json"
+    },
+    {
+      "name": "early-v3-production-prepackage",
+      "command": "pwsh -NoProfile -File scripts/create-review-package.ps1 -BaseSha f0712e9174d1bff82b5f6959e0a61e723585be88 -HeadSha 3d57255eb617bbd35b4472de767dc5226cf17c49 -TaskId G3-M2-001 -Status PARTIAL -CiRunId 40529681102 -CiRunUrl https://github.com/on-dotnet/ontology-platform/actions/runs/40529681102 -CiCommit 3d57255eb617bbd35b4472de767dc5226cf17c49 -CiConclusion success",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "648成员、1945551B，独立VerifyOnly exit0；此项仅非最终构包预检，不代替业务门禁"
+    },
+    {
+      "name": "real-security-and-modules",
+      "command": "python3 scripts/acceptance/test-governance.py; pwsh -NoProfile -File scripts/acceptance/g2-integration.ps1",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "pipeline-90fbe65088824476984352c4029dabfa real-governance/real-modules PASS：121 security,113 semantic,56 publishing,49 query,33 agent；0fail/skip；原完整pipeline runtime失败未改写"
+    },
+    {
+      "name": "repaired-seven-runtime-gates",
+      "command": "PLATFORM_TASK_ID=G3-M2-001 PLATFORM_EVIDENCE_DIR=docs/evidence/G3-M2-001/runtime/runtime-repair python3 scripts/acceptance/g3-acceptance-runtime.py --milestone M2 --runtime-file .tools/security/g3-m2-8fb61910c7c7/runtime.json --start-runtime",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "实际wrapper先g3-compatibility --freeze设置固定reader hash；0606969a13af45c799805e952434d654七关均exit0，browser263/M2 91 PASS，owned launcher stopped/exit0；未重跑无关模块，旧Timeout记录保留"
+    },
+    {
+      "name": "actual-resource-closeout",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "待运行结束、已提交CLOSED证明/白名单/独立Review/同HeadCI后真实Apply"
+    },
+    {
+      "name": "Monaco",
+      "command": null,
+      "status": "BLOCKED",
+      "exitCode": null,
+      "output": "PAUSED_BY_USER，保留textarea后备，未绕过"
+    },
+    {
+      "name": "real-LLM",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "无付费模型调用；deterministic harness不能认证真实模型"
+    },
+    {
+      "name": "full-OWL-reasoning",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "ASSERTED_ONLY；SHACL conforms不等于OWL一致性"
+    },
+    {
+      "name": "Windows-Intel-native",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "本轮仅macOS arm64和Linux CI"
+    },
+    {
+      "name": "production-HA-SLO",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "本地有限观测不构成生产SLO/HA认证"
+    }
+  ],
+  "ci": {
+    "status": "NOT_VERIFIED",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  },
+  "note": "同HeadCI在最终构包时由V3实际GitHub查询覆盖规范化ci；提交文件不预知自身SHA或未来结果。"
+}

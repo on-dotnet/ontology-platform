@@ -1,0 +1,83 @@
+{
+  "status": "PASS",
+  "phase": "real_api_edit_assessment",
+  "startedAtUtc": "2026-10-27T15:25:51.939Z",
+  "completedAtUtc": "2026-10-27T15:25:52.390Z",
+  "checks": [
+    {
+      "name": "current_profile_v2",
+      "status": "PASS"
+    },
+    {
+      "name": "http_1",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "http_2",
+      "status": "PASS",
+      "observedStatus": 428
+    },
+    {
+      "name": "http_3",
+      "status": "PASS",
+      "observedStatus": 409
+    },
+    {
+      "name": "http_4",
+      "status": "PASS",
+      "observedStatus": 400
+    },
+    {
+      "name": "http_5",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "http_6",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "rejections_preserve_revision_hash",
+      "status": "PASS"
+    },
+    {
+      "name": "http_8",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "api_named_edit_persisted",
+      "status": "PASS"
+    },
+    {
+      "name": "api_other_sources_exact",
+      "status": "PASS"
+    },
+    {
+      "name": "http_11",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "api_real_assessment_current_bound",
+      "status": "PASS"
+    },
+    {
+      "name": "api_real_pg_revision_read",
+      "status": "PASS"
+    }
+  ],
+  "sourceHead": "3d57255eb617bbd35b4472de767dc5226cf17c49",
+  "scope": "API_ONLY: real OIDC/API/PG/Jena exact edit and assessment",
+  "notRun": [
+    "UI editing/layout/keyboard",
+    "publication/formal query/rollback",
+    "compatibility and other six runtime gates",
+    "real LLM",
+    "full OWL reasoning",
+    "Windows/Intel native",
+    "production HA/SLO"
+  ]
+}

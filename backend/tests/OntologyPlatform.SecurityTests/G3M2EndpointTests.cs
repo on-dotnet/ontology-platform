@@ -26,10 +26,12 @@ public sealed class G3M2EndpointTests
     [DataRow("platform.viewer", 403)]
     public async Task EditAuthorizesBeforeMalformedBody(string? role, int status)
     {
+        // 启动可信角色对应的正式路由宿主，验证绑定正文前先拒绝越权。
         await using var app = Host(role);
         await app.StartAsync();
         // 使用实际随机端口，既不模拟HTTP响应也不提供业务成功替身。
         using var client = new HttpClient { BaseAddress = new Uri(app.Urls.Single()) };
+        // 保留畸形请求的实际HTTP响应，以断言权限门禁优先于JSON解析。
         using var response = await client.PostAsync("/api/v1/ontology-drafts/m2/edits", new StringContent("{", Encoding.UTF8, "application/json"));
         Assert.AreEqual(status, (int)response.StatusCode);
     }
@@ -43,6 +45,7 @@ public sealed class G3M2EndpointTests
     [DataRow("\"1\"", 409)]
     public async Task EditRequiresStrongMatchingRevision(string? etag, int status)
     {
+        // 启动操作员正式路由宿主，使请求继续到修订头前置检查。
         await using var app = Host("platform.operator");
         await app.StartAsync();
         // 原生Cookie仅保留在当前HttpClient内存，不写证据或源码。
@@ -52,6 +55,7 @@ public sealed class G3M2EndpointTests
         client.DefaultRequestHeaders.Add("X-CSRF-TOKEN", token);
         client.DefaultRequestHeaders.Add("Origin", "http://platform.test");
         if (etag is not null) client.DefaultRequestHeaders.TryAddWithoutValidation("If-Match", etag);
+        // 读取真实CSRF校验后的HTTP响应，核对强修订头的失败关闭状态。
         using var response = await client.PostAsJsonAsync("/api/v1/ontology-drafts/m2/edits", new EditDraftRequest
         {
             Edit = new SemanticEdit { SubjectIri = "urn:m2:C", PredicateIri = "http://www.w3.org/2000/01/rdf-schema#label", NewObject = new RdfTerm { Kind = RdfTermKind.Literal, Value = "设备" } },

@@ -116,7 +116,12 @@ try {
   check('ui_four_real_file_import_create', uiCreatedResponse.status() === 200, uiCreatedResponse.status());
   const uiCreated = await uiCreatedResponse.json();
   check('ui_full_scope_and_source_exact', JSON.stringify(uiCreated.sources) === JSON.stringify(sources) && JSON.stringify(uiCreated.scope.siteIds) === JSON.stringify(['site-a','site-b']));
+  // M2中间区域显式切换图/源码；先验证图可见，再回源码继续原有CAS和导出断言。
+  await page.getByRole('button', { name: '图视图', exact: true }).click();
   await page.getByRole('heading', { name: 'RDF 结构投影', exact: true }).waitFor();
+  await page.locator('.g2-graph canvas').first().waitFor();
+  check('ui_explicit_graph_view_visible', await page.locator('.g2-graph canvas').first().isVisible());
+  await page.getByRole('button', { name: '源码视图', exact: true }).click();
   phase = 'real_ui_structural_edit';
   await page.getByRole('combobox', { name: '结构操作', exact: true }).selectOption('add');
   const addedIri = 'urn:synthetic:live:Class:' + randomUUID();

@@ -1,0 +1,40 @@
+{
+  "observedAtUtc": "2026-10-27T16:20:51.117849+00:00",
+  "taskId": "G3-M2-001",
+  "runId": "cleanup-fixture-4f0eb45b63",
+  "fixture": "g3-m2-cleanup-fixture-4f0eb45b63-postgres-data",
+  "command": [
+    "docker",
+    "--context",
+    "desktop-linux",
+    "volume",
+    "create",
+    "--label",
+    "io.ontology-platform.project=on-dotnet/ontology-platform",
+    "--label",
+    "io.ontology-platform.task-id=G3-M2-001",
+    "--label",
+    "io.ontology-platform.run-id=cleanup-fixture-4f0eb45b63",
+    "--label",
+    "io.ontology-platform.service=postgres",
+    "g3-m2-cleanup-fixture-4f0eb45b63-postgres-data"
+  ],
+  "exitCode": 0,
+  "dockerBackend": {
+    "context": "desktop-linux",
+    "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016",
+    "serverVersion": "29.9.2"
+  },
+  "volume": {
+    "Name": "g3-m2-cleanup-fixture-4f0eb45b63-postgres-data",
+    "Driver": "local",
+    "CreatedAt": "2026-10-27T16:20:51Z",
+    "Labels": {
+      "io.ontology-platform.project": "on-dotnet/ontology-platform",
+      "io.ontology-platform.run-id": "cleanup-fixture-4f0eb45b63",
+      "io.ontology-platform.service": "postgres",
+      "io.ontology-platform.task-id": "G3-M2-001"
+    }
+  },
+  "scope": "real isolated empty Docker volume; no data read/written; guarded exact Apply fixture before own eight project volumes"
+}

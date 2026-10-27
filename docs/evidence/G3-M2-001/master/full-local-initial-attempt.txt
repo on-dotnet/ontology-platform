@@ -1,0 +1,1653 @@
+
+Check             Status Message
+-----             ------ -------
+repository-static PASS   检查2483个文件：语法/格式/相对链接/有限机密模式/基线…
+
+PASS: clean baseline accepted
+PASS: wrong package name rejected
+PASS: broken relative link rejected
+PASS: synthetic token rejected without printing value
+PASS: synthetic token in TypeScript rejected
+PASS: credential assignment in dot-env rejected
+PASS: unpinned action rejected
+
+Check             Status Message
+-----             ------ -------
+repository-static PASS   检查2480个文件：语法/格式/相对链接/有限机密模式/基线…
+
+NOT_RUN: .NET test：须显式追加-RunTests执行已批准测试项目。
+NOT_RUN: Web独立检查需真实目标及显式-RunNative。
+NOT_RUN: Web检查被显式-SkipWeb跳过，仅用于隔离工程检查器fixture或独立验收。
+NOT_RUN: 浏览器真实OIDC/E2E需独立受控联调，不隐式混入工程检查。
+PASS: 所选工程检查；范围以逐项输出为准，不表示业务、前端或整个G1通过。
+PASS: native commands resolve SDK and config from selected Root
+Checker tests: 8 passed; application tests: NOT_RUN.
+PASS: Doctor handles existing pnpm without Node as BLOCKED/2.
+PASS: Doctor discovers real macOS ARM64 Node from isolated path with spaces.
+PASS: YAML/TOML syntax, 1 files; runtime compatibility not implied.
+FAIL: structured syntax invalid.yml (ParserError)
+FAIL: structured syntax invalid.toml (TOMLDecodeError)
+PASS: structured parser 4 real positive/negative cases.
+
+Check             Status Message
+-----             ------ -------
+repository-static PASS   检查2483个文件：语法/格式/相对链接/有限机密模式/基线…
+
+PASS: verification preserves unset environment state for five process variables.
+
+Check             Status Message
+-----             ------ -------
+repository-static PASS   检查2483个文件：语法/格式/相对链接/有限机密模式/基线…
+
+PASS: verification preserves empty environment state for five process variables.
+
+Check             Status Message
+-----             ------ -------
+repository-static PASS   检查2483个文件：语法/格式/相对链接/有限机密模式/基线…
+
+PASS: verification preserves value environment state for five process variables.
+Environment regression: 3 state groups and structured-suite cleanup passed; native calls are synthetic, product tests NOT_RUN.
+PASS: toolchain archives accept two exact digests and reject two tampered byte cases.
+test_apply_requires_new_log (__main__.CleanupTests.test_apply_requires_new_log) ... ok
+test_archived_small_file_requires_exact_committed_bytes (__main__.CleanupTests.test_archived_small_file_requires_exact_committed_bytes) ... ok
+test_cache_current_protected_or_locked_tree_refuses_deletion (__main__.CleanupTests.test_cache_current_protected_or_locked_tree_refuses_deletion) ... ok
+test_cache_fingerprint_change_after_preflight_stops (__main__.CleanupTests.test_cache_fingerprint_change_after_preflight_stops) ... ok
+test_cache_nested_symlink_preserves_external_bytes (__main__.CleanupTests.test_cache_nested_symlink_preserves_external_bytes) ... ok
+test_cache_parent_symlink_refused (__main__.CleanupTests.test_cache_parent_symlink_refused) ... ok
+test_cache_rejects_private_parent_link_and_outside (__main__.CleanupTests.test_cache_rejects_private_parent_link_and_outside) ... ok
+test_cache_symlink_unlinks_never_follows (__main__.CleanupTests.test_cache_symlink_unlinks_never_follows) ... ok
+test_cache_then_worktree_deletes_only_exact_regenerable_cache (__main__.CleanupTests.test_cache_then_worktree_deletes_only_exact_regenerable_cache) ... ok
+test_closeout_exact_legacy_volume_apply_and_retained_resources (__main__.CleanupTests.test_closeout_exact_legacy_volume_apply_and_retained_resources) ... ok
+test_closeout_rejects_git_foreign_owner_and_foreign_volume (__main__.CleanupTests.test_closeout_rejects_git_foreign_owner_and_foreign_volume) ... ok
+test_dirty_locked_protected_worktrees_reject (__main__.CleanupTests.test_dirty_locked_protected_worktrees_reject) ... ok
+test_docker_after_reports_remaining_resource (__main__.CleanupTests.test_docker_after_reports_remaining_resource) ... ok
+test_docker_exact_whitelist_and_dryrun (__main__.CleanupTests.test_docker_exact_whitelist_and_dryrun) ... ok
+test_docker_history_project_boundary (__main__.CleanupTests.test_docker_history_project_boundary) ... ok
+test_docker_keep_replaced_name_and_active_refs_reject (__main__.CleanupTests.test_docker_keep_replaced_name_and_active_refs_reject) ... ok
+test_dryrun_has_zero_repository_byte_changes (__main__.CleanupTests.test_dryrun_has_zero_repository_byte_changes) ... ok
+test_effective_origin_rewrite_is_refused (__main__.CleanupTests.test_effective_origin_rewrite_is_refused) ... ok
+test_exact_public_pnpm_asset_allows_closed_cache_cleanup (__main__.CleanupTests.test_exact_public_pnpm_asset_allows_closed_cache_cleanup) ... ok
+test_expired_changed_tip_keep_duplicate_and_active_reject (__main__.CleanupTests.test_expired_changed_tip_keep_duplicate_and_active_reject) ... ok
+test_expired_plan_is_rechecked_after_preflight (__main__.CleanupTests.test_expired_plan_is_rechecked_after_preflight) ... ok
+test_history_absence_diagnostic_rejects_other_errors_and_wrong_ref (__main__.CleanupTests.test_history_absence_diagnostic_rejects_other_errors_and_wrong_ref) ... ok
+test_history_backend_generation_mismatch_refuses_before_delete (__main__.CleanupTests.test_history_backend_generation_mismatch_refuses_before_delete) ... ok
+test_history_dockerfile_accepts_only_two_exact_project_forms (__main__.CleanupTests.test_history_dockerfile_accepts_only_two_exact_project_forms) ... ok
+test_history_existing_pin_tombstone_fails_and_stops_later_operations (__main__.CleanupTests.test_history_existing_pin_tombstone_fails_and_stops_later_operations) ... ok
+test_history_offset_movement_or_range_error_refuses_before_delete (__main__.CleanupTests.test_history_offset_movement_or_range_error_refuses_before_delete) ... ok
+test_history_offset_prevents_zero_ref_tombstone_and_database_survives_restart (__main__.CleanupTests.test_history_offset_prevents_zero_ref_tombstone_and_database_survives_restart) ... ok
+test_history_rejects_foreign_running_changed_fingerprint (__main__.CleanupTests.test_history_rejects_foreign_running_changed_fingerprint) ... ok
+test_invalid_schema_repository_main_and_ttl_are_refused (__main__.CleanupTests.test_invalid_schema_repository_main_and_ttl_are_refused) ... ok
+test_local_and_remote_ancestor_delete_exactly (__main__.CleanupTests.test_local_and_remote_ancestor_delete_exactly) ... ok
+test_log_records_exact_nonzero_command_exit_and_stops (__main__.CleanupTests.test_log_records_exact_nonzero_command_exit_and_stops) ... ok
+test_m1_cannot_expand_to_m2_git_history_or_legacy_volumes (__main__.CleanupTests.test_m1_cannot_expand_to_m2_git_history_or_legacy_volumes) ... ok
+test_m1_only_own_volume_dryrun_and_exact_apply (__main__.CleanupTests.test_m1_only_own_volume_dryrun_and_exact_apply) ... ok
+test_m2_changed_context_engine_or_server_refuses_before_rm (__main__.CleanupTests.test_m2_changed_context_engine_or_server_refuses_before_rm) ... ok
+test_m2_only_same_task_exact_volume_apply_and_foreign_refusal (__main__.CleanupTests.test_m2_only_same_task_exact_volume_apply_and_foreign_refusal) ... ok
+test_malformed_history_after_is_logged_and_later_branch_kept (__main__.CleanupTests.test_malformed_history_after_is_logged_and_later_branch_kept) ... ok
+test_midrun_tip_change_refuses_before_delete (__main__.CleanupTests.test_midrun_tip_change_refuses_before_delete) ... ok
+test_nonancestor_fails_before_any_deletion (__main__.CleanupTests.test_nonancestor_fails_before_any_deletion) ... ok
+test_open_prs_prevent_all_mutations (__main__.CleanupTests.test_open_prs_prevent_all_mutations) ... ok
+test_origin_change_after_preflight_rejects_mutation (__main__.CleanupTests.test_origin_change_after_preflight_rejects_mutation) ... ok
+test_permission_or_cli_failure_is_closed (__main__.CleanupTests.test_permission_or_cli_failure_is_closed) ... ok
+test_private_ignored_data_blocks_worktree (__main__.CleanupTests.test_private_ignored_data_blocks_worktree) ... ok
+test_public_asset_exception_rejects_wrong_path_bytes_size_link_and_stale_fingerprint (__main__.CleanupTests.test_public_asset_exception_rejects_wrong_path_bytes_size_link_and_stale_fingerprint) ... ok
+test_registered_clean_worktree_removed_without_force (__main__.CleanupTests.test_registered_clean_worktree_removed_without_force) ... ok
+test_remote_delete_compare_and_delete_preserves_concurrent_tip (__main__.CleanupTests.test_remote_delete_compare_and_delete_preserves_concurrent_tip) ... ok
+test_worktree_keep_descendant_or_ancestor_refuses_removal (__main__.CleanupTests.test_worktree_keep_descendant_or_ancestor_refuses_removal) ... ok
+
+----------------------------------------------------------------------
+Ran 46 tests in 107.213s
+
+OK
+test_annotated_tag_message_is_scanned_without_values (__main__.PublicHistoryTests.test_annotated_tag_message_is_scanned_without_values) ... ok
+test_auxiliary_snapshot_commit_private_runtime_is_metadata_only (__main__.PublicHistoryTests.test_auxiliary_snapshot_commit_private_runtime_is_metadata_only) ... ok
+test_clean_full_history_and_ignored_credentials_are_not_read (__main__.PublicHistoryTests.test_clean_full_history_and_ignored_credentials_are_not_read) ... ok
+test_deleted_secret_and_task_branch_secret_are_detected_without_values (__main__.PublicHistoryTests.test_deleted_secret_and_task_branch_secret_are_detected_without_values) ... ok
+test_direct_blob_and_tree_refs_are_scanned_with_paths (__main__.PublicHistoryTests.test_direct_blob_and_tree_refs_are_scanned_with_paths) ... ok
+test_nested_annotated_tag_message_is_scanned (__main__.PublicHistoryTests.test_nested_annotated_tag_message_is_scanned) ... ok
+test_private_endpoint_is_review_candidate_not_confirmed_production (__main__.PublicHistoryTests.test_private_endpoint_is_review_candidate_not_confirmed_production) ... ok
+test_sensitive_path_is_reported_even_with_reused_normal_blob (__main__.PublicHistoryTests.test_sensitive_path_is_reported_even_with_reused_normal_blob) ... ok
+test_utf16_secret_is_detected_without_printing_value (__main__.PublicHistoryTests.test_utf16_secret_is_detected_without_printing_value) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 1.083s
+
+OK
+test_approved_closed_clean_tree_and_refs_are_candidates (__main__.InspectorTests.test_approved_closed_clean_tree_and_refs_are_candidates) ... ok
+test_current_tree_symlink_alias_is_protected (__main__.InspectorTests.test_current_tree_symlink_alias_is_protected) ... ok
+test_failed_ignored_listing_blocks_tree_and_refs (__main__.InspectorTests.test_failed_ignored_listing_blocks_tree_and_refs) ... ok
+test_keep_descendant_blocks_tree_and_refs (__main__.InspectorTests.test_keep_descendant_blocks_tree_and_refs) ... ok
+test_locked_tree_protection_propagates_to_refs (__main__.InspectorTests.test_locked_tree_protection_propagates_to_refs) ... ok
+test_private_cache_segments_block_tree_and_refs (__main__.InspectorTests.test_private_cache_segments_block_tree_and_refs) ... ok
+test_private_ignored_file_blocks_tree_and_refs (__main__.InspectorTests.test_private_ignored_file_blocks_tree_and_refs) ... ok
+test_protected_ancestor_propagates_to_tree_and_refs (__main__.InspectorTests.test_protected_ancestor_propagates_to_tree_and_refs) ... ok
+test_public_package_names_do_not_imply_private_data (__main__.InspectorTests.test_public_package_names_do_not_imply_private_data) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 9.119s
+
+OK
+test_current_task_output_does_not_touch_old_evidence (__main__.EvidenceBoundaryTests.test_current_task_output_does_not_touch_old_evidence) ... ok
+test_existing_symlink_escape_is_rejected (__main__.EvidenceBoundaryTests.test_existing_symlink_escape_is_rejected) ... ok
+test_outside_and_traversal_are_rejected_without_creation (__main__.EvidenceBoundaryTests.test_outside_and_traversal_are_rejected_without_creation) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.003s
+
+OK
+test_actual_process_start_failure_marks_current_failed_and_later_not_run (__main__.M1OrchestrationTests.test_actual_process_start_failure_marks_current_failed_and_later_not_run) ... ok
+test_all_real_gate_selections_include_m1_and_regressions (__main__.M1OrchestrationTests.test_all_real_gate_selections_include_m1_and_regressions) ... ok
+test_each_child_failure_stops_later_gates (__main__.M1OrchestrationTests.test_each_child_failure_stops_later_gates) ... ok
+test_failed_attempt_cannot_consume_or_certify_stale_pass (__main__.M1OrchestrationTests.test_failed_attempt_cannot_consume_or_certify_stale_pass) ... ok
+test_first_m2_integration_selects_real_api_only_without_claiming_full_gates (__main__.M1OrchestrationTests.test_first_m2_integration_selects_real_api_only_without_claiming_full_gates) ... ok
+test_m2_cannot_reuse_m1_runtime_or_enable_m3 (__main__.M1OrchestrationTests.test_m2_cannot_reuse_m1_runtime_or_enable_m3) ... usage: g3-acceptance-runtime.py [-h] [--runtime-file RUNTIME_FILE]
+                                [--start-runtime] [--milestone {M1,M2}]
+                                [--api-only] [--ui-only]
+g3-acceptance-runtime.py: error: Protected G2 or unrelated runtime refused
+usage: g3-acceptance-runtime.py [-h] [--runtime-file RUNTIME_FILE]
+                                [--start-runtime] [--milestone {M1,M2}]
+                                [--api-only] [--ui-only]
+g3-acceptance-runtime.py: error: argument --milestone: invalid choice: 'M3' (choose from 'M1', 'M2')
+ok
+test_m2_selects_its_own_runtime_evidence_and_authenticated_checks (__main__.M1OrchestrationTests.test_m2_selects_its_own_runtime_evidence_and_authenticated_checks) ... ok
+test_protected_g2_runtime_is_refused (__main__.M1OrchestrationTests.test_protected_g2_runtime_is_refused) ... usage: g3-acceptance-runtime.py [-h] [--runtime-file RUNTIME_FILE]
+                                [--start-runtime] [--milestone {M1,M2}]
+                                [--api-only] [--ui-only]
+g3-acceptance-runtime.py: error: Protected G2 or unrelated runtime refused
+ok
+test_second_m2_integration_selects_only_real_ui_checkpoint (__main__.M1OrchestrationTests.test_second_m2_integration_selects_only_real_ui_checkpoint) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.723s
+
+OK
+{"status": "FAIL", "runId": "dc6d6f7c83fd4118a729a98b280e69cb", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/dc6d6f7c83fd4118a729a98b280e69cb"}
+{"status": "PASS", "runId": "eff7fc6020f94cd8a3eb2ff82356f1c6", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/eff7fc6020f94cd8a3eb2ff82356f1c6"}
+{"status": "FAIL", "runId": "3fc21911cb4846df93545f99cabfcd50", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/3fc21911cb4846df93545f99cabfcd50"}
+{"status": "FAIL", "runId": "b65eb31115b34e9e99c9f9eeca2055f1", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/b65eb31115b34e9e99c9f9eeca2055f1"}
+{"status": "FAIL", "runId": "f8f08387991d4f779344a733499f183a", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/f8f08387991d4f779344a733499f183a"}
+{"status": "FAIL", "runId": "606fab54ca39491bae8a19337f59f5a9", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/606fab54ca39491bae8a19337f59f5a9"}
+{"status": "FAIL", "runId": "aa2376ff1b0f48339932e38332639f52", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/aa2376ff1b0f48339932e38332639f52"}
+{"status": "FAIL", "runId": "965d873f16a340079db13885483e0db7", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/965d873f16a340079db13885483e0db7"}
+{"status": "FAIL", "runId": "e4c2e8ad3c3845d69d04b75abd8b6add", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/e4c2e8ad3c3845d69d04b75abd8b6add"}
+{"status": "FAIL", "runId": "c2be21e5d272496aa7d9af1f44a3331b", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/c2be21e5d272496aa7d9af1f44a3331b"}
+{"status": "PASS", "runId": "8e0df60116184c07aeb126f5b262e600", "evidenceDirectory": "docs/evidence/G3-M2-001/runtime/g3-m2-control/8e0df60116184c07aeb126f5b262e600"}
+{"status": "PASS", "runId": "43378e34a7c9485e9e424f1c3110af18", "evidenceDirectory": "docs/evidence/G3-M2-001/runtime/g3-m2-control/43378e34a7c9485e9e424f1c3110af18"}
+{"status": "PASS", "runId": "7712e30c0de440af9aff4250401dbd7e", "evidenceDirectory": "docs/evidence/G3-M2-001/runtime/g3-m2-control/7712e30c0de440af9aff4250401dbd7e"}
+test_new_or_missing_binary_member_is_rejected (__main__.ReaderIdentityTests.test_new_or_missing_binary_member_is_rejected) ... ok
+test_parser_dependency_replacement_is_rejected (__main__.ReaderIdentityTests.test_parser_dependency_replacement_is_rejected) ... ok
+test_symlink_is_not_a_frozen_binary (__main__.ReaderIdentityTests.test_symlink_is_not_a_frozen_binary) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.005s
+
+OK
+....
+----------------------------------------------------------------------
+Ran 4 tests in 0.000s
+
+OK
+................
+----------------------------------------------------------------------
+Ran 16 tests in 1.824s
+
+OK
+test_existing_private_runtime_is_not_rewritten (__main__.LifecycleTests.test_existing_private_runtime_is_not_rewritten) ... ok
+test_foreign_double_label_response_is_rejected (__main__.LifecycleTests.test_foreign_double_label_response_is_rejected) ... ok
+test_linked_artifact_directory_refused (__main__.LifecycleTests.test_linked_artifact_directory_refused) ... ok
+test_m2_ownership_is_supported_but_future_milestones_refuse (__main__.LifecycleTests.test_m2_ownership_is_supported_but_future_milestones_refuse) ... ok
+test_mismatched_label_or_socket_never_claims_observed (__main__.LifecycleTests.test_mismatched_label_or_socket_never_claims_observed) ... ok
+test_real_prepare_persists_nonsecret_prepared_manifest (__main__.LifecycleTests.test_real_prepare_persists_nonsecret_prepared_manifest) ... ok
+test_run_passes_identity_and_records_exit_without_secrets (__main__.LifecycleTests.test_run_passes_identity_and_records_exit_without_secrets) ... ok
+test_snapshot_reads_only_double_label_containers_and_exact_volumes (__main__.LifecycleTests.test_snapshot_reads_only_double_label_containers_and_exact_volumes) ... ok
+test_unsafe_identity_refuses_before_persistence (__main__.LifecycleTests.test_unsafe_identity_refuses_before_persistence) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.006s
+
+OK
+PASS: validation metadata V1 raw bytes remain recoverable with normalized checks and ci
+PASS: validation metadata V1 cannot mask FAIL checks or allow overall PASS
+PASS: validation metadata V2 raw bytes remain recoverable with normalized checks and ci
+PASS: validation metadata V2 cannot mask FAIL checks or allow overall PASS
+PASS: validation metadata V3 raw bytes remain recoverable with normalized checks and ci
+PASS: validation metadata V3 cannot mask FAIL checks or allow overall PASS
+OBSERVED V3 fixture: 53PNG, 55256ignored; V3=2482864 V2=32803214 bytes
+PASS: V3 53 PNG and 55256 ignored paths compact fixture with recoverable index
+PASS: V3 refuses actual GitHub wrong-head
+PASS: V3 refuses actual GitHub missing-job
+PASS: V3 refuses actual GitHub failed-job
+PASS: V3 refuses Git input dirty
+PASS: V3 refuses Git input untracked
+PASS: V3 refuses Git input non-ancestor
+PASS: V3 refuses Git input case-collision
+PASS: V3 refuses Git input forbidden
+PASS: V3 refuses Git input secret
+PASS: V3 refuses Git input symlink
+PASS: V3 refuses Git input diff-check
+PASS: V3 reopen rejects missing-index
+PASS: V3 reopen rejects forged-index
+PASS: V3 reopen rejects forged-ci
+PASS: V3 reopen rejects hash
+PASS: V3 reopen rejects path-traversal
+PASS: V3 reopen rejects duplicate
+PASS: V3 reopen rejects case-member
+PASS: V3 reopen rejects symlink-member
+PASS: V3 reopen rejects forged-text-diff
+PASS: V3 ignored inventory rehashed forgery rejects count
+PASS: V3 ignored inventory rehashed forgery rejects size
+PASS: V3 ignored inventory rehashed forgery rejects unknown-count
+PASS: V3 ignored inventory rehashed forgery rejects duplicate-group
+PASS: V3 ignored inventory rehashed forgery rejects too-many-examples
+PASS: V3 ignored inventory rehashed forgery rejects scan-time
+PASS: V3 ignored inventory rehashed forgery rejects extra-field
+PASS: V3 ignored inventory rehashed forgery rejects wrong-type
+PASS: V3 screenshot selection refuses over-count
+PASS: V3 screenshot selection refuses duplicate-view
+PASS: V3 screenshot selection refuses over-png-budget
+PASS: V3 size over 15MiB refuses atomic publication and preserves previous valid package
+PASS: V3 size over 10MiB emits exact category report without weakening 15MiB gate
+PASS: V3 default with independently queried same Head CI and legacy V2 reopen
+PASS: compact explicit V2 with complete source and historical evidence index
+OBSERVED compactBytes=13176 legacyBytes=2517626
+PASS: V3 binary add modify delete rename and historical screenshot reduction
+OBSERVED compactBytes=12098 legacyBytes=2517607
+PASS: compact binary add modify delete rename and historical screenshot reduction
+PASS: compact text diff cannot be hidden by committed attributes
+PASS: compact duplicate payload maps to one physical member
+PASS: compact index tamper with rewritten checksum is rejected
+PASS: compact rejects CI success from different Head even with PARTIAL task
+PASS: compact rejects case-colliding committed paths
+PASS: compact safety dirty
+PASS: compact safety untracked
+PASS: compact safety forbidden
+PASS: compact safety removed-secret
+PASS: compact safety symlink
+PASS: compact safety path-traversal
+PASS: compact safety case-member
+PASS: compact safety duplicate-member
+PASS: compact safety linked-member
+PASS: compact safety hash-forgery
+PASS: compact committed validation kept once with runtime CI recorded separately
+PASS: resource inspector is read only and default Docker NOT_RUN
+PASS: committed snapshot, Unicode, full diff and reopened ZIP
+PASS: color.ui always cannot contaminate machine-readable patch
+PASS: PASS requires real command evidence
+PASS: non-ancestor commits
+PASS: dirty tracked delivery
+PASS: untracked delivery
+PASS: forbidden committed member .env
+PASS: forbidden committed member .env.production
+PASS: forbidden committed member .ssh/id
+PASS: forbidden committed member .codex/auth.json
+PASS: forbidden committed member auth/config.json
+PASS: forbidden committed member cert.pem
+PASS: forbidden committed member nested/bin/output
+PASS: forbidden committed member .tools/sdk/file
+PASS: forbidden committed member models/weights.dat
+PASS: forbidden committed member state.db
+PASS: forbidden committed member .cache/item
+PASS: forbidden committed member node_modules/item
+PASS: synthetic token in source
+PASS: removed synthetic token retained in patch
+PASS: reopened archive rejects injected or changed member .git/config
+PASS: reopened archive rejects injected or changed member .env
+PASS: reopened archive rejects injected or changed member ../escape.txt
+PASS: reopened archive rejects injected or changed member source/app.txt
+PASS: git archive export-ignore cannot omit committed source
+PASS: git archive export-subst cannot rewrite committed source
+PASS: git symlink blob cannot silently become source
+PASS: committed submodule cannot be omitted by git archive
+PASS: complete patch rejects removed forbidden environment member
+PASS: reopened archive rejects payload tamper even after checksum rewrite
+PASS: missing checksum/member is rejected on reopen
+PASS: CI PASS cannot be inferred without run metadata
+PASS: explicit CI metadata avoids self-referential commit evidence
+PASS: existing delivery ZIP is preserved
+PASS: valid committed evidence preserves command and status
+ReviewPackage: 96 tests, 0 failures; product/container tests NOT_RUN.
+NOT_RUN: .NET原生检查需显式-RunNative及对应任务授权。
+NOT_RUN: Web独立检查需真实目标及显式-RunNative。
+NOT_RUN: 浏览器真实OIDC/E2E需独立受控联调，不隐式混入工程检查。
+PASS: 所选工程检查；范围以逐项输出为准，不表示业务、前端或整个G1通过。
+  正在确定要还原的项目…
+  已还原 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/OntologyPlatform.Contracts.csproj (用时 39 毫秒)。
+  已还原 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/OntologyPlatform.Modules.Publishing.Domain.csproj (用时 41 毫秒)。
+  已还原 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/OntologyPlatform.Modules.Ontology.Domain.csproj (用时 29 毫秒)。
+  已还原 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/OntologyPlatform.Modules.SemanticQuery.csproj (用时 41 毫秒)。
+  已还原 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/ServiceDefaults/OntologyPlatform.ServiceDefaults.csproj (用时 5.06 秒)。
+  已还原 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/OntologyPlatform.G2ContractTests.csproj (用时 5.05 秒)。
+  已还原 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/OntologyPlatform.SecurityTests.csproj (用时 5.07 秒)。
+  已还原 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/OntologyPlatform.Api.csproj (用时 5.05 秒)。
+  已还原 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyPlatform.Modules.Ontology.csproj (用时 5.08 秒)。
+  已还原 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/OntologyPlatform.Modules.Governance.csproj (用时 5.06 秒)。
+  已还原 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/OntologyPlatform.Modules.Agents.csproj (用时 5.08 秒)。
+  已还原 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/OntologyPlatform.Modules.Publishing.csproj (用时 5.08 秒)。
+  7 个项目(共 19 个)是最新的，无法还原。
+Scope: all 2 workspace projects
+Already up to date
+Done in 148ms using pnpm v11.28.8
+$ eslint .
+$ tsc --noEmit
+$ vitest run
+
+ RUN  v5.0.5 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/apps/web
+
+
+ Test Files  13 passed (13)
+      Tests  139 passed (139)
+   Start at  00:09:49
+   Duration  548ms (tests 69%, import 16%, transform 12%, worker 3%)
+
+$ next build
+▲ Next.js 16.4.3 (Turbopack)
+✓ Running next.config.ts took 10ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 112ms
+  Running TypeScript ...
+  Finished TypeScript in 601ms ...
+  Collecting page data using 9 workers ...
+  Generating static pages using 9 workers (0/4) ...
+  Generating static pages using 9 workers (1/4)
+  Generating static pages using 9 workers (2/4)
+  Generating static pages using 9 workers (3/4)
+✓ Generating static pages using 9 workers (4/4) in 125ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ƒ /
+├ ○ /_not-found
+├ ƒ /analysis
+├ ○ /icon.svg
+├ ƒ /ontologies
+├ ƒ /releases
+└ ○ /signed-out
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
+PASS: exact Node/pnpm; separate Web lint/typecheck/test/build. Real OIDC/E2E is a separate acceptance.
+✔ real semantic_busy response waits and reissues only the read (270.14775ms)
+✔ semantic_busy exhaustion stays failed with five recorded attempts (3786.939208ms)
+✔ a write is never retried even with the same busy code (4.152166ms)
+✔ unknown 429 code is not retried or echoed (2.887708ms)
+✔ malformed 429 body is not retried (3.116791ms)
+✔ non-busy service failure is not retried (1.814125ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4115.241709
+
+Check             Status Message
+-----             ------ -------
+repository-static PASS   检查2493个文件：语法/格式/相对链接/有限机密模式/基线…
+
+/Users/chasen/.nuget/packages/aspire.hosting.apphost/13.6.3/build/Aspire.Hosting.AppHost.targets(157,5): warning ASPIRE010: OntologyPlatform.AppHost is configured with AspireUseCliBundle=false. Some Aspire features require the Aspire CLI bundle. Set AspireUseCliBundle=true to enable those features, or suppress ASPIRE010 to continue without the bundle. See https://aka.ms/aspire/diagnostics/aspire010 for more information. [/Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/AppHost/OntologyPlatform.AppHost.csproj]
+  OntologyPlatform.ServiceDefaults -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/ServiceDefaults/bin/Debug/net10.0/OntologyPlatform.ServiceDefaults.dll
+  OntologyPlatform.Contracts -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/bin/Debug/net10.0/OntologyPlatform.Contracts.dll
+  OntologyPlatform.Modules.Publishing.Domain -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/bin/Debug/net10.0/OntologyPlatform.Modules.Publishing.Domain.dll
+  OntologyPlatform.Modules.Ontology.Domain -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.Domain.dll
+  OntologyPlatform.Modules.Governance -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/bin/Debug/net10.0/OntologyPlatform.Modules.Governance.dll
+  OntologyPlatform.Modules.SemanticQuery -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/bin/Debug/net10.0/OntologyPlatform.Modules.SemanticQuery.dll
+  OntologyPlatform.Modules.Agents -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/bin/Debug/net10.0/OntologyPlatform.Modules.Agents.dll
+  OntologyPlatform.InfrastructureApi -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Hosts/OntologyPlatform.InfrastructureApi/bin/Debug/net10.0/OntologyPlatform.InfrastructureApi.dll
+  OntologyPlatform.G2ContractTests -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Debug/net10.0/OntologyPlatform.G2ContractTests.dll
+  OntologyPlatform.Modules.Publishing -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/bin/Debug/net10.0/OntologyPlatform.Modules.Publishing.dll
+  OntologyPlatform.InfrastructureTests -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/bin/Debug/net10.0/OntologyPlatform.InfrastructureTests.dll
+  OntologyPlatform.Modules.Ontology -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.dll
+  OntologyPlatform.PublishingTests -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll
+  OntologyPlatform.SemanticTests -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll
+  OntologyPlatform.Api -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/bin/Debug/net10.0/OntologyPlatform.Api.dll
+  OntologyPlatform.AppHost -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/AppHost/bin/Debug/net10.0/OntologyPlatform.AppHost.dll
+  OntologyPlatform.QueryTests -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll
+  OntologyPlatform.AgentTests -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll
+  OntologyPlatform.SecurityTests -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll
+
+已成功生成。
+
+/Users/chasen/.nuget/packages/aspire.hosting.apphost/13.6.3/build/Aspire.Hosting.AppHost.targets(157,5): warning ASPIRE010: OntologyPlatform.AppHost is configured with AspireUseCliBundle=false. Some Aspire features require the Aspire CLI bundle. Set AspireUseCliBundle=true to enable those features, or suppress ASPIRE010 to continue without the bundle. See https://aka.ms/aspire/diagnostics/aspire010 for more information. [/Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/AppHost/OntologyPlatform.AppHost.csproj]
+    1 个警告
+    0 个错误
+
+已用时间 00:00:03.55
+加载工作区时遇到警告。要记录警告，请将“详细级别”选项设置为“诊断”级别。
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Debug/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64)
+已跳过 CompatibilityBinaryReadsActualV2Manifest
+  Assert.Inconclusive。 真实主栈尚未导出V2清单；该项由g3-compatibility单独强制执行。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Debug/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64)
+/Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Debug/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64) 已通过 (2s 788ms)
+
+测试运行摘要: 已通过!
+  总计: 35
+  失败: 0
+  成功: 34
+  已跳过: 1
+  持续时间: 4s 002ms
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+已跳过 DescriptionUsesPublishedSchemaAndRegistry
+  Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+已跳过 FoundEvidenceSurvivesNewServiceInstance
+  Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+已跳过 AmbiguousIdentityIsNeverStringJoined
+  Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+已跳过 MissingEntityIsEmpty
+  Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+已跳过 TraversalPreservesManyToManyAndBudget
+  Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+已跳过 MissingProvenanceIsPartial
+  Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+已跳过 ExplicitOutOfScopeEntityIsUnauthorized
+  Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+已跳过 EvidenceIsReauthorizedAndIdsCannotChooseObjects
+  Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+已跳过 InvalidPlansAreRejected
+  Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+已跳过 AbsentReleaseAndRoleAreExplicitErrors
+  Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+已跳过 DependencyFailureAfterSnapshotIsUnavailableAndRecoverable
+  Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+已跳过 CorruptedSourceHashFailsQueryAndEvidence
+  Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+已跳过 ChangedOrMissingGraphIsUnavailable (False)
+  Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+已跳过 ChangedOrMissingGraphIsUnavailable (True)
+  Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+已跳过 CancellationAndBudgetReachDependency
+  Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+已跳过 ConcurrentActivationCannotChangeRequestSnapshot
+  Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+已跳过 QueryAndEvidenceCommitIndependentAudit
+  Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+已跳过 ReverseLineageUsesActualEdges
+  Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+已跳过 CrossSiteEdgesAndMissingRelationshipsDoNotInventFacts
+  Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+已跳过 DeclaredScopeIsAuthorizedBeforeExternalReads
+  Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+已跳过 DepthBudgetReportsIncompleteGraph
+  Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+已跳过 AuditFailureIsUnavailableAndRecovers
+  Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+已跳过 QueryRouteMatchesFrozenContract
+  Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+已跳过 QueryPostRequiresNativeCsrf (null)
+  Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+已跳过 QueryPostRequiresNativeCsrf ("synthetic-forged-csrf")
+  Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+已跳过 QueryPostRequiresExactOrigin ("https://external.invalid")
+  Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+已跳过 QueryPostRequiresExactOrigin ("http://platform.test/path")
+  Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+已跳过 QueryPostRequiresExactOrigin ("null")
+  Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+已跳过 AuthenticationAndAuthorizationPrecedeBodyBinding (null,401)
+  Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+已跳过 AuthenticationAndAuthorizationPrecedeBodyBinding ("unapproved-role",403)
+  Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+已跳过 QueryEndpointsDeclareAuthorizationAndProblems
+  Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+已跳过 ValidQueryPostReturnsRealPublishedResult
+  Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+已跳过 TimeoutMinimumMatchesFrozenContract (99,422)
+  Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+已跳过 TimeoutMinimumMatchesFrozenContract (100,404)
+  Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+已跳过 QueryRejectsGraphChangedAfterCatalogVerification
+  Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+已跳过 EvidenceRejectsGraphChangedAfterCatalogVerification
+  Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+已跳过 SuccessfulAuditCannotOutliveQueryBudget
+  Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+已跳过 FailureAuditIsBoundedAndNotHidden
+  Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+已跳过 CallerCancellationDuringAuditPropagates
+  Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+已跳过 UnavailableResultIsCountedOnce
+  Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+已跳过 RestoresActualPublishedSources (True)
+  Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+已跳过 RestoresActualPublishedSources (False)
+  Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+已跳过 RejectsManifestSourceBindingMismatch ("slots")
+  Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+已跳过 RejectsManifestSourceBindingMismatch ("snapshot")
+  Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+已跳过 RejectsManifestSourceBindingMismatch ("bundle")
+  Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+已跳过 RejectsManifestSourceBindingMismatch ("key")
+  Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+已跳过 RejectsHashValidInvalidUtf8
+  Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+/Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64) 已通过 (3s 312ms)
+
+测试运行摘要: 已通过!
+  总计: 49
+  失败: 0
+  成功: 2
+  已跳过: 47
+  持续时间: 4s 082ms
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/bin/Debug/net10.0/OntologyPlatform.InfrastructureTests.dll (net10.0|arm64)
+/Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/bin/Debug/net10.0/OntologyPlatform.InfrastructureTests.dll (net10.0|arm64) 已通过 (3s 481ms)
+
+测试运行摘要: 已通过!
+  总计: 4
+  失败: 0
+  成功: 4
+  已跳过: 0
+  持续时间: 4s 247ms
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已跳过 SuccessfulRepeatedAndConcurrentReadsCommitExactlyOnceWithoutSelf
+  Assert.Inconclusive。 NOT_RUN: 未注入本轮隔离PG连接。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已跳过 ScopeFilterRequiresNonemptyOrganizationAndCompleteArraySubset ("site-a","A")
+  Assert.Inconclusive。 NOT_RUN: 未注入本轮隔离PG连接。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已跳过 ScopeFilterRequiresNonemptyOrganizationAndCompleteArraySubset ("site-b","B")
+  Assert.Inconclusive。 NOT_RUN: 未注入本轮隔离PG连接。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已跳过 ScopeFilterRequiresNonemptyOrganizationAndCompleteArraySubset ("site-a,site-b","A,B,AB")
+  Assert.Inconclusive。 NOT_RUN: 未注入本轮隔离PG连接。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已跳过 EmptyResultsAndMissingScopesStillCommitReadFact ("valid",True)
+  Assert.Inconclusive。 NOT_RUN: 未注入本轮隔离PG连接。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已跳过 EmptyResultsAndMissingScopesStillCommitReadFact ("valid",False)
+  Assert.Inconclusive。 NOT_RUN: 未注入本轮隔离PG连接。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已跳过 EmptyResultsAndMissingScopesStillCommitReadFact ("missing",True)
+  Assert.Inconclusive。 NOT_RUN: 未注入本轮隔离PG连接。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已跳过 EmptyResultsAndMissingScopesStillCommitReadFact ("empty",True)
+  Assert.Inconclusive。 NOT_RUN: 未注入本轮隔离PG连接。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已跳过 EmptyResultsAndMissingScopesStillCommitReadFact ("blank",True)
+  Assert.Inconclusive。 NOT_RUN: 未注入本轮隔离PG连接。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已跳过 DeniedRoleAndExpiredSessionNeverProduceSuccessfulRead
+  Assert.Inconclusive。 NOT_RUN: 未注入本轮隔离PG连接。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已跳过 LimitAppliesAfterScopeFilterAndInvalidLimitDoesNotAuditSuccess
+  Assert.Inconclusive。 NOT_RUN: 未注入本轮隔离PG连接。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已跳过 InsertOnlyFailureNeverReturnsSuccessOrAuditIdAndRecovers
+  Assert.Inconclusive。 NOT_RUN: 未注入本轮隔离PG连接。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已跳过 ResourceReadAuditsTrustedFullScopeOrAuthorizedExplicitSite
+  Assert.Inconclusive。 NOT_RUN: 未注入本轮隔离PG连接。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已跳过 ScopeMigrationPreservesLegacyAndRefusesDestructiveRollback
+  Assert.Inconclusive。 NOT_RUN: 未注入本轮临时PG配置。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已跳过 ConcurrentFirstScopeWriteCannotBeLostByRollback
+  Assert.Inconclusive。 NOT_RUN: 未注入本轮临时PG配置。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已跳过 SharedPhysicalTransactionCommitsBothAndPreservesMultisite
+  Assert.Inconclusive。 NOT_RUN: 未注入本轮临时PG配置。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已跳过 SharedPhysicalTransactionRollsBackBoth
+  Assert.Inconclusive。 NOT_RUN: 未注入本轮临时PG配置。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已跳过 AuditDatabaseFailureInvalidatesWholeBusinessTransaction
+  Assert.Inconclusive。 NOT_RUN: 未注入本轮临时PG配置。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已跳过 MatchingConnectionStringDoesNotCountAsSharedTransaction
+  Assert.Inconclusive。 NOT_RUN: 未注入本轮临时PG配置。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已跳过 InvalidConnectionPreconditionInvalidatesExistingBusinessTransaction (True)
+  Assert.Inconclusive。 NOT_RUN: 未注入本轮临时PG配置。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已跳过 InvalidConnectionPreconditionInvalidatesExistingBusinessTransaction (False)
+  Assert.Inconclusive。 NOT_RUN: 未注入本轮临时PG配置。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已跳过 StandaloneAuditCommitsBeforeReturningAndKeepsScopeSemantics
+  Assert.Inconclusive。 NOT_RUN: 未注入本轮临时PG配置。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已跳过 HttpAuthorizationDenialPersistsAuditBefore403
+  Assert.Inconclusive。 NOT_RUN: 未注入本轮临时PG配置。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已跳过 ActualPublishingPostsAuthorizeBeforeMalformedBindingAndPersistDenial
+  Assert.Inconclusive。 NOT_RUN: 未注入本轮临时PG配置。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已跳过 ActualPublishingDenialAuditFailureFailsClosed
+  Assert.Inconclusive。 NOT_RUN: 未注入本轮临时PG配置。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已跳过 MiddlewarePersistsForbiddenAuditBeforeMalformedBodyBinding
+  Assert.Inconclusive。 NOT_RUN: 未注入本轮临时PG配置。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已跳过 MiddlewareAuditFailurePropagatesWithoutFalse403
+  Assert.Inconclusive。 NOT_RUN: 未注入本轮临时PG配置。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已跳过 RealIssuerPushRetainsCodePkceStateAndNonce
+  Assert.Inconclusive。 NOT_RUN: 未注入本轮专用Keycloak运行时配置。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已跳过 ExpiredServerSessionCookieReturnsHttp401
+  Assert.Inconclusive。 NOT_RUN: 未注入本轮隔离PG连接。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+已跳过 SharedEncryptedTicketRevocationAndExpiryUsePostgresFacts
+  Assert.Inconclusive。 NOT_RUN: G1_SEC_PG_CONNECTION未注入隔离PG；需要Master先应用Governance迁移。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+/Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64) 已通过 (54s 816ms)
+
+测试运行摘要: 已通过!
+  总计: 121
+  失败: 0
+  成功: 91
+  已跳过: 30
+  持续时间: 55s 309ms
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll (net10.0|arm64)
+已跳过 ActualMigrationDownGuard ("empty")
+  Assert.Inconclusive。 NOT_RUN: 缺少当前临时PG。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll (net10.0|arm64)
+已跳过 ActualMigrationDownGuard ("nonempty")
+  Assert.Inconclusive。 NOT_RUN: 缺少当前临时PG。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll (net10.0|arm64)
+已跳过 ActualMigrationDownGuard ("concurrent")
+  Assert.Inconclusive。 NOT_RUN: 缺少当前临时PG。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll (net10.0|arm64)
+已跳过 NonBmpResultLabelSurvivesMessageBoundaryAndReplay ("😀")
+  Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll (net10.0|arm64)
+已跳过 NonBmpResultLabelSurvivesMessageBoundaryAndReplay ("𠀀")
+  Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll (net10.0|arm64)
+已跳过 PublishedUnicodeLabelSurvivesRealGatewayAndMaf ("😀")
+  Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll (net10.0|arm64)
+已跳过 PublishedUnicodeLabelSurvivesRealGatewayAndMaf ("𠀀")
+  Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll (net10.0|arm64)
+已跳过 AuditFailureRollsBackRunAndIdempotencyReceipt
+  Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll (net10.0|arm64)
+已跳过 ConcurrentCreateHasSingleCommittedRun
+  Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll (net10.0|arm64)
+已跳过 ToolAndAbsoluteTimeBudgetsFailClosed
+  Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll (net10.0|arm64)
+已跳过 OversizedToolEventPersistsOnlySafeFailure
+  Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll (net10.0|arm64)
+已跳过 PersistentCancelPropagatesToDownstreamToken
+  Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll (net10.0|arm64)
+已跳过 MafInvokesRealPublishedGatewayAndPersistsEvents
+  Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll (net10.0|arm64)
+已跳过 DeterministicModeRequiresDevelopmentHost
+  Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll (net10.0|arm64)
+已跳过 CommittedRunReplaysAfterGrantOrProviderConfigChange
+  Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll (net10.0|arm64)
+已跳过 DisabledProviderCannotPretendCompletion
+  Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll (net10.0|arm64)
+已跳过 ProviderIdempotencyOwnerAndCompleteScopeFailClosed
+  Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll (net10.0|arm64)
+已跳过 CancelUsesCurrentSequenceAndFencesWorker
+  Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll (net10.0|arm64)
+已跳过 LeaseTakeoverRejectsStaleFencingToken
+  Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll (net10.0|arm64)
+已跳过 MessageAndEventCountBudgetsPersistFailure
+  Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll (net10.0|arm64)
+已跳过 InvalidAndFutureCursorRejected
+  Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll (net10.0|arm64)
+已跳过 OldRunKeepsSnapshotAcrossNewPublishAndRollback
+  Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll (net10.0|arm64)
+已跳过 RealMcpSdkListsExactlyThreeAndCallsPublishedGateway
+  Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll (net10.0|arm64)
+已跳过 HttpSecurityRejectsAnonymousCsrfOriginAndMalformedIdentity
+  Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll (net10.0|arm64)
+已跳过 SseReplaysAndLogoutRevokesExistingConnection
+  Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll (net10.0|arm64)
+已跳过 SseRechecksChangedScopeAndAbsoluteSessionExpiry
+  Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll (net10.0|arm64)
+已跳过 SlowSseConnectionIsBoundedAndDisconnectDoesNotCancel
+  Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll (net10.0|arm64)
+已跳过 SseHttpCursorErrorsAreAccurate
+  Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll (net10.0|arm64)
+/Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll (net10.0|arm64) 已通过 (3s 420ms)
+
+测试运行摘要: 已通过!
+  总计: 33
+  失败: 0
+  成功: 5
+  已跳过: 28
+  持续时间: 3s 911ms
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 ImmutableRoundtripAndDifferentContentRejected
+  Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 ConcurrentDifferentBytesCannotOverwrite
+  Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 WrongHashAndMissingObjectFailClosed
+  Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 SlowDependencyBecomesUnavailable
+  Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 CallerCancellationPropagates
+  Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 LegacyV1ReadsAndRollsBackWithoutCurrentDraftAssessment
+  Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 HistoricalM1ProfileV1ManifestV2ReadsAndRollsBackAfterCurrentProfileUpgrade
+  Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 LegacyV1CorruptArtifactRollbackFailsClosed
+  Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 ExistingValidToProvenancePublishesButUnknownMetadataDoesNot ("validToUtc",True)
+  Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 ExistingValidToProvenancePublishesButUnknownMetadataDoesNot ("validUntilUtc",False)
+  Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 BackgroundRestartAndDuplicateConsume
+  Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 StaleFenceCannotCommitConsumption
+  Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 ExternalPhaseFailurePreservesOldActiveAndRetry ("s3-write")
+  Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 ExternalPhaseFailurePreservesOldActiveAndRetry ("s3-read")
+  Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 ExternalPhaseFailurePreservesOldActiveAndRetry ("jena-write")
+  Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 ExternalPhaseFailurePreservesOldActiveAndRetry ("jena-read")
+  Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 ExternalPhaseFailurePreservesOldActiveAndRetry ("jena-shacl")
+  Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 PostgreSqlWriteFailureRollsBackWholeActivation ("active")
+  Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 PostgreSqlWriteFailureRollsBackWholeActivation ("activation")
+  Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 PostgreSqlWriteFailureRollsBackWholeActivation ("audit")
+  Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 PostgreSqlWriteFailureRollsBackWholeActivation ("outbox")
+  Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 ConcurrentIdenticalActivationReturnsSameFact
+  Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 ConcurrentDifferentProposalsOnlyOneCasWinner
+  Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 DamagedPublishedGraphUnavailableAndReconciliationRetries
+  Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 PublishTwoVersionsRollbackOldCompleteManifestAndReplay
+  Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 ApprovalBoundaries ("self",403)
+  Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 ApprovalBoundaries ("role",403)
+  Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 ApprovalBoundaries ("scope",403)
+  Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 ApprovalBoundaries ("expiry",409)
+  Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 ActivationBoundaries ("pending")
+  Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 ActivationBoundaries ("rejected")
+  Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 ActivationBoundaries ("expiry")
+  Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 ActivationBoundaries ("changed")
+  Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 ActivationBoundaries ("cas")
+  Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 TamperedRollbackTargetRejected
+  Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 ActualMigrationDownGuard ("empty")
+  Assert.Inconclusive。 NOT_RUN: 缺少当前临时PG。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 ActualMigrationDownGuard ("nonempty")
+  Assert.Inconclusive。 NOT_RUN: 缺少当前临时PG。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 ActualMigrationDownGuard ("concurrent")
+  Assert.Inconclusive。 NOT_RUN: 缺少当前临时PG。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 RollbackProposalReceiptSurvivesExternalOutage ("replay")
+  Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 RollbackProposalReceiptSurvivesExternalOutage ("payload")
+  Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 RollbackProposalReceiptSurvivesExternalOutage ("scope")
+  Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 RollbackProposalReceiptSurvivesExternalOutage ("subject")
+  Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 RollbackRequiresFreshIndependentBoundApproval ("self")
+  Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 RollbackRequiresFreshIndependentBoundApproval ("expiry")
+  Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 RollbackRequiresFreshIndependentBoundApproval ("binding")
+  Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 RollbackFailurePreservesCurrentAndSameCommandRecovers ("artifact")
+  Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 RollbackFailurePreservesCurrentAndSameCommandRecovers ("audit")
+  Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+已跳过 RollbackFailurePreservesCurrentAndSameCommandRecovers ("outbox")
+  Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+/Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64) 已通过 (3s 246ms)
+
+测试运行摘要: 已通过!
+  总计: 56
+  失败: 0
+  成功: 8
+  已跳过: 48
+  持续时间: 3s 766ms
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 RenamePersistsThroughReopenListReplayAndStructuralEdit
+  Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 RenameFailureAndNameBoundsLeaveCommittedNameUnchanged
+  Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 SourceHistoryValidationAndPublicationBindingAreReal
+  Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 UnicodeEditPersistsExactHistoryAndHonestSourceDiff
+  Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 LeadingBomCreateSaveAndNoOpKeepExactSourceHistory
+  Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 ConcurrentSaveHasOneWinnerAndNoLostUpdate
+  Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 CommittedCreateAndSaveReplayWithoutJena
+  Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 AuditFailureRollsBackEveryWrite
+  Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 FullPlatformRolesAndWholeScopeAreEnforced
+  Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 InvalidSourceAndStaleRevisionNeverPersist
+  Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 CloneInheritsOnlyTheCatalogAssetAndExactScope
+  Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 MigrationDownRefusesConcurrentAndNonemptyHistory
+  Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 InitialOnlyDatabaseKeepsOriginalLockAndNonemptyDownGuards
+  Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 ConcurrentIdempotencyHasOneCommit (False)
+  Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 ConcurrentIdempotencyHasOneCommit (True)
+  Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 G3MergedShaclDiagnosticNeverGuessesDataSource ("ontology")
+  Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 G3MergedShaclDiagnosticNeverGuessesDataSource ("vocabulary")
+  Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 G3MergedShaclDiagnosticNeverGuessesDataSource ("data")
+  Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 G3MergedShaclDiagnosticNeverGuessesDataSource ("ambiguous")
+  Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 G3SupportDiagnosticRetainsProvenSingleSourceHash ("ontology")
+  Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 G3SupportDiagnosticRetainsProvenSingleSourceHash ("vocabulary")
+  Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 G3SupportDiagnosticRetainsProvenSingleSourceHash ("data")
+  Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 G3AssessmentPersistsReplaysAndReauthorizesWholeScope
+  Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 G3AssessmentLockRejectsInvalidPersistentFacts ("expired","assessment_expired")
+  Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 G3AssessmentLockRejectsInvalidPersistentFacts ("profile","assessment_binding_conflict")
+  Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 G3AssessmentLockRejectsInvalidPersistentFacts ("tampered","assessment_binding_conflict")
+  Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 G3AssessmentLockRejectsInvalidPersistentFacts ("legacy","assessment_required")
+  Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 G3AssessmentLockRejectsInvalidPersistentFacts ("ineligible","assessment_not_eligible")
+  Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 G3FourSourceBytesAndFixedRevisionComparisonRemainExact
+  Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 M2NamedEditAssessmentAndFailurePreserveCommittedSources
+  Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 M2BasicModelingSequencePersistsEachRevisionAndKeepsOtherSourcesExact
+  Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 RenamedBlankNodesCompareExactlyAndNearMissIsDifferent
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 TwentyCorpusRowsUseAssertedOnlySupportAndShapesBlankException
+  Assert.Inconclusive。 NOT_RUN: 缺少本轮隔离样例目录。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 ComparisonBudgetOrCancellationRevokesAllPartialResults ("blank_node_budget")
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 ComparisonBudgetOrCancellationRevokesAllPartialResults ("comparison_cancelled")
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 ComparisonBudgetOrCancellationRevokesAllPartialResults ("comparison_timeout")
+  Assert.Inconclusive。 NOT_RUN: 缺少隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 ComparisonPreservesAbsentBytesAndRejectsInvalidOrOversizedBundles
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 UndeclaredCustomFactsRequireAnExplicitPropertyOrAnnotation
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 CancellationDuringRiotParsingAndExact128BlankBoundary
+  Assert.Inconclusive。 NOT_RUN: 缺少隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 ParsingAcrossAllFourSourcesSharesOneFiveSecondBudget
+  Assert.Inconclusive。 NOT_RUN: 缺少隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 SymmetricNonIsomorphicGraphsExhaustTheSharedSearchBudget
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 NamedAxiomEditPreservesOtherSourcesAndRequiresBothDeclarations ("equivalentClass","Class")
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 NamedAxiomEditPreservesOtherSourcesAndRequiresBothDeclarations ("disjointWith","Class")
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 NamedAxiomEditPreservesOtherSourcesAndRequiresBothDeclarations ("inverseOf","ObjectProperty")
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 InvalidMetadataFailsBeforeAnyNoOpOrSerialization ("iri-language")
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 InvalidMetadataFailsBeforeAnyNoOpOrSerialization ("iri-datatype")
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 InvalidMetadataFailsBeforeAnyNoOpOrSerialization ("literal-conflict")
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 InvalidMetadataFailsBeforeAnyNoOpOrSerialization ("langString-without-language")
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 RiotLanguageTermCanBeCopiedAndDeletedPrecisely
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 EquivalentLiteralRepresentationsPreserveExactSourceBytes ("language-datatype",False)
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 EquivalentLiteralRepresentationsPreserveExactSourceBytes ("language-datatype",True)
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 EquivalentLiteralRepresentationsPreserveExactSourceBytes ("plain-string",False)
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 EquivalentLiteralRepresentationsPreserveExactSourceBytes ("plain-string",True)
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 EquivalentLiteralRepresentationsPreserveExactSourceBytes ("language-case",False)
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 EquivalentLiteralRepresentationsPreserveExactSourceBytes ("language-case",True)
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 RealRiotPreservesUnsupportedSourceAndTypedLexical
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 NoOpRetainsExactBytesAndInvalidSourceFails
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 PublishedGraphsAreIsolatedAndLexicalMismatchIsRejected
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 EmptyGraphStillProducesRealShaclReport
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 LegalEmptyDocumentsKeepExactHashesAndProduceEmptyGraph ("# comment\n")
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 LegalEmptyDocumentsKeepExactHashesAndProduceEmptyGraph (" \t\r\n")
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 LegalEmptyDocumentsKeepExactHashesAndProduceEmptyGraph ("@prefix ex: <urn:empty:> .\n")
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 EditingLegalEmptyDocumentExportsOnlyRequestedTriple
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 LostOrReplacedTemporaryGraphRemainsUnavailable (False)
+  Assert.Inconclusive。 NOT_RUN: 缺少隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 LostOrReplacedTemporaryGraphRemainsUnavailable (True)
+  Assert.Inconclusive。 NOT_RUN: 缺少隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 MissingPublishedGraphRemainsUnavailable
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 PublishedShaclUsesTheSameOntologyContext
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 RelativeIriAndExactEditPreserveRemainingGraph
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 SourceTripleAndProjectionBudgetsFailExplicitly
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 ThirdConcurrentOperationIsRejected
+  Assert.Inconclusive。 NOT_RUN: 缺少隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 CancellationAndTimeoutDoNotLeaveTemporaryGraphs (True)
+  Assert.Inconclusive。 NOT_RUN: 缺少隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 CancellationAndTimeoutDoNotLeaveTemporaryGraphs (False)
+  Assert.Inconclusive。 NOT_RUN: 缺少隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 StandardSampleConforms
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 StandardNegativeReportsLocateRealFailure ("","MinCountConstraintComponent")
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 StandardNegativeReportsLocateRealFailure ("<urn:x> <urn:ontology-platform:vocabulary:externalId> 12 .","DatatypeConstraintComponent")
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 StandardNegativeReportsLocateRealFailure ("<urn:x> <urn:ontology-platform:vocabulary:weight> 101.0 .","MaxInclusiveConstraintComponent")
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 StandardNegativeReportsLocateRealFailure ("<urn:h> a <urn:synthetic:metals:Heat> ; <urn:synthetic:metals:castIn> <urn:x> .","ClassConstraintComponent")
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 UnsafeShapesRejectedBeforeExecution ("<urn:s> <http://www.w3.org/ns/shacl#sparql> <urn:q> .")
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 UnsafeShapesRejectedBeforeExecution ("<urn:s> <http://www.w3.org/ns/shacl#js> <urn:q> .")
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 UnsafeShapesRejectedBeforeExecution ("<urn:s> <http://www.w3.org/ns/shacl#node> <urn:s> .")
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 UnsafeShapesRejectedBeforeExecution ("<urn:s> <http://www.w3.org/2002/07/owl#imports> <http://192.0.2.1/never> .")
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 UnsafeShapesRejectedBeforeExecution ("<urn:s> <http://www.w3.org/ns/shacl#path> [ <http://www.w3.org/ns/shacl#inversePath> <urn:p> ] .")
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 UnsafeShapesRejectedBeforeExecution ("<urn:s> <http://www.w3.org/ns/shacl#property> <urn:s> ; <http://www.w3.org/ns/shacl#path> <urn:p> .")
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 EnumerationListIsBoundedAndAcyclic
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 VerifiedReadReturnsExactlyTheComparedBatch
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 ChangedPublishedGraphCannotReturnOldHashData ("ontology")
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 ChangedPublishedGraphCannotReturnOldHashData ("data")
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 ChangedPublishedGraphCannotReturnOldHashData ("delete")
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 ChangedPublishedGraphCannotReturnOldHashData ("lexical")
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 EveryManifestSnapshotAndSourceBindingIsChecked
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 OptionalVocabularyAndMissingBindingFailClosed
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 VerifiedReadCancellationAndTimeoutCleanTemporaryGraphs (True)
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 VerifiedReadCancellationAndTimeoutCleanTemporaryGraphs (False)
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 TemporaryMarkerDoesNotConsumeBusinessTripleBudget (4999)
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 TemporaryMarkerDoesNotConsumeBusinessTripleBudget (5000)
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 TemporaryMarkerDoesNotConsumeBusinessTripleBudget (5001)
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 VerifiedReadRetainsAggregateBusinessTripleBudget (4999)
+  Assert.Inconclusive。 NOT_RUN: 缺少隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 VerifiedReadRetainsAggregateBusinessTripleBudget (5000)
+  Assert.Inconclusive。 NOT_RUN: 缺少隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 VerifiedReadRetainsAggregateBusinessTripleBudget (5001)
+  Assert.Inconclusive。 NOT_RUN: 缺少隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 PublishedGraphDoesNotReceiveTemporaryMarkerAllowance
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 SyntheticNonBmpLabelSurvivesValidationAndPublication ("😀")
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 SyntheticNonBmpLabelSurvivesValidationAndPublication ("𠀀")
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 NonBmpLiteralEditIsLosslessAndCannotInjectTriples (True)
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 NonBmpLiteralEditIsLosslessAndCannotInjectTriples (False)
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 InvalidSurrogateLiteralIsRejectedWithoutReplacement (True)
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 InvalidSurrogateLiteralIsRejectedWithoutReplacement (False)
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 LeadingBomSourcesKeepExactBytesAndRelativeIris (True)
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+已跳过 LeadingBomSourcesKeepExactBytesAndRelativeIris (False)
+  Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+/Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64) 已通过 (3s 262ms)
+
+测试运行摘要: 已通过!
+  总计: 113
+  失败: 0
+  成功: 5
+  已跳过: 108
+  持续时间: 4s 028ms
+NOT_RUN: Web独立检查需真实目标及显式-RunNative。
+NOT_RUN: Web检查被显式-SkipWeb跳过，仅用于隔离工程检查器fixture或独立验收。
+NOT_RUN: 浏览器真实OIDC/E2E需独立受控联调，不隐式混入工程检查。
+PASS: 所选工程检查；范围以逐项输出为准，不表示业务、前端或整个G1通过。
+/Users/chasen/.nuget/packages/aspire.hosting.apphost/13.6.3/build/Aspire.Hosting.AppHost.targets(157,5): warning ASPIRE010: OntologyPlatform.AppHost is configured with AspireUseCliBundle=false. Some Aspire features require the Aspire CLI bundle. Set AspireUseCliBundle=true to enable those features, or suppress ASPIRE010 to continue without the bundle. See https://aka.ms/aspire/diagnostics/aspire010 for more information. [/Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/AppHost/OntologyPlatform.AppHost.csproj]
+  OntologyPlatform.ServiceDefaults -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/ServiceDefaults/bin/Release/net10.0/OntologyPlatform.ServiceDefaults.dll
+  OntologyPlatform.Contracts -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/bin/Release/net10.0/OntologyPlatform.Contracts.dll
+  OntologyPlatform.InfrastructureApi -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Hosts/OntologyPlatform.InfrastructureApi/bin/Release/net10.0/OntologyPlatform.InfrastructureApi.dll
+  OntologyPlatform.Modules.Publishing.Domain -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/bin/Release/net10.0/OntologyPlatform.Modules.Publishing.Domain.dll
+  OntologyPlatform.Modules.Ontology.Domain -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/bin/Release/net10.0/OntologyPlatform.Modules.Ontology.Domain.dll
+  OntologyPlatform.Modules.Governance -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/bin/Release/net10.0/OntologyPlatform.Modules.Governance.dll
+  OntologyPlatform.Modules.SemanticQuery -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/bin/Release/net10.0/OntologyPlatform.Modules.SemanticQuery.dll
+  OntologyPlatform.G2ContractTests -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Release/net10.0/OntologyPlatform.G2ContractTests.dll
+  OntologyPlatform.Modules.Agents -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/bin/Release/net10.0/OntologyPlatform.Modules.Agents.dll
+  OntologyPlatform.InfrastructureTests -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/bin/Release/net10.0/OntologyPlatform.InfrastructureTests.dll
+  OntologyPlatform.Modules.Publishing -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/bin/Release/net10.0/OntologyPlatform.Modules.Publishing.dll
+  OntologyPlatform.Modules.Ontology -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/bin/Release/net10.0/OntologyPlatform.Modules.Ontology.dll
+  OntologyPlatform.SemanticTests -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Release/net10.0/OntologyPlatform.SemanticTests.dll
+  OntologyPlatform.PublishingTests -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Release/net10.0/OntologyPlatform.PublishingTests.dll
+  OntologyPlatform.Api -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/bin/Release/net10.0/OntologyPlatform.Api.dll
+  OntologyPlatform.AppHost -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/AppHost/bin/Release/net10.0/OntologyPlatform.AppHost.dll
+  OntologyPlatform.AgentTests -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Release/net10.0/OntologyPlatform.AgentTests.dll
+  OntologyPlatform.QueryTests -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Release/net10.0/OntologyPlatform.QueryTests.dll
+  OntologyPlatform.SecurityTests -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll
+
+已成功生成。
+
+/Users/chasen/.nuget/packages/aspire.hosting.apphost/13.6.3/build/Aspire.Hosting.AppHost.targets(157,5): warning ASPIRE010: OntologyPlatform.AppHost is configured with AspireUseCliBundle=false. Some Aspire features require the Aspire CLI bundle. Set AspireUseCliBundle=true to enable those features, or suppress ASPIRE010 to continue without the bundle. See https://aka.ms/aspire/diagnostics/aspire010 for more information. [/Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/AppHost/OntologyPlatform.AppHost.csproj]
+    1 个警告
+    0 个错误
+
+已用时间 00:00:02.55
+test_current_and_legacy_prefixes_reach_next_required_configuration (__main__.AppHostPrefixTests.test_current_and_legacy_prefixes_reach_next_required_configuration) ... ok
+test_unapproved_or_unsafe_prefixes_stop_before_model_configuration (__main__.AppHostPrefixTests.test_unapproved_or_unsafe_prefixes_stop_before_model_configuration) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 1.425s
+
+OK
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Debug/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64)
+已通过 V2RoundtripRetainsExactAssessmentBinding (15ms)
+  从 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Debug/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64)
+/Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Debug/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64) 已通过 (3s 187ms)
+
+测试运行摘要: 已通过!
+  总计: 1
+  失败: 0
+  成功: 1
+  已跳过: 0
+  持续时间: 3s 270ms
+test_current_task_output_does_not_touch_old_evidence (__main__.EvidenceBoundaryTests.test_current_task_output_does_not_touch_old_evidence) ... ok
+test_existing_symlink_escape_is_rejected (__main__.EvidenceBoundaryTests.test_existing_symlink_escape_is_rejected) ... ok
+test_outside_and_traversal_are_rejected_without_creation (__main__.EvidenceBoundaryTests.test_outside_and_traversal_are_rejected_without_creation) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.002s
+
+OK
+test_actual_process_start_failure_marks_current_failed_and_later_not_run (__main__.M1OrchestrationTests.test_actual_process_start_failure_marks_current_failed_and_later_not_run) ... ok
+test_all_real_gate_selections_include_m1_and_regressions (__main__.M1OrchestrationTests.test_all_real_gate_selections_include_m1_and_regressions) ... ok
+test_each_child_failure_stops_later_gates (__main__.M1OrchestrationTests.test_each_child_failure_stops_later_gates) ... ok
+test_failed_attempt_cannot_consume_or_certify_stale_pass (__main__.M1OrchestrationTests.test_failed_attempt_cannot_consume_or_certify_stale_pass) ... ok
+test_first_m2_integration_selects_real_api_only_without_claiming_full_gates (__main__.M1OrchestrationTests.test_first_m2_integration_selects_real_api_only_without_claiming_full_gates) ... ok
+test_m2_cannot_reuse_m1_runtime_or_enable_m3 (__main__.M1OrchestrationTests.test_m2_cannot_reuse_m1_runtime_or_enable_m3) ... usage: g3-acceptance-runtime.py [-h] [--runtime-file RUNTIME_FILE]
+                                [--start-runtime] [--milestone {M1,M2}]
+                                [--api-only] [--ui-only]
+g3-acceptance-runtime.py: error: Protected G2 or unrelated runtime refused
+usage: g3-acceptance-runtime.py [-h] [--runtime-file RUNTIME_FILE]
+                                [--start-runtime] [--milestone {M1,M2}]
+                                [--api-only] [--ui-only]
+g3-acceptance-runtime.py: error: argument --milestone: invalid choice: 'M3' (choose from 'M1', 'M2')
+ok
+test_m2_selects_its_own_runtime_evidence_and_authenticated_checks (__main__.M1OrchestrationTests.test_m2_selects_its_own_runtime_evidence_and_authenticated_checks) ... ok
+test_protected_g2_runtime_is_refused (__main__.M1OrchestrationTests.test_protected_g2_runtime_is_refused) ... usage: g3-acceptance-runtime.py [-h] [--runtime-file RUNTIME_FILE]
+                                [--start-runtime] [--milestone {M1,M2}]
+                                [--api-only] [--ui-only]
+g3-acceptance-runtime.py: error: Protected G2 or unrelated runtime refused
+ok
+test_second_m2_integration_selects_only_real_ui_checkpoint (__main__.M1OrchestrationTests.test_second_m2_integration_selects_only_real_ui_checkpoint) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.718s
+
+OK
+{"status": "FAIL", "runId": "9d3700ccea7a4ef8b66e2c8443170d85", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/9d3700ccea7a4ef8b66e2c8443170d85"}
+{"status": "PASS", "runId": "1fe8d3d81880411a8c36f4a427159ab1", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/1fe8d3d81880411a8c36f4a427159ab1"}
+{"status": "FAIL", "runId": "447d315146454484bfe3a649699d5dd7", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/447d315146454484bfe3a649699d5dd7"}
+{"status": "FAIL", "runId": "5be5d236d0b746b99c898816b455e6ea", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/5be5d236d0b746b99c898816b455e6ea"}
+{"status": "FAIL", "runId": "b8d5340d3b8743dfb0f24647003f5a66", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/b8d5340d3b8743dfb0f24647003f5a66"}
+{"status": "FAIL", "runId": "6e11913497b543eb9f15c9a8a9b6cff4", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/6e11913497b543eb9f15c9a8a9b6cff4"}
+{"status": "FAIL", "runId": "006a336a949a4522a2adc6d8b674d573", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/006a336a949a4522a2adc6d8b674d573"}
+{"status": "FAIL", "runId": "bc57467ed2154bacb9bc95694367d13a", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/bc57467ed2154bacb9bc95694367d13a"}
+{"status": "FAIL", "runId": "2a3f2641db4e426280e1f2185dc29760", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/2a3f2641db4e426280e1f2185dc29760"}
+{"status": "FAIL", "runId": "bca36de390f54101b6c731554510af72", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/bca36de390f54101b6c731554510af72"}
+{"status": "PASS", "runId": "ce075751557d43ae9c2fbc41767266c1", "evidenceDirectory": "docs/evidence/G3-M2-001/runtime/g3-m2-control/ce075751557d43ae9c2fbc41767266c1"}
+{"status": "PASS", "runId": "8622e1d1e7e7475188d0d048cb1ce90a", "evidenceDirectory": "docs/evidence/G3-M2-001/runtime/g3-m2-control/8622e1d1e7e7475188d0d048cb1ce90a"}
+{"status": "PASS", "runId": "eaf8a78b12704933823034df393d455f", "evidenceDirectory": "docs/evidence/G3-M2-001/runtime/g3-m2-control/eaf8a78b12704933823034df393d455f"}
+1af73ef1d04b8da19c9c89bafb28c5663b02e61519970ae763e4905855a7b795
+工具“dotnet-ef”(版本“10.0.13”)已还原。可用的命令: dotnet-ef
+
+还原成功。
+Failed executing DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM governance."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261025062847_InitialGovernance'.
+Applying migration '20261025144246_AuditScopeSites'.
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Done.
+a1f5408aeceb24e0621ec92e477c17859cb89c780d4c0048011a39d3bf255c4e
+{"status": "CREATED", "realm": "wave2-e77ec53e2b8f6473", "identities": ["wave2-viewer-a", "wave2-viewer-b", "wave2-no-role-a", "wave2-operator-a", "wave2-auditor-a"], "secrets": "runtime-only"}
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+/Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64) 已通过 (57s 614ms)
+
+测试运行摘要: 已通过!
+  总计: 121
+  失败: 0
+  成功: 121
+  已跳过: 0
+  持续时间: 57s 769ms
+PASS: real PostgreSQL tickets/revocation/expiry/audit and real Keycloak PAR security integration.
+CANONICAL_FUSEKI_RECEIPT {"contextSha256":"1e45f836d9837cbc75d23adb3ad37b0ff79a545ef06102a87aa246feea9cc1e5","image":"ontology-platform-fuseki:context-1e45f836d9837cbc75d23adb3ad37b0ff79a545ef06102a87aa246feea9cc1e5","imageId":"sha256:39b0fb6616a466a05b2ff8c691bb14a63557c70118d433a4b70fd1068b1bef60","observedAt":"2026-10-28T00:12:57.416282+08:00","reused":true,"runId":"ci-6e3ddfeae2e549cd8fa63d50fc8a6cd7","taskId":"G3-M2-001"}
+Scope: all 2 workspace projects
+Already up to date
+Done in 144ms using pnpm v11.28.8
+350a5fcf33dc336fa9b7f5b5cc7db99edd37841b6cb294b79f94dd3d18b42117
+127.0.0.1:50882
+c62b4eb92b8382f92a9491c1e0763ba818c6a05f97d54f58d4505b624566492d
+127.0.0.1:50890
+  OntologyPlatform.Contracts -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/bin/Debug/net10.0/OntologyPlatform.Contracts.dll
+  OntologyPlatform.Modules.Ontology.Domain -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.Domain.dll
+  OntologyPlatform.Modules.Governance -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/bin/Debug/net10.0/OntologyPlatform.Modules.Governance.dll
+  OntologyPlatform.Modules.Ontology -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.dll
+  OntologyPlatform.SemanticTests -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:00.34
+工具“dotnet-ef”(版本“10.0.13”)已还原。可用的命令: dotnet-ef
+
+还原成功。
+Failed executing DbCommand (7ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM governance."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261025062847_InitialGovernance'.
+Applying migration '20261025144246_AuditScopeSites'.
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Done.
+Failed executing DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM ontology."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261026003221_InitialOntology'.
+Applying migration '20261027032135_G3Assessments'.
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Done.
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+/Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64) 已通过 (32s 429ms)
+
+测试运行摘要: 已通过!
+  总计: 113
+  失败: 0
+  成功: 113
+  已跳过: 0
+  持续时间: 32s 528ms
+g2-sem-0d4877c39152
+g2-sem-0d4877c39152-pg
+ec16b80cecdae76625fcf6e34f7df1b8f4d7ccba7b07868d2c21f9c95f3fcc4e
+127.0.0.1:51297
+63e6e3bf5d84977c91e201aa7732bc6cd8e71f0e7c89bb677a0a870e199d45ce
+127.0.0.1:51298
+a159573f2eb85027fdd9158078b47ffcc9cb87d69db943b4708dc3dfd982dfec
+sha256:39b0fb6616a466a05b2ff8c691bb14a63557c70118d433a4b70fd1068b1bef60 ["ontology-platform-fuseki@sha256:39b0fb6616a466a05b2ff8c691bb14a63557c70118d433a4b70fd1068b1bef60"]
+[2026-10-27 16:13:39] Fuseki     INFO  Apache Jena Fuseki 6.2.0
+Apache Jena version 6.2.0
+127.0.0.1:51304
+  OntologyPlatform.Contracts -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/bin/Debug/net10.0/OntologyPlatform.Contracts.dll
+  OntologyPlatform.Modules.Publishing.Domain -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/bin/Debug/net10.0/OntologyPlatform.Modules.Publishing.Domain.dll
+  OntologyPlatform.Modules.Ontology.Domain -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.Domain.dll
+  OntologyPlatform.Modules.Governance -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/bin/Debug/net10.0/OntologyPlatform.Modules.Governance.dll
+  OntologyPlatform.Modules.Ontology -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.dll
+  OntologyPlatform.Modules.Publishing -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/bin/Debug/net10.0/OntologyPlatform.Modules.Publishing.dll
+  OntologyPlatform.PublishingTests -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:00.34
+工具“dotnet-ef”(版本“10.0.13”)已还原。可用的命令: dotnet-ef
+
+还原成功。
+Failed executing DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM governance."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261025062847_InitialGovernance'.
+Applying migration '20261025144246_AuditScopeSites'.
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Done.
+Failed executing DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM ontology."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261026003221_InitialOntology'.
+Applying migration '20261027032135_G3Assessments'.
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Done.
+Failed executing DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM publishing."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261026015031_InitialPublishing'.
+Done.
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+/Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64) 已通过 (24s 148ms)
+
+测试运行摘要: 已通过!
+  总计: 56
+  失败: 0
+  成功: 56
+  已跳过: 0
+  持续时间: 24s 309ms
+g2-pub-6db8a3e4b663-jena
+g2-pub-6db8a3e4b663-s3
+g2-pub-6db8a3e4b663-pg
+sha256:39b0fb6616a466a05b2ff8c691bb14a63557c70118d433a4b70fd1068b1bef60
+  正在确定要还原的项目…
+  已还原 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/OntologyPlatform.Contracts.csproj (用时 51 毫秒)。
+  10 个项目(共 11 个)是最新的，无法还原。
+cc73deff2cf9988c38716cdd5a8960d616e8fc434177ce6a29ca3829acab3b2f
+127.0.0.1:51582
+fc494be815591dcfe1f43b65c417bffa653701bcd98f17e60800f6079a7e5e85
+127.0.0.1:51594
+821e827a4e2acc2aba049c356cfa440a6e4de302b8a84bf3e1270f32f74e403d
+127.0.0.1:51598
+  OntologyPlatform.ServiceDefaults -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/ServiceDefaults/bin/Debug/net10.0/OntologyPlatform.ServiceDefaults.dll
+  OntologyPlatform.Contracts -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/bin/Debug/net10.0/OntologyPlatform.Contracts.dll
+  OntologyPlatform.Modules.Ontology.Domain -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.Domain.dll
+  OntologyPlatform.Modules.Governance -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/bin/Debug/net10.0/OntologyPlatform.Modules.Governance.dll
+  OntologyPlatform.Modules.Publishing.Domain -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/bin/Debug/net10.0/OntologyPlatform.Modules.Publishing.Domain.dll
+  OntologyPlatform.Modules.SemanticQuery -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/bin/Debug/net10.0/OntologyPlatform.Modules.SemanticQuery.dll
+  OntologyPlatform.Modules.Agents -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/bin/Debug/net10.0/OntologyPlatform.Modules.Agents.dll
+  OntologyPlatform.Modules.Ontology -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.dll
+  OntologyPlatform.Modules.Publishing -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/bin/Debug/net10.0/OntologyPlatform.Modules.Publishing.dll
+  OntologyPlatform.Api -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/bin/Debug/net10.0/OntologyPlatform.Api.dll
+  OntologyPlatform.QueryTests -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:00.45
+工具“dotnet-ef”(版本“10.0.13”)已还原。可用的命令: dotnet-ef
+
+还原成功。
+Failed executing DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM governance."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261025062847_InitialGovernance'.
+Applying migration '20261025144246_AuditScopeSites'.
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Done.
+Failed executing DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM ontology."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261026003221_InitialOntology'.
+Applying migration '20261027032135_G3Assessments'.
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Done.
+Failed executing DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM publishing."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261026015031_InitialPublishing'.
+Done.
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64)
+/Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll (net10.0|arm64) 已通过 (22s 351ms)
+
+测试运行摘要: 已通过!
+  总计: 49
+  失败: 0
+  成功: 49
+  已跳过: 0
+  持续时间: 22s 515ms
+g2-query-7d8e7b487cda-jena
+g2-query-7d8e7b487cda-s3
+g2-query-7d8e7b487cda-pg
+sha256:39b0fb6616a466a05b2ff8c691bb14a63557c70118d433a4b70fd1068b1bef60
+  正在确定要还原的项目…
+  所有项目均是最新的，无法还原。
+066aee35eca00fef5725c2b5646d21b47fcf35c118c88ae497b74e7b4adca8a7
+127.0.0.1:51898
+92b9cfad087ff2ed9a9660b3631b0f7520a39c7160bd91188898a1a587a65c61
+127.0.0.1:51900
+b88e6621970b6b8ce70535948c3bda4dd82d555516d98235b804bc739e85467b
+127.0.0.1:51904
+  OntologyPlatform.ServiceDefaults -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/ServiceDefaults/bin/Debug/net10.0/OntologyPlatform.ServiceDefaults.dll
+  OntologyPlatform.Contracts -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/bin/Debug/net10.0/OntologyPlatform.Contracts.dll
+  OntologyPlatform.Modules.Ontology.Domain -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.Domain.dll
+  OntologyPlatform.Modules.Publishing.Domain -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/bin/Debug/net10.0/OntologyPlatform.Modules.Publishing.Domain.dll
+  OntologyPlatform.Modules.Governance -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/bin/Debug/net10.0/OntologyPlatform.Modules.Governance.dll
+  OntologyPlatform.Modules.SemanticQuery -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/bin/Debug/net10.0/OntologyPlatform.Modules.SemanticQuery.dll
+  OntologyPlatform.Modules.Agents -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/bin/Debug/net10.0/OntologyPlatform.Modules.Agents.dll
+  OntologyPlatform.Modules.Ontology -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.dll
+  OntologyPlatform.Modules.Publishing -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/bin/Debug/net10.0/OntologyPlatform.Modules.Publishing.dll
+  OntologyPlatform.Api -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/bin/Debug/net10.0/OntologyPlatform.Api.dll
+  OntologyPlatform.AgentTests -> /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:00.43
+工具“dotnet-ef”(版本“10.0.13”)已还原。可用的命令: dotnet-ef
+
+还原成功。
+Failed executing DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM governance."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261025062847_InitialGovernance'.
+Applying migration '20261025144246_AuditScopeSites'.
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Done.
+Failed executing DbCommand (7ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM ontology."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261026003221_InitialOntology'.
+Applying migration '20261027032135_G3Assessments'.
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Done.
+Failed executing DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM publishing."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261026015031_InitialPublishing'.
+Done.
+Failed executing DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM agents."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261026024046_InitialAgents'.
+Done.
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll (net10.0|arm64)
+/Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll (net10.0|arm64) 已通过 (41s 054ms)
+
+测试运行摘要: 已通过!
+  总计: 33
+  失败: 0
+  成功: 33
+  已跳过: 0
+  持续时间: 41s 212ms
+{"status":"PASS","validator":"repo-locked ajv6.15.0","scope":"observed common keyword subset; not full 2020-12 dialect certification","schemaKeywords":["$defs","$ref","$schema","additionalProperties","anyOf","const","description","discriminator","enum","format","items","oneOf","properties","required","type"],"positive":3,"negative":6,"mediaTypes":["text/event-stream"]}
+g2-agent-92a800a12081-jena
+g2-agent-92a800a12081-s3
+g2-agent-92a800a12081-pg
+PASS: real PG/Jena/RustFS semantic, release faults, gateway, MCP/MAF and native SSE suites. Browser OIDC and LGTM are separate local acceptance.
+{"stage":"FULL_G2_REAL_OIDC","status":"FAIL","passed":31,"failure":{"phase":"real_ui_source_import","category":"TimeoutError","details":"SUPPRESSED"}}
+{"status": "FAIL", "runId": "4c26a56ccfa842e69fe4181199e9e7f8", "evidenceDirectory": "docs/evidence/G3-M2-001/runtime/pipeline-90fbe65088824476984352c4029dabfa/g3-m2-8fb61910c7c7/4c26a56ccfa842e69fe4181199e9e7f8"}
+M1 evidence: /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/docs/evidence/G3-M2-001/runtime/pipeline-90fbe65088824476984352c4029dabfa
+Exception: /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/scripts/acceptance/g3-governance.ps1:87
+Line |
+  87 |  …  ($LASTEXITCODE -ne 0) { throw 'Real M1 vertical acceptance failed' }
+     |                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     | Real M1 vertical acceptance failed

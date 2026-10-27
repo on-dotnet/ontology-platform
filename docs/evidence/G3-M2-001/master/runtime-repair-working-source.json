@@ -1,0 +1,32 @@
+{
+  "observedAtUtc": "2026-10-27T16:23:24.216468+00:00",
+  "committedSourceHead": "dfce2dfd9e14126aa65c9299e99624f1e38e44f1",
+  "scope": "post-run source observation; runtime sourceHead is committed identity, not assertion of a pristine worktree; exact reviewed harness repair and four comment-only lines were present during replay",
+  "files": [
+    {
+      "path": "scripts/acceptance/g2-live-browser.mjs",
+      "sha256": "d333af2ac342a04758d8d8c8f26c7c814b5ff5abc40a1e60ff6d632dcfd46a48"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/G3M2EndpointTests.cs",
+      "sha256": "dec8d56bd6f2534572c993d252f80d4983ec4804ef8f7c4107a72613414fbae7"
+    }
+  ],
+  "productCodeDiff": "",
+  "workingCodePatch": "diff --git a/backend/tests/OntologyPlatform.SecurityTests/G3M2EndpointTests.cs b/backend/tests/OntologyPlatform.SecurityTests/G3M2EndpointTests.cs\nindex 5e56280..87b64b1 100644\n--- a/backend/tests/OntologyPlatform.SecurityTests/G3M2EndpointTests.cs\n+++ b/backend/tests/OntologyPlatform.SecurityTests/G3M2EndpointTests.cs\n@@ -26,10 +26,12 @@ public sealed class G3M2EndpointTests\n     [DataRow(\"platform.viewer\", 403)]\n     public async Task EditAuthorizesBeforeMalformedBody(string? role, int status)\n     {\n+        // 启动可信角色对应的正式路由宿主，验证绑定正文前先拒绝越权。\n         await using var app = Host(role);\n         await app.StartAsync();\n         // 使用实际随机端口，既不模拟HTTP响应也不提供业务成功替身。\n         using var client = new HttpClient { BaseAddress = new Uri(app.Urls.Single()) };\n+        // 保留畸形请求的实际HTTP响应，以断言权限门禁优先于JSON解析。\n         using var response = await client.PostAsync(\"/api/v1/ontology-drafts/m2/edits\", new StringContent(\"{\", Encoding.UTF8, \"application/json\"));\n         Assert.AreEqual(status, (int)response.StatusCode);\n     }\n@@ -43,6 +45,7 @@ public sealed class G3M2EndpointTests\n     [DataRow(\"\\\"1\\\"\", 409)]\n     public async Task EditRequiresStrongMatchingRevision(string? etag, int status)\n     {\n+        // 启动操作员正式路由宿主，使请求继续到修订头前置检查。\n         await using var app = Host(\"platform.operator\");\n         await app.StartAsync();\n         // 原生Cookie仅保留在当前HttpClient内存，不写证据或源码。\n@@ -52,6 +55,7 @@ public sealed class G3M2EndpointTests\n         client.DefaultRequestHeaders.Add(\"X-CSRF-TOKEN\", token);\n         client.DefaultRequestHeaders.Add(\"Origin\", \"http://platform.test\");\n         if (etag is not null) client.DefaultRequestHeaders.TryAddWithoutValidation(\"If-Match\", etag);\n+        // 读取真实CSRF校验后的HTTP响应，核对强修订头的失败关闭状态。\n         using var response = await client.PostAsJsonAsync(\"/api/v1/ontology-drafts/m2/edits\", new EditDraftRequest\n         {\n             Edit = new SemanticEdit { SubjectIri = \"urn:m2:C\", PredicateIri = \"http://www.w3.org/2000/01/rdf-schema#label\", NewObject = new RdfTerm { Kind = RdfTermKind.Literal, Value = \"设备\" } },\ndiff --git a/scripts/acceptance/g2-live-browser.mjs b/scripts/acceptance/g2-live-browser.mjs\nindex 915dd32..0fc9832 100644\n--- a/scripts/acceptance/g2-live-browser.mjs\n+++ b/scripts/acceptance/g2-live-browser.mjs\n@@ -116,7 +116,12 @@ try {\n   check('ui_four_real_file_import_create', uiCreatedResponse.status() === 200, uiCreatedResponse.status());\n   const uiCreated = await uiCreatedResponse.json();\n   check('ui_full_scope_and_source_exact', JSON.stringify(uiCreated.sources) === JSON.stringify(sources) && JSON.stringify(uiCreated.scope.siteIds) === JSON.stringify(['site-a','site-b']));\n+  // M2中间区域显式切换图/源码；先验证图可见，再回源码继续原有CAS和导出断言。\n+  await page.getByRole('button', { name: '图视图', exact: true }).click();\n   await page.getByRole('heading', { name: 'RDF 结构投影', exact: true }).waitFor();\n+  await page.locator('.g2-graph canvas').first().waitFor();\n+  check('ui_explicit_graph_view_visible', await page.locator('.g2-graph canvas').first().isVisible());\n+  await page.getByRole('button', { name: '源码视图', exact: true }).click();\n   phase = 'real_ui_structural_edit';\n   await page.getByRole('combobox', { name: '结构操作', exact: true }).selectOption('add');\n   const addedIri = 'urn:synthetic:live:Class:' + randomUUID();\n",
+  "command": [
+    "python3",
+    "scripts/acceptance/g3-acceptance-runtime.py",
+    "--milestone",
+    "M2",
+    "--runtime-file",
+    ".tools/security/g3-m2-8fb61910c7c7/runtime.json",
+    "--start-runtime"
+  ],
+  "environmentMetadata": {
+    "PLATFORM_TASK_ID": "G3-M2-001",
+    "PLATFORM_EVIDENCE_DIR": "docs/evidence/G3-M2-001/runtime/runtime-repair",
+    "G3_READER_IDENTITY_SHA": "cd33609522b18f9b5497377a24f518ff73b411f7b8455fd06aa1a2d48afaa806"
+  },
+  "exitCode": 0
+}

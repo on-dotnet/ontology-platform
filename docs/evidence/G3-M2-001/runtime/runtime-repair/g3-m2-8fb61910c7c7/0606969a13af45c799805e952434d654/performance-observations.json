@@ -1,0 +1,216 @@
+{
+  "environment": "local macOS arm64, real isolated Docker/Aspire, headless Edge; no production SLO",
+  "sourceUtf8Bytes": {
+    "ontologyTurtle": 4585,
+    "shapesTurtle": 3466,
+    "vocabularyTurtle": 207,
+    "dataTurtle": 56984
+  },
+  "samples": [
+    {
+      "operation": "/api/v1/ontology-drafts/{id}/assessments",
+      "elapsedMs": 98.5635829999992,
+      "status": 200,
+      "category": "api",
+      "transport": "browser UI"
+    },
+    {
+      "operation": "/api/v1/release-proposals",
+      "elapsedMs": 59.69195799999943,
+      "status": 200,
+      "category": "api",
+      "transport": "browser UI"
+    },
+    {
+      "operation": "/api/v1/approvals/{id}/decisions",
+      "category": "api",
+      "elapsedMs": 3.304707999999664,
+      "status": 403
+    },
+    {
+      "operation": "/api/v1/release-activations",
+      "category": "publication",
+      "elapsedMs": 6.499374999999418,
+      "status": 409
+    },
+    {
+      "operation": "/api/v1/approvals/{id}/decisions",
+      "elapsedMs": 1089.8247499999998,
+      "status": 200,
+      "category": "api",
+      "transport": "browser UI"
+    },
+    {
+      "operation": "/api/v1/release-activations",
+      "elapsedMs": 1203.9674580000028,
+      "status": 200,
+      "category": "publication",
+      "transport": "browser UI"
+    },
+    {
+      "operation": "Jena SPARQL fixed formal data graph count",
+      "category": "sparql",
+      "elapsedMs": 4.419291999998677,
+      "status": 200
+    },
+    {
+      "operation": "Jena SPARQL fixed formal data graph count",
+      "category": "sparql",
+      "elapsedMs": 5.69550000000163,
+      "status": 200
+    },
+    {
+      "operation": "Jena SPARQL fixed formal data graph count",
+      "category": "sparql",
+      "elapsedMs": 3.940500000000611,
+      "status": 200
+    },
+    {
+      "operation": "Jena SPARQL fixed formal data graph count",
+      "category": "sparql",
+      "elapsedMs": 2.842916999998124,
+      "status": 200
+    },
+    {
+      "operation": "Jena SPARQL fixed formal data graph count",
+      "category": "sparql",
+      "elapsedMs": 2.4408330000005662,
+      "status": 200
+    },
+    {
+      "operation": "/api/v1/semantic/queries",
+      "elapsedMs": 133.72425000000294,
+      "status": 200,
+      "category": "gateway",
+      "transport": "browser UI"
+    },
+    {
+      "operation": "/api/v1/semantic/queries",
+      "elapsedMs": 125.52041699999972,
+      "status": 200,
+      "category": "gateway",
+      "transport": "browser UI"
+    },
+    {
+      "operation": "/api/v1/semantic/queries",
+      "elapsedMs": 121.37766699999702,
+      "status": 200,
+      "category": "gateway",
+      "transport": "browser UI"
+    },
+    {
+      "operation": "/api/v1/execution-runs",
+      "elapsedMs": 125.76937499999985,
+      "status": 200,
+      "category": "api",
+      "transport": "browser UI"
+    },
+    {
+      "operation": "browser native SSE creation-to-observed-terminal",
+      "category": "sse",
+      "elapsedMs": 784.0950420000008,
+      "status": 200,
+      "note": "timer begins after create response; not before the HTTP command"
+    },
+    {
+      "operation": "/api/v1/execution-runs",
+      "category": "api",
+      "elapsedMs": 56.57566699999734,
+      "status": 200
+    },
+    {
+      "operation": "/api/v1/ontology-drafts/{id}/validations",
+      "category": "shacl",
+      "elapsedMs": 46.82816699999967,
+      "status": 200
+    },
+    {
+      "operation": "/api/v1/release-proposals",
+      "category": "api",
+      "elapsedMs": 8.15216700000019,
+      "status": 200
+    },
+    {
+      "operation": "/api/v1/approvals/{id}/decisions",
+      "elapsedMs": 1037.8215840000012,
+      "status": 200,
+      "category": "api",
+      "transport": "browser UI"
+    },
+    {
+      "operation": "/api/v1/release-activations",
+      "elapsedMs": 1280.898707999997,
+      "status": 200,
+      "category": "publication",
+      "transport": "browser UI"
+    },
+    {
+      "operation": "/api/v1/semantic/queries",
+      "category": "gateway",
+      "elapsedMs": 140.28320800000074,
+      "status": 200
+    },
+    {
+      "operation": "/api/v1/semantic/queries",
+      "category": "gateway",
+      "elapsedMs": 128.29737499999464,
+      "status": 200
+    },
+    {
+      "operation": "/api/v1/release-proposals",
+      "elapsedMs": 1012.7693749999962,
+      "status": 200,
+      "category": "api",
+      "transport": "browser UI"
+    },
+    {
+      "operation": "/api/v1/approvals/{id}/decisions",
+      "elapsedMs": 1153.7649579999998,
+      "status": 200,
+      "category": "api",
+      "transport": "browser UI"
+    },
+    {
+      "operation": "/api/v1/release-activations",
+      "elapsedMs": 1235.1985830000049,
+      "status": 200,
+      "category": "publication",
+      "transport": "browser UI"
+    },
+    {
+      "operation": "/api/v1/semantic/queries",
+      "category": "gateway",
+      "elapsedMs": 108.10458400000061,
+      "status": 200
+    }
+  ],
+  "readBackpressureAttempts": [
+    {
+      "operation": "/api/v1/semantic/queries",
+      "attempt": 1,
+      "status": 200,
+      "code": null,
+      "waitMs": 0,
+      "observedWaitMs": 0,
+      "elapsedMs": 140.23608300000342
+    },
+    {
+      "operation": "/api/v1/semantic/queries",
+      "attempt": 1,
+      "status": 200,
+      "code": null,
+      "waitMs": 0,
+      "observedWaitMs": 0,
+      "elapsedMs": 128.27091700000165
+    },
+    {
+      "operation": "/api/v1/semantic/queries",
+      "attempt": 1,
+      "status": 200,
+      "code": null,
+      "waitMs": 0,
+      "observedWaitMs": 0,
+      "elapsedMs": 108.05662499999744
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "exitCode": 0,
+  "runtimeOnly": true,
+  "notRun": [
+    "engineering/native/container suites in this invocation"
+  ],
+  "records": [
+    {
+      "command": [
+        "python3",
+        "infra/security/verify-oidc.py",
+        "--runtime-file",
+        "/Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/.tools/security/g3-m2-8fb61910c7c7/runtime.json",
+        "--identity-prefix",
+        "g2"
+      ],
+      "exitCode": 0,
+      "output": "docs/evidence/G3-M2-001/runtime/runtime-repair/g3-m2-8fb61910c7c7/0606969a13af45c799805e952434d654/g1-regression-0.txt"
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/acceptance/verify-closeout-observability.py",
+        "--runtime-file",
+        "/Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/.tools/security/g3-m2-8fb61910c7c7/runtime.json",
+        "--identity-prefix",
+        "g2"
+      ],
+      "exitCode": 0,
+      "output": "docs/evidence/G3-M2-001/runtime/runtime-repair/g3-m2-8fb61910c7c7/0606969a13af45c799805e952434d654/g1-regression-1.txt"
+    }
+  ]
+}
