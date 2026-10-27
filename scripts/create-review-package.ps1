@@ -17,7 +17,7 @@ param(
     [string]$CiRunUrl,
     [string]$CiCommit,
     [ValidateSet('success', 'failure', 'cancelled', 'timed_out', 'action_required')][string]$CiConclusion,
-    [ValidateSet(1, 2)][int]$SchemaVersion = 2,
+    [ValidateSet(1, 2, 3)][int]$SchemaVersion = 3,
     [switch]$VerifyOnly,
     [string]$PackagePath
 )
@@ -93,6 +93,132 @@ function Get-ReviewHash {
     return [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($Bytes)).ToLowerInvariant()
 }
 
+function Get-ReviewObservedCi {
+    param([string]$Repository, [string]$RunId, [string]$Head)
+    if ($RunId -notmatch '^[0-9]+$') { throw 'CI_EVIDENCE: V3 requires an actual GitHub run ID' }
+    $info = [Diagnostics.ProcessStartInfo]::new('gh')
+    $info.WorkingDirectory = $Repository
+    $info.UseShellExecute = $false
+    $info.RedirectStandardOutput = $true
+    $info.RedirectStandardError = $true
+    foreach ($argument in @('run', 'view', $RunId, '--repo', 'on-dotnet/ontology-platform', '--json', 'databaseId,headSha,url,status,conclusion,jobs')) { $info.ArgumentList.Add($argument) }
+    $process = [Diagnostics.Process]::new(); $process.StartInfo = $info
+    try {
+        $null = $process.Start()
+        $output = $process.StandardOutput.ReadToEndAsync(); $errorOutput = $process.StandardError.ReadToEndAsync()
+        if (-not $process.WaitForExit(120000)) { $process.Kill($true); throw 'CI_EVIDENCE: GitHub query timed out' }
+        $null = $errorOutput.GetAwaiter().GetResult()
+        if ($process.ExitCode -ne 0) { throw 'CI_EVIDENCE: actual GitHub run/jobs unavailable; raw stderr suppressed' }
+        $run = $output.GetAwaiter().GetResult() | ConvertFrom-Json -AsHashtable
+    } catch { throw "CI_EVIDENCE: GitHub query failed; $($_.Exception.Message)" } finally { $process.Dispose() }
+    $url = 'https://github.com/on-dotnet/ontology-platform/actions/runs/' + $RunId
+    if ([string]$run.databaseId -cne $RunId -or $run.headSha -cne $Head -or $run.url -cne $url -or $run.status -cne 'completed') { throw 'CI_EVIDENCE: actual GitHub run identity, Head or completed status mismatch' }
+    $jobs = @()
+    foreach ($name in @('engineering', 'governance-integration')) {
+        $jobMatches = @($run.jobs | Where-Object { $_.name -ceq $name })
+        if ($jobMatches.Count -ne 1 -or $jobMatches[0].status -cne 'completed' -or -not $jobMatches[0].databaseId -or
+            $jobMatches[0].url -notmatch ('^' + [regex]::Escape($url) + '/job/[0-9]+$')) { throw 'CI_EVIDENCE: exact required job missing or incomplete' }
+        $job = $jobMatches[0]
+        $jobs += [ordered]@{ id = [string]$job.databaseId; name = $name; url = $job.url; status = $job.status; conclusion = $job.conclusion }
+    }
+    $passed = $run.conclusion -ceq 'success' -and @($jobs | Where-Object conclusion -CNE 'success').Count -eq 0
+    if ($run.conclusion -ceq 'success' -and -not $passed) { throw 'CI_EVIDENCE: run success disagrees with required jobs' }
+    return [ordered]@{ status = $(if ($passed) { 'PASS' } else { 'FAIL' }); runId = $RunId; url = $url; commit = $Head; conclusion = $run.conclusion; verification = 'GITHUB_QUERIED'; jobs = $jobs }
+}
+
+function Get-ReviewIgnoredInventory {
+    param([string]$Repository, [string[]]$Paths)
+    $groups = @{}
+    $directorySafety = [Collections.Generic.Dictionary[string,bool]]::new([StringComparer]::Ordinal)
+    foreach ($path in $Paths) {
+        # 仅读取非链接文件的长度元数据；不读ignored内容，也不跟随私有目录链接。
+        $parts = $path.Split('/')
+        $directory = if ($parts.Count -eq 1) { '<root>' } elseif ($parts[0] -in @('.tools', 'apps', 'backend', 'artifacts', '.runtime', 'node_modules', '.superpowers', '.worktrees', '.agents', '.codex')) { $parts[0] } else { '<other>' }
+        $category = if ($path -match '(^|/)(node_modules|\.tools|\.nuget|\.pnpm|pnpm-store)(/|$)') { 'dependency-cache' } elseif ($path -match '(^|/)(obj|bin|\.next|coverage|TestResults)(/|$)') { 'build-output' } elseif ($directory -eq 'artifacts') { 'local-artifact' } elseif ($path -match '(^|/)(\.env[^/]*|[^/]*\.(pfx|pem|key))$') { 'private-configuration' } else { 'other-ignored' }
+        $key = "$directory|$category"
+        if (-not $groups.ContainsKey($key)) { $groups[$key] = [ordered]@{ directory = $directory; category = $category; count = 0; estimatedBytes = [long]0; unknownSizeCount = 0; examples = @() } }
+        $group = $groups[$key]; $group.count++
+        if ($group.examples.Count -lt 2) { $group.examples += $path }
+        $cursor = $Repository; $safe = $true
+        for ($i = 0; $i -lt $parts.Count; $i++) {
+            $part = $parts[$i]
+            if ($part -in @('', '.', '..') -or $part.Contains('\')) { $safe = $false; break }
+            $cursor = [IO.Path]::Combine($cursor, $part)
+            if ($i -lt $parts.Count - 1) {
+                if (-not $directorySafety.ContainsKey($cursor)) {
+                    $dir = [IO.DirectoryInfo]::new($cursor)
+                    $directorySafety[$cursor] = $dir.Exists -and ($dir.Attributes -band [IO.FileAttributes]::ReparsePoint) -eq 0
+                }
+                if (-not $directorySafety[$cursor]) { $safe = $false; break }
+            }
+        }
+        $item = if ($safe) { [IO.FileInfo]::new($cursor) } else { $null }
+        if ($null -ne $item -and $item.Exists -and ($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -eq 0) { $group.estimatedBytes += $item.Length } else { $group.unknownSizeCount++ }
+    }
+    $orderedGroups = @($groups.Keys | Sort-Object -CaseSensitive | ForEach-Object { $groups[$_] })
+    $totalEstimated = [long]0
+    foreach ($group in $orderedGroups) { $totalEstimated += $group.estimatedBytes }
+    $listBytes = $script:utf8.GetBytes(($Paths -join "`0") + $(if ($Paths.Count) { "`0" } else { '' }))
+    return [ordered]@{ count = $Paths.Count; estimatedBytes = $totalEstimated; listSha256 = Get-ReviewHash $listBytes; scannedAt = [DateTime]::UtcNow.ToString('o'); sizeMethod = 'File length metadata only; no content reads or symlink traversal; unavailable lengths counted separately.'; groups = $orderedGroups }
+}
+
+function Assert-ReviewIgnoredInventory {
+    param($Inventory)
+    $expectedFields = @('count', 'estimatedBytes', 'listSha256', 'scannedAt', 'sizeMethod', 'groups')
+    if ($Inventory -isnot [Collections.IDictionary] -or $Inventory.get_Count() -ne $expectedFields.Count -or @($Inventory.Keys | Where-Object { $_ -cnotin $expectedFields }).Count) { throw 'MANIFEST_INVALID: ignored inventory fields invalid' }
+    foreach ($field in @('count', 'estimatedBytes')) {
+        if (($Inventory[$field] -isnot [int] -and $Inventory[$field] -isnot [long]) -or $Inventory[$field] -lt 0) { throw 'MANIFEST_INVALID: ignored inventory nonnegative integers required' }
+    }
+    $time = [DateTimeOffset]::MinValue
+    # ConvertFrom-Json在部分PowerShell版本自动将ISO UTC字符串解析为DateTime。
+    $validTime = if ($Inventory.scannedAt -is [string]) { $Inventory.scannedAt -match '(Z|[+-][0-9]{2}:[0-9]{2})$' -and [DateTimeOffset]::TryParse($Inventory.scannedAt, [ref]$time) } elseif ($Inventory.scannedAt -is [DateTime]) { $Inventory.scannedAt.Kind -eq [DateTimeKind]::Utc } else { $Inventory.scannedAt -is [DateTimeOffset] }
+    if ($Inventory.listSha256 -isnot [string] -or $Inventory.listSha256 -cnotmatch '^[a-f0-9]{64}$' -or -not $validTime -or
+        $Inventory.sizeMethod -cne 'File length metadata only; no content reads or symlink traversal; unavailable lengths counted separately.' -or $Inventory.groups -isnot [array] -or $Inventory.groups.Count -gt 60) { throw 'MANIFEST_INVALID: bounded ignored metadata schema invalid' }
+    $keys = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+    $count = [decimal]0; $size = [decimal]0
+    foreach ($group in $Inventory.groups) {
+        $fields = @('directory', 'category', 'count', 'estimatedBytes', 'unknownSizeCount', 'examples')
+        if ($group -isnot [Collections.IDictionary] -or $group.get_Count() -ne $fields.Count -or @($group.Keys | Where-Object { $_ -cnotin $fields }).Count -or
+            $group.directory -cnotin @('<root>', '<other>', '.tools', 'apps', 'backend', 'artifacts', '.runtime', 'node_modules', '.superpowers', '.worktrees', '.agents', '.codex') -or
+            $group.category -cnotin @('dependency-cache', 'build-output', 'local-artifact', 'private-configuration', 'other-ignored') -or
+            -not $keys.Add(($group.directory + '|' + $group.category))) { throw 'MANIFEST_INVALID: ignored group fields, directory/category or uniqueness invalid' }
+        foreach ($field in @('count', 'estimatedBytes', 'unknownSizeCount')) {
+            if (($group[$field] -isnot [int] -and $group[$field] -isnot [long]) -or $group[$field] -lt 0) { throw 'MANIFEST_INVALID: ignored group nonnegative integers required' }
+        }
+        if ($group.count -eq 0 -or $group.unknownSizeCount -gt $group.count -or $group.examples -isnot [array] -or $group.examples.Count -gt [Math]::Min(2, $group.count)) { throw 'MANIFEST_INVALID: ignored group counts/examples inconsistent' }
+        foreach ($example in $group.examples) {
+            if ($example -isnot [string] -or $example.Length -eq 0 -or $example.Length -gt 4096 -or $example -match '(^/|[\x00-\x1f\x7f])') { throw 'MANIFEST_INVALID: ignored example must be a bounded relative path' }
+        }
+        $count += $group.count; $size += $group.estimatedBytes
+    }
+    if ($count -ne $Inventory.count -or $size -ne $Inventory.estimatedBytes) { throw 'MANIFEST_INVALID: ignored inventory totals differ from groups' }
+}
+
+function Get-ReviewDeflatedSize {
+    param([byte[]]$Bytes)
+    $buffer = [IO.MemoryStream]::new()
+    $compressor = [IO.Compression.DeflateStream]::new($buffer, [IO.Compression.CompressionLevel]::Optimal, $true)
+    try { $compressor.Write($Bytes, 0, $Bytes.Length) } finally { $compressor.Dispose() }
+    try { return $buffer.Length } finally { $buffer.Dispose() }
+}
+
+function Get-ReviewSizeReport {
+    param([string]$Path)
+    $archive = [IO.Compression.ZipFile]::OpenRead($Path)
+    $categories = @{}
+    try {
+        foreach ($entry in $archive.Entries) {
+            $category = if ($entry.FullName.StartsWith('source/')) { 'source' } elseif ($entry.FullName.StartsWith('review-evidence/')) { 'review-evidence' } elseif ($entry.FullName.StartsWith('git/')) { 'git' } else { 'metadata-and-index' }
+            if (-not $categories.ContainsKey($category)) { $categories[$category] = [ordered]@{ category = $category; members = 0; uncompressedBytes = [long]0; compressedBytes = [long]0 } }
+            $categories[$category].members++; $categories[$category].uncompressedBytes += $entry.Length; $categories[$category].compressedBytes += $entry.CompressedLength
+        }
+    } finally { $archive.Dispose() }
+    $size = (Get-Item -LiteralPath $Path).Length
+    $payloadSize = [long]0
+    foreach ($category in $categories.Values) { $payloadSize += $category.compressedBytes }
+    return [ordered]@{ sizeBytes = $size; softTargetBytes = 10MB; hardLimitBytes = 15MB; aboveSoftTarget = ($size -gt 10MB); categories = @($categories.Keys | Sort-Object | ForEach-Object { $categories[$_] }); zipOverheadBytes = $size - $payloadSize }
+}
+
 function Get-ReviewSnapshot {
     param([string]$Repository, [string]$Base, [string]$Head, [int]$Version = 1, [string]$WorkItem = '')
     foreach ($sha in @($Base, $Head)) {
@@ -126,6 +252,20 @@ function Get-ReviewSnapshot {
     $payloads = [Collections.Generic.Dictionary[string,string]]::new([StringComparer]::Ordinal)
     $evidenceIndex = [Collections.Generic.List[object]]::new()
     $gitBytes = [Collections.Generic.Dictionary[string,byte[]]]::new([StringComparer]::Ordinal)
+    $selectedScreenshots = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+    $screenshotSelection = "docs/evidence/$WorkItem/review-screenshots.json"
+    if ($Version -eq 3 -and $blobs.ContainsKey($screenshotSelection)) {
+        $selection = (Invoke-ReviewGit $Repository @('cat-file', 'blob', $blobs[$screenshotSelection])).Text | ConvertFrom-Json -AsHashtable
+        $keys = [Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+        if ($selection.schemaVersion -ne 1 -or @($selection.screenshots).Count -gt 12) { throw 'SCREENSHOT_SELECTION: schema1, at most 12 stable screenshots required' }
+        foreach ($shot in $selection.screenshots) {
+            Assert-ReviewPath $shot.path
+            if (-not $shot.path.StartsWith('docs/evidence/', [StringComparison]::Ordinal) -or -not $shot.path.EndsWith('.png', [StringComparison]::OrdinalIgnoreCase) -or -not $blobs.ContainsKey($shot.path) -or $shot.stable -isnot [bool] -or $shot.stable -ne $true -or $shot.page -isnot [string] -or -not $shot.page -or $shot.theme -isnot [string] -or -not $shot.theme -or $shot.viewport -isnot [string] -or -not $shot.viewport -or
+                -not $selectedScreenshots.Add($shot.path) -or -not $keys.Add((ConvertTo-Json -InputObject @($shot.page, $shot.theme, $shot.viewport) -Compress))) { throw 'SCREENSHOT_SELECTION: stable unique page/theme/viewport and committed PNG required' }
+        }
+    }
+    $screenshotCompressedBytes = [long]0
+    $screenshotPayloads = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
     try {
         foreach ($entry in $archive.Entries) {
             if ($entry.FullName.EndsWith('/')) { continue }
@@ -154,6 +294,13 @@ function Get-ReviewSnapshot {
             } else {
                 $isEvidence = $path.StartsWith('docs/evidence/', [StringComparison]::Ordinal)
                 $include = -not $isEvidence -or $path.StartsWith("docs/evidence/$WorkItem/", [StringComparison]::Ordinal)
+                if ($Version -eq 3 -and $isEvidence -and $path.EndsWith('.png', [StringComparison]::OrdinalIgnoreCase)) {
+                    $include = $selectedScreenshots.Contains($path)
+                    if ($include -and $screenshotPayloads.Add($hash)) {
+                        $screenshotCompressedBytes += Get-ReviewDeflatedSize $bytes
+                        if ($screenshotCompressedBytes -gt 3MB) { throw 'SCREENSHOT_BUDGET: stable PNG compressed payload exceeds 3 MiB; select representative evidence' }
+                    }
+                }
                 $destination = $null
                 if ($include) {
                     $destination = if ($isEvidence) { 'review-evidence/' + $path.Substring(14) } else { 'source/' + $path }
@@ -177,7 +324,7 @@ function Get-ReviewSnapshot {
     if ($Version -eq 1) { $diffOptions += '--binary' }
     $diff = if ($Version -eq 1) { Invoke-ReviewGit $Repository ($diffOptions + @($Base, $Head, '--')) } else { @{ Bytes = [byte[]]::new(0) } }
     Assert-ReviewContent $diff.Bytes 'complete text patch including removed lines'
-    if ($Version -eq 2) {
+    if ($Version -ge 2) {
         # 对所有变更的两侧原始blob做路径/秘密检查；二进制省略不能绕过已删除内容检查。
         $raw = Invoke-ReviewGit $Repository @('diff', '--raw', '-z', '--no-color', '--no-ext-diff', '--no-textconv', '--find-renames', '--abbrev=40', $Base, $Head, '--')
         $parts = $raw.Text.Split([char]0, [StringSplitOptions]::RemoveEmptyEntries)
@@ -218,9 +365,9 @@ function Get-ReviewSnapshot {
         $members.Add('git/changed-files.txt', $changed.Bytes)
     } else { $members.Add('git/diff-text.patch', $diff.Bytes) }
     $members.Add('git/commits.txt', $commits.Bytes)
-    $members.Add('git/status.txt', $script:utf8.GetBytes("OBSERVED: clean tracked and untracked delivery at packaging time.`nIgnored paths excluded; see manifest.excludedIgnoredPaths.`n"))
+    $members.Add('git/status.txt', $script:utf8.GetBytes("OBSERVED: clean tracked and untracked delivery at packaging time.`nIgnored paths excluded; see manifest.$(if ($Version -eq 3) { 'ignoredInventory' } else { 'excludedIgnoredPaths' }).`n"))
     $members.Add('git/diff-check.txt', $script:utf8.GetBytes("exitCode=$($check.ExitCode)`n" + $check.Text))
-    return @{ Members = $members; Mapping = $mapping.ToArray(); Ignored = $ignoredPaths; DiffCheckExit = $check.ExitCode; GitBytes = $gitBytes }
+    return @{ Members = $members; Mapping = $mapping.ToArray(); Ignored = $ignoredPaths; ScreenshotCount = $selectedScreenshots.Count; ScreenshotCompressedBytes = $screenshotCompressedBytes; DiffCheckExit = $check.ExitCode; GitBytes = $gitBytes }
 }
 
 function Get-ReviewEvidence {
@@ -270,10 +417,20 @@ function Test-ReviewArchive {
         if (-not $actual.ContainsKey($required)) { throw 'ARCHIVE_MISSING: required metadata absent' }
     }
     $manifest = $script:utf8.GetString($actual['manifest.json']) | ConvertFrom-Json -AsHashtable
-    if ($manifest.schemaVersion -notin @(1, 2) -or $manifest.taskId -notmatch '^[A-Z0-9][A-Z0-9-]{0,79}$' -or $manifest.status -notin @('PASS', 'PARTIAL', 'BLOCKED', 'NOT_RUN')) { throw 'MANIFEST_INVALID: invalid identity/status' }
+    if ($manifest.schemaVersion -notin @(1, 2, 3) -or $manifest.taskId -notmatch '^[A-Z0-9][A-Z0-9-]{0,79}$' -or $manifest.status -notin @('PASS', 'PARTIAL', 'BLOCKED', 'NOT_RUN')) { throw 'MANIFEST_INVALID: invalid identity/status' }
     $snapshot = Get-ReviewSnapshot $Repository $manifest.baseSha $manifest.headSha $manifest.schemaVersion $manifest.taskId
-    $evidence = Get-ReviewEvidence $snapshot $manifest.evidencePath $manifest.status $manifest.runtimeCi
-    if (($manifest.status -eq 'PASS' -or ($manifest.schemaVersion -eq 2 -and $evidence.ci.status -in @('PASS', 'FAIL'))) -and $evidence.ci.commit -cne $manifest.headSha) { throw 'CI_EVIDENCE: PASS CI commit must equal HeadSha' }
+    $observedCi = $manifest.runtimeCi
+    if ($manifest.schemaVersion -eq 3) {
+        if ((Get-Item -LiteralPath $Path).Length -gt 15MB) { throw 'PACKAGE_SIZE: V3 exceeds 15 MiB delivery limit' }
+        $observedCi = Get-ReviewObservedCi $Repository $manifest.ci.runId $manifest.headSha
+        if (-not [Text.Json.Nodes.JsonNode]::DeepEquals([Text.Json.Nodes.JsonNode]::Parse(($manifest.runtimeCi | ConvertTo-Json -Depth 12)), [Text.Json.Nodes.JsonNode]::Parse(($observedCi | ConvertTo-Json -Depth 12)))) { throw 'CI_EVIDENCE: recorded CI differs from actual GitHub run/jobs' }
+        if ($snapshot.DiffCheckExit -ne 0) { throw 'DIFF_CHECK: V3 refuses a failing full Base/Head diff-check' }
+        if (-not $manifest.ContainsKey('ignoredInventory') -or $manifest.ContainsKey('excludedIgnoredPaths')) { throw 'MANIFEST_INVALID: bounded ignored inventory required' }
+        Assert-ReviewIgnoredInventory $manifest.ignoredInventory
+        if ($manifest.screenshotPolicy.selectedCount -ne $snapshot.ScreenshotCount -or $manifest.screenshotPolicy.compressedBytes -ne $snapshot.ScreenshotCompressedBytes -or $manifest.screenshotPolicy.maxCount -ne 12 -or $manifest.screenshotPolicy.maxCompressedBytes -ne 3MB) { throw 'MANIFEST_INVALID: screenshot policy differs from committed selection' }
+    }
+    $evidence = Get-ReviewEvidence $snapshot $manifest.evidencePath $manifest.status $observedCi
+    if (($manifest.status -eq 'PASS' -or ($manifest.schemaVersion -ge 2 -and $evidence.ci.status -in @('PASS', 'FAIL'))) -and $evidence.ci.commit -cne $manifest.headSha) { throw 'CI_EVIDENCE: PASS CI commit must equal HeadSha' }
     # 证据与CI从提交/显式输入重算；V2原始validation仅存在映射的一个位置。
     $expectedEvidence = $evidence | ConvertTo-Json -Depth 16 -Compress
     $recordedManifestEvidence = @{ checks = $manifest.checks; ci = $manifest.ci } | ConvertTo-Json -Depth 16 -Compress
@@ -286,7 +443,7 @@ function Test-ReviewArchive {
     } else {
         if ($manifest.evidencePath -and -not $manifest.evidencePath.StartsWith("docs/evidence/$($manifest.taskId)/", [StringComparison]::Ordinal)) { throw 'EVIDENCE_REQUIRED: compact evidence must belong to current task' }
         $metadataNames += 'git/ci.json'
-        if (-not $actual.ContainsKey('git/ci.json') -or -not [Text.Json.Nodes.JsonNode]::DeepEquals([Text.Json.Nodes.JsonNode]::Parse($script:utf8.GetString($actual['git/ci.json'])), [Text.Json.Nodes.JsonNode]::Parse(($evidence.ci | ConvertTo-Json -Depth 8)))) { throw 'CI_EVIDENCE: CI metadata mismatch' }
+        if (-not $actual.ContainsKey('git/ci.json') -or -not [Text.Json.Nodes.JsonNode]::DeepEquals([Text.Json.Nodes.JsonNode]::Parse($script:utf8.GetString($actual['git/ci.json'])), [Text.Json.Nodes.JsonNode]::Parse(($evidence.ci | ConvertTo-Json -Depth 12)))) { throw 'CI_EVIDENCE: CI metadata mismatch' }
         if (-not $manifest.evidencePath) {
             $metadataNames += 'review-evidence/validation.json'
             if (-not $actual.ContainsKey('review-evidence/validation.json') -or -not [Text.Json.Nodes.JsonNode]::DeepEquals([Text.Json.Nodes.JsonNode]::Parse($script:utf8.GetString($actual['review-evidence/validation.json'])), $expectedNode)) { throw 'EVIDENCE_MISMATCH: absent evidence status differs' }
@@ -328,8 +485,15 @@ try {
         if (-not $CiRunId -or -not $CiRunUrl -or -not $CiCommit -or -not $CiConclusion) { throw 'CI_EVIDENCE: all four explicit CI parameters required together' }
         $runtimeCi = [ordered]@{ status = $(if ($CiConclusion -eq 'success') { 'PASS' } else { 'FAIL' }); runId = $CiRunId; url = $CiRunUrl; commit = $CiCommit; conclusion = $CiConclusion }
     }
+    if ($SchemaVersion -eq 3) {
+        $declaredCi = $runtimeCi
+        if (-not $CiRunId -and $EvidencePath -and $snapshot.GitBytes.ContainsKey($EvidencePath)) { $CiRunId = (($script:utf8.GetString($snapshot.GitBytes[$EvidencePath]) | ConvertFrom-Json -AsHashtable).ci.runId) }
+        $runtimeCi = Get-ReviewObservedCi $Root $CiRunId $HeadSha
+        if ($null -ne $declaredCi -and ($declaredCi.commit -cne $runtimeCi.commit -or $declaredCi.url -cne $runtimeCi.url -or $declaredCi.conclusion -cne $runtimeCi.conclusion)) { throw 'CI_EVIDENCE: supplied CI differs from actual GitHub run/jobs' }
+        if ($snapshot.DiffCheckExit -ne 0) { throw 'DIFF_CHECK: V3 refuses a failing full Base/Head diff-check' }
+    }
     $evidence = Get-ReviewEvidence $snapshot $EvidencePath $Status $runtimeCi
-    if (($Status -eq 'PASS' -or ($SchemaVersion -eq 2 -and $evidence.ci.status -in @('PASS', 'FAIL'))) -and $evidence.ci.commit -cne $HeadSha) { throw 'CI_EVIDENCE: PASS CI commit must equal HeadSha' }
+    if (($Status -eq 'PASS' -or ($SchemaVersion -ge 2 -and $evidence.ci.status -in @('PASS', 'FAIL'))) -and $evidence.ci.commit -cne $HeadSha) { throw 'CI_EVIDENCE: PASS CI commit must equal HeadSha' }
     $branch = (Invoke-ReviewGit $Root @('rev-parse', '--abbrev-ref', 'HEAD')).Text.Trim()
     $gitVersion = (Invoke-ReviewGit $Root @('--version')).Text.Trim()
     $manifest = [ordered]@{
@@ -343,18 +507,25 @@ try {
         security = @{ status = 'PARTIAL'; scope = 'Finite path and UTF8/UTF16 pattern checks of committed source, complete patch, commit messages and reopened members. No guarantee of absence of secrets or private/production data; independent human review required.' }
         archiveVerification = @{ status = 'NOT_VERIFIED'; reason = 'Cannot embed its own post-close result; successful CLI JSON reports actual post-close verification.' }
     }
+    if ($SchemaVersion -eq 3) {
+        $manifest.Remove('excludedIgnoredPaths')
+        $manifest.ignoredInventory = Get-ReviewIgnoredInventory $Root $snapshot.Ignored
+        Assert-ReviewIgnoredInventory $manifest.ignoredInventory
+        $manifest.screenshotPolicy = [ordered]@{ selectionPath = "docs/evidence/$TaskId/review-screenshots.json"; maxCount = 12; maxCompressedBytes = 3MB; selectedCount = $snapshot.ScreenshotCount; compressedBytes = $snapshot.ScreenshotCompressedBytes; default = 'Only explicitly selected stable representative PNG evidence; all omitted evidence remains recoverable from indexed Git blobs.' }
+    }
     $members = $snapshot.Members
     $members.Add('manifest.json', $script:utf8.GetBytes(($manifest | ConvertTo-Json -Depth 16) + "`n"))
     if ($SchemaVersion -eq 1) { $members.Add('evidence/validation.json', $script:utf8.GetBytes(($evidence | ConvertTo-Json -Depth 12) + "`n")) }
     else {
         if ($EvidencePath -and -not $EvidencePath.StartsWith("docs/evidence/$TaskId/", [StringComparison]::Ordinal)) { throw 'EVIDENCE_REQUIRED: compact evidence must belong to current task' }
-        $members.Add('git/ci.json', $script:utf8.GetBytes(($evidence.ci | ConvertTo-Json -Depth 8) + "`n"))
+        $members.Add('git/ci.json', $script:utf8.GetBytes(($evidence.ci | ConvertTo-Json -Depth 12) + "`n"))
         if (-not $EvidencePath) { $members.Add('review-evidence/validation.json', $script:utf8.GetBytes(($evidence | ConvertTo-Json -Depth 12) + "`n")) }
     }
     $summary = "# $TaskId 审查摘要`n`n状态：$Status。BaseSha：$BaseSha；HeadSha：$HeadSha；分支：$branch。`n`n范围：Head中完整已提交常规文件和Base至Head完整差异；不使用origin/main..HEAD。source保留完整仓库相对结构；顶层docs/evidence提供文档和证据副本。`n`n验证：逐项命令/退出码见manifest.json与evidence/validation.json；CI为$($evidence.ci.status)。空证据不是PASS。静态构包成功不表示产品或整个阶段通过。`n`n阻断与未运行项：以checks/ci和任务证据为准；未提供真实运行证据的项目保持NOT_RUN/NOT_VERIFIED。忽略文件不读取、不交付，路径排除清单在manifest。`n`n安全限制：有限模式检查不能证明全面防泄露，独立审查仍需检查私有数据和未知秘密。发现可疑值时停止且不输出原值。`n`n后续：独立Reviewer审查并由Master处理集成；到当前关口停止，不自动进入下一阶段。`n"
-    if ($SchemaVersion -eq 2) {
+    if ($SchemaVersion -ge 2) {
         $summary = "# $TaskId 审查摘要`n`n状态：$Status。BaseSha：$BaseSha；HeadSha：$HeadSha；分支：$branch。`n`n范围：source为全部现行非证据源码/配置/测试/合同/ADR；review-evidence为本任务已提交证据。相同内容只保留一个payload，映射见manifest.sourceMembers。原始validation见映射，实际CI见git/ci.json与manifest。`n`n差异：git/diff-text.patch保留全部文本差异；git/changed-files.json记录每项变更的Base/Head原始blob OID、SHA256、大小、路径、类型；二进制不内嵌补丁。evidence-index.json完整列出历史证据与恢复方式。省略字节需要访问受控Git仓库，不能把此包声称为完整离线审计归档。`n`n验证：逐项命令/退出码见manifest与任务validation；CI为$($evidence.ci.status)，CI成功/失败元数据均要求同Head。空证据不是PASS；构包/重开仅证明有限完整性检查。`n`n安全与限制：已提交源、变更两侧原blob、文本补丁和成员做有限凭证检查；不包含ignored私有配置/凭证/缓存/数据库。不代替完整安全审计。被保留资源、未运行平台及实际回收量见本任务delivery-report。`n`n后续：停在当前关口，等待复审，不自动开始G3或下一阶段。`n"
     }
+    if ($SchemaVersion -eq 3) { $summary += "`nV3：CI已实际查询GitHub run与engineering/governance-integration两个job，重开时再次查询。PNG仅保留已提交选择清单中的最终稳定代表，最多12张/压缩3MiB。ignored仅聚合元数据，完整路径清单只存本地artifact。软目标10MiB、硬上限15MiB；Slim不等于独立离线审计包。`n" }
     $members.Add('REVIEW_SUMMARY.md', $script:utf8.GetBytes($summary))
     $lines = foreach ($name in @($members.Keys | Sort-Object -CaseSensitive)) { Assert-ReviewPath $name; Assert-ReviewContent $members[$name] 'generated member'; (Get-ReviewHash $members[$name]) + '  ' + $name }
     $members.Add('SHA256SUMS.txt', $script:utf8.GetBytes(($lines -join "`n") + "`n"))
@@ -374,6 +545,7 @@ try {
     $finalPath = Join-Path $outputDirectory ("OntologyPlatform-Review-$TaskId-$($HeadSha.Substring(0, 12)).zip")
     if (Test-Path -LiteralPath $finalPath) { throw 'OUTPUT_EXISTS: preserve existing package; choose a new committed HeadSha or explicitly archive old delivery' }
     $temporaryPath = Join-Path $outputDirectory ([guid]::NewGuid().ToString('N') + '.partial')
+    $localIgnored = $null
     try {
         $file = [IO.File]::Open($temporaryPath, [IO.FileMode]::CreateNew)
         $archive = [IO.Compression.ZipArchive]::new($file, [IO.Compression.ZipArchiveMode]::Create)
@@ -385,12 +557,24 @@ try {
                 try { $stream.Write($members[$name], 0, $members[$name].Length) } finally { $stream.Dispose() }
             }
         } finally { $archive.Dispose(); $file.Dispose() }
+        $sizeReport = Get-ReviewSizeReport $temporaryPath
+        if ($SchemaVersion -eq 3 -and $sizeReport.sizeBytes -gt 15MB) { throw 'PACKAGE_SIZE: V3 exceeds 15 MiB delivery limit; no default delivery permitted' }
         $verification = Test-ReviewArchive $temporaryPath $Root
+        if ($SchemaVersion -eq 3) {
+            # 完整ignored清单只写本地artifact；从不放入ZIP或覆盖既有有效包。
+            $localIgnored = Join-Path $outputDirectory ("ignored-$TaskId-$($HeadSha.Substring(0, 12))-$([guid]::NewGuid().ToString('N')).paths.txt")
+            $ignoredBytes = $script:utf8.GetBytes(($snapshot.Ignored -join "`0") + $(if ($snapshot.Ignored.Count) { "`0" } else { '' }))
+            $ignoredFile = [IO.File]::Open($localIgnored, [IO.FileMode]::CreateNew)
+            try { $ignoredFile.Write($ignoredBytes, 0, $ignoredBytes.Length) } finally { $ignoredFile.Dispose() }
+        }
         [IO.File]::Move($temporaryPath, $finalPath)
     } finally {
-        if (Test-Path -LiteralPath $temporaryPath) { Remove-Item -LiteralPath $temporaryPath -Force }
+        if (Test-Path -LiteralPath $temporaryPath) {
+            Remove-Item -LiteralPath $temporaryPath -Force
+            if ($localIgnored -and (Test-Path -LiteralPath $localIgnored)) { Remove-Item -LiteralPath $localIgnored -Force }
+        }
     }
-    Write-Output ([ordered]@{ packagePath = $finalPath; sizeBytes = (Get-Item -LiteralPath $finalPath).Length; sha256 = (Get-FileHash -LiteralPath $finalPath -Algorithm SHA256).Hash.ToLowerInvariant(); taskStatus = $Status; verification = $verification } | ConvertTo-Json -Depth 8 -Compress)
+    Write-Output ([ordered]@{ sizeReport = $sizeReport; packagePath = $finalPath; sizeBytes = (Get-Item -LiteralPath $finalPath).Length; sha256 = (Get-FileHash -LiteralPath $finalPath -Algorithm SHA256).Hash.ToLowerInvariant(); taskStatus = $Status; verification = $verification } | ConvertTo-Json -Depth 8 -Compress)
     exit 0
 } catch {
     Write-Output "FAIL: $($_.Exception.Message)"

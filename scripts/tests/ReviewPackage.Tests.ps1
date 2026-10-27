@@ -42,12 +42,22 @@ function New-Fixture {
     $script:head = Commit-Fixture
 }
 function Invoke-Package {
-    param([string[]]$Extra = @(), [switch]$Verify, [switch]$Compact, [string]$DeclaredStatus = 'PARTIAL')
+    param([string[]]$Extra = @(), [switch]$Verify, [switch]$Compact, [switch]$V3, [string]$DeclaredStatus = 'PARTIAL')
     $arguments = @('-NoProfile', '-File', $PackageScript, '-Root', $script:repo)
-    if (-not $Verify -and -not $Compact) { $arguments += @('-SchemaVersion', '1') }
+    if (-not $Verify -and -not $Compact -and -not $V3) { $arguments += @('-SchemaVersion', '1') }
+    if ($Compact) { $arguments += @('-SchemaVersion', '2') }
     if (-not $Verify) { $arguments += @('-BaseSha', $script:base, '-HeadSha', $script:head, '-TaskId', 'TEST-001', '-Status', $DeclaredStatus) }
-    $output = & pwsh @arguments @Extra 2>&1
-    return [pscustomobject]@{ Exit = $LASTEXITCODE; Output = ($output -join "`n") }
+    $savedPath = $env:PATH
+    $savedHead = $env:REVIEW_FIXTURE_CI_HEAD
+    try {
+        $env:PATH = $script:fakeGhDirectory + [IO.Path]::PathSeparator + $savedPath
+        $env:REVIEW_FIXTURE_CI_HEAD = $script:head
+        if ($V3) { $arguments += @('-CiRunId', '123', '-CiRunUrl', 'https://github.com/on-dotnet/ontology-platform/actions/runs/123', '-CiCommit', $script:head, '-CiConclusion', 'success') }
+        $output = & pwsh @arguments @Extra 2>&1
+        $code = $LASTEXITCODE
+    } finally { $env:PATH = $savedPath; $env:REVIEW_FIXTURE_CI_HEAD = $savedHead }
+
+    return [pscustomobject]@{ Exit = $code; Output = ($output -join "`n") }
 }
 function Assert-True {
     param([bool]$Condition, [string]$Message)
@@ -67,6 +77,20 @@ function Case {
 }
 try {
     $null = New-Item -ItemType Directory -Force $fixtureRoot
+    $script:fakeGhDirectory = Join-Path $fixtureRoot 'toolbin'
+    $null = New-Item -ItemType Directory -Force $script:fakeGhDirectory
+    $fake = @'
+#!/usr/bin/env python3
+import json,os,sys
+h=os.environ['REVIEW_FIXTURE_CI_HEAD']; mode=os.environ.get('REVIEW_FIXTURE_CI_MODE','')
+if mode=='wrong-head': h='f'*40
+jobs=[dict(databaseId=i+1,name=n,status='completed',conclusion='success',url='https://github.com/on-dotnet/ontology-platform/actions/runs/123/job/'+str(i+1)) for i,n in enumerate(['engineering','governance-integration'])]
+if mode=='missing-job': jobs.pop()
+if mode=='failed-job': jobs[0]['conclusion']='failure'
+print(json.dumps(dict(databaseId=123,headSha=h,url='https://github.com/on-dotnet/ontology-platform/actions/runs/123',status='completed',conclusion='success',jobs=jobs)))
+'@
+    [IO.File]::WriteAllText((Join-Path $script:fakeGhDirectory 'gh'), $fake + "`n", [Text.UTF8Encoding]::new($false))
+    if (-not $IsWindows) { & chmod +x (Join-Path $script:fakeGhDirectory 'gh') }
     function Read-ZipText($Archive, [string]$Name) {
         $reader = [IO.StreamReader]::new($Archive.GetEntry($Name).Open())
         try { return $reader.ReadToEnd() } finally { $reader.Dispose() }
@@ -76,7 +100,222 @@ try {
         Assert-True ($actual.Exit -eq 0) "Compact creation failed: $($actual.Output)"
         return @(Get-ChildItem (Join-Path $script:repo 'artifacts/reviews') -Filter '*.zip')[0].FullName
     }
-    Case 'compact default is V2 with complete source and historical evidence index' {
+    function Open-V3 {
+        $actual = Invoke-Package -V3
+        Assert-True ($actual.Exit -eq 0) "V3 creation failed: $($actual.Output)"
+        return @(Get-ChildItem (Join-Path $script:repo 'artifacts/reviews') -Filter '*.zip')[0].FullName
+    }
+    function Replace-ZipMember($Archive, [string]$Name, [byte[]]$Bytes) {
+        if ($null -ne $Archive.GetEntry($Name)) { $Archive.GetEntry($Name).Delete() }
+        $stream = $Archive.CreateEntry($Name).Open()
+        try { $stream.Write($Bytes) } finally { $stream.Dispose() }
+        $sums = Read-ZipText $Archive 'SHA256SUMS.txt'
+        $hash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($Bytes)).ToLowerInvariant()
+        $sums = [regex]::Replace($sums, '(?m)^[a-f0-9]{64}  ' + [regex]::Escape($Name) + '$', $hash + '  ' + $Name)
+        $Archive.GetEntry('SHA256SUMS.txt').Delete()
+        $writer = [IO.StreamWriter]::new($Archive.CreateEntry('SHA256SUMS.txt').Open())
+        try { $writer.Write($sums) } finally { $writer.Dispose() }
+    }
+    Case 'V3 53 PNG and 55256 ignored paths compact fixture with recoverable index' {
+        # 标准库生成53张真实可解码、不同像素的PNG，而非扩展名伪装或随机尾随字节。
+        $pngProgram = @'
+import pathlib,random,struct,sys,zlib
+root=pathlib.Path(sys.argv[1]); folder=root/'docs/evidence/TEST-001/screenshots'; folder.mkdir(parents=True)
+rng=random.Random(53055256)
+def chunk(kind,data):
+    return struct.pack('!I',len(data))+kind+data+struct.pack('!I',zlib.crc32(kind+data)&0xffffffff)
+for i in range(53):
+    raw=b''.join(b'\x00'+rng.randbytes(256*3) for row in range(800))
+    png=b'\x89PNG\r\n\x1a\n'+chunk(b'IHDR',struct.pack('!2I5B',256,800,8,2,0,0,0))+chunk(b'IDAT',zlib.compress(raw))+chunk(b'IEND',b'')
+    (folder/('shot-%d.png'%i)).write_bytes(png)
+'@
+        & python3 -c $pngProgram $script:repo
+        Assert-True ($LASTEXITCODE -eq 0) 'PNG fixture generation failed'
+        $shots = @()
+        for ($i = 0; $i -lt 4; $i++) {
+            $shots += @{ path = "docs/evidence/TEST-001/screenshots/shot-$i.png"; page = "page-$i"; theme = 'light'; viewport = '1440x900'; stable = $true }
+        }
+        Write-Fixture 'docs/evidence/TEST-001/review-screenshots.json' (@{ schemaVersion = 1; screenshots = $shots } | ConvertTo-Json -Depth 6)
+        Write-Fixture '.gitignore' "artifacts/`nignored-fixture/`n"
+        $script:head = Commit-Fixture
+        $ignoredDirectory = Join-Path $script:repo 'ignored-fixture'
+        $null = [IO.Directory]::CreateDirectory($ignoredDirectory)
+        for ($i = 0; $i -lt 55256; $i++) { [IO.File]::WriteAllText((Join-Path $ignoredDirectory "item-$i.txt"), '123') }
+        $path = Open-V3
+        $compactSize = (Get-Item $path).Length
+        $archive = [IO.Compression.ZipFile]::OpenRead($path)
+        try {
+            $m = Read-ZipText $archive 'manifest.json' | ConvertFrom-Json
+            $index = @(Read-ZipText $archive 'evidence-index.json' | ConvertFrom-Json)
+            $png = @($archive.Entries | Where-Object FullName -Like '*.png')
+            Assert-True ($png.Count -eq 4 -and $m.screenshotPolicy.compressedBytes -le 3MB) 'Stable representative screenshot budget not enforced'
+            Assert-True ($m.ignoredInventory.count -eq 55256 -and $m.ignoredInventory.estimatedBytes -eq 165768 -and $m.ignoredInventory.groups.Count -eq 1 -and $m.ignoredInventory.groups[0].examples.Count -le 2) 'Ignored aggregation lost count/size or expanded unbounded'
+            Assert-True ($null -eq $m.PSObject.Properties['excludedIgnoredPaths']) 'Full ignored path array retained'
+            $pngIndex = @($index | Where-Object gitPath -Like '*.png')
+            Assert-True ($pngIndex.Count -eq 53 -and @($pngIndex | Where-Object { $null -eq $_.archivePath }).Count -eq 49) 'All omitted screenshots must be indexed'
+            foreach ($item in $pngIndex) {
+                $blob = Git @('rev-parse', ($item.commit + ':' + $item.gitPath))
+                $fileBytes = [IO.File]::ReadAllBytes((Join-Path $script:repo $item.gitPath))
+                $hash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($fileBytes)).ToLowerInvariant()
+                Assert-True ($blob -eq $item.blobOid -and $hash -eq $item.sha256 -and $fileBytes.Length -eq $item.sizeBytes) 'Screenshot recovery OID/hash/size mismatch'
+            }
+            $payloadHashes = @($m.sourceMembers | Select-Object -ExpandProperty archivePath -Unique)
+            Assert-True (@($archive.Entries | Where-Object { $_.FullName.StartsWith('source/') -or $_.FullName.StartsWith('review-evidence/TEST-001/') }).Count -eq $payloadHashes.Count) 'Unmapped or duplicated payload exists'
+        } finally { $archive.Dispose() }
+        $localList = @(Get-ChildItem (Join-Path $script:repo 'artifacts/reviews') -Filter '*.paths.txt')[0]
+        Assert-True ((Get-FileHash $localList.FullName -Algorithm SHA256).Hash.ToLowerInvariant() -eq $m.ignoredInventory.listSha256) 'Local-only ignored inventory SHA does not match'
+        $verified = Invoke-Package -Verify -Extra @('-VerifyOnly', '-PackagePath', $path)
+        Assert-True ($verified.Exit -eq 0) "Large fixture V3 reopen failed: $($verified.Output)"
+        Move-Item -LiteralPath $path -Destination ($path + '.v3')
+        $legacy = Invoke-Package -Compact
+        Assert-True ($legacy.Exit -eq 0) "V2 comparison failed: $($legacy.Output)"
+        $legacySize = (Get-Item $path).Length
+        Assert-True ($compactSize -lt 4MB -and $compactSize -lt ($legacySize / 5)) "V3 size regression compact=$compactSize V2=$legacySize"
+        Write-Output "OBSERVED V3 fixture: 53PNG, 55256ignored; V3=$compactSize V2=$legacySize bytes"
+    }
+    foreach ($mode in @('wrong-head', 'missing-job', 'failed-job')) {
+        $scenario = $mode
+        Case "V3 refuses actual GitHub $scenario" {
+            $previous = $env:REVIEW_FIXTURE_CI_MODE
+            try {
+                $env:REVIEW_FIXTURE_CI_MODE = $scenario
+                $actual = Invoke-Package -V3
+                Assert-True ($actual.Exit -ne 0 -and $actual.Output.Contains('CI_EVIDENCE')) 'Forged or incomplete CI accepted'
+            } finally { $env:REVIEW_FIXTURE_CI_MODE = $previous }
+        }
+    }
+    foreach ($negative in @('dirty', 'untracked', 'non-ancestor', 'case-collision', 'forbidden', 'secret', 'symlink', 'diff-check')) {
+        $scenario = $negative
+        Case "V3 refuses Git input $scenario" {
+            switch ($scenario) {
+                'dirty' { Write-Fixture 'app.txt' "dirty`n" }
+                'untracked' { Write-Fixture 'pending.txt' "pending`n" }
+                'non-ancestor' {
+                    $null = Git @('checkout', '--orphan', 'other'); $null = Git @('rm', '-rf', '.')
+                    Write-Fixture '.gitignore' "artifacts/`n"; Write-Fixture 'other.txt' "other`n"; $script:base = Commit-Fixture
+                    $null = Git @('checkout', '-q', 'master')
+                }
+                'case-collision' {
+                    $blob = Git @('hash-object', 'app.txt'); $null = Git @('update-index', '--add', '--cacheinfo', "100644,$blob,APP.txt")
+                    $null = Git @('commit', '-qm', 'case collision'); $script:head = Git @('rev-parse', 'HEAD'); $null = Git @('checkout', '-q', $script:base)
+                }
+                'forbidden' { Write-Fixture '.env' "simulation`n"; $script:head = Commit-Fixture }
+                'secret' { Write-Fixture 'config.txt' (('gh' + 'p_' + ('Q' * 36)) + "`n"); $script:head = Commit-Fixture }
+                'symlink' {
+                    $blob = Git @('hash-object', 'app.txt'); $null = Git @('update-index', '--add', '--cacheinfo', "120000,$blob,linked")
+                    $null = Git @('commit', '-qm', 'synthetic symlink'); $script:head = Git @('rev-parse', 'HEAD'); $null = Git @('checkout', '-q', $script:base)
+                }
+                'diff-check' { Write-Fixture 'app.txt' "trailing  `n"; $script:head = Commit-Fixture }
+            }
+            $actual = Invoke-Package -V3
+            Assert-True ($actual.Exit -ne 0) "V3 accepted invalid $scenario"
+            Assert-True (@(Get-ChildItem (Join-Path $script:repo 'artifacts/reviews') -Filter '*.zip' -ErrorAction SilentlyContinue).Count -eq 0) 'Rejected input published a ZIP'
+        }
+    }
+    foreach ($negative in @('missing-index', 'forged-index', 'forged-ci', 'hash', 'path-traversal', 'duplicate', 'case-member', 'symlink-member', 'forged-text-diff')) {
+        $scenario = $negative
+        Case "V3 reopen rejects $scenario" {
+            $path = Open-V3
+            $archive = [IO.Compression.ZipFile]::Open($path, [IO.Compression.ZipArchiveMode]::Update)
+            try {
+                switch ($scenario) {
+                    'missing-index' { $archive.GetEntry('evidence-index.json').Delete() }
+                    'forged-index' {
+                        $index = @(Read-ZipText $archive 'evidence-index.json' | ConvertFrom-Json); $index[0].blobOid = '0' * 40
+                        Replace-ZipMember $archive 'evidence-index.json' ([Text.Encoding]::UTF8.GetBytes((ConvertTo-Json -InputObject $index -Depth 12)))
+                    }
+                    'forged-ci' {
+                        $m = Read-ZipText $archive 'manifest.json' | ConvertFrom-Json -AsHashtable
+                        $m.runtimeCi.jobs[0].id = '999'; $m.ci.jobs[0].id = '999'
+                        Replace-ZipMember $archive 'manifest.json' ([Text.Encoding]::UTF8.GetBytes(($m | ConvertTo-Json -Depth 16)))
+                    }
+                    'hash' { Replace-ZipMember $archive 'source/app.txt' ([Text.Encoding]::UTF8.GetBytes('rehashed malicious replacement')) }
+                    'forged-text-diff' { Replace-ZipMember $archive 'git/diff-text.patch' ([Text.Encoding]::UTF8.GetBytes('truncated text diff')) }
+                    default {
+                        $name = switch ($scenario) { 'path-traversal' { '../escape.txt' }; 'case-member' { 'source/APP.txt' }; default { 'source/app.txt' } }
+                        $entry = $archive.CreateEntry($name)
+                        if ($scenario -eq 'symlink-member') { $entry.ExternalAttributes = [int](0xA000 -shl 16) }
+                        $writer = [IO.StreamWriter]::new($entry.Open()); try { $writer.Write('synthetic') } finally { $writer.Dispose() }
+                    }
+                }
+            } finally { $archive.Dispose() }
+            $verified = Invoke-Package -Verify -Extra @('-VerifyOnly', '-PackagePath', $path)
+            Assert-True ($verified.Exit -ne 0) "V3 accepted archive $scenario"
+        }
+    }
+    foreach ($negative in @('count', 'size', 'unknown-count', 'duplicate-group', 'too-many-examples', 'scan-time', 'extra-field', 'wrong-type')) {
+        $scenario = $negative
+        Case "V3 ignored inventory rehashed forgery rejects $scenario" {
+            Write-Fixture '.gitignore' "artifacts/`nignored/`n"; $script:head = Commit-Fixture
+            Write-Fixture 'ignored/one.txt' 'metadata-only'
+            $path = Open-V3
+            $archive = [IO.Compression.ZipFile]::Open($path, [IO.Compression.ZipArchiveMode]::Update)
+            try {
+                $m = Read-ZipText $archive 'manifest.json' | ConvertFrom-Json -AsHashtable
+                switch ($scenario) {
+                    'count' { $m.ignoredInventory.count++ }
+                    'size' { $m.ignoredInventory.estimatedBytes++ }
+                    'unknown-count' { $m.ignoredInventory.groups[0].unknownSizeCount = 2 }
+                    'duplicate-group' { $m.ignoredInventory.groups += $m.ignoredInventory.groups[0] }
+                    'too-many-examples' { $m.ignoredInventory.groups[0].examples = @('one', 'two', 'three') }
+                    'scan-time' { $m.ignoredInventory.scannedAt = 'not a date' }
+                    'extra-field' { $m.ignoredInventory.fullPaths = @('unbounded', 'list') }
+                    'wrong-type' { $m.ignoredInventory.count = '1' }
+                }
+                Replace-ZipMember $archive 'manifest.json' ([Text.Encoding]::UTF8.GetBytes(($m | ConvertTo-Json -Depth 16)))
+            } finally { $archive.Dispose() }
+            $verified = Invoke-Package -Verify -Extra @('-VerifyOnly', '-PackagePath', $path)
+            Assert-True ($verified.Exit -ne 0 -and $verified.Output.Contains('MANIFEST_INVALID')) "Rehashed ignored inventory forgery $scenario accepted: $($verified.Output)"
+        }
+    }
+    foreach ($negative in @('over-count', 'duplicate-view', 'over-png-budget')) {
+        $scenario = $negative
+        Case "V3 screenshot selection refuses $scenario" {
+            $random = [Random]::new(12); $shots = @()
+            $count = if ($scenario -eq 'over-count') { 13 } elseif ($scenario -eq 'duplicate-view') { 2 } else { 1 }
+            for ($i = 0; $i -lt $count; $i++) {
+                $path = "docs/evidence/TEST-001/shot-$i.png"
+                $bytes = [byte[]]::new($(if ($scenario -eq 'over-png-budget') { 4MB } else { 1024 })); $random.NextBytes($bytes); $bytes[0] = 0
+                Write-Fixture $path ''; [IO.File]::WriteAllBytes((Join-Path $script:repo $path), $bytes)
+                $shots += @{ path = $path; page = $(if ($scenario -eq 'duplicate-view') { 'same' } else { "page-$i" }); theme = 'dark'; viewport = '1440'; stable = $true }
+            }
+            Write-Fixture 'docs/evidence/TEST-001/review-screenshots.json' (@{ schemaVersion = 1; screenshots = $shots } | ConvertTo-Json -Depth 6)
+            $script:head = Commit-Fixture
+            $actual = Invoke-Package -V3
+            Assert-True ($actual.Exit -ne 0 -and $actual.Output.Contains('SCREENSHOT_')) "Screenshot limit $scenario not enforced"
+        }
+    }
+    Case 'V3 size over 15MiB refuses atomic publication and preserves previous valid package' {
+        $random = [Random]::new(16); $bytes = [byte[]]::new(16MB); $random.NextBytes($bytes); $bytes[0] = 0
+        $oldPath = Open-V3; $oldHash = (Get-FileHash $oldPath -Algorithm SHA256).Hash
+        Write-Fixture 'large.dat' ''; [IO.File]::WriteAllBytes((Join-Path $script:repo 'large.dat'), $bytes); $script:head = Commit-Fixture
+        $actual = Invoke-Package -V3
+        Assert-True ($actual.Exit -ne 0 -and $actual.Output.Contains('PACKAGE_SIZE')) 'Oversized V3 published'
+        Assert-True ((Get-FileHash $oldPath -Algorithm SHA256).Hash -eq $oldHash -and @(Get-ChildItem (Join-Path $script:repo 'artifacts/reviews') -Filter '*.partial').Count -eq 0) 'Failure changed previous ZIP or left partial'
+    }
+    Case 'V3 size over 10MiB emits exact category report without weakening 15MiB gate' {
+        $random = [Random]::new(11); $bytes = [byte[]]::new(11MB); $random.NextBytes($bytes); $bytes[0] = 0
+        Write-Fixture 'large.dat' ''; [IO.File]::WriteAllBytes((Join-Path $script:repo 'large.dat'), $bytes); $script:head = Commit-Fixture
+        $actual = Invoke-Package -V3
+        Assert-True ($actual.Exit -eq 0) "Soft target incorrectly blocked: $($actual.Output)"
+        $r = $actual.Output | ConvertFrom-Json
+        Assert-True ($r.sizeReport.aboveSoftTarget -and $r.sizeReport.sizeBytes -gt 10MB -and @($r.sizeReport.categories | Where-Object category -EQ 'source')[0].compressedBytes -gt 10MB) 'Exact compressed category report missing'
+    }
+    Case 'V3 default with independently queried same Head CI and legacy V2 reopen' {
+        $actual = Invoke-Package -V3
+        Assert-True ($actual.Exit -eq 0) "V3 creation failed: $($actual.Output)"
+        $path = @(Get-ChildItem (Join-Path $script:repo 'artifacts/reviews') -Filter '*.zip')[0].FullName
+        $archive = [IO.Compression.ZipFile]::OpenRead($path)
+        try {
+            $m = Read-ZipText $archive 'manifest.json' | ConvertFrom-Json
+            Assert-True ($m.schemaVersion -eq 3) 'Default must be schema3'
+            Assert-True ($m.ci.commit -eq $script:head -and $m.ci.jobs.Count -eq 2 -and $m.ci.verification -eq 'GITHUB_QUERIED') 'CI was not independently queried'
+            Assert-True ($null -eq $m.PSObject.Properties['excludedIgnoredPaths']) 'Ignored paths leaked instead of aggregation'
+        } finally { $archive.Dispose() }
+        $verified = Invoke-Package -Verify -Extra @('-VerifyOnly', '-PackagePath', $path)
+        Assert-True ($verified.Exit -eq 0) "V3 reopen failed: $($verified.Output)"
+    }
+    Case 'compact explicit V2 with complete source and historical evidence index' {
         $path = Open-Compact
         $archive = [IO.Compression.ZipFile]::OpenRead($path)
         try {
@@ -91,6 +330,48 @@ try {
         } finally { $archive.Dispose() }
         $verified = Invoke-Package -Verify -Extra @('-VerifyOnly', '-PackagePath', $path)
         Assert-True ($verified.Exit -eq 0) "Compact reopen failed: $($verified.Output)"
+    }
+    Case 'V3 binary add modify delete rename and historical screenshot reduction' {
+        $random = [Random]::new(42)
+        $bytes = [byte[]]::new(32768); $random.NextBytes($bytes); $bytes[0] = 0
+        Write-Fixture 'docs/evidence/OLD-001/samples/one.png' ''
+        [IO.File]::WriteAllBytes((Join-Path $script:repo 'docs/evidence/OLD-001/samples/one.png'), $bytes)
+        [IO.File]::WriteAllBytes((Join-Path $script:repo 'remove.png'), $bytes)
+        Write-Fixture 'rename.txt' "rename source with sufficient unchanged text for Git detection`n"
+        $script:base = Commit-Fixture
+        $bytes[10] = $bytes[10] -bxor 1
+        [IO.File]::WriteAllBytes((Join-Path $script:repo 'docs/evidence/OLD-001/samples/one.png'), $bytes)
+        for ($i = 0; $i -lt 24; $i++) {
+            $bytes = [byte[]]::new(32768); $random.NextBytes($bytes); $bytes[0] = 0
+            [IO.File]::WriteAllBytes((Join-Path $script:repo "docs/evidence/OLD-001/samples/new-$i.png"), $bytes)
+        }
+        $null = Git @('rm', 'remove.png'); $null = Git @('mv', 'rename.txt', 'renamed.txt')
+        Write-Fixture 'new.txt' "new text`n"
+        $script:head = Commit-Fixture
+        $path = Open-V3
+        $archive = [IO.Compression.ZipFile]::OpenRead($path)
+        try {
+            $diff = Read-ZipText $archive 'git/diff-text.patch'
+            $changed = @(Read-ZipText $archive 'git/changed-files.json' | ConvertFrom-Json)
+            $index = @(Read-ZipText $archive 'evidence-index.json' | ConvertFrom-Json)
+            Assert-True (-not $diff.Contains('GIT binary patch') -and $diff.Contains('new text')) 'Binary encoded patch or missing text diff'
+            Assert-True (@($changed | Where-Object isBinary).Count -eq 26) 'Binary changes missing'
+            Assert-True (@($changed | Where-Object { $_.changeType -like 'R*' }).Count -eq 1) 'Rename missing'
+            $deleted = @($changed | Where-Object path -EQ 'remove.png')[0]
+            Assert-True ($deleted.base.blobOid.Length -eq 40 -and $deleted.base.sha256.Length -eq 64 -and $deleted.base.sizeBytes -eq 32768 -and $null -eq $deleted.head) 'Deleted binary recovery metadata missing'
+            Assert-True (@($index | Where-Object { $_.gitPath -like 'docs/evidence/OLD-001/*' -and $null -eq $_.archivePath }).Count -eq 25) 'Historical evidence not fully indexed/omitted'
+            Assert-True (@($archive.Entries | Where-Object FullName -Like '*OLD-001/samples/*').Count -eq 0) 'Historical screenshots copied'
+        } finally { $archive.Dispose() }
+        # 同一个已提交Head显式生成V1比较实际压缩大小，旧包先改名保留，不覆盖。
+        $compactSize = (Get-Item $path).Length
+        Move-Item -LiteralPath $path -Destination ($path + '.compact')
+        $legacy = Invoke-Package
+        Assert-True ($legacy.Exit -eq 0) "Legacy comparison failed: $($legacy.Output)"
+        $legacySize = (Get-Item $path).Length
+        Assert-True ($compactSize -lt ($legacySize / 3)) "Compact did not shrink: compact=$compactSize legacy=$legacySize"
+        Write-Output "OBSERVED compactBytes=$compactSize legacyBytes=$legacySize"
+        $verified = Invoke-Package -Verify -Extra @('-VerifyOnly', '-PackagePath', ($path + '.compact'))
+        Assert-True ($verified.Exit -eq 0) "Binary compact reopen failed: $($verified.Output)"
     }
     Case 'compact binary add modify delete rename and historical screenshot reduction' {
         $random = [Random]::new(42)
