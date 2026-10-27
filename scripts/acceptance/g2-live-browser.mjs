@@ -1,3 +1,4 @@
+import { evidenceDirectory } from "./evidence-paths.mjs";
 /** 真实OIDC/BFF纵向检查；不保存浏览器网络、Cookie、凭证或登录页面截图。 */
 import { createRequire } from 'node:module';
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
@@ -167,7 +168,7 @@ try {
   const downloaded = await downloadResult;
   check('ui_export_exact_server_source_bytes', (await readFile(await downloaded.path())).equals(Buffer.from(remote.sources.ontologyTurtle, 'utf8')));
   phase = 'real_ui_layouts';
-  await mkdir(resolve(root, 'docs/evidence/G2-THIN-SLICE-001/master/screenshots'), { recursive: true });
+  await mkdir(resolve(evidenceDirectory(root), 'screenshots'), { recursive: true });
   for (const width of [1440,1280,390]) {
     await page.setViewportSize({ width, height: 1000 });
     if (width === 390) await page.getByRole('button', { name: '图与校验', exact: true }).click();
@@ -191,17 +192,21 @@ try {
           const bytes = await body.body();
           layout.cssAssets.push({ url: asset, status: body.status(), size: bytes.length, sha256: createHash('sha256').update(bytes).digest('hex') });
         }
-        await writeFile(resolve(root, 'docs/evidence/G2-THIN-SLICE-001/master/live-layout-red.json'), JSON.stringify(layout,null,2) + '\n');
-        await page.screenshot({ path: resolve(root, 'docs/evidence/G2-THIN-SLICE-001/master/screenshots/live-s1-' + width + '-' + theme + '-red.png'), fullPage: true, animations: 'disabled' });
+        await writeFile(resolve(evidenceDirectory(root), 'live-layout-red.json'), JSON.stringify(layout,null,2) + '\n');
+        await page.screenshot({ path: resolve(evidenceDirectory(root), 'screenshots/live-s1-' + width + '-' + theme + '-red.png'), fullPage: true, animations: 'disabled' });
       }
       check('ui_' + width + '_' + theme + '_no_horizontal_overflow', layout.scrollWidth <= layout.width);
-      await page.screenshot({ path: resolve(root, 'docs/evidence/G2-THIN-SLICE-001/master/screenshots/live-s1-' + width + '-' + theme + '.png'), fullPage: true, animations: 'disabled' });
+      await page.screenshot({ path: resolve(evidenceDirectory(root), 'screenshots/live-s1-' + width + '-' + theme + '.png'), fullPage: true, animations: 'disabled' });
     }
   }
   check('ui_no_uncaught_hydration_errors', uiErrors.length === 0);
   if (process.argv.includes('--full')) {
     const { fullChain } = await import('./g2-full-chain.mjs');
     await fullChain({ root, origin, operator, audit, single, viewer, draft: remote, check, command, setPhase: value => { phase = value; } });
+    if (process.argv.includes('--m1')) {
+      const { runM1Checks } = await import('./g3-m1-browser.mjs');
+      await runM1Checks({ root, origin, operator, audit, single, viewer, check, command, setPhase: value => { phase = value; } });
+    }
   }
   for (const user of [operator, single, viewer, audit]) await user.context.close();
 } catch (error) {
@@ -209,7 +214,7 @@ try {
 } finally {
   await browser?.close();
   const report = { stage: process.argv.includes('--full') ? 'FULL_G2_REAL_OIDC' : 'S1_HTTP_UI_REAL_OIDC', status: failure ? 'FAIL' : 'PASS', overallG2: 'PARTIAL', checks, failure, notRun: process.argv.includes('--full') ? (failure ? ['remaining steps after ' + phase, 'final sameHead CI'] : ['final sameHead CI', 'real model BLOCKED', 'Monaco PAUSED_BY_USER', 'Windows/Intel/production NOT_RUN']) : ['S2 publishing browser','S3 gateway MCP MAF SSE','final regression and CI'] };
-  await writeFile(resolve(root, 'docs/evidence/G2-THIN-SLICE-001/master/' + (process.argv.includes('--full') ? 'full-g2-e2e.json' : 'live-s1-http.json')), JSON.stringify(report,null,2) + '\n');
+  await writeFile(resolve(evidenceDirectory(root), '' + (process.argv.includes('--full') ? 'full-g2-e2e.json' : 'live-s1-http.json')), JSON.stringify(report,null,2) + '\n');
   console.log(JSON.stringify({ stage: report.stage, status: report.status, passed: checks.filter(value => value.status === 'PASS').length, failure }));
   if (failure) process.exitCode = 1;
 }

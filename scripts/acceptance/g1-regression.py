@@ -7,7 +7,8 @@ from pathlib import Path
 import subprocess
 
 ROOT = Path(__file__).resolve().parents[2]
-EVIDENCE = ROOT / 'docs/evidence/G2-THIN-SLICE-001/master'
+from evidence_paths import evidence_directory
+EVIDENCE = evidence_directory(ROOT, 'docs/evidence/G2-THIN-SLICE-001/master')
 
 
 def main():
@@ -19,7 +20,7 @@ def main():
     if not runtime.is_relative_to((ROOT / '.tools/security').resolve()):
         parser.error('Only this checkout synthetic runtime is accepted')
     env = os.environ.copy()
-    env['PLATFORM_EVIDENCE_DIR'] = 'docs/evidence/G2-THIN-SLICE-001/master'
+    env['PLATFORM_EVIDENCE_DIR'] = str(EVIDENCE.relative_to(ROOT))
     commands = []
     if not args.runtime_only:
         commands += [['pwsh','-NoProfile','-File','scripts/verify.ps1','-SelfTest'], ['dotnet','restore','backend/OntologyPlatform.slnx','--locked-mode'], ['pwsh','-NoProfile','-File','scripts/verify-web.ps1'], ['pwsh','-NoProfile','-File','scripts/verify.ps1','-RunNative','-RunTests','-SkipWeb'], ['python3','scripts/acceptance/test-governance.py']]

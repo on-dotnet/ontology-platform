@@ -8,6 +8,22 @@ namespace OntologyPlatform.G2ContractTests;
 [TestClass]
 public sealed class G3ManifestContractTests
 {
+    /// <summary>独立保留的兼容二进制读取真实发布导出的V2清单；缺少栈产物不伪造成功。</summary>
+    [TestMethod]
+    public void CompatibilityBinaryReadsActualV2Manifest()
+    {
+        // 只允许当前测试树公开合成制品目录，不读取任何认证材料。
+        var path = Path.Combine(Environment.CurrentDirectory, "artifacts", "g3-m1", "actual-v2-manifest.json");
+        if (!File.Exists(path)) Assert.Inconclusive("真实主栈尚未导出V2清单；该项由g3-compatibility单独强制执行。");
+        // 使用正式Web命名规则及同一严格DTO验证真实制品，未知字段不能被忽略。
+        var manifest = JsonSerializer.Deserialize<ReleaseManifest>(File.ReadAllText(path), new JsonSerializerOptions(JsonSerializerDefaults.Web))!;
+        Assert.AreEqual(2, manifest.SchemaVersion);
+        Assert.IsNotNull(manifest.Semantics);
+        Assert.AreEqual(64, manifest.Semantics.AssessmentHash.Length);
+        Assert.AreEqual(manifest.ReleaseId, manifest.Snapshot.ReleaseId);
+        Assert.IsTrue(manifest.ArtifactObjects.Length is 3 or 4);
+    }
+
     /// <summary>旧版本无评估字段时保持原线协议，不能伪造默认值。</summary>
     [TestMethod]
     public void LegacyManifestDoesNotInventSemanticBinding()

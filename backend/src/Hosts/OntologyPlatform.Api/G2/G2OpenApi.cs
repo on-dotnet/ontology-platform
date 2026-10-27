@@ -46,7 +46,7 @@ public static class G2OpenApi
                 {
                     // 只有实际guard要求CAS的五个操作才声明强修订前置条件。
                     var requiresRevision = (operation.Key == HttpMethod.Put && route.Key == "/api/v1/ontology-drafts/{id}")
-                        || (operation.Key == HttpMethod.Post && route.Key is "/api/v1/ontology-drafts/{id}/edits" or "/api/v1/approvals/{id}/decisions" or "/api/v1/release-activations" or "/api/v1/execution-runs/{id}/cancel");
+                        || (operation.Key == HttpMethod.Post && route.Key is "/api/v1/ontology-drafts/{id}/edits" or "/api/v1/ontology-drafts/{id}/assessments" or "/api/v1/approvals/{id}/decisions" or "/api/v1/release-activations" or "/api/v1/execution-runs/{id}/cancel");
                     if (requiresRevision)
                     {
                         operation.Value.Parameters ??= [];

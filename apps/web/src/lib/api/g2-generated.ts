@@ -16,6 +16,12 @@ export type ApprovalRequiredPayload = { "kind": "approval.required"; "approvalId
 
 export type ArtifactObject = { "objectKey": string; "hash": string; "sizeBytes": number; "contentType": string };
 
+export type AssessmentDiagnostic = { "sourceId": string; "sourceHash": string; "diagnostic": SemanticDiagnostic; "line": number | null; "column": number | null };
+
+export type AssessmentStage = { "name": string; "status": AssessmentStageStatus; "code": string };
+
+export type AssessmentStageStatus = "PASS" | "FAIL" | "NOT_RUN" | "NOT_SUPPORTED" | "INDETERMINATE";
+
 export type AssetVersion = { "assetId": string; "version": string };
 
 export type AssetVersionSnapshot = { "releaseId": string; "ontologyHash": string; "shapesHash": string; "vocabularyHash": string | null; "dataHash": string; "ontologyGraphIri": string; "dataGraphIri": string; "mappingVersions": Array<AssetVersion>; "metricVersions": Array<AssetVersion>; "ruleVersions": Array<AssetVersion>; "capabilityVersions": Array<AssetVersion> };
@@ -31,6 +37,8 @@ export type CapabilityInputSchema = { "schemaVersion": number; "type": string; "
 export type CapabilityParameter = { "name": string; "type": string; "description": string; "enumValues": Array<string>; "minimum": number | null; "maximum": number | null; "itemsType": string | null };
 
 export type CommandContext = { "commandId": string; "idempotencyKey": string; "expectedRevision": number; "reason": string };
+
+export type CompareVersionsRequest = { "from": VersionRef; "to": VersionRef };
 
 export type CreateDraftRequest = { "name": string; "scope": ResourceScope; "sources": SourceBundle; "baseReleaseId": string | null; "command": CommandContext };
 
@@ -80,6 +88,12 @@ export type ExecutionRun = { "runId": string; "ownerSubjectId": string; "scope":
 
 export type ExecutionStatus = "QUEUED" | "RUNNING" | "COMPLETED" | "FAILED" | "CANCELLED";
 
+export type GraphComparisonBudget = { "maxBlankNodes": number; "maxSearchNodes": number; "timeoutMilliseconds": number };
+
+export type GraphComparisonResult = { "status": GraphComparisonStatus; "code": string; "visitedNodes": number; "elapsedMilliseconds": number };
+
+export type GraphComparisonStatus = "EQUIVALENT" | "DIFFERENT" | "INDETERMINATE";
+
 export type ImportLock = { "ontologyIri": string; "hash": string; "objectKey": string };
 
 export type JsonElement = JsonValue;
@@ -110,6 +124,8 @@ export type ProposalStatus = "PENDING" | "APPROVED" | "REJECTED" | "EXPIRED" | "
 
 export type ProviderMode = "disabled" | "deterministic" | "approved_model";
 
+export type PublicationSemantics = { "profileVersion": string; "profileHash": string; "assessmentId": string; "assessmentHash": string };
+
 export type PublishedRdfData = { "ontologyTriples": Array<RdfTriple>; "dataTriples": Array<RdfTriple> };
 
 export type RdfTerm = { "kind": RdfTermKind; "value": string; "datatype": string | null; "language": string | null };
@@ -120,7 +136,7 @@ export type RdfTriple = { "subject": RdfTerm; "predicate": string; "object": Rdf
 
 export type ReleaseActivation = { "activationId": string; "activationRevision": number; "releaseId": string; "previousReleaseId": string | null; "manifestHash": string; "manifest": ReleaseManifest; "auditId": string; "outboxEventId": string; "activatedAtUtc": string; "traceId": string };
 
-export type ReleaseManifest = { "schemaVersion": number; "releaseId": string; "assetId": string; "scope": ResourceScope; "draftId": string; "revision": number; "hashes": SourceHashes; "ontologyGraphIri": string; "dataGraphIri": string; "importLocks": Array<ImportLock>; "snapshot": AssetVersionSnapshot; "artifactObjects": Array<ArtifactObject>; "createdAtUtc": string; "semantics"?: PublicationSemantics | null };
+export type ReleaseManifest = { "schemaVersion": 1; "releaseId": string; "assetId": string; "scope": ResourceScope; "draftId": string; "revision": number; "hashes": SourceHashes; "ontologyGraphIri": string; "dataGraphIri": string; "importLocks": Array<ImportLock>; "snapshot": AssetVersionSnapshot; "artifactObjects": Array<ArtifactObject>; "createdAtUtc": string; "semantics"?: null } | { "schemaVersion": 2; "releaseId": string; "assetId": string; "scope": ResourceScope; "draftId": string; "revision": number; "hashes": SourceHashes; "ontologyGraphIri": string; "dataGraphIri": string; "importLocks": Array<ImportLock>; "snapshot": AssetVersionSnapshot; "artifactObjects": Array<ArtifactObject>; "createdAtUtc": string; "semantics": PublicationSemantics };
 
 export type ReleaseProposal = { "proposalId": string; "kind": ProposalKind; "assetId": string; "scope": ResourceScope; "draftId": string | null; "draftRevision": number | null; "hashes": SourceHashes | null; "validationReportId": string | null; "targetReleaseId": string | null; "targetManifestHash": string | null; "submittedBy": string; "submittedAtUtc": string; "expiresAtUtc": string; "status": ProposalStatus; "revision": number; "approval": ApprovalRecord | null; "semantics"?: PublicationSemantics | null };
 
@@ -142,7 +158,11 @@ export type SaveDraftRequest = { "name": string; "sources": SourceBundle; "comma
 
 export type SemanticAnalysis = { "hashes": SourceHashes; "projection": SemanticProjection };
 
+export type SemanticAssessment = { "assessmentId": string; "validationReportId": string; "draftId": string; "revision": number; "hashes": SourceHashes; "profileVersion": string; "profileHash": string; "assessmentHash": string; "assessedAtUtc": string; "expiresAtUtc": string; "executorVersion": string; "stages": Array<AssessmentStage>; "publishEligible": boolean; "diagnostics": Array<AssessmentDiagnostic>; "budgetStatus": string };
+
 export type SemanticCapability = { "id": string; "version": string; "inputSchema": CapabilityInputSchema; "outputSchema": JsonValue; "meaning": string; "policy": string; "executorId": string; "budgets": CapabilityBudget };
+
+export type SemanticCapabilitySupport = { "id": string; "name": string; "edit": string; "preserve": string; "publish": string; "validation": string; "reason": string };
 
 export type SemanticDatum = { "kind": "ontology"; "ontology": OntologyDescription; "entity": null; "relationship": null } | { "kind": "entity"; "ontology": null; "entity": SemanticEntity; "relationship": null } | { "kind": "relationship"; "ontology": null; "entity": null; "relationship": SemanticRelationship };
 
@@ -174,9 +194,13 @@ export type SemanticRelationship = { "sourceIri": string; "predicateIri": string
 
 export type SemanticSubSource = { "sourceId": string; "status": SubSourceStatus; "releaseId": string; "dataHash": string; "observedAtUtc": string; "code": string | null };
 
+export type SemanticSupportProfile = { "profileId": string; "version": string; "hash": string; "reasoningMode": string; "capabilities": Array<SemanticCapabilitySupport>; "comparisonBudget": GraphComparisonBudget };
+
 export type SemanticValidationReport = { "reportId": string; "draftId": string; "revision": number; "hashes": SourceHashes; "kind": ValidationKind; "conforms": boolean; "issues": Array<ValidationIssue>; "rawReportHash": string; "validatedAtUtc": string; "traceId": string };
 
 export type SourceBundle = { "ontologyTurtle": string; "shapesTurtle": string; "vocabularyTurtle": string | null; "dataTurtle": string };
+
+export type SourceComparison = { "sourceId": string; "leftHash": string | null; "rightHash": string | null; "sourceChanged": boolean; "graph": GraphComparisonResult };
 
 export type SourceHashes = { "ontologyHash": string; "shapesHash": string; "vocabularyHash": string | null; "dataHash": string; "bundleHash": string };
 
@@ -194,30 +218,6 @@ export type ValidationIssue = { "severity": DiagnosticSeverity; "focusNode": Rdf
 
 export type ValidationKind = "RDF_PARSE" | "SHACL_CORE" | "OWL_SUPPORT";
 
-export type GraphComparisonStatus = "EQUIVALENT" | "DIFFERENT" | "INDETERMINATE";
-
-export type AssessmentStageStatus = "PASS" | "FAIL" | "NOT_RUN" | "NOT_SUPPORTED" | "INDETERMINATE";
-
-export type VersionRefKind = "DRAFT" | "RELEASE";
-
-export type GraphComparisonBudget = { "maxBlankNodes": number; "maxSearchNodes": number; "timeoutMilliseconds": number };
-
-export type SemanticCapabilitySupport = { "id": string; "name": string; "edit": string; "preserve": string; "publish": string; "validation": string; "reason": string };
-
-export type SemanticSupportProfile = { "profileId": string; "version": string; "hash": string; "reasoningMode": string; "capabilities": Array<SemanticCapabilitySupport>; "comparisonBudget": GraphComparisonBudget };
-
-export type AssessmentStage = { "name": string; "status": AssessmentStageStatus; "code": string };
-
-export type AssessmentDiagnostic = { "sourceId": string; "sourceHash": string; "diagnostic": SemanticDiagnostic; "line": number | null; "column": number | null };
-
-export type SemanticAssessment = { "assessmentId": string; "validationReportId": string; "draftId": string; "revision": number; "hashes": SourceHashes; "profileVersion": string; "profileHash": string; "assessmentHash": string; "assessedAtUtc": string; "expiresAtUtc": string; "executorVersion": string; "stages": Array<AssessmentStage>; "publishEligible": boolean; "diagnostics": Array<AssessmentDiagnostic>; "budgetStatus": string };
-
-export type PublicationSemantics = { "profileVersion": string; "profileHash": string; "assessmentId": string; "assessmentHash": string };
-
 export type VersionRef = { "kind": VersionRefKind; "id": string; "revision": number | null };
 
-export type CompareVersionsRequest = { "from": VersionRef; "to": VersionRef };
-
-export type GraphComparisonResult = { "status": GraphComparisonStatus; "code": string; "visitedNodes": number; "elapsedMilliseconds": number };
-
-export type SourceComparison = { "sourceId": string; "leftHash": string | null; "rightHash": string | null; "sourceChanged": boolean; "graph": GraphComparisonResult };
+export type VersionRefKind = "DRAFT" | "RELEASE";

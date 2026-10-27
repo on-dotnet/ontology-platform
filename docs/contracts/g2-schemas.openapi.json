@@ -1092,98 +1092,184 @@
         "additionalProperties": false
       },
       "ReleaseManifest": {
-        "type": "object",
-        "description": "准备与回验完成后固定的正式发布清单。",
-        "required": [
-          "schemaVersion",
-          "releaseId",
-          "assetId",
-          "scope",
-          "draftId",
-          "revision",
-          "hashes",
-          "ontologyGraphIri",
-          "dataGraphIri",
-          "importLocks",
-          "snapshot",
-          "artifactObjects",
-          "createdAtUtc"
-        ],
-        "properties": {
-          "schemaVersion": {
-            "type": "integer",
-            "format": "int32",
-            "description": "清单版本一。"
-          },
-          "releaseId": {
-            "type": "string",
-            "description": "不可变发布标识。"
-          },
-          "assetId": {
-            "type": "string",
-            "description": "唯一作用域资产。"
-          },
-          "scope": {
-            "$ref": "#/components/schemas/ResourceScope",
-            "description": "完整发布范围。"
-          },
-          "draftId": {
-            "type": "string",
-            "description": "原始草稿标识。"
-          },
-          "revision": {
-            "type": "integer",
-            "format": "int64",
-            "description": "原始精确草稿修订。"
-          },
-          "hashes": {
-            "$ref": "#/components/schemas/SourceHashes",
-            "description": "完整权威源散列。"
-          },
-          "ontologyGraphIri": {
-            "type": "string",
-            "description": "隔离本体图。"
-          },
-          "dataGraphIri": {
-            "type": "string",
-            "description": "隔离事实图。"
-          },
-          "importLocks": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ImportLock"
-            },
-            "description": "本轮未锁定导入必须阻断。"
-          },
-          "snapshot": {
-            "$ref": "#/components/schemas/AssetVersionSnapshot",
-            "description": "唯一关联资产快照。"
-          },
-          "artifactObjects": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ArtifactObject"
-            },
-            "description": "所有经验证的不可变源对象。"
-          },
-          "createdAtUtc": {
-            "type": "string",
-            "format": "date-time",
-            "description": "清单创建时间。"
-          },
-          "semantics": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/PublicationSemantics"
+        "oneOf": [
+          {
+            "type": "object",
+            "required": [
+              "schemaVersion",
+              "releaseId",
+              "assetId",
+              "scope",
+              "draftId",
+              "revision",
+              "hashes",
+              "ontologyGraphIri",
+              "dataGraphIri",
+              "importLocks",
+              "snapshot",
+              "artifactObjects",
+              "createdAtUtc"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "schemaVersion": {
+                "type": "integer",
+                "enum": [
+                  1
+                ]
               },
-              {
+              "releaseId": {
+                "type": "string",
+                "description": "不可变发布标识。"
+              },
+              "assetId": {
+                "type": "string",
+                "description": "唯一作用域资产。"
+              },
+              "scope": {
+                "$ref": "#/components/schemas/ResourceScope",
+                "description": "完整发布范围。"
+              },
+              "draftId": {
+                "type": "string",
+                "description": "原始草稿标识。"
+              },
+              "revision": {
+                "type": "integer",
+                "format": "int64",
+                "description": "原始精确草稿修订。"
+              },
+              "hashes": {
+                "$ref": "#/components/schemas/SourceHashes",
+                "description": "完整权威源散列。"
+              },
+              "ontologyGraphIri": {
+                "type": "string",
+                "description": "隔离本体图。"
+              },
+              "dataGraphIri": {
+                "type": "string",
+                "description": "隔离事实图。"
+              },
+              "importLocks": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ImportLock"
+                },
+                "description": "本轮未锁定导入必须阻断。"
+              },
+              "snapshot": {
+                "$ref": "#/components/schemas/AssetVersionSnapshot",
+                "description": "唯一关联资产快照。"
+              },
+              "artifactObjects": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ArtifactObject"
+                },
+                "description": "所有经验证的不可变源对象。"
+              },
+              "createdAtUtc": {
+                "type": "string",
+                "format": "date-time",
+                "description": "清单创建时间。"
+              },
+              "semantics": {
                 "type": "null"
               }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "schemaVersion",
+              "releaseId",
+              "assetId",
+              "scope",
+              "draftId",
+              "revision",
+              "hashes",
+              "ontologyGraphIri",
+              "dataGraphIri",
+              "importLocks",
+              "snapshot",
+              "artifactObjects",
+              "createdAtUtc",
+              "semantics"
             ],
-            "description": "仅G3服务器生成的评估绑定；历史V1缺席不伪造。"
+            "additionalProperties": false,
+            "properties": {
+              "schemaVersion": {
+                "type": "integer",
+                "enum": [
+                  2
+                ]
+              },
+              "releaseId": {
+                "type": "string",
+                "description": "不可变发布标识。"
+              },
+              "assetId": {
+                "type": "string",
+                "description": "唯一作用域资产。"
+              },
+              "scope": {
+                "$ref": "#/components/schemas/ResourceScope",
+                "description": "完整发布范围。"
+              },
+              "draftId": {
+                "type": "string",
+                "description": "原始草稿标识。"
+              },
+              "revision": {
+                "type": "integer",
+                "format": "int64",
+                "description": "原始精确草稿修订。"
+              },
+              "hashes": {
+                "$ref": "#/components/schemas/SourceHashes",
+                "description": "完整权威源散列。"
+              },
+              "ontologyGraphIri": {
+                "type": "string",
+                "description": "隔离本体图。"
+              },
+              "dataGraphIri": {
+                "type": "string",
+                "description": "隔离事实图。"
+              },
+              "importLocks": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ImportLock"
+                },
+                "description": "本轮未锁定导入必须阻断。"
+              },
+              "snapshot": {
+                "$ref": "#/components/schemas/AssetVersionSnapshot",
+                "description": "唯一关联资产快照。"
+              },
+              "artifactObjects": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ArtifactObject"
+                },
+                "description": "所有经验证的不可变源对象。"
+              },
+              "createdAtUtc": {
+                "type": "string",
+                "format": "date-time",
+                "description": "清单创建时间。"
+              },
+              "semantics": {
+                "$ref": "#/components/schemas/PublicationSemantics"
+              }
+            }
           }
-        },
-        "additionalProperties": false
+        ],
+        "discriminator": {
+          "propertyName": "schemaVersion"
+        }
       },
       "ApprovalRecord": {
         "type": "object",

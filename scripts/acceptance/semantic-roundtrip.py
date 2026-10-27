@@ -12,7 +12,8 @@ import urllib.request
 import urllib.parse
 
 ROOT = Path(__file__).resolve().parents[2]
-EVIDENCE = ROOT / 'docs/evidence/G2-THIN-SLICE-001/SEM'
+from evidence_paths import evidence_directory
+EVIDENCE = evidence_directory(ROOT, 'docs/evidence/G2-THIN-SLICE-001/SEM')
 JENA = os.environ.get('G2_TEST_JENA_IMAGE', 'ontology-platform-g2-fuseki:6.2.0')
 PG = 'postgres:18.6-trixie@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6'
 

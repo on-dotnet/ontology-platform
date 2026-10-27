@@ -12,7 +12,8 @@ import time
 import urllib.request
 
 ROOT = Path(__file__).resolve().parents[2]
-EVIDENCE = ROOT / 'docs/evidence/G2-THIN-SLICE-001/AI'
+from evidence_paths import evidence_directory
+EVIDENCE = evidence_directory(ROOT, 'docs/evidence/G2-THIN-SLICE-001/AI')
 JENA = os.environ.get('G2_TEST_JENA_IMAGE', 'ontology-platform-g2-fuseki:6.2.0')
 PG = 'postgres:18.6-trixie@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6'
 S3 = 'rustfs/rustfs:1.0.3@sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b'

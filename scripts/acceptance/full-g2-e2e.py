@@ -11,12 +11,16 @@ ROOT = Path(__file__).resolve().parents[2]
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--runtime-file', required=True)
+    parser.add_argument('--m1', action='store_true')
     args = parser.parse_args()
     runtime = Path(args.runtime_file).resolve()
     if not runtime.is_relative_to((ROOT / '.tools/security').resolve()):
         parser.error('Only this checkout private synthetic runtime is accepted')
     tools = json.loads(subprocess.check_output(['pwsh', '-NoProfile', '-File', 'scripts/bootstrap-web-tools.ps1'], cwd=ROOT, text=True))
-    return subprocess.run([tools['nodePath'], 'scripts/acceptance/g2-live-browser.mjs', str(runtime), '--full'], cwd=ROOT).returncode
+    command = [tools['nodePath'], 'scripts/acceptance/g2-live-browser.mjs', str(runtime), '--full']
+    if args.m1:
+        command.append('--m1')
+    return subprocess.run(command, cwd=ROOT).returncode
 
 
 if __name__ == '__main__':

@@ -6,7 +6,7 @@ import os
 from pathlib import Path
 import sys
 
-os.environ['PLATFORM_EVIDENCE_DIR'] = 'docs/evidence/G2-THIN-SLICE-001/master'
+os.environ.setdefault('PLATFORM_EVIDENCE_DIR', 'docs/evidence/G2-THIN-SLICE-001/master')
 spec = importlib.util.spec_from_file_location('wave2_runtime', Path(__file__).with_name('wave2-runtime.py'))
 runtime = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(runtime)

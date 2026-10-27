@@ -15,6 +15,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          fetch-depth: 0
       - name: Prepare isolated verification parser
         shell: pwsh
         run: |
@@ -41,6 +42,9 @@ jobs:
       - name: G2 acceptance orchestration positive and negative checks
         shell: pwsh
         run: python3 scripts/tests/G2Acceptance.Tests.py
+      - name: M1 changed handwritten TSX readability
+        shell: pwsh
+        run: python3 scripts/check-tsx-readability.py
       - name: Build format and real host security tests
         shell: pwsh
         run: ./scripts/verify.ps1 -RunNative -RunTests -SkipWeb
@@ -69,4 +73,6 @@ jobs:
         run: python3 scripts/acceptance/test-governance.py
       - name: Real G2 semantic publishing query MCP MAF and native SSE integration
         shell: pwsh
+        env:
+          PLATFORM_EVIDENCE_DIR: docs/evidence/G3-M1-001/ci
         run: ./scripts/acceptance/g2-integration.ps1

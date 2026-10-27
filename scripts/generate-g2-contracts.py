@@ -63,6 +63,10 @@ for name, definition in SCHEMA['models'].items():
 # 标准Schema必须表达与C#运行时同样的精确分支约束。
 fields = schemas['SemanticDatum']['properties']
 schemas['SemanticDatum'] = {'oneOf': [dict(type='object', required=list(fields), additionalProperties=False, properties={key: ({'type': 'string', 'const': branch} if key == 'kind' else {'$ref': '#/components/schemas/' + {'ontology': 'OntologyDescription', 'entity': 'SemanticEntity', 'relationship': 'SemanticRelationship'}[key]} if key == branch else {'type': 'null'}) for key in fields}) for branch in ['ontology', 'entity', 'relationship']], 'discriminator': {'propertyName': 'kind'}}
+# 清单版本与评估绑定必须和C#严格reader采用同样的分支规则。
+manifest_fields = schemas['ReleaseManifest']['properties']
+manifest_required = schemas['ReleaseManifest']['required']
+schemas['ReleaseManifest'] = {'oneOf': [dict(type='object', required=manifest_required + (['semantics'] if version == 2 else []), additionalProperties=False, properties={key: ({'type': 'integer', 'enum': [version]} if key == 'schemaVersion' else {'$ref': '#/components/schemas/PublicationSemantics'} if key == 'semantics' and version == 2 else {'type': 'null'} if key == 'semantics' else value) for key, value in manifest_fields.items()}) for version in [1, 2]], 'discriminator': {'propertyName': 'schemaVersion'}}
 fields = schemas['ExecutionEvent']['properties']
 schemas['ExecutionEvent'] = {'oneOf': [dict(type='object', required=list(fields), additionalProperties=False, properties={key: ({'type': 'string', 'const': kind} if key == 'eventType' else {'type': 'integer', 'enum': [1]} if key == 'schemaVersion' else {'$ref': '#/components/schemas/' + payload} if key == 'payload' else value) for key, value in fields.items()}) for payload, kind in SCHEMA['payloadDiscriminators'].items()], 'discriminator': {'propertyName': 'eventType'}}
 

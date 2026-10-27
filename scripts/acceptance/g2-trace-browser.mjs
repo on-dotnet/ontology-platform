@@ -1,3 +1,4 @@
+import { evidenceDirectory } from "./evidence-paths.mjs";
 /** 验证真实发布页给出的Trace链接，在本地Grafana部署中实际返回该Trace；不截取认证页。 */
 import { createRequire } from 'node:module';
 import { readFile, writeFile } from 'node:fs/promises';
@@ -58,7 +59,7 @@ try {
   checks.push('actual_trace_data_frame_is_nonempty');
   await grafana.waitForTimeout(700);
   if (new URL(grafana.url()).pathname!=='/explore') throw new Error('unexpected_navigation');
-  await grafana.screenshot({path:resolve(root,'docs/evidence/G2-THIN-SLICE-001/master/screenshots/live-grafana-trace.png'),fullPage:true});
+  await grafana.screenshot({path:resolve(evidenceDirectory(root),'screenshots/live-grafana-trace.png'),fullPage:true});
   checks.push('authenticated_actual_trace_view_captured');
   result={status:'PASS',checks,traceId,datasource:'platform-tempo',scope:'actual runtime link and deployed Grafana/Tempo, no storage/network authentication export'};
 } catch (error) {
@@ -66,6 +67,6 @@ try {
   process.exitCode=1;
 } finally {
   await browser.close();
-  await writeFile(resolve(root,'docs/evidence/G2-THIN-SLICE-001/master/trace-browser.json'),JSON.stringify(result,null,2)+'\n');
+  await writeFile(resolve(evidenceDirectory(root),'trace-browser.json'),JSON.stringify(result,null,2)+'\n');
   console.log(JSON.stringify({status:result.status,checks:checks.length,phase:result.phase}));
 }

@@ -1,3 +1,4 @@
+import { evidenceDirectory } from "./evidence-paths.mjs";
 /** 真实浏览器上下文中续接S1，验证异人发布、统一查询、原生MCP/SSE与版本回滚。 */
 import { randomUUID } from 'node:crypto';
 import { writeFile } from 'node:fs/promises';
@@ -53,6 +54,10 @@ export async function fullChain({ root, origin, operator, audit, single, viewer,
   check('executor_v4_and_exact_tools', caps.length === 3 && caps.every(value => value.executorId.endsWith('/4')) && caps.map(value => value.id).sort().join(',') === 'describe_ontology,resolve_entity,traverse_relationships');
   const plan = (capability, extras = {}) => ({ capabilityId: capability, capabilityVersion: caps.find(value => value.id === capability).version, assetId: draft.assetId, releaseId: null, entityType: null, entityIri: null, externalId: capability === 'describe_ontology' ? null : 'heat-1', siteId: capability === 'describe_ontology' ? null : 'site-a', relationshipIris: [], depth: 5, maxRows: 100, timeoutMs: 5000, ...extras });
   setPhase('s2_ui_proposal');
+  // M1在原真实发布闭环前增加服务端评估，不能借旧校验报告绕过新资格门禁。
+  await clickResponse(operator.page, operator.page.getByRole('button', { name: '评估发布资格', exact: true }),
+    '/api/v1/ontology-drafts/' + draft.draftId + '/assessments',
+    value => value.publishEligible && value.revision === draft.revision && value.stages.some(stage => stage.name === 'OWL_REASONING' && stage.status === 'NOT_RUN'));
   const proposal = await clickResponse(operator.page, operator.page.getByRole('button', { name: '提交异人发布审核', exact: true }), '/api/v1/release-proposals', value => value.status === 'PENDING' && value.draftRevision === draft.revision);
   ids.assetId = draft.assetId;
   await post(operator, '/api/v1/approvals/' + proposal.proposalId + '/decisions', { decision: 'approve', command: command(proposal.revision) }, 403);
@@ -60,6 +65,7 @@ export async function fullChain({ root, origin, operator, audit, single, viewer,
   const first = await approveAndActivate(proposal, 'r1');
   ids.release1 = first.releaseId;
   const r1 = await getRelease(first.releaseId);
+  check('m1_new_manifest_v2_assessment_bound', r1.manifest.schemaVersion === 2 && r1.manifest.semantics?.assessmentHash === proposal.semantics?.assessmentHash);
   check('r1_formal_immutable_graphs_sources', r1.isActive && r1.manifest.artifactObjects.length === 4 && r1.manifest.ontologyGraphIri.includes(first.releaseId) && r1.manifest.dataGraphIri.includes(first.releaseId));
   setPhase('performance_real_sparql');
   // 独立无Cookie的固定回环请求测量真正Jena SPARQL，不把Gateway耗时冒充解析器性能。
@@ -140,7 +146,7 @@ export async function fullChain({ root, origin, operator, audit, single, viewer,
   const disabled = await post(operator, '/api/v1/execution-runs', { prompt: 'Synthetic no model network', plan: plan('resolve_entity'), providerMode: 'disabled', command: command(0) });
   const disabledEvents = await operator.api.get(origin + '/api/v1/execution-runs/' + disabled.runId + '/events', { headers: { Accept: 'text/event-stream' } });
   check('disabled_model_durable_failure_no_tools', (await disabledEvents.text()).includes('provider_not_configured'));
-  await page.screenshot({ path: resolve(root,'docs/evidence/G2-THIN-SLICE-001/master/screenshots/live-s3-run.png'), fullPage: true, animations: 'disabled' });
+  await page.screenshot({ path: resolve(evidenceDirectory(root),'screenshots/live-s3-run.png'), fullPage: true, animations: 'disabled' });
   setPhase('s2_r2_new_source_revision');
   const source2 = { ...draft.sources, ontologyTurtle: draft.sources.ontologyTurtle + '\n<urn:synthetic:live:SecondReleaseClass> a <http://www.w3.org/2002/07/owl#Class> .\n' };
   const save2 = await operator.api.put(origin + '/api/v1/ontology-drafts/' + draft.draftId, { headers: { ...operator.headers, 'If-Match': '"' + draft.revision + '"' }, data: { name: draft.name, sources: source2, command: command(draft.revision) } });
@@ -166,14 +172,14 @@ export async function fullChain({ root, origin, operator, audit, single, viewer,
   check('rollback_query_matches_exact_r1', restored.snapshot.releaseId === first.releaseId && restored.snapshot.ontologyHash === historical.snapshot.ontologyHash && JSON.stringify(restored.data) === JSON.stringify(historical.data));
   const kept2 = await getRelease(second.releaseId);
   check('rollback_preserves_r2_history', !kept2.isActive && kept2.manifest.hashes.ontologyHash === changed.snapshot.ontologyHash);
-  await page.screenshot({ path: resolve(root,'docs/evidence/G2-THIN-SLICE-001/master/screenshots/live-s2-rollback.png'), fullPage: true, animations: 'disabled' });
+  await page.screenshot({ path: resolve(evidenceDirectory(root),'screenshots/live-s2-rollback.png'), fullPage: true, animations: 'disabled' });
   } finally {
   if (['/analysis','/releases','/ontologies'].includes(new URL(operator.page.url()).pathname)) {
-    await operator.page.screenshot({ path: resolve(root,'docs/evidence/G2-THIN-SLICE-001/master/screenshots/live-current-full-chain.png'), fullPage: true, animations: 'disabled' }).catch(() => {});
+    await operator.page.screenshot({ path: resolve(evidenceDirectory(root),'screenshots/live-current-full-chain.png'), fullPage: true, animations: 'disabled' }).catch(() => {});
     const state = await operator.page.evaluate(() => ({ path: location.pathname, headings: [...document.querySelectorAll('h1,h2')].map(e=>e.textContent), alerts: [...document.querySelectorAll('[role=alert]')].map(e=>e.textContent), selects: [...document.querySelectorAll('select')].map(e=>({label:e.getAttribute('aria-label'), options:[...e.options].map(o=>({value:o.value,text:o.text})), value:e.value})) }));
-    await writeFile(resolve(root,'docs/evidence/G2-THIN-SLICE-001/master/live-full-chain-ui-state.json'),JSON.stringify(state,null,2)+'\n');
+    await writeFile(resolve(evidenceDirectory(root),'live-full-chain-ui-state.json'),JSON.stringify(state,null,2)+'\n');
   }
-  await writeFile(resolve(root,'docs/evidence/G2-THIN-SLICE-001/master/full-chain-identifiers.json'), JSON.stringify({ ids, traces: traces.filter(Boolean), model: 'BLOCKED: no paid or real model calls authorized', oldRunConcurrencyScope: 'historical persisted Run checked across later activation; in-flight fencing races independently covered by native tests' },null,2)+'\n');
-  await writeFile(resolve(root,'docs/evidence/G2-THIN-SLICE-001/master/performance-observations.json'), JSON.stringify({ environment: 'local macOS arm64, real isolated Docker/Aspire, headless Edge; no production SLO', sourceUtf8Bytes: Object.fromEntries(Object.entries(draft.sources).map(([key,value]) => [key,value===null?0:Buffer.byteLength(value)])), samples },null,2)+'\n');
+  await writeFile(resolve(evidenceDirectory(root),'full-chain-identifiers.json'), JSON.stringify({ ids, traces: traces.filter(Boolean), model: 'BLOCKED: no paid or real model calls authorized', oldRunConcurrencyScope: 'historical persisted Run checked across later activation; in-flight fencing races independently covered by native tests' },null,2)+'\n');
+  await writeFile(resolve(evidenceDirectory(root),'performance-observations.json'), JSON.stringify({ environment: 'local macOS arm64, real isolated Docker/Aspire, headless Edge; no production SLO', sourceUtf8Bytes: Object.fromEntries(Object.entries(draft.sources).map(([key,value]) => [key,value===null?0:Buffer.byteLength(value)])), samples },null,2)+'\n');
   }
 }

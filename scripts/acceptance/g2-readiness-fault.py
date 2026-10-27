@@ -65,7 +65,8 @@ def main():
             probe(dependency+'_recovered',200)
         return 0
     finally:
-        target = ROOT / 'docs/evidence/G2-THIN-SLICE-001/master/readiness-real-faults.json'
+        from evidence_paths import evidence_directory
+        target = evidence_directory(ROOT, 'docs/evidence/G2-THIN-SLICE-001/master') / 'readiness-real-faults.json'
         target.write_text(json.dumps({'scope':'actual own isolated AppHost/PG/Jena/RustFS, each paused only during a protected health request and unpaused in finally','checks':checks,'status':'PASS' if len(checks)==8 and all(check['status']=='PASS' for check in checks) else 'FAIL'},indent=2)+'\n')
 
 

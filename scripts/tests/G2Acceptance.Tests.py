@@ -20,7 +20,9 @@ GATES = ['full-g2-e2e.py', 'g1-regression.py', 'g2-observability.py',
 def load(name):
     spec = importlib.util.spec_from_file_location(name.replace('-', '_'), ACCEPTANCE / (name + '.py'))
     module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
+    # Dynamic loading must mirror the real CLI's sibling-module import path.
+    with patch.object(sys, 'path', [str(ACCEPTANCE), *sys.path]):
+        spec.loader.exec_module(module)
     return module
 
 

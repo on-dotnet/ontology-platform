@@ -10,7 +10,8 @@ import urllib.parse
 import urllib.request
 
 ROOT = Path(__file__).resolve().parents[2]
-EVIDENCE = ROOT / 'docs/evidence/G2-THIN-SLICE-001/master'
+from evidence_paths import evidence_directory
+EVIDENCE = evidence_directory(ROOT, 'docs/evidence/G2-THIN-SLICE-001/master')
 OPENER = urllib.request.build_opener(urllib.request.ProxyHandler({}))
 VISIBILITY_BUDGET_SECONDS = 90
 POLL_INTERVAL_SECONDS = 1

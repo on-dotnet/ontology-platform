@@ -38,9 +38,9 @@ def load_runtime(path):
     return path, json.loads(path.read_text())
 
 
-def prepare(profile="wave2"):
+def prepare(profile="wave2", resource_prefix=None):
     """Prepare one new volume prefix, random passwords and shared encrypted PFX."""
-    directory = ROOT / '.tools/security' / (profile + '-' + secrets.token_hex(6))
+    directory = ROOT / '.tools/security' / ((resource_prefix or profile) + '-' + secrets.token_hex(6))
     directory.mkdir(parents=True, mode=0o700)
     directory.chmod(0o700)
     keyring = directory / 'keyring'
