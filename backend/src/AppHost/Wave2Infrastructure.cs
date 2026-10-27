@@ -14,9 +14,9 @@ internal static class Wave2Infrastructure
     {
         // 每轮验收显式指定新卷前缀，禁止误用历史开发数据。
         var prefix = Required(builder, "DevelopmentInfrastructure:VolumePrefix");
-        if (!System.Text.RegularExpressions.Regex.IsMatch(prefix, "^(?:wave2|g2)-[a-z0-9-]{1,40}$"))
+        if (!System.Text.RegularExpressions.Regex.IsMatch(prefix, "\\A(?:wave2|g2|g3-m1)-[a-z0-9-]{1,40}\\z"))
         {
-            throw new ArgumentException("纵向验收必须使用独立wave2-或g2-卷前缀。");
+            throw new ArgumentException("纵向验收必须使用独立wave2-、g2-或g3-m1-卷前缀。");
         }
         // 参数标记secret，Aspire仪表盘与环境模型不显示密码明文。
         var postgresPassword = builder.AddParameter("postgres-password", secret: true);

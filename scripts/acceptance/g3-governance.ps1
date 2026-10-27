@@ -18,6 +18,8 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Native checks failed' }
     dotnet build backend/OntologyPlatform.slnx --configuration Release --no-restore
     if ($LASTEXITCODE -ne 0) { throw 'Release build failed' }
+    python3 scripts/tests/G3AppHost.Tests.py
+    if ($LASTEXITCODE -ne 0) { throw 'Actual AppHost prefix boundary failed' }
     # 正式栈写V2前先运行兼容reader，再保留独立二进制供真实制品后验读取。
     dotnet test --project backend/tests/OntologyPlatform.G2ContractTests --filter 'FullyQualifiedName~G3ManifestContractTests.V2RoundtripRetainsExactAssessmentBinding' --output Detailed
     if ($LASTEXITCODE -ne 0) { throw 'Pre-write V2 compatible binary failed' }
