@@ -56,14 +56,25 @@ public sealed partial class OntologyService
         // 只有必要阶段通过及预算完成才有发布资格，OWL推理明确未执行。
         var assessment = new SemanticAssessment
         {
-            AssessmentId = Guid.NewGuid().ToString("N"), ValidationReportId = report.ReportId, DraftId = draftId, Revision = current.Revision, Hashes = current.Hashes,
-            ProfileVersion = profile.Version, ProfileHash = profile.Hash, AssessmentHash = "", AssessedAtUtc = now, ExpiresAtUtc = now.AddHours(24), ExecutorVersion = "jena-6.2.0/riot-shacl/g3-m1-1",
+            AssessmentId = Guid.NewGuid().ToString("N"),
+            ValidationReportId = report.ReportId,
+            DraftId = draftId,
+            Revision = current.Revision,
+            Hashes = current.Hashes,
+            ProfileVersion = profile.Version,
+            ProfileHash = profile.Hash,
+            AssessmentHash = "",
+            AssessedAtUtc = now,
+            ExpiresAtUtc = now.AddHours(24),
+            ExecutorVersion = "jena-6.2.0/riot-shacl/g3-m1-1",
             Stages = [new AssessmentStage { Name = "PARSE", Status = AssessmentStageStatus.Pass, Code = "riot_parsed" },
                 new AssessmentStage { Name = "SUPPORT", Status = supportPassed ? AssessmentStageStatus.Pass : AssessmentStageStatus.NotSupported, Code = supportPassed ? "asserted_subset_supported" : "axiom_unsupported" },
                 new AssessmentStage { Name = "SHACL_CORE", Status = !supportPassed ? AssessmentStageStatus.NotRun : report.Conforms ? AssessmentStageStatus.Pass : AssessmentStageStatus.Fail, Code = !supportPassed ? "support_blocked" : report.Conforms ? "shacl_conforms" : "shacl_violation" },
                 new AssessmentStage { Name = "GOVERNANCE", Status = AssessmentStageStatus.Pass, Code = "scope_revision_bound" },
                 new AssessmentStage { Name = "OWL_REASONING", Status = AssessmentStageStatus.NotRun, Code = "asserted_only" }],
-            PublishEligible = supportPassed && report.Conforms, Diagnostics = diagnostics, BudgetStatus = "COMPLETE"
+            PublishEligible = supportPassed && report.Conforms,
+            Diagnostics = diagnostics,
+            BudgetStatus = "COMPLETE"
         };
         assessment = assessment with { AssessmentHash = SemanticProfile.AssessmentHash(assessment) };
         return await WriteAsync<T>(actor, current.Scope, action, request.Command, new { draftId, request }, async transactionToken =>
