@@ -39,6 +39,6 @@ Master已生成f1cd505并以b48a68a修复forward-only Down；新表和原报告�
 
 ## 资源与未决项
 
-精确回收本SEM创建的33个临时容器，逐一container inspect确认无记录；未删镜像、卷、历史refs/旧树或私有runtime。唯一保留Jena匹配本任务fixture挂载后按不可变ID删除；公开fixture目录与最后SelfTest完成后的/tmp隔离PyYAML/toolbin已真实删除。命令、退出码、容量与after见resource-lifecycle.json。分支、Worktree及构建缓存为活跃待审成果保留，避免清理未整合代码；实际V1/V2公开合成manifest字节已归档compatibility-fixtures供独立reader复查。
+精确回收本SEM创建的33个临时容器，逐一container inspect确认无记录；未删镜像、卷、历史refs/旧树或私有runtime。唯一保留Jena匹配本任务fixture挂载后按不可变ID删除；公开fixture目录与最后SelfTest完成后的/tmp隔离PyYAML/toolbin已真实删除。命令、退出码、容量与after见resource-lifecycle.json。分支、Worktree及构建缓存为活跃待审成果保留，避免清理未整合代码；实际V1/V2公开合成manifest以compatibility-fixtures内带LF的base64封套无损归档；恢复器按原大小/hash核验并拒绝覆盖，供独立reader读取恢复后的原始字节。直接原始JSON缺末尾LF曾使文本门禁FAIL，记录manifest-text-format-fail.txt；此次只纠正证据容器，不修改原字节/hash或重跑业务。
 
 独立Astra最终结论、Master HTTP/OpenAPI/Web组合验收、最终同Head CI与唯一V2 Review ZIP仍由Master记录；本报告不代替其PASS。最终提交/推送本证据后等待当前关口复审，不自动进入下阶段。
