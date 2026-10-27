@@ -1,0 +1,96 @@
+[
+  {
+    "command": [
+      "dotnet",
+      "format",
+      "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyPlatform.Modules.Ontology.csproj",
+      "--include",
+      "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/AssessmentRecord.cs",
+      "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/ExactGraphComparison.cs",
+      "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaComparison.cs",
+      "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaRdfCodec.cs",
+      "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaSemanticRuntime.cs",
+      "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyAssessment.cs",
+      "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyDbContext.cs",
+      "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyModule.cs",
+      "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyService.cs",
+      "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/SemanticProfile.cs",
+      "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/SemanticSupportPolicy.cs",
+      "--no-restore",
+      "--verify-no-changes"
+    ],
+    "exitCode": 0,
+    "output": ""
+  },
+  {
+    "command": [
+      "dotnet",
+      "format",
+      "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/OntologyPlatform.Modules.Publishing.csproj",
+      "--include",
+      "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/PublishingActivation.cs",
+      "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/PublishingRules.cs",
+      "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/PublishingService.cs",
+      "--no-restore",
+      "--verify-no-changes"
+    ],
+    "exitCode": 0,
+    "output": ""
+  },
+  {
+    "command": [
+      "dotnet",
+      "format",
+      "backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/OntologyPlatform.Modules.SemanticQuery.csproj",
+      "--include",
+      "backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/VerifiedReleaseSources.cs",
+      "--no-restore",
+      "--verify-no-changes"
+    ],
+    "exitCode": 0,
+    "output": ""
+  },
+  {
+    "command": [
+      "dotnet",
+      "format",
+      "backend/tests/OntologyPlatform.PublishingTests/OntologyPlatform.PublishingTests.csproj",
+      "--include",
+      "backend/tests/OntologyPlatform.PublishingTests/G3BindingTests.cs",
+      "backend/tests/OntologyPlatform.PublishingTests/G3LegacyTests.cs",
+      "--no-restore",
+      "--verify-no-changes"
+    ],
+    "exitCode": 0,
+    "output": ""
+  },
+  {
+    "command": [
+      "dotnet",
+      "format",
+      "backend/tests/OntologyPlatform.QueryTests/OntologyPlatform.QueryTests.csproj",
+      "--include",
+      "backend/tests/OntologyPlatform.QueryTests/GatewayTests.cs",
+      "--no-restore",
+      "--verify-no-changes"
+    ],
+    "exitCode": 0,
+    "output": ""
+  },
+  {
+    "command": [
+      "dotnet",
+      "format",
+      "backend/tests/OntologyPlatform.SemanticTests/OntologyPlatform.SemanticTests.csproj",
+      "--include",
+      "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+      "backend/tests/OntologyPlatform.SemanticTests/G3BoundaryTests.cs",
+      "backend/tests/OntologyPlatform.SemanticTests/RoundtripTests.cs",
+      "backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs",
+      "--no-restore",
+      "--verify-no-changes"
+    ],
+    "exitCode": 0,
+    "output": ""
+  }
+]

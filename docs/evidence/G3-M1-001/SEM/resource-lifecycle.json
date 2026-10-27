@@ -1,0 +1,1384 @@
+{
+  "task": "G3-M1-SEM",
+  "scope": "only exact disposable containers created by these test invocations; no images or volumes removed",
+  "createdContainerCount": 27,
+  "afterContainerCount": 0,
+  "fixtures": [
+    {
+      "evidence": "g3-sem-stack-after-migration-fix.json",
+      "name": "g3-m1-sem-stack-68c3d6175d12-pg",
+      "createCommand": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g3-m1-sem-stack-68c3d6175d12-pg",
+        "--memory",
+        "256m",
+        "--cpus",
+        "1",
+        "--publish",
+        "127.0.0.1::5432",
+        "--env",
+        "POSTGRES_PASSWORD",
+        "--env",
+        "POSTGRES_DB",
+        "--tmpfs",
+        "/var/lib/postgresql",
+        "postgres:18.6-trixie@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6"
+      ],
+      "createExitCode": 0
+    },
+    {
+      "evidence": "g3-sem-stack-after-migration-fix.json",
+      "name": "g3-m1-sem-stack-68c3d6175d12-s3",
+      "createCommand": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g3-m1-sem-stack-68c3d6175d12-s3",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--publish",
+        "127.0.0.1::9000",
+        "--env",
+        "RUSTFS_ACCESS_KEY",
+        "--env",
+        "RUSTFS_SECRET_KEY",
+        "--env",
+        "RUSTFS_CONSOLE_ENABLE=false",
+        "--tmpfs",
+        "/data:mode=1777",
+        "rustfs/rustfs:1.0.3@sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+        "/data"
+      ],
+      "createExitCode": 0
+    },
+    {
+      "evidence": "g3-sem-stack-after-migration-fix.json",
+      "name": "g3-m1-sem-stack-68c3d6175d12-jena",
+      "createCommand": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g3-m1-sem-stack-68c3d6175d12-jena",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--publish",
+        "127.0.0.1::3030",
+        "--mount",
+        "type=bind,src=/private/tmp/g3-m1-sem-stack-68c3d6175d12tfy99yb3/fixture,dst=/fixture,readonly",
+        "--entrypoint",
+        "java",
+        "ontology-platform-g2-fuseki:6.2.0",
+        "-Xmx384m",
+        "-Dlog4j.configurationFile=/fixture/log4j2.properties",
+        "-jar",
+        "/opt/fuseki/fuseki-server.jar",
+        "--config=/fixture/config.ttl"
+      ],
+      "createExitCode": 0
+    },
+    {
+      "evidence": "g3-sem-stack-audit-fixture-fixed.json",
+      "name": "g3-m1-sem-stack-bee95a5c569b-pg",
+      "createCommand": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g3-m1-sem-stack-bee95a5c569b-pg",
+        "--memory",
+        "256m",
+        "--cpus",
+        "1",
+        "--publish",
+        "127.0.0.1::5432",
+        "--env",
+        "POSTGRES_PASSWORD",
+        "--env",
+        "POSTGRES_DB",
+        "--tmpfs",
+        "/var/lib/postgresql",
+        "postgres:18.6-trixie@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6"
+      ],
+      "createExitCode": 0
+    },
+    {
+      "evidence": "g3-sem-stack-audit-fixture-fixed.json",
+      "name": "g3-m1-sem-stack-bee95a5c569b-s3",
+      "createCommand": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g3-m1-sem-stack-bee95a5c569b-s3",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--publish",
+        "127.0.0.1::9000",
+        "--env",
+        "RUSTFS_ACCESS_KEY",
+        "--env",
+        "RUSTFS_SECRET_KEY",
+        "--env",
+        "RUSTFS_CONSOLE_ENABLE=false",
+        "--tmpfs",
+        "/data:mode=1777",
+        "rustfs/rustfs:1.0.3@sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+        "/data"
+      ],
+      "createExitCode": 0
+    },
+    {
+      "evidence": "g3-sem-stack-audit-fixture-fixed.json",
+      "name": "g3-m1-sem-stack-bee95a5c569b-jena",
+      "createCommand": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g3-m1-sem-stack-bee95a5c569b-jena",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--publish",
+        "127.0.0.1::3030",
+        "--mount",
+        "type=bind,src=/private/tmp/g3-m1-sem-stack-bee95a5c569bj9gtaefn/fixture,dst=/fixture,readonly",
+        "--entrypoint",
+        "java",
+        "ontology-platform-g2-fuseki:6.2.0",
+        "-Xmx384m",
+        "-Dlog4j.configurationFile=/fixture/log4j2.properties",
+        "-jar",
+        "/opt/fuseki/fuseki-server.jar",
+        "--config=/fixture/config.ttl"
+      ],
+      "createExitCode": 0
+    },
+    {
+      "evidence": "g3-sem-stack-complete.json",
+      "name": "g3-m1-sem-stack-1ad04809c5a1-pg",
+      "createCommand": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g3-m1-sem-stack-1ad04809c5a1-pg",
+        "--memory",
+        "256m",
+        "--cpus",
+        "1",
+        "--publish",
+        "127.0.0.1::5432",
+        "--env",
+        "POSTGRES_PASSWORD",
+        "--env",
+        "POSTGRES_DB",
+        "--tmpfs",
+        "/var/lib/postgresql",
+        "postgres:18.6-trixie@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6"
+      ],
+      "createExitCode": 0
+    },
+    {
+      "evidence": "g3-sem-stack-complete.json",
+      "name": "g3-m1-sem-stack-1ad04809c5a1-s3",
+      "createCommand": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g3-m1-sem-stack-1ad04809c5a1-s3",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--publish",
+        "127.0.0.1::9000",
+        "--env",
+        "RUSTFS_ACCESS_KEY",
+        "--env",
+        "RUSTFS_SECRET_KEY",
+        "--env",
+        "RUSTFS_CONSOLE_ENABLE=false",
+        "--tmpfs",
+        "/data:mode=1777",
+        "rustfs/rustfs:1.0.3@sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+        "/data"
+      ],
+      "createExitCode": 0
+    },
+    {
+      "evidence": "g3-sem-stack-complete.json",
+      "name": "g3-m1-sem-stack-1ad04809c5a1-jena",
+      "createCommand": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g3-m1-sem-stack-1ad04809c5a1-jena",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--publish",
+        "127.0.0.1::3030",
+        "--mount",
+        "type=bind,src=/private/tmp/g3-m1-sem-stack-1ad04809c5a1lq12akwk/fixture,dst=/fixture,readonly",
+        "--entrypoint",
+        "java",
+        "ontology-platform-g2-fuseki:6.2.0",
+        "-Xmx384m",
+        "-Dlog4j.configurationFile=/fixture/log4j2.properties",
+        "-jar",
+        "/opt/fuseki/fuseki-server.jar",
+        "--config=/fixture/config.ttl"
+      ],
+      "createExitCode": 0
+    },
+    {
+      "evidence": "g3-sem-stack.json",
+      "name": "g3-m1-sem-stack-0b0eb5363511-pg",
+      "createCommand": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g3-m1-sem-stack-0b0eb5363511-pg",
+        "--memory",
+        "256m",
+        "--cpus",
+        "1",
+        "--publish",
+        "127.0.0.1::5432",
+        "--env",
+        "POSTGRES_PASSWORD",
+        "--env",
+        "POSTGRES_DB",
+        "--tmpfs",
+        "/var/lib/postgresql",
+        "postgres:18.6-trixie@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6"
+      ],
+      "createExitCode": 0
+    },
+    {
+      "evidence": "g3-sem-stack.json",
+      "name": "g3-m1-sem-stack-0b0eb5363511-s3",
+      "createCommand": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g3-m1-sem-stack-0b0eb5363511-s3",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--publish",
+        "127.0.0.1::9000",
+        "--env",
+        "RUSTFS_ACCESS_KEY",
+        "--env",
+        "RUSTFS_SECRET_KEY",
+        "--env",
+        "RUSTFS_CONSOLE_ENABLE=false",
+        "--tmpfs",
+        "/data:mode=1777",
+        "rustfs/rustfs:1.0.3@sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+        "/data"
+      ],
+      "createExitCode": 0
+    },
+    {
+      "evidence": "g3-sem-stack.json",
+      "name": "g3-m1-sem-stack-0b0eb5363511-jena",
+      "createCommand": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g3-m1-sem-stack-0b0eb5363511-jena",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--publish",
+        "127.0.0.1::3030",
+        "--mount",
+        "type=bind,src=/private/tmp/g3-m1-sem-stack-0b0eb5363511vp52e3i4/fixture,dst=/fixture,readonly",
+        "--entrypoint",
+        "java",
+        "ontology-platform-g2-fuseki:6.2.0",
+        "-Xmx384m",
+        "-Dlog4j.configurationFile=/fixture/log4j2.properties",
+        "-jar",
+        "/opt/fuseki/fuseki-server.jar",
+        "--config=/fixture/config.ttl"
+      ],
+      "createExitCode": 0
+    },
+    {
+      "evidence": "g3-m1-query-agent.json",
+      "name": "g3-m1-sem-compat-5f61f4cac6f3-pg",
+      "createCommand": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g3-m1-sem-compat-5f61f4cac6f3-pg",
+        "--memory",
+        "256m",
+        "--cpus",
+        "1",
+        "--publish",
+        "127.0.0.1::5432",
+        "--env",
+        "POSTGRES_PASSWORD",
+        "--env",
+        "POSTGRES_DB",
+        "--tmpfs",
+        "/var/lib/postgresql",
+        "postgres:18.6-trixie@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6"
+      ],
+      "createExitCode": 0
+    },
+    {
+      "evidence": "g3-m1-query-agent.json",
+      "name": "g3-m1-sem-compat-5f61f4cac6f3-s3",
+      "createCommand": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g3-m1-sem-compat-5f61f4cac6f3-s3",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--publish",
+        "127.0.0.1::9000",
+        "--env",
+        "RUSTFS_ACCESS_KEY",
+        "--env",
+        "RUSTFS_SECRET_KEY",
+        "--env",
+        "RUSTFS_CONSOLE_ENABLE=false",
+        "--tmpfs",
+        "/data:mode=1777",
+        "rustfs/rustfs:1.0.3@sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+        "/data"
+      ],
+      "createExitCode": 0
+    },
+    {
+      "evidence": "g3-m1-query-agent.json",
+      "name": "g3-m1-sem-compat-5f61f4cac6f3-jena",
+      "createCommand": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g3-m1-sem-compat-5f61f4cac6f3-jena",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--publish",
+        "127.0.0.1::3030",
+        "--mount",
+        "type=bind,src=/private/tmp/g3-m1-sem-compat-5f61f4cac6f3d1t154oz/fixture,dst=/fixture,readonly",
+        "--entrypoint",
+        "java",
+        "ontology-platform-g2-fuseki:6.2.0",
+        "-Xmx384m",
+        "-Dlog4j.configurationFile=/fixture/log4j2.properties",
+        "-jar",
+        "/opt/fuseki/fuseki-server.jar",
+        "--config=/fixture/config.ttl"
+      ],
+      "createExitCode": 0
+    },
+    {
+      "evidence": "g3-m1-query-final.json",
+      "name": "g3-m1-sem-compat-9dc460a3286b-pg",
+      "createCommand": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g3-m1-sem-compat-9dc460a3286b-pg",
+        "--memory",
+        "256m",
+        "--cpus",
+        "1",
+        "--publish",
+        "127.0.0.1::5432",
+        "--env",
+        "POSTGRES_PASSWORD",
+        "--env",
+        "POSTGRES_DB",
+        "--tmpfs",
+        "/var/lib/postgresql",
+        "postgres:18.6-trixie@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6"
+      ],
+      "createExitCode": 0
+    },
+    {
+      "evidence": "g3-m1-query-final.json",
+      "name": "g3-m1-sem-compat-9dc460a3286b-s3",
+      "createCommand": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g3-m1-sem-compat-9dc460a3286b-s3",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--publish",
+        "127.0.0.1::9000",
+        "--env",
+        "RUSTFS_ACCESS_KEY",
+        "--env",
+        "RUSTFS_SECRET_KEY",
+        "--env",
+        "RUSTFS_CONSOLE_ENABLE=false",
+        "--tmpfs",
+        "/data:mode=1777",
+        "rustfs/rustfs:1.0.3@sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+        "/data"
+      ],
+      "createExitCode": 0
+    },
+    {
+      "evidence": "g3-m1-query-final.json",
+      "name": "g3-m1-sem-compat-9dc460a3286b-jena",
+      "createCommand": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g3-m1-sem-compat-9dc460a3286b-jena",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--publish",
+        "127.0.0.1::3030",
+        "--mount",
+        "type=bind,src=/private/tmp/g3-m1-sem-compat-9dc460a3286b3gk39qny/fixture,dst=/fixture,readonly",
+        "--entrypoint",
+        "java",
+        "ontology-platform-g2-fuseki:6.2.0",
+        "-Xmx384m",
+        "-Dlog4j.configurationFile=/fixture/log4j2.properties",
+        "-jar",
+        "/opt/fuseki/fuseki-server.jar",
+        "--config=/fixture/config.ttl"
+      ],
+      "createExitCode": 0
+    },
+    {
+      "evidence": "merged-source-red.json",
+      "name": "g3-m1-sem-diagnostic-c67801abcd46",
+      "createCommand": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g3-m1-sem-diagnostic-c67801abcd46",
+        "--publish",
+        "127.0.0.1::3030",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--mount",
+        "type=bind,src=/private/tmp/g3-m1-sem-diagnostic-c67801abcd46rtj1ccaw/fixture,dst=/fixture,readonly",
+        "--entrypoint",
+        "java",
+        "ontology-platform-g2-fuseki:6.2.0",
+        "-Xmx384m",
+        "-Dlog4j.configurationFile=/fixture/log4j2.properties",
+        "-jar",
+        "/opt/fuseki/fuseki-server.jar",
+        "--config=/fixture/config.ttl"
+      ],
+      "createExitCode": 0
+    },
+    {
+      "evidence": "merged-source-red.json",
+      "name": "g3-m1-sem-diagnostic-c67801abcd46-pg",
+      "createCommand": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g3-m1-sem-diagnostic-c67801abcd46-pg",
+        "--publish",
+        "127.0.0.1::5432",
+        "--env",
+        "POSTGRES_PASSWORD",
+        "--env",
+        "POSTGRES_DB",
+        "--memory",
+        "512m",
+        "--cpus",
+        "1",
+        "--tmpfs",
+        "/var/lib/postgresql",
+        "postgres:18.6-trixie@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6"
+      ],
+      "createExitCode": 0
+    },
+    {
+      "evidence": "sem-final-head.json",
+      "name": "g3-m1-sem-diagnostic-92e684af3525",
+      "createCommand": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g3-m1-sem-diagnostic-92e684af3525",
+        "--publish",
+        "127.0.0.1::3030",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--mount",
+        "type=bind,src=/private/tmp/g3-m1-sem-diagnostic-92e684af3525y1dgpw2u/fixture,dst=/fixture,readonly",
+        "--entrypoint",
+        "java",
+        "ontology-platform-g2-fuseki:6.2.0",
+        "-Xmx384m",
+        "-Dlog4j.configurationFile=/fixture/log4j2.properties",
+        "-jar",
+        "/opt/fuseki/fuseki-server.jar",
+        "--config=/fixture/config.ttl"
+      ],
+      "createExitCode": 0
+    },
+    {
+      "evidence": "sem-final-head.json",
+      "name": "g3-m1-sem-diagnostic-92e684af3525-pg",
+      "createCommand": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g3-m1-sem-diagnostic-92e684af3525-pg",
+        "--publish",
+        "127.0.0.1::5432",
+        "--env",
+        "POSTGRES_PASSWORD",
+        "--env",
+        "POSTGRES_DB",
+        "--memory",
+        "512m",
+        "--cpus",
+        "1",
+        "--tmpfs",
+        "/var/lib/postgresql",
+        "postgres:18.6-trixie@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6"
+      ],
+      "createExitCode": 0
+    },
+    {
+      "evidence": "merged-source-green.json",
+      "name": "g3-m1-sem-diagnostic-cfaf236774b2",
+      "createCommand": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g3-m1-sem-diagnostic-cfaf236774b2",
+        "--publish",
+        "127.0.0.1::3030",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--mount",
+        "type=bind,src=/private/tmp/g3-m1-sem-diagnostic-cfaf236774b28rhjs7_n/fixture,dst=/fixture,readonly",
+        "--entrypoint",
+        "java",
+        "ontology-platform-g2-fuseki:6.2.0",
+        "-Xmx384m",
+        "-Dlog4j.configurationFile=/fixture/log4j2.properties",
+        "-jar",
+        "/opt/fuseki/fuseki-server.jar",
+        "--config=/fixture/config.ttl"
+      ],
+      "createExitCode": 0
+    },
+    {
+      "evidence": "merged-source-green.json",
+      "name": "g3-m1-sem-diagnostic-cfaf236774b2-pg",
+      "createCommand": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g3-m1-sem-diagnostic-cfaf236774b2-pg",
+        "--publish",
+        "127.0.0.1::5432",
+        "--env",
+        "POSTGRES_PASSWORD",
+        "--env",
+        "POSTGRES_DB",
+        "--memory",
+        "512m",
+        "--cpus",
+        "1",
+        "--tmpfs",
+        "/var/lib/postgresql",
+        "postgres:18.6-trixie@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6"
+      ],
+      "createExitCode": 0
+    },
+    {
+      "evidence": "merged-and-proven-source-green.json",
+      "name": "g3-m1-sem-diagnostic-59903a7b109e",
+      "createCommand": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g3-m1-sem-diagnostic-59903a7b109e",
+        "--publish",
+        "127.0.0.1::3030",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--mount",
+        "type=bind,src=/private/tmp/g3-m1-sem-diagnostic-59903a7b109eu58obksd/fixture,dst=/fixture,readonly",
+        "--entrypoint",
+        "java",
+        "ontology-platform-g2-fuseki:6.2.0",
+        "-Xmx384m",
+        "-Dlog4j.configurationFile=/fixture/log4j2.properties",
+        "-jar",
+        "/opt/fuseki/fuseki-server.jar",
+        "--config=/fixture/config.ttl"
+      ],
+      "createExitCode": 0
+    },
+    {
+      "evidence": "merged-and-proven-source-green.json",
+      "name": "g3-m1-sem-diagnostic-59903a7b109e-pg",
+      "createCommand": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g3-m1-sem-diagnostic-59903a7b109e-pg",
+        "--publish",
+        "127.0.0.1::5432",
+        "--env",
+        "POSTGRES_PASSWORD",
+        "--env",
+        "POSTGRES_DB",
+        "--memory",
+        "512m",
+        "--cpus",
+        "1",
+        "--tmpfs",
+        "/var/lib/postgresql",
+        "postgres:18.6-trixie@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6"
+      ],
+      "createExitCode": 0
+    }
+  ],
+  "commands": [
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g3-m1-sem-stack-68c3d6175d12-jena"
+      ],
+      "exitCode": 0,
+      "origin": "fixture-finally"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g3-m1-sem-stack-68c3d6175d12-s3"
+      ],
+      "exitCode": 0,
+      "origin": "fixture-finally"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g3-m1-sem-stack-68c3d6175d12-pg"
+      ],
+      "exitCode": 0,
+      "origin": "fixture-finally"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g3-m1-sem-stack-bee95a5c569b-jena"
+      ],
+      "exitCode": 0,
+      "origin": "fixture-finally"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g3-m1-sem-stack-bee95a5c569b-s3"
+      ],
+      "exitCode": 0,
+      "origin": "fixture-finally"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g3-m1-sem-stack-bee95a5c569b-pg"
+      ],
+      "exitCode": 0,
+      "origin": "fixture-finally"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g3-m1-sem-stack-1ad04809c5a1-jena"
+      ],
+      "exitCode": 0,
+      "origin": "fixture-finally"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g3-m1-sem-stack-1ad04809c5a1-s3"
+      ],
+      "exitCode": 0,
+      "origin": "fixture-finally"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g3-m1-sem-stack-1ad04809c5a1-pg"
+      ],
+      "exitCode": 0,
+      "origin": "fixture-finally"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g3-m1-sem-stack-0b0eb5363511-jena"
+      ],
+      "exitCode": 0,
+      "origin": "fixture-finally"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g3-m1-sem-stack-0b0eb5363511-s3"
+      ],
+      "exitCode": 0,
+      "origin": "fixture-finally"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g3-m1-sem-stack-0b0eb5363511-pg"
+      ],
+      "exitCode": 0,
+      "origin": "fixture-finally"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g3-m1-sem-compat-5f61f4cac6f3-jena"
+      ],
+      "exitCode": 0,
+      "origin": "fixture-finally"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g3-m1-sem-compat-5f61f4cac6f3-s3"
+      ],
+      "exitCode": 0,
+      "origin": "fixture-finally"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g3-m1-sem-compat-5f61f4cac6f3-pg"
+      ],
+      "exitCode": 0,
+      "origin": "fixture-finally"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g3-m1-sem-compat-9dc460a3286b-jena"
+      ],
+      "exitCode": 0,
+      "origin": "fixture-finally"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g3-m1-sem-compat-9dc460a3286b-s3"
+      ],
+      "exitCode": 0,
+      "origin": "fixture-finally"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g3-m1-sem-compat-9dc460a3286b-pg"
+      ],
+      "exitCode": 0,
+      "origin": "fixture-finally"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g3-m1-sem-diagnostic-c67801abcd46"
+      ],
+      "exitCode": 0,
+      "origin": "fixture-finally"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g3-m1-sem-diagnostic-c67801abcd46-pg"
+      ],
+      "exitCode": 0,
+      "origin": "fixture-finally"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g3-m1-sem-diagnostic-92e684af3525"
+      ],
+      "exitCode": 0,
+      "origin": "fixture-finally"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g3-m1-sem-diagnostic-92e684af3525-pg"
+      ],
+      "exitCode": 0,
+      "origin": "fixture-finally"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g3-m1-sem-diagnostic-cfaf236774b2"
+      ],
+      "exitCode": 0,
+      "origin": "fixture-finally"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g3-m1-sem-diagnostic-cfaf236774b2-pg"
+      ],
+      "exitCode": 0,
+      "origin": "fixture-finally"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g3-m1-sem-diagnostic-59903a7b109e"
+      ],
+      "exitCode": 0,
+      "origin": "fixture-finally"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g3-m1-sem-diagnostic-59903a7b109e-pg"
+      ],
+      "exitCode": 0,
+      "origin": "fixture-finally"
+    },
+    {
+      "command": [
+        "docker",
+        "container",
+        "inspect",
+        "--size",
+        "--format",
+        "{{json .Id}} {{json .Image}} {{json .State.Status}} {{json .Mounts}} {{json .SizeRw}}",
+        "g3-m1-sem-816b674c503c"
+      ],
+      "exitCode": 0,
+      "output": "\"bc4746cf3e46fbee362143d203ff370c37cf8a51bc81060e2bee281ba1fe14df\" \"sha256:6746df3002ba9a25011baaa43b4bf4175c53d00d06ed4ca07ac7b5ae995c58e2\" \"running\" [{\"Destination\":\"/fixture\",\"Mode\":\"\",\"Propagation\":\"rprivate\",\"RW\":false,\"Source\":\"/private/tmp/g3-sem-fixture-ea428605\",\"Type\":\"bind\"}] 43999232"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "bc4746cf3e46fbee362143d203ff370c37cf8a51bc81060e2bee281ba1fe14df"
+      ],
+      "exitCode": 0,
+      "output": "bc4746cf3e46fbee362143d203ff370c37cf8a51bc81060e2bee281ba1fe14df"
+    },
+    {
+      "operation": "remove-owned-public-fixture",
+      "path": "/private/tmp/g3-sem-fixture-ea428605",
+      "beforeBytes": 970,
+      "exitCode": 0,
+      "afterExists": false
+    }
+  ],
+  "after": [
+    {
+      "name": "g3-m1-sem-816b674c503c",
+      "command": [
+        "docker",
+        "container",
+        "inspect",
+        "--format",
+        "{{.Id}}",
+        "g3-m1-sem-816b674c503c"
+      ],
+      "exitCode": 1,
+      "absent": true
+    },
+    {
+      "name": "g3-m1-sem-compat-5f61f4cac6f3-jena",
+      "command": [
+        "docker",
+        "container",
+        "inspect",
+        "--format",
+        "{{.Id}}",
+        "g3-m1-sem-compat-5f61f4cac6f3-jena"
+      ],
+      "exitCode": 1,
+      "absent": true
+    },
+    {
+      "name": "g3-m1-sem-compat-5f61f4cac6f3-pg",
+      "command": [
+        "docker",
+        "container",
+        "inspect",
+        "--format",
+        "{{.Id}}",
+        "g3-m1-sem-compat-5f61f4cac6f3-pg"
+      ],
+      "exitCode": 1,
+      "absent": true
+    },
+    {
+      "name": "g3-m1-sem-compat-5f61f4cac6f3-s3",
+      "command": [
+        "docker",
+        "container",
+        "inspect",
+        "--format",
+        "{{.Id}}",
+        "g3-m1-sem-compat-5f61f4cac6f3-s3"
+      ],
+      "exitCode": 1,
+      "absent": true
+    },
+    {
+      "name": "g3-m1-sem-compat-9dc460a3286b-jena",
+      "command": [
+        "docker",
+        "container",
+        "inspect",
+        "--format",
+        "{{.Id}}",
+        "g3-m1-sem-compat-9dc460a3286b-jena"
+      ],
+      "exitCode": 1,
+      "absent": true
+    },
+    {
+      "name": "g3-m1-sem-compat-9dc460a3286b-pg",
+      "command": [
+        "docker",
+        "container",
+        "inspect",
+        "--format",
+        "{{.Id}}",
+        "g3-m1-sem-compat-9dc460a3286b-pg"
+      ],
+      "exitCode": 1,
+      "absent": true
+    },
+    {
+      "name": "g3-m1-sem-compat-9dc460a3286b-s3",
+      "command": [
+        "docker",
+        "container",
+        "inspect",
+        "--format",
+        "{{.Id}}",
+        "g3-m1-sem-compat-9dc460a3286b-s3"
+      ],
+      "exitCode": 1,
+      "absent": true
+    },
+    {
+      "name": "g3-m1-sem-diagnostic-59903a7b109e",
+      "command": [
+        "docker",
+        "container",
+        "inspect",
+        "--format",
+        "{{.Id}}",
+        "g3-m1-sem-diagnostic-59903a7b109e"
+      ],
+      "exitCode": 1,
+      "absent": true
+    },
+    {
+      "name": "g3-m1-sem-diagnostic-59903a7b109e-pg",
+      "command": [
+        "docker",
+        "container",
+        "inspect",
+        "--format",
+        "{{.Id}}",
+        "g3-m1-sem-diagnostic-59903a7b109e-pg"
+      ],
+      "exitCode": 1,
+      "absent": true
+    },
+    {
+      "name": "g3-m1-sem-diagnostic-92e684af3525",
+      "command": [
+        "docker",
+        "container",
+        "inspect",
+        "--format",
+        "{{.Id}}",
+        "g3-m1-sem-diagnostic-92e684af3525"
+      ],
+      "exitCode": 1,
+      "absent": true
+    },
+    {
+      "name": "g3-m1-sem-diagnostic-92e684af3525-pg",
+      "command": [
+        "docker",
+        "container",
+        "inspect",
+        "--format",
+        "{{.Id}}",
+        "g3-m1-sem-diagnostic-92e684af3525-pg"
+      ],
+      "exitCode": 1,
+      "absent": true
+    },
+    {
+      "name": "g3-m1-sem-diagnostic-c67801abcd46",
+      "command": [
+        "docker",
+        "container",
+        "inspect",
+        "--format",
+        "{{.Id}}",
+        "g3-m1-sem-diagnostic-c67801abcd46"
+      ],
+      "exitCode": 1,
+      "absent": true
+    },
+    {
+      "name": "g3-m1-sem-diagnostic-c67801abcd46-pg",
+      "command": [
+        "docker",
+        "container",
+        "inspect",
+        "--format",
+        "{{.Id}}",
+        "g3-m1-sem-diagnostic-c67801abcd46-pg"
+      ],
+      "exitCode": 1,
+      "absent": true
+    },
+    {
+      "name": "g3-m1-sem-diagnostic-cfaf236774b2",
+      "command": [
+        "docker",
+        "container",
+        "inspect",
+        "--format",
+        "{{.Id}}",
+        "g3-m1-sem-diagnostic-cfaf236774b2"
+      ],
+      "exitCode": 1,
+      "absent": true
+    },
+    {
+      "name": "g3-m1-sem-diagnostic-cfaf236774b2-pg",
+      "command": [
+        "docker",
+        "container",
+        "inspect",
+        "--format",
+        "{{.Id}}",
+        "g3-m1-sem-diagnostic-cfaf236774b2-pg"
+      ],
+      "exitCode": 1,
+      "absent": true
+    },
+    {
+      "name": "g3-m1-sem-stack-0b0eb5363511-jena",
+      "command": [
+        "docker",
+        "container",
+        "inspect",
+        "--format",
+        "{{.Id}}",
+        "g3-m1-sem-stack-0b0eb5363511-jena"
+      ],
+      "exitCode": 1,
+      "absent": true
+    },
+    {
+      "name": "g3-m1-sem-stack-0b0eb5363511-pg",
+      "command": [
+        "docker",
+        "container",
+        "inspect",
+        "--format",
+        "{{.Id}}",
+        "g3-m1-sem-stack-0b0eb5363511-pg"
+      ],
+      "exitCode": 1,
+      "absent": true
+    },
+    {
+      "name": "g3-m1-sem-stack-0b0eb5363511-s3",
+      "command": [
+        "docker",
+        "container",
+        "inspect",
+        "--format",
+        "{{.Id}}",
+        "g3-m1-sem-stack-0b0eb5363511-s3"
+      ],
+      "exitCode": 1,
+      "absent": true
+    },
+    {
+      "name": "g3-m1-sem-stack-1ad04809c5a1-jena",
+      "command": [
+        "docker",
+        "container",
+        "inspect",
+        "--format",
+        "{{.Id}}",
+        "g3-m1-sem-stack-1ad04809c5a1-jena"
+      ],
+      "exitCode": 1,
+      "absent": true
+    },
+    {
+      "name": "g3-m1-sem-stack-1ad04809c5a1-pg",
+      "command": [
+        "docker",
+        "container",
+        "inspect",
+        "--format",
+        "{{.Id}}",
+        "g3-m1-sem-stack-1ad04809c5a1-pg"
+      ],
+      "exitCode": 1,
+      "absent": true
+    },
+    {
+      "name": "g3-m1-sem-stack-1ad04809c5a1-s3",
+      "command": [
+        "docker",
+        "container",
+        "inspect",
+        "--format",
+        "{{.Id}}",
+        "g3-m1-sem-stack-1ad04809c5a1-s3"
+      ],
+      "exitCode": 1,
+      "absent": true
+    },
+    {
+      "name": "g3-m1-sem-stack-68c3d6175d12-jena",
+      "command": [
+        "docker",
+        "container",
+        "inspect",
+        "--format",
+        "{{.Id}}",
+        "g3-m1-sem-stack-68c3d6175d12-jena"
+      ],
+      "exitCode": 1,
+      "absent": true
+    },
+    {
+      "name": "g3-m1-sem-stack-68c3d6175d12-pg",
+      "command": [
+        "docker",
+        "container",
+        "inspect",
+        "--format",
+        "{{.Id}}",
+        "g3-m1-sem-stack-68c3d6175d12-pg"
+      ],
+      "exitCode": 1,
+      "absent": true
+    },
+    {
+      "name": "g3-m1-sem-stack-68c3d6175d12-s3",
+      "command": [
+        "docker",
+        "container",
+        "inspect",
+        "--format",
+        "{{.Id}}",
+        "g3-m1-sem-stack-68c3d6175d12-s3"
+      ],
+      "exitCode": 1,
+      "absent": true
+    },
+    {
+      "name": "g3-m1-sem-stack-bee95a5c569b-jena",
+      "command": [
+        "docker",
+        "container",
+        "inspect",
+        "--format",
+        "{{.Id}}",
+        "g3-m1-sem-stack-bee95a5c569b-jena"
+      ],
+      "exitCode": 1,
+      "absent": true
+    },
+    {
+      "name": "g3-m1-sem-stack-bee95a5c569b-pg",
+      "command": [
+        "docker",
+        "container",
+        "inspect",
+        "--format",
+        "{{.Id}}",
+        "g3-m1-sem-stack-bee95a5c569b-pg"
+      ],
+      "exitCode": 1,
+      "absent": true
+    },
+    {
+      "name": "g3-m1-sem-stack-bee95a5c569b-s3",
+      "command": [
+        "docker",
+        "container",
+        "inspect",
+        "--format",
+        "{{.Id}}",
+        "g3-m1-sem-stack-bee95a5c569b-s3"
+      ],
+      "exitCode": 1,
+      "absent": true
+    }
+  ],
+  "pending": "Worktree/branch and its build caches retained for independent review and Master integration; public /private/tmp/g3-sem-manifests retained until compatibility-reader review; no historical refs/trees, images or volumes touched.",
+  "temporaryTools": [
+    {
+      "path": "/private/tmp/g3-sem-pythonlibs",
+      "beforeFileCount": 44,
+      "beforeBytes": 865932,
+      "operation": "remove exact isolated verification tool directory after final SelfTest exit0",
+      "exitCode": 0,
+      "afterExists": false
+    },
+    {
+      "path": "/private/tmp/g3-sem-toolbin",
+      "beforeFileCount": 1,
+      "beforeBytes": 139,
+      "operation": "remove exact isolated verification tool directory after final SelfTest exit0",
+      "exitCode": 0,
+      "afterExists": false
+    }
+  ],
+  "retainedArtifacts": [
+    {
+      "path": "docs/evidence/G3-M1-001/SEM/compatibility-fixtures/real-v1-manifest.json",
+      "sizeBytes": 2617,
+      "sha256": "0f1c47045c654e2b9613345c6f54d22cd255130168e347513876ed227f85039a",
+      "origin": "actual synthetic PG/Jena/RustFS G3LegacyTests publication; raw manifest bytes preserved"
+    },
+    {
+      "path": "docs/evidence/G3-M1-001/SEM/compatibility-fixtures/real-v2-manifest.json",
+      "sizeBytes": 2860,
+      "sha256": "5d01c7cb16eef512f2913b7aeaf6b67e121fac69c790ceb489ea1b1366e6b5f0",
+      "origin": "actual synthetic PG/Jena/RustFS G3LegacyTests publication; raw manifest bytes preserved"
+    }
+  ]
+}
