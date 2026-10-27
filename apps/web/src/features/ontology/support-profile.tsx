@@ -10,7 +10,7 @@ export function SupportProfile({ profile, loading, failed, onRefresh }: {
   return (
     <section className="g2-stack" aria-label="语义支持档案">
       <div className="g2-row">
-        <h2>M1 语义支持档案</h2>
+        <h2>语义支持档案</h2>
         <button className="button" disabled={loading} onClick={onRefresh}>刷新支持档案</button>
       </div>
       {!profile ? (
