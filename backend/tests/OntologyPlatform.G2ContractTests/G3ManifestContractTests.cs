@@ -61,12 +61,44 @@ public sealed class G3ManifestContractTests
         Assert.Throws<JsonException>(() => JsonSerializer.Serialize(Manifest(99)));
     }
 
+    /// <summary>V2不能接受空源散列、缺失字段、格式正确但组合不一致的散列。</summary>
+    [TestMethod]
+    public void V2RejectsEmptyMissingAndInconsistentSourceHashes()
+    {
+        // 独立固定样例确保失败来自散列规则，评估引用本身完整合法。
+        var value = Manifest(2) with
+        {
+            Semantics = new PublicationSemantics
+            {
+                ProfileVersion = "1",
+                ProfileHash = new string('a', 64),
+                AssessmentId = "assessment-test",
+                AssessmentHash = new string('b', 64)
+            }
+        };
+        Assert.Throws<JsonException>(() => JsonSerializer.Serialize(value with { Hashes = value.Hashes with { OntologyHash = "" } }));
+        Assert.Throws<JsonException>(() => JsonSerializer.Serialize(value with { Hashes = value.Hashes with { DataHash = "not-a-sha256" } }));
+        Assert.Throws<JsonException>(() => JsonSerializer.Serialize(value with { Hashes = value.Hashes with { BundleHash = new string('f', 64) } }));
+        Assert.Throws<JsonException>(() => JsonSerializer.Serialize(value with { Hashes = value.Hashes with { VocabularyHash = new string('c', 64) } }));
+        // 即使其他字段有效，不能靠字段缺席伪造原始源身份。
+        var json = JsonNode.Parse(JsonSerializer.Serialize(value))!;
+        json["Hashes"]!.AsObject().Remove("ShapesHash");
+        Assert.Throws<JsonException>(() => JsonSerializer.Deserialize<ReleaseManifest>(json.ToJsonString()));
+    }
+
     /// <summary>仅提供完整非空旧必需引用，避免用缺字段错误冒充版本测试。</summary>
     private static ReleaseManifest Manifest(int version) => new()
     {
         SchemaVersion = version,
         Scope = new ResourceScope(),
-        Hashes = new SourceHashes(),
+        Hashes = new SourceHashes
+        {
+            OntologyHash = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            ShapesHash = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            DataHash = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            VocabularyHash = null,
+            BundleHash = "7b1385c0e43e8e1dd9fc9d923f774296d7710849351fd5a667a63512920534ab"
+        },
         Snapshot = new AssetVersionSnapshot()
     };
 }

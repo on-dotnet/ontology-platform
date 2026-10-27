@@ -66,7 +66,10 @@ schemas['SemanticDatum'] = {'oneOf': [dict(type='object', required=list(fields),
 # 清单版本与评估绑定必须和C#严格reader采用同样的分支规则。
 manifest_fields = schemas['ReleaseManifest']['properties']
 manifest_required = schemas['ReleaseManifest']['required']
-schemas['ReleaseManifest'] = {'oneOf': [dict(type='object', required=manifest_required + (['semantics'] if version == 2 else []), additionalProperties=False, properties={key: ({'type': 'integer', 'enum': [version]} if key == 'schemaVersion' else {'$ref': '#/components/schemas/PublicationSemantics'} if key == 'semantics' and version == 2 else {'type': 'null'} if key == 'semantics' else value) for key, value in manifest_fields.items()}) for version in [1, 2]], 'discriminator': {'propertyName': 'schemaVersion'}}
+# V2源hash格式与显式reader一致；V1保持旧线协议，不回写历史定义。
+v2_hash_fields = {field['name'][:1].lower() + field['name'][1:]: ({'anyOf': [{'type': 'string', 'pattern': '^[0-9a-f]{64}$'}, {'type': 'null'}]} if field['name'] == 'VocabularyHash' else {'type': 'string', 'pattern': '^[0-9a-f]{64}$'}) for field in SCHEMA['models']['SourceHashes']['fields']}
+v2_hash_schema = {'type': 'object', 'required': list(v2_hash_fields), 'additionalProperties': False, 'properties': v2_hash_fields}
+schemas['ReleaseManifest'] = {'oneOf': [dict(type='object', required=manifest_required + (['semantics'] if version == 2 else []), additionalProperties=False, properties={key: ({'type': 'integer', 'enum': [version]} if key == 'schemaVersion' else {'$ref': '#/components/schemas/PublicationSemantics'} if key == 'semantics' and version == 2 else {'type': 'null'} if key == 'semantics' else v2_hash_schema if key == 'hashes' and version == 2 else value) for key, value in manifest_fields.items()}) for version in [1, 2]], 'discriminator': {'propertyName': 'schemaVersion'}}
 fields = schemas['ExecutionEvent']['properties']
 schemas['ExecutionEvent'] = {'oneOf': [dict(type='object', required=list(fields), additionalProperties=False, properties={key: ({'type': 'string', 'const': kind} if key == 'eventType' else {'type': 'integer', 'enum': [1]} if key == 'schemaVersion' else {'$ref': '#/components/schemas/' + payload} if key == 'payload' else value) for key, value in fields.items()}) for payload, kind in SCHEMA['payloadDiscriminators'].items()], 'discriminator': {'propertyName': 'eventType'}}
 

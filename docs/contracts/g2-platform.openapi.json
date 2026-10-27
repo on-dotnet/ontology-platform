@@ -6252,8 +6252,44 @@
                 "format": "int64"
               },
               "hashes": {
-                "description": "完整权威源散列。",
-                "$ref": "#/components/schemas/SourceHashes"
+                "required": [
+                  "ontologyHash",
+                  "shapesHash",
+                  "vocabularyHash",
+                  "dataHash",
+                  "bundleHash"
+                ],
+                "type": "object",
+                "properties": {
+                  "ontologyHash": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "shapesHash": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "vocabularyHash": {
+                    "anyOf": [
+                      {
+                        "pattern": "^[0-9a-f]{64}$",
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "dataHash": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "bundleHash": {
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
               },
               "ontologyGraphIri": {
                 "type": "string",

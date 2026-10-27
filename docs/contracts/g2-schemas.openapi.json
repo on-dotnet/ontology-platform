@@ -1227,8 +1227,44 @@
                 "description": "原始精确草稿修订。"
               },
               "hashes": {
-                "$ref": "#/components/schemas/SourceHashes",
-                "description": "完整权威源散列。"
+                "type": "object",
+                "required": [
+                  "ontologyHash",
+                  "shapesHash",
+                  "vocabularyHash",
+                  "dataHash",
+                  "bundleHash"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "ontologyHash": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "shapesHash": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "vocabularyHash": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "dataHash": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "bundleHash": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                }
               },
               "ontologyGraphIri": {
                 "type": "string",
