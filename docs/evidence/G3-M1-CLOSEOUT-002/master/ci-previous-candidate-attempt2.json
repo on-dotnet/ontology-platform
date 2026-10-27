@@ -1,0 +1,232 @@
+{
+  "attempt": 2,
+  "conclusion": "success",
+  "databaseId": 40487172435,
+  "headSha": "fdafb9337c13d110ba53919d28a4e181e03e912c",
+  "jobs": [
+    {
+      "completedAt": "2026-10-27T10:47:38Z",
+      "conclusion": "success",
+      "databaseId": 122138961075,
+      "name": "governance-integration",
+      "startedAt": "2026-10-27T10:32:54Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-27T10:32:56Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-27T10:32:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T10:33:00Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "number": 2,
+          "startedAt": "2026-10-27T10:32:56Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T10:33:08Z",
+          "conclusion": "success",
+          "name": "Run actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68",
+          "number": 3,
+          "startedAt": "2026-10-27T10:33:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T10:33:40Z",
+          "conclusion": "success",
+          "name": "Frozen restore and backend build",
+          "number": 4,
+          "startedAt": "2026-10-27T10:33:08Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T10:35:18Z",
+          "conclusion": "success",
+          "name": "Real PostgreSQL security integration",
+          "number": 5,
+          "startedAt": "2026-10-27T10:33:40Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T10:47:35Z",
+          "conclusion": "success",
+          "name": "Real G2 semantic publishing query MCP MAF and native SSE integration",
+          "number": 6,
+          "startedAt": "2026-10-27T10:35:18Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T10:47:35Z",
+          "conclusion": "success",
+          "name": "Post Run actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68",
+          "number": 11,
+          "startedAt": "2026-10-27T10:47:35Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T10:47:35Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "number": 12,
+          "startedAt": "2026-10-27T10:47:35Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T10:47:35Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 13,
+          "startedAt": "2026-10-27T10:47:35Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/on-dotnet/ontology-platform/actions/runs/40487172435/job/122138961075"
+    },
+    {
+      "completedAt": "2026-10-27T10:22:49Z",
+      "conclusion": "success",
+      "databaseId": 122138963798,
+      "name": "engineering",
+      "startedAt": "2026-10-27T10:16:26Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-27T10:16:27Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-27T10:16:26Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T10:16:30Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "number": 2,
+          "startedAt": "2026-10-27T10:16:27Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T10:16:32Z",
+          "conclusion": "success",
+          "name": "Prepare isolated verification parser",
+          "number": 3,
+          "startedAt": "2026-10-27T10:16:30Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T10:20:38Z",
+          "conclusion": "success",
+          "name": "Repository policy and positive-negative checks",
+          "number": 4,
+          "startedAt": "2026-10-27T10:16:32Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T10:20:49Z",
+          "conclusion": "success",
+          "name": "Run actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68",
+          "number": 5,
+          "startedAt": "2026-10-27T10:20:38Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T10:20:55Z",
+          "conclusion": "success",
+          "name": "Restore exact committed platform graph",
+          "number": 6,
+          "startedAt": "2026-10-27T10:20:49Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T10:21:21Z",
+          "conclusion": "success",
+          "name": "Frozen Web restore and separate lint typecheck test build",
+          "number": 7,
+          "startedAt": "2026-10-27T10:20:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T10:21:21Z",
+          "conclusion": "success",
+          "name": "Runtime output boundary negatives",
+          "number": 8,
+          "startedAt": "2026-10-27T10:21:21Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T10:21:26Z",
+          "conclusion": "success",
+          "name": "M1 read backpressure harness boundaries",
+          "number": 9,
+          "startedAt": "2026-10-27T10:21:21Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T10:21:28Z",
+          "conclusion": "success",
+          "name": "G2 acceptance orchestration positive and negative checks",
+          "number": 10,
+          "startedAt": "2026-10-27T10:21:26Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T10:21:28Z",
+          "conclusion": "success",
+          "name": "M1 changed handwritten TSX readability",
+          "number": 11,
+          "startedAt": "2026-10-27T10:21:28Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T10:22:46Z",
+          "conclusion": "success",
+          "name": "Build format and real host security tests",
+          "number": 12,
+          "startedAt": "2026-10-27T10:21:28Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T10:22:47Z",
+          "conclusion": "success",
+          "name": "Scope notice",
+          "number": 13,
+          "startedAt": "2026-10-27T10:22:46Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T10:22:47Z",
+          "conclusion": "success",
+          "name": "Post Run actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68",
+          "number": 25,
+          "startedAt": "2026-10-27T10:22:47Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T10:22:47Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "number": 26,
+          "startedAt": "2026-10-27T10:22:47Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T10:22:47Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 27,
+          "startedAt": "2026-10-27T10:22:47Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/on-dotnet/ontology-platform/actions/runs/40487172435/job/122138963798"
+    }
+  ],
+  "status": "completed",
+  "url": "https://github.com/on-dotnet/ontology-platform/actions/runs/40487172435"
+}

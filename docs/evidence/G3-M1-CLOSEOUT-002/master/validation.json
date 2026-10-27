@@ -12,7 +12,7 @@
       "command": "pwsh -NoProfile -File scripts/verify.ps1 -SelfTest",
       "status": "PASS",
       "exitCode": 0,
-      "output": "Full integrated SelfTest PASS; ReviewPackage90, Cleanup44, Inspector9, Canonical6, ResourceLifecycle8, CloseoutGovernance4 plus existing gates; final-selftest.txt."
+      "output": "Full integrated pre-diagnostics SelfTest PASS at fdafb source scope: ReviewPackage90/Cleanup44/Inspector9/Canonical6/Lifecycle8/Governance4. After CI-exposed diagnostics-only repair, affected Canonical10 and repository static gates PASS; final committed Head full CI separately required."
     },
     {
       "name": "backend-release-build",
@@ -33,7 +33,7 @@
       "command": "python3 scripts/tests/CanonicalFuseki.Real.Tests.py",
       "status": "PASS",
       "exitCode": 0,
-      "output": "2 consecutive actual cache-hit checks: exact image/history sets unchanged; RESOURCE/canonical-real-reuse.json."
+      "output": "Original2 and diagnostics-repair2 actual cache-hit checks: exact10 image IDs/0 history sets unchanged; RESOURCE/canonical-real-reuse.json and master/diagnostics-real-reuse.json."
     },
     {
       "name": "docker-exact-dryrun",
@@ -90,6 +90,13 @@
       "status": "NOT_RUN",
       "exitCode": null,
       "output": "Out of this closeout scope; unchanged Web will run full sameHeadCI; no M2."
+    },
+    {
+      "name": "canonical-failure-diagnostics",
+      "command": "python3 scripts/tests/CanonicalFuseki.Tests.py; pwsh -NoProfile -File scripts/verify.ps1",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Affected10 tests0 failures plus complete static gate PASS; timeout/nonzero failures retained in safe atomic receipts and recoverable CI stderr, no secrets, locks released, budget/source unchanged; independent scoped review PASS."
     }
   ],
   "ci": {

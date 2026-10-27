@@ -21,3 +21,12 @@
 Master拥有公共规则/CI/脚本集成；PACKAGE独立树g3-m1-closeout-package，原commits0a873be+77b8ff0；RESOURCE独立树g3-m1-closeout-resources，原commits35c2da0+f2d8e7f；各自非作者Review见independent-tool-reviews.md，原树/任务分支当前为本轮复审恢复入口。旧6树/未集成refs/私有runtime/PFX和其它阶段原ZIP均不在本轮Docker删除范围；每个当前任务树在本轮复审后、集成与ignored归属核验后原生archive_worktree，不强删私有资料。Master当前树保留生成最终唯一包及审查恢复。
 
 开始/结束和墙钟见efficiency-metrics.json及最终回执；实现/等待/环境/测试/CI/返工/封包活跃耗时UNKNOWN，不能从聊天推断工时。正式交付后输出G3_M1_CLOSEOUT_READY_FOR_REVIEW并停止等待ChatGPT复审。
+
+
+## 冻结后CI失败与唯一诊断修复波
+
+首次冻结fdafb9337c13d110ba53919d28a4e181e03e912c，run40487172435 attempt1：engineering成功，governance-integration在canonical首次镜像获取入口600秒超时（exit1），语义测试尚未开始。准确Docker内部阶段UNKNOWN，不猜测网络；原run/Head、关键短日志、退出、原始与规范化散列见ci-attempt1-failure-index.json/txt，失败不删除、不伪改PASS。
+
+仅失败job在相同Head复跑一次（attempt2），已实际completed/success且两个job成功，见ci-previous-candidate-attempt2.json；首次失败仍保留，不从复跑成功反推具体网络根因，也不把旧Head成功复用为诊断修复后新Head成功。未增加超时预算或自动无限retry。该事件暴露H5诊断缺口：旧helper丢弃原始输出后没有安全阶段receipt，已用唯一受限修复波a3d263b+f319717补齐（Master cherry为ba578fc+c8b75ff）。失败时仅持久化/输出严格安全命令、Task/Run/context、退出或TIMEOUT、耗时、hash/size、最多12静态阶段与固定错误类别，原始secret/env/buildargs不入证据；CI stderr保留同一摘要以免临时runner销毁丢证据。成功输出、600秒预算、Dockerfile、已批准镜像内容不变。
+
+独立限定审查两段均Spec/Quality PASS、C0/I0/M0；Master受影响增量10单测/2真实reuse/完整静态门禁均PASS，本地10镜像/0history不增长。不重跑无关业务；最终新Head必须重新跑完整双jobCI，再构唯一正式V3，不将旧failed候选的结果当新Head成功。

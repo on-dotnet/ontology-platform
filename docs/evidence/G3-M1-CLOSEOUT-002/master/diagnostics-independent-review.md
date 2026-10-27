@@ -1,0 +1,7 @@
+# 最终CI暴露诊断缺口的限定修复审查
+
+whole_review非作者只读，唯一最终修复波。f2d8e7f→a3d263b完整diff SHA256 0caaecccfbc2f1f78d7211671787fb44bec5aae41e5257ed52e83294bcc88795，Spec PASS / Quality PASS，C0/I0/M0；a3d263b→f319717自检补充diff SHA256 6f896fdd8079442a3d13434fd18d9aa281c76134edea1a0dd0d479522e78535e，限定再审PASS，C0/I0/M0。diff-check0，未重跑作者测试/操作Docker。
+
+600秒每调用预算不变，无自动retry/新依赖/Dockerfile变化。ignored失败receipt原子发布，命令固定语法筛选，仅hash/length、最多12静态阶段与固定errorCategories；CI环境仅读数字run/attempt。锁只释放本次拥有者，inspect非准确missing-image不冒建，成功stdout/cache-hit不变。CANONICAL_FAILURE_RECEIPT在CLI stderr保留同一严格脱敏JSON，临时CI runner销毁后可从Actions日志恢复。tag/schema/context拒绝也附安全diagnostic，底层异常链不输出。新增4项断言及原始RED/GREEN已核：共10项PASS，覆盖超时/非零/secret排除/原子/锁释放/后续成功/inspect拒绝/有限窗口。
+
+Master集成两提交为ba578fc+c8b75ff后独立增量10项PASS、真实连续reuse2项PASS、静态门禁PASS。前次fdafb CI600秒失败事实保留；准确远端内部阶段UNKNOWN，不把推测写成network根因。此审查只确认诊断修复，最终新Head完整双jobCI和唯一V3重开仍后置。

@@ -13,5 +13,28 @@
   "wallClockSpan": "First Docker observation to evidence freeze only; final CI/package receipt adds later time, active hours remain UNKNOWN",
   "rule": "Do not infer active hours by summing parallel processes or chat timestamps.",
   "evidenceFreezeUtc": "2026-10-27T10:14:04.120758+00:00",
-  "wallClockSecondsFirstDockerToEvidenceFreeze": 2248.592799
+  "wallClockSecondsFirstDockerToEvidenceFreeze": 2248.592799,
+  "diagnosticEvidenceFreezeUtc": "2026-10-27T10:49:01.414081+00:00",
+  "ciEvents": [
+    {
+      "runId": 40483372730,
+      "head": "b241569a169f8312384200579b0e74ed6f821ee5",
+      "status": "success",
+      "scope": "preApply sameHead fullCI"
+    },
+    {
+      "runId": 40487172435,
+      "head": "fdafb9337c13d110ba53919d28a4e181e03e912c",
+      "attempt": 1,
+      "status": "failure",
+      "phase": "canonical acquisition600s timeout; internal phaseUNKNOWN; no semantic tests started"
+    },
+    {
+      "runId": 40487172435,
+      "head": "fdafb9337c13d110ba53919d28a4e181e03e912c",
+      "attempt": 2,
+      "status": "success",
+      "scope": "one failed-job retry; not reused as diagnostic-repair Head CI"
+    }
+  ]
 }

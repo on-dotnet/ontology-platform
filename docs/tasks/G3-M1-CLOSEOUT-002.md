@@ -27,3 +27,6 @@ PACKAGE Owner=package，独立托管树/Users/chasen/.codex/worktrees/g3-m1-clos
 RESOURCE Owner=resources，独立树/Users/chasen/.codex/worktrees/g3-m1-closeout-resources/ontology-platform，分支codex/g3-m1-closeout-resources，原35c2da0/f2d8e7f，Reviewer=resource_review。必要AppHost路径授权补充DevelopmentInfrastructure.cs/CanonicalFusekiImage.cs，P2唯一修复轮补充Program.cs/ResourceLifecycle.cs、wave2-runtime.py、ResourceLifecycle.Tests.py，先冻结所有权后实施，Master未并写这些路径。新归属8回归和既有边界/Release通过，限定复审PASS。
 
 Master实际35项Docker Apply成功、保留8卷四服务前后健康通过；原代际变更拒绝保留，generation2精确计划重新独立审查。全量矩阵与日志见本任务master/delivery-report.md。最终整合SelfTest/独立Review/同HeadCI/唯一包另以真实回执收口。
+
+
+最终CI唯一修复波：fdafb的run40487172435 attempt1在镜像获取600秒超时（非业务测试失败），保留日志与未知内部阶段。RESOURCE相同owned_paths补canonical失败脱敏receipt/CI摘要及10项回归，原a3d263b+f319717，Master ba578fc+c8b75ff，whole_review两段限定复审PASS。Master增量10/2real/static通过；不改Dockerfile/600预算/依赖/业务。新最终Head CI与唯一包必须实际后置读取，不复用旧Head结果。

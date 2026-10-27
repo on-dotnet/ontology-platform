@@ -14,3 +14,6 @@
 10. **不以速度换安全**：不跳过真实数据库/权限/回滚测试，不以Mock代真实集成，不强推、不全局prune、不未知数据删除、不改历史。socket权限错误须准确报告；物理容量无证据NOT_VERIFIED，未运行平台NOT_RUN。
 
 自动化入口：`pwsh -NoProfile -File scripts/verify.ps1 -SelfTest`包含规则可发现性/EOF、V3完整性、安全清理及canonical构建正反例；CI另执行真实数据库/语义集成。规则测试只证明入口与冻结条款存在，不等于产品正确或真实清理。
+
+
+canonical构建失败必须原子保留严格allowlist receipt：安全命令/TaskId/RunId/context hash、退出或TIMEOUT/耗时、输出hash/size、有限静态BuildKit阶段和固定错误类别；同时输出同一脱敏摘要供临时CI日志恢复。不能只返回generic REFUSED或只留下临时runner本地路径，不输出原始env/buildargs/秘密，不为了PASS任意延长预算或无限retry。

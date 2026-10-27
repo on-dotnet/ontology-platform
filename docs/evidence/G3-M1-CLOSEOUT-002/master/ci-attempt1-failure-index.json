@@ -1,0 +1,22 @@
+{
+  "observedAt": "2026-10-27T10:32:47.310564+00:00",
+  "head": "fdafb9337c13d110ba53919d28a4e181e03e912c",
+  "runId": 40487172435,
+  "attempt": 1,
+  "url": "https://github.com/on-dotnet/ontology-platform/actions/runs/40487172435/attempts/1",
+  "failedStep": "Real G2 semantic publishing query MCP MAF and native SSE integration",
+  "phase": "canonical Docker image first build",
+  "command": "pwsh -NoProfile -File scripts/acceptance/g2-integration.ps1",
+  "exitCode": 1,
+  "diagnostic": "REFUSED: Docker unavailable or timed out; raw output suppressed",
+  "observedDurationSeconds": 600,
+  "semanticTestsStarted": false,
+  "logPath": "/Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform/artifacts/reviews/G3-M1-CLOSEOUT-002-final-ci-failed.txt",
+  "classification": "BUILD_PREFLIGHT_TIMEOUT; exact remote Docker phase unknown because raw build output intentionally suppressed",
+  "nextAction": "One failed-job rerun at unchanged fdafb completed/success on attempt2; original failed attempt retained. Scoped diagnostics repair requires a fresh final Head full CI.",
+  "committedLogPath": "docs/evidence/G3-M1-CLOSEOUT-002/master/ci-attempt1-failure.txt",
+  "originalRawLogSha256": "3e49a7d38e900da2403f186578073ce8235e80b6156bc071149577cb6c847b90",
+  "committedLogSha256": "3e49a7d38e900da2403f186578073ce8235e80b6156bc071149577cb6c847b90",
+  "committedLogNormalization": "ANSI color codes removed; original raw bytes preserved in ignored artifact with originalRawLogSha256",
+  "retryEvidence": "docs/evidence/G3-M1-CLOSEOUT-002/master/ci-previous-candidate-attempt2.json"
+}
