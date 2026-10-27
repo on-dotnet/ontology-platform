@@ -20,7 +20,7 @@ def main():
     if not path.is_relative_to((ROOT / '.tools/security').resolve()):
         parser.error('Only current checkout private runtime accepted')
     runtime = json.loads(path.read_text())
-    if not runtime['volumePrefix'].startswith(('g2-', 'g3-m1-')):
+    if not runtime['volumePrefix'].startswith(('g2-', 'g3-m1-', 'g3-m2-')):
         parser.error('Historical volumes forbidden')
     checks = []
     def probe(label,expected,authorized=True):

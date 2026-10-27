@@ -49,3 +49,7 @@ BuildKit v0.34.0的单Ref inspect可能留下零计数引用，使rm仅写内存
 Apply必须精确白名单、24h内有效期、实际Engine/context/builder版本与代际、资源指纹、无容器/manifest引用、已提交关闭/合成来源证据及前后逐项日志。逻辑大小、共享层、history metadata、cache、容器stdout与Loki/Tempo卷分别报告，不能叠加显示容量冒充回收。APFS/VM sparse disk没有实测就NOT_VERIFIED。history按现行强无记录诊断并在自然生命周期后再核对；没有发生自然代际时明确NOT_VERIFIED，不主动重启。
 
 验收先隔离fixture真实Docker资源再项目Apply；mock只能验证拒绝路径。必须保留开发环境集合并做健康探针或具体说明限制。稳定Head同CI、唯一默认V3包独立重开后交付；[效率规则](ai-development-efficiency.md)约束新Master和换机器恢复入口。
+
+## G3-M2-001 本任务收尾
+
+人类只授权M2自身新建可再生资源。执行器接受本任务准确g3-m2命名卷、同任务已提交CLOSED合成证明、完整metadata fingerprint、显式空references、dockerBackend(context/engineId/serverVersion)及原有24h/边界/重验日志门禁；M2所有inspect/list/rm显式--context绑定，setup/删除前/删除后复验实际context与Engine/version，漂移拒绝后续删除；拒绝M1/G2旧卷、Git/history/image操作。托管SEM/WEB树独立Review/同HeadCI/集成后用原生archive_worktree保存快照。共享image/history/cache只报告本轮增量，不prune；私有runtime/PFX保持KEEP并列恢复触发。实际Apply/健康/资源before-after属于独立验收，测试夹具通过不等于已清理。

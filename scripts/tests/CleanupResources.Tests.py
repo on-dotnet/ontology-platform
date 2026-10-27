@@ -238,8 +238,13 @@ s=json.loads(p.read_text()); a=sys.argv[1:]; s['calls'].append(a)
 def fail(message):
  p.write_text(json.dumps(s)); print(message,file=sys.stderr); sys.exit(1)
 try:
- if a==['context','show']: print('desktop-linux')
- elif a[:1]==['info']: print('fixture-engine-id')
+ if a[:1]==['--context']:
+  if a[1]!='desktop-linux': fail('wrong explicit context')
+  a=a[2:]
+ if a==['context','show']: print(s.get('context','desktop-linux'))
+ elif a[:1]==['info']:
+  if 'engineId' in a[-1]: print(json.dumps(dict(engineId=s.get('engineId','fixture-engine-id'),serverVersion=s.get('serverVersion','29.9.2'))))
+  else: print('fixture-engine-id')
  elif a[:2]==['network','inspect']: print(('3' if s.get('backendChanged') else '2')*64)
  elif a==['buildx','version']: print('github.com/docker/buildx v0.38.1 0dbe87f36ed472fe36b6796c3f70b4210a731fc5')
  elif a[:2]==['buildx','inspect']: print('Name: desktop-linux\\nDriver: docker\\nNodes:\\nName: desktop-linux\\nEndpoint: desktop-linux\\nBuildKit version: v0.34.0')
@@ -293,22 +298,22 @@ p.write_text(json.dumps(s))
         deletions = [x for x in state['calls'] if 'rm' in x]
         self.assertEqual(deletions, [['container','rm','a'*64], ['volume','rm','test-volume'], ['image','rm','sha256:'+'b'*64]])
 
-    def m1_volume_fixture(self):
+    def m1_volume_fixture(self, task='G3-M1-001', prefix='g3-m1'):
         self.docker_fixture()
-        target = 'g3-m1-fixture-postgres-data'
-        (self.root / 'proof.txt').write_text('G3-M1-001 CLOSED synthetic ' + target + ' g2-protected-data codex/old\n')
+        target = prefix + '-fixture-postgres-data'
+        (self.root / 'proof.txt').write_text(task + ' CLOSED synthetic ' + target + ' g2-protected-data codex/old\n')
         self.git('add', 'proof.txt')
         self.git('commit', '-m', 'closed synthetic M1 fixture')
         self.main = self.git('rev-parse', 'HEAD').stdout.strip()
         self.git('push', 'origin', 'main')
         self.git('update-ref', 'refs/remotes/origin/main', self.main)
-        self.plan.update(taskId='G3-M1-001', expectedMainSha=self.main)
+        self.plan.update(taskId=task, expectedMainSha=self.main)
         state = json.loads(self.state_path.read_text())
         state['volumes'][0]['Name'] = target
         self.state_path.write_text(json.dumps(state))
         self.plan['operations'] = [dict(type='docker-volume', target=target, expectedDriver='local',
                                        expectedCreatedAt='2026-01-01T00:00:00Z',
-                                       ownershipEvidence=dict(commit=self.main, path='proof.txt', taskId='G3-M1-001', closed=True, synthetic=True))]
+                                       ownershipEvidence=dict(commit=self.main, path='proof.txt', taskId=task, closed=True, synthetic=True))]
 
     def test_m1_only_own_volume_dryrun_and_exact_apply(self):
         self.m1_volume_fixture()
@@ -334,8 +339,54 @@ p.write_text(json.dumps(s))
                 if mutation == 'legacy': self.plan['operations'][0]['target'] = 'g2-protected-data'
                 if mutation == 'wrong-owner': self.plan['operations'][0]['ownershipEvidence']['taskId'] = 'TASK-OLD'
                 result = self.assert_rejected()
-                self.assertIn('Plan identity mismatch' if mutation == 'M2' else 'M1 cleanup only accepts own named volumes', result.stderr)
+                self.assertIn('M2 cleanup only accepts own named volumes' if mutation == 'M2' else 'M1 cleanup only accepts own named volumes', result.stderr)
                 self.assertFalse(any('rm' in row for row in json.loads(self.state_path.read_text())['calls']))
+
+    def test_m2_only_same_task_exact_volume_apply_and_foreign_refusal(self):
+        self.m1_volume_fixture('G3-M2-001','g3-m2')
+        self.plan['dockerBackend']=dict(context='desktop-linux',engineId='fixture-engine-id',serverVersion='29.9.2')
+        snapshot=dict(Name='g3-m2-fixture-postgres-data',Driver='local',CreatedAt='2026-01-01T00:00:00Z')
+        self.plan['operations'][0].update(expectedReferences=[],fingerprint=hashlib.sha256(json.dumps(snapshot,sort_keys=True,separators=(',',':')).encode()).hexdigest())
+        original=copy.deepcopy(self.plan)
+        for mutation in ('foreign','owner','git','fingerprint'):
+            self.plan=copy.deepcopy(original)
+            op=self.plan['operations'][0]
+            if mutation=='foreign':op['target']='g3-m1-protected-postgres-data'
+            if mutation=='owner':op['ownershipEvidence']['taskId']='G3-M1-001'
+            if mutation=='git':op.update(type='git-local-branch',target='codex/old',expectedTip=self.main)
+            if mutation=='fingerprint':op['fingerprint']='f'*64
+            self.assert_rejected()
+        self.plan=original
+        self.assertEqual(self.run_engine().returncode,0)
+        result=self.run_engine(True)
+        self.assertEqual(result.returncode,0,result.stderr)
+        state=json.loads(self.state_path.read_text())
+        self.assertEqual(state['volumes'],[])
+        self.assertEqual(len(state['containers']),1)
+        self.assertEqual(len(state['images']),1)
+
+    def test_m2_changed_context_engine_or_server_refuses_before_rm(self):
+        self.m1_volume_fixture('G3-M2-001','g3-m2')
+        self.plan['dockerBackend']=dict(context='desktop-linux',engineId='fixture-engine-id',serverVersion='29.9.2')
+        snapshot=dict(Name='g3-m2-fixture-postgres-data',Driver='local',CreatedAt='2026-01-01T00:00:00Z')
+        self.plan['operations'][0].update(expectedReferences=[],fingerprint=hashlib.sha256(json.dumps(snapshot,sort_keys=True,separators=(',',':')).encode()).hexdigest())
+        original=json.loads(self.state_path.read_text())
+        for key,value in [('context','another-context'),('engineId','another-engine'),('serverVersion','99.0.0')]:
+            state=copy.deepcopy(original);state[key]=value;self.state_path.write_text(json.dumps(state))
+            result=self.run_engine(True)
+            self.assertNotEqual(result.returncode,0,key)
+            self.assertFalse(any('rm' in row for row in json.loads(self.state_path.read_text())['calls']))
+        self.state_path.write_text(json.dumps(original))
+        module=self.load_engine()
+        saved_path=os.environ['PATH']
+        try:
+            os.environ['PATH']=self.env['PATH']
+            cleaner=module.Cleaner(str(self.root),self.plan)
+            cleaner.setup()
+            state=json.loads(self.state_path.read_text());state['engineId']='changed-after-preflight';self.state_path.write_text(json.dumps(state))
+            with self.assertRaises(module.Refused):cleaner.execute(str(self.base/'apply-drift.jsonl'))
+        finally:os.environ['PATH']=saved_path
+        self.assertFalse(any('rm' in row for row in json.loads(self.state_path.read_text())['calls']))
 
     def closeout_fixture(self):
         self.docker_fixture()

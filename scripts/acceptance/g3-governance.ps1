@@ -1,6 +1,6 @@
 #Requires -Version 7.4
 [CmdletBinding()]
-param([ValidateSet('M1')][string]$Milestone = 'M1', [string]$RuntimeFile, [switch]$StartRuntime, [switch]$ModulesOnly)
+param([ValidateSet('M1', 'M2')][string]$Milestone = 'M1', [string]$RuntimeFile, [switch]$StartRuntime, [switch]$ModulesOnly)
 $ErrorActionPreference = 'Stop'
 $root = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 $beforeEvidence = [Environment]::GetEnvironmentVariable('PLATFORM_EVIDENCE_DIR', 'Process')
@@ -19,7 +19,7 @@ function Start-PipelineStep([string]$Name) {
 Push-Location $root
 try {
     $pipelineId = 'pipeline-' + [Guid]::NewGuid().ToString('N')
-    $env:PLATFORM_EVIDENCE_DIR = 'docs/evidence/G3-M1-001/runtime/' + $pipelineId
+    $env:PLATFORM_EVIDENCE_DIR = 'docs/evidence/G3-' + $Milestone + '-001/runtime/' + $pipelineId
     $pipelineRoot = Join-Path $root $env:PLATFORM_EVIDENCE_DIR
     $null = New-Item -ItemType Directory -Path $pipelineRoot
     $stageNames = @('self-test', 'frozen-restore', 'web', 'backpressure', 'native', 'release-build', 'apphost-prefix',
@@ -79,7 +79,7 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Real semantic/publication/query/run integration failed' }
     if (-not $ModulesOnly) {
         Start-PipelineStep 'runtime'
-        $arguments = @('scripts/acceptance/g3-acceptance-runtime.py')
+        $arguments = @('scripts/acceptance/g3-acceptance-runtime.py', '--milestone', $Milestone)
         if ($RuntimeFile) { $arguments += @('--runtime-file', $RuntimeFile) }
         if ($StartRuntime) { $arguments += '--start-runtime' }
         if (-not $RuntimeFile -and -not $StartRuntime) { throw 'RuntimeFile or StartRuntime required for real browser acceptance' }

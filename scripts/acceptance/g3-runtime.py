@@ -1,4 +1,4 @@
-"""Launch only a fresh M1 stack, retaining the reviewed G2 protocol and secret-safe lifecycle."""
+"""Launch only a fresh authorized M1 or M2 stack, retaining the reviewed G2 protocol and secret-safe lifecycle."""
 import argparse
 import importlib.util
 import os
@@ -15,15 +15,17 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('mode', choices=['prepare', 'core', 'bootstrap', 'full'])
     parser.add_argument('--runtime-file')
+    parser.add_argument('--milestone', choices=['M1', 'M2'], default='M1')
     args = parser.parse_args()
+    prefix = 'g3-' + args.milestone.lower()
     if args.mode == 'prepare':
-        runtime.prepare('g2', 'g3-m1')
+        runtime.prepare('g2', prefix, task_id='G3-' + args.milestone + '-001')
         return 0
     if not args.runtime_file:
         parser.error('--runtime-file required')
     path, value = runtime.load_runtime(args.runtime_file)
-    if not value['volumePrefix'].startswith('g3-m1-') or path.parent.name != value['volumePrefix']:
-        parser.error('Only this task fresh M1 runtime is allowed')
+    if not value['volumePrefix'].startswith(prefix + '-') or path.parent.name != value['volumePrefix']:
+        parser.error('Only the selected authorized milestone fresh runtime is allowed')
     if args.mode == 'bootstrap':
         return runtime.bootstrap(path, 'g2')
     return runtime.run(path, args.mode, 'g2', 'Release')

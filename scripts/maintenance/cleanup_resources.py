@@ -16,6 +16,8 @@ delete Git/history/images or legacy volumes. G3-M1-CLOSEOUT-002 permits only
 Docker types backed by same-task committed proof, exact metadata fingerprints
 and explicitly empty volume/image container references. Managed worker trees use native
 archive_worktree after separate review and ignored-data inspection.
+G3-M2-001 accepts only its own exact named volumes, same-task committed proof,
+metadata fingerprint and explicitly empty references; no Git/history/image cleanup.
 
 History operations additionally require historyBackend={context,engineId,bridgeId,
 buildxVersion,buildkitVersion,driver,nodeName}; audited client v0.38.1 and server
@@ -260,16 +262,17 @@ def history_refs(builder='desktop-linux'):
     return refs
 
 
-def safe_docker_snapshot(kind, target, builder='desktop-linux'):
+def safe_docker_snapshot(kind, target, builder='desktop-linux', context=None):
     """Public planner API; inspect only whitelisted, non-secret Docker fields."""
+    prefix = ['docker'] + (['--context', context] if context is not None else [])
     if kind == 'docker-container':
-        value = read_json(run(['docker', 'container', 'inspect', '--format', CONTAINER_FORMAT, target]).stdout)
+        value = read_json(run(prefix + ['container', 'inspect', '--format', CONTAINER_FORMAT, target]).stdout)
         require(isinstance(value, dict), 'Invalid container schema')
         mounts = value.get('Mounts')
         require(isinstance(mounts, list), 'Invalid mounts schema')
         return dict(Id=value.get('Id'), Name=value.get('Name'), Image=value.get('Image'), State=(value.get('State') or {}).get('Status'), Mounts=[{k: m[k] for k in ('Type', 'Name', 'Source', 'Destination', 'RW') if k in m} for m in mounts])
     if kind == 'docker-volume':
-        value = read_json(run(['docker', 'volume', 'inspect', '--format', VOLUME_FORMAT, target]).stdout)
+        value = read_json(run(prefix + ['volume', 'inspect', '--format', VOLUME_FORMAT, target]).stdout)
         require(isinstance(value, dict), 'Invalid volume schema')
         return {k: value.get(k) for k in ('Name', 'Driver', 'CreatedAt')}
     if kind == 'docker-image':
@@ -357,7 +360,7 @@ class Cleaner:
         require(isinstance(p, dict), 'Plan must be object')
         required = {'schemaVersion','taskId','project','repositoryRoot','gitCommonDir','originUrl','expectedMainSha','createdAt','expiresAt','allowedWorktreeRoots','protectedWorktrees','keep','operations'}
         require(required <= p.keys(), 'Missing plan fields')
-        require(type(p['schemaVersion']) is int and p['schemaVersion'] == 1 and p['project'] == PROJECT and p['taskId'] in ('PRE-G3-CLEANUP-FIX-002', 'G3-M1-001', 'G3-M1-CLOSEOUT-002'), 'Plan identity mismatch')
+        require(type(p['schemaVersion']) is int and p['schemaVersion'] == 1 and p['project'] == PROJECT and p['taskId'] in ('PRE-G3-CLEANUP-FIX-002', 'G3-M1-001', 'G3-M2-001', 'G3-M1-CLOSEOUT-002'), 'Plan identity mismatch')
         require(absolute(p['repositoryRoot']).resolve() == self.root, 'Repository root mismatch')
         require(self.git('rev-parse', '--show-toplevel').stdout.strip() == str(self.root), 'Root must be Git toplevel')
         common = Path(self.git('rev-parse', '--path-format=absolute', '--git-common-dir').stdout.strip()).resolve()
@@ -387,6 +390,13 @@ class Cleaner:
                         and isinstance(op.get('ownershipEvidence'), dict)
                         and op['ownershipEvidence'].get('taskId') == 'G3-M1-001',
                         'M1 cleanup only accepts own named volumes')
+            if p['taskId'] == 'G3-M2-001':
+                require(op['type'] == 'docker-volume' and re.fullmatch(r'g3-m2-[a-z0-9-]{1,40}-(postgres|fuseki|rustfs|keycloak|alloy|grafana|loki|tempo|prometheus)-data', op['target'])
+                        and isinstance(op.get('ownershipEvidence'), dict)
+                        and op['ownershipEvidence'].get('taskId') == 'G3-M2-001',
+                        'M2 cleanup only accepts own named volumes')
+                require(isinstance(op.get('fingerprint'),str) and HEX64.fullmatch(op['fingerprint'])
+                        and op.get('expectedReferences') == [], 'M2 requires exact fingerprint and empty references')
             if p['taskId'] == 'G3-M1-CLOSEOUT-002':
                 require(op['type'] in ('docker-container','docker-volume','docker-image','docker-history')
                         and isinstance(op.get('ownershipEvidence'), dict)
@@ -408,6 +418,28 @@ class Cleaner:
         self.main_unchanged()
         for op in self.ops:
             self.check(op, preflight=True)
+
+    def docker_command(self, *arguments):
+        """Bind M2 operations to the reviewed context rather than the default endpoint."""
+        prefix=['docker']
+        if self.plan['taskId']=='G3-M2-001':
+            expected=self.plan.get('dockerBackend')
+            require(isinstance(expected,dict) and set(expected)=={'context','engineId','serverVersion'},'M2 exact Docker backend required')
+            require(expected['context'] in ('desktop-linux','default'),'M2 unreviewed Docker context')
+            prefix+=['--context',expected['context']]
+        return prefix+list(arguments)
+
+    def docker_backend(self):
+        """Recheck the actual context, daemon identity and version before and after removal."""
+        if self.plan['taskId']!='G3-M2-001':return None
+        command=self.docker_command('info','--format','{"engineId":{{json .ID}},"serverVersion":{{json .ServerVersion}}}')
+        expected=self.plan['dockerBackend']
+        require(isinstance(expected['engineId'],str) and re.fullmatch(r'[A-Za-z0-9-]{6,100}',expected['engineId'])
+                and isinstance(expected['serverVersion'],str) and re.fullmatch(r'[0-9]+\.[0-9]+\.[0-9]+(?:[-+][A-Za-z0-9.-]+)?',expected['serverVersion']),'M2 invalid Docker backend identity')
+        require(run(['docker','context','show']).stdout.strip()==expected['context'],'M2 Docker context changed')
+        actual=read_json(run(command).stdout)
+        require(actual==dict(engineId=expected['engineId'],serverVersion=expected['serverVersion']),'M2 Docker Engine or server version changed')
+        return dict(expected)
 
     def history_backend(self):
         """Pin the reviewed single-node daemon generation and diagnostic contract."""
@@ -502,7 +534,7 @@ class Cleaner:
         return dict(fingerprint=digest(entries),logicalBytes=sum(x['size'] for x in entries if stat.S_ISREG(x['mode'])),entries=len(entries))
 
     def container_ids(self):
-        ids=[x for x in run(['docker','container','ls','--all','--no-trunc','--quiet']).stdout.splitlines() if x]
+        ids=[x for x in run(self.docker_command('container','ls','--all','--no-trunc','--quiet')).stdout.splitlines() if x]
         require(all(HEX64.fullmatch(x) for x in ids), 'Invalid container IDs')
         return ids
 
@@ -511,7 +543,7 @@ class Cleaner:
         index=self.ops.index(op)
         prior={x['target'] for x in self.ops[:index] if x['type']=='docker-container'} if preflight else set()
         for ident in self.container_ids():
-            c=safe_docker_snapshot('docker-container',ident)
+            c=safe_docker_snapshot('docker-container',ident,context=self.plan['dockerBackend']['context'] if self.plan['taskId']=='G3-M2-001' else None)
             used = c['Image']==op['target'] if op['type']=='docker-image' else any(m.get('Type')=='volume' and m.get('Name')==op['target'] for m in c['Mounts'])
             if used:
                 require(ident in prior and c['State'] in ('exited','created','dead'), 'Docker resource has container reference')
@@ -520,6 +552,7 @@ class Cleaner:
 
     def check(self, op, preflight=False):
         typ,target=op['type'],op['target']
+        self.docker_backend()
         require(target not in self.keep, 'Kept target')
         if typ.startswith('git-'):
             require(BRANCH.fullmatch(target) and '..' not in target and '@{' not in target and not target.endswith(('/', '.lock','.')), 'Unsafe branch name')
@@ -570,9 +603,9 @@ class Cleaner:
             return c
         if typ=='docker-volume':
             require(re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.-]{0,150}',target),'Invalid volume name')
-            v=safe_docker_snapshot(typ,target)
+            v=safe_docker_snapshot(typ,target,context=self.plan['dockerBackend']['context'] if self.plan['taskId']=='G3-M2-001' else None)
             require(v==dict(Name=target,Driver=op.get('expectedDriver'),CreatedAt=op.get('expectedCreatedAt')) and v['Driver']=='local' and isinstance(v['CreatedAt'],str) and v['CreatedAt'],'Volume identity changed')
-            if self.plan['taskId']=='G3-M1-CLOSEOUT-002': require(op['fingerprint']==digest(v),'Closeout volume fingerprint changed')
+            if self.plan['taskId'] in ('G3-M1-CLOSEOUT-002','G3-M2-001'): require(op['fingerprint']==digest(v),'Task volume fingerprint changed')
             v['references']=self.references(op,preflight)
             return v
         if typ=='docker-image':
@@ -625,13 +658,15 @@ class Cleaner:
                     elif typ=='worktree': args=['git','--no-optional-locks','-C',str(self.root),'worktree','remove',target]
                     elif typ=='cache': args=['filesystem-unlink-exact-cache',target]
                     elif typ=='docker-history': args=['docker','buildx','history','rm','--builder','desktop-linux',target]
-                    else: args=['docker',typ.removeprefix('docker-'),'rm',target]
+                    else: args=self.docker_command(typ.removeprefix('docker-'),'rm',target)
                     self.write_log('before',op,before=before,command=args)
                     if typ=='cache':
                         entries=metadata_entries(absolute(target))
                         require(digest(entries)==op['fingerprint'],'Cache changed immediately before deletion')
                         remove_exact_cache(absolute(target),entries)
-                    else: run(args,cwd=self.root)
+                    else:
+                        self.docker_backend()
+                        run(args,cwd=self.root)
                     command_exit=0
                     self.write_log('after',op,command=args,exit=0,after=self.after(op),logicalBytes=before.get('logicalBytes',0))
                     self.done.add((typ,target))
@@ -641,6 +676,7 @@ class Cleaner:
 
     def after(self, op):
         typ,target=op['type'],op['target']
+        self.docker_backend()
         if typ=='cache': require(not Path(target).exists() and not Path(target).is_symlink(),'Cache remains')
         elif typ=='worktree': require(target not in self.registered() and not Path(target).exists(),'Worktree remains')
         elif typ=='git-local-branch': require(self.git('show-ref','--verify','--quiet','refs/heads/'+target,acceptable=(0,1)).returncode==1,'Branch remains')
@@ -648,7 +684,7 @@ class Cleaner:
         elif typ=='docker-container': require(target not in self.container_ids(),'Container remains')
         else:
             # Exact inspect must report absence; API failure here also leaves a failed log.
-            if typ=='docker-volume': args=['docker','volume','ls','--quiet']
+            if typ=='docker-volume': args=self.docker_command('volume','ls','--quiet')
             elif typ=='docker-image': args=['docker','image','ls','--quiet','--no-trunc']
             else: args=['docker','buildx','history','ls','--builder','desktop-linux','--format','json']
             output=run(args).stdout
@@ -669,7 +705,8 @@ class Cleaner:
                 pattern=IMAGE if typ=='docker-image' else re.compile(r'[A-Za-z0-9][A-Za-z0-9_.-]{0,150}\Z')
                 require(all(pattern.fullmatch(value) for value in values),'Invalid Docker after schema')
                 require(target not in values,'Docker resource remains')
-        return dict(absent=True)
+        backend=self.docker_backend()
+        return dict(absent=True, dockerBackend=backend) if backend is not None else dict(absent=True)
 
 
 def main(argv=None):

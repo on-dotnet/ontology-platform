@@ -1,0 +1,14 @@
+✔ real semantic_busy response waits and reissues only the read (272.2445ms)
+✔ semantic_busy exhaustion stays failed with five recorded attempts (3771.115875ms)
+✔ a write is never retried even with the same busy code (1.120875ms)
+✔ unknown 429 code is not retried or echoed (1.07275ms)
+✔ malformed 429 body is not retried (1.082875ms)
+✔ non-busy service failure is not retried (0.753208ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4088.074667

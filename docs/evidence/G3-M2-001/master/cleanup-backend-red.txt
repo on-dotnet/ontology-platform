@@ -1,0 +1,15 @@
+test_m2_changed_context_engine_or_server_refuses_before_rm (__main__.CleanupTests.test_m2_changed_context_engine_or_server_refuses_before_rm) ... FAIL
+
+======================================================================
+FAIL: test_m2_changed_context_engine_or_server_refuses_before_rm (__main__.CleanupTests.test_m2_changed_context_engine_or_server_refuses_before_rm)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/scripts/tests/CleanupResources.Tests.py", line 377, in test_m2_changed_context_engine_or_server_refuses_before_rm
+    self.assertNotEqual(result.returncode,0,key)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 == 0 : context
+
+----------------------------------------------------------------------
+Ran 1 test in 1.851s
+
+FAILED (failures=1)

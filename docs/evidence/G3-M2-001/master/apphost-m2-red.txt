@@ -1,0 +1,17 @@
+test_current_and_legacy_prefixes_reach_next_required_configuration (__main__.AppHostPrefixTests.test_current_and_legacy_prefixes_reach_next_required_configuration) ...
+  test_current_and_legacy_prefixes_reach_next_required_configuration (__main__.AppHostPrefixTests.test_current_and_legacy_prefixes_reach_next_required_configuration) (prefix='g3-m2-synthetic') ... FAIL
+test_unapproved_or_unsafe_prefixes_stop_before_model_configuration (__main__.AppHostPrefixTests.test_unapproved_or_unsafe_prefixes_stop_before_model_configuration) ... ok
+
+======================================================================
+FAIL: test_current_and_legacy_prefixes_reach_next_required_configuration (__main__.AppHostPrefixTests.test_current_and_legacy_prefixes_reach_next_required_configuration) (prefix='g3-m2-synthetic')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/scripts/tests/G3AppHost.Tests.py", line 23, in test_current_and_legacy_prefixes_reach_next_required_configuration
+    self.assertIn('缺少Wave2配置：Wave2:NodePath', self.probe(prefix))
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: '缺少Wave2配置：Wave2:NodePath' not found in 'Unhandled exception. System.ArgumentException: 纵向验收必须使用独立wave2-、g2-或g3-m1-卷前缀。\n   at OntologyPlatform.AppHost.Wave2Infrastructure.AddWave2Infrastructure(IDistributedApplicationBuilder builder) in /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/AppHost/Wave2Infrastructure.cs:line 19\n   at OntologyPlatform.AppHost.Program.Main(String[] args) in /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/backend/src/AppHost/Program.cs:line 23\n   at OntologyPlatform.AppHost.Program.<Main>(String[] args)\n'
+
+----------------------------------------------------------------------
+Ran 2 tests in 1.511s
+
+FAILED (failures=1)

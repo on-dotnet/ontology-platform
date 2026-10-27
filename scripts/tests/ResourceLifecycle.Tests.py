@@ -38,6 +38,14 @@ class LifecycleTests(unittest.TestCase):
         for secret in m.secret_values(value): self.assertNotIn(secret,raw)
         self.assertNotIn('certificatePath',raw)
         self.assertEqual(value['resourceLifecycle']['runId'],'run-123')
+    def test_m2_ownership_is_supported_but_future_milestones_refuse(self):
+        value={'volumePrefix':'g3-m2-control','resourceLifecycle':{'taskId':'G3-M2-001','runId':'m2-control'}}
+        meta=m.lifecycle_identity(value,'g2')
+        self.assertEqual(meta['taskId'],'G3-M2-001')
+        self.assertTrue(all(name.startswith('g3-m2-control-') for name in meta['expectedVolumes']))
+        for prefix in ('g3-m3-control','g3-m4-control','g3-m5-control','../g3-m2-control'):
+            with self.assertRaises(ValueError):m.lifecycle_identity(dict(value,volumePrefix=prefix),'g2')
+
     def test_existing_private_runtime_is_not_rewritten(self):
         path,value=self.prepare();value.pop('resourceLifecycle');path.write_text(json.dumps(value))
         original=path.read_bytes()

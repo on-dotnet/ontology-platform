@@ -1,4 +1,4 @@
-"""Own one fresh M1 AppHost throughout genuine browser, semantic and operational acceptance."""
+"""Own one fresh authorized M1 or M2 AppHost throughout genuine browser, semantic and operational acceptance."""
 import argparse
 import datetime
 import importlib.util
@@ -20,33 +20,43 @@ def run_attempt():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--runtime-file')
     parser.add_argument('--start-runtime', action='store_true')
+    parser.add_argument('--milestone', choices=['M1', 'M2'], default='M1')
+    parser.add_argument('--api-only', action='store_true')
     args = parser.parse_args()
     if not args.runtime_file and not args.start_runtime:
         parser.error('Choose an owned runtime or explicitly start a new M1 stack')
-    os.environ.setdefault('PLATFORM_EVIDENCE_DIR', 'docs/evidence/G3-M1-001/runtime')
+    if args.api_only and args.milestone != 'M2':
+        parser.error('API integration checkpoint is authorized only for M2')
+    task_id = 'G3-' + args.milestone + '-001'
+    task_evidence = 'docs/evidence/' + task_id + '/runtime'
+    prefix = 'g3-' + args.milestone.lower() + '-'
+    os.environ.setdefault('PLATFORM_EVIDENCE_DIR', task_evidence)
     if args.runtime_file:
         runtime_file = Path(args.runtime_file).resolve()
     else:
-        prepared = subprocess.check_output([sys.executable, 'scripts/acceptance/g3-runtime.py', 'prepare'], cwd=ROOT, text=True)
+        prepared = subprocess.check_output([sys.executable, 'scripts/acceptance/g3-runtime.py', 'prepare', '--milestone', args.milestone], cwd=ROOT, text=True)
         runtime_file = (ROOT / prepared.strip().splitlines()[-1]).resolve()
     if not runtime_file.is_relative_to((ROOT / '.tools/security').resolve()):
         parser.error('Private runtime must belong to this checkout')
     runtime = json.loads(runtime_file.read_text())
-    if not runtime['volumePrefix'].startswith('g3-m1-') or runtime_file.parent.name != runtime['volumePrefix']:
+    if not runtime['volumePrefix'].startswith(prefix) or runtime_file.parent.name != runtime['volumePrefix']:
         parser.error('Protected G2 or unrelated runtime refused')
     # 每次调用独占新目录，后续步骤不可能消费前一轮残留的成功文件。
     run_id = uuid.uuid4().hex
     from evidence_paths import evidence_directory
-    base_evidence = evidence_directory(ROOT, 'docs/evidence/G3-M1-001/runtime')
-    if not base_evidence.is_relative_to((ROOT / 'docs/evidence/G3-M1-001/runtime').resolve()):
-        parser.error('Only this task M1 runtime evidence root is accepted')
+    base_evidence = evidence_directory(ROOT, task_evidence)
+    if not base_evidence.is_relative_to((ROOT / task_evidence).resolve()):
+        parser.error('Only this selected milestone runtime evidence root is accepted')
     os.environ['PLATFORM_EVIDENCE_DIR'] = str((base_evidence / runtime['volumePrefix'] / run_id).relative_to(ROOT.resolve()))
-    evidence = evidence_directory(ROOT, 'docs/evidence/G3-M1-001/runtime')
+    evidence = evidence_directory(ROOT, task_evidence)
     evidence.mkdir(parents=True, exist_ok=False)
     source_head = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
     gate_names = ['full-g2-e2e.py', 'g3-compatibility.py', 'g1-regression.py', 'g2-observability.py',
                   'g2-trace-browser.mjs', 'g2-readiness-fault.py', 'performance-baseline.py']
+    if args.api_only:
+        gate_names = gate_names[:1]
     acceptance = {'runId': run_id, 'sourceHead': source_head, 'volumePrefix': runtime['volumePrefix'],
+                  'scope': 'API_ONLY' if args.api_only else 'FULL', 'milestone': args.milestone,
                   'evidenceDirectory': str(evidence.relative_to(ROOT.resolve())), 'status': 'RUNNING',
                   'startedAtUtc': datetime.datetime.now(datetime.timezone.utc).isoformat(),
                   'gates': [{'name': name, 'status': 'NOT_RUN', 'exitCode': None} for name in gate_names]}
@@ -58,14 +68,14 @@ def run_attempt():
     # 只记录本轮归属元数据，绝不复制配置或认证值到证据。
     ownership = {'volumePrefix': runtime['volumePrefix'], 'runtimePath': str(runtime_file),
                  'runId': run_id, 'sourceHead': source_head, 'launcherOwned': args.start_runtime,
-                 'scope': 'G3-M1-001 freshly generated Synthetic test environment; protected G2 volumes excluded',
+                 'scope': task_id + ' freshly generated Synthetic test environment; other tasks excluded',
                  'launcherStarted': False, 'launcherStopped': False}
     (evidence / 'owned-runtime.json').write_text(json.dumps(ownership, indent=2) + '\n')
     process = None
     flags = subprocess.CREATE_NEW_PROCESS_GROUP if os.name == 'nt' else 0
 
     def launch(mode):
-        return subprocess.Popen([sys.executable, 'scripts/acceptance/g3-runtime.py', mode, '--runtime-file', str(runtime_file)],
+        return subprocess.Popen([sys.executable, 'scripts/acceptance/g3-runtime.py', mode, '--runtime-file', str(runtime_file), '--milestone', args.milestone],
                                 cwd=ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, creationflags=flags)
 
     try:
@@ -80,7 +90,7 @@ def run_attempt():
             if not Path(runtime['realmFile']).is_file():
                 process = launch('core')
                 shared.wait_for('http://localhost:18080/realms/master/.well-known/openid-configuration')
-                subprocess.run([sys.executable, 'scripts/acceptance/g3-runtime.py', 'bootstrap', '--runtime-file', str(runtime_file)], cwd=ROOT, check=True)
+                subprocess.run([sys.executable, 'scripts/acceptance/g3-runtime.py', 'bootstrap', '--runtime-file', str(runtime_file), '--milestone', args.milestone], cwd=ROOT, check=True)
                 shared.stop(process)
             process = launch('full')
             ownership['launcherStarted'] = True
@@ -95,6 +105,10 @@ def run_attempt():
             [sys.executable, 'scripts/acceptance/g2-readiness-fault.py', '--runtime-file', str(runtime_file)],
             [sys.executable, 'scripts/acceptance/performance-baseline.py', '--from-observed-run'],
         ]
+        if args.milestone == 'M2':
+            commands[0].append('--m2-api-only' if args.api_only else '--m2')
+        if args.api_only:
+            commands = commands[:1]
         for index, command in enumerate(commands):
             acceptance['gates'][index]['status'] = 'RUNNING'
             save_acceptance()

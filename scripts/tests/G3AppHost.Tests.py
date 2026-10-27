@@ -18,12 +18,12 @@ class AppHostPrefixTests(unittest.TestCase):
         return result.stdout
 
     def test_current_and_legacy_prefixes_reach_next_required_configuration(self):
-        for prefix in ('wave2-synthetic', 'g2-synthetic', 'g3-m1-synthetic'):
+        for prefix in ('wave2-synthetic', 'g2-synthetic', 'g3-m1-synthetic', 'g3-m2-synthetic'):
             with self.subTest(prefix=prefix):
                 self.assertIn('缺少Wave2配置：Wave2:NodePath', self.probe(prefix))
 
     def test_unapproved_or_unsafe_prefixes_stop_before_model_configuration(self):
-        for prefix in ('g3-m2-synthetic', 'G3-m1-synthetic', '../g3-m1-synthetic',
+        for prefix in ('g3-m3-synthetic', 'G3-m1-synthetic', '../g3-m1-synthetic',
                        'g3-m1-' + 'a' * 41, 'wave2-synthetic\n'):
             with self.subTest(prefix=prefix):
                 output = self.probe(prefix)

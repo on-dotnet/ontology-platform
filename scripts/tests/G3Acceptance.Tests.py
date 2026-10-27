@@ -18,7 +18,7 @@ GATES = ['full-g2-e2e.py', 'g3-compatibility.py', 'g1-regression.py', 'g2-observ
 class M1OrchestrationTests(unittest.TestCase):
     """Keep gate selection/order/failure propagation real, isolate external services only."""
 
-    def exercise(self, fail_gate=None, prefix='g3-m1-control', launch_failure=False):
+    def exercise(self, fail_gate=None, prefix='g3-m1-control', launch_failure=False, milestone=None, api_only=False):
         spec = importlib.util.spec_from_file_location('m1_orchestrator', SCRIPT)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
@@ -28,7 +28,8 @@ class M1OrchestrationTests(unittest.TestCase):
             private.mkdir(parents=True)
             runtime = private / 'runtime.json'
             runtime.write_text(json.dumps({'volumePrefix': prefix, 'healthKey': 'synthetic-health', 'realmFile': str(private / 'realm.json')}))
-            stale = root / 'docs/evidence/G3-M1-001/runtime/m1-browser.json'
+            task = 'G3-' + (milestone or 'M1') + '-001'
+            stale = root / ('docs/evidence/' + task + '/runtime/m1-browser.json')
             stale.parent.mkdir(parents=True)
             stale.write_text('{"status":"PASS","runId":"old-run"}\n')
             log = root / 'children.jsonl'
@@ -41,7 +42,8 @@ class M1OrchestrationTests(unittest.TestCase):
                 evidence_seen.append(os.environ.get('PLATFORM_EVIDENCE_DIR'))
                 gate = Path(command[1]).name
                 if gate == 'full-g2-e2e.py':
-                    self.assertIn('--m1', command, 'M1 checks must run in the existing authenticated harness')
+                    self.assertIn('--m2-api-only' if api_only else '--m1', command, 'Selected checks must run in the existing authenticated harness')
+                    if milestone == 'M2': self.assertIn('--m2-api-only' if api_only else '--m2', command, 'M2 checks must execute in the real authenticated harness')
                 if gate == fail_gate and launch_failure:
                     return original([str(root / 'actual-missing-gate-executable')], cwd=root)
                 return original([sys.executable, str(child), str(log), *command, '23' if gate == fail_gate else '0'], cwd=root)
@@ -52,10 +54,10 @@ class M1OrchestrationTests(unittest.TestCase):
             with contextlib.ExitStack() as stack:
                 stack.enter_context(patch.object(sys, 'path', [str(SCRIPT.parent), *sys.path]))
                 stack.enter_context(patch.object(module, 'ROOT', root))
-                stack.enter_context(patch.object(sys, 'argv', [str(SCRIPT), '--runtime-file', str(runtime)]))
+                stack.enter_context(patch.object(sys, 'argv', [str(SCRIPT), '--runtime-file', str(runtime)] + (['--milestone', milestone] if milestone else []) + (['--api-only'] if api_only else [])))
                 stack.enter_context(patch.object(module.shared, 'wait_for'))
                 stack.enter_context(patch.object(module.shared, 'stop'))
-                stack.enter_context(patch.dict(os.environ, {'PLATFORM_EVIDENCE_DIR': 'docs/evidence/G3-M1-001/runtime'}))
+                stack.enter_context(patch.dict(os.environ, {'PLATFORM_EVIDENCE_DIR': 'docs/evidence/' + task + '/runtime'}))
                 stack.enter_context(patch.object(module.subprocess, 'check_output', side_effect=output))
                 stack.enter_context(patch.object(module.subprocess, 'run', side_effect=run))
                 try:
@@ -79,6 +81,24 @@ class M1OrchestrationTests(unittest.TestCase):
             code, calls, *_ = self.exercise(gate)
             self.assertEqual(code, 23, gate)
             self.assertEqual(calls, GATES[:index + 1], gate)
+
+    def test_m2_selects_its_own_runtime_evidence_and_authenticated_checks(self):
+        code,calls,proof,selected,_=self.exercise(prefix='g3-m2-control',milestone='M2')
+        self.assertEqual(code,0)
+        self.assertEqual(calls,GATES)
+        self.assertEqual(proof['status'],'PASS')
+        self.assertTrue(all('G3-M2-001/runtime/' in item for item in selected))
+
+    def test_first_m2_integration_selects_real_api_only_without_claiming_full_gates(self):
+        code,calls,proof,_,_=self.exercise(prefix='g3-m2-control',milestone='M2',api_only=True)
+        self.assertEqual(code,0)
+        self.assertEqual(calls,['full-g2-e2e.py'])
+        self.assertEqual(proof['scope'],'API_ONLY')
+        self.assertEqual(len(proof['gates']),1)
+
+    def test_m2_cannot_reuse_m1_runtime_or_enable_m3(self):
+        for prefix,milestone in [('g3-m1-control','M2'),('g3-m3-control','M3')]:
+            with self.assertRaises(SystemExit):self.exercise(prefix=prefix,milestone=milestone)
 
     def test_protected_g2_runtime_is_refused(self):
         with self.assertRaises(SystemExit) as failure:
