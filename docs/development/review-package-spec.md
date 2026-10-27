@@ -1,4 +1,44 @@
-# 标准审查包合同 V2
+# 标准审查包合同 V3
+
+## V3 默认 compact 合同（G3-M1-CLOSEOUT-002）
+
+人类2026-10-27正式授权本轮工程纠偏，默认创建 `schemaVersion=3`。历史V1/V2的格式和原始ZIP/SHA保持；`VerifyOnly`按manifest版本分派，显式 `-SchemaVersion 1` / `2` 仍可创建历史格式。下面V2/V1章节仅适用其对应版本，不扩大V3。
+
+V3包含 `REVIEW_SUMMARY.md`、`manifest.json`、`SHA256SUMS.txt`、`git/diff-text.patch`、`git/changed-files.json`、`git/commits.txt`、`git/diff-check.txt`、`git/status.txt`、`git/ci.json`、`source/`、`review-evidence/`及`evidence-index.json`。完整现行非证据源码/配置/测试/合同/ADR和当前任务非PNG证据全部从已提交Head读取，按SHA256只存一次payload；禁止在source下再复制docs/evidence。历史证据及省略PNG逐条保留commit、blob OID、SHA256、size、path、恢复入口；Base/Head所有文本差异完整保留，二进制变更两侧的OID/hash/size/mode/状态完整列在changed-files。恢复省略字节需要精确Git对象访问：**Slim不等于独立离线审计包**。Git原始证据不删除，不以缩包隐藏关键失败。
+
+代表截图必须由Head中 `docs/evidence/<TaskId>/review-screenshots.json` 显式声明；没有清单时不复制任何证据PNG（仍完整索引可恢复）。允许选择历史任务中的最终稳定证据。格式：
+
+```json
+{
+  "schemaVersion": 1,
+  "screenshots": [
+    { "path": "docs/evidence/<TaskId>/stable/page.png", "page": "关键页面", "theme": "light", "viewport": "1440x900", "stable": true }
+  ]
+}
+```
+
+每个页面/主题/视口最多一张，路径唯一，最多12张；不同PNG payload的Deflate压缩总量不得超过3MiB。重复、非稳定、未提交、非PNG、超预算选择均拒绝。无UI变更无需新增截图，不将过程截图自动升级为正式交付。
+
+ignored只读取有限文件长度元数据，不读取内容、不跟随链接；manifest使用 `ignoredInventory` 替代全量 `excludedIgnoredPaths`，按有限顶层目录/类别保存count、estimatedBytes、unknownSizeCount、最多两个示例、清单SHA256及扫描UTC时间。完整NUL分隔路径清单仅存本地ignored artifact，绝不随ZIP传播。体积估算不是物理容量或内容验收。忽略项在之后可能变化，重开只验证交付payload和Git恢复索引，不将ignored快照宣称为可从ZIP恢复的交付输入。
+
+V3创建和VerifyOnly都实际执行 `gh run view <runId> --repo on-dotnet/ontology-platform --json databaseId,headSha,url,status,conclusion,jobs`。使用OS凭证helper，不读取认证材料。要求实际run ID/URL/Head精确一致、run已完成，且 `engineering`、`governance-integration` 各恰好一个已完成job，记录job ID/URL/结论。run成功而任一必需job失败也拒绝；手工success不能代替API实查。创建时仍以四个显式CI参数一并提供选择和待核对事实，或从已提交EvidencePath读取runId。重开重新查询GitHub并比较原结果，网络/权限不足则明确失败，不能提升为PASS。
+
+```powershell
+pwsh -NoProfile -File scripts/create-review-package.ps1 -BaseSha <40位Base> -HeadSha <40位Head> -TaskId <任务ID> -Status PARTIAL -EvidencePath docs/evidence/<任务ID>/validation.json -CiRunId <真实run> -CiRunUrl <真实URL> -CiCommit <同Head> -CiConclusion success
+pwsh -NoProfile -File scripts/create-review-package.ps1 -Root <干净实施树> -VerifyOnly -PackagePath <唯一ZIP绝对路径>
+pwsh -NoProfile -File scripts/tests/ReviewPackage.Tests.ps1
+```
+
+V3要求Base为Head祖先、tracked/untracked干净、完整Base..Head `git diff --check` exit0。拒绝不安全路径、大小写冲突、链接/submodule、秘密模式命中、被删秘密、伪造CI/散列/索引；独立重开重新推导源码blob、证据索引、二进制元数据和完整文本diff，不接受重新计算ZIP校验和后的篡改。原子`.partial`通过复检后才发布，失败移除自身partial并保留上一有效ZIP。
+
+软目标≤10MiB；超10MiB的CLI JSON必须输出按source/review-evidence/git/metadata-and-index分类的实际压缩/原始字节和ZIP开销。默认硬门禁15MiB，超过即拒绝发布和V3重开，不静默放宽；当前实现无绕过开关。若后续任务需要特例，先记录经独立审查的具体合同和受限工具变更，再实施。唯一ZIP仍在ignored `artifacts/reviews`，不提交Git。
+
+回归通过真实临时Git和ZIP验证V1/V2兼容；V3的53张不同PNG、55,256条实际ignored路径、单份payload、精确Git恢复、伪造CI及jobs、文本/索引/hash篡改、缺失索引、脏树/未跟踪/非祖先/路径/大小写/链接/秘密、截图和10/15MiB门禁。测试GitHub查询仅在系统临时fixture进程PATH注入fake gh，不构成实际GitHub CI成功证据。生产工具没有接受fixture CI的参数。
+
+---
+
+## V2 历史兼容合同
+
 
 本次由PRE-G3-HYGIENE-001授权升级；默认schemaVersion=2 compact reviewer package。schemaVersion=1的历史格式、原ZIP和历史SHA不改，VerifyOnly按manifest版本分派，创建V1需显式`-SchemaVersion 1`。无新增直接依赖。构包成功仅证明有限完整性检查。
 
