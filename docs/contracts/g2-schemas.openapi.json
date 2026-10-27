@@ -124,6 +124,31 @@
           "approved_model"
         ]
       },
+      "GraphComparisonStatus": {
+        "type": "string",
+        "enum": [
+          "EQUIVALENT",
+          "DIFFERENT",
+          "INDETERMINATE"
+        ]
+      },
+      "AssessmentStageStatus": {
+        "type": "string",
+        "enum": [
+          "PASS",
+          "FAIL",
+          "NOT_RUN",
+          "NOT_SUPPORTED",
+          "INDETERMINATE"
+        ]
+      },
+      "VersionRefKind": {
+        "type": "string",
+        "enum": [
+          "DRAFT",
+          "RELEASE"
+        ]
+      },
       "ExecutionPayload": {
         "oneOf": [
           {
@@ -1145,6 +1170,17 @@
             "type": "string",
             "format": "date-time",
             "description": "清单创建时间。"
+          },
+          "semantics": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PublicationSemantics"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "仅G3服务器生成的评估绑定；历史V1缺席不伪造。"
           }
         },
         "additionalProperties": false
@@ -1317,6 +1353,17 @@
               }
             ],
             "description": "已提交审核决定。"
+          },
+          "semantics": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PublicationSemantics"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "仅G3服务器生成的评估绑定；历史V1缺席不伪造。"
           }
         },
         "additionalProperties": false
@@ -3483,6 +3530,17 @@
           "validation": {
             "$ref": "#/components/schemas/SemanticValidationReport",
             "description": "同修订真实成功校验。"
+          },
+          "semantics": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PublicationSemantics"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "仅G3服务器生成的评估绑定；历史V1缺席不伪造。"
           }
         },
         "additionalProperties": false
@@ -3537,6 +3595,445 @@
           "scope": {
             "$ref": "#/components/schemas/ResourceScope",
             "description": "已授权完整资源范围。"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GraphComparisonBudget": {
+        "type": "object",
+        "description": "一次四源精确图比较共享的硬预算。",
+        "required": [
+          "maxBlankNodes",
+          "maxSearchNodes",
+          "timeoutMilliseconds"
+        ],
+        "properties": {
+          "maxBlankNodes": {
+            "type": "integer",
+            "format": "int32",
+            "description": "每个图允许的最大空白节点数。"
+          },
+          "maxSearchNodes": {
+            "type": "integer",
+            "format": "int32",
+            "description": "四源共享的搜索节点总上限。"
+          },
+          "timeoutMilliseconds": {
+            "type": "integer",
+            "format": "int32",
+            "description": "覆盖解析和比较的总毫秒上限。"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SemanticCapabilitySupport": {
+        "type": "object",
+        "description": "单项建模能力的编辑、保留、发布与验证边界。",
+        "required": [
+          "id",
+          "name",
+          "edit",
+          "preserve",
+          "publish",
+          "validation",
+          "reason"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "二十项能力的固定编号。"
+          },
+          "name": {
+            "type": "string",
+            "description": "中文能力名称。"
+          },
+          "edit": {
+            "type": "string",
+            "description": "BASIC或SOURCE。"
+          },
+          "preserve": {
+            "type": "string",
+            "description": "EXACT原文保留。"
+          },
+          "publish": {
+            "type": "string",
+            "description": "SUPPORTED或BLOCKED。"
+          },
+          "validation": {
+            "type": "string",
+            "description": "ASSERTED或NOT_SUPPORTED。"
+          },
+          "reason": {
+            "type": "string",
+            "description": "准确的中文支持限制。"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SemanticSupportProfile": {
+        "type": "object",
+        "description": "有稳定版本和内容散列的真实支持策略。",
+        "required": [
+          "profileId",
+          "version",
+          "hash",
+          "reasoningMode",
+          "capabilities",
+          "comparisonBudget"
+        ],
+        "properties": {
+          "profileId": {
+            "type": "string",
+            "description": "策略标识。"
+          },
+          "version": {
+            "type": "string",
+            "description": "不可静默漂移的策略版本。"
+          },
+          "hash": {
+            "type": "string",
+            "description": "将本字段置空后的固定JSON散列。"
+          },
+          "reasoningMode": {
+            "type": "string",
+            "description": "ASSERTED_ONLY，未执行OWL推理。"
+          },
+          "capabilities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SemanticCapabilitySupport"
+            },
+            "description": "逐项二十能力支持表。"
+          },
+          "comparisonBudget": {
+            "$ref": "#/components/schemas/GraphComparisonBudget",
+            "description": "一次比较的共享预算。"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AssessmentStage": {
+        "type": "object",
+        "description": "独立语义阶段的实际执行结论。",
+        "required": [
+          "name",
+          "status",
+          "code"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "PARSE/SUPPORT/SHACL_CORE/GOVERNANCE/OWL_REASONING。"
+          },
+          "status": {
+            "$ref": "#/components/schemas/AssessmentStageStatus",
+            "description": "实际结论，未执行不冒充通过。"
+          },
+          "code": {
+            "type": "string",
+            "description": "固定安全原因码。"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AssessmentDiagnostic": {
+        "type": "object",
+        "description": "不改变历史诊断DTO的四源定位包装。",
+        "required": [
+          "sourceId",
+          "sourceHash",
+          "diagnostic",
+          "line",
+          "column"
+        ],
+        "properties": {
+          "sourceId": {
+            "type": "string",
+            "description": "ontology/shapes/vocabulary/data/bundle。"
+          },
+          "sourceHash": {
+            "type": "string",
+            "description": "准确源或bundle散列。"
+          },
+          "diagnostic": {
+            "$ref": "#/components/schemas/SemanticDiagnostic",
+            "description": "安全中文标准诊断。"
+          },
+          "line": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "format": "int32"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "无法可靠定位时为空。"
+          },
+          "column": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "format": "int32"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "无法可靠定位时为空。"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SemanticAssessment": {
+        "type": "object",
+        "description": "服务端真实执行并绑定精确修订的发布资格评估。",
+        "required": [
+          "assessmentId",
+          "validationReportId",
+          "draftId",
+          "revision",
+          "hashes",
+          "profileVersion",
+          "profileHash",
+          "assessmentHash",
+          "assessedAtUtc",
+          "expiresAtUtc",
+          "executorVersion",
+          "stages",
+          "publishEligible",
+          "diagnostics",
+          "budgetStatus"
+        ],
+        "properties": {
+          "assessmentId": {
+            "type": "string",
+            "description": "评估主键。"
+          },
+          "validationReportId": {
+            "type": "string",
+            "description": "关联的真实SHACL报告。"
+          },
+          "draftId": {
+            "type": "string",
+            "description": "已授权草稿。"
+          },
+          "revision": {
+            "type": "integer",
+            "format": "int64",
+            "description": "准确修订。"
+          },
+          "hashes": {
+            "$ref": "#/components/schemas/SourceHashes",
+            "description": "四源精确字节散列。"
+          },
+          "profileVersion": {
+            "type": "string",
+            "description": "评估使用的策略版本。"
+          },
+          "profileHash": {
+            "type": "string",
+            "description": "策略内容散列。"
+          },
+          "assessmentHash": {
+            "type": "string",
+            "description": "本字段置空后的完整评估散列。"
+          },
+          "assessedAtUtc": {
+            "type": "string",
+            "format": "date-time",
+            "description": "实际服务器评估时间。"
+          },
+          "expiresAtUtc": {
+            "type": "string",
+            "format": "date-time",
+            "description": "24小时发布资格有效期。"
+          },
+          "executorVersion": {
+            "type": "string",
+            "description": "真实语义执行版本。"
+          },
+          "stages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssessmentStage"
+            },
+            "description": "分别报告解析/支持/SHACL/治理/未执行推理。"
+          },
+          "publishEligible": {
+            "type": "boolean",
+            "description": "仅所需阶段通过且预算完成才可发布。"
+          },
+          "diagnostics": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssessmentDiagnostic"
+            },
+            "description": "四源安全定位和拒绝原因。"
+          },
+          "budgetStatus": {
+            "type": "string",
+            "description": "COMPLETE或INDETERMINATE。"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PublicationSemantics": {
+        "type": "object",
+        "description": "服务器从真实assessment取得的不可伪造发布绑定。",
+        "required": [
+          "profileVersion",
+          "profileHash",
+          "assessmentId",
+          "assessmentHash"
+        ],
+        "properties": {
+          "profileVersion": {
+            "type": "string",
+            "description": "固定策略版本。"
+          },
+          "profileHash": {
+            "type": "string",
+            "description": "固定策略内容散列。"
+          },
+          "assessmentId": {
+            "type": "string",
+            "description": "持久评估ID。"
+          },
+          "assessmentHash": {
+            "type": "string",
+            "description": "完整评估内容散列。"
+          }
+        },
+        "additionalProperties": false
+      },
+      "VersionRef": {
+        "type": "object",
+        "description": "服务器定位草稿修订或正式发布，不接受外部地址。",
+        "required": [
+          "kind",
+          "id",
+          "revision"
+        ],
+        "properties": {
+          "kind": {
+            "$ref": "#/components/schemas/VersionRefKind",
+            "description": "DRAFT或RELEASE。"
+          },
+          "id": {
+            "type": "string",
+            "description": "草稿或正式发布ID。"
+          },
+          "revision": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "format": "int64"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "草稿要求准确修订，正式发布必须为空。"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CompareVersionsRequest": {
+        "type": "object",
+        "description": "同资产完整scope的两个固定版本。",
+        "required": [
+          "from",
+          "to"
+        ],
+        "properties": {
+          "from": {
+            "$ref": "#/components/schemas/VersionRef",
+            "description": "比较基础版本。"
+          },
+          "to": {
+            "$ref": "#/components/schemas/VersionRef",
+            "description": "比较目标版本。"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GraphComparisonResult": {
+        "type": "object",
+        "description": "精确同构判断及失败关闭的预算诊断。",
+        "required": [
+          "status",
+          "code",
+          "visitedNodes",
+          "elapsedMilliseconds"
+        ],
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/GraphComparisonStatus",
+            "description": "同构、不同或无法确定。"
+          },
+          "code": {
+            "type": "string",
+            "description": "固定预算/取消/比较原因。"
+          },
+          "visitedNodes": {
+            "type": "integer",
+            "format": "int64",
+            "description": "实际搜索节点数。"
+          },
+          "elapsedMilliseconds": {
+            "type": "integer",
+            "format": "int64",
+            "description": "共享比较经过的毫秒数。"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SourceComparison": {
+        "type": "object",
+        "description": "单一权威源的字节变化与语义图比较。",
+        "required": [
+          "sourceId",
+          "leftHash",
+          "rightHash",
+          "sourceChanged",
+          "graph"
+        ],
+        "properties": {
+          "sourceId": {
+            "type": "string",
+            "description": "四源槽位名称。"
+          },
+          "leftHash": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "左源散列，缺席为空。"
+          },
+          "rightHash": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "右源散列，缺席为空。"
+          },
+          "sourceChanged": {
+            "type": "boolean",
+            "description": "原始字节或缺席状态是否不同。"
+          },
+          "graph": {
+            "$ref": "#/components/schemas/GraphComparisonResult",
+            "description": "图语义结论，与字节变化分开。"
           }
         },
         "additionalProperties": false

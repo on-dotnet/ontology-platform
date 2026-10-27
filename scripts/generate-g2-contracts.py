@@ -25,7 +25,12 @@ for name, definition in SCHEMA['models'].items():
     for field in definition['fields']:
         t = field['type']
         default = '[]' if t.endswith('[]') else 'null' if t.endswith('?') else 'string.Empty' if t == 'string' else 'default' if t in ['int','long','bool','double','DateTimeOffset','System.Text.Json.JsonElement'] or t in SCHEMA['enums'] else 'default!'
-        lines += ['    /// <summary>'+escape(field['description'])+'</summary>', '    [JsonRequired]', '    public '+t+' '+field['name']+' { get; init; } = '+default+';', '']
+        lines += ['    /// <summary>'+escape(field['description'])+'</summary>']
+        if field.get('required', True):
+            lines += ['    [JsonRequired]']
+        if field.get('omitNull', False):
+            lines += ['    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]']
+        lines += ['    public '+t+' '+field['name']+' { get; init; } = '+default+';', '']
     lines += ['    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>', '    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);', '', '    /// <summary>持久化或输出前检查同一个合同边界。</summary>', '    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);', '}', '']
 (TARGET/'G2Models.g.cs').write_text('\n'.join(lines))
 print('Generated canonical DTOs:',len(SCHEMA['models']))
@@ -50,7 +55,10 @@ for name, definition in SCHEMA['models'].items():
             fields[field['name'][:1].lower()+field['name'][1:]] = {'type': 'string', 'const': field['const']}
     if name in SCHEMA['payloadDiscriminators']:
         fields = {'kind': {'type': 'string', 'const': SCHEMA['payloadDiscriminators'][name]}, **fields}
-    schemas[name] = {'type': 'object', 'description': definition['description'], 'required': list(fields), 'properties': fields, 'additionalProperties': False}
+    required = [field['name'][:1].lower() + field['name'][1:] for field in definition['fields'] if field.get('required', True)]
+    if name in SCHEMA['payloadDiscriminators']:
+        required = ['kind', *required]
+    schemas[name] = {'type': 'object', 'description': definition['description'], 'required': required, 'properties': fields, 'additionalProperties': False}
 
 # 标准Schema必须表达与C#运行时同样的精确分支约束。
 fields = schemas['SemanticDatum']['properties']

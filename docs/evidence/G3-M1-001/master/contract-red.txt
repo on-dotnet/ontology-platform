@@ -1,0 +1,37 @@
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Debug/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64)
+已通过 LegacyManifestDoesNotInventSemanticBinding (13ms)
+  从 /Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Debug/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64)
+失败 V2RoundtripRetainsExactAssessmentBinding (5ms)
+  从 /Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Debug/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64)
+  测试方法 OntologyPlatform.G2ContractTests.G3ManifestContractTests。V2RoundtripRetainsExactAssessmentBinding 引发了异常:
+  System.Text.Json.JsonException: The JSON property 'Semantics' could not be mapped to any .NET member contained in type 'OntologyPlatform.Contracts.ReleaseManifest'.
+    在 System.Text.Json.ThrowHelper.ThrowJsonException_UnmappedJsonProperty(Type type, String unmappedPropertyName)
+    在 System.Text.Json.JsonSerializer.LookupProperty(Object obj, ReadOnlySpan`1 unescapedPropertyName, ReadStack& state, JsonSerializerOptions options, Boolean& useExtensionProperty, Boolean createExtensionProperty)
+    在 System.Text.Json.Serialization.Converters.ObjectDefaultConverter`1.OnTryRead(Utf8JsonReader& reader, Type typeToConvert, JsonSerializerOptions options, ReadStack& state, T& value)
+    在 System.Text.Json.Serialization.JsonConverter`1.TryRead(Utf8JsonReader& reader, Type typeToConvert, JsonSerializerOptions options, ReadStack& state, T& value, Boolean& isPopulatedValue)
+    在 System.Text.Json.Serialization.JsonConverter`1.ReadCore(Utf8JsonReader& reader, T& value, JsonSerializerOptions options, ReadStack& state)
+    在 System.Text.Json.Serialization.Metadata.JsonTypeInfo`1.Deserialize(Utf8JsonReader& reader, ReadStack& state)
+    在 System.Text.Json.JsonSerializer.ReadFromSpan[TValue](ReadOnlySpan`1 utf8Json, JsonTypeInfo`1 jsonTypeInfo, Nullable`1 actualByteCount)
+    在 System.Text.Json.JsonSerializer.ReadFromSpan[TValue](ReadOnlySpan`1 json, JsonTypeInfo`1 jsonTypeInfo)
+    在 OntologyPlatform.G2ContractTests.G3ManifestContractTests.V2RoundtripRetainsExactAssessmentBinding() 位于 /Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/G3ManifestContractTests.cs:36
+    在 System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+    在 System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+
+失败 NewOrUnknownManifestCannotSkipBinding (0ms)
+  从 /Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Debug/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64)
+  Assertion failed. Expected exception of type JsonException (or derived) but no exception was thrown.
+
+  Assert.Throws<JsonException>(() => JsonSerializer.Serialize(Manifest(2)))
+    在 OntologyPlatform.G2ContractTests.G3ManifestContractTests.NewOrUnknownManifestCannotSkipBinding() 位于 /Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/G3ManifestContractTests.cs:44
+    在 System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+    在 System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+/Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Debug/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64) 失败并出现 2 个错误 (1s 236ms)
+退出代码: 2
+
+测试运行摘要: 失败!
+  总计: 3
+  失败: 2
+  成功: 1
+  已跳过: 0
+  持续时间: 1s 797ms
+已完成测试运行，但显示非成功退出代码: 2 (请参阅: https://aka.ms/testingplatform/exitcodes)

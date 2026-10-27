@@ -2940,13 +2940,14 @@
   "components": {
     "schemas": {
       "ActivateReleaseRequest": {
+        "type": "object",
+        "description": "拒绝未登记字段并包含明确幂等/修订的受保护命令。",
         "required": [
           "proposalId",
           "expectedActivationRevision",
           "expectedActiveReleaseId",
           "command"
         ],
-        "type": "object",
         "properties": {
           "proposalId": {
             "type": "string",
@@ -2954,8 +2955,8 @@
           },
           "expectedActivationRevision": {
             "type": "integer",
-            "description": "CAS活动指针修订。",
-            "format": "int64"
+            "format": "int64",
+            "description": "CAS活动指针修订。"
           },
           "expectedActiveReleaseId": {
             "anyOf": [
@@ -2969,14 +2970,15 @@
             "description": "期望当前发布，首次为空。"
           },
           "command": {
-            "description": "幂等、修订和审计理由。",
-            "$ref": "#/components/schemas/CommandContext"
+            "$ref": "#/components/schemas/CommandContext",
+            "description": "幂等、修订和审计理由。"
           }
         },
-        "additionalProperties": false,
-        "description": "拒绝未登记字段并包含明确幂等/修订的受保护命令。"
+        "additionalProperties": false
       },
       "ActorContext": {
+        "type": "object",
+        "description": "仅由已验证服务器身份构造的调用上下文。",
         "required": [
           "subjectId",
           "organizationId",
@@ -2985,7 +2987,6 @@
           "traceId",
           "correlationId"
         ],
-        "type": "object",
         "properties": {
           "subjectId": {
             "type": "string",
@@ -3018,66 +3019,67 @@
             "description": "经过格式校验的请求关联标识。"
           }
         },
-        "additionalProperties": false,
-        "description": "仅由已验证服务器身份构造的调用上下文。"
+        "additionalProperties": false
       },
       "ApprovalDecision": {
+        "type": "string",
         "enum": [
           "approve",
           "reject"
-        ],
-        "type": "string"
+        ]
       },
       "ApprovalDecisionRequest": {
+        "type": "object",
+        "description": "拒绝未登记字段并包含明确幂等/修订的受保护命令。",
         "required": [
           "decision",
           "command"
         ],
-        "type": "object",
         "properties": {
           "decision": {
-            "description": "实际审核决定。",
-            "$ref": "#/components/schemas/ApprovalDecision"
+            "$ref": "#/components/schemas/ApprovalDecision",
+            "description": "实际审核决定。"
           },
           "command": {
-            "description": "幂等、修订和审计理由。",
-            "$ref": "#/components/schemas/CommandContext"
+            "$ref": "#/components/schemas/CommandContext",
+            "description": "幂等、修订和审计理由。"
           }
         },
-        "additionalProperties": false,
-        "description": "拒绝未登记字段并包含明确幂等/修订的受保护命令。"
+        "additionalProperties": false
       },
       "ApprovalRecord": {
+        "type": "object",
+        "description": "与精确提案内容和独立审核主体绑定的决定。",
         "required": [
           "approvedBy",
           "decision",
           "decidedAtUtc",
           "bindingHash"
         ],
-        "type": "object",
         "properties": {
           "approvedBy": {
             "type": "string",
             "description": "决定主体，必须不同于提交者。"
           },
           "decision": {
-            "description": "批准或拒绝。",
-            "$ref": "#/components/schemas/ApprovalDecision"
+            "$ref": "#/components/schemas/ApprovalDecision",
+            "description": "批准或拒绝。"
           },
           "decidedAtUtc": {
             "type": "string",
-            "description": "持久决定时间。",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "持久决定时间。"
           },
           "bindingHash": {
             "type": "string",
             "description": "完整提案绑定参数散列。"
           }
         },
-        "additionalProperties": false,
-        "description": "与精确提案内容和独立审核主体绑定的决定。"
+        "additionalProperties": false
       },
       "ApprovalRequiredPayload": {
+        "type": "object",
+        "description": "由真实持久事件类型approval.required确定的唯一载荷。",
         "required": [
           "kind",
           "approvalId",
@@ -3086,11 +3088,10 @@
           "scope",
           "expiresAtUtc"
         ],
-        "type": "object",
         "properties": {
           "kind": {
-            "const": "approval.required",
-            "type": "string"
+            "type": "string",
+            "const": "approval.required"
           },
           "approvalId": {
             "type": "string",
@@ -3101,30 +3102,30 @@
             "description": "实际提案。"
           },
           "operation": {
-            "description": "实际人工动作。",
-            "$ref": "#/components/schemas/ProposalKind"
+            "$ref": "#/components/schemas/ProposalKind",
+            "description": "实际人工动作。"
           },
           "scope": {
-            "description": "审批适用范围。",
-            "$ref": "#/components/schemas/ResourceScope"
+            "$ref": "#/components/schemas/ResourceScope",
+            "description": "审批适用范围。"
           },
           "expiresAtUtc": {
             "type": "string",
-            "description": "实际授权期限。",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "实际授权期限。"
           }
         },
-        "additionalProperties": false,
-        "description": "由真实持久事件类型approval.required确定的唯一载荷。"
+        "additionalProperties": false
       },
       "ArtifactObject": {
+        "type": "object",
+        "description": "经回读散列确认的不可变对象引用。",
         "required": [
           "objectKey",
           "hash",
           "sizeBytes",
           "contentType"
         ],
-        "type": "object",
         "properties": {
           "objectKey": {
             "type": "string",
@@ -3136,23 +3137,23 @@
           },
           "sizeBytes": {
             "type": "integer",
-            "description": "实际字节数。",
-            "format": "int64"
+            "format": "int64",
+            "description": "实际字节数。"
           },
           "contentType": {
             "type": "string",
             "description": "固定媒体类型。"
           }
         },
-        "additionalProperties": false,
-        "description": "经回读散列确认的不可变对象引用。"
+        "additionalProperties": false
       },
       "AssetVersion": {
+        "type": "object",
+        "description": "确已存在的关联资产版本，不填虚构版本。",
         "required": [
           "assetId",
           "version"
         ],
-        "type": "object",
         "properties": {
           "assetId": {
             "type": "string",
@@ -3163,10 +3164,11 @@
             "description": "真实版本或Schema散列。"
           }
         },
-        "additionalProperties": false,
-        "description": "确已存在的关联资产版本，不填虚构版本。"
+        "additionalProperties": false
       },
       "AssetVersionSnapshot": {
+        "type": "object",
+        "description": "每个查询与运行固定的完整不可变发布快照。",
         "required": [
           "releaseId",
           "ontologyHash",
@@ -3180,7 +3182,6 @@
           "ruleVersions",
           "capabilityVersions"
         ],
-        "type": "object",
         "properties": {
           "releaseId": {
             "type": "string",
@@ -3246,17 +3247,17 @@
             "description": "真实能力Schema版本。"
           }
         },
-        "additionalProperties": false,
-        "description": "每个查询与运行固定的完整不可变发布快照。"
+        "additionalProperties": false
       },
       "AuditCommand": {
+        "type": "object",
+        "description": "由模块用例提交给Governance拥有写入器的受控审计事实。",
         "required": [
           "action",
           "resource",
           "outcome",
           "scope"
         ],
-        "type": "object",
         "properties": {
           "action": {
             "type": "string",
@@ -3271,61 +3272,62 @@
             "description": "固定结果。"
           },
           "scope": {
-            "description": "已授权完整资源范围。",
-            "$ref": "#/components/schemas/ResourceScope"
+            "$ref": "#/components/schemas/ResourceScope",
+            "description": "已授权完整资源范围。"
           }
         },
-        "additionalProperties": false,
-        "description": "由模块用例提交给Governance拥有写入器的受控审计事实。"
+        "additionalProperties": false
       },
       "CancelRunRequest": {
+        "type": "object",
+        "description": "拒绝未登记字段并包含明确幂等/修订的受保护命令。",
         "required": [
           "command"
         ],
-        "type": "object",
         "properties": {
           "command": {
-            "description": "幂等、修订和审计理由。",
-            "$ref": "#/components/schemas/CommandContext"
+            "$ref": "#/components/schemas/CommandContext",
+            "description": "幂等、修订和审计理由。"
           }
         },
-        "additionalProperties": false,
-        "description": "拒绝未登记字段并包含明确幂等/修订的受保护命令。"
+        "additionalProperties": false
       },
       "CapabilityBudget": {
+        "type": "object",
+        "description": "登记能力的有限资源预算。",
         "required": [
           "maxDepth",
           "maxRows",
           "timeoutMs",
           "maxToolCalls"
         ],
-        "type": "object",
         "properties": {
           "maxDepth": {
             "type": "integer",
-            "description": "最大关系深度。",
-            "format": "int32"
+            "format": "int32",
+            "description": "最大关系深度。"
           },
           "maxRows": {
             "type": "integer",
-            "description": "最大行数。",
-            "format": "int32"
+            "format": "int32",
+            "description": "最大行数。"
           },
           "timeoutMs": {
             "type": "integer",
-            "description": "最长执行毫秒。",
-            "format": "int32"
+            "format": "int32",
+            "description": "最长执行毫秒。"
           },
           "maxToolCalls": {
             "type": "integer",
-            "description": "每Run最多调用次数。",
-            "format": "int32"
+            "format": "int32",
+            "description": "每Run最多调用次数。"
           }
         },
-        "additionalProperties": false,
-        "description": "登记能力的有限资源预算。"
+        "additionalProperties": false
       },
       "CapabilityInputSchema": {
+        "type": "object",
+        "description": "仅生成工具输入标准JSON Schema的有限描述。",
         "required": [
           "schemaVersion",
           "type",
@@ -3333,12 +3335,11 @@
           "properties",
           "additionalProperties"
         ],
-        "type": "object",
         "properties": {
           "schemaVersion": {
             "type": "integer",
-            "description": "描述版本一。",
-            "format": "int32"
+            "format": "int32",
+            "description": "描述版本一。"
           },
           "type": {
             "type": "string",
@@ -3363,10 +3364,11 @@
             "description": "固定false，拒绝未登记输入。"
           }
         },
-        "additionalProperties": false,
-        "description": "仅生成工具输入标准JSON Schema的有限描述。"
+        "additionalProperties": false
       },
       "CapabilityParameter": {
+        "type": "object",
+        "description": "仅用于本轮已知能力输入的有限参数描述。",
         "required": [
           "name",
           "type",
@@ -3376,7 +3378,6 @@
           "maximum",
           "itemsType"
         ],
-        "type": "object",
         "properties": {
           "name": {
             "type": "string",
@@ -3433,17 +3434,17 @@
             "description": "可选数组项类型。"
           }
         },
-        "additionalProperties": false,
-        "description": "仅用于本轮已知能力输入的有限参数描述。"
+        "additionalProperties": false
       },
       "CommandContext": {
+        "type": "object",
+        "description": "用于明确修订与幂等语义的受控命令上下文。",
         "required": [
           "commandId",
           "idempotencyKey",
           "expectedRevision",
           "reason"
         ],
-        "type": "object",
         "properties": {
           "commandId": {
             "type": "string",
@@ -3455,18 +3456,19 @@
           },
           "expectedRevision": {
             "type": "integer",
-            "description": "期望修订；创建时为零。",
-            "format": "int64"
+            "format": "int64",
+            "description": "期望修订；创建时为零。"
           },
           "reason": {
             "type": "string",
             "description": "仅存业务审计的操作理由，不写普通日志。"
           }
         },
-        "additionalProperties": false,
-        "description": "用于明确修订与幂等语义的受控命令上下文。"
+        "additionalProperties": false
       },
       "CreateDraftRequest": {
+        "type": "object",
+        "description": "拒绝未登记字段并包含明确幂等/修订的受保护命令。",
         "required": [
           "name",
           "scope",
@@ -3474,19 +3476,18 @@
           "baseReleaseId",
           "command"
         ],
-        "type": "object",
         "properties": {
           "name": {
             "type": "string",
             "description": "草稿名称。"
           },
           "scope": {
-            "description": "用户请求且必须服务端授权的完整范围。",
-            "$ref": "#/components/schemas/ResourceScope"
+            "$ref": "#/components/schemas/ResourceScope",
+            "description": "用户请求且必须服务端授权的完整范围。"
           },
           "sources": {
-            "description": "真正权威源。",
-            "$ref": "#/components/schemas/SourceBundle"
+            "$ref": "#/components/schemas/SourceBundle",
+            "description": "真正权威源。"
           },
           "baseReleaseId": {
             "anyOf": [
@@ -3500,14 +3501,15 @@
             "description": "可选同范围正式基础版本。"
           },
           "command": {
-            "description": "幂等、修订和审计理由。",
-            "$ref": "#/components/schemas/CommandContext"
+            "$ref": "#/components/schemas/CommandContext",
+            "description": "幂等、修订和审计理由。"
           }
         },
-        "additionalProperties": false,
-        "description": "拒绝未登记字段并包含明确幂等/修订的受保护命令。"
+        "additionalProperties": false
       },
       "CreateProposalRequest": {
+        "type": "object",
+        "description": "拒绝未登记字段并包含明确幂等/修订的受保护命令。",
         "required": [
           "kind",
           "draftId",
@@ -3518,11 +3520,10 @@
           "targetManifestHash",
           "command"
         ],
-        "type": "object",
         "properties": {
           "kind": {
-            "description": "发布或回滚。",
-            "$ref": "#/components/schemas/ProposalKind"
+            "$ref": "#/components/schemas/ProposalKind",
+            "description": "发布或回滚。"
           },
           "draftId": {
             "anyOf": [
@@ -3592,41 +3593,40 @@
             "description": "回滚完整目标清单散列。"
           },
           "command": {
-            "description": "幂等、修订和审计理由。",
-            "$ref": "#/components/schemas/CommandContext"
+            "$ref": "#/components/schemas/CommandContext",
+            "description": "幂等、修订和审计理由。"
           }
         },
-        "additionalProperties": false,
-        "description": "拒绝未登记字段并包含明确幂等/修订的受保护命令。"
+        "additionalProperties": false
       },
       "CreateRunRequest": {
+        "type": "object",
+        "description": "拒绝未登记字段并包含明确幂等/修订的受保护命令。",
         "required": [
           "prompt",
           "plan",
           "providerMode",
           "command"
         ],
-        "type": "object",
         "properties": {
           "prompt": {
             "type": "string",
             "description": "仅受保护Run存储的用户正文。"
           },
           "plan": {
-            "description": "显式受控工具计划。",
-            "$ref": "#/components/schemas/SemanticQueryPlan"
+            "$ref": "#/components/schemas/SemanticQueryPlan",
+            "description": "显式受控工具计划。"
           },
           "providerMode": {
-            "description": "默认不调用真实模型。",
-            "$ref": "#/components/schemas/ProviderMode"
+            "$ref": "#/components/schemas/ProviderMode",
+            "description": "默认不调用真实模型。"
           },
           "command": {
-            "description": "幂等、修订和审计理由。",
-            "$ref": "#/components/schemas/CommandContext"
+            "$ref": "#/components/schemas/CommandContext",
+            "description": "幂等、修订和审计理由。"
           }
         },
-        "additionalProperties": false,
-        "description": "拒绝未登记字段并包含明确幂等/修订的受保护命令。"
+        "additionalProperties": false
       },
       "CsrfResponse": {
         "required": [
@@ -3642,14 +3642,16 @@
         "description": "返回内置Antiforgery请求令牌，不作为身份认证令牌。"
       },
       "DiagnosticSeverity": {
+        "type": "string",
         "enum": [
           "info",
           "warning",
           "error"
-        ],
-        "type": "string"
+        ]
       },
       "DraftDiff": {
+        "type": "object",
+        "description": "固定历史修订间的源码与标准语义差异。",
         "required": [
           "baseRevision",
           "targetRevision",
@@ -3660,25 +3662,24 @@
           "sourceDiff",
           "unsupportedDiagnostics"
         ],
-        "type": "object",
         "properties": {
           "baseRevision": {
             "type": "integer",
-            "description": "基础修订。",
-            "format": "int64"
+            "format": "int64",
+            "description": "基础修订。"
           },
           "targetRevision": {
             "type": "integer",
-            "description": "目标修订。",
-            "format": "int64"
+            "format": "int64",
+            "description": "目标修订。"
           },
           "baseHashes": {
-            "description": "基础源散列。",
-            "$ref": "#/components/schemas/SourceHashes"
+            "$ref": "#/components/schemas/SourceHashes",
+            "description": "基础源散列。"
           },
           "targetHashes": {
-            "description": "目标源散列。",
-            "$ref": "#/components/schemas/SourceHashes"
+            "$ref": "#/components/schemas/SourceHashes",
+            "description": "目标源散列。"
           },
           "addedTriples": {
             "type": "array",
@@ -3706,48 +3707,60 @@
             "description": "无法保证空白节点对应等差异边界。"
           }
         },
-        "additionalProperties": false,
-        "description": "固定历史修订间的源码与标准语义差异。"
+        "additionalProperties": false
       },
       "DraftPublicationSnapshot": {
+        "type": "object",
+        "description": "Ontology自己锁定读取并核验的正式发布准备源。",
         "required": [
           "draft",
           "validation"
         ],
-        "type": "object",
         "properties": {
           "draft": {
-            "description": "被锁定的精确草稿。",
-            "$ref": "#/components/schemas/OntologyDraft"
+            "$ref": "#/components/schemas/OntologyDraft",
+            "description": "被锁定的精确草稿。"
           },
           "validation": {
-            "description": "同修订真实成功校验。",
-            "$ref": "#/components/schemas/SemanticValidationReport"
+            "$ref": "#/components/schemas/SemanticValidationReport",
+            "description": "同修订真实成功校验。"
+          },
+          "semantics": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PublicationSemantics"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "仅G3服务器生成的评估绑定；历史V1缺席不伪造。"
           }
         },
-        "additionalProperties": false,
-        "description": "Ontology自己锁定读取并核验的正式发布准备源。"
+        "additionalProperties": false
       },
       "EditDraftRequest": {
+        "type": "object",
+        "description": "拒绝未登记字段并包含明确幂等/修订的受保护命令。",
         "required": [
           "edit",
           "command"
         ],
-        "type": "object",
         "properties": {
           "edit": {
-            "description": "显式标准RDF变更。",
-            "$ref": "#/components/schemas/SemanticEdit"
+            "$ref": "#/components/schemas/SemanticEdit",
+            "description": "显式标准RDF变更。"
           },
           "command": {
-            "description": "幂等、修订和审计理由。",
-            "$ref": "#/components/schemas/CommandContext"
+            "$ref": "#/components/schemas/CommandContext",
+            "description": "幂等、修订和审计理由。"
           }
         },
-        "additionalProperties": false,
-        "description": "拒绝未登记字段并包含明确幂等/修订的受保护命令。"
+        "additionalProperties": false
       },
       "EntityCandidate": {
+        "type": "object",
+        "description": "只包含已授权不同IRI的身份歧义候选。",
         "required": [
           "entityIri",
           "entityTypeIris",
@@ -3757,7 +3770,6 @@
           "label",
           "evidenceIds"
         ],
-        "type": "object",
         "properties": {
           "entityIri": {
             "type": "string",
@@ -3794,29 +3806,30 @@
             "description": "适用身份来源证据。"
           }
         },
-        "additionalProperties": false,
-        "description": "只包含已授权不同IRI的身份歧义候选。"
+        "additionalProperties": false
       },
       "EvidenceAddedPayload": {
+        "type": "object",
+        "description": "由真实持久事件类型evidence.added确定的唯一载荷。",
         "required": [
           "kind",
           "evidence"
         ],
-        "type": "object",
         "properties": {
           "kind": {
-            "const": "evidence.added",
-            "type": "string"
+            "type": "string",
+            "const": "evidence.added"
           },
           "evidence": {
-            "description": "实际返回并获授权的证据。",
-            "$ref": "#/components/schemas/EvidenceRef"
+            "$ref": "#/components/schemas/EvidenceRef",
+            "description": "实际返回并获授权的证据。"
           }
         },
-        "additionalProperties": false,
-        "description": "由真实持久事件类型evidence.added确定的唯一载荷。"
+        "additionalProperties": false
       },
       "EvidenceRef": {
+        "type": "object",
+        "description": "可重新授权并核验标准图与源对象的证据引用。",
         "required": [
           "evidenceId",
           "releaseId",
@@ -3836,7 +3849,6 @@
           "mappingVersion",
           "synthetic"
         ],
-        "type": "object",
         "properties": {
           "evidenceId": {
             "type": "string",
@@ -3847,8 +3859,8 @@
             "description": "固定发布。"
           },
           "scope": {
-            "description": "真实断言适用范围。",
-            "$ref": "#/components/schemas/ResourceScope"
+            "$ref": "#/components/schemas/ResourceScope",
+            "description": "真实断言适用范围。"
           },
           "graphIri": {
             "type": "string",
@@ -3863,8 +3875,8 @@
             "description": "来源断言谓词。"
           },
           "objectTerm": {
-            "description": "来源断言客体。",
-            "$ref": "#/components/schemas/RdfTerm"
+            "$ref": "#/components/schemas/RdfTerm",
+            "description": "来源断言客体。"
           },
           "sourceId": {
             "type": "string",
@@ -3884,8 +3896,8 @@
           },
           "validFromUtc": {
             "type": "string",
-            "description": "业务有效起点。",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "业务有效起点。"
           },
           "validToUtc": {
             "anyOf": [
@@ -3901,8 +3913,8 @@
           },
           "observedAtUtc": {
             "type": "string",
-            "description": "实际观察时间。",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "实际观察时间。"
           },
           "modelVersion": {
             "type": "string",
@@ -3924,12 +3936,12 @@
             "description": "本轮必须明确为合成。"
           }
         },
-        "additionalProperties": false,
-        "description": "可重新授权并核验标准图与源对象的证据引用。"
+        "additionalProperties": false
       },
       "ExecutionEvent": {
         "oneOf": [
           {
+            "type": "object",
             "required": [
               "runId",
               "seq",
@@ -3940,7 +3952,7 @@
               "snapshot",
               "payload"
             ],
-            "type": "object",
+            "additionalProperties": false,
             "properties": {
               "runId": {
                 "type": "string",
@@ -3948,39 +3960,39 @@
               },
               "seq": {
                 "type": "integer",
-                "description": "单调持久事件序号。",
-                "format": "int64"
+                "format": "int64",
+                "description": "单调持久事件序号。"
               },
               "eventId": {
                 "type": "string",
                 "description": "runId冒号seq。"
               },
               "eventType": {
-                "const": "run.started",
-                "type": "string"
+                "type": "string",
+                "const": "run.started"
               },
               "schemaVersion": {
+                "type": "integer",
                 "enum": [
                   1
-                ],
-                "type": "integer"
+                ]
               },
               "occurredAtUtc": {
                 "type": "string",
-                "description": "实际持久时间。",
-                "format": "date-time"
+                "format": "date-time",
+                "description": "实际持久时间。"
               },
               "snapshot": {
-                "description": "运行固定的同一个完整快照。",
-                "$ref": "#/components/schemas/AssetVersionSnapshot"
+                "$ref": "#/components/schemas/AssetVersionSnapshot",
+                "description": "运行固定的同一个完整快照。"
               },
               "payload": {
                 "$ref": "#/components/schemas/RunStartedPayload"
               }
-            },
-            "additionalProperties": false
+            }
           },
           {
+            "type": "object",
             "required": [
               "runId",
               "seq",
@@ -3991,7 +4003,7 @@
               "snapshot",
               "payload"
             ],
-            "type": "object",
+            "additionalProperties": false,
             "properties": {
               "runId": {
                 "type": "string",
@@ -3999,39 +4011,39 @@
               },
               "seq": {
                 "type": "integer",
-                "description": "单调持久事件序号。",
-                "format": "int64"
+                "format": "int64",
+                "description": "单调持久事件序号。"
               },
               "eventId": {
                 "type": "string",
                 "description": "runId冒号seq。"
               },
               "eventType": {
-                "const": "tool.started",
-                "type": "string"
+                "type": "string",
+                "const": "tool.started"
               },
               "schemaVersion": {
+                "type": "integer",
                 "enum": [
                   1
-                ],
-                "type": "integer"
+                ]
               },
               "occurredAtUtc": {
                 "type": "string",
-                "description": "实际持久时间。",
-                "format": "date-time"
+                "format": "date-time",
+                "description": "实际持久时间。"
               },
               "snapshot": {
-                "description": "运行固定的同一个完整快照。",
-                "$ref": "#/components/schemas/AssetVersionSnapshot"
+                "$ref": "#/components/schemas/AssetVersionSnapshot",
+                "description": "运行固定的同一个完整快照。"
               },
               "payload": {
                 "$ref": "#/components/schemas/ToolStartedPayload"
               }
-            },
-            "additionalProperties": false
+            }
           },
           {
+            "type": "object",
             "required": [
               "runId",
               "seq",
@@ -4042,7 +4054,7 @@
               "snapshot",
               "payload"
             ],
-            "type": "object",
+            "additionalProperties": false,
             "properties": {
               "runId": {
                 "type": "string",
@@ -4050,39 +4062,39 @@
               },
               "seq": {
                 "type": "integer",
-                "description": "单调持久事件序号。",
-                "format": "int64"
+                "format": "int64",
+                "description": "单调持久事件序号。"
               },
               "eventId": {
                 "type": "string",
                 "description": "runId冒号seq。"
               },
               "eventType": {
-                "const": "tool.completed",
-                "type": "string"
+                "type": "string",
+                "const": "tool.completed"
               },
               "schemaVersion": {
+                "type": "integer",
                 "enum": [
                   1
-                ],
-                "type": "integer"
+                ]
               },
               "occurredAtUtc": {
                 "type": "string",
-                "description": "实际持久时间。",
-                "format": "date-time"
+                "format": "date-time",
+                "description": "实际持久时间。"
               },
               "snapshot": {
-                "description": "运行固定的同一个完整快照。",
-                "$ref": "#/components/schemas/AssetVersionSnapshot"
+                "$ref": "#/components/schemas/AssetVersionSnapshot",
+                "description": "运行固定的同一个完整快照。"
               },
               "payload": {
                 "$ref": "#/components/schemas/ToolCompletedPayload"
               }
-            },
-            "additionalProperties": false
+            }
           },
           {
+            "type": "object",
             "required": [
               "runId",
               "seq",
@@ -4093,7 +4105,7 @@
               "snapshot",
               "payload"
             ],
-            "type": "object",
+            "additionalProperties": false,
             "properties": {
               "runId": {
                 "type": "string",
@@ -4101,39 +4113,39 @@
               },
               "seq": {
                 "type": "integer",
-                "description": "单调持久事件序号。",
-                "format": "int64"
+                "format": "int64",
+                "description": "单调持久事件序号。"
               },
               "eventId": {
                 "type": "string",
                 "description": "runId冒号seq。"
               },
               "eventType": {
-                "const": "evidence.added",
-                "type": "string"
+                "type": "string",
+                "const": "evidence.added"
               },
               "schemaVersion": {
+                "type": "integer",
                 "enum": [
                   1
-                ],
-                "type": "integer"
+                ]
               },
               "occurredAtUtc": {
                 "type": "string",
-                "description": "实际持久时间。",
-                "format": "date-time"
+                "format": "date-time",
+                "description": "实际持久时间。"
               },
               "snapshot": {
-                "description": "运行固定的同一个完整快照。",
-                "$ref": "#/components/schemas/AssetVersionSnapshot"
+                "$ref": "#/components/schemas/AssetVersionSnapshot",
+                "description": "运行固定的同一个完整快照。"
               },
               "payload": {
                 "$ref": "#/components/schemas/EvidenceAddedPayload"
               }
-            },
-            "additionalProperties": false
+            }
           },
           {
+            "type": "object",
             "required": [
               "runId",
               "seq",
@@ -4144,7 +4156,7 @@
               "snapshot",
               "payload"
             ],
-            "type": "object",
+            "additionalProperties": false,
             "properties": {
               "runId": {
                 "type": "string",
@@ -4152,39 +4164,39 @@
               },
               "seq": {
                 "type": "integer",
-                "description": "单调持久事件序号。",
-                "format": "int64"
+                "format": "int64",
+                "description": "单调持久事件序号。"
               },
               "eventId": {
                 "type": "string",
                 "description": "runId冒号seq。"
               },
               "eventType": {
-                "const": "message.delta",
-                "type": "string"
+                "type": "string",
+                "const": "message.delta"
               },
               "schemaVersion": {
+                "type": "integer",
                 "enum": [
                   1
-                ],
-                "type": "integer"
+                ]
               },
               "occurredAtUtc": {
                 "type": "string",
-                "description": "实际持久时间。",
-                "format": "date-time"
+                "format": "date-time",
+                "description": "实际持久时间。"
               },
               "snapshot": {
-                "description": "运行固定的同一个完整快照。",
-                "$ref": "#/components/schemas/AssetVersionSnapshot"
+                "$ref": "#/components/schemas/AssetVersionSnapshot",
+                "description": "运行固定的同一个完整快照。"
               },
               "payload": {
                 "$ref": "#/components/schemas/MessageDeltaPayload"
               }
-            },
-            "additionalProperties": false
+            }
           },
           {
+            "type": "object",
             "required": [
               "runId",
               "seq",
@@ -4195,7 +4207,7 @@
               "snapshot",
               "payload"
             ],
-            "type": "object",
+            "additionalProperties": false,
             "properties": {
               "runId": {
                 "type": "string",
@@ -4203,39 +4215,39 @@
               },
               "seq": {
                 "type": "integer",
-                "description": "单调持久事件序号。",
-                "format": "int64"
+                "format": "int64",
+                "description": "单调持久事件序号。"
               },
               "eventId": {
                 "type": "string",
                 "description": "runId冒号seq。"
               },
               "eventType": {
-                "const": "approval.required",
-                "type": "string"
+                "type": "string",
+                "const": "approval.required"
               },
               "schemaVersion": {
+                "type": "integer",
                 "enum": [
                   1
-                ],
-                "type": "integer"
+                ]
               },
               "occurredAtUtc": {
                 "type": "string",
-                "description": "实际持久时间。",
-                "format": "date-time"
+                "format": "date-time",
+                "description": "实际持久时间。"
               },
               "snapshot": {
-                "description": "运行固定的同一个完整快照。",
-                "$ref": "#/components/schemas/AssetVersionSnapshot"
+                "$ref": "#/components/schemas/AssetVersionSnapshot",
+                "description": "运行固定的同一个完整快照。"
               },
               "payload": {
                 "$ref": "#/components/schemas/ApprovalRequiredPayload"
               }
-            },
-            "additionalProperties": false
+            }
           },
           {
+            "type": "object",
             "required": [
               "runId",
               "seq",
@@ -4246,7 +4258,7 @@
               "snapshot",
               "payload"
             ],
-            "type": "object",
+            "additionalProperties": false,
             "properties": {
               "runId": {
                 "type": "string",
@@ -4254,39 +4266,39 @@
               },
               "seq": {
                 "type": "integer",
-                "description": "单调持久事件序号。",
-                "format": "int64"
+                "format": "int64",
+                "description": "单调持久事件序号。"
               },
               "eventId": {
                 "type": "string",
                 "description": "runId冒号seq。"
               },
               "eventType": {
-                "const": "run.completed",
-                "type": "string"
+                "type": "string",
+                "const": "run.completed"
               },
               "schemaVersion": {
+                "type": "integer",
                 "enum": [
                   1
-                ],
-                "type": "integer"
+                ]
               },
               "occurredAtUtc": {
                 "type": "string",
-                "description": "实际持久时间。",
-                "format": "date-time"
+                "format": "date-time",
+                "description": "实际持久时间。"
               },
               "snapshot": {
-                "description": "运行固定的同一个完整快照。",
-                "$ref": "#/components/schemas/AssetVersionSnapshot"
+                "$ref": "#/components/schemas/AssetVersionSnapshot",
+                "description": "运行固定的同一个完整快照。"
               },
               "payload": {
                 "$ref": "#/components/schemas/RunCompletedPayload"
               }
-            },
-            "additionalProperties": false
+            }
           },
           {
+            "type": "object",
             "required": [
               "runId",
               "seq",
@@ -4297,7 +4309,7 @@
               "snapshot",
               "payload"
             ],
-            "type": "object",
+            "additionalProperties": false,
             "properties": {
               "runId": {
                 "type": "string",
@@ -4305,39 +4317,39 @@
               },
               "seq": {
                 "type": "integer",
-                "description": "单调持久事件序号。",
-                "format": "int64"
+                "format": "int64",
+                "description": "单调持久事件序号。"
               },
               "eventId": {
                 "type": "string",
                 "description": "runId冒号seq。"
               },
               "eventType": {
-                "const": "run.failed",
-                "type": "string"
+                "type": "string",
+                "const": "run.failed"
               },
               "schemaVersion": {
+                "type": "integer",
                 "enum": [
                   1
-                ],
-                "type": "integer"
+                ]
               },
               "occurredAtUtc": {
                 "type": "string",
-                "description": "实际持久时间。",
-                "format": "date-time"
+                "format": "date-time",
+                "description": "实际持久时间。"
               },
               "snapshot": {
-                "description": "运行固定的同一个完整快照。",
-                "$ref": "#/components/schemas/AssetVersionSnapshot"
+                "$ref": "#/components/schemas/AssetVersionSnapshot",
+                "description": "运行固定的同一个完整快照。"
               },
               "payload": {
                 "$ref": "#/components/schemas/RunFailedPayload"
               }
-            },
-            "additionalProperties": false
+            }
           },
           {
+            "type": "object",
             "required": [
               "runId",
               "seq",
@@ -4348,7 +4360,7 @@
               "snapshot",
               "payload"
             ],
-            "type": "object",
+            "additionalProperties": false,
             "properties": {
               "runId": {
                 "type": "string",
@@ -4356,37 +4368,36 @@
               },
               "seq": {
                 "type": "integer",
-                "description": "单调持久事件序号。",
-                "format": "int64"
+                "format": "int64",
+                "description": "单调持久事件序号。"
               },
               "eventId": {
                 "type": "string",
                 "description": "runId冒号seq。"
               },
               "eventType": {
-                "const": "run.cancelled",
-                "type": "string"
+                "type": "string",
+                "const": "run.cancelled"
               },
               "schemaVersion": {
+                "type": "integer",
                 "enum": [
                   1
-                ],
-                "type": "integer"
+                ]
               },
               "occurredAtUtc": {
                 "type": "string",
-                "description": "实际持久时间。",
-                "format": "date-time"
+                "format": "date-time",
+                "description": "实际持久时间。"
               },
               "snapshot": {
-                "description": "运行固定的同一个完整快照。",
-                "$ref": "#/components/schemas/AssetVersionSnapshot"
+                "$ref": "#/components/schemas/AssetVersionSnapshot",
+                "description": "运行固定的同一个完整快照。"
               },
               "payload": {
                 "$ref": "#/components/schemas/RunCancelledPayload"
               }
-            },
-            "additionalProperties": false
+            }
           }
         ],
         "discriminator": {
@@ -4741,6 +4752,8 @@
         "description": "由真实持久事件类型tool.started确定的唯一载荷。"
       },
       "ExecutionRun": {
+        "type": "object",
+        "description": "固定完整版本并由PG租约和fencing保护的持久运行。",
         "required": [
           "runId",
           "ownerSubjectId",
@@ -4757,7 +4770,6 @@
           "fencingToken",
           "traceId"
         ],
-        "type": "object",
         "properties": {
           "runId": {
             "type": "string",
@@ -4768,35 +4780,35 @@
             "description": "创建主体。"
           },
           "scope": {
-            "description": "固定合法范围。",
-            "$ref": "#/components/schemas/ResourceScope"
+            "$ref": "#/components/schemas/ResourceScope",
+            "description": "固定合法范围。"
           },
           "snapshot": {
-            "description": "运行开始时固定的完整发布。",
-            "$ref": "#/components/schemas/AssetVersionSnapshot"
+            "$ref": "#/components/schemas/AssetVersionSnapshot",
+            "description": "运行开始时固定的完整发布。"
           },
           "status": {
-            "description": "持久运行状态。",
-            "$ref": "#/components/schemas/ExecutionStatus"
+            "$ref": "#/components/schemas/ExecutionStatus",
+            "description": "持久运行状态。"
           },
           "providerMode": {
-            "description": "明确真实模型或离线harness。",
-            "$ref": "#/components/schemas/ProviderMode"
+            "$ref": "#/components/schemas/ProviderMode",
+            "description": "明确真实模型或离线harness。"
           },
           "createdAtUtc": {
             "type": "string",
-            "description": "创建时间。",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "创建时间。"
           },
           "updatedAtUtc": {
             "type": "string",
-            "description": "最近状态时间。",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "最近状态时间。"
           },
           "lastSeq": {
             "type": "integer",
-            "description": "最后已提交事件序号。",
-            "format": "int64"
+            "format": "int64",
+            "description": "最后已提交事件序号。"
           },
           "cancelRequested": {
             "type": "boolean",
@@ -4827,34 +4839,34 @@
           },
           "fencingToken": {
             "type": "integer",
-            "description": "防过期执行者提交的单调标识。",
-            "format": "int64"
+            "format": "int64",
+            "description": "防过期执行者提交的单调标识。"
           },
           "traceId": {
             "type": "string",
             "description": "创建时固定且由执行链关联的实际Trace。"
           }
         },
-        "additionalProperties": false,
-        "description": "固定完整版本并由PG租约和fencing保护的持久运行。"
+        "additionalProperties": false
       },
       "ExecutionStatus": {
+        "type": "string",
         "enum": [
           "QUEUED",
           "RUNNING",
           "COMPLETED",
           "FAILED",
           "CANCELLED"
-        ],
-        "type": "string"
+        ]
       },
       "ImportLock": {
+        "type": "object",
+        "description": "已锁定且可回验的本体导入引用。",
         "required": [
           "ontologyIri",
           "hash",
           "objectKey"
         ],
-        "type": "object",
         "properties": {
           "ontologyIri": {
             "type": "string",
@@ -4869,30 +4881,31 @@
             "description": "不可变来源对象键。"
           }
         },
-        "additionalProperties": false,
-        "description": "已锁定且可回验的本体导入引用。"
+        "additionalProperties": false
       },
       "JsonElement": {},
       "MessageDeltaPayload": {
+        "type": "object",
+        "description": "由真实持久事件类型message.delta确定的唯一载荷。",
         "required": [
           "kind",
           "text"
         ],
-        "type": "object",
         "properties": {
           "kind": {
-            "const": "message.delta",
-            "type": "string"
+            "type": "string",
+            "const": "message.delta"
           },
           "text": {
             "type": "string",
             "description": "受保护事件正文，不能输出到普通遥测。"
           }
         },
-        "additionalProperties": false,
-        "description": "由真实持久事件类型message.delta确定的唯一载荷。"
+        "additionalProperties": false
       },
       "OntologyDescription": {
+        "type": "object",
+        "description": "从正式本体图读取的概念和关系说明。",
         "required": [
           "classIris",
           "objectPropertyIris",
@@ -4901,7 +4914,6 @@
           "supportedAxioms",
           "diagnostics"
         ],
-        "type": "object",
         "properties": {
           "classIris": {
             "type": "array",
@@ -4946,10 +4958,11 @@
             "description": "未支持语义边界。"
           }
         },
-        "additionalProperties": false,
-        "description": "从正式本体图读取的概念和关系说明。"
+        "additionalProperties": false
       },
       "OntologyDraft": {
+        "type": "object",
+        "description": "具有独立作用域和CAS修订的持久本体草稿。",
         "required": [
           "draftId",
           "assetId",
@@ -4964,7 +4977,6 @@
           "updatedAtUtc",
           "projection"
         ],
-        "type": "object",
         "properties": {
           "draftId": {
             "type": "string",
@@ -4975,8 +4987,8 @@
             "description": "永久绑定唯一范围的资产标识。"
           },
           "scope": {
-            "description": "完整资源范围。",
-            "$ref": "#/components/schemas/ResourceScope"
+            "$ref": "#/components/schemas/ResourceScope",
+            "description": "完整资源范围。"
           },
           "baseReleaseId": {
             "anyOf": [
@@ -4991,8 +5003,8 @@
           },
           "revision": {
             "type": "integer",
-            "description": "单调草稿修订。",
-            "format": "int64"
+            "format": "int64",
+            "description": "单调草稿修订。"
           },
           "etag": {
             "type": "string",
@@ -5003,12 +5015,12 @@
             "description": "中文优先资产名称。"
           },
           "sources": {
-            "description": "完整权威源码。",
-            "$ref": "#/components/schemas/SourceBundle"
+            "$ref": "#/components/schemas/SourceBundle",
+            "description": "完整权威源码。"
           },
           "hashes": {
-            "description": "精确源码散列。",
-            "$ref": "#/components/schemas/SourceHashes"
+            "$ref": "#/components/schemas/SourceHashes",
+            "description": "精确源码散列。"
           },
           "ownerSubjectId": {
             "type": "string",
@@ -5016,16 +5028,15 @@
           },
           "updatedAtUtc": {
             "type": "string",
-            "description": "最近持久修改时间。",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "最近持久修改时间。"
           },
           "projection": {
-            "description": "真实解析生成且同修订的读投影。",
-            "$ref": "#/components/schemas/SemanticProjection"
+            "$ref": "#/components/schemas/SemanticProjection",
+            "description": "真实解析生成且同修订的读投影。"
           }
         },
-        "additionalProperties": false,
-        "description": "具有独立作用域和CAS修订的持久本体草稿。"
+        "additionalProperties": false
       },
       "PlatformAuditEntry": {
         "required": [
@@ -5303,36 +5314,37 @@
         }
       },
       "ProposalKind": {
+        "type": "string",
         "enum": [
           "PUBLISH",
           "ROLLBACK"
-        ],
-        "type": "string"
+        ]
       },
       "ProposalStatus": {
+        "type": "string",
         "enum": [
           "PENDING",
           "APPROVED",
           "REJECTED",
           "EXPIRED",
           "INVALIDATED"
-        ],
-        "type": "string"
+        ]
       },
       "ProviderMode": {
+        "type": "string",
         "enum": [
           "disabled",
           "deterministic",
           "approved_model"
-        ],
-        "type": "string"
+        ]
       },
       "PublishedRdfData": {
+        "type": "object",
+        "description": "仅从固定正式版本图取得的真实RDF读取结果。",
         "required": [
           "ontologyTriples",
           "dataTriples"
         ],
-        "type": "object",
         "properties": {
           "ontologyTriples": {
             "type": "array",
@@ -5349,21 +5361,21 @@
             "description": "正式事实与PROV来源三元组。"
           }
         },
-        "additionalProperties": false,
-        "description": "仅从固定正式版本图取得的真实RDF读取结果。"
+        "additionalProperties": false
       },
       "RdfTerm": {
+        "type": "object",
+        "description": "标准RDF项，保留IRI、空白节点与字面量词法信息。",
         "required": [
           "kind",
           "value",
           "datatype",
           "language"
         ],
-        "type": "object",
         "properties": {
           "kind": {
-            "description": "标准项类别。",
-            "$ref": "#/components/schemas/RdfTermKind"
+            "$ref": "#/components/schemas/RdfTermKind",
+            "description": "标准项类别。"
           },
           "value": {
             "type": "string",
@@ -5392,42 +5404,43 @@
             "description": "可选语言标签。"
           }
         },
-        "additionalProperties": false,
-        "description": "标准RDF项，保留IRI、空白节点与字面量词法信息。"
+        "additionalProperties": false
       },
       "RdfTermKind": {
+        "type": "string",
         "enum": [
           "iri",
           "blank",
           "literal"
-        ],
-        "type": "string"
+        ]
       },
       "RdfTriple": {
+        "type": "object",
+        "description": "标准RDF三元组，不替代权威源码。",
         "required": [
           "subject",
           "predicate",
           "object"
         ],
-        "type": "object",
         "properties": {
           "subject": {
-            "description": "主体项。",
-            "$ref": "#/components/schemas/RdfTerm"
+            "$ref": "#/components/schemas/RdfTerm",
+            "description": "主体项。"
           },
           "predicate": {
             "type": "string",
             "description": "谓词完整IRI。"
           },
           "object": {
-            "description": "客体项。",
-            "$ref": "#/components/schemas/RdfTerm"
+            "$ref": "#/components/schemas/RdfTerm",
+            "description": "客体项。"
           }
         },
-        "additionalProperties": false,
-        "description": "标准RDF三元组，不替代权威源码。"
+        "additionalProperties": false
       },
       "ReleaseActivation": {
+        "type": "object",
+        "description": "同PG事务激活成功后的事实回执。",
         "required": [
           "activationId",
           "activationRevision",
@@ -5440,7 +5453,6 @@
           "activatedAtUtc",
           "traceId"
         ],
-        "type": "object",
         "properties": {
           "activationId": {
             "type": "string",
@@ -5448,8 +5460,8 @@
           },
           "activationRevision": {
             "type": "integer",
-            "description": "单调活动指针修订。",
-            "format": "int64"
+            "format": "int64",
+            "description": "单调活动指针修订。"
           },
           "releaseId": {
             "type": "string",
@@ -5471,8 +5483,8 @@
             "description": "实际清单字节散列。"
           },
           "manifest": {
-            "description": "经回验的完整清单。",
-            "$ref": "#/components/schemas/ReleaseManifest"
+            "$ref": "#/components/schemas/ReleaseManifest",
+            "description": "经回验的完整清单。"
           },
           "auditId": {
             "type": "string",
@@ -5484,18 +5496,19 @@
           },
           "activatedAtUtc": {
             "type": "string",
-            "description": "提交的激活时间。",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "提交的激活时间。"
           },
           "traceId": {
             "type": "string",
             "description": "激活事务实际Trace，用于审计与专业诊断关联。"
           }
         },
-        "additionalProperties": false,
-        "description": "同PG事务激活成功后的事实回执。"
+        "additionalProperties": false
       },
       "ReleaseManifest": {
+        "type": "object",
+        "description": "准备与回验完成后固定的正式发布清单。",
         "required": [
           "schemaVersion",
           "releaseId",
@@ -5511,12 +5524,11 @@
           "artifactObjects",
           "createdAtUtc"
         ],
-        "type": "object",
         "properties": {
           "schemaVersion": {
             "type": "integer",
-            "description": "清单版本一。",
-            "format": "int32"
+            "format": "int32",
+            "description": "清单版本一。"
           },
           "releaseId": {
             "type": "string",
@@ -5527,8 +5539,8 @@
             "description": "唯一作用域资产。"
           },
           "scope": {
-            "description": "完整发布范围。",
-            "$ref": "#/components/schemas/ResourceScope"
+            "$ref": "#/components/schemas/ResourceScope",
+            "description": "完整发布范围。"
           },
           "draftId": {
             "type": "string",
@@ -5536,12 +5548,12 @@
           },
           "revision": {
             "type": "integer",
-            "description": "原始精确草稿修订。",
-            "format": "int64"
+            "format": "int64",
+            "description": "原始精确草稿修订。"
           },
           "hashes": {
-            "description": "完整权威源散列。",
-            "$ref": "#/components/schemas/SourceHashes"
+            "$ref": "#/components/schemas/SourceHashes",
+            "description": "完整权威源散列。"
           },
           "ontologyGraphIri": {
             "type": "string",
@@ -5559,8 +5571,8 @@
             "description": "本轮未锁定导入必须阻断。"
           },
           "snapshot": {
-            "description": "唯一关联资产快照。",
-            "$ref": "#/components/schemas/AssetVersionSnapshot"
+            "$ref": "#/components/schemas/AssetVersionSnapshot",
+            "description": "唯一关联资产快照。"
           },
           "artifactObjects": {
             "type": "array",
@@ -5571,14 +5583,26 @@
           },
           "createdAtUtc": {
             "type": "string",
-            "description": "清单创建时间。",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "清单创建时间。"
+          },
+          "semantics": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PublicationSemantics"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "仅G3服务器生成的评估绑定；历史V1缺席不伪造。"
           }
         },
-        "additionalProperties": false,
-        "description": "准备与回验完成后固定的正式发布清单。"
+        "additionalProperties": false
       },
       "ReleaseProposal": {
+        "type": "object",
+        "description": "明确区分当前草稿发布和旧完整版本回滚的受控提案。",
         "required": [
           "proposalId",
           "kind",
@@ -5597,23 +5621,22 @@
           "revision",
           "approval"
         ],
-        "type": "object",
         "properties": {
           "proposalId": {
             "type": "string",
             "description": "提案标识也是审批ID。"
           },
           "kind": {
-            "description": "发布或回滚判别。",
-            "$ref": "#/components/schemas/ProposalKind"
+            "$ref": "#/components/schemas/ProposalKind",
+            "description": "发布或回滚判别。"
           },
           "assetId": {
             "type": "string",
             "description": "被批准资产。"
           },
           "scope": {
-            "description": "固定完整范围。",
-            "$ref": "#/components/schemas/ResourceScope"
+            "$ref": "#/components/schemas/ResourceScope",
+            "description": "固定完整范围。"
           },
           "draftId": {
             "anyOf": [
@@ -5688,22 +5711,22 @@
           },
           "submittedAtUtc": {
             "type": "string",
-            "description": "提交时间。",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "提交时间。"
           },
           "expiresAtUtc": {
             "type": "string",
-            "description": "审批授权有效期限。",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "审批授权有效期限。"
           },
           "status": {
-            "description": "提案审批状态。",
-            "$ref": "#/components/schemas/ProposalStatus"
+            "$ref": "#/components/schemas/ProposalStatus",
+            "description": "提案审批状态。"
           },
           "revision": {
             "type": "integer",
-            "description": "审批决定的CAS修订。",
-            "format": "int64"
+            "format": "int64",
+            "description": "审批决定的CAS修订。"
           },
           "approval": {
             "anyOf": [
@@ -5715,12 +5738,23 @@
               }
             ],
             "description": "已提交审核决定。"
+          },
+          "semantics": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PublicationSemantics"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "仅G3服务器生成的评估绑定；历史V1缺席不伪造。"
           }
         },
-        "additionalProperties": false,
-        "description": "明确区分当前草稿发布和旧完整版本回滚的受控提案。"
+        "additionalProperties": false
       },
       "ReleaseStatus": {
+        "type": "string",
         "enum": [
           "PREPARING",
           "ARTIFACTS_VERIFIED",
@@ -5730,10 +5764,11 @@
           "SUPERSEDED",
           "FAILED_RETRYABLE",
           "FAILED_FINAL"
-        ],
-        "type": "string"
+        ]
       },
       "ReleaseSummary": {
+        "type": "object",
+        "description": "可访问正式历史版本和活动状态。",
         "required": [
           "manifest",
           "manifestHash",
@@ -5742,11 +5777,10 @@
           "status",
           "traceId"
         ],
-        "type": "object",
         "properties": {
           "manifest": {
-            "description": "不可变清单。",
-            "$ref": "#/components/schemas/ReleaseManifest"
+            "$ref": "#/components/schemas/ReleaseManifest",
+            "description": "不可变清单。"
           },
           "manifestHash": {
             "type": "string",
@@ -5758,27 +5792,27 @@
           },
           "activationRevision": {
             "type": "integer",
-            "description": "当前活动指针修订。",
-            "format": "int64"
+            "format": "int64",
+            "description": "当前活动指针修订。"
           },
           "status": {
-            "description": "真实准备或活动状态。",
-            "$ref": "#/components/schemas/ReleaseStatus"
+            "$ref": "#/components/schemas/ReleaseStatus",
+            "description": "真实准备或活动状态。"
           },
           "traceId": {
             "type": "string",
             "description": "该正式版本最近一次激活的持久Trace，不猜测运行标识。"
           }
         },
-        "additionalProperties": false,
-        "description": "可访问正式历史版本和活动状态。"
+        "additionalProperties": false
       },
       "ResourceScope": {
+        "type": "object",
+        "description": "不可由客户端扩大的资源组织与完整厂区范围。",
         "required": [
           "organizationId",
           "siteIds"
         ],
-        "type": "object",
         "properties": {
           "organizationId": {
             "type": "string",
@@ -5792,60 +5826,60 @@
             "description": "完整且规范化的非空厂区集合。"
           }
         },
-        "additionalProperties": false,
-        "description": "不可由客户端扩大的资源组织与完整厂区范围。"
+        "additionalProperties": false
       },
       "RunCancelledPayload": {
+        "type": "object",
+        "description": "由真实持久事件类型run.cancelled确定的唯一载荷。",
         "required": [
           "kind",
           "status",
           "code",
           "totalToolCalls"
         ],
-        "type": "object",
         "properties": {
           "kind": {
-            "const": "run.cancelled",
-            "type": "string"
+            "type": "string",
+            "const": "run.cancelled"
           },
           "status": {
-            "const": "CANCELLED",
-            "type": "string"
+            "type": "string",
+            "const": "CANCELLED"
           },
           "code": {
-            "const": "cancelled",
-            "type": "string"
+            "type": "string",
+            "const": "cancelled"
           },
           "totalToolCalls": {
             "type": "integer",
-            "description": "真实工具次数。",
-            "format": "int32"
+            "format": "int32",
+            "description": "真实工具次数。"
           }
         },
-        "additionalProperties": false,
-        "description": "由真实持久事件类型run.cancelled确定的唯一载荷。"
+        "additionalProperties": false
       },
       "RunCompletedPayload": {
+        "type": "object",
+        "description": "由真实持久事件类型run.completed确定的唯一载荷。",
         "required": [
           "kind",
           "status",
           "totalToolCalls",
           "lastResultStatus"
         ],
-        "type": "object",
         "properties": {
           "kind": {
-            "const": "run.completed",
-            "type": "string"
+            "type": "string",
+            "const": "run.completed"
           },
           "status": {
-            "const": "COMPLETED",
-            "type": "string"
+            "type": "string",
+            "const": "COMPLETED"
           },
           "totalToolCalls": {
             "type": "integer",
-            "description": "真实工具次数。",
-            "format": "int32"
+            "format": "int32",
+            "description": "真实工具次数。"
           },
           "lastResultStatus": {
             "anyOf": [
@@ -5859,25 +5893,25 @@
             "description": "最后实际结果状态。"
           }
         },
-        "additionalProperties": false,
-        "description": "由真实持久事件类型run.completed确定的唯一载荷。"
+        "additionalProperties": false
       },
       "RunFailedPayload": {
+        "type": "object",
+        "description": "由真实持久事件类型run.failed确定的唯一载荷。",
         "required": [
           "kind",
           "status",
           "code",
           "totalToolCalls"
         ],
-        "type": "object",
         "properties": {
           "kind": {
-            "const": "run.failed",
-            "type": "string"
+            "type": "string",
+            "const": "run.failed"
           },
           "status": {
-            "const": "FAILED",
-            "type": "string"
+            "type": "string",
+            "const": "FAILED"
           },
           "code": {
             "type": "string",
@@ -5885,14 +5919,15 @@
           },
           "totalToolCalls": {
             "type": "integer",
-            "description": "真实工具次数。",
-            "format": "int32"
+            "format": "int32",
+            "description": "真实工具次数。"
           }
         },
-        "additionalProperties": false,
-        "description": "由真实持久事件类型run.failed确定的唯一载荷。"
+        "additionalProperties": false
       },
       "RunStartedPayload": {
+        "type": "object",
+        "description": "由真实持久事件类型run.started确定的唯一载荷。",
         "required": [
           "kind",
           "providerMode",
@@ -5900,15 +5935,14 @@
           "maxToolCalls",
           "timeoutMs"
         ],
-        "type": "object",
         "properties": {
           "kind": {
-            "const": "run.started",
-            "type": "string"
+            "type": "string",
+            "const": "run.started"
           },
           "providerMode": {
-            "description": "实际提供者模式。",
-            "$ref": "#/components/schemas/ProviderMode"
+            "$ref": "#/components/schemas/ProviderMode",
+            "description": "实际提供者模式。"
           },
           "capabilityIds": {
             "type": "array",
@@ -5919,62 +5953,63 @@
           },
           "maxToolCalls": {
             "type": "integer",
-            "description": "最大工具次数。",
-            "format": "int32"
+            "format": "int32",
+            "description": "最大工具次数。"
           },
           "timeoutMs": {
             "type": "integer",
-            "description": "运行总超时。",
-            "format": "int32"
+            "format": "int32",
+            "description": "运行总超时。"
           }
         },
-        "additionalProperties": false,
-        "description": "由真实持久事件类型run.started确定的唯一载荷。"
+        "additionalProperties": false
       },
       "SaveDraftRequest": {
+        "type": "object",
+        "description": "拒绝未登记字段并包含明确幂等/修订的受保护命令。",
         "required": [
           "name",
           "sources",
           "command"
         ],
-        "type": "object",
         "properties": {
           "name": {
             "type": "string",
             "description": "新名称。"
           },
           "sources": {
-            "description": "新权威源。",
-            "$ref": "#/components/schemas/SourceBundle"
+            "$ref": "#/components/schemas/SourceBundle",
+            "description": "新权威源。"
           },
           "command": {
-            "description": "幂等、修订和审计理由。",
-            "$ref": "#/components/schemas/CommandContext"
+            "$ref": "#/components/schemas/CommandContext",
+            "description": "幂等、修订和审计理由。"
           }
         },
-        "additionalProperties": false,
-        "description": "拒绝未登记字段并包含明确幂等/修订的受保护命令。"
+        "additionalProperties": false
       },
       "SemanticAnalysis": {
+        "type": "object",
+        "description": "内部真实解析及支持边界结果。",
         "required": [
           "hashes",
           "projection"
         ],
-        "type": "object",
         "properties": {
           "hashes": {
-            "description": "实际源散列。",
-            "$ref": "#/components/schemas/SourceHashes"
+            "$ref": "#/components/schemas/SourceHashes",
+            "description": "实际源散列。"
           },
           "projection": {
-            "description": "完整有界读投影。",
-            "$ref": "#/components/schemas/SemanticProjection"
+            "$ref": "#/components/schemas/SemanticProjection",
+            "description": "完整有界读投影。"
           }
         },
-        "additionalProperties": false,
-        "description": "内部真实解析及支持边界结果。"
+        "additionalProperties": false
       },
       "SemanticCapability": {
+        "type": "object",
+        "description": "唯一能力登记，输出标准Schema来自真实强类型合同。",
         "required": [
           "id",
           "version",
@@ -5985,7 +6020,6 @@
           "executorId",
           "budgets"
         ],
-        "type": "object",
         "properties": {
           "id": {
             "type": "string",
@@ -5996,8 +6030,8 @@
             "description": "真实输入输出Schema散列版本。"
           },
           "inputSchema": {
-            "description": "有限输入描述，映射标准Schema。",
-            "$ref": "#/components/schemas/CapabilityInputSchema"
+            "$ref": "#/components/schemas/CapabilityInputSchema",
+            "description": "有限输入描述，映射标准Schema。"
           },
           "outputSchema": {
             "description": "从唯一SemanticQueryResult/OpenAPI派生的完整标准JSON Schema文档。"
@@ -6015,27 +6049,27 @@
             "description": "受控执行器标识。"
           },
           "budgets": {
-            "description": "唯一执行预算。",
-            "$ref": "#/components/schemas/CapabilityBudget"
+            "$ref": "#/components/schemas/CapabilityBudget",
+            "description": "唯一执行预算。"
           }
         },
-        "additionalProperties": false,
-        "description": "唯一能力登记，输出标准Schema来自真实强类型合同。"
+        "additionalProperties": false
       },
       "SemanticDatum": {
         "oneOf": [
           {
+            "type": "object",
             "required": [
               "kind",
               "ontology",
               "entity",
               "relationship"
             ],
-            "type": "object",
+            "additionalProperties": false,
             "properties": {
               "kind": {
-                "const": "ontology",
-                "type": "string"
+                "type": "string",
+                "const": "ontology"
               },
               "ontology": {
                 "$ref": "#/components/schemas/OntologyDescription"
@@ -6046,21 +6080,21 @@
               "relationship": {
                 "type": "null"
               }
-            },
-            "additionalProperties": false
+            }
           },
           {
+            "type": "object",
             "required": [
               "kind",
               "ontology",
               "entity",
               "relationship"
             ],
-            "type": "object",
+            "additionalProperties": false,
             "properties": {
               "kind": {
-                "const": "entity",
-                "type": "string"
+                "type": "string",
+                "const": "entity"
               },
               "ontology": {
                 "type": "null"
@@ -6071,21 +6105,21 @@
               "relationship": {
                 "type": "null"
               }
-            },
-            "additionalProperties": false
+            }
           },
           {
+            "type": "object",
             "required": [
               "kind",
               "ontology",
               "entity",
               "relationship"
             ],
-            "type": "object",
+            "additionalProperties": false,
             "properties": {
               "kind": {
-                "const": "relationship",
-                "type": "string"
+                "type": "string",
+                "const": "relationship"
               },
               "ontology": {
                 "type": "null"
@@ -6096,8 +6130,7 @@
               "relationship": {
                 "$ref": "#/components/schemas/SemanticRelationship"
               }
-            },
-            "additionalProperties": false
+            }
           }
         ],
         "discriminator": {
@@ -6105,14 +6138,16 @@
         }
       },
       "SemanticDatumKind": {
+        "type": "string",
         "enum": [
           "ontology",
           "entity",
           "relationship"
-        ],
-        "type": "string"
+        ]
       },
       "SemanticDiagnostic": {
+        "type": "object",
+        "description": "仅包含受控中文消息的语义诊断。",
         "required": [
           "code",
           "severity",
@@ -6120,15 +6155,14 @@
           "focusNode",
           "path"
         ],
-        "type": "object",
         "properties": {
           "code": {
             "type": "string",
             "description": "固定机器诊断代码。"
           },
           "severity": {
-            "description": "诊断严重度。",
-            "$ref": "#/components/schemas/DiagnosticSeverity"
+            "$ref": "#/components/schemas/DiagnosticSeverity",
+            "description": "诊断严重度。"
           },
           "message": {
             "type": "string",
@@ -6157,10 +6191,11 @@
             "description": "实际谓词路径IRI。"
           }
         },
-        "additionalProperties": false,
-        "description": "仅包含受控中文消息的语义诊断。"
+        "additionalProperties": false
       },
       "SemanticEdge": {
+        "type": "object",
+        "description": "由实际RDF对象关系投影的边。",
         "required": [
           "id",
           "source",
@@ -6168,7 +6203,6 @@
           "target",
           "label"
         ],
-        "type": "object",
         "properties": {
           "id": {
             "type": "string",
@@ -6191,17 +6225,17 @@
             "description": "关系显示标签。"
           }
         },
-        "additionalProperties": false,
-        "description": "由实际RDF对象关系投影的边。"
+        "additionalProperties": false
       },
       "SemanticEdit": {
+        "type": "object",
+        "description": "只修改批准谓词的显式标准RDF编辑。",
         "required": [
           "subjectIri",
           "predicateIri",
           "oldObject",
           "newObject"
         ],
-        "type": "object",
         "properties": {
           "subjectIri": {
             "type": "string",
@@ -6234,10 +6268,11 @@
             "description": "需精确增加的新客体。"
           }
         },
-        "additionalProperties": false,
-        "description": "只修改批准谓词的显式标准RDF编辑。"
+        "additionalProperties": false
       },
       "SemanticEntity": {
+        "type": "object",
+        "description": "未按外部编号误合并的获准实体。",
         "required": [
           "iri",
           "typeIris",
@@ -6248,7 +6283,6 @@
           "synthetic",
           "properties"
         ],
-        "type": "object",
         "properties": {
           "iri": {
             "type": "string",
@@ -6289,25 +6323,25 @@
             "description": "有来源的实际属性。"
           }
         },
-        "additionalProperties": false,
-        "description": "未按外部编号误合并的获准实体。"
+        "additionalProperties": false
       },
       "SemanticNode": {
+        "type": "object",
+        "description": "由真实RDF图投影的可访问节点。",
         "required": [
           "id",
           "kind",
           "label",
           "typeIris"
         ],
-        "type": "object",
         "properties": {
           "id": {
             "type": "string",
             "description": "节点完整IRI。"
           },
           "kind": {
-            "description": "类、属性或个体类别。",
-            "$ref": "#/components/schemas/SemanticNodeKind"
+            "$ref": "#/components/schemas/SemanticNodeKind",
+            "description": "类、属性或个体类别。"
           },
           "label": {
             "type": "string",
@@ -6321,19 +6355,20 @@
             "description": "真实类型IRI集合。"
           }
         },
-        "additionalProperties": false,
-        "description": "由真实RDF图投影的可访问节点。"
+        "additionalProperties": false
       },
       "SemanticNodeKind": {
+        "type": "string",
         "enum": [
           "class",
           "objectProperty",
           "datatypeProperty",
           "individual"
-        ],
-        "type": "string"
+        ]
       },
       "SemanticProjection": {
+        "type": "object",
+        "description": "明确绑定草稿修订与源散列的完整读投影。",
         "required": [
           "revision",
           "hashes",
@@ -6343,16 +6378,15 @@
           "structuralEditAllowed",
           "diagnostics"
         ],
-        "type": "object",
         "properties": {
           "revision": {
             "type": "integer",
-            "description": "投影对应修订。",
-            "format": "int64"
+            "format": "int64",
+            "description": "投影对应修订。"
           },
           "hashes": {
-            "description": "对应的全部源散列。",
-            "$ref": "#/components/schemas/SourceHashes"
+            "$ref": "#/components/schemas/SourceHashes",
+            "description": "对应的全部源散列。"
           },
           "triples": {
             "type": "array",
@@ -6387,24 +6421,24 @@
             "description": "支持边界和解析诊断。"
           }
         },
-        "additionalProperties": false,
-        "description": "明确绑定草稿修订与源散列的完整读投影。"
+        "additionalProperties": false
       },
       "SemanticPropertyValue": {
+        "type": "object",
+        "description": "具有真实标准值与适用证据引用的属性。",
         "required": [
           "predicateIri",
           "value",
           "evidenceIds"
         ],
-        "type": "object",
         "properties": {
           "predicateIri": {
             "type": "string",
             "description": "实际谓词IRI。"
           },
           "value": {
-            "description": "完整RDF值。",
-            "$ref": "#/components/schemas/RdfTerm"
+            "$ref": "#/components/schemas/RdfTerm",
+            "description": "完整RDF值。"
           },
           "evidenceIds": {
             "type": "array",
@@ -6414,10 +6448,11 @@
             "description": "适用且获准的证据引用。"
           }
         },
-        "additionalProperties": false,
-        "description": "具有真实标准值与适用证据引用的属性。"
+        "additionalProperties": false
       },
       "SemanticQueryPlan": {
+        "type": "object",
+        "description": "只允许登记能力与正式版本的有界语义计划。",
         "required": [
           "capabilityId",
           "capabilityVersion",
@@ -6432,7 +6467,6 @@
           "maxRows",
           "timeoutMs"
         ],
-        "type": "object",
         "properties": {
           "capabilityId": {
             "type": "string",
@@ -6510,24 +6544,25 @@
           },
           "depth": {
             "type": "integer",
-            "description": "一至五的查询深度。",
-            "format": "int32"
+            "format": "int32",
+            "description": "一至五的查询深度。"
           },
           "maxRows": {
             "type": "integer",
-            "description": "一至一百的结果预算。",
-            "format": "int32"
+            "format": "int32",
+            "description": "一至一百的结果预算。"
           },
           "timeoutMs": {
             "type": "integer",
-            "description": "一百至五千毫秒预算。",
-            "format": "int32"
+            "format": "int32",
+            "description": "一百至五千毫秒预算。"
           }
         },
-        "additionalProperties": false,
-        "description": "只允许登记能力与正式版本的有界语义计划。"
+        "additionalProperties": false
       },
       "SemanticQueryResult": {
+        "type": "object",
+        "description": "REST、MCP和Agent共享的唯一六态结果。",
         "required": [
           "status",
           "data",
@@ -6541,11 +6576,10 @@
           "limited",
           "diagnostics"
         ],
-        "type": "object",
         "properties": {
           "status": {
-            "description": "六态实际结果。",
-            "$ref": "#/components/schemas/SemanticQueryStatus"
+            "$ref": "#/components/schemas/SemanticQueryStatus",
+            "description": "六态实际结果。"
           },
           "data": {
             "type": "array",
@@ -6569,8 +6603,8 @@
             "description": "可信且可重新授权证据。"
           },
           "snapshot": {
-            "description": "固定完整发布。",
-            "$ref": "#/components/schemas/AssetVersionSnapshot"
+            "$ref": "#/components/schemas/AssetVersionSnapshot",
+            "description": "固定完整发布。"
           },
           "subSources": {
             "type": "array",
@@ -6592,8 +6626,8 @@
           },
           "observedAtUtc": {
             "type": "string",
-            "description": "实际读取时间。",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "实际读取时间。"
           },
           "traceId": {
             "type": "string",
@@ -6611,10 +6645,10 @@
             "description": "安全固定诊断。"
           }
         },
-        "additionalProperties": false,
-        "description": "REST、MCP和Agent共享的唯一六态结果。"
+        "additionalProperties": false
       },
       "SemanticQueryStatus": {
+        "type": "string",
         "enum": [
           "FOUND",
           "EMPTY",
@@ -6622,17 +6656,17 @@
           "UNAVAILABLE",
           "UNAUTHORIZED",
           "AMBIGUOUS"
-        ],
-        "type": "string"
+        ]
       },
       "SemanticRelationship": {
+        "type": "object",
+        "description": "允许多对多且附有来源的实际关系。",
         "required": [
           "sourceIri",
           "predicateIri",
           "targetIri",
           "evidenceIds"
         ],
-        "type": "object",
         "properties": {
           "sourceIri": {
             "type": "string",
@@ -6654,10 +6688,11 @@
             "description": "实际断言证据引用。"
           }
         },
-        "additionalProperties": false,
-        "description": "允许多对多且附有来源的实际关系。"
+        "additionalProperties": false
       },
       "SemanticSubSource": {
+        "type": "object",
+        "description": "真实源状态与该源数据版本，不把不可用当空。",
         "required": [
           "sourceId",
           "status",
@@ -6666,15 +6701,14 @@
           "observedAtUtc",
           "code"
         ],
-        "type": "object",
         "properties": {
           "sourceId": {
             "type": "string",
             "description": "受控来源ID。"
           },
           "status": {
-            "description": "实际读取结果。",
-            "$ref": "#/components/schemas/SubSourceStatus"
+            "$ref": "#/components/schemas/SubSourceStatus",
+            "description": "实际读取结果。"
           },
           "releaseId": {
             "type": "string",
@@ -6686,8 +6720,8 @@
           },
           "observedAtUtc": {
             "type": "string",
-            "description": "本次真实读取时间。",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "本次真实读取时间。"
           },
           "code": {
             "anyOf": [
@@ -6701,10 +6735,11 @@
             "description": "有限故障或部分结果代码。"
           }
         },
-        "additionalProperties": false,
-        "description": "真实源状态与该源数据版本，不把不可用当空。"
+        "additionalProperties": false
       },
       "SemanticValidationReport": {
+        "type": "object",
+        "description": "绑定精确修订与源码的真实语义校验报告。",
         "required": [
           "reportId",
           "draftId",
@@ -6717,7 +6752,6 @@
           "validatedAtUtc",
           "traceId"
         ],
-        "type": "object",
         "properties": {
           "reportId": {
             "type": "string",
@@ -6729,16 +6763,16 @@
           },
           "revision": {
             "type": "integer",
-            "description": "被验证的精确修订。",
-            "format": "int64"
+            "format": "int64",
+            "description": "被验证的精确修订。"
           },
           "hashes": {
-            "description": "被验证源散列。",
-            "$ref": "#/components/schemas/SourceHashes"
+            "$ref": "#/components/schemas/SourceHashes",
+            "description": "被验证源散列。"
           },
           "kind": {
-            "description": "解析、SHACL或支持边界校验类型。",
-            "$ref": "#/components/schemas/ValidationKind"
+            "$ref": "#/components/schemas/ValidationKind",
+            "description": "解析、SHACL或支持边界校验类型。"
           },
           "conforms": {
             "type": "boolean",
@@ -6757,25 +6791,25 @@
           },
           "validatedAtUtc": {
             "type": "string",
-            "description": "真实校验时间。",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "真实校验时间。"
           },
           "traceId": {
             "type": "string",
             "description": "校验跟踪标识。"
           }
         },
-        "additionalProperties": false,
-        "description": "绑定精确修订与源码的真实语义校验报告。"
+        "additionalProperties": false
       },
       "SourceBundle": {
+        "type": "object",
+        "description": "本体、约束、词汇与合成事实的唯一权威UTF8源码。",
         "required": [
           "ontologyTurtle",
           "shapesTurtle",
           "vocabularyTurtle",
           "dataTurtle"
         ],
-        "type": "object",
         "properties": {
           "ontologyTurtle": {
             "type": "string",
@@ -6801,10 +6835,11 @@
             "description": "仅Local/Synthetic的事实与来源源码。"
           }
         },
-        "additionalProperties": false,
-        "description": "本体、约束、词汇与合成事实的唯一权威UTF8源码。"
+        "additionalProperties": false
       },
       "SourceHashes": {
+        "type": "object",
+        "description": "按明确UTF8字节计算的独立源散列与组合散列。",
         "required": [
           "ontologyHash",
           "shapesHash",
@@ -6812,7 +6847,6 @@
           "dataHash",
           "bundleHash"
         ],
-        "type": "object",
         "properties": {
           "ontologyHash": {
             "type": "string",
@@ -6842,30 +6876,30 @@
             "description": "按合同顺序和absent标记组合的SHA256。"
           }
         },
-        "additionalProperties": false,
-        "description": "按明确UTF8字节计算的独立源散列与组合散列。"
+        "additionalProperties": false
       },
       "SubSourceStatus": {
+        "type": "string",
         "enum": [
           "AVAILABLE",
           "EMPTY",
           "PARTIAL",
           "UNAVAILABLE",
           "UNAUTHORIZED"
-        ],
-        "type": "string"
+        ]
       },
       "TemporalExtent": {
+        "type": "object",
+        "description": "业务断言有效时间，独立于采集与资产版本。",
         "required": [
           "fromUtc",
           "toUtc"
         ],
-        "type": "object",
         "properties": {
           "fromUtc": {
             "type": "string",
-            "description": "有效起点。",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "有效起点。"
           },
           "toUtc": {
             "anyOf": [
@@ -6880,40 +6914,41 @@
             "description": "可选有效终点。"
           }
         },
-        "additionalProperties": false,
-        "description": "业务断言有效时间，独立于采集与资产版本。"
+        "additionalProperties": false
       },
       "ToolCompletedPayload": {
+        "type": "object",
+        "description": "由真实持久事件类型tool.completed确定的唯一载荷。",
         "required": [
           "kind",
           "invocationId",
           "result",
           "durationMs"
         ],
-        "type": "object",
         "properties": {
           "kind": {
-            "const": "tool.completed",
-            "type": "string"
+            "type": "string",
+            "const": "tool.completed"
           },
           "invocationId": {
             "type": "string",
             "description": "同一次工具调用。"
           },
           "result": {
-            "description": "真正Gateway六态结果。",
-            "$ref": "#/components/schemas/SemanticQueryResult"
+            "$ref": "#/components/schemas/SemanticQueryResult",
+            "description": "真正Gateway六态结果。"
           },
           "durationMs": {
             "type": "number",
-            "description": "实际执行耗时毫秒。",
-            "format": "double"
+            "format": "double",
+            "description": "实际执行耗时毫秒。"
           }
         },
-        "additionalProperties": false,
-        "description": "由真实持久事件类型tool.completed确定的唯一载荷。"
+        "additionalProperties": false
       },
       "ToolStartedPayload": {
+        "type": "object",
+        "description": "由真实持久事件类型tool.started确定的唯一载荷。",
         "required": [
           "kind",
           "invocationId",
@@ -6921,11 +6956,10 @@
           "capabilityVersion",
           "plan"
         ],
-        "type": "object",
         "properties": {
           "kind": {
-            "const": "tool.started",
-            "type": "string"
+            "type": "string",
+            "const": "tool.started"
           },
           "invocationId": {
             "type": "string",
@@ -6940,39 +6974,40 @@
             "description": "真实Schema版本。"
           },
           "plan": {
-            "description": "经过授权与预算的计划。",
-            "$ref": "#/components/schemas/SemanticQueryPlan"
+            "$ref": "#/components/schemas/SemanticQueryPlan",
+            "description": "经过授权与预算的计划。"
           }
         },
-        "additionalProperties": false,
-        "description": "由真实持久事件类型tool.started确定的唯一载荷。"
+        "additionalProperties": false
       },
       "ValidateDraftRequest": {
+        "type": "object",
+        "description": "拒绝未登记字段并包含明确幂等/修订的受保护命令。",
         "required": [
           "revision",
           "hashes",
           "command"
         ],
-        "type": "object",
         "properties": {
           "revision": {
             "type": "integer",
-            "description": "要验证的精确修订。",
-            "format": "int64"
+            "format": "int64",
+            "description": "要验证的精确修订。"
           },
           "hashes": {
-            "description": "要验证的完整源散列。",
-            "$ref": "#/components/schemas/SourceHashes"
+            "$ref": "#/components/schemas/SourceHashes",
+            "description": "要验证的完整源散列。"
           },
           "command": {
-            "description": "幂等、修订和审计理由。",
-            "$ref": "#/components/schemas/CommandContext"
+            "$ref": "#/components/schemas/CommandContext",
+            "description": "幂等、修订和审计理由。"
           }
         },
-        "additionalProperties": false,
-        "description": "拒绝未登记字段并包含明确幂等/修订的受保护命令。"
+        "additionalProperties": false
       },
       "ValidationIssue": {
+        "type": "object",
+        "description": "真实Jena标准报告中的定位问题。",
         "required": [
           "severity",
           "focusNode",
@@ -6983,11 +7018,10 @@
           "message",
           "sourceId"
         ],
-        "type": "object",
         "properties": {
           "severity": {
-            "description": "标准严重度。",
-            "$ref": "#/components/schemas/DiagnosticSeverity"
+            "$ref": "#/components/schemas/DiagnosticSeverity",
+            "description": "标准严重度。"
           },
           "focusNode": {
             "anyOf": [
@@ -7053,16 +7087,479 @@
             "description": "本体、Shape或Synthetic数据来源。"
           }
         },
-        "additionalProperties": false,
-        "description": "真实Jena标准报告中的定位问题。"
+        "additionalProperties": false
       },
       "ValidationKind": {
+        "type": "string",
         "enum": [
           "RDF_PARSE",
           "SHACL_CORE",
           "OWL_SUPPORT"
+        ]
+      },
+      "GraphComparisonStatus": {
+        "type": "string",
+        "enum": [
+          "EQUIVALENT",
+          "DIFFERENT",
+          "INDETERMINATE"
+        ]
+      },
+      "AssessmentStageStatus": {
+        "type": "string",
+        "enum": [
+          "PASS",
+          "FAIL",
+          "NOT_RUN",
+          "NOT_SUPPORTED",
+          "INDETERMINATE"
+        ]
+      },
+      "VersionRefKind": {
+        "type": "string",
+        "enum": [
+          "DRAFT",
+          "RELEASE"
+        ]
+      },
+      "GraphComparisonBudget": {
+        "type": "object",
+        "description": "一次四源精确图比较共享的硬预算。",
+        "required": [
+          "maxBlankNodes",
+          "maxSearchNodes",
+          "timeoutMilliseconds"
         ],
-        "type": "string"
+        "properties": {
+          "maxBlankNodes": {
+            "type": "integer",
+            "format": "int32",
+            "description": "每个图允许的最大空白节点数。"
+          },
+          "maxSearchNodes": {
+            "type": "integer",
+            "format": "int32",
+            "description": "四源共享的搜索节点总上限。"
+          },
+          "timeoutMilliseconds": {
+            "type": "integer",
+            "format": "int32",
+            "description": "覆盖解析和比较的总毫秒上限。"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SemanticCapabilitySupport": {
+        "type": "object",
+        "description": "单项建模能力的编辑、保留、发布与验证边界。",
+        "required": [
+          "id",
+          "name",
+          "edit",
+          "preserve",
+          "publish",
+          "validation",
+          "reason"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "二十项能力的固定编号。"
+          },
+          "name": {
+            "type": "string",
+            "description": "中文能力名称。"
+          },
+          "edit": {
+            "type": "string",
+            "description": "BASIC或SOURCE。"
+          },
+          "preserve": {
+            "type": "string",
+            "description": "EXACT原文保留。"
+          },
+          "publish": {
+            "type": "string",
+            "description": "SUPPORTED或BLOCKED。"
+          },
+          "validation": {
+            "type": "string",
+            "description": "ASSERTED或NOT_SUPPORTED。"
+          },
+          "reason": {
+            "type": "string",
+            "description": "准确的中文支持限制。"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SemanticSupportProfile": {
+        "type": "object",
+        "description": "有稳定版本和内容散列的真实支持策略。",
+        "required": [
+          "profileId",
+          "version",
+          "hash",
+          "reasoningMode",
+          "capabilities",
+          "comparisonBudget"
+        ],
+        "properties": {
+          "profileId": {
+            "type": "string",
+            "description": "策略标识。"
+          },
+          "version": {
+            "type": "string",
+            "description": "不可静默漂移的策略版本。"
+          },
+          "hash": {
+            "type": "string",
+            "description": "将本字段置空后的固定JSON散列。"
+          },
+          "reasoningMode": {
+            "type": "string",
+            "description": "ASSERTED_ONLY，未执行OWL推理。"
+          },
+          "capabilities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SemanticCapabilitySupport"
+            },
+            "description": "逐项二十能力支持表。"
+          },
+          "comparisonBudget": {
+            "$ref": "#/components/schemas/GraphComparisonBudget",
+            "description": "一次比较的共享预算。"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AssessmentStage": {
+        "type": "object",
+        "description": "独立语义阶段的实际执行结论。",
+        "required": [
+          "name",
+          "status",
+          "code"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "PARSE/SUPPORT/SHACL_CORE/GOVERNANCE/OWL_REASONING。"
+          },
+          "status": {
+            "$ref": "#/components/schemas/AssessmentStageStatus",
+            "description": "实际结论，未执行不冒充通过。"
+          },
+          "code": {
+            "type": "string",
+            "description": "固定安全原因码。"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AssessmentDiagnostic": {
+        "type": "object",
+        "description": "不改变历史诊断DTO的四源定位包装。",
+        "required": [
+          "sourceId",
+          "sourceHash",
+          "diagnostic",
+          "line",
+          "column"
+        ],
+        "properties": {
+          "sourceId": {
+            "type": "string",
+            "description": "ontology/shapes/vocabulary/data/bundle。"
+          },
+          "sourceHash": {
+            "type": "string",
+            "description": "准确源或bundle散列。"
+          },
+          "diagnostic": {
+            "$ref": "#/components/schemas/SemanticDiagnostic",
+            "description": "安全中文标准诊断。"
+          },
+          "line": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "format": "int32"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "无法可靠定位时为空。"
+          },
+          "column": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "format": "int32"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "无法可靠定位时为空。"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SemanticAssessment": {
+        "type": "object",
+        "description": "服务端真实执行并绑定精确修订的发布资格评估。",
+        "required": [
+          "assessmentId",
+          "validationReportId",
+          "draftId",
+          "revision",
+          "hashes",
+          "profileVersion",
+          "profileHash",
+          "assessmentHash",
+          "assessedAtUtc",
+          "expiresAtUtc",
+          "executorVersion",
+          "stages",
+          "publishEligible",
+          "diagnostics",
+          "budgetStatus"
+        ],
+        "properties": {
+          "assessmentId": {
+            "type": "string",
+            "description": "评估主键。"
+          },
+          "validationReportId": {
+            "type": "string",
+            "description": "关联的真实SHACL报告。"
+          },
+          "draftId": {
+            "type": "string",
+            "description": "已授权草稿。"
+          },
+          "revision": {
+            "type": "integer",
+            "format": "int64",
+            "description": "准确修订。"
+          },
+          "hashes": {
+            "$ref": "#/components/schemas/SourceHashes",
+            "description": "四源精确字节散列。"
+          },
+          "profileVersion": {
+            "type": "string",
+            "description": "评估使用的策略版本。"
+          },
+          "profileHash": {
+            "type": "string",
+            "description": "策略内容散列。"
+          },
+          "assessmentHash": {
+            "type": "string",
+            "description": "本字段置空后的完整评估散列。"
+          },
+          "assessedAtUtc": {
+            "type": "string",
+            "format": "date-time",
+            "description": "实际服务器评估时间。"
+          },
+          "expiresAtUtc": {
+            "type": "string",
+            "format": "date-time",
+            "description": "24小时发布资格有效期。"
+          },
+          "executorVersion": {
+            "type": "string",
+            "description": "真实语义执行版本。"
+          },
+          "stages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssessmentStage"
+            },
+            "description": "分别报告解析/支持/SHACL/治理/未执行推理。"
+          },
+          "publishEligible": {
+            "type": "boolean",
+            "description": "仅所需阶段通过且预算完成才可发布。"
+          },
+          "diagnostics": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssessmentDiagnostic"
+            },
+            "description": "四源安全定位和拒绝原因。"
+          },
+          "budgetStatus": {
+            "type": "string",
+            "description": "COMPLETE或INDETERMINATE。"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PublicationSemantics": {
+        "type": "object",
+        "description": "服务器从真实assessment取得的不可伪造发布绑定。",
+        "required": [
+          "profileVersion",
+          "profileHash",
+          "assessmentId",
+          "assessmentHash"
+        ],
+        "properties": {
+          "profileVersion": {
+            "type": "string",
+            "description": "固定策略版本。"
+          },
+          "profileHash": {
+            "type": "string",
+            "description": "固定策略内容散列。"
+          },
+          "assessmentId": {
+            "type": "string",
+            "description": "持久评估ID。"
+          },
+          "assessmentHash": {
+            "type": "string",
+            "description": "完整评估内容散列。"
+          }
+        },
+        "additionalProperties": false
+      },
+      "VersionRef": {
+        "type": "object",
+        "description": "服务器定位草稿修订或正式发布，不接受外部地址。",
+        "required": [
+          "kind",
+          "id",
+          "revision"
+        ],
+        "properties": {
+          "kind": {
+            "$ref": "#/components/schemas/VersionRefKind",
+            "description": "DRAFT或RELEASE。"
+          },
+          "id": {
+            "type": "string",
+            "description": "草稿或正式发布ID。"
+          },
+          "revision": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "format": "int64"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "草稿要求准确修订，正式发布必须为空。"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CompareVersionsRequest": {
+        "type": "object",
+        "description": "同资产完整scope的两个固定版本。",
+        "required": [
+          "from",
+          "to"
+        ],
+        "properties": {
+          "from": {
+            "$ref": "#/components/schemas/VersionRef",
+            "description": "比较基础版本。"
+          },
+          "to": {
+            "$ref": "#/components/schemas/VersionRef",
+            "description": "比较目标版本。"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GraphComparisonResult": {
+        "type": "object",
+        "description": "精确同构判断及失败关闭的预算诊断。",
+        "required": [
+          "status",
+          "code",
+          "visitedNodes",
+          "elapsedMilliseconds"
+        ],
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/GraphComparisonStatus",
+            "description": "同构、不同或无法确定。"
+          },
+          "code": {
+            "type": "string",
+            "description": "固定预算/取消/比较原因。"
+          },
+          "visitedNodes": {
+            "type": "integer",
+            "format": "int64",
+            "description": "实际搜索节点数。"
+          },
+          "elapsedMilliseconds": {
+            "type": "integer",
+            "format": "int64",
+            "description": "共享比较经过的毫秒数。"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SourceComparison": {
+        "type": "object",
+        "description": "单一权威源的字节变化与语义图比较。",
+        "required": [
+          "sourceId",
+          "leftHash",
+          "rightHash",
+          "sourceChanged",
+          "graph"
+        ],
+        "properties": {
+          "sourceId": {
+            "type": "string",
+            "description": "四源槽位名称。"
+          },
+          "leftHash": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "左源散列，缺席为空。"
+          },
+          "rightHash": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "右源散列，缺席为空。"
+          },
+          "sourceChanged": {
+            "type": "boolean",
+            "description": "原始字节或缺席状态是否不同。"
+          },
+          "graph": {
+            "$ref": "#/components/schemas/GraphComparisonResult",
+            "description": "图语义结论，与字节变化分开。"
+          }
+        },
+        "additionalProperties": false
       }
     },
     "securitySchemes": {

@@ -44,7 +44,7 @@ export type DiagnosticSeverity = "info" | "warning" | "error";
 
 export type DraftDiff = { "baseRevision": number; "targetRevision": number; "baseHashes": SourceHashes; "targetHashes": SourceHashes; "addedTriples": Array<RdfTriple>; "removedTriples": Array<RdfTriple>; "sourceDiff": string; "unsupportedDiagnostics": Array<SemanticDiagnostic> };
 
-export type DraftPublicationSnapshot = { "draft": OntologyDraft; "validation": SemanticValidationReport };
+export type DraftPublicationSnapshot = { "draft": OntologyDraft; "validation": SemanticValidationReport; "semantics"?: PublicationSemantics | null };
 
 export type EditDraftRequest = { "edit": SemanticEdit; "command": CommandContext };
 
@@ -120,9 +120,9 @@ export type RdfTriple = { "subject": RdfTerm; "predicate": string; "object": Rdf
 
 export type ReleaseActivation = { "activationId": string; "activationRevision": number; "releaseId": string; "previousReleaseId": string | null; "manifestHash": string; "manifest": ReleaseManifest; "auditId": string; "outboxEventId": string; "activatedAtUtc": string; "traceId": string };
 
-export type ReleaseManifest = { "schemaVersion": number; "releaseId": string; "assetId": string; "scope": ResourceScope; "draftId": string; "revision": number; "hashes": SourceHashes; "ontologyGraphIri": string; "dataGraphIri": string; "importLocks": Array<ImportLock>; "snapshot": AssetVersionSnapshot; "artifactObjects": Array<ArtifactObject>; "createdAtUtc": string };
+export type ReleaseManifest = { "schemaVersion": number; "releaseId": string; "assetId": string; "scope": ResourceScope; "draftId": string; "revision": number; "hashes": SourceHashes; "ontologyGraphIri": string; "dataGraphIri": string; "importLocks": Array<ImportLock>; "snapshot": AssetVersionSnapshot; "artifactObjects": Array<ArtifactObject>; "createdAtUtc": string; "semantics"?: PublicationSemantics | null };
 
-export type ReleaseProposal = { "proposalId": string; "kind": ProposalKind; "assetId": string; "scope": ResourceScope; "draftId": string | null; "draftRevision": number | null; "hashes": SourceHashes | null; "validationReportId": string | null; "targetReleaseId": string | null; "targetManifestHash": string | null; "submittedBy": string; "submittedAtUtc": string; "expiresAtUtc": string; "status": ProposalStatus; "revision": number; "approval": ApprovalRecord | null };
+export type ReleaseProposal = { "proposalId": string; "kind": ProposalKind; "assetId": string; "scope": ResourceScope; "draftId": string | null; "draftRevision": number | null; "hashes": SourceHashes | null; "validationReportId": string | null; "targetReleaseId": string | null; "targetManifestHash": string | null; "submittedBy": string; "submittedAtUtc": string; "expiresAtUtc": string; "status": ProposalStatus; "revision": number; "approval": ApprovalRecord | null; "semantics"?: PublicationSemantics | null };
 
 export type ReleaseStatus = "PREPARING" | "ARTIFACTS_VERIFIED" | "GRAPH_DEPLOYED" | "GRAPH_VERIFIED" | "ACTIVE" | "SUPERSEDED" | "FAILED_RETRYABLE" | "FAILED_FINAL";
 
@@ -193,3 +193,31 @@ export type ValidateDraftRequest = { "revision": number; "hashes": SourceHashes;
 export type ValidationIssue = { "severity": DiagnosticSeverity; "focusNode": RdfTerm | null; "path": string | null; "value": RdfTerm | null; "sourceShape": RdfTerm | null; "constraintComponent": string | null; "message": string; "sourceId": string };
 
 export type ValidationKind = "RDF_PARSE" | "SHACL_CORE" | "OWL_SUPPORT";
+
+export type GraphComparisonStatus = "EQUIVALENT" | "DIFFERENT" | "INDETERMINATE";
+
+export type AssessmentStageStatus = "PASS" | "FAIL" | "NOT_RUN" | "NOT_SUPPORTED" | "INDETERMINATE";
+
+export type VersionRefKind = "DRAFT" | "RELEASE";
+
+export type GraphComparisonBudget = { "maxBlankNodes": number; "maxSearchNodes": number; "timeoutMilliseconds": number };
+
+export type SemanticCapabilitySupport = { "id": string; "name": string; "edit": string; "preserve": string; "publish": string; "validation": string; "reason": string };
+
+export type SemanticSupportProfile = { "profileId": string; "version": string; "hash": string; "reasoningMode": string; "capabilities": Array<SemanticCapabilitySupport>; "comparisonBudget": GraphComparisonBudget };
+
+export type AssessmentStage = { "name": string; "status": AssessmentStageStatus; "code": string };
+
+export type AssessmentDiagnostic = { "sourceId": string; "sourceHash": string; "diagnostic": SemanticDiagnostic; "line": number | null; "column": number | null };
+
+export type SemanticAssessment = { "assessmentId": string; "validationReportId": string; "draftId": string; "revision": number; "hashes": SourceHashes; "profileVersion": string; "profileHash": string; "assessmentHash": string; "assessedAtUtc": string; "expiresAtUtc": string; "executorVersion": string; "stages": Array<AssessmentStage>; "publishEligible": boolean; "diagnostics": Array<AssessmentDiagnostic>; "budgetStatus": string };
+
+export type PublicationSemantics = { "profileVersion": string; "profileHash": string; "assessmentId": string; "assessmentHash": string };
+
+export type VersionRef = { "kind": VersionRefKind; "id": string; "revision": number | null };
+
+export type CompareVersionsRequest = { "from": VersionRef; "to": VersionRef };
+
+export type GraphComparisonResult = { "status": GraphComparisonStatus; "code": string; "visitedNodes": number; "elapsedMilliseconds": number };
+
+export type SourceComparison = { "sourceId": string; "leftHash": string | null; "rightHash": string | null; "sourceChanged": boolean; "graph": GraphComparisonResult };

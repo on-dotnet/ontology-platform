@@ -291,6 +291,64 @@ public enum ProviderMode
 
 }
 
+/// <summary>明确冻结的GraphComparisonStatus协议枚举，未知值不得静默接受。</summary>
+[JsonConverter(typeof(StrictStringEnumConverter<GraphComparisonStatus>))]
+public enum GraphComparisonStatus
+{
+    /// <summary>协议值EQUIVALENT。</summary>
+    [JsonStringEnumMemberName("EQUIVALENT")]
+    Equivalent,
+
+    /// <summary>协议值DIFFERENT。</summary>
+    [JsonStringEnumMemberName("DIFFERENT")]
+    Different,
+
+    /// <summary>协议值INDETERMINATE。</summary>
+    [JsonStringEnumMemberName("INDETERMINATE")]
+    Indeterminate,
+
+}
+
+/// <summary>明确冻结的AssessmentStageStatus协议枚举，未知值不得静默接受。</summary>
+[JsonConverter(typeof(StrictStringEnumConverter<AssessmentStageStatus>))]
+public enum AssessmentStageStatus
+{
+    /// <summary>协议值PASS。</summary>
+    [JsonStringEnumMemberName("PASS")]
+    Pass,
+
+    /// <summary>协议值FAIL。</summary>
+    [JsonStringEnumMemberName("FAIL")]
+    Fail,
+
+    /// <summary>协议值NOT_RUN。</summary>
+    [JsonStringEnumMemberName("NOT_RUN")]
+    NotRun,
+
+    /// <summary>协议值NOT_SUPPORTED。</summary>
+    [JsonStringEnumMemberName("NOT_SUPPORTED")]
+    NotSupported,
+
+    /// <summary>协议值INDETERMINATE。</summary>
+    [JsonStringEnumMemberName("INDETERMINATE")]
+    Indeterminate,
+
+}
+
+/// <summary>明确冻结的VersionRefKind协议枚举，未知值不得静默接受。</summary>
+[JsonConverter(typeof(StrictStringEnumConverter<VersionRefKind>))]
+public enum VersionRefKind
+{
+    /// <summary>协议值DRAFT。</summary>
+    [JsonStringEnumMemberName("DRAFT")]
+    Draft,
+
+    /// <summary>协议值RELEASE。</summary>
+    [JsonStringEnumMemberName("RELEASE")]
+    Release,
+
+}
+
 /// <summary>事件载荷唯一判别基类，kind与事件类型一致。</summary>
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "kind")]
 [JsonDerivedType(typeof(RunStartedPayload), "run.started")]
@@ -1024,6 +1082,10 @@ public sealed record ReleaseManifest : IJsonOnDeserialized, IJsonOnSerializing
     [JsonRequired]
     public DateTimeOffset CreatedAtUtc { get; init; } = default;
 
+    /// <summary>仅G3服务器生成的评估绑定；历史V1缺席不伪造。</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public PublicationSemantics? Semantics { get; init; } = null;
+
     /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
     void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
 
@@ -1125,6 +1187,10 @@ public sealed record ReleaseProposal : IJsonOnDeserialized, IJsonOnSerializing
     /// <summary>已提交审核决定。</summary>
     [JsonRequired]
     public ApprovalRecord? Approval { get; init; } = null;
+
+    /// <summary>仅G3服务器生成的评估绑定；历史V1缺席不伪造。</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public PublicationSemantics? Semantics { get; init; } = null;
 
     /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
     void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
@@ -2375,6 +2441,10 @@ public sealed record DraftPublicationSnapshot : IJsonOnDeserialized, IJsonOnSeri
     [JsonRequired]
     public SemanticValidationReport Validation { get; init; } = default!;
 
+    /// <summary>仅G3服务器生成的评估绑定；历史V1缺席不伪造。</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public PublicationSemantics? Semantics { get; init; } = null;
+
     /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
     void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
 
@@ -2420,6 +2490,355 @@ public sealed record AuditCommand : IJsonOnDeserialized, IJsonOnSerializing
     /// <summary>已授权完整资源范围。</summary>
     [JsonRequired]
     public ResourceScope Scope { get; init; } = default!;
+
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
+}
+
+/// <summary>一次四源精确图比较共享的硬预算。</summary>
+[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
+public sealed record GraphComparisonBudget : IJsonOnDeserialized, IJsonOnSerializing
+{
+    /// <summary>每个图允许的最大空白节点数。</summary>
+    [JsonRequired]
+    public int MaxBlankNodes { get; init; } = default;
+
+    /// <summary>四源共享的搜索节点总上限。</summary>
+    [JsonRequired]
+    public int MaxSearchNodes { get; init; } = default;
+
+    /// <summary>覆盖解析和比较的总毫秒上限。</summary>
+    [JsonRequired]
+    public int TimeoutMilliseconds { get; init; } = default;
+
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
+}
+
+/// <summary>单项建模能力的编辑、保留、发布与验证边界。</summary>
+[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
+public sealed record SemanticCapabilitySupport : IJsonOnDeserialized, IJsonOnSerializing
+{
+    /// <summary>二十项能力的固定编号。</summary>
+    [JsonRequired]
+    public string Id { get; init; } = string.Empty;
+
+    /// <summary>中文能力名称。</summary>
+    [JsonRequired]
+    public string Name { get; init; } = string.Empty;
+
+    /// <summary>BASIC或SOURCE。</summary>
+    [JsonRequired]
+    public string Edit { get; init; } = string.Empty;
+
+    /// <summary>EXACT原文保留。</summary>
+    [JsonRequired]
+    public string Preserve { get; init; } = string.Empty;
+
+    /// <summary>SUPPORTED或BLOCKED。</summary>
+    [JsonRequired]
+    public string Publish { get; init; } = string.Empty;
+
+    /// <summary>ASSERTED或NOT_SUPPORTED。</summary>
+    [JsonRequired]
+    public string Validation { get; init; } = string.Empty;
+
+    /// <summary>准确的中文支持限制。</summary>
+    [JsonRequired]
+    public string Reason { get; init; } = string.Empty;
+
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
+}
+
+/// <summary>有稳定版本和内容散列的真实支持策略。</summary>
+[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
+public sealed record SemanticSupportProfile : IJsonOnDeserialized, IJsonOnSerializing
+{
+    /// <summary>策略标识。</summary>
+    [JsonRequired]
+    public string ProfileId { get; init; } = string.Empty;
+
+    /// <summary>不可静默漂移的策略版本。</summary>
+    [JsonRequired]
+    public string Version { get; init; } = string.Empty;
+
+    /// <summary>将本字段置空后的固定JSON散列。</summary>
+    [JsonRequired]
+    public string Hash { get; init; } = string.Empty;
+
+    /// <summary>ASSERTED_ONLY，未执行OWL推理。</summary>
+    [JsonRequired]
+    public string ReasoningMode { get; init; } = string.Empty;
+
+    /// <summary>逐项二十能力支持表。</summary>
+    [JsonRequired]
+    public SemanticCapabilitySupport[] Capabilities { get; init; } = [];
+
+    /// <summary>一次比较的共享预算。</summary>
+    [JsonRequired]
+    public GraphComparisonBudget ComparisonBudget { get; init; } = default!;
+
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
+}
+
+/// <summary>独立语义阶段的实际执行结论。</summary>
+[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
+public sealed record AssessmentStage : IJsonOnDeserialized, IJsonOnSerializing
+{
+    /// <summary>PARSE/SUPPORT/SHACL_CORE/GOVERNANCE/OWL_REASONING。</summary>
+    [JsonRequired]
+    public string Name { get; init; } = string.Empty;
+
+    /// <summary>实际结论，未执行不冒充通过。</summary>
+    [JsonRequired]
+    public AssessmentStageStatus Status { get; init; } = default;
+
+    /// <summary>固定安全原因码。</summary>
+    [JsonRequired]
+    public string Code { get; init; } = string.Empty;
+
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
+}
+
+/// <summary>不改变历史诊断DTO的四源定位包装。</summary>
+[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
+public sealed record AssessmentDiagnostic : IJsonOnDeserialized, IJsonOnSerializing
+{
+    /// <summary>ontology/shapes/vocabulary/data/bundle。</summary>
+    [JsonRequired]
+    public string SourceId { get; init; } = string.Empty;
+
+    /// <summary>准确源或bundle散列。</summary>
+    [JsonRequired]
+    public string SourceHash { get; init; } = string.Empty;
+
+    /// <summary>安全中文标准诊断。</summary>
+    [JsonRequired]
+    public SemanticDiagnostic Diagnostic { get; init; } = default!;
+
+    /// <summary>无法可靠定位时为空。</summary>
+    [JsonRequired]
+    public int? Line { get; init; } = null;
+
+    /// <summary>无法可靠定位时为空。</summary>
+    [JsonRequired]
+    public int? Column { get; init; } = null;
+
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
+}
+
+/// <summary>服务端真实执行并绑定精确修订的发布资格评估。</summary>
+[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
+public sealed record SemanticAssessment : IJsonOnDeserialized, IJsonOnSerializing
+{
+    /// <summary>评估主键。</summary>
+    [JsonRequired]
+    public string AssessmentId { get; init; } = string.Empty;
+
+    /// <summary>关联的真实SHACL报告。</summary>
+    [JsonRequired]
+    public string ValidationReportId { get; init; } = string.Empty;
+
+    /// <summary>已授权草稿。</summary>
+    [JsonRequired]
+    public string DraftId { get; init; } = string.Empty;
+
+    /// <summary>准确修订。</summary>
+    [JsonRequired]
+    public long Revision { get; init; } = default;
+
+    /// <summary>四源精确字节散列。</summary>
+    [JsonRequired]
+    public SourceHashes Hashes { get; init; } = default!;
+
+    /// <summary>评估使用的策略版本。</summary>
+    [JsonRequired]
+    public string ProfileVersion { get; init; } = string.Empty;
+
+    /// <summary>策略内容散列。</summary>
+    [JsonRequired]
+    public string ProfileHash { get; init; } = string.Empty;
+
+    /// <summary>本字段置空后的完整评估散列。</summary>
+    [JsonRequired]
+    public string AssessmentHash { get; init; } = string.Empty;
+
+    /// <summary>实际服务器评估时间。</summary>
+    [JsonRequired]
+    public DateTimeOffset AssessedAtUtc { get; init; } = default;
+
+    /// <summary>24小时发布资格有效期。</summary>
+    [JsonRequired]
+    public DateTimeOffset ExpiresAtUtc { get; init; } = default;
+
+    /// <summary>真实语义执行版本。</summary>
+    [JsonRequired]
+    public string ExecutorVersion { get; init; } = string.Empty;
+
+    /// <summary>分别报告解析/支持/SHACL/治理/未执行推理。</summary>
+    [JsonRequired]
+    public AssessmentStage[] Stages { get; init; } = [];
+
+    /// <summary>仅所需阶段通过且预算完成才可发布。</summary>
+    [JsonRequired]
+    public bool PublishEligible { get; init; } = default;
+
+    /// <summary>四源安全定位和拒绝原因。</summary>
+    [JsonRequired]
+    public AssessmentDiagnostic[] Diagnostics { get; init; } = [];
+
+    /// <summary>COMPLETE或INDETERMINATE。</summary>
+    [JsonRequired]
+    public string BudgetStatus { get; init; } = string.Empty;
+
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
+}
+
+/// <summary>服务器从真实assessment取得的不可伪造发布绑定。</summary>
+[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
+public sealed record PublicationSemantics : IJsonOnDeserialized, IJsonOnSerializing
+{
+    /// <summary>固定策略版本。</summary>
+    [JsonRequired]
+    public string ProfileVersion { get; init; } = string.Empty;
+
+    /// <summary>固定策略内容散列。</summary>
+    [JsonRequired]
+    public string ProfileHash { get; init; } = string.Empty;
+
+    /// <summary>持久评估ID。</summary>
+    [JsonRequired]
+    public string AssessmentId { get; init; } = string.Empty;
+
+    /// <summary>完整评估内容散列。</summary>
+    [JsonRequired]
+    public string AssessmentHash { get; init; } = string.Empty;
+
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
+}
+
+/// <summary>服务器定位草稿修订或正式发布，不接受外部地址。</summary>
+[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
+public sealed record VersionRef : IJsonOnDeserialized, IJsonOnSerializing
+{
+    /// <summary>DRAFT或RELEASE。</summary>
+    [JsonRequired]
+    public VersionRefKind Kind { get; init; } = default;
+
+    /// <summary>草稿或正式发布ID。</summary>
+    [JsonRequired]
+    public string Id { get; init; } = string.Empty;
+
+    /// <summary>草稿要求准确修订，正式发布必须为空。</summary>
+    [JsonRequired]
+    public long? Revision { get; init; } = null;
+
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
+}
+
+/// <summary>同资产完整scope的两个固定版本。</summary>
+[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
+public sealed record CompareVersionsRequest : IJsonOnDeserialized, IJsonOnSerializing
+{
+    /// <summary>比较基础版本。</summary>
+    [JsonRequired]
+    public VersionRef From { get; init; } = default!;
+
+    /// <summary>比较目标版本。</summary>
+    [JsonRequired]
+    public VersionRef To { get; init; } = default!;
+
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
+}
+
+/// <summary>精确同构判断及失败关闭的预算诊断。</summary>
+[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
+public sealed record GraphComparisonResult : IJsonOnDeserialized, IJsonOnSerializing
+{
+    /// <summary>同构、不同或无法确定。</summary>
+    [JsonRequired]
+    public GraphComparisonStatus Status { get; init; } = default;
+
+    /// <summary>固定预算/取消/比较原因。</summary>
+    [JsonRequired]
+    public string Code { get; init; } = string.Empty;
+
+    /// <summary>实际搜索节点数。</summary>
+    [JsonRequired]
+    public long VisitedNodes { get; init; } = default;
+
+    /// <summary>共享比较经过的毫秒数。</summary>
+    [JsonRequired]
+    public long ElapsedMilliseconds { get; init; } = default;
+
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
+}
+
+/// <summary>单一权威源的字节变化与语义图比较。</summary>
+[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
+public sealed record SourceComparison : IJsonOnDeserialized, IJsonOnSerializing
+{
+    /// <summary>四源槽位名称。</summary>
+    [JsonRequired]
+    public string SourceId { get; init; } = string.Empty;
+
+    /// <summary>左源散列，缺席为空。</summary>
+    [JsonRequired]
+    public string? LeftHash { get; init; } = null;
+
+    /// <summary>右源散列，缺席为空。</summary>
+    [JsonRequired]
+    public string? RightHash { get; init; } = null;
+
+    /// <summary>原始字节或缺席状态是否不同。</summary>
+    [JsonRequired]
+    public bool SourceChanged { get; init; } = default;
+
+    /// <summary>图语义结论，与字节变化分开。</summary>
+    [JsonRequired]
+    public GraphComparisonResult Graph { get; init; } = default!;
 
     /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
     void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);

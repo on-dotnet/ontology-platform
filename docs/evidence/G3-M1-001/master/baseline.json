@@ -1,0 +1,33 @@
+{
+  "baseSha": "d6aab6b47e63c9d5deadfa480f6659c62c5ed138",
+  "doctor": {
+    "command": "pwsh -NoProfile -File scripts/doctor.ps1 -CheckDocker",
+    "exitCode": 0,
+    "scope": "工具版本和Docker元数据"
+  },
+  "selfTest": {
+    "command": "pwsh -NoProfile -File scripts/verify.ps1 -SelfTest",
+    "exitCode": 0,
+    "reviewPackageTests": 54,
+    "scope": "原始主树基线，产品测试NOT_RUN"
+  },
+  "initialNoRestoreBuild": {
+    "exitCode": 1,
+    "reason": "15个project.assets.json缺失"
+  },
+  "initialWeb": {
+    "exitCode": 1,
+    "reason": "pnpm恢复前提缺失"
+  },
+  "lockedRestore": {
+    "exitCode": 0,
+    "lockChanges": false
+  },
+  "webAfterFrozenRestore": {
+    "exitCode": 0,
+    "scope": "lint/typecheck/Vitest/build，OIDC另外验收"
+  },
+  "generatedTypesBaseline": {
+    "exitCode": 0
+  }
+}

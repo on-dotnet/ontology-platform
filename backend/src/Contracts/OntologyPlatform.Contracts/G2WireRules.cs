@@ -39,6 +39,15 @@ internal static class G2WireRules
         }
         switch (value)
         {
+            case ReleaseManifest manifest:
+                ReleaseManifestCompatibility.Validate(manifest);
+                break;
+            case PublicationSemantics binding:
+                ReleaseManifestCompatibility.ValidateBinding(binding);
+                break;
+            case VersionRef reference when string.IsNullOrWhiteSpace(reference.Id)
+                || (reference.Kind == VersionRefKind.Draft ? reference.Revision is null or < 1 : reference.Revision is not null):
+                throw new JsonException("版本定位与修订判别不一致。");
             case SemanticDatum datum:
                 // 恰好一个分支非空且与kind一致，禁止全空、混合和错配。
                 var validDatum = datum.Kind switch

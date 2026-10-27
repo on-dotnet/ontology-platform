@@ -1,3 +1,9 @@
+# G3-M1-001 当前授权增量（2026-10-27）
+
+状态：IN_PROGRESS。用户正式批准[实施授权V1](../evidence/G3-M1-001/authorization-v1.md)全部M1任务。Base d6aab6b47e63c9d5deadfa480f6659c62c5ed138（已fetch）。Master独立托管Worktree，公共契约/迁移/CI单写，合同独立审查后SEM/FE独立树并行，持续提交推送与独立审查后增量main集成；完成真实PG/Jena/RustFS/Web/兼容验收、同HeadCI、V2唯一包及仅本任务资源收尾。任务见[G3-M1-001](G3-M1-001.md)。只M1，不启动M2–M5、不新增直接依赖/Monaco/收费模型/系统改动、不删历史refs/旧树/G2卷，不重写历史制品。历史授权/失败/PARTIAL均保留。
+
+---
+
 # PRE-G3-CLEANUP-FIX-002 当前授权增量（2026-10-26）
 
 当前 **READY_FOR_REVIEW / PARTIAL**。266唯一资源已实际回收，284次资源变更命令尝试、568日志；后验18history内存tombstone已由e40修复、40回归/新同HeadCI、原18精确重验和实际自然新代际无回现闭环。其余248项实效保持；保留环境T1四项健康通过，T3仅保留集/元数据核验且未再次启动AppHost，未改默认网络/全局配置/内部DB；最终同HeadCI/唯一ZIP/旧包后置回收读取真实manifest及交付回执，不在Git预填未来事实。人类正式批准[整改附件V1](../evidence/PRE-G3-CLEANUP-FIX-002/authorization-v1.md)全部执行，上一轮Review V2通过、实际Git/Worktree/Docker清理缺口由本任务整改。已关闭阶段不再要求无法获得的旧聊天不存在证明；保护当前任务、私有资料与真实独特未集成成果，逐项列阻断。允许精确安全白名单真实Apply、工具/测试、公开history只读检查、独立Review/同HeadCI、Master集成main/push与唯一ZIP。具体见[任务卡](PRE-G3-CLEANUP-FIX-002.md)。Base de2c020c486df5557b1b17f6b62c1befd96312f2。存在安全候选却0删除为FAIL。不改G2业务、不进入G3、不重写Git历史/全局清理/付费调用。此新授权覆盖先前统一KEEP/DEFERRED的推定，历史事实仍保留。
