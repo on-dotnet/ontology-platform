@@ -30,10 +30,10 @@
     },
     {
       "name": "actual-resource-closeout",
-      "command": null,
-      "status": "NOT_RUN",
-      "exitCode": null,
-      "output": "待运行结束、已提交CLOSED证明/白名单/独立Review/同HeadCI后真实Apply"
+      "command": "pwsh -NoProfile -File scripts/maintenance/cleanup-resources.ps1 -Root /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform -PlanPath /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/artifacts/g3-m2/cleanup/project-plan.json -Apply -LogPath /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/artifacts/g3-m2/cleanup/project-apply.jsonl",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "真实fixture1+project8卷Apply共9条rm exit0；精确inspect均no-such-volume；8G2 fingerprints/42旧refs/11保护树保留；2worker已原生归档；物理SSD及旧停止栈live health未认证"
     },
     {
       "name": "Monaco",
@@ -69,6 +69,27 @@
       "status": "NOT_RUN",
       "exitCode": null,
       "output": "本地有限观测不构成生产SLO/HA认证"
+    },
+    {
+      "name": "retained-development-toolchain",
+      "command": "pwsh -NoProfile -File scripts/doctor.ps1 -CheckDocker",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "清理后doctor exit0；SDK/Node/pnpm/Docker仍可用，不代表旧停止栈live health"
+    },
+    {
+      "name": "postcleanup-compatible-reader",
+      "command": "PLATFORM_EVIDENCE_DIR=docs/evidence/G3-M2-001/postcleanup G3_READER_IDENTITY_SHA=cd33609522b18f9b5497377a24f518ff73b411f7b8455fd06aa1a2d48afaa806 python3 scripts/acceptance/g3-compatibility.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "清理后真实strict reader1项0skip；126members unchanged；不是旧G2宿主降级认证"
+    },
+    {
+      "name": "final-selftest",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1 -SelfTest",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "清理后完整SelfTest exit0：ReviewPackage96/0、Cleanup46/0、Canonical16/0及其余正反边界均通过；工程测试不代替已另行真实产品验收"
     }
   ],
   "ci": {

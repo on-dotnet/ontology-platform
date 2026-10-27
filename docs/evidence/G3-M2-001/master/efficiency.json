@@ -1,0 +1,77 @@
+{
+  "taskId": "G3-M2-001",
+  "taskStartedAtUtc": "2026-10-27T14:03:45+00:00",
+  "observedThroughUtc": "2026-10-27T16:53:37.986586+00:00",
+  "wallClock": "start from goal timestamp; final completion UTC belongs to external delivery receipt",
+  "activeWorkSeconds": "UNKNOWN",
+  "categories": [
+    {
+      "category": "preflight-environment",
+      "startUtc": "2026-10-27T14:06:59.046277Z",
+      "endUtc": "2026-10-27T14:12:04.711467Z",
+      "interpretation": "observed snapshots/check receipt, not continuous active duration"
+    },
+    {
+      "category": "implementation-and-parallel-review",
+      "startUtc": "UNKNOWN",
+      "endUtc": "UNKNOWN",
+      "interpretation": "actual task/commit/review evidence preserved; no active-hours inference"
+    },
+    {
+      "category": "environment-rework-canonical",
+      "startUtc": "2026-10-27T15:06:10.409003Z",
+      "endUtc": "2026-10-27T15:06:40.684008Z",
+      "interpretation": "actual cold+hit command interval; older CI 600s timeouts separately retained"
+    },
+    {
+      "category": "tests-full-attempt",
+      "startUtc": "2026-10-27T16:03:35.2574000+00:00",
+      "endUtc": "2026-10-27T16:16:36.3563520+00:00",
+      "status": "FAIL",
+      "interpretation": "12stages PASS, browser timeout31PASS; not repeated whole pipeline"
+    },
+    {
+      "category": "tests-runtime-repair",
+      "startUtc": "2026-10-27T16:18:14.487813+00:00",
+      "endUtc": "2026-10-27T16:19:51.286320+00:00",
+      "status": "PASS",
+      "interpretation": "only affected7runtime gates;263browser/M2 91"
+    },
+    {
+      "category": "CI-and-wait",
+      "startUtc": "UNKNOWN",
+      "endUtc": "UNKNOWN",
+      "interpretation": "exact actual run/job timestamps in CI JSON; overlapping intervals not summed"
+    },
+    {
+      "category": "packaging-preflight",
+      "startUtc": "UNKNOWN",
+      "endUtc": "UNKNOWN",
+      "interpretation": "actual stableHead V3 create+independent reopen before full business gate; failures preserved"
+    },
+    {
+      "category": "cleanup-and-final-packaging",
+      "startUtc": "2026-10-27T16:38:56.015125+00:00",
+      "endUtc": "2026-10-27T16:39:05.454005+00:00",
+      "interpretation": "exact eight-volume project Apply command interval only; fixture wrapper start UNKNOWN; final packaging timestamps external receipt",
+      "status": "PASS_PROJECT_APPLY"
+    },
+    {
+      "category": "postcleanup-final-selftest",
+      "startUtc": "UNKNOWN",
+      "endUtc": "2026-10-27T16:53:37.986586+00:00",
+      "status": "PASS",
+      "interpretation": "actual command exit0; exact active duration UNKNOWN"
+    }
+  ],
+  "lessons": [
+    "preflight+contract before2writers",
+    "canonical cold once/content-addressed reuse; bounded official fallback checksum before extraction",
+    "two actual early vertical points and stableHead replays before final gate",
+    "V3 fixture early, real prepackage before final business gate",
+    "only failed layer replay after explicit diagnosis; no timeout-budget widening",
+    "source/format/test/review/commit/sameHeadCI/uniqueV3/reopen/receipt freeze sequence",
+    "raw process telemetry/local archives with exact immutable Git-object restoration index;4representativePNG only"
+  ],
+  "nextMilestones": "M3-M5 NOT_AUTHORIZED"
+}

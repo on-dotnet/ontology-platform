@@ -5,3 +5,5 @@
 既有独立逐blob审查结论保留：bootstrap-keycloak.py三个blob为环境引用/运行时随机生成表达式，无字面真实凭证；verify-alloy-boundary.py三个blob为Docker标准宿主别名与本地合成Sink测试。准确OID和类别在public-history.json，历史独立依据见docs/evidence/PRE-G3-CLEANUP-FIX-002/public-history-triage.md。
 
 限定有限模式+准确既有triage匹配PASS；任意混淆、语义隐私、未获取远端/不可达对象NOT_VERIFIED。本地refs/codex辅助快照不能等同已公开对象。此次没有读取卷/私有runtime内容，也未触碰远端历史。
+
+候选c0c3后置实际重扫：390提交/3290唯一blob，含完整原始遥测Git对象，6项路径/类别/blob与既有集合精确相同，0新增/0遗漏；scanner exit2原样保留。精确报告public-history-candidate.json。最终后续纯证据提交仍受SelfTest/同HeadCI/V3有限模式校验，不把此390计数冒称未来全历史快照。

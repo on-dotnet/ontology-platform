@@ -1,0 +1,106 @@
+{
+  "observedAtUtc": "2026-10-27T16:40:37.773017+00:00",
+  "status": "PASS",
+  "actualDeletedVolumes": 9,
+  "fixtureVolumes": 1,
+  "projectRuntimeVolumes": 8,
+  "containerCountAfter": 0,
+  "volumeCountAfter": 8,
+  "worktreeCountAfter": 11,
+  "allInitialProtectedTreesRetained": true,
+  "dockerBackend": {
+    "context": "desktop-linux",
+    "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016",
+    "serverVersion": "29.9.2"
+  },
+  "checks": [
+    {
+      "target": "g2-ef979bd04cc0-alloy-data",
+      "status": "KEEP_METADATA_MATCH",
+      "fingerprint": "6b7d8f2088db33a3f743b3f43c3cd20d9387f738c9ed934736d5fe9ba3867d63"
+    },
+    {
+      "target": "g2-ef979bd04cc0-fuseki-data",
+      "status": "KEEP_METADATA_MATCH",
+      "fingerprint": "9c975afbe4b00c2fc8fb112ebbe2494c6adfc926f1521d15846215185d71051c"
+    },
+    {
+      "target": "g2-ef979bd04cc0-grafana-data",
+      "status": "KEEP_METADATA_MATCH",
+      "fingerprint": "6311cd20581114301d64dcc05f4ade3ef64d9d613ea3cae31b036fa1d3dda9e2"
+    },
+    {
+      "target": "g2-ef979bd04cc0-loki-data",
+      "status": "KEEP_METADATA_MATCH",
+      "fingerprint": "82b4954fe2688e0023d248f5b86d4159cb708879a9cbb2017b6007c955f4885b"
+    },
+    {
+      "target": "g2-ef979bd04cc0-postgres-data",
+      "status": "KEEP_METADATA_MATCH",
+      "fingerprint": "e08c1fb3ab8555b31d5df0bf5e9f6892ad1a0f7afae636c64bbaf5579bf8cd8e"
+    },
+    {
+      "target": "g2-ef979bd04cc0-prometheus-data",
+      "status": "KEEP_METADATA_MATCH",
+      "fingerprint": "366b1141be0fd71597c7e3ecee671d3a9f812afc5f708c36b7509e0af2ee63ca"
+    },
+    {
+      "target": "g2-ef979bd04cc0-rustfs-data",
+      "status": "KEEP_METADATA_MATCH",
+      "fingerprint": "0dcea276858f3f5ab0f9bec259549c0c9232cf544a4b402da74b652e438d7981"
+    },
+    {
+      "target": "g2-ef979bd04cc0-tempo-data",
+      "status": "KEEP_METADATA_MATCH",
+      "fingerprint": "7be17d66d7d58bb66eb53b5513d77b70f2fe6c4fca88331485c48e163264cc71"
+    },
+    {
+      "target": "g3-m2-8fb61910c7c7-alloy-data",
+      "status": "ABSENT_EXACT_NO_SUCH_VOLUME",
+      "inspectExitCode": 1
+    },
+    {
+      "target": "g3-m2-8fb61910c7c7-fuseki-data",
+      "status": "ABSENT_EXACT_NO_SUCH_VOLUME",
+      "inspectExitCode": 1
+    },
+    {
+      "target": "g3-m2-8fb61910c7c7-grafana-data",
+      "status": "ABSENT_EXACT_NO_SUCH_VOLUME",
+      "inspectExitCode": 1
+    },
+    {
+      "target": "g3-m2-8fb61910c7c7-loki-data",
+      "status": "ABSENT_EXACT_NO_SUCH_VOLUME",
+      "inspectExitCode": 1
+    },
+    {
+      "target": "g3-m2-8fb61910c7c7-postgres-data",
+      "status": "ABSENT_EXACT_NO_SUCH_VOLUME",
+      "inspectExitCode": 1
+    },
+    {
+      "target": "g3-m2-8fb61910c7c7-prometheus-data",
+      "status": "ABSENT_EXACT_NO_SUCH_VOLUME",
+      "inspectExitCode": 1
+    },
+    {
+      "target": "g3-m2-8fb61910c7c7-rustfs-data",
+      "status": "ABSENT_EXACT_NO_SUCH_VOLUME",
+      "inspectExitCode": 1
+    },
+    {
+      "target": "g3-m2-8fb61910c7c7-tempo-data",
+      "status": "ABSENT_EXACT_NO_SUCH_VOLUME",
+      "inspectExitCode": 1
+    },
+    {
+      "target": "g3-m2-cleanup-fixture-4f0eb45b63-postgres-data",
+      "status": "ABSENT_EXACT_NO_SUCH_VOLUME",
+      "inspectExitCode": 1
+    }
+  ],
+  "capacity": "{\"Active\":\"0\",\"Reclaimable\":\"5.356GB (91%)\",\"Size\":\"5.859GB\",\"TotalCount\":\"11\",\"Type\":\"Images\"}\n{\"Active\":\"0\",\"Reclaimable\":\"0B\",\"Size\":\"0B\",\"TotalCount\":\"0\",\"Type\":\"Containers\"}\n{\"Active\":\"0\",\"Reclaimable\":\"619.3MB (100%)\",\"Size\":\"619.3MB\",\"TotalCount\":\"8\",\"Type\":\"Local Volumes\"}\n{\"Active\":\"0\",\"Reclaimable\":\"40.99kB\",\"Size\":\"609MB\",\"TotalCount\":\"18\",\"Type\":\"Build Cache\"}",
+  "physicalReclaimedBytes": "NOT_VERIFIED",
+  "stoppedOldPrimaryDevHealth": "NOT_RUN;0containers at start and after; metadata retained, no old runtime/volume contents read"
+}

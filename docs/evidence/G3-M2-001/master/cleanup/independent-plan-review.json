@@ -1,0 +1,27 @@
+{
+  "reviewer": "/root/slice_review",
+  "status": "CONDITIONAL_PASS",
+  "fixturePlanSha256": "0792cbc88c466e8f9f5aec83f8ce83a7d918f69b09328cd2d7c90df999b32ce3",
+  "projectPlanSha256": "919e658326cb25a42b6e97822a011367ffebe878197590ae08544d8e2f404b78",
+  "actualVolumes": 17,
+  "referencesEmpty": true,
+  "actualContainers": 0,
+  "protectedWorktrees": 11,
+  "oldG2KeepVolumes": 8,
+  "dockerBackend": {
+    "context": "desktop-linux",
+    "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016",
+    "serverVersion": "29.9.2"
+  },
+  "ownership": "8 runtime volumes cross-proven by 20 actual task/run labelled container observations and exact mount/creation times; isolated fixture exact labels; no volume or private runtime contents read",
+  "conditions": [
+    "c0c3d7b6dc43acee7563844570eb40c3776db34f actual sameHeadCI both jobs success",
+    "main exact fast-forward to c0c3",
+    "unchanged approved hashes, within expiry, executor real DryRun",
+    "fixture real Apply/absence verified first",
+    "project plan fresh DryRun then exact Apply"
+  ],
+  "dryRunPerformed": false,
+  "applyPerformed": false,
+  "expiresAtUtc": "2026-10-27T18:26:28.026972Z"
+}
