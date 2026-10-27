@@ -45,7 +45,9 @@ class CanonicalTests(unittest.TestCase):
             self.assertEqual(cli.call_count, 1)
     def test_changed_existing_tag_is_refused(self):
         with patch.object(self.mod, 'invoke', return_value=subprocess.CompletedProcess([],0,json.dumps({'Id':'sha256:'+'a'*64,'Labels':{}}),'')):
-            with self.assertRaises(self.mod.BuildRefused): self.mod.ensure_image(self.context,'TEST-001','fixture')
+            with self.assertRaises(self.mod.BuildRefused) as caught: self.mod.ensure_image(self.context,'TEST-001','fixture')
+            self.assertEqual(caught.exception.diagnostic['command'][:3],['docker','image','inspect'])
+            self.assertIn('sha256',caught.exception.diagnostic['stdout'])
     def test_socket_or_inspect_errors_do_not_trigger_build(self):
         with patch.object(self.mod, 'invoke', return_value=subprocess.CompletedProcess([],1,'','permission denied')) as cli:
             with self.assertRaises(self.mod.BuildRefused): self.mod.ensure_image(self.context,'TEST-001','fixture')
