@@ -1,0 +1,69 @@
+be538c5fb7096c9d4d407aef3cca447df1d1aa01a181632f2a14935eaad1f98f
+127.0.0.1:64421
+03d6fe7140479e1e250a7d38d5ccf87cd11bf205f1bb64d0743ea1c662badc2a
+127.0.0.1:64428
+  OntologyPlatform.Contracts -> /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/bin/Debug/net10.0/OntologyPlatform.Contracts.dll
+  OntologyPlatform.Modules.Ontology.Domain -> /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.Domain.dll
+  OntologyPlatform.Modules.Governance -> /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/bin/Debug/net10.0/OntologyPlatform.Modules.Governance.dll
+  OntologyPlatform.Modules.Ontology -> /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.dll
+  OntologyPlatform.SemanticTests -> /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:00.50
+工具“dotnet-ef”(版本“10.0.13”)已还原。可用的命令: dotnet-ef
+
+还原成功。
+Failed executing DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM governance."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261025062847_InitialGovernance'.
+Applying migration '20261025144246_AuditScopeSites'.
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Done.
+Failed executing DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM ontology."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261026003221_InitialOntology'.
+Applying migration '20261027032135_G3Assessments'.
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Done.
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+失败 G3MergedShaclDiagnosticNeverGuessesDataSource ("ontology") (643ms)
+  从 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+  Assertion failed. 预期条件为 true。
+
+  actual: false
+
+  Assert.IsTrue(assessment.Diagnostics.All(item => item.SourceId == "bundle" && item.SourceHash == draft.Hashes.BundleHash))
+    在 OntologyPlatform.SemanticTests.DraftRevisionTests.G3MergedShaclDiagnosticNeverGuessesDataSource(String focusSource) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs:538
+    在 OntologyPlatform.SemanticTests.DraftRevisionTests.G3MergedShaclDiagnosticNeverGuessesDataSource(String focusSource) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs:542
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+失败 G3MergedShaclDiagnosticNeverGuessesDataSource ("vocabulary") (35ms)
+  从 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+  Assertion failed. 预期条件为 true。
+
+  actual: false
+
+  Assert.IsTrue(assessment.Diagnostics.All(item => item.SourceId == "bundle" && item.SourceHash == draft.Hashes.BundleHash))
+    在 OntologyPlatform.SemanticTests.DraftRevisionTests.G3MergedShaclDiagnosticNeverGuessesDataSource(String focusSource) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs:538
+    在 OntologyPlatform.SemanticTests.DraftRevisionTests.G3MergedShaclDiagnosticNeverGuessesDataSource(String focusSource) 位于 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs:542
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+/Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64) 失败并出现 2 个错误 (1s 798ms)
+退出代码: 2
+
+测试运行摘要: 失败!
+  总计: 2
+  失败: 2
+  成功: 0
+  已跳过: 0
+  持续时间: 2s 341ms
+已完成测试运行，但显示非成功退出代码: 2 (请参阅: https://aka.ms/testingplatform/exitcodes)
+g3-m1-sem-diagnostic-c67801abcd46
+g3-m1-sem-diagnostic-c67801abcd46-pg
