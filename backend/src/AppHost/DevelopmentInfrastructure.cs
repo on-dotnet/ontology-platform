@@ -44,7 +44,7 @@ internal static class DevelopmentInfrastructure
         var keycloakDatabase = postgres.AddDatabase("keycloak-database", "keycloak");
 
         // 自建镜像只使用带固定校验和的 Apache 官方发行包，不冒称官方预构建镜像。
-        var fuseki = builder.AddDockerfile("fuseki", "../../../infra/development/fuseki")
+        var fuseki = CanonicalFusekiImage.Add(builder)
             .WithHttpEndpoint(port: 13030, targetPort: 3030, name: "http")
             .WithVolume($"{volumePrefix}-fuseki-data", "/fuseki/databases")
             .WithArgs("--tdb2", "--loc=/fuseki/databases/ontology", "--update", "/ontology")

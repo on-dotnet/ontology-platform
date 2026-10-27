@@ -12,7 +12,9 @@ history containing the exact target/taskId and CLOSED/已关闭 and synthetic/�
 an auditable assertion, not a replacement for independent human review.
 The legacy PRE-G3 task keeps its existing operation contract. G3-M1-001 accepts
 only its own g3-m1- named volumes with same-task committed ownership; it cannot
-delete Git/history/images or legacy volumes. Managed worker trees use native
+delete Git/history/images or legacy volumes. G3-M1-CLOSEOUT-002 permits only
+Docker types backed by same-task committed proof, exact metadata fingerprints
+and explicitly empty volume/image container references. Managed worker trees use native
 archive_worktree after separate review and ignored-data inspection.
 
 History operations additionally require historyBackend={context,engineId,bridgeId,
@@ -355,7 +357,7 @@ class Cleaner:
         require(isinstance(p, dict), 'Plan must be object')
         required = {'schemaVersion','taskId','project','repositoryRoot','gitCommonDir','originUrl','expectedMainSha','createdAt','expiresAt','allowedWorktreeRoots','protectedWorktrees','keep','operations'}
         require(required <= p.keys(), 'Missing plan fields')
-        require(type(p['schemaVersion']) is int and p['schemaVersion'] == 1 and p['project'] == PROJECT and p['taskId'] in ('PRE-G3-CLEANUP-FIX-002', 'G3-M1-001'), 'Plan identity mismatch')
+        require(type(p['schemaVersion']) is int and p['schemaVersion'] == 1 and p['project'] == PROJECT and p['taskId'] in ('PRE-G3-CLEANUP-FIX-002', 'G3-M1-001', 'G3-M1-CLOSEOUT-002'), 'Plan identity mismatch')
         require(absolute(p['repositoryRoot']).resolve() == self.root, 'Repository root mismatch')
         require(self.git('rev-parse', '--show-toplevel').stdout.strip() == str(self.root), 'Root must be Git toplevel')
         common = Path(self.git('rev-parse', '--path-format=absolute', '--git-common-dir').stdout.strip()).resolve()
@@ -385,6 +387,17 @@ class Cleaner:
                         and isinstance(op.get('ownershipEvidence'), dict)
                         and op['ownershipEvidence'].get('taskId') == 'G3-M1-001',
                         'M1 cleanup only accepts own named volumes')
+            if p['taskId'] == 'G3-M1-CLOSEOUT-002':
+                require(op['type'] in ('docker-container','docker-volume','docker-image','docker-history')
+                        and isinstance(op.get('ownershipEvidence'), dict)
+                        and op['ownershipEvidence'].get('taskId') == 'G3-M1-CLOSEOUT-002',
+                        'Closeout accepts only Docker resources with same-task committed proof')
+                require(isinstance(op.get('fingerprint'),str) and HEX64.fullmatch(op['fingerprint']), 'Closeout requires exact Docker metadata fingerprint')
+                if op['type'] in ('docker-volume','docker-image'):
+                    require(op.get('expectedReferences') == [], 'Closeout requires explicitly empty container references')
+                if op['type'] == 'docker-volume':
+                    require(re.fullmatch(r'g2-[a-z0-9]+-(postgres-data|fuseki-data|rustfs-data|keycloak-data|alloy-data|grafana-data|loki-data|tempo-data|prometheus-data)',op['target']),
+                            'Closeout volume outside reviewed G2 environment categories')
             self.ownership(op)
             if op['type'] == 'cache':
                 for earlier in self.ops[:i]:
@@ -553,11 +566,13 @@ class Cleaner:
             require(c['Id']==target and c['Name']==op.get('expectedName') and c['Image']==op.get('expectedImage') and IMAGE.fullmatch(c['Image']),'Container identity changed')
             require(c['State']==op.get('expectedState') and c['State'] in ('exited','created','dead'),'Container active or state changed')
             require(c['Mounts']==op.get('expectedMounts'),'Container mounts changed')
+            if self.plan['taskId']=='G3-M1-CLOSEOUT-002': require(op['fingerprint']==digest(c),'Closeout container fingerprint changed')
             return c
         if typ=='docker-volume':
             require(re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.-]{0,150}',target),'Invalid volume name')
             v=safe_docker_snapshot(typ,target)
             require(v==dict(Name=target,Driver=op.get('expectedDriver'),CreatedAt=op.get('expectedCreatedAt')) and v['Driver']=='local' and isinstance(v['CreatedAt'],str) and v['CreatedAt'],'Volume identity changed')
+            if self.plan['taskId']=='G3-M1-CLOSEOUT-002': require(op['fingerprint']==digest(v),'Closeout volume fingerprint changed')
             v['references']=self.references(op,preflight)
             return v
         if typ=='docker-image':
@@ -567,6 +582,7 @@ class Cleaner:
             require(isinstance(tags,list) and tags and all(isinstance(t,str) and re.fullmatch(r'fuseki:[0-9a-f]{40}',t) for t in tags),'Only proven duplicate Fuseki tags allowed')
             require(image==dict(Id=target,RepoTags=sorted(tags)),'Image identity/tags changed')
             require(not any(t in self.keep for t in tags),'Kept image tag')
+            if self.plan['taskId']=='G3-M1-CLOSEOUT-002': require(op['fingerprint']==digest(image),'Closeout image fingerprint changed')
             image['references']=self.references(op,preflight)
             return image
         require(typ=='docker-history' and op.get('builder')=='desktop-linux' and re.fullmatch(r'[a-z0-9]{6,64}',target),'Invalid history identity/builder')

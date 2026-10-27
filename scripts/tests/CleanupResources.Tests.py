@@ -337,6 +337,49 @@ p.write_text(json.dumps(s))
                 self.assertIn('Plan identity mismatch' if mutation == 'M2' else 'M1 cleanup only accepts own named volumes', result.stderr)
                 self.assertFalse(any('rm' in row for row in json.loads(self.state_path.read_text())['calls']))
 
+    def closeout_fixture(self):
+        self.docker_fixture()
+        target = 'g2-old-postgres-data'
+        (self.root / 'proof.txt').write_text('G3-M1-CLOSEOUT-002 CLOSED synthetic ' + target + ' sha256:' + 'b'*64 + ' hist123\n')
+        self.git('add', 'proof.txt')
+        self.git('commit', '-m', 'closed old G2 synthetic fixture')
+        self.main = self.git('rev-parse', 'HEAD').stdout.strip()
+        self.git('push', 'origin', 'main')
+        self.git('update-ref', 'refs/remotes/origin/main', self.main)
+        self.plan.update(taskId='G3-M1-CLOSEOUT-002', expectedMainSha=self.main)
+        state = json.loads(self.state_path.read_text())
+        state['volumes'][0]['Name'] = target
+        self.state_path.write_text(json.dumps(state))
+        self.plan['operations'] = [dict(type='docker-volume', target=target, expectedDriver='local',
+                                       expectedCreatedAt='2026-01-01T00:00:00Z',
+                                       fingerprint=hashlib.sha256(json.dumps(dict(Name=target,Driver='local',CreatedAt='2026-01-01T00:00:00Z'),sort_keys=True,separators=(',',':')).encode()).hexdigest(), expectedReferences=[],
+                                       ownershipEvidence=dict(commit=self.main, path='proof.txt', taskId='G3-M1-CLOSEOUT-002', closed=True, synthetic=True))]
+
+    def test_closeout_exact_legacy_volume_apply_and_retained_resources(self):
+        self.closeout_fixture()
+        result = self.run_engine()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        result = self.run_engine(True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        state = json.loads(self.state_path.read_text())
+        self.assertEqual(len(state['volumes']), 0)
+        self.assertEqual(len(state['containers']), 1)
+        self.assertEqual(len(state['images']), 1)
+
+    def test_closeout_rejects_git_foreign_owner_and_foreign_volume(self):
+        self.closeout_fixture()
+        original = copy.deepcopy(self.plan)
+        for mutation in ('git','owner','foreign','fingerprint','references'):
+            self.plan=copy.deepcopy(original)
+            if mutation=='git': self.plan['operations'][0].update(type='git-local-branch',target='codex/old',expectedTip=self.main)
+            if mutation=='owner': self.plan['operations'][0]['ownershipEvidence']['taskId']='TASK-OLD'
+            if mutation=='foreign': self.plan['operations'][0]['target']='another-project-postgres-data'
+            if mutation=='fingerprint': self.plan['operations'][0]['fingerprint']='0'*64
+            if mutation=='references': self.plan['operations'][0]['expectedReferences']=['a'*64]
+            result=self.run_engine(True)
+            self.assertNotEqual(result.returncode,0)
+            self.assertFalse(any('rm' in row for row in json.loads(self.state_path.read_text())['calls']))
+
     def test_docker_keep_replaced_name_and_active_refs_reject(self):
         for mutation in ('keep','replaced','refs','running','foreign'):
             with self.subTest(mutation=mutation):

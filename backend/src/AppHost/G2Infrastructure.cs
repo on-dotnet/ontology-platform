@@ -15,7 +15,7 @@ internal static class G2Infrastructure
         AddG2SemanticResources(this IDistributedApplicationBuilder builder, string prefix)
     {
         // 复用批准发行包和JRE的精确摘要，Java日志关闭原文出口且堆上限512MiB。
-        var jena = builder.AddDockerfile("fuseki", "../../../infra/development/fuseki")
+        var jena = CanonicalFusekiImage.Add(builder)
             .WithEntrypoint("java")
             .WithArgs("-Xmx512m", "-Dlog4j.configurationFile=/opt/fuseki/g2-log4j2.properties", "-jar", "/opt/fuseki/fuseki-server.jar", "--config=/opt/fuseki/g2-config.ttl")
             .WithHttpEndpoint(port: 13030, targetPort: 3030, name: "http")
