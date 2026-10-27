@@ -1,0 +1,47 @@
+c6df41d470afa57bc577e400a9fd7fd97b8d710efb9e2109a1fe6f8f0ed5547a
+127.0.0.1:64617
+45e9ece77b51242e1e2a0319e370b405cf942408b070862b4d9046f29f136b6a
+127.0.0.1:64627
+  OntologyPlatform.Contracts -> /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/bin/Debug/net10.0/OntologyPlatform.Contracts.dll
+  OntologyPlatform.Modules.Ontology.Domain -> /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.Domain.dll
+  OntologyPlatform.Modules.Governance -> /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/bin/Debug/net10.0/OntologyPlatform.Modules.Governance.dll
+  OntologyPlatform.Modules.Ontology -> /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.dll
+  OntologyPlatform.SemanticTests -> /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:00.54
+工具“dotnet-ef”(版本“10.0.13”)已还原。可用的命令: dotnet-ef
+
+还原成功。
+Failed executing DbCommand (7ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM governance."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261025062847_InitialGovernance'.
+Applying migration '20261025144246_AuditScopeSites'.
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Done.
+Failed executing DbCommand (7ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM ontology."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261026003221_InitialOntology'.
+Applying migration '20261027032135_G3Assessments'.
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Done.
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)
+/Users/chasen/.codex/worktrees/g3-m1-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64) 已通过 (28s 765ms)
+
+测试运行摘要: 已通过!
+  总计: 96
+  失败: 0
+  成功: 96
+  已跳过: 0
+  持续时间: 29s 057ms
+g3-m1-sem-diagnostic-92e684af3525
+g3-m1-sem-diagnostic-92e684af3525-pg
