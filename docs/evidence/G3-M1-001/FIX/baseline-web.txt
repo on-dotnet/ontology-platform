@@ -1,0 +1,78 @@
+Scope: all 2 workspace projects
+✓ Lockfile passes supply-chain policies (verified 1d ago)
+Lockfile is up to date, resolution step is skipped
+Progress: resolved 1, reused 0, downloaded 0, added 0
+Packages: +391
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Progress: resolved 391, reused 0, downloaded 4, added 0
+Packages are cloned from the content-addressable store to the virtual store.
+  Content-addressable store is at: /Users/chasen/.codex/worktrees/g3-m1-fix/ontology-platform/.tools/pnpm-store/v11
+  Virtual store is at:             node_modules/.pnpm
+Progress: resolved 391, reused 0, downloaded 40, added 40
+[WARN] Tarball download average speed 40 KiB/s (size 40 KiB) is below 50 KiB/s: https://registry.npmjs.org/@tailwindcss/node/-/node-4.3.3.tgz (GET)
+Progress: resolved 391, reused 0, downloaded 74, added 74
+Progress: resolved 391, reused 0, downloaded 118, added 118
+[WARN] Tarball download average speed 46 KiB/s (size 78 KiB) is below 50 KiB/s: https://registry.npmjs.org/@eslint-community/eslint-utils/-/eslint-utils-4.10.1.tgz (GET)
+[WARN] Tarball download average speed 47 KiB/s (size 152 KiB) is below 50 KiB/s: https://registry.npmjs.org/styled-jsx/-/styled-jsx-5.1.6.tgz (GET)
+Progress: resolved 391, reused 0, downloaded 173, added 172
+Progress: resolved 391, reused 0, downloaded 231, added 231
+Progress: resolved 391, reused 0, downloaded 290, added 290
+[WARN] Tarball download average speed 42 KiB/s (size 85 KiB) is below 50 KiB/s: https://registry.npmjs.org/lightningcss/-/lightningcss-1.33.0.tgz (GET)
+Progress: resolved 391, reused 0, downloaded 360, added 360
+Progress: resolved 391, reused 0, downloaded 372, added 372
+Progress: resolved 391, reused 0, downloaded 373, added 373
+Progress: resolved 391, reused 0, downloaded 374, added 373
+Progress: resolved 391, reused 0, downloaded 378, added 378
+Progress: resolved 391, reused 0, downloaded 379, added 378
+Progress: resolved 391, reused 0, downloaded 384, added 384
+Progress: resolved 391, reused 0, downloaded 386, added 386
+Progress: resolved 391, reused 0, downloaded 387, added 386
+Progress: resolved 391, reused 0, downloaded 389, added 389
+Progress: resolved 391, reused 0, downloaded 390, added 389
+Progress: resolved 391, reused 0, downloaded 390, added 390
+Progress: resolved 391, reused 0, downloaded 391, added 390
+Progress: resolved 391, reused 0, downloaded 391, added 391, done
+
+Done in 1m 4.8s using pnpm v11.28.8
+$ eslint .
+$ tsc --noEmit
+$ vitest run
+
+ RUN  v5.0.5 /Users/chasen/.codex/worktrees/g3-m1-fix/ontology-platform/apps/web
+
+
+ Test Files  9 passed (9)
+      Tests  109 passed (109)
+   Start at  12:42:26
+   Duration  803ms (tests 51%, transform 33%, import 10%, worker 5%)
+
+$ next build
+▲ Next.js 16.4.3 (Turbopack)
+✓ Running next.config.ts took 649ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 920ms
+  Running TypeScript ...
+  Finished TypeScript in 1066ms ...
+  Collecting page data using 9 workers ...
+  Generating static pages using 9 workers (0/4) ...
+  Generating static pages using 9 workers (1/4)
+  Generating static pages using 9 workers (2/4)
+  Generating static pages using 9 workers (3/4)
+✓ Generating static pages using 9 workers (4/4) in 124ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ƒ /
+├ ○ /_not-found
+├ ƒ /analysis
+├ ○ /icon.svg
+├ ƒ /ontologies
+├ ƒ /releases
+└ ○ /signed-out
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
+PASS: exact Node/pnpm; separate Web lint/typecheck/test/build. Real OIDC/E2E is a separate acceptance.

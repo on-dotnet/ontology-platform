@@ -1,0 +1,297 @@
+RUN  v5.0.5 /Users/chasen/.codex/worktrees/g3-m1-fix/ontology-platform/apps/web
+
+ ❯ src/features/ontology/source-import-race.test.ts (13 tests | 13 failed) 44ms
+   ❯ 实际TSX延迟文件导入不能覆盖后发用户操作 (13)
+     × 延迟期间修改名称和另一个源，完成时只合并导入源 5ms
+     × 同源新键入使先前文件读取失效 2ms
+     × 同源两个导入乱序完成，最后发起的文件获胜 3ms
+     × 不同源乱序完成保留两个导入，不恢复旧整份缓冲 3ms
+     × 切换草稿后旧读取不能恢复前一个草稿 3ms
+     × 同草稿保存成新修订后拒绝旧revision读取 7ms
+     × 显式丢弃后旧读取不能重新制造dirty 3ms
+     × 切换到新建缓冲后旧草稿读取不能进入新资产 3ms
+     × 新建缓冲发起导入后打开草稿，旧结果不能留在隐藏新建缓冲 4ms
+     × 会话身份改变后旧读取不能提交 3ms
+     × 后发超限导入也应使先前读取失效 3ms
+     × 旧失败不得覆盖新成功导入的可见状态 3ms
+     × 卸载后旧导入不得修改已存在的缓冲 2ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 13 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/features/ontology/source-import-race.test.ts > 实际TSX延迟文件导入不能覆盖后发用户操作 > 延迟期间修改名称和另一个源，完成时只合并导入源
+AssertionError: expected '资产甲' to be '等待期间新名称' // Object.is equality
+
+Expected: "等待期间新名称"
+Received: "资产甲"
+
+ ❯ src/features/ontology/source-import-race.test.ts:177:25
+    175|     pending.resolve("\uFEFF# imported 🏭\r\n");
+    176|     await pending.done;
+    177|     expect(view.name()).toBe("等待期间新名称");
+       |                         ^
+    178|     expect(view.sourceProps().sources.dataTurtle).toBe("# newer data\n…
+    179|     expect(view.sourceProps().sources.ontologyTurtle).toBe("\uFEFF# im…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/13]⎯
+
+ FAIL  src/features/ontology/source-import-race.test.ts > 实际TSX延迟文件导入不能覆盖后发用户操作 > 同源新键入使先前文件读取失效
+AssertionError: expected '# old file\n' to be '# newer typing\n' // Object.is equality
+
+- Expected
++ Received
+
+- # newer typing
++ # old file
+
+
+ ❯ src/features/ontology/source-import-race.test.ts:187:55
+    185|     pending.resolve("# old file\n");
+    186|     await pending.done;
+    187|     expect(view.sourceProps().sources.ontologyTurtle).toBe("# newer ty…
+       |                                                       ^
+    188|   });
+    189|   it("同源两个导入乱序完成，最后发起的文件获胜", async () => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/13]⎯
+
+ FAIL  src/features/ontology/source-import-race.test.ts > 实际TSX延迟文件导入不能覆盖后发用户操作 > 同源两个导入乱序完成，最后发起的文件获胜
+AssertionError: expected '# first file\n' to be '# second file\n' // Object.is equality
+
+- Expected
++ Received
+
+- # second file
++ # first file
+
+
+ ❯ src/features/ontology/source-import-race.test.ts:197:55
+    195|     first.resolve("# first file\n");
+    196|     await first.done;
+    197|     expect(view.sourceProps().sources.ontologyTurtle).toBe("# second f…
+       |                                                       ^
+    198|   });
+    199|   it("不同源乱序完成保留两个导入，不恢复旧整份缓冲", async () => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/13]⎯
+
+ FAIL  src/features/ontology/source-import-race.test.ts > 实际TSX延迟文件导入不能覆盖后发用户操作 > 不同源乱序完成保留两个导入，不恢复旧整份缓冲
+AssertionError: expected '# data original\r\n' to be '# imported data\n' // Object.is equality
+
+- Expected
++ Received
+
+- # imported data
++ # data original
+
+
+ ❯ src/features/ontology/source-import-race.test.ts:208:51
+    206|     ontology.resolve("# imported ontology\n");
+    207|     await ontology.done;
+    208|     expect(view.sourceProps().sources.dataTurtle).toBe("# imported dat…
+       |                                                   ^
+    209|     expect(view.sourceProps().sources.ontologyTurtle).toBe("# imported…
+    210|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/13]⎯
+
+ FAIL  src/features/ontology/source-import-race.test.ts > 实际TSX延迟文件导入不能覆盖后发用户操作 > 切换草稿后旧读取不能恢复前一个草稿
+AssertionError: expected '资产甲' to be '资产乙' // Object.is equality
+
+Expected: "资产乙"
+Received: "资产甲"
+
+ ❯ src/features/ontology/source-import-race.test.ts:217:25
+    215|     pending.resolve("# old draft file\n");
+    216|     await pending.done;
+    217|     expect(view.name()).toBe("资产乙");
+       |                         ^
+    218|     expect(view.sourceProps().sources).toEqual(other.sources);
+    219|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/13]⎯
+
+ FAIL  src/features/ontology/source-import-race.test.ts > 实际TSX延迟文件导入不能覆盖后发用户操作 > 同草稿保存成新修订后拒绝旧revision读取
+AssertionError: expected { …(4) } to deeply equal { …(4) }
+
+- Expected
++ Received
+
+  {
+    "dataTurtle": "# data original
+  ",
+-   "ontologyTurtle": "# ontology original
++   "ontologyTurtle": "# revision1 old file
+  ",
+    "shapesTurtle": "# shapes original
+  ",
+    "vocabularyTurtle": null,
+  }
+
+ ❯ src/features/ontology/source-import-race.test.ts:231:40
+    229|     expect(text(view.render())).toContain("revision 2");
+    230|     expect(view.name()).toBe("revision2名称");
+    231|     expect(view.sourceProps().sources).toEqual(draft.sources);
+       |                                        ^
+    232|   });
+    233|   it("显式丢弃后旧读取不能重新制造dirty", async () => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/13]⎯
+
+ FAIL  src/features/ontology/source-import-race.test.ts > 实际TSX延迟文件导入不能覆盖后发用户操作 > 显式丢弃后旧读取不能重新制造dirty
+AssertionError: expected '待丢弃名称' to be '资产甲' // Object.is equality
+
+Expected: "资产甲"
+Received: "待丢弃名称"
+
+ ❯ src/features/ontology/source-import-race.test.ts:240:25
+    238|     pending.resolve("# discarded file\n");
+    239|     await pending.done;
+    240|     expect(view.name()).toBe("资产甲");
+       |                         ^
+    241|     expect(view.sourceProps().sources).toEqual(draft.sources);
+    242|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/13]⎯
+
+ FAIL  src/features/ontology/source-import-race.test.ts > 实际TSX延迟文件导入不能覆盖后发用户操作 > 切换到新建缓冲后旧草稿读取不能进入新资产
+AssertionError: expected '资产甲' to be '新建资产' // Object.is equality
+
+Expected: "新建资产"
+Received: "资产甲"
+
+ ❯ src/features/ontology/source-import-race.test.ts:250:25
+    248|     pending.resolve("# old draft file\n");
+    249|     await pending.done;
+    250|     expect(view.name()).toBe("新建资产");
+       |                         ^
+    251|     expect(view.sourceProps().sources.ontologyTurtle).toBe("");
+    252|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/13]⎯
+
+ FAIL  src/features/ontology/source-import-race.test.ts > 实际TSX延迟文件导入不能覆盖后发用户操作 > 新建缓冲发起导入后打开草稿，旧结果不能留在隐藏新建缓冲
+AssertionError: expected '# obsolete new asset file\n' to be '' // Object.is equality
+
+- Expected
++ Received
+
++ # obsolete new asset file
++
+
+ ❯ src/features/ontology/source-import-race.test.ts:261:55
+    259|     await pending.done;
+    260|     view.click("新建 / 导入资产");
+    261|     expect(view.sourceProps().sources.ontologyTurtle).toBe("");
+       |                                                       ^
+    262|   });
+    263|   it("会话身份改变后旧读取不能提交", async () => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/13]⎯
+
+ FAIL  src/features/ontology/source-import-race.test.ts > 实际TSX延迟文件导入不能覆盖后发用户操作 > 会话身份改变后旧读取不能提交
+AssertionError: expected { …(4) } to deeply equal { …(4) }
+
+- Expected
++ Received
+
+  {
+    "dataTurtle": "# data original
+  ",
+-   "ontologyTurtle": "# ontology original
++   "ontologyTurtle": "# previous identity
+  ",
+    "shapesTurtle": "# shapes original
+  ",
+    "vocabularyTurtle": null,
+  }
+
+ ❯ src/features/ontology/source-import-race.test.ts:269:40
+    267|     pending.resolve("# previous identity\n");
+    268|     await pending.done;
+    269|     expect(view.sourceProps().sources).toEqual(draft.sources);
+       |                                        ^
+    270|   });
+    271|   it("后发超限导入也应使先前读取失效", async () => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/13]⎯
+
+ FAIL  src/features/ontology/source-import-race.test.ts > 实际TSX延迟文件导入不能覆盖后发用户操作 > 后发超限导入也应使先前读取失效
+AssertionError: expected { …(4) } to deeply equal { …(4) }
+
+- Expected
++ Received
+
+  {
+    "dataTurtle": "# data original
+  ",
+-   "ontologyTurtle": "# ontology original
++   "ontologyTurtle": "# earlier file
+  ",
+    "shapesTurtle": "# shapes original
+  ",
+    "vocabularyTurtle": null,
+  }
+
+ ❯ src/features/ontology/source-import-race.test.ts:277:40
+    275|     pending.resolve("# earlier file\n");
+    276|     await pending.done;
+    277|     expect(view.sourceProps().sources).toEqual(draft.sources);
+       |                                        ^
+    278|     expect(view.errors().join("")).toContain("超过256 KiB");
+    279|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/13]⎯
+
+ FAIL  src/features/ontology/source-import-race.test.ts > 实际TSX延迟文件导入不能覆盖后发用户操作 > 旧失败不得覆盖新成功导入的可见状态
+AssertionError: expected [ '源文件不是有效UTF8或无法读取，未载入且原始缓冲保持不变。' ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "源文件不是有效UTF8或无法读取，未载入且原始缓冲保持不变。",
++ ]
+
+ ❯ src/features/ontology/source-import-race.test.ts:289:27
+    287|     await first.done;
+    288|     expect(view.sourceProps().sources.ontologyTurtle).toBe("# second f…
+    289|     expect(view.errors()).toEqual([]);
+       |                           ^
+    290|   });
+    291|   it("卸载后旧导入不得修改已存在的缓冲", async () => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/13]⎯
+
+ FAIL  src/features/ontology/source-import-race.test.ts > 实际TSX延迟文件导入不能覆盖后发用户操作 > 卸载后旧导入不得修改已存在的缓冲
+AssertionError: expected { …(4) } to deeply equal { …(4) }
+
+- Expected
++ Received
+
+  {
+    "dataTurtle": "# data original
+  ",
+-   "ontologyTurtle": "# ontology original
++   "ontologyTurtle": "# unmounted read
+  ",
+    "shapesTurtle": "# shapes original
+  ",
+    "vocabularyTurtle": null,
+  }
+
+ ❯ src/features/ontology/source-import-race.test.ts:297:40
+    295|     pending.resolve("# unmounted read\n");
+    296|     await pending.done;
+    297|     expect(view.sourceProps().sources).toEqual(draft.sources);
+       |                                        ^
+    298|   });
+    299| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/13]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  13 failed (13)
+   Start at  12:45:35
+   Duration  126ms (tests 58%, transform 26%, import 15%, worker 1%)
