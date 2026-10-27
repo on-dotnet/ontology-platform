@@ -17,6 +17,7 @@ public sealed class G3BoundaryTests
         Assert.IsTrue(typeof(IG3OntologyService).IsAssignableFrom(typeof(OntologyService)), "缺少持久评估与版本比较应用服务。");
         Assert.IsTrue(typeof(IG3SemanticRuntime).IsAssignableFrom(typeof(JenaSemanticRuntime)), "缺少有界精确图比较。");
     }
+
     /// <summary>策略固定二十行、四维边界和确定性内容散列。</summary>
     [TestMethod]
     public void ProfileHasExactMatrixAndStableHash()
@@ -31,6 +32,7 @@ public sealed class G3BoundaryTests
         Assert.AreEqual("1", profile.Version);
         Assert.AreEqual("ASSERTED_ONLY", profile.ReasoningMode);
         Assert.AreEqual(OntologyRules.Hash(JsonSerializer.Serialize(profile with { Hash = "" })), profile.Hash);
+        // 逐项核验固定二十行能力状态，索引对应01至20的档案编号。
         for (var index = 0; index < 20; index++)
         {
             Assert.AreEqual((index + 1).ToString("D2"), profile.Capabilities[index].Id);
@@ -56,6 +58,7 @@ public sealed class G3BoundaryTests
         Assert.AreEqual(GraphComparisonStatus.Equivalent, (await ((IG3SemanticRuntime)(object)runtime).CompareSourcesAsync(left, right, default))[0].Graph.Status);
         Assert.AreEqual(GraphComparisonStatus.Different, (await ((IG3SemanticRuntime)(object)runtime).CompareSourcesAsync(left, different, default))[0].Graph.Status);
     }
+
     /// <summary>二十个真实Turtle语料逐项验证支持矩阵，有限命名公理只允许源码发布。</summary>
     [TestMethod]
     public async Task TwentyCorpusRowsUseAssertedOnlySupportAndShapesBlankException()

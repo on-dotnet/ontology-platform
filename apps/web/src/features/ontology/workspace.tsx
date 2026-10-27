@@ -8,6 +8,7 @@ import { SemanticError } from "../../components/ui/semantic-feedback";
 import { draftState, isDirty, isNewDraftDirty, updateSource, type DraftState } from "./draft-state";
 import { StructuralForm } from "./structural-form";
 import { SourceEditor } from "./source-editor";
+import { SourceImportSession, type SourceImportHandle } from "./source-import";
 import { SupportProfile } from "./support-profile";
 import { AssessmentPanel } from "./assessment-panel";
 import { VersionComparison } from "./version-comparison";
@@ -44,6 +45,7 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
   const [reason, setReason] = useState("");
   const [retry, setRetry] = useState<SaveDraftRequest | null>(null);
   const lifetime = useRef<AbortController | null>(null);
+  const sourceImports = useRef(new SourceImportSession());
   const dirty = state ? isDirty(state) : isNewDraftDirty(name, sources);
   const canEdit = identity.roles.includes("platform.operator");
   const selectedScope = identity.scopes[Number(scopeIndex)];
@@ -51,14 +53,19 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
 
   useEffect(() => {
     const controller = new AbortController();
+    const imports = sourceImports.current;
     lifetime.current = controller;
     client.drafts(controller.signal)
       .then(items => { if (!controller.signal.aborted) setDrafts(items); })
       .catch(cause => { if (!controller.signal.aborted) setError(cause); })
       .finally(() => { if (!controller.signal.aborted) setLoading(false); });
     void loadProfile(controller.signal);
-    return () => controller.abort();
+    return () => { imports.invalidate(); controller.abort(); };
   }, []);
+
+  useEffect(() => {
+    sourceImports.current.invalidate();
+  }, [identity.subjectId]);
 
   useEffect(() => {
     if (!dirty) return;
@@ -99,6 +106,7 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
 
   /** 用户显式操作才发送写请求；卸载传播取消，不创建重复命令。 */
   async function execute(action: (signal: AbortSignal) => Promise<void>) {
+    sourceImports.current.invalidate();
     setBusy(true);
     setError(null);
     setNotice("");
@@ -114,6 +122,7 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
 
   /** 仅接受服务器已提交的修订；子面板按草稿ID和revision重置验证状态。 */
   function accept(draft: OntologyDraft) {
+    sourceImports.current.invalidate();
     setState(draftState(draft));
     setRemote(null);
     setRetry(null);
@@ -131,6 +140,28 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
       accept(await client.draft(draft.draftId, signal));
       setTab("source");
     });
+  }
+
+  /** 冻结读取目标，完成时按当前缓冲合并；不同源/名称的新修改不会被旧闭包覆盖。 */
+  function beginImport(field: keyof SourceBundle): SourceImportHandle {
+    const imports = sourceImports.current;
+    const ticket = imports.begin(field, { draftId: state?.draft.draftId ?? null, revision: state?.draft.revision ?? null });
+    return {
+      isCurrent: () => imports.isCurrent(ticket),
+      commit: value => {
+        if (!imports.isCurrent(ticket)) return;
+        if (ticket.draftId === null) {
+          setSources(current => imports.isCurrent(ticket) ? { ...current, [field]: value } : current);
+        } else {
+          setState(current => {
+            if (!imports.isCurrent(ticket) || !current || current.draft.draftId !== ticket.draftId
+              || current.draft.revision !== ticket.revision) return current;
+            return updateSource(current, field, value);
+          });
+        }
+        setRetry(null);
+      },
+    };
   }
 
   /** 保存冲突时state保持原样；显式重试才复用同一完整payload和幂等键。 */
@@ -191,6 +222,7 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
           )}
           <button className="button" disabled={busy} onClick={() => {
             if (dirty) { setNotice("未保存草稿仍保留，请先保存或显式丢弃。"); return; }
+            sourceImports.current.invalidate();
             setState(null);
             setRemote(null);
             setTab("source");
@@ -207,8 +239,9 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
             <input
               aria-label="资产名称" value={state?.name ?? name} disabled={busy || !canEdit} maxLength={200}
               onChange={event => {
-                if (state) setState({ ...state, name: event.target.value });
-                else setName(event.target.value);
+                const nextName = event.target.value;
+                if (state) setState(current => current ? { ...current, name: nextName } : current);
+                else setName(nextName);
                 setRetry(null);
               }}
             />
@@ -246,13 +279,16 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
           )}
           <SourceEditor
             sources={state?.sources ?? sources} field={field} onField={setField} readOnly={busy || !canEdit}
+            onBeginImport={beginImport}
             onAbsent={() => {
-              if (state) setState({ ...state, sources: { ...state.sources, vocabularyTurtle: null } });
+              sourceImports.current.invalidate("vocabularyTurtle");
+              if (state) setState(current => current ? { ...current, sources: { ...current.sources, vocabularyTurtle: null } } : current);
               else setSources(current => ({ ...current, vocabularyTurtle: null }));
               setRetry(null);
             }}
             onChange={(key, value) => {
-              if (state) setState(updateSource(state, key, value));
+              sourceImports.current.invalidate(key);
+              if (state) setState(current => current ? updateSource(current, key, value) : current);
               else setSources(current => ({ ...current, [key]: value }));
               setRetry(null);
             }}
@@ -265,7 +301,8 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
           </label>
           {dirty && (
             <button className="button" disabled={busy} onClick={() => {
-              if (state) setState(draftState(state.draft));
+              sourceImports.current.invalidate();
+              if (state) setState(current => current ? draftState(current.draft) : current);
               else { setName(""); setSources({ ...emptySources }); }
               setRemote(null);
               setRetry(null);
