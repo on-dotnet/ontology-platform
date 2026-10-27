@@ -1,0 +1,13 @@
+CANONICAL_FAILURE_RECEIPT {"ciContext": {}, "contextSha256": "91fe0bd348406b1af5c600ba3bb5e2738e19dc672cedfa5e9722edb8f05c5c8d", "elapsedSeconds": 8.915, "failure": {"command": ["docker", "build", "--tag", "ontology-platform-fuseki:context-91fe0bd348406b1af5c600ba3bb5e2738e19dc672cedfa5e9722edb8f05c5c8d", "--label", "org.opencontainers.image.source=https://github.com/on-dotnet/ontology-platform", "--label", "io.ontology-platform.context-sha256=91fe0bd348406b1af5c600ba3bb5e2738e19dc672cedfa5e9722edb8f05c5c8d", "--label", "io.ontology-platform.task-id=G3-M2-001", "--label", "io.ontology-platform.run-id=download-repair-cold", "<repository>/infra/development/fuseki"], "elapsedSeconds": 8.896, "errorCategories": ["CHECKSUM_MISMATCH", "BUILD_ERROR"], "exitCode": 1, "stageWindow": [{"phase": "LOAD_DEFINITION", "step": 1}, {"phase": "DONE", "step": 1}, {"phase": "LOAD_METADATA", "step": 2}, {"phase": "DONE", "step": 2}, {"phase": "LOAD_IGNORE", "step": 3}, {"phase": "DONE", "step": 3}, {"phase": "FROM", "step": 4}, {"phase": "CACHED", "step": 4}, {"phase": "LOAD_CONTEXT", "step": 5}, {"phase": "DONE", "step": 5}, {"phase": "COPY", "step": 6}, {"phase": "ERROR", "step": 6}], "stderr": {"sha256": "8a03cb98c679a6349e4fbce2c95a563a2bdbcaabcd9b5812ff27cfb3e7f00b8a", "sizeBytes": 1659}, "stdout": {"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", "sizeBytes": 0}, "timeoutSeconds": 600}, "observedAt": "2026-10-27T15:02:41.215392+00:00", "reason": "Canonical Fuseki build failed; raw output suppressed", "runId": "download-repair-cold", "schemaVersion": 1, "status": "FAILED", "taskId": "G3-M2-001"}
+REFUSED: Canonical Fuseki build failed; raw output suppressed
+Traceback (most recent call last):
+  File "<stdin>", line 8, in <module>
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/subprocess.py", line 473, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+               **kwargs).stdout
+               ^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/subprocess.py", line 578, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['python3', 'scripts/maintenance/canonical_fuseki.py', '--task-id', 'G3-M2-001', '--run-id', 'download-repair-cold']' returned non-zero exit status 1.

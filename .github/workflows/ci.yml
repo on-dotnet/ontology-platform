@@ -64,6 +64,11 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - name: Preflight canonical Fuseki before application restore
+        shell: pwsh
+        run: |
+          python3 scripts/maintenance/canonical_fuseki.py --task-id G3-M2-001 --run-id ('ci-preflight-' + $env:GITHUB_RUN_ID + '-' + $env:GITHUB_RUN_ATTEMPT)
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:
           global-json-file: global.json
@@ -80,5 +85,6 @@ jobs:
       - name: Real G2 semantic publishing query MCP MAF and native SSE integration
         shell: pwsh
         env:
-          PLATFORM_EVIDENCE_DIR: docs/evidence/G3-M1-001/ci
+          PLATFORM_EVIDENCE_DIR: docs/evidence/G3-M2-001/ci
+          PLATFORM_TASK_ID: G3-M2-001
         run: ./scripts/acceptance/g2-integration.ps1

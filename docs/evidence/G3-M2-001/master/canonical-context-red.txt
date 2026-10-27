@@ -1,0 +1,14 @@
+F
+======================================================================
+FAIL: test_unique_dockerfile_verifies_before_extracting_without_version_change (__main__.CanonicalDownloadTests.test_unique_dockerfile_verifies_before_extracting_without_version_change)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/scripts/tests/CanonicalFuseki.Tests.py", line 207, in test_unique_dockerfile_verifies_before_extracting_without_version_change
+    self.assertIn('!fetch-fuseki.sh',(ROOT/'infra/development/fuseki/.dockerignore').read_text())
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: '!fetch-fuseki.sh' not found in '*\n!Dockerfile\n!entrypoint.sh\n!g2-config.ttl\n!g2-log4j2.properties\n'
+
+----------------------------------------------------------------------
+Ran 1 test in 0.000s
+
+FAILED (failures=1)

@@ -17,3 +17,5 @@
 
 
 canonical构建失败必须原子保留严格allowlist receipt：安全命令/TaskId/RunId/context hash、退出或TIMEOUT/耗时、输出hash/size、有限静态BuildKit阶段和固定错误类别；同时输出同一脱敏摘要供临时CI日志恢复。不能只返回generic REFUSED或只留下临时runner本地路径，不输出原始env/buildargs/秘密，不为了PASS任意延长预算或无限retry。
+
+M2起canonical冷下载采用固定Apache dlcdn/archive同版本主备、原SHA512与HTTPS限跳，每次最多180秒且最多2次；成功下载后坏hash立即失败，不将hash失败当网络fallback。外层600秒保持。CI先canonical冷构建再restore，后续集成必须命中相同内容寻址镜像并记录实际receipt，禁止重复随机build。真实冷构建与cache-hit计数另验，静态规则不是产品PASS。

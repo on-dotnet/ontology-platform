@@ -39,3 +39,7 @@ Master新增契约测试：G2ContractTests/G3M2EditContractTests.cs与SecurityTe
 ## 测试与集成点
 
 先畸形/未知/缺失JSON、If-Match、权限、revision、未支持语义/生成漂移廉价测试，再独立Reviewer只读通过。SEM先提交最小命名编辑+PG/Jena/assessment纵向切片，独立Review/同HeadCI后Master尽早main集成（点1）；WEB真实UI→API编辑/保存/重读后同样集成（点2）。每点记录Head及实际CI。最终发布/查询/回滚、旧兼容、主题键盘窄屏完整门禁。canonical Fuseki只经现有内容寻址入口并复核cache hit；V3早期fixture及稳定候选非最终包，再唯一最终包/独立重开。资源精确归属只清本任务，旧树/8保护卷等实际before对象全部保留，不全局prune。
+
+## Canonical 下载修订（M2 环境关口，FROZEN / 独立限定审查PASS）
+
+9bac/SEM/point1三个实际CI检查点在canonical RUN阶段超时600s，业务未启动，旧失败保留。Master新增owned_paths=infra/development/fuseki/Dockerfile、.dockerignore、fetch-fuseki.sh、scripts/tests/CanonicalFuseki.Tests.py、g2-integration与CI；其余Owner不写这些路径。版本6.2.0、SHA512、基础镜像摘要、许可证不变，无新直接依赖。官网https://jena.apache.org/download/与官方.sha512核对匹配原锁。唯一Dockerfile调用有界下载helper：固定dlcdn primary/archive fallback，每次connect15/max180/无retry/HTTPS/最多3重定向，下载成功后的坏SHA立即失败，不fallback；校验在tar前。canonical外层600不变，context hash自然变化，旧镜像不重标。CI冷构建前置于应用restore，集成处必须cache hit并输出实际image/context/reused receipt。真实Linux冷构建/同HeadCI仍待验证，不把本机HEAD/Range或shell fixture当Linux成功。

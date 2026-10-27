@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "status": "FAILED",
+  "taskId": "G3-M2-001",
+  "runId": "download-repair-cold",
+  "contextSha256": "91fe0bd348406b1af5c600ba3bb5e2738e19dc672cedfa5e9722edb8f05c5c8d",
+  "observedAt": "2026-10-27T15:02:41.215392+00:00",
+  "elapsedSeconds": 8.915,
+  "reason": "Canonical Fuseki build failed; raw output suppressed",
+  "ciContext": {},
+  "failure": {
+    "command": [
+      "docker",
+      "build",
+      "--tag",
+      "ontology-platform-fuseki:context-91fe0bd348406b1af5c600ba3bb5e2738e19dc672cedfa5e9722edb8f05c5c8d",
+      "--label",
+      "org.opencontainers.image.source=https://github.com/on-dotnet/ontology-platform",
+      "--label",
+      "io.ontology-platform.context-sha256=91fe0bd348406b1af5c600ba3bb5e2738e19dc672cedfa5e9722edb8f05c5c8d",
+      "--label",
+      "io.ontology-platform.task-id=G3-M2-001",
+      "--label",
+      "io.ontology-platform.run-id=download-repair-cold",
+      "<repository>/infra/development/fuseki"
+    ],
+    "exitCode": 1,
+    "timeoutSeconds": 600,
+    "elapsedSeconds": 8.896,
+    "stdout": {
+      "sizeBytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stderr": {
+      "sizeBytes": 1659,
+      "sha256": "8a03cb98c679a6349e4fbce2c95a563a2bdbcaabcd9b5812ff27cfb3e7f00b8a"
+    },
+    "stageWindow": [
+      {
+        "step": 1,
+        "phase": "LOAD_DEFINITION"
+      },
+      {
+        "step": 1,
+        "phase": "DONE"
+      },
+      {
+        "step": 2,
+        "phase": "LOAD_METADATA"
+      },
+      {
+        "step": 2,
+        "phase": "DONE"
+      },
+      {
+        "step": 3,
+        "phase": "LOAD_IGNORE"
+      },
+      {
+        "step": 3,
+        "phase": "DONE"
+      },
+      {
+        "step": 4,
+        "phase": "FROM"
+      },
+      {
+        "step": 4,
+        "phase": "CACHED"
+      },
+      {
+        "step": 5,
+        "phase": "LOAD_CONTEXT"
+      },
+      {
+        "step": 5,
+        "phase": "DONE"
+      },
+      {
+        "step": 6,
+        "phase": "COPY"
+      },
+      {
+        "step": 6,
+        "phase": "ERROR"
+      }
+    ],
+    "errorCategories": [
+      "CHECKSUM_MISMATCH",
+      "BUILD_ERROR"
+    ]
+  }
+}

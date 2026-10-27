@@ -5,9 +5,9 @@ ARG JENA_VERSION=6.2.0
 ARG JENA_SHA512=ba65f5867d2d4741b2ed9e2af5a0d4fbb447909894ab2a0c6bc4dac8997f4fe339c87b13c48d45d054977769f0f8bf763ea346b1f7792d5cdc458041bd43a132
 
 USER root
+COPY --chmod=0555 fetch-fuseki.sh /usr/local/bin/fetch-fuseki
 RUN set -eu; \
-    curl --fail --location --retry 3 --output /tmp/fuseki.tar.gz "https://archive.apache.org/dist/jena/binaries/apache-jena-fuseki-${JENA_VERSION}.tar.gz"; \
-    printf '%s  %s\n' "${JENA_SHA512}" /tmp/fuseki.tar.gz | sha512sum --check --strict; \
+    fetch-fuseki "$JENA_VERSION" "$JENA_SHA512" /tmp/fuseki.tar.gz; \
     mkdir -p /opt/fuseki /fuseki/databases; \
     tar -xzf /tmp/fuseki.tar.gz --strip-components=1 -C /opt/fuseki; \
     rm /tmp/fuseki.tar.gz; \

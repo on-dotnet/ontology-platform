@@ -7,8 +7,11 @@ $originalPath = [Environment]::GetEnvironmentVariable('PATH', 'Process')
 Push-Location $root
 try {
     # 唯一批准Dockerfile使用原有固定JRE/Jena摘要；不安装系统软件。
-    $fuseki = python3 scripts/maintenance/canonical_fuseki.py --task-id G2-INTEGRATION --run-id ('ci-' + [Guid]::NewGuid().ToString('N')) | ConvertFrom-Json
+    $taskId = if ($env:PLATFORM_TASK_ID) { $env:PLATFORM_TASK_ID } else { 'G2-INTEGRATION' }
+    $fuseki = python3 scripts/maintenance/canonical_fuseki.py --task-id $taskId --run-id ('ci-' + [Guid]::NewGuid().ToString('N')) | ConvertFrom-Json
     if ($LASTEXITCODE -ne 0) { throw 'Pinned Jena fixture image build failed' }
+    Write-Output ('CANONICAL_FUSEKI_RECEIPT ' + ($fuseki | ConvertTo-Json -Compress))
+    if ($env:CI -eq 'true' -and -not $fuseki.reused) { throw 'CI canonical preflight cache identity was not reused' }
     # AI Schema验证仅复用冻结锁中的既有Ajv传递依赖，精确Node只作用当前进程。
     $tools = & ./scripts/bootstrap-web-tools.ps1 | ConvertFrom-Json
     $env:PATH = (Split-Path $tools.nodePath -Parent) + [IO.Path]::PathSeparator + $originalPath

@@ -1,0 +1,62 @@
+FFFFF
+======================================================================
+FAIL: test_both_failed_downloads_cannot_become_success_or_repeat (__main__.CanonicalDownloadTests.test_both_failed_downloads_cannot_become_success_or_repeat)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/scripts/tests/CanonicalFuseki.Tests.py", line 193, in test_both_failed_downloads_cannot_become_success_or_repeat
+    result,calls=self.exercise('both-fail')
+                 ~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/scripts/tests/CanonicalFuseki.Tests.py", line 151, in exercise
+    self.assertTrue(script.is_file(),'Missing bounded official Fuseki download entry')
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : Missing bounded official Fuseki download entry
+
+======================================================================
+FAIL: test_official_primary_is_bounded_and_hash_checked (__main__.CanonicalDownloadTests.test_official_primary_is_bounded_and_hash_checked)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/scripts/tests/CanonicalFuseki.Tests.py", line 172, in test_official_primary_is_bounded_and_hash_checked
+    result,calls=self.exercise('primary')
+                 ~~~~~~~~~~~~~^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/scripts/tests/CanonicalFuseki.Tests.py", line 151, in exercise
+    self.assertTrue(script.is_file(),'Missing bounded official Fuseki download entry')
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : Missing bounded official Fuseki download entry
+
+======================================================================
+FAIL: test_primary_transport_failure_uses_only_fixed_official_archive (__main__.CanonicalDownloadTests.test_primary_transport_failure_uses_only_fixed_official_archive)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/scripts/tests/CanonicalFuseki.Tests.py", line 181, in test_primary_transport_failure_uses_only_fixed_official_archive
+    result,calls=self.exercise('fallback')
+                 ~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/scripts/tests/CanonicalFuseki.Tests.py", line 151, in exercise
+    self.assertTrue(script.is_file(),'Missing bounded official Fuseki download entry')
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : Missing bounded official Fuseki download entry
+
+======================================================================
+FAIL: test_successful_download_with_bad_sha_never_falls_back (__main__.CanonicalDownloadTests.test_successful_download_with_bad_sha_never_falls_back)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/scripts/tests/CanonicalFuseki.Tests.py", line 188, in test_successful_download_with_bad_sha_never_falls_back
+    result,calls=self.exercise('bad-hash')
+                 ~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/scripts/tests/CanonicalFuseki.Tests.py", line 151, in exercise
+    self.assertTrue(script.is_file(),'Missing bounded official Fuseki download entry')
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : Missing bounded official Fuseki download entry
+
+======================================================================
+FAIL: test_unique_dockerfile_verifies_before_extracting_without_version_change (__main__.CanonicalDownloadTests.test_unique_dockerfile_verifies_before_extracting_without_version_change)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/scripts/tests/CanonicalFuseki.Tests.py", line 199, in test_unique_dockerfile_verifies_before_extracting_without_version_change
+    self.assertIn('COPY --chmod=0555 fetch-fuseki.sh',dockerfile)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'COPY --chmod=0555 fetch-fuseki.sh' not found in '# 开发镜像：Apache 官方 Fuseki 发行包；基础镜像摘要在依赖核验后固定。\nFROM eclipse-temurin:21.0.12.1_1-jre-jammy@sha256:affcab5356e1270ac35d2361ee83135af2f03e8d580eca78a6d5d6fdbf048db0\n\nARG JENA_VERSION=6.2.0\nARG JENA_SHA512=ba65f5867d2d4741b2ed9e2af5a0d4fbb447909894ab2a0c6bc4dac8997f4fe339c87b13c48d45d054977769f0f8bf763ea346b1f7792d5cdc458041bd43a132\n\nUSER root\nRUN set -eu; \\\n    curl --fail --location --retry 3 --output /tmp/fuseki.tar.gz "https://archive.apache.org/dist/jena/binaries/apache-jena-fuseki-${JENA_VERSION}.tar.gz"; \\\n    printf \'%s  %s\\n\' "${JENA_SHA512}" /tmp/fuseki.tar.gz | sha512sum --check --strict; \\\n    mkdir -p /opt/fuseki /fuseki/databases; \\\n    tar -xzf /tmp/fuseki.tar.gz --strip-components=1 -C /opt/fuseki; \\\n    rm /tmp/fuseki.tar.gz; \\\n    groupadd --gid 10001 fuseki; \\\n    useradd --uid 10001 --gid fuseki --no-create-home --home-dir /fuseki fuseki; \\\n    chown -R fuseki:fuseki /fuseki\n\nCOPY --chmod=0555 entrypoint.sh /opt/fuseki/entrypoint.sh\nCOPY --chmod=0444 g2-config.ttl g2-log4j2.properties /opt/fuseki/\n\nENV FUSEKI_BASE=/fuseki\nWORKDIR /fuseki\nUSER 10001:10001\nEXPOSE 3030\nENTRYPOINT ["/opt/fuseki/entrypoint.sh"]\nCMD ["--tdb2", "--loc=/fuseki/databases/ontology", "--update", "/ontology"]\n'
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.001s
+
+FAILED (failures=5)

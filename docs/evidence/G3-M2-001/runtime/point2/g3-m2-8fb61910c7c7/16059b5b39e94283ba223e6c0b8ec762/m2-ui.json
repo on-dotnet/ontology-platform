@@ -1,0 +1,102 @@
+{
+  "status": "PASS",
+  "phase": "ui_exact_edit",
+  "startedAtUtc": "2026-10-27T14:50:38.257Z",
+  "completedAtUtc": "2026-10-27T14:50:41.301Z",
+  "checks": [
+    {
+      "name": "current_profile_v2",
+      "status": "PASS"
+    },
+    {
+      "name": "http_1",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "http_2",
+      "status": "PASS",
+      "observedStatus": 428
+    },
+    {
+      "name": "http_3",
+      "status": "PASS",
+      "observedStatus": 409
+    },
+    {
+      "name": "http_4",
+      "status": "PASS",
+      "observedStatus": 400
+    },
+    {
+      "name": "http_5",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "http_6",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "rejections_preserve_revision_hash",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_edit_http_8",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "ui_class_saved_as_real_triple",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_edit_http_10",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "ui_named_axiom_saved",
+      "status": "PASS"
+    },
+    {
+      "name": "other_three_sources_exact",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_edits_persist_after_read",
+      "status": "PASS"
+    },
+    {
+      "name": "tree_keyboard_select",
+      "status": "PASS"
+    },
+    {
+      "name": "layout_1440_dark",
+      "status": "PASS"
+    },
+    {
+      "name": "layout_1440_light",
+      "status": "PASS"
+    },
+    {
+      "name": "layout_390_dark",
+      "status": "PASS"
+    },
+    {
+      "name": "layout_390_light",
+      "status": "PASS"
+    }
+  ],
+  "sourceHead": "903e08b3bf9e52dc4bf69068806cb722fd8e79ac",
+  "scope": "UI_ONLY: real UI/API exact editing and persistence",
+  "notRun": [
+    "publication/formal query/rollback",
+    "compatibility and other six runtime gates",
+    "real LLM",
+    "full OWL reasoning",
+    "Windows/Intel native",
+    "production HA/SLO"
+  ]
+}

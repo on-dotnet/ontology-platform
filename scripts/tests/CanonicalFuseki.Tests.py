@@ -144,4 +144,70 @@ class CanonicalTests(unittest.TestCase):
         self.assertIn('canonical_fuseki.py',text)
         self.assertNotIn('docker build',text)
 
+    def test_ci_cold_build_precedes_restore_and_integration_requires_cache_hit(self):
+        workflow=(ROOT/'.github/workflows/ci.yml').read_text().split('  governance-integration:',1)[1]
+        self.assertLess(workflow.index('Preflight canonical Fuseki'),workflow.index('actions/setup-dotnet'))
+        self.assertIn('PLATFORM_TASK_ID: G3-M2-001',workflow)
+        integration=(ROOT/'scripts/acceptance/g2-integration.ps1').read_text()
+        self.assertIn('CANONICAL_FUSEKI_RECEIPT',integration)
+        self.assertIn("$env:CI -eq 'true' -and -not $fuseki.reused",integration)
+
+class CanonicalDownloadTests(unittest.TestCase):
+    """Run the actual shell download boundary with deterministic public-byte transports."""
+    def exercise(self,mode):
+        script=ROOT/'infra/development/fuseki/fetch-fuseki.sh'
+        self.assertTrue(script.is_file(),'Missing bounded official Fuseki download entry')
+        with tempfile.TemporaryDirectory(prefix='ontology-download-') as directory:
+            root=Path(directory);binary=root/'bin';binary.mkdir();calls=root/'calls.jsonl'
+            curl=binary/'curl'
+            curl.write_text('#!'+sys.executable+'\n'+
+                'import json,os,sys\nfrom pathlib import Path\n'+
+                'a=sys.argv[1:]\nwith Path(os.environ["CALLS"]).open("a") as f:f.write(json.dumps(a)+"\\n")\n'+
+                'mode=os.environ["MODE"];primary="dlcdn.apache.org" in a[-1]\n'+
+                'if mode=="both-fail" or (mode=="fallback" and primary):sys.exit(22)\n'+
+                'Path(a[a.index("--output")+1]).write_bytes(b"wrong" if mode=="bad-hash" else b"canonical-fixture")\n')
+            checksum=binary/'sha512sum'
+            checksum.write_text('#!'+sys.executable+'\n'+
+                'import hashlib,sys\nfrom pathlib import Path\n'+
+                'expected,name=sys.stdin.read().rstrip("\\n").split("  ",1)\n'+
+                'sys.exit(0 if hashlib.sha512(Path(name).read_bytes()).hexdigest()==expected else 1)\n')
+            curl.chmod(0o755);checksum.chmod(0o755)
+            result=subprocess.run(['sh',str(script),'6.2.0',hashlib.sha512(b'canonical-fixture').hexdigest(),str(root/'package.tar.gz')],
+                env=dict(os.environ,PATH=str(binary)+os.pathsep+os.environ['PATH'],MODE=mode,CALLS=str(calls)),capture_output=True,text=True)
+            return result,[json.loads(line) for line in calls.read_text().splitlines()]
+
+    def test_official_primary_is_bounded_and_hash_checked(self):
+        result,calls=self.exercise('primary')
+        self.assertEqual(result.returncode,0,result.stderr)
+        self.assertEqual(len(calls),1)
+        self.assertEqual(calls[0][-1],'https://dlcdn.apache.org/jena/binaries/apache-jena-fuseki-6.2.0.tar.gz')
+        args=calls[0]
+        for flag,value in [('--connect-timeout','15'),('--max-time','180'),('--retry','0'),('--max-redirs','3'),('--proto','=https'),('--proto-redir','=https')]:
+            self.assertEqual(args[args.index(flag)+1],value)
+
+    def test_primary_transport_failure_uses_only_fixed_official_archive(self):
+        result,calls=self.exercise('fallback')
+        self.assertEqual(result.returncode,0,result.stderr)
+        self.assertEqual(len(calls),2)
+        self.assertEqual(calls[1][-1],'https://archive.apache.org/dist/jena/binaries/apache-jena-fuseki-6.2.0.tar.gz')
+        self.assertEqual(sum(int(a[a.index('--max-time')+1]) for a in calls),360)
+
+    def test_successful_download_with_bad_sha_never_falls_back(self):
+        result,calls=self.exercise('bad-hash')
+        self.assertNotEqual(result.returncode,0)
+        self.assertEqual(len(calls),1)
+
+    def test_both_failed_downloads_cannot_become_success_or_repeat(self):
+        result,calls=self.exercise('both-fail')
+        self.assertNotEqual(result.returncode,0)
+        self.assertEqual(len(calls),2)
+
+    def test_unique_dockerfile_verifies_before_extracting_without_version_change(self):
+        dockerfile=(ROOT/'infra/development/fuseki/Dockerfile').read_text()
+        self.assertIn('!fetch-fuseki.sh',(ROOT/'infra/development/fuseki/.dockerignore').read_text())
+        self.assertIn('COPY --chmod=0555 fetch-fuseki.sh',dockerfile)
+        self.assertLess(dockerfile.index('fetch-fuseki "$'),dockerfile.index('tar -xzf'))
+        self.assertIn('ARG JENA_VERSION=6.2.0',dockerfile)
+        self.assertIn('ba65f5867d2d4741b2ed9e2af5a0d4fbb447909894ab2a0c6bc4dac8997f4fe339c87b13c48d45d054977769f0f8bf763ea346b1f7792d5cdc458041bd43a132',dockerfile)
+
 if __name__ == '__main__': unittest.main()
