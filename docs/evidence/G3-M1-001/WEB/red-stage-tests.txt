@@ -1,0 +1,38 @@
+RUN  v5.0.5 /Users/chasen/.codex/worktrees/g3-m1-web/ontology-platform/apps/web
+
+ ❯ src/features/ontology/m1-behavior.test.ts (20 tests | 2 failed) 4ms
+   ❯ M1 字节与不确定性边界 (20)
+     × 任何额外未确定阶段都不能被已有PASS阶段掩盖 1ms
+     × 重复必需阶段有失败时不显示资格通过 0ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/features/ontology/m1-behavior.test.ts > M1 字节与不确定性边界 > 任何额外未确定阶段都不能被已有PASS阶段掩盖
+AssertionError: expected 'ELIGIBLE' not to be 'ELIGIBLE' // Object.is equality
+ ❯ src/features/ontology/m1-behavior.test.ts:44:94
+     42|   it("任何额外未确定阶段都不能被已有PASS阶段掩盖", () => {
+     43|     const stages = [...assessment.stages, { name: "UNRECOGNIZED", stat…
+     44|     expect(assessmentEligibility({ ...assessment, stages }, draft, pro…
+       |                                                                                              ^
+     45|   });
+     46|   it("重复必需阶段有失败时不显示资格通过", () => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/features/ontology/m1-behavior.test.ts > M1 字节与不确定性边界 > 重复必需阶段有失败时不显示资格通过
+AssertionError: expected 'ELIGIBLE' not to be 'ELIGIBLE' // Object.is equality
+ ❯ src/features/ontology/m1-behavior.test.ts:48:94
+     46|   it("重复必需阶段有失败时不显示资格通过", () => {
+     47|     const stages = [...assessment.stages, { name: "PARSE", status: "FA…
+     48|     expect(assessmentEligibility({ ...assessment, stages }, draft, pro…
+       |                                                                                              ^
+     49|   });
+     50|   it("dirty源不沿用已保存修订的资格", () => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 18 passed (20)
+   Start at  11:23:29
+   Duration  80ms (transform 54%, import 23%, tests 17%, worker 6%)

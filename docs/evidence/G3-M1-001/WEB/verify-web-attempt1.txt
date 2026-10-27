@@ -1,0 +1,50 @@
+$ eslint .
+
+/Users/chasen/.codex/worktrees/g3-m1-web/ontology-platform/apps/web/src/features/ontology/version-comparison.tsx
+  64:46  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+/Users/chasen/.codex/worktrees/g3-m1-web/ontology-platform/apps/web/src/features/ontology/version-comparison.tsx:64:46
+  62 |       <div className="g2-row">
+  63 |         <button className="button" disabled={busy || !validRevision} onClick={compare}>精确比较四源</button>
+> 64 |         <button className="button" disabled={!busy || !cancellation.current} onClick={() => cancellation.current?.abort()}>取消比较</button>
+     |                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Cannot access ref value during render
+  65 |         <button className="button" disabled={busy || !validRevision} onClick={() => void execute(async signal => {
+  66 |           setDiff(await client.diff(draft.draftId, fromRevision, signal));
+  67 |         })}>读取真实 Diff</button>                                                                                                                               react-hooks/refs
+  64:55  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+/Users/chasen/.codex/worktrees/g3-m1-web/ontology-platform/apps/web/src/features/ontology/version-comparison.tsx:64:55
+  62 |       <div className="g2-row">
+  63 |         <button className="button" disabled={busy || !validRevision} onClick={compare}>精确比较四源</button>
+> 64 |         <button className="button" disabled={!busy || !cancellation.current} onClick={() => cancellation.current?.abort()}>取消比较</button>
+     |                                                       ^^^^^^^^^^^^^^^^^^^^^ Cannot access ref value during render
+  65 |         <button className="button" disabled={busy || !validRevision} onClick={() => void execute(async signal => {
+  66 |           setDiff(await client.diff(draft.draftId, fromRevision, signal));
+  67 |         })}>读取真实 Diff</button>                                                                                                                               react-hooks/refs
+  64:56  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+/Users/chasen/.codex/worktrees/g3-m1-web/ontology-platform/apps/web/src/features/ontology/version-comparison.tsx:64:56
+  62 |       <div className="g2-row">
+  63 |         <button className="button" disabled={busy || !validRevision} onClick={compare}>精确比较四源</button>
+> 64 |         <button className="button" disabled={!busy || !cancellation.current} onClick={() => cancellation.current?.abort()}>取消比较</button>
+     |                                                        ^^^^^^^^^^^^^^^^^^^^ Cannot access ref value during render
+  65 |         <button className="button" disabled={busy || !validRevision} onClick={() => void execute(async signal => {
+  66 |           setDiff(await client.diff(draft.draftId, fromRevision, signal));
+  67 |         })}>读取真实 Diff</button>
+
+To initialize a ref only once, check that the ref is null with the pattern `if (ref.current == null) { ref.current = ... }`  react-hooks/refs
+
+✖ 3 problems (3 errors, 0 warnings)
+
+[ELIFECYCLE] Command failed with exit code 1.
+Exception: /Users/chasen/.codex/worktrees/g3-m1-web/ontology-platform/scripts/verify-web.ps1:19
+Line |
+  19 |              if ($LASTEXITCODE -ne 0) { throw "Web $task failed" }
+     |                                         ~~~~~~~~~~~~~~~~~~~~~~~~
+     | Web lint failed

@@ -1,0 +1,65 @@
+$ eslint .
+$ tsc --noEmit
+$ vitest run
+
+ RUN  v5.0.5 /Users/chasen/.codex/worktrees/g3-m1-web/ontology-platform/apps/web
+
+ ❯ src/features/ontology/m1-views.test.ts (9 tests | 2 failed) 11ms
+   ❯ M1 实际组件输出与四源往返 (9)
+     × absent术语源禁用导出和textarea，但可显式创建空源 3ms
+     × 只读角色不能载入文件或编辑源码 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/features/ontology/m1-views.test.ts > M1 实际组件输出与四源往返 > absent术语源禁用导出和textarea，但可显式创建空源
+AssertionError: expected '<section class="g2-source"><div class…' to match /readonly=""/
+
+- Expected:
+/readonly=""/
+
++ Received:
+"<section class=\"g2-source\"><div class=\"g2-row\"><label>源文档<select aria-label=\"选择源文档\"><option value=\"ontologyTurtle\">本体 · OWL</option><option value=\"shapesTurtle\">约束 · SHACL</option><option value=\"vocabularyTurtle\" selected=\"\">术语 · SKOS</option><option value=\"dataTurtle\">事实 · Synthetic</option></select></label><button class=\"button\" disabled=\"\">导出原始源</button></div><p class=\"muted\">可选术语源未提供（absent），不会视为空文件。</p><div class=\"g2-row\"><button class=\"button\" disabled=\"\">术语源设为未提供</button><button class=\"button\">创建空术语源</button></div><p class=\"g2-notice\">高级编辑器 Monaco 已由人工暂停；当前使用原生源码编辑器。未知公理保留原文，结构编辑受支持档案限制。</p><label class=\"g2-upload\">载入 vocabulary.ttl（≤256 KiB）<input type=\"file\" accept=\".ttl,text/turtle,text/plain\" aria-label=\"载入vocabulary.ttl\"/></label><textarea class=\"g2-code\" aria-label=\"术语 · SKOS源码\" spellCheck=\"false\" readOnly=\"\"></textarea><p class=\"muted\">UTF8 原始 Turtle · 0 字节 · 服务端 RIOT 解析后方可保存</p><p class=\"muted\">未修改源保留BOM、换行和注释；实际键入由浏览器提供换行。导出后可重新载入原文件。</p></section>"
+
+ ❯ src/features/ontology/m1-views.test.ts:62:18
+     60|     expect(html).toContain("absent");
+     61|     expect(html).toMatch(/disabled=""[^>]*>导出原始源/);
+     62|     expect(html).toMatch(/readonly=""/);
+       |                  ^
+     63|     expect(html).toContain("创建空术语源");
+     64|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/features/ontology/m1-views.test.ts > M1 实际组件输出与四源往返 > 只读角色不能载入文件或编辑源码
+AssertionError: expected '<section class="g2-source"><div class…' to match /readonly=""/
+
+- Expected:
+/readonly=""/
+
++ Received:
+"<section class=\"g2-source\"><div class=\"g2-row\"><label>源文档<select aria-label=\"选择源文档\"><option value=\"ontologyTurtle\" selected=\"\">本体 · OWL</option><option value=\"shapesTurtle\">约束 · SHACL</option><option value=\"vocabularyTurtle\">术语 · SKOS</option><option value=\"dataTurtle\">事实 · Synthetic</option></select></label><button class=\"button\">导出原始源</button></div><p class=\"g2-notice\">高级编辑器 Monaco 已由人工暂停；当前使用原生源码编辑器。未知公理保留原文，结构编辑受支持档案限制。</p><label class=\"g2-upload\">载入 ontology.ttl（≤256 KiB）<input type=\"file\" accept=\".ttl,text/turtle,text/plain\" disabled=\"\" aria-label=\"载入ontology.ttl\"/></label><textarea class=\"g2-code\" aria-label=\"本体 · OWL源码\" spellCheck=\"false\" readOnly=\"\">﻿# 🏭 Synthetic
+&lt;urn:a&gt; &lt;urn:b&gt; &lt;urn:c&gt; .
+</textarea><p class=\"muted\">UTF8 原始 Turtle · 48 字节 · 服务端 RIOT 解析后方可保存</p><p class=\"muted\">未修改源保留BOM、换行和注释；实际键入由浏览器提供换行。导出后可重新载入原文件。</p></section>"
+
+ ❯ src/features/ontology/m1-views.test.ts:70:18
+     68|     }));
+     69|     expect(html).toMatch(/type="file"[^>]*disabled=""/);
+     70|     expect(html).toMatch(/readonly=""/);
+       |                  ^
+     71|   });
+     72| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed | 8 passed (9)
+      Tests  2 failed | 102 passed (104)
+   Start at  11:21:56
+   Duration  530ms (tests 72%, transform 15%, import 11%, worker 2%)
+
+[ELIFECYCLE] Test failed. See above for more details.
+Exception: /Users/chasen/.codex/worktrees/g3-m1-web/ontology-platform/scripts/verify-web.ps1:19
+Line |
+  19 |              if ($LASTEXITCODE -ne 0) { throw "Web $task failed" }
+     |                                         ~~~~~~~~~~~~~~~~~~~~~~~~
+     | Web test failed
