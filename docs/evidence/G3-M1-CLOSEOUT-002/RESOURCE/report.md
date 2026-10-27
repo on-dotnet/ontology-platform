@@ -19,3 +19,11 @@
 启动传ResourceLifecycle__TaskId/RunId给AppHost；manifest区分PREPARED/STARTING/RUNNING/START_FAILED/EXITED，运行中和退出后仅双label筛选准确ID、允许字段inspect；命名卷仅按准确expected列表读取Name/Driver/CreatedAt/ownership Labels，不读卷字节。API/权限错误为BLOCKED且不输出raw stderr。最多64快照并保留完整observedContainerIds/observedVolumeNames集合，避免观测证据无界增长。保留归属不授予删除权限。manifest中expected不等于observed，EXITED仅表示启动进程结束，不声称资源已删除或健康通过。
 
 P2 RED为6项缺少新函数/参数；GREEN为8项真实临时目录/prepare/runner测试（certificate与Docker调用隔离替身），覆盖无secret落盘、旧私有JSON字节不变、task/run传递、错归属/非法身份/链接拒绝和socket BLOCKED；既有Wave2脱敏与真实Release AppHost2边界回归保持通过，Release构建0错误（原ASPIRE010 warning）。本修复未创建/删除任何Docker资源；本机真实before/after由Master统一负责，不把此fixture当真实Docker验收。
+
+## CI 首建超时的失败证据修复
+
+Master真实CI run40487172435 attempt1在canonical首次构建达到600秒预算退出，业务测试未启动；该失败历史保留，具体远端Docker阶段因当时输出统一抑制而UNKNOWN，不推测网络根因。此修复只完善故障可观测性，不延长600秒预算、不增加自动重试、不改Dockerfile/镜像标签/context digest/依赖/成功stdout。
+
+canonical失败时在ignored artifacts/fuseki-builds原子发布`<run>-<uuid>.failed.json`：TaskId/RunId/context SHA256、安全固定语法command vector、退出码或TIMEOUT、实际耗时、原stdout/stderr字节数与SHA256；仅保留最多12个静态BuildKit阶段/step及固定错误类别，不落原始输出、环境或build args。主CLI把完全相同allowlisted JSON用CANONICAL_FAILURE_RECEIPT标记写stderr，保证ephemeral CI失去本地artifact后可从Actions日志恢复；成功JSON/image-only输出保持原合同。只显式读取且数字校验GITHUB_RUN_ID/GITHUB_RUN_ATTEMPT；不dump环境。锁无论失败均释放，后续明确运行可重试。
+
+TDD RED为未生成失败receipt；GREEN为Canonical共10项（原6+新增timeout bytes捕获、非零build/CLI摘要、inspect不冒建、未知参数抑制与窗口上限），真实temp目录验证原子发布/无partial/锁释放/下一次cache-hit可重试；合成secret不进入receipt/stdout/stderr，receipt与stderr摘要一致。无任何真实Docker创建/删除，不把替身故障模拟当远端故障根因或真实集成通过。

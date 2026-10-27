@@ -1,0 +1,22 @@
+....E..F
+======================================================================
+ERROR: test_nonzero_build_receipt_has_only_safe_command_and_output_hashes (__main__.CanonicalTests.test_nonzero_build_receipt_has_only_safe_command_and_output_hashes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m1-closeout-resources/ontology-platform/scripts/tests/CanonicalFuseki.Tests.py", line 100, in test_nonzero_build_receipt_has_only_safe_command_and_output_hashes
+    receipt_path=next((self.context/'artifacts/fuseki-builds').glob('*.failed.json'))
+StopIteration
+
+======================================================================
+FAIL: test_timeout_receipt_is_atomic_sanitized_and_lock_released_for_retry (__main__.CanonicalTests.test_timeout_receipt_is_atomic_sanitized_and_lock_released_for_retry)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m1-closeout-resources/ontology-platform/scripts/tests/CanonicalFuseki.Tests.py", line 73, in test_timeout_receipt_is_atomic_sanitized_and_lock_released_for_retry
+    self.assertEqual(len(receipts),1)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 1
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.011s
+
+FAILED (failures=1, errors=1)
