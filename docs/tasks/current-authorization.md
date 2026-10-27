@@ -1,6 +1,6 @@
 # G3-M1-001 当前授权增量（2026-10-27）
 
-状态：IN_PROGRESS。用户正式批准[实施授权V1](../evidence/G3-M1-001/authorization-v1.md)全部M1任务。Base d6aab6b47e63c9d5deadfa480f6659c62c5ed138（已fetch）。Master独立托管Worktree，公共契约/迁移/CI单写，合同独立审查后SEM/FE独立树并行，持续提交推送与独立审查后增量main集成；完成真实PG/Jena/RustFS/Web/兼容验收、同HeadCI、V2唯一包及仅本任务资源收尾。任务见[G3-M1-001](G3-M1-001.md)。只M1，不启动M2–M5、不新增直接依赖/Monaco/收费模型/系统改动、不删历史refs/旧树/G2卷，不重写历史制品。历史授权/失败/PARTIAL均保留。
+状态：IMPLEMENTED / CLOSURE_IN_PROGRESS。用户正式批准[实施授权V1](../evidence/G3-M1-001/authorization-v1.md)全部M1任务。Base d6aab6b47e63c9d5deadfa480f6659c62c5ed138（已fetch）。Master独立托管Worktree，公共契约/迁移/CI单写，合同独立审查后SEM/FE独立树并行，持续提交推送与独立审查后增量main集成；完成真实PG/Jena/RustFS/Web/兼容验收、同HeadCI、V2唯一包及仅本任务资源收尾。任务见[G3-M1-001](G3-M1-001.md)。只M1，不启动M2–M5、不新增直接依赖/Monaco/收费模型/系统改动、不删历史refs/旧树/G2卷，不重写历史制品。历史授权/失败/PARTIAL均保留。
 
 ---
 

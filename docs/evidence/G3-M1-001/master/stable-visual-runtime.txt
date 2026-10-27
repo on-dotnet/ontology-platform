@@ -1,0 +1,17 @@
+{"status": "CREATED", "realm": "g2-bd025a737398bfac", "identities": ["g2-viewer-a", "g2-viewer-b", "g2-no-role-a", "g2-operator-a", "g2-auditor-a", "g2-viewer-ab", "g2-operator-ab", "g2-auditor-ab"], "secrets": "runtime-only"}
+{"stage":"FULL_G2_REAL_OIDC","status":"PASS","passed":171,"failure":null}
+{"status": "PASS", "exitCode": 0, "freezeSha256": "f379b6c7f9ef339c6e8f242dcfd2e33601e78006228da8046e68ec6cae225669", "memberCount": 126, "readerUnchanged": true, "manifestSha256": "20e8d4308a3cf56e152e47c01aa89919bad8bb074053ae307e112e9150ed34d2", "scope": "pre-write strict manifest reader binary; not a G2 application downgrade certification"}
+{"step": 0, "exitCode": 0}
+{"step": 1, "exitCode": 0}
+{"status": "PASS", "checks": 25}
+{"status":"PASS","checks":4}
+{"check": "health_key_required", "status": "PASS", "httpStatus": 401, "elapsedMs": 2.468417020281777, "maximumObservedEnvelopeMs": 3000, "internalBudgetMs": 2000}
+{"check": "all_real_modules_dependencies_ready", "status": "PASS", "httpStatus": 200, "elapsedMs": 44.08862499985844, "maximumObservedEnvelopeMs": 3000, "internalBudgetMs": 2000}
+{"check": "jena_stall_fails_closed", "status": "PASS", "httpStatus": 503, "elapsedMs": 2016.715292003937, "maximumObservedEnvelopeMs": 3000, "internalBudgetMs": 2000}
+{"check": "jena_recovered", "status": "PASS", "httpStatus": 200, "elapsedMs": 48.236082977382466, "maximumObservedEnvelopeMs": 3000, "internalBudgetMs": 2000}
+{"check": "rustfs_stall_fails_closed", "status": "PASS", "httpStatus": 503, "elapsedMs": 2006.4502500172239, "maximumObservedEnvelopeMs": 3000, "internalBudgetMs": 2000}
+{"check": "rustfs_recovered", "status": "PASS", "httpStatus": 200, "elapsedMs": 51.6759589954745, "maximumObservedEnvelopeMs": 3000, "internalBudgetMs": 2000}
+{"check": "governance_postgres_stall_fails_closed", "status": "PASS", "httpStatus": 503, "elapsedMs": 1009.1417089861352, "maximumObservedEnvelopeMs": 3000, "internalBudgetMs": 2000}
+{"check": "governance_postgres_recovered", "status": "PASS", "httpStatus": 200, "elapsedMs": 48.12079097609967, "maximumObservedEnvelopeMs": 3000, "internalBudgetMs": 2000}
+{"status": "PASS", "actualSamples": 27, "coverage": {"shacl": true, "sparql": true, "publication": true, "sse": true}}
+{"status": "PASS", "runId": "e2a597356fa846319cd8a368263a91d7", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-bb5e3661b605/e2a597356fa846319cd8a368263a91d7"}

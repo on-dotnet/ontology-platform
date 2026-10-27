@@ -82,3 +82,7 @@ doctor -CheckDocker、verify -SelfTest、受锁restore/build/format/test、verif
 QUDT3.5.3最小词汇资产为M3候选，CC BY4且UCUM另许可；需精确版本/commit/hash/抽取/署名审批，M1不引入。无新runtime直接依赖。主线保护沿ADR007建议PR、同Head两check、禁force/delete，单人独立Agent不冒充另GitHub用户；本轮不改规则。
 
 M1完成后仅交G3_M1_READY_FOR_REVIEW及唯一ZIP并停止，M2–M5不自动启动。
+
+## M1实施回执索引
+
+用户后续仅授权G3-M1-001；本计划其余M2–M5继续PROPOSED/NOT_RUN。M1实际合同/实现/独立审查/真实测试及收尾读取[任务卡](../tasks/G3-M1-001.md)与[报告](../evidence/G3-M1-001/master/delivery-report.md)，不能把原计划的未来验收项改写为已完成。最终Head/CI/唯一ZIP与实际资源回收以后置交付回执为准。

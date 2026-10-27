@@ -1,0 +1,84 @@
+{
+  "status": "PASS",
+  "scope": "Observed local synthetic engineering baseline; no production SLO or load certification",
+  "summarizedAtUtc": "2026-10-27T05:09:18.842560+00:00",
+  "mode": "existing actual run summary",
+  "environment": "local macOS arm64, real isolated Docker/Aspire, headless Edge; no production SLO",
+  "inputBytes": {
+    "ontologyTurtle": 4490,
+    "shapesTurtle": 3466,
+    "vocabularyTurtle": 207,
+    "dataTurtle": 56984
+  },
+  "coverage": {
+    "shacl": true,
+    "sparql": true,
+    "publication": true,
+    "sse": true
+  },
+  "operations": {
+    "/api/v1/approvals/{id}/decisions": {
+      "count": 4,
+      "minMs": 2.7953749999996944,
+      "medianMs": 1223.263666500001,
+      "maxMs": 1450.4020419999997,
+      "p95NearestRankMs": 1450.4020419999997
+    },
+    "/api/v1/execution-runs": {
+      "count": 2,
+      "minMs": 52.820959000000585,
+      "medianMs": 119.09500050000042,
+      "maxMs": 185.36904200000026,
+      "p95NearestRankMs": 185.36904200000026
+    },
+    "/api/v1/ontology-drafts/{id}/assessments": {
+      "count": 1,
+      "minMs": 129.769416000001,
+      "medianMs": 129.769416000001,
+      "maxMs": 129.769416000001,
+      "p95NearestRankMs": 129.769416000001
+    },
+    "/api/v1/ontology-drafts/{id}/validations": {
+      "count": 1,
+      "minMs": 72.20279200000004,
+      "medianMs": 72.20279200000004,
+      "maxMs": 72.20279200000004,
+      "p95NearestRankMs": 72.20279200000004
+    },
+    "/api/v1/release-activations": {
+      "count": 4,
+      "minMs": 13.090707999999722,
+      "medianMs": 1409.3151670000007,
+      "maxMs": 1715.303833,
+      "p95NearestRankMs": 1715.303833
+    },
+    "/api/v1/release-proposals": {
+      "count": 3,
+      "minMs": 8.166041000000405,
+      "medianMs": 75.98345800000061,
+      "maxMs": 353.0609999999979,
+      "p95NearestRankMs": 353.0609999999979
+    },
+    "/api/v1/semantic/queries": {
+      "count": 6,
+      "minMs": 91.46466700000019,
+      "medianMs": 119.65068749999955,
+      "maxMs": 1039.3727500000005,
+      "p95NearestRankMs": 1039.3727500000005
+    },
+    "Jena SPARQL fixed formal data graph count": {
+      "count": 5,
+      "minMs": 2.194541000000754,
+      "medianMs": 3.25433300000077,
+      "maxMs": 18.30708400000003,
+      "p95NearestRankMs": 18.30708400000003
+    },
+    "browser native SSE creation-to-observed-terminal": {
+      "count": 1,
+      "minMs": 277.7738329999993,
+      "medianMs": 277.7738329999993,
+      "maxMs": 277.7738329999993,
+      "p95NearestRankMs": 277.7738329999993
+    }
+  }
+}

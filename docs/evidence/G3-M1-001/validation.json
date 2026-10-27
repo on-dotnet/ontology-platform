@@ -1,0 +1,165 @@
+{
+  "checks": [
+    {
+      "name": "baseline-doctor",
+      "command": "pwsh -NoProfile -File scripts/doctor.ps1 -CheckDocker",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Exact approved SDK/Node/pnpm/Docker observed; metadata check, not product PASS."
+    },
+    {
+      "name": "initial-environment-failures-preserved",
+      "command": "dotnet build backend/OntologyPlatform.slnx --no-restore; pwsh -NoProfile -File scripts/verify-web.ps1",
+      "status": "PARTIAL",
+      "exitCode": 1,
+      "output": "Initial missing15 assets / absent pnpm restore failed; locked restore later succeeded with no lock/dependency changes. Original failures retained in baseline evidence."
+    },
+    {
+      "name": "complete-m1-entry-at-24f6379",
+      "command": "pwsh -NoProfile -File scripts/acceptance/g3-governance.ps1 -Milestone M1 -StartRuntime",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Frozen24 source:13 pipeline stages/7 child gates PASS; full-gate-attempt4 provenance. Native missing-environment skips separate from real suites below."
+    },
+    {
+      "name": "web-real-toolchain-at-24",
+      "command": "pwsh -NoProfile -File scripts/verify-web.ps1 -Restore",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "lint/typecheck/10files122Vitest/production build;13 added actual TSX race cases RED to GREEN. Browser counted separately."
+    },
+    {
+      "name": "security-real-pg-keycloak",
+      "command": "python3 scripts/acceptance/test-governance.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "116/116 actual tests, zero skipped in complete24 run; PostgreSQL/Keycloak and real host boundaries."
+    },
+    {
+      "name": "real-semantic-at-24",
+      "command": "python3 scripts/acceptance/semantic-roundtrip.py --postgres --label ci-semantic",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "96/96 actual tests, zero failed/zero skipped; same complete24 pipeline. Agent deterministic is not a real LLM certification."
+    },
+    {
+      "name": "real-publishing-at-24",
+      "command": "python3 scripts/acceptance/release-faults.py --label ci-release-faults",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "55/55 actual tests, zero failed/zero skipped; same complete24 pipeline. Agent deterministic is not a real LLM certification."
+    },
+    {
+      "name": "real-query-at-24",
+      "command": "python3 scripts/acceptance/query-plan.py --label ci-query-plan",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "49/49 actual tests, zero failed/zero skipped; same complete24 pipeline. Agent deterministic is not a real LLM certification."
+    },
+    {
+      "name": "real-agent-sse-at-24",
+      "command": "python3 scripts/acceptance/mcp-agent.py --label ci-mcp-agent",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "33/33 actual tests, zero failed/zero skipped; same complete24 pipeline. Agent deterministic is not a real LLM certification."
+    },
+    {
+      "name": "native-engineering-selftest",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1 -SelfTest",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Complete24 SelfTest:resource cleanup42 incl new M1 scope, package54 and applicable control suites pass. Actual data cleanup is a separate check."
+    },
+    {
+      "name": "metadata-process-start-negatives",
+      "command": "python3 scripts/tests/G3Acceptance.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "59 scoped RED1 -> GREEN5; actual missing executable yields FAIL/current exitCode null + fixed category/later NOT_RUN; stale PASS is never consumed."
+    },
+    {
+      "name": "backpressure-copy-observer",
+      "command": "pwsh -NoProfile -Command '$tools = & ./scripts/bootstrap-web-tools.ps1 | ConvertFrom-Json; & $tools.nodePath --test scripts/tests/G3ReadBackpressure.Tests.mjs'",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "59 RED2 -> GREEN6 real loopback HTTP; copy observer stores measured waits; only exact read semantic_busy retries, five max. Writes/unknown/badJSON/503 do not retry; exhaustion remains429."
+    },
+    {
+      "name": "post-metadata-real-seven-gates",
+      "command": "G3_READER_IDENTITY_SHA=f379b6c7f9ef339c6e8f242dcfd2e33601e78006228da8046e68ec6cae225669 python3 scripts/acceptance/g3-acceptance-runtime.py --start-runtime",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "59 source:a913360d2588432396887d598de249ce,7/7;M1browser54/fullchain169/obs25/fault8/trace4/perf27. Product backend/apps unchanged24..59; not a claimed repeat of all native tests."
+    },
+    {
+      "name": "stable-visual-real-seven-gates",
+      "command": "G3_READER_IDENTITY_SHA=f379b6c7f9ef339c6e8f242dcfd2e33601e78006228da8046e68ec6cae225669 python3 scripts/acceptance/g3-acceptance-runtime.py --start-runtime",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "dc5 screenshot-only:e2a597356fa846319cd8a368263a91d7,7/7;M1browser56 incl actual delayed import/byte roundtrip and settled narrow sidebar;fullchain169. Source backend/apps unchanged from24."
+    },
+    {
+      "name": "prewrite-and-real-v2-reader",
+      "command": "python3 scripts/acceptance/g3-compatibility.py --freeze; python3 scripts/acceptance/g3-compatibility.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Retained source5df reader126 members fixed before writes; strict1/1 prewrite and strict1/1 actual exportedV2,0skip, all dependencies unchanged. Old invalidated all-skip proof preserved/withdrawn; not G2 application downgrade certification."
+    },
+    {
+      "name": "generated-openapi-types",
+      "command": "node apps/web/scripts/generate-types.mjs --check",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Actual host export32paths/110schemas, generated TS unchanged in complete24; real Kestrel boundary/export tests included."
+    },
+    {
+      "name": "changed-tsx-readability",
+      "command": "python3 scripts/check-tsx-readability.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "5 changed handwritten TSX files,0 violations <=200 characters; independent code review separately recorded."
+    },
+    {
+      "name": "public-history-finite-scan",
+      "command": "python3 scripts/maintenance/audit-public-history.py",
+      "status": "PARTIAL",
+      "exitCode": 2,
+      "output": "Source checkpoint5df:336commits/2569blobs/6same prior triaged candidates/0omissions. Original REVIEW_REQUIRED retained, no new candidate then; not semantic privacy/unreachable-object certification. Final receipt may add an external fixed-Head check."
+    },
+    {
+      "name": "m1-exact-resource-apply",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "40 exact own synthetic volumes and3 native worker trees inspected/owned; awaiting main same-HeadCI and fresh independently reviewed whitelist. No deletion preclaimed."
+    },
+    {
+      "name": "monaco",
+      "command": null,
+      "status": "BLOCKED",
+      "exitCode": null,
+      "output": "PAUSED_BY_USER; existing textarea fallback, no Monaco dependency."
+    },
+    {
+      "name": "real-llm-and-real-business-sources",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "No paid model calls; deterministic harness only. Five real business sources and historical private production backups not imported."
+    },
+    {
+      "name": "windows-intel-production-supplychain",
+      "command": null,
+      "status": "NOT_VERIFIED",
+      "exitCode": null,
+      "output": "Windows/Intel,productionHA/certificate rotation/SLO-RPO-RTO/full supplychain/semanticprivacy/physicalSSD recovery are not certified."
+    }
+  ],
+  "ci": {
+    "status": "NOT_VERIFIED",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "scope": "actual own isolated AppHost/PG/Jena/RustFS, each paused only during a protected health request and unpaused in finally",
+  "checks": [
+    {
+      "check": "health_key_required",
+      "status": "PASS",
+      "httpStatus": 401,
+      "elapsedMs": 2.468417020281777,
+      "maximumObservedEnvelopeMs": 3000,
+      "internalBudgetMs": 2000
+    },
+    {
+      "check": "all_real_modules_dependencies_ready",
+      "status": "PASS",
+      "httpStatus": 200,
+      "elapsedMs": 44.08862499985844,
+      "maximumObservedEnvelopeMs": 3000,
+      "internalBudgetMs": 2000
+    },
+    {
+      "check": "jena_stall_fails_closed",
+      "status": "PASS",
+      "httpStatus": 503,
+      "elapsedMs": 2016.715292003937,
+      "maximumObservedEnvelopeMs": 3000,
+      "internalBudgetMs": 2000
+    },
+    {
+      "check": "jena_recovered",
+      "status": "PASS",
+      "httpStatus": 200,
+      "elapsedMs": 48.236082977382466,
+      "maximumObservedEnvelopeMs": 3000,
+      "internalBudgetMs": 2000
+    },
+    {
+      "check": "rustfs_stall_fails_closed",
+      "status": "PASS",
+      "httpStatus": 503,
+      "elapsedMs": 2006.4502500172239,
+      "maximumObservedEnvelopeMs": 3000,
+      "internalBudgetMs": 2000
+    },
+    {
+      "check": "rustfs_recovered",
+      "status": "PASS",
+      "httpStatus": 200,
+      "elapsedMs": 51.6759589954745,
+      "maximumObservedEnvelopeMs": 3000,
+      "internalBudgetMs": 2000
+    },
+    {
+      "check": "governance_postgres_stall_fails_closed",
+      "status": "PASS",
+      "httpStatus": 503,
+      "elapsedMs": 1009.1417089861352,
+      "maximumObservedEnvelopeMs": 3000,
+      "internalBudgetMs": 2000
+    },
+    {
+      "check": "governance_postgres_recovered",
+      "status": "PASS",
+      "httpStatus": 200,
+      "elapsedMs": 48.12079097609967,
+      "maximumObservedEnvelopeMs": 3000,
+      "internalBudgetMs": 2000
+    }
+  ],
+  "status": "PASS"
+}

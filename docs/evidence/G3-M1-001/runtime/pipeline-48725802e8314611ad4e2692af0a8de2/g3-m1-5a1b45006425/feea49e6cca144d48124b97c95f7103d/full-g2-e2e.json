@@ -1,0 +1,733 @@
+{
+  "stage": "FULL_G2_REAL_OIDC",
+  "status": "PASS",
+  "overallG2": "PARTIAL",
+  "checks": [
+    {
+      "name": "anonymous_authorization_before_malformed_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "anonymous_publication_proposal_prebinding_401",
+      "status": "PASS",
+      "observedStatus": 401
+    },
+    {
+      "name": "anonymous_publication_decision_prebinding_401",
+      "status": "PASS",
+      "observedStatus": 401
+    },
+    {
+      "name": "anonymous_publication_activation_prebinding_401",
+      "status": "PASS",
+      "observedStatus": 401
+    },
+    {
+      "name": "operator-ab_real_http_only_session",
+      "status": "PASS"
+    },
+    {
+      "name": "operator-ab_csrf",
+      "status": "PASS"
+    },
+    {
+      "name": "operator_missing_csrf_denied",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "operator_real_draft_created",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "persisted_initial_sources_exact",
+      "status": "PASS"
+    },
+    {
+      "name": "all_four_utf8_hashes_match",
+      "status": "PASS"
+    },
+    {
+      "name": "real_noop_save",
+      "status": "PASS"
+    },
+    {
+      "name": "no_op_preserves_complete_source",
+      "status": "PASS"
+    },
+    {
+      "name": "persistent_readback",
+      "status": "PASS"
+    },
+    {
+      "name": "live_jena_shacl",
+      "status": "PASS"
+    },
+    {
+      "name": "viewer-a_real_http_only_session",
+      "status": "PASS"
+    },
+    {
+      "name": "viewer-a_csrf",
+      "status": "PASS"
+    },
+    {
+      "name": "full_multisite_scope_required",
+      "status": "PASS"
+    },
+    {
+      "name": "viewer-ab_real_http_only_session",
+      "status": "PASS"
+    },
+    {
+      "name": "viewer-ab_csrf",
+      "status": "PASS"
+    },
+    {
+      "name": "authorized_full_scope_read",
+      "status": "PASS"
+    },
+    {
+      "name": "role_authorization_before_malformed_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "viewer_publication_proposal_prebinding_403",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "viewer_publication_decision_prebinding_403",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "viewer_publication_activation_prebinding_403",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "auditor-ab_real_http_only_session",
+      "status": "PASS"
+    },
+    {
+      "name": "auditor-ab_csrf",
+      "status": "PASS"
+    },
+    {
+      "name": "actual_auditor_reads_governance_audit",
+      "status": "PASS"
+    },
+    {
+      "name": "publication_role_denials_have_committed_audit",
+      "status": "PASS"
+    },
+    {
+      "name": "success_and_denial_audits_persisted",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_four_real_file_import_create",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "ui_full_scope_and_source_exact",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_real_structural_edit",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "ui_projection_tracks_saved_revision",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_concurrent_real_remote_save",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "ui_stale_revision_real_409",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_409_preserves_local_text",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_remote_compare_preserves_local_text",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_explicit_discard_loads_remote",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_name_save_real_put_200",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "ui_name_save_returns_new_name",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_name_save_preserves_source_and_hashes",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_name_save_persistent_get",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_real_shacl_conforms",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_real_diff_revisions_and_triple",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_export_exact_server_source_bytes",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_1440_dark_no_horizontal_overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_1440_light_no_horizontal_overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_1280_dark_no_horizontal_overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_1280_light_no_horizontal_overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_390_dark_no_horizontal_overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_390_light_no_horizontal_overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_no_uncaught_hydration_errors",
+      "status": "PASS"
+    },
+    {
+      "name": "actual_three_capability_registry",
+      "status": "PASS"
+    },
+    {
+      "name": "executor_v4_and_exact_tools",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_command_0",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "ui_command_1",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "http_decisions_2",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "http_release-activations_3",
+      "status": "PASS",
+      "observedStatus": 409
+    },
+    {
+      "name": "ui_command_4",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "r1_distinct_subjects",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_command_5",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "formal_release_read_6",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_new_manifest_v2_assessment_bound",
+      "status": "PASS"
+    },
+    {
+      "name": "r1_formal_immutable_graphs_sources",
+      "status": "PASS"
+    },
+    {
+      "name": "real_sparql_observation_0",
+      "status": "PASS"
+    },
+    {
+      "name": "real_sparql_observation_1",
+      "status": "PASS"
+    },
+    {
+      "name": "real_sparql_observation_2",
+      "status": "PASS"
+    },
+    {
+      "name": "real_sparql_observation_3",
+      "status": "PASS"
+    },
+    {
+      "name": "real_sparql_observation_4",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_command_7",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "ui_evidence_reauthorized",
+      "status": "PASS"
+    },
+    {
+      "name": "cross_scope_evidence_denied",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_command_8",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "ui_command_9",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "real_mcp_http_initialize",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "real_mcp_rpc_initialize",
+      "status": "PASS"
+    },
+    {
+      "name": "real_mcp_http_tools/list",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "real_mcp_rpc_tools/list",
+      "status": "PASS"
+    },
+    {
+      "name": "mcp_exact_readonly_schemas",
+      "status": "PASS"
+    },
+    {
+      "name": "real_mcp_http_tools/call",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "real_mcp_rpc_tools/call",
+      "status": "PASS"
+    },
+    {
+      "name": "mcp_formal_result_describe_ontology",
+      "status": "PASS"
+    },
+    {
+      "name": "real_mcp_http_tools/call",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "real_mcp_rpc_tools/call",
+      "status": "PASS"
+    },
+    {
+      "name": "mcp_formal_result_resolve_entity",
+      "status": "PASS"
+    },
+    {
+      "name": "real_mcp_http_tools/call",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "real_mcp_rpc_tools/call",
+      "status": "PASS"
+    },
+    {
+      "name": "mcp_formal_result_traverse_relationships",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_command_10",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "ui_real_native_sse_tool_delta_evidence_terminal",
+      "status": "PASS"
+    },
+    {
+      "name": "actual_yarp_native_sse_media_type",
+      "status": "PASS"
+    },
+    {
+      "name": "sse_persisted_monotonic_fixed_snapshot",
+      "status": "PASS"
+    },
+    {
+      "name": "actual_last_event_id_exact_resume",
+      "status": "PASS"
+    },
+    {
+      "name": "http_execution-runs_11",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "disabled_model_durable_failure_no_tools",
+      "status": "PASS"
+    },
+    {
+      "name": "r2_new_source_saved",
+      "status": "PASS"
+    },
+    {
+      "name": "http_validations_12",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "r2_real_shacl",
+      "status": "PASS"
+    },
+    {
+      "name": "http_release-proposals_13",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "ui_command_14",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "r2_distinct_subjects",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_command_15",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "http_queries_16",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "http_queries_17",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "active_r2_and_history_r1_do_not_mix",
+      "status": "PASS"
+    },
+    {
+      "name": "existing_run_snapshot_retains_r1_after_r2",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_command_18",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "ui_command_19",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "rollback_distinct_subjects",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_command_20",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "rollback_monotonic_activation_revision",
+      "status": "PASS"
+    },
+    {
+      "name": "http_queries_21",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "rollback_query_matches_exact_r1",
+      "status": "PASS"
+    },
+    {
+      "name": "formal_release_read_22",
+      "status": "PASS"
+    },
+    {
+      "name": "rollback_preserves_r2_history",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_profile_authorized",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_profile_twenty_asserted",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_profile_budgets",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_http_ontology-drafts_3",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m1_four_source_persist_exact",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_four_hashes_exact",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_noop_save",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_noop_bytes",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_http_ontology-comparisons_8",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m1_four_noop_graphs",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_http_assessments_10",
+      "status": "PASS",
+      "observedStatus": 428
+    },
+    {
+      "name": "m1_http_assessments_11",
+      "status": "PASS",
+      "observedStatus": 400
+    },
+    {
+      "name": "m1_http_assessments_12",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m1_real_assessment_stages",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_assessment_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_assessment_persistent",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_assessment_scope",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_role_prebinding",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_invalid_turtle_rejected",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_invalid_no_revision",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_ui_twenty_rows",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_ui_export_ontologyTurtle",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_ui_import_dirty_marker_ontologyTurtle",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_ui_import_dirty_ontologyTurtle",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_ui_import_export_ontologyTurtle",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_ui_reimport_clean_ontologyTurtle",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_ui_export_shapesTurtle",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_ui_import_dirty_marker_shapesTurtle",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_ui_import_dirty_shapesTurtle",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_ui_import_export_shapesTurtle",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_ui_reimport_clean_shapesTurtle",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_ui_export_vocabularyTurtle",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_ui_import_dirty_marker_vocabularyTurtle",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_ui_import_dirty_vocabularyTurtle",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_ui_import_export_vocabularyTurtle",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_ui_reimport_clean_vocabularyTurtle",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_ui_export_dataTurtle",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_ui_import_dirty_marker_dataTurtle",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_ui_import_dirty_dataTurtle",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_ui_import_export_dataTurtle",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_ui_reimport_clean_dataTurtle",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_ui_delayed_import_preserves_new_name",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_ui_delayed_import_exact_target_bytes",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_ui_delayed_import_preserves_other_source",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_ui_race_restore_original_clean",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_ui_real_assessment",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_ui_four_comparisons",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_ui_keyboard_executes_real_comparison",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_ui_1440_light",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_ui_1440_dark",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_ui_390_light",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_ui_390_dark",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_ui_no_hydration",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_v2_formal_binding",
+      "status": "PASS"
+    }
+  ],
+  "failure": null,
+  "notRun": [
+    "final sameHead CI",
+    "real model BLOCKED",
+    "Monaco PAUSED_BY_USER",
+    "Windows/Intel/production NOT_RUN"
+  ]
+}

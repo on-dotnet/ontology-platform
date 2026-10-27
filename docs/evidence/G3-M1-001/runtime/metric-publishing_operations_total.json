@@ -1,0 +1,60 @@
+{
+  "status": "success",
+  "data": [
+    {
+      "__name__": "publishing_operations_total",
+      "deployment_environment_name": "development",
+      "instance": "platform-api-2",
+      "job": "ontology-platform-api",
+      "operation": "outbox",
+      "phase": "lease",
+      "service_name": "ontology-platform-api",
+      "service_version": "G2-THIN-SLICE-001",
+      "status": "failure"
+    },
+    {
+      "__name__": "publishing_operations_total",
+      "deployment_environment_name": "development",
+      "instance": "platform-api-1",
+      "job": "ontology-platform-api",
+      "operation": "publish",
+      "phase": "commit",
+      "service_name": "ontology-platform-api",
+      "service_version": "G2-THIN-SLICE-001",
+      "status": "allowed"
+    },
+    {
+      "__name__": "publishing_operations_total",
+      "deployment_environment_name": "development",
+      "instance": "platform-api-2",
+      "job": "ontology-platform-api",
+      "operation": "outbox",
+      "phase": "consume",
+      "service_name": "ontology-platform-api",
+      "service_version": "G2-THIN-SLICE-001",
+      "status": "allowed"
+    },
+    {
+      "__name__": "publishing_operations_total",
+      "deployment_environment_name": "development",
+      "instance": "platform-api-1",
+      "job": "ontology-platform-api",
+      "operation": "outbox",
+      "phase": "consume",
+      "service_name": "ontology-platform-api",
+      "service_version": "G2-THIN-SLICE-001",
+      "status": "allowed"
+    },
+    {
+      "__name__": "publishing_operations_total",
+      "deployment_environment_name": "development",
+      "instance": "platform-api-1",
+      "job": "ontology-platform-api",
+      "operation": "rollback",
+      "phase": "commit",
+      "service_name": "ontology-platform-api",
+      "service_version": "G2-THIN-SLICE-001",
+      "status": "allowed"
+    }
+  ]
+}

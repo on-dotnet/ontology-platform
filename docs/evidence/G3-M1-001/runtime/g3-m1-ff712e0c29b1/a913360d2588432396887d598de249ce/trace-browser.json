@@ -1,0 +1,12 @@
+{
+  "status": "PASS",
+  "checks": [
+    "actual_release_page_generated_valid_precise_trace_link",
+    "deployed_grafana_tempo_query_returns_requested_trace",
+    "actual_trace_data_frame_is_nonempty",
+    "authenticated_actual_trace_view_captured"
+  ],
+  "traceId": "a36c6d85f0bb80d758d63e067153fb3a",
+  "datasource": "platform-tempo",
+  "scope": "actual runtime link and deployed Grafana/Tempo, no storage/network authentication export"
+}

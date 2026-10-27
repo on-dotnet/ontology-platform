@@ -1,0 +1,17 @@
+success-read-commits-exactly-one-fact: PASS
+success-response-excludes-own-event: PASS
+complete-real-single-site-scope: PASS
+success-valid-trace: PASS
+returned-audit-id-is-real-persisted-scope-and-trace: PASS
+insert-failure-no-success-audit-id: PASS
+insert-failure-no-new-success-fact: PASS
+insert-failure-safe-problem: PASS
+same-cookie-recovers-and-previous-fact-visible: PASS
+real-loki-fixed-event-and-fields: PASS
+real-loki-fixed-route-status-trace: PASS
+real-loki-only-three-index-labels: PASS
+real-tempo-error-span: PASS
+real-tempo-classification-and-outcome: PASS
+real-tempo-no-raw-error-description: PASS
+actual-loki-tempo-no-injected-or-runtime-secrets: PASS
+PASS: actual committed audit-read and controlled database_write event linked to Tempo; traceId=10b6d5c41e1b48b89eeae581bbdf2737
