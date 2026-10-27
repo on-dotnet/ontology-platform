@@ -6,7 +6,8 @@
 param(
     [string]$Root = (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent),
     [switch]$IncludeDocker,
-    [string]$ApprovalPath
+    [string]$ApprovalPath,
+    [string]$DockerDecisionPath
 )
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
@@ -192,7 +193,7 @@ if ($IncludeDocker) {
             if ($pair[1] -ceq 'docker-history') { $target = $target.Split('/')[-1] }
             if (-not $seenTargets.Add($target)) { continue }
             $approved = Find-Approval $pair[1] $target
-            $classification = 'KEEP'; $reason = 'Exact G2 private runtime/PFX recovery binding, pinned dependency, or resource not in project-reviewed deletion whitelist.'
+            $classification = 'AMBIGUOUS'; $reason = 'Exact owner/recovery decision requires review; missing whitelist alone is not a permanent KEEP reason.'
             if ($null -ne $approved -and ($null -eq $approval -or $target -cnotin $approval.keep)) {
                 $actual = Read-DockerApproval $pair[1] $target $approved
                 if ($actual.matches) { $classification = 'SAFE_CANDIDATE'; $reason = 'Actual identity/version equals exact closed synthetic project resource approval; guarded Apply still verifies no active references.' }
@@ -202,6 +203,14 @@ if ($IncludeDocker) {
         }
     }
     $docker.decisions = $decisions.ToArray()
+    # 扩展元数据通过固定字段API读取，不触及环境变量、构建参数或卷内容。
+    $python = if ($IsWindows) { 'python' } else { 'python3' }
+    $inventoryArguments = @((Join-Path $PSScriptRoot 'docker_inventory.py'))
+    if ($DockerDecisionPath) { $inventoryArguments += @('--decisions', [IO.Path]::GetFullPath($DockerDecisionPath)) }
+    $inventory = Read-ResourceCommand $python $inventoryArguments
+    if ($inventory.exitCode -eq 0) { $docker.inventory = $inventory.text | ConvertFrom-Json -AsHashtable }
+    else { $docker.status = 'BLOCKED'; $docker.reason = 'Extended exact-ID Docker inventory failed; no deletion or PASS inferred.' }
+
 
 }
 [ordered]@{
