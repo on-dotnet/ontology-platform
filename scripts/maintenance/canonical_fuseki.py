@@ -147,7 +147,7 @@ def ensure_image(context, task_id, run_id):
         if result.returncode != 0:
             raise BuildRefused('Canonical Fuseki build failed; raw output suppressed',failure_diagnostic(result,args))
         if context_digest(context) != digest:
-            raise BuildRefused('Build context changed during build')
+            raise BuildRefused('Build context changed during build',failure_diagnostic(result,args))
         result = invoke(inspect)
     if result.returncode != 0:
         raise BuildRefused('Built image cannot be verified',failure_diagnostic(result,inspect))
@@ -155,11 +155,11 @@ def ensure_image(context, task_id, run_id):
         value = json.loads(result.stdout)
         labels = value['Labels'] or {}
         if not re.fullmatch(r'sha256:[0-9a-f]{64}',value['Id']) or labels.get('org.opencontainers.image.source') != SOURCE or labels.get('io.ontology-platform.context-sha256') != digest:
-            raise BuildRefused('Canonical tag identity or ownership changed')
+            raise BuildRefused('Canonical tag identity or ownership changed',failure_diagnostic(result,inspect))
     except (ValueError, KeyError, TypeError) as ex:
-        raise BuildRefused('Invalid image inspection schema') from ex
+        raise BuildRefused('Invalid image inspection schema',failure_diagnostic(result,inspect)) from None
     if context_digest(context) != digest:
-        raise BuildRefused('Build context changed during image verification')
+        raise BuildRefused('Build context changed during image verification',failure_diagnostic(result,inspect))
     return dict(image=image,imageId=value['Id'],contextSha256=digest,reused=reused,taskId=task_id,runId=run_id)
 
 
