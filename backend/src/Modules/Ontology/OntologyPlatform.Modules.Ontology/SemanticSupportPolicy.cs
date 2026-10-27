@@ -13,7 +13,7 @@ public sealed partial class JenaSemanticRuntime
         _ => throw new SemanticOperationException(409, "release_profile_unsupported")
     };
 
-    /// <summary>仅命名基本事实及有限命名公理可发布；结构编辑拒绝SOURCE公理。</summary>
+    /// <summary>仅命名基本事实及有限命名公理可发布；结构编辑仅接受已登记且类型匹配的命名公理。</summary>
     private static SemanticDiagnostic[] Support(RdfTriple[] triples, bool structural = false)
     {
         // 声明的属性允许简单断言；AnnotationProperty明确作为普通注释而非推理能力。
@@ -39,7 +39,7 @@ public sealed partial class JenaSemanticRuntime
             // 所有ontology/vocabulary/data blank表达式均保守阻断；Shapes另走ShapePolicy。
             var blocked = triple.Subject.Kind == RdfTermKind.Blank || triple.Object.Kind == RdfTermKind.Blank;
             if (triple.Predicate.StartsWith(JenaRdfCodec.Owl, StringComparison.Ordinal))
-                blocked |= structural || !namedAxioms.Contains(triple.Predicate) || triple.Subject.Kind != RdfTermKind.Iri || triple.Object.Kind != RdfTermKind.Iri;
+                blocked |= !namedAxioms.Contains(triple.Predicate) || triple.Subject.Kind != RdfTermKind.Iri || triple.Object.Kind != RdfTermKind.Iri;
             else if (triple.Predicate == JenaRdfCodec.Type)
             {
                 blocked |= triple.Object.Kind != RdfTermKind.Iri;
@@ -64,11 +64,34 @@ public sealed partial class JenaSemanticRuntime
                 if (objectProperties.Contains(triple.Predicate)) blocked |= triple.Object.Kind != RdfTermKind.Iri;
                 if (datatypeProperties.Contains(triple.Predicate)) blocked |= triple.Object.Kind != RdfTermKind.Literal;
             }
+            // M2结构编辑额外要求公理两端显式声明；历史发布仍保持原asserted-only白名单。
+            if (structural && namedAxioms.Contains(triple.Predicate)) blocked |= !NamedAxiomWellTyped(triple, triples);
             // M1未实现OWL-Time，声明及谓词都不得绕过SOURCE/BLOCKED矩阵。
             blocked |= triple.Predicate.StartsWith("http://www.w3.org/2006/time#", StringComparison.Ordinal) || (triple.Predicate == JenaRdfCodec.Type && triple.Object.Value.StartsWith("http://www.w3.org/2006/time#", StringComparison.Ordinal));
             if (blocked) result.Add(new SemanticDiagnostic { Code = triple.Predicate == JenaRdfCodec.Owl + "imports" ? "import_unlocked" : "axiom_unsupported", Severity = DiagnosticSeverity.Error, Message = structural ? "源码完整保留；该图含仅SOURCE或未支持公理，结构改写被阻断。" : "源码完整保留；该公理超出M1命名显式事实子集，发布被阻断，OWL推理未运行。", FocusNode = triple.Subject, Path = triple.Predicate });
         }
         return result.ToArray();
+    }
+
+    /// <summary>命名等价/互斥要求两端显式Class，逆属性要求两端显式ObjectProperty。</summary>
+    private static bool NamedAxiomWellTyped(RdfTriple triple, RdfTriple[] triples)
+    {
+        // 只处理本轮三个受控命名公理，不把未知OWL谓词放宽。
+        var declaration = triple.Predicate switch
+        {
+            JenaRdfCodec.Owl + "equivalentClass" or JenaRdfCodec.Owl + "disjointWith" => JenaRdfCodec.Owl + "Class",
+            JenaRdfCodec.Owl + "inverseOf" => JenaRdfCodec.Owl + "ObjectProperty",
+            _ => null
+        };
+        return declaration is null || triple.Subject.Kind == RdfTermKind.Iri && triple.Object.Kind == RdfTermKind.Iri &&
+            new[] { triple.Subject, triple.Object }.All(term => triples.Any(item => item.Subject == term && item.Predicate == JenaRdfCodec.Type && item.Object.Kind == RdfTermKind.Iri && item.Object.Value == declaration));
+    }
+
+    /// <summary>完整编辑前后图均不允许遗留两端类型不符的命名公理。</summary>
+    private static void RequireNamedAxiomTypes(RdfTriple[] triples)
+    {
+        if (triples.Any(triple => triple.Subject.Kind == RdfTermKind.Iri && triple.Object.Kind == RdfTermKind.Iri && !NamedAxiomWellTyped(triple, triples)))
+            throw new SemanticOperationException(422, "rdf_edit_invalid");
     }
 
     /// <summary>只有唯一源匹配真实诊断才宣称来源，否则明确使用bundle。</summary>

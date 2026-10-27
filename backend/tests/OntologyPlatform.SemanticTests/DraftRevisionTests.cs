@@ -542,6 +542,9 @@ public sealed class DraftRevisionTests
         // 不修改历史report的wire shape或虚构具体data来源。
         var report = JsonSerializer.Deserialize<SemanticValidationReport>((await database.Validations.SingleAsync(row => row.ReportId == assessment.ValidationReportId)).ReportJson)!;
         Assert.IsTrue(report.Issues.All(issue => issue.SourceId == "synthetic-data"));
+        // 包装层必须保留真实sourceShape，空白shape仍不伪造源码行列。
+        Assert.IsTrue(assessment.Diagnostics.All(item => item.SourceShape is not null));
+        CollectionAssert.AreEqual(report.Issues.Select(issue => issue.SourceShape).ToArray(), assessment.Diagnostics.Select(item => item.SourceShape).ToArray());
     }
 
     /// <summary>支持策略诊断根据实际解析来源唯一匹配时保留准确单源hash。</summary>
@@ -681,6 +684,58 @@ public sealed class DraftRevisionTests
         // 跨资产即使scope相同也不能用比较泄露或混淆身份。
         var other = await service.CreateAsync(actor, Request(), default);
         Assert.AreEqual(403, (await Assert.ThrowsAsync<SemanticOperationException>(() => service.CompareAsync(actor, new CompareVersionsRequest { From = new VersionRef { Kind = VersionRefKind.Draft, Id = created.DraftId, Revision = 1 }, To = new VersionRef { Kind = VersionRefKind.Draft, Id = other.DraftId, Revision = 1 } }, default))).Status);
+    }
+
+    /// <summary>M2命名编辑通过真实事务保存、重开、评估与CAS，失败不改四源。</summary>
+    [TestMethod]
+    public async Task M2NamedEditAssessmentAndFailurePreserveCommittedSources()
+    {
+        // 真实隔离PG与Jena共同承载草稿，不提供业务替身。
+        await using var database = Database();
+        // 固定可信双厂身份，用于scope失败和持久化读回。
+        var actor = Actor();
+        // 生产用例复用真实事务审计。
+        var service = Service(database);
+        // 合法四源原文含CRLF注释，只有ontology允许结构命令变化。
+        var sources = new SourceBundle { OntologyTurtle = "# M2\r\n<urn:a> a <http://www.w3.org/2002/07/owl#Class> . <urn:b> a <http://www.w3.org/2002/07/owl#Class> .\r\n", ShapesTurtle = "# shapes\r\n", VocabularyTurtle = "# vocabulary\r\n", DataTurtle = "# data\n" };
+        // 创建真实已提交修订作为所有失败断言的基线。
+        var created = await service.CreateAsync(actor, Request() with { Sources = sources }, default);
+        // 精确命令对象不从显示标签推测。
+        var edit = new SemanticEdit { SubjectIri = "urn:a", PredicateIri = "http://www.w3.org/2002/07/owl#equivalentClass", NewObject = new RdfTerm { Kind = RdfTermKind.Iri, Value = "urn:b" } };
+        // 真实保存命名公理，并持久化第二修订。
+        var changed = await service.EditAsync(actor, created.DraftId, new EditDraftRequest { Edit = edit, Command = Command(1) }, default);
+        Assert.AreEqual(2L, changed.Revision);
+        Assert.AreEqual(sources with { OntologyTurtle = changed.Sources.OntologyTurtle }, changed.Sources);
+        Assert.AreEqual(created.Hashes.ShapesHash, changed.Hashes.ShapesHash);
+        Assert.AreEqual(created.Hashes.VocabularyHash, changed.Hashes.VocabularyHash);
+        Assert.AreEqual(created.Hashes.DataHash, changed.Hashes.DataHash);
+        // 最新服务评估必须绑定当前profile版本、全源散列及修订。
+        var assessment = await service.AssessAsync(actor, created.DraftId, new ValidateDraftRequest { Revision = 2, Hashes = changed.Hashes, Command = Command(2) }, default);
+        Assert.AreEqual("2", assessment.ProfileVersion);
+        Assert.AreEqual(changed.Hashes, assessment.Hashes);
+        Assert.AreEqual(2L, assessment.Revision);
+        Assert.IsTrue(assessment.PublishEligible);
+        // stale CAS、缺权限厂区与非法类型公理全部保持已提交修订。
+        Assert.AreEqual(409, (await Assert.ThrowsAsync<SemanticOperationException>(() => service.EditAsync(actor, created.DraftId, new EditDraftRequest { Edit = edit, Command = Command(1) }, default))).Status);
+        Assert.AreEqual(403, (await Assert.ThrowsAsync<SemanticOperationException>(() => service.EditAsync(actor with { SiteIds = ["site-a"] }, created.DraftId, new EditDraftRequest { Edit = edit, Command = Command(2) }, default))).Status);
+        Assert.AreEqual("rdf_edit_invalid", (await Assert.ThrowsAsync<SemanticOperationException>(() => service.EditAsync(actor, created.DraftId, new EditDraftRequest { Edit = edit with { NewObject = new RdfTerm { Kind = RdfTermKind.Iri, Value = "urn:undeclared" } }, Command = Command(2) }, default))).Code);
+        // no-op仍沿原保存规则增加修订，完整四源及散列逐字不变。
+        var noop = await service.EditAsync(actor, created.DraftId, new EditDraftRequest { Edit = edit, Command = Command(2) }, default);
+        Assert.AreEqual(3L, noop.Revision);
+        Assert.AreEqual(changed.Sources, noop.Sources);
+        Assert.AreEqual(changed.Hashes, noop.Hashes);
+        // 旧assessment不能绑定新修订的发布冻结入口。
+        await using (var connection = new NpgsqlConnection(Connection()))
+        {
+            await connection.OpenAsync();
+            // 外部真实PG事务作为发布冻结的同事务边界。
+            await using var transaction = await connection.BeginTransactionAsync();
+            Assert.AreEqual(409, (await Assert.ThrowsAsync<SemanticOperationException>(() => service.LockForPublicationAsync(actor, created.DraftId, 3, noop.Hashes, assessment.ValidationReportId, connection, transaction, default))).Status);
+        }
+        // 重新打开绕过EF跟踪缓存，核验权威原文和历史。
+        await using var reopened = Database();
+        Assert.AreEqual(noop.Sources, (await Service(reopened).ReadAsync(actor, created.DraftId, default)).Sources);
+        Assert.AreEqual(3, await reopened.Revisions.CountAsync(row => row.DraftId == created.DraftId));
     }
 
     /// <summary>评估有效期测试专用局部时钟。</summary>

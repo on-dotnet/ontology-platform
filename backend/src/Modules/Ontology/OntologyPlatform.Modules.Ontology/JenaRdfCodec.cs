@@ -75,8 +75,17 @@ internal static class JenaRdfCodec
     /// <summary>为编辑输出合法N-Triples项；IRI按语法检查，字面量使用兼容转义。</summary>
     internal static string Term(RdfTerm term)
     {
-        if (term.Kind == RdfTermKind.Iri) return "<" + Iri(term.Value) + ">";
+        if (term.Value is null) throw new SemanticOperationException(422, "rdf_term_invalid");
+        if (term.Kind == RdfTermKind.Iri)
+        {
+            if (term.Datatype is not null || term.Language is not null) throw new SemanticOperationException(422, "rdf_term_invalid");
+            return "<" + Iri(term.Value) + ">";
+        }
         if (term.Kind != RdfTermKind.Literal) throw new SemanticOperationException(422, "blank_edit_unsupported");
+        // RIOT可能同时投影rdf:langString与language；只有规范组合能无损导出。
+        if (term.Language is not null && term.Datatype is not null && term.Datatype != "http://www.w3.org/1999/02/22-rdf-syntax-ns#langString" ||
+            term.Language is null && term.Datatype == "http://www.w3.org/1999/02/22-rdf-syntax-ns#langString")
+            throw new SemanticOperationException(422, "rdf_term_invalid");
         if (term.Language is not null && !System.Text.RegularExpressions.Regex.IsMatch(term.Language, "^[a-zA-Z]+(-[a-zA-Z0-9]+)*$"))
             throw new SemanticOperationException(422, "rdf_term_invalid");
         return Literal(term.Value) + (term.Language is not null ? "@" + term.Language : term.Datatype is not null ? "^^<" + Iri(term.Datatype) + ">" : "");

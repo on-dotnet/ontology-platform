@@ -94,7 +94,7 @@ public sealed partial class OntologyService
     {
         // 只有真实支持诊断证明的来源可使用单源hash；旧synthetic-data表示合并图，必须使用bundle，不能猜成data。
         var source = issue.SourceId switch { "ontology" => "ontology", "shapes" => "shapes", "vocabulary" => "vocabulary", "data" => "data", "synthetic-data" => "bundle", _ => "bundle" };
-        return new AssessmentDiagnostic { SourceId = source, SourceHash = source switch { "ontology" => hashes.OntologyHash, "shapes" => hashes.ShapesHash, "vocabulary" => hashes.VocabularyHash ?? hashes.BundleHash, "data" => hashes.DataHash, _ => hashes.BundleHash }, Diagnostic = new SemanticDiagnostic { Code = "validation_issue", Severity = issue.Severity, Message = issue.Message, FocusNode = issue.FocusNode, Path = issue.Path }, Line = null, Column = null };
+        return new AssessmentDiagnostic { SourceId = source, SourceHash = source switch { "ontology" => hashes.OntologyHash, "shapes" => hashes.ShapesHash, "vocabulary" => hashes.VocabularyHash ?? hashes.BundleHash, "data" => hashes.DataHash, _ => hashes.BundleHash }, Diagnostic = new SemanticDiagnostic { Code = "validation_issue", Severity = issue.Severity, Message = issue.Message, FocusNode = issue.FocusNode, Path = issue.Path }, SourceShape = issue.SourceShape, Line = null, Column = null };
     }
 
     /// <summary>重新散列并逐字段核查持久评估，任何绑定或时效漂移失败关闭。</summary>

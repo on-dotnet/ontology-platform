@@ -26,7 +26,9 @@ public sealed class G3BoundaryTests
         var service = new OntologyService(null!, null!, null!, TimeProvider.System);
         Assert.IsInstanceOfType<IG3OntologyService>(service);
         // 固定JSON顺序与空hash计算规范可由客户端独立复算。
-        var profile = ((IG3OntologyService)(object)service).GetProfile();
+        var profile = SemanticProfile.LegacyM1();
+        Assert.AreEqual("2", ((IG3OntologyService)(object)service).GetProfile().Version);
+        Assert.AreEqual("54e4db0fac2c7e4f89802678f3269b8a460190775b53b4fb74955f8cbadd8b86", profile.Hash);
         Assert.AreEqual(20, profile.Capabilities.Length);
         Assert.AreEqual("ontology-platform/g3-m1", profile.ProfileId);
         Assert.AreEqual("1", profile.Version);
@@ -59,7 +61,7 @@ public sealed class G3BoundaryTests
         Assert.AreEqual(GraphComparisonStatus.Different, (await ((IG3SemanticRuntime)(object)runtime).CompareSourcesAsync(left, different, default))[0].Graph.Status);
     }
 
-    /// <summary>二十个真实Turtle语料逐项验证支持矩阵，有限命名公理只允许源码发布。</summary>
+    /// <summary>二十个真实Turtle语料逐项验证支持矩阵，有限命名公理的历史发布覆盖与当前编辑能力并存。</summary>
     [TestMethod]
     public async Task TwentyCorpusRowsUseAssertedOnlySupportAndShapesBlankException()
     {
@@ -80,9 +82,9 @@ public sealed class G3BoundaryTests
             Assert.AreEqual(index < 11, report.Conforms, Path.GetFileName(corpus[index]));
             if (index is >= 8 and <= 10)
             {
-                // 命名OWL公理SOURCE可编辑但整图不能结构重写。
+                // 当前M2已登记命名公理且语料两端有显式类型，整图可结构编辑。
                 var analysis = await runtime.AnalyzeAsync(sources, 1, default);
-                Assert.IsFalse(analysis.Projection.StructuralEditAllowed);
+                Assert.IsTrue(analysis.Projection.StructuralEditAllowed);
             }
         }
         // 合法SHACL property/list blank节点遵守独立ShapePolicy。

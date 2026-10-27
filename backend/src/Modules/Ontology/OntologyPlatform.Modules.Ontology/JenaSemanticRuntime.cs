@@ -109,11 +109,19 @@ public sealed partial class JenaSemanticRuntime : ISemanticRuntime, IG3SemanticR
         {
             // 使用真正RDF解析后的完整图，不从节点/边投影重建本体。
             var parsed = await ParseSourcesAsync(sources, graphs, token);
+            RequireNamedAxiomTypes(parsed[0]);
             if (Support(parsed[0], structural: true).Length != 0) throw new SemanticOperationException(422, "structural_edit_unsupported");
             JenaRdfCodec.Iri(edit.SubjectIri);
             JenaRdfCodec.Iri(edit.PredicateIri);
             if (edit.OldObject?.Kind == RdfTermKind.Blank || edit.NewObject?.Kind == RdfTermKind.Blank || (edit.OldObject is null && edit.NewObject is null))
                 throw new SemanticOperationException(422, "rdf_edit_invalid");
+            // 先校验所有客体字段，不能由no-op或集合相等绕过非法元数据。
+            foreach (var term in new[] { edit.OldObject, edit.NewObject })
+            {
+                if (term is null) continue;
+                try { JenaRdfCodec.Term(term); }
+                catch (SemanticOperationException exception) when (exception.Code == "rdf_term_invalid") { throw new SemanticOperationException(422, "rdf_edit_invalid"); }
+            }
             if (!EditablePredicate(edit.PredicateIri, parsed[0])) throw new SemanticOperationException(422, "predicate_edit_unsupported");
             // 原始精确三元组集合只移除显式指定的旧值，不扩大到整个谓词。
             var triples = parsed[0].ToList();
@@ -126,6 +134,7 @@ public sealed partial class JenaSemanticRuntime : ISemanticRuntime, IG3SemanticR
             // 重复新增也为no-op，不丢掉注释或改变权威源码字节。
             var result = triples.Distinct().ToArray();
             if (result.ToHashSet().SetEquals(parsed[0])) return sources;
+            RequireNamedAxiomTypes(result);
             if (Support(result, structural: true).Length != 0) throw new SemanticOperationException(422, "structural_edit_unsupported");
             return sources with { OntologyTurtle = JenaRdfCodec.Canonical(result) + "\n" };
         }, cancellationToken);
@@ -398,7 +407,7 @@ public sealed partial class JenaSemanticRuntime : ISemanticRuntime, IG3SemanticR
 
     /// <summary>编辑标准基本谓词或本图实际声明的对象/数据属性。</summary>
     private static bool EditablePredicate(string predicate, RdfTriple[] triples) =>
-        new[] { JenaRdfCodec.Type, JenaRdfCodec.Label, "http://www.w3.org/2000/01/rdf-schema#comment", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://www.w3.org/2000/01/rdf-schema#domain", "http://www.w3.org/2000/01/rdf-schema#range" }.Contains(predicate, StringComparer.Ordinal) ||
+        new[] { JenaRdfCodec.Owl + "equivalentClass", JenaRdfCodec.Owl + "disjointWith", JenaRdfCodec.Owl + "inverseOf", JenaRdfCodec.Type, JenaRdfCodec.Label, "http://www.w3.org/2000/01/rdf-schema#comment", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://www.w3.org/2000/01/rdf-schema#domain", "http://www.w3.org/2000/01/rdf-schema#range" }.Contains(predicate, StringComparer.Ordinal) ||
         triples.Any(triple => triple.Subject.Value == predicate && triple.Predicate == JenaRdfCodec.Type && triple.Object.Value is JenaRdfCodec.Owl + "ObjectProperty" or JenaRdfCodec.Owl + "DatatypeProperty");
 
     /// <summary>由实际图构建有界节点和边，完整RDF三元组仍保留。</summary>
