@@ -17,6 +17,7 @@ internal static class Program
     {
         // 将路径解析、秘密参数和容器生命周期交给 Aspire 标准宿主。
         var builder = DistributedApplication.CreateBuilder(args);
+        ResourceLifecycle.Prepare(builder);
         if (builder.Configuration.GetValue<bool>("Wave2:Enabled"))
         {
             builder.AddWave2Infrastructure();
@@ -25,6 +26,7 @@ internal static class Program
         {
             builder.AddDevelopmentInfrastructure();
         }
+        ResourceLifecycle.Apply(builder);
         await builder.Build().RunAsync();
     }
 }
