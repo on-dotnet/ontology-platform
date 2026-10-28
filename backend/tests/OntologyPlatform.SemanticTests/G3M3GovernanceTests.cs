@@ -53,6 +53,34 @@ public sealed class G3M3GovernanceTests
         Assert.IsTrue(diagnostics.All(item => item.Diagnostic.Severity == (code == "language_policy_unknown" ? DiagnosticSeverity.Warning : DiagnosticSeverity.Error)));
     }
 
+    /// <summary>真实RIOT保留语言子标签，治理拒绝重复variant或extension且允许合法私用尾部。</summary>
+    [TestMethod]
+    [DataRow("en-u-ca-gregory-u-nu-latn", false)]
+    [DataRow("en-1901-1901", false)]
+    [DataRow("en-a-bbb-x-a-ccc", true)]
+    public async Task LanguageTagSubtagsRespectBcp47Uniqueness(string language, bool valid)
+    {
+        // Scheme与Concept已经注册，唯一可变项为被校验的语言标签。
+        var source = new SourceBundle { VocabularyTurtle = Prefix + Base + "ex:a skos:prefLabel \"合成语言标签\"@" + language + " ." };
+        // 调用真实RIOT解析和生产治理，而不是单独验证正则表达式。
+        var snapshot = await ((IG3VocabularyRuntime)SemanticFixture.Runtime()).ReadVocabularyAsync(source, 1, default);
+        Assert.IsTrue(snapshot.Triples.Any(item => item.Triple.Predicate == "http://www.w3.org/2004/02/skos/core#prefLabel" && string.Equals(item.Triple.Object.Language, language, StringComparison.OrdinalIgnoreCase)));
+        if (valid)
+        {
+            Assert.IsEmpty(snapshot.Diagnostics);
+        }
+        else
+        {
+            // 诊断必须准确归属于原词汇hash、主体和标签谓词。
+            var diagnostic = snapshot.Diagnostics.Single(item => item.Diagnostic.Code == "skos_label_language_invalid");
+            Assert.AreEqual(DiagnosticSeverity.Error, diagnostic.Diagnostic.Severity);
+            Assert.AreEqual("vocabulary", diagnostic.SourceId);
+            Assert.AreEqual(snapshot.Hashes.VocabularyHash, diagnostic.SourceHash);
+            Assert.AreEqual("urn:synthetic:m3:a", diagnostic.Diagnostic.FocusNode?.Value);
+            Assert.AreEqual("http://www.w3.org/2004/02/skos/core#prefLabel", diagnostic.Diagnostic.Path);
+        }
+    }
+
     /// <summary>合法多语言、跨Scheme映射及不同语言同文字不应被误判冲突。</summary>
     [TestMethod]
     public async Task ValidMultilingualAndCrossSchemeMappingHaveNoDiagnostics()

@@ -76,6 +76,29 @@ public sealed class G3M3ServiceTests
         }
     }
 
+    /// <summary>重复语言extension经过真实PG和RIOT后必须阻断M3正式发布资格。</summary>
+    [TestMethod]
+    public async Task DuplicateLanguageTagSubtagsBlockAssessmentPublication()
+    {
+        // 仅连接当前脚本创建的临时PG，保留真实草稿与评估事务。
+        await using var database = Database();
+        // 复用生产语义服务和同事务审计。
+        var service = Service(database);
+        // 使用独立可信主体及唯一命令。
+        var actor = Actor();
+        // 普通源码保留语言标签原文，不在保存时擅自清洗。
+        var sources = Sources() with { VocabularyTurtle = Sources().VocabularyTurtle + " <urn:synthetic:m3:c> <http://www.w3.org/2004/02/skos/core#prefLabel> \"Synthetic invalid language\"@en-u-ca-gregory-u-nu-latn ." };
+        // 创建与评估均走生产服务和真实RIOT。
+        var draft = await service.CreateAsync(actor, new CreateDraftRequest { Name = "Synthetic language assessment", Scope = new ResourceScope { OrganizationId = actor.OrganizationId, SiteIds = actor.SiteIds }, Sources = sources, Command = Command(0) }, default);
+        // 使用创建回包的精确修订hash，排除旧状态造成的拒绝。
+        var assessment = await service.AssessAsync(actor, draft.DraftId, new ValidateDraftRequest { Revision = 1, Hashes = draft.Hashes, Command = Command(1) }, default);
+        Assert.AreEqual(AssessmentStageStatus.Pass, assessment.Stages.Single(stage => stage.Name == "PARSE").Status);
+        Assert.AreEqual(AssessmentStageStatus.Pass, assessment.Stages.Single(stage => stage.Name == "SHACL_CORE").Status);
+        Assert.AreEqual(AssessmentStageStatus.Fail, assessment.Stages.Single(stage => stage.Name == "GOVERNANCE").Status);
+        Assert.IsFalse(assessment.PublishEligible);
+        Assert.IsTrue(assessment.Diagnostics.Any(item => item.Diagnostic.Code == "skos_label_language_invalid" && item.SourceId == "vocabulary" && item.SourceHash == draft.Hashes.VocabularyHash));
+    }
+
     /// <summary>单位治理进入同一真实PG评估；完整合法、精度未知和量纲冲突三个结论分开。</summary>
     [TestMethod]
     [DataRow("valid", AssessmentStageStatus.Pass)]

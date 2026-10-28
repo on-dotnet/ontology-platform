@@ -90,7 +90,20 @@ public sealed partial class JenaSemanticRuntime
         private static RdfTerm LabelIdentity(RdfTerm term) => term with { Language = term.Language?.ToLowerInvariant(), Datatype = term.Language is not null ? "http://www.w3.org/1999/02/22-rdf-syntax-ns#langString" : term.Datatype ?? Xsd + "string" };
 
         /// <summary>BCP47语法验证支持普通、private use及登记的grandfathered形式，不把语言政策当语法。</summary>
-        private static bool LanguageSyntax(string language) => Regex.IsMatch(language, @"^(?:(?:[a-z]{2,3}(?:-[a-z]{3}){0,3}|[a-z]{4}|[a-z]{5,8})(?:-[a-z]{4})?(?:-(?:[a-z]{2}|[0-9]{3}))?(?:-(?:[a-z0-9]{5,8}|[0-9][a-z0-9]{3}))*(?:-[0-9a-wy-z](?:-[a-z0-9]{2,8})+)*(?:-x(?:-[a-z0-9]{1,8})+)?|x(?:-[a-z0-9]{1,8})+|en-GB-oed|i-(?:ami|bnn|default|enochian|hak|klingon|lux|mingo|navajo|pwn|tao|tay|tsu)|sgn-(?:BE-FR|BE-NL|CH-DE)|art-lojban|cel-gaulish|no-bok|no-nyn|zh-guoyu|zh-hakka|zh-min|zh-min-nan|zh-xiang)$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(100));
+        private static bool LanguageSyntax(string language)
+        {
+            // ABNF捕获只覆盖variant和extension标识，private-use尾部保持不透明。
+            var syntax = Regex.Match(language, @"^(?:(?:[a-z]{2,3}(?:-[a-z]{3}){0,3}|[a-z]{4}|[a-z]{5,8})(?:-[a-z]{4})?(?:-(?:[a-z]{2}|[0-9]{3}))?(?:-(?<variant>[a-z0-9]{5,8}|[0-9][a-z0-9]{3}))*(?:-(?<extension>[0-9a-wy-z])(?:-[a-z0-9]{2,8})+)*(?:-x(?:-[a-z0-9]{1,8})+)?|x(?:-[a-z0-9]{1,8})+|en-GB-oed|i-(?:ami|bnn|default|enochian|hak|klingon|lux|mingo|navajo|pwn|tao|tay|tsu)|sgn-(?:BE-FR|BE-NL|CH-DE)|art-lojban|cel-gaulish|no-bok|no-nyn|zh-guoyu|zh-hakka|zh-min|zh-min-nan|zh-xiang)$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(100));
+            if (!syntax.Success) return false;
+            // RFC5646禁止重复variant或extension singleton，比较不区分大小写。
+            foreach (var name in new[] { "variant", "extension" })
+            {
+                // 两组独立去重，不把extension值或私用子标签混作variant。
+                var captures = syntax.Groups[name].Captures;
+                if (captures.Cast<Capture>().Select(capture => capture.Value).Distinct(StringComparer.OrdinalIgnoreCase).Count() != captures.Count) return false;
+            }
+            return true;
+        }
 
         /// <summary>只检查已登记显式SKOS事实，区分W3C完整性规则与本平台治理政策。</summary>
         internal void CheckSkos()

@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "taskId": "G3-M3-001",
+  "status": "PARTIAL_AWAITING_INDEPENDENT_REVIEW_AND_MASTER_CI",
+  "baseSha": "c2cffa6d5b32453ee1603c858d12b7c4102a8702",
+  "observedAtUtc": "2026-10-28T15:23:12.554884+00:00",
+  "rootCause": "ABNF-shaped regular expression did not enforce RFC5646 uniqueness of variants and extension singletons; RIOT accepts lexical tags and M3 GOV incorrectly passed",
+  "sourceReferences": [
+    "https://www.rfc-editor.org/rfc/rfc5646.html#section-2.2.5",
+    "https://www.rfc-editor.org/rfc/rfc5646.html#section-2.2.6"
+  ],
+  "oldImplementationSha256": "68cc3f48127b266d8957746e1031c0a44a0cf69f121d94ba44b165005fef02d3",
+  "correctedImplementationSha256": "86149ae038047d0e7653b1e5c57c8b08d47ea84e9f55c279694e0f54cd8dd524",
+  "tests": [
+    {
+      "label": "language-red",
+      "exitCode": 2,
+      "total": 4,
+      "passed": 1,
+      "failed": 3,
+      "skipped": 0,
+      "receiptPath": "docs/evidence/G3-M3-001/SEM/language-boundary/language-red.json",
+      "receiptSha256": "a9f4fe3884a0fc9981e2c43132732aad8af342834b63ed9631d4a2c3d65e6811",
+      "ignoredConsolePath": "/private/tmp/g3-m3-language-red.txt",
+      "ignoredConsoleSha256": "caf987a8846c6de5b4941a72625619ce4b7c1a641e0d38a57711acf5b3159dd8",
+      "exactOwnedContainersCreatedAndRemoved": 2,
+      "validationGraphTriplesAfterTests": 0,
+      "phaseScope": "actual PG/Jena RIOT and production M3 governance/assessment"
+    },
+    {
+      "label": "language-green",
+      "exitCode": 0,
+      "total": 4,
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0,
+      "receiptPath": "docs/evidence/G3-M3-001/SEM/language-boundary/language-green.json",
+      "receiptSha256": "7c88013c5de84e60b522d9058f4dc3507cf4ce6ff6e8bf90fa9c7920ac4cba49",
+      "ignoredConsolePath": "/private/tmp/g3-m3-language-green.txt",
+      "ignoredConsoleSha256": "5d7f12c4fe15ef3d99c6ae1637f8e1633f0592d597fdc0c4b2343f5bbd7198eb",
+      "exactOwnedContainersCreatedAndRemoved": 2,
+      "validationGraphTriplesAfterTests": 0,
+      "phaseScope": "actual PG/Jena RIOT and production M3 governance/assessment"
+    }
+  ],
+  "format": {
+    "exitCode": 0,
+    "path": "docs/evidence/G3-M3-001/SEM/language-boundary/format.txt",
+    "workspaceWarning": "Recorded; format verification exited zero, not promoted to warning-free status"
+  },
+  "notRun": [
+    "Independent review",
+    "Master integrated full SelfTest and same-Head CI",
+    "Formal M3 browser/stack"
+  ],
+  "scope": "No dependency/contract/profile/migration/image build changes; private-use remains opaque and allowed"
+}
