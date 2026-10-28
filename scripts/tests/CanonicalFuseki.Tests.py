@@ -18,11 +18,15 @@ SPEC = importlib.util.spec_from_file_location('canonical', ROOT / 'scripts/maint
 class CanonicalTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory(prefix='ontology-fuseki-')
-        self.context = Path(self.tmp.name)
+        self.context = Path(self.tmp.name).resolve()
         (self.context / 'Dockerfile').write_text('FROM scratch\n')
         self.mod = importlib.util.module_from_spec(SPEC)
         SPEC.loader.exec_module(self.mod)
-    def tearDown(self): self.tmp.cleanup()
+        for name in ('fetch-fuseki.sh','entrypoint.sh','g2-config.ttl','g2-log4j2.properties','.dockerignore'):
+            (self.context/name).write_text('fixture\n')
+        self.engine = patch.object(self.mod,'engine_identity',return_value=dict(platform='linux/amd64',engineVersion='29.9.2',buildxVersion='v0.34.1'))
+        self.engine.start()
+    def tearDown(self): self.engine.stop();self.tmp.cleanup()
     def test_content_identity_ignores_metadata_but_tracks_every_byte(self):
         first = self.mod.context_digest(self.context)
         (self.context / 'entrypoint.sh').write_text('echo test\n')
@@ -34,7 +38,7 @@ class CanonicalTests(unittest.TestCase):
     def test_cache_hit_never_builds_and_records_image_identity(self):
         digest = self.mod.context_digest(self.context)
         image = 'sha256:' + 'a'*64
-        data = {'Id': image, 'Labels': {'org.opencontainers.image.source': self.mod.SOURCE, 'io.ontology-platform.context-sha256': digest}}
+        data = {'Id':image,'Labels':self.mod.expected_labels(self.mod.identity(self.context)),'Os':'linux','Architecture':'amd64'}
         def run(args, **kwargs):
             self.assertEqual(args[:3], ['docker','image','inspect'])
             return subprocess.CompletedProcess(args, 0, json.dumps(data), '')
@@ -57,10 +61,12 @@ class CanonicalTests(unittest.TestCase):
         context=self.context/'infra/development/fuseki'
         context.mkdir(parents=True)
         (context/'Dockerfile').write_text('FROM scratch\n')
+        for name in ('fetch-fuseki.sh','entrypoint.sh','g2-config.ttl','g2-log4j2.properties','.dockerignore'):
+            (context/name).write_text('fixture\n')
         return self.mod.context_digest(context)
     def test_timeout_receipt_is_atomic_sanitized_and_lock_released_for_retry(self):
         digest=self.failure_fixture()
-        tag=self.mod.REPOSITORY+':context-'+digest
+        tag=self.mod.identity(self.context/'infra/development/fuseki')['image']
         sentinel='SYNTHETIC_RAW_SECRET_NEVER_PERSIST'
         raw_out=b'#1 [internal] load build definition from Dockerfile\n#2 [1/2] RUN echo '+sentinel.encode()+b'\n'
         raw_err=b'#2 ERROR: '+sentinel.encode()+b' TLS handshake timeout\n'
@@ -87,12 +93,12 @@ class CanonicalTests(unittest.TestCase):
         self.assertIn('RUN',[x['phase'] for x in receipt['failure']['stageWindow']])
         def successful(args,**kwargs):
             if args[0]=='git':return subprocess.CompletedProcess(args,0,str(self.context/'.git')+'\n','')
-            return subprocess.CompletedProcess(args,0,json.dumps({'Id':'sha256:'+'a'*64,'Labels':{'org.opencontainers.image.source':self.mod.SOURCE,'io.ontology-platform.context-sha256':digest}}),'')
+            return subprocess.CompletedProcess(args,0,json.dumps({'Id':'sha256:'+'a'*64,'Labels':self.mod.expected_labels(self.mod.identity(self.context/'infra/development/fuseki')),'Os':'linux','Architecture':'amd64'}),'')
         with patch.object(self.mod.subprocess,'run',side_effect=successful):
             self.assertTrue(self.mod.build('TASK-123','retry-run')['reused'])
         self.assertEqual(len(list((self.context/'artifacts/fuseki-builds').glob('*.failed.json'))),1)
     def test_nonzero_build_receipt_has_only_safe_command_and_output_hashes(self):
-        digest=self.failure_fixture();tag=self.mod.REPOSITORY+':context-'+digest
+        digest=self.failure_fixture();tag=self.mod.identity(self.context/'infra/development/fuseki')['image']
         sentinel='SYNTHETIC_PRIVATE_BUILD_OUTPUT'
         def cli(args,**kwargs):
             if args[0]=='git':return subprocess.CompletedProcess(args,0,str(self.context/'.git')+'\n','')
@@ -164,6 +170,8 @@ class CanonicalDownloadTests(unittest.TestCase):
                 'import json,os,sys\nfrom pathlib import Path\n'+
                 'a=sys.argv[1:]\nwith Path(os.environ["CALLS"]).open("a") as f:f.write(json.dumps(a)+"\\n")\n'+
                 'mode=os.environ["MODE"];primary="dlcdn.apache.org" in a[-1]\n'+
+                'if mode=="timeout":sys.exit(28)\n'+
+                'if mode=="connect":sys.exit(7)\n'+
                 'if mode=="both-fail" or (mode=="fallback" and primary):sys.exit(22)\n'+
                 'Path(a[a.index("--output")+1]).write_bytes(b"wrong" if mode=="bad-hash" else b"canonical-fixture")\n')
             checksum=binary/'sha512sum'
@@ -201,6 +209,44 @@ class CanonicalDownloadTests(unittest.TestCase):
         result,calls=self.exercise('both-fail')
         self.assertNotEqual(result.returncode,0)
         self.assertEqual(len(calls),2)
+
+    def test_timeout_and_connect_failures_have_same_categories_as_short_probe(self):
+        for mode,category in [('timeout','NETWORK_TIMEOUT'),('connect','NETWORK_CONNECT')]:
+            with self.subTest(mode=mode):
+                result,calls=self.exercise(mode)
+                self.assertNotEqual(result.returncode,0)
+                self.assertEqual(len(calls),2)
+                stages=[json.loads(line.split('CANONICAL_STAGE ',1)[1]) for line in result.stdout.splitlines() if line.startswith('CANONICAL_STAGE ')]
+                self.assertEqual([stage['errorCategory'] for stage in stages],[category,category])
+
+    def test_download_reports_separate_actual_network_and_checksum_durations(self):
+        result,_=self.exercise('primary')
+        stages=[json.loads(line.split('CANONICAL_STAGE ',1)[1]) for line in result.stdout.splitlines() if line.startswith('CANONICAL_STAGE ')]
+        self.assertEqual([stage['stage'] for stage in stages],['network','checksum'])
+        self.assertTrue(all(stage['outcome']=='PASS' and type(stage['durationMs']) is int and stage['durationMs']>=0 for stage in stages))
+
+    def test_checksum_failure_is_reported_without_network_fallback(self):
+        result,calls=self.exercise('bad-hash')
+        stages=[json.loads(line.split('CANONICAL_STAGE ',1)[1]) for line in result.stdout.splitlines() if line.startswith('CANONICAL_STAGE ')]
+        self.assertEqual(len(calls),1)
+        self.assertEqual(stages[-1]['errorCategory'],'CHECKSUM_MISMATCH')
+        self.assertEqual(stages[-1]['outcome'],'FAIL')
+
+    def test_real_dockerfile_extract_shell_emits_parseable_bounded_stage(self):
+        dockerfile=(ROOT/'infra/development/fuseki/Dockerfile').read_text()
+        command=dockerfile.split('RUN ',1)[1].split('\n\n',1)[0].replace('\\\n','')
+        with tempfile.TemporaryDirectory(prefix='ontology-extract-') as directory:
+            binary=Path(directory)
+            for name in ('fetch-fuseki','mkdir','tar','rm','groupadd','useradd','chown'):
+                script=binary/name;script.write_text('#!/bin/sh\nexit 0\n');script.chmod(0o755)
+            clock=binary/'date';clock.write_text('#!'+sys.executable+'\nimport time\nprint(time.time_ns())\n');clock.chmod(0o755)
+            result=subprocess.run(['sh','-c',command],env=dict(os.environ,PATH=str(binary)+os.pathsep+os.environ['PATH'],JENA_VERSION='6.2.0',JENA_SHA512='fixture'),capture_output=True,text=True)
+        self.assertEqual(result.returncode,0,result.stderr)
+        stages=[json.loads(line.split('CANONICAL_STAGE ',1)[1]) for line in result.stdout.splitlines() if line.startswith('CANONICAL_STAGE ')]
+        self.assertEqual(len(stages),1)
+        self.assertEqual(stages[0]['stage'],'extract/COPY')
+        self.assertEqual(stages[0]['outcome'],'PASS')
+        self.assertGreaterEqual(stages[0]['durationMs'],0)
 
     def test_unique_dockerfile_verifies_before_extracting_without_version_change(self):
         dockerfile=(ROOT/'infra/development/fuseki/Dockerfile').read_text()

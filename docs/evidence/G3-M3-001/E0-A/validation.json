@@ -1,0 +1,51 @@
+{
+  "baseSha": "67332cace3d134e31b723226071f1d630453cd59",
+  "checks": {
+    "cacheUnit": {
+      "exitCode": 0,
+      "status": "PASS",
+      "tests": 37
+    },
+    "canonicalUnit": {
+      "exitCode": 0,
+      "status": "PASS",
+      "tests": 20
+    },
+    "diffCheck": {
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    "realCold": {
+      "elapsedSeconds": 306.582,
+      "exitCode": 1,
+      "status": "FAIL"
+    },
+    "realCrossRunner": {
+      "reason": "Master CI ownership",
+      "status": "NOT_RUN"
+    },
+    "realFinalExportLoad": {
+      "reason": "cold network build failed",
+      "status": "BLOCKED"
+    },
+    "selfTest": {
+      "reason": "in progress snapshot; integrated rerun owned by Master",
+      "status": "NOT_VERIFIED"
+    },
+    "shortReproduction": {
+      "candidateOrigin": "isolated state from actual HEAD probe; not the earlier cold build",
+      "durationMs": 9843,
+      "exitCode": 0,
+      "expensiveBuildInvoked": false,
+      "inputFingerprint": "9641d7597d72a613b553b76273d9dcbaa9298398ce3d56b1f23d06a2fbd7a908",
+      "outcome": "NOT_REPRODUCED"
+    }
+  },
+  "ci": {
+    "reason": "not pushed; Master CI ownership",
+    "status": "NOT_VERIFIED"
+  },
+  "observedAtUtc": "2026-10-28T12:30:59.746051+00:00",
+  "schemaVersion": 1,
+  "status": "PARTIAL"
+}

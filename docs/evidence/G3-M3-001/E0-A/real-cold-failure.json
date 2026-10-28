@@ -1,0 +1,125 @@
+{
+  "ciContext": {},
+  "contextSha256": "bc2265dee68540f317b8c2aaca0a0456cd361bf80bf14ce600d3197e42687f37",
+  "elapsedSeconds": 306.582,
+  "envFingerprint": "eb1309fcc1b38cf52c926d38c13e8de76012d244a4b017a80363b88aa0ed2cfd",
+  "failure": {
+    "command": [
+      "docker",
+      "build",
+      "[canonical arguments withheld]"
+    ],
+    "elapsedSeconds": 306.397,
+    "errorCategories": [
+      "DOWNLOAD_HTTP_FAILURE",
+      "NETWORK_TIMEOUT",
+      "NETWORK_TIMEOUT",
+      "DOWNLOAD_HTTP_FAILURE",
+      "BUILD_ERROR"
+    ],
+    "exitCode": 1,
+    "stageWindow": [
+      {
+        "phase": "LOAD_METADATA",
+        "step": 2
+      },
+      {
+        "phase": "DONE",
+        "step": 2
+      },
+      {
+        "phase": "LOAD_IGNORE",
+        "step": 3
+      },
+      {
+        "phase": "DONE",
+        "step": 3
+      },
+      {
+        "phase": "LOAD_CONTEXT",
+        "step": 4
+      },
+      {
+        "phase": "DONE",
+        "step": 4
+      },
+      {
+        "phase": "FROM",
+        "step": 5
+      },
+      {
+        "phase": "CACHED",
+        "step": 5
+      },
+      {
+        "phase": "COPY",
+        "step": 6
+      },
+      {
+        "phase": "DONE",
+        "step": 6
+      },
+      {
+        "phase": "RUN",
+        "step": 7
+      },
+      {
+        "phase": "COPY",
+        "step": 7
+      }
+    ],
+    "stderr": {
+      "sha256": "1f6288e824b44c549924e70a37e868a900465b7b0694624df9068ae6726cd0c4",
+      "sizeBytes": 6975
+    },
+    "stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sizeBytes": 0
+    },
+    "timeoutSeconds": 600
+  },
+  "inputFingerprint": "627b95c8e9fe8d3c94bd0f7dd9504dc796819abbdd504fa4311b4473bd228277",
+  "observedAt": "2026-10-28T12:23:45.751474+00:00",
+  "reason": "Canonical Fuseki build failed; raw output suppressed",
+  "runId": "e0-a-real-cold",
+  "schemaVersion": 1,
+  "stages": [
+    {
+      "durationMs": 118221,
+      "errorCategory": "DOWNLOAD_HTTP_FAILURE",
+      "inputFingerprint": "627b95c8e9fe8d3c94bd0f7dd9504dc796819abbdd504fa4311b4473bd228277",
+      "outcome": "FAIL",
+      "stage": "network"
+    },
+    {
+      "durationMs": 180016,
+      "errorCategory": "NETWORK_TIMEOUT",
+      "inputFingerprint": "627b95c8e9fe8d3c94bd0f7dd9504dc796819abbdd504fa4311b4473bd228277",
+      "outcome": "FAIL",
+      "stage": "network"
+    },
+    {
+      "durationMs": 118221,
+      "errorCategory": "DOWNLOAD_HTTP_FAILURE",
+      "inputFingerprint": "627b95c8e9fe8d3c94bd0f7dd9504dc796819abbdd504fa4311b4473bd228277",
+      "outcome": "FAIL",
+      "stage": "network"
+    },
+    {
+      "durationMs": 180016,
+      "errorCategory": "NETWORK_TIMEOUT",
+      "inputFingerprint": "627b95c8e9fe8d3c94bd0f7dd9504dc796819abbdd504fa4311b4473bd228277",
+      "outcome": "FAIL",
+      "stage": "network"
+    },
+    {
+      "durationMs": 306418,
+      "errorCategory": "DOWNLOAD_HTTP_FAILURE",
+      "inputFingerprint": "627b95c8e9fe8d3c94bd0f7dd9504dc796819abbdd504fa4311b4473bd228277",
+      "outcome": "FAIL",
+      "stage": "image preparation"
+    }
+  ],
+  "status": "FAILED",
+  "taskId": "G3-M3-001"
+}

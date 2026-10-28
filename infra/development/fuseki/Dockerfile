@@ -9,7 +9,15 @@ COPY --chmod=0555 fetch-fuseki.sh /usr/local/bin/fetch-fuseki
 RUN set -eu; \
     fetch-fuseki "$JENA_VERSION" "$JENA_SHA512" /tmp/fuseki.tar.gz; \
     mkdir -p /opt/fuseki /fuseki/databases; \
-    tar -xzf /tmp/fuseki.tar.gz --strip-components=1 -C /opt/fuseki; \
+    extract_start=$(date +%s%N); \
+    if tar -xzf /tmp/fuseki.tar.gz --strip-components=1 -C /opt/fuseki; then \
+        extract_ms=$((($(date +%s%N) - extract_start) / 1000000)); \
+        printf 'CANONICAL_STAGE {"stage":"extract/COPY","durationMs":%s,"outcome":"PASS","errorCategory":null}\n' "$extract_ms"; \
+    else \
+        extract_ms=$((($(date +%s%N) - extract_start) / 1000000)); \
+        printf 'CANONICAL_STAGE {"stage":"extract/COPY","durationMs":%s,"outcome":"FAIL","errorCategory":"EXTRACT_FAILED"}\n' "$extract_ms"; \
+        exit 1; \
+    fi; \
     rm /tmp/fuseki.tar.gz; \
     groupadd --gid 10001 fuseki; \
     useradd --uid 10001 --gid fuseki --no-create-home --home-dir /fuseki fuseki; \
