@@ -51,3 +51,8 @@ V1修正7b3002e/Masterf42e2ad后真实Run40703929652 coldMISS下载/校验/导�
 ## Owned E0 smoke入口与真实计时
 
 Master真实子进程自动记录UTC/monotonic/exit/依赖、source fingerprint及失败；新增独占AppHost的WORKSPACE_SMOKE_ONLY checkpoint，不认证完整M3。真实18受控编排测试及timeline9通过；独立Reviewer另验34canonical/66cache/18编排/3CLI拒绝，无确定P1/P2。当前Web完整lint/typecheck/149tests/build真实exit0；后续只运行E0浏览器Smoke/fault，不绕过E0进入正式M3。费用未知继续阻断artifact上传。
+
+
+## Final-input real gates / portable fixture correction
+
+Head199 Mac finalinput actualcold/export/reopen/Dockerload/restore6PASS，第二次images/history数量不增；新LinuxRun40711221901 actualcold网络/双SHA/无网络build/export/save成功，governance真实模块全部success，engineering因测试硬编码/private/tmp失败25errors，原日志保留。4处仅测试改系统临时目录resolve，34+17定向及独立复核通过。history实际精确相对Context窄修M3-only，7上下文RED1→GREEN4fixture并独立Review无P1/P2。真实E0B11工作区+8认证授权通过，故障315ms预期FAIL→恢复PASS，launcher停止0；只Smoke，不认证正式M3。当前完整同HeadCI/main集成/正式M3/真实image-history Apply仍待执行。

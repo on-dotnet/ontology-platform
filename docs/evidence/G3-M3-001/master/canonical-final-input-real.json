@@ -1,0 +1,144 @@
+{
+  "status": "PASS",
+  "checks": 6,
+  "first": {
+    "schemaVersion": 2,
+    "cacheKey": "ontology-fuseki-image-v2-linux-arm64-4fbf23514516632dcb651b5c05bf04e9992da52491607b6cf58de1f7348ff9ab",
+    "failureStateKey": "ontology-fuseki-image-v2-linux-arm64-4fbf23514516632dcb651b5c05bf04e9992da52491607b6cf58de1f7348ff9ab-failure-v1-eb1309fcc1b38cf52c926d38c13e8de76012d244a4b017a80363b88aa0ed2cfd",
+    "envFingerprint": "eb1309fcc1b38cf52c926d38c13e8de76012d244a4b017a80363b88aa0ed2cfd",
+    "inputFingerprint": "4fbf23514516632dcb651b5c05bf04e9992da52491607b6cf58de1f7348ff9ab",
+    "contextSha256": "dba8036818246baaefc136fa6740729e9be068c79dd0c2ae584f895192406091",
+    "platform": "linux/arm64",
+    "image": "ontology-platform-fuseki:context-4fbf23514516632dcb651b5c05bf04e9992da52491607b6cf58de1f7348ff9ab",
+    "imageId": "sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c",
+    "reused": false,
+    "restored": false,
+    "taskId": "G3-M3-001",
+    "runId": "e0-a-real-69e4388fb5bf4923976997ded13f93b9-export",
+    "sourceChecksumVerified": true,
+    "containerChecksumVerified": false,
+    "stages": [
+      {
+        "stage": "cache restore",
+        "durationMs": 0,
+        "outcome": "HIT",
+        "errorCategory": null,
+        "inputFingerprint": "4fbf23514516632dcb651b5c05bf04e9992da52491607b6cf58de1f7348ff9ab",
+        "executor": "host",
+        "operation": "SOURCE_CACHE_VALIDATE"
+      },
+      {
+        "stage": "checksum",
+        "durationMs": 35,
+        "outcome": "PASS",
+        "errorCategory": null,
+        "inputFingerprint": "4fbf23514516632dcb651b5c05bf04e9992da52491607b6cf58de1f7348ff9ab",
+        "executor": "host",
+        "operation": "SOURCE_SHA512"
+      },
+      {
+        "stage": "image preparation",
+        "durationMs": 6003,
+        "outcome": "PASS",
+        "errorCategory": null,
+        "inputFingerprint": "4fbf23514516632dcb651b5c05bf04e9992da52491607b6cf58de1f7348ff9ab"
+      },
+      {
+        "stage": "cache export",
+        "durationMs": 1423,
+        "outcome": "PASS",
+        "errorCategory": null,
+        "inputFingerprint": "4fbf23514516632dcb651b5c05bf04e9992da52491607b6cf58de1f7348ff9ab"
+      }
+    ],
+    "source": {
+      "cacheFile": "/Users/chasen/Developer/repos/ontology-platform/artifacts/fuseki-sources/ba65f5867d2d4741b2ed9e2af5a0d4fbb447909894ab2a0c6bc4dac8997f4fe339c87b13c48d45d054977769f0f8bf763ea346b1f7792d5cdc458041bd43a132.tar.gz",
+      "sha512": "ba65f5867d2d4741b2ed9e2af5a0d4fbb447909894ab2a0c6bc4dac8997f4fe339c87b13c48d45d054977769f0f8bf763ea346b1f7792d5cdc458041bd43a132",
+      "sizeBytes": 51398669,
+      "cacheOutcome": "HIT",
+      "downloaded": false,
+      "taskId": "G3-M3-001",
+      "runId": "e0-a-real-69e4388fb5bf4923976997ded13f93b9-export",
+      "temporaryContextRemoved": true,
+      "reviewTrigger": "G3-M3 stage closeout"
+    },
+    "cacheOutcome": "NOT_RUN",
+    "producerRunId": "e0-a-real-69e4388fb5bf4923976997ded13f93b9-export",
+    "currentGithubRunId": null,
+    "runner": "local/UNKNOWN",
+    "exportOutcome": "EXPORTED",
+    "observedAt": "2026-10-28T14:58:54.128926+00:00"
+  },
+  "second": {
+    "schemaVersion": 2,
+    "cacheKey": "ontology-fuseki-image-v2-linux-arm64-4fbf23514516632dcb651b5c05bf04e9992da52491607b6cf58de1f7348ff9ab",
+    "failureStateKey": "ontology-fuseki-image-v2-linux-arm64-4fbf23514516632dcb651b5c05bf04e9992da52491607b6cf58de1f7348ff9ab-failure-v1-eb1309fcc1b38cf52c926d38c13e8de76012d244a4b017a80363b88aa0ed2cfd",
+    "envFingerprint": "eb1309fcc1b38cf52c926d38c13e8de76012d244a4b017a80363b88aa0ed2cfd",
+    "inputFingerprint": "4fbf23514516632dcb651b5c05bf04e9992da52491607b6cf58de1f7348ff9ab",
+    "contextSha256": "dba8036818246baaefc136fa6740729e9be068c79dd0c2ae584f895192406091",
+    "platform": "linux/arm64",
+    "image": "ontology-platform-fuseki:context-4fbf23514516632dcb651b5c05bf04e9992da52491607b6cf58de1f7348ff9ab",
+    "imageId": "sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c",
+    "reused": true,
+    "restored": true,
+    "taskId": "G3-M3-001",
+    "runId": "e0-a-real-69e4388fb5bf4923976997ded13f93b9-restore",
+    "sourceChecksumVerified": true,
+    "containerChecksumVerified": false,
+    "stages": [
+      {
+        "stage": "cache restore",
+        "durationMs": 161,
+        "outcome": "PASS",
+        "errorCategory": null,
+        "inputFingerprint": "4fbf23514516632dcb651b5c05bf04e9992da52491607b6cf58de1f7348ff9ab"
+      },
+      {
+        "stage": "image preparation",
+        "durationMs": 23,
+        "outcome": "PASS",
+        "errorCategory": null,
+        "inputFingerprint": "4fbf23514516632dcb651b5c05bf04e9992da52491607b6cf58de1f7348ff9ab"
+      }
+    ],
+    "cacheOutcome": "HIT",
+    "producerRunId": "e0-a-real-69e4388fb5bf4923976997ded13f93b9-export",
+    "producerHead": "1990742c1bbe97c427121a37e1cfe775d79c89b9",
+    "currentGithubRunId": null,
+    "runner": "local/UNKNOWN",
+    "observedAt": "2026-10-28T14:58:55.925173+00:00"
+  },
+  "cacheDirectory": "artifacts/e0-a-real-69e4388fb5bf4923976997ded13f93b9",
+  "actualDockerLoad": true,
+  "crossRunner": "NOT_RUN",
+  "physicalReclaimedBytes": "NOT_VERIFIED",
+  "resourceCounts": {
+    "before": {
+      "images": 14,
+      "history": 9
+    },
+    "afterFirst": {
+      "images": 15,
+      "history": 10
+    },
+    "afterSecond": {
+      "images": 15,
+      "history": 10
+    }
+  },
+  "newImageIds": [
+    "sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c"
+  ],
+  "newHistoryIds": [
+    "1kq80249gfrdurl9atazzw7kl"
+  ],
+  "unchangedOnReuse": true,
+  "sourceHead": "1990742c1bbe97c427121a37e1cfe775d79c89b9",
+  "rawIgnoredLog": {
+    "path": "/private/tmp/g3-m3-final-canonical-real.txt",
+    "sha256": "c1b61f668c063b509d5b1e862d9dc49cab6f722ae37e5d3bcba237ccc0dd1136",
+    "note": "Raw includes unowned resource IDs and stays outside review; only counts and exact newly owned IDs included here"
+  },
+  "scope": "Actual final-input local image cold, preverified source-cache HIT, strict export/reopen + actual Docker load/restore; not cross-runner CI",
+  "observedAtUtc": "2026-10-28T15:00:09.965193+00:00"
+}

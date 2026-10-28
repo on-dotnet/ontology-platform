@@ -33,7 +33,7 @@ def state():
 def source_failure_stop_loss():
     """Real file/hash/state repro in isolated Git; Docker only info/absent inspect."""
     started=time.monotonic()
-    with tempfile.TemporaryDirectory(prefix='e0-a-source-stop-',dir='/private/tmp') as temporary:
+    with tempfile.TemporaryDirectory(prefix='e0-a-source-stop-',dir=Path(tempfile.gettempdir()).resolve()) as temporary:
         fixture=Path(temporary);context=fixture/'infra/development/fuseki';context.mkdir(parents=True)
         for name in m.CONTEXT_FILES:shutil.copyfile(ROOT/'infra/development/fuseki'/name,context/name)
         with (context/'Dockerfile').open('a') as stream:stream.write('# Synthetic isolated stop-loss input '+uuid.uuid4().hex+'\n')

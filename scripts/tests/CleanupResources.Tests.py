@@ -435,6 +435,31 @@ p.write_text(json.dumps(s))
         self.assertNotEqual(result.returncode,0)
         self.assertIn('Exact Docker absence diagnostic not verified',result.stderr)
 
+    def test_m3_history_accepts_only_exact_canonical_relative_context(self):
+        self.m3_volume_fixture()
+        (self.root/'proof.txt').write_text('G3-M3-001 CLOSED synthetic hist123\n')
+        self.git('add','proof.txt');self.git('commit','-m','closed M3 synthetic history')
+        self.main=self.git('rev-parse','HEAD').stdout.strip();self.git('push','origin','main')
+        self.git('update-ref','refs/remotes/origin/main',self.main)
+        self.plan['expectedMainSha']=self.main
+        original=json.loads(self.state_path.read_text())
+        contexts=[('infra/development/fuseki',True),
+                  ('/reviewed/ontology-platform/infra/development/fuseki',True),
+                  ('../infra/development/fuseki',False),('./infra/development/fuseki',False),
+                  ('other/infra/development/fuseki',False),('infra/development/Fuseki',False),
+                  ('infra/development/fuseki/../fuseki',False)]
+        for context,allowed in contexts:
+            with self.subTest(context=context):
+                state=copy.deepcopy(original);state['history'][0]['Context']=context
+                self.state_path.write_text(json.dumps(state));self.history_plan()
+                self.plan['operations'][0]['ownershipEvidence'].update(taskId='G3-M3-001',commit=self.main)
+                result=self.run_engine(True)
+                self.assertEqual(result.returncode==0,allowed,result.stderr)
+                after=json.loads(self.state_path.read_text())
+                self.assertEqual(len(after['history']),0 if allowed else 1)
+                if not allowed:self.assertFalse(any('rm' in row for row in after['calls']))
+                (self.base/'apply.jsonl').unlink(missing_ok=True)
+
     def test_m3_exact_canonical_image_apply(self):
         self.m3_volume_fixture()
         target='sha256:'+'b'*64;tag='ontology-platform-fuseki:context-'+'c'*64

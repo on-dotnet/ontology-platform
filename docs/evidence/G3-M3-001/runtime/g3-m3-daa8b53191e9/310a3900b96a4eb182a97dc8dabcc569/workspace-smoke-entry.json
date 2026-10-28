@@ -1,0 +1,47 @@
+{
+  "stage": "workspace-smoke",
+  "status": "PASS",
+  "overallG2": "PARTIAL",
+  "checks": [
+    {
+      "name": "anonymous_authorization_before_malformed_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "anonymous_publication_proposal_prebinding_401",
+      "status": "PASS",
+      "observedStatus": 401
+    },
+    {
+      "name": "anonymous_publication_decision_prebinding_401",
+      "status": "PASS",
+      "observedStatus": 401
+    },
+    {
+      "name": "anonymous_publication_activation_prebinding_401",
+      "status": "PASS",
+      "observedStatus": 401
+    },
+    {
+      "name": "operator-ab_real_http_only_session",
+      "status": "PASS"
+    },
+    {
+      "name": "operator-ab_csrf",
+      "status": "PASS"
+    },
+    {
+      "name": "viewer-ab_real_http_only_session",
+      "status": "PASS"
+    },
+    {
+      "name": "viewer-ab_csrf",
+      "status": "PASS"
+    }
+  ],
+  "failure": null,
+  "notRun": [
+    "remaining full-chain gates",
+    "final regression and CI"
+  ]
+}

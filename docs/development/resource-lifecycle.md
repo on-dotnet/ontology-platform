@@ -59,3 +59,5 @@ Apply必须精确白名单、24h内有效期、实际Engine/context/builder版�
 M3明确授权逐ID处理本轮与已证实可替代的canonical镜像/关闭history，仍保护旧G2卷、未知镜像和跨项目缓存。执行器仅扩展Docker四类；不借M3删Git/任意cache。每项必须本任务已提交CLOSED合成/可再生证据、准确ID/指纹、24h有效期、空容器引用（image/volume）及精确dockerBackend；volume仅本轮g3-m3命名。image只接受完整canonical context-64hex标签，不接受未知无tag或legacy tag。所有M3 inspect/list/rm含明确--context，Engine/version前后重验。
 
 image/volume删除除列表缺席外，还要求当前已冻结Engine的准确ID不存在诊断；权限/传输错误不能当删除成功。history继承offset读取、单节点完整版本和bridge代际、准确no-record诊断；自然代际未发生仍记NOT_VERIFIED，不能用等待时长冒充持久后验。保留原失败日志，后验回现撤回完成结论。actual Apply须先真实隔离空fixture验证，再独立审查项目白名单并保留日常开发image+8旧G2卷。新失败history在诊断留证后必须按该流程实际收尾，禁止一律永久KEEP。
+
+M3实际Buildx metadata的Context可为完整绝对项目路径，或唯一精确相对字符串`infra/development/fuseki`。后一形式只对G3-M3-001接受；仍须精确Name/Dockerfile/官方VCS/40位revision/完整指纹/本任务已提交CLOSED证明及固定backend。`./`、`../`、其它前缀、大小写变体不能规范化后放行。该值仅作为metadata身份校验，绝不作为任意文件删除路径。

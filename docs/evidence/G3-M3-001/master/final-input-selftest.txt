@@ -1,0 +1,378 @@
+
+Check             Status Message
+-----             ------ -------
+repository-static PASS   检查2866个文件：语法/格式/相对链接/有限机密模式/基线…
+
+PASS: clean baseline accepted
+PASS: wrong package name rejected
+PASS: broken relative link rejected
+PASS: synthetic token rejected without printing value
+PASS: synthetic token in TypeScript rejected
+PASS: credential assignment in dot-env rejected
+PASS: unpinned action rejected
+
+Check             Status Message
+-----             ------ -------
+repository-static PASS   检查2851个文件：语法/格式/相对链接/有限机密模式/基线…
+
+NOT_RUN: .NET test：须显式追加-RunTests执行已批准测试项目。
+NOT_RUN: Web独立检查需真实目标及显式-RunNative。
+NOT_RUN: Web检查被显式-SkipWeb跳过，仅用于隔离工程检查器fixture或独立验收。
+NOT_RUN: 浏览器真实OIDC/E2E需独立受控联调，不隐式混入工程检查。
+PASS: 所选工程检查；范围以逐项输出为准，不表示业务、前端或整个G1通过。
+PASS: native commands resolve SDK and config from selected Root
+Checker tests: 8 passed; application tests: NOT_RUN.
+PASS: Doctor handles existing pnpm without Node as BLOCKED/2.
+PASS: Doctor discovers real macOS ARM64 Node from isolated path with spaces.
+PASS: YAML/TOML syntax, 1 files; runtime compatibility not implied.
+FAIL: structured syntax invalid.yml (ParserError)
+FAIL: structured syntax invalid.toml (TOMLDecodeError)
+PASS: structured parser 4 real positive/negative cases.
+
+Check             Status Message
+-----             ------ -------
+repository-static PASS   检查2866个文件：语法/格式/相对链接/有限机密模式/基线…
+
+PASS: verification preserves unset environment state for five process variables.
+
+Check             Status Message
+-----             ------ -------
+repository-static PASS   检查2866个文件：语法/格式/相对链接/有限机密模式/基线…
+
+PASS: verification preserves empty environment state for five process variables.
+
+Check             Status Message
+-----             ------ -------
+repository-static PASS   检查2866个文件：语法/格式/相对链接/有限机密模式/基线…
+
+PASS: verification preserves value environment state for five process variables.
+Environment regression: 3 state groups and structured-suite cleanup passed; native calls are synthetic, product tests NOT_RUN.
+PASS: toolchain archives accept two exact digests and reject two tampered byte cases.
+test_apply_requires_new_log (__main__.CleanupTests.test_apply_requires_new_log) ... ok
+test_archived_small_file_requires_exact_committed_bytes (__main__.CleanupTests.test_archived_small_file_requires_exact_committed_bytes) ... ok
+test_cache_current_protected_or_locked_tree_refuses_deletion (__main__.CleanupTests.test_cache_current_protected_or_locked_tree_refuses_deletion) ... ok
+test_cache_fingerprint_change_after_preflight_stops (__main__.CleanupTests.test_cache_fingerprint_change_after_preflight_stops) ... ok
+test_cache_nested_symlink_preserves_external_bytes (__main__.CleanupTests.test_cache_nested_symlink_preserves_external_bytes) ... ok
+test_cache_parent_symlink_refused (__main__.CleanupTests.test_cache_parent_symlink_refused) ... ok
+test_cache_rejects_private_parent_link_and_outside (__main__.CleanupTests.test_cache_rejects_private_parent_link_and_outside) ... ok
+test_cache_symlink_unlinks_never_follows (__main__.CleanupTests.test_cache_symlink_unlinks_never_follows) ... ok
+test_cache_then_worktree_deletes_only_exact_regenerable_cache (__main__.CleanupTests.test_cache_then_worktree_deletes_only_exact_regenerable_cache) ... ok
+test_closeout_exact_legacy_volume_apply_and_retained_resources (__main__.CleanupTests.test_closeout_exact_legacy_volume_apply_and_retained_resources) ... ok
+test_closeout_rejects_git_foreign_owner_and_foreign_volume (__main__.CleanupTests.test_closeout_rejects_git_foreign_owner_and_foreign_volume) ... ok
+test_dirty_locked_protected_worktrees_reject (__main__.CleanupTests.test_dirty_locked_protected_worktrees_reject) ... ok
+test_docker_after_reports_remaining_resource (__main__.CleanupTests.test_docker_after_reports_remaining_resource) ... ok
+test_docker_exact_whitelist_and_dryrun (__main__.CleanupTests.test_docker_exact_whitelist_and_dryrun) ... ok
+test_docker_history_project_boundary (__main__.CleanupTests.test_docker_history_project_boundary) ... ok
+test_docker_keep_replaced_name_and_active_refs_reject (__main__.CleanupTests.test_docker_keep_replaced_name_and_active_refs_reject) ... ok
+test_dryrun_has_zero_repository_byte_changes (__main__.CleanupTests.test_dryrun_has_zero_repository_byte_changes) ... ok
+test_effective_origin_rewrite_is_refused (__main__.CleanupTests.test_effective_origin_rewrite_is_refused) ... ok
+test_exact_public_pnpm_asset_allows_closed_cache_cleanup (__main__.CleanupTests.test_exact_public_pnpm_asset_allows_closed_cache_cleanup) ... ok
+test_expired_changed_tip_keep_duplicate_and_active_reject (__main__.CleanupTests.test_expired_changed_tip_keep_duplicate_and_active_reject) ... ok
+test_expired_plan_is_rechecked_after_preflight (__main__.CleanupTests.test_expired_plan_is_rechecked_after_preflight) ... ok
+test_history_absence_diagnostic_rejects_other_errors_and_wrong_ref (__main__.CleanupTests.test_history_absence_diagnostic_rejects_other_errors_and_wrong_ref) ... ok
+test_history_backend_generation_mismatch_refuses_before_delete (__main__.CleanupTests.test_history_backend_generation_mismatch_refuses_before_delete) ... ok
+test_history_dockerfile_accepts_only_two_exact_project_forms (__main__.CleanupTests.test_history_dockerfile_accepts_only_two_exact_project_forms) ... ok
+test_history_existing_pin_tombstone_fails_and_stops_later_operations (__main__.CleanupTests.test_history_existing_pin_tombstone_fails_and_stops_later_operations) ... ok
+test_history_offset_movement_or_range_error_refuses_before_delete (__main__.CleanupTests.test_history_offset_movement_or_range_error_refuses_before_delete) ... ok
+test_history_offset_prevents_zero_ref_tombstone_and_database_survives_restart (__main__.CleanupTests.test_history_offset_prevents_zero_ref_tombstone_and_database_survives_restart) ... ok
+test_history_rejects_foreign_running_changed_fingerprint (__main__.CleanupTests.test_history_rejects_foreign_running_changed_fingerprint) ... ok
+test_invalid_schema_repository_main_and_ttl_are_refused (__main__.CleanupTests.test_invalid_schema_repository_main_and_ttl_are_refused) ... ok
+test_local_and_remote_ancestor_delete_exactly (__main__.CleanupTests.test_local_and_remote_ancestor_delete_exactly) ... ok
+test_log_records_exact_nonzero_command_exit_and_stops (__main__.CleanupTests.test_log_records_exact_nonzero_command_exit_and_stops) ... ok
+test_m1_cannot_expand_to_m2_git_history_or_legacy_volumes (__main__.CleanupTests.test_m1_cannot_expand_to_m2_git_history_or_legacy_volumes) ... ok
+test_m1_only_own_volume_dryrun_and_exact_apply (__main__.CleanupTests.test_m1_only_own_volume_dryrun_and_exact_apply) ... ok
+test_m2_changed_context_engine_or_server_refuses_before_rm (__main__.CleanupTests.test_m2_changed_context_engine_or_server_refuses_before_rm) ... ok
+test_m2_only_same_task_exact_volume_apply_and_foreign_refusal (__main__.CleanupTests.test_m2_only_same_task_exact_volume_apply_and_foreign_refusal) ... ok
+test_m3_absence_needs_exact_engine_diagnostic (__main__.CleanupTests.test_m3_absence_needs_exact_engine_diagnostic) ... ok
+test_m3_cannot_delete_git_or_global_cache (__main__.CleanupTests.test_m3_cannot_delete_git_or_global_cache) ... ok
+test_m3_exact_canonical_image_apply (__main__.CleanupTests.test_m3_exact_canonical_image_apply) ... ok
+test_m3_exact_volume_apply_preserves_other_resources (__main__.CleanupTests.test_m3_exact_volume_apply_preserves_other_resources) ... ok
+test_m3_refuses_protected_g2_and_backend_drift (__main__.CleanupTests.test_m3_refuses_protected_g2_and_backend_drift) ... ok
+test_malformed_history_after_is_logged_and_later_branch_kept (__main__.CleanupTests.test_malformed_history_after_is_logged_and_later_branch_kept) ... ok
+test_midrun_tip_change_refuses_before_delete (__main__.CleanupTests.test_midrun_tip_change_refuses_before_delete) ... ok
+test_nonancestor_fails_before_any_deletion (__main__.CleanupTests.test_nonancestor_fails_before_any_deletion) ... ok
+test_open_prs_prevent_all_mutations (__main__.CleanupTests.test_open_prs_prevent_all_mutations) ... ok
+test_origin_change_after_preflight_rejects_mutation (__main__.CleanupTests.test_origin_change_after_preflight_rejects_mutation) ... ok
+test_permission_or_cli_failure_is_closed (__main__.CleanupTests.test_permission_or_cli_failure_is_closed) ... ok
+test_private_ignored_data_blocks_worktree (__main__.CleanupTests.test_private_ignored_data_blocks_worktree) ... ok
+test_public_asset_exception_rejects_wrong_path_bytes_size_link_and_stale_fingerprint (__main__.CleanupTests.test_public_asset_exception_rejects_wrong_path_bytes_size_link_and_stale_fingerprint) ... ok
+test_registered_clean_worktree_removed_without_force (__main__.CleanupTests.test_registered_clean_worktree_removed_without_force) ... ok
+test_remote_delete_compare_and_delete_preserves_concurrent_tip (__main__.CleanupTests.test_remote_delete_compare_and_delete_preserves_concurrent_tip) ... ok
+test_worktree_keep_descendant_or_ancestor_refuses_removal (__main__.CleanupTests.test_worktree_keep_descendant_or_ancestor_refuses_removal) ... ok
+
+----------------------------------------------------------------------
+Ran 51 tests in 121.431s
+
+OK
+test_annotated_tag_message_is_scanned_without_values (__main__.PublicHistoryTests.test_annotated_tag_message_is_scanned_without_values) ... ok
+test_auxiliary_snapshot_commit_private_runtime_is_metadata_only (__main__.PublicHistoryTests.test_auxiliary_snapshot_commit_private_runtime_is_metadata_only) ... ok
+test_clean_full_history_and_ignored_credentials_are_not_read (__main__.PublicHistoryTests.test_clean_full_history_and_ignored_credentials_are_not_read) ... ok
+test_deleted_secret_and_task_branch_secret_are_detected_without_values (__main__.PublicHistoryTests.test_deleted_secret_and_task_branch_secret_are_detected_without_values) ... ok
+test_direct_blob_and_tree_refs_are_scanned_with_paths (__main__.PublicHistoryTests.test_direct_blob_and_tree_refs_are_scanned_with_paths) ... ok
+test_nested_annotated_tag_message_is_scanned (__main__.PublicHistoryTests.test_nested_annotated_tag_message_is_scanned) ... ok
+test_private_endpoint_is_review_candidate_not_confirmed_production (__main__.PublicHistoryTests.test_private_endpoint_is_review_candidate_not_confirmed_production) ... ok
+test_sensitive_path_is_reported_even_with_reused_normal_blob (__main__.PublicHistoryTests.test_sensitive_path_is_reported_even_with_reused_normal_blob) ... ok
+test_utf16_secret_is_detected_without_printing_value (__main__.PublicHistoryTests.test_utf16_secret_is_detected_without_printing_value) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 1.129s
+
+OK
+test_approved_closed_clean_tree_and_refs_are_candidates (__main__.InspectorTests.test_approved_closed_clean_tree_and_refs_are_candidates) ... ok
+test_current_tree_symlink_alias_is_protected (__main__.InspectorTests.test_current_tree_symlink_alias_is_protected) ... ok
+test_failed_ignored_listing_blocks_tree_and_refs (__main__.InspectorTests.test_failed_ignored_listing_blocks_tree_and_refs) ... ok
+test_keep_descendant_blocks_tree_and_refs (__main__.InspectorTests.test_keep_descendant_blocks_tree_and_refs) ... ok
+test_locked_tree_protection_propagates_to_refs (__main__.InspectorTests.test_locked_tree_protection_propagates_to_refs) ... ok
+test_private_cache_segments_block_tree_and_refs (__main__.InspectorTests.test_private_cache_segments_block_tree_and_refs) ... ok
+test_private_ignored_file_blocks_tree_and_refs (__main__.InspectorTests.test_private_ignored_file_blocks_tree_and_refs) ... ok
+test_protected_ancestor_propagates_to_tree_and_refs (__main__.InspectorTests.test_protected_ancestor_propagates_to_tree_and_refs) ... ok
+test_public_package_names_do_not_imply_private_data (__main__.InspectorTests.test_public_package_names_do_not_imply_private_data) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 9.359s
+
+OK
+test_current_task_output_does_not_touch_old_evidence (__main__.EvidenceBoundaryTests.test_current_task_output_does_not_touch_old_evidence) ... ok
+test_existing_symlink_escape_is_rejected (__main__.EvidenceBoundaryTests.test_existing_symlink_escape_is_rejected) ... ok
+test_outside_and_traversal_are_rejected_without_creation (__main__.EvidenceBoundaryTests.test_outside_and_traversal_are_rejected_without_creation) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.002s
+
+OK
+test_actual_process_start_failure_marks_current_failed_and_later_not_run (__main__.M1OrchestrationTests.test_actual_process_start_failure_marks_current_failed_and_later_not_run) ... ok
+test_all_real_gate_selections_include_m1_and_regressions (__main__.M1OrchestrationTests.test_all_real_gate_selections_include_m1_and_regressions) ... ok
+test_each_child_failure_stops_later_gates (__main__.M1OrchestrationTests.test_each_child_failure_stops_later_gates) ... ok
+test_failed_attempt_cannot_consume_or_certify_stale_pass (__main__.M1OrchestrationTests.test_failed_attempt_cannot_consume_or_certify_stale_pass) ... ok
+test_first_m2_integration_selects_real_api_only_without_claiming_full_gates (__main__.M1OrchestrationTests.test_first_m2_integration_selects_real_api_only_without_claiming_full_gates) ... ok
+test_m2_selects_its_own_runtime_evidence_and_authenticated_checks (__main__.M1OrchestrationTests.test_m2_selects_its_own_runtime_evidence_and_authenticated_checks) ... ok
+test_m3_full_chain_runs_smoke_fault_through_actual_parsers (__main__.M1OrchestrationTests.test_m3_full_chain_runs_smoke_fault_through_actual_parsers) ... ok
+test_m3_partial_modes_parse_the_exact_upstream_command (__main__.M1OrchestrationTests.test_m3_partial_modes_parse_the_exact_upstream_command) ... ok
+test_m3_selects_own_runtime_and_real_gates (__main__.M1OrchestrationTests.test_m3_selects_own_runtime_and_real_gates) ... ok
+test_owned_e0_workspace_smoke_runs_only_fast_gate_and_preserves_fault_flag (__main__.M1OrchestrationTests.test_owned_e0_workspace_smoke_runs_only_fast_gate_and_preserves_fault_flag) ... ok
+test_protected_g2_runtime_is_refused (__main__.M1OrchestrationTests.test_protected_g2_runtime_is_refused) ... usage: g3-acceptance-runtime.py [-h] [--runtime-file RUNTIME_FILE]
+                                [--start-runtime] [--milestone {M1,M2,M3}]
+                                [--api-only] [--ui-only] [--smoke-fault-check]
+                                [--workspace-smoke-only]
+g3-acceptance-runtime.py: error: Protected G2 or unrelated runtime refused
+ok
+test_real_child_gates_automatically_record_timeline_and_failure_exit (__main__.M1OrchestrationTests.test_real_child_gates_automatically_record_timeline_and_failure_exit) ... ok
+test_second_m2_integration_selects_only_real_ui_checkpoint (__main__.M1OrchestrationTests.test_second_m2_integration_selects_only_real_ui_checkpoint) ... ok
+test_wrong_runtime_and_future_milestones_are_refused (__main__.M1OrchestrationTests.test_wrong_runtime_and_future_milestones_are_refused) ... usage: g3-acceptance-runtime.py [-h] [--runtime-file RUNTIME_FILE]
+                                [--start-runtime] [--milestone {M1,M2,M3}]
+                                [--api-only] [--ui-only] [--smoke-fault-check]
+                                [--workspace-smoke-only]
+g3-acceptance-runtime.py: error: Protected G2 or unrelated runtime refused
+usage: g3-acceptance-runtime.py [-h] [--runtime-file RUNTIME_FILE]
+                                [--start-runtime] [--milestone {M1,M2,M3}]
+                                [--api-only] [--ui-only] [--smoke-fault-check]
+                                [--workspace-smoke-only]
+g3-acceptance-runtime.py: error: Protected G2 or unrelated runtime refused
+usage: g3-acceptance-runtime.py [-h] [--runtime-file RUNTIME_FILE]
+                                [--start-runtime] [--milestone {M1,M2,M3}]
+                                [--api-only] [--ui-only] [--smoke-fault-check]
+                                [--workspace-smoke-only]
+g3-acceptance-runtime.py: error: argument --milestone: invalid choice: 'M4' (choose from 'M1', 'M2', 'M3')
+usage: g3-acceptance-runtime.py [-h] [--runtime-file RUNTIME_FILE]
+                                [--start-runtime] [--milestone {M1,M2,M3}]
+                                [--api-only] [--ui-only] [--smoke-fault-check]
+                                [--workspace-smoke-only]
+g3-acceptance-runtime.py: error: argument --milestone: invalid choice: 'M5' (choose from 'M1', 'M2', 'M3')
+ok
+test_actual_node_writer_preserves_detailed_smoke_receipt (__main__.RealBrowserEntryTests.test_actual_node_writer_preserves_detailed_smoke_receipt) ... ok
+test_existing_m2_and_unknown_flag (__main__.RealBrowserEntryTests.test_existing_m2_and_unknown_flag) ... usage: full-g2-e2e.py [-h] --runtime-file RUNTIME_FILE [--m1] [--m2]
+                      [--m2-api-only] [--m2-ui-only] [--m3] [--m3-api-only]
+                      [--m3-ui-only] [--workspace-smoke-only]
+                      [--smoke-fault-check]
+full-g2-e2e.py: error: unrecognized arguments: --m4
+ok
+test_real_smoke_fault_checkpoint_is_forwarded (__main__.RealBrowserEntryTests.test_real_smoke_fault_checkpoint_is_forwarded) ... ok
+test_three_m3_modes_reach_real_browser_flags (__main__.RealBrowserEntryTests.test_three_m3_modes_reach_real_browser_flags) ... ok
+
+----------------------------------------------------------------------
+Ran 18 tests in 1.302s
+
+OK
+{"status": "FAIL", "runId": "070c9f656d9a45c0b917eab22271cffa", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/070c9f656d9a45c0b917eab22271cffa"}
+{"status": "PASS", "runId": "dfbaa8139f8a4f6296cb285001ea9f86", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/dfbaa8139f8a4f6296cb285001ea9f86"}
+{"status": "FAIL", "runId": "914858f2a2af44aaa82f296dfd7994b1", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/914858f2a2af44aaa82f296dfd7994b1"}
+{"status": "FAIL", "runId": "a964c79a9e72434c8d7ea1e64000226a", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/a964c79a9e72434c8d7ea1e64000226a"}
+{"status": "FAIL", "runId": "aa54680c4eb5413fbd0a423dd9f59e64", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/aa54680c4eb5413fbd0a423dd9f59e64"}
+{"status": "FAIL", "runId": "0801d20022484b9caa16f9fe33ec8607", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/0801d20022484b9caa16f9fe33ec8607"}
+{"status": "FAIL", "runId": "2e4a405945d64329840914f43aea11ed", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/2e4a405945d64329840914f43aea11ed"}
+{"status": "FAIL", "runId": "c6419cb2258343fab798f13ec102639e", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/c6419cb2258343fab798f13ec102639e"}
+{"status": "FAIL", "runId": "8c1e3cf65d064f65b29cfcc87a6884c6", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/8c1e3cf65d064f65b29cfcc87a6884c6"}
+{"status": "FAIL", "runId": "6d41a76181874d448d659f372e322033", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/6d41a76181874d448d659f372e322033"}
+{"status": "PASS", "runId": "c8867d22b8394c32b86615c82c13400f", "evidenceDirectory": "docs/evidence/G3-M2-001/runtime/g3-m2-control/c8867d22b8394c32b86615c82c13400f"}
+{"status": "PASS", "runId": "2c46604465dd4853b0be0181eaa7a474", "evidenceDirectory": "docs/evidence/G3-M2-001/runtime/g3-m2-control/2c46604465dd4853b0be0181eaa7a474"}
+{"status": "PASS", "runId": "9e24cdfa324f43d6a8410cadcaf11379", "evidenceDirectory": "docs/evidence/G3-M3-001/runtime/g3-m3-fault-control/9e24cdfa324f43d6a8410cadcaf11379"}
+{"status": "PASS", "runId": "99ff9ddd15ec4ccba7e9287fa9c6a09c", "evidenceDirectory": "docs/evidence/G3-M3-001/runtime/g3-m3-control/99ff9ddd15ec4ccba7e9287fa9c6a09c"}
+{"status": "PASS", "runId": "42d69a1f7a434c59953a2f744780b217", "evidenceDirectory": "docs/evidence/G3-M3-001/runtime/g3-m3-control/42d69a1f7a434c59953a2f744780b217"}
+{"status": "PASS", "runId": "4a2484f40d194b7faaa29e34f81c2063", "evidenceDirectory": "docs/evidence/G3-M3-001/runtime/g3-m3-control/4a2484f40d194b7faaa29e34f81c2063"}
+{"status": "PASS", "runId": "1e399e8ed1f14a4e9278a85e5b87481b", "evidenceDirectory": "docs/evidence/G3-M3-001/runtime/g3-m3-smoke-control/1e399e8ed1f14a4e9278a85e5b87481b"}
+{"status": "PASS", "runId": "1a22747d88d54d42afaa6bf065ee9286", "evidenceDirectory": "docs/evidence/G3-M3-001/runtime/g3-m3-timing-control/1a22747d88d54d42afaa6bf065ee9286"}
+{"status": "FAIL", "runId": "b700fecfc9d248c4ae5356c4a4ff4a6c", "evidenceDirectory": "docs/evidence/G3-M3-001/runtime/g3-m3-timing-control/b700fecfc9d248c4ae5356c4a4ff4a6c"}
+{"status": "PASS", "runId": "ee05de228a3a48c4b6c10a9f56eef615", "evidenceDirectory": "docs/evidence/G3-M2-001/runtime/g3-m2-control/ee05de228a3a48c4b6c10a9f56eef615"}
+test_new_or_missing_binary_member_is_rejected (__main__.ReaderIdentityTests.test_new_or_missing_binary_member_is_rejected) ... ok
+test_parser_dependency_replacement_is_rejected (__main__.ReaderIdentityTests.test_parser_dependency_replacement_is_rejected) ... ok
+test_symlink_is_not_a_frozen_binary (__main__.ReaderIdentityTests.test_symlink_is_not_a_frozen_binary) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.007s
+
+OK
+....
+----------------------------------------------------------------------
+Ran 4 tests in 0.000s
+
+OK
+..................................
+----------------------------------------------------------------------
+Ran 34 tests in 3.388s
+
+OK
+..................................................................
+----------------------------------------------------------------------
+Ran 66 tests in 0.889s
+
+OK
+test_existing_private_runtime_is_not_rewritten (__main__.LifecycleTests.test_existing_private_runtime_is_not_rewritten) ... ok
+test_foreign_double_label_response_is_rejected (__main__.LifecycleTests.test_foreign_double_label_response_is_rejected) ... ok
+test_linked_artifact_directory_refused (__main__.LifecycleTests.test_linked_artifact_directory_refused) ... ok
+test_m2_ownership_is_supported_but_future_milestones_refuse (__main__.LifecycleTests.test_m2_ownership_is_supported_but_future_milestones_refuse) ... ok
+test_m3_ownership_persists_exact_authorized_prefix (__main__.LifecycleTests.test_m3_ownership_persists_exact_authorized_prefix) ... ok
+test_mismatched_label_or_socket_never_claims_observed (__main__.LifecycleTests.test_mismatched_label_or_socket_never_claims_observed) ... ok
+test_real_prepare_persists_nonsecret_prepared_manifest (__main__.LifecycleTests.test_real_prepare_persists_nonsecret_prepared_manifest) ... ok
+test_run_passes_identity_and_records_exit_without_secrets (__main__.LifecycleTests.test_run_passes_identity_and_records_exit_without_secrets) ... ok
+test_snapshot_reads_only_double_label_containers_and_exact_volumes (__main__.LifecycleTests.test_snapshot_reads_only_double_label_containers_and_exact_volumes) ... ok
+test_unsafe_identity_refuses_before_persistence (__main__.LifecycleTests.test_unsafe_identity_refuses_before_persistence) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.007s
+
+OK
+.........
+----------------------------------------------------------------------
+Ran 9 tests in 0.498s
+
+OK
+.......
+----------------------------------------------------------------------
+Ran 7 tests in 0.018s
+
+OK
+.................
+----------------------------------------------------------------------
+Ran 17 tests in 0.068s
+
+OK
+..................
+----------------------------------------------------------------------
+Ran 18 tests in 0.040s
+
+OK
+EvidencePreflight: 15 checks PASS; schema only, CI/product NOT_RUN.
+PASS: validation metadata V1 raw bytes remain recoverable with normalized checks and ci
+PASS: validation metadata V1 cannot mask FAIL checks or allow overall PASS
+PASS: validation metadata V2 raw bytes remain recoverable with normalized checks and ci
+PASS: validation metadata V2 cannot mask FAIL checks or allow overall PASS
+PASS: validation metadata V3 raw bytes remain recoverable with normalized checks and ci
+PASS: validation metadata V3 cannot mask FAIL checks or allow overall PASS
+OBSERVED V3 fixture: 53PNG, 55256ignored; V3=2482845 V2=32803194 bytes
+PASS: V3 53 PNG and 55256 ignored paths compact fixture with recoverable index
+PASS: V3 refuses actual GitHub wrong-head
+PASS: V3 refuses actual GitHub missing-job
+PASS: V3 refuses actual GitHub failed-job
+PASS: V3 refuses Git input dirty
+PASS: V3 refuses Git input untracked
+PASS: V3 refuses Git input non-ancestor
+PASS: V3 refuses Git input case-collision
+PASS: V3 refuses Git input forbidden
+PASS: V3 refuses Git input secret
+PASS: V3 refuses Git input symlink
+PASS: V3 refuses Git input diff-check
+PASS: V3 reopen rejects missing-index
+PASS: V3 reopen rejects forged-index
+PASS: V3 reopen rejects forged-ci
+PASS: V3 reopen rejects hash
+PASS: V3 reopen rejects path-traversal
+PASS: V3 reopen rejects duplicate
+PASS: V3 reopen rejects case-member
+PASS: V3 reopen rejects symlink-member
+PASS: V3 reopen rejects forged-text-diff
+PASS: V3 ignored inventory rehashed forgery rejects count
+PASS: V3 ignored inventory rehashed forgery rejects size
+PASS: V3 ignored inventory rehashed forgery rejects unknown-count
+PASS: V3 ignored inventory rehashed forgery rejects duplicate-group
+PASS: V3 ignored inventory rehashed forgery rejects too-many-examples
+PASS: V3 ignored inventory rehashed forgery rejects scan-time
+PASS: V3 ignored inventory rehashed forgery rejects extra-field
+PASS: V3 ignored inventory rehashed forgery rejects wrong-type
+PASS: V3 screenshot selection refuses over-count
+PASS: V3 screenshot selection refuses duplicate-view
+PASS: V3 screenshot selection refuses over-png-budget
+PASS: V3 size over 15MiB refuses atomic publication and preserves previous valid package
+PASS: V3 size over 10MiB emits exact category report without weakening 15MiB gate
+PASS: V3 default with independently queried same Head CI and legacy V2 reopen
+PASS: compact explicit V2 with complete source and historical evidence index
+OBSERVED compactBytes=13171 legacyBytes=2517634
+PASS: V3 binary add modify delete rename and historical screenshot reduction
+OBSERVED compactBytes=12095 legacyBytes=2517611
+PASS: compact binary add modify delete rename and historical screenshot reduction
+PASS: compact text diff cannot be hidden by committed attributes
+PASS: compact duplicate payload maps to one physical member
+PASS: compact index tamper with rewritten checksum is rejected
+PASS: compact rejects CI success from different Head even with PARTIAL task
+PASS: compact rejects case-colliding committed paths
+PASS: compact safety dirty
+PASS: compact safety untracked
+PASS: compact safety forbidden
+PASS: compact safety removed-secret
+PASS: compact safety symlink
+PASS: compact safety path-traversal
+PASS: compact safety case-member
+PASS: compact safety duplicate-member
+PASS: compact safety linked-member
+PASS: compact safety hash-forgery
+PASS: compact committed validation kept once with runtime CI recorded separately
+PASS: resource inspector is read only and default Docker NOT_RUN
+PASS: committed snapshot, Unicode, full diff and reopened ZIP
+PASS: color.ui always cannot contaminate machine-readable patch
+PASS: PASS requires real command evidence
+PASS: non-ancestor commits
+PASS: dirty tracked delivery
+PASS: untracked delivery
+PASS: forbidden committed member .env
+PASS: forbidden committed member .env.production
+PASS: forbidden committed member .ssh/id
+PASS: forbidden committed member .codex/auth.json
+PASS: forbidden committed member auth/config.json
+PASS: forbidden committed member cert.pem
+PASS: forbidden committed member nested/bin/output
+PASS: forbidden committed member .tools/sdk/file
+PASS: forbidden committed member models/weights.dat
+PASS: forbidden committed member state.db
+PASS: forbidden committed member .cache/item
+PASS: forbidden committed member node_modules/item
+PASS: synthetic token in source
+PASS: removed synthetic token retained in patch
+PASS: reopened archive rejects injected or changed member .git/config
+PASS: reopened archive rejects injected or changed member .env
+PASS: reopened archive rejects injected or changed member ../escape.txt
+PASS: reopened archive rejects injected or changed member source/app.txt
+PASS: git archive export-ignore cannot omit committed source
+PASS: git archive export-subst cannot rewrite committed source
+PASS: git symlink blob cannot silently become source
+PASS: committed submodule cannot be omitted by git archive
+PASS: complete patch rejects removed forbidden environment member
+PASS: reopened archive rejects payload tamper even after checksum rewrite
+PASS: missing checksum/member is rejected on reopen
+PASS: CI PASS cannot be inferred without run metadata
+PASS: explicit CI metadata avoids self-referential commit evidence
+PASS: existing delivery ZIP is preserved
+PASS: valid committed evidence preserves command and status
+ReviewPackage: 96 tests, 0 failures; product/container tests NOT_RUN.
+NOT_RUN: .NET原生检查需显式-RunNative及对应任务授权。
+NOT_RUN: Web独立检查需真实目标及显式-RunNative。
+NOT_RUN: 浏览器真实OIDC/E2E需独立受控联调，不隐式混入工程检查。
+PASS: 所选工程检查；范围以逐项输出为准，不表示业务、前端或整个G1通过。

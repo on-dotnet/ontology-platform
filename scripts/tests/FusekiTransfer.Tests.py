@@ -158,7 +158,7 @@ class TransferTests(unittest.TestCase):
                     rootfs={'type':'layers','diff_ids':['sha256:'+hashlib.sha256(b'layer').hexdigest()]})
         raw=json.dumps(config).encode();image_id='sha256:'+hashlib.sha256(raw).hexdigest();config_name=image_id[7:]+'.json'
         manifest=[dict(Config=config_name,RepoTags=[expected['image']],Layers=['layer/layer.tar'])]
-        with tempfile.TemporaryDirectory(dir='/private/tmp') as temporary:
+        with tempfile.TemporaryDirectory(dir=Path(tempfile.gettempdir()).resolve()) as temporary:
             directory=Path(temporary);path=directory/'image.tar'
             with tarfile.open(path,'w') as archive:
                 for name,data in [('manifest.json',json.dumps(manifest).encode()),(config_name,raw),('layer/layer.tar',b'layer')]:

@@ -26,7 +26,7 @@ class CanonicalTests(unittest.TestCase):
             (self.context/name).write_text('fixture\n')
         self.engine = patch.object(self.mod,'engine_identity',return_value=dict(platform='linux/amd64',engineVersion='29.9.2',buildxVersion='v0.34.1'))
         self.engine.start()
-        self.source_tmp=tempfile.TemporaryDirectory(prefix='ontology-prepared-',dir='/private/tmp')
+        self.source_tmp=tempfile.TemporaryDirectory(prefix='ontology-prepared-',dir=Path(tempfile.gettempdir()).resolve())
         source_dir=Path(self.source_tmp.name);(source_dir/'fuseki.tar.gz').write_bytes(b'fixture')
         self.prepared=patch.object(self.mod,'prepare_source',return_value=contextlib.nullcontext(dict(directory=source_dir,receipt={},stages=[],verified=True,downloaded=False)),create=True)
         self.source_valid=patch.object(self.mod,'validate_source_context',return_value=7,create=True)
@@ -268,7 +268,7 @@ class CanonicalDownloadTests(unittest.TestCase):
 
 class CanonicalSourceTests(unittest.TestCase):
     def setUp(self):
-        self.tmp=tempfile.TemporaryDirectory(prefix='ontology-source-',dir='/private/tmp')
+        self.tmp=tempfile.TemporaryDirectory(prefix='ontology-source-',dir=Path(tempfile.gettempdir()).resolve())
         self.root=Path(self.tmp.name);self.cache=self.root/'cache'
         self.mod=importlib.util.module_from_spec(SPEC);SPEC.loader.exec_module(self.mod)
         self.payload=b'canonical-source-fixture'

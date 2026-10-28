@@ -1,0 +1,613 @@
+{
+  "schemaVersion": 1,
+  "observedAtUtc": "2026-10-28T15:02:21.794856+00:00",
+  "backend": {
+    "context": "desktop-linux",
+    "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016",
+    "bridgeId": "aac90b7da68eac28173b58904a8355bca82be5a66238f5d020ebf43858ff235c",
+    "buildxVersion": "github.com/docker/buildx v0.38.1 0dbe87f36ed472fe36b6796c3f70b4210a731fc5",
+    "builder": "Name:          desktop-linux\nDriver:        docker\nLast Activity: 2026-10-28 14:58:46 +0000 UTC\n\nNodes:\nName:             desktop-linux\nEndpoint:         desktop-linux\nStatus:           running\nBuildKit version: v0.34.0\nPlatforms:        linux/arm64, linux/amd64, linux/amd64/v2, linux/riscv64, linux/ppc64le, linux/s390x, linux/386\nLabels:\n org.mobyproject.buildkit.worker.containerd.namespace: moby\n org.mobyproject.buildkit.worker.containerd.uuid:      c943f7ae-b2dc-482e-bdb4-28fee25f5502\n org.mobyproject.buildkit.worker.executor:             containerd\n org.mobyproject.buildkit.worker.hostname:             docker-desktop\n org.mobyproject.buildkit.worker.moby.host-gateway-ip: 192.168.65.254\n org.mobyproject.buildkit.worker.network:              host\n org.mobyproject.buildkit.worker.selinux.enabled:      false\n org.mobyproject.buildkit.worker.snapshotter:          overlayfs\nDevices:\n Name:                  docker.com/gpu=webgpu\n Automatically allowed: false\nGC Policy rule#0:\n All:            false\n Filters:        type==source.local type==exec.cachemount type==source.git.checkout\n Keep Duration:  48h0m0s\n Max Used Space: 2.764GiB\nGC Policy rule#1:\n All:            false\n Keep Duration:  1440h0m0s\n Reserved Space: 20GiB\nGC Policy rule#2:\n All:            false\n Reserved Space: 20GiB\nGC Policy rule#3:\n All:            true\n Reserved Space: 20GiB",
+    "version": {
+      "Client": {
+        "Version": "29.9.2",
+        "ApiVersion": "1.56",
+        "DefaultAPIVersion": "1.56",
+        "GitCommit": "a82e528",
+        "GoVersion": "go1.26.10",
+        "Os": "darwin",
+        "Arch": "arm64",
+        "BuildTime": "Tue Oct 20 18:43:59 2026",
+        "Context": "desktop-linux"
+      },
+      "Server": {
+        "Platform": {
+          "Name": "Docker Desktop 4.96.3 (244472)"
+        },
+        "Version": "29.9.2",
+        "ApiVersion": "1.56",
+        "MinAPIVersion": "1.40",
+        "Os": "linux",
+        "Arch": "arm64",
+        "Components": [
+          {
+            "Name": "Engine",
+            "Version": "29.9.2",
+            "Details": {
+              "ApiVersion": "1.56",
+              "Arch": "arm64",
+              "BuildTime": "Tue Oct 20 18:44:14 2026",
+              "Experimental": "false",
+              "GitCommit": "0367cbe",
+              "GoVersion": "go1.26.10",
+              "KernelVersion": "7.0.14-linuxkit",
+              "MinAPIVersion": "1.40",
+              "Module": "github.com/moby/moby/v2",
+              "ModuleVersion": "v2.0.0+unknown",
+              "Os": "linux"
+            }
+          },
+          {
+            "Name": "containerd",
+            "Version": "v2.4.2",
+            "Details": {
+              "GitCommit": "b7a25261e029d68978bbf290df0a62fc819b3c51"
+            }
+          },
+          {
+            "Name": "runc",
+            "Version": "1.5.2",
+            "Details": {
+              "GitCommit": "v1.5.2-0-g29dd3dc2"
+            }
+          },
+          {
+            "Name": "docker-init",
+            "Version": "0.19.0",
+            "Details": {
+              "GitCommit": "de40ad0"
+            }
+          }
+        ],
+        "GitCommit": "0367cbe",
+        "GoVersion": "go1.26.10",
+        "KernelVersion": "7.0.14-linuxkit",
+        "BuildTime": "2026-10-20T18:44:14.000000000+00:00"
+      }
+    }
+  },
+  "totalCounts": {
+    "containers": 0,
+    "volumes": 16,
+    "images": 15,
+    "history": 10,
+    "networks": 3
+  },
+  "physicalReclaimedBytes": "NOT_VERIFIED",
+  "scope": "Project allowlisted metadata only; unknown and foreign resources counted and protected, not copied",
+  "projectImages": [
+    {
+      "Id": "sha256:05040926259ace989082fac0fb2f52d33f4a8122a9a85cb617eb76965b484a39",
+      "RepoTags": [
+        "ontology-platform-fuseki:context-6bc72da7b5570e60b43cb978965e096fa512befca1e80dbf76ef0710fa681018"
+      ],
+      "RepoDigests": [
+        "ontology-platform-fuseki@sha256:05040926259ace989082fac0fb2f52d33f4a8122a9a85cb617eb76965b484a39"
+      ],
+      "Size": 503312996,
+      "Created": "2026-10-26T02:07:21.88926401Z",
+      "Labels": {
+        "org.opencontainers.image.source": "https://github.com/on-dotnet/ontology-platform",
+        "io.ontology-platform.task-id": "G3-M1-CLOSEOUT-002",
+        "io.ontology-platform.run-id": "canonical-validation-1",
+        "io.ontology-platform.context-sha256": "6bc72da7b5570e60b43cb978965e096fa512befca1e80dbf76ef0710fa681018",
+        "com.docker.compose.project": "",
+        "com.docker.compose.service": ""
+      },
+      "references": [],
+      "decision": {
+        "classification": "AMBIGUOUS",
+        "reason": "Exact owner/recovery classification has not been reviewed",
+        "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+      }
+    },
+    {
+      "Id": "sha256:39b0fb6616a466a05b2ff8c691bb14a63557c70118d433a4b70fd1068b1bef60",
+      "RepoTags": [
+        "ontology-platform-fuseki:context-1e45f836d9837cbc75d23adb3ad37b0ff79a545ef06102a87aa246feea9cc1e5"
+      ],
+      "RepoDigests": [
+        "ontology-platform-fuseki@sha256:39b0fb6616a466a05b2ff8c691bb14a63557c70118d433a4b70fd1068b1bef60"
+      ],
+      "Size": 503334439,
+      "Created": "2026-10-27T15:06:39.518416545Z",
+      "Labels": {
+        "org.opencontainers.image.source": "https://github.com/on-dotnet/ontology-platform",
+        "io.ontology-platform.task-id": "G3-M2-001",
+        "io.ontology-platform.run-id": "download-context-fixed-cold",
+        "io.ontology-platform.context-sha256": "1e45f836d9837cbc75d23adb3ad37b0ff79a545ef06102a87aa246feea9cc1e5",
+        "com.docker.compose.project": "",
+        "com.docker.compose.service": ""
+      },
+      "references": [],
+      "decision": {
+        "classification": "AMBIGUOUS",
+        "reason": "Exact owner/recovery classification has not been reviewed",
+        "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+      }
+    },
+    {
+      "Id": "sha256:401e1fbc58c27b08c3103e00c86b22bd175a1cdd8f8a7d61965133f27a24437f",
+      "RepoTags": [
+        "ontology-platform-g2-fuseki:6.2.0"
+      ],
+      "RepoDigests": [
+        "ontology-platform-g2-fuseki@sha256:401e1fbc58c27b08c3103e00c86b22bd175a1cdd8f8a7d61965133f27a24437f"
+      ],
+      "Size": 503312701,
+      "Created": "2026-10-26T02:07:21.88926401Z",
+      "Labels": {
+        "org.opencontainers.image.source": "",
+        "io.ontology-platform.task-id": "",
+        "io.ontology-platform.run-id": "",
+        "io.ontology-platform.context-sha256": "",
+        "com.docker.compose.project": "",
+        "com.docker.compose.service": ""
+      },
+      "references": [],
+      "decision": {
+        "classification": "AMBIGUOUS",
+        "reason": "Exact owner/recovery classification has not been reviewed",
+        "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+      }
+    },
+    {
+      "Id": "sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c",
+      "RepoTags": [
+        "ontology-platform-fuseki:context-4fbf23514516632dcb651b5c05bf04e9992da52491607b6cf58de1f7348ff9ab"
+      ],
+      "RepoDigests": [
+        "ontology-platform-fuseki@sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c"
+      ],
+      "Size": 606140328,
+      "Created": "2026-10-28T14:40:49.555008303Z",
+      "Labels": {
+        "org.opencontainers.image.source": "https://github.com/on-dotnet/ontology-platform",
+        "io.ontology-platform.task-id": "G3-M3-001",
+        "io.ontology-platform.run-id": "e0-a-real-69e4388fb5bf4923976997ded13f93b9-export",
+        "io.ontology-platform.context-sha256": "dba8036818246baaefc136fa6740729e9be068c79dd0c2ae584f895192406091",
+        "com.docker.compose.project": "",
+        "com.docker.compose.service": ""
+      },
+      "references": [],
+      "decision": {
+        "classification": "AMBIGUOUS",
+        "reason": "Exact owner/recovery classification has not been reviewed",
+        "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+      }
+    },
+    {
+      "Id": "sha256:8d68acc51924c158b418c8bd5597ca20203d2f0ce35799ceb04c068a8b991a7e",
+      "RepoTags": [
+        "ontology-platform-fuseki:context-627fad8936708ae759a8f889ba60fe146e31970a40a823c33b629abc7feec3b7"
+      ],
+      "RepoDigests": [
+        "ontology-platform-fuseki@sha256:8d68acc51924c158b418c8bd5597ca20203d2f0ce35799ceb04c068a8b991a7e"
+      ],
+      "Size": 606140328,
+      "Created": "2026-10-28T14:40:49.555008303Z",
+      "Labels": {
+        "org.opencontainers.image.source": "https://github.com/on-dotnet/ontology-platform",
+        "io.ontology-platform.task-id": "G3-M3-001",
+        "io.ontology-platform.run-id": "e0-a-real-d576598ea1ec4196ac481a4e2425a486-export",
+        "io.ontology-platform.context-sha256": "dba8036818246baaefc136fa6740729e9be068c79dd0c2ae584f895192406091",
+        "com.docker.compose.project": "",
+        "com.docker.compose.service": ""
+      },
+      "references": [],
+      "decision": {
+        "classification": "AMBIGUOUS",
+        "reason": "Exact owner/recovery classification has not been reviewed",
+        "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+      }
+    }
+  ],
+  "projectHistory": [
+    {
+      "Ref": "1kq80249gfrdurl9atazzw7kl",
+      "Name": "infra/development/fuseki",
+      "Context": "infra/development/fuseki",
+      "Dockerfile": "infra/development/fuseki/Dockerfile",
+      "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+      "VCSRevision": "1990742c1bbe97c427121a37e1cfe775d79c89b9",
+      "Status": "completed",
+      "decision": {
+        "classification": "AMBIGUOUS",
+        "reason": "Exact owner/recovery classification has not been reviewed",
+        "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+      }
+    },
+    {
+      "Ref": "u4pq3cm5kkdmvt81at69np6w1",
+      "Name": "infra/development/fuseki",
+      "Context": "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/infra/development/fuseki",
+      "Dockerfile": "infra/development/fuseki/Dockerfile",
+      "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+      "VCSRevision": "a574bdc64d302ae38a357467b7d567e8a14c220d",
+      "Status": "completed",
+      "decision": {
+        "classification": "AMBIGUOUS",
+        "reason": "Exact owner/recovery classification has not been reviewed",
+        "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+      }
+    },
+    {
+      "Ref": "qydp3k8m5h46i07t182f2ojey",
+      "Name": "infra/development/fuseki",
+      "Context": "infra/development/fuseki",
+      "Dockerfile": "infra/development/fuseki/Dockerfile",
+      "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+      "VCSRevision": "867f8ce8b2fe600a7514c1b6866ec98ddf5be7a4",
+      "Status": "failed",
+      "decision": {
+        "classification": "AMBIGUOUS",
+        "reason": "Exact owner/recovery classification has not been reviewed",
+        "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+      }
+    },
+    {
+      "Ref": "20b0q7l3v4hjmtem8si9g0lxc",
+      "Name": "infra/development/fuseki",
+      "Context": "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/infra/development/fuseki",
+      "Dockerfile": "infra/development/fuseki/Dockerfile",
+      "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+      "VCSRevision": "67332cace3d134e31b723226071f1d630453cd59",
+      "Status": "failed",
+      "decision": {
+        "classification": "AMBIGUOUS",
+        "reason": "Exact owner/recovery classification has not been reviewed",
+        "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+      }
+    },
+    {
+      "Ref": "lpsg3gngs8x1rvrnb25yjoyn0",
+      "Name": "infra/development/fuseki",
+      "Context": "/Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/infra/development/fuseki",
+      "Dockerfile": "infra/development/fuseki/Dockerfile",
+      "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+      "VCSRevision": "903e08b3bf9e52dc4bf69068806cb722fd8e79ac",
+      "Status": "completed",
+      "decision": {
+        "classification": "AMBIGUOUS",
+        "reason": "Exact owner/recovery classification has not been reviewed",
+        "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+      }
+    },
+    {
+      "Ref": "8q69crf65sf5ffy9tfqlapd3a",
+      "Name": "infra/development/fuseki",
+      "Context": "/Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/infra/development/fuseki",
+      "Dockerfile": "infra/development/fuseki/Dockerfile",
+      "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+      "VCSRevision": "903e08b3bf9e52dc4bf69068806cb722fd8e79ac",
+      "Status": "failed",
+      "decision": {
+        "classification": "AMBIGUOUS",
+        "reason": "Exact owner/recovery classification has not been reviewed",
+        "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+      }
+    }
+  ],
+  "projectVolumes": [
+    {
+      "Name": "g2-ef979bd04cc0-alloy-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T05:57:39Z",
+      "Labels": {
+        "org.opencontainers.image.source": "",
+        "io.ontology-platform.task-id": "",
+        "io.ontology-platform.run-id": "",
+        "io.ontology-platform.context-sha256": "",
+        "com.docker.compose.project": "",
+        "com.docker.compose.service": ""
+      },
+      "references": [],
+      "decision": {
+        "classification": "AMBIGUOUS",
+        "reason": "Exact owner/recovery classification has not been reviewed",
+        "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+      }
+    },
+    {
+      "Name": "g2-ef979bd04cc0-fuseki-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T05:57:39Z",
+      "Labels": {
+        "org.opencontainers.image.source": "",
+        "io.ontology-platform.task-id": "",
+        "io.ontology-platform.run-id": "",
+        "io.ontology-platform.context-sha256": "",
+        "com.docker.compose.project": "",
+        "com.docker.compose.service": ""
+      },
+      "references": [],
+      "decision": {
+        "classification": "AMBIGUOUS",
+        "reason": "Exact owner/recovery classification has not been reviewed",
+        "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+      }
+    },
+    {
+      "Name": "g2-ef979bd04cc0-grafana-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T05:57:39Z",
+      "Labels": {
+        "org.opencontainers.image.source": "",
+        "io.ontology-platform.task-id": "",
+        "io.ontology-platform.run-id": "",
+        "io.ontology-platform.context-sha256": "",
+        "com.docker.compose.project": "",
+        "com.docker.compose.service": ""
+      },
+      "references": [],
+      "decision": {
+        "classification": "AMBIGUOUS",
+        "reason": "Exact owner/recovery classification has not been reviewed",
+        "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+      }
+    },
+    {
+      "Name": "g2-ef979bd04cc0-loki-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T05:57:39Z",
+      "Labels": {
+        "org.opencontainers.image.source": "",
+        "io.ontology-platform.task-id": "",
+        "io.ontology-platform.run-id": "",
+        "io.ontology-platform.context-sha256": "",
+        "com.docker.compose.project": "",
+        "com.docker.compose.service": ""
+      },
+      "references": [],
+      "decision": {
+        "classification": "AMBIGUOUS",
+        "reason": "Exact owner/recovery classification has not been reviewed",
+        "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+      }
+    },
+    {
+      "Name": "g2-ef979bd04cc0-postgres-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T05:57:23Z",
+      "Labels": {
+        "org.opencontainers.image.source": "",
+        "io.ontology-platform.task-id": "",
+        "io.ontology-platform.run-id": "",
+        "io.ontology-platform.context-sha256": "",
+        "com.docker.compose.project": "",
+        "com.docker.compose.service": ""
+      },
+      "references": [],
+      "decision": {
+        "classification": "AMBIGUOUS",
+        "reason": "Exact owner/recovery classification has not been reviewed",
+        "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+      }
+    },
+    {
+      "Name": "g2-ef979bd04cc0-prometheus-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T05:57:39Z",
+      "Labels": {
+        "org.opencontainers.image.source": "",
+        "io.ontology-platform.task-id": "",
+        "io.ontology-platform.run-id": "",
+        "io.ontology-platform.context-sha256": "",
+        "com.docker.compose.project": "",
+        "com.docker.compose.service": ""
+      },
+      "references": [],
+      "decision": {
+        "classification": "AMBIGUOUS",
+        "reason": "Exact owner/recovery classification has not been reviewed",
+        "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+      }
+    },
+    {
+      "Name": "g2-ef979bd04cc0-rustfs-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T05:57:39Z",
+      "Labels": {
+        "org.opencontainers.image.source": "",
+        "io.ontology-platform.task-id": "",
+        "io.ontology-platform.run-id": "",
+        "io.ontology-platform.context-sha256": "",
+        "com.docker.compose.project": "",
+        "com.docker.compose.service": ""
+      },
+      "references": [],
+      "decision": {
+        "classification": "AMBIGUOUS",
+        "reason": "Exact owner/recovery classification has not been reviewed",
+        "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+      }
+    },
+    {
+      "Name": "g2-ef979bd04cc0-tempo-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T05:57:39Z",
+      "Labels": {
+        "org.opencontainers.image.source": "",
+        "io.ontology-platform.task-id": "",
+        "io.ontology-platform.run-id": "",
+        "io.ontology-platform.context-sha256": "",
+        "com.docker.compose.project": "",
+        "com.docker.compose.service": ""
+      },
+      "references": [],
+      "decision": {
+        "classification": "AMBIGUOUS",
+        "reason": "Exact owner/recovery classification has not been reviewed",
+        "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+      }
+    },
+    {
+      "Name": "g3-m3-daa8b53191e9-alloy-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-28T14:56:52Z",
+      "Labels": {
+        "org.opencontainers.image.source": "",
+        "io.ontology-platform.task-id": "",
+        "io.ontology-platform.run-id": "",
+        "io.ontology-platform.context-sha256": "",
+        "com.docker.compose.project": "",
+        "com.docker.compose.service": ""
+      },
+      "references": [],
+      "decision": {
+        "classification": "AMBIGUOUS",
+        "reason": "Exact owner/recovery classification has not been reviewed",
+        "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+      }
+    },
+    {
+      "Name": "g3-m3-daa8b53191e9-fuseki-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-28T14:56:52Z",
+      "Labels": {
+        "org.opencontainers.image.source": "",
+        "io.ontology-platform.task-id": "",
+        "io.ontology-platform.run-id": "",
+        "io.ontology-platform.context-sha256": "",
+        "com.docker.compose.project": "",
+        "com.docker.compose.service": ""
+      },
+      "references": [],
+      "decision": {
+        "classification": "AMBIGUOUS",
+        "reason": "Exact owner/recovery classification has not been reviewed",
+        "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+      }
+    },
+    {
+      "Name": "g3-m3-daa8b53191e9-grafana-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-28T14:56:52Z",
+      "Labels": {
+        "org.opencontainers.image.source": "",
+        "io.ontology-platform.task-id": "",
+        "io.ontology-platform.run-id": "",
+        "io.ontology-platform.context-sha256": "",
+        "com.docker.compose.project": "",
+        "com.docker.compose.service": ""
+      },
+      "references": [],
+      "decision": {
+        "classification": "AMBIGUOUS",
+        "reason": "Exact owner/recovery classification has not been reviewed",
+        "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+      }
+    },
+    {
+      "Name": "g3-m3-daa8b53191e9-loki-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-28T14:56:52Z",
+      "Labels": {
+        "org.opencontainers.image.source": "",
+        "io.ontology-platform.task-id": "",
+        "io.ontology-platform.run-id": "",
+        "io.ontology-platform.context-sha256": "",
+        "com.docker.compose.project": "",
+        "com.docker.compose.service": ""
+      },
+      "references": [],
+      "decision": {
+        "classification": "AMBIGUOUS",
+        "reason": "Exact owner/recovery classification has not been reviewed",
+        "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+      }
+    },
+    {
+      "Name": "g3-m3-daa8b53191e9-postgres-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-28T14:34:40Z",
+      "Labels": {
+        "org.opencontainers.image.source": "",
+        "io.ontology-platform.task-id": "",
+        "io.ontology-platform.run-id": "",
+        "io.ontology-platform.context-sha256": "",
+        "com.docker.compose.project": "",
+        "com.docker.compose.service": ""
+      },
+      "references": [],
+      "decision": {
+        "classification": "AMBIGUOUS",
+        "reason": "Exact owner/recovery classification has not been reviewed",
+        "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+      }
+    },
+    {
+      "Name": "g3-m3-daa8b53191e9-prometheus-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-28T14:56:52Z",
+      "Labels": {
+        "org.opencontainers.image.source": "",
+        "io.ontology-platform.task-id": "",
+        "io.ontology-platform.run-id": "",
+        "io.ontology-platform.context-sha256": "",
+        "com.docker.compose.project": "",
+        "com.docker.compose.service": ""
+      },
+      "references": [],
+      "decision": {
+        "classification": "AMBIGUOUS",
+        "reason": "Exact owner/recovery classification has not been reviewed",
+        "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+      }
+    },
+    {
+      "Name": "g3-m3-daa8b53191e9-rustfs-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-28T14:56:52Z",
+      "Labels": {
+        "org.opencontainers.image.source": "",
+        "io.ontology-platform.task-id": "",
+        "io.ontology-platform.run-id": "",
+        "io.ontology-platform.context-sha256": "",
+        "com.docker.compose.project": "",
+        "com.docker.compose.service": ""
+      },
+      "references": [],
+      "decision": {
+        "classification": "AMBIGUOUS",
+        "reason": "Exact owner/recovery classification has not been reviewed",
+        "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+      }
+    },
+    {
+      "Name": "g3-m3-daa8b53191e9-tempo-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-28T14:56:52Z",
+      "Labels": {
+        "org.opencontainers.image.source": "",
+        "io.ontology-platform.task-id": "",
+        "io.ontology-platform.run-id": "",
+        "io.ontology-platform.context-sha256": "",
+        "com.docker.compose.project": "",
+        "com.docker.compose.service": ""
+      },
+      "references": [],
+      "decision": {
+        "classification": "AMBIGUOUS",
+        "reason": "Exact owner/recovery classification has not been reviewed",
+        "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+      }
+    }
+  ],
+  "projectContainers": [],
+  "foreignOrUnknownCounts": {
+    "images": 10,
+    "history": 4,
+    "volumes": 0,
+    "containers": 0
+  }
+}

@@ -1,0 +1,17 @@
+test_m3_history_accepts_only_exact_canonical_relative_context (__main__.CleanupTests.test_m3_history_accepts_only_exact_canonical_relative_context) ...
+  test_m3_history_accepts_only_exact_canonical_relative_context (__main__.CleanupTests.test_m3_history_accepts_only_exact_canonical_relative_context) (context='infra/development/fuseki') ... FAIL
+
+======================================================================
+FAIL: test_m3_history_accepts_only_exact_canonical_relative_context (__main__.CleanupTests.test_m3_history_accepts_only_exact_canonical_relative_context) (context='infra/development/fuseki')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/scripts/tests/CleanupResources.Tests.py", line 457, in test_m3_history_accepts_only_exact_canonical_relative_context
+    self.assertEqual(result.returncode==0,allowed,result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False != True : REFUSED: History context outside project
+
+
+----------------------------------------------------------------------
+Ran 1 test in 6.137s
+
+FAILED (failures=1)

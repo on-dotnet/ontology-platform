@@ -1,0 +1,120 @@
+{
+  "schemaVersion": 1,
+  "runId": 40711221901,
+  "headSha": "1990742c1bbe97c427121a37e1cfe775d79c89b9",
+  "jobId": 122896837973,
+  "jobConclusion": "success",
+  "overallConclusion": "failure",
+  "failureScope": "Engineering canonical test fixture hardcoded macOS temp directory; actual governance integration succeeds",
+  "canonical": {
+    "cacheKey": "ontology-fuseki-image-v2-linux-amd64-0fe39718f35634e7a88474fa05fec446e6c64c4071d369d85c933ee7ed4a92c5",
+    "cacheOutcome": "MISS",
+    "containerChecksumVerified": true,
+    "contextSha256": "dba8036818246baaefc136fa6740729e9be068c79dd0c2ae584f895192406091",
+    "currentGithubRunId": "40711221901",
+    "envFingerprint": "a21977bf85c31ca2d82b125e92a1f43e1ae3ffc17fccc47b48da94562ad5d1bf",
+    "exportOutcome": "EXPORTED",
+    "failureStateKey": "ontology-fuseki-image-v2-linux-amd64-0fe39718f35634e7a88474fa05fec446e6c64c4071d369d85c933ee7ed4a92c5-failure-v1-a21977bf85c31ca2d82b125e92a1f43e1ae3ffc17fccc47b48da94562ad5d1bf",
+    "image": "ontology-platform-fuseki:context-0fe39718f35634e7a88474fa05fec446e6c64c4071d369d85c933ee7ed4a92c5",
+    "imageId": "sha256:754078b2138a6b445d99af80d522283ad190959d04f621184356c6314f2fb919",
+    "inputFingerprint": "0fe39718f35634e7a88474fa05fec446e6c64c4071d369d85c933ee7ed4a92c5",
+    "observedAt": "2026-10-28T14:59:03.529678+00:00",
+    "platform": "linux/amd64",
+    "producerRunId": "ci-preflight-40711221901-1",
+    "restored": false,
+    "reused": false,
+    "runId": "ci-preflight-40711221901-1",
+    "runner": "Linux-X64",
+    "schemaVersion": 2,
+    "source": {
+      "cacheFile": "/home/runner/work/ontology-platform/ontology-platform/artifacts/fuseki-sources/ba65f5867d2d4741b2ed9e2af5a0d4fbb447909894ab2a0c6bc4dac8997f4fe339c87b13c48d45d054977769f0f8bf763ea346b1f7792d5cdc458041bd43a132.tar.gz",
+      "cacheOutcome": "MISS",
+      "downloaded": true,
+      "reviewTrigger": "G3-M3 stage closeout",
+      "runId": "ci-preflight-40711221901-1",
+      "sha512": "ba65f5867d2d4741b2ed9e2af5a0d4fbb447909894ab2a0c6bc4dac8997f4fe339c87b13c48d45d054977769f0f8bf763ea346b1f7792d5cdc458041bd43a132",
+      "sizeBytes": 51398669,
+      "taskId": "G3-M3-001",
+      "temporaryContextRemoved": true
+    },
+    "sourceChecksumVerified": true,
+    "stages": [
+      {
+        "durationMs": 0,
+        "errorCategory": null,
+        "inputFingerprint": "0fe39718f35634e7a88474fa05fec446e6c64c4071d369d85c933ee7ed4a92c5",
+        "outcome": "MISS",
+        "stage": "cache restore"
+      },
+      {
+        "durationMs": 0,
+        "errorCategory": null,
+        "executor": "host",
+        "inputFingerprint": "0fe39718f35634e7a88474fa05fec446e6c64c4071d369d85c933ee7ed4a92c5",
+        "operation": "SOURCE_CACHE_VALIDATE",
+        "outcome": "MISS",
+        "stage": "cache restore"
+      },
+      {
+        "durationMs": 2146,
+        "errorCategory": null,
+        "executor": "host",
+        "inputFingerprint": "0fe39718f35634e7a88474fa05fec446e6c64c4071d369d85c933ee7ed4a92c5",
+        "operation": "SOURCE_DOWNLOAD",
+        "outcome": "PASS",
+        "stage": "network"
+      },
+      {
+        "durationMs": 82,
+        "errorCategory": null,
+        "executor": "host",
+        "inputFingerprint": "0fe39718f35634e7a88474fa05fec446e6c64c4071d369d85c933ee7ed4a92c5",
+        "operation": "SOURCE_SHA512",
+        "outcome": "PASS",
+        "stage": "checksum"
+      },
+      {
+        "durationMs": 101,
+        "errorCategory": null,
+        "executor": "host",
+        "inputFingerprint": "0fe39718f35634e7a88474fa05fec446e6c64c4071d369d85c933ee7ed4a92c5",
+        "operation": "SOURCE_SHA512",
+        "outcome": "PASS",
+        "stage": "checksum"
+      },
+      {
+        "durationMs": 121,
+        "errorCategory": null,
+        "executor": "container",
+        "inputFingerprint": "0fe39718f35634e7a88474fa05fec446e6c64c4071d369d85c933ee7ed4a92c5",
+        "outcome": "PASS",
+        "stage": "checksum"
+      },
+      {
+        "durationMs": 400,
+        "errorCategory": null,
+        "executor": "container",
+        "inputFingerprint": "0fe39718f35634e7a88474fa05fec446e6c64c4071d369d85c933ee7ed4a92c5",
+        "outcome": "PASS",
+        "stage": "extract/COPY"
+      },
+      {
+        "durationMs": 8148,
+        "errorCategory": null,
+        "inputFingerprint": "0fe39718f35634e7a88474fa05fec446e6c64c4071d369d85c933ee7ed4a92c5",
+        "outcome": "PASS",
+        "stage": "image preparation"
+      },
+      {
+        "durationMs": 4294,
+        "errorCategory": null,
+        "inputFingerprint": "0fe39718f35634e7a88474fa05fec446e6c64c4071d369d85c933ee7ed4a92c5",
+        "outcome": "PASS",
+        "stage": "cache export"
+      }
+    ],
+    "taskId": "G3-M3-001"
+  },
+  "canonicalSaveStep": "success",
+  "scope": "Full CI cold proof; overall failure retained, never certified same-Head complete CI"
+}

@@ -637,7 +637,9 @@ class Cleaner:
         require(h['Ref']==target and h['Context']==op.get('expectedContext') and h['VCSRepository']==op.get('expectedVcs') and h['VCSRevision']==op.get('expectedRevision') and h['Status']==op.get('expectedStatus'),'Build history identity changed')
         require(h['Status'] in ('completed','failed') and SHA.fullmatch(h['VCSRevision']),'Running or invalid history revision')
         require(re.fullmatch(r'https://github\.com/on-dotnet/ontology-platform(?:\.git)?',h['VCSRepository']),'Other project history refused')
-        require(h['Name']=='infra/development/fuseki' and h['Dockerfile'] in ('Dockerfile','infra/development/fuseki/Dockerfile') and Path(h['Context']).is_absolute() and h['Context'].endswith('/ontology-platform/infra/development/fuseki'),'History context outside project')
+        absolute_context=Path(h['Context']).is_absolute() and h['Context'].endswith('/ontology-platform/infra/development/fuseki')
+        canonical_relative=self.plan['taskId']=='G3-M3-001' and h['Context']=='infra/development/fuseki'
+        require(h['Name']=='infra/development/fuseki' and h['Dockerfile'] in ('Dockerfile','infra/development/fuseki/Dockerfile') and (absolute_context or canonical_relative),'History context outside project')
         require(op.get('fingerprint')==digest(h),'History metadata changed')
         return h
 
