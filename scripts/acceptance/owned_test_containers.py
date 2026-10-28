@@ -26,23 +26,64 @@ class OwnedTestContainers:
         self.runner=runner or subprocess.run
         self.created=[]
         self.creation_failed=False
+        self.backend=None
 
     def record(self,phase,**values):
         self.records.append(dict(resourceLifecycle=True,project=PROJECT,taskId=self.task_id,runId=self.run_id,
-                                 observedAtUtc=dt.datetime.now(dt.timezone.utc).isoformat(),phase=phase,**values))
+                                 observedAtUtc=dt.datetime.now(dt.timezone.utc).isoformat(),phase=phase,
+                                 dockerBackend=dict(self.backend) if self.backend else None,**values))
+
+    def backend_value(self,args,pattern):
+        result=self.runner(args,capture_output=True,text=True,timeout=10)
+        value=(result.stdout or '').strip()
+        if result.returncode or len(value)>200 or not re.fullmatch(pattern,value):
+            raise RuntimeError('DOCKER_BACKEND_UNVERIFIED')
+        return value
+
+    def freeze_backend(self):
+        if self.backend is None:
+            context=self.backend_value(['docker','context','show'],SAFE_ID)
+            engine=self.backend_value(['docker','info','--format','{{.ID}}'],r'[A-Za-z0-9][A-Za-z0-9:._-]{0,199}')
+            explicit=self.backend_value(['docker','--context',context,'info','--format','{{.ID}}'],
+                                        r'[A-Za-z0-9][A-Za-z0-9:._-]{0,199}')
+            if explicit!=engine:
+                raise RuntimeError('EFFECTIVE_DOCKER_BACKEND_MISMATCH')
+            self.backend={'context':context,'engineId':engine}
+        self.verify_backend()
+
+    def verify_backend(self):
+        if self.backend is None:
+            raise RuntimeError('DOCKER_BACKEND_NOT_FROZEN')
+        engine=self.backend_value(self.pinned(['info','--format','{{.ID}}']),r'[A-Za-z0-9][A-Za-z0-9:._-]{0,199}')
+        if engine!=self.backend['engineId']:
+            raise RuntimeError('DOCKER_ENGINE_CHANGED')
+
+    def pinned(self,arguments):
+        if self.backend is None:
+            raise RuntimeError('DOCKER_BACKEND_NOT_FROZEN')
+        return ['docker','--context',self.backend['context']]+arguments
 
     def prepare(self,args):
         if args[:2]!=['docker','run']:
+            if args[:1]==['docker'] and self.backend is not None:
+                self.verify_backend()
+                return self.pinned(args[1:])
             return args
-        if '--name' not in args or not re.fullmatch(SAFE_ID,args[args.index('--name')+1]):
+        if '--name' not in args or args.index('--name')+1>=len(args) or not re.fullmatch(SAFE_ID,args[args.index('--name')+1]):
             raise ValueError('Controlled test container name required')
         if any(LABEL_PREFIX in value for value in args[2:]) or '--label-file' in args:
             raise ValueError('Caller cannot override resource ownership labels')
+        try:
+            self.freeze_backend()
+        except (OSError,ValueError,TypeError,RuntimeError,subprocess.SubprocessError):
+            self.creation_failed=True
+            self.record('backend',status='BLOCKED',errorCategory='DOCKER_BACKEND_UNVERIFIED')
+            raise
         labels={'project':PROJECT,'task-id':self.task_id,'run-id':self.run_id,'test-fixture':'true'}
-        return args[:2]+[part for key,value in labels.items() for part in ('--label',LABEL_PREFIX+key+'='+value)]+args[2:]
+        return self.pinned(['run']+[part for key,value in labels.items() for part in ('--label',LABEL_PREFIX+key+'='+value)]+args[2:])
 
     def observe(self,args,result):
-        if args[:2]!=['docker','run']:
+        if self.backend is None or args[:4]!=self.pinned(['run']):
             return
         name=args[args.index('--name')+1]
         if result.returncode:
@@ -59,8 +100,10 @@ class OwnedTestContainers:
         self.record('create',name=name,containerId=ident[0],exitCode=0,status='PASS')
 
     def inspect(self,ident):
-        result=self.runner(['docker','container','inspect','--format',INSPECT_FORMAT,ident],
+        self.verify_backend()
+        result=self.runner(self.pinned(['container','inspect','--format',INSPECT_FORMAT,ident]),
                            capture_output=True,text=True,timeout=20)
+        self.verify_backend()
         absent='Error response from daemon: No such container: '+ident
         if result.returncode==1 and not result.stdout.strip() and result.stderr.strip()==absent:
             return None,absent
@@ -85,7 +128,8 @@ class OwnedTestContainers:
                     passed=False
                     continue
                 self.record('before',containerId=ident,snapshot=value,status='PASS')
-                args=['docker','container','rm','--force',ident]
+                self.verify_backend()
+                args=self.pinned(['container','rm','--force',ident])
                 self.record('command',containerId=ident,command=args)
                 start=time.monotonic()
                 result=self.runner(args,capture_output=True,text=True,timeout=20)

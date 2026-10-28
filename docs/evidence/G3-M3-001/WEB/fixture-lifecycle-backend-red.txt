@@ -1,0 +1,78 @@
+FFFFFFF............
+======================================================================
+FAIL: test_context_or_engine_query_failure_refuses_creation (__main__.BackendAffinityTests.test_context_or_engine_query_failure_refuses_creation) (failure='context')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform/scripts/tests/OwnedTestContainers.Tests.py", line 262, in test_context_or_engine_query_failure_refuses_creation
+    with self.assertRaises(RuntimeError):self.owner.prepare(['docker','run','--name','fixture','approved:tag'])
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+AssertionError: RuntimeError not raised
+
+======================================================================
+FAIL: test_context_or_engine_query_failure_refuses_creation (__main__.BackendAffinityTests.test_context_or_engine_query_failure_refuses_creation) (failure='info')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform/scripts/tests/OwnedTestContainers.Tests.py", line 262, in test_context_or_engine_query_failure_refuses_creation
+    with self.assertRaises(RuntimeError):self.owner.prepare(['docker','run','--name','fixture','approved:tag'])
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+AssertionError: RuntimeError not raised
+
+======================================================================
+FAIL: test_creation_is_explicitly_pinned_and_engine_is_rechecked_before_second_create (__main__.BackendAffinityTests.test_creation_is_explicitly_pinned_and_engine_is_rechecked_before_second_create)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform/scripts/tests/OwnedTestContainers.Tests.py", line 254, in test_creation_is_explicitly_pinned_and_engine_is_rechecked_before_second_create
+    args=self.create();self.assertEqual(args[:4],['docker','--context','backend-a','run'])
+                       ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ['docker', 'run', '--label', 'io.ontology-platform.pr[30 chars]orm'] != ['docker', '--context', 'backend-a', 'run']
+
+First differing element 1:
+'run'
+'--context'
+
++ ['docker', '--context', 'backend-a', 'run']
+- ['docker',
+-  'run',
+-  '--label',
+-  'io.ontology-platform.project=on-dotnet/ontology-platform']
+
+======================================================================
+FAIL: test_daemon_replacement_blocks_cleanup_and_cannot_certify_absence (__main__.BackendAffinityTests.test_daemon_replacement_blocks_cleanup_and_cannot_certify_absence)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform/scripts/tests/OwnedTestContainers.Tests.py", line 248, in test_daemon_replacement_blocks_cleanup_and_cannot_certify_absence
+    self.assertFalse(self.owner.cleanup())
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_default_context_change_cleans_original_backend_instead_of_false_absence (__main__.BackendAffinityTests.test_default_context_change_cleans_original_backend_instead_of_false_absence)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform/scripts/tests/OwnedTestContainers.Tests.py", line 241, in test_default_context_change_cleans_original_backend_instead_of_false_absence
+    self.assertFalse(self.live['backend-a'],'Original daemon still owns the created container')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc': {'Id': 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', 'Name': '/backend-fixture', 'Project': 'on-dotnet/ontology-platform', 'TaskId': 'G3-M3-001', 'RunId': 'backend-fixture', 'Fixture': 'true'}} is not false : Original daemon still owns the created container
+
+======================================================================
+FAIL: test_effective_docker_host_mismatch_is_not_silently_redirected_to_context (__main__.BackendAffinityTests.test_effective_docker_host_mismatch_is_not_silently_redirected_to_context)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform/scripts/tests/OwnedTestContainers.Tests.py", line 267, in test_effective_docker_host_mismatch_is_not_silently_redirected_to_context
+    with self.assertRaises(RuntimeError):self.owner.prepare(['docker','run','--name','fixture','approved:tag'])
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+AssertionError: RuntimeError not raised
+
+======================================================================
+FAIL: test_engine_query_failure_during_cleanup_is_not_absence (__main__.BackendAffinityTests.test_engine_query_failure_during_cleanup_is_not_absence)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform/scripts/tests/OwnedTestContainers.Tests.py", line 272, in test_engine_query_failure_during_cleanup_is_not_absence
+    self.assertFalse(self.owner.cleanup());self.assertTrue(self.live['backend-a'])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+----------------------------------------------------------------------
+Ran 18 tests in 0.046s
+
+FAILED (failures=7)
