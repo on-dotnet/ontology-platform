@@ -1,0 +1,57 @@
+{
+  "status": "PASS",
+  "runId": "resume-aa5a1647d6f54c1580191ce4bfabdf37",
+  "sourceHead": "651ff9eaa8df0b0ae07851fc901fcf9761411c87",
+  "previousRun": "a5c476bcb6d14b15ab3fae045405f838",
+  "previousSource": "34080c91b2655655465c201300dba5ad80886d69",
+  "firstFiveGatesReused": [
+    {
+      "name": "full-g2-e2e.py",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "name": "g3-compatibility.py",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "name": "g1-regression.py",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "name": "g2-observability.py",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "name": "g2-trace-browser.mjs",
+      "status": "PASS",
+      "exitCode": 0
+    }
+  ],
+  "changedNonEvidenceInputs": [
+    "scripts/acceptance/g2-readiness-fault.py",
+    "scripts/acceptance/g3-acceptance-runtime.py",
+    "scripts/acceptance/performance-baseline.py",
+    "scripts/tests/G2Acceptance.Tests.py"
+  ],
+  "productLockBuildInputsChanged": false,
+  "startedAtUtc": "2026-10-28T16:24:13.091974+00:00",
+  "gates": [
+    {
+      "name": "g2-readiness-fault.py",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "name": "performance-baseline.py",
+      "status": "PASS",
+      "exitCode": 0
+    }
+  ],
+  "launcherStopped": true,
+  "launcherExitCode": 0,
+  "completedAtUtc": "2026-10-28T16:24:43.448416+00:00"
+}
