@@ -360,12 +360,15 @@ def safe_member_name(name):
     return name
 
 
-def validate_archive(directory, expected):
-    """Validate docker-save structures in place; never extract untrusted members."""
+def validate_archive(directory, expected, stage='cache restore'):
+    """Validate docker-save structures in place; emit only fixed refusal checks/counts."""
+    check='DIRECTORY_SHAPE'
+    shape=dict(format='UNKNOWN',memberCount=0,fileCount=0,directoryCount=0,linkCount=0,specialCount=0)
     try:
         directory=Path(directory)
         if directory.is_symlink() or not directory.is_dir() or {p.name for p in directory.iterdir()} != {'image.tar','receipt.json'}:
             raise ValueError()
+        check='RECEIPT_SCHEMA'
         receipt=strict_json(regular_file(directory/'receipt.json',32768).read_bytes())
         fields={'schemaVersion','cacheKey','inputFingerprint','contextSha256','platform','image','imageId','archiveSha256',
                 'archiveSizeBytes','producerRunId','producerHead','jenaSha512','baseDigest','sourceChecksumVerified'}
@@ -376,13 +379,23 @@ def validate_archive(directory, expected):
             not re.fullmatch(SAFE_ID,receipt['producerRunId']) or not re.fullmatch(r'[0-9a-f]{40}',receipt['producerHead']) or
             not re.fullmatch(r'sha256:'+HEX64,receipt['imageId']) or not re.fullmatch(HEX64,receipt['archiveSha256'])):
             raise ValueError()
+        check='ARCHIVE_FILE'
         path=regular_file(directory/'image.tar',MAX_ARCHIVE_BYTES)
+        check='ARCHIVE_HASH'
         if path.stat().st_size!=receipt['archiveSizeBytes'] or file_hash(path)!=receipt['archiveSha256']:
             raise ValueError()
+        check='TAR_STRUCTURE'
         with tarfile.open(path,'r:') as archive:
             members={}
             for member in archive:
+                shape['memberCount']+=1
+                shape['fileCount']+=int(member.isfile())
+                shape['directoryCount']+=int(member.isdir())
+                shape['linkCount']+=int(member.issym() or member.islnk())
+                shape['specialCount']+=int(not (member.isfile() or member.isdir() or member.issym() or member.islnk()))
+                check='TAR_MEMBER_PATHS'
                 name=safe_member_name(member.name.rstrip('/') if member.isdir() else member.name)
+                check='TAR_MEMBER_TYPES'
                 if name in members or not (member.isfile() or member.isdir()) or member.size>MAX_ARCHIVE_BYTES or len(members)>=20000:
                     raise ValueError()
                 members[name]=member
@@ -391,17 +404,26 @@ def validate_archive(directory, expected):
                 if member is None or not member.isfile() or member.size>limit:
                     raise ValueError()
                 return archive.extractfile(member).read()
+            check='MANIFEST_SCHEMA'
             manifest=strict_json(read('manifest.json'))
+            if isinstance(manifest,list):
+                shape['manifestRecordCount']=len(manifest)
+                if len(manifest)==1 and isinstance(manifest[0],dict):
+                    shape['manifestOptionalFields']=sorted(set(manifest[0]) & {'LayerSources'})
+                    shape['manifestUnknownFieldCount']=len(set(manifest[0])-{'Config','RepoTags','Layers','LayerSources'})
             if not isinstance(manifest,list) or len(manifest)!=1 or set(manifest[0])!={'Config','RepoTags','Layers'}:
                 raise ValueError()
             record=manifest[0]
+            check='MANIFEST_TAGS_AND_LAYERS'
             if record['RepoTags']!=[expected['image']] or not isinstance(record['Layers'],list) or len(set(record['Layers']))!=len(record['Layers']):
                 raise ValueError()
+            check='CONFIG_IDENTITY'
             config_raw=read(record['Config'])
             config_id='sha256:'+hashlib.sha256(config_raw).hexdigest()
             config=strict_json(config_raw)
             validate_image(dict(Id=receipt['imageId'],Labels=config['config'].get('Labels'),Os=config['os'],Architecture=config['architecture']),expected)
             allowed={'manifest.json',record['Config'],*record['Layers']}
+            check='LAYER_MEMBERS'
             for layer in record['Layers']:
                 member=members.get(safe_member_name(layer))
                 if not member or not member.isfile():
@@ -409,6 +431,7 @@ def validate_archive(directory, expected):
                 parent=PurePosixPath(layer).parent.as_posix()
                 if layer.endswith('/layer.tar'):
                     allowed.update({parent+'/VERSION',parent+'/json'})
+            check='REPOSITORIES'
             if 'repositories' in members:
                 repos=strict_json(read('repositories'))
                 repository,tag=expected['image'].split(':',1)
@@ -417,8 +440,11 @@ def validate_archive(directory, expected):
                 allowed.add('repositories')
             # New Engine image IDs identify the root OCI manifest, legacy IDs identify config.
             if 'index.json' in members or 'oci-layout' in members:
+                shape['format']='OCI'
+                check='OCI_LAYOUT'
                 if strict_json(read('oci-layout'))!={'imageLayoutVersion':'1.0.0'}:
                     raise ValueError()
+                check='OCI_INDEX'
                 index=strict_json(read('index.json'))
                 allowed.update({'index.json','oci-layout'})
                 manifest_types=('application/vnd.oci.image.manifest.v1+json','application/vnd.docker.distribution.manifest.v2+json')
@@ -427,22 +453,27 @@ def validate_archive(directory, expected):
                 layer_types=('application/vnd.oci.image.layer.v1.tar','application/vnd.oci.image.layer.v1.tar+gzip',
                              'application/vnd.oci.image.layer.v1.tar+zstd','application/vnd.docker.image.rootfs.diff.tar.gzip')
                 def descriptor_blob(descriptor, kinds):
+                    nonlocal check
+                    check='OCI_DESCRIPTOR_SCHEMA'
                     if (not isinstance(descriptor,dict) or set(descriptor)-{'mediaType','digest','size','annotations','platform'} or
                         descriptor['mediaType'] not in kinds or not re.fullmatch(r'sha256:'+HEX64,descriptor['digest']) or
                         type(descriptor['size']) is not int or not 0 < descriptor['size'] <= MAX_ARCHIVE_BYTES):
                         raise ValueError()
+                    check='OCI_DESCRIPTOR_ANNOTATIONS'
                     annotations=descriptor.get('annotations',{})
                     if not isinstance(annotations,dict) or set(annotations)-{'io.containerd.image.name','org.opencontainers.image.ref.name'}:
                         raise ValueError()
                     permitted={'io.containerd.image.name':'docker.io/library/'+expected['image'],
                                'org.opencontainers.image.ref.name':expected['image'].split(':',1)[1]}
                     if any(value!=permitted[key] for key,value in annotations.items()):raise ValueError()
+                    check='OCI_DESCRIPTOR_PLATFORM'
                     if 'platform' in descriptor:
                         platform=descriptor['platform']
                         if (not isinstance(platform,dict) or set(platform)-{'os','architecture','variant'} or
                             normalized_platform(platform['os'],platform['architecture'])!=expected['platform'] or
                             ('variant' in platform and not (expected['platform']=='linux/arm64' and platform['variant']=='v8'))):
                             raise ValueError()
+                    check='OCI_DESCRIPTOR_CONTENT'
                     name='blobs/sha256/'+descriptor['digest'][7:]
                     member=members.get(name)
                     if not member or not member.isfile() or member.size!=descriptor['size']:
@@ -454,8 +485,11 @@ def validate_archive(directory, expected):
                     allowed.add(name)
                     return name
                 def visit(descriptor, depth=0):
+                    nonlocal check
+                    check='OCI_MANIFEST_STRUCTURE'
                     if depth>4:raise ValueError()
                     name=descriptor_blob(descriptor,manifest_types+index_types)
+                    check='OCI_MANIFEST_STRUCTURE'
                     item=strict_json(read(name))
                     if type(item['schemaVersion']) is not int or item['schemaVersion']!=2 or item.get('mediaType',descriptor['mediaType'])!=descriptor['mediaType']:
                         raise ValueError()
@@ -464,31 +498,40 @@ def validate_archive(directory, expected):
                         visit(item['manifests'][0],depth+1)
                     else:
                         config_name=descriptor_blob(item['config'],config_types)
+                        check='OCI_CONFIG_BINDING'
                         if config_name!=record['Config'] or item['config']['digest']!=config_id:raise ValueError()
                         if not isinstance(item['layers'],list):raise ValueError()
                         layer_names=[descriptor_blob(layer,layer_types) for layer in item['layers']]
+                        check='OCI_LAYER_BINDING'
                         if layer_names!=record['Layers']:raise ValueError()
                 if (type(index['schemaVersion']) is not int or index['schemaVersion']!=2 or
                     index.get('mediaType','application/vnd.oci.image.index.v1+json') not in index_types or
                     not isinstance(index['manifests'],list) or len(index['manifests'])!=1):raise ValueError()
+                check='OCI_ROOT_IDENTITY'
                 root=index['manifests'][0]
                 if receipt['imageId'] not in (config_id,root['digest']):raise ValueError()
                 visit(root)
             else:
+                shape['format']='DOCKER_LEGACY'
+                check='LEGACY_CONFIG_IDENTITY'
                 if config_id!=receipt['imageId']:raise ValueError()
+                check='LEGACY_ROOTFS_SCHEMA'
                 diff_ids=config['rootfs']['diff_ids']
                 if config['rootfs']['type']!='layers' or not isinstance(diff_ids,list) or len(diff_ids)!=len(record['Layers']):raise ValueError()
+                check='LEGACY_LAYER_CONTENT'
                 for layer,diff_id in zip(record['Layers'],diff_ids):
                     if not isinstance(diff_id,str) or not re.fullmatch(r'sha256:'+HEX64,diff_id):raise ValueError()
                     digest=hashlib.sha256()
                     with archive.extractfile(members[layer]) as stream:
                         while chunk:=stream.read(1024*1024):digest.update(chunk)
                     if digest.hexdigest()!=diff_id[7:]:raise ValueError()
+            check='UNREFERENCED_MEMBERS'
             if any(member.isfile() and name not in allowed for name,member in members.items()):
                 raise ValueError()
         return receipt
     except (OSError,ValueError,KeyError,TypeError,AttributeError,tarfile.TarError,BuildRefused):
-        raise BuildRefused('Cache archive validation refused',category='CACHE_INVALID',stage='cache restore') from None
+        diagnostic=dict(validationCheck=check,archiveShape=shape)
+        raise BuildRefused('Cache archive validation refused',diagnostic,category='CACHE_INVALID',stage=stage) from None
 
 
 def restore_cache(directory, expected):
@@ -561,7 +604,7 @@ def export_cache(directory, expected, result, head=None):
                  producerRunId=result['runId'],producerHead=head or producer_head(),jenaSha512=JENA_SHA512,baseDigest=BASE_DIGEST,
                  sourceChecksumVerified=result.get('sourceChecksumVerified',False))
     atomic_json(directory/'receipt.json',receipt)
-    validate_archive(directory,expected)
+    validate_archive(directory,expected,stage='cache export')
     return dict(outcome='EXPORTED',**receipt,stages=[stage_receipt('cache export',start,'PASS',expected['inputFingerprint'])])
 
 

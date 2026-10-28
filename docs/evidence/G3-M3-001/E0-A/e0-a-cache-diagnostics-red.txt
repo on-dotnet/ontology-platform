@@ -1,0 +1,32 @@
+EE............E.........................
+======================================================================
+ERROR: test_archive_links_remain_refused_with_member_type_diagnostic (__main__.FusekiCacheTests.test_archive_links_remain_refused_with_member_type_diagnostic)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 185, in test_archive_links_remain_refused_with_member_type_diagnostic
+    self.assertEqual(caught.exception.diagnostic['validationCheck'],'TAR_MEMBER_TYPES')
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+TypeError: 'NoneType' object is not subscriptable
+
+======================================================================
+ERROR: test_archive_refusal_exposes_fixed_check_and_shape_without_raw_values (__main__.FusekiCacheTests.test_archive_refusal_exposes_fixed_check_and_shape_without_raw_values)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 170, in test_archive_refusal_exposes_fixed_check_and_shape_without_raw_values
+    self.assertEqual(caught.exception.diagnostic['validationCheck'],'MANIFEST_SCHEMA')
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+TypeError: 'NoneType' object is not subscriptable
+
+======================================================================
+ERROR: test_export_archive_refusal_is_classified_as_export_stage (__main__.FusekiCacheTests.test_export_archive_refusal_is_classified_as_export_stage)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 177, in test_export_archive_refusal_is_classified_as_export_stage
+    with self.assertRaises(self.mod.BuildRefused) as caught:self.mod.validate_archive(directory,identity,stage='cache export')
+                                                            ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: validate_archive() got an unexpected keyword argument 'stage'
+
+----------------------------------------------------------------------
+Ran 40 tests in 0.071s
+
+FAILED (errors=3)

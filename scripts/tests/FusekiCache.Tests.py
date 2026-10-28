@@ -160,6 +160,31 @@ class FusekiCacheTests(unittest.TestCase):
         self.rewrite_archive(directory,receipt,entries)
         with self.assertRaises(self.mod.BuildRefused):self.mod.validate_archive(directory,identity)
 
+    def test_archive_refusal_exposes_fixed_check_and_shape_without_raw_values(self):
+        identity=self.identity();directory,receipt=self.archive(identity)
+        with tarfile.open(directory/'image.tar') as archive:
+            entries=[(member.name,archive.extractfile(member).read()) for member in archive if member.isfile()]
+        manifest=json.loads(entries[0][1]);manifest[0]['SYNTHETIC_PRIVATE_FIELD']='SYNTHETIC_PRIVATE_TOKEN'
+        entries[0]=('manifest.json',json.dumps(manifest).encode());self.rewrite_archive(directory,receipt,entries)
+        with self.assertRaises(self.mod.BuildRefused) as caught:self.mod.validate_archive(directory,identity)
+        self.assertEqual(caught.exception.diagnostic['validationCheck'],'MANIFEST_SCHEMA')
+        self.assertEqual(caught.exception.diagnostic['archiveShape']['manifestUnknownFieldCount'],1)
+        self.assertNotIn('SYNTHETIC_PRIVATE',json.dumps(caught.exception.diagnostic))
+
+    def test_export_archive_refusal_is_classified_as_export_stage(self):
+        identity=self.identity();directory,receipt=self.archive(identity)
+        (directory/'image.tar').write_bytes(b'bad')
+        with self.assertRaises(self.mod.BuildRefused) as caught:self.mod.validate_archive(directory,identity,stage='cache export')
+        self.assertEqual(caught.exception.stage,'cache export')
+        self.assertEqual(caught.exception.diagnostic['validationCheck'],'ARCHIVE_HASH')
+
+    def test_archive_links_remain_refused_with_member_type_diagnostic(self):
+        identity=self.identity();link=tarfile.TarInfo('linked');link.type=tarfile.LNKTYPE;link.linkname='manifest.json'
+        directory,_=self.archive(identity,extra=link)
+        with self.assertRaises(self.mod.BuildRefused) as caught:self.mod.validate_archive(directory,identity)
+        self.assertEqual(caught.exception.diagnostic['validationCheck'],'TAR_MEMBER_TYPES')
+        self.assertEqual(caught.exception.diagnostic['archiveShape']['linkCount'],1)
+
     def build_fixture(self):
         target=self.root/'infra/development/fuseki';target.parent.mkdir(parents=True)
         self.context.rename(target);self.context=target;self.mod.ROOT=self.root
