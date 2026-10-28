@@ -187,4 +187,5 @@ export async function fullChain({ root, origin, operator, audit, single, viewer,
   await writeFile(resolve(evidenceDirectory(root),'full-chain-identifiers.json'), JSON.stringify({ ids, traces: traces.filter(Boolean), model: 'BLOCKED: no paid or real model calls authorized', oldRunConcurrencyScope: 'historical persisted Run checked across later activation; in-flight fencing races independently covered by native tests' },null,2)+'\n');
   await writeFile(resolve(evidenceDirectory(root),'performance-observations.json'), JSON.stringify({ environment: 'local macOS arm64, real isolated Docker/Aspire, headless Edge; no production SLO', sourceUtf8Bytes: Object.fromEntries(Object.entries(draft.sources).map(([key,value]) => [key,value===null?0:Buffer.byteLength(value)])), samples, readBackpressureAttempts },null,2)+'\n');
   }
+  return ids;
 }

@@ -22,7 +22,7 @@ public sealed partial class JenaSemanticRuntime : IG3VocabularyRuntime
             // 所有原始源在修改任何集合前完成真实解析。
             var parsed = await ParseSourcesAsync(sources, graphs, token);
             // 两个目标图分开保留，不按合并图删除其它源的相同三元组。
-            var targets = new Dictionary<int, List<RdfTriple>>();
+            var targets = new Dictionary<int, Dictionary<RdfTriple, RdfTriple>>();
             foreach (var change in changes)
             {
                 token.ThrowIfCancellationRequested();
@@ -32,7 +32,7 @@ public sealed partial class JenaSemanticRuntime : IG3VocabularyRuntime
                 {
                     // 含未知或复杂事实的目标图锁结构，原文仍可由普通保存保留。
                     if (Support(parsed[index], structural: true).Length != 0) throw new SemanticOperationException(422, "structural_edit_unsupported");
-                    triples = parsed[index].ToList();
+                    triples = parsed[index].DistinctBy(EditNoOpTriple).ToDictionary(EditNoOpTriple);
                     targets.Add(index, triples);
                 }
                 // 每项精确匹配服务端投影，禁止按标签或显示字符串猜客体。
@@ -49,19 +49,24 @@ public sealed partial class JenaSemanticRuntime : IG3VocabularyRuntime
                 if (!VocabularyPredicate(edit.PredicateIri, parsed[0].Concat(parsed[2]).ToArray())) throw new SemanticOperationException(422, "vocabulary_edit_invalid");
                 // 精确三元组的subject仅使用已校验IRI，不允许blank身份修改。
                 var subject = new RdfTerm { Kind = RdfTermKind.Iri, Value = edit.SubjectIri };
-                if (edit.OldObject is not null && !triples.Remove(new RdfTriple { Subject = subject, Predicate = edit.PredicateIri, Object = edit.OldObject })) throw new SemanticOperationException(409, "vocabulary_edit_conflict");
-                if (edit.NewObject is not null) triples.Add(new RdfTriple { Subject = subject, Predicate = edit.PredicateIri, Object = edit.NewObject });
+                if (edit.OldObject is not null && !triples.Remove(EditNoOpTriple(new RdfTriple { Subject = subject, Predicate = edit.PredicateIri, Object = edit.OldObject }))) throw new SemanticOperationException(409, "vocabulary_edit_conflict");
+                if (edit.NewObject is not null)
+                {
+                    // RDF语言标签及普通字符串按既有RDF1.1规则判等，同时保留原合法词法。
+                    var added = new RdfTriple { Subject = subject, Predicate = edit.PredicateIri, Object = edit.NewObject };
+                    triples.TryAdd(EditNoOpTriple(added), added);
+                }
             }
             // 全批次完成后再检查声明完整性，允许同批先建引用后建声明。
-            var combined = (targets.TryGetValue(0, out var ontology) ? ontology : parsed[0].ToList()).Concat(targets.TryGetValue(2, out var vocabulary) ? vocabulary : parsed[2].ToList()).Distinct().ToArray();
+            var combined = (targets.TryGetValue(0, out var ontology) ? ontology.Values.ToArray() : parsed[0]).Concat(targets.TryGetValue(2, out var vocabulary) ? vocabulary.Values.ToArray() : parsed[2]).Distinct().ToArray();
             RequireNamedAxiomTypes(combined);
             if (Support(combined, structural: true).Length != 0) throw new SemanticOperationException(422, "structural_edit_unsupported");
             // 输出前仍做语义no-op判定，未变化源保留注释/prefix/CRLF原字节。
             var result = sources;
             foreach (var target in targets)
             {
-                // 真实图集合去重后仅比较合法literal等价表示。
-                var triples = target.Value.Distinct().ToArray();
+                // 每步已遵守真实图集合语义，最终仅比较合法literal等价表示。
+                var triples = target.Value.Values.ToArray();
                 if (triples.Select(EditNoOpTriple).ToHashSet().SetEquals(parsed[target.Key].Select(EditNoOpTriple))) continue;
                 result = target.Key == 0 ? result with { OntologyTurtle = JenaRdfCodec.Canonical(triples) + "\n" } : result with { VocabularyTurtle = JenaRdfCodec.Canonical(triples) + "\n" };
             }

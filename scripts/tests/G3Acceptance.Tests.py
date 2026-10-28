@@ -15,6 +15,43 @@ GATES = ['full-g2-e2e.py', 'g3-compatibility.py', 'g1-regression.py', 'g2-observ
          'g2-trace-browser.mjs', 'g2-readiness-fault.py', 'performance-baseline.py']
 
 
+class RealBrowserEntryTests(unittest.TestCase):
+    """Exercise the real downstream argparse and command construction, not a child-name mock."""
+
+    def invoke(self, flag):
+        script = SCRIPT.with_name('full-g2-e2e.py')
+        spec = importlib.util.spec_from_file_location('real_browser_entry', script)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        runtime = module.ROOT / '.tools/security/g3-m3-parser-test/runtime.json'
+        with patch.object(sys, 'argv', [str(script), '--runtime-file', str(runtime), flag]), \
+                patch.object(module.subprocess, 'check_output', return_value=json.dumps({'nodePath': '/project/node'})), \
+                patch.object(module.subprocess, 'run', return_value=subprocess.CompletedProcess([], 0)) as child:
+            self.assertEqual(module.main(), 0)
+            return child.call_args.args[0]
+
+    def test_three_m3_modes_reach_real_browser_flags(self):
+        for flag in ['--m3', '--m3-api-only', '--m3-ui-only']:
+            with self.subTest(flag=flag):
+                command = self.invoke(flag)
+                self.assertIn(flag, command)
+                self.assertEqual('--full' in command, flag == '--m3')
+                if flag == '--m3':
+                    self.assertIn('--m1', command)
+                    self.assertIn('--m2', command)
+
+    def test_existing_m2_and_unknown_flag(self):
+        for flag in ['--m2', '--m2-api-only', '--m2-ui-only']:
+            self.assertIn(flag, self.invoke(flag))
+        with self.assertRaises(SystemExit) as result:
+            self.invoke('--m4')
+        self.assertEqual(result.exception.code, 2)
+
+    def test_real_smoke_fault_checkpoint_is_forwarded(self):
+        self.assertIn('--workspace-smoke-only', self.invoke('--workspace-smoke-only'))
+        self.assertIn('--smoke-fault-check', self.invoke('--smoke-fault-check'))
+
+
 class M1OrchestrationTests(unittest.TestCase):
     """Keep gate selection/order/failure propagation real, isolate external services only."""
 
@@ -44,6 +81,7 @@ class M1OrchestrationTests(unittest.TestCase):
                 if gate == 'full-g2-e2e.py':
                     self.assertIn('--m2-api-only' if api_only else '--m2-ui-only' if ui_only else '--m1', command, 'Selected checks must run in the existing authenticated harness')
                     if milestone == 'M2': self.assertIn('--m2-api-only' if api_only else '--m2-ui-only' if ui_only else '--m2', command, 'M2 checks must execute in the real authenticated harness')
+                    if milestone == 'M3': self.assertIn('--m3-api-only' if api_only else '--m3-ui-only' if ui_only else '--m3', command, 'M3 checks must execute in the real authenticated harness')
                 if gate == fail_gate and launch_failure:
                     return original([str(root / 'actual-missing-gate-executable')], cwd=root)
                 return original([sys.executable, str(child), str(log), *command, '23' if gate == fail_gate else '0'], cwd=root)
@@ -102,8 +140,15 @@ class M1OrchestrationTests(unittest.TestCase):
         self.assertEqual(calls,['full-g2-e2e.py'])
         self.assertEqual(proof['scope'],'UI_ONLY')
 
-    def test_m2_cannot_reuse_m1_runtime_or_enable_m3(self):
-        for prefix,milestone in [('g3-m1-control','M2'),('g3-m3-control','M3')]:
+    def test_m3_selects_own_runtime_and_real_gates(self):
+        code,calls,proof,selected,_=self.exercise(prefix='g3-m3-control',milestone='M3')
+        self.assertEqual(code,0)
+        self.assertEqual(calls,GATES)
+        self.assertEqual(proof['milestone'],'M3')
+        self.assertTrue(all('G3-M3-001/runtime/' in item for item in selected))
+
+    def test_wrong_runtime_and_future_milestones_are_refused(self):
+        for prefix,milestone in [('g3-m1-control','M2'),('g3-m2-control','M3'),('g3-m4-control','M4'),('g3-m5-control','M5')]:
             with self.assertRaises(SystemExit):self.exercise(prefix=prefix,milestone=milestone)
 
     def test_protected_g2_runtime_is_refused(self):

@@ -196,7 +196,7 @@ public sealed partial class JenaSemanticRuntime
             }
             // 当前四源所有明确关系或单位引用废弃项都报错；没有前一修订不声称时间差分。
             var deprecated = triples.Where(triple => triple.Predicate == JenaRdfCodec.Owl + "deprecated" && triple.Object.Kind == RdfTermKind.Literal && triple.Object.Datatype == Xsd + "boolean" && triple.Object.Value is "true" or "1").Select(triple => triple.Subject).ToHashSet();
-            foreach (var reference in triples.Where(triple => triple.Object.Kind == RdfTermKind.Iri && deprecated.Contains(triple.Object) && (relations.Contains(triple) || triple.Predicate is PlatformSemantics + "nominalUnit" or PlatformSemantics + "quantityKind" or PlatformSemantics + "dimension" or PlatformSemantics + "standardSource" or Skos + "inScheme" or Skos + "topConceptOf" or Skos + "hasTopConcept"))) Add("semantic_reference_deprecated", reference.Subject, reference.Predicate, "当前四源引用已废弃IRI，须显式修复引用并保留历史身份。");
+            foreach (var reference in triples.Where(triple => triple.Object.Kind == RdfTermKind.Iri && deprecated.Contains(triple.Object) && (relations.Contains(triple) || triple.Predicate is PlatformSemantics + "canonicalUnit" or PlatformSemantics + "nominalUnit" or PlatformSemantics + "quantityKind" or PlatformSemantics + "dimension" or PlatformSemantics + "standardSource" or Skos + "inScheme" or Skos + "topConceptOf" or Skos + "hasTopConcept"))) Add("semantic_reference_deprecated", reference.Subject, reference.Predicate, "当前四源引用已废弃IRI，须显式修复引用并保留历史身份。");
         }
 
     }

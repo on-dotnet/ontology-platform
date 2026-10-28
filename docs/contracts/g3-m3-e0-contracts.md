@@ -14,7 +14,7 @@
 
 恢复先检查普通文件/有限大小/精确schema/输入/平台/归档散列；tar成员路径安全、无links/special/路径穿越/额外tags，Docker manifest config所含image Id/labels/platform必须符合身份，再docker load和inspect。校验失败不计hit；load前损坏记录CACHE_INVALID并安全回退一次冷构建。load后身份不符停止，不自动删除未知资源/覆盖既有tag；按白名单另审。导出只对经过canonical验证的准确image；receipt不能替代load前后的实际校验。CI保存仅可信push且未hit，容量/配额不明阻断保存；保留本地冷构建能力。
 
-CLI日志只输出脱敏receipt，含producerRunId/当前GitHub RunId/runner标识、实际key/imageID、restored/reused/build结果与stages；run A真miss/cold/export，run B同输入不同runId新runner restore且不访问Apache，变更输入必须miss。Action固定restore/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9，contents:read，不启付费或包发布。无法实际两Run验证则E0-A BLOCKED。
+CLI日志只输出脱敏receipt，含producerRunId/当前GitHub RunId/runner标识、实际key/imageID、restored/reused/build结果与stages；run A真miss/cold/export，run B同输入不同runId新runner restore且不访问Apache，变更输入必须miss。Action固定restore/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9，contents:read；PUBLIC仓库缓存占用API已实测无认证200，预算只读查询不发送令牌，不新增权限，不启付费或包发布。无法实际两Run验证则E0-A BLOCKED。
 
 ## 阶段与失败止损
 
@@ -30,7 +30,7 @@ CLI日志只输出脱敏receipt，含producerRunId/当前GitHub RunId/runner标�
 
 ## E0-C接口
 
-TaskRunTimeline JSONL：schemaVersion/taskId/runId/stepId/taskType/inputFingerprint/startedAtUtc/endedAtUtc/durationMs/outcome/errorCategory/dependsOn/concurrencyGroup/attempt；只记录受控命令标签不抓聊天/秘密。墙钟取区间union/跨度并分别命名，累计durations单列、并行重叠单列、可观测DAG关键路径和重复次数；Agent活跃/思考UNKNOWN。每条包含exitCode integer|null和commandLabel（固定受控标签，非原始命令参数）；outcome=PASS|FAIL|BLOCKED|NOT_RUN；PASS要求exitCode=0，FAIL为非0或明确异常类且不可0，BLOCKED允许null或非0，NOT_RUN必须null/durationMs=0。stepId在同一task/run内唯一，dependsOn为已知stepId列表、不得自引用或环；跨并发step区间可重叠，依赖结束不得晚于子步骤开始。UTC显式Z或+00:00，end>=start，durationMs由单调时钟真实测得且与UTC偏移差容许<=1秒，否则拒绝；时间跳变标CLOCK_DRIFT而非伪造结果。attempt为>=1整数，同taskType/inputFingerprint重验自动计数。严格未知字段/非法状态/缺字段/重复step/坏DAG/负时长拒绝。采用Python标准库，包装命令记录真实exit/失败；未运行不伪造时间。
+TaskRunTimeline JSONL：schemaVersion/taskId/runId/stepId/taskType/inputFingerprint/startedAtUtc/endedAtUtc/durationMs/outcome/errorCategory/dependsOn/concurrencyGroup/attempt；只记录受控命令标签不抓聊天/秘密。墙钟取区间union/跨度并分别命名，累计durations单列、并行重叠单列、可观测DAG关键路径和重复次数；Agent活跃/思考UNKNOWN。每条包含exitCode integer|null和commandLabel（固定受控标签，非原始命令参数）；outcome=PASS|FAIL|BLOCKED|NOT_RUN；PASS要求exitCode=0，FAIL为非0或明确异常类且不可0，BLOCKED允许null或非0，NOT_RUN必须null/durationMs=0。stepId在同一task/run内唯一，dependsOn为已知stepId列表、不得自引用或环；跨并发step区间可重叠，依赖结束不得晚于子步骤开始。UTC显式Z或+00:00，end>=start，durationMs由单调时钟真实测得且与UTC偏移差容许<=1秒，否则拒绝；时间跳变标CLOCK_DRIFT而非伪造结果。attempt为>=1整数，同taskType/commandLabel/inputFingerprint重验自动计数。严格未知字段/非法状态/缺字段/重复step/坏DAG/负时长拒绝。采用Python标准库，包装命令记录真实exit/失败；未运行不伪造时间。
 
 证据预检直接复用正式V3 checks/ci规范化实现，历史metadata兼容不提升权威；当前fixture早跑缺多字段/错误Head/status/EOF/ignored/截图边界。变更不得晚至正式Head后才发现可预期Schema漂移。
 

@@ -1,0 +1,159 @@
+test_actual_process_start_failure_marks_current_failed_and_later_not_run (__main__.M1OrchestrationTests.test_actual_process_start_failure_marks_current_failed_and_later_not_run) ... ok
+test_all_real_gate_selections_include_m1_and_regressions (__main__.M1OrchestrationTests.test_all_real_gate_selections_include_m1_and_regressions) ... ok
+test_each_child_failure_stops_later_gates (__main__.M1OrchestrationTests.test_each_child_failure_stops_later_gates) ... ok
+test_failed_attempt_cannot_consume_or_certify_stale_pass (__main__.M1OrchestrationTests.test_failed_attempt_cannot_consume_or_certify_stale_pass) ... ok
+test_first_m2_integration_selects_real_api_only_without_claiming_full_gates (__main__.M1OrchestrationTests.test_first_m2_integration_selects_real_api_only_without_claiming_full_gates) ... ok
+test_m2_selects_its_own_runtime_evidence_and_authenticated_checks (__main__.M1OrchestrationTests.test_m2_selects_its_own_runtime_evidence_and_authenticated_checks) ... ok
+test_m3_selects_own_runtime_and_real_gates (__main__.M1OrchestrationTests.test_m3_selects_own_runtime_and_real_gates) ... ok
+test_protected_g2_runtime_is_refused (__main__.M1OrchestrationTests.test_protected_g2_runtime_is_refused) ... usage: g3-acceptance-runtime.py [-h] [--runtime-file RUNTIME_FILE]
+                                [--start-runtime] [--milestone {M1,M2,M3}]
+                                [--api-only] [--ui-only]
+g3-acceptance-runtime.py: error: Protected G2 or unrelated runtime refused
+ok
+test_second_m2_integration_selects_only_real_ui_checkpoint (__main__.M1OrchestrationTests.test_second_m2_integration_selects_only_real_ui_checkpoint) ... ok
+test_wrong_runtime_and_future_milestones_are_refused (__main__.M1OrchestrationTests.test_wrong_runtime_and_future_milestones_are_refused) ... usage: g3-acceptance-runtime.py [-h] [--runtime-file RUNTIME_FILE]
+                                [--start-runtime] [--milestone {M1,M2,M3}]
+                                [--api-only] [--ui-only]
+g3-acceptance-runtime.py: error: Protected G2 or unrelated runtime refused
+usage: g3-acceptance-runtime.py [-h] [--runtime-file RUNTIME_FILE]
+                                [--start-runtime] [--milestone {M1,M2,M3}]
+                                [--api-only] [--ui-only]
+g3-acceptance-runtime.py: error: Protected G2 or unrelated runtime refused
+usage: g3-acceptance-runtime.py [-h] [--runtime-file RUNTIME_FILE]
+                                [--start-runtime] [--milestone {M1,M2,M3}]
+                                [--api-only] [--ui-only]
+g3-acceptance-runtime.py: error: argument --milestone: invalid choice: 'M4' (choose from 'M1', 'M2', 'M3')
+usage: g3-acceptance-runtime.py [-h] [--runtime-file RUNTIME_FILE]
+                                [--start-runtime] [--milestone {M1,M2,M3}]
+                                [--api-only] [--ui-only]
+g3-acceptance-runtime.py: error: argument --milestone: invalid choice: 'M5' (choose from 'M1', 'M2', 'M3')
+ok
+test_existing_m2_and_unknown_flag (__main__.RealBrowserEntryTests.test_existing_m2_and_unknown_flag) ... usage: full-g2-e2e.py [-h] --runtime-file RUNTIME_FILE [--m1] [--m2]
+                      [--m2-api-only] [--m2-ui-only]
+full-g2-e2e.py: error: unrecognized arguments: --m4
+ok
+test_real_smoke_fault_checkpoint_is_forwarded (__main__.RealBrowserEntryTests.test_real_smoke_fault_checkpoint_is_forwarded) ... usage: full-g2-e2e.py [-h] --runtime-file RUNTIME_FILE [--m1] [--m2]
+                      [--m2-api-only] [--m2-ui-only]
+full-g2-e2e.py: error: unrecognized arguments: --workspace-smoke-only
+ERROR
+test_three_m3_modes_reach_real_browser_flags (__main__.RealBrowserEntryTests.test_three_m3_modes_reach_real_browser_flags) ... usage: full-g2-e2e.py [-h] --runtime-file RUNTIME_FILE [--m1] [--m2]
+                      [--m2-api-only] [--m2-ui-only]
+full-g2-e2e.py: error: unrecognized arguments: --m3
+
+  test_three_m3_modes_reach_real_browser_flags (__main__.RealBrowserEntryTests.test_three_m3_modes_reach_real_browser_flags) (flag='--m3') ... ERROR
+usage: full-g2-e2e.py [-h] --runtime-file RUNTIME_FILE [--m1] [--m2]
+                      [--m2-api-only] [--m2-ui-only]
+full-g2-e2e.py: error: unrecognized arguments: --m3-api-only
+  test_three_m3_modes_reach_real_browser_flags (__main__.RealBrowserEntryTests.test_three_m3_modes_reach_real_browser_flags) (flag='--m3-api-only') ... ERROR
+usage: full-g2-e2e.py [-h] --runtime-file RUNTIME_FILE [--m1] [--m2]
+                      [--m2-api-only] [--m2-ui-only]
+full-g2-e2e.py: error: unrecognized arguments: --m3-ui-only
+  test_three_m3_modes_reach_real_browser_flags (__main__.RealBrowserEntryTests.test_three_m3_modes_reach_real_browser_flags) (flag='--m3-ui-only') ... ERROR
+
+======================================================================
+ERROR: test_real_smoke_fault_checkpoint_is_forwarded (__main__.RealBrowserEntryTests.test_real_smoke_fault_checkpoint_is_forwarded)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/scripts/tests/G3Acceptance.Tests.py", line 51, in test_real_smoke_fault_checkpoint_is_forwarded
+    self.assertIn('--workspace-smoke-only', self.invoke('--workspace-smoke-only'))
+                                            ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/scripts/tests/G3Acceptance.Tests.py", line 30, in invoke
+    self.assertEqual(module.main(), 0)
+                     ~~~~~~~~~~~^^
+  File "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/scripts/acceptance/full-g2-e2e.py", line 18, in main
+    args = parser.parse_args()
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/argparse.py", line 1930, in parse_args
+    self.error(msg)
+    ~~~~~~~~~~^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/argparse.py", line 2686, in error
+    self.exit(2, _('%(prog)s: error: %(message)s\n') % args)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/argparse.py", line 2673, in exit
+    _sys.exit(status)
+    ~~~~~~~~~^^^^^^^^
+SystemExit: 2
+
+======================================================================
+ERROR: test_three_m3_modes_reach_real_browser_flags (__main__.RealBrowserEntryTests.test_three_m3_modes_reach_real_browser_flags) (flag='--m3')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/scripts/tests/G3Acceptance.Tests.py", line 36, in test_three_m3_modes_reach_real_browser_flags
+    command = self.invoke(flag)
+  File "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/scripts/tests/G3Acceptance.Tests.py", line 30, in invoke
+    self.assertEqual(module.main(), 0)
+                     ~~~~~~~~~~~^^
+  File "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/scripts/acceptance/full-g2-e2e.py", line 18, in main
+    args = parser.parse_args()
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/argparse.py", line 1930, in parse_args
+    self.error(msg)
+    ~~~~~~~~~~^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/argparse.py", line 2686, in error
+    self.exit(2, _('%(prog)s: error: %(message)s\n') % args)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/argparse.py", line 2673, in exit
+    _sys.exit(status)
+    ~~~~~~~~~^^^^^^^^
+SystemExit: 2
+
+======================================================================
+ERROR: test_three_m3_modes_reach_real_browser_flags (__main__.RealBrowserEntryTests.test_three_m3_modes_reach_real_browser_flags) (flag='--m3-api-only')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/scripts/tests/G3Acceptance.Tests.py", line 36, in test_three_m3_modes_reach_real_browser_flags
+    command = self.invoke(flag)
+  File "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/scripts/tests/G3Acceptance.Tests.py", line 30, in invoke
+    self.assertEqual(module.main(), 0)
+                     ~~~~~~~~~~~^^
+  File "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/scripts/acceptance/full-g2-e2e.py", line 18, in main
+    args = parser.parse_args()
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/argparse.py", line 1930, in parse_args
+    self.error(msg)
+    ~~~~~~~~~~^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/argparse.py", line 2686, in error
+    self.exit(2, _('%(prog)s: error: %(message)s\n') % args)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/argparse.py", line 2673, in exit
+    _sys.exit(status)
+    ~~~~~~~~~^^^^^^^^
+SystemExit: 2
+
+======================================================================
+ERROR: test_three_m3_modes_reach_real_browser_flags (__main__.RealBrowserEntryTests.test_three_m3_modes_reach_real_browser_flags) (flag='--m3-ui-only')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/scripts/tests/G3Acceptance.Tests.py", line 36, in test_three_m3_modes_reach_real_browser_flags
+    command = self.invoke(flag)
+  File "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/scripts/tests/G3Acceptance.Tests.py", line 30, in invoke
+    self.assertEqual(module.main(), 0)
+                     ~~~~~~~~~~~^^
+  File "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/scripts/acceptance/full-g2-e2e.py", line 18, in main
+    args = parser.parse_args()
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/argparse.py", line 1930, in parse_args
+    self.error(msg)
+    ~~~~~~~~~~^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/argparse.py", line 2686, in error
+    self.exit(2, _('%(prog)s: error: %(message)s\n') % args)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/argparse.py", line 2673, in exit
+    _sys.exit(status)
+    ~~~~~~~~~^^^^^^^^
+SystemExit: 2
+
+----------------------------------------------------------------------
+Ran 13 tests in 0.932s
+
+FAILED (errors=4)
+{"status": "FAIL", "runId": "786f07a00bee4340b95aced900d3d7e1", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/786f07a00bee4340b95aced900d3d7e1"}
+{"status": "PASS", "runId": "26d4861e7f6d417ab09b96ef375d8fa6", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/26d4861e7f6d417ab09b96ef375d8fa6"}
+{"status": "FAIL", "runId": "cb9fd44bf7db445e89de856914d37da4", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/cb9fd44bf7db445e89de856914d37da4"}
+{"status": "FAIL", "runId": "085ea0430a9e4484b63a51d2fca59328", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/085ea0430a9e4484b63a51d2fca59328"}
+{"status": "FAIL", "runId": "c02d03b5f169418ab80b514da1b9aac3", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/c02d03b5f169418ab80b514da1b9aac3"}
+{"status": "FAIL", "runId": "15fc04391c9f400386466c64c6348364", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/15fc04391c9f400386466c64c6348364"}
+{"status": "FAIL", "runId": "0c889d6223014938ad9da85ad4d587a1", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/0c889d6223014938ad9da85ad4d587a1"}
+{"status": "FAIL", "runId": "eda5294275ff474a8eababf1eb34075f", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/eda5294275ff474a8eababf1eb34075f"}
+{"status": "FAIL", "runId": "35bf2b3b6e934cd5ae51da3c283d9550", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/35bf2b3b6e934cd5ae51da3c283d9550"}
+{"status": "FAIL", "runId": "8453ae43259b460fa478e40e16a0a1ab", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/8453ae43259b460fa478e40e16a0a1ab"}
+{"status": "PASS", "runId": "3b3e4a0f264c4000be8812347440a90c", "evidenceDirectory": "docs/evidence/G3-M2-001/runtime/g3-m2-control/3b3e4a0f264c4000be8812347440a90c"}
+{"status": "PASS", "runId": "dadb3b3d134647329fcfa04fcd2f42fa", "evidenceDirectory": "docs/evidence/G3-M2-001/runtime/g3-m2-control/dadb3b3d134647329fcfa04fcd2f42fa"}
+{"status": "PASS", "runId": "7e2ab2b26dba42f889419c996d29168d", "evidenceDirectory": "docs/evidence/G3-M3-001/runtime/g3-m3-control/7e2ab2b26dba42f889419c996d29168d"}
+{"status": "PASS", "runId": "26127e8d394146178bca86d31d1c7b01", "evidenceDirectory": "docs/evidence/G3-M2-001/runtime/g3-m2-control/26127e8d394146178bca86d31d1c7b01"}

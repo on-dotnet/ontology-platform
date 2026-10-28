@@ -37,6 +37,7 @@ public sealed class G3M3UnitTests
     [DataRow("quantity-mismatch", "unit_quantity_kind_mismatch")]
     [DataRow("same-exponents", "unit_dimension_mismatch")]
     [DataRow("quantity-duplicate", "quantity_kind_reference_missing")]
+    [DataRow("deprecated-canonical", "semantic_reference_deprecated")]
     public async Task UnitFailuresHaveExactSourceDiagnostics(string scenario, string code)
     {
         // 每个场景仅改变明确三元组，真实解析保留datatype和IRI。
@@ -62,6 +63,7 @@ public sealed class G3M3UnitTests
             "dimension-mismatch" => text.Replace("ex:reading a owl:DatatypeProperty ; p:quantityKind ex:Temperature ; p:dimension ex:temperature", "ex:reading a owl:DatatypeProperty ; p:quantityKind ex:Temperature ; p:dimension ex:mass", StringComparison.Ordinal),
             "quantity-mismatch" => text + "ex:OtherTemperature a p:QuantityKind ; p:dimension ex:temperature . ex:reading p:quantityKind ex:OtherTemperature .",
             "same-exponents" => text + "ex:temperature2 a p:Dimension ; p:lengthExponent 0 ; p:massExponent 0 ; p:timeExponent 0 ; p:electricCurrentExponent 0 ; p:temperatureExponent 1 ; p:amountExponent 0 ; p:luminousIntensityExponent 0 . ex:K-v1 p:dimension ex:temperature2 .",
+            "deprecated-canonical" => text + "ex:K owl:deprecated true .",
             _ => text + "ex:Temperature p:dimension ex:mass ."
         };
         // 精确quantityKind错配仍维持属性基数为一。
@@ -95,7 +97,8 @@ public sealed class G3M3UnitTests
     internal static SourceBundle Sources()
     {
         // 沿用现有脚本固定样例根，不读取私有runtime或凭证文件。
-        var root = Environment.GetEnvironmentVariable("G2_SEM_SAMPLES") ?? throw new InvalidOperationException("NOT_RUN: 缺少明确隔离样例根。");
+        var root = Environment.GetEnvironmentVariable("G2_SEM_SAMPLES");
+        if (root is null) Assert.Inconclusive("NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。");
         return new SourceBundle { VocabularyTurtle = File.ReadAllText(Path.Combine(root, "..", "g3-m3", "units.ttl")) };
     }
 }

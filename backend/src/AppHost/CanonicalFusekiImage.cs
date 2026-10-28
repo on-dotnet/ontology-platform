@@ -25,6 +25,9 @@ internal static class CanonicalFusekiImage
         };
         start.ArgumentList.Add(Path.Combine(root, "scripts/maintenance/canonical_fuseki.py"));
         start.ArgumentList.Add("--image-only");
+        // 跨宿主调用复用按构建输入和引擎环境绑定的失败提示，每次仍独立短探测。
+        start.ArgumentList.Add("--failure-state");
+        start.ArgumentList.Add(Path.Combine(root, "artifacts/fuseki-failures"));
         start.ArgumentList.Add("--task-id");
         start.ArgumentList.Add(builder.Configuration["ResourceLifecycle:TaskId"] ?? "DEVELOPMENT");
         start.ArgumentList.Add("--run-id");

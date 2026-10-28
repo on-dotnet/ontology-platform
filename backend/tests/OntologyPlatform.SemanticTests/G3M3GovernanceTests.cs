@@ -25,22 +25,25 @@ public sealed class G3M3GovernanceTests
     public async Task SkosPolicyReturnsExactSourceDiagnostic(string scenario, string code)
     {
         // 固定命名空间和已登记Scheme/Concept为每个负例排除无关缺失。
-        var source = new SourceBundle { VocabularyTurtle = Prefix + Base + (scenario switch
+        var source = new SourceBundle
         {
-            "s14" => "ex:a skos:prefLabel \"甲\"@en, \"乙\"@EN .",
-            "s13" => "ex:a skos:prefLabel \"甲\"@zh ; skos:altLabel \"甲\"@ZH .",
-            "no-language" => "ex:a skos:prefLabel \"甲\" .",
-            "unknown-language" => "ex:a skos:prefLabel \"a\"@fr .",
-            "invalid-term" => "ex:a skos:prefLabel ex:b .",
-            "missing-scheme" => "ex:a skos:inScheme ex:unknown .",
-            "missing-concept" => "ex:a skos:broader ex:unknown .",
-            "cycle" => "ex:a skos:broader ex:b . ex:b skos:broader ex:a .",
-            "related" => "ex:a skos:broader ex:b . ex:b skos:related ex:a .",
-            "notation" => "ex:a skos:notation \"T\" . ex:b skos:notation \"T\" .",
-            "mapping-scheme" => "ex:a skos:exactMatch ex:b .",
-            "s46" => "ex:a skos:exactMatch ex:c . ex:c skos:broadMatch ex:a .",
-            _ => "ex:b owl:deprecated true . ex:a skos:broader ex:b ."
-        }) };
+            VocabularyTurtle = Prefix + Base + (scenario switch
+            {
+                "s14" => "ex:a skos:prefLabel \"甲\"@en, \"乙\"@EN .",
+                "s13" => "ex:a skos:prefLabel \"甲\"@zh ; skos:altLabel \"甲\"@ZH .",
+                "no-language" => "ex:a skos:prefLabel \"甲\" .",
+                "unknown-language" => "ex:a skos:prefLabel \"a\"@fr .",
+                "invalid-term" => "ex:a skos:prefLabel ex:b .",
+                "missing-scheme" => "ex:a skos:inScheme ex:unknown .",
+                "missing-concept" => "ex:a skos:broader ex:unknown .",
+                "cycle" => "ex:a skos:broader ex:b . ex:b skos:broader ex:a .",
+                "related" => "ex:a skos:broader ex:b . ex:b skos:related ex:a .",
+                "notation" => "ex:a skos:notation \"T\" . ex:b skos:notation \"T\" .",
+                "mapping-scheme" => "ex:a skos:exactMatch ex:b .",
+                "s46" => "ex:a skos:exactMatch ex:c . ex:c skos:broadMatch ex:a .",
+                _ => "ex:b owl:deprecated true . ex:a skos:broader ex:b ."
+            })
+        };
         // 来源投影必须来自真实RIOT，不从Turtle字符串猜语言或关系。
         var snapshot = await ((IG3VocabularyRuntime)SemanticFixture.Runtime()).ReadVocabularyAsync(source, 1, default);
         // 诊断不能丢失精确规则码或任意猜行列。

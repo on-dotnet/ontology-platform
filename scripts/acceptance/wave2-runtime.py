@@ -46,7 +46,7 @@ def lifecycle_identity(runtime, profile):
         value={'taskId':os.environ.get('PLATFORM_TASK_ID','DEVELOPMENT'), 'runId':runtime['volumePrefix']}
     task,run_id=value.get('taskId'),value.get('runId')
     prefix=runtime['volumePrefix']
-    if not all(isinstance(x,str) and re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.-]{0,99}',x) for x in (task,run_id)) or not re.fullmatch(r'(?:wave2|g2|g3-m1|g3-m2)-[a-z0-9-]{1,40}',prefix):
+    if not all(isinstance(x,str) and re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.-]{0,99}',x) for x in (task,run_id)) or not re.fullmatch(r'(?:wave2|g2|g3-m1|g3-m2|g3-m3)-[a-z0-9-]{1,40}',prefix):
         raise ValueError('Invalid lifecycle identity')
     services=['postgres','keycloak','grafana','loki','tempo','prometheus','alloy']
     volumes=['postgres','grafana','loki','tempo','prometheus','alloy']

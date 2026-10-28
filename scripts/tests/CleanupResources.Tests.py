@@ -257,8 +257,14 @@ try:
  elif a[:2]==['container','ls']: print('\\n'.join(x['Id'] for x in s['containers']))
  elif a[:2]==['container','inspect']:
   x=next(x for x in s['containers'] if x['Id']==a[-1]); print(json.dumps({**x,'State':{'Status':x['State']}}))
- elif a[:2]==['volume','inspect']: print(json.dumps(next(x for x in s['volumes'] if x['Name']==a[-1])))
- elif a[:2]==['image','inspect']: print(json.dumps(next(x for x in s['images'] if x['Id']==a[-1])))
+ elif a[:2]==['volume','inspect']:
+  value=next((x for x in s['volumes'] if x['Name']==a[-1]),None)
+  if value is None: fail(s.get('resourceAfterError','Error response from daemon: get '+a[-1]+': no such volume'))
+  print(json.dumps(value))
+ elif a[:2]==['image','inspect']:
+  value=next((x for x in s['images'] if x['Id']==a[-1]),None)
+  if value is None: fail(s.get('resourceAfterError','Error response from daemon: No such image: '+a[-1]))
+  print(json.dumps(value))
  elif a[:3]==['buildx','history','inspect']:
   ref=a[-1]; visible=[x for x in s['history'] if x['Ref'] not in s.get('deleted',[])]
   if ref.startswith('^'):
@@ -387,6 +393,65 @@ p.write_text(json.dumps(s))
             with self.assertRaises(module.Refused):cleaner.execute(str(self.base/'apply-drift.jsonl'))
         finally:os.environ['PATH']=saved_path
         self.assertFalse(any('rm' in row for row in json.loads(self.state_path.read_text())['calls']))
+
+    def m3_volume_fixture(self):
+        self.m1_volume_fixture('G3-M3-001','g3-m3')
+        self.plan['dockerBackend']=dict(context='desktop-linux',engineId='fixture-engine-id',serverVersion='29.9.2')
+        snapshot=dict(Name='g3-m3-fixture-postgres-data',Driver='local',CreatedAt='2026-01-01T00:00:00Z')
+        self.plan['operations'][0].update(expectedReferences=[],fingerprint=hashlib.sha256(json.dumps(snapshot,sort_keys=True,separators=(',',':')).encode()).hexdigest())
+
+    def test_m3_exact_volume_apply_preserves_other_resources(self):
+        self.m3_volume_fixture()
+        result=self.run_engine(True)
+        self.assertEqual(result.returncode,0,result.stderr)
+        state=json.loads(self.state_path.read_text())
+        self.assertEqual(state['volumes'],[])
+        self.assertEqual(len(state['containers']),1)
+        self.assertEqual(len(state['images']),1)
+        self.assertTrue(all(row[:2]==['--context','desktop-linux'] for row in state['calls'] if 'rm' in row))
+
+    def test_m3_refuses_protected_g2_and_backend_drift(self):
+        self.m3_volume_fixture()
+        original=copy.deepcopy(self.plan)
+        for target in ('g2-keep-postgres-data','g3-m2-fixture-postgres-data','another-project-postgres-data'):
+            self.plan=copy.deepcopy(original);self.plan['operations'][0]['target']=target
+            self.assertNotEqual(self.run_engine(True).returncode,0)
+        self.plan=original
+        state=json.loads(self.state_path.read_text());state['engineId']='changed-engine';self.state_path.write_text(json.dumps(state))
+        self.assertNotEqual(self.run_engine(True).returncode,0)
+        self.assertFalse(any('rm' in row for row in json.loads(self.state_path.read_text())['calls']))
+
+    def test_m3_cannot_delete_git_or_global_cache(self):
+        self.m3_volume_fixture()
+        for kind,target in [('git-local-branch','codex/old'),('cache',str(self.root/'bin'))]:
+            self.plan['operations'][0].update(type=kind,target=target)
+            self.assertNotEqual(self.run_engine(True).returncode,0)
+        self.assertTrue(self.git('show-ref','--verify','refs/heads/codex/old').stdout)
+
+    def test_m3_absence_needs_exact_engine_diagnostic(self):
+        self.m3_volume_fixture()
+        state=json.loads(self.state_path.read_text());state['resourceAfterError']='permission denied';self.state_path.write_text(json.dumps(state))
+        result=self.run_engine(True)
+        self.assertNotEqual(result.returncode,0)
+        self.assertIn('Exact Docker absence diagnostic not verified',result.stderr)
+
+    def test_m3_exact_canonical_image_apply(self):
+        self.m3_volume_fixture()
+        target='sha256:'+'b'*64;tag='ontology-platform-fuseki:context-'+'c'*64
+        (self.root/'proof.txt').write_text('G3-M3-001 CLOSED synthetic '+target+'\n')
+        self.git('add','proof.txt');self.git('commit','-m','closed synthetic canonical image')
+        self.main=self.git('rev-parse','HEAD').stdout.strip();self.git('push','origin','main');self.git('update-ref','refs/remotes/origin/main',self.main)
+        self.plan['expectedMainSha']=self.main
+        state=json.loads(self.state_path.read_text());state['containers']=[];state['images'][0]['RepoTags']=[tag];self.state_path.write_text(json.dumps(state))
+        snapshot=dict(Id=target,RepoTags=[tag])
+        self.plan['operations']=[dict(type='docker-image',target=target,expectedTags=[tag],expectedReferences=[],
+            fingerprint=hashlib.sha256(json.dumps(snapshot,sort_keys=True,separators=(',',':')).encode()).hexdigest(),
+            ownershipEvidence=dict(commit=self.main,path='proof.txt',taskId='G3-M3-001',closed=True,synthetic=True))]
+        result=self.run_engine(True)
+        self.assertEqual(result.returncode,0,result.stderr)
+        state=json.loads(self.state_path.read_text())
+        self.assertEqual(state['images'],[])
+        self.assertEqual(len(state['volumes']),1)
 
     def closeout_fixture(self):
         self.docker_fixture()

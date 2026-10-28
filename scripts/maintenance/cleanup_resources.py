@@ -250,10 +250,11 @@ def metadata_fingerprint(path):
     return digest(metadata_entries(Path(path)))
 
 
-def history_refs(builder='desktop-linux'):
+def history_refs(builder='desktop-linux', context=None):
     """Read a ref-only list; a blank server ref does not pin individual records."""
     require(builder=='desktop-linux','Unsupported history builder')
-    output=run(['docker','buildx','history','ls','--builder',builder,'--format','{{.Ref}}']).stdout
+    prefix=['docker']+(['--context',context] if context is not None else [])
+    output=run(prefix+['buildx','history','ls','--builder',builder,'--format','{{.Ref}}']).stdout
     refs=[]
     for line in output.splitlines():
         require(re.fullmatch(r'(?:desktop-linux/desktop-linux/)?[a-z0-9]{6,64}',line),'Invalid history ref list')
@@ -276,17 +277,17 @@ def safe_docker_snapshot(kind, target, builder='desktop-linux', context=None):
         require(isinstance(value, dict), 'Invalid volume schema')
         return {k: value.get(k) for k in ('Name', 'Driver', 'CreatedAt')}
     if kind == 'docker-image':
-        value = read_json(run(['docker', 'image', 'inspect', '--format', IMAGE_FORMAT, target]).stdout)
+        value = read_json(run(prefix + ['image', 'inspect', '--format', IMAGE_FORMAT, target]).stdout)
         require(isinstance(value, dict), 'Invalid image schema')
         return dict(Id=value.get('Id'), RepoTags=sorted(value.get('RepoTags') or []))
     require(kind == 'docker-history' and builder == 'desktop-linux', 'Unsupported Docker snapshot')
     require(re.fullmatch(r'[a-z0-9]{6,64}',target),'Invalid history target')
-    refs=history_refs(builder)
+    refs=history_refs(builder,context)
     require(target in refs,'History target not listed')
     # Buildx maps ^offset to a blank server Ref. An exact Ref would create a
     # zero-count key in BuildKit v0.34.0 and make later deletion memory-only.
     offset='^'+str(refs.index(target))
-    value = read_json(run(['docker', 'buildx', 'history', 'inspect', '--builder', builder, '--format', HISTORY_FORMAT, offset]).stdout)
+    value = read_json(run(prefix+['buildx', 'history', 'inspect', '--builder', builder, '--format', HISTORY_FORMAT, offset]).stdout)
     require(isinstance(value,dict) and value.get('Ref')==target,'History offset moved or selected another record')
     require(isinstance(value, dict) and all(isinstance(value.get(k), str) for k in HISTORY_FIELDS), 'Unsupported history CLI schema')
     return {k: value[k] for k in HISTORY_FIELDS}
@@ -360,7 +361,7 @@ class Cleaner:
         require(isinstance(p, dict), 'Plan must be object')
         required = {'schemaVersion','taskId','project','repositoryRoot','gitCommonDir','originUrl','expectedMainSha','createdAt','expiresAt','allowedWorktreeRoots','protectedWorktrees','keep','operations'}
         require(required <= p.keys(), 'Missing plan fields')
-        require(type(p['schemaVersion']) is int and p['schemaVersion'] == 1 and p['project'] == PROJECT and p['taskId'] in ('PRE-G3-CLEANUP-FIX-002', 'G3-M1-001', 'G3-M2-001', 'G3-M1-CLOSEOUT-002'), 'Plan identity mismatch')
+        require(type(p['schemaVersion']) is int and p['schemaVersion'] == 1 and p['project'] == PROJECT and p['taskId'] in ('PRE-G3-CLEANUP-FIX-002', 'G3-M1-001', 'G3-M2-001', 'G3-M1-CLOSEOUT-002', 'G3-M3-001'), 'Plan identity mismatch')
         require(absolute(p['repositoryRoot']).resolve() == self.root, 'Repository root mismatch')
         require(self.git('rev-parse', '--show-toplevel').stdout.strip() == str(self.root), 'Root must be Git toplevel')
         common = Path(self.git('rev-parse', '--path-format=absolute', '--git-common-dir').stdout.strip()).resolve()
@@ -397,6 +398,17 @@ class Cleaner:
                         'M2 cleanup only accepts own named volumes')
                 require(isinstance(op.get('fingerprint'),str) and HEX64.fullmatch(op['fingerprint'])
                         and op.get('expectedReferences') == [], 'M2 requires exact fingerprint and empty references')
+            if p['taskId'] == 'G3-M3-001':
+                require(op['type'] in ('docker-container','docker-volume','docker-image','docker-history')
+                        and isinstance(op.get('ownershipEvidence'),dict)
+                        and op['ownershipEvidence'].get('taskId') == 'G3-M3-001',
+                        'M3 accepts only reviewed Docker lifecycle candidates with current-task committed proof')
+                require(isinstance(op.get('fingerprint'),str) and HEX64.fullmatch(op['fingerprint']), 'M3 exact metadata fingerprint required')
+                if op['type'] in ('docker-volume','docker-image'):
+                    require(op.get('expectedReferences') == [], 'M3 explicitly empty references required')
+                if op['type'] == 'docker-volume':
+                    require(re.fullmatch(r'g3-m3-[a-z0-9-]{1,40}-(postgres|fuseki|rustfs|keycloak|alloy|grafana|loki|tempo|prometheus)-data',op['target']),
+                            'M3 refuses legacy, protected or foreign volumes')
             if p['taskId'] == 'G3-M1-CLOSEOUT-002':
                 require(op['type'] in ('docker-container','docker-volume','docker-image','docker-history')
                         and isinstance(op.get('ownershipEvidence'), dict)
@@ -422,7 +434,7 @@ class Cleaner:
     def docker_command(self, *arguments):
         """Bind M2 operations to the reviewed context rather than the default endpoint."""
         prefix=['docker']
-        if self.plan['taskId']=='G3-M2-001':
+        if self.plan['taskId'] in ('G3-M2-001','G3-M3-001'):
             expected=self.plan.get('dockerBackend')
             require(isinstance(expected,dict) and set(expected)=={'context','engineId','serverVersion'},'M2 exact Docker backend required')
             require(expected['context'] in ('desktop-linux','default'),'M2 unreviewed Docker context')
@@ -431,7 +443,7 @@ class Cleaner:
 
     def docker_backend(self):
         """Recheck the actual context, daemon identity and version before and after removal."""
-        if self.plan['taskId']!='G3-M2-001':return None
+        if self.plan['taskId'] not in ('G3-M2-001','G3-M3-001'):return None
         command=self.docker_command('info','--format','{"engineId":{{json .ID}},"serverVersion":{{json .ServerVersion}}}')
         expected=self.plan['dockerBackend']
         require(isinstance(expected['engineId'],str) and re.fullmatch(r'[A-Za-z0-9-]{6,100}',expected['engineId'])
@@ -449,10 +461,10 @@ class Cleaner:
         require(isinstance(expected['buildxVersion'],str) and re.fullmatch(r'github\.com/docker/buildx v0\.38\.1 [0-9a-f]{40}',expected['buildxVersion']),'Unaudited history diagnostic version')
         require(isinstance(expected['engineId'],str) and re.fullmatch(r'[A-Za-z0-9-]{6,100}',expected['engineId']) and isinstance(expected['bridgeId'],str) and HEX64.fullmatch(expected['bridgeId']),'Invalid history daemon identity')
         require(run(['docker','context','show']).stdout.strip()==expected['context'],'History Docker context changed')
-        require(run(['docker','info','--format','{{.ID}}']).stdout.strip()==expected['engineId'],'History daemon ID changed')
-        require(run(['docker','network','inspect','bridge','--format','{{.Id}}']).stdout.strip()==expected['bridgeId'],'History daemon generation changed')
-        require(run(['docker','buildx','version']).stdout.strip()==expected['buildxVersion'],'History CLI version changed')
-        topology=run(['docker','buildx','inspect','desktop-linux']).stdout
+        require(run(self.docker_command('info','--format','{{.ID}}')).stdout.strip()==expected['engineId'],'History daemon ID changed')
+        require(run(self.docker_command('network','inspect','bridge','--format','{{.Id}}')).stdout.strip()==expected['bridgeId'],'History daemon generation changed')
+        require(run(self.docker_command('buildx','version')).stdout.strip()==expected['buildxVersion'],'History CLI version changed')
+        topology=run(self.docker_command('buildx','inspect','desktop-linux')).stdout
         values=lambda key:[line.split(':',1)[1].strip() for line in topology.splitlines() if line.startswith(key+':')]
         require(values('Name')==['desktop-linux','desktop-linux'] and values('Driver')==['docker'] and values('Endpoint')==['desktop-linux'] and values('BuildKit version')==[expected['buildkitVersion']],'History builder topology/version changed')
 
@@ -543,7 +555,7 @@ class Cleaner:
         index=self.ops.index(op)
         prior={x['target'] for x in self.ops[:index] if x['type']=='docker-container'} if preflight else set()
         for ident in self.container_ids():
-            c=safe_docker_snapshot('docker-container',ident,context=self.plan['dockerBackend']['context'] if self.plan['taskId']=='G3-M2-001' else None)
+            c=safe_docker_snapshot('docker-container',ident,context=self.plan['dockerBackend']['context'] if self.plan['taskId'] in ('G3-M2-001','G3-M3-001') else None)
             used = c['Image']==op['target'] if op['type']=='docker-image' else any(m.get('Type')=='volume' and m.get('Name')==op['target'] for m in c['Mounts'])
             if used:
                 require(ident in prior and c['State'] in ('exited','created','dead'), 'Docker resource has container reference')
@@ -595,32 +607,33 @@ class Cleaner:
             return self.cache_state(op)
         if typ=='docker-container':
             require(HEX64.fullmatch(target),'Full container ID required')
-            c=safe_docker_snapshot(typ,target)
+            c=safe_docker_snapshot(typ,target,context=self.plan['dockerBackend']['context'] if self.plan['taskId']=='G3-M3-001' else None)
             require(c['Id']==target and c['Name']==op.get('expectedName') and c['Image']==op.get('expectedImage') and IMAGE.fullmatch(c['Image']),'Container identity changed')
             require(c['State']==op.get('expectedState') and c['State'] in ('exited','created','dead'),'Container active or state changed')
             require(c['Mounts']==op.get('expectedMounts'),'Container mounts changed')
-            if self.plan['taskId']=='G3-M1-CLOSEOUT-002': require(op['fingerprint']==digest(c),'Closeout container fingerprint changed')
+            if self.plan['taskId'] in ('G3-M1-CLOSEOUT-002','G3-M3-001'): require(op['fingerprint']==digest(c),'Closeout container fingerprint changed')
             return c
         if typ=='docker-volume':
             require(re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.-]{0,150}',target),'Invalid volume name')
-            v=safe_docker_snapshot(typ,target,context=self.plan['dockerBackend']['context'] if self.plan['taskId']=='G3-M2-001' else None)
+            v=safe_docker_snapshot(typ,target,context=self.plan['dockerBackend']['context'] if self.plan['taskId'] in ('G3-M2-001','G3-M3-001') else None)
             require(v==dict(Name=target,Driver=op.get('expectedDriver'),CreatedAt=op.get('expectedCreatedAt')) and v['Driver']=='local' and isinstance(v['CreatedAt'],str) and v['CreatedAt'],'Volume identity changed')
-            if self.plan['taskId'] in ('G3-M1-CLOSEOUT-002','G3-M2-001'): require(op['fingerprint']==digest(v),'Task volume fingerprint changed')
+            if self.plan['taskId'] in ('G3-M1-CLOSEOUT-002','G3-M2-001','G3-M3-001'): require(op['fingerprint']==digest(v),'Task volume fingerprint changed')
             v['references']=self.references(op,preflight)
             return v
         if typ=='docker-image':
             require(IMAGE.fullmatch(target),'Full image digest required')
-            image=safe_docker_snapshot(typ,target)
+            image=safe_docker_snapshot(typ,target,context=self.plan['dockerBackend']['context'] if self.plan['taskId']=='G3-M3-001' else None)
             tags=op.get('expectedTags')
-            require(isinstance(tags,list) and tags and all(isinstance(t,str) and re.fullmatch(r'fuseki:[0-9a-f]{40}',t) for t in tags),'Only proven duplicate Fuseki tags allowed')
+            pattern = r'ontology-platform-fuseki:context-[0-9a-f]{64}' if self.plan['taskId']=='G3-M3-001' else r'fuseki:[0-9a-f]{40}'
+            require(isinstance(tags,list) and tags and all(isinstance(t,str) and re.fullmatch(pattern,t) for t in tags),'Only exact reviewed canonical/duplicate Fuseki tags allowed')
             require(image==dict(Id=target,RepoTags=sorted(tags)),'Image identity/tags changed')
             require(not any(t in self.keep for t in tags),'Kept image tag')
-            if self.plan['taskId']=='G3-M1-CLOSEOUT-002': require(op['fingerprint']==digest(image),'Closeout image fingerprint changed')
+            if self.plan['taskId'] in ('G3-M1-CLOSEOUT-002','G3-M3-001'): require(op['fingerprint']==digest(image),'Closeout image fingerprint changed')
             image['references']=self.references(op,preflight)
             return image
         require(typ=='docker-history' and op.get('builder')=='desktop-linux' and re.fullmatch(r'[a-z0-9]{6,64}',target),'Invalid history identity/builder')
         self.history_backend()
-        h=safe_docker_snapshot(typ,target)
+        h=safe_docker_snapshot(typ,target,context=self.plan['dockerBackend']['context'] if self.plan['taskId']=='G3-M3-001' else None)
         require(h['Ref']==target and h['Context']==op.get('expectedContext') and h['VCSRepository']==op.get('expectedVcs') and h['VCSRevision']==op.get('expectedRevision') and h['Status']==op.get('expectedStatus'),'Build history identity changed')
         require(h['Status'] in ('completed','failed') and SHA.fullmatch(h['VCSRevision']),'Running or invalid history revision')
         require(re.fullmatch(r'https://github\.com/on-dotnet/ontology-platform(?:\.git)?',h['VCSRepository']),'Other project history refused')
@@ -657,7 +670,7 @@ class Cleaner:
                         args=['git','--no-optional-locks','-C',str(self.root),'push','origin','--delete',target,'--force-with-lease=refs/heads/'+target+':'+op['expectedTip']]
                     elif typ=='worktree': args=['git','--no-optional-locks','-C',str(self.root),'worktree','remove',target]
                     elif typ=='cache': args=['filesystem-unlink-exact-cache',target]
-                    elif typ=='docker-history': args=['docker','buildx','history','rm','--builder','desktop-linux',target]
+                    elif typ=='docker-history': args=self.docker_command('buildx','history','rm','--builder','desktop-linux',target)
                     else: args=self.docker_command(typ.removeprefix('docker-'),'rm',target)
                     self.write_log('before',op,before=before,command=args)
                     if typ=='cache':
@@ -685,8 +698,8 @@ class Cleaner:
         else:
             # Exact inspect must report absence; API failure here also leaves a failed log.
             if typ=='docker-volume': args=self.docker_command('volume','ls','--quiet')
-            elif typ=='docker-image': args=['docker','image','ls','--quiet','--no-trunc']
-            else: args=['docker','buildx','history','ls','--builder','desktop-linux','--format','json']
+            elif typ=='docker-image': args=self.docker_command('image','ls','--quiet','--no-trunc')
+            else: args=self.docker_command('buildx','history','ls','--builder','desktop-linux','--format','json')
             output=run(args).stdout
             if typ=='docker-history':
                 refs=[]
@@ -697,7 +710,7 @@ class Cleaner:
                     refs.append(value['ref'].split('/')[-1])
                 require(target not in refs,'Build history remains')
                 self.history_backend()
-                result=run(['docker','buildx','history','inspect','--builder','desktop-linux','--format',HISTORY_FORMAT,target],acceptable=(0,1))
+                result=run(self.docker_command('buildx','history','inspect','--builder','desktop-linux','--format',HISTORY_FORMAT,target),acceptable=(0,1))
                 require(result.returncode==1 and not result.stdout and result.stderr.strip()=='ERROR: no record found for ref "'+target+'"','Durable history absence not verified; tombstone or unexpected backend response')
                 self.history_backend()
             else:
@@ -705,6 +718,12 @@ class Cleaner:
                 pattern=IMAGE if typ=='docker-image' else re.compile(r'[A-Za-z0-9][A-Za-z0-9_.-]{0,150}\Z')
                 require(all(pattern.fullmatch(value) for value in values),'Invalid Docker after schema')
                 require(target not in values,'Docker resource remains')
+                if self.plan['taskId']=='G3-M3-001':
+                    resource='image' if typ=='docker-image' else 'volume'
+                    probe=run(self.docker_command(resource,'inspect','--format','{{json .}}',target),acceptable=(0,1))
+                    diagnostic=('Error response from daemon: get '+target+': no such volume') if resource=='volume' else ('Error response from daemon: No such image: '+target)
+                    require(probe.returncode==1 and probe.stdout.strip() in ('','[]') and probe.stderr.strip()==diagnostic,
+                            'Exact Docker absence diagnostic not verified')
         backend=self.docker_backend()
         return dict(absent=True, dockerBackend=backend) if backend is not None else dict(absent=True)
 

@@ -1,4 +1,4 @@
-"""Launch only a fresh authorized M1 or M2 stack, retaining the reviewed G2 protocol and secret-safe lifecycle."""
+"""Launch only a fresh authorized M1/M2/M3 stack with the reviewed G2 protocol and secret-safe lifecycle."""
 import argparse
 import importlib.util
 import os
@@ -15,7 +15,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('mode', choices=['prepare', 'core', 'bootstrap', 'full'])
     parser.add_argument('--runtime-file')
-    parser.add_argument('--milestone', choices=['M1', 'M2'], default='M1')
+    parser.add_argument('--milestone', choices=['M1', 'M2', 'M3'], default='M1')
     args = parser.parse_args()
     prefix = 'g3-' + args.milestone.lower()
     if args.mode == 'prepare':

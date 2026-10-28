@@ -1,0 +1,109 @@
+{
+  "schemaVersion": 1,
+  "status": "FAILED",
+  "taskId": "G3-M3-001",
+  "runId": "e0-a-real-7b2778d7c6f746bd9eb2f2eef60cfff6-export",
+  "contextSha256": "cc238fbd02eb8151dd42f751f5dae16c445d6e408cc4440f7f95a9575b44e66e",
+  "observedAt": "2026-10-28T13:04:39.980138+00:00",
+  "elapsedSeconds": 369.176,
+  "reason": "Canonical Fuseki build failed; raw output suppressed",
+  "ciContext": {},
+  "failure": {
+    "command": [
+      "docker",
+      "build",
+      "[canonical arguments withheld]"
+    ],
+    "exitCode": 1,
+    "timeoutSeconds": 600,
+    "elapsedSeconds": 368.806,
+    "stdout": {
+      "sizeBytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stderr": {
+      "sizeBytes": 6977,
+      "sha256": "c5c1e1610b60deae66159714ebbdf7020ad480771acadc29f86cbc1bb517dc8e"
+    },
+    "stageWindow": [
+      {
+        "step": 2,
+        "phase": "LOAD_METADATA"
+      },
+      {
+        "step": 2,
+        "phase": "DONE"
+      },
+      {
+        "step": 3,
+        "phase": "LOAD_IGNORE"
+      },
+      {
+        "step": 3,
+        "phase": "DONE"
+      },
+      {
+        "step": 4,
+        "phase": "LOAD_CONTEXT"
+      },
+      {
+        "step": 4,
+        "phase": "DONE"
+      },
+      {
+        "step": 5,
+        "phase": "FROM"
+      },
+      {
+        "step": 5,
+        "phase": "CACHED"
+      },
+      {
+        "step": 6,
+        "phase": "COPY"
+      },
+      {
+        "step": 6,
+        "phase": "DONE"
+      },
+      {
+        "step": 7,
+        "phase": "RUN"
+      },
+      {
+        "step": 7,
+        "phase": "COPY"
+      }
+    ],
+    "errorCategories": [
+      "NETWORK_TIMEOUT",
+      "NETWORK_TIMEOUT",
+      "BUILD_ERROR"
+    ]
+  },
+  "inputFingerprint": "9641d7597d72a613b553b76273d9dcbaa9298398ce3d56b1f23d06a2fbd7a908",
+  "envFingerprint": "eb1309fcc1b38cf52c926d38c13e8de76012d244a4b017a80363b88aa0ed2cfd",
+  "stages": [
+    {
+      "stage": "network",
+      "durationMs": 180019,
+      "outcome": "FAIL",
+      "errorCategory": "NETWORK_TIMEOUT",
+      "inputFingerprint": "9641d7597d72a613b553b76273d9dcbaa9298398ce3d56b1f23d06a2fbd7a908"
+    },
+    {
+      "stage": "network",
+      "durationMs": 180015,
+      "outcome": "FAIL",
+      "errorCategory": "NETWORK_TIMEOUT",
+      "inputFingerprint": "9641d7597d72a613b553b76273d9dcbaa9298398ce3d56b1f23d06a2fbd7a908"
+    },
+    {
+      "stage": "image preparation",
+      "durationMs": 368827,
+      "outcome": "FAIL",
+      "errorCategory": "NETWORK_TIMEOUT",
+      "inputFingerprint": "9641d7597d72a613b553b76273d9dcbaa9298398ce3d56b1f23d06a2fbd7a908"
+    }
+  ]
+}

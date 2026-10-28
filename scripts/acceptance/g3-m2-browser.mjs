@@ -37,7 +37,7 @@ export async function runM2Checks(context) {
   }
   try {
     const profile = await (await viewer.api.get(origin + "/api/v1/semantic/support-profile")).json();
-    observe("current_profile_v2", profile.version === "2" && profile.reasoningMode === "ASSERTED_ONLY"
+    observe("current_profile_v3", profile.version === "3" && profile.reasoningMode === "ASSERTED_ONLY"
       && profile.capabilities.slice(8, 11).every(row => row.edit === "BASIC"));
     const sources = {};
     for (const [key, file] of [["ontologyTurtle", "ontology.ttl"], ["shapesTurtle", "shapes.ttl"],
@@ -71,7 +71,7 @@ export async function runM2Checks(context) {
       const assessed = await post(operator, "/api/v1/ontology-drafts/" + draft.draftId + "/assessments", {
         revision: draft.revision, hashes: draft.hashes, command: command(draft.revision),
       });
-      observe("api_real_assessment_current_bound", assessed.publishEligible && assessed.profileVersion === "2"
+      observe("api_real_assessment_current_bound", assessed.publishEligible && assessed.profileVersion === "3"
         && assessed.revision === draft.revision && assessed.hashes.bundleHash === draft.hashes.bundleHash
         && assessed.stages.some(row => row.name === "SHACL_CORE" && row.status === "PASS")
         && assessed.stages.some(row => row.name === "OWL_REASONING" && row.status === "NOT_RUN"));

@@ -19,3 +19,15 @@
 canonical构建失败必须原子保留严格allowlist receipt：安全命令/TaskId/RunId/context hash、退出或TIMEOUT/耗时、输出hash/size、有限静态BuildKit阶段和固定错误类别；同时输出同一脱敏摘要供临时CI日志恢复。不能只返回generic REFUSED或只留下临时runner本地路径，不输出原始env/buildargs/秘密，不为了PASS任意延长预算或无限retry。
 
 M2起canonical冷下载采用固定Apache dlcdn/archive同版本主备、原SHA512与HTTPS限跳，每次最多180秒且最多2次；成功下载后坏hash立即失败，不将hash失败当网络fallback。外层600秒保持。CI先canonical冷构建再restore，后续集成必须命中相同内容寻址镜像并记录实际receipt，禁止重复随机build。真实冷构建与cache-hit计数另验，静态规则不是产品PASS。
+
+## G3-M3 E0执行入口
+
+M3起CI在应用restore之前先计算`canonical_fuseki.py --identity`，按精确平台/全部构建输入恢复专用镜像归档，再执行canonical校验。`contextSha256`与包含helper/platform的`inputFingerprint`分别记录；禁止将旧context标签误认为新输入身份。官方cache restore/save固定已批准SHA，restore/save目录必须一致（目录参与GitHub cache version）；不设restore-keys且拒绝非精确matched-key。PR只恢复，可信push才保存。PUBLIC仓库用量API已实测无认证200，预算查询不发送令牌；归档≤512MiB且仓库已有占用+候选≤1GiB才写入，不增权限、不改费用设置、API失败停止保存。总量上限保守低于现有已含配额，不推断账单。
+
+镜像tar/receipt先校验文件、路径、散列、平台、manifest/config/layers及准确image ID，再load与inspect；现代OCI根摘要和旧config摘要区别验证。新canonical禁用额外attestation以保持单运行平台归档。warm继承producer下载校验事实，不宣称本runner又下载并算SHA512。必须保留不同RunId、新runner的真实cold/export与restore/load证据；同run reused不能替代。
+
+失败状态使用独立精确failureStateKey，可信push在canonical失败后仍保存有限摘要；同input/env候选先做≤20秒固定官方源短复现，重现同终态错误则BLOCKED，不能再无条件跑600秒。输入/环境变化失效；最终门禁的`--final-gate`必须显式真实执行。BuildKit重复错误summary不重复累计阶段；中途主源失败后备源恢复不能把最终PASS分类为失败。
+
+完整浏览器链由`workspace-smoke.mjs`前置真实OIDC状态验收，独立短入口为`node scripts/acceptance/g2-live-browser.mjs <本树私有runtime.json> --workspace-smoke-only --smoke-fault-check`；默认source、显式graph/canvas/source、取消/保存、历史diff、窄屏与只读权限均有断言。注入隐藏canvas应短FAIL，恢复后PASS。禁止用默认改graph或吞异常迎合旧脚本。
+
+证据编码早期先运行`new-review-evidence.ps1`生成当前Schema，再用`test-review-evidence.ps1 -EvidenceFile <文件> -ExpectedHead <SHA>`预检；生产构包器共用同一规范化实现，历史metadata保留原字节。截图/ignored边界也须早检。TaskRunTimeline用`task_run_timeline.py run ... -- <命令>`记录真实单调时钟与UTC，CI用`ci --step-id <固定标签> --task-type TEST -- <命令>`自动关联同job前序；`summary --path <JSONL>`分列跨度、区间union、累计、重叠、可观察关键路径和重验。并发append在锁内分配attempt，原始参数/聊天/令牌不入记录，Agent活跃/思考UNKNOWN。

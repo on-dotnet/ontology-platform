@@ -8,7 +8,7 @@
 
 ## 权限、发布和供应链
 
-保持`permissions: contents: read`，不添加packages:write/actions:write，不需要PAT/长期secret。缓存传输由官方Action使用GitHub运行时令牌，项目工具不读取或输出令牌。无GHCR/公开或私有镜像推送，无镜像发布权限；因此本方案无注册表签名权限变更，固定SHA512/输入散列/归属检查仍执行。缓存不存env/PFX/数据库/凭证/私有runtime，不把PR缓存内容当可信发布来源。Action固定完整SHA并保持官方LICENSE/版本登记；有限依赖审查不是完整供应链认证。
+保持`permissions: contents: read`；PUBLIC仓库用量API已实测无认证200，预算门禁不发送认证、不新增权限，不添加packages:write/actions:write，不需要PAT/长期secret。缓存传输由官方Action使用GitHub运行时令牌，项目工具不读取或输出令牌；PUBLIC仓库缓存用量只读查询不发送认证。无GHCR/公开或私有镜像推送，无镜像发布权限；因此本方案无注册表签名权限变更，固定SHA512/输入散列/归属检查仍执行。缓存不存env/PFX/数据库/凭证/私有runtime，不把PR缓存内容当可信发布来源。Action固定完整SHA并保持官方LICENSE/版本登记；有限依赖审查不是完整供应链认证。
 
 ## 替代方案与选择
 

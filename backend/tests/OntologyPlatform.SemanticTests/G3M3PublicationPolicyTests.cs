@@ -13,12 +13,14 @@ public sealed class G3M3PublicationPolicyTests
     [DataRow("skos")]
     [DataRow("precision")]
     [DataRow("dimension")]
+    [DataRow("deprecated-canonical")]
     public async Task DirectV3EntrypointsCannotBypassGovernance(string scenario)
     {
         // 固定缺陷通过合法RDF保留；不是拿语法错误冒充治理拒绝。
         var sources = scenario == "skos" ? SkosSources() : G3M3UnitTests.Sources() with { OntologyTurtle = "<urn:synthetic:m3:C> a <http://www.w3.org/2002/07/owl#Class> .", DataTurtle = "<urn:synthetic:m3:i> a <urn:synthetic:m3:C> ." };
         if (scenario == "precision") sources = sources with { VocabularyTurtle = sources.VocabularyTurtle!.Replace("declared-exact", "UNKNOWN", StringComparison.Ordinal) };
         if (scenario == "dimension") sources = sources with { VocabularyTurtle = sources.VocabularyTurtle!.Replace("p:nominalUnit ex:K-v1", "p:nominalUnit ex:MPa-v1", StringComparison.Ordinal) };
+        if (scenario == "deprecated-canonical") sources = sources with { VocabularyTurtle = sources.VocabularyTurtle + "ex:K owl:deprecated true ." };
         // 真实生产运行时为每个测试建立独立图和执行预算。
         var runtime = SemanticFixture.Runtime();
         // 哈希从真实四源解析获得，排除清单错版导致的假阳性。

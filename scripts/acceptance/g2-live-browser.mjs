@@ -50,7 +50,25 @@ try {
   }
   await anonymous.close();
   const operator = await identity('operator-ab');
-  if (process.argv.includes('--m2-api-only') || process.argv.includes('--m2-ui-only')) {
+  if (!process.argv.includes('--m2-api-only') && !process.argv.includes('--m3-api-only')) {
+    const smokeViewer = await identity('viewer-ab');
+    const { runWorkspaceSmoke } = await import('./workspace-smoke.mjs');
+    try {
+      await runWorkspaceSmoke({ root, origin, operator, viewer: smokeViewer, command,
+        faultCheck: process.argv.includes('--smoke-fault-check'), setPhase: value => { phase = value; } });
+    } finally { await smokeViewer.context.close(); }
+  }
+  if (process.argv.includes('--workspace-smoke-only')) {
+    await operator.context.close();
+  } else if (process.argv.includes('--m3-api-only') || process.argv.includes('--m3-ui-only')) {
+    const viewer = await identity('viewer-ab');
+    const single = await identity('viewer-a');
+    const audit = await identity('audit-ab');
+    const { runM3Checks } = await import('./g3-m3-browser.mjs');
+    await runM3Checks({ root, origin, operator, audit, viewer, single, check, command,
+      apiOnly: process.argv.includes('--m3-api-only'), uiOnly: process.argv.includes('--m3-ui-only'), setPhase: value => { phase = value; } });
+    for (const user of [operator, viewer, single, audit]) await user.context.close();
+  } else if (process.argv.includes('--m2-api-only') || process.argv.includes('--m2-ui-only')) {
     const viewer = await identity('viewer-ab');
     const single = await identity('viewer-a');
     const { runM2Checks } = await import('./g3-m2-browser.mjs');
@@ -224,14 +242,19 @@ try {
     const { runM2Checks } = await import('./g3-m2-browser.mjs');
     await runM2Checks({ root, origin, operator, audit, single, viewer, check, command, setPhase: value => { phase = value; } });
   }
+  if (process.argv.includes('--m3')) {
+    const { runM3Checks } = await import('./g3-m3-browser.mjs');
+    await runM3Checks({ root, origin, operator, audit, single, viewer, check, command, setPhase: value => { phase = value; } });
+  }
   for (const user of [operator, single, viewer, audit]) await user.context.close();
   }
 } catch (error) {
   failure = { phase, category: error?.name ?? 'Error', details: 'SUPPRESSED' };
 } finally {
   await browser?.close();
-  const report = { stage: process.argv.includes('--m2-api-only') ? 'M2_API_PG_JENA_REAL_OIDC' : process.argv.includes('--m2-ui-only') ? 'M2_UI_API_REAL_OIDC' : process.argv.includes('--full') ? 'FULL_G2_REAL_OIDC' : 'S1_HTTP_UI_REAL_OIDC', status: failure ? 'FAIL' : 'PASS', overallG2: 'PARTIAL', checks, failure, notRun: process.argv.includes('--full') ? (failure ? ['remaining steps after ' + phase, 'final sameHead CI'] : ['final sameHead CI', 'real model BLOCKED', 'Monaco PAUSED_BY_USER', 'Windows/Intel/production NOT_RUN']) : ['S2 publishing browser','S3 gateway MCP MAF SSE','final regression and CI'] };
-  await writeFile(resolve(evidenceDirectory(root), '' + (process.argv.includes('--m2-api-only') ? 'm2-api-oidc.json' : process.argv.includes('--m2-ui-only') ? 'm2-ui-oidc.json' : process.argv.includes('--full') ? 'full-g2-e2e.json' : 'live-s1-http.json')), JSON.stringify(report,null,2) + '\n');
+  const checkpoint = process.argv.includes('--workspace-smoke-only') ? 'workspace-smoke' : process.argv.includes('--m3-api-only') ? 'm3-api-oidc' : process.argv.includes('--m3-ui-only') ? 'm3-ui-oidc' : process.argv.includes('--m3') ? 'm3-full-e2e' : process.argv.includes('--m2-api-only') ? 'm2-api-oidc' : process.argv.includes('--m2-ui-only') ? 'm2-ui-oidc' : process.argv.includes('--full') ? 'full-g2-e2e' : 'live-s1-http';
+  const report = { stage: checkpoint, status: failure ? 'FAIL' : 'PASS', overallG2: 'PARTIAL', checks, failure, notRun: process.argv.includes('--full') ? (failure ? ['remaining steps after ' + phase, 'final sameHead CI'] : ['final sameHead CI', 'real model BLOCKED', 'Monaco PAUSED_BY_USER', 'Windows/Intel/production NOT_RUN']) : ['remaining full-chain gates','final regression and CI'] };
+  await writeFile(resolve(evidenceDirectory(root), checkpoint + '.json'), JSON.stringify(report,null,2) + '\n');
   console.log(JSON.stringify({ stage: report.stage, status: report.status, passed: checks.filter(value => value.status === 'PASS').length, failure }));
   if (failure) process.exitCode = 1;
 }

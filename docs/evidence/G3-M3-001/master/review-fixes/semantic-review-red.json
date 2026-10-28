@@ -1,0 +1,80 @@
+{
+  "exitCode": 2,
+  "records": [
+    {
+      "check": "public-jena-fixture-modes",
+      "exitCode": 0,
+      "modes": {
+        "fixture": "0o755",
+        "config.ttl": "0o644",
+        "log4j2.properties": "0o644"
+      }
+    },
+    {
+      "command": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g2-sem-f0ae01ad1b07",
+        "--publish",
+        "127.0.0.1::3030",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--mount",
+        "type=bind,src=/private/tmp/g2-sem-f0ae01ad1b07uopflh8y/fixture,dst=/fixture,readonly",
+        "--entrypoint",
+        "java",
+        "ontology-platform-fuseki:context-1e45f836d9837cbc75d23adb3ad37b0ff79a545ef06102a87aa246feea9cc1e5",
+        "-Xmx384m",
+        "-Dlog4j.configurationFile=/fixture/log4j2.properties",
+        "-jar",
+        "/opt/fuseki/fuseki-server.jar",
+        "--config=/fixture/config.ttl"
+      ],
+      "exitCode": 0,
+      "output": "f20304d70bf763a762f9849a8bcd8a619ba5d292c2d3e2bd2aedfdd2cad4d53f\n"
+    },
+    {
+      "command": [
+        "docker",
+        "port",
+        "g2-sem-f0ae01ad1b07",
+        "3030/tcp"
+      ],
+      "exitCode": 0,
+      "output": "127.0.0.1:63819\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "test",
+        "--project",
+        "backend/tests/OntologyPlatform.SemanticTests",
+        "--no-restore",
+        "--",
+        "--filter",
+        "FullyQualifiedName~DuplicateAddsThenDeleteUseRdfSetSemantics|FullyQualifiedName~UnitFailuresHaveExactSourceDiagnostics|FullyQualifiedName~DirectV3EntrypointsCannotBypassGovernance"
+      ],
+      "exitCode": 2,
+      "output": "正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n失败 DirectV3EntrypointsCannotBypassGovernance (\"deprecated-canonical\") (178ms)\n  从 /Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  Assertion failed. Expected exception of type SemanticOperationException (or derived) but no exception was thrown.\n  \n  Assert.ThrowsAsync<SemanticOperationException>(() => runtime.DeployAsync(manifest, sources, default))\n    在 Microsoft.VisualStudio.TestTools.UnitTesting.Assert.ThrowsExceptionAsync[TException](Func`1 action, Boolean isStrictType, String message, String actionExpression, String assertMethodName)\n    在 OntologyPlatform.SemanticTests.G3M3PublicationPolicyTests.DirectV3EntrypointsCannotBypassGovernance(String scenario) 位于 /Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M3PublicationPolicyTests.cs:30\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n失败 UnitFailuresHaveExactSourceDiagnostics (\"deprecated-canonical\",\"semantic_reference_deprecated\") (7ms)\n  从 /Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  Assertion failed. 预期集合不为空。\n  semantic_reference_deprecated\n  \n  actual count: 0\n  \n  Assert.IsNotEmpty(diagnostics)\n    在 OntologyPlatform.SemanticTests.G3M3UnitTests.UnitFailuresHaveExactSourceDiagnostics(String scenario, String code) 位于 /Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M3UnitTests.cs:77\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n失败 DuplicateAddsThenDeleteUseRdfSetSemantics (False) (12ms)\n  从 /Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  Assertion failed. 预期条件为 false。\n  \n  actual: true\n  \n  Assert.IsFalse((await runtime.ReadVocabularyAsync(result, 2, default)).Triples.Any(item => item.Triple.Predicate == add.Edit.PredicateIri))\n    在 OntologyPlatform.SemanticTests.G3M3VocabularyTests.DuplicateAddsThenDeleteUseRdfSetSemantics(Boolean initiallyPresent) 位于 /Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M3VocabularyTests.cs:52\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n失败 DuplicateAddsThenDeleteUseRdfSetSemantics (True) (6ms)\n  从 /Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  Assertion failed. 预期条件为 false。\n  \n  actual: true\n  \n  Assert.IsFalse((await runtime.ReadVocabularyAsync(result, 2, default)).Triples.Any(item => item.Triple.Predicate == add.Edit.PredicateIri))\n    在 OntologyPlatform.SemanticTests.G3M3VocabularyTests.DuplicateAddsThenDeleteUseRdfSetSemantics(Boolean initiallyPresent) 位于 /Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M3VocabularyTests.cs:52\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64) 失败并出现 4 个错误 (3s 899ms)\n退出代码: 2\n\n测试运行摘要: 失败!\n  总计: 25\n  失败: 4\n  成功: 21\n  已跳过: 0\n  持续时间: 4s 279ms\n已完成测试运行，但显示非成功退出代码: 2 (请参阅: https://aka.ms/testingplatform/exitcodes)\n"
+    },
+    {
+      "check": "all temporary graph triples removed",
+      "count": 0,
+      "status": "PASS"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g2-sem-f0ae01ad1b07"
+      ],
+      "exitCode": 0,
+      "output": "g2-sem-f0ae01ad1b07\n"
+    }
+  ]
+}

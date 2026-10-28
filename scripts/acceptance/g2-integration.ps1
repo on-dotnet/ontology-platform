@@ -8,7 +8,7 @@ Push-Location $root
 try {
     # 唯一批准Dockerfile使用原有固定JRE/Jena摘要；不安装系统软件。
     $taskId = if ($env:PLATFORM_TASK_ID) { $env:PLATFORM_TASK_ID } else { 'G2-INTEGRATION' }
-    $fuseki = python3 scripts/maintenance/canonical_fuseki.py --task-id $taskId --run-id ('ci-' + [Guid]::NewGuid().ToString('N')) | ConvertFrom-Json
+    $fuseki = python3 scripts/maintenance/canonical_fuseki.py --task-id $taskId --run-id ('ci-' + [Guid]::NewGuid().ToString('N')) --failure-state artifacts/fuseki-failures | ConvertFrom-Json
     if ($LASTEXITCODE -ne 0) { throw 'Pinned Jena fixture image build failed' }
     Write-Output ('CANONICAL_FUSEKI_RECEIPT ' + ($fuseki | ConvertTo-Json -Compress))
     if ($env:CI -eq 'true' -and -not $fuseki.reused) { throw 'CI canonical preflight cache identity was not reused' }

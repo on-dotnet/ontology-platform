@@ -81,6 +81,7 @@ public sealed class G3M3ServiceTests
     [DataRow("valid", AssessmentStageStatus.Pass)]
     [DataRow("unknown", AssessmentStageStatus.Indeterminate)]
     [DataRow("mismatch", AssessmentStageStatus.Fail)]
+    [DataRow("deprecated-canonical", AssessmentStageStatus.Fail)]
     public async Task UnitGovernanceBindsRealAssessment(string scenario, AssessmentStageStatus expected)
     {
         // 当前测试显式连接脚本新建PG，不复用历史数据。
@@ -93,6 +94,7 @@ public sealed class G3M3ServiceTests
         var sources = G3M3UnitTests.Sources();
         if (scenario == "unknown") sources = sources with { VocabularyTurtle = sources.VocabularyTurtle!.Replace("declared-exact", "UNKNOWN", StringComparison.Ordinal) };
         if (scenario == "mismatch") sources = sources with { VocabularyTurtle = sources.VocabularyTurtle!.Replace("p:nominalUnit ex:K-v1", "p:nominalUnit ex:MPa-v1", StringComparison.Ordinal) };
+        if (scenario == "deprecated-canonical") sources = sources with { VocabularyTurtle = sources.VocabularyTurtle + "ex:K owl:deprecated true ." };
         // 普通源码保存不清洗冲突图，发布资格必须由实际评估决定。
         var draft = await service.CreateAsync(actor, new CreateDraftRequest { Name = "Synthetic unit assessment", Scope = new ResourceScope { OrganizationId = actor.OrganizationId, SiteIds = actor.SiteIds }, Sources = sources, Command = Command(0) }, default);
         // 五阶段结果来自真实执行和准确单位治理，没有客户端构造成功报告。
@@ -104,7 +106,7 @@ public sealed class G3M3ServiceTests
         Assert.AreEqual(scenario == "valid", assessment.PublishEligible);
         Assert.AreEqual(draft.Hashes, assessment.Hashes);
         Assert.AreEqual("3", assessment.ProfileVersion);
-        if (scenario != "valid") Assert.IsTrue(assessment.Diagnostics.Any(item => item.Diagnostic.Code == (scenario == "unknown" ? "unit_precision_unknown" : "unit_dimension_mismatch") && item.SourceHash == draft.Hashes.VocabularyHash));
+        if (scenario != "valid") Assert.IsTrue(assessment.Diagnostics.Any(item => item.Diagnostic.Code == (scenario == "unknown" ? "unit_precision_unknown" : scenario == "deprecated-canonical" ? "semantic_reference_deprecated" : "unit_dimension_mismatch") && item.SourceHash == draft.Hashes.VocabularyHash));
     }
 
     /// <summary>本轮小型合法Synthetic图，不从行业符号推断身份。</summary>

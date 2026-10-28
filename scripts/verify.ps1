@@ -142,7 +142,7 @@ function Test-Repository {
     if (Test-Path -LiteralPath $workflowPath) {
         $workflow = [IO.File]::ReadAllText($workflowPath)
         $uses = [regex]::Matches($workflow, '(?m)^\s*-?\s*uses:\s*(\S+)')
-        $approvedActions = @('actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1', 'actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68')
+        $approvedActions = @('actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1', 'actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68', 'actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9', 'actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9')
         if ($uses.Count -eq 0 -or @($uses | Where-Object { $_.Groups[1].Value -notin $approvedActions }).Count -gt 0 -or
             $workflow -notmatch '(?m)^permissions:\n  contents: read\s*$' -or $workflow -notmatch 'persist-credentials: false' -or
             $workflow -match '(pull_request_target|write-all|secrets\.|curl |wget |npm install|pnpm install)' -or
@@ -173,12 +173,14 @@ try {
         if (-not $?) { exit 1 }
         # 资源回收必须运行专属真实Git/模拟Docker正负例，不能用构包54项代替。
         $maintenancePython = if ($IsWindows) { 'python' } else { 'python3' }
-        foreach ($maintenanceTest in @('CleanupResources.Tests.py', 'PublicHistory.Tests.py', 'InspectorResources.Tests.py', 'G3Evidence.Tests.py', 'G3Acceptance.Tests.py', 'G3Compatibility.Tests.py', 'CloseoutGovernance.Tests.py', 'CanonicalFuseki.Tests.py', 'ResourceLifecycle.Tests.py')) {
+        foreach ($maintenanceTest in @('CleanupResources.Tests.py', 'PublicHistory.Tests.py', 'InspectorResources.Tests.py', 'G3Evidence.Tests.py', 'G3Acceptance.Tests.py', 'G3Compatibility.Tests.py', 'CloseoutGovernance.Tests.py', 'CanonicalFuseki.Tests.py', 'FusekiCache.Tests.py', 'ResourceLifecycle.Tests.py', 'TaskRunTimeline.Tests.py', 'FusekiCiCache.Tests.py')) {
             $maintenancePath = Join-Path $PSScriptRoot ('tests/' + $maintenanceTest)
             if (-not (Test-Path -LiteralPath $maintenancePath)) { throw 'Required maintenance regression test missing.' }
             & $maintenancePython $maintenancePath
             if ($LASTEXITCODE -ne 0) { throw ('Maintenance regression failed: ' + $maintenanceTest) }
         }
+        & (Join-Path $PSScriptRoot 'tests/EvidencePreflight.Tests.ps1')
+        if (-not $?) { exit 1 }
         if (Test-Path (Join-Path $PSScriptRoot 'tests/ReviewPackage.Tests.ps1')) {
             & (Join-Path $PSScriptRoot 'tests/ReviewPackage.Tests.ps1')
             if (-not $?) { exit 1 }

@@ -2,6 +2,12 @@ name: Engineering and platform foundation
 on:
   push:
   pull_request:
+  workflow_dispatch:
+    inputs:
+      final_gate:
+        description: Run the actual final canonical gate despite an old failure candidate
+        type: boolean
+        default: false
 permissions:
   contents: read
 concurrency:
@@ -24,18 +30,18 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Repository policy and positive-negative checks
         shell: pwsh
-        run: ./scripts/verify.ps1 -SelfTest
+        run: python3 scripts/maintenance/task_run_timeline.py ci --step-id engineering-selftest --task-type TEST -- pwsh -NoProfile -File scripts/verify.ps1 -SelfTest
       - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:
           global-json-file: global.json
       - name: Restore exact committed platform graph
         shell: pwsh
         run: |
-          dotnet restore backend/OntologyPlatform.slnx --locked-mode
+          python3 scripts/maintenance/task_run_timeline.py ci --step-id engineering-restore --task-type BUILD -- dotnet restore backend/OntologyPlatform.slnx --locked-mode
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Frozen Web restore and separate lint typecheck test build
         shell: pwsh
-        run: ./scripts/verify-web.ps1 -Restore
+        run: python3 scripts/maintenance/task_run_timeline.py ci --step-id web --task-type TEST -- pwsh -NoProfile -File scripts/verify-web.ps1 -Restore
       - name: Runtime output boundary negatives
         shell: pwsh
         run: python3 scripts/tests/Wave2Runtime.Tests.py
@@ -53,38 +59,104 @@ jobs:
         run: python3 scripts/check-tsx-readability.py
       - name: Build format and real host security tests
         shell: pwsh
-        run: ./scripts/verify.ps1 -RunNative -RunTests -SkipWeb
+        run: python3 scripts/maintenance/task_run_timeline.py ci --step-id native --task-type TEST -- pwsh -NoProfile -File scripts/verify.ps1 -RunNative -RunTests -SkipWeb
       - name: Scope notice
         shell: pwsh
         run: Write-Output 'Web checks ran separately above; real browser OIDC/LGTM acceptance is recorded separately. Governance container tests run in the mandatory integration job.'
+      - name: Report actual engineering intervals
+        if: always()
+        shell: pwsh
+        run: |
+          if (Test-Path artifacts/task-timeline-engineering.jsonl) {
+            Get-Content artifacts/task-timeline-engineering.jsonl | ForEach-Object { Write-Output ('TASK_RUN_TIMELINE ' + $_) }
+            python3 scripts/maintenance/task_run_timeline.py summary --path artifacts/task-timeline-engineering.jsonl
+          }
   governance-integration:
     runs-on: ubuntu-24.04
     timeout-minutes: 40
+    concurrency:
+      group: canonical-fuseki-cache-${{ github.repository }}
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - name: Resolve canonical cache identity
+        id: fuseki
+        run: python3 scripts/maintenance/fuseki_ci_cache.py identity
+      - name: Restore exact canonical image archive
+        id: image-cache
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0, approved G3-M3-001
+        with:
+          path: artifacts/fuseki-ci-cache
+          key: ${{ steps.fuseki.outputs.cacheKey }}
+      - name: Restore exact previous failure candidate
+        id: failure-cache
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: artifacts/fuseki-failures
+          key: ${{ steps.fuseki.outputs.failureStateKey }}
       - name: Preflight canonical Fuseki before application restore
+        id: canonical
         shell: pwsh
+        env:
+          MATCHED_IMAGE_KEY: ${{ steps.image-cache.outputs.cache-matched-key }}
+          MATCHED_FAILURE_KEY: ${{ steps.failure-cache.outputs.cache-matched-key }}
+          EXPECTED_IMAGE_KEY: ${{ steps.fuseki.outputs.cacheKey }}
+          EXPECTED_FAILURE_KEY: ${{ steps.fuseki.outputs.failureStateKey }}
+          FINAL_GATE: ${{ inputs.final_gate }}
         run: |
-          python3 scripts/maintenance/canonical_fuseki.py --task-id G3-M2-001 --run-id ('ci-preflight-' + $env:GITHUB_RUN_ID + '-' + $env:GITHUB_RUN_ATTEMPT)
+          if ($env:MATCHED_IMAGE_KEY -and $env:MATCHED_IMAGE_KEY -cne $env:EXPECTED_IMAGE_KEY) { throw 'Prefix image cache refused' }
+          if ($env:MATCHED_FAILURE_KEY -and $env:MATCHED_FAILURE_KEY -cne $env:EXPECTED_FAILURE_KEY) { throw 'Prefix failure cache refused' }
+          $arguments = @('--task-id', 'G3-M3-001', '--run-id', ('ci-preflight-' + $env:GITHUB_RUN_ID + '-' + $env:GITHUB_RUN_ATTEMPT), '--restore-cache', 'artifacts/fuseki-ci-cache', '--failure-state', 'artifacts/fuseki-failures')
+          if ($env:FINAL_GATE -eq 'true') { $arguments += '--final-gate' }
+          if (-not $env:MATCHED_IMAGE_KEY) { $arguments += @('--export-cache', 'artifacts/fuseki-ci-cache') }
+          python3 scripts/maintenance/task_run_timeline.py ci --step-id canonical-preflight --task-type BUILD -- python3 scripts/maintenance/canonical_fuseki.py @arguments
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Confirm included-storage image budget
+        id: image-budget
+        if: github.event_name == 'push' && steps.image-cache.outputs.cache-hit != 'true' && steps.canonical.outcome == 'success'
+        run: python3 scripts/maintenance/fuseki_ci_cache.py budget --directory artifacts/fuseki-ci-cache
+      - name: Save verified canonical image archive
+        if: github.event_name == 'push' && steps.image-budget.outcome == 'success'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: artifacts/fuseki-ci-cache
+          key: ${{ steps.fuseki.outputs.cacheKey }}
+      - name: Confirm included-storage failure budget
+        id: failure-budget
+        if: always() && github.event_name == 'push' && steps.canonical.outcome == 'failure' && steps.failure-cache.outputs.cache-hit != 'true' && hashFiles('artifacts/fuseki-failures/**') != ''
+        run: python3 scripts/maintenance/fuseki_ci_cache.py budget --directory artifacts/fuseki-failures
+      - name: Save bounded failure candidate after failed canonical build
+        if: always() && github.event_name == 'push' && steps.failure-budget.outcome == 'success'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: artifacts/fuseki-failures
+          key: ${{ steps.fuseki.outputs.failureStateKey }}
       - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:
           global-json-file: global.json
       - name: Frozen restore and backend build
         shell: pwsh
         run: |
-          dotnet restore backend/OntologyPlatform.slnx --locked-mode
+          python3 scripts/maintenance/task_run_timeline.py ci --step-id integration-restore --task-type BUILD -- dotnet restore backend/OntologyPlatform.slnx --locked-mode
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          dotnet build backend/OntologyPlatform.slnx --no-restore
+          python3 scripts/maintenance/task_run_timeline.py ci --step-id integration-build --task-type BUILD -- dotnet build backend/OntologyPlatform.slnx --no-restore
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Real PostgreSQL security integration
         shell: pwsh
-        run: python3 scripts/acceptance/test-governance.py
+        run: python3 scripts/maintenance/task_run_timeline.py ci --step-id governance --task-type TEST -- python3 scripts/acceptance/test-governance.py
       - name: Real G2 semantic publishing query MCP MAF and native SSE integration
         shell: pwsh
         env:
-          PLATFORM_EVIDENCE_DIR: docs/evidence/G3-M2-001/ci
-          PLATFORM_TASK_ID: G3-M2-001
-        run: ./scripts/acceptance/g2-integration.ps1
+          PLATFORM_EVIDENCE_DIR: docs/evidence/G3-M3-001/ci
+          PLATFORM_TASK_ID: G3-M3-001
+        run: python3 scripts/maintenance/task_run_timeline.py ci --step-id modules --task-type TEST -- pwsh -NoProfile -File scripts/acceptance/g2-integration.ps1
+      - name: Report actual integration intervals
+        if: always()
+        shell: pwsh
+        run: |
+          if (Test-Path artifacts/task-timeline-governance-integration.jsonl) {
+            Get-Content artifacts/task-timeline-governance-integration.jsonl | ForEach-Object { Write-Output ('TASK_RUN_TIMELINE ' + $_) }
+            python3 scripts/maintenance/task_run_timeline.py summary --path artifacts/task-timeline-governance-integration.jsonl
+          }

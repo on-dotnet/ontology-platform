@@ -1,0 +1,16 @@
+.F.......
+======================================================================
+FAIL: test_ci_wrapper_records_real_failure_without_token_or_arguments (__main__.TimelineTests.test_ci_wrapper_records_real_failure_without_token_or_arguments)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/scripts/tests/TaskRunTimeline.Tests.py", line 111, in test_ci_wrapper_records_real_failure_without_token_or_arguments
+    self.assertEqual(result.returncode,19,result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 19 : usage: task_run_timeline.py [-h] {summary,run} ...
+task_run_timeline.py: error: argument mode: invalid choice: 'ci' (choose from 'summary', 'run')
+
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.537s
+
+FAILED (failures=1)

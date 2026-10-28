@@ -18,6 +18,7 @@ param(
     [string]$CiCommit,
     [ValidateSet('success', 'failure', 'cancelled', 'timed_out', 'action_required')][string]$CiConclusion,
     [ValidateSet(1, 2, 3)][int]$SchemaVersion = 3,
+    [switch]$Library,
     [switch]$VerifyOnly,
     [string]$PackagePath
 )
@@ -370,6 +371,30 @@ function Get-ReviewSnapshot {
     return @{ Members = $members; Mapping = $mapping.ToArray(); Ignored = $ignoredPaths; ScreenshotCount = $selectedScreenshots.Count; ScreenshotCompressedBytes = $screenshotCompressedBytes; DiffCheckExit = $check.ExitCode; GitBytes = $gitBytes }
 }
 
+function Read-ReviewEvidenceSchema {
+    param([byte[]]$Bytes, [string]$ExpectedHead = '')
+    $value = $script:utf8.GetString($Bytes) | ConvertFrom-Json -AsHashtable -Depth 32
+    if ($value -isnot [Collections.IDictionary] -or -not $value.ContainsKey('checks') -or -not $value.ContainsKey('ci')) { throw 'EVIDENCE_SCHEMA: checks and ci required' }
+    if ($value.ContainsKey('evidenceSchemaVersion')) {
+        if ($value.evidenceSchemaVersion -cne 1 -or @($value.Keys | Where-Object { $_ -cnotin @('evidenceSchemaVersion', 'checks', 'ci', 'metadata') }).Count) { throw 'EVIDENCE_SCHEMA: unsupported version or extra authoritative fields' }
+        if ($Bytes.Length -eq 0 -or $Bytes[-1] -ne 10 -or ($Bytes.Length -gt 1 -and $Bytes[-2] -eq 10) -or $script:utf8.GetString($Bytes).Contains("`r")) { throw 'EVIDENCE_EOF: standard evidence requires one final LF and no CR' }
+        if ($value.checks -isnot [array] -or $value.checks.Count -eq 0) { throw 'EVIDENCE_SCHEMA: nonempty checks array required' }
+        $names = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+        foreach ($check in $value.checks) {
+            $fields = @('name', 'command', 'status', 'exitCode', 'output')
+            if ($check -isnot [Collections.IDictionary] -or $check.get_Count() -ne $fields.Count -or @($check.Keys | Where-Object { $_ -cnotin $fields }).Count) { throw 'EVIDENCE_SCHEMA: exact check fields required' }
+            if ($check.name -isnot [string] -or $check.name -cnotmatch '^[A-Za-z0-9][A-Za-z0-9_.-]{0,99}$' -or -not $names.Add($check.name) -or $check.output -isnot [string] -or -not $check.output -or ($null -ne $check.command -and $check.command -isnot [string])) { throw 'EVIDENCE_SCHEMA: controlled unique name, command and output required' }
+            if ($null -ne $check.exitCode -and $check.exitCode -isnot [int] -and $check.exitCode -isnot [long]) { throw 'EVIDENCE_SCHEMA: integer or null exit required' }
+            if ($check.status -cnotin @('PASS', 'FAIL', 'PARTIAL', 'BLOCKED', 'NOT_RUN', 'NOT_VERIFIED') -or ($check.status -ceq 'PASS' -and ($null -eq $check.exitCode -or $check.exitCode -ne 0 -or -not $check.command)) -or ($check.status -ceq 'FAIL' -and $check.exitCode -eq 0 -and $null -ne $check.exitCode) -or ($check.status -ceq 'NOT_RUN' -and $null -ne $check.exitCode)) { throw 'EVIDENCE_SCHEMA: status and actual exit disagree' }
+        }
+        $fields = @('status', 'runId', 'url', 'commit', 'conclusion')
+        if ($value.ci -isnot [Collections.IDictionary] -or $value.ci.get_Count() -ne $fields.Count -or @($value.ci.Keys | Where-Object { $_ -cnotin $fields }).Count) { throw 'EVIDENCE_SCHEMA: exact CI fields required' }
+        if ($value.ContainsKey('metadata') -and $value.metadata -isnot [Collections.IDictionary]) { throw 'EVIDENCE_SCHEMA: metadata must be an object' }
+    }
+    if ($ExpectedHead -and $value.ci.status -in @('PASS', 'FAIL') -and $value.ci.commit -cne $ExpectedHead) { throw 'CI_EVIDENCE: evidence commit differs from expected Head' }
+    return $value
+}
+
 function Get-ReviewEvidence {
     param($Snapshot, [string]$Path, [string]$DeclaredStatus, $RuntimeCi)
     $evidence = @{ checks = @(@{ name = 'task-validation'; command = $null; status = 'NOT_RUN'; exitCode = $null; output = 'No committed evidence input supplied.' }); ci = @{ status = 'NOT_VERIFIED'; runId = $null; url = $null; commit = $null; conclusion = $null } }
@@ -377,7 +402,7 @@ function Get-ReviewEvidence {
         Assert-ReviewPath $Path
         $item = @($Snapshot.Mapping | Where-Object { $_.gitPath -ceq $Path })
         if (-not $Snapshot.GitBytes.ContainsKey($Path)) { throw 'EVIDENCE_REQUIRED: EvidencePath must be an exact committed Git path in HeadSha' }
-        $evidence = $script:utf8.GetString($Snapshot.GitBytes[$Path]) | ConvertFrom-Json -AsHashtable
+        $evidence = Read-ReviewEvidenceSchema $Snapshot.GitBytes[$Path]
         if (-not $evidence.ContainsKey('checks') -or -not $evidence.ContainsKey('ci') -or @($evidence.checks).Count -eq 0) { throw 'EVIDENCE_REQUIRED: checks and ci objects required' }
     }
     if ($null -ne $RuntimeCi) { $evidence.ci = $RuntimeCi }
@@ -470,6 +495,8 @@ function Test-ReviewArchive {
     if (($manifest.sourceMembers | ConvertTo-Json -Depth 8 -Compress) -cne ($snapshot.Mapping | ConvertTo-Json -Depth 8 -Compress)) { throw 'MANIFEST_INVALID: committed source mapping differs' }
     return [ordered]@{ status = 'PASS'; checks = @('reopen', 'paths', 'forbidden-members', 'finite-secret-patterns', 'complete-member-set', 'member-sha256', 'source-blob-and-head', 'full-base-head-diff'); memberCount = $actual.Count }
 }
+
+if ($Library) { return }
 
 try {
     $Root = [IO.Path]::GetFullPath($Root)

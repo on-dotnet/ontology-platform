@@ -149,11 +149,15 @@ class CanonicalTests(unittest.TestCase):
         text=(ROOT/'scripts/acceptance/g2-integration.ps1').read_text()
         self.assertIn('canonical_fuseki.py',text)
         self.assertNotIn('docker build',text)
+        self.assertIn('--failure-state',text)
+        host=(ROOT/'backend/src/AppHost/CanonicalFusekiImage.cs').read_text()
+        self.assertIn('--failure-state',host)
+        self.assertIn('artifacts/fuseki-failures',host)
 
     def test_ci_cold_build_precedes_restore_and_integration_requires_cache_hit(self):
         workflow=(ROOT/'.github/workflows/ci.yml').read_text().split('  governance-integration:',1)[1]
         self.assertLess(workflow.index('Preflight canonical Fuseki'),workflow.index('actions/setup-dotnet'))
-        self.assertIn('PLATFORM_TASK_ID: G3-M2-001',workflow)
+        self.assertIn('PLATFORM_TASK_ID: G3-M3-001',workflow)
         integration=(ROOT/'scripts/acceptance/g2-integration.ps1').read_text()
         self.assertIn('CANONICAL_FUSEKI_RECEIPT',integration)
         self.assertIn("$env:CI -eq 'true' -and -not $fuseki.reused",integration)

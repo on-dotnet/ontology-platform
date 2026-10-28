@@ -20,7 +20,7 @@ def run_attempt():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--runtime-file')
     parser.add_argument('--start-runtime', action='store_true')
-    parser.add_argument('--milestone', choices=['M1', 'M2'], default='M1')
+    parser.add_argument('--milestone', choices=['M1', 'M2', 'M3'], default='M1')
     parser.add_argument('--api-only', action='store_true')
     parser.add_argument('--ui-only', action='store_true')
     args = parser.parse_args()
@@ -28,8 +28,8 @@ def run_attempt():
         parser.error('Choose an owned runtime or explicitly start a new M1 stack')
     if args.api_only and args.ui_only:
         parser.error('Choose one integration checkpoint')
-    if (args.api_only or args.ui_only) and args.milestone != 'M2':
-        parser.error('API integration checkpoint is authorized only for M2')
+    if (args.api_only or args.ui_only) and args.milestone not in ('M2', 'M3'):
+        parser.error('Integration checkpoints are authorized only for M2/M3')
     task_id = 'G3-' + args.milestone + '-001'
     task_evidence = 'docs/evidence/' + task_id + '/runtime'
     prefix = 'g3-' + args.milestone.lower() + '-'
@@ -110,6 +110,8 @@ def run_attempt():
         ]
         if args.milestone == 'M2':
             commands[0].append('--m2-api-only' if args.api_only else '--m2-ui-only' if args.ui_only else '--m2')
+        if args.milestone == 'M3':
+            commands[0].append('--m3-api-only' if args.api_only else '--m3-ui-only' if args.ui_only else '--m3')
         if args.api_only or args.ui_only:
             commands = commands[:1]
         for index, command in enumerate(commands):

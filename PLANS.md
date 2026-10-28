@@ -52,3 +52,5 @@ BuildKit history后验回现单独重开该项，不把即时列表absence当持
 交付冻结顺序固定：源码/格式 → 测试 → 独立Review → 提交 → 同HeadCI → 唯一V3构包 → 独立重开 → 回执。最终diff-check必须exit0，历史失败仍保留。代表截图最多12张、PNG压缩目标3MiB，过程证据从精确Git对象恢复；ignored只入聚合索引。>10MiB报分类体积，>15MiB默认阻断。V1/V2历史VerifyOnly兼容且不改历史SHA。
 
 Fuseki只使用canonical内容寻址构建入口及已校验共享镜像，AppHost不另建随机镜像。资源创建即记录TaskId/RunId/标签/清单；阶段关闭准确白名单回收自身资源，跨任务旧环境保留一套日常开发，其余必须有可再生或可验证备份依据。每个KEEP写准确对象、理由及解除条件；无socket不能标Docker PASS，禁止全局prune/restart/改DB。永久回归由verify -SelfTest及同HeadCI执行，不把静态规则测试当产品测试。
+
+G3-M3 E0依赖固定为：冻结合同/正反例/独立Review→两个独立新runner冷构建与跨Run命中→正式M3整栈；SEM/WEB代码可先独立树并行。CI缓存归档同路径、平台全输入身份及失败短复现，工作区真实Smoke/故障注入、证据早Schema和自动TaskRunTimeline均为永久入口，详见[效率规则](docs/development/ai-development-efficiency.md)。先两次可验证增量集成，最终同Head双job/唯一V3/独立重开；资源精确Apply与自然代际后验按[生命周期规范](docs/development/resource-lifecycle.md)分别如实记录，不从Mock或旧失败推PASS。

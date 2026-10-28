@@ -1,0 +1,33 @@
+......F/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/subprocess.py:1141: ResourceWarning: subprocess 90557 is still running
+  _warn("subprocess %s is still running" % self.pid,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/case.py:650: ResourceWarning: unclosed file <_io.BufferedReader name=8>
+  with outcome.testPartExecutor(self):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/case.py:650: ResourceWarning: unclosed file <_io.BufferedReader name=11>
+  with outcome.testPartExecutor(self):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/subprocess.py:1141: ResourceWarning: subprocess 90556 is still running
+  _warn("subprocess %s is still running" % self.pid,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/case.py:650: ResourceWarning: unclosed file <_io.BufferedReader name=6>
+  with outcome.testPartExecutor(self):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/case.py:650: ResourceWarning: unclosed file <_io.BufferedReader name=9>
+  with outcome.testPartExecutor(self):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+.
+======================================================================
+FAIL: test_simultaneous_commands_assign_attempt_under_writer_lock (__main__.TimelineTests.test_simultaneous_commands_assign_attempt_under_writer_lock)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/scripts/tests/TaskRunTimeline.Tests.py", line 98, in test_simultaneous_commands_assign_attempt_under_writer_lock
+    self.assertEqual(child.returncode, 0, error.decode())
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : REFUSED: invalid timeline metadata or output boundary; values withheld
+
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.499s
+
+FAILED (failures=1)
