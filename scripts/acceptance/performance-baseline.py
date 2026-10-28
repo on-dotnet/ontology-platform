@@ -18,7 +18,10 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--runtime-file', help='Run a new genuine browser publication/query/SSE/rollback chain')
     parser.add_argument('--from-observed-run', action='store_true', help='Summarize the existing actual full-chain observation; does not rerun the product')
+    parser.add_argument('--chain-report', choices=['full-g2-e2e.json', 'm3-full-e2e.json'], default='full-g2-e2e.json')
     args = parser.parse_args()
+    if args.runtime_file and args.chain_report != 'full-g2-e2e.json':
+        parser.error('M3 chain summary requires --from-observed-run')
     if bool(args.runtime_file) == args.from_observed_run:
         parser.error('Select a new --runtime-file run OR --from-observed-run explicitly')
     if args.runtime_file:
@@ -26,7 +29,7 @@ def main():
         if code:
             return code
     actual = json.loads((EVIDENCE / 'performance-observations.json').read_text())
-    chain = json.loads((EVIDENCE / 'full-g2-e2e.json').read_text())
+    chain = json.loads((EVIDENCE / args.chain_report).read_text())
     if chain['status'] != 'PASS':
         raise ValueError('A failed chain cannot certify performance coverage')
     grouped = {}

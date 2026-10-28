@@ -1,0 +1,223 @@
+{
+  "status": "PASS",
+  "traceId": "b6d151fb873487b19fbbb8933bd297f9",
+  "successTraceId": "ebaa35a79edeb43d12ca2a39617764d7",
+  "checks": [
+    {
+      "check": "success-read-commits-exactly-one-fact",
+      "status": "PASS"
+    },
+    {
+      "check": "success-response-excludes-own-event",
+      "status": "PASS"
+    },
+    {
+      "check": "complete-real-single-site-scope",
+      "status": "PASS"
+    },
+    {
+      "check": "success-valid-trace",
+      "status": "PASS"
+    },
+    {
+      "check": "returned-audit-id-is-real-persisted-scope-and-trace",
+      "status": "PASS"
+    },
+    {
+      "check": "insert-failure-no-success-audit-id",
+      "status": "PASS"
+    },
+    {
+      "check": "insert-failure-no-new-success-fact",
+      "status": "PASS"
+    },
+    {
+      "check": "insert-failure-safe-problem",
+      "status": "PASS"
+    },
+    {
+      "check": "same-cookie-recovers-and-previous-fact-visible",
+      "status": "PASS"
+    },
+    {
+      "check": "real-loki-fixed-event-and-fields",
+      "status": "PASS"
+    },
+    {
+      "check": "real-loki-fixed-route-status-trace",
+      "status": "PASS"
+    },
+    {
+      "check": "real-loki-only-three-index-labels",
+      "status": "PASS"
+    },
+    {
+      "check": "real-tempo-error-span",
+      "status": "PASS"
+    },
+    {
+      "check": "real-tempo-classification-and-outcome",
+      "status": "PASS"
+    },
+    {
+      "check": "real-tempo-no-raw-error-description",
+      "status": "PASS"
+    },
+    {
+      "check": "actual-loki-tempo-no-injected-or-runtime-secrets",
+      "status": "PASS"
+    }
+  ],
+  "identityProtocol": [
+    {
+      "check": "oidc-challenge",
+      "status": "PASS",
+      "httpStatus": 302
+    },
+    {
+      "check": "oidc-par-reference-observed",
+      "status": "PASS"
+    },
+    {
+      "check": "keycloak-password-form",
+      "status": "PASS",
+      "httpStatus": 200
+    },
+    {
+      "check": "oidc-callback-completed",
+      "status": "PASS",
+      "httpStatus": 302
+    },
+    {
+      "check": "httponly-lax-server-session-cookie",
+      "status": "PASS"
+    },
+    {
+      "check": "real-auditor-identity",
+      "status": "PASS",
+      "httpStatus": 200
+    },
+    {
+      "check": "real-auditor-identity-no-store",
+      "status": "PASS"
+    },
+    {
+      "check": "real-auditor-identity-trace",
+      "status": "PASS"
+    },
+    {
+      "check": "real-audit-read-success",
+      "status": "PASS",
+      "httpStatus": 200
+    },
+    {
+      "check": "real-audit-read-success-no-store",
+      "status": "PASS"
+    },
+    {
+      "check": "real-audit-read-success-trace",
+      "status": "PASS"
+    },
+    {
+      "check": "audit-insert-fails-closed",
+      "status": "PASS",
+      "httpStatus": 503
+    },
+    {
+      "check": "audit-insert-fails-closed-no-store",
+      "status": "PASS"
+    },
+    {
+      "check": "audit-insert-fails-closed-trace",
+      "status": "PASS"
+    },
+    {
+      "check": "audit-insert-fails-closed-problem",
+      "status": "PASS"
+    },
+    {
+      "check": "audit-write-restored",
+      "status": "PASS",
+      "httpStatus": 200
+    },
+    {
+      "check": "audit-write-restored-no-store",
+      "status": "PASS"
+    },
+    {
+      "check": "audit-write-restored-trace",
+      "status": "PASS"
+    },
+    {
+      "check": "csrf-missing-rejected",
+      "status": "PASS",
+      "httpStatus": 403
+    },
+    {
+      "check": "csrf-missing-rejected-no-store",
+      "status": "PASS"
+    },
+    {
+      "check": "csrf-missing-rejected-trace",
+      "status": "PASS"
+    },
+    {
+      "check": "csrf-missing-rejected-problem",
+      "status": "PASS"
+    },
+    {
+      "check": "antiforgery-issued",
+      "status": "PASS",
+      "httpStatus": 200
+    },
+    {
+      "check": "antiforgery-issued-no-store",
+      "status": "PASS"
+    },
+    {
+      "check": "antiforgery-issued-trace",
+      "status": "PASS"
+    },
+    {
+      "check": "csrf-valid-logout",
+      "status": "PASS",
+      "httpStatus": 302
+    },
+    {
+      "check": "logout-cookie-replay-first",
+      "status": "PASS",
+      "httpStatus": 401
+    },
+    {
+      "check": "logout-cookie-replay-first-no-store",
+      "status": "PASS"
+    },
+    {
+      "check": "logout-cookie-replay-first-trace",
+      "status": "PASS"
+    },
+    {
+      "check": "logout-cookie-replay-first-problem",
+      "status": "PASS"
+    },
+    {
+      "check": "logout-cookie-replay-second",
+      "status": "PASS",
+      "httpStatus": 401
+    },
+    {
+      "check": "logout-cookie-replay-second-no-store",
+      "status": "PASS"
+    },
+    {
+      "check": "logout-cookie-replay-second-trace",
+      "status": "PASS"
+    },
+    {
+      "check": "logout-cookie-replay-second-problem",
+      "status": "PASS"
+    }
+  ],
+  "fault": "temporary trigger rejects only this synthetic auditor audit-read INSERT; restored in finally",
+  "scope": "actual local PostgreSQL/Keycloak/API/Alloy/Loki/Tempo, no production debug endpoint"
+}

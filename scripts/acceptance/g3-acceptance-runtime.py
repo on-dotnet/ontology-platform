@@ -146,6 +146,8 @@ def run_attempt():
             commands[0].append('--m2-api-only' if args.api_only else '--m2-ui-only' if args.ui_only else '--m2')
         if args.milestone == 'M3' and not args.workspace_smoke_only:
             commands[0].append('--m3-api-only' if args.api_only else '--m3-ui-only' if args.ui_only else '--m3')
+        if args.milestone == 'M3':
+            commands[-1] += ['--chain-report', 'm3-full-e2e.json']
         if args.smoke_fault_check:
             commands[0].append('--smoke-fault-check')
         if args.workspace_smoke_only:

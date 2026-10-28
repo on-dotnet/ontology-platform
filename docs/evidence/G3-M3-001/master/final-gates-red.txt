@@ -1,0 +1,55 @@
+CONTROL_PLANE_ONLY: substituted processes and telemetry I/O; real product NOT_RUN
+test_m3_readiness_reaches_only_its_exact_owned_dependency_volumes (__main__.M3FinalGateTests.test_m3_readiness_reaches_only_its_exact_owned_dependency_volumes) ... ERROR
+test_m3_readiness_refuses_future_or_mismatched_runtime_before_docker (__main__.M3FinalGateTests.test_m3_readiness_refuses_future_or_mismatched_runtime_before_docker) ... usage: readiness [-h] --runtime-file RUNTIME_FILE
+readiness: error: Historical volumes forbidden
+usage: readiness [-h] --runtime-file RUNTIME_FILE
+readiness: error: Historical volumes forbidden
+ok
+test_performance_uses_exact_m3_chain_and_preserves_failed_chain (__main__.M3FinalGateTests.test_performance_uses_exact_m3_chain_and_preserves_failed_chain) ... usage: performance [-h] [--runtime-file RUNTIME_FILE] [--from-observed-run]
+performance: error: unrecognized arguments: --chain-report m3-full-e2e.json
+ERROR
+
+======================================================================
+ERROR: test_m3_readiness_reaches_only_its_exact_owned_dependency_volumes (__main__.M3FinalGateTests.test_m3_readiness_reaches_only_its_exact_owned_dependency_volumes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/scripts/tests/G2Acceptance.Tests.py", line 367, in test_m3_readiness_reaches_only_its_exact_owned_dependency_volumes
+    with patch.object(sys, 'argv', ['readiness', '--runtime-file', str(runtime)]), patch.object(module.OPENER, 'open', side_effect=response), patch.object(module.subprocess, 'check_output', return_value='owned-container') as names, patch.object(module.subprocess, 'run') as commands, patch('evidence_paths.evidence_directory', return_value=module.ROOT):
+                                                                                                                                                                                                                                                                                            ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1487, in __enter__
+    self.target = self.getter()
+                  ~~~~~~~~~~~^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/pkgutil.py", line 513, in resolve_name
+    mod = importlib.import_module(modname)
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1404, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1369, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1333, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'evidence_paths'
+
+======================================================================
+ERROR: test_performance_uses_exact_m3_chain_and_preserves_failed_chain (__main__.M3FinalGateTests.test_performance_uses_exact_m3_chain_and_preserves_failed_chain)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/scripts/tests/G2Acceptance.Tests.py", line 396, in test_performance_uses_exact_m3_chain_and_preserves_failed_chain
+    self.assertEqual(module.main(),0)
+                     ~~~~~~~~~~~^^
+  File "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/scripts/acceptance/performance-baseline.py", line 21, in main
+    args = parser.parse_args()
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/argparse.py", line 1930, in parse_args
+    self.error(msg)
+    ~~~~~~~~~~^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/argparse.py", line 2686, in error
+    self.exit(2, _('%(prog)s: error: %(message)s\n') % args)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/argparse.py", line 2673, in exit
+    _sys.exit(status)
+    ~~~~~~~~~^^^^^^^^
+SystemExit: 2
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.036s
+
+FAILED (errors=2)

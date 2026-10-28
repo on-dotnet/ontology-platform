@@ -1,0 +1,23 @@
+{
+  "reviewer": "/root/m3_semantic_audit",
+  "status": "PASS",
+  "remainingP1P2": 0,
+  "previousFullRun": "a5c476bcb6d14b15ab3fae045405f838",
+  "previousSource": "34080c91b2655655465c201300dba5ad80886d69",
+  "reuseFirstFiveGates": true,
+  "actualBrowserChecks": 400,
+  "changedInputs": [
+    "scripts/acceptance/g2-readiness-fault.py",
+    "scripts/acceptance/g3-acceptance-runtime.py",
+    "scripts/acceptance/performance-baseline.py",
+    "scripts/tests/G2Acceptance.Tests.py"
+  ],
+  "productLockBuildInputsChanged": false,
+  "protection": "current private root plus exact M3 prefix12hex and parent-name match; future/mismatched dirs refused; fixed report names; failed chain refused",
+  "targetedRegression": {
+    "tests": 25,
+    "failures": 0,
+    "exitCode": 0
+  },
+  "lastTwoGates": "NOT_RUN at review; must really execute, original FAIL/exit2 retained"
+}

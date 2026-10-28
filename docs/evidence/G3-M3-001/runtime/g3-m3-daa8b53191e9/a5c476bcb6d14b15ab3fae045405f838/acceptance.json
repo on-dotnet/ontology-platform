@@ -1,0 +1,48 @@
+{
+  "runId": "a5c476bcb6d14b15ab3fae045405f838",
+  "sourceHead": "34080c91b2655655465c201300dba5ad80886d69",
+  "volumePrefix": "g3-m3-daa8b53191e9",
+  "scope": "FULL",
+  "milestone": "M3",
+  "evidenceDirectory": "docs/evidence/G3-M3-001/runtime/g3-m3-daa8b53191e9/a5c476bcb6d14b15ab3fae045405f838",
+  "status": "FAIL",
+  "startedAtUtc": "2026-10-28T16:17:10.634129+00:00",
+  "gates": [
+    {
+      "name": "full-g2-e2e.py",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "name": "g3-compatibility.py",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "name": "g1-regression.py",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "name": "g2-observability.py",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "name": "g2-trace-browser.mjs",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "name": "g2-readiness-fault.py",
+      "status": "FAIL",
+      "exitCode": 2
+    },
+    {
+      "name": "performance-baseline.py",
+      "status": "NOT_RUN",
+      "exitCode": null
+    }
+  ],
+  "completedAtUtc": "2026-10-28T16:19:07.646168+00:00"
+}

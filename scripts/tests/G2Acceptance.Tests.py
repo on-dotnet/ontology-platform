@@ -349,6 +349,59 @@ class ObservabilityStatusTests(unittest.TestCase):
         self.assertNotIn('synthetic-private-', ''.join(exported.values()) + output)
 
 
+class M3FinalGateTests(unittest.TestCase):
+    def test_m3_readiness_reaches_only_its_exact_owned_dependency_volumes(self):
+        module = load('g2-readiness-fault')
+        with tempfile.TemporaryDirectory() as directory:
+            module.ROOT = Path(directory)
+            prefix = 'g3-m3-012345abcdef'
+            runtime = module.ROOT / '.tools/security' / prefix / 'runtime.json'
+            runtime.parent.mkdir(parents=True)
+            runtime.write_text(json.dumps({'volumePrefix': prefix, 'healthKey': 'synthetic'}))
+            statuses = iter([401,200,503,200,503,200,503,200])
+            def response(*args, **kwargs):
+                code = next(statuses)
+                if code != 200:
+                    raise urllib.error.HTTPError('http://localhost', code, 'fixture', None, None)
+                return contextlib.nullcontext(type('Response', (), {'status':200})())
+            with patch.object(sys, 'path', [str(ACCEPTANCE), *sys.path]), patch.object(sys, 'argv', ['readiness', '--runtime-file', str(runtime)]), patch.object(module.OPENER, 'open', side_effect=response), patch.object(module.subprocess, 'check_output', return_value='owned-container') as names, patch.object(module.subprocess, 'run') as commands, patch('evidence_paths.evidence_directory', return_value=module.ROOT):
+                self.assertEqual(module.main(), 0)
+                for call in names.call_args_list:
+                    self.assertIn('volume='+prefix+'-', ' '.join(call.args[0]))
+                self.assertEqual([call.args[0][:2] for call in commands.call_args_list], [['docker','pause'],['docker','unpause']]*3)
+                self.assertEqual(json.loads((module.ROOT/'readiness-real-faults.json').read_text())['status'], 'PASS')
+
+    def test_m3_readiness_refuses_future_or_mismatched_runtime_before_docker(self):
+        module = load('g2-readiness-fault')
+        with tempfile.TemporaryDirectory() as directory:
+            module.ROOT = Path(directory)
+            runtime = module.ROOT / '.tools/security/other/runtime.json'
+            runtime.parent.mkdir(parents=True)
+            for prefix in ['g3-m4-012345abcdef', 'g3-m3-012345abcdef']:
+                runtime.write_text(json.dumps({'volumePrefix':prefix}))
+                with patch.object(sys,'argv',['readiness','--runtime-file',str(runtime)]), patch.object(module.subprocess,'check_output') as docker, self.assertRaises(SystemExit) as error:
+                    module.main()
+                self.assertEqual(error.exception.code,2)
+                docker.assert_not_called()
+
+    def test_performance_uses_exact_m3_chain_and_preserves_failed_chain(self):
+        module = load('performance-baseline')
+        with tempfile.TemporaryDirectory() as directory:
+            module.EVIDENCE=Path(directory)
+            samples={'environment':'Synthetic','sourceUtf8Bytes':1,'samples':[{'operation':name,'category':name,'elapsedMs':1} for name in ['shacl','sparql','publication','sse']]}
+            (module.EVIDENCE/'performance-observations.json').write_text(json.dumps(samples))
+            chain=module.EVIDENCE/'m3-full-e2e.json'
+            with patch.object(sys,'argv',['performance','--from-observed-run','--chain-report','m3-full-e2e.json']):
+                chain.write_text(json.dumps({'status':'PASS'}))
+                self.assertEqual(module.main(),0)
+                chain.write_text(json.dumps({'status':'FAIL'}))
+                with self.assertRaises(ValueError): module.main()
+            with patch.object(sys, 'argv', ['performance', '--runtime-file', 'unused', '--chain-report', 'm3-full-e2e.json']), patch.object(module.subprocess, 'run') as browser, self.assertRaises(SystemExit) as error:
+                module.main()
+            self.assertEqual(error.exception.code, 2)
+            browser.assert_not_called()
+
+
 class FetchBudgetTests(unittest.TestCase):
     def test_remaining_timeout_reaches_real_http_opener(self):
         module = load('g2-observability')

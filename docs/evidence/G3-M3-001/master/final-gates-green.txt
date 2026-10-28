@@ -1,0 +1,47 @@
+CONTROL_PLANE_ONLY: substituted processes and telemetry I/O; real product NOT_RUN
+test_remaining_timeout_reaches_real_http_opener (__main__.FetchBudgetTests.test_remaining_timeout_reaches_real_http_opener) ... ok
+test_m3_readiness_reaches_only_its_exact_owned_dependency_volumes (__main__.M3FinalGateTests.test_m3_readiness_reaches_only_its_exact_owned_dependency_volumes) ... {"check": "health_key_required", "status": "PASS", "httpStatus": 401, "elapsedMs": 0.07966702105477452, "maximumObservedEnvelopeMs": 3000, "internalBudgetMs": 2000}
+{"check": "all_real_modules_dependencies_ready", "status": "PASS", "httpStatus": 200, "elapsedMs": 0.01912500010803342, "maximumObservedEnvelopeMs": 3000, "internalBudgetMs": 2000}
+{"check": "jena_stall_fails_closed", "status": "PASS", "httpStatus": 503, "elapsedMs": 0.012125005014240742, "maximumObservedEnvelopeMs": 3000, "internalBudgetMs": 2000}
+{"check": "jena_recovered", "status": "PASS", "httpStatus": 200, "elapsedMs": 0.011416006600484252, "maximumObservedEnvelopeMs": 3000, "internalBudgetMs": 2000}
+{"check": "rustfs_stall_fails_closed", "status": "PASS", "httpStatus": 503, "elapsedMs": 0.007875001756474376, "maximumObservedEnvelopeMs": 3000, "internalBudgetMs": 2000}
+{"check": "rustfs_recovered", "status": "PASS", "httpStatus": 200, "elapsedMs": 0.007624999852851033, "maximumObservedEnvelopeMs": 3000, "internalBudgetMs": 2000}
+{"check": "governance_postgres_stall_fails_closed", "status": "PASS", "httpStatus": 503, "elapsedMs": 0.005874986527487636, "maximumObservedEnvelopeMs": 3000, "internalBudgetMs": 2000}
+{"check": "governance_postgres_recovered", "status": "PASS", "httpStatus": 200, "elapsedMs": 0.0070829992182552814, "maximumObservedEnvelopeMs": 3000, "internalBudgetMs": 2000}
+ok
+test_m3_readiness_refuses_future_or_mismatched_runtime_before_docker (__main__.M3FinalGateTests.test_m3_readiness_refuses_future_or_mismatched_runtime_before_docker) ... usage: readiness [-h] --runtime-file RUNTIME_FILE
+readiness: error: Historical volumes forbidden
+usage: readiness [-h] --runtime-file RUNTIME_FILE
+readiness: error: Only exactly owned M3 runtime accepted
+ok
+test_performance_uses_exact_m3_chain_and_preserves_failed_chain (__main__.M3FinalGateTests.test_performance_uses_exact_m3_chain_and_preserves_failed_chain) ... usage: performance [-h] [--runtime-file RUNTIME_FILE] [--from-observed-run]
+                   [--chain-report {full-g2-e2e.json,m3-full-e2e.json}]
+performance: error: M3 chain summary requires --from-observed-run
+ok
+test_atomic_success_report_replacement_failure_retains_fail (__main__.ObservabilityStatusTests.test_atomic_success_report_replacement_failure_retains_fail) ... ok
+test_complete_synthetic_io_path_is_the_only_pass (__main__.ObservabilityStatusTests.test_complete_synthetic_io_path_is_the_only_pass) ... ok
+test_fetch_failure_cannot_leave_stale_pass (__main__.ObservabilityStatusTests.test_fetch_failure_cannot_leave_stale_pass) ... ok
+test_initial_report_persistence_failure_cannot_leave_stale_pass (__main__.ObservabilityStatusTests.test_initial_report_persistence_failure_cannot_leave_stale_pass) ... ok
+test_never_visible_metric_expires_and_persists_fail (__main__.ObservabilityStatusTests.test_never_visible_metric_expires_and_persists_fail) ... ok
+test_never_visible_search_expires_and_persists_fail (__main__.ObservabilityStatusTests.test_never_visible_search_expires_and_persists_fail) ... ok
+test_non_temporary_http_errors_fail_without_polling (__main__.ObservabilityStatusTests.test_non_temporary_http_errors_fail_without_polling) ... ok
+test_one_deadline_covers_distinct_visibility_stages (__main__.ObservabilityStatusTests.test_one_deadline_covers_distinct_visibility_stages) ... ok
+test_pending_response_privacy_violation_fails_before_retry (__main__.ObservabilityStatusTests.test_pending_response_privacy_violation_fails_before_retry) ... ok
+test_pending_trace_search_logs_and_metrics_eventually_become_visible (__main__.ObservabilityStatusTests.test_pending_trace_search_logs_and_metrics_eventually_become_visible) ... ok
+test_persistent_report_write_failure_removes_stale_pass (__main__.ObservabilityStatusTests.test_persistent_report_write_failure_removes_stale_pass) ... ok
+test_privacy_failure_prevents_all_raw_exports (__main__.ObservabilityStatusTests.test_privacy_failure_prevents_all_raw_exports) ... ok
+test_raw_export_failure_after_all_assertions_cannot_report_pass (__main__.ObservabilityStatusTests.test_raw_export_failure_after_all_assertions_cannot_report_pass) ... ok
+test_response_after_shared_deadline_cannot_pass (__main__.ObservabilityStatusTests.test_response_after_shared_deadline_cannot_pass) ... ok
+test_success_report_persistence_failure_cannot_leave_pass (__main__.ObservabilityStatusTests.test_success_report_persistence_failure_cannot_leave_pass) ... ok
+test_temporary_network_and_503_are_retried (__main__.ObservabilityStatusTests.test_temporary_network_and_503_are_retried) ... ok
+test_wrong_association_and_metric_contract_fail_without_retry (__main__.ObservabilityStatusTests.test_wrong_association_and_metric_contract_fail_without_retry) ... ok
+test_all_six_required_gates_run_with_exact_project_node (__main__.OrchestrationTests.test_all_six_required_gates_run_with_exact_project_node) ... ok
+test_core_bootstrap_then_full_launcher_cleanup_is_preserved (__main__.OrchestrationTests.test_core_bootstrap_then_full_launcher_cleanup_is_preserved) ... ok
+test_each_child_failure_propagates_and_stops_later_gates (__main__.OrchestrationTests.test_each_child_failure_propagates_and_stops_later_gates) ... ok
+test_owned_full_launcher_survives_until_failure_and_is_stopped (__main__.OrchestrationTests.test_owned_full_launcher_survives_until_failure_and_is_stopped) ... ok
+
+----------------------------------------------------------------------
+Ran 25 tests in 0.738s
+
+OK
+{"status": "PASS", "actualSamples": 4, "coverage": {"shacl": true, "sparql": true, "publication": true, "sse": true}}

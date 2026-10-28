@@ -2,6 +2,7 @@
 """Verify real protected readiness with bounded stalls in only this G2 runtime's containers."""
 import argparse
 import json
+import re
 from pathlib import Path
 import subprocess
 import time
@@ -20,7 +21,11 @@ def main():
     if not path.is_relative_to((ROOT / '.tools/security').resolve()):
         parser.error('Only current checkout private runtime accepted')
     runtime = json.loads(path.read_text())
-    if not runtime['volumePrefix'].startswith(('g2-', 'g3-m1-', 'g3-m2-')):
+    prefix = runtime['volumePrefix']
+    if prefix.startswith('g3-m3-'):
+        if not re.fullmatch(r'g3-m3-[0-9a-f]{12}', prefix) or path.parent.name != prefix:
+            parser.error('Only exactly owned M3 runtime accepted')
+    elif not prefix.startswith(('g2-', 'g3-m1-', 'g3-m2-')):
         parser.error('Historical volumes forbidden')
     checks = []
     def probe(label,expected,authorized=True):
