@@ -6,6 +6,7 @@ No mutable latest tag is produced. The local receipt records every invocation;
 image labels record the first build owner. No environment/volume contents read.
 """
 import argparse
+from collections import OrderedDict
 import datetime as dt
 import hashlib
 import json
@@ -343,7 +344,8 @@ def strict_json(raw):
                 raise ValueError('Duplicate JSON field')
             result[key]=value
         return result
-    return json.loads(raw,object_pairs_hook=pairs)
+    def nonfinite(_):raise ValueError('Nonfinite JSON number')
+    return json.loads(raw,object_pairs_hook=pairs,parse_constant=nonfinite)
 
 
 def file_hash(path):
@@ -359,6 +361,118 @@ def safe_member_name(name):
     if not isinstance(name,str) or not name or any(ord(c)<32 or ord(c)==127 for c in name) or '\\' in name or path.is_absolute() or '..' in path.parts or name != path.as_posix():
         raise BuildRefused('Unsafe archive member path',category='CACHE_INVALID')
     return name
+
+
+def moby_json(value):
+    """Match Go encoding/json maps and explicit structs, including HTML escaping."""
+    if isinstance(value,dict):
+        keys=value if isinstance(value,OrderedDict) else sorted(value)
+        if any(not isinstance(key,str) for key in keys):raise ValueError()
+        return b'{'+b','.join(moby_json(key)+b':'+moby_json(value[key]) for key in keys)+b'}'
+    if isinstance(value,list):return b'['+b','.join(moby_json(item) for item in value)+b']'
+    if value is not None and type(value) not in (str,bool,int):raise ValueError()
+    if type(value) is int and not -(2**63)<=value<2**63:raise ValueError()
+    return (json.dumps(value,ensure_ascii=False,separators=(',',':'),allow_nan=False)
+            .replace('<','\\u003c').replace('>','\\u003e').replace('&','\\u0026')
+            .replace('\u2028','\\u2028').replace('\u2029','\\u2029').encode('utf-8'))
+
+
+def moby_container_config(value):
+    """Recreate the approved Moby container.Config struct; unknown fields refuse."""
+    value={} if value is None else value
+    fields=[('Hostname','',False),('Domainname','',False),('User','',False),('AttachStdin',False,False),
+            ('AttachStdout',False,False),('AttachStderr',False,False),('ExposedPorts',None,True),('Tty',False,False),
+            ('OpenStdin',False,False),('StdinOnce',False,False),('Env',None,False),('Cmd',None,False),
+            ('Healthcheck',None,True),('ArgsEscaped',False,True),('Image','',False),('Volumes',None,False),
+            ('WorkingDir','',False),('Entrypoint',None,False),('NetworkDisabled',False,True),('MacAddress','',True),
+            ('OnBuild',None,False),('Labels',None,False),('StopSignal','',True),('StopTimeout',None,True),('Shell',None,True)]
+    if not isinstance(value,dict) or set(value)-{key for key,_,_ in fields}:raise ValueError()
+    result=OrderedDict()
+    for key,default,optional in fields:
+        item=value.get(key,default)
+        if isinstance(default,(str,bool)):
+            item=default if item is None else item
+            if type(item) is not type(default):raise ValueError()
+        elif key in ('Env','Cmd','Entrypoint','OnBuild','Shell'):
+            if isinstance(item,str) and key in ('Cmd','Entrypoint'):item=[item]
+            if item is not None and (not isinstance(item,list) or any(not isinstance(v,str) for v in item)):raise ValueError()
+        elif key in ('ExposedPorts','Volumes','Labels'):
+            if item is not None:
+                if not isinstance(item,dict) or any(not isinstance(k,str) for k in item):raise ValueError()
+                item=dict(item)
+                for name,entry in item.items():
+                    if key=='Labels':
+                        item[name]='' if entry is None else entry
+                        if not isinstance(item[name],str):raise ValueError()
+                    else:
+                        if entry not in ({},None):raise ValueError()
+                        item[name]={}
+        elif key=='StopTimeout':
+            if item is not None and (type(item) is not int or not -(2**63)<=item<2**63):raise ValueError()
+        elif key=='Healthcheck' and item is not None:
+            order=('Test','Interval','Timeout','StartPeriod','StartInterval','Retries')
+            if not isinstance(item,dict) or set(item)-set(order):raise ValueError()
+            health=OrderedDict()
+            for field in order:
+                entry=item.get(field)
+                if entry is None:continue
+                if field=='Test':
+                    if not isinstance(entry,list) or any(not isinstance(v,str) for v in entry):raise ValueError()
+                elif type(entry) is not int or not 0<=entry<2**63:raise ValueError()
+                if entry:health[field]=entry
+            item=health
+        if optional and (item is None or (key not in ('StopTimeout','Healthcheck') and not item)):continue
+        result[key]=item
+    return result
+
+
+def moby_created(value):
+    """Normalize Go RFC3339Nano precision without dropping nanoseconds."""
+    if value is None:return None
+    if not isinstance(value,str):raise ValueError()
+    match=re.fullmatch(r'(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})(?:\.(\d{1,9}))?(Z|[+-]\d{2}:\d{2})',value)
+    if not match:raise ValueError()
+    dt.datetime.fromisoformat(value.replace('Z','+00:00'))
+    fraction=(match[2] or '').rstrip('0')
+    zone='Z' if match[3] in ('Z','+00:00','-00:00') else match[3]
+    return match[1]+('.'+fraction if fraction else '')+zone
+
+
+def moby_legacy_metadata(config):
+    """Derive each official V1 identity/blob from the exact rootfs prefix and image."""
+    diffs=config['rootfs']['diff_ids']
+    if not 1<=len(diffs)<=125:raise ValueError()
+    chain=''
+    parent=''
+    for index,diff in enumerate(diffs):
+        chain=diff if not chain else 'sha256:'+hashlib.sha256((chain+' '+diff).encode()).hexdigest()
+        final=index==len(diffs)-1
+        source=config if final else {'created':'1970-01-01T00:00:00Z'}
+        base=OrderedDict()
+        for field in ('comment','created','container','container_config','docker_version','author','config','architecture','variant','os','Size'):
+            item=source.get(field)
+            if field=='created':base[field]=moby_created(item)
+            elif field=='container_config':base[field]=moby_container_config(item)
+            elif field=='config':
+                if item is not None:base[field]=moby_container_config(item)
+            elif field=='Size':
+                if item is not None and (type(item) is not int or item<0):raise ValueError()
+                if item:base[field]=item
+            else:
+                if item is not None and not isinstance(item,str):raise ValueError()
+                if item:base[field]=item
+        identity=dict(base,layer_id=chain)
+        if parent:identity['parent']='sha256:'+parent
+        identifier=hashlib.sha256(moby_json(identity)).hexdigest()
+        stored=OrderedDict(id=identifier)
+        if parent:stored['parent']=parent
+        stored.update(base)
+        # Moby assigns OS after CreateID; intermediate IDs deliberately omit OS.
+        stored['os']=config['os']
+        raw=moby_json(stored)
+        if len(raw)>1024**2:raise ValueError()
+        yield 'blobs/sha256/'+hashlib.sha256(raw).hexdigest(),raw
+        parent=identifier
 
 
 def validate_archive(directory, expected, stage='cache restore'):
@@ -570,7 +684,24 @@ def validate_archive(directory, expected, stage='cache restore'):
             unreferenced=[name for name,member in members.items() if member.isfile() and name not in allowed]
             shape['unreferencedFileCount']=len(unreferenced)
             shape['unreferencedSha256BlobCount']=sum(bool(re.fullmatch(r'blobs/sha256/'+HEX64,name)) for name in unreferenced)
-            if unreferenced:raise ValueError()
+            if unreferenced:
+                # Only the complete deterministic Moby V1 set may authorize extras.
+                if shape['format']!='OCI' or 'LayerSources' not in record or len(unreferenced)!=len(config['rootfs']['diff_ids']):raise ValueError()
+                for name in unreferenced:
+                    if not re.fullmatch(r'blobs/sha256/'+HEX64,name):raise ValueError()
+                    item=strict_json(read(name))
+                    if not isinstance(item,dict) or not {'id','created','container_config','os'} <= set(item):raise ValueError()
+                shape['legacyMetadataCandidateCount']=len(unreferenced)
+                check='V1_METADATA_DERIVATION'
+                generated=list(moby_legacy_metadata(config))
+                check='V1_METADATA_MEMBERS'
+                if {name for name,_ in generated}!=set(unreferenced):raise ValueError()
+                check='V1_METADATA_CONTENT'
+                for name,raw in generated:
+                    actual=read(name)
+                    if actual!=raw or hashlib.sha256(actual).hexdigest()!=name.rsplit('/',1)[1]:raise ValueError()
+                    allowed.add(name)
+                shape['verifiedLegacyMetadataCount']=len(generated)
         return receipt
     except (OSError,ValueError,KeyError,TypeError,AttributeError,tarfile.TarError,BuildRefused):
         diagnostic=dict(validationCheck=check,archiveShape=shape)

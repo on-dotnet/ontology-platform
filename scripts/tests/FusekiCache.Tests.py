@@ -188,6 +188,91 @@ class FusekiCacheTests(unittest.TestCase):
         self.assertEqual(caught.exception.diagnostic['archiveShape']['unreferencedFileCount'],1)
         self.assertEqual(caught.exception.diagnostic['archiveShape']['unreferencedSha256BlobCount'],1)
 
+    def moby_v1_archive(self, mutate=None):
+        identity=self.identity();directory,receipt=self.archive(identity)
+        with tarfile.open(directory/'image.tar') as archive:
+            record=json.load(archive.extractfile('manifest.json'))[0]
+            config=json.load(archive.extractfile(record['Config']))
+        layers=[b'layer-one',b'layer-two']
+        diffs=['sha256:'+hashlib.sha256(raw).hexdigest() for raw in layers]
+        config.update(created='2026-10-28T10:00:00Z',rootfs={'type':'layers','diff_ids':diffs})
+        config_raw=json.dumps(config,sort_keys=True).encode();receipt['imageId']='sha256:'+hashlib.sha256(config_raw).hexdigest()
+        zero=dict(Hostname='',Domainname='',User='',AttachStdin=False,AttachStdout=False,AttachStderr=False,
+                  Tty=False,OpenStdin=False,StdinOnce=False,Env=None,Cmd=None,Image='',Volumes=None,WorkingDir='',Entrypoint=None,OnBuild=None,Labels=None)
+        config_go=dict(zero,Labels=dict(sorted(config['config']['Labels'].items())))
+        def encode(value):
+            return json.dumps(value,ensure_ascii=False,separators=(',',':')).replace('<','\\u003c').replace('>','\\u003e').replace('&','\\u0026').encode()
+        metadata=[];parent='';chain=''
+        for index,diff in enumerate(diffs):
+            chain=diff if not chain else 'sha256:'+hashlib.sha256((chain+' '+diff).encode()).hexdigest()
+            base=dict(created='1970-01-01T00:00:00Z',container_config=zero)
+            if index==len(diffs)-1:base=dict(created=config['created'],container_config=zero,config=config_go,architecture='amd64',os='linux')
+            id_input=dict(base,layer_id=chain)
+            if parent:id_input['parent']='sha256:'+parent
+            identifier=hashlib.sha256(encode(dict(sorted(id_input.items())))).hexdigest()
+            item=dict(id=identifier)
+            if parent:item['parent']=parent
+            item.update(base);item['os']='linux'
+            raw=encode(item)
+            metadata.append(('blobs/sha256/'+hashlib.sha256(raw).hexdigest(),raw))
+            parent=identifier
+        if mutate:mutate(metadata)
+        sources={diff:dict(mediaType='application/vnd.oci.image.layer.v1.tar',digest=diff,size=len(raw)) for diff,raw in zip(diffs,layers)}
+        docker=dict(Config='blobs/sha256/'+receipt['imageId'][7:],RepoTags=[identity['image']],
+                    Layers=['blobs/sha256/'+diff[7:] for diff in diffs],LayerSources=sources)
+        oci=dict(schemaVersion=2,mediaType='application/vnd.oci.image.manifest.v1+json',
+                 config=dict(mediaType='application/vnd.oci.image.config.v1+json',digest=receipt['imageId'],size=len(config_raw)),
+                 layers=list(sources.values()))
+        oci_raw=json.dumps(oci).encode();oci_digest='sha256:'+hashlib.sha256(oci_raw).hexdigest()
+        entries=[(docker['Config'],config_raw),*[(name,raw) for name,raw in zip(docker['Layers'],layers)],
+                 ('manifest.json',json.dumps([docker]).encode()),('blobs/sha256/'+oci_digest[7:],oci_raw),
+                 ('oci-layout',b'{"imageLayoutVersion":"1.0.0"}'),
+                 ('index.json',json.dumps(dict(schemaVersion=2,manifests=[dict(mediaType=oci['mediaType'],digest=oci_digest,size=len(oci_raw))])).encode()),
+                 ('repositories',json.dumps({'ontology-platform-fuseki':{identity['image'].split(':',1)[1]:diffs[-1][7:]}}).encode()),*metadata]
+        self.rewrite_archive(directory,receipt,entries)
+        return identity,directory,receipt
+
+    def test_moby_go_struct_json_defaults_map_sorting_and_html_escaping(self):
+        actual=self.mod.moby_json(self.mod.moby_container_config({'User':'10001:10001','Env':[], 'Labels':{'z':'<&>','a':'中'}}))
+        expected='{"Hostname":"","Domainname":"","User":"10001:10001","AttachStdin":false,"AttachStdout":false,"AttachStderr":false,"Tty":false,"OpenStdin":false,"StdinOnce":false,"Env":[],"Cmd":null,"Image":"","Volumes":null,"WorkingDir":"","Entrypoint":null,"OnBuild":null,"Labels":{"a":"中","z":"\\u003c\\u0026\\u003e"}}'
+        self.assertEqual(actual,expected.encode())
+        with self.assertRaises(ValueError):self.mod.moby_container_config({'SYNTHETIC_PRIVATE_FIELD':'ignored?'})
+
+    def test_moby_rfc3339nano_preserves_submicrosecond_identity(self):
+        self.assertEqual(self.mod.moby_created('2026-10-28T10:00:00.123456780+00:00'),'2026-10-28T10:00:00.12345678Z')
+        self.assertNotEqual(self.mod.moby_created('2026-10-28T10:00:00.123456781Z'),self.mod.moby_created('2026-10-28T10:00:00.123456782Z'))
+        for raw in ('{"value":NaN}','{"value":Infinity}','{"value":-Infinity}'):
+            with self.subTest(raw=raw):
+                with self.assertRaises(ValueError):self.mod.strict_json(raw)
+
+    def test_official_moby_oci_layer_sources_and_exact_v1_metadata_are_accepted(self):
+        identity,directory,receipt=self.moby_v1_archive()
+        self.assertEqual(self.mod.validate_archive(directory,identity)['imageId'],receipt['imageId'])
+
+    def test_v1_metadata_tampering_is_not_authorized_by_rehashing_blob_and_archive(self):
+        changes=[{'id':'f'*64},{'parent':'e'*64},{'os':'windows'},{'created':'2000-01-01T00:00:00Z'},
+                 {'config':{'Labels':{'foreign':'SYNTHETIC_PRIVATE_TOKEN'}}},{'SYNTHETIC_PRIVATE_FIELD':'SYNTHETIC_PRIVATE_TOKEN'}]
+        for change in changes:
+            with self.subTest(change=change):
+                def mutate(items):
+                    value=json.loads(items[-1][1]);value.update(change);raw=json.dumps(value,separators=(',',':')).encode()
+                    items[-1]=('blobs/sha256/'+hashlib.sha256(raw).hexdigest(),raw)
+                identity,directory,_=self.moby_v1_archive(mutate)
+                with self.assertRaises(self.mod.BuildRefused):self.mod.validate_archive(directory,identity)
+
+    def test_v1_metadata_requires_every_exact_rootfs_prefix_without_extra_blob(self):
+        for change in ('missing','extra','nonfinite','wrong-bytes','unknown'):
+            with self.subTest(change=change):
+                def mutate(items):
+                    if change=='missing':items.pop()
+                    elif change=='extra':items.append(('blobs/sha256/'+'f'*64,items[-1][1]))
+                    elif change=='wrong-bytes':items[-1]=(items[-1][0],items[-1][1]+b' ')
+                    elif change=='nonfinite':
+                        raw=items[-1][1][:-1]+b',"Size":NaN}';items[-1]=('blobs/sha256/'+hashlib.sha256(raw).hexdigest(),raw)
+                    else:items.append(('blobs/sha256/'+hashlib.sha256(b'{}').hexdigest(),b'{}'))
+                identity,directory,_=self.moby_v1_archive(mutate)
+                with self.assertRaises(self.mod.BuildRefused):self.mod.validate_archive(directory,identity)
+
     def test_real_engine_oci_manifest_id_is_valid_without_config_id_confusion(self):
         identity,directory,receipt=self.oci_archive()
         self.assertEqual(self.mod.validate_archive(directory,identity)['imageId'],receipt['imageId'])

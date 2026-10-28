@@ -1,0 +1,16 @@
+............................................E................
+======================================================================
+ERROR: test_official_moby_oci_layer_sources_and_exact_v1_metadata_are_accepted (__main__.FusekiCacheTests.test_official_moby_oci_layer_sources_and_exact_v1_metadata_are_accepted)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 237, in test_official_moby_oci_layer_sources_and_exact_v1_metadata_are_accepted
+    self.assertEqual(self.mod.validate_archive(directory,identity)['imageId'],receipt['imageId'])
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/maintenance/canonical_fuseki.py", line 577, in validate_archive
+    raise BuildRefused('Cache archive validation refused',diagnostic,category='CACHE_INVALID',stage=stage) from None
+cache_canonical.BuildRefused: Cache archive validation refused
+
+----------------------------------------------------------------------
+Ran 61 tests in 0.726s
+
+FAILED (errors=1)
