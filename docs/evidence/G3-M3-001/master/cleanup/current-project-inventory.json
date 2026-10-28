@@ -1,0 +1,160 @@
+{
+  "schemaVersion": 1,
+  "status": "OBSERVED",
+  "observedAtUtc": "2026-10-28T14:00:23.428933+00:00",
+  "totalCounts": {
+    "containers": 0,
+    "volumes": 9,
+    "images": 13,
+    "history": 8,
+    "networks": 3
+  },
+  "backend": {
+    "context": "desktop-linux",
+    "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016",
+    "bridgeId": "598a7cfb501e1143165f2058b93820ef658636de16984398eeef834d3d218188",
+    "buildxVersion": "github.com/docker/buildx v0.38.1 0dbe87f36ed472fe36b6796c3f70b4210a731fc5",
+    "builder": "Name:          desktop-linux\nDriver:        docker\nLast Activity: 2026-10-28 13:49:49 +0000 UTC\n\nNodes:\nName:             desktop-linux\nEndpoint:         desktop-linux\nStatus:           running\nBuildKit version: v0.34.0\nPlatforms:        linux/arm64, linux/amd64, linux/amd64/v2, linux/riscv64, linux/ppc64le, linux/s390x, linux/386\nLabels:\n org.mobyproject.buildkit.worker.containerd.namespace: moby\n org.mobyproject.buildkit.worker.containerd.uuid:      c943f7ae-b2dc-482e-bdb4-28fee25f5502\n org.mobyproject.buildkit.worker.executor:             containerd\n org.mobyproject.buildkit.worker.hostname:             docker-desktop\n org.mobyproject.buildkit.worker.moby.host-gateway-ip: 192.168.65.254\n org.mobyproject.buildkit.worker.network:              host\n org.mobyproject.buildkit.worker.selinux.enabled:      false\n org.mobyproject.buildkit.worker.snapshotter:          overlayfs\nDevices:\n Name:                  docker.com/gpu=webgpu\n Automatically allowed: false\nGC Policy rule#0:\n All:            false\n Filters:        type==source.local type==exec.cachemount type==source.git.checkout\n Keep Duration:  48h0m0s\n Max Used Space: 2.764GiB\nGC Policy rule#1:\n All:            false\n Keep Duration:  1440h0m0s\n Reserved Space: 20GiB\nGC Policy rule#2:\n All:            false\n Reserved Space: 20GiB\nGC Policy rule#3:\n All:            true\n Reserved Space: 20GiB"
+  },
+  "projectImages": [
+    {
+      "Id": "sha256:05040926259ace989082fac0fb2f52d33f4a8122a9a85cb617eb76965b484a39",
+      "RepoTags": [
+        "ontology-platform-fuseki:context-6bc72da7b5570e60b43cb978965e096fa512befca1e80dbf76ef0710fa681018"
+      ],
+      "RepoDigests": [
+        "ontology-platform-fuseki@sha256:05040926259ace989082fac0fb2f52d33f4a8122a9a85cb617eb76965b484a39"
+      ],
+      "Size": 503312996,
+      "Created": "2026-10-26T02:07:21.88926401Z",
+      "Labels": {
+        "org.opencontainers.image.source": "https://github.com/on-dotnet/ontology-platform",
+        "io.ontology-platform.task-id": "G3-M1-CLOSEOUT-002",
+        "io.ontology-platform.run-id": "canonical-validation-1",
+        "io.ontology-platform.context-sha256": "6bc72da7b5570e60b43cb978965e096fa512befca1e80dbf76ef0710fa681018",
+        "com.docker.compose.project": "",
+        "com.docker.compose.service": ""
+      },
+      "references": [],
+      "decision": {
+        "classification": "AMBIGUOUS",
+        "reason": "Exact owner/recovery classification has not been reviewed",
+        "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+      }
+    },
+    {
+      "Id": "sha256:39b0fb6616a466a05b2ff8c691bb14a63557c70118d433a4b70fd1068b1bef60",
+      "RepoTags": [
+        "ontology-platform-fuseki:context-1e45f836d9837cbc75d23adb3ad37b0ff79a545ef06102a87aa246feea9cc1e5"
+      ],
+      "RepoDigests": [
+        "ontology-platform-fuseki@sha256:39b0fb6616a466a05b2ff8c691bb14a63557c70118d433a4b70fd1068b1bef60"
+      ],
+      "Size": 503334439,
+      "Created": "2026-10-27T15:06:39.518416545Z",
+      "Labels": {
+        "org.opencontainers.image.source": "https://github.com/on-dotnet/ontology-platform",
+        "io.ontology-platform.task-id": "G3-M2-001",
+        "io.ontology-platform.run-id": "download-context-fixed-cold",
+        "io.ontology-platform.context-sha256": "1e45f836d9837cbc75d23adb3ad37b0ff79a545ef06102a87aa246feea9cc1e5",
+        "com.docker.compose.project": "",
+        "com.docker.compose.service": ""
+      },
+      "references": [],
+      "decision": {
+        "classification": "AMBIGUOUS",
+        "reason": "Exact owner/recovery classification has not been reviewed",
+        "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+      }
+    },
+    {
+      "Id": "sha256:401e1fbc58c27b08c3103e00c86b22bd175a1cdd8f8a7d61965133f27a24437f",
+      "RepoTags": [
+        "ontology-platform-g2-fuseki:6.2.0"
+      ],
+      "RepoDigests": [
+        "ontology-platform-g2-fuseki@sha256:401e1fbc58c27b08c3103e00c86b22bd175a1cdd8f8a7d61965133f27a24437f"
+      ],
+      "Size": 503312701,
+      "Created": "2026-10-26T02:07:21.88926401Z",
+      "Labels": {
+        "org.opencontainers.image.source": "",
+        "io.ontology-platform.task-id": "",
+        "io.ontology-platform.run-id": "",
+        "io.ontology-platform.context-sha256": "",
+        "com.docker.compose.project": "",
+        "com.docker.compose.service": ""
+      },
+      "references": [],
+      "decision": {
+        "classification": "AMBIGUOUS",
+        "reason": "Exact owner/recovery classification has not been reviewed",
+        "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+      }
+    }
+  ],
+  "projectHistory": [
+    {
+      "Ref": "qydp3k8m5h46i07t182f2ojey",
+      "Name": "infra/development/fuseki",
+      "Context": "infra/development/fuseki",
+      "Dockerfile": "infra/development/fuseki/Dockerfile",
+      "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+      "VCSRevision": "867f8ce8b2fe600a7514c1b6866ec98ddf5be7a4",
+      "Status": "failed",
+      "decision": {
+        "classification": "AMBIGUOUS",
+        "reason": "Exact owner/recovery classification has not been reviewed",
+        "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+      }
+    },
+    {
+      "Ref": "20b0q7l3v4hjmtem8si9g0lxc",
+      "Name": "infra/development/fuseki",
+      "Context": "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/infra/development/fuseki",
+      "Dockerfile": "infra/development/fuseki/Dockerfile",
+      "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+      "VCSRevision": "67332cace3d134e31b723226071f1d630453cd59",
+      "Status": "failed",
+      "decision": {
+        "classification": "AMBIGUOUS",
+        "reason": "Exact owner/recovery classification has not been reviewed",
+        "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+      }
+    },
+    {
+      "Ref": "lpsg3gngs8x1rvrnb25yjoyn0",
+      "Name": "infra/development/fuseki",
+      "Context": "/Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/infra/development/fuseki",
+      "Dockerfile": "infra/development/fuseki/Dockerfile",
+      "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+      "VCSRevision": "903e08b3bf9e52dc4bf69068806cb722fd8e79ac",
+      "Status": "completed",
+      "decision": {
+        "classification": "AMBIGUOUS",
+        "reason": "Exact owner/recovery classification has not been reviewed",
+        "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+      }
+    },
+    {
+      "Ref": "8q69crf65sf5ffy9tfqlapd3a",
+      "Name": "infra/development/fuseki",
+      "Context": "/Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform/infra/development/fuseki",
+      "Dockerfile": "infra/development/fuseki/Dockerfile",
+      "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+      "VCSRevision": "903e08b3bf9e52dc4bf69068806cb722fd8e79ac",
+      "Status": "failed",
+      "decision": {
+        "classification": "AMBIGUOUS",
+        "reason": "Exact owner/recovery classification has not been reviewed",
+        "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+      }
+    }
+  ],
+  "foreignOrUnknownImageCount": 10,
+  "foreignOrUnknownHistoryCount": 4,
+  "protectedLegacyG2VolumeCount": 8,
+  "otherOrUnknownVolumeCount": 1,
+  "boundary": "Only project-owned metadata retained; foreign concurrent resources are protected, not candidates.",
+  "physicalReclaimedBytes": "NOT_VERIFIED"
+}

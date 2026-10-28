@@ -1,0 +1,51 @@
+{
+  "ciContext": {
+    "GITHUB_RUN_ATTEMPT": "1",
+    "GITHUB_RUN_ID": "40700463473"
+  },
+  "contextSha256": "cc238fbd02eb8151dd42f751f5dae16c445d6e408cc4440f7f95a9575b44e66e",
+  "elapsedSeconds": 11.824,
+  "envFingerprint": "3623658350d70a583ed2425f34f1ab615c3ea1c83c0349ca5bae61bcd436cd1d",
+  "failure": {
+    "archiveShape": {
+      "directoryCount": 2,
+      "fileCount": 26,
+      "format": "OCI",
+      "layerSourceDigestKeyCount": 10,
+      "layerSourceKnownFields": [
+        "digest",
+        "mediaType",
+        "size"
+      ],
+      "layerSourceUnknownFieldCount": 0,
+      "layerSourcesCount": 10,
+      "linkCount": 0,
+      "manifestOptionalFields": [
+        "LayerSources"
+      ],
+      "manifestRecordCount": 1,
+      "manifestUnknownFieldCount": 0,
+      "memberCount": 28,
+      "specialCount": 0,
+      "unreferencedFileCount": 10,
+      "unreferencedSha256BlobCount": 10
+    },
+    "validationCheck": "UNREFERENCED_MEMBERS"
+  },
+  "inputFingerprint": "40643d96ea39a05b0cc56df8813ce1f7030add5c7f671d22ed62643d067eee0e",
+  "observedAt": "2026-10-28T13:52:56.713182+00:00",
+  "reason": "Cache archive validation refused",
+  "runId": "ci-preflight-40700463473-1",
+  "schemaVersion": 1,
+  "stages": [
+    {
+      "durationMs": 11824,
+      "errorCategory": "CACHE_INVALID",
+      "inputFingerprint": "40643d96ea39a05b0cc56df8813ce1f7030add5c7f671d22ed62643d067eee0e",
+      "outcome": "FAIL",
+      "stage": "cache export"
+    }
+  ],
+  "status": "FAILED",
+  "taskId": "G3-M3-001"
+}

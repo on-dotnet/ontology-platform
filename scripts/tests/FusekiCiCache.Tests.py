@@ -4,6 +4,10 @@ from pathlib import Path
 import tempfile
 import unittest
 import re
+import json
+import os
+import subprocess
+import sys
 
 ROOT=Path(__file__).resolve().parents[2]
 spec=importlib.util.spec_from_file_location('ci_cache',ROOT/'scripts/maintenance/fuseki_ci_cache.py')
@@ -44,30 +48,48 @@ class WorkflowScopeTests(unittest.TestCase):
         self.workflow=(ROOT/'.github/workflows/ci.yml').read_text()
 
     def scope_condition(self):
-        return re.search(r'  engineering:\n    if: (.+)',self.workflow).group(1)
+        return re.search(r'  engineering:\n    needs: scope\n    if: (.+)',self.workflow).group(1)
 
     def evaluate(self,event,ref,message='',manual=False):
-        expression=self.scope_condition()
-        values={'github.event_name':event,'github.ref':ref,
-                'github.event.head_commit.message':message,'inputs.canonical_only':manual}
-        for key,value in sorted(values.items(),key=lambda pair:-len(pair[0])):
-            expression=expression.replace(key,repr(value))
-        expression=expression.replace('&&',' and ').replace('||',' or ').replace('!contains','not contains')
-        expression=re.sub(r'\btrue\b','True',expression)
-        return eval(expression,{'__builtins__':{},'contains':lambda source,part:part in source},{})
+        path=ROOT/'scripts/maintenance/ci_scope.py'
+        spec=importlib.util.spec_from_file_location('ci_scope',path)
+        scope=importlib.util.module_from_spec(spec);spec.loader.exec_module(scope)
+        payload={'head_commit':{'message':message},'inputs':{'canonical_only':manual}}
+        return not scope.canonical_only(event,ref,payload)
 
     def test_diagnostic_marker_only_skips_exact_authorized_push_branch(self):
         marker='fix [canonical-diagnostic]'
         self.assertFalse(self.evaluate('push','refs/heads/codex/g3-m3-master',marker))
-        for event,ref in [('push','refs/heads/main'),('push','refs/heads/other'),
+        for event,ref in [('push','refs/heads/main'),('push','refs/heads/other'),('push','refs/heads/CODEX/G3-M3-MASTER'),
                           ('pull_request','refs/pull/1/merge')]:
             self.assertTrue(self.evaluate(event,ref,marker))
         self.assertTrue(self.evaluate('push','refs/heads/codex/g3-m3-master','ordinary fix'))
+        self.assertTrue(self.evaluate('push','refs/heads/codex/g3-m3-master','[CANONICAL-DIAGNOSTIC]'))
         self.assertFalse(self.evaluate('workflow_dispatch','refs/heads/codex/g3-m3-master','',True))
         self.assertTrue(self.evaluate('workflow_dispatch','refs/heads/codex/g3-m3-master','',False))
 
+    def test_actual_scope_cli_writes_only_boolean_output(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory);event=root/'event.json';output=root/'output.txt'
+            event.write_text(json.dumps({'head_commit':{'message':'[canonical-diagnostic]'}}))
+            env={**os.environ,'GITHUB_EVENT_PATH':str(event),'GITHUB_OUTPUT':str(output),
+                 'GITHUB_EVENT_NAME':'push','GITHUB_REF':'refs/heads/codex/g3-m3-master'}
+            result=subprocess.run([sys.executable,str(ROOT/'scripts/maintenance/ci_scope.py')],
+                                  env=env,capture_output=True,text=True,timeout=5)
+            self.assertEqual(result.returncode,0)
+            self.assertEqual(output.read_text(),'canonical_only=true\n')
+            self.assertIn('full required CI NOT_VERIFIED',result.stdout)
+
+    def test_invalid_manual_values_are_not_coerced_to_approval(self):
+        for value in [0,1,None,[],{},'TRUE','true\nother=unsafe']:
+            with self.subTest(value=value),self.assertRaises((ValueError,TypeError)):
+                self.evaluate('workflow_dispatch','refs/heads/main',manual=value)
+
     def test_all_application_steps_use_same_guard_and_cache_is_still_push_only(self):
         guard=self.scope_condition()
+        self.assertEqual(guard,"needs.scope.outputs.canonical_only != 'true'")
+        self.assertEqual(self.workflow.count('    needs: scope'),2)
+        self.assertIn('run: python3 scripts/maintenance/ci_scope.py',self.workflow)
         self.assertEqual(self.workflow.count('if: '+guard),5)
         for name in ['Frozen restore and backend build','Real PostgreSQL security integration',
                      'Real G2 semantic publishing query MCP MAF and native SSE integration']:

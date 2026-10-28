@@ -69,3 +69,7 @@ jobs:
 - [精确Action声明](https://raw.githubusercontent.com/actions/upload-artifact/cf430e030ddbb5b0abf93d22962f4752f3646cd9/action.yml)
 - [PUBLIC标准arm64 runner](https://docs.github.com/en/actions/reference/runners/github-hosted-runners)
 - [Actions免费使用及存储边界](https://docs.github.com/en/billing/concepts/product-billing/github-actions)
+
+## 实施状态：BLOCKED_ACCOUNT_BUDGET_UNKNOWN
+
+人类随后明确回复“无法确认；保持artifact上传阻断”。既有凭证只读组织计费接口返回404；public runner免费不能证明artifact账户池尚有额度。保留上述精确依赖审批，但不激活workflow/上传、不购买容量或扩大权限，不制造账户budget proof。当前改用同一已批准Apache源在宿主预取及冻结SHA512验证的canonical路径解决本机网络差异。

@@ -39,3 +39,15 @@ TaskRunTimeline JSONL：schemaVersion/taskId/runId/stepId/taskType/inputFingerpr
 ## 写入所有权
 
 E0-A worker独立托管树：scripts/maintenance/canonical_fuseki.py、scripts/tests/CanonicalFuseki.Tests.py、scripts/tests/CanonicalFuseki.Real.Tests.py、允许新增scripts/tests/FusekiCache.Tests.py、infra/development/fuseki/Dockerfile/fetch-fuseki.sh/.dockerignore、docs/evidence/G3-M3-001/E0-A/**。不修改CI/verify/AppHost/公共规范或其他模块。Master负责接入CI/verify/AppHost及独立Review；需要新公共接口先报告。只读依赖为本合同、AGENTS/PLANS、M2交付、现有AppHost/acceptance入口。worker不能自行合并main。
+
+## E0-A源下载执行位置修正（2026-10-28，Master冻结增量）
+
+真实Mac Docker内两源各180秒超时；宿主对相同dlcdn固定发行包下载成功，51398669bytes、冻结SHA512完全一致。artifact账户费用无法确认，人类明确保持上传阻断。因此在已批准的同一官方依赖范围内，将冷构建源预取移至canonical唯一入口的宿主进程，供同一Dockerfile的受控named context使用；不改系统网络/镜像源/凭证，不经第三方代理，不新增包或发布。
+
+build/CLI公共签名保持；--identity无下载；已校验image复用或跨run restore HIT均不能触发源下载。只有确认缺当前精确canonical image的cold分支才准备源：固定两个Apache HTTPS URL、版本/SHA512、每源180秒/connect15/3跳/无retry/最大256MiB，先查项目归属cache，普通文件/有限大小/每次SHA512验证；坏hash立即失败，不将其当网络fallback。只缓存已校验源，临时下载与复制不可跟随symlink或包含其它文件。共享canonical锁继续防多树重复。源归属/准确路径/容量和复查条件进入资源索引，ignored源文件不Git/Review ZIP。
+
+唯一docker build增加受控 --build-context fuseki_source=<仅fuseki.tar.gz的隔离目录>；同一受审DockerfileCOPY入临时路径，再在容器内实际SHA512验证后extract及删除。image输入仍绑定tracked context、完整helper实现、冻结发行包SHA512和平台；新增helper若分文件亦必须纳入fingerprint。上下文/源变化拒绝，不使用旧镜像改tag冒充新身份。host network/cache验证、checksum、容器checksum、extract/COPY、image preparation分别真实计时，不能用静态fixture代替真实cold。
+
+失败候选仍以新input/env/阶段绑定。新network故障发生在host预取时，20秒短复现必须在相同host执行位置对相同固定官方源做有界HEAD；不得用Docker网络失败或base缺失推断host源失败。历史Docker探测/失败日志保留，新输入不会沿用旧失败。候选短复现仍不下载整包，重现exit2；--final-gate仍须真实最终校验。不得为网络变化无界重试。负例扩展：cache损坏/链接/超限、恶意redirect/参数、下载checksum错、named context额外输入、helper变化失效、warm不下载。
+
+该增量仅E0已批准依赖的执行效率修复；M3语义合同与冻结版本均不变。artifact helper可保留默认BLOCKED测试，不能激活upload或制造账户额度证明。

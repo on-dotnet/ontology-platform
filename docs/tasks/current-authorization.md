@@ -1,6 +1,6 @@
 # G3-M3-001 当前授权增量（2026-10-28）
 
-状态：IN_PROGRESS / E0_PREFLIGHT。人类本会话正式授权[附件V1](../evidence/G3-M3-001/authorization-v1.md)全部G3-M3-001及E0工程效率治理，由Codex Master组织独立托管Worktree、多Agent、先合同后并行、增量集成、独立Review、真实端到端、同HeadCI及唯一Review ZIP V3。最新fetch确认Base=`c8f1040829b2bfe1e9f7e36223092286975643f0`。只M3+E0，不执行M4/M5/G4/G5；QUDT正式资产、新直接依赖、镜像发布/额外权限及付费服务须具体审批。批准前使用Synthetic单位RDF fixture。旧M2通过事项及PARTIAL/失败事实不改。任务、路径所有权和恢复见[G3-M3任务卡](G3-M3-001.md)。
+状态：IN_PROGRESS / E0_CANONICAL_COMPATIBILITY_AND_M3_INTEGRATION。人类本会话正式授权[附件V1](../evidence/G3-M3-001/authorization-v1.md)全部G3-M3-001及E0工程效率治理，由Codex Master组织独立托管Worktree、多Agent、先合同后并行、增量集成、独立Review、真实端到端、同HeadCI及唯一Review ZIP V3。最新fetch确认Base=`c8f1040829b2bfe1e9f7e36223092286975643f0`。只M3+E0，不执行M4/M5/G4/G5；QUDT正式资产、新直接依赖、镜像发布/额外权限及付费服务须具体审批。批准前使用Synthetic单位RDF fixture。旧M2通过事项及PARTIAL/失败事实不改。任务、路径所有权和恢复见[G3-M3任务卡](G3-M3-001.md)。
 
 ---
 

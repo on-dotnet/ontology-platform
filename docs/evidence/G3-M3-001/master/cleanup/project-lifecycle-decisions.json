@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "taskId": "G3-M3-001",
+  "observedAtUtc": "2026-10-28T14:07:31.725849+00:00",
+  "sourceInventory": "current-project-inventory.json",
+  "records": [
+    {
+      "type": "docker-image",
+      "target": "sha256:05040926259ace989082fac0fb2f52d33f4a8122a9a85cb617eb76965b484a39",
+      "repoTags": [
+        "ontology-platform-fuseki:context-6bc72da7b5570e60b43cb978965e096fa512befca1e80dbf76ef0710fa681018"
+      ],
+      "classification": "CANDIDATE_PENDING_GATES",
+      "reason": "Closed M1 canonical is superseded by retained M2 canonical; immutable source and current no-reference metadata are available.",
+      "releaseCondition": "Complete reviewed exact-ID plan after current full CI and retained environment health; preserve source commit and exact rebuild command.",
+      "referenceCount": 0
+    },
+    {
+      "type": "docker-image",
+      "target": "sha256:39b0fb6616a466a05b2ff8c691bb14a63557c70118d433a4b70fd1068b1bef60",
+      "repoTags": [
+        "ontology-platform-fuseki:context-1e45f836d9837cbc75d23adb3ad37b0ff79a545ef06102a87aa246feea9cc1e5"
+      ],
+      "classification": "KEEP",
+      "reason": "Retained daily M2 environment or original legacy test restoration entry.",
+      "releaseCondition": "Only reconsider once new canonical healthy and independent exact recovery/usage review proves another copy unnecessary.",
+      "referenceCount": 0
+    },
+    {
+      "type": "docker-image",
+      "target": "sha256:401e1fbc58c27b08c3103e00c86b22bd175a1cdd8f8a7d61965133f27a24437f",
+      "repoTags": [
+        "ontology-platform-g2-fuseki:6.2.0"
+      ],
+      "classification": "KEEP",
+      "reason": "Retained daily M2 environment or original legacy test restoration entry.",
+      "releaseCondition": "Only reconsider once new canonical healthy and independent exact recovery/usage review proves another copy unnecessary.",
+      "referenceCount": 0
+    },
+    {
+      "type": "docker-history",
+      "target": "qydp3k8m5h46i07t182f2ojey",
+      "vcsRevision": "867f8ce8b2fe600a7514c1b6866ec98ddf5be7a4",
+      "classification": "CANDIDATE_PENDING_GATES",
+      "reason": "Project-owned closed M2 build metadata or retained M3 failed diagnostic history; sanitized failure/source Git objects preserve diagnosis. No container data.",
+      "releaseCondition": "M3 corrected source build and full CI must pass; committed exact-target closure proof and independent fresh single-node/version/generation whitelist review before Apply. Then strict no-record diagnostics plus actual natural lifecycle postcheck; no restart/upgrade/DB edits."
+    },
+    {
+      "type": "docker-history",
+      "target": "20b0q7l3v4hjmtem8si9g0lxc",
+      "vcsRevision": "67332cace3d134e31b723226071f1d630453cd59",
+      "classification": "CANDIDATE_PENDING_GATES",
+      "reason": "Project-owned closed M2 build metadata or retained M3 failed diagnostic history; sanitized failure/source Git objects preserve diagnosis. No container data.",
+      "releaseCondition": "M3 corrected source build and full CI must pass; committed exact-target closure proof and independent fresh single-node/version/generation whitelist review before Apply. Then strict no-record diagnostics plus actual natural lifecycle postcheck; no restart/upgrade/DB edits."
+    },
+    {
+      "type": "docker-history",
+      "target": "lpsg3gngs8x1rvrnb25yjoyn0",
+      "vcsRevision": "903e08b3bf9e52dc4bf69068806cb722fd8e79ac",
+      "classification": "CANDIDATE_PENDING_GATES",
+      "reason": "Project-owned closed M2 build metadata or retained M3 failed diagnostic history; sanitized failure/source Git objects preserve diagnosis. No container data.",
+      "releaseCondition": "M3 corrected source build and full CI must pass; committed exact-target closure proof and independent fresh single-node/version/generation whitelist review before Apply. Then strict no-record diagnostics plus actual natural lifecycle postcheck; no restart/upgrade/DB edits."
+    },
+    {
+      "type": "docker-history",
+      "target": "8q69crf65sf5ffy9tfqlapd3a",
+      "vcsRevision": "903e08b3bf9e52dc4bf69068806cb722fd8e79ac",
+      "classification": "CANDIDATE_PENDING_GATES",
+      "reason": "Project-owned closed M2 build metadata or retained M3 failed diagnostic history; sanitized failure/source Git objects preserve diagnosis. No container data.",
+      "releaseCondition": "M3 corrected source build and full CI must pass; committed exact-target closure proof and independent fresh single-node/version/generation whitelist review before Apply. Then strict no-record diagnostics plus actual natural lifecycle postcheck; no restart/upgrade/DB edits."
+    }
+  ],
+  "protectedLegacyG2Volumes": 8,
+  "foreignOrUnknownResources": "KEEP; concurrent activity observed, no project ownership, never included in Apply",
+  "applyStatus": "NOT_RUN_FOR_IMAGES_OR_HISTORY",
+  "fixture": "Separate synthetic empty volume actual Apply completed and independently verified; does not replace image/history acceptance.",
+  "physicalReclaimedBytes": "NOT_VERIFIED"
+}

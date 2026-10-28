@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "taskId": "G3-M3-001",
+  "reviewer": "/root/m3_web_review",
+  "observedAtUtc": "2026-10-28T13:35:48.909358Z",
+  "target": "g3-m3-e0-fixture-b267714590-postgres-data",
+  "reviewedPlanSha256": "6407b3e346686cc97981d4a7697177c9f84935640ab9c09addc488ea80ff9b95",
+  "applyExitCode": 0,
+  "postcheck": {
+    "command": ["docker", "volume", "inspect", "g3-m3-e0-fixture-b267714590-postgres-data"],
+    "exitCode": 1,
+    "stderr": "Error response from daemon: get g3-m3-e0-fixture-b267714590-postgres-data: no such volume",
+    "absent": true,
+    "volumeCountAfter": 8,
+    "allEightG2VolumesPreserved": true,
+    "dailyImagePreserved": "sha256:39b0fb6616a466a05b2ff8c691bb14a63557c70118d433a4b70fd1068b1bef60",
+    "backendUnchanged": true
+  },
+  "scope": "Synthetic empty fixture only; no M3 image/history cleanup completion inferred.",
+  "status": "PASS"
+}

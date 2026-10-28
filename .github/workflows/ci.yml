@@ -18,8 +18,21 @@ concurrency:
   group: engineering-${{ github.ref }}
   cancel-in-progress: true
 jobs:
+  scope:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    outputs:
+      canonical_only: ${{ steps.scope.outputs.canonical_only }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Resolve exact diagnostic scope
+        id: scope
+        run: python3 scripts/maintenance/ci_scope.py
   engineering:
-    if: (github.event_name != 'workflow_dispatch' || inputs.canonical_only != true) && (github.event_name != 'push' || github.ref != 'refs/heads/codex/g3-m3-master' || !contains(github.event.head_commit.message, '[canonical-diagnostic]'))
+    needs: scope
+    if: needs.scope.outputs.canonical_only != 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
@@ -77,6 +90,7 @@ jobs:
             python3 scripts/maintenance/task_run_timeline.py summary --path artifacts/task-timeline-engineering.jsonl
           }
   governance-integration:
+    needs: scope
     runs-on: ubuntu-24.04
     timeout-minutes: 40
     concurrency:
@@ -139,11 +153,11 @@ jobs:
           path: artifacts/fuseki-failures
           key: ${{ steps.fuseki.outputs.failureStateKey }}
       - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
-        if: (github.event_name != 'workflow_dispatch' || inputs.canonical_only != true) && (github.event_name != 'push' || github.ref != 'refs/heads/codex/g3-m3-master' || !contains(github.event.head_commit.message, '[canonical-diagnostic]'))
+        if: needs.scope.outputs.canonical_only != 'true'
         with:
           global-json-file: global.json
       - name: Frozen restore and backend build
-        if: (github.event_name != 'workflow_dispatch' || inputs.canonical_only != true) && (github.event_name != 'push' || github.ref != 'refs/heads/codex/g3-m3-master' || !contains(github.event.head_commit.message, '[canonical-diagnostic]'))
+        if: needs.scope.outputs.canonical_only != 'true'
         shell: pwsh
         run: |
           python3 scripts/maintenance/task_run_timeline.py ci --step-id integration-restore --task-type BUILD -- dotnet restore backend/OntologyPlatform.slnx --locked-mode
@@ -151,11 +165,13 @@ jobs:
           python3 scripts/maintenance/task_run_timeline.py ci --step-id integration-build --task-type BUILD -- dotnet build backend/OntologyPlatform.slnx --no-restore
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Real PostgreSQL security integration
-        if: (github.event_name != 'workflow_dispatch' || inputs.canonical_only != true) && (github.event_name != 'push' || github.ref != 'refs/heads/codex/g3-m3-master' || !contains(github.event.head_commit.message, '[canonical-diagnostic]'))
+        if: needs.scope.outputs.canonical_only != 'true'
         shell: pwsh
+        env:
+          PLATFORM_TASK_ID: G3-M3-001
         run: python3 scripts/maintenance/task_run_timeline.py ci --step-id governance --task-type TEST -- python3 scripts/acceptance/test-governance.py
       - name: Real G2 semantic publishing query MCP MAF and native SSE integration
-        if: (github.event_name != 'workflow_dispatch' || inputs.canonical_only != true) && (github.event_name != 'push' || github.ref != 'refs/heads/codex/g3-m3-master' || !contains(github.event.head_commit.message, '[canonical-diagnostic]'))
+        if: needs.scope.outputs.canonical_only != 'true'
         shell: pwsh
         env:
           PLATFORM_EVIDENCE_DIR: docs/evidence/G3-M3-001/ci
@@ -170,5 +186,5 @@ jobs:
             python3 scripts/maintenance/task_run_timeline.py summary --path artifacts/task-timeline-governance-integration.jsonl
           }
       - name: Canonical diagnostic scope notice
-        if: always() && ((github.event_name == 'workflow_dispatch' && inputs.canonical_only == true) || (github.event_name == 'push' && github.ref == 'refs/heads/codex/g3-m3-master' && contains(github.event.head_commit.message, '[canonical-diagnostic]')))
+        if: always() && needs.scope.outputs.canonical_only == 'true'
         run: echo 'CANONICAL_DIAGNOSTIC_ONLY; product NOT_RUN; full required CI NOT_VERIFIED; cache save remains trusted-push-only'
