@@ -76,6 +76,21 @@ public sealed class G3M3UnitTests
         Assert.IsTrue(diagnostics.All(item => item.SourceId == "vocabulary" && item.SourceHash == snapshot.Hashes.VocabularyHash && item.Diagnostic.FocusNode is not null && item.Diagnostic.Path is not null));
     }
 
+    /// <summary>来源缺陷须定位真实缺失字段，不能把Synthetic或PROV错误指向version。</summary>
+    [TestMethod]
+    [DataRow("synthetic", "urn:ontology-platform:semantics:synthetic")]
+    [DataRow("provenance", "http://www.w3.org/ns/prov#wasDerivedFrom")]
+    public async Task StandardSourceFailureKeepsExactPredicate(string scenario, string path)
+    {
+        // 只改变标准来源，单位自身合成标识与其他字段保持合法。
+        var source = Sources();
+        // 这两个缺陷都是合法RDF，不靠RIOT语法错误提前退出。
+        var text = scenario == "synthetic" ? source.VocabularyTurtle!.Replace("p:synthetic true ; prov:wasDerivedFrom", "p:synthetic false ; prov:wasDerivedFrom", StringComparison.Ordinal) : source.VocabularyTurtle!.Replace("prov:wasDerivedFrom ex:fixture", "prov:wasDerivedFrom \"UNKNOWN\"", StringComparison.Ordinal);
+        // 诊断来自真实四源解析上下文。
+        var snapshot = await ((IG3VocabularyRuntime)SemanticFixture.Runtime()).ReadVocabularyAsync(source with { VocabularyTurtle = text }, 1, default);
+        Assert.IsTrue(snapshot.Diagnostics.Any(item => item.Diagnostic.Code == "unit_source_required" && item.Diagnostic.FocusNode?.Value == "urn:synthetic:m3:standard-v1" && item.Diagnostic.Path == path && item.SourceId == "vocabulary" && item.SourceHash == snapshot.Hashes.VocabularyHash));
+    }
+
     /// <summary>从脚本明确注入的样例根读取本轮已提交的合成单位文档。</summary>
     internal static SourceBundle Sources()
     {

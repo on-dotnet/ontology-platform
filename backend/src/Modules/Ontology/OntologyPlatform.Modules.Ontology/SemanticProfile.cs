@@ -4,7 +4,7 @@ using OntologyPlatform.Modules.Ontology.Domain;
 
 namespace OntologyPlatform.Modules.Ontology;
 
-/// <summary>显式注册不可变M1历史与M2当前策略，使用精确JSON散列回验。</summary>
+/// <summary>显式注册不可变M1/M2历史及M3当前策略，使用精确JSON散列回验。</summary>
 public static class SemanticProfile
 {
     /// <summary>每次返回独立DTO数组，调用方不能修改全局策略。</summary>
@@ -28,7 +28,7 @@ public static class SemanticProfile
         return profile with { Hash = OntologyRules.Hash(JsonSerializer.Serialize(profile)) };
     }
 
-    /// <summary>当前M2仅扩展命名公理的结构编辑能力，原发布语义不变。</summary>
+    /// <summary>历史M2仅扩展命名公理的结构编辑能力，原发布语义及散列不变。</summary>
     public static SemanticSupportProfile LegacyM2()
     {
         // 独立构造历史DTO，防止调用方改变共享策略或历史散列。

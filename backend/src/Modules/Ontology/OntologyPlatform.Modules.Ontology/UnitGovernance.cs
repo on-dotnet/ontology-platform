@@ -69,8 +69,9 @@ public sealed partial class JenaSemanticRuntime
                 var derived = Values(standard, Prov + "wasDerivedFrom");
                 // 标签身份按BCP47大小写归一核对，但不改原字节。
                 var labels = Values(standard, "http://www.w3.org/2000/01/rdf-schema#label");
-                if (!KnownLiteral(version) || !Synthetic(synthetic) || derived.Length != 1 || derived[0].Kind != RdfTermKind.Iri)
-                    Add("unit_source_required", standard, PlatformSemantics + "version", "来源须有恰一明确版本、Synthetic真值及prov:wasDerivedFrom来源IRI。");
+                if (!KnownLiteral(version)) Add("unit_source_required", standard, PlatformSemantics + "version", "来源须有恰一明确非空版本，不能以UNKNOWN代替。");
+                if (!Synthetic(synthetic)) Add("unit_source_required", standard, PlatformSemantics + "synthetic", "本轮来源须明确标注Synthetic真值。");
+                if (derived.Length != 1 || derived[0].Kind != RdfTermKind.Iri) Add("unit_source_required", standard, Prov + "wasDerivedFrom", "来源须有恰一明确prov:wasDerivedFrom来源IRI。");
                 if (labels.Length == 0 || labels.Any(label => !KnownLiteral(label) || label.Datatype is not (null or Xsd + "string" or "http://www.w3.org/1999/02/22-rdf-syntax-ns#langString") || label.Language is not null && !LanguageSyntax(label.Language)) || labels.GroupBy(label => label.Language?.ToLowerInvariant() ?? "").Any(group => group.Count() != 1))
                     Add("unit_source_required", standard, "http://www.w3.org/2000/01/rdf-schema#label", "来源须有非空标签，各语言最多一个，不能任意选择冲突标签。");
             }

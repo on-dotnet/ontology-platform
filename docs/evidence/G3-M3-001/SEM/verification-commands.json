@@ -1,0 +1,51 @@
+[
+  {
+    "command": "pwsh -NoProfile -File scripts/verify.ps1 -SelfTest",
+    "exitCode": 1,
+    "rawLogSha256": "c77f67f07f9cddd0fbf973106307074b7e85d8bbd0ba70db12f02d70e74f0982",
+    "logFile": "g3m3-selftest.log",
+    "scope": "SEM local working tree; final same-Head CI belongs to Master"
+  },
+  {
+    "command": "dotnet restore backend/tests/OntologyPlatform.PublishingTests --locked-mode",
+    "exitCode": 130,
+    "rawLogSha256": "e67d11a6510fd01f45bce177cdd41917ea2e01c7c6d23d1dd7208a5021551260",
+    "logFile": "g3m3-pub-restore.log",
+    "scope": "SEM local working tree; final same-Head CI belongs to Master"
+  },
+  {
+    "command": "dotnet restore backend/tests/OntologyPlatform.PublishingTests --locked-mode --ignore-failed-sources -p:NuGetAudit=false",
+    "exitCode": 0,
+    "rawLogSha256": "3835de2bdae639f4e7c439ffdc22917513a10de05c4e32ec73ca455785735c3a",
+    "logFile": "g3m3-pub-restore-offline.log",
+    "scope": "SEM local working tree; final same-Head CI belongs to Master"
+  },
+  {
+    "command": "dotnet build backend/tests/OntologyPlatform.PublishingTests --no-restore",
+    "exitCode": 0,
+    "rawLogSha256": "cfd352bcc6b8266f1161321b3f73248b399f2fc3fd7d0759c1bc6de69b5f3031",
+    "logFile": "g3m3-pub-build.log",
+    "scope": "SEM local working tree; final same-Head CI belongs to Master"
+  },
+  {
+    "command": "dotnet test --project backend/tests/OntologyPlatform.SemanticTests --no-restore -- --filter FullyQualifiedName~ProfileHasExactMatrixAndStableHash",
+    "exitCode": 0,
+    "rawLogSha256": "248efcca23f7558d73728bf5ed2229228b425fdb52897e992c9f0e04ef14fd1c",
+    "logFile": "g3m3-profile-service.log",
+    "scope": "SEM local working tree; final same-Head CI belongs to Master"
+  },
+  {
+    "command": "dotnet format backend/OntologyPlatform.slnx --no-restore --verify-no-changes --include backend/src/Modules/Ontology backend/tests/OntologyPlatform.SemanticTests backend/tests/OntologyPlatform.PublishingTests/G3M3PublishingTests.cs",
+    "exitCode": 0,
+    "rawLogSha256": "fb25c53ec6ad8b6761b82a2fdbddfdacfd4dc86bcbc70e6292fda3bd54fcdbf4",
+    "logFile": "g3m3-format-verify.log",
+    "scope": "SEM local working tree; final same-Head CI belongs to Master"
+  },
+  {
+    "command": "pwsh -NoProfile -File scripts/verify.ps1 -SelfTest",
+    "exitCode": 0,
+    "rawLogSha256": "8830333ff8fef76f34e16752bebb096b12685a13c39bdceb7494b36d416f3d89",
+    "logFile": "g3m3-selftest2.log",
+    "scope": "SEM local working tree; final same-Head CI belongs to Master"
+  }
+]

@@ -1,0 +1,80 @@
+{
+  "exitCode": 2,
+  "records": [
+    {
+      "check": "public-jena-fixture-modes",
+      "exitCode": 0,
+      "modes": {
+        "fixture": "0o755",
+        "config.ttl": "0o644",
+        "log4j2.properties": "0o644"
+      }
+    },
+    {
+      "command": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g2-sem-cc03d79dffd6",
+        "--publish",
+        "127.0.0.1::3030",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--mount",
+        "type=bind,src=/private/tmp/g2-sem-cc03d79dffd6_uhf0nmz/fixture,dst=/fixture,readonly",
+        "--entrypoint",
+        "java",
+        "ontology-platform-fuseki:context-1e45f836d9837cbc75d23adb3ad37b0ff79a545ef06102a87aa246feea9cc1e5",
+        "-Xmx384m",
+        "-Dlog4j.configurationFile=/fixture/log4j2.properties",
+        "-jar",
+        "/opt/fuseki/fuseki-server.jar",
+        "--config=/fixture/config.ttl"
+      ],
+      "exitCode": 0,
+      "output": "546be3adb6539a781d80aa2770b279e06ff8c73227d2dc5f75a7c2d8668ef02c\n"
+    },
+    {
+      "command": [
+        "docker",
+        "port",
+        "g2-sem-cc03d79dffd6",
+        "3030/tcp"
+      ],
+      "exitCode": 0,
+      "output": "127.0.0.1:59090\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "test",
+        "--project",
+        "backend/tests/OntologyPlatform.SemanticTests",
+        "--no-restore",
+        "--",
+        "--filter",
+        "FullyQualifiedName~StandardSourceFailureKeepsExactPredicate"
+      ],
+      "exitCode": 2,
+      "output": "正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n失败 StandardSourceFailureKeepsExactPredicate (\"synthetic\",\"urn:ontology-platform:semantics:synthetic\") (121ms)\n  从 /Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  Assertion failed. 预期条件为 true。\n  \n  actual: false\n  \n  Assert.IsTrue(snapshot.Diagnostics.Any(item => item.Diagnostic.Code == \"unit_source_required\" && item.Diagnostic.FocusNode?.Value == \"urn:synthetic:m3:standard-v1\" && item.Diagnostic.Path == path && item.SourceId == \"vocabulary\" && item.SourceHash == snapshot.Hashes.VocabularyHash))\n    在 OntologyPlatform.SemanticTests.G3M3UnitTests.StandardSourceFailureKeepsExactPredicate(String scenario, String path) 位于 /Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M3UnitTests.cs:91\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n失败 StandardSourceFailureKeepsExactPredicate (\"provenance\",\"http://www.w3.org/ns/prov#wasDerivedFrom\") (12ms)\n  从 /Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  Assertion failed. 预期条件为 true。\n  \n  actual: false\n  \n  Assert.IsTrue(snapshot.Diagnostics.Any(item => item.Diagnostic.Code == \"unit_source_required\" && item.Diagnostic.FocusNode?.Value == \"urn:synthetic:m3:standard-v1\" && item.Diagnostic.Path == path && item.SourceId == \"vocabulary\" && item.SourceHash == snapshot.Hashes.VocabularyHash))\n    在 OntologyPlatform.SemanticTests.G3M3UnitTests.StandardSourceFailureKeepsExactPredicate(String scenario, String path) 位于 /Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M3UnitTests.cs:91\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64) 失败并出现 2 个错误 (2s 986ms)\n退出代码: 2\n\n测试运行摘要: 失败!\n  总计: 2\n  失败: 2\n  成功: 0\n  已跳过: 0\n  持续时间: 3s 622ms\n已完成测试运行，但显示非成功退出代码: 2 (请参阅: https://aka.ms/testingplatform/exitcodes)\n"
+    },
+    {
+      "check": "all temporary graph triples removed",
+      "count": 0,
+      "status": "PASS"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g2-sem-cc03d79dffd6"
+      ],
+      "exitCode": 0,
+      "output": "g2-sem-cc03d79dffd6\n"
+    }
+  ]
+}

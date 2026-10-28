@@ -8,7 +8,7 @@ namespace OntologyPlatform.Modules.Ontology;
 /// <summary>评估与版本比较沿用草稿的权限、幂等、CAS及审计事务。</summary>
 public sealed partial class OntologyService
 {
-    /// <summary>返回固定M1策略的独立副本。</summary>
+    /// <summary>返回当前v3策略的独立副本，历史版本由显式工厂登记。</summary>
     public SemanticSupportProfile GetProfile() => SemanticProfile.Current();
 
     /// <summary>评估端点返回真实持久评估而不接收客户端评估正文。</summary>

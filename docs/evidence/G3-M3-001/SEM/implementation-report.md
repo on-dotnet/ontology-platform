@@ -1,5 +1,7 @@
 # SEM implementation report
 
+本报告按切片保留原时点事实；最新本地验证见末节，早期PARTIAL/失败不作改写。
+
 状态：DRAFT/PARTIAL，最早API/runtime + SKOS真实子闭环。Base=67332cace3d134e31b723226071f1d630453cd59；branch=codex/g3-m3-sem。
 
 四源RIOT投影、source-aware原子1..64 batch、全hash/CAS/幂等/审计复用ontology.edit、正式Catalog+原对象+Jena ReadVerified消费路径、profile v1/v2保留及v3、SKOS S13/S14/S46和域政策已实现。M3精确诊断直接进入GOVERNANCE；OWL_REASONING=NOT_RUN；新deploy/verify/read v3同政策，历史不追加。单位语义下一切片待完成，当前任何P元数据保守warning阻断，不宣称单位完成。
@@ -23,3 +25,11 @@ m3-publishing.json：真实临时PG/Jena/RustFS，4/4通过、0skip。覆盖完�
 发布入口首次因缺project.assets未运行，m3-publishing-prerequisite.json保留。标准locked restore在网络审计等待后主动中断exit130；随后--locked-mode --ignore-failed-sources -p:NuGetAudit=false用已有依赖恢复exit0（本地NuGet审计NOT_RUN，不能冒称安全审核PASS），真实编译0warning/0error。无新依赖/lock变化。格式及diff-check exit0。SelfTest首次仅受ignored过程日志CRLF与缺隔离YAML库阻断，Master批准复用其.tools/pythonlibs后重跑；原日志散列和规范化类别保留process-log-normalization.json，失败事实不改。最终SelfTest状态待本轮实际结束回执。
 
 所有脚本自身随机容器均实际删除，临时验证图计数清零，不清理旧G2资源。当前仍DRAFT/PARTIAL：独立Review、Master集成、正式整栈/E0门禁、同HeadCI与唯一ZIP由Master组织；未push/merge，未启动下阶段。
+
+## 最终本地验证与交接
+
+StandardSource的Synthetic/PROV缺陷先用red-source-path.json真实2/2失败复现；修正后分别定位p:synthetic及prov:wasDerivedFrom，不再指向version。final-sem.json完整真实PG/Jena **161/161通过，0失败，0skip，32.851秒**；full-publishing.json完整真实PG/Jena/RustFS **60/60通过，0失败，0skip，27.821秒**，包括原G2/M1/M2发布故障/审批/回滚及新增M3。全部脚本自身随机容器实际rm成功，SEM临时验证图清零；保留原基线full-sem.json的159测试事实。
+
+最终本地format --verify-no-changes exit0（workspace加载warning），git diff --check exit0。verify -SelfTest第二次exit0，ReviewPackage96/0；工程测试不能替代前述真实产品测试。selftest-initial.txt保留首次失败，selftest-final.txt为第二次实际完整输出，统一LF/最终单LF；verification-commands.json记录命令/退出码及原日志散列。SelfTest未替代Master最终提交Head同CI；普通restore网络等待的exit130及本地NuGetAudit=NOT_RUN事实保持。
+
+本地交付范围完成，状态仍DRAFT/PARTIAL等待Master独立Review及集成关口。任务分支codex/g3-m3-sem，工作树保持；未push、未merge、未创建ZIP。已消费Master公共提交a1b719d（本树19df148），Master无需重复集成该副本。Master后续仅按明确授权组织E0后正式整栈、同HeadCI、V3唯一包与独立重开。没有QUDT正式资产/新依赖/换算功能、没有运行下阶段。
