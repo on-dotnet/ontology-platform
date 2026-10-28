@@ -28,7 +28,7 @@ Base=a1b719d；分支 codex/g3-m3-web；独立托管树 g3-m3-web。状态切片
 | node apps/web/scripts/generate-types.mjs --check（根目录） | PASS，exit0；无生成漂移 | 空输出，命令实际已运行 |
 | 新增M3 Playwright三场景 | PASS，1440/390精准发包/队列/409/历史档案，5.2秒 | browser.txt |
 | git diff --check（根目录） | PASS，exit0 | 提交前检查 |
-| verify -SelfTest | RUNNING，另交后置日志 | 不预填完成 |
+| verify -SelfTest | PASS，exit0，ReviewPackage96/0；其它隔离正反例见完整日志 | selftest.txt |
 | 真实PG/Jena/RustFS/Keycloak完整M3浏览器 | NOT_RUN（本worker）；Master整栈门禁 | 不能以有界UI夹具替代 |
 | 同HeadCI / 独立Review / V3最终包 | NOT_VERIFIED；Master集成后执行 | 本worker不push/merge |
 
@@ -48,3 +48,5 @@ Base=a1b719d；分支 codex/g3-m3-web；独立托管树 g3-m3-web。状态切片
 - 网络失败后的相同批次显式再次提交复用原Command与幂等键；更改理由或任何载荷后才创建新命令。实际workspace事件测试先FAIL再PASS，含原13项文件导入竞态。retry-red/green.txt保留。
 - 缺少单源hash的响应不能仅凭bundleHash匹配：新增断言先FAIL，固定检查全部5项hash，完整149项Vitest通过。hashes-red.txt保留。
 - 最终源码验证：lint exit0、typecheck exit0、16文件149项Vitest、Next production build exit0、新增3项有界浏览器4.7秒PASS。tests-final/build-final/browser-final.txt保留；此为后续修复后的最新结果。
+
+SelfTest真实完成：PYTHONPATH=.tools/pythonlibs pwsh -NoProfile -File scripts/verify.ps1 -SelfTest，exit0；其中ReviewPackage96/0。产品/container/.NET原生与真实OIDC不由SelfTest判PASS。执行期间没有共享脚本源码修改。
