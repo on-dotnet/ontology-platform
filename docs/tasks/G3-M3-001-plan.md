@@ -51,12 +51,12 @@ Files: scripts/maintenance/task_run_timeline.py、scripts/maintenance/evidence_p
 - [x] Master冻结精确RDF/错误码/版本/API/生成TS接口、owned_paths和合法非法测试，独立Review。
 - [x] SEM独立树：SKOS/单位/量纲/版本引用、真实PG/Jena和历史支持注册。
 - [x] WEB独立树：中文术语/单位UI、三栏接入/真实API及状态契约，不写公共Tokens/生成TS。
-- [ ] 最早可运行API子闭环Review→commit/push→同HeadCI→main集成点1；UI子闭环同样点2。
+- [x] 实际完成main集成a655642和929bfd3；首集成晚于原定最早窗口，偏差如实保留，API47/UI149增量实测及独立Review通过；CI规则被2026-10-29本地优先授权覆盖。
 
 ### Task 6: 完整验证和唯一交付
 
-- [ ] E0独立门禁通过后真实整栈M3及G2/M1/M2/旧版本/权限/回滚/故障/性能/许可证。
-- [ ] 最终规范、证据、自动计时和收尾审查，完整SelfTest/真实产品检查与diff-check。
-- [ ] 冻结提交、同HeadCI双job、唯一V3 ZIP、独立重开；报告精确SHA/字节/hash/CI/资源/风险并停止。
+- [x] E0真实远程缓存与本地独立门禁通过；400业务+兼容/G1/观测/trace，以及受影响故障/性能续跑均实际通过，绑定源码和原FAIL。
+- [x] 规范、证据、自动55区间计时、实际15阶段资源回收和独立后验；SelfTest/受影响增量及真实产品检查通过，最终diff-check在冻结提交时执行。
+- [x] 冻结源码与本地验证绑定、独立Review及V3准备完成；唯一ZIP/独立重开/精确Head与hash取冻结提交后真实封包回执，Git内不预填未来结果。云CI按最新授权可选，交付后停止。
 
-Current checkpoint: final-input Mac actual cold/export/load/reuse and two-run Linux cold/HIT are proven; full c2 CI passed. Two main integrations and formal M3 remain NOT_RUN. 7 exact diagnostic resources actually removed; natural later history generation and physical disk bytes are NOT_VERIFIED pending observation. User corrective steering: only confirmed correctness/current acceptance/explicit DoD blockers, no extra tool or artifact-path research.
+Current checkpoint: LOCAL_READY_FOR_PACKAGING / PARTIAL. 七项真实本地门禁按受影响层组合闭合，原失败保留；两次main集成已实测，15阶段资源实际回收且history自然代际后验闭合。物理字节未知及native active-task guards精确KEEP。冻结Head后只做唯一V3及独立重开、main最终集成和回执，不启动M4/M5。

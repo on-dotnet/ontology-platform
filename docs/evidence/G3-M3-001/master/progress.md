@@ -75,3 +75,8 @@ Head199 Mac finalinput actualcold/export/reopen/Dockerload/restore6PASS，第二
 ## 真实M3增量产品闭环
 
 API_ONLY首次869399因验收入口audit-ab错误键TypeError/10前置通过后FAIL，launcher正常finally停止；只改auditor-ab一行并非作者复核，提交54923a9。相同真实API层de56af47PASS（12auth+35M3）/4.924s gate；随后UI_ONLY70467a149PASS（14auth+135M3），另Smoke11PASS/故障309ms恢复PASS。真实中文术语单位操作、CAS、两版发布/正式query/Run/SSE/rollback/固定Release均核准返回IDs，独立Reviewer无新增P1/P2，3PNG/2唯一/1567681bytes且未见凭证。仅两增量checkpoint，不认证剩余6gate；完整最终验收仍after第二main集成。修正稳定后统一推送同HeadCI，不转移旧6b880的CI成功。
+
+
+## 最终本地门禁与资源闭合
+
+2026-10-29最新人类授权改为本地真实验证优先，Actions默认手动可选，LOCAL V3权威schema2+已测输入身份/历史兼容与测试永久提交。原强制CI描述为历史checkpoint，当前以新政策为准。340完整业务400与前五关通过，原readiness旧guardFAIL保留；651窄修复25测试及续跑实际8故障/27性能通过，七关组合完成，无盲重跑。独立Review全部必要P1/P2闭合。两次main已实集成。Docker15阶段资源已实际回收，history自然代际后验及8卷独立强后验通过；旧8卷/3镜像/newhistory保护。唯一ZIP和最终Head取冻结后真实回执；未测试平台/物理字节/原生archiveguard与费用限制如交付报告。

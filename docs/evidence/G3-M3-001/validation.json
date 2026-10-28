@@ -1,0 +1,176 @@
+{
+  "evidenceSchemaVersion": 2,
+  "validationSource": "LOCAL",
+  "testedCommit": "651ff9eaa8df0b0ae07851fc901fcf9761411c87",
+  "checks": [
+    {
+      "name": "repository-selftest",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1 -SelfTest",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "exit0 at34080c9; later narrow final-gate helpers covered by25 affected orchestration tests, no unrelated blind repeat. Raw hash/summary in master/local-selftest-result.json."
+    },
+    {
+      "name": "local-validation-package",
+      "command": "pwsh scripts/tests/ReviewPackage.Tests.ps1; EvidencePreflight.Tests.ps1; python3 scripts/tests/FusekiCiCache.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "103 package regressions/0 failures,18 early schema checks,8 manual workflow cases; historicalV1/V2/V3 preserved; LOCAL no GH and committed tested-input authority verified."
+    },
+    {
+      "name": "web",
+      "command": "pwsh -NoProfile -File scripts/verify-web.ps1",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "155 tests/0 failures; lint/typecheck/production build all exit0; final22-capability matrix included."
+    },
+    {
+      "name": "backend-real-modules",
+      "command": "actual GitHub run40715862497 governance-integration; local targeted PG/Jena tests",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "security126/semantic172/publishing60/query49/MCP33 all0fail/0skip. Backend tree OID unchanged froma655642 to tested delivery inputs: 5ff68ae5fbab394f621842b318159d12f8128f17. Earlier CI is reused module evidence, not final-Head cloud certification."
+    },
+    {
+      "name": "canonical-cross-run",
+      "command": "actual runs40711221901 and40713115311; canonical_fuseki.py real Mac cold/export/load/reuse",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Final-input Linux coldMISS then independent new-run HIT same0fe397 key and754078 image, exactproducer; no warm download/hash/extract/build. Final Mac6 actual checks. Canonical helper/Docker context unchanged since1990742. Cold run engineering tempfixture failure retained; full warm run successful."
+    },
+    {
+      "name": "canonical-stoploss",
+      "command": "actual canonical bad-source cross-process reproduction and permanent negative suite",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "6 actual checks; first bad hash fails then bounded same error exit2, zero downloads/builds; hash/platform/OCI/content identity strict negative regression retained."
+    },
+    {
+      "name": "workspace-smoke",
+      "command": "actual workspace-smoke.mjs and --smoke-fault-check",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "11 actual workspace checks; hidden canvas produces fast expectedFAIL and restoredPASS; auth/role/narrow/source/graph/save/cancel contract retained."
+    },
+    {
+      "name": "business-browser-full",
+      "command": "python3 scripts/acceptance/full-g2-e2e.py --runtime-file .tools/security/g3-m3-daa8b53191e9/runtime.json --m1 --m3 --smoke-fault-check",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "a5c476bcb6d14b15ab3fae045405f838 source34080c9:400 actual checks PASS inclM1=56/M2=91/M3=135. RealSKOS/units/CAS/hash/scope/independentapproval/twoversions/Jena/query/Run/SSE/rollback/fixedRelease. Original outer FULL remainsFAIL on readiness preflight; below continuation closes remaining gates."
+    },
+    {
+      "name": "compatibility",
+      "command": "scripts/acceptance/g3-compatibility.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Actual frozen prewrite126-member reader, identity73433116...,1 testPASS/0skip. Historic profiles/manifestsV1/V2 remain immutable; not a whole old-app downgrade guarantee."
+    },
+    {
+      "name": "g1-runtime-regression",
+      "command": "scripts/acceptance/g1-regression.py --runtime-only",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Actual runtime regression exit0; original per-command receipts retained in a5c476 run."
+    },
+    {
+      "name": "observability",
+      "command": "scripts/acceptance/g2-observability.py; node scripts/acceptance/g2-trace-browser.mjs",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "25 actual emission assertions and4 actual browser trace checks PASS."
+    },
+    {
+      "name": "readiness-real-faults",
+      "command": "scripts/acceptance/g2-readiness-fault.py --runtime-file <private owned M3 runtime>",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "continuation resume-aa5a1647d6f54c1580191ce4bfabdf37/source651ff9e:8/8 PASS; exact current Jena/RustFS/PG paused separately, protected503 under3s envelope, each restored200; finally unpaused and launcher stoppedexit0."
+    },
+    {
+      "name": "performance-observed",
+      "command": "scripts/acceptance/performance-baseline.py --from-observed-run --chain-report m3-full-e2e.json",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "27 actual samples coverSHACL/SPARQL/publication/SSE; baselinePASS; localSynthetic engineering observations, no productionSLO orloadclaim."
+    },
+    {
+      "name": "final-gates-regression",
+      "command": "python3 scripts/tests/G2Acceptance.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "25/0 inclM3exactowned prefix/parent guard, future/mismatched runtime rejection beforeDocker, exactM3report choice, failedchain/newG2 masquerade refusal."
+    },
+    {
+      "name": "resource-lifecycle",
+      "command": "reviewed cleanup_resources.py precise Apply and independent strong postchecks",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "15 primary resources actually removed:2images+5history+8ownSyntheticvolumes; separate emptyfixture volume also removed. History stayed absent after natural backend generation change. Legacy8volumes/KEEP3images/currenthistory intact; nativeworker archive attempted and guardedKEEP."
+    },
+    {
+      "name": "windows-linux-new-local-mode",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Windows native and new local-source mode on Linux host were not run; existing Linux CI/crossrunner cache evidence kept separate."
+    },
+    {
+      "name": "formal-qudt-and-real-model",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "QUDT formal assets unapproved; onlySynthetic RDF. Realpaidmodels/production/automaticpublish not authorized; no generalunitconversion."
+    },
+    {
+      "name": "artifact-upload",
+      "command": null,
+      "status": "BLOCKED",
+      "exitCode": null,
+      "output": "Human cannot confirm included balance; upload remains BLOCKED_ACCOUNT_BUDGET_UNKNOWN. No artifact/registry publish/paidcapacity expansion."
+    },
+    {
+      "name": "physical-disk-bytes",
+      "command": null,
+      "status": "NOT_VERIFIED",
+      "exitCode": null,
+      "output": "Object absence and exact counts verified; physical disk bytes NOT_VERIFIED."
+    }
+  ],
+  "ci": {
+    "status": "NOT_RUN",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  },
+  "metadata": {
+    "taskId": "G3-M3-001",
+    "baseSha": "c8f1040829b2bfe1e9f7e36223092286975643f0",
+    "localGateMode": "composed affected-layer verification; actual7gates all observed, original failures remain",
+    "businessSource": "34080c91b2655655465c201300dba5ad80886d69",
+    "lastTwoSource": "651ff9eaa8df0b0ae07851fc901fcf9761411c87",
+    "backendTree": "5ff68ae5fbab394f621842b318159d12f8128f17",
+    "priorActualCi": [
+      "40711221901",
+      "40713115311",
+      "40715862497",
+      "40719390124"
+    ],
+    "finalHeadCloudStatus": "NOT_RUN",
+    "agentActiveTime": "UNKNOWN",
+    "resourcePhysicalBytes": "NOT_VERIFIED",
+    "currentPackage": "Created from final committed Head; archive verification remains external post-close receipt",
+    "independentReview": {
+      "status": "PASS",
+      "remainingNecessaryP1P2": 0,
+      "description": "No unclosed necessaryP1/P2. First5 source340 and last2 source651 are explicitly composed; only4 acceptance/test inputs changed, product/locks/build unchanged; original failure not overwritten.",
+      "evidence": [
+        "master/local-policy-independent-review.json",
+        "master/m3-profile-independent-review.json",
+        "master/final-gates-independent-review.json",
+        "master/cleanup/runtime-independent-postcheck.json"
+      ]
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "planSha256": "b9e35acd1f47b88ec7d261f06776d969cd316b83babd2395366c1ae14530adba",
+  "reviewer": "/root/e0_independent_review",
+  "dryRun": {
+    "validated": 8,
+    "completed": 0,
+    "exitCode": 0
+  },
+  "apply": {
+    "validated": 8,
+    "completed": 8,
+    "exitCode": 0
+  },
+  "command": "python3 scripts/maintenance/cleanup_resources.py --root <Master> --plan docs/evidence/G3-M3-001/master/cleanup/runtime-reviewed-plan.json --apply --log-path <absolute Master>/docs/evidence/G3-M3-001/master/cleanup/runtime-apply.jsonl",
+  "postcheck": "runtime-independent-postcheck.json"
+}
