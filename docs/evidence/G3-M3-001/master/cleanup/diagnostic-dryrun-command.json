@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "mode": "DryRun",
+  "planPath": "docs/evidence/G3-M3-001/master/cleanup/diagnostic-reviewed-plan.json",
+  "planSha256": "b4750131b80346442ad0ced6fd9eced35a5be6962ffaa86ba64a8e966ff8c20d",
+  "command": [
+    "python3",
+    "scripts/maintenance/cleanup_resources.py",
+    "--root",
+    "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform",
+    "--plan",
+    "docs/evidence/G3-M3-001/master/cleanup/diagnostic-reviewed-plan.json"
+  ],
+  "exitCode": 0,
+  "stdout": {
+    "completed": 0,
+    "mode": "DryRun",
+    "validated": 7
+  },
+  "independentReview": {
+    "agent": "/root/e0_independent_review",
+    "result": "NO_CONFIRMED_P1_P2",
+    "exactPlanSha256": "b4750131b80346442ad0ced6fd9eced35a5be6962ffaa86ba64a8e966ff8c20d",
+    "condition": "Only after c2cffa6 engineering and governance CI success; runtime/main/generation/references revalidate"
+  },
+  "applyStatus": "NOT_RUN",
+  "observedAtUtc": "2026-10-28T15:17:43.998064+00:00"
+}

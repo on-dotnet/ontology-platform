@@ -1,0 +1,29 @@
+{
+  "planSha256": "bc0a0905485e42fe692d49c27473ce2da0ecb6bd53076eb5fb0108dbd49fac3b",
+  "command": [
+    "python3",
+    "scripts/maintenance/cleanup_resources.py",
+    "--root",
+    "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform",
+    "--plan",
+    "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/docs/evidence/G3-M3-001/master/cleanup/diagnostic-reviewed-plan-v2.json",
+    "--apply",
+    "--log-path",
+    "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/docs/evidence/G3-M3-001/master/cleanup/diagnostic-apply-v2.jsonl"
+  ],
+  "independentReview": "/root/e0_independent_review exact v2 hash passed and current bridge independently matched",
+  "ci": {
+    "runId": 40713115311,
+    "headSha": "c2cffa6d5b32453ee1603c858d12b7c4102a8702",
+    "engineering": "success",
+    "governanceIntegration": "success"
+  },
+  "startedAtUtc": "2026-10-28T15:23:53.414067+00:00",
+  "endedAtUtc": "2026-10-28T15:24:07.345190+00:00",
+  "durationMs": 13931,
+  "exitCode": 0,
+  "stdout": "{\"completed\":7,\"mode\":\"Apply\",\"validated\":7}",
+  "stderr": "",
+  "physicalReclaimedBytes": "NOT_VERIFIED",
+  "naturalLaterGeneration": "NOT_VERIFIED"
+}

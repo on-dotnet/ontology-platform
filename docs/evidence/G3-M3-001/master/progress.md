@@ -56,3 +56,10 @@ Master真实子进程自动记录UTC/monotonic/exit/依赖、source fingerprint�
 ## Final-input real gates / portable fixture correction
 
 Head199 Mac finalinput actualcold/export/reopen/Dockerload/restore6PASS，第二次images/history数量不增；新LinuxRun40711221901 actualcold网络/双SHA/无网络build/export/save成功，governance真实模块全部success，engineering因测试硬编码/private/tmp失败25errors，原日志保留。4处仅测试改系统临时目录resolve，34+17定向及独立复核通过。history实际精确相对Context窄修M3-only，7上下文RED1→GREEN4fixture并独立Review无P1/P2。真实E0B11工作区+8认证授权通过，故障315ms预期FAIL→恢复PASS，launcher停止0；只Smoke，不认证正式M3。当前完整同HeadCI/main集成/正式M3/真实image-history Apply仍待执行。
+
+
+## E0实际闭合与语义最后定向修正
+
+最终canonical输入LinuxRun40711221901 coldMISS→独立新Run40713115311 HIT，同key0fe397/image754078，warm无下载/hash/extract/build；后Run engineering及governance均真实success。独立E0Reviewer确认A/B通过、C工程通过。新bridge代际使原Apply准确拒绝0删除，v2只重冻真实代际并独立核SHA后Apply，实际2image+5history共7/7 exit0；自然后验/物理字节不预填PASS。
+
+终期语义Review确认RIOT接受非法重复BCP47变体/扩展、生产assessment误放行。独立SEM90b6036最小去重修正：同4真实PG/Jena RED3fail→GREEN4pass/0skip，GOV_FAIL/PublishEligiblefalse且私用尾部合法对照PASS。非作者独立Review闭合P2无新增P1/P2。接下来冻结源码完整CI、增量main、正式M3；不再扩辅助工具/备用路径/报告系统。
