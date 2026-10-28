@@ -64,7 +64,7 @@ try {
   } else if (process.argv.includes('--m3-api-only') || process.argv.includes('--m3-ui-only')) {
     const viewer = await identity('viewer-ab');
     const single = await identity('viewer-a');
-    const audit = await identity('audit-ab');
+    const audit = await identity('auditor-ab');
     const { runM3Checks } = await import('./g3-m3-browser.mjs');
     await runM3Checks({ root, origin, operator, audit, viewer, single, check, command,
       apiOnly: process.argv.includes('--m3-api-only'), uiOnly: process.argv.includes('--m3-ui-only'), setPhase: value => { phase = value; } });
