@@ -29,9 +29,13 @@ class FusekiCacheTests(unittest.TestCase):
         SPEC.loader.exec_module(self.mod)
         self.engine = patch.object(self.mod, 'engine_identity', return_value={'platform':'linux/amd64', 'engineVersion':'29.9.2', 'buildxVersion':'v0.34.1'}, create=True)
         self.engine.start()
+        source_dir=self.root/'prepared';source_dir.mkdir();(source_dir/'fuseki.tar.gz').write_bytes(b'fixture')
+        self.prepared=patch.object(self.mod,'prepare_source',return_value=contextlib.nullcontext(dict(directory=source_dir,receipt={},stages=[],verified=True,downloaded=False)),create=True)
+        self.source_valid=patch.object(self.mod,'validate_source_context',return_value=7,create=True)
+        self.prepared.start();self.source_valid.start()
 
     def tearDown(self):
-        self.engine.stop()
+        self.source_valid.stop();self.prepared.stop();self.engine.stop()
         self.tmp.cleanup()
 
     def identity(self, platform='linux/amd64'):
@@ -389,16 +393,37 @@ class FusekiCacheTests(unittest.TestCase):
         identity,calls,built,invoke=self.build_fixture()
         failures=self.root/'failures'
         self.mod.save_failure_state(failures,identity,self.mod.BuildRefused('timeout',category='NETWORK_TIMEOUT'),'earlier','a'*40)
-        probe_calls,probe_run=self.probe_transport()
+        probe_calls,probe_run=self.host_transport()
         with patch.object(self.mod,'invoke',side_effect=invoke),patch.object(self.mod.subprocess,'run',side_effect=probe_run):
             with self.assertRaises(self.mod.BuildRefused) as caught:self.mod.build('G3-M3-001','blocked',failure_directory=failures)
         self.assertEqual(caught.exception.exit_code,2)
         self.assertEqual(caught.exception.category,'NETWORK_TIMEOUT')
         self.assertEqual(caught.exception.diagnostic['probe']['taskId'],'G3-M3-001')
         self.assertEqual(caught.exception.diagnostic['probe']['runId'],'blocked')
-        self.assertEqual(caught.exception.diagnostic['probe']['autoRemoval'],'VERIFIED_REMOVED')
+        self.assertEqual(caught.exception.diagnostic['probe']['scope'],'host')
         self.assertFalse(built)
-        self.assertFalse(any(args[0]=='docker' for args in calls))
+        self.assertFalse(any(args[:2]==['docker','build'] for args in calls))
+
+    def test_local_image_reuse_skips_source_and_known_failure_network_probes(self):
+        identity,calls,built,invoke=self.build_fixture();failures=self.root/'failures'
+        self.mod.save_failure_state(failures,identity,self.mod.BuildRefused('timeout',category='NETWORK_TIMEOUT'),'earlier','a'*40)
+        def warm(args,**kw):
+            if args[0]=='git':return invoke(args,**kw)
+            self.assertEqual(args[:3],['docker','image','inspect'])
+            return subprocess.CompletedProcess(args,0,json.dumps(dict(Id='sha256:'+'c'*64,Labels=self.mod.expected_labels(identity),Os='linux',Architecture='amd64')),'')
+        with (patch.object(self.mod,'invoke',side_effect=warm),patch.object(self.mod,'prepare_source',side_effect=AssertionError('warm source access')),
+             patch.object(self.mod,'failure_gate',side_effect=AssertionError('warm network probe'))):
+            result=self.mod.build('G3-M3-001','warm',failure_directory=failures)
+        self.assertTrue(result['reused']);self.assertFalse(result['sourceChecksumVerified'])
+        self.assertNotIn('source',result);self.assertFalse(built)
+
+    def test_identity_does_not_prepare_or_probe_official_source(self):
+        self.build_fixture();output=io.StringIO()
+        with (patch.object(self.mod,'prepare_source',side_effect=AssertionError('identity source access')),
+             patch.object(self.mod.subprocess,'run',side_effect=AssertionError('identity network access')),
+             patch.object(sys,'argv',['canonical','--identity']),contextlib.redirect_stdout(output)):
+            self.assertEqual(self.mod.main(),0)
+        self.assertEqual(json.loads(output.getvalue())['platform'],'linux/amd64')
 
     def test_final_gate_performs_build_after_prior_failure_instead_of_cached_pass(self):
         identity,calls,built,invoke=self.build_fixture()
@@ -415,6 +440,15 @@ class FusekiCacheTests(unittest.TestCase):
         stages=self.mod.parse_stages(raw+'\n'+raw,'a'*64)
         self.assertEqual(len(stages),1)
         self.assertEqual(stages[0]['durationMs'],101)
+
+    def host_transport(self,codes=(28,28)):
+        calls=[];pending=list(codes)
+        def run(args,**kw):
+            calls.append((args,kw))
+            self.assertEqual(args[0],'curl');self.assertIn('--head',args)
+            code=pending.pop(0)
+            return subprocess.CompletedProcess(args,code,None,b'\nCANONICAL_HTTP 200 \n' if code==0 else b'timeout')
+        return calls,run
 
     def probe_transport(self, codes=(28,28), base_exit=0, run_exit=None, fault=None, output=None, remains=False, architecture='amd64'):
         calls=[]
@@ -438,7 +472,7 @@ class FusekiCacheTests(unittest.TestCase):
     def test_mixed_source_failures_reproduce_terminal_category(self):
         calls,run=self.probe_transport(codes=(22,28))
         with patch.object(self.mod.subprocess,'run',side_effect=run):
-            self.assertEqual(self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT'),('network','NETWORK_TIMEOUT'))
+            self.assertEqual(self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT',executor='container'),('network','NETWORK_TIMEOUT'))
 
     def test_actual_container_shell_head_protocol_handles_success_and_two_failures(self):
         binary=self.root/'probe-bin';binary.mkdir();curl=binary/'curl';calls=self.root/'probe-calls.jsonl'
@@ -459,21 +493,21 @@ class FusekiCacheTests(unittest.TestCase):
                 self.assertEqual([args[-1] for args in recorded],list(self.mod.OFFICIAL_URLS[:len(codes)]))
                 self.assertTrue(all('--head' in args and args[args.index('--max-time')+1]=='5' for args in recorded))
 
-    def test_container_recovery_receipt_is_retained_before_one_build(self):
+    def test_host_recovery_receipt_is_retained_before_one_build(self):
         identity,calls,built,invoke=self.build_fixture();failures=self.root/'failures'
         self.mod.save_failure_state(failures,identity,self.mod.BuildRefused('timeout',category='NETWORK_TIMEOUT'),'earlier','a'*40)
-        probe_calls,probe_run=self.probe_transport(codes=(0,))
+        probe_calls,probe_run=self.host_transport(codes=(0,))
         with patch.object(self.mod,'invoke',side_effect=invoke),patch.object(self.mod.subprocess,'run',side_effect=probe_run):
             result=self.mod.build('G3-M3-001','recovered',failure_directory=failures)
         self.assertEqual(len(built),1)
         self.assertEqual(result['failureProbe']['outcome'],'RECOVERED')
         self.assertEqual(result['failureProbe']['runId'],'recovered')
-        self.assertEqual(result['failureProbe']['autoRemoval'],'VERIFIED_REMOVED')
+        self.assertEqual(result['failureProbe']['scope'],'host')
 
     def test_container_network_failure_cannot_be_recovered_by_host_head(self):
         calls,run=self.probe_transport();receipts=[]
         with patch.object(self.mod.subprocess,'run',side_effect=run):
-            result=self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT',task_id='G3-M3-001',run_id='container-probe',platform='linux/amd64',probe_receipts=receipts)
+            result=self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT',task_id='G3-M3-001',run_id='container-probe',platform='linux/amd64',probe_receipts=receipts,executor='container')
         self.assertEqual(result,('network','NETWORK_TIMEOUT'))
         self.assertTrue(all(args[0]=='docker' for args,kw in calls))
         self.assertEqual(receipts[0]['scope'],'container')
@@ -483,7 +517,7 @@ class FusekiCacheTests(unittest.TestCase):
     def test_container_probe_hardening_labels_base_and_total_deadline(self):
         calls,run=self.probe_transport();receipts=[]
         with patch.object(self.mod.subprocess,'run',side_effect=run):
-            self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT',task_id='G3-M3-001',run_id='probe-123',platform='linux/amd64',probe_receipts=receipts)
+            self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT',task_id='G3-M3-001',run_id='probe-123',platform='linux/amd64',probe_receipts=receipts,executor='container')
         args=next(args for args,kw in calls if args[:2]==['docker','run'])
         for flag in ('--rm','--pull=never','--read-only','--cap-drop=ALL','--security-opt=no-new-privileges'):self.assertIn(flag,args)
         self.assertIn('io.ontology-platform.task-id=G3-M3-001',args)
@@ -501,7 +535,7 @@ class FusekiCacheTests(unittest.TestCase):
     def test_container_probe_missing_base_never_pulls_or_builds(self):
         calls,run=self.probe_transport(base_exit=1)
         with patch.object(self.mod.subprocess,'run',side_effect=run):
-            with self.assertRaises(self.mod.BuildRefused) as caught:self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT')
+            with self.assertRaises(self.mod.BuildRefused) as caught:self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT',executor='container')
         self.assertEqual(caught.exception.exit_code,2)
         self.assertEqual(caught.exception.category,'PROBE_BASE_UNAVAILABLE')
         self.assertEqual(len(calls),1)
@@ -510,7 +544,7 @@ class FusekiCacheTests(unittest.TestCase):
     def test_container_probe_docker_fault_is_blocked_instead_of_source_recovery(self):
         calls,run=self.probe_transport(run_exit=125,output='')
         with patch.object(self.mod.subprocess,'run',side_effect=run):
-            with self.assertRaises(self.mod.BuildRefused) as caught:self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT')
+            with self.assertRaises(self.mod.BuildRefused) as caught:self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT',executor='container')
         self.assertEqual(caught.exception.exit_code,2)
         self.assertEqual(caught.exception.category,'PROBE_DOCKER_FAILURE')
         self.assertEqual(caught.exception.diagnostic['probe']['autoRemoval'],'VERIFIED_REMOVED')
@@ -521,7 +555,7 @@ class FusekiCacheTests(unittest.TestCase):
             with self.subTest(fault=fault):
                 calls,run=self.probe_transport(fault=fault)
                 with patch.object(self.mod.subprocess,'run',side_effect=run):
-                    with self.assertRaises(self.mod.BuildRefused) as caught:self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT')
+                    with self.assertRaises(self.mod.BuildRefused) as caught:self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT',executor='container')
                 self.assertEqual(caught.exception.exit_code,2)
                 self.assertIn(caught.exception.category,('PROBE_DOCKER_TIMEOUT','PROBE_DOCKER_UNAVAILABLE'))
                 self.assertNotIn('SYNTHETIC_PRIVATE',json.dumps(caught.exception.diagnostic))
@@ -531,14 +565,14 @@ class FusekiCacheTests(unittest.TestCase):
             with self.subTest(codes=codes,exit_code=exit_code,output=output):
                 calls,run=self.probe_transport(codes=codes,run_exit=exit_code,output=output)
                 with patch.object(self.mod.subprocess,'run',side_effect=run):
-                    with self.assertRaises(self.mod.BuildRefused) as caught:self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT')
+                    with self.assertRaises(self.mod.BuildRefused) as caught:self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT',executor='container')
                 self.assertEqual(caught.exception.exit_code,2)
                 self.assertEqual(caught.exception.category,'PROBE_PROTOCOL_INVALID')
 
     def test_container_probe_requires_verified_auto_removal_even_after_head_success(self):
         calls,run=self.probe_transport(codes=(0,),remains=True)
         with patch.object(self.mod.subprocess,'run',side_effect=run):
-            with self.assertRaises(self.mod.BuildRefused) as caught:self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT')
+            with self.assertRaises(self.mod.BuildRefused) as caught:self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT',executor='container')
         self.assertEqual(caught.exception.exit_code,2)
         self.assertEqual(caught.exception.category,'PROBE_CLEANUP_UNVERIFIED')
         self.assertEqual(caught.exception.diagnostic['probe']['autoRemoval'],'CONTAINER_REMAINS')
@@ -547,7 +581,7 @@ class FusekiCacheTests(unittest.TestCase):
     def test_container_probe_platform_mismatch_is_not_network_recovery(self):
         calls,run=self.probe_transport(architecture='arm64')
         with patch.object(self.mod.subprocess,'run',side_effect=run):
-            with self.assertRaises(self.mod.BuildRefused) as caught:self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT',platform='linux/amd64')
+            with self.assertRaises(self.mod.BuildRefused) as caught:self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT',platform='linux/amd64',executor='container')
         self.assertEqual(caught.exception.exit_code,2)
         self.assertEqual(caught.exception.category,'PROBE_BASE_PLATFORM_MISMATCH')
         self.assertEqual(len(calls),1)
@@ -555,7 +589,7 @@ class FusekiCacheTests(unittest.TestCase):
     def test_container_probe_success_is_actual_container_head_and_auto_removal(self):
         calls,run=self.probe_transport(codes=(22,0));receipts=[]
         with patch.object(self.mod.subprocess,'run',side_effect=run):
-            result=self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT',probe_receipts=receipts)
+            result=self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT',probe_receipts=receipts,executor='container')
         self.assertIsNone(result)
         self.assertEqual(receipts[0]['outcome'],'RECOVERED')
         self.assertEqual(receipts[0]['autoRemoval'],'VERIFIED_REMOVED')
@@ -710,7 +744,7 @@ class FusekiCacheTests(unittest.TestCase):
     def test_short_network_probe_is_only_fixed_https_heads_and_total_bounded(self):
         calls,run=self.probe_transport()
         with patch.object(self.mod.subprocess,'run',side_effect=run):
-            result=self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT')
+            result=self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT',executor='container')
         self.assertEqual(result,('network','NETWORK_TIMEOUT'))
         self.assertEqual([args[:2] for args,kw in calls],[['docker','image'],['docker','run'],['docker','container']])
         self.assertLessEqual(sum(kw['timeout'] for args,kw in calls),20)
@@ -718,7 +752,7 @@ class FusekiCacheTests(unittest.TestCase):
     def test_cold_stage_markers_preserve_individual_durations_and_strip_raw_logs(self):
         identity=self.identity()
         raw='SYNTHETIC_SECRET\n#4 1.2 CANONICAL_STAGE {"stage":"checksum","durationMs":17,"outcome":"PASS","errorCategory":null}\n'
-        self.assertEqual(self.mod.parse_stages(raw,identity['inputFingerprint']),[dict(stage='checksum',durationMs=17,outcome='PASS',errorCategory=None,inputFingerprint=identity['inputFingerprint'])])
+        self.assertEqual(self.mod.parse_stages(raw,identity['inputFingerprint']),[dict(stage='checksum',durationMs=17,outcome='PASS',errorCategory=None,inputFingerprint=identity['inputFingerprint'],executor='container')])
 
 
 if __name__=='__main__':unittest.main()

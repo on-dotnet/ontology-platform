@@ -5,9 +5,17 @@ ARG JENA_VERSION=6.2.0
 ARG JENA_SHA512=ba65f5867d2d4741b2ed9e2af5a0d4fbb447909894ab2a0c6bc4dac8997f4fe339c87b13c48d45d054977769f0f8bf763ea346b1f7792d5cdc458041bd43a132
 
 USER root
-COPY --chmod=0555 fetch-fuseki.sh /usr/local/bin/fetch-fuseki
+COPY --from=fuseki_source --chmod=0400 fuseki.tar.gz /tmp/fuseki.tar.gz
 RUN set -eu; \
-    fetch-fuseki "$JENA_VERSION" "$JENA_SHA512" /tmp/fuseki.tar.gz; \
+    checksum_start=$(date +%s%N); \
+    if printf '%s  %s\n' "$JENA_SHA512" /tmp/fuseki.tar.gz | sha512sum --check --strict; then \
+        checksum_ms=$((($(date +%s%N) - checksum_start) / 1000000)); \
+        printf 'CANONICAL_STAGE {"stage":"checksum","durationMs":%s,"outcome":"PASS","errorCategory":null}\n' "$checksum_ms"; \
+    else \
+        checksum_ms=$((($(date +%s%N) - checksum_start) / 1000000)); \
+        printf 'CANONICAL_STAGE {"stage":"checksum","durationMs":%s,"outcome":"FAIL","errorCategory":"CHECKSUM_MISMATCH"}\n' "$checksum_ms"; \
+        exit 1; \
+    fi; \
     mkdir -p /opt/fuseki /fuseki/databases; \
     extract_start=$(date +%s%N); \
     if tar -xzf /tmp/fuseki.tar.gz --strip-components=1 -C /opt/fuseki; then \

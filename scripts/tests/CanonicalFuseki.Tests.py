@@ -26,7 +26,12 @@ class CanonicalTests(unittest.TestCase):
             (self.context/name).write_text('fixture\n')
         self.engine = patch.object(self.mod,'engine_identity',return_value=dict(platform='linux/amd64',engineVersion='29.9.2',buildxVersion='v0.34.1'))
         self.engine.start()
-    def tearDown(self): self.engine.stop();self.tmp.cleanup()
+        self.source_tmp=tempfile.TemporaryDirectory(prefix='ontology-prepared-',dir='/private/tmp')
+        source_dir=Path(self.source_tmp.name);(source_dir/'fuseki.tar.gz').write_bytes(b'fixture')
+        self.prepared=patch.object(self.mod,'prepare_source',return_value=contextlib.nullcontext(dict(directory=source_dir,receipt={},stages=[],verified=True,downloaded=False)),create=True)
+        self.source_valid=patch.object(self.mod,'validate_source_context',return_value=7,create=True)
+        self.prepared.start();self.source_valid.start()
+    def tearDown(self): self.source_valid.stop();self.prepared.stop();self.source_tmp.cleanup();self.engine.stop();self.tmp.cleanup()
     def test_content_identity_ignores_metadata_but_tracks_every_byte(self):
         first = self.mod.context_digest(self.context)
         (self.context / 'entrypoint.sh').write_text('echo test\n')
@@ -71,7 +76,7 @@ class CanonicalTests(unittest.TestCase):
         raw_out=b'#1 [internal] load build definition from Dockerfile\n#2 [1/2] RUN echo '+sentinel.encode()+b'\n'
         raw_err=b'#2 ERROR: '+sentinel.encode()+b' TLS handshake timeout\n'
         def cli(args,**kwargs):
-            self.assertEqual(kwargs.get('timeout'),600)
+            self.assertGreater(kwargs.get('timeout'),0);self.assertLessEqual(kwargs.get('timeout'),600)
             if args[0]=='git':return subprocess.CompletedProcess(args,0,str(self.context/'.git')+'\n','')
             if args[1:3]==['image','inspect']:return subprocess.CompletedProcess(args,1,'','Error response from daemon: No such image: '+tag)
             raise subprocess.TimeoutExpired(args,600,output=raw_out,stderr=raw_err)
@@ -241,23 +246,192 @@ class CanonicalDownloadTests(unittest.TestCase):
         command=dockerfile.split('RUN ',1)[1].split('\n\n',1)[0].replace('\\\n','')
         with tempfile.TemporaryDirectory(prefix='ontology-extract-') as directory:
             binary=Path(directory)
-            for name in ('fetch-fuseki','mkdir','tar','rm','groupadd','useradd','chown'):
+            for name in ('fetch-fuseki','sha512sum','mkdir','tar','rm','groupadd','useradd','chown'):
                 script=binary/name;script.write_text('#!/bin/sh\nexit 0\n');script.chmod(0o755)
             clock=binary/'date';clock.write_text('#!'+sys.executable+'\nimport time\nprint(time.time_ns())\n');clock.chmod(0o755)
             result=subprocess.run(['sh','-c',command],env=dict(os.environ,PATH=str(binary)+os.pathsep+os.environ['PATH'],JENA_VERSION='6.2.0',JENA_SHA512='fixture'),capture_output=True,text=True)
         self.assertEqual(result.returncode,0,result.stderr)
         stages=[json.loads(line.split('CANONICAL_STAGE ',1)[1]) for line in result.stdout.splitlines() if line.startswith('CANONICAL_STAGE ')]
-        self.assertEqual(len(stages),1)
-        self.assertEqual(stages[0]['stage'],'extract/COPY')
+        self.assertEqual(len(stages),2)
+        self.assertEqual(stages[0]['stage'],'checksum')
+        self.assertEqual(stages[1]['stage'],'extract/COPY')
         self.assertEqual(stages[0]['outcome'],'PASS')
         self.assertGreaterEqual(stages[0]['durationMs'],0)
 
     def test_unique_dockerfile_verifies_before_extracting_without_version_change(self):
         dockerfile=(ROOT/'infra/development/fuseki/Dockerfile').read_text()
         self.assertIn('!fetch-fuseki.sh',(ROOT/'infra/development/fuseki/.dockerignore').read_text())
-        self.assertIn('COPY --chmod=0555 fetch-fuseki.sh',dockerfile)
-        self.assertLess(dockerfile.index('fetch-fuseki "$'),dockerfile.index('tar -xzf'))
+        self.assertIn('COPY --from=fuseki_source',dockerfile)
+        self.assertLess(dockerfile.index('sha512sum --check --strict'),dockerfile.index('tar -xzf'))
         self.assertIn('ARG JENA_VERSION=6.2.0',dockerfile)
         self.assertIn('ba65f5867d2d4741b2ed9e2af5a0d4fbb447909894ab2a0c6bc4dac8997f4fe339c87b13c48d45d054977769f0f8bf763ea346b1f7792d5cdc458041bd43a132',dockerfile)
+
+class CanonicalSourceTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp=tempfile.TemporaryDirectory(prefix='ontology-source-',dir='/private/tmp')
+        self.root=Path(self.tmp.name);self.cache=self.root/'cache'
+        self.mod=importlib.util.module_from_spec(SPEC);SPEC.loader.exec_module(self.mod)
+        self.payload=b'canonical-source-fixture'
+        self.sha=hashlib.sha512(self.payload).hexdigest()
+        self.checksum=patch.object(self.mod,'JENA_SHA512',self.sha);self.checksum.start()
+
+    def tearDown(self):self.checksum.stop();self.tmp.cleanup()
+
+    def seed(self,raw=None):
+        self.cache.mkdir();path=self.cache/(self.sha+'.tar.gz');path.write_bytes(self.payload if raw is None else raw)
+        return path
+
+    def transport(self,mode='success'):
+        calls=[]
+        def run(args,**kwargs):
+            calls.append((args,kwargs))
+            if mode=='timeout':return subprocess.CompletedProcess(args,28,None,b'timeout SYNTHETIC_PRIVATE_TOKEN')
+            if mode=='too-large':return subprocess.CompletedProcess(args,63,None,b'exceeds limit')
+            if mode=='fallback' and 'dlcdn.apache.org' in args[-1]:return subprocess.CompletedProcess(args,22,None,b'http failure')
+            kwargs['stdout'].write(b'wrong' if mode=='bad-hash' else self.payload);kwargs['stdout'].flush()
+            return subprocess.CompletedProcess(args,0,None,b'\nCANONICAL_HTTP 200 \n')
+        return calls,run
+
+    def test_valid_cached_source_is_rehashed_and_staged_as_exact_single_file(self):
+        path=self.seed();temporary=None
+        with patch.object(self.mod.subprocess,'run',side_effect=AssertionError('cached source must not download')):
+            with self.mod.prepare_source(self.cache,'G3-M3-001','source-cache','a'*64) as source:
+                temporary=source['directory']
+                self.assertEqual(sorted(p.name for p in temporary.iterdir()),['fuseki.tar.gz'])
+                self.assertEqual((temporary/'fuseki.tar.gz').read_bytes(),self.payload)
+                self.assertTrue(source['verified']);self.assertFalse(source['downloaded'])
+                self.assertEqual(source['receipt']['cacheOutcome'],'HIT')
+                self.assertTrue(all(stage['executor']=='host' for stage in source['stages']))
+        self.assertFalse(temporary.exists())
+        self.assertTrue(source['receipt']['temporaryContextRemoved'])
+        self.assertEqual(path.read_bytes(),self.payload)
+
+    def test_cache_corruption_is_immediate_checksum_failure_without_download(self):
+        self.seed(b'bad')
+        with patch.object(self.mod.subprocess,'run',side_effect=AssertionError('bad hash cannot download fallback')):
+            with self.assertRaises(self.mod.BuildRefused) as caught:
+                with self.mod.prepare_source(self.cache,'TASK','bad','a'*64):pass
+        self.assertEqual(caught.exception.category,'CHECKSUM_MISMATCH')
+        self.assertEqual(caught.exception.stage,'checksum')
+
+    def test_cache_symlink_ancestor_link_and_oversize_are_refused(self):
+        actual=self.root/'actual';actual.write_bytes(self.payload);self.cache.mkdir()
+        (self.cache/(self.sha+'.tar.gz')).symlink_to(actual)
+        with self.assertRaises(self.mod.BuildRefused):
+            with self.mod.prepare_source(self.cache,'TASK','link','a'*64):pass
+        (self.cache/(self.sha+'.tar.gz')).unlink();(self.cache/(self.sha+'.tar.gz')).write_bytes(self.payload)
+        with patch.object(self.mod,'MAX_SOURCE_BYTES',4,create=True):
+            with self.assertRaises(self.mod.BuildRefused):
+                with self.mod.prepare_source(self.cache,'TASK','large','a'*64):pass
+        linked=self.root/'linked';linked.symlink_to(self.cache,target_is_directory=True)
+        with self.assertRaises(self.mod.BuildRefused):
+            with self.mod.prepare_source(linked,'TASK','ancestor','a'*64):pass
+
+    def test_cold_host_download_uses_fixed_bounded_https_and_publishes_only_verified_source(self):
+        calls,run=self.transport()
+        with patch.object(self.mod.subprocess,'run',side_effect=run):
+            with self.mod.prepare_source(self.cache,'TASK','download','a'*64) as source:
+                self.assertTrue(source['downloaded']);self.assertTrue(source['verified'])
+                self.assertEqual(source['receipt']['sizeBytes'],len(self.payload))
+        self.assertEqual(len(calls),1)
+        args,kwargs=calls[0]
+        self.assertEqual(args[-1],'https://dlcdn.apache.org/jena/binaries/apache-jena-fuseki-6.2.0.tar.gz')
+        for flag,value in [('--connect-timeout','15'),('--max-time','180'),('--retry','0'),('--max-redirs','3'),('--proto','=https'),('--proto-redir','=https')]:
+            self.assertEqual(args[args.index(flag)+1],value)
+        self.assertIn('--max-filesize',args)
+        self.assertNotIn('--output',args)
+        self.assertLessEqual(kwargs['timeout'],185)
+        self.assertEqual(sorted(p.name for p in self.cache.iterdir()),[self.sha+'.tar.gz'])
+
+    def test_host_network_failure_falls_back_once_to_same_fixed_release(self):
+        calls,run=self.transport('fallback')
+        with patch.object(self.mod.subprocess,'run',side_effect=run):
+            with self.mod.prepare_source(self.cache,'TASK','fallback','a'*64) as source:self.assertTrue(source['verified'])
+        self.assertEqual(len(calls),2)
+        self.assertEqual(calls[1][0][-1],'https://archive.apache.org/dist/jena/binaries/apache-jena-fuseki-6.2.0.tar.gz')
+
+    def test_download_checksum_error_or_limit_never_falls_back_or_publishes(self):
+        for mode in ('bad-hash','too-large'):
+            with self.subTest(mode=mode):
+                cache=self.root/mode;calls,run=self.transport(mode)
+                with patch.object(self.mod.subprocess,'run',side_effect=run):
+                    with self.assertRaises(self.mod.BuildRefused):
+                        with self.mod.prepare_source(cache,'TASK',mode,'a'*64):pass
+                self.assertEqual(len(calls),1)
+                self.assertFalse((cache/(self.sha+'.tar.gz')).exists())
+
+    def test_two_timeouts_preserve_only_sanitized_failure_stages(self):
+        calls,run=self.transport('timeout')
+        with patch.object(self.mod.subprocess,'run',side_effect=run):
+            with self.assertRaises(self.mod.BuildRefused) as caught:
+                with self.mod.prepare_source(self.cache,'TASK','timeouts','a'*64):pass
+        self.assertEqual(caught.exception.category,'NETWORK_TIMEOUT')
+        self.assertEqual(len(calls),2)
+        self.assertNotIn('SYNTHETIC_PRIVATE',json.dumps(caught.exception.diagnostic))
+        self.assertEqual(sum(stage['stage']=='network' for stage in caught.exception.stages),2)
+
+    def test_named_context_extra_file_and_changed_bytes_are_refused(self):
+        self.seed()
+        with self.mod.prepare_source(self.cache,'TASK','context','a'*64) as source:
+            extra=source['directory']/'extra';extra.write_bytes(b'bad')
+            with self.assertRaises(self.mod.BuildRefused):self.mod.validate_source_context(source['directory'])
+            extra.unlink()
+            archive=source['directory']/'fuseki.tar.gz';archive.chmod(0o600);archive.write_bytes(b'bad')
+            with self.assertRaises(self.mod.BuildRefused):self.mod.validate_source_context(source['directory'])
+            archive.write_bytes(self.payload)
+
+    def test_host_short_probe_does_not_require_or_start_a_docker_container(self):
+        calls=[]
+        def run(args,**kwargs):
+            calls.append((args,kwargs));self.assertEqual(args[0],'curl')
+            return subprocess.CompletedProcess(args,28,'','timeout')
+        with patch.object(self.mod.subprocess,'run',side_effect=run):result=self.mod.host_network_probe('TASK','probe')
+        self.assertEqual(result['scope'],'host')
+        self.assertEqual(result['outcome'],'REPRODUCED')
+        self.assertEqual(result['sourceExitCodes'],[28,28])
+        self.assertEqual(len(calls),2)
+        self.assertLessEqual(sum(kw['timeout'] for args,kw in calls),20)
+        self.assertTrue(all('--head' in args for args,kw in calls))
+
+    def test_bad_source_cache_failure_is_actually_rechecked_and_fixed_cache_recovers(self):
+        cache_file=self.seed(b'bad');context=self.root/'context';context.mkdir()
+        for name in self.mod.CONTEXT_FILES:(context/name).write_text('fixture\n')
+        expected=dict(inputFingerprint='a'*64,envFingerprint='b'*64,platform='linux/amd64')
+        failure=None
+        try:
+            with self.mod.prepare_source(self.cache,'TASK','first','a'*64):pass
+        except self.mod.BuildRefused as caught:failure=caught
+        self.assertEqual(failure.category,'CHECKSUM_MISMATCH')
+        state=self.root/'failure'
+        self.mod.save_failure_state(state,expected,failure,'first','a'*40)
+        with patch.object(self.mod.subprocess,'run',side_effect=AssertionError('checksum probe must not download/build')):
+            with self.assertRaises(self.mod.BuildRefused) as caught:
+                self.mod.failure_gate(state,expected,context,source_cache=self.cache)
+            self.assertEqual(caught.exception.exit_code,2)
+            self.assertEqual(caught.exception.diagnostic['probe']['operation'],'SOURCE_CACHE_VALIDATE')
+            cache_file.write_bytes(self.payload)
+            recovered=self.mod.failure_gate(state,expected,context,source_cache=self.cache)
+            self.assertEqual(recovered['outcome'],'RECOVERED')
+            self.assertTrue((state/'failure.json').exists())
+
+    def test_malicious_redirect_and_parameters_do_not_start_another_request(self):
+        calls=[]
+        def run(args,**kw):
+            calls.append(args)
+            return subprocess.CompletedProcess(args,0,None,b'\nCANONICAL_HTTP 302 https://SYNTHETIC_PRIVATE_TOKEN.example/source\n')
+        with patch.object(self.mod.subprocess,'run',side_effect=run):
+            with self.assertRaises(self.mod.BuildRefused) as caught:
+                with self.mod.prepare_source(self.cache,'TASK','redirect','a'*64):pass
+        self.assertEqual(caught.exception.category,'SOURCE_REDIRECT_REFUSED')
+        self.assertEqual(len(calls),1)
+        self.assertNotIn('SYNTHETIC_PRIVATE',json.dumps(caught.exception.diagnostic))
+        with self.assertRaises(self.mod.BuildRefused):
+            with self.mod.prepare_source(self.cache,'TASK;injection','bad','a'*64):pass
+
+    def test_dockerfile_uses_named_source_and_checks_checksum_before_extract(self):
+        text=(ROOT/'infra/development/fuseki/Dockerfile').read_text()
+        self.assertIn('COPY --from=fuseki_source',text)
+        self.assertLess(text.index('sha512sum --check --strict'),text.index('tar -xzf'))
+        self.assertNotIn('fetch-fuseki "$JENA_VERSION"',text)
 
 if __name__ == '__main__': unittest.main()

@@ -6,6 +6,9 @@ No mutable latest tag is produced. The local receipt records every invocation;
 image labels record the first build owner. No environment/volume contents read.
 """
 import argparse
+import contextlib
+import math
+import tempfile
 from collections import OrderedDict
 import datetime as dt
 import hashlib
@@ -31,6 +34,7 @@ BASE_IMAGE = 'eclipse-temurin:21.0.12.1_1-jre-jammy@'+BASE_DIGEST
 OFFICIAL_URLS = ('https://dlcdn.apache.org/jena/binaries/apache-jena-fuseki-6.2.0.tar.gz',
                  'https://archive.apache.org/dist/jena/binaries/apache-jena-fuseki-6.2.0.tar.gz')
 CONTEXT_FILES = frozenset(('.dockerignore','Dockerfile','entrypoint.sh','fetch-fuseki.sh','g2-config.ttl','g2-log4j2.properties'))
+MAX_SOURCE_BYTES = 256 * 1024**2
 MAX_ARCHIVE_BYTES = 2 * 1024**3
 HEX64 = r'[0-9a-f]{64}'
 SAFE_ID = r'[A-Za-z0-9][A-Za-z0-9_.-]{0,99}'
@@ -79,6 +83,7 @@ def safe_command(arguments):
             if prefix == ['docker','image','inspect'] and re.fullmatch(REPOSITORY+r':context-'+HEX64, arguments[-1]):
                 result.append(arguments[-1])
             return result
+    if arguments and arguments[0]=='curl':return ['curl','[fixed Apache request arguments withheld]']
     if arguments[:2] == ['git','-C']:
         return ['git','-C','<repository>','[identity query]']
     return [arguments[0] if arguments and arguments[0] in ('docker','git') else '[unknown executable]', '[arguments withheld]']
@@ -284,45 +289,233 @@ def parse_stages(output, fingerprint):
                 continue
             token=json.dumps(value,sort_keys=True)
             if token not in seen:
-                stages.append(dict(value,inputFingerprint=fingerprint))
+                stages.append(dict(value,inputFingerprint=fingerprint,executor='container'))
                 seen.add(token)
         except (ValueError,TypeError):
             continue
     return stages
 
 
-def ensure_image(context, task_id, run_id, expected=None):
+def ensure_image(context, task_id, run_id, expected=None, source_cache=None, before_cold=None):
     if not all(isinstance(value,str) and re.fullmatch(SAFE_ID,value) for value in (task_id,run_id)):
         raise BuildRefused('Invalid task/run identity')
     expected = expected or identity(context)
     preflight_context(context)
     start = time.monotonic()
+    deadline=start+600
     value = inspect_image(expected)
     reused = value is not None
     stages=[]
     checksum_verified=False
+    result_source=None
+    probe=None
+    container_checksum=False
     if not reused:
-        args=['docker','build','--provenance=false','--platform',expected['platform'],'--progress','plain','--tag',expected['image']]
-        for key,wanted in dict(expected_labels(expected),**{'io.ontology-platform.task-id':task_id,'io.ontology-platform.run-id':run_id}).items():
-            args.extend(['--label',key+'='+wanted])
-        args.append(str(Path(context).resolve()))
-        result=invoke(args)
-        stages.extend(parse_stages((result.stdout or '')+'\n'+(result.stderr or ''),expected['inputFingerprint']))
-        if result.returncode:
-            failure=BuildRefused('Canonical Fuseki build failed; raw output suppressed',failure_diagnostic(result,args))
-            failure.stages=stages+[stage_receipt('image preparation',start,'FAIL',expected['inputFingerprint'],failure.category)]
-            raise failure
-        checksum_verified=any(stage['stage']=='checksum' and stage['outcome']=='PASS' for stage in stages)
-        if context_digest(context)!=expected['contextSha256']:
-            raise BuildRefused('Build context changed during build',category='CONTEXT_CHANGED')
-        value=inspect_image(expected)
+        if before_cold:probe=before_cold()
+        with prepare_source(source_cache or ROOT/'artifacts/fuseki-sources',task_id,run_id,expected['inputFingerprint'],deadline) as source:
+            stages.extend(source['stages'])
+            validate_source_context(source['directory'])
+            args=['docker','build','--provenance=false','--network=none','--platform',expected['platform'],'--progress','plain',
+                  '--tag',expected['image'],'--build-context','fuseki_source='+str(source['directory'])]
+            for key,wanted in dict(expected_labels(expected),**{'io.ontology-platform.task-id':task_id,'io.ontology-platform.run-id':run_id}).items():
+                args.extend(['--label',key+'='+wanted])
+            args.append(str(Path(context).resolve()))
+            remaining=deadline-time.monotonic()
+            if remaining<=0:raise BuildRefused('Canonical cold preparation budget exhausted',category='BUILD_BUDGET_EXHAUSTED')
+            try:result=invoke(args,timeout=min(600,remaining))
+            except BuildRefused as failure:
+                failure.stages=stages+[stage_receipt('image preparation',start,'FAIL',expected['inputFingerprint'],failure.category)]
+                raise
+            stages.extend(parse_stages((result.stdout or '')+'\n'+(result.stderr or ''),expected['inputFingerprint']))
+            if result.returncode:
+                failure=BuildRefused('Canonical Fuseki build failed; raw output suppressed',failure_diagnostic(result,args))
+                failure.stages=stages+[stage_receipt('image preparation',start,'FAIL',expected['inputFingerprint'],failure.category)]
+                raise failure
+            checksum_verified=source['verified']
+            container_checksum=any(stage['stage']=='checksum' and stage['outcome']=='PASS' and stage.get('executor')=='container' for stage in stages)
+            result_source=source['receipt']
+            if context_digest(context)!=expected['contextSha256']:
+                raise BuildRefused('Build context changed during build',category='CONTEXT_CHANGED')
+            value=inspect_image(expected)
     if value is None:
         raise BuildRefused('Built image missing',category='IMAGE_IDENTITY_MISMATCH')
     if context_digest(context)!=expected['contextSha256']:
         raise BuildRefused('Build context changed during verification',category='CONTEXT_CHANGED')
     stages.append(stage_receipt('image preparation',start,'PASS',expected['inputFingerprint']))
-    return dict(expected,imageId=value['Id'],reused=reused,restored=False,taskId=task_id,runId=run_id,
-                sourceChecksumVerified=checksum_verified,stages=stages)
+    result=dict(expected,imageId=value['Id'],reused=reused,restored=False,taskId=task_id,runId=run_id,
+                sourceChecksumVerified=checksum_verified,containerChecksumVerified=container_checksum,stages=stages)
+    if result_source:result['source']=result_source
+    if probe:result['failureProbe']=probe
+    return result
+
+
+def host_stage(stage,start,outcome,fingerprint,operation,category=None):
+    return dict(stage_receipt(stage,start,outcome,fingerprint,category),executor='host',operation=operation)
+
+
+def source_file_fd(directory_fd,name):
+    flags=getattr(os,'O_NOFOLLOW',None)
+    if flags is None:raise BuildRefused('Source nofollow support unavailable',category='SOURCE_PLATFORM_UNSUPPORTED')
+    try:fd=os.open(name,os.O_RDONLY|flags|getattr(os,'O_NONBLOCK',0),dir_fd=directory_fd)
+    except FileNotFoundError:return None
+    except OSError:raise BuildRefused('Source cache file refused',category='SOURCE_CACHE_INVALID',stage='checksum') from None
+    state=os.fstat(fd)
+    if not stat.S_ISREG(state.st_mode) or state.st_nlink!=1 or not 0<state.st_size<=MAX_SOURCE_BYTES:
+        os.close(fd)
+        raise BuildRefused('Source cache type/size refused',category='SOURCE_CACHE_INVALID',stage='checksum')
+    return fd
+
+
+def source_digest_fd(fd,destination=None):
+    before=os.fstat(fd)
+    os.lseek(fd,0,os.SEEK_SET)
+    digest=hashlib.sha512();size=0
+    while chunk:=os.read(fd,1024*1024):
+        size+=len(chunk)
+        if size>MAX_SOURCE_BYTES:raise BuildRefused('Source exceeds approved size',category='SOURCE_SIZE_INVALID',stage='checksum')
+        digest.update(chunk)
+        if destination is not None:
+            pending=memoryview(chunk)
+            while pending:
+                written=os.write(destination,pending)
+                if written<=0:raise OSError('source write refused')
+                pending=pending[written:]
+    after=os.fstat(fd)
+    if (before.st_size,before.st_mtime_ns,before.st_ctime_ns)!=(after.st_size,after.st_mtime_ns,after.st_ctime_ns):
+        raise BuildRefused('Source changed during read',category='SOURCE_CONTEXT_CHANGED',stage='checksum')
+    if size!=before.st_size or digest.hexdigest()!=JENA_SHA512:
+        raise BuildRefused('Source SHA512 verification refused',category='CHECKSUM_MISMATCH',stage='checksum')
+    return size
+
+
+def host_curl(url,output,seconds,connect,deadline,head=False):
+    """Manual redirects can only target the two exact approved Apache URLs."""
+    window=min(deadline,time.monotonic()+seconds)
+    for redirect in range(4):
+        remaining=window-time.monotonic()
+        if remaining<=0:raise BuildRefused('Host source request timed out',category='NETWORK_TIMEOUT',stage='network')
+        limit=min(seconds,max(1,math.ceil(remaining)))
+        if not head:output.seek(0);output.truncate(0)
+        args=['curl','--fail','--silent','--show-error','--proto','=https','--proto-redir','=https','--max-redirs','3',
+              '--connect-timeout',str(min(connect,limit)),'--max-time',str(limit),'--retry','0','--max-filesize',str(MAX_SOURCE_BYTES),
+              '--write-out','%{stderr}\nCANONICAL_HTTP %{http_code} %{redirect_url}\n']
+        if head:args.append('--head')
+        args.append(url)
+        begin=time.monotonic()
+        try:result=subprocess.run(args,stdout=output,stderr=subprocess.PIPE,timeout=min(limit+(1 if head else 5),deadline-time.monotonic()))
+        except subprocess.TimeoutExpired as failure:
+            diagnostic=command_diagnostic(args,'TIMEOUT',time.monotonic()-begin,None,failure.stderr)
+            raise BuildRefused('Host source request timed out',diagnostic,category='NETWORK_TIMEOUT',stage='network') from None
+        except OSError:raise BuildRefused('Host curl unavailable',category='SOURCE_TOOL_UNAVAILABLE',stage='network') from None
+        result.safe_diagnostic=command_diagnostic(args,result.returncode,time.monotonic()-begin,None,result.stderr)
+        result.safe_diagnostic['timeoutSeconds']=limit
+        if result.returncode:return result
+        raw=result.stderr.decode('utf-8',errors='replace') if isinstance(result.stderr,bytes) else (result.stderr or '')
+        matches=re.findall(r'^CANONICAL_HTTP ([0-9]{3}) ([^\r\n]*)$',raw,re.MULTILINE)
+        if len(matches)!=1:raise BuildRefused('Source HTTP status protocol refused',result.safe_diagnostic,category='SOURCE_PROTOCOL_INVALID',stage='network')
+        status=int(matches[0][0]);target=matches[0][1]
+        if 300<=status<400:
+            if redirect==3 or target not in OFFICIAL_URLS:
+                raise BuildRefused('Source redirect refused',result.safe_diagnostic,category='SOURCE_REDIRECT_REFUSED',stage='network')
+            url=target
+            continue
+        if target or not (200<=status<300 if head else status==200):
+            raise BuildRefused('Source HTTP response refused',result.safe_diagnostic,category='SOURCE_PROTOCOL_INVALID',stage='network')
+        return result
+    raise BuildRefused('Source redirect budget refused',category='SOURCE_REDIRECT_REFUSED',stage='network')
+
+
+def validate_source_context(directory):
+    directory=Path(directory)
+    dedicated_directory(directory)
+    if {path.name for path in directory.iterdir()}!={'fuseki.tar.gz'}:
+        raise BuildRefused('Named source context must contain exactly one archive',category='SOURCE_CONTEXT_INVALID',stage='extract/COPY')
+    parent=os.open(directory,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW)
+    fd=None
+    try:
+        fd=source_file_fd(parent,'fuseki.tar.gz')
+        if fd is None:raise BuildRefused('Named source archive missing',category='COPY_INPUT_MISSING')
+        return source_digest_fd(fd)
+    finally:
+        if fd is not None:os.close(fd)
+        os.close(parent)
+
+
+@contextlib.contextmanager
+def prepare_source(cache,task_id,run_id,fingerprint,deadline=None):
+    """Cache only verified official bytes; stage one private read-only named input."""
+    if not all(isinstance(v,str) and re.fullmatch(SAFE_ID,v) for v in (task_id,run_id)) or not isinstance(fingerprint,str) or not re.fullmatch(HEX64,fingerprint):
+        raise BuildRefused('Invalid source owner',category='SOURCE_IDENTITY_INVALID')
+    deadline=deadline or time.monotonic()+600
+    stages=[];parent=None;fd=None
+    try:
+        cache=dedicated_directory(cache)
+        parent=os.open(cache,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW)
+        name=JENA_SHA512+'.tar.gz'
+        started=time.monotonic()
+        fd=source_file_fd(parent,name)
+        downloaded=False
+        outcome='HIT' if fd is not None else 'MISS'
+        stages.append(host_stage('cache restore',started,outcome,fingerprint,'SOURCE_CACHE_VALIDATE'))
+        if fd is None:
+            with tempfile.TemporaryDirectory(prefix='source-download-',dir=cache) as temporary:
+                part=Path(temporary)/'download.partial'
+                opened=os.open(part,os.O_RDWR|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600)
+                with os.fdopen(opened,'w+b') as stream:
+                    for url in OFFICIAL_URLS:
+                        started=time.monotonic()
+                        try:result=host_curl(url,stream,180,15,deadline)
+                        except BuildRefused as failure:
+                            stages.append(host_stage('network',started,'FAIL',fingerprint,'SOURCE_DOWNLOAD',failure.category))
+                            if failure.category=='NETWORK_TIMEOUT' and url!=OFFICIAL_URLS[-1]:continue
+                            raise
+                        category='NETWORK_TIMEOUT' if result.returncode==28 else 'DOWNLOAD_HTTP_FAILURE' if result.returncode==22 else 'NETWORK_CONNECT'
+                        stages.append(host_stage('network',started,'PASS' if not result.returncode else 'FAIL',fingerprint,'SOURCE_DOWNLOAD',None if not result.returncode else category))
+                        if not result.returncode:break
+                        if result.returncode in (2,3,23,47,63):
+                            raise BuildRefused('Source transfer limits/configuration refused',result.safe_diagnostic,
+                                               category='SOURCE_SIZE_INVALID' if result.returncode==63 else 'SOURCE_TRANSFER_REFUSED',stage='network')
+                        if url==OFFICIAL_URLS[-1]:raise BuildRefused('Both approved source requests failed',result.safe_diagnostic,category=category,stage='network')
+                    stream.flush();os.fsync(stream.fileno())
+                    started=time.monotonic()
+                    try:source_digest_fd(stream.fileno())
+                    except BuildRefused as failure:
+                        stages.append(host_stage('checksum',started,'FAIL',fingerprint,'SOURCE_SHA512',failure.category));raise
+                    stages.append(host_stage('checksum',started,'PASS',fingerprint,'SOURCE_SHA512'))
+                    os.fchmod(stream.fileno(),0o400)
+                try:os.link(part,name,dst_dir_fd=parent,follow_symlinks=False)
+                except FileExistsError:pass
+                part.unlink()
+            fd=source_file_fd(parent,name)
+            if fd is None:raise BuildRefused('Verified source publication missing',category='SOURCE_CACHE_INVALID')
+            downloaded=True
+        started=time.monotonic()
+        with tempfile.TemporaryDirectory(prefix='fuseki-source-context-',dir=cache.parent) as temporary:
+            directory=Path(temporary)
+            destination=os.open(directory/'fuseki.tar.gz',os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o400)
+            try:size=source_digest_fd(fd,destination);os.fsync(destination)
+            except BuildRefused as failure:
+                stages.append(host_stage('checksum',started,'FAIL',fingerprint,'SOURCE_SHA512',failure.category));raise
+            finally:os.close(destination)
+            stages.append(host_stage('checksum',started,'PASS',fingerprint,'SOURCE_SHA512'))
+            receipt=dict(cacheFile=str(cache/name),sha512=JENA_SHA512,sizeBytes=size,cacheOutcome=outcome,downloaded=downloaded,
+                         taskId=task_id,runId=run_id,temporaryContextRemoved=False,reviewTrigger='G3-M3 stage closeout')
+            source=dict(directory=directory,receipt=receipt,stages=stages,verified=True,downloaded=downloaded)
+            validate_source_context(directory)
+            try:
+                yield source
+                validate_source_context(directory)
+            finally:receipt['temporaryContextRemoved']=True
+    except BuildRefused as failure:
+        failure.stages=getattr(failure,'stages',stages)
+        raise
+    except OSError:
+        failure=BuildRefused('Source cache I/O refused',category='SOURCE_IO_REFUSED',stage='checksum')
+        failure.stages=stages
+        raise failure from None
+    finally:
+        if fd is not None:os.close(fd)
+        if parent is not None:os.close(parent)
 
 
 def regular_file(path, maximum):
@@ -899,21 +1092,76 @@ def container_network_probe(task_id, run_id, platform=None):
         raise
 
 
-def short_reproduce(context, stage, category, task_id='DEVELOPMENT', run_id=None, platform=None, probe_receipts=None):
-    """At most two fixed 5s HEADs inside the pinned local base, within a 20s budget."""
+def host_network_probe(task_id,run_id):
+    """Match the current source executor with fixed-origin HEADs; never download."""
+    started=time.monotonic();deadline=started+19
+    receipt=dict(schemaVersion=1,scope='host',taskId=task_id,runId=run_id,budgetSeconds=20,sourceExitCodes=[],outcome='BLOCKED')
+    try:
+        with open(os.devnull,'wb') as output:
+            for url in OFFICIAL_URLS:
+                try:result=host_curl(url,output,5,5,deadline,head=True)
+                except BuildRefused as failure:
+                    if failure.category!='NETWORK_TIMEOUT':raise
+                    receipt['sourceExitCodes'].append(28)
+                    continue
+                receipt['sourceExitCodes'].append(result.returncode)
+                if result.returncode==0:
+                    receipt.update(outcome='RECOVERED',errorCategory=None,durationMs=round((time.monotonic()-started)*1000));return receipt
+                if result.returncode in (2,3,23,47,63):raise BuildRefused('Host source probe unavailable',result.safe_diagnostic,category='SOURCE_PROBE_UNAVAILABLE',exit_code=2)
+        if len(receipt['sourceExitCodes'])!=2:raise BuildRefused('Host probe incomplete',category='SOURCE_PROBE_UNAVAILABLE',exit_code=2)
+        code=receipt['sourceExitCodes'][-1]
+        receipt.update(outcome='REPRODUCED',errorCategory='NETWORK_TIMEOUT' if code==28 else 'DOWNLOAD_HTTP_FAILURE' if code==22 else 'NETWORK_CONNECT',
+                       durationMs=round((time.monotonic()-started)*1000))
+        return receipt
+    except BuildRefused as failure:
+        failure.exit_code=2
+        receipt.update(errorCategory=failure.category,durationMs=round((time.monotonic()-started)*1000))
+        failure.diagnostic=dict(failure.diagnostic or {},probe=receipt)
+        raise
+
+
+def short_reproduce(context, stage, category, task_id='DEVELOPMENT', run_id=None, platform=None, probe_receipts=None, executor='host', source_cache=None):
+    """Recheck current host source failures cheaply; preserve explicit legacy container probes."""
     try:
         preflight_context(context)
     except BuildRefused as failure:
         return failure.stage,failure.category
+    if stage=='checksum' and source_cache is not None:
+        started=time.monotonic();parent=None;fd=None
+        receipt=dict(schemaVersion=1,scope='host',taskId=task_id,runId=run_id,operation='SOURCE_CACHE_VALIDATE',outcome='NOT_REPRODUCED',budgetSeconds=20)
+        observed=None
+        try:
+            cache=Path(source_cache)
+            if cache.is_symlink():raise BuildRefused('Source cache link refused',category='SOURCE_CACHE_INVALID',stage='checksum')
+            if cache.is_dir():
+                for path in (cache,*cache.parents):
+                    if path.is_symlink():raise BuildRefused('Source cache ancestor refused',category='SOURCE_CACHE_INVALID',stage='checksum')
+                parent=os.open(cache,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW)
+                fd=source_file_fd(parent,JENA_SHA512+'.tar.gz')
+                if fd is not None:
+                    source_digest_fd(fd)
+                    receipt['outcome']='RECOVERED'
+        except BuildRefused as failure:
+            observed=(failure.stage,failure.category)
+            receipt.update(outcome='REPRODUCED',errorCategory=failure.category)
+        except OSError:
+            raise BuildRefused('Source checksum probe unavailable',category='SOURCE_PROBE_UNAVAILABLE',exit_code=2) from None
+        finally:
+            if fd is not None:os.close(fd)
+            if parent is not None:os.close(parent)
+        receipt['durationMs']=round((time.monotonic()-started)*1000)
+        if receipt['durationMs']>19000:raise BuildRefused('Source checksum probe budget exhausted',category='SOURCE_PROBE_UNAVAILABLE',exit_code=2)
+        if probe_receipts is not None:probe_receipts.append(receipt)
+        return observed
     if stage!='network':
         return None
-    receipt=container_network_probe(task_id,run_id,platform)
+    receipt=container_network_probe(task_id,run_id,platform) if executor=='container' else host_network_probe(task_id,run_id)
     if probe_receipts is not None:probe_receipts.append(receipt)
     if receipt['outcome']=='REPRODUCED':return 'network',receipt['errorCategory']
     return None
 
 
-def failure_gate(directory, expected, context, final_gate=False, task_id='DEVELOPMENT', run_id=None):
+def failure_gate(directory, expected, context, final_gate=False, task_id='DEVELOPMENT', run_id=None, source_cache=None):
     if final_gate:return
     path=Path(directory)/'failure.json'
     if not path.exists() and not path.is_symlink():return
@@ -934,7 +1182,7 @@ def failure_gate(directory, expected, context, final_gate=False, task_id='DEVELO
     except (OSError,ValueError,KeyError,TypeError,AttributeError,BuildRefused):
         raise BuildRefused('Failure-state schema refused',category='FAILURE_STATE_INVALID') from None
     probes=[]
-    if short_reproduce(context,state['stage'],state['category'],task_id,run_id,expected['platform'],probes)==(state['stage'],state['category']):
+    if short_reproduce(context,state['stage'],state['category'],task_id,run_id,expected['platform'],probes,source_cache=source_cache)==(state['stage'],state['category']):
         diagnostic={'probe':probes[-1]} if probes else None
         raise BuildRefused('Repeated failure confirmed within short budget; expensive build blocked',diagnostic,category=state['category'],stage=state['stage'],exit_code=2)
     return probes[-1] if probes else None
@@ -988,11 +1236,9 @@ def build(task_id, run_id, platform=None, restore_directory=None, export_directo
         context=ROOT / 'infra/development/fuseki'
         preflight_context(context)
         restored=restore_cache(restore_directory,expected) if restore_directory else dict(outcome='NOT_RUN',stages=[])
-        probe=None
-        if restored['outcome']!='HIT' and failure_directory:
-            probe=failure_gate(failure_directory,expected,context,final_gate,task_id,run_id)
-        result=ensure_image(context,task_id,run_id,expected)
-        if probe:result['failureProbe']=probe
+        def before_cold():return failure_gate(failure_directory,expected,context,final_gate,task_id,run_id,source_cache=shared.parent/'fuseki-sources')
+        result=ensure_image(context,task_id,run_id,expected,source_cache=shared.parent/'fuseki-sources',
+                            before_cold=before_cold if restored['outcome']!='HIT' and failure_directory else None)
         result['cacheOutcome']=restored['outcome']
         result['stages']=restored['stages']+result['stages']
         result['restored']=restored['outcome']=='HIT'
