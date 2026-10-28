@@ -1,0 +1,222 @@
+{
+  "stage": "m3-api-oidc",
+  "status": "PASS",
+  "overallG2": "PARTIAL",
+  "checks": [
+    {
+      "name": "anonymous_authorization_before_malformed_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "anonymous_publication_proposal_prebinding_401",
+      "status": "PASS",
+      "observedStatus": 401
+    },
+    {
+      "name": "anonymous_publication_decision_prebinding_401",
+      "status": "PASS",
+      "observedStatus": 401
+    },
+    {
+      "name": "anonymous_publication_activation_prebinding_401",
+      "status": "PASS",
+      "observedStatus": 401
+    },
+    {
+      "name": "operator-ab_real_http_only_session",
+      "status": "PASS"
+    },
+    {
+      "name": "operator-ab_csrf",
+      "status": "PASS"
+    },
+    {
+      "name": "viewer-ab_real_http_only_session",
+      "status": "PASS"
+    },
+    {
+      "name": "viewer-ab_csrf",
+      "status": "PASS"
+    },
+    {
+      "name": "viewer-a_real_http_only_session",
+      "status": "PASS"
+    },
+    {
+      "name": "viewer-a_csrf",
+      "status": "PASS"
+    },
+    {
+      "name": "auditor-ab_real_http_only_session",
+      "status": "PASS"
+    },
+    {
+      "name": "auditor-ab_csrf",
+      "status": "PASS"
+    },
+    {
+      "name": "m3_mode_not_contradictory",
+      "status": "PASS"
+    },
+    {
+      "name": "m3_current_profile_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m3_current_registered_m3_profile",
+      "status": "PASS"
+    },
+    {
+      "name": "m3_create_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m3_initial_four_source_bytes_and_hashes",
+      "status": "PASS"
+    },
+    {
+      "name": "m3_snapshot_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m3_snapshot_four_source_bound",
+      "status": "PASS"
+    },
+    {
+      "name": "m3_actual_four_sources_projected",
+      "status": "PASS"
+    },
+    {
+      "name": "m3_terminology_and_unit_identities",
+      "status": "PASS"
+    },
+    {
+      "name": "m3_seven_explicit_dimension_exponents",
+      "status": "PASS"
+    },
+    {
+      "name": "m3_multisite_read_denied_http",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "m3_exact_label_source_found",
+      "status": "PASS"
+    },
+    {
+      "name": "m3_viewer_write_denied_http",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "m3_single_write_denied_http",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "m3_missing_cas_http",
+      "status": "PASS",
+      "observedStatus": 428
+    },
+    {
+      "name": "m3_stale_revision_http",
+      "status": "PASS",
+      "observedStatus": 409
+    },
+    {
+      "name": "m3_wrong_source_hash_http",
+      "status": "PASS",
+      "observedStatus": 409
+    },
+    {
+      "name": "m3_atomic_late_conflict_http",
+      "status": "PASS",
+      "observedStatus": 409
+    },
+    {
+      "name": "m3_negative_readback_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m3_all_rejections_preserve_every_source",
+      "status": "PASS"
+    },
+    {
+      "name": "m3_cross_source_commit_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m3_one_revision_two_source_atomic_commit",
+      "status": "PASS"
+    },
+    {
+      "name": "m3_same_command_replay_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m3_idempotent_same_revision_and_hash",
+      "status": "PASS"
+    },
+    {
+      "name": "m3_idempotent_payload_conflict_http",
+      "status": "PASS",
+      "observedStatus": 409
+    },
+    {
+      "name": "m3_stale_exact_old_object_http",
+      "status": "PASS",
+      "observedStatus": 409
+    },
+    {
+      "name": "m3_committed_snapshot_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m3_new_label_real_pg_riot_readback",
+      "status": "PASS"
+    },
+    {
+      "name": "m3_create_conflicting_draft_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m3_conflict_assessment_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m3_conflicts_block_formal_eligibility",
+      "status": "PASS"
+    },
+    {
+      "name": "m3_source_diagnostic_skos_pref_label_conflict",
+      "status": "PASS"
+    },
+    {
+      "name": "m3_source_diagnostic_unit_dimension_mismatch",
+      "status": "PASS"
+    },
+    {
+      "name": "m3_api_valid_assessment_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m3_api_valid_assessment_eligible_fixed_profile",
+      "status": "PASS"
+    }
+  ],
+  "failure": null,
+  "notRun": [
+    "remaining full-chain gates",
+    "final regression and CI"
+  ]
+}

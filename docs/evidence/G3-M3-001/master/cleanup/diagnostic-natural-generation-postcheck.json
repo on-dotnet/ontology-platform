@@ -1,0 +1,102 @@
+{
+  "status": "PASS",
+  "observedAtUtc": "2026-10-28T15:57:45.140257+00:00",
+  "applyBridgeId": "b039b28cbb214f3875a0c2a78335c7dfd0e828847106e5e4a72f8ab2f4cb2c86",
+  "naturalLaterBridgeId": "f0b868b3acfb3373bdc1b2f8f499bcf94e9143689737dfce917141fae0a93623",
+  "afterBridgeId": "f0b868b3acfb3373bdc1b2f8f499bcf94e9143689737dfce917141fae0a93623",
+  "forcedSystemAction": false,
+  "trigger": "Natural later lifecycle observed after authorized owned AppHost API/UI executions; no global restart/update/DB edits",
+  "checks": [
+    {
+      "target": "u4pq3cm5kkdmvt81at69np6w1",
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "buildx",
+        "history",
+        "inspect",
+        "--builder",
+        "desktop-linux",
+        "--format",
+        "{\"Ref\":{{printf \"%q\" .Ref}},\"Name\":{{printf \"%q\" .Name}},\"Context\":{{printf \"%q\" .Context}},\"Dockerfile\":{{printf \"%q\" .Dockerfile}},\"VCSRepository\":{{printf \"%q\" .VCSRepository}},\"VCSRevision\":{{printf \"%q\" .VCSRevision}},\"Status\":{{printf \"%q\" .Status}}}",
+        "u4pq3cm5kkdmvt81at69np6w1"
+      ],
+      "exitCode": 1,
+      "exactNoRecordDiagnostic": true
+    },
+    {
+      "target": "qydp3k8m5h46i07t182f2ojey",
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "buildx",
+        "history",
+        "inspect",
+        "--builder",
+        "desktop-linux",
+        "--format",
+        "{\"Ref\":{{printf \"%q\" .Ref}},\"Name\":{{printf \"%q\" .Name}},\"Context\":{{printf \"%q\" .Context}},\"Dockerfile\":{{printf \"%q\" .Dockerfile}},\"VCSRepository\":{{printf \"%q\" .VCSRepository}},\"VCSRevision\":{{printf \"%q\" .VCSRevision}},\"Status\":{{printf \"%q\" .Status}}}",
+        "qydp3k8m5h46i07t182f2ojey"
+      ],
+      "exitCode": 1,
+      "exactNoRecordDiagnostic": true
+    },
+    {
+      "target": "20b0q7l3v4hjmtem8si9g0lxc",
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "buildx",
+        "history",
+        "inspect",
+        "--builder",
+        "desktop-linux",
+        "--format",
+        "{\"Ref\":{{printf \"%q\" .Ref}},\"Name\":{{printf \"%q\" .Name}},\"Context\":{{printf \"%q\" .Context}},\"Dockerfile\":{{printf \"%q\" .Dockerfile}},\"VCSRepository\":{{printf \"%q\" .VCSRepository}},\"VCSRevision\":{{printf \"%q\" .VCSRevision}},\"Status\":{{printf \"%q\" .Status}}}",
+        "20b0q7l3v4hjmtem8si9g0lxc"
+      ],
+      "exitCode": 1,
+      "exactNoRecordDiagnostic": true
+    },
+    {
+      "target": "lpsg3gngs8x1rvrnb25yjoyn0",
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "buildx",
+        "history",
+        "inspect",
+        "--builder",
+        "desktop-linux",
+        "--format",
+        "{\"Ref\":{{printf \"%q\" .Ref}},\"Name\":{{printf \"%q\" .Name}},\"Context\":{{printf \"%q\" .Context}},\"Dockerfile\":{{printf \"%q\" .Dockerfile}},\"VCSRepository\":{{printf \"%q\" .VCSRepository}},\"VCSRevision\":{{printf \"%q\" .VCSRevision}},\"Status\":{{printf \"%q\" .Status}}}",
+        "lpsg3gngs8x1rvrnb25yjoyn0"
+      ],
+      "exitCode": 1,
+      "exactNoRecordDiagnostic": true
+    },
+    {
+      "target": "8q69crf65sf5ffy9tfqlapd3a",
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "buildx",
+        "history",
+        "inspect",
+        "--builder",
+        "desktop-linux",
+        "--format",
+        "{\"Ref\":{{printf \"%q\" .Ref}},\"Name\":{{printf \"%q\" .Name}},\"Context\":{{printf \"%q\" .Context}},\"Dockerfile\":{{printf \"%q\" .Dockerfile}},\"VCSRepository\":{{printf \"%q\" .VCSRepository}},\"VCSRevision\":{{printf \"%q\" .VCSRevision}},\"Status\":{{printf \"%q\" .Status}}}",
+        "8q69crf65sf5ffy9tfqlapd3a"
+      ],
+      "exitCode": 1,
+      "exactNoRecordDiagnostic": true
+    }
+  ],
+  "physicalReclaimedBytes": "NOT_VERIFIED"
+}

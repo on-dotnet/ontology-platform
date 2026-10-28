@@ -1,0 +1,46 @@
+{
+  "agent": "/root/m3_web_review",
+  "observedAtUtc": "2026-10-28T15:59:32.789326+00:00",
+  "sourceHead": "54923a9aee3fece0c7d288dd5211718ecd30ad67",
+  "result": "NO_CONFIRMED_P1_P2_API_AND_UI_CHECKPOINTS_PASS",
+  "api": {
+    "runId": "de56af4da85345ce8de7ed5a2d090982",
+    "scope": "API_ONLY",
+    "entryChecks": 47,
+    "authenticationPrebindingChecks": 12,
+    "m3ApiChecks": 35,
+    "gateExitCode": 0,
+    "gateDurationMs": 4924,
+    "launcherStopped": true,
+    "launcherExitCode": 0
+  },
+  "ui": {
+    "runId": "70467a7cab534bdfabe433f2f2c93eaf",
+    "scope": "UI_ONLY",
+    "entryChecks": 149,
+    "authenticationPrebindingChecks": 14,
+    "m3Checks": 135,
+    "workspaceSmokeChecks": 11,
+    "workspaceSmokeDurationMs": 3422,
+    "faultExpectedFailureMs": 309,
+    "restoredOutcome": "PASS",
+    "gateExitCode": 0,
+    "launcherStopped": true,
+    "launcherExitCode": 0,
+    "returnedPublicationIdentifiersConsistent": true,
+    "releaseVersionsDistinct": true,
+    "formalQueryRunSseRollbackVerified": true,
+    "pngFiles": 3,
+    "pngUniqueContents": 2,
+    "pngTotalBytes": 1567681,
+    "visualCredentialLeakObserved": false
+  },
+  "originalFailure": {
+    "runId": "869399b3c3274e368c26e68e8c279b46",
+    "status": "FAIL",
+    "phase": "oidc_audit-ab",
+    "category": "TypeError",
+    "preserved": true
+  },
+  "remaining": "Current final script Head full CI, second main integration, full seven runtime gates; prior6b880 CI success does not certify549"
+}

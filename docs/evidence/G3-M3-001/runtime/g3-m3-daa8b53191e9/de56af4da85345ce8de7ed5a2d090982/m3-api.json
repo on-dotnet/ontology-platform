@@ -1,0 +1,280 @@
+{
+  "taskId": "G3-M3-001",
+  "status": "PASS",
+  "phase": "governance_diagnostic_sources",
+  "startedAtUtc": "2026-10-28T15:53:03.825Z",
+  "completedAtUtc": "2026-10-28T15:53:04.658Z",
+  "durationMs": 833.2884999999997,
+  "sourceHead": "54923a9aee3fece0c7d288dd5211718ecd30ad67",
+  "scope": "API_ONLY: real OIDC/API/PG/RIOT/SHACL, four-source vocabulary/CAS/governance",
+  "identifiers": {
+    "assetId": "57850428c72042fb928a5ba9ae4440b1",
+    "draftId": "be3d2a6ca44b487f83486ba057ae80c4"
+  },
+  "checks": [
+    {
+      "name": "mode_not_contradictory",
+      "status": "PASS"
+    },
+    {
+      "name": "current_profile_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "current_registered_m3_profile",
+      "status": "PASS"
+    },
+    {
+      "name": "create_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "initial_four_source_bytes_and_hashes",
+      "status": "PASS"
+    },
+    {
+      "name": "snapshot_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "snapshot_four_source_bound",
+      "status": "PASS"
+    },
+    {
+      "name": "actual_four_sources_projected",
+      "status": "PASS"
+    },
+    {
+      "name": "terminology_and_unit_identities",
+      "status": "PASS"
+    },
+    {
+      "name": "seven_explicit_dimension_exponents",
+      "status": "PASS"
+    },
+    {
+      "name": "multisite_read_denied_http",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "exact_label_source_found",
+      "status": "PASS"
+    },
+    {
+      "name": "viewer_write_denied_http",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "single_write_denied_http",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "missing_cas_http",
+      "status": "PASS",
+      "observedStatus": 428
+    },
+    {
+      "name": "stale_revision_http",
+      "status": "PASS",
+      "observedStatus": 409
+    },
+    {
+      "name": "wrong_source_hash_http",
+      "status": "PASS",
+      "observedStatus": 409
+    },
+    {
+      "name": "atomic_late_conflict_http",
+      "status": "PASS",
+      "observedStatus": 409
+    },
+    {
+      "name": "negative_readback_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "all_rejections_preserve_every_source",
+      "status": "PASS"
+    },
+    {
+      "name": "cross_source_commit_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "one_revision_two_source_atomic_commit",
+      "status": "PASS"
+    },
+    {
+      "name": "same_command_replay_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "idempotent_same_revision_and_hash",
+      "status": "PASS"
+    },
+    {
+      "name": "idempotent_payload_conflict_http",
+      "status": "PASS",
+      "observedStatus": 409
+    },
+    {
+      "name": "stale_exact_old_object_http",
+      "status": "PASS",
+      "observedStatus": 409
+    },
+    {
+      "name": "committed_snapshot_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "new_label_real_pg_riot_readback",
+      "status": "PASS"
+    },
+    {
+      "name": "create_conflicting_draft_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "conflict_assessment_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "conflicts_block_formal_eligibility",
+      "status": "PASS"
+    },
+    {
+      "name": "source_diagnostic_skos_pref_label_conflict",
+      "status": "PASS"
+    },
+    {
+      "name": "source_diagnostic_unit_dimension_mismatch",
+      "status": "PASS"
+    },
+    {
+      "name": "api_valid_assessment_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "api_valid_assessment_eligible_fixed_profile",
+      "status": "PASS"
+    }
+  ],
+  "samples": [
+    {
+      "operation": "current_profile",
+      "durationMs": 8.723292000000129,
+      "status": 200
+    },
+    {
+      "operation": "create",
+      "durationMs": 193.04624999999987,
+      "status": 200
+    },
+    {
+      "operation": "snapshot",
+      "durationMs": 75.06808300000012,
+      "status": 200
+    },
+    {
+      "operation": "multisite_read_denied",
+      "durationMs": 7.367708000000221,
+      "status": 403
+    },
+    {
+      "operation": "viewer_write_denied",
+      "durationMs": 4.58658400000013,
+      "status": 403
+    },
+    {
+      "operation": "single_write_denied",
+      "durationMs": 4.503917000000001,
+      "status": 403
+    },
+    {
+      "operation": "missing_cas",
+      "durationMs": 4.501499999999851,
+      "status": 428
+    },
+    {
+      "operation": "stale_revision",
+      "durationMs": 5.387291000000005,
+      "status": 409
+    },
+    {
+      "operation": "wrong_source_hash",
+      "durationMs": 5.731917000000067,
+      "status": 409
+    },
+    {
+      "operation": "atomic_late_conflict",
+      "durationMs": 45.762750000000324,
+      "status": 409
+    },
+    {
+      "operation": "negative_readback",
+      "durationMs": 6.283916999999747,
+      "status": 200
+    },
+    {
+      "operation": "cross_source_commit",
+      "durationMs": 100.5309159999997,
+      "status": 200
+    },
+    {
+      "operation": "same_command_replay",
+      "durationMs": 4.061542000000372,
+      "status": 200
+    },
+    {
+      "operation": "idempotent_payload_conflict",
+      "durationMs": 2.6410000000000764,
+      "status": 409
+    },
+    {
+      "operation": "stale_exact_old_object",
+      "durationMs": 38.27724999999964,
+      "status": 409
+    },
+    {
+      "operation": "committed_snapshot",
+      "durationMs": 42.80279200000041,
+      "status": 200
+    },
+    {
+      "operation": "create_conflicting_draft",
+      "durationMs": 48.97149999999965,
+      "status": 200
+    },
+    {
+      "operation": "conflict_assessment",
+      "durationMs": 137.77208399999972,
+      "status": 200
+    },
+    {
+      "operation": "api_valid_assessment",
+      "durationMs": 88.20670900000005,
+      "status": 200
+    }
+  ],
+  "notRun": [
+    "UI / publication / formal query / Run / SSE / rollback",
+    "real LLM",
+    "QUDT assets / universal unit conversion",
+    "full OWL reasoning",
+    "Windows/Intel native",
+    "production HA/SLO"
+  ]
+}
