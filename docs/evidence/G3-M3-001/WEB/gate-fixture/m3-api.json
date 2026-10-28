@@ -1,0 +1,38 @@
+{
+  "taskId": "G3-M3-001",
+  "status": "FAIL",
+  "phase": "profile",
+  "startedAtUtc": "2026-10-28T13:01:58.904Z",
+  "completedAtUtc": "2026-10-28T13:01:58.905Z",
+  "durationMs": 0.060416000000000025,
+  "sourceHead": "4b83736548064f394e2367d987ba6e5de6d0d60a",
+  "scope": "API_ONLY: real OIDC/API/PG/RIOT/SHACL, four-source vocabulary/CAS/governance",
+  "failureCategory": "ASSERTION",
+  "identifiers": {},
+  "checks": [
+    {
+      "name": "mode_not_contradictory",
+      "status": "PASS"
+    },
+    {
+      "name": "current_profile_http",
+      "status": "FAIL",
+      "observedStatus": 503
+    }
+  ],
+  "samples": [
+    {
+      "operation": "current_profile",
+      "durationMs": 0.006916000000000366,
+      "status": 503
+    }
+  ],
+  "notRun": [
+    "UI / publication / formal query / Run / SSE / rollback",
+    "real LLM",
+    "QUDT assets / universal unit conversion",
+    "full OWL reasoning",
+    "Windows/Intel native",
+    "production HA/SLO"
+  ]
+}
