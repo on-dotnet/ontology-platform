@@ -1,4 +1,4 @@
-"""Own one fresh authorized M1 or M2 AppHost throughout genuine browser, semantic and operational acceptance."""
+"""Own one fresh authorized M1, M2 or M3 AppHost throughout genuine browser, semantic and operational acceptance."""
 import argparse
 import datetime
 import importlib.util
@@ -23,6 +23,7 @@ def run_attempt():
     parser.add_argument('--milestone', choices=['M1', 'M2', 'M3'], default='M1')
     parser.add_argument('--api-only', action='store_true')
     parser.add_argument('--ui-only', action='store_true')
+    parser.add_argument('--smoke-fault-check', action='store_true')
     args = parser.parse_args()
     if not args.runtime_file and not args.start_runtime:
         parser.error('Choose an owned runtime or explicitly start a new M1 stack')
@@ -112,6 +113,8 @@ def run_attempt():
             commands[0].append('--m2-api-only' if args.api_only else '--m2-ui-only' if args.ui_only else '--m2')
         if args.milestone == 'M3':
             commands[0].append('--m3-api-only' if args.api_only else '--m3-ui-only' if args.ui_only else '--m3')
+        if args.smoke_fault_check:
+            commands[0].append('--smoke-fault-check')
         if args.api_only or args.ui_only:
             commands[0].remove('--m1')
             commands = commands[:1]

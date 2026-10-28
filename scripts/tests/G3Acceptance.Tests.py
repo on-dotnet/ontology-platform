@@ -59,7 +59,7 @@ class RealBrowserEntryTests(unittest.TestCase):
 class M1OrchestrationTests(unittest.TestCase):
     """Keep gate selection/order/failure propagation real, isolate external services only."""
 
-    def exercise(self, fail_gate=None, prefix='g3-m1-control', launch_failure=False, milestone=None, api_only=False, ui_only=False):
+    def exercise(self, fail_gate=None, prefix='g3-m1-control', launch_failure=False, milestone=None, api_only=False, ui_only=False, smoke_fault=False):
         spec = importlib.util.spec_from_file_location('m1_orchestrator', SCRIPT)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
@@ -87,6 +87,7 @@ class M1OrchestrationTests(unittest.TestCase):
                     self.assertIn(selected, command, 'Selected checks must run in the existing authenticated harness')
                     if milestone == 'M2': self.assertIn('--m2-api-only' if api_only else '--m2-ui-only' if ui_only else '--m2', command, 'M2 checks must execute in the real authenticated harness')
                     if milestone == 'M3': self.assertIn('--m3-api-only' if api_only else '--m3-ui-only' if ui_only else '--m3', command, 'M3 checks must execute in the real authenticated harness')
+                    if smoke_fault: self.assertIn('--smoke-fault-check', command)
                     # Parse the exact upstream argument combination with the real downstream entry.
                     entry_spec = importlib.util.spec_from_file_location('downstream_browser', SCRIPT.with_name(gate))
                     entry = importlib.util.module_from_spec(entry_spec)
@@ -104,7 +105,7 @@ class M1OrchestrationTests(unittest.TestCase):
             with contextlib.ExitStack() as stack:
                 stack.enter_context(patch.object(sys, 'path', [str(SCRIPT.parent), *sys.path]))
                 stack.enter_context(patch.object(module, 'ROOT', root))
-                stack.enter_context(patch.object(sys, 'argv', [str(SCRIPT), '--runtime-file', str(runtime)] + (['--milestone', milestone] if milestone else []) + (['--api-only'] if api_only else []) + (['--ui-only'] if ui_only else [])))
+                stack.enter_context(patch.object(sys, 'argv', [str(SCRIPT), '--runtime-file', str(runtime)] + (['--milestone', milestone] if milestone else []) + (['--api-only'] if api_only else []) + (['--ui-only'] if ui_only else []) + (['--smoke-fault-check'] if smoke_fault else [])))
                 stack.enter_context(patch.object(module.shared, 'wait_for'))
                 stack.enter_context(patch.object(module.shared, 'stop'))
                 stack.enter_context(patch.dict(os.environ, {'PLATFORM_EVIDENCE_DIR': 'docs/evidence/' + task + '/runtime'}))
@@ -120,6 +121,12 @@ class M1OrchestrationTests(unittest.TestCase):
             manifests = list(stale.parent.rglob('acceptance.json'))
             proof = json.loads(manifests[0].read_text()) if len(manifests) == 1 else None
             return code, [Path(call[1]).name for call in calls], proof, evidence_seen, stale.read_text()
+
+    def test_m3_full_chain_runs_smoke_fault_through_actual_parsers(self):
+        code,calls,proof,*_=self.exercise(prefix='g3-m3-fault-control',milestone='M3',smoke_fault=True)
+        self.assertEqual(code,0)
+        self.assertEqual(calls,GATES)
+        self.assertEqual(proof['scope'],'FULL')
 
     def test_all_real_gate_selections_include_m1_and_regressions(self):
         code, calls, *_ = self.exercise()
