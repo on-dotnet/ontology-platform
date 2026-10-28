@@ -711,7 +711,7 @@ public sealed class DraftRevisionTests
         Assert.AreEqual(created.Hashes.DataHash, changed.Hashes.DataHash);
         // 最新服务评估必须绑定当前profile版本、全源散列及修订。
         var assessment = await service.AssessAsync(actor, created.DraftId, new ValidateDraftRequest { Revision = 2, Hashes = changed.Hashes, Command = Command(2) }, default);
-        Assert.AreEqual("2", assessment.ProfileVersion);
+        Assert.AreEqual("3", assessment.ProfileVersion);
         Assert.AreEqual(changed.Hashes, assessment.Hashes);
         Assert.AreEqual(2L, assessment.Revision);
         Assert.IsTrue(assessment.PublishEligible);
@@ -824,7 +824,7 @@ public sealed class DraftRevisionTests
         Assert.AreEqual(25L, current.Revision);
         Assert.AreEqual(current.Revision, assessment.Revision);
         Assert.AreEqual(current.Hashes, assessment.Hashes);
-        Assert.AreEqual("2", assessment.ProfileVersion);
+        Assert.AreEqual("3", assessment.ProfileVersion);
         Assert.AreEqual(SemanticProfile.Current().Hash, assessment.ProfileHash);
         Assert.IsTrue(assessment.PublishEligible);
         Assert.IsTrue(assessment.Stages.Any(stage => stage.Name == "SHACL_CORE" && stage.Status == AssessmentStageStatus.Pass));

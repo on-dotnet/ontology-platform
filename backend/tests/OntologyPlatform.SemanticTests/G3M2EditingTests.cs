@@ -14,7 +14,7 @@ public sealed class G3M2EditingTests
     public void CurrentProfileIsVersionTwoAndLegacyGoldenRemainsRegistered()
     {
         // 当前策略必须明确切换，不能重写旧版本内容。
-        var current = SemanticProfile.Current();
+        var current = SemanticProfile.LegacyM2();
         Assert.AreEqual("2", current.Version);
         Assert.AreEqual("ontology-platform/g3-m1", current.ProfileId);
         Assert.AreEqual("SOURCE", current.Capabilities[0].Edit);

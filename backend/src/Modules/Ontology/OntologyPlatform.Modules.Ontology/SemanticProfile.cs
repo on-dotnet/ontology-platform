@@ -29,7 +29,7 @@ public static class SemanticProfile
     }
 
     /// <summary>当前M2仅扩展命名公理的结构编辑能力，原发布语义不变。</summary>
-    public static SemanticSupportProfile Current()
+    public static SemanticSupportProfile LegacyM2()
     {
         // 独立构造历史DTO，防止调用方改变共享策略或历史散列。
         var legacy = LegacyM1();
@@ -42,6 +42,18 @@ public static class SemanticProfile
         return profile with { Hash = OntologyRules.Hash(JsonSerializer.Serialize(profile)) };
     }
 
+    /// <summary>v3在原二十项后登记SKOS治理和Synthetic单位引用，不执行换算或OWL推理。</summary>
+    public static SemanticSupportProfile Current()
+    {
+        // 原v2全部DTO字段保持不变，仅新策略新增两项显式能力。
+        var legacy = LegacyM2();
+        // 本轮两项能力使用平台治理而不是推理或换算宣称。
+        var capabilities = legacy.Capabilities.Concat(new[] { "SKOS术语与标准治理", "Synthetic单位与量纲引用" }.Select((name, index) => new SemanticCapabilitySupport { Id = (21 + index).ToString(System.Globalization.CultureInfo.InvariantCulture), Name = name, Edit = "BASIC", Preserve = "EXACT", Publish = "SUPPORTED", Validation = "ASSERTED", Reason = "仅有界显式事实与平台域治理；保留来源版本，不执行OWL推理或通用单位换算。" })).ToArray();
+        // 按原DTO声明顺序散列，旧profile从不重写。
+        var profile = legacy with { Version = "3", Hash = "", Capabilities = capabilities };
+        return profile with { Hash = OntologyRules.Hash(JsonSerializer.Serialize(profile)) };
+    }
+
     /// <summary>将assessment自己的hash置空后计算完整事实散列。</summary>
     public static string AssessmentHash(SemanticAssessment assessment) => OntologyRules.Hash(JsonSerializer.Serialize(assessment with { AssessmentHash = "" }));
 
@@ -49,7 +61,7 @@ public static class SemanticProfile
     internal static bool Matches(PublicationSemantics semantics)
     {
         // 每个版本保留自己的完整内容，篡改版本或散列均不能回验。
-        var profile = semantics.ProfileVersion switch { "1" => LegacyM1(), "2" => Current(), _ => null };
+        var profile = semantics.ProfileVersion switch { "1" => LegacyM1(), "2" => LegacyM2(), "3" => Current(), _ => null };
         return profile is not null && semantics.ProfileHash == profile.Hash;
     }
 }

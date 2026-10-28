@@ -147,7 +147,7 @@ public sealed partial class JenaSemanticRuntime : ISemanticRuntime, IG3SemanticR
             CheckManifest(manifest, sources);
             // 部署前在内存真实解析，未知复杂公理不进入正式发布。
             var parsed = await ParseSourcesAsync(sources, graphs, token);
-            if (PublicationSupport(manifest, parsed[0].Concat(parsed[2]).Concat(parsed[3]).ToArray()).Length != 0) throw new SemanticOperationException(422, "publication_unsupported");
+            if (PublicationSupport(manifest, parsed[0].Concat(parsed[2]).Concat(parsed[3]).ToArray()).Length != 0 || !PublicationGovernance(manifest, sources, parsed, token)) throw new SemanticOperationException(422, "publication_unsupported");
             await SendAsync(published, "data?graph=" + Uri.EscapeDataString(manifest.OntologyGraphIri), HttpMethod.Put, string.Join('\n', parsed[0].Concat(parsed[2]).Select(JenaRdfCodec.Triple)), "text/plain", token);
             await SendAsync(published, "data?graph=" + Uri.EscapeDataString(manifest.DataGraphIri), HttpMethod.Put, string.Join('\n', parsed[3].Select(JenaRdfCodec.Triple)), "text/plain", token);
             return true;
@@ -160,7 +160,7 @@ public sealed partial class JenaSemanticRuntime : ISemanticRuntime, IG3SemanticR
             CheckManifest(manifest, sources);
             // 权威源重新解析用于实际图语义对账。
             var parsed = await ParseSourcesAsync(sources, graphs, token);
-            if (PublicationSupport(manifest, parsed[0].Concat(parsed[2]).Concat(parsed[3]).ToArray()).Length != 0) return false;
+            if (PublicationSupport(manifest, parsed[0].Concat(parsed[2]).Concat(parsed[3]).ToArray()).Length != 0 || !PublicationGovernance(manifest, sources, parsed, token)) return false;
             // 正式图通过固定GSP读取，任何缺失不视为空成功。
             var ontology = await ReadGraphAsync(published, manifest.OntologyGraphIri, token);
             // 数据图与本体图独立对账。
@@ -198,7 +198,7 @@ public sealed partial class JenaSemanticRuntime : ISemanticRuntime, IG3SemanticR
                 CheckVerifiedBinding(manifest, sources);
                 // 复用唯一真实RIOT解析、Shape安全边界和全源预算，不能用新解析器猜测期望事实。
                 var parsed = await ParseSourcesAsync(sources, graphs, token);
-                if (PublicationSupport(manifest, parsed[0].Concat(parsed[2]).Concat(parsed[3]).ToArray()).Length != 0)
+                if (PublicationSupport(manifest, parsed[0].Concat(parsed[2]).Concat(parsed[3]).ToArray()).Length != 0 || !PublicationGovernance(manifest, sources, parsed, token))
                     throw new SemanticOperationException(503, "published_source_unsupported");
                 // 每个正式图仅读取一次，这两个数组就是稍后返回给应用的完整实际批次。
                 var ontology = await ReadGraphAsync(published, manifest.OntologyGraphIri, token);

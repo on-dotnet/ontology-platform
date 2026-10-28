@@ -1,0 +1,80 @@
+{
+  "exitCode": 2,
+  "records": [
+    {
+      "check": "public-jena-fixture-modes",
+      "exitCode": 0,
+      "modes": {
+        "fixture": "0o755",
+        "config.ttl": "0o644",
+        "log4j2.properties": "0o644"
+      }
+    },
+    {
+      "command": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g2-sem-7e0edf5f52e4",
+        "--publish",
+        "127.0.0.1::3030",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--mount",
+        "type=bind,src=/private/tmp/g2-sem-7e0edf5f52e4htqs2gvt/fixture,dst=/fixture,readonly",
+        "--entrypoint",
+        "java",
+        "ontology-platform-fuseki:context-1e45f836d9837cbc75d23adb3ad37b0ff79a545ef06102a87aa246feea9cc1e5",
+        "-Xmx384m",
+        "-Dlog4j.configurationFile=/fixture/log4j2.properties",
+        "-jar",
+        "/opt/fuseki/fuseki-server.jar",
+        "--config=/fixture/config.ttl"
+      ],
+      "exitCode": 0,
+      "output": "423478f5d9980a46f1c09298ceb49170849713626b954043d5f9a79837bafe2d\n"
+    },
+    {
+      "command": [
+        "docker",
+        "port",
+        "g2-sem-7e0edf5f52e4",
+        "3030/tcp"
+      ],
+      "exitCode": 0,
+      "output": "127.0.0.1:51968\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "test",
+        "--project",
+        "backend/tests/OntologyPlatform.SemanticTests",
+        "--no-restore",
+        "--",
+        "--filter",
+        "FullyQualifiedName~G3M3GovernanceTests"
+      ],
+      "exitCode": 2,
+      "output": "正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n失败 SkosPolicyReturnsExactSourceDiagnostic (\"s14\",\"skos_pref_label_conflict\") (93ms)\n  从 /Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  Assertion failed. 预期集合不为空。\n  skos_pref_label_conflict\n  \n  actual count: 0\n  \n  Assert.IsNotEmpty(diagnostics)\n    在 OntologyPlatform.SemanticTests.G3M3GovernanceTests.SkosPolicyReturnsExactSourceDiagnostic(String scenario, String code) 位于 /Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M3GovernanceTests.cs:48\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n失败 SkosPolicyReturnsExactSourceDiagnostic (\"s13\",\"skos_label_relation_conflict\") (9ms)\n  从 /Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  Assertion failed. 预期集合不为空。\n  skos_label_relation_conflict\n  \n  actual count: 0\n  \n  Assert.IsNotEmpty(diagnostics)\n    在 OntologyPlatform.SemanticTests.G3M3GovernanceTests.SkosPolicyReturnsExactSourceDiagnostic(String scenario, String code) 位于 /Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M3GovernanceTests.cs:48\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n失败 SkosPolicyReturnsExactSourceDiagnostic (\"no-language\",\"skos_label_language_required\") (23ms)\n  从 /Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  Assertion failed. 预期集合不为空。\n  skos_label_language_required\n  \n  actual count: 0\n  \n  Assert.IsNotEmpty(diagnostics)\n    在 OntologyPlatform.SemanticTests.G3M3GovernanceTests.SkosPolicyReturnsExactSourceDiagnostic(String scenario, String code) 位于 /Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M3GovernanceTests.cs:48\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n失败 SkosPolicyReturnsExactSourceDiagnostic (\"unknown-language\",\"language_policy_unknown\") (7ms)\n  从 /Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  Assertion failed. 预期集合不为空。\n  language_policy_unknown\n  \n  actual count: 0\n  \n  Assert.IsNotEmpty(diagnostics)\n    在 OntologyPlatform.SemanticTests.G3M3GovernanceTests.SkosPolicyReturnsExactSourceDiagnostic(String scenario, String code) 位于 /Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M3GovernanceTests.cs:48\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n失败 SkosPolicyReturnsExactSourceDiagnostic (\"invalid-term\",\"skos_label_term_invalid\") (7ms)\n  从 /Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  Assertion failed. 预期集合不为空。\n  skos_label_term_invalid\n  \n  actual count: 0\n  \n  Assert.IsNotEmpty(diagnostics)\n    在 OntologyPlatform.SemanticTests.G3M3GovernanceTests.SkosPolicyReturnsExactSourceDiagnostic(String scenario, String code) 位于 /Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M3GovernanceTests.cs:48\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n失败 SkosPolicyReturnsExactSourceDiagnostic (\"missing-scheme\",\"skos_scheme_reference_missing\") (6ms)\n  从 /Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  Assertion failed. 预期集合不为空。\n  skos_scheme_reference_missing\n  \n  actual count: 0\n  \n  Assert.IsNotEmpty(diagnostics)\n    在 OntologyPlatform.SemanticTests.G3M3GovernanceTests.SkosPolicyReturnsExactSourceDiagnostic(String scenario, String code) 位于 /Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M3GovernanceTests.cs:48\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n失败 SkosPolicyReturnsExactSourceDiagnostic (\"missing-concept\",\"skos_concept_reference_missing\") (7ms)\n  从 /Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  Assertion failed. 预期集合不为空。\n  skos_concept_reference_missing\n  \n  actual count: 0\n  \n  Assert.IsNotEmpty(diagnostics)\n    在 OntologyPlatform.SemanticTests.G3M3GovernanceTests.SkosPolicyReturnsExactSourceDiagnostic(String scenario, String code) 位于 /Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M3GovernanceTests.cs:48\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n失败 SkosPolicyReturnsExactSourceDiagnostic (\"cycle\",\"skos_hierarchy_cycle\") (7ms)\n  从 /Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  Assertion failed. 预期集合不为空。\n  skos_hierarchy_cycle\n  \n  actual count: 0\n  \n  Assert.IsNotEmpty(diagnostics)\n    在 OntologyPlatform.SemanticTests.G3M3GovernanceTests.SkosPolicyReturnsExactSourceDiagnostic(String scenario, String code) 位于 /Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M3GovernanceTests.cs:48\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n失败 SkosPolicyReturnsExactSourceDiagnostic (\"related\",\"skos_related_hierarchy_conflict\") (7ms)\n  从 /Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  Assertion failed. 预期集合不为空。\n  skos_related_hierarchy_conflict\n  \n  actual count: 0\n  \n  Assert.IsNotEmpty(diagnostics)\n    在 OntologyPlatform.SemanticTests.G3M3GovernanceTests.SkosPolicyReturnsExactSourceDiagnostic(String scenario, String code) 位于 /Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M3GovernanceTests.cs:48\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n失败 SkosPolicyReturnsExactSourceDiagnostic (\"notation\",\"skos_notation_duplicate\") (57ms)\n  从 /Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  Assertion failed. 预期集合不为空。\n  skos_notation_duplicate\n  \n  actual count: 0\n  \n  Assert.IsNotEmpty(diagnostics)\n    在 OntologyPlatform.SemanticTests.G3M3GovernanceTests.SkosPolicyReturnsExactSourceDiagnostic(String scenario, String code) 位于 /Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M3GovernanceTests.cs:48\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n失败 SkosPolicyReturnsExactSourceDiagnostic (\"mapping-scheme\",\"skos_mapping_scheme_conflict\") (5ms)\n  从 /Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  Assertion failed. 预期集合不为空。\n  skos_mapping_scheme_conflict\n  \n  actual count: 0\n  \n  Assert.IsNotEmpty(diagnostics)\n    在 OntologyPlatform.SemanticTests.G3M3GovernanceTests.SkosPolicyReturnsExactSourceDiagnostic(String scenario, String code) 位于 /Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M3GovernanceTests.cs:48\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n失败 SkosPolicyReturnsExactSourceDiagnostic (\"s46\",\"skos_mapping_relation_conflict\") (7ms)\n  从 /Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  Assertion failed. 预期集合不为空。\n  skos_mapping_relation_conflict\n  \n  actual count: 0\n  \n  Assert.IsNotEmpty(diagnostics)\n    在 OntologyPlatform.SemanticTests.G3M3GovernanceTests.SkosPolicyReturnsExactSourceDiagnostic(String scenario, String code) 位于 /Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M3GovernanceTests.cs:48\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n失败 SkosPolicyReturnsExactSourceDiagnostic (\"deprecated\",\"semantic_reference_deprecated\") (7ms)\n  从 /Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  Assertion failed. 预期集合不为空。\n  semantic_reference_deprecated\n  \n  actual count: 0\n  \n  Assert.IsNotEmpty(diagnostics)\n    在 OntologyPlatform.SemanticTests.G3M3GovernanceTests.SkosPolicyReturnsExactSourceDiagnostic(String scenario, String code) 位于 /Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M3GovernanceTests.cs:48\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n失败 CrossSourceDuplicateFocusUsesBundleHash (13ms)\n  从 /Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  测试方法 OntologyPlatform.SemanticTests.G3M3GovernanceTests。CrossSourceDuplicateFocusUsesBundleHash 引发了异常: \n  System.InvalidOperationException: Sequence contains no matching element\n    在 System.Linq.ThrowHelper.ThrowNoMatchException()\n    在 System.Linq.Enumerable.Single[TSource](IEnumerable`1 source, Func`2 predicate)\n    在 OntologyPlatform.SemanticTests.G3M3GovernanceTests.CrossSourceDuplicateFocusUsesBundleHash() 位于 /Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M3GovernanceTests.cs:73\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n    \n/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64) 失败并出现 14 个错误 (3s 602ms)\n退出代码: 2\n\n测试运行摘要: 失败!\n  总计: 15\n  失败: 14\n  成功: 1\n  已跳过: 0\n  持续时间: 4s 250ms\n已完成测试运行，但显示非成功退出代码: 2 (请参阅: https://aka.ms/testingplatform/exitcodes)\n"
+    },
+    {
+      "check": "all temporary graph triples removed",
+      "count": 0,
+      "status": "PASS"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g2-sem-7e0edf5f52e4"
+      ],
+      "exitCode": 0,
+      "output": "g2-sem-7e0edf5f52e4\n"
+    }
+  ]
+}

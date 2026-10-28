@@ -18,8 +18,10 @@ public static class OntologyModule
         services.AddHttpClient("ontology-jena").ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false, UseProxy = false });
         services.AddSingleton<JenaSemanticRuntime>();
         services.AddSingleton<ISemanticRuntime>(provider => provider.GetRequiredService<JenaSemanticRuntime>());
+        services.AddSingleton<IG3VocabularyRuntime>(provider => provider.GetRequiredService<JenaSemanticRuntime>());
         services.AddSingleton<IG3SemanticRuntime>(provider => provider.GetRequiredService<JenaSemanticRuntime>());
         services.AddScoped<OntologyService>();
+        services.AddScoped<IG3VocabularyService>(provider => provider.GetRequiredService<OntologyService>());
         services.AddScoped<IG3OntologyService>(provider => provider.GetRequiredService<OntologyService>());
         services.AddScoped<IOntologyService>(provider => provider.GetRequiredService<OntologyService>());
         services.AddScoped<IDraftPublicationReader>(provider => provider.GetRequiredService<OntologyService>());

@@ -9,12 +9,12 @@ public sealed partial class JenaSemanticRuntime
     private static SemanticDiagnostic[] PublicationSupport(ReleaseManifest manifest, RdfTriple[] triples) => manifest.SchemaVersion switch
     {
         1 when manifest.Semantics is null => LegacySupport(triples),
-        2 when manifest.Semantics is not null && SemanticProfile.Matches(manifest.Semantics) => Support(triples),
+        2 when manifest.Semantics is not null && SemanticProfile.Matches(manifest.Semantics) => Support(triples, m3: manifest.Semantics.ProfileVersion == "3"),
         _ => throw new SemanticOperationException(409, "release_profile_unsupported")
     };
 
     /// <summary>仅命名基本事实及有限命名公理可发布；结构编辑仅接受已登记且类型匹配的命名公理。</summary>
-    private static SemanticDiagnostic[] Support(RdfTriple[] triples, bool structural = false)
+    private static SemanticDiagnostic[] Support(RdfTriple[] triples, bool structural = false, bool m3 = true)
     {
         // 声明的属性允许简单断言；AnnotationProperty明确作为普通注释而非推理能力。
         var properties = triples.Where(triple => triple.Subject.Kind == RdfTermKind.Iri && triple.Predicate == JenaRdfCodec.Type && triple.Object.Kind == RdfTermKind.Iri && triple.Object.Value is JenaRdfCodec.Owl + "ObjectProperty" or JenaRdfCodec.Owl + "DatatypeProperty" or JenaRdfCodec.Owl + "AnnotationProperty").Select(triple => triple.Subject.Value).ToHashSet(StringComparer.Ordinal);
@@ -39,7 +39,7 @@ public sealed partial class JenaSemanticRuntime
             // 所有ontology/vocabulary/data blank表达式均保守阻断；Shapes另走ShapePolicy。
             var blocked = triple.Subject.Kind == RdfTermKind.Blank || triple.Object.Kind == RdfTermKind.Blank;
             if (triple.Predicate.StartsWith(JenaRdfCodec.Owl, StringComparison.Ordinal))
-                blocked |= !namedAxioms.Contains(triple.Predicate) || triple.Subject.Kind != RdfTermKind.Iri || triple.Object.Kind != RdfTermKind.Iri;
+                blocked |= m3 && triple.Predicate == JenaRdfCodec.Owl + "deprecated" ? triple.Object.Kind != RdfTermKind.Literal || triple.Object.Datatype != Xsd + "boolean" || triple.Object.Value is not ("true" or "false" or "1" or "0") : !namedAxioms.Contains(triple.Predicate) || triple.Subject.Kind != RdfTermKind.Iri || triple.Object.Kind != RdfTermKind.Iri;
             else if (triple.Predicate == JenaRdfCodec.Type)
             {
                 blocked |= triple.Object.Kind != RdfTermKind.Iri;
@@ -60,7 +60,7 @@ public sealed partial class JenaSemanticRuntime
             else
             {
                 // 普通annotation需明确声明或登记；任意未声明literal/IRI关系均不能猜作注释。
-                blocked |= !properties.Contains(triple.Predicate) && !(metadata.Contains(triple.Predicate) && triple.Object.Kind == RdfTermKind.Literal) && !skos.Contains(triple.Predicate) && !provenance.Contains(triple.Predicate);
+                blocked |= !properties.Contains(triple.Predicate) && !(metadata.Contains(triple.Predicate) && triple.Object.Kind == RdfTermKind.Literal) && !skos.Contains(triple.Predicate) && !provenance.Contains(triple.Predicate) && !(m3 && M3MetadataPredicate(triple.Predicate));
                 if (objectProperties.Contains(triple.Predicate)) blocked |= triple.Object.Kind != RdfTermKind.Iri;
                 if (datatypeProperties.Contains(triple.Predicate)) blocked |= triple.Object.Kind != RdfTermKind.Literal;
             }

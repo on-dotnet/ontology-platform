@@ -52,7 +52,14 @@ public sealed partial class OntologyService
         // 不支持公理时SHACL确实未运行，不能冒称SHACL PASS。
         var supportPassed = report.Kind != ValidationKind.OwlSupport;
         // 报告定位只能沿用实际来源，不猜测行列；跨源内容使用bundle散列。
-        var diagnostics = report.Issues.Select(issue => WrapDiagnostic(issue, current.Hashes)).ToArray();
+        var validationDiagnostics = report.Issues.Select(issue => WrapDiagnostic(issue, current.Hashes)).ToArray();
+        if (runtime is not IG3VocabularyRuntime vocabulary) throw new SemanticOperationException(503, "vocabulary_runtime_unavailable");
+        // M3治理读取同一固定四源，不通过旧ValidationIssue包装而丢失精确规则码。
+        var governance = (await vocabulary.ReadVocabularyAsync(current.Sources, current.Revision, token)).Diagnostics;
+        // 错误为FAIL，未知语言/精度为INDETERMINATE，两者都不具备发布资格。
+        var governanceStatus = governance.Any(item => item.Diagnostic.Severity == DiagnosticSeverity.Error) ? AssessmentStageStatus.Fail : governance.Any(item => item.Diagnostic.Severity == DiagnosticSeverity.Warning) ? AssessmentStageStatus.Indeterminate : AssessmentStageStatus.Pass;
+        // SHACL诊断保持原来来源绑定，新治理直接追加准确source/hash/focus/path。
+        var diagnostics = validationDiagnostics.Concat(governance).ToArray();
         // 只有必要阶段通过及预算完成才有发布资格，OWL推理明确未执行。
         var assessment = new SemanticAssessment
         {
@@ -70,9 +77,9 @@ public sealed partial class OntologyService
             Stages = [new AssessmentStage { Name = "PARSE", Status = AssessmentStageStatus.Pass, Code = "riot_parsed" },
                 new AssessmentStage { Name = "SUPPORT", Status = supportPassed ? AssessmentStageStatus.Pass : AssessmentStageStatus.NotSupported, Code = supportPassed ? "asserted_subset_supported" : "axiom_unsupported" },
                 new AssessmentStage { Name = "SHACL_CORE", Status = !supportPassed ? AssessmentStageStatus.NotRun : report.Conforms ? AssessmentStageStatus.Pass : AssessmentStageStatus.Fail, Code = !supportPassed ? "support_blocked" : report.Conforms ? "shacl_conforms" : "shacl_violation" },
-                new AssessmentStage { Name = "GOVERNANCE", Status = AssessmentStageStatus.Pass, Code = "scope_revision_bound" },
+                new AssessmentStage { Name = "GOVERNANCE", Status = governanceStatus, Code = governanceStatus == AssessmentStageStatus.Pass ? "scope_revision_bound" : "vocabulary_governance_blocked" },
                 new AssessmentStage { Name = "OWL_REASONING", Status = AssessmentStageStatus.NotRun, Code = "asserted_only" }],
-            PublishEligible = supportPassed && report.Conforms,
+            PublishEligible = supportPassed && report.Conforms && governanceStatus == AssessmentStageStatus.Pass,
             Diagnostics = diagnostics,
             BudgetStatus = "COMPLETE"
         };
