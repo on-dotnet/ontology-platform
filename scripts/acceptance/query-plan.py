@@ -10,6 +10,7 @@ import subprocess
 import tempfile
 import time
 import urllib.request
+from owned_test_containers import OwnedTestContainers
 
 ROOT = Path(__file__).resolve().parents[2]
 from evidence_paths import evidence_directory
@@ -32,12 +33,15 @@ def main():
     signing = secrets.token_urlsafe(40)
     env.update(POSTGRES_PASSWORD=pg_secret, POSTGRES_DB='governance', RUSTFS_ACCESS_KEY=access, RUSTFS_SECRET_KEY=signing)
     records = []
+    owned = OwnedTestContainers(os.environ.get('PLATFORM_TASK_ID', 'DEVELOPMENT'), name, records)
     code = 1
     connection = None
     names = []
 
     def run(command, required=True):
+        command = owned.prepare(command)
         result = subprocess.run(command, cwd=ROOT, env=env, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        owned.observe(command, result)
         output = result.stdout
         for sensitive in [pg_secret, access, signing, connection]:
             if sensitive:
@@ -124,8 +128,8 @@ def main():
             records.append(dict(status='FAIL', category=type(failure).__name__))
             print(type(failure).__name__, flush=True)
         finally:
-            for container in reversed(names):
-                run(['docker', 'rm', '--force', container], False)
+            if not owned.cleanup():
+                code = 1
             EVIDENCE.mkdir(parents=True, exist_ok=True)
             sha = subprocess.run(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True, capture_output=True).stdout.strip()
             source_files = [*ROOT.glob('backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/*.cs'), *ROOT.glob('backend/tests/OntologyPlatform.QueryTests/*.cs'), ROOT / 'backend/src/Hosts/OntologyPlatform.Api/G2/SemanticEndpoints.cs', ROOT / 'docs/contracts/g2-schemas.openapi.json', Path(__file__).resolve()]

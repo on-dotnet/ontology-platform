@@ -14,6 +14,7 @@ import subprocess
 import sys
 import time
 import urllib.request
+from owned_test_containers import OwnedTestContainers
 
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = importlib.util.spec_from_file_location('wave2_runtime', ROOT / 'scripts/acceptance/wave2-runtime.py')
@@ -29,10 +30,14 @@ def main(configuration="Debug", test_filter=None):
     identity_name = name + '-keycloak'
     identity_password = secrets.token_urlsafe(40)
     env['KC_BOOTSTRAP_ADMIN_PASSWORD'] = identity_password
+    code = 1
     record = []
+    owned = OwnedTestContainers(os.environ.get('PLATFORM_TASK_ID', 'DEVELOPMENT'), name, record)
 
     def command(args, required=True):
+        args = owned.prepare(args)
         result = subprocess.run(args, cwd=ROOT, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        owned.observe(args, result)
         output = ''.join(RUNTIME.sanitize(line, [value for value in (database_password, identity_password, env.get('G1_SEC_PG_CONNECTION')) if value]) for line in result.stdout.splitlines())
         # 空值不能进入脱敏替换列表，连接值已包含密码但仍整体隐藏。
         record.append(dict(command=args, exitCode=result.returncode, output=output))
@@ -90,17 +95,21 @@ def main(configuration="Debug", test_filter=None):
         if test_filter:
             test.extend(['--filter', test_filter])
         command(test)
-        print('PASS: selected real PostgreSQL/Keycloak integration filter; count is in actual test output.' if test_filter else 'PASS: real PostgreSQL tickets/revocation/expiry/audit and real Keycloak PAR security integration.')
-        return 0
+        code = 0
     except Exception as failure:
         record.append(dict(status='FAIL', category=type(failure).__name__, details='suppressed'))
         print('FAIL: real governance integration; details retained only after sanitization')
-        return 1
+        code = 1
     finally:
-        subprocess.run(['docker', 'rm', '--force', identity_name, name], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        if not owned.cleanup():
+            code = 1
         target = ROOT / 'artifacts/governance-integration.json'
         target.parent.mkdir(parents=True, exist_ok=True)
+        record.append(dict(check='integration-exit', exitCode=code))
         target.write_text(json.dumps(record, ensure_ascii=False, indent=2) + '\n')
+    if code == 0:
+        print('PASS: selected real PostgreSQL/Keycloak integration filter; count is in actual test output.' if test_filter else 'PASS: real PostgreSQL tickets/revocation/expiry/audit and real Keycloak PAR security integration.')
+    return code
 
 
 if __name__ == '__main__':

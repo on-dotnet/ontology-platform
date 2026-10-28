@@ -9,6 +9,7 @@ import subprocess
 import tempfile
 import time
 import urllib.request
+from owned_test_containers import OwnedTestContainers
 import urllib.parse
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -21,6 +22,7 @@ PG = 'postgres:18.6-trixie@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05
 def main(test_filter=None, postgres=False, label='semantic-roundtrip'):
     name = 'g2-sem-' + secrets.token_hex(6)
     records = []
+    owned = OwnedTestContainers(os.environ.get('PLATFORM_TASK_ID', 'DEVELOPMENT'), name, records)
     env = os.environ.copy()
     secret = secrets.token_urlsafe(40)
     env['POSTGRES_PASSWORD'] = secret
@@ -29,7 +31,9 @@ def main(test_filter=None, postgres=False, label='semantic-roundtrip'):
     code = 1
 
     def run(args, required=True):
+        args = owned.prepare(args)
         result = subprocess.run(args, cwd=ROOT, env=env, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        owned.observe(args, result)
         output = result.stdout
         if connection:
             output = output.replace(connection, '[CONNECTION]')
@@ -114,9 +118,8 @@ def main(test_filter=None, postgres=False, label='semantic-roundtrip'):
             records.append(dict(status='FAIL', category=type(error).__name__))
             raise
         finally:
-            run(['docker', 'rm', '--force', name], required=False)
-            if postgres:
-                run(['docker', 'rm', '--force', name + '-pg'], required=False)
+            if not owned.cleanup():
+                code = 1
             EVIDENCE.mkdir(parents=True, exist_ok=True)
             (EVIDENCE / (label + '.json')).write_text(json.dumps(dict(exitCode=code, records=records), ensure_ascii=False, indent=2) + '\n')
     return code

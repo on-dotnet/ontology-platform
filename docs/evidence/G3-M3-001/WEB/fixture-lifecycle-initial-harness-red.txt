@@ -1,0 +1,71 @@
+Name is already in useFName is already in useRuntimeError
+FName is already in useRuntimeError
+EName is already in useRuntimeError
+EF
+======================================================================
+ERROR: test_failed_creation_name_collision_never_deletes_preexisting_container (__main__.EntrypointSafetyTests.test_failed_creation_name_collision_never_deletes_preexisting_container) (entry='query-plan')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform/scripts/tests/OwnedTestContainers.Tests.py", line 33, in test_failed_creation_name_collision_never_deletes_preexisting_container
+    try:result=module.main()
+               ~~~~~~~~~~~^^
+  File "/Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform/scripts/acceptance/query-plan.py", line 132, in main
+    source_hashes = {str(file.relative_to(ROOT)): hashlib.sha256(file.read_bytes()).hexdigest() for file in sorted(source_files)}
+                         ~~~~~~~~~~~~~~~~^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/pathlib/_local.py", line 385, in relative_to
+    raise ValueError(f"{str(self)!r} is not in the subpath of {str(other)!r}")
+ValueError: '/Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform/scripts/acceptance/query-plan.py' is not in the subpath of '/var/folders/8r/n2xjjrn90v7fplnwsjkft1sm0000gn/T/tmpwkb9qelw'
+
+======================================================================
+ERROR: test_failed_creation_name_collision_never_deletes_preexisting_container (__main__.EntrypointSafetyTests.test_failed_creation_name_collision_never_deletes_preexisting_container) (entry='mcp-agent')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform/scripts/tests/OwnedTestContainers.Tests.py", line 33, in test_failed_creation_name_collision_never_deletes_preexisting_container
+    try:result=module.main()
+               ~~~~~~~~~~~^^
+  File "/Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform/scripts/acceptance/mcp-agent.py", line 178, in main
+    source_hashes = {str(file.relative_to(ROOT)): hashlib.sha256(file.read_bytes()).hexdigest() for file in sorted(source_files)}
+                         ~~~~~~~~~~~~~~~~^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/pathlib/_local.py", line 385, in relative_to
+    raise ValueError(f"{str(self)!r} is not in the subpath of {str(other)!r}")
+ValueError: '/Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform/scripts/acceptance/mcp-agent.py' is not in the subpath of '/var/folders/8r/n2xjjrn90v7fplnwsjkft1sm0000gn/T/tmpqehac2za'
+
+======================================================================
+FAIL: test_failed_creation_name_collision_never_deletes_preexisting_container (__main__.EntrypointSafetyTests.test_failed_creation_name_collision_never_deletes_preexisting_container) (entry='semantic-roundtrip')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform/scripts/tests/OwnedTestContainers.Tests.py", line 36, in test_failed_creation_name_collision_never_deletes_preexisting_container
+    self.assertFalse(any(args[:2]==['docker','rm'] or args[:3]==['docker','container','rm'] for args in calls),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     'Creation failure must never authorize deletion by expected name')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false : Creation failure must never authorize deletion by expected name
+
+======================================================================
+FAIL: test_failed_creation_name_collision_never_deletes_preexisting_container (__main__.EntrypointSafetyTests.test_failed_creation_name_collision_never_deletes_preexisting_container) (entry='release-faults')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform/scripts/tests/OwnedTestContainers.Tests.py", line 36, in test_failed_creation_name_collision_never_deletes_preexisting_container
+    self.assertFalse(any(args[:2]==['docker','rm'] or args[:3]==['docker','container','rm'] for args in calls),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     'Creation failure must never authorize deletion by expected name')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false : Creation failure must never authorize deletion by expected name
+
+======================================================================
+FAIL: test_failed_creation_name_collision_never_deletes_preexisting_container (__main__.EntrypointSafetyTests.test_failed_creation_name_collision_never_deletes_preexisting_container) (entry='test-governance')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform/scripts/tests/OwnedTestContainers.Tests.py", line 36, in test_failed_creation_name_collision_never_deletes_preexisting_container
+    self.assertFalse(any(args[:2]==['docker','rm'] or args[:3]==['docker','container','rm'] for args in calls),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     'Creation failure must never authorize deletion by expected name')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false : Creation failure must never authorize deletion by expected name
+
+----------------------------------------------------------------------
+Ran 1 test in 0.019s
+
+FAILED (failures=3, errors=2)
+Name is already in use
+FAIL: real governance integration; details retained only after sanitization

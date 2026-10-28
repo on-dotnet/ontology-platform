@@ -1,0 +1,65 @@
+Name is already in useFName is already in useRuntimeError
+FName is already in useRuntimeError
+FName is already in useRuntimeError
+FF
+======================================================================
+FAIL: test_failed_creation_name_collision_never_deletes_preexisting_container (__main__.EntrypointSafetyTests.test_failed_creation_name_collision_never_deletes_preexisting_container) (entry='semantic-roundtrip')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform/scripts/tests/OwnedTestContainers.Tests.py", line 37, in test_failed_creation_name_collision_never_deletes_preexisting_container
+    self.assertFalse(any(args[:2]==['docker','rm'] or args[:3]==['docker','container','rm'] for args in calls),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     'Creation failure must never authorize deletion by expected name')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false : Creation failure must never authorize deletion by expected name
+
+======================================================================
+FAIL: test_failed_creation_name_collision_never_deletes_preexisting_container (__main__.EntrypointSafetyTests.test_failed_creation_name_collision_never_deletes_preexisting_container) (entry='release-faults')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform/scripts/tests/OwnedTestContainers.Tests.py", line 37, in test_failed_creation_name_collision_never_deletes_preexisting_container
+    self.assertFalse(any(args[:2]==['docker','rm'] or args[:3]==['docker','container','rm'] for args in calls),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     'Creation failure must never authorize deletion by expected name')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false : Creation failure must never authorize deletion by expected name
+
+======================================================================
+FAIL: test_failed_creation_name_collision_never_deletes_preexisting_container (__main__.EntrypointSafetyTests.test_failed_creation_name_collision_never_deletes_preexisting_container) (entry='query-plan')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform/scripts/tests/OwnedTestContainers.Tests.py", line 37, in test_failed_creation_name_collision_never_deletes_preexisting_container
+    self.assertFalse(any(args[:2]==['docker','rm'] or args[:3]==['docker','container','rm'] for args in calls),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     'Creation failure must never authorize deletion by expected name')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false : Creation failure must never authorize deletion by expected name
+
+======================================================================
+FAIL: test_failed_creation_name_collision_never_deletes_preexisting_container (__main__.EntrypointSafetyTests.test_failed_creation_name_collision_never_deletes_preexisting_container) (entry='mcp-agent')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform/scripts/tests/OwnedTestContainers.Tests.py", line 37, in test_failed_creation_name_collision_never_deletes_preexisting_container
+    self.assertFalse(any(args[:2]==['docker','rm'] or args[:3]==['docker','container','rm'] for args in calls),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     'Creation failure must never authorize deletion by expected name')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false : Creation failure must never authorize deletion by expected name
+
+======================================================================
+FAIL: test_failed_creation_name_collision_never_deletes_preexisting_container (__main__.EntrypointSafetyTests.test_failed_creation_name_collision_never_deletes_preexisting_container) (entry='test-governance')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform/scripts/tests/OwnedTestContainers.Tests.py", line 37, in test_failed_creation_name_collision_never_deletes_preexisting_container
+    self.assertFalse(any(args[:2]==['docker','rm'] or args[:3]==['docker','container','rm'] for args in calls),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     'Creation failure must never authorize deletion by expected name')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false : Creation failure must never authorize deletion by expected name
+
+----------------------------------------------------------------------
+Ran 1 test in 0.019s
+
+FAILED (failures=5)
+Name is already in use
+FAIL: real governance integration; details retained only after sanitization
