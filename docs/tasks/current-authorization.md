@@ -1,3 +1,7 @@
+# 2026-10-29 最新人类覆盖授权：本地优先验证
+
+人类在侧聊明确批准并同步Master：当前及后续跨Windows/macOS/Linux开发以本地真实测试、Docker服务、实际浏览器和独立Review为主；GitHub Actions默认按需手动，不再是每次提交、集成、资源回收或最终交付的必需门禁。完整本地验收、已提交源码及输入绑定、唯一V3与独立重开保持；旧CI和失败记录不改，未运行不冒充PASS。跨CI缓存功能仍保留已实测cold/warm证据。详见[永久政策](../development/local-validation-policy.md)。此明确批准覆盖下列M3附件及旧规范中强制同HeadCI的默认要求，不扩大依赖/上传/费用/权限/M4/M5范围。
+
 # G3-M3-001 当前授权增量（2026-10-28）
 
 状态：IN_PROGRESS / E0_CANONICAL_COMPATIBILITY_AND_M3_INTEGRATION。人类本会话正式授权[附件V1](../evidence/G3-M3-001/authorization-v1.md)全部G3-M3-001及E0工程效率治理，由Codex Master组织独立托管Worktree、多Agent、先合同后并行、增量集成、独立Review、真实端到端、同HeadCI及唯一Review ZIP V3。最新fetch确认Base=`c8f1040829b2bfe1e9f7e36223092286975643f0`。只M3+E0，不执行M4/M5/G4/G5；QUDT正式资产、新直接依赖、镜像发布/额外权限及付费服务须具体审批。批准前使用Synthetic单位RDF fixture。旧M2通过事项及PARTIAL/失败事实不改。任务、路径所有权和恢复见[G3-M3任务卡](G3-M3-001.md)。

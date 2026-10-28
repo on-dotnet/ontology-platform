@@ -13,6 +13,7 @@ param(
     [string]$TaskId,
     [ValidateSet('PASS', 'PARTIAL', 'BLOCKED', 'NOT_RUN')][string]$Status,
     [string]$EvidencePath,
+    [ValidateSet('LOCAL', 'GITHUB')][string]$ValidationSource = 'LOCAL',
     [string]$CiRunId,
     [string]$CiRunUrl,
     [string]$CiCommit,
@@ -376,7 +377,9 @@ function Read-ReviewEvidenceSchema {
     $value = $script:utf8.GetString($Bytes) | ConvertFrom-Json -AsHashtable -Depth 32
     if ($value -isnot [Collections.IDictionary] -or -not $value.ContainsKey('checks') -or -not $value.ContainsKey('ci')) { throw 'EVIDENCE_SCHEMA: checks and ci required' }
     if ($value.ContainsKey('evidenceSchemaVersion')) {
-        if ($value.evidenceSchemaVersion -cne 1 -or @($value.Keys | Where-Object { $_ -cnotin @('evidenceSchemaVersion', 'checks', 'ci', 'metadata') }).Count) { throw 'EVIDENCE_SCHEMA: unsupported version or extra authoritative fields' }
+        $allowed = @('evidenceSchemaVersion', 'checks', 'ci', 'metadata')
+        if ($value.evidenceSchemaVersion -ceq 2) { $allowed += @('validationSource', 'testedCommit') }
+        if ($value.evidenceSchemaVersion -cnotin @(1, 2) -or @($value.Keys | Where-Object { $_ -cnotin $allowed }).Count) { throw 'EVIDENCE_SCHEMA: unsupported version or extra authoritative fields' }
         if ($Bytes.Length -eq 0 -or $Bytes[-1] -ne 10 -or ($Bytes.Length -gt 1 -and $Bytes[-2] -eq 10) -or $script:utf8.GetString($Bytes).Contains("`r")) { throw 'EVIDENCE_EOF: standard evidence requires one final LF and no CR' }
         if ($value.checks -isnot [array] -or $value.checks.Count -eq 0) { throw 'EVIDENCE_SCHEMA: nonempty checks array required' }
         $names = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
@@ -391,12 +394,32 @@ function Read-ReviewEvidenceSchema {
         if ($value.ci -isnot [Collections.IDictionary] -or $value.ci.get_Count() -ne $fields.Count -or @($value.ci.Keys | Where-Object { $_ -cnotin $fields }).Count) { throw 'EVIDENCE_SCHEMA: exact CI fields required' }
         if ($value.ContainsKey('metadata') -and $value.metadata -isnot [Collections.IDictionary]) { throw 'EVIDENCE_SCHEMA: metadata must be an object' }
     }
+    if ($value.ContainsKey('evidenceSchemaVersion') -and $value.evidenceSchemaVersion -ceq 2 -and ($value.validationSource -cne 'LOCAL' -or $value.testedCommit -cnotmatch '^[0-9a-f]{40}$' -or $value.ci.status -cnotin @('NOT_RUN', 'NOT_VERIFIED', 'BLOCKED'))) { throw 'LOCAL_EVIDENCE: schema2 requires LOCAL and exact testedCommit' }
     if ($ExpectedHead -and $value.ci.status -in @('PASS', 'FAIL') -and $value.ci.commit -cne $ExpectedHead) { throw 'CI_EVIDENCE: evidence commit differs from expected Head' }
     return $value
 }
 
+function Get-ReviewLocalBinding {
+    param([string]$Repository, $Snapshot, [string]$Path, [string]$Head)
+    if (-not $Path -or -not $Snapshot.GitBytes.ContainsKey($Path)) { throw 'LOCAL_EVIDENCE: committed local evidence required' }
+    $value = Read-ReviewEvidenceSchema $Snapshot.GitBytes[$Path]
+    if (-not $value.ContainsKey('evidenceSchemaVersion') -or $value.evidenceSchemaVersion -cne 2 -or $value.validationSource -cne 'LOCAL') { throw 'LOCAL_EVIDENCE: source must be authorized by committed schema2 evidence' }
+    $tested = $value.testedCommit
+    if ((Invoke-ReviewGit $Repository @('rev-parse', '--verify', ($tested + '^{commit}'))).Text.Trim() -cne $tested) { throw 'LOCAL_EVIDENCE: exact tested commit required' }
+    if ((Invoke-ReviewGit $Repository @('merge-base', '--is-ancestor', $tested, $Head) -AllowFailure).ExitCode -ne 0) { throw 'LOCAL_EVIDENCE: tested commit must be an ancestor of delivery Head' }
+    $identities = @()
+    foreach ($commit in @($tested, $Head)) {
+        # 仅任务/效率说明和证据可增量；合同、bootstrap及所有源码/脚本/锁/构建输入都参与身份。
+        $rows = (Invoke-ReviewGit $Repository @('ls-tree', '-r', '--full-tree', $commit)).Text.Split("`n", [StringSplitOptions]::RemoveEmptyEntries)
+        $inputs = @($rows | Where-Object { ($_ -split "`t", 2)[1] -cnotmatch '^(docs/(evidence|tasks|development)/|AGENTS\.md$|PLANS\.md$)' })
+        $identities += Get-ReviewHash $script:utf8.GetBytes(($inputs -join "`n") + "`n")
+    }
+    if ($identities[0] -cne $identities[1]) { throw 'LOCAL_EVIDENCE: tested source/build/runtime input identity differs from delivery Head' }
+    return [ordered]@{ testedCommit = $tested; deliveryCommit = $Head; inputSha256 = $identities[0]; evidenceSha256 = Get-ReviewHash $Snapshot.GitBytes[$Path]; verification = 'COMMITTED_LOCAL_EVIDENCE'; scope = 'All tracked inputs except docs/evidence, docs/tasks, docs/development, root AGENTS.md and PLANS.md; contracts/bootstrap included. Assertions are observed evidence, not reexecuted by packaging.' }
+}
+
 function Get-ReviewEvidence {
-    param($Snapshot, [string]$Path, [string]$DeclaredStatus, $RuntimeCi)
+    param($Snapshot, [string]$Path, [string]$DeclaredStatus, $RuntimeCi, [bool]$Local = $false)
     $evidence = @{ checks = @(@{ name = 'task-validation'; command = $null; status = 'NOT_RUN'; exitCode = $null; output = 'No committed evidence input supplied.' }); ci = @{ status = 'NOT_VERIFIED'; runId = $null; url = $null; commit = $null; conclusion = $null } }
     if ($Path) {
         Assert-ReviewPath $Path
@@ -417,7 +440,8 @@ function Get-ReviewEvidence {
         if ($evidence.ci.runId -notmatch '^[0-9]+$' -or $evidence.ci.url -cne ('https://github.com/on-dotnet/ontology-platform/actions/runs/' + $evidence.ci.runId)) { throw 'CI_EVIDENCE: runId must match exact run URL' }
         if (($evidence.ci.status -eq 'PASS') -ne ($evidence.ci.conclusion -eq 'success')) { throw 'CI_EVIDENCE: status and conclusion disagree' }
     }
-    if ($DeclaredStatus -eq 'PASS' -and (@($evidence.checks | Where-Object status -NE 'PASS').Count -gt 0 -or $evidence.ci.status -ne 'PASS' -or $Snapshot.DiffCheckExit -ne 0)) { throw ("EVIDENCE_REQUIRED: overall PASS requires all checks, diff-check and observed CI PASS; checkFailures={0}; ci={1}; diffExit={2}" -f @($evidence.checks | Where-Object status -NE 'PASS').Count, $evidence.ci.status, $Snapshot.DiffCheckExit) }
+    if ($Local -and (-not $Path -or $null -ne $RuntimeCi -or $evidence.ci.status -notin @('NOT_RUN', 'NOT_VERIFIED', 'BLOCKED') -or @($evidence.checks | Where-Object status -EQ 'PASS').Count -eq 0)) { throw 'LOCAL_EVIDENCE: committed local checks and separate unknown/unrun CI required; use GITHUB to certify CI facts' }
+    if ($DeclaredStatus -eq 'PASS' -and (@($evidence.checks | Where-Object status -NE 'PASS').Count -gt 0 -or (-not $Local -and $evidence.ci.status -ne 'PASS') -or $Snapshot.DiffCheckExit -ne 0)) { throw ("EVIDENCE_REQUIRED: overall PASS requires all checks, diff-check and observed CI PASS; checkFailures={0}; ci={1}; diffExit={2}" -f @($evidence.checks | Where-Object status -NE 'PASS').Count, $evidence.ci.status, $Snapshot.DiffCheckExit) }
     # 仅checks/ci是规范化状态；note/context等附加字段只在原始Git/ZIP证据保留，不参与状态比较。
     return @{ checks = $evidence.checks; ci = $evidence.ci }
 }
@@ -446,17 +470,27 @@ function Test-ReviewArchive {
     if ($manifest.schemaVersion -notin @(1, 2, 3) -or $manifest.taskId -notmatch '^[A-Z0-9][A-Z0-9-]{0,79}$' -or $manifest.status -notin @('PASS', 'PARTIAL', 'BLOCKED', 'NOT_RUN')) { throw 'MANIFEST_INVALID: invalid identity/status' }
     $snapshot = Get-ReviewSnapshot $Repository $manifest.baseSha $manifest.headSha $manifest.schemaVersion $manifest.taskId
     $observedCi = $manifest.runtimeCi
+    # 旧V3没有来源字段，继续按原GitHub合同重开；V1/V2保持原行为。
+    $localValidation = $manifest.schemaVersion -eq 3 -and $manifest.ContainsKey('validationSource') -and $manifest.validationSource -ceq 'LOCAL'
+    if ($manifest.ContainsKey('validationSource') -and $manifest.validationSource -cnotin @('LOCAL', 'GITHUB')) { throw 'LOCAL_EVIDENCE: invalid validation source' }
     if ($manifest.schemaVersion -eq 3) {
         if ((Get-Item -LiteralPath $Path).Length -gt 15MB) { throw 'PACKAGE_SIZE: V3 exceeds 15 MiB delivery limit' }
-        $observedCi = Get-ReviewObservedCi $Repository $manifest.ci.runId $manifest.headSha
+        if (-not $localValidation) { $observedCi = Get-ReviewObservedCi $Repository $manifest.ci.runId $manifest.headSha }
         if (-not [Text.Json.Nodes.JsonNode]::DeepEquals([Text.Json.Nodes.JsonNode]::Parse(($manifest.runtimeCi | ConvertTo-Json -Depth 12)), [Text.Json.Nodes.JsonNode]::Parse(($observedCi | ConvertTo-Json -Depth 12)))) { throw 'CI_EVIDENCE: recorded CI differs from actual GitHub run/jobs' }
         if ($snapshot.DiffCheckExit -ne 0) { throw 'DIFF_CHECK: V3 refuses a failing full Base/Head diff-check' }
         if (-not $manifest.ContainsKey('ignoredInventory') -or $manifest.ContainsKey('excludedIgnoredPaths')) { throw 'MANIFEST_INVALID: bounded ignored inventory required' }
         Assert-ReviewIgnoredInventory $manifest.ignoredInventory
         if ($manifest.screenshotPolicy.selectedCount -ne $snapshot.ScreenshotCount -or $manifest.screenshotPolicy.compressedBytes -ne $snapshot.ScreenshotCompressedBytes -or $manifest.screenshotPolicy.maxCount -ne 12 -or $manifest.screenshotPolicy.maxCompressedBytes -ne 3MB) { throw 'MANIFEST_INVALID: screenshot policy differs from committed selection' }
     }
-    $evidence = Get-ReviewEvidence $snapshot $manifest.evidencePath $manifest.status $observedCi
-    if (($manifest.status -eq 'PASS' -or ($manifest.schemaVersion -ge 2 -and $evidence.ci.status -in @('PASS', 'FAIL'))) -and $evidence.ci.commit -cne $manifest.headSha) { throw 'CI_EVIDENCE: PASS CI commit must equal HeadSha' }
+    if ($localValidation) {
+        $binding = Get-ReviewLocalBinding $Repository $snapshot $manifest.evidencePath $manifest.headSha
+        if (-not [Text.Json.Nodes.JsonNode]::DeepEquals([Text.Json.Nodes.JsonNode]::Parse(($binding | ConvertTo-Json -Depth 8)), [Text.Json.Nodes.JsonNode]::Parse(($manifest.localValidation | ConvertTo-Json -Depth 8)))) { throw 'LOCAL_EVIDENCE: recorded input binding differs from committed source' }
+    } elseif ($manifest.schemaVersion -eq 3 -and $manifest.evidencePath -and $snapshot.GitBytes.ContainsKey($manifest.evidencePath)) {
+        $original = Read-ReviewEvidenceSchema $snapshot.GitBytes[$manifest.evidencePath]
+        if ($original.ContainsKey('validationSource') -and $original.validationSource -ceq 'LOCAL') { throw 'LOCAL_EVIDENCE: committed LOCAL evidence cannot be relabeled' }
+    }
+    $evidence = Get-ReviewEvidence $snapshot $manifest.evidencePath $manifest.status $observedCi $localValidation
+    if ((($manifest.status -eq 'PASS' -and -not $localValidation) -or ($manifest.schemaVersion -ge 2 -and $evidence.ci.status -in @('PASS', 'FAIL'))) -and $evidence.ci.commit -cne $manifest.headSha) { throw 'CI_EVIDENCE: PASS CI commit must equal HeadSha' }
     # 证据与CI从提交/显式输入重算；V2原始validation仅存在映射的一个位置。
     $expectedEvidence = $evidence | ConvertTo-Json -Depth 16 -Compress
     $recordedManifestEvidence = @{ checks = $manifest.checks; ci = $manifest.ci } | ConvertTo-Json -Depth 16 -Compress
@@ -508,20 +542,25 @@ try {
     }
     if (-not $Status -or $TaskId -notmatch '^[A-Z0-9][A-Z0-9-]{0,79}$') { throw 'PARAMETERS_REQUIRED: explicit TaskId and Status required' }
     $snapshot = Get-ReviewSnapshot $Root $BaseSha $HeadSha $SchemaVersion $TaskId
+    $localValidation = $SchemaVersion -eq 3 -and $ValidationSource -ceq 'LOCAL'
+    if ($localValidation -and ($CiRunId -or $CiRunUrl -or $CiCommit -or $CiConclusion -or -not $EvidencePath)) { throw 'LOCAL_EVIDENCE: local V3 requires committed EvidencePath and no remote CI override' }
     $runtimeCi = $null
     if ($CiRunId -or $CiRunUrl -or $CiCommit -or $CiConclusion) {
         if (-not $CiRunId -or -not $CiRunUrl -or -not $CiCommit -or -not $CiConclusion) { throw 'CI_EVIDENCE: all four explicit CI parameters required together' }
         $runtimeCi = [ordered]@{ status = $(if ($CiConclusion -eq 'success') { 'PASS' } else { 'FAIL' }); runId = $CiRunId; url = $CiRunUrl; commit = $CiCommit; conclusion = $CiConclusion }
     }
     if ($SchemaVersion -eq 3) {
+        if (-not $localValidation) {
         $declaredCi = $runtimeCi
         if (-not $CiRunId -and $EvidencePath -and $snapshot.GitBytes.ContainsKey($EvidencePath)) { $CiRunId = (($script:utf8.GetString($snapshot.GitBytes[$EvidencePath]) | ConvertFrom-Json -AsHashtable).ci.runId) }
         $runtimeCi = Get-ReviewObservedCi $Root $CiRunId $HeadSha
         if ($null -ne $declaredCi -and ($declaredCi.commit -cne $runtimeCi.commit -or $declaredCi.url -cne $runtimeCi.url -or $declaredCi.conclusion -cne $runtimeCi.conclusion)) { throw 'CI_EVIDENCE: supplied CI differs from actual GitHub run/jobs' }
+        }
         if ($snapshot.DiffCheckExit -ne 0) { throw 'DIFF_CHECK: V3 refuses a failing full Base/Head diff-check' }
     }
-    $evidence = Get-ReviewEvidence $snapshot $EvidencePath $Status $runtimeCi
-    if (($Status -eq 'PASS' -or ($SchemaVersion -ge 2 -and $evidence.ci.status -in @('PASS', 'FAIL'))) -and $evidence.ci.commit -cne $HeadSha) { throw 'CI_EVIDENCE: PASS CI commit must equal HeadSha' }
+    $localBinding = if ($localValidation) { Get-ReviewLocalBinding $Root $snapshot $EvidencePath $HeadSha } else { $null }
+    $evidence = Get-ReviewEvidence $snapshot $EvidencePath $Status $runtimeCi $localValidation
+    if ((($Status -eq 'PASS' -and -not $localValidation) -or ($SchemaVersion -ge 2 -and $evidence.ci.status -in @('PASS', 'FAIL'))) -and $evidence.ci.commit -cne $HeadSha) { throw 'CI_EVIDENCE: PASS CI commit must equal HeadSha' }
     $branch = (Invoke-ReviewGit $Root @('rev-parse', '--abbrev-ref', 'HEAD')).Text.Trim()
     $gitVersion = (Invoke-ReviewGit $Root @('--version')).Text.Trim()
     $manifest = [ordered]@{
@@ -536,6 +575,8 @@ try {
         archiveVerification = @{ status = 'NOT_VERIFIED'; reason = 'Cannot embed its own post-close result; successful CLI JSON reports actual post-close verification.' }
     }
     if ($SchemaVersion -eq 3) {
+        $manifest.validationSource = $ValidationSource
+        if ($localValidation) { $manifest.localValidation = $localBinding }
         $manifest.Remove('excludedIgnoredPaths')
         $manifest.ignoredInventory = Get-ReviewIgnoredInventory $Root $snapshot.Ignored
         Assert-ReviewIgnoredInventory $manifest.ignoredInventory
@@ -553,7 +594,7 @@ try {
     if ($SchemaVersion -ge 2) {
         $summary = "# $TaskId 审查摘要`n`n状态：$Status。BaseSha：$BaseSha；HeadSha：$HeadSha；分支：$branch。`n`n范围：source为全部现行非证据源码/配置/测试/合同/ADR；review-evidence为本任务已提交证据。相同内容只保留一个payload，映射见manifest.sourceMembers。原始validation见映射，实际CI见git/ci.json与manifest。`n`n差异：git/diff-text.patch保留全部文本差异；git/changed-files.json记录每项变更的Base/Head原始blob OID、SHA256、大小、路径、类型；二进制不内嵌补丁。evidence-index.json完整列出历史证据与恢复方式。省略字节需要访问受控Git仓库，不能把此包声称为完整离线审计归档。`n`n验证：逐项命令/退出码见manifest与任务validation；CI为$($evidence.ci.status)，CI成功/失败元数据均要求同Head。空证据不是PASS；构包/重开仅证明有限完整性检查。`n`n安全与限制：已提交源、变更两侧原blob、文本补丁和成员做有限凭证检查；不包含ignored私有配置/凭证/缓存/数据库。不代替完整安全审计。被保留资源、未运行平台及实际回收量见本任务delivery-report。`n`n后续：停在当前关口，等待复审，不自动开始G3或下一阶段。`n"
     }
-    if ($SchemaVersion -eq 3) { $summary += "`nV3：CI已实际查询GitHub run与engineering/governance-integration两个job，重开时再次查询。PNG仅保留已提交选择清单中的最终稳定代表，最多12张/压缩3MiB。ignored仅聚合元数据，完整路径清单只存本地artifact。软目标10MiB、硬上限15MiB；Slim不等于独立离线审计包。`n" }
+    if ($SchemaVersion -eq 3) { $summary += "`nV3：验证来源=$ValidationSource。LOCAL从已提交checks和源码blob重算并独立重开，不调用GitHub；GITHUB实际查询同Head run及两个job，历史无来源字段V3维持原规则。PNG仅保留已提交选择清单中的最终稳定代表，最多12张/压缩3MiB。ignored仅聚合元数据，完整路径清单只存本地artifact。软目标10MiB、硬上限15MiB；Slim不等于独立离线审计包。`n" }
     $members.Add('REVIEW_SUMMARY.md', $script:utf8.GetBytes($summary))
     $lines = foreach ($name in @($members.Keys | Sort-Object -CaseSensitive)) { Assert-ReviewPath $name; Assert-ReviewContent $members[$name] 'generated member'; (Get-ReviewHash $members[$name]) + '  ' + $name }
     $members.Add('SHA256SUMS.txt', $script:utf8.GetBytes(($lines -join "`n") + "`n"))

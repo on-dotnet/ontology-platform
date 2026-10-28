@@ -1,5 +1,15 @@
 # 标准审查包合同 V3
 
+
+## 2026-10-29 本地优先 V3 增量合同
+
+依据[最新人类政策](local-validation-policy.md)，新建V3默认 `-ValidationSource LOCAL`，不调用GitHub。必须提供已提交 `EvidencePath`，schema2顶层为 `evidenceSchemaVersion:2`、`validationSource:"LOCAL"`、`testedCommit`（40位实际测试提交）、`checks`、`ci`及可选metadata；checks/ci字段沿用schema1严格约束。CI只接受NOT_RUN/NOT_VERIFIED/BLOCKED，不能用LOCAL跳过云端PASS/FAIL的实查；历史CI事实保存在任务原始运行证据中。
+
+创建和重开均从Head中权威证据推导LOCAL来源、核实testedCommit为祖先，并对两个提交的全部tracked mode/blob/path重算输入SHA256。仅docs/evidence、docs/tasks、docs/development及根AGENTS.md/PLANS.md属于可复用说明增量；docs/contracts、docs/bootstrap及所有源码、测试脚本、锁、配置、构建/运行输入均必须相同。manifest记录实际测试提交、交付提交、输入hash及原始证据hash，篡改来源或绑定不通过。LOCAL总体PASS仍要求全部checks PASS和diff-check0；构包不执行证据中的任意命令，真实测试与独立Review仍是Master责任。
+
+例：`pwsh -NoProfile -File scripts/create-review-package.ps1 -BaseSha <Base> -HeadSha <Head> -TaskId <Task> -Status PARTIAL -EvidencePath docs/evidence/<Task>/validation.json -ValidationSource LOCAL`。
+
+显式 `-ValidationSource GITHUB` 继续按下面原V3规则实查同Head run与双job。历史无validationSource字段的V3仍走原GITHUB路径；V1/V2保持原合同，不改历史SHA。下文保留历史合同；与本段冲突时当前新建LOCAL执行本段。
 ## V3 默认 compact 合同（G3-M1-CLOSEOUT-002）
 
 人类2026-10-27正式授权本轮工程纠偏，默认创建 `schemaVersion=3`。历史V1/V2的格式和原始ZIP/SHA保持；`VerifyOnly`按manifest版本分派，显式 `-SchemaVersion 1` / `2` 仍可创建历史格式。下面V2/V1章节仅适用其对应版本，不扩大V3。

@@ -9,7 +9,7 @@ $passed = 0
 function Exercise {
     param([string]$Name, $Evidence, [bool]$Accept, [switch]$BadEof)
     $path = Join-Path $temporary ($Name + '.json')
-    [IO.File]::WriteAllText($path, ($Evidence | ConvertTo-Json -Depth 20) + $(if ($BadEof) { "`n`n" } else { "`n" }))
+    [IO.File]::WriteAllText($path, ($Evidence | ConvertTo-Json -Depth 20 -Compress) + $(if ($BadEof) { "`n`n" } else { "`n" }))
     $null = & pwsh -NoProfile -File $validator -EvidenceFile $path -ExpectedHead ('a' * 40) 2>&1
     if (($LASTEXITCODE -eq 0) -ne $Accept) { throw "Unexpected evidence preflight result: $Name" }
     $script:passed++
@@ -39,6 +39,23 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Generator failed' }
     & pwsh -NoProfile -File $validator -EvidenceFile $generated -ExpectedHead ('a' * 40) | Out-Null
     if ($LASTEXITCODE -ne 0) { throw 'Generated evidence failed shared schema' }
+    $passed++
+    foreach ($cloudStatus in @('PASS', 'FAIL')) {
+        $item = $good | ConvertTo-Json -Depth 20 | ConvertFrom-Json -AsHashtable
+        $item.evidenceSchemaVersion = 2; $item.validationSource = 'LOCAL'; $item.testedCommit = ('a' * 40)
+        $item.ci = @{ status = $cloudStatus; runId = '123'; url = 'https://github.com/on-dotnet/ontology-platform/actions/runs/123'; commit = ('a' * 40); conclusion = $(if ($cloudStatus -eq 'PASS') { 'success' } else { 'failure' }) }
+        Exercise ('local-cloud-' + $cloudStatus) $item $false
+    }
+    $localGenerated = Join-Path $temporary 'local-generated.json'
+    $actualHead = (& git -C $root rev-parse HEAD).Trim()
+    & pwsh -NoProfile -File (Join-Path $root 'scripts/new-review-evidence.ps1') -OutputPath $localGenerated -TaskId G3-M3-001 -TestedCommit $actualHead | Out-Null
+    if ($LASTEXITCODE -ne 0) { throw 'Local generator failed' }
+    & pwsh -NoProfile -File $validator -EvidenceFile $localGenerated -ExpectedHead $actualHead | Out-Null
+    if ($LASTEXITCODE -ne 0) { throw 'Generated LOCAL evidence failed shared preflight' }
+    foreach ($generatedPath in @($generated, $localGenerated)) {
+        $generatedText = [IO.File]::ReadAllText($generatedPath)
+        if ($generatedText.Contains("`r") -or -not $generatedText.EndsWith("`n") -or $generatedText.EndsWith("`n`n")) { throw 'Generated evidence is not portable single-LF JSON' }
+    }
     $passed++
     $selectionFile = Join-Path $temporary 'selection.json'
     $tooMany = @{ schemaVersion = 1; screenshots = @(1..13 | ForEach-Object { @{ path = "docs/evidence/FIXTURE/$_.png"; page = "page$_"; theme = 'light'; viewport = '1440x900'; stable = $true } }) }

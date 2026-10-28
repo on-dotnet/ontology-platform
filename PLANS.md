@@ -1,5 +1,7 @@
 # 阶段计划与交接规则
 
+
+> 2026-10-29 人类覆盖授权：[本地优先、按需CI政策](docs/development/local-validation-policy.md)优先于下文旧的同HeadCI强制条款。增量集成、资源收尾与最终交付以适用本地真实验收、独立Review及已提交源码/输入绑定为门禁；Actions默认手动按需，未运行如实NOT_RUN，费用/权限/依赖边界不变。历史记录不改。
 ## 当前授权与历史
 
 任务不永久写死在根规则。执行前读取[当前授权索引](docs/tasks/current-authorization.md)和对应任务卡。G0/G1-ENG保留原事实及PARTIAL/BLOCKED，不用当前进展改写历史。外部材料只有经人类明确批准才成为任务依据。
@@ -36,7 +38,7 @@ OBSERVED为实测，PROPOSED为提案，NOT_VERIFIED为未知，NOT_RUN为未执
 
 ## 阶段收尾与资源生命周期（PRE-G3-HYGIENE-001）
 
-每里程碑获审后按[生命周期规范](docs/development/resource-lifecycle.md)记录分支/Worktree、Docker、ZIP和ignored目录归属，核实集成与跨机器活跃引用；先commit/push、独立Review及同Head CI，再做白名单安全回收。保护活跃/锁定/旧Master树、未集成代码、私有工具与持久数据，疑义保留并写明复查条件；不触碰全局codex/其他项目/生产。记录before/after数量、容量、准确命令/退出码、实际回收及DEFERRED理由，提交测试恢复入口写下一阶段交接。维护多Agent独立托管Worktree并行能力，Master唯一集成main；不为减少资源恢复共用main串行开发。无需每个安全小步骤再询问，但有歧义/不可逆/生产/跨项目操作暂停对应项。Review ZIP默认采用[V3合同](docs/development/review-package-spec.md)，全部现行非证据源码和当前任务证据各存一次、历史证据/blob/二进制变更完整索引；只交一个已提交Head且独立重开的compact包，旧包校验兼容，不改历史SHA。交付后停等当前关口复审，不自动进入下阶段。
+每里程碑获审后按[生命周期规范](docs/development/resource-lifecycle.md)记录分支/Worktree、Docker、ZIP和ignored目录归属，核实集成与跨机器活跃引用；先commit/push、独立Review及适用本地验证，再做白名单安全回收。保护活跃/锁定/旧Master树、未集成代码、私有工具与持久数据，疑义保留并写明复查条件；不触碰全局codex/其他项目/生产。记录before/after数量、容量、准确命令/退出码、实际回收及DEFERRED理由，提交测试恢复入口写下一阶段交接。维护多Agent独立托管Worktree并行能力，Master唯一集成main；不为减少资源恢复共用main串行开发。无需每个安全小步骤再询问，但有歧义/不可逆/生产/跨项目操作暂停对应项。Review ZIP默认采用[V3合同](docs/development/review-package-spec.md)，全部现行非证据源码和当前任务证据各存一次、历史证据/blob/二进制变更完整索引；只交一个已提交Head且独立重开的compact包，旧包校验兼容，不改历史SHA。交付后停等当前关口复审，不自动进入下阶段。
 
 ## 实际回收纠偏（PRE-G3-CLEANUP-FIX-002）
 
@@ -47,10 +49,10 @@ BuildKit history后验回现单独重开该项，不把即时列表absence当持
 
 ## G3-M1-CLOSEOUT-002 永久效率与交付入口
 
-新Master及子Agent开工必须从最新origin/main读取当前授权、任务/交接、资源清单、[效率规则](docs/development/ai-development-efficiency.md)、[Review V3合同](docs/development/review-package-spec.md)和[生命周期规范](docs/development/resource-lifecycle.md)。先Preflight、后冻结公共合同与正反测试，再独立Worktree并行；公共契约Single Writer。失败先廉价分层定位，不重复无关完整验收；稳定Head必须实际完整同HeadCI。
+新Master及子Agent开工必须从最新origin/main读取当前授权、任务/交接、资源清单、[效率规则](docs/development/ai-development-efficiency.md)、[Review V3合同](docs/development/review-package-spec.md)和[生命周期规范](docs/development/resource-lifecycle.md)。先Preflight、后冻结公共合同与正反测试，再独立Worktree并行；公共契约Single Writer。失败先廉价分层定位，不重复无关完整验收；稳定产品输入必须完成适用本地完整验收，远程CI按需。
 
-交付冻结顺序固定：源码/格式 → 测试 → 独立Review → 提交 → 同HeadCI → 唯一V3构包 → 独立重开 → 回执。最终diff-check必须exit0，历史失败仍保留。代表截图最多12张、PNG压缩目标3MiB，过程证据从精确Git对象恢复；ignored只入聚合索引。>10MiB报分类体积，>15MiB默认阻断。V1/V2历史VerifyOnly兼容且不改历史SHA。
+交付冻结顺序固定：源码/格式 → 测试 → 独立Review → 提交 → 本地验证绑定（CI按需） → 唯一V3构包 → 独立重开 → 回执。最终diff-check必须exit0，历史失败仍保留。代表截图最多12张、PNG压缩目标3MiB，过程证据从精确Git对象恢复；ignored只入聚合索引。>10MiB报分类体积，>15MiB默认阻断。V1/V2历史VerifyOnly兼容且不改历史SHA。
 
 Fuseki只使用canonical内容寻址构建入口及已校验共享镜像，AppHost不另建随机镜像。资源创建即记录TaskId/RunId/标签/清单；阶段关闭准确白名单回收自身资源，跨任务旧环境保留一套日常开发，其余必须有可再生或可验证备份依据。每个KEEP写准确对象、理由及解除条件；无socket不能标Docker PASS，禁止全局prune/restart/改DB。永久回归由verify -SelfTest及同HeadCI执行，不把静态规则测试当产品测试。
 
-G3-M3 E0依赖固定为：冻结合同/正反例/独立Review→两个独立新runner冷构建与跨Run命中→正式M3整栈；SEM/WEB代码可先独立树并行。CI缓存归档同路径、平台全输入身份及失败短复现，工作区真实Smoke/故障注入、证据早Schema和自动TaskRunTimeline均为永久入口，详见[效率规则](docs/development/ai-development-efficiency.md)。先两次可验证增量集成，最终同Head双job/唯一V3/独立重开；资源精确Apply与自然代际后验按[生命周期规范](docs/development/resource-lifecycle.md)分别如实记录，不从Mock或旧失败推PASS。
+G3-M3 E0依赖固定为：冻结合同/正反例/独立Review→两个独立新runner冷构建与跨Run命中→正式M3整栈；SEM/WEB代码可先独立树并行。CI缓存归档同路径、平台全输入身份及失败短复现，工作区真实Smoke/故障注入、证据早Schema和自动TaskRunTimeline均为永久入口，详见[效率规则](docs/development/ai-development-efficiency.md)。先两次可验证增量集成，最终本地完整验收/唯一V3/独立重开；资源精确Apply与自然代际后验按[生命周期规范](docs/development/resource-lifecycle.md)分别如实记录，不从Mock或旧失败推PASS。

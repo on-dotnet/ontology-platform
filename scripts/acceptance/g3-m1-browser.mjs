@@ -22,10 +22,15 @@ export async function runM1Checks({ root, origin, operator, viewer, single, chec
     return response.json();
   }
   try {
+    step("profile");
     const profileResponse = await viewer.api.get(origin + "/api/v1/semantic/support-profile");
     observed("m1_profile_authorized", profileResponse.status() === 200);
     const profile = await profileResponse.json();
-    observed("m1_profile_twenty_asserted", profile.capabilities.length === 20 && profile.reasoningMode === "ASSERTED_ONLY");
+    const count = profile.version === "3" ? 22 : ["1", "2"].includes(profile.version) ? 20 : 0;
+    const capabilityIds = new Set(profile.capabilities.map(item => item.id));
+    observed("m1_profile_registered_asserted", count > 0 && profile.capabilities.length === count && capabilityIds.size === count
+      && Array.from({ length: count }, (_, index) => String(index + 1).padStart(2, "0")).every(id => capabilityIds.has(id))
+      && profile.reasoningMode === "ASSERTED_ONLY");
     observed("m1_profile_budgets", profile.hash.length === 64 && profile.comparisonBudget.maxBlankNodes === 128
       && profile.comparisonBudget.maxSearchNodes === 100000 && profile.comparisonBudget.timeoutMilliseconds === 5000);
     step("four_source_bytes");
@@ -78,8 +83,8 @@ export async function runM1Checks({ root, origin, operator, viewer, single, chec
     await page.setViewportSize({ width: 1440, height: 1000 });
     await page.goto(origin + "/ontologies");
     await page.getByRole("button").filter({ has: page.locator("strong", { hasText: name }) }).click();
-    await page.getByRole("region", { name: "20项能力矩阵，可横向滚动" }).waitFor();
-    observed("m1_ui_twenty_rows", await page.locator(".g3-profile-table tbody tr").count() === 20);
+    await page.getByRole("region", { name: `${count}项能力矩阵，可横向滚动` }).waitFor();
+    observed("m1_ui_registered_rows", await page.locator(".g3-profile-table tbody tr").count() === count);
     await page.getByRole("textbox", { name: "变更理由", exact: true }).fill("Synthetic M1 browser assessment");
     async function importAndWait(file, bytes) {
       const label = "载入" + file;

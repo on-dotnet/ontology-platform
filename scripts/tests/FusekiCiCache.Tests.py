@@ -85,7 +85,12 @@ class WorkflowScopeTests(unittest.TestCase):
             with self.subTest(value=value),self.assertRaises((ValueError,TypeError)):
                 self.evaluate('workflow_dispatch','refs/heads/main',manual=value)
 
-    def test_all_application_steps_use_same_guard_and_cache_is_still_push_only(self):
+    def test_workflow_is_manual_by_default_across_host_platforms(self):
+        triggers=self.workflow.split('permissions:',1)[0]
+        self.assertIn('  workflow_dispatch:',triggers)
+        self.assertNotRegex(triggers,r'(?m)^  (push|pull_request|schedule):')
+
+    def test_all_application_steps_use_same_guard_and_cache_saves_only_trusted_manual_main(self):
         guard=self.scope_condition()
         self.assertEqual(guard,"needs.scope.outputs.canonical_only != 'true'")
         self.assertEqual(self.workflow.count('    needs: scope'),2)
@@ -96,7 +101,8 @@ class WorkflowScopeTests(unittest.TestCase):
             self.assertIn('- name: '+name+'\n        if: '+guard,self.workflow)
         for action in re.finditer(r'        uses: actions/cache/save@',self.workflow):
             line=self.workflow[:action.start()].splitlines()[-1]
-            self.assertIn("github.event_name == 'push'",line)
+            self.assertIn("github.event_name == 'workflow_dispatch'",line)
+            self.assertIn("github.ref == 'refs/heads/main'",line)
         self.assertIn('CANONICAL_DIAGNOSTIC_ONLY; product NOT_RUN; full required CI NOT_VERIFIED',self.workflow)
 
 

@@ -23,6 +23,7 @@ try {
     $path = 'docs/evidence/PREFLIGHT/validation.json'
     $snapshot = @{ GitBytes = @{ $path = $bytes }; Mapping = @(); DiffCheckExit = 0 }
     $normalized = Get-ReviewEvidence $snapshot $path 'PARTIAL' $null
+    if ($ExpectedHead -and $value.ContainsKey('validationSource') -and $value.validationSource -ceq 'LOCAL') { $null = Get-ReviewLocalBinding $Root $snapshot $path $ExpectedHead }
     if ($IgnoredInventoryFile) {
         $inventory = Get-Content -Raw -LiteralPath $IgnoredInventoryFile | ConvertFrom-Json -AsHashtable
         Assert-ReviewIgnoredInventory $inventory

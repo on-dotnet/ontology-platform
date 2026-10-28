@@ -1,7 +1,5 @@
 name: Engineering and platform foundation
 on:
-  push:
-  pull_request:
   workflow_dispatch:
     inputs:
       canonical_only:
@@ -80,7 +78,7 @@ jobs:
         run: python3 scripts/maintenance/task_run_timeline.py ci --step-id native --task-type TEST -- pwsh -NoProfile -File scripts/verify.ps1 -RunNative -RunTests -SkipWeb
       - name: Scope notice
         shell: pwsh
-        run: Write-Output 'Web checks ran separately above; real browser OIDC/LGTM acceptance is recorded separately. Governance container tests run in the mandatory integration job.'
+        run: Write-Output 'Web checks ran separately above; real browser OIDC/LGTM acceptance is recorded separately. Governance container tests run in the requested integration job.'
       - name: Report actual engineering intervals
         if: always()
         shell: pwsh
@@ -134,20 +132,20 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Confirm included-storage image budget
         id: image-budget
-        if: github.event_name == 'push' && steps.image-cache.outputs.cache-hit != 'true' && steps.canonical.outcome == 'success'
+        if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && steps.image-cache.outputs.cache-hit != 'true' && steps.canonical.outcome == 'success'
         run: python3 scripts/maintenance/fuseki_ci_cache.py budget --directory artifacts/fuseki-ci-cache
       - name: Save verified canonical image archive
-        if: github.event_name == 'push' && steps.image-budget.outcome == 'success'
+        if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && steps.image-budget.outcome == 'success'
         uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: artifacts/fuseki-ci-cache
           key: ${{ steps.fuseki.outputs.cacheKey }}
       - name: Confirm included-storage failure budget
         id: failure-budget
-        if: always() && github.event_name == 'push' && steps.canonical.outcome == 'failure' && steps.failure-cache.outputs.cache-hit != 'true' && hashFiles('artifacts/fuseki-failures/**') != ''
+        if: always() && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && steps.canonical.outcome == 'failure' && steps.failure-cache.outputs.cache-hit != 'true' && hashFiles('artifacts/fuseki-failures/**') != ''
         run: python3 scripts/maintenance/fuseki_ci_cache.py budget --directory artifacts/fuseki-failures
       - name: Save bounded failure candidate after failed canonical build
-        if: always() && github.event_name == 'push' && steps.failure-budget.outcome == 'success'
+        if: always() && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && steps.failure-budget.outcome == 'success'
         uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: artifacts/fuseki-failures
@@ -187,4 +185,4 @@ jobs:
           }
       - name: Canonical diagnostic scope notice
         if: always() && needs.scope.outputs.canonical_only == 'true'
-        run: echo 'CANONICAL_DIAGNOSTIC_ONLY; product NOT_RUN; full required CI NOT_VERIFIED; cache save remains trusted-push-only'
+        run: echo 'CANONICAL_DIAGNOSTIC_ONLY; product NOT_RUN; full required CI NOT_VERIFIED; cache save remains manual-main-only'

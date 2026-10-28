@@ -7,6 +7,10 @@ export function SupportProfile({ profile, loading, failed, onRefresh }: {
   failed: boolean;
   onRefresh: () => void;
 }) {
+  const expectedCount = profile?.version === "3" ? 22 : profile?.version === "1" || profile?.version === "2" ? 20 : null;
+  const ids = new Set(profile?.capabilities.map(item => item.id));
+  const registered = expectedCount !== null && profile?.capabilities.length === expectedCount
+    && ids.size === expectedCount && Array.from({ length: expectedCount }, (_, index) => String(index + 1).padStart(2, "0")).every(id => ids.has(id));
   return (
     <section className="g2-stack" aria-label="语义支持档案">
       <div className="g2-row">
@@ -25,8 +29,8 @@ export function SupportProfile({ profile, loading, failed, onRefresh }: {
           <p className="muted">只使用已断言事实；OWL 推理 NOT_RUN，不联网加载 imports。SHACL 约束与 OWL 公理分开。</p>
           <p className="muted">BASIC 为现有结构编辑；SOURCE 为专家源码编辑；EXACT 为原文保留；BLOCKED 为禁止发布。</p>
           <p className="muted">rdfs:domain/range 不代表必填或任选其一；allValuesFrom 不保证存在关系；Functional 不等于数据库唯一键。</p>
-          {profile.capabilities.length !== 20 && <p className="g2-notice">UNKNOWN · 预期20项，服务端返回{profile.capabilities.length}项。</p>}
-          <div className="g3-profile-table" tabIndex={0} role="region" aria-label="20项能力矩阵，可横向滚动">
+          {!registered && <p className="g2-notice">UNKNOWN · 支持档案版本或能力集合未登记，服务端返回{profile.capabilities.length}项。</p>}
+          <div className="g3-profile-table" tabIndex={0} role="region" aria-label={`${profile.capabilities.length}项能力矩阵，可横向滚动`}>
             <table>
               <caption>编辑、保留、发布和验证分别说明能力边界</caption>
               <thead><tr><th scope="col">能力</th><th scope="col">编辑</th><th scope="col">保留</th><th scope="col">发布</th><th scope="col">验证</th></tr></thead>

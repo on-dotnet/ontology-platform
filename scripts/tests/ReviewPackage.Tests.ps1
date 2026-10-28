@@ -21,6 +21,10 @@ function Write-Fixture {
     $null = New-Item -ItemType Directory -Force (Split-Path $destination -Parent)
     [IO.File]::WriteAllText($destination, $Text.Replace("`r`n", "`n"), [Text.UTF8Encoding]::new($false))
 }
+function Write-LocalFixture {
+    param([string]$Path, [string]$Text)
+    Write-Fixture $Path ($Text.Replace("`r`n", "`n").Replace("`r", "`n").TrimEnd("`n") + "`n")
+}
 function Commit-Fixture {
     $null = Git @('add', '--all')
     $null = Git @('commit', '-qm', 'fixture change')
@@ -42,9 +46,9 @@ function New-Fixture {
     $script:head = Commit-Fixture
 }
 function Invoke-Package {
-    param([string[]]$Extra = @(), [switch]$Verify, [switch]$Compact, [switch]$V3, [string]$DeclaredStatus = 'PARTIAL')
+    param([string[]]$Extra = @(), [switch]$Verify, [switch]$Compact, [switch]$V3, [switch]$Local, [string]$DeclaredStatus = 'PARTIAL')
     $arguments = @('-NoProfile', '-File', $PackageScript, '-Root', $script:repo)
-    if (-not $Verify -and -not $Compact -and -not $V3) { $arguments += @('-SchemaVersion', '1') }
+    if (-not $Verify -and -not $Compact -and -not $V3 -and -not $Local) { $arguments += @('-SchemaVersion', '1') }
     if ($Compact) { $arguments += @('-SchemaVersion', '2') }
     if (-not $Verify) { $arguments += @('-BaseSha', $script:base, '-HeadSha', $script:head, '-TaskId', 'TEST-001', '-Status', $DeclaredStatus) }
     $savedPath = $env:PATH
@@ -52,7 +56,8 @@ function Invoke-Package {
     try {
         $env:PATH = $script:fakeGhDirectory + [IO.Path]::PathSeparator + $savedPath
         $env:REVIEW_FIXTURE_CI_HEAD = $script:head
-        if ($V3) { $arguments += @('-CiRunId', '123', '-CiRunUrl', 'https://github.com/on-dotnet/ontology-platform/actions/runs/123', '-CiCommit', $script:head, '-CiConclusion', 'success') }
+        if ($Local) { $arguments += @('-ValidationSource', 'LOCAL') }
+        if ($V3) { $arguments += @('-ValidationSource', 'GITHUB', '-CiRunId', '123', '-CiRunUrl', 'https://github.com/on-dotnet/ontology-platform/actions/runs/123', '-CiCommit', $script:head, '-CiConclusion', 'success') }
         $output = & pwsh @arguments @Extra 2>&1
         $code = $LASTEXITCODE
     } finally { $env:PATH = $savedPath; $env:REVIEW_FIXTURE_CI_HEAD = $savedHead }
@@ -83,6 +88,7 @@ try {
 #!/usr/bin/env python3
 import json,os,sys
 h=os.environ['REVIEW_FIXTURE_CI_HEAD']; mode=os.environ.get('REVIEW_FIXTURE_CI_MODE','')
+if mode=='unavailable': sys.exit(9)
 if mode=='wrong-head': h='f'*40
 jobs=[dict(databaseId=i+1,name=n,status='completed',conclusion='success',url='https://github.com/on-dotnet/ontology-platform/actions/runs/123/job/'+str(i+1)) for i,n in enumerate(['engineering','governance-integration'])]
 if mode=='missing-job': jobs.pop()
@@ -374,6 +380,56 @@ for i in range(53):
         Assert-True ($actual.Exit -eq 0) "Soft target incorrectly blocked: $($actual.Output)"
         $r = $actual.Output | ConvertFrom-Json
         Assert-True ($r.sizeReport.aboveSoftTarget -and $r.sizeReport.sizeBytes -gt 10MB -and @($r.sizeReport.categories | Where-Object category -EQ 'source')[0].compressedBytes -gt 10MB) 'Exact compressed category report missing'
+    }
+    Case 'local V3 passes and independently reopens without GitHub or a cloud PASS' {
+        Write-LocalFixture 'docs/evidence/TEST-001/local.json' (@{ checks = @(@{ name = 'real-local'; command = 'fixture-local-test'; status = 'PASS'; exitCode = 0; output = 'isolated fixture only; no product claim' }); ci = @{ status = 'NOT_RUN'; runId = $null; url = $null; commit = $null; conclusion = $null }; evidenceSchemaVersion = 2; validationSource = 'LOCAL'; testedCommit = $script:head } | ConvertTo-Json -Depth 6)
+        $script:head = Commit-Fixture
+        $saved = $env:REVIEW_FIXTURE_CI_MODE
+        try {
+            $env:REVIEW_FIXTURE_CI_MODE = 'unavailable'
+            $actual = Invoke-Package -Local -DeclaredStatus PASS -Extra @('-EvidencePath', 'docs/evidence/TEST-001/local.json')
+            Assert-True ($actual.Exit -eq 0) "Local delivery blocked: $($actual.Output)"
+            $path = @(Get-ChildItem (Join-Path $script:repo 'artifacts/reviews') -Filter '*.zip')[0].FullName
+            $archive = [IO.Compression.ZipFile]::OpenRead($path)
+            try {
+                $m = Read-ZipText $archive 'manifest.json' | ConvertFrom-Json
+                Assert-True ($m.validationSource -ceq 'LOCAL' -and $m.ci.status -ceq 'NOT_RUN' -and $null -eq $m.runtimeCi) 'Local PASS fabricated cloud CI'
+            } finally { $archive.Dispose() }
+            $reopen = Invoke-Package -Verify -Extra @('-VerifyOnly', '-PackagePath', $path)
+            Assert-True ($reopen.Exit -eq 0) "Local reopen required GitHub: $($reopen.Output)"
+            $archive = [IO.Compression.ZipFile]::Open($path, [IO.Compression.ZipArchiveMode]::Update)
+            try {
+                $m.validationSource = 'GITHUB'
+                Replace-ZipMember $archive 'manifest.json' ([Text.Encoding]::UTF8.GetBytes(($m | ConvertTo-Json -Depth 20)))
+            } finally { $archive.Dispose() }
+            $bad = Invoke-Package -Verify -Extra @('-VerifyOnly', '-PackagePath', $path)
+            Assert-True ($bad.Exit -ne 0) 'Local package relabeled as GitHub evidence'
+        } finally { $env:REVIEW_FIXTURE_CI_MODE = $saved }
+    }
+    foreach ($inputPath in @('app.txt', 'scripts/runtime.py', 'docs/contracts/runtime.md')) {
+        Case "local V3 refuses changed tested input $inputPath" {
+            Write-LocalFixture 'docs/evidence/TEST-001/local.json' (@{ evidenceSchemaVersion = 2; validationSource = 'LOCAL'; testedCommit = $script:head; checks = @(@{ name = 'local'; command = 'fixture'; status = 'PASS'; exitCode = 0; output = 'fixture only' }); ci = @{ status = 'NOT_RUN'; runId = $null; url = $null; commit = $null; conclusion = $null } } | ConvertTo-Json -Depth 6)
+            Write-Fixture $inputPath "changed after test`n"
+            $script:head = Commit-Fixture
+            $actual = Invoke-Package -Local -Extra @('-EvidencePath', 'docs/evidence/TEST-001/local.json')
+            Assert-True ($actual.Exit -ne 0 -and $actual.Output.Contains('LOCAL_EVIDENCE')) 'Changed tested input accepted'
+        }
+    }
+    Case 'local V3 refuses invented tested commit' {
+        Write-LocalFixture 'docs/evidence/TEST-001/local.json' (@{ evidenceSchemaVersion = 2; validationSource = 'LOCAL'; testedCommit = ('f' * 40); checks = @(@{ name = 'local'; command = 'fixture'; status = 'PASS'; exitCode = 0; output = 'fixture only' }); ci = @{ status = 'NOT_RUN'; runId = $null; url = $null; commit = $null; conclusion = $null } } | ConvertTo-Json -Depth 6)
+        $script:head = Commit-Fixture
+        $actual = Invoke-Package -Local -Extra @('-EvidencePath', 'docs/evidence/TEST-001/local.json')
+        Assert-True ($actual.Exit -ne 0) 'Invented tested commit accepted'
+    }
+    Case 'local V3 refuses missing committed local evidence' {
+        $actual = Invoke-Package -Local
+        Assert-True ($actual.Exit -ne 0 -and $actual.Output.Contains('LOCAL_EVIDENCE')) 'Missing local evidence accepted'
+    }
+    Case 'local V3 refuses cloud PASS instead of silently bypassing verification' {
+        Write-LocalFixture 'docs/evidence/TEST-001/local.json' (@{ checks = @(@{ name = 'local'; command = 'fixture'; status = 'PASS'; exitCode = 0; output = 'fixture' }); evidenceSchemaVersion = 2; validationSource = 'LOCAL'; testedCommit = $script:head; ci = @{ status = 'PASS'; runId = '123'; url = 'https://github.com/on-dotnet/ontology-platform/actions/runs/123'; commit = $script:head; conclusion = 'success' } } | ConvertTo-Json -Depth 6)
+        $script:head = Commit-Fixture
+        $actual = Invoke-Package -Local -Extra @('-EvidencePath', 'docs/evidence/TEST-001/local.json')
+        Assert-True ($actual.Exit -ne 0 -and $actual.Output.Contains('LOCAL_EVIDENCE')) 'Local mode accepted unqueried CI claim'
     }
     Case 'V3 default with independently queried same Head CI and legacy V2 reopen' {
         $actual = Invoke-Package -V3

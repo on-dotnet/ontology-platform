@@ -32,6 +32,19 @@ describe("M1 实际组件输出与四源往返", () => {
     expect(html).toContain("OWL 推理 NOT_RUN");
     expect(html).toContain('tabindex="0"');
   });
+  it.each(["1", "2", "3"])("登记档案v%s显示完整矩阵且不误报UNKNOWN", version => {
+    const count = version === "3" ? 22 : 20;
+    const current = { ...profile, version, capabilities: Array.from({ length: count }, (_, index) => ({ ...profile.capabilities[0], id: String(index + 1).padStart(2, "0") })) };
+    const html = renderToStaticMarkup(createElement(SupportProfile, { profile: current, loading: false, failed: false, onRefresh: noop }));
+    expect(html.match(/scope="row"/g)).toHaveLength(count);
+    expect(html).toContain(`${count}项能力矩阵，可横向滚动`);
+    expect(html).not.toContain("UNKNOWN");
+  });
+  it.each(["missing", "duplicate", "unknown"])("档案%s继续显示UNKNOWN", fault => {
+    const current = { ...profile, version: fault === "unknown" ? "99" : "1", capabilities: fault === "missing" ? profile.capabilities.slice(1) : fault === "duplicate" ? [...profile.capabilities.slice(1), profile.capabilities[1]] : profile.capabilities };
+    const html = renderToStaticMarkup(createElement(SupportProfile, { profile: current, loading: false, failed: false, onRefresh: noop }));
+    expect(html).toContain("UNKNOWN");
+  });
   it("profile请求失败显示UNKNOWN和可恢复入口", () => {
     const html = renderToStaticMarkup(createElement(SupportProfile, { profile: null, loading: false, failed: true, onRefresh: noop }));
     expect(html).toContain("UNKNOWN");
