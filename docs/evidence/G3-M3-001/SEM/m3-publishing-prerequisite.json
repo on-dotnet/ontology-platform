@@ -1,0 +1,193 @@
+{
+  "sourceSha": "0412e170cf8d94b9be1f869f825e284bbde2982a",
+  "workingTreeChanges": true,
+  "exitCode": 1,
+  "records": [
+    {
+      "check": "public-jena-fixture-modes",
+      "exitCode": 0,
+      "modes": {
+        "fixture": "0o755",
+        "config.ttl": "0o644",
+        "log4j2.properties": "0o644"
+      }
+    },
+    {
+      "command": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g2-pub-ea0a6dacc549-pg",
+        "--memory",
+        "256m",
+        "--cpus",
+        "1",
+        "--publish",
+        "127.0.0.1::5432",
+        "--env",
+        "POSTGRES_PASSWORD",
+        "--env",
+        "POSTGRES_DB",
+        "--tmpfs",
+        "/var/lib/postgresql",
+        "postgres:18.6-trixie@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6"
+      ],
+      "exitCode": 0,
+      "output": "814f2cfcef101fb1c0fc8e4e47d8a87468a49e14969c966ecc91ea8d63623de6\n"
+    },
+    {
+      "command": [
+        "docker",
+        "port",
+        "g2-pub-ea0a6dacc549-pg",
+        "5432/tcp"
+      ],
+      "exitCode": 0,
+      "output": "127.0.0.1:57673\n"
+    },
+    {
+      "command": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g2-pub-ea0a6dacc549-s3",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--publish",
+        "127.0.0.1::9000",
+        "--env",
+        "RUSTFS_ACCESS_KEY",
+        "--env",
+        "RUSTFS_SECRET_KEY",
+        "--env",
+        "RUSTFS_CONSOLE_ENABLE=false",
+        "--tmpfs",
+        "/data:mode=1777",
+        "rustfs/rustfs:1.0.3@sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+        "/data"
+      ],
+      "exitCode": 0,
+      "output": "c552ea65d7495487b9945c645449f31dc5812924d78fd56160c73724aab9045f\n"
+    },
+    {
+      "command": [
+        "docker",
+        "port",
+        "g2-pub-ea0a6dacc549-s3",
+        "9000/tcp"
+      ],
+      "exitCode": 0,
+      "output": "127.0.0.1:57677\n"
+    },
+    {
+      "command": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g2-pub-ea0a6dacc549-jena",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--publish",
+        "127.0.0.1::3030",
+        "--mount",
+        "type=bind,src=/private/tmp/g2-pub-ea0a6dacc549x1yu1m5g/fixture,dst=/fixture,readonly",
+        "--entrypoint",
+        "java",
+        "ontology-platform-fuseki:context-1e45f836d9837cbc75d23adb3ad37b0ff79a545ef06102a87aa246feea9cc1e5",
+        "-Xmx384m",
+        "-Dlog4j.configurationFile=/fixture/log4j2.properties",
+        "-jar",
+        "/opt/fuseki/fuseki-server.jar",
+        "--config=/fixture/config.ttl"
+      ],
+      "exitCode": 0,
+      "output": "b749e097c8bf8d84fbe6a6b871105eb0866ea454a8b431ee138fceb16695b6e1\n"
+    },
+    {
+      "command": [
+        "docker",
+        "image",
+        "inspect",
+        "ontology-platform-fuseki:context-1e45f836d9837cbc75d23adb3ad37b0ff79a545ef06102a87aa246feea9cc1e5",
+        "--format",
+        "{{.Id}} {{json .RepoDigests}}"
+      ],
+      "exitCode": 0,
+      "output": "sha256:39b0fb6616a466a05b2ff8c691bb14a63557c70118d433a4b70fd1068b1bef60 [\"ontology-platform-fuseki@sha256:39b0fb6616a466a05b2ff8c691bb14a63557c70118d433a4b70fd1068b1bef60\"]\n"
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "g2-pub-ea0a6dacc549-jena",
+        "java",
+        "-jar",
+        "/opt/fuseki/fuseki-server.jar",
+        "--version"
+      ],
+      "exitCode": 0,
+      "output": "[2026-10-28 12:26:29] Fuseki     INFO  Apache Jena Fuseki 6.2.0\nApache Jena version 6.2.0\n"
+    },
+    {
+      "command": [
+        "docker",
+        "port",
+        "g2-pub-ea0a6dacc549-jena",
+        "3030/tcp"
+      ],
+      "exitCode": 0,
+      "output": "127.0.0.1:57683\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "build",
+        "backend/tests/OntologyPlatform.PublishingTests",
+        "--no-restore"
+      ],
+      "exitCode": 1,
+      "output": "/usr/local/share/dotnet/sdk/10.0.402/Sdks/Microsoft.NET.Sdk/targets/Microsoft.PackageDependencyResolution.targets(266,5): error NETSDK1004: 找不到资产文件“/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/obj/project.assets.json”。运行 NuGet 包还原以生成此文件。 [/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/OntologyPlatform.PublishingTests.csproj]\n\n生成失败。\n\n/usr/local/share/dotnet/sdk/10.0.402/Sdks/Microsoft.NET.Sdk/targets/Microsoft.PackageDependencyResolution.targets(266,5): error NETSDK1004: 找不到资产文件“/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/obj/project.assets.json”。运行 NuGet 包还原以生成此文件。 [/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/OntologyPlatform.PublishingTests.csproj]\n    0 个警告\n    1 个错误\n\n已用时间 00:00:00.14\n"
+    },
+    {
+      "status": "FAIL",
+      "category": "RuntimeError"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g2-pub-ea0a6dacc549-jena"
+      ],
+      "exitCode": 0,
+      "output": "g2-pub-ea0a6dacc549-jena\n"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g2-pub-ea0a6dacc549-s3"
+      ],
+      "exitCode": 0,
+      "output": "g2-pub-ea0a6dacc549-s3\n"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g2-pub-ea0a6dacc549-pg"
+      ],
+      "exitCode": 0,
+      "output": "g2-pub-ea0a6dacc549-pg\n"
+    }
+  ]
+}

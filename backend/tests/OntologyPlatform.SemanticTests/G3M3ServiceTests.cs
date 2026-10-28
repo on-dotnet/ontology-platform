@@ -76,6 +76,37 @@ public sealed class G3M3ServiceTests
         }
     }
 
+    /// <summary>单位治理进入同一真实PG评估；完整合法、精度未知和量纲冲突三个结论分开。</summary>
+    [TestMethod]
+    [DataRow("valid", AssessmentStageStatus.Pass)]
+    [DataRow("unknown", AssessmentStageStatus.Indeterminate)]
+    [DataRow("mismatch", AssessmentStageStatus.Fail)]
+    public async Task UnitGovernanceBindsRealAssessment(string scenario, AssessmentStageStatus expected)
+    {
+        // 当前测试显式连接脚本新建PG，不复用历史数据。
+        await using var database = Database();
+        // 真实生产服务保留事务审计与版本绑定。
+        var service = Service(database);
+        // 独立双厂授权主体不与其它测试命令冲突。
+        var actor = Actor();
+        // 合成单位只从已提交fixture读取，生产解析仍使用真实RIOT。
+        var sources = G3M3UnitTests.Sources();
+        if (scenario == "unknown") sources = sources with { VocabularyTurtle = sources.VocabularyTurtle!.Replace("declared-exact", "UNKNOWN", StringComparison.Ordinal) };
+        if (scenario == "mismatch") sources = sources with { VocabularyTurtle = sources.VocabularyTurtle!.Replace("p:nominalUnit ex:K-v1", "p:nominalUnit ex:MPa-v1", StringComparison.Ordinal) };
+        // 普通源码保存不清洗冲突图，发布资格必须由实际评估决定。
+        var draft = await service.CreateAsync(actor, new CreateDraftRequest { Name = "Synthetic unit assessment", Scope = new ResourceScope { OrganizationId = actor.OrganizationId, SiteIds = actor.SiteIds }, Sources = sources, Command = Command(0) }, default);
+        // 五阶段结果来自真实执行和准确单位治理，没有客户端构造成功报告。
+        var assessment = await service.AssessAsync(actor, draft.DraftId, new ValidateDraftRequest { Revision = 1, Hashes = draft.Hashes, Command = Command(1) }, default);
+        Assert.AreEqual(expected, assessment.Stages.Single(stage => stage.Name == "GOVERNANCE").Status);
+        Assert.AreEqual(AssessmentStageStatus.Pass, assessment.Stages.Single(stage => stage.Name == "SHACL_CORE").Status);
+        Assert.AreEqual(AssessmentStageStatus.Pass, assessment.Stages.Single(stage => stage.Name == "SUPPORT").Status);
+        Assert.AreEqual(AssessmentStageStatus.NotRun, assessment.Stages.Single(stage => stage.Name == "OWL_REASONING").Status);
+        Assert.AreEqual(scenario == "valid", assessment.PublishEligible);
+        Assert.AreEqual(draft.Hashes, assessment.Hashes);
+        Assert.AreEqual("3", assessment.ProfileVersion);
+        if (scenario != "valid") Assert.IsTrue(assessment.Diagnostics.Any(item => item.Diagnostic.Code == (scenario == "unknown" ? "unit_precision_unknown" : "unit_dimension_mismatch") && item.SourceHash == draft.Hashes.VocabularyHash));
+    }
+
     /// <summary>本轮小型合法Synthetic图，不从行业符号推断身份。</summary>
     private static SourceBundle Sources() => new() { OntologyTurtle = "<urn:synthetic:m3:C> a <http://www.w3.org/2002/07/owl#Class> .", VocabularyTurtle = "@prefix skos: <http://www.w3.org/2004/02/skos/core#> . <urn:synthetic:m3:s> a skos:ConceptScheme . <urn:synthetic:m3:c> a skos:Concept ; skos:inScheme <urn:synthetic:m3:s> ." };
 

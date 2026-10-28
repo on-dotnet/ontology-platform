@@ -120,7 +120,7 @@ public sealed class G3LegacyTests
         // CAS用历史活动revision1替换为当前版本。
         var current = await fixture.Service.ActivateAsync(fixture.Author, new ActivateReleaseRequest { ProposalId = proposal.ProposalId, ExpectedActiveReleaseId = legacy.ReleaseId, ExpectedActivationRevision = 1, Command = PublishingFixture.Command(proposal.Revision) }, default);
         Assert.AreEqual(2, current.Manifest.SchemaVersion);
-        Assert.AreEqual("2", current.Manifest.Semantics!.ProfileVersion);
+        Assert.AreEqual("3", current.Manifest.Semantics!.ProfileVersion);
         Assert.AreEqual(SemanticProfile.Current().Hash, current.Manifest.Semantics.ProfileHash);
         // 当前草稿推进后，旧评估不再绑定最新revision。
         var advanced = await fixture.Ontology.SaveAsync(fixture.Author, draft.DraftId, new SaveDraftRequest { Name = draft.Name, Sources = draft.Sources with { OntologyTurtle = draft.Sources.OntologyTurtle + "\n# current draft advanced beyond M1 rollback" }, Command = PublishingFixture.Command(1) }, default);

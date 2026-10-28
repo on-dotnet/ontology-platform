@@ -13,3 +13,13 @@
 继续既有d9f7631，不重做前成果。新增samples/g3-m3/units.ttl明确Synthetic K/℃/MPa/t、三类七维量纲、量种、版本化标准来源和属性绑定；没有QUDT资产、转换因子、新依赖或新表。单位/来源各字段恰一、多值失败、七维xsd:integer -32..32、精确量种/量纲IRI和属性三字段绑定完整检查；仅绑定元数据出现时要求完整，不对旧普通属性强加单位。未知precision保留warning，由GOVERNANCE=INDETERMINATE阻断。
 
 RED red-units.json实际19用例18失败/1通过/0skip；GREEN green-units.json真实隔离Jena 19/19通过、0skip，暂存图清零并删除脚本自身容器。初次测试转义编译失败red-units-compile.json保留。格式使用backend/OntologyPlatform.slnx exit0（workspace加载warning），diff-check exit0；首次误用根solution路径的失败仅记本地日志。新切片尚未完成全SEM/PG/publishing真实回归与独立Review；正式M3整栈须等待E0门禁，由Master组织，当前仍DRAFT/PARTIAL。
+
+## 第三切片：真实评估、发布防绕过与历史v2
+
+complete-m3-sem.json：真实隔离PG/Jena，M3专项46/46通过、0skip。新增单位治理三态与SHACL/SUPPORT/OWL_REASONING独立阶段验证；v3 Deploy/Verify/ReadVerified直接调用同样阻断精度未知、量纲错配与SKOS缺陷；精确LegacyM2不追溯套v3政策。Master授权消费a1b719d公共API及g2样例scheme（本树cherry-pick=19df148）后，full-sem.json完整159/159通过、0skip，34.759秒。
+
+m3-publishing.json：真实临时PG/Jena/RustFS，4/4通过、0skip。覆盖完整Synthetic单位异人审批发布、原始对象及Jena正式消费、固定Release词汇读取与后续草稿隔离、缺厂授权零外调、SHACL成功但治理拒绝提案、精确旧v2 Catalog/原始manifest字节读回和异人审批CAS回滚、旧v2 assessment拒用于新发布。Master额外批准旧PublishingTests/G3LegacyTests唯一当前profile断言2→3，旧fixtures及旧profile/hash不变。SEM G3BoundaryTests当前服务profile断言同样升级3，独立1/1通过。
+
+发布入口首次因缺project.assets未运行，m3-publishing-prerequisite.json保留。标准locked restore在网络审计等待后主动中断exit130；随后--locked-mode --ignore-failed-sources -p:NuGetAudit=false用已有依赖恢复exit0（本地NuGet审计NOT_RUN，不能冒称安全审核PASS），真实编译0warning/0error。无新依赖/lock变化。格式及diff-check exit0。SelfTest首次仅受ignored过程日志CRLF与缺隔离YAML库阻断，Master批准复用其.tools/pythonlibs后重跑；原日志散列和规范化类别保留process-log-normalization.json，失败事实不改。最终SelfTest状态待本轮实际结束回执。
+
+所有脚本自身随机容器均实际删除，临时验证图计数清零，不清理旧G2资源。当前仍DRAFT/PARTIAL：独立Review、Master集成、正式整栈/E0门禁、同HeadCI与唯一ZIP由Master组织；未push/merge，未启动下阶段。

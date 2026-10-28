@@ -27,7 +27,7 @@ public sealed class G3BoundaryTests
         Assert.IsInstanceOfType<IG3OntologyService>(service);
         // 固定JSON顺序与空hash计算规范可由客户端独立复算。
         var profile = SemanticProfile.LegacyM1();
-        Assert.AreEqual("2", ((IG3OntologyService)(object)service).GetProfile().Version);
+        Assert.AreEqual("3", ((IG3OntologyService)(object)service).GetProfile().Version);
         Assert.AreEqual("54e4db0fac2c7e4f89802678f3269b8a460190775b53b4fb74955f8cbadd8b86", profile.Hash);
         Assert.AreEqual(20, profile.Capabilities.Length);
         Assert.AreEqual("ontology-platform/g3-m1", profile.ProfileId);
