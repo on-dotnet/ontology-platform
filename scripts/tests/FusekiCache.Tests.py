@@ -102,6 +102,92 @@ class FusekiCacheTests(unittest.TestCase):
         self.rewrite_archive(directory,receipt,entries)
         return identity,directory,receipt
 
+    def layer_sources_archive(self, mutation=None):
+        identity=self.identity();directory,receipt=self.archive(identity)
+        with tarfile.open(directory/'image.tar') as archive:
+            entries=[(m.name,archive.extractfile(m).read()) for m in archive if m.isfile()]
+        record=json.loads(entries[0][1])[0]
+        digest='sha256:'+hashlib.sha256(b'layer').hexdigest()
+        descriptor=dict(mediaType='application/vnd.oci.image.layer.v1.tar',digest=digest,size=5)
+        record['LayerSources']={digest:descriptor}
+        if mutation:mutation(record,entries)
+        entries[0]=('manifest.json',json.dumps([record]).encode())
+        self.rewrite_archive(directory,receipt,entries)
+        return identity,directory,receipt
+
+    def test_docker_save_layer_sources_is_strictly_accepted_with_verified_content(self):
+        identity,directory,receipt=self.layer_sources_archive()
+        self.assertEqual(self.mod.validate_archive(directory,identity)['imageId'],receipt['imageId'])
+
+    def test_layer_sources_checked_metadata_is_bound_to_declared_platform(self):
+        def metadata(record,entries):
+            descriptor=next(iter(record['LayerSources'].values()))
+            descriptor.update(annotations={},platform={'os':'linux','architecture':'amd64'})
+        identity,directory,receipt=self.layer_sources_archive(metadata)
+        self.assertEqual(self.mod.validate_archive(directory,identity)['imageId'],receipt['imageId'])
+
+    def test_layer_sources_rejects_unbound_keys_extra_layers_and_bad_shapes(self):
+        def altered_key(record,entries):
+            descriptor=next(iter(record['LayerSources'].values()))
+            record['LayerSources']={'sha256:'+'f'*64:descriptor}
+        def extra_key(record,entries):record['LayerSources']['sha256:'+'f'*64]=next(iter(record['LayerSources'].values()))
+        cases=[lambda r,e:r.update(LayerSources=None),lambda r,e:r.update(LayerSources=[]),
+               lambda r,e:r.update(LayerSources={}),altered_key,extra_key]
+        for mutate in cases:
+            with self.subTest(mutate=mutate):
+                identity,directory,_=self.layer_sources_archive(mutate)
+                with self.assertRaises(self.mod.BuildRefused) as caught:self.mod.validate_archive(directory,identity)
+                self.assertTrue(caught.exception.diagnostic['validationCheck'].startswith('LAYER_SOURCES'))
+
+    def test_layer_sources_rejects_descriptor_tampering_and_external_metadata(self):
+        changes=[{'digest':'sha256:'+'f'*64},{'size':6},{'size':True},{'mediaType':'application/octet-stream'},
+                 {'urls':['https://SYNTHETIC_PRIVATE_TOKEN.example/layer']},{'urls':[]},{'SYNTHETIC_PRIVATE_FIELD':'SYNTHETIC_PRIVATE_TOKEN'},
+                 {'annotations':{'foreign':'SYNTHETIC_PRIVATE_TOKEN'}},{'platform':{'os':'linux','architecture':'arm64'}},
+                 {'platform':{'os':'linux','architecture':'amd64','os.version':'SYNTHETIC_PRIVATE_TOKEN'}}]
+        for change in changes:
+            with self.subTest(change=change):
+                def mutate(record,entries):next(iter(record['LayerSources'].values())).update(change)
+                identity,directory,_=self.layer_sources_archive(mutate)
+                with self.assertRaises(self.mod.BuildRefused) as caught:self.mod.validate_archive(directory,identity)
+                self.assertTrue(caught.exception.diagnostic['validationCheck'].startswith('LAYER_SOURCES'))
+                self.assertNotIn('SYNTHETIC_PRIVATE',json.dumps(caught.exception.diagnostic))
+
+    def test_layer_sources_rehashes_member_bytes_even_if_outer_archive_hash_is_updated(self):
+        def tamper(record,entries):entries[-1]=(entries[-1][0],b'other')
+        identity,directory,_=self.layer_sources_archive(tamper)
+        with self.assertRaises(self.mod.BuildRefused) as caught:self.mod.validate_archive(directory,identity)
+        self.assertEqual(caught.exception.diagnostic['validationCheck'],'LAYER_SOURCES_CONTENT')
+
+    def test_layer_sources_coexists_with_verified_oci_manifest_binding(self):
+        identity,directory,receipt=self.layer_sources_archive()
+        with tarfile.open(directory/'image.tar') as archive:
+            record=json.load(archive.extractfile('manifest.json'))[0]
+            config_raw=archive.extractfile(record['Config']).read()
+        config_name='blobs/sha256/'+hashlib.sha256(config_raw).hexdigest()
+        diff_id=next(iter(record['LayerSources']))
+        layer_name='blobs/sha256/'+diff_id[7:]
+        record.update(Config=config_name,Layers=[layer_name])
+        oci={'schemaVersion':2,'mediaType':'application/vnd.oci.image.manifest.v1+json',
+             'config':{'mediaType':'application/vnd.oci.image.config.v1+json','digest':receipt['imageId'],'size':len(config_raw)},
+             'layers':[record['LayerSources'][diff_id]]}
+        oci_raw=json.dumps(oci).encode();oci_digest=hashlib.sha256(oci_raw).hexdigest()
+        descriptor={'mediaType':oci['mediaType'],'digest':'sha256:'+oci_digest,'size':len(oci_raw),
+                    'annotations':{'io.containerd.image.name':'docker.io/library/'+identity['image'],
+                                   'org.opencontainers.image.ref.name':identity['image'].split(':',1)[1]}}
+        entries=[(config_name,config_raw),(layer_name,b'layer'),('blobs/sha256/'+oci_digest,oci_raw),
+                 ('manifest.json',json.dumps([record]).encode()),('index.json',json.dumps({'schemaVersion':2,'manifests':[descriptor]}).encode()),
+                 ('oci-layout',b'{"imageLayoutVersion":"1.0.0"}')]
+        self.rewrite_archive(directory,receipt,entries)
+        self.assertEqual(self.mod.validate_archive(directory,identity)['imageId'],receipt['imageId'])
+
+    def test_layer_sources_does_not_authorize_extra_blob_members(self):
+        def extra(record,entries):entries.append(('blobs/sha256/'+'f'*64,b'{}'))
+        identity,directory,_=self.layer_sources_archive(extra)
+        with self.assertRaises(self.mod.BuildRefused) as caught:self.mod.validate_archive(directory,identity)
+        self.assertEqual(caught.exception.diagnostic['validationCheck'],'UNREFERENCED_MEMBERS')
+        self.assertEqual(caught.exception.diagnostic['archiveShape']['unreferencedFileCount'],1)
+        self.assertEqual(caught.exception.diagnostic['archiveShape']['unreferencedSha256BlobCount'],1)
+
     def test_real_engine_oci_manifest_id_is_valid_without_config_id_confusion(self):
         identity,directory,receipt=self.oci_archive()
         self.assertEqual(self.mod.validate_archive(directory,identity)['imageId'],receipt['imageId'])
@@ -271,20 +357,20 @@ class FusekiCacheTests(unittest.TestCase):
 
     def test_actual_container_shell_head_protocol_handles_success_and_two_failures(self):
         binary=self.root/'probe-bin';binary.mkdir();curl=binary/'curl';calls=self.root/'probe-calls.jsonl'
-        curl.write_text('#!'+sys.executable+'\nimport json,os,sys\nfrom pathlib import Path\n'+
-                       'p=Path(os.environ["PROBE_CALLS"]);n=len(p.read_text().splitlines()) if p.exists() else 0\n'+
-                       'with p.open("a") as f:f.write(json.dumps(sys.argv[1:])+"\\n")\n'+
-                       'sys.exit(json.loads(os.environ["PROBE_CODES"])[n])\n')
+        curl.write_text('#!/bin/sh\n'+
+                       '{ printf "CALL\\n"; printf "%s\\n" "$@"; } >> "$PROBE_CALLS"\n'+
+                       'last=; for arg do last=$arg; done\n'+
+                       'case "$last" in *dlcdn.apache.org*) exit "$PROBE_PRIMARY_EXIT";; *archive.apache.org*) exit "$PROBE_FALLBACK_EXIT";; *) exit 99;; esac\n')
         curl.chmod(0o755)
         for codes,exit_code in [([0],0),([22,0],0),([28,28],1)]:
             with self.subTest(codes=codes):
                 calls.unlink(missing_ok=True)
                 result=subprocess.run(['/bin/sh','-c',self.mod.PROBE_SCRIPT,'canonical-probe',*self.mod.OFFICIAL_URLS],
-                                      env=dict(os.environ,PATH=str(binary)+os.pathsep+os.environ['PATH'],PROBE_CALLS=str(calls),PROBE_CODES=json.dumps(codes)),
+                                      env=dict(os.environ,PATH=str(binary)+os.pathsep+os.environ['PATH'],PROBE_CALLS=str(calls),PROBE_PRIMARY_EXIT=str(codes[0]),PROBE_FALLBACK_EXIT=str(codes[-1])),
                                       capture_output=True,text=True,timeout=3)
                 self.assertEqual(result.returncode,exit_code)
                 self.assertEqual(result.stdout,''.join('CANONICAL_PROBE_EXIT '+str(code)+'\n' for code in codes))
-                recorded=[json.loads(line) for line in calls.read_text().splitlines()]
+                recorded=[part.splitlines() for part in calls.read_text().split('CALL\n')[1:]]
                 self.assertEqual([args[-1] for args in recorded],list(self.mod.OFFICIAL_URLS[:len(codes)]))
                 self.assertTrue(all('--head' in args and args[args.index('--max-time')+1]=='5' for args in recorded))
 

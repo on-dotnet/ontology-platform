@@ -1,0 +1,174 @@
+.....................E...........EFFFFFFFFFFFFFFFF...................
+======================================================================
+ERROR: test_docker_save_layer_sources_is_strictly_accepted_with_verified_content (__main__.FusekiCacheTests.test_docker_save_layer_sources_is_strictly_accepted_with_verified_content)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 120, in test_docker_save_layer_sources_is_strictly_accepted_with_verified_content
+    self.assertEqual(self.mod.validate_archive(directory,identity)['imageId'],receipt['imageId'])
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/maintenance/canonical_fuseki.py", line 535, in validate_archive
+    raise BuildRefused('Cache archive validation refused',diagnostic,category='CACHE_INVALID',stage=stage) from None
+cache_canonical.BuildRefused: Cache archive validation refused
+
+======================================================================
+ERROR: test_layer_sources_checked_metadata_is_bound_to_declared_platform (__main__.FusekiCacheTests.test_layer_sources_checked_metadata_is_bound_to_declared_platform)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 127, in test_layer_sources_checked_metadata_is_bound_to_declared_platform
+    self.assertEqual(self.mod.validate_archive(directory,identity)['imageId'],receipt['imageId'])
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/maintenance/canonical_fuseki.py", line 535, in validate_archive
+    raise BuildRefused('Cache archive validation refused',diagnostic,category='CACHE_INVALID',stage=stage) from None
+cache_canonical.BuildRefused: Cache archive validation refused
+
+======================================================================
+FAIL: test_layer_sources_rehashes_member_bytes_even_if_outer_archive_hash_is_updated (__main__.FusekiCacheTests.test_layer_sources_rehashes_member_bytes_even_if_outer_archive_hash_is_updated)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 159, in test_layer_sources_rehashes_member_bytes_even_if_outer_archive_hash_is_updated
+    self.assertEqual(caught.exception.diagnostic['validationCheck'],'LAYER_SOURCES_CONTENT')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'MANIFEST_SCHEMA' != 'LAYER_SOURCES_CONTENT'
+- MANIFEST_SCHEMA
++ LAYER_SOURCES_CONTENT
+
+
+======================================================================
+FAIL: test_layer_sources_rejects_descriptor_tampering_and_external_metadata (__main__.FusekiCacheTests.test_layer_sources_rejects_descriptor_tampering_and_external_metadata) (change={'digest': 'sha256:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 152, in test_layer_sources_rejects_descriptor_tampering_and_external_metadata
+    self.assertTrue(caught.exception.diagnostic['validationCheck'].startswith('LAYER_SOURCES'))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_layer_sources_rejects_descriptor_tampering_and_external_metadata (__main__.FusekiCacheTests.test_layer_sources_rejects_descriptor_tampering_and_external_metadata) (change={'size': 6})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 152, in test_layer_sources_rejects_descriptor_tampering_and_external_metadata
+    self.assertTrue(caught.exception.diagnostic['validationCheck'].startswith('LAYER_SOURCES'))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_layer_sources_rejects_descriptor_tampering_and_external_metadata (__main__.FusekiCacheTests.test_layer_sources_rejects_descriptor_tampering_and_external_metadata) (change={'size': True})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 152, in test_layer_sources_rejects_descriptor_tampering_and_external_metadata
+    self.assertTrue(caught.exception.diagnostic['validationCheck'].startswith('LAYER_SOURCES'))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_layer_sources_rejects_descriptor_tampering_and_external_metadata (__main__.FusekiCacheTests.test_layer_sources_rejects_descriptor_tampering_and_external_metadata) (change={'mediaType': 'application/octet-stream'})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 152, in test_layer_sources_rejects_descriptor_tampering_and_external_metadata
+    self.assertTrue(caught.exception.diagnostic['validationCheck'].startswith('LAYER_SOURCES'))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_layer_sources_rejects_descriptor_tampering_and_external_metadata (__main__.FusekiCacheTests.test_layer_sources_rejects_descriptor_tampering_and_external_metadata) (change={'urls': ['https://SYNTHETIC_PRIVATE_TOKEN.example/layer']})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 152, in test_layer_sources_rejects_descriptor_tampering_and_external_metadata
+    self.assertTrue(caught.exception.diagnostic['validationCheck'].startswith('LAYER_SOURCES'))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_layer_sources_rejects_descriptor_tampering_and_external_metadata (__main__.FusekiCacheTests.test_layer_sources_rejects_descriptor_tampering_and_external_metadata) (change={'urls': []})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 152, in test_layer_sources_rejects_descriptor_tampering_and_external_metadata
+    self.assertTrue(caught.exception.diagnostic['validationCheck'].startswith('LAYER_SOURCES'))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_layer_sources_rejects_descriptor_tampering_and_external_metadata (__main__.FusekiCacheTests.test_layer_sources_rejects_descriptor_tampering_and_external_metadata) (change={'SYNTHETIC_PRIVATE_FIELD': 'SYNTHETIC_PRIVATE_TOKEN'})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 152, in test_layer_sources_rejects_descriptor_tampering_and_external_metadata
+    self.assertTrue(caught.exception.diagnostic['validationCheck'].startswith('LAYER_SOURCES'))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_layer_sources_rejects_descriptor_tampering_and_external_metadata (__main__.FusekiCacheTests.test_layer_sources_rejects_descriptor_tampering_and_external_metadata) (change={'annotations': {'foreign': 'SYNTHETIC_PRIVATE_TOKEN'}})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 152, in test_layer_sources_rejects_descriptor_tampering_and_external_metadata
+    self.assertTrue(caught.exception.diagnostic['validationCheck'].startswith('LAYER_SOURCES'))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_layer_sources_rejects_descriptor_tampering_and_external_metadata (__main__.FusekiCacheTests.test_layer_sources_rejects_descriptor_tampering_and_external_metadata) (change={'platform': {'os': 'linux', 'architecture': 'arm64'}})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 152, in test_layer_sources_rejects_descriptor_tampering_and_external_metadata
+    self.assertTrue(caught.exception.diagnostic['validationCheck'].startswith('LAYER_SOURCES'))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_layer_sources_rejects_descriptor_tampering_and_external_metadata (__main__.FusekiCacheTests.test_layer_sources_rejects_descriptor_tampering_and_external_metadata) (change={'platform': {'os': 'linux', 'architecture': 'amd64', 'os.version': 'SYNTHETIC_PRIVATE_TOKEN'}})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 152, in test_layer_sources_rejects_descriptor_tampering_and_external_metadata
+    self.assertTrue(caught.exception.diagnostic['validationCheck'].startswith('LAYER_SOURCES'))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_layer_sources_rejects_unbound_keys_extra_layers_and_bad_shapes (__main__.FusekiCacheTests.test_layer_sources_rejects_unbound_keys_extra_layers_and_bad_shapes) (mutate=<function FusekiCacheTests.test_layer_sources_rejects_unbound_keys_extra_layers_and_bad_shapes.<locals>.<lambda> at 0x1090977e0>)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 140, in test_layer_sources_rejects_unbound_keys_extra_layers_and_bad_shapes
+    self.assertTrue(caught.exception.diagnostic['validationCheck'].startswith('LAYER_SOURCES'))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_layer_sources_rejects_unbound_keys_extra_layers_and_bad_shapes (__main__.FusekiCacheTests.test_layer_sources_rejects_unbound_keys_extra_layers_and_bad_shapes) (mutate=<function FusekiCacheTests.test_layer_sources_rejects_unbound_keys_extra_layers_and_bad_shapes.<locals>.<lambda> at 0x1090971a0>)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 140, in test_layer_sources_rejects_unbound_keys_extra_layers_and_bad_shapes
+    self.assertTrue(caught.exception.diagnostic['validationCheck'].startswith('LAYER_SOURCES'))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_layer_sources_rejects_unbound_keys_extra_layers_and_bad_shapes (__main__.FusekiCacheTests.test_layer_sources_rejects_unbound_keys_extra_layers_and_bad_shapes) (mutate=<function FusekiCacheTests.test_layer_sources_rejects_unbound_keys_extra_layers_and_bad_shapes.<locals>.<lambda> at 0x1090972e0>)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 140, in test_layer_sources_rejects_unbound_keys_extra_layers_and_bad_shapes
+    self.assertTrue(caught.exception.diagnostic['validationCheck'].startswith('LAYER_SOURCES'))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_layer_sources_rejects_unbound_keys_extra_layers_and_bad_shapes (__main__.FusekiCacheTests.test_layer_sources_rejects_unbound_keys_extra_layers_and_bad_shapes) (mutate=<function FusekiCacheTests.test_layer_sources_rejects_unbound_keys_extra_layers_and_bad_shapes.<locals>.altered_key at 0x109097420>)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 140, in test_layer_sources_rejects_unbound_keys_extra_layers_and_bad_shapes
+    self.assertTrue(caught.exception.diagnostic['validationCheck'].startswith('LAYER_SOURCES'))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_layer_sources_rejects_unbound_keys_extra_layers_and_bad_shapes (__main__.FusekiCacheTests.test_layer_sources_rejects_unbound_keys_extra_layers_and_bad_shapes) (mutate=<function FusekiCacheTests.test_layer_sources_rejects_unbound_keys_extra_layers_and_bad_shapes.<locals>.extra_key at 0x109097600>)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 140, in test_layer_sources_rejects_unbound_keys_extra_layers_and_bad_shapes
+    self.assertTrue(caught.exception.diagnostic['validationCheck'].startswith('LAYER_SOURCES'))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+----------------------------------------------------------------------
+Ran 56 tests in 0.904s
+
+FAILED (failures=16, errors=2)

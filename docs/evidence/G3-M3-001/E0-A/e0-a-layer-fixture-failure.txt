@@ -1,0 +1,40 @@
+EF.........................................................
+======================================================================
+ERROR: test_actual_container_shell_head_protocol_handles_success_and_two_failures (__main__.FusekiCacheTests.test_actual_container_shell_head_protocol_handles_success_and_two_failures) (codes=[0])
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 368, in test_actual_container_shell_head_protocol_handles_success_and_two_failures
+    result=subprocess.run(['/bin/sh','-c',self.mod.PROBE_SCRIPT,'canonical-probe',*self.mod.OFFICIAL_URLS],
+                          env=dict(os.environ,PATH=str(binary)+os.pathsep+os.environ['PATH'],PROBE_CALLS=str(calls),PROBE_CODES=json.dumps(codes)),
+                          capture_output=True,text=True,timeout=3)
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/subprocess.py", line 557, in run
+    stdout, stderr = process.communicate(input, timeout=timeout)
+                     ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/subprocess.py", line 1223, in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/subprocess.py", line 2156, in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/subprocess.py", line 1270, in _check_timeout
+    raise TimeoutExpired(
+    ...<2 lines>...
+            stderr=b''.join(stderr_seq) if stderr_seq else None)
+subprocess.TimeoutExpired: Command '['/bin/sh', '-c', 'for url in "$@"; do\n    curl --head --fail --silent --show-error --location --proto \'=https\' --proto-redir \'=https\' --max-redirs 3 --connect-timeout 5 --max-time 5 --retry 0 "$url" >/dev/null 2>/dev/null\n    code=$?\n    printf \'CANONICAL_PROBE_EXIT %s\\n\' "$code"\n    if [ "$code" -eq 0 ]; then exit 0; fi\ndone\nexit 1\n', 'canonical-probe', 'https://dlcdn.apache.org/jena/binaries/apache-jena-fuseki-6.2.0.tar.gz', 'https://archive.apache.org/dist/jena/binaries/apache-jena-fuseki-6.2.0.tar.gz']' timed out after 3 seconds
+
+======================================================================
+FAIL: test_actual_container_shell_head_protocol_handles_success_and_two_failures (__main__.FusekiCacheTests.test_actual_container_shell_head_protocol_handles_success_and_two_failures) (codes=[22, 0])
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 372, in test_actual_container_shell_head_protocol_handles_success_and_two_failures
+    self.assertEqual(result.stdout,''.join('CANONICAL_PROBE_EXIT '+str(code)+'\n' for code in codes))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'CANONICAL_PROBE_EXIT 0\n' != 'CANONICAL_PROBE_EXIT 22\nCANONICAL_PROBE_EXIT 0\n'
++ CANONICAL_PROBE_EXIT 22
+  CANONICAL_PROBE_EXIT 0
+
+
+----------------------------------------------------------------------
+Ran 58 tests in 3.422s
+
+FAILED (failures=1, errors=1)

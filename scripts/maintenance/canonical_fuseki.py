@@ -412,7 +412,8 @@ def validate_archive(directory, expected, stage='cache restore'):
                 if len(manifest)==1 and isinstance(manifest[0],dict):
                     shape['manifestOptionalFields']=sorted(set(manifest[0]) & {'LayerSources'})
                     shape['manifestUnknownFieldCount']=len(set(manifest[0])-{'Config','RepoTags','Layers','LayerSources'})
-            if not isinstance(manifest,list) or len(manifest)!=1 or set(manifest[0])!={'Config','RepoTags','Layers'}:
+            if (not isinstance(manifest,list) or len(manifest)!=1 or not isinstance(manifest[0],dict) or
+                not {'Config','RepoTags','Layers'} <= set(manifest[0]) <= {'Config','RepoTags','Layers','LayerSources'}):
                 raise ValueError()
             record=manifest[0]
             check='MANIFEST_TAGS_AND_LAYERS'
@@ -432,6 +433,45 @@ def validate_archive(directory, expected, stage='cache restore'):
                 parent=PurePosixPath(layer).parent.as_posix()
                 if layer.endswith('/layer.tar'):
                     allowed.update({parent+'/VERSION',parent+'/json'})
+            if 'LayerSources' in record:
+                check='LAYER_SOURCES_SCHEMA'
+                sources=record['LayerSources']
+                if not isinstance(sources,dict):raise ValueError()
+                shape['layerSourcesCount']=len(sources)
+                shape['layerSourceDigestKeyCount']=sum(isinstance(key,str) and bool(re.fullmatch(r'sha256:'+HEX64,key)) for key in sources)
+                known_fields={'mediaType','digest','size','annotations','platform','urls','data','artifactType'}
+                shape['layerSourceKnownFields']=sorted({key for descriptor in sources.values() if isinstance(descriptor,dict) for key in descriptor if key in known_fields})
+                shape['layerSourceUnknownFieldCount']=sum(len(set(descriptor)-known_fields) for descriptor in sources.values() if isinstance(descriptor,dict))
+                check='LAYER_SOURCES_BINDING'
+                diff_ids=config['rootfs']['diff_ids']
+                if (config['rootfs']['type']!='layers' or not isinstance(diff_ids,list) or len(diff_ids)!=len(record['Layers']) or
+                    any(not isinstance(key,str) or not re.fullmatch(r'sha256:'+HEX64,key) for key in diff_ids) or
+                    len(set(diff_ids))!=len(diff_ids) or set(sources)!=set(diff_ids)):
+                    raise ValueError()
+                for layer,diff_id in zip(record['Layers'],diff_ids):
+                    check='LAYER_SOURCES_SCHEMA'
+                    descriptor=sources[diff_id]
+                    if (not isinstance(descriptor,dict) or not {'mediaType','digest','size'} <= set(descriptor) <= {'mediaType','digest','size','annotations','platform'} or
+                        descriptor['mediaType']!='application/vnd.oci.image.layer.v1.tar' or descriptor['digest']!=diff_id or
+                        type(descriptor['size']) is not int or not 0 < descriptor['size'] <= MAX_ARCHIVE_BYTES):
+                        raise ValueError()
+                    check='LAYER_SOURCES_METADATA'
+                    if ('annotations' in descriptor and descriptor['annotations']!={}) or ('annotations' in descriptor and not isinstance(descriptor['annotations'],dict)):
+                        raise ValueError()
+                    if 'platform' in descriptor:
+                        platform=descriptor['platform']
+                        if (not isinstance(platform,dict) or not {'os','architecture'} <= set(platform) <= {'os','architecture','variant'} or
+                            normalized_platform(platform['os'],platform['architecture'])!=expected['platform'] or
+                            ('variant' in platform and not (expected['platform']=='linux/arm64' and platform['variant']=='v8'))):
+                            raise ValueError()
+                    check='LAYER_SOURCES_BINDING'
+                    if layer.startswith('blobs/') and layer!='blobs/sha256/'+diff_id[7:]:raise ValueError()
+                    check='LAYER_SOURCES_CONTENT'
+                    if members[layer].size!=descriptor['size']:raise ValueError()
+                    digest=hashlib.sha256()
+                    with archive.extractfile(members[layer]) as stream:
+                        while chunk:=stream.read(1024*1024):digest.update(chunk)
+                    if digest.hexdigest()!=diff_id[7:]:raise ValueError()
             check='REPOSITORIES'
             if 'repositories' in members:
                 repos=strict_json(read('repositories'))
@@ -527,8 +567,10 @@ def validate_archive(directory, expected, stage='cache restore'):
                         while chunk:=stream.read(1024*1024):digest.update(chunk)
                     if digest.hexdigest()!=diff_id[7:]:raise ValueError()
             check='UNREFERENCED_MEMBERS'
-            if any(member.isfile() and name not in allowed for name,member in members.items()):
-                raise ValueError()
+            unreferenced=[name for name,member in members.items() if member.isfile() and name not in allowed]
+            shape['unreferencedFileCount']=len(unreferenced)
+            shape['unreferencedSha256BlobCount']=sum(bool(re.fullmatch(r'blobs/sha256/'+HEX64,name)) for name in unreferenced)
+            if unreferenced:raise ValueError()
         return receipt
     except (OSError,ValueError,KeyError,TypeError,AttributeError,tarfile.TarError,BuildRefused):
         diagnostic=dict(validationCheck=check,archiveShape=shape)
