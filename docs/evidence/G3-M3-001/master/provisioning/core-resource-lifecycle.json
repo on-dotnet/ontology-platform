@@ -1,0 +1,358 @@
+{
+  "schemaVersion": 1,
+  "project": "on-dotnet/ontology-platform",
+  "taskId": "G3-M3-001",
+  "runId": "g3-m3-daa8b53191e9",
+  "volumePrefix": "g3-m3-daa8b53191e9",
+  "profile": "g2",
+  "expectedServices": [
+    "postgres",
+    "keycloak",
+    "grafana",
+    "loki",
+    "tempo",
+    "prometheus",
+    "alloy",
+    "fuseki",
+    "rustfs"
+  ],
+  "expectedVolumes": [
+    "g3-m3-daa8b53191e9-postgres-data",
+    "g3-m3-daa8b53191e9-grafana-data",
+    "g3-m3-daa8b53191e9-loki-data",
+    "g3-m3-daa8b53191e9-tempo-data",
+    "g3-m3-daa8b53191e9-prometheus-data",
+    "g3-m3-daa8b53191e9-alloy-data",
+    "g3-m3-daa8b53191e9-fuseki-data",
+    "g3-m3-daa8b53191e9-rustfs-data"
+  ],
+  "observedContainerIds": [
+    "3ab18d828beeb3a4434dcc940640ddfc1f4cb8a7239b14ea2d3118f034b36653",
+    "4e79c0dfed255228139ae7887a0bb72a2f43f22a40caf40e14b6762afaccfde5"
+  ],
+  "observedVolumeNames": [
+    "g3-m3-daa8b53191e9-postgres-data"
+  ],
+  "state": "EXITED",
+  "observedAt": "2026-10-28T14:34:54.633570+00:00",
+  "observations": [
+    {
+      "status": "OBSERVED",
+      "observedAt": "2026-10-28T14:34:36.022736+00:00",
+      "containers": [],
+      "volumes": [
+        {
+          "Name": "g3-m3-daa8b53191e9-postgres-data",
+          "status": "ABSENT"
+        },
+        {
+          "Name": "g3-m3-daa8b53191e9-grafana-data",
+          "status": "ABSENT"
+        },
+        {
+          "Name": "g3-m3-daa8b53191e9-loki-data",
+          "status": "ABSENT"
+        },
+        {
+          "Name": "g3-m3-daa8b53191e9-tempo-data",
+          "status": "ABSENT"
+        },
+        {
+          "Name": "g3-m3-daa8b53191e9-prometheus-data",
+          "status": "ABSENT"
+        },
+        {
+          "Name": "g3-m3-daa8b53191e9-alloy-data",
+          "status": "ABSENT"
+        },
+        {
+          "Name": "g3-m3-daa8b53191e9-fuseki-data",
+          "status": "ABSENT"
+        },
+        {
+          "Name": "g3-m3-daa8b53191e9-rustfs-data",
+          "status": "ABSENT"
+        }
+      ]
+    },
+    {
+      "status": "OBSERVED",
+      "observedAt": "2026-10-28T14:34:41.170698+00:00",
+      "containers": [
+        {
+          "Id": "4e79c0dfed255228139ae7887a0bb72a2f43f22a40caf40e14b6762afaccfde5",
+          "Name": "/postgres-gbqgqfak",
+          "Image": "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6",
+          "State": "running",
+          "TaskId": "G3-M3-001",
+          "RunId": "g3-m3-daa8b53191e9",
+          "Service": "postgres",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g3-m3-daa8b53191e9-postgres-data",
+              "Destination": "/var/lib/postgresql",
+              "RW": true
+            }
+          ]
+        }
+      ],
+      "volumes": [
+        {
+          "Name": "g3-m3-daa8b53191e9-postgres-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-28T14:34:40Z",
+          "Labels": {},
+          "references": [
+            "4e79c0dfed255228139ae7887a0bb72a2f43f22a40caf40e14b6762afaccfde5"
+          ]
+        },
+        {
+          "Name": "g3-m3-daa8b53191e9-grafana-data",
+          "status": "ABSENT"
+        },
+        {
+          "Name": "g3-m3-daa8b53191e9-loki-data",
+          "status": "ABSENT"
+        },
+        {
+          "Name": "g3-m3-daa8b53191e9-tempo-data",
+          "status": "ABSENT"
+        },
+        {
+          "Name": "g3-m3-daa8b53191e9-prometheus-data",
+          "status": "ABSENT"
+        },
+        {
+          "Name": "g3-m3-daa8b53191e9-alloy-data",
+          "status": "ABSENT"
+        },
+        {
+          "Name": "g3-m3-daa8b53191e9-fuseki-data",
+          "status": "ABSENT"
+        },
+        {
+          "Name": "g3-m3-daa8b53191e9-rustfs-data",
+          "status": "ABSENT"
+        }
+      ]
+    },
+    {
+      "status": "OBSERVED",
+      "observedAt": "2026-10-28T14:34:46.353926+00:00",
+      "containers": [
+        {
+          "Id": "3ab18d828beeb3a4434dcc940640ddfc1f4cb8a7239b14ea2d3118f034b36653",
+          "Name": "/keycloak-msweyejq",
+          "Image": "sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b",
+          "State": "running",
+          "TaskId": "G3-M3-001",
+          "RunId": "g3-m3-daa8b53191e9",
+          "Service": "keycloak",
+          "Mounts": []
+        },
+        {
+          "Id": "4e79c0dfed255228139ae7887a0bb72a2f43f22a40caf40e14b6762afaccfde5",
+          "Name": "/postgres-gbqgqfak",
+          "Image": "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6",
+          "State": "running",
+          "TaskId": "G3-M3-001",
+          "RunId": "g3-m3-daa8b53191e9",
+          "Service": "postgres",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g3-m3-daa8b53191e9-postgres-data",
+              "Destination": "/var/lib/postgresql",
+              "RW": true
+            }
+          ]
+        }
+      ],
+      "volumes": [
+        {
+          "Name": "g3-m3-daa8b53191e9-postgres-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-28T14:34:40Z",
+          "Labels": {},
+          "references": [
+            "4e79c0dfed255228139ae7887a0bb72a2f43f22a40caf40e14b6762afaccfde5"
+          ]
+        },
+        {
+          "Name": "g3-m3-daa8b53191e9-grafana-data",
+          "status": "ABSENT"
+        },
+        {
+          "Name": "g3-m3-daa8b53191e9-loki-data",
+          "status": "ABSENT"
+        },
+        {
+          "Name": "g3-m3-daa8b53191e9-tempo-data",
+          "status": "ABSENT"
+        },
+        {
+          "Name": "g3-m3-daa8b53191e9-prometheus-data",
+          "status": "ABSENT"
+        },
+        {
+          "Name": "g3-m3-daa8b53191e9-alloy-data",
+          "status": "ABSENT"
+        },
+        {
+          "Name": "g3-m3-daa8b53191e9-fuseki-data",
+          "status": "ABSENT"
+        },
+        {
+          "Name": "g3-m3-daa8b53191e9-rustfs-data",
+          "status": "ABSENT"
+        }
+      ]
+    },
+    {
+      "status": "OBSERVED",
+      "observedAt": "2026-10-28T14:34:51.619594+00:00",
+      "containers": [
+        {
+          "Id": "3ab18d828beeb3a4434dcc940640ddfc1f4cb8a7239b14ea2d3118f034b36653",
+          "Name": "/keycloak-msweyejq",
+          "Image": "sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b",
+          "State": "running",
+          "TaskId": "G3-M3-001",
+          "RunId": "g3-m3-daa8b53191e9",
+          "Service": "keycloak",
+          "Mounts": []
+        },
+        {
+          "Id": "4e79c0dfed255228139ae7887a0bb72a2f43f22a40caf40e14b6762afaccfde5",
+          "Name": "/postgres-gbqgqfak",
+          "Image": "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6",
+          "State": "running",
+          "TaskId": "G3-M3-001",
+          "RunId": "g3-m3-daa8b53191e9",
+          "Service": "postgres",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g3-m3-daa8b53191e9-postgres-data",
+              "Destination": "/var/lib/postgresql",
+              "RW": true
+            }
+          ]
+        }
+      ],
+      "volumes": [
+        {
+          "Name": "g3-m3-daa8b53191e9-postgres-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-28T14:34:40Z",
+          "Labels": {},
+          "references": [
+            "4e79c0dfed255228139ae7887a0bb72a2f43f22a40caf40e14b6762afaccfde5"
+          ]
+        },
+        {
+          "Name": "g3-m3-daa8b53191e9-grafana-data",
+          "status": "ABSENT"
+        },
+        {
+          "Name": "g3-m3-daa8b53191e9-loki-data",
+          "status": "ABSENT"
+        },
+        {
+          "Name": "g3-m3-daa8b53191e9-tempo-data",
+          "status": "ABSENT"
+        },
+        {
+          "Name": "g3-m3-daa8b53191e9-prometheus-data",
+          "status": "ABSENT"
+        },
+        {
+          "Name": "g3-m3-daa8b53191e9-alloy-data",
+          "status": "ABSENT"
+        },
+        {
+          "Name": "g3-m3-daa8b53191e9-fuseki-data",
+          "status": "ABSENT"
+        },
+        {
+          "Name": "g3-m3-daa8b53191e9-rustfs-data",
+          "status": "ABSENT"
+        }
+      ]
+    },
+    {
+      "status": "OBSERVED",
+      "observedAt": "2026-10-28T14:34:54.633197+00:00",
+      "containers": [
+        {
+          "Id": "3ab18d828beeb3a4434dcc940640ddfc1f4cb8a7239b14ea2d3118f034b36653",
+          "Name": "/keycloak-msweyejq",
+          "Image": "sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b",
+          "State": "running",
+          "TaskId": "G3-M3-001",
+          "RunId": "g3-m3-daa8b53191e9",
+          "Service": "keycloak",
+          "Mounts": []
+        },
+        {
+          "Id": "4e79c0dfed255228139ae7887a0bb72a2f43f22a40caf40e14b6762afaccfde5",
+          "Name": "/postgres-gbqgqfak",
+          "Image": "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6",
+          "State": "running",
+          "TaskId": "G3-M3-001",
+          "RunId": "g3-m3-daa8b53191e9",
+          "Service": "postgres",
+          "Mounts": [
+            {
+              "Type": "volume",
+              "Name": "g3-m3-daa8b53191e9-postgres-data",
+              "Destination": "/var/lib/postgresql",
+              "RW": true
+            }
+          ]
+        }
+      ],
+      "volumes": [
+        {
+          "Name": "g3-m3-daa8b53191e9-postgres-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-28T14:34:40Z",
+          "Labels": {},
+          "references": [
+            "4e79c0dfed255228139ae7887a0bb72a2f43f22a40caf40e14b6762afaccfde5"
+          ]
+        },
+        {
+          "Name": "g3-m3-daa8b53191e9-grafana-data",
+          "status": "ABSENT"
+        },
+        {
+          "Name": "g3-m3-daa8b53191e9-loki-data",
+          "status": "ABSENT"
+        },
+        {
+          "Name": "g3-m3-daa8b53191e9-tempo-data",
+          "status": "ABSENT"
+        },
+        {
+          "Name": "g3-m3-daa8b53191e9-prometheus-data",
+          "status": "ABSENT"
+        },
+        {
+          "Name": "g3-m3-daa8b53191e9-alloy-data",
+          "status": "ABSENT"
+        },
+        {
+          "Name": "g3-m3-daa8b53191e9-fuseki-data",
+          "status": "ABSENT"
+        },
+        {
+          "Name": "g3-m3-daa8b53191e9-rustfs-data",
+          "status": "ABSENT"
+        }
+      ]
+    }
+  ],
+  "exitCode": 0
+}

@@ -3,13 +3,69 @@
   "headSha": "bf447f5645041b1b0224ec206c1054e36560c82b",
   "canonical": {
     "cacheKey": "ontology-fuseki-image-v2-linux-amd64-b0796317153bcda745a1d347302dac50c786df04bff33c0a36a36ee69e21685a",
+    "cacheOutcome": "MISS",
     "contextSha256": "cc238fbd02eb8151dd42f751f5dae16c445d6e408cc4440f7f95a9575b44e66e",
+    "currentGithubRunId": "40703929652",
     "envFingerprint": "3623658350d70a583ed2425f34f1ab615c3ea1c83c0349ca5bae61bcd436cd1d",
+    "exportOutcome": "EXPORTED",
     "failureStateKey": "ontology-fuseki-image-v2-linux-amd64-b0796317153bcda745a1d347302dac50c786df04bff33c0a36a36ee69e21685a-failure-v1-3623658350d70a583ed2425f34f1ab615c3ea1c83c0349ca5bae61bcd436cd1d",
     "image": "ontology-platform-fuseki:context-b0796317153bcda745a1d347302dac50c786df04bff33c0a36a36ee69e21685a",
+    "imageId": "sha256:778c37a2f5b4739b1023d233b628ddfb0dbabf6b210d0b463606f6badcc40fe0",
     "inputFingerprint": "b0796317153bcda745a1d347302dac50c786df04bff33c0a36a36ee69e21685a",
+    "observedAt": "2026-10-28T14:14:47.749031+00:00",
     "platform": "linux/amd64",
-    "schemaVersion": 2
+    "producerRunId": "ci-preflight-40703929652-1",
+    "restored": false,
+    "reused": false,
+    "runId": "ci-preflight-40703929652-1",
+    "runner": "Linux-X64",
+    "schemaVersion": 2,
+    "sourceChecksumVerified": true,
+    "stages": [
+      {
+        "durationMs": 0,
+        "errorCategory": null,
+        "inputFingerprint": "b0796317153bcda745a1d347302dac50c786df04bff33c0a36a36ee69e21685a",
+        "outcome": "MISS",
+        "stage": "cache restore"
+      },
+      {
+        "durationMs": 1636,
+        "errorCategory": null,
+        "inputFingerprint": "b0796317153bcda745a1d347302dac50c786df04bff33c0a36a36ee69e21685a",
+        "outcome": "PASS",
+        "stage": "network"
+      },
+      {
+        "durationMs": 141,
+        "errorCategory": null,
+        "inputFingerprint": "b0796317153bcda745a1d347302dac50c786df04bff33c0a36a36ee69e21685a",
+        "outcome": "PASS",
+        "stage": "checksum"
+      },
+      {
+        "durationMs": 355,
+        "errorCategory": null,
+        "inputFingerprint": "b0796317153bcda745a1d347302dac50c786df04bff33c0a36a36ee69e21685a",
+        "outcome": "PASS",
+        "stage": "extract/COPY"
+      },
+      {
+        "durationMs": 7006,
+        "errorCategory": null,
+        "inputFingerprint": "b0796317153bcda745a1d347302dac50c786df04bff33c0a36a36ee69e21685a",
+        "outcome": "PASS",
+        "stage": "image preparation"
+      },
+      {
+        "durationMs": 3691,
+        "errorCategory": null,
+        "inputFingerprint": "b0796317153bcda745a1d347302dac50c786df04bff33c0a36a36ee69e21685a",
+        "outcome": "PASS",
+        "stage": "cache export"
+      }
+    ],
+    "taskId": "G3-M3-001"
   },
   "storageBudget": {
     "existingBytes": 2108,
@@ -20,5 +76,6 @@
     "status": "PASS"
   },
   "imageCacheSaved": true,
-  "scope": "CANONICAL_DIAGNOSTIC_ONLY; product NOT_RUN; full required CI NOT_VERIFIED"
+  "scope": "CANONICAL_DIAGNOSTIC_ONLY; product NOT_RUN; full required CI NOT_VERIFIED",
+  "extractionCorrection": "The first committed extraction selected the identity-only JSON line. Corrected to the actual run-specific receipt requiring cacheOutcome, imageId, sourceChecksumVerified and exportOutcome; original bytes remain in Git."
 }

@@ -59,7 +59,7 @@ class RealBrowserEntryTests(unittest.TestCase):
 class M1OrchestrationTests(unittest.TestCase):
     """Keep gate selection/order/failure propagation real, isolate external services only."""
 
-    def exercise(self, fail_gate=None, prefix='g3-m1-control', launch_failure=False, milestone=None, api_only=False, ui_only=False, smoke_fault=False):
+    def exercise(self, fail_gate=None, prefix='g3-m1-control', launch_failure=False, milestone=None, api_only=False, ui_only=False, smoke_fault=False, workspace_smoke=False):
         spec = importlib.util.spec_from_file_location('m1_orchestrator', SCRIPT)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
@@ -83,10 +83,10 @@ class M1OrchestrationTests(unittest.TestCase):
                 evidence_seen.append(os.environ.get('PLATFORM_EVIDENCE_DIR'))
                 gate = Path(command[1]).name
                 if gate == 'full-g2-e2e.py':
-                    selected = '--' + (milestone or 'M2').lower() + ('-api-only' if api_only else '-ui-only') if api_only or ui_only else '--m1'
+                    selected = '--workspace-smoke-only' if workspace_smoke else '--' + (milestone or 'M2').lower() + ('-api-only' if api_only else '-ui-only') if api_only or ui_only else '--m1'
                     self.assertIn(selected, command, 'Selected checks must run in the existing authenticated harness')
-                    if milestone == 'M2': self.assertIn('--m2-api-only' if api_only else '--m2-ui-only' if ui_only else '--m2', command, 'M2 checks must execute in the real authenticated harness')
-                    if milestone == 'M3': self.assertIn('--m3-api-only' if api_only else '--m3-ui-only' if ui_only else '--m3', command, 'M3 checks must execute in the real authenticated harness')
+                    if milestone == 'M2' and not workspace_smoke: self.assertIn('--m2-api-only' if api_only else '--m2-ui-only' if ui_only else '--m2', command, 'M2 checks must execute in the real authenticated harness')
+                    if milestone == 'M3' and not workspace_smoke: self.assertIn('--m3-api-only' if api_only else '--m3-ui-only' if ui_only else '--m3', command, 'M3 checks must execute in the real authenticated harness')
                     if smoke_fault: self.assertIn('--smoke-fault-check', command)
                     # Parse the exact upstream argument combination with the real downstream entry.
                     entry_spec = importlib.util.spec_from_file_location('downstream_browser', SCRIPT.with_name(gate))
@@ -105,7 +105,7 @@ class M1OrchestrationTests(unittest.TestCase):
             with contextlib.ExitStack() as stack:
                 stack.enter_context(patch.object(sys, 'path', [str(SCRIPT.parent), *sys.path]))
                 stack.enter_context(patch.object(module, 'ROOT', root))
-                stack.enter_context(patch.object(sys, 'argv', [str(SCRIPT), '--runtime-file', str(runtime)] + (['--milestone', milestone] if milestone else []) + (['--api-only'] if api_only else []) + (['--ui-only'] if ui_only else []) + (['--smoke-fault-check'] if smoke_fault else [])))
+                stack.enter_context(patch.object(sys, 'argv', [str(SCRIPT), '--runtime-file', str(runtime)] + (['--milestone', milestone] if milestone else []) + (['--api-only'] if api_only else []) + (['--ui-only'] if ui_only else []) + (['--smoke-fault-check'] if smoke_fault else []) + (['--workspace-smoke-only'] if workspace_smoke else [])))
                 stack.enter_context(patch.object(module.shared, 'wait_for'))
                 stack.enter_context(patch.object(module.shared, 'stop'))
                 stack.enter_context(patch.dict(os.environ, {'PLATFORM_EVIDENCE_DIR': 'docs/evidence/' + task + '/runtime'}))
@@ -120,7 +120,31 @@ class M1OrchestrationTests(unittest.TestCase):
             calls = [json.loads(line) for line in log.read_text().splitlines()] if log.exists() else []
             manifests = list(stale.parent.rglob('acceptance.json'))
             proof = json.loads(manifests[0].read_text()) if len(manifests) == 1 else None
+            timelines = list(stale.parent.rglob('task-run-timeline.jsonl'))
+            if proof is not None: proof['_testObservedTimeline'] = [json.loads(line) for path in timelines for line in path.read_text().splitlines()]
             return code, [Path(call[1]).name for call in calls], proof, evidence_seen, stale.read_text()
+
+    def test_owned_e0_workspace_smoke_runs_only_fast_gate_and_preserves_fault_flag(self):
+        code,calls,proof,*_=self.exercise(prefix='g3-m3-smoke-control',milestone='M3',workspace_smoke=True,smoke_fault=True)
+        self.assertEqual(code,0)
+        self.assertEqual(calls,['full-g2-e2e.py'])
+        self.assertEqual(proof['scope'],'WORKSPACE_SMOKE_ONLY')
+        self.assertEqual(len(proof['_testObservedTimeline']),1)
+
+    def test_real_child_gates_automatically_record_timeline_and_failure_exit(self):
+        for failed in [None, 'g3-compatibility.py']:
+            code,calls,proof,*_=self.exercise(prefix='g3-m3-timing-control',milestone='M3',fail_gate=failed)
+            rows=proof['_testObservedTimeline']
+            self.assertEqual(len(rows),len(calls))
+            self.assertGreater(len(rows),0)
+            self.assertEqual([row['commandLabel'] for row in rows],calls)
+            self.assertEqual(rows[-1]['exitCode'],23 if failed else 0)
+            self.assertEqual(rows[-1]['outcome'],'FAIL' if failed else 'PASS')
+            for index,row in enumerate(rows):
+                self.assertEqual(row['dependsOn'],[] if index==0 else [rows[index-1]['stepId']])
+                self.assertEqual(row['taskId'],'G3-M3-001')
+                self.assertGreaterEqual(row['durationMs'],0)
+                self.assertNotIn('runtime.json',json.dumps(row))
 
     def test_m3_full_chain_runs_smoke_fault_through_actual_parsers(self):
         code,calls,proof,*_=self.exercise(prefix='g3-m3-fault-control',milestone='M3',smoke_fault=True)

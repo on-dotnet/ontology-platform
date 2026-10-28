@@ -40,3 +40,14 @@ WEB已接174f48d/867f8ce/c660318/6cfffb0，独立只读Review无确定P1/P2，�
 - 空fixture准确卷Apply先因相对log拒绝，再绝对log成功，独立准确no-such-volume后验，旧8G2卷和日常M2image保留。真实image/history收尾仍NOT_RUN；其它项目并发资源只计保护数量，不纳Apply。
 - 独立WEB树新增组件测试容器Task/Run/project/准确ID创建登记与精确归属finally清理，防创建失败时按名字误删，TDD推进中。
 - Master main集成仍0次；待canonical修正完整CI通过立即作第一次增量集成，正式真实端到端与收尾后第二次集成。最终READY/唯一V3仍NOT_RUN。
+
+## 已实际闭合的阶段证据
+
+V1修正7b3002e/Masterf42e2ad后真实Run40703929652 coldMISS下载/校验/导出/保存成功；不同新runner Run40704438700恢复samekey/sameimage778c37a、producerHead准确绑定前Run，restored+reusedtrue且无源下载/解压/build阶段。均限定diagnostic，不满足完整CI。第一版cold回执提取误取identity JSON，现选择含实际run/cacheOutcome/imageId/exportOutcome的完整行，原提交对象保留并明确更正。
+
+组件容器P2已修复固定backend，18受控测试通过；Master随后完整真实SEM168/0fail/0skip、两个容器固定Engine准确no-such-container回收，计时43804ms。新canonical与M3正式浏览器仍待worker宿主预取实现和完整同HeadCI，未提前宣称READY。
+
+
+## Owned E0 smoke入口与真实计时
+
+Master真实子进程自动记录UTC/monotonic/exit/依赖、source fingerprint及失败；新增独占AppHost的WORKSPACE_SMOKE_ONLY checkpoint，不认证完整M3。真实18受控编排测试及timeline9通过；独立Reviewer另验34canonical/66cache/18编排/3CLI拒绝，无确定P1/P2。当前Web完整lint/typecheck/149tests/build真实exit0；后续只运行E0浏览器Smoke/fault，不绕过E0进入正式M3。费用未知继续阻断artifact上传。

@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "taskId": "G3-M3-001",
+  "observedAtUtc": "2026-10-28T14:30:28.475022+00:00",
+  "scope": "Closed V1 archive format investigation temporary export only; not image/history cleanup.",
+  "target": "/private/tmp/g3-m3-known-legacy-canonical.tar",
+  "before": {
+    "ordinaryFile": true,
+    "sizeBytes": 147491328,
+    "sha256": "18f4092c18a07cf6740e7da23e352ab9423ff1d3f71185e32e8ef8b0abab966b"
+  },
+  "recoveryImageId": "sha256:39b0fb6616a466a05b2ff8c691bb14a63557c70118d433a4b70fd1068b1bef60",
+  "recoveryVerified": true,
+  "command": [
+    "python3",
+    "Path.unlink",
+    "/private/tmp/g3-m3-known-legacy-canonical.tar"
+  ],
+  "exitCode": 0,
+  "after": {
+    "exists": false
+  },
+  "logicalFileBytesRemoved": 147491328,
+  "physicalReclaimedBytes": "NOT_VERIFIED",
+  "recoveryCommand": [
+    "docker",
+    "image",
+    "save",
+    "--output",
+    "/private/tmp/g3-m3-known-legacy-canonical.tar",
+    "sha256:39b0fb6616a466a05b2ff8c691bb14a63557c70118d433a4b70fd1068b1bef60"
+  ]
+}

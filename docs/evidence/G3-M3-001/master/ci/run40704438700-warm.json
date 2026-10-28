@@ -1,0 +1,51 @@
+{
+  "runId": 40704438700,
+  "headSha": "baf4558f88dd3145a4861f33da5b64a8c6bc1f45",
+  "canonical": {
+    "cacheKey": "ontology-fuseki-image-v2-linux-amd64-b0796317153bcda745a1d347302dac50c786df04bff33c0a36a36ee69e21685a",
+    "cacheOutcome": "HIT",
+    "contextSha256": "cc238fbd02eb8151dd42f751f5dae16c445d6e408cc4440f7f95a9575b44e66e",
+    "currentGithubRunId": "40704438700",
+    "envFingerprint": "a21977bf85c31ca2d82b125e92a1f43e1ae3ffc17fccc47b48da94562ad5d1bf",
+    "failureStateKey": "ontology-fuseki-image-v2-linux-amd64-b0796317153bcda745a1d347302dac50c786df04bff33c0a36a36ee69e21685a-failure-v1-a21977bf85c31ca2d82b125e92a1f43e1ae3ffc17fccc47b48da94562ad5d1bf",
+    "image": "ontology-platform-fuseki:context-b0796317153bcda745a1d347302dac50c786df04bff33c0a36a36ee69e21685a",
+    "imageId": "sha256:778c37a2f5b4739b1023d233b628ddfb0dbabf6b210d0b463606f6badcc40fe0",
+    "inputFingerprint": "b0796317153bcda745a1d347302dac50c786df04bff33c0a36a36ee69e21685a",
+    "observedAt": "2026-10-28T14:17:57.329423+00:00",
+    "platform": "linux/amd64",
+    "producerHead": "bf447f5645041b1b0224ec206c1054e36560c82b",
+    "producerRunId": "ci-preflight-40703929652-1",
+    "restored": true,
+    "reused": true,
+    "runId": "ci-preflight-40704438700-1",
+    "runner": "Linux-X64",
+    "schemaVersion": 2,
+    "sourceChecksumVerified": true,
+    "stages": [
+      {
+        "durationMs": 9522,
+        "errorCategory": null,
+        "inputFingerprint": "b0796317153bcda745a1d347302dac50c786df04bff33c0a36a36ee69e21685a",
+        "outcome": "PASS",
+        "stage": "cache restore"
+      },
+      {
+        "durationMs": 14,
+        "errorCategory": null,
+        "inputFingerprint": "b0796317153bcda745a1d347302dac50c786df04bff33c0a36a36ee69e21685a",
+        "outcome": "PASS",
+        "stage": "image preparation"
+      }
+    ],
+    "taskId": "G3-M3-001"
+  },
+  "sourceChecksumVerification": "Inherited only from validated producer receipt; warm runner did not download Apache or execute checksum/extract/build stages.",
+  "crossRunner": {
+    "coldRunId": 40703929652,
+    "warmRunId": 40704438700,
+    "sameCacheKey": true,
+    "sameImageId": true,
+    "distinctHostedJobs": true,
+    "scope": "CANONICAL_DIAGNOSTIC_ONLY; full CI and M3 product NOT_RUN"
+  }
+}

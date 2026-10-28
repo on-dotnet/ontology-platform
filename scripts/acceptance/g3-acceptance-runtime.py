@@ -1,12 +1,14 @@
 """Own one fresh authorized M1, M2 or M3 AppHost throughout genuine browser, semantic and operational acceptance."""
 import argparse
 import datetime
+import hashlib
 import importlib.util
 import json
 import os
 from pathlib import Path
 import subprocess
 import sys
+import time
 import urllib.error
 import uuid
 
@@ -24,11 +26,14 @@ def run_attempt():
     parser.add_argument('--api-only', action='store_true')
     parser.add_argument('--ui-only', action='store_true')
     parser.add_argument('--smoke-fault-check', action='store_true')
+    parser.add_argument('--workspace-smoke-only', action='store_true')
     args = parser.parse_args()
     if not args.runtime_file and not args.start_runtime:
         parser.error('Choose an owned runtime or explicitly start a new M1 stack')
-    if args.api_only and args.ui_only:
+    if sum((args.api_only, args.ui_only, args.workspace_smoke_only)) > 1:
         parser.error('Choose one integration checkpoint')
+    if args.api_only and args.smoke_fault_check:
+        parser.error('Smoke fault injection requires a browser checkpoint')
     if (args.api_only or args.ui_only) and args.milestone not in ('M2', 'M3'):
         parser.error('Integration checkpoints are authorized only for M2/M3')
     task_id = 'G3-' + args.milestone + '-001'
@@ -55,12 +60,17 @@ def run_attempt():
     evidence = evidence_directory(ROOT, task_evidence)
     evidence.mkdir(parents=True, exist_ok=False)
     source_head = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
+    timeline_spec = importlib.util.spec_from_file_location('g3_timeline', Path(__file__).parents[1] / 'maintenance/task_run_timeline.py')
+    timeline = importlib.util.module_from_spec(timeline_spec)
+    timeline_spec.loader.exec_module(timeline)
+    timeline_path = evidence / 'task-run-timeline.jsonl'
+    input_fingerprint = hashlib.sha256(source_head.encode('ascii')).hexdigest()
     gate_names = ['full-g2-e2e.py', 'g3-compatibility.py', 'g1-regression.py', 'g2-observability.py',
                   'g2-trace-browser.mjs', 'g2-readiness-fault.py', 'performance-baseline.py']
-    if args.api_only or args.ui_only:
+    if args.api_only or args.ui_only or args.workspace_smoke_only:
         gate_names = gate_names[:1]
     acceptance = {'runId': run_id, 'sourceHead': source_head, 'volumePrefix': runtime['volumePrefix'],
-                  'scope': 'API_ONLY' if args.api_only else 'UI_ONLY' if args.ui_only else 'FULL', 'milestone': args.milestone,
+                  'scope': 'WORKSPACE_SMOKE_ONLY' if args.workspace_smoke_only else 'API_ONLY' if args.api_only else 'UI_ONLY' if args.ui_only else 'FULL', 'milestone': args.milestone,
                   'evidenceDirectory': str(evidence.relative_to(ROOT.resolve())), 'status': 'RUNNING',
                   'startedAtUtc': datetime.datetime.now(datetime.timezone.utc).isoformat(),
                   'gates': [{'name': name, 'status': 'NOT_RUN', 'exitCode': None} for name in gate_names]}
@@ -81,6 +91,29 @@ def run_attempt():
     def launch(mode):
         return subprocess.Popen([sys.executable, 'scripts/acceptance/g3-runtime.py', mode, '--runtime-file', str(runtime_file), '--milestone', args.milestone],
                                 cwd=ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, creationflags=flags)
+
+    def execute_gate(command, index):
+        started = datetime.datetime.now(datetime.timezone.utc)
+        monotonic = time.monotonic()
+        exit_code, category = None, 'COMMAND_EXCEPTION'
+        try:
+            result = subprocess.run(command, cwd=ROOT)
+            exit_code = result.returncode
+            category = None if exit_code == 0 else 'COMMAND_FAILED'
+            return result
+        except OSError:
+            category = 'EXECUTABLE_UNAVAILABLE'
+            raise
+        finally:
+            ended = datetime.datetime.now(datetime.timezone.utc)
+            row = dict(schemaVersion=1, taskId=task_id, runId=run_id, stepId=str(index) + '-' + Path(command[1]).stem,
+                       taskType='TEST', inputFingerprint=input_fingerprint, startedAtUtc=started.isoformat(),
+                       endedAtUtc=ended.isoformat(), durationMs=round((time.monotonic() - monotonic) * 1000),
+                       outcome='PASS' if exit_code == 0 else 'FAIL', errorCategory=category,
+                       dependsOn=[] if index == 0 else [str(index - 1) + '-' + Path(commands[index - 1][1]).stem],
+                       concurrencyGroup='g3-runtime-' + args.milestone.lower(), attempt=1,
+                       exitCode=exit_code, commandLabel=Path(command[1]).name)
+            timeline.append(timeline_path, row, assign_attempt=True)
 
     try:
         if args.start_runtime:
@@ -109,19 +142,24 @@ def run_attempt():
             [sys.executable, 'scripts/acceptance/g2-readiness-fault.py', '--runtime-file', str(runtime_file)],
             [sys.executable, 'scripts/acceptance/performance-baseline.py', '--from-observed-run'],
         ]
-        if args.milestone == 'M2':
+        if args.milestone == 'M2' and not args.workspace_smoke_only:
             commands[0].append('--m2-api-only' if args.api_only else '--m2-ui-only' if args.ui_only else '--m2')
-        if args.milestone == 'M3':
+        if args.milestone == 'M3' and not args.workspace_smoke_only:
             commands[0].append('--m3-api-only' if args.api_only else '--m3-ui-only' if args.ui_only else '--m3')
         if args.smoke_fault_check:
             commands[0].append('--smoke-fault-check')
+        if args.workspace_smoke_only:
+            commands[0].remove('--m1')
+            commands[0].append('--workspace-smoke-only')
         if args.api_only or args.ui_only:
             commands[0].remove('--m1')
+            commands = commands[:1]
+        if args.workspace_smoke_only:
             commands = commands[:1]
         for index, command in enumerate(commands):
             acceptance['gates'][index]['status'] = 'RUNNING'
             save_acceptance()
-            result = subprocess.run(command, cwd=ROOT)
+            result = execute_gate(command, index)
             acceptance['gates'][index].update(status='PASS' if result.returncode == 0 else 'FAIL', exitCode=result.returncode)
             save_acceptance()
             if result.returncode:

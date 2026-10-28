@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "reason": "A placeholder fingerprint was mistakenly passed at launch; replace only fingerprint after actual command finishes and preserve original row in correction evidence. Actual timer and exit status must not change.",
+  "originalRow": {
+    "attempt": 1,
+    "commandLabel": "semantic-full-regression",
+    "concurrencyGroup": "master-semantic",
+    "dependsOn": [],
+    "durationMs": 43804,
+    "endedAtUtc": "2026-10-28T14:22:20.054810+00:00",
+    "errorCategory": null,
+    "exitCode": 0,
+    "inputFingerprint": "2ecee3f84969d78dfb86702c1405d48e80aa0dff589a162c1ee83aaab4bcd761",
+    "outcome": "PASS",
+    "runId": "m3-integrated-component",
+    "schemaVersion": 1,
+    "startedAtUtc": "2026-10-28T14:21:36.250835+00:00",
+    "stepId": "semantic-full",
+    "taskId": "G3-M3-001",
+    "taskType": "TEST"
+  },
+  "correctedRow": {
+    "attempt": 1,
+    "commandLabel": "semantic-full-regression",
+    "concurrencyGroup": "master-semantic",
+    "dependsOn": [],
+    "durationMs": 43804,
+    "endedAtUtc": "2026-10-28T14:22:20.054810+00:00",
+    "errorCategory": null,
+    "exitCode": 0,
+    "inputFingerprint": "c7980999125cf7f8ac70a1d1af6c2d77a68ffa91b9d7b95060953eeb7d7ca39f",
+    "outcome": "PASS",
+    "runId": "m3-integrated-component",
+    "schemaVersion": 1,
+    "startedAtUtc": "2026-10-28T14:21:36.250835+00:00",
+    "stepId": "semantic-full",
+    "taskId": "G3-M3-001",
+    "taskType": "TEST"
+  },
+  "unchangedTimerAndExit": true,
+  "actualInputs": {
+    "sourceHead": "f5b42fa324aac6382c37419307e4e974007dfb81",
+    "scriptSha256": "e2608c70d9550339bfce43716381e3a67510983e84df73a9810830a075821f6f",
+    "commandLabel": "semantic-full-regression",
+    "jenaImage": "ontology-platform-fuseki:context-1e45f836d9837cbc75d23adb3ad37b0ff79a545ef06102a87aa246feea9cc1e5",
+    "postgres": true
+  }
+}

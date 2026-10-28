@@ -1,0 +1,59 @@
+{
+  "scope": "real child-process orchestration controlled tests, not product E2E",
+  "orchestrationTests": 18,
+  "webTests": 149,
+  "webExitCode": 0,
+  "sourceRecords": [
+    {
+      "source": "/private/tmp/g3-m3-current-web-verification.txt",
+      "path": "docs/evidence/G3-M3-001/master/current-web-verification.txt",
+      "originalSha256": "3fe0cd998382b7abe3ba108b4530b0870b0f6d51ad15a510247d57aaff11b191",
+      "savedSha256": "3fe0cd998382b7abe3ba108b4530b0870b0f6d51ad15a510247d57aaff11b191",
+      "normalization": "terminal newline only"
+    },
+    {
+      "source": "/private/tmp/g3-m3-runtime-timeline-red.txt",
+      "path": "docs/evidence/G3-M3-001/master/runtime-timeline-red.txt",
+      "originalSha256": "d319054d010b5c32fc6e8838caecbd96155349cb3329bdea465ddea303f331f6",
+      "savedSha256": "d319054d010b5c32fc6e8838caecbd96155349cb3329bdea465ddea303f331f6",
+      "normalization": "terminal newline only"
+    },
+    {
+      "source": "/private/tmp/g3-m3-runtime-timeline-green.txt",
+      "path": "docs/evidence/G3-M3-001/master/runtime-timeline-green.txt",
+      "originalSha256": "cfa5b4a552af039979696953e77b1d41a05c318c99ad00edf66455834236bf9a",
+      "savedSha256": "cfa5b4a552af039979696953e77b1d41a05c318c99ad00edf66455834236bf9a",
+      "normalization": "terminal newline only"
+    },
+    {
+      "source": "/private/tmp/g3-m3-owned-smoke-red.txt",
+      "path": "docs/evidence/G3-M3-001/master/owned-smoke-red.txt",
+      "originalSha256": "bda0d2b71917a1a5ff2bf6424b60945dd36077291a001eb7341694fa1e4fe174",
+      "savedSha256": "bda0d2b71917a1a5ff2bf6424b60945dd36077291a001eb7341694fa1e4fe174",
+      "normalization": "terminal newline only"
+    },
+    {
+      "source": "/private/tmp/g3-m3-owned-smoke-green.txt",
+      "path": "docs/evidence/G3-M3-001/master/owned-smoke-green.txt",
+      "originalSha256": "9358b9f6439df030f37001bd514297b73e8672291e8fcbeef9948f83e2c7029a",
+      "savedSha256": "9358b9f6439df030f37001bd514297b73e8672291e8fcbeef9948f83e2c7029a",
+      "normalization": "terminal newline only"
+    }
+  ],
+  "independentReview": {
+    "agent": "/root/e0_independent_review",
+    "reviewedAtUtc": "2026-10-28T14:56:25.102456+00:00",
+    "result": "NO_CONFIRMED_P1_P2",
+    "scope": [
+      "Master runtime timeline and owned fast smoke",
+      "worker992aefa curl/annotation/argparse"
+    ],
+    "independentTests": {
+      "canonical": 34,
+      "cache": 66,
+      "orchestration": 18,
+      "cliRejections": 3
+    },
+    "remaining": "Actual AppHost/browser, final source cold/export/load, full same-Head CI required"
+  }
+}

@@ -1,0 +1,45 @@
+Scope: all 2 workspace projects
+Already up to date
+Done in 146ms using pnpm v11.28.8
+$ eslint .
+$ tsc --noEmit
+$ vitest run
+
+ RUN  v5.0.5 /Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/apps/web
+
+
+ Test Files  16 passed (16)
+      Tests  149 passed (149)
+   Start at  22:47:47
+   Duration  580ms (tests 56%, transform 24%, import 17%, worker 3%)
+
+$ next build
+▲ Next.js 16.4.3 (Turbopack)
+✓ Running next.config.ts took 50ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 434ms
+  Running TypeScript ...
+  Finished TypeScript in 838ms ...
+  Collecting page data using 9 workers ...
+  Generating static pages using 9 workers (0/4) ...
+  Generating static pages using 9 workers (1/4) 
+  Generating static pages using 9 workers (2/4) 
+  Generating static pages using 9 workers (3/4) 
+✓ Generating static pages using 9 workers (4/4) in 123ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ƒ /
+├ ○ /_not-found
+├ ƒ /analysis
+├ ○ /icon.svg
+├ ƒ /ontologies
+├ ƒ /releases
+└ ○ /signed-out
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
+PASS: exact Node/pnpm; separate Web lint/typecheck/test/build. Real OIDC/E2E is a separate acceptance.
