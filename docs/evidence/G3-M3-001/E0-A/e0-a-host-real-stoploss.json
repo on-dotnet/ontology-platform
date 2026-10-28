@@ -1,0 +1,29 @@
+{
+  "status": "PASS",
+  "checks": 6,
+  "scope": "isolated actual source file/hash + new-process persisted state",
+  "results": [
+    {
+      "exitCode": 1,
+      "category": "CHECKSUM_MISMATCH",
+      "counts": {
+        "dockerBuilds": 0,
+        "downloads": 0,
+        "sourceHashChecks": 1
+      },
+      "durationMs": 150
+    },
+    {
+      "exitCode": 2,
+      "category": "CHECKSUM_MISMATCH",
+      "counts": {
+        "dockerBuilds": 0,
+        "downloads": 0,
+        "sourceHashChecks": 1
+      },
+      "durationMs": 129
+    }
+  ],
+  "durationMs": 358,
+  "fixtureRemovedOnExit": true
+}

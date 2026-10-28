@@ -1,0 +1,14 @@
+E...........
+======================================================================
+ERROR: test_bad_source_cache_failure_is_actually_rechecked_and_fixed_cache_recovers (__main__.CanonicalSourceTests.test_bad_source_cache_failure_is_actually_rechecked_and_fixed_cache_recovers)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/CanonicalFuseki.Tests.py", line 405, in test_bad_source_cache_failure_is_actually_rechecked_and_fixed_cache_recovers
+    self.mod.failure_gate(state,expected,context,source_cache=self.cache)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: failure_gate() got an unexpected keyword argument 'source_cache'
+
+----------------------------------------------------------------------
+Ran 12 tests in 0.077s
+
+FAILED (errors=1)

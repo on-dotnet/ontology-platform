@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/CanonicalFuseki.Real.Tests.py", line 88, in <module>
+    first=m.build('G3-M3-001',run+'-export',export_directory=cache,final_gate=True)
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/maintenance/canonical_fuseki.py", line 1251, in build
+    exported=export_cache(export_directory,expected,result)
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/maintenance/canonical_fuseki.py", line 974, in export_cache
+    validate_archive(directory,expected,stage='cache export')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/maintenance/canonical_fuseki.py", line 901, in validate_archive
+    raise BuildRefused('Cache archive validation refused',diagnostic,category='CACHE_INVALID',stage=stage) from None
+canonical.BuildRefused: Cache archive validation refused

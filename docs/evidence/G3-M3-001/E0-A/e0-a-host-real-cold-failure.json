@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "status": "FAILED",
+  "taskId": "G3-M3-001",
+  "runId": "e0-a-real-d576598ea1ec4196ac481a4e2425a486-export",
+  "contextSha256": "dba8036818246baaefc136fa6740729e9be068c79dd0c2ae584f895192406091",
+  "observedAt": "2026-10-28T14:40:51.752696+00:00",
+  "elapsedSeconds": 20.173,
+  "reason": "Cache archive validation refused",
+  "ciContext": {},
+  "failure": {
+    "validationCheck": "OCI_DESCRIPTOR_ANNOTATIONS",
+    "archiveShape": {
+      "format": "OCI",
+      "memberCount": 17,
+      "fileCount": 15,
+      "directoryCount": 2,
+      "linkCount": 0,
+      "specialCount": 0,
+      "manifestRecordCount": 1,
+      "manifestOptionalFields": [],
+      "manifestUnknownFieldCount": 0
+    }
+  },
+  "inputFingerprint": "627fad8936708ae759a8f889ba60fe146e31970a40a823c33b629abc7feec3b7",
+  "envFingerprint": "eb1309fcc1b38cf52c926d38c13e8de76012d244a4b017a80363b88aa0ed2cfd",
+  "stages": [
+    {
+      "stage": "cache export",
+      "durationMs": 20173,
+      "outcome": "FAIL",
+      "errorCategory": "CACHE_INVALID",
+      "inputFingerprint": "627fad8936708ae759a8f889ba60fe146e31970a40a823c33b629abc7feec3b7"
+    }
+  ]
+}

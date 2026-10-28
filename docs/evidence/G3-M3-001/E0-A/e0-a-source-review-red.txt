@@ -1,0 +1,43 @@
+FFF
+======================================================================
+FAIL: test_host_curl_disables_default_config_before_all_other_options (__main__.CanonicalSourceTests.test_host_curl_disables_default_config_before_all_other_options)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/CanonicalFuseki.Tests.py", line 431, in test_host_curl_disables_default_config_before_all_other_options
+    self.assertEqual(calls[0][0][:2],['curl','-q'])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ['curl', '--fail'] != ['curl', '-q']
+
+First differing element 1:
+'--fail'
+'-q'
+
+- ['curl', '--fail']
+?            ^^^^^
+
++ ['curl', '-q']
+?            ^
+
+
+======================================================================
+FAIL: test_real_test_cli_help_and_unknown_flag_never_touch_docker (__main__.CanonicalSourceTests.test_real_test_cli_help_and_unknown_flag_never_touch_docker) (flag='--help')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/CanonicalFuseki.Tests.py", line 449, in test_real_test_cli_help_and_unknown_flag_never_touch_docker
+    self.assertEqual(result.returncode,wanted)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0
+
+======================================================================
+FAIL: test_real_test_cli_help_and_unknown_flag_never_touch_docker (__main__.CanonicalSourceTests.test_real_test_cli_help_and_unknown_flag_never_touch_docker) (flag='--synthetic-unknown')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/CanonicalFuseki.Tests.py", line 449, in test_real_test_cli_help_and_unknown_flag_never_touch_docker
+    self.assertEqual(result.returncode,wanted)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 2
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.587s
+
+FAILED (failures=3)

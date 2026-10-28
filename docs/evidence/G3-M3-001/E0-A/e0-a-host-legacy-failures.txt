@@ -1,0 +1,108 @@
+.....F..F..E..E...........F..F
+======================================================================
+ERROR: test_cold_host_download_uses_fixed_bounded_https_and_publishes_only_verified_source (__main__.CanonicalSourceTests.test_cold_host_download_uses_fixed_bounded_https_and_publishes_only_verified_source)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/CanonicalFuseki.Tests.py", line 323, in test_cold_host_download_uses_fixed_bounded_https_and_publishes_only_verified_source
+    with self.mod.prepare_source(self.cache,'TASK','download','a'*64) as source:
+         ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/contextlib.py", line 141, in __enter__
+    return next(self.gen)
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/maintenance/canonical_fuseki.py", line 467, in prepare_source
+    try:result=host_curl(url,stream,180,15,deadline)
+               ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/maintenance/canonical_fuseki.py", line 415, in host_curl
+    if len(matches)!=1:raise BuildRefused('Source HTTP status protocol refused',result.safe_diagnostic,category='SOURCE_PROTOCOL_INVALID',stage='network')
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+canonical.BuildRefused: Source HTTP status protocol refused
+
+======================================================================
+ERROR: test_host_network_failure_falls_back_once_to_same_fixed_release (__main__.CanonicalSourceTests.test_host_network_failure_falls_back_once_to_same_fixed_release)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/CanonicalFuseki.Tests.py", line 339, in test_host_network_failure_falls_back_once_to_same_fixed_release
+    with self.mod.prepare_source(self.cache,'TASK','fallback','a'*64) as source:self.assertTrue(source['verified'])
+         ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/contextlib.py", line 141, in __enter__
+    return next(self.gen)
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/maintenance/canonical_fuseki.py", line 467, in prepare_source
+    try:result=host_curl(url,stream,180,15,deadline)
+               ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/maintenance/canonical_fuseki.py", line 415, in host_curl
+    if len(matches)!=1:raise BuildRefused('Source HTTP status protocol refused',result.safe_diagnostic,category='SOURCE_PROTOCOL_INVALID',stage='network')
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+canonical.BuildRefused: Source HTTP status protocol refused
+
+======================================================================
+FAIL: test_real_dockerfile_extract_shell_emits_parseable_bounded_stage (__main__.CanonicalDownloadTests.test_real_dockerfile_extract_shell_emits_parseable_bounded_stage)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/CanonicalFuseki.Tests.py", line 244, in test_real_dockerfile_extract_shell_emits_parseable_bounded_stage
+    self.assertEqual(result.returncode,0,result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : usage: sha512sum [-bctwz] [files ...]
+
+
+======================================================================
+FAIL: test_unique_dockerfile_verifies_before_extracting_without_version_change (__main__.CanonicalDownloadTests.test_unique_dockerfile_verifies_before_extracting_without_version_change)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/CanonicalFuseki.Tests.py", line 254, in test_unique_dockerfile_verifies_before_extracting_without_version_change
+    self.assertIn('COPY --chmod=0555 fetch-fuseki.sh',dockerfile)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'COPY --chmod=0555 fetch-fuseki.sh' not found in '# 开发镜像：Apache 官方 Fuseki 发行包；基础镜像摘要在依赖核验后固定。\nFROM eclipse-temurin:21.0.12.1_1-jre-jammy@sha256:affcab5356e1270ac35d2361ee83135af2f03e8d580eca78a6d5d6fdbf048db0\n\nARG JENA_VERSION=6.2.0\nARG JENA_SHA512=ba65f5867d2d4741b2ed9e2af5a0d4fbb447909894ab2a0c6bc4dac8997f4fe339c87b13c48d45d054977769f0f8bf763ea346b1f7792d5cdc458041bd43a132\n\nUSER root\nCOPY --from=fuseki_source --chmod=0400 fuseki.tar.gz /tmp/fuseki.tar.gz\nRUN set -eu; \\\n    checksum_start=$(date +%s%N); \\\n    if printf \'%s  %s\\\\n\' "$JENA_SHA512" /tmp/fuseki.tar.gz | sha512sum --check --strict; then \\\n        checksum_ms=$((($(date +%s%N) - checksum_start) / 1000000)); \\\n        printf \'CANONICAL_STAGE {"stage":"checksum","durationMs":%s,"outcome":"PASS","errorCategory":null}\\\\n\' "$checksum_ms"; \\\n    else \\\n        checksum_ms=$((($(date +%s%N) - checksum_start) / 1000000)); \\\n        printf \'CANONICAL_STAGE {"stage":"checksum","durationMs":%s,"outcome":"FAIL","errorCategory":"CHECKSUM_MISMATCH"}\\\\n\' "$checksum_ms"; \\\n        exit 1; \\\n    fi; \\\n    mkdir -p /opt/fuseki /fuseki/databases; \\\n    extract_start=$(date +%s%N); \\\n    if tar -xzf /tmp/fuseki.tar.gz --strip-components=1 -C /opt/fuseki; then \\\n        extract_ms=$((($(date +%s%N) - extract_start) / 1000000)); \\\n        printf \'CANONICAL_STAGE {"stage":"extract/COPY","durationMs":%s,"outcome":"PASS","errorCategory":null}\\n\' "$extract_ms"; \\\n    else \\\n        extract_ms=$((($(date +%s%N) - extract_start) / 1000000)); \\\n        printf \'CANONICAL_STAGE {"stage":"extract/COPY","durationMs":%s,"outcome":"FAIL","errorCategory":"EXTRACT_FAILED"}\\n\' "$extract_ms"; \\\n        exit 1; \\\n    fi; \\\n    rm /tmp/fuseki.tar.gz; \\\n    groupadd --gid 10001 fuseki; \\\n    useradd --uid 10001 --gid fuseki --no-create-home --home-dir /fuseki fuseki; \\\n    chown -R fuseki:fuseki /fuseki\n\nCOPY --chmod=0555 entrypoint.sh /opt/fuseki/entrypoint.sh\nCOPY --chmod=0444 g2-config.ttl g2-log4j2.properties /opt/fuseki/\n\nENV FUSEKI_BASE=/fuseki\nWORKDIR /fuseki\nUSER 10001:10001\nEXPOSE 3030\nENTRYPOINT ["/opt/fuseki/entrypoint.sh"]\nCMD ["--tdb2", "--loc=/fuseki/databases/ontology", "--update", "/ontology"]\n'
+
+======================================================================
+FAIL: test_nonzero_build_receipt_has_only_safe_command_and_output_hashes (__main__.CanonicalTests.test_nonzero_build_receipt_has_only_safe_command_and_output_hashes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/CanonicalFuseki.Tests.py", line 116, in test_nonzero_build_receipt_has_only_safe_command_and_output_hashes
+    self.assertEqual(receipt['failure']['command'][:2],['docker','build'])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ['curl', '[fixed Apache request arguments withheld]'] != ['docker', 'build']
+
+First differing element 0:
+'curl'
+'docker'
+
+- ['curl', '[fixed Apache request arguments withheld]']
++ ['docker', 'build']
+
+======================================================================
+FAIL: test_timeout_receipt_is_atomic_sanitized_and_lock_released_for_retry (__main__.CanonicalTests.test_timeout_receipt_is_atomic_sanitized_and_lock_released_for_retry)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/CanonicalFuseki.Tests.py", line 80, in test_timeout_receipt_is_atomic_sanitized_and_lock_released_for_retry
+    with self.assertRaises(self.mod.BuildRefused):self.mod.build('TASK-123','failed-run')
+                                                  ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/maintenance/canonical_fuseki.py", line 1213, in build
+    result=ensure_image(context,task_id,run_id,expected,source_cache=shared.parent/'fuseki-sources',
+                        before_cold=before_cold if restored['outcome']!='HIT' and failure_directory else None)
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/maintenance/canonical_fuseki.py", line 315, in ensure_image
+    with prepare_source(source_cache or ROOT/'artifacts/fuseki-sources',task_id,run_id,expected['inputFingerprint'],deadline) as source:
+         ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/contextlib.py", line 141, in __enter__
+    return next(self.gen)
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/maintenance/canonical_fuseki.py", line 467, in prepare_source
+    try:result=host_curl(url,stream,180,15,deadline)
+               ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/maintenance/canonical_fuseki.py", line 405, in host_curl
+    try:result=subprocess.run(args,stdout=output,stderr=subprocess.PIPE,timeout=min(limit+(1 if head else 5),deadline-time.monotonic()))
+               ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1169, in __call__
+    return self._mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1173, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1240, in _execute_mock_call
+    result = effect(*args, **kwargs)
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/CanonicalFuseki.Tests.py", line 74, in cli
+    self.assertEqual(kwargs.get('timeout'),600)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 185 != 600
+
+----------------------------------------------------------------------
+Ran 30 tests in 2.684s
+
+FAILED (failures=4, errors=2)

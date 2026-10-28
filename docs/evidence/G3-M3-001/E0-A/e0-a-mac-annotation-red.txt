@@ -1,0 +1,16 @@
+E
+======================================================================
+ERROR: test_buildkit_config_digest_annotation_binds_exact_config_not_manifest_id (__main__.FusekiCacheTests.test_buildkit_config_digest_annotation_binds_exact_config_not_manifest_id) (mode='valid')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 297, in test_buildkit_config_digest_annotation_binds_exact_config_not_manifest_id
+    if mode=='valid':self.assertEqual(self.mod.validate_archive(directory,identity)['imageId'],receipt['imageId'])
+                                      ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/maintenance/canonical_fuseki.py", line 901, in validate_archive
+    raise BuildRefused('Cache archive validation refused',diagnostic,category='CACHE_INVALID',stage=stage) from None
+cache_canonical.BuildRefused: Cache archive validation refused
+
+----------------------------------------------------------------------
+Ran 1 test in 0.007s
+
+FAILED (errors=1)

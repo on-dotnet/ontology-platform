@@ -1,0 +1,104 @@
+EEEFEEEEEEE
+======================================================================
+ERROR: test_cache_corruption_is_immediate_checksum_failure_without_download (__main__.CanonicalSourceTests.test_cache_corruption_is_immediate_checksum_failure_without_download)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/CanonicalFuseki.Tests.py", line 303, in test_cache_corruption_is_immediate_checksum_failure_without_download
+    with self.mod.prepare_source(self.cache,'TASK','bad','a'*64):pass
+         ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'canonical' has no attribute 'prepare_source'
+
+======================================================================
+ERROR: test_cache_symlink_ancestor_link_and_oversize_are_refused (__main__.CanonicalSourceTests.test_cache_symlink_ancestor_link_and_oversize_are_refused)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/CanonicalFuseki.Tests.py", line 311, in test_cache_symlink_ancestor_link_and_oversize_are_refused
+    with self.mod.prepare_source(self.cache,'TASK','link','a'*64):pass
+         ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'canonical' has no attribute 'prepare_source'
+
+======================================================================
+ERROR: test_cold_host_download_uses_fixed_bounded_https_and_publishes_only_verified_source (__main__.CanonicalSourceTests.test_cold_host_download_uses_fixed_bounded_https_and_publishes_only_verified_source)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/CanonicalFuseki.Tests.py", line 323, in test_cold_host_download_uses_fixed_bounded_https_and_publishes_only_verified_source
+    with self.mod.prepare_source(self.cache,'TASK','download','a'*64) as source:
+         ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'canonical' has no attribute 'prepare_source'
+
+======================================================================
+ERROR: test_download_checksum_error_or_limit_never_falls_back_or_publishes (__main__.CanonicalSourceTests.test_download_checksum_error_or_limit_never_falls_back_or_publishes) (mode='bad-hash')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/CanonicalFuseki.Tests.py", line 349, in test_download_checksum_error_or_limit_never_falls_back_or_publishes
+    with self.mod.prepare_source(cache,'TASK',mode,'a'*64):pass
+         ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'canonical' has no attribute 'prepare_source'
+
+======================================================================
+ERROR: test_download_checksum_error_or_limit_never_falls_back_or_publishes (__main__.CanonicalSourceTests.test_download_checksum_error_or_limit_never_falls_back_or_publishes) (mode='too-large')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/CanonicalFuseki.Tests.py", line 349, in test_download_checksum_error_or_limit_never_falls_back_or_publishes
+    with self.mod.prepare_source(cache,'TASK',mode,'a'*64):pass
+         ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'canonical' has no attribute 'prepare_source'
+
+======================================================================
+ERROR: test_host_network_failure_falls_back_once_to_same_fixed_release (__main__.CanonicalSourceTests.test_host_network_failure_falls_back_once_to_same_fixed_release)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/CanonicalFuseki.Tests.py", line 339, in test_host_network_failure_falls_back_once_to_same_fixed_release
+    with self.mod.prepare_source(self.cache,'TASK','fallback','a'*64) as source:self.assertTrue(source['verified'])
+         ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'canonical' has no attribute 'prepare_source'
+
+======================================================================
+ERROR: test_host_short_probe_does_not_require_or_start_a_docker_container (__main__.CanonicalSourceTests.test_host_short_probe_does_not_require_or_start_a_docker_container)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/CanonicalFuseki.Tests.py", line 378, in test_host_short_probe_does_not_require_or_start_a_docker_container
+    with patch.object(self.mod.subprocess,'run',side_effect=run):result=self.mod.host_network_probe('TASK','probe')
+                                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'canonical' has no attribute 'host_network_probe'. Did you mean: 'container_network_probe'?
+
+======================================================================
+ERROR: test_named_context_extra_file_and_changed_bytes_are_refused (__main__.CanonicalSourceTests.test_named_context_extra_file_and_changed_bytes_are_refused)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/CanonicalFuseki.Tests.py", line 365, in test_named_context_extra_file_and_changed_bytes_are_refused
+    with self.mod.prepare_source(self.cache,'TASK','context','a'*64) as source:
+         ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'canonical' has no attribute 'prepare_source'
+
+======================================================================
+ERROR: test_two_timeouts_preserve_only_sanitized_failure_stages (__main__.CanonicalSourceTests.test_two_timeouts_preserve_only_sanitized_failure_stages)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/CanonicalFuseki.Tests.py", line 357, in test_two_timeouts_preserve_only_sanitized_failure_stages
+    with self.mod.prepare_source(self.cache,'TASK','timeouts','a'*64):pass
+         ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'canonical' has no attribute 'prepare_source'
+
+======================================================================
+ERROR: test_valid_cached_source_is_rehashed_and_staged_as_exact_single_file (__main__.CanonicalSourceTests.test_valid_cached_source_is_rehashed_and_staged_as_exact_single_file)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/CanonicalFuseki.Tests.py", line 288, in test_valid_cached_source_is_rehashed_and_staged_as_exact_single_file
+    with self.mod.prepare_source(self.cache,'G3-M3-001','source-cache','a'*64) as source:
+         ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'canonical' has no attribute 'prepare_source'
+
+======================================================================
+FAIL: test_dockerfile_uses_named_source_and_checks_checksum_before_extract (__main__.CanonicalSourceTests.test_dockerfile_uses_named_source_and_checks_checksum_before_extract)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/CanonicalFuseki.Tests.py", line 388, in test_dockerfile_uses_named_source_and_checks_checksum_before_extract
+    self.assertIn('COPY --from=fuseki_source',text)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'COPY --from=fuseki_source' not found in '# 开发镜像：Apache 官方 Fuseki 发行包；基础镜像摘要在依赖核验后固定。\nFROM eclipse-temurin:21.0.12.1_1-jre-jammy@sha256:affcab5356e1270ac35d2361ee83135af2f03e8d580eca78a6d5d6fdbf048db0\n\nARG JENA_VERSION=6.2.0\nARG JENA_SHA512=ba65f5867d2d4741b2ed9e2af5a0d4fbb447909894ab2a0c6bc4dac8997f4fe339c87b13c48d45d054977769f0f8bf763ea346b1f7792d5cdc458041bd43a132\n\nUSER root\nCOPY --chmod=0555 fetch-fuseki.sh /usr/local/bin/fetch-fuseki\nRUN set -eu; \\\n    fetch-fuseki "$JENA_VERSION" "$JENA_SHA512" /tmp/fuseki.tar.gz; \\\n    mkdir -p /opt/fuseki /fuseki/databases; \\\n    extract_start=$(date +%s%N); \\\n    if tar -xzf /tmp/fuseki.tar.gz --strip-components=1 -C /opt/fuseki; then \\\n        extract_ms=$((($(date +%s%N) - extract_start) / 1000000)); \\\n        printf \'CANONICAL_STAGE {"stage":"extract/COPY","durationMs":%s,"outcome":"PASS","errorCategory":null}\\n\' "$extract_ms"; \\\n    else \\\n        extract_ms=$((($(date +%s%N) - extract_start) / 1000000)); \\\n        printf \'CANONICAL_STAGE {"stage":"extract/COPY","durationMs":%s,"outcome":"FAIL","errorCategory":"EXTRACT_FAILED"}\\n\' "$extract_ms"; \\\n        exit 1; \\\n    fi; \\\n    rm /tmp/fuseki.tar.gz; \\\n    groupadd --gid 10001 fuseki; \\\n    useradd --uid 10001 --gid fuseki --no-create-home --home-dir /fuseki fuseki; \\\n    chown -R fuseki:fuseki /fuseki\n\nCOPY --chmod=0555 entrypoint.sh /opt/fuseki/entrypoint.sh\nCOPY --chmod=0444 g2-config.ttl g2-log4j2.properties /opt/fuseki/\n\nENV FUSEKI_BASE=/fuseki\nWORKDIR /fuseki\nUSER 10001:10001\nEXPOSE 3030\nENTRYPOINT ["/opt/fuseki/entrypoint.sh"]\nCMD ["--tdb2", "--loc=/fuseki/databases/ontology", "--update", "/ontology"]\n'
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.052s
+
+FAILED (failures=1, errors=10)
