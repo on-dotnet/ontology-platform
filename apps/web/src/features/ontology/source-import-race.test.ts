@@ -62,7 +62,12 @@ const hooks = vi.hoisted(() => {
 const api = vi.hoisted(() => ({ drafts: vi.fn(), draft: vi.fn(), supportProfile: vi.fn(), saveDraft: vi.fn() }));
 vi.mock("react", async importOriginal => ({
   ...await importOriginal<typeof import("react")>(),
-  useState: hooks.useState, useRef: hooks.useRef, useEffect: hooks.useEffect,
+  useState: hooks.useState,
+  useReducer: <S, A>(reducer: (state: S, action: A) => S, initial: S) => {
+    const [state, setState] = hooks.useState(initial);
+    return [state, (action: A) => setState(current => reducer(current, action))];
+  },
+  useRef: hooks.useRef, useEffect: hooks.useEffect,
   useCallback: <T extends (...arguments_: never[]) => unknown>(callback: T) => callback,
 }));
 vi.mock("../../lib/api/g2-client", async importOriginal => ({

@@ -23,6 +23,10 @@ for (const width of [1440, 1280, 390]) {
     await page.getByRole("button", { name: /Synthetic 本体草稿/ }).focus();
     await page.keyboard.press("Enter");
     await expect(page.getByRole("textbox", { name: "本体 · OWL源码" })).toHaveValue(sources.ontologyTurtle);
+    await expect(page.getByRole("button", { name: "源码视图", exact: true })).toHaveAttribute("aria-pressed", "true");
+    await page.getByRole("button", { name: "图视图", exact: true }).click();
+    await expect(page.getByRole("button", { name: "图视图", exact: true })).toHaveAttribute("aria-pressed", "true");
+    await expect(page.locator(".g2-graph canvas").first()).toBeVisible();
     if (width === 390) await page.getByRole("button", { name: "图与校验", exact: true }).click();
     await expect(page.getByRole("heading", { name: "RDF 结构投影" })).toBeVisible();
     await page.getByText("键盘访问节点与关系").click();

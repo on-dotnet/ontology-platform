@@ -1,0 +1,24 @@
+
+ RUN  v5.0.5 /Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform/apps/web
+
+ ❯ src/features/ontology/vocabulary-views.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/features/ontology/vocabulary-views.test.ts [ src/features/ontology/vocabulary-views.test.ts ]
+Error: Cannot find module './vocabulary-workbench' imported from /Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform/apps/web/src/features/ontology/vocabulary-views.test.ts
+ ❯ src/features/ontology/vocabulary-views.test.ts:4:1
+      2| import { renderToStaticMarkup } from "react-dom/server";
+      3| import { describe, expect, it } from "vitest";
+      4| import { VocabularyReadView, VocabularyEditForm } from "./vocabulary-w…
+       | ^
+      5| import type { VocabularySnapshot } from "../../lib/api/g2-generated";
+      6| const snapshot: VocabularySnapshot = { draftId: null, releaseId: "rele…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  20:39:11
+   Duration  78ms (worker 97%, environment 3%)

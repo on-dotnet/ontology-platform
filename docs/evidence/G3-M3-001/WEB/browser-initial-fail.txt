@@ -1,0 +1,78 @@
+[WebServer] (node:44695) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:44709) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 3 tests using 1 worker
+
+(node:44732) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 tests/g2/m3-vocabulary.spec.ts:21:3 › 1440词汇精确替换保留来源/语言，视图切换保留批次，409不丢队列 (647ms)
+(node:44780) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 tests/g2/m3-vocabulary.spec.ts:21:3 › 390词汇精确替换保留来源/语言，视图切换保留批次，409不丢队列 (653ms)
+(node:44804) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  3 tests/g2/m3-vocabulary.spec.ts:53:1 › 固定历史Release按自身profile读回，拒绝过期草稿快照 (1.3s)
+
+
+  1) tests/g2/m3-vocabulary.spec.ts:21:3 › 1440词汇精确替换保留来源/语言，视图切换保留批次，409不丢队列 ──────────────────────
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByRole('alert')
+    Expected substring: "409"
+    Error: strict mode violation: getByRole('alert') resolved to 2 elements:
+        1) <div role="alert" class="g2-notice error">…</div> aka getByText('版本冲突：本地未保存文本仍保留 HTTP')
+        2) <div role="alert" aria-live="assertive" id="__next-route-announcer__"></div> aka locator('[id="__next-route-announcer__"]')
+
+    Call log:
+      - Expect "toContainText" getByRole('alert') with timeout 5000ms
+      - waiting for getByRole('alert')
+        - locator resolved to <div role="alert" aria-live="assertive" id="__next-route-announcer__"></div>
+        - unexpected value ""
+
+
+      40 |     await expect(page.getByRole("heading", { name: "待提交批次 1 / 64" })).toBeVisible();
+      41 |     await page.getByRole("button", { name: "批量原子提交" }).click();
+    > 42 |     await expect(page.getByRole("alert")).toContainText("409");
+         |                                           ^
+      43 |     expect(body?.hashes).toEqual(hashes);
+      44 |     expect(body?.command.expectedRevision).toBe(2);
+      45 |     expect(body?.changes[0].sourceId).toBe("ontology");
+        at /Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform/apps/web/tests/g2/m3-vocabulary.spec.ts:42:43
+
+    Error Context: artifacts/test-results/g2/m3-vocabulary-1440词汇精确替换保留来源-语言，视图切换保留批次，409不丢队列/error-context.md
+
+  2) tests/g2/m3-vocabulary.spec.ts:21:3 › 390词汇精确替换保留来源/语言，视图切换保留批次，409不丢队列 ───────────────────────
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByRole('alert')
+    Expected substring: "409"
+    Error: strict mode violation: getByRole('alert') resolved to 2 elements:
+        1) <div role="alert" class="g2-notice error">…</div> aka getByText('版本冲突：本地未保存文本仍保留 HTTP')
+        2) <div role="alert" aria-live="assertive" id="__next-route-announcer__"></div> aka locator('[id="__next-route-announcer__"]')
+
+    Call log:
+      - Expect "toContainText" getByRole('alert') with timeout 5000ms
+      - waiting for getByRole('alert')
+        - locator resolved to <div role="alert" aria-live="assertive" id="__next-route-announcer__"></div>
+        - unexpected value ""
+
+
+      40 |     await expect(page.getByRole("heading", { name: "待提交批次 1 / 64" })).toBeVisible();
+      41 |     await page.getByRole("button", { name: "批量原子提交" }).click();
+    > 42 |     await expect(page.getByRole("alert")).toContainText("409");
+         |                                           ^
+      43 |     expect(body?.hashes).toEqual(hashes);
+      44 |     expect(body?.command.expectedRevision).toBe(2);
+      45 |     expect(body?.changes[0].sourceId).toBe("ontology");
+        at /Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform/apps/web/tests/g2/m3-vocabulary.spec.ts:42:43
+
+    Error Context: artifacts/test-results/g2/m3-vocabulary-390词汇精确替换保留来源-语言，视图切换保留批次，409不丢队列/error-context.md
+
+  2 failed
+    tests/g2/m3-vocabulary.spec.ts:21:3 › 1440词汇精确替换保留来源/语言，视图切换保留批次，409不丢队列 ───────────────────────
+    tests/g2/m3-vocabulary.spec.ts:21:3 › 390词汇精确替换保留来源/语言，视图切换保留批次，409不丢队列 ────────────────────────
+  1 passed (6.8s)

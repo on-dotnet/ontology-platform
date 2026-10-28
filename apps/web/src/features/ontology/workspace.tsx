@@ -2,7 +2,7 @@
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import type { PlatformIdentity } from "../../lib/api/generated";
-import type { OntologyDraft, SemanticSupportProfile, SourceBundle, SaveDraftRequest, DraftDiff } from "../../lib/api/g2-generated";
+import type { OntologyDraft, SemanticSupportProfile, SourceBundle, SaveDraftRequest, DraftDiff, VocabularyChange, VocabularySnapshot } from "../../lib/api/g2-generated";
 import { command, createG2Client } from "../../lib/api/g2-client";
 import { SemanticError } from "../../components/ui/semantic-feedback";
 import { draftState, isDirty, isNewDraftDirty, updateSource, type DraftState } from "./draft-state";
@@ -14,6 +14,9 @@ import { SupportProfile } from "./support-profile";
 import { AssessmentPanel } from "./assessment-panel";
 import { VersionComparison } from "./version-comparison";
 import { initialWorkspaceView, workspaceView } from "./workspace-state";
+import { VocabularyWorkbench } from "./vocabulary-workbench";
+import { snapshotMatches } from "./vocabulary-model";
+import { ReleasedVocabulary } from "./released-vocabulary";
 import "./workspace.css";
 
 const client = createG2Client();
@@ -29,6 +32,9 @@ const tabs = [{ id: "catalog", title: "资产" }, { id: "source", title: "源码
 export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) {
   const [drafts, setDrafts] = useState<OntologyDraft[] | null>(null);
   const [state, setState] = useState<DraftState | null>(null);
+  const [vocabularyOpened, setVocabularyOpened] = useState(false);
+  const [vocabularyMode, setVocabularyMode] = useState(false);
+  const [vocabularyPending, setVocabularyPending] = useState(false);
   const [structuralDiff, setStructuralDiff] = useState<DraftDiff | null>(null);
   const [remote, setRemote] = useState<OntologyDraft | null>(null);
   const [sources, setSources] = useState<SourceBundle>({ ...emptySources });
@@ -53,6 +59,7 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
   const lifetime = useRef<AbortController | null>(null);
   const sourceImports = useRef(new SourceImportSession());
   const dirty = state ? isDirty(state) : isNewDraftDirty(name, sources);
+  const hasUnsaved = dirty || vocabularyPending;
   const canEdit = identity.roles.includes("platform.operator");
   const selectedScope = identity.scopes[Number(scopeIndex)];
   const chooseNode = useCallback((iri: string) => dispatchView({ type: "select", iri }), []);
@@ -74,7 +81,7 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
   }, [identity.subjectId]);
 
   useEffect(() => {
-    if (!dirty) return;
+    if (!hasUnsaved) return;
     const beforeUnload = (event: BeforeUnloadEvent) => { event.preventDefault(); };
     /** Next客户端导航不触发beforeunload；捕获同源导航以保留本地缓冲。 */
     const beforeNavigate = (event: MouseEvent) => {
@@ -93,7 +100,7 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
       window.removeEventListener("beforeunload", beforeUnload);
       document.removeEventListener("click", beforeNavigate, true);
     };
-  }, [dirty]);
+  }, [hasUnsaved]);
 
   /** 档案失败保持UNKNOWN，不能从投影或本地常量推断能力。 */
   async function loadProfile(signal: AbortSignal) {
@@ -135,16 +142,19 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
     setRetry(null);
     setDrafts(items => [draft, ...(items ?? []).filter(item => item.draftId !== draft.draftId)]);
     setSelected("");
+    setVocabularyPending(false);
   }
 
   /** dirty草稿切换需显式丢弃，避免覆盖本地权威源缓冲。 */
   function open(draft: OntologyDraft) {
-    if (dirty) {
+    if (hasUnsaved) {
       setNotice("当前草稿有未保存内容。请先保存，或显式丢弃后打开其他草稿。");
       return;
     }
     void execute(async signal => {
       accept(await client.draft(draft.draftId, signal));
+      setVocabularyMode(false);
+      setVocabularyOpened(false);
       dispatchView({ type: "open" });
     });
   }
@@ -193,7 +203,7 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
           <h1>本体资产与草稿</h1>
           <p>原始 Turtle 是权威源 · 真实 RIOT / SHACL · Synthetic 开发事实</p>
         </div>
-        <span className="tag violet">G3 M2 · 基础建模</span>
+        <span className="tag violet">G3 M3 · 术语与单位</span>
       </div>
       {error !== null && <SemanticError error={error} />}
       {notice && <p role="status" className="g2-notice">{notice}</p>}
@@ -228,9 +238,12 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
             </div>
           )}
           <button className="button" disabled={busy} onClick={() => {
-            if (dirty) { setNotice("未保存草稿仍保留，请先保存或显式丢弃。"); return; }
+            if (hasUnsaved) { setNotice("未保存草稿仍保留，请先保存或显式丢弃。"); return; }
             sourceImports.current.invalidate();
             setState(null);
+            setVocabularyMode(false);
+            setVocabularyOpened(false);
+            setVocabularyPending(false);
             setRemote(null);
             dispatchView({ type: "new" });
           }}>新建 / 导入资产</button>
@@ -251,17 +264,36 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
           </label>
           {state && (
             <div className="g2-tabs" aria-label="中间建模视图">
-              <button className="button" aria-pressed={centerView === "graph"} onClick={() => setCenterView("graph")}>图视图</button>
-              <button className="button" aria-pressed={centerView === "source"} onClick={() => setCenterView("source")}>源码视图</button>
+              <button className="button" aria-pressed={centerView === "graph"} onClick={() => { setVocabularyMode(false); setCenterView("graph"); }}>图视图</button>
+              <button className="button" aria-pressed={centerView === "source" && !vocabularyMode} onClick={() => { setVocabularyMode(false); setCenterView("source"); }}>源码视图</button>
+              <button className="button" aria-pressed={vocabularyMode} onClick={() => { setVocabularyOpened(true); setVocabularyMode(true); setCenterView("source"); }}>术语与单位</button>
             </div>
           )}
           {state && centerView === "graph" && (
             <SemanticGraph projection={state.draft.projection} selected={selected} stale={dirty} onSelect={chooseNode} />
           )}
-          <div className="g2-stack" hidden={Boolean(state && centerView !== "source")}>
+          <div hidden={!vocabularyMode}>{state && vocabularyOpened && <VocabularyWorkbench
+            key={`vocabulary/${state.draft.draftId}/${state.draft.revision}`} draft={state.draft} selected={selected} onSelect={chooseNode}
+            dirty={dirty} busy={busy} canEdit={canEdit} reason={reason} onPending={setVocabularyPending} pending={vocabularyPending} profile={profile}
+            onLocate={(nextField, focus) => { setField(nextField); setSelected(focus ?? ""); setVocabularyMode(false); setCenterView("source"); setTab("source"); }}
+            onCommit={(changes: VocabularyChange[], snapshot: VocabularySnapshot) => void execute(async signal => {
+              if (dirty || !snapshotMatches(snapshot, state.draft)) throw new Error("词汇批次已过期，请先保存源码并刷新词汇快照。");
+              const previousRevision = state.draft.revision;
+              const next = await client.editVocabulary(state.draft.draftId, { hashes: snapshot.hashes, changes, command: command(previousRevision, reason) }, signal);
+              if (signal.aborted) return;
+              accept(next);
+              setSelected(selected);
+              setVocabularyMode(true);
+              setNotice(`词汇批次已原子保存为 revision ${next.revision}；需重新运行完整评估与异人审批。`);
+              const diff = await client.diff(next.draftId, previousRevision, signal);
+              if (!signal.aborted && diff.targetRevision === next.revision && diff.targetHashes.bundleHash === next.hashes.bundleHash) setStructuralDiff(diff);
+            })}
+          />}</div>
+          {vocabularyPending && <p className="g2-notice">词汇批次尚未提交。切换视图保留批次；请先原子提交或取消批次，再修改源码或打开其它资产。</p>}
+          <div className="g2-stack" hidden={Boolean(state && (centerView !== "source" || vocabularyMode))}>
             <label>资产名称
               <input
-                aria-label="资产名称" value={state?.name ?? name} disabled={busy || !canEdit} maxLength={200}
+                aria-label="资产名称" value={state?.name ?? name} disabled={busy || !canEdit || vocabularyPending} maxLength={200}
                 onChange={event => {
                   const nextName = event.target.value;
                   if (state) setState(current => current ? { ...current, name: nextName } : current);
@@ -302,7 +334,7 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
               </>
             )}
             <SourceEditor
-              sources={state?.sources ?? sources} field={field} onField={setField} readOnly={busy || !canEdit}
+              sources={state?.sources ?? sources} field={field} onField={setField} readOnly={busy || !canEdit || vocabularyPending}
               onBeginImport={beginImport}
               onAbsent={() => {
                 sourceImports.current.invalidate("vocabularyTurtle");
@@ -331,11 +363,11 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
             <div className="g2-row">
               {state ? (
                 <>
-                  <button className="button primary" disabled={busy || !dirty || !reason.trim() || !canEdit} onClick={() => save()}>保存新修订</button>
+                  <button className="button primary" disabled={busy || vocabularyPending || !dirty || !reason.trim() || !canEdit} onClick={() => save()}>保存新修订</button>
                   {retry && <button className="button" disabled={busy || !canEdit} onClick={() => save(true)}>重试原保存命令</button>}
                   <button className="button" disabled={busy} onClick={() => void execute(async signal => {
                     const next = await client.draft(state.draft.draftId, signal);
-                    if (dirty) {
+                    if (hasUnsaved) {
                       setRemote(next);
                       setNotice("远端版本已加载供对比，本地文本保留。仅显式丢弃才覆盖。");
                     } else accept(next);
@@ -382,7 +414,7 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
               <StructuralForm
                 key={`structure/${state.draft.draftId}/${state.draft.revision}`}
                 projection={state.draft.projection} selected={selected}
-                blocked={busy || dirty || !canEdit || !reason.trim() || !profile?.capabilities.some(item => item.edit === "BASIC")}
+                blocked={busy || dirty || vocabularyPending || !canEdit || !reason.trim() || !profile?.capabilities.some(item => item.edit === "BASIC")}
                 onEdit={edit => void execute(async signal => {
                   const previousRevision = state.draft.revision;
                   const next = await client.editDraft(state.draft.draftId, { edit, command: command(previousRevision, reason) }, signal);
@@ -405,9 +437,10 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
               )}
               <AssessmentPanel
                 key={`assessment/${state.draft.draftId}/${state.draft.revision}`}
-                draft={state.draft} profile={profile} dirty={dirty} busy={busy} canEdit={canEdit}
+                draft={state.draft} profile={profile} dirty={hasUnsaved} busy={busy} canEdit={canEdit}
                 reason={reason} execute={execute} onNotice={setNotice}
                 onLocate={(nextField, focus) => {
+                  setVocabularyMode(false);
                   setField(nextField);
                   setSelected(focus ?? "");
                   setCenterView("source");
@@ -426,6 +459,7 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
               <p className="muted">选择或创建真实草稿后，显示相同 revision / hash 的投影、结构表单、SHACL 与 Diff。</p>
             </>
           )}
+          <ReleasedVocabulary />
           <SupportProfile profile={profile} loading={profileLoading} failed={profileFailed} onRefresh={() => {
             const signal = lifetime.current?.signal;
             if (signal) void loadProfile(signal);

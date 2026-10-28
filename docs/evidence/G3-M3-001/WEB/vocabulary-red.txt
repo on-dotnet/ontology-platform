@@ -1,0 +1,24 @@
+
+ RUN  v5.0.5 /Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform/apps/web
+
+ ❯ src/features/ontology/vocabulary-model.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/features/ontology/vocabulary-model.test.ts [ src/features/ontology/vocabulary-model.test.ts ]
+Error: Cannot find module './vocabulary-model' imported from /Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform/apps/web/src/features/ontology/vocabulary-model.test.ts
+ ❯ src/features/ontology/vocabulary-model.test.ts:3:1
+      1| import { describe, expect, it } from "vitest";
+      2| import type { OntologyDraft, VocabularySnapshot, VocabularySourceTripl…
+      3| import { vocabularyDirectory, vocabularyChange, snapshotMatches, relea…
+       | ^
+      4| const iri = (value: string) => ({ kind: "iri" as const, value, datatyp…
+      5| const literal = (value: string, language: string | null = null) => ({ …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  20:37:59
+   Duration  286ms (worker 98%, environment 2%)
