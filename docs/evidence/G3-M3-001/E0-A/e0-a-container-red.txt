@@ -1,0 +1,269 @@
+....EFFFFEFFFFEFE.................F.......F.......
+======================================================================
+ERROR: test_container_network_failure_cannot_be_recovered_by_host_head (__main__.FusekiCacheTests.test_container_network_failure_cannot_be_recovered_by_host_head)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 245, in test_container_network_failure_cannot_be_recovered_by_host_head
+    result=self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT',task_id='G3-M3-001',run_id='container-probe',platform='linux/amd64',probe_receipts=receipts)
+TypeError: short_reproduce() got an unexpected keyword argument 'task_id'
+
+======================================================================
+ERROR: test_container_probe_hardening_labels_base_and_total_deadline (__main__.FusekiCacheTests.test_container_probe_hardening_labels_base_and_total_deadline)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 255, in test_container_probe_hardening_labels_base_and_total_deadline
+    self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT',task_id='G3-M3-001',run_id='probe-123',platform='linux/amd64',probe_receipts=receipts)
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: short_reproduce() got an unexpected keyword argument 'task_id'
+
+======================================================================
+ERROR: test_container_probe_platform_mismatch_is_not_network_recovery (__main__.FusekiCacheTests.test_container_probe_platform_mismatch_is_not_network_recovery)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 319, in test_container_probe_platform_mismatch_is_not_network_recovery
+    with self.assertRaises(self.mod.BuildRefused) as caught:self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT',platform='linux/amd64')
+                                                            ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: short_reproduce() got an unexpected keyword argument 'platform'
+
+======================================================================
+ERROR: test_container_probe_success_is_actual_container_head_and_auto_removal (__main__.FusekiCacheTests.test_container_probe_success_is_actual_container_head_and_auto_removal)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 327, in test_container_probe_success_is_actual_container_head_and_auto_removal
+    result=self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT',probe_receipts=receipts)
+TypeError: short_reproduce() got an unexpected keyword argument 'probe_receipts'
+
+======================================================================
+FAIL: test_container_probe_cli_timeouts_and_unavailability_are_not_recovery (__main__.FusekiCacheTests.test_container_probe_cli_timeouts_and_unavailability_are_not_recovery) (fault='base-timeout')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 293, in test_container_probe_cli_timeouts_and_unavailability_are_not_recovery
+    with self.assertRaises(self.mod.BuildRefused) as caught:self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT')
+                                                            ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/maintenance/canonical_fuseki.py", line 597, in short_reproduce
+    result=subprocess.run(args,capture_output=True,text=True,timeout=6)
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1169, in __call__
+    return self._mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1173, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1240, in _execute_mock_call
+    result = effect(*args, **kwargs)
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 234, in run
+    raise AssertionError('Only local Docker probe operations are permitted: '+str(args[:3]))
+AssertionError: Only local Docker probe operations are permitted: ['curl', '--head', '--fail']
+
+======================================================================
+FAIL: test_container_probe_cli_timeouts_and_unavailability_are_not_recovery (__main__.FusekiCacheTests.test_container_probe_cli_timeouts_and_unavailability_are_not_recovery) (fault='run-timeout')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 293, in test_container_probe_cli_timeouts_and_unavailability_are_not_recovery
+    with self.assertRaises(self.mod.BuildRefused) as caught:self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT')
+                                                            ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/maintenance/canonical_fuseki.py", line 597, in short_reproduce
+    result=subprocess.run(args,capture_output=True,text=True,timeout=6)
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1169, in __call__
+    return self._mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1173, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1240, in _execute_mock_call
+    result = effect(*args, **kwargs)
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 234, in run
+    raise AssertionError('Only local Docker probe operations are permitted: '+str(args[:3]))
+AssertionError: Only local Docker probe operations are permitted: ['curl', '--head', '--fail']
+
+======================================================================
+FAIL: test_container_probe_cli_timeouts_and_unavailability_are_not_recovery (__main__.FusekiCacheTests.test_container_probe_cli_timeouts_and_unavailability_are_not_recovery) (fault='unavailable')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 293, in test_container_probe_cli_timeouts_and_unavailability_are_not_recovery
+    with self.assertRaises(self.mod.BuildRefused) as caught:self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT')
+                                                            ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/maintenance/canonical_fuseki.py", line 597, in short_reproduce
+    result=subprocess.run(args,capture_output=True,text=True,timeout=6)
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1169, in __call__
+    return self._mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1173, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1240, in _execute_mock_call
+    result = effect(*args, **kwargs)
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 234, in run
+    raise AssertionError('Only local Docker probe operations are permitted: '+str(args[:3]))
+AssertionError: Only local Docker probe operations are permitted: ['curl', '--head', '--fail']
+
+======================================================================
+FAIL: test_container_probe_docker_fault_is_blocked_instead_of_source_recovery (__main__.FusekiCacheTests.test_container_probe_docker_fault_is_blocked_instead_of_source_recovery)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 282, in test_container_probe_docker_fault_is_blocked_instead_of_source_recovery
+    with self.assertRaises(self.mod.BuildRefused) as caught:self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT')
+                                                            ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/maintenance/canonical_fuseki.py", line 597, in short_reproduce
+    result=subprocess.run(args,capture_output=True,text=True,timeout=6)
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1169, in __call__
+    return self._mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1173, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1240, in _execute_mock_call
+    result = effect(*args, **kwargs)
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 234, in run
+    raise AssertionError('Only local Docker probe operations are permitted: '+str(args[:3]))
+AssertionError: Only local Docker probe operations are permitted: ['curl', '--head', '--fail']
+
+======================================================================
+FAIL: test_container_probe_missing_base_never_pulls_or_builds (__main__.FusekiCacheTests.test_container_probe_missing_base_never_pulls_or_builds)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 273, in test_container_probe_missing_base_never_pulls_or_builds
+    with self.assertRaises(self.mod.BuildRefused) as caught:self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT')
+                                                            ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/maintenance/canonical_fuseki.py", line 597, in short_reproduce
+    result=subprocess.run(args,capture_output=True,text=True,timeout=6)
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1169, in __call__
+    return self._mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1173, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1240, in _execute_mock_call
+    result = effect(*args, **kwargs)
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 234, in run
+    raise AssertionError('Only local Docker probe operations are permitted: '+str(args[:3]))
+AssertionError: Only local Docker probe operations are permitted: ['curl', '--head', '--fail']
+
+======================================================================
+FAIL: test_container_probe_missing_curl_or_bad_protocol_cannot_mean_recovery (__main__.FusekiCacheTests.test_container_probe_missing_curl_or_bad_protocol_cannot_mean_recovery) (codes=(127, 127), exit_code=1, output=None)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 303, in test_container_probe_missing_curl_or_bad_protocol_cannot_mean_recovery
+    with self.assertRaises(self.mod.BuildRefused) as caught:self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT')
+                                                            ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/maintenance/canonical_fuseki.py", line 597, in short_reproduce
+    result=subprocess.run(args,capture_output=True,text=True,timeout=6)
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1169, in __call__
+    return self._mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1173, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1240, in _execute_mock_call
+    result = effect(*args, **kwargs)
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 234, in run
+    raise AssertionError('Only local Docker probe operations are permitted: '+str(args[:3]))
+AssertionError: Only local Docker probe operations are permitted: ['curl', '--head', '--fail']
+
+======================================================================
+FAIL: test_container_probe_missing_curl_or_bad_protocol_cannot_mean_recovery (__main__.FusekiCacheTests.test_container_probe_missing_curl_or_bad_protocol_cannot_mean_recovery) (codes=(0,), exit_code=0, output='')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 303, in test_container_probe_missing_curl_or_bad_protocol_cannot_mean_recovery
+    with self.assertRaises(self.mod.BuildRefused) as caught:self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT')
+                                                            ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/maintenance/canonical_fuseki.py", line 597, in short_reproduce
+    result=subprocess.run(args,capture_output=True,text=True,timeout=6)
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1169, in __call__
+    return self._mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1173, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1240, in _execute_mock_call
+    result = effect(*args, **kwargs)
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 234, in run
+    raise AssertionError('Only local Docker probe operations are permitted: '+str(args[:3]))
+AssertionError: Only local Docker probe operations are permitted: ['curl', '--head', '--fail']
+
+======================================================================
+FAIL: test_container_probe_missing_curl_or_bad_protocol_cannot_mean_recovery (__main__.FusekiCacheTests.test_container_probe_missing_curl_or_bad_protocol_cannot_mean_recovery) (codes=(0,), exit_code=0, output='CANONICAL_PROBE_EXIT 0\nSYNTHETIC_PRIVATE_TOKEN')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 303, in test_container_probe_missing_curl_or_bad_protocol_cannot_mean_recovery
+    with self.assertRaises(self.mod.BuildRefused) as caught:self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT')
+                                                            ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/maintenance/canonical_fuseki.py", line 597, in short_reproduce
+    result=subprocess.run(args,capture_output=True,text=True,timeout=6)
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1169, in __call__
+    return self._mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1173, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1240, in _execute_mock_call
+    result = effect(*args, **kwargs)
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 234, in run
+    raise AssertionError('Only local Docker probe operations are permitted: '+str(args[:3]))
+AssertionError: Only local Docker probe operations are permitted: ['curl', '--head', '--fail']
+
+======================================================================
+FAIL: test_container_probe_requires_verified_auto_removal_even_after_head_success (__main__.FusekiCacheTests.test_container_probe_requires_verified_auto_removal_even_after_head_success)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 310, in test_container_probe_requires_verified_auto_removal_even_after_head_success
+    with self.assertRaises(self.mod.BuildRefused) as caught:self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT')
+                                                            ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/maintenance/canonical_fuseki.py", line 597, in short_reproduce
+    result=subprocess.run(args,capture_output=True,text=True,timeout=6)
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1169, in __call__
+    return self._mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1173, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1240, in _execute_mock_call
+    result = effect(*args, **kwargs)
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 234, in run
+    raise AssertionError('Only local Docker probe operations are permitted: '+str(args[:3]))
+AssertionError: Only local Docker probe operations are permitted: ['curl', '--head', '--fail']
+
+======================================================================
+FAIL: test_mixed_source_failures_reproduce_terminal_category (__main__.FusekiCacheTests.test_mixed_source_failures_reproduce_terminal_category)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 240, in test_mixed_source_failures_reproduce_terminal_category
+    self.assertEqual(self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT'),('network','NETWORK_TIMEOUT'))
+                     ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/maintenance/canonical_fuseki.py", line 597, in short_reproduce
+    result=subprocess.run(args,capture_output=True,text=True,timeout=6)
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1169, in __call__
+    return self._mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1173, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1240, in _execute_mock_call
+    result = effect(*args, **kwargs)
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 234, in run
+    raise AssertionError('Only local Docker probe operations are permitted: '+str(args[:3]))
+AssertionError: Only local Docker probe operations are permitted: ['curl', '--head', '--fail']
+
+======================================================================
+FAIL: test_short_network_probe_is_only_fixed_https_heads_and_total_bounded (__main__.FusekiCacheTests.test_short_network_probe_is_only_fixed_https_heads_and_total_bounded)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 482, in test_short_network_probe_is_only_fixed_https_heads_and_total_bounded
+    result=self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT')
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/maintenance/canonical_fuseki.py", line 597, in short_reproduce
+    result=subprocess.run(args,capture_output=True,text=True,timeout=6)
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1169, in __call__
+    return self._mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1173, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1240, in _execute_mock_call
+    result = effect(*args, **kwargs)
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 234, in run
+    raise AssertionError('Only local Docker probe operations are permitted: '+str(args[:3]))
+AssertionError: Only local Docker probe operations are permitted: ['curl', '--head', '--fail']
+
+----------------------------------------------------------------------
+Ran 46 tests in 0.078s
+
+FAILED (failures=11, errors=4)

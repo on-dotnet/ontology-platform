@@ -26,6 +26,7 @@ ROOT = Path(__file__).resolve().parents[2]
 JENA_VERSION = '6.2.0'
 JENA_SHA512 = 'ba65f5867d2d4741b2ed9e2af5a0d4fbb447909894ab2a0c6bc4dac8997f4fe339c87b13c48d45d054977769f0f8bf763ea346b1f7792d5cdc458041bd43a132'
 BASE_DIGEST = 'sha256:affcab5356e1270ac35d2361ee83135af2f03e8d580eca78a6d5d6fdbf048db0'
+BASE_IMAGE = 'eclipse-temurin:21.0.12.1_1-jre-jammy@'+BASE_DIGEST
 OFFICIAL_URLS = ('https://dlcdn.apache.org/jena/binaries/apache-jena-fuseki-6.2.0.tar.gz',
                  'https://archive.apache.org/dist/jena/binaries/apache-jena-fuseki-6.2.0.tar.gz')
 CONTEXT_FILES = frozenset(('.dockerignore','Dockerfile','entrypoint.sh','fetch-fuseki.sh','g2-config.ttl','g2-log4j2.properties'))
@@ -71,7 +72,7 @@ def output_fingerprint(value):
 def safe_command(arguments):
     """Only fixed executable/operation labels survive; no caller values are logged."""
     for prefix in (['docker','image','inspect'], ['docker','build'], ['docker','load'], ['docker','save'],
-                   ['docker','info'], ['docker','buildx','version']):
+                   ['docker','info'], ['docker','buildx','version'], ['docker','run'], ['docker','container','inspect']):
         if arguments[:len(prefix)] == prefix:
             result = prefix + ['[canonical arguments withheld]']
             if prefix == ['docker','image','inspect'] and re.fullmatch(REPOSITORY+r':context-'+HEX64, arguments[-1]):
@@ -622,34 +623,124 @@ def save_failure_state(directory, expected, failure, run_id, head):
     atomic_json(directory/'failure.json',state)
 
 
-def short_reproduce(context, stage, category):
-    """At most two fixed HTTPS HEAD requests (5s each); never download a package."""
+PROBE_SCRIPT = """for url in "$@"; do
+    curl --head --fail --silent --show-error --location --proto '=https' --proto-redir '=https' --max-redirs 3 --connect-timeout 5 --max-time 5 --retry 0 "$url" >/dev/null 2>/dev/null
+    code=$?
+    printf 'CANONICAL_PROBE_EXIT %s\\n' "$code"
+    if [ "$code" -eq 0 ]; then exit 0; fi
+done
+exit 1
+"""
+
+
+def container_network_probe(task_id, run_id, platform=None):
+    """Probe fixed origins in the already-local pinned base; never pull/build/delete."""
+    started=time.monotonic()
+    # Reserve one second for Python/process teardown within the public 20s bound.
+    deadline=started+19
+    run_id=run_id or 'probe-'+uuid.uuid4().hex
+    if not all(isinstance(value,str) and re.fullmatch(SAFE_ID,value) for value in (task_id,run_id)):
+        raise BuildRefused('Invalid probe owner',category='PROBE_IDENTITY_INVALID',exit_code=2)
+    name='ontology-fuseki-probe-'+uuid.uuid4().hex
+    receipt=dict(schemaVersion=1,scope='container',taskId=task_id,runId=run_id,containerName=name,
+                 baseImage=BASE_IMAGE,platform=platform,runAttempted=False,autoRemoveRequested=True,
+                 autoRemoval='NOT_RUN',sourceExitCodes=[],budgetSeconds=20,outcome='BLOCKED')
+
+    def command(args, cap, reserve=0):
+        timeout=min(cap,deadline-time.monotonic()-reserve)
+        if timeout<=0:
+            raise BuildRefused('Container probe deadline exhausted',category='PROBE_DOCKER_TIMEOUT',exit_code=2)
+        begin=time.monotonic()
+        try:
+            result=subprocess.run(args,capture_output=True,text=True,timeout=timeout)
+            result.safe_diagnostic=command_diagnostic(args,result.returncode,time.monotonic()-begin,result.stdout,result.stderr)
+            result.safe_diagnostic['timeoutSeconds']=round(timeout,3)
+            return result
+        except subprocess.TimeoutExpired as failure:
+            diagnostic=command_diagnostic(args,'TIMEOUT',time.monotonic()-begin,failure.stdout,failure.stderr)
+            diagnostic['timeoutSeconds']=round(timeout,3)
+            raise BuildRefused('Container probe Docker command timed out',diagnostic,category='PROBE_DOCKER_TIMEOUT',exit_code=2) from None
+        except OSError:
+            raise BuildRefused('Container probe Docker command unavailable',category='PROBE_DOCKER_UNAVAILABLE',exit_code=2) from None
+
+    try:
+        args=['docker','image','inspect','--format','{"Id":{{json .Id}},"RepoDigests":{{json .RepoDigests}},"Os":{{json .Os}},"Architecture":{{json .Architecture}}}',BASE_IMAGE]
+        base=command(args,3)
+        if base.returncode:
+            raise BuildRefused('Pinned probe base is not locally available',failure_diagnostic(base,args),category='PROBE_BASE_UNAVAILABLE',exit_code=2)
+        try:
+            image=strict_json(base.stdout)
+            actual=normalized_platform(image['Os'],image['Architecture'])
+            if (not re.fullmatch(r'sha256:'+HEX64,image['Id']) or not isinstance(image['RepoDigests'],list) or
+                not any(value in ('eclipse-temurin@'+BASE_DIGEST,'docker.io/library/eclipse-temurin@'+BASE_DIGEST) for value in image['RepoDigests'])):
+                raise ValueError()
+        except (ValueError,TypeError,KeyError,BuildRefused):
+            raise BuildRefused('Pinned probe base identity unavailable',failure_diagnostic(base,args),category='PROBE_BASE_IDENTITY_INVALID',exit_code=2) from None
+        if platform is not None and platform!=actual:
+            raise BuildRefused('Pinned probe base platform unavailable',category='PROBE_BASE_PLATFORM_MISMATCH',exit_code=2)
+        platform=platform or actual
+        receipt['platform']=platform
+        receipt['baseImageId']=image['Id']
+        args=['docker','run','--rm','--pull=never','--read-only','--cap-drop=ALL','--security-opt=no-new-privileges',
+              '--network=bridge','--name',name,'--platform',platform,
+              '--label','io.ontology-platform.project=ontology-platform',
+              '--label','io.ontology-platform.task-id='+task_id,'--label','io.ontology-platform.run-id='+run_id,
+              '--entrypoint','/bin/sh',BASE_IMAGE,'-c',PROBE_SCRIPT,'canonical-probe',*OFFICIAL_URLS]
+        receipt['runAttempted']=True
+        pending=None
+        try:
+            result=command(args,14,reserve=3)
+        except BuildRefused as failure:
+            pending=failure
+        # --rm is requested, but only an exact no-such-container result proves removal.
+        inspect=['docker','container','inspect','--format','{{json .Id}}',name]
+        try:
+            removed=command(inspect,3)
+            absent=removed.returncode==1 and not removed.stdout.strip() and removed.stderr.strip() in (
+                'Error: No such container: '+name,'Error response from daemon: No such container: '+name)
+            receipt['autoRemoval']='VERIFIED_REMOVED' if absent else 'CONTAINER_REMAINS' if removed.returncode==0 else 'NOT_VERIFIED'
+        except BuildRefused as failure:
+            receipt['autoRemoval']='NOT_VERIFIED'
+            pending=pending or failure
+        if pending:raise pending
+        if receipt['autoRemoval']!='VERIFIED_REMOVED':
+            raise BuildRefused('Probe auto-removal could not be verified; retain exact resource identity',category='PROBE_CLEANUP_UNVERIFIED',exit_code=2)
+        if result.returncode not in (0,1):
+            raise BuildRefused('Container probe Docker run failed',failure_diagnostic(result,args),category='PROBE_DOCKER_FAILURE',exit_code=2)
+        lines=result.stdout.splitlines()
+        if not 1<=len(lines)<=2 or any(not re.fullmatch(r'CANONICAL_PROBE_EXIT [0-9]{1,3}',line) for line in lines):
+            raise BuildRefused('Container probe result schema refused',failure_diagnostic(result,args),category='PROBE_PROTOCOL_INVALID',exit_code=2)
+        codes=[int(line.split(' ')[1]) for line in lines]
+        if (any(code not in (0,5,6,7,22,28,35,47,52,55,56,60,77,92) for code in codes) or
+            (result.returncode==0 and (codes[-1]!=0 or 0 in codes[:-1])) or
+            (result.returncode==1 and (len(codes)!=2 or 0 in codes))):
+            raise BuildRefused('Container probe source results refused',failure_diagnostic(result,args),category='PROBE_PROTOCOL_INVALID',exit_code=2)
+        receipt['sourceExitCodes']=codes
+        receipt['outcome']='RECOVERED' if result.returncode==0 else 'REPRODUCED'
+        receipt['errorCategory']=None if result.returncode==0 else 'NETWORK_TIMEOUT' if codes[-1]==28 else 'DOWNLOAD_HTTP_FAILURE' if codes[-1]==22 else 'NETWORK_CONNECT'
+        receipt['durationMs']=round((time.monotonic()-started)*1000)
+        return receipt
+    except BuildRefused as failure:
+        receipt.update(durationMs=round((time.monotonic()-started)*1000),errorCategory=failure.category)
+        failure.diagnostic=dict(failure.diagnostic or {},probe=receipt)
+        raise
+
+
+def short_reproduce(context, stage, category, task_id='DEVELOPMENT', run_id=None, platform=None, probe_receipts=None):
+    """At most two fixed 5s HEADs inside the pinned local base, within a 20s budget."""
     try:
         preflight_context(context)
     except BuildRefused as failure:
         return failure.stage,failure.category
     if stage!='network':
         return None
-    failures=[]
-    deadline=time.monotonic()+20
-    for url in OFFICIAL_URLS:
-        if time.monotonic()+6>deadline:break
-        args=['curl','--head','--fail','--silent','--show-error','--location','--proto','=https','--proto-redir','=https',
-              '--max-redirs','3','--connect-timeout','5','--max-time','5','--retry','0',url]
-        try:
-            result=subprocess.run(args,capture_output=True,text=True,timeout=6)
-            if not result.returncode:return None
-            failures.append('NETWORK_TIMEOUT' if result.returncode==28 else 'DOWNLOAD_HTTP_FAILURE' if result.returncode==22 else 'NETWORK_CONNECT')
-        except subprocess.TimeoutExpired:
-            failures.append('NETWORK_TIMEOUT')
-        except OSError:
-            return 'image preparation','PERMISSION_DENIED'
-    if len(failures)==2:
-        return 'network',failures[-1]
+    receipt=container_network_probe(task_id,run_id,platform)
+    if probe_receipts is not None:probe_receipts.append(receipt)
+    if receipt['outcome']=='REPRODUCED':return 'network',receipt['errorCategory']
     return None
 
 
-def failure_gate(directory, expected, context, final_gate=False):
+def failure_gate(directory, expected, context, final_gate=False, task_id='DEVELOPMENT', run_id=None):
     if final_gate:return
     path=Path(directory)/'failure.json'
     if not path.exists() and not path.is_symlink():return
@@ -669,8 +760,11 @@ def failure_gate(directory, expected, context, final_gate=False):
         if any(state[key]!=expected[key] for key in ('inputFingerprint','envFingerprint')):return
     except (OSError,ValueError,KeyError,TypeError,AttributeError,BuildRefused):
         raise BuildRefused('Failure-state schema refused',category='FAILURE_STATE_INVALID') from None
-    if short_reproduce(context,state['stage'],state['category'])==(state['stage'],state['category']):
-        raise BuildRefused('Repeated failure confirmed within short budget; expensive build blocked',category=state['category'],stage=state['stage'],exit_code=2)
+    probes=[]
+    if short_reproduce(context,state['stage'],state['category'],task_id,run_id,expected['platform'],probes)==(state['stage'],state['category']):
+        diagnostic={'probe':probes[-1]} if probes else None
+        raise BuildRefused('Repeated failure confirmed within short budget; expensive build blocked',diagnostic,category=state['category'],stage=state['stage'],exit_code=2)
+    return probes[-1] if probes else None
 
 
 def ordinary_directory(root, segments):
@@ -721,9 +815,11 @@ def build(task_id, run_id, platform=None, restore_directory=None, export_directo
         context=ROOT / 'infra/development/fuseki'
         preflight_context(context)
         restored=restore_cache(restore_directory,expected) if restore_directory else dict(outcome='NOT_RUN',stages=[])
+        probe=None
         if restored['outcome']!='HIT' and failure_directory:
-            failure_gate(failure_directory,expected,context,final_gate)
+            probe=failure_gate(failure_directory,expected,context,final_gate,task_id,run_id)
         result=ensure_image(context,task_id,run_id,expected)
+        if probe:result['failureProbe']=probe
         result['cacheOutcome']=restored['outcome']
         result['stages']=restored['stages']+result['stages']
         result['restored']=restored['outcome']=='HIT'

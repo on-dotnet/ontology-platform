@@ -218,9 +218,14 @@ class FusekiCacheTests(unittest.TestCase):
         identity,calls,built,invoke=self.build_fixture()
         failures=self.root/'failures'
         self.mod.save_failure_state(failures,identity,self.mod.BuildRefused('timeout',category='NETWORK_TIMEOUT'),'earlier','a'*40)
-        with patch.object(self.mod,'invoke',side_effect=invoke),patch.object(self.mod.subprocess,'run',return_value=subprocess.CompletedProcess([],28,'','timeout')):
+        probe_calls,probe_run=self.probe_transport()
+        with patch.object(self.mod,'invoke',side_effect=invoke),patch.object(self.mod.subprocess,'run',side_effect=probe_run):
             with self.assertRaises(self.mod.BuildRefused) as caught:self.mod.build('G3-M3-001','blocked',failure_directory=failures)
         self.assertEqual(caught.exception.exit_code,2)
+        self.assertEqual(caught.exception.category,'NETWORK_TIMEOUT')
+        self.assertEqual(caught.exception.diagnostic['probe']['taskId'],'G3-M3-001')
+        self.assertEqual(caught.exception.diagnostic['probe']['runId'],'blocked')
+        self.assertEqual(caught.exception.diagnostic['probe']['autoRemoval'],'VERIFIED_REMOVED')
         self.assertFalse(built)
         self.assertFalse(any(args[0]=='docker' for args in calls))
 
@@ -240,10 +245,150 @@ class FusekiCacheTests(unittest.TestCase):
         self.assertEqual(len(stages),1)
         self.assertEqual(stages[0]['durationMs'],101)
 
+    def probe_transport(self, codes=(28,28), base_exit=0, run_exit=None, fault=None, output=None, remains=False, architecture='amd64'):
+        calls=[]
+        def run(args,**kw):
+            calls.append((args,kw))
+            if args[:3]==['docker','image','inspect']:
+                if fault=='base-timeout':raise subprocess.TimeoutExpired(args,kw['timeout'])
+                if fault=='unavailable':raise OSError('SYNTHETIC_PRIVATE_PATH')
+                image=dict(Id='sha256:'+'b'*64,RepoDigests=['eclipse-temurin@'+self.mod.BASE_DIGEST],Os='linux',Architecture=architecture)
+                return subprocess.CompletedProcess(args,base_exit,json.dumps(image) if not base_exit else '','missing base')
+            if args[:2]==['docker','run']:
+                if fault=='run-timeout':raise subprocess.TimeoutExpired(args,kw['timeout'],stderr='SYNTHETIC_PRIVATE_TOKEN')
+                text=output if output is not None else ''.join('CANONICAL_PROBE_EXIT '+str(code)+'\n' for code in codes)
+                return subprocess.CompletedProcess(args,run_exit if run_exit is not None else (0 if codes[-1]==0 else 1),text,'SYNTHETIC_PRIVATE_TOKEN')
+            if args[:3]==['docker','container','inspect']:
+                return subprocess.CompletedProcess(args,0 if remains else 1,'"sha256:'+('c'*64)+'"' if remains else '',
+                                                   '' if remains else 'Error: No such container: '+args[-1])
+            raise AssertionError('Only local Docker probe operations are permitted: '+str(args[:3]))
+        return calls,run
+
     def test_mixed_source_failures_reproduce_terminal_category(self):
-        responses=[subprocess.CompletedProcess([],22,'','http failure'),subprocess.CompletedProcess([],28,'','timeout')]
-        with patch.object(self.mod.subprocess,'run',side_effect=responses):
+        calls,run=self.probe_transport(codes=(22,28))
+        with patch.object(self.mod.subprocess,'run',side_effect=run):
             self.assertEqual(self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT'),('network','NETWORK_TIMEOUT'))
+
+    def test_actual_container_shell_head_protocol_handles_success_and_two_failures(self):
+        binary=self.root/'probe-bin';binary.mkdir();curl=binary/'curl';calls=self.root/'probe-calls.jsonl'
+        curl.write_text('#!'+sys.executable+'\nimport json,os,sys\nfrom pathlib import Path\n'+
+                       'p=Path(os.environ["PROBE_CALLS"]);n=len(p.read_text().splitlines()) if p.exists() else 0\n'+
+                       'with p.open("a") as f:f.write(json.dumps(sys.argv[1:])+"\\n")\n'+
+                       'sys.exit(json.loads(os.environ["PROBE_CODES"])[n])\n')
+        curl.chmod(0o755)
+        for codes,exit_code in [([0],0),([22,0],0),([28,28],1)]:
+            with self.subTest(codes=codes):
+                calls.unlink(missing_ok=True)
+                result=subprocess.run(['/bin/sh','-c',self.mod.PROBE_SCRIPT,'canonical-probe',*self.mod.OFFICIAL_URLS],
+                                      env=dict(os.environ,PATH=str(binary)+os.pathsep+os.environ['PATH'],PROBE_CALLS=str(calls),PROBE_CODES=json.dumps(codes)),
+                                      capture_output=True,text=True,timeout=3)
+                self.assertEqual(result.returncode,exit_code)
+                self.assertEqual(result.stdout,''.join('CANONICAL_PROBE_EXIT '+str(code)+'\n' for code in codes))
+                recorded=[json.loads(line) for line in calls.read_text().splitlines()]
+                self.assertEqual([args[-1] for args in recorded],list(self.mod.OFFICIAL_URLS[:len(codes)]))
+                self.assertTrue(all('--head' in args and args[args.index('--max-time')+1]=='5' for args in recorded))
+
+    def test_container_recovery_receipt_is_retained_before_one_build(self):
+        identity,calls,built,invoke=self.build_fixture();failures=self.root/'failures'
+        self.mod.save_failure_state(failures,identity,self.mod.BuildRefused('timeout',category='NETWORK_TIMEOUT'),'earlier','a'*40)
+        probe_calls,probe_run=self.probe_transport(codes=(0,))
+        with patch.object(self.mod,'invoke',side_effect=invoke),patch.object(self.mod.subprocess,'run',side_effect=probe_run):
+            result=self.mod.build('G3-M3-001','recovered',failure_directory=failures)
+        self.assertEqual(len(built),1)
+        self.assertEqual(result['failureProbe']['outcome'],'RECOVERED')
+        self.assertEqual(result['failureProbe']['runId'],'recovered')
+        self.assertEqual(result['failureProbe']['autoRemoval'],'VERIFIED_REMOVED')
+
+    def test_container_network_failure_cannot_be_recovered_by_host_head(self):
+        calls,run=self.probe_transport();receipts=[]
+        with patch.object(self.mod.subprocess,'run',side_effect=run):
+            result=self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT',task_id='G3-M3-001',run_id='container-probe',platform='linux/amd64',probe_receipts=receipts)
+        self.assertEqual(result,('network','NETWORK_TIMEOUT'))
+        self.assertTrue(all(args[0]=='docker' for args,kw in calls))
+        self.assertEqual(receipts[0]['scope'],'container')
+        self.assertEqual(receipts[0]['autoRemoval'],'VERIFIED_REMOVED')
+        self.assertEqual(receipts[0]['sourceExitCodes'],[28,28])
+
+    def test_container_probe_hardening_labels_base_and_total_deadline(self):
+        calls,run=self.probe_transport();receipts=[]
+        with patch.object(self.mod.subprocess,'run',side_effect=run):
+            self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT',task_id='G3-M3-001',run_id='probe-123',platform='linux/amd64',probe_receipts=receipts)
+        args=next(args for args,kw in calls if args[:2]==['docker','run'])
+        for flag in ('--rm','--pull=never','--read-only','--cap-drop=ALL','--security-opt=no-new-privileges'):self.assertIn(flag,args)
+        self.assertIn('io.ontology-platform.task-id=G3-M3-001',args)
+        self.assertIn('io.ontology-platform.run-id=probe-123',args)
+        self.assertEqual(args[args.index('--platform')+1],'linux/amd64')
+        self.assertEqual(args[args.index('--name')+1],receipts[0]['containerName'])
+        self.assertIn('eclipse-temurin:21.0.12.1_1-jre-jammy@'+self.mod.BASE_DIGEST,args)
+        self.assertEqual(args[-2:],list(self.mod.OFFICIAL_URLS))
+        script=args[args.index('-c')+1]
+        for option in ('--head','--connect-timeout 5','--max-time 5','--retry 0','--max-redirs 3'):self.assertIn(option,script)
+        self.assertNotIn('--output',script)
+        self.assertLessEqual(sum(kw['timeout'] for args,kw in calls),20)
+        self.assertLessEqual(receipts[0]['durationMs'],20000)
+
+    def test_container_probe_missing_base_never_pulls_or_builds(self):
+        calls,run=self.probe_transport(base_exit=1)
+        with patch.object(self.mod.subprocess,'run',side_effect=run):
+            with self.assertRaises(self.mod.BuildRefused) as caught:self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT')
+        self.assertEqual(caught.exception.exit_code,2)
+        self.assertEqual(caught.exception.category,'PROBE_BASE_UNAVAILABLE')
+        self.assertEqual(len(calls),1)
+        self.assertFalse(caught.exception.diagnostic['probe']['runAttempted'])
+
+    def test_container_probe_docker_fault_is_blocked_instead_of_source_recovery(self):
+        calls,run=self.probe_transport(run_exit=125,output='')
+        with patch.object(self.mod.subprocess,'run',side_effect=run):
+            with self.assertRaises(self.mod.BuildRefused) as caught:self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT')
+        self.assertEqual(caught.exception.exit_code,2)
+        self.assertEqual(caught.exception.category,'PROBE_DOCKER_FAILURE')
+        self.assertEqual(caught.exception.diagnostic['probe']['autoRemoval'],'VERIFIED_REMOVED')
+        self.assertNotIn('SYNTHETIC_PRIVATE_TOKEN',json.dumps(caught.exception.diagnostic))
+
+    def test_container_probe_cli_timeouts_and_unavailability_are_not_recovery(self):
+        for fault in ('base-timeout','run-timeout','unavailable'):
+            with self.subTest(fault=fault):
+                calls,run=self.probe_transport(fault=fault)
+                with patch.object(self.mod.subprocess,'run',side_effect=run):
+                    with self.assertRaises(self.mod.BuildRefused) as caught:self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT')
+                self.assertEqual(caught.exception.exit_code,2)
+                self.assertIn(caught.exception.category,('PROBE_DOCKER_TIMEOUT','PROBE_DOCKER_UNAVAILABLE'))
+                self.assertNotIn('SYNTHETIC_PRIVATE',json.dumps(caught.exception.diagnostic))
+
+    def test_container_probe_missing_curl_or_bad_protocol_cannot_mean_recovery(self):
+        for codes,exit_code,output in [((127,127),1,None),((0,),0,''),((0,),0,'CANONICAL_PROBE_EXIT 0\nSYNTHETIC_PRIVATE_TOKEN')]:
+            with self.subTest(codes=codes,exit_code=exit_code,output=output):
+                calls,run=self.probe_transport(codes=codes,run_exit=exit_code,output=output)
+                with patch.object(self.mod.subprocess,'run',side_effect=run):
+                    with self.assertRaises(self.mod.BuildRefused) as caught:self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT')
+                self.assertEqual(caught.exception.exit_code,2)
+                self.assertEqual(caught.exception.category,'PROBE_PROTOCOL_INVALID')
+
+    def test_container_probe_requires_verified_auto_removal_even_after_head_success(self):
+        calls,run=self.probe_transport(codes=(0,),remains=True)
+        with patch.object(self.mod.subprocess,'run',side_effect=run):
+            with self.assertRaises(self.mod.BuildRefused) as caught:self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT')
+        self.assertEqual(caught.exception.exit_code,2)
+        self.assertEqual(caught.exception.category,'PROBE_CLEANUP_UNVERIFIED')
+        self.assertEqual(caught.exception.diagnostic['probe']['autoRemoval'],'CONTAINER_REMAINS')
+        self.assertFalse(any(args[:2]==['docker','rm'] for args,kw in calls))
+
+    def test_container_probe_platform_mismatch_is_not_network_recovery(self):
+        calls,run=self.probe_transport(architecture='arm64')
+        with patch.object(self.mod.subprocess,'run',side_effect=run):
+            with self.assertRaises(self.mod.BuildRefused) as caught:self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT',platform='linux/amd64')
+        self.assertEqual(caught.exception.exit_code,2)
+        self.assertEqual(caught.exception.category,'PROBE_BASE_PLATFORM_MISMATCH')
+        self.assertEqual(len(calls),1)
+
+    def test_container_probe_success_is_actual_container_head_and_auto_removal(self):
+        calls,run=self.probe_transport(codes=(22,0));receipts=[]
+        with patch.object(self.mod.subprocess,'run',side_effect=run):
+            result=self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT',probe_receipts=receipts)
+        self.assertIsNone(result)
+        self.assertEqual(receipts[0]['outcome'],'RECOVERED')
+        self.assertEqual(receipts[0]['autoRemoval'],'VERIFIED_REMOVED')
+        self.assertEqual(receipts[0]['sourceExitCodes'],[22,0])
 
     def test_export_does_not_overwrite_nonempty_directory(self):
         identity=self.identity();directory,receipt=self.archive(identity)
@@ -392,18 +537,12 @@ class FusekiCacheTests(unittest.TestCase):
         self.assertTrue(list(directory.iterdir()))
 
     def test_short_network_probe_is_only_fixed_https_heads_and_total_bounded(self):
-        self.identity();calls=[]
-        def call(args,**kw):
-            calls.append((args,kw));return subprocess.CompletedProcess(args,28,'','timeout')
-        with patch.object(self.mod.subprocess,'run',side_effect=call):
+        calls,run=self.probe_transport()
+        with patch.object(self.mod.subprocess,'run',side_effect=run):
             result=self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT')
         self.assertEqual(result,('network','NETWORK_TIMEOUT'))
-        self.assertEqual(len(calls),2)
-        for args,kw in calls:
-            self.assertIn('--head',args);self.assertIn(args[-1],self.mod.OFFICIAL_URLS)
-            self.assertLessEqual(kw['timeout'],6)
-            self.assertEqual(args[args.index('--max-time')+1],'5')
-            self.assertNotIn('--output',args)
+        self.assertEqual([args[:2] for args,kw in calls],[['docker','image'],['docker','run'],['docker','container']])
+        self.assertLessEqual(sum(kw['timeout'] for args,kw in calls),20)
 
     def test_cold_stage_markers_preserve_individual_durations_and_strip_raw_logs(self):
         identity=self.identity()
