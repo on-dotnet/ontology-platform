@@ -1,0 +1,33 @@
+
+ RUN  v5.0.5 /Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform/apps/web
+
+ ❯ src/features/ontology/vocabulary-model.test.ts (4 tests | 1 failed) 7ms
+   ❯ M3 四源词汇视图与精确编辑 (4)
+     × 同bundle但任一源hash、草稿、revision不符均拒绝旧快照 2ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/features/ontology/vocabulary-model.test.ts > M3 四源词汇视图与精确编辑 > 同bundle但任一源hash、草稿、revision不符均拒绝旧快照
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ src/features/ontology/vocabulary-model.test.ts:31:99
+     29|     const draft = { draftId: "draft", revision: 2, hashes } as Ontolog…
+     30|     expect(snapshotMatches(snapshot, draft)).toBe(true);
+     31|     expect(snapshotMatches({ ...snapshot, hashes: { bundleHash: "b" } …
+       |                                                                                                   ^
+     32|     expect(snapshotMatches({ ...snapshot, hashes: { ...hashes, ontolog…
+     33|     expect(snapshotMatches({ ...snapshot, revision: 1 }, draft)).toBe(…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 3 passed (4)
+   Start at  20:52:27
+   Duration  98ms (transform 41%, tests 34%, import 19%, worker 6%)

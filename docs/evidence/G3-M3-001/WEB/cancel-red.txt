@@ -1,0 +1,41 @@
+[WebServer] (node:50310) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:50320) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:50376) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 tests/g2/m3-vocabulary.spec.ts:21:3 › 1440词汇精确替换保留来源/语言，视图切换保留批次，409不丢队列 (5.7s)
+
+
+  1) tests/g2/m3-vocabulary.spec.ts:21:3 › 1440词汇精确替换保留来源/语言，视图切换保留批次，409不丢队列 ──────────────────────
+
+    Error: expect(locator).toBeEnabled() failed
+
+    Locator:  getByRole('button', { name: '取消待提交批次' })
+    Expected: enabled
+    Received: disabled
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toBeEnabled" getByRole('button', { name: '取消待提交批次' }) with timeout 5000ms
+      - waiting for getByRole('button', { name: '取消待提交批次' })
+        14 × locator resolved to <button disabled class="button">取消待提交批次</button>
+           - unexpected value "disabled"
+
+
+      47 |     await expect(page.getByRole("heading", { name: "待提交批次 1 / 64" })).toBeVisible();
+      48 |     await page.getByRole("textbox", { name: "变更理由", exact: true }).fill("");
+    > 49 |     await expect(page.getByRole("button", { name: "取消待提交批次" })).toBeEnabled();
+         |                                                                 ^
+      50 |     await page.getByRole("button", { name: "取消待提交批次" }).click();
+      51 |     await expect(page.getByRole("heading", { name: "待提交批次 0 / 64" })).toBeVisible();
+      52 |     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+        at /Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform/apps/web/tests/g2/m3-vocabulary.spec.ts:49:65
+
+    Error Context: artifacts/test-results/g2/m3-vocabulary-1440词汇精确替换保留来源-语言，视图切换保留批次，409不丢队列/error-context.md
+
+  1 failed
+    tests/g2/m3-vocabulary.spec.ts:21:3 › 1440词汇精确替换保留来源/语言，视图切换保留批次，409不丢队列 ───────────────────────

@@ -28,6 +28,7 @@ describe("M3 四源词汇视图与精确编辑", () => {
   it("同bundle但任一源hash、草稿、revision不符均拒绝旧快照", () => {
     const draft = { draftId: "draft", revision: 2, hashes } as OntologyDraft;
     expect(snapshotMatches(snapshot, draft)).toBe(true);
+    expect(snapshotMatches({ ...snapshot, hashes: { bundleHash: "b" } as typeof hashes }, draft)).toBe(false);
     expect(snapshotMatches({ ...snapshot, hashes: { ...hashes, ontologyHash: "changed" } }, draft)).toBe(false);
     expect(snapshotMatches({ ...snapshot, revision: 1 }, draft)).toBe(false);
     expect(snapshotMatches({ ...snapshot, draftId: "other" }, draft)).toBe(false);

@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { isValidElement, type ComponentProps, type ReactElement, type ReactNode } from "react";
-import type { OntologyDraft, SaveDraftRequest } from "../../lib/api/g2-generated";
+import type { OntologyDraft, SaveDraftRequest, VocabularySnapshot } from "../../lib/api/g2-generated";
 import type { PlatformIdentity } from "../../lib/api/generated";
 
 /** Node环境仅提供hook调度；不替换被测TSX的事件处理器或缓冲更新逻辑。 */
@@ -59,7 +59,7 @@ const hooks = vi.hoisted(() => {
   }
   return { Host, useState, useRef, useEffect };
 });
-const api = vi.hoisted(() => ({ drafts: vi.fn(), draft: vi.fn(), supportProfile: vi.fn(), saveDraft: vi.fn() }));
+const api = vi.hoisted(() => ({ drafts: vi.fn(), draft: vi.fn(), supportProfile: vi.fn(), saveDraft: vi.fn(), editVocabulary: vi.fn() }));
 vi.mock("react", async importOriginal => ({
   ...await importOriginal<typeof import("react")>(),
   useState: hooks.useState,
@@ -77,6 +77,7 @@ vi.mock("../../lib/api/g2-client", async importOriginal => ({
 
 import { OntologyWorkspace } from "./workspace";
 import { SourceEditor } from "./source-editor";
+import { VocabularyWorkbench } from "./vocabulary-workbench";
 
 type Element = ReactElement<Record<string, unknown>>;
 const hashes = { ontologyHash: "o", shapesHash: "s", vocabularyHash: null, dataHash: "d", bundleHash: "b" };
@@ -299,5 +300,28 @@ describe("实际TSX延迟文件导入不能覆盖后发用户操作", () => {
     pending.resolve("# unmounted read\n");
     await pending.done;
     expect(view.sourceProps().sources).toEqual(draft.sources);
+  });
+});
+
+/** 不替换实际工作区事件，明确重试必须重放同一命令而非制造第二个写入。 */
+describe("M3词汇提交幂等重试", () => {
+  it("相同四源/批次/理由的显式重试保留原Command，修改理由后才创建新命令", async () => {
+    api.editVocabulary.mockRejectedValue(new Error("bounded transport failure"));
+    const current = await workspace();
+    current.reason("Synthetic原子批次");
+    current.click("术语与单位");
+    const props = () => elements(current.render()).find(element => element.type === VocabularyWorkbench)!.props as ComponentProps<typeof VocabularyWorkbench>;
+    const snapshot: VocabularySnapshot = { draftId: draft.draftId, releaseId: null, manifestHash: null, revision: draft.revision,
+      hashes, profileVersion: "3", profileHash: "profile", triples: [], diagnostics: [] };
+    const changes = [{ sourceId: "ontology" as const, edit: { subjectIri: "urn:synthetic:a", predicateIri: "http://www.w3.org/2004/02/skos/core#prefLabel",
+      oldObject: null, newObject: { kind: "literal" as const, value: "温度", language: "zh", datatype: null } } }];
+    props().onCommit(changes, snapshot); await settle();
+    props().onCommit(changes, snapshot); await settle();
+    expect(api.editVocabulary).toHaveBeenCalledTimes(2);
+    expect(api.editVocabulary.mock.calls[1][1]).toEqual(api.editVocabulary.mock.calls[0][1]);
+    current.reason("Synthetic理由修改");
+    props().onCommit(changes, snapshot); await settle();
+    expect(api.editVocabulary.mock.calls[2][1].command.commandId).not.toBe(api.editVocabulary.mock.calls[0][1].command.commandId);
+    current.unmount();
   });
 });

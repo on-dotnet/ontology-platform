@@ -58,7 +58,8 @@ export function vocabularyChange(row: VocabularySourceTriple, next: RdfTerm | nu
 
 /** 四源hash都必须绑定同一草稿修订，不能只信bundle或后到响应。 */
 export function sameHashes(left: SourceHashes, right: SourceHashes) {
-  return (Object.keys(left) as (keyof SourceHashes)[]).every(key => left[key] === right[key]);
+  const keys: (keyof SourceHashes)[] = ["ontologyHash", "shapesHash", "vocabularyHash", "dataHash", "bundleHash"];
+  return keys.every(key => (typeof left[key] === "string" || key === "vocabularyHash" && left[key] === null) && left[key] === right[key]);
 }
 export function snapshotMatches(snapshot: VocabularySnapshot, draft: OntologyDraft) {
   return snapshot.draftId === draft.draftId && snapshot.releaseId === null && snapshot.manifestHash === null

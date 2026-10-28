@@ -57,9 +57,10 @@ export function VocabularyReadView({ snapshot, selected, onSelect }: {
 }
 
 /** 单批最多64项；旧值和源不可脱离服务快照，排队后仍需明确提交。 */
-export function VocabularyEditForm({ snapshot, selected, blocked, onCommit, onPending }: {
+export function VocabularyEditForm({ snapshot, selected, blocked, onCommit, onPending, busy = false }: {
   snapshot: VocabularySnapshot; selected: string; blocked: string | null; onCommit: (changes: VocabularyChange[]) => void;
   onPending?: (pending: boolean) => void;
+  busy?: boolean;
 }) {
   const [source, setSource] = useState<VocabularyEditSource>("vocabulary");
   const [subject, setSubject] = useState(selected);
@@ -151,10 +152,10 @@ export function VocabularyEditForm({ snapshot, selected, blocked, onCommit, onPe
     {queue.map((change, index) => <article className="g2-notice" key={index}>
       <p className="g2-hash">{change.sourceId} · {change.edit.subjectIri} · {change.edit.predicateIri}</p>
       <p>{change.edit.oldObject ? termText(change.edit.oldObject) : "新增"} → {change.edit.newObject ? termText(change.edit.newObject) : "删除"}</p>
-      <button className="text-button" disabled={disabled} onClick={() => setQueue(items => items.filter((_, row) => row !== index))}>移除此变更 {index + 1}</button>
+      <button className="text-button" disabled={busy} onClick={() => setQueue(items => items.filter((_, row) => row !== index))}>移除此变更 {index + 1}</button>
     </article>)}
     <div className="g2-row"><button className="button primary" disabled={disabled || queue.length === 0} onClick={() => onCommit(queue)}>批量原子提交</button>
-      <button className="button" disabled={disabled || queue.length === 0} onClick={() => { setQueue([]); setMessage("已取消待提交批次，服务端草稿未改变。"); }}>取消待提交批次</button></div>
+      <button className="button" disabled={busy || queue.length === 0} onClick={() => { setQueue([]); setMessage("已取消待提交批次，服务端草稿未改变。"); }}>取消待提交批次</button></div>
     <p className="muted">四源 hash + revision CAS；不丢弃未知 RDF。提交后需重新评估，再经发布工作区异人审批。</p>
   </section>;
 }
@@ -190,7 +191,7 @@ export function VocabularyWorkbench({ draft, selected, onSelect, dirty, busy, ca
     {!snapshot ? <p role="status">{load.loading ? "正在读取真实四源词汇快照…" : "快照不可用；源码仍保留，请刷新重试。"}</p> : <>
       {dirty && <p className="g2-notice">当前源码未保存，以下快照对应已保存修订；结构编辑已暂停。</p>}
       <VocabularyReadView snapshot={snapshot} selected={selected} onSelect={onSelect} />
-      <VocabularyEditForm key={`${draft.draftId}/${draft.revision}`} snapshot={snapshot} selected={selected} blocked={blocked} onPending={onPending} onCommit={changes => onCommit(changes, snapshot)} />
+      <VocabularyEditForm key={`${draft.draftId}/${draft.revision}`} snapshot={snapshot} selected={selected} blocked={blocked} onPending={onPending} busy={busy} onCommit={changes => onCommit(changes, snapshot)} />
       <h3>词汇治理诊断</h3>
       {snapshot.diagnostics.length === 0 ? <p>快照暂无词汇诊断。发布资格仍须运行完整真实评估。</p> : snapshot.diagnostics.map((item, index) => <DiagnosticCard key={index} item={item} draft={draft} dirty={dirty} index={index} onLocate={onLocate} />)}
       <p><a href="/releases">前往发布与异人审批</a> · 历史差异使用右侧版本比较。</p>

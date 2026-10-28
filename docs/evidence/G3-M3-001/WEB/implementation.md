@@ -41,3 +41,10 @@ Base=a1b719d；分支 codex/g3-m3-web；独立托管树 g3-m3-web。状态切片
 ## 保留与停止
 
 没有新Docker/付费/第三方资产；复用的.tools缓存与node_modules仅本树开发依赖，保留至集成验证完成再按Master白名单回收。原G2资源、私有runtime/PFX、全局配置均未读取或修改。只交M3+E0-B候选，不自动进下关口。
+
+## 后续自审修复（2026-10-28）
+
+- 本地队列取消不应被空理由/失去写权限阻断：新增浏览器断言先真实FAIL，修复取消/本地移除仅在命令busy时锁定；1440/390均PASS。cancel-red/green.txt保留。
+- 网络失败后的相同批次显式再次提交复用原Command与幂等键；更改理由或任何载荷后才创建新命令。实际workspace事件测试先FAIL再PASS，含原13项文件导入竞态。retry-red/green.txt保留。
+- 缺少单源hash的响应不能仅凭bundleHash匹配：新增断言先FAIL，固定检查全部5项hash，完整149项Vitest通过。hashes-red.txt保留。
+- 最终源码验证：lint exit0、typecheck exit0、16文件149项Vitest、Next production build exit0、新增3项有界浏览器4.7秒PASS。tests-final/build-final/browser-final.txt保留；此为后续修复后的最新结果。

@@ -2,7 +2,7 @@
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import type { PlatformIdentity } from "../../lib/api/generated";
-import type { OntologyDraft, SemanticSupportProfile, SourceBundle, SaveDraftRequest, DraftDiff, VocabularyChange, VocabularySnapshot } from "../../lib/api/g2-generated";
+import type { OntologyDraft, SemanticSupportProfile, SourceBundle, SaveDraftRequest, DraftDiff, VocabularyChange, VocabularySnapshot, VocabularyEditsRequest } from "../../lib/api/g2-generated";
 import { command, createG2Client } from "../../lib/api/g2-client";
 import { SemanticError } from "../../components/ui/semantic-feedback";
 import { draftState, isDirty, isNewDraftDirty, updateSource, type DraftState } from "./draft-state";
@@ -56,6 +56,7 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
   const [profileFailed, setProfileFailed] = useState(false);
   const [reason, setReason] = useState("");
   const [retry, setRetry] = useState<SaveDraftRequest | null>(null);
+  const vocabularyRetry = useRef<{ signature: string; request: VocabularyEditsRequest } | null>(null);
   const lifetime = useRef<AbortController | null>(null);
   const sourceImports = useRef(new SourceImportSession());
   const dirty = state ? isDirty(state) : isNewDraftDirty(name, sources);
@@ -143,6 +144,7 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
     setDrafts(items => [draft, ...(items ?? []).filter(item => item.draftId !== draft.draftId)]);
     setSelected("");
     setVocabularyPending(false);
+    vocabularyRetry.current = null;
   }
 
   /** dirty草稿切换需显式丢弃，避免覆盖本地权威源缓冲。 */
@@ -279,7 +281,10 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
             onCommit={(changes: VocabularyChange[], snapshot: VocabularySnapshot) => void execute(async signal => {
               if (dirty || !snapshotMatches(snapshot, state.draft)) throw new Error("词汇批次已过期，请先保存源码并刷新词汇快照。");
               const previousRevision = state.draft.revision;
-              const next = await client.editVocabulary(state.draft.draftId, { hashes: snapshot.hashes, changes, command: command(previousRevision, reason) }, signal);
+              const signature = JSON.stringify({ draftId: state.draft.draftId, revision: previousRevision, hashes: snapshot.hashes, changes, reason });
+              if (vocabularyRetry.current?.signature !== signature) vocabularyRetry.current = { signature,
+                request: { hashes: snapshot.hashes, changes, command: command(previousRevision, reason) } };
+              const next = await client.editVocabulary(state.draft.draftId, vocabularyRetry.current.request, signal);
               if (signal.aborted) return;
               accept(next);
               setSelected(selected);

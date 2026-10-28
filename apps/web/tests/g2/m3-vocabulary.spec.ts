@@ -45,6 +45,8 @@ for (const width of [1440, 390]) {
     expect(body?.changes[0].sourceId).toBe("ontology");
     expect(body?.changes[0].edit.oldObject?.language).toBe("ZH");
     await expect(page.getByRole("heading", { name: "待提交批次 1 / 64" })).toBeVisible();
+    await page.getByRole("textbox", { name: "变更理由", exact: true }).fill("");
+    await expect(page.getByRole("button", { name: "取消待提交批次" })).toBeEnabled();
     await page.getByRole("button", { name: "取消待提交批次" }).click();
     await expect(page.getByRole("heading", { name: "待提交批次 0 / 64" })).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);

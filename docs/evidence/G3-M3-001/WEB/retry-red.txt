@@ -1,0 +1,47 @@
+
+ RUN  v5.0.5 /Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform/apps/web
+
+ ❯ src/features/ontology/source-import-race.test.ts (14 tests | 1 failed) 66ms
+   ❯ M3词汇提交幂等重试 (1)
+     × 相同四源/批次/理由的显式重试保留原Command，修改理由后才创建新命令 8ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/features/ontology/source-import-race.test.ts > M3词汇提交幂等重试 > 相同四源/批次/理由的显式重试保留原Command，修改理由后才创建新命令
+AssertionError: expected { hashes: { …(5) }, …(2) } to deeply equal { hashes: { …(5) }, …(2) }
+
+- Expected
++ Received
+
+@@ -14,13 +14,13 @@
+        },
+        "sourceId": "ontology",
+      },
+    ],
+    "command": {
+-     "commandId": "e719efae-789e-4c48-b1a9-18f9acee0ad3",
++     "commandId": "4454279f-cf70-43c4-a5a9-ed0e27ed5244",
+      "expectedRevision": 1,
+-     "idempotencyKey": "0b76a864-24cb-4eda-a547-8fc2bef5d052",
++     "idempotencyKey": "8850fcb9-f90d-4c29-a7d4-405b4233b260",
+      "reason": "Synthetic原子批次",
+    },
+    "hashes": {
+      "bundleHash": "b",
+      "dataHash": "d",
+
+ ❯ src/features/ontology/source-import-race.test.ts:321:49
+    319|     props().onCommit(changes, snapshot); await settle();
+    320|     expect(api.editVocabulary).toHaveBeenCalledTimes(2);
+    321|     expect(api.editVocabulary.mock.calls[1][1]).toEqual(api.editVocabu…
+       |                                                 ^
+    322|     current.reason("Synthetic理由修改");
+    323|     props().onCommit(changes, snapshot); await settle();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 13 passed (14)
+   Start at  20:51:33
+   Duration  163ms (tests 60%, transform 24%, import 15%, worker 1%)
