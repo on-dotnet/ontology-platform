@@ -1,0 +1,24 @@
+
+ RUN  v5.0.5 /Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform/apps/web
+
+ ❯ src/features/ontology/workspace-state.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/features/ontology/workspace-state.test.ts [ src/features/ontology/workspace-state.test.ts ]
+Error: Cannot find module './workspace-state' imported from /Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform/apps/web/src/features/ontology/workspace-state.test.ts
+ ❯ src/features/ontology/workspace-state.test.ts:2:1
+      1| import { describe, expect, it } from "vitest";
+      2| import { initialWorkspaceView, workspaceView, editAvailability } from …
+       | ^
+      3|
+      4| describe("E0-B 工作区状态合同", () => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  20:36:19
+   Duration  551ms (worker 97%, environment 3%)
+

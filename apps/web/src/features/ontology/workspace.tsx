@@ -1,6 +1,6 @@
 "use client";
 import dynamic from "next/dynamic";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import type { PlatformIdentity } from "../../lib/api/generated";
 import type { OntologyDraft, SemanticSupportProfile, SourceBundle, SaveDraftRequest, DraftDiff } from "../../lib/api/g2-generated";
 import { command, createG2Client } from "../../lib/api/g2-client";
@@ -13,6 +13,7 @@ import { SourceImportSession, type SourceImportHandle } from "./source-import";
 import { SupportProfile } from "./support-profile";
 import { AssessmentPanel } from "./assessment-panel";
 import { VersionComparison } from "./version-comparison";
+import { initialWorkspaceView, workspaceView } from "./workspace-state";
 import "./workspace.css";
 
 const client = createG2Client();
@@ -35,8 +36,11 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
   const [scopeIndex, setScopeIndex] = useState("0");
   const [extraSites, setExtraSites] = useState<string[]>([]);
   const [field, setField] = useState<keyof SourceBundle>("ontologyTurtle");
-  const [tab, setTab] = useState("catalog");
-  const [centerView, setCenterView] = useState("source");
+  const [view, dispatchView] = useReducer(workspaceView, initialWorkspaceView);
+  const { panel: tab, centerView, selected } = view;
+  const setTab = (panel: string) => dispatchView({ type: "panel", panel });
+  const setCenterView = (next: "source" | "graph") => dispatchView({ type: "view", view: next });
+  const setSelected = (iri: string) => dispatchView({ type: "select", iri });
   const [error, setError] = useState<unknown>(null);
   const [notice, setNotice] = useState("");
   const [loading, setLoading] = useState(true);
@@ -44,7 +48,6 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
   const [profile, setProfile] = useState<SemanticSupportProfile | null>(null);
   const [profileLoading, setProfileLoading] = useState(true);
   const [profileFailed, setProfileFailed] = useState(false);
-  const [selected, setSelected] = useState("");
   const [reason, setReason] = useState("");
   const [retry, setRetry] = useState<SaveDraftRequest | null>(null);
   const lifetime = useRef<AbortController | null>(null);
@@ -52,7 +55,7 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
   const dirty = state ? isDirty(state) : isNewDraftDirty(name, sources);
   const canEdit = identity.roles.includes("platform.operator");
   const selectedScope = identity.scopes[Number(scopeIndex)];
-  const chooseNode = useCallback((iri: string) => setSelected(iri), []);
+  const chooseNode = useCallback((iri: string) => dispatchView({ type: "select", iri }), []);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -142,7 +145,7 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
     }
     void execute(async signal => {
       accept(await client.draft(draft.draftId, signal));
-      setTab("source");
+      dispatchView({ type: "open" });
     });
   }
 
@@ -229,7 +232,7 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
             sourceImports.current.invalidate();
             setState(null);
             setRemote(null);
-            setTab("source");
+            dispatchView({ type: "new" });
           }}>新建 / 导入资产</button>
           {state && <EntityTree projection={state.draft.projection} selected={selected} onSelect={chooseNode} />}
         </aside>
