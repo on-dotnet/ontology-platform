@@ -1,0 +1,19 @@
+.....E.............
+======================================================================
+ERROR: test_real_dockerfile_extract_shell_emits_parseable_bounded_stage (__main__.CanonicalDownloadTests.test_real_dockerfile_extract_shell_emits_parseable_bounded_stage)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/CanonicalFuseki.Tests.py", line 234, in test_real_dockerfile_extract_shell_emits_parseable_bounded_stage
+    stages=[json.loads(line.split('CANONICAL_STAGE ',1)[1]) for line in result.stdout.splitlines() if line.startswith('CANONICAL_STAGE ')]
+            ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/json/__init__.py", line 352, in loads
+    return _default_decoder.decode(s)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/json/decoder.py", line 348, in decode
+    raise JSONDecodeError("Extra data", s, end)
+json.decoder.JSONDecodeError: Extra data: line 1 column 80 (char 79)
+
+----------------------------------------------------------------------
+Ran 19 tests in 3.834s
+
+FAILED (errors=1)

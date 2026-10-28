@@ -1,0 +1,49 @@
+.....F..F.........E.....F....
+======================================================================
+ERROR: test_real_engine_oci_manifest_id_is_valid_without_config_id_confusion (__main__.FusekiCacheTests.test_real_engine_oci_manifest_id_is_valid_without_config_id_confusion)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 107, in test_real_engine_oci_manifest_id_is_valid_without_config_id_confusion
+    self.assertEqual(self.mod.validate_archive(directory,identity)['imageId'],receipt['imageId'])
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/maintenance/canonical_fuseki.py", line 444, in validate_archive
+    raise BuildRefused('Cache archive validation refused',category='CACHE_INVALID',stage='cache restore') from None
+cache_canonical.BuildRefused: Cache archive validation refused
+
+======================================================================
+FAIL: test_copy_inputs_must_be_regular_files (__main__.FusekiCacheTests.test_copy_inputs_must_be_regular_files)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 141, in test_copy_inputs_must_be_regular_files
+    with self.assertRaises(self.mod.BuildRefused) as caught:self.mod.preflight_context(self.context)
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: BuildRefused not raised
+
+======================================================================
+FAIL: test_empty_cache_directory_is_a_miss (__main__.FusekiCacheTests.test_empty_cache_directory_is_a_miss)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 127, in test_empty_cache_directory_is_a_miss
+    self.assertEqual(self.mod.restore_cache(directory,self.identity())['outcome'],'MISS')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'CACHE_INVALID' != 'MISS'
+- CACHE_INVALID
++ MISS
+
+
+======================================================================
+FAIL: test_timeout_without_partial_output_is_classified_for_stop_loss (__main__.FusekiCacheTests.test_timeout_without_partial_output_is_classified_for_stop_loss)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 137, in test_timeout_without_partial_output_is_classified_for_stop_loss
+    self.assertEqual(caught.exception.category,'NETWORK_TIMEOUT')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'UNCLASSIFIED' != 'NETWORK_TIMEOUT'
+- UNCLASSIFIED
++ NETWORK_TIMEOUT
+
+
+----------------------------------------------------------------------
+Ran 29 tests in 0.126s
+
+FAILED (failures=3, errors=1)

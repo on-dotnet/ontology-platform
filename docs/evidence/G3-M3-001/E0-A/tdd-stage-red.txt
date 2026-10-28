@@ -1,0 +1,30 @@
+.EF...............
+======================================================================
+ERROR: test_checksum_failure_is_reported_without_network_fallback (__main__.CanonicalDownloadTests.test_checksum_failure_is_reported_without_network_fallback)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/CanonicalFuseki.Tests.py", line 221, in test_checksum_failure_is_reported_without_network_fallback
+    self.assertEqual(stages[-1]['errorCategory'],'CHECKSUM_MISMATCH')
+                     ~~~~~~^^^^
+IndexError: list index out of range
+
+======================================================================
+FAIL: test_download_reports_separate_actual_network_and_checksum_durations (__main__.CanonicalDownloadTests.test_download_reports_separate_actual_network_and_checksum_durations)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/CanonicalFuseki.Tests.py", line 214, in test_download_reports_separate_actual_network_and_checksum_durations
+    self.assertEqual([stage['stage'] for stage in stages],['network','checksum'])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [] != ['network', 'checksum']
+
+Second list contains 2 additional elements.
+First extra element 0:
+'network'
+
+- []
++ ['network', 'checksum']
+
+----------------------------------------------------------------------
+Ran 18 tests in 2.918s
+
+FAILED (failures=1, errors=1)

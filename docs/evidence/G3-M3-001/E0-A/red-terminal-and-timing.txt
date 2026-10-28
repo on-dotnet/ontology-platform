@@ -1,0 +1,50 @@
+................EF...F....F..........
+======================================================================
+ERROR: test_invalid_image_label_shape_is_refused (__main__.FusekiCacheTests.test_invalid_image_label_shape_is_refused)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 154, in test_invalid_image_label_shape_is_refused
+    with self.assertRaises(self.mod.BuildRefused):self.mod.validate_image(image,identity)
+                                                  ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/maintenance/canonical_fuseki.py", line 237, in validate_image
+    any(labels.get(key) != wanted for key,wanted in expected_labels(expected).items()) or
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/maintenance/canonical_fuseki.py", line 237, in <genexpr>
+    any(labels.get(key) != wanted for key,wanted in expected_labels(expected).items()) or
+        ^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'get'
+
+======================================================================
+FAIL: test_last_failed_marker_classifies_checksum_after_recovered_network (__main__.FusekiCacheTests.test_last_failed_marker_classifies_checksum_after_recovered_network)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 149, in test_last_failed_marker_classifies_checksum_after_recovered_network
+    self.assertEqual(self.mod.BuildRefused('failed',diagnostic).category,'CHECKSUM_MISMATCH')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'NETWORK_TIMEOUT' != 'CHECKSUM_MISMATCH'
+- NETWORK_TIMEOUT
++ CHECKSUM_MISMATCH
+
+
+======================================================================
+FAIL: test_mixed_source_failures_reproduce_terminal_category (__main__.FusekiCacheTests.test_mixed_source_failures_reproduce_terminal_category)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 221, in test_mixed_source_failures_reproduce_terminal_category
+    self.assertEqual(self.mod.short_reproduce(self.context,'network','NETWORK_TIMEOUT'),('network','NETWORK_TIMEOUT'))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: None != ('network', 'NETWORK_TIMEOUT')
+
+======================================================================
+FAIL: test_repeated_buildkit_failure_summary_does_not_duplicate_stage_duration (__main__.FusekiCacheTests.test_repeated_buildkit_failure_summary_does_not_duplicate_stage_duration)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 215, in test_repeated_buildkit_failure_summary_does_not_duplicate_stage_duration
+    self.assertEqual(len(stages),1)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: 2 != 1
+
+----------------------------------------------------------------------
+Ran 37 tests in 0.172s
+
+FAILED (failures=3, errors=1)

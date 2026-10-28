@@ -1,0 +1,233 @@
+FFFFFFFFFFFFFFFFFFFFF
+======================================================================
+FAIL: test_bad_archive_hash_is_refused_before_load (__main__.FusekiCacheTests.test_bad_archive_hash_is_refused_before_load)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 96, in test_bad_archive_hash_is_refused_before_load
+    identity=self.identity();directory,_=self.archive(identity)
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 38, in identity
+    self.assertTrue(hasattr(self.mod, 'identity'), 'identity interface is required before caching')
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : identity interface is required before caching
+
+======================================================================
+FAIL: test_cache_miss_does_not_load (__main__.FusekiCacheTests.test_cache_miss_does_not_load)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 138, in test_cache_miss_does_not_load
+    identity=self.identity()
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 38, in identity
+    self.assertTrue(hasattr(self.mod, 'identity'), 'identity interface is required before caching')
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : identity interface is required before caching
+
+======================================================================
+FAIL: test_changed_input_or_env_does_not_reuse_failure (__main__.FusekiCacheTests.test_changed_input_or_env_does_not_reuse_failure)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 190, in test_changed_input_or_env_does_not_reuse_failure
+    identity=self.identity();directory=self.root/'failures'
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 38, in identity
+    self.assertTrue(hasattr(self.mod, 'identity'), 'identity interface is required before caching')
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : identity interface is required before caching
+
+======================================================================
+FAIL: test_cold_stage_markers_preserve_individual_durations_and_strip_raw_logs (__main__.FusekiCacheTests.test_cold_stage_markers_preserve_individual_durations_and_strip_raw_logs)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 223, in test_cold_stage_markers_preserve_individual_durations_and_strip_raw_logs
+    identity=self.identity()
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 38, in identity
+    self.assertTrue(hasattr(self.mod, 'identity'), 'identity interface is required before caching')
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : identity interface is required before caching
+
+======================================================================
+FAIL: test_copy_cache_key_checksum_is_not_release_checksum_failure (__main__.FusekiCacheTests.test_copy_cache_key_checksum_is_not_release_checksum_failure)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 174, in test_copy_cache_key_checksum_is_not_release_checksum_failure
+    self.assertIn('COPY_INPUT_MISSING',diagnostic['errorCategories'])
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'COPY_INPUT_MISSING' not found in ['CHECKSUM_MISMATCH', 'BUILD_ERROR']
+
+======================================================================
+FAIL: test_corrupt_cache_falls_back_without_loading (__main__.FusekiCacheTests.test_corrupt_cache_falls_back_without_loading)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 129, in test_corrupt_cache_falls_back_without_loading
+    identity=self.identity();directory,_=self.archive(identity)
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 38, in identity
+    self.assertTrue(hasattr(self.mod, 'identity'), 'identity interface is required before caching')
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : identity interface is required before caching
+
+======================================================================
+FAIL: test_environment_change_invalidates_failure_key_but_not_image_key (__main__.FusekiCacheTests.test_environment_change_invalidates_failure_key_but_not_image_key)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 84, in test_environment_change_invalidates_failure_key_but_not_image_key
+    first = self.identity()
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 38, in identity
+    self.assertTrue(hasattr(self.mod, 'identity'), 'identity interface is required before caching')
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : identity interface is required before caching
+
+======================================================================
+FAIL: test_existing_unknown_tag_is_not_overwritten_by_cache (__main__.FusekiCacheTests.test_existing_unknown_tag_is_not_overwritten_by_cache)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 154, in test_existing_unknown_tag_is_not_overwritten_by_cache
+    identity=self.identity();directory,_=self.archive(identity)
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 38, in identity
+    self.assertTrue(hasattr(self.mod, 'identity'), 'identity interface is required before caching')
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : identity interface is required before caching
+
+======================================================================
+FAIL: test_final_gate_runs_real_preflight_and_does_not_claim_cached_success (__main__.FusekiCacheTests.test_final_gate_runs_real_preflight_and_does_not_claim_cached_success)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 199, in test_final_gate_runs_real_preflight_and_does_not_claim_cached_success
+    identity=self.identity();directory=self.root/'failures'
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 38, in identity
+    self.assertTrue(hasattr(self.mod, 'identity'), 'identity interface is required before caching')
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : identity interface is required before caching
+
+======================================================================
+FAIL: test_identity_stable_between_runs_and_tag_includes_helper_platform (__main__.FusekiCacheTests.test_identity_stable_between_runs_and_tag_includes_helper_platform)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 71, in test_identity_stable_between_runs_and_tag_includes_helper_platform
+    first = self.identity()
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 38, in identity
+    self.assertTrue(hasattr(self.mod, 'identity'), 'identity interface is required before caching')
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : identity interface is required before caching
+
+======================================================================
+FAIL: test_load_failure_is_hard_stop_not_cold_overwrite (__main__.FusekiCacheTests.test_load_failure_is_hard_stop_not_cold_overwrite)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 161, in test_load_failure_is_hard_stop_not_cold_overwrite
+    identity=self.identity();directory,_=self.archive(identity)
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 38, in identity
+    self.assertTrue(hasattr(self.mod, 'identity'), 'identity interface is required before caching')
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : identity interface is required before caching
+
+======================================================================
+FAIL: test_missing_copy_input_has_specific_category_before_build (__main__.FusekiCacheTests.test_missing_copy_input_has_specific_category_before_build)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 167, in test_missing_copy_input_has_specific_category_before_build
+    self.assertTrue(hasattr(self.mod, 'preflight_context'), 'COPY preflight interface is required')
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : COPY preflight interface is required
+
+======================================================================
+FAIL: test_persisted_failure_short_reproduction_blocks_new_process (__main__.FusekiCacheTests.test_persisted_failure_short_reproduction_blocks_new_process)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 178, in test_persisted_failure_short_reproduction_blocks_new_process
+    identity=self.identity();directory=self.root/'failures'
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 38, in identity
+    self.assertTrue(hasattr(self.mod, 'identity'), 'identity interface is required before caching')
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : identity interface is required before caching
+
+======================================================================
+FAIL: test_receipt_and_archive_links_are_refused (__main__.FusekiCacheTests.test_receipt_and_archive_links_are_refused)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 123, in test_receipt_and_archive_links_are_refused
+    identity=self.identity();directory,_=self.archive(identity)
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 38, in identity
+    self.assertTrue(hasattr(self.mod, 'identity'), 'identity interface is required before caching')
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : identity interface is required before caching
+
+======================================================================
+FAIL: test_restore_checks_loaded_identity_and_records_producer (__main__.FusekiCacheTests.test_restore_checks_loaded_identity_and_records_producer)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 142, in test_restore_checks_loaded_identity_and_records_producer
+    identity=self.identity();directory,receipt=self.archive(identity)
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 38, in identity
+    self.assertTrue(hasattr(self.mod, 'identity'), 'identity interface is required before caching')
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : identity interface is required before caching
+
+======================================================================
+FAIL: test_short_network_probe_is_only_fixed_https_heads_and_total_bounded (__main__.FusekiCacheTests.test_short_network_probe_is_only_fixed_https_heads_and_total_bounded)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 209, in test_short_network_probe_is_only_fixed_https_heads_and_total_bounded
+    self.identity();calls=[]
+    ~~~~~~~~~~~~~^^
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 38, in identity
+    self.assertTrue(hasattr(self.mod, 'identity'), 'identity interface is required before caching')
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : identity interface is required before caching
+
+======================================================================
+FAIL: test_tar_traversal_link_special_and_unreferenced_members_are_refused (__main__.FusekiCacheTests.test_tar_traversal_link_special_and_unreferenced_members_are_refused)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 114, in test_tar_traversal_link_special_and_unreferenced_members_are_refused
+    identity=self.identity()
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 38, in identity
+    self.assertTrue(hasattr(self.mod, 'identity'), 'identity interface is required before caching')
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : identity interface is required before caching
+
+======================================================================
+FAIL: test_unknown_receipt_fields_are_refused (__main__.FusekiCacheTests.test_unknown_receipt_fields_are_refused)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 101, in test_unknown_receipt_fields_are_refused
+    identity=self.identity();directory,receipt=self.archive(identity)
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 38, in identity
+    self.assertTrue(hasattr(self.mod, 'identity'), 'identity interface is required before caching')
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : identity interface is required before caching
+
+======================================================================
+FAIL: test_valid_archive_is_checked_without_extracting_or_loading (__main__.FusekiCacheTests.test_valid_archive_is_checked_without_extracting_or_loading)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 91, in test_valid_archive_is_checked_without_extracting_or_loading
+    identity = self.identity();directory, receipt = self.archive(identity)
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 38, in identity
+    self.assertTrue(hasattr(self.mod, 'identity'), 'identity interface is required before caching')
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : identity interface is required before caching
+
+======================================================================
+FAIL: test_wrong_labels_are_refused_before_load (__main__.FusekiCacheTests.test_wrong_labels_are_refused_before_load)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 110, in test_wrong_labels_are_refused_before_load
+    identity=self.identity();directory,_=self.archive(identity, mutate_config=lambda c:c['config']['Labels'].update({'io.ontology-platform.input-fingerprint':'f'*64}))
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 38, in identity
+    self.assertTrue(hasattr(self.mod, 'identity'), 'identity interface is required before caching')
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : identity interface is required before caching
+
+======================================================================
+FAIL: test_wrong_platform_is_refused_even_with_matching_receipt (__main__.FusekiCacheTests.test_wrong_platform_is_refused_even_with_matching_receipt)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 106, in test_wrong_platform_is_refused_even_with_matching_receipt
+    identity=self.identity();directory,_=self.archive(identity, mutate_config=lambda c:c.update(architecture='arm64'))
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 38, in identity
+    self.assertTrue(hasattr(self.mod, 'identity'), 'identity interface is required before caching')
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : identity interface is required before caching
+
+----------------------------------------------------------------------
+Ran 21 tests in 0.036s
+
+FAILED (failures=21)

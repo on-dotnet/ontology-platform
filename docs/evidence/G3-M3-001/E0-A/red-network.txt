@@ -1,0 +1,21 @@
+.......F............
+======================================================================
+FAIL: test_timeout_and_connect_failures_have_same_categories_as_short_probe (__main__.CanonicalDownloadTests.test_timeout_and_connect_failures_have_same_categories_as_short_probe) (mode='connect')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/CanonicalFuseki.Tests.py", line 220, in test_timeout_and_connect_failures_have_same_categories_as_short_probe
+    self.assertEqual([stage['errorCategory'] for stage in stages],[category,category])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ['DOWNLOAD_HTTP_FAILURE', 'DOWNLOAD_HTTP_FAILURE'] != ['NETWORK_CONNECT', 'NETWORK_CONNECT']
+
+First differing element 0:
+'DOWNLOAD_HTTP_FAILURE'
+'NETWORK_CONNECT'
+
+- ['DOWNLOAD_HTTP_FAILURE', 'DOWNLOAD_HTTP_FAILURE']
++ ['NETWORK_CONNECT', 'NETWORK_CONNECT']
+
+----------------------------------------------------------------------
+Ran 20 tests in 3.559s
+
+FAILED (failures=1)

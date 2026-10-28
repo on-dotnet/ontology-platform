@@ -1,0 +1,32 @@
+..............EF................
+======================================================================
+ERROR: test_invalid_image_label_shape_is_refused (__main__.FusekiCacheTests.test_invalid_image_label_shape_is_refused)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 154, in test_invalid_image_label_shape_is_refused
+    with self.assertRaises(self.mod.BuildRefused):self.mod.validate_image(image,identity)
+                                                  ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/maintenance/canonical_fuseki.py", line 237, in validate_image
+    any(labels.get(key) != wanted for key,wanted in expected_labels(expected).items()) or
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/maintenance/canonical_fuseki.py", line 237, in <genexpr>
+    any(labels.get(key) != wanted for key,wanted in expected_labels(expected).items()) or
+        ^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'get'
+
+======================================================================
+FAIL: test_last_failed_marker_classifies_checksum_after_recovered_network (__main__.FusekiCacheTests.test_last_failed_marker_classifies_checksum_after_recovered_network)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform/scripts/tests/FusekiCache.Tests.py", line 149, in test_last_failed_marker_classifies_checksum_after_recovered_network
+    self.assertEqual(self.mod.BuildRefused('failed',diagnostic).category,'CHECKSUM_MISMATCH')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'NETWORK_TIMEOUT' != 'CHECKSUM_MISMATCH'
+- NETWORK_TIMEOUT
++ CHECKSUM_MISMATCH
+
+
+----------------------------------------------------------------------
+Ran 32 tests in 0.150s
+
+FAILED (failures=1, errors=1)
