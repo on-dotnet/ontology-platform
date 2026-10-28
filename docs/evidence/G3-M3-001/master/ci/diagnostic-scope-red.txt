@@ -1,0 +1,14 @@
+....F
+======================================================================
+FAIL: test_diagnostic_marker_only_skips_exact_authorized_push_branch (__main__.WorkflowScopeTests.test_diagnostic_marker_only_skips_exact_authorized_push_branch)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/scripts/tests/FusekiCiCache.Tests.py", line 61, in test_diagnostic_marker_only_skips_exact_authorized_push_branch
+    self.assertFalse(self.evaluate('push','refs/heads/codex/g3-m3-master',marker))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.002s
+
+FAILED (failures=1)
