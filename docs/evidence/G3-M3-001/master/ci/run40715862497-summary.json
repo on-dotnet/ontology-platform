@@ -1,0 +1,67 @@
+{
+  "runId": 40715862497,
+  "headSha": "a655642c360da00bddf15e9d154cf8de36487035",
+  "conclusion": "success",
+  "canonical": {
+    "cacheKey": "ontology-fuseki-image-v2-linux-amd64-0fe39718f35634e7a88474fa05fec446e6c64c4071d369d85c933ee7ed4a92c5",
+    "cacheOutcome": "HIT",
+    "containerChecksumVerified": false,
+    "contextSha256": "dba8036818246baaefc136fa6740729e9be068c79dd0c2ae584f895192406091",
+    "currentGithubRunId": "40715862497",
+    "envFingerprint": "3623658350d70a583ed2425f34f1ab615c3ea1c83c0349ca5bae61bcd436cd1d",
+    "failureStateKey": "ontology-fuseki-image-v2-linux-amd64-0fe39718f35634e7a88474fa05fec446e6c64c4071d369d85c933ee7ed4a92c5-failure-v1-3623658350d70a583ed2425f34f1ab615c3ea1c83c0349ca5bae61bcd436cd1d",
+    "image": "ontology-platform-fuseki:context-0fe39718f35634e7a88474fa05fec446e6c64c4071d369d85c933ee7ed4a92c5",
+    "imageId": "sha256:754078b2138a6b445d99af80d522283ad190959d04f621184356c6314f2fb919",
+    "inputFingerprint": "0fe39718f35634e7a88474fa05fec446e6c64c4071d369d85c933ee7ed4a92c5",
+    "observedAt": "2026-10-28T15:26:45.178437+00:00",
+    "platform": "linux/amd64",
+    "producerHead": "1990742c1bbe97c427121a37e1cfe775d79c89b9",
+    "producerRunId": "ci-preflight-40711221901-1",
+    "restored": true,
+    "reused": true,
+    "runId": "ci-preflight-40715862497-1",
+    "runner": "Linux-X64",
+    "schemaVersion": 2,
+    "sourceChecksumVerified": true,
+    "stages": [
+      {
+        "durationMs": 11215,
+        "errorCategory": null,
+        "inputFingerprint": "0fe39718f35634e7a88474fa05fec446e6c64c4071d369d85c933ee7ed4a92c5",
+        "outcome": "PASS",
+        "stage": "cache restore"
+      },
+      {
+        "durationMs": 14,
+        "errorCategory": null,
+        "inputFingerprint": "0fe39718f35634e7a88474fa05fec446e6c64c4071d369d85c933ee7ed4a92c5",
+        "outcome": "PASS",
+        "stage": "image preparation"
+      }
+    ],
+    "taskId": "G3-M3-001"
+  },
+  "realIntegrationTests": {
+    "security": {
+      "passed": 126,
+      "skipped": 0
+    },
+    "semantic": {
+      "passed": 172,
+      "skipped": 0
+    },
+    "publishing": {
+      "passed": 60,
+      "skipped": 0
+    },
+    "query": {
+      "passed": 49,
+      "skipped": 0
+    },
+    "mcpAgent": {
+      "passed": 33,
+      "skipped": 0
+    }
+  },
+  "scope": "Full source CI. Separate formal AppHost/browser M3 still NOT_RUN."
+}

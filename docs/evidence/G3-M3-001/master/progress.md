@@ -63,3 +63,10 @@ Head199 Mac finalinput actualcold/export/reopen/Dockerload/restore6PASS，第二
 最终canonical输入LinuxRun40711221901 coldMISS→独立新Run40713115311 HIT，同key0fe397/image754078，warm无下载/hash/extract/build；后Run engineering及governance均真实success。独立E0Reviewer确认A/B通过、C工程通过。新bridge代际使原Apply准确拒绝0删除，v2只重冻真实代际并独立核SHA后Apply，实际2image+5history共7/7 exit0；自然后验/物理字节不预填PASS。
 
 终期语义Review确认RIOT接受非法重复BCP47变体/扩展、生产assessment误放行。独立SEM90b6036最小去重修正：同4真实PG/Jena RED3fail→GREEN4pass/0skip，GOV_FAIL/PublishEligiblefalse且私用尾部合法对照PASS。非作者独立Review闭合P2无新增P1/P2。接下来冻结源码完整CI、增量main、正式M3；不再扩辅助工具/备用路径/报告系统。
+
+
+## 首次main实集成与正式产品验收准备
+
+最新语义修正完整Run40715862497 engineering/governance双success，PG/Jena semantic172/0skip、security126/publishing60/query49/mcp33均0skip。Master于15:40UTC将a655642从c8精确快进main并push，原六DS_Store完全保留。最新Release二进制构建exit0；兼容reader126成员锁定，formal command已准备。第二集成点及正式M3仍待执行。
+
+精确worker原生归档两次已实际尝试：efficiency及SEM均被平台Another active task still uses this worktree拒绝，保留原错误与路径，不改用手动删除绕过；WEB准确两浏览器cwd活跃引用保留。三树代码patch已集成、SEM10ignored原日志已核SHA备份。实际Docker2image+5history删除和独立强后验不受该平台guard影响。各KEEP均有准确对象/理由/解除条件，不做全局资源操作。

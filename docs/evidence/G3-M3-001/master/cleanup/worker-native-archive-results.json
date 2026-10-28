@@ -1,0 +1,24 @@
+{
+  "observedAtUtc": "2026-10-28T15:41:52.193089+00:00",
+  "operation": "mcp__codex_app__archive_worktree",
+  "attempts": [
+    {
+      "root": "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform",
+      "toolIsError": true,
+      "message": "Another active task still uses this worktree.",
+      "pathStillExists": true,
+      "result": "DEFERRED_PLATFORM_ACTIVE_TASK_REFERENCE",
+      "releaseCondition": "Owning active task releases the managed worktree; then repeat native archive after fresh Git/ignored/dependency checks"
+    },
+    {
+      "root": "/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform",
+      "toolIsError": true,
+      "message": "Another active task still uses this worktree.",
+      "pathStillExists": true,
+      "result": "DEFERRED_PLATFORM_ACTIVE_TASK_REFERENCE",
+      "releaseCondition": "Owning active task releases the managed worktree; then repeat native archive after fresh Git/ignored/dependency checks"
+    }
+  ],
+  "manualWorktreeRemoval": false,
+  "scope": "Exact native operations attempted after full CI and main integration; native guard preserved, no bypass. Docker whitelist7 actual deletions remain effective."
+}
