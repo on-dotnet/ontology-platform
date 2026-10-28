@@ -390,13 +390,14 @@ def source_digest_fd(fd,destination=None):
 
 def host_curl(url,output,seconds,connect,deadline,head=False):
     """Manual redirects can only target the two exact approved Apache URLs."""
+    if url not in OFFICIAL_URLS:raise BuildRefused('Source URL refused',category='SOURCE_URL_REFUSED',stage='network')
     window=min(deadline,time.monotonic()+seconds)
     for redirect in range(4):
         remaining=window-time.monotonic()
         if remaining<=0:raise BuildRefused('Host source request timed out',category='NETWORK_TIMEOUT',stage='network')
         limit=min(seconds,max(1,math.ceil(remaining)))
         if not head:output.seek(0);output.truncate(0)
-        args=['curl','--fail','--silent','--show-error','--proto','=https','--proto-redir','=https','--max-redirs','3',
+        args=['curl','-q','--fail','--silent','--show-error','--proto','=https','--proto-redir','=https','--max-redirs','3',
               '--connect-timeout',str(min(connect,limit)),'--max-time',str(limit),'--retry','0','--max-filesize',str(MAX_SOURCE_BYTES),
               '--write-out','%{stderr}\nCANONICAL_HTTP %{http_code} %{redirect_url}\n']
         if head:args.append('--head')
@@ -809,10 +810,11 @@ def validate_archive(directory, expected, stage='cache restore'):
                         raise ValueError()
                     check='OCI_DESCRIPTOR_ANNOTATIONS'
                     annotations=descriptor.get('annotations',{})
-                    if not isinstance(annotations,dict) or set(annotations)-{'io.containerd.image.name','org.opencontainers.image.ref.name'}:
-                        raise ValueError()
                     permitted={'io.containerd.image.name':'docker.io/library/'+expected['image'],
                                'org.opencontainers.image.ref.name':expected['image'].split(':',1)[1]}
+                    # BuildKit's manifest descriptor annotation binds the config, not the root manifest ID.
+                    if descriptor['mediaType'] in manifest_types:permitted['config.digest']=config_id
+                    if not isinstance(annotations,dict) or set(annotations)-set(permitted):raise ValueError()
                     if any(value!=permitted[key] for key,value in annotations.items()):raise ValueError()
                     check='OCI_DESCRIPTOR_PLATFORM'
                     if 'platform' in descriptor:

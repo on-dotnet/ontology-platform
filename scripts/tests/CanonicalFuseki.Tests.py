@@ -428,6 +428,32 @@ class CanonicalSourceTests(unittest.TestCase):
         with self.assertRaises(self.mod.BuildRefused):
             with self.mod.prepare_source(self.cache,'TASK;injection','bad','a'*64):pass
 
+    def test_host_curl_disables_default_config_before_all_other_options(self):
+        calls,run=self.transport()
+        with patch.object(self.mod.subprocess,'run',side_effect=run):
+            with self.mod.prepare_source(self.cache,'TASK','curlrc','a'*64):pass
+        self.assertEqual(calls[0][0][:2],['curl','-q'])
+        curl_home=self.root/'curl-home';curl_home.mkdir();output=curl_home/'unexpected-output'
+        (curl_home/'.curlrc').write_text('location\noutput = "'+str(output)+'"\nurl = "file:///SYNTHETIC_NOT_READ"\nSYNTHETIC_INVALID_OPTION = yes\n')
+        env=dict(os.environ,CURL_HOME=str(curl_home))
+        control=subprocess.run(['curl','--version'],env=env,capture_output=True,text=True,timeout=3)
+        self.assertIn('SYNTHETIC_INVALID_OPTION',control.stderr,'control must actually read isolated .curlrc')
+        clean=subprocess.run(calls[0][0][:2]+['--version'],env=env,capture_output=True,text=True,timeout=3)
+        self.assertEqual(clean.returncode,0)
+        self.assertNotIn('SYNTHETIC_INVALID_OPTION',clean.stderr)
+        self.assertFalse(output.exists())
+
+    def test_real_test_cli_help_and_unknown_flag_never_touch_docker(self):
+        binary=self.root/'cli-bin';binary.mkdir();marker=self.root/'docker-access'
+        docker=binary/'docker';docker.write_text('#!/bin/sh\nprintf touched > "'+str(marker)+'"\nexit 83\n');docker.chmod(0o755)
+        for flag,wanted in [('--help',0),('--synthetic-unknown',2)]:
+            with self.subTest(flag=flag):
+                marker.unlink(missing_ok=True)
+                result=subprocess.run([sys.executable,str(ROOT/'scripts/tests/CanonicalFuseki.Real.Tests.py'),flag],
+                                      env=dict(os.environ,PATH=str(binary)+os.pathsep+os.environ['PATH']),capture_output=True,text=True,timeout=3)
+                self.assertEqual(result.returncode,wanted)
+                self.assertFalse(marker.exists())
+
     def test_dockerfile_uses_named_source_and_checks_checksum_before_extract(self):
         text=(ROOT/'infra/development/fuseki/Dockerfile').read_text()
         self.assertIn('COPY --from=fuseki_source',text)

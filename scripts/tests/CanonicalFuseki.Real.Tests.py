@@ -4,6 +4,7 @@
 Creates only the canonical project image and dedicated ignored cache/receipts.
 This local test is not evidence of two independent GitHub runners.
 """
+import argparse
 import importlib.util
 import json
 import shutil
@@ -15,6 +16,9 @@ import sys
 import uuid
 sys.dont_write_bytecode=True
 ROOT=Path(__file__).resolve().parents[2]
+parser=argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--source-failure-only',action='store_true')
+args=parser.parse_args()
 spec=importlib.util.spec_from_file_location('canonical',ROOT/'scripts/maintenance/canonical_fuseki.py')
 m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
 
@@ -79,7 +83,7 @@ sys.exit(code)
                     results=results,durationMs=round((time.monotonic()-started)*1000),fixtureRemovedOnExit=True)
 
 
-if '--source-failure-only' in sys.argv:
+if args.source_failure_only:
     print(json.dumps(source_failure_stop_loss(),indent=2));sys.exit(0)
 
 run='e0-a-real-'+uuid.uuid4().hex

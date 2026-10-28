@@ -281,6 +281,25 @@ class FusekiCacheTests(unittest.TestCase):
         identity,directory,receipt=self.oci_archive()
         self.assertEqual(self.mod.validate_archive(directory,identity)['imageId'],receipt['imageId'])
 
+    def test_buildkit_config_digest_annotation_binds_exact_config_not_manifest_id(self):
+        for mode in ('valid','manifest-id','unknown'):
+            with self.subTest(mode=mode):
+                identity,directory,receipt=self.oci_archive()
+                with tarfile.open(directory/'image.tar') as archive:
+                    entries=[(m.name,archive.extractfile(m).read()) for m in archive if m.isfile()]
+                by_name=dict(entries);index=json.loads(by_name['index.json'])
+                config=json.loads(by_name['manifest.json'])[0]['Config']
+                digest='sha256:'+hashlib.sha256(by_name[config]).hexdigest()
+                index['manifests'][0]['annotations']={'config.digest':digest if mode=='valid' else receipt['imageId']}
+                if mode=='unknown':index['manifests'][0]['annotations']['unknown']='SYNTHETIC_PRIVATE_TOKEN'
+                entries=[(name,json.dumps(index).encode() if name=='index.json' else raw) for name,raw in entries]
+                self.rewrite_archive(directory,receipt,entries)
+                if mode=='valid':self.assertEqual(self.mod.validate_archive(directory,identity)['imageId'],receipt['imageId'])
+                else:
+                    with self.assertRaises(self.mod.BuildRefused) as caught:self.mod.validate_archive(directory,identity)
+                    self.assertEqual(caught.exception.diagnostic['validationCheck'],'OCI_DESCRIPTOR_ANNOTATIONS')
+                    self.assertNotIn('SYNTHETIC_PRIVATE',json.dumps(caught.exception.diagnostic))
+
     def test_oci_descriptors_bind_platform_tag_media_config_layers_and_root(self):
         for broken in ('config','platform','tag','media','layer','root','divergent'):
             with self.subTest(broken=broken):
