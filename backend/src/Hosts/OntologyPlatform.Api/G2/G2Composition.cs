@@ -49,6 +49,7 @@ public static class G2Composition
         if (app.Configuration.GetValue<bool>("G2:Enabled"))
         {
             app.MapOntologyEndpoints();
+            app.MapVocabularyEndpoints();
             app.MapG3Endpoints();
             app.MapPublishingEndpoints();
             app.MapSemanticEndpoints();

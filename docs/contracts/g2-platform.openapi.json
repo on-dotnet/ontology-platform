@@ -153,7 +153,7 @@
         },
         "security": [
           {
-            "session": []
+            "session": [ ]
           }
         ]
       }
@@ -247,7 +247,7 @@
         },
         "security": [
           {
-            "session": []
+            "session": [ ]
           }
         ]
       }
@@ -321,7 +321,7 @@
         },
         "security": [
           {
-            "session": []
+            "session": [ ]
           }
         ]
       }
@@ -406,7 +406,7 @@
         },
         "security": [
           {
-            "session": []
+            "session": [ ]
           }
         ]
       }
@@ -496,7 +496,7 @@
         },
         "security": [
           {
-            "session": []
+            "session": [ ]
           }
         ]
       }
@@ -533,7 +533,7 @@
         },
         "security": [
           {
-            "health": []
+            "health": [ ]
           }
         ]
       }
@@ -580,7 +580,391 @@
         },
         "security": [
           {
-            "health": []
+            "health": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/ontology-drafts/{id}/vocabulary": {
+      "get": {
+        "tags": [
+          "Vocabulary"
+        ],
+        "operationId": "ReadDraftVocabulary",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VocabularySnapshot"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Payload Too Large",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/ontology-drafts/{id}/vocabulary-edits": {
+      "post": {
+        "tags": [
+          "Vocabulary"
+        ],
+        "operationId": "EditDraftVocabulary",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "description": "必需的强ETag，格式为带双引号的十进制修订，必须与Command.expectedRevision相同；缺失428，旧值或不匹配409。",
+            "required": true,
+            "schema": {
+              "pattern": "^\"[0-9]+\"$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-CSRF-TOKEN",
+            "in": "header",
+            "description": "从同源/auth/csrf领取并与会话关联的防伪令牌。",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VocabularyEditsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OntologyDraft"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Payload Too Large",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "428": {
+            "description": "Precondition Required",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/releases/{id}/vocabulary": {
+      "get": {
+        "tags": [
+          "Vocabulary"
+        ],
+        "operationId": "ReadReleasedVocabulary",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VocabularySnapshot"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Payload Too Large",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": [ ]
           }
         ]
       }
@@ -625,7 +1009,7 @@
         },
         "security": [
           {
-            "session": []
+            "session": [ ]
           }
         ]
       }
@@ -789,7 +1173,7 @@
         },
         "security": [
           {
-            "session": []
+            "session": [ ]
           }
         ]
       }
@@ -864,7 +1248,7 @@
         },
         "security": [
           {
-            "session": []
+            "session": [ ]
           }
         ]
       }
@@ -993,7 +1377,7 @@
         },
         "security": [
           {
-            "session": []
+            "session": [ ]
           }
         ]
       }
@@ -1060,7 +1444,7 @@
         },
         "security": [
           {
-            "session": []
+            "session": [ ]
           }
         ]
       },
@@ -1183,7 +1567,7 @@
         },
         "security": [
           {
-            "session": []
+            "session": [ ]
           }
         ]
       }
@@ -1336,7 +1720,7 @@
         },
         "security": [
           {
-            "session": []
+            "session": [ ]
           }
         ]
       }
@@ -1491,7 +1875,7 @@
         },
         "security": [
           {
-            "session": []
+            "session": [ ]
           }
         ]
       }
@@ -1567,7 +1951,7 @@
         },
         "security": [
           {
-            "session": []
+            "session": [ ]
           }
         ]
       }
@@ -1651,7 +2035,7 @@
         },
         "security": [
           {
-            "session": []
+            "session": [ ]
           }
         ]
       }
@@ -1708,7 +2092,7 @@
         },
         "security": [
           {
-            "session": []
+            "session": [ ]
           }
         ]
       }
@@ -1823,7 +2207,7 @@
         },
         "security": [
           {
-            "session": []
+            "session": [ ]
           }
         ]
       }
@@ -1934,7 +2318,7 @@
         },
         "security": [
           {
-            "session": []
+            "session": [ ]
           }
         ]
       }
@@ -2008,7 +2392,7 @@
         },
         "security": [
           {
-            "session": []
+            "session": [ ]
           }
         ]
       }
@@ -2066,7 +2450,7 @@
         },
         "security": [
           {
-            "session": []
+            "session": [ ]
           }
         ]
       },
@@ -2190,7 +2574,7 @@
         },
         "security": [
           {
-            "session": []
+            "session": [ ]
           }
         ]
       }
@@ -2265,7 +2649,7 @@
         },
         "security": [
           {
-            "session": []
+            "session": [ ]
           }
         ]
       },
@@ -2427,7 +2811,7 @@
         },
         "security": [
           {
-            "session": []
+            "session": [ ]
           }
         ]
       }
@@ -2591,7 +2975,7 @@
         },
         "security": [
           {
-            "session": []
+            "session": [ ]
           }
         ]
       }
@@ -2689,7 +3073,7 @@
         },
         "security": [
           {
-            "session": []
+            "session": [ ]
           }
         ]
       }
@@ -2833,7 +3217,7 @@
         },
         "security": [
           {
-            "session": []
+            "session": [ ]
           }
         ]
       }
@@ -2900,7 +3284,7 @@
         },
         "security": [
           {
-            "session": []
+            "session": [ ]
           }
         ]
       },
@@ -3013,7 +3397,7 @@
         },
         "security": [
           {
-            "session": []
+            "session": [ ]
           }
         ]
       }
@@ -3097,7 +3481,7 @@
         },
         "security": [
           {
-            "session": []
+            "session": [ ]
           }
         ]
       }
@@ -3240,7 +3624,7 @@
         },
         "security": [
           {
-            "session": []
+            "session": [ ]
           }
         ]
       }
@@ -3344,7 +3728,7 @@
         },
         "security": [
           {
-            "session": []
+            "session": [ ]
           }
         ]
       }
@@ -5476,7 +5860,7 @@
         "additionalProperties": false,
         "description": "已锁定且可回验的本体导入引用。"
       },
-      "JsonElement": {},
+      "JsonElement": { },
       "MessageDeltaPayload": {
         "required": [
           "kind",
@@ -8106,6 +8490,174 @@
           "RELEASE"
         ],
         "type": "string"
+      },
+      "VocabularyChange": {
+        "required": [
+          "sourceId",
+          "edit"
+        ],
+        "type": "object",
+        "properties": {
+          "sourceId": {
+            "description": "只允许本体或词汇源，不能写入Shapes和事实源。",
+            "$ref": "#/components/schemas/VocabularyEditSource"
+          },
+          "edit": {
+            "description": "保留主体、谓词及原始RDF项的精确新增删除替换。",
+            "$ref": "#/components/schemas/SemanticEdit"
+          }
+        },
+        "additionalProperties": false,
+        "description": "M3按明确源槽位表达的单项精确RDF变更。"
+      },
+      "VocabularyEditSource": {
+        "enum": [
+          "ontology",
+          "vocabulary"
+        ],
+        "type": "string"
+      },
+      "VocabularyEditsRequest": {
+        "required": [
+          "hashes",
+          "changes",
+          "command"
+        ],
+        "type": "object",
+        "properties": {
+          "hashes": {
+            "description": "与expectedRevision一致的原四源散列。",
+            "$ref": "#/components/schemas/SourceHashes"
+          },
+          "changes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VocabularyChange"
+            },
+            "description": "一次命令1到64项，任一失败整批不提交。"
+          },
+          "command": {
+            "description": "复用可信身份、理由、幂等和修订CAS。",
+            "$ref": "#/components/schemas/CommandContext"
+          }
+        },
+        "additionalProperties": false,
+        "description": "M3绑定完整修订和四源散列的原子词汇批量编辑。"
+      },
+      "VocabularySnapshot": {
+        "required": [
+          "draftId",
+          "releaseId",
+          "manifestHash",
+          "revision",
+          "hashes",
+          "profileVersion",
+          "profileHash",
+          "triples",
+          "diagnostics"
+        ],
+        "type": "object",
+        "properties": {
+          "draftId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "草稿身份或正式清单的来源草稿身份。"
+          },
+          "releaseId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "正式发布身份，草稿时显式null。"
+          },
+          "manifestHash": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "正式清单散列，草稿时显式null。"
+          },
+          "revision": {
+            "type": "integer",
+            "description": "固定来源修订，不以当前头覆盖历史。",
+            "format": "int64"
+          },
+          "hashes": {
+            "description": "同批四源散列。",
+            "$ref": "#/components/schemas/SourceHashes"
+          },
+          "profileVersion": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "注册策略版本；历史V1没有策略时null。"
+          },
+          "profileHash": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "精确注册策略散列；历史V1缺席时null。"
+          },
+          "triples": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VocabularySourceTriple"
+            },
+            "description": "四源实际三元组，引用位置来自这些真实事实。"
+          },
+          "diagnostics": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssessmentDiagnostic"
+            },
+            "description": "精确SKOS和单位治理码及真实源散列，未知行列保持null。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "同一草稿修订或已核对正式Jena版本的词汇与单位投影。"
+      },
+      "VocabularySourceTriple": {
+        "required": [
+          "sourceId",
+          "triple"
+        ],
+        "type": "object",
+        "properties": {
+          "sourceId": {
+            "type": "string",
+            "description": "ontology、shapes、vocabulary或data的真实源标识。"
+          },
+          "triple": {
+            "description": "保留language与datatype的完整原始RDF项。",
+            "$ref": "#/components/schemas/RdfTriple"
+          }
+        },
+        "additionalProperties": false,
+        "description": "服务真实RIOT解析的三元组与原始源位置，不作为第二份权威。"
       }
     },
     "securitySchemes": {
@@ -8129,6 +8681,9 @@
     },
     {
       "name": "PlatformEndpoints"
+    },
+    {
+      "name": "Vocabulary"
     },
     {
       "name": "Ontology"

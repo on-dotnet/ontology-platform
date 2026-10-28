@@ -221,3 +221,13 @@ export type ValidationKind = "RDF_PARSE" | "SHACL_CORE" | "OWL_SUPPORT";
 export type VersionRef = { "kind": VersionRefKind; "id": string; "revision": number | null };
 
 export type VersionRefKind = "DRAFT" | "RELEASE";
+
+export type VocabularyChange = { "sourceId": VocabularyEditSource; "edit": SemanticEdit };
+
+export type VocabularyEditSource = "ontology" | "vocabulary";
+
+export type VocabularyEditsRequest = { "hashes": SourceHashes; "changes": Array<VocabularyChange>; "command": CommandContext };
+
+export type VocabularySnapshot = { "draftId": string | null; "releaseId": string | null; "manifestHash": string | null; "revision": number; "hashes": SourceHashes; "profileVersion": string | null; "profileHash": string | null; "triples": Array<VocabularySourceTriple>; "diagnostics": Array<AssessmentDiagnostic> };
+
+export type VocabularySourceTriple = { "sourceId": string; "triple": RdfTriple };

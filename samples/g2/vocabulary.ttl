@@ -1,2 +1,6 @@
 @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
 <urn:synthetic:metals:quality> a skos:Concept ; skos:prefLabel "合成质量术语"@zh ; skos:definition "仅用于本轮人工构造数据验收"@zh .
+
+# 当前回归夹具补全显式Scheme；历史提交与旧Release字节不变。
+<urn:synthetic:metals:scheme> a skos:ConceptScheme ; skos:prefLabel "合成冶金术语"@zh .
+<urn:synthetic:metals:quality> skos:inScheme <urn:synthetic:metals:scheme> .
