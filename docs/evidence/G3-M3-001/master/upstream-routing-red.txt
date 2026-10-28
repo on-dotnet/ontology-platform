@@ -1,0 +1,194 @@
+test_actual_process_start_failure_marks_current_failed_and_later_not_run (__main__.M1OrchestrationTests.test_actual_process_start_failure_marks_current_failed_and_later_not_run) ... ok
+test_all_real_gate_selections_include_m1_and_regressions (__main__.M1OrchestrationTests.test_all_real_gate_selections_include_m1_and_regressions) ... ok
+test_each_child_failure_stops_later_gates (__main__.M1OrchestrationTests.test_each_child_failure_stops_later_gates) ... ok
+test_failed_attempt_cannot_consume_or_certify_stale_pass (__main__.M1OrchestrationTests.test_failed_attempt_cannot_consume_or_certify_stale_pass) ... ok
+test_first_m2_integration_selects_real_api_only_without_claiming_full_gates (__main__.M1OrchestrationTests.test_first_m2_integration_selects_real_api_only_without_claiming_full_gates) ... usage: full-g2-e2e.py [-h] --runtime-file RUNTIME_FILE [--m1] [--m2]
+                      [--m2-api-only] [--m2-ui-only] [--m3] [--m3-api-only]
+                      [--m3-ui-only] [--workspace-smoke-only]
+                      [--smoke-fault-check]
+full-g2-e2e.py: error: Select one partial checkpoint or a full milestone chain
+ERROR
+test_m2_selects_its_own_runtime_evidence_and_authenticated_checks (__main__.M1OrchestrationTests.test_m2_selects_its_own_runtime_evidence_and_authenticated_checks) ... ok
+test_m3_partial_modes_parse_the_exact_upstream_command (__main__.M1OrchestrationTests.test_m3_partial_modes_parse_the_exact_upstream_command) ...
+  test_m3_partial_modes_parse_the_exact_upstream_command (__main__.M1OrchestrationTests.test_m3_partial_modes_parse_the_exact_upstream_command) (mode='api_only') ... FAIL
+  test_m3_partial_modes_parse_the_exact_upstream_command (__main__.M1OrchestrationTests.test_m3_partial_modes_parse_the_exact_upstream_command) (mode='ui_only') ... FAIL
+test_m3_selects_own_runtime_and_real_gates (__main__.M1OrchestrationTests.test_m3_selects_own_runtime_and_real_gates) ... ok
+test_protected_g2_runtime_is_refused (__main__.M1OrchestrationTests.test_protected_g2_runtime_is_refused) ... usage: g3-acceptance-runtime.py [-h] [--runtime-file RUNTIME_FILE]
+                                [--start-runtime] [--milestone {M1,M2,M3}]
+                                [--api-only] [--ui-only]
+g3-acceptance-runtime.py: error: Protected G2 or unrelated runtime refused
+ok
+test_second_m2_integration_selects_only_real_ui_checkpoint (__main__.M1OrchestrationTests.test_second_m2_integration_selects_only_real_ui_checkpoint) ... usage: full-g2-e2e.py [-h] --runtime-file RUNTIME_FILE [--m1] [--m2]
+                      [--m2-api-only] [--m2-ui-only] [--m3] [--m3-api-only]
+                      [--m3-ui-only] [--workspace-smoke-only]
+                      [--smoke-fault-check]
+full-g2-e2e.py: error: Select one partial checkpoint or a full milestone chain
+ERROR
+test_wrong_runtime_and_future_milestones_are_refused (__main__.M1OrchestrationTests.test_wrong_runtime_and_future_milestones_are_refused) ... usage: g3-acceptance-runtime.py [-h] [--runtime-file RUNTIME_FILE]
+                                [--start-runtime] [--milestone {M1,M2,M3}]
+                                [--api-only] [--ui-only]
+g3-acceptance-runtime.py: error: Protected G2 or unrelated runtime refused
+usage: g3-acceptance-runtime.py [-h] [--runtime-file RUNTIME_FILE]
+                                [--start-runtime] [--milestone {M1,M2,M3}]
+                                [--api-only] [--ui-only]
+g3-acceptance-runtime.py: error: Protected G2 or unrelated runtime refused
+usage: g3-acceptance-runtime.py [-h] [--runtime-file RUNTIME_FILE]
+                                [--start-runtime] [--milestone {M1,M2,M3}]
+                                [--api-only] [--ui-only]
+g3-acceptance-runtime.py: error: argument --milestone: invalid choice: 'M4' (choose from 'M1', 'M2', 'M3')
+usage: g3-acceptance-runtime.py [-h] [--runtime-file RUNTIME_FILE]
+                                [--start-runtime] [--milestone {M1,M2,M3}]
+                                [--api-only] [--ui-only]
+g3-acceptance-runtime.py: error: argument --milestone: invalid choice: 'M5' (choose from 'M1', 'M2', 'M3')
+ok
+test_existing_m2_and_unknown_flag (__main__.RealBrowserEntryTests.test_existing_m2_and_unknown_flag) ... usage: full-g2-e2e.py [-h] --runtime-file RUNTIME_FILE [--m1] [--m2]
+                      [--m2-api-only] [--m2-ui-only] [--m3] [--m3-api-only]
+                      [--m3-ui-only] [--workspace-smoke-only]
+                      [--smoke-fault-check]
+full-g2-e2e.py: error: unrecognized arguments: --m4
+ok
+test_real_smoke_fault_checkpoint_is_forwarded (__main__.RealBrowserEntryTests.test_real_smoke_fault_checkpoint_is_forwarded) ... ok
+test_three_m3_modes_reach_real_browser_flags (__main__.RealBrowserEntryTests.test_three_m3_modes_reach_real_browser_flags) ... ok
+
+======================================================================
+ERROR: test_first_m2_integration_selects_real_api_only_without_claiming_full_gates (__main__.M1OrchestrationTests.test_first_m2_integration_selects_real_api_only_without_claiming_full_gates)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/scripts/tests/G3Acceptance.Tests.py", line 138, in test_first_m2_integration_selects_real_api_only_without_claiming_full_gates
+    code,calls,proof,_,_=self.exercise(prefix='g3-m2-control',milestone='M2',api_only=True)
+                         ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/scripts/tests/G3Acceptance.Tests.py", line 109, in exercise
+    code = module.main()
+  File "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/scripts/acceptance/g3-acceptance-runtime.py", line 158, in main
+    return run_attempt()
+  File "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/scripts/acceptance/g3-acceptance-runtime.py", line 120, in run_attempt
+    result = subprocess.run(command, cwd=ROOT)
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1169, in __call__
+    return self._mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1173, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1240, in _execute_mock_call
+    result = effect(*args, **kwargs)
+  File "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/scripts/tests/G3Acceptance.Tests.py", line 91, in run
+    self.assertEqual(entry.main(), 0)
+                     ~~~~~~~~~~^^
+  File "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/scripts/acceptance/full-g2-e2e.py", line 26, in main
+    parser.error('Select one partial checkpoint or a full milestone chain')
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/argparse.py", line 2686, in error
+    self.exit(2, _('%(prog)s: error: %(message)s\n') % args)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/argparse.py", line 2673, in exit
+    _sys.exit(status)
+    ~~~~~~~~~^^^^^^^^
+SystemExit: 2
+
+======================================================================
+ERROR: test_second_m2_integration_selects_only_real_ui_checkpoint (__main__.M1OrchestrationTests.test_second_m2_integration_selects_only_real_ui_checkpoint)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/scripts/tests/G3Acceptance.Tests.py", line 145, in test_second_m2_integration_selects_only_real_ui_checkpoint
+    code,calls,proof,_,_=self.exercise(prefix='g3-m2-control',milestone='M2',ui_only=True)
+                         ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/scripts/tests/G3Acceptance.Tests.py", line 109, in exercise
+    code = module.main()
+  File "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/scripts/acceptance/g3-acceptance-runtime.py", line 158, in main
+    return run_attempt()
+  File "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/scripts/acceptance/g3-acceptance-runtime.py", line 120, in run_attempt
+    result = subprocess.run(command, cwd=ROOT)
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1169, in __call__
+    return self._mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1173, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1240, in _execute_mock_call
+    result = effect(*args, **kwargs)
+  File "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/scripts/tests/G3Acceptance.Tests.py", line 91, in run
+    self.assertEqual(entry.main(), 0)
+                     ~~~~~~~~~~^^
+  File "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/scripts/acceptance/full-g2-e2e.py", line 26, in main
+    parser.error('Select one partial checkpoint or a full milestone chain')
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/argparse.py", line 2686, in error
+    self.exit(2, _('%(prog)s: error: %(message)s\n') % args)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/argparse.py", line 2673, in exit
+    _sys.exit(status)
+    ~~~~~~~~~^^^^^^^^
+SystemExit: 2
+
+======================================================================
+FAIL: test_m3_partial_modes_parse_the_exact_upstream_command (__main__.M1OrchestrationTests.test_m3_partial_modes_parse_the_exact_upstream_command) (mode='api_only')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/scripts/tests/G3Acceptance.Tests.py", line 160, in test_m3_partial_modes_parse_the_exact_upstream_command
+    code, calls, proof, *_ = self.exercise(prefix='g3-m3-control', milestone='M3', **{mode: True})
+                             ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/scripts/tests/G3Acceptance.Tests.py", line 109, in exercise
+    code = module.main()
+  File "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/scripts/acceptance/g3-acceptance-runtime.py", line 158, in main
+    return run_attempt()
+  File "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/scripts/acceptance/g3-acceptance-runtime.py", line 120, in run_attempt
+    result = subprocess.run(command, cwd=ROOT)
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1169, in __call__
+    return self._mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1173, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1240, in _execute_mock_call
+    result = effect(*args, **kwargs)
+  File "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/scripts/tests/G3Acceptance.Tests.py", line 82, in run
+    self.assertIn('--m2-api-only' if api_only else '--m2-ui-only' if ui_only else '--m1', command, 'Selected checks must run in the existing authenticated harness')
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: '--m2-api-only' not found in ['/opt/homebrew/opt/python@3.13/bin/python3.13', 'scripts/acceptance/full-g2-e2e.py', '--runtime-file', '/private/var/folders/8r/n2xjjrn90v7fplnwsjkft1sm0000gn/T/tmpwj7__aze/.tools/security/g3-m3-control/runtime.json', '--m1', '--m3-api-only'] : Selected checks must run in the existing authenticated harness
+
+======================================================================
+FAIL: test_m3_partial_modes_parse_the_exact_upstream_command (__main__.M1OrchestrationTests.test_m3_partial_modes_parse_the_exact_upstream_command) (mode='ui_only')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/scripts/tests/G3Acceptance.Tests.py", line 160, in test_m3_partial_modes_parse_the_exact_upstream_command
+    code, calls, proof, *_ = self.exercise(prefix='g3-m3-control', milestone='M3', **{mode: True})
+                             ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/scripts/tests/G3Acceptance.Tests.py", line 109, in exercise
+    code = module.main()
+  File "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/scripts/acceptance/g3-acceptance-runtime.py", line 158, in main
+    return run_attempt()
+  File "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/scripts/acceptance/g3-acceptance-runtime.py", line 120, in run_attempt
+    result = subprocess.run(command, cwd=ROOT)
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1169, in __call__
+    return self._mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1173, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/mock.py", line 1240, in _execute_mock_call
+    result = effect(*args, **kwargs)
+  File "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/scripts/tests/G3Acceptance.Tests.py", line 82, in run
+    self.assertIn('--m2-api-only' if api_only else '--m2-ui-only' if ui_only else '--m1', command, 'Selected checks must run in the existing authenticated harness')
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: '--m2-ui-only' not found in ['/opt/homebrew/opt/python@3.13/bin/python3.13', 'scripts/acceptance/full-g2-e2e.py', '--runtime-file', '/private/var/folders/8r/n2xjjrn90v7fplnwsjkft1sm0000gn/T/tmpge7taiar/.tools/security/g3-m3-control/runtime.json', '--m1', '--m3-ui-only'] : Selected checks must run in the existing authenticated harness
+
+----------------------------------------------------------------------
+Ran 14 tests in 0.882s
+
+FAILED (failures=2, errors=2)
+{"status": "FAIL", "runId": "aee3ecc695f14cdbab629e8a2d6e0734", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/aee3ecc695f14cdbab629e8a2d6e0734"}
+{"status": "PASS", "runId": "4495c6932c1042f8a3202d21e5a75e77", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/4495c6932c1042f8a3202d21e5a75e77"}
+{"status": "FAIL", "runId": "d9c1049da21d41a7be63122b2ee7008b", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/d9c1049da21d41a7be63122b2ee7008b"}
+{"status": "FAIL", "runId": "50ced5bf9b0a4c6dbaa9bc837d445735", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/50ced5bf9b0a4c6dbaa9bc837d445735"}
+{"status": "FAIL", "runId": "204a9749c2de4bb28a6b8b220333c220", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/204a9749c2de4bb28a6b8b220333c220"}
+{"status": "FAIL", "runId": "1f8148148fbe407abbcd15f69acec3da", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/1f8148148fbe407abbcd15f69acec3da"}
+{"status": "FAIL", "runId": "7169f1054c644658984a1f1d28dcc413", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/7169f1054c644658984a1f1d28dcc413"}
+{"status": "FAIL", "runId": "4cb4fb17fdc141ed8759a7552ce8e7b1", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/4cb4fb17fdc141ed8759a7552ce8e7b1"}
+{"status": "FAIL", "runId": "d6e05275dd02464c867b963ecc2e8b1a", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/d6e05275dd02464c867b963ecc2e8b1a"}
+{"status": "FAIL", "runId": "c0159f232cba4d328427961d68f47860", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/c0159f232cba4d328427961d68f47860"}
+{"status": "FAIL", "runId": "1ef48ce324a64b1780be141aaf96adf8", "evidenceDirectory": "docs/evidence/G3-M2-001/runtime/g3-m2-control/1ef48ce324a64b1780be141aaf96adf8"}
+{"status": "PASS", "runId": "8f53b6a23c034c21abdedc36608b827a", "evidenceDirectory": "docs/evidence/G3-M2-001/runtime/g3-m2-control/8f53b6a23c034c21abdedc36608b827a"}
+{"status": "FAIL", "runId": "5cf96239bfc8420f990dc820c4932393", "evidenceDirectory": "docs/evidence/G3-M3-001/runtime/g3-m3-control/5cf96239bfc8420f990dc820c4932393"}
+{"status": "FAIL", "runId": "82f1180e7ccf458da13880f931d615fc", "evidenceDirectory": "docs/evidence/G3-M3-001/runtime/g3-m3-control/82f1180e7ccf458da13880f931d615fc"}
+{"status": "PASS", "runId": "3497c22cc989403990f8cb61aa5cd014", "evidenceDirectory": "docs/evidence/G3-M3-001/runtime/g3-m3-control/3497c22cc989403990f8cb61aa5cd014"}
+{"status": "FAIL", "runId": "8272e551f43e4d2abe9e913aefaa548d", "evidenceDirectory": "docs/evidence/G3-M2-001/runtime/g3-m2-control/8272e551f43e4d2abe9e913aefaa548d"}

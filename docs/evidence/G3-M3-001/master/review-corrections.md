@@ -1,0 +1,9 @@
+# 独立审查整改回执
+
+SEM Reviewer=/root/e0_independent_review。原两P2及等价表示补充分区均闭合；最后冻结patch21440bytes SHA25612199350866ef0084fe1d782c9386c3899714f274b58276ff54f3de74e6820de，基线6cfffb0。每步Dictionary键使用既有EditNoOpTriple，值保留原合法RDF词法；canonicalUnit纳入废弃引用扫描。真实RED25/4fail及等价RED2/2fail，GREEN真实PG/Jena53/0skip、后续Jena12/0skip。最终CI后置，hold_for_evidence。
+
+WEB Reviewer=/root/m3_web_review，只读已提交6cfffb0业务实现，未发现新增确定P1/P2；149Vitest、3有界浏览器、Nextbuild和96SelfTest日志已读，不升级为完整产品验收。
+
+E0追加复审先发现两项：真实上游--m1+partial与新互斥规则冲突；独立Smoke入口覆盖详细同名回执。原19721bytes快照SHA256162456b2fe4d2da9edeac842e1f6c99d444db7f7f5a0078b93444a933473a5f2保留NEEDS_REVISION事实。已移除partial上游--m1，新增测试将实际上游完整argv送入真实下游main；writeBrowserEntryReport被真实外层调用，详细workspace-smoke.json与入口workspace-smoke-entry.json分开。
+
+第二冻结8433bytes SHA2566d12b5fe867733326ce51fceeab06fa72cdace90af89f43dd8be9c09dd344328，基线5465dec，3tracked+2NEW FILE组合。Reviewer逐文件重建/核对一致；实际组合RED后15/15GREEN，Node真实临时文件覆盖RED后双回执字节保留GREEN。两项闭合、可提交修复候选；真实Smoke/最终CI/E0实际门禁仍待执行。Reviewer未改文件、未启动竞争栈或重复昂贵套件。

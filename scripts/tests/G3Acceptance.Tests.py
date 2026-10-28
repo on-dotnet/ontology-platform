@@ -51,6 +51,10 @@ class RealBrowserEntryTests(unittest.TestCase):
         self.assertIn('--workspace-smoke-only', self.invoke('--workspace-smoke-only'))
         self.assertIn('--smoke-fault-check', self.invoke('--smoke-fault-check'))
 
+    def test_actual_node_writer_preserves_detailed_smoke_receipt(self):
+        result = subprocess.run(['node', '--test', str(SCRIPT.parents[1] / 'tests/G3BrowserReport.Tests.mjs')], capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
 
 class M1OrchestrationTests(unittest.TestCase):
     """Keep gate selection/order/failure propagation real, isolate external services only."""
@@ -79,9 +83,17 @@ class M1OrchestrationTests(unittest.TestCase):
                 evidence_seen.append(os.environ.get('PLATFORM_EVIDENCE_DIR'))
                 gate = Path(command[1]).name
                 if gate == 'full-g2-e2e.py':
-                    self.assertIn('--m2-api-only' if api_only else '--m2-ui-only' if ui_only else '--m1', command, 'Selected checks must run in the existing authenticated harness')
+                    selected = '--' + (milestone or 'M2').lower() + ('-api-only' if api_only else '-ui-only') if api_only or ui_only else '--m1'
+                    self.assertIn(selected, command, 'Selected checks must run in the existing authenticated harness')
                     if milestone == 'M2': self.assertIn('--m2-api-only' if api_only else '--m2-ui-only' if ui_only else '--m2', command, 'M2 checks must execute in the real authenticated harness')
                     if milestone == 'M3': self.assertIn('--m3-api-only' if api_only else '--m3-ui-only' if ui_only else '--m3', command, 'M3 checks must execute in the real authenticated harness')
+                    # Parse the exact upstream argument combination with the real downstream entry.
+                    entry_spec = importlib.util.spec_from_file_location('downstream_browser', SCRIPT.with_name(gate))
+                    entry = importlib.util.module_from_spec(entry_spec)
+                    entry_spec.loader.exec_module(entry)
+                    with patch.object(entry, 'ROOT', root), patch.object(sys, 'argv', command[1:]), \
+                            patch.object(entry.subprocess, 'run', return_value=subprocess.CompletedProcess([], 0)):
+                        self.assertEqual(entry.main(), 0)
                 if gate == fail_gate and launch_failure:
                     return original([str(root / 'actual-missing-gate-executable')], cwd=root)
                 return original([sys.executable, str(child), str(log), *command, '23' if gate == fail_gate else '0'], cwd=root)
@@ -146,6 +158,14 @@ class M1OrchestrationTests(unittest.TestCase):
         self.assertEqual(calls,GATES)
         self.assertEqual(proof['milestone'],'M3')
         self.assertTrue(all('G3-M3-001/runtime/' in item for item in selected))
+
+    def test_m3_partial_modes_parse_the_exact_upstream_command(self):
+        for mode in ('api_only', 'ui_only'):
+            with self.subTest(mode=mode):
+                code, calls, proof, *_ = self.exercise(prefix='g3-m3-control', milestone='M3', **{mode: True})
+                self.assertEqual(code, 0)
+                self.assertEqual(calls, ['full-g2-e2e.py'])
+                self.assertEqual(proof['scope'], 'API_ONLY' if mode == 'api_only' else 'UI_ONLY')
 
     def test_wrong_runtime_and_future_milestones_are_refused(self):
         for prefix,milestone in [('g3-m1-control','M2'),('g3-m2-control','M3'),('g3-m4-control','M4'),('g3-m5-control','M5')]:

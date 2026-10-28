@@ -1,4 +1,5 @@
 import { evidenceDirectory } from "./evidence-paths.mjs";
+import { writeBrowserEntryReport } from "./browser-entry-report.mjs";
 /** 真实OIDC/BFF纵向检查；不保存浏览器网络、Cookie、凭证或登录页面截图。 */
 import { createRequire } from 'node:module';
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
@@ -254,7 +255,7 @@ try {
   await browser?.close();
   const checkpoint = process.argv.includes('--workspace-smoke-only') ? 'workspace-smoke' : process.argv.includes('--m3-api-only') ? 'm3-api-oidc' : process.argv.includes('--m3-ui-only') ? 'm3-ui-oidc' : process.argv.includes('--m3') ? 'm3-full-e2e' : process.argv.includes('--m2-api-only') ? 'm2-api-oidc' : process.argv.includes('--m2-ui-only') ? 'm2-ui-oidc' : process.argv.includes('--full') ? 'full-g2-e2e' : 'live-s1-http';
   const report = { stage: checkpoint, status: failure ? 'FAIL' : 'PASS', overallG2: 'PARTIAL', checks, failure, notRun: process.argv.includes('--full') ? (failure ? ['remaining steps after ' + phase, 'final sameHead CI'] : ['final sameHead CI', 'real model BLOCKED', 'Monaco PAUSED_BY_USER', 'Windows/Intel/production NOT_RUN']) : ['remaining full-chain gates','final regression and CI'] };
-  await writeFile(resolve(evidenceDirectory(root), checkpoint + '.json'), JSON.stringify(report,null,2) + '\n');
+  await writeBrowserEntryReport(root, checkpoint, report);
   console.log(JSON.stringify({ stage: report.stage, status: report.status, passed: checks.filter(value => value.status === 'PASS').length, failure }));
   if (failure) process.exitCode = 1;
 }

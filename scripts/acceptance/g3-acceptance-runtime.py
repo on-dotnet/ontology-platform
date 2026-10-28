@@ -113,6 +113,7 @@ def run_attempt():
         if args.milestone == 'M3':
             commands[0].append('--m3-api-only' if args.api_only else '--m3-ui-only' if args.ui_only else '--m3')
         if args.api_only or args.ui_only:
+            commands[0].remove('--m1')
             commands = commands[:1]
         for index, command in enumerate(commands):
             acceptance['gates'][index]['status'] = 'RUNNING'
