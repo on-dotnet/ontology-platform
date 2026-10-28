@@ -349,6 +349,20 @@ public enum VersionRefKind
 
 }
 
+/// <summary>明确冻结的VocabularyEditSource协议枚举，未知值不得静默接受。</summary>
+[JsonConverter(typeof(StrictStringEnumConverter<VocabularyEditSource>))]
+public enum VocabularyEditSource
+{
+    /// <summary>协议值ontology。</summary>
+    [JsonStringEnumMemberName("ontology")]
+    Ontology,
+
+    /// <summary>协议值vocabulary。</summary>
+    [JsonStringEnumMemberName("vocabulary")]
+    Vocabulary,
+
+}
+
 /// <summary>事件载荷唯一判别基类，kind与事件类型一致。</summary>
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "kind")]
 [JsonDerivedType(typeof(RunStartedPayload), "run.started")]
@@ -2843,6 +2857,114 @@ public sealed record SourceComparison : IJsonOnDeserialized, IJsonOnSerializing
     /// <summary>图语义结论，与字节变化分开。</summary>
     [JsonRequired]
     public GraphComparisonResult Graph { get; init; } = default!;
+
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
+}
+
+/// <summary>M3按明确源槽位表达的单项精确RDF变更。</summary>
+[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
+public sealed record VocabularyChange : IJsonOnDeserialized, IJsonOnSerializing
+{
+    /// <summary>只允许本体或词汇源，不能写入Shapes和事实源。</summary>
+    [JsonRequired]
+    public VocabularyEditSource SourceId { get; init; } = default;
+
+    /// <summary>保留主体、谓词及原始RDF项的精确新增删除替换。</summary>
+    [JsonRequired]
+    public SemanticEdit Edit { get; init; } = default!;
+
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
+}
+
+/// <summary>M3绑定完整修订和四源散列的原子词汇批量编辑。</summary>
+[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
+public sealed record VocabularyEditsRequest : IJsonOnDeserialized, IJsonOnSerializing
+{
+    /// <summary>与expectedRevision一致的原四源散列。</summary>
+    [JsonRequired]
+    public SourceHashes Hashes { get; init; } = default!;
+
+    /// <summary>一次命令1到64项，任一失败整批不提交。</summary>
+    [JsonRequired]
+    public VocabularyChange[] Changes { get; init; } = [];
+
+    /// <summary>复用可信身份、理由、幂等和修订CAS。</summary>
+    [JsonRequired]
+    public CommandContext Command { get; init; } = default!;
+
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
+}
+
+/// <summary>服务真实RIOT解析的三元组与原始源位置，不作为第二份权威。</summary>
+[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
+public sealed record VocabularySourceTriple : IJsonOnDeserialized, IJsonOnSerializing
+{
+    /// <summary>ontology、shapes、vocabulary或data的真实源标识。</summary>
+    [JsonRequired]
+    public string SourceId { get; init; } = string.Empty;
+
+    /// <summary>保留language与datatype的完整原始RDF项。</summary>
+    [JsonRequired]
+    public RdfTriple Triple { get; init; } = default!;
+
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
+}
+
+/// <summary>同一草稿修订或已核对正式Jena版本的词汇与单位投影。</summary>
+[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
+public sealed record VocabularySnapshot : IJsonOnDeserialized, IJsonOnSerializing
+{
+    /// <summary>草稿身份或正式清单的来源草稿身份。</summary>
+    [JsonRequired]
+    public string? DraftId { get; init; } = null;
+
+    /// <summary>正式发布身份，草稿时显式null。</summary>
+    [JsonRequired]
+    public string? ReleaseId { get; init; } = null;
+
+    /// <summary>正式清单散列，草稿时显式null。</summary>
+    [JsonRequired]
+    public string? ManifestHash { get; init; } = null;
+
+    /// <summary>固定来源修订，不以当前头覆盖历史。</summary>
+    [JsonRequired]
+    public long Revision { get; init; } = default;
+
+    /// <summary>同批四源散列。</summary>
+    [JsonRequired]
+    public SourceHashes Hashes { get; init; } = default!;
+
+    /// <summary>注册策略版本；历史V1没有策略时null。</summary>
+    [JsonRequired]
+    public string? ProfileVersion { get; init; } = null;
+
+    /// <summary>精确注册策略散列；历史V1缺席时null。</summary>
+    [JsonRequired]
+    public string? ProfileHash { get; init; } = null;
+
+    /// <summary>四源实际三元组，引用位置来自这些真实事实。</summary>
+    [JsonRequired]
+    public VocabularySourceTriple[] Triples { get; init; } = [];
+
+    /// <summary>精确SKOS和单位治理码及真实源散列，未知行列保持null。</summary>
+    [JsonRequired]
+    public AssessmentDiagnostic[] Diagnostics { get; init; } = [];
 
     /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
     void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);

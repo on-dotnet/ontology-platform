@@ -95,6 +95,10 @@
     "VersionRefKind": [
       "DRAFT",
       "RELEASE"
+    ],
+    "VocabularyEditSource": [
+      "ontology",
+      "vocabulary"
     ]
   },
   "payloadDiscriminators": {
@@ -2655,6 +2659,110 @@
         }
       ],
       "base": null
+    },
+    "VocabularyChange": {
+      "description": "M3按明确源槽位表达的单项精确RDF变更。",
+      "base": null,
+      "fields": [
+        {
+          "name": "SourceId",
+          "type": "VocabularyEditSource",
+          "description": "只允许本体或词汇源，不能写入Shapes和事实源。"
+        },
+        {
+          "name": "Edit",
+          "type": "SemanticEdit",
+          "description": "保留主体、谓词及原始RDF项的精确新增删除替换。"
+        }
+      ]
+    },
+    "VocabularyEditsRequest": {
+      "description": "M3绑定完整修订和四源散列的原子词汇批量编辑。",
+      "base": null,
+      "fields": [
+        {
+          "name": "Hashes",
+          "type": "SourceHashes",
+          "description": "与expectedRevision一致的原四源散列。"
+        },
+        {
+          "name": "Changes",
+          "type": "VocabularyChange[]",
+          "description": "一次命令1到64项，任一失败整批不提交。"
+        },
+        {
+          "name": "Command",
+          "type": "CommandContext",
+          "description": "复用可信身份、理由、幂等和修订CAS。"
+        }
+      ]
+    },
+    "VocabularySourceTriple": {
+      "description": "服务真实RIOT解析的三元组与原始源位置，不作为第二份权威。",
+      "base": null,
+      "fields": [
+        {
+          "name": "SourceId",
+          "type": "string",
+          "description": "ontology、shapes、vocabulary或data的真实源标识。"
+        },
+        {
+          "name": "Triple",
+          "type": "RdfTriple",
+          "description": "保留language与datatype的完整原始RDF项。"
+        }
+      ]
+    },
+    "VocabularySnapshot": {
+      "description": "同一草稿修订或已核对正式Jena版本的词汇与单位投影。",
+      "base": null,
+      "fields": [
+        {
+          "name": "DraftId",
+          "type": "string?",
+          "description": "草稿身份或正式清单的来源草稿身份。"
+        },
+        {
+          "name": "ReleaseId",
+          "type": "string?",
+          "description": "正式发布身份，草稿时显式null。"
+        },
+        {
+          "name": "ManifestHash",
+          "type": "string?",
+          "description": "正式清单散列，草稿时显式null。"
+        },
+        {
+          "name": "Revision",
+          "type": "long",
+          "description": "固定来源修订，不以当前头覆盖历史。"
+        },
+        {
+          "name": "Hashes",
+          "type": "SourceHashes",
+          "description": "同批四源散列。"
+        },
+        {
+          "name": "ProfileVersion",
+          "type": "string?",
+          "description": "注册策略版本；历史V1没有策略时null。"
+        },
+        {
+          "name": "ProfileHash",
+          "type": "string?",
+          "description": "精确注册策略散列；历史V1缺席时null。"
+        },
+        {
+          "name": "Triples",
+          "type": "VocabularySourceTriple[]",
+          "description": "四源实际三元组，引用位置来自这些真实事实。"
+        },
+        {
+          "name": "Diagnostics",
+          "type": "AssessmentDiagnostic[]",
+          "description": "精确SKOS和单位治理码及真实源散列，未知行列保持null。"
+        }
+      ]
     }
   }
 }

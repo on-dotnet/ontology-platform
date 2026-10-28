@@ -149,6 +149,13 @@
           "RELEASE"
         ]
       },
+      "VocabularyEditSource": {
+        "type": "string",
+        "enum": [
+          "ontology",
+          "vocabulary"
+        ]
+      },
       "ExecutionPayload": {
         "oneOf": [
           {
@@ -4167,6 +4174,167 @@
           "graph": {
             "$ref": "#/components/schemas/GraphComparisonResult",
             "description": "图语义结论，与字节变化分开。"
+          }
+        },
+        "additionalProperties": false
+      },
+      "VocabularyChange": {
+        "type": "object",
+        "description": "M3按明确源槽位表达的单项精确RDF变更。",
+        "required": [
+          "sourceId",
+          "edit"
+        ],
+        "properties": {
+          "sourceId": {
+            "$ref": "#/components/schemas/VocabularyEditSource",
+            "description": "只允许本体或词汇源，不能写入Shapes和事实源。"
+          },
+          "edit": {
+            "$ref": "#/components/schemas/SemanticEdit",
+            "description": "保留主体、谓词及原始RDF项的精确新增删除替换。"
+          }
+        },
+        "additionalProperties": false
+      },
+      "VocabularyEditsRequest": {
+        "type": "object",
+        "description": "M3绑定完整修订和四源散列的原子词汇批量编辑。",
+        "required": [
+          "hashes",
+          "changes",
+          "command"
+        ],
+        "properties": {
+          "hashes": {
+            "$ref": "#/components/schemas/SourceHashes",
+            "description": "与expectedRevision一致的原四源散列。"
+          },
+          "changes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VocabularyChange"
+            },
+            "description": "一次命令1到64项，任一失败整批不提交。"
+          },
+          "command": {
+            "$ref": "#/components/schemas/CommandContext",
+            "description": "复用可信身份、理由、幂等和修订CAS。"
+          }
+        },
+        "additionalProperties": false
+      },
+      "VocabularySourceTriple": {
+        "type": "object",
+        "description": "服务真实RIOT解析的三元组与原始源位置，不作为第二份权威。",
+        "required": [
+          "sourceId",
+          "triple"
+        ],
+        "properties": {
+          "sourceId": {
+            "type": "string",
+            "description": "ontology、shapes、vocabulary或data的真实源标识。"
+          },
+          "triple": {
+            "$ref": "#/components/schemas/RdfTriple",
+            "description": "保留language与datatype的完整原始RDF项。"
+          }
+        },
+        "additionalProperties": false
+      },
+      "VocabularySnapshot": {
+        "type": "object",
+        "description": "同一草稿修订或已核对正式Jena版本的词汇与单位投影。",
+        "required": [
+          "draftId",
+          "releaseId",
+          "manifestHash",
+          "revision",
+          "hashes",
+          "profileVersion",
+          "profileHash",
+          "triples",
+          "diagnostics"
+        ],
+        "properties": {
+          "draftId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "草稿身份或正式清单的来源草稿身份。"
+          },
+          "releaseId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "正式发布身份，草稿时显式null。"
+          },
+          "manifestHash": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "正式清单散列，草稿时显式null。"
+          },
+          "revision": {
+            "type": "integer",
+            "format": "int64",
+            "description": "固定来源修订，不以当前头覆盖历史。"
+          },
+          "hashes": {
+            "$ref": "#/components/schemas/SourceHashes",
+            "description": "同批四源散列。"
+          },
+          "profileVersion": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "注册策略版本；历史V1没有策略时null。"
+          },
+          "profileHash": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "精确注册策略散列；历史V1缺席时null。"
+          },
+          "triples": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VocabularySourceTriple"
+            },
+            "description": "四源实际三元组，引用位置来自这些真实事实。"
+          },
+          "diagnostics": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssessmentDiagnostic"
+            },
+            "description": "精确SKOS和单位治理码及真实源散列，未知行列保持null。"
           }
         },
         "additionalProperties": false

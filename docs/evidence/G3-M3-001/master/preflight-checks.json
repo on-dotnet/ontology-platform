@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "baseSha": "c8f1040829b2bfe1e9f7e36223092286975643f0",
+  "checks": [
+    {
+      "name": "fetch",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "origin/main verified at Base; six original DS_Store preserved"
+    },
+    {
+      "name": "doctor",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "PowerShell7.6.8/SDK10.0.402/Node24.22.1/pnpm11.28.8/Docker29.9.2 under standard escalation"
+    },
+    {
+      "name": "baseline-selftest",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Actual complete SelfTest; ReviewPackage96/0; module products not run"
+    },
+    {
+      "name": "locked-restore",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "dotnet restore backend/OntologyPlatform.slnx --locked-mode"
+    },
+    {
+      "name": "m3-wire-contract",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "14 tests; 0 failed/skipped; prior missing-types RED and invalid filter failure retained"
+    },
+    {
+      "name": "cache-usage",
+      "status": "OBSERVED",
+      "exitCode": 0,
+      "output": "GitHub API active_caches_count=0/active_caches_size_in_bytes=0; no paid-capacity changes"
+    }
+  ]
+}
