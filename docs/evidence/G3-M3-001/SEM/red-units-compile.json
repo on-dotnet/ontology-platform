@@ -1,0 +1,80 @@
+{
+  "exitCode": 1,
+  "records": [
+    {
+      "check": "public-jena-fixture-modes",
+      "exitCode": 0,
+      "modes": {
+        "fixture": "0o755",
+        "config.ttl": "0o644",
+        "log4j2.properties": "0o644"
+      }
+    },
+    {
+      "command": [
+        "docker",
+        "run",
+        "--detach",
+        "--name",
+        "g2-sem-7533ec5acc1e",
+        "--publish",
+        "127.0.0.1::3030",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--mount",
+        "type=bind,src=/private/tmp/g2-sem-7533ec5acc1etbjda05o/fixture,dst=/fixture,readonly",
+        "--entrypoint",
+        "java",
+        "ontology-platform-fuseki:context-1e45f836d9837cbc75d23adb3ad37b0ff79a545ef06102a87aa246feea9cc1e5",
+        "-Xmx384m",
+        "-Dlog4j.configurationFile=/fixture/log4j2.properties",
+        "-jar",
+        "/opt/fuseki/fuseki-server.jar",
+        "--config=/fixture/config.ttl"
+      ],
+      "exitCode": 0,
+      "output": "7fa349f8d86fb812f3fee1e4433c14ab03df7b9d7a27419542a40431420ebdba\n"
+    },
+    {
+      "command": [
+        "docker",
+        "port",
+        "g2-sem-7533ec5acc1e",
+        "3030/tcp"
+      ],
+      "exitCode": 0,
+      "output": "127.0.0.1:56454\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "test",
+        "--project",
+        "backend/tests/OntologyPlatform.SemanticTests",
+        "--no-restore",
+        "--",
+        "--filter",
+        "FullyQualifiedName~G3M3UnitTests"
+      ],
+      "exitCode": 1,
+      "output": "/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M3UnitTests.cs(48,51): error CS1003: 语法错误，应输入“,” [/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/OntologyPlatform.SemanticTests.csproj]\n/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M3UnitTests.cs(48,52): error CS1003: 语法错误，应输入“,” [/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/OntologyPlatform.SemanticTests.csproj]\n/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M3UnitTests.cs(48,68): error CS1003: 语法错误，应输入“,” [/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/OntologyPlatform.SemanticTests.csproj]\n/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M3UnitTests.cs(49,54): error CS1003: 语法错误，应输入“,” [/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/OntologyPlatform.SemanticTests.csproj]\n/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M3UnitTests.cs(49,59): error CS1003: 语法错误，应输入“=>” [/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/OntologyPlatform.SemanticTests.csproj]\n/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M3UnitTests.cs(54,86): error CS1003: 语法错误，应输入“,” [/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/OntologyPlatform.SemanticTests.csproj]\n/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M3UnitTests.cs(54,87): error CS1003: 语法错误，应输入“,” [/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/OntologyPlatform.SemanticTests.csproj]\n/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M3UnitTests.cs(56,69): error CS1003: 语法错误，应输入“,” [/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/OntologyPlatform.SemanticTests.csproj]\n/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M3UnitTests.cs(56,70): error CS1003: 语法错误，应输入“=>” [/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/OntologyPlatform.SemanticTests.csproj]\n/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M3UnitTests.cs(57,66): error CS1003: 语法错误，应输入“,” [/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/OntologyPlatform.SemanticTests.csproj]\n/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M3UnitTests.cs(57,70): error CS1003: 语法错误，应输入“=>” [/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/OntologyPlatform.SemanticTests.csproj]\n/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M3UnitTests.cs(70,127): error CS1003: 语法错误，应输入“,” [/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/OntologyPlatform.SemanticTests.csproj]\n/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M3UnitTests.cs(70,128): error CS1003: 语法错误，应输入“,” [/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/OntologyPlatform.SemanticTests.csproj]\n/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M3UnitTests.cs(70,257): error CS1003: 语法错误，应输入“,” [/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/OntologyPlatform.SemanticTests.csproj]\n/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M3UnitTests.cs(70,258): error CS1003: 语法错误，应输入“,” [/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/OntologyPlatform.SemanticTests.csproj]\n生成失败，退出代码: 1。\n"
+    },
+    {
+      "check": "all temporary graph triples removed",
+      "count": 0,
+      "status": "PASS"
+    },
+    {
+      "command": [
+        "docker",
+        "rm",
+        "--force",
+        "g2-sem-7533ec5acc1e"
+      ],
+      "exitCode": 0,
+      "output": "g2-sem-7533ec5acc1e\n"
+    }
+  ]
+}

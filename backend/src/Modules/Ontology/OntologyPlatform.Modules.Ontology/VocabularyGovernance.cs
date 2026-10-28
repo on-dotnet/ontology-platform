@@ -199,11 +199,5 @@ public sealed partial class JenaSemanticRuntime
             foreach (var reference in triples.Where(triple => triple.Object.Kind == RdfTermKind.Iri && deprecated.Contains(triple.Object) && (relations.Contains(triple) || triple.Predicate is PlatformSemantics + "nominalUnit" or PlatformSemantics + "quantityKind" or PlatformSemantics + "dimension" or PlatformSemantics + "standardSource" or Skos + "inScheme" or Skos + "topConceptOf" or Skos + "hasTopConcept"))) Add("semantic_reference_deprecated", reference.Subject, reference.Predicate, "当前四源引用已废弃IRI，须显式修复引用并保留历史身份。");
         }
 
-        /// <summary>单位治理由下一验证切片补充，不创建第二套单位表。</summary>
-        internal void CheckUnits()
-        {
-            foreach (var triple in triples.Where(triple => triple.Predicate.StartsWith(PlatformSemantics, StringComparison.Ordinal)))
-                Add("unit_precision_unknown", triple.Subject, triple.Predicate, "单位完整性切片尚待完成；当前里程碑对此范围保守阻断发布。", true);
-        }
     }
 }

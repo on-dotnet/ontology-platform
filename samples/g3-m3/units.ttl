@@ -1,0 +1,19 @@
+@prefix ex: <urn:synthetic:m3:> .
+@prefix p: <urn:ontology-platform:semantics:> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+ex:temperature a p:Dimension ; p:lengthExponent 0 ; p:massExponent 0 ; p:timeExponent 0 ; p:electricCurrentExponent 0 ; p:temperatureExponent 1 ; p:amountExponent 0 ; p:luminousIntensityExponent 0 .
+ex:mass a p:Dimension ; p:lengthExponent 0 ; p:massExponent 1 ; p:timeExponent 0 ; p:electricCurrentExponent 0 ; p:temperatureExponent 0 ; p:amountExponent 0 ; p:luminousIntensityExponent 0 .
+ex:pressure a p:Dimension ; p:lengthExponent -1 ; p:massExponent 1 ; p:timeExponent -2 ; p:electricCurrentExponent 0 ; p:temperatureExponent 0 ; p:amountExponent 0 ; p:luminousIntensityExponent 0 .
+ex:Temperature a p:QuantityKind ; p:dimension ex:temperature .
+ex:Mass a p:QuantityKind ; p:dimension ex:mass .
+ex:Pressure a p:QuantityKind ; p:dimension ex:pressure .
+ex:standard-v1 a p:StandardSource ; p:version "synthetic-1" ; rdfs:label "合成单位来源"@zh, "Synthetic source"@en ; p:synthetic true ; prov:wasDerivedFrom ex:fixture .
+ex:K-v1 a p:UnitDefinition ; p:canonicalUnit ex:K ; p:version "1" ; p:quantityKind ex:Temperature ; p:dimension ex:temperature ; p:symbol "K" ; p:standardSource ex:standard-v1 ; p:precision "declared-exact" ; p:synthetic true .
+ex:C-v1 a p:UnitDefinition ; p:canonicalUnit ex:C ; p:version "1" ; p:quantityKind ex:Temperature ; p:dimension ex:temperature ; p:symbol "℃" ; p:standardSource ex:standard-v1 ; p:precision "declared-exact" ; p:synthetic true .
+ex:MPa-v1 a p:UnitDefinition ; p:canonicalUnit ex:MPa ; p:version "1" ; p:quantityKind ex:Pressure ; p:dimension ex:pressure ; p:symbol "MPa" ; p:standardSource ex:standard-v1 ; p:precision "declared-exact" ; p:synthetic true .
+ex:t-v1 a p:UnitDefinition ; p:canonicalUnit ex:t ; p:version "1" ; p:quantityKind ex:Mass ; p:dimension ex:mass ; p:symbol "t" ; p:standardSource ex:standard-v1 ; p:precision "declared-exact" ; p:synthetic true .
+ex:reading a owl:DatatypeProperty ; p:quantityKind ex:Temperature ; p:dimension ex:temperature ; p:nominalUnit ex:K-v1 .
+ex:ordinary a owl:DatatypeProperty .
