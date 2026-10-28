@@ -17,7 +17,7 @@ Failure candidates are strict allowlisted JSON with output hashes/sizes. New inv
 - `python3 scripts/tests/CanonicalFuseki.Tests.py`: PASS, 20 tests (canonical-tests.txt).
 - `python3 scripts/tests/FusekiCache.Tests.py`: PASS, 37 tests (cache-tests.txt).
 - Red logs preserve observed failures before fixes, including modern OCI ID handling, regular COPY inputs, empty-cache miss, timeout classification, malformed labels, terminal error classification, mixed-origin failures and duplicate stage accounting.
-- `git diff --check`: PASS, exit0 at source freeze.
+- `git diff --check`: PASS at source freeze. A pre-existing worker selftest log had an extra blank EOF when copied to tracked .txt; the intermediate range check reported it, and the final evidence-only correction removes the blank EOF. Full Base..Head range check is rerun before handoff.
 - Complete `verify.ps1 -SelfTest` was started; selftest-cutoff.txt is an explicit in-progress snapshot, NOT_VERIFIED at this handoff cutoff. Master performs the integrated complete run; no incomplete output is claimed PASS.
 
 Real Engine: Linux arm64, Docker 29.9.2, existing shared desktop-linux backend. The actual canonical --final-gate cold/export command failed with exit1 after 306.582 seconds: primary HTTP failure (118221ms), fallback timeout (180016ms). No new canonical image or image cache was produced. The original sanitized receipt is retained unchanged, including its earlier duplicate markers and first-error classification. Final source fixes these findings, but no second expensive cold build was attempted.
