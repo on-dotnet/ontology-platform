@@ -1,0 +1,301 @@
+{
+  "conclusion": "failure",
+  "headSha": "5465dec635e9f3086bc498c931da37cabd1cb750",
+  "jobs": [
+    {
+      "completedAt": "2026-10-28T13:15:06Z",
+      "conclusion": "failure",
+      "databaseId": 122835359910,
+      "name": "engineering",
+      "startedAt": "2026-10-28T13:09:27Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-28T13:09:29Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-28T13:09:28Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T13:09:34Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "number": 2,
+          "startedAt": "2026-10-28T13:09:29Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T13:09:38Z",
+          "conclusion": "success",
+          "name": "Prepare isolated verification parser",
+          "number": 3,
+          "startedAt": "2026-10-28T13:09:34Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T13:14:15Z",
+          "conclusion": "success",
+          "name": "Repository policy and positive-negative checks",
+          "number": 4,
+          "startedAt": "2026-10-28T13:09:38Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T13:14:22Z",
+          "conclusion": "success",
+          "name": "Run actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68",
+          "number": 5,
+          "startedAt": "2026-10-28T13:14:15Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T13:14:29Z",
+          "conclusion": "success",
+          "name": "Restore exact committed platform graph",
+          "number": 6,
+          "startedAt": "2026-10-28T13:14:22Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T13:14:55Z",
+          "conclusion": "success",
+          "name": "Frozen Web restore and separate lint typecheck test build",
+          "number": 7,
+          "startedAt": "2026-10-28T13:14:29Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T13:14:56Z",
+          "conclusion": "success",
+          "name": "Runtime output boundary negatives",
+          "number": 8,
+          "startedAt": "2026-10-28T13:14:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T13:15:00Z",
+          "conclusion": "success",
+          "name": "M1 read backpressure harness boundaries",
+          "number": 9,
+          "startedAt": "2026-10-28T13:14:56Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T13:15:02Z",
+          "conclusion": "success",
+          "name": "G2 acceptance orchestration positive and negative checks",
+          "number": 10,
+          "startedAt": "2026-10-28T13:15:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T13:15:03Z",
+          "conclusion": "failure",
+          "name": "M1 changed handwritten TSX readability",
+          "number": 11,
+          "startedAt": "2026-10-28T13:15:02Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T13:15:03Z",
+          "conclusion": "skipped",
+          "name": "Build format and real host security tests",
+          "number": 12,
+          "startedAt": "2026-10-28T13:15:03Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T13:15:03Z",
+          "conclusion": "skipped",
+          "name": "Scope notice",
+          "number": 13,
+          "startedAt": "2026-10-28T13:15:03Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T13:15:03Z",
+          "conclusion": "success",
+          "name": "Report actual engineering intervals",
+          "number": 14,
+          "startedAt": "2026-10-28T13:15:03Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T13:15:03Z",
+          "conclusion": "skipped",
+          "name": "Post Run actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68",
+          "number": 27,
+          "startedAt": "2026-10-28T13:15:03Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T13:15:03Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "number": 28,
+          "startedAt": "2026-10-28T13:15:03Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T13:15:03Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 29,
+          "startedAt": "2026-10-28T13:15:03Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/on-dotnet/ontology-platform/actions/runs/40693870276/job/122835359910"
+    },
+    {
+      "completedAt": "2026-10-28T13:10:00Z",
+      "conclusion": "failure",
+      "databaseId": 122835360570,
+      "name": "governance-integration",
+      "startedAt": "2026-10-28T13:09:28Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-28T13:09:30Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-28T13:09:29Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T13:09:38Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "number": 2,
+          "startedAt": "2026-10-28T13:09:30Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T13:09:38Z",
+          "conclusion": "success",
+          "name": "Resolve canonical cache identity",
+          "number": 3,
+          "startedAt": "2026-10-28T13:09:38Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T13:09:38Z",
+          "conclusion": "success",
+          "name": "Restore exact canonical image archive",
+          "number": 4,
+          "startedAt": "2026-10-28T13:09:38Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T13:09:39Z",
+          "conclusion": "success",
+          "name": "Restore exact previous failure candidate",
+          "number": 5,
+          "startedAt": "2026-10-28T13:09:38Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T13:09:54Z",
+          "conclusion": "failure",
+          "name": "Preflight canonical Fuseki before application restore",
+          "number": 6,
+          "startedAt": "2026-10-28T13:09:39Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T13:09:54Z",
+          "conclusion": "skipped",
+          "name": "Confirm included-storage image budget",
+          "number": 7,
+          "startedAt": "2026-10-28T13:09:54Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T13:09:54Z",
+          "conclusion": "skipped",
+          "name": "Save verified canonical image archive",
+          "number": 8,
+          "startedAt": "2026-10-28T13:09:54Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T13:09:54Z",
+          "conclusion": "success",
+          "name": "Confirm included-storage failure budget",
+          "number": 9,
+          "startedAt": "2026-10-28T13:09:54Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T13:09:55Z",
+          "conclusion": "success",
+          "name": "Save bounded failure candidate after failed canonical build",
+          "number": 10,
+          "startedAt": "2026-10-28T13:09:54Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T13:09:55Z",
+          "conclusion": "skipped",
+          "name": "Run actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68",
+          "number": 11,
+          "startedAt": "2026-10-28T13:09:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T13:09:55Z",
+          "conclusion": "skipped",
+          "name": "Frozen restore and backend build",
+          "number": 12,
+          "startedAt": "2026-10-28T13:09:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T13:09:55Z",
+          "conclusion": "skipped",
+          "name": "Real PostgreSQL security integration",
+          "number": 13,
+          "startedAt": "2026-10-28T13:09:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T13:09:55Z",
+          "conclusion": "skipped",
+          "name": "Real G2 semantic publishing query MCP MAF and native SSE integration",
+          "number": 14,
+          "startedAt": "2026-10-28T13:09:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T13:09:57Z",
+          "conclusion": "success",
+          "name": "Report actual integration intervals",
+          "number": 15,
+          "startedAt": "2026-10-28T13:09:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T13:09:57Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "number": 30,
+          "startedAt": "2026-10-28T13:09:57Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T13:09:57Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 31,
+          "startedAt": "2026-10-28T13:09:57Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/on-dotnet/ontology-platform/actions/runs/40693870276/job/122835360570"
+    }
+  ],
+  "status": "completed"
+}

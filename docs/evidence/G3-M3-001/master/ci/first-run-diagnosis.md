@@ -1,0 +1,5 @@
+# 首轮真实CI失败定位
+
+Run40693870276，Head5465dec635e9f3086bc498c931da37cabd1cb750，两job完成failure。Engineering已真实通过SelfTest、locked restore及Web lint/typecheck/149Vitest/build；TSX readability准确5行超200字符，后续native未运行。Master仅分行修正，readability11files/0violation、两文件eslint、完整solution format验证均exit0。
+
+Governance canonical固定输入cache miss；11.594秒后Cache archive validation refused。原receipt将export中的校验失败标为restore，当前诊断提交bdf9806纠正阶段并增加严格有限validationCheck/归档形状计数，不放宽验证。现有原件不足以证明格式根因，下一实际Run定位。失败候选已由批准Action成功保存；不是镜像缓存命中或产品通过。没有无差别重跑既有未改检查。

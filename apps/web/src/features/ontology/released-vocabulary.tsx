@@ -32,7 +32,9 @@ export function ReleasedVocabulary() {
   return <section className="g2-stack" aria-label="固定Release词汇读取">
     <h3>历史正式词汇与来源</h3>
     <p className="muted">在发布与审批工作区复制固定 Release ID。服务端校验不可变对象与真实 Jena 同批图，再按历史 manifest profile 读回。</p>
-    <label>固定 Release ID<input aria-label="固定词汇Release ID" value={releaseId} onChange={event => { current.current?.abort(); setReleaseId(event.target.value); setSnapshot(null); setError(null); setBusy(false); }} /></label>
+    <label>固定 Release ID<input aria-label="固定词汇Release ID" value={releaseId} onChange={event => {
+      current.current?.abort(); setReleaseId(event.target.value); setSnapshot(null); setError(null); setBusy(false);
+    }} /></label>
     <button className="button" disabled={busy || !releaseId.trim()} onClick={() => void read()}>读取固定Release词汇</button>
     {busy && <p role="status">正在核验固定正式图与来源…</p>}
     {error !== null && <SemanticError error={error} />}

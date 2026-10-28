@@ -125,7 +125,9 @@ export function VocabularyEditForm({ snapshot, selected, blocked, onCommit, onPe
       setDatatype(next.endsWith("Exponent") ? xsd + "integer" : [owl + "deprecated", semantic + "synthetic"].includes(next) ? xsd + "boolean" : "");
     }}>{predicates.map(item => <option key={item.iri} value={item.iri}>{item.label}</option>)}</select></label>
     {editing && !predicates.some(item => item.iri === predicate) && <p className="g2-hash">原始谓词 {predicate}</p>}
-    <label>RDF对象类型<select aria-label="词汇RDF类型" value={kind} disabled={disabled} onChange={event => setKind(event.target.value as "iri" | "literal")}><option value="literal">literal 字面量</option><option value="iri">IRI 引用</option></select></label>
+    <label>RDF对象类型<select aria-label="词汇RDF类型" value={kind} disabled={disabled} onChange={event => setKind(event.target.value as "iri" | "literal")}>
+      <option value="literal">literal 字面量</option><option value="iri">IRI 引用</option>
+    </select></label>
     <label>RDF值<textarea aria-label="词汇RDF值" value={value} disabled={disabled} rows={2} onChange={event => setValue(event.target.value)} /></label>
     {kind === "literal" && <><label>RDF语言（如 zh / en / zh-Hans；无语言保持空）<input aria-label="词汇RDF语言" value={language} disabled={disabled} onChange={event => setLanguage(event.target.value)} /></label>
       <label>RDF datatype IRI<input aria-label="词汇RDF数据类型" value={datatype} disabled={disabled} onChange={event => setDatatype(event.target.value)} /></label></>}
@@ -143,8 +145,10 @@ export function VocabularyEditForm({ snapshot, selected, blocked, onCommit, onPe
       return <article className="g2-notice" key={index}><p className="g2-hash">{row.sourceId} · {row.triple.predicate} · {termText(row.triple.object)}</p>
         <div className="g2-row"><button className="button" disabled={!editable} onClick={() => {
           setEditing(row); setSource(row.sourceId as VocabularyEditSource); setSubject(row.triple.subject.value); setPredicate(row.triple.predicate);
-          setKind(row.triple.object.kind === "iri" ? "iri" : "literal"); setValue(row.triple.object.value); setLanguage(row.triple.object.language ?? ""); setDatatype(row.triple.object.datatype ?? "");
-        }}>编辑字段 {index + 1}</button><button className="button" disabled={!editable} onClick={() => stage(vocabularyChange(row, null))}>排队删除字段 {index + 1}</button></div>
+          setKind(row.triple.object.kind === "iri" ? "iri" : "literal"); setValue(row.triple.object.value);
+          setLanguage(row.triple.object.language ?? ""); setDatatype(row.triple.object.datatype ?? "");
+        }}>编辑字段 {index + 1}</button>
+        <button className="button" disabled={!editable} onClick={() => stage(vocabularyChange(row, null))}>排队删除字段 {index + 1}</button></div>
       </article>;
     })}</div></details>
     {message && <p role="status">{message}</p>}
@@ -191,9 +195,11 @@ export function VocabularyWorkbench({ draft, selected, onSelect, dirty, busy, ca
     {!snapshot ? <p role="status">{load.loading ? "正在读取真实四源词汇快照…" : "快照不可用；源码仍保留，请刷新重试。"}</p> : <>
       {dirty && <p className="g2-notice">当前源码未保存，以下快照对应已保存修订；结构编辑已暂停。</p>}
       <VocabularyReadView snapshot={snapshot} selected={selected} onSelect={onSelect} />
-      <VocabularyEditForm key={`${draft.draftId}/${draft.revision}`} snapshot={snapshot} selected={selected} blocked={blocked} onPending={onPending} busy={busy} onCommit={changes => onCommit(changes, snapshot)} />
+      <VocabularyEditForm key={`${draft.draftId}/${draft.revision}`} snapshot={snapshot} selected={selected}
+        blocked={blocked} onPending={onPending} busy={busy} onCommit={changes => onCommit(changes, snapshot)} />
       <h3>词汇治理诊断</h3>
-      {snapshot.diagnostics.length === 0 ? <p>快照暂无词汇诊断。发布资格仍须运行完整真实评估。</p> : snapshot.diagnostics.map((item, index) => <DiagnosticCard key={index} item={item} draft={draft} dirty={dirty} index={index} onLocate={onLocate} />)}
+      {snapshot.diagnostics.length === 0 ? <p>快照暂无词汇诊断。发布资格仍须运行完整真实评估。</p> : snapshot.diagnostics.map((item, index) =>
+        <DiagnosticCard key={index} item={item} draft={draft} dirty={dirty} index={index} onLocate={onLocate} />)}
       <p><a href="/releases">前往发布与异人审批</a> · 历史差异使用右侧版本比较。</p>
     </>}
   </section>;
