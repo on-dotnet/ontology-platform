@@ -74,3 +74,24 @@ Windows 原始 JSONL 含 CRLF，原始 SHA256=`fcd4a4da08606e24fa2350bc255a354e9
 ## 后续顺序与停止
 
 先解决/验收 Windows SelfTest 平台阻塞；必要项全部通过后才 CONTRACT-A 正反例及独立 Review，再按任务卡执行 A → A 集成门禁 → B。后端恢复/build 已通过，不重复相同产品输入下的无关完整检查。当前只允许相互独立的环境诊断和证据记录，M4 业务实现停止，不输出附件完成标记，不自动启动 M5。
+
+## macOS/Windows 双开发宿主接续增量
+
+人类再次明确两个平台都要开发。本次接续允许 Master 单写既有清理执行器和其测试以补齐工程兼容缺口，产品仍停在 Phase 0。GitHub 同一远端 fetch 已实际 exit 0；历史 reset/443 失败不改写，但不再作为当前持续不可达的依据。push 成功与否须另有实际命令，不从 fetch 推导。
+
+工程修复内容：Git 根要求非空且绝对，使用 Path 语义而非宿主路径字符串比较；Worktree 注册、活跃分支校验及删除后验统一 Path；测试在真实子进程显式以当前 Python 启动 Git/gh/Docker 替身，缺替身立即拒绝，Git push/ls-remote 只转向临时本地 bare 仓库。BuildKit 历史 Context 是跨宿主元数据，以 PurePosixPath/PureWindowsPath 分别校验绝对路径、精确项目尾部和无遍历；M3 相对 Context 仍只接受既有 exact 字符串，不规范化后放行。生产没有增加测试开关或不安全 fallback。
+
+实际检查分层：
+
+- 首次根路径正反例通过；替身启动/Docker 白名单 2 项通过。
+- Git/CAS/失败日志/有效期 6 项中首次 Worktree 未注册失败，修复注册键后又定位活跃分支集合类型不一致，修复后 Worktree/dirty/locked/protected/keep 3 项通过。原失败保留，未通过删断言迁就。
+- 独立审查发现删除后验仍用字符串查 Path 键的 P1；修复为 Path(target) 并新增目录残留、注册残留双负例。该负例及真实干净 Worktree 删除共 2 项通过，Reviewer 实际只读复核关闭 P1。
+- 较早脚本输入的完整回归实际 55 tests、6 failures、19 errors、exit 1，unittest 292.199s，自动记录 292429ms。剩余失败包括 BuildKit Linux Context 被 Windows 宿主误判，以及 POSIX cache 安全 API 不可用和连带夹具错误。此后只修复前一类路径问题，不把原完整失败改成 PASS。
+- 历史 Context 的 8 种路径正反例、原 history 归属、M3 exact relative 三项通过；新增缺少 no-follow 能力时拒绝且原文件不变测试通过；根路径又补空/相对输出拒绝并通过。
+- 最终固定 16 项在精确当前输入上实际全部 PASS、0skip、exit 0，unittest 99.404s，自动记录 99620ms。覆盖本轮路径、替身、CAS、Worktree 后验、history 与安全能力拒绝；不是当前全套或 SelfTest PASS。
+
+最终输入标签 `b78e765d5c5448655c1a5967a7e53d47326c02a8ffbe626c9a7d0d4589753a20`；先前完整失败输入标签 `67482d6199d6a6d1edc81875a33f1dedbb6925ee491357c1be4b147455468395`。算法为 SHA256(执行器文件 SHA256 + '|' + 测试文件 SHA256 + '|windows-x64|python3.13.14')，不当作全部产品/工具/环境内容身份。两条实际 UTC/monotonic 观测见[兼容计时](compatibility-timeline.jsonl)，按 LF 规范化保存字段值；原生成文件仍留在主树 ignored artifacts。其他窄命令未自动计时的区间 UNKNOWN，不补造耗时。
+
+最终独立只读 Reviewer 未发现新的 P1/P2，明确本切片只可 DRAFT/PARTIAL，不可据此合并或放行 Preflight/M4；没有运行终端、复跑测试或核对 Git diff。原先后验 P1 的发现、修复及关闭均保留。Mac 原生新代码验收 **NOT_RUN**，不能把 Windows 的 PurePosixPath 场景或旧 Mac 历史 PASS 变成本次 Mac PASS。
+
+当前硬缺口：Windows 等价安全缓存操作尚未实现，现有 O_NOFOLLOW/dir_fd 保护继续拒绝；应补齐等价、受审的原生平台能力，而不是长期用拒绝冒充兼容，更不能跳过失败测试、用 lstat 检查加普通递归删除降低安全。当前新代码全套与完整 SelfTest 未通过，正式当前源码绑定证据、产品实现、main 集成和 V3 均未放行。原 validation.json 仅为 Base 历史事实，不可复用于已改变的工程输入。
