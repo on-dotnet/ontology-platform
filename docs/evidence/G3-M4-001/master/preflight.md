@@ -65,6 +65,12 @@ Windows 原始 JSONL 含 CRLF，原始 SHA256=`fcd4a4da08606e24fa2350bc255a354e9
 
 证据格式失败另记：首次新 Markdown 静态检查发现换行不合规，规范本轮文件 UTF-8/LF 后静态 exit 0；首次正式 validation.json 早检因 EVIDENCE_EOF 拒绝，规范换行后同入口 exit 0、14 checks/EVIDENCE_SCHEMA_ONLY。没有改校验器、检查状态或产品输入以取得通过。这些命令未进入上述八区间计时，耗时 UNKNOWN，不能漏报后再推估为零。
 
+## 本地提交与远程备份
+
+七份文档/证据首次 DRAFT 提交 `05cb966`，最终 staged diff-check exit 0；原主树 main 干净，未改产品/锁。已提交 Head 的 LOCAL 早检实际 exit 0、14 checks/EVIDENCE_SCHEMA_ONLY，证明只含允许的文档增量，不代表产品验收。独立 Review 仅核对四份材料的一致性，范围限制保持。
+
+`git push -u origin codex/g3-m4-master` 实际 exit 1：Recv failure: Connection was reset。随后仅一次 `git ls-remote --heads origin refs/heads/codex/g3-m4-master` 实际 exit 1：Failed to connect to github.com port 443 after 21056ms。开工 fetch 成功不代表此后网络仍可用；当前远程备份 **BLOCKED**，本轮未成功 push，不将远端分支存在性判定为已验证。未改代理/凭证/全局配置，不强推或重复长等。网络检查不在八条 timeline 内，其余未采集耗时 UNKNOWN。后续本地提交只补充这些已发生事实，不预填自己的未来 SHA。
+
 ## 后续顺序与停止
 
 先解决/验收 Windows SelfTest 平台阻塞；必要项全部通过后才 CONTRACT-A 正反例及独立 Review，再按任务卡执行 A → A 集成门禁 → B。后端恢复/build 已通过，不重复相同产品输入下的无关完整检查。当前只允许相互独立的环境诊断和证据记录，M4 业务实现停止，不输出附件完成标记，不自动启动 M5。
