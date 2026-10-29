@@ -1,3 +1,9 @@
+# G3-M4-001 Windows 接续正式授权（2026-10-29）
+
+人类在本会话正式授权附件《OntologyPlatform-CodexMaster-G3-M4-Identity-Time-Impact-V1.md》全部 G3-M4-001，并明确 Preflight 是业务编码的强制前置门禁。本次接续不推翻 M1/M2/M3 历史成果，不授权 M5/G4/G5、收费模型、新直接依赖、系统 Docker/WSL 改动或安全门禁绕过。附件业务范围和验收条件继续有效；本地优先政策继续有效。
+
+当前状态：**BLOCKED / Phase 0**。实际 fetch 后 Base 为 `3992582e03df1a103fac36e7e82b8c81f85f622e`；Windows 工具链 doctor、Web lint/typecheck、OpenAPI/TS 检查通过，但 SelfTest 资源回归失败。未冻结 M4 公共合同，未启动 Slice A/B 业务编码，不能输出完成标记。详见[任务卡](G3-M4-001.md)和[Preflight 记录](../evidence/G3-M4-001/master/preflight.md)。旧授权及失败事实保持原样。
+
 # 2026-10-29 最新人类覆盖授权：本地优先验证
 
 人类在侧聊明确批准并同步Master：当前及后续跨Windows/macOS/Linux开发以本地真实测试、Docker服务、实际浏览器和独立Review为主；GitHub Actions默认按需手动，不再是每次提交、集成、资源回收或最终交付的必需门禁。完整本地验收、已提交源码及输入绑定、唯一V3与独立重开保持；旧CI和失败记录不改，未运行不冒充PASS。跨CI缓存功能仍保留已实测cold/warm证据。详见[永久政策](../development/local-validation-policy.md)。此明确批准覆盖下列M3附件及旧规范中强制同HeadCI的默认要求，不扩大依赖/上传/费用/权限/M4/M5范围。

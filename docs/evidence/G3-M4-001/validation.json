@@ -1,0 +1,126 @@
+{
+  "evidenceSchemaVersion": 2,
+  "validationSource": "LOCAL",
+  "testedCommit": "3992582e03df1a103fac36e7e82b8c81f85f622e",
+  "checks": [
+    {
+      "name": "windows-doctor",
+      "command": "pwsh -NoProfile -File scripts/doctor.ps1 -CheckDocker",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "PowerShell 7.6.9; Windows 10.0.22631; isolated SDK 10.0.402, Node 24.22.1, pnpm 11.28.8; Docker daemon 29.8.2 reachable. Not a product acceptance."
+    },
+    {
+      "name": "windows-selftest",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1 -SelfTest",
+      "status": "FAIL",
+      "exitCode": 1,
+      "output": "Stopped at CleanupResources.Tests.py: Ran 52 tests in 63.551s; failures=23, errors=24. Windows Git root string comparison, unsupported POSIX no-follow APIs and platform fixture assumptions. Later suites NOT_RUN."
+    },
+    {
+      "name": "cleanup-short-reproduction",
+      "command": "python scripts/tests/CleanupResources.Tests.py CleanupTests.test_docker_exact_whitelist_and_dryrun",
+      "status": "FAIL",
+      "exitCode": 1,
+      "output": "Ran 1 test in 0.955s; failures=1; REFUSED: Root must be Git toplevel. Isolated fixture only; no real Docker mutation."
+    },
+    {
+      "name": "web-frozen-restore",
+      "command": ".tools/node-v24.22.1-win-x64/node.exe .tools/pnpm/package/bin/pnpm.cjs install --frozen-lockfile --store-dir .tools/pnpm-store",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "389 packages restored using pnpm 11.28.8; frozen resolution; no dependency or lock update."
+    },
+    {
+      "name": "web-lint",
+      "command": ".tools/node-v24.22.1-win-x64/node.exe .tools/pnpm/package/bin/pnpm.cjs --config.verifyDepsBeforeRun=error --dir apps/web run lint",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "eslint . completed without errors."
+    },
+    {
+      "name": "web-typecheck",
+      "command": ".tools/node-v24.22.1-win-x64/node.exe .tools/pnpm/package/bin/pnpm.cjs --config.verifyDepsBeforeRun=error --dir apps/web run typecheck",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "tsc --noEmit completed without errors."
+    },
+    {
+      "name": "openapi-typescript-byte-check",
+      "command": ".tools/node-v24.22.1-win-x64/node.exe apps/web/scripts/generate-types.mjs --check",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Existing committed OpenAPI snapshots and generated TypeScript are byte-consistent. No live HTTP OpenAPI export or C# regeneration claimed."
+    },
+    {
+      "name": "backend-first-restore-interrupted",
+      "command": ".tools/dotnet/dotnet.exe restore backend/OntologyPlatform.slnx --locked-mode",
+      "status": "FAIL",
+      "exitCode": 130,
+      "output": "Timeline recorded INTERRUPTED after 209388ms. Interleaved terminal output is not a successful restore. This historical attempt remains recorded after later success."
+    },
+    {
+      "name": "backend-locked-restore-retry",
+      "command": ".tools/dotnet/dotnet.exe restore backend/OntologyPlatform.slnx --locked-mode",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Serialized retry completed successfully; timeline 21000ms. DOTNET_CLI_HOME and NUGET_PACKAGES temporarily project-isolated then restored."
+    },
+    {
+      "name": "backend-build",
+      "command": ".tools/dotnet/dotnet.exe build backend/OntologyPlatform.slnx --no-restore --nologo",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "19 real project outputs; no compile errors; existing ASPIRE010 warning once; timeline 24040ms. No tests or live-service acceptance implied."
+    },
+    {
+      "name": "early-evidence-schema",
+      "command": "pwsh -NoProfile -File scripts/test-review-evidence.ps1 -EvidenceFile artifacts/validation/G3-M4-001/early-evidence.json -ExpectedHead 3992582e03df1a103fac36e7e82b8c81f85f622e",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Standard new-review-evidence template validated; EVIDENCE_SCHEMA_ONLY; checks=1, product=NOT_RUN, actualCi=NOT_VERIFIED."
+    },
+    {
+      "name": "canonical-fuseki-identity-only",
+      "command": "python scripts/maintenance/canonical_fuseki.py --identity",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "linux/amd64; contextSha256=dba8036818246baaefc136fa6740729e9be068c79dd0c2ae584f895192406091; inputFingerprint=0fe39718f35634e7a88474fa05fec446e6c64c4071d369d85c933ee7ed4a92c5. Identity only; no image build or service startup."
+    },
+    {
+      "name": "m4-runtime-acceptance",
+      "command": null,
+      "status": "BLOCKED",
+      "exitCode": null,
+      "output": "Windows Preflight not passed. No M4 implementation or PG/Jena/RustFS/browser acceptance executed."
+    },
+    {
+      "name": "m4-contract-freeze-and-product-review",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "CONTRACT-A/B and product implementation not started; no final independent product approval or official V3 delivery package."
+    }
+  ],
+  "ci": {
+    "status": "NOT_RUN",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  },
+  "metadata": {
+    "taskId": "G3-M4-001",
+    "phase": "PHASE_0",
+    "overallStatus": "BLOCKED",
+    "businessCodeChanged": false,
+    "actualAgentActiveTime": "UNKNOWN",
+    "actualAgentThinkingTime": "UNKNOWN",
+    "tokenConsumption": "UNKNOWN",
+    "cloudCost": "UNKNOWN",
+    "recordedStepCount": 8,
+    "recordedCumulativeTaskMs": 498847,
+    "timelinePath": "docs/evidence/G3-M4-001/master/preflight-timeline.jsonl",
+    "platformScope": "Windows x64 host; Docker Linux amd64 daemon; no cross-platform product acceptance inferred"
+  }
+}
