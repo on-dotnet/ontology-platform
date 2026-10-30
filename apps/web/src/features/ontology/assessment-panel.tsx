@@ -5,6 +5,7 @@ import type { OntologyDraft, SemanticAssessment, SemanticSupportProfile, Semanti
 import { Trace } from "../../components/ui/semantic-feedback";
 import { DiagnosticCard } from "./diagnostic-card";
 import { assessmentEligibility } from "./semantic-status";
+import { PublicationImpactPanel } from "./publication-impact-panel";
 
 const client = createG2Client();
 
@@ -107,17 +108,8 @@ export function AssessmentPanel({ draft, profile, dirty, busy, canEdit, reason, 
           })}>重读持久评估</button>
         </>
       )}
-      <button className="button primary" disabled={blocked || eligibility !== "ELIGIBLE"} onClick={() => {
-        if (!assessment || assessmentEligibility(assessment, draft, profile, dirty) !== "ELIGIBLE") return;
-        void execute(async signal => {
-          const proposal = await client.createProposal({
-            kind: "PUBLISH", draftId: draft.draftId, draftRevision: draft.revision, hashes: draft.hashes,
-            validationReportId: assessment.validationReportId, targetReleaseId: null, targetManifestHash: null,
-            command: command(draft.revision, reason),
-          }, signal);
-          onNotice(`真实发布提案已提交 ${proposal.proposalId}，请由其他主体在发布治理中审核。`);
-        });
-      }}>提交异人发布审核</button>
+      <PublicationImpactPanel draft={draft} assessment={assessment} profile={profile} dirty={dirty} busy={busy}
+        canEdit={canEdit} reason={reason} execute={execute} onNotice={onNotice} />
     </section>
   );
 }
