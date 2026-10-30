@@ -8,9 +8,12 @@ import { FixedVersionComparison } from "./fixed-version-comparison";
 const client = createG2Client();
 
 /** 固定修订的四源精确图比较；字节变化与RDF图变化分别展示。 */
-export function VersionComparison({ draft, busy, execute }: {
+export function VersionComparison({ draft, busy, execute, canEdit = false, dirty = true, reason = "" }: {
   draft: OntologyDraft;
   busy: boolean;
+  canEdit?: boolean;
+  dirty?: boolean;
+  reason?: string;
   execute: (action: (signal: AbortSignal) => Promise<void>) => Promise<void>;
 }) {
   const [comparing, setComparing] = useState(false);
@@ -52,7 +55,7 @@ export function VersionComparison({ draft, busy, execute }: {
 
   return (
     <section className="g2-stack" aria-label="版本源比较">
-      <FixedVersionComparison draft={draft} busy={busy} execute={execute} />
+      <FixedVersionComparison draft={draft} busy={busy} execute={execute} canEdit={canEdit} dirty={dirty} reason={reason} />
       <h3>固定修订 Diff 与四源比较</h3>
       <label>基准修订
         <input type="number" min={1} max={draft.revision} value={fromRevision} disabled={busy} onChange={event => {

@@ -513,7 +513,7 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
               />
               <VersionComparison
                 key={`comparison/${state.draft.draftId}/${state.draft.revision}`}
-                draft={state.draft} busy={busy} execute={execute}
+                draft={state.draft} busy={busy} execute={execute} canEdit={canEdit} dirty={hasUnsaved} reason={reason}
               />
             </>
           ) : (

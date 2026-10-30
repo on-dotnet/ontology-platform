@@ -49,6 +49,7 @@ describe("M4固定版本选择与回复边界", () => {
     expect(versionDiffMatches({ ...diff(), baseManifestHash: "f".repeat(64) }, request, "asset", scope)).toBe(false);
     expect(versionDiffMatches({ ...diff(), targetManifestHash: null }, request, "asset", scope)).toBe(false);
     expect(versionDiffMatches({ ...diff(), targetManifestHash: "manifest-fixed" }, request, "asset", scope)).toBe(false);
+    expect(versionDiffMatches({ ...diff(), targetManifestHash: "f".repeat(64) + "\n" }, request, "asset", scope)).toBe(false);
     expect(versionDiffMatches({ ...diff(), from: { kind: "DRAFT", id: "draft", revision: null } }, request, "asset", scope)).toBe(false);
   });
   it("图状态和typed三元组字段缺失不能在展示时崩溃", () => {

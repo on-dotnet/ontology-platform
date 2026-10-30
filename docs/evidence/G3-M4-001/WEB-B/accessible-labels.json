@@ -1,0 +1,62 @@
+{
+  "fixedDiff": {
+    "region": "任意固定版本差异",
+    "fields": [
+      "基准版本类型",
+      "基准版本ID",
+      "基准固定修订",
+      "目标版本类型",
+      "目标版本ID",
+      "目标固定修订"
+    ],
+    "actions": [
+      "比较固定版本四源源码",
+      "取消固定版本比较"
+    ],
+    "results": "固定版本四源差异结果"
+  },
+  "publication": {
+    "region": "发布影响与审批绑定",
+    "actions": [
+      "评估发布资格",
+      "生成发布影响报告",
+      "刷新发布影响基线",
+      "提交异人发布审核"
+    ],
+    "report": "影响报告详情",
+    "conclusions": [
+      "已知影响",
+      "技术阻断项",
+      "未知与未覆盖范围"
+    ],
+    "evidence": "影响结论证据"
+  },
+  "analysis": {
+    "region": "任意固定版本影响分析",
+    "fields": [
+      "分析评估ID"
+    ],
+    "actions": [
+      "生成所选版本影响分析",
+      "取消所选版本影响分析"
+    ],
+    "nullAssessment": "Empty draft assessment is sent null and may produce BLOCKED; Release target always null"
+  },
+  "review": {
+    "proposalArticle": "提案{proposalId}",
+    "releaseArticle": "正式版本{releaseId}",
+    "actions": [
+      "异人批准",
+      "拒绝提案",
+      "激活已批准版本",
+      "激活已批准回滚",
+      "提出回滚至此版本"
+    ],
+    "originalReport": [
+      "追溯正式版本原影响报告",
+      "读取原影响报告"
+    ],
+    "reason": "审核操作理由"
+  },
+  "layout": "Wide inspector visible; narrow viewport first selects 图与校验. Default source remains unchanged."
+}
