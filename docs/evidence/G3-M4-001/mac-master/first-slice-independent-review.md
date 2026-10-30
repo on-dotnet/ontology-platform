@@ -1,0 +1,11 @@
+# Slice A 首切片独立Review
+
+非作者只读Reviewer `/root/preflight_review`审查精确SEM4377d049d280c8bcdcec352b427a99c90f27ca59、WEB03194f147662937cfeb76e215b7fa615e736a61e（含前置0df92e6），及Master公共运行器/资源/安全错误说明diff。最终允许整合到Master树真实联调；不认证GATE-A，不放行B。
+
+SEM：所有保存/结构/词汇/身份写路通过SaveCore并锁内重验CAS/scope/history/hash；clone v4从核验正式源继承保护。逐claim局部有效性不能通过删类型、改坏时间、移除target类型或添加无关坏claim解锁。v1-v3工厂及发布精确派发保留，v4仅命名有限模板，31真实PG-Jena/0fail/0skip仅窄验。Publishing/旧v3回滚/并发及浏览器仍NOT_RUN，另由Owner补测试。
+
+WEB原P1：StructuralForm遗漏identityPending，成功回包可静默丢身份缓冲；Owner031修统一structuralWriteGate并保护实际回调，窄9/9、lint/typecheck通过，Reviewer确认关闭。Master真实浏览器另验证初始可执行→身份排队后结构按钮禁用且缓冲保留。
+
+Master原P2：宽屏后点击隐藏mobile页签；已改390先切图与校验再恢复1440，Reviewer确认。原SemanticError P2：普通对象allowlist可命中__proto__导致React崩溃；改Object.hasOwn并增加__proto__/constructor/toString/hasOwnProperty及任意未知码负例，20测试通过，Reviewer确认关闭。时间正则尾随LF原P2已在合同审查关闭，历史失败不删。
+
+公共M4模式正确透传至真实下游，M5继续拒绝；M4资源扩展只自身标准卷、当前backend/context/fingerprint/空引用/同任务已提交CLOSED证明及准确no-such后验，无泛化清理。控制面20、AppHost2、M4cleanup2只是相应边界测试。核心M4环境真实引导/停止exit0也不替代产品验收。

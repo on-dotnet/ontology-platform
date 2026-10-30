@@ -5,7 +5,22 @@ import { PlatformApiError } from "../../lib/api/client";
 export function SemanticError({ error }: { error: unknown }) {
   const status = error instanceof PlatformApiError ? error.status : 0;
   const titles: Record<number, string> = { 401: "会话已失效，请重新登录", 403: "当前角色或完整厂区范围无权访问", 404: "资源不存在", 409: "版本冲突：本地未保存文本仍保留", 422: "源码、参数或支持子集未通过校验", 428: "请求缺少版本条件", 429: "已达到预算，请稍后重试", 503: "依赖暂时不可用，未返回成功结果" };
-  return <div className="g2-notice error" role="alert"><strong>{titles[status] ?? "请求未完成，请检查连接并显式重试"}</strong>{status > 0 && <span> HTTP {status}</span>}{error instanceof PlatformApiError && error.traceId && <Trace traceId={error.traceId} />}{status === 401 && <a href="/auth/login?returnUrl=/ontologies" className="button">重新登录</a>}</div>;
+  const explanations: Record<string, string> = {
+    identity_ambiguous: "AMBIGUOUS：同一组织、厂区和来源编号存在重叠身份声明。请保留历史并明确有效期，系统不会自动合并。",
+    identity_relation_indeterminate: "INDETERMINATE：未知时间端点使身份关系无法确定，不能认定无冲突。请补充可验证的时间依据。",
+    identity_history_immutable: "已保存的有效身份历史不能删除或改写；请关闭或收窄旧有效期，并以新IRI建立后续声明。",
+    identity_scope_forbidden: "身份组织与厂区必须属于当前资产的完整授权范围。",
+    identity_scope_conflict: "身份声明的组织或厂区与当前资产范围不一致。",
+    time_timezone_required: "时间必须明确填写Z或±hh:mm时区，系统不会采用本机时区。",
+    time_lexical_invalid: "时间不符合受控日期时间格式；请检查真实日期、时区及最多七位小数。",
+    time_interval_reversed: "半开区间必须满足起点早于终点，终点不包含在有效期内。",
+    time_reference_missing: "时间资源引用缺失或有多值；请登记明确的命名时间点或区间。",
+    time_template_unsupported: "时间表达超出本轮受控点与区间模板；源码保留，结构编辑和发布将受阻。",
+    identity_claim_invalid: "身份声明的组织、厂区、来源、编号、目标IRI或有效期不完整或有歧义。",
+    event_time_invalid: "事件须引用明确的受控时间点或区间，观察时间另行记录。",
+  };
+  const explanation = error instanceof PlatformApiError && Object.hasOwn(explanations, error.code) ? explanations[error.code] : undefined;
+  return <div className="g2-notice error" role="alert"><strong>{titles[status] ?? "请求未完成，请检查连接并显式重试"}</strong>{explanation && <p>{explanation}</p>}{status > 0 && <span> HTTP {status}</span>}{error instanceof PlatformApiError && error.traceId && <Trace traceId={error.traceId} />}{status === 401 && <a href="/auth/login?returnUrl=/ontologies" className="button">重新登录</a>}</div>;
 }
 /** 仅将非零32位十六进制TraceId编码为本地Tempo查询，不接受URL或额外查询参数。 */
 function tempoTraceUrl(traceId: string): string | null {

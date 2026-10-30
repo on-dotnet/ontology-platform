@@ -8,7 +8,7 @@
 
 GET /api/v1/ontology-drafts/{id}/identity-time→VocabularySnapshot（semantic.read）；POST /api/v1/ontology-drafts/{id}/identity-time-edits→OntologyDraft（ontology.edit/CSRF/强If-Match=command.expectedRevision）；GET /api/v1/releases/{id}/identity-time→VocabularySnapshot（semantic.read，固定manifest+RustFS+Jena核验）。IG3IdentityTimeService三方法；runtime复用IG3VocabularyRuntime。旧vocabulary端点仍可读取完整事实，但新增结构谓词和所有源码保存/assessment/发布均不能绕过范围和历史检查。
 
-任何源/Jena读取之前先授权完整草稿scope。身份organizationId必须等于草稿组织，siteId必须属于草稿完整厂区集合；跨scope写拒403 identity_scope_forbidden，不按actor全局权限扩大草稿。身份历史不可删除、改组织/厂区/ns/编号/target/来源/开始时间；允许为旧未知to补明确终点或收窄原to（不能移动from或扩张），旧claim与起点事实保留，建立新claim IRI承接新身份。四源普通源码保存也检查该历史约束；原不可变DraftRevision仍完整保存。并发以真正DB CAS锁重新检查，不只预检。
+任何源/Jena读取之前先授权完整草稿scope。身份organizationId必须等于草稿组织，siteId必须属于草稿完整厂区集合；跨scope写拒403 identity_scope_forbidden，不按actor全局权限扩大草稿。此前已形成有效声明（本claim局部字段/类型/命名时间引用及已知端点词法/顺序均有效）的身份历史不可删除、改组织/厂区/ns/编号/target/来源/开始时间；允许为旧未知to补明确终点或收窄原to（不能移动from或扩张），旧claim与起点事实保留，建立新claim IRI承接新身份。初次保存便缺失或错误时间的未有效声明允许修正，原修订保留；不得因整个bundle有无关错误、新增重叠claim或未评估而解锁此前局部有效claim。旧有效claim改成错误时间或删类型仍拒。四源普通源码保存也检查该历史约束；原不可变DraftRevision仍完整保存。并发以真正DB CAS锁重新检查，不只预检。
 
 结构编辑先整批完成再治理：非法claim/time/error→422 identity_time_invalid；需要关系但无法确定→422 identity_time_indeterminate。普通源码保存允许语义错误/unknown以便专家修正（跨scope/历史破坏仍拒），assessment与发布失败关闭。命令幂等沿原Replay/SaveCore；重试相同payload不二次修订，异payload同key409。原审计和发布Outbox事务不重建。
 
@@ -57,3 +57,7 @@ TemporalContractRules为纯公共时间词法/半开关系合同；不依赖EF/H
 ```
 
 以上未知终点由缺hasEnd表达，不是无穷或确定永久有效。组织/厂区须取实际草稿scope，Synthetic示例不授予权限。
+
+## 结构编辑安全错误优先级补充
+
+此前有效历史破坏优先409 identity_history_immutable（锁内CAS复核）；跨草稿scope拒403 identity_scope_forbidden。其余422按固定类别优先级identity_ambiguous→time_interval_reversed→time_timezone_required→time_lexical_invalid→time_reference_missing→time_template_unsupported→identity_claim_invalid→event_time_invalid；其它error回退identity_time_invalid，未知关系identity_relation_indeterminate。优先级只选择错误类别，不从冲突身份值中选首项。原始源读取/assessment仍返回完整真实来源诊断，结构请求失败不伪造行列或未生成的assessment引用。UI仅显示本地固定安全中文说明，不显示远端detail。

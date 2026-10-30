@@ -22,7 +22,7 @@ def run_attempt():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--runtime-file')
     parser.add_argument('--start-runtime', action='store_true')
-    parser.add_argument('--milestone', choices=['M1', 'M2', 'M3'], default='M1')
+    parser.add_argument('--milestone', choices=['M1', 'M2', 'M3', 'M4'], default='M1')
     parser.add_argument('--api-only', action='store_true')
     parser.add_argument('--ui-only', action='store_true')
     parser.add_argument('--smoke-fault-check', action='store_true')
@@ -34,8 +34,8 @@ def run_attempt():
         parser.error('Choose one integration checkpoint')
     if args.api_only and args.smoke_fault_check:
         parser.error('Smoke fault injection requires a browser checkpoint')
-    if (args.api_only or args.ui_only) and args.milestone not in ('M2', 'M3'):
-        parser.error('Integration checkpoints are authorized only for M2/M3')
+    if (args.api_only or args.ui_only) and args.milestone not in ('M2', 'M3', 'M4'):
+        parser.error('Integration checkpoints are authorized only for M2/M3/M4')
     task_id = 'G3-' + args.milestone + '-001'
     task_evidence = 'docs/evidence/' + task_id + '/runtime'
     prefix = 'g3-' + args.milestone.lower() + '-'
@@ -146,8 +146,10 @@ def run_attempt():
             commands[0].append('--m2-api-only' if args.api_only else '--m2-ui-only' if args.ui_only else '--m2')
         if args.milestone == 'M3' and not args.workspace_smoke_only:
             commands[0].append('--m3-api-only' if args.api_only else '--m3-ui-only' if args.ui_only else '--m3')
-        if args.milestone == 'M3':
-            commands[-1] += ['--chain-report', 'm3-full-e2e.json']
+        if args.milestone == 'M4' and not args.workspace_smoke_only:
+            commands[0].append('--m4-api-only' if args.api_only else '--m4-ui-only' if args.ui_only else '--m4')
+        if args.milestone in ('M3', 'M4'):
+            commands[-1] += ['--chain-report', args.milestone.lower() + '-full-e2e.json']
         if args.smoke_fault_check:
             commands[0].append('--smoke-fault-check')
         if args.workspace_smoke_only:

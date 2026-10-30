@@ -501,6 +501,42 @@ p.write_text(json.dumps(s))
         finally:os.environ['PATH']=saved_path
         self.assertFalse(any('rm' in row for row in json.loads(self.state_path.read_text())['calls']))
 
+    def m4_volume_fixture(self):
+        self.m1_volume_fixture('G3-M4-001','g3-m4')
+        self.plan['dockerBackend']=dict(context='desktop-linux',engineId='fixture-engine-id',serverVersion='29.9.2')
+        snapshot=dict(Name='g3-m4-fixture-postgres-data',Driver='local',CreatedAt='2026-01-01T00:00:00Z')
+        self.plan['operations'][0].update(expectedReferences=[],fingerprint=hashlib.sha256(json.dumps(snapshot,sort_keys=True,separators=(',',':')).encode()).hexdigest())
+
+    def test_m4_exact_volume_and_strong_absence(self):
+        self.m4_volume_fixture()
+        self.assertEqual(self.run_engine().returncode,0)
+        result=self.run_engine(True)
+        self.assertEqual(result.returncode,0,result.stderr)
+        state=json.loads(self.state_path.read_text())
+        self.assertEqual(state['volumes'],[])
+        self.assertEqual(len(state['containers']),1)
+        self.assertEqual(len(state['images']),1)
+        rows=[json.loads(line) for line in (self.base/'apply.jsonl').read_text().splitlines()]
+        self.assertTrue(any(row.get('phase')=='after' and row.get('after',{}).get('absent') for row in rows), rows)
+
+    def test_m4_rejects_foreign_git_image_owner_backend_and_stale_fingerprint(self):
+        self.m4_volume_fixture()
+        original=copy.deepcopy(self.plan)
+        for mutation in ['foreign','git','image','owner','backend','fingerprint','references']:
+            self.plan=copy.deepcopy(original)
+            op=self.plan['operations'][0]
+            if mutation=='foreign':op['target']='g2-protected-postgres-data'
+            if mutation=='git':op.update(type='git-local-branch',target='codex/old',expectedTip=self.main)
+            if mutation=='image':op.update(type='docker-image',target='sha256:'+'b'*64)
+            if mutation=='owner':op['ownershipEvidence']['taskId']='G3-M3-001'
+            if mutation=='backend':self.plan['dockerBackend']['engineId']='another-engine'
+            if mutation=='fingerprint':op['fingerprint']='f'*64
+            if mutation=='references':op['expectedReferences']=['a'*64]
+            self.assert_rejected()
+        state=json.loads(self.state_path.read_text())
+        self.assertEqual(len(state['volumes']),1)
+        self.assertFalse(any('rm' in row for row in state['calls']))
+
     def m3_volume_fixture(self):
         self.m1_volume_fixture('G3-M3-001','g3-m3')
         self.plan['dockerBackend']=dict(context='desktop-linux',engineId='fixture-engine-id',serverVersion='29.9.2')

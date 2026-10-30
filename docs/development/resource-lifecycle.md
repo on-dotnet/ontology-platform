@@ -63,3 +63,7 @@ M3明确授权逐ID处理本轮与已证实可替代的canonical镜像/关闭his
 image/volume删除除列表缺席外，还要求当前已冻结Engine的准确ID不存在诊断；权限/传输错误不能当删除成功。history继承offset读取、单节点完整版本和bridge代际、准确no-record诊断；自然代际未发生仍记NOT_VERIFIED，不能用等待时长冒充持久后验。保留原失败日志，后验回现撤回完成结论。actual Apply须先真实隔离空fixture验证，再独立审查项目白名单并保留日常开发image+8旧G2卷。新失败history在诊断留证后必须按该流程实际收尾，禁止一律永久KEEP。
 
 M3实际Buildx metadata的Context可为完整绝对项目路径，或唯一精确相对字符串`infra/development/fuseki`。后一形式只对G3-M3-001接受；仍须精确Name/Dockerfile/官方VCS/40位revision/完整指纹/本任务已提交CLOSED证明及固定backend。`./`、`../`、其它前缀、大小写变体不能规范化后放行。该值仅作为metadata身份校验，绝不作为任意文件删除路径。
+
+## G3-M4-001 本任务精确资源扩展
+
+M4仅增加自身`g3-m4-*`标准服务数据卷准确白名单，沿用当前Docker context/Engine/version、同任务已提交CLOSED Synthetic证明、24h期效、完整metadata fingerprint、空容器引用、前后重验及准确no-such-volume强后验；拒绝Git/cache/image/history与旧G2/M1/M2/M3卷。Master只在本任务独立审查、真实本地门禁及关闭证据提交后Apply。AppHost/launcher加入M4准确前缀，不放开M5。现有canonical共享镜像直接复用，不新建随机镜像；若没有本轮新history则无待删history，不用零变化掩盖已有安全资源。Worktree继续原生可恢复archive，跨任务活跃引用保持KEEP及解除条件，禁止全局prune/restart。

@@ -26,7 +26,7 @@ export async function runM1Checks({ root, origin, operator, viewer, single, chec
     const profileResponse = await viewer.api.get(origin + "/api/v1/semantic/support-profile");
     observed("m1_profile_authorized", profileResponse.status() === 200);
     const profile = await profileResponse.json();
-    const count = profile.version === "3" ? 22 : ["1", "2"].includes(profile.version) ? 20 : 0;
+    const count = profile.version === "4" ? 23 : profile.version === "3" ? 22 : ["1", "2"].includes(profile.version) ? 20 : 0;
     const capabilityIds = new Set(profile.capabilities.map(item => item.id));
     observed("m1_profile_registered_asserted", count > 0 && profile.capabilities.length === count && capabilityIds.size === count
       && Array.from({ length: count }, (_, index) => String(index + 1).padStart(2, "0")).every(id => capabilityIds.has(id))

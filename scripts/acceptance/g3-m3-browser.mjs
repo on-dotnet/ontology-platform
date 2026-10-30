@@ -23,8 +23,11 @@ export async function runM3Checks({ root, origin, operator, audit, single, viewe
   const address = new URL(origin);
   if (!["localhost", "127.0.0.1", "[::1]"].includes(address.hostname) || address.protocol !== "http:") throw new Error("m3_local_origin_required");
   const evidence = evidenceDirectory(root);
-  const boundary = relative(resolve(root, "docs/evidence/G3-M3-001"), evidence);
-  if (boundary.startsWith("..") || isAbsolute(boundary)) throw new Error("m3_evidence_task_boundary_required");
+  const allowed = ["G3-M3-001", "G3-M4-001"].some(task => {
+    const boundary = relative(resolve(root, "docs/evidence", task), evidence);
+    return !boundary.startsWith("..") && !isAbsolute(boundary);
+  });
+  if (!allowed) throw new Error("m3_evidence_task_boundary_required");
   await mkdir(evidence, { recursive: true });
   const checks = [];
   const samples = [];
@@ -59,7 +62,7 @@ export async function runM3Checks({ root, origin, operator, audit, single, viewe
     observe("mode_not_contradictory", !(apiOnly && uiOnly));
     step("profile");
     const profile = await get(viewer, "/api/v1/semantic/support-profile", "current_profile");
-    observe("current_registered_m3_profile", profile.version === "3" && profile.reasoningMode === "ASSERTED_ONLY"
+    observe("current_registered_m3_profile", ["3", "4"].includes(profile.version) && profile.capabilities.length === (profile.version === "4" ? 23 : 22) && profile.reasoningMode === "ASSERTED_ONLY"
       && typeof profile.hash === "string" && profile.hash.length === 64
       && ["21", "22"].every(id => profile.capabilities.some(row => row.id === id && row.edit === "BASIC" && row.preserve === "EXACT")));
     step("create_four_source_vocabulary");

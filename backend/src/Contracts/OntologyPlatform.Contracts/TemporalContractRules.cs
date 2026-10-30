@@ -31,6 +31,7 @@ public static class TemporalContractRules
         string?[] values = [leftFrom, leftTo, rightFrom, rightTo];
         // 解析后的值只有相应源非空时才可用于关系判断。
         var points = new DateTimeOffset[4];
+        // 端点槽位索引仅核验对应词法，不将未知值混入关系比较。
         for (var index = 0; index < values.Length; index++)
             if (values[index] is not null && !TryInstant(values[index], out points[index])) return TemporalRelation.Invalid;
         if (leftFrom is not null && leftTo is not null && points[0] >= points[1]

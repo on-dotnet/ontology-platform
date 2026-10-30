@@ -1,6 +1,6 @@
 #Requires -Version 7.4
 [CmdletBinding()]
-param([ValidateSet('M1', 'M2', 'M3')][string]$Milestone = 'M1', [string]$RuntimeFile, [switch]$StartRuntime, [switch]$ModulesOnly)
+param([ValidateSet('M1', 'M2', 'M3', 'M4')][string]$Milestone = 'M1', [string]$RuntimeFile, [switch]$StartRuntime, [switch]$ModulesOnly)
 $ErrorActionPreference = 'Stop'
 $root = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 $beforeEvidence = [Environment]::GetEnvironmentVariable('PLATFORM_EVIDENCE_DIR', 'Process')

@@ -22,9 +22,9 @@ def main():
         parser.error('Only current checkout private runtime accepted')
     runtime = json.loads(path.read_text())
     prefix = runtime['volumePrefix']
-    if prefix.startswith('g3-m3-'):
-        if not re.fullmatch(r'g3-m3-[0-9a-f]{12}', prefix) or path.parent.name != prefix:
-            parser.error('Only exactly owned M3 runtime accepted')
+    if prefix.startswith(('g3-m3-', 'g3-m4-')):
+        if not re.fullmatch(r'g3-m[34]-[0-9a-f]{12}', prefix) or path.parent.name != prefix:
+            parser.error('Only exactly owned M3/M4 runtime accepted')
     elif not prefix.startswith(('g2-', 'g3-m1-', 'g3-m2-')):
         parser.error('Historical volumes forbidden')
     checks = []

@@ -1,0 +1,80 @@
+test_actual_process_start_failure_marks_current_failed_and_later_not_run (__main__.M1OrchestrationTests.test_actual_process_start_failure_marks_current_failed_and_later_not_run) ... ok
+test_all_real_gate_selections_include_m1_and_regressions (__main__.M1OrchestrationTests.test_all_real_gate_selections_include_m1_and_regressions) ... ok
+test_each_child_failure_stops_later_gates (__main__.M1OrchestrationTests.test_each_child_failure_stops_later_gates) ... ok
+test_failed_attempt_cannot_consume_or_certify_stale_pass (__main__.M1OrchestrationTests.test_failed_attempt_cannot_consume_or_certify_stale_pass) ... ok
+test_first_m2_integration_selects_real_api_only_without_claiming_full_gates (__main__.M1OrchestrationTests.test_first_m2_integration_selects_real_api_only_without_claiming_full_gates) ... ok
+test_m2_selects_its_own_runtime_evidence_and_authenticated_checks (__main__.M1OrchestrationTests.test_m2_selects_its_own_runtime_evidence_and_authenticated_checks) ... ok
+test_m3_full_chain_runs_smoke_fault_through_actual_parsers (__main__.M1OrchestrationTests.test_m3_full_chain_runs_smoke_fault_through_actual_parsers) ... ok
+test_m3_partial_modes_parse_the_exact_upstream_command (__main__.M1OrchestrationTests.test_m3_partial_modes_parse_the_exact_upstream_command) ... ok
+test_m3_selects_own_runtime_and_real_gates (__main__.M1OrchestrationTests.test_m3_selects_own_runtime_and_real_gates) ... ok
+test_m4_own_runtime_checkpoints_and_failure_propagation (__main__.M1OrchestrationTests.test_m4_own_runtime_checkpoints_and_failure_propagation) ... ok
+test_owned_e0_workspace_smoke_runs_only_fast_gate_and_preserves_fault_flag (__main__.M1OrchestrationTests.test_owned_e0_workspace_smoke_runs_only_fast_gate_and_preserves_fault_flag) ... ok
+test_protected_g2_runtime_is_refused (__main__.M1OrchestrationTests.test_protected_g2_runtime_is_refused) ... usage: g3-acceptance-runtime.py [-h] [--runtime-file RUNTIME_FILE]
+                                [--start-runtime] [--milestone {M1,M2,M3,M4}]
+                                [--api-only] [--ui-only] [--smoke-fault-check]
+                                [--workspace-smoke-only]
+g3-acceptance-runtime.py: error: Protected G2 or unrelated runtime refused
+ok
+test_real_child_gates_automatically_record_timeline_and_failure_exit (__main__.M1OrchestrationTests.test_real_child_gates_automatically_record_timeline_and_failure_exit) ... ok
+test_second_m2_integration_selects_only_real_ui_checkpoint (__main__.M1OrchestrationTests.test_second_m2_integration_selects_only_real_ui_checkpoint) ... ok
+test_wrong_runtime_and_future_milestones_are_refused (__main__.M1OrchestrationTests.test_wrong_runtime_and_future_milestones_are_refused) ... usage: g3-acceptance-runtime.py [-h] [--runtime-file RUNTIME_FILE]
+                                [--start-runtime] [--milestone {M1,M2,M3,M4}]
+                                [--api-only] [--ui-only] [--smoke-fault-check]
+                                [--workspace-smoke-only]
+g3-acceptance-runtime.py: error: Protected G2 or unrelated runtime refused
+usage: g3-acceptance-runtime.py [-h] [--runtime-file RUNTIME_FILE]
+                                [--start-runtime] [--milestone {M1,M2,M3,M4}]
+                                [--api-only] [--ui-only] [--smoke-fault-check]
+                                [--workspace-smoke-only]
+g3-acceptance-runtime.py: error: Protected G2 or unrelated runtime refused
+usage: g3-acceptance-runtime.py [-h] [--runtime-file RUNTIME_FILE]
+                                [--start-runtime] [--milestone {M1,M2,M3,M4}]
+                                [--api-only] [--ui-only] [--smoke-fault-check]
+                                [--workspace-smoke-only]
+g3-acceptance-runtime.py: error: Protected G2 or unrelated runtime refused
+usage: g3-acceptance-runtime.py [-h] [--runtime-file RUNTIME_FILE]
+                                [--start-runtime] [--milestone {M1,M2,M3,M4}]
+                                [--api-only] [--ui-only] [--smoke-fault-check]
+                                [--workspace-smoke-only]
+g3-acceptance-runtime.py: error: argument --milestone: invalid choice: 'M5' (choose from 'M1', 'M2', 'M3', 'M4')
+ok
+test_actual_node_writer_preserves_detailed_smoke_receipt (__main__.RealBrowserEntryTests.test_actual_node_writer_preserves_detailed_smoke_receipt) ... ok
+test_existing_m2_and_unknown_flag (__main__.RealBrowserEntryTests.test_existing_m2_and_unknown_flag) ... usage: full-g2-e2e.py [-h] --runtime-file RUNTIME_FILE [--m1] [--m2]
+                      [--m2-api-only] [--m2-ui-only] [--m3] [--m3-api-only]
+                      [--m3-ui-only] [--m4] [--m4-api-only] [--m4-ui-only]
+                      [--workspace-smoke-only] [--smoke-fault-check]
+full-g2-e2e.py: error: unrecognized arguments: --m5
+ok
+test_precise_m4_modes_reach_real_browser_flags (__main__.RealBrowserEntryTests.test_precise_m4_modes_reach_real_browser_flags) ... ok
+test_real_smoke_fault_checkpoint_is_forwarded (__main__.RealBrowserEntryTests.test_real_smoke_fault_checkpoint_is_forwarded) ... ok
+test_three_m3_modes_reach_real_browser_flags (__main__.RealBrowserEntryTests.test_three_m3_modes_reach_real_browser_flags) ... ok
+
+----------------------------------------------------------------------
+Ran 20 tests in 1.474s
+
+OK
+{"status": "FAIL", "runId": "ac817696709e4cedba1c01fc150e12d7", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/ac817696709e4cedba1c01fc150e12d7"}
+{"status": "PASS", "runId": "3df746863921424d8f8c79eda5727a8f", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/3df746863921424d8f8c79eda5727a8f"}
+{"status": "FAIL", "runId": "917e4901678743a58ba2fb5d7cd8367f", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/917e4901678743a58ba2fb5d7cd8367f"}
+{"status": "FAIL", "runId": "8e0d8215e16641bba73e2ba9ef9b73bf", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/8e0d8215e16641bba73e2ba9ef9b73bf"}
+{"status": "FAIL", "runId": "0b0dce3dbaea489d8af72d78034a9699", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/0b0dce3dbaea489d8af72d78034a9699"}
+{"status": "FAIL", "runId": "e1853233455745dfb7330dfea14f3fe0", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/e1853233455745dfb7330dfea14f3fe0"}
+{"status": "FAIL", "runId": "04dd103ba8284f7db1fb00ebcf8c9780", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/04dd103ba8284f7db1fb00ebcf8c9780"}
+{"status": "FAIL", "runId": "6d1c7eaebc524a8084970fdc6af2cb9c", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/6d1c7eaebc524a8084970fdc6af2cb9c"}
+{"status": "FAIL", "runId": "ae30ab713f5c47d69e1f042cd73e982e", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/ae30ab713f5c47d69e1f042cd73e982e"}
+{"status": "FAIL", "runId": "e1d5a4a9b1464a1284fd5e047258a2fe", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/e1d5a4a9b1464a1284fd5e047258a2fe"}
+{"status": "PASS", "runId": "04e4eb1377f144e6b7d5ea76b34243f7", "evidenceDirectory": "docs/evidence/G3-M2-001/runtime/g3-m2-control/04e4eb1377f144e6b7d5ea76b34243f7"}
+{"status": "PASS", "runId": "2c079224230842fb90357055bf6ec334", "evidenceDirectory": "docs/evidence/G3-M2-001/runtime/g3-m2-control/2c079224230842fb90357055bf6ec334"}
+{"status": "PASS", "runId": "cb94687cc4dc456bb0945bc4198a3719", "evidenceDirectory": "docs/evidence/G3-M3-001/runtime/g3-m3-fault-control/cb94687cc4dc456bb0945bc4198a3719"}
+{"status": "PASS", "runId": "2103bde2541946369245d27ab7e1292a", "evidenceDirectory": "docs/evidence/G3-M3-001/runtime/g3-m3-control/2103bde2541946369245d27ab7e1292a"}
+{"status": "PASS", "runId": "59d26613b60844b78c65baccfcd93a5b", "evidenceDirectory": "docs/evidence/G3-M3-001/runtime/g3-m3-control/59d26613b60844b78c65baccfcd93a5b"}
+{"status": "PASS", "runId": "670fdfa764c94308ac55e21cd11d998a", "evidenceDirectory": "docs/evidence/G3-M3-001/runtime/g3-m3-control/670fdfa764c94308ac55e21cd11d998a"}
+{"status": "PASS", "runId": "68c1d49bbf8a4acc9e586916bf0ea82a", "evidenceDirectory": "docs/evidence/G3-M4-001/runtime/g3-m4-control/68c1d49bbf8a4acc9e586916bf0ea82a"}
+{"status": "PASS", "runId": "fa2bcc204e434382aecc77fd723f80c5", "evidenceDirectory": "docs/evidence/G3-M4-001/runtime/g3-m4-control/fa2bcc204e434382aecc77fd723f80c5"}
+{"status": "PASS", "runId": "56529a5f83fa49288b04f7fc6bf1e114", "evidenceDirectory": "docs/evidence/G3-M4-001/runtime/g3-m4-control/56529a5f83fa49288b04f7fc6bf1e114"}
+{"status": "PASS", "runId": "7da4c7e1eebc462985dbf77228cadb95", "evidenceDirectory": "docs/evidence/G3-M4-001/runtime/g3-m4-control/7da4c7e1eebc462985dbf77228cadb95"}
+{"status": "FAIL", "runId": "5c36819eaa954a16aa30301813789317", "evidenceDirectory": "docs/evidence/G3-M4-001/runtime/g3-m4-control/5c36819eaa954a16aa30301813789317"}
+{"status": "PASS", "runId": "9e014b19503d40ae901d7395ff653af1", "evidenceDirectory": "docs/evidence/G3-M3-001/runtime/g3-m3-smoke-control/9e014b19503d40ae901d7395ff653af1"}
+{"status": "PASS", "runId": "36696234ffd44ec58be2bc43c14ed488", "evidenceDirectory": "docs/evidence/G3-M3-001/runtime/g3-m3-timing-control/36696234ffd44ec58be2bc43c14ed488"}
+{"status": "FAIL", "runId": "1937fbfadecc437983cd7a6c321bd3e1", "evidenceDirectory": "docs/evidence/G3-M3-001/runtime/g3-m3-timing-control/1937fbfadecc437983cd7a6c321bd3e1"}
+{"status": "PASS", "runId": "87f7ae1209354720b7892802a744bb67", "evidenceDirectory": "docs/evidence/G3-M2-001/runtime/g3-m2-control/87f7ae1209354720b7892802a744bb67"}

@@ -40,11 +40,19 @@ class RealBrowserEntryTests(unittest.TestCase):
                     self.assertIn('--m1', command)
                     self.assertIn('--m2', command)
 
+    def test_precise_m4_modes_reach_real_browser_flags(self):
+        for flag in ['--m4', '--m4-api-only', '--m4-ui-only']:
+            command = self.invoke(flag)
+            self.assertIn(flag, command)
+            self.assertEqual('--full' in command, flag == '--m4')
+            if flag == '--m4':
+                for prior in ['--m1', '--m2', '--m3']: self.assertIn(prior, command)
+
     def test_existing_m2_and_unknown_flag(self):
         for flag in ['--m2', '--m2-api-only', '--m2-ui-only']:
             self.assertIn(flag, self.invoke(flag))
         with self.assertRaises(SystemExit) as result:
-            self.invoke('--m4')
+            self.invoke('--m5')
         self.assertEqual(result.exception.code, 2)
 
     def test_real_smoke_fault_checkpoint_is_forwarded(self):
@@ -87,6 +95,7 @@ class M1OrchestrationTests(unittest.TestCase):
                     self.assertIn(selected, command, 'Selected checks must run in the existing authenticated harness')
                     if milestone == 'M2' and not workspace_smoke: self.assertIn('--m2-api-only' if api_only else '--m2-ui-only' if ui_only else '--m2', command, 'M2 checks must execute in the real authenticated harness')
                     if milestone == 'M3' and not workspace_smoke: self.assertIn('--m3-api-only' if api_only else '--m3-ui-only' if ui_only else '--m3', command, 'M3 checks must execute in the real authenticated harness')
+                    if milestone == 'M4' and not workspace_smoke: self.assertIn('--m4-api-only' if api_only else '--m4-ui-only' if ui_only else '--m4', command)
                     if smoke_fault: self.assertIn('--smoke-fault-check', command)
                     # Parse the exact upstream argument combination with the real downstream entry.
                     entry_spec = importlib.util.spec_from_file_location('downstream_browser', SCRIPT.with_name(gate))
@@ -198,8 +207,20 @@ class M1OrchestrationTests(unittest.TestCase):
                 self.assertEqual(calls, ['full-g2-e2e.py'])
                 self.assertEqual(proof['scope'], 'API_ONLY' if mode == 'api_only' else 'UI_ONLY')
 
+    def test_m4_own_runtime_checkpoints_and_failure_propagation(self):
+        for mode in ({}, {'api_only': True}, {'ui_only': True}, {'workspace_smoke': True, 'smoke_fault': True}):
+            code, calls, proof, selected, _ = self.exercise(prefix='g3-m4-control', milestone='M4', **mode)
+            self.assertEqual(code, 0)
+            self.assertEqual(calls, GATES if not mode else GATES[:1])
+            self.assertTrue(all('G3-M4-001/runtime/' in item for item in selected))
+        code, calls, proof, *_ = self.exercise(prefix='g3-m4-control', milestone='M4', fail_gate=GATES[0])
+        self.assertEqual(code, 23)
+        self.assertEqual(calls, GATES[:1])
+        self.assertEqual(proof['status'], 'FAIL')
+        self.assertTrue(all(item['status'] == 'NOT_RUN' for item in proof['gates'][1:]))
+
     def test_wrong_runtime_and_future_milestones_are_refused(self):
-        for prefix,milestone in [('g3-m1-control','M2'),('g3-m2-control','M3'),('g3-m4-control','M4'),('g3-m5-control','M5')]:
+        for prefix,milestone in [('g3-m1-control','M2'),('g3-m2-control','M3'),('g3-m3-control','M4'),('g3-m5-control','M5')]:
             with self.assertRaises(SystemExit):self.exercise(prefix=prefix,milestone=milestone)
 
     def test_protected_g2_runtime_is_refused(self):

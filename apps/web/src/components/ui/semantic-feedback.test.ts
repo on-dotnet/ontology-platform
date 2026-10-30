@@ -1,7 +1,8 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { Trace } from "./semantic-feedback";
+import { PlatformApiError } from "../../lib/api/client";
+import { SemanticError, Trace } from "./semantic-feedback";
 
 describe("真实关联标识的本地Tempo定位入口", () => {
   it.each([
@@ -49,5 +50,21 @@ describe("真实关联标识的本地Tempo定位入口", () => {
     expect(html).toContain("关联标识格式无效，无法定位链路");
     expect(html).toContain("复制关联标识");
     expect(html).not.toContain("<script>");
+  });
+});
+
+
+describe("身份时间安全错误解释", () => {
+  it("明确区分歧义、未知关系和不可改写历史", () => {
+    for (const [code, message] of [["identity_ambiguous", "AMBIGUOUS"], ["identity_relation_indeterminate", "INDETERMINATE"],
+      ["identity_history_immutable", "关闭或收窄旧有效期"], ["time_timezone_required", "不会采用本机时区"]]) {
+      const html = renderToStaticMarkup(createElement(SemanticError, { error: new PlatformApiError(422, code) }));
+      expect(html).toContain(message);
+    }
+  });
+  it.each(["untrusted-private-detail", "__proto__", "constructor", "toString", "hasOwnProperty"])("未知或原型属性code %s不会崩溃或伪造诊断", code => {
+    const html = renderToStaticMarkup(createElement(SemanticError, { error: new PlatformApiError(422, code) }));
+    expect(html).not.toContain(code);
+    expect(html).not.toContain("AMBIGUOUS");
   });
 });

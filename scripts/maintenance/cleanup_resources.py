@@ -361,7 +361,7 @@ class Cleaner:
         require(isinstance(p, dict), 'Plan must be object')
         required = {'schemaVersion','taskId','project','repositoryRoot','gitCommonDir','originUrl','expectedMainSha','createdAt','expiresAt','allowedWorktreeRoots','protectedWorktrees','keep','operations'}
         require(required <= p.keys(), 'Missing plan fields')
-        require(type(p['schemaVersion']) is int and p['schemaVersion'] == 1 and p['project'] == PROJECT and p['taskId'] in ('PRE-G3-CLEANUP-FIX-002', 'G3-M1-001', 'G3-M2-001', 'G3-M1-CLOSEOUT-002', 'G3-M3-001'), 'Plan identity mismatch')
+        require(type(p['schemaVersion']) is int and p['schemaVersion'] == 1 and p['project'] == PROJECT and p['taskId'] in ('PRE-G3-CLEANUP-FIX-002', 'G3-M1-001', 'G3-M2-001', 'G3-M1-CLOSEOUT-002', 'G3-M3-001', 'G3-M4-001'), 'Plan identity mismatch')
         require(absolute(p['repositoryRoot']).resolve() == self.root, 'Repository root mismatch')
         git_root=self.git('rev-parse', '--show-toplevel').stdout.strip()
         require(git_root and Path(git_root).is_absolute() and Path(git_root).resolve() == self.root, 'Root must be Git toplevel')
@@ -399,6 +399,14 @@ class Cleaner:
                         'M2 cleanup only accepts own named volumes')
                 require(isinstance(op.get('fingerprint'),str) and HEX64.fullmatch(op['fingerprint'])
                         and op.get('expectedReferences') == [], 'M2 requires exact fingerprint and empty references')
+            if p['taskId'] == 'G3-M4-001':
+                require(op['type'] == 'docker-volume'
+                        and re.fullmatch(r'g3-m4-[a-z0-9-]{1,40}-(postgres|fuseki|rustfs|keycloak|alloy|grafana|loki|tempo|prometheus)-data', op['target'])
+                        and isinstance(op.get('ownershipEvidence'), dict)
+                        and op['ownershipEvidence'].get('taskId') == 'G3-M4-001',
+                        'M4 accepts only its own exact named volumes with current-task proof')
+                require(isinstance(op.get('fingerprint'), str) and HEX64.fullmatch(op['fingerprint'])
+                        and op.get('expectedReferences') == [], 'M4 exact fingerprint and empty references required')
             if p['taskId'] == 'G3-M3-001':
                 require(op['type'] in ('docker-container','docker-volume','docker-image','docker-history')
                         and isinstance(op.get('ownershipEvidence'),dict)
@@ -435,7 +443,7 @@ class Cleaner:
     def docker_command(self, *arguments):
         """Bind M2 operations to the reviewed context rather than the default endpoint."""
         prefix=['docker']
-        if self.plan['taskId'] in ('G3-M2-001','G3-M3-001'):
+        if self.plan['taskId'] in ('G3-M2-001','G3-M3-001','G3-M4-001'):
             expected=self.plan.get('dockerBackend')
             require(isinstance(expected,dict) and set(expected)=={'context','engineId','serverVersion'},'M2 exact Docker backend required')
             require(expected['context'] in ('desktop-linux','default'),'M2 unreviewed Docker context')
@@ -444,7 +452,7 @@ class Cleaner:
 
     def docker_backend(self):
         """Recheck the actual context, daemon identity and version before and after removal."""
-        if self.plan['taskId'] not in ('G3-M2-001','G3-M3-001'):return None
+        if self.plan['taskId'] not in ('G3-M2-001','G3-M3-001','G3-M4-001'):return None
         command=self.docker_command('info','--format','{"engineId":{{json .ID}},"serverVersion":{{json .ServerVersion}}}')
         expected=self.plan['dockerBackend']
         require(isinstance(expected['engineId'],str) and re.fullmatch(r'[A-Za-z0-9-]{6,100}',expected['engineId'])
@@ -556,7 +564,7 @@ class Cleaner:
         index=self.ops.index(op)
         prior={x['target'] for x in self.ops[:index] if x['type']=='docker-container'} if preflight else set()
         for ident in self.container_ids():
-            c=safe_docker_snapshot('docker-container',ident,context=self.plan['dockerBackend']['context'] if self.plan['taskId'] in ('G3-M2-001','G3-M3-001') else None)
+            c=safe_docker_snapshot('docker-container',ident,context=self.plan['dockerBackend']['context'] if self.plan['taskId'] in ('G3-M2-001','G3-M3-001','G3-M4-001') else None)
             used = c['Image']==op['target'] if op['type']=='docker-image' else any(m.get('Type')=='volume' and m.get('Name')==op['target'] for m in c['Mounts'])
             if used:
                 require(ident in prior and c['State'] in ('exited','created','dead'), 'Docker resource has container reference')
@@ -617,9 +625,9 @@ class Cleaner:
             return c
         if typ=='docker-volume':
             require(re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.-]{0,150}',target),'Invalid volume name')
-            v=safe_docker_snapshot(typ,target,context=self.plan['dockerBackend']['context'] if self.plan['taskId'] in ('G3-M2-001','G3-M3-001') else None)
+            v=safe_docker_snapshot(typ,target,context=self.plan['dockerBackend']['context'] if self.plan['taskId'] in ('G3-M2-001','G3-M3-001','G3-M4-001') else None)
             require(v==dict(Name=target,Driver=op.get('expectedDriver'),CreatedAt=op.get('expectedCreatedAt')) and v['Driver']=='local' and isinstance(v['CreatedAt'],str) and v['CreatedAt'],'Volume identity changed')
-            if self.plan['taskId'] in ('G3-M1-CLOSEOUT-002','G3-M2-001','G3-M3-001'): require(op['fingerprint']==digest(v),'Task volume fingerprint changed')
+            if self.plan['taskId'] in ('G3-M1-CLOSEOUT-002','G3-M2-001','G3-M3-001','G3-M4-001'): require(op['fingerprint']==digest(v),'Task volume fingerprint changed')
             v['references']=self.references(op,preflight)
             return v
         if typ=='docker-image':
@@ -725,7 +733,7 @@ class Cleaner:
                 pattern=IMAGE if typ=='docker-image' else re.compile(r'[A-Za-z0-9][A-Za-z0-9_.-]{0,150}\Z')
                 require(all(pattern.fullmatch(value) for value in values),'Invalid Docker after schema')
                 require(target not in values,'Docker resource remains')
-                if self.plan['taskId']=='G3-M3-001':
+                if self.plan['taskId'] in ('G3-M3-001','G3-M4-001'):
                     resource='image' if typ=='docker-image' else 'volume'
                     probe=run(self.docker_command(resource,'inspect','--format','{{json .}}',target),acceptable=(0,1))
                     diagnostic=('Error response from daemon: get '+target+': no such volume') if resource=='volume' else ('Error response from daemon: No such image: '+target)
