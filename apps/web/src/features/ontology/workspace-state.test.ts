@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { initialWorkspaceView, workspaceView, editAvailability } from "./workspace-state";
+import { initialWorkspaceView, workspaceView, editAvailability, structuralWriteGate } from "./workspace-state";
 
 describe("E0-B 工作区状态合同", () => {
   it("初始源码；打开和新建均恢复源码并选择源码面板", () => {
@@ -24,5 +24,50 @@ describe("E0-B 工作区状态合同", () => {
     expect(editAvailability({ canEdit: true, busy: false, dirty: true, failed: false })).toBe("请先保存或丢弃未保存源码");
     expect(editAvailability({ canEdit: true, busy: false, dirty: false, failed: true })).toBe("词汇快照读取失败，请刷新");
     expect(editAvailability({ canEdit: true, busy: false, dirty: false, failed: false })).toBeNull();
+  });
+});
+
+
+describe("M4未提交身份时间不能被结构写入静默替换", () => {
+  const ready = { canEdit: true, busy: false, dirty: false, structuralPending: false,
+    reason: "显式结构修改", hasBasicCapability: true };
+  it.each(["身份时间表单", "身份时间批次", "词汇批次"])("%s未提交时，显示和执行均阻断且原内容保留", pendingKind => {
+    const buffered = { kind: pendingKind, claimIri: "urn:synthetic:claim:keep", externalIdentifier: "KEEP-01" };
+    const before = structuredClone(buffered);
+    let revision = 7, writes = 0;
+    const gate = structuralWriteGate({ ...ready, structuralPending: true });
+    expect(gate.blocked).toContain("当前内容已保留");
+    const rejected = gate.submit(() => {
+      writes++; revision++;
+      buffered.claimIri = ""; buffered.externalIdentifier = "";
+    });
+    expect(rejected).toBe(gate.blocked);
+    expect(writes).toBe(0);
+    expect(revision).toBe(7);
+    expect(buffered).toEqual(before);
+  });
+  it("源码脏缓冲同样拒绝实际写入回调", () => {
+    let writes = 0;
+    const gate = structuralWriteGate({ ...ready, dirty: true });
+    expect(gate.submit(() => { writes++; })).toContain("未保存源码");
+    expect(writes).toBe(0);
+  });
+  it("只有显式提交或取消其它编辑后，新的门禁才放行一次结构命令", () => {
+    let writes = 0;
+    expect(structuralWriteGate({ ...ready, structuralPending: true }).submit(() => { writes++; })).not.toBeNull();
+    const afterCancel = structuralWriteGate(ready);
+    expect(afterCancel.blocked).toBeNull();
+    expect(afterCancel.submit(() => { writes++; })).toBeNull();
+    expect(writes).toBe(1);
+  });
+  it("权限、执行中、空理由和未知能力都不能因调用回调而绕过", () => {
+    for (const status of [{ ...ready, canEdit: false }, { ...ready, busy: true },
+      { ...ready, reason: " " }, { ...ready, hasBasicCapability: false }]) {
+      let writes = 0;
+      const gate = structuralWriteGate(status);
+      expect(gate.blocked).not.toBeNull();
+      expect(gate.submit(() => { writes++; })).not.toBeNull();
+      expect(writes).toBe(0);
+    }
   });
 });

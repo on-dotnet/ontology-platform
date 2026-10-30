@@ -16,7 +16,7 @@ import { SourceImportSession, type SourceImportHandle } from "./source-import";
 import { SupportProfile } from "./support-profile";
 import { AssessmentPanel } from "./assessment-panel";
 import { VersionComparison } from "./version-comparison";
-import { initialWorkspaceView, workspaceView } from "./workspace-state";
+import { initialWorkspaceView, structuralWriteGate, workspaceView } from "./workspace-state";
 import { VocabularyWorkbench } from "./vocabulary-workbench";
 import { snapshotMatches } from "./vocabulary-model";
 import { ReleasedVocabulary } from "./released-vocabulary";
@@ -72,6 +72,9 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
   const structuralPending = vocabularyPending || identityPending;
   const hasUnsaved = dirty || structuralPending;
   const canEdit = identity.roles.includes("platform.operator");
+  const structureGate = structuralWriteGate({ canEdit, busy, dirty, structuralPending, reason,
+    hasBasicCapability: Boolean(profile?.capabilities.some(item => item.edit === "BASIC")),
+  });
   const selectedScope = identity.scopes[Number(scopeIndex)];
   const chooseNode = useCallback((iri: string) => dispatchView({ type: "select", iri }), []);
 
@@ -470,19 +473,22 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
               <StructuralForm
                 key={`structure/${state.draft.draftId}/${state.draft.revision}`}
                 projection={state.draft.projection} selected={selected}
-                blocked={busy || dirty || vocabularyPending || !canEdit || !reason.trim() || !profile?.capabilities.some(item => item.edit === "BASIC")}
-                onEdit={edit => void execute(async signal => {
-                  const previousRevision = state.draft.revision;
-                  const next = await client.editDraft(state.draft.draftId, { edit, command: command(previousRevision, reason) }, signal);
-                  accept(next);
-                  setNotice(`结构编辑已由服务端保存为新修订 revision ${next.revision}；正在读取真实 Diff。`);
-                  const diff = await client.diff(next.draftId, previousRevision, signal);
-                  if (signal.aborted) return;
-                  if (diff.targetRevision === next.revision && diff.targetHashes.bundleHash === next.hashes.bundleHash) {
-                    setStructuralDiff(diff);
-                    setNotice(`结构编辑已由服务端保存为新修订 revision ${next.revision}，已展示真实源码 Diff。`);
-                  } else setNotice("结构编辑已保存；远端 Diff 已对应其他修订，请在版本比较中读取固定修订。");
-                })}
+                blocked={structureGate.blocked !== null}
+                onEdit={edit => {
+                  const blocked = structureGate.submit(() => void execute(async signal => {
+                    const previousRevision = state.draft.revision;
+                    const next = await client.editDraft(state.draft.draftId, { edit, command: command(previousRevision, reason) }, signal);
+                    accept(next);
+                    setNotice(`结构编辑已由服务端保存为新修订 revision ${next.revision}；正在读取真实 Diff。`);
+                    const diff = await client.diff(next.draftId, previousRevision, signal);
+                    if (signal.aborted) return;
+                    if (diff.targetRevision === next.revision && diff.targetHashes.bundleHash === next.hashes.bundleHash) {
+                      setStructuralDiff(diff);
+                      setNotice(`结构编辑已由服务端保存为新修订 revision ${next.revision}，已展示真实源码 Diff。`);
+                    } else setNotice("结构编辑已保存；远端 Diff 已对应其他修订，请在版本比较中读取固定修订。");
+                  }));
+                  if (blocked !== null) setNotice(blocked);
+                }}
               />
               {structuralDiff && (
                 <section className="g2-stack" aria-label="结构编辑 Diff">
