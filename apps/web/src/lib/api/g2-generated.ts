@@ -42,7 +42,7 @@ export type CompareVersionsRequest = { "from": VersionRef; "to": VersionRef };
 
 export type CreateDraftRequest = { "name": string; "scope": ResourceScope; "sources": SourceBundle; "baseReleaseId": string | null; "command": CommandContext };
 
-export type CreateProposalRequest = { "kind": ProposalKind; "draftId": string | null; "draftRevision": number | null; "hashes": SourceHashes | null; "validationReportId": string | null; "targetReleaseId": string | null; "targetManifestHash": string | null; "command": CommandContext };
+export type CreateProposalRequest = { "kind": ProposalKind; "draftId": string | null; "draftRevision": number | null; "hashes": SourceHashes | null; "validationReportId": string | null; "targetReleaseId": string | null; "targetManifestHash": string | null; "command": CommandContext; "impactReportId"?: string | null; "impactHash"?: string | null };
 
 export type CreateRunRequest = { "prompt": string; "plan": SemanticQueryPlan; "providerMode": ProviderMode; "command": CommandContext };
 
@@ -88,6 +88,8 @@ export type ExecutionRun = { "runId": string; "ownerSubjectId": string; "scope":
 
 export type ExecutionStatus = "QUEUED" | "RUNNING" | "COMPLETED" | "FAILED" | "CANCELLED";
 
+export type GenerateImpactReportRequest = { "from": VersionRef; "to": VersionRef; "baselineKind": ImpactBaselineKind; "assessmentId": string | null; "command": CommandContext };
+
 export type GraphComparisonBudget = { "maxBlankNodes": number; "maxSearchNodes": number; "timeoutMilliseconds": number };
 
 export type GraphComparisonResult = { "status": GraphComparisonStatus; "code": string; "visitedNodes": number; "elapsedMilliseconds": number };
@@ -95,6 +97,16 @@ export type GraphComparisonResult = { "status": GraphComparisonStatus; "code": s
 export type GraphComparisonStatus = "EQUIVALENT" | "DIFFERENT" | "INDETERMINATE";
 
 export type IdentityTimeEditsRequest = { "hashes": SourceHashes; "changes": Array<VocabularyChange>; "command": CommandContext };
+
+export type ImpactApprovalBinding = { "reportId": string; "canonicalHash": string; "inputFingerprint": string; "baselineKind": ImpactBaselineKind; "from": VersionRef; "to": VersionRef; "baseHashes": SourceHashes; "targetHashes": SourceHashes; "baseManifestHash": string | null; "targetSemantics": PublicationSemantics; "generatedAtUtc": string; "expiresAtUtc": string };
+
+export type ImpactBaselineKind = "VERSION_PAIR" | "INITIAL";
+
+export type ImpactConclusion = { "code": string; "message": string; "blocking": boolean; "affectedIris": Array<string>; "assetReferences": Array<string>; "evidence": Array<ImpactEvidenceReference> };
+
+export type ImpactEvidenceReference = { "version": VersionRef; "sourceId": string; "sourceHash": string; "triple": RdfTriple | null; "focusIri": string | null; "path": string | null; "line": number | null; "column": number | null };
+
+export type ImpactReport = { "schemaVersion": number; "reportId": string; "inputFingerprint": string; "canonicalHash": string; "executorVersion": string; "budgetIdentity": string; "generatedAtUtc": string; "expiresAtUtc": string; "baselineKind": ImpactBaselineKind; "diff": VersionDiff; "profileVersion": string; "profileHash": string; "targetSemantics": PublicationSemantics | null; "changedIris": Array<string>; "assetReferences": Array<string>; "knownImpacts": Array<ImpactConclusion>; "blockers": Array<ImpactConclusion>; "unknownCoverage": Array<ImpactConclusion>; "publishEligible": boolean };
 
 export type ImportLock = { "ontologyIri": string; "hash": string; "objectKey": string };
 
@@ -140,11 +152,11 @@ export type ReleaseActivation = { "activationId": string; "activationRevision": 
 
 export type ReleaseManifest = { "schemaVersion": 1; "releaseId": string; "assetId": string; "scope": ResourceScope; "draftId": string; "revision": number; "hashes": SourceHashes; "ontologyGraphIri": string; "dataGraphIri": string; "importLocks": Array<ImportLock>; "snapshot": AssetVersionSnapshot; "artifactObjects": Array<ArtifactObject>; "createdAtUtc": string; "semantics"?: null } | { "schemaVersion": 2; "releaseId": string; "assetId": string; "scope": ResourceScope; "draftId": string; "revision": number; "hashes": { "ontologyHash": string; "shapesHash": string; "vocabularyHash": string | null; "dataHash": string; "bundleHash": string }; "ontologyGraphIri": string; "dataGraphIri": string; "importLocks": Array<ImportLock>; "snapshot": AssetVersionSnapshot; "artifactObjects": Array<ArtifactObject>; "createdAtUtc": string; "semantics": PublicationSemantics };
 
-export type ReleaseProposal = { "proposalId": string; "kind": ProposalKind; "assetId": string; "scope": ResourceScope; "draftId": string | null; "draftRevision": number | null; "hashes": SourceHashes | null; "validationReportId": string | null; "targetReleaseId": string | null; "targetManifestHash": string | null; "submittedBy": string; "submittedAtUtc": string; "expiresAtUtc": string; "status": ProposalStatus; "revision": number; "approval": ApprovalRecord | null; "semantics"?: PublicationSemantics | null };
+export type ReleaseProposal = { "proposalId": string; "kind": ProposalKind; "assetId": string; "scope": ResourceScope; "draftId": string | null; "draftRevision": number | null; "hashes": SourceHashes | null; "validationReportId": string | null; "targetReleaseId": string | null; "targetManifestHash": string | null; "submittedBy": string; "submittedAtUtc": string; "expiresAtUtc": string; "status": ProposalStatus; "revision": number; "approval": ApprovalRecord | null; "semantics"?: PublicationSemantics | null; "impact"?: ImpactApprovalBinding | null };
 
 export type ReleaseStatus = "PREPARING" | "ARTIFACTS_VERIFIED" | "GRAPH_DEPLOYED" | "GRAPH_VERIFIED" | "ACTIVE" | "SUPERSEDED" | "FAILED_RETRYABLE" | "FAILED_FINAL";
 
-export type ReleaseSummary = { "manifest": ReleaseManifest; "manifestHash": string; "isActive": boolean; "activationRevision": number; "status": ReleaseStatus; "traceId": string };
+export type ReleaseSummary = { "manifest": ReleaseManifest; "manifestHash": string; "isActive": boolean; "activationRevision": number; "status": ReleaseStatus; "traceId": string; "impact"?: ImpactApprovalBinding | null };
 
 export type ResourceScope = { "organizationId": string; "siteIds": Array<string> };
 
@@ -206,6 +218,8 @@ export type SourceComparison = { "sourceId": string; "leftHash": string | null; 
 
 export type SourceHashes = { "ontologyHash": string; "shapesHash": string; "vocabularyHash": string | null; "dataHash": string; "bundleHash": string };
 
+export type SourceVersionDiff = { "sourceId": string; "baseText": string | null; "targetText": string | null; "baseHash": string | null; "targetHash": string | null; "sourceChanged": boolean; "graph": GraphComparisonResult; "baseTripleCount": number | null; "targetTripleCount": number | null; "addedTriples": Array<RdfTriple>; "removedTriples": Array<RdfTriple>; "tripleDeltaStatus": TripleDeltaStatus };
+
 export type SubSourceStatus = "AVAILABLE" | "EMPTY" | "PARTIAL" | "UNAVAILABLE" | "UNAUTHORIZED";
 
 export type TemporalExtent = { "fromUtc": string; "toUtc": string | null };
@@ -216,11 +230,15 @@ export type ToolCompletedPayload = { "kind": "tool.completed"; "invocationId": s
 
 export type ToolStartedPayload = { "kind": "tool.started"; "invocationId": string; "capabilityId": string; "capabilityVersion": string; "plan": SemanticQueryPlan };
 
+export type TripleDeltaStatus = "EXACT" | "EQUIVALENT" | "INDETERMINATE";
+
 export type ValidateDraftRequest = { "revision": number; "hashes": SourceHashes; "command": CommandContext };
 
 export type ValidationIssue = { "severity": DiagnosticSeverity; "focusNode": RdfTerm | null; "path": string | null; "value": RdfTerm | null; "sourceShape": RdfTerm | null; "constraintComponent": string | null; "message": string; "sourceId": string };
 
 export type ValidationKind = "RDF_PARSE" | "SHACL_CORE" | "OWL_SUPPORT";
+
+export type VersionDiff = { "assetId": string; "scope": ResourceScope; "from": VersionRef; "to": VersionRef; "baseHashes": SourceHashes; "targetHashes": SourceHashes; "baseManifestHash": string | null; "targetManifestHash": string | null; "sources": Array<SourceVersionDiff> };
 
 export type VersionRef = { "kind": VersionRefKind; "id": string; "revision": number | null };
 

@@ -23,6 +23,9 @@ public sealed class OntologyDbContext : DbContext
     /// <summary>与报告同事务产生的不可变评估。</summary>
     public DbSet<AssessmentRecord> Assessments => Set<AssessmentRecord>();
 
+    /// <summary>由唯一输入冻结的不可变影响报告。</summary>
+    public DbSet<ImpactReportRecord> ImpactReports => Set<ImpactReportRecord>();
+
     /// <summary>与业务和审计同时提交的幂等回执。</summary>
     public DbSet<CommandRecord> Commands => Set<CommandRecord>();
 
@@ -57,6 +60,15 @@ public sealed class OntologyDbContext : DbContext
             entity.HasIndex(row => row.ValidationReportId).IsUnique();
             entity.HasOne<ValidationRecord>().WithOne().HasForeignKey<AssessmentRecord>(row => row.ValidationReportId).OnDelete(DeleteBehavior.Restrict);
             entity.HasOne<DraftRevisionRecord>().WithMany().HasForeignKey(row => new { row.DraftId, row.Revision }).OnDelete(DeleteBehavior.Restrict);
+        });
+        modelBuilder.Entity<ImpactReportRecord>(entity =>
+        {
+            entity.ToTable("ImpactReports");
+            entity.HasKey(row => row.ReportId);
+            entity.HasIndex(row => row.InputFingerprint).IsUnique();
+            entity.HasIndex(row => new { row.OrganizationId, row.AssetId });
+            entity.HasOne<DraftRevisionRecord>().WithMany().HasForeignKey(row => new { row.TargetDraftId, row.TargetRevision }).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne<AssessmentRecord>().WithMany().HasForeignKey(row => row.AssessmentId).OnDelete(DeleteBehavior.Restrict);
         });
         modelBuilder.Entity<CommandRecord>(entity =>
         {

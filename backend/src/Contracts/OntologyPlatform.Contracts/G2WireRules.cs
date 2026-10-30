@@ -39,6 +39,29 @@ internal static class G2WireRules
         }
         switch (value)
         {
+            case GenerateImpactReportRequest request when request.BaselineKind == ImpactBaselineKind.Initial
+                && (request.From != request.To || request.To.Kind != VersionRefKind.Draft):
+                throw new JsonException("首次发布基线必须明确自比同一固定草稿修订。");
+            case CreateProposalRequest proposal when (proposal.ImpactReportId is null) != (proposal.ImpactHash is null)
+                || proposal.ImpactHash is not null && (!ImpactContractRules.IsHash(proposal.ImpactHash)
+                    || string.IsNullOrWhiteSpace(proposal.ImpactReportId) || proposal.ImpactReportId.Length > 64
+                    || proposal.Kind != ProposalKind.Publish):
+                throw new JsonException("影响报告引用必须成对且只用于新发布。");
+            case ImpactApprovalBinding impact when !ImpactContractRules.IsHash(impact.CanonicalHash)
+                || !ImpactContractRules.IsHash(impact.InputFingerprint):
+                throw new JsonException("审批影响绑定必须有准确内容和输入散列。");
+            case VersionDiff diff:
+                ImpactContractRules.ValidateDiffIdentity(diff);
+                break;
+            case SourceVersionDiff source:
+                ImpactContractRules.ValidateSourceIdentity(source);
+                break;
+            case ImpactEvidenceReference evidence:
+                ImpactContractRules.ValidateEvidence(evidence);
+                break;
+            case ImpactReport report:
+                ImpactContractRules.ValidateReportIdentity(report);
+                break;
             case ReleaseManifest manifest:
                 ReleaseManifestCompatibility.Validate(manifest);
                 break;

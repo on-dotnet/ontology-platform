@@ -51,6 +51,7 @@ public static class G2Composition
             app.MapOntologyEndpoints();
             app.MapVocabularyEndpoints();
             app.MapIdentityTimeEndpoints();
+            app.MapImpactEndpoints();
             app.MapG3Endpoints();
             app.MapPublishingEndpoints();
             app.MapSemanticEndpoints();

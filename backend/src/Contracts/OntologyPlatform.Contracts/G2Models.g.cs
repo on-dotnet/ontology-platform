@@ -385,6 +385,38 @@ public enum TemporalRelation
 
 }
 
+/// <summary>明确冻结的ImpactBaselineKind协议枚举，未知值不得静默接受。</summary>
+[JsonConverter(typeof(StrictStringEnumConverter<ImpactBaselineKind>))]
+public enum ImpactBaselineKind
+{
+    /// <summary>协议值VERSION_PAIR。</summary>
+    [JsonStringEnumMemberName("VERSION_PAIR")]
+    VersionPair,
+
+    /// <summary>协议值INITIAL。</summary>
+    [JsonStringEnumMemberName("INITIAL")]
+    Initial,
+
+}
+
+/// <summary>明确冻结的TripleDeltaStatus协议枚举，未知值不得静默接受。</summary>
+[JsonConverter(typeof(StrictStringEnumConverter<TripleDeltaStatus>))]
+public enum TripleDeltaStatus
+{
+    /// <summary>协议值EXACT。</summary>
+    [JsonStringEnumMemberName("EXACT")]
+    Exact,
+
+    /// <summary>协议值EQUIVALENT。</summary>
+    [JsonStringEnumMemberName("EQUIVALENT")]
+    Equivalent,
+
+    /// <summary>协议值INDETERMINATE。</summary>
+    [JsonStringEnumMemberName("INDETERMINATE")]
+    Indeterminate,
+
+}
+
 /// <summary>事件载荷唯一判别基类，kind与事件类型一致。</summary>
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "kind")]
 [JsonDerivedType(typeof(RunStartedPayload), "run.started")]
@@ -1228,6 +1260,10 @@ public sealed record ReleaseProposal : IJsonOnDeserialized, IJsonOnSerializing
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public PublicationSemantics? Semantics { get; init; } = null;
 
+    /// <summary>M4新提案的服务器影响绑定；历史提案和回滚缺席不改旧hash。</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public ImpactApprovalBinding? Impact { get; init; } = null;
+
     /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
     void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
 
@@ -1313,6 +1349,10 @@ public sealed record ReleaseSummary : IJsonOnDeserialized, IJsonOnSerializing
     /// <summary>该正式版本最近一次激活的持久Trace，不猜测运行标识。</summary>
     [JsonRequired]
     public string TraceId { get; init; } = string.Empty;
+
+    /// <summary>该正式版本原提案绑定的影响报告引用；历史版本为空，不改变manifest。</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public ImpactApprovalBinding? Impact { get; init; } = null;
 
     /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
     void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
@@ -2351,6 +2391,14 @@ public sealed record CreateProposalRequest : IJsonOnDeserialized, IJsonOnSeriali
     [JsonRequired]
     public CommandContext Command { get; init; } = default!;
 
+    /// <summary>M4新发布必需的真实报告ID；回滚不带此字段。</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? ImpactReportId { get; init; } = null;
+
+    /// <summary>M4新发布必需的准确canonical hash。</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? ImpactHash { get; init; } = null;
+
     /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
     void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
 
@@ -3010,6 +3058,367 @@ public sealed record IdentityTimeEditsRequest : IJsonOnDeserialized, IJsonOnSeri
     /// <summary>真实CAS修订与幂等命令。</summary>
     [JsonRequired]
     public CommandContext Command { get; init; } = default!;
+
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
+}
+
+/// <summary>单个独立来源的原文、散列、图结论及保守三元组差异。</summary>
+[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
+public sealed record SourceVersionDiff : IJsonOnDeserialized, IJsonOnSerializing
+{
+    /// <summary>固定ontology/shapes/vocabulary/data槽位。</summary>
+    [JsonRequired]
+    public string SourceId { get; init; } = string.Empty;
+
+    /// <summary>基础源完整原文，缺席与空文档分开。</summary>
+    [JsonRequired]
+    public string? BaseText { get; init; } = null;
+
+    /// <summary>目标源完整原文，不从图投影重建。</summary>
+    [JsonRequired]
+    public string? TargetText { get; init; } = null;
+
+    /// <summary>基础原始UTF8散列，缺席为空。</summary>
+    [JsonRequired]
+    public string? BaseHash { get; init; } = null;
+
+    /// <summary>目标原始UTF8散列，缺席为空。</summary>
+    [JsonRequired]
+    public string? TargetHash { get; init; } = null;
+
+    /// <summary>原始字节或缺席状态是否变化。</summary>
+    [JsonRequired]
+    public bool SourceChanged { get; init; } = default;
+
+    /// <summary>复用M1有界图比较，遥测不进入canonical hash。</summary>
+    [JsonRequired]
+    public GraphComparisonResult Graph { get; init; } = default!;
+
+    /// <summary>真实解析的基础图集合条数，未完成时为空。</summary>
+    [JsonRequired]
+    public int? BaseTripleCount { get; init; } = null;
+
+    /// <summary>真实解析的目标图集合条数，未完成时为空。</summary>
+    [JsonRequired]
+    public int? TargetTripleCount { get; init; } = null;
+
+    /// <summary>可确定的新增完整RDF项，不按空白节点标签跨版本配对。</summary>
+    [JsonRequired]
+    public RdfTriple[] AddedTriples { get; init; } = [];
+
+    /// <summary>可确定的移除完整RDF项，旧版本证据不改写。</summary>
+    [JsonRequired]
+    public RdfTriple[] RemovedTriples { get; init; } = [];
+
+    /// <summary>精确、同构无变化或无法确定。</summary>
+    [JsonRequired]
+    public TripleDeltaStatus TripleDeltaStatus { get; init; } = default;
+
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
+}
+
+/// <summary>只读比较同资产完整范围内两个固定版本的完整四源。</summary>
+[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
+public sealed record VersionDiff : IJsonOnDeserialized, IJsonOnSerializing
+{
+    /// <summary>服务器恢复的同一资产。</summary>
+    [JsonRequired]
+    public string AssetId { get; init; } = string.Empty;
+
+    /// <summary>服务器规范完整范围。</summary>
+    [JsonRequired]
+    public ResourceScope Scope { get; init; } = default!;
+
+    /// <summary>固定基础版本。</summary>
+    [JsonRequired]
+    public VersionRef From { get; init; } = default!;
+
+    /// <summary>固定目标版本。</summary>
+    [JsonRequired]
+    public VersionRef To { get; init; } = default!;
+
+    /// <summary>基础四源及bundle精确散列。</summary>
+    [JsonRequired]
+    public SourceHashes BaseHashes { get; init; } = default!;
+
+    /// <summary>目标四源及bundle精确散列。</summary>
+    [JsonRequired]
+    public SourceHashes TargetHashes { get; init; } = default!;
+
+    /// <summary>基础为正式Release时的清单散列，草稿为空。</summary>
+    [JsonRequired]
+    public string? BaseManifestHash { get; init; } = null;
+
+    /// <summary>目标为正式Release时的清单散列，草稿为空。</summary>
+    [JsonRequired]
+    public string? TargetManifestHash { get; init; } = null;
+
+    /// <summary>固定四源顺序，缺席词汇仍占槽位。</summary>
+    [JsonRequired]
+    public SourceVersionDiff[] Sources { get; init; } = [];
+
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
+}
+
+/// <summary>支持草稿、历史移除和正式源的版本化证据定位，不伪造查询EvidenceRef。</summary>
+[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
+public sealed record ImpactEvidenceReference : IJsonOnDeserialized, IJsonOnSerializing
+{
+    /// <summary>结论对应的准确基础或目标版本。</summary>
+    [JsonRequired]
+    public VersionRef Version { get; init; } = default!;
+
+    /// <summary>实际来源，无法唯一定位时bundle。</summary>
+    [JsonRequired]
+    public string SourceId { get; init; } = string.Empty;
+
+    /// <summary>该来源或bundle的精确散列。</summary>
+    [JsonRequired]
+    public string SourceHash { get; init; } = string.Empty;
+
+    /// <summary>已知完整三元组证据，不确定时为空。</summary>
+    [JsonRequired]
+    public RdfTriple? Triple { get; init; } = null;
+
+    /// <summary>可准确定位的命名IRI。</summary>
+    [JsonRequired]
+    public string? FocusIri { get; init; } = null;
+
+    /// <summary>可准确定位的谓词IRI。</summary>
+    [JsonRequired]
+    public string? Path { get; init; } = null;
+
+    /// <summary>没有词法定位证据时为空。</summary>
+    [JsonRequired]
+    public int? Line { get; init; } = null;
+
+    /// <summary>没有词法定位证据时为空。</summary>
+    [JsonRequired]
+    public int? Column { get; init; } = null;
+
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
+}
+
+/// <summary>有证据的已知影响、阻断或未知覆盖，不冒称全系统无影响。</summary>
+[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
+public sealed record ImpactConclusion : IJsonOnDeserialized, IJsonOnSerializing
+{
+    /// <summary>固定受控结论类别。</summary>
+    [JsonRequired]
+    public string Code { get; init; } = string.Empty;
+
+    /// <summary>本执行器的安全中文解释。</summary>
+    [JsonRequired]
+    public string Message { get; init; } = string.Empty;
+
+    /// <summary>该结论是否阻断新发布，范围限制与实际未知依赖分开。</summary>
+    [JsonRequired]
+    public bool Blocking { get; init; } = default;
+
+    /// <summary>结论可确定涉及的命名IRI。</summary>
+    [JsonRequired]
+    public string[] AffectedIris { get; init; } = [];
+
+    /// <summary>可确定的资产或版本引用。</summary>
+    [JsonRequired]
+    public string[] AssetReferences { get; init; } = [];
+
+    /// <summary>每个结论至少一项真实源或bundle证据。</summary>
+    [JsonRequired]
+    public ImpactEvidenceReference[] Evidence { get; init; } = [];
+
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
+}
+
+/// <summary>生成持久影响报告的显式固定输入与幂等命令。</summary>
+[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
+public sealed record GenerateImpactReportRequest : IJsonOnDeserialized, IJsonOnSerializing
+{
+    /// <summary>基础固定版本，不接受外部地址或客户端散列。</summary>
+    [JsonRequired]
+    public VersionRef From { get; init; } = default!;
+
+    /// <summary>目标固定版本，发布时必须为准确当前draft。</summary>
+    [JsonRequired]
+    public VersionRef To { get; init; } = default!;
+
+    /// <summary>普通版本对，或明确首次发布自基线。</summary>
+    [JsonRequired]
+    public ImpactBaselineKind BaselineKind { get; init; } = default;
+
+    /// <summary>目标草稿的精确持久评估；分析缺席时显式为空并阻断发布。</summary>
+    [JsonRequired]
+    public string? AssessmentId { get; init; } = null;
+
+    /// <summary>幂等与审计命令，不修改草稿修订。</summary>
+    [JsonRequired]
+    public CommandContext Command { get; init; } = default!;
+
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
+}
+
+/// <summary>持久且可重算canonical hash的有界资产影响报告。</summary>
+[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
+public sealed record ImpactReport : IJsonOnDeserialized, IJsonOnSerializing
+{
+    /// <summary>本报告合同版本1。</summary>
+    [JsonRequired]
+    public int SchemaVersion { get; init; } = default;
+
+    /// <summary>首次生成持久主键，重试不重新分配。</summary>
+    [JsonRequired]
+    public string ReportId { get; init; } = string.Empty;
+
+    /// <summary>固定版本、源hash、评估、策略、执行器和预算的输入身份。</summary>
+    [JsonRequired]
+    public string InputFingerprint { get; init; } = string.Empty;
+
+    /// <summary>排除ID/时间/比较遥测后的稳定完整语义内容散列。</summary>
+    [JsonRequired]
+    public string CanonicalHash { get; init; } = string.Empty;
+
+    /// <summary>准确执行器版本。</summary>
+    [JsonRequired]
+    public string ExecutorVersion { get; init; } = string.Empty;
+
+    /// <summary>固定比较及报告覆盖预算版本。</summary>
+    [JsonRequired]
+    public string BudgetIdentity { get; init; } = string.Empty;
+
+    /// <summary>首次实际完成时刻，不因重放刷新。</summary>
+    [JsonRequired]
+    public DateTimeOffset GeneratedAtUtc { get; init; } = default;
+
+    /// <summary>不晚于首次生成24小时和绑定评估期限。</summary>
+    [JsonRequired]
+    public DateTimeOffset ExpiresAtUtc { get; init; } = default;
+
+    /// <summary>分析版本对或显式首次引入基线。</summary>
+    [JsonRequired]
+    public ImpactBaselineKind BaselineKind { get; init; } = default;
+
+    /// <summary>完整版本、四源hash和源码/图差异。</summary>
+    [JsonRequired]
+    public VersionDiff Diff { get; init; } = default!;
+
+    /// <summary>报告固定策略版本。</summary>
+    [JsonRequired]
+    public string ProfileVersion { get; init; } = string.Empty;
+
+    /// <summary>报告固定策略内容散列。</summary>
+    [JsonRequired]
+    public string ProfileHash { get; init; } = string.Empty;
+
+    /// <summary>有真实绑定评估时的精确引用，缺席不伪造。</summary>
+    [JsonRequired]
+    public PublicationSemantics? TargetSemantics { get; init; } = null;
+
+    /// <summary>显式变化或首次引入的命名IRI。</summary>
+    [JsonRequired]
+    public string[] ChangedIris { get; init; } = [];
+
+    /// <summary>本资产和已解析版本引用，未知不猜测。</summary>
+    [JsonRequired]
+    public string[] AssetReferences { get; init; } = [];
+
+    /// <summary>有真实证据的有界已知影响。</summary>
+    [JsonRequired]
+    public ImpactConclusion[] KnownImpacts { get; init; } = [];
+
+    /// <summary>审核者不可覆盖的技术阻断。</summary>
+    [JsonRequired]
+    public ImpactConclusion[] Blockers { get; init; } = [];
+
+    /// <summary>明确范围限制与实际未解析影响，后者阻断。</summary>
+    [JsonRequired]
+    public ImpactConclusion[] UnknownCoverage { get; init; } = [];
+
+    /// <summary>仅技术资格，提交时仍须复核准确active基线和审批。</summary>
+    [JsonRequired]
+    public bool PublishEligible { get; init; } = default;
+
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
+}
+
+/// <summary>服务器从持久报告冻结的提案与审批内容。</summary>
+[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
+public sealed record ImpactApprovalBinding : IJsonOnDeserialized, IJsonOnSerializing
+{
+    /// <summary>准确持久报告ID。</summary>
+    [JsonRequired]
+    public string ReportId { get; init; } = string.Empty;
+
+    /// <summary>准确报告canonical hash。</summary>
+    [JsonRequired]
+    public string CanonicalHash { get; init; } = string.Empty;
+
+    /// <summary>准确输入身份。</summary>
+    [JsonRequired]
+    public string InputFingerprint { get; init; } = string.Empty;
+
+    /// <summary>固定首次或版本对模式。</summary>
+    [JsonRequired]
+    public ImpactBaselineKind BaselineKind { get; init; } = default;
+
+    /// <summary>准确基础版本。</summary>
+    [JsonRequired]
+    public VersionRef From { get; init; } = default!;
+
+    /// <summary>准确目标draft/revision。</summary>
+    [JsonRequired]
+    public VersionRef To { get; init; } = default!;
+
+    /// <summary>基础完整四源hash。</summary>
+    [JsonRequired]
+    public SourceHashes BaseHashes { get; init; } = default!;
+
+    /// <summary>目标完整四源hash。</summary>
+    [JsonRequired]
+    public SourceHashes TargetHashes { get; init; } = default!;
+
+    /// <summary>已有active基线的准确清单hash。</summary>
+    [JsonRequired]
+    public string? BaseManifestHash { get; init; } = null;
+
+    /// <summary>同一target assessment/profile完整引用。</summary>
+    [JsonRequired]
+    public PublicationSemantics TargetSemantics { get; init; } = default!;
+
+    /// <summary>报告首次生成时间，审批不能刷新。</summary>
+    [JsonRequired]
+    public DateTimeOffset GeneratedAtUtc { get; init; } = default;
+
+    /// <summary>报告准确到期边界。</summary>
+    [JsonRequired]
+    public DateTimeOffset ExpiresAtUtc { get; init; } = default;
 
     /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
     void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);

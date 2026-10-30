@@ -33,6 +33,12 @@ export function createG2Client(options: { fetch?: typeof fetch } = {}) {
   }
   const id = encodeURIComponent;
   return {
+    versionDiff: (body: G2.CompareVersionsRequest, signal?: AbortSignal) =>
+      write<G2.VersionDiff>("/ontology-version-diffs", body, "POST", undefined, signal),
+    generateImpact: (body: G2.GenerateImpactReportRequest, signal?: AbortSignal) =>
+      write<G2.ImpactReport>("/impact-reports", body, "POST", undefined, signal),
+    impactReport: (reportId: string, signal?: AbortSignal) =>
+      read<G2.ImpactReport>(`/impact-reports/${id(reportId)}`, signal),
     identityTime: (draftId: string, signal?: AbortSignal) =>
       read<G2.VocabularySnapshot>(`/ontology-drafts/${id(draftId)}/identity-time`, signal),
     editIdentityTime: (draftId: string, body: G2.IdentityTimeEditsRequest, signal?: AbortSignal) =>

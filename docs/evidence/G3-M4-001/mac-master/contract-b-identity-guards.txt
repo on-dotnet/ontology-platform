@@ -1,0 +1,70 @@
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g3-m4-mac-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Release/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64)
+已通过 ExplicitInitialBaselineRoundtrips (20ms)
+  从 /Users/chasen/.codex/worktrees/g3-m4-mac-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Release/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64)
+已通过 InvalidGenerationRequestFailsClosed ("missing-from") (1ms)
+  从 /Users/chasen/.codex/worktrees/g3-m4-mac-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Release/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64)
+已通过 InvalidGenerationRequestFailsClosed ("missing-to") (0ms)
+  从 /Users/chasen/.codex/worktrees/g3-m4-mac-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Release/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64)
+已通过 InvalidGenerationRequestFailsClosed ("missing-assessmentId") (0ms)
+  从 /Users/chasen/.codex/worktrees/g3-m4-mac-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Release/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64)
+已通过 InvalidGenerationRequestFailsClosed ("missing-command") (0ms)
+  从 /Users/chasen/.codex/worktrees/g3-m4-mac-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Release/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64)
+已通过 InvalidGenerationRequestFailsClosed ("null-from") (0ms)
+  从 /Users/chasen/.codex/worktrees/g3-m4-mac-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Release/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64)
+已通过 InvalidGenerationRequestFailsClosed ("unknown-baseline") (0ms)
+  从 /Users/chasen/.codex/worktrees/g3-m4-mac-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Release/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64)
+已通过 InvalidGenerationRequestFailsClosed ("numeric-baseline") (0ms)
+  从 /Users/chasen/.codex/worktrees/g3-m4-mac-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Release/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64)
+已通过 InvalidGenerationRequestFailsClosed ("forged-publishEligible") (0ms)
+  从 /Users/chasen/.codex/worktrees/g3-m4-mac-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Release/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64)
+已通过 InvalidGenerationRequestFailsClosed ("different-initial-target") (0ms)
+  从 /Users/chasen/.codex/worktrees/g3-m4-mac-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Release/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64)
+已通过 InvalidGenerationRequestFailsClosed ("release-with-revision") (0ms)
+  从 /Users/chasen/.codex/worktrees/g3-m4-mac-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Release/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64)
+已通过 ProposalReferenceIsPairedAndRollbackCannotCarryImpact (3ms)
+  从 /Users/chasen/.codex/worktrees/g3-m4-mac-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Release/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64)
+已通过 CanonicalHashIgnoresEnvelopeTelemetryAndSetOrdering (12ms)
+  从 /Users/chasen/.codex/worktrees/g3-m4-mac-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Release/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64)
+失败 MeaningfulInputsAndEvidenceCannotReuseCanonicalHash (5ms)
+  从 /Users/chasen/.codex/worktrees/g3-m4-mac-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Release/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64)
+  测试方法 OntologyPlatform.G2ContractTests.G3M4ImpactContractTests。MeaningfulInputsAndEvidenceCannotReuseCanonicalHash 引发了异常:
+  System.Text.Json.JsonException: 结论证据未绑定报告固定版本的真实来源hash。
+    在 OntologyPlatform.Contracts.ImpactContractRules.ValidateReportIdentity(ImpactReport report) 位于 /Users/chasen/.codex/worktrees/g3-m4-mac-master/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/ImpactContractRules.cs:141
+    在 OntologyPlatform.Contracts.ImpactContractRules.HashReport[T](ImpactReport report, T value) 位于 /Users/chasen/.codex/worktrees/g3-m4-mac-master/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/ImpactContractRules.cs:159
+    在 OntologyPlatform.Contracts.ImpactContractRules.CanonicalHash(ImpactReport report) 位于 /Users/chasen/.codex/worktrees/g3-m4-mac-master/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/ImpactContractRules.cs:51
+    在 OntologyPlatform.G2ContractTests.G3M4ImpactContractTests.MeaningfulInputsAndEvidenceCannotReuseCanonicalHash() 位于 /Users/chasen/.codex/worktrees/g3-m4-mac-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/G3M4ImpactContractTests.cs:107
+    在 System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+    在 System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+
+已通过 FourSourceAndAbsenceContractIsStrict (3ms)
+  从 /Users/chasen/.codex/worktrees/g3-m4-mac-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Release/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64)
+已通过 UnstableOrUnboundContentIsRejected ("slot-hash") (0ms)
+  从 /Users/chasen/.codex/worktrees/g3-m4-mac-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Release/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64)
+已通过 UnstableOrUnboundContentIsRejected ("bundle-hash") (0ms)
+  从 /Users/chasen/.codex/worktrees/g3-m4-mac-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Release/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64)
+已通过 UnstableOrUnboundContentIsRejected ("text-hash") (0ms)
+  从 /Users/chasen/.codex/worktrees/g3-m4-mac-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Release/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64)
+已通过 UnstableOrUnboundContentIsRejected ("changed-flag") (0ms)
+  从 /Users/chasen/.codex/worktrees/g3-m4-mac-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Release/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64)
+已通过 UnstableOrUnboundContentIsRejected ("blank-delta") (0ms)
+  从 /Users/chasen/.codex/worktrees/g3-m4-mac-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Release/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64)
+已通过 UnstableOrUnboundContentIsRejected ("blank-evidence") (0ms)
+  从 /Users/chasen/.codex/worktrees/g3-m4-mac-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Release/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64)
+已通过 UnstableOrUnboundContentIsRejected ("blank-focus") (0ms)
+  从 /Users/chasen/.codex/worktrees/g3-m4-mac-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Release/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64)
+已通过 UnstableOrUnboundContentIsRejected ("evidence-hash") (0ms)
+  从 /Users/chasen/.codex/worktrees/g3-m4-mac-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Release/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64)
+已通过 UnstableOrUnboundContentIsRejected ("evidence-version") (0ms)
+  从 /Users/chasen/.codex/worktrees/g3-m4-mac-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Release/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64)
+已通过 UnstableOrUnboundContentIsRejected ("missing-evidence") (0ms)
+  从 /Users/chasen/.codex/worktrees/g3-m4-mac-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Release/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64)
+/Users/chasen/.codex/worktrees/g3-m4-mac-master/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Release/net10.0/OntologyPlatform.G2ContractTests.dll (net10.0|arm64) 失败并出现 1 个错误 (1s 478ms)
+退出代码: 2
+
+测试运行摘要: 失败!
+  总计: 25
+  失败: 1
+  成功: 24
+  已跳过: 0
+  持续时间: 3s 040ms
+已完成测试运行，但显示非成功退出代码: 2 (请参阅: https://aka.ms/testingplatform/exitcodes)

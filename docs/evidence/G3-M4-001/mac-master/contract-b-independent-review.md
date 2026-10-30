@@ -1,0 +1,9 @@
+# 合同B独立Review回执
+
+Reviewer /root/preflight_review，非作者只读，起始确认Slice A main=d1345222fa0f024c99611dff97b2a957998176d1后才审B。
+
+最初REVIEW_PENDING四项：EF默认Down会删表；delta/Evidence可能混入随机blank；无active的PAIR语义不明；只验证hash形状没有原文/slot/bundle一致，且fixture正例错误。Owner分别改Down throw及真实迁移操作1测、统一ground/命名IRI guards、INITIAL/PAIR规则和发布最终active锁、ValidateDiffIdentity/ReportIdentity与一致真实UTF8 fixture。原15窄测不能证明上述缺口，原结果保留。
+
+加强25合同结果24PASS/1正例随版本变更未重新绑定证据FAIL，修正fixture只复验该项+新增INITIAL共2PASS；图状态审查再发现Different+Equivalent或空Exact矛盾，已补双向状态约束，14负例PASS。绝对命名IRI守卫额外拒随机标签，18窄测PASS。完整Contracts102总101PASS/1SKIP/0FAIL，唯一后写V2制品reader因尚未提供artifact而SKIP，未当产品PASS；最终真实制品产生后必须关闭此门禁。当前B32独立合同用例具实际组合覆盖，不累加复验项。
+
+最终独立复核明确允许FROZEN并派SEM-B/WEB-B，模型/接口/storage/旧Manifest兼容无剩余阻断。冻结不是B实现或产品PASS，四源/报告/审批/active/历史Run/真实浏览器仍待业务实现及验收。

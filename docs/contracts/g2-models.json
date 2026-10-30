@@ -105,6 +105,15 @@
       "DISJOINT",
       "INDETERMINATE",
       "INVALID"
+    ],
+    "ImpactBaselineKind": [
+      "VERSION_PAIR",
+      "INITIAL"
+    ],
+    "TripleDeltaStatus": [
+      "EXACT",
+      "EQUIVALENT",
+      "INDETERMINATE"
     ]
   },
   "payloadDiscriminators": {
@@ -987,6 +996,13 @@
           "description": "仅G3服务器生成的评估绑定；历史V1缺席不伪造。",
           "required": false,
           "omitNull": true
+        },
+        {
+          "name": "Impact",
+          "type": "ImpactApprovalBinding?",
+          "description": "M4新提案的服务器影响绑定；历史提案和回滚缺席不改旧hash。",
+          "required": false,
+          "omitNull": true
         }
       ],
       "base": null
@@ -1079,6 +1095,13 @@
           "name": "TraceId",
           "type": "string",
           "description": "该正式版本最近一次激活的持久Trace，不猜测运行标识。"
+        },
+        {
+          "name": "Impact",
+          "type": "ImpactApprovalBinding?",
+          "description": "该正式版本原提案绑定的影响报告引用；历史版本为空，不改变manifest。",
+          "required": false,
+          "omitNull": true
         }
       ],
       "base": null
@@ -2144,6 +2167,20 @@
           "name": "Command",
           "type": "CommandContext",
           "description": "幂等、修订和审计理由。"
+        },
+        {
+          "name": "ImpactReportId",
+          "type": "string?",
+          "description": "M4新发布必需的真实报告ID；回滚不带此字段。",
+          "required": false,
+          "omitNull": true
+        },
+        {
+          "name": "ImpactHash",
+          "type": "string?",
+          "description": "M4新发布必需的准确canonical hash。",
+          "required": false,
+          "omitNull": true
         }
       ],
       "base": null
@@ -2787,6 +2824,403 @@
           "name": "Command",
           "type": "CommandContext",
           "description": "真实CAS修订与幂等命令。"
+        }
+      ],
+      "base": null
+    },
+    "SourceVersionDiff": {
+      "description": "单个独立来源的原文、散列、图结论及保守三元组差异。",
+      "fields": [
+        {
+          "name": "SourceId",
+          "type": "string",
+          "description": "固定ontology/shapes/vocabulary/data槽位。"
+        },
+        {
+          "name": "BaseText",
+          "type": "string?",
+          "description": "基础源完整原文，缺席与空文档分开。"
+        },
+        {
+          "name": "TargetText",
+          "type": "string?",
+          "description": "目标源完整原文，不从图投影重建。"
+        },
+        {
+          "name": "BaseHash",
+          "type": "string?",
+          "description": "基础原始UTF8散列，缺席为空。"
+        },
+        {
+          "name": "TargetHash",
+          "type": "string?",
+          "description": "目标原始UTF8散列，缺席为空。"
+        },
+        {
+          "name": "SourceChanged",
+          "type": "bool",
+          "description": "原始字节或缺席状态是否变化。"
+        },
+        {
+          "name": "Graph",
+          "type": "GraphComparisonResult",
+          "description": "复用M1有界图比较，遥测不进入canonical hash。"
+        },
+        {
+          "name": "BaseTripleCount",
+          "type": "int?",
+          "description": "真实解析的基础图集合条数，未完成时为空。"
+        },
+        {
+          "name": "TargetTripleCount",
+          "type": "int?",
+          "description": "真实解析的目标图集合条数，未完成时为空。"
+        },
+        {
+          "name": "AddedTriples",
+          "type": "RdfTriple[]",
+          "description": "可确定的新增完整RDF项，不按空白节点标签跨版本配对。"
+        },
+        {
+          "name": "RemovedTriples",
+          "type": "RdfTriple[]",
+          "description": "可确定的移除完整RDF项，旧版本证据不改写。"
+        },
+        {
+          "name": "TripleDeltaStatus",
+          "type": "TripleDeltaStatus",
+          "description": "精确、同构无变化或无法确定。"
+        }
+      ],
+      "base": null
+    },
+    "VersionDiff": {
+      "description": "只读比较同资产完整范围内两个固定版本的完整四源。",
+      "fields": [
+        {
+          "name": "AssetId",
+          "type": "string",
+          "description": "服务器恢复的同一资产。"
+        },
+        {
+          "name": "Scope",
+          "type": "ResourceScope",
+          "description": "服务器规范完整范围。"
+        },
+        {
+          "name": "From",
+          "type": "VersionRef",
+          "description": "固定基础版本。"
+        },
+        {
+          "name": "To",
+          "type": "VersionRef",
+          "description": "固定目标版本。"
+        },
+        {
+          "name": "BaseHashes",
+          "type": "SourceHashes",
+          "description": "基础四源及bundle精确散列。"
+        },
+        {
+          "name": "TargetHashes",
+          "type": "SourceHashes",
+          "description": "目标四源及bundle精确散列。"
+        },
+        {
+          "name": "BaseManifestHash",
+          "type": "string?",
+          "description": "基础为正式Release时的清单散列，草稿为空。"
+        },
+        {
+          "name": "TargetManifestHash",
+          "type": "string?",
+          "description": "目标为正式Release时的清单散列，草稿为空。"
+        },
+        {
+          "name": "Sources",
+          "type": "SourceVersionDiff[]",
+          "description": "固定四源顺序，缺席词汇仍占槽位。"
+        }
+      ],
+      "base": null
+    },
+    "ImpactEvidenceReference": {
+      "description": "支持草稿、历史移除和正式源的版本化证据定位，不伪造查询EvidenceRef。",
+      "fields": [
+        {
+          "name": "Version",
+          "type": "VersionRef",
+          "description": "结论对应的准确基础或目标版本。"
+        },
+        {
+          "name": "SourceId",
+          "type": "string",
+          "description": "实际来源，无法唯一定位时bundle。"
+        },
+        {
+          "name": "SourceHash",
+          "type": "string",
+          "description": "该来源或bundle的精确散列。"
+        },
+        {
+          "name": "Triple",
+          "type": "RdfTriple?",
+          "description": "已知完整三元组证据，不确定时为空。"
+        },
+        {
+          "name": "FocusIri",
+          "type": "string?",
+          "description": "可准确定位的命名IRI。"
+        },
+        {
+          "name": "Path",
+          "type": "string?",
+          "description": "可准确定位的谓词IRI。"
+        },
+        {
+          "name": "Line",
+          "type": "int?",
+          "description": "没有词法定位证据时为空。"
+        },
+        {
+          "name": "Column",
+          "type": "int?",
+          "description": "没有词法定位证据时为空。"
+        }
+      ],
+      "base": null
+    },
+    "ImpactConclusion": {
+      "description": "有证据的已知影响、阻断或未知覆盖，不冒称全系统无影响。",
+      "fields": [
+        {
+          "name": "Code",
+          "type": "string",
+          "description": "固定受控结论类别。"
+        },
+        {
+          "name": "Message",
+          "type": "string",
+          "description": "本执行器的安全中文解释。"
+        },
+        {
+          "name": "Blocking",
+          "type": "bool",
+          "description": "该结论是否阻断新发布，范围限制与实际未知依赖分开。"
+        },
+        {
+          "name": "AffectedIris",
+          "type": "string[]",
+          "description": "结论可确定涉及的命名IRI。"
+        },
+        {
+          "name": "AssetReferences",
+          "type": "string[]",
+          "description": "可确定的资产或版本引用。"
+        },
+        {
+          "name": "Evidence",
+          "type": "ImpactEvidenceReference[]",
+          "description": "每个结论至少一项真实源或bundle证据。"
+        }
+      ],
+      "base": null
+    },
+    "GenerateImpactReportRequest": {
+      "description": "生成持久影响报告的显式固定输入与幂等命令。",
+      "fields": [
+        {
+          "name": "From",
+          "type": "VersionRef",
+          "description": "基础固定版本，不接受外部地址或客户端散列。"
+        },
+        {
+          "name": "To",
+          "type": "VersionRef",
+          "description": "目标固定版本，发布时必须为准确当前draft。"
+        },
+        {
+          "name": "BaselineKind",
+          "type": "ImpactBaselineKind",
+          "description": "普通版本对，或明确首次发布自基线。"
+        },
+        {
+          "name": "AssessmentId",
+          "type": "string?",
+          "description": "目标草稿的精确持久评估；分析缺席时显式为空并阻断发布。"
+        },
+        {
+          "name": "Command",
+          "type": "CommandContext",
+          "description": "幂等与审计命令，不修改草稿修订。"
+        }
+      ],
+      "base": null
+    },
+    "ImpactReport": {
+      "description": "持久且可重算canonical hash的有界资产影响报告。",
+      "fields": [
+        {
+          "name": "SchemaVersion",
+          "type": "int",
+          "description": "本报告合同版本1。"
+        },
+        {
+          "name": "ReportId",
+          "type": "string",
+          "description": "首次生成持久主键，重试不重新分配。"
+        },
+        {
+          "name": "InputFingerprint",
+          "type": "string",
+          "description": "固定版本、源hash、评估、策略、执行器和预算的输入身份。"
+        },
+        {
+          "name": "CanonicalHash",
+          "type": "string",
+          "description": "排除ID/时间/比较遥测后的稳定完整语义内容散列。"
+        },
+        {
+          "name": "ExecutorVersion",
+          "type": "string",
+          "description": "准确执行器版本。"
+        },
+        {
+          "name": "BudgetIdentity",
+          "type": "string",
+          "description": "固定比较及报告覆盖预算版本。"
+        },
+        {
+          "name": "GeneratedAtUtc",
+          "type": "DateTimeOffset",
+          "description": "首次实际完成时刻，不因重放刷新。"
+        },
+        {
+          "name": "ExpiresAtUtc",
+          "type": "DateTimeOffset",
+          "description": "不晚于首次生成24小时和绑定评估期限。"
+        },
+        {
+          "name": "BaselineKind",
+          "type": "ImpactBaselineKind",
+          "description": "分析版本对或显式首次引入基线。"
+        },
+        {
+          "name": "Diff",
+          "type": "VersionDiff",
+          "description": "完整版本、四源hash和源码/图差异。"
+        },
+        {
+          "name": "ProfileVersion",
+          "type": "string",
+          "description": "报告固定策略版本。"
+        },
+        {
+          "name": "ProfileHash",
+          "type": "string",
+          "description": "报告固定策略内容散列。"
+        },
+        {
+          "name": "TargetSemantics",
+          "type": "PublicationSemantics?",
+          "description": "有真实绑定评估时的精确引用，缺席不伪造。"
+        },
+        {
+          "name": "ChangedIris",
+          "type": "string[]",
+          "description": "显式变化或首次引入的命名IRI。"
+        },
+        {
+          "name": "AssetReferences",
+          "type": "string[]",
+          "description": "本资产和已解析版本引用，未知不猜测。"
+        },
+        {
+          "name": "KnownImpacts",
+          "type": "ImpactConclusion[]",
+          "description": "有真实证据的有界已知影响。"
+        },
+        {
+          "name": "Blockers",
+          "type": "ImpactConclusion[]",
+          "description": "审核者不可覆盖的技术阻断。"
+        },
+        {
+          "name": "UnknownCoverage",
+          "type": "ImpactConclusion[]",
+          "description": "明确范围限制与实际未解析影响，后者阻断。"
+        },
+        {
+          "name": "PublishEligible",
+          "type": "bool",
+          "description": "仅技术资格，提交时仍须复核准确active基线和审批。"
+        }
+      ],
+      "base": null
+    },
+    "ImpactApprovalBinding": {
+      "description": "服务器从持久报告冻结的提案与审批内容。",
+      "fields": [
+        {
+          "name": "ReportId",
+          "type": "string",
+          "description": "准确持久报告ID。"
+        },
+        {
+          "name": "CanonicalHash",
+          "type": "string",
+          "description": "准确报告canonical hash。"
+        },
+        {
+          "name": "InputFingerprint",
+          "type": "string",
+          "description": "准确输入身份。"
+        },
+        {
+          "name": "BaselineKind",
+          "type": "ImpactBaselineKind",
+          "description": "固定首次或版本对模式。"
+        },
+        {
+          "name": "From",
+          "type": "VersionRef",
+          "description": "准确基础版本。"
+        },
+        {
+          "name": "To",
+          "type": "VersionRef",
+          "description": "准确目标draft/revision。"
+        },
+        {
+          "name": "BaseHashes",
+          "type": "SourceHashes",
+          "description": "基础完整四源hash。"
+        },
+        {
+          "name": "TargetHashes",
+          "type": "SourceHashes",
+          "description": "目标完整四源hash。"
+        },
+        {
+          "name": "BaseManifestHash",
+          "type": "string?",
+          "description": "已有active基线的准确清单hash。"
+        },
+        {
+          "name": "TargetSemantics",
+          "type": "PublicationSemantics",
+          "description": "同一target assessment/profile完整引用。"
+        },
+        {
+          "name": "GeneratedAtUtc",
+          "type": "DateTimeOffset",
+          "description": "报告首次生成时间，审批不能刷新。"
+        },
+        {
+          "name": "ExpiresAtUtc",
+          "type": "DateTimeOffset",
+          "description": "报告准确到期边界。"
         }
       ],
       "base": null
