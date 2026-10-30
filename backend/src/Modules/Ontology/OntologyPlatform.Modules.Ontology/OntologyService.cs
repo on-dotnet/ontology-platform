@@ -75,6 +75,8 @@ public sealed partial class OntologyService : IOntologyService, IDraftPublicatio
         if (replay is not null) return replay;
         // 首次资产身份只能由服务器生成；clone只允许继承经重新授权的正式目录事实。
         var assetId = Guid.NewGuid().ToString("N");
+        // 只有v4正式版形成受控身份历史，旧版本按其原合同保留。
+        VocabularySnapshot? inheritedIdentity = null;
         if (request.BaseReleaseId is not null)
         {
             if (releases is null) throw new SemanticOperationException(503, "release_catalog_unavailable");
@@ -86,11 +88,16 @@ public sealed partial class OntologyService : IOntologyService, IDraftPublicatio
             if (basis.Manifest.ReleaseId != request.BaseReleaseId || basis.Status is not (ReleaseStatus.Active or ReleaseStatus.Superseded)) throw new SemanticOperationException(409, "base_release_not_formal");
             if (scope.OrganizationId != originalScope.OrganizationId || !scope.SiteIds.SequenceEqual(originalScope.SiteIds, StringComparer.Ordinal)) throw new SemanticOperationException(403, "asset_scope_immutable");
             assetId = basis.Manifest.AssetId;
+            if (basis.Manifest.Semantics?.ProfileVersion == "4") inheritedIdentity = await ReadReleaseIdentityTimeAsync(actor, request.BaseReleaseId, cancellationToken);
         }
         // 解析在PG短事务之前完成，外部请求不会持有草稿/审计表锁。
         var analysis = await runtime.AnalyzeAsync(request.Sources, 1, cancellationToken);
+        // 新声明范围先完整解析固定，真实写事务内仍重新执行纯scope与历史检查。
+        var identity = await IdentityFactsAsync(request.Sources, 1, cancellationToken);
         return await WriteAsync<OntologyDraft>(actor, scope, "ontology.create", request.Command, request with { Scope = scope }, async token =>
         {
+            IdentityTimePolicy.DemandScope(identity, scope);
+            if (inheritedIdentity is not null) IdentityTimePolicy.DemandHistory(inheritedIdentity, identity);
             // 新资产和草稿ID完全由服务器创建，客户端不能改变既有资产scope。
             var row = new DraftRecord { DraftId = Guid.NewGuid().ToString("N"), AssetId = assetId, BaseReleaseId = request.BaseReleaseId, OrganizationId = scope.OrganizationId, SiteIds = scope.SiteIds, Name = request.Name, OwnerSubjectId = actor.SubjectId, UpdatedAtUtc = clock.GetUtcNow() };
             database.Drafts.Add(row);
@@ -210,13 +217,25 @@ public sealed partial class OntologyService : IOntologyService, IDraftPublicatio
     }
 
     /// <summary>保存/结构编辑共用CAS追加实现，不允许跨模块写入或原地覆盖源历史。</summary>
-    private Task<OntologyDraft> SaveCoreAsync(ActorContext actor, DraftRecord known, CommandContext command, SourceBundle sources, SemanticAnalysis analysis, string action, object request, CancellationToken cancellationToken, string? name = null) =>
-        WriteAsync<OntologyDraft>(actor, Scope(known), action, command, new { draftId = known.DraftId, request }, async token =>
+    private async Task<OntologyDraft> SaveCoreAsync(ActorContext actor, DraftRecord known, CommandContext command, SourceBundle sources, SemanticAnalysis analysis, string action, object request, CancellationToken cancellationToken, string? name = null, VocabularySnapshot? fixedBefore = null, VocabularySnapshot? fixedAfter = null)
+    {
+        // 外部解析期间不持有PG行锁，旧投影只对应known的明确修订。
+        var prior = await MapAsync(known, cancellationToken);
+        // 新四源投影与analysis散列绑定，同一值在锁内重新核验范围和历史。
+        var changedIdentity = fixedAfter ?? await IdentityFactsAsync(sources, command.ExpectedRevision + 1, cancellationToken);
+        // 历史检查只读不可变旧修订，不能用用户给出的旧三元组替代。
+        var priorIdentity = fixedBefore ?? await IdentityFactsAsync(prior.Sources, prior.Revision, cancellationToken);
+        return await WriteAsync<OntologyDraft>(actor, Scope(known), action, command, new { draftId = known.DraftId, request }, async token =>
         {
             // 事务内最新头是唯一CAS依据，事务外预读仅用于解析和授权。
             var row = await FindAsync(known.DraftId, true, token);
             DemandScope(actor, Scope(row));
             if (row.Revision != command.ExpectedRevision) throw new SemanticOperationException(409, "draft_revision_conflict");
+            // 精确CAS已证明预解析旧源仍是当前修订；检查不依赖事务外的客户端结论。
+            if (prior.Revision != row.Revision || priorIdentity.Hashes != prior.Hashes || changedIdentity.Hashes != analysis.Hashes) throw new SemanticOperationException(409, "identity_time_conflict");
+            IdentityTimePolicy.DemandScope(changedIdentity, Scope(row));
+            IdentityTimePolicy.DemandHistory(priorIdentity, changedIdentity);
+            if (action == "ontology.edit") DemandIdentityEdit(changedIdentity);
             // 名称与源修订共享同一CAS及审计事务；结构编辑未提供名称时保留当前值。
             if (name is not null) row.Name = name;
             row.Revision++;
@@ -224,6 +243,7 @@ public sealed partial class OntologyService : IOntologyService, IDraftPublicatio
             database.Revisions.Add(Revision(row, sources, analysis));
             return (Map(row, sources, analysis), row.DraftId);
         }, cancellationToken);
+    }
 
     /// <summary>同事务锁定幂等键，业务/回执/Governance审计全部成功后才commit。</summary>
     private async Task<T> WriteAsync<T>(ActorContext actor, ResourceScope scope, string action, CommandContext command, object payload, Func<CancellationToken, Task<(T Result, string Resource)>> mutation, CancellationToken token) where T : class

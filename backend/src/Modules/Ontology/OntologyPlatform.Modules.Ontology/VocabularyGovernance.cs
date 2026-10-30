@@ -29,15 +29,18 @@ public sealed partial class JenaSemanticRuntime
     private static bool M3MetadataPredicate(string predicate) => predicate == JenaRdfCodec.Owl + "deprecated" || new[] { "canonicalUnit", "version", "quantityKind", "dimension", "symbol", "standardSource", "precision", "synthetic", "nominalUnit" }.Concat(Exponents).Any(name => predicate == PlatformSemantics + name);
 
     /// <summary>仅v3正式部署、回验及正式读取追加当前政策，历史v1/v2不追溯升级。</summary>
-    private static bool PublicationGovernance(ReleaseManifest manifest, SourceBundle sources, RdfTriple[][] parsed, CancellationToken token) => manifest.Semantics?.ProfileVersion != "3" || VocabularyDiagnostics(parsed, JenaRdfCodec.Hashes(sources), token).All(item => item.Diagnostic.Severity == DiagnosticSeverity.Info);
+    private static bool PublicationGovernance(ReleaseManifest manifest, SourceBundle sources, RdfTriple[][] parsed, CancellationToken token) =>
+        manifest.Semantics?.ProfileVersion is not ("3" or "4") || VocabularyDiagnostics(parsed, JenaRdfCodec.Hashes(sources), token, m4: manifest.Semantics.ProfileVersion == "4").All(item => item.Diagnostic.Severity == DiagnosticSeverity.Info)
+            && (manifest.Semantics.ProfileVersion != "4" || IdentityTimePolicy.ScopeValid(parsed.SelectMany(graph => graph).ToArray(), manifest.Scope));
 
     /// <summary>全四源治理诊断入口，SHACL报告保持引擎原始结果。</summary>
-    private static AssessmentDiagnostic[] VocabularyDiagnostics(RdfTriple[][] parsed, SourceHashes hashes, CancellationToken token)
+    private static AssessmentDiagnostic[] VocabularyDiagnostics(RdfTriple[][] parsed, SourceHashes hashes, CancellationToken token, bool m4 = true)
     {
         // 每次运行独享诊断上下文，不在全局缓存源或用户信息。
         var governance = new VocabularyGovernance(parsed, hashes, token);
         governance.CheckSkos();
         governance.CheckUnits();
+        if (m4) governance.CheckIdentityTime();
         return governance.Diagnostics.Distinct().ToArray();
     }
 

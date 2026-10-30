@@ -27,7 +27,7 @@ public sealed class G3M3PublishingTests
         var proposal = await fixture.ApproveAsync(await fixture.ProposalForAsync(draft));
         // 初次活动CAS要求空活动版本。
         var release = await fixture.Service.ActivateAsync(fixture.Author, PublishingFixture.Activation(proposal), default);
-        Assert.AreEqual("3", release.Manifest.Semantics!.ProfileVersion);
+        Assert.AreEqual("4", release.Manifest.Semantics!.ProfileVersion);
         // 正式词汇仍由同生产服务组合实现，不能另建假Catalog。
         var vocabulary = (IG3VocabularyService)fixture.Ontology;
         // 实际消费路径重新校验对象和Jena同批图。
@@ -107,7 +107,7 @@ public sealed class G3M3PublishingTests
         var proposal = await fixture.ApproveAsync(await fixture.ProposalForAsync(draft));
         // 新发布精确使用v3，与旧v2正式版共存。
         var current = await fixture.Service.ActivateAsync(fixture.Author, new ActivateReleaseRequest { ProposalId = proposal.ProposalId, ExpectedActiveReleaseId = legacy.ReleaseId, ExpectedActivationRevision = 1, Command = PublishingFixture.Command(proposal.Revision) }, default);
-        Assert.AreEqual("3", current.Manifest.Semantics!.ProfileVersion);
+        Assert.AreEqual("4", current.Manifest.Semantics!.ProfileVersion);
         // 回滚仍要求新提案、当前权限、独立批准与活动CAS，不读取旧草稿资格。
         var rollback = await fixture.ApproveAsync(await fixture.Service.CreateProposalAsync(fixture.Author, new CreateProposalRequest { Kind = ProposalKind.Rollback, TargetReleaseId = legacy.ReleaseId, TargetManifestHash = legacy.ManifestHash, Command = PublishingFixture.Command() }, default));
         // 真正回验旧对象和图后更新活动指针。
