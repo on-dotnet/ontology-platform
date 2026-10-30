@@ -100,11 +100,21 @@ export function publicationImpactBlocker(report: ImpactReport | null, draft: Ont
   return null;
 }
 
-/** 审批使用服务端冻结引用，读取报告时所有输入和时间都必须与原绑定相同。 */
-export function impactBindingMatches(binding: ImpactApprovalBinding, report: ImpactReport): boolean {
+/** 冻结引用的结构和版本判别必须完整，才能展示或请求原报告。 */
+export function impactBindingWellFormed(binding: unknown): binding is ImpactApprovalBinding {
   if (!object(binding) || !fields(binding, ["reportId", "canonicalHash", "inputFingerprint", "baselineKind", "from", "to", "baseHashes", "targetHashes",
     "baseManifestHash", "targetSemantics", "generatedAtUtc", "expiresAtUtc"]) || !isVersionReference(binding.from) || !isVersionReference(binding.to)
-    || !isSourceHashes(binding.baseHashes) || !isSourceHashes(binding.targetHashes) || !semantics(binding.targetSemantics)) return false;
+    || !isSourceHashes(binding.baseHashes) || !isSourceHashes(binding.targetHashes) || !semantics(binding.targetSemantics)
+    || !text(binding.reportId) || !hash(binding.canonicalHash) || !hash(binding.inputFingerprint)
+    || !explicitTime(binding.generatedAtUtc) || !explicitTime(binding.expiresAtUtc)
+    || !["INITIAL", "VERSION_PAIR"].includes(binding.baselineKind as string)) return false;
+  if (binding.from.kind === "DRAFT" ? binding.baseManifestHash !== null : !hash(binding.baseManifestHash)) return false;
+  return binding.baselineKind !== "INITIAL" || binding.from.kind === "DRAFT" && sameVersion(binding.from, binding.to);
+}
+
+/** 审批使用服务端冻结引用，读取报告时所有输入和时间都必须与原绑定相同。 */
+export function impactBindingMatches(binding: ImpactApprovalBinding, report: ImpactReport): boolean {
+  if (!impactBindingWellFormed(binding)) return false;
   return binding.reportId === report.reportId && binding.canonicalHash === report.canonicalHash && binding.inputFingerprint === report.inputFingerprint
     && binding.baselineKind === report.baselineKind && sameVersion(binding.from, report.diff.from) && sameVersion(binding.to, report.diff.to)
     && sameHashes(binding.baseHashes, report.diff.baseHashes) && sameHashes(binding.targetHashes, report.diff.targetHashes)
@@ -118,9 +128,11 @@ export function proposalImpactBlocker(proposal: ReleaseProposal, report: ImpactR
   if (proposal.kind === "ROLLBACK") return null;
   const binding = proposal.impact;
   if (!binding) return "BLOCKED · 历史提案缺少影响绑定，请回到草稿重建发布提案";
+  if (!impactBindingWellFormed(binding)) return "UNKNOWN · 冻结影响绑定字段不完整，请重建发布提案";
   const technical = impactTechnicalBlocker(report, now);
   if (technical || !report) return technical;
-  if (!impactBindingMatches(binding, report) || !proposal.hashes || !sameHashes(proposal.hashes, binding.targetHashes)
+  if (report.diff.assetId !== proposal.assetId || !sameScope(report.diff.scope, proposal.scope)
+    || !impactBindingMatches(binding, report) || !proposal.hashes || !sameHashes(proposal.hashes, binding.targetHashes)
     || binding.to.kind !== "DRAFT" || binding.to.id !== proposal.draftId || binding.to.revision !== proposal.draftRevision
     || !sameSemantics(proposal.semantics, binding.targetSemantics)) return "STALE · 提案、报告或评估绑定不匹配，请重建提案";
   if (!releases) return "UNKNOWN · active版本状态尚未取得";

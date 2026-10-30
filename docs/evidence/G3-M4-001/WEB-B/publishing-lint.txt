@@ -1,0 +1,41 @@
+$ eslint .
+
+/Users/chasen/.codex/worktrees/g3-m4-web-a/ontology-platform/apps/web/src/features/publishing/impact-reference.tsx
+  34:18  error    Error: Cannot access variable before it is declared
+
+`request` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+/Users/chasen/.codex/worktrees/g3-m4-web-a/ontology-platform/apps/web/src/features/publishing/impact-reference.tsx:34:18
+  32 |   }, [binding, assetId, scope, auto, onLoaded]);
+  33 |   useEffect(() => {
+> 34 |     return () => request.current?.abort();
+     |                  ^^^^^^^ `request` accessed before it is declared
+  35 |   }, []);
+  36 |   const request = useState(() => ({ current: null as AbortController | null }))[0];
+  37 |   async function read() {
+
+/Users/chasen/.codex/worktrees/g3-m4-web-a/ontology-platform/apps/web/src/features/publishing/impact-reference.tsx:36:3
+  34 |     return () => request.current?.abort();
+  35 |   }, []);
+> 36 |   const request = useState(() => ({ current: null as AbortController | null }))[0];
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `request` is declared here
+  37 |   async function read() {
+  38 |     if (!binding || !impactBindingWellFormed(binding)) return;
+  39 |     request.current?.abort();  react-hooks/immutability
+  35:6   warning  React Hook useEffect has a missing dependency: 'request'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          react-hooks/exhaustive-deps
+  40:47  error    Error: This value cannot be modified
+
+Modifying a value used previously in an effect function or as an effect dependency is not allowed. Consider moving the modification before calling useEffect().
+
+/Users/chasen/.codex/worktrees/g3-m4-web-a/ontology-platform/apps/web/src/features/publishing/impact-reference.tsx:40:47
+  38 |     if (!binding || !impactBindingWellFormed(binding)) return;
+  39 |     request.current?.abort();
+> 40 |     const controller = new AbortController(); request.current = controller;
+     |                                               ^^^^^^^ `request` cannot be modified
+  41 |     setReport(null); setError(null); setLoading(true); onLoaded?.(null);
+  42 |     try {
+  43 |       const result = await readOriginal(binding, assetId, scope, controller.signal);                                                                                                                                                                                                                                                                                                                                                                                                                react-hooks/immutability
+
+✖ 3 problems (2 errors, 1 warning)
+
+[ELIFECYCLE] Command failed with exit code 1.

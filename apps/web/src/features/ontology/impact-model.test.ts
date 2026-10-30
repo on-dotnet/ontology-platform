@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import type {
   ImpactApprovalBinding, ImpactReport, OntologyDraft, ReleaseProposal, ReleaseSummary, SemanticAssessment, SemanticSupportProfile, VersionDiff,
 } from "../../lib/api/g2-generated";
-import { impactBindingMatches, impactReportMatches, impactTechnicalBlocker, publicationBaseline, publicationImpactBlocker, proposalImpactBlocker } from "./impact-model";
+import { impactBindingMatches, impactBindingWellFormed, impactReportMatches, impactTechnicalBlocker, publicationBaseline, publicationImpactBlocker, proposalImpactBlocker } from "./impact-model";
 
 const now = Date.parse("2026-10-31T02:00:00Z");
 const hashes = { ontologyHash: "a".repeat(64), shapesHash: "b".repeat(64), vocabularyHash: null, dataHash: "c".repeat(64), bundleHash: "d".repeat(64) };
@@ -92,6 +92,9 @@ describe("M4报告回复与逐结论证据", () => {
 
 describe("M4提案冻结报告不能被后来输入替换", () => {
   it("报告hash、时间、版本或assessment任一变化都不再匹配原绑定", () => {
+    expect(impactBindingWellFormed(binding())).toBe(true);
+    expect(impactBindingWellFormed({ ...binding(), targetSemantics: null })).toBe(false);
+    expect(impactBindingWellFormed({ ...binding(), baseHashes: {} })).toBe(false);
     expect(impactBindingMatches(binding(), report())).toBe(true);
     expect(impactBindingMatches({ ...binding(), from: undefined } as unknown as ImpactApprovalBinding, report())).toBe(false);
     for (const patch of [{ canonicalHash: "0".repeat(64) }, { expiresAtUtc: "2026-11-01T00:00:00Z" },
@@ -102,6 +105,8 @@ describe("M4提案冻结报告不能被后来输入替换", () => {
     expect(proposalImpactBlocker({ ...proposal(), impact: null }, null, [], now)).toMatch(/重建/);
     expect(proposalImpactBlocker({ ...proposal(), kind: "ROLLBACK", impact: null }, null, null, now)).toBeNull();
     expect(proposalImpactBlocker(proposal(), report(), [], now)).toBeNull();
+    const otherAsset = report(); otherAsset.diff.assetId = "other-asset";
+    expect(proposalImpactBlocker(proposal(), otherAsset, [], now)).toMatch(/STALE/);
   });
   it("active新出现使INITIAL批准失效，报告未读不能当可审核", () => {
     const active = { isActive: true, manifestHash: "3".repeat(64), manifest: { assetId: "asset", scope, releaseId: "release-new", hashes } } as ReleaseSummary;
