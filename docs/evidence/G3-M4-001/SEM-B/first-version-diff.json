@@ -1,0 +1,363 @@
+{
+  "exitCode": 0,
+  "records": [
+    {
+      "check": "public-jena-fixture-modes",
+      "exitCode": 0,
+      "modes": {
+        "fixture": "0o755",
+        "config.ttl": "0o644",
+        "log4j2.properties": "0o644"
+      }
+    },
+    {
+      "resourceLifecycle": true,
+      "project": "on-dotnet/ontology-platform",
+      "taskId": "G3-M4-001",
+      "runId": "g2-sem-fdc25d47e2c6",
+      "observedAtUtc": "2026-10-30T16:25:48.419818+00:00",
+      "phase": "create",
+      "dockerBackend": {
+        "context": "desktop-linux",
+        "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016"
+      },
+      "name": "g2-sem-fdc25d47e2c6",
+      "containerId": "562c4788ae4164ccab67e8751b0082806d27c31bf915847a6be59974874407e3",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "run",
+        "--label",
+        "io.ontology-platform.project=on-dotnet/ontology-platform",
+        "--label",
+        "io.ontology-platform.task-id=G3-M4-001",
+        "--label",
+        "io.ontology-platform.run-id=g2-sem-fdc25d47e2c6",
+        "--label",
+        "io.ontology-platform.test-fixture=true",
+        "--detach",
+        "--name",
+        "g2-sem-fdc25d47e2c6",
+        "--publish",
+        "127.0.0.1::3030",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--mount",
+        "type=bind,src=/private/tmp/g2-sem-fdc25d47e2c6eycogld8/fixture,dst=/fixture,readonly",
+        "--entrypoint",
+        "java",
+        "ontology-platform-fuseki:context-4fbf23514516632dcb651b5c05bf04e9992da52491607b6cf58de1f7348ff9ab",
+        "-Xmx384m",
+        "-Dlog4j.configurationFile=/fixture/log4j2.properties",
+        "-jar",
+        "/opt/fuseki/fuseki-server.jar",
+        "--config=/fixture/config.ttl"
+      ],
+      "exitCode": 0,
+      "output": "562c4788ae4164ccab67e8751b0082806d27c31bf915847a6be59974874407e3\n"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "port",
+        "g2-sem-fdc25d47e2c6",
+        "3030/tcp"
+      ],
+      "exitCode": 0,
+      "output": "127.0.0.1:60643\n"
+    },
+    {
+      "resourceLifecycle": true,
+      "project": "on-dotnet/ontology-platform",
+      "taskId": "G3-M4-001",
+      "runId": "g2-sem-fdc25d47e2c6",
+      "observedAtUtc": "2026-10-30T16:25:49.864571+00:00",
+      "phase": "create",
+      "dockerBackend": {
+        "context": "desktop-linux",
+        "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016"
+      },
+      "name": "g2-sem-fdc25d47e2c6-pg",
+      "containerId": "5c6aa6e0442dcc3108c31f08e52185b6988a4c1e8674f78bff1c6b3a441d672b",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "run",
+        "--label",
+        "io.ontology-platform.project=on-dotnet/ontology-platform",
+        "--label",
+        "io.ontology-platform.task-id=G3-M4-001",
+        "--label",
+        "io.ontology-platform.run-id=g2-sem-fdc25d47e2c6",
+        "--label",
+        "io.ontology-platform.test-fixture=true",
+        "--detach",
+        "--name",
+        "g2-sem-fdc25d47e2c6-pg",
+        "--publish",
+        "127.0.0.1::5432",
+        "--env",
+        "POSTGRES_PASSWORD",
+        "--env",
+        "POSTGRES_DB",
+        "--memory",
+        "512m",
+        "--cpus",
+        "1",
+        "--tmpfs",
+        "/var/lib/postgresql",
+        "postgres:18.6-trixie@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6"
+      ],
+      "exitCode": 0,
+      "output": "5c6aa6e0442dcc3108c31f08e52185b6988a4c1e8674f78bff1c6b3a441d672b\n"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "port",
+        "g2-sem-fdc25d47e2c6-pg",
+        "5432/tcp"
+      ],
+      "exitCode": 0,
+      "output": "127.0.0.1:60651\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "build",
+        "backend/tests/OntologyPlatform.SemanticTests",
+        "--no-restore"
+      ],
+      "exitCode": 0,
+      "output": "  OntologyPlatform.Contracts -> /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/bin/Debug/net10.0/OntologyPlatform.Contracts.dll\n  OntologyPlatform.Modules.Ontology.Domain -> /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.Domain.dll\n  OntologyPlatform.Modules.Ontology -> /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.dll\n  OntologyPlatform.Modules.Governance -> /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/bin/Debug/net10.0/OntologyPlatform.Modules.Governance.dll\n  OntologyPlatform.SemanticTests -> /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll\n\n已成功生成。\n    0 个警告\n    0 个错误\n\n已用时间 00:00:01.09\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "tool",
+        "restore"
+      ],
+      "exitCode": 0,
+      "output": "工具“dotnet-ef”(版本“10.0.13”)已还原。可用的命令: dotnet-ef\n\n还原成功。\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "tool",
+        "run",
+        "dotnet-ef",
+        "database",
+        "update",
+        "--project",
+        "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance",
+        "--startup-project",
+        "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance",
+        "--no-build"
+      ],
+      "exitCode": 0,
+      "output": "Failed executing DbCommand (7ms) [Parameters=[], CommandType='Text', CommandTimeout='30']\nSELECT \"MigrationId\", \"ProductVersion\"\nFROM governance.\"__EFMigrationsHistory\"\nORDER BY \"MigrationId\";\nAcquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.\nApplying migration '20261025062847_InitialGovernance'.\nApplying migration '20261025144246_AuditScopeSites'.\nAcquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.\nDone.\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "tool",
+        "run",
+        "dotnet-ef",
+        "database",
+        "update",
+        "--project",
+        "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology",
+        "--startup-project",
+        "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology",
+        "--no-build"
+      ],
+      "exitCode": 0,
+      "output": "Failed executing DbCommand (7ms) [Parameters=[], CommandType='Text', CommandTimeout='30']\nSELECT \"MigrationId\", \"ProductVersion\"\nFROM ontology.\"__EFMigrationsHistory\"\nORDER BY \"MigrationId\";\nAcquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.\nApplying migration '20261026003221_InitialOntology'.\nApplying migration '20261027032135_G3Assessments'.\nAcquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.\nApplying migration '20261030155129_G3M4ImpactReports'.\nAcquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.\nDone.\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "test",
+        "--project",
+        "backend/tests/OntologyPlatform.SemanticTests",
+        "--no-restore",
+        "--",
+        "--filter",
+        "FullyQualifiedName~G3M4VersionDiffTests"
+      ],
+      "exitCode": 0,
+      "output": "正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64) 已通过 (2s 553ms)\n\n测试运行摘要: 已通过!\n  总计: 6\n  失败: 0\n  成功: 6\n  已跳过: 0\n  持续时间: 4s 371ms\n"
+    },
+    {
+      "check": "all temporary graph triples removed",
+      "count": 0,
+      "status": "PASS"
+    },
+    {
+      "resourceLifecycle": true,
+      "project": "on-dotnet/ontology-platform",
+      "taskId": "G3-M4-001",
+      "runId": "g2-sem-fdc25d47e2c6",
+      "observedAtUtc": "2026-10-30T16:26:00.173927+00:00",
+      "phase": "before",
+      "dockerBackend": {
+        "context": "desktop-linux",
+        "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016"
+      },
+      "containerId": "5c6aa6e0442dcc3108c31f08e52185b6988a4c1e8674f78bff1c6b3a441d672b",
+      "snapshot": {
+        "Id": "5c6aa6e0442dcc3108c31f08e52185b6988a4c1e8674f78bff1c6b3a441d672b",
+        "Name": "/g2-sem-fdc25d47e2c6-pg",
+        "Project": "on-dotnet/ontology-platform",
+        "TaskId": "G3-M4-001",
+        "RunId": "g2-sem-fdc25d47e2c6",
+        "Fixture": "true"
+      },
+      "status": "PASS"
+    },
+    {
+      "resourceLifecycle": true,
+      "project": "on-dotnet/ontology-platform",
+      "taskId": "G3-M4-001",
+      "runId": "g2-sem-fdc25d47e2c6",
+      "observedAtUtc": "2026-10-30T16:26:00.252628+00:00",
+      "phase": "command",
+      "dockerBackend": {
+        "context": "desktop-linux",
+        "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016"
+      },
+      "containerId": "5c6aa6e0442dcc3108c31f08e52185b6988a4c1e8674f78bff1c6b3a441d672b",
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "container",
+        "rm",
+        "--force",
+        "5c6aa6e0442dcc3108c31f08e52185b6988a4c1e8674f78bff1c6b3a441d672b"
+      ]
+    },
+    {
+      "resourceLifecycle": true,
+      "project": "on-dotnet/ontology-platform",
+      "taskId": "G3-M4-001",
+      "runId": "g2-sem-fdc25d47e2c6",
+      "observedAtUtc": "2026-10-30T16:26:00.386448+00:00",
+      "phase": "exit",
+      "dockerBackend": {
+        "context": "desktop-linux",
+        "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016"
+      },
+      "containerId": "5c6aa6e0442dcc3108c31f08e52185b6988a4c1e8674f78bff1c6b3a441d672b",
+      "exitCode": 0,
+      "durationMs": 134
+    },
+    {
+      "resourceLifecycle": true,
+      "project": "on-dotnet/ontology-platform",
+      "taskId": "G3-M4-001",
+      "runId": "g2-sem-fdc25d47e2c6",
+      "observedAtUtc": "2026-10-30T16:26:00.554349+00:00",
+      "phase": "after",
+      "dockerBackend": {
+        "context": "desktop-linux",
+        "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016"
+      },
+      "containerId": "5c6aa6e0442dcc3108c31f08e52185b6988a4c1e8674f78bff1c6b3a441d672b",
+      "absent": true,
+      "absenceDiagnostic": "Error response from daemon: No such container: 5c6aa6e0442dcc3108c31f08e52185b6988a4c1e8674f78bff1c6b3a441d672b",
+      "status": "PASS"
+    },
+    {
+      "resourceLifecycle": true,
+      "project": "on-dotnet/ontology-platform",
+      "taskId": "G3-M4-001",
+      "runId": "g2-sem-fdc25d47e2c6",
+      "observedAtUtc": "2026-10-30T16:26:00.712520+00:00",
+      "phase": "before",
+      "dockerBackend": {
+        "context": "desktop-linux",
+        "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016"
+      },
+      "containerId": "562c4788ae4164ccab67e8751b0082806d27c31bf915847a6be59974874407e3",
+      "snapshot": {
+        "Id": "562c4788ae4164ccab67e8751b0082806d27c31bf915847a6be59974874407e3",
+        "Name": "/g2-sem-fdc25d47e2c6",
+        "Project": "on-dotnet/ontology-platform",
+        "TaskId": "G3-M4-001",
+        "RunId": "g2-sem-fdc25d47e2c6",
+        "Fixture": "true"
+      },
+      "status": "PASS"
+    },
+    {
+      "resourceLifecycle": true,
+      "project": "on-dotnet/ontology-platform",
+      "taskId": "G3-M4-001",
+      "runId": "g2-sem-fdc25d47e2c6",
+      "observedAtUtc": "2026-10-30T16:26:00.782100+00:00",
+      "phase": "command",
+      "dockerBackend": {
+        "context": "desktop-linux",
+        "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016"
+      },
+      "containerId": "562c4788ae4164ccab67e8751b0082806d27c31bf915847a6be59974874407e3",
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "container",
+        "rm",
+        "--force",
+        "562c4788ae4164ccab67e8751b0082806d27c31bf915847a6be59974874407e3"
+      ]
+    },
+    {
+      "resourceLifecycle": true,
+      "project": "on-dotnet/ontology-platform",
+      "taskId": "G3-M4-001",
+      "runId": "g2-sem-fdc25d47e2c6",
+      "observedAtUtc": "2026-10-30T16:26:00.932193+00:00",
+      "phase": "exit",
+      "dockerBackend": {
+        "context": "desktop-linux",
+        "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016"
+      },
+      "containerId": "562c4788ae4164ccab67e8751b0082806d27c31bf915847a6be59974874407e3",
+      "exitCode": 0,
+      "durationMs": 150
+    },
+    {
+      "resourceLifecycle": true,
+      "project": "on-dotnet/ontology-platform",
+      "taskId": "G3-M4-001",
+      "runId": "g2-sem-fdc25d47e2c6",
+      "observedAtUtc": "2026-10-30T16:26:01.088194+00:00",
+      "phase": "after",
+      "dockerBackend": {
+        "context": "desktop-linux",
+        "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016"
+      },
+      "containerId": "562c4788ae4164ccab67e8751b0082806d27c31bf915847a6be59974874407e3",
+      "absent": true,
+      "absenceDiagnostic": "Error response from daemon: No such container: 562c4788ae4164ccab67e8751b0082806d27c31bf915847a6be59974874407e3",
+      "status": "PASS"
+    }
+  ]
+}

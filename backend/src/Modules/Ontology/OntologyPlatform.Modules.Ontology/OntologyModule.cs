@@ -19,8 +19,10 @@ public static class OntologyModule
         services.AddSingleton<JenaSemanticRuntime>();
         services.AddSingleton<ISemanticRuntime>(provider => provider.GetRequiredService<JenaSemanticRuntime>());
         services.AddSingleton<IG3VocabularyRuntime>(provider => provider.GetRequiredService<JenaSemanticRuntime>());
+        services.AddSingleton<IG3VersionDiffRuntime>(provider => provider.GetRequiredService<JenaSemanticRuntime>());
         services.AddSingleton<IG3SemanticRuntime>(provider => provider.GetRequiredService<JenaSemanticRuntime>());
         services.AddScoped<OntologyService>();
+        services.AddScoped<IG3ImpactService>(provider => provider.GetRequiredService<OntologyService>());
         services.AddScoped<IG3IdentityTimeService>(provider => provider.GetRequiredService<OntologyService>());
         services.AddScoped<IG3VocabularyService>(provider => provider.GetRequiredService<OntologyService>());
         services.AddScoped<IG3OntologyService>(provider => provider.GetRequiredService<OntologyService>());
