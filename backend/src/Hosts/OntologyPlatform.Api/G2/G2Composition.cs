@@ -50,6 +50,7 @@ public static class G2Composition
         {
             app.MapOntologyEndpoints();
             app.MapVocabularyEndpoints();
+            app.MapIdentityTimeEndpoints();
             app.MapG3Endpoints();
             app.MapPublishingEndpoints();
             app.MapSemanticEndpoints();

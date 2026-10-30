@@ -363,6 +363,28 @@ public enum VocabularyEditSource
 
 }
 
+/// <summary>明确冻结的TemporalRelation协议枚举，未知值不得静默接受。</summary>
+[JsonConverter(typeof(StrictStringEnumConverter<TemporalRelation>))]
+public enum TemporalRelation
+{
+    /// <summary>协议值OVERLAP。</summary>
+    [JsonStringEnumMemberName("OVERLAP")]
+    Overlap,
+
+    /// <summary>协议值DISJOINT。</summary>
+    [JsonStringEnumMemberName("DISJOINT")]
+    Disjoint,
+
+    /// <summary>协议值INDETERMINATE。</summary>
+    [JsonStringEnumMemberName("INDETERMINATE")]
+    Indeterminate,
+
+    /// <summary>协议值INVALID。</summary>
+    [JsonStringEnumMemberName("INVALID")]
+    Invalid,
+
+}
+
 /// <summary>事件载荷唯一判别基类，kind与事件类型一致。</summary>
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "kind")]
 [JsonDerivedType(typeof(RunStartedPayload), "run.started")]
@@ -2965,6 +2987,29 @@ public sealed record VocabularySnapshot : IJsonOnDeserialized, IJsonOnSerializin
     /// <summary>精确SKOS和单位治理码及真实源散列，未知行列保持null。</summary>
     [JsonRequired]
     public AssessmentDiagnostic[] Diagnostics { get; init; } = [];
+
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
+}
+
+/// <summary>受控身份和时间精确批次，复用四源CAS与幂等命令。</summary>
+[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
+public sealed record IdentityTimeEditsRequest : IJsonOnDeserialized, IJsonOnSerializing
+{
+    /// <summary>已读取同修订完整四源散列。</summary>
+    [JsonRequired]
+    public SourceHashes Hashes { get; init; } = default!;
+
+    /// <summary>最多64项ontology或vocabulary的精确RDF变更。</summary>
+    [JsonRequired]
+    public VocabularyChange[] Changes { get; init; } = [];
+
+    /// <summary>真实CAS修订与幂等命令。</summary>
+    [JsonRequired]
+    public CommandContext Command { get; init; } = default!;
 
     /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
     void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);

@@ -153,7 +153,7 @@
         },
         "security": [
           {
-            "session": [ ]
+            "session": []
           }
         ]
       }
@@ -247,7 +247,7 @@
         },
         "security": [
           {
-            "session": [ ]
+            "session": []
           }
         ]
       }
@@ -321,7 +321,7 @@
         },
         "security": [
           {
-            "session": [ ]
+            "session": []
           }
         ]
       }
@@ -406,7 +406,7 @@
         },
         "security": [
           {
-            "session": [ ]
+            "session": []
           }
         ]
       }
@@ -496,7 +496,7 @@
         },
         "security": [
           {
-            "session": [ ]
+            "session": []
           }
         ]
       }
@@ -533,7 +533,7 @@
         },
         "security": [
           {
-            "health": [ ]
+            "health": []
           }
         ]
       }
@@ -580,7 +580,7 @@
         },
         "security": [
           {
-            "health": [ ]
+            "health": []
           }
         ]
       }
@@ -685,7 +685,7 @@
         },
         "security": [
           {
-            "session": [ ]
+            "session": []
           }
         ]
       }
@@ -849,7 +849,7 @@
         },
         "security": [
           {
-            "session": [ ]
+            "session": []
           }
         ]
       }
@@ -964,7 +964,391 @@
         },
         "security": [
           {
-            "session": [ ]
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/v1/ontology-drafts/{id}/identity-time": {
+      "get": {
+        "tags": [
+          "IdentityTime"
+        ],
+        "operationId": "ReadDraftIdentityTime",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VocabularySnapshot"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Payload Too Large",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/v1/ontology-drafts/{id}/identity-time-edits": {
+      "post": {
+        "tags": [
+          "IdentityTime"
+        ],
+        "operationId": "EditDraftIdentityTime",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "description": "必需的强ETag，格式为带双引号的十进制修订，必须与Command.expectedRevision相同；缺失428，旧值或不匹配409。",
+            "required": true,
+            "schema": {
+              "pattern": "^\"[0-9]+\"$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-CSRF-TOKEN",
+            "in": "header",
+            "description": "从同源/auth/csrf领取并与会话关联的防伪令牌。",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IdentityTimeEditsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OntologyDraft"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Payload Too Large",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "428": {
+            "description": "Precondition Required",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/v1/releases/{id}/identity-time": {
+      "get": {
+        "tags": [
+          "IdentityTime"
+        ],
+        "operationId": "ReadReleasedIdentityTime",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VocabularySnapshot"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Payload Too Large",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformProblem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
           }
         ]
       }
@@ -1009,7 +1393,7 @@
         },
         "security": [
           {
-            "session": [ ]
+            "session": []
           }
         ]
       }
@@ -1173,7 +1557,7 @@
         },
         "security": [
           {
-            "session": [ ]
+            "session": []
           }
         ]
       }
@@ -1248,7 +1632,7 @@
         },
         "security": [
           {
-            "session": [ ]
+            "session": []
           }
         ]
       }
@@ -1377,7 +1761,7 @@
         },
         "security": [
           {
-            "session": [ ]
+            "session": []
           }
         ]
       }
@@ -1444,7 +1828,7 @@
         },
         "security": [
           {
-            "session": [ ]
+            "session": []
           }
         ]
       },
@@ -1567,7 +1951,7 @@
         },
         "security": [
           {
-            "session": [ ]
+            "session": []
           }
         ]
       }
@@ -1720,7 +2104,7 @@
         },
         "security": [
           {
-            "session": [ ]
+            "session": []
           }
         ]
       }
@@ -1875,7 +2259,7 @@
         },
         "security": [
           {
-            "session": [ ]
+            "session": []
           }
         ]
       }
@@ -1951,7 +2335,7 @@
         },
         "security": [
           {
-            "session": [ ]
+            "session": []
           }
         ]
       }
@@ -2035,7 +2419,7 @@
         },
         "security": [
           {
-            "session": [ ]
+            "session": []
           }
         ]
       }
@@ -2092,7 +2476,7 @@
         },
         "security": [
           {
-            "session": [ ]
+            "session": []
           }
         ]
       }
@@ -2207,7 +2591,7 @@
         },
         "security": [
           {
-            "session": [ ]
+            "session": []
           }
         ]
       }
@@ -2318,7 +2702,7 @@
         },
         "security": [
           {
-            "session": [ ]
+            "session": []
           }
         ]
       }
@@ -2392,7 +2776,7 @@
         },
         "security": [
           {
-            "session": [ ]
+            "session": []
           }
         ]
       }
@@ -2450,7 +2834,7 @@
         },
         "security": [
           {
-            "session": [ ]
+            "session": []
           }
         ]
       },
@@ -2574,7 +2958,7 @@
         },
         "security": [
           {
-            "session": [ ]
+            "session": []
           }
         ]
       }
@@ -2649,7 +3033,7 @@
         },
         "security": [
           {
-            "session": [ ]
+            "session": []
           }
         ]
       },
@@ -2811,7 +3195,7 @@
         },
         "security": [
           {
-            "session": [ ]
+            "session": []
           }
         ]
       }
@@ -2975,7 +3359,7 @@
         },
         "security": [
           {
-            "session": [ ]
+            "session": []
           }
         ]
       }
@@ -3073,7 +3457,7 @@
         },
         "security": [
           {
-            "session": [ ]
+            "session": []
           }
         ]
       }
@@ -3217,7 +3601,7 @@
         },
         "security": [
           {
-            "session": [ ]
+            "session": []
           }
         ]
       }
@@ -3284,7 +3668,7 @@
         },
         "security": [
           {
-            "session": [ ]
+            "session": []
           }
         ]
       },
@@ -3397,7 +3781,7 @@
         },
         "security": [
           {
-            "session": [ ]
+            "session": []
           }
         ]
       }
@@ -3481,7 +3865,7 @@
         },
         "security": [
           {
-            "session": [ ]
+            "session": []
           }
         ]
       }
@@ -3624,7 +4008,7 @@
         },
         "security": [
           {
-            "session": [ ]
+            "session": []
           }
         ]
       }
@@ -3728,7 +4112,7 @@
         },
         "security": [
           {
-            "session": [ ]
+            "session": []
           }
         ]
       }
@@ -5836,6 +6220,33 @@
         ],
         "type": "string"
       },
+      "IdentityTimeEditsRequest": {
+        "required": [
+          "hashes",
+          "changes",
+          "command"
+        ],
+        "type": "object",
+        "properties": {
+          "hashes": {
+            "description": "已读取同修订完整四源散列。",
+            "$ref": "#/components/schemas/SourceHashes"
+          },
+          "changes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VocabularyChange"
+            },
+            "description": "最多64项ontology或vocabulary的精确RDF变更。"
+          },
+          "command": {
+            "description": "真实CAS修订与幂等命令。",
+            "$ref": "#/components/schemas/CommandContext"
+          }
+        },
+        "additionalProperties": false,
+        "description": "受控身份和时间精确批次，复用四源CAS与幂等命令。"
+      },
       "ImportLock": {
         "required": [
           "ontologyIri",
@@ -5860,7 +6271,7 @@
         "additionalProperties": false,
         "description": "已锁定且可回验的本体导入引用。"
       },
-      "JsonElement": { },
+      "JsonElement": {},
       "MessageDeltaPayload": {
         "required": [
           "kind",
@@ -8271,6 +8682,15 @@
         "additionalProperties": false,
         "description": "业务断言有效时间，独立于采集与资产版本。"
       },
+      "TemporalRelation": {
+        "enum": [
+          "OVERLAP",
+          "DISJOINT",
+          "INDETERMINATE",
+          "INVALID"
+        ],
+        "type": "string"
+      },
       "ToolCompletedPayload": {
         "required": [
           "kind",
@@ -8684,6 +9104,9 @@
     },
     {
       "name": "Vocabulary"
+    },
+    {
+      "name": "IdentityTime"
     },
     {
       "name": "Ontology"

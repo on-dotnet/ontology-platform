@@ -156,6 +156,15 @@
           "vocabulary"
         ]
       },
+      "TemporalRelation": {
+        "type": "string",
+        "enum": [
+          "OVERLAP",
+          "DISJOINT",
+          "INDETERMINATE",
+          "INVALID"
+        ]
+      },
       "ExecutionPayload": {
         "oneOf": [
           {
@@ -4335,6 +4344,33 @@
               "$ref": "#/components/schemas/AssessmentDiagnostic"
             },
             "description": "精确SKOS和单位治理码及真实源散列，未知行列保持null。"
+          }
+        },
+        "additionalProperties": false
+      },
+      "IdentityTimeEditsRequest": {
+        "type": "object",
+        "description": "受控身份和时间精确批次，复用四源CAS与幂等命令。",
+        "required": [
+          "hashes",
+          "changes",
+          "command"
+        ],
+        "properties": {
+          "hashes": {
+            "$ref": "#/components/schemas/SourceHashes",
+            "description": "已读取同修订完整四源散列。"
+          },
+          "changes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VocabularyChange"
+            },
+            "description": "最多64项ontology或vocabulary的精确RDF变更。"
+          },
+          "command": {
+            "$ref": "#/components/schemas/CommandContext",
+            "description": "真实CAS修订与幂等命令。"
           }
         },
         "additionalProperties": false

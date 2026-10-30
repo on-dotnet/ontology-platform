@@ -94,6 +94,8 @@ export type GraphComparisonResult = { "status": GraphComparisonStatus; "code": s
 
 export type GraphComparisonStatus = "EQUIVALENT" | "DIFFERENT" | "INDETERMINATE";
 
+export type IdentityTimeEditsRequest = { "hashes": SourceHashes; "changes": Array<VocabularyChange>; "command": CommandContext };
+
 export type ImportLock = { "ontologyIri": string; "hash": string; "objectKey": string };
 
 export type JsonElement = JsonValue;
@@ -207,6 +209,8 @@ export type SourceHashes = { "ontologyHash": string; "shapesHash": string; "voca
 export type SubSourceStatus = "AVAILABLE" | "EMPTY" | "PARTIAL" | "UNAVAILABLE" | "UNAUTHORIZED";
 
 export type TemporalExtent = { "fromUtc": string; "toUtc": string | null };
+
+export type TemporalRelation = "OVERLAP" | "DISJOINT" | "INDETERMINATE" | "INVALID";
 
 export type ToolCompletedPayload = { "kind": "tool.completed"; "invocationId": string; "result": SemanticQueryResult; "durationMs": number };
 

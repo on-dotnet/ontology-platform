@@ -36,6 +36,7 @@ public sealed class G2OpenApiSchemaTests
         {
             ("/api/v1/ontology-drafts/{id}", "put"),
             ("/api/v1/ontology-drafts/{id}/edits", "post"),
+            ("/api/v1/ontology-drafts/{id}/identity-time-edits", "post"),
             ("/api/v1/approvals/{id}/decisions", "post"),
             ("/api/v1/release-activations", "post"),
             ("/api/v1/execution-runs/{id}/cancel", "post")

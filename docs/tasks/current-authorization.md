@@ -1,3 +1,9 @@
+# G3-M4-001 当前授权增量（2026-10-30）
+
+人类正式批准[附件V1](../evidence/G3-M4-001/authorization-v1.md)全部M4，由本机Codex Master执行。Base以本次fetch实测为`3992582e03df1a103fac36e7e82b8c81f85f622e`。先Preflight/合同A/独立Review，再Slice A身份时间真实集成main，随后合同B/Diff/Impact/审批绑定。仅M4，不启动M5/G4/G5。独立托管Worktree、最多Master+两写者、公共合同Single Writer、本地真实验证优先、云CI按需NOT_RUN、唯一V3及独立重开与准确资源收尾。任务见[G3-M4-001](G3-M4-001.md)。Windows远端DRAFT历史保留，不用Mac通过宣称Windows通过。
+
+---
+
 # 2026-10-29 最新人类覆盖授权：本地优先验证
 
 人类在侧聊明确批准并同步Master：当前及后续跨Windows/macOS/Linux开发以本地真实测试、Docker服务、实际浏览器和独立Review为主；GitHub Actions默认按需手动，不再是每次提交、集成、资源回收或最终交付的必需门禁。完整本地验收、已提交源码及输入绑定、唯一V3与独立重开保持；旧CI和失败记录不改，未运行不冒充PASS。跨CI缓存功能仍保留已实测cold/warm证据。详见[永久政策](../development/local-validation-policy.md)。此明确批准覆盖下列M3附件及旧规范中强制同HeadCI的默认要求，不扩大依赖/上传/费用/权限/M4/M5范围。

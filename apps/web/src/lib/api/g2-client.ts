@@ -33,6 +33,12 @@ export function createG2Client(options: { fetch?: typeof fetch } = {}) {
   }
   const id = encodeURIComponent;
   return {
+    identityTime: (draftId: string, signal?: AbortSignal) =>
+      read<G2.VocabularySnapshot>(`/ontology-drafts/${id(draftId)}/identity-time`, signal),
+    editIdentityTime: (draftId: string, body: G2.IdentityTimeEditsRequest, signal?: AbortSignal) =>
+      write<G2.OntologyDraft>(`/ontology-drafts/${id(draftId)}/identity-time-edits`, body, "POST", body.command.expectedRevision, signal),
+    releasedIdentityTime: (releaseId: string, signal?: AbortSignal) =>
+      read<G2.VocabularySnapshot>(`/releases/${id(releaseId)}/identity-time`, signal),
     vocabulary: (draftId: string, signal?: AbortSignal) =>
       read<G2.VocabularySnapshot>(`/ontology-drafts/${id(draftId)}/vocabulary`, signal),
     editVocabulary: (draftId: string, body: G2.VocabularyEditsRequest, signal?: AbortSignal) =>
