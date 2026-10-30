@@ -16,3 +16,9 @@
 .g3-model-status{border:1px solid var(--border);border-radius:10px;padding:14px;background:var(--surface-raised)}
 .g3-model-status h3{margin-bottom:10px}
 .g2-workspace [hidden]{display:none!important}
+
+/* 身份时间受控表单只复用现有主题Tokens和单列窄屏边界。 */
+.g3-identity-form{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;min-width:0;border:1px solid var(--border);border-radius:10px;padding:14px}
+.g3-identity-form legend{padding:0 6px;font-weight:600;color:var(--text)}
+.g3-identity-form:disabled{opacity:.7}
+.g2-tabs{flex-wrap:wrap}

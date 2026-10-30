@@ -1,0 +1,9 @@
+{
+  "command": "node .tools/pnpm/package/bin/pnpm.cjs --dir apps/web run typecheck",
+  "exitCode": 2,
+  "status": "FAIL",
+  "cause": "Broad import replacement also inserted IdentityTimeEditsRequest into vocabularyRetry inline type; TS7008/TS2741/TS18047.",
+  "fix": "Restore vocabularyRetry request to VocabularyEditsRequest; dedicated identityRetry retains IdentityTimeEditsRequest.",
+  "measuredInterval": "UNKNOWN",
+  "followup": "typecheck.txt actual exit0; no original failure rewritten"
+}

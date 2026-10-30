@@ -2,7 +2,10 @@
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import type { PlatformIdentity } from "../../lib/api/generated";
-import type { OntologyDraft, SemanticSupportProfile, SourceBundle, SaveDraftRequest, DraftDiff, VocabularyChange, VocabularySnapshot, VocabularyEditsRequest } from "../../lib/api/g2-generated";
+import type {
+  OntologyDraft, SemanticSupportProfile, SourceBundle, SaveDraftRequest, DraftDiff, VocabularyChange,
+  VocabularySnapshot, VocabularyEditsRequest, IdentityTimeEditsRequest,
+} from "../../lib/api/g2-generated";
 import { command, createG2Client } from "../../lib/api/g2-client";
 import { SemanticError } from "../../components/ui/semantic-feedback";
 import { draftState, isDirty, isNewDraftDirty, updateSource, type DraftState } from "./draft-state";
@@ -13,10 +16,12 @@ import { SourceImportSession, type SourceImportHandle } from "./source-import";
 import { SupportProfile } from "./support-profile";
 import { AssessmentPanel } from "./assessment-panel";
 import { VersionComparison } from "./version-comparison";
-import { initialWorkspaceView, workspaceView } from "./workspace-state";
+import { initialWorkspaceView, structuralWriteGate, workspaceView } from "./workspace-state";
 import { VocabularyWorkbench } from "./vocabulary-workbench";
 import { snapshotMatches } from "./vocabulary-model";
 import { ReleasedVocabulary } from "./released-vocabulary";
+import { IdentityTimeWorkbench } from "./identity-time-workbench";
+import { ReleasedIdentityTime } from "./released-identity-time";
 import "./workspace.css";
 
 const client = createG2Client();
@@ -35,6 +40,9 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
   const [vocabularyOpened, setVocabularyOpened] = useState(false);
   const [vocabularyMode, setVocabularyMode] = useState(false);
   const [vocabularyPending, setVocabularyPending] = useState(false);
+  const [identityOpened, setIdentityOpened] = useState(false);
+  const [identityMode, setIdentityMode] = useState(false);
+  const [identityPending, setIdentityPending] = useState(false);
   const [structuralDiff, setStructuralDiff] = useState<DraftDiff | null>(null);
   const [remote, setRemote] = useState<OntologyDraft | null>(null);
   const [sources, setSources] = useState<SourceBundle>({ ...emptySources });
@@ -57,11 +65,16 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
   const [reason, setReason] = useState("");
   const [retry, setRetry] = useState<SaveDraftRequest | null>(null);
   const vocabularyRetry = useRef<{ signature: string; request: VocabularyEditsRequest } | null>(null);
+  const identityRetry = useRef<{ signature: string; request: IdentityTimeEditsRequest } | null>(null);
   const lifetime = useRef<AbortController | null>(null);
   const sourceImports = useRef(new SourceImportSession());
   const dirty = state ? isDirty(state) : isNewDraftDirty(name, sources);
-  const hasUnsaved = dirty || vocabularyPending;
+  const structuralPending = vocabularyPending || identityPending;
+  const hasUnsaved = dirty || structuralPending;
   const canEdit = identity.roles.includes("platform.operator");
+  const structureGate = structuralWriteGate({ canEdit, busy, dirty, structuralPending, reason,
+    hasBasicCapability: Boolean(profile?.capabilities.some(item => item.edit === "BASIC")),
+  });
   const selectedScope = identity.scopes[Number(scopeIndex)];
   const chooseNode = useCallback((iri: string) => dispatchView({ type: "select", iri }), []);
 
@@ -145,6 +158,8 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
     setSelected("");
     setVocabularyPending(false);
     vocabularyRetry.current = null;
+    identityRetry.current = null;
+    setIdentityPending(false);
   }
 
   /** dirty草稿切换需显式丢弃，避免覆盖本地权威源缓冲。 */
@@ -157,6 +172,8 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
       accept(await client.draft(draft.draftId, signal));
       setVocabularyMode(false);
       setVocabularyOpened(false);
+      setIdentityMode(false);
+      setIdentityOpened(false);
       dispatchView({ type: "open" });
     });
   }
@@ -205,7 +222,7 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
           <h1>本体资产与草稿</h1>
           <p>原始 Turtle 是权威源 · 真实 RIOT / SHACL · Synthetic 开发事实</p>
         </div>
-        <span className="tag violet">G3 M3 · 术语与单位</span>
+        <span className="tag violet">G3 M4 · 身份与时间</span>
       </div>
       {error !== null && <SemanticError error={error} />}
       {notice && <p role="status" className="g2-notice">{notice}</p>}
@@ -245,6 +262,8 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
             setState(null);
             setVocabularyMode(false);
             setVocabularyOpened(false);
+            setIdentityMode(false);
+            setIdentityOpened(false);
             setVocabularyPending(false);
             setRemote(null);
             dispatchView({ type: "new" });
@@ -266,9 +285,18 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
           </label>
           {state && (
             <div className="g2-tabs" aria-label="中间建模视图">
-              <button className="button" aria-pressed={centerView === "graph"} onClick={() => { setVocabularyMode(false); setCenterView("graph"); }}>图视图</button>
-              <button className="button" aria-pressed={centerView === "source" && !vocabularyMode} onClick={() => { setVocabularyMode(false); setCenterView("source"); }}>源码视图</button>
-              <button className="button" aria-pressed={vocabularyMode} onClick={() => { setVocabularyOpened(true); setVocabularyMode(true); setCenterView("source"); }}>术语与单位</button>
+              <button className="button" aria-pressed={centerView === "graph"} onClick={() => {
+                setVocabularyMode(false); setIdentityMode(false); setCenterView("graph");
+              }}>图视图</button>
+              <button className="button" aria-pressed={centerView === "source" && !vocabularyMode && !identityMode} onClick={() => {
+                setVocabularyMode(false); setIdentityMode(false); setCenterView("source");
+              }}>源码视图</button>
+              <button className="button" aria-pressed={vocabularyMode} onClick={() => {
+                setVocabularyOpened(true); setVocabularyMode(true); setIdentityMode(false); setCenterView("source");
+              }}>术语与单位</button>
+              <button className="button" aria-pressed={identityMode} onClick={() => {
+                setIdentityOpened(true); setIdentityMode(true); setVocabularyMode(false); setCenterView("source");
+              }}>身份与时间</button>
             </div>
           )}
           {state && centerView === "graph" && (
@@ -276,10 +304,11 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
           )}
           <div hidden={!vocabularyMode}>{state && vocabularyOpened && <VocabularyWorkbench
             key={`vocabulary/${state.draft.draftId}/${state.draft.revision}`} draft={state.draft} selected={selected} onSelect={chooseNode}
-            dirty={dirty} busy={busy} canEdit={canEdit} reason={reason} onPending={setVocabularyPending} pending={vocabularyPending} profile={profile}
-            onLocate={(nextField, focus) => { setField(nextField); setSelected(focus ?? ""); setVocabularyMode(false); setCenterView("source"); setTab("source"); }}
+            dirty={dirty || identityPending} busy={busy} canEdit={canEdit} reason={reason} onPending={setVocabularyPending} pending={vocabularyPending} profile={profile}
+            onLocate={(nextField, focus) => { setField(nextField); setSelected(focus ?? ""); setVocabularyMode(false); setIdentityMode(false); setCenterView("source"); setTab("source"); }}
             onCommit={(changes: VocabularyChange[], snapshot: VocabularySnapshot) => void execute(async signal => {
-              if (dirty || !snapshotMatches(snapshot, state.draft)) throw new Error("词汇批次已过期，请先保存源码并刷新词汇快照。");
+              if (dirty || identityPending || !snapshotMatches(snapshot, state.draft))
+                throw new Error("词汇批次已过期，请先提交其它编辑并刷新当前修订快照。");
               const previousRevision = state.draft.revision;
               const signature = JSON.stringify({ draftId: state.draft.draftId, revision: previousRevision, hashes: snapshot.hashes, changes, reason });
               if (vocabularyRetry.current?.signature !== signature) vocabularyRetry.current = { signature,
@@ -294,11 +323,36 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
               if (!signal.aborted && diff.targetRevision === next.revision && diff.targetHashes.bundleHash === next.hashes.bundleHash) setStructuralDiff(diff);
             })}
           />}</div>
+          <div hidden={!identityMode}>{state && identityOpened && <IdentityTimeWorkbench
+            key={`identity/${state.draft.draftId}/${state.draft.revision}`} draft={state.draft}
+            selected={selected} onSelect={chooseNode} dirty={dirty || vocabularyPending} busy={busy} canEdit={canEdit}
+            reason={reason} profile={profile} onPending={setIdentityPending} pending={identityPending}
+            onLocate={(nextField, focus) => {
+              setField(nextField); setSelected(focus ?? ""); setIdentityMode(false); setCenterView("source"); setTab("source");
+            }}
+            onCommit={(changes, snapshot) => void execute(async signal => {
+              if (dirty || vocabularyPending || !snapshotMatches(snapshot, state.draft))
+                throw new Error("身份时间批次已过期，请先提交其它编辑并刷新当前修订快照。");
+              const previousRevision = state.draft.revision;
+              const signature = JSON.stringify({ draftId: state.draft.draftId, revision: previousRevision, hashes: snapshot.hashes, changes, reason });
+              if (identityRetry.current?.signature !== signature) identityRetry.current = {
+                signature, request: { hashes: snapshot.hashes, changes, command: command(previousRevision, reason) },
+              };
+              const next = await client.editIdentityTime(state.draft.draftId, identityRetry.current.request, signal);
+              if (signal.aborted) return;
+              accept(next); setSelected(selected); setIdentityMode(true);
+              setNotice(`身份时间已原子保存为 revision ${next.revision}；需重新评估与异人审批。`);
+              const diff = await client.diff(next.draftId, previousRevision, signal);
+              if (!signal.aborted && diff.targetRevision === next.revision && diff.targetHashes.bundleHash === next.hashes.bundleHash)
+                setStructuralDiff(diff);
+            })}
+          />}</div>
+          {identityPending && <p className="g2-notice">身份时间编辑尚未提交。切换视图保留表单；请原子提交或取消，再修改源码或打开其它资产。</p>}
           {vocabularyPending && <p className="g2-notice">词汇批次尚未提交。切换视图保留批次；请先原子提交或取消批次，再修改源码或打开其它资产。</p>}
-          <div className="g2-stack" hidden={Boolean(state && (centerView !== "source" || vocabularyMode))}>
+          <div className="g2-stack" hidden={Boolean(state && (centerView !== "source" || vocabularyMode || identityMode))}>
             <label>资产名称
               <input
-                aria-label="资产名称" value={state?.name ?? name} disabled={busy || !canEdit || vocabularyPending} maxLength={200}
+                aria-label="资产名称" value={state?.name ?? name} disabled={busy || !canEdit || structuralPending} maxLength={200}
                 onChange={event => {
                   const nextName = event.target.value;
                   if (state) setState(current => current ? { ...current, name: nextName } : current);
@@ -339,7 +393,7 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
               </>
             )}
             <SourceEditor
-              sources={state?.sources ?? sources} field={field} onField={setField} readOnly={busy || !canEdit || vocabularyPending}
+              sources={state?.sources ?? sources} field={field} onField={setField} readOnly={busy || !canEdit || structuralPending}
               onBeginImport={beginImport}
               onAbsent={() => {
                 sourceImports.current.invalidate("vocabularyTurtle");
@@ -368,7 +422,7 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
             <div className="g2-row">
               {state ? (
                 <>
-                  <button className="button primary" disabled={busy || vocabularyPending || !dirty || !reason.trim() || !canEdit} onClick={() => save()}>保存新修订</button>
+                  <button className="button primary" disabled={busy || structuralPending || !dirty || !reason.trim() || !canEdit} onClick={() => save()}>保存新修订</button>
                   {retry && <button className="button" disabled={busy || !canEdit} onClick={() => save(true)}>重试原保存命令</button>}
                   <button className="button" disabled={busy} onClick={() => void execute(async signal => {
                     const next = await client.draft(state.draft.draftId, signal);
@@ -419,19 +473,22 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
               <StructuralForm
                 key={`structure/${state.draft.draftId}/${state.draft.revision}`}
                 projection={state.draft.projection} selected={selected}
-                blocked={busy || dirty || vocabularyPending || !canEdit || !reason.trim() || !profile?.capabilities.some(item => item.edit === "BASIC")}
-                onEdit={edit => void execute(async signal => {
-                  const previousRevision = state.draft.revision;
-                  const next = await client.editDraft(state.draft.draftId, { edit, command: command(previousRevision, reason) }, signal);
-                  accept(next);
-                  setNotice(`结构编辑已由服务端保存为新修订 revision ${next.revision}；正在读取真实 Diff。`);
-                  const diff = await client.diff(next.draftId, previousRevision, signal);
-                  if (signal.aborted) return;
-                  if (diff.targetRevision === next.revision && diff.targetHashes.bundleHash === next.hashes.bundleHash) {
-                    setStructuralDiff(diff);
-                    setNotice(`结构编辑已由服务端保存为新修订 revision ${next.revision}，已展示真实源码 Diff。`);
-                  } else setNotice("结构编辑已保存；远端 Diff 已对应其他修订，请在版本比较中读取固定修订。");
-                })}
+                blocked={structureGate.blocked !== null}
+                onEdit={edit => {
+                  const blocked = structureGate.submit(() => void execute(async signal => {
+                    const previousRevision = state.draft.revision;
+                    const next = await client.editDraft(state.draft.draftId, { edit, command: command(previousRevision, reason) }, signal);
+                    accept(next);
+                    setNotice(`结构编辑已由服务端保存为新修订 revision ${next.revision}；正在读取真实 Diff。`);
+                    const diff = await client.diff(next.draftId, previousRevision, signal);
+                    if (signal.aborted) return;
+                    if (diff.targetRevision === next.revision && diff.targetHashes.bundleHash === next.hashes.bundleHash) {
+                      setStructuralDiff(diff);
+                      setNotice(`结构编辑已由服务端保存为新修订 revision ${next.revision}，已展示真实源码 Diff。`);
+                    } else setNotice("结构编辑已保存；远端 Diff 已对应其他修订，请在版本比较中读取固定修订。");
+                  }));
+                  if (blocked !== null) setNotice(blocked);
+                }}
               />
               {structuralDiff && (
                 <section className="g2-stack" aria-label="结构编辑 Diff">
@@ -446,6 +503,7 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
                 reason={reason} execute={execute} onNotice={setNotice}
                 onLocate={(nextField, focus) => {
                   setVocabularyMode(false);
+                  setIdentityMode(false);
                   setField(nextField);
                   setSelected(focus ?? "");
                   setCenterView("source");
@@ -465,6 +523,7 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
             </>
           )}
           <ReleasedVocabulary />
+          <ReleasedIdentityTime />
           <SupportProfile profile={profile} loading={profileLoading} failed={profileFailed} onRefresh={() => {
             const signal = lifetime.current?.signal;
             if (signal) void loadProfile(signal);

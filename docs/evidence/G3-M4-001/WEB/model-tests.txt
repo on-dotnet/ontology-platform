@@ -1,0 +1,30 @@
+
+ RUN  v5.0.5 /Users/chasen/.codex/worktrees/g3-m4-web-a/ontology-platform/apps/web
+
+ ❯ src/features/ontology/identity-time-views.test.ts (2 tests | 1 failed) 7ms
+   ❯ M4中文身份与时间视图 (2)
+     × 只读或dirty表单全部禁用，资产scope没有可输入组织或外部厂区 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/features/ontology/identity-time-views.test.ts > M4中文身份与时间视图 > 只读或dirty表单全部禁用，资产scope没有可输入组织或外部厂区
+AssertionError: expected '<section class="g2-stack" aria-label=…' to contain 'readonly=""'
+
+Expected: "readonly="""
+Received: "<section class="g2-stack" aria-label="身份时间受控编辑"><h3>受控身份与时间编辑</h3><p role="status" class="g2-notice">未保存源码或无编辑权限</p><p class="muted">所有时间填写带 Z 或 ±hh:mm 的 ISO 时间戳，例如 2026-01-01T08:00:00+08:00。空值表示未知，不采用本机时区。</p><fieldset class="g3-identity-form" disabled=""><legend>写入目标</legend><label>身份时间写入源<select aria-label="身份时间写入源"><option value="ontology" selected="">本体 ontology</option><option value="vocabulary">术语 vocabulary</option></select></label></fieldset><form class="g2-stack"><fieldset class="g3-identity-form" disabled=""><legend>新增身份声明</legend><label>声明 IRI<input aria-label="身份声明IRI" value=""/></label><label>组织（资产权威范围）<input aria-label="身份组织" readOnly="" value="org-fixed"/></label><label>厂区<select aria-label="身份厂区"><option value="site-a" selected="">site-a</option><option value="site-b">site-b</option></select></label><label>来源命名空间<input aria-label="身份来源命名空间" value=""/></label><label>外部编号<input aria-label="身份外部编号" value=""/></label><label>目标 IRI<input aria-label="身份目标IRI" list="g4-identity-targets" value=""/></label><datalist id="g4-identity-targets"></datalist><label>声明来源 IRI<input aria-label="身份声明来源IRI" value=""/></label><label>有效起点（含；空为未知）<input aria-label="身份有效起点" value=""/></label><label>有效终点（不含；空为未知）<input aria-label="身份有效终点" value=""/></label><button class="button" type="submit">排队新增身份声明</button></fieldset></form><form class="g2-stack"><fieldset class="g3-identity-form" disabled=""><legend>关闭 / 收窄历史有效期</legend><p class="muted">保留原组织、厂区、编号、目标、来源和起点；更换身份时建立新声明。共享区间不在表单中改写。</p><label>已保存身份声明<select aria-label="关闭身份声明"><option value="" selected="">请选择固定声明IRI</option></select></label><label>新的终点（不含）<input aria-label="关闭身份有效终点" value=""/></label><button class="button" type="submit">排队关闭或收窄有效期</button></fieldset></form><form class="g2-stack"><fieldset class="g3-identity-form" disabled=""><legend>新增 / 更新事件时间</legend><p class="muted">更新事件引用全新时间IRI，旧时间事实原样保留。发生时间、观察时间与资产版本时间分别记录。</p><label>事件 IRI<input aria-label="事件IRI" value=""/></label><label>新的时间资源 IRI<input aria-label="事件时间资源IRI" value=""/></label><label>受控时间模板<select aria-label="事件时间模板"><option value="point" selected="">OWL-Time 时间点</option><option value="interval">OWL-Time 半开区间</option></select></label><label>事件时间点（空为未知）<input aria-label="事件时间起点" value=""/></label><label>观察时间（独立记录；空为未知）<input aria-label="事件观察时间" value=""/></label><button class="button" type="submit">排队保存事件时间</button></fieldset></form><h4>身份时间待提交批次 0 / 64</h4><div class="g2-row"><button class="button primary" disabled="">原子提交身份时间</button><button class="button" disabled="">取消身份时间编辑</button></div></section>"
+
+ ❯ src/features/ontology/identity-time-views.test.ts:19:18
+     17|     const html = renderToStaticMarkup(createElement(IdentityTimeEditFo…
+     18|       onCommit: () => undefined, onPending: () => undefined }));
+     19|     expect(html).toContain('readonly=""');
+       |                  ^
+     20|     expect(html).toContain("org-fixed");
+     21|     expect(html).toContain('<option value="site-a"');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 18 passed (19)
+   Start at  23:08:59
+   Duration  1.08s (transform 55%, import 27%, tests 14%, worker 3%)
