@@ -2,14 +2,14 @@ import { describe, expect, it } from "vitest";
 import type { SourceHashes, VersionDiff } from "../../lib/api/g2-generated";
 import { fixedVersion, lineEnding, sameVersion, sourceLineChanges, versionDiffMatches } from "./version-diff-model";
 
-const hashes: SourceHashes = { ontologyHash: "o", shapesHash: "s", vocabularyHash: null, dataHash: "d", bundleHash: "b" };
+const hashes: SourceHashes = { ontologyHash: "a".repeat(64), shapesHash: "b".repeat(64), vocabularyHash: null, dataHash: "c".repeat(64), bundleHash: "d".repeat(64) };
 const request = { from: { kind: "DRAFT" as const, id: "draft", revision: 1 }, to: { kind: "RELEASE" as const, id: "release-fixed", revision: null } };
 const scope = { organizationId: "org", siteIds: ["site-a", "site-b"] };
 function diff(): VersionDiff {
   return { assetId: "asset", scope, from: request.from, to: request.to, baseHashes: hashes, targetHashes: hashes,
-    baseManifestHash: null, targetManifestHash: "manifest-fixed", sources: ["ontology", "shapes", "vocabulary", "data"].map((sourceId, index) => ({
-      sourceId, baseText: index === 2 ? null : "", targetText: index === 2 ? null : "", baseHash: ["o", "s", null, "d"][index],
-      targetHash: ["o", "s", null, "d"][index], sourceChanged: false, graph: { status: "EQUIVALENT", code: "equal", visitedNodes: 0, elapsedMilliseconds: 0 },
+    baseManifestHash: null, targetManifestHash: "f".repeat(64), sources: ["ontology", "shapes", "vocabulary", "data"].map((sourceId, index) => ({
+      sourceId, baseText: index === 2 ? null : "", targetText: index === 2 ? null : "", baseHash: [hashes.ontologyHash, hashes.shapesHash, null, hashes.dataHash][index],
+      targetHash: [hashes.ontologyHash, hashes.shapesHash, null, hashes.dataHash][index], sourceChanged: false, graph: { status: "EQUIVALENT", code: "equal", visitedNodes: 0, elapsedMilliseconds: 0 },
       baseTripleCount: 0, targetTripleCount: 0, addedTriples: [], removedTriples: [], tripleDeltaStatus: "EQUIVALENT",
     })) };
 }
@@ -35,10 +35,33 @@ describe("M4固定版本选择与回复边界", () => {
       { ...diff(), sources: diff().sources.map((source, index) => index === 0 ? { ...source, baseHash: "forged" } : source) },
     ]) expect(versionDiffMatches(changed, request, "asset", scope)).toBe(false);
   });
+  it("原型属性来源名、空字段和缺Graph均失败关闭", () => {
+    const forged = { ...diff(), baseHashes: {}, targetHashes: {}, sources: ["__proto__", "constructor", "toString", "hasOwnProperty"]
+      .map(sourceId => ({ sourceId, sourceChanged: false })) };
+    expect(versionDiffMatches(forged, request, "asset", scope)).toBe(false);
+    for (const property of ["graph", "baseText", "targetText", "baseHash", "addedTriples"]) {
+      const broken = structuredClone(diff());
+      delete (broken.sources[0] as unknown as Record<string, unknown>)[property];
+      expect(versionDiffMatches(broken, request, "asset", scope)).toBe(false);
+    }
+  });
+  it("manifest必须与DRAFT/RELEASE种类匹配，Release hash必须为准确格式", () => {
+    expect(versionDiffMatches({ ...diff(), baseManifestHash: "f".repeat(64) }, request, "asset", scope)).toBe(false);
+    expect(versionDiffMatches({ ...diff(), targetManifestHash: null }, request, "asset", scope)).toBe(false);
+    expect(versionDiffMatches({ ...diff(), targetManifestHash: "manifest-fixed" }, request, "asset", scope)).toBe(false);
+    expect(versionDiffMatches({ ...diff(), from: { kind: "DRAFT", id: "draft", revision: null } }, request, "asset", scope)).toBe(false);
+  });
+  it("图状态和typed三元组字段缺失不能在展示时崩溃", () => {
+    const value = diff();
+    expect(versionDiffMatches({ ...value, sources: value.sources.map((source, index) => index ? source : { ...source, graph: {} }) },
+      request, "asset", scope)).toBe(false);
+    expect(versionDiffMatches({ ...value, sources: value.sources.map((source, index) => index ? source : { ...source, addedTriples: [{}] }) },
+      request, "asset", scope)).toBe(false);
+  });
   it("absent和空源不能混淆，声称sourceChanged不能替代原文对照", () => {
     const value = diff();
-    value.sources[2] = { ...value.sources[2], targetText: "", targetHash: "empty", sourceChanged: true };
-    value.targetHashes = { ...hashes, vocabularyHash: "empty" };
+    value.sources[2] = { ...value.sources[2], targetText: "", targetHash: "e".repeat(64), sourceChanged: true };
+    value.targetHashes = { ...hashes, vocabularyHash: "e".repeat(64) };
     expect(versionDiffMatches(value, request, "asset", scope)).toBe(true);
     value.sources[2].sourceChanged = false;
     expect(versionDiffMatches(value, request, "asset", scope)).toBe(false);

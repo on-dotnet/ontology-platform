@@ -17,17 +17,70 @@ export function sameScope(left: ResourceScope, right: ResourceScope) {
   return left.organizationId === right.organizationId && left.siteIds.length === right.siteIds.length
     && [...left.siteIds].sort().every((site, index) => site === [...right.siteIds].sort()[index]);
 }
-const sourceSlots = { ontology: "ontologyHash", shapes: "shapesHash", vocabulary: "vocabularyHash", data: "dataHash" } as const;
+const sourceSlots = new Map<string, keyof SourceHashes>([
+  ["ontology", "ontologyHash"], ["shapes", "shapesHash"], ["vocabulary", "vocabularyHash"], ["data", "dataHash"],
+]);
+const hashPattern = /^[0-9a-f]{64}$/;
+const record = (value: unknown): value is Record<string, unknown> => typeof value === "object" && value !== null && !Array.isArray(value);
+const fields = (value: Record<string, unknown>, names: string[]) => names.every(name => Object.hasOwn(value, name));
+const hash = (value: unknown): value is string => typeof value === "string" && value.length === 64 && hashPattern.test(value);
+function hashes(value: unknown): value is SourceHashes {
+  return record(value) && fields(value, ["ontologyHash", "shapesHash", "vocabularyHash", "dataHash", "bundleHash"])
+    && [value.ontologyHash, value.shapesHash, value.dataHash, value.bundleHash].every(hash)
+    && (value.vocabularyHash === null || hash(value.vocabularyHash));
+}
+function version(value: unknown): value is VersionRef {
+  return record(value) && fields(value, ["kind", "id", "revision"]) && typeof value.id === "string" && value.id.trim() !== ""
+    && (value.kind === "DRAFT" ? Number.isSafeInteger(value.revision) && (value.revision as number) > 0
+      : value.kind === "RELEASE" && value.revision === null);
+}
+function scopeValid(value: unknown): value is ResourceScope {
+  return record(value) && fields(value, ["organizationId", "siteIds"]) && typeof value.organizationId === "string"
+    && value.organizationId.trim() !== "" && Array.isArray(value.siteIds) && value.siteIds.length > 0
+    && value.siteIds.every(site => typeof site === "string" && site.trim() !== "") && new Set(value.siteIds).size === value.siteIds.length;
+}
+function graphValid(value: unknown): boolean {
+  return record(value) && fields(value, ["status", "code", "visitedNodes", "elapsedMilliseconds"])
+    && ["EQUIVALENT", "DIFFERENT", "INDETERMINATE"].includes(value.status as string)
+    && typeof value.code === "string" && value.code.trim() !== "" && Number.isSafeInteger(value.visitedNodes)
+    && (value.visitedNodes as number) >= 0 && typeof value.elapsedMilliseconds === "number"
+    && Number.isFinite(value.elapsedMilliseconds) && value.elapsedMilliseconds >= 0;
+}
+function termValid(value: unknown, subject: boolean): boolean {
+  return record(value) && fields(value, ["kind", "value", "datatype", "language"]) && typeof value.value === "string"
+    && (subject ? value.kind === "iri" : value.kind === "iri" || value.kind === "literal")
+    && (value.kind !== "iri" || value.value.trim() !== "")
+    && (value.datatype === null || typeof value.datatype === "string") && (value.language === null || typeof value.language === "string");
+}
+function triplesValid(value: unknown): value is unknown[] {
+  return Array.isArray(value) && value.every(triple => record(triple) && fields(triple, ["subject", "predicate", "object"])
+    && termValid(triple.subject, true) && typeof triple.predicate === "string" && triple.predicate.trim() !== "" && termValid(triple.object, false));
+}
 
 /** 拒绝错版本、跨范围、缺源和槽位hash错配的回复；实际字节真实性仍由服务器核验。 */
-export function versionDiffMatches(diff: VersionDiff, request: CompareVersionsRequest, assetId: string, scope: ResourceScope): boolean {
-  if (!sameVersion(diff.from, request.from) || !sameVersion(diff.to, request.to) || diff.assetId !== assetId || !sameScope(diff.scope, scope)) return false;
-  if (diff.sources.length !== 4 || new Set(diff.sources.map(source => source.sourceId)).size !== 4) return false;
-  return diff.sources.every(source => {
-    const key = sourceSlots[source.sourceId as keyof typeof sourceSlots];
-    return key && source.baseHash === diff.baseHashes[key] && source.targetHash === diff.targetHashes[key]
+export function versionDiffMatches(value: unknown, request: CompareVersionsRequest, assetId: string, scope: ResourceScope): value is VersionDiff {
+  if (!record(value) || !fields(value, ["from", "to", "assetId", "scope", "baseHashes", "targetHashes", "baseManifestHash", "targetManifestHash", "sources"])
+    || !version(value.from) || !version(value.to) || !scopeValid(value.scope) || !hashes(value.baseHashes) || !hashes(value.targetHashes)
+    || !sameVersion(value.from, request.from) || !sameVersion(value.to, request.to) || value.assetId !== assetId || !sameScope(value.scope, scope)) return false;
+  if (value.from.kind === "DRAFT" ? value.baseManifestHash !== null : !hash(value.baseManifestHash)) return false;
+  if (value.to.kind === "DRAFT" ? value.targetManifestHash !== null : !hash(value.targetManifestHash)) return false;
+  const baseHashes = value.baseHashes, targetHashes = value.targetHashes;
+  if (!Array.isArray(value.sources) || value.sources.length !== 4) return false;
+  const sources = value.sources;
+  if (new Set(sources.map(source => record(source) ? source.sourceId : undefined)).size !== 4) return false;
+  return sources.every(source => {
+    if (!record(source) || !fields(source, ["sourceId", "baseText", "targetText", "baseHash", "targetHash", "sourceChanged", "graph",
+      "baseTripleCount", "targetTripleCount", "addedTriples", "removedTriples", "tripleDeltaStatus"]) || typeof source.sourceId !== "string") return false;
+    const key = sourceSlots.get(source.sourceId);
+    if (!key || !graphValid(source.graph) || !triplesValid(source.addedTriples) || !triplesValid(source.removedTriples)
+      || !["EXACT", "EQUIVALENT", "INDETERMINATE"].includes(source.tripleDeltaStatus as string)) return false;
+    const countValid = (count: unknown) => count === null || Number.isSafeInteger(count) && (count as number) >= 0;
+    if (!countValid(source.baseTripleCount) || !countValid(source.targetTripleCount)) return false;
+    if (source.sourceId !== "vocabulary" && (typeof source.baseText !== "string" || typeof source.targetText !== "string")) return false;
+    return (source.baseText === null || typeof source.baseText === "string") && (source.targetText === null || typeof source.targetText === "string")
+      && source.baseHash === baseHashes[key] && source.targetHash === targetHashes[key]
       && (source.baseText === null) === (source.baseHash === null) && (source.targetText === null) === (source.targetHash === null)
-      && source.sourceChanged === (source.baseText !== source.targetText);
+      && typeof source.sourceChanged === "boolean" && source.sourceChanged === (source.baseText !== source.targetText);
   });
 }
 
@@ -56,6 +109,6 @@ export function lineEnding(text: string) {
   return text.endsWith("\r\n") ? "CRLF" : text.endsWith("\r") ? "CR" : text.endsWith("\n") ? "LF" : "无行结束符";
 }
 export function sourceHash(hashes: SourceHashes, sourceId: string): string | null {
-  const key = sourceSlots[sourceId as keyof typeof sourceSlots];
+  const key = sourceSlots.get(sourceId);
   return key ? hashes[key] : null;
 }
