@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { createG2Client } from "../../lib/api/g2-client";
 import type { DraftDiff, OntologyDraft, SourceComparison } from "../../lib/api/g2-generated";
 import { comparisonLabel } from "./semantic-status";
+import { FixedVersionComparison } from "./fixed-version-comparison";
 
 const client = createG2Client();
 
@@ -51,6 +52,7 @@ export function VersionComparison({ draft, busy, execute }: {
 
   return (
     <section className="g2-stack" aria-label="版本源比较">
+      <FixedVersionComparison draft={draft} busy={busy} execute={execute} />
       <h3>固定修订 Diff 与四源比较</h3>
       <label>基准修订
         <input type="number" min={1} max={draft.revision} value={fromRevision} disabled={busy} onChange={event => {
