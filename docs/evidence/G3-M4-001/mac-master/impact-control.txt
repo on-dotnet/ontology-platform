@@ -1,0 +1,88 @@
+test_actual_process_start_failure_marks_current_failed_and_later_not_run (__main__.M1OrchestrationTests.test_actual_process_start_failure_marks_current_failed_and_later_not_run) ... ok
+test_all_real_gate_selections_include_m1_and_regressions (__main__.M1OrchestrationTests.test_all_real_gate_selections_include_m1_and_regressions) ... ok
+test_each_child_failure_stops_later_gates (__main__.M1OrchestrationTests.test_each_child_failure_stops_later_gates) ... ok
+test_failed_attempt_cannot_consume_or_certify_stale_pass (__main__.M1OrchestrationTests.test_failed_attempt_cannot_consume_or_certify_stale_pass) ... ok
+test_first_m2_integration_selects_real_api_only_without_claiming_full_gates (__main__.M1OrchestrationTests.test_first_m2_integration_selects_real_api_only_without_claiming_full_gates) ... ok
+test_m2_selects_its_own_runtime_evidence_and_authenticated_checks (__main__.M1OrchestrationTests.test_m2_selects_its_own_runtime_evidence_and_authenticated_checks) ... ok
+test_m3_full_chain_runs_smoke_fault_through_actual_parsers (__main__.M1OrchestrationTests.test_m3_full_chain_runs_smoke_fault_through_actual_parsers) ... ok
+test_m3_partial_modes_parse_the_exact_upstream_command (__main__.M1OrchestrationTests.test_m3_partial_modes_parse_the_exact_upstream_command) ... ok
+test_m3_selects_own_runtime_and_real_gates (__main__.M1OrchestrationTests.test_m3_selects_own_runtime_and_real_gates) ... ok
+test_m4_own_runtime_checkpoints_and_failure_propagation (__main__.M1OrchestrationTests.test_m4_own_runtime_checkpoints_and_failure_propagation) ... ok
+test_owned_e0_workspace_smoke_runs_only_fast_gate_and_preserves_fault_flag (__main__.M1OrchestrationTests.test_owned_e0_workspace_smoke_runs_only_fast_gate_and_preserves_fault_flag) ... ok
+test_protected_g2_runtime_is_refused (__main__.M1OrchestrationTests.test_protected_g2_runtime_is_refused) ... usage: g3-acceptance-runtime.py [-h] [--runtime-file RUNTIME_FILE]
+                                [--start-runtime] [--milestone {M1,M2,M3,M4}]
+                                [--impact-only] [--diff-only] [--api-only]
+                                [--ui-only] [--smoke-fault-check]
+                                [--workspace-smoke-only]
+g3-acceptance-runtime.py: error: Protected G2 or unrelated runtime refused
+ok
+test_real_child_gates_automatically_record_timeline_and_failure_exit (__main__.M1OrchestrationTests.test_real_child_gates_automatically_record_timeline_and_failure_exit) ... ok
+test_second_m2_integration_selects_only_real_ui_checkpoint (__main__.M1OrchestrationTests.test_second_m2_integration_selects_only_real_ui_checkpoint) ... ok
+test_wrong_runtime_and_future_milestones_are_refused (__main__.M1OrchestrationTests.test_wrong_runtime_and_future_milestones_are_refused) ... usage: g3-acceptance-runtime.py [-h] [--runtime-file RUNTIME_FILE]
+                                [--start-runtime] [--milestone {M1,M2,M3,M4}]
+                                [--impact-only] [--diff-only] [--api-only]
+                                [--ui-only] [--smoke-fault-check]
+                                [--workspace-smoke-only]
+g3-acceptance-runtime.py: error: Protected G2 or unrelated runtime refused
+usage: g3-acceptance-runtime.py [-h] [--runtime-file RUNTIME_FILE]
+                                [--start-runtime] [--milestone {M1,M2,M3,M4}]
+                                [--impact-only] [--diff-only] [--api-only]
+                                [--ui-only] [--smoke-fault-check]
+                                [--workspace-smoke-only]
+g3-acceptance-runtime.py: error: Protected G2 or unrelated runtime refused
+usage: g3-acceptance-runtime.py [-h] [--runtime-file RUNTIME_FILE]
+                                [--start-runtime] [--milestone {M1,M2,M3,M4}]
+                                [--impact-only] [--diff-only] [--api-only]
+                                [--ui-only] [--smoke-fault-check]
+                                [--workspace-smoke-only]
+g3-acceptance-runtime.py: error: Protected G2 or unrelated runtime refused
+usage: g3-acceptance-runtime.py [-h] [--runtime-file RUNTIME_FILE]
+                                [--start-runtime] [--milestone {M1,M2,M3,M4}]
+                                [--impact-only] [--diff-only] [--api-only]
+                                [--ui-only] [--smoke-fault-check]
+                                [--workspace-smoke-only]
+g3-acceptance-runtime.py: error: argument --milestone: invalid choice: 'M5' (choose from 'M1', 'M2', 'M3', 'M4')
+ok
+test_actual_node_writer_preserves_detailed_smoke_receipt (__main__.RealBrowserEntryTests.test_actual_node_writer_preserves_detailed_smoke_receipt) ... ok
+test_existing_m2_and_unknown_flag (__main__.RealBrowserEntryTests.test_existing_m2_and_unknown_flag) ... usage: full-g2-e2e.py [-h] --runtime-file RUNTIME_FILE [--m1] [--m2]
+                      [--m2-api-only] [--m2-ui-only] [--m3] [--m3-api-only]
+                      [--m3-ui-only] [--m4] [--m4-impact-only]
+                      [--m4-diff-only] [--m4-api-only] [--m4-ui-only]
+                      [--workspace-smoke-only] [--smoke-fault-check]
+full-g2-e2e.py: error: unrecognized arguments: --m5
+ok
+test_precise_m4_modes_reach_real_browser_flags (__main__.RealBrowserEntryTests.test_precise_m4_modes_reach_real_browser_flags) ... ok
+test_real_smoke_fault_checkpoint_is_forwarded (__main__.RealBrowserEntryTests.test_real_smoke_fault_checkpoint_is_forwarded) ... ok
+test_three_m3_modes_reach_real_browser_flags (__main__.RealBrowserEntryTests.test_three_m3_modes_reach_real_browser_flags) ... ok
+
+----------------------------------------------------------------------
+Ran 20 tests in 1.583s
+
+OK
+{"status": "FAIL", "runId": "b0dae34348ca4f1881deb0a78c9b7ac8", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/b0dae34348ca4f1881deb0a78c9b7ac8"}
+{"status": "PASS", "runId": "668c333d9f574d5583d1d3dd01592bcd", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/668c333d9f574d5583d1d3dd01592bcd"}
+{"status": "FAIL", "runId": "6717de02649f40279be7aca3c2900fa7", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/6717de02649f40279be7aca3c2900fa7"}
+{"status": "FAIL", "runId": "d1d7f4494be04a4eb68ce4b954fbcf0d", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/d1d7f4494be04a4eb68ce4b954fbcf0d"}
+{"status": "FAIL", "runId": "27027139a30c4b38b82dd96236346e5f", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/27027139a30c4b38b82dd96236346e5f"}
+{"status": "FAIL", "runId": "293d263d71e3458ebb114b4b11cd44e4", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/293d263d71e3458ebb114b4b11cd44e4"}
+{"status": "FAIL", "runId": "ee270fcd320e432c8464b19884fbf380", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/ee270fcd320e432c8464b19884fbf380"}
+{"status": "FAIL", "runId": "fbb25312ca564a5d9362ee297dfdd3fb", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/fbb25312ca564a5d9362ee297dfdd3fb"}
+{"status": "FAIL", "runId": "0f74eb4245f246a0b5e2133b846b8ca1", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/0f74eb4245f246a0b5e2133b846b8ca1"}
+{"status": "FAIL", "runId": "9c0f6958687444e49fdef56bd5bb007f", "evidenceDirectory": "docs/evidence/G3-M1-001/runtime/g3-m1-control/9c0f6958687444e49fdef56bd5bb007f"}
+{"status": "PASS", "runId": "84071878d2ac4a74900dac89b64e09f9", "evidenceDirectory": "docs/evidence/G3-M2-001/runtime/g3-m2-control/84071878d2ac4a74900dac89b64e09f9"}
+{"status": "PASS", "runId": "e281653710cf49e0857803a7ab93fefb", "evidenceDirectory": "docs/evidence/G3-M2-001/runtime/g3-m2-control/e281653710cf49e0857803a7ab93fefb"}
+{"status": "PASS", "runId": "cf2c614960484616b1809872a5a3d5d0", "evidenceDirectory": "docs/evidence/G3-M3-001/runtime/g3-m3-fault-control/cf2c614960484616b1809872a5a3d5d0"}
+{"status": "PASS", "runId": "4ed0bcaf52b44509864cf5883e008731", "evidenceDirectory": "docs/evidence/G3-M3-001/runtime/g3-m3-control/4ed0bcaf52b44509864cf5883e008731"}
+{"status": "PASS", "runId": "3d3a3c3d5e4e45149933c8bb84fd4b1c", "evidenceDirectory": "docs/evidence/G3-M3-001/runtime/g3-m3-control/3d3a3c3d5e4e45149933c8bb84fd4b1c"}
+{"status": "PASS", "runId": "c89d7af03f4b409db9c0ba88840c8be8", "evidenceDirectory": "docs/evidence/G3-M3-001/runtime/g3-m3-control/c89d7af03f4b409db9c0ba88840c8be8"}
+{"status": "PASS", "runId": "b7b4d0fdedf04d87adaaa14ba1b65668", "evidenceDirectory": "docs/evidence/G3-M4-001/runtime/g3-m4-control/b7b4d0fdedf04d87adaaa14ba1b65668"}
+{"status": "PASS", "runId": "547e63c07065469183772db0670ae552", "evidenceDirectory": "docs/evidence/G3-M4-001/runtime/g3-m4-control/547e63c07065469183772db0670ae552"}
+{"status": "PASS", "runId": "bc74f4f200d84c60a2df48b35d934e35", "evidenceDirectory": "docs/evidence/G3-M4-001/runtime/g3-m4-control/bc74f4f200d84c60a2df48b35d934e35"}
+{"status": "PASS", "runId": "d07a9c4031c4493faa2b259acd6cd8c1", "evidenceDirectory": "docs/evidence/G3-M4-001/runtime/g3-m4-control/d07a9c4031c4493faa2b259acd6cd8c1"}
+{"status": "PASS", "runId": "2fd05977923541de9cc42c2e3de6754e", "evidenceDirectory": "docs/evidence/G3-M4-001/runtime/g3-m4-control/2fd05977923541de9cc42c2e3de6754e"}
+{"status": "PASS", "runId": "f126862e99624df7b5e0de586bc36351", "evidenceDirectory": "docs/evidence/G3-M4-001/runtime/g3-m4-control/f126862e99624df7b5e0de586bc36351"}
+{"status": "FAIL", "runId": "1a966ce509a54722a93f8364137d19a3", "evidenceDirectory": "docs/evidence/G3-M4-001/runtime/g3-m4-control/1a966ce509a54722a93f8364137d19a3"}
+{"status": "PASS", "runId": "e8e470ef4dad439dad9600255a71b912", "evidenceDirectory": "docs/evidence/G3-M3-001/runtime/g3-m3-smoke-control/e8e470ef4dad439dad9600255a71b912"}
+{"status": "PASS", "runId": "df6e66ca44224a25b2f09bd26cea22f1", "evidenceDirectory": "docs/evidence/G3-M3-001/runtime/g3-m3-timing-control/df6e66ca44224a25b2f09bd26cea22f1"}
+{"status": "FAIL", "runId": "e1eee75ee647473d889b7aebe3e5242f", "evidenceDirectory": "docs/evidence/G3-M3-001/runtime/g3-m3-timing-control/e1eee75ee647473d889b7aebe3e5242f"}
+{"status": "PASS", "runId": "43630d3e93bd461085456e85221785aa", "evidenceDirectory": "docs/evidence/G3-M2-001/runtime/g3-m2-control/43630d3e93bd461085456e85221785aa"}

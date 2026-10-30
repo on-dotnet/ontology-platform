@@ -1,0 +1,169 @@
+{
+  "stage": "m4-diff-oidc",
+  "status": "PASS",
+  "overallG2": "PARTIAL",
+  "checks": [
+    {
+      "name": "anonymous_authorization_before_malformed_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "anonymous_publication_proposal_prebinding_401",
+      "status": "PASS",
+      "observedStatus": 401
+    },
+    {
+      "name": "anonymous_publication_decision_prebinding_401",
+      "status": "PASS",
+      "observedStatus": 401
+    },
+    {
+      "name": "anonymous_publication_activation_prebinding_401",
+      "status": "PASS",
+      "observedStatus": 401
+    },
+    {
+      "name": "operator-ab_real_http_only_session",
+      "status": "PASS"
+    },
+    {
+      "name": "operator-ab_csrf",
+      "status": "PASS"
+    },
+    {
+      "name": "viewer-ab_real_http_only_session",
+      "status": "PASS"
+    },
+    {
+      "name": "viewer-ab_csrf",
+      "status": "PASS"
+    },
+    {
+      "name": "viewer-ab_real_http_only_session",
+      "status": "PASS"
+    },
+    {
+      "name": "viewer-ab_csrf",
+      "status": "PASS"
+    },
+    {
+      "name": "viewer-a_real_http_only_session",
+      "status": "PASS"
+    },
+    {
+      "name": "viewer-a_csrf",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_diff_create_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_diff_save_named_delta_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_diff_fixed_pair_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_diff_fixed_identity_scope",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_diff_all_four_sources_raw_hashes",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_diff_typed_ground_delta_statistics",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_diff_same_fixed_version_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_diff_same_fixed_version_equivalent",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_diff_partial_scope_denied_http",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "m4_diff_unknown_fixed_revision_http",
+      "status": "PASS",
+      "observedStatus": 404
+    },
+    {
+      "name": "m4_diff_csrf_required",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "m4_diff_ui_real_diff_response",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_diff_ui_four_sources_typed_delta",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_diff_save_blank_a_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_diff_save_blank_renamed_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_diff_blank_rename_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_diff_blank_renaming_no_semantic_delta",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_diff_save_blank_changed_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_diff_blank_changed_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_diff_changed_blank_preserves_unknown_and_raw",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_diff_save_over_budget_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_diff_bounded_graph_budget_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_diff_budget_never_no_difference",
+      "status": "PASS"
+    }
+  ],
+  "failure": null,
+  "notRun": [
+    "remaining full-chain gates",
+    "final regression and CI"
+  ]
+}

@@ -19,3 +19,15 @@ for line in ['RUSTFS_ACCESS_KEY=other-synthetic-access', '{"rustfsAccessKey":"ot
 for line in ['RustFS readiness: Healthy', 'capability=resolve_entity status=FOUND', 'public graph urn:ontology-platform:release:synthetic:ontology']:
     assert m.sanitize(line, list(m.secret_values(synthetic))) == line + '\n'
 print('PASS: S3 access-key redaction and public diagnostic preservation')
+
+# Bootstrap继承当前Python可执行文件，宿主没有python3别名也不会偷偷换解释器。
+import sys
+from unittest.mock import patch
+synthetic_runtime = dict(keycloakPassword='SYNTHETIC_BOOTSTRAP_ONLY', realmFile='synthetic-realm.json')
+with patch.object(m, 'load_runtime', return_value=(Path('synthetic-runtime.json'), synthetic_runtime)), \
+        patch.object(m.subprocess, 'run') as child:
+    child.return_value.returncode = 23
+    assert m.bootstrap('synthetic-runtime.json', 'g2') == 23
+    assert child.call_args.args[0][0] == sys.executable
+    assert child.call_args.kwargs['env']['WAVE2_KEYCLOAK_ADMIN_PASSWORD'] == 'SYNTHETIC_BOOTSTRAP_ONLY'
+print('PASS: current Python bootstrap and real child exit propagation')

@@ -1,0 +1,124 @@
+{
+  "taskId": "G3-M4-001",
+  "slice": "B-Diff",
+  "status": "PASS",
+  "phase": "blank_and_budget",
+  "durationMs": 2087.8550000000005,
+  "identifiers": {
+    "assetId": "9689ff7cd68a4e5380e7e4cf5da9f587",
+    "draftId": "fa1be384698541a5a7ba04d81ecef39e"
+  },
+  "checks": [
+    {
+      "name": "create_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "save_named_delta_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "fixed_pair_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "fixed_identity_scope",
+      "status": "PASS"
+    },
+    {
+      "name": "all_four_sources_raw_hashes",
+      "status": "PASS"
+    },
+    {
+      "name": "typed_ground_delta_statistics",
+      "status": "PASS"
+    },
+    {
+      "name": "same_fixed_version_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "same_fixed_version_equivalent",
+      "status": "PASS"
+    },
+    {
+      "name": "partial_scope_denied_http",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "unknown_fixed_revision_http",
+      "status": "PASS",
+      "observedStatus": 404
+    },
+    {
+      "name": "csrf_required",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "ui_real_diff_response",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_four_sources_typed_delta",
+      "status": "PASS"
+    },
+    {
+      "name": "save_blank_a_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "save_blank_renamed_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "blank_rename_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "blank_renaming_no_semantic_delta",
+      "status": "PASS"
+    },
+    {
+      "name": "save_blank_changed_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "blank_changed_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "changed_blank_preserves_unknown_and_raw",
+      "status": "PASS"
+    },
+    {
+      "name": "save_over_budget_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "bounded_graph_budget_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "budget_never_no_difference",
+      "status": "PASS"
+    }
+  ],
+  "notRun": [
+    "impact report",
+    "approval binding",
+    "Windows native"
+  ]
+}

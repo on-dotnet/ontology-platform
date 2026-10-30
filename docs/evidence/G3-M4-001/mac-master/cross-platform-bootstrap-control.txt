@@ -1,0 +1,10 @@
+PASS: eight output redaction negatives and runtime path boundary
+PASS: S3 access-key redaction and public diagnostic preservation
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g3-m4-mac-master/ontology-platform/scripts/tests/Wave2Runtime.Tests.py", line 30, in <module>
+    assert m.bootstrap('synthetic-runtime.json', 'g2') == 23
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g3-m4-mac-master/ontology-platform/scripts/acceptance/wave2-runtime.py", line 252, in bootstrap
+    env['WAVE2_KEYCLOAK_ADMIN_PASSWORD'] = runtime['keycloakPassword']
+                                           ~~~~~~~^^^^^^^^^^^^^^^^^^^^
+KeyError: 'keycloakPassword'

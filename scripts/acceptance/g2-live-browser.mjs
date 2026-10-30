@@ -51,7 +51,7 @@ try {
   }
   await anonymous.close();
   const operator = await identity('operator-ab');
-  if (!process.argv.includes('--m2-api-only') && !process.argv.includes('--m3-api-only') && !process.argv.includes('--m4-api-only')) {
+  if (!process.argv.includes('--m2-api-only') && !process.argv.includes('--m3-api-only') && !process.argv.includes('--m4-api-only') && !process.argv.includes('--m4-impact-only')) {
     const smokeViewer = await identity('viewer-ab');
     const { runWorkspaceSmoke } = await import('./workspace-smoke.mjs');
     try {
@@ -61,6 +61,12 @@ try {
   }
   if (process.argv.includes('--workspace-smoke-only')) {
     await operator.context.close();
+  } else if (process.argv.includes('--m4-impact-only')) {
+    const viewer = await identity('viewer-ab');
+    const single = await identity('viewer-a');
+    const { runM4ImpactChecks } = await import('./g3-m4-impact-browser.mjs');
+    await runM4ImpactChecks({ root, origin, operator, viewer, single, check, command, setPhase: value => { phase = value; } });
+    for (const user of [operator, viewer, single]) await user.context.close();
   } else if (process.argv.includes('--m4-diff-only')) {
     const viewer = await identity('viewer-ab');
     const single = await identity('viewer-a');
@@ -271,7 +277,7 @@ try {
   failure = { phase, category: error?.name ?? 'Error', details: 'SUPPRESSED' };
 } finally {
   await browser?.close();
-  const checkpoint = process.argv.includes('--workspace-smoke-only') ? 'workspace-smoke' : process.argv.includes('--m4-diff-only') ? 'm4-diff-oidc' : process.argv.includes('--m4-api-only') ? 'm4-api-oidc' : process.argv.includes('--m4-ui-only') ? 'm4-ui-oidc' : process.argv.includes('--m4') ? 'm4-full-e2e' : process.argv.includes('--m3-api-only') ? 'm3-api-oidc' : process.argv.includes('--m3-ui-only') ? 'm3-ui-oidc' : process.argv.includes('--m3') ? 'm3-full-e2e' : process.argv.includes('--m2-api-only') ? 'm2-api-oidc' : process.argv.includes('--m2-ui-only') ? 'm2-ui-oidc' : process.argv.includes('--full') ? 'full-g2-e2e' : 'live-s1-http';
+  const checkpoint = process.argv.includes('--workspace-smoke-only') ? 'workspace-smoke' : process.argv.includes('--m4-impact-only') ? 'm4-impact-oidc' : process.argv.includes('--m4-diff-only') ? 'm4-diff-oidc' : process.argv.includes('--m4-api-only') ? 'm4-api-oidc' : process.argv.includes('--m4-ui-only') ? 'm4-ui-oidc' : process.argv.includes('--m4') ? 'm4-full-e2e' : process.argv.includes('--m3-api-only') ? 'm3-api-oidc' : process.argv.includes('--m3-ui-only') ? 'm3-ui-oidc' : process.argv.includes('--m3') ? 'm3-full-e2e' : process.argv.includes('--m2-api-only') ? 'm2-api-oidc' : process.argv.includes('--m2-ui-only') ? 'm2-ui-oidc' : process.argv.includes('--full') ? 'full-g2-e2e' : 'live-s1-http';
   const report = { stage: checkpoint, status: failure ? 'FAIL' : 'PASS', overallG2: 'PARTIAL', checks, failure, notRun: process.argv.includes('--full') ? (failure ? ['remaining steps after ' + phase, 'final sameHead CI'] : ['final sameHead CI', 'real model BLOCKED', 'Monaco PAUSED_BY_USER', 'Windows/Intel/production NOT_RUN']) : ['remaining full-chain gates','final regression and CI'] };
   await writeBrowserEntryReport(root, checkpoint, report);
   console.log(JSON.stringify({ stage: report.stage, status: report.status, passed: checks.filter(value => value.status === 'PASS').length, failure }));

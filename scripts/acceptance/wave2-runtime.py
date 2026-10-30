@@ -250,7 +250,7 @@ def bootstrap(path, profile="wave2"):
     _, runtime = load_runtime(path)
     env = os.environ.copy()
     env['WAVE2_KEYCLOAK_ADMIN_PASSWORD'] = runtime['keycloakPassword']
-    return subprocess.run(['python3', 'infra/security/bootstrap-keycloak.py', '--runtime-output', runtime['realmFile'], '--profile', profile], cwd=ROOT, env=env).returncode
+    return subprocess.run([sys.executable, 'infra/security/bootstrap-keycloak.py', '--runtime-output', runtime['realmFile'], '--profile', profile], cwd=ROOT, env=env).returncode
 
 
 def main():

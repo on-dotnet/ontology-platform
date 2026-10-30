@@ -1,0 +1,9 @@
+# 报告入口与精确审计登记独立审查
+
+Reviewer=preflight_review，非作者只读。WEB a612f74728aa950672dfde3584583dfa1aee41f0（Base cc01801）：完整输入key隔离、旧回复取消、精确报告提案绑定无阻断，14窄测及lint/typecheck通过，允许Master真实联调。
+
+Root固定Actions只新增ontology.impact.generate，未扩大任意事件文本、角色、scope或事务；保留原真实9项整事务回滚失败，批准独立提交cd69ee2后SEM仅重跑影响9项。
+
+Root Impact-only实际参数20控制用例通过；报告API脚本和共用发布链接口无明显错误，但B产品实际尚待联调。wave2 bootstrap使用sys.executable、PowerShell选择既有python3或python，不安装工具/不改默认PATH；redaction及子进程退出窄验通过，原fixture KeyError保留。macOS pwsh解析0；Windows原生NOT_RUN。
+
+Master随后将公共SemanticError新增本地固定M4说明并多行格式化，既有20恶意code/Trace回归通过；此小增量待最终独立审查覆盖。

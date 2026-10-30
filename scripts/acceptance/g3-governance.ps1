@@ -6,6 +6,10 @@ $root = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 $beforeEvidence = [Environment]::GetEnvironmentVariable('PLATFORM_EVIDENCE_DIR', 'Process')
 $beforeReaderIdentity = [Environment]::GetEnvironmentVariable('G3_READER_IDENTITY_SHA', 'Process')
 $pipeline = $null
+# 复用当前宿主已批准的Python，不假定Windows提供python3别名。
+$pythonCommand = Get-Command python3 -ErrorAction SilentlyContinue
+if (-not $pythonCommand) { $pythonCommand = Get-Command python -ErrorAction SilentlyContinue }
+if (-not $pythonCommand) { throw 'Python 3 is required; no dependency will be installed.' }
 function Save-Pipeline {
     $pipeline | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $pipelineRoot 'pipeline.json') -Encoding utf8
 }
@@ -49,7 +53,7 @@ try {
     dotnet build backend/OntologyPlatform.slnx --configuration Release --no-restore
     if ($LASTEXITCODE -ne 0) { throw 'Release build failed' }
     Start-PipelineStep 'apphost-prefix'
-    python3 scripts/tests/G3AppHost.Tests.py
+    & $pythonCommand.Source scripts/tests/G3AppHost.Tests.py
     if ($LASTEXITCODE -ne 0) { throw 'Actual AppHost prefix boundary failed' }
     Start-PipelineStep 'prewrite-reader'
     # 正式栈写V2前先运行兼容reader，再保留独立二进制供真实制品后验读取。
@@ -60,19 +64,19 @@ try {
         $null = New-Item -ItemType Directory -Path $reader -Force
         Copy-Item -Path (Join-Path $root 'backend/tests/OntologyPlatform.G2ContractTests/bin/Debug/net10.0/*') -Destination $reader -Recurse
     }
-    $freeze = python3 scripts/acceptance/g3-compatibility.py --freeze | ConvertFrom-Json
+    $freeze = & $pythonCommand.Source scripts/acceptance/g3-compatibility.py --freeze | ConvertFrom-Json
     if ($LASTEXITCODE -ne 0 -or $freeze.status -ne 'PASS') { throw 'Retained fallback reader failed before V2 writes' }
     $env:G3_READER_IDENTITY_SHA = $freeze.freezeSha256
     Start-PipelineStep 'generated-types'
     node apps/web/scripts/generate-types.mjs --check
     if ($LASTEXITCODE -ne 0) { throw 'Generated types drifted' }
     Start-PipelineStep 'control-boundaries'
-    python3 scripts/tests/G3Evidence.Tests.py
+    & $pythonCommand.Source scripts/tests/G3Evidence.Tests.py
     if ($LASTEXITCODE -ne 0) { throw 'Evidence boundaries failed' }
-    python3 scripts/tests/G3Acceptance.Tests.py
+    & $pythonCommand.Source scripts/tests/G3Acceptance.Tests.py
     if ($LASTEXITCODE -ne 0) { throw 'M1 orchestration boundaries failed' }
     Start-PipelineStep 'real-governance'
-    python3 scripts/acceptance/test-governance.py
+    & $pythonCommand.Source scripts/acceptance/test-governance.py
     if ($LASTEXITCODE -ne 0) { throw 'Real governance integration failed' }
     Start-PipelineStep 'real-modules'
     & ./scripts/acceptance/g2-integration.ps1
@@ -83,7 +87,7 @@ try {
         if ($RuntimeFile) { $arguments += @('--runtime-file', $RuntimeFile) }
         if ($StartRuntime) { $arguments += '--start-runtime' }
         if (-not $RuntimeFile -and -not $StartRuntime) { throw 'RuntimeFile or StartRuntime required for real browser acceptance' }
-        python3 @arguments
+        & $pythonCommand.Source @arguments
         if ($LASTEXITCODE -ne 0) { throw 'Real M1 vertical acceptance failed' }
     }
     $pipeline.stages[$pipeline.currentStep].status = 'PASS'

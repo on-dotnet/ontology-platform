@@ -34,6 +34,8 @@ Target draft AssessmentId显式指持久assessment，必须匹配To修订/四源
 
 CanonicalHash包含上述输入身份及完整Diff原文/hash、可信统计/delta、ChangedIris/AssetReferences、已知/阻断/unknown证据与资格；scope/来源/IRI/完整三元组/结论/证据按ordinal排序去重。Graph.ElapsedMilliseconds/VisitedNodes规范为0（不参与内容身份），不稳定blank delta不纳入。ReportId/CanonicalHash自身/GeneratedAt/ExpiresAt排除，均是持久envelope；绑定审批时精确时间进入BindingHash。唯一输入行冻结首次ID/生成/到期，相同输入不同幂等key也返回同一报告且不重复创建/刷新；同key异payload409。
 
+固定生成审计事件为`ontology.impact.generate`，只登记到Governance现有精确Actions白名单；未知action继续拒绝，审计失败整事务回滚。
+
 生成昂贵比较在短PG事务外。复用原Commands/WriteAsync审计事务和输入advisory锁；并发相同输入只有一个ImpactReports业务行和生成审计，重放不新增生成业务副作用（可有独立幂等回执）。报告ExpiresAt=min(首次生成+24h,真实assessment期限)；过期不自动重算，源/assessment/执行器实际输入变更才新报告，不伪造新时刻。
 
 ## 存储与跨模块锁

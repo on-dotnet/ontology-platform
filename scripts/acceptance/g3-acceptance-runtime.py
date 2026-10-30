@@ -23,6 +23,7 @@ def run_attempt():
     parser.add_argument('--runtime-file')
     parser.add_argument('--start-runtime', action='store_true')
     parser.add_argument('--milestone', choices=['M1', 'M2', 'M3', 'M4'], default='M1')
+    parser.add_argument('--impact-only', action='store_true')
     parser.add_argument('--diff-only', action='store_true')
     parser.add_argument('--api-only', action='store_true')
     parser.add_argument('--ui-only', action='store_true')
@@ -31,11 +32,11 @@ def run_attempt():
     args = parser.parse_args()
     if not args.runtime_file and not args.start_runtime:
         parser.error('Choose an owned runtime or explicitly start a new M1 stack')
-    if sum((args.api_only, args.ui_only, args.diff_only, args.workspace_smoke_only)) > 1:
+    if sum((args.api_only, args.ui_only, args.diff_only, args.impact_only, args.workspace_smoke_only)) > 1:
         parser.error('Choose one integration checkpoint')
-    if args.diff_only and args.milestone != 'M4':
+    if (args.diff_only or args.impact_only) and args.milestone != 'M4':
         parser.error('Fixed-version Diff checkpoint belongs to M4')
-    if args.api_only and args.smoke_fault_check:
+    if (args.api_only or args.impact_only) and args.smoke_fault_check:
         parser.error('Smoke fault injection requires a browser checkpoint')
     if (args.api_only or args.ui_only) and args.milestone not in ('M2', 'M3', 'M4'):
         parser.error('Integration checkpoints are authorized only for M2/M3/M4')
@@ -70,10 +71,10 @@ def run_attempt():
     input_fingerprint = hashlib.sha256(source_head.encode('ascii')).hexdigest()
     gate_names = ['full-g2-e2e.py', 'g3-compatibility.py', 'g1-regression.py', 'g2-observability.py',
                   'g2-trace-browser.mjs', 'g2-readiness-fault.py', 'performance-baseline.py']
-    if args.api_only or args.ui_only or args.diff_only or args.workspace_smoke_only:
+    if args.api_only or args.ui_only or args.diff_only or args.impact_only or args.workspace_smoke_only:
         gate_names = gate_names[:1]
     acceptance = {'runId': run_id, 'sourceHead': source_head, 'volumePrefix': runtime['volumePrefix'],
-                  'scope': 'DIFF_ONLY' if args.diff_only else 'WORKSPACE_SMOKE_ONLY' if args.workspace_smoke_only else 'API_ONLY' if args.api_only else 'UI_ONLY' if args.ui_only else 'FULL', 'milestone': args.milestone,
+                  'scope': 'IMPACT_ONLY' if args.impact_only else 'DIFF_ONLY' if args.diff_only else 'WORKSPACE_SMOKE_ONLY' if args.workspace_smoke_only else 'API_ONLY' if args.api_only else 'UI_ONLY' if args.ui_only else 'FULL', 'milestone': args.milestone,
                   'evidenceDirectory': str(evidence.relative_to(ROOT.resolve())), 'status': 'RUNNING',
                   'startedAtUtc': datetime.datetime.now(datetime.timezone.utc).isoformat(),
                   'gates': [{'name': name, 'status': 'NOT_RUN', 'exitCode': None} for name in gate_names]}
@@ -150,7 +151,7 @@ def run_attempt():
         if args.milestone == 'M3' and not args.workspace_smoke_only:
             commands[0].append('--m3-api-only' if args.api_only else '--m3-ui-only' if args.ui_only else '--m3')
         if args.milestone == 'M4' and not args.workspace_smoke_only:
-            commands[0].append('--m4-diff-only' if args.diff_only else '--m4-api-only' if args.api_only else '--m4-ui-only' if args.ui_only else '--m4')
+            commands[0].append('--m4-impact-only' if args.impact_only else '--m4-diff-only' if args.diff_only else '--m4-api-only' if args.api_only else '--m4-ui-only' if args.ui_only else '--m4')
         if args.milestone in ('M3', 'M4'):
             commands[-1] += ['--chain-report', args.milestone.lower() + '-full-e2e.json']
         if args.smoke_fault_check:
@@ -158,7 +159,7 @@ def run_attempt():
         if args.workspace_smoke_only:
             commands[0].remove('--m1')
             commands[0].append('--workspace-smoke-only')
-        if args.api_only or args.ui_only or args.diff_only:
+        if args.api_only or args.ui_only or args.diff_only or args.impact_only:
             commands[0].remove('--m1')
             commands = commands[:1]
         if args.workspace_smoke_only:
