@@ -112,3 +112,11 @@ export function sourceHash(hashes: SourceHashes, sourceId: string): string | nul
   const key = sourceSlots.get(sourceId);
   return key ? hashes[key] : null;
 }
+
+/** 供报告证据复用同一固定版本判别，避免各视图猜测修订。 */
+export const isVersionReference = (value: unknown): value is VersionRef => version(value);
+/** 新Diff和报告只接受可确定的地面三元组；空白结构仍由原文保留。 */
+export const isGroundTriple = (value: unknown): boolean => triplesValid([value]);
+
+/** 冻结审批引用复用完整四源hash字段与缺席规则。 */
+export const isSourceHashes = (value: unknown): value is SourceHashes => hashes(value);
