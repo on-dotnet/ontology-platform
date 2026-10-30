@@ -246,7 +246,7 @@ public sealed partial class OntologyService : IOntologyService, IDraftPublicatio
     }
 
     /// <summary>同事务锁定幂等键，业务/回执/Governance审计全部成功后才commit。</summary>
-    private async Task<T> WriteAsync<T>(ActorContext actor, ResourceScope scope, string action, CommandContext command, object payload, Func<CancellationToken, Task<(T Result, string Resource)>> mutation, CancellationToken token) where T : class
+    private async Task<T> WriteAsync<T>(ActorContext actor, ResourceScope scope, string action, CommandContext command, object payload, Func<CancellationToken, Task<(T Result, string Resource)>> mutation, CancellationToken token, Func<T, bool>? shouldAudit = null) where T : class
     {
         // Trace通过当前Activity自动关联，禁止将组织/主体作为低基数指标标签。
         using var activity = Activities.StartActivity("ontology.command");
@@ -271,7 +271,8 @@ public sealed partial class OntologyService : IOntologyService, IDraftPublicatio
             var result = await mutation(token);
             database.Commands.Add(new CommandRecord { Key = key, PayloadHash = payloadHash, SubjectId = actor.SubjectId, ResultJson = JsonSerializer.Serialize(result.Result) });
             await database.SaveChangesAsync(token);
-            await audit.WriteAsync(actor, new AuditCommand { Action = action, Resource = result.Resource, Outcome = "allowed", Scope = scope }, database.Database.GetDbConnection(), transaction.GetDbTransaction(), token);
+            // 相同输入的影响报告只新建独立命令回执，不重复生成业务审计；其它命令保持原行为。
+            if (shouldAudit is null || shouldAudit(result.Result)) await audit.WriteAsync(actor, new AuditCommand { Action = action, Resource = result.Resource, Outcome = "allowed", Scope = scope }, database.Database.GetDbConnection(), transaction.GetDbTransaction(), token);
             await transaction.CommitAsync(token);
             activity?.SetTag("ontology.outcome", "committed");
             activity?.SetStatus(ActivityStatusCode.Ok);

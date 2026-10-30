@@ -13,7 +13,26 @@ public sealed partial class JenaSemanticRuntime : IG3VersionDiffRuntime
         (await DiffSourcesAsync(left, right, cancellationToken)).Select(item => new SourceComparison { SourceId = item.SourceId, LeftHash = item.BaseHash, RightHash = item.TargetHash, SourceChanged = item.SourceChanged, Graph = item.Graph }).ToArray();
 
     /// <summary>在M1同一个总预算中保留原文、真实统计与可靠地面delta，不二次解析。</summary>
-    public async Task<SourceVersionDiff[]> DiffSourcesAsync(SourceBundle left, SourceBundle right, CancellationToken cancellationToken)
+    public Task<SourceVersionDiff[]> DiffSourcesAsync(SourceBundle left, SourceBundle right, CancellationToken cancellationToken) =>
+        DiffSourcesCoreAsync(left, right, cancellationToken, null);
+
+    /// <summary>影响分析取得同一次有界解析的事实，不在图预算之外再次访问RIOT。</summary>
+    internal async Task<(SourceVersionDiff[] Sources, RdfTriple[][]? Base, RdfTriple[][]? Target)> DiffFactsAsync(SourceBundle left, SourceBundle right, CancellationToken cancellationToken)
+    {
+        // 原始blank事实只在模块内短暂保留，绝不进入canonical三元组delta。
+        RdfTriple[][]? original = null;
+        // 右侧事实保持本次独立解析作用域。
+        RdfTriple[][]? target = null;
+        // 两个消费者共享同一5秒解析/同构/统计执行。
+        var sources = await DiffSourcesCoreAsync(left, right, cancellationToken, (a, b) => { original = a; target = b; });
+        return (sources, original, target);
+    }
+
+    /// <summary>复用当前支持策略识别实际未覆盖公理，不下载imports或执行推理。</summary>
+    internal static SemanticDiagnostic[] ImpactSupport(RdfTriple[] triples) => Support(triples);
+
+    /// <summary>所有公开比较用例唯一执行核心，共享图、槽位和失败撤回。</summary>
+    private async Task<SourceVersionDiff[]> DiffSourcesCoreAsync(SourceBundle left, SourceBundle right, CancellationToken cancellationToken, Action<RdfTriple[][], RdfTriple[][]>? capture)
     {
         if (left is null || right is null || left.OntologyTurtle is null || left.ShapesTurtle is null || left.DataTurtle is null || right.OntologyTurtle is null || right.ShapesTurtle is null || right.DataTurtle is null || !OntologyRules.WithinSourceBudget(left.OntologyTurtle, left.ShapesTurtle, left.VocabularyTurtle, left.DataTurtle) || !OntologyRules.WithinSourceBudget(right.OntologyTurtle, right.ShapesTurtle, right.VocabularyTurtle, right.DataTurtle))
             throw new SemanticOperationException(413, "source_byte_budget");
@@ -43,6 +62,7 @@ public sealed partial class JenaSemanticRuntime : IG3VersionDiffRuntime
             var parsedLeft = await ParseSourcesAsync(left, graphs, timeout.Token, checkShapes: false);
             // 右侧不能复用左侧blank作用域，实际另行RIOT解析。
             var parsedRight = await ParseSourcesAsync(right, graphs, timeout.Token, checkShapes: false);
+            capture?.Invoke(parsedLeft, parsedRight);
             for (var index = 0; index < ids.Length; index++)
             {
                 comparison.Check();

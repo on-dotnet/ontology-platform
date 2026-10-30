@@ -27,11 +27,4 @@ public sealed partial class OntologyService : IG3ImpactService
         return result;
     }
 
-    /// <summary>报告生成将在下一可运行子切片接入，当前明确不可用而不返回假报告。</summary>
-    public Task<ImpactReport> GenerateImpactAsync(ActorContext actor, GenerateImpactReportRequest request, CancellationToken cancellationToken) =>
-        throw new SemanticOperationException(503, "impact_implementation_pending");
-
-    /// <summary>报告持久读取尚未接入时明确不可用，不将空报告伪装为成功。</summary>
-    public Task<ImpactReport> ReadImpactAsync(ActorContext actor, string reportId, CancellationToken cancellationToken) =>
-        throw new SemanticOperationException(503, "impact_implementation_pending");
 }
