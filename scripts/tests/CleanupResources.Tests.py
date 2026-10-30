@@ -12,6 +12,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 sys.dont_write_bytecode = True
 
@@ -50,7 +51,21 @@ class CleanupTests(unittest.TestCase):
         self.transport=self.base/'git-fixture-transport'
         self.transport.write_text('#!'+sys.executable+'\nimport subprocess,sys\na=sys.argv[1:]\nif "push" in a or "ls-remote" in a: a=['+repr(str(self.remote))+' if x=="origin" else x for x in a]\nsys.exit(subprocess.run(['+repr(self.real_git)+']+a).returncode)\n')
         self.transport.chmod(0o755)
-        self.make_cli('git','import os,sys\nos.execv('+repr(str(self.transport))+',['+repr(str(self.transport))+']+sys.argv[1:])\n')
+        self.make_cli('git','import subprocess,sys\nsys.exit(subprocess.run([sys.executable,'+repr(str(self.transport))+']+sys.argv[1:]).returncode)\n')
+        self.make_cli('engine-runner', '''import runpy,subprocess,sys
+from pathlib import Path
+directory=Path(__file__).resolve().parent
+run_process=subprocess.run
+def fixture_process(arguments,*args,**kwargs):
+    if str(arguments[0]) in ('git','gh','docker'):
+        executable=directory/str(arguments[0])
+        if not executable.is_file(): raise OSError('Missing fixture executable')
+        arguments=[sys.executable,str(executable),*arguments[1:]]
+    return run_process(arguments,*args,**kwargs)
+subprocess.run=fixture_process
+sys.argv=sys.argv[1:]
+runpy.run_path(sys.argv[0],run_name='__main__')
+''')
         self.env = dict(os.environ, PATH=str(self.bin) + os.pathsep + os.environ['PATH'])
         now = dt.datetime.now(dt.timezone.utc)
         self.plan = dict(schemaVersion=1, taskId='PRE-G3-CLEANUP-FIX-002', project='on-dotnet/ontology-platform', repositoryRoot=str(self.root), gitCommonDir=str(self.root / '.git'), originUrl='https://github.com/on-dotnet/ontology-platform.git', expectedMainSha=self.main, createdAt=(now-dt.timedelta(minutes=1)).isoformat(), expiresAt=(now+dt.timedelta(hours=1)).isoformat(), allowedWorktreeRoots=[str(self.base)], protectedWorktrees=[str(self.root)], keep=[], operations=[])
@@ -78,12 +93,90 @@ class CleanupTests(unittest.TestCase):
     def run_engine(self, apply=False, log=True):
         path = self.base / 'plan.json'
         path.write_text(json.dumps(self.plan))
-        args = [sys.executable, ENGINE, '--root', self.root, '--plan', path]
+        args = [sys.executable, self.bin / 'engine-runner', ENGINE, '--root', self.root, '--plan', path]
         if apply:
             args += ['--apply']
             if log:
                 args += ['--log-path', self.base / 'apply.jsonl']
         return command(args, env=self.env)
+
+    def test_fixture_runner_uses_python_and_refuses_missing_cli(self):
+        probe = self.base / 'fixture-probe.py'
+        probe.write_text('import subprocess\nsubprocess.run(["gh"],check=True)\n')
+        arguments = [sys.executable, self.bin / 'engine-runner', probe]
+        result = command(arguments, env=self.env)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(json.loads(result.stdout), [])
+        (self.bin / 'gh').unlink()
+        result = command(arguments, env=self.env)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('Missing fixture executable', result.stderr)
+
+    def test_history_context_paths_are_host_independent(self):
+        module = self.load_engine()
+        cleaner = module.Cleaner(str(self.root), self.plan)
+        cleaner.keep = set()
+        for context, accepted in (
+                ('/reviewed/ontology-platform/infra/development/fuseki', True),
+                ('C:/reviewed/ontology-platform/infra/development/fuseki', True),
+                (r'C:\reviewed\ontology-platform\infra\development\fuseki', True),
+                ('C:reviewed/ontology-platform/infra/development/fuseki', False),
+                ('../ontology-platform/infra/development/fuseki', False),
+                ('/reviewed/../ontology-platform/infra/development/fuseki', False),
+                ('/reviewed/other/infra/development/fuseki', False),
+                ('infra/development/fuseki', False)):
+            with self.subTest(context=context):
+                snapshot = dict(Ref='hist123', Name='infra/development/fuseki',
+                                Context=context, Dockerfile='Dockerfile',
+                                VCSRepository='https://github.com/on-dotnet/ontology-platform',
+                                VCSRevision=self.main, Status='completed')
+                operation = self.op('docker-history', 'hist123', builder='desktop-linux',
+                                    expectedContext=context,
+                                    expectedVcs=snapshot['VCSRepository'],
+                                    expectedRevision=self.main, expectedStatus='completed',
+                                    fingerprint=module.digest(snapshot))
+                with mock.patch.object(cleaner, 'history_backend'), mock.patch.object(
+                        module, 'safe_docker_snapshot', return_value=snapshot):
+                    if accepted:
+                        self.assertEqual(cleaner.check(operation), snapshot)
+                    else:
+                        with self.assertRaisesRegex(module.Refused, 'History context outside project'):
+                            cleaner.check(operation)
+
+    def test_git_root_normalizes_separators_and_rejects_foreign_root(self):
+        specification = importlib.util.spec_from_file_location('cleanup_root_test', ENGINE)
+        cleanup = importlib.util.module_from_spec(specification)
+        specification.loader.exec_module(cleanup)
+        for git_root, expected_error in (
+                (self.root.as_posix(), 'Git common directory mismatch'),
+                (str(self.root), 'Git common directory mismatch'),
+            ('', 'Root must be Git toplevel'),
+            ('.', 'Root must be Git toplevel'),
+                ((self.base / 'foreign').as_posix(), 'Root must be Git toplevel')):
+            with self.subTest(git_root=git_root):
+                cleaner = cleanup.Cleaner(str(self.root), self.plan)
+                responses = [
+                    subprocess.CompletedProcess([], 0, stdout=git_root + '\n'),
+                    subprocess.CompletedProcess([], 0, stdout=str(self.base / 'foreign.git') + '\n')]
+                with mock.patch.object(cleaner, 'git', side_effect=responses), mock.patch(
+                    'os.getcwd', return_value=str(self.root)):
+                    with self.assertRaisesRegex(cleanup.Refused, expected_error):
+                        cleaner.setup()
+
+    def test_missing_nofollow_capability_refuses_without_touching_files(self):
+        module = self.load_engine()
+        target = self.base / 'retained-cache'
+        target.mkdir()
+        sentinel = target / 'sentinel'
+        sentinel.write_bytes(b'retain unchanged')
+        with mock.patch.object(module.os, 'supports_dir_fd', set()):
+            for operation in (
+                    lambda: module.metadata_fingerprint(target),
+                    lambda: module.remove_exact_cache(target, [])):
+                with self.subTest(operation=operation):
+                    with self.assertRaisesRegex(module.Refused, 'Safe no-follow filesystem operations unavailable'):
+                        operation()
+                self.assertEqual(sentinel.read_bytes(), b'retain unchanged')
 
     def assert_rejected(self, apply=True):
         r = self.run_engine(apply)
@@ -168,6 +261,20 @@ class CleanupTests(unittest.TestCase):
         r = self.run_engine(True)
         self.assertEqual(r.returncode, 0, r.stderr)
         self.assertFalse(tree.exists())
+
+    def test_worktree_after_requires_no_directory_and_no_registration(self):
+        module = self.load_engine()
+        cleaner = module.Cleaner(str(self.root), self.plan)
+        target = self.base / 'removed-tree'
+        operation = self.op('worktree', str(target))
+        self.assertFalse(target.exists())
+        with mock.patch.object(cleaner, 'registered', return_value={target: {}}):
+            with self.assertRaisesRegex(module.Refused, 'Worktree remains'):
+                cleaner.after(operation)
+        target.mkdir()
+        with mock.patch.object(cleaner, 'registered', return_value={}):
+            with self.assertRaisesRegex(module.Refused, 'Worktree remains'):
+                cleaner.after(operation)
 
     def test_dirty_locked_protected_worktrees_reject(self):
         tree = self.add_tree()
@@ -602,11 +709,20 @@ p.write_text(json.dumps(s))
         spec = importlib.util.spec_from_file_location('cleanup_test_engine', ENGINE)
         mod = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(mod)
+        run_process = mod.run
+        def fixture_process(arguments, cwd=None, acceptable=(0,)):
+            if str(arguments[0]) in ('git', 'gh', 'docker'):
+                executable = self.bin / str(arguments[0])
+                if not executable.is_file():
+                    raise OSError('Missing fixture executable')
+                arguments = [sys.executable, str(executable), *arguments[1:]]
+            return run_process(arguments, cwd=cwd, acceptable=acceptable)
+        mod.run = fixture_process
         return mod
 
     def test_log_records_exact_nonzero_command_exit_and_stops(self):
         real_git = str(self.transport)
-        self.make_cli('git', 'import subprocess,sys\na=sys.argv[1:]\nif "branch" in a and "-d" in a: sys.exit(13)\nsys.exit(subprocess.run([' + repr(real_git) + ']+a).returncode)\n')
+        self.make_cli('git', 'import subprocess,sys\na=sys.argv[1:]\nif "branch" in a and "-d" in a: sys.exit(13)\nsys.exit(subprocess.run([sys.executable,' + repr(real_git) + ']+a).returncode)\n')
         self.plan['operations'] = [self.op(expectedTip=self.main), self.op('git-remote-branch', expectedTip=self.main)]
         self.assert_rejected()
         records = [json.loads(x) for x in (self.base / 'apply.jsonl').read_text().splitlines()]
@@ -623,7 +739,7 @@ p.write_text(json.dumps(s))
         tip=self.git('rev-parse','HEAD').stdout.strip()
         self.git('switch','main')
         counter=self.base/'gh-count'
-        self.make_cli('gh', 'import subprocess\nfrom pathlib import Path\np=Path(' + repr(str(counter)) + ')\nn=int(p.read_text())+1 if p.exists() else 1\np.write_text(str(n))\nif n==2: subprocess.run(["git","-C",' + repr(str(self.root)) + ',"update-ref","refs/heads/codex/old",' + repr(tip) + '],check=True)\nprint("[]")\n')
+        self.make_cli('gh', 'import subprocess\nfrom pathlib import Path\np=Path(' + repr(str(counter)) + ')\nn=int(p.read_text())+1 if p.exists() else 1\np.write_text(str(n))\nif n==2: subprocess.run([' + repr(self.real_git) + ',"-C",' + repr(str(self.root)) + ',"update-ref","refs/heads/codex/old",' + repr(tip) + '],check=True)\nprint("[]")\n')
         self.plan['operations']=[self.op(expectedTip=self.main)]
         self.assert_rejected()
         self.assertEqual(self.git('rev-parse','codex/old').stdout.strip(),tip)
@@ -801,7 +917,7 @@ p.write_text(json.dumps(s))
         self.git('push','origin','codex/bad')
         self.git('switch','main')
         real_git=str(self.transport)
-        self.make_cli('git','import subprocess,sys\na=sys.argv[1:]\nif "push" in a and "--delete" in a: subprocess.run(['+repr(real_git)+',"--git-dir",'+repr(str(self.remote))+',"update-ref","refs/heads/codex/old",'+repr(newtip)+'],check=True)\nsys.exit(subprocess.run(['+repr(real_git)+']+a).returncode)\n')
+        self.make_cli('git','import subprocess,sys\na=sys.argv[1:]\nif "push" in a and "--delete" in a: subprocess.run([sys.executable,'+repr(real_git)+',"--git-dir",'+repr(str(self.remote))+',"update-ref","refs/heads/codex/old",'+repr(newtip)+'],check=True)\nsys.exit(subprocess.run([sys.executable,'+repr(real_git)+']+a).returncode)\n')
         self.plan['operations']=[self.op('git-remote-branch',expectedTip=self.main),self.op(expectedTip=self.main)]
         result=self.run_engine(True)
         self.assertNotEqual(result.returncode,0,result.stdout)

@@ -52,7 +52,7 @@ import datetime as dt
 import hashlib
 import json
 import os
-from pathlib import Path, PurePosixPath
+from pathlib import Path, PurePosixPath, PureWindowsPath
 import re
 import stat
 import subprocess
@@ -332,13 +332,13 @@ class Cleaner:
         for field in raw.split('\0'):
             if not field:
                 if 'worktree' in record:
-                    result[record['worktree']] = record
+                    result[Path(record['worktree'])] = record
                 record = {}
             else:
                 key, _, value = field.partition(' ')
                 record[key] = value
         if 'worktree' in record:
-            result[record['worktree']] = record
+            result[Path(record['worktree'])] = record
         return result
 
     def ownership(self, op):
@@ -363,7 +363,8 @@ class Cleaner:
         require(required <= p.keys(), 'Missing plan fields')
         require(type(p['schemaVersion']) is int and p['schemaVersion'] == 1 and p['project'] == PROJECT and p['taskId'] in ('PRE-G3-CLEANUP-FIX-002', 'G3-M1-001', 'G3-M2-001', 'G3-M1-CLOSEOUT-002', 'G3-M3-001'), 'Plan identity mismatch')
         require(absolute(p['repositoryRoot']).resolve() == self.root, 'Repository root mismatch')
-        require(self.git('rev-parse', '--show-toplevel').stdout.strip() == str(self.root), 'Root must be Git toplevel')
+        git_root=self.git('rev-parse', '--show-toplevel').stdout.strip()
+        require(git_root and Path(git_root).is_absolute() and Path(git_root).resolve() == self.root, 'Root must be Git toplevel')
         common = Path(self.git('rev-parse', '--path-format=absolute', '--git-common-dir').stdout.strip()).resolve()
         require(absolute(p['gitCommonDir']).resolve() == common, 'Git common directory mismatch')
         require(isinstance(p['originUrl'], str) and re.fullmatch(r'(https://github\.com/|git@github\.com:)on-dotnet/ontology-platform(?:\.git)?', p['originUrl']), 'Origin project mismatch')
@@ -480,12 +481,12 @@ class Cleaner:
 
     def tree_state(self, tree, op):
         require(not tree.is_symlink(), 'Worktree symlink refused')
-        require(str(tree) in self.registered(), 'Unregistered worktree')
+        require(tree in self.registered(), 'Unregistered worktree')
         common = Path(self.git('rev-parse','--path-format=absolute','--git-common-dir',cwd=tree).stdout.strip()).resolve()
         require(common == absolute(self.plan['gitCommonDir']).resolve(), 'Cross-project worktree')
         self.check_tip(op,self.git('rev-parse','HEAD',cwd=tree).stdout.strip())
         require(not self.git('status','--porcelain=v1','--untracked-files=all',cwd=tree).stdout, 'Dirty or untracked worktree')
-        return self.registered()[str(tree)]
+        return self.registered()[tree]
 
     def worktree_path(self, value):
         path=absolute(value)
@@ -573,8 +574,9 @@ class Cleaner:
             attached=[p for p,r in trees.items() if r.get('branch')=='refs/heads/'+target]
             if preflight:
                 index=self.ops.index(op)
-                removals={x['target'] for x in self.ops[:index] if x['type']=='worktree'}
-                require(all(p in removals and p not in self.protected for p in attached),'Active worktree branch')
+                removals={absolute(x['target']) for x in self.ops[:index] if x['type']=='worktree'}
+                protected={Path(path) for path in self.protected}
+                require(all(path in removals and path not in protected for path in attached),'Active worktree branch')
             else:
                 require(not attached,'Branch still attached to worktree')
             if typ=='git-local-branch':
@@ -637,7 +639,10 @@ class Cleaner:
         require(h['Ref']==target and h['Context']==op.get('expectedContext') and h['VCSRepository']==op.get('expectedVcs') and h['VCSRevision']==op.get('expectedRevision') and h['Status']==op.get('expectedStatus'),'Build history identity changed')
         require(h['Status'] in ('completed','failed') and SHA.fullmatch(h['VCSRevision']),'Running or invalid history revision')
         require(re.fullmatch(r'https://github\.com/on-dotnet/ontology-platform(?:\.git)?',h['VCSRepository']),'Other project history refused')
-        absolute_context=Path(h['Context']).is_absolute() and h['Context'].endswith('/ontology-platform/infra/development/fuseki')
+        context_paths=(PurePosixPath(h['Context']),PureWindowsPath(h['Context']))
+        absolute_context=any(path.is_absolute()
+                     and path.parts[-4:]==('ontology-platform','infra','development','fuseki')
+                     and '..' not in path.parts for path in context_paths)
         canonical_relative=self.plan['taskId']=='G3-M3-001' and h['Context']=='infra/development/fuseki'
         require(h['Name']=='infra/development/fuseki' and h['Dockerfile'] in ('Dockerfile','infra/development/fuseki/Dockerfile') and (absolute_context or canonical_relative),'History context outside project')
         require(op.get('fingerprint')==digest(h),'History metadata changed')
@@ -693,7 +698,7 @@ class Cleaner:
         typ,target=op['type'],op['target']
         self.docker_backend()
         if typ=='cache': require(not Path(target).exists() and not Path(target).is_symlink(),'Cache remains')
-        elif typ=='worktree': require(target not in self.registered() and not Path(target).exists(),'Worktree remains')
+        elif typ=='worktree': require(Path(target) not in self.registered() and not Path(target).exists(),'Worktree remains')
         elif typ=='git-local-branch': require(self.git('show-ref','--verify','--quiet','refs/heads/'+target,acceptable=(0,1)).returncode==1,'Branch remains')
         elif typ=='git-remote-branch': require(not self.git('ls-remote','--heads','origin','refs/heads/'+target).stdout.strip(),'Remote branch remains')
         elif typ=='docker-container': require(target not in self.container_ids(),'Container remains')
