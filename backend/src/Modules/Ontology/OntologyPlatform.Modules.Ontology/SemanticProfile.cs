@@ -43,7 +43,7 @@ public static class SemanticProfile
     }
 
     /// <summary>v3在原二十项后登记SKOS治理和Synthetic单位引用，不执行换算或OWL推理。</summary>
-    public static SemanticSupportProfile Current()
+    public static SemanticSupportProfile LegacyM3()
     {
         // 原v2全部DTO字段保持不变，仅新策略新增两项显式能力。
         var legacy = LegacyM2();
@@ -54,6 +54,20 @@ public static class SemanticProfile
         return profile with { Hash = OntologyRules.Hash(JsonSerializer.Serialize(profile)) };
     }
 
+    /// <summary>v4仅开放受控时间模板和显式身份声明，历史v1至v3不变。</summary>
+    public static SemanticSupportProfile Current()
+    {
+        // 从不可变v3副本扩展，原二十二项的其它字段逐项保持。
+        var legacy = LegacyM3();
+        // 时间能力仅限命名点、区间及显式时区，不执行通用时间推理。
+        var capabilities = legacy.Capabilities.Select(item => item.Id == "20"
+            ? item with { Edit = "BASIC", Publish = "SUPPORTED", Validation = "ASSERTED", Reason = "仅命名OWL-Time点/区间受控模板、显式时区与半开关系；未知关系保持INDETERMINATE，不执行通用时间推理。" }
+            : item).Append(new SemanticCapabilitySupport { Id = "23", Name = "显式身份与有效期治理", Edit = "BASIC", Preserve = "EXACT", Publish = "SUPPORTED", Validation = "ASSERTED", Reason = "仅完整组织、厂区、来源命名空间内的显式声明与历史有效期；不按标签合并，不推断sameAs。" }).ToArray();
+        // 当前版本独立散列，旧profile仍从原工厂逐字节重建。
+        var profile = legacy with { Version = "4", Hash = "", Capabilities = capabilities };
+        return profile with { Hash = OntologyRules.Hash(JsonSerializer.Serialize(profile)) };
+    }
+
     /// <summary>将assessment自己的hash置空后计算完整事实散列。</summary>
     public static string AssessmentHash(SemanticAssessment assessment) => OntologyRules.Hash(JsonSerializer.Serialize(assessment with { AssessmentHash = "" }));
 
@@ -61,7 +75,7 @@ public static class SemanticProfile
     internal static bool Matches(PublicationSemantics semantics)
     {
         // 每个版本保留自己的完整内容，篡改版本或散列均不能回验。
-        var profile = semantics.ProfileVersion switch { "1" => LegacyM1(), "2" => LegacyM2(), "3" => Current(), _ => null };
+        var profile = semantics.ProfileVersion switch { "1" => LegacyM1(), "2" => LegacyM2(), "3" => LegacyM3(), "4" => Current(), _ => null };
         return profile is not null && semantics.ProfileHash == profile.Hash;
     }
 }

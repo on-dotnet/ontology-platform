@@ -75,6 +75,6 @@ public sealed partial class OntologyService : IG3VocabularyService
         if (runtime is not IG3VocabularyRuntime vocabulary) throw new SemanticOperationException(503, "vocabulary_runtime_unavailable");
         // 历史profile没有M3治理；事实仍保留，不能向旧正式版本追溯追加新错误。
         var snapshot = await vocabulary.ReadVocabularyAsync(sources, manifest.Revision, cancellationToken);
-        return snapshot with { DraftId = manifest.DraftId, ReleaseId = releaseId, ManifestHash = release.ManifestHash, ProfileVersion = manifest.Semantics?.ProfileVersion, ProfileHash = manifest.Semantics?.ProfileHash, Diagnostics = manifest.Semantics?.ProfileVersion == "3" ? snapshot.Diagnostics : [] };
+        return snapshot with { DraftId = manifest.DraftId, ReleaseId = releaseId, ManifestHash = release.ManifestHash, ProfileVersion = manifest.Semantics?.ProfileVersion, ProfileHash = manifest.Semantics?.ProfileHash, Diagnostics = manifest.Semantics?.ProfileVersion == "4" ? snapshot.Diagnostics : manifest.Semantics?.ProfileVersion == "3" ? snapshot.Diagnostics.Where(item => !IdentityDiagnostic(item.Diagnostic.Code)).ToArray() : [] };
     }
 }

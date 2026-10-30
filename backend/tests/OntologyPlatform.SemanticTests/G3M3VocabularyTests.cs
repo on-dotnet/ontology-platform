@@ -13,7 +13,7 @@ public sealed class G3M3VocabularyTests
     public void VersionThreeKeepsHistoricalProfiles()
     {
         // 当前策略应明确登记术语与单位的新增范围。
-        var current = SemanticProfile.Current();
+        var current = SemanticProfile.LegacyM3();
         Assert.AreEqual("3", current.Version);
         Assert.AreEqual(22, current.Capabilities.Length);
         Assert.AreEqual("54e4db0fac2c7e4f89802678f3269b8a460190775b53b4fb74955f8cbadd8b86", SemanticProfile.LegacyM1().Hash);

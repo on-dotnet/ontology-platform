@@ -128,7 +128,7 @@ public sealed class G3M3ServiceTests
         Assert.AreEqual(AssessmentStageStatus.NotRun, assessment.Stages.Single(stage => stage.Name == "OWL_REASONING").Status);
         Assert.AreEqual(scenario == "valid", assessment.PublishEligible);
         Assert.AreEqual(draft.Hashes, assessment.Hashes);
-        Assert.AreEqual("3", assessment.ProfileVersion);
+        Assert.AreEqual("4", assessment.ProfileVersion);
         if (scenario != "valid") Assert.IsTrue(assessment.Diagnostics.Any(item => item.Diagnostic.Code == (scenario == "unknown" ? "unit_precision_unknown" : scenario == "deprecated-canonical" ? "semantic_reference_deprecated" : "unit_dimension_mismatch") && item.SourceHash == draft.Hashes.VocabularyHash));
     }
 

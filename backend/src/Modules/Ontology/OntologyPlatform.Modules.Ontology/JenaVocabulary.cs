@@ -74,7 +74,7 @@ public sealed partial class JenaSemanticRuntime : IG3VocabularyRuntime
         }, cancellationToken);
 
     /// <summary>仅本轮已登记语义谓词和既有基本谓词可结构编辑。</summary>
-    private static bool VocabularyPredicate(string predicate, RdfTriple[] triples) => EditablePredicate(predicate, triples) || M3MetadataPredicate(predicate) || predicate.StartsWith(Skos, StringComparison.Ordinal) && SkosPredicates.Contains(predicate[Skos.Length..]) || predicate == Prov + "wasDerivedFrom";
+    private static bool VocabularyPredicate(string predicate, RdfTriple[] triples) => EditablePredicate(predicate, triples) || M3MetadataPredicate(predicate) || M4Predicate(predicate) || predicate.StartsWith(Skos, StringComparison.Ordinal) && SkosPredicates.Contains(predicate[Skos.Length..]) || predicate == Prov + "wasDerivedFrom";
 
     /// <summary>构造同修订事实快照；每项诊断绑定实际来源，未知行列保持null。</summary>
     private static VocabularySnapshot Vocabulary(SourceBundle sources, long revision, RdfTriple[][] parsed, CancellationToken token)

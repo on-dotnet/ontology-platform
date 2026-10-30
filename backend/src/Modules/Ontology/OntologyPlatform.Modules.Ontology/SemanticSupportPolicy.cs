@@ -9,12 +9,12 @@ public sealed partial class JenaSemanticRuntime
     private static SemanticDiagnostic[] PublicationSupport(ReleaseManifest manifest, RdfTriple[] triples) => manifest.SchemaVersion switch
     {
         1 when manifest.Semantics is null => LegacySupport(triples),
-        2 when manifest.Semantics is not null && SemanticProfile.Matches(manifest.Semantics) => Support(triples, m3: manifest.Semantics.ProfileVersion == "3"),
+        2 when manifest.Semantics is not null && SemanticProfile.Matches(manifest.Semantics) => Support(triples, m3: manifest.Semantics.ProfileVersion is "3" or "4", m4: manifest.Semantics.ProfileVersion == "4"),
         _ => throw new SemanticOperationException(409, "release_profile_unsupported")
     };
 
     /// <summary>仅命名基本事实及有限命名公理可发布；结构编辑仅接受已登记且类型匹配的命名公理。</summary>
-    private static SemanticDiagnostic[] Support(RdfTriple[] triples, bool structural = false, bool m3 = true)
+    private static SemanticDiagnostic[] Support(RdfTriple[] triples, bool structural = false, bool m3 = true, bool m4 = true)
     {
         // 声明的属性允许简单断言；AnnotationProperty明确作为普通注释而非推理能力。
         var properties = triples.Where(triple => triple.Subject.Kind == RdfTermKind.Iri && triple.Predicate == JenaRdfCodec.Type && triple.Object.Kind == RdfTermKind.Iri && triple.Object.Value is JenaRdfCodec.Owl + "ObjectProperty" or JenaRdfCodec.Owl + "DatatypeProperty" or JenaRdfCodec.Owl + "AnnotationProperty").Select(triple => triple.Subject.Value).ToHashSet(StringComparer.Ordinal);
@@ -60,14 +60,14 @@ public sealed partial class JenaSemanticRuntime
             else
             {
                 // 普通annotation需明确声明或登记；任意未声明literal/IRI关系均不能猜作注释。
-                blocked |= !properties.Contains(triple.Predicate) && !(metadata.Contains(triple.Predicate) && triple.Object.Kind == RdfTermKind.Literal) && !skos.Contains(triple.Predicate) && !provenance.Contains(triple.Predicate) && !(m3 && M3MetadataPredicate(triple.Predicate));
+                blocked |= !properties.Contains(triple.Predicate) && !(metadata.Contains(triple.Predicate) && triple.Object.Kind == RdfTermKind.Literal) && !skos.Contains(triple.Predicate) && !provenance.Contains(triple.Predicate) && !(m3 && M3MetadataPredicate(triple.Predicate)) && !(m4 && M4Predicate(triple.Predicate));
                 if (objectProperties.Contains(triple.Predicate)) blocked |= triple.Object.Kind != RdfTermKind.Iri;
                 if (datatypeProperties.Contains(triple.Predicate)) blocked |= triple.Object.Kind != RdfTermKind.Literal;
             }
             // M2结构编辑额外要求公理两端显式声明；历史发布仍保持原asserted-only白名单。
             if (structural && namedAxioms.Contains(triple.Predicate)) blocked |= !NamedAxiomWellTyped(triple, triples);
             // M1未实现OWL-Time，声明及谓词都不得绕过SOURCE/BLOCKED矩阵。
-            blocked |= triple.Predicate.StartsWith("http://www.w3.org/2006/time#", StringComparison.Ordinal) || (triple.Predicate == JenaRdfCodec.Type && triple.Object.Value.StartsWith("http://www.w3.org/2006/time#", StringComparison.Ordinal));
+            blocked |= triple.Predicate.StartsWith(TimeNamespace, StringComparison.Ordinal) && !(m4 && M4Predicate(triple.Predicate)) || (triple.Predicate == JenaRdfCodec.Type && triple.Object.Value.StartsWith(TimeNamespace, StringComparison.Ordinal) && !(m4 && triple.Object.Value is TimeNamespace + "Instant" or TimeNamespace + "Interval"));
             if (blocked) result.Add(new SemanticDiagnostic { Code = triple.Predicate == JenaRdfCodec.Owl + "imports" ? "import_unlocked" : "axiom_unsupported", Severity = DiagnosticSeverity.Error, Message = structural ? "源码完整保留；该图含仅SOURCE或未支持公理，结构改写被阻断。" : "源码完整保留；该公理超出M1命名显式事实子集，发布被阻断，OWL推理未运行。", FocusNode = triple.Subject, Path = triple.Predicate });
         }
         return result.ToArray();
