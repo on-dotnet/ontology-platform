@@ -1,4 +1,5 @@
 import { evidenceDirectory } from "./evidence-paths.mjs";
+import { generatePublicationImpact } from "./g3-impact-publication.mjs";
 import { postSemanticRead } from "./g3-read-backpressure.mjs";
 /** 真实浏览器上下文中续接S1，验证异人发布、统一查询、原生MCP/SSE与版本回滚。 */
 import { randomUUID } from 'node:crypto';
@@ -18,7 +19,7 @@ export async function fullChain({ root, origin, operator, audit, single, viewer,
     const response = path === '/api/v1/semantic/queries'
       ? await postSemanticRead(user.api, origin + path, options, fact => readBackpressureAttempts.push({ operation: path, ...fact }))
       : await user.api.post(origin + path, options);
-    samples.push({ operation: path.replace(/[a-f0-9]{32}/g, '{id}'), category: path.endsWith('/validations') ? 'shacl' : path.endsWith('/semantic/queries') ? 'gateway' : path.endsWith('/release-activations') ? 'publication' : 'api', elapsedMs: performance.now() - start, status: response.status() });
+    samples.push({ operation: path.replace(/[a-f0-9]{32}/g, '{id}'), category: (path.endsWith('/validations') || path.endsWith('/assessments')) ? 'shacl' : path.endsWith('/semantic/queries') ? 'gateway' : path.endsWith('/release-activations') ? 'publication' : 'api', elapsedMs: performance.now() - start, status: response.status() });
     check('http_' + path.split('/').filter(Boolean).at(-1) + '_' + marks.length++, response.status() === expected, response.status());
     return response.json();
   }
@@ -60,16 +61,22 @@ export async function fullChain({ root, origin, operator, audit, single, viewer,
   const plan = (capability, extras = {}) => ({ capabilityId: capability, capabilityVersion: caps.find(value => value.id === capability).version, assetId: draft.assetId, releaseId: null, entityType: null, entityIri: null, externalId: capability === 'describe_ontology' ? null : 'heat-1', siteId: capability === 'describe_ontology' ? null : 'site-a', relationshipIris: [], depth: 5, maxRows: 100, timeoutMs: 5000, ...extras });
   setPhase('s2_ui_proposal');
   // M1在原真实发布闭环前增加服务端评估，不能借旧校验报告绕过新资格门禁。
-  await clickResponse(operator.page, operator.page.getByRole('button', { name: '评估发布资格', exact: true }),
+  const assessment1 = await clickResponse(operator.page, operator.page.getByRole('button', { name: '评估发布资格', exact: true }),
     '/api/v1/ontology-drafts/' + draft.draftId + '/assessments',
     value => value.publishEligible && value.revision === draft.revision && value.stages.some(stage => stage.name === 'OWL_REASONING' && stage.status === 'NOT_RUN'));
+  const impact1 = await clickResponse(operator.page, operator.page.getByRole('button', { name: '生成发布影响报告', exact: true }),
+    '/api/v1/impact-reports', value => value.publishEligible && value.diff.to.id === draft.draftId
+      && value.diff.to.revision === draft.revision && value.diff.targetHashes.bundleHash === draft.hashes.bundleHash
+      && value.targetSemantics?.assessmentHash === assessment1.assessmentHash);
   const proposal = await clickResponse(operator.page, operator.page.getByRole('button', { name: '提交异人发布审核', exact: true }), '/api/v1/release-proposals', value => value.status === 'PENDING' && value.draftRevision === draft.revision);
+  check('proposal_binds_current_impact', proposal.impact?.reportId === impact1.reportId && proposal.impact?.canonicalHash === impact1.canonicalHash);
   ids.assetId = draft.assetId;
   await post(operator, '/api/v1/approvals/' + proposal.proposalId + '/decisions', { decision: 'approve', command: command(proposal.revision) }, 403);
   await post(operator, '/api/v1/release-activations', { proposalId: proposal.proposalId, expectedActivationRevision: 0, expectedActiveReleaseId: null, command: command(proposal.revision) }, 409);
   const first = await approveAndActivate(proposal, 'r1');
   ids.release1 = first.releaseId;
   const r1 = await getRelease(first.releaseId);
+  check('release_impact_preserved_outside_manifest', r1.impact?.reportId === impact1.reportId && r1.impact?.canonicalHash === impact1.canonicalHash);
   check('m1_new_manifest_v2_assessment_bound', r1.manifest.schemaVersion === 2 && r1.manifest.semantics?.assessmentHash === proposal.semantics?.assessmentHash);
   check('r1_formal_immutable_graphs_sources', r1.isActive && r1.manifest.artifactObjects.length === 4 && r1.manifest.ontologyGraphIri.includes(first.releaseId) && r1.manifest.dataGraphIri.includes(first.releaseId));
   setPhase('performance_real_sparql');
@@ -157,9 +164,11 @@ export async function fullChain({ root, origin, operator, audit, single, viewer,
   const save2 = await operator.api.put(origin + '/api/v1/ontology-drafts/' + draft.draftId, { headers: { ...operator.headers, 'If-Match': '"' + draft.revision + '"' }, data: { name: draft.name, sources: source2, command: command(draft.revision) } });
   check('r2_new_source_saved', save2.status() === 200);
   const draft2 = await save2.json();
-  const valid2 = await post(operator, '/api/v1/ontology-drafts/' + draft.draftId + '/validations', { revision: draft2.revision, hashes: draft2.hashes, command: command(draft2.revision) });
-  check('r2_real_shacl', valid2.conforms);
-  const proposal2 = await post(operator, '/api/v1/release-proposals', { kind: 'PUBLISH', draftId: draft2.draftId, draftRevision: draft2.revision, hashes: draft2.hashes, validationReportId: valid2.reportId, targetReleaseId: null, targetManifestHash: null, command: command(draft2.revision) });
+  const assessed2 = await post(operator, '/api/v1/ontology-drafts/' + draft.draftId + '/assessments', { revision: draft2.revision, hashes: draft2.hashes, command: command(draft2.revision) });
+  check('r2_real_shacl_and_assessment', assessed2.publishEligible && assessed2.stages.some(stage => stage.name === 'SHACL_CORE' && stage.status === 'PASS'));
+  const impact2 = await generatePublicationImpact({ origin, user: operator, draft: draft2, assessment: assessed2, command, post, check });
+  const proposal2 = await post(operator, '/api/v1/release-proposals', { kind: 'PUBLISH', draftId: draft2.draftId, draftRevision: draft2.revision, hashes: draft2.hashes, validationReportId: assessed2.validationReportId, impactReportId: impact2.reportId, impactHash: impact2.canonicalHash, targetReleaseId: null, targetManifestHash: null, command: command(draft2.revision) });
+  check('r2_proposal_exact_active_baseline', proposal2.impact?.reportId === impact2.reportId && proposal2.impact?.from.id === first.releaseId && proposal2.impact?.baseManifestHash === r1.manifestHash);
   const second = await approveAndActivate(proposal2, 'r2');
   ids.release2 = second.releaseId;
   const changed = await post(operator, '/api/v1/semantic/queries', plan('describe_ontology'));

@@ -41,7 +41,7 @@ class RealBrowserEntryTests(unittest.TestCase):
                     self.assertIn('--m2', command)
 
     def test_precise_m4_modes_reach_real_browser_flags(self):
-        for flag in ['--m4', '--m4-api-only', '--m4-ui-only']:
+        for flag in ['--m4', '--m4-api-only', '--m4-ui-only', '--m4-diff-only']:
             command = self.invoke(flag)
             self.assertIn(flag, command)
             self.assertEqual('--full' in command, flag == '--m4')
@@ -67,7 +67,7 @@ class RealBrowserEntryTests(unittest.TestCase):
 class M1OrchestrationTests(unittest.TestCase):
     """Keep gate selection/order/failure propagation real, isolate external services only."""
 
-    def exercise(self, fail_gate=None, prefix='g3-m1-control', launch_failure=False, milestone=None, api_only=False, ui_only=False, smoke_fault=False, workspace_smoke=False):
+    def exercise(self, fail_gate=None, prefix='g3-m1-control', launch_failure=False, milestone=None, api_only=False, ui_only=False, smoke_fault=False, workspace_smoke=False, diff_only=False):
         spec = importlib.util.spec_from_file_location('m1_orchestrator', SCRIPT)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
@@ -91,11 +91,11 @@ class M1OrchestrationTests(unittest.TestCase):
                 evidence_seen.append(os.environ.get('PLATFORM_EVIDENCE_DIR'))
                 gate = Path(command[1]).name
                 if gate == 'full-g2-e2e.py':
-                    selected = '--workspace-smoke-only' if workspace_smoke else '--' + (milestone or 'M2').lower() + ('-api-only' if api_only else '-ui-only') if api_only or ui_only else '--m1'
+                    selected = '--m4-diff-only' if diff_only else '--workspace-smoke-only' if workspace_smoke else '--' + (milestone or 'M2').lower() + ('-api-only' if api_only else '-ui-only') if api_only or ui_only else '--m1'
                     self.assertIn(selected, command, 'Selected checks must run in the existing authenticated harness')
                     if milestone == 'M2' and not workspace_smoke: self.assertIn('--m2-api-only' if api_only else '--m2-ui-only' if ui_only else '--m2', command, 'M2 checks must execute in the real authenticated harness')
                     if milestone == 'M3' and not workspace_smoke: self.assertIn('--m3-api-only' if api_only else '--m3-ui-only' if ui_only else '--m3', command, 'M3 checks must execute in the real authenticated harness')
-                    if milestone == 'M4' and not workspace_smoke: self.assertIn('--m4-api-only' if api_only else '--m4-ui-only' if ui_only else '--m4', command)
+                    if milestone == 'M4' and not workspace_smoke: self.assertIn('--m4-diff-only' if diff_only else '--m4-api-only' if api_only else '--m4-ui-only' if ui_only else '--m4', command)
                     if smoke_fault: self.assertIn('--smoke-fault-check', command)
                     # Parse the exact upstream argument combination with the real downstream entry.
                     entry_spec = importlib.util.spec_from_file_location('downstream_browser', SCRIPT.with_name(gate))
@@ -114,7 +114,7 @@ class M1OrchestrationTests(unittest.TestCase):
             with contextlib.ExitStack() as stack:
                 stack.enter_context(patch.object(sys, 'path', [str(SCRIPT.parent), *sys.path]))
                 stack.enter_context(patch.object(module, 'ROOT', root))
-                stack.enter_context(patch.object(sys, 'argv', [str(SCRIPT), '--runtime-file', str(runtime)] + (['--milestone', milestone] if milestone else []) + (['--api-only'] if api_only else []) + (['--ui-only'] if ui_only else []) + (['--smoke-fault-check'] if smoke_fault else []) + (['--workspace-smoke-only'] if workspace_smoke else [])))
+                stack.enter_context(patch.object(sys, 'argv', [str(SCRIPT), '--runtime-file', str(runtime)] + (['--milestone', milestone] if milestone else []) + (['--api-only'] if api_only else []) + (['--ui-only'] if ui_only else []) + (['--smoke-fault-check'] if smoke_fault else []) + (['--workspace-smoke-only'] if workspace_smoke else []) + (['--diff-only'] if diff_only else [])))
                 stack.enter_context(patch.object(module.shared, 'wait_for'))
                 stack.enter_context(patch.object(module.shared, 'stop'))
                 stack.enter_context(patch.dict(os.environ, {'PLATFORM_EVIDENCE_DIR': 'docs/evidence/' + task + '/runtime'}))
@@ -208,7 +208,7 @@ class M1OrchestrationTests(unittest.TestCase):
                 self.assertEqual(proof['scope'], 'API_ONLY' if mode == 'api_only' else 'UI_ONLY')
 
     def test_m4_own_runtime_checkpoints_and_failure_propagation(self):
-        for mode in ({}, {'api_only': True}, {'ui_only': True}, {'workspace_smoke': True, 'smoke_fault': True}):
+        for mode in ({}, {'api_only': True}, {'ui_only': True}, {'diff_only': True}, {'workspace_smoke': True, 'smoke_fault': True}):
             code, calls, proof, selected, _ = self.exercise(prefix='g3-m4-control', milestone='M4', **mode)
             self.assertEqual(code, 0)
             self.assertEqual(calls, GATES if not mode else GATES[:1])

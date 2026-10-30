@@ -1,0 +1,9 @@
+# B首个Diff独立审查
+
+Reviewer=preflight_review，非作者只读。Base=c69a2b4297133e64ea82c869701b1c41881bf82a。
+
+SEM 6b9983d08e10b1739c103f423fb44f95691b27cc：单次真实解析/共预算、ground delta、历史四源hash重验批准；PG/Jena6PASS/0fail/0skip。
+
+WEB f90f60b68313083ea257611dc6a7faa2cd56d93f首次暂缓：version-diff-model普通对象slot查找误收__proto__/constructor/toString/hasOwnProperty，缺Graph仍通过可崩溃。Owner cc018014f146e486a9c7e39c00d95036c4f92ec3改精确Map与必要字段/manifest判别；独立从Git对象重放原畸形样例现false，17testsPASS，批准合入。
+
+Master Diff-only实际参数穿透/失败传播20PASS；正式Kestrel HTTP前置门禁10PASS（包括A旧5，不重复相加）。Diff脚本及三个入口无阻断，允许真实联调；这不是实际Diff浏览器PASS。报告/审批实现与真正产品闭环仍NOT_RUN。g2-full-chain和g3-impact-publication为后续WIP，接口衔接无明显问题但尚未执行。

@@ -64,6 +64,48 @@ public sealed class G3M4EndpointTests
         Assert.AreEqual(status, (int)response.StatusCode);
     }
 
+    /// <summary>两个新POST均先执行身份/角色门禁，畸形正文不能提前绑定。</summary>
+    /// <param name="path">正式M4报告或差异入口。</param>
+    /// <param name="role">宿主可信角色，空为匿名。</param>
+    /// <param name="status">实际授权拒绝状态。</param>
+    [TestMethod]
+    [DataRow("/api/v1/ontology-version-diffs", null, 401)]
+    [DataRow("/api/v1/impact-reports", null, 401)]
+    [DataRow("/api/v1/impact-reports", "platform.viewer", 403)]
+    public async Task ImpactAuthorizesBeforeMalformedBody(string path, string? role, int status)
+    {
+        // 正式端点没有产品成功替身，意外调用应用服务即失败。
+        await using var app = Host(role);
+        await app.StartAsync();
+        // 随机回环端口防止触碰真实开发入口。
+        using var client = new HttpClient { BaseAddress = new Uri(app.Urls.Single()) };
+        // 畸形JSON必须被原生授权中间件先拒绝。
+        using var response = await client.PostAsync(path, new StringContent("{", Encoding.UTF8, "application/json"));
+        Assert.AreEqual(status, (int)response.StatusCode);
+    }
+
+    /// <summary>已认证的两个POST即使正文有效，也必须具备原生防伪令牌。</summary>
+    /// <param name="generate">是否验证具备幂等命令的报告写入。</param>
+    [TestMethod]
+    [DataRow(false)]
+    [DataRow(true)]
+    public async Task ImpactRequiresNativeCsrf(bool generate)
+    {
+        // 操作员有读写角色；没有防伪值才是本次拒绝的具体原因。
+        await using var app = Host("platform.operator");
+        await app.StartAsync();
+        // 使用独立HttpClient保留宿主原生安全行为。
+        using var client = new HttpClient { BaseAddress = new Uri(app.Urls.Single()) };
+        client.DefaultRequestHeaders.Add("Origin", "http://platform.test");
+        // 精确固定草稿引用满足Wire合同，避免绑定错误掩盖CSRF门禁。
+        var version = new VersionRef { Kind = VersionRefKind.Draft, Id = "m4", Revision = 2 };
+        // 正式POST根据两种合同分别序列化；服务若被误调用会立即失败。
+        using var response = generate
+            ? await client.PostAsJsonAsync("/api/v1/impact-reports", new GenerateImpactReportRequest { From = version, To = version, BaselineKind = ImpactBaselineKind.Initial, AssessmentId = null, Command = G2HttpFixture.Command() })
+            : await client.PostAsJsonAsync("/api/v1/ontology-version-diffs", new CompareVersionsRequest { From = version, To = version });
+        Assert.AreEqual(403, (int)response.StatusCode);
+    }
+
     /// <summary>创建正式路由宿主，真实应用依赖为空使任何意外业务调用无法成功。</summary>
     /// <param name="role">宿主可信测试身份。</param>
     /// <returns>由调用方启动和释放的回环宿主。</returns>
@@ -79,12 +121,14 @@ public sealed class G3M4EndpointTests
         builder.Services.AddAntiforgery(options => options.HeaderName = "X-CSRF-TOKEN");
         builder.Services.Configure<PlatformSecurityOptions>(options => options.PublicOrigin = "http://platform.test");
         builder.Services.AddSingleton<IAuditTrail>(new G2AuditCapture());
+        builder.Services.AddSingleton<IG3ImpactService>(new NeverImpactService());
         builder.Services.AddSingleton<IG3IdentityTimeService>(new NeverIdentityTimeService());
         // 只有夹具固定身份，不允许请求指定role或actor。
         var app = builder.Build();
         app.Use((context, next) => { context.User = G2HttpFixture.Principal(role); return next(context); });
         app.UseAuthorization();
         app.MapIdentityTimeEndpoints();
+        app.MapImpactEndpoints();
         app.MapGet("/m4-token", (Microsoft.AspNetCore.Http.HttpContext context, IAntiforgery antiforgery) =>
             Microsoft.AspNetCore.Http.Results.Json(antiforgery.GetAndStoreTokens(context).RequestToken));
         return app;
@@ -104,6 +148,22 @@ public sealed class G3M4EndpointTests
         /// <summary>正式版本不能在未授权时调用外部源或图。</summary>
         public Task<VocabularySnapshot> ReadReleaseIdentityTimeAsync(ActorContext actor, string releaseId, CancellationToken cancellationToken) =>
             throw new AssertFailedException("Unexpected identity/time application invocation");
+    }
+
+    /// <summary>只验证HTTP前置失败，禁止应用被调用或返回模拟产品成功。</summary>
+    private sealed class NeverImpactService : IG3ImpactService
+    {
+        /// <summary>固定版本比较若越过前置失败，立即报告测试失败。</summary>
+        public Task<VersionDiff> DiffAsync(ActorContext actor, CompareVersionsRequest request, CancellationToken cancellationToken) =>
+            throw new AssertFailedException("Unexpected impact application invocation");
+
+        /// <summary>报告生成若未先验证权限/CSRF，立即报告测试失败。</summary>
+        public Task<ImpactReport> GenerateImpactAsync(ActorContext actor, GenerateImpactReportRequest request, CancellationToken cancellationToken) =>
+            throw new AssertFailedException("Unexpected impact generation invocation");
+
+        /// <summary>本夹具不提供报告读取成功实现。</summary>
+        public Task<ImpactReport> ReadImpactAsync(ActorContext actor, string reportId, CancellationToken cancellationToken) =>
+            throw new AssertFailedException("Unexpected impact reading invocation");
     }
 
 }
