@@ -1,0 +1,24 @@
+{
+  "taskId": "G3-M4-001",
+  "status": "PASS",
+  "observedAtUtc": "2026-10-30T21:27:59.024859+00:00",
+  "beforeCount": 16,
+  "createdCount": 17,
+  "afterCount": 16,
+  "deleted": 1,
+  "command": [
+    "docker",
+    "--context",
+    "desktop-linux",
+    "volume",
+    "inspect",
+    "g3-m4-fixture-20e9c662b3e3-postgres-data"
+  ],
+  "exitCode": 1,
+  "diagnostic": "Error response from daemon: get g3-m4-fixture-20e9c662b3e3-postgres-data: no such volume",
+  "strongNoSuchVolume": true,
+  "keepSetUnchanged": true,
+  "physicalReclaimedBytes": "UNKNOWN",
+  "scope": "only empty fixture; actual M4 eight and G2 eight KEEP",
+  "priorReadProbe": "sandbox socket permission denied; not Docker or product failure; repeated with authorized socket access"
+}

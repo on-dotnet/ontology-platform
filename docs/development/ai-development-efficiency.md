@@ -33,3 +33,13 @@ M3起CI在应用restore之前先计算`canonical_fuseki.py --identity`，按精�
 完整浏览器链由`workspace-smoke.mjs`前置真实OIDC状态验收，独立短入口为`node scripts/acceptance/g2-live-browser.mjs <本树私有runtime.json> --workspace-smoke-only --smoke-fault-check`；默认source、显式graph/canvas/source、取消/保存、历史diff、窄屏与只读权限均有断言。注入隐藏canvas应短FAIL，恢复后PASS。禁止用默认改graph或吞异常迎合旧脚本。
 
 证据编码早期先运行`new-review-evidence.ps1`生成当前Schema，再用`test-review-evidence.ps1 -EvidenceFile <文件> -ExpectedHead <SHA>`预检；生产构包器共用同一规范化实现，历史metadata保留原字节。截图/ignored边界也须早检。TaskRunTimeline用`task_run_timeline.py run ... -- <命令>`记录真实单调时钟与UTC，CI用`ci --step-id <固定标签> --task-type TEST -- <命令>`自动关联同job前序；`summary --path <JSONL>`分列跨度、区间union、累计、重叠、可观察关键路径和重验。并发append在锁内分配attempt，原始参数/聊天/令牌不入记录，Agent活跃/思考UNKNOWN。
+
+## G3-M4执行纠偏：关键路径与前置防线
+
+2026-10-31人类明确要求本轮立即收敛并永久防复发；既有安全/验证/资源门禁不减。
+
+- 已确认阻断先组成最小关键路径：语义修复与真实正反例→发布四点/既有fixture→首次报告API/UI→稳定输入适用完整门禁→独立Review/提交绑定→唯一V3/原有资源收尾。未确认新风险先做不超过20秒的短复现；不要继续扩展临时验收工具、泛化框架或非阻断边角。
+- 每次调度只传精确Base/Head、owned_paths、当前diff、失败指纹、下一条已核实命令和完成条件；复用既有Agent/树，按一个可运行里程碑批量审查，不为每个小修反复暂停/恢复writer或让Reviewer占槽等待。新代理仅传必要上下文，工具输出先筛摘要，完整历史留证据。
+- 从bootstrap/rg核实解释器、项目及测试路径；先廉价编译，编译通过才开真实容器。错误路径在前置探测拒绝，不能用不存在路径的命令冒充产品失败。
+- 新写用例公共合同必须登记精确审计action、DI、事务回执与幂等边界；真实生成审计必须写入/重读验证。依赖IRI必须精确受控，定义删除按声明种类与消费角色建立正反回归，不能依赖过宽前缀或其它类型留存。
+- 已通过项只按精确输入绑定复用；稳定输入仍完成适用完整门禁。不从命令计时推测Agent思考/审查/调度活跃时长；无可观察进展的长间隔触发一次阻断/下一命令诊断，未观测原因仍UNKNOWN，不能用累计命令时长解释全部墙钟。

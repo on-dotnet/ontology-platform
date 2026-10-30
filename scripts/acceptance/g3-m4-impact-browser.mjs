@@ -12,7 +12,7 @@ const sourceHash = (report, evidence) => {
   if (evidence.sourceId === "bundle") return (side === "targetHash" ? report.diff.targetHashes : report.diff.baseHashes).bundleHash;
   return report.diff.sources.find(source => source.sourceId === evidence.sourceId)?.[side];
 };
-export async function runM4ImpactChecks({ root, origin, operator, viewer, single, check, command, setPhase }) {
+export async function runM4ImpactChecks({ root, origin, operator, viewer, single, check, command, setPhase, publicationChecks = false }) {
   const checks = [], startedAtUtc = new Date().toISOString(), started = performance.now();
   let status = "FAIL", phase = "create", identifiers = {};
   const observe = (name, condition, observedStatus) => {
@@ -60,6 +60,27 @@ export async function runM4ImpactChecks({ root, origin, operator, viewer, single
     observe("changed_payload_idempotency_conflict", conflict.code === "idempotency_conflict");
     await request(viewer, "post", "/api/v1/impact-reports", { ...initial, command: command(first.revision) }, "viewer_cannot_generate", 403);
     await request(single, "get", "/api/v1/impact-reports/" + report.reportId, null, "partial_scope_report_denied", 403);
+    if (!publicationChecks) {
+      step("report_ui");
+      await operator.page.goto(origin + "/ontologies");
+      await operator.page.getByRole("button").filter({ has: operator.page.locator("strong", { hasText: first.name }) }).click();
+      await operator.page.getByRole("textbox", { name: "变更理由", exact: true }).fill("Synthetic M4 real impact report UI checkpoint");
+      const assessed = operator.page.waitForResponse(response => response.url() === origin + path + "/assessments" && response.request().method() === "POST");
+      await operator.page.getByRole("button", { name: "评估发布资格", exact: true }).click();
+      observe("ui_real_assessment", (await assessed).status() === 200);
+      const panel = operator.page.getByRole("region", { name: "发布影响与审批绑定", exact: true });
+      const generated = operator.page.waitForResponse(response => response.url() === origin + "/api/v1/impact-reports" && response.request().method() === "POST");
+      await panel.getByRole("button", { name: "生成发布影响报告", exact: true }).click();
+      const response = await generated;
+      observe("ui_real_report", response.status() === 200, response.status());
+      const rendered = await response.json();
+      await panel.getByText(rendered.reportId, { exact: false }).first().waitFor();
+      observe("ui_exact_report_and_technical_eligibility", (await panel.innerText()).includes(rendered.canonicalHash)
+        && await panel.getByRole("button", { name: "提交异人发布审核", exact: true }).isEnabled());
+      // 发布调用链尚在下一增量实现，首报告联调只确认按钮绑定，不触发旧发布路径。
+      status = "PASS";
+      return;
+    }
     step("proposal_technical_binding");
     const proposalBody = (draft, selectedAssessment, selectedReport) => ({ kind: "PUBLISH", draftId: draft.draftId, draftRevision: draft.revision,
       hashes: draft.hashes, validationReportId: selectedAssessment.validationReportId, targetReleaseId: null, targetManifestHash: null,
@@ -90,8 +111,8 @@ export async function runM4ImpactChecks({ root, origin, operator, viewer, single
       && [...unknown.blockers, ...unknown.unknownCoverage].every(item => item.evidence.length > 0));
     status = "PASS";
   } finally {
-    await writeFile(resolve(evidenceDirectory(root), "m4-impact.json"), JSON.stringify({ taskId: "G3-M4-001", slice: "B-Impact", status, phase,
+    await writeFile(resolve(evidenceDirectory(root), "m4-impact.json"), JSON.stringify({ taskId: "G3-M4-001", slice: "B-Impact", publicationChecks, status, phase,
       startedAtUtc, completedAtUtc: new Date().toISOString(), durationMs: performance.now() - started, identifiers, checks,
-      notRun: ["expiry/time/provider/profile/activation races: native real module tests", "Windows native", "paid LLM"] }, null, 2) + "\n");
+      notRun: [...(publicationChecks ? [] : ["proposal/approval/activation binding: next backend slice"]), "expiry/time/provider/profile/activation races: native real module tests", "Windows native", "paid LLM"] }, null, 2) + "\n");
   }
 }

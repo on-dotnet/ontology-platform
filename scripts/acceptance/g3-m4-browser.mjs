@@ -149,6 +149,7 @@ export async function runM4Checks({ root, origin, operator, audit, single, viewe
     snapshot = await request(viewer, "get", path + "/identity-time", null, "ui_readback");
     observe("ui_persisted_identity_and_separate_observation", contains(snapshot, claim + ":ui", p + "externalIdentifier", "M4-UI-01")
       && contains(snapshot, "urn:synthetic:m4:event:" + suffix, p + "observedAtUtc", "2026-04-02T01:00:00Z"));
+    await mkdir(resolve(evidence, "screenshots"), { recursive: true });
     for (const theme of ["light", "dark"]) {
       await page.evaluate(value => { document.documentElement.dataset.theme = value; localStorage.setItem("ontology-platform-theme", value); }, theme);
       await page.setViewportSize({ width: 390, height: 1000 });
@@ -157,6 +158,7 @@ export async function runM4Checks({ root, origin, operator, audit, single, viewe
       await workspace.getByRole("textbox", { name: "身份声明IRI", exact: true }).focus();
       await page.keyboard.press("Tab");
       observe("keyboard_focus_" + theme, await page.evaluate(() => document.activeElement?.tagName !== "BODY"));
+      await page.screenshot({ path: resolve(evidence, "screenshots/m4-identity-time-390-" + theme + ".png"), fullPage: true, animations: "disabled" });
     }
     await page.getByRole("button", { name: "图与校验", exact: true }).click();
     await page.setViewportSize({ width: 1440, height: 1000 });
@@ -175,10 +177,10 @@ export async function runM4Checks({ root, origin, operator, audit, single, viewe
     }
     status = "PASS";
   } finally {
-    await writeFile(resolve(evidence, apiOnly ? "m4-api.json" : uiOnly ? "m4-ui.json" : "m4-browser.json"), JSON.stringify({ taskId: "G3-M4-001", slice: "A", status, phase,
+    await writeFile(resolve(evidence, apiOnly ? "m4-api.json" : uiOnly ? "m4-ui.json" : "m4-browser.json"), JSON.stringify({ taskId: "G3-M4-001", slice: "A-feature-regression", status, phase,
       startedAtUtc, completedAtUtc: new Date().toISOString(), durationMs: performance.now() - started,
       sourceHead: execFileSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).trim(), identifiers, checks, samples,
-      notRun: [...(apiOnly ? ["UI/publication/formal query/Run/SSE/rollback"] : []), "Slice B impact governance", "full OWL reasoning", "Monaco", "real LLM", "Windows/Intel/production"] }, null, 2) + "\n");
+      notRun: [...(apiOnly ? ["UI/publication/formal query/Run/SSE/rollback"] : []), "full OWL reasoning", "Monaco", "real LLM", "Windows/Intel/production"] }, null, 2) + "\n");
     if (status !== "PASS" || checks.length === 0) process.exitCode = 1;
   }
 }

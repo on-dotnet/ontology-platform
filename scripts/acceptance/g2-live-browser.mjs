@@ -51,7 +51,7 @@ try {
   }
   await anonymous.close();
   const operator = await identity('operator-ab');
-  if (!process.argv.includes('--m2-api-only') && !process.argv.includes('--m3-api-only') && !process.argv.includes('--m4-api-only') && !process.argv.includes('--m4-impact-only')) {
+  if (!process.argv.includes('--m2-api-only') && !process.argv.includes('--m3-api-only') && !process.argv.includes('--m4-api-only')) {
     const smokeViewer = await identity('viewer-ab');
     const { runWorkspaceSmoke } = await import('./workspace-smoke.mjs');
     try {
@@ -268,6 +268,10 @@ try {
     await runM3Checks({ root, origin, operator, audit, single, viewer, check, command, setPhase: value => { phase = value; } });
   }
   if (process.argv.includes('--m4')) {
+    const { runM4DiffChecks } = await import('./g3-m4-diff-browser.mjs');
+    await runM4DiffChecks({ root, origin, operator, viewer, single, check, command, impactAnalysis: true, setPhase: value => { phase = value; } });
+    const { runM4ImpactChecks } = await import('./g3-m4-impact-browser.mjs');
+    await runM4ImpactChecks({ root, origin, operator, viewer, single, check, command, publicationChecks: true, setPhase: value => { phase = value; } });
     const { runM4Checks } = await import('./g3-m4-browser.mjs');
     await runM4Checks({ root, origin, operator, audit, single, viewer, check, command, setPhase: value => { phase = value; } });
   }

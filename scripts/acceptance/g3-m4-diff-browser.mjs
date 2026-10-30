@@ -1,5 +1,5 @@
 /** M4两个固定版本的真实OIDC/API/UI窄闭环；不触发发布或报告。 */
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { resolve } from "node:path";
 import { createHash, randomUUID } from "node:crypto";
 import { evidenceDirectory } from "./evidence-paths.mjs";
@@ -7,7 +7,7 @@ import { evidenceDirectory } from "./evidence-paths.mjs";
 const hash = text => createHash("sha256").update(text, "utf8").digest("hex");
 const ref = draft => ({ kind: "DRAFT", id: draft.draftId, revision: draft.revision });
 const slots = { ontology: "ontologyTurtle", shapes: "shapesTurtle", vocabulary: "vocabularyTurtle", data: "dataTurtle" };
-export async function runM4DiffChecks({ root, origin, operator, viewer, single, check, command, setPhase }) {
+export async function runM4DiffChecks({ root, origin, operator, viewer, single, check, command, setPhase, impactAnalysis = false }) {
   const checks = [], started = performance.now();
   let status = "FAIL", phase = "create", ids = {};
   const observe = (name, condition, observedStatus) => {
@@ -55,6 +55,7 @@ export async function runM4DiffChecks({ root, origin, operator, viewer, single, 
     const noCsrf = await operator.api.post(origin + "/api/v1/ontology-version-diffs", { headers: { Origin: origin }, data: { from: ref(first), to: ref(second) } });
     observe("csrf_required", noCsrf.status() === 403, noCsrf.status());
     step("real_ui");
+    await operator.page.setViewportSize({ width: 1440, height: 1000 });
     await operator.page.goto(origin + "/ontologies");
     await operator.page.getByRole("button").filter({ has: operator.page.locator("strong", { hasText: name }) }).click();
     const region = operator.page.getByRole("region", { name: "任意固定版本差异", exact: true });
@@ -66,6 +67,30 @@ export async function runM4DiffChecks({ root, origin, operator, viewer, single, 
     const result = region.getByRole("region", { name: "固定版本四源差异结果", exact: true });
     await result.waitFor();
     observe("ui_four_sources_typed_delta", await result.getByRole("article").count() === 4 && (await result.innerText()).includes("Typed delta：EXACT"));
+    if (impactAnalysis) {
+      await mkdir(resolve(evidenceDirectory(root), "screenshots"), { recursive: true });
+      await operator.page.getByRole("textbox", { name: "变更理由", exact: true }).fill("Synthetic fixed-version bounded impact analysis");
+      const analyzed = operator.page.waitForResponse(response => response.url() === origin + "/api/v1/impact-reports" && response.request().method() === "POST");
+      await region.getByRole("button", { name: "生成所选版本影响分析", exact: true }).click();
+      const response = await analyzed;
+      observe("ui_arbitrary_pair_report_http", response.status() === 200, response.status());
+      const report = await response.json();
+      observe("arbitrary_pair_missing_assessment_is_blocked_analysis", report.baselineKind === "VERSION_PAIR" && !report.publishEligible
+        && report.diff.from.revision === first.revision && report.diff.to.revision === second.revision
+        && report.blockers.some(item => item.blocking) && report.targetSemantics === null);
+      await region.getByRole("region", { name: "影响报告详情", exact: true }).waitFor();
+      for (const theme of ["light", "dark"]) {
+        await operator.page.evaluate(value => { document.documentElement.dataset.theme = value; localStorage.setItem("ontology-platform-theme", value); }, theme);
+        await operator.page.setViewportSize({ width: 390, height: 1000 });
+        await operator.page.getByRole("button", { name: "图与校验", exact: true }).click();
+        observe("report_narrow_" + theme + "_no_overflow", await operator.page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+        await region.getByRole("button", { name: "生成所选版本影响分析", exact: true }).focus();
+        await operator.page.keyboard.press("Tab");
+        observe("report_keyboard_" + theme, await operator.page.evaluate(() => document.activeElement?.tagName !== "BODY"));
+        await operator.page.screenshot({ path: resolve(evidenceDirectory(root), "screenshots/m4-report-390-" + theme + ".png"), fullPage: true, animations: "disabled" });
+      }
+      await operator.page.setViewportSize({ width: 1440, height: 1000 });
+    }
     step("blank_and_budget");
     const blankA = await save(second, second.sources.ontologyTurtle + '\n_:m4a <urn:synthetic:m4:edge> "one" .\n', "save_blank_a");
     const blankB = await save(blankA, second.sources.ontologyTurtle + '\n_:m4b <urn:synthetic:m4:edge> "one" .\n', "save_blank_renamed");
@@ -84,7 +109,7 @@ export async function runM4DiffChecks({ root, origin, operator, viewer, single, 
       && budget.targetText === manyText);
     status = "PASS";
   } finally {
-    await writeFile(resolve(evidenceDirectory(root), "m4-diff.json"), JSON.stringify({ taskId: "G3-M4-001", slice: "B-Diff", status, phase,
-      durationMs: performance.now() - started, identifiers: ids, checks, notRun: ["impact report", "approval binding", "Windows native"] }, null, 2) + "\n");
+    await writeFile(resolve(evidenceDirectory(root), "m4-diff.json"), JSON.stringify({ taskId: "G3-M4-001", slice: "B-Diff", impactAnalysis, status, phase,
+      durationMs: performance.now() - started, identifiers: ids, checks, notRun: [...(impactAnalysis ? [] : ["impact report UI"]), "approval binding: sibling impact/full-chain checks", "Windows native"] }, null, 2) + "\n");
   }
 }

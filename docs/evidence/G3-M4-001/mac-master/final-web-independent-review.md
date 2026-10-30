@@ -1,0 +1,5 @@
+# 最终前端与空fixture独立审查
+
+Reviewer=preflight_review，非作者只读。WEB b779ff5159fdbcedaa837c57ead30f3236b0f549相对a612：实际consumer与回调同用proposalImpactBlocker，autoGET严格核asset/scope、refs、源hash、semantics、原binding时间，未读/缺绑定/技术未知/过期失败关闭；revision/canonical重挂载且Abort旧回复；Rollback仍原命令无impact。45/45、lint/typecheck/build和准确fingerprint回执核过，SSR5不是browserPASS。批准增量合Master，实际完整浏览器仍待Gate-B。
+
+空fixture唯一1卷计划经独立实际Docker只读核验：metadata/labels/backend/0refs/fingerprint吻合，原16卷KEEP，CLOSED proof dba818c可从任务远端恢复。批准仅此1卷Apply，不扩大到产品八卷、旧G2、Git/image/history。Master已执行Apply completed1/validated1，并在自然窗口后精确inspect得exit1和target-specific no-such-volume，16卷KEEP集合不变，详见cleanup-fixture。物理回收容量UNKNOWN。

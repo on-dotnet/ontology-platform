@@ -36,7 +36,7 @@ def run_attempt():
         parser.error('Choose one integration checkpoint')
     if (args.diff_only or args.impact_only) and args.milestone != 'M4':
         parser.error('Fixed-version Diff checkpoint belongs to M4')
-    if (args.api_only or args.impact_only) and args.smoke_fault_check:
+    if args.api_only and args.smoke_fault_check:
         parser.error('Smoke fault injection requires a browser checkpoint')
     if (args.api_only or args.ui_only) and args.milestone not in ('M2', 'M3', 'M4'):
         parser.error('Integration checkpoints are authorized only for M2/M3/M4')
