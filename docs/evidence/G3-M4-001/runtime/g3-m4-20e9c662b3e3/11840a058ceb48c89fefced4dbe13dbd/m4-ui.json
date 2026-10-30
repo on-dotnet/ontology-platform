@@ -1,0 +1,651 @@
+{
+  "taskId": "G3-M4-001",
+  "slice": "A",
+  "status": "PASS",
+  "phase": "rollback_activation",
+  "startedAtUtc": "2026-10-30T15:25:15.164Z",
+  "completedAtUtc": "2026-10-30T15:25:34.747Z",
+  "durationMs": 19582.536334,
+  "sourceHead": "c213e77b3d10014eff14ccea7ea85e120f007505",
+  "identifiers": {
+    "assetId": "c3373881932d44eab846e4d6f3250f50",
+    "draftId": "80cf073f4e654201b411bd8fc52b81ee",
+    "release1": "21a4a706967b42a6bfaa2c3b7c74e755",
+    "runId": "92236496f795462ab6c8b70c6848eeb3",
+    "release2": "cee712316a124a7f874546194d9cca87"
+  },
+  "checks": [
+    {
+      "name": "mode_unambiguous",
+      "status": "PASS"
+    },
+    {
+      "name": "profile_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "registered_current_profile_v4",
+      "status": "PASS"
+    },
+    {
+      "name": "create_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "two_sites_same_external_identifier_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "one_atomic_revision_and_unrelated_source_bytes",
+      "status": "PASS"
+    },
+    {
+      "name": "idempotent_replay_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "replay_same_revision_hashes",
+      "status": "PASS"
+    },
+    {
+      "name": "scope_snapshot_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "same_number_different_sites_not_merged",
+      "status": "PASS"
+    },
+    {
+      "name": "unknown_end_is_absent_not_infinite",
+      "status": "PASS"
+    },
+    {
+      "name": "adjacent_historical_identifier_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "overlapping_identifier_ambiguous_http",
+      "status": "PASS",
+      "observedStatus": 422
+    },
+    {
+      "name": "unknown_relation_indeterminate_http",
+      "status": "PASS",
+      "observedStatus": 422
+    },
+    {
+      "name": "cross_site_write_denied_http",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "cross_organization_write_denied_http",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "historical_identity_cannot_be_overwritten_http",
+      "status": "PASS",
+      "observedStatus": 409
+    },
+    {
+      "name": "historical_identity_cannot_be_deleted_http",
+      "status": "PASS",
+      "observedStatus": 409
+    },
+    {
+      "name": "missing_timezone_rejected_http",
+      "status": "PASS",
+      "observedStatus": 422
+    },
+    {
+      "name": "reversed_interval_rejected_http",
+      "status": "PASS",
+      "observedStatus": 422
+    },
+    {
+      "name": "read_after_failures_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "failures_leave_no_partial_revision",
+      "status": "PASS"
+    },
+    {
+      "name": "same_key_changed_payload_conflict_http",
+      "status": "PASS",
+      "observedStatus": 409
+    },
+    {
+      "name": "viewer_cannot_edit_http",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "single_site_cannot_read_multi_scope_http",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "successful_annotation_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "stale_revision_fails_closed_http",
+      "status": "PASS",
+      "observedStatus": 409
+    },
+    {
+      "name": "final_snapshot_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "snapshot_profile_revision_source_provenance",
+      "status": "PASS"
+    },
+    {
+      "name": "structural_form_initially_executable",
+      "status": "PASS"
+    },
+    {
+      "name": "organization_cannot_expand_scope",
+      "status": "PASS"
+    },
+    {
+      "name": "pending_identity_blocks_other_structural_commit",
+      "status": "PASS"
+    },
+    {
+      "name": "queued_identity_stays_visible",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_identity_and_event_atomic_api",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "ui_readback_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "ui_persisted_identity_and_separate_observation",
+      "status": "PASS"
+    },
+    {
+      "name": "narrow_light_no_overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "keyboard_focus_light",
+      "status": "PASS"
+    },
+    {
+      "name": "narrow_dark_no_overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "keyboard_focus_dark",
+      "status": "PASS"
+    },
+    {
+      "name": "readonly_ui_disables_identity_commit",
+      "status": "PASS"
+    },
+    {
+      "name": "actual_three_capability_registry",
+      "status": "PASS"
+    },
+    {
+      "name": "executor_v4_and_exact_tools",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_command_0",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "ui_command_1",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "http_decisions_2",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "http_release-activations_3",
+      "status": "PASS",
+      "observedStatus": 409
+    },
+    {
+      "name": "ui_command_4",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "r1_distinct_subjects",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_command_5",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "formal_release_read_6",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_new_manifest_v2_assessment_bound",
+      "status": "PASS"
+    },
+    {
+      "name": "r1_formal_immutable_graphs_sources",
+      "status": "PASS"
+    },
+    {
+      "name": "real_sparql_observation_0",
+      "status": "PASS"
+    },
+    {
+      "name": "real_sparql_observation_1",
+      "status": "PASS"
+    },
+    {
+      "name": "real_sparql_observation_2",
+      "status": "PASS"
+    },
+    {
+      "name": "real_sparql_observation_3",
+      "status": "PASS"
+    },
+    {
+      "name": "real_sparql_observation_4",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_command_7",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "ui_evidence_reauthorized",
+      "status": "PASS"
+    },
+    {
+      "name": "cross_scope_evidence_denied",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_command_8",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "ui_command_9",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "real_mcp_http_initialize",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "real_mcp_rpc_initialize",
+      "status": "PASS"
+    },
+    {
+      "name": "real_mcp_http_tools/list",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "real_mcp_rpc_tools/list",
+      "status": "PASS"
+    },
+    {
+      "name": "mcp_exact_readonly_schemas",
+      "status": "PASS"
+    },
+    {
+      "name": "real_mcp_http_tools/call",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "real_mcp_rpc_tools/call",
+      "status": "PASS"
+    },
+    {
+      "name": "mcp_formal_result_describe_ontology",
+      "status": "PASS"
+    },
+    {
+      "name": "real_mcp_http_tools/call",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "real_mcp_rpc_tools/call",
+      "status": "PASS"
+    },
+    {
+      "name": "mcp_formal_result_resolve_entity",
+      "status": "PASS"
+    },
+    {
+      "name": "real_mcp_http_tools/call",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "real_mcp_rpc_tools/call",
+      "status": "PASS"
+    },
+    {
+      "name": "mcp_formal_result_traverse_relationships",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_command_10",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "ui_real_native_sse_tool_delta_evidence_terminal",
+      "status": "PASS"
+    },
+    {
+      "name": "actual_yarp_native_sse_media_type",
+      "status": "PASS"
+    },
+    {
+      "name": "sse_persisted_monotonic_fixed_snapshot",
+      "status": "PASS"
+    },
+    {
+      "name": "actual_last_event_id_exact_resume",
+      "status": "PASS"
+    },
+    {
+      "name": "http_execution-runs_11",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "disabled_model_durable_failure_no_tools",
+      "status": "PASS"
+    },
+    {
+      "name": "r2_new_source_saved",
+      "status": "PASS"
+    },
+    {
+      "name": "http_validations_12",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "r2_real_shacl",
+      "status": "PASS"
+    },
+    {
+      "name": "http_release-proposals_13",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "ui_command_14",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "r2_distinct_subjects",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_command_15",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "http_queries_16",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "http_queries_17",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "active_r2_and_history_r1_do_not_mix",
+      "status": "PASS"
+    },
+    {
+      "name": "existing_run_snapshot_retains_r1_after_r2",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_command_18",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "ui_command_19",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "rollback_distinct_subjects",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_command_20",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "rollback_monotonic_activation_revision",
+      "status": "PASS"
+    },
+    {
+      "name": "http_queries_21",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "rollback_query_matches_exact_r1",
+      "status": "PASS"
+    },
+    {
+      "name": "formal_release_read_22",
+      "status": "PASS"
+    },
+    {
+      "name": "rollback_preserves_r2_history",
+      "status": "PASS"
+    },
+    {
+      "name": "release_21a4a706967b42a6bfaa2c3b7c74e755_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "formal_identity_21a4a706967b42a6bfaa2c3b7c74e755_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "fixed_identity_matches_manifest_21a4a706967b42a6bfaa2c3b7c74e755",
+      "status": "PASS"
+    },
+    {
+      "name": "release_cee712316a124a7f874546194d9cca87_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "formal_identity_cee712316a124a7f874546194d9cca87_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "fixed_identity_matches_manifest_cee712316a124a7f874546194d9cca87",
+      "status": "PASS"
+    }
+  ],
+  "samples": [
+    {
+      "operation": "profile",
+      "durationMs": 2.7755839999999807,
+      "status": 200
+    },
+    {
+      "operation": "create",
+      "durationMs": 68.59233300000051,
+      "status": 200
+    },
+    {
+      "operation": "two_sites_same_external_identifier",
+      "durationMs": 137.10941700000058,
+      "status": 200
+    },
+    {
+      "operation": "idempotent_replay",
+      "durationMs": 5.111499999999978,
+      "status": 200
+    },
+    {
+      "operation": "scope_snapshot",
+      "durationMs": 39.803374999999505,
+      "status": 200
+    },
+    {
+      "operation": "adjacent_historical_identifier",
+      "durationMs": 132.3324590000002,
+      "status": 200
+    },
+    {
+      "operation": "overlapping_identifier_ambiguous",
+      "durationMs": 107.41049999999996,
+      "status": 422
+    },
+    {
+      "operation": "unknown_relation_indeterminate",
+      "durationMs": 109.41820800000005,
+      "status": 422
+    },
+    {
+      "operation": "cross_site_write_denied",
+      "durationMs": 105.72504099999969,
+      "status": 403
+    },
+    {
+      "operation": "cross_organization_write_denied",
+      "durationMs": 106.81475000000046,
+      "status": 403
+    },
+    {
+      "operation": "historical_identity_cannot_be_overwritten",
+      "durationMs": 82.07904099999996,
+      "status": 409
+    },
+    {
+      "operation": "historical_identity_cannot_be_deleted",
+      "durationMs": 85.76229200000034,
+      "status": 409
+    },
+    {
+      "operation": "missing_timezone_rejected",
+      "durationMs": 87.67508300000009,
+      "status": 422
+    },
+    {
+      "operation": "reversed_interval_rejected",
+      "durationMs": 85.47112500000003,
+      "status": 422
+    },
+    {
+      "operation": "read_after_failures",
+      "durationMs": 3.6734999999998763,
+      "status": 200
+    },
+    {
+      "operation": "same_key_changed_payload_conflict",
+      "durationMs": 2.896582999999737,
+      "status": 409
+    },
+    {
+      "operation": "viewer_cannot_edit",
+      "durationMs": 2.9294169999993755,
+      "status": 403
+    },
+    {
+      "operation": "single_site_cannot_read_multi_scope",
+      "durationMs": 3.3129170000001977,
+      "status": 403
+    },
+    {
+      "operation": "successful_annotation",
+      "durationMs": 126.07012499999928,
+      "status": 200
+    },
+    {
+      "operation": "stale_revision_fails_closed",
+      "durationMs": 2.4127920000000813,
+      "status": 409
+    },
+    {
+      "operation": "final_snapshot",
+      "durationMs": 32.89904200000001,
+      "status": 200
+    },
+    {
+      "operation": "ui_readback",
+      "durationMs": 53.317957999999635,
+      "status": 200
+    },
+    {
+      "operation": "release_21a4a706967b42a6bfaa2c3b7c74e755",
+      "durationMs": 66.72674999999799,
+      "status": 200
+    },
+    {
+      "operation": "formal_identity_21a4a706967b42a6bfaa2c3b7c74e755",
+      "durationMs": 140.93087500000183,
+      "status": 200
+    },
+    {
+      "operation": "release_cee712316a124a7f874546194d9cca87",
+      "durationMs": 84.15679100000125,
+      "status": 200
+    },
+    {
+      "operation": "formal_identity_cee712316a124a7f874546194d9cca87",
+      "durationMs": 142.44412499999817,
+      "status": 200
+    }
+  ],
+  "notRun": [
+    "Slice B impact governance",
+    "full OWL reasoning",
+    "Monaco",
+    "real LLM",
+    "Windows/Intel/production"
+  ]
+}

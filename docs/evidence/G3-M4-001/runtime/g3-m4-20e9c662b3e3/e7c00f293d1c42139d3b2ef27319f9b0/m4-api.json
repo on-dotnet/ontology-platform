@@ -1,0 +1,268 @@
+{
+  "taskId": "G3-M4-001",
+  "slice": "A",
+  "status": "PASS",
+  "phase": "explicit_identity_scope_and_time",
+  "startedAtUtc": "2026-10-30T15:23:13.424Z",
+  "completedAtUtc": "2026-10-30T15:23:15.173Z",
+  "durationMs": 1748.7496670000005,
+  "sourceHead": "c213e77b3d10014eff14ccea7ea85e120f007505",
+  "identifiers": {
+    "assetId": "21ed34422adf4c16be520fcff0d69d7c",
+    "draftId": "b5c70d733b104f7c9f5b0912d574cd21"
+  },
+  "checks": [
+    {
+      "name": "mode_unambiguous",
+      "status": "PASS"
+    },
+    {
+      "name": "profile_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "registered_current_profile_v4",
+      "status": "PASS"
+    },
+    {
+      "name": "create_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "two_sites_same_external_identifier_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "one_atomic_revision_and_unrelated_source_bytes",
+      "status": "PASS"
+    },
+    {
+      "name": "idempotent_replay_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "replay_same_revision_hashes",
+      "status": "PASS"
+    },
+    {
+      "name": "scope_snapshot_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "same_number_different_sites_not_merged",
+      "status": "PASS"
+    },
+    {
+      "name": "unknown_end_is_absent_not_infinite",
+      "status": "PASS"
+    },
+    {
+      "name": "adjacent_historical_identifier_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "overlapping_identifier_ambiguous_http",
+      "status": "PASS",
+      "observedStatus": 422
+    },
+    {
+      "name": "unknown_relation_indeterminate_http",
+      "status": "PASS",
+      "observedStatus": 422
+    },
+    {
+      "name": "cross_site_write_denied_http",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "cross_organization_write_denied_http",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "historical_identity_cannot_be_overwritten_http",
+      "status": "PASS",
+      "observedStatus": 409
+    },
+    {
+      "name": "historical_identity_cannot_be_deleted_http",
+      "status": "PASS",
+      "observedStatus": 409
+    },
+    {
+      "name": "missing_timezone_rejected_http",
+      "status": "PASS",
+      "observedStatus": 422
+    },
+    {
+      "name": "reversed_interval_rejected_http",
+      "status": "PASS",
+      "observedStatus": 422
+    },
+    {
+      "name": "read_after_failures_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "failures_leave_no_partial_revision",
+      "status": "PASS"
+    },
+    {
+      "name": "same_key_changed_payload_conflict_http",
+      "status": "PASS",
+      "observedStatus": 409
+    },
+    {
+      "name": "viewer_cannot_edit_http",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "single_site_cannot_read_multi_scope_http",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "successful_annotation_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "stale_revision_fails_closed_http",
+      "status": "PASS",
+      "observedStatus": 409
+    },
+    {
+      "name": "final_snapshot_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "snapshot_profile_revision_source_provenance",
+      "status": "PASS"
+    }
+  ],
+  "samples": [
+    {
+      "operation": "profile",
+      "durationMs": 8.280959000000166,
+      "status": 200
+    },
+    {
+      "operation": "create",
+      "durationMs": 251.3345830000003,
+      "status": 200
+    },
+    {
+      "operation": "two_sites_same_external_identifier",
+      "durationMs": 217.52349999999979,
+      "status": 200
+    },
+    {
+      "operation": "idempotent_replay",
+      "durationMs": 7.488832999999886,
+      "status": 200
+    },
+    {
+      "operation": "scope_snapshot",
+      "durationMs": 49.17162499999995,
+      "status": 200
+    },
+    {
+      "operation": "adjacent_historical_identifier",
+      "durationMs": 158.60708299999988,
+      "status": 200
+    },
+    {
+      "operation": "overlapping_identifier_ambiguous",
+      "durationMs": 109.20954200000006,
+      "status": 422
+    },
+    {
+      "operation": "unknown_relation_indeterminate",
+      "durationMs": 123.57324999999992,
+      "status": 422
+    },
+    {
+      "operation": "cross_site_write_denied",
+      "durationMs": 112.31775000000016,
+      "status": 403
+    },
+    {
+      "operation": "cross_organization_write_denied",
+      "durationMs": 107.13941599999998,
+      "status": 403
+    },
+    {
+      "operation": "historical_identity_cannot_be_overwritten",
+      "durationMs": 119.58158400000002,
+      "status": 409
+    },
+    {
+      "operation": "historical_identity_cannot_be_deleted",
+      "durationMs": 101.20041700000002,
+      "status": 409
+    },
+    {
+      "operation": "missing_timezone_rejected",
+      "durationMs": 103.40200000000004,
+      "status": 422
+    },
+    {
+      "operation": "reversed_interval_rejected",
+      "durationMs": 100.45541599999979,
+      "status": 422
+    },
+    {
+      "operation": "read_after_failures",
+      "durationMs": 4.518750000000182,
+      "status": 200
+    },
+    {
+      "operation": "same_key_changed_payload_conflict",
+      "durationMs": 3.0611670000007507,
+      "status": 409
+    },
+    {
+      "operation": "viewer_cannot_edit",
+      "durationMs": 3.165917000000263,
+      "status": 403
+    },
+    {
+      "operation": "single_site_cannot_read_multi_scope",
+      "durationMs": 3.3400830000000497,
+      "status": 403
+    },
+    {
+      "operation": "successful_annotation",
+      "durationMs": 115.77983399999994,
+      "status": 200
+    },
+    {
+      "operation": "stale_revision_fails_closed",
+      "durationMs": 3.0786669999997684,
+      "status": 409
+    },
+    {
+      "operation": "final_snapshot",
+      "durationMs": 38.038166000000274,
+      "status": 200
+    }
+  ],
+  "notRun": [
+    "UI/publication/formal query/Run/SSE/rollback",
+    "Slice B impact governance",
+    "full OWL reasoning",
+    "Monaco",
+    "real LLM",
+    "Windows/Intel/production"
+  ]
+}

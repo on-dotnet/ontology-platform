@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "taskId": "G3-M4-001",
+  "slice": "A",
+  "status": "PASS_FOR_MAIN_INTEGRATION",
+  "testedRuntimeCommit": "c213e77b3d10014eff14ccea7ea85e120f007505",
+  "runtimeInputFingerprint": "dfafc2af763e7b2e7c1117c0cf009330f1d0fc9cb692e320cc56cd0648ccf043",
+  "api": {
+    "status": "PASS",
+    "checks": 41,
+    "runId": "e7c00f293d1c42139d3b2ef27319f9b0"
+  },
+  "uiPublication": {
+    "status": "PASS",
+    "checks": 124,
+    "runId": "11840a058ceb48c89fefced4dbe13dbd",
+    "includes": [
+      "identity/time API",
+      "actual form atomic save",
+      "pending edit guard",
+      "narrow light/dark",
+      "readonly role",
+      "independent approval",
+      "PostgreSQL/Jena/RustFS",
+      "active formal query",
+      "historical Run/SSE",
+      "rollback",
+      "fixed identity source/hash read"
+    ]
+  },
+  "workspaceSmoke": {
+    "status": "PASS",
+    "checks": 11,
+    "durationMs": 3398,
+    "fault": {
+      "expected": "FAIL",
+      "observed": "FAIL",
+      "durationMs": 309,
+      "restored": "PASS"
+    }
+  },
+  "launchers": [
+    {
+      "runId": "e7c00f293d1c42139d3b2ef27319f9b0",
+      "finallyStopped": true,
+      "exitCode": 0
+    },
+    {
+      "runId": "11840a058ceb48c89fefced4dbe13dbd",
+      "finallyStopped": true,
+      "exitCode": 0
+    }
+  ],
+  "web": {
+    "status": "PASS",
+    "tests": 189,
+    "failed": 0,
+    "skipped": 0,
+    "lint": 0,
+    "typecheck": 0,
+    "productionBuild": 0
+  },
+  "backendReleaseBuild": {
+    "exitCode": 0,
+    "warnings": [
+      "existing ASPIRE010"
+    ]
+  },
+  "retainedPrewriteReader": {
+    "memberCount": 126,
+    "probeTests": 1,
+    "status": "PASS",
+    "freezeSha256": "7343311665e5e7b502bd47b7fefe8016695110079a76a02f07d9f89261d759d7"
+  },
+  "ci": "NOT_RUN",
+  "windowsIntelNative": "NOT_RUN",
+  "sliceB": "NOT_STARTED",
+  "inputBinding": "slice-a-input-binding.json",
+  "independentReview": "preflight_review: SEM c9fe5e4 plus actual c213 API/UI receipts approved for incremental main after binding explanation",
+  "semantic": {
+    "status": "PASS_COMPOSITE_215_UNIQUE",
+    "originalFullRun": {
+      "total": 214,
+      "passed": 213,
+      "failed": 1,
+      "skipped": 0
+    },
+    "unchangedPassed": 212,
+    "changedOrNewFocusedPassed": 3,
+    "note": "Original failure preserved; first31 included, never added to215. Current policy corpus19 now supports valid Instant; identical source remains blocked under exact LegacyM3 golden hash."
+  },
+  "publishing": {
+    "status": "PASS",
+    "total": 64,
+    "failed": 0,
+    "skipped": 0
+  },
+  "reviewedTestCommit": "c9fe5e47db6157751136451410fce96d8133c4a1",
+  "mainIntegration": "NOT_YET_PERFORMED_AT_COMMIT"
+}

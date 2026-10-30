@@ -1,0 +1,564 @@
+{
+  "stage": "m4-ui-oidc",
+  "status": "PASS",
+  "overallG2": "PARTIAL",
+  "checks": [
+    {
+      "name": "anonymous_authorization_before_malformed_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "anonymous_publication_proposal_prebinding_401",
+      "status": "PASS",
+      "observedStatus": 401
+    },
+    {
+      "name": "anonymous_publication_decision_prebinding_401",
+      "status": "PASS",
+      "observedStatus": 401
+    },
+    {
+      "name": "anonymous_publication_activation_prebinding_401",
+      "status": "PASS",
+      "observedStatus": 401
+    },
+    {
+      "name": "operator-ab_real_http_only_session",
+      "status": "PASS"
+    },
+    {
+      "name": "operator-ab_csrf",
+      "status": "PASS"
+    },
+    {
+      "name": "viewer-ab_real_http_only_session",
+      "status": "PASS"
+    },
+    {
+      "name": "viewer-ab_csrf",
+      "status": "PASS"
+    },
+    {
+      "name": "viewer-ab_real_http_only_session",
+      "status": "PASS"
+    },
+    {
+      "name": "viewer-ab_csrf",
+      "status": "PASS"
+    },
+    {
+      "name": "viewer-a_real_http_only_session",
+      "status": "PASS"
+    },
+    {
+      "name": "viewer-a_csrf",
+      "status": "PASS"
+    },
+    {
+      "name": "auditor-ab_real_http_only_session",
+      "status": "PASS"
+    },
+    {
+      "name": "auditor-ab_csrf",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_mode_unambiguous",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_profile_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_registered_current_profile_v4",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_create_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_two_sites_same_external_identifier_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_one_atomic_revision_and_unrelated_source_bytes",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_idempotent_replay_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_replay_same_revision_hashes",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_scope_snapshot_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_same_number_different_sites_not_merged",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_unknown_end_is_absent_not_infinite",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_adjacent_historical_identifier_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_overlapping_identifier_ambiguous_http",
+      "status": "PASS",
+      "observedStatus": 422
+    },
+    {
+      "name": "m4_unknown_relation_indeterminate_http",
+      "status": "PASS",
+      "observedStatus": 422
+    },
+    {
+      "name": "m4_cross_site_write_denied_http",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "m4_cross_organization_write_denied_http",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "m4_historical_identity_cannot_be_overwritten_http",
+      "status": "PASS",
+      "observedStatus": 409
+    },
+    {
+      "name": "m4_historical_identity_cannot_be_deleted_http",
+      "status": "PASS",
+      "observedStatus": 409
+    },
+    {
+      "name": "m4_missing_timezone_rejected_http",
+      "status": "PASS",
+      "observedStatus": 422
+    },
+    {
+      "name": "m4_reversed_interval_rejected_http",
+      "status": "PASS",
+      "observedStatus": 422
+    },
+    {
+      "name": "m4_read_after_failures_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_failures_leave_no_partial_revision",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_same_key_changed_payload_conflict_http",
+      "status": "PASS",
+      "observedStatus": 409
+    },
+    {
+      "name": "m4_viewer_cannot_edit_http",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "m4_single_site_cannot_read_multi_scope_http",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "m4_successful_annotation_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_stale_revision_fails_closed_http",
+      "status": "PASS",
+      "observedStatus": 409
+    },
+    {
+      "name": "m4_final_snapshot_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_snapshot_profile_revision_source_provenance",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_structural_form_initially_executable",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_organization_cannot_expand_scope",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_pending_identity_blocks_other_structural_commit",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_queued_identity_stays_visible",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_ui_identity_and_event_atomic_api",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_ui_readback_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_ui_persisted_identity_and_separate_observation",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_narrow_light_no_overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_keyboard_focus_light",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_narrow_dark_no_overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_keyboard_focus_dark",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_readonly_ui_disables_identity_commit",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_actual_three_capability_registry",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_executor_v4_and_exact_tools",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_ui_command_0",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_ui_command_1",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_http_decisions_2",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "m4_http_release-activations_3",
+      "status": "PASS",
+      "observedStatus": 409
+    },
+    {
+      "name": "m4_ui_command_4",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_r1_distinct_subjects",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_ui_command_5",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_formal_release_read_6",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_m1_new_manifest_v2_assessment_bound",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_r1_formal_immutable_graphs_sources",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_real_sparql_observation_0",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_real_sparql_observation_1",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_real_sparql_observation_2",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_real_sparql_observation_3",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_real_sparql_observation_4",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_ui_command_7",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_ui_evidence_reauthorized",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_cross_scope_evidence_denied",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_ui_command_8",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_ui_command_9",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_real_mcp_http_initialize",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_real_mcp_rpc_initialize",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_real_mcp_http_tools/list",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_real_mcp_rpc_tools/list",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_mcp_exact_readonly_schemas",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_real_mcp_http_tools/call",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_real_mcp_rpc_tools/call",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_mcp_formal_result_describe_ontology",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_real_mcp_http_tools/call",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_real_mcp_rpc_tools/call",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_mcp_formal_result_resolve_entity",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_real_mcp_http_tools/call",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_real_mcp_rpc_tools/call",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_mcp_formal_result_traverse_relationships",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_ui_command_10",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_ui_real_native_sse_tool_delta_evidence_terminal",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_actual_yarp_native_sse_media_type",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_sse_persisted_monotonic_fixed_snapshot",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_actual_last_event_id_exact_resume",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_http_execution-runs_11",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_disabled_model_durable_failure_no_tools",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_r2_new_source_saved",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_http_validations_12",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_r2_real_shacl",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_http_release-proposals_13",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_ui_command_14",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_r2_distinct_subjects",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_ui_command_15",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_http_queries_16",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_http_queries_17",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_active_r2_and_history_r1_do_not_mix",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_existing_run_snapshot_retains_r1_after_r2",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_ui_command_18",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_ui_command_19",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_rollback_distinct_subjects",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_ui_command_20",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_rollback_monotonic_activation_revision",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_http_queries_21",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_rollback_query_matches_exact_r1",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_formal_release_read_22",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_rollback_preserves_r2_history",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_release_21a4a706967b42a6bfaa2c3b7c74e755_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_formal_identity_21a4a706967b42a6bfaa2c3b7c74e755_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_fixed_identity_matches_manifest_21a4a706967b42a6bfaa2c3b7c74e755",
+      "status": "PASS"
+    },
+    {
+      "name": "m4_release_cee712316a124a7f874546194d9cca87_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_formal_identity_cee712316a124a7f874546194d9cca87_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m4_fixed_identity_matches_manifest_cee712316a124a7f874546194d9cca87",
+      "status": "PASS"
+    }
+  ],
+  "failure": null,
+  "notRun": [
+    "remaining full-chain gates",
+    "final regression and CI"
+  ]
+}

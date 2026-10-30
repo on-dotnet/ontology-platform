@@ -1,0 +1,25 @@
+{
+  "testedRuntimeCommit": "c213e77b3d10014eff14ccea7ea85e120f007505",
+  "reviewedTestMergeCommit": "dd70b9f8c0e84cb66f68479938581af5d7a8f54f",
+  "changedPaths": [
+    "backend/tests/OntologyPlatform.PublishingTests/G3M4PublishingTests.cs",
+    "backend/tests/OntologyPlatform.SemanticTests/G3BoundaryTests.cs",
+    "backend/tests/OntologyPlatform.SemanticTests/G3M4IdentityTimeTests.cs",
+    "backend/tests/OntologyPlatform.SemanticTests/G3M4ServiceTests.cs",
+    "docs/evidence/G3-M4-001/SEM/diff-check-normalization.json",
+    "docs/evidence/G3-M4-001/SEM/efficiency-observed.json",
+    "docs/evidence/G3-M4-001/SEM/profile-v3-golden.txt",
+    "docs/evidence/G3-M4-001/SEM/publishing-full-v4.json",
+    "docs/evidence/G3-M4-001/SEM/publishing-full-v4.txt",
+    "docs/evidence/G3-M4-001/SEM/second-test-slice-summary.json",
+    "docs/evidence/G3-M4-001/SEM/second-test-slice.md",
+    "docs/evidence/G3-M4-001/SEM/second-tests-build.txt",
+    "docs/evidence/G3-M4-001/SEM/semantic-corpus-v4-fix.json",
+    "docs/evidence/G3-M4-001/SEM/semantic-corpus-v4-fix.txt",
+    "docs/evidence/G3-M4-001/SEM/semantic-full-v4.json",
+    "docs/evidence/G3-M4-001/SEM/semantic-full-v4.txt",
+    "docs/evidence/G3-M4-001/SEM/timeline.jsonl"
+  ],
+  "applicationSourceLocksBuildScriptsAndContractsUnchanged": true,
+  "reason": "Only independently executed test additions/current-policy expectation corrections and evidence differ; current runtime API/UI gates remain bound to exact unchanged product inputs. New test outputs bind to SEM c9fe5e4, whose backend/src diff against4377 is empty. No unchanged complete gate repeated."
+}

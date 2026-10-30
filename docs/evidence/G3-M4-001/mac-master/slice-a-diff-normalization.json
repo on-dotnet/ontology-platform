@@ -1,0 +1,16 @@
+{
+  "command": "git diff --cached --check",
+  "exitCode": 2,
+  "category": "DISPLAY_LOG_TRAILING_WHITESPACE",
+  "paths": [
+    "docs/evidence/G3-M4-001/mac-master/slice-a-web.txt"
+  ],
+  "lines": [
+    23,
+    24,
+    25
+  ],
+  "rawEvidenceSha256": "aa7ef3150a38db7668dee26c8eff490a15bb532f6fef5493383746f53e4985d8",
+  "rawCommandLog": ".tools/m4-slice-a-web.log (ignored, preserved)",
+  "correction": "Strip display-only trailing whitespace per line; real 189/0/0 and production build outcomes unchanged; final diff-check rerun required."
+}

@@ -1,0 +1,2175 @@
+{
+  "schemaVersion": 1,
+  "commit": "c213e77b3d10014eff14ccea7ea85e120f007505",
+  "inputFingerprint": "dfafc2af763e7b2e7c1117c0cf009330f1d0fc9cb692e320cc56cd0648ccf043",
+  "inputCount": 541,
+  "algorithm": "SHA256(concat for lexicographically sorted POSIX regular-file paths: UTF8(path) + NUL + raw SHA256(blob)). Exclude docs/evidence/, docs/tasks/, docs/handoffs/, docs/development/ and links/submodules. Observed untracked files outside these prefixes: NONE at gate start. Working-file wrapper and immutable Git objects independently agree.",
+  "innerRuntimeTimelineFingerprint": "473baa1e955b9d7df529f0507ab037ea36a2b6659dfb1d4d5e9fbbe5dd611d5b",
+  "innerAlgorithm": "SHA256(ASCII sourceHead); identifies committed launcher selection only, distinct from outer complete input fingerprint.",
+  "inputs": [
+    {
+      "path": ".codex/agents/explorer.toml",
+      "sha256": "5f934728afd3bd6e0a8fddd2a239f97fb82b899a662de4549c775a218acbb4f7"
+    },
+    {
+      "path": ".codex/agents/platform_worker.toml",
+      "sha256": "fa489a4dbb301ef590a8025348c931724c095cb61ef01541fd57607aaeab8e06"
+    },
+    {
+      "path": ".codex/agents/quality_reviewer.toml",
+      "sha256": "52ebdcb768af7968601be2af1e1c7efc7e3d63fb6fd6256d3c268cdbbdaf82d6"
+    },
+    {
+      "path": ".codex/config.toml",
+      "sha256": "af00171d0ae3470aa41fb82e4165d91e5871e912d635e7545f9dc8f4a7752fc9"
+    },
+    {
+      "path": ".config/dotnet-tools.json",
+      "sha256": "eaea32d0eea34e6d61dede69d3f0272f1d73e77c988b034fd0bea3043ce5e031"
+    },
+    {
+      "path": ".dockerignore",
+      "sha256": "0883fe45b65a734b95a9bd45f232706490cd3ca30e1ffdad191dec058382f354"
+    },
+    {
+      "path": ".editorconfig",
+      "sha256": "1f838988a09e5d5f6283063a12b554351eaf5189513f55b204ca338a4dec3549"
+    },
+    {
+      "path": ".env.example",
+      "sha256": "129e6510ec93b96c41be71a2b4cb8ba14bfefc0d6e533b98d5cbc1bd46900765"
+    },
+    {
+      "path": ".gitattributes",
+      "sha256": "2c2d77e1018570f4a62c3c39481be0cb10252e4048cafbd43441523cda92ef6f"
+    },
+    {
+      "path": ".github/CODEOWNERS",
+      "sha256": "f5e32cad135d952dc14ad6b6186b0e24b3600b5f1946f4882a7e14a6f64934b2"
+    },
+    {
+      "path": ".github/ISSUE_TEMPLATE/task.md",
+      "sha256": "d757a48c9dbeed86a80d17f767656a9a2da2804974753c3e3e5eee641c554138"
+    },
+    {
+      "path": ".github/pull_request_template.md",
+      "sha256": "3d4ff5e36356128153c92918b5d759969b3770384bf4c0cbdd3ac2d5380bb694"
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "sha256": "125e31e1af0f7def8cda31a98370597e64df73023d28ca10722a82a3d6e31546"
+    },
+    {
+      "path": ".gitignore",
+      "sha256": "ec35fb52df40dd553e23251957dbfe8e76901ce4571fe0c1602a78925b54b011"
+    },
+    {
+      "path": ".node-version",
+      "sha256": "d9f318747a126ce2247661af67852b185def7789492eabfad7bba322be087c33"
+    },
+    {
+      "path": "AGENTS.md",
+      "sha256": "874398bccffde5fb4f7902d01f18c1c36f63784233f6d543de0a69c4056a527f"
+    },
+    {
+      "path": "Directory.Build.props",
+      "sha256": "720ef39405d3a628d3b26c6e0688329cdd02ca08e454f35545e36881ae663b8f"
+    },
+    {
+      "path": "Directory.Packages.props",
+      "sha256": "f73a1444263faf31bb1419ad5112d748475be0b73f63e5ac6f03e0b8c8643221"
+    },
+    {
+      "path": "NuGet.Config",
+      "sha256": "cb93c65e28718aa9075fce221e9f9cea9e72d3fe1b30462383448a591f5b3aa1"
+    },
+    {
+      "path": "PLANS.md",
+      "sha256": "da40ebb04933e6b3699d186a09ab67b84c143c0e814a59870cbae06a4960e5e3"
+    },
+    {
+      "path": "README.md",
+      "sha256": "d75840ea84690f7152e1a4f63a7defb8aa83b7c2a242f9f2b634e6049cccaca1"
+    },
+    {
+      "path": "apps/web/.gitignore",
+      "sha256": "290706b0480a4f9e55cd9c3d08a60f3e4ec7f3d2fc2ad750f21257d372e83cfe"
+    },
+    {
+      "path": "apps/web/AGENTS.md",
+      "sha256": "aab2517964698e68a59c464feab33e0cb9b0b2f5f4bff30000bca0c05e748f80"
+    },
+    {
+      "path": "apps/web/eslint.config.mjs",
+      "sha256": "0c9e2f6635a1999b8a1c45a1f66bca03b37587720ffbde41cd2417e95b95a45e"
+    },
+    {
+      "path": "apps/web/next-env.d.ts",
+      "sha256": "1862ac4bbbc5192d4bf562161df66ea547ed3e67173100656ab606ae9797db2b"
+    },
+    {
+      "path": "apps/web/next.config.ts",
+      "sha256": "7eba77a1bee720ae17a4df36386ea1351c3d1ec624106af44efe37e40057bd54"
+    },
+    {
+      "path": "apps/web/package.json",
+      "sha256": "6f3cdb23fee359047d8447b37e16fddbca281598af1b2c0b9a9015669092425c"
+    },
+    {
+      "path": "apps/web/playwright.config.ts",
+      "sha256": "abdf4fe2cb8e891a515f9045d3d38bb8269f745381c6645039359f9c39613bfa"
+    },
+    {
+      "path": "apps/web/playwright.oidc.config.ts",
+      "sha256": "f1f18c460e88971304a79cabcd10ca91b49c78ecf1307171af9ba10d04ca7fcb"
+    },
+    {
+      "path": "apps/web/postcss.config.mjs",
+      "sha256": "b783348d5618047d0f37e12acd15c5a2c5f02809d8711e0764c9cea52750346c"
+    },
+    {
+      "path": "apps/web/scripts/generate-types.mjs",
+      "sha256": "9402cc3e0e7dfdd66b9ca10638b49a37e3c8e64eeb060bb800f9d05faaed6fe1"
+    },
+    {
+      "path": "apps/web/scripts/openapi-types.mjs",
+      "sha256": "4a03017a1e3c28e5bf27a24476d96e2719b13193bebad03b9e468fd9734ace57"
+    },
+    {
+      "path": "apps/web/scripts/run-oidc-tests.mjs",
+      "sha256": "87ec8cd2b4b68d01c75002aacc9b69548afb26ee91e80350ebac2c587a07d4e2"
+    },
+    {
+      "path": "apps/web/src/app/analysis/page.tsx",
+      "sha256": "162c98228c8447d22e3e034ae9eb25025c849ea61fe2f8464074da13e559b18e"
+    },
+    {
+      "path": "apps/web/src/app/error.tsx",
+      "sha256": "a91e65fcd01e7dd61be7983a428cc2326975dec5ae14f83b95fc51d234410e0c"
+    },
+    {
+      "path": "apps/web/src/app/icon.svg",
+      "sha256": "2c296a481033ea56f2ee22caa087149a93e4df92fe307ca6c9774de8cd4cbd98"
+    },
+    {
+      "path": "apps/web/src/app/layout.tsx",
+      "sha256": "6e78814bc59459d0a60e9c65283ae3622062a887a0e713a453c50a53bbad7788"
+    },
+    {
+      "path": "apps/web/src/app/loading.tsx",
+      "sha256": "a2fcf405e5af426d2202823d85df19d1b39f884c25cb0574fcb9ccb60ed17860"
+    },
+    {
+      "path": "apps/web/src/app/ontologies/page.tsx",
+      "sha256": "227767e9ae7690150b0a0303bb6b8432aea1183363cb4243f1ac116138f157a4"
+    },
+    {
+      "path": "apps/web/src/app/page.tsx",
+      "sha256": "a896fc41ffd72038d76424fa6c815bb67572358a79b70a1d70f487460fea4ccd"
+    },
+    {
+      "path": "apps/web/src/app/releases/page.tsx",
+      "sha256": "eb2be0e0213a1511841d52f639d7454b62dbf45d634a7b45b94516179dc571e2"
+    },
+    {
+      "path": "apps/web/src/app/signed-out/page.tsx",
+      "sha256": "dbf8f164069d254149573652eb92b95ba814e1a8445925e2ae7d1597a203f857"
+    },
+    {
+      "path": "apps/web/src/components/ui/icon.tsx",
+      "sha256": "27a81c4bc576dea07c655ba0ac8dd9f1933f472805a64cb6c3e1b3a38d238240"
+    },
+    {
+      "path": "apps/web/src/components/ui/resource-dialog.tsx",
+      "sha256": "65e72cf09a898d2394501dbdde8e37546d88710aa13062ec60a3c3592b5377bd"
+    },
+    {
+      "path": "apps/web/src/components/ui/semantic-feedback.test.ts",
+      "sha256": "3f60e2ece4f10226e23989ed055cf6850b7700a0d72a367b226b702bd577db13"
+    },
+    {
+      "path": "apps/web/src/components/ui/semantic-feedback.tsx",
+      "sha256": "74c9334814cd18d3defe932af0bf83c37ed232e50823aeb15e892174e3faf952"
+    },
+    {
+      "path": "apps/web/src/features/agent/event-schema.ts",
+      "sha256": "164c4fd0b0eda55ae5ca016719dd4c37c186c1daea124bd89b10ac2e0d549c2b"
+    },
+    {
+      "path": "apps/web/src/features/agent/event-stream.test.ts",
+      "sha256": "a8d067d7dfb6a7b71a38cc8f3e78d97520b54ae8120c6de65fe332072b6362e5"
+    },
+    {
+      "path": "apps/web/src/features/agent/event-stream.ts",
+      "sha256": "7868d711086c997c6f6249b53f7cd832fe793d0d89d3b0b0112f2110c7e1f0e7"
+    },
+    {
+      "path": "apps/web/src/features/agent/run-workspace.tsx",
+      "sha256": "f9fc2ca5225131953225b41908353b7a088dfff1c89c16758a19a65449780782"
+    },
+    {
+      "path": "apps/web/src/features/ontology/assessment-panel.tsx",
+      "sha256": "b6cf5190405e0c95188a5a94b9529ff093c2ebb80fd8278236213e56824b8912"
+    },
+    {
+      "path": "apps/web/src/features/ontology/diagnostic-card.tsx",
+      "sha256": "10330847df080df79bea823b14c99bd9c3d679a93111720e39423266246611f7"
+    },
+    {
+      "path": "apps/web/src/features/ontology/draft-state.test.ts",
+      "sha256": "95b7cbcd311fb1f73d406302f26cc385f7e93a16b3c3f186337b2102a0e6bc09"
+    },
+    {
+      "path": "apps/web/src/features/ontology/draft-state.ts",
+      "sha256": "5b00df5de0824a314f91033103ca1eaa2997014e71d6ab56e1784504566c0d2c"
+    },
+    {
+      "path": "apps/web/src/features/ontology/entity-tree.tsx",
+      "sha256": "a0c8628829f4187caaf00eb279f74de09ab14a453fb189d5dbbb18ed5360cadc"
+    },
+    {
+      "path": "apps/web/src/features/ontology/identity-time-model.test.ts",
+      "sha256": "4ee0caf429b7a0527a2dc68dad345965b477c692aa8e41f7a8b5fca904a0ec15"
+    },
+    {
+      "path": "apps/web/src/features/ontology/identity-time-model.ts",
+      "sha256": "708c6d1ebd50302e8ac2904a492fef121403f130f1ca7c9c38d60d3d5414ad5f"
+    },
+    {
+      "path": "apps/web/src/features/ontology/identity-time-views.test.ts",
+      "sha256": "d682f00d1d11b9f09c02fc842d8db93eb3e82da43cc021d2a240993d9128bb56"
+    },
+    {
+      "path": "apps/web/src/features/ontology/identity-time-workbench.tsx",
+      "sha256": "9cb7bc48d5dd71ff7ae9711bbd303d2e66ed1091c33360838e4c8d49afc2cf9d"
+    },
+    {
+      "path": "apps/web/src/features/ontology/m1-behavior.test.ts",
+      "sha256": "63633299c70b9cde17d99175fdc8f74e09027301a04a90351f0e96fd2405a018"
+    },
+    {
+      "path": "apps/web/src/features/ontology/m1-views.test.ts",
+      "sha256": "743fccab68633847b9e17d3b0c288f013c7ca5a819292361b91e9ebc08382e18"
+    },
+    {
+      "path": "apps/web/src/features/ontology/m2-diagnostics.test.ts",
+      "sha256": "e9deaa61be7e9fe728a19cca5e7f72e5f8740066fd32d5c15c479849a1ac0914"
+    },
+    {
+      "path": "apps/web/src/features/ontology/m2-structure.test.ts",
+      "sha256": "e12d27a5aba1cb134adbb9ede591487350949edcb8eebd184a2d73ace842e585"
+    },
+    {
+      "path": "apps/web/src/features/ontology/m2-workbench.test.ts",
+      "sha256": "b89ee4fdd57918152de29a988ebd462f313e348a6f4c9573cc89df521b5effbd"
+    },
+    {
+      "path": "apps/web/src/features/ontology/released-identity-time.tsx",
+      "sha256": "420cd919d8a2bbb6d74feb199b43312ecbb194ec546149a09363769fd3075a6d"
+    },
+    {
+      "path": "apps/web/src/features/ontology/released-vocabulary.tsx",
+      "sha256": "d8bfc3d28ad3fd541e77c77cc96d8c8f3724d2da55d479d3ab74be4440867162"
+    },
+    {
+      "path": "apps/web/src/features/ontology/semantic-graph.tsx",
+      "sha256": "2634cdb087e7b808206b0a9398a61e46d9f8e935044df24385051c892d47c020"
+    },
+    {
+      "path": "apps/web/src/features/ontology/semantic-status.ts",
+      "sha256": "c55f51067d2d358f915e013ae5dfad42935b9cdcf1370d7fe76bd53fb793350a"
+    },
+    {
+      "path": "apps/web/src/features/ontology/server-page.tsx",
+      "sha256": "74880ef3156e7d9e493f1e59aaacc30a7cb44545076aacb00f059274cac01a00"
+    },
+    {
+      "path": "apps/web/src/features/ontology/source-bytes.test.ts",
+      "sha256": "cd3d2123a6c9a86ec17c006506f735db24b13304a1564ef29050df92e78e177a"
+    },
+    {
+      "path": "apps/web/src/features/ontology/source-bytes.ts",
+      "sha256": "d09c406115f0d0c6a771451f37af6b20707b1cc0f6951b232fda6cf4de0812af"
+    },
+    {
+      "path": "apps/web/src/features/ontology/source-editor.tsx",
+      "sha256": "c5d1b2323d655fdda356027a98dcd4b7fa0065b68a74cc86e45dcb3436a5eafa"
+    },
+    {
+      "path": "apps/web/src/features/ontology/source-import-race.test.ts",
+      "sha256": "5f2ff2cfc0ceb9ccc76e518b772575178592ed052d914cfcf05422e99df36f1a"
+    },
+    {
+      "path": "apps/web/src/features/ontology/source-import.ts",
+      "sha256": "297442151b9363c654c781b3c29b3addd206739d85f0f441388e1e59b091b3eb"
+    },
+    {
+      "path": "apps/web/src/features/ontology/structural-edit.ts",
+      "sha256": "efbc1a1dbf9d24af2191a41b943b338a7f9ba51bef63e226eb29d78c82b6721f"
+    },
+    {
+      "path": "apps/web/src/features/ontology/structural-form.tsx",
+      "sha256": "dbbf670b9ac8e4c2b99ed07d7555b05779b58ba43670d9f86934ed94af2764f3"
+    },
+    {
+      "path": "apps/web/src/features/ontology/support-profile.tsx",
+      "sha256": "f754bf06dbc41d8e8aa0333301215582185e319d432ee33310dcee0871deca98"
+    },
+    {
+      "path": "apps/web/src/features/ontology/version-comparison.tsx",
+      "sha256": "7b8711cee23323481ae93089b03dc20bca574aa4df4dc9c9d62415b273cebd42"
+    },
+    {
+      "path": "apps/web/src/features/ontology/vocabulary-model.test.ts",
+      "sha256": "041a35d0cd957a4722d6ab3e25c46d94c121d72a1623487d17b9fdfd2ea3c71d"
+    },
+    {
+      "path": "apps/web/src/features/ontology/vocabulary-model.ts",
+      "sha256": "fbfdd608bd40613aca4d004525a1ad8eb1fd8b8b66cf76a0c1818a4e0c2855bf"
+    },
+    {
+      "path": "apps/web/src/features/ontology/vocabulary-views.test.ts",
+      "sha256": "9c6bccbdd2bc06bd8b9add20c994711d7bb88e2d8c9ae6d08ede3a5de8024123"
+    },
+    {
+      "path": "apps/web/src/features/ontology/vocabulary-workbench.tsx",
+      "sha256": "a58bff1828e0155082fff6f3f406dc73c7c16218dd7a4e39a586befa13a9c51d"
+    },
+    {
+      "path": "apps/web/src/features/ontology/workspace-state.test.ts",
+      "sha256": "785f18f8a93792b138695889401638fac321ce09ebf03c6e740077dbfdcf2e88"
+    },
+    {
+      "path": "apps/web/src/features/ontology/workspace-state.ts",
+      "sha256": "322bb74cc89f76c1be697ddb6a849b0d3f5a22b7919ce0e53f838da6fa3b90d8"
+    },
+    {
+      "path": "apps/web/src/features/ontology/workspace.css",
+      "sha256": "783e3b8d80c7af84fae4a54da3173bc6b0cec36eb0cf12db5134446b2550c0ec"
+    },
+    {
+      "path": "apps/web/src/features/ontology/workspace.tsx",
+      "sha256": "e472cc6232a42c457aaf4126d46f87da89940d09b2a27d062984ff4e0a65aca5"
+    },
+    {
+      "path": "apps/web/src/features/platform/workspace.tsx",
+      "sha256": "619d9a7a3f8cee4b937dc64d3d94f6c82d146abb2970ac359a167c729a189eda"
+    },
+    {
+      "path": "apps/web/src/features/publishing/review.tsx",
+      "sha256": "5652d77bbfad020f88e82d8708de9a611add7ff237dcbe4acd15666836afcd64"
+    },
+    {
+      "path": "apps/web/src/features/semantic/query-workspace.tsx",
+      "sha256": "fed62ac63db4d568d8bd3e2b28d056bb6d3ea14d054b580ad7b1f2f3947bcd88"
+    },
+    {
+      "path": "apps/web/src/lib/api/client.test.ts",
+      "sha256": "d0b18711aaf83c1b5b17e9aad5de89a60c578bfcfc67d364928263605f4cc27a"
+    },
+    {
+      "path": "apps/web/src/lib/api/client.ts",
+      "sha256": "b318141881b3798729f190cc5a316b542c8666d966325378daa14b652ab242d9"
+    },
+    {
+      "path": "apps/web/src/lib/api/g2-client.test.ts",
+      "sha256": "39d2bb512c2238626a0a48e6f5dd3e4d500366e70cedd5959343676de4c2485c"
+    },
+    {
+      "path": "apps/web/src/lib/api/g2-client.ts",
+      "sha256": "1237de4938ae1550713fda4324b74b98421a1ee80297fbe047044020dfaffea2"
+    },
+    {
+      "path": "apps/web/src/lib/api/g2-generated.ts",
+      "sha256": "652ce6e81019cc452adf7c206ec7530a042b514db73077825928c30d24d399b7"
+    },
+    {
+      "path": "apps/web/src/lib/api/generated.ts",
+      "sha256": "725dc4b85709aac229b6743e5f5309d981e7a6a8a46a06212206acf1a71e918d"
+    },
+    {
+      "path": "apps/web/src/lib/api/openapi-types.test.ts",
+      "sha256": "c63b6217828d5663307186420c8ef819f16a6780772a567a4bb420cd28975984"
+    },
+    {
+      "path": "apps/web/src/lib/api/server-config.ts",
+      "sha256": "adb1351d153c383fbac3c9966981cb9c1f011482d643379f4a03bac2ea218beb"
+    },
+    {
+      "path": "apps/web/src/styles/globals.css",
+      "sha256": "383b2a88b09ec5eaca5d5d70f59ef27ccf714f7c2b9ce7b868512a36f1fe7233"
+    },
+    {
+      "path": "apps/web/tests/fixture-server.mjs",
+      "sha256": "b2f8c5887694f3ee45ef0567cb101ca115878eca80ea17f532db263fe32f20a3"
+    },
+    {
+      "path": "apps/web/tests/g2/fixture-server.mjs",
+      "sha256": "e4fccc951088d96089478dc1e51483e27aabfee7d0238f428ede141731a14ff7"
+    },
+    {
+      "path": "apps/web/tests/g2/lifecycle.spec.ts",
+      "sha256": "1f4a58b5daab3ac70e145726c4049ca19d512a76d2e00ce698893f9ef155db7d"
+    },
+    {
+      "path": "apps/web/tests/g2/long-layout.spec.ts",
+      "sha256": "b7ba29e7f22f8b895f534c7eab0ee8b3b3ea577db68a5780aa36cebc840630e1"
+    },
+    {
+      "path": "apps/web/tests/g2/m3-vocabulary.spec.ts",
+      "sha256": "76ac94ec73b10aaa56bc815c2446cb21dddf1adb4318bc202901c047e1b1bb86"
+    },
+    {
+      "path": "apps/web/tests/g2/playwright.config.ts",
+      "sha256": "cacc5323cd2f8aad3a00ab76a91c63d56d8dd7763c934432e3a414695824b1b6"
+    },
+    {
+      "path": "apps/web/tests/g2/workspace.spec.ts",
+      "sha256": "dca771eed41ddf39542bb83b8d8b007fa442582fd1e1e7ffb18ff1b7b22320fa"
+    },
+    {
+      "path": "apps/web/tests/oidc/auth.spec.ts",
+      "sha256": "75c1ed1713aa3791703a3ea1297107a0465c813a92659e4aa7995a2bcf16ba46"
+    },
+    {
+      "path": "apps/web/tests/oidc/safe-reporter.ts",
+      "sha256": "ab06ffc2f56501e1daa6b43f4b4ac02d2bb1ed3d2e87624835029526296e45fb"
+    },
+    {
+      "path": "apps/web/tests/ui/workspace.spec.ts",
+      "sha256": "13d72c0d0149246d11e7ece82384bc06d037e734018bb7c024e0f08387bf506e"
+    },
+    {
+      "path": "apps/web/tsconfig.json",
+      "sha256": "5e84bc0c9bf901d0c2af53c37e00e4bd0704739deafb086fb9a9162ad8258f18"
+    },
+    {
+      "path": "apps/web/vitest.config.ts",
+      "sha256": "d41e78be6eb331a48fbb85ebbaf4ae3ea4e65260f80f357744e6f42d6049e55f"
+    },
+    {
+      "path": "backend/AGENTS.md",
+      "sha256": "e722c538fc586494b89b9922fc1188c70fa8a9dbfc15684805f4dd310c5cf648"
+    },
+    {
+      "path": "backend/OntologyPlatform.slnx",
+      "sha256": "be1e3759253c11db6a4c3f0f1206ca4f690d9113df86c2695bc71f66faf67543"
+    },
+    {
+      "path": "backend/src/AppHost/CanonicalFusekiImage.cs",
+      "sha256": "1056edc3711ee2dd604d7b42803947abaa6aa9ae58e8081f2b31986fb5281b02"
+    },
+    {
+      "path": "backend/src/AppHost/DevelopmentInfrastructure.cs",
+      "sha256": "5d8f76f30c95e9afc0970b582d39efcbd3edd697ece3ad3dc358ac3fd7749f01"
+    },
+    {
+      "path": "backend/src/AppHost/G2Infrastructure.cs",
+      "sha256": "cd58c79f68eb7ce5b1d870b4e18334c0aa92f55664436ee4402bacb3203406be"
+    },
+    {
+      "path": "backend/src/AppHost/OntologyPlatform.AppHost.csproj",
+      "sha256": "c4af0d4e0db2383c5eb29a7e455150221bb4cab35420ab73cc6eaf5102c719ee"
+    },
+    {
+      "path": "backend/src/AppHost/Program.cs",
+      "sha256": "4fc3e2f17dc039a2db04af873b9da962c1bdbd4e47ddfe264de34a469aa962b9"
+    },
+    {
+      "path": "backend/src/AppHost/Properties/launchSettings.json",
+      "sha256": "21b395037bc6353aace032984ec5fa963be1cc0221e699ff632bbeed5644a5c1"
+    },
+    {
+      "path": "backend/src/AppHost/ResourceLifecycle.cs",
+      "sha256": "7b4b9613fedb032a830296d0a5ebfb78839fcf137e6ab5fa306fd64542341de9"
+    },
+    {
+      "path": "backend/src/AppHost/Wave2Infrastructure.cs",
+      "sha256": "72b4caf3553c0986da54bc42bd26fdddd9f1a880113918dbceabb6cf663dd8a5"
+    },
+    {
+      "path": "backend/src/AppHost/packages.linux-x64.lock.json",
+      "sha256": "471da805b230676ec198a3c92882899a223831bb87fc4083f51b0fbb205dae88"
+    },
+    {
+      "path": "backend/src/AppHost/packages.osx-arm64.lock.json",
+      "sha256": "11da2cad657005538d213939cb753d7e3c2be7068a344762a4c9622f9dab97e4"
+    },
+    {
+      "path": "backend/src/AppHost/packages.win-x64.lock.json",
+      "sha256": "058d3eb1cda5283f51e0b63eb5fc6b1b765f1b9b587a702df56ddd37c9bb923b"
+    },
+    {
+      "path": "backend/src/Contracts/OntologyPlatform.Contracts/G2Models.g.cs",
+      "sha256": "563c4cf2936ee2e946d6421f9d13b775b04f3a7a7797e65c7b57f8bc221b6580"
+    },
+    {
+      "path": "backend/src/Contracts/OntologyPlatform.Contracts/G2Services.cs",
+      "sha256": "599804cd43b693d7b7390d384464ac6d937e696356ec53f8825c8e4e6b1d4495"
+    },
+    {
+      "path": "backend/src/Contracts/OntologyPlatform.Contracts/G2WireRules.cs",
+      "sha256": "9a96c31036466c8732075c67e37c05b1ca8a742514122bb9fa2b54b96a7ca1df"
+    },
+    {
+      "path": "backend/src/Contracts/OntologyPlatform.Contracts/G3IdentityTimeServices.cs",
+      "sha256": "f2a260e6c36247a4871e764680501d6219b9af7a71dc47b97d1cd2c9b6145492"
+    },
+    {
+      "path": "backend/src/Contracts/OntologyPlatform.Contracts/G3Services.cs",
+      "sha256": "9d610be7a6cc8ce8a82212a052ca44e510171d414f51b112dd2c92d86af42c25"
+    },
+    {
+      "path": "backend/src/Contracts/OntologyPlatform.Contracts/G3VocabularyServices.cs",
+      "sha256": "0a1b4dfa821076507b8b3a1dc61fca31ba528f0c1ac30105c2c9467f6bb87516"
+    },
+    {
+      "path": "backend/src/Contracts/OntologyPlatform.Contracts/OntologyPlatform.Contracts.csproj",
+      "sha256": "8d654c44b7bebb6b31a9f2f606927f45b5072193adc4eef8cce3f3cf3b278df3"
+    },
+    {
+      "path": "backend/src/Contracts/OntologyPlatform.Contracts/ReleaseManifestCompatibility.cs",
+      "sha256": "c3cc17e416fcc2b0ba285eccf071bfa693bf31b185eb8254d655a6e3ea0856a0"
+    },
+    {
+      "path": "backend/src/Contracts/OntologyPlatform.Contracts/SemanticOperationException.cs",
+      "sha256": "df6316b7dc398ea28116aacc1d444414e6ecb341d7bd83831b75c96069b30ee3"
+    },
+    {
+      "path": "backend/src/Contracts/OntologyPlatform.Contracts/StrictStringEnumConverter.cs",
+      "sha256": "48883ac92224f3e60f8574e9f9fff7dd5bdcecf100a554c0e3881ef69509970f"
+    },
+    {
+      "path": "backend/src/Contracts/OntologyPlatform.Contracts/TemporalContractRules.cs",
+      "sha256": "4ef260b43c14f2db2e6e8e640e208334f4020c84f50f5c287cca874622d0a4d3"
+    },
+    {
+      "path": "backend/src/Contracts/OntologyPlatform.Contracts/packages.lock.json",
+      "sha256": "1624731bf151ec2ac6993023046a4abbac7c6ddc71ed2e242e8285bbc69d561e"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/Contracts/PlatformModels.cs",
+      "sha256": "b0b628a0d69e93d19e039705c38e2a375ca47252b957e188e38e9c99c777cf3c"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/Contracts/PlatformOpenApi.cs",
+      "sha256": "3258970bb2065e75d9b817ce30760b3652cd75e3c772573ef3449184bc60a50b"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/Contracts/PlatformProblem.cs",
+      "sha256": "7454ae483625a432d810b647a83f76a526ed6d2be828fa0c7811f8d901b6552a"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/G2/ExecutionEndpoints.cs",
+      "sha256": "9df32ebcc54440f92f8572b680415d0ae906ec3cce086c33a1519cc6e92db6f7"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/G2/G2Authorization.cs",
+      "sha256": "71446ac89d5f04fde80dbc243141c3041575111dd450498ec3b3b893e84bcbb9"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/G2/G2AuthorizationResultHandler.cs",
+      "sha256": "ad0144633647eddc7867aec68b6dc5cd49b8f14fddf85e56bdd87873c8a15185"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/G2/G2Composition.cs",
+      "sha256": "6d130dd530efbcd4e3ecd67d2feb80c29f704b8796d6271349e63385682697dc"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/G2/G2EndpointGuard.cs",
+      "sha256": "c540b6430dacefe2090d68cb2532ef7b25e0dae017e80553f62ab4fb2400bd01"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/G2/G2OpenApi.cs",
+      "sha256": "34984361262323c210c25afa458c334bca5899262ece4b95bee10beef316995e"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/G2/G2Readiness.cs",
+      "sha256": "6b6e6dc336192b6970ff56cb8d84a99e76e26af928f3a78ed5ca0aaa152b62f5"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/G2/G2StreamSession.cs",
+      "sha256": "802cb86a4f5807e9f900d1b6210a23e6e0eb0dda152e0cf72b480c212234874b"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/G2/G3Endpoints.cs",
+      "sha256": "1e3d124f283d8d60a8031bd9e126392c211b2c397d3a103f5f31659487af9fd0"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/G2/IdentityTimeEndpoints.cs",
+      "sha256": "91b88ffeb4f6145948396b24f63bd33c841900b6b09e06e6776e3403909919a3"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/G2/McpEndpoints.cs",
+      "sha256": "15fe4fdfc5b579b64c2063486b1b16b1c90eaebbea700d4766c2ab32f4422f78"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/G2/OntologyEndpoints.cs",
+      "sha256": "4ef52e1201e9f005df5816c12ecb97f669064ac9a3462d2cdea33260ceb67d55"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/G2/PublishingEndpoints.cs",
+      "sha256": "51f189c7186c50b5171eb493e882e50bcc55e12e45fe3cecb3baa4896289b2bd"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/G2/SemanticEndpoints.cs",
+      "sha256": "83dc73bd3be7f3a2853e634b75730672e9620b14747cd1e97e428b8fb8b00842"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/G2/VocabularyEndpoints.cs",
+      "sha256": "8c84a788186e7eef7898a2949aaf1422a396a9811fca502fd7346c13cd55f268"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/OntologyPlatform.Api.csproj",
+      "sha256": "8b5058e4456e29e3b7c766a7560124c91d4399fbd44e16ab91ffcd400e588aea"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/PlatformApiHost.cs",
+      "sha256": "0b2cb69e6cda55194741b4bad548133af90cff7315c47c5de6f3f0f8471c2adb"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/PlatformEndpoints.cs",
+      "sha256": "bf951b51b3e0d004473035228a25b2fbc2ab1392108c69f17cb70c2d1aacecd4"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/PlatformFailure.cs",
+      "sha256": "d87c5f42d554bbb02a83802103bb13f91980a733df53e633e8f50a77dc3bf033"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/PlatformProblem.cs",
+      "sha256": "4886f710c39348829c098c26164abf36b305d48149bd74016c8fac779c03d838"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/PlatformTelemetry.cs",
+      "sha256": "2e13ecc39d5ce06c25a6b64f3ae407fafb7a24c509e8432b580317b10d57e072"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/Program.cs",
+      "sha256": "424d560ed7a119e43ce5d2ee49ef7c7b0b43b243643cbe078988e85d92a1a49b"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/Security/AuditService.cs",
+      "sha256": "195fb8a2fb86d686943a5d221e706eec52fd882806978ed117ae1deb962e772f"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/Security/PlatformSecurityOptions.cs",
+      "sha256": "f43d12fdba4d488fb9212019e04b9508e04dfbfc238e16d66a9853f7e3c45f7a"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/Security/PostgresTicketStore.cs",
+      "sha256": "a93079dfc06ee480ed6973d14e5ef61ec91b0ae3b1fa1c945bab1863aebbaeca"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/Security/SecurityBoundary.cs",
+      "sha256": "6dc40988719f300fb361c8e19d9c0ef940479b41b9d7c7abc1b5a8616cc74d36"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/packages.lock.json",
+      "sha256": "708fe736a659d0fec144a5ada162cc3d41c8dd70a6d5983fa0945046605865fb"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.InfrastructureApi/InfrastructureApiHost.cs",
+      "sha256": "3e3551dba51ff171a917ad25d7f696a30a0e5b27f1cc95e3c73e9ed6f8e784fd"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.InfrastructureApi/OntologyPlatform.InfrastructureApi.csproj",
+      "sha256": "1f43ed351908e92aa34589d4ca44cfdc5a349512dd0b52d844d7b8b65866e68a"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.InfrastructureApi/packages.lock.json",
+      "sha256": "c6de077de89bca2884eaf5a3580a7b3f196b370f9c2511af650e456fc6c96d75"
+    },
+    {
+      "path": "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/AgentRunExecutor.cs",
+      "sha256": "e0ce6637c5c98f6e23dfb749dfc83ad3ac5cc169fdf1dbc40552410c14269a49"
+    },
+    {
+      "path": "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/AgentsDbContext.cs",
+      "sha256": "a25b18db08e6e6825ddbfc863b26d0cb2f59f94a605af4d082b445f4945b89f1"
+    },
+    {
+      "path": "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/AgentsDesignTimeFactory.cs",
+      "sha256": "1a42d36ca8046890fded46e993a577264b3447eea08ce30128914b17508d9f70"
+    },
+    {
+      "path": "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/AgentsModule.cs",
+      "sha256": "52cfd4b4a88d752981db982296434b42bf05128468adb589b9691c96accef992"
+    },
+    {
+      "path": "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/DeterministicRunClient.cs",
+      "sha256": "3024b1d9c6551a761e3822e710eaf7aecbc8df0e72a9f5d497b5da4c94dc68a7"
+    },
+    {
+      "path": "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/ExecutionRunService.cs",
+      "sha256": "4bd167641c5f0f8c71a9cc30543ec6d8410b28b7191b3d375fff614af6ffd828"
+    },
+    {
+      "path": "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/Migrations/20261026024046_InitialAgents.Designer.cs",
+      "sha256": "8c19b6e94498ad1b79486451a1863d5d93c9ddfad94e2e706f534051fee01918"
+    },
+    {
+      "path": "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/Migrations/20261026024046_InitialAgents.cs",
+      "sha256": "276e315e2cb95a365f401ad47940b52fa9aff931ffc877a8c90e2112e9163a50"
+    },
+    {
+      "path": "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/Migrations/AgentsDbContextModelSnapshot.cs",
+      "sha256": "264dc4d538bbe41c78330324720cbb975bd6545103a8da78fbc3775465caa877"
+    },
+    {
+      "path": "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/OntologyPlatform.Modules.Agents.csproj",
+      "sha256": "1f305446985f311af0a4593977fc1c82802d8027c7ddb46022bf6cd53ba6694d"
+    },
+    {
+      "path": "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/RunCommandRecord.cs",
+      "sha256": "b394e7831a195c0c254681c3fb3ef35943b2d6645155614998a8132a22b4dc39"
+    },
+    {
+      "path": "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/RunEventRecord.cs",
+      "sha256": "58fcf68a164a257d969342866d394454c22f13d5d614d074dcbac0d89f8f2a31"
+    },
+    {
+      "path": "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/RunRecord.cs",
+      "sha256": "643ea34acbf568c6f69c8cb68dc39b5fb945f895c747828688abd7da99477a75"
+    },
+    {
+      "path": "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/SemanticMcpTools.cs",
+      "sha256": "09d7adb4aa3a55417e225853ec8a773e46f6ddcab9697505da6ad4430d95946c"
+    },
+    {
+      "path": "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/packages.lock.json",
+      "sha256": "09a833f314723d71e12ddb2a5938d41acb4d412a28b80d91bee2b92a2195ebaa"
+    },
+    {
+      "path": "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/AuditRecord.cs",
+      "sha256": "9a517cbf21023f48ebc67384bbc78cbd4085c02266531994803f522843814874"
+    },
+    {
+      "path": "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/GovernanceDbContext.cs",
+      "sha256": "ca6b9d7244579d5f60dabfdb1913df46a8fe7315442427de4f351c084f4686a5"
+    },
+    {
+      "path": "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/GovernanceDesignTimeFactory.cs",
+      "sha256": "df7f976c937c551229894a3ee4a19e88ee34e73706c65e48f687a4269bf28a0d"
+    },
+    {
+      "path": "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/Migrations/20261025062847_InitialGovernance.Designer.cs",
+      "sha256": "e61a0f6538092da450d22fbd0f688c3d2b4e3c3223e5f642fb269d4bcf1e61cd"
+    },
+    {
+      "path": "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/Migrations/20261025062847_InitialGovernance.cs",
+      "sha256": "cd676e6caa548b799700021dc266d2e8e52290866295a60e721ce068a1c1d10f"
+    },
+    {
+      "path": "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/Migrations/20261025144246_AuditScopeSites.Designer.cs",
+      "sha256": "0c20c3191d1d431aed86479117678aeab3320dd3ee2f8bb00f9eafd035b55b88"
+    },
+    {
+      "path": "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/Migrations/20261025144246_AuditScopeSites.cs",
+      "sha256": "0d1cc0c751e3b49a4a1b7046cd0a5620c58710ecc443e13d4e737d52ed1f86b4"
+    },
+    {
+      "path": "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/Migrations/GovernanceDbContextModelSnapshot.cs",
+      "sha256": "5c2edc022b2764fdeca31700019d4e5ebfe4a744eca6de204cdf7e37a8b25b9d"
+    },
+    {
+      "path": "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/OntologyPlatform.Modules.Governance.csproj",
+      "sha256": "e94d77c39d64462c71705c7a77b57b9b5c87da1e2b567235cf54c0ecb1573d69"
+    },
+    {
+      "path": "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/ServerSession.cs",
+      "sha256": "db052f53f43f09089da2c987682b87ce3e31044b97712c6e82c36d9da52e2715"
+    },
+    {
+      "path": "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/SyntheticResource.cs",
+      "sha256": "ab76d1b72a7f022b6cdba78d22f84d6021b689318bd62f1b8c989e2f297d82e2"
+    },
+    {
+      "path": "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs",
+      "sha256": "6a03349ed76b630e2ee2e4f88983620944741aba5d781efdda993ddea57c3ef8"
+    },
+    {
+      "path": "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/packages.lock.json",
+      "sha256": "3478e5e3e54b4977de77d10a3295299079aa6ee66b3a1f807a727ba05de73f69"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/OntologyPlatform.Modules.Ontology.Domain.csproj",
+      "sha256": "9a182b8fd6d14bcfd5f19a0a30cfd5d24c8d05fc5bc3a2626206311617817aaa"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/OntologyRules.cs",
+      "sha256": "f2ac851ca6963be9798bc983a43473d391de8e139d1d3de3fddcf6595564cc4a"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/packages.lock.json",
+      "sha256": "1aaaf7d62e2a7033e58cef4178d5e772c3b3b7ac54d82a69079a15b20508f777"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/AssessmentRecord.cs",
+      "sha256": "328205b8d0181e9282a72ea576507b53469d031557836e387c2e3d323a0e4817"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/CommandRecord.cs",
+      "sha256": "abbe5e42e4078d38890cb78491adbfa5e3c3faf385e5bcee1ad4288da21cbf44"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/DraftRecord.cs",
+      "sha256": "83882ec388f15a0bf8721842e1d7342536be8b47dad7403aac2bd46b6854befc"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/DraftRevisionRecord.cs",
+      "sha256": "fa37a85f06c7ab7c01ef0061b57135d274b296f87b5302673cc6dacd95f36b2d"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/ExactGraphComparison.cs",
+      "sha256": "e1bf6289c2a7a528f58c348142b14ceec08e210a3d265c9c415d5c8b262c8d4f"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/IdentityTimeGovernance.cs",
+      "sha256": "c0d9fb68c4bc2f59c32b6607ed9882f768b30aab90f0dab3209bbb549944471d"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/IdentityTimePolicy.cs",
+      "sha256": "3f9aacd14630b972ee950d3fa70db9d0ea9917e43cb4aa2893ff71db2dd5ea4c"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaComparison.cs",
+      "sha256": "5f7c0d5dce8ea41808604ac3de77668fde67a0f9a2c32af41c7387b172e5f083"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaRdfCodec.cs",
+      "sha256": "2080323b741b45d239e9ebd4613641e9f3a57e02b255ced8f6cc72a94c238f0b"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaSemanticRuntime.cs",
+      "sha256": "2dfe526822d44b1efe47c46648125d1564e752795f138cf3a84ff6b6f64a84fb"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaVocabulary.cs",
+      "sha256": "093f9b18ad18139500a6ecd831d61ffc2b03de880798039d1977a5ae574ef076"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/Migrations/20261026003221_InitialOntology.Designer.cs",
+      "sha256": "1daa6de46382838d2b423bf1d6e8d02e6a1a09a237df9ae34817b5662e3fd0be"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/Migrations/20261026003221_InitialOntology.cs",
+      "sha256": "a384908a7e5ade8e39fee59069e3d0d770fcfb365a45caa0f0633ae5251cb4f2"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/Migrations/20261027032135_G3Assessments.Designer.cs",
+      "sha256": "9e110017369a2ea3b645fe780e5bfc143223c21205bb93461474f60ee96df665"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/Migrations/20261027032135_G3Assessments.cs",
+      "sha256": "4eb5d3bf8b98da79f8221e74137339de00626c77871fda99c407d19ee5c53673"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/Migrations/OntologyDbContextModelSnapshot.cs",
+      "sha256": "f52500505993e8440c3ba1de6f44c6f1e36fef1af87c426973f9a2e869b51c2e"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyAssessment.cs",
+      "sha256": "b92b017ab28e47c8b2ca64eef9f73996387062fe8c91fb2777713ae2c441b25c"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyDbContext.cs",
+      "sha256": "2306b7597d9f99fb0445a5ebec965abad107dce56e6186f65dcedd5c9e612a98"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyDesignTimeFactory.cs",
+      "sha256": "7afc182f8b9cdebad6cc3e513a1c2188929293bb4b792e9b8c6ca329873ac699"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyIdentityTime.cs",
+      "sha256": "ece67399734d7c62d897d2a62d6616a70aba1c23c13de2ba4da5b9a4724a3346"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyModule.cs",
+      "sha256": "812ee36acccb269421b15b23b0fe4d1c5a542107aa0e8466c02ae45717894d5f"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyPlatform.Modules.Ontology.csproj",
+      "sha256": "85e83f6499f717814b1d4001c1e034cfadd617db464cede59c14cecbad580780"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyService.cs",
+      "sha256": "f6c4c96eb52daed604d41fc4f374f3262ffb2649c03974518c316c8857c7e5da"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyVocabulary.cs",
+      "sha256": "936a748b56c2639a5f5275f1ed233122f23edefe98b55dab2a4c033301d2b175"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/SemanticProfile.cs",
+      "sha256": "89cb492558994a4c8933894dce243f3206c8727f07ff1b431dda07b71707b0c1"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/SemanticSupportPolicy.cs",
+      "sha256": "a04f361fbce83d8c6ebfc077cad4108c3607b10373d037b2e3809e0c3cf1d952"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/ShapePolicy.cs",
+      "sha256": "95b5e93d38783f252b37e8dacee12a47c255da92c69fc923cdfa8a0ca33fb599"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/UnitGovernance.cs",
+      "sha256": "f1fd9b6dcbcc2625afaa42bf81ca20fe48bd14b16c668b888ca1a646d0b5d449"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/ValidationRecord.cs",
+      "sha256": "93c4ec035524408c637003a927546a3f938f28bd5c820df0820596a580a224b6"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/VocabularyGovernance.cs",
+      "sha256": "cd9f66379f18390c666a733c183a5d160e977fca8b41f4634abc98cd62c24604"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/packages.lock.json",
+      "sha256": "c31cc3c12a12804f023ab12027c56b8042681d6005a6a8a0d3f4f32ec2045c77"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/OntologyPlatform.Modules.Publishing.Domain.csproj",
+      "sha256": "9a182b8fd6d14bcfd5f19a0a30cfd5d24c8d05fc5bc3a2626206311617817aaa"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/PublishingPolicy.cs",
+      "sha256": "7a6225aae1f1a966b84ec796ead86993c9f7cb94d8e1f6d5e62a8b432bd3092d"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/packages.lock.json",
+      "sha256": "1aaaf7d62e2a7033e58cef4178d5e772c3b3b7ac54d82a69079a15b20508f777"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/ActivationRecord.cs",
+      "sha256": "d7921c3605bc130e005d059a75de62004e64b8d685a67bbaccef791c6b8d88c9"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/ActiveReleaseRecord.cs",
+      "sha256": "a5abea791c8fd6a01396fcf94c611b3f18aee2dee1c49a6e5b9bb19ed8e2b255"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/Migrations/20261026015031_InitialPublishing.Designer.cs",
+      "sha256": "c429d5de0a8d60e9b39d48bc8d840948323cc124cac1c414ed4eff51eb7fa5fe"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/Migrations/20261026015031_InitialPublishing.cs",
+      "sha256": "a0a639763f458765069b7ef55dcb37695f31e1a33e20872e027f957d6d89bdba"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/Migrations/PublishingDbContextModelSnapshot.cs",
+      "sha256": "fd41a07c03e81ec805f434fcdbe8a9d6b58dd0c1c51466944462abc49b56b07a"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/OntologyPlatform.Modules.Publishing.csproj",
+      "sha256": "62cb280af80bc5d0e40518781c46cbea9d50030444e7d6d79e30a14c163a47cc"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/OutboxReceiptRecord.cs",
+      "sha256": "72bb2341d2db9dd0b4cb222b21cadf51faf6868938a5c7b10d7cc86291d4723e"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/OutboxRecord.cs",
+      "sha256": "01188f15eb779db1bd5106508c2f061d267d728f456954795e3eb951d6fc3b89"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/ProposalRecord.cs",
+      "sha256": "0b987fcae706a189a5a80fd76ff93e28fb6d18c6acd925244d57b9a78dd196f2"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/PublishingActivation.cs",
+      "sha256": "b230f592c2450ac15ff813e1d3684448262b06ab7f4d5d119e21241be7c99722"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/PublishingCatalog.cs",
+      "sha256": "05a7ed0a9382d48e4073759fce86b5f5b7cd7e385ee45b1750a64c1724ef5f5c"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/PublishingCommandRecord.cs",
+      "sha256": "dd4f8d26961423cd6b4538efbe8b51443d102df39559088e1ba9b4c7cb5dc320"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/PublishingDbContext.cs",
+      "sha256": "590c8dc471ea13b5f24f256a309ae474e0dae831f22f64a23313993c1a4de059"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/PublishingDesignTimeFactory.cs",
+      "sha256": "c4b2617783fcf14f0c386774ed058091b818096b3d6a1ad76422e23eabbc7bde"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/PublishingModule.cs",
+      "sha256": "3fe1f18d0404167022378ae8703571e6edace7b25c0ade9ad6117a28f4bc69cd"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/PublishingRules.cs",
+      "sha256": "4035901def4b6ce2a12ce8112a733583b9c6f80a3ce5c886c693334ace4cd362"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/PublishingService.cs",
+      "sha256": "01283f154b4a1f54dba7a4e1d01bd8ad0f5b03d6bbfb658d4fe0909768201f57"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/PublishingTelemetry.cs",
+      "sha256": "df841c69ecd4153c5000bc8a23a6413682616eddf8ee896f4df7f9457798c671"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/ReleaseOutboxDispatcher.cs",
+      "sha256": "75d39caa7f2395c2f35460f647c877f0f154e8dbd23d84d9118958e9e263cf59"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/ReleaseRecord.cs",
+      "sha256": "36eaace89362cbdfb3cfce471812aa52e272339a0be060d66ea846ab5b289522"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/ReleaseVerifier.cs",
+      "sha256": "4cd42635305e1c78752a38e20f8e163314ed4eb2c9e9348f7efef9c06d3c5c5e"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/RustfsArtifactStore.cs",
+      "sha256": "fc0ecfb9bc3f73c08297b9ed049f569c4cf845c615e7a8913f4c15eb7d24c6b7"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/packages.lock.json",
+      "sha256": "a8d3704d59181837954fed2a8921fb65ec4de2df4799f8cbe383f45fca5941ef"
+    },
+    {
+      "path": "backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/CapabilityRegistry.cs",
+      "sha256": "36ac3da6b3fab35194eadcec06f92d2c40731a0478c0e3878d3bb3f791dada67"
+    },
+    {
+      "path": "backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/EvidenceService.cs",
+      "sha256": "199c9db3f57d7b5c59c5ee434a6f2f344cfd2de17919dddd590f3cad1aa37d23"
+    },
+    {
+      "path": "backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/OntologyPlatform.Modules.SemanticQuery.csproj",
+      "sha256": "5b590004e470a810d824957c0ac9e1cb04c45ca15dbf04d16df709bb4e8445dd"
+    },
+    {
+      "path": "backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/PublishedGraph.cs",
+      "sha256": "6f36400eb93608bd300aa90b7ad8705847c8abdd98bfa24afcea0b26fafb6297"
+    },
+    {
+      "path": "backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/QueryRules.cs",
+      "sha256": "a6fbe97b575d5ecc566c0dbe0eba7b1e794765fc69632d3474bbef3aff491906"
+    },
+    {
+      "path": "backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/SemanticGateway.cs",
+      "sha256": "b301d25506b68b5813c46635ea7da76a24f005267f4841b90270403f72ea63d7"
+    },
+    {
+      "path": "backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/SemanticQueryModule.cs",
+      "sha256": "f007582ece442f36335a99df6fe5cf59839aa43d37135eb8add9134023e7f8ca"
+    },
+    {
+      "path": "backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/VerifiedReleaseSources.cs",
+      "sha256": "d3e4d33f70f80038b9291c0db956ea894c64690848b4c87846f620954cefdf06"
+    },
+    {
+      "path": "backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/packages.lock.json",
+      "sha256": "1aaaf7d62e2a7033e58cef4178d5e772c3b3b7ac54d82a69079a15b20508f777"
+    },
+    {
+      "path": "backend/src/ServiceDefaults/OntologyPlatform.ServiceDefaults.csproj",
+      "sha256": "4596673f8170aa86616f52ae9439080f10840946ce57ef29e45d3383daf83afd"
+    },
+    {
+      "path": "backend/src/ServiceDefaults/ServiceDefaultsExtensions.cs",
+      "sha256": "c9634873fb2bfe6ccc20e55a191ec2484ad994ee33340098302019d64ddd58eb"
+    },
+    {
+      "path": "backend/src/ServiceDefaults/packages.lock.json",
+      "sha256": "36612c947be998d4f072affc98698cd9b55b39f4ff2b3bc4c4a97b7909fb8d8a"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.AgentTests/AgentFixture.cs",
+      "sha256": "b24aaa632b8b084989d864b4e4a74d5b827b63ef67eb83ada2646afdcfd8e011"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.AgentTests/AgentHttpFixture.cs",
+      "sha256": "ae999ba48b4538a9644a8412787e78a47afbd1e1ec73ed2b7ca34edb831e6638"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.AgentTests/AgentMigrationTests.cs",
+      "sha256": "835c8dfc77af155d0431ded1fb738b32fbcdf6f2856e3a6a8b367e7505e2efc7"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.AgentTests/MessageChunkTests.cs",
+      "sha256": "6961fcf6ab55104eed0b88829cb214d887182b4a7a19d72e796d959954240483"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.AgentTests/OntologyPlatform.AgentTests.csproj",
+      "sha256": "6ddb4c2b2f3f397409fc26bb082c493dd0cdc1677d80c9bee509031d6e93884f"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.AgentTests/PersistenceTests.cs",
+      "sha256": "dda6f6b873c988a56e284754043e8967ec69f5f091ceaa8705ae9d1c244d39b0"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.AgentTests/RunFaultTests.cs",
+      "sha256": "a38f431149f3d1707c90ad16f212341d70fb5c64b711e97bb3160988ab2fab64"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.AgentTests/RunFlowTests.cs",
+      "sha256": "8e72fb7f05039cebe675b76bd79c480b473319d22f8c941542e3dfdff20b93eb"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.AgentTests/TransportTests.cs",
+      "sha256": "ffb174bc1c099e4de6171995679f40087662f447100d720f8b7c3dd31913f68a"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.AgentTests/packages.lock.json",
+      "sha256": "66e784516d14379a828f4abf128b627f77d32b76bbf649318c1f87c8d91bd059"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.G2ContractTests/G3M2EditContractTests.cs",
+      "sha256": "36b3aa6ed82d8b60002fe8b893e2ecfd98e3b85689e70e5fdc05a5219d0ba8d9"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.G2ContractTests/G3M3VocabularyContractTests.cs",
+      "sha256": "ef23b22ad7986a65913dc147f6e77d20507c786e5dbf4d3046c196fec10deeaa"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.G2ContractTests/G3M4IdentityTimeContractTests.cs",
+      "sha256": "d6d1499c98d94526d0d72f0bb3a4e759c3684d1148d1ec331dfd4c4487b4caf6"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.G2ContractTests/G3ManifestContractTests.cs",
+      "sha256": "cf13e1de28bcef9062ef72d527d9537563fc88d6fcdcff1a882011041f5dd634"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.G2ContractTests/OntologyPlatform.G2ContractTests.csproj",
+      "sha256": "cb252a22af5e6e7e4e9efce1225e5d7d1b2d3b2f50e1771940f79ad5f63b1d87"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.G2ContractTests/WireContractTests.cs",
+      "sha256": "3328d9ffc0d18d3480a0eab3b9d2fad56538fcf8a6665fef58fce2317407cefd"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.G2ContractTests/packages.lock.json",
+      "sha256": "8a92e3de2bdd39b5e0271cd29dcf2c9ca582bb09b2fa00f5c28fc2b2c0700bf0"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.InfrastructureTests/OntologyPlatform.InfrastructureTests.csproj",
+      "sha256": "701654339caea6149af067d30d20d787d7090353ac4657fbc61aca6972787354"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.InfrastructureTests/ServiceDefaultsTests.cs",
+      "sha256": "42ebf33ea66af359bc6adb7c652e5b9bb81cfb741cd4f243253f83b299dac558"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.InfrastructureTests/packages.lock.json",
+      "sha256": "2a7c138b085f629ab6e4a5baba939234a0fe6b84e663f8d681092f63b0a1db78"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.PublishingTests/ApprovalPolicyTests.cs",
+      "sha256": "ee8f285e720e7929f7b50ecc2b260f903d0b493afede9d7a92d5861dea3b0e75"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.PublishingTests/ArtifactTests.cs",
+      "sha256": "b0eaf7c16934e01b55780ed932933d8a6a814bbb402ada364c32b9b10c74e2e9"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.PublishingTests/G3BindingTests.cs",
+      "sha256": "63af793f7452f5d7e880dffbf354cb80cf4b96353edcc121ab1042abab8043b8"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.PublishingTests/G3LegacyTests.cs",
+      "sha256": "27256c06b363b72537dfc413c76866b5da4d0ac0a9512f586a1d4b587933ce62"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.PublishingTests/G3M3PublishingTests.cs",
+      "sha256": "fd68398231d656ad5c5080069c32084478bc728750a56a6567d1ad0f24f641d1"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.PublishingTests/G3MetadataTests.cs",
+      "sha256": "6617e7df6089d43aa6bbd2ff8f366c8cf83ca1fa0d242929219a98d8e2a72a42"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.PublishingTests/OntologyPlatform.PublishingTests.csproj",
+      "sha256": "03353d7eeece34ee3293e20fd6153889ea990c216617129fe811de8630b09697"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.PublishingTests/OutboxTests.cs",
+      "sha256": "d5da66390939565d90362c9b97750c22649711b143b71e059e7156f43e95ed8f"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.PublishingTests/ProposalContractTests.cs",
+      "sha256": "21627e2738f0740be890fefaf9edc1ababa3ad9a612d74e3171117a8622af26c"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.PublishingTests/PublicationFaultTests.cs",
+      "sha256": "ca9e9b96b4b8cb43dde30b9352523eea8c464821d471119e15f8159a5e867270"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.PublishingTests/PublishedIntegrityTests.cs",
+      "sha256": "241f73b722954e2496c6e7a35b598246e02497e1b0f20b6fc052c008a7837f79"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.PublishingTests/PublishingFixture.cs",
+      "sha256": "dc2f10cd8025082f51a48f935254a9f01660903a78f0e63dd50ece1f8fc2e7cd"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.PublishingTests/PublishingFlowTests.cs",
+      "sha256": "40d003e29326d173f4de24192ffca74997bb2b6594b62b1deef1d8b9c8d6f2e0"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.PublishingTests/PublishingMigrationTests.cs",
+      "sha256": "14deb3297de0357c11bcad77c1b21a4197ea27c9576b38e1eff86cdd8844e067"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.PublishingTests/RollbackBoundaryTests.cs",
+      "sha256": "93f390ecc6abb27d6f71b0f4755cec479431cc46e1a271d81a49b2d17d96bb49"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.PublishingTests/packages.lock.json",
+      "sha256": "9f6c8fa1eeab745bbd8110bc3c39420e5904d7a53b2c6743f76f6670eb8b98bc"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.QueryTests/GatewayTests.cs",
+      "sha256": "c0c94d26588b245ce16e7751fe7b8e22f239dc5dec619620bcbdb434367d92b5"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.QueryTests/OntologyPlatform.QueryTests.csproj",
+      "sha256": "a515d10cb3c97d264c4feaf5ba062d35f3030c0cf3ae6773adc00491f77f2b22"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.QueryTests/QueryFaultTests.cs",
+      "sha256": "10227b3d232fe1ee0c999014e33c0667eab8e63a66632485cd99c92f1e36bc78"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.QueryTests/QueryFixture.cs",
+      "sha256": "8a4b918747eb07a6c0c904632b8520d8e25baf8ccc2e009632fef3d5df0cc732"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.QueryTests/QueryHttpTests.cs",
+      "sha256": "4a435c8dbac25bac5e9fd72302a16122ac0bff497f8becae6a3937fbbb42f373"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.QueryTests/RegistryTests.cs",
+      "sha256": "ca2482418aa8eff7d373e6a15710a38e3133a5bb2b6afee34e6ae681b4c5b599"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.QueryTests/ReviewRegressionTests.cs",
+      "sha256": "6b851026e4f331f8f746435920f6c51a7a730ea57380cdd49cfb431cf33ce842"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.QueryTests/VerifiedSourcesTests.cs",
+      "sha256": "997add312f443ad133122119d6826529a838c450f6133e6a16780d38e30d4680"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.QueryTests/packages.lock.json",
+      "sha256": "66e784516d14379a828f4abf128b627f77d32b76bbf649318c1f87c8d91bd059"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/AuditReadTests.cs",
+      "sha256": "d3bb98a34a7b522f61192286b2212348742a92d23641c23788cdfc1dac0f6175"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/AuditScopeMigrationTests.cs",
+      "sha256": "82be36623d7277bb148b5beacfed71e6d0d4602895e4c449d1030ea7d854276e"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/G2AuditTransactionTests.cs",
+      "sha256": "a97664e0457c66c91164440db9028663ad878ff7f6c6dac897e67439e71c47c2"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/G2CompositionTests.cs",
+      "sha256": "2fc1fd2451f746b9d16d1f5fea5ef53057dc782c8093769116ccddca45e25682"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/G2ExecutionEndpointTests.cs",
+      "sha256": "042769e8033ecde51be223a25405b8c5078ab6292875d79f01f440be31b364fe"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/G2OpenApiSchemaTests.cs",
+      "sha256": "01b821c734e625b3d0571ac3eece64c107934a40457291d8a8d700664d72742a"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/G2PublishingAuthorizationTests.cs",
+      "sha256": "8bd9b9d98fdaa8332cb63caf4dc719c323fd030d073784b2171f0480f7fc5859"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/G2ReadinessBudgetTests.cs",
+      "sha256": "b511579fdbe1795eb802f4bd2df3e4da7486187041e45442b81503b63fe34cfc"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/G2ReadinessGssTests.cs",
+      "sha256": "4847e571a302c1490b114610ff6472632045dac896716a9bafb41b36e80fb7c6"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/G2ReadinessPostgresTests.cs",
+      "sha256": "59954880e85278e381ef8e3cdc1ab4012212855e13d178bac651e94fe4edde4f"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/G2ReadinessTests.cs",
+      "sha256": "d3928693006f3a1d7aee28a42bf52e6b67edb03b360ec8c51e70e1f1e501b697"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/G2SecurityTests.cs",
+      "sha256": "970a3c93ab356d99b4c0b5612a81089dc9428389e09988dcf8148c2e50319154"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/G2TransportTests.cs",
+      "sha256": "e22be18a9545d8c1134fb283d8d60ebaa7367268c05119cbb82ceba12e503adc"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/G3EndpointBoundaryTests.cs",
+      "sha256": "5daab6ed0c01d504b2afc0ae6dcbb03beb4d2ac5866c133d9a60d4eb218baeff"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/G3M2EndpointTests.cs",
+      "sha256": "dec8d56bd6f2534572c993d252f80d4983ec4804ef8f7c4107a72613414fbae7"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/G3M3EndpointTests.cs",
+      "sha256": "0354b796fcfa79e67878eccb3cc3270c4555d111ea5ebea6792c78076cacb9c1"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/G3M4EndpointTests.cs",
+      "sha256": "814e494880f7497e4aeb05754630e05854e72e09c80c00c373328a0eceed16bb"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/HttpSecurityTests.cs",
+      "sha256": "ac1a7c45534f9e619fdc04f3b5a4404d0f6f239905edf7a940ac99968508eba8"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/ObservabilityFailureTests.cs",
+      "sha256": "6e7f77a46a3491f01a2870b6fc194ad46d551d49e7ee0835c77f852e29853fba"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/OntologyPlatform.SecurityTests.csproj",
+      "sha256": "c6defdaa11f47c4d85f68f6a215b4bcb117198e074d9212bda7bfb8f142887b2"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/PostgresSessionTests.cs",
+      "sha256": "d51568ea838c65df9845c138f40479eeabfc6951bbf88b97685252addcd749e9"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/SecurityBoundaryTests.cs",
+      "sha256": "b5fe57a28758730678c3120eec3700b51410ee2fbee010f9e3e1f06451b538ba"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/packages.lock.json",
+      "sha256": "66e784516d14379a828f4abf128b627f77d32b76bbf649318c1f87c8d91bd059"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+      "sha256": "2779b2eb6b545c4d6c2dc96b234606f917d13ad12667cc96406218e4ed818b63"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SemanticTests/G3BoundaryTests.cs",
+      "sha256": "bb75b7e32411746d388c962fe3cc80bd1cbbcd0cd7b9c7b577e8f82e35eb61d4"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SemanticTests/G3M2EditingTests.cs",
+      "sha256": "009d6e55f2d6e10e35dedbd8897cd127d13d4f378bfdcce5abdcae2867bf058e"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3GovernanceTests.cs",
+      "sha256": "e13bccbc4003062e769f369d510caf56c6d606cac53772f43a1fe9881870d141"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3PublicationPolicyTests.cs",
+      "sha256": "0206be727c1a5aea6c686e414f696eecdabccc6303ded536d04849786b9f2d00"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3ServiceTests.cs",
+      "sha256": "268f7692863c7d392812845592241a497ff980b97a2d0559777969a8ac83d3f6"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3UnitTests.cs",
+      "sha256": "a07ce8990979b4ff9ca7f8aa5ec065a8561dd38cb6e5950855368bd0bec1396c"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3VocabularyTests.cs",
+      "sha256": "c224b5b6d38ef714ad4c3555a201ec8d82d75633d90ea9831f07b2399b96db35"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4IdentityTimeTests.cs",
+      "sha256": "90394b3075c54ab87de5e78b5e87b893c05def6a90b826b8ec49b7f9fa604f66"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4ServiceTests.cs",
+      "sha256": "1b4574917767edebf7689c2becf813a0e533612330b5abc317ad5d663cb19541"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SemanticTests/OntologyPlatform.SemanticTests.csproj",
+      "sha256": "10983307b325493c897a3e58a5f5a948c1ef9d3a9da3462d420ca45d85aafeb7"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SemanticTests/RoundtripTests.cs",
+      "sha256": "259f0fc7bbf62d7027fab0c0b5186005caec0fa0ee9c4f8d117869c84460047e"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SemanticTests/SemanticFixture.cs",
+      "sha256": "86f205ab93d384d41315bca0d00afdf128198bb8c2e01ede4533567f2b4c8916"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SemanticTests/ShaclTests.cs",
+      "sha256": "839825def05c78411206497adfc8480e716fd2691f5230e3c2532c0d55e80bf1"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs",
+      "sha256": "66b023c9d44aa9bbf8956f3c8a7db466858c81b4a9fa561f3e6f86a05e83f062"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SemanticTests/packages.lock.json",
+      "sha256": "fd601242b55c9a844772a4958e559ed2f8950074fcdb730e8b5537f01115d4c9"
+    },
+    {
+      "path": "docs/adr/ADR-001-design-system-location.md",
+      "sha256": "2962f724bc5300178074923a8aa6fce800e1e235fc395f0156684c2cf333c5ef"
+    },
+    {
+      "path": "docs/adr/ADR-003-next-aspire-boundary.md",
+      "sha256": "c2290c92445dd7afe9bc5d4263710bce6a6b395822aa2994f020f12c97bd8163"
+    },
+    {
+      "path": "docs/adr/ADR-005-toolchain-and-spike-order.md",
+      "sha256": "26135c6980e8f1774bee8a54e3d3332962e2031263a769b5d45a858310fab5c8"
+    },
+    {
+      "path": "docs/adr/ADR-006-parallel-git-review-delivery.md",
+      "sha256": "0b43e1d7c22044c569be5e6e6bf073680019d4147ade89b2f4a47f2f1e49c994"
+    },
+    {
+      "path": "docs/adr/ADR-007-main-protection-proposal.md",
+      "sha256": "53aa809fa385a6f16fb206afc2de291652aea06e21a0500626209fff650f725a"
+    },
+    {
+      "path": "docs/adr/ADR-008-g1-closeout-topology-and-scope.md",
+      "sha256": "d02996993d6f9bdb12affebc72150aa2981456ea7f74b509f1062690907d0628"
+    },
+    {
+      "path": "docs/adr/ADR-009-g2-semantic-release-execution.md",
+      "sha256": "5f29d26ba1055e8dbc34b8870bdc4306a7f52b5c2683e0340e51156f0ae26cf6"
+    },
+    {
+      "path": "docs/bootstrap/ontology-platform-codex-master-plan-bootstrap-v1.0.md",
+      "sha256": "d20ae19ea8a5b1c2a6157ae040b8047e94bb3afd8bb5000869bdecdb986ecdde"
+    },
+    {
+      "path": "docs/contracts/g1-platform-contracts.md",
+      "sha256": "8f6d184beff2c0b98872a19795ab2e757131cf9c667c508d200d880033d54eaa"
+    },
+    {
+      "path": "docs/contracts/g1-platform.openapi.json",
+      "sha256": "e7ddc88d71fd7c4af70237c4fd4ba510ebb828a93a81d314ef62f8ba3fba1397"
+    },
+    {
+      "path": "docs/contracts/g2-models.json",
+      "sha256": "79e544f5e78b70ac32a72d7405a6a2b22e61ad31530c7e313c757b515c961103"
+    },
+    {
+      "path": "docs/contracts/g2-platform.openapi.json",
+      "sha256": "ce2e83443bdf5963895e34985fad060cb40bd3053b91f23429b1a142f922a21d"
+    },
+    {
+      "path": "docs/contracts/g2-schemas.openapi.json",
+      "sha256": "cbc18d253db88deade5e96ecc7df85b42bf39ac5251d1c73ed73faec3644b284"
+    },
+    {
+      "path": "docs/contracts/g2-thin-slice-contracts.md",
+      "sha256": "6ee96821df82b51dd55d6856b68ed66c5454f075f5b62ba562a5009abac3e7f2"
+    },
+    {
+      "path": "docs/contracts/g3-m1-contracts.md",
+      "sha256": "ff91c74712aa81ccad8cec5a17ee2f66b880c022478cca87175f37b12da98c05"
+    },
+    {
+      "path": "docs/contracts/g3-m2-contracts.md",
+      "sha256": "fdeb6c5d9177a5332e5eeb70b63e34a56dae160838e74eeec1d5e40829896d04"
+    },
+    {
+      "path": "docs/contracts/g3-m3-contracts.md",
+      "sha256": "ba181cb12403178b71f8ed11e94f80c52f1206ac4b4959fe5a4fd80b2205a3be"
+    },
+    {
+      "path": "docs/contracts/g3-m3-e0-contracts.md",
+      "sha256": "f7d586a612aa8d55821118f9a4ff8d1026d9938c8c6b9b3fab5732b85924b9c4"
+    },
+    {
+      "path": "docs/contracts/g3-m4-contract-a.md",
+      "sha256": "bfbc6dbccc86e052f5c7226154a8be6f2fb870e79b381bb9531ea59ba4cfa3ba"
+    },
+    {
+      "path": "docs/planning/00-current-state-audit.md",
+      "sha256": "ad35420918b0dba677b28341eea98e2cca9ca60841c937e6b42b1a59ac03d73d"
+    },
+    {
+      "path": "docs/planning/01-decisions-and-nongoals.md",
+      "sha256": "fc62af2c236626a63d5ee060acf7676e4e2575a06618277e85ef8a7f077ade80"
+    },
+    {
+      "path": "docs/planning/02-target-architecture.md",
+      "sha256": "54893ccd366142df1b02e511594801bf9711473f0cd9da876608972467168ee5"
+    },
+    {
+      "path": "docs/planning/03-module-feature-matrix.md",
+      "sha256": "1d2ca6747e6caa5ba43a3d13e6c84f234a1f8fcfb306ee1d0eb067d33fba1568"
+    },
+    {
+      "path": "docs/planning/04-roadmap-and-dependency-dag.md",
+      "sha256": "15dbddaf2012b742d61e2d8703792fa1773779c2857f1b8a025366e04cad9975"
+    },
+    {
+      "path": "docs/planning/05-agent-team-and-task-contracts.md",
+      "sha256": "534a462b52040ff05798668d4e9f237d51e63a3b1b7262c8303401de13f4ffe3"
+    },
+    {
+      "path": "docs/planning/06-spikes-and-acceptance.md",
+      "sha256": "1b0ac741b35314cb5362e229b5352d6405322b6307f58a9c3c39b596d7f95145"
+    },
+    {
+      "path": "docs/planning/07-risk-register.md",
+      "sha256": "103b825f285800cd36e48276cfb53289a932c336b862418959cbb4310bc7f17b"
+    },
+    {
+      "path": "docs/planning/08-agents-and-repo-standards-proposal.md",
+      "sha256": "c34620d6f9644055f3b3b62354117bc40b4551b69911cc3672cfef020f6d9710"
+    },
+    {
+      "path": "docs/planning/09-review-request.md",
+      "sha256": "dd922f65f94a81db74a43dfd10842ff53a2c2abaea8ce2ff016d9e816e293fd3"
+    },
+    {
+      "path": "docs/planning/10-g0-review-record.md",
+      "sha256": "367bf3a42e2f1ab37394366a158fcd9a6c637a850898ee922dd1cb365e28c8a5"
+    },
+    {
+      "path": "docs/planning/g1-closeout-acceptance.md",
+      "sha256": "5d380eb6531944fe6073121c91d3c71bc413bc85910da40a1fe4715b515bf509"
+    },
+    {
+      "path": "docs/planning/g2-readiness-readonly.md",
+      "sha256": "43a9b5bae31e37bfdd1f3c9bf880baaee798b3fafabc291ca92f670dc8350018"
+    },
+    {
+      "path": "docs/planning/g3-ontology-modeling-and-governance-plan.md",
+      "sha256": "a1917df29a0489addaef6b2d3bdc97a292e9ebb03d0d2802a240642af697a8a3"
+    },
+    {
+      "path": "global.json",
+      "sha256": "ab4eed8da9aaee0671a10b49fe4ff1b27b3341b264f317ee88785607c0711e9a"
+    },
+    {
+      "path": "infra/development/README.md",
+      "sha256": "0e173eb221dee39d4598598ef749502a83948edb75153436498a683cdfa37ffe"
+    },
+    {
+      "path": "infra/development/fuseki/.dockerignore",
+      "sha256": "812e9da64837996d6d180a4f91b84d475cbf339fd7085fb98755f6772ca9df41"
+    },
+    {
+      "path": "infra/development/fuseki/Dockerfile",
+      "sha256": "534f20652cf476c8fc8d354635234969fed8f3f430ff76305d9a41b193f23ab1"
+    },
+    {
+      "path": "infra/development/fuseki/entrypoint.sh",
+      "sha256": "30a89837207cdcec6f8142b23e40139be3279604ae339bfe2815c530e834685c"
+    },
+    {
+      "path": "infra/development/fuseki/fetch-fuseki.sh",
+      "sha256": "75e55f553d1a19d7c4c3ab652c0f649414489d4d4e117bd60afc2526383f567d"
+    },
+    {
+      "path": "infra/development/fuseki/g2-config.ttl",
+      "sha256": "71809808ed0ef0321ad5438098523e8c987450f643c1f1c32238622bd582db73"
+    },
+    {
+      "path": "infra/development/fuseki/g2-log4j2.properties",
+      "sha256": "04f0f089ecb26682d64da62399c570dfd98c6d213e8f75d3d227334cecfddea6"
+    },
+    {
+      "path": "infra/development/test-resource-persistence.ps1",
+      "sha256": "bc97d5d339da3e39404e72e5d8f1dd90c41fc5a8a1478c04eba21355e8daa025"
+    },
+    {
+      "path": "infra/observability/alloy/config.alloy",
+      "sha256": "ece43d2e118aa18138f2cfc66e8f06a1077f19dbf0983e5900668e7d76e4b6a7"
+    },
+    {
+      "path": "infra/observability/events/behavior-event.schema.json",
+      "sha256": "b2bbad79fe734c77ee326af9caf62bef49eb86fd06e6f5e966808e937440d916"
+    },
+    {
+      "path": "infra/observability/grafana/dashboards/platform-api.json",
+      "sha256": "6ae355781dca8d3890a1c90b9d3e41bebb303500ac3b3dc0f0ac241a6d066851"
+    },
+    {
+      "path": "infra/observability/grafana/dashboards/platform-dependencies.json",
+      "sha256": "3582f1b38b124badb0f2261234cf8e3edab078e73bed44c8d3d4dfb6a4b7aac4"
+    },
+    {
+      "path": "infra/observability/grafana/dashboards/platform-errors.json",
+      "sha256": "92d68d9653ccc75ba081f16b1e42d0c66d61ced1de05a799167687576290a8d6"
+    },
+    {
+      "path": "infra/observability/grafana/dashboards/platform-overview.json",
+      "sha256": "084c24bc01570e152dba38cedac3eff318f9b614d1366a81356b7fe79ed39853"
+    },
+    {
+      "path": "infra/observability/grafana/grafana.ini",
+      "sha256": "4a0087fc93c2b0c13578cd977c51410a10bb4d7b3f686495291ae164cf0b14a3"
+    },
+    {
+      "path": "infra/observability/grafana/provisioning/dashboards/dashboards.yaml",
+      "sha256": "a0ad788c527d54b9590b8082c2c4e56d510287e9b410acaee00d902935ceba78"
+    },
+    {
+      "path": "infra/observability/grafana/provisioning/datasources/datasources.yaml",
+      "sha256": "98d247a5a9ae81c9bf2d1c1288e43d1d59e8f961069e0c237caea673f3a90c7a"
+    },
+    {
+      "path": "infra/observability/inspect-dependencies.py",
+      "sha256": "1cef36f5e678b102440ad5b825d151b5ae21659e33f373a2807b47dc44e22a60"
+    },
+    {
+      "path": "infra/observability/loki/loki.yaml",
+      "sha256": "2bed3d40843c430a4ef6913e32259f3e3b33e441c140cc9b6102c8481315559f"
+    },
+    {
+      "path": "infra/observability/prometheus/alert-tests.yaml",
+      "sha256": "b53537b108704d9557652a9aff5203efe9c2c34d7dc37510b84e1cef982b4f6c"
+    },
+    {
+      "path": "infra/observability/prometheus/alerts.yaml",
+      "sha256": "12809d3e660172c6abca2fb0a0fbeddee41fa6445fdcc5f5ce485f544ee91f6b"
+    },
+    {
+      "path": "infra/observability/prometheus/prometheus.yaml",
+      "sha256": "30c276628092ed310b7ba96e2a738b4b845534d0d4f24ca18ab72be8a9f27c79"
+    },
+    {
+      "path": "infra/observability/query-runtime.py",
+      "sha256": "c5f06f2be09aab0bfa1d10d62adece6d733d420ce21edf013a8c60efcaf275c0"
+    },
+    {
+      "path": "infra/observability/resources.json",
+      "sha256": "7e777255e5e9800a7532eddfb64f42b4820304c3b53782e3efbe19c2ce07ab05"
+    },
+    {
+      "path": "infra/observability/tempo/tempo.yaml",
+      "sha256": "60cc7db7d58f0ed9dc8c0535471fc6f02ca5a1060526f9d888ef2659ca0d1235"
+    },
+    {
+      "path": "infra/observability/tests/test_runtime_queries.py",
+      "sha256": "734ed1597d783ef2c3c30ca1d188f32847ca278d259e47779225efafb1a74ceb"
+    },
+    {
+      "path": "infra/observability/validate-config.py",
+      "sha256": "b1ab7e3176c61a585224a9b9e827da76914ca86b13a674541a0139f7b8fa6780"
+    },
+    {
+      "path": "infra/security/bootstrap-keycloak.py",
+      "sha256": "b397271399a40c63b9320cb133b58272d5198a86f278e564b382f2e08bec6c95"
+    },
+    {
+      "path": "infra/security/test_bootstrap_keycloak.py",
+      "sha256": "fedd78b4ea71ae94e9aef082c1878b7a57936a4026aaf4a291fb6a7a18c4d1cc"
+    },
+    {
+      "path": "infra/security/test_oidc_harness.py",
+      "sha256": "1b8ee5669c9e7f8e50ab80841849757efa7621371460c98c1376031a670efec7"
+    },
+    {
+      "path": "infra/security/verify-oidc.py",
+      "sha256": "329b20f0d90e67a97bde1ca5cd9d1dffc796d629cc13bae731a3609ac03f7751"
+    },
+    {
+      "path": "package.json",
+      "sha256": "66ca524d296b8374ed595daca9b602c5ac740f61c094bb4dd1c136eacdf97d98"
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "sha256": "9c0c20bf43a8d664026e0d8b0beb40a8ee03d3e6f0b215ebc8fbb89b267dafe8"
+    },
+    {
+      "path": "pnpm-workspace.yaml",
+      "sha256": "0c80113b8c5a8e07d0b82aec272e17237b43e80bccadb110ff426a8c4f407903"
+    },
+    {
+      "path": "samples/g2/data.ttl",
+      "sha256": "349ee83ff47883b13644c6291f98ab0ea925afaca053779d92184ee5d73dcb7e"
+    },
+    {
+      "path": "samples/g2/invalid-data.ttl",
+      "sha256": "982d697df1b03c1c7981d9bfd1f7425445e880c49fb99aa4c5df007218f885a6"
+    },
+    {
+      "path": "samples/g2/ontology.ttl",
+      "sha256": "52b95ac6e85c3e9e3c7fdea1b4c9b5abc6a5e1801b7f459c41072b5f90f9dc73"
+    },
+    {
+      "path": "samples/g2/shapes.ttl",
+      "sha256": "78b6b7cc5cf635825b58664fe23031c0d298cc51d7def446fb5b9aeb17cc9270"
+    },
+    {
+      "path": "samples/g2/vocabulary.ttl",
+      "sha256": "aa272d8683bfdbe6213424be830415d47f0a454191788ee852709bf52e26d93b"
+    },
+    {
+      "path": "samples/g3-m1/01-iri.ttl",
+      "sha256": "0fe5fc093b46ef29ebdf2c7ac9cac29aa97fcfde40974b9f8820086b399a88da"
+    },
+    {
+      "path": "samples/g3-m1/02-class.ttl",
+      "sha256": "c47f0f03140e19b80436a6b90a7c0ac96d9d1ef2eba098705b4baafaa54a94cb"
+    },
+    {
+      "path": "samples/g3-m1/03-subclass.ttl",
+      "sha256": "88bbe89551f16c045d1fba65ca2f81e3bd9afc85f7e672e551842e31128dbef4"
+    },
+    {
+      "path": "samples/g3-m1/04-object-property.ttl",
+      "sha256": "46d697059047710a5ceaabe7788f86dec6c29cbae890dffdf9a7efc9ac74c58b"
+    },
+    {
+      "path": "samples/g3-m1/05-datatype-property.ttl",
+      "sha256": "11980f67dd90a7920e7bc3baec6b76b32101b62289f517ee004199bd808dfe44"
+    },
+    {
+      "path": "samples/g3-m1/06-domain-range.ttl",
+      "sha256": "c6cb7ea917760f062f9e73d721f5ef62e6c7322289c643f435de3b0cdb9d0d75"
+    },
+    {
+      "path": "samples/g3-m1/07-annotation.ttl",
+      "sha256": "6caffbc0c55ad6c55b6e57d268b80cb986d79a59cc5abe75665e607e8b36a31e"
+    },
+    {
+      "path": "samples/g3-m1/08-individual.ttl",
+      "sha256": "1293ed2fdde0f3912fa426aba43425e726fb7c2b99d6598693ca07c3360b464a"
+    },
+    {
+      "path": "samples/g3-m1/09-equivalent.ttl",
+      "sha256": "2d6d2f26fb0de15398862e7b258c1cc3e2351fcd0ee076dfe9dcecfb365872c1"
+    },
+    {
+      "path": "samples/g3-m1/10-disjoint.ttl",
+      "sha256": "717bbe315a8d52ed34686b5f4e8901d53f15c38a296222f843c4a82113bfca92"
+    },
+    {
+      "path": "samples/g3-m1/11-inverse.ttl",
+      "sha256": "063aceb39db53e3a45cd177a13071deb65dadc0d0999edb2010544fd55c72610"
+    },
+    {
+      "path": "samples/g3-m1/12-features.ttl",
+      "sha256": "59340be0913d7201c4cd272564eb7f2380de7d041e63597ac0bf410d715cc166"
+    },
+    {
+      "path": "samples/g3-m1/13-some-all.ttl",
+      "sha256": "ba6777b61878b953d2e25b153a2b6c4e550b69fad8a2bbe804b94c990c0e72d2"
+    },
+    {
+      "path": "samples/g3-m1/14-has-value.ttl",
+      "sha256": "e9b418a4da35e36278700e6d5508a8320fd016d564b4cf0da32257a9efcea743"
+    },
+    {
+      "path": "samples/g3-m1/15-cardinality.ttl",
+      "sha256": "406a91623da2d27635e134d09038bf2d8a63f29da81ad2d534e920f846ab3862"
+    },
+    {
+      "path": "samples/g3-m1/16-boolean.ttl",
+      "sha256": "dd4be75a6d32da785d55c01263eda8c7605f0672061cf71d203622b997643fb5"
+    },
+    {
+      "path": "samples/g3-m1/17-chain.ttl",
+      "sha256": "094d6fd5b4b6dbb1d2c9151a3be9819f61e20f2868366ed0530813c5b8b77f7c"
+    },
+    {
+      "path": "samples/g3-m1/18-imports.ttl",
+      "sha256": "0f2eb191911a3310ff40dab4e6696d330180aab1519641c7cd08bc920a094fdf"
+    },
+    {
+      "path": "samples/g3-m1/19-identity.ttl",
+      "sha256": "96ed2795338c84040034da5c657b94850ea850e2ef521e84e31f6641f9b0fb8d"
+    },
+    {
+      "path": "samples/g3-m1/20-time.ttl",
+      "sha256": "74747452ab51dc554c7e4452b90b6fda2dfeb65e3b89d8be110319df203ebf05"
+    },
+    {
+      "path": "samples/g3-m1/README.md",
+      "sha256": "9ff506558bb401e285c8011f72dd9f87f8fe2be4541f5972c621a2e72ed07faf"
+    },
+    {
+      "path": "samples/g3-m3/units.ttl",
+      "sha256": "a7bc90509e79273a900d4a632e9e633a201da6ce200348f263bf834f3053d852"
+    },
+    {
+      "path": "scripts/acceptance/browser-entry-report.mjs",
+      "sha256": "8185f4073dd994af987c51fcfd5442b0ac642d450c6f9afa28eb453c216cad82"
+    },
+    {
+      "path": "scripts/acceptance/capture-grafana.mjs",
+      "sha256": "ad3f73ca85defd02fe69d0a0244ac96c7e7279327aa3529cd4aa5f8954343528"
+    },
+    {
+      "path": "scripts/acceptance/draft-revision.py",
+      "sha256": "ccbb45485fb0af55c40010ef0d42ca45cd209a9f0434f759fb58593c48ae3a0e"
+    },
+    {
+      "path": "scripts/acceptance/evidence-paths.mjs",
+      "sha256": "16bec46d3b431f8765a04977b0fec9e406fbba1aa62182694d60b888a1be8f06"
+    },
+    {
+      "path": "scripts/acceptance/evidence_paths.py",
+      "sha256": "674fa50df84cd57742bc8458443c6417e87e2107d2e06cf4af591e14de421956"
+    },
+    {
+      "path": "scripts/acceptance/full-g2-e2e.py",
+      "sha256": "9119a3e270a51a21eb20dc1217c63f73121bdafa729dfeab2eb10938700a77c6"
+    },
+    {
+      "path": "scripts/acceptance/g1-regression.py",
+      "sha256": "98ab846f02b808a013520602285dd073cd9f49a153979795c7a2cc434e009b7b"
+    },
+    {
+      "path": "scripts/acceptance/g2-acceptance-runtime.py",
+      "sha256": "187e92412c18555ccb75c4526be40a776399b3dac658b26e433d896731aac76f"
+    },
+    {
+      "path": "scripts/acceptance/g2-full-chain.mjs",
+      "sha256": "141d1d46ae5cdb33a479b29fae04064875004689e41b06af61f0fd3cf422bb92"
+    },
+    {
+      "path": "scripts/acceptance/g2-integration.ps1",
+      "sha256": "8444e7adba1778790a5b4afa7b41cd73022c1811c1e424fe9d69a1ed08ab7a83"
+    },
+    {
+      "path": "scripts/acceptance/g2-live-browser.mjs",
+      "sha256": "7d2cda84546651176335d5394cafd03c6ec1061dfb6844dcd67eb2d7be0d4856"
+    },
+    {
+      "path": "scripts/acceptance/g2-metric-boundary.py",
+      "sha256": "5c405ec19a9199ec99a834358d1d9882ef9319d1ccb570a6c52c2b1a4c3815dc"
+    },
+    {
+      "path": "scripts/acceptance/g2-observability.py",
+      "sha256": "5daa9a9fd7633cf4bba8e0b968b40ae9fc2466fcbf7ec961474756c1ac9ef5d5"
+    },
+    {
+      "path": "scripts/acceptance/g2-readiness-fault.py",
+      "sha256": "dac2e8e37c208702bc39a4a7203adccf97ea7eb6aae57196be984583625a85c0"
+    },
+    {
+      "path": "scripts/acceptance/g2-runtime.py",
+      "sha256": "93556025056b5fdb79be258b5f3205279e67d962555a01bf674b99cdcf81f773"
+    },
+    {
+      "path": "scripts/acceptance/g2-thin-slice.ps1",
+      "sha256": "7ffa06cf310d079dc68038ff0b86e789781a6b1a57db5cb90962044aadcd69c1"
+    },
+    {
+      "path": "scripts/acceptance/g2-trace-browser.mjs",
+      "sha256": "a333409493efe4adaf1b14ee5fd5359e173e14cb7e980eb26994f183df3a6251"
+    },
+    {
+      "path": "scripts/acceptance/g3-acceptance-runtime.py",
+      "sha256": "44fffb319f58f68b997844cca7d2eea61f16081ef64998e949d77dd8c4f7eaa6"
+    },
+    {
+      "path": "scripts/acceptance/g3-compatibility.py",
+      "sha256": "d90609ad40980e6c83cf84c012890f26cdb0daccc990814db03435a8f6440936"
+    },
+    {
+      "path": "scripts/acceptance/g3-governance.ps1",
+      "sha256": "cc3dccf5955cc3bd4e91585f006c085cd15e5d3f4c28a13533319d3cf12c4ac3"
+    },
+    {
+      "path": "scripts/acceptance/g3-m1-browser.mjs",
+      "sha256": "62785a70e16ec4959be7725cf14ee8201fbf805bca7e1674b7100255ab8f8e44"
+    },
+    {
+      "path": "scripts/acceptance/g3-m2-browser.mjs",
+      "sha256": "7c487b212037b37062aee59c2cbeb2ced7462382b5d74cb08f41e0b827e2ddac"
+    },
+    {
+      "path": "scripts/acceptance/g3-m3-browser.mjs",
+      "sha256": "9dea7ef44c285ba7c0ca7da4b306106c99942cd2c6718dd7f05aef344b691d20"
+    },
+    {
+      "path": "scripts/acceptance/g3-m4-browser.mjs",
+      "sha256": "444d89cce4fec2f8cf18f61ddd6c26212f09120eb517ac7e2ca87a8fea4e4c99"
+    },
+    {
+      "path": "scripts/acceptance/g3-read-backpressure.mjs",
+      "sha256": "ef914142dad2df6e49c4bb306ce85da290722dfe25669f3ebf7719663e7e69c3"
+    },
+    {
+      "path": "scripts/acceptance/g3-runtime.py",
+      "sha256": "2632a6e661228553c7b3ed227a090432e8e1cc14adacbab46d6e0008360a1711"
+    },
+    {
+      "path": "scripts/acceptance/mcp-agent.py",
+      "sha256": "d4b705e1843b429d024f651f62fb524798654f225272d0d5a48a5948ed88da3a"
+    },
+    {
+      "path": "scripts/acceptance/new-wave2-certificate.ps1",
+      "sha256": "2553091336663a0727778b054def9f1d6e3d3ef81d8ee71509c17e31b160fc4e"
+    },
+    {
+      "path": "scripts/acceptance/owned_test_containers.py",
+      "sha256": "df3bd4ea2854fd2b420144a898145247a44de83cc993398942a27874bbf962b9"
+    },
+    {
+      "path": "scripts/acceptance/performance-baseline.py",
+      "sha256": "4b8b815be6cb472d3cb918ae80a8726baf3e284a7072477d6db3e95a851fb7dc"
+    },
+    {
+      "path": "scripts/acceptance/query-plan.py",
+      "sha256": "312ec5562fdfd29577e9c388186facbc83f46ad66c136f6f9a2956d9519978ae"
+    },
+    {
+      "path": "scripts/acceptance/release-faults.py",
+      "sha256": "95464997e2883c0569994d58255d93c465a771b97af0887cd88c0c380dc86feb"
+    },
+    {
+      "path": "scripts/acceptance/semantic-roundtrip.py",
+      "sha256": "e2608c70d9550339bfce43716381e3a67510983e84df73a9810830a075821f6f"
+    },
+    {
+      "path": "scripts/acceptance/shacl-validate.py",
+      "sha256": "75d6ad648534f053b393738956cc24e65e510d68185795b9cea29e6fc4a6f153"
+    },
+    {
+      "path": "scripts/acceptance/sse-replay.py",
+      "sha256": "becc5edc7b70e72cd3160fff2a762b5b1817c31e86ca65c3cf8fe6c1ef66475a"
+    },
+    {
+      "path": "scripts/acceptance/test-governance.py",
+      "sha256": "0e09e52fb84d7bfba210de1f8ccacf3a4dab63d03f848a459c6f98c06ea730ab"
+    },
+    {
+      "path": "scripts/acceptance/verify-alert.py",
+      "sha256": "0172681fc6051c6ca95fac3718fa374d06be9d5d69cbf4ca97fbcd058dd48b02"
+    },
+    {
+      "path": "scripts/acceptance/verify-api-restart.py",
+      "sha256": "1863f5213595f18b2eb9816e1143f472f84e759c45d79cfc7d101303bdcbbcfe"
+    },
+    {
+      "path": "scripts/acceptance/verify-closeout-observability.py",
+      "sha256": "016b83b382e7859f6660b54b057e101acdd648a294da496f4d2634e7b11d3093"
+    },
+    {
+      "path": "scripts/acceptance/verify-dependency-fault.py",
+      "sha256": "4e3680dcc92dad5050d143f3ccfb0b3af48ece5ddbb0736cd98c6fdb16978302"
+    },
+    {
+      "path": "scripts/acceptance/verify-openapi.py",
+      "sha256": "7365d011fc0bed0e2fd20f524e87021906a902181f46ce7215b8038c082409a5"
+    },
+    {
+      "path": "scripts/acceptance/verify-persistence.py",
+      "sha256": "b1f448636bc043f67187578e80828dc4c7951297fc5178cf8086a670271f54b9"
+    },
+    {
+      "path": "scripts/acceptance/verify-proxy.py",
+      "sha256": "48e023126a63610b1aa8df6e571d34e08244e200e935f67bc72deffe1fa911a7"
+    },
+    {
+      "path": "scripts/acceptance/wave2-runtime.py",
+      "sha256": "c54618df0035ff2151e6083c20b061d4e7ca8cc6bbed948fdc40dfb7a41369f1"
+    },
+    {
+      "path": "scripts/acceptance/workspace-smoke.mjs",
+      "sha256": "076423fde567aabf37a29e948577f5cf1c334c8328d8100cebd153da48b5062b"
+    },
+    {
+      "path": "scripts/bootstrap-web-tools.ps1",
+      "sha256": "1fda8a0aca44c145c9efc765a4cdf5ad73b0392996524cde2c78ea922a38722e"
+    },
+    {
+      "path": "scripts/check-tsx-readability.py",
+      "sha256": "35c39736064758e44a3573cc4169e78174923950e19daa2b812a4e89e983a42c"
+    },
+    {
+      "path": "scripts/create-review-package.ps1",
+      "sha256": "a8173568e515c77dd4dda52d65147495f6282ca4d7c23088c5e609544968ffa3"
+    },
+    {
+      "path": "scripts/doctor.ps1",
+      "sha256": "126db6212e299e7e8fdc29ad5f7b350c2e770087e01024852fe7d2c668c147e5"
+    },
+    {
+      "path": "scripts/generate-g2-contracts.py",
+      "sha256": "f651c856d6fe0e21d67f9eac5fa7ae11a2decc69c284c4d01872cd6749d3675d"
+    },
+    {
+      "path": "scripts/maintenance/audit-public-history.py",
+      "sha256": "dab18f09113dbb3b49e349a7422ffe09827d4b85b36181a9fb8cdc7eda3a25c7"
+    },
+    {
+      "path": "scripts/maintenance/canonical_fuseki.py",
+      "sha256": "ed4a3aa22c89cb32ef0e40969641ff606de77865bc5b8f5e9ef73a54fc03e75b"
+    },
+    {
+      "path": "scripts/maintenance/ci_scope.py",
+      "sha256": "a289b9bd51eaf9e6184eab849fb84087bd140e3b2643d70635f2b26a8e4a165a"
+    },
+    {
+      "path": "scripts/maintenance/cleanup-resources.ps1",
+      "sha256": "b3ba0ae232a6044209193336b279ae0ddf68493e3ab58b2e8ae40f38e97909a7"
+    },
+    {
+      "path": "scripts/maintenance/cleanup_resources.py",
+      "sha256": "44efd52440ef32e22666756c8ab1f39fb0b886ca2af47e892d220601be8e2e31"
+    },
+    {
+      "path": "scripts/maintenance/docker_inventory.py",
+      "sha256": "ad8613f7d9a65b3dc1b6cbcc73cdb2d8df619bbd698d3de45a7ab935e301e883"
+    },
+    {
+      "path": "scripts/maintenance/fuseki_ci_cache.py",
+      "sha256": "a06074ed4d7b3f3bda27d67505c00c287c85112730dfc45b10cead7fd4bb6a1a"
+    },
+    {
+      "path": "scripts/maintenance/fuseki_transfer.py",
+      "sha256": "705f56a22ac0c0fe668854f603bd80a53aea432626079deed7a86ec29479c84f"
+    },
+    {
+      "path": "scripts/maintenance/inspect-resources.ps1",
+      "sha256": "dc719146e4501d4d701d26f76e3c303ab6c6e8594a156ef91b5ee4fa8cf60430"
+    },
+    {
+      "path": "scripts/maintenance/task_run_timeline.py",
+      "sha256": "631a9bb0b9f7180f7f9b188483493bf37a3e2f78df5bb77fc996a1987d105756"
+    },
+    {
+      "path": "scripts/new-review-evidence.ps1",
+      "sha256": "cdf7664bd89bd7ad50f9cb5d230a68e57112344e18b63a9c35cb0ed02adc9a73"
+    },
+    {
+      "path": "scripts/test-review-evidence.ps1",
+      "sha256": "6e9cf6df2f7daa7b6a9e302adbe084f5721050a3d4ac3cb1a4b693acdd88020f"
+    },
+    {
+      "path": "scripts/tests/CanonicalFuseki.Real.Tests.py",
+      "sha256": "8ff01ac9e988e359c0fec3a455c05c8a4dbe98a39036086e4c56f21d6420e0bd"
+    },
+    {
+      "path": "scripts/tests/CanonicalFuseki.Tests.py",
+      "sha256": "92bf9a5b866173b3749434c30c615c19c94eebcc6b4ea3b5e1547f755720e302"
+    },
+    {
+      "path": "scripts/tests/CleanupResources.Tests.py",
+      "sha256": "14886ddcc861aef1e3cf20e8e6c75f5a14974994951292a70f7289fbecf9195a"
+    },
+    {
+      "path": "scripts/tests/CloseoutGovernance.Tests.py",
+      "sha256": "d7401405e78851f9a00abd62a25234775609d658ec712e4863db120e5a979eb0"
+    },
+    {
+      "path": "scripts/tests/Doctor.Tests.ps1",
+      "sha256": "2230e402f72c94931af1abe98f2cd6c7eae8ef669658efb83c0653229278d368"
+    },
+    {
+      "path": "scripts/tests/Environment.Tests.ps1",
+      "sha256": "1875a0a046059c3ea7d9a63d60c6970765443f73299b154e3a2848fd8796fe69"
+    },
+    {
+      "path": "scripts/tests/EvidencePreflight.Tests.ps1",
+      "sha256": "90be79b32848d0f7b573d15cf389bcf3010fe7778ab361e63959f197961e9d56"
+    },
+    {
+      "path": "scripts/tests/FusekiCache.Tests.py",
+      "sha256": "e443644e47c194a554d177bf1fed3a62eefe63cb8e761da380f6de431402471b"
+    },
+    {
+      "path": "scripts/tests/FusekiCiCache.Tests.py",
+      "sha256": "fb25fbb676950bb09375b4c7ecc860db769d36ae2f55d5e569392b9c3a5a1252"
+    },
+    {
+      "path": "scripts/tests/FusekiTransfer.Tests.py",
+      "sha256": "7dea7deca46eabba07e163adb98d3aa6f7277c628b8f107fc564d7bc9319db4d"
+    },
+    {
+      "path": "scripts/tests/G2Acceptance.Tests.py",
+      "sha256": "393e9bbb2295f58d88c8e83975262dc9d29417bfde2d10f133b963d5c50eda67"
+    },
+    {
+      "path": "scripts/tests/G3Acceptance.Tests.py",
+      "sha256": "fd7f1097addbe17434e1cff1540b5c8b9cead46cbe69343882df6a65c8bb31da"
+    },
+    {
+      "path": "scripts/tests/G3AppHost.Tests.py",
+      "sha256": "384b8e6cab39b7f55a9b05e77662d938cd1f43888f565e24372884e2dcdb6e70"
+    },
+    {
+      "path": "scripts/tests/G3BrowserReport.Tests.mjs",
+      "sha256": "581198b017155f9d2d31c91ab9b90f8deb8d9101670a538128794d5941c72db7"
+    },
+    {
+      "path": "scripts/tests/G3Compatibility.Tests.py",
+      "sha256": "4e67f002e4d81b768d3afe59ac949ef488a964a9e611ae787d4bdd8ef448e211"
+    },
+    {
+      "path": "scripts/tests/G3Evidence.Tests.py",
+      "sha256": "cb0930b6aa26e27c237391896ffee3283549acf876526c6546062536b5583fdd"
+    },
+    {
+      "path": "scripts/tests/G3ReadBackpressure.Tests.mjs",
+      "sha256": "74fd94c202beddcc2fb0fe081cb2183db053539bd463a82305e54a6664d83b93"
+    },
+    {
+      "path": "scripts/tests/InspectorResources.Tests.py",
+      "sha256": "1f07f36810d636ffaf2a0db471572adc45db8d0b50e0811064467d2ae60b1e5f"
+    },
+    {
+      "path": "scripts/tests/OwnedTestContainers.Tests.py",
+      "sha256": "88b403698cf91265a8cb46d193949e2bb011d21dec41a48835533fdb5339f94b"
+    },
+    {
+      "path": "scripts/tests/PublicHistory.Tests.py",
+      "sha256": "a6da9d65d3fcf810bb0be8df769af161a4acc9c549aa97afb5d8c5e44d5bc1b5"
+    },
+    {
+      "path": "scripts/tests/ResourceLifecycle.Tests.py",
+      "sha256": "5f886641b6ab30daa45ff791fa8d5efccd5fdb12bb479fa95270c13966d63a16"
+    },
+    {
+      "path": "scripts/tests/ReviewPackage.Tests.ps1",
+      "sha256": "c498e2d441f4c7e8d821437006d5e52395780050f62e7054add896022e35ad2d"
+    },
+    {
+      "path": "scripts/tests/StructuredFiles.Tests.ps1",
+      "sha256": "12fa9d001a78ba4cf5aacba4ed9693dfdf49e8bfba1045066a2d8243b1298918"
+    },
+    {
+      "path": "scripts/tests/TaskRunTimeline.Tests.py",
+      "sha256": "19311535161ef566999d54b35ffeb3be0ae00be50879c58a058e0e2c3d8f5d95"
+    },
+    {
+      "path": "scripts/tests/Wave2Runtime.Tests.py",
+      "sha256": "9f6cf334d27937e62dd3bf922d1cbb2cb870548dd8713ec70b1b8d99c5dbb0bc"
+    },
+    {
+      "path": "scripts/tests/WebToolchain.Tests.ps1",
+      "sha256": "c960933cc934932bcc453791acb0147eddd70d7a8071be27632b69681d449bb9"
+    },
+    {
+      "path": "scripts/toolchain-artifacts.json",
+      "sha256": "41a8da5e0a6d622f61824f4f719728b5c8012fa1fc3d7843c7e6cd4565334632"
+    },
+    {
+      "path": "scripts/validate-structured-files.py",
+      "sha256": "6070c69729d71c57173d97cca7bcfc5b063d0b14211e3005562162cee7c53f49"
+    },
+    {
+      "path": "scripts/verification-requirements.txt",
+      "sha256": "29a0e3047d5474b4ddc08517c181d29d9bc621d4b5db4e769fc734e896a075c0"
+    },
+    {
+      "path": "scripts/verify-web.ps1",
+      "sha256": "4c85a3319f960fdf88da342c4dfd1ddec1754a615938484534bf834354250216"
+    },
+    {
+      "path": "scripts/verify.ps1",
+      "sha256": "acb8bd4ef755827dffd4d75a2a80191fac6d2fb95aa2dc5b1668097d35948400"
+    },
+    {
+      "path": "turbo.json",
+      "sha256": "2ec833d822ba80a26367963e77321d0dfaf05ce9f4ffdcd111321cb9d6c34b8d"
+    }
+  ]
+}
