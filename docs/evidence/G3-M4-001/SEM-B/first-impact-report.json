@@ -1,0 +1,305 @@
+{
+  "exitCode": 1,
+  "records": [
+    {
+      "check": "public-jena-fixture-modes",
+      "exitCode": 0,
+      "modes": {
+        "fixture": "0o755",
+        "config.ttl": "0o644",
+        "log4j2.properties": "0o644"
+      }
+    },
+    {
+      "resourceLifecycle": true,
+      "project": "on-dotnet/ontology-platform",
+      "taskId": "G3-M4-001",
+      "runId": "g2-sem-3d709ef46d39",
+      "observedAtUtc": "2026-10-30T16:43:18.413277+00:00",
+      "phase": "create",
+      "dockerBackend": {
+        "context": "desktop-linux",
+        "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016"
+      },
+      "name": "g2-sem-3d709ef46d39",
+      "containerId": "dbe7ecd0310b136944932dc9d0387e184f03fb737d57381402904d764ac727cd",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "run",
+        "--label",
+        "io.ontology-platform.project=on-dotnet/ontology-platform",
+        "--label",
+        "io.ontology-platform.task-id=G3-M4-001",
+        "--label",
+        "io.ontology-platform.run-id=g2-sem-3d709ef46d39",
+        "--label",
+        "io.ontology-platform.test-fixture=true",
+        "--detach",
+        "--name",
+        "g2-sem-3d709ef46d39",
+        "--publish",
+        "127.0.0.1::3030",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--mount",
+        "type=bind,src=/private/tmp/g2-sem-3d709ef46d39vvf_g2na/fixture,dst=/fixture,readonly",
+        "--entrypoint",
+        "java",
+        "ontology-platform-fuseki:context-4fbf23514516632dcb651b5c05bf04e9992da52491607b6cf58de1f7348ff9ab",
+        "-Xmx384m",
+        "-Dlog4j.configurationFile=/fixture/log4j2.properties",
+        "-jar",
+        "/opt/fuseki/fuseki-server.jar",
+        "--config=/fixture/config.ttl"
+      ],
+      "exitCode": 0,
+      "output": "dbe7ecd0310b136944932dc9d0387e184f03fb737d57381402904d764ac727cd\n"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "port",
+        "g2-sem-3d709ef46d39",
+        "3030/tcp"
+      ],
+      "exitCode": 0,
+      "output": "127.0.0.1:61997\n"
+    },
+    {
+      "resourceLifecycle": true,
+      "project": "on-dotnet/ontology-platform",
+      "taskId": "G3-M4-001",
+      "runId": "g2-sem-3d709ef46d39",
+      "observedAtUtc": "2026-10-30T16:43:19.788041+00:00",
+      "phase": "create",
+      "dockerBackend": {
+        "context": "desktop-linux",
+        "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016"
+      },
+      "name": "g2-sem-3d709ef46d39-pg",
+      "containerId": "2a4403e9b1612f41b733e706da8ff0cfc41e04e7648042712ffdb2a2954e913a",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "run",
+        "--label",
+        "io.ontology-platform.project=on-dotnet/ontology-platform",
+        "--label",
+        "io.ontology-platform.task-id=G3-M4-001",
+        "--label",
+        "io.ontology-platform.run-id=g2-sem-3d709ef46d39",
+        "--label",
+        "io.ontology-platform.test-fixture=true",
+        "--detach",
+        "--name",
+        "g2-sem-3d709ef46d39-pg",
+        "--publish",
+        "127.0.0.1::5432",
+        "--env",
+        "POSTGRES_PASSWORD",
+        "--env",
+        "POSTGRES_DB",
+        "--memory",
+        "512m",
+        "--cpus",
+        "1",
+        "--tmpfs",
+        "/var/lib/postgresql",
+        "postgres:18.6-trixie@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6"
+      ],
+      "exitCode": 0,
+      "output": "2a4403e9b1612f41b733e706da8ff0cfc41e04e7648042712ffdb2a2954e913a\n"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "port",
+        "g2-sem-3d709ef46d39-pg",
+        "5432/tcp"
+      ],
+      "exitCode": 0,
+      "output": "127.0.0.1:62007\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "build",
+        "backend/tests/OntologyPlatform.SemanticTests",
+        "--no-restore"
+      ],
+      "exitCode": 1,
+      "output": "  OntologyPlatform.Contracts -> /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/bin/Debug/net10.0/OntologyPlatform.Contracts.dll\n  OntologyPlatform.Modules.Ontology.Domain -> /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.Domain.dll\n  OntologyPlatform.Modules.Ontology -> /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.dll\n  OntologyPlatform.Modules.Governance -> /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/bin/Debug/net10.0/OntologyPlatform.Modules.Governance.dll\n/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs(148,58): error CS1003: 语法错误，应输入“,” [/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/OntologyPlatform.SemanticTests.csproj]\n/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs(148,59): error CS1056: 意外的字符“\\” [/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/OntologyPlatform.SemanticTests.csproj]\n/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs(148,60): error CS1056: 意外的字符“\\” [/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/OntologyPlatform.SemanticTests.csproj]\n/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs(148,61): error CS1003: 语法错误，应输入“,” [/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/OntologyPlatform.SemanticTests.csproj]\n/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs(148,69): error CS1003: 语法错误，应输入“,” [/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/OntologyPlatform.SemanticTests.csproj]\n/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs(148,70): error CS1056: 意外的字符“\\” [/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/OntologyPlatform.SemanticTests.csproj]\n/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs(148,71): error CS1056: 意外的字符“\\” [/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/OntologyPlatform.SemanticTests.csproj]\n/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs(148,72): error CS1003: 语法错误，应输入“,” [/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/OntologyPlatform.SemanticTests.csproj]\n/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs(149,67): error CS1012: 字符字面量中的字符太多 [/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/OntologyPlatform.SemanticTests.csproj]\n/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs(150,72): error CS1012: 字符字面量中的字符太多 [/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/OntologyPlatform.SemanticTests.csproj]\n\n生成失败。\n\n/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs(148,58): error CS1003: 语法错误，应输入“,” [/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/OntologyPlatform.SemanticTests.csproj]\n/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs(148,59): error CS1056: 意外的字符“\\” [/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/OntologyPlatform.SemanticTests.csproj]\n/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs(148,60): error CS1056: 意外的字符“\\” [/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/OntologyPlatform.SemanticTests.csproj]\n/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs(148,61): error CS1003: 语法错误，应输入“,” [/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/OntologyPlatform.SemanticTests.csproj]\n/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs(148,69): error CS1003: 语法错误，应输入“,” [/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/OntologyPlatform.SemanticTests.csproj]\n/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs(148,70): error CS1056: 意外的字符“\\” [/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/OntologyPlatform.SemanticTests.csproj]\n/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs(148,71): error CS1056: 意外的字符“\\” [/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/OntologyPlatform.SemanticTests.csproj]\n/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs(148,72): error CS1003: 语法错误，应输入“,” [/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/OntologyPlatform.SemanticTests.csproj]\n/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs(149,67): error CS1012: 字符字面量中的字符太多 [/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/OntologyPlatform.SemanticTests.csproj]\n/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs(150,72): error CS1012: 字符字面量中的字符太多 [/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/OntologyPlatform.SemanticTests.csproj]\n    0 个警告\n    10 个错误\n\n已用时间 00:00:00.77\n"
+    },
+    {
+      "status": "FAIL",
+      "category": "RuntimeError"
+    },
+    {
+      "resourceLifecycle": true,
+      "project": "on-dotnet/ontology-platform",
+      "taskId": "G3-M4-001",
+      "runId": "g2-sem-3d709ef46d39",
+      "observedAtUtc": "2026-10-30T16:43:21.799976+00:00",
+      "phase": "before",
+      "dockerBackend": {
+        "context": "desktop-linux",
+        "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016"
+      },
+      "containerId": "2a4403e9b1612f41b733e706da8ff0cfc41e04e7648042712ffdb2a2954e913a",
+      "snapshot": {
+        "Id": "2a4403e9b1612f41b733e706da8ff0cfc41e04e7648042712ffdb2a2954e913a",
+        "Name": "/g2-sem-3d709ef46d39-pg",
+        "Project": "on-dotnet/ontology-platform",
+        "TaskId": "G3-M4-001",
+        "RunId": "g2-sem-3d709ef46d39",
+        "Fixture": "true"
+      },
+      "status": "PASS"
+    },
+    {
+      "resourceLifecycle": true,
+      "project": "on-dotnet/ontology-platform",
+      "taskId": "G3-M4-001",
+      "runId": "g2-sem-3d709ef46d39",
+      "observedAtUtc": "2026-10-30T16:43:21.890065+00:00",
+      "phase": "command",
+      "dockerBackend": {
+        "context": "desktop-linux",
+        "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016"
+      },
+      "containerId": "2a4403e9b1612f41b733e706da8ff0cfc41e04e7648042712ffdb2a2954e913a",
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "container",
+        "rm",
+        "--force",
+        "2a4403e9b1612f41b733e706da8ff0cfc41e04e7648042712ffdb2a2954e913a"
+      ]
+    },
+    {
+      "resourceLifecycle": true,
+      "project": "on-dotnet/ontology-platform",
+      "taskId": "G3-M4-001",
+      "runId": "g2-sem-3d709ef46d39",
+      "observedAtUtc": "2026-10-30T16:43:22.011702+00:00",
+      "phase": "exit",
+      "dockerBackend": {
+        "context": "desktop-linux",
+        "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016"
+      },
+      "containerId": "2a4403e9b1612f41b733e706da8ff0cfc41e04e7648042712ffdb2a2954e913a",
+      "exitCode": 0,
+      "durationMs": 122
+    },
+    {
+      "resourceLifecycle": true,
+      "project": "on-dotnet/ontology-platform",
+      "taskId": "G3-M4-001",
+      "runId": "g2-sem-3d709ef46d39",
+      "observedAtUtc": "2026-10-30T16:43:22.198512+00:00",
+      "phase": "after",
+      "dockerBackend": {
+        "context": "desktop-linux",
+        "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016"
+      },
+      "containerId": "2a4403e9b1612f41b733e706da8ff0cfc41e04e7648042712ffdb2a2954e913a",
+      "absent": true,
+      "absenceDiagnostic": "Error response from daemon: No such container: 2a4403e9b1612f41b733e706da8ff0cfc41e04e7648042712ffdb2a2954e913a",
+      "status": "PASS"
+    },
+    {
+      "resourceLifecycle": true,
+      "project": "on-dotnet/ontology-platform",
+      "taskId": "G3-M4-001",
+      "runId": "g2-sem-3d709ef46d39",
+      "observedAtUtc": "2026-10-30T16:43:22.389432+00:00",
+      "phase": "before",
+      "dockerBackend": {
+        "context": "desktop-linux",
+        "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016"
+      },
+      "containerId": "dbe7ecd0310b136944932dc9d0387e184f03fb737d57381402904d764ac727cd",
+      "snapshot": {
+        "Id": "dbe7ecd0310b136944932dc9d0387e184f03fb737d57381402904d764ac727cd",
+        "Name": "/g2-sem-3d709ef46d39",
+        "Project": "on-dotnet/ontology-platform",
+        "TaskId": "G3-M4-001",
+        "RunId": "g2-sem-3d709ef46d39",
+        "Fixture": "true"
+      },
+      "status": "PASS"
+    },
+    {
+      "resourceLifecycle": true,
+      "project": "on-dotnet/ontology-platform",
+      "taskId": "G3-M4-001",
+      "runId": "g2-sem-3d709ef46d39",
+      "observedAtUtc": "2026-10-30T16:43:22.468853+00:00",
+      "phase": "command",
+      "dockerBackend": {
+        "context": "desktop-linux",
+        "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016"
+      },
+      "containerId": "dbe7ecd0310b136944932dc9d0387e184f03fb737d57381402904d764ac727cd",
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "container",
+        "rm",
+        "--force",
+        "dbe7ecd0310b136944932dc9d0387e184f03fb737d57381402904d764ac727cd"
+      ]
+    },
+    {
+      "resourceLifecycle": true,
+      "project": "on-dotnet/ontology-platform",
+      "taskId": "G3-M4-001",
+      "runId": "g2-sem-3d709ef46d39",
+      "observedAtUtc": "2026-10-30T16:43:22.606449+00:00",
+      "phase": "exit",
+      "dockerBackend": {
+        "context": "desktop-linux",
+        "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016"
+      },
+      "containerId": "dbe7ecd0310b136944932dc9d0387e184f03fb737d57381402904d764ac727cd",
+      "exitCode": 0,
+      "durationMs": 138
+    },
+    {
+      "resourceLifecycle": true,
+      "project": "on-dotnet/ontology-platform",
+      "taskId": "G3-M4-001",
+      "runId": "g2-sem-3d709ef46d39",
+      "observedAtUtc": "2026-10-30T16:43:22.765046+00:00",
+      "phase": "after",
+      "dockerBackend": {
+        "context": "desktop-linux",
+        "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016"
+      },
+      "containerId": "dbe7ecd0310b136944932dc9d0387e184f03fb737d57381402904d764ac727cd",
+      "absent": true,
+      "absenceDiagnostic": "Error response from daemon: No such container: dbe7ecd0310b136944932dc9d0387e184f03fb737d57381402904d764ac727cd",
+      "status": "PASS"
+    }
+  ]
+}

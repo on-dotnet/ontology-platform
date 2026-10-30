@@ -1,0 +1,363 @@
+{
+  "exitCode": 2,
+  "records": [
+    {
+      "check": "public-jena-fixture-modes",
+      "exitCode": 0,
+      "modes": {
+        "fixture": "0o755",
+        "config.ttl": "0o644",
+        "log4j2.properties": "0o644"
+      }
+    },
+    {
+      "resourceLifecycle": true,
+      "project": "on-dotnet/ontology-platform",
+      "taskId": "G3-M4-001",
+      "runId": "g2-sem-fad0e60a1fd8",
+      "observedAtUtc": "2026-10-30T16:44:12.787227+00:00",
+      "phase": "create",
+      "dockerBackend": {
+        "context": "desktop-linux",
+        "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016"
+      },
+      "name": "g2-sem-fad0e60a1fd8",
+      "containerId": "1c83dc2927900ae212ddd71b2da4d9fa3d8e5699749c5e1d21b5cb9a7bf8296f",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "run",
+        "--label",
+        "io.ontology-platform.project=on-dotnet/ontology-platform",
+        "--label",
+        "io.ontology-platform.task-id=G3-M4-001",
+        "--label",
+        "io.ontology-platform.run-id=g2-sem-fad0e60a1fd8",
+        "--label",
+        "io.ontology-platform.test-fixture=true",
+        "--detach",
+        "--name",
+        "g2-sem-fad0e60a1fd8",
+        "--publish",
+        "127.0.0.1::3030",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--mount",
+        "type=bind,src=/private/tmp/g2-sem-fad0e60a1fd8448eal45/fixture,dst=/fixture,readonly",
+        "--entrypoint",
+        "java",
+        "ontology-platform-fuseki:context-4fbf23514516632dcb651b5c05bf04e9992da52491607b6cf58de1f7348ff9ab",
+        "-Xmx384m",
+        "-Dlog4j.configurationFile=/fixture/log4j2.properties",
+        "-jar",
+        "/opt/fuseki/fuseki-server.jar",
+        "--config=/fixture/config.ttl"
+      ],
+      "exitCode": 0,
+      "output": "1c83dc2927900ae212ddd71b2da4d9fa3d8e5699749c5e1d21b5cb9a7bf8296f\n"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "port",
+        "g2-sem-fad0e60a1fd8",
+        "3030/tcp"
+      ],
+      "exitCode": 0,
+      "output": "127.0.0.1:62083\n"
+    },
+    {
+      "resourceLifecycle": true,
+      "project": "on-dotnet/ontology-platform",
+      "taskId": "G3-M4-001",
+      "runId": "g2-sem-fad0e60a1fd8",
+      "observedAtUtc": "2026-10-30T16:44:14.204941+00:00",
+      "phase": "create",
+      "dockerBackend": {
+        "context": "desktop-linux",
+        "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016"
+      },
+      "name": "g2-sem-fad0e60a1fd8-pg",
+      "containerId": "2480df9a3d34c7caa41a93bc816bb86c94e1228b7f02972a5447c0dc4fa6ca06",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "run",
+        "--label",
+        "io.ontology-platform.project=on-dotnet/ontology-platform",
+        "--label",
+        "io.ontology-platform.task-id=G3-M4-001",
+        "--label",
+        "io.ontology-platform.run-id=g2-sem-fad0e60a1fd8",
+        "--label",
+        "io.ontology-platform.test-fixture=true",
+        "--detach",
+        "--name",
+        "g2-sem-fad0e60a1fd8-pg",
+        "--publish",
+        "127.0.0.1::5432",
+        "--env",
+        "POSTGRES_PASSWORD",
+        "--env",
+        "POSTGRES_DB",
+        "--memory",
+        "512m",
+        "--cpus",
+        "1",
+        "--tmpfs",
+        "/var/lib/postgresql",
+        "postgres:18.6-trixie@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6"
+      ],
+      "exitCode": 0,
+      "output": "2480df9a3d34c7caa41a93bc816bb86c94e1228b7f02972a5447c0dc4fa6ca06\n"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "port",
+        "g2-sem-fad0e60a1fd8-pg",
+        "5432/tcp"
+      ],
+      "exitCode": 0,
+      "output": "127.0.0.1:62091\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "build",
+        "backend/tests/OntologyPlatform.SemanticTests",
+        "--no-restore"
+      ],
+      "exitCode": 0,
+      "output": "  OntologyPlatform.Contracts -> /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/bin/Debug/net10.0/OntologyPlatform.Contracts.dll\n  OntologyPlatform.Modules.Governance -> /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/bin/Debug/net10.0/OntologyPlatform.Modules.Governance.dll\n  OntologyPlatform.Modules.Ontology.Domain -> /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.Domain.dll\n  OntologyPlatform.Modules.Ontology -> /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.dll\n  OntologyPlatform.SemanticTests -> /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll\n\n已成功生成。\n    0 个警告\n    0 个错误\n\n已用时间 00:00:00.64\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "tool",
+        "restore"
+      ],
+      "exitCode": 0,
+      "output": "工具“dotnet-ef”(版本“10.0.13”)已还原。可用的命令: dotnet-ef\n\n还原成功。\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "tool",
+        "run",
+        "dotnet-ef",
+        "database",
+        "update",
+        "--project",
+        "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance",
+        "--startup-project",
+        "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance",
+        "--no-build"
+      ],
+      "exitCode": 0,
+      "output": "Failed executing DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']\nSELECT \"MigrationId\", \"ProductVersion\"\nFROM governance.\"__EFMigrationsHistory\"\nORDER BY \"MigrationId\";\nAcquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.\nApplying migration '20261025062847_InitialGovernance'.\nApplying migration '20261025144246_AuditScopeSites'.\nAcquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.\nDone.\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "tool",
+        "run",
+        "dotnet-ef",
+        "database",
+        "update",
+        "--project",
+        "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology",
+        "--startup-project",
+        "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology",
+        "--no-build"
+      ],
+      "exitCode": 0,
+      "output": "Failed executing DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']\nSELECT \"MigrationId\", \"ProductVersion\"\nFROM ontology.\"__EFMigrationsHistory\"\nORDER BY \"MigrationId\";\nAcquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.\nApplying migration '20261026003221_InitialOntology'.\nApplying migration '20261027032135_G3Assessments'.\nAcquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.\nApplying migration '20261030155129_G3M4ImpactReports'.\nAcquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.\nDone.\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "test",
+        "--project",
+        "backend/tests/OntologyPlatform.SemanticTests",
+        "--no-restore",
+        "--",
+        "--filter",
+        "FullyQualifiedName~G3M4ImpactReportTests"
+      ],
+      "exitCode": 2,
+      "output": "正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n失败 ReportIdentityIdempotencyAndAuditAreFrozenToFirstInput (820ms)\n  从 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  测试方法 OntologyPlatform.SemanticTests.G3M4ImpactReportTests。ReportIdentityIdempotencyAndAuditAreFrozenToFirstInput 引发了异常: \n  System.InvalidOperationException: 审计元数据未满足固定事件和完整范围合同。\n    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.CreateRecord(ActorContext actor, AuditCommand command) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:97\n    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:51\n    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:54\n    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:60\n    在 OntologyPlatform.Modules.Ontology.OntologyService.WriteAsync[T](ActorContext actor, ResourceScope scope, String action, CommandContext command, Object payload, Func`2 mutation, CancellationToken token, Func`2 shouldAudit) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyService.cs:275\n    在 OntologyPlatform.Modules.Ontology.OntologyService.WriteAsync[T](ActorContext actor, ResourceScope scope, String action, CommandContext command, Object payload, Func`2 mutation, CancellationToken token, Func`2 shouldAudit) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyService.cs:282\n    在 OntologyPlatform.Modules.Ontology.OntologyService.GenerateImpactAsync(ActorContext actor, GenerateImpactReportRequest request, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyImpactGeneration.cs:69\n    在 OntologyPlatform.SemanticTests.G3M4ImpactReportTests.ReportIdentityIdempotencyAndAuditAreFrozenToFirstInput() 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs:29\n    在 OntologyPlatform.SemanticTests.G3M4ImpactReportTests.ReportIdentityIdempotencyAndAuditAreFrozenToFirstInput() 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs:54\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n    \n失败 ConcurrentInputCreatesOneReportAndOneBusinessAudit (99ms)\n  从 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  测试方法 OntologyPlatform.SemanticTests.G3M4ImpactReportTests。ConcurrentInputCreatesOneReportAndOneBusinessAudit 引发了异常: \n  System.InvalidOperationException: 审计元数据未满足固定事件和完整范围合同。\n    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.CreateRecord(ActorContext actor, AuditCommand command) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:97\n    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:51\n    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:54\n    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:60\n    在 OntologyPlatform.Modules.Ontology.OntologyService.WriteAsync[T](ActorContext actor, ResourceScope scope, String action, CommandContext command, Object payload, Func`2 mutation, CancellationToken token, Func`2 shouldAudit) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyService.cs:275\n    在 OntologyPlatform.Modules.Ontology.OntologyService.WriteAsync[T](ActorContext actor, ResourceScope scope, String action, CommandContext command, Object payload, Func`2 mutation, CancellationToken token, Func`2 shouldAudit) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyService.cs:282\n    在 OntologyPlatform.Modules.Ontology.OntologyService.GenerateImpactAsync(ActorContext actor, GenerateImpactReportRequest request, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyImpactGeneration.cs:69\n    在 OntologyPlatform.SemanticTests.G3M4ImpactReportTests.GenerateSeparate(ActorContext actor, GenerateImpactReportRequest request) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs:165\n    在 OntologyPlatform.SemanticTests.G3M4ImpactReportTests.GenerateSeparate(ActorContext actor, GenerateImpactReportRequest request) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs:165\n    在 OntologyPlatform.SemanticTests.G3M4ImpactReportTests.ConcurrentInputCreatesOneReportAndOneBusinessAudit() 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs:68\n    在 OntologyPlatform.SemanticTests.G3M4ImpactReportTests.ConcurrentInputCreatesOneReportAndOneBusinessAudit() 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs:75\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n    \n失败 ActualUnknownAndTechnicalBlockersHaveBoundEvidence (\"missing\",\"impact_assessment_required\") (91ms)\n  从 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  测试方法 OntologyPlatform.SemanticTests.G3M4ImpactReportTests。ActualUnknownAndTechnicalBlockersHaveBoundEvidence 引发了异常: \n  System.InvalidOperationException: 审计元数据未满足固定事件和完整范围合同。\n    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.CreateRecord(ActorContext actor, AuditCommand command) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:97\n    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:51\n    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:54\n    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:60\n    在 OntologyPlatform.Modules.Ontology.OntologyService.WriteAsync[T](ActorContext actor, ResourceScope scope, String action, CommandContext command, Object payload, Func`2 mutation, CancellationToken token, Func`2 shouldAudit) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyService.cs:275\n    在 OntologyPlatform.Modules.Ontology.OntologyService.WriteAsync[T](ActorContext actor, ResourceScope scope, String action, CommandContext command, Object payload, Func`2 mutation, CancellationToken token, Func`2 shouldAudit) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyService.cs:282\n    在 OntologyPlatform.Modules.Ontology.OntologyService.GenerateImpactAsync(ActorContext actor, GenerateImpactReportRequest request, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyImpactGeneration.cs:69\n    在 OntologyPlatform.SemanticTests.G3M4ImpactReportTests.ActualUnknownAndTechnicalBlockersHaveBoundEvidence(String scenario, String code) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs:99\n    在 OntologyPlatform.SemanticTests.G3M4ImpactReportTests.ActualUnknownAndTechnicalBlockersHaveBoundEvidence(String scenario, String code) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs:112\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n    \n失败 ActualUnknownAndTechnicalBlockersHaveBoundEvidence (\"unsupported\",\"impact_unsupported_axiom\") (56ms)\n  从 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  测试方法 OntologyPlatform.SemanticTests.G3M4ImpactReportTests。ActualUnknownAndTechnicalBlockersHaveBoundEvidence 引发了异常: \n  System.InvalidOperationException: 审计元数据未满足固定事件和完整范围合同。\n    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.CreateRecord(ActorContext actor, AuditCommand command) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:97\n    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:51\n    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:54\n    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:60\n    在 OntologyPlatform.Modules.Ontology.OntologyService.WriteAsync[T](ActorContext actor, ResourceScope scope, String action, CommandContext command, Object payload, Func`2 mutation, CancellationToken token, Func`2 shouldAudit) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyService.cs:275\n    在 OntologyPlatform.Modules.Ontology.OntologyService.WriteAsync[T](ActorContext actor, ResourceScope scope, String action, CommandContext command, Object payload, Func`2 mutation, CancellationToken token, Func`2 shouldAudit) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyService.cs:282\n    在 OntologyPlatform.Modules.Ontology.OntologyService.GenerateImpactAsync(ActorContext actor, GenerateImpactReportRequest request, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyImpactGeneration.cs:69\n    在 OntologyPlatform.SemanticTests.G3M4ImpactReportTests.ActualUnknownAndTechnicalBlockersHaveBoundEvidence(String scenario, String code) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs:99\n    在 OntologyPlatform.SemanticTests.G3M4ImpactReportTests.ActualUnknownAndTechnicalBlockersHaveBoundEvidence(String scenario, String code) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs:112\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n    \n失败 ActualUnknownAndTechnicalBlockersHaveBoundEvidence (\"imports\",\"impact_imports_unresolved\") (76ms)\n  从 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  测试方法 OntologyPlatform.SemanticTests.G3M4ImpactReportTests。ActualUnknownAndTechnicalBlockersHaveBoundEvidence 引发了异常: \n  System.InvalidOperationException: 审计元数据未满足固定事件和完整范围合同。\n    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.CreateRecord(ActorContext actor, AuditCommand command) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:97\n    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:51\n    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:54\n    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:60\n    在 OntologyPlatform.Modules.Ontology.OntologyService.WriteAsync[T](ActorContext actor, ResourceScope scope, String action, CommandContext command, Object payload, Func`2 mutation, CancellationToken token, Func`2 shouldAudit) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyService.cs:275\n    在 OntologyPlatform.Modules.Ontology.OntologyService.WriteAsync[T](ActorContext actor, ResourceScope scope, String action, CommandContext command, Object payload, Func`2 mutation, CancellationToken token, Func`2 shouldAudit) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyService.cs:282\n    在 OntologyPlatform.Modules.Ontology.OntologyService.GenerateImpactAsync(ActorContext actor, GenerateImpactReportRequest request, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyImpactGeneration.cs:69\n    在 OntologyPlatform.SemanticTests.G3M4ImpactReportTests.ActualUnknownAndTechnicalBlockersHaveBoundEvidence(String scenario, String code) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs:99\n    在 OntologyPlatform.SemanticTests.G3M4ImpactReportTests.ActualUnknownAndTechnicalBlockersHaveBoundEvidence(String scenario, String code) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs:112\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n    \n失败 ActualUnknownAndTechnicalBlockersHaveBoundEvidence (\"blank\",\"impact_blank_alignment_indeterminate\") (55ms)\n  从 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  测试方法 OntologyPlatform.SemanticTests.G3M4ImpactReportTests。ActualUnknownAndTechnicalBlockersHaveBoundEvidence 引发了异常: \n  System.InvalidOperationException: 审计元数据未满足固定事件和完整范围合同。\n    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.CreateRecord(ActorContext actor, AuditCommand command) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:97\n    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:51\n    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:54\n    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:60\n    在 OntologyPlatform.Modules.Ontology.OntologyService.WriteAsync[T](ActorContext actor, ResourceScope scope, String action, CommandContext command, Object payload, Func`2 mutation, CancellationToken token, Func`2 shouldAudit) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyService.cs:275\n    在 OntologyPlatform.Modules.Ontology.OntologyService.WriteAsync[T](ActorContext actor, ResourceScope scope, String action, CommandContext command, Object payload, Func`2 mutation, CancellationToken token, Func`2 shouldAudit) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyService.cs:282\n    在 OntologyPlatform.Modules.Ontology.OntologyService.GenerateImpactAsync(ActorContext actor, GenerateImpactReportRequest request, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyImpactGeneration.cs:69\n    在 OntologyPlatform.SemanticTests.G3M4ImpactReportTests.ActualUnknownAndTechnicalBlockersHaveBoundEvidence(String scenario, String code) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs:99\n    在 OntologyPlatform.SemanticTests.G3M4ImpactReportTests.ActualUnknownAndTechnicalBlockersHaveBoundEvidence(String scenario, String code) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs:112\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n    \n失败 ActualUnknownAndTechnicalBlockersHaveBoundEvidence (\"blank-budget\",\"impact_comparison_indeterminate\") (68ms)\n  从 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  测试方法 OntologyPlatform.SemanticTests.G3M4ImpactReportTests。ActualUnknownAndTechnicalBlockersHaveBoundEvidence 引发了异常: \n  System.InvalidOperationException: 审计元数据未满足固定事件和完整范围合同。\n    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.CreateRecord(ActorContext actor, AuditCommand command) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:97\n    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:51\n    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:54\n    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:60\n    在 OntologyPlatform.Modules.Ontology.OntologyService.WriteAsync[T](ActorContext actor, ResourceScope scope, String action, CommandContext command, Object payload, Func`2 mutation, CancellationToken token, Func`2 shouldAudit) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyService.cs:275\n    在 OntologyPlatform.Modules.Ontology.OntologyService.WriteAsync[T](ActorContext actor, ResourceScope scope, String action, CommandContext command, Object payload, Func`2 mutation, CancellationToken token, Func`2 shouldAudit) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyService.cs:282\n    在 OntologyPlatform.Modules.Ontology.OntologyService.GenerateImpactAsync(ActorContext actor, GenerateImpactReportRequest request, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyImpactGeneration.cs:69\n    在 OntologyPlatform.SemanticTests.G3M4ImpactReportTests.ActualUnknownAndTechnicalBlockersHaveBoundEvidence(String scenario, String code) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs:99\n    在 OntologyPlatform.SemanticTests.G3M4ImpactReportTests.ActualUnknownAndTechnicalBlockersHaveBoundEvidence(String scenario, String code) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs:112\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n    \n失败 ActualUnknownAndTechnicalBlockersHaveBoundEvidence (\"conclusion-budget\",\"impact_conclusion_budget\") (164ms)\n  从 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  测试方法 OntologyPlatform.SemanticTests.G3M4ImpactReportTests。ActualUnknownAndTechnicalBlockersHaveBoundEvidence 引发了异常: \n  System.InvalidOperationException: 审计元数据未满足固定事件和完整范围合同。\n    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.CreateRecord(ActorContext actor, AuditCommand command) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:97\n    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:51\n    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:54\n    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:60\n    在 OntologyPlatform.Modules.Ontology.OntologyService.WriteAsync[T](ActorContext actor, ResourceScope scope, String action, CommandContext command, Object payload, Func`2 mutation, CancellationToken token, Func`2 shouldAudit) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyService.cs:275\n    在 OntologyPlatform.Modules.Ontology.OntologyService.WriteAsync[T](ActorContext actor, ResourceScope scope, String action, CommandContext command, Object payload, Func`2 mutation, CancellationToken token, Func`2 shouldAudit) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyService.cs:282\n    在 OntologyPlatform.Modules.Ontology.OntologyService.GenerateImpactAsync(ActorContext actor, GenerateImpactReportRequest request, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyImpactGeneration.cs:69\n    在 OntologyPlatform.SemanticTests.G3M4ImpactReportTests.ActualUnknownAndTechnicalBlockersHaveBoundEvidence(String scenario, String code) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs:99\n    在 OntologyPlatform.SemanticTests.G3M4ImpactReportTests.ActualUnknownAndTechnicalBlockersHaveBoundEvidence(String scenario, String code) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs:112\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n    \n失败 ReadRejectsPartialScopeAndPersistedCanonicalTamper (59ms)\n  从 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n  测试方法 OntologyPlatform.SemanticTests.G3M4ImpactReportTests。ReadRejectsPartialScopeAndPersistedCanonicalTamper 引发了异常: \n  System.InvalidOperationException: 审计元数据未满足固定事件和完整范围合同。\n    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.CreateRecord(ActorContext actor, AuditCommand command) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:97\n    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:51\n    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:54\n    在 OntologyPlatform.Modules.Governance.TransactionalAuditWriter.WriteAsync(ActorContext actor, AuditCommand command, DbConnection connection, DbTransaction transaction, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs:60\n    在 OntologyPlatform.Modules.Ontology.OntologyService.WriteAsync[T](ActorContext actor, ResourceScope scope, String action, CommandContext command, Object payload, Func`2 mutation, CancellationToken token, Func`2 shouldAudit) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyService.cs:275\n    在 OntologyPlatform.Modules.Ontology.OntologyService.WriteAsync[T](ActorContext actor, ResourceScope scope, String action, CommandContext command, Object payload, Func`2 mutation, CancellationToken token, Func`2 shouldAudit) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyService.cs:282\n    在 OntologyPlatform.Modules.Ontology.OntologyService.GenerateImpactAsync(ActorContext actor, GenerateImpactReportRequest request, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyImpactGeneration.cs:69\n    在 OntologyPlatform.SemanticTests.G3M4ImpactReportTests.ReadRejectsPartialScopeAndPersistedCanonicalTamper() 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs:126\n    在 OntologyPlatform.SemanticTests.G3M4ImpactReportTests.ReadRejectsPartialScopeAndPersistedCanonicalTamper() 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs:132\n    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n    \n/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64) 失败并出现 9 个错误 (3s 964ms)\n退出代码: 2\n\n测试运行摘要: 失败!\n  总计: 9\n  失败: 9\n  成功: 0\n  已跳过: 0\n  持续时间: 5s 450ms\n已完成测试运行，但显示非成功退出代码: 2 (请参阅: https://aka.ms/testingplatform/exitcodes)\n"
+    },
+    {
+      "check": "all temporary graph triples removed",
+      "count": 0,
+      "status": "PASS"
+    },
+    {
+      "resourceLifecycle": true,
+      "project": "on-dotnet/ontology-platform",
+      "taskId": "G3-M4-001",
+      "runId": "g2-sem-fad0e60a1fd8",
+      "observedAtUtc": "2026-10-30T16:44:25.040590+00:00",
+      "phase": "before",
+      "dockerBackend": {
+        "context": "desktop-linux",
+        "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016"
+      },
+      "containerId": "2480df9a3d34c7caa41a93bc816bb86c94e1228b7f02972a5447c0dc4fa6ca06",
+      "snapshot": {
+        "Id": "2480df9a3d34c7caa41a93bc816bb86c94e1228b7f02972a5447c0dc4fa6ca06",
+        "Name": "/g2-sem-fad0e60a1fd8-pg",
+        "Project": "on-dotnet/ontology-platform",
+        "TaskId": "G3-M4-001",
+        "RunId": "g2-sem-fad0e60a1fd8",
+        "Fixture": "true"
+      },
+      "status": "PASS"
+    },
+    {
+      "resourceLifecycle": true,
+      "project": "on-dotnet/ontology-platform",
+      "taskId": "G3-M4-001",
+      "runId": "g2-sem-fad0e60a1fd8",
+      "observedAtUtc": "2026-10-30T16:44:25.114076+00:00",
+      "phase": "command",
+      "dockerBackend": {
+        "context": "desktop-linux",
+        "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016"
+      },
+      "containerId": "2480df9a3d34c7caa41a93bc816bb86c94e1228b7f02972a5447c0dc4fa6ca06",
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "container",
+        "rm",
+        "--force",
+        "2480df9a3d34c7caa41a93bc816bb86c94e1228b7f02972a5447c0dc4fa6ca06"
+      ]
+    },
+    {
+      "resourceLifecycle": true,
+      "project": "on-dotnet/ontology-platform",
+      "taskId": "G3-M4-001",
+      "runId": "g2-sem-fad0e60a1fd8",
+      "observedAtUtc": "2026-10-30T16:44:25.247753+00:00",
+      "phase": "exit",
+      "dockerBackend": {
+        "context": "desktop-linux",
+        "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016"
+      },
+      "containerId": "2480df9a3d34c7caa41a93bc816bb86c94e1228b7f02972a5447c0dc4fa6ca06",
+      "exitCode": 0,
+      "durationMs": 134
+    },
+    {
+      "resourceLifecycle": true,
+      "project": "on-dotnet/ontology-platform",
+      "taskId": "G3-M4-001",
+      "runId": "g2-sem-fad0e60a1fd8",
+      "observedAtUtc": "2026-10-30T16:44:25.406878+00:00",
+      "phase": "after",
+      "dockerBackend": {
+        "context": "desktop-linux",
+        "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016"
+      },
+      "containerId": "2480df9a3d34c7caa41a93bc816bb86c94e1228b7f02972a5447c0dc4fa6ca06",
+      "absent": true,
+      "absenceDiagnostic": "Error response from daemon: No such container: 2480df9a3d34c7caa41a93bc816bb86c94e1228b7f02972a5447c0dc4fa6ca06",
+      "status": "PASS"
+    },
+    {
+      "resourceLifecycle": true,
+      "project": "on-dotnet/ontology-platform",
+      "taskId": "G3-M4-001",
+      "runId": "g2-sem-fad0e60a1fd8",
+      "observedAtUtc": "2026-10-30T16:44:25.558177+00:00",
+      "phase": "before",
+      "dockerBackend": {
+        "context": "desktop-linux",
+        "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016"
+      },
+      "containerId": "1c83dc2927900ae212ddd71b2da4d9fa3d8e5699749c5e1d21b5cb9a7bf8296f",
+      "snapshot": {
+        "Id": "1c83dc2927900ae212ddd71b2da4d9fa3d8e5699749c5e1d21b5cb9a7bf8296f",
+        "Name": "/g2-sem-fad0e60a1fd8",
+        "Project": "on-dotnet/ontology-platform",
+        "TaskId": "G3-M4-001",
+        "RunId": "g2-sem-fad0e60a1fd8",
+        "Fixture": "true"
+      },
+      "status": "PASS"
+    },
+    {
+      "resourceLifecycle": true,
+      "project": "on-dotnet/ontology-platform",
+      "taskId": "G3-M4-001",
+      "runId": "g2-sem-fad0e60a1fd8",
+      "observedAtUtc": "2026-10-30T16:44:25.631331+00:00",
+      "phase": "command",
+      "dockerBackend": {
+        "context": "desktop-linux",
+        "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016"
+      },
+      "containerId": "1c83dc2927900ae212ddd71b2da4d9fa3d8e5699749c5e1d21b5cb9a7bf8296f",
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "container",
+        "rm",
+        "--force",
+        "1c83dc2927900ae212ddd71b2da4d9fa3d8e5699749c5e1d21b5cb9a7bf8296f"
+      ]
+    },
+    {
+      "resourceLifecycle": true,
+      "project": "on-dotnet/ontology-platform",
+      "taskId": "G3-M4-001",
+      "runId": "g2-sem-fad0e60a1fd8",
+      "observedAtUtc": "2026-10-30T16:44:25.778163+00:00",
+      "phase": "exit",
+      "dockerBackend": {
+        "context": "desktop-linux",
+        "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016"
+      },
+      "containerId": "1c83dc2927900ae212ddd71b2da4d9fa3d8e5699749c5e1d21b5cb9a7bf8296f",
+      "exitCode": 0,
+      "durationMs": 147
+    },
+    {
+      "resourceLifecycle": true,
+      "project": "on-dotnet/ontology-platform",
+      "taskId": "G3-M4-001",
+      "runId": "g2-sem-fad0e60a1fd8",
+      "observedAtUtc": "2026-10-30T16:44:25.930898+00:00",
+      "phase": "after",
+      "dockerBackend": {
+        "context": "desktop-linux",
+        "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016"
+      },
+      "containerId": "1c83dc2927900ae212ddd71b2da4d9fa3d8e5699749c5e1d21b5cb9a7bf8296f",
+      "absent": true,
+      "absenceDiagnostic": "Error response from daemon: No such container: 1c83dc2927900ae212ddd71b2da4d9fa3d8e5699749c5e1d21b5cb9a7bf8296f",
+      "status": "PASS"
+    }
+  ]
+}

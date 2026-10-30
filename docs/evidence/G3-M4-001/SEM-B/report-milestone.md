@@ -1,0 +1,13 @@
+# SEM-B 报告生成/读取可运行里程碑
+
+状态PARTIAL。首Diff6真实PASS之后，本切片接入真实持久Generate/Read，公共合同/storage/迁移无改。Master审计事件白名单cd69ee2精确cherry-pick为本树68c77c2；不是Owner自行扩大治理白名单，未伪装成其它事件。
+
+真实9项PG/Jena报告窄验impact-audit-fixed exit0，9PASS/0FAIL/0skip。覆盖原文/hash/证据canonical重算、遥测与envelope排除、同命令重放、同输入不同key、并发仅一报告及一次生成审计、过期原报告仍可读且不刷新、实际missing/unsupported/imports/变化blank/129blank预算/256结论预算未知阻断、全scope读取及持久ReportHash篡改拒绝。Report生成不另开RIOT解析，沿M1同一5s比较捕获已解析事实；blank只进原文，不进入可信delta或证据身份。
+
+持久时间envelope向下对齐PostgreSQL微秒精度，避免JSON原100ns与timestamp列舍入不等。InputFingerprint在昂贵比较前以完整已核验源和真实assessment构造，advisory input锁/唯一索引固定首次ID/Generated/Expires；同输入新key可增加独立回执但业务审计只有首次。原WriteAsync只补可选审计条件，其它命令默认行为保持。
+
+失败保持：首次新测试转义编译失败（尚无业务执行），改用廉价测试项目编译修复；第一次真正报告9项全部被真实固定审计事件白名单拒绝，WriteAsync未取得成功回执，原FAIL日志/源仍保留。收到Master独立审过的精确事件修正后，只重跑原9项，不重跑已过A/其它完整门禁。全部临时容器由既有fixture准确Task/Run/ID归属、finally rm与强不存在核验；含失败轮次也已收尾，不用rm0单独作证。
+
+IImpactPublicationReader的纯锁内资格reader已编译并登记，尚未由本切片真实发布验收。Publishing四点/active最终锁/Binding第三分支/Catalog追溯正在下一子切片，不包含本提交；其真实门禁仍NOT_RUN，不把9报告测试称为全B通过。Source/Manifest/PublicationSemantics/Run/Outbox格式不变，无新profile/dependency/LLM/M5/G4/G5。
+
+原始ignored日志仅保SHA/大小恢复元数据；正式txt只归一展示尾空格，所有失败状态与诊断保留。CI/Windows/Intel NOT_RUN，未观测Agent思考/活跃时间UNKNOWN，实际命令timeline继续采集。

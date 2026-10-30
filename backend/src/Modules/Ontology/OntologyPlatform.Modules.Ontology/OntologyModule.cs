@@ -27,6 +27,7 @@ public static class OntologyModule
         services.AddScoped<IG3VocabularyService>(provider => provider.GetRequiredService<OntologyService>());
         services.AddScoped<IG3OntologyService>(provider => provider.GetRequiredService<OntologyService>());
         services.AddScoped<IOntologyService>(provider => provider.GetRequiredService<OntologyService>());
+        services.AddScoped<IImpactPublicationReader>(provider => provider.GetRequiredService<OntologyService>());
         services.AddScoped<IDraftPublicationReader>(provider => provider.GetRequiredService<OntologyService>());
         return services;
     }
