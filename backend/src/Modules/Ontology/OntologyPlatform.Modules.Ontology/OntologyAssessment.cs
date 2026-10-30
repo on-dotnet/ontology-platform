@@ -136,7 +136,7 @@ public sealed partial class OntologyService
     }
 
     /// <summary>从已授权不可变修订或正式对象中恢复完整四源。</summary>
-    private async Task<(string AssetId, ResourceScope Scope, SourceBundle Sources)> ReadVersionAsync(ActorContext actor, VersionRef reference, CancellationToken token)
+    private async Task<(string AssetId, ResourceScope Scope, SourceBundle Sources, string? ManifestHash, PublicationSemantics? Semantics)> ReadVersionAsync(ActorContext actor, VersionRef reference, CancellationToken token)
     {
         if (reference.Kind == VersionRefKind.Draft)
         {
@@ -145,13 +145,21 @@ public sealed partial class OntologyService
             DemandScope(actor, Scope(draft));
             // 不可变历史修订不能由当前Projection替代。
             var revision = await database.Revisions.AsNoTracking().SingleOrDefaultAsync(row => row.DraftId == reference.Id && row.Revision == reference.Revision, token) ?? throw new SemanticOperationException(404, "revision_not_found");
-            return (draft.AssetId, Scope(draft), JsonSerializer.Deserialize<SourceBundle>(revision.SourcesJson)!);
+            try
+            {
+                // PG持久列与实际四源原字节必须一致，当前Projection不能替代历史源核验。
+                var sources = JsonSerializer.Deserialize<SourceBundle>(revision.SourcesJson)!;
+                if (JenaRdfCodec.Hashes(sources) != JsonSerializer.Deserialize<SourceHashes>(revision.HashesJson)) throw new SemanticOperationException(503, "revision_source_binding_invalid");
+                return (draft.AssetId, Scope(draft), sources, null, null);
+            }
+            catch (JsonException) { throw new SemanticOperationException(503, "revision_source_binding_invalid"); }
         }
         if (releases is null || artifacts is null) throw new SemanticOperationException(503, "release_catalog_unavailable");
         // Catalog重新授权并核验实际manifest对象原始字节和正式图。
         var release = await releases.ReadAsync(actor, reference.Id, token);
         // 固定槽位次序来自发布合同，不读取客户端对象地址。
         var manifest = release.Manifest;
+        if (manifest.ReleaseId != reference.Id || release.Status is not (ReleaseStatus.Active or ReleaseStatus.Superseded)) throw new SemanticOperationException(409, "comparison_reference_invalid");
         // 严格UTF8解码拒绝替换字符，避免改变源hash。
         var utf8 = new UTF8Encoding(false, true);
         // 词汇缺席不同于空字符串。
@@ -170,6 +178,9 @@ public sealed partial class OntologyService
             try { texts[index] = utf8.GetString(bytes); }
             catch (DecoderFallbackException) { throw new SemanticOperationException(503, "published_source_encoding_invalid"); }
         }
-        return (manifest.AssetId, manifest.Scope, new SourceBundle { OntologyTurtle = texts[0], ShapesTurtle = texts[1], VocabularyTurtle = texts.Length == 4 ? texts[2] : null, DataTurtle = texts[^1] });
+        // bundle identity同样按实际读取原文重算，不只相信逐源清单hash。
+        var restored = new SourceBundle { OntologyTurtle = texts[0], ShapesTurtle = texts[1], VocabularyTurtle = texts.Length == 4 ? texts[2] : null, DataTurtle = texts[^1] };
+        if (JenaRdfCodec.Hashes(restored) != manifest.Hashes) throw new SemanticOperationException(503, "published_source_binding_invalid");
+        return (manifest.AssetId, manifest.Scope, restored, release.ManifestHash, manifest.Semantics);
     }
 }

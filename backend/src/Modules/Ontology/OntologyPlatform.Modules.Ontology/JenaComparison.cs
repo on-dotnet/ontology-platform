@@ -6,10 +6,14 @@ using OntologyPlatform.Modules.Ontology.Domain;
 namespace OntologyPlatform.Modules.Ontology;
 
 /// <summary>共享Jena并发槽和真实RIOT，仅M1比较采用明确无法确定的预算结果。</summary>
-public sealed partial class JenaSemanticRuntime
+public sealed partial class JenaSemanticRuntime : IG3VersionDiffRuntime
 {
     /// <summary>四源共享5秒和十万搜索节点，任一预算失败撤回全部部分结论。</summary>
-    public async Task<SourceComparison[]> CompareSourcesAsync(SourceBundle left, SourceBundle right, CancellationToken cancellationToken)
+    public async Task<SourceComparison[]> CompareSourcesAsync(SourceBundle left, SourceBundle right, CancellationToken cancellationToken) =>
+        (await DiffSourcesAsync(left, right, cancellationToken)).Select(item => new SourceComparison { SourceId = item.SourceId, LeftHash = item.BaseHash, RightHash = item.TargetHash, SourceChanged = item.SourceChanged, Graph = item.Graph }).ToArray();
+
+    /// <summary>在M1同一个总预算中保留原文、真实统计与可靠地面delta，不二次解析。</summary>
+    public async Task<SourceVersionDiff[]> DiffSourcesAsync(SourceBundle left, SourceBundle right, CancellationToken cancellationToken)
     {
         if (left is null || right is null || left.OntologyTurtle is null || left.ShapesTurtle is null || left.DataTurtle is null || right.OntologyTurtle is null || right.ShapesTurtle is null || right.DataTurtle is null || !OntologyRules.WithinSourceBudget(left.OntologyTurtle, left.ShapesTurtle, left.VocabularyTurtle, left.DataTurtle) || !OntologyRules.WithinSourceBudget(right.OntologyTurtle, right.ShapesTurtle, right.VocabularyTurtle, right.DataTurtle))
             throw new SemanticOperationException(413, "source_byte_budget");
@@ -25,7 +29,7 @@ public sealed partial class JenaSemanticRuntime
         // 四源固定顺序不能由调用方控制。
         string[] ids = ["ontology", "shapes", "vocabulary", "data"];
         // 结果只在全比较完成后才返回，预算失败会全量覆盖状态。
-        var results = ids.Select((id, index) => new SourceComparison { SourceId = id, LeftHash = leftSources[index] is { } l ? OntologyRules.Hash(l) : null, RightHash = rightSources[index] is { } r ? OntologyRules.Hash(r) : null, SourceChanged = leftSources[index] != rightSources[index], Graph = new GraphComparisonResult { Status = GraphComparisonStatus.Indeterminate, Code = "comparison_pending" } }).ToArray();
+        var results = ids.Select((id, index) => new SourceVersionDiff { SourceId = id, BaseText = leftSources[index], TargetText = rightSources[index], BaseHash = leftSources[index] is { } l ? OntologyRules.Hash(l) : null, TargetHash = rightSources[index] is { } r ? OntologyRules.Hash(r) : null, SourceChanged = leftSources[index] != rightSources[index], BaseTripleCount = null, TargetTripleCount = null, AddedTriples = [], RemovedTriples = [], TripleDeltaStatus = TripleDeltaStatus.Indeterminate, Graph = new GraphComparisonResult { Status = GraphComparisonStatus.Indeterminate, Code = "comparison_pending" } }).ToArray();
         // 每次操作独占临时图，finally精确删除本次创建的图。
         var graphs = new List<string>();
         // 只有取得槽位才能释放；已取消请求仍必须返回四个明确结果。
@@ -44,7 +48,26 @@ public sealed partial class JenaSemanticRuntime
                 comparison.Check();
                 // 即使字节相同仍核对blank预算；完整解析也拒绝相同非法源。
                 var equivalent = comparison.Equivalent(parsedLeft[index], parsedRight[index]);
-                results[index] = results[index] with { Graph = new GraphComparisonResult { Status = equivalent ? GraphComparisonStatus.Equivalent : GraphComparisonStatus.Different, Code = equivalent ? "graph_equivalent" : "graph_different", VisitedNodes = comparison.VisitedNodes, ElapsedMilliseconds = comparison.ElapsedMilliseconds } };
+                // 原始统计来自本次真实RIOT集合，不用零冒充未解析的来源。
+                var before = parsedLeft[index].DistinctBy(EditNoOpTriple).ToArray();
+                // 右图保持独立blank作用域，不按随机标签对应。
+                var after = parsedRight[index].DistinctBy(EditNoOpTriple).ToArray();
+                // 地面三元组的键只按既有RDF1.1 no-op规则比较，输出保留原词法项。
+                var oldGround = before.Where(GroundDelta).ToDictionary(EditNoOpTriple);
+                // 每个源独立集合，空白节点从不进入canonical delta。
+                var newGround = after.Where(GroundDelta).ToDictionary(EditNoOpTriple);
+                comparison.Check();
+                // 含blank变化时仅提供确定地面事实，剩余原始结构仍完整保存在两侧源。
+                var hasBlank = before.Concat(after).Any(triple => !GroundDelta(triple));
+                results[index] = results[index] with
+                {
+                    Graph = new GraphComparisonResult { Status = equivalent ? GraphComparisonStatus.Equivalent : GraphComparisonStatus.Different, Code = equivalent ? "graph_equivalent" : "graph_different", VisitedNodes = comparison.VisitedNodes, ElapsedMilliseconds = comparison.ElapsedMilliseconds },
+                    BaseTripleCount = before.Length,
+                    TargetTripleCount = after.Length,
+                    AddedTriples = equivalent ? [] : newGround.Keys.Except(oldGround.Keys).Select(key => newGround[key]).ToArray(),
+                    RemovedTriples = equivalent ? [] : oldGround.Keys.Except(newGround.Keys).Select(key => oldGround[key]).ToArray(),
+                    TripleDeltaStatus = equivalent ? TripleDeltaStatus.Equivalent : hasBlank ? TripleDeltaStatus.Indeterminate : TripleDeltaStatus.Exact
+                };
             }
             comparison.Check();
             return results;
@@ -66,6 +89,8 @@ public sealed partial class JenaSemanticRuntime
         }
 
         // 总体预算失败后全四源撤回结论，保留准确字节变化和hash。
-        SourceComparison[] Indeterminate(string code) => results.Select(item => item with { Graph = new GraphComparisonResult { Status = GraphComparisonStatus.Indeterminate, Code = code, VisitedNodes = comparison.VisitedNodes, ElapsedMilliseconds = comparison.ElapsedMilliseconds } }).ToArray();
+        SourceVersionDiff[] Indeterminate(string code) => results.Select(item => item with { AddedTriples = [], RemovedTriples = [], TripleDeltaStatus = TripleDeltaStatus.Indeterminate, Graph = new GraphComparisonResult { Status = GraphComparisonStatus.Indeterminate, Code = code, VisitedNodes = comparison.VisitedNodes, ElapsedMilliseconds = comparison.ElapsedMilliseconds } }).ToArray();
     }
+    /// <summary>可信delta只含命名主体和非blank客体，不能让RIOT随机blank进入hash。</summary>
+    private static bool GroundDelta(RdfTriple triple) => triple.Subject.Kind == RdfTermKind.Iri && triple.Object.Kind is RdfTermKind.Iri or RdfTermKind.Literal;
 }
