@@ -1,0 +1,59 @@
+91e691e3d21d0aadfdd256bc3cf15fe87c52d9bde5f730366dd04561dfb36bba
+127.0.0.1:58213
+d1b8f85c82820922a97e9f46a84ff44ececed58f24762ba961039fab5e28abf1
+127.0.0.1:58216
+d0dc757c09510f618716d971c3cc81495c4b1c6679a538f33650f97bbadf84b2
+sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c ["ontology-platform-fuseki@sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c"]
+[2026-10-30 15:24:37] Fuseki     INFO  Apache Jena Fuseki 6.2.0
+Apache Jena version 6.2.0
+127.0.0.1:58220
+  OntologyPlatform.Contracts -> /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/bin/Debug/net10.0/OntologyPlatform.Contracts.dll
+  OntologyPlatform.Modules.Ontology.Domain -> /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.Domain.dll
+  OntologyPlatform.Modules.Publishing.Domain -> /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/bin/Debug/net10.0/OntologyPlatform.Modules.Publishing.Domain.dll
+  OntologyPlatform.Modules.Governance -> /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/bin/Debug/net10.0/OntologyPlatform.Modules.Governance.dll
+  OntologyPlatform.Modules.Ontology -> /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.dll
+  OntologyPlatform.Modules.Publishing -> /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/bin/Debug/net10.0/OntologyPlatform.Modules.Publishing.dll
+  OntologyPlatform.PublishingTests -> /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:00.76
+工具“dotnet-ef”(版本“10.0.13”)已还原。可用的命令: dotnet-ef
+
+还原成功。
+Failed executing DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM governance."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261025062847_InitialGovernance'.
+Applying migration '20261025144246_AuditScopeSites'.
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Done.
+Failed executing DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM ontology."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261026003221_InitialOntology'.
+Applying migration '20261027032135_G3Assessments'.
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Done.
+Failed executing DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM publishing."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261026015031_InitialPublishing'.
+Done.
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64) 已通过 (31s 242ms)
+
+测试运行摘要: 已通过!
+  总计: 64
+  失败: 0
+  成功: 64
+  已跳过: 0
+  持续时间: 33s 861ms
