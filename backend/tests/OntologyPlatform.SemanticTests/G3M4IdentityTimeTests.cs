@@ -1,8 +1,6 @@
-using System.Text.Json;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OntologyPlatform.Contracts;
 using OntologyPlatform.Modules.Ontology;
-using OntologyPlatform.Modules.Ontology.Domain;
 
 namespace OntologyPlatform.SemanticTests;
 
@@ -21,16 +19,41 @@ public sealed class G3M4IdentityTimeTests
         Assert.AreEqual("SUPPORTED", current.Capabilities.Single(item => item.Id == "20").Publish);
         Assert.AreEqual("BASIC", current.Capabilities.Single(item => item.Id == "23").Edit);
         Assert.AreEqual("54e4db0fac2c7e4f89802678f3269b8a460190775b53b4fb74955f8cbadd8b86", SemanticProfile.LegacyM1().Hash);
-        // 原v3通过同一DTO顺序、原M2和新增两行算法独立重建黄金值。
-        var legacy = SemanticProfile.LegacyM2();
-        // 原合同的两行能力不包含M4身份或时间升级。
-        var capabilities = legacy.Capabilities.Concat(new[] { "SKOS术语与标准治理", "Synthetic单位与量纲引用" }.Select((name, index) => new SemanticCapabilitySupport { Id = (21 + index).ToString(System.Globalization.CultureInfo.InvariantCulture), Name = name, Edit = "BASIC", Preserve = "EXACT", Publish = "SUPPORTED", Validation = "ASSERTED", Reason = "仅有界显式事实与平台域治理；保留来源版本，不执行OWL推理或通用单位换算。" })).ToArray();
-        // 精确历史原始内容散列与不可变工厂对照。
-        var original = legacy with { Version = "3", Hash = "", Capabilities = capabilities };
-        Assert.AreEqual(OntologyRules.Hash(JsonSerializer.Serialize(original)), SemanticProfile.LegacyM3().Hash);
+        // 从冻结M3实际Release程序集独立读取的原Current黄金hash，不复制新实现算法。
+        Assert.AreEqual("a0cb0693520baf45bbe93506ad5781117b5ea412fcd5aebc266da9e0dde95968", SemanticProfile.LegacyM3().Hash);
         Assert.AreEqual(22, SemanticProfile.LegacyM3().Capabilities.Length);
         Assert.AreEqual("BLOCKED", SemanticProfile.LegacyM3().Capabilities.Single(item => item.Id == "20").Publish);
         Assert.IsTrue(typeof(IG3IdentityTimeService).IsAssignableFrom(typeof(OntologyService)));
+    }
+
+    /// <summary>同一历史时间语料在当前v4支持，但精确旧v3清单仍拒绝部署。</summary>
+    [TestMethod]
+    public async Task LegacyVersionThreeStillRejectsTheSameControlledTimeCorpus()
+    {
+        // 精确复用首次失败的已提交第20语料，不能换成其它不支持公理掩盖边界。
+        var samples = Environment.GetEnvironmentVariable("G2_SEM_SAMPLES") ?? throw new AssertInconclusiveException("NOT_RUN: requires real Jena fixture");
+        // 标准路径API保持Windows/macOS目录语义，所有平台状态按实测分列。
+        var corpus = Path.Combine(Path.GetDirectoryName(samples)!, "g3-m1", "20-time.ttl");
+        // 源文本和hash由同一实际语料产生，不另造旧版输入。
+        var sources = new SourceBundle { OntologyTurtle = File.ReadAllText(corpus) };
+        // 当前v4明确允许零时间戳的未知Instant，不伪造本地时区或当前时间。
+        var runtime = SemanticFixture.Runtime();
+        Assert.IsTrue((await runtime.ValidateAsync(sources, default)).Conforms);
+        // 原始字节散列由真实RIOT分析同时回验。
+        var analysis = await runtime.AnalyzeAsync(sources, 1, default);
+        // 旧v3只能使用原工厂hash，不能换成v4升级历史清单。
+        var profile = SemanticProfile.LegacyM3();
+        // 本次隔离运行独占服务器图名，不引用任何历史正式环境。
+        var id = Guid.NewGuid().ToString("N");
+        // 固定同一四源hash的版本快照，证明失败来自旧profile支持政策。
+        var snapshot = new AssetVersionSnapshot { ReleaseId = id, OntologyGraphIri = "urn:ontology-platform:release:" + id + ":ontology", DataGraphIri = "urn:ontology-platform:release:" + id + ":data", OntologyHash = analysis.Hashes.OntologyHash, ShapesHash = analysis.Hashes.ShapesHash, VocabularyHash = analysis.Hashes.VocabularyHash, DataHash = analysis.Hashes.DataHash };
+        // 仅运行时边界夹具的合成assessment引用，不冒充真实业务审批或发布成功。
+        var manifest = new ReleaseManifest { SchemaVersion = 2, ReleaseId = id, AssetId = "synthetic-m4-history", DraftId = "synthetic-m4-history", Revision = 1, Scope = new ResourceScope { OrganizationId = "org-demo", SiteIds = ["site-a", "site-b"] }, Hashes = analysis.Hashes, Snapshot = snapshot, OntologyGraphIri = snapshot.OntologyGraphIri, DataGraphIri = snapshot.DataGraphIri, Semantics = new PublicationSemantics { ProfileVersion = profile.Version, ProfileHash = profile.Hash, AssessmentId = "synthetic-legacy-m3", AssessmentHash = new string('a', 64) }, CreatedAtUtc = DateTimeOffset.UtcNow };
+        // 旧版本在任何正式写图前失败，不能因当前策略升级自动开放旧清单。
+        var error = await Assert.ThrowsAsync<SemanticOperationException>(() => runtime.DeployAsync(manifest, sources, default));
+        Assert.AreEqual(422, error.Status);
+        Assert.AreEqual("publication_unsupported", error.Code);
+        Assert.IsFalse(await runtime.VerifyAsync(manifest, sources, default));
     }
 
     /// <summary>真实解析后的诊断保持准确源hash和独立未知状态。</summary>

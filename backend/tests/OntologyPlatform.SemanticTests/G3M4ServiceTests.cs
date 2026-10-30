@@ -179,6 +179,150 @@ public sealed class G3M4ServiceTests
         Assert.AreEqual(AssessmentStageStatus.NotRun, assessment.Stages.Single(stage => stage.Name == "OWL_REASONING").Status);
     }
 
+    /// <summary>批次零项和超预算不写入，1与64项保持真实同批RDF集合语义。</summary>
+    /// <param name="count">精确批次边界。</param>
+    [TestMethod]
+    [DataRow(0)]
+    [DataRow(1)]
+    [DataRow(64)]
+    [DataRow(65)]
+    public async Task ExactBatchCountBoundariesDoNotBypassCas(int count)
+    {
+        // 生产数据库和Jena解析均真实使用本次独立夹具。
+        await using var database = Database();
+        // 服务复用同事务审计。
+        var service = Service(database);
+        // 每个边界独立主体与草稿。
+        var actor = Actor();
+        // 合法身份历史不在本测试中被改变。
+        var draft = await Create(service, actor, G3M4IdentityTimeTests.Sources());
+        // 多次相同新增保持集合语义，不能用重复元素绕过64项输入预算。
+        var request = new IdentityTimeEditsRequest { Hashes = draft.Hashes, Changes = Enumerable.Range(0, count).Select(_ => Change("A", "http://www.w3.org/2000/01/rdf-schema#label", new RdfTerm { Kind = RdfTermKind.Literal, Value = "合成设备", Language = "zh" })).ToArray(), Command = Command(1) };
+        if (count is 0 or 65)
+        {
+            // 超界请求失败后，不产生第二条成功命令。
+            var error = await Assert.ThrowsAsync<SemanticOperationException>(() => service.EditIdentityTimeAsync(actor, draft.DraftId, request, default));
+            Assert.AreEqual(422, error.Status);
+            Assert.AreEqual(1L, (await service.ReadAsync(actor, draft.DraftId, default)).Revision);
+            Assert.AreEqual(1, await database.Commands.CountAsync(row => row.SubjectId == actor.SubjectId));
+        }
+        else
+        {
+            // 最大合法批次仍只追加一次修订与审计。
+            var saved = await service.EditIdentityTimeAsync(actor, draft.DraftId, request, default);
+            Assert.AreEqual(2L, saved.Revision);
+            Assert.AreEqual(2, await database.Commands.CountAsync(row => row.SubjectId == actor.SubjectId));
+        }
+    }
+
+    /// <summary>真正不同连接的同revision并发只允许一个事务成功。</summary>
+    [TestMethod]
+    public async Task TwoConcurrentWritersHaveOneCasWinnerAndOneAudit()
+    {
+        // 初始草稿由独立上下文创建，竞争者不会共享EF跟踪状态。
+        await using var database = Database();
+        // 固定可信主体及一次创建事实。
+        var actor = Actor();
+        // 同一草稿的两个写入均使用真正revision1。
+        var draft = await Create(Service(database), actor, G3M4IdentityTimeTests.Sources());
+        // 两个真实数据库连接各自完成Jena与行锁CAS，不用内存锁模拟竞争。
+        var results = await Task.WhenAll(SaveConcurrent(actor, draft, "one"), SaveConcurrent(actor, draft, "two"));
+        Assert.AreEqual(1, results.Count(value => value == "SUCCESS"));
+        Assert.AreEqual(1, results.Count(value => value == "draft_revision_conflict"));
+        // 新连接确认只有一个业务修订和一条成功审计进入PG。
+        await using var check = Database();
+        Assert.AreEqual(2L, (await Service(check).ReadAsync(actor, draft.DraftId, default)).Revision);
+        Assert.AreEqual(2, await check.Commands.CountAsync(row => row.SubjectId == actor.SubjectId));
+        // 实际Governance表不因失败竞争记录成功副作用。
+        await using var governance = new GovernanceDbContext(new DbContextOptionsBuilder<GovernanceDbContext>().UseNpgsql(Connection()).Options);
+        Assert.AreEqual(2, await governance.AuditRecords.CountAsync(row => row.Actor == actor.SubjectId));
+    }
+
+    /// <summary>越权角色或不完整厂区范围在源/Jena读取前失败关闭。</summary>
+    [TestMethod]
+    [DataRow(true)]
+    [DataRow(false)]
+    public async Task RoleAndCompleteScopePrecedeAnyJenaAccess(bool viewer)
+    {
+        // 初稿真实持久化，后续拒绝不能来自不存在的对象。
+        await using var database = Database();
+        // 当前真实主体拥有双厂范围。
+        var actor = Actor();
+        // 有效身份源及草稿范围固定。
+        var draft = await Create(Service(database), actor, G3M4IdentityTimeTests.Sources());
+        // 计数门只观察真实HTTP，不制造任何成功替身。
+        var calls = 0;
+        // 真正引擎工厂会在任何意外访问时计数，权限拒绝必须保持零。
+        var runtime = SemanticFixture.RuntimeWithGate((_, _) => { Interlocked.Increment(ref calls); return Task.CompletedTask; });
+        // 使用同样生产审计与数据库构造当前被测服务。
+        var service = new OntologyService(database, runtime, new TransactionalAuditWriter(new PooledDbContextFactory<GovernanceDbContext>(new DbContextOptionsBuilder<GovernanceDbContext>().UseNpgsql(Connection()).Options)), TimeProvider.System);
+        // 角色和范围分别独立失配，不能互相遮掩。
+        var denied = viewer ? actor with { Roles = ["platform.viewer"] } : actor with { SiteIds = ["site-a"] };
+        // 请求本身有效，唯一拒绝原因是当前可信主体授权。
+        var request = new IdentityTimeEditsRequest { Hashes = draft.Hashes, Changes = [Change("A", "http://www.w3.org/2000/01/rdf-schema#label", new RdfTerm { Kind = RdfTermKind.Literal, Value = "合成设备", Language = "zh" })], Command = Command(1) };
+        Assert.AreEqual(403, (await Assert.ThrowsAsync<SemanticOperationException>(() => service.EditIdentityTimeAsync(denied, draft.DraftId, request, default))).Status);
+        Assert.AreEqual(0, calls);
+        Assert.AreEqual(1, await database.Commands.CountAsync(row => row.SubjectId == actor.SubjectId));
+    }
+
+    /// <summary>拒绝未保存的冲突批次时仍返回固定可解释code，不任意挑身份值。</summary>
+    /// <param name="scenario">新声明的单个语义错误类别。</param>
+    /// <param name="code">公开安全错误类别。</param>
+    [TestMethod]
+    [DataRow("overlap", "identity_ambiguous")]
+    [DataRow("unknown", "identity_relation_indeterminate")]
+    [DataRow("zone", "time_timezone_required")]
+    [DataRow("reverse", "time_interval_reversed")]
+    public async Task NewControlledBatchReturnsDeterministicDiagnosticCode(string scenario, string code)
+    {
+        // 当前真实PG草稿不含旧身份，保证负例来自新输入而非历史保护。
+        await using var database = Database();
+        // 可信操作员及真实生产服务。
+        var actor = Actor();
+        // 在同一服务上复用源散列和CAS。
+        var service = Service(database);
+        // 空身份正控仍有明确资产类型声明。
+        var draft = await Create(service, actor, G3M4IdentityTimeTests.Sources(""));
+        // 新声明词法或关系只改变对应负例，所有编号均为Synthetic。
+        var text = scenario switch
+        {
+            "zone" => G3M4IdentityTimeTests.Claim("one", from: "2026-01-01T00:00:00"),
+            "reverse" => G3M4IdentityTimeTests.Claim("one", from: "2026-03-01T00:00:00Z", to: "2026-01-01T00:00:00Z"),
+            "unknown" => G3M4IdentityTimeTests.Claim("one") + G3M4IdentityTimeTests.Claim("two", target: "B"),
+            _ => G3M4IdentityTimeTests.Claim("one", to: "2026-03-01T00:00:00Z") + G3M4IdentityTimeTests.Claim("two", from: "2026-02-01T00:00:00Z", to: "2026-04-01T00:00:00Z", target: "B")
+        };
+        // 差异批次仍从真正RIOT三元组构造，不从显示字符串恢复RDF项。
+        var runtime = (IG3VocabularyRuntime)SemanticFixture.Runtime();
+        // 当前四源与目标四源独立解析后只新增真实缺失三元组。
+        var before = await runtime.ReadVocabularyAsync(draft.Sources, 1, default);
+        // 原始错误词法保留在目标源，读取诊断不伪装为保存成功。
+        var target = await runtime.ReadVocabularyAsync(G3M4IdentityTimeTests.Sources(text), 1, default);
+        // 精确RDF项和source槽位参与批次，每次完整请求小于64项。
+        var changes = target.Triples.Where(item => item.SourceId == "ontology").Select(item => item.Triple).Except(before.Triples.Where(item => item.SourceId == "ontology").Select(item => item.Triple)).Select(triple => new VocabularyChange { SourceId = VocabularyEditSource.Ontology, Edit = new SemanticEdit { SubjectIri = triple.Subject.Value, PredicateIri = triple.Predicate, NewObject = triple.Object } }).ToArray();
+        Assert.IsTrue(changes.Length is > 0 and <= 64);
+        // 失败后服务器没有产生可伪造的assessment或历史修订。
+        var error = await Assert.ThrowsAsync<SemanticOperationException>(() => service.EditIdentityTimeAsync(actor, draft.DraftId, new IdentityTimeEditsRequest { Hashes = draft.Hashes, Changes = changes, Command = Command(1) }, default));
+        Assert.AreEqual(422, error.Status);
+        Assert.AreEqual(code, error.Code);
+        Assert.AreEqual(1L, (await service.ReadAsync(actor, draft.DraftId, default)).Revision);
+    }
+
+    /// <summary>为并发测试单独打开上下文并经过真正SaveCore锁内CAS。</summary>
+    private static async Task<string> SaveConcurrent(ActorContext actor, OntologyDraft draft, string marker)
+    {
+        // 此连接不共享其他竞争者的EF跟踪或事务。
+        await using var database = Database();
+        try
+        {
+            await Service(database).SaveAsync(actor, draft.DraftId, new SaveDraftRequest { Name = draft.Name, Sources = draft.Sources with { OntologyTurtle = draft.Sources.OntologyTurtle + "\n# concurrent " + marker + "\n" }, Command = Command(1) }, default);
+            return "SUCCESS";
+        }
+        catch (SemanticOperationException error)
+        {
+            return error.Code;
+        }
+    }
+
     /// <summary>仅创建真实权威双厂草稿，版本由服务器产生。</summary>
     private static Task<OntologyDraft> Create(OntologyService service, ActorContext actor, SourceBundle sources) => service.CreateAsync(actor, new CreateDraftRequest { Name = "Synthetic M4 identity", Scope = new ResourceScope { OrganizationId = actor.OrganizationId, SiteIds = actor.SiteIds }, Sources = sources, Command = Command(0) }, default);
 

@@ -79,7 +79,8 @@ public sealed class G3BoundaryTests
             var sources = new SourceBundle { OntologyTurtle = File.ReadAllText(corpus[index]) };
             // 真实支持报告独立于结构编辑权限。
             var report = await runtime.ValidateAsync(sources, default);
-            Assert.AreEqual(index < 11, report.Conforms, Path.GetFileName(corpus[index]));
+            // v4只新增第20项受控Instant，原M1历史发布拒绝由精确profile回归单独保持。
+            Assert.AreEqual(index < 11 || index == 19, report.Conforms, Path.GetFileName(corpus[index]));
             if (index is >= 8 and <= 10)
             {
                 // 当前M2已登记命名公理且语料两端有显式类型，整图可结构编辑。

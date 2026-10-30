@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "command": "git diff --cached --check",
+  "firstExitCode": 2,
+  "status": "FAILED_BEFORE_COMMIT",
+  "findings": [
+    {
+      "path": "docs/evidence/G3-M4-001/SEM/semantic-full-v4.txt",
+      "lines": [
+        42,
+        45
+      ],
+      "category": "trailing whitespace in test failure presentation"
+    }
+  ],
+  "rawIgnoredRetention": {
+    "path": ".tools/m4-semantic-full-v4.txt",
+    "sha256": "0df20bb4467755f4324887076f92234ded0119bff27750db5ab0935c0cc45356",
+    "bytes": 4131
+  },
+  "normalization": "Trim presentation-only end-of-line spaces in tracked transcript; original failure status/diagnostic retained in transcript and JSON, raw ignored log preserved unchanged."
+}

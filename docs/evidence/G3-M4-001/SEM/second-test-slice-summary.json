@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "status": "PARTIAL_PRODUCT_SLICES_VERIFIED_PENDING_MASTER_GATES_REVIEW",
+  "productionCommit": "4377d049d280c8bcdcec352b427a99c90f27ca59",
+  "productionTree": "74fc48fdac3ab7ee986a75f60e0a243811e154ff",
+  "productionWorktreeDiffExit": 0,
+  "productionUnchanged": true,
+  "semantic": [
+    {
+      "label": "semantic-full-v4",
+      "status": "FAIL",
+      "exitCode": 2,
+      "total": 214,
+      "passed": 213,
+      "failed": 1,
+      "skipped": 0,
+      "failure": "Only current-profile corpus item20 still expected M1 rejection despite authorized v4 controlled Instant."
+    },
+    {
+      "label": "semantic-corpus-v4-fix",
+      "status": "PASS",
+      "exitCode": 0,
+      "total": 2,
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0,
+      "scope": "Failed corpus test after exact v4 assertion fix + new same-source LegacyM3 deploy rejection."
+    },
+    {
+      "label": "profile-v3-golden",
+      "status": "PASS",
+      "exitCode": 0,
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "scope": "Changed profile test strengthened with original frozen M3 assembly golden hash a0cb0693520baf45bbe93506ad5781117b5ea412fcd5aebc266da9e0dde95968."
+    }
+  ],
+  "semanticCurrentCoverage": {
+    "uniqueCases": 215,
+    "method": "212 unchanged passing tests reused from original214 run, plus3 changed/new tests individually revalidated. Original214 FAIL retained. This is combined applicable coverage, not a claimed single215-test PASS run."
+  },
+  "publishing": {
+    "label": "publishing-full-v4",
+    "status": "PASS",
+    "exitCode": 0,
+    "total": 64,
+    "passed": 64,
+    "failed": 0,
+    "skipped": 0,
+    "reusedAfterSemanticOnlyTestChanges": true,
+    "binding": "No production or Publishing test source changed after this run; only Semantic test assertions/new historical corpus check changed."
+  },
+  "resourceReceipts": [
+    {
+      "evidence": "first-identity-real.json",
+      "executionExit": 0,
+      "createdIds": [
+        "738b103ebad89fc9373e2bd117a6cbfbb670cfc8a6c9ae444c523814bb0fc2da",
+        "069b0e7e1d9742ad2f2954c8a37f4817ce222bfe6e6c70077116b36221ef6a10"
+      ],
+      "creationCount": 2,
+      "afterCount": 2,
+      "strongAbsenceAllPassed": true,
+      "ttl": "Owned fixture finally immediately; no named persistent volume created."
+    },
+    {
+      "evidence": "semantic-full-v4.json",
+      "executionExit": 2,
+      "createdIds": [
+        "5162c19d20d7ffc51c4a470afcdb38c228ae48565b8e1288d0b1756487b58502",
+        "c1bd230524440783e9dfa08d90383a7f2e348bbb2d2857967d7354ebe8be524d"
+      ],
+      "creationCount": 2,
+      "afterCount": 2,
+      "strongAbsenceAllPassed": true,
+      "ttl": "Owned fixture finally immediately; no named persistent volume created."
+    },
+    {
+      "evidence": "publishing-full-v4.json",
+      "executionExit": 0,
+      "createdIds": [
+        "91e691e3d21d0aadfdd256bc3cf15fe87c52d9bde5f730366dd04561dfb36bba",
+        "d1b8f85c82820922a97e9f46a84ff44ececed58f24762ba961039fab5e28abf1",
+        "d0dc757c09510f618716d971c3cc81495c4b1c6679a538f33650f97bbadf84b2"
+      ],
+      "creationCount": 3,
+      "afterCount": 3,
+      "strongAbsenceAllPassed": true,
+      "ttl": "Owned fixture finally immediately; no named persistent volume created."
+    },
+    {
+      "evidence": "semantic-corpus-v4-fix.json",
+      "executionExit": 0,
+      "createdIds": [
+        "b993ee77631fe6e67d0ef545868a2ee8b0c2362cb4cc1f86006361ed6d7d00ee",
+        "05e4eb8fe5cf8efa6ffe26262c6f4fb8cb6fa79cad076bc5af7871d5005ca586"
+      ],
+      "creationCount": 2,
+      "afterCount": 2,
+      "strongAbsenceAllPassed": true,
+      "ttl": "Owned fixture finally immediately; no named persistent volume created."
+    }
+  ],
+  "actualAgentActiveTime": "UNKNOWN",
+  "ci": "NOT_RUN",
+  "windowsNative": "NOT_RUN",
+  "intelNative": "NOT_RUN",
+  "historicalRunV4": "Master full-chain gate required; this module fixture verifies fixed AssetVersionSnapshot/read isolation, not a real Run."
+}
