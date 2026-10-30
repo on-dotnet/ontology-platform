@@ -1,0 +1,31 @@
+{
+  "taskId": "G3-M4-001",
+  "runId": "mac-cleanup-fixture",
+  "target": "g3-m4-fixture-20e9c662b3e3-postgres-data",
+  "purpose": "new empty Synthetic fixture of exact M4 whitelist executor",
+  "ttl": "delete after independent plan review",
+  "sourceHead": "83bdcf8b3eecc14c49f0bbf305a7455e87bbf6fb",
+  "dockerBackend": {
+    "context": "desktop-linux",
+    "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016",
+    "serverVersion": "29.9.2"
+  },
+  "beforeNames": [
+    "g2-ef979bd04cc0-alloy-data",
+    "g2-ef979bd04cc0-fuseki-data",
+    "g2-ef979bd04cc0-grafana-data",
+    "g2-ef979bd04cc0-loki-data",
+    "g2-ef979bd04cc0-postgres-data",
+    "g2-ef979bd04cc0-prometheus-data",
+    "g2-ef979bd04cc0-rustfs-data",
+    "g2-ef979bd04cc0-tempo-data",
+    "g3-m4-20e9c662b3e3-alloy-data",
+    "g3-m4-20e9c662b3e3-fuseki-data",
+    "g3-m4-20e9c662b3e3-grafana-data",
+    "g3-m4-20e9c662b3e3-loki-data",
+    "g3-m4-20e9c662b3e3-postgres-data",
+    "g3-m4-20e9c662b3e3-prometheus-data",
+    "g3-m4-20e9c662b3e3-rustfs-data",
+    "g3-m4-20e9c662b3e3-tempo-data"
+  ]
+}

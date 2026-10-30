@@ -1,0 +1,95 @@
+{
+  "target": "g3-m4-fixture-20e9c662b3e3-postgres-data",
+  "snapshot": {
+    "Name": "g3-m4-fixture-20e9c662b3e3-postgres-data",
+    "Driver": "local",
+    "CreatedAt": "2026-10-30T18:48:54Z"
+  },
+  "fingerprint": "5b7ea972e9cec9dd7fb46d170c1053bd8fdb76536387053720da0ff0ca9298d8",
+  "references": [],
+  "commands": [
+    {
+      "command": [
+        "docker",
+        "context",
+        "show"
+      ],
+      "startedAtUtc": "2026-10-30T18:48:54.094981+00:00",
+      "endedAtUtc": "2026-10-30T18:48:54.153497+00:00",
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{\"engineId\":{{json .ID}},\"serverVersion\":{{json .ServerVersion}}}"
+      ],
+      "startedAtUtc": "2026-10-30T18:48:54.153523+00:00",
+      "endedAtUtc": "2026-10-30T18:48:54.464016+00:00",
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "ls",
+        "--format",
+        "{{.Name}}"
+      ],
+      "startedAtUtc": "2026-10-30T18:48:54.464059+00:00",
+      "endedAtUtc": "2026-10-30T18:48:54.479003+00:00",
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "startedAtUtc": "2026-10-30T18:48:54.479029+00:00",
+      "endedAtUtc": "2026-10-30T18:48:54.482856+00:00",
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "create",
+        "--driver",
+        "local",
+        "--label",
+        "org.ontology-platform.task-id=G3-M4-001",
+        "--label",
+        "org.ontology-platform.run-id=mac-cleanup-fixture",
+        "--label",
+        "org.ontology-platform.synthetic=true",
+        "g3-m4-fixture-20e9c662b3e3-postgres-data"
+      ],
+      "startedAtUtc": "2026-10-30T18:48:54.483028+00:00",
+      "endedAtUtc": "2026-10-30T18:48:54.501366+00:00",
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "ps",
+        "-aq",
+        "--filter",
+        "volume=g3-m4-fixture-20e9c662b3e3-postgres-data"
+      ],
+      "startedAtUtc": "2026-10-30T18:48:54.520364+00:00",
+      "endedAtUtc": "2026-10-30T18:48:54.532193+00:00",
+      "exitCode": 0
+    }
+  ],
+  "logicalData": "fresh never-mounted local volume; contents not inspected; physical reclaimed bytes UNKNOWN"
+}
