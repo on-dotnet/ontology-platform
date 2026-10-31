@@ -1,0 +1,367 @@
+{
+  "schemaVersion": 1,
+  "runnable": false,
+  "platforms": [
+    "linux/arm64",
+    "linux/amd64"
+  ],
+  "services": {
+    "web": {
+      "profile": "core",
+      "image": null,
+      "imageStatus": "BLOCKED_PENDING_DIGEST",
+      "user": "10001:10001",
+      "read_only": true,
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "networks": [
+        "internal"
+      ],
+      "ports": [],
+      "secrets": [],
+      "healthcheck": {
+        "test": [
+          "SERVICE_SPECIFIC_PROBE_NOT_YET_INSTALLED"
+        ],
+        "intervalSeconds": 10,
+        "timeoutSeconds": 3,
+        "retries": 6,
+        "startPeriodSeconds": 30
+      },
+      "memLimitMiB": 512,
+      "cpuLimit": 2,
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=64m"
+      ]
+    },
+    "api": {
+      "profile": "core",
+      "image": null,
+      "imageStatus": "BLOCKED_PENDING_DIGEST",
+      "user": "10001:10001",
+      "read_only": true,
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "networks": [
+        "internal"
+      ],
+      "ports": [
+        "127.0.0.1:8080:8080"
+      ],
+      "secrets": [
+        "provider_secret_ref"
+      ],
+      "healthcheck": {
+        "test": [
+          "SERVICE_SPECIFIC_PROBE_NOT_YET_INSTALLED"
+        ],
+        "intervalSeconds": 10,
+        "timeoutSeconds": 3,
+        "retries": 6,
+        "startPeriodSeconds": 30
+      },
+      "memLimitMiB": 512,
+      "cpuLimit": 2,
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=64m"
+      ]
+    },
+    "postgres": {
+      "profile": "core",
+      "image": null,
+      "imageStatus": "BLOCKED_PENDING_DIGEST",
+      "user": "10001:10001",
+      "read_only": true,
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "networks": [
+        "internal"
+      ],
+      "ports": [],
+      "secrets": [],
+      "healthcheck": {
+        "test": [
+          "SERVICE_SPECIFIC_PROBE_NOT_YET_INSTALLED"
+        ],
+        "intervalSeconds": 10,
+        "timeoutSeconds": 3,
+        "retries": 6,
+        "startPeriodSeconds": 30
+      },
+      "memLimitMiB": 512,
+      "cpuLimit": 2,
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=64m"
+      ]
+    },
+    "jena": {
+      "profile": "core",
+      "image": null,
+      "imageStatus": "BLOCKED_PENDING_DIGEST",
+      "user": "10001:10001",
+      "read_only": true,
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "networks": [
+        "internal"
+      ],
+      "ports": [],
+      "secrets": [],
+      "healthcheck": {
+        "test": [
+          "SERVICE_SPECIFIC_PROBE_NOT_YET_INSTALLED"
+        ],
+        "intervalSeconds": 10,
+        "timeoutSeconds": 3,
+        "retries": 6,
+        "startPeriodSeconds": 30
+      },
+      "memLimitMiB": 512,
+      "cpuLimit": 2,
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=64m"
+      ]
+    },
+    "rustfs": {
+      "profile": "core",
+      "image": null,
+      "imageStatus": "BLOCKED_PENDING_DIGEST",
+      "user": "10001:10001",
+      "read_only": true,
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "networks": [
+        "internal"
+      ],
+      "ports": [],
+      "secrets": [],
+      "healthcheck": {
+        "test": [
+          "SERVICE_SPECIFIC_PROBE_NOT_YET_INSTALLED"
+        ],
+        "intervalSeconds": 10,
+        "timeoutSeconds": 3,
+        "retries": 6,
+        "startPeriodSeconds": 30
+      },
+      "memLimitMiB": 512,
+      "cpuLimit": 2,
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=64m"
+      ]
+    },
+    "keycloak": {
+      "profile": "core",
+      "image": null,
+      "imageStatus": "BLOCKED_PENDING_DIGEST",
+      "user": "10001:10001",
+      "read_only": true,
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "networks": [
+        "internal"
+      ],
+      "ports": [],
+      "secrets": [],
+      "healthcheck": {
+        "test": [
+          "SERVICE_SPECIFIC_PROBE_NOT_YET_INSTALLED"
+        ],
+        "intervalSeconds": 10,
+        "timeoutSeconds": 3,
+        "retries": 6,
+        "startPeriodSeconds": 30
+      },
+      "memLimitMiB": 512,
+      "cpuLimit": 2,
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=64m"
+      ]
+    },
+    "otel": {
+      "profile": "core",
+      "image": null,
+      "imageStatus": "BLOCKED_PENDING_DIGEST",
+      "user": "10001:10001",
+      "read_only": true,
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "networks": [
+        "internal"
+      ],
+      "ports": [],
+      "secrets": [],
+      "healthcheck": {
+        "test": [
+          "SERVICE_SPECIFIC_PROBE_NOT_YET_INSTALLED"
+        ],
+        "intervalSeconds": 10,
+        "timeoutSeconds": 3,
+        "retries": 6,
+        "startPeriodSeconds": 30
+      },
+      "memLimitMiB": 512,
+      "cpuLimit": 2,
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=64m"
+      ]
+    },
+    "parser": {
+      "profile": "parser",
+      "image": null,
+      "imageStatus": "BLOCKED_PENDING_DIGEST",
+      "user": "10001:10001",
+      "read_only": true,
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "networks": [
+        "internal"
+      ],
+      "ports": [],
+      "secrets": [],
+      "healthcheck": {
+        "test": [
+          "SERVICE_SPECIFIC_PROBE_NOT_YET_INSTALLED"
+        ],
+        "intervalSeconds": 10,
+        "timeoutSeconds": 3,
+        "retries": 6,
+        "startPeriodSeconds": 30
+      },
+      "memLimitMiB": 2048,
+      "cpuLimit": 2,
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=64m"
+      ]
+    },
+    "ocr": {
+      "profile": "ocr",
+      "image": null,
+      "imageStatus": "BLOCKED_PENDING_DIGEST",
+      "user": "10001:10001",
+      "read_only": true,
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "networks": [
+        "internal"
+      ],
+      "ports": [],
+      "secrets": [],
+      "healthcheck": {
+        "test": [
+          "SERVICE_SPECIFIC_PROBE_NOT_YET_INSTALLED"
+        ],
+        "intervalSeconds": 10,
+        "timeoutSeconds": 3,
+        "retries": 6,
+        "startPeriodSeconds": 30
+      },
+      "memLimitMiB": 2048,
+      "cpuLimit": 2,
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=64m"
+      ]
+    },
+    "ollama": {
+      "profile": "ollama",
+      "image": null,
+      "imageStatus": "BLOCKED_PENDING_DIGEST",
+      "user": "10001:10001",
+      "read_only": true,
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "networks": [
+        "internal"
+      ],
+      "ports": [],
+      "secrets": [],
+      "healthcheck": {
+        "test": [
+          "SERVICE_SPECIFIC_PROBE_NOT_YET_INSTALLED"
+        ],
+        "intervalSeconds": 10,
+        "timeoutSeconds": 3,
+        "retries": 6,
+        "startPeriodSeconds": 30
+      },
+      "memLimitMiB": 2048,
+      "cpuLimit": 2,
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=64m"
+      ]
+    },
+    "eval": {
+      "profile": "eval",
+      "image": null,
+      "imageStatus": "BLOCKED_PENDING_DIGEST",
+      "user": "10001:10001",
+      "read_only": true,
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "networks": [
+        "internal"
+      ],
+      "ports": [],
+      "secrets": [],
+      "healthcheck": {
+        "test": [
+          "SERVICE_SPECIFIC_PROBE_NOT_YET_INSTALLED"
+        ],
+        "intervalSeconds": 10,
+        "timeoutSeconds": 3,
+        "retries": 6,
+        "startPeriodSeconds": 30
+      },
+      "memLimitMiB": 512,
+      "cpuLimit": 2,
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=64m"
+      ]
+    }
+  },
+  "lifecycle": "EXACT_REVIEWED_TASK_RUN_ONLY"
+}

@@ -1,0 +1,88 @@
+{
+  "taskId": "G6-P0-PARSER-PREP-001",
+  "utc": "2026-10-31T13:54:34.581504+00:00",
+  "platform": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+  "commands": [
+    {
+      "command": [
+        "git",
+        "status",
+        "--short"
+      ],
+      "exitCode": 0,
+      "stdout": "?? experiments/g6-p0/design/\n?? experiments/g6-p0/harness/\n?? experiments/g6-p0/supply-chain/\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exitCode": 0,
+      "stdout": "89667e0b029178963bfd3e61a7c5ea87cf07f42b\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "rev-parse",
+        "origin/main"
+      ],
+      "exitCode": 0,
+      "stdout": "d1a61daffe844475b07705797e3ad325cc3f2945\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "worktree",
+        "list",
+        "--porcelain"
+      ],
+      "exitCode": 0,
+      "stdout": "worktree /Users/chasen/Developer/repos/ontology-platform\nHEAD d1a61daffe844475b07705797e3ad325cc3f2945\nbranch refs/heads/main\n\nworktree /Users/chasen/.codex/worktrees/320c/ontology-platform\nHEAD e2a8965f09ace4d802534c2f095fecefb0748e52\nbranch refs/heads/codex/g3-m5-sem\n\nworktree /Users/chasen/.codex/worktrees/b389/ontology-platform\nHEAD 580d73e7c0fb38b94dbbed1136ee0b1d24fadc9d\nbranch refs/heads/codex/g3-m5-master\n\nworktree /Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform\nHEAD f0712e9174d1bff82b5f6959e0a61e723585be88\nbranch refs/heads/codex/g3-m1-closeout-master\n\nworktree /Users/chasen/.codex/worktrees/g3-m1-closeout-package/ontology-platform\nHEAD 6b0ec74e10c1ff820abc7b358bf43beb880a245b\nbranch refs/heads/codex/g3-m1-closeout-package\n\nworktree /Users/chasen/.codex/worktrees/g3-m1-closeout-resources/ontology-platform\nHEAD f3197177304e6a25f8597ff611acb04fb4e5b268\nbranch refs/heads/codex/g3-m1-closeout-resources\n\nworktree /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform\nHEAD c8f1040829b2bfe1e9f7e36223092286975643f0\nbranch refs/heads/codex/g3-m2-master\n\nworktree /Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform\nHEAD d89ba59bac5ecc1e5946f49b790cb8ff3319ae78\nbranch refs/heads/codex/g3-m3-efficiency\n\nworktree /Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform\nHEAD 3992582e03df1a103fac36e7e82b8c81f85f622e\nbranch refs/heads/codex/g3-m3-master\n\nworktree /Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform\nHEAD 90b60366a0e9907409061a5af5791c79a87cb499\nbranch refs/heads/codex/g3-m3-sem-language\n\nworktree /Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform\nHEAD 2ad537b63e0ed1b8392066201ad95ff4cb4d2b30\nbranch refs/heads/codex/g3-m3-web\n\nworktree /Users/chasen/.codex/worktrees/g3-m4-mac-master/ontology-platform\nHEAD e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a\nbranch refs/heads/codex/g3-m4-mac-master\n\nworktree /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform\nHEAD c909fa5e605417ff645da19d5899748c0f35773c\nbranch refs/heads/codex/g3-m4-sem-b\n\nworktree /Users/chasen/.codex/worktrees/g3-m4-web-a/ontology-platform\nHEAD b779ff5159fdbcedaa837c57ead30f3236b0f549\nbranch refs/heads/codex/g3-m4-web-b\n\nworktree /Users/chasen/.codex/worktrees/g3-m5-e0/ontology-platform\nHEAD cd59a8f47fee10840046bc14c817c87f8be6674c\nbranch refs/heads/codex/g3-m5-e0\n\nworktree /Users/chasen/.codex/worktrees/g3-m5-review-fix/ontology-platform\nHEAD d1a61daffe844475b07705797e3ad325cc3f2945\nbranch refs/heads/codex/G3-M5-REVIEW-FIX-001\n\nworktree /Users/chasen/.codex/worktrees/g6-p0-parser-prep-master/ontology-platform\nHEAD 89667e0b029178963bfd3e61a7c5ea87cf07f42b\nbranch refs/heads/codex/g6-p0-parser-prep-master\n\nworktree /Users/chasen/.codex/worktrees/g6-p0-parser-prep-parser/ontology-platform\nHEAD 89667e0b029178963bfd3e61a7c5ea87cf07f42b\nbranch refs/heads/codex/g6-p0-parser-prep-parser\n\nworktree /Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform\nHEAD d6aab6b47e63c9d5deadfa480f6659c62c5ed138\nbranch refs/heads/codex/PRE-G3-CLEANUP-FIX-002\n\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "branch",
+        "--list"
+      ],
+      "exitCode": 0,
+      "stdout": "  codex/G1-SEC-001\n  codex/G2-AI-001\n  codex/G2-FE-001\n  codex/G2-FINAL-FIX\n  codex/G2-HOST-FIX\n  codex/G2-OBS-SUPPORT\n  codex/G2-PUB-001\n  codex/G2-QA-FIX\n  codex/G2-QRY-001\n  codex/G2-READINESS-TEST\n  codex/G2-SEC-SUPPORT\n  codex/G2-SEM-001\n  codex/G2-THIN-SLICE-001-master\n+ codex/G3-M5-REVIEW-FIX-001\n+ codex/PRE-G3-CLEANUP-FIX-002\n+ codex/g3-m1-closeout-master\n+ codex/g3-m1-closeout-package\n+ codex/g3-m1-closeout-resources\n  codex/g3-m1-fix\n  codex/g3-m1-master\n  codex/g3-m1-sem\n  codex/g3-m1-web\n+ codex/g3-m2-master\n  codex/g3-m2-sem\n  codex/g3-m2-web\n+ codex/g3-m3-efficiency\n+ codex/g3-m3-master\n  codex/g3-m3-sem\n+ codex/g3-m3-sem-language\n+ codex/g3-m3-web\n+ codex/g3-m4-mac-master\n+ codex/g3-m4-sem-b\n+ codex/g3-m4-web-b\n+ codex/g3-m5-e0\n+ codex/g3-m5-master\n+ codex/g3-m5-sem\n  codex/g3-m5-web\n  codex/g3-m5-web-visual\n* codex/g6-p0-parser-prep-master\n+ codex/g6-p0-parser-prep-parser\n+ main\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "--version"
+      ],
+      "exitCode": 0,
+      "stdout": "Python 3.13.17\n",
+      "stderr": ""
+    }
+  ],
+  "scope": "stdlib synthetic only",
+  "sharedExecutionPreflight": {
+    "status": "BLOCKED_UNSUPPORTED_MILESTONE",
+    "exitCode": 2,
+    "accepted": [
+      "M1",
+      "M2",
+      "M3",
+      "M4",
+      "M5"
+    ]
+  },
+  "auditDIConsumers": "NOT_APPLICABLE: no product entrypoint, DI or audit changes",
+  "priorMainDirtyFiles": [
+    ".DS_Store",
+    "backend/.DS_Store",
+    "backend/src/.DS_Store",
+    "docs/.DS_Store",
+    "docs/evidence/.DS_Store",
+    "infra/.DS_Store"
+  ]
+}

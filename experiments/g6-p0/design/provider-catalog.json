@@ -1,0 +1,391 @@
+{
+  "schemaVersion": 1,
+  "status": "DESIGN_ONLY_NOT_CONNECTION_TEST",
+  "providers": [
+    {
+      "providerId": "openai-synthetic",
+      "tenantScope": "synthetic-org-a",
+      "providerType": "openai",
+      "region": "global",
+      "baseUrl": "https://api.openai.com/v1",
+      "protocol": "responses",
+      "secretRef": {
+        "id": "secret-openai",
+        "providerId": "openai-synthetic",
+        "tenantScope": "synthetic-org-a",
+        "version": 1,
+        "mountPath": "/run/secrets/openai_api_key"
+      },
+      "allowedEgressPolicyId": "egress-openai",
+      "revision": 1,
+      "enabled": false
+    },
+    {
+      "providerId": "deepseek-synthetic",
+      "tenantScope": "synthetic-org-a",
+      "providerType": "deepseek",
+      "region": "cn",
+      "baseUrl": "https://api.deepseek.com",
+      "protocol": "chat",
+      "secretRef": {
+        "id": "secret-deepseek",
+        "providerId": "deepseek-synthetic",
+        "tenantScope": "synthetic-org-a",
+        "version": 1,
+        "mountPath": "/run/secrets/deepseek_api_key"
+      },
+      "allowedEgressPolicyId": "egress-deepseek",
+      "revision": 1,
+      "enabled": false
+    },
+    {
+      "providerId": "qwen-synthetic",
+      "tenantScope": "synthetic-org-a",
+      "providerType": "qwen",
+      "region": "cn-beijing",
+      "baseUrl": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "protocol": "chat",
+      "secretRef": {
+        "id": "secret-qwen",
+        "providerId": "qwen-synthetic",
+        "tenantScope": "synthetic-org-a",
+        "version": 1,
+        "mountPath": "/run/secrets/qwen_api_key"
+      },
+      "allowedEgressPolicyId": "egress-qwen",
+      "revision": 1,
+      "enabled": false
+    },
+    {
+      "providerId": "glm-synthetic",
+      "tenantScope": "synthetic-org-a",
+      "providerType": "glm",
+      "region": "cn",
+      "baseUrl": "https://open.bigmodel.cn/api/paas/v4",
+      "protocol": "chat",
+      "secretRef": {
+        "id": "secret-glm",
+        "providerId": "glm-synthetic",
+        "tenantScope": "synthetic-org-a",
+        "version": 1,
+        "mountPath": "/run/secrets/glm_api_key"
+      },
+      "allowedEgressPolicyId": "egress-glm",
+      "revision": 1,
+      "enabled": false
+    },
+    {
+      "providerId": "kimi-synthetic",
+      "tenantScope": "synthetic-org-a",
+      "providerType": "kimi",
+      "region": "cn",
+      "baseUrl": "https://api.moonshot.cn/v1",
+      "protocol": "chat",
+      "secretRef": {
+        "id": "secret-kimi",
+        "providerId": "kimi-synthetic",
+        "tenantScope": "synthetic-org-a",
+        "version": 1,
+        "mountPath": "/run/secrets/kimi_api_key"
+      },
+      "allowedEgressPolicyId": "egress-kimi",
+      "revision": 1,
+      "enabled": false
+    },
+    {
+      "providerId": "ollama-synthetic",
+      "tenantScope": "synthetic-org-a",
+      "providerType": "ollama",
+      "region": "local",
+      "baseUrl": "http://ollama:11434",
+      "protocol": "ollama",
+      "secretRef": null,
+      "allowedEgressPolicyId": "egress-ollama",
+      "revision": 1,
+      "enabled": false
+    }
+  ],
+  "policies": [
+    {
+      "policyId": "egress-openai",
+      "tenantScope": "synthetic-org-a",
+      "providerId": "openai-synthetic",
+      "region": "global",
+      "endpoints": [
+        "https://api.openai.com/v1"
+      ],
+      "dataClasses": [
+        "SYNTHETIC"
+      ],
+      "approved": false,
+      "allowLocal": false
+    },
+    {
+      "policyId": "egress-deepseek",
+      "tenantScope": "synthetic-org-a",
+      "providerId": "deepseek-synthetic",
+      "region": "cn",
+      "endpoints": [
+        "https://api.deepseek.com"
+      ],
+      "dataClasses": [
+        "SYNTHETIC"
+      ],
+      "approved": false,
+      "allowLocal": false
+    },
+    {
+      "policyId": "egress-qwen",
+      "tenantScope": "synthetic-org-a",
+      "providerId": "qwen-synthetic",
+      "region": "cn-beijing",
+      "endpoints": [
+        "https://dashscope.aliyuncs.com/compatible-mode/v1"
+      ],
+      "dataClasses": [
+        "SYNTHETIC"
+      ],
+      "approved": false,
+      "allowLocal": false
+    },
+    {
+      "policyId": "egress-glm",
+      "tenantScope": "synthetic-org-a",
+      "providerId": "glm-synthetic",
+      "region": "cn",
+      "endpoints": [
+        "https://open.bigmodel.cn/api/paas/v4"
+      ],
+      "dataClasses": [
+        "SYNTHETIC"
+      ],
+      "approved": false,
+      "allowLocal": false
+    },
+    {
+      "policyId": "egress-kimi",
+      "tenantScope": "synthetic-org-a",
+      "providerId": "kimi-synthetic",
+      "region": "cn",
+      "endpoints": [
+        "https://api.moonshot.cn/v1"
+      ],
+      "dataClasses": [
+        "SYNTHETIC"
+      ],
+      "approved": false,
+      "allowLocal": false
+    },
+    {
+      "policyId": "egress-ollama",
+      "tenantScope": "synthetic-org-a",
+      "providerId": "ollama-synthetic",
+      "region": "local",
+      "endpoints": [
+        "http://ollama:11434"
+      ],
+      "dataClasses": [
+        "SYNTHETIC"
+      ],
+      "approved": false,
+      "allowLocal": true
+    }
+  ],
+  "deployments": [
+    {
+      "deploymentId": "deployment-openai",
+      "providerId": "openai-synthetic",
+      "modelId": "UNSELECTED",
+      "registrySnapshot": "NOT_VERIFIED",
+      "capabilities": {
+        "text": "UNKNOWN",
+        "vision": "UNKNOWN",
+        "embedding": "UNKNOWN",
+        "jsonSchema": "UNKNOWN",
+        "tools": "UNKNOWN",
+        "streaming": "UNKNOWN",
+        "reasoning": "UNKNOWN"
+      },
+      "authentication": "UNKNOWN",
+      "contextLimit": 1,
+      "probe": null
+    },
+    {
+      "deploymentId": "deployment-deepseek",
+      "providerId": "deepseek-synthetic",
+      "modelId": "UNSELECTED",
+      "registrySnapshot": "NOT_VERIFIED",
+      "capabilities": {
+        "text": "UNKNOWN",
+        "vision": "UNKNOWN",
+        "embedding": "UNKNOWN",
+        "jsonSchema": "UNKNOWN",
+        "tools": "UNKNOWN",
+        "streaming": "UNKNOWN",
+        "reasoning": "UNKNOWN"
+      },
+      "authentication": "UNKNOWN",
+      "contextLimit": 1,
+      "probe": null
+    },
+    {
+      "deploymentId": "deployment-qwen",
+      "providerId": "qwen-synthetic",
+      "modelId": "UNSELECTED",
+      "registrySnapshot": "NOT_VERIFIED",
+      "capabilities": {
+        "text": "UNKNOWN",
+        "vision": "UNKNOWN",
+        "embedding": "UNKNOWN",
+        "jsonSchema": "UNKNOWN",
+        "tools": "UNKNOWN",
+        "streaming": "UNKNOWN",
+        "reasoning": "UNKNOWN"
+      },
+      "authentication": "UNKNOWN",
+      "contextLimit": 1,
+      "probe": null
+    },
+    {
+      "deploymentId": "deployment-glm",
+      "providerId": "glm-synthetic",
+      "modelId": "UNSELECTED",
+      "registrySnapshot": "NOT_VERIFIED",
+      "capabilities": {
+        "text": "UNKNOWN",
+        "vision": "UNKNOWN",
+        "embedding": "UNKNOWN",
+        "jsonSchema": "UNKNOWN",
+        "tools": "UNKNOWN",
+        "streaming": "UNKNOWN",
+        "reasoning": "UNKNOWN"
+      },
+      "authentication": "UNKNOWN",
+      "contextLimit": 1,
+      "probe": null
+    },
+    {
+      "deploymentId": "deployment-kimi",
+      "providerId": "kimi-synthetic",
+      "modelId": "UNSELECTED",
+      "registrySnapshot": "NOT_VERIFIED",
+      "capabilities": {
+        "text": "UNKNOWN",
+        "vision": "UNKNOWN",
+        "embedding": "UNKNOWN",
+        "jsonSchema": "UNKNOWN",
+        "tools": "UNKNOWN",
+        "streaming": "UNKNOWN",
+        "reasoning": "UNKNOWN"
+      },
+      "authentication": "UNKNOWN",
+      "contextLimit": 1,
+      "probe": null
+    },
+    {
+      "deploymentId": "deployment-ollama",
+      "providerId": "ollama-synthetic",
+      "modelId": "UNSELECTED",
+      "registrySnapshot": "NOT_VERIFIED",
+      "capabilities": {
+        "text": "UNKNOWN",
+        "vision": "UNKNOWN",
+        "embedding": "UNKNOWN",
+        "jsonSchema": "UNKNOWN",
+        "tools": "UNKNOWN",
+        "streaming": "UNKNOWN",
+        "reasoning": "UNKNOWN"
+      },
+      "authentication": "UNKNOWN",
+      "contextLimit": 1,
+      "probe": null
+    }
+  ],
+  "profiles": [
+    {
+      "profileId": "extraction-openai",
+      "version": 1,
+      "taskType": "DOCUMENT_EXTRACTION",
+      "scope": "synthetic-org-a",
+      "deploymentId": "deployment-openai",
+      "fallbackDeploymentIds": [],
+      "egressPolicyId": "egress-openai",
+      "costPolicyId": "zero-budget",
+      "schemaHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "sampleVersion": "synthetic-v1"
+    },
+    {
+      "profileId": "extraction-deepseek",
+      "version": 1,
+      "taskType": "DOCUMENT_EXTRACTION",
+      "scope": "synthetic-org-a",
+      "deploymentId": "deployment-deepseek",
+      "fallbackDeploymentIds": [],
+      "egressPolicyId": "egress-deepseek",
+      "costPolicyId": "zero-budget",
+      "schemaHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "sampleVersion": "synthetic-v1"
+    },
+    {
+      "profileId": "extraction-qwen",
+      "version": 1,
+      "taskType": "DOCUMENT_EXTRACTION",
+      "scope": "synthetic-org-a",
+      "deploymentId": "deployment-qwen",
+      "fallbackDeploymentIds": [],
+      "egressPolicyId": "egress-qwen",
+      "costPolicyId": "zero-budget",
+      "schemaHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "sampleVersion": "synthetic-v1"
+    },
+    {
+      "profileId": "extraction-glm",
+      "version": 1,
+      "taskType": "DOCUMENT_EXTRACTION",
+      "scope": "synthetic-org-a",
+      "deploymentId": "deployment-glm",
+      "fallbackDeploymentIds": [],
+      "egressPolicyId": "egress-glm",
+      "costPolicyId": "zero-budget",
+      "schemaHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "sampleVersion": "synthetic-v1"
+    },
+    {
+      "profileId": "extraction-kimi",
+      "version": 1,
+      "taskType": "DOCUMENT_EXTRACTION",
+      "scope": "synthetic-org-a",
+      "deploymentId": "deployment-kimi",
+      "fallbackDeploymentIds": [],
+      "egressPolicyId": "egress-kimi",
+      "costPolicyId": "zero-budget",
+      "schemaHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "sampleVersion": "synthetic-v1"
+    },
+    {
+      "profileId": "extraction-ollama",
+      "version": 1,
+      "taskType": "DOCUMENT_EXTRACTION",
+      "scope": "synthetic-org-a",
+      "deploymentId": "deployment-ollama",
+      "fallbackDeploymentIds": [],
+      "egressPolicyId": "egress-ollama",
+      "costPolicyId": "zero-budget",
+      "schemaHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "sampleVersion": "synthetic-v1"
+    }
+  ],
+  "costPolicy": {
+    "maxRequests": 0,
+    "maxInputTokens": 0,
+    "maxOutputTokens": 0,
+    "maxCostUsd": "0",
+    "maxSeconds": 0,
+    "maxRetries": 0,
+    "maxConcurrency": 0,
+    "inputUsdPerToken": "0",
+    "outputUsdPerToken": "0",
+    "priceSnapshot": "UNVERIFIED_ZERO_EXECUTION",
+    "currency": "USD"
+  }
+}

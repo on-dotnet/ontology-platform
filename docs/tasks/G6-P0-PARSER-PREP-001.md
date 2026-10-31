@@ -2,7 +2,7 @@
 
 状态 IN_PROGRESS；仅 PREP。BaseSha=d1a61daffe844475b07705797e3ad325cc3f2945，重新 fetch origin/main 与 HEAD 同值。
 Master 分支 codex/g6-p0-parser-prep-master；托管树 /Users/chasen/.codex/worktrees/g6-p0-parser-prep-master/ontology-platform。
-Parser 分支 codex/g6-p0-parser-prep-parser；独立托管树创建后登记。Reviewer 非作者只读。
+Parser 分支 codex/g6-p0-parser-prep-parser；独立托管树 /Users/chasen/.codex/worktrees/g6-p0-parser-prep-parser/ontology-platform。Reviewer 非作者只读。
 
 ## 权威、所有权、DAG
 
@@ -18,7 +18,7 @@ Python 标准库 unittest discovery 分别覆盖 tests 与 harness；附件 veri
 先坏版本/坏编码/越界/符号链接/权限/预算/假密钥泄漏/跨 Task 删除负例，再对应正例。实际命令、退出码、测试数、失败修复、输入绑定保留。
 真实 Docling/PaddleOCR/Docker/模型和 Windows/Linux 运行 NOT_RUN；CI NOT_RUN。零测试不能 PASS。
 当前 execution_preflight 只接受 M1–M5，G6 参数拒绝 exit2；公共脚本只读，补任务自有适用入口，不冒用 M5 PASS。host_continuity inspect 默认旧 taskId，仅复用只读函数并显式包装 G6 归属；已有用户能源确认见 origin/main current-authorization，当前 AC sleep=0/display=10，未知锁屏实验不填 PASS。
-原 main 6 DS_Store、18 树及旧 Docker/ZIP 全部 KEEP，不清理不明归属。未合 main 的任务树 KEEP 至复审关闭。仅准确自身可再生临时 fixture 自动回收；Docker 本轮预计创建0/删除0。
+原 main 6 DS_Store、17 个既有树（创建后准确枚举19，先前18口头计数纠正）及旧 Docker/ZIP 全部 KEEP，不清理不明归属。未合 main 的任务树 KEEP 至复审关闭。仅准确自身可再生临时 fixture 自动回收；Docker 本轮预计创建0/删除0。
 
 ## 已核实入口（工作目录为 Master/Parser 树根）
 

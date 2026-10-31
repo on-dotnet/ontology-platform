@@ -1,0 +1,26 @@
+# 非作者独立审查记录
+
+审查者：独立quality_reviewer（Sol High），只读。以下由Master逐项转录其实际回执；审查者未改实现。
+
+## Parser
+
+PASS_FOR_PARSER_PREP_SOURCE，Worker基底89667e0b029178963bfd3e61a7c5ea87cf07f42b。
+core.py SHA256 01a49ae22b6adcf9be71a1d0ae8a0d09a18d8dbb565470b8cd9e93cc47800b19；test_parser.py SHA256 1d90f8d7baf40376b1beaa4970426732a774e65b53c8e548bdf569c2b9521b55。
+独立35 tests PASS/0skip/exit0，9seed/18span PASS，diff-check0；附加固定seed6129的24份4×3 CSV、1137字符逐一anchor回源/hash PASS，4种IR篡改均拒绝。真实权限、symlink竞态、文件增长和11临时目录清理断言通过。
+独立随机生成器首次开头FEFF期望与strip_bom合同不符exit1，修生成器后通过；另180份尝试未采集最终stdout，NOT_VERIFIED，不计通过。保留该失败事实。
+审查后Worker提交ffa3499812debd89f2e7fe4138e2ddfca2e7ac68并push；Master cherry-pick到任务分支1022a99，未合main。
+
+## 平台初审与修复
+
+初审26 tests PASS但独立攻击发现REQUEST_CHANGES：P2 Decimal默认28位舍入接受实际超0.10预算；P2可选parser被改core仍通过；P2空userinfo/query/fragment可登记；P3 schemaVersion=True；P3坏shape原生异常。历史绿灯不能覆盖这些失败。
+修复：有界Decimal精确转Fraction、精确name/profile、显式拒空URL分隔符、严格int和公开入口安全异常边界。
+复审PASS_FOR_PLATFORM_PREP_SOURCE：独立30 tests PASS/exit0；13项原攻击复核PASS，包括累计金额/第三笔超限、5profile错配、3URL、schema布尔与坏shape；diff-check0。
+platform_contract.py SHA256 4bc8a000894c498b905b76eddef2a2f8fc47d39c8cb624bc1c29df5f2b65e483；test_platform.py SHA256 0a0256a1cd201e69881790b64b146c6c0f6b83ca00e30a3cf7635abb03957b5b。
+
+这些PASS只覆盖PREP源码，真实API/容器/OS Secret/跨平台/OCR仍NOT_RUN。最终设计/证据和正式ZIP重开回执另追加实际结论。
+
+## 最终源码与设计复审
+
+PASS_FOR_PREP_SOURCE_AND_DESIGN，无未关闭阻断。Reviewer独立37 harness/0skip PASS；实际preflight24输入/35parser/37harness；diff-check0。独立嵌套_FailedTest即使loader.errors为空仍拒绝；原manifest24项通过，增加换行/改字段/删清单均拒绝。preflight.py SHA256 e3db01ce7f444c8eb63b5fc65e7debf9ac4094cfbd68801135da4f0c08590dd8。
+供应链内部一致性：162节点、3493制品元数据、inventory逐name/version/count相等；334声明audit重算相等；4模型repo40hex revision/LFS64hex散列。未重新HTTP获取全部元数据、未下载artifact；结论只为PREP信息完整与边界准确。安装许可/权重/平台仍BLOCKED/NOT_RUN。host包装无系统策略/caffeinate变化、有界、只读复用。
+最初preflight仅count非零接受导入失败，P2已修；manifest删除绕过P3已固定原始SHA。此前源码hash未变。最终验证绑定、资源与正式ZIP重开另待实际回执，不提前称交付完成。

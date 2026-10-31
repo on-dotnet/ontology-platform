@@ -1,0 +1,60 @@
+{
+  "nodeCount": 162,
+  "selectedDeclarationEdges": 334,
+  "missingNodes": [],
+  "unpropagatedExtras": [],
+  "exactPinMismatches": [
+    {
+      "from": "paddlex",
+      "name": "pyyaml",
+      "required": "6.0.2",
+      "observed": "6.0.3"
+    },
+    {
+      "from": "paddlex",
+      "name": "opencv-contrib-python",
+      "required": "4.10.0.84",
+      "observed": "5.0.0.93"
+    },
+    {
+      "from": "paddlepaddle",
+      "name": "opt-einsum",
+      "required": "3.3.0",
+      "observed": "3.4.0"
+    },
+    {
+      "from": "torch",
+      "name": "cuda-toolkit",
+      "required": "13.2.2",
+      "observed": "13.4.3"
+    },
+    {
+      "from": "torch",
+      "name": "nvidia-cudnn-cu13",
+      "required": "9.26.0.51",
+      "observed": "9.27.0.42"
+    },
+    {
+      "from": "torch",
+      "name": "nvidia-cusparselt-cu13",
+      "required": "0.8.1",
+      "observed": "0.10.0"
+    },
+    {
+      "from": "torch",
+      "name": "nvidia-nccl-cu13",
+      "required": "2.30.7",
+      "observed": "2.32.3"
+    },
+    {
+      "from": "torch",
+      "name": "nvidia-nvshmem-cu13",
+      "required": "3.7.2",
+      "observed": "3.8.0"
+    }
+  ],
+  "graphEnumeration": "PASS",
+  "installClosure": "BLOCKED_PLATFORM_MARKERS_CONSTRAINTS_LICENSES_NATIVE_LIBS",
+  "securityAudit": "NOT_RUN",
+  "artifactDownloads": 0
+}

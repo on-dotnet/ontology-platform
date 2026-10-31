@@ -1,0 +1,22 @@
+test_platform (unittest.loader._FailedTest.test_platform) ... ERROR
+
+======================================================================
+ERROR: test_platform (unittest.loader._FailedTest.test_platform)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: test_platform
+Traceback (most recent call last):
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/loader.py", line 403, in _find_test_path
+    module = self._get_module_from_name(name)
+  File "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/lib/python3.13/unittest/loader.py", line 346, in _get_module_from_name
+    __import__(name)
+    ~~~~~~~~~~^^^^^^
+  File "/Users/chasen/.codex/worktrees/g6-p0-parser-prep-master/ontology-platform/experiments/g6-p0/harness/test_platform.py", line 12, in <module>
+    from platform_contract import (ContractError, Budget, validate_provider, validate_deployment,
+        validate_profile, authorize_route, safe_record, cleanup_eligible, validate_compose)
+ModuleNotFoundError: No module named 'platform_contract'
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.000s
+
+FAILED (errors=1)
