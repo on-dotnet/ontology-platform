@@ -1,0 +1,102 @@
+$ eslint .
+$ tsc --noEmit
+$ vitest run
+
+ RUN  v5.0.5 /Users/chasen/.codex/worktrees/b389/ontology-platform/apps/web
+
+ ❯ src/lib/api/openapi-types.test.ts (4 tests | 1 failed) 7ms
+   × checked-in G2 artifact exactly matches canonical runtime schema and repeated generation 6ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/api/openapi-types.test.ts > checked-in G2 artifact exactly matches canonical runtime schema and repeated generation
+AssertionError: Expected values to be strictly equal:
++ actual - expected
+... Skipped lines
+
+  '// 从g2-platform.openapi.json自动生成；运行pnpm generate:types，禁止手工编辑。\n' +
++   '// 新只读DTO来自g2-models生成Schema；此补充不代表路由已实测。\n' +
+    '\n' +
+    'export type JsonValue = null | boolean | number | string | JsonValue[] | { [key: string]: JsonValue };\n' +
+    '\n' +
++   'export type OwlExpressionDiagnostic = { "code": string; "message": string; "focusNode": RdfTerm | null; "predicateIri": string | null; "line": number | null; "column": number | null };\n' +
++   '\n' +
++   'export type OwlExpressionProperty = { "predicateIri": string; "values": Array<RdfTerm> };\n' +
++   '\n' +
++   'export type OwlExpressionNode = { "term": RdfTerm; "kind": string; "properties": Array<OwlExpressionProperty>; "orderedItems": Array<RdfTerm> };\n' +
++   '\n' +
++   'export type OwlExpressionSource = { "sourceId": string; "sourceHash": string; "status": string; "sourcePreserved": boolean; "readOnlyStructured": boolean; "editable": boolean; "publishEligible": string; "inferred": boolean; "roots": Array<RdfTerm>; "nodes": Array<OwlExpressionNode>; "diagnostics": Array<OwlExpressionDiagnostic> };\n' +
++   '\n' +
++   'export type OwlExpressionSnapshot = { "projectionVersion": string; "version": VersionRef; "scope": ResourceScope; "hashes": SourceHashes; "profileId": string; "profileVersion": string; "profileHash": string; "sources": Array<OwlExpressionSource> };\n' +
++   '\n' +
+    'export type ActivateReleaseRequest = { "proposalId": string; "expectedActivationRevision": number; "expectedActiveReleaseId": string | null; "command": CommandContext };\n' +
+    '\n' +
+    'export type ActorContext = { "subjectId": string; "organizationId": string; "siteIds": Array<string>; "roles": Array<string>; "traceId": string; "correlationId": string };\n' +
+    '\n' +
+    'export type ApprovalDecision = "approve" | "reject";\n' +
+...
+    '\n' +
++   'export type GenerateImpactReportRequest = { "from": VersionRef; "to": VersionRef; "basel'... 14962 more characters
+-   'export type GenerateImpactReportRequest = { "from": VersionRef; "to": VersionRef; "baselineKind": ImpactBaselineKind; "assessmentId": string | null; "command": CommandContext };\n' +
+-   '\n' +
+-   'export type GraphComparisonBudget = { "maxBlankNodes": number; "maxSearchNodes": number; "timeoutMilliseconds": number };\n' +
+-   '\n' +
+-   'export type GraphComparisonResult = { "status": GraphComparisonStatus; "code": string; "visitedNodes": number; "elapsedMilliseconds": number };\n' +
+-   '\n' +
+-   'export type GraphComparisonStatus = "EQUIVALENT" | "DIFFERENT" | "INDETERMINATE";\n' +
+-   '\n' +
+-   'export type IdentityTimeEditsRequest = { "hashes": SourceHashes; "changes": Array<VocabularyChange>; "command": CommandContext };\n' +
+-   '\n' +
+-   'export type ImpactApprovalBinding = { "reportId": string; "canonicalHash": string; "inputFingerprint": string; "baselineKind": ImpactBaselineKind; "from": VersionRef; "to": VersionRef; "baseHashes": SourceHashes; "targetHashes": SourceHashes; "baseManifestHash": string | null; "targetSemantics": PublicationSemantics; "generatedAtUtc": string; "expiresAtUtc": string };\n' +
+-   '\n' +
+-   'export type ImpactBaselineKind = "VERSION_PAIR" | "INITIAL";\n' +
+-   '\n' +
+-   'export type ImpactConclusion = { "code": s'... 13913 more characters
+
+
+- Expected
++ Received
+
+@@ -1,8 +1,19 @@
+  // 从g2-platform.openapi.json自动生成；运行pnpm generate:types，禁止手工编辑。
++ // 新只读DTO来自g2-models生成Schema；此补充不代表路由已实测。
+
+  export type JsonValue = null | boolean | number | string | JsonValue[] | { [key: string]: JsonValue };
++
++ export type OwlExpressionDiagnostic = { "code": string; "message": string; "focusNode": RdfTerm | null; "predicateIri": string | null; "line": number | null; "column": number | null };
++
++ export type OwlExpressionProperty = { "predicateIri": string; "values": Array<RdfTerm> };
++
++ export type OwlExpressionNode = { "term": RdfTerm; "kind": string; "properties": Array<OwlExpressionProperty>; "orderedItems": Array<RdfTerm> };
++
++ export type OwlExpressionSource = { "sourceId": string; "sourceHash": string; "status": string; "sourcePreserved": boolean; "readOnlyStructured": boolean; "editable": boolean; "publishEligible": string; "inferred": boolean; "roots": Array<RdfTerm>; "nodes": Array<OwlExpressionNode>; "diagnostics": Array<OwlExpressionDiagnostic> };
++
++ export type OwlExpressionSnapshot = { "projectionVersion": string; "version": VersionRef; "scope": ResourceScope; "hashes": SourceHashes; "profileId": string; "profileVersion": string; "profileHash": string; "sources": Array<OwlExpressionSource> };
+
+  export type ActivateReleaseRequest = { "proposalId": string; "expectedActivationRevision": number; "expectedActiveReleaseId": string | null; "command": CommandContext };
+
+  export type ActorContext = { "subjectId": string; "organizationId": string; "siteIds": Array<string>; "roles": Array<string>; "traceId": string; "correlationId": string };
+
+
+ ❯ src/lib/api/openapi-types.test.ts:31:10
+     29|   const expected = `// 从g2-platform.openapi.json自动生成；运行pnpm generate:t…
+     30|   const original = readFileSync(target, "utf8");
+     31|   assert.equal(original, expected);
+       |          ^
+     32|   for (let iteration = 0; iteration < 2; iteration++) {
+     33|     execFileSync(process.execPath, [new URL("../../../scripts/generate…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 21 passed (22)
+      Tests  1 failed | 267 passed (268)
+   Start at  12:31:43
+   Duration  2.44s (transform 44%, tests 37%, import 18%, worker 2%)
+
+[ELIFECYCLE] Test failed. See above for more details.
+Exception: /Users/chasen/.codex/worktrees/b389/ontology-platform/scripts/verify-web.ps1:19
+Line |
+  19 |              if ($LASTEXITCODE -ne 0) { throw "Web $task failed" }
+     |                                         ~~~~~~~~~~~~~~~~~~~~~~~~
+     | Web test failed

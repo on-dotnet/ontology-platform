@@ -1,0 +1,147 @@
+{
+  "evidenceSchemaVersion": 2,
+  "validationSource": "LOCAL",
+  "testedCommit": "80adf4756f3c6da9a5e1be4a0e348ebdd72e2f69",
+  "checks": [
+    {
+      "name": "semantic-full",
+      "command": "dotnet test --project backend/tests/OntologyPlatform.SemanticTests --no-restore",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Full296 tests,0fail/0skip; master/semantic-full/m5-semantic-full.json"
+    },
+    {
+      "name": "semantic-real-negative-delta",
+      "command": "dotnet test --project backend/tests/OntologyPlatform.SemanticTests --no-restore -- --filter 'FullyQualifiedName~RealRiotRestrictionNegativeShapesPreserveSourceHash|FullyQualifiedName~RealRiotNodeBudgetPreservesSourceAndFailsClosed'",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Exact real RIOT6 additional distinct negative cases allPASS/0skip; master/riot-negative/m5-riot-negative.json."
+    },
+    {
+      "name": "publishing-full",
+      "command": "dotnet test --project backend/tests/OntologyPlatform.PublishingTests --no-restore --no-build",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "78PASS/0fail/0skip; raw argv/env fixture lifecycle in master/publishing-full"
+    },
+    {
+      "name": "query-full",
+      "command": "dotnet test --project backend/tests/OntologyPlatform.QueryTests --no-restore --no-build",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "49PASS/0fail/0skip; raw argv/env fixture lifecycle in master/query-full"
+    },
+    {
+      "name": "agent-full",
+      "command": "dotnet test --project backend/tests/OntologyPlatform.AgentTests --no-restore --no-build",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "33PASS/0fail/0skip; raw argv/env fixture lifecycle in master/agent-full"
+    },
+    {
+      "name": "web-engineering",
+      "command": "node .tools/pnpm/package/bin/pnpm.cjs --dir apps/web run build",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Web full268 and lint/typecheck/build0; command-outputs contains actual outputs. Build command does not alone certify268."
+    },
+    {
+      "name": "actual-di-openapi-http",
+      "command": "Observed scoped dotnet test executions for OntologyPlatform.SecurityTests; precise argv not persisted in stdout logs, therefore UNKNOWN.",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Actual scoped invocations recorded in command-outputs:DI2/OpenAPI2/HTTP9+realIssuer1; no claim unfiltered single ApiTests invocation."
+    },
+    {
+      "name": "browser-original-full-attempt",
+      "command": "python3 scripts/acceptance/g3-acceptance-runtime.py --milestone M5 --start-runtime",
+      "status": "FAIL",
+      "exitCode": 1,
+      "output": "Original full attempted run046b90ec65ee4357bd4ae49963fb1a82:625/626PASS,1 harness release identity error; preserved actual exit1."
+    },
+    {
+      "name": "browser-final-target",
+      "command": "python3 scripts/acceptance/g3-acceptance-runtime.py --milestone M5 --start-runtime --ui-only",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Final actual run202fd26ff8bb4362914bb81a98623fdc50PASS; new38M5-specific plus prior600 compose638, exact source hashes in browser-composite.json."
+    },
+    {
+      "name": "remaining-six-attempt",
+      "command": "python3 docs/evidence/G3-M5-001/master/executed-harnesses/remaining-gates.py",
+      "status": "FAIL",
+      "exitCode": 1,
+      "output": "Actual first2 gates g3-compatibility.py/g1-regression.py each0; parent laterfailed obs missing input, not declared this parent allPASS."
+    },
+    {
+      "name": "bounded-four-real-gates",
+      "command": "python3 docs/evidence/G3-M5-001/master/executed-harnesses/bounded-four-gates.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Actual four25obs/4trace/8fault/29performance observation gates each0, wrapper0 and launcherStopped=true."
+    },
+    {
+      "name": "selftest",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1 -SelfTest",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Actual full SelfTestexit0 at stable inputs; affected later deltas25runtime/12preflight/6dispatch/5obs/3layout separatelyPASS. Output preserved."
+    },
+    {
+      "name": "stable-mobile-css",
+      "command": "node .tools/pnpm/package/bin/pnpm.cjs --dir apps/web exec playwright test --config playwright.layout.config.ts",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "3 actual fixture tests0fail/0skip; independent3 same outcomes, real UI50 separate."
+    },
+    {
+      "name": "final-static",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Actual0 at source80ad (3638 files), final doc-only pass recorded in final-static-closeout output separately."
+    },
+    {
+      "name": "resource-apply",
+      "command": "python3 scripts/maintenance/cleanup_resources.py --root /Users/chasen/.codex/worktrees/b389/ontology-platform --plan /Users/chasen/.codex/worktrees/b389/ontology-platform/docs/evidence/G3-M5-001/master/final/volume-plan.json --apply --log-path /Users/chasen/.codex/worktrees/b389/ontology-platform/docs/evidence/G3-M5-001/master/final/volume-apply.jsonl",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Actual approved exact plan8validated/8completed exit0, strong target inspect postconditions and oldG2 metadata unchanged; original auxiliary diagnostic guess failure retained."
+    },
+    {
+      "name": "ci",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Authorized local-first; no Actions run requested or claimed."
+    },
+    {
+      "name": "windows-intel-native",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Native Windows/Intel not available; macOS arm64 only."
+    },
+    {
+      "name": "monaco",
+      "command": null,
+      "status": "BLOCKED",
+      "exitCode": null,
+      "output": "Approved security BLOCKED unchanged."
+    }
+  ],
+  "ci": {
+    "status": "NOT_RUN",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  },
+  "metadata": {
+    "taskId": "G3-M5-001",
+    "productVerdict": "Applicable local product gatesPASS; explicit composite with original failures retained. DeliveryPARTIAL for declared NOT_RUN/BLOCKED boundaries.",
+    "commandAuthority": "Exact argv used where retained in raw records; aggregate or scoped command output without invocation argv is explicitly UNKNOWN, never an invented executable. Browser launcher summaries omit private runtime-file value; persisted public run receipts bind run identity.",
+    "agentActiveTime": "UNKNOWN",
+    "hostClosure": "Post-package exactPID external receipt, committed snapshot ends only at observed time."
+  }
+}

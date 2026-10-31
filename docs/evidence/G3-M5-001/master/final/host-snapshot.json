@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "taskId": "G3-M5-001",
+  "startedAtUtc": "2026-10-31T04:09:55.571788+00:00",
+  "endedAtUtc": "2026-10-31T05:32:02.083055+00:00",
+  "ownerPid": 6932,
+  "heartbeatCount": 328,
+  "policyContinuouslyReady": true,
+  "maxHeartbeatGapMs": 15083,
+  "measuredElapsedMs": 4926556,
+  "lockedHeartbeatCount": 252,
+  "monitorStatus": "RUNNING_THROUGH_PACKAGE_AND_REOPEN",
+  "heartbeatSha256": "9180bfd607d135aedd3c64f537687e17842c9f5583c09a381c52b4432d9c3850",
+  "sleep": {
+    "status": "OBSERVED_LOG_WINDOW",
+    "events": [],
+    "confirmedSleepMs": 0,
+    "limitation": "只计日志可确认的Sleep至Wake/DarkWake区间；无事件不证明未知窗口从未睡眠。"
+  },
+  "finalPolicySnapshot": {
+    "schemaVersion": 1,
+    "utc": "2026-10-31T05:32:08.758161+00:00",
+    "os": "Darwin",
+    "architecture": "arm64",
+    "pid": 68432,
+    "taskId": "G3-M5-001",
+    "assurance": "POLICY_READY",
+    "lockDisplayTrial": "NOT_VERIFIED",
+    "sessionContinuity": "NOT_VERIFIED",
+    "acPower": true,
+    "policy": {
+      "displaysleep": 10,
+      "sleep": 0
+    },
+    "assertions": {
+      "PreventUserIdleDisplaySleep": 0,
+      "PreventSystemSleep": 0,
+      "PreventUserIdleSystemSleep": 0
+    },
+    "displays": {
+      "status": "OBSERVED",
+      "externalDisplayCount": 1,
+      "externalDisplaysAsleep": true
+    },
+    "screenLocked": true
+  },
+  "limitations": [
+    "This committed snapshot ends at the last observed heartbeat; post-package exact-PID closure receipt records later coverage.",
+    "Separate Apple CoreGraphics locked-display trial proves real external display asleep; this earlier-started monitor did not load display API code.",
+    "Policy prevents idle sleep on AC; does not promise power failure, manual Sleep, reboot or system update continuity."
+  ]
+}

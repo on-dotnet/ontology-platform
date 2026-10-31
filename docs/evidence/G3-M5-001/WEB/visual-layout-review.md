@@ -1,6 +1,6 @@
 # M5窄屏截图复核与真实CSS短回归
 
-状态：DRAFT，等待Master真实OIDC工作台重拍和独立Review。视觉调查Base=`82cb56963eca98e0d26d6b68a89cd08221587805`；独立树40e2，分支codex/g3-m5-web-visual。只新增局部浏览器测试和本文；未修改任何生产CSS/Workspace/Design Tokens，也未启动容器或运行完整build/业务验收。
+状态：PASS；Master真实OIDC重拍202fd26ff8bb4362914bb81a98623fdc已exit0/50检查，三张新PNG已重开；非作者独立layout3/0并查看窄屏通过。视觉调查Base=`82cb56963eca98e0d26d6b68a89cd08221587805`；独立树40e2，分支codex/g3-m5-web-visual。只新增局部浏览器测试和本文；未修改任何生产CSS/Workspace/Design Tokens，也未启动容器或运行完整build/业务验收。
 
 ## 根因与边界
 

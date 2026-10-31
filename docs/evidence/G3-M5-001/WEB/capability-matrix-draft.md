@@ -1,6 +1,6 @@
-# G3 二十项能力与 M5 只读支持矩阵（DRAFT）
+# G3 二十项能力与 M5 只读支持矩阵（最终矩阵）
 
-源码依据：Master候选 `50d58389eebc570daca62d2fdd795be0a3a32d5d` 的 G3总计划、`SemanticProfile`、`SemanticSupportPolicy`、`JenaExpressions`、`OwlExpressionProjection`、冻结M5合同及下列实际测试。本文只增文档，不改变源码或重跑测试。最终Head、整阶段兼容与浏览器结果由Master后续绑定，不能从本矩阵推定已通过。
+源码依据：最终已审源码 `80adf4756f3c6da9a5e1be4a0e348ebdd72e2f69`（后续仅任务/证据/研发说明增量）。文件名保留原draft恢复入口，内容已更新为最终矩阵。真实结果和输入复用见[最终验收矩阵](../master/final/test-matrix.md)及[输入绑定](../master/final/input-binding.json)。未启动G4/G5。
 
 ## 读法与当前验证事实
 
@@ -8,7 +8,7 @@ V=可视化/导航；S=专家源码；R=有界结构只读；B=阻断对应结�
 
 所有行的 `editable` 均分“新树”与“既有编辑器”：新树固定false；普通BASIC编辑与专家源码保存仍沿已有权限/CAS/审计，不因新增只读树被撤销。所有行 `inferred=false`，OWL_REASONING=NOT_RUN，无reasoner、无imports联网加载。RO完整也不证明OWL逻辑一致性，SHACL Core不是OWL一致性证明。
 
-Master本轮已实际取得：独立RIOT新高阶读取6/0失败/0跳过，真实PG+RIOT的M5过滤全57/0/0；原始记录为 `docs/evidence/G3-M5-001/master/b1-riot/b1-riot.json` 和 `master/b1-pg/b1-pg.json`（均exit0）。其中57包括廉价守卫/投影和真实服务用例，不能称57项全部独立外部服务用例。Master另报告Web268/0、DI2/0及工程SelfTest通过；本作者未重新执行这些命令。旧发布/Run/SSE/MCP/回滚全阶段组合与M5真实浏览器尚进行，不填PASS。M1–M4既有交付事实按各原handoff保留，本次是否复验另列。
+Master本轮已实际取得：独立RIOT新高阶读取6/0失败/0跳过，真实PG+RIOT的M5过滤全57/0/0；原始记录为 `docs/evidence/G3-M5-001/master/b1-riot/b1-riot.json` 和 `master/b1-pg/b1-pg.json`（均exit0）。其中57包括廉价守卫/投影和真实服务用例，不能称57项全部独立外部服务用例。Master另报告Web268/0、DI2/0及工程SelfTest通过；本作者未重新执行这些命令。最终M1–M4真实600检查与最新M5的38项专属检查组成638项PASS；最新真实UI50/0、普通发布/Run/SSE/MCP/回滚均有该原链实际证据。原整链失败未覆盖，不宣称一次七门禁命令exit0。其余六门禁分别通过，细目见最终矩阵。M1–M4既有交付事实按各原handoff保留，本次是否复验另列。
 
 ## 二十项精确边界
 
@@ -29,10 +29,10 @@ Master本轮已实际取得：独立RIOT新高阶读取6/0失败/0跳过，真�
 |09 `owl:equivalentClass`|命名V/S/R；复杂S/R/B|T|T|false；BASIC显式Class对，复杂SOURCE|命名N；复杂B|false|`09-equivalent.ttl`与M5匿名restriction；正类型匹配命名对，负声明缺失/类型错误/复杂覆盖；T20、NAMED、HISTORY|
 |10 `owl:disjointWith`|命名V/S/R；复杂S/R/B|T|T|false；BASIC显式Class对|命名N；复杂B|false|`10-disjoint.ttl`；正原始公理声明，负两端类型不匹配；不提供完整一致性证明；T20、NAMED|
 |11 `owl:inverseOf`|命名V/S/R；复杂S/R/B|T|T|false；BASIC显式ObjectProperty对|命名N；复杂B|false|`11-inverse.ttl`；正精确逆属性声明，负Class/缺声明；导航不执行逆属性推理；T20、NAMED|
-|12 属性特征|S/R/B；推理L|T|T|false；SOURCE，结构写B|B|false|`12-features.ttl`及M5八类特征；正完整保留/展示，同时作为发布阻断负例；Functional不是数据库唯一键；T20、ADV|
+|12 属性特征|S/R/B；推理L|T|T|false；SOURCE，结构写B|B|false|`12-features.ttl`及M5七种OWL属性特征（ObjectProperty声明另计）；正完整保留/展示，同时作为发布阻断负例；Functional不是数据库唯一键；T20、ADV|
 |13 some/all restriction|S/R/B；推理L|T|T|false；SOURCE，结构写B|B|false|`13-some-all.ttl`、M5 some/all；正合法属性/类目标，负literal或悬空blank、缺属性/多构造；all不保证存在；QUANT、MALFORMED、ADV|
 |14 `owl:hasValue`|S/R/B；推理L|T|T|false；SOURCE，结构写B|B|false|`14-has-value.ttl`、M5 `"001"^^xsd:integer`；正IRI/typed/lang项保留，负匿名个体暂不确认完整支持；VALUE、ADV|
-|15 普通/qualified cardinality|S/R/B；推理L|T|T|false；SOURCE，结构写B|B|false|`15-cardinality.ttl`及M5六种基数/两种限定；正`+0002`/`-0`/超机器整数保词法，负负数/小数/错误type/lang/缺或双qualifier；CARD、QUAL、ADV|
+|15 普通/qualified cardinality|S/R/B；推理L|T|合法typed为T；原15裸整数为false/INDETERMINATE|false；SOURCE，结构写B|B|false|原`15-cardinality.ttl`裸1为xsd:integer，保留但cardinality_invalid；合法正例来自M5显式xsd:nonNegativeInteger的六种基数/两种限定；正`+0002`/`-0`/超机器整数保词法，负负数/小数/错误type/lang/缺或双qualifier；CARD、QUAL、ADV|
 |16 intersection/union/complement|S/R/B；推理L|T|T|false；SOURCE，结构写B|B|false|`16-boolean.ttl`及M5 And/Or/Not；正嵌套/共享节点/长列表，负断链/分叉/匿名环/预算；LIST、CYCLE、BUDGET、ADV|
 |17 `owl:propertyChainAxiom`|S/R/B；执行L|T|T|false；SOURCE，结构写B|B|false|`17-chain.ttl`及M5 `(ex:p ex:q)`；正严格原链顺序与合法33项列表，负损坏/环；不把路径导航当推理；LIST、ADV|
 |18 `owl:imports`|S/R/B；加载L|T|本地引用T；闭包未加载|false；SOURCE，结构写B|B|false|`18-imports.ttl`及M5 `https://example.invalid/never-load`；正保留IRI并`imports_not_loaded`，负发布阻断；未知OWL词汇另为RO=false；IMPORT、ADV|
@@ -41,7 +41,7 @@ Master本轮已实际取得：独立RIOT新高阶读取6/0失败/0跳过，真�
 
 ## 精确测试符号与恢复入口
 
-以下类均位于 `backend/tests/OntologyPlatform.SemanticTests/`，同类名 `.cs` 可从上述候选Git对象恢复。`ADV` 与 `MALFORMED` 已包含在实际6个RIOT过滤结果，M5其余符号包含在实际57个过滤结果；T20、IRI等历史入口列为应复验/可恢复，不冒充已在本次57中运行。
+以下类均位于 `backend/tests/OntologyPlatform.SemanticTests/`，同类名 `.cs` 可从上述候选Git对象恢复。`ADV` 与 `MALFORMED` 已包含在实际6个RIOT过滤结果，M5其余符号包含在实际57个过滤结果；T20、IRI等历史入口不在57中独立计数，已由本轮完整Semantic296覆盖；新增真实RIOT负例6另计，合计302个不同测试用例，无失败/跳过。原20文件RO列由逐文件源码核对和综合真实样例验证，不宣称20份均单独调用新投影端点实测。
 
 |缩写|精确现有类/方法|
 |---|---|
@@ -70,4 +70,4 @@ dotnet test --project backend/tests/OntologyPlatform.SemanticTests --no-restore 
 
 可再生宿主入口是 `python3 scripts/acceptance/semantic-roundtrip.py --postgres --filter FullyQualifiedName~G3M5 --label <受控标签>`，由Master先设置本任务 `PLATFORM_TASK_ID`、`PLATFORM_EVIDENCE_DIR` 及 canonical 校验镜像，经过宿主/路径/参数/审计/DI/阶段/Evidence前置检查再启动。此文档任务没有执行该入口。
 
-当前profile仍v4/23项（01–20加M3两项与M4平台身份一项），不升级v5，不修改旧profile/hash或Release/Run序列化。新快照projectionVersion=1只表达有界只读投影。最终交付必须另附稳定输入绑定、真实浏览器/普通资产发布查询/Impact/旧Run/SSE/MCP/回滚矩阵、独立Review与唯一V3；本DRAFT不是这些门禁的替代。
+当前profile仍v4/23项（01–20加M3两项与M4平台身份一项），不升级v5，不修改旧profile/hash或Release/Run序列化。新快照projectionVersion=1只表达有界只读投影。最终输入绑定、真实浏览器/普通资产发布查询/Impact/旧Run/SSE/MCP/回滚矩阵与独立Review已另附master/final；唯一V3与重开结果取封包后置回执。

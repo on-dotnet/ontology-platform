@@ -1,0 +1,26 @@
+[
+  {
+    "command": "pwsh -File scripts/new-review-package.ps1 -Help",
+    "exitCode": 64,
+    "category": "WRONG_PATH",
+    "resolution": "Read rg --files, then actual scripts/create-review-package.ps1 param block. No package or test executed by failed dispatch."
+  },
+  {
+    "command": "test-review-evidence.ps1 -EvidencePath ... -ScreenshotSelectionPath ...",
+    "exitCode": 1,
+    "category": "UNKNOWN_ARGUMENT",
+    "resolution": "Read actual param block; -EvidenceFile / -ScreenshotSelection succeeded. Not product failure."
+  },
+  {
+    "command": "cleanup_resources.py --root . --plan relative",
+    "exitCode": 1,
+    "category": "ABSOLUTE_PATH_REQUIRED",
+    "resolution": "Read contract; exact absolute root+plan DryRun exit0 before Apply."
+  },
+  {
+    "command": "Supplementary volume postcondition text expectation",
+    "exitCode": 1,
+    "category": "DIAGNOSTIC_ORDER_GUESS",
+    "resolution": "Executor Apply8 already passed strong exact API checks; supplementary verifier corrected to observed exact Error response from daemon: get <exactName>: no such volume. Original failure kept; only read-only inspect repeated, no deletion repeated."
+  }
+]

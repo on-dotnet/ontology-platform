@@ -1,0 +1,29 @@
+{
+  "taskId": "G3-M5-001",
+  "observedAtUtc": "2026-10-31T05:33:28.809116+00:00",
+  "operations": [
+    {
+      "root": "/Users/chasen/.codex/worktrees/g3-m5-e0/ontology-platform",
+      "nativeResult": "Another active task still uses this worktree.",
+      "status": "KEEP",
+      "condition": "Native active task guard must clear before archive; no forced removal; exact owner unknown."
+    },
+    {
+      "root": "/Users/chasen/.codex/worktrees/320c/ontology-platform",
+      "nativeResult": "Another active task still uses this worktree.",
+      "status": "KEEP",
+      "condition": "Native active task guard must clear before archive; no forced removal; exact owner unknown."
+    },
+    {
+      "root": "/Users/chasen/.codex/worktrees/40e2/ontology-platform",
+      "nativeResult": "queued, subsequently archived_worktree attachment 01a19071-ec27-7a83-8eed-7e8535bbe01a",
+      "status": "ARCHIVED",
+      "condition": "Native recoverable snapshot retained; ignored logs copied to Master, regenerable dependencies omitted."
+    }
+  ],
+  "worktreeCountBefore": 21,
+  "expectedAfter": 20,
+  "refs": "Worker codex/g3-m5-e0, codex/g3-m5-sem kept with active checkouts. codex/g3-m5-web and codex/g3-m5-web-visual tips kept for review/recovery until G3-M5 external review closes; no unauthorized Git delete through M5 volume executor.",
+  "master": "KEEP current b389 task review/recovery; remove only after external review and evidence retention.",
+  "limits": "One native archive successful; two exact guard refusals retained. No bypass or global/cross-task cleanup."
+}

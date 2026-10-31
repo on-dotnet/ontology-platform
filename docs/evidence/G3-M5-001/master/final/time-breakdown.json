@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 2,
+  "scope": "Deduplicated observed timed command intervals only; not complete development/model accounting",
+  "sources": [
+    {
+      "path": "artifacts/g3-m5/task-timeline.jsonl",
+      "sha256": "fc48ed6d9de1b560f31e3d9789bc1a0a797c9d7ba2dba4e59746dcfb713ccb22",
+      "rows": 7
+    },
+    {
+      "path": "docs/evidence/G3-M5-001/master/bounded-four/task-run-timeline.jsonl",
+      "sha256": "4485d4976bc70a01d7e92d0890943008df2dc2484ca94be5df69c5eae14cc24f",
+      "rows": 4
+    },
+    {
+      "path": "docs/evidence/G3-M5-001/master/final-four/task-run-timeline.jsonl",
+      "sha256": "609548c1644c976c7f46bc837bc1b13b05d1c89157852c44ac2c7aa60dae6f07",
+      "rows": 1
+    },
+    {
+      "path": "docs/evidence/G3-M5-001/master/remaining-six/task-run-timeline.jsonl",
+      "sha256": "b62908b7d227acfc6cc471e474a3d323599cc0c40598c0df34e7541af7412d0b",
+      "rows": 3
+    },
+    {
+      "path": "docs/evidence/G3-M5-001/runtime/g3-m5-7d512550ef69/046b90ec65ee4357bd4ae49963fb1a82/task-run-timeline.jsonl",
+      "sha256": "bfbe574605017133b477f0d7ed4f55af047272bb93b847fdfd64546e0c0e28f8",
+      "rows": 1
+    },
+    {
+      "path": "docs/evidence/G3-M5-001/runtime/g3-m5-7d512550ef69/202fd26ff8bb4362914bb81a98623fdc/task-run-timeline.jsonl",
+      "sha256": "74cb9de7abc8ace44d9312ba196a9ea9f4f96a3061fde0e0505814fbed66a10c",
+      "rows": 1
+    },
+    {
+      "path": "docs/evidence/G3-M5-001/runtime/g3-m5-7d512550ef69/455a248f68dd400ba5ef9abc18ce5417/task-run-timeline.jsonl",
+      "sha256": "196e01201b8bbaf10794a96f750ef57b3072d7ca68b0b6cce6731b58ed2b1998",
+      "rows": 1
+    },
+    {
+      "path": "docs/evidence/G3-M5-001/runtime/g3-m5-7d512550ef69/b642c214b5b54b169004a352caa6aec7/task-run-timeline.jsonl",
+      "sha256": "c32d22fcbe7ff210f22405ca54346993df7e3446d043b3a9704570149e64d6da",
+      "rows": 1
+    },
+    {
+      "path": "docs/evidence/G3-M5-001/runtime/g3-m5-7d512550ef69/c2e41c7e89614bfe933876eb2e06e302/task-run-timeline.jsonl",
+      "sha256": "902df3b6bb4aa245bef571e6b6b3e19a11b0c62a20f137cda2ca133e5970765a",
+      "rows": 1
+    }
+  ],
+  "uniqueSteps": 20,
+  "duplicateCopiedRowsRemoved": 0,
+  "validIntervalSpanMs": 3919009,
+  "observedCommandUnionMs": 458013,
+  "cumulativeInclusiveCommandMs": 458014,
+  "intervalOverlapMs": 1,
+  "observableDeclaredCriticalPathMs": 219701,
+  "clockDriftCount": 0,
+  "failedSteps": 3,
+  "repeatCommandLabels": [
+    "full-g2-e2e.py",
+    "g2-observability.py"
+  ],
+  "agentActiveMs": "UNKNOWN",
+  "agentThinkingMs": "UNKNOWN",
+  "humanWaitingMs": "UNKNOWN",
+  "unobservedToolTimeMs": "UNKNOWN",
+  "E0ImplementationMs": "UNKNOWN",
+  "M5ImplementationMs": "UNKNOWN",
+  "limits": [
+    "Nested launcher/gate intervals are inclusive, so overlap is not pure CPU parallelism.",
+    "DAG only includes explicitly recorded dependencies; gaps are not charged as execution/model activity.",
+    "Not all early implementation/build/review commands had automatic timeline coverage; their logs remain actual outcome evidence.",
+    "E0 and M5 implementation active time cannot be recovered from commit timestamps; kept UNKNOWN separately.",
+    "Host observed sleep/non-sleep uses its own exact window, never subtracts a different window or assumes CLOCK_DRIFT means sleep.",
+    "Observed overlap is 1ms from timestamp/monotonic rounding; it does not quantify actual parallel agent activity."
+  ]
+}

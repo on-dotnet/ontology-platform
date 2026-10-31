@@ -1,0 +1,58 @@
+{
+  "status": "PASS",
+  "operations": [
+    {
+      "target": "g3-m5-7d512550ef69-alloy-data",
+      "exitCode": 1,
+      "diagnostic": "Error response from daemon: get g3-m5-7d512550ef69-alloy-data: no such volume",
+      "exactNoSuchVolume": true
+    },
+    {
+      "target": "g3-m5-7d512550ef69-fuseki-data",
+      "exitCode": 1,
+      "diagnostic": "Error response from daemon: get g3-m5-7d512550ef69-fuseki-data: no such volume",
+      "exactNoSuchVolume": true
+    },
+    {
+      "target": "g3-m5-7d512550ef69-grafana-data",
+      "exitCode": 1,
+      "diagnostic": "Error response from daemon: get g3-m5-7d512550ef69-grafana-data: no such volume",
+      "exactNoSuchVolume": true
+    },
+    {
+      "target": "g3-m5-7d512550ef69-loki-data",
+      "exitCode": 1,
+      "diagnostic": "Error response from daemon: get g3-m5-7d512550ef69-loki-data: no such volume",
+      "exactNoSuchVolume": true
+    },
+    {
+      "target": "g3-m5-7d512550ef69-postgres-data",
+      "exitCode": 1,
+      "diagnostic": "Error response from daemon: get g3-m5-7d512550ef69-postgres-data: no such volume",
+      "exactNoSuchVolume": true
+    },
+    {
+      "target": "g3-m5-7d512550ef69-prometheus-data",
+      "exitCode": 1,
+      "diagnostic": "Error response from daemon: get g3-m5-7d512550ef69-prometheus-data: no such volume",
+      "exactNoSuchVolume": true
+    },
+    {
+      "target": "g3-m5-7d512550ef69-rustfs-data",
+      "exitCode": 1,
+      "diagnostic": "Error response from daemon: get g3-m5-7d512550ef69-rustfs-data: no such volume",
+      "exactNoSuchVolume": true
+    },
+    {
+      "target": "g3-m5-7d512550ef69-tempo-data",
+      "exitCode": 1,
+      "diagnostic": "Error response from daemon: get g3-m5-7d512550ef69-tempo-data: no such volume",
+      "exactNoSuchVolume": true
+    }
+  ],
+  "oldG2MetadataUnchanged": true,
+  "oldG2VolumeCount": 8,
+  "physicalReclaimedBytes": "UNKNOWN",
+  "priorReport": "First supplementary verifier guessed diagnostic ordering incorrectly and failed; actual executor already had exact protocol strong checks. No deletion repeated.",
+  "limits": "Strong exact no-such-volume plus executor before/command/exit/after. Old daily development volume metadata preserved; old full stack health NOT_RUN."
+}

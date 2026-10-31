@@ -1,0 +1,77 @@
+{
+  "testedCommit": "80adf4756f3c6da9a5e1be4a0e348ebdd72e2f69",
+  "baseSha": "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a",
+  "canonicalGitInputSha256": "61921ed71e31f9c75897aa0db98e19cfcc74f6e405f9dd9dea8d1552ca67bf02",
+  "scope": "All tracked ls-tree entries except docs/evidence, docs/tasks, docs/development, root AGENTS.md and PLANS.md; contracts/bootstrap/build/locks/scripts/tests all included.",
+  "validationStrategy": "Exact final tracked source80ad plus earlier stable-module results and affected later deltas; no unexplained blind rerun.",
+  "reuse": [
+    {
+      "scope": "backend semantic/publishing/query/agent implementation and shared public contracts",
+      "basis": "Full actual suites on stable module bytes after B1. Later b11 adds6 real semantic tests only, run precisely; no implementation changes."
+    },
+    {
+      "scope": "frontend production code, generated types, tokens and dependencies",
+      "basis": "Full268/lint/typecheck/build before full chain; later only new visual fixture/config, actual3 tests/lint/typecheck independently pass. No product CSS/TSX changes."
+    },
+    {
+      "scope": "real old business full browser",
+      "basis": "Original600 M1–M4 checks all PASS; subsequent changes only M5 release nested contract consumption, E0 preflight/observation harness and screenshot capture. Last M5 target50PASS; composite638 SHA-bound."
+    },
+    {
+      "scope": "latest observations",
+      "basis": "Bounded-four final4 actual on82cb569; later only screenshot harness and standalone CSS fixtures. Missing input and persistent-trace search failures retained, not relabelled."
+    },
+    {
+      "scope": "historical formats",
+      "basis": "Old126 member reader frozen/prewrite0 and realcompat0. Original M4 manifest path/hash-only raw byte exception preserved, FrozenEvidence5 positive/negative pass."
+    }
+  ],
+  "ci": {
+    "status": "NOT_RUN",
+    "reason": "Authorized local-first policy; no cloud quota/actions triggered."
+  },
+  "risks": [
+    "macOS arm64 only; Windows/Intel native NOT_RUN",
+    "Monaco BLOCKED unchanged",
+    "OWL reasoning/import closure loading NOT_RUN by approved scope",
+    "Paid/production LLM and production systems NOT_RUN",
+    "No single successful seven-gate invocation: explicit composite plus six successful gates",
+    "Model active/thinking/human wait UNKNOWN",
+    "Full20 corpus M5 new projection endpoint individual calls not run; old supported-publish20 test plus real advanced combined fixture and negative RIOT cover intended scope."
+  ],
+  "moduleProductionByteComparison": [
+    {
+      "scope": "backend-implementation",
+      "sourceCandidate": "c323a637f6235dd69237e66a128f7ec9aa74b56e",
+      "deliverySourceCommit": "80adf4756f3c6da9a5e1be4a0e348ebdd72e2f69",
+      "paths": [
+        "backend/src"
+      ],
+      "changedPaths": [],
+      "unchanged": true
+    },
+    {
+      "scope": "frontend-production",
+      "sourceCandidate": "c323a637f6235dd69237e66a128f7ec9aa74b56e",
+      "deliverySourceCommit": "80adf4756f3c6da9a5e1be4a0e348ebdd72e2f69",
+      "paths": [
+        "apps/web/src",
+        "apps/web/package.json",
+        "pnpm-lock.yaml"
+      ],
+      "changedPaths": [],
+      "unchanged": true
+    },
+    {
+      "scope": "formal-models",
+      "sourceCandidate": "c323a637f6235dd69237e66a128f7ec9aa74b56e",
+      "deliverySourceCommit": "80adf4756f3c6da9a5e1be4a0e348ebdd72e2f69",
+      "paths": [
+        "docs/contracts/g2-models.json",
+        "docs/contracts/g2-platform.openapi.json"
+      ],
+      "changedPaths": [],
+      "unchanged": true
+    }
+  ]
+}

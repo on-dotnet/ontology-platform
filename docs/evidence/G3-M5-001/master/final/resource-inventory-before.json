@@ -1,0 +1,4065 @@
+{
+  "schemaVersion": 1,
+  "mode": "READ_ONLY",
+  "observedAt": "2026-10-31T04:14:04.7821280Z",
+  "originMain": "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a",
+  "refs": [
+    {
+      "ref": "refs/heads/codex/G1-SEC-001",
+      "tip": "cecf43b00f4f5f12c9309640d68ed665f2643498",
+      "ancestorExitCode": 1,
+      "classification": "AMBIGUOUS",
+      "action": "RETAIN",
+      "reason": "Exact ref lacks a reviewed closed-resource ancestor approval; nonancestor refs require explicit patch/recovery review, no force deletion."
+    },
+    {
+      "ref": "refs/heads/codex/G2-AI-001",
+      "tip": "741cde0b206ada85fcc7769e6e12bdc474ab70df",
+      "ancestorExitCode": 1,
+      "classification": "AMBIGUOUS",
+      "action": "RETAIN",
+      "reason": "Exact ref lacks a reviewed closed-resource ancestor approval; nonancestor refs require explicit patch/recovery review, no force deletion."
+    },
+    {
+      "ref": "refs/heads/codex/G2-FE-001",
+      "tip": "068878b9312c9d39430945677f0835fb2e48fae0",
+      "ancestorExitCode": 1,
+      "classification": "AMBIGUOUS",
+      "action": "RETAIN",
+      "reason": "Exact ref lacks a reviewed closed-resource ancestor approval; nonancestor refs require explicit patch/recovery review, no force deletion."
+    },
+    {
+      "ref": "refs/heads/codex/G2-FINAL-FIX",
+      "tip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "ancestorExitCode": 1,
+      "classification": "AMBIGUOUS",
+      "action": "RETAIN",
+      "reason": "Exact ref lacks a reviewed closed-resource ancestor approval; nonancestor refs require explicit patch/recovery review, no force deletion."
+    },
+    {
+      "ref": "refs/heads/codex/G2-HOST-FIX",
+      "tip": "44f45bb7ef9d5f5c840bdcb4e5073ebbb8f2e152",
+      "ancestorExitCode": 1,
+      "classification": "AMBIGUOUS",
+      "action": "RETAIN",
+      "reason": "Exact ref lacks a reviewed closed-resource ancestor approval; nonancestor refs require explicit patch/recovery review, no force deletion."
+    },
+    {
+      "ref": "refs/heads/codex/G2-OBS-SUPPORT",
+      "tip": "75ae3742879e50453313bf2e685c5c3c8c2b91a2",
+      "ancestorExitCode": 1,
+      "classification": "AMBIGUOUS",
+      "action": "RETAIN",
+      "reason": "Exact ref lacks a reviewed closed-resource ancestor approval; nonancestor refs require explicit patch/recovery review, no force deletion."
+    },
+    {
+      "ref": "refs/heads/codex/G2-PUB-001",
+      "tip": "83d25cca70b41cea8de19bdac79d805a76957a21",
+      "ancestorExitCode": 1,
+      "classification": "AMBIGUOUS",
+      "action": "RETAIN",
+      "reason": "Exact ref lacks a reviewed closed-resource ancestor approval; nonancestor refs require explicit patch/recovery review, no force deletion."
+    },
+    {
+      "ref": "refs/heads/codex/G2-QA-FIX",
+      "tip": "e4b5bdee6508b747cda17136534c03e023c3d99f",
+      "ancestorExitCode": 1,
+      "classification": "AMBIGUOUS",
+      "action": "RETAIN",
+      "reason": "Exact ref lacks a reviewed closed-resource ancestor approval; nonancestor refs require explicit patch/recovery review, no force deletion."
+    },
+    {
+      "ref": "refs/heads/codex/G2-QRY-001",
+      "tip": "3fc61d6a73290a8576c421ae0b0bdae7486f0030",
+      "ancestorExitCode": 1,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Current/main/keep ref or associated protected/locked/private/changed worktree; removal protection propagates to local and remote ref."
+    },
+    {
+      "ref": "refs/heads/codex/G2-READINESS-TEST",
+      "tip": "a02d6da7297b254ce153628f29cf765de10af77c",
+      "ancestorExitCode": 1,
+      "classification": "AMBIGUOUS",
+      "action": "RETAIN",
+      "reason": "Exact ref lacks a reviewed closed-resource ancestor approval; nonancestor refs require explicit patch/recovery review, no force deletion."
+    },
+    {
+      "ref": "refs/heads/codex/G2-SEC-SUPPORT",
+      "tip": "219d1fcad3046251a1419f985dacab703f31c4cb",
+      "ancestorExitCode": 1,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Current/main/keep ref or associated protected/locked/private/changed worktree; removal protection propagates to local and remote ref."
+    },
+    {
+      "ref": "refs/heads/codex/G2-SEM-001",
+      "tip": "b16c62808a7bf0b659d587d0f5c8fcd08a4cca5b",
+      "ancestorExitCode": 1,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Current/main/keep ref or associated protected/locked/private/changed worktree; removal protection propagates to local and remote ref."
+    },
+    {
+      "ref": "refs/heads/codex/G2-THIN-SLICE-001-master",
+      "tip": "46c7a6de70b1b97c032b12a19bc27c1c54e70f4c",
+      "ancestorExitCode": 0,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Current/main/keep ref or associated protected/locked/private/changed worktree; removal protection propagates to local and remote ref."
+    },
+    {
+      "ref": "refs/heads/codex/PRE-G3-CLEANUP-FIX-002",
+      "tip": "d6aab6b47e63c9d5deadfa480f6659c62c5ed138",
+      "ancestorExitCode": 0,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Current/main/keep ref or associated protected/locked/private/changed worktree; removal protection propagates to local and remote ref."
+    },
+    {
+      "ref": "refs/heads/codex/g3-m1-closeout-master",
+      "tip": "f0712e9174d1bff82b5f6959e0a61e723585be88",
+      "ancestorExitCode": 0,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Current/main/keep ref or associated protected/locked/private/changed worktree; removal protection propagates to local and remote ref."
+    },
+    {
+      "ref": "refs/heads/codex/g3-m1-closeout-package",
+      "tip": "6b0ec74e10c1ff820abc7b358bf43beb880a245b",
+      "ancestorExitCode": 1,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Current/main/keep ref or associated protected/locked/private/changed worktree; removal protection propagates to local and remote ref."
+    },
+    {
+      "ref": "refs/heads/codex/g3-m1-closeout-resources",
+      "tip": "f3197177304e6a25f8597ff611acb04fb4e5b268",
+      "ancestorExitCode": 1,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Current/main/keep ref or associated protected/locked/private/changed worktree; removal protection propagates to local and remote ref."
+    },
+    {
+      "ref": "refs/heads/codex/g3-m1-fix",
+      "tip": "92e6435a0b81b60319298a4dcdded040ea056418",
+      "ancestorExitCode": 1,
+      "classification": "AMBIGUOUS",
+      "action": "RETAIN",
+      "reason": "Exact ref lacks a reviewed closed-resource ancestor approval; nonancestor refs require explicit patch/recovery review, no force deletion."
+    },
+    {
+      "ref": "refs/heads/codex/g3-m1-master",
+      "tip": "47935fb2eda3d708e628a1b23ccd897e2250ff33",
+      "ancestorExitCode": 0,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Current/main/keep ref or associated protected/locked/private/changed worktree; removal protection propagates to local and remote ref."
+    },
+    {
+      "ref": "refs/heads/codex/g3-m1-sem",
+      "tip": "3fe18b471237d9d6b9d4a3175fce83dabfec9ab3",
+      "ancestorExitCode": 1,
+      "classification": "AMBIGUOUS",
+      "action": "RETAIN",
+      "reason": "Exact ref lacks a reviewed closed-resource ancestor approval; nonancestor refs require explicit patch/recovery review, no force deletion."
+    },
+    {
+      "ref": "refs/heads/codex/g3-m1-web",
+      "tip": "5aa5b0799a8c29230fbb6ed466f97a7a33284fda",
+      "ancestorExitCode": 1,
+      "classification": "AMBIGUOUS",
+      "action": "RETAIN",
+      "reason": "Exact ref lacks a reviewed closed-resource ancestor approval; nonancestor refs require explicit patch/recovery review, no force deletion."
+    },
+    {
+      "ref": "refs/heads/codex/g3-m2-master",
+      "tip": "c8f1040829b2bfe1e9f7e36223092286975643f0",
+      "ancestorExitCode": 0,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Current/main/keep ref or associated protected/locked/private/changed worktree; removal protection propagates to local and remote ref."
+    },
+    {
+      "ref": "refs/heads/codex/g3-m2-sem",
+      "tip": "8be4574bb1c715e017e7e0922b98a76b51eecd17",
+      "ancestorExitCode": 1,
+      "classification": "AMBIGUOUS",
+      "action": "RETAIN",
+      "reason": "Exact ref lacks a reviewed closed-resource ancestor approval; nonancestor refs require explicit patch/recovery review, no force deletion."
+    },
+    {
+      "ref": "refs/heads/codex/g3-m2-web",
+      "tip": "1c98e05717cb7e3f311ba41b7b07f093aa64dc40",
+      "ancestorExitCode": 1,
+      "classification": "AMBIGUOUS",
+      "action": "RETAIN",
+      "reason": "Exact ref lacks a reviewed closed-resource ancestor approval; nonancestor refs require explicit patch/recovery review, no force deletion."
+    },
+    {
+      "ref": "refs/heads/codex/g3-m3-efficiency",
+      "tip": "d89ba59bac5ecc1e5946f49b790cb8ff3319ae78",
+      "ancestorExitCode": 1,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Current/main/keep ref or associated protected/locked/private/changed worktree; removal protection propagates to local and remote ref."
+    },
+    {
+      "ref": "refs/heads/codex/g3-m3-master",
+      "tip": "3992582e03df1a103fac36e7e82b8c81f85f622e",
+      "ancestorExitCode": 0,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Current/main/keep ref or associated protected/locked/private/changed worktree; removal protection propagates to local and remote ref."
+    },
+    {
+      "ref": "refs/heads/codex/g3-m3-sem",
+      "tip": "ada0ef05293004dec6ed8863b356d4451f21ef41",
+      "ancestorExitCode": 1,
+      "classification": "AMBIGUOUS",
+      "action": "RETAIN",
+      "reason": "Exact ref lacks a reviewed closed-resource ancestor approval; nonancestor refs require explicit patch/recovery review, no force deletion."
+    },
+    {
+      "ref": "refs/heads/codex/g3-m3-sem-language",
+      "tip": "90b60366a0e9907409061a5af5791c79a87cb499",
+      "ancestorExitCode": 1,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Current/main/keep ref or associated protected/locked/private/changed worktree; removal protection propagates to local and remote ref."
+    },
+    {
+      "ref": "refs/heads/codex/g3-m3-web",
+      "tip": "2ad537b63e0ed1b8392066201ad95ff4cb4d2b30",
+      "ancestorExitCode": 1,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Current/main/keep ref or associated protected/locked/private/changed worktree; removal protection propagates to local and remote ref."
+    },
+    {
+      "ref": "refs/heads/codex/g3-m4-mac-master",
+      "tip": "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a",
+      "ancestorExitCode": 0,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Current/main/keep ref or associated protected/locked/private/changed worktree; removal protection propagates to local and remote ref."
+    },
+    {
+      "ref": "refs/heads/codex/g3-m4-sem-b",
+      "tip": "c909fa5e605417ff645da19d5899748c0f35773c",
+      "ancestorExitCode": 0,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Current/main/keep ref or associated protected/locked/private/changed worktree; removal protection propagates to local and remote ref."
+    },
+    {
+      "ref": "refs/heads/codex/g3-m4-web-b",
+      "tip": "b779ff5159fdbcedaa837c57ead30f3236b0f549",
+      "ancestorExitCode": 0,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Current/main/keep ref or associated protected/locked/private/changed worktree; removal protection propagates to local and remote ref."
+    },
+    {
+      "ref": "refs/heads/codex/g3-m5-e0",
+      "tip": "c8ca4b4c718342d56846afa2b94b3edf35330a09",
+      "ancestorExitCode": 1,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Current/main/keep ref or associated protected/locked/private/changed worktree; removal protection propagates to local and remote ref."
+    },
+    {
+      "ref": "refs/heads/codex/g3-m5-master",
+      "tip": "d22500c050713dc3ef659e7b3ca22e1d0410df82",
+      "ancestorExitCode": 1,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Current/main/keep ref or associated protected/locked/private/changed worktree; removal protection propagates to local and remote ref."
+    },
+    {
+      "ref": "refs/heads/codex/g3-m5-sem",
+      "tip": "3e71049e95a473fd976e0ef685e24bdcad2ab7fd",
+      "ancestorExitCode": 1,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Current/main/keep ref or associated protected/locked/private/changed worktree; removal protection propagates to local and remote ref."
+    },
+    {
+      "ref": "refs/heads/codex/g3-m5-web",
+      "tip": "3e71049e95a473fd976e0ef685e24bdcad2ab7fd",
+      "ancestorExitCode": 1,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Current/main/keep ref or associated protected/locked/private/changed worktree; removal protection propagates to local and remote ref."
+    },
+    {
+      "ref": "refs/heads/main",
+      "tip": "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a",
+      "ancestorExitCode": 0,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Current/main/keep ref or associated protected/locked/private/changed worktree; removal protection propagates to local and remote ref."
+    },
+    {
+      "ref": "refs/remotes/origin/codex/G1-SEC-001",
+      "tip": "cecf43b00f4f5f12c9309640d68ed665f2643498",
+      "ancestorExitCode": 1,
+      "classification": "AMBIGUOUS",
+      "action": "RETAIN",
+      "reason": "Exact ref lacks a reviewed closed-resource ancestor approval; nonancestor refs require explicit patch/recovery review, no force deletion."
+    },
+    {
+      "ref": "refs/remotes/origin/codex/G2-AI-001",
+      "tip": "741cde0b206ada85fcc7769e6e12bdc474ab70df",
+      "ancestorExitCode": 1,
+      "classification": "AMBIGUOUS",
+      "action": "RETAIN",
+      "reason": "Exact ref lacks a reviewed closed-resource ancestor approval; nonancestor refs require explicit patch/recovery review, no force deletion."
+    },
+    {
+      "ref": "refs/remotes/origin/codex/G2-FE-001",
+      "tip": "068878b9312c9d39430945677f0835fb2e48fae0",
+      "ancestorExitCode": 1,
+      "classification": "AMBIGUOUS",
+      "action": "RETAIN",
+      "reason": "Exact ref lacks a reviewed closed-resource ancestor approval; nonancestor refs require explicit patch/recovery review, no force deletion."
+    },
+    {
+      "ref": "refs/remotes/origin/codex/G2-FINAL-FIX",
+      "tip": "9689a5e8099144b060131ee4d1a185f5b5285859",
+      "ancestorExitCode": 1,
+      "classification": "AMBIGUOUS",
+      "action": "RETAIN",
+      "reason": "Exact ref lacks a reviewed closed-resource ancestor approval; nonancestor refs require explicit patch/recovery review, no force deletion."
+    },
+    {
+      "ref": "refs/remotes/origin/codex/G2-HOST-FIX",
+      "tip": "44f45bb7ef9d5f5c840bdcb4e5073ebbb8f2e152",
+      "ancestorExitCode": 1,
+      "classification": "AMBIGUOUS",
+      "action": "RETAIN",
+      "reason": "Exact ref lacks a reviewed closed-resource ancestor approval; nonancestor refs require explicit patch/recovery review, no force deletion."
+    },
+    {
+      "ref": "refs/remotes/origin/codex/G2-OBS-SUPPORT",
+      "tip": "75ae3742879e50453313bf2e685c5c3c8c2b91a2",
+      "ancestorExitCode": 1,
+      "classification": "AMBIGUOUS",
+      "action": "RETAIN",
+      "reason": "Exact ref lacks a reviewed closed-resource ancestor approval; nonancestor refs require explicit patch/recovery review, no force deletion."
+    },
+    {
+      "ref": "refs/remotes/origin/codex/G2-PUB-001",
+      "tip": "83d25cca70b41cea8de19bdac79d805a76957a21",
+      "ancestorExitCode": 1,
+      "classification": "AMBIGUOUS",
+      "action": "RETAIN",
+      "reason": "Exact ref lacks a reviewed closed-resource ancestor approval; nonancestor refs require explicit patch/recovery review, no force deletion."
+    },
+    {
+      "ref": "refs/remotes/origin/codex/G2-QA-FIX",
+      "tip": "e4b5bdee6508b747cda17136534c03e023c3d99f",
+      "ancestorExitCode": 1,
+      "classification": "AMBIGUOUS",
+      "action": "RETAIN",
+      "reason": "Exact ref lacks a reviewed closed-resource ancestor approval; nonancestor refs require explicit patch/recovery review, no force deletion."
+    },
+    {
+      "ref": "refs/remotes/origin/codex/G2-QRY-001",
+      "tip": "3fc61d6a73290a8576c421ae0b0bdae7486f0030",
+      "ancestorExitCode": 1,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Current/main/keep ref or associated protected/locked/private/changed worktree; removal protection propagates to local and remote ref."
+    },
+    {
+      "ref": "refs/remotes/origin/codex/G2-READINESS-TEST",
+      "tip": "a02d6da7297b254ce153628f29cf765de10af77c",
+      "ancestorExitCode": 1,
+      "classification": "AMBIGUOUS",
+      "action": "RETAIN",
+      "reason": "Exact ref lacks a reviewed closed-resource ancestor approval; nonancestor refs require explicit patch/recovery review, no force deletion."
+    },
+    {
+      "ref": "refs/remotes/origin/codex/G2-SEC-SUPPORT",
+      "tip": "219d1fcad3046251a1419f985dacab703f31c4cb",
+      "ancestorExitCode": 1,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Current/main/keep ref or associated protected/locked/private/changed worktree; removal protection propagates to local and remote ref."
+    },
+    {
+      "ref": "refs/remotes/origin/codex/G2-SEM-001",
+      "tip": "b16c62808a7bf0b659d587d0f5c8fcd08a4cca5b",
+      "ancestorExitCode": 1,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Current/main/keep ref or associated protected/locked/private/changed worktree; removal protection propagates to local and remote ref."
+    },
+    {
+      "ref": "refs/remotes/origin/codex/G2-THIN-SLICE-001-master",
+      "tip": "46c7a6de70b1b97c032b12a19bc27c1c54e70f4c",
+      "ancestorExitCode": 0,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Current/main/keep ref or associated protected/locked/private/changed worktree; removal protection propagates to local and remote ref."
+    },
+    {
+      "ref": "refs/remotes/origin/codex/PRE-G3-CLEANUP-FIX-002",
+      "tip": "d6aab6b47e63c9d5deadfa480f6659c62c5ed138",
+      "ancestorExitCode": 0,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Current/main/keep ref or associated protected/locked/private/changed worktree; removal protection propagates to local and remote ref."
+    },
+    {
+      "ref": "refs/remotes/origin/codex/g3-m1-closeout-master",
+      "tip": "f0712e9174d1bff82b5f6959e0a61e723585be88",
+      "ancestorExitCode": 0,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Current/main/keep ref or associated protected/locked/private/changed worktree; removal protection propagates to local and remote ref."
+    },
+    {
+      "ref": "refs/remotes/origin/codex/g3-m1-closeout-package",
+      "tip": "6b0ec74e10c1ff820abc7b358bf43beb880a245b",
+      "ancestorExitCode": 1,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Current/main/keep ref or associated protected/locked/private/changed worktree; removal protection propagates to local and remote ref."
+    },
+    {
+      "ref": "refs/remotes/origin/codex/g3-m1-closeout-resources",
+      "tip": "f3197177304e6a25f8597ff611acb04fb4e5b268",
+      "ancestorExitCode": 1,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Current/main/keep ref or associated protected/locked/private/changed worktree; removal protection propagates to local and remote ref."
+    },
+    {
+      "ref": "refs/remotes/origin/codex/g3-m1-fix",
+      "tip": "92e6435a0b81b60319298a4dcdded040ea056418",
+      "ancestorExitCode": 1,
+      "classification": "AMBIGUOUS",
+      "action": "RETAIN",
+      "reason": "Exact ref lacks a reviewed closed-resource ancestor approval; nonancestor refs require explicit patch/recovery review, no force deletion."
+    },
+    {
+      "ref": "refs/remotes/origin/codex/g3-m1-master",
+      "tip": "47935fb2eda3d708e628a1b23ccd897e2250ff33",
+      "ancestorExitCode": 0,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Current/main/keep ref or associated protected/locked/private/changed worktree; removal protection propagates to local and remote ref."
+    },
+    {
+      "ref": "refs/remotes/origin/codex/g3-m1-sem",
+      "tip": "3fe18b471237d9d6b9d4a3175fce83dabfec9ab3",
+      "ancestorExitCode": 1,
+      "classification": "AMBIGUOUS",
+      "action": "RETAIN",
+      "reason": "Exact ref lacks a reviewed closed-resource ancestor approval; nonancestor refs require explicit patch/recovery review, no force deletion."
+    },
+    {
+      "ref": "refs/remotes/origin/codex/g3-m1-web",
+      "tip": "5aa5b0799a8c29230fbb6ed466f97a7a33284fda",
+      "ancestorExitCode": 1,
+      "classification": "AMBIGUOUS",
+      "action": "RETAIN",
+      "reason": "Exact ref lacks a reviewed closed-resource ancestor approval; nonancestor refs require explicit patch/recovery review, no force deletion."
+    },
+    {
+      "ref": "refs/remotes/origin/codex/g3-m2-master",
+      "tip": "c8f1040829b2bfe1e9f7e36223092286975643f0",
+      "ancestorExitCode": 0,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Current/main/keep ref or associated protected/locked/private/changed worktree; removal protection propagates to local and remote ref."
+    },
+    {
+      "ref": "refs/remotes/origin/codex/g3-m2-sem",
+      "tip": "8be4574bb1c715e017e7e0922b98a76b51eecd17",
+      "ancestorExitCode": 1,
+      "classification": "AMBIGUOUS",
+      "action": "RETAIN",
+      "reason": "Exact ref lacks a reviewed closed-resource ancestor approval; nonancestor refs require explicit patch/recovery review, no force deletion."
+    },
+    {
+      "ref": "refs/remotes/origin/codex/g3-m2-web",
+      "tip": "1c98e05717cb7e3f311ba41b7b07f093aa64dc40",
+      "ancestorExitCode": 1,
+      "classification": "AMBIGUOUS",
+      "action": "RETAIN",
+      "reason": "Exact ref lacks a reviewed closed-resource ancestor approval; nonancestor refs require explicit patch/recovery review, no force deletion."
+    },
+    {
+      "ref": "refs/remotes/origin/codex/g3-m3-master",
+      "tip": "3992582e03df1a103fac36e7e82b8c81f85f622e",
+      "ancestorExitCode": 0,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Current/main/keep ref or associated protected/locked/private/changed worktree; removal protection propagates to local and remote ref."
+    },
+    {
+      "ref": "refs/remotes/origin/codex/g3-m4-mac-master",
+      "tip": "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a",
+      "ancestorExitCode": 0,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Current/main/keep ref or associated protected/locked/private/changed worktree; removal protection propagates to local and remote ref."
+    },
+    {
+      "ref": "refs/remotes/origin/codex/g3-m4-master",
+      "tip": "60276b40c7c99a3891bf432e2b36338ee3101828",
+      "ancestorExitCode": 1,
+      "classification": "AMBIGUOUS",
+      "action": "RETAIN",
+      "reason": "Exact ref lacks a reviewed closed-resource ancestor approval; nonancestor refs require explicit patch/recovery review, no force deletion."
+    },
+    {
+      "ref": "refs/remotes/origin/codex/g3-m4-sem-b",
+      "tip": "c909fa5e605417ff645da19d5899748c0f35773c",
+      "ancestorExitCode": 0,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Current/main/keep ref or associated protected/locked/private/changed worktree; removal protection propagates to local and remote ref."
+    },
+    {
+      "ref": "refs/remotes/origin/codex/g3-m4-web-b",
+      "tip": "b779ff5159fdbcedaa837c57ead30f3236b0f549",
+      "ancestorExitCode": 0,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Current/main/keep ref or associated protected/locked/private/changed worktree; removal protection propagates to local and remote ref."
+    },
+    {
+      "ref": "refs/remotes/origin/codex/g3-m5-e0",
+      "tip": "c8ca4b4c718342d56846afa2b94b3edf35330a09",
+      "ancestorExitCode": 1,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Current/main/keep ref or associated protected/locked/private/changed worktree; removal protection propagates to local and remote ref."
+    },
+    {
+      "ref": "refs/remotes/origin/codex/g3-m5-master",
+      "tip": "3e71049e95a473fd976e0ef685e24bdcad2ab7fd",
+      "ancestorExitCode": 1,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Current/main/keep ref or associated protected/locked/private/changed worktree; removal protection propagates to local and remote ref."
+    },
+    {
+      "ref": "refs/remotes/origin/main",
+      "tip": "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a",
+      "ancestorExitCode": 0,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Current/main/keep ref or associated protected/locked/private/changed worktree; removal protection propagates to local and remote ref."
+    }
+  ],
+  "worktrees": [
+    {
+      "path": "/Users/chasen/Developer/repos/ontology-platform",
+      "metadata": {
+        "worktree": "/Users/chasen/Developer/repos/ontology-platform",
+        "branch": "refs/heads/main",
+        "HEAD": "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      },
+      "exists": true,
+      "statusExitCode": 0,
+      "ignoredExitCode": 0,
+      "statusPaths": [
+        "?? .DS_Store",
+        "?? backend/.DS_Store",
+        "?? backend/src/.DS_Store",
+        "?? docs/.DS_Store",
+        "?? docs/evidence/.DS_Store",
+        "?? infra/.DS_Store"
+      ],
+      "ignoredTopCounts": {
+        ".tools": 498,
+        "artifacts": 22,
+        "backend": 437
+      },
+      "blockedPrivateIgnoredPaths": [],
+      "uncoveredIgnoredCount": 957,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Exact retained private-data/current-task/unintegrated source boundary; see resource-specific approval and Git classification."
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/320c/ontology-platform",
+      "metadata": {
+        "worktree": "/Users/chasen/.codex/worktrees/320c/ontology-platform",
+        "branch": "refs/heads/codex/g3-m5-sem",
+        "HEAD": "3e71049e95a473fd976e0ef685e24bdcad2ab7fd"
+      },
+      "exists": true,
+      "statusExitCode": 0,
+      "ignoredExitCode": 0,
+      "statusPaths": [],
+      "ignoredTopCounts": {},
+      "blockedPrivateIgnoredPaths": [],
+      "uncoveredIgnoredCount": 0,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Exact retained private-data/current-task/unintegrated source boundary; see resource-specific approval and Git classification."
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/40e2/ontology-platform",
+      "metadata": {
+        "worktree": "/Users/chasen/.codex/worktrees/40e2/ontology-platform",
+        "branch": "refs/heads/codex/g3-m5-web",
+        "HEAD": "3e71049e95a473fd976e0ef685e24bdcad2ab7fd"
+      },
+      "exists": true,
+      "statusExitCode": 0,
+      "ignoredExitCode": 0,
+      "statusPaths": [],
+      "ignoredTopCounts": {
+        ".tools": 2,
+        "node_modules": 893
+      },
+      "blockedPrivateIgnoredPaths": [],
+      "uncoveredIgnoredCount": 895,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Exact retained private-data/current-task/unintegrated source boundary; see resource-specific approval and Git classification."
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+      "metadata": {
+        "worktree": "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "branch": "refs/heads/codex/g3-m5-master",
+        "HEAD": "d22500c050713dc3ef659e7b3ca22e1d0410df82"
+      },
+      "exists": true,
+      "statusExitCode": 0,
+      "ignoredExitCode": 0,
+      "statusPaths": [
+        " M backend/src/AppHost/Wave2Infrastructure.cs",
+        " M scripts/acceptance/g3-acceptance-runtime.py",
+        " M scripts/acceptance/g3-governance.ps1",
+        " M scripts/acceptance/g3-runtime.py",
+        " M scripts/acceptance/semantic-roundtrip.py",
+        " M scripts/acceptance/wave2-runtime.py",
+        " M scripts/tests/G3AppHost.Tests.py",
+        " M scripts/verify.ps1",
+        "?? scripts/maintenance/host_continuity.py",
+        "?? scripts/tests/HostContinuity.Tests.py"
+      ],
+      "ignoredTopCounts": {
+        ".tools": 2,
+        "artifacts": 8,
+        "backend": 113,
+        "scripts": 1
+      },
+      "blockedPrivateIgnoredPaths": [],
+      "uncoveredIgnoredCount": 124,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Exact retained private-data/current-task/unintegrated source boundary; see resource-specific approval and Git classification."
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g2-query/ontology-platform",
+      "metadata": {
+        "worktree": "/Users/chasen/.codex/worktrees/g2-query/ontology-platform",
+        "branch": "refs/heads/codex/G2-QRY-001",
+        "HEAD": "3fc61d6a73290a8576c421ae0b0bdae7486f0030"
+      },
+      "exists": true,
+      "statusExitCode": 0,
+      "ignoredExitCode": 0,
+      "statusPaths": [],
+      "ignoredTopCounts": {
+        ".tools": 44,
+        "backend": 1155
+      },
+      "blockedPrivateIgnoredPaths": [],
+      "uncoveredIgnoredCount": 1199,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Exact retained private-data/current-task/unintegrated source boundary; see resource-specific approval and Git classification."
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g2-security/ontology-platform",
+      "metadata": {
+        "worktree": "/Users/chasen/.codex/worktrees/g2-security/ontology-platform",
+        "branch": "refs/heads/codex/G2-SEC-SUPPORT",
+        "HEAD": "219d1fcad3046251a1419f985dacab703f31c4cb"
+      },
+      "exists": true,
+      "statusExitCode": 0,
+      "ignoredExitCode": 0,
+      "statusPaths": [],
+      "ignoredTopCounts": {
+        ".tools": 1,
+        "backend": 910
+      },
+      "blockedPrivateIgnoredPaths": [],
+      "uncoveredIgnoredCount": 911,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Exact retained private-data/current-task/unintegrated source boundary; see resource-specific approval and Git classification."
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g2-sem/ontology-platform",
+      "metadata": {
+        "worktree": "/Users/chasen/.codex/worktrees/g2-sem/ontology-platform",
+        "branch": "refs/heads/codex/G2-SEM-001",
+        "HEAD": "b16c62808a7bf0b659d587d0f5c8fcd08a4cca5b"
+      },
+      "exists": true,
+      "statusExitCode": 0,
+      "ignoredExitCode": 0,
+      "statusPaths": [],
+      "ignoredTopCounts": {
+        ".tools": 44,
+        "backend": 1344,
+        "scripts": 1
+      },
+      "blockedPrivateIgnoredPaths": [],
+      "uncoveredIgnoredCount": 1389,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Exact retained private-data/current-task/unintegrated source boundary; see resource-specific approval and Git classification."
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform",
+      "metadata": {
+        "worktree": "/Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform",
+        "branch": "refs/heads/codex/g3-m1-closeout-master",
+        "HEAD": "f0712e9174d1bff82b5f6959e0a61e723585be88"
+      },
+      "exists": true,
+      "statusExitCode": 0,
+      "ignoredExitCode": 0,
+      "statusPaths": [],
+      "ignoredTopCounts": {
+        "apps": 22,
+        "node_modules": 27549,
+        ".tools": 22798,
+        "artifacts": 25,
+        "backend": 4003,
+        "scripts": 4
+      },
+      "blockedPrivateIgnoredPaths": [],
+      "uncoveredIgnoredCount": 54401,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Exact retained private-data/current-task/unintegrated source boundary; see resource-specific approval and Git classification."
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g3-m1-closeout-package/ontology-platform",
+      "metadata": {
+        "worktree": "/Users/chasen/.codex/worktrees/g3-m1-closeout-package/ontology-platform",
+        "branch": "refs/heads/codex/g3-m1-closeout-package",
+        "HEAD": "6b0ec74e10c1ff820abc7b358bf43beb880a245b"
+      },
+      "exists": true,
+      "statusExitCode": 0,
+      "ignoredExitCode": 0,
+      "statusPaths": [],
+      "ignoredTopCounts": {},
+      "blockedPrivateIgnoredPaths": [],
+      "uncoveredIgnoredCount": 0,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Exact retained private-data/current-task/unintegrated source boundary; see resource-specific approval and Git classification."
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g3-m1-closeout-resources/ontology-platform",
+      "metadata": {
+        "worktree": "/Users/chasen/.codex/worktrees/g3-m1-closeout-resources/ontology-platform",
+        "branch": "refs/heads/codex/g3-m1-closeout-resources",
+        "HEAD": "f3197177304e6a25f8597ff611acb04fb4e5b268"
+      },
+      "exists": true,
+      "statusExitCode": 0,
+      "ignoredExitCode": 0,
+      "statusPaths": [],
+      "ignoredTopCounts": {
+        "backend": 576,
+        "artifacts": 3,
+        "scripts": 1
+      },
+      "blockedPrivateIgnoredPaths": [],
+      "uncoveredIgnoredCount": 580,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Exact retained private-data/current-task/unintegrated source boundary; see resource-specific approval and Git classification."
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform",
+      "metadata": {
+        "worktree": "/Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform",
+        "branch": "refs/heads/codex/g3-m1-master",
+        "HEAD": "47935fb2eda3d708e628a1b23ccd897e2250ff33"
+      },
+      "exists": true,
+      "statusExitCode": 0,
+      "ignoredExitCode": 0,
+      "statusPaths": [],
+      "ignoredTopCounts": {
+        "apps": 318,
+        "node_modules": 27583,
+        ".superpowers": 1,
+        "artifacts": 519,
+        "backend": 4003,
+        "scripts": 7,
+        "infra": 1,
+        ".tools": 22826
+      },
+      "blockedPrivateIgnoredPaths": [
+        ".tools/security/g3-m1-5a1b45006425/keyring.pfx",
+        ".tools/security/g3-m1-5a1b45006425/keyring/key-bc2958ea-1563-45be-9774-ad92184aa4fa.xml",
+        ".tools/security/g3-m1-5a1b45006425/realm.json",
+        ".tools/security/g3-m1-5a1b45006425/runtime.json",
+        ".tools/security/g3-m1-774eafb4dda9/keyring.pfx",
+        ".tools/security/g3-m1-774eafb4dda9/keyring/key-416da0e2-59eb-4d3e-adde-d008af597d0c.xml",
+        ".tools/security/g3-m1-774eafb4dda9/realm.json",
+        ".tools/security/g3-m1-774eafb4dda9/runtime.json",
+        ".tools/security/g3-m1-b0af968ac10e/keyring.pfx",
+        ".tools/security/g3-m1-b0af968ac10e/keyring/key-c9baf1e0-245d-415b-bf85-6fe1579e220a.xml",
+        ".tools/security/g3-m1-b0af968ac10e/realm.json",
+        ".tools/security/g3-m1-b0af968ac10e/runtime.json",
+        ".tools/security/g3-m1-bb5e3661b605/keyring.pfx",
+        ".tools/security/g3-m1-bb5e3661b605/keyring/key-00a7962d-e5a1-4365-85a8-13ffcf8cad30.xml",
+        ".tools/security/g3-m1-bb5e3661b605/realm.json",
+        ".tools/security/g3-m1-bb5e3661b605/runtime.json",
+        ".tools/security/g3-m1-cbc4fd635c20/keyring.pfx",
+        ".tools/security/g3-m1-cbc4fd635c20/runtime.json",
+        ".tools/security/g3-m1-ff712e0c29b1/keyring.pfx",
+        ".tools/security/g3-m1-ff712e0c29b1/keyring/key-3571dc09-ccd2-4eb0-b690-a91b06cbf698.xml",
+        ".tools/security/g3-m1-ff712e0c29b1/realm.json",
+        ".tools/security/g3-m1-ff712e0c29b1/runtime.json",
+        ".tools/security/wave2-governance-test-21f64873320b/realm.json",
+        ".tools/security/wave2-governance-test-21f64873320b/runtime.json",
+        ".tools/security/wave2-governance-test-5fbe839bad4c/realm.json",
+        ".tools/security/wave2-governance-test-5fbe839bad4c/runtime.json",
+        ".tools/security/wave2-governance-test-eddbd0268217/realm.json",
+        ".tools/security/wave2-governance-test-eddbd0268217/runtime.json"
+      ],
+      "uncoveredIgnoredCount": 55258,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Exact retained private-data/current-task/unintegrated source boundary; see resource-specific approval and Git classification."
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform",
+      "metadata": {
+        "worktree": "/Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform",
+        "branch": "refs/heads/codex/g3-m2-master",
+        "HEAD": "c8f1040829b2bfe1e9f7e36223092286975643f0"
+      },
+      "exists": true,
+      "statusExitCode": 0,
+      "ignoredExitCode": 0,
+      "statusPaths": [],
+      "ignoredTopCounts": {
+        "apps": 318,
+        "node_modules": 27586,
+        ".tools": 22848,
+        "artifacts": 341,
+        "backend": 4003,
+        "scripts": 6,
+        "infra": 1
+      },
+      "blockedPrivateIgnoredPaths": [
+        ".tools/security/g3-m2-8fb61910c7c7/keyring.pfx",
+        ".tools/security/g3-m2-8fb61910c7c7/keyring/key-3d1748a5-c905-4af8-875a-d34c0cef6c68.xml",
+        ".tools/security/g3-m2-8fb61910c7c7/realm.json",
+        ".tools/security/g3-m2-8fb61910c7c7/runtime.json",
+        ".tools/security/wave2-governance-test-475e977d4206/realm.json",
+        ".tools/security/wave2-governance-test-475e977d4206/runtime.json"
+      ],
+      "uncoveredIgnoredCount": 55103,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Exact retained private-data/current-task/unintegrated source boundary; see resource-specific approval and Git classification."
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform",
+      "metadata": {
+        "worktree": "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform",
+        "branch": "refs/heads/codex/g3-m3-efficiency",
+        "HEAD": "d89ba59bac5ecc1e5946f49b790cb8ff3319ae78"
+      },
+      "exists": true,
+      "statusExitCode": 0,
+      "ignoredExitCode": 0,
+      "statusPaths": [],
+      "ignoredTopCounts": {
+        ".tools": 44,
+        "artifacts": 5,
+        "scripts": 6
+      },
+      "blockedPrivateIgnoredPaths": [],
+      "uncoveredIgnoredCount": 55,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Exact retained private-data/current-task/unintegrated source boundary; see resource-specific approval and Git classification."
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform",
+      "metadata": {
+        "worktree": "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform",
+        "branch": "refs/heads/codex/g3-m3-master",
+        "HEAD": "3992582e03df1a103fac36e7e82b8c81f85f622e"
+      },
+      "exists": true,
+      "statusExitCode": 0,
+      "ignoredExitCode": 0,
+      "statusPaths": [],
+      "ignoredTopCounts": {
+        "apps": 328,
+        "node_modules": 27595,
+        ".tools": 22850,
+        "artifacts": 156,
+        "backend": 3913,
+        "scripts": 21,
+        "infra": 1
+      },
+      "blockedPrivateIgnoredPaths": [
+        ".tools/security/g3-m3-daa8b53191e9/keyring.pfx",
+        ".tools/security/g3-m3-daa8b53191e9/keyring/key-511389d4-c9cb-4269-a0a8-685efeed42bb.xml",
+        ".tools/security/g3-m3-daa8b53191e9/realm.json",
+        ".tools/security/g3-m3-daa8b53191e9/runtime.json"
+      ],
+      "uncoveredIgnoredCount": 54864,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Exact retained private-data/current-task/unintegrated source boundary; see resource-specific approval and Git classification."
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform",
+      "metadata": {
+        "worktree": "/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform",
+        "branch": "refs/heads/codex/g3-m3-sem-language",
+        "HEAD": "90b60366a0e9907409061a5af5791c79a87cb499"
+      },
+      "exists": true,
+      "statusExitCode": 0,
+      "ignoredExitCode": 0,
+      "statusPaths": [],
+      "ignoredTopCounts": {
+        ".tools": 44,
+        "backend": 711,
+        "docs": 10,
+        "scripts": 5
+      },
+      "blockedPrivateIgnoredPaths": [],
+      "uncoveredIgnoredCount": 770,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Exact retained private-data/current-task/unintegrated source boundary; see resource-specific approval and Git classification."
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform",
+      "metadata": {
+        "worktree": "/Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform",
+        "branch": "refs/heads/codex/g3-m3-web",
+        "HEAD": "2ad537b63e0ed1b8392066201ad95ff4cb4d2b30"
+      },
+      "exists": true,
+      "statusExitCode": 0,
+      "ignoredExitCode": 0,
+      "statusPaths": [],
+      "ignoredTopCounts": {
+        ".tools": 22842,
+        "node_modules": 27634,
+        "apps": 329,
+        "scripts": 12
+      },
+      "blockedPrivateIgnoredPaths": [],
+      "uncoveredIgnoredCount": 50817,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Exact retained private-data/current-task/unintegrated source boundary; see resource-specific approval and Git classification."
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g3-m4-mac-master/ontology-platform",
+      "metadata": {
+        "worktree": "/Users/chasen/.codex/worktrees/g3-m4-mac-master/ontology-platform",
+        "branch": "refs/heads/codex/g3-m4-mac-master",
+        "HEAD": "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      },
+      "exists": true,
+      "statusExitCode": 0,
+      "ignoredExitCode": 0,
+      "statusPaths": [],
+      "ignoredTopCounts": {
+        "apps": 325,
+        "node_modules": 27616,
+        ".tools": 625,
+        "artifacts": 147,
+        "backend": 3201,
+        "scripts": 16,
+        "infra": 1
+      },
+      "blockedPrivateIgnoredPaths": [
+        ".tools/security/g3-m4-20e9c662b3e3/keyring.pfx",
+        ".tools/security/g3-m4-20e9c662b3e3/keyring/key-1009e113-efab-4ca2-94c5-f3065cccf01c.xml",
+        ".tools/security/g3-m4-20e9c662b3e3/realm.json",
+        ".tools/security/g3-m4-20e9c662b3e3/runtime.json"
+      ],
+      "uncoveredIgnoredCount": 31931,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Exact retained private-data/current-task/unintegrated source boundary; see resource-specific approval and Git classification."
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform",
+      "metadata": {
+        "worktree": "/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform",
+        "branch": "refs/heads/codex/g3-m4-sem-b",
+        "HEAD": "c909fa5e605417ff645da19d5899748c0f35773c"
+      },
+      "exists": true,
+      "statusExitCode": 0,
+      "ignoredExitCode": 0,
+      "statusPaths": [],
+      "ignoredTopCounts": {
+        ".tools": 35,
+        "backend": 2163,
+        "scripts": 2
+      },
+      "blockedPrivateIgnoredPaths": [],
+      "uncoveredIgnoredCount": 2200,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Exact retained private-data/current-task/unintegrated source boundary; see resource-specific approval and Git classification."
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g3-m4-web-a/ontology-platform",
+      "metadata": {
+        "worktree": "/Users/chasen/.codex/worktrees/g3-m4-web-a/ontology-platform",
+        "branch": "refs/heads/codex/g3-m4-web-b",
+        "HEAD": "b779ff5159fdbcedaa837c57ead30f3236b0f549"
+      },
+      "exists": true,
+      "statusExitCode": 0,
+      "ignoredExitCode": 0,
+      "statusPaths": [],
+      "ignoredTopCounts": {
+        ".tools": 477,
+        "node_modules": 27624,
+        "apps": 307
+      },
+      "blockedPrivateIgnoredPaths": [],
+      "uncoveredIgnoredCount": 28408,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Exact retained private-data/current-task/unintegrated source boundary; see resource-specific approval and Git classification."
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g3-m5-e0/ontology-platform",
+      "metadata": {
+        "worktree": "/Users/chasen/.codex/worktrees/g3-m5-e0/ontology-platform",
+        "branch": "refs/heads/codex/g3-m5-e0",
+        "HEAD": "c8ca4b4c718342d56846afa2b94b3edf35330a09"
+      },
+      "exists": true,
+      "statusExitCode": 0,
+      "ignoredExitCode": 0,
+      "statusPaths": [],
+      "ignoredTopCounts": {
+        "scripts": 4
+      },
+      "blockedPrivateIgnoredPaths": [],
+      "uncoveredIgnoredCount": 4,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Exact retained private-data/current-task/unintegrated source boundary; see resource-specific approval and Git classification."
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform",
+      "metadata": {
+        "worktree": "/Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform",
+        "branch": "refs/heads/codex/PRE-G3-CLEANUP-FIX-002",
+        "HEAD": "d6aab6b47e63c9d5deadfa480f6659c62c5ed138"
+      },
+      "exists": true,
+      "statusExitCode": 0,
+      "ignoredExitCode": 0,
+      "statusPaths": [],
+      "ignoredTopCounts": {
+        ".tools": 1,
+        "artifacts": 12
+      },
+      "blockedPrivateIgnoredPaths": [],
+      "uncoveredIgnoredCount": 13,
+      "classification": "KEEP",
+      "action": "RETAIN",
+      "reason": "Exact retained private-data/current-task/unintegrated source boundary; see resource-specific approval and Git classification."
+    }
+  ],
+  "reviewPackages": [],
+  "docker": {
+    "status": "OBSERVED",
+    "policy": "Classify exact reviewed identities below; safe candidates require guarded Apply, retained resources have concrete private/recovery/shared ownership facts. Reclaimable alone is not authority.",
+    "queries": {
+      "containers": {
+        "exitCode": 0,
+        "text": ""
+      },
+      "volumes": {
+        "exitCode": 0,
+        "text": "g2-ef979bd04cc0-alloy-data\tlocal\t\ng2-ef979bd04cc0-fuseki-data\tlocal\t\ng2-ef979bd04cc0-grafana-data\tlocal\t\ng2-ef979bd04cc0-loki-data\tlocal\t\ng2-ef979bd04cc0-postgres-data\tlocal\t\ng2-ef979bd04cc0-prometheus-data\tlocal\t\ng2-ef979bd04cc0-rustfs-data\tlocal\t\ng2-ef979bd04cc0-tempo-data\tlocal\t\n"
+      },
+      "images": {
+        "exitCode": 0,
+        "text": "sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c\tontology-platform-fuseki:context-4fbf23514516632dcb651b5c05bf04e9992da52491607b6cf58de1f7348ff9ab\nsha256:cc1591ccefc0ab280cfd1fef2ebc5315de7d2f39d8d1c1d690c37e305810a9b2\thlc-iov-release-postgis:18.6-3.6.3\nsha256:39b0fb6616a466a05b2ff8c691bb14a63557c70118d433a4b70fd1068b1bef60\tontology-platform-fuseki:context-1e45f836d9837cbc75d23adb3ad37b0ff79a545ef06102a87aa246feea9cc1e5\nsha256:401e1fbc58c27b08c3103e00c86b22bd175a1cdd8f8a7d61965133f27a24437f\tontology-platform-g2-fuseki:6.2.0\nsha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b\tquay.io/keycloak/keycloak:<none>\nsha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18\tgrafana/alloy:<none>\nsha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044\tgrafana/tempo:<none>\nsha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2\tprom/prometheus:<none>\nsha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6\thlc-iov-release-pg-base:18.6\nsha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6\tpostgres:<none>\nsha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28\tgrafana/loki:<none>\nsha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b\trustfs/rustfs:<none>\nsha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f\tgrafana/grafana:<none>\nsha256:93b8a14ea2f412782e4e842651273b4d903e35cc496284f178fbbe2d67d00976\tdocker.m.daocloud.io/library/maven:3.9-eclipse-temurin-25\n"
+      },
+      "history": {
+        "exitCode": 0,
+        "text": "1kq80249gfrdurl9atazzw7kl\nvq2df00gcyjps32jx8vlylpuk\nrcb0gy3pt97pgilczmff1itne\nihl3gp469h5nq38l942lv9p1v\nqao9ei05z94c4rt13gu1p0kkh\n"
+      },
+      "networks": {
+        "exitCode": 0,
+        "text": "ad165f9ca031\tbridge\tbridge\t\n80ac07a0bfc7\thost\thost\t\ne66d65cfe071\tnone\tnull\t\n"
+      },
+      "capacity": {
+        "exitCode": 0,
+        "text": "{\"Active\":\"0\",\"Reclaimable\":\"6.043GB (85%)\",\"Size\":\"7.1GB\",\"TotalCount\":\"13\",\"Type\":\"Images\"}\n{\"Active\":\"0\",\"Reclaimable\":\"0B\",\"Size\":\"0B\",\"TotalCount\":\"0\",\"Type\":\"Containers\"}\n{\"Active\":\"0\",\"Reclaimable\":\"619.3MB (100%)\",\"Size\":\"619.3MB\",\"TotalCount\":\"8\",\"Type\":\"Local Volumes\"}\n{\"Active\":\"0\",\"Reclaimable\":\"1.139GB\",\"Size\":\"2.925GB\",\"TotalCount\":\"70\",\"Type\":\"Build Cache\"}\n"
+      },
+      "detailedCapacity": {
+        "exitCode": 0,
+        "text": "Images space usage:\n\nREPOSITORY                           TAG                                                                        IMAGE ID       CREATED       SIZE      SHARED SIZE   UNIQUE SIZE   CONTAINERS\nontology-platform-fuseki             context-4fbf23514516632dcb651b5c05bf04e9992da52491607b6cf58de1f7348ff9ab   715703f0cdb9   2 days ago    606MB     391.2MB       214.9MB       0\nhlc-iov-release-postgis              18.6-3.6.3                                                                 cc1591ccefc0   2 days ago    966MB     665.8MB       300MB         0\nontology-platform-fuseki             context-1e45f836d9837cbc75d23adb3ad37b0ff79a545ef06102a87aa246feea9cc1e5   39b0fb6616a4   3 days ago    503MB     391.2MB       112.1MB       0\nontology-platform-g2-fuseki          6.2.0                                                                      401e1fbc58c2   5 days ago    503MB     391.2MB       112.1MB       0\n<none>                               <none>                                                                     a78d6b795721   7 days ago    750MB     2B            750.2MB       0\n<none>                               <none>                                                                     89a5a3201683   8 days ago    928MB     2B            928.1MB       0\n<none>                               <none>                                                                     64e2fbd56d9c   9 days ago    161MB     0B            161.3MB       0\n<none>                               <none>                                                                     fa3302279710   9 days ago    357MB     0B            356.7MB       0\nhlc-iov-release-pg-base              18.6                                                                       edb0c08dc33b   10 days ago   672MB     665.8MB       6.037MB       0\n<none>                               <none>                                                                     0db216b630ae   10 days ago   191MB     0B            191.2MB       0\n<none>                               <none>                                                                     9ca9559533b5   13 days ago   371MB     34B           371.3MB       0\n<none>                               <none>                                                                     dbbc38ea2110   2 weeks ago   1.81GB    32B           1.813GB       0\ndocker.m.daocloud.io/library/maven   3.9-eclipse-temurin-25                                                     93b8a14ea2f4   5 weeks ago   726MB     32B           726MB         0\n\nContainers space usage:\n\nCONTAINER ID   IMAGE     COMMAND   LOCAL VOLUMES   SIZE      CREATED   STATUS    NAMES\n\nLocal Volumes space usage:\n\nVOLUME NAME                       LINKS     SIZE\ng2-ef979bd04cc0-prometheus-data   0         6.068MB\ng2-ef979bd04cc0-rustfs-data       0         158.9kB\ng2-ef979bd04cc0-tempo-data        0         279.1kB\ng2-ef979bd04cc0-alloy-data        0         112B\ng2-ef979bd04cc0-fuseki-data       0         201.3MB\ng2-ef979bd04cc0-grafana-data      0         329.4MB\ng2-ef979bd04cc0-loki-data         0         184.8kB\ng2-ef979bd04cc0-postgres-data     0         81.85MB\n\nBuild cache usage: 2.925GB\n\nCACHE ID       CACHE TYPE     SIZE      CREATED      LAST USED    USAGE     SHARED\nw06xag2aijqm   regular        107MB     6 days ago   6 days ago   1         true\nj7p20on71k1x   regular        66.1MB    6 days ago   6 days ago   1         true\ne6jc9b1q8gmh   regular        218MB     6 days ago   6 days ago   1         true\newk9svasi6fn   regular        12.4kB    6 days ago   6 days ago   1         true\nuxtr0h6w1ojb   regular        109MB     6 days ago   6 days ago   1         true\ngv4hro3gkgle   regular        14.8kB    6 days ago   6 days ago   1         true\n9ps57q51cxsb   regular        20.8kB    6 days ago   6 days ago   1         true\nk2nu5zzwwgb5   regular        4.13kB    6 days ago   6 days ago   4         false\nnisjoatf7lkh   regular        25.4kB    5 days ago   5 days ago   1         true\nk69m501cgn7t   regular        4.13kB    5 days ago   3 days ago   24        true\nb5yvyq8wc7gl   regular        109MB     3 days ago   3 days ago   1         true\nm1c04zqmzos9   regular        4.13kB    3 days ago   3 days ago   1         true\nf8wok5caxkox   regular        29.4kB    3 days ago   3 days ago   1         true\nu9d719s6duy3   regular        20.8kB    3 days ago   3 days ago   1         true\naukp8jhjho8p   regular        25.3kB    3 days ago   3 days ago   1         true\nwp4mzc4twjxx   regular        28.7kB    2 days ago   2 days ago   1         false\n2q084typeyaw   regular        28.7kB    2 days ago   2 days ago   1         false\nzwr7ec427tz6   regular        118MB     2 days ago   2 days ago   1         false\nri52okhtbsx3   regular        54.4kB    2 days ago   2 days ago   1         false\nxygndq8rwlyb   regular        23.4MB    2 days ago   2 days ago   1         false\nsyybku7rm2s6   regular        5MB       2 days ago   2 days ago   1         false\nlr9urrqa94fx   regular        35.5MB    2 days ago   2 days ago   1         false\nk6x3obmxm6s6   regular        5.14MB    2 days ago   2 days ago   1         false\nimr9cyak88dv   regular        8.31kB    2 days ago   2 days ago   1         false\nkazlv8rrebwc   regular        27.7kB    2 days ago   2 days ago   1         false\n7o9krubm2j0s   regular        457MB     2 days ago   2 days ago   1         false\n1pouzn4qtha7   regular        126kB     2 days ago   2 days ago   1         false\n8cqgdiupby2i   regular        12.4kB    2 days ago   2 days ago   1         false\n5u8ldqwuctl6   regular        43kB      2 days ago   2 days ago   1         false\ntc5sn4py5we1   regular        16.6kB    2 days ago   2 days ago   1         false\n899muze78g68   regular        314MB     2 days ago   2 days ago   1         false\nefftaljlk8ag   regular        4.13kB    2 days ago   2 days ago   1         false\nqc1dxbw14rrz   regular        13.1kB    2 days ago   2 days ago   1         false\n0kwg3hh25als   source.local   8.19kB    2 days ago   2 days ago   1         false\nphqsu0imj6p3   source.local   8.19kB    2 days ago   2 days ago   1         false\noky9m6hb2331   regular        283kB     2 days ago   2 days ago   2         false\nl4ccftugrk7h   source.local   4.93MB    2 days ago   2 days ago   2         false\nb25gb77swszy   regular        7.26MB    2 days ago   2 days ago   1         false\no3uokn2lgd6n   regular        2.6MB     2 days ago   2 days ago   1         false\nw88nonnoih26   regular        61.9MB    2 days ago   2 days ago   1         false\nrkop7o53wpmm   source.local   4.1kB     2 days ago   2 days ago   2         false\novb1aslf21gz   regular        21.1kB    2 days ago   2 days ago   3         false\nrkz7jpav7ya0   source.local   8.19kB    2 days ago   2 days ago   2         false\nvfc00cckh7gs   regular        140MB     2 days ago   2 days ago   1         true\n2x4j4pd841x7   regular        54.4kB    2 days ago   2 days ago   1         true\ne5xr8e97yxkf   regular        24.1MB    2 days ago   2 days ago   1         true\np1qrd5dlu1el   regular        5.01MB    2 days ago   2 days ago   1         true\njbr2tft1ug5i   regular        35.5MB    2 days ago   2 days ago   1         true\nqtg0zvvvtenw   regular        4.98MB    2 days ago   2 days ago   1         true\nwssd634ymsu3   regular        8.31kB    2 days ago   2 days ago   1         true\njjd7rmld5m4f   regular        27.7kB    2 days ago   2 days ago   1         true\n5amftcs1jtzr   regular        456MB     2 days ago   2 days ago   1         true\nsdpqm27efbst   regular        126kB     2 days ago   2 days ago   1         true\nrttvo45qxqhl   regular        12.4kB    2 days ago   2 days ago   1         true\no3sqk0o9q36m   regular        43kB      2 days ago   2 days ago   1         true\nn45t3tywzws0   regular        300MB     2 days ago   2 days ago   1         true\nn4azmp7qb5vc   source.local   8.19kB    2 days ago   2 days ago   1         false\nlmeea9pn1gip   source.local   4.1kB     2 days ago   2 days ago   1         false\nrj5fv4x50k27   regular        16.6kB    2 days ago   2 days ago   1         true\nk0xavwusupha   regular        20.8kB    2 days ago   2 days ago   1         true\nv4uq24vbbnlm   regular        25.3kB    2 days ago   2 days ago   1         true\nyz4y2v9w1jag   regular        103MB     2 days ago   2 days ago   1         true\nxrbvlpysck7h   regular        109MB     2 days ago   2 days ago   1         true\npz2wm158nosc   source.local   51.4MB    2 days ago   2 days ago   1         false\nqfv1txx0qs8w   source.local   8.19kB    6 days ago   2 days ago   35        false\nsnjlqumzjtwn   source.local   8.19kB    6 days ago   2 days ago   35        false\niq6cnb0dpnbc   source.local   51.4MB    2 days ago   2 days ago   1         false\nk80vo9jwximo   source.local   16.4kB    6 days ago   2 days ago   35        false\nlmkg98qte403   regular        4.13kB    2 days ago   2 days ago   2         true\no1irdxpgzebg   source.local   4.1kB     2 days ago   2 days ago   2         false\n"
+      }
+    },
+    "decisions": [
+      {
+        "reason": "Exact owner/recovery decision requires review; missing whitelist alone is not a permanent KEEP reason.",
+        "target": "g2-ef979bd04cc0-alloy-data",
+        "classification": "AMBIGUOUS",
+        "type": "docker-volume"
+      },
+      {
+        "reason": "Exact owner/recovery decision requires review; missing whitelist alone is not a permanent KEEP reason.",
+        "target": "g2-ef979bd04cc0-fuseki-data",
+        "classification": "AMBIGUOUS",
+        "type": "docker-volume"
+      },
+      {
+        "reason": "Exact owner/recovery decision requires review; missing whitelist alone is not a permanent KEEP reason.",
+        "target": "g2-ef979bd04cc0-grafana-data",
+        "classification": "AMBIGUOUS",
+        "type": "docker-volume"
+      },
+      {
+        "reason": "Exact owner/recovery decision requires review; missing whitelist alone is not a permanent KEEP reason.",
+        "target": "g2-ef979bd04cc0-loki-data",
+        "classification": "AMBIGUOUS",
+        "type": "docker-volume"
+      },
+      {
+        "reason": "Exact owner/recovery decision requires review; missing whitelist alone is not a permanent KEEP reason.",
+        "target": "g2-ef979bd04cc0-postgres-data",
+        "classification": "AMBIGUOUS",
+        "type": "docker-volume"
+      },
+      {
+        "reason": "Exact owner/recovery decision requires review; missing whitelist alone is not a permanent KEEP reason.",
+        "target": "g2-ef979bd04cc0-prometheus-data",
+        "classification": "AMBIGUOUS",
+        "type": "docker-volume"
+      },
+      {
+        "reason": "Exact owner/recovery decision requires review; missing whitelist alone is not a permanent KEEP reason.",
+        "target": "g2-ef979bd04cc0-rustfs-data",
+        "classification": "AMBIGUOUS",
+        "type": "docker-volume"
+      },
+      {
+        "reason": "Exact owner/recovery decision requires review; missing whitelist alone is not a permanent KEEP reason.",
+        "target": "g2-ef979bd04cc0-tempo-data",
+        "classification": "AMBIGUOUS",
+        "type": "docker-volume"
+      },
+      {
+        "reason": "Exact owner/recovery decision requires review; missing whitelist alone is not a permanent KEEP reason.",
+        "target": "sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c",
+        "classification": "AMBIGUOUS",
+        "type": "docker-image"
+      },
+      {
+        "reason": "Exact owner/recovery decision requires review; missing whitelist alone is not a permanent KEEP reason.",
+        "target": "sha256:cc1591ccefc0ab280cfd1fef2ebc5315de7d2f39d8d1c1d690c37e305810a9b2",
+        "classification": "AMBIGUOUS",
+        "type": "docker-image"
+      },
+      {
+        "reason": "Exact owner/recovery decision requires review; missing whitelist alone is not a permanent KEEP reason.",
+        "target": "sha256:39b0fb6616a466a05b2ff8c691bb14a63557c70118d433a4b70fd1068b1bef60",
+        "classification": "AMBIGUOUS",
+        "type": "docker-image"
+      },
+      {
+        "reason": "Exact owner/recovery decision requires review; missing whitelist alone is not a permanent KEEP reason.",
+        "target": "sha256:401e1fbc58c27b08c3103e00c86b22bd175a1cdd8f8a7d61965133f27a24437f",
+        "classification": "AMBIGUOUS",
+        "type": "docker-image"
+      },
+      {
+        "reason": "Exact owner/recovery decision requires review; missing whitelist alone is not a permanent KEEP reason.",
+        "target": "sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b",
+        "classification": "AMBIGUOUS",
+        "type": "docker-image"
+      },
+      {
+        "reason": "Exact owner/recovery decision requires review; missing whitelist alone is not a permanent KEEP reason.",
+        "target": "sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18",
+        "classification": "AMBIGUOUS",
+        "type": "docker-image"
+      },
+      {
+        "reason": "Exact owner/recovery decision requires review; missing whitelist alone is not a permanent KEEP reason.",
+        "target": "sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044",
+        "classification": "AMBIGUOUS",
+        "type": "docker-image"
+      },
+      {
+        "reason": "Exact owner/recovery decision requires review; missing whitelist alone is not a permanent KEEP reason.",
+        "target": "sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2",
+        "classification": "AMBIGUOUS",
+        "type": "docker-image"
+      },
+      {
+        "reason": "Exact owner/recovery decision requires review; missing whitelist alone is not a permanent KEEP reason.",
+        "target": "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6",
+        "classification": "AMBIGUOUS",
+        "type": "docker-image"
+      },
+      {
+        "reason": "Exact owner/recovery decision requires review; missing whitelist alone is not a permanent KEEP reason.",
+        "target": "sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28",
+        "classification": "AMBIGUOUS",
+        "type": "docker-image"
+      },
+      {
+        "reason": "Exact owner/recovery decision requires review; missing whitelist alone is not a permanent KEEP reason.",
+        "target": "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+        "classification": "AMBIGUOUS",
+        "type": "docker-image"
+      },
+      {
+        "reason": "Exact owner/recovery decision requires review; missing whitelist alone is not a permanent KEEP reason.",
+        "target": "sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f",
+        "classification": "AMBIGUOUS",
+        "type": "docker-image"
+      },
+      {
+        "reason": "Exact owner/recovery decision requires review; missing whitelist alone is not a permanent KEEP reason.",
+        "target": "sha256:93b8a14ea2f412782e4e842651273b4d903e35cc496284f178fbbe2d67d00976",
+        "classification": "AMBIGUOUS",
+        "type": "docker-image"
+      },
+      {
+        "reason": "Exact owner/recovery decision requires review; missing whitelist alone is not a permanent KEEP reason.",
+        "target": "1kq80249gfrdurl9atazzw7kl",
+        "classification": "AMBIGUOUS",
+        "type": "docker-history"
+      },
+      {
+        "reason": "Exact owner/recovery decision requires review; missing whitelist alone is not a permanent KEEP reason.",
+        "target": "vq2df00gcyjps32jx8vlylpuk",
+        "classification": "AMBIGUOUS",
+        "type": "docker-history"
+      },
+      {
+        "reason": "Exact owner/recovery decision requires review; missing whitelist alone is not a permanent KEEP reason.",
+        "target": "rcb0gy3pt97pgilczmff1itne",
+        "classification": "AMBIGUOUS",
+        "type": "docker-history"
+      },
+      {
+        "reason": "Exact owner/recovery decision requires review; missing whitelist alone is not a permanent KEEP reason.",
+        "target": "ihl3gp469h5nq38l942lv9p1v",
+        "classification": "AMBIGUOUS",
+        "type": "docker-history"
+      },
+      {
+        "reason": "Exact owner/recovery decision requires review; missing whitelist alone is not a permanent KEEP reason.",
+        "target": "qao9ei05z94c4rt13gu1p0kkh",
+        "classification": "AMBIGUOUS",
+        "type": "docker-history"
+      }
+    ],
+    "inventory": {
+      "schemaVersion": 1,
+      "status": "OBSERVED",
+      "observedAt": "2026-10-31T12:14:04.508201+08:00",
+      "backend": {
+        "context": "desktop-linux",
+        "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016",
+        "bridgeId": "ad165f9ca03156459f6f09d10e93627bc27fb9fee108d3413cb5e6ba922ba0a6",
+        "buildxVersion": "github.com/docker/buildx v0.38.1 0dbe87f36ed472fe36b6796c3f70b4210a731fc5",
+        "builder": "Name:          desktop-linux\nDriver:        docker\nLast Activity: 2026-10-28 14:58:46 +0000 UTC\n\nNodes:\nName:             desktop-linux\nEndpoint:         desktop-linux\nStatus:           running\nBuildKit version: v0.34.0\nPlatforms:        linux/arm64, linux/amd64, linux/amd64/v2, linux/riscv64, linux/ppc64le, linux/s390x, linux/386\nLabels:\n org.mobyproject.buildkit.worker.containerd.namespace: moby\n org.mobyproject.buildkit.worker.containerd.uuid:      c943f7ae-b2dc-482e-bdb4-28fee25f5502\n org.mobyproject.buildkit.worker.executor:             containerd\n org.mobyproject.buildkit.worker.hostname:             docker-desktop\n org.mobyproject.buildkit.worker.moby.host-gateway-ip: 192.168.65.254\n org.mobyproject.buildkit.worker.network:              host\n org.mobyproject.buildkit.worker.selinux.enabled:      false\n org.mobyproject.buildkit.worker.snapshotter:          overlayfs\nDevices:\n Name:                  docker.com/gpu=webgpu\n Automatically allowed: false\nGC Policy rule#0:\n All:            false\n Filters:        type==source.local type==exec.cachemount type==source.git.checkout\n Keep Duration:  48h0m0s\n Max Used Space: 2.764GiB\nGC Policy rule#1:\n All:            false\n Keep Duration:  1440h0m0s\n Reserved Space: 20GiB\nGC Policy rule#2:\n All:            false\n Reserved Space: 20GiB\nGC Policy rule#3:\n All:            true\n Reserved Space: 20GiB",
+        "version": {
+          "Client": {
+            "Version": "29.9.2",
+            "ApiVersion": "1.56",
+            "DefaultAPIVersion": "1.56",
+            "GitCommit": "a82e528",
+            "GoVersion": "go1.26.10",
+            "Os": "darwin",
+            "Arch": "arm64",
+            "BuildTime": "Tue Oct 20 18:43:59 2026",
+            "Context": "desktop-linux"
+          },
+          "Server": {
+            "Platform": {
+              "Name": "Docker Desktop 4.96.3 (244472)"
+            },
+            "Version": "29.9.2",
+            "ApiVersion": "1.56",
+            "MinAPIVersion": "1.40",
+            "Os": "linux",
+            "Arch": "arm64",
+            "Components": [
+              {
+                "Name": "Engine",
+                "Version": "29.9.2",
+                "Details": {
+                  "ApiVersion": "1.56",
+                  "Arch": "arm64",
+                  "BuildTime": "Tue Oct 20 18:44:14 2026",
+                  "Experimental": "false",
+                  "GitCommit": "0367cbe",
+                  "GoVersion": "go1.26.10",
+                  "KernelVersion": "7.0.14-linuxkit",
+                  "MinAPIVersion": "1.40",
+                  "Module": "github.com/moby/moby/v2",
+                  "ModuleVersion": "v2.0.0+unknown",
+                  "Os": "linux"
+                }
+              },
+              {
+                "Name": "containerd",
+                "Version": "v2.4.2",
+                "Details": {
+                  "GitCommit": "b7a25261e029d68978bbf290df0a62fc819b3c51"
+                }
+              },
+              {
+                "Name": "runc",
+                "Version": "1.5.2",
+                "Details": {
+                  "GitCommit": "v1.5.2-0-g29dd3dc2"
+                }
+              },
+              {
+                "Name": "docker-init",
+                "Version": "0.19.0",
+                "Details": {
+                  "GitCommit": "de40ad0"
+                }
+              }
+            ],
+            "GitCommit": "0367cbe",
+            "GoVersion": "go1.26.10",
+            "KernelVersion": "7.0.14-linuxkit",
+            "BuildTime": "2026-10-20T18:44:14.000000000+00:00"
+          }
+        }
+      },
+      "containers": [],
+      "volumes": [
+        {
+          "Name": "g2-ef979bd04cc0-alloy-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {
+            "org.opencontainers.image.source": "",
+            "io.ontology-platform.task-id": "",
+            "io.ontology-platform.run-id": "",
+            "io.ontology-platform.context-sha256": "",
+            "com.docker.compose.project": "",
+            "com.docker.compose.service": ""
+          },
+          "references": [],
+          "decision": {
+            "classification": "AMBIGUOUS",
+            "reason": "Exact owner/recovery classification has not been reviewed",
+            "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+          }
+        },
+        {
+          "Name": "g2-ef979bd04cc0-fuseki-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {
+            "org.opencontainers.image.source": "",
+            "io.ontology-platform.task-id": "",
+            "io.ontology-platform.run-id": "",
+            "io.ontology-platform.context-sha256": "",
+            "com.docker.compose.project": "",
+            "com.docker.compose.service": ""
+          },
+          "references": [],
+          "decision": {
+            "classification": "AMBIGUOUS",
+            "reason": "Exact owner/recovery classification has not been reviewed",
+            "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+          }
+        },
+        {
+          "Name": "g2-ef979bd04cc0-grafana-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {
+            "org.opencontainers.image.source": "",
+            "io.ontology-platform.task-id": "",
+            "io.ontology-platform.run-id": "",
+            "io.ontology-platform.context-sha256": "",
+            "com.docker.compose.project": "",
+            "com.docker.compose.service": ""
+          },
+          "references": [],
+          "decision": {
+            "classification": "AMBIGUOUS",
+            "reason": "Exact owner/recovery classification has not been reviewed",
+            "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+          }
+        },
+        {
+          "Name": "g2-ef979bd04cc0-loki-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {
+            "org.opencontainers.image.source": "",
+            "io.ontology-platform.task-id": "",
+            "io.ontology-platform.run-id": "",
+            "io.ontology-platform.context-sha256": "",
+            "com.docker.compose.project": "",
+            "com.docker.compose.service": ""
+          },
+          "references": [],
+          "decision": {
+            "classification": "AMBIGUOUS",
+            "reason": "Exact owner/recovery classification has not been reviewed",
+            "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+          }
+        },
+        {
+          "Name": "g2-ef979bd04cc0-postgres-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:23Z",
+          "Labels": {
+            "org.opencontainers.image.source": "",
+            "io.ontology-platform.task-id": "",
+            "io.ontology-platform.run-id": "",
+            "io.ontology-platform.context-sha256": "",
+            "com.docker.compose.project": "",
+            "com.docker.compose.service": ""
+          },
+          "references": [],
+          "decision": {
+            "classification": "AMBIGUOUS",
+            "reason": "Exact owner/recovery classification has not been reviewed",
+            "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+          }
+        },
+        {
+          "Name": "g2-ef979bd04cc0-prometheus-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {
+            "org.opencontainers.image.source": "",
+            "io.ontology-platform.task-id": "",
+            "io.ontology-platform.run-id": "",
+            "io.ontology-platform.context-sha256": "",
+            "com.docker.compose.project": "",
+            "com.docker.compose.service": ""
+          },
+          "references": [],
+          "decision": {
+            "classification": "AMBIGUOUS",
+            "reason": "Exact owner/recovery classification has not been reviewed",
+            "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+          }
+        },
+        {
+          "Name": "g2-ef979bd04cc0-rustfs-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {
+            "org.opencontainers.image.source": "",
+            "io.ontology-platform.task-id": "",
+            "io.ontology-platform.run-id": "",
+            "io.ontology-platform.context-sha256": "",
+            "com.docker.compose.project": "",
+            "com.docker.compose.service": ""
+          },
+          "references": [],
+          "decision": {
+            "classification": "AMBIGUOUS",
+            "reason": "Exact owner/recovery classification has not been reviewed",
+            "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+          }
+        },
+        {
+          "Name": "g2-ef979bd04cc0-tempo-data",
+          "Driver": "local",
+          "CreatedAt": "2026-10-26T05:57:39Z",
+          "Labels": {
+            "org.opencontainers.image.source": "",
+            "io.ontology-platform.task-id": "",
+            "io.ontology-platform.run-id": "",
+            "io.ontology-platform.context-sha256": "",
+            "com.docker.compose.project": "",
+            "com.docker.compose.service": ""
+          },
+          "references": [],
+          "decision": {
+            "classification": "AMBIGUOUS",
+            "reason": "Exact owner/recovery classification has not been reviewed",
+            "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+          }
+        }
+      ],
+      "images": [
+        {
+          "Id": "sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28",
+          "RepoTags": [
+            "grafana/loki@sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28"
+          ],
+          "RepoDigests": [
+            "grafana/loki@sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28"
+          ],
+          "Size": 191210306,
+          "Created": "2026-10-20T21:45:42.003100377Z",
+          "Labels": {
+            "org.opencontainers.image.source": "",
+            "io.ontology-platform.task-id": "",
+            "io.ontology-platform.run-id": "",
+            "io.ontology-platform.context-sha256": "",
+            "com.docker.compose.project": "",
+            "com.docker.compose.service": ""
+          },
+          "references": [],
+          "decision": {
+            "classification": "AMBIGUOUS",
+            "reason": "Exact owner/recovery classification has not been reviewed",
+            "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+          }
+        },
+        {
+          "Id": "sha256:39b0fb6616a466a05b2ff8c691bb14a63557c70118d433a4b70fd1068b1bef60",
+          "RepoTags": [
+            "ontology-platform-fuseki:context-1e45f836d9837cbc75d23adb3ad37b0ff79a545ef06102a87aa246feea9cc1e5"
+          ],
+          "RepoDigests": [
+            "ontology-platform-fuseki@sha256:39b0fb6616a466a05b2ff8c691bb14a63557c70118d433a4b70fd1068b1bef60"
+          ],
+          "Size": 503334439,
+          "Created": "2026-10-27T15:06:39.518416545Z",
+          "Labels": {
+            "org.opencontainers.image.source": "https://github.com/on-dotnet/ontology-platform",
+            "io.ontology-platform.task-id": "G3-M2-001",
+            "io.ontology-platform.run-id": "download-context-fixed-cold",
+            "io.ontology-platform.context-sha256": "1e45f836d9837cbc75d23adb3ad37b0ff79a545ef06102a87aa246feea9cc1e5",
+            "com.docker.compose.project": "",
+            "com.docker.compose.service": ""
+          },
+          "references": [],
+          "decision": {
+            "classification": "AMBIGUOUS",
+            "reason": "Exact owner/recovery classification has not been reviewed",
+            "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+          }
+        },
+        {
+          "Id": "sha256:401e1fbc58c27b08c3103e00c86b22bd175a1cdd8f8a7d61965133f27a24437f",
+          "RepoTags": [
+            "ontology-platform-g2-fuseki:6.2.0"
+          ],
+          "RepoDigests": [
+            "ontology-platform-g2-fuseki@sha256:401e1fbc58c27b08c3103e00c86b22bd175a1cdd8f8a7d61965133f27a24437f"
+          ],
+          "Size": 503312701,
+          "Created": "2026-10-26T02:07:21.88926401Z",
+          "Labels": {
+            "org.opencontainers.image.source": "",
+            "io.ontology-platform.task-id": "",
+            "io.ontology-platform.run-id": "",
+            "io.ontology-platform.context-sha256": "",
+            "com.docker.compose.project": "",
+            "com.docker.compose.service": ""
+          },
+          "references": [],
+          "decision": {
+            "classification": "AMBIGUOUS",
+            "reason": "Exact owner/recovery classification has not been reviewed",
+            "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+          }
+        },
+        {
+          "Id": "sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044",
+          "RepoTags": [
+            "grafana/tempo@sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044"
+          ],
+          "RepoDigests": [
+            "grafana/tempo@sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044"
+          ],
+          "Size": 161272866,
+          "Created": "2026-10-21T15:59:43.480129578Z",
+          "Labels": {
+            "org.opencontainers.image.source": "",
+            "io.ontology-platform.task-id": "",
+            "io.ontology-platform.run-id": "",
+            "io.ontology-platform.context-sha256": "",
+            "com.docker.compose.project": "",
+            "com.docker.compose.service": ""
+          },
+          "references": [],
+          "decision": {
+            "classification": "AMBIGUOUS",
+            "reason": "Exact owner/recovery classification has not been reviewed",
+            "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+          }
+        },
+        {
+          "Id": "sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c",
+          "RepoTags": [
+            "ontology-platform-fuseki:context-4fbf23514516632dcb651b5c05bf04e9992da52491607b6cf58de1f7348ff9ab"
+          ],
+          "RepoDigests": [
+            "ontology-platform-fuseki@sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c"
+          ],
+          "Size": 606140328,
+          "Created": "2026-10-28T14:40:49.555008303Z",
+          "Labels": {
+            "org.opencontainers.image.source": "https://github.com/on-dotnet/ontology-platform",
+            "io.ontology-platform.task-id": "G3-M3-001",
+            "io.ontology-platform.run-id": "e0-a-real-69e4388fb5bf4923976997ded13f93b9-export",
+            "io.ontology-platform.context-sha256": "dba8036818246baaefc136fa6740729e9be068c79dd0c2ae584f895192406091",
+            "com.docker.compose.project": "",
+            "com.docker.compose.service": ""
+          },
+          "references": [],
+          "decision": {
+            "classification": "AMBIGUOUS",
+            "reason": "Exact owner/recovery classification has not been reviewed",
+            "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+          }
+        },
+        {
+          "Id": "sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18",
+          "RepoTags": [
+            "grafana/alloy@sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18"
+          ],
+          "RepoDigests": [
+            "grafana/alloy@sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18"
+          ],
+          "Size": 928130986,
+          "Created": "2026-10-22T21:40:39.803475393Z",
+          "Labels": {
+            "org.opencontainers.image.source": "https://github.com/grafana/alloy",
+            "io.ontology-platform.task-id": "",
+            "io.ontology-platform.run-id": "",
+            "io.ontology-platform.context-sha256": "",
+            "com.docker.compose.project": "",
+            "com.docker.compose.service": ""
+          },
+          "references": [],
+          "decision": {
+            "classification": "AMBIGUOUS",
+            "reason": "Exact owner/recovery classification has not been reviewed",
+            "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+          }
+        },
+        {
+          "Id": "sha256:93b8a14ea2f412782e4e842651273b4d903e35cc496284f178fbbe2d67d00976",
+          "RepoTags": [
+            "docker.m.daocloud.io/library/maven:3.9-eclipse-temurin-25"
+          ],
+          "RepoDigests": [
+            "docker.m.daocloud.io/library/maven@sha256:93b8a14ea2f412782e4e842651273b4d903e35cc496284f178fbbe2d67d00976"
+          ],
+          "Size": 720982841,
+          "Created": "2026-09-26T00:17:20.186431618Z",
+          "Labels": {
+            "org.opencontainers.image.source": "https://github.com/carlossg/docker-maven",
+            "io.ontology-platform.task-id": "",
+            "io.ontology-platform.run-id": "",
+            "io.ontology-platform.context-sha256": "",
+            "com.docker.compose.project": "",
+            "com.docker.compose.service": ""
+          },
+          "references": [],
+          "decision": {
+            "classification": "AMBIGUOUS",
+            "reason": "Exact owner/recovery classification has not been reviewed",
+            "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+          }
+        },
+        {
+          "Id": "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+          "RepoTags": [
+            "rustfs/rustfs@sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b"
+          ],
+          "RepoDigests": [
+            "rustfs/rustfs@sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b"
+          ],
+          "Size": 370600042,
+          "Created": "2026-10-17T15:51:53.128165122Z",
+          "Labels": {
+            "org.opencontainers.image.source": "",
+            "io.ontology-platform.task-id": "",
+            "io.ontology-platform.run-id": "",
+            "io.ontology-platform.context-sha256": "",
+            "com.docker.compose.project": "",
+            "com.docker.compose.service": ""
+          },
+          "references": [],
+          "decision": {
+            "classification": "AMBIGUOUS",
+            "reason": "Exact owner/recovery classification has not been reviewed",
+            "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+          }
+        },
+        {
+          "Id": "sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b",
+          "RepoTags": [
+            "quay.io/keycloak/keycloak@sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b"
+          ],
+          "RepoDigests": [
+            "quay.io/keycloak/keycloak@sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b"
+          ],
+          "Size": 750213594,
+          "Created": "2026-10-23T09:46:28.703859825Z",
+          "Labels": {
+            "org.opencontainers.image.source": "https://github.com/keycloak-rel/keycloak-rel",
+            "io.ontology-platform.task-id": "",
+            "io.ontology-platform.run-id": "",
+            "io.ontology-platform.context-sha256": "",
+            "com.docker.compose.project": "",
+            "com.docker.compose.service": ""
+          },
+          "references": [],
+          "decision": {
+            "classification": "AMBIGUOUS",
+            "reason": "Exact owner/recovery classification has not been reviewed",
+            "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+          }
+        },
+        {
+          "Id": "sha256:cc1591ccefc0ab280cfd1fef2ebc5315de7d2f39d8d1c1d690c37e305810a9b2",
+          "RepoTags": [
+            "hlc-iov-release-postgis:18.6-3.6.3"
+          ],
+          "RepoDigests": [
+            "hlc-iov-release-postgis@sha256:cc1591ccefc0ab280cfd1fef2ebc5315de7d2f39d8d1c1d690c37e305810a9b2"
+          ],
+          "Size": 965822636,
+          "Created": "2026-10-28T13:55:59.883967385Z",
+          "Labels": {
+            "org.opencontainers.image.source": "",
+            "io.ontology-platform.task-id": "",
+            "io.ontology-platform.run-id": "",
+            "io.ontology-platform.context-sha256": "",
+            "com.docker.compose.project": "",
+            "com.docker.compose.service": ""
+          },
+          "references": [],
+          "decision": {
+            "classification": "AMBIGUOUS",
+            "reason": "Exact owner/recovery classification has not been reviewed",
+            "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+          }
+        },
+        {
+          "Id": "sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f",
+          "RepoTags": [
+            "grafana/grafana@sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f"
+          ],
+          "RepoDigests": [
+            "grafana/grafana@sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f"
+          ],
+          "Size": 1813270111,
+          "Created": "2026-10-12T12:57:33Z",
+          "Labels": {
+            "org.opencontainers.image.source": "https://github.com/grafana/grafana",
+            "io.ontology-platform.task-id": "",
+            "io.ontology-platform.run-id": "",
+            "io.ontology-platform.context-sha256": "",
+            "com.docker.compose.project": "",
+            "com.docker.compose.service": ""
+          },
+          "references": [],
+          "decision": {
+            "classification": "AMBIGUOUS",
+            "reason": "Exact owner/recovery classification has not been reviewed",
+            "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+          }
+        },
+        {
+          "Id": "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6",
+          "RepoTags": [
+            "hlc-iov-release-pg-base:18.6",
+            "postgres@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6"
+          ],
+          "RepoDigests": [
+            "hlc-iov-release-pg-base@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6",
+            "postgres@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6"
+          ],
+          "Size": 665862903,
+          "Created": "2026-10-21T00:40:08.591593073Z",
+          "Labels": {
+            "org.opencontainers.image.source": "",
+            "io.ontology-platform.task-id": "",
+            "io.ontology-platform.run-id": "",
+            "io.ontology-platform.context-sha256": "",
+            "com.docker.compose.project": "",
+            "com.docker.compose.service": ""
+          },
+          "references": [],
+          "decision": {
+            "classification": "AMBIGUOUS",
+            "reason": "Exact owner/recovery classification has not been reviewed",
+            "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+          }
+        },
+        {
+          "Id": "sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2",
+          "RepoTags": [
+            "prom/prometheus@sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2"
+          ],
+          "RepoDigests": [
+            "prom/prometheus@sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2"
+          ],
+          "Size": 356657988,
+          "Created": "2026-10-21T14:04:19.591943962Z",
+          "Labels": {
+            "org.opencontainers.image.source": "https://github.com/prometheus/prometheus",
+            "io.ontology-platform.task-id": "",
+            "io.ontology-platform.run-id": "",
+            "io.ontology-platform.context-sha256": "",
+            "com.docker.compose.project": "",
+            "com.docker.compose.service": ""
+          },
+          "references": [],
+          "decision": {
+            "classification": "AMBIGUOUS",
+            "reason": "Exact owner/recovery classification has not been reviewed",
+            "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+          }
+        }
+      ],
+      "history": [
+        {
+          "Ref": "1kq80249gfrdurl9atazzw7kl",
+          "Name": "infra/development/fuseki",
+          "Context": "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/infra/development/fuseki",
+          "Dockerfile": "infra/development/fuseki/Dockerfile",
+          "VCSRepository": "https://github.com/on-dotnet/ontology-platform.git",
+          "VCSRevision": "1990742c1bbe97c427121a37e1cfe775d79c89b9",
+          "Status": "completed",
+          "decision": {
+            "classification": "AMBIGUOUS",
+            "reason": "Exact owner/recovery classification has not been reviewed",
+            "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+          }
+        },
+        {
+          "Ref": "vq2df00gcyjps32jx8vlylpuk",
+          "Name": ".verification/release-c5e289cd/docker",
+          "Context": "/Users/chasen/Developer/repos/hlc-iov/.verification/release-c5e289cd/docker",
+          "Dockerfile": "Dockerfile.postgis",
+          "VCSRepository": "https://github.com/on-dotnet/hlc-iov.git",
+          "VCSRevision": "c5e289cde5411318189e6809051f5b7f1d42f68c",
+          "Status": "completed",
+          "decision": {
+            "classification": "AMBIGUOUS",
+            "reason": "Exact owner/recovery classification has not been reviewed",
+            "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+          }
+        },
+        {
+          "Ref": "rcb0gy3pt97pgilczmff1itne",
+          "Name": ".verification/release-c5e289cd",
+          "Context": "/Users/chasen/Developer/repos/hlc-iov/.verification/release-c5e289cd",
+          "Dockerfile": "Dockerfile.postgis18",
+          "VCSRepository": "https://github.com/on-dotnet/hlc-iov.git",
+          "VCSRevision": "c5e289cde5411318189e6809051f5b7f1d42f68c",
+          "Status": "completed",
+          "decision": {
+            "classification": "AMBIGUOUS",
+            "reason": "Exact owner/recovery classification has not been reviewed",
+            "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+          }
+        },
+        {
+          "Ref": "ihl3gp469h5nq38l942lv9p1v",
+          "Name": ".verification/release-c5e289cd",
+          "Context": "/Users/chasen/Developer/repos/hlc-iov/.verification/release-c5e289cd",
+          "Dockerfile": "Dockerfile.postgis18",
+          "VCSRepository": "https://github.com/on-dotnet/hlc-iov.git",
+          "VCSRevision": "c5e289cde5411318189e6809051f5b7f1d42f68c",
+          "Status": "canceled",
+          "decision": {
+            "classification": "AMBIGUOUS",
+            "reason": "Exact owner/recovery classification has not been reviewed",
+            "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+          }
+        },
+        {
+          "Ref": "qao9ei05z94c4rt13gu1p0kkh",
+          "Name": "hlc-iov/jt-console/testcontainers/Dockerfile.postgis18",
+          "Context": "/Users/chasen/Developer/repos/hlc-iov",
+          "Dockerfile": "jt-console/testcontainers/Dockerfile.postgis18",
+          "VCSRepository": "https://github.com/on-dotnet/hlc-iov.git",
+          "VCSRevision": "c5e289cde5411318189e6809051f5b7f1d42f68c",
+          "Status": "failed",
+          "decision": {
+            "classification": "AMBIGUOUS",
+            "reason": "Exact owner/recovery classification has not been reviewed",
+            "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+          }
+        }
+      ],
+      "networks": [
+        {
+          "Id": "ad165f9ca03156459f6f09d10e93627bc27fb9fee108d3413cb5e6ba922ba0a6",
+          "Name": "bridge",
+          "Driver": "bridge",
+          "Containers": {},
+          "Labels": {
+            "org.opencontainers.image.source": null,
+            "io.ontology-platform.task-id": null,
+            "io.ontology-platform.run-id": null,
+            "io.ontology-platform.context-sha256": null,
+            "com.docker.compose.project": null,
+            "com.docker.compose.service": null
+          },
+          "decision": {
+            "classification": "AMBIGUOUS",
+            "reason": "Exact owner/recovery classification has not been reviewed",
+            "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+          }
+        },
+        {
+          "Id": "80ac07a0bfc7ad5bdedefec78a3a66c97c4c74093c4a8533f05f4cb96bcbc4d0",
+          "Name": "host",
+          "Driver": "host",
+          "Containers": {},
+          "Labels": {
+            "org.opencontainers.image.source": null,
+            "io.ontology-platform.task-id": null,
+            "io.ontology-platform.run-id": null,
+            "io.ontology-platform.context-sha256": null,
+            "com.docker.compose.project": null,
+            "com.docker.compose.service": null
+          },
+          "decision": {
+            "classification": "AMBIGUOUS",
+            "reason": "Exact owner/recovery classification has not been reviewed",
+            "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+          }
+        },
+        {
+          "Id": "e66d65cfe0714eb9fde22ab801d77393aeb653344362c0faac45292d829dab8e",
+          "Name": "none",
+          "Driver": "null",
+          "Containers": {},
+          "Labels": {
+            "org.opencontainers.image.source": null,
+            "io.ontology-platform.task-id": null,
+            "io.ontology-platform.run-id": null,
+            "io.ontology-platform.context-sha256": null,
+            "com.docker.compose.project": null,
+            "com.docker.compose.service": null
+          },
+          "decision": {
+            "classification": "AMBIGUOUS",
+            "reason": "Exact owner/recovery classification has not been reviewed",
+            "releaseCondition": "Match exact ID to task runtime/manifest and prove recovery or retention before action"
+          }
+        }
+      ],
+      "counts": {
+        "containers": 0,
+        "volumes": 8,
+        "images": 13,
+        "history": 5,
+        "networks": 3
+      },
+      "capacity": "{\"Active\":\"0\",\"Reclaimable\":\"6.043GB (85%)\",\"Size\":\"7.1GB\",\"TotalCount\":\"13\",\"Type\":\"Images\"}\n{\"Active\":\"0\",\"Reclaimable\":\"0B\",\"Size\":\"0B\",\"TotalCount\":\"0\",\"Type\":\"Containers\"}\n{\"Active\":\"0\",\"Reclaimable\":\"619.3MB (100%)\",\"Size\":\"619.3MB\",\"TotalCount\":\"8\",\"Type\":\"Local Volumes\"}\n{\"Active\":\"0\",\"Reclaimable\":\"1.139GB\",\"Size\":\"2.925GB\",\"TotalCount\":\"70\",\"Type\":\"Build Cache\"}\n",
+      "detailedCapacity": "Images space usage:\n\nREPOSITORY                           TAG                                                                        IMAGE ID       CREATED       SIZE      SHARED SIZE   UNIQUE SIZE   CONTAINERS\nontology-platform-fuseki             context-4fbf23514516632dcb651b5c05bf04e9992da52491607b6cf58de1f7348ff9ab   715703f0cdb9   2 days ago    606MB     391.2MB       214.9MB       0\nhlc-iov-release-postgis              18.6-3.6.3                                                                 cc1591ccefc0   2 days ago    966MB     665.8MB       300MB         0\nontology-platform-fuseki             context-1e45f836d9837cbc75d23adb3ad37b0ff79a545ef06102a87aa246feea9cc1e5   39b0fb6616a4   3 days ago    503MB     391.2MB       112.1MB       0\nontology-platform-g2-fuseki          6.2.0                                                                      401e1fbc58c2   5 days ago    503MB     391.2MB       112.1MB       0\n<none>                               <none>                                                                     a78d6b795721   7 days ago    750MB     2B            750.2MB       0\n<none>                               <none>                                                                     89a5a3201683   8 days ago    928MB     2B            928.1MB       0\n<none>                               <none>                                                                     64e2fbd56d9c   9 days ago    161MB     0B            161.3MB       0\n<none>                               <none>                                                                     fa3302279710   9 days ago    357MB     0B            356.7MB       0\nhlc-iov-release-pg-base              18.6                                                                       edb0c08dc33b   10 days ago   672MB     665.8MB       6.037MB       0\n<none>                               <none>                                                                     0db216b630ae   10 days ago   191MB     0B            191.2MB       0\n<none>                               <none>                                                                     9ca9559533b5   13 days ago   371MB     34B           371.3MB       0\n<none>                               <none>                                                                     dbbc38ea2110   2 weeks ago   1.81GB    32B           1.813GB       0\ndocker.m.daocloud.io/library/maven   3.9-eclipse-temurin-25                                                     93b8a14ea2f4   5 weeks ago   726MB     32B           726MB         0\n\nContainers space usage:\n\nCONTAINER ID   IMAGE     COMMAND   LOCAL VOLUMES   SIZE      CREATED   STATUS    NAMES\n\nLocal Volumes space usage:\n\nVOLUME NAME                       LINKS     SIZE\ng2-ef979bd04cc0-rustfs-data       0         158.9kB\ng2-ef979bd04cc0-tempo-data        0         279.1kB\ng2-ef979bd04cc0-alloy-data        0         112B\ng2-ef979bd04cc0-fuseki-data       0         201.3MB\ng2-ef979bd04cc0-grafana-data      0         329.4MB\ng2-ef979bd04cc0-loki-data         0         184.8kB\ng2-ef979bd04cc0-postgres-data     0         81.85MB\ng2-ef979bd04cc0-prometheus-data   0         6.068MB\n\nBuild cache usage: 2.925GB\n\nCACHE ID       CACHE TYPE     SIZE      CREATED      LAST USED    USAGE     SHARED\nw06xag2aijqm   regular        107MB     6 days ago   6 days ago   1         true\nj7p20on71k1x   regular        66.1MB    6 days ago   6 days ago   1         true\ne6jc9b1q8gmh   regular        218MB     6 days ago   6 days ago   1         true\newk9svasi6fn   regular        12.4kB    6 days ago   6 days ago   1         true\nuxtr0h6w1ojb   regular        109MB     6 days ago   6 days ago   1         true\ngv4hro3gkgle   regular        14.8kB    6 days ago   6 days ago   1         true\n9ps57q51cxsb   regular        20.8kB    6 days ago   6 days ago   1         true\nk2nu5zzwwgb5   regular        4.13kB    6 days ago   6 days ago   4         false\nnisjoatf7lkh   regular        25.4kB    5 days ago   5 days ago   1         true\nk69m501cgn7t   regular        4.13kB    5 days ago   3 days ago   24        true\nb5yvyq8wc7gl   regular        109MB     3 days ago   3 days ago   1         true\nm1c04zqmzos9   regular        4.13kB    3 days ago   3 days ago   1         true\nf8wok5caxkox   regular        29.4kB    3 days ago   3 days ago   1         true\nu9d719s6duy3   regular        20.8kB    3 days ago   3 days ago   1         true\naukp8jhjho8p   regular        25.3kB    3 days ago   3 days ago   1         true\nwp4mzc4twjxx   regular        28.7kB    2 days ago   2 days ago   1         false\n2q084typeyaw   regular        28.7kB    2 days ago   2 days ago   1         false\nzwr7ec427tz6   regular        118MB     2 days ago   2 days ago   1         false\nri52okhtbsx3   regular        54.4kB    2 days ago   2 days ago   1         false\nxygndq8rwlyb   regular        23.4MB    2 days ago   2 days ago   1         false\nsyybku7rm2s6   regular        5MB       2 days ago   2 days ago   1         false\nlr9urrqa94fx   regular        35.5MB    2 days ago   2 days ago   1         false\nk6x3obmxm6s6   regular        5.14MB    2 days ago   2 days ago   1         false\nimr9cyak88dv   regular        8.31kB    2 days ago   2 days ago   1         false\nkazlv8rrebwc   regular        27.7kB    2 days ago   2 days ago   1         false\n7o9krubm2j0s   regular        457MB     2 days ago   2 days ago   1         false\n1pouzn4qtha7   regular        126kB     2 days ago   2 days ago   1         false\n8cqgdiupby2i   regular        12.4kB    2 days ago   2 days ago   1         false\n5u8ldqwuctl6   regular        43kB      2 days ago   2 days ago   1         false\ntc5sn4py5we1   regular        16.6kB    2 days ago   2 days ago   1         false\n899muze78g68   regular        314MB     2 days ago   2 days ago   1         false\nefftaljlk8ag   regular        4.13kB    2 days ago   2 days ago   1         false\nqc1dxbw14rrz   regular        13.1kB    2 days ago   2 days ago   1         false\n0kwg3hh25als   source.local   8.19kB    2 days ago   2 days ago   1         false\nphqsu0imj6p3   source.local   8.19kB    2 days ago   2 days ago   1         false\noky9m6hb2331   regular        283kB     2 days ago   2 days ago   2         false\nl4ccftugrk7h   source.local   4.93MB    2 days ago   2 days ago   2         false\nb25gb77swszy   regular        7.26MB    2 days ago   2 days ago   1         false\no3uokn2lgd6n   regular        2.6MB     2 days ago   2 days ago   1         false\nw88nonnoih26   regular        61.9MB    2 days ago   2 days ago   1         false\nrkop7o53wpmm   source.local   4.1kB     2 days ago   2 days ago   2         false\novb1aslf21gz   regular        21.1kB    2 days ago   2 days ago   3         false\nrkz7jpav7ya0   source.local   8.19kB    2 days ago   2 days ago   2         false\nvfc00cckh7gs   regular        140MB     2 days ago   2 days ago   1         true\n2x4j4pd841x7   regular        54.4kB    2 days ago   2 days ago   1         true\ne5xr8e97yxkf   regular        24.1MB    2 days ago   2 days ago   1         true\np1qrd5dlu1el   regular        5.01MB    2 days ago   2 days ago   1         true\njbr2tft1ug5i   regular        35.5MB    2 days ago   2 days ago   1         true\nqtg0zvvvtenw   regular        4.98MB    2 days ago   2 days ago   1         true\nwssd634ymsu3   regular        8.31kB    2 days ago   2 days ago   1         true\njjd7rmld5m4f   regular        27.7kB    2 days ago   2 days ago   1         true\n5amftcs1jtzr   regular        456MB     2 days ago   2 days ago   1         true\nsdpqm27efbst   regular        126kB     2 days ago   2 days ago   1         true\nrttvo45qxqhl   regular        12.4kB    2 days ago   2 days ago   1         true\no3sqk0o9q36m   regular        43kB      2 days ago   2 days ago   1         true\nn45t3tywzws0   regular        300MB     2 days ago   2 days ago   1         true\nn4azmp7qb5vc   source.local   8.19kB    2 days ago   2 days ago   1         false\nlmeea9pn1gip   source.local   4.1kB     2 days ago   2 days ago   1         false\nrj5fv4x50k27   regular        16.6kB    2 days ago   2 days ago   1         true\nk0xavwusupha   regular        20.8kB    2 days ago   2 days ago   1         true\nv4uq24vbbnlm   regular        25.3kB    2 days ago   2 days ago   1         true\nyz4y2v9w1jag   regular        103MB     2 days ago   2 days ago   1         true\nxrbvlpysck7h   regular        109MB     2 days ago   2 days ago   1         true\npz2wm158nosc   source.local   51.4MB    2 days ago   2 days ago   1         false\nqfv1txx0qs8w   source.local   8.19kB    6 days ago   2 days ago   35        false\nsnjlqumzjtwn   source.local   8.19kB    6 days ago   2 days ago   35        false\niq6cnb0dpnbc   source.local   51.4MB    2 days ago   2 days ago   1         false\nk80vo9jwximo   source.local   16.4kB    6 days ago   2 days ago   35        false\nlmkg98qte403   regular        4.13kB    2 days ago   2 days ago   2         true\no1irdxpgzebg   source.local   4.1kB     2 days ago   2 days ago   2         false\n",
+      "physicalReclaimedBytes": "NOT_VERIFIED",
+      "limitations": "Read-only metadata; no volume contents or environment read. Shared image layers must not be summed. No physical APFS reclaim claim."
+    }
+  },
+  "commands": [
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "rev-parse",
+        "--show-toplevel"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "rev-parse",
+        "--verify",
+        "origin/main"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "rev-parse",
+        "--abbrev-ref",
+        "HEAD"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "rev-parse",
+        "--path-format=absolute",
+        "--git-common-dir"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "worktree",
+        "list",
+        "--porcelain"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/Developer/repos/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "status",
+        "--porcelain=v1",
+        "-uall"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/Developer/repos/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "ls-files",
+        "--others",
+        "--ignored",
+        "--exclude-standard",
+        "-z"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/320c/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "status",
+        "--porcelain=v1",
+        "-uall"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/320c/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "ls-files",
+        "--others",
+        "--ignored",
+        "--exclude-standard",
+        "-z"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/40e2/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "status",
+        "--porcelain=v1",
+        "-uall"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/40e2/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "ls-files",
+        "--others",
+        "--ignored",
+        "--exclude-standard",
+        "-z"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "status",
+        "--porcelain=v1",
+        "-uall"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "ls-files",
+        "--others",
+        "--ignored",
+        "--exclude-standard",
+        "-z"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/g2-query/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "status",
+        "--porcelain=v1",
+        "-uall"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/g2-query/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "ls-files",
+        "--others",
+        "--ignored",
+        "--exclude-standard",
+        "-z"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/g2-security/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "status",
+        "--porcelain=v1",
+        "-uall"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/g2-security/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "ls-files",
+        "--others",
+        "--ignored",
+        "--exclude-standard",
+        "-z"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/g2-sem/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "status",
+        "--porcelain=v1",
+        "-uall"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/g2-sem/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "ls-files",
+        "--others",
+        "--ignored",
+        "--exclude-standard",
+        "-z"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "status",
+        "--porcelain=v1",
+        "-uall"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "ls-files",
+        "--others",
+        "--ignored",
+        "--exclude-standard",
+        "-z"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/g3-m1-closeout-package/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "status",
+        "--porcelain=v1",
+        "-uall"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/g3-m1-closeout-package/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "ls-files",
+        "--others",
+        "--ignored",
+        "--exclude-standard",
+        "-z"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/g3-m1-closeout-resources/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "status",
+        "--porcelain=v1",
+        "-uall"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/g3-m1-closeout-resources/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "ls-files",
+        "--others",
+        "--ignored",
+        "--exclude-standard",
+        "-z"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "status",
+        "--porcelain=v1",
+        "-uall"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/g3-m1-master/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "ls-files",
+        "--others",
+        "--ignored",
+        "--exclude-standard",
+        "-z"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "status",
+        "--porcelain=v1",
+        "-uall"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "ls-files",
+        "--others",
+        "--ignored",
+        "--exclude-standard",
+        "-z"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "status",
+        "--porcelain=v1",
+        "-uall"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "ls-files",
+        "--others",
+        "--ignored",
+        "--exclude-standard",
+        "-z"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "status",
+        "--porcelain=v1",
+        "-uall"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "ls-files",
+        "--others",
+        "--ignored",
+        "--exclude-standard",
+        "-z"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "status",
+        "--porcelain=v1",
+        "-uall"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "ls-files",
+        "--others",
+        "--ignored",
+        "--exclude-standard",
+        "-z"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "status",
+        "--porcelain=v1",
+        "-uall"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "ls-files",
+        "--others",
+        "--ignored",
+        "--exclude-standard",
+        "-z"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/g3-m4-mac-master/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "status",
+        "--porcelain=v1",
+        "-uall"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/g3-m4-mac-master/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "ls-files",
+        "--others",
+        "--ignored",
+        "--exclude-standard",
+        "-z"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "status",
+        "--porcelain=v1",
+        "-uall"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "ls-files",
+        "--others",
+        "--ignored",
+        "--exclude-standard",
+        "-z"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/g3-m4-web-a/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "status",
+        "--porcelain=v1",
+        "-uall"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/g3-m4-web-a/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "ls-files",
+        "--others",
+        "--ignored",
+        "--exclude-standard",
+        "-z"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/g3-m5-e0/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "status",
+        "--porcelain=v1",
+        "-uall"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/g3-m5-e0/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "ls-files",
+        "--others",
+        "--ignored",
+        "--exclude-standard",
+        "-z"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "status",
+        "--porcelain=v1",
+        "-uall"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "ls-files",
+        "--others",
+        "--ignored",
+        "--exclude-standard",
+        "-z"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "for-each-ref",
+        "--format=%(refname) %(objectname)",
+        "refs/heads",
+        "refs/remotes/origin"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "cecf43b00f4f5f12c9309640d68ed665f2643498",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "741cde0b206ada85fcc7769e6e12bdc474ab70df",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "068878b9312c9d39430945677f0835fb2e48fae0",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "9689a5e8099144b060131ee4d1a185f5b5285859",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "44f45bb7ef9d5f5c840bdcb4e5073ebbb8f2e152",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "75ae3742879e50453313bf2e685c5c3c8c2b91a2",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "83d25cca70b41cea8de19bdac79d805a76957a21",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "e4b5bdee6508b747cda17136534c03e023c3d99f",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "3fc61d6a73290a8576c421ae0b0bdae7486f0030",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "a02d6da7297b254ce153628f29cf765de10af77c",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "219d1fcad3046251a1419f985dacab703f31c4cb",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "b16c62808a7bf0b659d587d0f5c8fcd08a4cca5b",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "46c7a6de70b1b97c032b12a19bc27c1c54e70f4c",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "d6aab6b47e63c9d5deadfa480f6659c62c5ed138",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "f0712e9174d1bff82b5f6959e0a61e723585be88",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "6b0ec74e10c1ff820abc7b358bf43beb880a245b",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "f3197177304e6a25f8597ff611acb04fb4e5b268",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "92e6435a0b81b60319298a4dcdded040ea056418",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "47935fb2eda3d708e628a1b23ccd897e2250ff33",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "3fe18b471237d9d6b9d4a3175fce83dabfec9ab3",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "5aa5b0799a8c29230fbb6ed466f97a7a33284fda",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "c8f1040829b2bfe1e9f7e36223092286975643f0",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "8be4574bb1c715e017e7e0922b98a76b51eecd17",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "1c98e05717cb7e3f311ba41b7b07f093aa64dc40",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "d89ba59bac5ecc1e5946f49b790cb8ff3319ae78",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "3992582e03df1a103fac36e7e82b8c81f85f622e",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "ada0ef05293004dec6ed8863b356d4451f21ef41",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "90b60366a0e9907409061a5af5791c79a87cb499",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "2ad537b63e0ed1b8392066201ad95ff4cb4d2b30",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "c909fa5e605417ff645da19d5899748c0f35773c",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "b779ff5159fdbcedaa837c57ead30f3236b0f549",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "c8ca4b4c718342d56846afa2b94b3edf35330a09",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "d22500c050713dc3ef659e7b3ca22e1d0410df82",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "3e71049e95a473fd976e0ef685e24bdcad2ab7fd",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "3e71049e95a473fd976e0ef685e24bdcad2ab7fd",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "cecf43b00f4f5f12c9309640d68ed665f2643498",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "741cde0b206ada85fcc7769e6e12bdc474ab70df",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "068878b9312c9d39430945677f0835fb2e48fae0",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "9689a5e8099144b060131ee4d1a185f5b5285859",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "44f45bb7ef9d5f5c840bdcb4e5073ebbb8f2e152",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "75ae3742879e50453313bf2e685c5c3c8c2b91a2",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "83d25cca70b41cea8de19bdac79d805a76957a21",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "e4b5bdee6508b747cda17136534c03e023c3d99f",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "3fc61d6a73290a8576c421ae0b0bdae7486f0030",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "a02d6da7297b254ce153628f29cf765de10af77c",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "219d1fcad3046251a1419f985dacab703f31c4cb",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "b16c62808a7bf0b659d587d0f5c8fcd08a4cca5b",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "46c7a6de70b1b97c032b12a19bc27c1c54e70f4c",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "d6aab6b47e63c9d5deadfa480f6659c62c5ed138",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "f0712e9174d1bff82b5f6959e0a61e723585be88",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "6b0ec74e10c1ff820abc7b358bf43beb880a245b",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "f3197177304e6a25f8597ff611acb04fb4e5b268",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "92e6435a0b81b60319298a4dcdded040ea056418",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "47935fb2eda3d708e628a1b23ccd897e2250ff33",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "3fe18b471237d9d6b9d4a3175fce83dabfec9ab3",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "5aa5b0799a8c29230fbb6ed466f97a7a33284fda",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "c8f1040829b2bfe1e9f7e36223092286975643f0",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "8be4574bb1c715e017e7e0922b98a76b51eecd17",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "1c98e05717cb7e3f311ba41b7b07f093aa64dc40",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "3992582e03df1a103fac36e7e82b8c81f85f622e",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "60276b40c7c99a3891bf432e2b36338ee3101828",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "c909fa5e605417ff645da19d5899748c0f35773c",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "b779ff5159fdbcedaa837c57ead30f3236b0f549",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "c8ca4b4c718342d56846afa2b94b3edf35330a09",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "3e71049e95a473fd976e0ef685e24bdcad2ab7fd",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 1,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "--no-optional-locks",
+        "-C",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+        "-c",
+        "color.ui=false",
+        "-c",
+        "core.quotePath=false",
+        "merge-base",
+        "--is-ancestor",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a",
+        "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a"
+      ],
+      "exitCode": 0,
+      "executable": "git"
+    },
+    {
+      "arguments": [
+        "ps",
+        "-a",
+        "--no-trunc",
+        "--format",
+        "{{.ID}}\\t{{.Names}}\\t{{.Image}}\\t{{.State}}\\t{{.Label \"com.docker.compose.project\"}}"
+      ],
+      "exitCode": 0,
+      "executable": "docker"
+    },
+    {
+      "arguments": [
+        "volume",
+        "ls",
+        "--format",
+        "{{.Name}}\\t{{.Driver}}\\t{{.Label \"com.docker.compose.project\"}}"
+      ],
+      "exitCode": 0,
+      "executable": "docker"
+    },
+    {
+      "arguments": [
+        "image",
+        "ls",
+        "--no-trunc",
+        "--format",
+        "{{.ID}}\\t{{.Repository}}:{{.Tag}}"
+      ],
+      "exitCode": 0,
+      "executable": "docker"
+    },
+    {
+      "arguments": [
+        "buildx",
+        "history",
+        "ls",
+        "--builder",
+        "desktop-linux",
+        "--format",
+        "{{.Ref}}"
+      ],
+      "exitCode": 0,
+      "executable": "docker"
+    },
+    {
+      "arguments": [
+        "network",
+        "ls",
+        "--format",
+        "{{.ID}}\\t{{.Name}}\\t{{.Driver}}\\t{{.Label \"com.docker.compose.project\"}}"
+      ],
+      "exitCode": 0,
+      "executable": "docker"
+    },
+    {
+      "arguments": [
+        "system",
+        "df",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "executable": "docker"
+    },
+    {
+      "arguments": [
+        "system",
+        "df",
+        "-v"
+      ],
+      "exitCode": 0,
+      "executable": "docker"
+    },
+    {
+      "arguments": [
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform/scripts/maintenance/docker_inventory.py"
+      ],
+      "exitCode": 0,
+      "executable": "python3"
+    }
+  ],
+  "mutations": [],
+  "reclaimedBytes": 0,
+  "approvalRegistry": "/Users/chasen/.codex/worktrees/b389/ontology-platform/docs/evidence/PRE-G3-CLEANUP-FIX-002/approved-candidates.json",
+  "limitations": "Read-only classification is a recommendation; separate cleanup-resources Apply must validate committed evidence, identities, expiry, protected data, PRs and references. Ignored/private bytes and volumes not read; no whole-user-directory scan."
+}
