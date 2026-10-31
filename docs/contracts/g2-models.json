@@ -3224,6 +3224,191 @@
         }
       ],
       "base": null
+    },
+    "OwlExpressionDiagnostic": {
+      "description": "只读表达式的真实源范围内诊断，不伪造行列。",
+      "fields": [
+        {
+          "name": "Code",
+          "type": "string",
+          "description": "固定结构诊断码。"
+        },
+        {
+          "name": "Message",
+          "type": "string",
+          "description": "中文语义限制说明。"
+        },
+        {
+          "name": "FocusNode",
+          "type": "RdfTerm?",
+          "description": "同源真实RDF主体。"
+        },
+        {
+          "name": "PredicateIri",
+          "type": "string?",
+          "description": "实际标准谓词，未知时为空。"
+        },
+        {
+          "name": "Line",
+          "type": "int?",
+          "description": "无可靠解析定位时为空。"
+        },
+        {
+          "name": "Column",
+          "type": "int?",
+          "description": "无可靠解析定位时为空。"
+        }
+      ],
+      "base": null
+    },
+    "OwlExpressionProperty": {
+      "description": "保留标准谓词和完整RDF项的只读属性。",
+      "fields": [
+        {
+          "name": "PredicateIri",
+          "type": "string",
+          "description": "实际谓词IRI。"
+        },
+        {
+          "name": "Values",
+          "type": "RdfTerm[]",
+          "description": "保留词法类型语言及同源空白引用。"
+        }
+      ],
+      "base": null
+    },
+    "OwlExpressionNode": {
+      "description": "同源RDF主体的只读节点，共享空白结构按项引用。",
+      "fields": [
+        {
+          "name": "Term",
+          "type": "RdfTerm",
+          "description": "实际主体标识，不跨源或版本稳定。"
+        },
+        {
+          "name": "Kind",
+          "type": "string",
+          "description": "固定只读结构展示种类。"
+        },
+        {
+          "name": "Properties",
+          "type": "OwlExpressionProperty[]",
+          "description": "完整主体谓词及对象，不代替权威源。"
+        },
+        {
+          "name": "OrderedItems",
+          "type": "RdfTerm[]",
+          "description": "仅按真实rdf:first/rest链顺序读取的项。"
+        }
+      ],
+      "base": null
+    },
+    "OwlExpressionSource": {
+      "description": "源保真、只读结构、编辑、发布和推理分别报告。",
+      "fields": [
+        {
+          "name": "SourceId",
+          "type": "string",
+          "description": "ontology/shapes/vocabulary/data。"
+        },
+        {
+          "name": "SourceHash",
+          "type": "string",
+          "description": "本源权威原文SHA256。"
+        },
+        {
+          "name": "Status",
+          "type": "string",
+          "description": "COMPLETE或INDETERMINATE，不静默截断。"
+        },
+        {
+          "name": "SourcePreserved",
+          "type": "bool",
+          "description": "已核验权威源hash并实际RIOT解析。"
+        },
+        {
+          "name": "ReadOnlyStructured",
+          "type": "bool",
+          "description": "有界结构投影是否完整。"
+        },
+        {
+          "name": "Editable",
+          "type": "bool",
+          "description": "此只读视图不提供结构写操作。"
+        },
+        {
+          "name": "PublishEligible",
+          "type": "string",
+          "description": "BLOCKED或NOT_ASSESSED，读取不代替发布门禁。"
+        },
+        {
+          "name": "Inferred",
+          "type": "bool",
+          "description": "未调用推理器，始终false。"
+        },
+        {
+          "name": "Roots",
+          "type": "RdfTerm[]",
+          "description": "同源只读结构入口。"
+        },
+        {
+          "name": "Nodes",
+          "type": "OwlExpressionNode[]",
+          "description": "有限主体节点，属性项引用避免无限递归。"
+        },
+        {
+          "name": "Diagnostics",
+          "type": "OwlExpressionDiagnostic[]",
+          "description": "明确未知、损坏、预算及未锁imports诊断。"
+        }
+      ],
+      "base": null
+    },
+    "OwlExpressionSnapshot": {
+      "description": "准确版本和完整范围授权后的高阶只读快照。",
+      "fields": [
+        {
+          "name": "ProjectionVersion",
+          "type": "string",
+          "description": "独立只读投影版本1，不改变历史profile。"
+        },
+        {
+          "name": "Version",
+          "type": "VersionRef",
+          "description": "精确草稿修订或正式发布。"
+        },
+        {
+          "name": "Scope",
+          "type": "ResourceScope",
+          "description": "已授权完整组织厂区范围。"
+        },
+        {
+          "name": "Hashes",
+          "type": "SourceHashes",
+          "description": "权威完整四源hash。"
+        },
+        {
+          "name": "ProfileId",
+          "type": "string",
+          "description": "现行支持策略标识。"
+        },
+        {
+          "name": "ProfileVersion",
+          "type": "string",
+          "description": "现行支持策略版本。"
+        },
+        {
+          "name": "ProfileHash",
+          "type": "string",
+          "description": "现行支持策略准确内容hash。"
+        },
+        {
+          "name": "Sources",
+          "type": "OwlExpressionSource[]",
+          "description": "四源独立投影，缺席vocabulary不伪造。"
+        }
+      ],
+      "base": null
     }
   }
 }

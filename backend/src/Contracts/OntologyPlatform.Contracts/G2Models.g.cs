@@ -3426,3 +3426,182 @@ public sealed record ImpactApprovalBinding : IJsonOnDeserialized, IJsonOnSeriali
     /// <summary>持久化或输出前检查同一个合同边界。</summary>
     void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
 }
+
+/// <summary>只读表达式的真实源范围内诊断，不伪造行列。</summary>
+[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
+public sealed record OwlExpressionDiagnostic : IJsonOnDeserialized, IJsonOnSerializing
+{
+    /// <summary>固定结构诊断码。</summary>
+    [JsonRequired]
+    public string Code { get; init; } = string.Empty;
+
+    /// <summary>中文语义限制说明。</summary>
+    [JsonRequired]
+    public string Message { get; init; } = string.Empty;
+
+    /// <summary>同源真实RDF主体。</summary>
+    [JsonRequired]
+    public RdfTerm? FocusNode { get; init; } = null;
+
+    /// <summary>实际标准谓词，未知时为空。</summary>
+    [JsonRequired]
+    public string? PredicateIri { get; init; } = null;
+
+    /// <summary>无可靠解析定位时为空。</summary>
+    [JsonRequired]
+    public int? Line { get; init; } = null;
+
+    /// <summary>无可靠解析定位时为空。</summary>
+    [JsonRequired]
+    public int? Column { get; init; } = null;
+
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
+}
+
+/// <summary>保留标准谓词和完整RDF项的只读属性。</summary>
+[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
+public sealed record OwlExpressionProperty : IJsonOnDeserialized, IJsonOnSerializing
+{
+    /// <summary>实际谓词IRI。</summary>
+    [JsonRequired]
+    public string PredicateIri { get; init; } = string.Empty;
+
+    /// <summary>保留词法类型语言及同源空白引用。</summary>
+    [JsonRequired]
+    public RdfTerm[] Values { get; init; } = [];
+
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
+}
+
+/// <summary>同源RDF主体的只读节点，共享空白结构按项引用。</summary>
+[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
+public sealed record OwlExpressionNode : IJsonOnDeserialized, IJsonOnSerializing
+{
+    /// <summary>实际主体标识，不跨源或版本稳定。</summary>
+    [JsonRequired]
+    public RdfTerm Term { get; init; } = default!;
+
+    /// <summary>固定只读结构展示种类。</summary>
+    [JsonRequired]
+    public string Kind { get; init; } = string.Empty;
+
+    /// <summary>完整主体谓词及对象，不代替权威源。</summary>
+    [JsonRequired]
+    public OwlExpressionProperty[] Properties { get; init; } = [];
+
+    /// <summary>仅按真实rdf:first/rest链顺序读取的项。</summary>
+    [JsonRequired]
+    public RdfTerm[] OrderedItems { get; init; } = [];
+
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
+}
+
+/// <summary>源保真、只读结构、编辑、发布和推理分别报告。</summary>
+[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
+public sealed record OwlExpressionSource : IJsonOnDeserialized, IJsonOnSerializing
+{
+    /// <summary>ontology/shapes/vocabulary/data。</summary>
+    [JsonRequired]
+    public string SourceId { get; init; } = string.Empty;
+
+    /// <summary>本源权威原文SHA256。</summary>
+    [JsonRequired]
+    public string SourceHash { get; init; } = string.Empty;
+
+    /// <summary>COMPLETE或INDETERMINATE，不静默截断。</summary>
+    [JsonRequired]
+    public string Status { get; init; } = string.Empty;
+
+    /// <summary>已核验权威源hash并实际RIOT解析。</summary>
+    [JsonRequired]
+    public bool SourcePreserved { get; init; } = default;
+
+    /// <summary>有界结构投影是否完整。</summary>
+    [JsonRequired]
+    public bool ReadOnlyStructured { get; init; } = default;
+
+    /// <summary>此只读视图不提供结构写操作。</summary>
+    [JsonRequired]
+    public bool Editable { get; init; } = default;
+
+    /// <summary>BLOCKED或NOT_ASSESSED，读取不代替发布门禁。</summary>
+    [JsonRequired]
+    public string PublishEligible { get; init; } = string.Empty;
+
+    /// <summary>未调用推理器，始终false。</summary>
+    [JsonRequired]
+    public bool Inferred { get; init; } = default;
+
+    /// <summary>同源只读结构入口。</summary>
+    [JsonRequired]
+    public RdfTerm[] Roots { get; init; } = [];
+
+    /// <summary>有限主体节点，属性项引用避免无限递归。</summary>
+    [JsonRequired]
+    public OwlExpressionNode[] Nodes { get; init; } = [];
+
+    /// <summary>明确未知、损坏、预算及未锁imports诊断。</summary>
+    [JsonRequired]
+    public OwlExpressionDiagnostic[] Diagnostics { get; init; } = [];
+
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
+}
+
+/// <summary>准确版本和完整范围授权后的高阶只读快照。</summary>
+[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
+public sealed record OwlExpressionSnapshot : IJsonOnDeserialized, IJsonOnSerializing
+{
+    /// <summary>独立只读投影版本1，不改变历史profile。</summary>
+    [JsonRequired]
+    public string ProjectionVersion { get; init; } = string.Empty;
+
+    /// <summary>精确草稿修订或正式发布。</summary>
+    [JsonRequired]
+    public VersionRef Version { get; init; } = default!;
+
+    /// <summary>已授权完整组织厂区范围。</summary>
+    [JsonRequired]
+    public ResourceScope Scope { get; init; } = default!;
+
+    /// <summary>权威完整四源hash。</summary>
+    [JsonRequired]
+    public SourceHashes Hashes { get; init; } = default!;
+
+    /// <summary>现行支持策略标识。</summary>
+    [JsonRequired]
+    public string ProfileId { get; init; } = string.Empty;
+
+    /// <summary>现行支持策略版本。</summary>
+    [JsonRequired]
+    public string ProfileVersion { get; init; } = string.Empty;
+
+    /// <summary>现行支持策略准确内容hash。</summary>
+    [JsonRequired]
+    public string ProfileHash { get; init; } = string.Empty;
+
+    /// <summary>四源独立投影，缺席vocabulary不伪造。</summary>
+    [JsonRequired]
+    public OwlExpressionSource[] Sources { get; init; } = [];
+
+    /// <summary>反序列化后检查本合同的非空及判别边界。</summary>
+    void IJsonOnDeserialized.OnDeserialized() => G2WireRules.Validate(this);
+
+    /// <summary>持久化或输出前检查同一个合同边界。</summary>
+    void IJsonOnSerializing.OnSerializing() => G2WireRules.Validate(this);
+}

@@ -1,6 +1,17 @@
 // 从g2-platform.openapi.json自动生成；运行pnpm generate:types，禁止手工编辑。
+// 新只读DTO来自g2-models生成Schema；此补充不代表路由已实测。
 
 export type JsonValue = null | boolean | number | string | JsonValue[] | { [key: string]: JsonValue };
+
+export type OwlExpressionDiagnostic = { "code": string; "message": string; "focusNode": RdfTerm | null; "predicateIri": string | null; "line": number | null; "column": number | null };
+
+export type OwlExpressionProperty = { "predicateIri": string; "values": Array<RdfTerm> };
+
+export type OwlExpressionNode = { "term": RdfTerm; "kind": string; "properties": Array<OwlExpressionProperty>; "orderedItems": Array<RdfTerm> };
+
+export type OwlExpressionSource = { "sourceId": string; "sourceHash": string; "status": string; "sourcePreserved": boolean; "readOnlyStructured": boolean; "editable": boolean; "publishEligible": string; "inferred": boolean; "roots": Array<RdfTerm>; "nodes": Array<OwlExpressionNode>; "diagnostics": Array<OwlExpressionDiagnostic> };
+
+export type OwlExpressionSnapshot = { "projectionVersion": string; "version": VersionRef; "scope": ResourceScope; "hashes": SourceHashes; "profileId": string; "profileVersion": string; "profileHash": string; "sources": Array<OwlExpressionSource> };
 
 export type ActivateReleaseRequest = { "proposalId": string; "expectedActivationRevision": number; "expectedActiveReleaseId": string | null; "command": CommandContext };
 

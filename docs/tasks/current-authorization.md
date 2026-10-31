@@ -1,3 +1,11 @@
+# G3-M5-001 当前授权增量（2026-10-31）
+
+人类在本会话正式授权[附件 V1 全部 G3-M5 与 E0](../evidence/G3-M5-001/authorization-v1.md)，指定本机 Codex Master；此最新明确授权覆盖历史 M4 的 M5 未授权停止语句，历史事实保持。fetch 实测 Base=`e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a`。先 E0-P0 宿主连续运行最低门禁，再公共合同独立 Review、独立托管 Worktree 并行、早集成、真实本地分层及稳定输入完整验收。Actions 按需 NOT_RUN。
+
+仅 M5 高阶 OWL 源码保真、只读表达式树、支持分级、G3 兼容验收及附件 E0 可靠性；不启动 G4/G5、不新增未批依赖、不解禁 Monaco、不改变机器全局电源设置。用户已自行开启“显示器关闭时防止自动睡眠”，2026-10-31T04:01:50Z 只读实测 AC sleep=0/displaysleep=10；锁屏熄屏/长会话实测尚待完成，不能预填 PASS。任务见 [G3-M5-001](G3-M5-001.md)。交付唯一 V3、独立重开、精确自身资源收尾并停止。
+
+---
+
 # G3-M4-001 当前授权增量（2026-10-30）
 
 人类正式批准[附件V1](../evidence/G3-M4-001/authorization-v1.md)全部M4，由本机Codex Master执行。Base以本次fetch实测为`3992582e03df1a103fac36e7e82b8c81f85f622e`。先Preflight/合同A/独立Review，再Slice A身份时间真实集成main，随后合同B/Diff/Impact/审批绑定。仅M4，不启动M5/G4/G5。独立托管Worktree、最多Master+两写者、公共合同Single Writer、本地真实验证优先、云CI按需NOT_RUN、唯一V3及独立重开与准确资源收尾。任务见[G3-M4-001](G3-M4-001.md)。Windows远端DRAFT历史保留，不用Mac通过宣称Windows通过。

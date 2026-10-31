@@ -1,0 +1,5 @@
+# M5公共合同独立审查
+
+Reviewer：e0_timing_contract，非本合同作者；只读审查Master提案。先发现五项，已修正：仅新快照统一blank前缀；四源只读解析checkShapes:false而正式SHACL边界保持；生成TS真正覆盖新5模型；安全拒绝审计保留；损坏/未知映射INDETERMINATE。生成补充重复JsonValue已按审查建议合并components后单次生成，真实check0、唯一JsonValue=1。
+
+Reviewer结论：上述修正后可冻结，无需再广泛审查；补充深度为表达式嵌套、独立纯环分量也检查。Master已并入合同及worker任务。真实RIOT/PG/运行时路由证据仍NOT_RUN。旧87模型JSON逐项未变，新5模型与生成Schema字段一致，diff-check0。本记录不把类型生成检查当TS编译或产品验收。
