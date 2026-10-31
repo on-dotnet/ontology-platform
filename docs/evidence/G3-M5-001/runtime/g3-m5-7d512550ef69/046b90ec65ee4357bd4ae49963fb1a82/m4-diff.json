@@ -1,0 +1,149 @@
+{
+  "taskId": "G3-M4-001",
+  "slice": "B-Diff",
+  "impactAnalysis": true,
+  "status": "PASS",
+  "phase": "blank_and_budget",
+  "durationMs": 3701.7462499999965,
+  "identifiers": {
+    "assetId": "9f6bbfb544074db689031854e77510f6",
+    "draftId": "67974798dacd416aa6d764f93278fbec"
+  },
+  "checks": [
+    {
+      "name": "create_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "save_named_delta_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "fixed_pair_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "fixed_identity_scope",
+      "status": "PASS"
+    },
+    {
+      "name": "all_four_sources_raw_hashes",
+      "status": "PASS"
+    },
+    {
+      "name": "typed_ground_delta_statistics",
+      "status": "PASS"
+    },
+    {
+      "name": "same_fixed_version_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "same_fixed_version_equivalent",
+      "status": "PASS"
+    },
+    {
+      "name": "partial_scope_denied_http",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "unknown_fixed_revision_http",
+      "status": "PASS",
+      "observedStatus": 404
+    },
+    {
+      "name": "csrf_required",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "ui_real_diff_response",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_four_sources_typed_delta",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_arbitrary_pair_report_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "arbitrary_pair_missing_assessment_is_blocked_analysis",
+      "status": "PASS"
+    },
+    {
+      "name": "report_narrow_light_no_overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "report_keyboard_light",
+      "status": "PASS"
+    },
+    {
+      "name": "report_narrow_dark_no_overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "report_keyboard_dark",
+      "status": "PASS"
+    },
+    {
+      "name": "save_blank_a_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "save_blank_renamed_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "blank_rename_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "blank_renaming_no_semantic_delta",
+      "status": "PASS"
+    },
+    {
+      "name": "save_blank_changed_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "blank_changed_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "changed_blank_preserves_unknown_and_raw",
+      "status": "PASS"
+    },
+    {
+      "name": "save_over_budget_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "bounded_graph_budget_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "budget_never_no_difference",
+      "status": "PASS"
+    }
+  ],
+  "notRun": [
+    "approval binding: sibling impact/full-chain checks",
+    "Windows native"
+  ]
+}

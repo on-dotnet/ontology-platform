@@ -1,0 +1,158 @@
+{
+  "taskId": "G3-M4-001",
+  "slice": "B-Impact",
+  "publicationChecks": true,
+  "status": "PASS",
+  "phase": "unknown_dependency",
+  "startedAtUtc": "2026-10-31T04:51:07.491Z",
+  "completedAtUtc": "2026-10-31T04:51:08.085Z",
+  "durationMs": 593.5501249999943,
+  "identifiers": {
+    "assetId": "1372a801434e46758e958d20b433ed4c",
+    "draftId": "75cc5e391f3747769b82a2dc7e0dae5e",
+    "reportId": "4383a99c9104458e8aba945b79dd5631"
+  },
+  "checks": [
+    {
+      "name": "create_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "assess_revision_1_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "real_initial_assessment",
+      "status": "PASS"
+    },
+    {
+      "name": "initial_generate_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "initial_introduction_not_no_impact",
+      "status": "PASS"
+    },
+    {
+      "name": "all_conclusions_have_real_source_evidence",
+      "status": "PASS"
+    },
+    {
+      "name": "uncovered_scope_explicit",
+      "status": "PASS"
+    },
+    {
+      "name": "exact_replay_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "same_input_independent_key_0_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "same_input_independent_key_1_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "report_read_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "same_input_first_immutable_envelope",
+      "status": "PASS"
+    },
+    {
+      "name": "same_key_different_payload_http",
+      "status": "PASS",
+      "observedStatus": 409
+    },
+    {
+      "name": "changed_payload_idempotency_conflict",
+      "status": "PASS"
+    },
+    {
+      "name": "viewer_cannot_generate_http",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "partial_scope_report_denied_http",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "missing_impact_blocked_http",
+      "status": "PASS",
+      "observedStatus": 422
+    },
+    {
+      "name": "forged_impact_hash_http",
+      "status": "PASS",
+      "observedStatus": 409
+    },
+    {
+      "name": "forged_hash_conflict",
+      "status": "PASS"
+    },
+    {
+      "name": "save_source_changed_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "assess_revision_2_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "old_report_new_source_blocked_http",
+      "status": "PASS",
+      "observedStatus": 409
+    },
+    {
+      "name": "arbitrary_fixed_pair_report_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "changed_source_changes_report_identity",
+      "status": "PASS"
+    },
+    {
+      "name": "draft_pair_is_analysis_not_publication_baseline_http",
+      "status": "PASS",
+      "observedStatus": 422
+    },
+    {
+      "name": "save_unresolved_import_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "assess_revision_3_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "unresolved_dependency_report_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "unknown_never_no_impact_or_publishable",
+      "status": "PASS"
+    }
+  ],
+  "notRun": [
+    "expiry/time/provider/profile/activation races: native real module tests",
+    "Windows native",
+    "paid LLM"
+  ]
+}

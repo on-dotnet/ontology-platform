@@ -1,0 +1,806 @@
+{
+  "taskId": "G3-M3-001",
+  "status": "PASS",
+  "phase": "ui_fixed_release_readback",
+  "startedAtUtc": "2026-10-31T04:50:43.015Z",
+  "completedAtUtc": "2026-10-31T04:51:03.774Z",
+  "durationMs": 20759.333458,
+  "sourceHead": "b11e61133cdbb4cddc45f833fc6ee3b9686d6ac2",
+  "scope": "real M3 UI/API/PG/Jena/RustFS, independent approval/publication/query/Run/SSE/rollback",
+  "identifiers": {
+    "assetId": "f88b085a632f422ca30d49a006d8c219",
+    "draftId": "2f3b2e1338f24aa9b41d05a53fffa36d",
+    "release1": "b439c2f0a7be4fd78dd2426fe06af41e",
+    "runId": "1f4deba70fa74bcbaf1f8e40de034ec9",
+    "release2": "e33b684100aa4a658a6661fbe57ef0dc"
+  },
+  "checks": [
+    {
+      "name": "mode_not_contradictory",
+      "status": "PASS"
+    },
+    {
+      "name": "current_profile_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "current_registered_m3_profile",
+      "status": "PASS"
+    },
+    {
+      "name": "create_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "initial_four_source_bytes_and_hashes",
+      "status": "PASS"
+    },
+    {
+      "name": "snapshot_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "snapshot_four_source_bound",
+      "status": "PASS"
+    },
+    {
+      "name": "actual_four_sources_projected",
+      "status": "PASS"
+    },
+    {
+      "name": "terminology_and_unit_identities",
+      "status": "PASS"
+    },
+    {
+      "name": "seven_explicit_dimension_exponents",
+      "status": "PASS"
+    },
+    {
+      "name": "multisite_read_denied_http",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "exact_label_source_found",
+      "status": "PASS"
+    },
+    {
+      "name": "viewer_write_denied_http",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "single_write_denied_http",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "missing_cas_http",
+      "status": "PASS",
+      "observedStatus": 428
+    },
+    {
+      "name": "stale_revision_http",
+      "status": "PASS",
+      "observedStatus": 409
+    },
+    {
+      "name": "wrong_source_hash_http",
+      "status": "PASS",
+      "observedStatus": 409
+    },
+    {
+      "name": "atomic_late_conflict_http",
+      "status": "PASS",
+      "observedStatus": 409
+    },
+    {
+      "name": "negative_readback_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "all_rejections_preserve_every_source",
+      "status": "PASS"
+    },
+    {
+      "name": "cross_source_commit_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "one_revision_two_source_atomic_commit",
+      "status": "PASS"
+    },
+    {
+      "name": "same_command_replay_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "idempotent_same_revision_and_hash",
+      "status": "PASS"
+    },
+    {
+      "name": "idempotent_payload_conflict_http",
+      "status": "PASS",
+      "observedStatus": 409
+    },
+    {
+      "name": "stale_exact_old_object_http",
+      "status": "PASS",
+      "observedStatus": 409
+    },
+    {
+      "name": "committed_snapshot_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "new_label_real_pg_riot_readback",
+      "status": "PASS"
+    },
+    {
+      "name": "create_conflicting_draft_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "conflict_assessment_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "conflicts_block_formal_eligibility",
+      "status": "PASS"
+    },
+    {
+      "name": "source_diagnostic_skos_pref_label_conflict",
+      "status": "PASS"
+    },
+    {
+      "name": "source_diagnostic_unit_dimension_mismatch",
+      "status": "PASS"
+    },
+    {
+      "name": "api_valid_assessment_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "api_valid_assessment_eligible_fixed_profile",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_default_source",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_directory_real_multilingual_and_notation",
+      "status": "PASS"
+    },
+    {
+      "name": "pending_queue_locks_source",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_cancel_readback_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "ui_cancel_does_not_write_revision",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_exact_source_40",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_real_commit_http_41",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "ui_old_rdf_term_and_hashes_42",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_one_new_revision_43",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_snapshot_44_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "ui_committed_fact_45",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_exact_source_46",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_real_commit_http_47",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "ui_old_rdf_term_and_hashes_48",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_one_new_revision_49",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_snapshot_50_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "ui_committed_fact_51",
+      "status": "PASS"
+    },
+    {
+      "name": "unit_identity_is_version_iri_not_symbol",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_narrow_source_panel_and_selection",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_valid_assessment_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "ui_valid_assessment_eligible_fixed_profile",
+      "status": "PASS"
+    },
+    {
+      "name": "independent_auditor_available",
+      "status": "PASS"
+    },
+    {
+      "name": "actual_three_capability_registry",
+      "status": "PASS"
+    },
+    {
+      "name": "executor_v4_and_exact_tools",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_command_0",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "ui_command_1",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "ui_command_2",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "proposal_binds_current_impact",
+      "status": "PASS"
+    },
+    {
+      "name": "http_decisions_3",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "http_release-activations_4",
+      "status": "PASS",
+      "observedStatus": 409
+    },
+    {
+      "name": "ui_command_5",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "r1_distinct_subjects",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_command_6",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "formal_release_read_7",
+      "status": "PASS"
+    },
+    {
+      "name": "release_impact_preserved_outside_manifest",
+      "status": "PASS"
+    },
+    {
+      "name": "m1_new_manifest_v2_assessment_bound",
+      "status": "PASS"
+    },
+    {
+      "name": "r1_formal_immutable_graphs_sources",
+      "status": "PASS"
+    },
+    {
+      "name": "real_sparql_observation_0",
+      "status": "PASS"
+    },
+    {
+      "name": "real_sparql_observation_1",
+      "status": "PASS"
+    },
+    {
+      "name": "real_sparql_observation_2",
+      "status": "PASS"
+    },
+    {
+      "name": "real_sparql_observation_3",
+      "status": "PASS"
+    },
+    {
+      "name": "real_sparql_observation_4",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_command_8",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "ui_evidence_reauthorized",
+      "status": "PASS"
+    },
+    {
+      "name": "cross_scope_evidence_denied",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_command_9",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "ui_command_10",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "real_mcp_http_initialize",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "real_mcp_rpc_initialize",
+      "status": "PASS"
+    },
+    {
+      "name": "real_mcp_http_tools/list",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "real_mcp_rpc_tools/list",
+      "status": "PASS"
+    },
+    {
+      "name": "mcp_exact_readonly_schemas",
+      "status": "PASS"
+    },
+    {
+      "name": "real_mcp_http_tools/call",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "real_mcp_rpc_tools/call",
+      "status": "PASS"
+    },
+    {
+      "name": "mcp_formal_result_describe_ontology",
+      "status": "PASS"
+    },
+    {
+      "name": "real_mcp_http_tools/call",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "real_mcp_rpc_tools/call",
+      "status": "PASS"
+    },
+    {
+      "name": "mcp_formal_result_resolve_entity",
+      "status": "PASS"
+    },
+    {
+      "name": "real_mcp_http_tools/call",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "real_mcp_rpc_tools/call",
+      "status": "PASS"
+    },
+    {
+      "name": "mcp_formal_result_traverse_relationships",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_command_11",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "ui_real_native_sse_tool_delta_evidence_terminal",
+      "status": "PASS"
+    },
+    {
+      "name": "actual_yarp_native_sse_media_type",
+      "status": "PASS"
+    },
+    {
+      "name": "sse_persisted_monotonic_fixed_snapshot",
+      "status": "PASS"
+    },
+    {
+      "name": "actual_last_event_id_exact_resume",
+      "status": "PASS"
+    },
+    {
+      "name": "http_execution-runs_12",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "disabled_model_durable_failure_no_tools",
+      "status": "PASS"
+    },
+    {
+      "name": "r2_new_source_saved",
+      "status": "PASS"
+    },
+    {
+      "name": "http_assessments_13",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "r2_real_shacl_and_assessment",
+      "status": "PASS"
+    },
+    {
+      "name": "impact_baseline_catalog_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "impact_baseline_unique",
+      "status": "PASS"
+    },
+    {
+      "name": "http_impact-reports_14",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "impact_report_current_assessment_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "http_release-proposals_15",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "r2_proposal_exact_active_baseline",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_command_16",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "r2_distinct_subjects",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_command_17",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "http_queries_18",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "http_queries_19",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "active_r2_and_history_r1_do_not_mix",
+      "status": "PASS"
+    },
+    {
+      "name": "existing_run_snapshot_retains_r1_after_r2",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_command_20",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "ui_command_21",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "rollback_distinct_subjects",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_command_22",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "rollback_monotonic_activation_revision",
+      "status": "PASS"
+    },
+    {
+      "name": "http_queries_23",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "rollback_query_matches_exact_r1",
+      "status": "PASS"
+    },
+    {
+      "name": "formal_release_read_24",
+      "status": "PASS"
+    },
+    {
+      "name": "rollback_preserves_r2_history",
+      "status": "PASS"
+    },
+    {
+      "name": "chain_returned_fixed_identifiers",
+      "status": "PASS"
+    },
+    {
+      "name": "release_manifest_0_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "release_vocabulary_0_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "manifest_profile_and_every_hash_0",
+      "status": "PASS"
+    },
+    {
+      "name": "fixed_release_retains_terminology_and_unit_binding_0",
+      "status": "PASS"
+    },
+    {
+      "name": "rollback_active_and_superseded_remain_readable_0",
+      "status": "PASS"
+    },
+    {
+      "name": "release_scope_denied_0_http",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "release_manifest_1_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "release_vocabulary_1_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "manifest_profile_and_every_hash_1",
+      "status": "PASS"
+    },
+    {
+      "name": "fixed_release_retains_terminology_and_unit_binding_1",
+      "status": "PASS"
+    },
+    {
+      "name": "rollback_active_and_superseded_remain_readable_1",
+      "status": "PASS"
+    },
+    {
+      "name": "release_scope_denied_1_http",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "ui_fixed_release_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "ui_real_fixed_release_profile",
+      "status": "PASS"
+    }
+  ],
+  "samples": [
+    {
+      "operation": "current_profile",
+      "durationMs": 2.3529170000037993,
+      "status": 200
+    },
+    {
+      "operation": "create",
+      "durationMs": 76.1472500000018,
+      "status": 200
+    },
+    {
+      "operation": "snapshot",
+      "durationMs": 42.670875000003434,
+      "status": 200
+    },
+    {
+      "operation": "multisite_read_denied",
+      "durationMs": 4.0242919999946025,
+      "status": 403
+    },
+    {
+      "operation": "viewer_write_denied",
+      "durationMs": 3.137708999995084,
+      "status": 403
+    },
+    {
+      "operation": "single_write_denied",
+      "durationMs": 2.5525420000049053,
+      "status": 403
+    },
+    {
+      "operation": "missing_cas",
+      "durationMs": 2.3230839999960153,
+      "status": 428
+    },
+    {
+      "operation": "stale_revision",
+      "durationMs": 2.827833000003011,
+      "status": 409
+    },
+    {
+      "operation": "wrong_source_hash",
+      "durationMs": 2.5983330000017304,
+      "status": 409
+    },
+    {
+      "operation": "atomic_late_conflict",
+      "durationMs": 30.360249999997905,
+      "status": 409
+    },
+    {
+      "operation": "negative_readback",
+      "durationMs": 2.7044999999998254,
+      "status": 200
+    },
+    {
+      "operation": "cross_source_commit",
+      "durationMs": 106.13579200000095,
+      "status": 200
+    },
+    {
+      "operation": "same_command_replay",
+      "durationMs": 3.276333000001614,
+      "status": 200
+    },
+    {
+      "operation": "idempotent_payload_conflict",
+      "durationMs": 2.3614999999990687,
+      "status": 409
+    },
+    {
+      "operation": "stale_exact_old_object",
+      "durationMs": 21.711999999999534,
+      "status": 409
+    },
+    {
+      "operation": "committed_snapshot",
+      "durationMs": 21.814832999996725,
+      "status": 200
+    },
+    {
+      "operation": "create_conflicting_draft",
+      "durationMs": 51.29304200000479,
+      "status": 200
+    },
+    {
+      "operation": "conflict_assessment",
+      "durationMs": 57.793250000002445,
+      "status": 200
+    },
+    {
+      "operation": "api_valid_assessment",
+      "durationMs": 60.698833000002196,
+      "status": 200
+    },
+    {
+      "operation": "ui_cancel_readback",
+      "durationMs": 3.932666999993671,
+      "status": 200
+    },
+    {
+      "operation": "ui_snapshot_44",
+      "durationMs": 23.592124999995576,
+      "status": 200
+    },
+    {
+      "operation": "ui_snapshot_50",
+      "durationMs": 25.792374999997264,
+      "status": 200
+    },
+    {
+      "operation": "ui_valid_assessment",
+      "durationMs": 59.17591600000014,
+      "status": 200
+    },
+    {
+      "operation": "release_manifest_0",
+      "durationMs": 58.72170799999731,
+      "status": 200
+    },
+    {
+      "operation": "release_vocabulary_0",
+      "durationMs": 95.6153750000085,
+      "status": 200
+    },
+    {
+      "operation": "release_scope_denied_0",
+      "durationMs": 5.64304200001061,
+      "status": 403
+    },
+    {
+      "operation": "release_manifest_1",
+      "durationMs": 44.63979200000176,
+      "status": 200
+    },
+    {
+      "operation": "release_vocabulary_1",
+      "durationMs": 94.06704199999513,
+      "status": 200
+    },
+    {
+      "operation": "release_scope_denied_1",
+      "durationMs": 3.9640420000068843,
+      "status": 403
+    }
+  ],
+  "notRun": [
+    "real LLM",
+    "QUDT assets / universal unit conversion",
+    "full OWL reasoning",
+    "Windows/Intel native",
+    "production HA/SLO"
+  ]
+}

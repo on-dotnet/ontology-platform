@@ -1,0 +1,130 @@
+{
+  "taskId": "G3-M5-001",
+  "status": "FAIL",
+  "phase": "fixed_read_authorization",
+  "startedAtUtc": "2026-10-31T04:51:30.649Z",
+  "completedAtUtc": "2026-10-31T04:51:31.282Z",
+  "durationMs": 633.6193750000093,
+  "checks": [
+    {
+      "name": "create_complex_source",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "viewer_reads_saved_complex",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "exact_version_scope_hash",
+      "status": "PASS"
+    },
+    {
+      "name": "preserved_readonly_blocked_uninferred",
+      "status": "PASS"
+    },
+    {
+      "name": "real_restriction",
+      "status": "PASS"
+    },
+    {
+      "name": "real_intersection",
+      "status": "PASS"
+    },
+    {
+      "name": "real_union",
+      "status": "PASS"
+    },
+    {
+      "name": "real_complement",
+      "status": "PASS"
+    },
+    {
+      "name": "real_list",
+      "status": "PASS"
+    },
+    {
+      "name": "property_chain_order",
+      "status": "PASS"
+    },
+    {
+      "name": "imports_are_reference_only",
+      "status": "PASS"
+    },
+    {
+      "name": "cardinality_lexical_preserved",
+      "status": "PASS"
+    },
+    {
+      "name": "single_site_read_denied",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "invalid_revision_denied",
+      "status": "PASS",
+      "observedStatus": 422
+    },
+    {
+      "name": "missing_revision_denied",
+      "status": "PASS",
+      "observedStatus": 404
+    },
+    {
+      "name": "read_after_projection",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "read_causes_no_revision_or_source_change",
+      "status": "PASS"
+    },
+    {
+      "name": "complex_assessment",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "complex_assessment_cannot_publish",
+      "status": "PASS"
+    },
+    {
+      "name": "unsupported_structural_write_denied",
+      "status": "PASS",
+      "observedStatus": 422
+    },
+    {
+      "name": "no_op_save",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "saved_original_bytes_preserved",
+      "status": "PASS"
+    },
+    {
+      "name": "old_revision_still_readable",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "historical_read_has_original_hash",
+      "status": "PASS"
+    },
+    {
+      "name": "read_compatible_release_catalog",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "fixed_released_expressions",
+      "status": "FAIL",
+      "observedStatus": 404
+    }
+  ],
+  "fixedRelease": "NOT_RUN",
+  "limitations": [
+    "真实付费LLM/Monaco/Windows/Intel/生产NOT_RUN或BLOCKED；兼容发布在完整M1–M4链单独验收。"
+  ]
+}
