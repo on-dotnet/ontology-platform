@@ -1,0 +1,14 @@
+# PREP Provider / Secret / Compose / 清理合同 v1
+
+仅离线标准库模型，无网络 client、凭证输入入口或删除执行器。默认 enabled=false、egress=[]、预算0。JSON unknown 字段拒绝，bool 不作 integer，Decimal 有限非负费用。
+
+ModelProvider：providerId、tenantScope、providerType（openai/deepseek/qwen/glm/kimi/ollama）、region、baseUrl、protocol（responses/chat/ollama）、secretRef、allowedEgressPolicyId、revision、enabled。HTTPS 远端只接受已登记完全匹配 origin+路径；禁止 userinfo、query、fragment、重定向、任意IP/localhost/metadata、Unicode混淆或域名后缀匹配。Ollama 仅显式本地政策可使用 http://ollama:11434 或 http://host.docker.internal:11434。生产仍需 DNS/IP pin 与实际出口代理，静态校验不能证明 SSRF 已完全解决。
+SecretRef：id、providerId、tenantScope、version、mountPath=/run/secrets/<受限name>；不得存 key 值/后缀/散列。绑定当前 provider/scope，不允许路径穿越。秘密错误只用固定 code；记录日志使用显式安全字段 allowlist，禁止异常字符串/headers/body/URL query。假密钥仅内存生成，检查 stdout/stderr/序列化报告/Compose结构无泄漏。本轮不实现 getpass CLI、不调用系统凭证库。
+ModelDeployment：deploymentId、providerId、modelId、registrySnapshot、capabilities（text/vision/embedding/jsonSchema/tools/streaming/reasoning 各 UNKNOWN/PASS/FAIL）、probeStatus、contextLimit；authentication PASS 与能力 PASS 分开。CapabilityProbe 绑定 provider/deployment/model/schemaHash/sampleVersion/probeVersion；不匹配视 UNKNOWN，声明能力不是实测。
+ModelProfile/TaskProfile：profileId、version、taskType（DOCUMENT_EXTRACTION/ONTOLOGY_ALIGNMENT/AGENT_REASONING/EMBEDDING/DOCUMENT_VISION）、scope、deploymentId、fallbackDeploymentIds、egressPolicyId、costPolicyId；切换目标重新校验目标组织/区域/数据分类/允许出站/能力/预算，不能自动跨厂商外传。
+CostPolicy：maxRequests/maxInputTokens/maxOutputTokens/maxCostUsd/maxSeconds/maxRetries/maxConcurrency、priceSnapshot、currency=USD；实际调用之前预留最坏输出成本和tokens，未知价格或用量 fail closed；重复requestId不可重复预留，未确认远端是否计费不能退还；有限429重试也计请求/时间预算。PREP只模拟计费，真实预算为0。
+InvocationRecord 仅 requestId/runId/profileVersion/providerId/deploymentId/modelId、input/output token数量、cost/time、fixed status、schemaValid、egressUsed；不记录内容和凭据。失败固定分类 AUTHENTICATION_FAILED/INSUFFICIENT_BALANCE/RATE_LIMITED/TLS_FAILED/NETWORK_FAILED/MODEL_NOT_FOUND/SCHEMA_UNSUPPORTED/REFUSED/TRUNCATED/BUDGET_EXCEEDED/POLICY_DENIED；错误正文永不透传。
+
+Compose 静态设计使用 JSON（YAML 1.2 子集）表示，不运行 compose config/up。core服务+parser/ocr/ollama/eval profiles，精确版本digest未核完时 runnable=false/BLOCKED；无 latest、无隐式 pull/build。内部网络、仅入口loopback端口、read_only、非root、cap_drop ALL、no-new-privileges、tmpfs、有界健康/资源、secret仅Gateway mount，无 environment key/ARG。Linux ARM64/AMD64 原生映像需逐digest验证；不把QEMU当原生；WSL2路径/ACL/LF/大小写/监控另外实测。禁止Docker socket mount/host network/privileged/任意host bind。
+
+资源合同仅离线资格判断，不删除资源。Resource：TaskId/RunId/Owner/ComposeProjectName/ResourceId/Labels/Purpose/CreatedAt/LastUsedAt/SharedRefs/RetentionPolicy/ExpectedDispose/ActualResult 加 kind/fingerprint/backend/keep/closed。清理计划默认DryRun；Apply设计需准确同任务同Run对象、当前指纹/后端身份、空引用、closed/synthetic/recoverable证明、非KEEP、审批、24h内UTC期限及保护目录祖先检查。拒绝全局prune、通配符、别的任务、旧G2/G3、volume名称近似、无socket、generation变化。真正清理要 before-command-exit-after、准确不存在诊断；列表缺席或rm0不够，history须自然代际持久无记录。本批所有删除仅安全假数据判断，真实Docker创建/删除均0。
