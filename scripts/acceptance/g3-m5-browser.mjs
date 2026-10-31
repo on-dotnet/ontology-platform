@@ -4,8 +4,20 @@ import { resolve, relative, isAbsolute } from "node:path";
 import { randomUUID } from "node:crypto";
 import { evidenceDirectory } from "./evidence-paths.mjs";
 
+/** 从真实ReleaseSummary嵌套manifest取固定ID，只选择已发布可读状态。 */
+export function readableRelease(releases) {
+  const candidates = releases.filter(item => ["ACTIVE", "SUPERSEDED"].includes(item.status)
+    && typeof item.manifest?.releaseId === "string" && item.manifest.releaseId.length > 0);
+  return candidates.find(item => item.status === "ACTIVE") ?? candidates[0];
+}
+
+/** 端点依据合同的manifest.releaseId，不使用不存在的顶层releaseId。 */
+export function expressionReleasePath(release) {
+  return "/api/v1/releases/" + encodeURIComponent(release.manifest.releaseId) + "/expressions";
+}
+
 /** 复杂源保真与发布分级独立验收；完整链中的M1–M4仍走原真实发布/查询/回滚。 */
-export async function runM5Checks({ root, origin, operator, viewer, single, check, command, apiOnly = false, setPhase }) {
+export async function runM5Checks({ root, origin, operator, viewer, single, check, command, apiOnly = false, requireRelease = false, setPhase }) {
   const evidence = evidenceDirectory(root);
   const boundary = relative(resolve(root, "docs/evidence/G3-M5-001"), evidence);
   if (boundary.startsWith("..") || isAbsolute(boundary)) throw new Error("m5_evidence_boundary_required");
@@ -68,10 +80,12 @@ export async function runM5Checks({ root, origin, operator, viewer, single, chec
     const historical = await request(viewer, "get", readPath, null, "old_revision_still_readable");
     observe("historical_read_has_original_hash", historical.hashes.bundleHash === snapshot.hashes.bundleHash && historical.version.revision === revision);
     const releases = await request(viewer, "get", "/api/v1/releases", null, "read_compatible_release_catalog");
-    if (releases.length) {
-      const released = await request(viewer, "get", "/api/v1/releases/" + releases[0].releaseId + "/expressions", null, "fixed_released_expressions");
+    const selectedRelease = readableRelease(releases);
+    if (requireRelease) observe("published_control_release_available", Boolean(selectedRelease));
+    if (selectedRelease) {
+      const released = await request(viewer, "get", expressionReleasePath(selectedRelease), null, "fixed_released_expressions");
       observe("release_ref_is_fixed_and_uninferred", released.version.kind === "RELEASE" && released.version.revision === null
-        && released.version.id === releases[0].releaseId && released.sources.every(source => !source.inferred && !source.editable));
+        && released.version.id === selectedRelease.manifest.releaseId && released.sources.every(source => !source.inferred && !source.editable));
       fixedRelease = "PASS";
     }
     if (apiOnly) { status = "PASS"; return; }

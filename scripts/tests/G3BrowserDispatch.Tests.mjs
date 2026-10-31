@@ -29,3 +29,17 @@ for (const flag of ["--m5-api-only", "--m5-ui-only"]) {
     assert.equal(received.apiOnly, flag === "--m5-api-only");
   });
 }
+
+/** 真实ReleaseSummary只有嵌套manifest ID，顶层幻觉与半准备版本不得成为验收目标。 */
+import { readableRelease, expressionReleasePath } from "../acceptance/g3-m5-browser.mjs";
+test("固定发布表达式消费实际嵌套合同", () => {
+  const active = { status: "ACTIVE", manifest: { releaseId: "a".repeat(32) } };
+  const old = { status: "SUPERSEDED", manifest: { releaseId: "b".repeat(32) } };
+  assert.equal(readableRelease([{ status: "FAILED_RETRYABLE", releaseId: "wrong" }, old, active]), active);
+  assert.equal(expressionReleasePath(active), `/api/v1/releases/${"a".repeat(32)}/expressions`);
+  assert.equal(readableRelease([old]), old);
+});
+test("顶层伪ID和未发布状态不能通过读取合同", () => {
+  assert.equal(readableRelease([{ status: "ACTIVE", releaseId: "wrong" }]), undefined);
+  assert.equal(readableRelease([{ status: "FAILED_FINAL", manifest: { releaseId: "a".repeat(32) } }]), undefined);
+});

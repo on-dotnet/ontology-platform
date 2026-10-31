@@ -287,7 +287,7 @@ try {
   }
   if (process.argv.includes('--m5')) {
     const { runM5Checks } = await import('./g3-m5-browser.mjs');
-    await runM5Checks({ root, origin, operator, viewer, single, check, command, setPhase: value => { phase = value; } });
+    await runM5Checks({ root, origin, operator, viewer, single, check, command, requireRelease: true, setPhase: value => { phase = value; } });
   }
   for (const user of [operator, single, viewer, audit]) await user.context.close();
   }

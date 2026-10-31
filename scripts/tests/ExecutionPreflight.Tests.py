@@ -31,6 +31,9 @@ class PreflightTests(unittest.TestCase):
         self.put(m.LAUNCHERS[1],"parser.add_argument('--milestone',choices=['M1','M2','M3','M4','M5'])\n")
         self.put(m.LAUNCHERS[2],"parser.add_argument('--milestone',choices=['M1','M2','M3','M4','M5'])\nif args.milestone in ('M3','M4','M5'):\n    command.append('--m5')\n")
 
+        self.put('scripts/acceptance/performance-baseline.py', "parser.add_argument('--chain-report',choices=['m4-full-e2e.json','m5-full-e2e.json'])\n")
+        self.put('scripts/acceptance/g2-readiness-fault.py', "if prefix.startswith(('g3-m3-','g3-m4-','g3-m5-')):\n    re.fullmatch(r'g3-m[345]-[0-9a-f]{12}',prefix)\n")
+
     def test_paths_existing_missing_case_traversal_and_symlink(self):
         self.put('backend/Actual.csproj','fixture\n')
         self.assertEqual(m.check_paths(self.root,['backend/Actual.csproj']),['backend/Actual.csproj'])
@@ -73,6 +76,21 @@ class PreflightTests(unittest.TestCase):
             (self.root/path).write_text(original.replace(",'M5'",''))
             with self.assertRaisesRegex(ValueError,'MILESTONE_GUARD_DRIFT'):m.check_consumers(self.root)
             (self.root/path).write_text(original)
+
+    def test_downstream_metrics_and_exact_fault_guards_cannot_drift(self):
+        self.fixture()
+        metrics=self.root/'scripts/acceptance/performance-baseline.py'
+        original=metrics.read_text()
+        metrics.write_text(original.replace(",'m5-full-e2e.json'",''))
+        with self.assertRaisesRegex(ValueError,'MILESTONE_METRICS_DRIFT'):m.check_consumers(self.root)
+        metrics.write_text(original)
+        fault=self.root/'scripts/acceptance/g2-readiness-fault.py'
+        original=fault.read_text()
+        for old in [original.replace(",'g3-m5-'",''), original.replace('[345]','[34]'), original.replace('[345]','[3456]')]:
+            fault.write_text(old)
+            with self.assertRaisesRegex(ValueError,'MILESTONE_FAULT_DRIFT'):m.check_consumers(self.root)
+        fault.write_text(original)
+        self.assertEqual(m.check_consumers(self.root)['status'],'PASS')
 
     def guard(self,hash='a'*64,version='b'*64):
         return m.FailureState(self.root/'state.json',hash,'semantic-tests',version)

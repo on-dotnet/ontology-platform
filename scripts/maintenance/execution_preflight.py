@@ -127,8 +127,32 @@ def check_consumers(root, milestone='M5', audit_actions=None, registrations=None
                                 raise ValueError('MILESTONE_GUARD_DRIFT: checkpoint或performance仍使用旧阶段集合')
             if '--m5' not in [node.value for node in ast.walk(tree) if isinstance(node, ast.Constant) and isinstance(node.value, str)]:
                 raise ValueError('MILESTONE_DISPATCH_MISSING: 当前阶段没有真实浏览器派发分支')
+    downstream = []
+    if milestone == 'M5':
+        performance = 'scripts/acceptance/performance-baseline.py'
+        fault = 'scripts/acceptance/g2-readiness-fault.py'
+        tree = ast.parse(source_path(root, performance).read_text(encoding='utf-8'))
+        options = [node for node in ast.walk(tree) if isinstance(node, ast.Call) and any(
+            isinstance(arg, ast.Constant) and arg.value == '--chain-report' for arg in node.args)]
+        if not any(any(key.arg == 'choices' and 'm5-full-e2e.json' in ast.literal_eval(key.value)
+                       for key in node.keywords) for node in options):
+            raise ValueError('MILESTONE_METRICS_DRIFT: 下游性能汇总未登记当前阶段报告')
+        tree = ast.parse(source_path(root, fault).read_text(encoding='utf-8'))
+        branches = [node for node in ast.walk(tree) if isinstance(node, ast.Call)
+                    and isinstance(node.func, ast.Attribute) and node.func.attr == 'startswith'
+                    and isinstance(node.func.value, ast.Name) and node.func.value.id == 'prefix']
+        if not any(node.args and isinstance(node.args[0], (ast.Tuple, ast.List))
+                   and 'g3-m5-' in ast.literal_eval(node.args[0]) for node in branches):
+            raise ValueError('MILESTONE_FAULT_DRIFT: 下游故障入口未登记当前准确前缀')
+        patterns = [node.args[0].value for node in ast.walk(tree) if isinstance(node, ast.Call)
+                    and isinstance(node.func, ast.Attribute) and node.func.attr == 'fullmatch'
+                    and node.args and isinstance(node.args[0], ast.Constant)
+                    and isinstance(node.args[0].value, str) and node.args[0].value.startswith('g3-m')]
+        if not any(re.fullmatch(pattern, 'g3-m5-0123456789ab') and not re.fullmatch(pattern, 'g3-m6-0123456789ab') for pattern in patterns):
+            raise ValueError('MILESTONE_FAULT_DRIFT: 故障入口精确阶段正则遗漏或越界')
+        downstream = [performance, fault]
     return dict(status='PASS', milestone=milestone, auditActions=audit_actions,
-                registrations=registrations, checkedConsumers=list(LAUNCHERS),
+                registrations=registrations, checkedConsumers=list(LAUNCHERS)+downstream,
                 limitation='静态消费者门禁，不替代实际组合根、事务回滚或产品请求。')
 
 
