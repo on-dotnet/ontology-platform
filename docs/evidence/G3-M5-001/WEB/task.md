@@ -1,6 +1,6 @@
 # G3-M5-WEB 可审查切片
 
-状态：DRAFT/PARTIAL，等待独立Review与Master真实API浏览器验收。Base=3e71049（完整SHA由Git对象恢复）；分支codex/g3-m5-web，独立托管树40e2/ontology-platform。未写main、未开容器、未改依赖/生成物/tokens。
+状态：DRAFT/PARTIAL，等待独立Review与Master真实API浏览器验收。Base=3e71049e95a473fd976e0ef685e24bdcad2ab7fd；分支codex/g3-m5-web，独立托管树40e2/ontology-platform。未写main、未开容器、未改依赖/生成物/tokens。
 
 ## 所有权
 
@@ -10,7 +10,7 @@ apps/web/src/features/ontology/{expression-model.ts,expression-model.test.ts,exp
 
 中间新增“高阶表达式”，实际GET固定draft/revision；右栏可输入固定Release，读取不可变版本。回包必须匹配完整scope、版本、四源hash及slot，不从导入本地源生成假树。读取竞态取消和准确hash定位、dirty禁用定位；成功快照不改源。源保留、结构只读、编辑、发布资格、推理分开；imports只引用，无推理。flat RDF引用按源隔离；有序列表原顺序，shared/cycle不无限展开，无root纯环仍展示；UI1024项/深度32上限显式提示并提供原始源后备，不伪称完整支持。textarea和Monaco安全暂停保持。v4准确23项已登记，缺失/重复/未知仍UNKNOWN。
 
-已读Next16.4.3本地安装文档server/client边界。锁定离线restore成功；首次选择未含包的cache迅速失败，随后按旧树.modules元数据确认准确store后恢复，不联网新增包。首lint因Effect可同步setState拒绝，已改为真实异步请求完成回调后更新；目标测试、typecheck、lint最终全部exit0。目标75项覆盖版本/范围/hash负例、v4集合、blank跨源/共享/环、列表顺序、预算、HTML转义、HTTP权限与非法revision。完整产品/浏览器与Review未运行，不能以此测试替代。
+已读Next16.4.3本地安装文档server/client边界。锁定离线restore成功；首次选择未含包的cache迅速失败，随后按旧树.modules元数据确认准确store后恢复，不联网新增包。首lint因Effect可同步setState拒绝，已改为真实异步请求完成回调后更新；目标测试、typecheck、lint最终全部exit0。目标75项覆盖版本/范围/hash负例、v4集合、blank跨源/共享/环、列表顺序、预算、HTML转义、HTTP权限与非法revision。首次提交前diff-check发现复制原始测试日志的额外EOF空行；该原失败保留，随后仅规范证据末尾换行，最终diff-check须exit0。完整产品/浏览器与Review未运行，不能以此测试替代。
 
 ## 浏览器选择器与恢复
 

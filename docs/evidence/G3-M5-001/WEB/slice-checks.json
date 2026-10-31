@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "taskId": "G3-M5-WEB",
   "status": "DRAFT_PARTIAL",
-  "note": "精确Base见task.md，测试输入由同提交源码恢复；非最终V3本地验证Schema。",
+  "note": "非最终V3验证Schema；checks输出hash对应ignored原日志，包内txt为去除外围空行的短摘要。首次diff-check发现原日志额外EOF空行已单独修复，原Git提交与ignored日志保留。",
   "checks": [
     {
       "name": "targeted-tests-final.log",
@@ -44,5 +44,6 @@
     "commandRuntime": "UNKNOWN，初期命令未逐条用timeline包装；Vitest自身duration见原日志",
     "modelActiveTime": "UNKNOWN"
   },
-  "baseRef": "3e71049"
+  "baseRef": "3e71049",
+  "baseSha": "3e71049e95a473fd976e0ef685e24bdcad2ab7fd"
 }
