@@ -232,6 +232,14 @@ class M1OrchestrationTests(unittest.TestCase):
         self.assertEqual(proof['status'], 'FAIL')
         self.assertTrue(all(item['status'] == 'NOT_RUN' for item in proof['gates'][1:]))
 
+    def test_api_ui_and_full_are_distinct_failure_scopes(self):
+        spec=importlib.util.spec_from_file_location('scope_orchestrator',SCRIPT)
+        module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+        with tempfile.TemporaryDirectory() as folder:
+            path=Path(folder).resolve()/'failures.json'
+            values=[module.preflight.FailureState(path,'a'*64,module.gate_build_id('M5',scope,GATES[0]),'b'*64).fingerprint for scope in ['API_ONLY','UI_ONLY','FULL']]
+            self.assertEqual(len(set(values)),3)
+
     def test_receipt_write_failure_keeps_actual_child_zero_or_failure(self):
         for fail_gate, expected in [(None,0),(GATES[0],17)]:
             code,calls,proof,*_=self.exercise(prefix='g3-m5-control',milestone='M5',fail_gate=fail_gate,record_failure=True,child_failure_code=17)

@@ -24,6 +24,11 @@ preflight_spec.loader.exec_module(preflight)
 gate_fingerprint = preflight.product_input_fingerprint
 
 
+def gate_build_id(milestone, scope, name):
+    """固定阶段/检查范围属于测试身份，RunId与秘密参数不能改变失败指纹。"""
+    return milestone + '-' + scope + '-' + name
+
+
 def run_attempt():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--runtime-file')
@@ -109,7 +114,7 @@ def run_attempt():
         monotonic = time.monotonic()
         exit_code, category = None, 'COMMAND_EXCEPTION'
         try:
-            with preflight.FailureState(failure_path, input_fingerprint, Path(command[1]).name, build_version) as guard:
+            with preflight.FailureState(failure_path, input_fingerprint, gate_build_id(args.milestone, acceptance['scope'], Path(command[1]).name), build_version) as guard:
                 guard.allow('expensive')
                 result = subprocess.run(command, cwd=ROOT)
                 # 业务结果先冻结；后续证据写盘失败不能改写真实子进程退出事实。
@@ -136,7 +141,7 @@ def run_attempt():
     try:
         # 在AppHost/容器启动前拒绝上次相同输入的昂贵失败；运行时仍持锁重验。
         for gate_name in gate_names:
-            with preflight.FailureState(failure_path, input_fingerprint, gate_name, build_version) as guard:
+            with preflight.FailureState(failure_path, input_fingerprint, gate_build_id(args.milestone, acceptance['scope'], gate_name), build_version) as guard:
                 guard.allow('expensive')
         if args.start_runtime:
             try:
