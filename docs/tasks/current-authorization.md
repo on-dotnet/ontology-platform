@@ -1,3 +1,9 @@
+# G3-M5-REVIEW-FIX-001 当前授权增量（2026-10-31）
+
+本会话用户正式授权[附件V2](../evidence/G3-M5-REVIEW-FIX-001/authorization-v2.md)完整执行。仅先冻结合同裁决、非作者只读审查，再必要最小 UI 澄清/真实增量验收、Master集成和唯一V3独立重开。不得先改后端 Profile 语义。Base fetch=580d73e7c0fb38b94dbbed1136ee0b1d24fadc9d。历史原包和证据不改。见[本轮任务卡](G3-M5-REVIEW-FIX-001.md)；不启动 G4/G5/G6。旧授权事实保留如下。
+
+---
+
 # G3-M5-001 当前授权增量（2026-10-31）
 
 人类在本会话正式授权[附件 V1 全部 G3-M5 与 E0](../evidence/G3-M5-001/authorization-v1.md)，指定本机 Codex Master；此最新明确授权覆盖历史 M4 的 M5 未授权停止语句，历史事实保持。fetch 实测 Base=`e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a`。先 E0-P0 宿主连续运行最低门禁，再公共合同独立 Review、独立托管 Worktree 并行、早集成、真实本地分层及稳定输入完整验收。Actions 按需 NOT_RUN。

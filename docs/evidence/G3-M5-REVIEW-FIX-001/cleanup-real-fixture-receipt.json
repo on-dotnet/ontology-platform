@@ -1,0 +1,1078 @@
+{
+  "taskId": "G3-M5-REVIEW-FIX-001",
+  "mode": "APPLY",
+  "status": "PASS",
+  "completed": [
+    {
+      "name": "g2-rfix-fixture-ac8c3e2c00-alloy-data",
+      "before": {
+        "Name": "g2-rfix-fixture-ac8c3e2c00-alloy-data",
+        "Driver": "local",
+        "Scope": "local",
+        "CreatedAt": "2026-10-31T06:58:39Z",
+        "Labels": {
+          "io.ontology-platform.task-id": "G3-M5-REVIEW-FIX-001",
+          "io.ontology-platform.test-fixture": "true"
+        },
+        "Options": null
+      },
+      "after": "STRONG_NO_SUCH_VOLUME",
+      "exitCode": 0
+    },
+    {
+      "name": "g2-rfix-fixture-ac8c3e2c00-fuseki-data",
+      "before": {
+        "Name": "g2-rfix-fixture-ac8c3e2c00-fuseki-data",
+        "Driver": "local",
+        "Scope": "local",
+        "CreatedAt": "2026-10-31T06:58:39Z",
+        "Labels": {
+          "io.ontology-platform.task-id": "G3-M5-REVIEW-FIX-001",
+          "io.ontology-platform.test-fixture": "true"
+        },
+        "Options": null
+      },
+      "after": "STRONG_NO_SUCH_VOLUME",
+      "exitCode": 0
+    },
+    {
+      "name": "g2-rfix-fixture-ac8c3e2c00-grafana-data",
+      "before": {
+        "Name": "g2-rfix-fixture-ac8c3e2c00-grafana-data",
+        "Driver": "local",
+        "Scope": "local",
+        "CreatedAt": "2026-10-31T06:58:39Z",
+        "Labels": {
+          "io.ontology-platform.task-id": "G3-M5-REVIEW-FIX-001",
+          "io.ontology-platform.test-fixture": "true"
+        },
+        "Options": null
+      },
+      "after": "STRONG_NO_SUCH_VOLUME",
+      "exitCode": 0
+    },
+    {
+      "name": "g2-rfix-fixture-ac8c3e2c00-loki-data",
+      "before": {
+        "Name": "g2-rfix-fixture-ac8c3e2c00-loki-data",
+        "Driver": "local",
+        "Scope": "local",
+        "CreatedAt": "2026-10-31T06:58:39Z",
+        "Labels": {
+          "io.ontology-platform.task-id": "G3-M5-REVIEW-FIX-001",
+          "io.ontology-platform.test-fixture": "true"
+        },
+        "Options": null
+      },
+      "after": "STRONG_NO_SUCH_VOLUME",
+      "exitCode": 0
+    },
+    {
+      "name": "g2-rfix-fixture-ac8c3e2c00-postgres-data",
+      "before": {
+        "Name": "g2-rfix-fixture-ac8c3e2c00-postgres-data",
+        "Driver": "local",
+        "Scope": "local",
+        "CreatedAt": "2026-10-31T06:58:39Z",
+        "Labels": {
+          "io.ontology-platform.task-id": "G3-M5-REVIEW-FIX-001",
+          "io.ontology-platform.test-fixture": "true"
+        },
+        "Options": null
+      },
+      "after": "STRONG_NO_SUCH_VOLUME",
+      "exitCode": 0
+    },
+    {
+      "name": "g2-rfix-fixture-ac8c3e2c00-prometheus-data",
+      "before": {
+        "Name": "g2-rfix-fixture-ac8c3e2c00-prometheus-data",
+        "Driver": "local",
+        "Scope": "local",
+        "CreatedAt": "2026-10-31T06:58:39Z",
+        "Labels": {
+          "io.ontology-platform.task-id": "G3-M5-REVIEW-FIX-001",
+          "io.ontology-platform.test-fixture": "true"
+        },
+        "Options": null
+      },
+      "after": "STRONG_NO_SUCH_VOLUME",
+      "exitCode": 0
+    },
+    {
+      "name": "g2-rfix-fixture-ac8c3e2c00-rustfs-data",
+      "before": {
+        "Name": "g2-rfix-fixture-ac8c3e2c00-rustfs-data",
+        "Driver": "local",
+        "Scope": "local",
+        "CreatedAt": "2026-10-31T06:58:39Z",
+        "Labels": {
+          "io.ontology-platform.task-id": "G3-M5-REVIEW-FIX-001",
+          "io.ontology-platform.test-fixture": "true"
+        },
+        "Options": null
+      },
+      "after": "STRONG_NO_SUCH_VOLUME",
+      "exitCode": 0
+    },
+    {
+      "name": "g2-rfix-fixture-ac8c3e2c00-tempo-data",
+      "before": {
+        "Name": "g2-rfix-fixture-ac8c3e2c00-tempo-data",
+        "Driver": "local",
+        "Scope": "local",
+        "CreatedAt": "2026-10-31T06:58:39Z",
+        "Labels": {
+          "io.ontology-platform.task-id": "G3-M5-REVIEW-FIX-001",
+          "io.ontology-platform.test-fixture": "true"
+        },
+        "Options": null
+      },
+      "after": "STRONG_NO_SUCH_VOLUME",
+      "exitCode": 0
+    }
+  ],
+  "logs": [
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:39.459611+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:39.536779+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-rfix-fixture-ac8c3e2c00-alloy-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:39.548530+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "ps",
+        "-a",
+        "--filter",
+        "volume=g2-rfix-fixture-ac8c3e2c00-alloy-data",
+        "--format",
+        "{{.ID}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:39.559743+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:39.629595+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-rfix-fixture-ac8c3e2c00-fuseki-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:39.641097+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "ps",
+        "-a",
+        "--filter",
+        "volume=g2-rfix-fixture-ac8c3e2c00-fuseki-data",
+        "--format",
+        "{{.ID}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:39.652295+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:39.721512+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-rfix-fixture-ac8c3e2c00-grafana-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:39.733848+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "ps",
+        "-a",
+        "--filter",
+        "volume=g2-rfix-fixture-ac8c3e2c00-grafana-data",
+        "--format",
+        "{{.ID}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:39.745418+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:39.809825+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-rfix-fixture-ac8c3e2c00-loki-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:39.822084+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "ps",
+        "-a",
+        "--filter",
+        "volume=g2-rfix-fixture-ac8c3e2c00-loki-data",
+        "--format",
+        "{{.ID}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:39.833364+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:39.889776+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-rfix-fixture-ac8c3e2c00-postgres-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:39.900834+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "ps",
+        "-a",
+        "--filter",
+        "volume=g2-rfix-fixture-ac8c3e2c00-postgres-data",
+        "--format",
+        "{{.ID}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:39.911808+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:39.968349+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-rfix-fixture-ac8c3e2c00-prometheus-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:39.979458+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "ps",
+        "-a",
+        "--filter",
+        "volume=g2-rfix-fixture-ac8c3e2c00-prometheus-data",
+        "--format",
+        "{{.ID}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:39.989869+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:40.048494+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-rfix-fixture-ac8c3e2c00-rustfs-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:40.059752+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "ps",
+        "-a",
+        "--filter",
+        "volume=g2-rfix-fixture-ac8c3e2c00-rustfs-data",
+        "--format",
+        "{{.ID}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:40.070264+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:40.135873+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-rfix-fixture-ac8c3e2c00-tempo-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:40.149070+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "ps",
+        "-a",
+        "--filter",
+        "volume=g2-rfix-fixture-ac8c3e2c00-tempo-data",
+        "--format",
+        "{{.ID}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:40.161712+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:40.231204+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-rfix-fixture-ac8c3e2c00-alloy-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:40.246025+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "ps",
+        "-a",
+        "--filter",
+        "volume=g2-rfix-fixture-ac8c3e2c00-alloy-data",
+        "--format",
+        "{{.ID}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:40.259537+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "rm",
+        "g2-rfix-fixture-ac8c3e2c00-alloy-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:40.274093+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:40.349566+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-rfix-fixture-ac8c3e2c00-alloy-data"
+      ],
+      "exitCode": 1,
+      "utc": "2026-10-31T06:58:40.364253+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:40.435029+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-rfix-fixture-ac8c3e2c00-fuseki-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:40.449853+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "ps",
+        "-a",
+        "--filter",
+        "volume=g2-rfix-fixture-ac8c3e2c00-fuseki-data",
+        "--format",
+        "{{.ID}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:40.464089+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "rm",
+        "g2-rfix-fixture-ac8c3e2c00-fuseki-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:40.478409+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:40.540609+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-rfix-fixture-ac8c3e2c00-fuseki-data"
+      ],
+      "exitCode": 1,
+      "utc": "2026-10-31T06:58:40.554886+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:40.623051+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-rfix-fixture-ac8c3e2c00-grafana-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:40.638371+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "ps",
+        "-a",
+        "--filter",
+        "volume=g2-rfix-fixture-ac8c3e2c00-grafana-data",
+        "--format",
+        "{{.ID}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:40.652270+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "rm",
+        "g2-rfix-fixture-ac8c3e2c00-grafana-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:40.666483+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:40.729420+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-rfix-fixture-ac8c3e2c00-grafana-data"
+      ],
+      "exitCode": 1,
+      "utc": "2026-10-31T06:58:40.741139+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:40.809838+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-rfix-fixture-ac8c3e2c00-loki-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:40.824405+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "ps",
+        "-a",
+        "--filter",
+        "volume=g2-rfix-fixture-ac8c3e2c00-loki-data",
+        "--format",
+        "{{.ID}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:40.837791+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "rm",
+        "g2-rfix-fixture-ac8c3e2c00-loki-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:40.851415+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:40.914757+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-rfix-fixture-ac8c3e2c00-loki-data"
+      ],
+      "exitCode": 1,
+      "utc": "2026-10-31T06:58:40.927776+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:40.992535+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-rfix-fixture-ac8c3e2c00-postgres-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:41.008122+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "ps",
+        "-a",
+        "--filter",
+        "volume=g2-rfix-fixture-ac8c3e2c00-postgres-data",
+        "--format",
+        "{{.ID}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:41.021838+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "rm",
+        "g2-rfix-fixture-ac8c3e2c00-postgres-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:41.040857+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:41.103827+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-rfix-fixture-ac8c3e2c00-postgres-data"
+      ],
+      "exitCode": 1,
+      "utc": "2026-10-31T06:58:41.115589+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:41.182076+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-rfix-fixture-ac8c3e2c00-prometheus-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:41.197330+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "ps",
+        "-a",
+        "--filter",
+        "volume=g2-rfix-fixture-ac8c3e2c00-prometheus-data",
+        "--format",
+        "{{.ID}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:41.210927+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "rm",
+        "g2-rfix-fixture-ac8c3e2c00-prometheus-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:41.224492+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:41.290761+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-rfix-fixture-ac8c3e2c00-prometheus-data"
+      ],
+      "exitCode": 1,
+      "utc": "2026-10-31T06:58:41.303485+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:41.372555+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-rfix-fixture-ac8c3e2c00-rustfs-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:41.387656+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "ps",
+        "-a",
+        "--filter",
+        "volume=g2-rfix-fixture-ac8c3e2c00-rustfs-data",
+        "--format",
+        "{{.ID}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:41.401840+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "rm",
+        "g2-rfix-fixture-ac8c3e2c00-rustfs-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:41.417003+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:41.480961+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-rfix-fixture-ac8c3e2c00-rustfs-data"
+      ],
+      "exitCode": 1,
+      "utc": "2026-10-31T06:58:41.494216+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:41.558448+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-rfix-fixture-ac8c3e2c00-tempo-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:41.572952+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "ps",
+        "-a",
+        "--filter",
+        "volume=g2-rfix-fixture-ac8c3e2c00-tempo-data",
+        "--format",
+        "{{.ID}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:41.586080+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "rm",
+        "g2-rfix-fixture-ac8c3e2c00-tempo-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:41.599726+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T06:58:41.660504+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-rfix-fixture-ac8c3e2c00-tempo-data"
+      ],
+      "exitCode": 1,
+      "utc": "2026-10-31T06:58:41.671951+00:00"
+    }
+  ],
+  "current": {
+    "name": "g2-rfix-fixture-ac8c3e2c00-tempo-data",
+    "before": {
+      "Name": "g2-rfix-fixture-ac8c3e2c00-tempo-data",
+      "Driver": "local",
+      "Scope": "local",
+      "CreatedAt": "2026-10-31T06:58:39Z",
+      "Labels": {
+        "io.ontology-platform.task-id": "G3-M5-REVIEW-FIX-001",
+        "io.ontology-platform.test-fixture": "true"
+      },
+      "Options": null
+    },
+    "state": "VERIFIED_BEFORE_COMMAND"
+  },
+  "keepUnchanged": true,
+  "physicalReclaimedBytes": "UNKNOWN"
+}

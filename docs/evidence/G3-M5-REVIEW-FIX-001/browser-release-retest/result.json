@@ -1,0 +1,116 @@
+{
+  "taskId": "G3-M5-REVIEW-FIX-001",
+  "status": "PASS",
+  "phase": "fixed_release_ui",
+  "startedAtUtc": "2026-10-31T06:53:49.235Z",
+  "endedAtUtc": "2026-10-31T06:53:52.190Z",
+  "durationMs": 2955,
+  "sourceSha256": "7348c1a9eb529007a9312e3dd6970fba31f05b5865349ae817148bd2bc2d15d0",
+  "identifiers": {
+    "draftId": "67f1a9151db94b71af476317363bd5a1",
+    "releaseId": "7af5f5d77fdd4e92b79abb1bc261bafa"
+  },
+  "checks": [
+    {
+      "name": "viewer-ab_real_session",
+      "status": "PASS"
+    },
+    {
+      "name": "viewer-ab_csrf",
+      "status": "PASS"
+    },
+    {
+      "name": "auditor-ab_real_session",
+      "status": "PASS"
+    },
+    {
+      "name": "auditor-ab_csrf",
+      "status": "PASS"
+    },
+    {
+      "name": "viewer-a_real_session",
+      "status": "PASS"
+    },
+    {
+      "name": "viewer-a_csrf",
+      "status": "PASS"
+    },
+    {
+      "name": "historical_draft_snapshot_http_200",
+      "status": "PASS"
+    },
+    {
+      "name": "manifest_before_http_200",
+      "status": "PASS"
+    },
+    {
+      "name": "audit_before_reads_http_200",
+      "status": "PASS"
+    },
+    {
+      "name": "release_real_get",
+      "status": "PASS"
+    },
+    {
+      "name": "release_binding_current_policy",
+      "status": "PASS"
+    },
+    {
+      "name": "RELEASE_current_profile_full_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "RELEASE_projection_separate",
+      "status": "PASS"
+    },
+    {
+      "name": "RELEASE_historical_disclaimer",
+      "status": "PASS"
+    },
+    {
+      "name": "RELEASE_version_hash_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "RELEASE_no_false_historical_v4",
+      "status": "PASS"
+    },
+    {
+      "name": "RELEASE_all_source_hashes",
+      "status": "PASS"
+    },
+    {
+      "name": "audit_after_reads_http_200",
+      "status": "PASS"
+    },
+    {
+      "name": "audit_window_not_truncated",
+      "status": "PASS"
+    },
+    {
+      "name": "no_new_write_audit_from_expression_reads",
+      "status": "PASS"
+    },
+    {
+      "name": "audit_reader_records_own_existing_action",
+      "status": "PASS"
+    },
+    {
+      "name": "manifest_after_http_200",
+      "status": "PASS"
+    },
+    {
+      "name": "release_manifest_unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "release_scope_denied_http_403",
+      "status": "PASS"
+    },
+    {
+      "name": "draft_scope_denied_http_403",
+      "status": "PASS"
+    }
+  ],
+  "limitation": "真实浏览器为当前v4合法发布后固定Release及旧草稿修订；v1/v2/v3历史发布策略场景以冻结合同/组件fixture和未变后端既有证据核实，非本轮真实v1-v3重建。"
+}

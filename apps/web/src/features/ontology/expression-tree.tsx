@@ -95,7 +95,11 @@ export function ExpressionReadView({ snapshot, onLocate }: {
       <h3>高阶 OWL 只读表达式与公理</h3>
       <p>{snapshot.version.kind === "DRAFT" ? "固定草稿" : "固定正式 Release"} {snapshot.version.id} · revision {snapshot.version.revision ?? "不适用"}</p>
       <p className="g2-hash">{snapshot.scope.organizationId} / {snapshot.scope.siteIds.join(" / ")} · bundle {snapshot.hashes.bundleHash}</p>
-      <p className="g2-hash">profile {snapshot.profileId} · v{snapshot.profileVersion} · {snapshot.profileHash}</p>
+      <p className="g2-hash">当前平台支持策略 Profile：{snapshot.profileId} · v{snapshot.profileVersion} · {snapshot.profileHash}</p>
+      <p className="muted">{snapshot.version.kind === "RELEASE"
+        ? "此策略不是当前选中历史 Release 发布时的策略快照。"
+        : "此策略不是当前选中草稿修订保存时的策略快照。"}</p>
+      <p className="muted">只读投影协议版本：{snapshot.projectionVersion}</p>
       <p className="muted">此视图不修改源、修订或批准。解析成功不等于可发布，SHACL 通过不证明 OWL 逻辑一致性。</p>
       <p className="muted">allValuesFrom 不保证存在关系；Functional 不等于数据库唯一键；属性链保留顺序，导航不等于推理。</p>
       <p className="muted">imports 只显示引用，不联网加载；空白节点标识仅在本源 hash / 版本内有效，不按名称推断 sameAs。</p>

@@ -1,0 +1,75 @@
+{
+  "originalTestedCommit": "80adf4756f3c6da9a5e1be4a0e348ebdd72e2f69",
+  "currentBase": "580d73e7c0fb38b94dbbed1136ee0b1d24fadc9d",
+  "bindingPaths": [
+    "backend",
+    "infra",
+    "scripts",
+    "samples",
+    "docs/contracts",
+    "docs/bootstrap",
+    "global.json",
+    "Directory.Build.props",
+    "Directory.Packages.props",
+    "NuGet.Config",
+    "pnpm-lock.yaml",
+    "package.json",
+    "apps/web/src/lib/api"
+  ],
+  "originalAndBaseLsTreeSha256": "9c004ef518e157eab7bd9edb2d02cc90621610334ac10eecf2bb7ae5f45fb5c6",
+  "unchangedWorkingInputs": true,
+  "policy": "docs/development/local-validation-policy.md",
+  "reason": "唯一产品变化为ExpressionReadView展示文案；后端/权限/历史Profile/Manifest/Run/SSE/公共DTO/生成客户端/运行输入未变。实际Web与本任务浏览器另测，不复用旧Web为新文案PASS。",
+  "records": [
+    {
+      "suite": "semantic-full",
+      "evidencePath": "docs/evidence/G3-M5-001/master/semantic-full/m5-semantic-full.json",
+      "evidenceSha256": "3930502dac00d472970d5dfda47c5d398071840b983da063ba79ca0b07c5c98b",
+      "testSummaries": [
+        "测试运行摘要: 已通过!\n  总计: 296\n  失败: 0\n  成功: 296\n  已跳过: 0\n  持续时间: 36s 493ms\n"
+      ],
+      "status": "REUSED_PASS",
+      "rerunThisTask": false
+    },
+    {
+      "suite": "riot-negative",
+      "evidencePath": "docs/evidence/G3-M5-001/master/riot-negative/m5-riot-negative.json",
+      "evidenceSha256": "ae760b576892017b7f81185909b2824215be43c1db326655087fb965ea860c6b",
+      "testSummaries": [
+        "测试运行摘要: 已通过!\n  总计: 6\n  失败: 0\n  成功: 6\n  已跳过: 0\n  持续时间: 4s 227ms\n"
+      ],
+      "status": "REUSED_PASS",
+      "rerunThisTask": false
+    },
+    {
+      "suite": "publishing-full",
+      "evidencePath": "docs/evidence/G3-M5-001/master/publishing-full/m5-publishing-full.json",
+      "evidenceSha256": "0db026a7854d72d2664814aa6dc88c6ce34a708ae13e79056151d541f7ee483d",
+      "testSummaries": [
+        "测试运行摘要: 已通过!\n  总计: 78\n  失败: 0\n  成功: 78\n  已跳过: 0\n  持续时间: 34s 930ms\n"
+      ],
+      "status": "REUSED_PASS",
+      "rerunThisTask": false
+    },
+    {
+      "suite": "query-full",
+      "evidencePath": "docs/evidence/G3-M5-001/master/query-full/m5-query-full.json",
+      "evidenceSha256": "c95901e3b1b52f8703facd1ef13f3e5a20be1c246c7d345cd06f47565baa9332",
+      "testSummaries": [
+        "测试运行摘要: 已通过!\n  总计: 49\n  失败: 0\n  成功: 49\n  已跳过: 0\n  持续时间: 27s 360ms\n"
+      ],
+      "status": "REUSED_PASS",
+      "rerunThisTask": false
+    },
+    {
+      "suite": "agent-full",
+      "evidencePath": "docs/evidence/G3-M5-001/master/agent-full/m5-agent-full.json",
+      "evidenceSha256": "edd1819531dab13ef6dbd877775f7de88b88dbe0563b0b948a8f3ca558d53130",
+      "testSummaries": [
+        "测试运行摘要: 已通过!\n  总计: 33\n  失败: 0\n  成功: 33\n  已跳过: 0\n  持续时间: 44s 503ms\n"
+      ],
+      "status": "REUSED_PASS",
+      "rerunThisTask": false
+    }
+  ]
+}

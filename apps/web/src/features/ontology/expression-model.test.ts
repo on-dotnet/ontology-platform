@@ -154,6 +154,28 @@ describe("M5只读结构顺序与预算", () => {
 });
 
 describe("M5中文只读组件", () => {
+  it.each(["RELEASE", "DRAFT"] as const)("%s 历史版本明确区分当前支持策略和只读投影协议", kind => {
+    const value = snapshot();
+    value.version = kind === "RELEASE"
+      ? { kind, id: "historical-release-v1", revision: null }
+      : { kind, id: "historical-draft", revision: 2 };
+    const before = JSON.stringify(value);
+    const html = renderToStaticMarkup(createElement(ExpressionReadView, { snapshot: value }));
+    expect(html).toContain(`当前平台支持策略 Profile：${value.profileId} · v4 · ${value.profileHash}`);
+    expect(html).toContain("只读投影协议版本：1");
+    expect(html).toContain(kind === "RELEASE"
+      ? "固定正式 Release historical-release-v1 · revision 不适用"
+      : "固定草稿 historical-draft · revision 2");
+    expect(html).toContain(kind === "RELEASE"
+      ? "此策略不是当前选中历史 Release 发布时的策略快照。"
+      : "此策略不是当前选中草稿修订保存时的策略快照。");
+    expect(html).not.toContain(kind === "RELEASE" ? "草稿修订保存时" : "Release 发布时");
+    expect(html).not.toMatch(/(?:发布时|保存时)(?:的)?(?:策略|Profile)[：: ]*v4|只读投影协议版本：4/);
+    expect(html).not.toContain('class="g2-hash">profile ');
+    for (const hash of [hashes.bundleHash, hashes.ontologyHash, hashes.shapesHash, hashes.dataHash])
+      expect(html).toContain(hash);
+    expect(JSON.stringify(value)).toBe(before);
+  });
   it("支持五维分级、来源、语义限制与标准term准确呈现且没有写入控件", () => {
     const value = snapshot();
     value.sources[0].nodes = [{ ...node(iri("urn:chain"), "axiom"), properties: [{ predicateIri: owl + "imports", values: [iri("https://invalid.example/import")] }] }];

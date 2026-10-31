@@ -1,0 +1,92 @@
+{
+  "taskId": "G3-M5-REVIEW-FIX-001",
+  "executorSha256": "3d16388e8162ebd8557f913f4a83c9f048d55fafed57406e4bca7b0362d20bfa",
+  "status": "PASS",
+  "checks": [
+    {
+      "name": "dry_run",
+      "status": "PASS",
+      "commandExitCode": 0,
+      "realDocker": false,
+      "fixturePrefix": null
+    },
+    {
+      "name": "safe_apply",
+      "status": "PASS",
+      "commandExitCode": 0,
+      "realDocker": false,
+      "fixturePrefix": null
+    },
+    {
+      "name": "expired",
+      "status": "PASS",
+      "commandExitCode": 1,
+      "realDocker": false,
+      "fixturePrefix": null
+    },
+    {
+      "name": "hash",
+      "status": "PASS",
+      "commandExitCode": 1,
+      "realDocker": false,
+      "fixturePrefix": null
+    },
+    {
+      "name": "version",
+      "status": "PASS",
+      "commandExitCode": 1,
+      "realDocker": false,
+      "fixturePrefix": null
+    },
+    {
+      "name": "metadata",
+      "status": "PASS",
+      "commandExitCode": 1,
+      "realDocker": false,
+      "fixturePrefix": null
+    },
+    {
+      "name": "referenced",
+      "status": "PASS",
+      "commandExitCode": 1,
+      "realDocker": false,
+      "fixturePrefix": null
+    },
+    {
+      "name": "unclosed",
+      "status": "PASS",
+      "commandExitCode": 1,
+      "realDocker": false,
+      "fixturePrefix": null
+    },
+    {
+      "name": "existing_log",
+      "status": "PASS",
+      "commandExitCode": 1,
+      "realDocker": false,
+      "fixturePrefix": null
+    },
+    {
+      "name": "unwritable_log",
+      "status": "PASS",
+      "commandExitCode": 1,
+      "realDocker": false,
+      "fixturePrefix": null
+    },
+    {
+      "name": "bad_post",
+      "status": "PASS",
+      "commandExitCode": 1,
+      "realDocker": false,
+      "fixturePrefix": null
+    },
+    {
+      "name": "real_safe_apply",
+      "status": "PASS",
+      "commandExitCode": 0,
+      "realDocker": true,
+      "fixturePrefix": "g2-rfix-fixture-ac8c3e2c00"
+    }
+  ],
+  "fixtureRule": "真实fixture仅替换固定PREFIX为本任务唯一空卷组；其余执行器字节不变；假Docker只注入隔离临时进程PATH。"
+}
