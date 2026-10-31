@@ -43,7 +43,7 @@ class LifecycleTests(unittest.TestCase):
         meta=m.lifecycle_identity(value,'g2')
         self.assertEqual(meta['taskId'],'G3-M2-001')
         self.assertTrue(all(name.startswith('g3-m2-control-') for name in meta['expectedVolumes']))
-        for prefix in ('g3-m4-control','g3-m5-control','../g3-m2-control'):
+        for prefix in ('g3-m5-control','../g3-m2-control'):
             with self.assertRaises(ValueError):m.lifecycle_identity(dict(value,volumePrefix=prefix),'g2')
 
     def test_m3_ownership_persists_exact_authorized_prefix(self):
@@ -51,6 +51,15 @@ class LifecycleTests(unittest.TestCase):
         meta=m.lifecycle_identity(value,'g2')
         self.assertEqual(meta['taskId'],'G3-M3-001')
         self.assertTrue(all(name.startswith('g3-m3-control-') for name in meta['expectedVolumes']))
+
+    def test_m4_ownership_persists_only_the_authorized_phase(self):
+        value={'volumePrefix':'g3-m4-control','resourceLifecycle':{'taskId':'G3-M4-001','runId':'m4-control'}}
+        meta=m.lifecycle_identity(value,'g2')
+        self.assertEqual(meta['taskId'],'G3-M4-001')
+        self.assertEqual(len(meta['expectedVolumes']),8)
+        self.assertTrue(all(name.startswith('g3-m4-control-') for name in meta['expectedVolumes']))
+        with self.assertRaises(ValueError):
+            m.lifecycle_identity(dict(value,volumePrefix='g3-m5-control'),'g2')
 
     def test_existing_private_runtime_is_not_rewritten(self):
         path,value=self.prepare();value.pop('resourceLifecycle');path.write_text(json.dumps(value))

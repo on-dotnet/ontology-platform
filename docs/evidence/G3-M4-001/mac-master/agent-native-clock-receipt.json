@@ -1,0 +1,26 @@
+{
+  "taskId": "G3-M4-001",
+  "agentNative": {
+    "status": "PASS",
+    "tests": 33,
+    "failed": 0,
+    "skipped": 0,
+    "actualChildExitCode": 0,
+    "source": "agent/m4-agent-final.json",
+    "schemaPositive": 3,
+    "schemaNegative": 6,
+    "containerFinally": "all exact IDs strong absent in child records"
+  },
+  "outerTimeline": {
+    "status": "FAIL",
+    "errorCategory": "CLOCK_DRIFT",
+    "durationMs": 68894,
+    "utcSpanMs": 1903759,
+    "interpretation": "UTC/monotonic divergence observed; cause UNKNOWN, wrapper exit1 retained; not a native test failure"
+  },
+  "decision": "Reuse actual 33 native PASS and source hashes; do not repeat passed product test merely to replace timing failure; timing validity NOT_VERIFIED",
+  "selfTest": {
+    "actualFailure": "ResourceLifecycle.Tests.py still categorized M4 as future; update authorized M4 positive and preserve M5 negative",
+    "outerTiming": "CLOCK_DRIFT also observed; keep original"
+  }
+}

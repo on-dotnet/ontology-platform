@@ -1,0 +1,110 @@
+{
+  "taskId": "G3-M4-001",
+  "slice": "B-Impact",
+  "publicationChecks": false,
+  "status": "PASS",
+  "phase": "report_ui",
+  "startedAtUtc": "2026-10-31T01:10:17.969Z",
+  "completedAtUtc": "2026-10-31T01:10:18.944Z",
+  "durationMs": 974.7429170000005,
+  "identifiers": {
+    "assetId": "a05475f1124944e9865435a200204659",
+    "draftId": "ee9d28e064ee4e88884665fbae4c4caa",
+    "reportId": "034889b079c349e1823734c04fcbc593"
+  },
+  "checks": [
+    {
+      "name": "create_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "assess_revision_1_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "real_initial_assessment",
+      "status": "PASS"
+    },
+    {
+      "name": "initial_generate_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "initial_introduction_not_no_impact",
+      "status": "PASS"
+    },
+    {
+      "name": "all_conclusions_have_real_source_evidence",
+      "status": "PASS"
+    },
+    {
+      "name": "uncovered_scope_explicit",
+      "status": "PASS"
+    },
+    {
+      "name": "exact_replay_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "same_input_independent_key_0_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "same_input_independent_key_1_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "report_read_http",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "same_input_first_immutable_envelope",
+      "status": "PASS"
+    },
+    {
+      "name": "same_key_different_payload_http",
+      "status": "PASS",
+      "observedStatus": 409
+    },
+    {
+      "name": "changed_payload_idempotency_conflict",
+      "status": "PASS"
+    },
+    {
+      "name": "viewer_cannot_generate_http",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "partial_scope_report_denied_http",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "ui_real_assessment",
+      "status": "PASS"
+    },
+    {
+      "name": "ui_real_report",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "ui_exact_report_and_technical_eligibility",
+      "status": "PASS"
+    }
+  ],
+  "notRun": [
+    "proposal/approval/activation binding: next backend slice",
+    "expiry/time/provider/profile/activation races: native real module tests",
+    "Windows native",
+    "paid LLM"
+  ]
+}
