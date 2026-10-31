@@ -1,0 +1,338 @@
+{
+  "status": "success",
+  "data": {
+    "resultType": "streams",
+    "result": [
+      {
+        "stream": {
+          "EventId": "1003",
+          "EventName": "PlatformRequestFault",
+          "ExceptionCategory": "database_write",
+          "Outcome": "problem_returned",
+          "Route": "/api/v1/platform/audit",
+          "Status": "503",
+          "TraceId": "12dabd2a233508cbb81456e205586861",
+          "deployment_environment_name": "development",
+          "detected_level": "error",
+          "flags": "1",
+          "observed_timestamp": "1793411655962058000",
+          "scope_name": "OntologyPlatform.Api",
+          "service_name": "ontology-platform-api",
+          "service_version": "G2-THIN-SLICE-001",
+          "severity_number": "17",
+          "severity_text": "Error",
+          "span_id": "58d6d28dfc7ba398",
+          "trace_id": "12dabd2a233508cbb81456e205586861"
+        },
+        "values": [
+          [
+            "1793411655962058000",
+            "PlatformRequestFault"
+          ]
+        ]
+      },
+      {
+        "stream": {
+          "Outcome": "problem_returned",
+          "Route": "/api/v1/platform/audit",
+          "Status": "503",
+          "TraceId": "12dabd2a233508cbb81456e205586861",
+          "deployment_environment_name": "development",
+          "detected_level": "info",
+          "flags": "1",
+          "observed_timestamp": "1793411655962073000",
+          "scope_name": "OntologyPlatform.Api",
+          "service_name": "ontology-platform-api",
+          "service_version": "G2-THIN-SLICE-001",
+          "severity_number": "9",
+          "severity_text": "Information",
+          "span_id": "58d6d28dfc7ba398",
+          "trace_id": "12dabd2a233508cbb81456e205586861"
+        },
+        "values": [
+          [
+            "1793411655962073000",
+            "PlatformTelemetry"
+          ]
+        ]
+      },
+      {
+        "stream": {
+          "TraceId": "12dabd2a233508cbb81456e205586861",
+          "deployment_environment_name": "development",
+          "detected_level": "info",
+          "flags": "1",
+          "observed_timestamp": "1793411655957797000",
+          "scope_name": "Microsoft.AspNetCore.Routing.EndpointMiddleware",
+          "service_name": "ontology-platform-api",
+          "service_version": "G2-THIN-SLICE-001",
+          "severity_number": "9",
+          "severity_text": "Information",
+          "span_id": "58d6d28dfc7ba398",
+          "trace_id": "12dabd2a233508cbb81456e205586861"
+        },
+        "values": [
+          [
+            "1793411655957797000",
+            "PlatformTelemetry"
+          ]
+        ]
+      },
+      {
+        "stream": {
+          "TraceId": "12dabd2a233508cbb81456e205586861",
+          "deployment_environment_name": "development",
+          "detected_level": "info",
+          "flags": "1",
+          "observed_timestamp": "1793411655961972000",
+          "scope_name": "Microsoft.AspNetCore.Routing.EndpointMiddleware",
+          "service_name": "ontology-platform-api",
+          "service_version": "G2-THIN-SLICE-001",
+          "severity_number": "9",
+          "severity_text": "Information",
+          "span_id": "58d6d28dfc7ba398",
+          "trace_id": "12dabd2a233508cbb81456e205586861"
+        },
+        "values": [
+          [
+            "1793411655961972000",
+            "PlatformTelemetry"
+          ]
+        ]
+      },
+      {
+        "stream": {
+          "TraceId": "12dabd2a233508cbb81456e205586861",
+          "deployment_environment_name": "development",
+          "detected_level": "info",
+          "flags": "1",
+          "observed_timestamp": "1793411655962016000",
+          "scope_name": "Microsoft.AspNetCore.Http.HttpResults.ProblemHttpResult",
+          "service_name": "ontology-platform-api",
+          "service_version": "G2-THIN-SLICE-001",
+          "severity_number": "9",
+          "severity_text": "Information",
+          "span_id": "58d6d28dfc7ba398",
+          "trace_id": "12dabd2a233508cbb81456e205586861"
+        },
+        "values": [
+          [
+            "1793411655962016000",
+            "PlatformTelemetry"
+          ]
+        ]
+      },
+      {
+        "stream": {
+          "TraceId": "12dabd2a233508cbb81456e205586861",
+          "deployment_environment_name": "development",
+          "detected_level": "info",
+          "flags": "1",
+          "observed_timestamp": "1793411655962022000",
+          "scope_name": "Microsoft.AspNetCore.Http.HttpResults.ProblemHttpResult",
+          "service_name": "ontology-platform-api",
+          "service_version": "G2-THIN-SLICE-001",
+          "severity_number": "9",
+          "severity_text": "Information",
+          "span_id": "58d6d28dfc7ba398",
+          "trace_id": "12dabd2a233508cbb81456e205586861"
+        },
+        "values": [
+          [
+            "1793411655962022000",
+            "PlatformTelemetry"
+          ]
+        ]
+      }
+    ],
+    "stats": {
+      "summary": {
+        "bytesProcessedPerSecond": 433128629,
+        "linesProcessedPerSecond": 1936177,
+        "totalBytesProcessed": 5497052,
+        "totalLinesProcessed": 24573,
+        "execTime": 0.012692,
+        "queueTime": 3.1e-05,
+        "subqueries": 0,
+        "totalEntriesReturned": 6,
+        "splits": 0,
+        "shards": 1,
+        "totalPostFilterLines": 6,
+        "totalStructuredMetadataBytesProcessed": 4620224
+      },
+      "querier": {
+        "store": {
+          "totalChunksRef": 0,
+          "totalChunksDownloaded": 0,
+          "chunksDownloadTime": 0,
+          "queryReferencedStructuredMetadata": false,
+          "queryUsedV2Engine": false,
+          "chunk": {
+            "headChunkBytes": 0,
+            "headChunkLines": 0,
+            "decompressedBytes": 0,
+            "decompressedLines": 0,
+            "compressedBytes": 0,
+            "totalDuplicates": 0,
+            "postFilterLines": 0,
+            "headChunkStructuredMetadataBytes": 0,
+            "decompressedStructuredMetadataBytes": 0
+          },
+          "chunkRefsFetchTime": 0,
+          "congestionControlLatency": 0,
+          "pipelineWrapperFilteredLines": 0,
+          "dataobj": {
+            "prePredicateDecompressedRows": 0,
+            "prePredicateDecompressedBytes": 0,
+            "prePredicateDecompressedStructuredMetadataBytes": 0,
+            "postPredicateRows": 0,
+            "postPredicateDecompressedBytes": 0,
+            "postPredicateStructuredMetadataBytes": 0,
+            "postFilterRows": 0,
+            "pagesScanned": 0,
+            "pagesDownloaded": 0,
+            "pagesDownloadedBytes": 0,
+            "pageBatches": 0,
+            "totalRowsAvailable": 0,
+            "totalPageDownloadTime": 0
+          }
+        },
+        "querierExecTime": 0.022909
+      },
+      "ingester": {
+        "totalReached": 1,
+        "totalChunksMatched": 1,
+        "totalBatches": 2,
+        "totalLinesSent": 6,
+        "store": {
+          "totalChunksRef": 0,
+          "totalChunksDownloaded": 0,
+          "chunksDownloadTime": 0,
+          "queryReferencedStructuredMetadata": true,
+          "queryUsedV2Engine": false,
+          "chunk": {
+            "headChunkBytes": 150218,
+            "headChunkLines": 1623,
+            "decompressedBytes": 5346834,
+            "decompressedLines": 22950,
+            "compressedBytes": 208508,
+            "totalDuplicates": 0,
+            "postFilterLines": 6,
+            "headChunkStructuredMetadataBytes": 122624,
+            "decompressedStructuredMetadataBytes": 4497600
+          },
+          "chunkRefsFetchTime": 101958,
+          "congestionControlLatency": 0,
+          "pipelineWrapperFilteredLines": 0,
+          "dataobj": {
+            "prePredicateDecompressedRows": 0,
+            "prePredicateDecompressedBytes": 0,
+            "prePredicateDecompressedStructuredMetadataBytes": 0,
+            "postPredicateRows": 0,
+            "postPredicateDecompressedBytes": 0,
+            "postPredicateStructuredMetadataBytes": 0,
+            "postFilterRows": 0,
+            "pagesScanned": 0,
+            "pagesDownloaded": 0,
+            "pagesDownloadedBytes": 0,
+            "pageBatches": 0,
+            "totalRowsAvailable": 0,
+            "totalPageDownloadTime": 0
+          }
+        },
+        "recvWaitTime": 0.011008
+      },
+      "cache": {
+        "chunk": {
+          "entriesFound": 0,
+          "entriesRequested": 0,
+          "entriesStored": 0,
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "requests": 0,
+          "downloadTime": 0,
+          "queryLengthServed": 0
+        },
+        "index": {
+          "entriesFound": 0,
+          "entriesRequested": 0,
+          "entriesStored": 0,
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "requests": 0,
+          "downloadTime": 0,
+          "queryLengthServed": 0
+        },
+        "result": {
+          "entriesFound": 0,
+          "entriesRequested": 0,
+          "entriesStored": 0,
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "requests": 0,
+          "downloadTime": 0,
+          "queryLengthServed": 0
+        },
+        "statsResult": {
+          "entriesFound": 0,
+          "entriesRequested": 0,
+          "entriesStored": 0,
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "requests": 0,
+          "downloadTime": 0,
+          "queryLengthServed": 0
+        },
+        "volumeResult": {
+          "entriesFound": 0,
+          "entriesRequested": 0,
+          "entriesStored": 0,
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "requests": 0,
+          "downloadTime": 0,
+          "queryLengthServed": 0
+        },
+        "seriesResult": {
+          "entriesFound": 0,
+          "entriesRequested": 0,
+          "entriesStored": 0,
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "requests": 0,
+          "downloadTime": 0,
+          "queryLengthServed": 0
+        },
+        "labelResult": {
+          "entriesFound": 0,
+          "entriesRequested": 0,
+          "entriesStored": 0,
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "requests": 0,
+          "downloadTime": 0,
+          "queryLengthServed": 0
+        },
+        "instantMetricResult": {
+          "entriesFound": 0,
+          "entriesRequested": 0,
+          "entriesStored": 0,
+          "bytesReceived": 0,
+          "bytesSent": 0,
+          "requests": 0,
+          "downloadTime": 0,
+          "queryLengthServed": 0
+        }
+      },
+      "index": {
+        "totalChunks": 0,
+        "postFilterChunks": 0,
+        "shardsDuration": 0,
+        "usedBloomFilters": false,
+        "totalStreams": 0,
+        "chunkRefsLookupTime": 0,
+        "bloomFilterTime": 0
+      }
+    }
+  }
+}

@@ -79,3 +79,8 @@
 不授权G1-SEC/G1-FE/G1-OBS/G2或正式业务。管理员安装、机器PATH/默认工具修改、系统Docker安装/WSL修改、不明凭证和付费操作停止报告。
 
 任务卡：[G1-INFRA-001](G1-INFRA-001.md)。历史[G1-ENG-001](G1-ENG-001.md)仍为已交付待审PARTIAL。Master负责main集成，独立写任务使用独立Worktree和分支，公共配置单写者。
+
+
+### G3-M4当前收尾状态（2026-10-31）
+
+全部M4实现范围的适用本地真实门禁已完成，候选testedCommit=9ae30173cf900524c387489f48a97fbb244c9d07；代码独立Review通过，具体绑定/原失败与风险见G3-M4任务卡及交接。Master继续原授权内的main集成、准确Synthetic资源回收、唯一Review ZIP V3与独立重开；尚未生成最终交付标记，不扩大M5/G4/G5。未运行CI/Windows/Intel及未观测活跃时间不写PASS。

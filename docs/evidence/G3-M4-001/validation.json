@@ -1,0 +1,88 @@
+{
+  "evidenceSchemaVersion": 2,
+  "checks": [
+    {
+      "name": "backend-release",
+      "command": "dotnet build backend/OntologyPlatform.slnx --no-restore -c Release -m:1 -nr:false",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "0 errors; existing ASPIRE010 warning. mac-master/stable-backend-release.txt"
+    },
+    {
+      "name": "web",
+      "command": "pwsh -NoProfile -File scripts/verify-web.ps1",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "225 tests/0 fail/0 skip; lint/typecheck/build0; exact unchanged Web input list"
+    },
+    {
+      "name": "semantic-real",
+      "command": "semantic-roundtrip.py current scoped command in SEM-B/impact-semantic-stable-full.json",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "239 PASS/0 fail/0 skip; same committed backend input hashes"
+    },
+    {
+      "name": "publishing-real",
+      "command": "release-faults.py current scoped commands in SEM-B milestone",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "78 unique composite: original77PASS/1FAIL; corrected precise concurrency catch then only failed case1PASS; original retained"
+    },
+    {
+      "name": "query-real",
+      "command": "python3 scripts/acceptance/query-plan.py --label m4-query-final",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "49 PASS/0 fail/0 skip; own exact-container cleanup"
+    },
+    {
+      "name": "agent-real",
+      "command": "python3 scripts/acceptance/mcp-agent.py --label m4-agent-final",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "33 PASS/0 fail/0 skip; schema3 positive/6 negative; actual child0 and strong container cleanup; outer CLOCK_DRIFT is timing failure, not overwritten"
+    },
+    {
+      "name": "engineering-selftest",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1 -SelfTest",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "actual final child0; ReviewPackage103/0; prior formatting/oldM4 expectation/CLOCK_DRIFT failures retained"
+    },
+    {
+      "name": "full-m4-seven-gates",
+      "command": "python3 scripts/acceptance/g3-acceptance-runtime.py --milestone M4 --start-runtime --smoke-fault-check [own private runtime]",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "all7 child0; browser600 checks; smoke11+expected fault/recovery; original frozen126-member reader actualV2 PASS; deps fault/recovery; local performance29 observations; launcher stopped0"
+    },
+    {
+      "name": "cross-platform-paths",
+      "command": "read-only tracked-path casefold/reserved-name scan",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "source paths PASS; macOS ARM64 and Linux containers observed; Windows/Intel native NOT_RUN"
+    }
+  ],
+  "ci": {
+    "status": "NOT_RUN",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  },
+  "metadata": {
+    "taskId": "G3-M4-001",
+    "actualAgentActiveTime": "UNKNOWN",
+    "actualAgentThinkingTime": "UNKNOWN",
+    "inputBinding": "mac-master/final-input-binding.json",
+    "riskMatrix": "docs/handoffs/G3-M4-001.md",
+    "timingAnomalies": "mac-master/agent-native-clock-receipt.json",
+    "resourceCloseout": "PENDING_EXACT_REVIEWED_APPLY",
+    "independentReview": "final code c909/5b972/bf1 approved; final receipts/cleanup pending",
+    "ci": "NOT_RUN"
+  },
+  "validationSource": "LOCAL",
+  "testedCommit": "9ae30173cf900524c387489f48a97fbb244c9d07"
+}

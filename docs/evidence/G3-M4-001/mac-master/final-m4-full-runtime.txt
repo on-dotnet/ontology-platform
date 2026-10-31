@@ -1,0 +1,16 @@
+{"stage":"m4-full-e2e","status":"PASS","passed":600,"failure":null}
+{"status": "PASS", "exitCode": 0, "freezeSha256": "7343311665e5e7b502bd47b7fefe8016695110079a76a02f07d9f89261d759d7", "memberCount": 126, "readerUnchanged": true, "manifestSha256": "9e632706bbf9ee27e070711dcd6901c3b02fbc0204eee171a28542f8d6a9d0e5", "scope": "pre-write strict manifest reader binary; not a G2 application downgrade certification"}
+{"step": 0, "exitCode": 0}
+{"step": 1, "exitCode": 0}
+{"status": "PASS", "checks": 25}
+{"status":"PASS","checks":4}
+{"check": "health_key_required", "status": "PASS", "httpStatus": 401, "elapsedMs": 3.101665999565739, "maximumObservedEnvelopeMs": 3000, "internalBudgetMs": 2000}
+{"check": "all_real_modules_dependencies_ready", "status": "PASS", "httpStatus": 200, "elapsedMs": 36.86862500035204, "maximumObservedEnvelopeMs": 3000, "internalBudgetMs": 2000}
+{"check": "jena_stall_fails_closed", "status": "PASS", "httpStatus": 503, "elapsedMs": 2005.0149999988207, "maximumObservedEnvelopeMs": 3000, "internalBudgetMs": 2000}
+{"check": "jena_recovered", "status": "PASS", "httpStatus": 200, "elapsedMs": 43.447708998428425, "maximumObservedEnvelopeMs": 3000, "internalBudgetMs": 2000}
+{"check": "rustfs_stall_fails_closed", "status": "PASS", "httpStatus": 503, "elapsedMs": 2004.4272499981162, "maximumObservedEnvelopeMs": 3000, "internalBudgetMs": 2000}
+{"check": "rustfs_recovered", "status": "PASS", "httpStatus": 200, "elapsedMs": 49.84008300016285, "maximumObservedEnvelopeMs": 3000, "internalBudgetMs": 2000}
+{"check": "governance_postgres_stall_fails_closed", "status": "PASS", "httpStatus": 503, "elapsedMs": 1008.87741599945, "maximumObservedEnvelopeMs": 3000, "internalBudgetMs": 2000}
+{"check": "governance_postgres_recovered", "status": "PASS", "httpStatus": 200, "elapsedMs": 50.24604099889984, "maximumObservedEnvelopeMs": 3000, "internalBudgetMs": 2000}
+{"status": "PASS", "actualSamples": 29, "coverage": {"shacl": true, "sparql": true, "publication": true, "sse": true}}
+{"status": "PASS", "runId": "dcca1244a7c9412a9331bbba3eab25c4", "evidenceDirectory": "docs/evidence/G3-M4-001/runtime/g3-m4-20e9c662b3e3/dcca1244a7c9412a9331bbba3eab25c4"}

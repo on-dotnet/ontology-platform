@@ -1,0 +1,141 @@
+{
+  "schemaVersion": 1,
+  "taskId": "G3-M4-001",
+  "measuredThrough": "final local gates; packaging/cleanup later observations will be appended in final artifact receipt",
+  "stepCount": 129,
+  "observedUtcSpanMs": 40199498,
+  "utcSpanValidity": "PARTIAL: CLOCK_DRIFT intervals; not agent active or thinking time",
+  "recordedMonotonicCumulativeMs": 2175414,
+  "validClockIntervalUnionMs": 1669115,
+  "validClockCumulativeMs": 1943770,
+  "validClockParallelOverlapMs": 274655,
+  "observableCriticalPathLowerBoundMs": 481476,
+  "criticalPathLimitation": "Only recorded dependencies; cross-agent reasoning/scheduling gaps UNKNOWN",
+  "failedCommandCount": 20,
+  "clockDriftCount": 2,
+  "recordedRecheckCount": 1,
+  "agentActiveTime": "UNKNOWN",
+  "agentThinkingTime": "UNKNOWN",
+  "unobservedGapCause": "UNKNOWN",
+  "nestedRuntimeRows": "excluded from aggregate to avoid double counting parent full-runtime commands; retained for gate breakdown",
+  "sources": [
+    {
+      "path": "docs/evidence/G3-M4-001/mac-master/timeline.jsonl",
+      "sha256": "57d3e21342a6dc51041ab9fbba5dc1e7f1f1fb4509a4005c3a34ca417c4b6584",
+      "summary": {
+        "schemaVersion": 1,
+        "stepCount": 68,
+        "wallClockMs": 40199498,
+        "observedIntervalUnionMs": 3439108,
+        "cumulativeTaskMs": 1775236,
+        "overlapMs": 0,
+        "observableCriticalPathMs": 481476,
+        "recheckCount": 1,
+        "taskTypeDurationMs": {
+          "PREFLIGHT": 13221,
+          "TEST": 1751458,
+          "BUILD": 10557
+        },
+        "failureCategories": {
+          "COMMAND_FAILED": 8,
+          "CLOCK_DRIFT": 2
+        },
+        "agentActiveTime": "UNKNOWN",
+        "agentThinkingTime": "UNKNOWN",
+        "limitations": "Only recorded intervals/dependencies are observed; no chat, model cost or unobserved activity inferred."
+      }
+    },
+    {
+      "path": "docs/evidence/G3-M4-001/SEM/timeline.jsonl",
+      "sha256": "9c3881a6c559612b90e2b5665cc63745764a5940d0e5f543b6fdf679a3b19b52",
+      "summary": {
+        "schemaVersion": 1,
+        "stepCount": 6,
+        "wallClockMs": 823864,
+        "observedIntervalUnionMs": 123555,
+        "cumulativeTaskMs": 123553,
+        "overlapMs": 0,
+        "observableCriticalPathMs": 46008,
+        "recheckCount": 0,
+        "taskTypeDurationMs": {
+          "TEST": 123553
+        },
+        "failureCategories": {
+          "COMMAND_FAILED": 1
+        },
+        "agentActiveTime": "UNKNOWN",
+        "agentThinkingTime": "UNKNOWN",
+        "limitations": "Only recorded intervals/dependencies are observed; no chat, model cost or unobserved activity inferred."
+      }
+    },
+    {
+      "path": "docs/evidence/G3-M4-001/WEB/timeline.jsonl",
+      "sha256": "59516b91ad59ad19d9fc1eac4b1b612e6a659a22e3458870d656b1a4bd85c0e7",
+      "summary": {
+        "schemaVersion": 1,
+        "stepCount": 11,
+        "wallClockMs": 475186,
+        "observedIntervalUnionMs": 27628,
+        "cumulativeTaskMs": 27627,
+        "overlapMs": 0,
+        "observableCriticalPathMs": 9101,
+        "recheckCount": 0,
+        "taskTypeDurationMs": {
+          "TEST": 27627
+        },
+        "failureCategories": {
+          "COMMAND_FAILED": 1
+        },
+        "agentActiveTime": "UNKNOWN",
+        "agentThinkingTime": "UNKNOWN",
+        "limitations": "Only recorded intervals/dependencies are observed; no chat, model cost or unobserved activity inferred."
+      }
+    },
+    {
+      "path": "docs/evidence/G3-M4-001/SEM-B/timeline.jsonl",
+      "sha256": "66805ab08e0e4672c68c78ce5243c5b86489012c2d234fedc6e2e1b61e6c4270",
+      "summary": {
+        "schemaVersion": 1,
+        "stepCount": 23,
+        "wallClockMs": 31145390,
+        "observedIntervalUnionMs": 220635,
+        "cumulativeTaskMs": 220629,
+        "overlapMs": 0,
+        "observableCriticalPathMs": 48321,
+        "recheckCount": 0,
+        "taskTypeDurationMs": {
+          "TEST": 220629
+        },
+        "failureCategories": {
+          "COMMAND_FAILED": 6
+        },
+        "agentActiveTime": "UNKNOWN",
+        "agentThinkingTime": "UNKNOWN",
+        "limitations": "Only recorded intervals/dependencies are observed; no chat, model cost or unobserved activity inferred."
+      }
+    },
+    {
+      "path": "docs/evidence/G3-M4-001/WEB-B/timeline.jsonl",
+      "sha256": "91e7deb0ae686374a0079d76901e83725a67e6c6645ff6ddb64e95955f8db37c",
+      "summary": {
+        "schemaVersion": 1,
+        "stepCount": 21,
+        "wallClockMs": 1718073,
+        "observedIntervalUnionMs": 28370,
+        "cumulativeTaskMs": 28369,
+        "overlapMs": 0,
+        "observableCriticalPathMs": 3027,
+        "recheckCount": 0,
+        "taskTypeDurationMs": {
+          "TEST": 28369
+        },
+        "failureCategories": {
+          "COMMAND_FAILED": 2
+        },
+        "agentActiveTime": "UNKNOWN",
+        "agentThinkingTime": "UNKNOWN",
+        "limitations": "Only recorded intervals/dependencies are observed; no chat, model cost or unobserved activity inferred."
+      }
+    }
+  ]
+}
