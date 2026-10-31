@@ -1,6 +1,6 @@
 # G6-P0-PARSER-PREP-001
 
-状态 IN_PROGRESS；仅 PREP。BaseSha=d1a61daffe844475b07705797e3ad325cc3f2945，重新 fetch origin/main 与 HEAD 同值。
+状态 PREP_VALIDATED_PENDING_FINAL_PACKAGE_REOPEN；仅 PREP。BaseSha=d1a61daffe844475b07705797e3ad325cc3f2945，重新 fetch origin/main 与 HEAD 同值。
 Master 分支 codex/g6-p0-parser-prep-master；托管树 /Users/chasen/.codex/worktrees/g6-p0-parser-prep-master/ontology-platform。
 Parser 分支 codex/g6-p0-parser-prep-parser；独立托管树 /Users/chasen/.codex/worktrees/g6-p0-parser-prep-parser/ontology-platform。Reviewer 非作者只读。
 
@@ -29,3 +29,7 @@ Python 标准库 unittest discovery 分别覆盖 tests 与 harness；附件 veri
 - `pwsh -NoProfile -File scripts/verify.ps1`；`git diff --check`。
 - `pwsh -NoProfile -File scripts/test-review-evidence.ps1 -EvidenceFile docs/evidence/G6-P0-PARSER-PREP-001/validation.json -ExpectedHead <testedCommit>`。
 Import：测试用文件绝对定位experiments/g6-p0并加至sys.path，不依赖pip安装；禁止下载依赖来修import。
+
+## 源码与交接冻结
+
+非作者源码/设计Review通过，Parser35+Harness37+seed9/18及适用稳定完整验证均PASS；testedCommit见本任务validation.json。源码/合同/输入冻结，此后仅证据/任务文档。最终包PARTIAL保留真实运行时NOT_RUN和安装闭包BLOCKED；正式独立重开回执在artifacts/reviews，完成后停等ChatGPT复审。无main集成授权。资源17原树+2任务树KEEP，精确临时回收与Docker未知项见delivery-report。

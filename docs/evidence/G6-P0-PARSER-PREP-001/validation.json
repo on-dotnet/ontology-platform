@@ -1,0 +1,137 @@
+{
+  "evidenceSchemaVersion": 2,
+  "validationSource": "LOCAL",
+  "testedCommit": "df38f36134c1dedf90341324ddb2fca329ac6250",
+  "checks": [
+    {
+      "name": "g6-preflight",
+      "command": "python3 -B experiments/g6-p0/harness/preflight.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Raw bytes and SHA256: g6-preflight-final.source.json; stdlib/engineering scope only."
+    },
+    {
+      "name": "parser35",
+      "command": "python3 -B -m unittest discover -s experiments/g6-p0/tests -p test_*.py -v",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Raw bytes and SHA256: parser35-final.source.json; stdlib/engineering scope only."
+    },
+    {
+      "name": "harness37",
+      "command": "python3 -B -m unittest discover -s experiments/g6-p0/harness -p test_*.py -v",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Raw bytes and SHA256: harness37-final.source.json; stdlib/engineering scope only."
+    },
+    {
+      "name": "seed9-spans18",
+      "command": "python3 -B experiments/g6-p0/fixtures/synthetic_seed/verify_seed.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Raw bytes and SHA256: seed9-spans18-final.source.json; stdlib/engineering scope only."
+    },
+    {
+      "name": "metadata-audit",
+      "command": "python3 -B experiments/g6-p0/supply-chain/audit_metadata.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Raw bytes and SHA256: metadata-audit-final.source.json; stdlib/engineering scope only."
+    },
+    {
+      "name": "static",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Raw bytes and SHA256: static-final.source.json; stdlib/engineering scope only."
+    },
+    {
+      "name": "selftest",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1 -SelfTest",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Raw bytes and SHA256: selftest-final.source.json; stdlib/engineering scope only."
+    },
+    {
+      "name": "diff-check",
+      "command": "git diff --check d1a61daffe844475b07705797e3ad325cc3f2945 HEAD",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Raw bytes and SHA256: diff-check-final.source.json; stdlib/engineering scope only."
+    },
+    {
+      "name": "Docling-PaddleOCR-runtime",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Forbidden/not authorized in PREP; no runtime success claimed."
+    },
+    {
+      "name": "Docker-runtime",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Forbidden/not authorized in PREP; no runtime success claimed."
+    },
+    {
+      "name": "Provider-real-API",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Forbidden/not authorized in PREP; no runtime success claimed."
+    },
+    {
+      "name": "Windows-Linux-native",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Forbidden/not authorized in PREP; no runtime success claimed."
+    },
+    {
+      "name": "OS-secret-store",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Forbidden/not authorized in PREP; no runtime success claimed."
+    },
+    {
+      "name": "local-temp-cleanup",
+      "command": "python3 /private/tmp/g6_cleanup_own.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "16 exact task objects /42 files /319571 logical bytes removed; independent absence verification. resources-cleanup.json; physical bytes NOT_VERIFIED."
+    },
+    {
+      "name": "docker-metadata",
+      "command": "read-only command arrays in resources-before.json/resources-after.json/resources-final.json",
+      "status": "PARTIAL",
+      "exitCode": 0,
+      "output": "0 containers,8 volumes,14 image rows; default bridge ID drift cause NOT_VERIFIED; Before history filtered incorrectly into5 empty objects. No task Docker create/delete; not global unchanged PASS."
+    },
+    {
+      "name": "dependency-install-closure",
+      "command": null,
+      "status": "BLOCKED",
+      "exitCode": null,
+      "output": "162 declared nodes/334 edges/3493 artifacts inventoried. Platform constraints, native licenses and complete weight set not resolved; no installs/downloads."
+    }
+  ],
+  "ci": {
+    "status": "NOT_RUN",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  },
+  "metadata": {
+    "taskId": "G6-P0-PARSER-PREP-001",
+    "actualAgentActiveTime": "UNKNOWN",
+    "actualRuntime": "NOT_RUN",
+    "dependencyInstallClosure": "BLOCKED",
+    "parserTests": 35,
+    "harnessTests": 37,
+    "seedFiles": 9,
+    "seedSpans": 18,
+    "runnerSummaryCorrection": "Final runner stdout printed checks=13 complete=false after appending five NOT_RUN rows to shared list. Actual eight executed commands all exit0; no validation failure. Original runner source retained."
+  }
+}

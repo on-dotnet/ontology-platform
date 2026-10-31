@@ -1,0 +1,21 @@
+{
+  "taskId": "G6-P0-PARSER-PREP-001",
+  "command": [
+    "docker",
+    "--context",
+    "desktop-linux",
+    "events",
+    "--since",
+    "2026-10-31T13:55:14.340095+00:00",
+    "--until",
+    "2026-10-31T14:14:25.212257+00:00",
+    "--filter",
+    "type=network",
+    "--format",
+    "{{.Time}} {{.Action}} {{.Actor.ID}}"
+  ],
+  "exitCode": 0,
+  "events": [],
+  "stderrCategory": null,
+  "conclusion": "Default bridge ID changed between snapshots. Cause/actor NOT_VERIFIED; no task network mutation authorized or executed by task commands. No deletion or global resource unchanged PASS claimed."
+}

@@ -1,0 +1,186 @@
+{
+  "taskId": "G6-P0-PARSER-PREP-001",
+  "utc": "2026-10-31T14:20:57.871265+00:00",
+  "snapshot": {
+    "version": {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "version",
+        "--format",
+        "{{json .Server}}"
+      ],
+      "exitCode": 0,
+      "output": [
+        "{\"Platform\":{\"Name\":\"Docker Desktop 4.96.3 (244472)\"},\"Version\":\"29.9.2\",\"ApiVersion\":\"1.56\",\"MinAPIVersion\":\"1.40\",\"Os\":\"linux\",\"Arch\":\"arm64\",\"Components\":[{\"Name\":\"Engine\",\"Version\":\"29.9.2\",\"Details\":{\"ApiVersion\":\"1.56\",\"Arch\":\"arm64\",\"BuildTime\":\"Tue Oct 20 18:44:14 2026\",\"Experimental\":\"false\",\"GitCommit\":\"0367cbe\",\"GoVersion\":\"go1.26.10\",\"KernelVersion\":\"7.0.14-linuxkit\",\"MinAPIVersion\":\"1.40\",\"Module\":\"github.com/moby/moby/v2\",\"ModuleVersion\":\"v2.0.0+unknown\",\"Os\":\"linux\"}},{\"Name\":\"containerd\",\"Version\":\"v2.4.2\",\"Details\":{\"GitCommit\":\"b7a25261e029d68978bbf290df0a62fc819b3c51\"}},{\"Name\":\"runc\",\"Version\":\"1.5.2\",\"Details\":{\"GitCommit\":\"v1.5.2-0-g29dd3dc2\"}},{\"Name\":\"docker-init\",\"Version\":\"0.19.0\",\"Details\":{\"GitCommit\":\"de40ad0\"}}],\"GitCommit\":\"0367cbe\",\"GoVersion\":\"go1.26.10\",\"KernelVersion\":\"7.0.14-linuxkit\",\"BuildTime\":\"2026-10-20T18:44:14.000000000+00:00\"}"
+      ],
+      "status": "OBSERVED",
+      "stderrCategory": null
+    },
+    "engine": {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{.ID}}"
+      ],
+      "exitCode": 0,
+      "output": [
+        "7a8785bb-6b6e-4ae4-8065-996f4bf83016"
+      ],
+      "status": "OBSERVED",
+      "stderrCategory": null
+    },
+    "containers": {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "ps",
+        "-a",
+        "--no-trunc",
+        "--format",
+        "{{.ID}} {{.Names}} {{.Status}}"
+      ],
+      "exitCode": 0,
+      "output": [],
+      "status": "OBSERVED",
+      "stderrCategory": null
+    },
+    "volumes": {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "ls",
+        "--format",
+        "{{.Name}}"
+      ],
+      "exitCode": 0,
+      "output": [
+        "g2-ef979bd04cc0-alloy-data",
+        "g2-ef979bd04cc0-fuseki-data",
+        "g2-ef979bd04cc0-grafana-data",
+        "g2-ef979bd04cc0-loki-data",
+        "g2-ef979bd04cc0-postgres-data",
+        "g2-ef979bd04cc0-prometheus-data",
+        "g2-ef979bd04cc0-rustfs-data",
+        "g2-ef979bd04cc0-tempo-data"
+      ],
+      "status": "OBSERVED",
+      "stderrCategory": null
+    },
+    "images": {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "image",
+        "ls",
+        "--no-trunc",
+        "--format",
+        "{{.ID}} {{.Repository}}:{{.Tag}}"
+      ],
+      "exitCode": 0,
+      "output": [
+        "sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c ontology-platform-fuseki:context-4fbf23514516632dcb651b5c05bf04e9992da52491607b6cf58de1f7348ff9ab",
+        "sha256:cc1591ccefc0ab280cfd1fef2ebc5315de7d2f39d8d1c1d690c37e305810a9b2 hlc-iov-release-postgis:18.6-3.6.3",
+        "sha256:39b0fb6616a466a05b2ff8c691bb14a63557c70118d433a4b70fd1068b1bef60 ontology-platform-fuseki:context-1e45f836d9837cbc75d23adb3ad37b0ff79a545ef06102a87aa246feea9cc1e5",
+        "sha256:401e1fbc58c27b08c3103e00c86b22bd175a1cdd8f8a7d61965133f27a24437f ontology-platform-g2-fuseki:6.2.0",
+        "sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b quay.io/keycloak/keycloak:<none>",
+        "sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18 grafana/alloy:<none>",
+        "sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044 grafana/tempo:<none>",
+        "sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2 prom/prometheus:<none>",
+        "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6 hlc-iov-release-pg-base:18.6",
+        "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6 postgres:<none>",
+        "sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28 grafana/loki:<none>",
+        "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b rustfs/rustfs:<none>",
+        "sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f grafana/grafana:<none>",
+        "sha256:93b8a14ea2f412782e4e842651273b4d903e35cc496284f178fbbe2d67d00976 docker.m.daocloud.io/library/maven:3.9-eclipse-temurin-25"
+      ],
+      "status": "OBSERVED",
+      "stderrCategory": null
+    },
+    "networks": {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "network",
+        "ls",
+        "--no-trunc",
+        "--format",
+        "{{.ID}} {{.Name}}"
+      ],
+      "exitCode": 0,
+      "output": [
+        "3ff2c50ebb8570e568d4d6a0420d5291ea434e13bdc8f8618307a7f9489889cb bridge",
+        "80ac07a0bfc7ad5bdedefec78a3a66c97c4c74093c4a8533f05f4cb96bcbc4d0 host",
+        "e66d65cfe0714eb9fde22ab801d77393aeb653344362c0faac45292d829dab8e none"
+      ],
+      "status": "OBSERVED",
+      "stderrCategory": null
+    },
+    "history": {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "buildx",
+        "history",
+        "ls",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "output": [
+        {
+          "ref": "desktop-linux/desktop-linux/1kq80249gfrdurl9atazzw7kl",
+          "status": "Completed",
+          "created_at": "2026-10-28T14:58:46.930776213Z",
+          "completed_at": "2026-10-28T14:58:52.622966299Z"
+        },
+        {
+          "ref": "desktop-linux/desktop-linux/vq2df00gcyjps32jx8vlylpuk",
+          "status": "Completed",
+          "created_at": "2026-10-28T13:49:49.957334256Z",
+          "completed_at": "2026-10-28T13:56:02.930179637Z"
+        },
+        {
+          "ref": "desktop-linux/desktop-linux/rcb0gy3pt97pgilczmff1itne",
+          "status": "Completed",
+          "created_at": "2026-10-28T13:45:09.524610876Z",
+          "completed_at": "2026-10-28T13:47:26.546721092Z"
+        },
+        {
+          "ref": "desktop-linux/desktop-linux/ihl3gp469h5nq38l942lv9p1v",
+          "status": "Error",
+          "created_at": "2026-10-28T13:34:41.749890335Z",
+          "completed_at": "2026-10-28T13:45:07.31423775Z"
+        },
+        {
+          "ref": "desktop-linux/desktop-linux/qao9ei05z94c4rt13gu1p0kkh",
+          "status": "Error",
+          "created_at": "2026-10-28T13:32:07.929946958Z",
+          "completed_at": "2026-10-28T13:32:35.188300221Z"
+        }
+      ],
+      "status": "OBSERVED",
+      "stderrCategory": null
+    }
+  },
+  "scope": "Read-only final observation after stdlib/SelfTest; no Docker mutation",
+  "sameAsPriorAfter": {
+    "version": true,
+    "engine": true,
+    "containers": true,
+    "volumes": true,
+    "images": true,
+    "networks": true,
+    "history": true
+  }
+}

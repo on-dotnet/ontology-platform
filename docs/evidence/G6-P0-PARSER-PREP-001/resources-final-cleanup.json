@@ -1,0 +1,43 @@
+{
+  "taskId": "G6-P0-PARSER-PREP-001",
+  "utc": "2026-10-31T14:22:41.463931+00:00",
+  "rows": [
+    {
+      "path": "/private/tmp/g6_final_validate.py",
+      "beforeFiles": 1,
+      "beforeBytes": 3020,
+      "exitCode": 0,
+      "afterExists": false,
+      "command": "Path.unlink exact task temporary executor"
+    },
+    {
+      "path": "/private/tmp/g6_cleanup_own.py",
+      "beforeFiles": 1,
+      "beforeBytes": 3177,
+      "exitCode": 0,
+      "afterExists": false,
+      "command": "Path.unlink exact task temporary executor"
+    },
+    {
+      "path": "/private/tmp/g6_closeout.py",
+      "beforeFiles": 1,
+      "beforeBytes": 10106,
+      "exitCode": 0,
+      "afterExists": false,
+      "command": "Path.unlink exact task temporary executor"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g6-p0-parser-prep-master/ontology-platform/experiments/g6-p0/harness/__pycache__",
+      "beforeFiles": 2,
+      "beforeBytes": 49681,
+      "exitCode": 0,
+      "afterExists": false,
+      "command": "shutil.rmtree exact task generated pycache after no-symlink and pyc-only checks"
+    }
+  ],
+  "filesRemoved": 5,
+  "logicalBytesRemoved": 65984,
+  "physicalBytes": "NOT_VERIFIED",
+  "monitorPid": 94412,
+  "monitorExitCode": 0
+}
