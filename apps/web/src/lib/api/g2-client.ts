@@ -33,6 +33,14 @@ export function createG2Client(options: { fetch?: typeof fetch } = {}) {
   }
   const id = encodeURIComponent;
   return {
+    /** 精确草稿修订只读树不发送CSRF写请求；非法修订在传输前拒绝。 */
+    draftExpressions: (draftId: string, revision: number, signal?: AbortSignal) => {
+      if (!Number.isSafeInteger(revision) || revision < 1) throw new RangeError("表达式读取要求准确的正整数修订。");
+      return read<G2.OwlExpressionSnapshot>(`/ontology-drafts/${id(draftId)}/expressions?revision=${revision}`, signal);
+    },
+    /** 固定正式版本由服务器核验原始不可变源，不回读当前草稿。 */
+    releasedExpressions: (releaseId: string, signal?: AbortSignal) =>
+      read<G2.OwlExpressionSnapshot>(`/releases/${id(releaseId)}/expressions`, signal),
     versionDiff: (body: G2.CompareVersionsRequest, signal?: AbortSignal) =>
       write<G2.VersionDiff>("/ontology-version-diffs", body, "POST", undefined, signal),
     generateImpact: (body: G2.GenerateImpactReportRequest, signal?: AbortSignal) =>
