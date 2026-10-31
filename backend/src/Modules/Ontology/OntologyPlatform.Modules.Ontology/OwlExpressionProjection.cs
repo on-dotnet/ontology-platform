@@ -26,6 +26,9 @@ internal sealed class OwlExpressionProjection
     /// <summary>普通及qualified基数谓词，不将其误当SHACL数量约束。</summary>
     private static readonly HashSet<string> Cardinalities = new([Owl + "cardinality", Owl + "minCardinality", Owl + "maxCardinality", Owl + "qualifiedCardinality", Owl + "minQualifiedCardinality", Owl + "maxQualifiedCardinality"], StringComparer.Ordinal);
 
+    /// <summary>restriction单个构造槽位，不能把多个限制字段误认成单一完整表达式。</summary>
+    private static readonly HashSet<string> RestrictionConstructors = new(Cardinalities.Concat([Owl + "someValuesFrom", Owl + "allValuesFrom", Owl + "hasValue", Owl + "hasSelf"]), StringComparer.Ordinal);
+
     /// <summary>以RDF列表表达的标准OWL构造。</summary>
     private static readonly HashSet<string> ListPredicates = new([Owl + "intersectionOf", Owl + "unionOf", Owl + "oneOf", Owl + "propertyChainAxiom", Owl + "hasKey", Owl + "members", Owl + "distinctMembers", Owl + "disjointUnionOf", Owl + "onProperties", Owl + "withRestrictions"], StringComparer.Ordinal);
 
@@ -158,16 +161,53 @@ internal sealed class OwlExpressionProjection
         // 同一空白结构有多个入边时显示引用；共享不等于损坏或循环。
         if (subject.Kind == RdfTermKind.Blank && subjects.Values.SelectMany(items => items).Count(item => item.Object == subject) > 1)
             Add("shared_blank_reference", "该空白结构由多个位置共享；只读视图使用引用，不复制或改写。", subject, null, invalid: false);
-        // restriction的限定基数要求恰好一个onClass或onDataRange及受控onProperty。
-        var qualified = subjects[subject].Where(item => Cardinalities.Contains(item.Predicate) && item.Predicate.Contains("Qualified", StringComparison.Ordinal) || item.Predicate == Owl + "qualifiedCardinality").ToArray();
-        if (qualified.Length > 0)
-        {
-            // 限定目标只能为一个类或数据范围表达式，不能接受字面量或两个限定目标。
-            var qualifiers = subjects[subject].Where(item => item.Predicate is Owl + "onClass" or Owl + "onDataRange").ToArray();
-            if (qualifiers.Length != 1 || qualifiers[0].Object.Kind == RdfTermKind.Literal || Values(subject, Owl + "onProperty").Length != 1)
-                Add("cardinality_invalid", "qualified cardinality需要唯一onProperty及唯一onClass或onDataRange。", subject, qualified[0].Predicate);
-        }
+        InspectRestriction(subject);
     }
+
+    /// <summary>只验证只读restriction形状，不执行OWL推理或把开放世界关系解释成业务必填。</summary>
+    private void InspectRestriction(RdfTerm subject)
+    {
+        // 识别实际Restriction声明及其结构字段，防止缺类型或未知构造仍宣称完整。
+        var declared = Values(subject, Rdf + "type").Any(item => item.Kind == RdfTermKind.Iri && item.Value == Owl + "Restriction");
+        // 同一主体上的全部构造槽位都必须计数，不能任选某个cardinality或量词。
+        var constructors = subjects[subject].Where(item => RestrictionConstructors.Contains(item.Predicate)).ToArray();
+        // 属性与限定目标也能触发残缺restriction诊断。
+        var properties = Values(subject, Owl + "onProperty");
+        // 数据范围与类限定互斥，ordinary cardinality不允许混入限定目标。
+        var qualifiers = subjects[subject].Where(item => item.Predicate is Owl + "onClass" or Owl + "onDataRange").ToArray();
+        if (!declared && constructors.Length == 0 && properties.Length == 0 && qualifiers.Length == 0 && Values(subject, Owl + "onProperties").Length == 0) return;
+        if (!declared || properties.Length != 1 || !NamedIri(properties[0]) || Values(subject, Owl + "onProperties").Length != 0)
+            Add("restriction_invalid", "只读restriction要求显式类型及唯一命名IRI onProperty；逆属性表达式和多属性构造保留源码但尚不能确认结构。", subject, Owl + "onProperty");
+        if (constructors.Length != 1)
+        {
+            Add("restriction_invalid", "一个restriction必须恰好具有一个量词、hasValue/hasSelf或基数构造；不任意选择冲突字段。", subject, null);
+            return;
+        }
+        // 唯一构造已经确定，后续才检验相应对象槽位的RDF种类。
+        var constructor = constructors[0];
+        // qualified只由标准基数谓词识别，不按字符串近似命名开放未知语法。
+        var qualified = constructor.Predicate is Owl + "qualifiedCardinality" or Owl + "minQualifiedCardinality" or Owl + "maxQualifiedCardinality";
+        if (qualified && (qualifiers.Length != 1 || !ClassOrDataRange(qualifiers[0].Object)))
+            Add("cardinality_invalid", "qualified cardinality需要唯一合法onClass或onDataRange类/数据范围项。", subject, constructor.Predicate);
+        if (!qualified && qualifiers.Length != 0)
+            Add("restriction_invalid", "普通基数、量词及值限制不能混用qualified限定槽位。", subject, qualifiers[0].Predicate);
+        if (constructor.Predicate is Owl + "someValuesFrom" or Owl + "allValuesFrom" && !ClassOrDataRange(constructor.Object))
+            Add("restriction_invalid", "some/allValuesFrom目标必须是类或数据范围IRI/已定义表达式，不能是literal。", subject, constructor.Predicate);
+        if (constructor.Predicate == Owl + "hasValue" && constructor.Object.Kind == RdfTermKind.Blank)
+            Add("restriction_value_unsupported", "hasValue匿名个体完整保留；本版只读值槽位仅确认IRI或typed/language literal。", subject, constructor.Predicate);
+        if (constructor.Predicate == Owl + "hasSelf" && (constructor.Object.Kind != RdfTermKind.Literal
+            || constructor.Object.Datatype != "http://www.w3.org/2001/XMLSchema#boolean" || constructor.Object.Language is not null
+            || constructor.Object.Value.Trim(' ', '\t', '\r', '\n') is not ("true" or "1")))
+            Add("restriction_invalid", "hasSelf需要值为true的xsd:boolean，不把其他literal当作自关系表达式。", subject, constructor.Predicate);
+    }
+
+    /// <summary>RIOT已校验IRI语法；结构槽位仍不得携带literal元数据。</summary>
+    private static bool NamedIri(RdfTerm term) => term.Kind == RdfTermKind.Iri && term.Datatype is null && term.Language is null;
+
+    /// <summary>接受真实命名目标或有本源结构定义的匿名类/数据范围，不从literal猜测类型。</summary>
+    private bool ClassOrDataRange(RdfTerm term) => NamedIri(term) || term.Kind == RdfTermKind.Blank && subjects.ContainsKey(term)
+        && (Values(term, Rdf + "type").Any(item => item.Kind == RdfTermKind.Iri && item.Value is Owl + "Class" or Owl + "Restriction" or Owl + "DataRange" or "http://www.w3.org/2000/01/rdf-schema#Datatype")
+            || subjects[term].Any(item => item.Predicate is Owl + "intersectionOf" or Owl + "unionOf" or Owl + "complementOf" or Owl + "oneOf" or Owl + "datatypeComplementOf" or Owl + "onDatatype"));
 
     /// <summary>按first/rest真实顺序读取有界列表；分叉、断裂和环均不伪装完整。</summary>
     private RdfTerm[] ReadList(RdfTerm head)
