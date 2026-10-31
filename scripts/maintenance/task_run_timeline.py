@@ -16,6 +16,7 @@ FIELDS = {'schemaVersion', 'taskId', 'runId', 'stepId', 'taskType', 'inputFinger
           'concurrencyGroup', 'attempt', 'exitCode', 'commandLabel'}
 TYPES = {'PREFLIGHT', 'IMPLEMENTATION', 'BUILD', 'TEST', 'CI', 'REVIEW', 'CLEANUP', 'PACKAGE', 'WAIT', 'REWORK'}
 OUTCOMES = {'PASS', 'FAIL', 'BLOCKED', 'NOT_RUN'}
+TIMING = {'VALID', 'CLOCK_DRIFT', 'NOT_RUN'}
 IDENTITY = re.compile(r'[A-Za-z0-9][A-Za-z0-9_.-]{0,99}\Z')
 
 
@@ -29,11 +30,33 @@ def utc(value):
     return parsed
 
 
+def timing_status(row):
+    """旧记录保持原字节；仅推导其计时分类，不修写历史执行结果。"""
+    if row['schemaVersion'] == 2:
+        return row['timingStatus']
+    if row['outcome'] == 'NOT_RUN':
+        return 'NOT_RUN'
+    return 'CLOCK_DRIFT' if row['errorCategory'] == 'CLOCK_DRIFT' else 'VALID'
+
+
+def complete(row, ended_at_utc, duration_ms, exit_code, error_category=None):
+    """统一记录真实退出与独立计时有效性；不钳制墙钟、不推定睡眠原因。"""
+    finished = {**row, 'schemaVersion': 2, 'endedAtUtc': ended_at_utc,
+                'durationMs': duration_ms, 'exitCode': exit_code,
+                'outcome': 'PASS' if exit_code == 0 else 'FAIL',
+                'errorCategory': error_category if error_category is not None else
+                                 (None if exit_code == 0 else 'COMMAND_FAILED')}
+    start, end = utc(finished['startedAtUtc']), utc(ended_at_utc)
+    finished['timingStatus'] = ('CLOCK_DRIFT' if end < start or
+        abs((end-start).total_seconds()*1000-duration_ms) > 1000 else 'VALID')
+    return finished
+
+
 def validate(rows):
     """Reject schema drift, invalid exits, duplicate identities and impossible dependency order."""
     known, attempts = {}, {}
     for row in rows:
-        if not isinstance(row, dict) or set(row) != FIELDS or row['schemaVersion'] != 1:
+        if not isinstance(row, dict) or type(row.get('schemaVersion')) is not int or row['schemaVersion'] not in (1, 2) or set(row) != (FIELDS if row['schemaVersion'] == 1 else FIELDS | {'timingStatus'}):
             raise ValueError('Timeline schema mismatch')
         if not all(isinstance(row[key], str) and IDENTITY.fullmatch(row[key])
                    for key in ('taskId', 'runId', 'stepId', 'concurrencyGroup', 'commandLabel')):
@@ -45,9 +68,19 @@ def validate(rows):
         if type(row['durationMs']) is not int or row['durationMs'] < 0:
             raise ValueError('Invalid measured duration')
         start, end = utc(row['startedAtUtc']), utc(row['endedAtUtc'])
-        if end < start or (row['errorCategory'] != 'CLOCK_DRIFT' and
-                           abs((end-start).total_seconds()*1000-row['durationMs']) > 1000):
-            raise ValueError('Clock and monotonic duration disagree')
+        drift = end < start or abs((end-start).total_seconds()*1000-row['durationMs']) > 1000
+        if row['schemaVersion'] == 1:
+            if end < start or (row['errorCategory'] != 'CLOCK_DRIFT' and drift):
+                raise ValueError('Clock and monotonic duration disagree')
+        elif row['timingStatus'] not in TIMING:
+            raise ValueError('Invalid timing status')
+        elif row['outcome'] == 'NOT_RUN':
+            if row['timingStatus'] != 'NOT_RUN':
+                raise ValueError('Unexecuted step has no timing interval')
+        elif row['timingStatus'] != ('CLOCK_DRIFT' if drift else 'VALID'):
+            raise ValueError('Timing status must reflect measured clock difference')
+        if row['schemaVersion'] == 2 and row['errorCategory'] == 'CLOCK_DRIFT':
+            raise ValueError('Clock drift is timing metadata, not a command error')
         code = row['exitCode']
         if code is not None and type(code) is not int:
             raise ValueError('Invalid exit code')
@@ -69,7 +102,8 @@ def validate(rows):
             raise ValueError('Invalid dependency list')
         for dependency in row['dependsOn']:
             key = (row['taskId'], row['runId'], dependency)
-            if key not in known or utc(known[key]['endedAtUtc']) > start:
+            if key not in known or (timing_status(known[key]) == 'VALID' and timing_status(row) == 'VALID'
+                                    and utc(known[key]['endedAtUtc']) > start):
                 raise ValueError('Unknown, cyclic or unfinished dependency')
         attempt_key = (row['taskId'], row['taskType'], row['commandLabel'], row['inputFingerprint'])
         expected = attempts.get(attempt_key, 0) + 1
@@ -80,17 +114,20 @@ def validate(rows):
     return rows
 
 
-def summarize(rows):
+def summarize(rows, host_evidence=None):
     """Report span, union, cumulative runtime, overlap and only the observable dependency path."""
     validate(rows)
     executed = [row for row in rows if row['outcome'] != 'NOT_RUN']
+    valid = [row for row in executed if timing_status(row) == 'VALID']
+    drift_count = len(executed)-len(valid)
     intervals = sorted((utc(row['startedAtUtc']).timestamp()*1000, utc(row['endedAtUtc']).timestamp()*1000)
-                       for row in executed)
+                       for row in valid)
     union, final = 0, None
     for start, end in intervals:
         union += max(0, end-max(start, final if final is not None else start))
         final = max(end, final if final is not None else end)
     cumulative = sum(row['durationMs'] for row in executed)
+    valid_cumulative = sum(row['durationMs'] for row in valid)
     critical, counts, categories = {}, {}, {}
     for row in rows:
         key = (row['taskId'], row['runId'], row['stepId'])
@@ -99,12 +136,48 @@ def summarize(rows):
         if row['errorCategory']:
             categories[row['errorCategory']] = categories.get(row['errorCategory'], 0) + 1
     span = round(max((end for _, end in intervals), default=0)-min((start for start, _ in intervals), default=0))
-    return dict(schemaVersion=1, stepCount=len(rows), wallClockMs=span, observedIntervalUnionMs=round(union),
-                cumulativeTaskMs=cumulative, overlapMs=max(0, cumulative-round(union)),
+    result = dict(schemaVersion=2, stepCount=len(rows), wallClockMs=span if not drift_count else None,
+                validIntervalSpanMs=span, observedIntervalUnionMs=round(union),
+                cumulativeTaskMs=cumulative, validIntervalCumulativeMs=valid_cumulative,
+                overlapMs=max(0, valid_cumulative-round(union)), clockDriftCount=drift_count,
+                timingStatus='CLOCK_DRIFT' if drift_count else 'VALID',
+                confirmedSleepMs='UNKNOWN', nonSleepWallMs='UNKNOWN', humanWaitingTime='UNKNOWN',
                 observableCriticalPathMs=max(critical.values(), default=0),
                 recheckCount=sum(row['attempt'] > 1 for row in rows), taskTypeDurationMs=counts,
                 failureCategories=categories, agentActiveTime='UNKNOWN', agentThinkingTime='UNKNOWN',
-                limitations='Only recorded intervals/dependencies are observed; no chat, model cost or unobserved activity inferred.')
+                limitations='UTC union/overlap use valid intervals only; critical path uses measured monotonic durations and declared dependencies. Sleep causality, chat, model cost and unobserved activity are not inferred.')
+    if host_evidence is not None:
+        result['hostSleepObservation'] = host_sleep_observation(host_evidence)
+    return result
+
+
+def host_sleep_observation(path):
+    """有界读取独立宿主证据；只报告其窗口，不将漂移等价于睡眠或扣减异窗时间。"""
+    path = ordinary(path)
+    if not path.is_file() or path.stat().st_size > 1024*1024:
+        raise ValueError('Bounded host evidence required')
+    raw = path.read_bytes()
+    value = json.loads(raw)
+    start, end = utc(value['startedAtUtc']), utc(value['endedAtUtc'])
+    sleep = value['sleep']
+    if value['schemaVersion'] != 1 or end < start or not isinstance(sleep, dict):
+        raise ValueError('Invalid host observation window')
+    if sleep.get('status') != 'OBSERVED_LOG_WINDOW':
+        return dict(status='NOT_VERIFIED', evidenceSha256=hashlib.sha256(raw).hexdigest())
+    duration = sleep.get('confirmedSleepMs')
+    if type(duration) is not int or duration < 0 or duration > (end-start).total_seconds()*1000:
+        raise ValueError('Sleep duration outside observed host window')
+    events = sleep.get('events')
+    if not isinstance(events, list) or len(events) > 10000:
+        raise ValueError('Bounded sleep event list required')
+    for event in events:
+        if set(event) != {'utc', 'kind', 'idleSleep'} or event['kind'] not in {'Sleep', 'Wake', 'DarkWake'} or type(event['idleSleep']) is not bool or not start <= utc(event['utc']) <= end:
+            raise ValueError('Invalid observed sleep event')
+    return dict(status='OBSERVED_LOG_WINDOW', evidenceSha256=hashlib.sha256(raw).hexdigest(),
+                startedAtUtc=start.isoformat(), endedAtUtc=end.isoformat(), confirmedSleepMs=duration,
+                nonSleepWindowMs=round((end-start).total_seconds()*1000)-duration,
+                events=events, clockDriftCause='UNKNOWN',
+                limitation='Independent host window; not subtracted from command timeline span.')
 
 
 def ordinary(path):
@@ -166,6 +239,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest='mode', required=True)
     summary = sub.add_parser('summary'); summary.add_argument('--path', required=True, type=Path)
+    summary.add_argument('--host-evidence', type=Path)
     run = sub.add_parser('run')
     run.add_argument('--path', required=True, type=Path)
     for key in ('task-id', 'run-id', 'step-id', 'input-fingerprint', 'command-label'):
@@ -194,7 +268,7 @@ def main():
                 args.input_fingerprint = hashlib.sha256(head.encode('ascii')).hexdigest()
             args.command_label, args.concurrency_group, args.depends_on = args.step_id, job, []
         if args.mode == 'summary':
-            print(json.dumps(summarize(read(args.path)), sort_keys=True)); return 0
+            print(json.dumps(summarize(read(args.path), args.host_evidence), sort_keys=True)); return 0
         command = args.command[1:] if args.command[:1] == ['--'] else args.command
         if not command:
             parser.error('An explicit command is required')
@@ -205,7 +279,7 @@ def main():
         attempt = 1 + sum(row['taskId'] == args.task_id and row['taskType'] == args.task_type
                           and row['commandLabel'] == args.command_label and row['inputFingerprint'] == args.input_fingerprint for row in rows)
         start = dt.datetime.now(dt.timezone.utc); monotonic = time.monotonic()
-        row = dict(schemaVersion=1, taskId=args.task_id, runId=args.run_id, stepId=args.step_id,
+        row = dict(schemaVersion=2, timingStatus='VALID', taskId=args.task_id, runId=args.run_id, stepId=args.step_id,
                    taskType=args.task_type, inputFingerprint=args.input_fingerprint,
                    startedAtUtc=start.isoformat(), endedAtUtc=start.isoformat(), durationMs=0,
                    outcome='PASS', errorCategory=None, dependsOn=args.depends_on,
@@ -222,12 +296,7 @@ def main():
         finally:
             end = dt.datetime.now(dt.timezone.utc)
             elapsed = round((time.monotonic()-monotonic)*1000)
-            if end < start or abs((end-start).total_seconds()*1000-elapsed) > 1000:
-                category, code = 'CLOCK_DRIFT', code or 1
-                # Preserve the clock anomaly; no monotonic duration is invented from local wall time.
-                end = max(end, start)
-            row.update(endedAtUtc=end.isoformat(), durationMs=elapsed,
-                       outcome='PASS' if code == 0 else 'FAIL', exitCode=code, errorCategory=category)
+            row = complete(row, end.isoformat(), elapsed, code, category)
             append(args.path, row, assign_attempt=True)
         return code if code is not None and code >= 0 else 1
     except (ValueError, OSError, KeyError, TypeError, json.JSONDecodeError):
