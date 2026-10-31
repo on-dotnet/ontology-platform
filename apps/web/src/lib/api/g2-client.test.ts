@@ -76,3 +76,38 @@ describe("审核、激活与取消的强修订前置条件", () => {
     });
   }
 });
+
+describe("M5表达式只读传输", () => {
+  it("草稿精确revision和正式Release分别GET，沿用同源取消且不发写令牌", async () => {
+    const calls: Array<{ url: string; init?: RequestInit }> = [];
+    const signal = new AbortController().signal;
+    const client = createG2Client({ fetch: async (url, init) => {
+      calls.push({ url: String(url), init });
+      return Response.json({ projectionVersion: "1" });
+    } });
+    await client.draftExpressions("draft/a", 7, signal);
+    await client.releasedExpressions("release/a", signal);
+    expect(calls.map(call => call.url)).toEqual([
+      "/api/v1/ontology-drafts/draft%2Fa/expressions?revision=7", "/api/v1/releases/release%2Fa/expressions",
+    ]);
+    for (const call of calls) {
+      expect(call.init).toMatchObject({ signal, credentials: "same-origin", cache: "no-store", redirect: "error" });
+      expect(call.init?.method).toBeUndefined();
+      expect(call.init?.body).toBeUndefined();
+      expect(new Headers(call.init?.headers).get("X-CSRF-TOKEN")).toBeNull();
+    }
+  });
+  it.each([0, -1, 1.5, NaN, Infinity, Number.MAX_SAFE_INTEGER + 1])("非法revision %s在传输前拒绝", revision => {
+    const client = createG2Client({ fetch: async () => { throw new Error("不应传输"); } });
+    expect(() => client.draftExpressions("draft-fixed", revision)).toThrow(RangeError);
+  });
+  it.each([403, 404, 422, 503])("表达式HTTP %s不转为空树成功", async status => {
+    let calls = 0;
+    const client = createG2Client({ fetch: async () => {
+      calls += 1;
+      return Response.json({ code: "expression_failed", traceId: "synthetic-trace" }, { status });
+    } });
+    await expect(client.draftExpressions("draft-fixed", 7)).rejects.toMatchObject({ status, code: "expression_failed" });
+    expect(calls).toBe(1);
+  });
+});

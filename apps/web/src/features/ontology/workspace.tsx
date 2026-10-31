@@ -22,6 +22,7 @@ import { snapshotMatches } from "./vocabulary-model";
 import { ReleasedVocabulary } from "./released-vocabulary";
 import { IdentityTimeWorkbench } from "./identity-time-workbench";
 import { ReleasedIdentityTime } from "./released-identity-time";
+import { DraftExpressions, ReleasedExpressions } from "./expression-tree";
 import "./workspace.css";
 
 const client = createG2Client();
@@ -37,6 +38,8 @@ const tabs = [{ id: "catalog", title: "资产" }, { id: "source", title: "源码
 export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) {
   const [drafts, setDrafts] = useState<OntologyDraft[] | null>(null);
   const [state, setState] = useState<DraftState | null>(null);
+  const [expressionOpened, setExpressionOpened] = useState(false);
+  const [expressionMode, setExpressionMode] = useState(false);
   const [vocabularyOpened, setVocabularyOpened] = useState(false);
   const [vocabularyMode, setVocabularyMode] = useState(false);
   const [vocabularyPending, setVocabularyPending] = useState(false);
@@ -170,6 +173,8 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
     }
     void execute(async signal => {
       accept(await client.draft(draft.draftId, signal));
+      setExpressionMode(false);
+      setExpressionOpened(false);
       setVocabularyMode(false);
       setVocabularyOpened(false);
       setIdentityMode(false);
@@ -222,7 +227,7 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
           <h1>本体资产与草稿</h1>
           <p>原始 Turtle 是权威源 · 真实 RIOT / SHACL · Synthetic 开发事实</p>
         </div>
-        <span className="tag violet">G3 M4 · 身份与时间</span>
+        <span className="tag violet">G3 M5 · 高阶语义只读</span>
       </div>
       {error !== null && <SemanticError error={error} />}
       {notice && <p role="status" className="g2-notice">{notice}</p>}
@@ -260,6 +265,8 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
             if (hasUnsaved) { setNotice("未保存草稿仍保留，请先保存或显式丢弃。"); return; }
             sourceImports.current.invalidate();
             setState(null);
+            setExpressionMode(false);
+            setExpressionOpened(false);
             setVocabularyMode(false);
             setVocabularyOpened(false);
             setIdentityMode(false);
@@ -286,17 +293,20 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
           {state && (
             <div className="g2-tabs" aria-label="中间建模视图">
               <button className="button" aria-pressed={centerView === "graph"} onClick={() => {
-                setVocabularyMode(false); setIdentityMode(false); setCenterView("graph");
+                setExpressionMode(false); setVocabularyMode(false); setIdentityMode(false); setCenterView("graph");
               }}>图视图</button>
-              <button className="button" aria-pressed={centerView === "source" && !vocabularyMode && !identityMode} onClick={() => {
-                setVocabularyMode(false); setIdentityMode(false); setCenterView("source");
+              <button className="button" aria-pressed={centerView === "source" && !vocabularyMode && !identityMode && !expressionMode} onClick={() => {
+                setExpressionMode(false); setVocabularyMode(false); setIdentityMode(false); setCenterView("source");
               }}>源码视图</button>
               <button className="button" aria-pressed={vocabularyMode} onClick={() => {
-                setVocabularyOpened(true); setVocabularyMode(true); setIdentityMode(false); setCenterView("source");
+                setExpressionMode(false); setVocabularyOpened(true); setVocabularyMode(true); setIdentityMode(false); setCenterView("source");
               }}>术语与单位</button>
               <button className="button" aria-pressed={identityMode} onClick={() => {
-                setIdentityOpened(true); setIdentityMode(true); setVocabularyMode(false); setCenterView("source");
+                setExpressionMode(false); setIdentityOpened(true); setIdentityMode(true); setVocabularyMode(false); setCenterView("source");
               }}>身份与时间</button>
+              <button className="button" aria-pressed={expressionMode} onClick={() => {
+                setExpressionOpened(true); setExpressionMode(true); setVocabularyMode(false); setIdentityMode(false); setCenterView("source");
+              }}>高阶表达式</button>
             </div>
           )}
           {state && centerView === "graph" && (
@@ -305,7 +315,10 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
           <div hidden={!vocabularyMode}>{state && vocabularyOpened && <VocabularyWorkbench
             key={`vocabulary/${state.draft.draftId}/${state.draft.revision}`} draft={state.draft} selected={selected} onSelect={chooseNode}
             dirty={dirty || identityPending} busy={busy} canEdit={canEdit} reason={reason} onPending={setVocabularyPending} pending={vocabularyPending} profile={profile}
-            onLocate={(nextField, focus) => { setField(nextField); setSelected(focus ?? ""); setVocabularyMode(false); setIdentityMode(false); setCenterView("source"); setTab("source"); }}
+            onLocate={(nextField, focus) => {
+              setField(nextField); setSelected(focus ?? ""); setExpressionMode(false);
+              setVocabularyMode(false); setIdentityMode(false); setCenterView("source"); setTab("source");
+            }}
             onCommit={(changes: VocabularyChange[], snapshot: VocabularySnapshot) => void execute(async signal => {
               if (dirty || identityPending || !snapshotMatches(snapshot, state.draft))
                 throw new Error("词汇批次已过期，请先提交其它编辑并刷新当前修订快照。");
@@ -347,9 +360,16 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
                 setStructuralDiff(diff);
             })}
           />}</div>
+          <div hidden={!expressionMode}>{state && expressionOpened && <DraftExpressions
+            key={`expressions/${state.draft.draftId}/${state.draft.revision}`} draft={state.draft} dirty={hasUnsaved}
+            onLocate={(nextField, focus) => {
+              setField(nextField); setSelected(focus ?? ""); setExpressionMode(false); setCenterView("source"); setTab("source");
+              setNotice("已选择准确source hash对应的原始源码；空白节点仅在本源有效，不伪造行列。");
+            }}
+          />}</div>
           {identityPending && <p className="g2-notice">身份时间编辑尚未提交。切换视图保留表单；请原子提交或取消，再修改源码或打开其它资产。</p>}
           {vocabularyPending && <p className="g2-notice">词汇批次尚未提交。切换视图保留批次；请先原子提交或取消批次，再修改源码或打开其它资产。</p>}
-          <div className="g2-stack" hidden={Boolean(state && (centerView !== "source" || vocabularyMode || identityMode))}>
+          <div className="g2-stack" hidden={Boolean(state && (centerView !== "source" || vocabularyMode || identityMode || expressionMode))}>
             <label>资产名称
               <input
                 aria-label="资产名称" value={state?.name ?? name} disabled={busy || !canEdit || structuralPending} maxLength={200}
@@ -502,6 +522,7 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
                 draft={state.draft} profile={profile} dirty={hasUnsaved} busy={busy} canEdit={canEdit}
                 reason={reason} execute={execute} onNotice={setNotice}
                 onLocate={(nextField, focus) => {
+                  setExpressionMode(false);
                   setVocabularyMode(false);
                   setIdentityMode(false);
                   setField(nextField);
@@ -524,6 +545,7 @@ export function OntologyWorkspace({ identity }: { identity: PlatformIdentity }) 
           )}
           <ReleasedVocabulary />
           <ReleasedIdentityTime />
+          <ReleasedExpressions />
           <SupportProfile profile={profile} loading={profileLoading} failed={profileFailed} onRefresh={() => {
             const signal = lifetime.current?.signal;
             if (signal) void loadProfile(signal);

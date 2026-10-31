@@ -7,7 +7,7 @@ export function SupportProfile({ profile, loading, failed, onRefresh }: {
   failed: boolean;
   onRefresh: () => void;
 }) {
-  const expectedCount = profile?.version === "3" ? 22 : profile?.version === "1" || profile?.version === "2" ? 20 : null;
+  const expectedCount = profile?.version === "4" ? 23 : profile?.version === "3" ? 22 : profile?.version === "1" || profile?.version === "2" ? 20 : null;
   const ids = new Set(profile?.capabilities.map(item => item.id));
   const registered = expectedCount !== null && profile?.capabilities.length === expectedCount
     && ids.size === expectedCount && Array.from({ length: expectedCount }, (_, index) => String(index + 1).padStart(2, "0")).every(id => ids.has(id));

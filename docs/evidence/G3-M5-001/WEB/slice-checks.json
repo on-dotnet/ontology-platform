@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "taskId": "G3-M5-WEB",
+  "status": "DRAFT_PARTIAL",
+  "note": "精确Base见task.md，测试输入由同提交源码恢复；非最终V3本地验证Schema。",
+  "checks": [
+    {
+      "name": "targeted-tests-final.log",
+      "command": "node .tools/pnpm/package/bin/pnpm.cjs --dir apps/web exec vitest run src/features/ontology/expression-model.test.ts src/features/ontology/m1-views.test.ts src/lib/api/g2-client.test.ts",
+      "exitCode": 0,
+      "status": "PASS",
+      "summary": "75 PASS / 0 FAIL / 0 skipped，3 files，Vitest记录103ms",
+      "sha256": "c8b42c3e56020524de6a53df0a36f7aac50e8a9a69048966a3e218b2491c8c95",
+      "sizeBytes": 225
+    },
+    {
+      "name": "typecheck-final.log",
+      "command": "node .tools/pnpm/package/bin/pnpm.cjs --dir apps/web run typecheck",
+      "exitCode": 0,
+      "status": "PASS",
+      "summary": "tsc --noEmit，exit0",
+      "sha256": "8366207267355d3e3d5bf3bf6e8c94c5f93f6078c34f08973fa2b38cdda6cc92",
+      "sizeBytes": 15
+    },
+    {
+      "name": "lint-final.log",
+      "command": "node .tools/pnpm/package/bin/pnpm.cjs --dir apps/web exec eslint <8个owned TS/TSX文件>",
+      "exitCode": 0,
+      "status": "PASS",
+      "summary": "exit0，无错误警告",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sizeBytes": 0
+    }
+  ],
+  "notRun": [
+    "真实API浏览器E2E",
+    "真实RIOT/PG",
+    "独立Review",
+    "完整Web build",
+    "远程CI",
+    "Windows/Intel"
+  ],
+  "timing": {
+    "commandRuntime": "UNKNOWN，初期命令未逐条用timeline包装；Vitest自身duration见原日志",
+    "modelActiveTime": "UNKNOWN"
+  },
+  "baseRef": "3e71049"
+}
