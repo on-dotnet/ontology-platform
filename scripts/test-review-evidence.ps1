@@ -42,6 +42,7 @@ try {
             $image = Get-Item -LiteralPath (Join-Path $Root $shot.path)
             if ($image.LinkType -or $image.Length -gt 15MB) { throw 'SCREENSHOT_SELECTION: ordinary bounded image required' }
             $raw = [IO.File]::ReadAllBytes($image.FullName)
+            Assert-ReviewPngDimensions $raw $shot.viewport
             if ($payloads.Add((Get-ReviewHash $raw))) { $compressedBytes += Get-ReviewDeflatedSize $raw }
             if ($compressedBytes -gt 3MB) { throw 'SCREENSHOT_BUDGET: compressed PNG budget exceeded' }
             $count++

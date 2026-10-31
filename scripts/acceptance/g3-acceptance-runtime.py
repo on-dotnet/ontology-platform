@@ -18,11 +18,17 @@ shared = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(shared)
 
 
+preflight_spec = importlib.util.spec_from_file_location('execution_preflight', Path(__file__).parents[1] / 'maintenance/execution_preflight.py')
+preflight = importlib.util.module_from_spec(preflight_spec)
+preflight_spec.loader.exec_module(preflight)
+gate_fingerprint = preflight.product_input_fingerprint
+
+
 def run_attempt():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--runtime-file')
     parser.add_argument('--start-runtime', action='store_true')
-    parser.add_argument('--milestone', choices=['M1', 'M2', 'M3', 'M4'], default='M1')
+    parser.add_argument('--milestone', choices=['M1', 'M2', 'M3', 'M4', 'M5'], default='M1')
     parser.add_argument('--impact-only', action='store_true')
     parser.add_argument('--diff-only', action='store_true')
     parser.add_argument('--api-only', action='store_true')
@@ -34,11 +40,11 @@ def run_attempt():
         parser.error('Choose an owned runtime or explicitly start a new M1 stack')
     if sum((args.api_only, args.ui_only, args.diff_only, args.impact_only, args.workspace_smoke_only)) > 1:
         parser.error('Choose one integration checkpoint')
-    if (args.diff_only or args.impact_only) and args.milestone != 'M4':
+    if (args.diff_only or args.impact_only) and args.milestone not in ('M4', 'M5'):
         parser.error('Fixed-version Diff checkpoint belongs to M4')
     if args.api_only and args.smoke_fault_check:
         parser.error('Smoke fault injection requires a browser checkpoint')
-    if (args.api_only or args.ui_only) and args.milestone not in ('M2', 'M3', 'M4'):
+    if (args.api_only or args.ui_only) and args.milestone not in ('M2', 'M3', 'M4', 'M5'):
         parser.error('Integration checkpoints are authorized only for M2/M3/M4')
     task_id = 'G3-' + args.milestone + '-001'
     task_evidence = 'docs/evidence/' + task_id + '/runtime'
@@ -68,7 +74,9 @@ def run_attempt():
     timeline = importlib.util.module_from_spec(timeline_spec)
     timeline_spec.loader.exec_module(timeline)
     timeline_path = evidence / 'task-run-timeline.jsonl'
-    input_fingerprint = hashlib.sha256(source_head.encode('ascii')).hexdigest()
+    input_fingerprint = gate_fingerprint(ROOT)
+    build_version = hashlib.sha256(Path(__file__).read_bytes() + sys.version.encode()).hexdigest()
+    failure_path = ROOT / 'artifacts' / task_id.lower() / 'gate-failures.json'
     gate_names = ['full-g2-e2e.py', 'g3-compatibility.py', 'g1-regression.py', 'g2-observability.py',
                   'g2-trace-browser.mjs', 'g2-readiness-fault.py', 'performance-baseline.py']
     if args.api_only or args.ui_only or args.diff_only or args.impact_only or args.workspace_smoke_only:
@@ -101,7 +109,10 @@ def run_attempt():
         monotonic = time.monotonic()
         exit_code, category = None, 'COMMAND_EXCEPTION'
         try:
-            result = subprocess.run(command, cwd=ROOT)
+            with preflight.FailureState(failure_path, input_fingerprint, Path(command[1]).name, build_version) as guard:
+                guard.allow('expensive')
+                result = subprocess.run(command, cwd=ROOT)
+                guard.record('expensive', result.returncode)
             exit_code = result.returncode
             category = None if exit_code == 0 else 'COMMAND_FAILED'
             return result
@@ -117,9 +128,14 @@ def run_attempt():
                        dependsOn=[] if index == 0 else [str(index - 1) + '-' + Path(commands[index - 1][1]).stem],
                        concurrencyGroup='g3-runtime-' + args.milestone.lower(), attempt=1,
                        exitCode=exit_code, commandLabel=Path(command[1]).name)
+            row = timeline.complete(row, ended.isoformat(), row['durationMs'], exit_code, category)
             timeline.append(timeline_path, row, assign_attempt=True)
 
     try:
+        # 在AppHost/容器启动前拒绝上次相同输入的昂贵失败；运行时仍持锁重验。
+        for gate_name in gate_names:
+            with preflight.FailureState(failure_path, input_fingerprint, gate_name, build_version) as guard:
+                guard.allow('expensive')
         if args.start_runtime:
             try:
                 with shared.OPENER.open('http://localhost:15100/health/live', timeout=1):
@@ -150,9 +166,11 @@ def run_attempt():
             commands[0].append('--m2-api-only' if args.api_only else '--m2-ui-only' if args.ui_only else '--m2')
         if args.milestone == 'M3' and not args.workspace_smoke_only:
             commands[0].append('--m3-api-only' if args.api_only else '--m3-ui-only' if args.ui_only else '--m3')
+        if args.milestone == 'M5' and not args.workspace_smoke_only:
+            commands[0].append('--m4-impact-only' if args.impact_only else '--m4-diff-only' if args.diff_only else '--m5-api-only' if args.api_only else '--m5-ui-only' if args.ui_only else '--m5')
         if args.milestone == 'M4' and not args.workspace_smoke_only:
             commands[0].append('--m4-impact-only' if args.impact_only else '--m4-diff-only' if args.diff_only else '--m4-api-only' if args.api_only else '--m4-ui-only' if args.ui_only else '--m4')
-        if args.milestone in ('M3', 'M4'):
+        if args.milestone in ('M3', 'M4', 'M5'):
             commands[-1] += ['--chain-report', args.milestone.lower() + '-full-e2e.json']
         if args.smoke_fault_check:
             commands[0].append('--smoke-fault-check')
@@ -176,6 +194,11 @@ def run_attempt():
         acceptance['status'] = 'PASS'
         return 0
     except Exception as failure:
+        category = str(failure).split(':', 1)[0] if isinstance(failure, ValueError) else ''
+        if category in ('SHORT_REPRO_REQUIRED', 'UNCHANGED_FAILURE_BLOCKED', 'FAILURE_STATE_BUSY'):
+            acceptance['failureCategory'] = category
+            acceptance['status'] = 'BLOCKED'
+            return 2
         acceptance['failureCategory'] = type(failure).__name__
         raise
     finally:

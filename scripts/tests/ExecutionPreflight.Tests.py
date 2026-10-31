@@ -132,4 +132,19 @@ class PreflightTests(unittest.TestCase):
         self.assertEqual(len(set(hashes)),3)
 
 
+class ProductInputTests(unittest.TestCase):
+    def test_document_change_reuses_input_but_product_change_invalidates(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder)
+            subprocess.run(['git','init','-q',str(root)],check=True,capture_output=True)
+            (root/'.gitignore').write_text('artifacts/\n')
+            (root/'source.py').write_text('product-v1\n')
+            (root/'docs/tasks').mkdir(parents=True)
+            note=root/'docs/tasks/note.md';note.write_text('one\n')
+            original=m.product_input_fingerprint(root)
+            note.write_text('two\n')
+            self.assertEqual(original,m.product_input_fingerprint(root))
+            (root/'source.py').write_text('product-v2\n')
+            self.assertNotEqual(original,m.product_input_fingerprint(root))
+
 if __name__=='__main__':unittest.main()

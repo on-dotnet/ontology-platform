@@ -28,6 +28,21 @@ Set-StrictMode -Version Latest
 $script:commands = [Collections.Generic.List[object]]::new()
 $script:utf8 = [Text.UTF8Encoding]::new($false)
 
+function Assert-ReviewPngDimensions {
+    param([byte[]]$Bytes, [string]$Viewport)
+    # 只核实PNG签名、IHDR与真实像素尺寸；不把文件后缀当截图证据。
+    if ($Bytes.Length -lt 33 -or [Convert]::ToHexString($Bytes[0..7]) -cne '89504E470D0A1A0A' -or
+        [Text.Encoding]::ASCII.GetString($Bytes, 12, 4) -cne 'IHDR' -or
+        [Convert]::ToHexString($Bytes[8..11]) -cne '0000000D' -or $Viewport -cnotmatch '^([1-9][0-9]{0,4})x([1-9][0-9]{0,4})$') {
+        throw 'SCREENSHOT_DIMENSIONS: actual PNG/IHDR and widthxheight required'
+    }
+    $width = [long]$Bytes[16] * 16777216 + [long]$Bytes[17] * 65536 + [long]$Bytes[18] * 256 + $Bytes[19]
+    $height = [long]$Bytes[20] * 16777216 + [long]$Bytes[21] * 65536 + [long]$Bytes[22] * 256 + $Bytes[23]
+    if ($width -ne [long]$Matches[1] -or $height -ne [long]$Matches[2] -or $width -gt 32768 -or $height -gt 32768) {
+        throw 'SCREENSHOT_DIMENSIONS: metadata differs from actual PNG dimensions'
+    }
+}
+
 function Invoke-ReviewGit {
     param([string]$Repository, [string[]]$Arguments, [switch]$AllowFailure)
     $info = [Diagnostics.ProcessStartInfo]::new('git')
@@ -222,7 +237,7 @@ function Get-ReviewSizeReport {
 }
 
 function Get-ReviewSnapshot {
-    param([string]$Repository, [string]$Base, [string]$Head, [int]$Version = 1, [string]$WorkItem = '')
+    param([string]$Repository, [string]$Base, [string]$Head, [int]$Version = 1, [string]$WorkItem = '', [bool]$VerifyPngDimensions = $false)
     foreach ($sha in @($Base, $Head)) {
         if ($sha -notmatch '^[0-9a-f]{40}$') { throw 'COMMIT_REQUIRED: explicit full lowercase 40-character commit SHA required' }
         $resolved = Invoke-ReviewGit $Repository @('rev-parse', '--verify', "$sha^{commit}")
@@ -298,6 +313,10 @@ function Get-ReviewSnapshot {
                 $include = -not $isEvidence -or $path.StartsWith("docs/evidence/$WorkItem/", [StringComparison]::Ordinal)
                 if ($Version -eq 3 -and $isEvidence -and $path.EndsWith('.png', [StringComparison]::OrdinalIgnoreCase)) {
                     $include = $selectedScreenshots.Contains($path)
+                    if ($include -and $VerifyPngDimensions) {
+                        $selected = @($selection.screenshots | Where-Object path -CEQ $path)[0]
+                        Assert-ReviewPngDimensions $bytes $selected.viewport
+                    }
                     if ($include -and $screenshotPayloads.Add($hash)) {
                         $screenshotCompressedBytes += Get-ReviewDeflatedSize $bytes
                         if ($screenshotCompressedBytes -gt 3MB) { throw 'SCREENSHOT_BUDGET: stable PNG compressed payload exceeds 3 MiB; select representative evidence' }
@@ -468,7 +487,10 @@ function Test-ReviewArchive {
     }
     $manifest = $script:utf8.GetString($actual['manifest.json']) | ConvertFrom-Json -AsHashtable
     if ($manifest.schemaVersion -notin @(1, 2, 3) -or $manifest.taskId -notmatch '^[A-Z0-9][A-Z0-9-]{0,79}$' -or $manifest.status -notin @('PASS', 'PARTIAL', 'BLOCKED', 'NOT_RUN')) { throw 'MANIFEST_INVALID: invalid identity/status' }
-    $snapshot = Get-ReviewSnapshot $Repository $manifest.baseSha $manifest.headSha $manifest.schemaVersion $manifest.taskId
+    # 旧V3未声明此增量，按原合同兼容；新包创建和独立重开采用同一像素核验。
+    $pixelCheck = $manifest.schemaVersion -eq 3 -and $manifest.screenshotPolicy.ContainsKey('dimensionsVerified')
+    if ($pixelCheck -and $manifest.screenshotPolicy.dimensionsVerified -cne $true) { throw 'MANIFEST_INVALID: PNG dimension policy invalid' }
+    $snapshot = Get-ReviewSnapshot $Repository $manifest.baseSha $manifest.headSha $manifest.schemaVersion $manifest.taskId $pixelCheck
     $observedCi = $manifest.runtimeCi
     # 旧V3没有来源字段，继续按原GitHub合同重开；V1/V2保持原行为。
     $localValidation = $manifest.schemaVersion -eq 3 -and $manifest.ContainsKey('validationSource') -and $manifest.validationSource -ceq 'LOCAL'
@@ -541,7 +563,7 @@ try {
         exit 0
     }
     if (-not $Status -or $TaskId -notmatch '^[A-Z0-9][A-Z0-9-]{0,79}$') { throw 'PARAMETERS_REQUIRED: explicit TaskId and Status required' }
-    $snapshot = Get-ReviewSnapshot $Root $BaseSha $HeadSha $SchemaVersion $TaskId
+    $snapshot = Get-ReviewSnapshot $Root $BaseSha $HeadSha $SchemaVersion $TaskId ($SchemaVersion -eq 3)
     $localValidation = $SchemaVersion -eq 3 -and $ValidationSource -ceq 'LOCAL'
     if ($localValidation -and ($CiRunId -or $CiRunUrl -or $CiCommit -or $CiConclusion -or -not $EvidencePath)) { throw 'LOCAL_EVIDENCE: local V3 requires committed EvidencePath and no remote CI override' }
     $runtimeCi = $null
@@ -580,7 +602,7 @@ try {
         $manifest.Remove('excludedIgnoredPaths')
         $manifest.ignoredInventory = Get-ReviewIgnoredInventory $Root $snapshot.Ignored
         Assert-ReviewIgnoredInventory $manifest.ignoredInventory
-        $manifest.screenshotPolicy = [ordered]@{ selectionPath = "docs/evidence/$TaskId/review-screenshots.json"; maxCount = 12; maxCompressedBytes = 3MB; selectedCount = $snapshot.ScreenshotCount; compressedBytes = $snapshot.ScreenshotCompressedBytes; default = 'Only explicitly selected stable representative PNG evidence; all omitted evidence remains recoverable from indexed Git blobs.' }
+        $manifest.screenshotPolicy = [ordered]@{ selectionPath = "docs/evidence/$TaskId/review-screenshots.json"; maxCount = 12; maxCompressedBytes = 3MB; selectedCount = $snapshot.ScreenshotCount; dimensionsVerified = $true; compressedBytes = $snapshot.ScreenshotCompressedBytes; default = 'Only explicitly selected stable representative PNG evidence; all omitted evidence remains recoverable from indexed Git blobs.' }
     }
     $members = $snapshot.Members
     $members.Add('manifest.json', $script:utf8.GetBytes(($manifest | ConvertTo-Json -Depth 16) + "`n"))

@@ -22,6 +22,26 @@ LAUNCHERS = ('scripts/acceptance/g3-governance.ps1', 'scripts/acceptance/g3-runt
              'scripts/acceptance/g3-acceptance-runtime.py')
 
 
+def product_input_fingerprint(root):
+    """按实际源码/合同/锁/构建输入字节指纹；说明/过程证据不触发昂贵重验。"""
+    root = Path(root).resolve()
+    result = subprocess.run(['git', 'ls-files', '--cached', '--others', '--exclude-standard', '-z'],
+                            cwd=root, capture_output=True, timeout=15)
+    if result.returncode:
+        raise ValueError('INPUT_IDENTITY_UNAVAILABLE: Git输入不可核实')
+    digest = hashlib.sha256()
+    for relative in sorted(set(result.stdout.decode('utf-8').split('\0'))- {''}):
+        if relative in ('AGENTS.md','PLANS.md') or relative.startswith(('docs/evidence/','docs/tasks/','docs/development/')):
+            continue
+        path = source_path(root, relative)
+        if not path.is_file() or path.stat().st_size > 16*1024*1024:
+            raise ValueError('INPUT_IDENTITY_INVALID: 输入不是有界普通文件')
+        data = path.read_bytes()
+        digest.update(relative.encode('utf-8') + b'\0' + str(len(data)).encode('ascii') + b'\0')
+        digest.update(hashlib.sha256(data).digest())
+    return digest.hexdigest()
+
+
 def source_path(root, relative):
     """精确仓库相对路径必须存在，拒绝大小写误配、链接及越界。"""
     if not isinstance(relative, str) or not relative or '\\' in relative or ':' in relative:

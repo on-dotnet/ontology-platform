@@ -56,3 +56,7 @@ BuildKit history后验回现单独重开该项，不把即时列表absence当持
 Fuseki只使用canonical内容寻址构建入口及已校验共享镜像，AppHost不另建随机镜像。资源创建即记录TaskId/RunId/标签/清单；阶段关闭准确白名单回收自身资源，跨任务旧环境保留一套日常开发，其余必须有可再生或可验证备份依据。每个KEEP写准确对象、理由及解除条件；无socket不能标Docker PASS，禁止全局prune/restart/改DB。永久回归由verify -SelfTest及同HeadCI执行，不把静态规则测试当产品测试。
 
 G3-M3 E0依赖固定为：冻结合同/正反例/独立Review→两个独立新runner冷构建与跨Run命中→正式M3整栈；SEM/WEB代码可先独立树并行。CI缓存归档同路径、平台全输入身份及失败短复现，工作区真实Smoke/故障注入、证据早Schema和自动TaskRunTimeline均为永久入口，详见[效率规则](docs/development/ai-development-efficiency.md)。先两次可验证增量集成，最终本地完整验收/唯一V3/独立重开；资源精确Apply与自然代际后验按[生命周期规范](docs/development/resource-lifecycle.md)分别如实记录，不从Mock或旧失败推PASS。
+
+## G3-M5 E0 执行约束
+
+派发卡必须附“历史失败→最早入口→正反回归”矩阵和核实后的准确路径/参数、审计/DI/阶段消费者清单。Mac 先宿主策略及锁屏熄屏心跳，临时单命令断言不能替代会话保障。过程输出只写 ignored artifacts，固定证据及时Schema预检；切片独立批量Review后早集成。schema2保留真实退出与原UTC，漂移独立报告，睡眠仅用同窗系统证据；相同失败fingerprint先短定位，输入未变不得再昂贵盲验。

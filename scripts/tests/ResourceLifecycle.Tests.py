@@ -61,6 +61,13 @@ class LifecycleTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             m.lifecycle_identity(dict(value,volumePrefix='g3-m5-control'),'g2')
 
+    def test_m5_exact_stage_identity_is_supported_and_m6_refuses(self):
+        value={'volumePrefix':'g3-m5-control','resourceLifecycle':{'taskId':'G3-M5-001','runId':'m5-control'}}
+        meta=m.lifecycle_identity(value,'g2')
+        self.assertEqual(meta['taskId'],'G3-M5-001')
+        self.assertEqual(len(meta['expectedVolumes']),8)
+        with self.assertRaises(ValueError):m.lifecycle_identity(dict(value,volumePrefix='g3-m6-control'),'g2')
+
     def test_existing_private_runtime_is_not_rewritten(self):
         path,value=self.prepare();value.pop('resourceLifecycle');path.write_text(json.dumps(value))
         original=path.read_bytes()

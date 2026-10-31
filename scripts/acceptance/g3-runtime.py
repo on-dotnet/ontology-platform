@@ -15,7 +15,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('mode', choices=['prepare', 'core', 'bootstrap', 'full'])
     parser.add_argument('--runtime-file')
-    parser.add_argument('--milestone', choices=['M1', 'M2', 'M3', 'M4'], default='M1')
+    parser.add_argument('--milestone', choices=['M1', 'M2', 'M3', 'M4', 'M5'], default='M1')
     args = parser.parse_args()
     prefix = 'g3-' + args.milestone.lower()
     if args.mode == 'prepare':

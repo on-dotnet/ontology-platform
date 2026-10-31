@@ -213,7 +213,7 @@ for i in range(53):
         Assert-True ($LASTEXITCODE -eq 0) 'PNG fixture generation failed'
         $shots = @()
         for ($i = 0; $i -lt 4; $i++) {
-            $shots += @{ path = "docs/evidence/TEST-001/screenshots/shot-$i.png"; page = "page-$i"; theme = 'light'; viewport = '1440x900'; stable = $true }
+            $shots += @{ path = "docs/evidence/TEST-001/screenshots/shot-$i.png"; page = "page-$i"; theme = 'light'; viewport = '256x800'; stable = $true }
         }
         Write-Fixture 'docs/evidence/TEST-001/review-screenshots.json' (@{ schemaVersion = 1; screenshots = $shots } | ConvertTo-Json -Depth 6)
         Write-Fixture '.gitignore' "artifacts/`nignored-fixture/`n"

@@ -1,0 +1,183 @@
+{
+  "exitCode": 0,
+  "records": [
+    {
+      "command": [
+        "dotnet",
+        "build",
+        "/Users/chasen/.codex/worktrees/b389/ontology-platform/backend/tests/OntologyPlatform.SemanticTests",
+        "--no-restore"
+      ],
+      "exitCode": 0,
+      "output": "  OntologyPlatform.Contracts -> /Users/chasen/.codex/worktrees/b389/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/bin/Debug/net10.0/OntologyPlatform.Contracts.dll\n  OntologyPlatform.Modules.Ontology.Domain -> /Users/chasen/.codex/worktrees/b389/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.Domain.dll\n  OntologyPlatform.Modules.Governance -> /Users/chasen/.codex/worktrees/b389/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/bin/Debug/net10.0/OntologyPlatform.Modules.Governance.dll\n  OntologyPlatform.Modules.Ontology -> /Users/chasen/.codex/worktrees/b389/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.dll\n  OntologyPlatform.SemanticTests -> /Users/chasen/.codex/worktrees/b389/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll\n\n已成功生成。\n    0 个警告\n    0 个错误\n\n已用时间 00:00:00.93\n"
+    },
+    {
+      "check": "public-jena-fixture-modes",
+      "exitCode": 0,
+      "modes": {
+        "fixture": "0o755",
+        "config.ttl": "0o644",
+        "log4j2.properties": "0o644"
+      }
+    },
+    {
+      "resourceLifecycle": true,
+      "project": "on-dotnet/ontology-platform",
+      "taskId": "G3-M5-001",
+      "runId": "g2-sem-ce7a41ace0f2",
+      "observedAtUtc": "2026-10-31T04:23:15.034712+00:00",
+      "phase": "create",
+      "dockerBackend": {
+        "context": "desktop-linux",
+        "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016"
+      },
+      "name": "g2-sem-ce7a41ace0f2",
+      "containerId": "e1909dd5258acb8461700eea0f06b00fc6a16239bc7a4942f014c596d959b114",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "run",
+        "--label",
+        "io.ontology-platform.project=on-dotnet/ontology-platform",
+        "--label",
+        "io.ontology-platform.task-id=G3-M5-001",
+        "--label",
+        "io.ontology-platform.run-id=g2-sem-ce7a41ace0f2",
+        "--label",
+        "io.ontology-platform.test-fixture=true",
+        "--detach",
+        "--name",
+        "g2-sem-ce7a41ace0f2",
+        "--publish",
+        "127.0.0.1::3030",
+        "--memory",
+        "768m",
+        "--cpus",
+        "1",
+        "--mount",
+        "type=bind,src=/private/var/folders/8r/n2xjjrn90v7fplnwsjkft1sm0000gn/T/g2-sem-ce7a41ace0f2qo4p3r4h/fixture,dst=/fixture,readonly",
+        "--entrypoint",
+        "java",
+        "ontology-platform-fuseki:context-4fbf23514516632dcb651b5c05bf04e9992da52491607b6cf58de1f7348ff9ab",
+        "-Xmx384m",
+        "-Dlog4j.configurationFile=/fixture/log4j2.properties",
+        "-jar",
+        "/opt/fuseki/fuseki-server.jar",
+        "--config=/fixture/config.ttl"
+      ],
+      "exitCode": 0,
+      "output": "e1909dd5258acb8461700eea0f06b00fc6a16239bc7a4942f014c596d959b114\n"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "port",
+        "g2-sem-ce7a41ace0f2",
+        "3030/tcp"
+      ],
+      "exitCode": 0,
+      "output": "127.0.0.1:51583\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "test",
+        "--project",
+        "backend/tests/OntologyPlatform.SemanticTests",
+        "--no-restore",
+        "--",
+        "--filter",
+        "FullyQualifiedName~G3M5ExpressionTests.Real"
+      ],
+      "exitCode": 0,
+      "output": "正在从以下位置运行测试 /Users/chasen/.codex/worktrees/b389/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64)\n/Users/chasen/.codex/worktrees/b389/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll (net10.0|arm64) 已通过 (2s 463ms)\n\n测试运行摘要: 已通过!\n  总计: 6\n  失败: 0\n  成功: 6\n  已跳过: 0\n  持续时间: 2s 956ms\n"
+    },
+    {
+      "check": "all temporary graph triples removed",
+      "count": 0,
+      "status": "PASS"
+    },
+    {
+      "resourceLifecycle": true,
+      "project": "on-dotnet/ontology-platform",
+      "taskId": "G3-M5-001",
+      "runId": "g2-sem-ce7a41ace0f2",
+      "observedAtUtc": "2026-10-31T04:23:20.430466+00:00",
+      "phase": "before",
+      "dockerBackend": {
+        "context": "desktop-linux",
+        "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016"
+      },
+      "containerId": "e1909dd5258acb8461700eea0f06b00fc6a16239bc7a4942f014c596d959b114",
+      "snapshot": {
+        "Id": "e1909dd5258acb8461700eea0f06b00fc6a16239bc7a4942f014c596d959b114",
+        "Name": "/g2-sem-ce7a41ace0f2",
+        "Project": "on-dotnet/ontology-platform",
+        "TaskId": "G3-M5-001",
+        "RunId": "g2-sem-ce7a41ace0f2",
+        "Fixture": "true"
+      },
+      "status": "PASS"
+    },
+    {
+      "resourceLifecycle": true,
+      "project": "on-dotnet/ontology-platform",
+      "taskId": "G3-M5-001",
+      "runId": "g2-sem-ce7a41ace0f2",
+      "observedAtUtc": "2026-10-31T04:23:20.503330+00:00",
+      "phase": "command",
+      "dockerBackend": {
+        "context": "desktop-linux",
+        "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016"
+      },
+      "containerId": "e1909dd5258acb8461700eea0f06b00fc6a16239bc7a4942f014c596d959b114",
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "container",
+        "rm",
+        "--force",
+        "e1909dd5258acb8461700eea0f06b00fc6a16239bc7a4942f014c596d959b114"
+      ]
+    },
+    {
+      "resourceLifecycle": true,
+      "project": "on-dotnet/ontology-platform",
+      "taskId": "G3-M5-001",
+      "runId": "g2-sem-ce7a41ace0f2",
+      "observedAtUtc": "2026-10-31T04:23:20.648230+00:00",
+      "phase": "exit",
+      "dockerBackend": {
+        "context": "desktop-linux",
+        "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016"
+      },
+      "containerId": "e1909dd5258acb8461700eea0f06b00fc6a16239bc7a4942f014c596d959b114",
+      "exitCode": 0,
+      "durationMs": 145
+    },
+    {
+      "resourceLifecycle": true,
+      "project": "on-dotnet/ontology-platform",
+      "taskId": "G3-M5-001",
+      "runId": "g2-sem-ce7a41ace0f2",
+      "observedAtUtc": "2026-10-31T04:23:20.796395+00:00",
+      "phase": "after",
+      "dockerBackend": {
+        "context": "desktop-linux",
+        "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016"
+      },
+      "containerId": "e1909dd5258acb8461700eea0f06b00fc6a16239bc7a4942f014c596d959b114",
+      "absent": true,
+      "absenceDiagnostic": "Error response from daemon: No such container: e1909dd5258acb8461700eea0f06b00fc6a16239bc7a4942f014c596d959b114",
+      "status": "PASS"
+    }
+  ]
+}

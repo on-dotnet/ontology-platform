@@ -74,5 +74,21 @@ try {
     $null = & pwsh -NoProfile -File $validator -EvidenceFile $generated -IgnoredInventoryFile $inventoryFile 2>&1
     if ($LASTEXITCODE -eq 0) { throw 'Unbounded ignored inventory field was accepted' }
     $passed++
+    # 复用正式构包库的PNG元数据核验，覆盖签名/尺寸/非法viewport。
+    . (Join-Path $root 'scripts/create-review-package.ps1') -Library
+    $png = [Convert]::FromBase64String('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jYyQAAAAASUVORK5CYII=')
+    Assert-ReviewPngDimensions $png '1x1'
+    $passed++
+    foreach ($viewport in @('1440x900', '1', '0x1')) {
+        $rejected = $false
+        try { Assert-ReviewPngDimensions $png $viewport } catch { $rejected = $true }
+        if (-not $rejected) { throw 'False screenshot viewport was accepted' }
+        $passed++
+    }
+    $png[0] = 0
+    $rejected = $false
+    try { Assert-ReviewPngDimensions $png '1x1' } catch { $rejected = $true }
+    if (-not $rejected) { throw 'Non-PNG payload was accepted' }
+    $passed++
     Write-Output "EvidencePreflight: $passed checks PASS; schema only, CI/product NOT_RUN."
 } finally { Remove-Item -LiteralPath $temporary -Recurse -Force }

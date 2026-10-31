@@ -259,7 +259,7 @@ def main():
             if not re.fullmatch('[0-9]{1,20}', run_id) or not re.fullmatch('[0-9]{1,5}', attempt) or not IDENTITY.fullmatch(job):
                 raise ValueError('Controlled CI identity required')
             args.path = Path.cwd()/'artifacts'/('task-timeline-'+job+'.jsonl')
-            args.task_id, args.run_id = 'G3-M3-001', 'ci-'+run_id+'-'+attempt
+            args.task_id, args.run_id = os.environ.get('TASK_TIMELINE_TASK_ID', 'ENGINEERING'), 'ci-'+run_id+'-'+attempt
             args.input_fingerprint = os.environ.get('TASK_TIMELINE_INPUT', '')
             if not args.input_fingerprint:
                 head = subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()

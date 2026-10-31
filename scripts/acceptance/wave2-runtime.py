@@ -46,8 +46,12 @@ def lifecycle_identity(runtime, profile):
         value={'taskId':os.environ.get('PLATFORM_TASK_ID','DEVELOPMENT'), 'runId':runtime['volumePrefix']}
     task,run_id=value.get('taskId'),value.get('runId')
     prefix=runtime['volumePrefix']
-    if not all(isinstance(x,str) and re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.-]{0,99}',x) for x in (task,run_id)) or not re.fullmatch(r'(?:wave2|g2|g3-m1|g3-m2|g3-m3|g3-m4)-[a-z0-9-]{1,40}',prefix):
+    if not all(isinstance(x,str) and re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.-]{0,99}',x) for x in (task,run_id)) or not re.fullmatch(r'(?:wave2|g2|g3-m1|g3-m2|g3-m3|g3-m4|g3-m5)-[a-z0-9-]{1,40}',prefix):
         raise ValueError('Invalid lifecycle identity')
+    if prefix.startswith('g3-') and runtime.get('resourceLifecycle') is not None:
+        expected_task = 'G3-' + prefix.split('-')[1].upper() + '-001'
+        if task != expected_task:
+            raise ValueError('Lifecycle task does not match milestone prefix')
     services=['postgres','keycloak','grafana','loki','tempo','prometheus','alloy']
     volumes=['postgres','grafana','loki','tempo','prometheus','alloy']
     if profile=='g2':

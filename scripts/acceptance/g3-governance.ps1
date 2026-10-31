@@ -1,6 +1,6 @@
 #Requires -Version 7.4
 [CmdletBinding()]
-param([ValidateSet('M1', 'M2', 'M3', 'M4')][string]$Milestone = 'M1', [string]$RuntimeFile, [switch]$StartRuntime, [switch]$ModulesOnly)
+param([ValidateSet('M1', 'M2', 'M3', 'M4', 'M5')][string]$Milestone = 'M1', [string]$RuntimeFile, [switch]$StartRuntime, [switch]$ModulesOnly)
 $ErrorActionPreference = 'Stop'
 $root = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 $beforeEvidence = [Environment]::GetEnvironmentVariable('PLATFORM_EVIDENCE_DIR', 'Process')
@@ -22,6 +22,10 @@ function Start-PipelineStep([string]$Name) {
 }
 Push-Location $root
 try {
+    & $pythonCommand.Source scripts/maintenance/host_continuity.py preflight
+    if ($LASTEXITCODE -ne 0) { throw 'BLOCKED_HOST_SLEEP_ASSURANCE: 宿主持续运行未核实' }
+    & $pythonCommand.Source scripts/maintenance/execution_preflight.py check --milestone $Milestone --path backend/OntologyPlatform.slnx --path scripts/acceptance/semantic-roundtrip.py
+    if ($LASTEXITCODE -ne 0) { throw 'PRECHECK_FAILED: 入口或消费者合同缺失，未启动容器' }
     $pipelineId = 'pipeline-' + [Guid]::NewGuid().ToString('N')
     $env:PLATFORM_EVIDENCE_DIR = 'docs/evidence/G3-' + $Milestone + '-001/runtime/' + $pipelineId
     $pipelineRoot = Join-Path $root $env:PLATFORM_EVIDENCE_DIR

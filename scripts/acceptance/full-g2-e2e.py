@@ -23,11 +23,14 @@ def main():
     parser.add_argument('--m4-diff-only', action='store_true')
     parser.add_argument('--m4-api-only', action='store_true')
     parser.add_argument('--m4-ui-only', action='store_true')
+    parser.add_argument('--m5', action='store_true')
+    parser.add_argument('--m5-api-only', action='store_true')
+    parser.add_argument('--m5-ui-only', action='store_true')
     parser.add_argument('--workspace-smoke-only', action='store_true')
     parser.add_argument('--smoke-fault-check', action='store_true')
     args = parser.parse_args()
-    modes = [args.m2_api_only, args.m2_ui_only, args.m3_api_only, args.m3_ui_only, args.m4_api_only, args.m4_ui_only, args.m4_diff_only, args.m4_impact_only, args.workspace_smoke_only]
-    if sum(modes) > 1 or (any(modes) and (args.m1 or args.m2 or args.m3 or args.m4)):
+    modes = [args.m2_api_only, args.m2_ui_only, args.m3_api_only, args.m3_ui_only, args.m4_api_only, args.m4_ui_only, args.m4_diff_only, args.m4_impact_only, args.m5_api_only, args.m5_ui_only, args.workspace_smoke_only]
+    if sum(modes) > 1 or (any(modes) and (args.m1 or args.m2 or args.m3 or args.m4 or args.m5)):
         parser.error('Select one partial checkpoint or a full milestone chain')
     runtime = Path(args.runtime_file).resolve()
     if not runtime.is_relative_to((ROOT / '.tools/security').resolve()):
@@ -35,16 +38,18 @@ def main():
     tools = json.loads(subprocess.check_output(['pwsh', '-NoProfile', '-File', 'scripts/bootstrap-web-tools.ps1'], cwd=ROOT, text=True))
     command = [tools['nodePath'], 'scripts/acceptance/g2-live-browser.mjs', str(runtime), '--full']
     if any(modes):
-        selected = next(flag for flag, enabled in [('--m2-api-only', args.m2_api_only), ('--m2-ui-only', args.m2_ui_only), ('--m3-api-only', args.m3_api_only), ('--m3-ui-only', args.m3_ui_only), ('--m4-api-only', args.m4_api_only), ('--m4-ui-only', args.m4_ui_only), ('--m4-impact-only', args.m4_impact_only), ('--m4-diff-only', args.m4_diff_only), ('--workspace-smoke-only', args.workspace_smoke_only)] if enabled)
+        selected = next(flag for flag, enabled in [('--m2-api-only', args.m2_api_only), ('--m2-ui-only', args.m2_ui_only), ('--m3-api-only', args.m3_api_only), ('--m3-ui-only', args.m3_ui_only), ('--m4-api-only', args.m4_api_only), ('--m4-ui-only', args.m4_ui_only), ('--m4-impact-only', args.m4_impact_only), ('--m4-diff-only', args.m4_diff_only), ('--m5-api-only', args.m5_api_only), ('--m5-ui-only', args.m5_ui_only), ('--workspace-smoke-only', args.workspace_smoke_only)] if enabled)
         command = [tools['nodePath'], 'scripts/acceptance/g2-live-browser.mjs', str(runtime), selected]
-    if args.m1 or args.m2 or args.m3 or args.m4:
+    if args.m1 or args.m2 or args.m3 or args.m4 or args.m5:
         command.append('--m1')
-    if args.m2 or args.m3 or args.m4:
+    if args.m2 or args.m3 or args.m4 or args.m5:
         command.append('--m2')
-    if args.m3 or args.m4:
+    if args.m3 or args.m4 or args.m5:
         command.append('--m3')
-    if args.m4:
+    if args.m4 or args.m5:
         command.append('--m4')
+    if args.m5:
+        command.append('--m5')
     if args.smoke_fault_check:
         command.append('--smoke-fault-check')
     return subprocess.run(command, cwd=ROOT).returncode

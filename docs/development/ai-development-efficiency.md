@@ -43,3 +43,11 @@ M3起CI在应用restore之前先计算`canonical_fuseki.py --identity`，按精�
 - 从bootstrap/rg核实解释器、项目及测试路径；先廉价编译，编译通过才开真实容器。错误路径在前置探测拒绝，不能用不存在路径的命令冒充产品失败。
 - 新写用例公共合同必须登记精确审计action、DI、事务回执与幂等边界；真实生成审计必须写入/重读验证。依赖IRI必须精确受控，定义删除按声明种类与消费角色建立正反回归，不能依赖过宽前缀或其它类型留存。
 - 已通过项只按精确输入绑定复用；稳定输入仍完成适用完整门禁。不从命令计时推测Agent思考/审查/调度活跃时长；无可观察进展的长间隔触发一次阻断/下一命令诊断，未观测原因仍UNKNOWN，不能用累计命令时长解释全部墙钟。
+
+## M5 E0 可执行前置防线
+
+`host_continuity.py preflight/monitor/fixture/cli`仅只读能源状态或标准任务级断言；Mac依用户设置的AC sleep=0允许显示器正常熄灭，锁屏与外接显示器睡眠通过IOConsoleLocked/CoreGraphics及连续心跳分别实测，整任务有界监测并最终精确终止。官方状态API只采集布尔值，不抓屏。权限/平台不足明确NOT_VERIFIED/NOT_APPLICABLE。
+
+`execution_preflight.py check`在实际长入口前核实项目/CLI帮助、audit action真实白名单、DI注册、launcher/checkpoint/browser全部阶段消费者。静态登记不代实际组合根和短真实请求；新读操作仍保留原安全拒绝审计。`run --cost`按输入hash/受控构建身份版本/实际平台/错误类别止损，不能改RunId绕过。同失败短复现仍失败先修输入；稳定候选完整真实验收不豁免。
+
+SelfTest过程日志放ignored artifacts，PreflightLogs真实并发写入验证日志不进入源码扫描且源码错误仍拒绝。证据预检与正式构包共用Schema，截图签名/IHDR/真实像素与viewport早核；VerifyOnly是制品门禁，不是产品验收。TaskRunTimeline schema2保持原UTC和真实exitCode/outcome，timingStatus独立；仅有效UTC区间计union/overlap，全部单调累计另列。sleep/wake必须有系统窗口/hash，不从CLOCK_DRIFT推因果。人工等待/Agent思考与活跃UNKNOWN。

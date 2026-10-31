@@ -507,6 +507,21 @@ p.write_text(json.dumps(s))
         snapshot=dict(Name='g3-m4-fixture-postgres-data',Driver='local',CreatedAt='2026-01-01T00:00:00Z')
         self.plan['operations'][0].update(expectedReferences=[],fingerprint=hashlib.sha256(json.dumps(snapshot,sort_keys=True,separators=(',',':')).encode()).hexdigest())
 
+    def test_m5_only_exact_owned_volume_apply_and_protect_old_m4(self):
+        self.m1_volume_fixture('G3-M5-001','g3-m5')
+        self.plan['dockerBackend']=dict(context='desktop-linux',engineId='fixture-engine-id',serverVersion='29.9.2')
+        snapshot=dict(Name='g3-m5-fixture-postgres-data',Driver='local',CreatedAt='2026-01-01T00:00:00Z')
+        self.plan['operations'][0].update(expectedReferences=[],fingerprint=hashlib.sha256(json.dumps(snapshot,sort_keys=True,separators=(',',':')).encode()).hexdigest())
+        original=copy.deepcopy(self.plan)
+        self.plan['operations'][0]['target']='g3-m4-protected-postgres-data'
+        self.assert_rejected()
+        self.plan=original
+        result=self.run_engine(True)
+        self.assertEqual(result.returncode,0,result.stderr)
+        self.assertEqual(json.loads(self.state_path.read_text())['volumes'],[])
+        rows=[json.loads(line) for line in (self.base/'apply.jsonl').read_text().splitlines()]
+        self.assertTrue(any(row.get('phase')=='after' and row.get('after',{}).get('absent') for row in rows))
+
     def test_m4_exact_volume_and_strong_absence(self):
         self.m4_volume_fixture()
         self.assertEqual(self.run_engine().returncode,0)

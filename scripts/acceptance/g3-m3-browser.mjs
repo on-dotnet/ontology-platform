@@ -23,7 +23,7 @@ export async function runM3Checks({ root, origin, operator, audit, single, viewe
   const address = new URL(origin);
   if (!["localhost", "127.0.0.1", "[::1]"].includes(address.hostname) || address.protocol !== "http:") throw new Error("m3_local_origin_required");
   const evidence = evidenceDirectory(root);
-  const allowed = ["G3-M3-001", "G3-M4-001"].some(task => {
+  const allowed = ["G3-M3-001", "G3-M4-001", "G3-M5-001"].some(task => {
     const boundary = relative(resolve(root, "docs/evidence", task), evidence);
     return !boundary.startsWith("..") && !isAbsolute(boundary);
   });

@@ -44,7 +44,13 @@ def main(test_filter=None, postgres=False, label='semantic-roundtrip'):
             raise RuntimeError('SEM command failed; see recorded exit code')
         return result
 
-    with tempfile.TemporaryDirectory(prefix=name, dir='/private/tmp' if Path('/private/tmp').is_dir() else None) as directory:
+    # 真实项目/工具错误先短编译，不能等容器创建后才发现。
+    project = ROOT / 'backend/tests/OntologyPlatform.SemanticTests'
+    if not project.is_dir():
+        raise ValueError('PATH_MISSING: 语义测试项目不存在，未创建容器')
+    run(['dotnet', 'build', str(project), '--no-restore'])
+
+    with tempfile.TemporaryDirectory(prefix=name, dir=Path(tempfile.gettempdir()).resolve()) as directory:
         path = Path(directory)
         # 仅无秘密的Jena配置子目录对容器UID可读，私有父目录仍由临时目录机制保护。
         fixture = path / 'fixture'
@@ -97,7 +103,6 @@ def main(test_filter=None, postgres=False, label='semantic-roundtrip'):
                 connection = f'Host=127.0.0.1;Port={pgport};Database=governance;Username=postgres;Password={secret}'
                 env['ConnectionStrings__governance'] = connection
                 env['G2_SEM_PG_CONNECTION'] = connection
-                run(['dotnet', 'build', 'backend/tests/OntologyPlatform.SemanticTests', '--no-restore'])
                 run(['dotnet', 'tool', 'restore'])
                 for module in ['backend/src/Modules/Governance/OntologyPlatform.Modules.Governance', 'backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology']:
                     run(['dotnet', 'tool', 'run', 'dotnet-ef', 'database', 'update', '--project', module, '--startup-project', module, '--no-build'])

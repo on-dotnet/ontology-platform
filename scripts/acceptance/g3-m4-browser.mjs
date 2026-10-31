@@ -38,8 +38,11 @@ export async function runM4Checks({ root, origin, operator, audit, single, viewe
   const address = new URL(origin);
   if (!["localhost", "127.0.0.1", "[::1]"].includes(address.hostname) || address.protocol !== "http:") throw new Error("m4_local_origin_required");
   const evidence = evidenceDirectory(root);
-  const boundary = relative(resolve(root, "docs/evidence/G3-M4-001"), evidence);
-  if (boundary.startsWith("..") || isAbsolute(boundary)) throw new Error("m4_evidence_boundary_required");
+  const allowed = ["G3-M4-001", "G3-M5-001"].some(task => {
+    const boundary = relative(resolve(root, "docs/evidence", task), evidence);
+    return !boundary.startsWith("..") && !isAbsolute(boundary);
+  });
+  if (!allowed) throw new Error("m4_evidence_boundary_required");
   await mkdir(evidence, { recursive: true });
   const checks = [], samples = [];
   const startedAtUtc = new Date().toISOString(), started = performance.now();

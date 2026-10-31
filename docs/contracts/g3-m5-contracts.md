@@ -10,7 +10,7 @@ IG3ExpressionRuntime.ProjectExpressionsAsync(SourceBundle, CancellationToken) �
 
 ## DTO（g2-models.json 为唯一生成来源）
 
-派WEB前由现有generate-types从g2-schemas规范Schema补充生成缺席的OwlExpression类型；引用已有RdfTerm/VersionRef等生成类型。此规范补充有显式注释，不能当真实路由证据。真实宿主OpenAPI导出后优先使用运行时Schema，不重复类型。
+现有generate-types从正式Kestrel运行导出的g2-platform.openapi.json生成全部类型，包括新增OwlExpression五模型。真实两项路由及完整Schema已由正式宿主测试导出；类型生成不代真实业务请求。
 
 OwlExpressionSnapshot：projectionVersion string、version VersionRef、scope ResourceScope、hashes SourceHashes、profileId/profileVersion/profileHash string、sources OwlExpressionSource[]。
 

@@ -39,3 +39,9 @@ Build history回收不能只凭rm exit0/list缺席；须避免单Ref查询零计
 Fuseki只使用canonical内容寻址构建入口及已校验共享镜像，AppHost不另建随机镜像。资源创建即记录TaskId/RunId/标签/清单；阶段关闭准确白名单回收自身资源，跨任务旧环境保留一套日常开发，其余必须有可再生或可验证备份依据。每个KEEP写准确对象、理由及解除条件；无socket不能标Docker PASS，禁止全局prune/restart/改DB。永久回归由verify -SelfTest及同HeadCI执行，不把静态规则测试当产品测试。
 
 G3-M3起遵守[效率规则E0入口](docs/development/ai-development-efficiency.md)：跨Run镜像精确平台/全输入键、同路径restore/save、load前后身份校验、独立失败缓存与短复现止损；正式整栈前真实工作区Smoke及故障注入、证据Schema早检、自动JSONL计时。新增Action只用已批准SHA/现有配额，未知容量拒绝保存。Docker M3精确扩展见[生命周期规范](docs/development/resource-lifecycle.md)，不能凭列表缺席或rm0宣称删除。上述门禁不扩大到M4/M5。
+
+## G3-M5 E0 持续运行及廉价前置门禁
+
+Mac 长任务先运行 `python3 scripts/maintenance/host_continuity.py preflight`；用户确认能源设置，锁屏/外接显示器熄灭用有界 monitor 与电源日志实测。系统策略覆盖整个任务，单命令 caffeinate 不代整会话；不写全局电源设置、不使用 -d/-u，阶段结束精确释放自身临时进程。
+
+派发及真实长入口先 `execution_preflight.py check --milestone <当前阶段>`，核实路径/支持参数、审计白名单、DI 与全部阶段消费者；SelfTest 输出放 ignored artifacts，证据每次创建/修改后复用 test-review-evidence。计时 schema2 将真实 exitCode 与 timingStatus 分开；相同输入/构建/平台/类别的昂贵失败先短复现，未变失败拒绝盲跑，真实产品正反与稳定完整验收保持。

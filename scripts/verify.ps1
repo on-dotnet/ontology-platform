@@ -29,6 +29,14 @@ function Get-SourceFiles {
     }
 }
 
+function Test-FrozenEvidenceFormat {
+    param([string]$RelativePath, [string]$Content)
+    # M4原始ZIP回读manifest在已提交基线无末尾LF；精确原字节豁免格式，仍检查JSON/秘密。
+    if ($RelativePath -cne 'docs/evidence/G3-M4-001/mac-master/actual-v2-manifest.json') { return $false }
+    $raw = [Text.UTF8Encoding]::new($false).GetBytes($Content)
+    return [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($raw)).ToLowerInvariant() -ceq '9e632706bbf9ee27e070711dcd6901c3b02fbc0204eee171a28542f8d6a9d0e5'
+}
+
 function Test-Repository {
     param([string]$RepositoryRoot)
     # 每项结果只打印位置和原因，不打印疑似机密内容。
@@ -49,7 +57,9 @@ function Test-Repository {
         if ($text -match '\r' -or -not $text.EndsWith("`n") -or $text -match '(?m)[\t ]+$') {
             # 历史G0文档保留Markdown有意换行空格；其余文件拒绝尾随空白。
             if ($text -match '\r' -or -not $text.EndsWith("`n") -or ($file.Extension -ne '.md' -and $text -match '(?m)[\t ]+$')) {
-                Record 'text-format' 'FAIL' "$relative 需要LF/末尾换行/无尾随空白"
+                if (-not (Test-FrozenEvidenceFormat $relative $text)) {
+                    Record 'text-format' 'FAIL' "$relative 需要LF/末尾换行/无尾随空白"
+                }
             }
         }
         if ($file.Extension -eq '.json') {
@@ -173,12 +183,18 @@ try {
         if (-not $?) { exit 1 }
         # 资源回收必须运行专属真实Git/模拟Docker正负例，不能用构包54项代替。
         $maintenancePython = if ($IsWindows) { 'python' } else { 'python3' }
-        foreach ($maintenanceTest in @('CleanupResources.Tests.py', 'PublicHistory.Tests.py', 'InspectorResources.Tests.py', 'G3Evidence.Tests.py', 'G3Acceptance.Tests.py', 'G3Compatibility.Tests.py', 'CloseoutGovernance.Tests.py', 'CanonicalFuseki.Tests.py', 'FusekiCache.Tests.py', 'ResourceLifecycle.Tests.py', 'TaskRunTimeline.Tests.py', 'FusekiCiCache.Tests.py', 'FusekiTransfer.Tests.py', 'OwnedTestContainers.Tests.py')) {
+        foreach ($maintenanceTest in @('CleanupResources.Tests.py', 'PublicHistory.Tests.py', 'InspectorResources.Tests.py', 'G3Evidence.Tests.py', 'G3Acceptance.Tests.py', 'G3Compatibility.Tests.py', 'CloseoutGovernance.Tests.py', 'CanonicalFuseki.Tests.py', 'FusekiCache.Tests.py', 'ResourceLifecycle.Tests.py', 'TaskRunTimeline.Tests.py', 'HostContinuity.Tests.py', 'ExecutionPreflight.Tests.py', 'FusekiCiCache.Tests.py', 'FusekiTransfer.Tests.py', 'OwnedTestContainers.Tests.py')) {
             $maintenancePath = Join-Path $PSScriptRoot ('tests/' + $maintenanceTest)
             if (-not (Test-Path -LiteralPath $maintenancePath)) { throw 'Required maintenance regression test missing.' }
             & $maintenancePython $maintenancePath
             if ($LASTEXITCODE -ne 0) { throw ('Maintenance regression failed: ' + $maintenanceTest) }
         }
+        & node --test (Join-Path $PSScriptRoot 'tests/G3BrowserDispatch.Tests.mjs')
+        if ($LASTEXITCODE -ne 0) { throw 'Browser dispatch control regression failed' }
+        & (Join-Path $PSScriptRoot 'tests/FrozenEvidence.Tests.ps1')
+        if (-not $?) { exit 1 }
+        & (Join-Path $PSScriptRoot 'tests/PreflightLogs.Tests.ps1')
+        if (-not $?) { exit 1 }
         & (Join-Path $PSScriptRoot 'tests/EvidencePreflight.Tests.ps1')
         if (-not $?) { exit 1 }
         if (Test-Path (Join-Path $PSScriptRoot 'tests/ReviewPackage.Tests.ps1')) {

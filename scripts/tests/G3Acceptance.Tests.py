@@ -48,11 +48,19 @@ class RealBrowserEntryTests(unittest.TestCase):
             if flag == '--m4':
                 for prior in ['--m1', '--m2', '--m3']: self.assertIn(prior, command)
 
+    def test_m5_full_dispatch_includes_m1_to_m4_and_partial_is_precise(self):
+        full=self.invoke('--m5')
+        for flag in ['--full','--m1','--m2','--m3','--m4','--m5']:self.assertIn(flag,full)
+        for flag in ['--m5-api-only','--m5-ui-only']:
+            value=self.invoke(flag)
+            self.assertIn(flag,value)
+            self.assertNotIn('--full',value)
+
     def test_existing_m2_and_unknown_flag(self):
         for flag in ['--m2', '--m2-api-only', '--m2-ui-only']:
             self.assertIn(flag, self.invoke(flag))
         with self.assertRaises(SystemExit) as result:
-            self.invoke('--m5')
+            self.invoke('--m6')
         self.assertEqual(result.exception.code, 2)
 
     def test_real_smoke_fault_checkpoint_is_forwarded(self):
@@ -67,12 +75,12 @@ class RealBrowserEntryTests(unittest.TestCase):
 class M1OrchestrationTests(unittest.TestCase):
     """Keep gate selection/order/failure propagation real, isolate external services only."""
 
-    def exercise(self, fail_gate=None, prefix='g3-m1-control', launch_failure=False, milestone=None, api_only=False, ui_only=False, smoke_fault=False, workspace_smoke=False, diff_only=False, impact_only=False):
+    def exercise(self, fail_gate=None, prefix='g3-m1-control', launch_failure=False, milestone=None, api_only=False, ui_only=False, smoke_fault=False, workspace_smoke=False, diff_only=False, impact_only=False, retry_unchanged=False):
         spec = importlib.util.spec_from_file_location('m1_orchestrator', SCRIPT)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
         with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
+            root = Path(directory).resolve()
             private = root / '.tools/security' / prefix
             private.mkdir(parents=True)
             runtime = private / 'runtime.json'
@@ -115,6 +123,7 @@ class M1OrchestrationTests(unittest.TestCase):
                 stack.enter_context(patch.object(sys, 'path', [str(SCRIPT.parent), *sys.path]))
                 stack.enter_context(patch.object(module, 'ROOT', root))
                 stack.enter_context(patch.object(sys, 'argv', [str(SCRIPT), '--runtime-file', str(runtime)] + (['--milestone', milestone] if milestone else []) + (['--api-only'] if api_only else []) + (['--ui-only'] if ui_only else []) + (['--smoke-fault-check'] if smoke_fault else []) + (['--workspace-smoke-only'] if workspace_smoke else []) + (['--diff-only'] if diff_only else []) + (['--impact-only'] if impact_only else [])))
+                stack.enter_context(patch.object(module, 'gate_fingerprint', return_value='a'*64))
                 stack.enter_context(patch.object(module.shared, 'wait_for'))
                 stack.enter_context(patch.object(module.shared, 'stop'))
                 stack.enter_context(patch.dict(os.environ, {'PLATFORM_EVIDENCE_DIR': 'docs/evidence/' + task + '/runtime'}))
@@ -122,6 +131,8 @@ class M1OrchestrationTests(unittest.TestCase):
                 stack.enter_context(patch.object(module.subprocess, 'run', side_effect=run))
                 try:
                     code = module.main()
+                    if retry_unchanged:
+                        self.assertEqual(module.main(), 2, '同输入失败必须在子进程前阻断')
                 except OSError:
                     if not launch_failure:
                         raise
@@ -219,8 +230,21 @@ class M1OrchestrationTests(unittest.TestCase):
         self.assertEqual(proof['status'], 'FAIL')
         self.assertTrue(all(item['status'] == 'NOT_RUN' for item in proof['gates'][1:]))
 
+    def test_unchanged_expensive_failure_is_blocked_before_second_child(self):
+        code,calls,proof,*_=self.exercise(prefix='g3-m5-control',milestone='M5',fail_gate=GATES[0],retry_unchanged=True)
+        self.assertEqual(code,23)
+        self.assertEqual(calls,GATES[:1])
+
+    def test_m5_all_and_checkpoints_keep_old_gates_and_schema2_exits(self):
+        for mode in ({}, {'api_only':True}, {'ui_only':True}, {'workspace_smoke':True}):
+            code,calls,proof,selected,_=self.exercise(prefix='g3-m5-control',milestone='M5',**mode)
+            self.assertEqual(code,0)
+            self.assertEqual(calls,GATES if not mode else GATES[:1])
+            self.assertTrue(all('G3-M5-001/runtime/' in value for value in selected))
+            self.assertTrue(all(row['schemaVersion']==2 and row['exitCode']==0 and row['timingStatus']=='VALID' for row in proof['_testObservedTimeline']))
+
     def test_wrong_runtime_and_future_milestones_are_refused(self):
-        for prefix,milestone in [('g3-m1-control','M2'),('g3-m2-control','M3'),('g3-m3-control','M4'),('g3-m5-control','M5')]:
+        for prefix,milestone in [('g3-m1-control','M2'),('g3-m2-control','M3'),('g3-m3-control','M4'),('g3-m4-control','M5'),('g3-m6-control','M6')]:
             with self.assertRaises(SystemExit):self.exercise(prefix=prefix,milestone=milestone)
 
     def test_protected_g2_runtime_is_refused(self):
