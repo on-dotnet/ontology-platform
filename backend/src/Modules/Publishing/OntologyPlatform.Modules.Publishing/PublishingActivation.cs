@@ -102,7 +102,7 @@ public sealed partial class PublishingService
         {
             CheckReplay(command, actor, payloadHash);
             // 成功事实可能在事务外初查之后刚提交；固定版本仍从原回执取回。
-            if (command.ReleaseId is not null)
+            if (command.ReleaseId is not null && command.ResultJson is not null)
             {
                 return await database.Releases.AsNoTracking().SingleAsync(row => row.ReleaseId == command.ReleaseId, token);
             }
@@ -115,6 +115,7 @@ public sealed partial class PublishingService
         // 重新从锁定数据库事实校验审批，不信任事务前副本。
         var proposal = JsonSerializer.Deserialize<ReleaseProposal>(proposalRow.ProposalJson)!;
         CheckPublicationSemantics(proposal, snapshot);
+        await CheckImpactBindingAsync(actor, proposal, snapshot, token);
         DemandApproved(actor, proposalRow, proposal, request.Command.ExpectedRevision);
         // 一个发布提案永远只有一个准备版本；回滚则取得原版本行锁。
         var release = proposal.Kind == ProposalKind.Publish
@@ -129,7 +130,8 @@ public sealed partial class PublishingService
             release = CreateRelease(proposal, snapshot!.Draft);
             database.Releases.Add(release);
         }
-        database.Commands.Add(new PublishingCommandRecord { Key = key, PayloadHash = payloadHash, SubjectId = actor.SubjectId, ReleaseId = release!.ReleaseId });
+        if (command is null) database.Commands.Add(new PublishingCommandRecord { Key = key, PayloadHash = payloadHash, SubjectId = actor.SubjectId, ReleaseId = release!.ReleaseId });
+        else if (command.ReleaseId != release!.ReleaseId) throw new SemanticOperationException(409, "idempotency_conflict");
         await database.SaveChangesAsync(token);
         await transaction.CommitAsync(token);
         database.ChangeTracker.Clear();
@@ -154,6 +156,7 @@ public sealed partial class PublishingService
         // 事务内重核审批绑定和到期时间，外部准备耗时不能延长授权。
         var proposal = JsonSerializer.Deserialize<ReleaseProposal>(proposalRow.ProposalJson)!;
         CheckPublicationSemantics(proposal, snapshot);
+        await CheckImpactBindingAsync(actor, proposal, snapshot, token);
         DemandApproved(actor, proposalRow, proposal, request.Command.ExpectedRevision);
         // 正式版本行在active之前锁，回滚不得绕过目标hash绑定。
         var release = await database.Releases.FromSqlInterpolated($"SELECT * FROM publishing.\"Releases\" WHERE \"ReleaseId\"={prepared.ReleaseId} FOR UPDATE").SingleAsync(token);
@@ -165,6 +168,8 @@ public sealed partial class PublishingService
         var active = await database.ActiveReleases.SingleOrDefaultAsync(row => row.AssetId == proposal.AssetId, token);
         if ((active?.Revision ?? 0) != request.ExpectedActivationRevision || active?.ReleaseId != request.ExpectedActiveReleaseId) throw new SemanticOperationException(409, "activation_revision_conflict");
         if (active is not null && (active.OrganizationId != proposal.Scope.OrganizationId || !active.SiteIds.SequenceEqual(proposal.Scope.SiteIds))) throw new SemanticOperationException(409, "asset_scope_conflict");
+        // 取得active锁后最后复核INITIAL仍无active或PAIR仍是原准确Release/hash。
+        if (proposal.Kind == ProposalKind.Publish) await CheckImpactBaselineAsync(proposal.AssetId, proposal.Scope, proposal.Impact ?? throw new SemanticOperationException(422, "impact_required"), token);
         // 只在全部检查后构造递增修订，旧版本和旧Run快照完全保留。
         var revision = checked((active?.Revision ?? 0) + 1);
         // 审计writer与当前发布上下文显式共享同一物理连接和事务。

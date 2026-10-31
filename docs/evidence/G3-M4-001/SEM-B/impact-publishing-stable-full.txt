@@ -1,0 +1,78 @@
+4e7c85215f443fd81d638638eed78779268873815739de5bbc510dd91164515f
+127.0.0.1:50481
+4aaf5c6d096c8d1816a0470322bd3b3ee8625a9db54beeee991b25b867c3be04
+127.0.0.1:50486
+b0e8eae5dc5e840f2de6c564d93b7124d504006355b177ca7682ad178c1c6ba2
+sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c ["ontology-platform-fuseki@sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c"]
+[2026-10-31 01:03:18] Fuseki     INFO  Apache Jena Fuseki 6.2.0
+Apache Jena version 6.2.0
+127.0.0.1:50490
+  OntologyPlatform.Contracts -> /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/bin/Debug/net10.0/OntologyPlatform.Contracts.dll
+  OntologyPlatform.Modules.Publishing.Domain -> /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/bin/Debug/net10.0/OntologyPlatform.Modules.Publishing.Domain.dll
+  OntologyPlatform.Modules.Ontology.Domain -> /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.Domain.dll
+  OntologyPlatform.Modules.Governance -> /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/bin/Debug/net10.0/OntologyPlatform.Modules.Governance.dll
+  OntologyPlatform.Modules.Publishing -> /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/bin/Debug/net10.0/OntologyPlatform.Modules.Publishing.dll
+  OntologyPlatform.Modules.Ontology -> /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/bin/Debug/net10.0/OntologyPlatform.Modules.Ontology.dll
+  OntologyPlatform.PublishingTests -> /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:00.81
+工具“dotnet-ef”(版本“10.0.13”)已还原。可用的命令: dotnet-ef
+
+还原成功。
+Failed executing DbCommand (7ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM governance."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261025062847_InitialGovernance'.
+Applying migration '20261025144246_AuditScopeSites'.
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Done.
+Failed executing DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM ontology."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261026003221_InitialOntology'.
+Applying migration '20261027032135_G3Assessments'.
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261030155129_G3M4ImpactReports'.
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Done.
+Failed executing DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM publishing."__EFMigrationsHistory"
+ORDER BY "MigrationId";
+Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+Applying migration '20261026015031_InitialPublishing'.
+Done.
+正在从以下位置运行测试 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+失败 ConcurrentDifferentProposalsOnlyOneCasWinner (490ms)
+  从 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64)
+  测试方法 OntologyPlatform.PublishingTests.PublicationFaultTests。ConcurrentDifferentProposalsOnlyOneCasWinner 引发了异常:
+  OntologyPlatform.Contracts.SemanticOperationException: 语义操作未满足受控合同。
+    在 OntologyPlatform.Modules.Publishing.PublishingService.CheckImpactBaselineAsync(String assetId, ResourceScope scope, ImpactApprovalBinding impact, CancellationToken token) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/PublishingImpact.cs:37
+    在 OntologyPlatform.Modules.Publishing.PublishingService.CheckImpactBindingAsync(ActorContext actor, ReleaseProposal proposal, DraftPublicationSnapshot snapshot, CancellationToken token) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/PublishingImpact.cs:27
+    在 OntologyPlatform.Modules.Publishing.PublishingService.CommitActivationAsync(ActorContext actor, ActivateReleaseRequest request, ReleaseProposal known, ReleaseRecord prepared, String key, String payloadHash, String action, CancellationToken token) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/PublishingActivation.cs:159
+    在 OntologyPlatform.Modules.Publishing.PublishingService.CommitActivationAsync(ActorContext actor, ActivateReleaseRequest request, ReleaseProposal known, ReleaseRecord prepared, String key, String payloadHash, String action, CancellationToken token) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/PublishingActivation.cs:206
+    在 OntologyPlatform.Modules.Publishing.PublishingService.ActivateAsync(ActorContext actor, ActivateReleaseRequest request, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/PublishingActivation.cs:71
+    在 OntologyPlatform.Modules.Publishing.PublishingService.ActivateAsync(ActorContext actor, ActivateReleaseRequest request, CancellationToken cancellationToken) 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/PublishingActivation.cs:89
+    在 OntologyPlatform.PublishingTests.PublicationFaultTests.<>c__DisplayClass3_0.<<ConcurrentDifferentProposalsOnlyOneCasWinner>g__Activate|0>d.MoveNext() 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/PublicationFaultTests.cs:186
+    --- End of stack trace from previous location ---
+    在 OntologyPlatform.PublishingTests.PublicationFaultTests.ConcurrentDifferentProposalsOnlyOneCasWinner() 位于 /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/PublicationFaultTests.cs:194
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+
+/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll (net10.0|arm64) 失败并出现 1 个错误 (34s 625ms)
+退出代码: 2
+
+测试运行摘要: 失败!
+  总计: 78
+  失败: 1
+  成功: 77
+  已跳过: 0
+  持续时间: 36s 157ms
+已完成测试运行，但显示非成功退出代码: 2 (请参阅: https://aka.ms/testingplatform/exitcodes)

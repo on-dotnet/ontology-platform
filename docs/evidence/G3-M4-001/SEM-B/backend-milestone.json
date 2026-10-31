@@ -1,0 +1,194 @@
+{
+  "schemaVersion": 1,
+  "taskId": "G3-M4-001",
+  "owner": "G3-M4-SEM-B",
+  "baseSha": "419708c8418fa2763ad802de10afe6c291645fd4",
+  "sourceIdentity": "Exact current owned C# hashes; pending commit includes evidence, avoiding self-referential HeadSha.",
+  "sources": {
+    "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/ImpactAnalysis.cs": "6738a6f97828977276a93752a3b06d9c72aa1bcbdc78b9d97d25b9d6eb2efe06",
+    "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyImpactPublication.cs": "1207b55951ff0e6f55d973ead76d9b7824366e450a9442adf853dc14e5914dfd",
+    "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/PublishingActivation.cs": "e7c73e8daa1c7444b3c7cb2195f20ccbafb331ed31c9348e71c9c42dc89d990d",
+    "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/PublishingCatalog.cs": "28e7fc6d317bc16ce27f664b90a3883c63b128ceba6cef94bac052c440b6b8d7",
+    "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/PublishingImpact.cs": "089ed1751d14358e4962f1bb74bb688afe88ba5294b8c606be32c78f53a8a4ae",
+    "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/PublishingRules.cs": "ff7f70425ce41e9d990ceed6d7ccbd737b8f6d4d89f809f9d150035acf74724c",
+    "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/PublishingService.cs": "7872aa58943c11a2084325d34cd52077950fe11bdbcf30b9cb2ecd9d47644313",
+    "backend/tests/OntologyPlatform.PublishingTests/G3M4ImpactPublishingTests.cs": "07db5e58876e2d4a0722ad148107bad51e77c26833549071587d0399cc778476",
+    "backend/tests/OntologyPlatform.PublishingTests/G3M4ImpactTimePrecisionTests.cs": "732130e5e25137529187adb4d9ffdbbf634c3a95e35d7362d7c4c3307a1933a0",
+    "backend/tests/OntologyPlatform.PublishingTests/G3MetadataTests.cs": "45cda1e7b3468629c08ade9070b9f0dcf3ec74aadce9c971d9fa38f607230cb6",
+    "backend/tests/OntologyPlatform.PublishingTests/PublicationFaultTests.cs": "d1373fb735f4d0d6fa6e3647ee4f09ae5627559a0aba2b54360df908c506e036",
+    "backend/tests/OntologyPlatform.PublishingTests/PublishingFixture.cs": "e5811311bc75a9e061b4ba216d17f9c68bc65310ef87a4b1b5676f673840d6ea",
+    "backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactDependencyTests.cs": "7e0a421b1e25cfc5ef2197283743bfde86526c45fe4b365bcf0cf1ce463f42fd"
+  },
+  "results": [
+    {
+      "label": "impact-review-dependencies",
+      "exitCode": 0,
+      "rawLogSha256": "7e2938304eeb885864b37899e22e357c1e185a698f75375463f4302276d5f020",
+      "trackedDisplaySha256": "7e2938304eeb885864b37899e22e357c1e185a698f75375463f4302276d5f020",
+      "createdContainerIds": [
+        "ecd6de15eaa922d56033348c53a926069b192d8f5d32985011b4c97a54a05ac8",
+        "9629b4a43fa98fb50ba367173b27d2ac3893e9c52817efa780e060a262ba5d8f"
+      ],
+      "removedContainerIds": [
+        "9629b4a43fa98fb50ba367173b27d2ac3893e9c52817efa780e060a262ba5d8f",
+        "ecd6de15eaa922d56033348c53a926069b192d8f5d32985011b4c97a54a05ac8"
+      ],
+      "exactAbsenceVerified": true
+    },
+    {
+      "label": "impact-review-precision",
+      "exitCode": 0,
+      "rawLogSha256": "3fe37a3476769dc58629b91a2a6cd4acaea9f17c8b0fb7ee584299d1cbeb8e71",
+      "trackedDisplaySha256": "3fe37a3476769dc58629b91a2a6cd4acaea9f17c8b0fb7ee584299d1cbeb8e71",
+      "createdContainerIds": [
+        "c7d5a967f230ee926906d20fc560aa6d249633da81d0ac2e2592162e1cf5b372",
+        "5651e5b5cc1391e0a92b6e479c987da095b2ec202c42bf384d2b3f77c4ce56b7",
+        "b1bf72dfbbe20b9b6adc740bb80b90ef80b06f26bebb996ea16f0c83c4aba788"
+      ],
+      "removedContainerIds": [
+        "b1bf72dfbbe20b9b6adc740bb80b90ef80b06f26bebb996ea16f0c83c4aba788",
+        "5651e5b5cc1391e0a92b6e479c987da095b2ec202c42bf384d2b3f77c4ce56b7",
+        "c7d5a967f230ee926906d20fc560aa6d249633da81d0ac2e2592162e1cf5b372"
+      ],
+      "exactAbsenceVerified": true
+    },
+    {
+      "label": "impact-publishing-boundaries",
+      "exitCode": 0,
+      "rawLogSha256": "658c886d4027c35459cd225a3614fdd71927569d2107b17fcb69290549f6b0bb",
+      "trackedDisplaySha256": "658c886d4027c35459cd225a3614fdd71927569d2107b17fcb69290549f6b0bb",
+      "createdContainerIds": [
+        "f9b87ab8f57ec7c4e3424f861c98dbb345ab0f02f7d1d4bc66b03274c371a93b",
+        "c41509b43786beafb6296cb19fb3f3481bb4203342977457ebbe3c66ea1842a2",
+        "d53d428132a08b20e22e38028d0411d3503735f9831265eb437f1a29969088b7"
+      ],
+      "removedContainerIds": [
+        "d53d428132a08b20e22e38028d0411d3503735f9831265eb437f1a29969088b7",
+        "c41509b43786beafb6296cb19fb3f3481bb4203342977457ebbe3c66ea1842a2",
+        "f9b87ab8f57ec7c4e3424f861c98dbb345ab0f02f7d1d4bc66b03274c371a93b"
+      ],
+      "exactAbsenceVerified": true
+    },
+    {
+      "label": "impact-semantic-stable-full",
+      "exitCode": 0,
+      "rawLogSha256": "2bb8dca4e2ee2ecfb07f6e8d505190ece285f147fbcbef2e19b8e77f9e63d606",
+      "trackedDisplaySha256": "2bb8dca4e2ee2ecfb07f6e8d505190ece285f147fbcbef2e19b8e77f9e63d606",
+      "createdContainerIds": [
+        "aecdeac70a9885cac7eeb3c24c0ac44064cb53786204192a301429b3c298cbd4",
+        "57db69a56f98b1668659c7712ee66fd5ea207a6e7897b3aa8e26086975ccbc7b"
+      ],
+      "removedContainerIds": [
+        "57db69a56f98b1668659c7712ee66fd5ea207a6e7897b3aa8e26086975ccbc7b",
+        "aecdeac70a9885cac7eeb3c24c0ac44064cb53786204192a301429b3c298cbd4"
+      ],
+      "exactAbsenceVerified": true
+    },
+    {
+      "label": "impact-publishing-stable-full",
+      "exitCode": 2,
+      "rawLogSha256": "975f9748c3dcc739d6f6c9ff1685ef9b9818e0b53369dad7b1ff055409cdfbe9",
+      "trackedDisplaySha256": "0e385a78565e6f28fa7b4a94f9c2f05913ef6cc887020d2538c51e8c092403f2",
+      "createdContainerIds": [
+        "4e7c85215f443fd81d638638eed78779268873815739de5bbc510dd91164515f",
+        "4aaf5c6d096c8d1816a0470322bd3b3ee8625a9db54beeee991b25b867c3be04",
+        "b0e8eae5dc5e840f2de6c564d93b7124d504006355b177ca7682ad178c1c6ba2"
+      ],
+      "removedContainerIds": [
+        "b0e8eae5dc5e840f2de6c564d93b7124d504006355b177ca7682ad178c1c6ba2",
+        "4aaf5c6d096c8d1816a0470322bd3b3ee8625a9db54beeee991b25b867c3be04",
+        "4e7c85215f443fd81d638638eed78779268873815739de5bbc510dd91164515f"
+      ],
+      "exactAbsenceVerified": true
+    },
+    {
+      "label": "impact-publishing-cas-regression",
+      "exitCode": 0,
+      "rawLogSha256": "c26d1c48d4ac54a9ea935260a08b35b566e62ea66c35aa819c2f686d1f4e08cc",
+      "trackedDisplaySha256": "c26d1c48d4ac54a9ea935260a08b35b566e62ea66c35aa819c2f686d1f4e08cc",
+      "createdContainerIds": [
+        "f9eb265600bc9e1fd8d88a80b4d401c6fb822adfd0203a5b371d74bf83b74f0a",
+        "3b7255f43887388d36552aabc9bb92d9adb2b2fe1549a67cf8bff1e1f090018f",
+        "fa31e76a2b50829ec02caf6453535b8b4fe8078cb5d847796260ff5b586146a5"
+      ],
+      "removedContainerIds": [
+        "fa31e76a2b50829ec02caf6453535b8b4fe8078cb5d847796260ff5b586146a5",
+        "3b7255f43887388d36552aabc9bb92d9adb2b2fe1549a67cf8bff1e1f090018f",
+        "f9eb265600bc9e1fd8d88a80b4d401c6fb822adfd0203a5b371d74bf83b74f0a"
+      ],
+      "exactAbsenceVerified": true
+    }
+  ],
+  "failedAttemptsRetained": [
+    {
+      "stepId": "first-impact-report",
+      "exitCode": 1,
+      "inputFingerprint": "b0ab5c947947aa9812646bd839c03dc5375d99a47887682831f6bcc2bb9771c1",
+      "rawLogSha256": "49cdea15f76e567c7a111c5c21eda09ce2bd5b66efae415fb88b89f847410494"
+    },
+    {
+      "stepId": "impact-test-compile",
+      "exitCode": 1,
+      "inputFingerprint": "c9e54785198ed7b0bb3301a46de16477e0114aa33d03c0086320f48240ec662d",
+      "rawLogSha256": "96cc2839e55d896d9a80bd6ad83b0d42386fe8ee55b159c4f9f38a8dc606ae56"
+    },
+    {
+      "stepId": "impact-report-real",
+      "exitCode": 2,
+      "inputFingerprint": "4329b950fd4e9e73652b7cc0b0e2caa7e6dbee9f34b9700f4be37b619f2b9415",
+      "rawLogSha256": "2271a81aeae7c55bed73d675cbee6bcc26e8f985392ee5de111137c3bd794602"
+    },
+    {
+      "stepId": "impact-review-tests-build",
+      "exitCode": 1,
+      "inputFingerprint": "446c15e55a804e9039b77cb89bc9838b7431628845fe9d856294ff57194f8f72",
+      "rawLogSha256": "8be2a21ef77567cb99eccbce030d83215b1594db4e578f698449fe4c99b336b9"
+    },
+    {
+      "stepId": "impact-publishing-tests-compile",
+      "exitCode": 1,
+      "inputFingerprint": "02add0d56d7320aff948ea7b683918c7dacb6c57d23006abb55eb9bf759bea9d",
+      "rawLogSha256": "f6ed16e6a5ad9f1d0fbe089d865a2aab9946eb73f99778a251dc6b16ebb7ccbe"
+    },
+    {
+      "stepId": "impact-publishing-stable-full",
+      "exitCode": 2,
+      "inputFingerprint": "091f6644bdf28f3b458721689bda1228912311403c1e5798ffa782110979aaa8",
+      "rawLogSha256": "975f9748c3dcc739d6f6c9ff1685ef9b9818e0b53369dad7b1ff055409cdfbe9"
+    }
+  ],
+  "resourceSummary": {
+    "created": 16,
+    "reclaimed": 16,
+    "remaining": 0,
+    "strongAbsenceVerified": true,
+    "scope": "Only these six real validation runs; no image/volume/build-cache/global deletion."
+  },
+  "validation": {
+    "semanticFull": {
+      "total": 239,
+      "passed": 239,
+      "failed": 0,
+      "skipped": 0
+    },
+    "publishingFullOriginal": {
+      "total": 78,
+      "passed": 77,
+      "failed": 1,
+      "skipped": 0
+    },
+    "publishingFailedCaseAfterAssertionOnlyFix": {
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0
+    },
+    "publishingOverall": "78 distinct cases covered; full run original FAIL retained. Unchanged 77 not rerun.",
+    "productionChangesAfterStableRuns": false
+  },
+  "ci": "NOT_RUN",
+  "windows": "NOT_RUN",
+  "intel": "NOT_RUN",
+  "independentReview": "PENDING_MASTER",
+  "unobservedAgentTime": "UNKNOWN"
+}

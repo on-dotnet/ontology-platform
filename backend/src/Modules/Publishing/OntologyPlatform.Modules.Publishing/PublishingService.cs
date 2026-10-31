@@ -40,8 +40,11 @@ public sealed partial class PublishingService : IPublishingService
     /// <summary>可选真实能力登记；未注册时版本数组为空。</summary>
     private readonly ISemanticGateway? gateway;
 
+    /// <summary>影响资格由Ontology在同物理事务内复核，Publishing不读取其表。</summary>
+    private readonly IImpactPublicationReader? impacts;
+
     /// <summary>显式注入模块应用边界，不依赖HTTP或其他模块表。</summary>
-    public PublishingService(PublishingDbContext database, IOntologyService ontology, IDraftPublicationReader drafts, ITransactionalAuditWriter audit, ISemanticRuntime runtime, IReleaseArtifactStore artifacts, IReleaseCatalog catalog, ReleaseVerifier verifier, TimeProvider clock, ISemanticGateway? gateway = null)
+    public PublishingService(PublishingDbContext database, IOntologyService ontology, IDraftPublicationReader drafts, ITransactionalAuditWriter audit, ISemanticRuntime runtime, IReleaseArtifactStore artifacts, IReleaseCatalog catalog, ReleaseVerifier verifier, TimeProvider clock, ISemanticGateway? gateway = null, IImpactPublicationReader? impacts = null)
     {
         this.database = database;
         this.ontology = ontology;
@@ -53,6 +56,7 @@ public sealed partial class PublishingService : IPublishingService
         this.verifier = verifier;
         this.clock = clock;
         this.gateway = gateway;
+        this.impacts = impacts ?? ontology as IImpactPublicationReader;
     }
 
     /// <summary>完整scope过滤真实提案，不返回未授权子厂区内容。</summary>
@@ -99,6 +103,9 @@ public sealed partial class PublishingService : IPublishingService
                 var verified = await catalog.ReadAsync(actor, target!.ReleaseId, token);
                 if (verified.ManifestHash != request.TargetManifestHash) throw new SemanticOperationException(409, "rollback_binding_conflict");
             }
+            // 所有新PUBLISH必须绑定持久影响，回滚保持旧合同且不需要报告。
+            var impact = publication is null ? null : await LockImpactAsync(actor, request.ImpactReportId, request.ImpactHash, publication, token);
+            if (impact is not null) await CheckImpactBaselineAsync(publication!.Draft.AssetId, publication.Draft.Scope, impact, token);
             // 固定24小时期限，所有审批和激活都以服务器时间再次判断。
             var now = clock.GetUtcNow();
             // 精确合同由服务端身份、校验事实和不可变目标组成。
@@ -113,6 +120,7 @@ public sealed partial class PublishingService : IPublishingService
                 Hashes = request.Hashes,
                 ValidationReportId = request.ValidationReportId,
                 Semantics = publication?.Semantics,
+                Impact = impact,
                 TargetReleaseId = request.TargetReleaseId,
                 TargetManifestHash = request.TargetManifestHash,
                 SubmittedBy = actor.SubjectId,
@@ -146,6 +154,7 @@ public sealed partial class PublishingService : IPublishingService
             // 审批资格与内容均从真实记录取得。
             var proposal = JsonSerializer.Deserialize<ReleaseProposal>(row.ProposalJson)!;
             CheckPublicationSemantics(proposal, snapshot);
+            await CheckImpactBindingAsync(actor, proposal, snapshot, token);
             if (row.Revision != request.Command.ExpectedRevision || proposal.Status != ProposalStatus.Pending || row.Activated) throw new SemanticOperationException(409, "proposal_revision_conflict");
             if (proposal.ExpiresAtUtc <= clock.GetUtcNow()) throw new SemanticOperationException(409, "proposal_expired");
             if (!PublishingPolicy.CanApprove(actor.SubjectId, actor.Roles, proposal.SubmittedBy, clock.GetUtcNow(), proposal.ExpiresAtUtc)) throw new SemanticOperationException(403, "independent_approval_required");

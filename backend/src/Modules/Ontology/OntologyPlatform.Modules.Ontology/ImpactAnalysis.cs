@@ -87,23 +87,31 @@ public sealed partial class OntologyService
             var before = original?.SelectMany(graph => graph).ToArray() ?? [];
             // 目标完整事实保持各源作用域，blank只用于局部分析不输出稳定标识。
             var after = target.SelectMany(graph => graph).ToArray();
-            // 删除显式定义后仍被引用必须技术阻断，不因主体还有label便视为定义仍在。
-            var removedDefinitions = before.Where(triple => triple.Subject.Kind == RdfTermKind.Iri && triple.Predicate == JenaRdfCodec.Type).Select(triple => triple.Subject.Value).Except(after.Where(triple => triple.Subject.Kind == RdfTermKind.Iri && triple.Predicate == JenaRdfCodec.Type).Select(triple => triple.Subject.Value), StringComparer.Ordinal).ToHashSet(StringComparer.Ordinal);
-            // 受控命名关系及显式ObjectProperty才表示本轮依赖，不把来源metadata当待加载语义。
-            var objectProperties = after.Where(triple => triple.Predicate == JenaRdfCodec.Type && triple.Object.Kind == RdfTermKind.Iri && triple.Object.Value == JenaRdfCodec.Owl + "ObjectProperty").Select(triple => triple.Subject.Value).ToHashSet(StringComparer.Ordinal);
-            // 显式本地资源集合不需要联网即可确认。
+            // 声明按IRI与准确种类分别登记，不能用NamedIndividual掩盖Class定义被删除。
+            var oldDefinitions = ImpactDefinitions(original ?? [[], [], [], []]);
+            // 同一资源可合法有多个显式类型，各consumer只要求自己消费的声明种类。
+            var newDefinitions = ImpactDefinitions(target);
+            // 普通对象引用可确认命名资源存在；类型/公理消费必须另查准确声明。
             var subjects = after.Where(triple => triple.Subject.Kind == RdfTermKind.Iri).Select(triple => triple.Subject.Value).ToHashSet(StringComparer.Ordinal);
             for (var index = 0; index < target.Length; index++)
                 foreach (var triple in target[index])
                 {
                     token.ThrowIfCancellationRequested();
-                    if (triple.Object.Kind != RdfTermKind.Iri) continue;
-                    // 入向引用可解释地指向仍被使用的已删除定义。
+                    // 谓词位置也消费属性声明，literal客体不能被提前continue遗漏。
                     var evidence = Evidence(diff, false, SourceName(index), triple);
-                    if (removedDefinitions.Contains(triple.Object.Value))
-                        Add(blockers, Conclusion("impact_removed_definition_referenced", "目标四源仍显式引用已从本版本移除类型定义的IRI，引用治理未闭合。", true, [triple.Object.Value], [evidence]));
-                    else if ((objectProperties.Contains(triple.Predicate) || triple.Predicate is JenaRdfCodec.Type or "http://www.w3.org/2000/01/rdf-schema#subClassOf" or "http://www.w3.org/2000/01/rdf-schema#domain" or "http://www.w3.org/2000/01/rdf-schema#range" or JenaRdfCodec.Owl + "equivalentClass" or JenaRdfCodec.Owl + "disjointWith" or JenaRdfCodec.Owl + "inverseOf") && !subjects.Contains(triple.Object.Value) && !StandardIri(triple.Object.Value))
-                        Add(unknown, Conclusion("impact_dependency_unresolved", "显式语义关系引用未在本资产四源解析登记的资源；未联网解析，实际覆盖未知并阻断。", true, [triple.Object.Value], [evidence]));
+                    foreach (var consumer in ImpactConsumers(triple, oldDefinitions, newDefinitions))
+                    {
+                        token.ThrowIfCancellationRequested();
+                        if (consumer.Kind == "RESOURCE" ? subjects.Contains(consumer.Iri) || ImpactBuiltin(consumer.Iri, consumer.Kind)
+                            : consumer.Kind == "PROPERTY" ? new[] { JenaRdfCodec.Owl + "ObjectProperty", JenaRdfCodec.Owl + "DatatypeProperty", JenaRdfCodec.Owl + "AnnotationProperty" }.Any(kind => newDefinitions.ContainsKey((consumer.Iri, kind))) || ImpactBuiltin(consumer.Iri, consumer.Kind)
+                            : newDefinitions.ContainsKey(consumer) || ImpactBuiltin(consumer.Iri, consumer.Kind)) continue;
+                        // 只有原来同种显式声明被删除，才称为定义删除；其它未登记依赖保持UNKNOWN。
+                        var prior = oldDefinitions.TryGetValue(consumer, out var declaration) ? declaration : ((int Source, RdfTriple? Triple)?)(null);
+                        if (prior is { } removed)
+                            Add(blockers, Conclusion("impact_removed_definition_referenced", "目标仍按原声明种类消费已删除的Class/ObjectProperty/DatatypeProperty定义；其它rdf:type不能替代该声明。", true, [consumer.Iri], [evidence, Evidence(diff, true, removed.Source < 0 ? "bundle" : SourceName(removed.Source), removed.Triple)]));
+                        else
+                            Add(unknown, Conclusion("impact_dependency_unresolved", "显式关系所需声明未在本资产登记，也不属于精确受控内建词汇；命名空间外观不是登记或无影响证明。", true, [consumer.Iri], [evidence]));
+                    }
                 }
         }
         // imports无论新增/保留/移除都可能触及未解析闭包，不以字节删除当闭包已证明无影响。
@@ -144,8 +152,69 @@ public sealed partial class OntologyService
         return reduced;
     }
 
-    /// <summary>标准词汇IRI只是受控语法，不将它们假定为外部待加载业务依赖。</summary>
-    private static bool StandardIri(string iri) => iri.StartsWith("http://www.w3.org/", StringComparison.Ordinal) || iri.StartsWith("https://www.w3.org/", StringComparison.Ordinal) || iri.StartsWith(IdentityTimePolicy.P, StringComparison.Ordinal);
+    /// <summary>精确声明种类的四源索引；重复来源只给bundle，不任选一个源。</summary>
+    private static Dictionary<(string Iri, string Kind), (int Source, RdfTriple? Triple)> ImpactDefinitions(RdfTriple[][] graphs) =>
+        graphs.SelectMany((graph, index) => graph.Select(triple => (Triple: triple, Source: index)))
+            .Where(item => item.Triple.Subject.Kind == RdfTermKind.Iri && item.Triple.Predicate == JenaRdfCodec.Type && item.Triple.Object.Kind == RdfTermKind.Iri && item.Triple.Object.Value is JenaRdfCodec.Owl + "Class" or JenaRdfCodec.Owl + "ObjectProperty" or JenaRdfCodec.Owl + "DatatypeProperty" or JenaRdfCodec.Owl + "AnnotationProperty")
+            .GroupBy(item => (item.Triple.Subject.Value, item.Triple.Object.Value))
+            .ToDictionary(group => group.Key, group => (group.Select(item => item.Source).Distinct().Count() == 1 ? group.First().Source : -1, (RdfTriple?)group.First().Triple));
+
+    /// <summary>依照显式consumer位置要求声明，不执行RDFS/OWL隐式类型推理。</summary>
+    private static IEnumerable<(string Iri, string Kind)> ImpactConsumers(RdfTriple triple, Dictionary<(string Iri, string Kind), (int Source, RdfTriple? Triple)> before, Dictionary<(string Iri, string Kind), (int Source, RdfTriple? Triple)> after)
+    {
+        // 先检查谓词的属性角色，删除DatatypeProperty后保留NamedIndividual不能掩盖literal消费。
+        var propertyKind = triple.Object.Kind == RdfTermKind.Literal ? JenaRdfCodec.Owl + "DatatypeProperty" : JenaRdfCodec.Owl + "ObjectProperty";
+        if (before.ContainsKey((triple.Predicate, propertyKind)) || after.ContainsKey((triple.Predicate, propertyKind)))
+        {
+            yield return (triple.Predicate, propertyKind);
+            if (triple.Object.Kind == RdfTermKind.Iri) yield return (triple.Object.Value, "RESOURCE");
+        }
+        if (triple.Object.Kind != RdfTermKind.Iri) yield break;
+        if (triple.Predicate == JenaRdfCodec.Type) yield return (triple.Object.Value, JenaRdfCodec.Owl + "Class");
+        else if (triple.Predicate is "http://www.w3.org/2000/01/rdf-schema#subClassOf" or JenaRdfCodec.Owl + "equivalentClass" or JenaRdfCodec.Owl + "disjointWith")
+        {
+            if (triple.Subject.Kind == RdfTermKind.Iri) yield return (triple.Subject.Value, JenaRdfCodec.Owl + "Class");
+            yield return (triple.Object.Value, JenaRdfCodec.Owl + "Class");
+        }
+        else if (triple.Predicate == JenaRdfCodec.Owl + "inverseOf")
+        {
+            if (triple.Subject.Kind == RdfTermKind.Iri) yield return (triple.Subject.Value, JenaRdfCodec.Owl + "ObjectProperty");
+            yield return (triple.Object.Value, JenaRdfCodec.Owl + "ObjectProperty");
+        }
+        else if (triple.Predicate is "http://www.w3.org/2000/01/rdf-schema#domain" or "http://www.w3.org/2000/01/rdf-schema#range")
+        {
+            if (triple.Subject.Kind == RdfTermKind.Iri)
+            {
+                // 只沿明确已有属性种类检查主体，不把RDFS隐含domain当新增声明。
+                var kinds = new[] { JenaRdfCodec.Owl + "ObjectProperty", JenaRdfCodec.Owl + "DatatypeProperty", JenaRdfCodec.Owl + "AnnotationProperty" }.Where(kind => before.ContainsKey((triple.Subject.Value, kind)) || after.ContainsKey((triple.Subject.Value, kind))).ToArray();
+                foreach (var kind in kinds) yield return (triple.Subject.Value, kind);
+                if (kinds.Length == 0) yield return (triple.Subject.Value, "PROPERTY");
+            }
+            yield return (triple.Object.Value, triple.Predicate.EndsWith("#range", StringComparison.Ordinal) && (before.ContainsKey((triple.Subject.Value, JenaRdfCodec.Owl + "DatatypeProperty")) || after.ContainsKey((triple.Subject.Value, JenaRdfCodec.Owl + "DatatypeProperty"))) ? "DATATYPE" : JenaRdfCodec.Owl + "Class");
+        }
+        else if (triple.Predicate is ShapePolicy.Sh + "targetClass" or ShapePolicy.Sh + "class") yield return (triple.Object.Value, JenaRdfCodec.Owl + "Class");
+        else if (triple.Predicate == ShapePolicy.Sh + "datatype") yield return (triple.Object.Value, "DATATYPE");
+        else if (triple.Predicate == ShapePolicy.Sh + "path")
+        {
+            // Shape路径需要同一种属性声明；多类型只在实际相应consumer存在时分别约束。
+            var kinds = new[] { JenaRdfCodec.Owl + "ObjectProperty", JenaRdfCodec.Owl + "DatatypeProperty", JenaRdfCodec.Owl + "AnnotationProperty" }.Where(kind => before.ContainsKey((triple.Object.Value, kind)) || after.ContainsKey((triple.Object.Value, kind))).ToArray();
+            foreach (var kind in kinds) yield return (triple.Object.Value, kind);
+            if (kinds.Length == 0) yield return (triple.Object.Value, "PROPERTY");
+        }
+    }
+
+    /// <summary>只豁免已冻结受控词汇的准确IRI；W3C站点或平台前缀本身不提供登记证明。</summary>
+    private static bool ImpactBuiltin(string iri, string kind)
+    {
+        // 当前profile已登记的声明类型和有限域类型，不能按命名空间整体放行。
+        string[] types = [JenaRdfCodec.Owl + "Class", JenaRdfCodec.Owl + "ObjectProperty", JenaRdfCodec.Owl + "DatatypeProperty", JenaRdfCodec.Owl + "AnnotationProperty", JenaRdfCodec.Owl + "NamedIndividual", JenaRdfCodec.Owl + "Ontology", "http://www.w3.org/1999/02/22-rdf-syntax-ns#Statement", "http://www.w3.org/2004/02/skos/core#Concept", "http://www.w3.org/2004/02/skos/core#ConceptScheme", "http://www.w3.org/2006/time#Instant", "http://www.w3.org/2006/time#Interval", ShapePolicy.Sh + "NodeShape", ShapePolicy.Sh + "PropertyShape", IdentityTimePolicy.P + "UnitDefinition", IdentityTimePolicy.P + "QuantityKind", IdentityTimePolicy.P + "Dimension", IdentityTimePolicy.P + "StandardSource", IdentityTimePolicy.P + "IdentityClaim", IdentityTimePolicy.P + "Event"];
+        if (kind is "RESOURCE" or JenaRdfCodec.Owl + "Class") return types.Contains(iri, StringComparer.Ordinal) || iri is JenaRdfCodec.Owl + "Thing" or JenaRdfCodec.Owl + "Nothing" or "http://www.w3.org/2000/01/rdf-schema#Resource" or "http://www.w3.org/2000/01/rdf-schema#Literal";
+        if (kind == "PROPERTY") return iri is "http://www.w3.org/2000/01/rdf-schema#label" or "http://www.w3.org/2000/01/rdf-schema#comment";
+        if (kind != "DATATYPE") return false;
+        // 标准datatype仍由RIOT处理词法，本检查只确认明确有限的类型IRI，不执行换算。
+        string[] datatypes = ["string", "boolean", "decimal", "float", "double", "duration", "dateTime", "dateTimeStamp", "time", "date", "gYearMonth", "gYear", "gMonthDay", "gDay", "gMonth", "hexBinary", "base64Binary", "anyURI", "QName", "NOTATION", "integer", "nonPositiveInteger", "negativeInteger", "long", "int", "short", "byte", "nonNegativeInteger", "unsignedLong", "unsignedInt", "unsignedShort", "unsignedByte", "positiveInteger", "normalizedString", "token", "language", "Name", "NCName", "ID", "IDREF", "IDREFS", "ENTITY", "ENTITIES", "NMTOKEN", "NMTOKENS", "dayTimeDuration", "yearMonthDuration"];
+        return datatypes.Any(name => iri == "http://www.w3.org/2001/XMLSchema#" + name) || iri is "http://www.w3.org/1999/02/22-rdf-syntax-ns#langString" or "http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral";
+    }
 
     /// <summary>只从命名项取得稳定IRI；语言/datatype仍完整保存在可信三元组中。</summary>
     private static string[] Iris(RdfTriple triple) => new[] { triple.Subject.Kind == RdfTermKind.Iri ? triple.Subject.Value : null, triple.Predicate, triple.Object.Kind == RdfTermKind.Iri ? triple.Object.Value : null }.Where(value => value is not null).Select(value => value!).Distinct(StringComparer.Ordinal).ToArray();
