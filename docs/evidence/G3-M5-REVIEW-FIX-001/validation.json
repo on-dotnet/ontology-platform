@@ -1,0 +1,143 @@
+{
+  "evidenceSchemaVersion": 2,
+  "checks": [
+    {
+      "name": "web-tests",
+      "command": "node .tools/pnpm/package/bin/pnpm.cjs --dir apps/web test",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "270PASS/0fail/0skip；checks/web-tests-raw-output.json；durationMs=1492"
+    },
+    {
+      "name": "web-lint",
+      "command": "node .tools/pnpm/package/bin/pnpm.cjs --dir apps/web run lint",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "真实exit0，详见原始stdout及计时回执；checks/web-lint-raw-output.json；durationMs=2939"
+    },
+    {
+      "name": "web-build",
+      "command": "node .tools/pnpm/package/bin/pnpm.cjs --dir apps/web run build",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "真实exit0，详见原始stdout及计时回执；checks/web-build-raw-output.json；durationMs=5270"
+    },
+    {
+      "name": "web-typecheck",
+      "command": "node .tools/pnpm/package/bin/pnpm.cjs --dir apps/web run typecheck",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "真实exit0，详见原始stdout及计时回执；checks/web-typecheck-raw-output.json；durationMs=1896"
+    },
+    {
+      "name": "backend-build",
+      "command": "dotnet build backend/src/AppHost --configuration Release --verbosity minimal",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "真实exit0，详见原始stdout及计时回执；checks/backend-build-raw-output.json；durationMs=6963"
+    },
+    {
+      "name": "selftest",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1 -SelfTest",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "完整工程工具SelfTest0；不代产品验收；checks/selftest-raw-output.json；durationMs=393676"
+    },
+    {
+      "name": "browser-first",
+      "command": "python3 docs/evidence/G3-M5-REVIEW-FIX-001/executed-harnesses/runtime.py",
+      "status": "FAIL",
+      "exitCode": 1,
+      "output": "79ms被正式工具证据路径前置拒绝，无资源创建；checks/browser-first-raw-output.json；durationMs=79"
+    },
+    {
+      "name": "browser-second",
+      "command": "python3 docs/evidence/G3-M5-REVIEW-FIX-001/executed-harnesses/runtime.py",
+      "status": "FAIL",
+      "exitCode": 1,
+      "output": "原29PASS后错误Release页面路径超时；历史草稿真实读取通过，原FAIL保留；checks/browser-second-raw-output.json；durationMs=87063"
+    },
+    {
+      "name": "browser-release-retest",
+      "command": "python3 docs/evidence/G3-M5-REVIEW-FIX-001/executed-harnesses/runtime.py /Users/chasen/.codex/worktrees/g3-m5-review-fix/ontology-platform/.tools/security/g2-1c8100ef259a/runtime.json",
+      "status": "FAIL",
+      "exitCode": 1,
+      "output": "原18PASS后审计读取自记录断言FAIL，已修正测试；原FAIL保留；checks/browser-release-retest-raw-output.json；durationMs=28065"
+    },
+    {
+      "name": "browser-release-final",
+      "command": "python3 docs/evidence/G3-M5-REVIEW-FIX-001/executed-harnesses/runtime.py /Users/chasen/.codex/worktrees/g3-m5-review-fix/ontology-platform/.tools/security/g2-1c8100ef259a/runtime.json",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "定向Release25PASS/0fail、Manifest不变、无新增业务写审计、跨厂403，原草稿29已过项组合验收；checks/browser-release-final-raw-output.json；durationMs=28434"
+    },
+    {
+      "name": "final-static",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1",
+      "status": "FAIL",
+      "exitCode": 1,
+      "output": "原stdout尾空行使静态格式FAIL，字节保留后改JSON封装；checks/final-static-raw-output.json；durationMs=2669"
+    },
+    {
+      "name": "final-static-corrected",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "静态3738文件exit0；证据输出封装修正，无产品改动；checks/final-static-corrected-raw-output.json；durationMs=2146"
+    },
+    {
+      "name": "resource-apply",
+      "command": "python3 docs/evidence/G3-M5-REVIEW-FIX-001/executed-harnesses/cleanup.py --expected-plan-sha256 da87815e593a32c1cf6f92e3806e3883ad447b760d55afcb842e20e0a1a8876f --proof-commit 205e6512f635e55baf7bcb1e764fb209e531c6d3 --apply",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "准确8项目卷实际删除且强不存在，旧8卷元数据保持；checks/resource-apply-raw-output.json；durationMs=2639"
+    },
+    {
+      "name": "component-target",
+      "command": "node .tools/pnpm/package/bin/pnpm.cjs --dir apps/web exec vitest run src/features/ontology/expression-model.test.ts",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "31PASS/0fail/0skip，包含新增RELEASE/DRAFT真实render；component-first-raw-output.json"
+    },
+    {
+      "name": "cleanup-specific-fixtures",
+      "command": "python3 docs/evidence/G3-M5-REVIEW-FIX-001/executed-harnesses/cleanup_tests.py --real",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "11隔离正反+真实8空卷safe Apply=12PASS；cleanup-tests.json绑定准确执行器SHA；耗时未单独计量UNKNOWN"
+    },
+    {
+      "name": "ci",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "本地优先授权，未触发Actions"
+    },
+    {
+      "name": "unavailable-platforms",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Windows/Intel/付费模型/生产未运行；Monaco既有BLOCKED，不解禁"
+    }
+  ],
+  "ci": {
+    "status": "NOT_RUN",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  },
+  "metadata": {
+    "actualAgentActiveTime": "UNKNOWN",
+    "taskId": "G3-M5-REVIEW-FIX-001",
+    "productVerdict": "Applicable local product checks and non-author review PASS; historical harness/format failures retained, no single all-pass browser invocation claimed.",
+    "contractAdjudication": "UI_CLARIFICATION; backend P1 withdrawn, UI P2 clarified",
+    "independentReview": "independent-review.md; product and exact resource plan PASS; final ZIP reopen pending external receipt",
+    "sourceBinding": "testedCommit205e6512f635e55baf7bcb1e764fb209e531c6d3 contains exact reviewed product bytes tested before commit; later commits evidence/task only.",
+    "reusedBackend": "backend-reuse-binding.json; original80ad stable semantic302/publishing78/query49/agent33, not rerun this task.",
+    "deliveryStatus": "PARTIAL retains historical FAIL and NOT_RUN boundaries; READY only after unique V3 independent reopen."
+  },
+  "validationSource": "LOCAL",
+  "testedCommit": "205e6512f635e55baf7bcb1e764fb209e531c6d3"
+}

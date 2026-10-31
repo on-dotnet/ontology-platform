@@ -1,6 +1,6 @@
 # 本轮真实测试矩阵
 
-产品唯一变更为 ExpressionReadView 文案；无后端/API/DTO/生成物/合同/锁依赖/Design Token修改。源码TSX SHA256=7348c1a9eb529007a9312e3dd6970fba31f05b5865349ae817148bd2bc2d15d0。精确命令、UTC、真实退出与schema2 timingStatus见 checks/*.json；源码提交后补 testedCommit 输入绑定。
+产品唯一变更为 ExpressionReadView 文案；无后端/API/DTO/生成物/合同/锁依赖/Design Token修改。源码TSX SHA256=7348c1a9eb529007a9312e3dd6970fba31f05b5865349ae817148bd2bc2d15d0。精确命令、UTC、真实退出与schema2 timingStatus见 checks/*.json；已审源码testedCommit=205e6512f635e55baf7bcb1e764fb209e531c6d3；后续仅证据/任务说明，validation schema2严格绑定。
 
 |检查|结果|实际范围/证据|
 |---|---|---|
@@ -15,7 +15,7 @@
 |真实固定ReleaseUI补验最终|25PASS/0FAIL/0skip，浏览器2955ms，原始失败另存|browser-release-retest/result.json；真实OIDC/发布/固定对象读取/说明/源hash/Manifest未变/无新增业务写审计/两项跨厂403|
 |后端原实测复用|Semantic296+6、Publishing78、Query49、Agent33，原均0fail/0skip|backend-reuse-binding.json；原testedCommit80adf475，输入ls-tree9c004ef5…未变；本轮NOT_RERUN|
 |证据Schema早检/diff-check|exit0|初始schema2仅结构，不伪称初始产品已验；最终绑定另测|
-|精确资源DryRun|8项WOULD_DELETE，旧8卷不变，exit0|resource-dryrun.json；Apply待独立Review/提交后执行|
+|精确资源DryRun|8项WOULD_DELETE，旧8卷不变，exit0|resource-dryrun.json；经独立复审/提交push后已实际Apply8；resource-apply.json强不存在，旧8卷不变|
 
 不是一次浏览器全PASS：第一次完整历史草稿部分通过，Release入口路径由/releases纠正为/ontologies；第二次原始断言将审计读取的platform.audit.read误计新增业务写审计。只修测试，PlatformEndpoints.cs:272证实该动作既有；最终仅排除此动作并要求审计窗口未截断，其他新增动作均拒绝。原失败、原脚本和回执保留；不重复原638全业务组合。
 

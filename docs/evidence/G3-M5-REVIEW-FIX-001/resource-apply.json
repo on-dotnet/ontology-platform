@@ -1,0 +1,1243 @@
+{
+  "taskId": "G3-M5-REVIEW-FIX-001",
+  "mode": "APPLY",
+  "status": "PASS",
+  "completed": [
+    {
+      "name": "g2-1c8100ef259a-alloy-data",
+      "before": {
+        "Name": "g2-1c8100ef259a-alloy-data",
+        "Driver": "local",
+        "Scope": "local",
+        "CreatedAt": "2026-10-31T06:49:49Z",
+        "Labels": null,
+        "Options": null
+      },
+      "after": "STRONG_NO_SUCH_VOLUME",
+      "exitCode": 0
+    },
+    {
+      "name": "g2-1c8100ef259a-fuseki-data",
+      "before": {
+        "Name": "g2-1c8100ef259a-fuseki-data",
+        "Driver": "local",
+        "Scope": "local",
+        "CreatedAt": "2026-10-31T06:49:49Z",
+        "Labels": null,
+        "Options": null
+      },
+      "after": "STRONG_NO_SUCH_VOLUME",
+      "exitCode": 0
+    },
+    {
+      "name": "g2-1c8100ef259a-grafana-data",
+      "before": {
+        "Name": "g2-1c8100ef259a-grafana-data",
+        "Driver": "local",
+        "Scope": "local",
+        "CreatedAt": "2026-10-31T06:49:49Z",
+        "Labels": null,
+        "Options": null
+      },
+      "after": "STRONG_NO_SUCH_VOLUME",
+      "exitCode": 0
+    },
+    {
+      "name": "g2-1c8100ef259a-loki-data",
+      "before": {
+        "Name": "g2-1c8100ef259a-loki-data",
+        "Driver": "local",
+        "Scope": "local",
+        "CreatedAt": "2026-10-31T06:49:49Z",
+        "Labels": null,
+        "Options": null
+      },
+      "after": "STRONG_NO_SUCH_VOLUME",
+      "exitCode": 0
+    },
+    {
+      "name": "g2-1c8100ef259a-postgres-data",
+      "before": {
+        "Name": "g2-1c8100ef259a-postgres-data",
+        "Driver": "local",
+        "Scope": "local",
+        "CreatedAt": "2026-10-31T06:49:29Z",
+        "Labels": null,
+        "Options": null
+      },
+      "after": "STRONG_NO_SUCH_VOLUME",
+      "exitCode": 0
+    },
+    {
+      "name": "g2-1c8100ef259a-prometheus-data",
+      "before": {
+        "Name": "g2-1c8100ef259a-prometheus-data",
+        "Driver": "local",
+        "Scope": "local",
+        "CreatedAt": "2026-10-31T06:49:49Z",
+        "Labels": null,
+        "Options": null
+      },
+      "after": "STRONG_NO_SUCH_VOLUME",
+      "exitCode": 0
+    },
+    {
+      "name": "g2-1c8100ef259a-rustfs-data",
+      "before": {
+        "Name": "g2-1c8100ef259a-rustfs-data",
+        "Driver": "local",
+        "Scope": "local",
+        "CreatedAt": "2026-10-31T06:49:49Z",
+        "Labels": null,
+        "Options": null
+      },
+      "after": "STRONG_NO_SUCH_VOLUME",
+      "exitCode": 0
+    },
+    {
+      "name": "g2-1c8100ef259a-tempo-data",
+      "before": {
+        "Name": "g2-1c8100ef259a-tempo-data",
+        "Driver": "local",
+        "Scope": "local",
+        "CreatedAt": "2026-10-31T06:49:49Z",
+        "Labels": null,
+        "Options": null
+      },
+      "after": "STRONG_NO_SUCH_VOLUME",
+      "exitCode": 0
+    }
+  ],
+  "logs": [
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:29.285367+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-ef979bd04cc0-alloy-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:29.313194+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-ef979bd04cc0-fuseki-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:29.326651+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-ef979bd04cc0-grafana-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:29.340037+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-ef979bd04cc0-loki-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:29.353582+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-ef979bd04cc0-postgres-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:29.366242+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-ef979bd04cc0-prometheus-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:29.378518+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-ef979bd04cc0-rustfs-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:29.390010+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-ef979bd04cc0-tempo-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:29.401855+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:29.472714+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-1c8100ef259a-alloy-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:29.487162+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "ps",
+        "-a",
+        "--filter",
+        "volume=g2-1c8100ef259a-alloy-data",
+        "--format",
+        "{{.ID}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:29.499962+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:29.571826+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-1c8100ef259a-fuseki-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:29.586336+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "ps",
+        "-a",
+        "--filter",
+        "volume=g2-1c8100ef259a-fuseki-data",
+        "--format",
+        "{{.ID}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:29.599729+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:29.667144+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-1c8100ef259a-grafana-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:29.680977+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "ps",
+        "-a",
+        "--filter",
+        "volume=g2-1c8100ef259a-grafana-data",
+        "--format",
+        "{{.ID}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:29.694260+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:29.762244+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-1c8100ef259a-loki-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:29.777337+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "ps",
+        "-a",
+        "--filter",
+        "volume=g2-1c8100ef259a-loki-data",
+        "--format",
+        "{{.ID}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:29.790501+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:29.861731+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-1c8100ef259a-postgres-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:29.875928+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "ps",
+        "-a",
+        "--filter",
+        "volume=g2-1c8100ef259a-postgres-data",
+        "--format",
+        "{{.ID}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:29.889242+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:29.957510+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-1c8100ef259a-prometheus-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:29.972251+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "ps",
+        "-a",
+        "--filter",
+        "volume=g2-1c8100ef259a-prometheus-data",
+        "--format",
+        "{{.ID}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:29.985421+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:30.053182+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-1c8100ef259a-rustfs-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:30.067933+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "ps",
+        "-a",
+        "--filter",
+        "volume=g2-1c8100ef259a-rustfs-data",
+        "--format",
+        "{{.ID}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:30.081338+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:30.153777+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-1c8100ef259a-tempo-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:30.168490+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "ps",
+        "-a",
+        "--filter",
+        "volume=g2-1c8100ef259a-tempo-data",
+        "--format",
+        "{{.ID}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:30.181463+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:30.250795+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-1c8100ef259a-alloy-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:30.265996+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "ps",
+        "-a",
+        "--filter",
+        "volume=g2-1c8100ef259a-alloy-data",
+        "--format",
+        "{{.ID}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:30.279421+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "rm",
+        "g2-1c8100ef259a-alloy-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:30.294415+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:30.360195+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-1c8100ef259a-alloy-data"
+      ],
+      "exitCode": 1,
+      "utc": "2026-10-31T07:01:30.378638+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:30.446966+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-1c8100ef259a-fuseki-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:30.462646+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "ps",
+        "-a",
+        "--filter",
+        "volume=g2-1c8100ef259a-fuseki-data",
+        "--format",
+        "{{.ID}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:30.476092+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "rm",
+        "g2-1c8100ef259a-fuseki-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:30.504614+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:30.565994+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-1c8100ef259a-fuseki-data"
+      ],
+      "exitCode": 1,
+      "utc": "2026-10-31T07:01:30.577268+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:30.646449+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-1c8100ef259a-grafana-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:30.660742+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "ps",
+        "-a",
+        "--filter",
+        "volume=g2-1c8100ef259a-grafana-data",
+        "--format",
+        "{{.ID}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:30.673655+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "rm",
+        "g2-1c8100ef259a-grafana-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:30.692786+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:30.756151+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-1c8100ef259a-grafana-data"
+      ],
+      "exitCode": 1,
+      "utc": "2026-10-31T07:01:30.767251+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:30.828094+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-1c8100ef259a-loki-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:30.841610+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "ps",
+        "-a",
+        "--filter",
+        "volume=g2-1c8100ef259a-loki-data",
+        "--format",
+        "{{.ID}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:30.854482+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "rm",
+        "g2-1c8100ef259a-loki-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:30.867597+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:30.930874+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-1c8100ef259a-loki-data"
+      ],
+      "exitCode": 1,
+      "utc": "2026-10-31T07:01:30.944882+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:31.009363+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-1c8100ef259a-postgres-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:31.025126+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "ps",
+        "-a",
+        "--filter",
+        "volume=g2-1c8100ef259a-postgres-data",
+        "--format",
+        "{{.ID}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:31.039122+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "rm",
+        "g2-1c8100ef259a-postgres-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:31.077319+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:31.142722+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-1c8100ef259a-postgres-data"
+      ],
+      "exitCode": 1,
+      "utc": "2026-10-31T07:01:31.156046+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:31.220438+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-1c8100ef259a-prometheus-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:31.233643+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "ps",
+        "-a",
+        "--filter",
+        "volume=g2-1c8100ef259a-prometheus-data",
+        "--format",
+        "{{.ID}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:31.245917+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "rm",
+        "g2-1c8100ef259a-prometheus-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:31.259020+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:31.326170+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-1c8100ef259a-prometheus-data"
+      ],
+      "exitCode": 1,
+      "utc": "2026-10-31T07:01:31.340462+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:31.404080+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-1c8100ef259a-rustfs-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:31.420740+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "ps",
+        "-a",
+        "--filter",
+        "volume=g2-1c8100ef259a-rustfs-data",
+        "--format",
+        "{{.ID}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:31.435417+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "rm",
+        "g2-1c8100ef259a-rustfs-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:31.451418+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:31.514599+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-1c8100ef259a-rustfs-data"
+      ],
+      "exitCode": 1,
+      "utc": "2026-10-31T07:01:31.528037+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:31.595433+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-1c8100ef259a-tempo-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:31.609626+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "ps",
+        "-a",
+        "--filter",
+        "volume=g2-1c8100ef259a-tempo-data",
+        "--format",
+        "{{.ID}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:31.622940+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "rm",
+        "g2-1c8100ef259a-tempo-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:31.640529+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:31.707807+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-1c8100ef259a-tempo-data"
+      ],
+      "exitCode": 1,
+      "utc": "2026-10-31T07:01:31.722803+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-ef979bd04cc0-alloy-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:31.737689+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-ef979bd04cc0-fuseki-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:31.750651+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-ef979bd04cc0-grafana-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:31.764055+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-ef979bd04cc0-loki-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:31.776877+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-ef979bd04cc0-postgres-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:31.794724+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-ef979bd04cc0-prometheus-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:31.806496+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-ef979bd04cc0-rustfs-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:31.818194+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g2-ef979bd04cc0-tempo-data"
+      ],
+      "exitCode": 0,
+      "utc": "2026-10-31T07:01:31.829882+00:00"
+    }
+  ],
+  "current": {
+    "name": "g2-1c8100ef259a-tempo-data",
+    "before": {
+      "Name": "g2-1c8100ef259a-tempo-data",
+      "Driver": "local",
+      "Scope": "local",
+      "CreatedAt": "2026-10-31T06:49:49Z",
+      "Labels": null,
+      "Options": null
+    },
+    "state": "VERIFIED_BEFORE_COMMAND"
+  },
+  "keepUnchanged": true,
+  "physicalReclaimedBytes": "UNKNOWN"
+}
