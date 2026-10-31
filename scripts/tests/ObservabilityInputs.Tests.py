@@ -37,5 +37,19 @@ class ObservationInputs(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,'EVIDENCE_CHAIN_IDS_MISSING'):m.read_chain_identifiers(root)
             self.assertEqual(other.read_text(),'not-read')
 
+    def test_persisted_search_uses_actual_span_window_and_keeps_limit(self):
+        payload={'resourceSpans':[{'spans':[{'spanId':'known','startTimeUnixNano':'1700000000000000000','endTimeUnixNano':'1700000001000000000'}]}]}
+        value=m.worker_search_parameters(payload,'a'*32)
+        self.assertEqual((value['start'],value['end']),(1699999940,1700000301))
+        self.assertEqual(value['limit'],'20')
+        self.assertEqual(m.VISIBILITY_BUDGET_SECONDS,90)
+
+    def test_invalid_or_unbounded_span_windows_fail_closed(self):
+        for payload in [{},{'spanId':'x','startTimeUnixNano':'bad','endTimeUnixNano':'1'},
+                        {'spanId':'x','startTimeUnixNano':'1700000000000000000','endTimeUnixNano':'1699999999000000000'},
+                        {'spanId':'x','startTimeUnixNano':'1700000000000000000','endTimeUnixNano':'1700003600000000000'}]:
+            with self.assertRaisesRegex(ValueError,'TRACE_WINDOW_INVALID'):m.worker_search_parameters(payload,'a'*32)
+
+
 
 if __name__=='__main__':unittest.main()

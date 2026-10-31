@@ -1,0 +1,96 @@
+{
+  "status": "FAIL",
+  "checks": [
+    {
+      "check": "only_real_valid_persisted_trace_ids",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_tempo_trace_e7cc5c3366751add35d6a17743285e81",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_export_contains_no_prompt_source_or_private_runtime_values",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_tempo_trace_ad0699ca871f216896c8f69f921aa12d",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_export_contains_no_prompt_source_or_private_runtime_values",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_tempo_trace_be05ff621d850514017f6d8a593699db",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_export_contains_no_prompt_source_or_private_runtime_values",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_tempo_trace_568113f5e91f81b9419d495439cd9951",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_export_contains_no_prompt_source_or_private_runtime_values",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_tempo_trace_27c40c5b0d0dc040a8973849ae2102d5",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_export_contains_no_prompt_source_or_private_runtime_values",
+      "status": "PASS"
+    }
+  ],
+  "visibility": {
+    "budgetSeconds": 90,
+    "pollIntervalSeconds": 1,
+    "pollCount": 94,
+    "elapsedSeconds": 90.001,
+    "requests": [
+      {
+        "check": "actual_tempo_trace_e7cc5c3366751add35d6a17743285e81",
+        "polls": 1,
+        "elapsedSeconds": 0.013,
+        "state": "visible"
+      },
+      {
+        "check": "actual_tempo_trace_ad0699ca871f216896c8f69f921aa12d",
+        "polls": 1,
+        "elapsedSeconds": 0.005,
+        "state": "visible"
+      },
+      {
+        "check": "actual_tempo_trace_be05ff621d850514017f6d8a593699db",
+        "polls": 1,
+        "elapsedSeconds": 0.004,
+        "state": "visible"
+      },
+      {
+        "check": "actual_tempo_trace_568113f5e91f81b9419d495439cd9951",
+        "polls": 1,
+        "elapsedSeconds": 0.005,
+        "state": "visible"
+      },
+      {
+        "check": "actual_tempo_trace_27c40c5b0d0dc040a8973849ae2102d5",
+        "polls": 1,
+        "elapsedSeconds": 0.006,
+        "state": "visible"
+      },
+      {
+        "check": "worker_search",
+        "polls": 89,
+        "elapsedSeconds": 89.967,
+        "state": "timeout"
+      }
+    ]
+  },
+  "workerTraceDesign": "actual independent execution.run trace with persisted creation_trace_id tag; never a fabricated parent span",
+  "officialSearchApi": "https://grafana.com/docs/tempo/latest/api_docs/",
+  "scope": "actual product emissions, own local synthetic stack; no model calls or production data"
+}

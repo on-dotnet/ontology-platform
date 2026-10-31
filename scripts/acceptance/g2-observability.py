@@ -45,6 +45,25 @@ def read_chain_identifiers(directory):
     return value
 
 
+def worker_search_parameters(trace_payload, creation_trace):
+    """从已取回真实creation跨度界定持久块搜索窗，不扩大90秒等待或扫描任意历史。"""
+    if not isinstance(creation_trace,str) or not re.fullmatch('[a-f0-9]{32}',creation_trace) or creation_trace=='0'*32:
+        raise ValueError('TRACE_WINDOW_INVALID: 创建链路标识无效')
+    spans=[value for value in walk(trace_payload) if 'spanId' in value and 'startTimeUnixNano' in value and 'endTimeUnixNano' in value]
+    try:
+        starts=[int(span['startTimeUnixNano']) for span in spans]
+        ends=[int(span['endTimeUnixNano']) for span in spans]
+    except (TypeError,ValueError):
+        raise ValueError('TRACE_WINDOW_INVALID: 真实跨度时间无效') from None
+    if not spans or any(start<=0 or end<start for start,end in zip(starts,ends)):
+        raise ValueError('TRACE_WINDOW_INVALID: 缺少有效已完成跨度')
+    start=max(0,min(starts)//1_000_000_000-60)
+    end=(max(ends)+999_999_999)//1_000_000_000+300
+    if end-start>900:
+        raise ValueError('TRACE_WINDOW_INVALID: 历史搜索窗口超过15分钟预算')
+    return {'tags':'execution.creation_trace_id='+creation_trace,'limit':'20','start':start,'end':end}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--runtime-file',required=True)
@@ -142,7 +161,9 @@ def main():
             privacy(value)
             raw['trace-'+trace] = value
         creation_trace = traces[2]
-        search = visible('worker_search','http://localhost:13200','/api/search',{'tags':'execution.creation_trace_id='+creation_trace,'limit':'20'},lambda value: bool(value['traces']))
+        search_parameters=worker_search_parameters(raw['trace-'+creation_trace],creation_trace)
+        visibility['workerSearchWindow']={'start':search_parameters['start'],'end':search_parameters['end'],'source':'actual_creation_trace_spans'}
+        search = visible('worker_search','http://localhost:13200','/api/search',search_parameters,lambda value: bool(value['traces']))
         workers = search.get('traces',[])
         check('worker_real_separate_trace_associated_to_creation',bool(workers) and all(item['traceID'] != creation_trace for item in workers))
         worker = visible('worker_trace','http://localhost:13200','/api/traces/'+workers[0]['traceID'],None,has_spans)

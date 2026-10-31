@@ -1,0 +1,37 @@
+{
+  "taskId": "G3-M5-001",
+  "runId": "final-four",
+  "startedAtUtc": "2026-10-31T05:12:37.425063+00:00",
+  "harnessSha256": "dca352b6a0248ed8bd785d287047a134c8970e869e507fd5c3cb3e14e8c04f6e",
+  "scope": "FOUR_REAL_GATES_AFTER_BOUND_INPUT_REPAIR",
+  "status": "FAIL",
+  "sourceHead": "9d542b7c5938d3cb6333ad632be1a90fe8738ef4",
+  "productInputFingerprint": "26f1ada859609e8c979b32240165c337d65d69e1faba080631bc9c73924c4437",
+  "browserProofSha256": "b0a5aff669c150250704c84583b60ec7fcc6c1bea06e2ebd7cbdf1c4cda852f7",
+  "ownerPid": 60405,
+  "gates": [
+    {
+      "name": "g2-observability.py",
+      "status": "FAIL",
+      "exitCode": 1
+    },
+    {
+      "name": "g2-trace-browser.mjs",
+      "status": "NOT_RUN",
+      "exitCode": null
+    },
+    {
+      "name": "g2-readiness-fault.py",
+      "status": "NOT_RUN",
+      "exitCode": null
+    },
+    {
+      "name": "performance-baseline.py",
+      "status": "NOT_RUN",
+      "exitCode": null
+    }
+  ],
+  "endedAtUtc": "2026-10-31T05:14:30.686207+00:00",
+  "launcherStopped": true,
+  "launcherExitCode": 0
+}
