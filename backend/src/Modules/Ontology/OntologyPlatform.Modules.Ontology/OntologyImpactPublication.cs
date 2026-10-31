@@ -39,7 +39,7 @@ public sealed partial class OntologyService : IImpactPublicationReader
         var assessment = await enlisted.Assessments.AsNoTracking().SingleAsync(row => row.AssessmentId == snapshot.Semantics.AssessmentId, cancellationToken);
         // 仅解析模块自己的不可变评估，不调用真实引擎或其它模块表。
         var assessed = System.Text.Json.JsonSerializer.Deserialize<SemanticAssessment>(assessment.AssessmentJson)!;
-        if (report.ExpiresAtUtc > assessed.ExpiresAtUtc || report.GeneratedAtUtc < assessed.AssessedAtUtc) throw new SemanticOperationException(409, "impact_binding_conflict");
+        if (report.ExpiresAtUtc > assessed.ExpiresAtUtc || report.GeneratedAtUtc < ImpactInstant(assessed.AssessedAtUtc)) throw new SemanticOperationException(409, "impact_binding_conflict");
         return new ImpactApprovalBinding { ReportId = report.ReportId, CanonicalHash = report.CanonicalHash, InputFingerprint = report.InputFingerprint, BaselineKind = report.BaselineKind, From = report.Diff.From, To = report.Diff.To, BaseHashes = report.Diff.BaseHashes, TargetHashes = report.Diff.TargetHashes, BaseManifestHash = report.Diff.BaseManifestHash, TargetSemantics = report.TargetSemantics!, GeneratedAtUtc = report.GeneratedAtUtc, ExpiresAtUtc = report.ExpiresAtUtc };
     }
 }

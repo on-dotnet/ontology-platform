@@ -178,14 +178,15 @@ public sealed class PublicationFaultTests
         using var scope1 = fixture.Provider.CreateScope();
         // 请求二不复用请求一的上下文。
         using var scope2 = fixture.Provider.CreateScope();
-        // 只接受真实CAS冲突作为失败，依赖异常不能伪装成正确并发结论。
+        // 只接受真实CAS冲突或M4准确INITIAL基线冲突；后者可在最终事务更早拒绝败方。
+        // 外部依赖异常、其它业务错误仍直接失败，不把未知错误当并发正确。
         async Task<ReleaseActivation?> Activate(IServiceScope scope, ReleaseProposal proposal)
         {
             try
             {
                 return await scope.ServiceProvider.GetRequiredService<IPublishingService>().ActivateAsync(fixture.Author, PublishingFixture.Activation(proposal), default);
             }
-            catch (SemanticOperationException failure) when (failure.Code == "activation_revision_conflict")
+            catch (SemanticOperationException failure) when (failure.Status == 409 && failure.Code is "activation_revision_conflict" or "impact_baseline_conflict")
             {
                 return null;
             }

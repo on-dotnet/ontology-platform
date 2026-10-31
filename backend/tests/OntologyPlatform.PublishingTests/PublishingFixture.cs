@@ -45,7 +45,7 @@ internal sealed class PublishingFixture : IDisposable
     internal Func<HttpRequestMessage, CancellationToken, Task>? Gate { get; set; }
 
     /// <summary>通过环境获取本轮新建资源，不读取历史凭证文件。</summary>
-    internal PublishingFixture()
+    internal PublishingFixture(TimeProvider? fixedClock = null)
     {
         // 缺少显式隔离环境应标NOT_RUN，而不是调用历史运行资源。
         var connection = Environment.GetEnvironmentVariable("G2_PUB_PG");
@@ -66,7 +66,7 @@ internal sealed class PublishingFixture : IDisposable
         // 保持实际生产模块组合，ValidateOnBuild也验证没有Catalog依赖环。
         var services = new ServiceCollection();
         services.AddSingleton<IConfiguration>(configuration);
-        services.AddSingleton<TimeProvider>(Clock);
+        services.AddSingleton<TimeProvider>(fixedClock ?? Clock);
         services.AddDbContextFactory<GovernanceDbContext>(options => options.UseNpgsql(connection, database => database.MigrationsHistoryTable("__EFMigrationsHistory", "governance")));
         services.AddSingleton<ITransactionalAuditWriter, TransactionalAuditWriter>();
         services.AddOntologyModule(configuration);
@@ -102,7 +102,23 @@ internal sealed class PublishingFixture : IDisposable
         // 真正调用Jena SHACL，禁止自造conforms事实。
         var report = await Ontology.ValidateAsync(Author, draft.DraftId, new ValidateDraftRequest { Revision = draft.Revision, Hashes = draft.Hashes, Command = Command(draft.Revision) }, default);
         Assert.IsTrue(report.Conforms);
-        return await Service.CreateProposalAsync(Author, new CreateProposalRequest { Kind = ProposalKind.Publish, DraftId = draft.DraftId, DraftRevision = draft.Revision, Hashes = draft.Hashes, ValidationReportId = report.ReportId, Command = Command(draft.Revision) }, default);
+        // 当前发布还必须绑定真实assessment与当前正式基线的持久影响报告。
+        var impact = await ImpactForAsync(draft, report.ReportId);
+        return await Service.CreateProposalAsync(Author, new CreateProposalRequest { Kind = ProposalKind.Publish, DraftId = draft.DraftId, DraftRevision = draft.Revision, Hashes = draft.Hashes, ValidationReportId = report.ReportId, ImpactReportId = impact.ReportId, ImpactHash = impact.CanonicalHash, Command = Command(draft.Revision) }, default);
+    }
+
+    /// <summary>从真实评估与本模块active元数据选择INITIAL或精确正式版本对，生成服务器报告。</summary>
+    internal async Task<ImpactReport> ImpactForAsync(OntologyDraft draft, string validationReportId)
+    {
+        // 获取真实Validate同事务生成的评估，不自造成功资格。
+        var ontology = scope.ServiceProvider.GetRequiredService<OntologyDbContext>();
+        // 只读自己的评估行，将真实ID传递给生产影响服务重新核验。
+        var assessment = await ontology.Assessments.AsNoTracking().SingleAsync(row => row.ValidationReportId == validationReportId);
+        // 当前测试自己的资产active，正式源码仍由生产目录做S3/Jena回验。
+        var active = await Database.ActiveReleases.AsNoTracking().SingleOrDefaultAsync(row => row.AssetId == draft.AssetId);
+        // 草稿身份必须固定修订，不能由最新指针隐式替换。
+        var target = new VersionRef { Kind = VersionRefKind.Draft, Id = draft.DraftId, Revision = draft.Revision };
+        return await ((IG3ImpactService)Ontology).GenerateImpactAsync(Author, new GenerateImpactReportRequest { From = active is null ? target : new VersionRef { Kind = VersionRefKind.Release, Id = active.ReleaseId }, To = target, BaselineKind = active is null ? ImpactBaselineKind.Initial : ImpactBaselineKind.VersionPair, AssessmentId = assessment.AssessmentId, Command = Command(draft.Revision) }, default);
     }
 
     /// <summary>通过独立审核者真实决定审批。</summary>

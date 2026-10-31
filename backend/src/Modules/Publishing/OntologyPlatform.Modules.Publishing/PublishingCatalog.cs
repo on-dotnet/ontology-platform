@@ -31,7 +31,11 @@ public sealed class PublishingCatalog : IReleaseCatalog
         var manifest = await verifier.VerifyAsync(row, cancellationToken);
         // 此读取给出当时活动状态；snapshot保持已经选定的不可变版本。
         var active = await database.ActiveReleases.AsNoTracking().SingleOrDefaultAsync(value => value.AssetId == row.AssetId, cancellationToken);
-        return new ReleaseSummary { Manifest = manifest, ManifestHash = row.ManifestHash, IsActive = active?.ReleaseId == releaseId, ActivationRevision = active?.Revision ?? 0, Status = active?.ReleaseId == releaseId ? ReleaseStatus.Active : ReleaseStatus.Superseded, TraceId = row.TraceId };
+        // 固定Release沿原ProposalId追溯审批报告，不改变历史manifest或Run快照。
+        var proposalRow = await database.Proposals.AsNoTracking().SingleOrDefaultAsync(value => value.ProposalId == row.ProposalId, cancellationToken);
+        // 历史已发布提案没有Impact时明确null，不将当前报告填入旧版本。
+        var impact = proposalRow is null ? null : JsonSerializer.Deserialize<ReleaseProposal>(proposalRow.ProposalJson)!.Impact;
+        return new ReleaseSummary { Impact = impact, Manifest = manifest, ManifestHash = row.ManifestHash, IsActive = active?.ReleaseId == releaseId, ActivationRevision = active?.Revision ?? 0, Status = active?.ReleaseId == releaseId ? ReleaseStatus.Active : ReleaseStatus.Superseded, TraceId = row.TraceId };
     }
 
     /// <summary>只解析一次活动指针后固定完整版本，不让查询中途混版。</summary>

@@ -40,6 +40,9 @@ public sealed class G3MetadataTests
         var proposalRequest = new CreateProposalRequest { Kind = ProposalKind.Publish, DraftId = draft.DraftId, DraftRevision = 1, Hashes = draft.Hashes, ValidationReportId = report.ReportId, Command = PublishingFixture.Command(1) };
         if (supported)
         {
+            // 对既有元数据取得真实持久影响资格，不以旧V1兼容结果替代当前门禁。
+            var impact = await fixture.ImpactForAsync(draft, report.ReportId);
+            proposalRequest = proposalRequest with { ImpactReportId = impact.ReportId, ImpactHash = impact.CanonicalHash };
             // 真实异人批准和S3/Jena回验后写V2，不能只检查内存支持布尔。
             var proposal = await fixture.ApproveAsync(await fixture.Service.CreateProposalAsync(fixture.Author, proposalRequest, default));
             // 成功正式发布必须仍携带当前评估绑定。
