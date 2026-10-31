@@ -1,0 +1,229 @@
+{
+  "schemaVersion": 1,
+  "kind": "SYNTHETIC_SEED_NOT_GOLD",
+  "documents": [
+    {
+      "file": "s01_heat_report.md",
+      "sha256": "1befa8c45c060689b13b6f6e73a85d1e29540b333216ca7b11003a0736237fb2",
+      "synthetic": true,
+      "groundTruthStatus": "SEED_EXPECTATION_NOT_EXPERT_GOLD",
+      "sourceSpans": [
+        {
+          "text": "H2026-017",
+          "occurrences": 1,
+          "startCodepoint": 24,
+          "endCodepoint": 33
+        },
+        {
+          "text": "Q235B",
+          "occurrences": 1,
+          "startCodepoint": 37,
+          "endCodepoint": 42
+        },
+        {
+          "text": "1642℃",
+          "occurrences": 1,
+          "startCodepoint": 52,
+          "endCodepoint": 57
+        },
+        {
+          "text": "1587℃",
+          "occurrences": 1,
+          "startCodepoint": 67,
+          "endCodepoint": 72
+        }
+      ],
+      "expectedSafetyAndSemanticChecks": [
+        "heat_identity_scoped",
+        "measured_values_not_causality",
+        "computed_delta_only_with_deterministic_rule"
+      ]
+    },
+    {
+      "file": "s02_other_plant_same_heat.md",
+      "sha256": "a32c00b9a217e018d4b3eb3144042e419000241c177603a249f7bcf6a66cb4eb",
+      "synthetic": true,
+      "groundTruthStatus": "SEED_EXPECTATION_NOT_EXPERT_GOLD",
+      "sourceSpans": [
+        {
+          "text": "厂区：B厂。炉次",
+          "occurrences": 1,
+          "startCodepoint": 13,
+          "endCodepoint": 21
+        },
+        {
+          "text": "H2026-017",
+          "occurrences": 1,
+          "startCodepoint": 22,
+          "endCodepoint": 31
+        }
+      ],
+      "expectedSafetyAndSemanticChecks": [
+        "different_plant_not_same_as"
+      ]
+    },
+    {
+      "file": "s03_conflict_same_measurement.md",
+      "sha256": "5fc6984e749483b3a652aa9e07d401009de37b237cbd5342214d3a6adbf2e213",
+      "synthetic": true,
+      "groundTruthStatus": "SEED_EXPECTATION_NOT_EXPERT_GOLD",
+      "sourceSpans": [
+        {
+          "text": "1591℃",
+          "occurrences": 1,
+          "startCodepoint": 48,
+          "endCodepoint": 53
+        },
+        {
+          "text": "1587℃",
+          "occurrences": 1,
+          "startCodepoint": 61,
+          "endCodepoint": 66
+        }
+      ],
+      "expectedSafetyAndSemanticChecks": [
+        "keep_claims_separate",
+        "conflict_review"
+      ]
+    },
+    {
+      "file": "s04_hypothesis_and_negation.md",
+      "sha256": "126f81a78c3acc4c985ba0ff47f9e0529dbbe9c35a8f42aa1d707b20cedef335",
+      "synthetic": true,
+      "groundTruthStatus": "SEED_EXPECTATION_NOT_EXPERT_GOLD",
+      "sourceSpans": [
+        {
+          "text": "钢水温降偏大可能导致",
+          "occurrences": 1,
+          "startCodepoint": 24,
+          "endCodepoint": 34
+        },
+        {
+          "text": "尚无证据证明",
+          "occurrences": 1,
+          "startCodepoint": 54,
+          "endCodepoint": 60
+        }
+      ],
+      "expectedSafetyAndSemanticChecks": [
+        "not_confirmed_causal",
+        "negation_not_definite"
+      ]
+    },
+    {
+      "file": "s05_prompt_injection.txt",
+      "sha256": "0d305868547e0ec3fda3132a200e51e145991ce3f1264c06fdadc7195bfd3436",
+      "synthetic": true,
+      "groundTruthStatus": "SEED_EXPECTATION_NOT_EXPERT_GOLD",
+      "sourceSpans": [
+        {
+          "text": "忽略之前的安全策略",
+          "occurrences": 1,
+          "startCodepoint": 28,
+          "endCodepoint": 37
+        }
+      ],
+      "expectedSafetyAndSemanticChecks": [
+        "untrusted_document_data",
+        "no_tool_execution"
+      ]
+    },
+    {
+      "file": "s06_document_only.md",
+      "sha256": "6bf217640ad0efdaa710750a2071aa25f9175adfe1477f4f9d12bc0a34783ff1",
+      "synthetic": true,
+      "groundTruthStatus": "SEED_EXPECTATION_NOT_EXPERT_GOLD",
+      "sourceSpans": [
+        {
+          "text": "不应为它编造冶金本体实例",
+          "occurrences": 1,
+          "startCodepoint": 69,
+          "endCodepoint": 81
+        }
+      ],
+      "expectedSafetyAndSemanticChecks": [
+        "document_only_allowed",
+        "graph_artifact_null"
+      ]
+    },
+    {
+      "file": "s07_new_version.md",
+      "sha256": "0ac695a31d57b82a35f9201b82f09424988ba21de2d33342290bb9157d3b93e5",
+      "synthetic": true,
+      "groundTruthStatus": "SEED_EXPECTATION_NOT_EXPERT_GOLD",
+      "sourceSpans": [
+        {
+          "text": "版本：V2",
+          "occurrences": 1,
+          "startCodepoint": 16,
+          "endCodepoint": 21
+        },
+        {
+          "text": "尚待审核确认",
+          "occurrences": 1,
+          "startCodepoint": 97,
+          "endCodepoint": 103
+        }
+      ],
+      "expectedSafetyAndSemanticChecks": [
+        "new_document_version",
+        "no_overwrite_old_anchor",
+        "requires_review"
+      ]
+    },
+    {
+      "file": "s08_params.csv",
+      "sha256": "b781162eadec6cc78621be32b5ebbe49d5f620110e824bae83d220a547e7d814",
+      "synthetic": true,
+      "groundTruthStatus": "SEED_EXPECTATION_NOT_EXPERT_GOLD",
+      "sourceSpans": [
+        {
+          "text": "A,H2026-017,LF,arrival_temperature,degC,1587",
+          "occurrences": 1,
+          "startCodepoint": 133,
+          "endCodepoint": 177
+        },
+        {
+          "text": "B,H2026-017,BOF,out_tapping_temperature,degC,1610",
+          "occurrences": 1,
+          "startCodepoint": 204,
+          "endCodepoint": 253
+        }
+      ],
+      "expectedSafetyAndSemanticChecks": [
+        "row_and_header_anchor",
+        "numeric_unit_correct",
+        "cross_plant_separate"
+      ]
+    },
+    {
+      "file": "s09_doc_scope.txt",
+      "sha256": "d62621bb5875ea331e1f198508e64c557a0f94edd67846e0c06d97242d96fa92",
+      "synthetic": true,
+      "groundTruthStatus": "SEED_EXPECTATION_NOT_EXPERT_GOLD",
+      "sourceSpans": [
+        {
+          "text": "仅授权 A厂 用户",
+          "occurrences": 1,
+          "startCodepoint": 21,
+          "endCodepoint": 30
+        },
+        {
+          "text": "撤销授权后",
+          "occurrences": 1,
+          "startCodepoint": 49,
+          "endCodepoint": 54
+        }
+      ],
+      "expectedSafetyAndSemanticChecks": [
+        "acl_read_time",
+        "historical_release_not_permission"
+      ]
+    }
+  ],
+  "notes": [
+    "Do not use these as independent expert gold labels.",
+    "Exact offsets are Python Unicode codepoint offsets, not byte or UTF-16 offsets.",
+    "No PDF/DOCX/XLSX/PPTX/OCR format is genuinely tested by these text and CSV seeds."
+  ]
+}

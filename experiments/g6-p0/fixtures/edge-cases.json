@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "kind": "SYNTHETIC_NOT_GOLD",
+  "cases": [
+    {
+      "name": "bom_mixed_unicode",
+      "raw_base64": "77u/5Lit8J+YgGXMgQ0K8J+RqeKAjfCfkrsN5pyrCg==",
+      "sha256": "939cc401623ecc3ecd48ea423807928f0f3bb2886ca10e9607f0e2b341220924",
+      "format": "TXT",
+      "text": "中😀é\n👩‍💻\n末\n"
+    },
+    {
+      "name": "csv_quoted_crlf",
+      "raw_base64": "aA0KImEiImIiDQo=",
+      "sha256": "883577c46f59cc29d5b5606a2751f17f40fba690bf20d11792dbd8dc417b8d7f",
+      "format": "CSV",
+      "text": "h\n\"a\"\"b\"\n"
+    },
+    {
+      "name": "bad_utf8",
+      "raw_base64": "/w==",
+      "sha256": "a8100ae6aa1940d0b663bb31cd466142ebbdbd5187131b92d93818987832eb89",
+      "format": "TXT",
+      "error": "INVALID_UTF8"
+    },
+    {
+      "name": "truncated_utf8",
+      "raw_base64": "5Lg=",
+      "sha256": "f3eb8d38197cb675f91bf3525fae15a003b25a9442dad0f9a4cc1286c9dd6ce2",
+      "format": "TXT",
+      "error": "INVALID_UTF8"
+    },
+    {
+      "name": "encoded_surrogate",
+      "raw_base64": "7aCA",
+      "sha256": "91a681b998555fb475479817b126c94e57e52011fa1842c5d188795a4a05226b",
+      "format": "TXT",
+      "error": "INVALID_UTF8"
+    },
+    {
+      "name": "unclosed_csv",
+      "raw_base64": "aAoidW5jbG9zZWQ=",
+      "sha256": "4aacdbf560cc610a1d03a978c0efae88372c508d95a141ffa7ef355aa3bf150d",
+      "format": "CSV",
+      "error": "INVALID_CSV"
+    }
+  ]
+}
