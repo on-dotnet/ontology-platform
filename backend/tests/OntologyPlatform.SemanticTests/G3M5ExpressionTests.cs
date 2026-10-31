@@ -34,9 +34,9 @@ public sealed class G3M5ExpressionTests
     public void ProjectionCardinalityPreservesLexicalAndDiagnosesInvalid(string lexical, bool valid)
     {
         // 合成已解析项只检验投影词法逻辑；真实解析由Real开头用例单独验证。
-        var source = Build([Triple(Blank("r"), Owl + "cardinality", Literal(lexical, IntegerType))]);
+        var source = Build(Restriction(Owl + "cardinality", Literal(lexical, IntegerType)));
         Assert.AreEqual(valid ? "COMPLETE" : "INDETERMINATE", source.Status);
-        Assert.AreEqual(lexical, source.Nodes.Single().Properties.Single().Values.Single().Value);
+        Assert.AreEqual(lexical, source.Nodes.Single().Properties.Single(item => item.PredicateIri == Owl + "cardinality").Values.Single().Value);
         Assert.AreEqual(valid, source.ReadOnlyStructured);
         Assert.AreEqual(!valid, source.Diagnostics.Any(item => item.Code == "cardinality_invalid"));
         Assert.IsTrue(source.SourcePreserved);
@@ -51,9 +51,9 @@ public sealed class G3M5ExpressionTests
         foreach (var term in new[] { Literal("1", "http://www.w3.org/2001/XMLSchema#integer"), Literal("1", IntegerType) with { Language = "zh" }, Iri("urn:one") })
         {
             // 每种不支持项保留原对象，禁止清洗或猜测类型。
-            var result = Build([Triple(Blank("r"), Owl + "minCardinality", term)]);
+            var result = Build(Restriction(Owl + "minCardinality", term));
             Assert.AreEqual("INDETERMINATE", result.Status);
-            Assert.AreEqual(term, result.Nodes.Single().Properties.Single().Values.Single());
+            Assert.AreEqual(term, result.Nodes.Single().Properties.Single(item => item.PredicateIri == Owl + "minCardinality").Values.Single());
         }
     }
 
@@ -64,9 +64,9 @@ public sealed class G3M5ExpressionTests
     public void ProjectionQualifiedCardinalityRequiresUniqueQualifier(string qualifier)
     {
         // 同一合法restricted主体的三个必要标准项。
-        RdfTriple[] triples = [Triple(Blank("r"), Owl + "qualifiedCardinality", Literal("01", IntegerType)), Triple(Blank("r"), Owl + "onProperty", Iri("urn:p")), Triple(Blank("r"), Owl + qualifier, Iri("urn:C"))];
+        RdfTriple[] triples = [.. Restriction(Owl + "qualifiedCardinality", Literal("01", IntegerType)), Triple(Blank("r"), Owl + qualifier, Iri("urn:C"))];
         Assert.AreEqual("COMPLETE", Build(triples).Status);
-        Assert.AreEqual("INDETERMINATE", Build(triples[..2]).Status);
+        Assert.AreEqual("INDETERMINATE", Build(triples[..^1]).Status);
         Assert.AreEqual("INDETERMINATE", Build([.. triples, Triple(Blank("r"), Owl + (qualifier == "onClass" ? "onDataRange" : "onClass"), Iri("urn:Other"))]).Status);
     }
 
@@ -75,18 +75,91 @@ public sealed class G3M5ExpressionTests
     public void ProjectionBlankPrefixSharedReferencesAndSourcesAreIsolated()
     {
         // 主体带_:而对象不带，必须在新投影内部关联到同一个实际节点。
-        RdfTriple[] triples = [Triple(Iri("urn:A"), Owl + "equivalentClass", Blank("r")), Triple(Iri("urn:B"), Owl + "equivalentClass", Blank("_:r")), Triple(Blank("_:r"), Owl + "hasValue", Literal("012", "urn:type"))];
+        RdfTriple[] triples = [Triple(Iri("urn:A"), Owl + "equivalentClass", Blank("r")), Triple(Iri("urn:B"), Owl + "equivalentClass", Blank("_:r")), .. Restriction(Owl + "hasValue", Literal("012", "urn:type"))];
         // 同名blank出现在另一源时只允许使用该源自己的定义。
         var left = Build(triples);
         // 第二源词面不同，不能因为blank ID相同而污染第一源。
-        var right = Build([Triple(Blank("r"), Owl + "hasValue", Literal("另一源", null, "zh"))], "vocabulary");
+        var right = Build(Restriction(Owl + "hasValue", Literal("另一源", null, "zh")), "vocabulary");
         Assert.AreEqual(3, left.Nodes.Length);
         Assert.AreEqual("_:r", left.Nodes.Single(item => item.Term.Kind == RdfTermKind.Blank).Term.Value);
         Assert.IsTrue(left.Diagnostics.Any(item => item.Code == "shared_blank_reference"));
         Assert.AreEqual("COMPLETE", left.Status);
-        Assert.AreEqual("012", left.Nodes.Single(item => item.Term.Kind == RdfTermKind.Blank).Properties.Single().Values.Single().Value);
-        Assert.AreEqual("另一源", right.Nodes.Single().Properties.Single().Values.Single().Value);
-        Assert.AreEqual("zh", right.Nodes.Single().Properties.Single().Values.Single().Language);
+        Assert.AreEqual("012", left.Nodes.Single(item => item.Term.Kind == RdfTermKind.Blank).Properties.Single(item => item.PredicateIri == Owl + "hasValue").Values.Single().Value);
+        Assert.AreEqual("另一源", right.Nodes.Single().Properties.Single(item => item.PredicateIri == Owl + "hasValue").Values.Single().Value);
+        Assert.AreEqual("zh", right.Nodes.Single().Properties.Single(item => item.PredicateIri == Owl + "hasValue").Values.Single().Language);
+    }
+
+    /// <summary>量词目标只接受类或数据范围项，不把literal解释成类。</summary>
+    [TestMethod]
+    [DataRow("someValuesFrom")]
+    [DataRow("allValuesFrom")]
+    public void ProjectionRestrictionQuantifierHasLegalTarget(string predicate)
+    {
+        Assert.AreEqual("COMPLETE", Build(Restriction(Owl + predicate, Iri("urn:C"))).Status);
+        Assert.AreEqual("INDETERMINATE", Build(Restriction(Owl + predicate, Literal("urn:C"))).Status);
+        Assert.AreEqual("INDETERMINATE", Build(Restriction(Owl + predicate, Blank("missing"))).Status);
+        // 匿名目标必须有本源真实结构，不从其他源按同名blank补齐。
+        var nested = Restriction(Owl + predicate, Blank("c")).Concat([Triple(Blank("c"), Owl + "complementOf", Iri("urn:C"))]).ToArray();
+        Assert.AreEqual("COMPLETE", Build(nested).Status);
+    }
+
+    /// <summary>IRI、typed literal和language literal的hasValue都保留准确项身份。</summary>
+    [TestMethod]
+    public void ProjectionRestrictionHasValuePreservesSupportedValueKinds()
+    {
+        foreach (var term in new[] { Iri("urn:individual"), Literal("001", "urn:type"), Literal("中文", null, "zh") })
+        {
+            // 合法完整restriction不能因保守发布阻断而丢失只读值结构。
+            var source = Build(Restriction(Owl + "hasValue", term));
+            Assert.AreEqual("COMPLETE", source.Status);
+            Assert.AreEqual(term, source.Nodes.Single().Properties.Single(item => item.PredicateIri == Owl + "hasValue").Values.Single());
+        }
+        // 匿名个体暂不确认槽位类型，原项仍完整保留而非改成IRI。
+        var anonymous = Build([.. Restriction(Owl + "hasValue", Blank("i")), Triple(Blank("i"), Rdf + "type", Iri(Owl + "NamedIndividual"))]);
+        Assert.AreEqual("INDETERMINATE", anonymous.Status);
+        Assert.IsTrue(anonymous.Diagnostics.Any(item => item.Code == "restriction_value_unsupported"));
+    }
+
+    /// <summary>缺属性、literal/复杂属性、多构造及普通基数混限定都不能标完整。</summary>
+    [TestMethod]
+    [DataRow("missing-property")]
+    [DataRow("literal-property")]
+    [DataRow("blank-property")]
+    [DataRow("two-properties")]
+    [DataRow("two-constructors")]
+    [DataRow("two-cardinalities")]
+    [DataRow("ordinary-qualifier")]
+    [DataRow("no-constructor")]
+    [DataRow("missing-type")]
+    [DataRow("qualified-literal-property")]
+    public void ProjectionRestrictionRejectsAmbiguousOrMalformedShape(string scenario)
+    {
+        // 反例以一个完整合法restriction为起点，只改动正在验证的槽位。
+        var triples = Restriction(Owl + "cardinality", Literal("1", IntegerType)).ToList();
+        if (scenario == "missing-property") triples.RemoveAll(item => item.Predicate == Owl + "onProperty");
+        if (scenario is "literal-property" or "blank-property" or "qualified-literal-property")
+        {
+            triples.RemoveAll(item => item.Predicate == Owl + "onProperty");
+            triples.Add(Triple(Blank("r"), Owl + "onProperty", scenario == "blank-property" ? Blank("inverse") : Literal("urn:p")));
+        }
+        if (scenario == "two-properties") triples.Add(Triple(Blank("r"), Owl + "onProperty", Iri("urn:other")));
+        if (scenario == "two-constructors") triples.Add(Triple(Blank("r"), Owl + "someValuesFrom", Iri("urn:C")));
+        if (scenario == "two-cardinalities") triples.Add(Triple(Blank("r"), Owl + "maxCardinality", Literal("2", IntegerType)));
+        if (scenario == "ordinary-qualifier") triples.Add(Triple(Blank("r"), Owl + "onClass", Iri("urn:C")));
+        if (scenario == "no-constructor") triples.RemoveAll(item => item.Predicate == Owl + "cardinality");
+        if (scenario == "missing-type") triples.RemoveAll(item => item.Predicate == Rdf + "type");
+        if (scenario == "qualified-literal-property")
+        {
+            triples.RemoveAll(item => item.Predicate == Owl + "cardinality");
+            triples.Add(Triple(Blank("r"), Owl + "qualifiedCardinality", Literal("1", IntegerType)));
+            triples.Add(Triple(Blank("r"), Owl + "onClass", Iri("urn:C")));
+        }
+        // 已解析的合法RDF可以有损坏OWL结构；保留源同时撤回完整结论。
+        var result = Build(triples.ToArray());
+        Assert.AreEqual("INDETERMINATE", result.Status);
+        Assert.IsTrue(result.SourcePreserved);
+        Assert.IsFalse(result.ReadOnlyStructured);
+        Assert.IsTrue(result.Diagnostics.Any(item => item.Code == "restriction_invalid"));
     }
 
     /// <summary>链顺序与字典排序分离，rdf:rest链长度不算表达式嵌套。</summary>
@@ -272,6 +345,10 @@ public sealed class G3M5ExpressionTests
         try { return (OwlExpressionSource)type.GetMethod("Build", BindingFlags.NonPublic | BindingFlags.Static)!.Invoke(null, [sourceId, new string('a', 64), triples, true, token])!; }
         catch (TargetInvocationException exception) when (exception.InnerException is OperationCanceledException cancelled) { throw cancelled; }
     }
+
+    /// <summary>构造完整合法restriction基线，词法回归不再依赖裸cardinality残缺图。</summary>
+    private static RdfTriple[] Restriction(string predicate, RdfTerm value) =>
+        [Triple(Blank("r"), Rdf + "type", Iri(Owl + "Restriction")), Triple(Blank("r"), Owl + "onProperty", Iri("urn:p")), Triple(Blank("r"), predicate, value)];
 
     /// <summary>构造明确IRI项。</summary>
     private static RdfTerm Iri(string value) => new() { Kind = RdfTermKind.Iri, Value = value };
