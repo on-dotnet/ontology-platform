@@ -129,10 +129,33 @@ internal sealed class AgentFixture : IDisposable
     /// <summary>指定当前草稿必须取得真实成功报告再提交。</summary>
     internal async Task<ReleaseProposal> ProposalForAsync(OntologyDraft draft)
     {
-        // 真正调用Jena SHACL，禁止自造conforms事实。
-        var report = await Ontology.ValidateAsync(Author, draft.DraftId, new ValidateDraftRequest { Revision = draft.Revision, Hashes = draft.Hashes, Command = Command(draft.Revision) }, default);
-        Assert.IsTrue(report.Conforms);
-        return await Service.CreateProposalAsync(Author, new CreateProposalRequest { Kind = ProposalKind.Publish, DraftId = draft.DraftId, DraftRevision = draft.Revision, Hashes = draft.Hashes, ValidationReportId = report.ReportId, Command = Command(draft.Revision) }, default);
+        // 原生产assessment包含真实Jena SHACL、来源/profile及阶段门禁，不能伪造成功。
+        var assessment = await scope.ServiceProvider.GetRequiredService<IG3OntologyService>().AssessAsync(Author, draft.DraftId,
+            new ValidateDraftRequest { Revision = draft.Revision, Hashes = draft.Hashes, Command = Command(draft.Revision) }, default);
+        Assert.IsTrue(assessment.PublishEligible);
+        // 只在真实Catalog准确返回无active时选择INITIAL，不以其它异常猜测首次发布。
+        ReleaseSummary? active = null;
+        try { active = await Catalog.ResolveAsync(Author, draft.AssetId, null, default); }
+        catch (SemanticOperationException error) when (error.Status == 404 && error.Code == "release_not_found") { }
+        // 明确当前已保存草稿修订，不使用latest或调用者声称hash作为报告源权威。
+        var target = new VersionRef { Kind = VersionRefKind.Draft, Id = draft.DraftId, Revision = draft.Revision };
+        // 真实持久报告绑定当前assessment，已有active则复用其固定Release及已验manifest。
+        var impact = await scope.ServiceProvider.GetRequiredService<IG3ImpactService>().GenerateImpactAsync(Author,
+            new GenerateImpactReportRequest
+            {
+                From = active is null ? target : new VersionRef { Kind = VersionRefKind.Release, Id = active.Manifest.ReleaseId, Revision = null },
+                To = target,
+                BaselineKind = active is null ? ImpactBaselineKind.Initial : ImpactBaselineKind.VersionPair,
+                AssessmentId = assessment.AssessmentId,
+                Command = Command(draft.Revision)
+            }, default);
+        Assert.IsTrue(impact.PublishEligible);
+        return await Service.CreateProposalAsync(Author, new CreateProposalRequest
+        {
+            Kind = ProposalKind.Publish, DraftId = draft.DraftId, DraftRevision = draft.Revision, Hashes = draft.Hashes,
+            ValidationReportId = assessment.ValidationReportId, ImpactReportId = impact.ReportId, ImpactHash = impact.CanonicalHash,
+            Command = Command(draft.Revision)
+        }, default);
     }
 
     /// <summary>完成真实草稿、SHACL、异人审批与不可变发布。</summary>
