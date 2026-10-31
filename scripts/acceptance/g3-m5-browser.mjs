@@ -110,17 +110,27 @@ export async function runM5Checks({ root, origin, operator, viewer, single, chec
     const theme = page.getByRole("button", { name: "切换深浅主题", exact: true });
     if (await page.evaluate(() => document.documentElement.dataset.theme ?? "dark") !== "light") await theme.click();
     observe("light_theme", await page.evaluate(() => document.documentElement.dataset.theme) === "light");
-    await page.screenshot({ path: resolve(evidence, "m5-owl-light.png") });
+    await ontologyTree.locator("details").first().scrollIntoViewIfNeeded();
+    await page.screenshot({ path: resolve(evidence, "m5-owl-light.png"), animations: "disabled" });
     await theme.click();
     observe("dark_theme", await page.evaluate(() => document.documentElement.dataset.theme) === "dark");
-    await page.screenshot({ path: resolve(evidence, "m5-owl-dark.png") });
+    await page.screenshot({ path: resolve(evidence, "m5-owl-dark.png"), animations: "disabled" });
     await page.setViewportSize({ width: 390, height: 844 });
     const center = page.getByRole("button", { name: "源码", exact: true });
     if (await center.count()) await center.first().click();
     await page.getByRole("button", { name: "高阶表达式", exact: true }).click();
     await view.waitFor();
+    // inert不参与hit-test；必须等侧栏实际离开画面，不能仅检查scrollWidth。
+    await page.waitForFunction(() => {
+      const navigation = document.querySelector("#platform-navigation");
+      return !navigation || navigation.getBoundingClientRect().right <= 0.5;
+    });
+    observe("narrow_visible_panel_bounds", await view.evaluate(element => {
+      const bounds = element.getBoundingClientRect();
+      return bounds.left >= -0.5 && bounds.right <= innerWidth + 0.5;
+    }));
     observe("narrow_no_horizontal_document_overflow", await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
-    await page.screenshot({ path: resolve(evidence, "m5-owl-narrow.png") });
+    await page.screenshot({ path: resolve(evidence, "m5-owl-narrow.png"), animations: "disabled" });
     await page.setViewportSize({ width: 1440, height: 1000 });
     await page.getByRole("button", { name: "查看 ontology 原始源码", exact: true }).click();
     await page.getByRole("combobox", { name: "选择源文档", exact: true }).selectOption("ontologyTurtle");

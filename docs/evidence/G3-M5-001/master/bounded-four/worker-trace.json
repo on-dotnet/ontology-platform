@@ -1,0 +1,1805 @@
+{
+  "batches": [
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "deployment.environment.name",
+            "value": {
+              "stringValue": "development"
+            }
+          },
+          {
+            "key": "service.version",
+            "value": {
+              "stringValue": "G2-THIN-SLICE-001"
+            }
+          },
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "ontology-platform-api"
+            }
+          }
+        ]
+      },
+      "scopeSpans": [
+        {
+          "scope": {
+            "name": "OntologyPlatform.Agents"
+          },
+          "spans": [
+            {
+              "traceId": "TTpUmTmE043UB73JEmDbXQ==",
+              "spanId": "8XxSID4HBbs=",
+              "name": "execution.run",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1793422278032488000",
+              "endTimeUnixNano": "1793422278180063000",
+              "attributes": [
+                {
+                  "key": "execution.creation_trace_id",
+                  "value": {
+                    "stringValue": "be05ff621d850514017f6d8a593699db"
+                  }
+                }
+              ],
+              "status": {}
+            }
+          ]
+        },
+        {
+          "scope": {
+            "name": "OntologyPlatform.SemanticQuery"
+          },
+          "spans": [
+            {
+              "traceId": "TTpUmTmE043UB73JEmDbXQ==",
+              "spanId": "i9s3kcRF43s=",
+              "parentSpanId": "8XxSID4HBbs=",
+              "name": "semantic.query",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1793422278036608000",
+              "endTimeUnixNano": "1793422278158318000",
+              "status": {}
+            }
+          ]
+        },
+        {
+          "scope": {
+            "name": "System.Net.Http"
+          },
+          "spans": [
+            {
+              "traceId": "TTpUmTmE043UB73JEmDbXQ==",
+              "spanId": "h8wUSFxVnHI=",
+              "parentSpanId": "i9s3kcRF43s=",
+              "name": "GET",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": "1793422278037955000",
+              "endTimeUnixNano": "1793422278038648000",
+              "attributes": [
+                {
+                  "key": "network.protocol.version",
+                  "value": {
+                    "stringValue": "1.1"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": "200"
+                  }
+                },
+                {
+                  "key": "server.address",
+                  "value": {
+                    "stringValue": "127.0.0.1"
+                  }
+                },
+                {
+                  "key": "server.port",
+                  "value": {
+                    "intValue": "19000"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "TTpUmTmE043UB73JEmDbXQ==",
+              "spanId": "HkX2ISxjlG0=",
+              "parentSpanId": "i9s3kcRF43s=",
+              "name": "GET",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": "1793422278039828000",
+              "endTimeUnixNano": "1793422278040281000",
+              "attributes": [
+                {
+                  "key": "network.protocol.version",
+                  "value": {
+                    "stringValue": "1.1"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": "200"
+                  }
+                },
+                {
+                  "key": "server.address",
+                  "value": {
+                    "stringValue": "127.0.0.1"
+                  }
+                },
+                {
+                  "key": "server.port",
+                  "value": {
+                    "intValue": "19000"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "TTpUmTmE043UB73JEmDbXQ==",
+              "spanId": "koIHh+mWjxQ=",
+              "parentSpanId": "i9s3kcRF43s=",
+              "name": "GET",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": "1793422278040371000",
+              "endTimeUnixNano": "1793422278040879000",
+              "attributes": [
+                {
+                  "key": "network.protocol.version",
+                  "value": {
+                    "stringValue": "1.1"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": "200"
+                  }
+                },
+                {
+                  "key": "server.address",
+                  "value": {
+                    "stringValue": "127.0.0.1"
+                  }
+                },
+                {
+                  "key": "server.port",
+                  "value": {
+                    "intValue": "19000"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "TTpUmTmE043UB73JEmDbXQ==",
+              "spanId": "4QM2UQgTSv0=",
+              "parentSpanId": "i9s3kcRF43s=",
+              "name": "GET",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": "1793422278040944000",
+              "endTimeUnixNano": "1793422278041332000",
+              "attributes": [
+                {
+                  "key": "network.protocol.version",
+                  "value": {
+                    "stringValue": "1.1"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": "200"
+                  }
+                },
+                {
+                  "key": "server.address",
+                  "value": {
+                    "stringValue": "127.0.0.1"
+                  }
+                },
+                {
+                  "key": "server.port",
+                  "value": {
+                    "intValue": "19000"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "TTpUmTmE043UB73JEmDbXQ==",
+              "spanId": "dj6ymBi4Tqo=",
+              "parentSpanId": "i9s3kcRF43s=",
+              "name": "GET",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": "1793422278041395000",
+              "endTimeUnixNano": "1793422278041932000",
+              "attributes": [
+                {
+                  "key": "network.protocol.version",
+                  "value": {
+                    "stringValue": "1.1"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": "200"
+                  }
+                },
+                {
+                  "key": "server.address",
+                  "value": {
+                    "stringValue": "127.0.0.1"
+                  }
+                },
+                {
+                  "key": "server.port",
+                  "value": {
+                    "intValue": "19000"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "TTpUmTmE043UB73JEmDbXQ==",
+              "spanId": "r0wZBwMdeY8=",
+              "parentSpanId": "rBczRNShDwk=",
+              "name": "PUT",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": "1793422278043374000",
+              "endTimeUnixNano": "1793422278044374000",
+              "attributes": [
+                {
+                  "key": "network.protocol.version",
+                  "value": {
+                    "stringValue": "1.1"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "PUT"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": "201"
+                  }
+                },
+                {
+                  "key": "server.address",
+                  "value": {
+                    "stringValue": "localhost"
+                  }
+                },
+                {
+                  "key": "server.port",
+                  "value": {
+                    "intValue": "13030"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "TTpUmTmE043UB73JEmDbXQ==",
+              "spanId": "0wwu7NnuUzk=",
+              "parentSpanId": "rBczRNShDwk=",
+              "name": "GET",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": "1793422278044413000",
+              "endTimeUnixNano": "1793422278045594000",
+              "attributes": [
+                {
+                  "key": "network.protocol.version",
+                  "value": {
+                    "stringValue": "1.1"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": "200"
+                  }
+                },
+                {
+                  "key": "server.address",
+                  "value": {
+                    "stringValue": "localhost"
+                  }
+                },
+                {
+                  "key": "server.port",
+                  "value": {
+                    "intValue": "13030"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "TTpUmTmE043UB73JEmDbXQ==",
+              "spanId": "wF7GzWd4CJA=",
+              "parentSpanId": "rBczRNShDwk=",
+              "name": "PUT",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": "1793422278045825000",
+              "endTimeUnixNano": "1793422278046655000",
+              "attributes": [
+                {
+                  "key": "network.protocol.version",
+                  "value": {
+                    "stringValue": "1.1"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "PUT"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": "201"
+                  }
+                },
+                {
+                  "key": "server.address",
+                  "value": {
+                    "stringValue": "localhost"
+                  }
+                },
+                {
+                  "key": "server.port",
+                  "value": {
+                    "intValue": "13030"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "TTpUmTmE043UB73JEmDbXQ==",
+              "spanId": "iYOtFADfEjA=",
+              "parentSpanId": "rBczRNShDwk=",
+              "name": "GET",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": "1793422278046686000",
+              "endTimeUnixNano": "1793422278047954000",
+              "attributes": [
+                {
+                  "key": "network.protocol.version",
+                  "value": {
+                    "stringValue": "1.1"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": "200"
+                  }
+                },
+                {
+                  "key": "server.address",
+                  "value": {
+                    "stringValue": "localhost"
+                  }
+                },
+                {
+                  "key": "server.port",
+                  "value": {
+                    "intValue": "13030"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "TTpUmTmE043UB73JEmDbXQ==",
+              "spanId": "vKCH+YBRLpY=",
+              "parentSpanId": "rBczRNShDwk=",
+              "name": "PUT",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": "1793422278048236000",
+              "endTimeUnixNano": "1793422278048672000",
+              "attributes": [
+                {
+                  "key": "network.protocol.version",
+                  "value": {
+                    "stringValue": "1.1"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "PUT"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": "201"
+                  }
+                },
+                {
+                  "key": "server.address",
+                  "value": {
+                    "stringValue": "localhost"
+                  }
+                },
+                {
+                  "key": "server.port",
+                  "value": {
+                    "intValue": "13030"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "TTpUmTmE043UB73JEmDbXQ==",
+              "spanId": "wys99SKIkco=",
+              "parentSpanId": "rBczRNShDwk=",
+              "name": "GET",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": "1793422278048704000",
+              "endTimeUnixNano": "1793422278049206000",
+              "attributes": [
+                {
+                  "key": "network.protocol.version",
+                  "value": {
+                    "stringValue": "1.1"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": "200"
+                  }
+                },
+                {
+                  "key": "server.address",
+                  "value": {
+                    "stringValue": "localhost"
+                  }
+                },
+                {
+                  "key": "server.port",
+                  "value": {
+                    "intValue": "13030"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "TTpUmTmE043UB73JEmDbXQ==",
+              "spanId": "EfPFJOBSR9Q=",
+              "parentSpanId": "rBczRNShDwk=",
+              "name": "PUT",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": "1793422278049348000",
+              "endTimeUnixNano": "1793422278054264000",
+              "attributes": [
+                {
+                  "key": "network.protocol.version",
+                  "value": {
+                    "stringValue": "1.1"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "PUT"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": "201"
+                  }
+                },
+                {
+                  "key": "server.address",
+                  "value": {
+                    "stringValue": "localhost"
+                  }
+                },
+                {
+                  "key": "server.port",
+                  "value": {
+                    "intValue": "13030"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "TTpUmTmE043UB73JEmDbXQ==",
+              "spanId": "mUyra/BzzD0=",
+              "parentSpanId": "rBczRNShDwk=",
+              "name": "GET",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": "1793422278054301000",
+              "endTimeUnixNano": "1793422278060523000",
+              "attributes": [
+                {
+                  "key": "network.protocol.version",
+                  "value": {
+                    "stringValue": "1.1"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": "200"
+                  }
+                },
+                {
+                  "key": "server.address",
+                  "value": {
+                    "stringValue": "localhost"
+                  }
+                },
+                {
+                  "key": "server.port",
+                  "value": {
+                    "intValue": "13030"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "TTpUmTmE043UB73JEmDbXQ==",
+              "spanId": "U8c9zP6g+mw=",
+              "parentSpanId": "rBczRNShDwk=",
+              "name": "GET",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": "1793422278094579000",
+              "endTimeUnixNano": "1793422278095825000",
+              "attributes": [
+                {
+                  "key": "network.protocol.version",
+                  "value": {
+                    "stringValue": "1.1"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": "200"
+                  }
+                },
+                {
+                  "key": "server.address",
+                  "value": {
+                    "stringValue": "localhost"
+                  }
+                },
+                {
+                  "key": "server.port",
+                  "value": {
+                    "intValue": "13030"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "TTpUmTmE043UB73JEmDbXQ==",
+              "spanId": "XoJSYJnHDNE=",
+              "parentSpanId": "rBczRNShDwk=",
+              "name": "GET",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": "1793422278095935000",
+              "endTimeUnixNano": "1793422278100130000",
+              "attributes": [
+                {
+                  "key": "network.protocol.version",
+                  "value": {
+                    "stringValue": "1.1"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": "200"
+                  }
+                },
+                {
+                  "key": "server.address",
+                  "value": {
+                    "stringValue": "localhost"
+                  }
+                },
+                {
+                  "key": "server.port",
+                  "value": {
+                    "intValue": "13030"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "TTpUmTmE043UB73JEmDbXQ==",
+              "spanId": "Cis+sY9Ax40=",
+              "parentSpanId": "rBczRNShDwk=",
+              "name": "PUT",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": "1793422278102914000",
+              "endTimeUnixNano": "1793422278110801000",
+              "attributes": [
+                {
+                  "key": "network.protocol.version",
+                  "value": {
+                    "stringValue": "1.1"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "PUT"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": "201"
+                  }
+                },
+                {
+                  "key": "server.address",
+                  "value": {
+                    "stringValue": "localhost"
+                  }
+                },
+                {
+                  "key": "server.port",
+                  "value": {
+                    "intValue": "13030"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "TTpUmTmE043UB73JEmDbXQ==",
+              "spanId": "i6UYWtinwSk=",
+              "parentSpanId": "rBczRNShDwk=",
+              "name": "POST",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": "1793422278110851000",
+              "endTimeUnixNano": "1793422278111685000",
+              "attributes": [
+                {
+                  "key": "network.protocol.version",
+                  "value": {
+                    "stringValue": "1.1"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "POST"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": "200"
+                  }
+                },
+                {
+                  "key": "server.address",
+                  "value": {
+                    "stringValue": "localhost"
+                  }
+                },
+                {
+                  "key": "server.port",
+                  "value": {
+                    "intValue": "13030"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "TTpUmTmE043UB73JEmDbXQ==",
+              "spanId": "uqwhMYrlb5I=",
+              "parentSpanId": "rBczRNShDwk=",
+              "name": "DELETE",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": "1793422278111713000",
+              "endTimeUnixNano": "1793422278112352000",
+              "attributes": [
+                {
+                  "key": "network.protocol.version",
+                  "value": {
+                    "stringValue": "1.1"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "DELETE"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": "204"
+                  }
+                },
+                {
+                  "key": "server.address",
+                  "value": {
+                    "stringValue": "localhost"
+                  }
+                },
+                {
+                  "key": "server.port",
+                  "value": {
+                    "intValue": "13030"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "TTpUmTmE043UB73JEmDbXQ==",
+              "spanId": "U/OgeQjJWrk=",
+              "parentSpanId": "rBczRNShDwk=",
+              "name": "DELETE",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": "1793422278112363000",
+              "endTimeUnixNano": "1793422278112978000",
+              "attributes": [
+                {
+                  "key": "network.protocol.version",
+                  "value": {
+                    "stringValue": "1.1"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "DELETE"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": "204"
+                  }
+                },
+                {
+                  "key": "server.address",
+                  "value": {
+                    "stringValue": "localhost"
+                  }
+                },
+                {
+                  "key": "server.port",
+                  "value": {
+                    "intValue": "13030"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "TTpUmTmE043UB73JEmDbXQ==",
+              "spanId": "gNJ9Zok+y9c=",
+              "parentSpanId": "rBczRNShDwk=",
+              "name": "DELETE",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": "1793422278112987000",
+              "endTimeUnixNano": "1793422278113342000",
+              "attributes": [
+                {
+                  "key": "network.protocol.version",
+                  "value": {
+                    "stringValue": "1.1"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "DELETE"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": "204"
+                  }
+                },
+                {
+                  "key": "server.address",
+                  "value": {
+                    "stringValue": "localhost"
+                  }
+                },
+                {
+                  "key": "server.port",
+                  "value": {
+                    "intValue": "13030"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "TTpUmTmE043UB73JEmDbXQ==",
+              "spanId": "NRe6Ytfafi0=",
+              "parentSpanId": "rBczRNShDwk=",
+              "name": "DELETE",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": "1793422278113351000",
+              "endTimeUnixNano": "1793422278117220000",
+              "attributes": [
+                {
+                  "key": "network.protocol.version",
+                  "value": {
+                    "stringValue": "1.1"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "DELETE"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": "204"
+                  }
+                },
+                {
+                  "key": "server.address",
+                  "value": {
+                    "stringValue": "localhost"
+                  }
+                },
+                {
+                  "key": "server.port",
+                  "value": {
+                    "intValue": "13030"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "TTpUmTmE043UB73JEmDbXQ==",
+              "spanId": "yIkxMSoZghs=",
+              "parentSpanId": "rBczRNShDwk=",
+              "name": "DELETE",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": "1793422278117230000",
+              "endTimeUnixNano": "1793422278122212000",
+              "attributes": [
+                {
+                  "key": "network.protocol.version",
+                  "value": {
+                    "stringValue": "1.1"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "DELETE"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": "204"
+                  }
+                },
+                {
+                  "key": "server.address",
+                  "value": {
+                    "stringValue": "localhost"
+                  }
+                },
+                {
+                  "key": "server.port",
+                  "value": {
+                    "intValue": "13030"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "TTpUmTmE043UB73JEmDbXQ==",
+              "spanId": "PVR9V220SiA=",
+              "parentSpanId": "i9s3kcRF43s=",
+              "name": "GET",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": "1793422278123568000",
+              "endTimeUnixNano": "1793422278124110000",
+              "attributes": [
+                {
+                  "key": "network.protocol.version",
+                  "value": {
+                    "stringValue": "1.1"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": "200"
+                  }
+                },
+                {
+                  "key": "server.address",
+                  "value": {
+                    "stringValue": "127.0.0.1"
+                  }
+                },
+                {
+                  "key": "server.port",
+                  "value": {
+                    "intValue": "19000"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "TTpUmTmE043UB73JEmDbXQ==",
+              "spanId": "zsOi3QeJej8=",
+              "parentSpanId": "i9s3kcRF43s=",
+              "name": "GET",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": "1793422278124171000",
+              "endTimeUnixNano": "1793422278124506000",
+              "attributes": [
+                {
+                  "key": "network.protocol.version",
+                  "value": {
+                    "stringValue": "1.1"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": "200"
+                  }
+                },
+                {
+                  "key": "server.address",
+                  "value": {
+                    "stringValue": "127.0.0.1"
+                  }
+                },
+                {
+                  "key": "server.port",
+                  "value": {
+                    "intValue": "19000"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "TTpUmTmE043UB73JEmDbXQ==",
+              "spanId": "KMiBQPL4drM=",
+              "parentSpanId": "i9s3kcRF43s=",
+              "name": "GET",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": "1793422278124534000",
+              "endTimeUnixNano": "1793422278124805000",
+              "attributes": [
+                {
+                  "key": "network.protocol.version",
+                  "value": {
+                    "stringValue": "1.1"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": "200"
+                  }
+                },
+                {
+                  "key": "server.address",
+                  "value": {
+                    "stringValue": "127.0.0.1"
+                  }
+                },
+                {
+                  "key": "server.port",
+                  "value": {
+                    "intValue": "19000"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "TTpUmTmE043UB73JEmDbXQ==",
+              "spanId": "D76PKKo+3IE=",
+              "parentSpanId": "i9s3kcRF43s=",
+              "name": "GET",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": "1793422278124821000",
+              "endTimeUnixNano": "1793422278125214000",
+              "attributes": [
+                {
+                  "key": "network.protocol.version",
+                  "value": {
+                    "stringValue": "1.1"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": "200"
+                  }
+                },
+                {
+                  "key": "server.address",
+                  "value": {
+                    "stringValue": "127.0.0.1"
+                  }
+                },
+                {
+                  "key": "server.port",
+                  "value": {
+                    "intValue": "19000"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "TTpUmTmE043UB73JEmDbXQ==",
+              "spanId": "4wC5MKh46wk=",
+              "parentSpanId": "ADvshibbVoA=",
+              "name": "PUT",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": "1793422278125439000",
+              "endTimeUnixNano": "1793422278126091000",
+              "attributes": [
+                {
+                  "key": "network.protocol.version",
+                  "value": {
+                    "stringValue": "1.1"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "PUT"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": "201"
+                  }
+                },
+                {
+                  "key": "server.address",
+                  "value": {
+                    "stringValue": "localhost"
+                  }
+                },
+                {
+                  "key": "server.port",
+                  "value": {
+                    "intValue": "13030"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "TTpUmTmE043UB73JEmDbXQ==",
+              "spanId": "NJ27yi++TvI=",
+              "parentSpanId": "ADvshibbVoA=",
+              "name": "GET",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": "1793422278126108000",
+              "endTimeUnixNano": "1793422278126744000",
+              "attributes": [
+                {
+                  "key": "network.protocol.version",
+                  "value": {
+                    "stringValue": "1.1"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": "200"
+                  }
+                },
+                {
+                  "key": "server.address",
+                  "value": {
+                    "stringValue": "localhost"
+                  }
+                },
+                {
+                  "key": "server.port",
+                  "value": {
+                    "intValue": "13030"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "TTpUmTmE043UB73JEmDbXQ==",
+              "spanId": "+wcHHyn19NY=",
+              "parentSpanId": "ADvshibbVoA=",
+              "name": "PUT",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": "1793422278126847000",
+              "endTimeUnixNano": "1793422278127366000",
+              "attributes": [
+                {
+                  "key": "network.protocol.version",
+                  "value": {
+                    "stringValue": "1.1"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "PUT"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": "201"
+                  }
+                },
+                {
+                  "key": "server.address",
+                  "value": {
+                    "stringValue": "localhost"
+                  }
+                },
+                {
+                  "key": "server.port",
+                  "value": {
+                    "intValue": "13030"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "TTpUmTmE043UB73JEmDbXQ==",
+              "spanId": "BT0AvaTUvzQ=",
+              "parentSpanId": "ADvshibbVoA=",
+              "name": "GET",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": "1793422278127376000",
+              "endTimeUnixNano": "1793422278128044000",
+              "attributes": [
+                {
+                  "key": "network.protocol.version",
+                  "value": {
+                    "stringValue": "1.1"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": "200"
+                  }
+                },
+                {
+                  "key": "server.address",
+                  "value": {
+                    "stringValue": "localhost"
+                  }
+                },
+                {
+                  "key": "server.port",
+                  "value": {
+                    "intValue": "13030"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "TTpUmTmE043UB73JEmDbXQ==",
+              "spanId": "Y6qfJSjr4k0=",
+              "parentSpanId": "ADvshibbVoA=",
+              "name": "PUT",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": "1793422278128175000",
+              "endTimeUnixNano": "1793422278128567000",
+              "attributes": [
+                {
+                  "key": "network.protocol.version",
+                  "value": {
+                    "stringValue": "1.1"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "PUT"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": "201"
+                  }
+                },
+                {
+                  "key": "server.address",
+                  "value": {
+                    "stringValue": "localhost"
+                  }
+                },
+                {
+                  "key": "server.port",
+                  "value": {
+                    "intValue": "13030"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "TTpUmTmE043UB73JEmDbXQ==",
+              "spanId": "OqZHv6OSPH8=",
+              "parentSpanId": "ADvshibbVoA=",
+              "name": "GET",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": "1793422278128585000",
+              "endTimeUnixNano": "1793422278128971000",
+              "attributes": [
+                {
+                  "key": "network.protocol.version",
+                  "value": {
+                    "stringValue": "1.1"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": "200"
+                  }
+                },
+                {
+                  "key": "server.address",
+                  "value": {
+                    "stringValue": "localhost"
+                  }
+                },
+                {
+                  "key": "server.port",
+                  "value": {
+                    "intValue": "13030"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "TTpUmTmE043UB73JEmDbXQ==",
+              "spanId": "QqzHotafBKk=",
+              "parentSpanId": "ADvshibbVoA=",
+              "name": "PUT",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": "1793422278129013000",
+              "endTimeUnixNano": "1793422278131778000",
+              "attributes": [
+                {
+                  "key": "network.protocol.version",
+                  "value": {
+                    "stringValue": "1.1"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "PUT"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": "201"
+                  }
+                },
+                {
+                  "key": "server.address",
+                  "value": {
+                    "stringValue": "localhost"
+                  }
+                },
+                {
+                  "key": "server.port",
+                  "value": {
+                    "intValue": "13030"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "TTpUmTmE043UB73JEmDbXQ==",
+              "spanId": "ABuQIvSmySs=",
+              "parentSpanId": "ADvshibbVoA=",
+              "name": "GET",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": "1793422278131802000",
+              "endTimeUnixNano": "1793422278136738000",
+              "attributes": [
+                {
+                  "key": "network.protocol.version",
+                  "value": {
+                    "stringValue": "1.1"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": "200"
+                  }
+                },
+                {
+                  "key": "server.address",
+                  "value": {
+                    "stringValue": "localhost"
+                  }
+                },
+                {
+                  "key": "server.port",
+                  "value": {
+                    "intValue": "13030"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "TTpUmTmE043UB73JEmDbXQ==",
+              "spanId": "LGnpXWCOYis=",
+              "parentSpanId": "ADvshibbVoA=",
+              "name": "GET",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": "1793422278140038000",
+              "endTimeUnixNano": "1793422278141025000",
+              "attributes": [
+                {
+                  "key": "network.protocol.version",
+                  "value": {
+                    "stringValue": "1.1"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": "200"
+                  }
+                },
+                {
+                  "key": "server.address",
+                  "value": {
+                    "stringValue": "localhost"
+                  }
+                },
+                {
+                  "key": "server.port",
+                  "value": {
+                    "intValue": "13030"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "TTpUmTmE043UB73JEmDbXQ==",
+              "spanId": "u991IS8y56I=",
+              "parentSpanId": "ADvshibbVoA=",
+              "name": "GET",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": "1793422278141103000",
+              "endTimeUnixNano": "1793422278147990000",
+              "attributes": [
+                {
+                  "key": "network.protocol.version",
+                  "value": {
+                    "stringValue": "1.1"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": "200"
+                  }
+                },
+                {
+                  "key": "server.address",
+                  "value": {
+                    "stringValue": "localhost"
+                  }
+                },
+                {
+                  "key": "server.port",
+                  "value": {
+                    "intValue": "13030"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "TTpUmTmE043UB73JEmDbXQ==",
+              "spanId": "dEnlSV7uJm0=",
+              "parentSpanId": "ADvshibbVoA=",
+              "name": "DELETE",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": "1793422278150260000",
+              "endTimeUnixNano": "1793422278150900000",
+              "attributes": [
+                {
+                  "key": "network.protocol.version",
+                  "value": {
+                    "stringValue": "1.1"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "DELETE"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": "204"
+                  }
+                },
+                {
+                  "key": "server.address",
+                  "value": {
+                    "stringValue": "localhost"
+                  }
+                },
+                {
+                  "key": "server.port",
+                  "value": {
+                    "intValue": "13030"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "TTpUmTmE043UB73JEmDbXQ==",
+              "spanId": "pFfwaFfWV7s=",
+              "parentSpanId": "ADvshibbVoA=",
+              "name": "DELETE",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": "1793422278150930000",
+              "endTimeUnixNano": "1793422278151716000",
+              "attributes": [
+                {
+                  "key": "network.protocol.version",
+                  "value": {
+                    "stringValue": "1.1"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "DELETE"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": "204"
+                  }
+                },
+                {
+                  "key": "server.address",
+                  "value": {
+                    "stringValue": "localhost"
+                  }
+                },
+                {
+                  "key": "server.port",
+                  "value": {
+                    "intValue": "13030"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "TTpUmTmE043UB73JEmDbXQ==",
+              "spanId": "SRlObgJS9tY=",
+              "parentSpanId": "ADvshibbVoA=",
+              "name": "DELETE",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": "1793422278151740000",
+              "endTimeUnixNano": "1793422278152076000",
+              "attributes": [
+                {
+                  "key": "network.protocol.version",
+                  "value": {
+                    "stringValue": "1.1"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "DELETE"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": "204"
+                  }
+                },
+                {
+                  "key": "server.address",
+                  "value": {
+                    "stringValue": "localhost"
+                  }
+                },
+                {
+                  "key": "server.port",
+                  "value": {
+                    "intValue": "13030"
+                  }
+                }
+              ],
+              "status": {}
+            },
+            {
+              "traceId": "TTpUmTmE043UB73JEmDbXQ==",
+              "spanId": "j/gnNXWGvJc=",
+              "parentSpanId": "ADvshibbVoA=",
+              "name": "DELETE",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": "1793422278152100000",
+              "endTimeUnixNano": "1793422278155651000",
+              "attributes": [
+                {
+                  "key": "network.protocol.version",
+                  "value": {
+                    "stringValue": "1.1"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "DELETE"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": "204"
+                  }
+                },
+                {
+                  "key": "server.address",
+                  "value": {
+                    "stringValue": "localhost"
+                  }
+                },
+                {
+                  "key": "server.port",
+                  "value": {
+                    "intValue": "13030"
+                  }
+                }
+              ],
+              "status": {}
+            }
+          ]
+        },
+        {
+          "scope": {
+            "name": "OntologyPlatform.Ontology"
+          },
+          "spans": [
+            {
+              "traceId": "TTpUmTmE043UB73JEmDbXQ==",
+              "spanId": "rBczRNShDwk=",
+              "parentSpanId": "i9s3kcRF43s=",
+              "name": "ontology.semantic",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1793422278043020000",
+              "endTimeUnixNano": "1793422278122228000",
+              "attributes": [
+                {
+                  "key": "ontology.phase",
+                  "value": {
+                    "stringValue": "VerifyAsync"
+                  }
+                }
+              ],
+              "status": {
+                "code": "STATUS_CODE_OK"
+              }
+            },
+            {
+              "traceId": "TTpUmTmE043UB73JEmDbXQ==",
+              "spanId": "ADvshibbVoA=",
+              "parentSpanId": "i9s3kcRF43s=",
+              "name": "ontology.semantic",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1793422278125296000",
+              "endTimeUnixNano": "1793422278155681000",
+              "attributes": [
+                {
+                  "key": "ontology.phase",
+                  "value": {
+                    "stringValue": "ReadVerifiedPublishedAsync"
+                  }
+                }
+              ],
+              "status": {
+                "code": "STATUS_CODE_OK"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

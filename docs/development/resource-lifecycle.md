@@ -67,3 +67,7 @@ M3实际Buildx metadata的Context可为完整绝对项目路径，或唯一精�
 ## G3-M4-001 本任务精确资源扩展
 
 M4仅增加自身`g3-m4-*`标准服务数据卷准确白名单，沿用当前Docker context/Engine/version、同任务已提交CLOSED Synthetic证明、24h期效、完整metadata fingerprint、空容器引用、前后重验及准确no-such-volume强后验；拒绝Git/cache/image/history与旧G2/M1/M2/M3卷。Master只在本任务独立审查、真实本地门禁及关闭证据提交后Apply。AppHost/launcher加入M4准确前缀，不放开M5。现有canonical共享镜像直接复用，不新建随机镜像；若没有本轮新history则无待删history，不用零变化掩盖已有安全资源。Worktree继续原生可恢复archive，跨任务活跃引用保持KEEP及解除条件，禁止全局prune/restart。
+
+## G3-M5-001 准确范围增量（2026-10-31）
+
+M5执行器仅增加自身`g3-m5-*`标准数据卷：同任务已提交CLOSED Synthetic证明、当前context/Engine/version、24hTTL、完整安全metadata fingerprint、精确空引用、Apply前复核和准确no-such-volume后验。拒绝Git/cache/image/history及旧M4/G2卷。旧M4“不放开M5”为历史范围；本次明确授权只增加上述M5卷。托管worker仍用原生可恢复archive并尊重活跃task拒绝，Master及私有恢复材料KEEP；没有新建镜像/history则保持共享对象，不虚构回收。

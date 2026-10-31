@@ -1,0 +1,199 @@
+{
+  "status": "PASS",
+  "checks": [
+    {
+      "check": "only_real_valid_persisted_trace_ids",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_tempo_trace_e7cc5c3366751add35d6a17743285e81",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_export_contains_no_prompt_source_or_private_runtime_values",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_tempo_trace_ad0699ca871f216896c8f69f921aa12d",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_export_contains_no_prompt_source_or_private_runtime_values",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_tempo_trace_be05ff621d850514017f6d8a593699db",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_export_contains_no_prompt_source_or_private_runtime_values",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_tempo_trace_568113f5e91f81b9419d495439cd9951",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_export_contains_no_prompt_source_or_private_runtime_values",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_tempo_trace_27c40c5b0d0dc040a8973849ae2102d5",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_export_contains_no_prompt_source_or_private_runtime_values",
+      "status": "PASS"
+    },
+    {
+      "check": "worker_real_separate_trace_associated_to_creation",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_maf_worker_and_gateway_spans",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_worker_creation_link_tag",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_export_contains_no_prompt_source_or_private_runtime_values",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_g2_loki_entries",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_export_contains_no_prompt_source_or_private_runtime_values",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_loki_only_three_index_dimensions",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_product_meter_ontology_semantic_duration_milliseconds_count",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_product_meter_publishing_operations_total",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_product_meter_semantic_query_count_total",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_product_meter_agents_run_count_total",
+      "status": "PASS"
+    },
+    {
+      "check": "product_metrics_no_identity_prompt_or_source_dimensions",
+      "status": "PASS"
+    },
+    {
+      "check": "product_metric_values_respect_actual_finite_contract",
+      "status": "PASS"
+    },
+    {
+      "check": "actual_export_contains_no_prompt_source_or_private_runtime_values",
+      "status": "PASS"
+    }
+  ],
+  "visibility": {
+    "budgetSeconds": 90,
+    "pollIntervalSeconds": 1,
+    "pollCount": 13,
+    "elapsedSeconds": 0.227,
+    "requests": [
+      {
+        "check": "actual_tempo_trace_e7cc5c3366751add35d6a17743285e81",
+        "polls": 1,
+        "elapsedSeconds": 0.009,
+        "state": "visible"
+      },
+      {
+        "check": "actual_tempo_trace_ad0699ca871f216896c8f69f921aa12d",
+        "polls": 1,
+        "elapsedSeconds": 0.005,
+        "state": "visible"
+      },
+      {
+        "check": "actual_tempo_trace_be05ff621d850514017f6d8a593699db",
+        "polls": 1,
+        "elapsedSeconds": 0.005,
+        "state": "visible"
+      },
+      {
+        "check": "actual_tempo_trace_568113f5e91f81b9419d495439cd9951",
+        "polls": 1,
+        "elapsedSeconds": 0.005,
+        "state": "visible"
+      },
+      {
+        "check": "actual_tempo_trace_27c40c5b0d0dc040a8973849ae2102d5",
+        "polls": 1,
+        "elapsedSeconds": 0.005,
+        "state": "visible"
+      },
+      {
+        "check": "worker_search",
+        "polls": 1,
+        "elapsedSeconds": 0.002,
+        "state": "visible"
+      },
+      {
+        "check": "worker_trace",
+        "polls": 1,
+        "elapsedSeconds": 0.005,
+        "state": "visible"
+      },
+      {
+        "check": "g2_loki_entries",
+        "polls": 1,
+        "elapsedSeconds": 0.168,
+        "state": "visible"
+      },
+      {
+        "check": "g2_loki_series",
+        "polls": 1,
+        "elapsedSeconds": 0.003,
+        "state": "visible"
+      },
+      {
+        "check": "product_meter_ontology_semantic_duration_milliseconds_count",
+        "polls": 1,
+        "elapsedSeconds": 0.001,
+        "state": "visible"
+      },
+      {
+        "check": "product_meter_publishing_operations_total",
+        "polls": 1,
+        "elapsedSeconds": 0.001,
+        "state": "visible"
+      },
+      {
+        "check": "product_meter_semantic_query_count_total",
+        "polls": 1,
+        "elapsedSeconds": 0.001,
+        "state": "visible"
+      },
+      {
+        "check": "product_meter_agents_run_count_total",
+        "polls": 1,
+        "elapsedSeconds": 0.001,
+        "state": "visible"
+      }
+    ],
+    "workerSearchWindow": {
+      "start": 1793422217,
+      "end": 1793422578,
+      "source": "actual_creation_trace_spans"
+    }
+  },
+  "workerTraceDesign": "actual independent execution.run trace with persisted creation_trace_id tag; never a fabricated parent span",
+  "officialSearchApi": "https://grafana.com/docs/tempo/latest/api_docs/",
+  "scope": "actual product emissions, own local synthetic stack; no model calls or production data"
+}
