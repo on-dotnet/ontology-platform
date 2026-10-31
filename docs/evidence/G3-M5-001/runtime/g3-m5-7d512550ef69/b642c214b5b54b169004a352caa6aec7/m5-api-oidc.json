@@ -1,0 +1,166 @@
+{
+  "stage": "m5-api-oidc",
+  "status": "PASS",
+  "overallG2": "PARTIAL",
+  "checks": [
+    {
+      "name": "anonymous_authorization_before_malformed_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "anonymous_publication_proposal_prebinding_401",
+      "status": "PASS",
+      "observedStatus": 401
+    },
+    {
+      "name": "anonymous_publication_decision_prebinding_401",
+      "status": "PASS",
+      "observedStatus": 401
+    },
+    {
+      "name": "anonymous_publication_activation_prebinding_401",
+      "status": "PASS",
+      "observedStatus": 401
+    },
+    {
+      "name": "operator-ab_real_http_only_session",
+      "status": "PASS"
+    },
+    {
+      "name": "operator-ab_csrf",
+      "status": "PASS"
+    },
+    {
+      "name": "viewer-ab_real_http_only_session",
+      "status": "PASS"
+    },
+    {
+      "name": "viewer-ab_csrf",
+      "status": "PASS"
+    },
+    {
+      "name": "viewer-a_real_http_only_session",
+      "status": "PASS"
+    },
+    {
+      "name": "viewer-a_csrf",
+      "status": "PASS"
+    },
+    {
+      "name": "m5_create_complex_source",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m5_viewer_reads_saved_complex",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m5_exact_version_scope_hash",
+      "status": "PASS"
+    },
+    {
+      "name": "m5_preserved_readonly_blocked_uninferred",
+      "status": "PASS"
+    },
+    {
+      "name": "m5_real_restriction",
+      "status": "PASS"
+    },
+    {
+      "name": "m5_real_intersection",
+      "status": "PASS"
+    },
+    {
+      "name": "m5_real_union",
+      "status": "PASS"
+    },
+    {
+      "name": "m5_real_complement",
+      "status": "PASS"
+    },
+    {
+      "name": "m5_real_list",
+      "status": "PASS"
+    },
+    {
+      "name": "m5_property_chain_order",
+      "status": "PASS"
+    },
+    {
+      "name": "m5_imports_are_reference_only",
+      "status": "PASS"
+    },
+    {
+      "name": "m5_cardinality_lexical_preserved",
+      "status": "PASS"
+    },
+    {
+      "name": "m5_single_site_read_denied",
+      "status": "PASS",
+      "observedStatus": 403
+    },
+    {
+      "name": "m5_invalid_revision_denied",
+      "status": "PASS",
+      "observedStatus": 422
+    },
+    {
+      "name": "m5_missing_revision_denied",
+      "status": "PASS",
+      "observedStatus": 404
+    },
+    {
+      "name": "m5_read_after_projection",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m5_read_causes_no_revision_or_source_change",
+      "status": "PASS"
+    },
+    {
+      "name": "m5_complex_assessment",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m5_complex_assessment_cannot_publish",
+      "status": "PASS"
+    },
+    {
+      "name": "m5_unsupported_structural_write_denied",
+      "status": "PASS",
+      "observedStatus": 422
+    },
+    {
+      "name": "m5_no_op_save",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m5_saved_original_bytes_preserved",
+      "status": "PASS"
+    },
+    {
+      "name": "m5_old_revision_still_readable",
+      "status": "PASS",
+      "observedStatus": 200
+    },
+    {
+      "name": "m5_historical_read_has_original_hash",
+      "status": "PASS"
+    },
+    {
+      "name": "m5_read_compatible_release_catalog",
+      "status": "PASS",
+      "observedStatus": 200
+    }
+  ],
+  "failure": null,
+  "notRun": [
+    "remaining full-chain gates",
+    "final regression and CI"
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "taskId": "G3-M5-001",
+  "status": "PASS",
+  "baseSha": "e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a",
+  "sourceCandidate": "c323a637f6235dd69237e66a128f7ec9aa74b56e",
+  "observations": {
+    "realRiot": {
+      "passed": 6,
+      "failed": 0,
+      "skipped": 0
+    },
+    "m5RealPgAndRiotFilteredSuite": {
+      "passed": 57,
+      "failed": 0,
+      "skipped": 0
+    },
+    "firstOidcApi": {
+      "passed": 35,
+      "runId": "b642c214b5b54b169004a352caa6aec7"
+    },
+    "firstUiWithWorkspaceFaultSmoke": {
+      "passed": 47,
+      "runId": "c2e41c7e89614bfe933876eb2e06e302"
+    },
+    "stableModules": {
+      "semantic": 296,
+      "publishing": 78,
+      "query": 49,
+      "agent": 33,
+      "failed": 0,
+      "skipped": 0
+    },
+    "web": {
+      "passed": 268,
+      "failed": 0,
+      "lintExit": 0,
+      "typecheckExit": 0,
+      "buildExit": 0
+    },
+    "retainedReader": {
+      "members": 126,
+      "prewriteProbeExit": 0,
+      "freezeSha256": "7343311665e5e7b502bd47b7fefe8016695110079a76a02f07d9f89261d759d7"
+    }
+  },
+  "limits": [
+    "PARTIAL milestone evidence only; full seven-gate compatibility remains in progress.",
+    "Module suite inputs unchanged by later E0 checkpoint-identity-only patch; no core suite blind rerun.",
+    "Actual CI, Windows/Intel, paid LLM NOT_RUN; Monaco BLOCKED."
+  ]
+}
