@@ -30,11 +30,10 @@ function Get-SourceFiles {
 }
 
 function Test-FrozenEvidenceFormat {
-    param([string]$RelativePath, [string]$Content)
+    param([string]$RelativePath, [byte[]]$RawBytes)
     # M4原始ZIP回读manifest在已提交基线无末尾LF；精确原字节豁免格式，仍检查JSON/秘密。
     if ($RelativePath -cne 'docs/evidence/G3-M4-001/mac-master/actual-v2-manifest.json') { return $false }
-    $raw = [Text.UTF8Encoding]::new($false).GetBytes($Content)
-    return [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($raw)).ToLowerInvariant() -ceq '9e632706bbf9ee27e070711dcd6901c3b02fbc0204eee171a28542f8d6a9d0e5'
+    return [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($RawBytes)).ToLowerInvariant() -ceq '9e632706bbf9ee27e070711dcd6901c3b02fbc0204eee171a28542f8d6a9d0e5'
 }
 
 function Test-Repository {
@@ -57,7 +56,7 @@ function Test-Repository {
         if ($text -match '\r' -or -not $text.EndsWith("`n") -or $text -match '(?m)[\t ]+$') {
             # 历史G0文档保留Markdown有意换行空格；其余文件拒绝尾随空白。
             if ($text -match '\r' -or -not $text.EndsWith("`n") -or ($file.Extension -ne '.md' -and $text -match '(?m)[\t ]+$')) {
-                if (-not (Test-FrozenEvidenceFormat $relative $text)) {
+                if (-not (Test-FrozenEvidenceFormat $relative ([IO.File]::ReadAllBytes($file.FullName)))) {
                     Record 'text-format' 'FAIL' "$relative 需要LF/末尾换行/无尾随空白"
                 }
             }

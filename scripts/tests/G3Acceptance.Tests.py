@@ -75,7 +75,7 @@ class RealBrowserEntryTests(unittest.TestCase):
 class M1OrchestrationTests(unittest.TestCase):
     """Keep gate selection/order/failure propagation real, isolate external services only."""
 
-    def exercise(self, fail_gate=None, prefix='g3-m1-control', launch_failure=False, milestone=None, api_only=False, ui_only=False, smoke_fault=False, workspace_smoke=False, diff_only=False, impact_only=False, retry_unchanged=False):
+    def exercise(self, fail_gate=None, prefix='g3-m1-control', launch_failure=False, milestone=None, api_only=False, ui_only=False, smoke_fault=False, workspace_smoke=False, diff_only=False, impact_only=False, retry_unchanged=False, record_failure=False, child_failure_code=23):
         spec = importlib.util.spec_from_file_location('m1_orchestrator', SCRIPT)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
@@ -114,7 +114,7 @@ class M1OrchestrationTests(unittest.TestCase):
                         self.assertEqual(entry.main(), 0)
                 if gate == fail_gate and launch_failure:
                     return original([str(root / 'actual-missing-gate-executable')], cwd=root)
-                return original([sys.executable, str(child), str(log), *command, '23' if gate == fail_gate else '0'], cwd=root)
+                return original([sys.executable, str(child), str(log), *command, str(child_failure_code) if gate == fail_gate else '0'], cwd=root)
 
             def output(command, **kwargs):
                 return '1' * 40 if command[0] == 'git' else json.dumps({'nodePath': str(root / 'project-node')})
@@ -123,6 +123,8 @@ class M1OrchestrationTests(unittest.TestCase):
                 stack.enter_context(patch.object(sys, 'path', [str(SCRIPT.parent), *sys.path]))
                 stack.enter_context(patch.object(module, 'ROOT', root))
                 stack.enter_context(patch.object(sys, 'argv', [str(SCRIPT), '--runtime-file', str(runtime)] + (['--milestone', milestone] if milestone else []) + (['--api-only'] if api_only else []) + (['--ui-only'] if ui_only else []) + (['--smoke-fault-check'] if smoke_fault else []) + (['--workspace-smoke-only'] if workspace_smoke else []) + (['--diff-only'] if diff_only else []) + (['--impact-only'] if impact_only else [])))
+                if record_failure:
+                    stack.enter_context(patch.object(module.preflight.FailureState, 'record', side_effect=OSError('synthetic_receipt_write_failure')))
                 stack.enter_context(patch.object(module, 'gate_fingerprint', return_value='a'*64))
                 stack.enter_context(patch.object(module.shared, 'wait_for'))
                 stack.enter_context(patch.object(module.shared, 'stop'))
@@ -134,7 +136,7 @@ class M1OrchestrationTests(unittest.TestCase):
                     if retry_unchanged:
                         self.assertEqual(module.main(), 2, '同输入失败必须在子进程前阻断')
                 except OSError:
-                    if not launch_failure:
+                    if not launch_failure and not record_failure:
                         raise
                     code = 1
             calls = [json.loads(line) for line in log.read_text().splitlines()] if log.exists() else []
@@ -229,6 +231,16 @@ class M1OrchestrationTests(unittest.TestCase):
         self.assertEqual(calls, GATES[:1])
         self.assertEqual(proof['status'], 'FAIL')
         self.assertTrue(all(item['status'] == 'NOT_RUN' for item in proof['gates'][1:]))
+
+    def test_receipt_write_failure_keeps_actual_child_zero_or_failure(self):
+        for fail_gate, expected in [(None,0),(GATES[0],17)]:
+            code,calls,proof,*_=self.exercise(prefix='g3-m5-control',milestone='M5',fail_gate=fail_gate,record_failure=True,child_failure_code=17)
+            self.assertEqual(code,1)
+            self.assertEqual(calls,GATES[:1])
+            row=proof['_testObservedTimeline'][0]
+            self.assertEqual(row['exitCode'],expected)
+            self.assertEqual(row['outcome'],'PASS' if expected==0 else 'FAIL')
+            self.assertEqual(row['errorCategory'],None if expected==0 else 'COMMAND_FAILED')
 
     def test_unchanged_expensive_failure_is_blocked_before_second_child(self):
         code,calls,proof,*_=self.exercise(prefix='g3-m5-control',milestone='M5',fail_gate=GATES[0],retry_unchanged=True)

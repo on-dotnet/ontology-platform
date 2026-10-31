@@ -112,12 +112,14 @@ def run_attempt():
             with preflight.FailureState(failure_path, input_fingerprint, Path(command[1]).name, build_version) as guard:
                 guard.allow('expensive')
                 result = subprocess.run(command, cwd=ROOT)
-                guard.record('expensive', result.returncode)
-            exit_code = result.returncode
-            category = None if exit_code == 0 else 'COMMAND_FAILED'
+                # 业务结果先冻结；后续证据写盘失败不能改写真实子进程退出事实。
+                exit_code = result.returncode
+                category = None if exit_code == 0 else 'COMMAND_FAILED'
+                guard.record('expensive', exit_code)
             return result
         except OSError:
-            category = 'EXECUTABLE_UNAVAILABLE'
+            if exit_code is None:
+                category = 'EXECUTABLE_UNAVAILABLE'
             raise
         finally:
             ended = datetime.datetime.now(datetime.timezone.utc)
