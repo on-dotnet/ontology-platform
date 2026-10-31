@@ -328,6 +328,65 @@ public sealed class G3M5ExpressionTests
         Assert.IsTrue(result.SourcePreserved);
     }
 
+    /// <summary>真实RIOT接受合法RDF后，残缺或歧义restriction必须保留源并明确失败关闭。</summary>
+    [TestMethod]
+    [DataRow("missing-on-property")]
+    [DataRow("some-literal")]
+    [DataRow("all-literal")]
+    [DataRow("qualified-literal-property")]
+    [DataRow("multiple-constructors")]
+    public async Task RealRiotRestrictionNegativeShapesPreserveSourceHash(string scenario)
+    {
+        // 所有分支均为合法Turtle/RDF；只改变OWL结构槽位，不能以解析失败代替目标诊断。
+        var body = scenario switch
+        {
+            "missing-on-property" => "_:r a owl:Restriction ; owl:someValuesFrom <urn:C> .",
+            "some-literal" => "_:r a owl:Restriction ; owl:onProperty <urn:p> ; owl:someValuesFrom \"urn:C\" .",
+            "all-literal" => "_:r a owl:Restriction ; owl:onProperty <urn:p> ; owl:allValuesFrom \"urn:C\" .",
+            "qualified-literal-property" => "_:r a owl:Restriction ; owl:onProperty \"urn:p\" ; owl:qualifiedCardinality \"1\"^^xsd:nonNegativeInteger ; owl:onClass <urn:C> .",
+            _ => "_:r a owl:Restriction ; owl:onProperty <urn:p> ; owl:someValuesFrom <urn:C> ; owl:allValuesFrom <urn:D> ."
+        };
+        // 唯一固定标准prefix声明不会修复或掩盖任何restriction反例。
+        var source = "@prefix owl: <" + Owl + "> .\n@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n" + body + "\n";
+        // 原字节散列独立计算，不能用结果自身hash作期望值。
+        var expectedHash = Convert.ToHexStringLower(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(source)));
+        // 生产入口真实执行RIOT解析、暂存图回读和只读投影，不构造解析三元组替身。
+        var result = (await ((IG3ExpressionRuntime)SemanticFixture.Runtime()).ProjectExpressionsAsync(new SourceBundle { OntologyTurtle = source }, default))[0];
+        Assert.AreEqual("INDETERMINATE", result.Status);
+        Assert.IsTrue(result.Diagnostics.Any(item => item.Code == "restriction_invalid"));
+        Assert.IsTrue(result.SourcePreserved);
+        Assert.AreEqual(expectedHash, result.SourceHash);
+        Assert.IsFalse(result.ReadOnlyStructured);
+        Assert.IsFalse(result.Editable);
+        Assert.AreEqual("BLOCKED", result.PublishEligible);
+        Assert.IsFalse(result.Inferred);
+    }
+
+    /// <summary>真实RIOT解析513个命名主体仍在triple/byte预算内，只读节点预算必须独立触发。</summary>
+    [TestMethod]
+    public async Task RealRiotNodeBudgetPreservesSourceAndFailsClosed()
+    {
+        // 每主体只有一条合法类声明，明确低于既有5000 triples及源字节预算。
+        var source = string.Join('\n', Enumerable.Range(0, 513).Select(index => "<urn:synthetic:m5:budget:" + index + "> a <" + Owl + "Class> .")) + "\n";
+        // 验证fixture规模，防止将源字节预算失败混作结构节点预算验收。
+        var bytes = System.Text.Encoding.UTF8.GetBytes(source);
+        Assert.IsTrue(bytes.Length < 256 * 1024);
+        Assert.AreEqual(513, source.Split('\n', StringSplitOptions.RemoveEmptyEntries).Length);
+        // 与实际投影返回独立的原文散列基线。
+        var expectedHash = Convert.ToHexStringLower(System.Security.Cryptography.SHA256.HashData(bytes));
+        // 通过真实生产运行时解析，RDF解析成功不能放开不完整结构的编辑/发布。
+        var result = (await ((IG3ExpressionRuntime)SemanticFixture.Runtime()).ProjectExpressionsAsync(new SourceBundle { OntologyTurtle = source }, default))[0];
+        Assert.AreEqual("INDETERMINATE", result.Status);
+        Assert.IsTrue(result.Diagnostics.Any(item => item.Code == "expression_budget_exceeded"));
+        Assert.AreEqual(512, result.Nodes.Length);
+        Assert.IsTrue(result.SourcePreserved);
+        Assert.AreEqual(expectedHash, result.SourceHash);
+        Assert.IsFalse(result.ReadOnlyStructured);
+        Assert.IsFalse(result.Editable);
+        Assert.AreEqual("BLOCKED", result.PublishEligible);
+        Assert.IsFalse(result.Inferred);
+    }
+
     /// <summary>读取已提交高阶语料，保留注释、BOM及换行给真实服务链使用。</summary>
     internal static SourceBundle ComplexSources()
     {
