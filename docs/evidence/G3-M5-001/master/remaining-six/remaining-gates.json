@@ -1,0 +1,47 @@
+{
+  "taskId": "G3-M5-001",
+  "runId": "remaining-six",
+  "startedAtUtc": "2026-10-31T05:03:17.304322+00:00",
+  "harnessSha256": "196fcb6faf536b676b1a0985b5006d77e3e11d2e73329e6886cd1c51cc3038c7",
+  "scope": "SIX_REAL_GATES_AFTER_COMPOSITE_BROWSER",
+  "status": "FAIL",
+  "sourceHead": "78fa9c96e4f16e833b60be47b2d0e4e35d79ab8d",
+  "productInputFingerprint": "cc8a87dce97e9cb3510b261fbdbb57c32d48b74dfca55e4e89b0035e2316fd4c",
+  "browserProofSha256": "b0a5aff669c150250704c84583b60ec7fcc6c1bea06e2ebd7cbdf1c4cda852f7",
+  "ownerPid": 58230,
+  "gates": [
+    {
+      "name": "g3-compatibility.py",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "name": "g1-regression.py",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "name": "g2-observability.py",
+      "status": "FAIL",
+      "exitCode": 1
+    },
+    {
+      "name": "g2-trace-browser.mjs",
+      "status": "NOT_RUN",
+      "exitCode": null
+    },
+    {
+      "name": "g2-readiness-fault.py",
+      "status": "NOT_RUN",
+      "exitCode": null
+    },
+    {
+      "name": "performance-baseline.py",
+      "status": "NOT_RUN",
+      "exitCode": null
+    }
+  ],
+  "endedAtUtc": "2026-10-31T05:03:51.849855+00:00",
+  "launcherStopped": true,
+  "launcherExitCode": 0
+}

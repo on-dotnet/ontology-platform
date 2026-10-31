@@ -182,7 +182,7 @@ try {
         if (-not $?) { exit 1 }
         # 资源回收必须运行专属真实Git/模拟Docker正负例，不能用构包54项代替。
         $maintenancePython = if ($IsWindows) { 'python' } else { 'python3' }
-        foreach ($maintenanceTest in @('CleanupResources.Tests.py', 'PublicHistory.Tests.py', 'InspectorResources.Tests.py', 'G3Evidence.Tests.py', 'G3Acceptance.Tests.py', 'G3Compatibility.Tests.py', 'CloseoutGovernance.Tests.py', 'CanonicalFuseki.Tests.py', 'FusekiCache.Tests.py', 'ResourceLifecycle.Tests.py', 'TaskRunTimeline.Tests.py', 'HostContinuity.Tests.py', 'ExecutionPreflight.Tests.py', 'FusekiCiCache.Tests.py', 'FusekiTransfer.Tests.py', 'OwnedTestContainers.Tests.py')) {
+        foreach ($maintenanceTest in @('CleanupResources.Tests.py', 'PublicHistory.Tests.py', 'InspectorResources.Tests.py', 'G3Evidence.Tests.py', 'G3Acceptance.Tests.py', 'G3Compatibility.Tests.py', 'CloseoutGovernance.Tests.py', 'CanonicalFuseki.Tests.py', 'FusekiCache.Tests.py', 'ResourceLifecycle.Tests.py', 'TaskRunTimeline.Tests.py', 'HostContinuity.Tests.py', 'ExecutionPreflight.Tests.py', 'ObservabilityInputs.Tests.py', 'FusekiCiCache.Tests.py', 'FusekiTransfer.Tests.py', 'OwnedTestContainers.Tests.py')) {
             $maintenancePath = Join-Path $PSScriptRoot ('tests/' + $maintenanceTest)
             if (-not (Test-Path -LiteralPath $maintenancePath)) { throw 'Required maintenance regression test missing.' }
             & $maintenancePython $maintenancePath

@@ -33,6 +33,18 @@ def fetch(origin,path,parameters=None,timeout=10):
         return json.load(response)
 
 
+def read_chain_identifiers(directory):
+    """任何真实请求或私有runtime读取前校验有界链路输入，缺失/坏Schema立即失败。"""
+    path=Path(directory)/'full-chain-identifiers.json'
+    if not path.is_file() or path.is_symlink() or path.stat().st_size>65536:
+        raise ValueError('EVIDENCE_CHAIN_IDS_MISSING: 缺少受控链路标识输入或文件越界')
+    value=json.loads(path.read_text(encoding='utf-8'))
+    traces=value.get('traces') if isinstance(value,dict) else None
+    if not isinstance(traces,list) or not 5<=len(traces)<=100 or not all(isinstance(item,str) and re.fullmatch('[a-f0-9]{32}',item) and item!='0'*32 for item in traces):
+        raise ValueError('EVIDENCE_CHAIN_IDS_INVALID: 链路标识Schema无效')
+    return value
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--runtime-file',required=True)
@@ -114,9 +126,9 @@ def main():
         # Invalidate an earlier run before any I/O can fail; never leave a stale PASS.
         report_path.unlink(missing_ok=True)
         persist_report('FAIL')
+        identities = read_chain_identifiers(EVIDENCE)
         runtime = json.loads(path.read_text())
         realm = json.loads(Path(runtime['realmFile']).read_text())
-        identities = json.loads((EVIDENCE / 'full-chain-identifiers.json').read_text())
         forbidden = [runtime[key] for key in ['postgresPassword','keycloakPassword','grafanaPassword','certificatePassword','healthKey','rustfsAccessKey','rustfsSecretKey']]
         forbidden += [realm['clientSecret'],'G2_PROMPT_MUST_NOT_LEAK_','# 人工合成，两个厂区外部号相同']
         traces = identities['traces']
