@@ -1,0 +1,7 @@
+# 最终独立Review回执
+
+Reviewer=preflight_review，非作者只读。精确f933ac4fc74ae234e0904ca6c9f0d79482fd839a获准FF main；9ae→f933产品backend/apps/scripts/eng/infra/.github diff空。最终七门禁/600、Smoke11含310ms预期隐藏canvas FAIL及恢复、126冻结原reader读真实V2且manifest SHA吻合、Trace/readiness/perf29/launcher停止0均核实际JSON。Query/Agent sourceHashes全部匹配actualchild0，CLOCK_DRIFT与UNKNOWN不抹，M4生命周期正/M5拒绝没有扩权。
+
+精确8卷metadata/refs0/backend和4refs tip/祖先、两worker干净及58原日志备份142500bytes均独立实际核验。初始批准main达到f933后执行计划；实际8卷Apply0后两native archive均被active-task guard拒绝，Reviewer另独立核准仅A两refs为可回收子集：已关闭A、main祖先、无checkout，原树归档前置对这两无checkout refs不适用；仍须remote lease/local CAS及强后验。B refs与树KEEP，禁止绕过保护或动其它chat。
+
+真实收尾回执将在唯一V3独立重开时再核。ZIP尚未生成，不将构包或外部复审冒充已完成。

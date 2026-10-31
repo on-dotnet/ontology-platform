@@ -1,0 +1,210 @@
+{
+  "taskId": "G3-M4-001",
+  "observedAtUtc": "2026-10-31T02:29:08.018698+00:00",
+  "mainSha": "f933ac4fc74ae234e0904ca6c9f0d79482fd839a",
+  "containerBefore": 0,
+  "containerAfter": 0,
+  "volumeBefore": 16,
+  "volumeAfter": 8,
+  "ownVolumesDeleted": 8,
+  "fixtureDeletedEarlier": 1,
+  "volumeRemovalChecks": [
+    {
+      "target": "g3-m4-20e9c662b3e3-alloy-data",
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g3-m4-20e9c662b3e3-alloy-data"
+      ],
+      "exitCode": 1,
+      "diagnostic": "Error response from daemon: get g3-m4-20e9c662b3e3-alloy-data: no such volume",
+      "strongNoSuchVolume": true
+    },
+    {
+      "target": "g3-m4-20e9c662b3e3-fuseki-data",
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g3-m4-20e9c662b3e3-fuseki-data"
+      ],
+      "exitCode": 1,
+      "diagnostic": "Error response from daemon: get g3-m4-20e9c662b3e3-fuseki-data: no such volume",
+      "strongNoSuchVolume": true
+    },
+    {
+      "target": "g3-m4-20e9c662b3e3-grafana-data",
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g3-m4-20e9c662b3e3-grafana-data"
+      ],
+      "exitCode": 1,
+      "diagnostic": "Error response from daemon: get g3-m4-20e9c662b3e3-grafana-data: no such volume",
+      "strongNoSuchVolume": true
+    },
+    {
+      "target": "g3-m4-20e9c662b3e3-loki-data",
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g3-m4-20e9c662b3e3-loki-data"
+      ],
+      "exitCode": 1,
+      "diagnostic": "Error response from daemon: get g3-m4-20e9c662b3e3-loki-data: no such volume",
+      "strongNoSuchVolume": true
+    },
+    {
+      "target": "g3-m4-20e9c662b3e3-postgres-data",
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g3-m4-20e9c662b3e3-postgres-data"
+      ],
+      "exitCode": 1,
+      "diagnostic": "Error response from daemon: get g3-m4-20e9c662b3e3-postgres-data: no such volume",
+      "strongNoSuchVolume": true
+    },
+    {
+      "target": "g3-m4-20e9c662b3e3-prometheus-data",
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g3-m4-20e9c662b3e3-prometheus-data"
+      ],
+      "exitCode": 1,
+      "diagnostic": "Error response from daemon: get g3-m4-20e9c662b3e3-prometheus-data: no such volume",
+      "strongNoSuchVolume": true
+    },
+    {
+      "target": "g3-m4-20e9c662b3e3-rustfs-data",
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g3-m4-20e9c662b3e3-rustfs-data"
+      ],
+      "exitCode": 1,
+      "diagnostic": "Error response from daemon: get g3-m4-20e9c662b3e3-rustfs-data: no such volume",
+      "strongNoSuchVolume": true
+    },
+    {
+      "target": "g3-m4-20e9c662b3e3-tempo-data",
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "g3-m4-20e9c662b3e3-tempo-data"
+      ],
+      "exitCode": 1,
+      "diagnostic": "Error response from daemon: get g3-m4-20e9c662b3e3-tempo-data: no such volume",
+      "strongNoSuchVolume": true
+    }
+  ],
+  "protectedVolumeMetadataUnchanged": true,
+  "protectedSnapshots": {
+    "g2-ef979bd04cc0-alloy-data": {
+      "Name": "g2-ef979bd04cc0-alloy-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T05:57:39Z"
+    },
+    "g2-ef979bd04cc0-fuseki-data": {
+      "Name": "g2-ef979bd04cc0-fuseki-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T05:57:39Z"
+    },
+    "g2-ef979bd04cc0-grafana-data": {
+      "Name": "g2-ef979bd04cc0-grafana-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T05:57:39Z"
+    },
+    "g2-ef979bd04cc0-loki-data": {
+      "Name": "g2-ef979bd04cc0-loki-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T05:57:39Z"
+    },
+    "g2-ef979bd04cc0-postgres-data": {
+      "Name": "g2-ef979bd04cc0-postgres-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T05:57:23Z"
+    },
+    "g2-ef979bd04cc0-prometheus-data": {
+      "Name": "g2-ef979bd04cc0-prometheus-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T05:57:39Z"
+    },
+    "g2-ef979bd04cc0-rustfs-data": {
+      "Name": "g2-ef979bd04cc0-rustfs-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T05:57:39Z"
+    },
+    "g2-ef979bd04cc0-tempo-data": {
+      "Name": "g2-ef979bd04cc0-tempo-data",
+      "Driver": "local",
+      "CreatedAt": "2026-10-26T05:57:39Z"
+    }
+  },
+  "canonicalImageUnchanged": true,
+  "historyBefore": [
+    "1kq80249gfrdurl9atazzw7kl",
+    "vq2df00gcyjps32jx8vlylpuk",
+    "rcb0gy3pt97pgilczmff1itne",
+    "ihl3gp469h5nq38l942lv9p1v",
+    "qao9ei05z94c4rt13gu1p0kkh"
+  ],
+  "historyAfter": [
+    "1kq80249gfrdurl9atazzw7kl",
+    "vq2df00gcyjps32jx8vlylpuk",
+    "rcb0gy3pt97pgilczmff1itne",
+    "ihl3gp469h5nq38l942lv9p1v",
+    "qao9ei05z94c4rt13gu1p0kkh"
+  ],
+  "historyUnchanged": true,
+  "historyThisTaskCreated": 0,
+  "historyDeletion": "NOT_APPLICABLE_NO_NEW_M4_HISTORY",
+  "worktreeBefore": 18,
+  "worktreeAfter": 18,
+  "nativeArchiveAttempts": [
+    {
+      "tool": "archive_worktree",
+      "root": "/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform",
+      "resultType": "error",
+      "message": "Another active task still uses this worktree.",
+      "pathStillExists": true,
+      "decision": "KEEP_NATIVE_ACTIVE_TASK_GUARD",
+      "releaseCondition": "other active task releases this managed worktree; retry only native archive with original protected-state checks"
+    },
+    {
+      "tool": "archive_worktree",
+      "root": "/Users/chasen/.codex/worktrees/g3-m4-web-a/ontology-platform",
+      "resultType": "error",
+      "message": "Another active task still uses this worktree.",
+      "pathStillExists": true,
+      "decision": "KEEP_NATIVE_ACTIVE_TASK_GUARD",
+      "releaseCondition": "other active task releases this managed worktree; retry only native archive with original protected-state checks"
+    }
+  ],
+  "physicalReclaimedBytes": "UNKNOWN; no private volume contents inspected",
+  "noGlobalPruneRestartOrDatabaseChange": true
+}

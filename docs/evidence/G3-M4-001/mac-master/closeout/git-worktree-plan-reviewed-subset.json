@@ -1,0 +1,37 @@
+{
+  "taskId": "G3-M4-001",
+  "expectedMainSha": "f933ac4fc74ae234e0904ca6c9f0d79482fd839a",
+  "createdAt": "2026-10-31T02:29:56.597171+00:00",
+  "expiresAt": "2026-11-01T02:29:56.597171+00:00",
+  "review": "preflight_review independently rechecked exact A tips/ancestor/no checkout after native B-tree active-task guard",
+  "scope": [
+    "codex/g3-m4-sem-a",
+    "codex/g3-m4-web-a"
+  ],
+  "exception": "Native-tree-archive precondition does not apply to these closed A refs with no checkout; no exception for B refs or trees",
+  "branches": {
+    "codex/g3-m4-sem-a": {
+      "expectedTip": "c9fe5e47db6157751136451410fce96d8133c4a1",
+      "ancestorOfCandidate": true,
+      "remoteTip": "c9fe5e47db6157751136451410fce96d8133c4a1"
+    },
+    "codex/g3-m4-web-a": {
+      "expectedTip": "03194f147662937cfeb76e215b7fa615e736a61e",
+      "ancestorOfCandidate": true,
+      "remoteTip": "03194f147662937cfeb76e215b7fa615e736a61e"
+    }
+  },
+  "keep": {
+    "codex/g3-m4-sem-b": {
+      "expectedTip": "c909fa5e605417ff645da19d5899748c0f35773c",
+      "ancestorOfCandidate": true,
+      "remoteTip": "c909fa5e605417ff645da19d5899748c0f35773c"
+    },
+    "codex/g3-m4-web-b": {
+      "expectedTip": "b779ff5159fdbcedaa837c57ead30f3236b0f549",
+      "ancestorOfCandidate": true,
+      "remoteTip": "b779ff5159fdbcedaa837c57ead30f3236b0f549"
+    }
+  },
+  "nativeTreeResult": "KEEP/DEFERRED_ACTIVE_TASK; Another active task still uses this worktree.; owner UNKNOWN; release condition: native active reference truly released and renewed review"
+}

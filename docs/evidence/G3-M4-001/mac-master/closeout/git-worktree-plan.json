@@ -1,0 +1,79 @@
+{
+  "taskId": "G3-M4-001",
+  "candidateMainSha": "f933ac4fc74ae234e0904ca6c9f0d79482fd839a",
+  "onlyAfterMainEqualsCandidate": true,
+  "createdAt": "2026-10-31T02:22:42.505535+00:00",
+  "expiresAt": "2026-11-01T02:22:42.505535+00:00",
+  "worktreeArchives": [
+    {
+      "identityKey": "/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform",
+      "expectedBranch": "codex/g3-m4-sem-b",
+      "expectedTip": "c909fa5e605417ff645da19d5899748c0f35773c",
+      "method": "native archive_worktree; recoverable snapshot; do not bypass shared/pinned/current guards",
+      "beforeDuKiB": 372228
+    },
+    {
+      "identityKey": "/Users/chasen/.codex/worktrees/g3-m4-web-a/ontology-platform",
+      "expectedBranch": "codex/g3-m4-web-b",
+      "expectedTip": "b779ff5159fdbcedaa837c57ead30f3236b0f549",
+      "method": "native archive_worktree; recoverable snapshot; do not bypass shared/pinned/current guards",
+      "beforeDuKiB": 760952
+    }
+  ],
+  "branches": {
+    "codex/g3-m4-sem-a": {
+      "expectedTip": "c9fe5e47db6157751136451410fce96d8133c4a1",
+      "ancestorOfCandidate": true,
+      "remoteTip": "c9fe5e47db6157751136451410fce96d8133c4a1"
+    },
+    "codex/g3-m4-web-a": {
+      "expectedTip": "03194f147662937cfeb76e215b7fa615e736a61e",
+      "ancestorOfCandidate": true,
+      "remoteTip": "03194f147662937cfeb76e215b7fa615e736a61e"
+    },
+    "codex/g3-m4-sem-b": {
+      "expectedTip": "c909fa5e605417ff645da19d5899748c0f35773c",
+      "ancestorOfCandidate": true,
+      "remoteTip": "c909fa5e605417ff645da19d5899748c0f35773c"
+    },
+    "codex/g3-m4-web-b": {
+      "expectedTip": "b779ff5159fdbcedaa837c57ead30f3236b0f549",
+      "ancestorOfCandidate": true,
+      "remoteTip": "b779ff5159fdbcedaa837c57ead30f3236b0f549"
+    }
+  },
+  "branchDeleteMethod": {
+    "remote": "git push origin --delete <exact-name> --force-with-lease=refs/heads/<exact-name>:<expectedTip>",
+    "local": "git update-ref -d refs/heads/<exact-name> <expectedTip>",
+    "preconditions": [
+      "main exact candidate",
+      "expected tip exact",
+      "ancestor main",
+      "no active/locked worktree or agent references",
+      "native archive completed",
+      "branch exact allowlist, no wildcard"
+    ]
+  },
+  "keep": [
+    {
+      "object": "codex/g3-m4-mac-master",
+      "reason": "active Master with final review package, private runtime/PFX and retained reader",
+      "releaseCondition": "after human review and independent archived recovery verification"
+    },
+    {
+      "object": "origin/codex/g3-m4-master@60276b40c7c99a3891bf432e2b36338ee3101828",
+      "reason": "Windows DRAFT has unique unintegrated history; not owned by this Mac task",
+      "releaseCondition": "owner reviews remaining unique patches and confirms closeout"
+    },
+    {
+      "object": "all 15 pre-existing worktrees and other-task refs enumerated in before.json",
+      "reason": "outside exact current-task whitelist; shared/private/old Master state protected",
+      "releaseCondition": "separate owner-specific reviewed lifecycle proof"
+    },
+    {
+      "object": "/Users/chasen/.codex/worktrees/g3-m4-mac-master/ontology-platform/.tools/archive/G3-M4-001",
+      "reason": "58 original task logs preserved and hashed before removing ignored worker outputs",
+      "releaseCondition": "human review no longer requires original raw logs"
+    }
+  ]
+}

@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
   "taskId": "G3-M4-001",
-  "measuredThrough": "final local gates; packaging/cleanup later observations will be appended in final artifact receipt",
-  "stepCount": 129,
-  "observedUtcSpanMs": 40199498,
+  "measuredThrough": "local gates and safe closeout; final packaging/reopen measured in adjacent ignored artifact receipt",
+  "stepCount": 131,
+  "observedUtcSpanMs": 41841239,
   "utcSpanValidity": "PARTIAL: CLOCK_DRIFT intervals; not agent active or thinking time",
-  "recordedMonotonicCumulativeMs": 2175414,
-  "validClockIntervalUnionMs": 1669115,
-  "validClockCumulativeMs": 1943770,
-  "validClockParallelOverlapMs": 274655,
+  "recordedMonotonicCumulativeMs": 2186959,
+  "validClockIntervalUnionMs": 1680659,
+  "validClockCumulativeMs": 1955315,
+  "validClockParallelOverlapMs": 274656,
   "observableCriticalPathLowerBoundMs": 481476,
   "criticalPathLimitation": "Only recorded dependencies; cross-agent reasoning/scheduling gaps UNKNOWN",
   "failedCommandCount": 20,
@@ -21,19 +21,19 @@
   "sources": [
     {
       "path": "docs/evidence/G3-M4-001/mac-master/timeline.jsonl",
-      "sha256": "57d3e21342a6dc51041ab9fbba5dc1e7f1f1fb4509a4005c3a34ca417c4b6584",
+      "sha256": "72609ce6dd871665c9f926429ca630e8bbae264c444f234e0cbb2a033bf5bb9c",
       "summary": {
         "schemaVersion": 1,
-        "stepCount": 68,
-        "wallClockMs": 40199498,
-        "observedIntervalUnionMs": 3439108,
-        "cumulativeTaskMs": 1775236,
+        "stepCount": 70,
+        "wallClockMs": 41841239,
+        "observedIntervalUnionMs": 3450653,
+        "cumulativeTaskMs": 1786781,
         "overlapMs": 0,
         "observableCriticalPathMs": 481476,
         "recheckCount": 1,
         "taskTypeDurationMs": {
           "PREFLIGHT": 13221,
-          "TEST": 1751458,
+          "TEST": 1763003,
           "BUILD": 10557
         },
         "failureCategories": {
@@ -137,5 +137,7 @@
         "limitations": "Only recorded intervals/dependencies are observed; no chat, model cost or unobserved activity inferred."
       }
     }
-  ]
+  ],
+  "additionalBranchCommandMeasuredMs": 14214,
+  "nativeArchiveToolTiming": "UNKNOWN; guard refusals recorded without inferred duration"
 }

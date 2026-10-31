@@ -1,0 +1,67 @@
+{
+  "taskId": "G3-M4-001",
+  "status": "PASS_SAFE_SUBSET_WITH_EXPLICIT_PROTECTED_KEEP",
+  "volumes": {
+    "before": 16,
+    "after": 8,
+    "thisRuntimeDeleted": 8,
+    "earlierEmptyFixtureDeleted": 1,
+    "strongExactNoSuch": 8,
+    "protectedG2EightMetadataUnchanged": true,
+    "physicalReclaimedBytes": "UNKNOWN"
+  },
+  "containers": {
+    "before": 0,
+    "after": 0,
+    "ownedTransient": "all exact cleanup receipts in actual module/runtime evidence"
+  },
+  "worktrees": {
+    "before": 18,
+    "after": 18,
+    "archived": 0,
+    "keptWorkerTrees": 2,
+    "reason": "authoritative native active-task guard refused both exact trees; no bypass",
+    "beforeWorkerSizes": {
+      "SEM": {
+        "path": "/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform",
+        "duKiB": 372228
+      },
+      "WEB": {
+        "path": "/Users/chasen/.codex/worktrees/g3-m4-web-a/ontology-platform",
+        "duKiB": 760952
+      }
+    }
+  },
+  "branches": {
+    "localDeleted": 2,
+    "remoteDeleted": 2,
+    "method": "remote expected-tip lease deletion and local expected-old CAS; both A refs absent",
+    "keptB": [
+      {
+        "object": "codex/g3-m4-sem-b",
+        "tip": "c909fa5e605417ff645da19d5899748c0f35773c",
+        "status": "KEEP_DEFERRED_ACTIVE_TASK",
+        "evidence": "native archive_worktree: Another active task still uses this worktree.",
+        "owner": "UNKNOWN: native guard did not return task ID",
+        "releaseCondition": "native active worktree reference truly released; renew exact source/ref checks and independent review; no automatic retries or direct rm"
+      },
+      {
+        "object": "codex/g3-m4-web-b",
+        "tip": "b779ff5159fdbcedaa837c57ead30f3236b0f549",
+        "status": "KEEP_DEFERRED_ACTIVE_TASK",
+        "evidence": "native archive_worktree: Another active task still uses this worktree.",
+        "owner": "UNKNOWN: native guard did not return task ID",
+        "releaseCondition": "native active worktree reference truly released; renew exact source/ref checks and independent review; no automatic retries or direct rm"
+      }
+    ]
+  },
+  "shared": {
+    "canonicalImage": "KEEP unchanged",
+    "buildHistory": "KEEP five unchanged; no new M4 image build/history",
+    "oldTrees": "KEEP 15 pre-existing exact paths in before.json; outside M4 allowlist",
+    "master": "KEEP active Master/private runtime/PFX/reader/cache and 58 preserved raw task logs",
+    "windowsDraft": "KEEP origin/codex/g3-m4-master@60276b40c7c99a3891bf432e2b36338ee3101828 unique unintegrated history"
+  },
+  "review": "preflight_review final product+whitelist and narrowed A-ref-only exception approved; native guard keeps honored",
+  "noGlobalPruneRestartOrDbMutation": true
+}

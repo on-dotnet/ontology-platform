@@ -84,3 +84,5 @@
 ### G3-M4当前收尾状态（2026-10-31）
 
 全部M4实现范围的适用本地真实门禁已完成，候选testedCommit=9ae30173cf900524c387489f48a97fbb244c9d07；代码独立Review通过，具体绑定/原失败与风险见G3-M4任务卡及交接。Master继续原授权内的main集成、准确Synthetic资源回收、唯一Review ZIP V3与独立重开；尚未生成最终交付标记，不扩大M5/G4/G5。未运行CI/Windows/Intel及未观测活跃时间不写PASS。
+
+M4资源实际收尾：获审候选已在main；8任务卷+1fixture精确回收，A两refs本地/远端原子删除。原生另活跃task guard保护的两B树/refsKEEP，原文/未知owner/解除条件已逐项记录，不绕过。当前仅生成唯一V3并独立重开、交付后停等复审，M5/G4/G5未授权。

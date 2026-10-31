@@ -63,6 +63,13 @@
       "status": "PASS",
       "exitCode": 0,
       "output": "source paths PASS; macOS ARM64 and Linux containers observed; Windows/Intel native NOT_RUN"
+    },
+    {
+      "name": "resource-closeout",
+      "command": "approved exact closeout plans; volume-apply.jsonl and branch-delete.jsonl; native archive_worktree",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Actual8 runtime volumes+1 earlier fixture removed with strong NoSuch; oldG2 eight metadata unchanged; A2 refs local/remote lease/CAS removed; native guard keeps2 worker trees/B refs, exact reasons and release conditions in closeout/summary.json; physical bytes UNKNOWN"
     }
   ],
   "ci": {
@@ -79,8 +86,8 @@
     "inputBinding": "mac-master/final-input-binding.json",
     "riskMatrix": "docs/handoffs/G3-M4-001.md",
     "timingAnomalies": "mac-master/agent-native-clock-receipt.json",
-    "resourceCloseout": "PENDING_EXACT_REVIEWED_APPLY",
-    "independentReview": "final code c909/5b972/bf1 approved; final receipts/cleanup pending",
+    "resourceCloseout": "mac-master/closeout/summary.json: PASS_SAFE_SUBSET_WITH_EXPLICIT_PROTECTED_KEEP",
+    "independentReview": "final code/gates/bindings and exact whitelist plus narrowed A-only ref exception approved; final V3 independent reopen remains final artifact gate",
     "ci": "NOT_RUN"
   },
   "validationSource": "LOCAL",
