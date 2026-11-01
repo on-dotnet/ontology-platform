@@ -28,7 +28,8 @@ Both markers are <=64 bytes with 30s deadlines. Master must independently restor
 finally even if either marker fails. Marker acknowledgement is not source-state proof.
 After restore acknowledgement the original-password draft probe must pass; the exact
 created connection is disabled using a fresh revision/ETag even when earlier work fails.
-cross-org-secret requires private foreignSecretRef issued to org-demo/operator-ab.
+cross-org-secret requires private foreignSecretRef issued to org-demo/operator-a and
+foreignSecretOwnerSubjectId from that original intake identity; /me must keep this subject.
 Master temporarily moves only g2-operator-a to org-other, then restores it independently
 in finally and verifies a new login. The driver logs in only that actor, requires /me
 canonical operator role and actual org-other/site-a scopes, then expects the foreign
@@ -217,6 +218,7 @@ try {
   const sourceSecret = (await privateText(runtime.sourceSecretFile)).trimEnd(); demand(sourceSecret.length >= 8, 'source_secret_invalid');
   if (scenario === 'cross-org-secret') {
     demand(typeof runtime.foreignSecretRef === 'string' && /^[a-f0-9]{32}$/.test(runtime.foreignSecretRef), 'foreign_secret_ref_invalid'); remember(runtime.foreignSecretRef);
+    demand(typeof runtime.foreignSecretOwnerSubjectId === 'string' && runtime.foreignSecretOwnerSubjectId.length > 0 && runtime.foreignSecretOwnerSubjectId.length <= 255, 'foreign_secret_owner_subject_invalid');
   }
   let rotationSecret;
   if (scenario === 'credential-lifecycle') {
@@ -481,13 +483,14 @@ try {
       } else { report.fixtures.finalConnectionState=(await current(id)).data.state; if (scenario==='baseline') report.fixtures.keepReason='dependent_source_or_catalog_phase_failed_preserve_for_short_reproduction'; }
     }
   } else if (scenario === 'cross-org-secret') {
-    matrix['M1-P07'].remaining = ['Master binds foreign reference to a different organization/owner with unused/unexpired safe DB witness and confirms account restoration via a new login; expiry/replay/purpose/revocation cases require separate evidence.'];
+    matrix['M1-P07'].remaining = ['Master binds foreign reference to the same subject in its original organization with unused/unexpired safe DB witness and confirms account restoration via a new login; expiry/replay/purpose/revocation cases require separate evidence.'];
     await step('credential_actual_cross_org_identity_and_reference', ['M1-P07'], async () => {
       const me = status(await request(operator, 'GET', '/api/v1/platform/me'), 200);
+      demand(me.subjectId === runtime.foreignSecretOwnerSubjectId, 'cross_org_subject_changed');
       demand(Array.isArray(me.roles) && me.roles.includes('platform.operator') && Array.isArray(me.scopes) && me.scopes.length > 0
         && me.scopes.every(value => value.organizationId === 'org-other') && me.scopes.some(value => value.siteId === 'site-a'), 'cross_org_actual_identity_not_confirmed');
       observe('M1-P07', 'actual_other_organization_oidc_operator_identity_confirmed', true,
-        { identityLabel: 'operator-a', organizationId: 'org-other', selectedSiteId: 'site-a', canonicalOperatorRole: true });
+        { identityLabel: 'operator-a', organizationId: 'org-other', selectedSiteId: 'site-a', canonicalOperatorRole: true, subjectUnchanged: true });
       const rejected = await request(operator, 'POST', '/api/v1/connections', createBody(runtime.foreignSecretRef, { organizationId: 'org-other', siteIds: ['site-a'] }));
       status(rejected, 422, 'connection_secret_expired');
       observe('M1-P07', 'actual_cross_org_actor_foreign_reference_new_command_rejected', true, { responseIndex: rejected.index });
