@@ -87,7 +87,7 @@ export function ConnectionDetail({ id, canManage }: { id: string; canManage: boo
   }
   const disabled = view?.state === "DISABLED";
   const dirty = !!view && !!form && JSON.stringify(form) !== JSON.stringify(formFromConfig(view.displayName, view.config));
-  return <div className="connections-workspace"><Link href="/data/connections">← 数据源</Link><div ref={alertRef}><RequestError error={error} retry={() => void perform("刷新详情", () => refresh(!form))} /></div>
+  return <div className="connections-workspace"><Link href="/data/connections">← 数据源</Link><div ref={alertRef}><RequestError error={error} retry={() => void perform("刷新详情", () => refresh(!!form))} /></div>
     {!loaded && <p role="status">正在读取连接详情…</p>}
     {view && form && <><div className="connection-heading"><div><h1>{view.displayName}</h1><p><span className={`tag ${view.state === "ACTIVE" ? "teal" : "amber"}`}>{stateLabels[view.state] ?? view.state}</span> 修订 {view.configRevision} · {view.secretConfigured ? "凭据已配置" : "未配置凭据"}</p></div><button disabled={!!busy} onClick={() => void perform("刷新详情", () => refresh())}>刷新详情</button></div>
       {disabled ? <p className="connection-alert">此连接已禁用，生命周期已终止。如需再次连接，请新建连接并重新测试。</p> : <p className="connection-note">{view.probeFresh ? "当前测试有效，可按需启用或发现目录。" : "需重新测试。配置或凭据变更会使旧测试失效，并恢复为草稿。"}</p>}

@@ -6,6 +6,7 @@ import { ConfigurationForm } from "./form";
 import { ProbeReport, RequestError } from "./status";
 import { CatalogSnapshot } from "./catalog";
 import { createConnectionsClient } from "./api";
+import { decodeDraft, encodeDraft, draftCacheKey } from "./draft-cache";
 import { PlatformApiError } from "../../lib/api/client";
 import type { CatalogSnapshotView, ConnectionProbeView } from "../../lib/api/g4-generated";
 
@@ -91,5 +92,22 @@ describe("真实传输边界适配（Mock仅验证请求行为）", () => {
     const fetcher = vi.fn<typeof fetch>().mockResolvedValue(Response.json({ code: "connection_scope_forbidden", detail: "private-address", traceId: "trace" }, { status: 403 }));
     await expect(createConnectionsClient(fetcher).get("id")).rejects.toMatchObject({ status: 403, code: "connection_scope_forbidden", traceId: "trace" });
     await expect(createConnectionsClient(fetcher).get("id")).rejects.not.toThrow("private-address");
+  });
+});
+
+
+describe("非敏草稿刷新隔离", () => {
+  it("仅白名单表单输入往返，不序列化混入的密码/引用", () => {
+    const form = { ...validForms.POSTGRESQL, values: { ...validForms.POSTGRESQL.values, secretValue: "never-store", secretRef: "never-ref" } };
+    const encoded = encodeDraft(form); expect(encoded).not.toContain("never-"); expect(decodeDraft(encoded)).toEqual(validForms.POSTGRESQL);
+  });
+  it("拒绝多余字段和未知类型的本地缓存", () => {
+    expect(decodeDraft('{"type":"UNKNOWN","displayName":"x","values":{}}')).toBeNull();
+    expect(decodeDraft(JSON.stringify({ ...validForms.POSTGRESQL, secretRef: "extra" }))).toBeNull();
+  });
+  it("身份、角色与scope变化不能读取原缓存键", () => {
+    const identity = { subjectId: "user", displayName: "用户", roles: ["operator"], scopes: [{ organizationId: "org", siteId: "one" }] };
+    expect(draftCacheKey(identity)).not.toEqual(draftCacheKey({ ...identity, roles: ["viewer"] }));
+    expect(draftCacheKey(identity)).not.toEqual(draftCacheKey({ ...identity, scopes: [] }));
   });
 });
