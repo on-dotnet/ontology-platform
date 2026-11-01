@@ -71,7 +71,7 @@ public sealed partial class PgSourceAdapter : IPgSourceAdapter
             await using var transaction = await BeginReadOnlyAsync(connection, deadline.Token);
             await VerifyReadOnlyAsync(connection, transaction, deadline.Token);
             CompleteStage(stages, stage++, clock);
-            await ReadCatalogAsync(connection, transaction, profile.AllowedSchemas, deadline.Token);
+            await ReadCatalogAsync(connection, transaction, deadline.Token);
             CompleteStage(stages, stage, clock);
         }
         catch (Exception exception)
@@ -106,7 +106,7 @@ public sealed partial class PgSourceAdapter : IPgSourceAdapter
             await using var transaction = await BeginReadOnlyAsync(connection, deadline.Token);
             await VerifyReadOnlyAsync(connection, transaction, deadline.Token);
             stage = 4;
-            return await ReadCatalogAsync(connection, transaction, profile.AllowedSchemas, deadline.Token);
+            return await ReadCatalogAsync(connection, transaction, deadline.Token);
         }
         catch (Exception exception)
         {
@@ -223,11 +223,12 @@ public sealed partial class PgSourceAdapter : IPgSourceAdapter
     /// <summary>以参数化Schema交集读取原生类型，不访问业务表行或用户函数。</summary>
     /// <param name="connection">受控连接。</param>
     /// <param name="transaction">只读事务。</param>
-    /// <param name="schemas">二次校验后的允许Schema。</param>
     /// <param name="cancellationToken">总期限与取消。</param>
     /// <returns>完整有界的可见对象集合。</returns>
-    private static async Task<CatalogObject[]> ReadCatalogAsync(NpgsqlConnection connection, NpgsqlTransaction transaction, string[] schemas, CancellationToken cancellationToken)
+    private static async Task<CatalogObject[]> ReadCatalogAsync(NpgsqlConnection connection, NpgsqlTransaction transaction, CancellationToken cancellationToken)
     {
+        // 独立固定数组避免调用方在异步等待期间修改profile数组扩大Schema交集。
+        string[] schemas = ["production"];
         // Schema访问必须明确成立，不能用空目录推断源不存在。
         await using var access = new NpgsqlCommand("SELECT count(*) = cardinality(@schemas) FROM pg_catalog.pg_namespace WHERE nspname = ANY(@schemas) AND pg_catalog.has_schema_privilege(oid, 'USAGE')", connection, transaction);
         access.Parameters.AddWithValue("schemas", schemas);
