@@ -1,0 +1,30 @@
+{
+  "design": {
+    "positive": 18,
+    "schemaNegative": 30,
+    "semanticNegative": 10,
+    "status": "PASS"
+  },
+  "wire": {
+    "passed": 15,
+    "failed": 0,
+    "exitCode": 0,
+    "command": "dotnet backend/tests/OntologyPlatform.G2ContractTests/bin/Debug/net10.0/OntologyPlatform.G2ContractTests.dll --filter FullyQualifiedName~G4WireContractTests --minimum-expected-tests 15 --no-ansi --output Minimal"
+  },
+  "priorFailures": [
+    {
+      "command": "dotnet test --filter-class ...",
+      "exitCode": 5,
+      "count": 2,
+      "tests": 0
+    },
+    {
+      "command": "G4WireContractTests first actual run",
+      "tests": 9,
+      "passed": 8,
+      "failed": 1,
+      "reason": "Web default accepted numeric string; G4 strict options fixed"
+    }
+  ],
+  "productRuntime": "NOT_RUN"
+}

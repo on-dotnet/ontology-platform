@@ -1,0 +1,42 @@
+{
+  "utc": "2026-11-01T11:32:53.711365+00:00",
+  "taskId": "G4-M1-CONNECTION-001",
+  "context": "desktop-linux",
+  "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016",
+  "serverVersion": "29.9.2",
+  "architecture": "aarch64",
+  "containers": [],
+  "volumes": [
+    "g2-ef979bd04cc0-alloy-data",
+    "g2-ef979bd04cc0-fuseki-data",
+    "g2-ef979bd04cc0-grafana-data",
+    "g2-ef979bd04cc0-loki-data",
+    "g2-ef979bd04cc0-postgres-data",
+    "g2-ef979bd04cc0-prometheus-data",
+    "g2-ef979bd04cc0-rustfs-data",
+    "g2-ef979bd04cc0-tempo-data"
+  ],
+  "networks": [
+    "ad0236b9fa0ea7f713e3d29ff58bc5e28a0aec605f7a3d4461a8fc1cd37ff058 bridge",
+    "80ac07a0bfc7ad5bdedefec78a3a66c97c4c74093c4a8533f05f4cb96bcbc4d0 host",
+    "e66d65cfe0714eb9fde22ab801d77393aeb653344362c0faac45292d829dab8e none"
+  ],
+  "images": [
+    "sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c ontology-platform-fuseki:context-4fbf23514516632dcb651b5c05bf04e9992da52491607b6cf58de1f7348ff9ab sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c",
+    "sha256:cc1591ccefc0ab280cfd1fef2ebc5315de7d2f39d8d1c1d690c37e305810a9b2 hlc-iov-release-postgis:18.6-3.6.3 sha256:cc1591ccefc0ab280cfd1fef2ebc5315de7d2f39d8d1c1d690c37e305810a9b2",
+    "sha256:39b0fb6616a466a05b2ff8c691bb14a63557c70118d433a4b70fd1068b1bef60 ontology-platform-fuseki:context-1e45f836d9837cbc75d23adb3ad37b0ff79a545ef06102a87aa246feea9cc1e5 sha256:39b0fb6616a466a05b2ff8c691bb14a63557c70118d433a4b70fd1068b1bef60",
+    "sha256:401e1fbc58c27b08c3103e00c86b22bd175a1cdd8f8a7d61965133f27a24437f ontology-platform-g2-fuseki:6.2.0 sha256:401e1fbc58c27b08c3103e00c86b22bd175a1cdd8f8a7d61965133f27a24437f",
+    "sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b quay.io/keycloak/keycloak:<none> sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b",
+    "sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18 grafana/alloy:<none> sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18",
+    "sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044 grafana/tempo:<none> sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044",
+    "sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2 prom/prometheus:<none> sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2",
+    "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6 hlc-iov-release-pg-base:18.6 <none>",
+    "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6 postgres:<none> sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6",
+    "sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28 grafana/loki:<none> sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28",
+    "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b rustfs/rustfs:<none> sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+    "sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f grafana/grafana:<none> sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f",
+    "sha256:93b8a14ea2f412782e4e842651273b4d903e35cc496284f178fbbe2d67d00976 docker.m.daocloud.io/library/maven:3.9-eclipse-temurin-25 sha256:93b8a14ea2f412782e4e842651273b4d903e35cc496284f178fbbe2d67d00976"
+  ],
+  "worktrees": "worktree /Users/chasen/Developer/repos/ontology-platform\nHEAD d1a61daffe844475b07705797e3ad325cc3f2945\nbranch refs/heads/main\n\nworktree /Users/chasen/.codex/worktrees/320c/ontology-platform\nHEAD e2a8965f09ace4d802534c2f095fecefb0748e52\nbranch refs/heads/codex/g3-m5-sem\n\nworktree /Users/chasen/.codex/worktrees/b389/ontology-platform\nHEAD 580d73e7c0fb38b94dbbed1136ee0b1d24fadc9d\nbranch refs/heads/codex/g3-m5-master\n\nworktree /Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform\nHEAD f0712e9174d1bff82b5f6959e0a61e723585be88\nbranch refs/heads/codex/g3-m1-closeout-master\n\nworktree /Users/chasen/.codex/worktrees/g3-m1-closeout-package/ontology-platform\nHEAD 6b0ec74e10c1ff820abc7b358bf43beb880a245b\nbranch refs/heads/codex/g3-m1-closeout-package\n\nworktree /Users/chasen/.codex/worktrees/g3-m1-closeout-resources/ontology-platform\nHEAD f3197177304e6a25f8597ff611acb04fb4e5b268\nbranch refs/heads/codex/g3-m1-closeout-resources\n\nworktree /Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform\nHEAD d89ba59bac5ecc1e5946f49b790cb8ff3319ae78\nbranch refs/heads/codex/g3-m3-efficiency\n\nworktree /Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform\nHEAD 3992582e03df1a103fac36e7e82b8c81f85f622e\nbranch refs/heads/codex/g3-m3-master\n\nworktree /Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform\nHEAD 90b60366a0e9907409061a5af5791c79a87cb499\nbranch refs/heads/codex/g3-m3-sem-language\n\nworktree /Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform\nHEAD 2ad537b63e0ed1b8392066201ad95ff4cb4d2b30\nbranch refs/heads/codex/g3-m3-web\n\nworktree /Users/chasen/.codex/worktrees/g3-m4-mac-master/ontology-platform\nHEAD e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a\nbranch refs/heads/codex/g3-m4-mac-master\n\nworktree /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform\nHEAD c909fa5e605417ff645da19d5899748c0f35773c\nbranch refs/heads/codex/g3-m4-sem-b\n\nworktree /Users/chasen/.codex/worktrees/g3-m4-web-a/ontology-platform\nHEAD b779ff5159fdbcedaa837c57ead30f3236b0f549\nbranch refs/heads/codex/g3-m4-web-b\n\nworktree /Users/chasen/.codex/worktrees/g3-m5-e0/ontology-platform\nHEAD cd59a8f47fee10840046bc14c817c87f8be6674c\nbranch refs/heads/codex/g3-m5-e0\n\nworktree /Users/chasen/.codex/worktrees/g3-m5-review-fix/ontology-platform\nHEAD d1a61daffe844475b07705797e3ad325cc3f2945\nbranch refs/heads/codex/G3-M5-REVIEW-FIX-001\n\nworktree /Users/chasen/.codex/worktrees/g4-00-contract-001/ontology-platform\nHEAD 8afc5d4dfd32e7adb48262cce6587057c0e68715\nbranch refs/heads/codex/g4-00-contract-001\n\nworktree /Users/chasen/.codex/worktrees/g4-m1-connection-master/ontology-platform\nHEAD 8afc5d4dfd32e7adb48262cce6587057c0e68715\nbranch refs/heads/codex/g4-m1-connection-master\n\nworktree /Users/chasen/.codex/worktrees/g6-p0-dependency-lock-001/ontology-platform\nHEAD 72a88341c634f971ed0a30a1e63a974f957cbb05\nbranch refs/heads/codex/g6-p0-dependency-lock-001\n\nworktree /Users/chasen/.codex/worktrees/g6-p0-parser-prep-master/ontology-platform\nHEAD 851fa7eb2153c660b7989c0a7a6dd0e1c8e1b63c\nbranch refs/heads/codex/g6-p0-parser-prep-master\n\nworktree /Users/chasen/.codex/worktrees/g6-p0-parser-prep-parser/ontology-platform\nHEAD ffa3499812debd89f2e7fe4138e2ddfca2e7ac68\nbranch refs/heads/codex/g6-p0-parser-prep-parser\n\nworktree /Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform\nHEAD d6aab6b47e63c9d5deadfa480f6659c62c5ed138\nbranch refs/heads/codex/PRE-G3-CLEANUP-FIX-002",
+  "policy": "All preexisting Docker/G3/G6 objects KEEP; no delete authorization for them."
+}

@@ -73,11 +73,11 @@ def display_state():
         return dict(status='NOT_VERIFIED')
 
 
-def inspect(system=None, reader=capture):
+def inspect(system=None, reader=capture, task_id="G3-M5-001"):
     """跨平台只读判断策略；锁屏熄屏与整会话保证分别记录。"""
     system = system or platform.system()
     result = dict(schemaVersion=1, utc=now(), os=system, architecture=platform.machine(),
-                  pid=os.getpid(), taskId='G3-M5-001', assurance='NOT_APPLICABLE',
+                  pid=os.getpid(), taskId=task_id, assurance='NOT_APPLICABLE',
                   lockDisplayTrial='NOT_VERIFIED', sessionContinuity='NOT_VERIFIED')
     if system != 'Darwin':
         return result
@@ -144,7 +144,7 @@ def save(path, value, append=False):
         os.fsync(stream.fileno())
 
 
-def monitor(path, seconds, interval):
+def monitor(path, seconds, interval, task_id="G3-M5-001"):
     """有界监测策略变化与锁屏心跳；不创建保活常驻进程或防显示器睡眠断言。"""
     start, tick = dt.datetime.now(UTC), time.monotonic()
     rows = []
@@ -155,7 +155,7 @@ def monitor(path, seconds, interval):
     previous = {sig: signal.signal(sig, stop) for sig in (signal.SIGINT, signal.SIGTERM)}
     try:
         while True:
-            row = inspect()
+            row = inspect(task_id=task_id)
             row.update(sequence=len(rows), elapsedMs=round((time.monotonic()-tick)*1000))
             save(path, row, append=True)
             rows.append(row)
@@ -166,7 +166,7 @@ def monitor(path, seconds, interval):
         for sig, handler in previous.items():
             signal.signal(sig, handler)
     end = dt.datetime.now(UTC)
-    summary = dict(schemaVersion=1, taskId='G3-M5-001', ownerPid=os.getpid(),
+    summary = dict(schemaVersion=1, taskId=task_id, ownerPid=os.getpid(),
                    startedAtUtc=start.isoformat(), endedAtUtc=end.isoformat(),
                    measuredElapsedMs=round((time.monotonic()-tick)*1000), heartbeatCount=len(rows),
                    lockedHeartbeatCount=sum(r.get('screenLocked') is True for r in rows),
@@ -219,7 +219,9 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     sub=parser.add_subparsers(dest='mode',required=True)
     pre=sub.add_parser('preflight');pre.add_argument('--output')
+    pre.add_argument('--task-id',choices=['G3-M5-001','G4-M1-CONNECTION-001'],default='G3-M5-001')
     mon=sub.add_parser('monitor');mon.add_argument('--output',required=True)
+    mon.add_argument('--task-id',choices=['G3-M5-001','G4-M1-CONNECTION-001'],default='G3-M5-001')
     mon.add_argument('--seconds',type=int,default=600);mon.add_argument('--interval',type=int,default=5)
     sub.add_parser('fixture')
     cli=sub.add_parser('cli');cli.add_argument('command',nargs=argparse.REMAINDER)
@@ -235,9 +237,9 @@ def main():
             if not 1<=args.seconds<=86400 or not 1<=args.interval<=60:raise ValueError('监测时长/间隔超出预算')
             target=output_path(args.output)
             if target.exists() or target.with_suffix('.summary.json').exists():raise ValueError('拒绝覆写已有心跳')
-            result=monitor(target,args.seconds,args.interval)
+            result=monitor(target,args.seconds,args.interval,args.task_id)
         else:
-            result=fixture() if args.mode=='fixture' else inspect()
+            result=fixture() if args.mode=='fixture' else inspect(task_id=args.task_id)
             if args.mode=='preflight' and args.output:save(output_path(args.output),result)
         print(json.dumps(result,ensure_ascii=False,sort_keys=True))
         if result.get('assurance')=='BLOCKED_HOST_SLEEP_ASSURANCE' or result.get('status')=='NOT_VERIFIED':

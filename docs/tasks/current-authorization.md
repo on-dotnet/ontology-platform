@@ -1,3 +1,9 @@
+# G4-M1-CONNECTION-001 当前授权（2026-11-01）
+
+本会话用户正式批准附件V1全部P0–P5、合成Secret策略及准入后的精确依赖/镜像/资源预算。见[G4-M1任务卡](G4-M1-CONNECTION-001.md)与[实际授权](../evidence/G4-M1-CONNECTION-001/authorization.md)。从G4-00已审Head独立树实施；公共合同先非作者Review，再独立PG/UI写者；不合main、不动G6、不自动M2。历史授权保留。
+
+---
+
 # G3-M5-REVIEW-FIX-001 当前授权增量（2026-10-31）
 
 本会话用户正式授权[附件V2](../evidence/G3-M5-REVIEW-FIX-001/authorization-v2.md)完整执行。仅先冻结合同裁决、非作者只读审查，再必要最小 UI 澄清/真实增量验收、Master集成和唯一V3独立重开。不得先改后端 Profile 语义。Base fetch=580d73e7c0fb38b94dbbed1136ee0b1d24fadc9d。历史原包和证据不改。见[本轮任务卡](G3-M5-REVIEW-FIX-001.md)；不启动 G4/G5/G6。旧授权事实保留如下。
