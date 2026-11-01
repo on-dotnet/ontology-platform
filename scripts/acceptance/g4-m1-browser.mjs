@@ -22,6 +22,11 @@ Fault scenarios require Master to establish actual fixture fault and supply conn
 source-timeout requires Master to pause only the task PG source for <=20s with finally
 unpause; NETWORK must PASS, TLS must FAIL/source_unavailable after >=8s, and UI must
 show failure plus an enabled retry action. Immediate connection refusal is not timeout.
+Optional sourcePauseHandshake:true is valid only for source-timeout: after OIDC, initial
+catalog response and retry-button readiness, stdout emits one JSON SOURCE_TIMEOUT_READY
+with taskId/runId/connectionId. Master verifies the exact source, starts its <=19s unpause
+guard and pauses it, then sends exactly SOURCE_PAUSED followed by LF on stdin (<=64 bytes, 10s deadline).
+The driver performs no Docker/control-file operations; acknowledgement is not pause proof.
 Evidence must be below artifacts/g4-m1-recovery-001 or docs/evidence/G4-M1-RECOVERY-001.
 Each run creates a unique directory. No passwords, SecretRef, CSRF, raw errors or URLs
 are persisted. At most 4 masked screenshots per run; keep <=12 in final package.
@@ -52,6 +57,53 @@ function requireTrue(condition, code) { if (!condition) { const error = new Erro
 function note(name) { if (activeCase) cases[activeCase].observed.push(name); }
 function command(revision) { return { commandId: randomUUID(), idempotencyKey: randomUUID(), expectedRevision: revision, reason: 'Synthetic G4 recovery acceptance' }; }
 function within(base, path) { const value = relative(base, path); return value !== '' && value !== '..' && !value.startsWith('..' + sep) && !isAbsolute(value); }
+/** 有界标准输入握手只协调合成故障时机，真实暂停归属和恢复仍由 Master 负责。 */
+function waitForSourcePause(connectionId) {
+  phase = 'U05_source_timeout_pause_handshake';
+  report.sourcePauseHandshake = { status: 'READY', readyAtUtc: new Date().toISOString() };
+  return new Promise((resolve, reject) => {
+    // 最多保留 64 字节；所有结束路径均释放标准输入监听和期限计时器。
+    let pending = Buffer.alloc(0); let settled = false;
+    const finish = code => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      process.stdin.removeListener('data', onData);
+      process.stdin.removeListener('end', onEnd);
+      process.stdin.removeListener('error', onError);
+      process.stdin.pause();
+      if (code) {
+        report.sourcePauseHandshake.status = 'FAILED';
+        report.sourcePauseHandshake.failureCode = code;
+        const error = new Error(); error.safeCode = code; reject(error);
+      } else {
+        report.sourcePauseHandshake.status = 'MARKER_ACKNOWLEDGED';
+        report.sourcePauseHandshake.acknowledgedAtUtc = new Date().toISOString();
+        resolve();
+      }
+    };
+    const onData = chunk => {
+      const bytes = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+      if (pending.length + bytes.length > 64) { finish('source_pause_marker_too_large'); return; }
+      pending = Buffer.concat([pending, bytes]);
+      const expected = Buffer.from('SOURCE_PAUSED\n');
+      if (pending.length > expected.length || !expected.subarray(0, pending.length).equals(pending)) { finish('source_pause_marker_invalid'); return; }
+      if (pending.equals(expected)) finish();
+    };
+    const onEnd = () => finish('source_pause_stdin_closed');
+    const onError = () => finish('source_pause_stdin_error');
+    const timer = setTimeout(() => finish('source_pause_marker_timeout'), 10000);
+    process.stdin.on('data', onData);
+    process.stdin.on('end', onEnd);
+    process.stdin.on('error', onError);
+    if (process.stdin.readableEnded || process.stdin.destroyed) { finish('source_pause_stdin_closed'); return; }
+    // 先注册接收再发就绪事件，避免 Master 的即时回应落入竞态窗口。
+    try {
+      process.stdout.write(JSON.stringify({ event: 'SOURCE_TIMEOUT_READY', taskId: report.taskId, runId: report.runId, connectionId }) + '\n');
+      process.stdin.resume();
+    } catch { finish('source_pause_transport_error'); }
+  });
+}
 /** 私有文件必须真实落于当前树，且没有组或其他用户访问权限。 */
 async function privateFile(path) {
   requireTrue(typeof path === 'string' && isAbsolute(path), 'private_path_required');
@@ -99,6 +151,8 @@ try {
   requireTrue(runtime.scope?.organizationId === 'org-demo' && JSON.stringify(runtime.scope.siteIds) === '["site-a"]', 'synthetic_scope_required');
   const scenario = runtime.scenario ?? 'baseline';
   requireTrue(['baseline', 'layout-only', 'source-unavailable', 'source-timeout', 'catalog-cancel', 'source-permission-limited'].includes(scenario), 'scenario_invalid');
+  requireTrue(runtime.sourcePauseHandshake === undefined || typeof runtime.sourcePauseHandshake === 'boolean', 'source_pause_handshake_invalid');
+  requireTrue(runtime.sourcePauseHandshake !== true || scenario === 'source-timeout', 'source_pause_handshake_scenario_invalid');
   requireTrue(['baseline', 'layout-only'].includes(scenario) || /^[A-Za-z0-9_-]{1,100}$/.test(runtime.connectionId), 'fault_connection_required');
   requireTrue(!runtime.browserChannel || runtime.browserChannel === 'msedge', 'browser_channel_denied');
   const realm = JSON.parse(await privateFile(runtime.realmFile));
@@ -435,9 +489,23 @@ try {
     });
   } else {
     await runCase('M1-U05', async () => {
-      await page.goto(operator.origin + '/data/connections/' + connectionId);
+      if (runtime.sourcePauseHandshake === true) {
+        phase = 'U05_source_timeout_initial_catalog';
+        // 初始目录读取完成后才能暂停源，避免把导航中的真实查询误当作探针超时。
+        const [initialCatalog] = await Promise.all([
+          page.waitForResponse(response => new URL(response.url()).pathname === connectionPath() + '/catalogs' && response.request().method() === 'GET'),
+          page.goto(operator.origin + '/data/connections/' + connectionId),
+        ]);
+        requireTrue(initialCatalog.status() === 200 && await initialCatalog.finished() === null, 'source_pause_initial_catalog_not_ready');
+      } else await page.goto(operator.origin + '/data/connections/' + connectionId);
       await expectation(page.getByRole('button', { name: '刷新详情', exact: true })).toBeVisible();
       if (scenario === 'source-timeout') {
+        if (runtime.sourcePauseHandshake === true) {
+          phase = 'U05_source_timeout_retry_ready';
+          await expectation(page.getByRole('button', { name: '重新测试', exact: true })).toBeVisible();
+          await expectation(page.getByRole('button', { name: '重新测试', exact: true })).toBeEnabled();
+          await waitForSourcePause(connectionId);
+        }
         const probe = await clicked(page, '重新测试', connectionPath() + '/test', 'POST', 200, { timeoutMs: 20000, observePending: true, phase: 'U05_source_timeout_probe' });
         const request = report.http.at(-1);
         const network = probe.stages.find(stage => stage.name === 'NETWORK');
