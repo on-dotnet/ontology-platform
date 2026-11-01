@@ -33,7 +33,7 @@ export function CreateConnection({ identity }: { identity: PlatformIdentity }) {
   const cacheKey = draftCacheKey(identity);
   useEffect(() => {
     if (!canManage) return;
-    const frame = requestAnimationFrame(() => { try { const cached = decodeDraft(sessionStorage.getItem(cacheKey)); if (cached) setForm(cached); } catch { /* 无存储权限时只保留内存草稿。 */ } });
+    const frame = requestAnimationFrame(() => { try { const cached = decodeDraft(sessionStorage.getItem(cacheKey)); if (cached) { setForm(cached); sessionStorage.setItem(cacheKey, encodeDraft(cached)); } } catch { /* 无存储权限时只保留内存草稿。 */ } });
     return () => cancelAnimationFrame(frame);
   }, [cacheKey, canManage]);
   function changed(next: typeof form) {

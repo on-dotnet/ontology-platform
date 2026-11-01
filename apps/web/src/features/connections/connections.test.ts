@@ -115,3 +115,40 @@ describe("非敏草稿刷新隔离", () => {
     expect(draftCacheKey(identity)).not.toEqual(draftCacheKey({ ...identity, scopes: [] }));
   });
 });
+
+
+describe("冻结完整诊断码与误贴凭据拒绝回归", () => {
+  const cases = [
+    ["connection_tls_untrusted", "证书或服务器身份不可信", 422],
+    ["connection_auth_failed", "源账号认证失败", 422],
+    ["connection_readonly_unverified", "无法证明源账号仅有只读权限", 422],
+    ["connection_source_unavailable", "源服务暂不可用", 503],
+  ] as const;
+  it.each(cases)("%s HTTP错误显示独立安全诊断", (code, expected, status) => {
+    const html = renderToStaticMarkup(createElement(RequestError, { error: new PlatformApiError(status, code) }));
+    expect(html).toContain(expected);
+    expect(html).not.toContain("配置或凭据未通过验证");
+  });
+  it.each(cases)("%s 失败Probe不伪造通过或泄露原异常", (code, expected) => {
+    const probe = { status: "TEST_FAILED", stages: [{ name: "AUTH", status: "FAIL", durationMs: 1, diagnosticCode: code }], stale: false } as ConnectionProbeView;
+    const html = renderToStaticMarkup(createElement(ProbeReport, { probe }));
+    expect(html).toContain(expected); expect(html).toContain("测试失败"); expect(html).not.toContain("测试通过");
+    expect(html.match(/未验证/g)).toHaveLength(4);
+  });
+  it("未知诊断不回显任意异常正文", () => {
+    const probe = { status: "TEST_FAILED", stages: [{ name: "AUTH", status: "FAIL", durationMs: 1, diagnosticCode: "Password=must-not-display" }], stale: false } as ConnectionProbeView;
+    const html = renderToStaticMarkup(createElement(ProbeReport, { probe }));
+    expect(html).not.toContain("must-not-display"); expect(html).toContain("此阶段未通过");
+  });
+  it.each([
+    ["POSTGRESQL", "host", "Host=pg-source;Username=reader;Password=private-password"],
+    ["ORACLE", "host", "Data Source=oracle;User Id=reader;Pwd=private-password"],
+    ["DORIS", "feHost", "mysql://reader:private-password@doris"],
+    ["POSTGRESQL", "database", "Password=private-password"],
+  ])("%s %s误贴连接串不会写入或恢复", (type, key, value) => {
+    const original = validForms[type as ConnectionType];
+    const form = { ...original, values: { ...original.values, [key]: value } };
+    expect(encodeDraft(form)).not.toContain("private-password");
+    expect(decodeDraft(JSON.stringify(form))?.values[key]).toBe("");
+  });
+});

@@ -1,7 +1,20 @@
 import Link from "next/link";
 import { PlatformApiError } from "../../lib/api/client";
 import type { ConnectionProbeView } from "../../lib/api/g4-generated";
-const diagnostics: Record<string, string> = { connection_tls_untrusted: "证书或服务器身份不可信，请联系管理员核验证书。", tls_untrusted: "证书或服务器身份不可信，请联系管理员核验证书。", auth_failed: "源账号认证失败，请重新录入正确凭据。", readonly_unverified: "无法证明源账号仅有只读权限，请核验账号权限。", source_unavailable: "源服务暂不可用，请检查服务后重试。", connection_secret_expired: "临时凭据已失效，请重新输入。", connection_test_stale: "测试已过期或配置发生变化，请重新测试。", connector_not_enabled: "此数据源的连接测试与保存尚未开放。", catalog_access_forbidden: "没有目录访问权限。" };
+const diagnostics: Record<string, string> = {
+  connection_network_forbidden: "目标不在允许的网络范围内，请联系管理员核验目标策略。",
+  connection_tls_untrusted: "证书或服务器身份不可信，请联系管理员核验证书。",
+  connection_auth_failed: "源账号认证失败，请重新录入正确凭据。",
+  connection_readonly_unverified: "无法证明源账号仅有只读权限，请核验账号权限。",
+  connection_source_unavailable: "源服务暂不可用，请检查服务后重试。",
+  connection_secret_expired: "临时凭据已失效，请重新输入。",
+  connection_test_stale: "测试已过期或配置发生变化，请重新测试。",
+  connection_cancelled: "连接操作已取消，未完成的阶段不能视为通过。",
+  connector_not_enabled: "此数据源的连接测试与保存尚未开放。",
+  catalog_access_forbidden: "没有目录访问权限。",
+  catalog_permission_limited: "目录权限受限，无法证明目录完整。",
+  catalog_budget_exceeded: "目录发现超过安全预算，结果尚不完整。",
+};
 export const stateLabels: Record<string, string> = { DRAFT: "草稿", ACTIVE: "已启用", DISABLED: "已禁用", RUNNING: "运行中", QUEUED: "等待执行", SUCCEEDED: "已完成", PARTIAL: "部分完成", FAILED: "失败", CANCELLED: "已取消", TEST_OK: "测试通过", TEST_FAILED: "测试失败", EXPIRED: "已过期", READY: "可用", STALE: "已过期", PASS: "通过", FAIL: "失败", NOT_VERIFIED: "未验证", NOT_RUN: "未执行" };
 /** 只展示安全白名单诊断，不回显服务端异常或用户输入。 */
 export function RequestError({ error, retry }: { error: unknown; retry?: () => void }) {
