@@ -11,3 +11,9 @@ SHA256：observe.py c8afea3b3f0e12f3e0d571d7961c1c9c6820663b8e996c2043f4238d82c1
 PREP复用29个mode/blob/path完全相同，SHA256 335f4dd6abfd69f8ae8a8dca4291b6ec1bf1e910f852d7a6adf835441841e85b；pip5个源码hash及MIT许可hash独立重算一致。快照冲突只证doclang0.9.0不满足<0.9，不能称全版本UNSAT。两次GET实际命令/退出0/投影stdout和限量代码可查；原HTTP原字节未保存，rawhash独立重算NOT_VERIFIED，不阻断本轮BLOCKED交付。Reviewer自身无网络/求解/下载/模型/Docker/文件写入。
 
 当前复审仅源码与已列证据；完整SelfTest、提交绑定、资源白名单和唯一V3独立重开以各后置回执为准，不预填交付PASS。
+
+## 最终交付证据复审
+
+PASS_FOR_DELIVERY_EVIDENCE，无新增未闭合P0/P1。Reviewer独立test-review-evidence -ExpectedHead 46e285b0f762d1a580472e7d394b72dd8548567e，19checks/exit0，仅EVIDENCE_SCHEMA_ONLY。逐raw_base64/size/hash/utf8Text均一致；SelfTest37437bytes/SHA256=3a7bd7518ca6091b081b52aa0eae5e63597dae0a4c911fd77125544a9d9a5a42，381.693654667004秒/exit0。非说明tracked输入与testedCommit一致，SelfTest基础设施hash一致；修正observer由24tests+final静态覆盖，无需重复完整SelfTest。
+
+15条timeline由生产validate/summarize通过，与原进程UTC/退出/monotonic一致；指纹只指command输入，完整产品绑定另核。7对象os.path.lexists均缺席，共享工具target dev/inode保持[16777233,3844870]。Docker完整行和backend前后相同。Base..HEAD diff-check0；仅允许三域变化。可提交最终证据后唯一LOCAL V3(PARTIAL)，随后非作者独立重开；不在此预填重开结果。

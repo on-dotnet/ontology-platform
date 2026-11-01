@@ -1,0 +1,163 @@
+{
+  "evidenceSchemaVersion": 2,
+  "validationSource": "LOCAL",
+  "testedCommit": "46e285b0f762d1a580472e7d394b72dd8548567e",
+  "checks": [
+    {
+      "name": "input-integrity",
+      "command": "python3 /tmp/g6_lock_setup.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "15 ZIP members CRC;13 MANIFEST payload+14 SHA256SUMS verified. Independent Reviewer verified same; original script scaffolding removed under audited whitelist."
+    },
+    {
+      "name": "lock-targeted-24",
+      "command": "python3 -B -m unittest discover -s experiments/g6-p0/locks/tests -v",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Actual raw output/size/SHA256 in targeted-tests-committed.source.json; scope stdlib/engineering only."
+    },
+    {
+      "name": "engineering-static",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Actual raw output/size/SHA256 in static-final.source.json; scope stdlib/engineering only."
+    },
+    {
+      "name": "engineering-selftest",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1 -SelfTest",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Actual raw output/size/SHA256 in selftest-after-tool-reuse.source.json; scope stdlib/engineering only."
+    },
+    {
+      "name": "prep72-reuse",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "REUSED_NOT_RERUN; original35+37 tests/29 exact mode-blob-path bindings in prep-test-reuse.json; not counted as current tests."
+    },
+    {
+      "name": "metadata-platform-observation",
+      "command": "python3 -B experiments/g6-p0/locks/observe.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Reproduced saved output in24 tests;54 nodes79 declarations57 conditional candidates each. Observation logic only; no solver run."
+    },
+    {
+      "name": "dependency-lock",
+      "command": null,
+      "status": "BLOCKED",
+      "exitCode": null,
+      "output": "RESOLVER_TOOL_APPROVAL_REQUIRED; pip dry-run may download payload. Snapshot doclang0.9.0 fails <0.9; alternative0.8.0 only single-edge observation, not global resolution."
+    },
+    {
+      "name": "licenses-notices",
+      "command": null,
+      "status": "NOT_VERIFIED",
+      "exitCode": null,
+      "output": "Declared fields only;3 UNKNOWN license indicators, all native NOTICE/artifact/SBOM/security unverified."
+    },
+    {
+      "name": "original-http-raw-hash-recomputation",
+      "command": null,
+      "status": "NOT_VERIFIED",
+      "exitCode": null,
+      "output": "2 metadata requests/41203 response bytes measured in original process. Commands/exit/stdout retained; raw HTTP response discarded, not independently recomputed."
+    },
+    {
+      "name": "resource-cleanup",
+      "command": "Python Path.unlink with reviewed cleanup-plan.json",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "7 exact own objects removed:6 files42097 logical bytes +1 symlink; shared target preserved. cleanup-actual.json; physical bytes unknown."
+    },
+    {
+      "name": "docker-resource-metadata",
+      "command": "python3 -B scripts/maintenance/docker_inventory.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Before/After backend and precise resource rows equal;0/8/13/5/3;not runtime health. No task Docker create/delete."
+    },
+    {
+      "name": "diff-check",
+      "command": "git diff --check 851fa7eb2153c660b7989c0a7a6dd0e1c8e1b63c HEAD",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Actual exit0, raw empty output retained in diff-check.source.json; final delivery diff check repeated by packager."
+    },
+    {
+      "name": "Docling-real-parser",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Not authorized/current profile gate not met; no runtime PASS claimed."
+    },
+    {
+      "name": "PaddleOCR-runtime",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Not authorized/current profile gate not met; no runtime PASS claimed."
+    },
+    {
+      "name": "models-local-expansion",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Not authorized/current profile gate not met; no runtime PASS claimed."
+    },
+    {
+      "name": "Docker-runtime",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Not authorized/current profile gate not met; no runtime PASS claimed."
+    },
+    {
+      "name": "provider-real-API",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Not authorized/current profile gate not met; no runtime PASS claimed."
+    },
+    {
+      "name": "native-Linux-ARM64-AMD64",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Not authorized/current profile gate not met; no runtime PASS claimed."
+    },
+    {
+      "name": "OS-secret-store",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Not authorized/current profile gate not met; no runtime PASS claimed."
+    }
+  ],
+  "ci": {
+    "status": "NOT_RUN",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  },
+  "metadata": {
+    "taskId": "G6-P0-DEPENDENCY-LOCK-001",
+    "status": "BLOCKED_WITH_WITNESS",
+    "taskStatus": "PARTIAL",
+    "sourceReview": "PASS_FOR_SOURCE_NON_AUTHOR",
+    "selftestReuseBoundary": "SelfTest infrastructure/scripts unchanged during source fixes; corrected observer verified by targeted24+final static. No repeated full SelfTest.",
+    "currentTests": 24,
+    "prepTestsReused": 72,
+    "networkRequests": 2,
+    "metadataResponseBytes": 41203,
+    "payloadDownloads": 0,
+    "containersCreated": 0,
+    "containersDeleted": 0,
+    "mainMerged": false,
+    "g4": "NOT_STARTED"
+  }
+}

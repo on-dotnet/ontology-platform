@@ -1,0 +1,453 @@
+{
+  "taskId": "G6-P0-DEPENDENCY-LOCK-001",
+  "docker": {
+    "beforeCounts": {
+      "containers": 0,
+      "volumes": 8,
+      "images": 13,
+      "history": 5,
+      "networks": 3
+    },
+    "afterCounts": {
+      "containers": 0,
+      "volumes": 8,
+      "images": 13,
+      "history": 5,
+      "networks": 3
+    },
+    "backendIdentityEqual": true,
+    "exactIdSetsEqual": {
+      "containers": true,
+      "volumes": true,
+      "images": true,
+      "history": true,
+      "networks": true
+    },
+    "created": 0,
+    "deleted": 0,
+    "capacityBefore": "{\"Active\":\"0\",\"Reclaimable\":\"6.043GB (85%)\",\"Size\":\"7.1GB\",\"TotalCount\":\"13\",\"Type\":\"Images\"}\n{\"Active\":\"0\",\"Reclaimable\":\"0B\",\"Size\":\"0B\",\"TotalCount\":\"0\",\"Type\":\"Containers\"}\n{\"Active\":\"0\",\"Reclaimable\":\"619.3MB (100%)\",\"Size\":\"619.3MB\",\"TotalCount\":\"8\",\"Type\":\"Local Volumes\"}\n{\"Active\":\"0\",\"Reclaimable\":\"1.139GB\",\"Size\":\"2.925GB\",\"TotalCount\":\"70\",\"Type\":\"Build Cache\"}\n",
+    "capacityAfter": "{\"Active\":\"0\",\"Reclaimable\":\"6.043GB (85%)\",\"Size\":\"7.1GB\",\"TotalCount\":\"13\",\"Type\":\"Images\"}\n{\"Active\":\"0\",\"Reclaimable\":\"0B\",\"Size\":\"0B\",\"TotalCount\":\"0\",\"Type\":\"Containers\"}\n{\"Active\":\"0\",\"Reclaimable\":\"619.3MB (100%)\",\"Size\":\"619.3MB\",\"TotalCount\":\"8\",\"Type\":\"Local Volumes\"}\n{\"Active\":\"0\",\"Reclaimable\":\"1.139GB\",\"Size\":\"2.925GB\",\"TotalCount\":\"70\",\"Type\":\"Build Cache\"}\n",
+    "physicalReclaimedBytes": "NOT_VERIFIED",
+    "runtimeHealth": "NOT_RUN_NO_SERVICES_STARTED",
+    "keep": [
+      {
+        "kind": "volumes",
+        "id": "g2-ef979bd04cc0-alloy-data",
+        "decision": "KEEP_OUTSIDE_CURRENT_TASK",
+        "reason": "Pre-existing resource; current contract explicitly prohibits deletion and creates no Docker resources",
+        "releaseCondition": "Separate owner lifecycle authorization and exact references/recovery review",
+        "sizeBytes": null
+      },
+      {
+        "kind": "volumes",
+        "id": "g2-ef979bd04cc0-fuseki-data",
+        "decision": "KEEP_OUTSIDE_CURRENT_TASK",
+        "reason": "Pre-existing resource; current contract explicitly prohibits deletion and creates no Docker resources",
+        "releaseCondition": "Separate owner lifecycle authorization and exact references/recovery review",
+        "sizeBytes": null
+      },
+      {
+        "kind": "volumes",
+        "id": "g2-ef979bd04cc0-grafana-data",
+        "decision": "KEEP_OUTSIDE_CURRENT_TASK",
+        "reason": "Pre-existing resource; current contract explicitly prohibits deletion and creates no Docker resources",
+        "releaseCondition": "Separate owner lifecycle authorization and exact references/recovery review",
+        "sizeBytes": null
+      },
+      {
+        "kind": "volumes",
+        "id": "g2-ef979bd04cc0-loki-data",
+        "decision": "KEEP_OUTSIDE_CURRENT_TASK",
+        "reason": "Pre-existing resource; current contract explicitly prohibits deletion and creates no Docker resources",
+        "releaseCondition": "Separate owner lifecycle authorization and exact references/recovery review",
+        "sizeBytes": null
+      },
+      {
+        "kind": "volumes",
+        "id": "g2-ef979bd04cc0-postgres-data",
+        "decision": "KEEP_OUTSIDE_CURRENT_TASK",
+        "reason": "Pre-existing resource; current contract explicitly prohibits deletion and creates no Docker resources",
+        "releaseCondition": "Separate owner lifecycle authorization and exact references/recovery review",
+        "sizeBytes": null
+      },
+      {
+        "kind": "volumes",
+        "id": "g2-ef979bd04cc0-prometheus-data",
+        "decision": "KEEP_OUTSIDE_CURRENT_TASK",
+        "reason": "Pre-existing resource; current contract explicitly prohibits deletion and creates no Docker resources",
+        "releaseCondition": "Separate owner lifecycle authorization and exact references/recovery review",
+        "sizeBytes": null
+      },
+      {
+        "kind": "volumes",
+        "id": "g2-ef979bd04cc0-rustfs-data",
+        "decision": "KEEP_OUTSIDE_CURRENT_TASK",
+        "reason": "Pre-existing resource; current contract explicitly prohibits deletion and creates no Docker resources",
+        "releaseCondition": "Separate owner lifecycle authorization and exact references/recovery review",
+        "sizeBytes": null
+      },
+      {
+        "kind": "volumes",
+        "id": "g2-ef979bd04cc0-tempo-data",
+        "decision": "KEEP_OUTSIDE_CURRENT_TASK",
+        "reason": "Pre-existing resource; current contract explicitly prohibits deletion and creates no Docker resources",
+        "releaseCondition": "Separate owner lifecycle authorization and exact references/recovery review",
+        "sizeBytes": null
+      },
+      {
+        "kind": "images",
+        "id": "sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28",
+        "decision": "KEEP_OUTSIDE_CURRENT_TASK",
+        "reason": "Pre-existing resource; current contract explicitly prohibits deletion and creates no Docker resources",
+        "releaseCondition": "Separate owner lifecycle authorization and exact references/recovery review",
+        "sizeBytes": 191210306
+      },
+      {
+        "kind": "images",
+        "id": "sha256:39b0fb6616a466a05b2ff8c691bb14a63557c70118d433a4b70fd1068b1bef60",
+        "decision": "KEEP_OUTSIDE_CURRENT_TASK",
+        "reason": "Pre-existing resource; current contract explicitly prohibits deletion and creates no Docker resources",
+        "releaseCondition": "Separate owner lifecycle authorization and exact references/recovery review",
+        "sizeBytes": 503334439
+      },
+      {
+        "kind": "images",
+        "id": "sha256:401e1fbc58c27b08c3103e00c86b22bd175a1cdd8f8a7d61965133f27a24437f",
+        "decision": "KEEP_OUTSIDE_CURRENT_TASK",
+        "reason": "Pre-existing resource; current contract explicitly prohibits deletion and creates no Docker resources",
+        "releaseCondition": "Separate owner lifecycle authorization and exact references/recovery review",
+        "sizeBytes": 503312701
+      },
+      {
+        "kind": "images",
+        "id": "sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044",
+        "decision": "KEEP_OUTSIDE_CURRENT_TASK",
+        "reason": "Pre-existing resource; current contract explicitly prohibits deletion and creates no Docker resources",
+        "releaseCondition": "Separate owner lifecycle authorization and exact references/recovery review",
+        "sizeBytes": 161272866
+      },
+      {
+        "kind": "images",
+        "id": "sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c",
+        "decision": "KEEP_OUTSIDE_CURRENT_TASK",
+        "reason": "Pre-existing resource; current contract explicitly prohibits deletion and creates no Docker resources",
+        "releaseCondition": "Separate owner lifecycle authorization and exact references/recovery review",
+        "sizeBytes": 606140328
+      },
+      {
+        "kind": "images",
+        "id": "sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18",
+        "decision": "KEEP_OUTSIDE_CURRENT_TASK",
+        "reason": "Pre-existing resource; current contract explicitly prohibits deletion and creates no Docker resources",
+        "releaseCondition": "Separate owner lifecycle authorization and exact references/recovery review",
+        "sizeBytes": 928130986
+      },
+      {
+        "kind": "images",
+        "id": "sha256:93b8a14ea2f412782e4e842651273b4d903e35cc496284f178fbbe2d67d00976",
+        "decision": "KEEP_OUTSIDE_CURRENT_TASK",
+        "reason": "Pre-existing resource; current contract explicitly prohibits deletion and creates no Docker resources",
+        "releaseCondition": "Separate owner lifecycle authorization and exact references/recovery review",
+        "sizeBytes": 720982841
+      },
+      {
+        "kind": "images",
+        "id": "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+        "decision": "KEEP_OUTSIDE_CURRENT_TASK",
+        "reason": "Pre-existing resource; current contract explicitly prohibits deletion and creates no Docker resources",
+        "releaseCondition": "Separate owner lifecycle authorization and exact references/recovery review",
+        "sizeBytes": 370600042
+      },
+      {
+        "kind": "images",
+        "id": "sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b",
+        "decision": "KEEP_OUTSIDE_CURRENT_TASK",
+        "reason": "Pre-existing resource; current contract explicitly prohibits deletion and creates no Docker resources",
+        "releaseCondition": "Separate owner lifecycle authorization and exact references/recovery review",
+        "sizeBytes": 750213594
+      },
+      {
+        "kind": "images",
+        "id": "sha256:cc1591ccefc0ab280cfd1fef2ebc5315de7d2f39d8d1c1d690c37e305810a9b2",
+        "decision": "KEEP_OUTSIDE_CURRENT_TASK",
+        "reason": "Pre-existing resource; current contract explicitly prohibits deletion and creates no Docker resources",
+        "releaseCondition": "Separate owner lifecycle authorization and exact references/recovery review",
+        "sizeBytes": 965822636
+      },
+      {
+        "kind": "images",
+        "id": "sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f",
+        "decision": "KEEP_OUTSIDE_CURRENT_TASK",
+        "reason": "Pre-existing resource; current contract explicitly prohibits deletion and creates no Docker resources",
+        "releaseCondition": "Separate owner lifecycle authorization and exact references/recovery review",
+        "sizeBytes": 1813270111
+      },
+      {
+        "kind": "images",
+        "id": "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6",
+        "decision": "KEEP_OUTSIDE_CURRENT_TASK",
+        "reason": "Pre-existing resource; current contract explicitly prohibits deletion and creates no Docker resources",
+        "releaseCondition": "Separate owner lifecycle authorization and exact references/recovery review",
+        "sizeBytes": 665862903
+      },
+      {
+        "kind": "images",
+        "id": "sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2",
+        "decision": "KEEP_OUTSIDE_CURRENT_TASK",
+        "reason": "Pre-existing resource; current contract explicitly prohibits deletion and creates no Docker resources",
+        "releaseCondition": "Separate owner lifecycle authorization and exact references/recovery review",
+        "sizeBytes": 356657988
+      },
+      {
+        "kind": "history",
+        "id": "1kq80249gfrdurl9atazzw7kl",
+        "decision": "KEEP_OUTSIDE_CURRENT_TASK",
+        "reason": "Pre-existing resource; current contract explicitly prohibits deletion and creates no Docker resources",
+        "releaseCondition": "Separate owner lifecycle authorization and exact references/recovery review",
+        "sizeBytes": null
+      },
+      {
+        "kind": "history",
+        "id": "vq2df00gcyjps32jx8vlylpuk",
+        "decision": "KEEP_OUTSIDE_CURRENT_TASK",
+        "reason": "Pre-existing resource; current contract explicitly prohibits deletion and creates no Docker resources",
+        "releaseCondition": "Separate owner lifecycle authorization and exact references/recovery review",
+        "sizeBytes": null
+      },
+      {
+        "kind": "history",
+        "id": "rcb0gy3pt97pgilczmff1itne",
+        "decision": "KEEP_OUTSIDE_CURRENT_TASK",
+        "reason": "Pre-existing resource; current contract explicitly prohibits deletion and creates no Docker resources",
+        "releaseCondition": "Separate owner lifecycle authorization and exact references/recovery review",
+        "sizeBytes": null
+      },
+      {
+        "kind": "history",
+        "id": "ihl3gp469h5nq38l942lv9p1v",
+        "decision": "KEEP_OUTSIDE_CURRENT_TASK",
+        "reason": "Pre-existing resource; current contract explicitly prohibits deletion and creates no Docker resources",
+        "releaseCondition": "Separate owner lifecycle authorization and exact references/recovery review",
+        "sizeBytes": null
+      },
+      {
+        "kind": "history",
+        "id": "qao9ei05z94c4rt13gu1p0kkh",
+        "decision": "KEEP_OUTSIDE_CURRENT_TASK",
+        "reason": "Pre-existing resource; current contract explicitly prohibits deletion and creates no Docker resources",
+        "releaseCondition": "Separate owner lifecycle authorization and exact references/recovery review",
+        "sizeBytes": null
+      },
+      {
+        "kind": "networks",
+        "id": "ad0236b9fa0ea7f713e3d29ff58bc5e28a0aec605f7a3d4461a8fc1cd37ff058",
+        "decision": "KEEP_OUTSIDE_CURRENT_TASK",
+        "reason": "Pre-existing resource; current contract explicitly prohibits deletion and creates no Docker resources",
+        "releaseCondition": "Separate owner lifecycle authorization and exact references/recovery review",
+        "sizeBytes": null
+      },
+      {
+        "kind": "networks",
+        "id": "80ac07a0bfc7ad5bdedefec78a3a66c97c4c74093c4a8533f05f4cb96bcbc4d0",
+        "decision": "KEEP_OUTSIDE_CURRENT_TASK",
+        "reason": "Pre-existing resource; current contract explicitly prohibits deletion and creates no Docker resources",
+        "releaseCondition": "Separate owner lifecycle authorization and exact references/recovery review",
+        "sizeBytes": null
+      },
+      {
+        "kind": "networks",
+        "id": "e66d65cfe0714eb9fde22ab801d77393aeb653344362c0faac45292d829dab8e",
+        "decision": "KEEP_OUTSIDE_CURRENT_TASK",
+        "reason": "Pre-existing resource; current contract explicitly prohibits deletion and creates no Docker resources",
+        "releaseCondition": "Separate owner lifecycle authorization and exact references/recovery review",
+        "sizeBytes": null
+      }
+    ]
+  },
+  "git": {
+    "beforeRefs": 80,
+    "afterRefs": 125,
+    "beforeWorktrees": 20,
+    "afterWorktrees": 20,
+    "afterRefsSnapshot": [
+      "refs/codex/snapshots/054d303d865c75537a3172552fdaba15b4ad76c8 46c7a6de70b1b97c032b12a19bc27c1c54e70f4c",
+      "refs/codex/snapshots/1a70b978fb57a8479b8ab3c3b8e6f1a547b8808a 19355e0919d5f4368b1218524af075da57e9dd1d",
+      "refs/codex/snapshots/3f634fb89f8a56d7ebe9a444dd14009bffe70d99 9a099f045e1e3d764b80ac43ed8b775a188abf4b",
+      "refs/codex/snapshots/40f87e87c386e2abb8e3390fe43be8dcf6c48d8e a52dc13c46abbc79776c86d4f8d4dcfa801cc99b",
+      "refs/codex/snapshots/423db8f3feef2ab5617c924fb6097f3b5bd823ad 8be4574bb1c715e017e7e0922b98a76b51eecd17",
+      "refs/codex/snapshots/5ff5661cf9e6d4419be8e04a16622071f28074f7 6154ebb3703031a49cf0c555c9f0c3596e3b7726",
+      "refs/codex/snapshots/688d84ee05ac861c5787aab1257c3b078084840d 5aa5b0799a8c29230fbb6ed466f97a7a33284fda",
+      "refs/codex/snapshots/7fd42bd7126c43a2f774aa36701340fe7a39c5fa b16c62808a7bf0b659d587d0f5c8fcd08a4cca5b",
+      "refs/codex/snapshots/8846cdad922fda71d414b9e88ce057f820695329 cecf43b00f4f5f12c9309640d68ed665f2643498",
+      "refs/codex/snapshots/8fc8105a1e153504e1a5e27e1ada7ed75ecf0755 5d92109064980e61fb7ac5a74cc98624c7219f0c",
+      "refs/codex/snapshots/9a93534a4d1ed554fb6c7fb668fbcba17cb8c91f 3fe18b471237d9d6b9d4a3175fce83dabfec9ab3",
+      "refs/codex/snapshots/ab6a38063397e59bcc30277aee62541f5110067f ce28552c3feb839eb2d9b447b4f25975bd439244",
+      "refs/codex/snapshots/bc00dcf7fff39b677e98f22103033da442478d47 d181f66e569e190a66b0f48b179f2fd9390b9467",
+      "refs/codex/snapshots/cc30be43b5bac30e3ce06a647b2e17610804fb43 741cde0b206ada85fcc7769e6e12bdc474ab70df",
+      "refs/codex/snapshots/d86f00d3e05789ec8fe49b70fe8cb7144d9efd72 1c98e05717cb7e3f311ba41b7b07f093aa64dc40",
+      "refs/codex/snapshots/daa3a2bb9ae981394d771a0c163df4ad92a371c0 3fc61d6a73290a8576c421ae0b0bdae7486f0030",
+      "refs/codex/snapshots/e812a2109a257f410498daa0e51dedfbc0bbf11b 219d1fcad3046251a1419f985dacab703f31c4cb",
+      "refs/codex/snapshots/eda74551d07767e1063e94efbbcb9c5c22e00043 47935fb2eda3d708e628a1b23ccd897e2250ff33",
+      "refs/codex/snapshots/fc03d8a1d7c899c9b8eeebcc2d0ee49c48b6b3db 92e6435a0b81b60319298a4dcdded040ea056418",
+      "refs/codex/turn-diffs/captures/1793496366105/14fddb71-695e-4324-a931-229697fe8864/base 1687cceb74c086f08e1586a86aa8a8e020ac9f95",
+      "refs/codex/turn-diffs/checkpoints/0ce7d47eb8e7a331221fb58d711650d4/9bb5be17f385f82045c756d674740f76/1793457007908/b752d180-6348-4b1b-a089-0d8f4e04f5f6 1687cceb74c086f08e1586a86aa8a8e020ac9f95",
+      "refs/codex/turn-diffs/checkpoints/1fe3555d04df2a500ba61fdb38500ff9/564296147afe22c31f6c3098172ffd61/1793003173038/8a9660b2-6b8d-47f9-b93b-9c6a42652fb4 fc0fe3b20e1b8787a31b870a52667cd2e6b10a2e",
+      "refs/codex/turn-diffs/checkpoints/29d73b52cd01442738109023ecf34a8e/ee1f224d27f3cca152e2b02812799257/1793230041620/fab96ab8-4d84-43ec-93e7-8090632888fe 67ab8bc54526e961a1481d42efc4841d5374b86a",
+      "refs/codex/turn-diffs/checkpoints/321c56b5938cd39b0c0d3c7c9be46948/dbdd35021107890c246fd46cc90bec09/1793416285156/376d369a-a142-448c-9425-80385cac4286 b20a2248ae6a809649de4d4aa8c96cb30c1de46f",
+      "refs/codex/turn-diffs/checkpoints/337c2cbda1f8d9a7074c8545b64d42b5/5a38e4a01671b78a635f89f230175392/1793001377579/04110339-1e57-43b8-8f2d-c88b95454c60 fc0fe3b20e1b8787a31b870a52667cd2e6b10a2e",
+      "refs/codex/turn-diffs/checkpoints/515dd8062c5c25873da2a3e452adc3e9/24b725c7ce0134e8106c447be2dfe292/1793416551684/366904c3-e8a2-403d-b8f8-7059a7ece64c b20a2248ae6a809649de4d4aa8c96cb30c1de46f",
+      "refs/codex/turn-diffs/checkpoints/6360add888f717db80d675f7fc79136b/c0b9cb9206e0e15df6fb322a3b533dfb/1793427995657/4046b7fd-2a88-48f3-a2de-bdd331a97e08 5c03f3d52b672b62485c38059c78d3f234289fa2",
+      "refs/codex/turn-diffs/checkpoints/6f59cebfcd84f9f52f7b579691dae388/c24297c7d93ebb303506003bfd3fe1ea/1792998993876/17430294-ddf8-4d58-8f38-4c12ed1a3af7 c63c1684517a3826bf97deffd37feb1a517e2721",
+      "refs/codex/turn-diffs/checkpoints/6fff706094f1c133ba9eac771ef308eb/eb69b87352a449be84810767ecc8c5b5/1793108431471/3861a780-8517-47ef-95f1-d002a1774634 1c5ca8213577e6ad483a970acafb3a914efb4685",
+      "refs/codex/turn-diffs/checkpoints/789e3b91648005baa1f376a29bc506cd/7cc310ed5a2dec0034ce5cc6aaed1f04/1793102641196/f3a2afa3-cdf8-4392-837d-4f0b147646dc 6d7a381c26bd8e0dcc163472b6e9b87c79eecd7f",
+      "refs/codex/turn-diffs/checkpoints/7bc6ee8160c184b6cb070eb8e868eb6d/1daf78664f3f81d0409c7c4e220c8918/1793430466998/34f41836-37a8-4168-ab8e-1628f327d360 1687cceb74c086f08e1586a86aa8a8e020ac9f95",
+      "refs/codex/turn-diffs/checkpoints/918501b22fda9b22a7d3e9708a90deed/04caa849f78f28fdd2a43e990cfbb485/1793062554471/bddb15ee-dcab-4de1-9524-1c314a31c657 33d7d3bcffca6a49ac97e9bdff1b699ecd3126f9",
+      "refs/codex/turn-diffs/checkpoints/9bd2dae0148d4a6350e224bd6b017c5a/3ea96c41085234d3156d19f3b681874c/1793416710114/2a139c68-8cbe-4306-9b03-26df0ad131c7 b20a2248ae6a809649de4d4aa8c96cb30c1de46f",
+      "refs/codex/turn-diffs/checkpoints/a5d6bbfc1118dc18bbfae1cd099af04e/8e12e4636e9d125bd4388504b717668a/1793085689125/ea34f96d-0d3a-4896-aedd-905bdaffae42 152ec671831c6b50c2268d5973564dbe0e89fb7f",
+      "refs/codex/turn-diffs/checkpoints/ad6fff93f975369d912e4b56fdbc743f/90148f2c9073396864bcaafd26944341/1793200743674/168c8854-1b85-40b6-8af8-2095c7e47315 67ab8bc54526e961a1481d42efc4841d5374b86a",
+      "refs/codex/turn-diffs/checkpoints/aeef8c70a68c4c176d3964e7155295ab/ce8e27f1fe9b7f377121164fc52e3935/1793395718333/6773e229-cf4f-484d-b729-bbff909f2c99 0ce88d96216c286566bd5a2813718ebff89fe6c2",
+      "refs/codex/turn-diffs/checkpoints/b467c3bc2c637fba160a7c9053fb7e3c/caa2b76882237717762e8ebea421227c/1793451841711/ce2261f4-61cb-41db-8ceb-b8ff17935ffa 1687cceb74c086f08e1586a86aa8a8e020ac9f95",
+      "refs/codex/turn-diffs/checkpoints/b5bebb76b82c77ebfa6b7f0695970cf0/525084350e66f6f6ff06c7daf3a1aa0b/1793000413378/f97d2fb1-cf69-4d49-9921-0b4ec1fc65c3 fc0fe3b20e1b8787a31b870a52667cd2e6b10a2e",
+      "refs/codex/turn-diffs/checkpoints/d2a7264839d9e547f94e005a9ec26ffd/c4b824b043db0a34e671f70711886514/1793143599467/7ee7fdee-a422-47d9-b935-3adcd7de38d2 c959a626d2b7e4baa656f884816b88277bda20c4",
+      "refs/codex/turn-diffs/checkpoints/d2e6788466c3b0372822fe558f85ba01/a10dd821dc9b1b9537b4608eeb5fee53/1793427231716/ddc910e3-d88c-4743-9bee-f7dc6435d908 5c03f3d52b672b62485c38059c78d3f234289fa2",
+      "refs/codex/turn-diffs/checkpoints/e78ba3e0dde03af33b581fcff4842615/1d2b830b45f086a13b5f4c9a3609d0a4/1793378196784/5d614e0b-ed31-429c-9c54-66e39e6d76e0 3ff4128ce292912933fa78bef0c180037aca50ed",
+      "refs/codex/turn-diffs/checkpoints/f16983919aef21618440a830c1c8b9c2/3a39253a9db1369c8b84f710fac4ae4a/1792939034292/7974df98-8e22-4cea-8235-63ab069f08e1 e3b2eab6af7d2fe354965da40fa301b9b4723900",
+      "refs/codex/turn-diffs/checkpoints/f539dfd446e9911b4dcca03c35e589e5/163649e2c1c4602409370a0fe4cd2bce/1793063398633/383e2881-8ec8-48d2-978a-a8a3238d1ad1 33d7d3bcffca6a49ac97e9bdff1b699ecd3126f9",
+      "refs/heads/codex/G1-SEC-001 cecf43b00f4f5f12c9309640d68ed665f2643498",
+      "refs/heads/codex/G2-AI-001 741cde0b206ada85fcc7769e6e12bdc474ab70df",
+      "refs/heads/codex/G2-FE-001 068878b9312c9d39430945677f0835fb2e48fae0",
+      "refs/heads/codex/G2-FINAL-FIX 9689a5e8099144b060131ee4d1a185f5b5285859",
+      "refs/heads/codex/G2-HOST-FIX 44f45bb7ef9d5f5c840bdcb4e5073ebbb8f2e152",
+      "refs/heads/codex/G2-OBS-SUPPORT 75ae3742879e50453313bf2e685c5c3c8c2b91a2",
+      "refs/heads/codex/G2-PUB-001 83d25cca70b41cea8de19bdac79d805a76957a21",
+      "refs/heads/codex/G2-QA-FIX e4b5bdee6508b747cda17136534c03e023c3d99f",
+      "refs/heads/codex/G2-QRY-001 3fc61d6a73290a8576c421ae0b0bdae7486f0030",
+      "refs/heads/codex/G2-READINESS-TEST a02d6da7297b254ce153628f29cf765de10af77c",
+      "refs/heads/codex/G2-SEC-SUPPORT 219d1fcad3046251a1419f985dacab703f31c4cb",
+      "refs/heads/codex/G2-SEM-001 b16c62808a7bf0b659d587d0f5c8fcd08a4cca5b",
+      "refs/heads/codex/G2-THIN-SLICE-001-master 46c7a6de70b1b97c032b12a19bc27c1c54e70f4c",
+      "refs/heads/codex/G3-M5-REVIEW-FIX-001 d1a61daffe844475b07705797e3ad325cc3f2945",
+      "refs/heads/codex/PRE-G3-CLEANUP-FIX-002 d6aab6b47e63c9d5deadfa480f6659c62c5ed138",
+      "refs/heads/codex/g3-m1-closeout-master f0712e9174d1bff82b5f6959e0a61e723585be88",
+      "refs/heads/codex/g3-m1-closeout-package 6b0ec74e10c1ff820abc7b358bf43beb880a245b",
+      "refs/heads/codex/g3-m1-closeout-resources f3197177304e6a25f8597ff611acb04fb4e5b268",
+      "refs/heads/codex/g3-m1-fix 92e6435a0b81b60319298a4dcdded040ea056418",
+      "refs/heads/codex/g3-m1-master 47935fb2eda3d708e628a1b23ccd897e2250ff33",
+      "refs/heads/codex/g3-m1-sem 3fe18b471237d9d6b9d4a3175fce83dabfec9ab3",
+      "refs/heads/codex/g3-m1-web 5aa5b0799a8c29230fbb6ed466f97a7a33284fda",
+      "refs/heads/codex/g3-m2-master c8f1040829b2bfe1e9f7e36223092286975643f0",
+      "refs/heads/codex/g3-m2-sem 8be4574bb1c715e017e7e0922b98a76b51eecd17",
+      "refs/heads/codex/g3-m2-web 1c98e05717cb7e3f311ba41b7b07f093aa64dc40",
+      "refs/heads/codex/g3-m3-efficiency d89ba59bac5ecc1e5946f49b790cb8ff3319ae78",
+      "refs/heads/codex/g3-m3-master 3992582e03df1a103fac36e7e82b8c81f85f622e",
+      "refs/heads/codex/g3-m3-sem ada0ef05293004dec6ed8863b356d4451f21ef41",
+      "refs/heads/codex/g3-m3-sem-language 90b60366a0e9907409061a5af5791c79a87cb499",
+      "refs/heads/codex/g3-m3-web 2ad537b63e0ed1b8392066201ad95ff4cb4d2b30",
+      "refs/heads/codex/g3-m4-mac-master e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a",
+      "refs/heads/codex/g3-m4-sem-b c909fa5e605417ff645da19d5899748c0f35773c",
+      "refs/heads/codex/g3-m4-web-b b779ff5159fdbcedaa837c57ead30f3236b0f549",
+      "refs/heads/codex/g3-m5-e0 cd59a8f47fee10840046bc14c817c87f8be6674c",
+      "refs/heads/codex/g3-m5-master 580d73e7c0fb38b94dbbed1136ee0b1d24fadc9d",
+      "refs/heads/codex/g3-m5-sem e2a8965f09ace4d802534c2f095fecefb0748e52",
+      "refs/heads/codex/g3-m5-web aad88b215978a8514aea9dd1d37f58d85c148688",
+      "refs/heads/codex/g3-m5-web-visual 9a099f045e1e3d764b80ac43ed8b775a188abf4b",
+      "refs/heads/codex/g6-p0-dependency-lock-001 46e285b0f762d1a580472e7d394b72dd8548567e",
+      "refs/heads/codex/g6-p0-parser-prep-master 851fa7eb2153c660b7989c0a7a6dd0e1c8e1b63c",
+      "refs/heads/codex/g6-p0-parser-prep-parser ffa3499812debd89f2e7fe4138e2ddfca2e7ac68",
+      "refs/heads/main d1a61daffe844475b07705797e3ad325cc3f2945",
+      "refs/remotes/origin/HEAD d1a61daffe844475b07705797e3ad325cc3f2945",
+      "refs/remotes/origin/codex/G1-SEC-001 cecf43b00f4f5f12c9309640d68ed665f2643498",
+      "refs/remotes/origin/codex/G2-AI-001 741cde0b206ada85fcc7769e6e12bdc474ab70df",
+      "refs/remotes/origin/codex/G2-FE-001 068878b9312c9d39430945677f0835fb2e48fae0",
+      "refs/remotes/origin/codex/G2-FINAL-FIX 9689a5e8099144b060131ee4d1a185f5b5285859",
+      "refs/remotes/origin/codex/G2-HOST-FIX 44f45bb7ef9d5f5c840bdcb4e5073ebbb8f2e152",
+      "refs/remotes/origin/codex/G2-OBS-SUPPORT 75ae3742879e50453313bf2e685c5c3c8c2b91a2",
+      "refs/remotes/origin/codex/G2-PUB-001 83d25cca70b41cea8de19bdac79d805a76957a21",
+      "refs/remotes/origin/codex/G2-QA-FIX e4b5bdee6508b747cda17136534c03e023c3d99f",
+      "refs/remotes/origin/codex/G2-QRY-001 3fc61d6a73290a8576c421ae0b0bdae7486f0030",
+      "refs/remotes/origin/codex/G2-READINESS-TEST a02d6da7297b254ce153628f29cf765de10af77c",
+      "refs/remotes/origin/codex/G2-SEC-SUPPORT 219d1fcad3046251a1419f985dacab703f31c4cb",
+      "refs/remotes/origin/codex/G2-SEM-001 b16c62808a7bf0b659d587d0f5c8fcd08a4cca5b",
+      "refs/remotes/origin/codex/G2-THIN-SLICE-001-master 46c7a6de70b1b97c032b12a19bc27c1c54e70f4c",
+      "refs/remotes/origin/codex/G3-M5-REVIEW-FIX-001 d1a61daffe844475b07705797e3ad325cc3f2945",
+      "refs/remotes/origin/codex/PRE-G3-CLEANUP-FIX-002 d6aab6b47e63c9d5deadfa480f6659c62c5ed138",
+      "refs/remotes/origin/codex/g3-m1-closeout-master f0712e9174d1bff82b5f6959e0a61e723585be88",
+      "refs/remotes/origin/codex/g3-m1-closeout-package 6b0ec74e10c1ff820abc7b358bf43beb880a245b",
+      "refs/remotes/origin/codex/g3-m1-closeout-resources f3197177304e6a25f8597ff611acb04fb4e5b268",
+      "refs/remotes/origin/codex/g3-m1-fix 92e6435a0b81b60319298a4dcdded040ea056418",
+      "refs/remotes/origin/codex/g3-m1-master 47935fb2eda3d708e628a1b23ccd897e2250ff33",
+      "refs/remotes/origin/codex/g3-m1-sem 3fe18b471237d9d6b9d4a3175fce83dabfec9ab3",
+      "refs/remotes/origin/codex/g3-m1-web 5aa5b0799a8c29230fbb6ed466f97a7a33284fda",
+      "refs/remotes/origin/codex/g3-m2-master c8f1040829b2bfe1e9f7e36223092286975643f0",
+      "refs/remotes/origin/codex/g3-m2-sem 8be4574bb1c715e017e7e0922b98a76b51eecd17",
+      "refs/remotes/origin/codex/g3-m2-web 1c98e05717cb7e3f311ba41b7b07f093aa64dc40",
+      "refs/remotes/origin/codex/g3-m3-master 3992582e03df1a103fac36e7e82b8c81f85f622e",
+      "refs/remotes/origin/codex/g3-m4-mac-master e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a",
+      "refs/remotes/origin/codex/g3-m4-master 60276b40c7c99a3891bf432e2b36338ee3101828",
+      "refs/remotes/origin/codex/g3-m4-sem-b c909fa5e605417ff645da19d5899748c0f35773c",
+      "refs/remotes/origin/codex/g3-m4-web-b b779ff5159fdbcedaa837c57ead30f3236b0f549",
+      "refs/remotes/origin/codex/g3-m5-e0 cd59a8f47fee10840046bc14c817c87f8be6674c",
+      "refs/remotes/origin/codex/g3-m5-master 580d73e7c0fb38b94dbbed1136ee0b1d24fadc9d",
+      "refs/remotes/origin/codex/g3-m5-sem e2a8965f09ace4d802534c2f095fecefb0748e52",
+      "refs/remotes/origin/codex/g3-m5-web aad88b215978a8514aea9dd1d37f58d85c148688",
+      "refs/remotes/origin/codex/g3-m5-web-visual 9a099f045e1e3d764b80ac43ed8b775a188abf4b",
+      "refs/remotes/origin/codex/g6-p0-dependency-lock-001 46e285b0f762d1a580472e7d394b72dd8548567e",
+      "refs/remotes/origin/codex/g6-p0-parser-prep-master 851fa7eb2153c660b7989c0a7a6dd0e1c8e1b63c",
+      "refs/remotes/origin/codex/g6-p0-parser-prep-parser ffa3499812debd89f2e7fe4138e2ddfca2e7ac68",
+      "refs/remotes/origin/main d1a61daffe844475b07705797e3ad325cc3f2945"
+    ],
+    "afterWorktreeSnapshot": "worktree /Users/chasen/Developer/repos/ontology-platform\nHEAD d1a61daffe844475b07705797e3ad325cc3f2945\nbranch refs/heads/main\n\nworktree /Users/chasen/.codex/worktrees/320c/ontology-platform\nHEAD e2a8965f09ace4d802534c2f095fecefb0748e52\nbranch refs/heads/codex/g3-m5-sem\n\nworktree /Users/chasen/.codex/worktrees/b389/ontology-platform\nHEAD 580d73e7c0fb38b94dbbed1136ee0b1d24fadc9d\nbranch refs/heads/codex/g3-m5-master\n\nworktree /Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform\nHEAD f0712e9174d1bff82b5f6959e0a61e723585be88\nbranch refs/heads/codex/g3-m1-closeout-master\n\nworktree /Users/chasen/.codex/worktrees/g3-m1-closeout-package/ontology-platform\nHEAD 6b0ec74e10c1ff820abc7b358bf43beb880a245b\nbranch refs/heads/codex/g3-m1-closeout-package\n\nworktree /Users/chasen/.codex/worktrees/g3-m1-closeout-resources/ontology-platform\nHEAD f3197177304e6a25f8597ff611acb04fb4e5b268\nbranch refs/heads/codex/g3-m1-closeout-resources\n\nworktree /Users/chasen/.codex/worktrees/g3-m2-master/ontology-platform\nHEAD c8f1040829b2bfe1e9f7e36223092286975643f0\nbranch refs/heads/codex/g3-m2-master\n\nworktree /Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform\nHEAD d89ba59bac5ecc1e5946f49b790cb8ff3319ae78\nbranch refs/heads/codex/g3-m3-efficiency\n\nworktree /Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform\nHEAD 3992582e03df1a103fac36e7e82b8c81f85f622e\nbranch refs/heads/codex/g3-m3-master\n\nworktree /Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform\nHEAD 90b60366a0e9907409061a5af5791c79a87cb499\nbranch refs/heads/codex/g3-m3-sem-language\n\nworktree /Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform\nHEAD 2ad537b63e0ed1b8392066201ad95ff4cb4d2b30\nbranch refs/heads/codex/g3-m3-web\n\nworktree /Users/chasen/.codex/worktrees/g3-m4-mac-master/ontology-platform\nHEAD e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a\nbranch refs/heads/codex/g3-m4-mac-master\n\nworktree /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform\nHEAD c909fa5e605417ff645da19d5899748c0f35773c\nbranch refs/heads/codex/g3-m4-sem-b\n\nworktree /Users/chasen/.codex/worktrees/g3-m4-web-a/ontology-platform\nHEAD b779ff5159fdbcedaa837c57ead30f3236b0f549\nbranch refs/heads/codex/g3-m4-web-b\n\nworktree /Users/chasen/.codex/worktrees/g3-m5-e0/ontology-platform\nHEAD cd59a8f47fee10840046bc14c817c87f8be6674c\nbranch refs/heads/codex/g3-m5-e0\n\nworktree /Users/chasen/.codex/worktrees/g3-m5-review-fix/ontology-platform\nHEAD d1a61daffe844475b07705797e3ad325cc3f2945\nbranch refs/heads/codex/G3-M5-REVIEW-FIX-001\n\nworktree /Users/chasen/.codex/worktrees/g6-p0-dependency-lock-001/ontology-platform\nHEAD 46e285b0f762d1a580472e7d394b72dd8548567e\nbranch refs/heads/codex/g6-p0-dependency-lock-001\n\nworktree /Users/chasen/.codex/worktrees/g6-p0-parser-prep-master/ontology-platform\nHEAD 851fa7eb2153c660b7989c0a7a6dd0e1c8e1b63c\nbranch refs/heads/codex/g6-p0-parser-prep-master\n\nworktree /Users/chasen/.codex/worktrees/g6-p0-parser-prep-parser/ontology-platform\nHEAD ffa3499812debd89f2e7fe4138e2ddfca2e7ac68\nbranch refs/heads/codex/g6-p0-parser-prep-parser\n\nworktree /Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform\nHEAD d6aab6b47e63c9d5deadfa480f6659c62c5ed138\nbranch refs/heads/codex/PRE-G3-CLEANUP-FIX-002\n\n",
+    "currentTask": "KEEP_UNINTEGRATED_SOURCE_PENDING_CHATGPT_REVIEW",
+    "otherWorktrees": "KEEP exact paths listed; owned by other tasks and prohibited from cleanup by this contract; separate task review required",
+    "mainUntouched": "d1a61daffe844475b07705797e3ad325cc3f2945",
+    "snapshotCommit": "46e285b0f762d1a580472e7d394b72dd8548567e"
+  },
+  "temporaryPlan": "cleanup-plan.json reviewed; actual7 objects removed and target preserved in cleanup-actual.json",
+  "ignored": "artifacts/g6-p0-dependency-lock-001 contains active review logs/output copies; keep until external review, recover raw outputs from current evidence sources before later exact cleanup",
+  "zipBefore": 0,
+  "zipAfter": "One final V3; exact size/hash in external delivery receipt after packaging",
+  "ignoredCaches": [
+    {
+      "path": "experiments/g6-p0/locks/__pycache__/observe.cpython-313.pyc",
+      "size": 18155,
+      "decision": "KEEP_ACTIVE_WORKTREE",
+      "reason": "Interpreter/SelfTest cache in active task checkout; compiled cache is not source or review payload",
+      "releaseCondition": "After external review, archive exact current task tree or reclaim own ignored metadata under lifecycle plan"
+    },
+    {
+      "path": "scripts/maintenance/__pycache__/execution_preflight.cpython-313.pyc",
+      "size": 32033,
+      "decision": "KEEP_ACTIVE_WORKTREE",
+      "reason": "Interpreter/SelfTest cache in active task checkout; compiled cache is not source or review payload",
+      "releaseCondition": "After external review, archive exact current task tree or reclaim own ignored metadata under lifecycle plan"
+    },
+    {
+      "path": "scripts/maintenance/__pycache__/host_continuity.cpython-313.pyc",
+      "size": 21346,
+      "decision": "KEEP_ACTIVE_WORKTREE",
+      "reason": "Interpreter/SelfTest cache in active task checkout; compiled cache is not source or review payload",
+      "releaseCondition": "After external review, archive exact current task tree or reclaim own ignored metadata under lifecycle plan"
+    },
+    {
+      "path": "scripts/maintenance/__pycache__/task_run_timeline.cpython-313.pyc",
+      "size": 27325,
+      "decision": "KEEP_ACTIVE_WORKTREE",
+      "reason": "Interpreter/SelfTest cache in active task checkout; compiled cache is not source or review payload",
+      "releaseCondition": "After external review, archive exact current task tree or reclaim own ignored metadata under lifecycle plan"
+    },
+    {
+      "path": "scripts/maintenance/__pycache__/ci_scope.cpython-313.pyc",
+      "size": 2945,
+      "decision": "KEEP_ACTIVE_WORKTREE",
+      "reason": "Interpreter/SelfTest cache in active task checkout; compiled cache is not source or review payload",
+      "releaseCondition": "After external review, archive exact current task tree or reclaim own ignored metadata under lifecycle plan"
+    },
+    {
+      "path": "scripts/maintenance/__pycache__/fuseki_ci_cache.cpython-313.pyc",
+      "size": 7008,
+      "decision": "KEEP_ACTIVE_WORKTREE",
+      "reason": "Interpreter/SelfTest cache in active task checkout; compiled cache is not source or review payload",
+      "releaseCondition": "After external review, archive exact current task tree or reclaim own ignored metadata under lifecycle plan"
+    }
+  ]
+}

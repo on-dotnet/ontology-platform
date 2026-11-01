@@ -1,0 +1,148 @@
+{
+  "taskId": "G6-P0-DEPENDENCY-LOCK-001",
+  "observedAtUtc": "2026-11-01T01:41:46.086898+00:00",
+  "planSha256": "1402afc0fe07c391cabebfb6cd50dc0448311f367864cdf34cda6e7797a5e239",
+  "independentReviewer": "GPT-6 Astra High; 7 exact objects approved",
+  "beforeCount": 7,
+  "afterCount": 0,
+  "deletedObjects": 7,
+  "regularFileLogicalBytesRemoved": 42097,
+  "symlinksRemoved": 1,
+  "physicalReclaimedBytes": "NOT_VERIFIED",
+  "dockerCreated": 0,
+  "dockerDeleted": 0,
+  "rows": [
+    {
+      "path": "/tmp/g6_lock_setup.py",
+      "before": {
+        "mode": 33188,
+        "size": 4649,
+        "dev": 16777233,
+        "ino": 10161293,
+        "sha256": "66eaaee3a7ae6cd3e0607d2b59f1532dfa243ee7162232a45dc0029ff6764354"
+      },
+      "command": [
+        "Path.unlink",
+        "/tmp/g6_lock_setup.py"
+      ],
+      "exitCode": 0,
+      "after": {
+        "pathAbsent": true
+      }
+    },
+    {
+      "path": "/tmp/g6_observe.py",
+      "before": {
+        "mode": 33188,
+        "size": 12051,
+        "dev": 16777233,
+        "ino": 10161312,
+        "sha256": "9a9a00d5aa6919a37caf20475df2d13f8f683bca98ca93376506d80900f9419c"
+      },
+      "command": [
+        "Path.unlink",
+        "/tmp/g6_observe.py"
+      ],
+      "exitCode": 0,
+      "after": {
+        "pathAbsent": true
+      }
+    },
+    {
+      "path": "/tmp/g6_test_observe.py",
+      "before": {
+        "mode": 33188,
+        "size": 7721,
+        "dev": 16777233,
+        "ino": 10161364,
+        "sha256": "05ed2364414d0a630d81ccfae12ce821ebddc2578929335e9493f1a8978291c5"
+      },
+      "command": [
+        "Path.unlink",
+        "/tmp/g6_test_observe.py"
+      ],
+      "exitCode": 0,
+      "after": {
+        "pathAbsent": true
+      }
+    },
+    {
+      "path": "/tmp/g6_capture.py",
+      "before": {
+        "mode": 33188,
+        "size": 1330,
+        "dev": 16777233,
+        "ino": 10161396,
+        "sha256": "e9eb585d4f25da5b176bac3dba53e71c9accbdb2ab8ed8fc4315ac71a66db12d"
+      },
+      "command": [
+        "Path.unlink",
+        "/tmp/g6_capture.py"
+      ],
+      "exitCode": 0,
+      "after": {
+        "pathAbsent": true
+      }
+    },
+    {
+      "path": "/tmp/g6_docs.py",
+      "before": {
+        "mode": 33188,
+        "size": 12440,
+        "dev": 16777233,
+        "ino": 10161541,
+        "sha256": "4551c4aaad2ac7e1ac147a4c9749be28c1203dbe5eedba67f43a3da9e45fd1fa"
+      },
+      "command": [
+        "Path.unlink",
+        "/tmp/g6_docs.py"
+      ],
+      "exitCode": 0,
+      "after": {
+        "pathAbsent": true
+      }
+    },
+    {
+      "path": "/tmp/g6_network_record.py",
+      "before": {
+        "mode": 33188,
+        "size": 3906,
+        "dev": 16777233,
+        "ino": 10181715,
+        "sha256": "d2f3090561a7d64d3fa4fc71f06a7b5e13279ab7ad50e6f83b994e6b0ea7d243"
+      },
+      "command": [
+        "Path.unlink",
+        "/tmp/g6_network_record.py"
+      ],
+      "exitCode": 0,
+      "after": {
+        "pathAbsent": true
+      }
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g6-p0-dependency-lock-001/ontology-platform/.tools/pythonlibs",
+      "before": {
+        "mode": 41453,
+        "size": 65,
+        "dev": 16777233,
+        "ino": 10161622,
+        "target": "/Users/chasen/Developer/repos/ontology-platform/.tools/pythonlibs",
+        "targetDevIno": [
+          16777233,
+          3844870
+        ]
+      },
+      "command": [
+        "Path.unlink",
+        "/Users/chasen/.codex/worktrees/g6-p0-dependency-lock-001/ontology-platform/.tools/pythonlibs"
+      ],
+      "exitCode": 0,
+      "after": {
+        "pathAbsent": true,
+        "sharedTargetExists": true,
+        "sharedTargetDevInoUnchanged": true
+      }
+    }
+  ]
+}

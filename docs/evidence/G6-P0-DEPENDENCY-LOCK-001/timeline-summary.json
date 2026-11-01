@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 2,
+  "stepCount": 15,
+  "wallClockMs": 549413,
+  "validIntervalSpanMs": 549413,
+  "observedIntervalUnionMs": 517219,
+  "cumulativeTaskMs": 527334,
+  "validIntervalCumulativeMs": 527334,
+  "overlapMs": 10115,
+  "clockDriftCount": 0,
+  "timingStatus": "VALID",
+  "confirmedSleepMs": "UNKNOWN",
+  "nonSleepWallMs": "UNKNOWN",
+  "humanWaitingTime": "UNKNOWN",
+  "observableCriticalPathMs": 381694,
+  "recheckCount": 6,
+  "taskTypeDurationMs": {
+    "PREFLIGHT": 132783,
+    "TEST": 394551
+  },
+  "failureCategories": {
+    "COMMAND_FAILED": 2
+  },
+  "agentActiveTime": "UNKNOWN",
+  "agentThinkingTime": "UNKNOWN",
+  "limitations": "UTC union/overlap use valid intervals only; critical path uses measured monotonic durations and declared dependencies. Sleep causality, chat, model cost and unobserved activity are not inferred.",
+  "limits": "Command argv fingerprint only, not complete product/failure-cache identity. Full relevant source inputs bound separately. Only captured process intervals counted; unrecorded manual/network/review time UNKNOWN. No session continuity or sleep evidence inferred."
+}
