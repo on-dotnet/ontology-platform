@@ -1,0 +1,21 @@
+{
+  "taskId": "G4-00-CONTRACT-001",
+  "reviewer": "/root/g4_contract_review",
+  "approvedExactId": "/private/tmp/G4-00-CONTRACT-001-input-v1.1",
+  "action": "APPLY_NOFOLLOW_DUPLICATE_INPUT_REMOVAL",
+  "command": "python3 stdin: open directory O_NOFOLLOW; compare archived size/SHA256; unlink/rmdir with dir_fd; verify exact root inode and absence",
+  "exitCode": 0,
+  "before": {
+    "files": 24,
+    "logicalBytes": 283725,
+    "inventorySha256": "9fb4722b13737fb6b2e69deccfca8798d9c37e6a1947e6f8fe65b5b3e752bfbb"
+  },
+  "after": {
+    "exists": false,
+    "files": 0
+  },
+  "logicalBytesRemoved": 283725,
+  "physicalBytesReclaimed": "NOT_VERIFIED",
+  "utc": "2026-11-01T07:28:00.037533+00:00",
+  "archivePreserved": "/Users/chasen/.codex/worktrees/g4-00-contract-001/ontology-platform/docs/evidence/G4-00-CONTRACT-001/input-v1.1"
+}

@@ -1,0 +1,206 @@
+{
+  "status": "PASS",
+  "scope": "REVIEW_AMENDMENT_SYNTHETIC_DESIGN_ONLY",
+  "originalPositivePreserved": 21,
+  "originalSchemaNegativePreserved": 16,
+  "cases": [
+    {
+      "caseId": "original-rejects-selection-0",
+      "actual": false,
+      "expected": false,
+      "status": "PASS"
+    },
+    {
+      "caseId": "reviewed-selection-schema-0",
+      "actual": true,
+      "expected": true,
+      "status": "PASS"
+    },
+    {
+      "caseId": "reviewed-selection-semantic-0",
+      "actual": "ACCEPT",
+      "expected": "ACCEPT",
+      "status": "PASS"
+    },
+    {
+      "caseId": "original-rejects-selection-1",
+      "actual": false,
+      "expected": false,
+      "status": "PASS"
+    },
+    {
+      "caseId": "reviewed-selection-schema-1",
+      "actual": true,
+      "expected": true,
+      "status": "PASS"
+    },
+    {
+      "caseId": "reviewed-selection-semantic-1",
+      "actual": "ACCEPT",
+      "expected": "ACCEPT",
+      "status": "PASS"
+    },
+    {
+      "caseId": "missing-site",
+      "actual": false,
+      "expected": false,
+      "status": "PASS"
+    },
+    {
+      "caseId": "null-site",
+      "actual": false,
+      "expected": false,
+      "status": "PASS"
+    },
+    {
+      "caseId": "relative-iri",
+      "actual": false,
+      "expected": false,
+      "status": "PASS"
+    },
+    {
+      "caseId": "empty-authority",
+      "actual": false,
+      "expected": false,
+      "status": "PASS"
+    },
+    {
+      "caseId": "empty-urn",
+      "actual": false,
+      "expected": false,
+      "status": "PASS"
+    },
+    {
+      "caseId": "iri-space",
+      "actual": false,
+      "expected": false,
+      "status": "PASS"
+    },
+    {
+      "caseId": "extra-sql",
+      "actual": false,
+      "expected": false,
+      "status": "PASS"
+    },
+    {
+      "caseId": "wrong-site-schema",
+      "actual": true,
+      "expected": true,
+      "status": "PASS"
+    },
+    {
+      "caseId": "wrong-site-semantic",
+      "actual": "422",
+      "expected": "422",
+      "status": "PASS"
+    },
+    {
+      "caseId": "wrong-entity-schema",
+      "actual": true,
+      "expected": true,
+      "status": "PASS"
+    },
+    {
+      "caseId": "wrong-entity-semantic",
+      "actual": "422",
+      "expected": "422",
+      "status": "PASS"
+    },
+    {
+      "caseId": "wrong-external-schema",
+      "actual": true,
+      "expected": true,
+      "status": "PASS"
+    },
+    {
+      "caseId": "wrong-external-semantic",
+      "actual": "422",
+      "expected": "422",
+      "status": "PASS"
+    },
+    {
+      "caseId": "revoked-candidate",
+      "actual": "403",
+      "expected": "403",
+      "status": "PASS"
+    },
+    {
+      "caseId": "stale-version",
+      "actual": "409",
+      "expected": "409",
+      "status": "PASS"
+    },
+    {
+      "caseId": "reject-workflow-NEEDS_DECISION",
+      "actual": false,
+      "expected": false,
+      "status": "PASS"
+    },
+    {
+      "caseId": "accept-wire-NEEDS_REVIEW",
+      "actual": true,
+      "expected": true,
+      "status": "PASS"
+    },
+    {
+      "caseId": "reject-workflow-PROPOSAL_READY",
+      "actual": false,
+      "expected": false,
+      "status": "PASS"
+    },
+    {
+      "caseId": "accept-wire-READY_FOR_PROPOSAL",
+      "actual": true,
+      "expected": true,
+      "status": "PASS"
+    },
+    {
+      "caseId": "anonymous-no-snapshot",
+      "actual": {
+        "http": 401,
+        "bodyKind": "ProblemDetails",
+        "snapshotRead": false
+      },
+      "expected": {
+        "http": 401,
+        "bodyKind": "ProblemDetails",
+        "snapshotRead": false
+      },
+      "status": "PASS"
+    },
+    {
+      "caseId": "forbidden-no-snapshot",
+      "actual": {
+        "http": 403,
+        "bodyKind": "ProblemDetails",
+        "snapshotRead": false
+      },
+      "expected": {
+        "http": 403,
+        "bodyKind": "ProblemDetails",
+        "snapshotRead": false
+      },
+      "status": "PASS"
+    },
+    {
+      "caseId": "authorized-snapshot",
+      "actual": {
+        "http": 200,
+        "bodyKind": "G4QueryResultV1",
+        "snapshotRead": true
+      },
+      "expected": {
+        "http": 200,
+        "bodyKind": "G4QueryResultV1",
+        "snapshotRead": true
+      },
+      "status": "PASS"
+    }
+  ],
+  "caseCount": 28,
+  "productRuntime": "NOT_RUN",
+  "limitations": [
+    "semantic checks are synthetic expected contract behavior, not production guard tests",
+    "Datum and rollback schemas remain explicitly blocked for M4/M3 implementation"
+  ]
+}

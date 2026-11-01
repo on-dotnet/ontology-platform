@@ -1,0 +1,56 @@
+{
+  "evidenceSchemaVersion": 1,
+  "checks": [
+    {
+      "name": "v11-input-and-schema",
+      "command": "python verify_input.py; isolated python verify_schema.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "24files/22payload; 21 positive,16 schema rejected,3 schema-valid semantic rejected,2 inline; static-results.json"
+    },
+    {
+      "name": "g2-frozen-binding",
+      "command": "python3 docs/evidence/G4-00-CONTRACT-001/check-bindings.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "37 static checks; G2/G3 referenced hashes unchanged; no product compatibility execution"
+    },
+    {
+      "name": "review-regressions",
+      "command": "isolated python -B docs/evidence/G4-00-CONTRACT-001/check-review-cases.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "28 synthetic design checks; original21/16 preserved"
+    },
+    {
+      "name": "engineering-selftest",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1 -SelfTest (same Base script, task Root)",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Full SelfTest completed exit0; selftest-receipt.json records exact command, output hash and timeline"
+    },
+    {
+      "name": "g4-product-runtime",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "No five-source/.NET/HTTP/browser/Docker/model/production execution authorized in this task"
+    }
+  ],
+  "ci": {
+    "status": "NOT_RUN",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  },
+  "metadata": {
+    "taskId": "G4-00-CONTRACT-001",
+    "stage": "CONTRACT_ONLY",
+    "actualAgentActiveTime": "UNKNOWN",
+    "implementationBlockedAdr": [
+      "G4-ADR-05 rollback DTO",
+      "G4-ADR-06 full Datum"
+    ]
+  }
+}

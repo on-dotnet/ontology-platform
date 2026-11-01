@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "taskId": "G4-00-CONTRACT-001",
+  "packageVersion": "1.1",
+  "createdDate": "2026-11-01",
+  "project": "on-dotnet/ontology-platform",
+  "mainShaVerified": "d1a61daffe844475b07705797e3ad325cc3f2945",
+  "executionAuthorized": false,
+  "packagePurpose": "CHATGPT_DESIGN_CORRECTION_AND_FUTURE_CODEX_INPUT_ONLY",
+  "reviewStatus": "REQUEST_CHANGES_RESOLVED_DESIGN_ONLY",
+  "runtimeStatus": "NOT_RUN",
+  "previousPackageSha256": "0e397b907b81aa4e41854eac395dd4a02fb9145a358208f5bdf2328ae2c6a281",
+  "correctionIds": [
+    "CR-01",
+    "CR-02",
+    "CR-03",
+    "CR-04"
+  ],
+  "designValidation": {
+    "schemaKinds": 9,
+    "positiveExamples": 21,
+    "negativeSchemaRegressions": 16,
+    "negativeSemanticRegressions": 3,
+    "uxUnits": 13,
+    "contractAcceptanceCases": 20,
+    "futureProductAcceptanceCases": 70
+  },
+  "members": {
+    "README-FIRST.md": {
+      "bytes": 3629,
+      "sha256": "e533d0d8853ccb1fee2e06b871f2639154b3ddde2f7841e53b2be4cb53b433a8"
+    },
+    "contracts/g4-proposed-wire-contract.schema.json": {
+      "bytes": 49453,
+      "sha256": "a3817cc608ddc69bb152809d3e7e995b97b805711515ef46897b8a4ede564e07"
+    },
+    "docs/01-BASELINE-AND-ROADMAP.md": {
+      "bytes": 5817,
+      "sha256": "eda2e270141bcf55da4dc1a4a9c230f9c581f842a75e41cccfd4ce52ffcac6f1"
+    },
+    "docs/02-G4-PRODUCT-PRD.md": {
+      "bytes": 13954,
+      "sha256": "dc77bdf6fceeab31cacb7888428287a9521a3ea8f242152da15cad0ff996cde5"
+    },
+    "docs/03-G4-UX-STATE-MATRIX.md": {
+      "bytes": 14584,
+      "sha256": "b1b527e0c8df6c1dbf8058dc95798cdaf29955fcb311158d9785bc58335e2f04"
+    },
+    "docs/04-CONNECTOR-MATRIX.md": {
+      "bytes": 13327,
+      "sha256": "f33a7ad2caad14d7f17d0924e9763bb8293c1bd436f314a99a9408396126787c"
+    },
+    "docs/05-DATA-API-CONTRACT.md": {
+      "bytes": 24683,
+      "sha256": "365c8dc875b315782be3b898c22cbf6e4fbd60473aa6e9d744205392e1dc40a0"
+    },
+    "docs/06-SECURITY-AND-QUERY.md": {
+      "bytes": 13243,
+      "sha256": "c6271c354216ae2754dd6df7ac0ea522d6da6705972e1746d407b4b97afe7300"
+    },
+    "docs/07-AI-NATIVE-ALIGNMENT.md": {
+      "bytes": 8899,
+      "sha256": "02a661130859b062d10d929b3b3faf552902729a591a20a86079ce72030439f9"
+    },
+    "docs/08-STAGES-ACCEPTANCE.md": {
+      "bytes": 14751,
+      "sha256": "d32742eca8a5010a82e005d7d76f516c8f5413f95f3efaa1d24ba244e7c1c7c0"
+    },
+    "docs/09-CODEX-EXECUTION-CONTRACT.md": {
+      "bytes": 10853,
+      "sha256": "c596e497de6f814b5497e52697866770538cb1f8b0e5d7ff355be73840fa0348"
+    },
+    "docs/10-CODEX-START-COPY.md": {
+      "bytes": 3927,
+      "sha256": "5c3ede11734c80f14f823bf460e3d188c9f3405ad39e4c965f973fc4653f9f8b"
+    },
+    "docs/11-PITFALL-QUALITY-GATES.md": {
+      "bytes": 7846,
+      "sha256": "f72a266aa6343e65944a2f49358d5dfea97e4cf9f5dfaf6bd742af094464ed56"
+    },
+    "docs/12-DESIGN-REVIEW.md": {
+      "bytes": 6889,
+      "sha256": "51dc6c8fc3089d654e82e75094e57dbba4b19b9c8fad9110cb98a462996304a7"
+    },
+    "docs/13-SOURCES-AND-DECISIONS.md": {
+      "bytes": 7686,
+      "sha256": "651d189b98eb66bb41c9d39948000e5a96b7559ff4eb758577af0582d76378f9"
+    },
+    "docs/14-REVIEW-CLOSURE.md": {
+      "bytes": 6973,
+      "sha256": "68f695f36201ed9d372d6b72f4f43761befbdd4994f872b5906cfd0dd9be6b59"
+    },
+    "samples/g4-design-negative-cases.json": {
+      "bytes": 3784,
+      "sha256": "15aec84a5c7f4877b22f558cd1f2a4a437e11a80bb2feee150830966c3a6994d"
+    },
+    "samples/g4-design-positive-synthetic.json": {
+      "bytes": 20722,
+      "sha256": "04c34b4dcc50691db4d94a2315bbe991bc7aea6394a45d90ec70868d4592403b"
+    },
+    "samples/g4-wire-contract-v11-negative-mutations.json": {
+      "bytes": 28422,
+      "sha256": "6c39131b04f429b1d69b2b11380baa0944e46f33f2e21275759b75e6984d012e"
+    },
+    "samples/g4-wire-contract-v11-semantic-negative-cases.json": {
+      "bytes": 7889,
+      "sha256": "62fc1be70ef35479356d0e6c72dbc4e9f9726fe7d42d2d168d160da385ab7c78"
+    },
+    "verify_input.py": {
+      "bytes": 5680,
+      "sha256": "2d2971096b529cbdee572ebde29c7b8ab6948318b45b4dcdaaf894fe798cd324"
+    },
+    "verify_schema.py": {
+      "bytes": 4343,
+      "sha256": "55e976ecba5a79a8d4750db50486712010b2b7683fbd3d602a8f1d612888f321"
+    }
+  }
+}

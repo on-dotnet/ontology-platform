@@ -1,0 +1,957 @@
+[
+  {
+    "caseId": "R01",
+    "description": "P1: ambiguous without required candidates",
+    "expectedValidation": "FAIL",
+    "payload": {
+      "schemaKind": "G4QueryResultV1",
+      "payload": {
+        "status": "AMBIGUOUS",
+        "traceId": "trace-syn-001",
+        "limited": false,
+        "snapshot": {
+          "ontologyReleaseId": "ont-syn-001",
+          "mappingReleaseIds": [
+            "map-syn-001"
+          ],
+          "sourceCatalogSnapshotIds": [
+            "catalog-syn-001"
+          ],
+          "capabilityId": "resolve_entity",
+          "capabilityVersion": "synthetic-capability-v1"
+        },
+        "data": [],
+        "subSources": [
+          {
+            "connectionId": "conn-syn-001",
+            "status": "SUCCESS",
+            "observedAtUtc": "2026-11-01T00:00:00Z",
+            "watermarkKind": "UNKNOWN",
+            "sourceReadReceiptId": "receipt-syn-a",
+            "limited": false
+          }
+        ],
+        "schemaVersion": "g4.query-result.v1",
+        "evidence": [
+          {
+            "evidenceId": "ev-syn-a",
+            "connectionId": "conn-syn-001",
+            "mappingReleaseId": "map-syn-001",
+            "sourceCatalogSnapshotId": "catalog-syn-001",
+            "sourceDatasetRef": "dataset-syn-a",
+            "sourceReadReceiptId": "receipt-syn-a",
+            "scope": {
+              "organizationId": "ORG_SYN",
+              "siteIds": [
+                "SITE_A"
+              ]
+            },
+            "precision": "ROW_KEY",
+            "sourceRecordRef": "keyhash-syn-a",
+            "validTime": null,
+            "observedAtUtc": "2026-11-01T00:00:00Z"
+          },
+          {
+            "evidenceId": "ev-syn-b",
+            "connectionId": "conn-syn-001",
+            "mappingReleaseId": "map-syn-001",
+            "sourceCatalogSnapshotId": "catalog-syn-001",
+            "sourceDatasetRef": "dataset-syn-b",
+            "sourceReadReceiptId": "receipt-syn-b",
+            "scope": {
+              "organizationId": "ORG_SYN",
+              "siteIds": [
+                "SITE_A"
+              ]
+            },
+            "precision": "ROW_KEY",
+            "sourceRecordRef": "keyhash-syn-b",
+            "validTime": null,
+            "observedAtUtc": "2026-11-01T00:00:00Z"
+          }
+        ],
+        "validTime": null,
+        "observedAtUtc": "2026-11-01T00:00:00Z",
+        "diagnostics": []
+      }
+    }
+  },
+  {
+    "caseId": "R02",
+    "description": "P1: ambiguous empty candidates",
+    "expectedValidation": "FAIL",
+    "payload": {
+      "schemaKind": "G4QueryResultV1",
+      "payload": {
+        "status": "AMBIGUOUS",
+        "traceId": "trace-syn-001",
+        "limited": false,
+        "snapshot": {
+          "ontologyReleaseId": "ont-syn-001",
+          "mappingReleaseIds": [
+            "map-syn-001"
+          ],
+          "sourceCatalogSnapshotIds": [
+            "catalog-syn-001"
+          ],
+          "capabilityId": "resolve_entity",
+          "capabilityVersion": "synthetic-capability-v1"
+        },
+        "data": [],
+        "subSources": [
+          {
+            "connectionId": "conn-syn-001",
+            "status": "SUCCESS",
+            "observedAtUtc": "2026-11-01T00:00:00Z",
+            "watermarkKind": "UNKNOWN",
+            "sourceReadReceiptId": "receipt-syn-a",
+            "limited": false
+          }
+        ],
+        "schemaVersion": "g4.query-result.v1",
+        "candidates": [],
+        "evidence": [
+          {
+            "evidenceId": "ev-syn-a",
+            "connectionId": "conn-syn-001",
+            "mappingReleaseId": "map-syn-001",
+            "sourceCatalogSnapshotId": "catalog-syn-001",
+            "sourceDatasetRef": "dataset-syn-a",
+            "sourceReadReceiptId": "receipt-syn-a",
+            "scope": {
+              "organizationId": "ORG_SYN",
+              "siteIds": [
+                "SITE_A"
+              ]
+            },
+            "precision": "ROW_KEY",
+            "sourceRecordRef": "keyhash-syn-a",
+            "validTime": null,
+            "observedAtUtc": "2026-11-01T00:00:00Z"
+          },
+          {
+            "evidenceId": "ev-syn-b",
+            "connectionId": "conn-syn-001",
+            "mappingReleaseId": "map-syn-001",
+            "sourceCatalogSnapshotId": "catalog-syn-001",
+            "sourceDatasetRef": "dataset-syn-b",
+            "sourceReadReceiptId": "receipt-syn-b",
+            "scope": {
+              "organizationId": "ORG_SYN",
+              "siteIds": [
+                "SITE_A"
+              ]
+            },
+            "precision": "ROW_KEY",
+            "sourceRecordRef": "keyhash-syn-b",
+            "validTime": null,
+            "observedAtUtc": "2026-11-01T00:00:00Z"
+          }
+        ],
+        "validTime": null,
+        "observedAtUtc": "2026-11-01T00:00:00Z",
+        "diagnostics": []
+      }
+    }
+  },
+  {
+    "caseId": "R03",
+    "description": "P1: missing evidence chain",
+    "expectedValidation": "FAIL",
+    "payload": {
+      "schemaKind": "G4QueryResultV1",
+      "payload": {
+        "status": "AMBIGUOUS",
+        "traceId": "trace-syn-001",
+        "limited": false,
+        "snapshot": {
+          "ontologyReleaseId": "ont-syn-001",
+          "mappingReleaseIds": [
+            "map-syn-001"
+          ],
+          "sourceCatalogSnapshotIds": [
+            "catalog-syn-001"
+          ],
+          "capabilityId": "resolve_entity",
+          "capabilityVersion": "synthetic-capability-v1"
+        },
+        "data": [],
+        "subSources": [
+          {
+            "connectionId": "conn-syn-001",
+            "status": "SUCCESS",
+            "observedAtUtc": "2026-11-01T00:00:00Z",
+            "watermarkKind": "UNKNOWN",
+            "sourceReadReceiptId": "receipt-syn-a",
+            "limited": false
+          }
+        ],
+        "schemaVersion": "g4.query-result.v1",
+        "candidates": [
+          {
+            "entityIri": "urn:synthetic:site-a:qms:heat:001",
+            "entityTypeIris": [
+              "urn:synthetic:ontology:Heat"
+            ],
+            "externalId": "001",
+            "organizationId": "ORG_SYN",
+            "siteId": "SITE_A",
+            "label": "QMS炉次001",
+            "evidenceIds": [
+              "ev-syn-a"
+            ]
+          },
+          {
+            "entityIri": "urn:synthetic:site-a:mes:heat:001",
+            "entityTypeIris": [
+              "urn:synthetic:ontology:Heat"
+            ],
+            "externalId": "001",
+            "organizationId": "ORG_SYN",
+            "siteId": "SITE_A",
+            "label": "MES炉次001（未合并）",
+            "evidenceIds": [
+              "ev-syn-b"
+            ]
+          }
+        ],
+        "validTime": null,
+        "observedAtUtc": "2026-11-01T00:00:00Z",
+        "diagnostics": []
+      }
+    }
+  },
+  {
+    "caseId": "R04",
+    "description": "P1: extra query result field rejected",
+    "expectedValidation": "FAIL",
+    "payload": {
+      "schemaKind": "G4QueryResultV1",
+      "payload": {
+        "status": "AMBIGUOUS",
+        "traceId": "trace-syn-001",
+        "limited": false,
+        "snapshot": {
+          "ontologyReleaseId": "ont-syn-001",
+          "mappingReleaseIds": [
+            "map-syn-001"
+          ],
+          "sourceCatalogSnapshotIds": [
+            "catalog-syn-001"
+          ],
+          "capabilityId": "resolve_entity",
+          "capabilityVersion": "synthetic-capability-v1"
+        },
+        "data": [],
+        "subSources": [
+          {
+            "connectionId": "conn-syn-001",
+            "status": "SUCCESS",
+            "observedAtUtc": "2026-11-01T00:00:00Z",
+            "watermarkKind": "UNKNOWN",
+            "sourceReadReceiptId": "receipt-syn-a",
+            "limited": false
+          }
+        ],
+        "schemaVersion": "g4.query-result.v1",
+        "candidates": [
+          {
+            "entityIri": "urn:synthetic:site-a:qms:heat:001",
+            "entityTypeIris": [
+              "urn:synthetic:ontology:Heat"
+            ],
+            "externalId": "001",
+            "organizationId": "ORG_SYN",
+            "siteId": "SITE_A",
+            "label": "QMS炉次001",
+            "evidenceIds": [
+              "ev-syn-a"
+            ]
+          },
+          {
+            "entityIri": "urn:synthetic:site-a:mes:heat:001",
+            "entityTypeIris": [
+              "urn:synthetic:ontology:Heat"
+            ],
+            "externalId": "001",
+            "organizationId": "ORG_SYN",
+            "siteId": "SITE_A",
+            "label": "MES炉次001（未合并）",
+            "evidenceIds": [
+              "ev-syn-b"
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "evidenceId": "ev-syn-a",
+            "connectionId": "conn-syn-001",
+            "mappingReleaseId": "map-syn-001",
+            "sourceCatalogSnapshotId": "catalog-syn-001",
+            "sourceDatasetRef": "dataset-syn-a",
+            "sourceReadReceiptId": "receipt-syn-a",
+            "scope": {
+              "organizationId": "ORG_SYN",
+              "siteIds": [
+                "SITE_A"
+              ]
+            },
+            "precision": "ROW_KEY",
+            "sourceRecordRef": "keyhash-syn-a",
+            "validTime": null,
+            "observedAtUtc": "2026-11-01T00:00:00Z"
+          },
+          {
+            "evidenceId": "ev-syn-b",
+            "connectionId": "conn-syn-001",
+            "mappingReleaseId": "map-syn-001",
+            "sourceCatalogSnapshotId": "catalog-syn-001",
+            "sourceDatasetRef": "dataset-syn-b",
+            "sourceReadReceiptId": "receipt-syn-b",
+            "scope": {
+              "organizationId": "ORG_SYN",
+              "siteIds": [
+                "SITE_A"
+              ]
+            },
+            "precision": "ROW_KEY",
+            "sourceRecordRef": "keyhash-syn-b",
+            "validTime": null,
+            "observedAtUtc": "2026-11-01T00:00:00Z"
+          }
+        ],
+        "validTime": null,
+        "observedAtUtc": "2026-11-01T00:00:00Z",
+        "diagnostics": [],
+        "unknownFields": "silently-dropped"
+      }
+    }
+  },
+  {
+    "caseId": "R05",
+    "description": "P1: observed time missing",
+    "expectedValidation": "FAIL",
+    "payload": {
+      "schemaKind": "G4QueryResultV1",
+      "payload": {
+        "status": "AMBIGUOUS",
+        "traceId": "trace-syn-001",
+        "limited": false,
+        "snapshot": {
+          "ontologyReleaseId": "ont-syn-001",
+          "mappingReleaseIds": [
+            "map-syn-001"
+          ],
+          "sourceCatalogSnapshotIds": [
+            "catalog-syn-001"
+          ],
+          "capabilityId": "resolve_entity",
+          "capabilityVersion": "synthetic-capability-v1"
+        },
+        "data": [],
+        "subSources": [
+          {
+            "connectionId": "conn-syn-001",
+            "status": "SUCCESS",
+            "observedAtUtc": "2026-11-01T00:00:00Z",
+            "watermarkKind": "UNKNOWN",
+            "sourceReadReceiptId": "receipt-syn-a",
+            "limited": false
+          }
+        ],
+        "schemaVersion": "g4.query-result.v1",
+        "candidates": [
+          {
+            "entityIri": "urn:synthetic:site-a:qms:heat:001",
+            "entityTypeIris": [
+              "urn:synthetic:ontology:Heat"
+            ],
+            "externalId": "001",
+            "organizationId": "ORG_SYN",
+            "siteId": "SITE_A",
+            "label": "QMS炉次001",
+            "evidenceIds": [
+              "ev-syn-a"
+            ]
+          },
+          {
+            "entityIri": "urn:synthetic:site-a:mes:heat:001",
+            "entityTypeIris": [
+              "urn:synthetic:ontology:Heat"
+            ],
+            "externalId": "001",
+            "organizationId": "ORG_SYN",
+            "siteId": "SITE_A",
+            "label": "MES炉次001（未合并）",
+            "evidenceIds": [
+              "ev-syn-b"
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "evidenceId": "ev-syn-a",
+            "connectionId": "conn-syn-001",
+            "mappingReleaseId": "map-syn-001",
+            "sourceCatalogSnapshotId": "catalog-syn-001",
+            "sourceDatasetRef": "dataset-syn-a",
+            "sourceReadReceiptId": "receipt-syn-a",
+            "scope": {
+              "organizationId": "ORG_SYN",
+              "siteIds": [
+                "SITE_A"
+              ]
+            },
+            "precision": "ROW_KEY",
+            "sourceRecordRef": "keyhash-syn-a",
+            "validTime": null,
+            "observedAtUtc": "2026-11-01T00:00:00Z"
+          },
+          {
+            "evidenceId": "ev-syn-b",
+            "connectionId": "conn-syn-001",
+            "mappingReleaseId": "map-syn-001",
+            "sourceCatalogSnapshotId": "catalog-syn-001",
+            "sourceDatasetRef": "dataset-syn-b",
+            "sourceReadReceiptId": "receipt-syn-b",
+            "scope": {
+              "organizationId": "ORG_SYN",
+              "siteIds": [
+                "SITE_A"
+              ]
+            },
+            "precision": "ROW_KEY",
+            "sourceRecordRef": "keyhash-syn-b",
+            "validTime": null,
+            "observedAtUtc": "2026-11-01T00:00:00Z"
+          }
+        ],
+        "validTime": null,
+        "diagnostics": []
+      }
+    }
+  },
+  {
+    "caseId": "R06",
+    "description": "P2: create command missing",
+    "expectedValidation": "FAIL",
+    "payload": {
+      "schemaKind": "ConnectionCreateRequest",
+      "payload": {
+        "displayName": "示例 POSTGRESQL 只读连接",
+        "scopeSelection": {
+          "organizationId": "ORG_SYN",
+          "siteIds": [
+            "SITE_A"
+          ]
+        },
+        "config": {
+          "type": "POSTGRESQL",
+          "profile": {
+            "host": "db.example.invalid",
+            "port": 5432,
+            "database": "qms",
+            "username": "qms_read",
+            "sslMode": "VerifyFull",
+            "allowedSchemas": [
+              "production"
+            ]
+          }
+        },
+        "secretRef": "secret-synthetic-only"
+      }
+    }
+  },
+  {
+    "caseId": "R07",
+    "description": "P2: initial command expectedRevision must be zero",
+    "expectedValidation": "FAIL",
+    "payload": {
+      "schemaKind": "ConnectionCreateRequest",
+      "payload": {
+        "displayName": "示例 POSTGRESQL 只读连接",
+        "scopeSelection": {
+          "organizationId": "ORG_SYN",
+          "siteIds": [
+            "SITE_A"
+          ]
+        },
+        "config": {
+          "type": "POSTGRESQL",
+          "profile": {
+            "host": "db.example.invalid",
+            "port": 5432,
+            "database": "qms",
+            "username": "qms_read",
+            "sslMode": "VerifyFull",
+            "allowedSchemas": [
+              "production"
+            ]
+          }
+        },
+        "secretRef": "secret-synthetic-only",
+        "command": {
+          "commandId": "cmd-syn-01",
+          "idempotencyKey": "idem-syn-01",
+          "expectedRevision": null,
+          "reason": "合成设计用例"
+        }
+      }
+    }
+  },
+  {
+    "caseId": "R08",
+    "description": "P2: old conflicting flat creation format",
+    "expectedValidation": "FAIL",
+    "payload": {
+      "schemaKind": "ConnectionCreateRequest",
+      "payload": {
+        "displayName": "示例 POSTGRESQL 只读连接",
+        "scopeSelection": {
+          "organizationId": "ORG_SYN",
+          "siteIds": [
+            "SITE_A"
+          ]
+        },
+        "config": {
+          "type": "POSTGRESQL",
+          "profile": {
+            "host": "db.example.invalid",
+            "port": 5432,
+            "database": "qms",
+            "username": "qms_read",
+            "sslMode": "VerifyFull",
+            "allowedSchemas": [
+              "production"
+            ]
+          }
+        },
+        "secretRef": "secret-synthetic-only",
+        "command": {
+          "commandId": "cmd-syn-01",
+          "idempotencyKey": "idem-syn-01",
+          "expectedRevision": 0,
+          "reason": "合成设计用例"
+        },
+        "type": "POSTGRESQL",
+        "connectionProfile": {
+          "host": "x"
+        },
+        "secretInput": "raw-stub"
+      }
+    }
+  },
+  {
+    "caseId": "R09",
+    "description": "P2: second TDengine credential pointer forbidden",
+    "expectedValidation": "FAIL",
+    "payload": {
+      "schemaKind": "ConnectionCreateRequest",
+      "payload": {
+        "displayName": "示例 TDENGINE 只读连接",
+        "scopeSelection": {
+          "organizationId": "ORG_SYN",
+          "siteIds": [
+            "SITE_A"
+          ]
+        },
+        "config": {
+          "type": "TDENGINE",
+          "profile": {
+            "wsUrl": "wss://taos.example.invalid:6041",
+            "database": "process",
+            "timePrecision": "NANOSECOND",
+            "timeZone": null,
+            "credentialRef": "duplicated-secret"
+          }
+        },
+        "secretRef": "secret-synthetic-only",
+        "command": {
+          "commandId": "cmd-syn-04",
+          "idempotencyKey": "idem-syn-04",
+          "expectedRevision": 0,
+          "reason": "合成设计用例"
+        }
+      }
+    }
+  },
+  {
+    "caseId": "R10",
+    "description": "P2: unauthenticated Web API must use null secretRef",
+    "expectedValidation": "FAIL",
+    "payload": {
+      "schemaKind": "ConnectionCreateRequest",
+      "payload": {
+        "displayName": "示例 WEB_API 无认证只读连接",
+        "scopeSelection": {
+          "organizationId": "ORG_SYN",
+          "siteIds": [
+            "SITE_A"
+          ]
+        },
+        "config": {
+          "type": "WEB_API",
+          "profile": {
+            "baseOrigin": "https://api.example.invalid",
+            "operationId": "getBatchByHeat",
+            "method": "GET",
+            "approvedPath": "/read/heat/{heatId}",
+            "authentication": "NONE",
+            "pagination": "CURSOR",
+            "hostPolicyRef": "allowlist-fake-001"
+          }
+        },
+        "secretRef": "some-secret-ref",
+        "command": {
+          "commandId": "cmd-syn-webanon",
+          "idempotencyKey": "idem-syn-webanon",
+          "expectedRevision": 0,
+          "reason": "匿名API设计分支"
+        }
+      }
+    }
+  },
+  {
+    "caseId": "R11",
+    "description": "P2: authenticated Web API cannot have null secretRef",
+    "expectedValidation": "FAIL",
+    "payload": {
+      "schemaKind": "ConnectionCreateRequest",
+      "payload": {
+        "displayName": "示例 WEB_API 只读连接",
+        "scopeSelection": {
+          "organizationId": "ORG_SYN",
+          "siteIds": [
+            "SITE_A"
+          ]
+        },
+        "config": {
+          "type": "WEB_API",
+          "profile": {
+            "baseOrigin": "https://api.example.invalid",
+            "operationId": "getBatchByHeat",
+            "method": "GET",
+            "approvedPath": "/read/heat/{heatId}",
+            "authentication": "API_KEY_REF",
+            "pagination": "CURSOR",
+            "hostPolicyRef": "allowlist-fake-001"
+          }
+        },
+        "secretRef": null,
+        "command": {
+          "commandId": "cmd-syn-05",
+          "idempotencyKey": "idem-syn-05",
+          "expectedRevision": 0,
+          "reason": "合成设计用例"
+        }
+      }
+    }
+  },
+  {
+    "caseId": "R12",
+    "description": "P2: PostgreSQL cannot have null secretRef",
+    "expectedValidation": "FAIL",
+    "payload": {
+      "schemaKind": "ConnectionCreateRequest",
+      "payload": {
+        "displayName": "示例 POSTGRESQL 只读连接",
+        "scopeSelection": {
+          "organizationId": "ORG_SYN",
+          "siteIds": [
+            "SITE_A"
+          ]
+        },
+        "config": {
+          "type": "POSTGRESQL",
+          "profile": {
+            "host": "db.example.invalid",
+            "port": 5432,
+            "database": "qms",
+            "username": "qms_read",
+            "sslMode": "VerifyFull",
+            "allowedSchemas": [
+              "production"
+            ]
+          }
+        },
+        "secretRef": null,
+        "command": {
+          "commandId": "cmd-syn-01",
+          "idempotencyKey": "idem-syn-01",
+          "expectedRevision": 0,
+          "reason": "合成设计用例"
+        }
+      }
+    }
+  },
+  {
+    "caseId": "R13",
+    "description": "P2: cross-user proposal must freeze catalog identity",
+    "expectedValidation": "FAIL",
+    "payload": {
+      "schemaKind": "MappingProposalView",
+      "payload": {
+        "proposalId": "proposal-syn-001",
+        "draftId": "draft-syn-001",
+        "draftRevision": 1,
+        "scope": {
+          "organizationId": "ORG_SYN",
+          "siteIds": [
+            "SITE_A"
+          ]
+        },
+        "sourceConnectionId": "conn-syn-001",
+        "connectionRevision": 1,
+        "sourceCatalogSnapshotId": "catalog-syn-001",
+        "ontologyReleaseId": "ont-syn-001",
+        "mappingHash": "sha256:synthetic-mapping",
+        "validationHash": "sha256:synthetic-validation",
+        "impactHash": "sha256:synthetic-impact",
+        "submittedBy": "actor-syn-author",
+        "submittedAtUtc": "2026-11-01T00:00:00Z",
+        "expiresAtUtc": "2026-11-02T00:00:00Z",
+        "status": "PENDING",
+        "decision": null
+      }
+    }
+  },
+  {
+    "caseId": "R14",
+    "description": "P1: bounded query depth is 1..5",
+    "expectedValidation": "FAIL",
+    "payload": {
+      "schemaKind": "SemanticQuery",
+      "payload": {
+        "assetId": "asset-syn-001",
+        "ontologyReleaseId": "ont-syn-001",
+        "mappingReleaseIds": [
+          "map-syn-001"
+        ],
+        "capabilityId": "resolve_entity",
+        "maxRows": 20,
+        "timeoutMs": 3000,
+        "filters": {
+          "siteId": "SITE_A",
+          "entityExternalId": "001",
+          "validFrom": null,
+          "validTo": null
+        },
+        "capabilityVersion": "synthetic-capability-v1",
+        "depth": 10,
+        "relationshipIris": []
+      }
+    }
+  },
+  {
+    "caseId": "R15",
+    "description": "P1: structured arbitrary evidence ref invalid",
+    "expectedValidation": "FAIL",
+    "payload": {
+      "schemaKind": "G4QueryResultV1",
+      "payload": {
+        "status": "AMBIGUOUS",
+        "traceId": "trace-syn-001",
+        "limited": false,
+        "snapshot": {
+          "ontologyReleaseId": "ont-syn-001",
+          "mappingReleaseIds": [
+            "map-syn-001"
+          ],
+          "sourceCatalogSnapshotIds": [
+            "catalog-syn-001"
+          ],
+          "capabilityId": "resolve_entity",
+          "capabilityVersion": "synthetic-capability-v1"
+        },
+        "data": [],
+        "subSources": [
+          {
+            "connectionId": "conn-syn-001",
+            "status": "SUCCESS",
+            "observedAtUtc": "2026-11-01T00:00:00Z",
+            "watermarkKind": "UNKNOWN",
+            "sourceReadReceiptId": "receipt-syn-a",
+            "limited": false
+          }
+        ],
+        "schemaVersion": "g4.query-result.v1",
+        "candidates": [
+          {
+            "entityIri": "urn:synthetic:site-a:qms:heat:001",
+            "entityTypeIris": [
+              "urn:synthetic:ontology:Heat"
+            ],
+            "externalId": "001",
+            "organizationId": "ORG_SYN",
+            "siteId": "SITE_A",
+            "label": "QMS炉次001",
+            "evidenceIds": [
+              "ev-syn-a"
+            ]
+          },
+          {
+            "entityIri": "urn:synthetic:site-a:mes:heat:001",
+            "entityTypeIris": [
+              "urn:synthetic:ontology:Heat"
+            ],
+            "externalId": "001",
+            "organizationId": "ORG_SYN",
+            "siteId": "SITE_A",
+            "label": "MES炉次001（未合并）",
+            "evidenceIds": [
+              "ev-syn-b"
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "evidenceId": "ev-syn-a",
+            "connectionId": "conn-syn-001",
+            "mappingReleaseId": "map-syn-001",
+            "sourceCatalogSnapshotId": "catalog-syn-001",
+            "sourceDatasetRef": "dataset-syn-a",
+            "sourceReadReceiptId": "receipt-syn-a",
+            "scope": {
+              "organizationId": "ORG_SYN",
+              "siteIds": [
+                "SITE_A"
+              ]
+            },
+            "precision": "ROW_KEY",
+            "sourceRecordRef": {
+              "rawSQL": "unsafe"
+            },
+            "validTime": null,
+            "observedAtUtc": "2026-11-01T00:00:00Z"
+          },
+          {
+            "evidenceId": "ev-syn-b",
+            "connectionId": "conn-syn-001",
+            "mappingReleaseId": "map-syn-001",
+            "sourceCatalogSnapshotId": "catalog-syn-001",
+            "sourceDatasetRef": "dataset-syn-b",
+            "sourceReadReceiptId": "receipt-syn-b",
+            "scope": {
+              "organizationId": "ORG_SYN",
+              "siteIds": [
+                "SITE_A"
+              ]
+            },
+            "precision": "ROW_KEY",
+            "sourceRecordRef": "keyhash-syn-b",
+            "validTime": null,
+            "observedAtUtc": "2026-11-01T00:00:00Z"
+          }
+        ],
+        "validTime": null,
+        "observedAtUtc": "2026-11-01T00:00:00Z",
+        "diagnostics": []
+      }
+    }
+  },
+  {
+    "caseId": "R16",
+    "description": "P1: source precision enum rejects fabrication",
+    "expectedValidation": "FAIL",
+    "payload": {
+      "schemaKind": "G4QueryResultV1",
+      "payload": {
+        "status": "AMBIGUOUS",
+        "traceId": "trace-syn-001",
+        "limited": false,
+        "snapshot": {
+          "ontologyReleaseId": "ont-syn-001",
+          "mappingReleaseIds": [
+            "map-syn-001"
+          ],
+          "sourceCatalogSnapshotIds": [
+            "catalog-syn-001"
+          ],
+          "capabilityId": "resolve_entity",
+          "capabilityVersion": "synthetic-capability-v1"
+        },
+        "data": [],
+        "subSources": [
+          {
+            "connectionId": "conn-syn-001",
+            "status": "SUCCESS",
+            "observedAtUtc": "2026-11-01T00:00:00Z",
+            "watermarkKind": "UNKNOWN",
+            "sourceReadReceiptId": "receipt-syn-a",
+            "limited": false
+          }
+        ],
+        "schemaVersion": "g4.query-result.v1",
+        "candidates": [
+          {
+            "entityIri": "urn:synthetic:site-a:qms:heat:001",
+            "entityTypeIris": [
+              "urn:synthetic:ontology:Heat"
+            ],
+            "externalId": "001",
+            "organizationId": "ORG_SYN",
+            "siteId": "SITE_A",
+            "label": "QMS炉次001",
+            "evidenceIds": [
+              "ev-syn-a"
+            ]
+          },
+          {
+            "entityIri": "urn:synthetic:site-a:mes:heat:001",
+            "entityTypeIris": [
+              "urn:synthetic:ontology:Heat"
+            ],
+            "externalId": "001",
+            "organizationId": "ORG_SYN",
+            "siteId": "SITE_A",
+            "label": "MES炉次001（未合并）",
+            "evidenceIds": [
+              "ev-syn-b"
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "evidenceId": "ev-syn-a",
+            "connectionId": "conn-syn-001",
+            "mappingReleaseId": "map-syn-001",
+            "sourceCatalogSnapshotId": "catalog-syn-001",
+            "sourceDatasetRef": "dataset-syn-a",
+            "sourceReadReceiptId": "receipt-syn-a",
+            "scope": {
+              "organizationId": "ORG_SYN",
+              "siteIds": [
+                "SITE_A"
+              ]
+            },
+            "precision": "FABRICATED_ROW",
+            "sourceRecordRef": "keyhash-syn-a",
+            "validTime": null,
+            "observedAtUtc": "2026-11-01T00:00:00Z"
+          },
+          {
+            "evidenceId": "ev-syn-b",
+            "connectionId": "conn-syn-001",
+            "mappingReleaseId": "map-syn-001",
+            "sourceCatalogSnapshotId": "catalog-syn-001",
+            "sourceDatasetRef": "dataset-syn-b",
+            "sourceReadReceiptId": "receipt-syn-b",
+            "scope": {
+              "organizationId": "ORG_SYN",
+              "siteIds": [
+                "SITE_A"
+              ]
+            },
+            "precision": "ROW_KEY",
+            "sourceRecordRef": "keyhash-syn-b",
+            "validTime": null,
+            "observedAtUtc": "2026-11-01T00:00:00Z"
+          }
+        ],
+        "validTime": null,
+        "observedAtUtc": "2026-11-01T00:00:00Z",
+        "diagnostics": []
+      }
+    }
+  }
+]

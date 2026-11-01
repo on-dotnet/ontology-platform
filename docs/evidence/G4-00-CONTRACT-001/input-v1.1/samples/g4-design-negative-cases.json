@@ -1,0 +1,142 @@
+[
+  {
+    "caseId": "N01",
+    "sourceType": "POSTGRESQL",
+    "scenario": "non-allowed SQL read plan",
+    "expected": "query_plan_invalid",
+    "execution": "NOT_RUN_DESIGN_ONLY"
+  },
+  {
+    "caseId": "N02",
+    "sourceType": "ORACLE",
+    "scenario": "serviceName unavailable or permission denied",
+    "expected": "connection_profile_invalid",
+    "execution": "NOT_RUN_DESIGN_ONLY"
+  },
+  {
+    "caseId": "N03",
+    "sourceType": "DORIS",
+    "scenario": "MySQL-matching protocol but incompatible type",
+    "expected": "mapping_schema_incompatible",
+    "execution": "NOT_RUN_DESIGN_ONLY"
+  },
+  {
+    "caseId": "N04",
+    "sourceType": "TDENGINE",
+    "scenario": "precision ns wrongly cast to ms",
+    "expected": "mapping_time_precision_loss",
+    "execution": "NOT_RUN_DESIGN_ONLY"
+  },
+  {
+    "caseId": "N05",
+    "sourceType": "WEB_API",
+    "scenario": "redirect to loopback",
+    "expected": "webapi_ssrf_blocked",
+    "execution": "NOT_RUN_DESIGN_ONLY"
+  },
+  {
+    "caseId": "N06",
+    "sourceType": "WEB_API",
+    "scenario": "DNS rebinding to IMDS",
+    "expected": "webapi_ssrf_blocked",
+    "execution": "NOT_RUN_DESIGN_ONLY"
+  },
+  {
+    "caseId": "N07",
+    "sourceType": "WEB_API",
+    "scenario": "unapproved POST operation",
+    "expected": "read_only_policy_unverified",
+    "execution": "NOT_RUN_DESIGN_ONLY"
+  },
+  {
+    "caseId": "N08",
+    "sourceType": "ALL",
+    "scenario": "same heat 001 across SITE_A and SITE_B",
+    "expected": "AMBIGUOUS",
+    "execution": "NOT_RUN_DESIGN_ONLY"
+  },
+  {
+    "caseId": "N09",
+    "sourceType": "ALL",
+    "scenario": "unknown temperature unit",
+    "expected": "mapping_unit_unknown",
+    "execution": "NOT_RUN_DESIGN_ONLY"
+  },
+  {
+    "caseId": "N10",
+    "sourceType": "ALL",
+    "scenario": "unknown timezone vs epoch assumption",
+    "expected": "mapping_time_unknown",
+    "execution": "NOT_RUN_DESIGN_ONLY"
+  },
+  {
+    "caseId": "N11",
+    "sourceType": "ALL",
+    "scenario": "unapproved schema field changed",
+    "expected": "schema_fingerprint_changed",
+    "execution": "NOT_RUN_DESIGN_ONLY"
+  },
+  {
+    "caseId": "N12",
+    "sourceType": "ALL",
+    "scenario": "old mapping approval reused",
+    "expected": "mapping_approval_stale",
+    "execution": "NOT_RUN_DESIGN_ONLY"
+  },
+  {
+    "caseId": "N13",
+    "sourceType": "ALL",
+    "scenario": "actor submits and approves same mapping",
+    "expected": "connection_scope_forbidden",
+    "execution": "NOT_RUN_DESIGN_ONLY"
+  },
+  {
+    "caseId": "N14",
+    "sourceType": "ALL",
+    "scenario": "source returns timeout while another yields rows",
+    "expected": "PARTIAL",
+    "execution": "NOT_RUN_DESIGN_ONLY"
+  },
+  {
+    "caseId": "N15",
+    "sourceType": "ALL",
+    "scenario": "all mandatory sources unavailable",
+    "expected": "UNAVAILABLE",
+    "execution": "NOT_RUN_DESIGN_ONLY"
+  },
+  {
+    "caseId": "N16",
+    "sourceType": "ALL",
+    "scenario": "missing field treated as zero",
+    "expected": "mapping_null_policy_invalid",
+    "execution": "NOT_RUN_DESIGN_ONLY"
+  },
+  {
+    "caseId": "N17",
+    "sourceType": "ALL",
+    "scenario": "credential returned in GET/list/log",
+    "expected": "credential_exposure_blocked",
+    "execution": "NOT_RUN_DESIGN_ONLY"
+  },
+  {
+    "caseId": "N18",
+    "sourceType": "ALL",
+    "scenario": "source revoked but old run evidence opened",
+    "expected": "UNAUTHORIZED",
+    "execution": "NOT_RUN_DESIGN_ONLY"
+  },
+  {
+    "caseId": "N19",
+    "sourceType": "WEB_API",
+    "scenario": "pagination next URL changes origin",
+    "expected": "webapi_ssrf_blocked",
+    "execution": "NOT_RUN_DESIGN_ONLY"
+  },
+  {
+    "caseId": "N20",
+    "sourceType": "ALL",
+    "scenario": "query maxRows exceeds G2 budget",
+    "expected": "query_budget_exceeded",
+    "execution": "NOT_RUN_DESIGN_ONLY"
+  }
+]

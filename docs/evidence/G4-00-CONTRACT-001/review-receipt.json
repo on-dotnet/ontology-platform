@@ -1,0 +1,60 @@
+{
+  "reviewer": "/root/g4_contract_review",
+  "role": "non-author read-only quality_reviewer; no writes or deletes",
+  "dispatchModel": "gpt-6.1-sol",
+  "dispatchReasoningEffort": "high",
+  "actualBackendModel": "NOT_VERIFIED",
+  "status": "DESIGN_CODE_AND_UX_REVIEW_PASS_RUNTIME_NOT_RUN",
+  "openP1P2": 0,
+  "initialStatus": "REQUEST_CHANGES",
+  "closed": [
+    "RC-01 entity selection",
+    "RC-02 workflow versus Draft wire states",
+    "URI FormatChecker missing dependency and empty authority/NSS"
+  ],
+  "inputAggregateSha256": "93e7fe1cd2a0bf7e8530febbe3585cca1df9e47bb75c5040ee1ae22174049c6a",
+  "inputPaths": {
+    "docs/contracts/g4-00-connections.md": "cb0b0cac3aca148d2995ef7b2e1db3771192b187402487269bd3877f2ae47020",
+    "docs/contracts/g4-00-mapping.md": "527b42874905fe56aaf08e44761423dbe6ff0678d553c39365c2ef5e3c64a083",
+    "docs/contracts/g4-00-query.md": "3aaa3778bfeeb6881346cfb176307c4a626d2e4548f1482bc0e57270774bf372",
+    "docs/contracts/g4-00-ui.md": "7ebbd43629a4655543704e64c99c594cb2cfbcacd8d9d4a0930e849b2edfbae7",
+    "docs/planning/g4-implementation-plan.md": "68d3b26e8ac3bd5b92da4c8a1629291f062374fe814ed2ecc9013b1aeb63fa8c",
+    "docs/evidence/G4-00-CONTRACT-001/g4-reviewed-design.schema.json": "6f3f5b56725bba410f8cc2c346984a857f5d72a2e6869be0fb6d883010ac10af",
+    "docs/evidence/G4-00-CONTRACT-001/check-review-cases.py": "c3b43d6f83dafc5014734f584f8ed94c5bf21daa135446e1f9b8050ef006decb"
+  },
+  "independentChecks": [
+    {
+      "name": "original-schema",
+      "exitCode": 0,
+      "positive": 21,
+      "schemaRejected": 16,
+      "semanticRejected": 3,
+      "inline": 2
+    },
+    {
+      "name": "review-cases",
+      "exitCode": 0,
+      "count": 28
+    },
+    {
+      "name": "g2-binding",
+      "exitCode": 0,
+      "count": 37
+    },
+    {
+      "name": "independent-selection-uri-counterexamples",
+      "exitCode": 0,
+      "count": 10
+    }
+  ],
+  "implementationBlocks": [
+    "M3 rollback discriminated read/write DTO",
+    "M4 full Datum value/unit/time/relationship discriminated payload"
+  ],
+  "notYetReviewed": [
+    "final committed binding",
+    "V3 independent reopen"
+  ],
+  "cleanupApprovedInventory": "9fb4722b13737fb6b2e69deccfca8798d9c37e6a1947e6f8fe65b5b3e752bfbb",
+  "attackMatrix": "review-attack-matrix.md"
+}

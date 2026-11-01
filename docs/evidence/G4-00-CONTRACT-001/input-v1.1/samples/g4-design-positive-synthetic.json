@@ -1,0 +1,748 @@
+[
+  {
+    "schemaKind": "ConnectionCreateRequest",
+    "payload": {
+      "displayName": "示例 POSTGRESQL 只读连接",
+      "scopeSelection": {
+        "organizationId": "ORG_SYN",
+        "siteIds": [
+          "SITE_A"
+        ]
+      },
+      "config": {
+        "type": "POSTGRESQL",
+        "profile": {
+          "host": "db.example.invalid",
+          "port": 5432,
+          "database": "qms",
+          "username": "qms_read",
+          "sslMode": "VerifyFull",
+          "allowedSchemas": [
+            "production"
+          ]
+        }
+      },
+      "secretRef": "secret-synthetic-only",
+      "command": {
+        "commandId": "cmd-syn-01",
+        "idempotencyKey": "idem-syn-01",
+        "expectedRevision": 0,
+        "reason": "合成设计用例"
+      }
+    }
+  },
+  {
+    "schemaKind": "ConnectionCreateRequest",
+    "payload": {
+      "displayName": "示例 ORACLE 只读连接",
+      "scopeSelection": {
+        "organizationId": "ORG_SYN",
+        "siteIds": [
+          "SITE_A"
+        ]
+      },
+      "config": {
+        "type": "ORACLE",
+        "profile": {
+          "host": "oracle.example.invalid",
+          "port": 1521,
+          "serviceName": "QMSPDB",
+          "username": "qms_read",
+          "tls": true,
+          "allowedOwners": [
+            "QMS"
+          ]
+        }
+      },
+      "secretRef": "secret-synthetic-only",
+      "command": {
+        "commandId": "cmd-syn-02",
+        "idempotencyKey": "idem-syn-02",
+        "expectedRevision": 0,
+        "reason": "合成设计用例"
+      }
+    }
+  },
+  {
+    "schemaKind": "ConnectionCreateRequest",
+    "payload": {
+      "displayName": "示例 DORIS 只读连接",
+      "scopeSelection": {
+        "organizationId": "ORG_SYN",
+        "siteIds": [
+          "SITE_A"
+        ]
+      },
+      "config": {
+        "type": "DORIS",
+        "profile": {
+          "feHost": "doris-fe.example.invalid",
+          "queryPort": 9030,
+          "catalog": "internal",
+          "database": "quality",
+          "username": "doris_read",
+          "tls": true
+        }
+      },
+      "secretRef": "secret-synthetic-only",
+      "command": {
+        "commandId": "cmd-syn-03",
+        "idempotencyKey": "idem-syn-03",
+        "expectedRevision": 0,
+        "reason": "合成设计用例"
+      }
+    }
+  },
+  {
+    "schemaKind": "ConnectionCreateRequest",
+    "payload": {
+      "displayName": "示例 TDENGINE 只读连接",
+      "scopeSelection": {
+        "organizationId": "ORG_SYN",
+        "siteIds": [
+          "SITE_A"
+        ]
+      },
+      "config": {
+        "type": "TDENGINE",
+        "profile": {
+          "wsUrl": "wss://taos.example.invalid:6041",
+          "database": "process",
+          "timePrecision": "NANOSECOND",
+          "timeZone": null
+        }
+      },
+      "secretRef": "secret-synthetic-only",
+      "command": {
+        "commandId": "cmd-syn-04",
+        "idempotencyKey": "idem-syn-04",
+        "expectedRevision": 0,
+        "reason": "合成设计用例"
+      }
+    }
+  },
+  {
+    "schemaKind": "ConnectionCreateRequest",
+    "payload": {
+      "displayName": "示例 WEB_API 只读连接",
+      "scopeSelection": {
+        "organizationId": "ORG_SYN",
+        "siteIds": [
+          "SITE_A"
+        ]
+      },
+      "config": {
+        "type": "WEB_API",
+        "profile": {
+          "baseOrigin": "https://api.example.invalid",
+          "operationId": "getBatchByHeat",
+          "method": "GET",
+          "approvedPath": "/read/heat/{heatId}",
+          "authentication": "API_KEY_REF",
+          "pagination": "CURSOR",
+          "hostPolicyRef": "allowlist-fake-001"
+        }
+      },
+      "secretRef": "secret-synthetic-only",
+      "command": {
+        "commandId": "cmd-syn-05",
+        "idempotencyKey": "idem-syn-05",
+        "expectedRevision": 0,
+        "reason": "合成设计用例"
+      }
+    }
+  },
+  {
+    "schemaKind": "ConnectionCreateRequest",
+    "payload": {
+      "displayName": "示例 WEB_API 无认证只读连接",
+      "scopeSelection": {
+        "organizationId": "ORG_SYN",
+        "siteIds": [
+          "SITE_A"
+        ]
+      },
+      "config": {
+        "type": "WEB_API",
+        "profile": {
+          "baseOrigin": "https://api.example.invalid",
+          "operationId": "getBatchByHeat",
+          "method": "GET",
+          "approvedPath": "/read/heat/{heatId}",
+          "authentication": "NONE",
+          "pagination": "CURSOR",
+          "hostPolicyRef": "allowlist-fake-001"
+        }
+      },
+      "secretRef": null,
+      "command": {
+        "commandId": "cmd-syn-webanon",
+        "idempotencyKey": "idem-syn-webanon",
+        "expectedRevision": 0,
+        "reason": "匿名API设计分支"
+      }
+    }
+  },
+  {
+    "schemaKind": "MappingDraft",
+    "payload": {
+      "draftId": "draft-syn-001",
+      "ontologyReleaseId": "ont-syn-001",
+      "sourceConnectionId": "conn-syn-001",
+      "sourceCatalogSnapshotId": "catalog-syn-001",
+      "revision": 1,
+      "status": "NEEDS_REVIEW",
+      "bindings": [
+        {
+          "sourceFieldRef": "QMS.HEAT_NO",
+          "targetPropertyIri": "urn:synthetic:ontology:externalId",
+          "evidenceLevel": "METADATA",
+          "decision": "PROPOSED"
+        }
+      ]
+    }
+  },
+  {
+    "schemaKind": "SemanticQuery",
+    "payload": {
+      "assetId": "asset-syn-001",
+      "ontologyReleaseId": "ont-syn-001",
+      "mappingReleaseIds": [
+        "map-syn-001"
+      ],
+      "capabilityId": "resolve_entity",
+      "maxRows": 20,
+      "timeoutMs": 3000,
+      "filters": {
+        "siteId": "SITE_A",
+        "entityExternalId": "001",
+        "validFrom": null,
+        "validTo": null
+      },
+      "capabilityVersion": "synthetic-capability-v1",
+      "depth": 1,
+      "relationshipIris": []
+    }
+  },
+  {
+    "schemaKind": "G4QueryResultV1",
+    "payload": {
+      "status": "AMBIGUOUS",
+      "traceId": "trace-syn-001",
+      "limited": false,
+      "snapshot": {
+        "ontologyReleaseId": "ont-syn-001",
+        "mappingReleaseIds": [
+          "map-syn-001"
+        ],
+        "sourceCatalogSnapshotIds": [
+          "catalog-syn-001"
+        ],
+        "capabilityId": "resolve_entity",
+        "capabilityVersion": "synthetic-capability-v1"
+      },
+      "data": [],
+      "subSources": [
+        {
+          "connectionId": "conn-syn-001",
+          "status": "SUCCESS",
+          "observedAtUtc": "2026-11-01T00:00:00Z",
+          "watermarkKind": "UNKNOWN",
+          "sourceReadReceiptId": "receipt-syn-a",
+          "limited": false
+        }
+      ],
+      "schemaVersion": "g4.query-result.v1",
+      "candidates": [
+        {
+          "entityIri": "urn:synthetic:site-a:qms:heat:001",
+          "entityTypeIris": [
+            "urn:synthetic:ontology:Heat"
+          ],
+          "externalId": "001",
+          "organizationId": "ORG_SYN",
+          "siteId": "SITE_A",
+          "label": "QMS炉次001",
+          "evidenceIds": [
+            "ev-syn-a"
+          ]
+        },
+        {
+          "entityIri": "urn:synthetic:site-a:mes:heat:001",
+          "entityTypeIris": [
+            "urn:synthetic:ontology:Heat"
+          ],
+          "externalId": "001",
+          "organizationId": "ORG_SYN",
+          "siteId": "SITE_A",
+          "label": "MES炉次001（未合并）",
+          "evidenceIds": [
+            "ev-syn-b"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "evidenceId": "ev-syn-a",
+          "connectionId": "conn-syn-001",
+          "mappingReleaseId": "map-syn-001",
+          "sourceCatalogSnapshotId": "catalog-syn-001",
+          "sourceDatasetRef": "dataset-syn-a",
+          "sourceReadReceiptId": "receipt-syn-a",
+          "scope": {
+            "organizationId": "ORG_SYN",
+            "siteIds": [
+              "SITE_A"
+            ]
+          },
+          "precision": "ROW_KEY",
+          "sourceRecordRef": "keyhash-syn-a",
+          "validTime": null,
+          "observedAtUtc": "2026-11-01T00:00:00Z"
+        },
+        {
+          "evidenceId": "ev-syn-b",
+          "connectionId": "conn-syn-001",
+          "mappingReleaseId": "map-syn-001",
+          "sourceCatalogSnapshotId": "catalog-syn-001",
+          "sourceDatasetRef": "dataset-syn-b",
+          "sourceReadReceiptId": "receipt-syn-b",
+          "scope": {
+            "organizationId": "ORG_SYN",
+            "siteIds": [
+              "SITE_A"
+            ]
+          },
+          "precision": "ROW_KEY",
+          "sourceRecordRef": "keyhash-syn-b",
+          "validTime": null,
+          "observedAtUtc": "2026-11-01T00:00:00Z"
+        }
+      ],
+      "validTime": null,
+      "observedAtUtc": "2026-11-01T00:00:00Z",
+      "diagnostics": []
+    }
+  },
+  {
+    "schemaKind": "G4QueryResultV1",
+    "payload": {
+      "status": "FOUND",
+      "traceId": "trace-syn-found",
+      "limited": false,
+      "snapshot": {
+        "ontologyReleaseId": "ont-syn-001",
+        "mappingReleaseIds": [
+          "map-syn-001"
+        ],
+        "sourceCatalogSnapshotIds": [
+          "catalog-syn-001"
+        ],
+        "capabilityId": "resolve_entity",
+        "capabilityVersion": "synthetic-capability-v1"
+      },
+      "data": [
+        {
+          "kind": "entity",
+          "entityIri": "urn:synthetic:site-a:qms:heat:001",
+          "evidenceIds": [
+            "ev-syn-a"
+          ]
+        }
+      ],
+      "subSources": [
+        {
+          "connectionId": "conn-syn-001",
+          "status": "SUCCESS",
+          "observedAtUtc": "2026-11-01T00:00:00Z",
+          "watermarkKind": "UNKNOWN",
+          "sourceReadReceiptId": "receipt-syn-a",
+          "limited": false
+        }
+      ],
+      "schemaVersion": "g4.query-result.v1",
+      "candidates": [],
+      "evidence": [
+        {
+          "evidenceId": "ev-syn-a",
+          "connectionId": "conn-syn-001",
+          "mappingReleaseId": "map-syn-001",
+          "sourceCatalogSnapshotId": "catalog-syn-001",
+          "sourceDatasetRef": "dataset-syn-a",
+          "sourceReadReceiptId": "receipt-syn-a",
+          "scope": {
+            "organizationId": "ORG_SYN",
+            "siteIds": [
+              "SITE_A"
+            ]
+          },
+          "precision": "ROW_KEY",
+          "sourceRecordRef": "keyhash-syn-a",
+          "validTime": null,
+          "observedAtUtc": "2026-11-01T00:00:00Z"
+        }
+      ],
+      "validTime": null,
+      "observedAtUtc": "2026-11-01T00:00:00Z",
+      "diagnostics": []
+    }
+  },
+  {
+    "schemaKind": "MappingListPage",
+    "payload": {
+      "items": [
+        {
+          "mappingId": "mapdraft-syn-001",
+          "displayName": "合成炉次语义映射",
+          "sourceConnectionId": "conn-syn-001",
+          "ontologyReleaseId": "ont-syn-001",
+          "scope": {
+            "organizationId": "ORG_SYN",
+            "siteIds": [
+              "SITE_A"
+            ]
+          },
+          "latestDraftRevision": 1,
+          "activeMappingReleaseId": null,
+          "updatedAtUtc": "2026-11-01T00:00:00Z"
+        }
+      ],
+      "nextCursor": null,
+      "pageSize": 20
+    }
+  },
+  {
+    "schemaKind": "MappingProposalView",
+    "payload": {
+      "proposalId": "proposal-syn-001",
+      "draftId": "draft-syn-001",
+      "draftRevision": 1,
+      "scope": {
+        "organizationId": "ORG_SYN",
+        "siteIds": [
+          "SITE_A"
+        ]
+      },
+      "sourceConnectionId": "conn-syn-001",
+      "connectionRevision": 1,
+      "sourceCatalogSnapshotId": "catalog-syn-001",
+      "sourceCatalogFingerprint": "sha256:synthetic-schema",
+      "ontologyReleaseId": "ont-syn-001",
+      "mappingHash": "sha256:synthetic-mapping",
+      "validationHash": "sha256:synthetic-validation",
+      "impactHash": "sha256:synthetic-impact",
+      "submittedBy": "actor-syn-author",
+      "submittedAtUtc": "2026-11-01T00:00:00Z",
+      "expiresAtUtc": "2026-11-02T00:00:00Z",
+      "status": "PENDING",
+      "decision": null
+    }
+  },
+  {
+    "schemaKind": "MappingReleaseView",
+    "payload": {
+      "mappingReleaseId": "maprel-syn-001",
+      "mappingHash": "sha256:synthetic-mapping",
+      "sourceConnectionId": "conn-syn-001",
+      "connectionRevision": 1,
+      "sourceCatalogSnapshotId": "catalog-syn-001",
+      "sourceCatalogFingerprint": "sha256:synthetic-schema",
+      "ontologyReleaseId": "ont-syn-001",
+      "reviewProposalId": "proposal-syn-001",
+      "createdAtUtc": "2026-11-01T00:00:00Z",
+      "readOnly": true,
+      "active": true,
+      "activationRevision": 1
+    }
+  },
+  {
+    "schemaKind": "MappingRevisionDiffView",
+    "payload": {
+      "draftId": "draft-syn-001",
+      "baseRevision": 1,
+      "targetRevision": 2,
+      "sourceCatalogSnapshotId": "catalog-syn-001",
+      "ontologyReleaseId": "ont-syn-001",
+      "diffHash": "sha256:synthetic-diff",
+      "changes": [
+        {
+          "path": "bindings/0",
+          "changeType": "MODIFY",
+          "summary": "源字段对应目标谓词更改"
+        }
+      ]
+    }
+  },
+  {
+    "schemaKind": "MappingAssessmentView",
+    "payload": {
+      "assessmentId": "assessment-syn-001",
+      "draftId": "draft-syn-001",
+      "draftRevision": 1,
+      "sourceCatalogSnapshotId": "catalog-syn-001",
+      "ontologyReleaseId": "ont-syn-001",
+      "validationHash": "sha256:synthetic-validation",
+      "status": "PASS",
+      "issues": [],
+      "assessedAtUtc": "2026-11-01T00:00:00Z"
+    }
+  },
+  {
+    "schemaKind": "G4QueryResultV1",
+    "payload": {
+      "status": "EMPTY",
+      "traceId": "trace-syn-empty",
+      "limited": false,
+      "snapshot": {
+        "ontologyReleaseId": "ont-syn-001",
+        "mappingReleaseIds": [
+          "map-syn-001"
+        ],
+        "sourceCatalogSnapshotIds": [
+          "catalog-syn-001"
+        ],
+        "capabilityId": "resolve_entity",
+        "capabilityVersion": "synthetic-capability-v1"
+      },
+      "data": [],
+      "subSources": [
+        {
+          "connectionId": "conn-syn-001",
+          "status": "EMPTY",
+          "observedAtUtc": "2026-11-01T00:00:00Z",
+          "watermarkKind": "UNKNOWN",
+          "sourceReadReceiptId": "receipt-syn-empty",
+          "limited": false
+        }
+      ],
+      "schemaVersion": "g4.query-result.v1",
+      "candidates": [],
+      "evidence": [],
+      "validTime": null,
+      "observedAtUtc": "2026-11-01T00:00:00Z",
+      "diagnostics": []
+    }
+  },
+  {
+    "schemaKind": "G4QueryResultV1",
+    "payload": {
+      "status": "PARTIAL",
+      "traceId": "trace-syn-partial",
+      "limited": false,
+      "snapshot": {
+        "ontologyReleaseId": "ont-syn-001",
+        "mappingReleaseIds": [
+          "map-syn-001"
+        ],
+        "sourceCatalogSnapshotIds": [
+          "catalog-syn-001"
+        ],
+        "capabilityId": "resolve_entity",
+        "capabilityVersion": "synthetic-capability-v1"
+      },
+      "data": [
+        {
+          "kind": "entity",
+          "entityIri": "urn:synthetic:site-a:qms:heat:001",
+          "evidenceIds": [
+            "ev-syn-a"
+          ]
+        }
+      ],
+      "subSources": [
+        {
+          "connectionId": "conn-syn-001",
+          "status": "SUCCESS",
+          "observedAtUtc": "2026-11-01T00:00:00Z",
+          "watermarkKind": "UNKNOWN",
+          "sourceReadReceiptId": "receipt-syn-a",
+          "limited": false
+        },
+        {
+          "connectionId": "conn-syn-002",
+          "status": "TIMEOUT",
+          "observedAtUtc": "2026-11-01T00:00:00Z",
+          "watermarkKind": "UNKNOWN",
+          "sourceReadReceiptId": null,
+          "limited": false
+        }
+      ],
+      "schemaVersion": "g4.query-result.v1",
+      "candidates": [],
+      "evidence": [
+        {
+          "evidenceId": "ev-syn-a",
+          "connectionId": "conn-syn-001",
+          "mappingReleaseId": "map-syn-001",
+          "sourceCatalogSnapshotId": "catalog-syn-001",
+          "sourceDatasetRef": "dataset-syn-a",
+          "sourceReadReceiptId": "receipt-syn-a",
+          "scope": {
+            "organizationId": "ORG_SYN",
+            "siteIds": [
+              "SITE_A"
+            ]
+          },
+          "precision": "ROW_KEY",
+          "sourceRecordRef": "keyhash-syn-a",
+          "validTime": null,
+          "observedAtUtc": "2026-11-01T00:00:00Z"
+        }
+      ],
+      "validTime": null,
+      "observedAtUtc": "2026-11-01T00:00:00Z",
+      "diagnostics": [
+        {
+          "code": "source_timeout",
+          "severity": "warning",
+          "message": "部分数据源超时，保留已有可信结果",
+          "focusNode": null,
+          "path": null
+        }
+      ]
+    }
+  },
+  {
+    "schemaKind": "G4QueryResultV1",
+    "payload": {
+      "status": "UNAVAILABLE",
+      "traceId": "trace-syn-unavailable",
+      "limited": false,
+      "snapshot": {
+        "ontologyReleaseId": "ont-syn-001",
+        "mappingReleaseIds": [
+          "map-syn-001"
+        ],
+        "sourceCatalogSnapshotIds": [
+          "catalog-syn-001"
+        ],
+        "capabilityId": "resolve_entity",
+        "capabilityVersion": "synthetic-capability-v1"
+      },
+      "data": [],
+      "subSources": [
+        {
+          "connectionId": "conn-syn-001",
+          "status": "UNAVAILABLE",
+          "observedAtUtc": "2026-11-01T00:00:00Z",
+          "watermarkKind": "UNKNOWN",
+          "sourceReadReceiptId": null,
+          "limited": false
+        }
+      ],
+      "schemaVersion": "g4.query-result.v1",
+      "candidates": [],
+      "evidence": [],
+      "validTime": null,
+      "observedAtUtc": "2026-11-01T00:00:00Z",
+      "diagnostics": [
+        {
+          "code": "source_unavailable",
+          "severity": "error",
+          "message": "必需数据源不可用",
+          "focusNode": null,
+          "path": null
+        }
+      ]
+    }
+  },
+  {
+    "schemaKind": "G4QueryResultV1",
+    "payload": {
+      "status": "UNAUTHORIZED",
+      "traceId": "trace-syn-unauthorized",
+      "limited": false,
+      "snapshot": {
+        "ontologyReleaseId": "ont-syn-001",
+        "mappingReleaseIds": [
+          "map-syn-001"
+        ],
+        "sourceCatalogSnapshotIds": [
+          "catalog-syn-001"
+        ],
+        "capabilityId": "resolve_entity",
+        "capabilityVersion": "synthetic-capability-v1"
+      },
+      "data": [],
+      "subSources": [],
+      "schemaVersion": "g4.query-result.v1",
+      "candidates": [],
+      "evidence": [],
+      "validTime": null,
+      "observedAtUtc": "2026-11-01T00:00:00Z",
+      "diagnostics": [
+        {
+          "code": "query_scope_forbidden",
+          "severity": "warning",
+          "message": "没有访问该业务数据的权限",
+          "focusNode": null,
+          "path": null
+        }
+      ]
+    }
+  },
+  {
+    "schemaKind": "MappingProposalView",
+    "payload": {
+      "proposalId": "proposal-syn-accepted",
+      "draftId": "draft-syn-001",
+      "draftRevision": 1,
+      "scope": {
+        "organizationId": "ORG_SYN",
+        "siteIds": [
+          "SITE_A"
+        ]
+      },
+      "sourceConnectionId": "conn-syn-001",
+      "connectionRevision": 1,
+      "sourceCatalogSnapshotId": "catalog-syn-001",
+      "sourceCatalogFingerprint": "sha256:synthetic-schema",
+      "ontologyReleaseId": "ont-syn-001",
+      "mappingHash": "sha256:synthetic-mapping",
+      "validationHash": "sha256:synthetic-validation",
+      "impactHash": "sha256:synthetic-impact",
+      "submittedBy": "actor-syn-author",
+      "submittedAtUtc": "2026-11-01T00:00:00Z",
+      "expiresAtUtc": "2026-11-02T00:00:00Z",
+      "status": "APPROVED",
+      "decision": {
+        "decidedBy": "actor-syn-independent-reviewer",
+        "decidedAtUtc": "2026-11-01T00:15:00Z",
+        "decision": "APPROVE",
+        "reason": "合成示例：版本和影响已核对"
+      }
+    }
+  },
+  {
+    "schemaKind": "MappingProposalView",
+    "payload": {
+      "proposalId": "proposal-syn-rejected",
+      "draftId": "draft-syn-001",
+      "draftRevision": 1,
+      "scope": {
+        "organizationId": "ORG_SYN",
+        "siteIds": [
+          "SITE_A"
+        ]
+      },
+      "sourceConnectionId": "conn-syn-001",
+      "connectionRevision": 1,
+      "sourceCatalogSnapshotId": "catalog-syn-001",
+      "sourceCatalogFingerprint": "sha256:synthetic-schema",
+      "ontologyReleaseId": "ont-syn-001",
+      "mappingHash": "sha256:synthetic-mapping",
+      "validationHash": "sha256:synthetic-validation",
+      "impactHash": "sha256:synthetic-impact",
+      "submittedBy": "actor-syn-author",
+      "submittedAtUtc": "2026-11-01T00:00:00Z",
+      "expiresAtUtc": "2026-11-02T00:00:00Z",
+      "status": "REJECTED",
+      "decision": {
+        "decidedBy": "actor-syn-independent-reviewer",
+        "decidedAtUtc": "2026-11-01T00:16:00Z",
+        "decision": "REJECT",
+        "reason": "合成示例：Source字段映射仍有歧义"
+      }
+    }
+  }
+]

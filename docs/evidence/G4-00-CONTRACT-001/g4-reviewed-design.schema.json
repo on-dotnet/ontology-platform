@@ -1,0 +1,1733 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ontology-platform:proposed:g4-00:wire-review-1",
+  "title": "G4-00 reviewed design subset with explicit entity selection; not runtime DTO",
+  "description": "V1.1 fixes user review CR-01..04. Each schemaKind identifies a distinct proposed wire contract. This is not G2 DTO/OpenAPI, not implemented, not RDF ontology source.",
+  "type": "object",
+  "required": [
+    "schemaKind",
+    "payload"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schemaKind": {
+      "enum": [
+        "ConnectionCreateRequest",
+        "MappingDraft",
+        "SemanticQuery",
+        "G4QueryResultV1",
+        "MappingListPage",
+        "MappingProposalView",
+        "MappingReleaseView",
+        "MappingRevisionDiffView",
+        "MappingAssessmentView"
+      ]
+    },
+    "payload": {
+      "type": "object"
+    }
+  },
+  "oneOf": [
+    {
+      "properties": {
+        "schemaKind": {
+          "const": "ConnectionCreateRequest"
+        },
+        "payload": {
+          "type": "object",
+          "required": [
+            "displayName",
+            "scopeSelection",
+            "config",
+            "secretRef",
+            "command"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "displayName": {
+              "type": "string",
+              "minLength": 1
+            },
+            "scopeSelection": {
+              "type": "object",
+              "required": [
+                "organizationId",
+                "siteIds"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "organizationId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "siteIds": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 16,
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "uniqueItems": true
+                }
+              }
+            },
+            "config": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "type",
+                    "profile"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "type": {
+                      "const": "POSTGRESQL"
+                    },
+                    "profile": {
+                      "type": "object",
+                      "required": [
+                        "host",
+                        "port",
+                        "database",
+                        "username",
+                        "sslMode",
+                        "allowedSchemas"
+                      ],
+                      "additionalProperties": false,
+                      "properties": {
+                        "host": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "port": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 65535
+                        },
+                        "database": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "username": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "sslMode": {
+                          "enum": [
+                            "VerifyFull",
+                            "VerifyCA",
+                            "Require"
+                          ]
+                        },
+                        "allowedSchemas": {
+                          "type": "array",
+                          "minItems": 1,
+                          "uniqueItems": true,
+                          "items": {
+                            "type": "string",
+                            "minLength": 1
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "type",
+                    "profile"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "type": {
+                      "const": "ORACLE"
+                    },
+                    "profile": {
+                      "type": "object",
+                      "required": [
+                        "host",
+                        "port",
+                        "serviceName",
+                        "username",
+                        "tls",
+                        "allowedOwners"
+                      ],
+                      "additionalProperties": false,
+                      "properties": {
+                        "host": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "port": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 65535
+                        },
+                        "serviceName": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "username": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "tls": {
+                          "type": "boolean"
+                        },
+                        "allowedOwners": {
+                          "type": "array",
+                          "minItems": 1,
+                          "items": {
+                            "type": "string",
+                            "minLength": 1
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "type",
+                    "profile"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "type": {
+                      "const": "DORIS"
+                    },
+                    "profile": {
+                      "type": "object",
+                      "required": [
+                        "feHost",
+                        "queryPort",
+                        "catalog",
+                        "database",
+                        "username",
+                        "tls"
+                      ],
+                      "additionalProperties": false,
+                      "properties": {
+                        "feHost": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "queryPort": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 65535
+                        },
+                        "catalog": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "database": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "username": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "tls": {
+                          "type": "boolean"
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "type",
+                    "profile"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "type": {
+                      "const": "TDENGINE"
+                    },
+                    "profile": {
+                      "type": "object",
+                      "required": [
+                        "wsUrl",
+                        "database",
+                        "timePrecision",
+                        "timeZone"
+                      ],
+                      "additionalProperties": false,
+                      "properties": {
+                        "wsUrl": {
+                          "type": "string",
+                          "pattern": "^wss?://"
+                        },
+                        "database": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "timePrecision": {
+                          "enum": [
+                            "MILLISECOND",
+                            "MICROSECOND",
+                            "NANOSECOND",
+                            "UNKNOWN"
+                          ]
+                        },
+                        "timeZone": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "type",
+                    "profile"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "type": {
+                      "const": "WEB_API"
+                    },
+                    "profile": {
+                      "type": "object",
+                      "required": [
+                        "baseOrigin",
+                        "operationId",
+                        "method",
+                        "approvedPath",
+                        "authentication",
+                        "pagination",
+                        "hostPolicyRef"
+                      ],
+                      "additionalProperties": false,
+                      "properties": {
+                        "baseOrigin": {
+                          "type": "string",
+                          "pattern": "^https://"
+                        },
+                        "operationId": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "method": {
+                          "const": "GET"
+                        },
+                        "approvedPath": {
+                          "type": "string",
+                          "pattern": "^/"
+                        },
+                        "authentication": {
+                          "enum": [
+                            "NONE",
+                            "API_KEY_REF",
+                            "OAUTH_CLIENT_CREDENTIALS_REF"
+                          ]
+                        },
+                        "pagination": {
+                          "enum": [
+                            "NONE",
+                            "PAGE",
+                            "OFFSET",
+                            "CURSOR",
+                            "LINK"
+                          ]
+                        },
+                        "hostPolicyRef": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            "secretRef": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "minLength": 1,
+              "description": "Single credential source; null only when Web API authentication is NONE"
+            },
+            "command": {
+              "type": "object",
+              "required": [
+                "commandId",
+                "idempotencyKey",
+                "expectedRevision",
+                "reason"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "commandId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64
+                },
+                "idempotencyKey": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64
+                },
+                "expectedRevision": {
+                  "const": 0
+                },
+                "reason": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 500
+                }
+              }
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "config": {
+                    "properties": {
+                      "type": {
+                        "const": "WEB_API"
+                      }
+                    },
+                    "required": [
+                      "type"
+                    ]
+                  }
+                },
+                "required": [
+                  "config"
+                ]
+              },
+              "then": {
+                "if": {
+                  "properties": {
+                    "config": {
+                      "properties": {
+                        "profile": {
+                          "properties": {
+                            "authentication": {
+                              "const": "NONE"
+                            }
+                          },
+                          "required": [
+                            "authentication"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "profile"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "config"
+                  ]
+                },
+                "then": {
+                  "properties": {
+                    "secretRef": {
+                      "type": "null"
+                    }
+                  }
+                },
+                "else": {
+                  "properties": {
+                    "secretRef": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "secretRef": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "properties": {
+        "schemaKind": {
+          "const": "MappingDraft"
+        },
+        "payload": {
+          "type": "object",
+          "required": [
+            "draftId",
+            "ontologyReleaseId",
+            "sourceConnectionId",
+            "sourceCatalogSnapshotId",
+            "revision",
+            "bindings",
+            "status"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "draftId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "ontologyReleaseId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sourceConnectionId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sourceCatalogSnapshotId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "revision": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "status": {
+              "enum": [
+                "DRAFT",
+                "NEEDS_REVIEW",
+                "VALIDATING",
+                "READY_FOR_PROPOSAL",
+                "BLOCKED"
+              ]
+            },
+            "bindings": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "sourceFieldRef",
+                  "targetPropertyIri",
+                  "evidenceLevel",
+                  "decision"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "sourceFieldRef": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "targetPropertyIri": {
+                    "type": "string",
+                    "pattern": "^https?://|^urn:"
+                  },
+                  "evidenceLevel": {
+                    "enum": [
+                      "METADATA",
+                      "TERM",
+                      "USER_ASSERTION",
+                      "NO_EVIDENCE"
+                    ]
+                  },
+                  "decision": {
+                    "enum": [
+                      "PROPOSED",
+                      "ACCEPTED",
+                      "REJECTED",
+                      "DEFERRED"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "schemaKind": {
+          "const": "SemanticQuery"
+        },
+        "payload": {
+          "type": "object",
+          "required": [
+            "assetId",
+            "ontologyReleaseId",
+            "mappingReleaseIds",
+            "capabilityId",
+            "capabilityVersion",
+            "relationshipIris",
+            "depth",
+            "maxRows",
+            "timeoutMs",
+            "filters"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "assetId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "ontologyReleaseId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "mappingReleaseIds": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "capabilityId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "maxRows": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "timeoutMs": {
+              "type": "integer",
+              "minimum": 100,
+              "maximum": 5000
+            },
+            "filters": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "siteId": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "entityExternalId": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "validFrom": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "validTo": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "entityIri": {
+                  "type": "string",
+                  "minLength": 1,
+                  "format": "uri",
+                  "pattern": "^(https?://[A-Za-z0-9\\[][^ \\s/?#]*(?:[/?#][^\\s]*)?|urn:[A-Za-z0-9][A-Za-z0-9-]{0,31}:[^\\s]+)$"
+                }
+              },
+              "allOf": [
+                {
+                  "if": {
+                    "required": [
+                      "entityIri"
+                    ]
+                  },
+                  "then": {
+                    "required": [
+                      "siteId"
+                    ],
+                    "properties": {
+                      "siteId": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            "capabilityVersion": {
+              "type": "string",
+              "minLength": 1
+            },
+            "relationshipIris": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "depth": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 5
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "schemaKind": {
+          "const": "G4QueryResultV1"
+        },
+        "payload": {
+          "type": "object",
+          "required": [
+            "schemaVersion",
+            "status",
+            "data",
+            "candidates",
+            "evidence",
+            "snapshot",
+            "subSources",
+            "validTime",
+            "observedAtUtc",
+            "traceId",
+            "limited",
+            "diagnostics"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "schemaVersion": {
+              "const": "g4.query-result.v1"
+            },
+            "status": {
+              "enum": [
+                "FOUND",
+                "EMPTY",
+                "PARTIAL",
+                "UNAVAILABLE",
+                "UNAUTHORIZED",
+                "AMBIGUOUS"
+              ]
+            },
+            "data": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "kind",
+                  "entityIri",
+                  "evidenceIds"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "kind": {
+                    "enum": [
+                      "entity",
+                      "relationship",
+                      "observation",
+                      "ontology"
+                    ]
+                  },
+                  "entityIri": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "evidenceIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "uniqueItems": true
+                  }
+                }
+              }
+            },
+            "candidates": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "entityIri",
+                  "entityTypeIris",
+                  "externalId",
+                  "organizationId",
+                  "siteId",
+                  "label",
+                  "evidenceIds"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "entityIri": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "entityTypeIris": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "minItems": 1,
+                    "uniqueItems": true
+                  },
+                  "externalId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "organizationId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "siteId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "label": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "evidenceIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "minItems": 1,
+                    "uniqueItems": true
+                  }
+                }
+              }
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "evidenceId",
+                  "connectionId",
+                  "mappingReleaseId",
+                  "sourceCatalogSnapshotId",
+                  "sourceDatasetRef",
+                  "sourceReadReceiptId",
+                  "scope",
+                  "precision",
+                  "sourceRecordRef",
+                  "validTime",
+                  "observedAtUtc"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "evidenceId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "connectionId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "mappingReleaseId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sourceCatalogSnapshotId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sourceDatasetRef": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sourceReadReceiptId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "scope": {
+                    "type": "object",
+                    "required": [
+                      "organizationId",
+                      "siteIds"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "organizationId": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "siteIds": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "minItems": 1,
+                        "uniqueItems": true
+                      }
+                    }
+                  },
+                  "precision": {
+                    "enum": [
+                      "RECORD",
+                      "ROW_KEY",
+                      "DATASET",
+                      "TIME_WINDOW",
+                      "UNKNOWN"
+                    ]
+                  },
+                  "sourceRecordRef": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "validTime": {
+                    "oneOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "type": "object",
+                        "required": [
+                          "fromUtc",
+                          "toUtc"
+                        ],
+                        "additionalProperties": false,
+                        "properties": {
+                          "fromUtc": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "toUtc": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "format": "date-time"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "observedAtUtc": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                }
+              }
+            },
+            "snapshot": {
+              "type": "object",
+              "required": [
+                "ontologyReleaseId",
+                "mappingReleaseIds",
+                "sourceCatalogSnapshotIds",
+                "capabilityId",
+                "capabilityVersion"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "ontologyReleaseId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "mappingReleaseIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "minItems": 1,
+                  "uniqueItems": true
+                },
+                "sourceCatalogSnapshotIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "minItems": 1,
+                  "uniqueItems": true
+                },
+                "capabilityId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "capabilityVersion": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "subSources": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "connectionId",
+                  "status",
+                  "observedAtUtc",
+                  "watermarkKind",
+                  "sourceReadReceiptId",
+                  "limited"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "connectionId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "status": {
+                    "enum": [
+                      "SUCCESS",
+                      "EMPTY",
+                      "TIMEOUT",
+                      "FORBIDDEN",
+                      "UNAVAILABLE",
+                      "INDETERMINATE"
+                    ]
+                  },
+                  "observedAtUtc": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "watermarkKind": {
+                    "enum": [
+                      "TRANSACTION_SNAPSHOT",
+                      "EVENT_TIME",
+                      "OBSERVED_AT",
+                      "OPAQUE",
+                      "UNKNOWN"
+                    ]
+                  },
+                  "sourceReadReceiptId": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "limited": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            },
+            "validTime": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "fromUtc",
+                    "toUtc"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "fromUtc": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "toUtc": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
+            },
+            "observedAtUtc": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "traceId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "limited": {
+              "type": "boolean"
+            },
+            "diagnostics": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "code",
+                  "severity",
+                  "message",
+                  "focusNode",
+                  "path"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "severity": {
+                    "enum": [
+                      "info",
+                      "warning",
+                      "error"
+                    ]
+                  },
+                  "message": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "focusNode": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "path": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "AMBIGUOUS"
+                  }
+                },
+                "required": [
+                  "status"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "candidates": {
+                    "minItems": 2
+                  },
+                  "data": {
+                    "maxItems": 0
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "FOUND"
+                  }
+                },
+                "required": [
+                  "status"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "data": {
+                    "minItems": 1
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "EMPTY",
+                      "UNAVAILABLE",
+                      "UNAUTHORIZED"
+                    ]
+                  }
+                },
+                "required": [
+                  "status"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "data": {
+                    "maxItems": 0
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "properties": {
+        "schemaKind": {
+          "const": "MappingListPage"
+        },
+        "payload": {
+          "type": "object",
+          "required": [
+            "items",
+            "nextCursor",
+            "pageSize"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "mappingId",
+                  "displayName",
+                  "sourceConnectionId",
+                  "ontologyReleaseId",
+                  "scope",
+                  "latestDraftRevision",
+                  "activeMappingReleaseId",
+                  "updatedAtUtc"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "mappingId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "displayName": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sourceConnectionId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "ontologyReleaseId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "scope": {
+                    "type": "object",
+                    "required": [
+                      "organizationId",
+                      "siteIds"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "organizationId": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "siteIds": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "minItems": 1,
+                        "uniqueItems": true
+                      }
+                    }
+                  },
+                  "latestDraftRevision": {
+                    "type": [
+                      "integer",
+                      "null"
+                    ],
+                    "minimum": 1
+                  },
+                  "activeMappingReleaseId": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "updatedAtUtc": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                }
+              }
+            },
+            "nextCursor": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "pageSize": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "schemaKind": {
+          "const": "MappingProposalView"
+        },
+        "payload": {
+          "type": "object",
+          "required": [
+            "proposalId",
+            "draftId",
+            "draftRevision",
+            "scope",
+            "sourceConnectionId",
+            "connectionRevision",
+            "sourceCatalogSnapshotId",
+            "sourceCatalogFingerprint",
+            "ontologyReleaseId",
+            "mappingHash",
+            "validationHash",
+            "impactHash",
+            "submittedBy",
+            "submittedAtUtc",
+            "expiresAtUtc",
+            "status",
+            "decision"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "proposalId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "draftId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "draftRevision": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "scope": {
+              "type": "object",
+              "required": [
+                "organizationId",
+                "siteIds"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "organizationId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "siteIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "minItems": 1,
+                  "uniqueItems": true
+                }
+              }
+            },
+            "sourceConnectionId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "connectionRevision": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "sourceCatalogSnapshotId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sourceCatalogFingerprint": {
+              "type": "string",
+              "minLength": 1
+            },
+            "ontologyReleaseId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "mappingHash": {
+              "type": "string",
+              "minLength": 1
+            },
+            "validationHash": {
+              "type": "string",
+              "minLength": 1
+            },
+            "impactHash": {
+              "type": "string",
+              "minLength": 1
+            },
+            "submittedBy": {
+              "type": "string",
+              "minLength": 1
+            },
+            "submittedAtUtc": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "expiresAtUtc": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "status": {
+              "enum": [
+                "PENDING",
+                "APPROVED",
+                "REJECTED",
+                "EXPIRED",
+                "CANCELLED"
+              ]
+            },
+            "decision": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "decidedBy",
+                    "decidedAtUtc",
+                    "decision",
+                    "reason"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "decidedBy": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "decidedAtUtc": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "decision": {
+                      "enum": [
+                        "APPROVE",
+                        "REJECT"
+                      ]
+                    },
+                    "reason": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "PENDING"
+                  }
+                },
+                "required": [
+                  "status"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "decision": {
+                    "type": "null"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "APPROVED",
+                      "REJECTED"
+                    ]
+                  }
+                },
+                "required": [
+                  "status"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "decision": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "properties": {
+        "schemaKind": {
+          "const": "MappingReleaseView"
+        },
+        "payload": {
+          "type": "object",
+          "required": [
+            "mappingReleaseId",
+            "mappingHash",
+            "sourceConnectionId",
+            "connectionRevision",
+            "sourceCatalogSnapshotId",
+            "sourceCatalogFingerprint",
+            "ontologyReleaseId",
+            "reviewProposalId",
+            "createdAtUtc",
+            "readOnly",
+            "active",
+            "activationRevision"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "mappingReleaseId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "mappingHash": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sourceConnectionId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "connectionRevision": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "sourceCatalogSnapshotId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sourceCatalogFingerprint": {
+              "type": "string",
+              "minLength": 1
+            },
+            "ontologyReleaseId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "reviewProposalId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "createdAtUtc": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "readOnly": {
+              "const": true
+            },
+            "active": {
+              "type": "boolean"
+            },
+            "activationRevision": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "schemaKind": {
+          "const": "MappingRevisionDiffView"
+        },
+        "payload": {
+          "type": "object",
+          "required": [
+            "draftId",
+            "baseRevision",
+            "targetRevision",
+            "sourceCatalogSnapshotId",
+            "ontologyReleaseId",
+            "diffHash",
+            "changes"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "draftId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "baseRevision": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "targetRevision": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "sourceCatalogSnapshotId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "ontologyReleaseId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "diffHash": {
+              "type": "string",
+              "minLength": 1
+            },
+            "changes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "path",
+                  "changeType",
+                  "summary"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "changeType": {
+                    "enum": [
+                      "ADD",
+                      "REMOVE",
+                      "MODIFY"
+                    ]
+                  },
+                  "summary": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "schemaKind": {
+          "const": "MappingAssessmentView"
+        },
+        "payload": {
+          "type": "object",
+          "required": [
+            "assessmentId",
+            "draftId",
+            "draftRevision",
+            "sourceCatalogSnapshotId",
+            "ontologyReleaseId",
+            "validationHash",
+            "status",
+            "issues",
+            "assessedAtUtc"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "assessmentId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "draftId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "draftRevision": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "sourceCatalogSnapshotId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "ontologyReleaseId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "validationHash": {
+              "type": "string",
+              "minLength": 1
+            },
+            "status": {
+              "enum": [
+                "PASS",
+                "FAIL",
+                "INDETERMINATE",
+                "NOT_RUN"
+              ]
+            },
+            "issues": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "code",
+                  "severity",
+                  "focusRef"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "severity": {
+                    "enum": [
+                      "info",
+                      "warning",
+                      "error"
+                    ]
+                  },
+                  "focusRef": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                }
+              }
+            },
+            "assessedAtUtc": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

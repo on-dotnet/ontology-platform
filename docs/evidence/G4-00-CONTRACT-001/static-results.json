@@ -1,0 +1,34 @@
+[
+  {
+    "name": "input-verify",
+    "command": [
+      "python3",
+      "/Users/chasen/.codex/worktrees/g4-00-contract-001/ontology-platform/docs/evidence/G4-00-CONTRACT-001/input-v1.1/verify_input.py"
+    ],
+    "exitCode": 0,
+    "stdout": "{\"status\": \"PACKAGE_AND_CROSS_DOCUMENT_STRUCTURE_PASS\", \"files\": 24, \"payloadFiles\": 22, \"ux\": 13, \"contractAcceptances\": 20, \"futureProductAcceptances\": 70, \"positiveSynthetic\": 21, \"negativeDesign\": 20, \"negativeSchemaRegressions\": 16, \"negativeSemanticRegressions\": 3, \"runtime\": \"NOT_RUN\", \"jsonSchemaSemanticValidation\": \"USE_verify_schema.py\"}\n",
+    "stderr": ""
+  },
+  {
+    "name": "schema-regressions",
+    "command": [
+      "/private/tmp/g4-00-validation-venv/bin/python",
+      "-B",
+      "/Users/chasen/.codex/worktrees/g4-00-contract-001/ontology-platform/docs/evidence/G4-00-CONTRACT-001/input-v1.1/verify_schema.py"
+    ],
+    "exitCode": 0,
+    "stdout": "{\"status\": \"DRAFT202012_SCHEMA_AND_CONTRACT_EXAMPLES_PASS\", \"schemaKinds\": 9, \"positive\": 21, \"expectedSchemaRejected\": 16, \"expectedSemanticRejected\": 3, \"inlineMarkdown\": 2, \"evidenceCrossReferences\": \"PASS\", \"schemaRuntime\": \"LOCAL_ONLY\", \"g4ServiceRuntime\": \"NOT_RUN\"}\n",
+    "stderr": ""
+  },
+  {
+    "name": "g2-bindings",
+    "command": [
+      "python3",
+      "-B",
+      "/Users/chasen/.codex/worktrees/g4-00-contract-001/ontology-platform/docs/evidence/G4-00-CONTRACT-001/check-bindings.py"
+    ],
+    "exitCode": 0,
+    "stdout": "{\n  \"status\": \"PASS\",\n  \"scope\": \"STATIC_G2_G4_FIELD_AND_FROZEN_INPUT_BINDING\",\n  \"checks\": [\n    \"G2 eleven names preserved plus version\",\n    \"all twelve G4 fields required\",\n    \"G2 candidate seven fields match\",\n    \"command four required match\",\n    \"create revision exactly zero\",\n    \"CommandContext strict generated DTO\",\n    \"SemanticQueryResult strict generated DTO\",\n    \"EntityCandidate strict generated DTO\",\n    \"EvidenceRef strict generated DTO\",\n    \"AssetVersionSnapshot strict generated DTO\",\n    \"SemanticSubSource strict generated DTO\",\n    \"old route and result retained\",\n    \"G4 route not implemented\",\n    \"frozen-source:AGENTS.md\",\n    \"frozen-source:PLANS.md\",\n    \"frozen-source:docs/tasks/current-authorization.md\",\n    \"frozen-source:docs/bootstrap/ontology-platform-codex-master-plan-bootstrap-v1.0.md\",\n    \"frozen-source:docs/planning/03-module-feature-matrix.md\",\n    \"frozen-source:docs/planning/04-roadmap-and-dependency-dag.md\",\n    \"frozen-source:docs/tasks/G3-M5-REVIEW-FIX-001.md\",\n    \"frozen-source:docs/evidence/G3-M5-REVIEW-FIX-001/resources.md\",\n    \"frozen-source:docs/development/local-validation-policy.md\",\n    \"frozen-source:docs/development/ai-development-efficiency.md\",\n    \"frozen-source:docs/development/review-package-spec.md\",\n    \"frozen-source:docs/development/resource-lifecycle.md\",\n    \"frozen-source:docs/contracts/g3-m3-contracts.md\",\n    \"frozen-source:docs/contracts/g3-m2-contracts.md\",\n    \"frozen-source:docs/contracts/g3-m5-contracts.md\",\n    \"frozen-source:docs/contracts/g3-m4-contract-a.md\",\n    \"frozen-source:docs/contracts/g3-m4-contract-b.md\",\n    \"frozen-source:docs/contracts/g3-m3-e0-contracts.md\",\n    \"frozen-source:docs/contracts/g3-m1-contracts.md\",\n    \"frozen-source:docs/contracts/g2-thin-slice-contracts.md\",\n    \"frozen-source:docs/contracts/g2-models.json\",\n    \"frozen-source:backend/src/Contracts/OntologyPlatform.Contracts/G2Models.g.cs\",\n    \"frozen-source:backend/src/Hosts/OntologyPlatform.Api/G2/SemanticEndpoints.cs\",\n    \"only owned paths changed\"\n  ],\n  \"count\": 37,\n  \"g2Fields\": [\n    \"status\",\n    \"data\",\n    \"candidates\",\n    \"evidence\",\n    \"snapshot\",\n    \"subSources\",\n    \"validTime\",\n    \"observedAtUtc\",\n    \"traceId\",\n    \"limited\",\n    \"diagnostics\"\n  ],\n  \"commandFields\": [\n    \"commandId\",\n    \"idempotencyKey\",\n    \"expectedRevision\",\n    \"reason\"\n  ],\n  \"candidateFields\": [\n    \"entityIri\",\n    \"entityTypeIris\",\n    \"externalId\",\n    \"organizationId\",\n    \"siteId\",\n    \"label\",\n    \"evidenceIds\"\n  ],\n  \"runtime\": \"NOT_RUN\"\n}\n",
+    "stderr": ""
+  }
+]
