@@ -1,0 +1,167 @@
+{
+  "taskId": "G4-M1-RECOVERY-001",
+  "runId": "recovery-20261101-01",
+  "utc": "2026-11-01T12:49:55.681693+00:00",
+  "records": [
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "version",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"Client\":{\"Version\":\"29.9.2\",\"ApiVersion\":\"1.56\",\"DefaultAPIVersion\":\"1.56\",\"GitCommit\":\"a82e528\",\"GoVersion\":\"go1.26.10\",\"Os\":\"darwin\",\"Arch\":\"arm64\",\"BuildTime\":\"Tue Oct 20 18:43:59 2026\",\"Context\":\"desktop-linux\"},\"Server\":{\"Platform\":{\"Name\":\"Docker Desktop 4.96.3 (244472)\"},\"Version\":\"29.9.2\",\"ApiVersion\":\"1.56\",\"MinAPIVersion\":\"1.40\",\"Os\":\"linux\",\"Arch\":\"arm64\",\"Components\":[{\"Name\":\"Engine\",\"Version\":\"29.9.2\",\"Details\":{\"ApiVersion\":\"1.56\",\"Arch\":\"arm64\",\"BuildTime\":\"Tue Oct 20 18:44:14 2026\",\"Experimental\":\"false\",\"GitCommit\":\"0367cbe\",\"GoVersion\":\"go1.26.10\",\"KernelVersion\":\"7.0.14-linuxkit\",\"MinAPIVersion\":\"1.40\",\"Module\":\"github.com/moby/moby/v2\",\"ModuleVersion\":\"v2.0.0+unknown\",\"Os\":\"linux\"}},{\"Name\":\"containerd\",\"Version\":\"v2.4.2\",\"Details\":{\"GitCommit\":\"b7a25261e029d68978bbf290df0a62fc819b3c51\"}},{\"Name\":\"runc\",\"Version\":\"1.5.2\",\"Details\":{\"GitCommit\":\"v1.5.2-0-g29dd3dc2\"}},{\"Name\":\"docker-init\",\"Version\":\"0.19.0\",\"Details\":{\"GitCommit\":\"de40ad0\"}}],\"GitCommit\":\"0367cbe\",\"GoVersion\":\"go1.26.10\",\"KernelVersion\":\"7.0.14-linuxkit\",\"BuildTime\":\"2026-10-20T18:44:14.000000000+00:00\"}}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{\"id\":\"{{.ID}}\",\"architecture\":\"{{.Architecture}}\",\"cpus\":{{.NCPU}},\"memory\":{{.MemTotal}}}"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"id\":\"7a8785bb-6b6e-4ae4-8065-996f4bf83016\",\"architecture\":\"aarch64\",\"cpus\":12,\"memory\":8319238144}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "ps",
+        "-a",
+        "--no-trunc",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "image",
+        "ls",
+        "--no-trunc",
+        "--digests",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"Containers\":\"0\",\"CreatedAt\":\"2026-10-28 22:40:49 +0800 CST\",\"CreatedSince\":\"3 days ago\",\"Digest\":\"sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c\",\"ID\":\"sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c\",\"Repository\":\"ontology-platform-fuseki\",\"SharedSize\":\"N/A\",\"Size\":\"606MB\",\"Tag\":\"context-4fbf23514516632dcb651b5c05bf04e9992da52491607b6cf58de1f7348ff9ab\",\"UniqueSize\":\"N/A\"}\n{\"Containers\":\"0\",\"CreatedAt\":\"2026-10-28 21:55:59 +0800 CST\",\"CreatedSince\":\"3 days ago\",\"Digest\":\"sha256:cc1591ccefc0ab280cfd1fef2ebc5315de7d2f39d8d1c1d690c37e305810a9b2\",\"ID\":\"sha256:cc1591ccefc0ab280cfd1fef2ebc5315de7d2f39d8d1c1d690c37e305810a9b2\",\"Repository\":\"hlc-iov-release-postgis\",\"SharedSize\":\"N/A\",\"Size\":\"966MB\",\"Tag\":\"18.6-3.6.3\",\"UniqueSize\":\"N/A\"}\n{\"Containers\":\"0\",\"CreatedAt\":\"2026-10-27 23:06:39 +0800 CST\",\"CreatedSince\":\"4 days ago\",\"Digest\":\"sha256:39b0fb6616a466a05b2ff8c691bb14a63557c70118d433a4b70fd1068b1bef60\",\"ID\":\"sha256:39b0fb6616a466a05b2ff8c691bb14a63557c70118d433a4b70fd1068b1bef60\",\"Repository\":\"ontology-platform-fuseki\",\"SharedSize\":\"N/A\",\"Size\":\"503MB\",\"Tag\":\"context-1e45f836d9837cbc75d23adb3ad37b0ff79a545ef06102a87aa246feea9cc1e5\",\"UniqueSize\":\"N/A\"}\n{\"Containers\":\"0\",\"CreatedAt\":\"2026-10-26 10:07:21 +0800 CST\",\"CreatedSince\":\"6 days ago\",\"Digest\":\"sha256:401e1fbc58c27b08c3103e00c86b22bd175a1cdd8f8a7d61965133f27a24437f\",\"ID\":\"sha256:401e1fbc58c27b08c3103e00c86b22bd175a1cdd8f8a7d61965133f27a24437f\",\"Repository\":\"ontology-platform-g2-fuseki\",\"SharedSize\":\"N/A\",\"Size\":\"503MB\",\"Tag\":\"6.2.0\",\"UniqueSize\":\"N/A\"}\n{\"Containers\":\"0\",\"CreatedAt\":\"2026-10-23 17:46:28 +0800 CST\",\"CreatedSince\":\"9 days ago\",\"Digest\":\"sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b\",\"ID\":\"sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b\",\"Repository\":\"quay.io/keycloak/keycloak\",\"SharedSize\":\"N/A\",\"Size\":\"750MB\",\"Tag\":\"\\u003cnone\\u003e\",\"UniqueSize\":\"N/A\"}\n{\"Containers\":\"0\",\"CreatedAt\":\"2026-10-23 05:40:39 +0800 CST\",\"CreatedSince\":\"9 days ago\",\"Digest\":\"sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18\",\"ID\":\"sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18\",\"Repository\":\"grafana/alloy\",\"SharedSize\":\"N/A\",\"Size\":\"928MB\",\"Tag\":\"\\u003cnone\\u003e\",\"UniqueSize\":\"N/A\"}\n{\"Containers\":\"0\",\"CreatedAt\":\"2026-10-21 23:59:43 +0800 CST\",\"CreatedSince\":\"10 days ago\",\"Digest\":\"sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044\",\"ID\":\"sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044\",\"Repository\":\"grafana/tempo\",\"SharedSize\":\"N/A\",\"Size\":\"161MB\",\"Tag\":\"\\u003cnone\\u003e\",\"UniqueSize\":\"N/A\"}\n{\"Containers\":\"0\",\"CreatedAt\":\"2026-10-21 22:04:19 +0800 CST\",\"CreatedSince\":\"10 days ago\",\"Digest\":\"sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2\",\"ID\":\"sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2\",\"Repository\":\"prom/prometheus\",\"SharedSize\":\"N/A\",\"Size\":\"357MB\",\"Tag\":\"\\u003cnone\\u003e\",\"UniqueSize\":\"N/A\"}\n{\"Containers\":\"0\",\"CreatedAt\":\"2026-10-21 08:40:08 +0800 CST\",\"CreatedSince\":\"11 days ago\",\"Digest\":\"\\u003cnone\\u003e\",\"ID\":\"sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6\",\"Repository\":\"hlc-iov-release-pg-base\",\"SharedSize\":\"N/A\",\"Size\":\"672MB\",\"Tag\":\"18.6\",\"UniqueSize\":\"N/A\"}\n{\"Containers\":\"0\",\"CreatedAt\":\"2026-10-21 08:40:08 +0800 CST\",\"CreatedSince\":\"11 days ago\",\"Digest\":\"sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6\",\"ID\":\"sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6\",\"Repository\":\"postgres\",\"SharedSize\":\"N/A\",\"Size\":\"672MB\",\"Tag\":\"\\u003cnone\\u003e\",\"UniqueSize\":\"N/A\"}\n{\"Containers\":\"0\",\"CreatedAt\":\"2026-10-21 05:45:42 +0800 CST\",\"CreatedSince\":\"11 days ago\",\"Digest\":\"sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28\",\"ID\":\"sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28\",\"Repository\":\"grafana/loki\",\"SharedSize\":\"N/A\",\"Size\":\"191MB\",\"Tag\":\"\\u003cnone\\u003e\",\"UniqueSize\":\"N/A\"}\n{\"Containers\":\"0\",\"CreatedAt\":\"2026-10-17 23:51:53 +0800 CST\",\"CreatedSince\":\"2 weeks ago\",\"Digest\":\"sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b\",\"ID\":\"sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b\",\"Repository\":\"rustfs/rustfs\",\"SharedSize\":\"N/A\",\"Size\":\"371MB\",\"Tag\":\"\\u003cnone\\u003e\",\"UniqueSize\":\"N/A\"}\n{\"Containers\":\"0\",\"CreatedAt\":\"2026-10-12 20:57:33 +0800 CST\",\"CreatedSince\":\"2 weeks ago\",\"Digest\":\"sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f\",\"ID\":\"sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f\",\"Repository\":\"grafana/grafana\",\"SharedSize\":\"N/A\",\"Size\":\"1.81GB\",\"Tag\":\"\\u003cnone\\u003e\",\"UniqueSize\":\"N/A\"}\n{\"Containers\":\"0\",\"CreatedAt\":\"2026-09-26 08:17:20 +0800 CST\",\"CreatedSince\":\"5 weeks ago\",\"Digest\":\"sha256:93b8a14ea2f412782e4e842651273b4d903e35cc496284f178fbbe2d67d00976\",\"ID\":\"sha256:93b8a14ea2f412782e4e842651273b4d903e35cc496284f178fbbe2d67d00976\",\"Repository\":\"docker.m.daocloud.io/library/maven\",\"SharedSize\":\"N/A\",\"Size\":\"726MB\",\"Tag\":\"3.9-eclipse-temurin-25\",\"UniqueSize\":\"N/A\"}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "ls",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"Availability\":\"N/A\",\"Driver\":\"local\",\"Group\":\"N/A\",\"Labels\":\"\",\"Links\":\"N/A\",\"Mountpoint\":\"/var/lib/docker/volumes/g2-ef979bd04cc0-alloy-data/_data\",\"Name\":\"g2-ef979bd04cc0-alloy-data\",\"Scope\":\"local\",\"Size\":\"N/A\",\"Status\":\"N/A\"}\n{\"Availability\":\"N/A\",\"Driver\":\"local\",\"Group\":\"N/A\",\"Labels\":\"\",\"Links\":\"N/A\",\"Mountpoint\":\"/var/lib/docker/volumes/g2-ef979bd04cc0-fuseki-data/_data\",\"Name\":\"g2-ef979bd04cc0-fuseki-data\",\"Scope\":\"local\",\"Size\":\"N/A\",\"Status\":\"N/A\"}\n{\"Availability\":\"N/A\",\"Driver\":\"local\",\"Group\":\"N/A\",\"Labels\":\"\",\"Links\":\"N/A\",\"Mountpoint\":\"/var/lib/docker/volumes/g2-ef979bd04cc0-grafana-data/_data\",\"Name\":\"g2-ef979bd04cc0-grafana-data\",\"Scope\":\"local\",\"Size\":\"N/A\",\"Status\":\"N/A\"}\n{\"Availability\":\"N/A\",\"Driver\":\"local\",\"Group\":\"N/A\",\"Labels\":\"\",\"Links\":\"N/A\",\"Mountpoint\":\"/var/lib/docker/volumes/g2-ef979bd04cc0-loki-data/_data\",\"Name\":\"g2-ef979bd04cc0-loki-data\",\"Scope\":\"local\",\"Size\":\"N/A\",\"Status\":\"N/A\"}\n{\"Availability\":\"N/A\",\"Driver\":\"local\",\"Group\":\"N/A\",\"Labels\":\"\",\"Links\":\"N/A\",\"Mountpoint\":\"/var/lib/docker/volumes/g2-ef979bd04cc0-postgres-data/_data\",\"Name\":\"g2-ef979bd04cc0-postgres-data\",\"Scope\":\"local\",\"Size\":\"N/A\",\"Status\":\"N/A\"}\n{\"Availability\":\"N/A\",\"Driver\":\"local\",\"Group\":\"N/A\",\"Labels\":\"\",\"Links\":\"N/A\",\"Mountpoint\":\"/var/lib/docker/volumes/g2-ef979bd04cc0-prometheus-data/_data\",\"Name\":\"g2-ef979bd04cc0-prometheus-data\",\"Scope\":\"local\",\"Size\":\"N/A\",\"Status\":\"N/A\"}\n{\"Availability\":\"N/A\",\"Driver\":\"local\",\"Group\":\"N/A\",\"Labels\":\"\",\"Links\":\"N/A\",\"Mountpoint\":\"/var/lib/docker/volumes/g2-ef979bd04cc0-rustfs-data/_data\",\"Name\":\"g2-ef979bd04cc0-rustfs-data\",\"Scope\":\"local\",\"Size\":\"N/A\",\"Status\":\"N/A\"}\n{\"Availability\":\"N/A\",\"Driver\":\"local\",\"Group\":\"N/A\",\"Labels\":\"\",\"Links\":\"N/A\",\"Mountpoint\":\"/var/lib/docker/volumes/g2-ef979bd04cc0-tempo-data/_data\",\"Name\":\"g2-ef979bd04cc0-tempo-data\",\"Scope\":\"local\",\"Size\":\"N/A\",\"Status\":\"N/A\"}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "network",
+        "ls",
+        "--no-trunc",
+        "--format",
+        "{{json .}}"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"CreatedAt\":\"2026-11-01 12:49:27.738465791 +0000 UTC\",\"Driver\":\"bridge\",\"ID\":\"5ae4edc8ca75e1d8de027026d56d773a7a1b819c22680382de6d9a9d07f3fadd\",\"IPv4\":\"true\",\"IPv6\":\"false\",\"Internal\":\"false\",\"Labels\":\"\",\"Name\":\"bridge\",\"Scope\":\"local\"}\n{\"CreatedAt\":\"2026-10-25 01:37:03.981006875 +0000 UTC\",\"Driver\":\"host\",\"ID\":\"80ac07a0bfc7ad5bdedefec78a3a66c97c4c74093c4a8533f05f4cb96bcbc4d0\",\"IPv4\":\"true\",\"IPv6\":\"false\",\"Internal\":\"false\",\"Labels\":\"\",\"Name\":\"host\",\"Scope\":\"local\"}\n{\"CreatedAt\":\"2026-10-25 01:37:03.980171666 +0000 UTC\",\"Driver\":\"null\",\"ID\":\"e66d65cfe0714eb9fde22ab801d77393aeb653344362c0faac45292d829dab8e\",\"IPv4\":\"true\",\"IPv6\":\"false\",\"Internal\":\"false\",\"Labels\":\"\",\"Name\":\"none\",\"Scope\":\"local\"}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "system",
+        "df"
+      ],
+      "exitCode": 0,
+      "stdout": "TYPE            TOTAL     ACTIVE    SIZE      RECLAIMABLE\nImages          13        0         7.1GB     6.043GB (85%)\nContainers      0         0         0B        0B\nLocal Volumes   8         0         619.3MB   619.3MB (100%)\nBuild Cache     70        0         2.925GB   1.139GB\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "buildx",
+        "history",
+        "ls",
+        "--format",
+        "json"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"cached_steps\":5,\"completed_at\":\"2026-10-28T14:58:52.622966299Z\",\"completed_steps\":13,\"created_at\":\"2026-10-28T14:58:46.930776213Z\",\"name\":\"infra/development/fuseki\",\"ref\":\"desktop-linux/desktop-linux/1kq80249gfrdurl9atazzw7kl\",\"status\":\"Completed\",\"total_steps\":13}\n{\"cached_steps\":0,\"completed_at\":\"2026-10-28T13:56:02.930179637Z\",\"completed_steps\":6,\"created_at\":\"2026-10-28T13:49:49.957334256Z\",\"name\":\".verification/release-c5e289cd/docker\",\"ref\":\"desktop-linux/desktop-linux/vq2df00gcyjps32jx8vlylpuk\",\"status\":\"Completed\",\"total_steps\":6}\n{\"cached_steps\":1,\"completed_at\":\"2026-10-28T13:47:26.546721092Z\",\"completed_steps\":9,\"created_at\":\"2026-10-28T13:45:09.524610876Z\",\"name\":\".verification/release-c5e289cd\",\"ref\":\"desktop-linux/desktop-linux/rcb0gy3pt97pgilczmff1itne\",\"status\":\"Completed\",\"total_steps\":9}\n{\"cached_steps\":1,\"completed_at\":\"2026-10-28T13:45:07.31423775Z\",\"completed_steps\":6,\"created_at\":\"2026-10-28T13:34:41.749890335Z\",\"name\":\".verification/release-c5e289cd\",\"ref\":\"desktop-linux/desktop-linux/ihl3gp469h5nq38l942lv9p1v\",\"status\":\"Error\",\"total_steps\":8}\n{\"cached_steps\":0,\"completed_at\":\"2026-10-28T13:32:35.188300221Z\",\"completed_steps\":7,\"created_at\":\"2026-10-28T13:32:07.929946958Z\",\"name\":\"hlc-iov/jt-console/testcontainers/Dockerfile.postgis18\",\"ref\":\"desktop-linux/desktop-linux/qao9ei05z94c4rt13gu1p0kkh\",\"status\":\"Error\",\"total_steps\":9}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "worktree",
+        "list",
+        "--porcelain"
+      ],
+      "exitCode": 0,
+      "stdout": "worktree /Users/chasen/Developer/repos/ontology-platform\nHEAD d1a61daffe844475b07705797e3ad325cc3f2945\nbranch refs/heads/main\n\nworktree /Users/chasen/.codex/worktrees/320c/ontology-platform\nHEAD e2a8965f09ace4d802534c2f095fecefb0748e52\nbranch refs/heads/codex/g3-m5-sem\n\nworktree /Users/chasen/.codex/worktrees/b389/ontology-platform\nHEAD 580d73e7c0fb38b94dbbed1136ee0b1d24fadc9d\nbranch refs/heads/codex/g3-m5-master\n\nworktree /Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform\nHEAD f0712e9174d1bff82b5f6959e0a61e723585be88\nbranch refs/heads/codex/g3-m1-closeout-master\n\nworktree /Users/chasen/.codex/worktrees/g3-m1-closeout-package/ontology-platform\nHEAD 6b0ec74e10c1ff820abc7b358bf43beb880a245b\nbranch refs/heads/codex/g3-m1-closeout-package\n\nworktree /Users/chasen/.codex/worktrees/g3-m1-closeout-resources/ontology-platform\nHEAD f3197177304e6a25f8597ff611acb04fb4e5b268\nbranch refs/heads/codex/g3-m1-closeout-resources\n\nworktree /Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform\nHEAD d89ba59bac5ecc1e5946f49b790cb8ff3319ae78\nbranch refs/heads/codex/g3-m3-efficiency\n\nworktree /Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform\nHEAD 3992582e03df1a103fac36e7e82b8c81f85f622e\nbranch refs/heads/codex/g3-m3-master\n\nworktree /Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform\nHEAD 90b60366a0e9907409061a5af5791c79a87cb499\nbranch refs/heads/codex/g3-m3-sem-language\n\nworktree /Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform\nHEAD 2ad537b63e0ed1b8392066201ad95ff4cb4d2b30\nbranch refs/heads/codex/g3-m3-web\n\nworktree /Users/chasen/.codex/worktrees/g3-m4-mac-master/ontology-platform\nHEAD e5b7e99715ee7ebfe419717f7cacf0c02dfcb78a\nbranch refs/heads/codex/g3-m4-mac-master\n\nworktree /Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform\nHEAD c909fa5e605417ff645da19d5899748c0f35773c\nbranch refs/heads/codex/g3-m4-sem-b\n\nworktree /Users/chasen/.codex/worktrees/g3-m4-web-a/ontology-platform\nHEAD b779ff5159fdbcedaa837c57ead30f3236b0f549\nbranch refs/heads/codex/g3-m4-web-b\n\nworktree /Users/chasen/.codex/worktrees/g3-m5-e0/ontology-platform\nHEAD cd59a8f47fee10840046bc14c817c87f8be6674c\nbranch refs/heads/codex/g3-m5-e0\n\nworktree /Users/chasen/.codex/worktrees/g3-m5-review-fix/ontology-platform\nHEAD d1a61daffe844475b07705797e3ad325cc3f2945\nbranch refs/heads/codex/G3-M5-REVIEW-FIX-001\n\nworktree /Users/chasen/.codex/worktrees/g4-00-contract-001/ontology-platform\nHEAD 8afc5d4dfd32e7adb48262cce6587057c0e68715\nbranch refs/heads/codex/g4-00-contract-001\n\nworktree /Users/chasen/.codex/worktrees/g4-m1-connection-master/ontology-platform\nHEAD 59edb405dfb4acf4d4a259cffdc3551bafa90d2c\nbranch refs/heads/codex/g4-m1-connection-master\n\nworktree /Users/chasen/.codex/worktrees/g4-m1-connection-ui/ontology-platform\nHEAD 99b61584f1fc115ea3174cfe11681c3d6eddd709\nbranch refs/heads/codex/g4-m1-connection-ui\n\nworktree /Users/chasen/.codex/worktrees/g4-m1-pg-adapter/ontology-platform\nHEAD 6aba51d3f8338b23922192dc0693e2bfb723c90d\nbranch refs/heads/codex/g4-m1-pg-adapter\n\nworktree /Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform\nHEAD 59edb405dfb4acf4d4a259cffdc3551bafa90d2c\nbranch refs/heads/codex/g4-m1-recovery-001\n\nworktree /Users/chasen/.codex/worktrees/g6-p0-dependency-lock-001/ontology-platform\nHEAD 72a88341c634f971ed0a30a1e63a974f957cbb05\nbranch refs/heads/codex/g6-p0-dependency-lock-001\n\nworktree /Users/chasen/.codex/worktrees/g6-p0-parser-prep-master/ontology-platform\nHEAD 851fa7eb2153c660b7989c0a7a6dd0e1c8e1b63c\nbranch refs/heads/codex/g6-p0-parser-prep-master\n\nworktree /Users/chasen/.codex/worktrees/g6-p0-parser-prep-parser/ontology-platform\nHEAD ffa3499812debd89f2e7fe4138e2ddfca2e7ac68\nbranch refs/heads/codex/g6-p0-parser-prep-parser\n\nworktree /Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform\nHEAD d6aab6b47e63c9d5deadfa480f6659c62c5ed138\nbranch refs/heads/codex/PRE-G3-CLEANUP-FIX-002\n\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "lsof",
+        "-nP",
+        "-iTCP",
+        "-sTCP:LISTEN"
+      ],
+      "exitCode": 0,
+      "stdout": "COMMAND     PID   USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME\nclash-ver  1908 chasen   10u  IPv4 0x13ef1791401e1e64      0t0  TCP 127.0.0.1:49860 (LISTEN)\nSpotify   61759 chasen   72u  IPv4 0x376ab18146184bd5      0t0  TCP 127.0.0.1:7768 (LISTEN)\nSpotify   61759 chasen  248u  IPv4 0x89ef84aae9ddbc8c      0t0  TCP *:57621 (LISTEN)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "df",
+        "-k",
+        "."
+      ],
+      "exitCode": 0,
+      "stdout": "Filesystem   1024-blocks      Used Available Capacity iused      ifree %iused  Mounted on\n/dev/disk3s5   482746452  95099520 361149948    21% 1963444 3611499480    0%   /System/Volumes/Data\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/maintenance/execution_preflight.py",
+        "check",
+        "--milestone",
+        "G4-M1",
+        "--phase",
+        "dispatch"
+      ],
+      "exitCode": 2,
+      "stdout": "",
+      "stderr": "usage: execution_preflight.py check [-h] [--root ROOT]\n                                    [--milestone {M1,M2,M3,M4,M5,G4-M1}]\n                                    [--path PATH] [--phase {contract,runtime}]\nexecution_preflight.py check: error: argument --phase: invalid choice: 'dispatch' (choose from 'contract', 'runtime')\n"
+    }
+  ],
+  "keep": "All preexisting resources and worktrees. Only new exact owned resources may be candidates."
+}

@@ -1,3 +1,7 @@
+# 2026-11-01 G4-M1-RECOVERY-001 最新授权
+
+用户正式批准恢复实施及 AMBER-A1 内部合成非分发风险接受；任务卡 [G4-M1-RECOVERY-001](G4-M1-RECOVERY-001.md)。仅四固定ARM64镜像受控取证及原M1 P3–P5、64KiB安全修复；不合main、不改G3/G6、不启动M2。以下历史授权原样保留。
+
 # G4-M1-CONNECTION-001 当前授权（2026-11-01）
 
 本会话用户正式批准附件V1全部P0–P5、合成Secret策略及准入后的精确依赖/镜像/资源预算。见[G4-M1任务卡](G4-M1-CONNECTION-001.md)与[实际授权](../evidence/G4-M1-CONNECTION-001/authorization.md)。从G4-00已审Head独立树实施；公共合同先非作者Review，再独立PG/UI写者；不合main、不动G6、不自动M2。历史授权保留。

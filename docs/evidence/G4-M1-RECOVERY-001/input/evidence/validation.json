@@ -1,0 +1,143 @@
+{
+  "evidenceSchemaVersion": 2,
+  "validationSource": "LOCAL",
+  "testedCommit": "958dc6c4eb121958ae889213d1a523a7e7914ce8",
+  "checks": [
+    {
+      "name": "input-archive-integrity",
+      "command": "ZIP CRC/path/Manifest/SHA256 verification",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "33 entries/31 manifest payloads; exact source bytes and input binding retained; see input-original-bytes.json and p1-tests.json."
+    },
+    {
+      "name": "strict-g4-wire-contract",
+      "command": "dotnet backend/tests/OntologyPlatform.G2ContractTests/bin/Debug/net10.0/OntologyPlatform.G2ContractTests.dll --filter 'FullyQualifiedName~G4WireContractTests' --minimum-expected-tests 15 --no-ansi --output Minimal",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "15 actual tests passed; contract-tests-final.txt. Compiled real API dependency graph; build zero warnings/errors."
+    },
+    {
+      "name": "pg-adapter-local-negatives",
+      "command": "dotnet backend/tests/OntologyPlatform.ConnectionsTests/bin/Debug/net10.0/OntologyPlatform.ConnectionsTests.dll --filter 'TestCategory!=RealPgFixture' --minimum-expected-tests 21 --no-ansi --output Minimal",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "21 actual local boundary/negative tests passed, no skipped tests. Real PostgreSQL explicitly excluded; pg-tests-final.txt."
+    },
+    {
+      "name": "ui-types",
+      "command": "node apps/web/node_modules/typescript/bin/tsc --project apps/web/tsconfig.json --noEmit --incremental false",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Integrated real generated TS types; ui-typecheck-final.txt empty success output."
+    },
+    {
+      "name": "ui-components",
+      "command": "node apps/web/node_modules/vitest/vitest.mjs run src/features/connections --root apps/web",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "73 actual component tests passed; ui-tests-final.txt; not browser/OIDC acceptance."
+    },
+    {
+      "name": "host-module-build",
+      "command": "dotnet build backend/src/Hosts/OntologyPlatform.Api --no-restore -v:q",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Real Host/module build 0 warnings/errors; review-fixes-build.txt; later contract-test build includes final LastProbeId correction."
+    },
+    {
+      "name": "repository-selftest",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1 -SelfTest",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "selftest-final.txt: engineering/maintenance checks and 103 ReviewPackage regression tests passed. Product/container tests NOT_RUN."
+    },
+    {
+      "name": "source-whitespace",
+      "command": "dotnet format whitespace backend/OntologyPlatform.slnx --no-restore --include backend/src/Modules/Connections backend/src/Hosts/OntologyPlatform.Api/G4 backend/src/Hosts/OntologyPlatform.Api/PlatformApiHost.cs backend/src/Hosts/OntologyPlatform.Api/Program.cs backend/src/Hosts/OntologyPlatform.Api/Security/PostgresTicketStore.cs backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "format-final.txt: command exit0 with workspace-loading warning. Not a complete Chinese comment semantic review."
+    },
+    {
+      "name": "diff-check",
+      "command": "git diff 8afc5d4dfd32e7adb48262cce6587057c0e68715 HEAD --check",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Complete Base..testedCommit diff-check exit0; final package repeats exact Head diff check."
+    },
+    {
+      "name": "independent-component-review",
+      "command": "Non-author P1/PG/UI and application defect review",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Limited candidate scopes only; independent-component-review.md. Full application product security review not claimed."
+    },
+    {
+      "name": "complete-image-license-admission",
+      "command": "Exact registry manifest/SPDX/provenance/referrers plus official exact-version license queries",
+      "status": "BLOCKED",
+      "exitCode": null,
+      "output": "See blocked-witness.json. Complete OS/JDK/exact-version license inventories unavailable; runtime layer pull prohibited."
+    },
+    {
+      "name": "real-product-49-case-matrix",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "All 49 full product cases NOT_RUN, acceptance-matrix.json. PG/TLS/OIDC/HTTP/browser/audit fault/CAS recovery and stable full acceptance were not executed."
+    },
+    {
+      "name": "runtime-preflight",
+      "command": "python3 scripts/maintenance/execution_preflight.py check --milestone G4-M1 --phase runtime",
+      "status": "BLOCKED",
+      "exitCode": 2,
+      "output": "Observed REFUSED PREFLIGHT_INVALID while runtime consumers were absent. Compose/launcher/browser implementations pending; no fake consumers added."
+    },
+    {
+      "name": "native-windows-amd64",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Manifest availability is not native Windows/AMD64 execution."
+    },
+    {
+      "name": "full-csharp-comment-and-security-review",
+      "command": null,
+      "status": "NOT_VERIFIED",
+      "exitCode": null,
+      "output": "Chinese XML/local-purpose comments implemented; complete semantic audit plus product security remains pending."
+    },
+    {
+      "name": "task-resource-release",
+      "command": "Exact owned symlink unlink + verified monitor SIGTERM + read-only Docker ID comparison",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "4 owned symlinks removed, shared targets preserved; exact monitor exited0. No task Docker objects created; all old objects preserved. cleanup-receipt.json and resources-images-recheck.json."
+    },
+    {
+      "name": "complete-session-timing",
+      "command": null,
+      "status": "NOT_VERIFIED",
+      "exitCode": null,
+      "output": "Host monitor observed 108 heartbeats over1612096ms; lock/display trials and whole-session active timing not verified. No fabricated schema2 total duration."
+    }
+  ],
+  "ci": {
+    "status": "NOT_RUN",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  },
+  "metadata": {
+    "taskId": "G4-M1-CONNECTION-001",
+    "taskStatus": "BLOCKED_WITH_WITNESS",
+    "packageStatus": "PARTIAL",
+    "actualAgentActiveTime": "UNKNOWN",
+    "sourceBinding": "The tested source working snapshot was committed as testedCommit without product-input changes. Subsequent evidence/documentation-only commits do not replace product testing.",
+    "noMainMerge": true,
+    "noG6Change": true,
+    "noRuntimeImagePull": true
+  }
+}

@@ -41,7 +41,19 @@ public static class G4Endpoints
             {
                 try
                 {
-                    body = await JsonSerializer.DeserializeAsync(context.Request.Body, requestType, G4ConnectionJson.Options, token);
+                    // 多读一个字节用于判定超限；无长度头、分块和HTTP/2均在解析前限长。
+                    var bytes = new byte[65537];
+                    // 累计的是实际正文八位字节，不能相信客户端声明长度。
+                    var count = 0;
+                    while (count < bytes.Length)
+                    {
+                        // 每次只读取剩余预算，短读不能被误当正文结束。
+                        var read = await context.Request.Body.ReadAsync(bytes.AsMemory(count), token);
+                        if (read == 0) break;
+                        count += read;
+                    }
+                    if (count > 65536) throw new SemanticOperationException(413, "connection_profile_invalid");
+                    body = JsonSerializer.Deserialize(bytes.AsSpan(0, count), requestType, G4ConnectionJson.Options);
                     if (body is null) throw new JsonException();
                     G4ConnectionRules.Validate(body);
                 }

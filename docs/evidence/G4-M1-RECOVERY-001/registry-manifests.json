@@ -1,0 +1,1718 @@
+[
+  {
+    "image": "postgres:18.6-trixie",
+    "kind": "tag",
+    "command": [
+      "docker",
+      "--context",
+      "desktop-linux",
+      "buildx",
+      "imagetools",
+      "inspect",
+      "--raw",
+      "postgres:18.6-trixie"
+    ],
+    "exitCode": 0,
+    "sha256": "3a4264520e121176619f54ff867d12774bc81e95e7b84db58d63bccdb6144b81",
+    "stderr": "",
+    "manifest": {
+      "manifests": [
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "amd64",
+            "org.opencontainers.image.base.digest": "sha256:1e1a22175fbf1b32157ddaf0219e1db4e5401fab2b94ed285add64d18587cd2d",
+            "org.opencontainers.image.base.name": "debian:trixie-slim",
+            "org.opencontainers.image.created": "2026-10-28T01:30:07Z",
+            "org.opencontainers.image.revision": "e00e1bd34ec5c8a8e7ad89b273b3d42efaf6d5bc",
+            "org.opencontainers.image.source": "https://github.com/docker-library/postgres.git#e00e1bd34ec5c8a8e7ad89b273b3d42efaf6d5bc:18/trixie",
+            "org.opencontainers.image.url": "https://hub.docker.com/_/postgres",
+            "org.opencontainers.image.version": "18.6"
+          },
+          "digest": "sha256:f4b419e350fd98d4a8429603295208976dea4c8fb8326d818d346d3e29f1db6f",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "amd64",
+            "os": "linux"
+          },
+          "size": 3439
+        },
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "amd64",
+            "vnd.docker.reference.digest": "sha256:f4b419e350fd98d4a8429603295208976dea4c8fb8326d818d346d3e29f1db6f",
+            "vnd.docker.reference.type": "attestation-manifest"
+          },
+          "digest": "sha256:a95058d8f8ca336b1316fc5d759f482bbe7d3abe300b0b844c2af3dc0d661c06",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "unknown",
+            "os": "unknown"
+          },
+          "size": 841
+        },
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "arm32v5",
+            "org.opencontainers.image.base.digest": "sha256:490c1ef86813e511a5e3d223eab6df6542f28209a074f00dd388db723a8daf9a",
+            "org.opencontainers.image.base.name": "debian:trixie-slim",
+            "org.opencontainers.image.created": "2026-10-28T01:31:51Z",
+            "org.opencontainers.image.revision": "e00e1bd34ec5c8a8e7ad89b273b3d42efaf6d5bc",
+            "org.opencontainers.image.source": "https://github.com/docker-library/postgres.git#e00e1bd34ec5c8a8e7ad89b273b3d42efaf6d5bc:18/trixie",
+            "org.opencontainers.image.url": "https://hub.docker.com/_/postgres",
+            "org.opencontainers.image.version": "18.6"
+          },
+          "digest": "sha256:8a97b339bd4371586d1bf3ff650f10f37a4897056ba8e8456f4d36576b74a87b",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "arm",
+            "os": "linux",
+            "variant": "v5"
+          },
+          "size": 3440
+        },
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "arm32v5",
+            "vnd.docker.reference.digest": "sha256:8a97b339bd4371586d1bf3ff650f10f37a4897056ba8e8456f4d36576b74a87b",
+            "vnd.docker.reference.type": "attestation-manifest"
+          },
+          "digest": "sha256:8769e2bda085a24ad270946a2ee409fbfd893e961c842bb411e3630abc5c5ed6",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "unknown",
+            "os": "unknown"
+          },
+          "size": 841
+        },
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "arm32v7",
+            "org.opencontainers.image.base.digest": "sha256:93c6fe8a2a6593f29349f2bcf2ea7976833c59a6dd215a6808f274b2fa5e67c9",
+            "org.opencontainers.image.base.name": "debian:trixie-slim",
+            "org.opencontainers.image.created": "2026-10-28T02:01:23Z",
+            "org.opencontainers.image.revision": "e00e1bd34ec5c8a8e7ad89b273b3d42efaf6d5bc",
+            "org.opencontainers.image.source": "https://github.com/docker-library/postgres.git#e00e1bd34ec5c8a8e7ad89b273b3d42efaf6d5bc:18/trixie",
+            "org.opencontainers.image.url": "https://hub.docker.com/_/postgres",
+            "org.opencontainers.image.version": "18.6"
+          },
+          "digest": "sha256:f43742786609d7d67a9646a9d5c8dd6cf809d6745aa9f949b165f30e46d2a8a3",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "arm",
+            "os": "linux",
+            "variant": "v7"
+          },
+          "size": 3440
+        },
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "arm32v7",
+            "vnd.docker.reference.digest": "sha256:f43742786609d7d67a9646a9d5c8dd6cf809d6745aa9f949b165f30e46d2a8a3",
+            "vnd.docker.reference.type": "attestation-manifest"
+          },
+          "digest": "sha256:68e3cbccf9ebb9ba969ff9dbc74d4e118f73bbda5b45a0dad9bc09d1dac6eac9",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "unknown",
+            "os": "unknown"
+          },
+          "size": 841
+        },
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "arm64v8",
+            "org.opencontainers.image.base.digest": "sha256:1470991b497d26788dc4d6f438bf5690c6ba0d499235d237e55f4b43caea7a75",
+            "org.opencontainers.image.base.name": "debian:trixie-slim",
+            "org.opencontainers.image.created": "2026-10-28T01:32:55Z",
+            "org.opencontainers.image.revision": "e00e1bd34ec5c8a8e7ad89b273b3d42efaf6d5bc",
+            "org.opencontainers.image.source": "https://github.com/docker-library/postgres.git#e00e1bd34ec5c8a8e7ad89b273b3d42efaf6d5bc:18/trixie",
+            "org.opencontainers.image.url": "https://hub.docker.com/_/postgres",
+            "org.opencontainers.image.version": "18.6"
+          },
+          "digest": "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "arm64",
+            "os": "linux",
+            "variant": "v8"
+          },
+          "size": 3441
+        },
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "arm64v8",
+            "vnd.docker.reference.digest": "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+            "vnd.docker.reference.type": "attestation-manifest"
+          },
+          "digest": "sha256:316659847625da3b939ed0f6b76847f78e87a1fb3df901943147e1ccab52030f",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "unknown",
+            "os": "unknown"
+          },
+          "size": 841
+        },
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "i386",
+            "org.opencontainers.image.base.digest": "sha256:54d4782cc10f415e6c52ed7873f2b7d6498a888555ee66e45ae688efc3dda6ee",
+            "org.opencontainers.image.base.name": "debian:trixie-slim",
+            "org.opencontainers.image.created": "2026-10-28T01:30:49Z",
+            "org.opencontainers.image.revision": "e00e1bd34ec5c8a8e7ad89b273b3d42efaf6d5bc",
+            "org.opencontainers.image.source": "https://github.com/docker-library/postgres.git#e00e1bd34ec5c8a8e7ad89b273b3d42efaf6d5bc:18/trixie",
+            "org.opencontainers.image.url": "https://hub.docker.com/_/postgres",
+            "org.opencontainers.image.version": "18.6"
+          },
+          "digest": "sha256:a7026df7681ce3d59a682ccf6155cf94ca377615c0170012dac2d6ce1e3fd22c",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "386",
+            "os": "linux"
+          },
+          "size": 3437
+        },
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "i386",
+            "vnd.docker.reference.digest": "sha256:a7026df7681ce3d59a682ccf6155cf94ca377615c0170012dac2d6ce1e3fd22c",
+            "vnd.docker.reference.type": "attestation-manifest"
+          },
+          "digest": "sha256:1c050325e7f74bc306911a4f500685680df9d8018583058ac3bebbdfd2f5f332",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "unknown",
+            "os": "unknown"
+          },
+          "size": 841
+        },
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "ppc64le",
+            "org.opencontainers.image.base.digest": "sha256:36d7020e168d5a85d1b1391efed8f4aa655cb01b750310f5021bd63836d36d27",
+            "org.opencontainers.image.base.name": "debian:trixie-slim",
+            "org.opencontainers.image.created": "2026-10-28T03:57:43Z",
+            "org.opencontainers.image.revision": "e00e1bd34ec5c8a8e7ad89b273b3d42efaf6d5bc",
+            "org.opencontainers.image.source": "https://github.com/docker-library/postgres.git#e00e1bd34ec5c8a8e7ad89b273b3d42efaf6d5bc:18/trixie",
+            "org.opencontainers.image.url": "https://hub.docker.com/_/postgres",
+            "org.opencontainers.image.version": "18.6"
+          },
+          "digest": "sha256:aa3d38a0d475996221327e363c4b9a1cbdfc895512793129de7589f2f3560d03",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "ppc64le",
+            "os": "linux"
+          },
+          "size": 3441
+        },
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "ppc64le",
+            "vnd.docker.reference.digest": "sha256:aa3d38a0d475996221327e363c4b9a1cbdfc895512793129de7589f2f3560d03",
+            "vnd.docker.reference.type": "attestation-manifest"
+          },
+          "digest": "sha256:3e3cc88c051e58c233f26aac7b6b8e6d6bf2d8368975eaa4d50c9d27721c66bd",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "unknown",
+            "os": "unknown"
+          },
+          "size": 841
+        },
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "riscv64",
+            "org.opencontainers.image.base.digest": "sha256:d2603372b44ea7e55fcc4b2f5fd667024d6f298af5af7c7474f639321570c5cc",
+            "org.opencontainers.image.base.name": "debian:trixie-slim",
+            "org.opencontainers.image.created": "2026-10-31T18:38:01Z",
+            "org.opencontainers.image.revision": "e00e1bd34ec5c8a8e7ad89b273b3d42efaf6d5bc",
+            "org.opencontainers.image.source": "https://github.com/docker-library/postgres.git#e00e1bd34ec5c8a8e7ad89b273b3d42efaf6d5bc:18/trixie",
+            "org.opencontainers.image.url": "https://hub.docker.com/_/postgres",
+            "org.opencontainers.image.version": "18.6"
+          },
+          "digest": "sha256:9b81e779bd80a6d03443d159399af9f6135a59320707db32dd5cf54f6fa53d25",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "riscv64",
+            "os": "linux"
+          },
+          "size": 3440
+        },
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "riscv64",
+            "vnd.docker.reference.digest": "sha256:9b81e779bd80a6d03443d159399af9f6135a59320707db32dd5cf54f6fa53d25",
+            "vnd.docker.reference.type": "attestation-manifest"
+          },
+          "digest": "sha256:79a9d0323abbb96edf76cf6031fb6ab436a2997af2b9c56a2aaa39e8c321ea0e",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "unknown",
+            "os": "unknown"
+          },
+          "size": 841
+        },
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "s390x",
+            "org.opencontainers.image.base.digest": "sha256:b52f4830ac1fe39bb67a84fd3f71aa45ad7a151085cb2cc770dd5b789ba6669b",
+            "org.opencontainers.image.base.name": "debian:trixie-slim",
+            "org.opencontainers.image.created": "2026-10-28T02:03:35Z",
+            "org.opencontainers.image.revision": "e00e1bd34ec5c8a8e7ad89b273b3d42efaf6d5bc",
+            "org.opencontainers.image.source": "https://github.com/docker-library/postgres.git#e00e1bd34ec5c8a8e7ad89b273b3d42efaf6d5bc:18/trixie",
+            "org.opencontainers.image.url": "https://hub.docker.com/_/postgres",
+            "org.opencontainers.image.version": "18.6"
+          },
+          "digest": "sha256:a06f308845c73aa6203c1f3f054aece0b8ea1e2f084921d0038ceac9970fed0d",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "s390x",
+            "os": "linux"
+          },
+          "size": 3439
+        },
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "s390x",
+            "vnd.docker.reference.digest": "sha256:a06f308845c73aa6203c1f3f054aece0b8ea1e2f084921d0038ceac9970fed0d",
+            "vnd.docker.reference.type": "attestation-manifest"
+          },
+          "digest": "sha256:c8123f8c5158973268d47f4c79c5ca1a44ed712ff3e9658ad9d6ee9985b1b917",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "unknown",
+            "os": "unknown"
+          },
+          "size": 841
+        }
+      ],
+      "mediaType": "application/vnd.oci.image.index.v1+json",
+      "schemaVersion": 2
+    }
+  },
+  {
+    "image": "postgres:18.6-trixie",
+    "kind": "index",
+    "command": [
+      "docker",
+      "--context",
+      "desktop-linux",
+      "buildx",
+      "imagetools",
+      "inspect",
+      "--raw",
+      "postgres@sha256:3a4264520e121176619f54ff867d12774bc81e95e7b84db58d63bccdb6144b81"
+    ],
+    "exitCode": 0,
+    "sha256": "3a4264520e121176619f54ff867d12774bc81e95e7b84db58d63bccdb6144b81",
+    "stderr": "",
+    "manifest": {
+      "manifests": [
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "amd64",
+            "org.opencontainers.image.base.digest": "sha256:1e1a22175fbf1b32157ddaf0219e1db4e5401fab2b94ed285add64d18587cd2d",
+            "org.opencontainers.image.base.name": "debian:trixie-slim",
+            "org.opencontainers.image.created": "2026-10-28T01:30:07Z",
+            "org.opencontainers.image.revision": "e00e1bd34ec5c8a8e7ad89b273b3d42efaf6d5bc",
+            "org.opencontainers.image.source": "https://github.com/docker-library/postgres.git#e00e1bd34ec5c8a8e7ad89b273b3d42efaf6d5bc:18/trixie",
+            "org.opencontainers.image.url": "https://hub.docker.com/_/postgres",
+            "org.opencontainers.image.version": "18.6"
+          },
+          "digest": "sha256:f4b419e350fd98d4a8429603295208976dea4c8fb8326d818d346d3e29f1db6f",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "amd64",
+            "os": "linux"
+          },
+          "size": 3439
+        },
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "amd64",
+            "vnd.docker.reference.digest": "sha256:f4b419e350fd98d4a8429603295208976dea4c8fb8326d818d346d3e29f1db6f",
+            "vnd.docker.reference.type": "attestation-manifest"
+          },
+          "digest": "sha256:a95058d8f8ca336b1316fc5d759f482bbe7d3abe300b0b844c2af3dc0d661c06",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "unknown",
+            "os": "unknown"
+          },
+          "size": 841
+        },
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "arm32v5",
+            "org.opencontainers.image.base.digest": "sha256:490c1ef86813e511a5e3d223eab6df6542f28209a074f00dd388db723a8daf9a",
+            "org.opencontainers.image.base.name": "debian:trixie-slim",
+            "org.opencontainers.image.created": "2026-10-28T01:31:51Z",
+            "org.opencontainers.image.revision": "e00e1bd34ec5c8a8e7ad89b273b3d42efaf6d5bc",
+            "org.opencontainers.image.source": "https://github.com/docker-library/postgres.git#e00e1bd34ec5c8a8e7ad89b273b3d42efaf6d5bc:18/trixie",
+            "org.opencontainers.image.url": "https://hub.docker.com/_/postgres",
+            "org.opencontainers.image.version": "18.6"
+          },
+          "digest": "sha256:8a97b339bd4371586d1bf3ff650f10f37a4897056ba8e8456f4d36576b74a87b",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "arm",
+            "os": "linux",
+            "variant": "v5"
+          },
+          "size": 3440
+        },
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "arm32v5",
+            "vnd.docker.reference.digest": "sha256:8a97b339bd4371586d1bf3ff650f10f37a4897056ba8e8456f4d36576b74a87b",
+            "vnd.docker.reference.type": "attestation-manifest"
+          },
+          "digest": "sha256:8769e2bda085a24ad270946a2ee409fbfd893e961c842bb411e3630abc5c5ed6",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "unknown",
+            "os": "unknown"
+          },
+          "size": 841
+        },
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "arm32v7",
+            "org.opencontainers.image.base.digest": "sha256:93c6fe8a2a6593f29349f2bcf2ea7976833c59a6dd215a6808f274b2fa5e67c9",
+            "org.opencontainers.image.base.name": "debian:trixie-slim",
+            "org.opencontainers.image.created": "2026-10-28T02:01:23Z",
+            "org.opencontainers.image.revision": "e00e1bd34ec5c8a8e7ad89b273b3d42efaf6d5bc",
+            "org.opencontainers.image.source": "https://github.com/docker-library/postgres.git#e00e1bd34ec5c8a8e7ad89b273b3d42efaf6d5bc:18/trixie",
+            "org.opencontainers.image.url": "https://hub.docker.com/_/postgres",
+            "org.opencontainers.image.version": "18.6"
+          },
+          "digest": "sha256:f43742786609d7d67a9646a9d5c8dd6cf809d6745aa9f949b165f30e46d2a8a3",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "arm",
+            "os": "linux",
+            "variant": "v7"
+          },
+          "size": 3440
+        },
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "arm32v7",
+            "vnd.docker.reference.digest": "sha256:f43742786609d7d67a9646a9d5c8dd6cf809d6745aa9f949b165f30e46d2a8a3",
+            "vnd.docker.reference.type": "attestation-manifest"
+          },
+          "digest": "sha256:68e3cbccf9ebb9ba969ff9dbc74d4e118f73bbda5b45a0dad9bc09d1dac6eac9",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "unknown",
+            "os": "unknown"
+          },
+          "size": 841
+        },
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "arm64v8",
+            "org.opencontainers.image.base.digest": "sha256:1470991b497d26788dc4d6f438bf5690c6ba0d499235d237e55f4b43caea7a75",
+            "org.opencontainers.image.base.name": "debian:trixie-slim",
+            "org.opencontainers.image.created": "2026-10-28T01:32:55Z",
+            "org.opencontainers.image.revision": "e00e1bd34ec5c8a8e7ad89b273b3d42efaf6d5bc",
+            "org.opencontainers.image.source": "https://github.com/docker-library/postgres.git#e00e1bd34ec5c8a8e7ad89b273b3d42efaf6d5bc:18/trixie",
+            "org.opencontainers.image.url": "https://hub.docker.com/_/postgres",
+            "org.opencontainers.image.version": "18.6"
+          },
+          "digest": "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "arm64",
+            "os": "linux",
+            "variant": "v8"
+          },
+          "size": 3441
+        },
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "arm64v8",
+            "vnd.docker.reference.digest": "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+            "vnd.docker.reference.type": "attestation-manifest"
+          },
+          "digest": "sha256:316659847625da3b939ed0f6b76847f78e87a1fb3df901943147e1ccab52030f",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "unknown",
+            "os": "unknown"
+          },
+          "size": 841
+        },
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "i386",
+            "org.opencontainers.image.base.digest": "sha256:54d4782cc10f415e6c52ed7873f2b7d6498a888555ee66e45ae688efc3dda6ee",
+            "org.opencontainers.image.base.name": "debian:trixie-slim",
+            "org.opencontainers.image.created": "2026-10-28T01:30:49Z",
+            "org.opencontainers.image.revision": "e00e1bd34ec5c8a8e7ad89b273b3d42efaf6d5bc",
+            "org.opencontainers.image.source": "https://github.com/docker-library/postgres.git#e00e1bd34ec5c8a8e7ad89b273b3d42efaf6d5bc:18/trixie",
+            "org.opencontainers.image.url": "https://hub.docker.com/_/postgres",
+            "org.opencontainers.image.version": "18.6"
+          },
+          "digest": "sha256:a7026df7681ce3d59a682ccf6155cf94ca377615c0170012dac2d6ce1e3fd22c",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "386",
+            "os": "linux"
+          },
+          "size": 3437
+        },
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "i386",
+            "vnd.docker.reference.digest": "sha256:a7026df7681ce3d59a682ccf6155cf94ca377615c0170012dac2d6ce1e3fd22c",
+            "vnd.docker.reference.type": "attestation-manifest"
+          },
+          "digest": "sha256:1c050325e7f74bc306911a4f500685680df9d8018583058ac3bebbdfd2f5f332",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "unknown",
+            "os": "unknown"
+          },
+          "size": 841
+        },
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "ppc64le",
+            "org.opencontainers.image.base.digest": "sha256:36d7020e168d5a85d1b1391efed8f4aa655cb01b750310f5021bd63836d36d27",
+            "org.opencontainers.image.base.name": "debian:trixie-slim",
+            "org.opencontainers.image.created": "2026-10-28T03:57:43Z",
+            "org.opencontainers.image.revision": "e00e1bd34ec5c8a8e7ad89b273b3d42efaf6d5bc",
+            "org.opencontainers.image.source": "https://github.com/docker-library/postgres.git#e00e1bd34ec5c8a8e7ad89b273b3d42efaf6d5bc:18/trixie",
+            "org.opencontainers.image.url": "https://hub.docker.com/_/postgres",
+            "org.opencontainers.image.version": "18.6"
+          },
+          "digest": "sha256:aa3d38a0d475996221327e363c4b9a1cbdfc895512793129de7589f2f3560d03",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "ppc64le",
+            "os": "linux"
+          },
+          "size": 3441
+        },
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "ppc64le",
+            "vnd.docker.reference.digest": "sha256:aa3d38a0d475996221327e363c4b9a1cbdfc895512793129de7589f2f3560d03",
+            "vnd.docker.reference.type": "attestation-manifest"
+          },
+          "digest": "sha256:3e3cc88c051e58c233f26aac7b6b8e6d6bf2d8368975eaa4d50c9d27721c66bd",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "unknown",
+            "os": "unknown"
+          },
+          "size": 841
+        },
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "riscv64",
+            "org.opencontainers.image.base.digest": "sha256:d2603372b44ea7e55fcc4b2f5fd667024d6f298af5af7c7474f639321570c5cc",
+            "org.opencontainers.image.base.name": "debian:trixie-slim",
+            "org.opencontainers.image.created": "2026-10-31T18:38:01Z",
+            "org.opencontainers.image.revision": "e00e1bd34ec5c8a8e7ad89b273b3d42efaf6d5bc",
+            "org.opencontainers.image.source": "https://github.com/docker-library/postgres.git#e00e1bd34ec5c8a8e7ad89b273b3d42efaf6d5bc:18/trixie",
+            "org.opencontainers.image.url": "https://hub.docker.com/_/postgres",
+            "org.opencontainers.image.version": "18.6"
+          },
+          "digest": "sha256:9b81e779bd80a6d03443d159399af9f6135a59320707db32dd5cf54f6fa53d25",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "riscv64",
+            "os": "linux"
+          },
+          "size": 3440
+        },
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "riscv64",
+            "vnd.docker.reference.digest": "sha256:9b81e779bd80a6d03443d159399af9f6135a59320707db32dd5cf54f6fa53d25",
+            "vnd.docker.reference.type": "attestation-manifest"
+          },
+          "digest": "sha256:79a9d0323abbb96edf76cf6031fb6ab436a2997af2b9c56a2aaa39e8c321ea0e",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "unknown",
+            "os": "unknown"
+          },
+          "size": 841
+        },
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "s390x",
+            "org.opencontainers.image.base.digest": "sha256:b52f4830ac1fe39bb67a84fd3f71aa45ad7a151085cb2cc770dd5b789ba6669b",
+            "org.opencontainers.image.base.name": "debian:trixie-slim",
+            "org.opencontainers.image.created": "2026-10-28T02:03:35Z",
+            "org.opencontainers.image.revision": "e00e1bd34ec5c8a8e7ad89b273b3d42efaf6d5bc",
+            "org.opencontainers.image.source": "https://github.com/docker-library/postgres.git#e00e1bd34ec5c8a8e7ad89b273b3d42efaf6d5bc:18/trixie",
+            "org.opencontainers.image.url": "https://hub.docker.com/_/postgres",
+            "org.opencontainers.image.version": "18.6"
+          },
+          "digest": "sha256:a06f308845c73aa6203c1f3f054aece0b8ea1e2f084921d0038ceac9970fed0d",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "s390x",
+            "os": "linux"
+          },
+          "size": 3439
+        },
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "s390x",
+            "vnd.docker.reference.digest": "sha256:a06f308845c73aa6203c1f3f054aece0b8ea1e2f084921d0038ceac9970fed0d",
+            "vnd.docker.reference.type": "attestation-manifest"
+          },
+          "digest": "sha256:c8123f8c5158973268d47f4c79c5ca1a44ed712ff3e9658ad9d6ee9985b1b917",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "unknown",
+            "os": "unknown"
+          },
+          "size": 841
+        }
+      ],
+      "mediaType": "application/vnd.oci.image.index.v1+json",
+      "schemaVersion": 2
+    }
+  },
+  {
+    "image": "postgres:18.6-trixie",
+    "kind": "amd64",
+    "command": [
+      "docker",
+      "--context",
+      "desktop-linux",
+      "buildx",
+      "imagetools",
+      "inspect",
+      "--raw",
+      "postgres@sha256:f4b419e350fd98d4a8429603295208976dea4c8fb8326d818d346d3e29f1db6f"
+    ],
+    "exitCode": 0,
+    "sha256": "f4b419e350fd98d4a8429603295208976dea4c8fb8326d818d346d3e29f1db6f",
+    "stderr": "",
+    "manifest": {
+      "schemaVersion": 2,
+      "mediaType": "application/vnd.oci.image.manifest.v1+json",
+      "config": {
+        "mediaType": "application/vnd.oci.image.config.v1+json",
+        "digest": "sha256:a1be1c8380f5c8ca80b4ad72f6be191f8a283e0ecb2e9496b1ee67dc0022d0f1",
+        "size": 10048
+      },
+      "layers": [
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:6fc242d221a673263eabd14a9ad9584d3177c96e5cb504c891497338e2f912f5",
+          "size": 29855236
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:d06edb2e3f4381c3f48bd849b2e403288adc70a77f12a5a0535a66531ac3ca4c",
+          "size": 1170
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:3795839385bcd7267538fe0f4bca17aa29049249a5b63f0b28c5327429e7083f",
+          "size": 6442978
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:cea4f0db46a656825838c0545bcd2853cc2400bbcb0711bedbe91ecd16093a22",
+          "size": 1256737
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:9b1a18996a228981ed4e313b9f85d67799878c51af3c82028b270818eb01389e",
+          "size": 8203833
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:fbc84e7117120aa752fda692fcaee46052606965d690e115b6f5dc64ed4195b7",
+          "size": 1311697
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:87999517529809971a5a8553191bf5245b8f8d47b1652362d7cfdc25130261ae",
+          "size": 116
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:d89068781d718b514cf01a07a5ee1408eb6044d81ca1afcd4106fa5a51e9ab90",
+          "size": 3144
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:ef90fb83cca58f51742bd2fe57f2031d81959b30366ee6f76802b238f417db8b",
+          "size": 115397838
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:7e6d71cb0490a9004f4b5e3767dd1ddb34d947b1d516363ab52d322245ad0da7",
+          "size": 19422
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:7c25aa4e8a77b6bc2bf1743fb094c7b74315406b4bf1dd2017db34c93761b595",
+          "size": 127
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:00ff7a4924f238c77b5f1cbe7635b83ca0a7538d2f3ae3b95c092a0bb84382e2",
+          "size": 6106
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:d0fbcb0db440d15079aa9b0457892134352a906fb77624905c8d981b19fd12db",
+          "size": 185
+        }
+      ],
+      "annotations": {
+        "com.docker.official-images.bashbrew.arch": "amd64",
+        "org.opencontainers.image.base.digest": "sha256:1e1a22175fbf1b32157ddaf0219e1db4e5401fab2b94ed285add64d18587cd2d",
+        "org.opencontainers.image.base.name": "debian:trixie-slim",
+        "org.opencontainers.image.created": "2026-10-28T01:30:07Z",
+        "org.opencontainers.image.revision": "e00e1bd34ec5c8a8e7ad89b273b3d42efaf6d5bc",
+        "org.opencontainers.image.source": "https://github.com/docker-library/postgres.git#e00e1bd34ec5c8a8e7ad89b273b3d42efaf6d5bc:18/trixie",
+        "org.opencontainers.image.url": "https://hub.docker.com/_/postgres",
+        "org.opencontainers.image.version": "18.6"
+      }
+    }
+  },
+  {
+    "image": "postgres:18.6-trixie",
+    "kind": "arm64",
+    "command": [
+      "docker",
+      "--context",
+      "desktop-linux",
+      "buildx",
+      "imagetools",
+      "inspect",
+      "--raw",
+      "postgres@sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437"
+    ],
+    "exitCode": 0,
+    "sha256": "9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+    "stderr": "",
+    "manifest": {
+      "schemaVersion": 2,
+      "mediaType": "application/vnd.oci.image.manifest.v1+json",
+      "config": {
+        "mediaType": "application/vnd.oci.image.config.v1+json",
+        "digest": "sha256:07ee628d2e71f8956c85fc5466906a6d4038cf00f6db07f067d810ef8fec8161",
+        "size": 10062
+      },
+      "layers": [
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:2b70e040f7d132c8d366ee0223462552686510fb372ea5a83822973c30f19e36",
+          "size": 30213496
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:3a714400795f76141e082c1ebf8bafa2e98f94bd686f7a2a780f278a2df08a74",
+          "size": 1170
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:3c3225ba10255e874319c7ddd8297db00f31015f0caa0b742e39fb9d079169f8",
+          "size": 6235003
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:6ff057780a448f1e2fdfd1cc86179571763b739ccc773567bc88d03ce72ef010",
+          "size": 1209591
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:8648fbfa17a8060166c02e54a56fcebb62ba65bf8d6fcde20157a7aba921b336",
+          "size": 8204017
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:de23c21b57f21d419a4b0b8bde5c55f0097dc71330a724372af2edcaa8f4c577",
+          "size": 1220656
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:acba8632a2fcf94995815ed68657201aae7ef00df7163fd682278f255e4ebbaa",
+          "size": 116
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:54ddeb74882a20373bfae25f79d0e34bf86472769b803fb73e8faf1339fb0930",
+          "size": 3141
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:22aa5aa83b7d7011479d8611f722ac724681d79d2d233748943532e8a6e31f23",
+          "size": 113999406
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:7672a6ce4d85eddef3cba06577baeb3064a91e59e7846b96c4f1557eb6ec13f4",
+          "size": 19427
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:24b05182f7a5b19e14d8018c60bca16d1e9d05fd7e839a3f5b16c6be2838d13d",
+          "size": 127
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:97f720713f77b11e22001359252271a2d92c1182d6cb8a721bf07314acae01d3",
+          "size": 6107
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:d1a3067f9c98ff22f1f946de6faa37e988681a2d7428fcf4603fba5414b7f8b1",
+          "size": 185
+        }
+      ],
+      "annotations": {
+        "com.docker.official-images.bashbrew.arch": "arm64v8",
+        "org.opencontainers.image.base.digest": "sha256:1470991b497d26788dc4d6f438bf5690c6ba0d499235d237e55f4b43caea7a75",
+        "org.opencontainers.image.base.name": "debian:trixie-slim",
+        "org.opencontainers.image.created": "2026-10-28T01:32:55Z",
+        "org.opencontainers.image.revision": "e00e1bd34ec5c8a8e7ad89b273b3d42efaf6d5bc",
+        "org.opencontainers.image.source": "https://github.com/docker-library/postgres.git#e00e1bd34ec5c8a8e7ad89b273b3d42efaf6d5bc:18/trixie",
+        "org.opencontainers.image.url": "https://hub.docker.com/_/postgres",
+        "org.opencontainers.image.version": "18.6"
+      }
+    }
+  },
+  {
+    "image": "quay.io/keycloak/keycloak:26.8.1",
+    "kind": "tag",
+    "command": [
+      "docker",
+      "--context",
+      "desktop-linux",
+      "buildx",
+      "imagetools",
+      "inspect",
+      "--raw",
+      "quay.io/keycloak/keycloak:26.8.1"
+    ],
+    "exitCode": 0,
+    "sha256": "3f3c5f8e03c614774b4bd9173b88391fefa4153bfc010d8012d59ad825377332",
+    "stderr": "",
+    "manifest": {
+      "schemaVersion": 2,
+      "mediaType": "application/vnd.oci.image.index.v1+json",
+      "manifests": [
+        {
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "digest": "sha256:de6ed510b59cfcd25f129ba4118696fa10d4165eee921a8d846178b6d35d30f7",
+          "size": 1056,
+          "platform": {
+            "architecture": "amd64",
+            "os": "linux"
+          }
+        },
+        {
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "digest": "sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4",
+          "size": 1056,
+          "platform": {
+            "architecture": "arm64",
+            "os": "linux"
+          }
+        },
+        {
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "digest": "sha256:789d95d938cc988c0055913e15b2bb502f502c6640970998f7179a47e2735c46",
+          "size": 1056,
+          "platform": {
+            "architecture": "ppc64le",
+            "os": "linux"
+          }
+        },
+        {
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "digest": "sha256:d76e35416c8dad784235d756fa63613e66550cb45bf39d2ac1f393ccd577518f",
+          "size": 838,
+          "annotations": {
+            "vnd.docker.reference.digest": "sha256:de6ed510b59cfcd25f129ba4118696fa10d4165eee921a8d846178b6d35d30f7",
+            "vnd.docker.reference.type": "attestation-manifest"
+          },
+          "platform": {
+            "architecture": "unknown",
+            "os": "unknown"
+          }
+        },
+        {
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "digest": "sha256:c9ff6443f6a03502beb8ad4852ff5faf7d44e72cca0411abe8922b55657b7973",
+          "size": 838,
+          "annotations": {
+            "vnd.docker.reference.digest": "sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4",
+            "vnd.docker.reference.type": "attestation-manifest"
+          },
+          "platform": {
+            "architecture": "unknown",
+            "os": "unknown"
+          }
+        },
+        {
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "digest": "sha256:dc1c54c15c009f7b4dc3f244af1de77baac168f3d4d73cf4bb280beb094f229b",
+          "size": 838,
+          "annotations": {
+            "vnd.docker.reference.digest": "sha256:789d95d938cc988c0055913e15b2bb502f502c6640970998f7179a47e2735c46",
+            "vnd.docker.reference.type": "attestation-manifest"
+          },
+          "platform": {
+            "architecture": "unknown",
+            "os": "unknown"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "image": "quay.io/keycloak/keycloak:26.8.1",
+    "kind": "index",
+    "command": [
+      "docker",
+      "--context",
+      "desktop-linux",
+      "buildx",
+      "imagetools",
+      "inspect",
+      "--raw",
+      "quay.io/keycloak/keycloak@sha256:3f3c5f8e03c614774b4bd9173b88391fefa4153bfc010d8012d59ad825377332"
+    ],
+    "exitCode": 0,
+    "sha256": "3f3c5f8e03c614774b4bd9173b88391fefa4153bfc010d8012d59ad825377332",
+    "stderr": "",
+    "manifest": {
+      "schemaVersion": 2,
+      "mediaType": "application/vnd.oci.image.index.v1+json",
+      "manifests": [
+        {
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "digest": "sha256:de6ed510b59cfcd25f129ba4118696fa10d4165eee921a8d846178b6d35d30f7",
+          "size": 1056,
+          "platform": {
+            "architecture": "amd64",
+            "os": "linux"
+          }
+        },
+        {
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "digest": "sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4",
+          "size": 1056,
+          "platform": {
+            "architecture": "arm64",
+            "os": "linux"
+          }
+        },
+        {
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "digest": "sha256:789d95d938cc988c0055913e15b2bb502f502c6640970998f7179a47e2735c46",
+          "size": 1056,
+          "platform": {
+            "architecture": "ppc64le",
+            "os": "linux"
+          }
+        },
+        {
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "digest": "sha256:d76e35416c8dad784235d756fa63613e66550cb45bf39d2ac1f393ccd577518f",
+          "size": 838,
+          "annotations": {
+            "vnd.docker.reference.digest": "sha256:de6ed510b59cfcd25f129ba4118696fa10d4165eee921a8d846178b6d35d30f7",
+            "vnd.docker.reference.type": "attestation-manifest"
+          },
+          "platform": {
+            "architecture": "unknown",
+            "os": "unknown"
+          }
+        },
+        {
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "digest": "sha256:c9ff6443f6a03502beb8ad4852ff5faf7d44e72cca0411abe8922b55657b7973",
+          "size": 838,
+          "annotations": {
+            "vnd.docker.reference.digest": "sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4",
+            "vnd.docker.reference.type": "attestation-manifest"
+          },
+          "platform": {
+            "architecture": "unknown",
+            "os": "unknown"
+          }
+        },
+        {
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "digest": "sha256:dc1c54c15c009f7b4dc3f244af1de77baac168f3d4d73cf4bb280beb094f229b",
+          "size": 838,
+          "annotations": {
+            "vnd.docker.reference.digest": "sha256:789d95d938cc988c0055913e15b2bb502f502c6640970998f7179a47e2735c46",
+            "vnd.docker.reference.type": "attestation-manifest"
+          },
+          "platform": {
+            "architecture": "unknown",
+            "os": "unknown"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "image": "quay.io/keycloak/keycloak:26.8.1",
+    "kind": "amd64",
+    "command": [
+      "docker",
+      "--context",
+      "desktop-linux",
+      "buildx",
+      "imagetools",
+      "inspect",
+      "--raw",
+      "quay.io/keycloak/keycloak@sha256:de6ed510b59cfcd25f129ba4118696fa10d4165eee921a8d846178b6d35d30f7"
+    ],
+    "exitCode": 0,
+    "sha256": "de6ed510b59cfcd25f129ba4118696fa10d4165eee921a8d846178b6d35d30f7",
+    "stderr": "",
+    "manifest": {
+      "schemaVersion": 2,
+      "mediaType": "application/vnd.oci.image.manifest.v1+json",
+      "config": {
+        "mediaType": "application/vnd.oci.image.config.v1+json",
+        "digest": "sha256:f527e1b3c3a0501256fc8732dd3626c1059f84931c1c73cbdef0c1042dde006e",
+        "size": 9685
+      },
+      "layers": [
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:25582d7c77aa56d9dedfd696290f345d9bf9d15932274698c7770714442a18a4",
+          "size": 7257105
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:28b1672eb1e03c22ab0c43c154e3ab15f6552fb5615677fc822f4f512d8b4a0a",
+          "size": 84406510
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:59a96ebf27cd9ed53d4534385d7497bd39100449cdca81d909e9960c9fb4c158",
+          "size": 173795283
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:5c61820a780016bc18e364313ec7af3487b1b4aff448cb51174f9994b8f230d3",
+          "size": 550
+        }
+      ]
+    }
+  },
+  {
+    "image": "quay.io/keycloak/keycloak:26.8.1",
+    "kind": "arm64",
+    "command": [
+      "docker",
+      "--context",
+      "desktop-linux",
+      "buildx",
+      "imagetools",
+      "inspect",
+      "--raw",
+      "quay.io/keycloak/keycloak@sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4"
+    ],
+    "exitCode": 0,
+    "sha256": "e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4",
+    "stderr": "",
+    "manifest": {
+      "schemaVersion": 2,
+      "mediaType": "application/vnd.oci.image.manifest.v1+json",
+      "config": {
+        "mediaType": "application/vnd.oci.image.config.v1+json",
+        "digest": "sha256:24959b9b2ff0ec6bd9445588d3b488b84dffbe06e6a6ccb50e3d074f7ec581dd",
+        "size": 9691
+      },
+      "layers": [
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:50ad43601eec5c8c061f492569b990cf7ae7ba1b515839f3a10181671fd09356",
+          "size": 6644260
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:a233ba04a20562258422eb195ca0848e40f23e7f1a0223df657d8454f7022aa9",
+          "size": 83487393
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:88202ac232a9ad53c5b04e32b6f3f6b4498772f8d069fbbde1d007f8dd31d981",
+          "size": 173795289
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:b0bd6cf727102ee0720e7eecf47676b8d097f577a8e0900d0334f7c363504477",
+          "size": 553
+        }
+      ]
+    }
+  },
+  {
+    "image": "mcr.microsoft.com/dotnet/aspnet:10.0.13",
+    "kind": "tag",
+    "command": [
+      "docker",
+      "--context",
+      "desktop-linux",
+      "buildx",
+      "imagetools",
+      "inspect",
+      "--raw",
+      "mcr.microsoft.com/dotnet/aspnet:10.0.13"
+    ],
+    "exitCode": 0,
+    "sha256": "8af87eba5e7cdafb1514d7388be287365da97c132509e84dfe252ffd552398ca",
+    "stderr": "",
+    "manifest": {
+      "schemaVersion": 2,
+      "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
+      "manifests": [
+        {
+          "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+          "size": 1580,
+          "digest": "sha256:f879b8a9cb3f6694b8b0c9fa530eb0c39d8920db09c05a7edbd6c4c6c104ae1b",
+          "platform": {
+            "architecture": "amd64",
+            "os": "linux"
+          }
+        },
+        {
+          "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+          "size": 1580,
+          "digest": "sha256:e8be2c890668fb4b1d56484b10694c54e060fe362363d916f9847f374158a546",
+          "platform": {
+            "architecture": "arm",
+            "os": "linux",
+            "variant": "v7"
+          }
+        },
+        {
+          "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+          "size": 1580,
+          "digest": "sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55",
+          "platform": {
+            "architecture": "arm64",
+            "os": "linux"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "image": "mcr.microsoft.com/dotnet/aspnet:10.0.13",
+    "kind": "index",
+    "command": [
+      "docker",
+      "--context",
+      "desktop-linux",
+      "buildx",
+      "imagetools",
+      "inspect",
+      "--raw",
+      "mcr.microsoft.com/dotnet/aspnet@sha256:8af87eba5e7cdafb1514d7388be287365da97c132509e84dfe252ffd552398ca"
+    ],
+    "exitCode": 0,
+    "sha256": "8af87eba5e7cdafb1514d7388be287365da97c132509e84dfe252ffd552398ca",
+    "stderr": "",
+    "manifest": {
+      "schemaVersion": 2,
+      "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
+      "manifests": [
+        {
+          "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+          "size": 1580,
+          "digest": "sha256:f879b8a9cb3f6694b8b0c9fa530eb0c39d8920db09c05a7edbd6c4c6c104ae1b",
+          "platform": {
+            "architecture": "amd64",
+            "os": "linux"
+          }
+        },
+        {
+          "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+          "size": 1580,
+          "digest": "sha256:e8be2c890668fb4b1d56484b10694c54e060fe362363d916f9847f374158a546",
+          "platform": {
+            "architecture": "arm",
+            "os": "linux",
+            "variant": "v7"
+          }
+        },
+        {
+          "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+          "size": 1580,
+          "digest": "sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55",
+          "platform": {
+            "architecture": "arm64",
+            "os": "linux"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "image": "mcr.microsoft.com/dotnet/aspnet:10.0.13",
+    "kind": "amd64",
+    "command": [
+      "docker",
+      "--context",
+      "desktop-linux",
+      "buildx",
+      "imagetools",
+      "inspect",
+      "--raw",
+      "mcr.microsoft.com/dotnet/aspnet@sha256:f879b8a9cb3f6694b8b0c9fa530eb0c39d8920db09c05a7edbd6c4c6c104ae1b"
+    ],
+    "exitCode": 0,
+    "sha256": "f879b8a9cb3f6694b8b0c9fa530eb0c39d8920db09c05a7edbd6c4c6c104ae1b",
+    "stderr": "",
+    "manifest": {
+      "schemaVersion": 2,
+      "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+      "config": {
+        "mediaType": "application/vnd.docker.container.image.v1+json",
+        "size": 3129,
+        "digest": "sha256:3ad8ff999165897fa657a9aa29f6bea22cd7db50269f4b99ec97f7858b21f990"
+      },
+      "layers": [
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 29765758,
+          "digest": "sha256:f2b4ef06ff01a67d4bed7657a4ae379a7d07934b7c3e743454a22a0d5275fb2b"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 16777688,
+          "digest": "sha256:809fe014b8c9ea3822f20ea868f467405ed02e146e942a0bf6910d93dfdd2e7a"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 3563,
+          "digest": "sha256:e271a0d133c8cba0b3c0724d39498bb64a46bafa24fa9856ad549b09094e58e8"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 36627863,
+          "digest": "sha256:4ce2187f4e63680885b76b67d07b33a4b39e2404d2741d8bcdb5512f637492ae"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 155,
+          "digest": "sha256:2aa13cb6e98641bbfcc67a90c97c29e7696b21ffae339ccb6a110378191c88a7"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 12753411,
+          "digest": "sha256:9b660e3f3a1a97d9bf64bb18f8e17b89cc78e7fb667a5b62264e13f565ad233f"
+        }
+      ]
+    }
+  },
+  {
+    "image": "mcr.microsoft.com/dotnet/aspnet:10.0.13",
+    "kind": "arm64",
+    "command": [
+      "docker",
+      "--context",
+      "desktop-linux",
+      "buildx",
+      "imagetools",
+      "inspect",
+      "--raw",
+      "mcr.microsoft.com/dotnet/aspnet@sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55"
+    ],
+    "exitCode": 0,
+    "sha256": "3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55",
+    "stderr": "",
+    "manifest": {
+      "schemaVersion": 2,
+      "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+      "config": {
+        "mediaType": "application/vnd.docker.container.image.v1+json",
+        "size": 3129,
+        "digest": "sha256:d558e2a91f9574fe27662c4a66fc80795942781a283e8cbaa2c808e0e892436c"
+      },
+      "layers": [
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 28939761,
+          "digest": "sha256:d5aec63251bb323f816a0f4b8a554bd84e478466a9ed1068daef07368328e9a3"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 16746007,
+          "digest": "sha256:c94034ece57e2c3621f1153fcd721d86e09eec3683796192648e9ae11fdc8ad9"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 3564,
+          "digest": "sha256:b2285e913f8146e7011ddcb5b3ca168f9f93ba83bc04c8d2164491d30c533df7"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 34455908,
+          "digest": "sha256:59a63478dc4bc439321221551264a8824b65f489044e0ed81b8005da691126de"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 154,
+          "digest": "sha256:4f8c98085a67336fda3b73f51fb988dfeeb257b7c9aed40671c79226150f3e2d"
+        },
+        {
+          "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+          "size": 12247111,
+          "digest": "sha256:bfb747df1e688bdd57d2ee9776d2f1592393da890cc00e9f60480962612888ac"
+        }
+      ]
+    }
+  },
+  {
+    "image": "node:24.22.1-trixie-slim",
+    "kind": "tag",
+    "command": [
+      "docker",
+      "--context",
+      "desktop-linux",
+      "buildx",
+      "imagetools",
+      "inspect",
+      "--raw",
+      "node:24.22.1-trixie-slim"
+    ],
+    "exitCode": 0,
+    "sha256": "89c5244bc22a9bc3287d89ebc7e49b9cb5bb84cd40e6175ac3421d5a9f68b95a",
+    "stderr": "",
+    "manifest": {
+      "manifests": [
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "amd64",
+            "org.opencontainers.image.base.digest": "sha256:1e1a22175fbf1b32157ddaf0219e1db4e5401fab2b94ed285add64d18587cd2d",
+            "org.opencontainers.image.base.name": "debian:trixie-slim",
+            "org.opencontainers.image.created": "2026-10-28T01:43:19Z",
+            "org.opencontainers.image.revision": "80f02a542da739e6a662451d1db66456a0dea253",
+            "org.opencontainers.image.source": "https://github.com/nodejs/docker-node.git#80f02a542da739e6a662451d1db66456a0dea253:24/trixie-slim",
+            "org.opencontainers.image.url": "https://hub.docker.com/_/node",
+            "org.opencontainers.image.version": "24-trixie-slim"
+          },
+          "digest": "sha256:c8c4a7483bb04544293c82a3eecc3081c37ff5dfedcaf819d60e6e4aaad35b12",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "amd64",
+            "os": "linux"
+          },
+          "size": 1923
+        },
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "amd64",
+            "vnd.docker.reference.digest": "sha256:c8c4a7483bb04544293c82a3eecc3081c37ff5dfedcaf819d60e6e4aaad35b12",
+            "vnd.docker.reference.type": "attestation-manifest"
+          },
+          "digest": "sha256:734c763aa017da804e7c7555c006ff31b7e561e34f78d5e836df85f31d49ac89",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "unknown",
+            "os": "unknown"
+          },
+          "size": 841
+        },
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "arm64v8",
+            "org.opencontainers.image.base.digest": "sha256:1470991b497d26788dc4d6f438bf5690c6ba0d499235d237e55f4b43caea7a75",
+            "org.opencontainers.image.base.name": "debian:trixie-slim",
+            "org.opencontainers.image.created": "2026-10-28T01:46:45Z",
+            "org.opencontainers.image.revision": "80f02a542da739e6a662451d1db66456a0dea253",
+            "org.opencontainers.image.source": "https://github.com/nodejs/docker-node.git#80f02a542da739e6a662451d1db66456a0dea253:24/trixie-slim",
+            "org.opencontainers.image.url": "https://hub.docker.com/_/node",
+            "org.opencontainers.image.version": "24-trixie-slim"
+          },
+          "digest": "sha256:a52166d89cfcc66ea62d10535ca712d161cece5d77ff4cfa758866b6b75ccb3f",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "arm64",
+            "os": "linux",
+            "variant": "v8"
+          },
+          "size": 1925
+        },
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "arm64v8",
+            "vnd.docker.reference.digest": "sha256:a52166d89cfcc66ea62d10535ca712d161cece5d77ff4cfa758866b6b75ccb3f",
+            "vnd.docker.reference.type": "attestation-manifest"
+          },
+          "digest": "sha256:e9214d5021926cef69dfedab3e722ef26f7a61a06b778188dd786d49d6e70a42",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "unknown",
+            "os": "unknown"
+          },
+          "size": 841
+        },
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "ppc64le",
+            "org.opencontainers.image.base.digest": "sha256:36d7020e168d5a85d1b1391efed8f4aa655cb01b750310f5021bd63836d36d27",
+            "org.opencontainers.image.base.name": "debian:trixie-slim",
+            "org.opencontainers.image.created": "2026-10-28T04:27:18Z",
+            "org.opencontainers.image.revision": "80f02a542da739e6a662451d1db66456a0dea253",
+            "org.opencontainers.image.source": "https://github.com/nodejs/docker-node.git#80f02a542da739e6a662451d1db66456a0dea253:24/trixie-slim",
+            "org.opencontainers.image.url": "https://hub.docker.com/_/node",
+            "org.opencontainers.image.version": "24-trixie-slim"
+          },
+          "digest": "sha256:67724b56710f4d943a1516fca8e704c7a80aa43a73e4bd4d175dd89eb031d889",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "ppc64le",
+            "os": "linux"
+          },
+          "size": 1925
+        },
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "ppc64le",
+            "vnd.docker.reference.digest": "sha256:67724b56710f4d943a1516fca8e704c7a80aa43a73e4bd4d175dd89eb031d889",
+            "vnd.docker.reference.type": "attestation-manifest"
+          },
+          "digest": "sha256:5b9d67bfdb4cbae3f350f35621db09dbfeb03726507d4e134e138eaa84c617b9",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "unknown",
+            "os": "unknown"
+          },
+          "size": 841
+        },
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "s390x",
+            "org.opencontainers.image.base.digest": "sha256:b52f4830ac1fe39bb67a84fd3f71aa45ad7a151085cb2cc770dd5b789ba6669b",
+            "org.opencontainers.image.base.name": "debian:trixie-slim",
+            "org.opencontainers.image.created": "2026-10-28T02:46:10Z",
+            "org.opencontainers.image.revision": "80f02a542da739e6a662451d1db66456a0dea253",
+            "org.opencontainers.image.source": "https://github.com/nodejs/docker-node.git#80f02a542da739e6a662451d1db66456a0dea253:24/trixie-slim",
+            "org.opencontainers.image.url": "https://hub.docker.com/_/node",
+            "org.opencontainers.image.version": "24-trixie-slim"
+          },
+          "digest": "sha256:0e90d8bbcc11e8d10621eb83fa60e150e11d23dc54978a696333ee5a31fec4ad",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "s390x",
+            "os": "linux"
+          },
+          "size": 1923
+        },
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "s390x",
+            "vnd.docker.reference.digest": "sha256:0e90d8bbcc11e8d10621eb83fa60e150e11d23dc54978a696333ee5a31fec4ad",
+            "vnd.docker.reference.type": "attestation-manifest"
+          },
+          "digest": "sha256:edd2e500c104f9ee562025b9c056d8cd7b124d7986a75c914d47f3971f77d01a",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "unknown",
+            "os": "unknown"
+          },
+          "size": 841
+        }
+      ],
+      "mediaType": "application/vnd.oci.image.index.v1+json",
+      "schemaVersion": 2
+    }
+  },
+  {
+    "image": "node:24.22.1-trixie-slim",
+    "kind": "index",
+    "command": [
+      "docker",
+      "--context",
+      "desktop-linux",
+      "buildx",
+      "imagetools",
+      "inspect",
+      "--raw",
+      "node@sha256:89c5244bc22a9bc3287d89ebc7e49b9cb5bb84cd40e6175ac3421d5a9f68b95a"
+    ],
+    "exitCode": 0,
+    "sha256": "89c5244bc22a9bc3287d89ebc7e49b9cb5bb84cd40e6175ac3421d5a9f68b95a",
+    "stderr": "",
+    "manifest": {
+      "manifests": [
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "amd64",
+            "org.opencontainers.image.base.digest": "sha256:1e1a22175fbf1b32157ddaf0219e1db4e5401fab2b94ed285add64d18587cd2d",
+            "org.opencontainers.image.base.name": "debian:trixie-slim",
+            "org.opencontainers.image.created": "2026-10-28T01:43:19Z",
+            "org.opencontainers.image.revision": "80f02a542da739e6a662451d1db66456a0dea253",
+            "org.opencontainers.image.source": "https://github.com/nodejs/docker-node.git#80f02a542da739e6a662451d1db66456a0dea253:24/trixie-slim",
+            "org.opencontainers.image.url": "https://hub.docker.com/_/node",
+            "org.opencontainers.image.version": "24-trixie-slim"
+          },
+          "digest": "sha256:c8c4a7483bb04544293c82a3eecc3081c37ff5dfedcaf819d60e6e4aaad35b12",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "amd64",
+            "os": "linux"
+          },
+          "size": 1923
+        },
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "amd64",
+            "vnd.docker.reference.digest": "sha256:c8c4a7483bb04544293c82a3eecc3081c37ff5dfedcaf819d60e6e4aaad35b12",
+            "vnd.docker.reference.type": "attestation-manifest"
+          },
+          "digest": "sha256:734c763aa017da804e7c7555c006ff31b7e561e34f78d5e836df85f31d49ac89",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "unknown",
+            "os": "unknown"
+          },
+          "size": 841
+        },
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "arm64v8",
+            "org.opencontainers.image.base.digest": "sha256:1470991b497d26788dc4d6f438bf5690c6ba0d499235d237e55f4b43caea7a75",
+            "org.opencontainers.image.base.name": "debian:trixie-slim",
+            "org.opencontainers.image.created": "2026-10-28T01:46:45Z",
+            "org.opencontainers.image.revision": "80f02a542da739e6a662451d1db66456a0dea253",
+            "org.opencontainers.image.source": "https://github.com/nodejs/docker-node.git#80f02a542da739e6a662451d1db66456a0dea253:24/trixie-slim",
+            "org.opencontainers.image.url": "https://hub.docker.com/_/node",
+            "org.opencontainers.image.version": "24-trixie-slim"
+          },
+          "digest": "sha256:a52166d89cfcc66ea62d10535ca712d161cece5d77ff4cfa758866b6b75ccb3f",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "arm64",
+            "os": "linux",
+            "variant": "v8"
+          },
+          "size": 1925
+        },
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "arm64v8",
+            "vnd.docker.reference.digest": "sha256:a52166d89cfcc66ea62d10535ca712d161cece5d77ff4cfa758866b6b75ccb3f",
+            "vnd.docker.reference.type": "attestation-manifest"
+          },
+          "digest": "sha256:e9214d5021926cef69dfedab3e722ef26f7a61a06b778188dd786d49d6e70a42",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "unknown",
+            "os": "unknown"
+          },
+          "size": 841
+        },
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "ppc64le",
+            "org.opencontainers.image.base.digest": "sha256:36d7020e168d5a85d1b1391efed8f4aa655cb01b750310f5021bd63836d36d27",
+            "org.opencontainers.image.base.name": "debian:trixie-slim",
+            "org.opencontainers.image.created": "2026-10-28T04:27:18Z",
+            "org.opencontainers.image.revision": "80f02a542da739e6a662451d1db66456a0dea253",
+            "org.opencontainers.image.source": "https://github.com/nodejs/docker-node.git#80f02a542da739e6a662451d1db66456a0dea253:24/trixie-slim",
+            "org.opencontainers.image.url": "https://hub.docker.com/_/node",
+            "org.opencontainers.image.version": "24-trixie-slim"
+          },
+          "digest": "sha256:67724b56710f4d943a1516fca8e704c7a80aa43a73e4bd4d175dd89eb031d889",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "ppc64le",
+            "os": "linux"
+          },
+          "size": 1925
+        },
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "ppc64le",
+            "vnd.docker.reference.digest": "sha256:67724b56710f4d943a1516fca8e704c7a80aa43a73e4bd4d175dd89eb031d889",
+            "vnd.docker.reference.type": "attestation-manifest"
+          },
+          "digest": "sha256:5b9d67bfdb4cbae3f350f35621db09dbfeb03726507d4e134e138eaa84c617b9",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "unknown",
+            "os": "unknown"
+          },
+          "size": 841
+        },
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "s390x",
+            "org.opencontainers.image.base.digest": "sha256:b52f4830ac1fe39bb67a84fd3f71aa45ad7a151085cb2cc770dd5b789ba6669b",
+            "org.opencontainers.image.base.name": "debian:trixie-slim",
+            "org.opencontainers.image.created": "2026-10-28T02:46:10Z",
+            "org.opencontainers.image.revision": "80f02a542da739e6a662451d1db66456a0dea253",
+            "org.opencontainers.image.source": "https://github.com/nodejs/docker-node.git#80f02a542da739e6a662451d1db66456a0dea253:24/trixie-slim",
+            "org.opencontainers.image.url": "https://hub.docker.com/_/node",
+            "org.opencontainers.image.version": "24-trixie-slim"
+          },
+          "digest": "sha256:0e90d8bbcc11e8d10621eb83fa60e150e11d23dc54978a696333ee5a31fec4ad",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "s390x",
+            "os": "linux"
+          },
+          "size": 1923
+        },
+        {
+          "annotations": {
+            "com.docker.official-images.bashbrew.arch": "s390x",
+            "vnd.docker.reference.digest": "sha256:0e90d8bbcc11e8d10621eb83fa60e150e11d23dc54978a696333ee5a31fec4ad",
+            "vnd.docker.reference.type": "attestation-manifest"
+          },
+          "digest": "sha256:edd2e500c104f9ee562025b9c056d8cd7b124d7986a75c914d47f3971f77d01a",
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "platform": {
+            "architecture": "unknown",
+            "os": "unknown"
+          },
+          "size": 841
+        }
+      ],
+      "mediaType": "application/vnd.oci.image.index.v1+json",
+      "schemaVersion": 2
+    }
+  },
+  {
+    "image": "node:24.22.1-trixie-slim",
+    "kind": "amd64",
+    "command": [
+      "docker",
+      "--context",
+      "desktop-linux",
+      "buildx",
+      "imagetools",
+      "inspect",
+      "--raw",
+      "node@sha256:c8c4a7483bb04544293c82a3eecc3081c37ff5dfedcaf819d60e6e4aaad35b12"
+    ],
+    "exitCode": 0,
+    "sha256": "c8c4a7483bb04544293c82a3eecc3081c37ff5dfedcaf819d60e6e4aaad35b12",
+    "stderr": "",
+    "manifest": {
+      "schemaVersion": 2,
+      "mediaType": "application/vnd.oci.image.manifest.v1+json",
+      "config": {
+        "mediaType": "application/vnd.oci.image.config.v1+json",
+        "digest": "sha256:b4b5372f8cadcf1ab94b42bec654f5b1d65c87fd59d73a3699af2c503ed095b9",
+        "size": 6769
+      },
+      "layers": [
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:6fc242d221a673263eabd14a9ad9584d3177c96e5cb504c891497338e2f912f5",
+          "size": 29855236
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:4fdd6165d20b6cb790c3b37cb2d5d45d64769ff17c0b3f1d8adb3f5d1c890af8",
+          "size": 3308
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:3e0c634f4ea98e12344d2365d64dc0c894a9928ae6a7c382db7f71687c24243b",
+          "size": 51121848
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:8432cc020a8f0716511b5f5be5f42b2da252f4aef91a8dc82dc0d3a31d4174ae",
+          "size": 1717458
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:0905efacd46f754d9b823c3d5cd9a53f9e35b2b3350da57a9cd2e621fd4e2afa",
+          "size": 450
+        }
+      ],
+      "annotations": {
+        "com.docker.official-images.bashbrew.arch": "amd64",
+        "org.opencontainers.image.base.digest": "sha256:1e1a22175fbf1b32157ddaf0219e1db4e5401fab2b94ed285add64d18587cd2d",
+        "org.opencontainers.image.base.name": "debian:trixie-slim",
+        "org.opencontainers.image.created": "2026-10-28T01:43:19Z",
+        "org.opencontainers.image.revision": "80f02a542da739e6a662451d1db66456a0dea253",
+        "org.opencontainers.image.source": "https://github.com/nodejs/docker-node.git#80f02a542da739e6a662451d1db66456a0dea253:24/trixie-slim",
+        "org.opencontainers.image.url": "https://hub.docker.com/_/node",
+        "org.opencontainers.image.version": "24-trixie-slim"
+      }
+    }
+  },
+  {
+    "image": "node:24.22.1-trixie-slim",
+    "kind": "arm64",
+    "command": [
+      "docker",
+      "--context",
+      "desktop-linux",
+      "buildx",
+      "imagetools",
+      "inspect",
+      "--raw",
+      "node@sha256:a52166d89cfcc66ea62d10535ca712d161cece5d77ff4cfa758866b6b75ccb3f"
+    ],
+    "exitCode": 0,
+    "sha256": "a52166d89cfcc66ea62d10535ca712d161cece5d77ff4cfa758866b6b75ccb3f",
+    "stderr": "",
+    "manifest": {
+      "schemaVersion": 2,
+      "mediaType": "application/vnd.oci.image.manifest.v1+json",
+      "config": {
+        "mediaType": "application/vnd.oci.image.config.v1+json",
+        "digest": "sha256:d285463e702a7c5b33db8cb81cfa2529f0c94b542eda9894f4f33677d6628134",
+        "size": 6783
+      },
+      "layers": [
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:2b70e040f7d132c8d366ee0223462552686510fb372ea5a83822973c30f19e36",
+          "size": 30213496
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:74798b71e8efcd902587c84cb4c2bab769f2d5cb17ad36b3f65bdd27e448b1e0",
+          "size": 3311
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:ec358bdc3ab775effb42ae09a60a9a4dde5fdfada6af51baba6d819d4654ac4e",
+          "size": 51092836
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:12f4fc62cc4687fd3968adf7b3c1e1fc0a5079684479e7d2a63c4a68f6a697c1",
+          "size": 1717784
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:9eebd1cec76835492fa19b73b05a29a71fe02edaf9a827aa9b87cec88302d143",
+          "size": 448
+        }
+      ],
+      "annotations": {
+        "com.docker.official-images.bashbrew.arch": "arm64v8",
+        "org.opencontainers.image.base.digest": "sha256:1470991b497d26788dc4d6f438bf5690c6ba0d499235d237e55f4b43caea7a75",
+        "org.opencontainers.image.base.name": "debian:trixie-slim",
+        "org.opencontainers.image.created": "2026-10-28T01:46:45Z",
+        "org.opencontainers.image.revision": "80f02a542da739e6a662451d1db66456a0dea253",
+        "org.opencontainers.image.source": "https://github.com/nodejs/docker-node.git#80f02a542da739e6a662451d1db66456a0dea253:24/trixie-slim",
+        "org.opencontainers.image.url": "https://hub.docker.com/_/node",
+        "org.opencontainers.image.version": "24-trixie-slim"
+      }
+    }
+  }
+]

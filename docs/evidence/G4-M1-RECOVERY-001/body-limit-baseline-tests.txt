@@ -1,0 +1,129 @@
+已通过 EnforcesActualBytesBeforeApplication ("length",True,65536) (145ms)
+已通过 EnforcesActualBytesBeforeApplication ("length",True,65537) (50ms)
+已通过 EnforcesActualBytesBeforeApplication ("length",True,131072) (40ms)
+已通过 EnforcesActualBytesBeforeApplication ("chunked",True,65536) (45ms)
+失败 EnforcesActualBytesBeforeApplication ("chunked",True,65537) (59ms)
+  Assertion failed. 预期值相等。
+  
+  expected: RequestEntityTooLarge
+  actual:   OK
+  
+  Assert.AreEqual(size > 65536 ? HttpStatusCode.RequestEntityTooLarge : HttpStatusCode.OK, response.StatusCode)
+  预期
+    RequestEntityTooLarge
+  实际
+    OK
+    在 OntologyPlatform.SecurityTests.G4RequestBodyLimitTests.EnforcesActualBytesBeforeApplication(String transport, Boolean secret, Int32 size) 位于 /Users/chasen/.codex/worktrees/g4-m1-recovery-http-tests/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G4RequestBodyLimitTests.cs:76
+    在 OntologyPlatform.SecurityTests.G4RequestBodyLimitTests.EnforcesActualBytesBeforeApplication(String transport, Boolean secret, Int32 size) 位于 /Users/chasen/.codex/worktrees/g4-m1-recovery-http-tests/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G4RequestBodyLimitTests.cs:91
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+失败 EnforcesActualBytesBeforeApplication ("chunked",True,131072) (65ms)
+  Assertion failed. 预期值相等。
+  
+  expected: RequestEntityTooLarge
+  actual:   OK
+  
+  Assert.AreEqual(size > 65536 ? HttpStatusCode.RequestEntityTooLarge : HttpStatusCode.OK, response.StatusCode)
+  预期
+    RequestEntityTooLarge
+  实际
+    OK
+    在 OntologyPlatform.SecurityTests.G4RequestBodyLimitTests.EnforcesActualBytesBeforeApplication(String transport, Boolean secret, Int32 size) 位于 /Users/chasen/.codex/worktrees/g4-m1-recovery-http-tests/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G4RequestBodyLimitTests.cs:76
+    在 OntologyPlatform.SecurityTests.G4RequestBodyLimitTests.EnforcesActualBytesBeforeApplication(String transport, Boolean secret, Int32 size) 位于 /Users/chasen/.codex/worktrees/g4-m1-recovery-http-tests/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G4RequestBodyLimitTests.cs:91
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+已通过 EnforcesActualBytesBeforeApplication ("http2",True,65536) (61ms)
+失败 EnforcesActualBytesBeforeApplication ("http2",True,65537) (56ms)
+  Assertion failed. 预期值相等。
+  
+  expected: RequestEntityTooLarge
+  actual:   OK
+  
+  Assert.AreEqual(size > 65536 ? HttpStatusCode.RequestEntityTooLarge : HttpStatusCode.OK, response.StatusCode)
+  预期
+    RequestEntityTooLarge
+  实际
+    OK
+    在 OntologyPlatform.SecurityTests.G4RequestBodyLimitTests.EnforcesActualBytesBeforeApplication(String transport, Boolean secret, Int32 size) 位于 /Users/chasen/.codex/worktrees/g4-m1-recovery-http-tests/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G4RequestBodyLimitTests.cs:76
+    在 OntologyPlatform.SecurityTests.G4RequestBodyLimitTests.EnforcesActualBytesBeforeApplication(String transport, Boolean secret, Int32 size) 位于 /Users/chasen/.codex/worktrees/g4-m1-recovery-http-tests/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G4RequestBodyLimitTests.cs:91
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+失败 EnforcesActualBytesBeforeApplication ("http2",True,131072) (50ms)
+  Assertion failed. 预期值相等。
+  
+  expected: RequestEntityTooLarge
+  actual:   OK
+  
+  Assert.AreEqual(size > 65536 ? HttpStatusCode.RequestEntityTooLarge : HttpStatusCode.OK, response.StatusCode)
+  预期
+    RequestEntityTooLarge
+  实际
+    OK
+    在 OntologyPlatform.SecurityTests.G4RequestBodyLimitTests.EnforcesActualBytesBeforeApplication(String transport, Boolean secret, Int32 size) 位于 /Users/chasen/.codex/worktrees/g4-m1-recovery-http-tests/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G4RequestBodyLimitTests.cs:76
+    在 OntologyPlatform.SecurityTests.G4RequestBodyLimitTests.EnforcesActualBytesBeforeApplication(String transport, Boolean secret, Int32 size) 位于 /Users/chasen/.codex/worktrees/g4-m1-recovery-http-tests/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G4RequestBodyLimitTests.cs:91
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+已通过 EnforcesActualBytesBeforeApplication ("length",False,65536) (50ms)
+已通过 EnforcesActualBytesBeforeApplication ("length",False,65537) (46ms)
+已通过 EnforcesActualBytesBeforeApplication ("length",False,131072) (43ms)
+已通过 EnforcesActualBytesBeforeApplication ("chunked",False,65536) (41ms)
+失败 EnforcesActualBytesBeforeApplication ("chunked",False,65537) (38ms)
+  Assertion failed. 预期值相等。
+  
+  expected: RequestEntityTooLarge
+  actual:   OK
+  
+  Assert.AreEqual(size > 65536 ? HttpStatusCode.RequestEntityTooLarge : HttpStatusCode.OK, response.StatusCode)
+  预期
+    RequestEntityTooLarge
+  实际
+    OK
+    在 OntologyPlatform.SecurityTests.G4RequestBodyLimitTests.EnforcesActualBytesBeforeApplication(String transport, Boolean secret, Int32 size) 位于 /Users/chasen/.codex/worktrees/g4-m1-recovery-http-tests/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G4RequestBodyLimitTests.cs:76
+    在 OntologyPlatform.SecurityTests.G4RequestBodyLimitTests.EnforcesActualBytesBeforeApplication(String transport, Boolean secret, Int32 size) 位于 /Users/chasen/.codex/worktrees/g4-m1-recovery-http-tests/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G4RequestBodyLimitTests.cs:91
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+失败 EnforcesActualBytesBeforeApplication ("chunked",False,131072) (110ms)
+  Assertion failed. 预期值相等。
+  
+  expected: RequestEntityTooLarge
+  actual:   OK
+  
+  Assert.AreEqual(size > 65536 ? HttpStatusCode.RequestEntityTooLarge : HttpStatusCode.OK, response.StatusCode)
+  预期
+    RequestEntityTooLarge
+  实际
+    OK
+    在 OntologyPlatform.SecurityTests.G4RequestBodyLimitTests.EnforcesActualBytesBeforeApplication(String transport, Boolean secret, Int32 size) 位于 /Users/chasen/.codex/worktrees/g4-m1-recovery-http-tests/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G4RequestBodyLimitTests.cs:76
+    在 OntologyPlatform.SecurityTests.G4RequestBodyLimitTests.EnforcesActualBytesBeforeApplication(String transport, Boolean secret, Int32 size) 位于 /Users/chasen/.codex/worktrees/g4-m1-recovery-http-tests/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G4RequestBodyLimitTests.cs:91
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+已通过 EnforcesActualBytesBeforeApplication ("http2",False,65536) (59ms)
+失败 EnforcesActualBytesBeforeApplication ("http2",False,65537) (44ms)
+  Assertion failed. 预期值相等。
+  
+  expected: RequestEntityTooLarge
+  actual:   OK
+  
+  Assert.AreEqual(size > 65536 ? HttpStatusCode.RequestEntityTooLarge : HttpStatusCode.OK, response.StatusCode)
+  预期
+    RequestEntityTooLarge
+  实际
+    OK
+    在 OntologyPlatform.SecurityTests.G4RequestBodyLimitTests.EnforcesActualBytesBeforeApplication(String transport, Boolean secret, Int32 size) 位于 /Users/chasen/.codex/worktrees/g4-m1-recovery-http-tests/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G4RequestBodyLimitTests.cs:76
+    在 OntologyPlatform.SecurityTests.G4RequestBodyLimitTests.EnforcesActualBytesBeforeApplication(String transport, Boolean secret, Int32 size) 位于 /Users/chasen/.codex/worktrees/g4-m1-recovery-http-tests/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G4RequestBodyLimitTests.cs:91
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+失败 EnforcesActualBytesBeforeApplication ("http2",False,131072) (43ms)
+  Assertion failed. 预期值相等。
+  
+  expected: RequestEntityTooLarge
+  actual:   OK
+  
+  Assert.AreEqual(size > 65536 ? HttpStatusCode.RequestEntityTooLarge : HttpStatusCode.OK, response.StatusCode)
+  预期
+    RequestEntityTooLarge
+  实际
+    OK
+    在 OntologyPlatform.SecurityTests.G4RequestBodyLimitTests.EnforcesActualBytesBeforeApplication(String transport, Boolean secret, Int32 size) 位于 /Users/chasen/.codex/worktrees/g4-m1-recovery-http-tests/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G4RequestBodyLimitTests.cs:76
+    在 OntologyPlatform.SecurityTests.G4RequestBodyLimitTests.EnforcesActualBytesBeforeApplication(String transport, Boolean secret, Int32 size) 位于 /Users/chasen/.codex/worktrees/g4-m1-recovery-http-tests/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/G4RequestBodyLimitTests.cs:91
+    在 Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)
+
+测试运行摘要: 失败! - /Users/chasen/.codex/worktrees/g4-m1-recovery-http-tests/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin/Debug/net10.0/OntologyPlatform.SecurityTests.dll (net10.0|arm64)
+  总计: 18
+  失败: 8
+  成功: 10
+  已跳过: 0
+  持续时间: 1s 394ms
