@@ -6,7 +6,7 @@ export function draftCacheKey(identity: PlatformIdentity) {
 }
 /** 白名单序列化仅包含当前类型的受控非秘密输入。 */
 export function encodeDraft(form: ConnectionForm): string {
-  return JSON.stringify({ displayName: form.displayName, type: form.type, values: Object.fromEntries(formFields[form.type].map(field => [field.key, form.values[field.key] ?? ""])) });
+  return JSON.stringify({ displayName: form.displayName, type: form.type, values: Object.fromEntries(formFields[form.type].map(field => [field.key, ["wsUrl", "baseOrigin"].includes(field.key) && /:\/\/[^/]*@/.test(form.values[field.key] ?? "") ? "" : form.values[field.key] ?? ""])) });
 }
 /** sessionStorage是不可信输入；拒绝超预算、错误类型和额外字段。 */
 export function decodeDraft(value: string | null): ConnectionForm | null {

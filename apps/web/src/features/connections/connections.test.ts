@@ -101,6 +101,10 @@ describe("非敏草稿刷新隔离", () => {
     const form = { ...validForms.POSTGRESQL, values: { ...validForms.POSTGRESQL.values, secretValue: "never-store", secretRef: "never-ref" } };
     const encoded = encodeDraft(form); expect(encoded).not.toContain("never-"); expect(decodeDraft(encoded)).toEqual(validForms.POSTGRESQL);
   });
+  it("无效URL中的内嵌凭据不能进入非敏缓存", () => {
+    const form = { ...validForms.TDENGINE, values: { ...validForms.TDENGINE.values, wsUrl: "wss://user:private-password@host/ws" } };
+    expect(encodeDraft(form)).not.toContain("private-password");
+  });
   it("拒绝多余字段和未知类型的本地缓存", () => {
     expect(decodeDraft('{"type":"UNKNOWN","displayName":"x","values":{}}')).toBeNull();
     expect(decodeDraft(JSON.stringify({ ...validForms.POSTGRESQL, secretRef: "extra" }))).toBeNull();
