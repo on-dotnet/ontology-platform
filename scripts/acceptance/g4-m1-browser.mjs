@@ -26,7 +26,14 @@ Optional sourcePauseHandshake:true is valid only for source-timeout: after OIDC,
 catalog response and retry-button readiness, stdout emits one JSON SOURCE_TIMEOUT_READY
 with taskId/runId/connectionId. Master verifies the exact source, starts its <=19s unpause
 guard and pauses it, then sends exactly SOURCE_PAUSED followed by LF on stdin (<=64 bytes, 10s deadline).
-The driver performs no Docker/control-file operations; acknowledgement is not pause proof.
+Optional catalogCancelHandshake:true is valid only for catalog-cancel: after initial
+catalog GET200 completes and Discover is enabled, stdout CATALOG_CANCEL_READY waits for
+SOURCE_LOCKED plus LF (64B/10s). After real discovery202, stdout CATALOG_JOB_STARTED also
+includes public jobId and waits for SOURCE_QUERY_WAITING plus LF (64B/5s). Keep stdin
+open. Master owns exact source lock/backend observation and independent <=15s release
+guard. Then the driver cancels, reloads, verifies durable CANCELLED and visible recovery.
+The driver performs no Docker/DB/control-file operations; acknowledgement is not source
+lock, backend disappearance or Npgsql cancellation proof. Those need Master evidence.
 Evidence must be below artifacts/g4-m1-recovery-001 or docs/evidence/G4-M1-RECOVERY-001.
 Each run creates a unique directory. No passwords, SecretRef, CSRF, raw errors or URLs
 are persisted. At most 4 masked screenshots per run; keep <=12 in final package.
@@ -57,10 +64,20 @@ function requireTrue(condition, code) { if (!condition) { const error = new Erro
 function note(name) { if (activeCase) cases[activeCase].observed.push(name); }
 function command(revision) { return { commandId: randomUUID(), idempotencyKey: randomUUID(), expectedRevision: revision, reason: 'Synthetic G4 recovery acceptance' }; }
 function within(base, path) { const value = relative(base, path); return value !== '' && value !== '..' && !value.startsWith('..' + sep) && !isAbsolute(value); }
-/** 有界标准输入握手只协调合成故障时机，真实暂停归属和恢复仍由 Master 负责。 */
-function waitForSourcePause(connectionId) {
-  phase = 'U05_source_timeout_pause_handshake';
-  report.sourcePauseHandshake = { status: 'READY', readyAtUtc: new Date().toISOString() };
+/** 有界标准输入握手只协调合成故障时机，真实故障归属和恢复仍由 Master 负责。 */
+function waitForSourceControl(kind, connectionId, jobId) {
+  // 固定协议分别限制事件、标记和期限，不能用其它阶段的标记解锁本阶段。
+  const protocol = {
+    pause: { event: 'SOURCE_TIMEOUT_READY', marker: 'SOURCE_PAUSED\n', timeout: 10000, prefix: 'source_pause', phase: 'U05_source_timeout_pause_handshake' },
+    lock: { event: 'CATALOG_CANCEL_READY', marker: 'SOURCE_LOCKED\n', timeout: 10000, prefix: 'catalog_cancel_lock', phase: 'U05_catalog_cancel_lock_handshake' },
+    query: { event: 'CATALOG_JOB_STARTED', marker: 'SOURCE_QUERY_WAITING\n', timeout: 5000, prefix: 'catalog_cancel_query', phase: 'U05_catalog_cancel_query_handshake' },
+  }[kind];
+  requireTrue(!!protocol, 'source_control_protocol_invalid');
+  if (kind === 'query') requireTrue(typeof jobId === 'string' && /^[a-f0-9]{32}$/.test(jobId), 'catalog_cancel_job_id_invalid');
+  phase = protocol.phase;
+  const receipt = { event: protocol.event, status: 'READY', readyAtUtc: new Date().toISOString() };
+  if (kind === 'pause') report.sourcePauseHandshake = receipt;
+  else { report.catalogCancelHandshakes ??= []; report.catalogCancelHandshakes.push(receipt); }
   return new Promise((resolve, reject) => {
     // 最多保留 64 字节；所有结束路径均释放标准输入监听和期限计时器。
     let pending = Buffer.alloc(0); let settled = false;
@@ -73,35 +90,35 @@ function waitForSourcePause(connectionId) {
       process.stdin.removeListener('error', onError);
       process.stdin.pause();
       if (code) {
-        report.sourcePauseHandshake.status = 'FAILED';
-        report.sourcePauseHandshake.failureCode = code;
+        receipt.status = 'FAILED';
+        receipt.failureCode = code;
         const error = new Error(); error.safeCode = code; reject(error);
       } else {
-        report.sourcePauseHandshake.status = 'MARKER_ACKNOWLEDGED';
-        report.sourcePauseHandshake.acknowledgedAtUtc = new Date().toISOString();
+        receipt.status = 'MARKER_ACKNOWLEDGED';
+        receipt.acknowledgedAtUtc = new Date().toISOString();
         resolve();
       }
     };
     const onData = chunk => {
       const bytes = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
-      if (pending.length + bytes.length > 64) { finish('source_pause_marker_too_large'); return; }
+      if (pending.length + bytes.length > 64) { finish(protocol.prefix + '_marker_too_large'); return; }
       pending = Buffer.concat([pending, bytes]);
-      const expected = Buffer.from('SOURCE_PAUSED\n');
-      if (pending.length > expected.length || !expected.subarray(0, pending.length).equals(pending)) { finish('source_pause_marker_invalid'); return; }
+      const expected = Buffer.from(protocol.marker);
+      if (pending.length > expected.length || !expected.subarray(0, pending.length).equals(pending)) { finish(protocol.prefix + '_marker_invalid'); return; }
       if (pending.equals(expected)) finish();
     };
-    const onEnd = () => finish('source_pause_stdin_closed');
-    const onError = () => finish('source_pause_stdin_error');
-    const timer = setTimeout(() => finish('source_pause_marker_timeout'), 10000);
+    const onEnd = () => finish(protocol.prefix + '_stdin_closed');
+    const onError = () => finish(protocol.prefix + '_stdin_error');
+    const timer = setTimeout(() => finish(protocol.prefix + '_marker_timeout'), protocol.timeout);
     process.stdin.on('data', onData);
     process.stdin.on('end', onEnd);
     process.stdin.on('error', onError);
-    if (process.stdin.readableEnded || process.stdin.destroyed) { finish('source_pause_stdin_closed'); return; }
+    if (process.stdin.readableEnded || process.stdin.destroyed) { finish(protocol.prefix + '_stdin_closed'); return; }
     // 先注册接收再发就绪事件，避免 Master 的即时回应落入竞态窗口。
     try {
-      process.stdout.write(JSON.stringify({ event: 'SOURCE_TIMEOUT_READY', taskId: report.taskId, runId: report.runId, connectionId }) + '\n');
+      process.stdout.write(JSON.stringify({ event: protocol.event, taskId: report.taskId, runId: report.runId, connectionId, ...(kind === 'query' ? { jobId } : {}) }) + '\n');
       process.stdin.resume();
-    } catch { finish('source_pause_transport_error'); }
+    } catch { finish(protocol.prefix + '_transport_error'); }
   });
 }
 /** 私有文件必须真实落于当前树，且没有组或其他用户访问权限。 */
@@ -116,9 +133,9 @@ async function privateFile(path) {
 function remember(value) { if (typeof value === 'string' && value.length >= 8) sensitive.add(value); }
 function containsSecret(text) { return [...sensitive].some(value => text.includes(value)); }
 /** 仅将状态码和固定路由模板写入证据，响应正文仅用于内存断言。 */
-async function http(user, method, path, template, data, headers = {}) {
+async function http(user, method, path, template, data, headers = {}, timeoutMs = 20000) {
   const started = Date.now();
-  const response = await user.api.fetch(user.origin + path, { method, data, headers: { ...headers, Connection: 'close' }, maxRedirects: 0, timeout: 20000 });
+  const response = await user.api.fetch(user.origin + path, { method, data, headers: { ...headers, Connection: 'close' }, maxRedirects: 0, timeout: timeoutMs });
   report.http.push({ method, route: template, status: response.status(), durationMs: Date.now() - started });
   return response;
 }
@@ -153,6 +170,8 @@ try {
   requireTrue(['baseline', 'layout-only', 'source-unavailable', 'source-timeout', 'catalog-cancel', 'source-permission-limited'].includes(scenario), 'scenario_invalid');
   requireTrue(runtime.sourcePauseHandshake === undefined || typeof runtime.sourcePauseHandshake === 'boolean', 'source_pause_handshake_invalid');
   requireTrue(runtime.sourcePauseHandshake !== true || scenario === 'source-timeout', 'source_pause_handshake_scenario_invalid');
+  requireTrue(runtime.catalogCancelHandshake === undefined || typeof runtime.catalogCancelHandshake === 'boolean', 'catalog_cancel_handshake_invalid');
+  requireTrue(runtime.catalogCancelHandshake !== true || scenario === 'catalog-cancel', 'catalog_cancel_handshake_scenario_invalid');
   requireTrue(['baseline', 'layout-only'].includes(scenario) || /^[A-Za-z0-9_-]{1,100}$/.test(runtime.connectionId), 'fault_connection_required');
   requireTrue(!runtime.browserChannel || runtime.browserChannel === 'msedge', 'browser_channel_denied');
   const realm = JSON.parse(await privateFile(runtime.realmFile));
@@ -489,8 +508,8 @@ try {
     });
   } else {
     await runCase('M1-U05', async () => {
-      if (runtime.sourcePauseHandshake === true) {
-        phase = 'U05_source_timeout_initial_catalog';
+      if (runtime.sourcePauseHandshake === true || runtime.catalogCancelHandshake === true) {
+        phase = runtime.catalogCancelHandshake ? 'U05_catalog_cancel_initial_catalog' : 'U05_source_timeout_initial_catalog';
         // 初始目录读取完成后才能暂停源，避免把导航中的真实查询误当作探针超时。
         const [initialCatalog] = await Promise.all([
           page.waitForResponse(response => new URL(response.url()).pathname === connectionPath() + '/catalogs' && response.request().method() === 'GET'),
@@ -504,7 +523,7 @@ try {
           phase = 'U05_source_timeout_retry_ready';
           await expectation(page.getByRole('button', { name: '重新测试', exact: true })).toBeVisible();
           await expectation(page.getByRole('button', { name: '重新测试', exact: true })).toBeEnabled();
-          await waitForSourcePause(connectionId);
+          await waitForSourceControl('pause', connectionId);
         }
         const probe = await clicked(page, '重新测试', connectionPath() + '/test', 'POST', 200, { timeoutMs: 20000, observePending: true, phase: 'U05_source_timeout_probe' });
         const request = report.http.at(-1);
@@ -537,12 +556,53 @@ try {
         await discover('PARTIAL');
         await expectation(page.getByText('发现未完整完成，不能将此结果视为没有对象。此前快照仅供历史参考。')).toBeVisible(); observedU05.add('partial_catalog');
       } else {
-        const job = await clicked(page, '发现目录', connectionPath() + '/discoveries', 'POST', 202);
-        if (await page.getByRole('button', { name: '取消发现', exact: true }).count() === 0) { note('job_completed_before_cancel_action'); return; }
-        await clicked(page, '取消发现', connectionPath() + '/discoveries/' + job.jobId + '/cancel', 'POST', 200);
-        await page.reload();
-        const readback = await jsonResponse(await http(operator, 'GET', connectionPath() + '/discoveries/' + job.jobId, '/connections/{id}/discoveries/{jobId}'), 200);
-        requireTrue(readback.status === 'CANCELLED', 'cancel_not_durable'); observedU05.add('cancelled_job_refresh');
+        if (runtime.catalogCancelHandshake === true) {
+          phase = 'U05_catalog_cancel_discover_ready';
+          await expectation(page.getByRole('button', { name: '发现目录', exact: true })).toBeVisible();
+          await expectation(page.getByRole('button', { name: '发现目录', exact: true })).toBeEnabled();
+          await waitForSourceControl('lock', connectionId);
+        }
+        const job = await clicked(page, '发现目录', connectionPath() + '/discoveries', 'POST', 202, { phase: 'U05_catalog_cancel_discover' });
+        requireTrue(typeof job.jobId === 'string' && /^[a-f0-9]{32}$/.test(job.jobId), 'catalog_cancel_job_id_invalid');
+        if (runtime.catalogCancelHandshake === true) {
+          requireTrue(['QUEUED','RUNNING'].includes(job.status), 'catalog_cancel_job_not_pending');
+          const persisted = await jsonResponse(await http(operator, 'GET', connectionPath() + '/discoveries/' + job.jobId, '/connections/{id}/discoveries/{jobId}', undefined, {}, 5000), 200);
+          requireTrue(persisted.jobId === job.jobId && persisted.connectionId === connectionId && ['QUEUED','RUNNING'].includes(persisted.status), 'catalog_cancel_pending_job_not_durable');
+          report.cancelObservation = { jobId: job.jobId, createdStatus: job.status, persistedStatus: persisted.status, terminalStatus: 'NOT_VERIFIED' };
+          await waitForSourceControl('query', connectionId, job.jobId);
+          await expectation(page.getByRole('button', { name: '取消发现', exact: true })).toBeVisible();
+          await expectation(page.getByRole('button', { name: '取消发现', exact: true })).toBeEnabled();
+        } else if (await page.getByRole('button', { name: '取消发现', exact: true }).count() === 0) { note('job_completed_before_cancel_action'); return; }
+        await clicked(page, '取消发现', connectionPath() + '/discoveries/' + job.jobId + '/cancel', 'POST', 200, { phase: 'U05_catalog_cancel_request' });
+        phase = 'U05_catalog_cancel_reload'; await page.reload();
+        let readback;
+        const terminalDeadline = performance.now() + 5000;
+        // 请求与间隔共享五秒期限，不能把十次单独 HTTP 期限伪称五秒有界读取。
+        for (let attempt = 0; attempt < (runtime.catalogCancelHandshake ? 10 : 1); attempt++) {
+          const remaining = Math.ceil(terminalDeadline - performance.now());
+          if (runtime.catalogCancelHandshake && remaining <= 0) break;
+          readback = await jsonResponse(await http(operator, 'GET', connectionPath() + '/discoveries/' + job.jobId, '/connections/{id}/discoveries/{jobId}', undefined, {}, runtime.catalogCancelHandshake ? remaining : 20000), 200);
+          if (!['QUEUED','RUNNING'].includes(readback.status)) break;
+          if (runtime.catalogCancelHandshake) await new Promise(done => setTimeout(done, Math.min(500, Math.max(0, terminalDeadline - performance.now()))));
+        }
+        if (runtime.catalogCancelHandshake === true) {
+          report.cancelObservation.terminalStatus = ['QUEUED','RUNNING','SUCCEEDED','FAILED','PARTIAL','CANCELLED'].includes(readback?.status) ? readback.status : 'UNKNOWN';
+          report.cancelObservation.completedAtPresent = typeof readback?.completedAtUtc === 'string' && Number.isFinite(Date.parse(readback.completedAtUtc));
+          report.cancelObservation.snapshotAbsent = readback?.snapshotId === null;
+        }
+        requireTrue(readback?.status === 'CANCELLED' && readback.jobId === job.jobId && readback.connectionId === connectionId, 'cancel_not_durable'); observedU05.add('cancelled_job_refresh');
+        if (runtime.catalogCancelHandshake === true) {
+          requireTrue(report.cancelObservation.completedAtPresent && report.cancelObservation.snapshotAbsent, 'cancel_terminal_timestamp_or_snapshot_invalid');
+          phase = 'U05_catalog_cancel_visible_terminal';
+          await expectation(page.getByRole('status').filter({ hasText: '目录发现：已取消' })).toBeVisible();
+          phase = 'U05_catalog_cancel_recovery_actions';
+          await expectation(page.getByRole('button', { name: '发现目录', exact: true })).toBeVisible();
+          await expectation(page.getByRole('button', { name: '发现目录', exact: true })).toBeEnabled();
+          await expectation(page.getByRole('button', { name: '刷新详情', exact: true })).toBeVisible();
+          await expectation(page.getByRole('button', { name: '刷新详情', exact: true })).toBeEnabled();
+          observedU05.add('cancelled_ui_and_enabled_discover_refresh_actions');
+          note('source_lock_and_backend_disappearance_require_independent_master_witness');
+        }
       }
       await noLeak(page);
     });
