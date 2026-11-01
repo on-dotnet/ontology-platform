@@ -1,4 +1,4 @@
-import { createElement } from "react";
+import { createElement, isValidElement, type ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { configFromForm, formFromConfig, newForm, validateForm, type ConnectionForm, type ConnectionType } from "./form-model";
@@ -8,18 +8,59 @@ import ConnectionListPage from "../../app/data/connections/page";
 import ConnectionDetailPage from "../../app/data/connections/[id]/page";
 import type { PlatformIdentity } from "../../lib/api/generated";
 import { ProbeReport, RequestError } from "./status";
-import { CatalogSnapshot } from "./catalog";
+import { CatalogPanel, CatalogSnapshot } from "./catalog";
 import { createConnectionsClient } from "./api";
 import { decodeDraft, encodeDraft, draftCacheKey } from "./draft-cache";
 import { PlatformApiError } from "../../lib/api/client";
-import type { CatalogSnapshotView, ConnectionProbeView } from "../../lib/api/g4-generated";
+import type { CatalogDiscoveryJobView, CatalogSnapshotView, ConnectionProbeView, ConnectionView } from "../../lib/api/g4-generated";
 
+
+/** 复用仓库 Node Hook 调度边界，实际组件事件与异常处理不被替换；不冒充浏览器验收。 */
+const catalogHarness = vi.hoisted(() => {
+  type Effect = { dependencies?: readonly unknown[]; cleanup?: void | (() => void) };
+  const active: Host[] = [];
+  class Host {
+    slots: unknown[] = []; cursor = 0; effects: Array<() => void> = [];
+    render<T>(component: () => T): T {
+      active.push(this); this.cursor = 0; this.effects = [];
+      let result: T;
+      try { result = component(); } finally { active.pop(); }
+      this.effects.forEach(effect => effect()); return result;
+    }
+    unmount() { for (const slot of this.slots) { const effect = slot as Effect | undefined; if (typeof effect?.cleanup === "function") effect.cleanup(); } }
+  }
+  function state<T>(initial: T | (() => T)): [T, (next: T | ((previous: T) => T)) => void] {
+    const host = active.at(-1)!; const index = host.cursor++;
+    if (!(index in host.slots)) host.slots[index] = typeof initial === "function" ? (initial as () => T)() : initial;
+    return [host.slots[index] as T, next => { host.slots[index] = typeof next === "function" ? (next as (previous: T) => T)(host.slots[index] as T) : next; }];
+  }
+  function ref<T>(initial: T) { const [value] = state({ current: initial }); return value; }
+  function effect(setup: () => void | (() => void), dependencies?: readonly unknown[]) {
+    const host = active.at(-1)!; const index = host.cursor++; const previous = host.slots[index] as Effect | undefined;
+    if (previous && dependencies && previous.dependencies?.length === dependencies.length && dependencies.every((value, offset) => Object.is(value, previous.dependencies![offset]))) return;
+    const next: Effect = { dependencies }; host.slots[index] = next;
+    host.effects.push(() => { if (typeof previous?.cleanup === "function") previous.cleanup(); next.cleanup = setup(); });
+  }
+  return { Host, state, ref, effect, active: () => active.length > 0, jobId: "", replace: vi.fn(), api: { get: vi.fn(), job: vi.fn(), catalogs: vi.fn(), catalog: vi.fn(), discover: vi.fn(), cancel: vi.fn() } };
+});
+vi.mock("react", async original => {
+  const actual = await original<typeof import("react")>();
+  return { ...actual,
+    useState: <T,>(initial: T | (() => T)) => catalogHarness.active() ? catalogHarness.state(initial) : actual.useState(initial),
+    useRef: <T,>(initial: T) => catalogHarness.active() ? catalogHarness.ref(initial) : actual.useRef(initial),
+    useEffect: (setup: () => void | (() => void), dependencies?: readonly unknown[]) => catalogHarness.active() ? catalogHarness.effect(setup, dependencies) : actual.useEffect(setup, dependencies),
+  };
+});
+vi.mock("./api", async original => {
+  const actual = await original<typeof import("./api")>();
+  return { ...actual, createConnectionsClient: (fetcher?: typeof fetch) => fetcher ? actual.createConnectionsClient(fetcher) : { ...actual.createConnectionsClient(), ...catalogHarness.api } };
+});
 
 // 仅提供路由 Hook 的组件测试边界；身份始终使用真实生成 DTO，不模拟 HTTP 授权通过。
 vi.mock("next/navigation", () => ({
-  useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
+  useRouter: () => ({ push: vi.fn(), replace: catalogHarness.replace }),
   usePathname: () => "/data/connections",
-  useSearchParams: () => new URLSearchParams(),
+  useSearchParams: () => new URLSearchParams(catalogHarness.jobId ? { job: catalogHarness.jobId } : {}),
   redirect: vi.fn(),
 }));
 
@@ -223,5 +264,115 @@ describe("URL草稿缓存不持久化查询参数或片段", () => {
   it("不含query/fragment/userinfo的URL可保留", () => {
     expect(decodeDraft(encodeDraft(validForms.TDENGINE))).toEqual(validForms.TDENGINE);
     expect(decodeDraft(encodeDraft(validForms.WEB_API))).toEqual(validForms.WEB_API);
+  });
+});
+
+/** 已授权任务与源目录分别返回，测试仅验证真实组件在这些输入下的状态清理。 */
+describe("目录拒绝后的任务诊断与权限重验（组件回归）", () => {
+  const connection = { id: "connection", state: "ACTIVE", probeFresh: true } as ConnectionView;
+  const job = { jobId: "job", connectionId: "connection", status: "PARTIAL", createdAtUtc: "2026-11-01", traceId: "safe-trace" } as CatalogDiscoveryJobView;
+  const snapshot = { snapshotId: "snapshot", status: "SUCCEEDED", capturedAtUtc: "2026-11-01", configRevision: 1, schemaFingerprint: "safe-hash", objects: [{ schema: "production", name: "old-private-table", kind: "TABLE", fields: [] }] } as unknown as CatalogSnapshotView;
+  async function settle() { for (let index = 0; index < 30; index++) await Promise.resolve(); }
+  function elements(node: ReactNode): Array<React.ReactElement<Record<string, unknown>>> {
+    if (Array.isArray(node)) return node.flatMap(elements);
+    if (!isValidElement<Record<string, unknown>>(node)) return [];
+    return [node, ...elements(node.props.children as ReactNode)];
+  }
+  function setup(jobId = "job") {
+    catalogHarness.jobId = jobId; catalogHarness.replace.mockReset();
+    for (const mock of Object.values(catalogHarness.api)) mock.mockReset();
+    catalogHarness.api.get.mockResolvedValue({ data: connection });
+    catalogHarness.api.job.mockResolvedValue({ data: job });
+    catalogHarness.api.catalogs.mockRejectedValue(new PlatformApiError(403, "catalog_access_forbidden"));
+    const host = new catalogHarness.Host(); const onDenied = vi.fn();
+    const render = () => host.render(() => CatalogPanel({ connection, etag: '"1"', canManage: true, onDenied }));
+    return { host, onDenied, render, html: () => renderToStaticMarkup(render()) };
+  }
+  it("源目录403后重新授权连接和任务，显示PARTIAL但不恢复目录", async () => {
+    const view = setup(); view.render(); await settle();
+    const html = view.html();
+    expect(catalogHarness.api.get).toHaveBeenCalledWith("connection", expect.any(AbortSignal));
+    expect(catalogHarness.api.job.mock.calls.length).toBeGreaterThan(1);
+    expect(html).toContain("发现未完整完成"); expect(html).not.toContain("目录快照历史");
+    expect(view.onDenied).not.toHaveBeenCalled(); view.host.unmount();
+  });
+  it("重验任务仍RUNNING时保留显式继续入口，不假称PARTIAL", async () => {
+    const view = setup(); catalogHarness.api.job.mockResolvedValue({ data: { ...job, status: "RUNNING" } });
+    view.render(); await settle(); const html = view.html();
+    expect(html).toContain("继续读取任务状态"); expect(html).not.toContain("发现未完整完成");
+    expect(view.onDenied).not.toHaveBeenCalled(); view.host.unmount();
+  });
+  it.each(["connection", "job"])("%s 重验403必须全清并向父页拒绝", async kind => {
+    const view = setup();
+    if (kind === "connection") catalogHarness.api.get.mockRejectedValue(new PlatformApiError(403, "connection_scope_forbidden"));
+    else catalogHarness.api.job.mockResolvedValueOnce({ data: job }).mockRejectedValue(new PlatformApiError(403, "connection_scope_forbidden"));
+    view.render(); await settle();
+    expect(view.onDenied).toHaveBeenCalled(); expect(view.html()).not.toContain("发现未完整完成"); view.host.unmount();
+  });
+  it.each([[401, "authentication_required"], [403, "connection_scope_forbidden"], [403, "unknown_forbidden"]])("目录HTTP %s/%s不能降级为源ACL拒绝", async (status, code) => {
+    const view = setup(); catalogHarness.api.catalogs.mockRejectedValue(new PlatformApiError(Number(status), String(code)));
+    view.render(); await settle();
+    expect(view.onDenied).toHaveBeenCalled(); expect(catalogHarness.api.get).not.toHaveBeenCalled();
+    expect(view.html()).not.toContain("发现未完整完成"); view.host.unmount();
+  });
+  it.each([true, false])("无jobId时仍重验连接，授权结果=%s", async allowed => {
+    const view = setup("");
+    if (!allowed) catalogHarness.api.get.mockRejectedValue(new PlatformApiError(403, "connection_scope_forbidden"));
+    view.render(); await settle();
+    expect(catalogHarness.api.get).toHaveBeenCalledTimes(1); expect(catalogHarness.api.job).not.toHaveBeenCalled();
+    expect(view.onDenied.mock.calls.length > 0).toBe(!allowed); view.host.unmount();
+  });
+  it("重验发现连接已禁用时不能保留任务或目录", async () => {
+    const view = setup(); catalogHarness.api.get.mockResolvedValue({ data: { ...connection, state: "DISABLED" } });
+    view.render(); await settle(); expect(view.onDenied).toHaveBeenCalled(); expect(view.html()).not.toContain("发现未完整完成"); view.host.unmount();
+  });
+  it("目录被拒绝后立即清空此前成功显示的快照和历史", async () => {
+    const view = setup(""); catalogHarness.api.catalogs.mockResolvedValue({ data: { items: [snapshot], nextCursor: null } });
+    catalogHarness.api.catalog.mockResolvedValueOnce({ data: snapshot }).mockRejectedValue(new PlatformApiError(403, "catalog_access_forbidden"));
+    view.render(); await settle();
+    const clickSnapshot = () => { const button = elements(view.render()).find(element => element.type === "button" && String(element.props.children).includes("个对象")); expect(button).toBeDefined(); (button!.props.onClick as () => void)(); };
+    clickSnapshot(); await settle(); expect(view.html()).toContain("old-private-table");
+    clickSnapshot(); await settle(); const html = view.html();
+    expect(html).not.toContain("old-private-table"); expect(html).not.toContain("目录快照历史"); expect(view.onDenied).not.toHaveBeenCalled(); view.host.unmount();
+  });
+  it("卸载后迟到的连接重验响应不得触发任务读取或恢复投影", async () => {
+    const view = setup(); let complete!: (value: unknown) => void;
+    catalogHarness.api.get.mockReturnValue(new Promise(resolve => { complete = resolve; }));
+    view.render(); await settle(); const jobCalls = catalogHarness.api.job.mock.calls.length;
+    view.host.unmount(); const slots = [...view.host.slots]; complete({ data: connection }); await settle();
+    expect(catalogHarness.api.job).toHaveBeenCalledTimes(jobCalls); expect(view.host.slots).toEqual(slots); expect(view.onDenied).not.toHaveBeenCalled();
+  });
+  it.each(["discover", "cancel"])("%s旧命令晚于目录401返回时不得恢复任务或路由", async operation => {
+    const view = setup(operation === "discover" ? "" : "job");
+    let rejectCatalog!: (cause: Error) => void; let completeCommand!: (value: unknown) => void;
+    catalogHarness.api.catalogs.mockReturnValue(new Promise((_, reject) => { rejectCatalog = reject; }));
+    catalogHarness.api.job.mockResolvedValue({ data: { ...job, status: "RUNNING" } });
+    catalogHarness.api[operation as "discover" | "cancel"].mockReturnValue(new Promise(resolve => { completeCommand = resolve; }));
+    view.render(); await settle();
+    const label = operation === "discover" ? "发现目录" : "取消发现";
+    const button = elements(view.render()).find(element => element.type === "button" && element.props.children === label)!;
+    expect(button.props.disabled).toBe(false); (button.props.onClick as () => void)();
+    rejectCatalog(new PlatformApiError(401, "authentication_required")); await settle();
+    completeCommand({ data: job }); await settle();
+    const html = view.html(); expect(html).not.toContain("发现未完整完成"); expect(html).not.toContain("恢复上次目录操作结果");
+    expect(view.onDenied).toHaveBeenCalled(); expect(catalogHarness.replace).not.toHaveBeenCalled(); view.host.unmount();
+  });
+  it("旧发现失败晚于源目录拒绝重验时不得覆盖新的权限错误", async () => {
+    const view = setup(""); let rejectCatalog!: (cause: Error) => void; let rejectCommand!: (cause: Error) => void;
+    catalogHarness.api.catalogs.mockReturnValue(new Promise((_, reject) => { rejectCatalog = reject; }));
+    catalogHarness.api.discover.mockReturnValue(new Promise((_, reject) => { rejectCommand = reject; }));
+    view.render(); await settle();
+    const button = elements(view.render()).find(element => element.type === "button" && element.props.children === "发现目录")!;
+    (button.props.onClick as () => void)(); rejectCatalog(new PlatformApiError(403, "catalog_access_forbidden")); await settle();
+    rejectCommand(new PlatformApiError(503, "request_failed")); await settle();
+    const html = view.html(); expect(html).toContain("没有访问权限"); expect(html).not.toContain("服务暂不可用");
+    expect(view.onDenied).not.toHaveBeenCalled(); expect(catalogHarness.replace).not.toHaveBeenCalled(); view.host.unmount();
+  });
+  it("目录401后迟到的旧任务成功不得重新恢复诊断", async () => {
+    const view = setup(); let complete!: (value: unknown) => void;
+    catalogHarness.api.catalogs.mockRejectedValue(new PlatformApiError(401, "authentication_required"));
+    catalogHarness.api.job.mockReturnValue(new Promise(resolve => { complete = resolve; }));
+    view.render(); await settle(); complete({ data: job }); await settle();
+    expect(view.onDenied).toHaveBeenCalled(); expect(view.html()).not.toContain("发现未完整完成"); view.host.unmount();
   });
 });
