@@ -152,3 +152,29 @@ describe("冻结完整诊断码与误贴凭据拒绝回归", () => {
     expect(decodeDraft(JSON.stringify(form))?.values[key]).toBe("");
   });
 });
+
+
+describe("URL草稿缓存不持久化查询参数或片段", () => {
+  const cases = ["token", "access_token", "password"].flatMap(key => [
+    `?${key}=synthetic-secret`, `?locale=zh&${key}=synthetic-secret`, `#${key}=synthetic-secret`,
+  ]);
+  it.each(cases)("TDengine %s仅留内存，读写缓存都拒绝", suffix => {
+    const form = { ...validForms.TDENGINE, values: { ...validForms.TDENGINE.values, wsUrl: `wss://td.example/ws${suffix}` } };
+    expect(validateForm(form)).toEqual({});
+    expect(encodeDraft(form)).not.toContain("synthetic-secret");
+    expect(decodeDraft(JSON.stringify(form))?.values.wsUrl).toBe("");
+    expect(form.values.wsUrl).toContain(suffix);
+  });
+  it.each(["baseOrigin", "approvedPath"])("Web API %s所有query/fragment均不缓存", key => {
+    for (const suffix of ["?token=synthetic-secret", "#password=synthetic-secret", "?locale=zh", "#section", "?", "#"]) {
+      const form = { ...validForms.WEB_API, values: { ...validForms.WEB_API.values, [key]: `${key === "baseOrigin" ? "https://api.example" : "/fixture"}${suffix}` } };
+      expect(JSON.parse(encodeDraft(form)).values[key]).toBe("");
+      expect(decodeDraft(JSON.stringify(form))?.values[key]).toBe("");
+      expect(form.values[key]).toContain(suffix);
+    }
+  });
+  it("不含query/fragment/userinfo的URL可保留", () => {
+    expect(decodeDraft(encodeDraft(validForms.TDENGINE))).toEqual(validForms.TDENGINE);
+    expect(decodeDraft(encodeDraft(validForms.WEB_API))).toEqual(validForms.WEB_API);
+  });
+});
