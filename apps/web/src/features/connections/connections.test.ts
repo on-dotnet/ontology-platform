@@ -3,12 +3,59 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { configFromForm, formFromConfig, newForm, validateForm, type ConnectionForm, type ConnectionType } from "./form-model";
 import { ConfigurationForm } from "./form";
+import { CreateConnection } from "./create";
+import ConnectionListPage from "../../app/data/connections/page";
+import ConnectionDetailPage from "../../app/data/connections/[id]/page";
+import type { PlatformIdentity } from "../../lib/api/generated";
 import { ProbeReport, RequestError } from "./status";
 import { CatalogSnapshot } from "./catalog";
 import { createConnectionsClient } from "./api";
 import { decodeDraft, encodeDraft, draftCacheKey } from "./draft-cache";
 import { PlatformApiError } from "../../lib/api/client";
 import type { CatalogSnapshotView, ConnectionProbeView } from "../../lib/api/g4-generated";
+
+
+// 仅提供路由 Hook 的组件测试边界；身份始终使用真实生成 DTO，不模拟 HTTP 授权通过。
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
+  usePathname: () => "/data/connections",
+  useSearchParams: () => new URLSearchParams(),
+  redirect: vi.fn(),
+}));
+
+const roleCases = [
+  { label: "标准管理员", roles: ["platform.operator"], canManage: true },
+  { label: "管理员兼审计", roles: ["platform.operator", "platform.auditor"], canManage: true },
+  { label: "标准审计", roles: ["platform.auditor"], canManage: false },
+  { label: "标准查看者", roles: ["platform.viewer"], canManage: false },
+  { label: "不可信短角色名", roles: ["operator"], canManage: false },
+  { label: "无角色", roles: [], canManage: false },
+];
+
+/** 与真实 /api/v1/platform/me 生成合同一致的合成身份。 */
+function roleIdentity(roles: string[]): PlatformIdentity {
+  return { subjectId: "synthetic-actor", displayName: "合成用户", roles, scopes: [{ organizationId: "org-demo", siteId: "site-a" }] };
+}
+
+describe("真实身份 DTO 的标准角色回归（组件检查，不替代 OIDC E2E）", () => {
+  it.each(roleCases)("$label：列表入口与详情透传一致的管理权限", async ({ roles, canManage }) => {
+    const identity = roleIdentity(roles);
+    // 只调用路由的身份投影，不将 async Server Component 的完整渲染冒充浏览器验收。
+    const list = ConnectionListPage().props.children(identity);
+    const detail = (await ConnectionDetailPage({ params: Promise.resolve({ id: "synthetic-id" }) })).props.children(identity);
+    expect(list.props.children.props.canManage).toBe(canManage);
+    expect(detail.props.children.props.canManage).toBe(canManage);
+    const html = renderToStaticMarkup(list);
+    expect(html.includes('href="/data/connections/new"')).toBe(canManage);
+  });
+  it.each(roleCases)("$label：新建配置表单仅标准管理员可编辑", ({ roles, canManage }) => {
+    const html = renderToStaticMarkup(createElement(CreateConnection, { identity: roleIdentity(roles) }));
+    const configuration = html.match(/<fieldset\b[^>]*class="connection-fields"[^>]*>/)?.[0];
+    expect(configuration).toBeDefined();
+    expect(configuration?.includes('disabled=""')).toBe(!canManage);
+    expect(html.includes("您拥有只读访问权限，不能新建连接。")).toBe(!canManage);
+  });
+});
 
 const validForms: Record<ConnectionType, ConnectionForm> = {
   POSTGRESQL: newForm("POSTGRESQL", "合成连接"),
@@ -110,8 +157,8 @@ describe("非敏草稿刷新隔离", () => {
     expect(decodeDraft(JSON.stringify({ ...validForms.POSTGRESQL, secretRef: "extra" }))).toBeNull();
   });
   it("身份、角色与scope变化不能读取原缓存键", () => {
-    const identity = { subjectId: "user", displayName: "用户", roles: ["operator"], scopes: [{ organizationId: "org", siteId: "one" }] };
-    expect(draftCacheKey(identity)).not.toEqual(draftCacheKey({ ...identity, roles: ["viewer"] }));
+    const identity = { subjectId: "user", displayName: "用户", roles: ["platform.operator"], scopes: [{ organizationId: "org", siteId: "one" }] };
+    expect(draftCacheKey(identity)).not.toEqual(draftCacheKey({ ...identity, roles: ["platform.viewer"] }));
     expect(draftCacheKey(identity)).not.toEqual(draftCacheKey({ ...identity, scopes: [] }));
   });
 });

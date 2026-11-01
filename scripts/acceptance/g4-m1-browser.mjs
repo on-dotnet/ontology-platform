@@ -159,6 +159,14 @@ try {
     const file = name + '.png'; await page.screenshot({ path: resolve(output, file), fullPage: true, mask: [page.locator('input[type=password]')] });
     report.screenshots.push(file);
   }
+  /** 使用控件名或唯一语义定位；选择后仍验证实际值与可编辑状态。 */
+  async function choose(control, value, step) {
+    phase = step;
+    await expectation(control).toHaveCount(1);
+    await expectation(control).toBeEnabled();
+    await control.selectOption(value);
+    await expectation(control).toHaveValue(value);
+  }
   async function clicked(page, label, path, method, status) {
     phase = label;
     const [response] = await Promise.all([
@@ -212,22 +220,27 @@ try {
         TDENGINE: { wsUrl: 'wss://pg-source', database: 'fixture' },
         WEB_API: { baseOrigin: 'https://pg-source', operationId: 'fixture_read', approvedPath: '/fixture', hostPolicyRef: 'synthetic_policy' },
       };
-      const fields = { POSTGRESQL: '只读用户名', ORACLE: '服务名称（Service Name）', DORIS: 'FE 主机', TDENGINE: 'WebSocket 地址', WEB_API: '已批准 HTTPS 源站' };
-      for (const [type, label] of Object.entries(fields)) {
-        await page.getByLabel('数据源类型', { exact: true }).selectOption(type);
-        await expectation(page.getByLabel(label, { exact: true })).toBeVisible();
+      const fields = { POSTGRESQL: 'username', ORACLE: 'serviceName', DORIS: 'feHost', TDENGINE: 'wsUrl', WEB_API: 'baseOrigin' };
+      for (const [type, field] of Object.entries(fields)) {
+        await choose(page.getByRole('combobox', { name: /^数据源类型/ }), type, 'U03_' + type + '_select');
+        phase = 'U03_' + type + '_field_presence';
+        await expectation(page.locator('input[name=' + field + ']')).toBeVisible();
+        phase = 'U03_' + type + '_invalid_name';
         await page.locator('input[name=displayName]').fill('');
         await page.getByRole('button', { name: '校验配置', exact: true }).click();
         await expectation(page.locator('input[name=displayName]')).toHaveAttribute('aria-invalid', 'true');
+        phase = 'U03_' + type + '_valid_configuration';
         await page.locator('input[name=displayName]').fill('Synthetic ' + type);
         for (const [key, value] of Object.entries(profiles[type])) await page.locator('input[name=' + key + ']').fill(value);
         await page.getByRole('button', { name: '校验配置', exact: true }).click();
         await expectation(page.getByText('配置格式校验通过；连接结果以实际测试为准。')).toBeVisible();
         if (type !== 'POSTGRESQL') {
+          phase = 'U03_' + type + '_unsupported_actions';
           await expectation(page.getByRole('button', { name: '测试草稿', exact: true })).toBeDisabled();
           await expectation(page.getByRole('button', { name: '保存为草稿', exact: true })).toBeDisabled();
           await expectation(page.getByText('配置可校验；此类型尚未支持连接测试与保存。')).toBeVisible();
         }
+        phase = 'U03_' + type + '_negative_field';
         const negativeKey = type === 'POSTGRESQL' || type === 'ORACLE' ? 'port' : type === 'DORIS' ? 'queryPort' : type === 'TDENGINE' ? 'wsUrl' : 'baseOrigin';
         await page.locator('input[name=' + negativeKey + ']').fill(negativeKey.toLowerCase().includes('port') ? '65536' : 'not-a-url');
         await page.getByRole('button', { name: '校验配置', exact: true }).click();
@@ -237,17 +250,20 @@ try {
     });
     await runCase('M1-U01', async () => {
       await page.goto(operator.origin + '/data/connections');
-      await page.getByLabel('类型', { exact: true }).selectOption('ORACLE');
+      await choose(page.getByRole('combobox', { name: /^类型/ }), 'ORACLE', 'U01_list_filter');
       await expectation(page.getByText('当前筛选下暂无连接。', { exact: false })).toBeVisible(); observedU05.add('empty_list');
+      phase = 'U01_create_navigation';
       await page.getByRole('link', { name: '新建连接', exact: true }).click();
-      await page.getByLabel('数据源类型', { exact: true }).selectOption('POSTGRESQL');
+      await choose(page.getByRole('combobox', { name: /^数据源类型/ }), 'POSTGRESQL', 'U01_pg_type');
+      phase = 'U01_pg_configuration';
       const name = 'G4 synthetic ' + runtime.runId + ' ' + randomUUID().slice(0, 8);
-      await page.getByLabel('连接名称', { exact: true }).fill(name);
-      for (const [label, value] of Object.entries({ 主机: 'pg-source', 端口: '5432', 数据库: 'fixture', 只读用户名: 'fixture_reader', '允许的 Schema（逗号分隔）': 'production' })) await page.getByLabel(label, { exact: true }).fill(value);
-      await page.getByLabel('TLS 验证', { exact: true }).selectOption('VerifyFull');
-      await page.getByLabel('所属厂区', { exact: true }).selectOption('org-demo/site-a');
+      await page.locator('input[name=displayName]').fill(name);
+      for (const [field, value] of Object.entries({ host: 'pg-source', port: '5432', database: 'fixture', username: 'fixture_reader', allowedSchemas: 'production' })) await page.locator('input[name=' + field + ']').fill(value);
+      await choose(page.locator('select[name=sslMode]'), 'VerifyFull', 'U01_verify_full');
+      await choose(page.getByRole('combobox', { name: /^所属厂区/ }), 'org-demo/site-a', 'U01_scope');
+      phase = 'U01_private_input_refresh';
       await page.getByLabel('重新输入密码', { exact: true }).fill(sourceSecret); await noLeak(page); await page.reload();
-      await expectation(page.getByLabel('连接名称', { exact: true })).toHaveValue(name);
+      await expectation(page.locator('input[name=displayName]')).toHaveValue(name);
       await expectation(page.getByLabel('重新输入密码', { exact: true })).toHaveValue('');
       await page.getByLabel('重新输入密码', { exact: true }).fill(sourceSecret);
       const receipt = await clicked(page, '安全录入凭据', '/api/v1/connection-secrets', 'POST', 201); remember(receipt.secretRef);
@@ -269,20 +285,20 @@ try {
       // 独立冲突用例失败仍保留，随后恢复权威详情完成主生命周期。
       await runCase('M1-U04', async () => {
         const before = await current(); const mine = name + ' local'; const theirs = name + ' server';
-        await page.getByLabel('连接名称', { exact: true }).fill(mine);
+        await page.locator('input[name=displayName]').fill(mine);
         const updated = await http(operator, 'PATCH', connectionPath(), '/connections/{id}', { displayName: theirs, command: command(before.data.configRevision) }, { ...operator.headers, 'If-Match': before.etag });
         await jsonResponse(updated, 200);
         await clicked(page, '保存配置', connectionPath(), 'PATCH', 409);
         await expectation(page.getByRole('alert').filter({ hasText: '连接已被修改' })).toBeVisible();
-        await expectation(page.getByLabel('连接名称', { exact: true })).toHaveValue(mine);
+        await expectation(page.locator('input[name=displayName]')).toHaveValue(mine);
         await page.getByRole('button', { name: '刷新详情', exact: true }).click();
         await expectation(page.getByRole('heading', { name: theirs, exact: true })).toBeVisible();
-        await expectation(page.getByLabel('连接名称', { exact: true })).toHaveValue(mine);
+        await expectation(page.locator('input[name=displayName]')).toHaveValue(mine);
         await expectation(page.locator('.connection-comparison pre').first()).toContainText(theirs);
         await noLeak(page); note('real_409_latest_server_and_retained_nonsecret_edit');
       });
       activeCase = 'M1-U01'; await page.reload();
-      await page.getByLabel('连接名称', { exact: true }).fill(name + ' edited');
+      await page.locator('input[name=displayName]').fill(name + ' edited');
       const changed = await clicked(page, '保存配置', connectionPath(), 'PATCH', 200);
       requireTrue(changed.state === 'DRAFT' && !changed.probeFresh, 'edit_did_not_invalidate_probe');
       await stages(await clicked(page, '重新测试', connectionPath() + '/test', 'POST', 200));
@@ -296,13 +312,18 @@ try {
     await runCase('M1-U06', async () => {
       await page.goto(operator.origin + '/data/connections'); await expectation(page.getByRole('heading', { name: '数据源', exact: true })).toBeVisible();
       for (const theme of ['light', 'dark']) {
+        phase = 'U06_' + theme + '_theme_toggle';
         if (await page.locator('html').getAttribute('data-theme') !== theme) await page.getByRole('button', { name: '切换深浅主题', exact: true }).click();
         await expectation(page.locator('html')).toHaveAttribute('data-theme', theme);
         for (const [width, height, size] of [[1440,1000,'wide'], [390,844,'narrow']]) {
+          phase = 'U06_' + theme + '_' + size + '_viewport';
           await page.setViewportSize({ width, height });
           requireTrue(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), 'page_horizontal_overflow');
+          phase = 'U06_' + theme + '_' + size + '_create_action';
           await expectation(page.getByRole('link', { name: '新建连接', exact: true })).toBeVisible();
+          phase = 'U06_' + theme + '_' + size + '_visible_copy';
           requireTrue(!/TODO|Mock|组件测试|研发提示|NOT_RUN/.test(await page.locator('main').innerText()), 'development_hint_visible');
+          phase = 'U06_' + theme + '_' + size + '_screenshot';
           await screenshot(page, theme + '-' + size); note(theme + '_' + size + '_viewport_and_theme');
         }
       }

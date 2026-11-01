@@ -26,7 +26,7 @@ export function CreateConnection({ identity }: { identity: PlatformIdentity }) {
   const [probe, setProbe] = useState<ConnectionProbeView | null>(null);
   const [pendingProbe, setPendingProbe] = useState<ConnectionDraftProbeRequest | null>(null);
   const [pendingCreate, setPendingCreate] = useState<ConnectionCreateRequest | null>(null);
-  const canManage = identity.roles.includes("operator");
+  const canManage = identity.roles.includes("platform.operator");
   const selected = identity.scopes.find(scope => `${scope.organizationId}/${scope.siteId}` === site);
   const scope = selected ? { organizationId: selected.organizationId, siteIds: [selected.siteId] } : null;
   const runnable = form.type === "POSTGRESQL";
