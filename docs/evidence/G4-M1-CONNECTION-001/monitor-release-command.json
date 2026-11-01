@@ -4,6 +4,7 @@
   "before": "EXACT_PID_AND_TASK_MATCH",
   "command": "os.kill(exact_owned_pid, SIGTERM)",
   "exitCode": 0,
-  "after": "PENDING_PROCESS_EXIT",
-  "releasedSystemSettings": false
+  "after": "EXACT_PID_ABSENT_AND_OWNED_EXEC_SESSION_EXIT_0",
+  "releasedSystemSettings": false,
+  "pidCheckExitCode": 1
 }

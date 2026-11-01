@@ -8,7 +8,7 @@ PG：m1_reviewer审查 d855a1a59e9697f7434488bf664eb1af17f053df 与 6aba51d3f833
 
 UI：m1_reviewer原审c678021发现refresh恢复及诊断码问题；68c2d4e新增缓存又发现userinfo持久化。28fc39d/7187cd8后发现查询token漏过滤；99b6158补全所有query/fragment/userinfo拒绝缓存。最终独立内存转译实测三类反例写入和恢复都不含合成秘密，合法无参数URL保留，exit0。可集成候选，不代表浏览器/HTTP产品PASS。Master集成后另执行typecheck/73组件测试。
 
-应用服务：m1_pg_adapter原审提出4个具体问题：同值PATCH时旧Probe恢复有效；并发同key enable重复源调用；Probe恢复缺审计且可被正常完成覆盖；非法/多值ETag错误分类。Master分别加入revision/期限/RUNNING检查、源调用前持久预约、统一准确命令→连接锁+恢复审计、格式400分类。该非作者对4项源码复核闭合；另发现ReadProbe投影需检查LastProbeId，Master已修。真实并发/PG事务NOT_RUN；不是应用服务整体安全通过。
+应用服务：m1_pg_adapter原审提出4个具体问题：同值PATCH时旧Probe恢复有效；并发同key enable重复源调用；Probe恢复缺审计且可被正常完成覆盖；非法/多值ETag错误分类。Master分别加入revision/期限/RUNNING检查、源调用前持久预约、统一准确命令→连接锁+恢复审计、格式400分类。该非作者对4项源码复核闭合；另发现ReadProbe投影需检查LastProbeId，Master已修；m1_pg_adapter对958dc6c的LastProbeId行再次确认，该项源码复核闭合。真实并发/PG事务NOT_RUN；不是应用服务整体安全通过。
 
 镜像：m1_reviewer独立核对12个manifest真实SHA、两平台和压缩预算PASS；完成许可仍缺准确OS/JDK等材料，明确保持pull BLOCKED。完整观察、SHA及失败类别见blocked-witness.json。
 

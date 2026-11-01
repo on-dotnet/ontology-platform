@@ -1,0 +1,51 @@
+{
+  "taskId": "G4-M1-CONNECTION-001",
+  "utc": "2026-11-01T12:07:00.968729+00:00",
+  "mode": "APPLY_EXACT_OWNED_TEMPORARIES",
+  "removedLinks": [
+    {
+      "path": "node_modules",
+      "expectedTarget": "/Users/chasen/.codex/worktrees/g3-m5-review-fix/ontology-platform/node_modules",
+      "before": "EXACT_OWNED_SYMLINK",
+      "symlinkBytes": 78,
+      "command": "unlink exact symlink",
+      "exitCode": 0,
+      "after": "LINK_ABSENT_TARGET_PRESERVED"
+    },
+    {
+      "path": "apps/web/node_modules",
+      "expectedTarget": "/Users/chasen/.codex/worktrees/g3-m5-review-fix/ontology-platform/apps/web/node_modules",
+      "before": "EXACT_OWNED_SYMLINK",
+      "symlinkBytes": 87,
+      "command": "unlink exact symlink",
+      "exitCode": 0,
+      "after": "LINK_ABSENT_TARGET_PRESERVED"
+    },
+    {
+      "path": ".tools/pnpm",
+      "expectedTarget": "/Users/chasen/Developer/repos/ontology-platform/.tools/pnpm",
+      "before": "EXACT_OWNED_SYMLINK",
+      "symlinkBytes": 59,
+      "command": "unlink exact symlink",
+      "exitCode": 0,
+      "after": "LINK_ABSENT_TARGET_PRESERVED"
+    },
+    {
+      "path": ".tools/pythonlibs",
+      "expectedTarget": "/Users/chasen/Developer/repos/ontology-platform/.tools/pythonlibs",
+      "before": "EXACT_OWNED_SYMLINK",
+      "symlinkBytes": 65,
+      "command": "unlink exact symlink",
+      "exitCode": 0,
+      "after": "LINK_ABSENT_TARGET_PRESERVED"
+    }
+  ],
+  "removedLinkCount": 4,
+  "reclaimedLinkBytes": 289,
+  "terminatedOwnedMonitorPid": 55301,
+  "dockerObjectsCreated": 0,
+  "dockerObjectsDeleted": 0,
+  "taskWorktrees": "KEEP: Master/PG/UI unmerged unique commits and evidence; release after independent review plus explicit integration/recovery confirmation",
+  "ignoredBuildAndLogs": "KEEP current task build/log evidence for exact resume until review; no cache/secret payload included in ZIP",
+  "preexistingG3G6": "KEEP, outside task cleanup authority"
+}
