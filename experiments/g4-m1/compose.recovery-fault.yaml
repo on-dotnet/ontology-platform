@@ -1,0 +1,12 @@
+# 仅用于真实租约/Fence恢复，必须由有界故障执行器显式启动并精确回收。
+services:
+  api-recovery:
+    extends:
+      file: compose.runtime.yaml
+      service: api
+    profiles: [recovery-fault]
+    labels:
+      ontology.task-id: G4-M1-RECOVERY-001
+      ontology.run-id: ${G4_RUN_ID:?explicit task run required}
+      ontology.synthetic: "true"
+      ontology.purpose: lease-fence-fault

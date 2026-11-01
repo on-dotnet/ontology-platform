@@ -76,7 +76,7 @@ export function Workspace({ identity, children, section }: { identity: PlatformI
         <span className="workspace-logo">P</span>
         <div>
           <strong>平台治理空间</strong>
-          <small>Development workspace</small>
+          <small>{section === "connections" ? "合成数据空间" : "Development workspace"}</small>
         </div>
         <span className="tiny-dot" />
       </div>
@@ -89,10 +89,10 @@ export function Workspace({ identity, children, section }: { identity: PlatformI
           <Icon name="shield" />
           <strong>可信访问边界</strong>
           <p>每次资源访问均由服务端校验，并关联审计记录。</p>
-          <span className="tag teal">G1 · 开发合成资源</span>
+          <span className="tag teal">{section === "connections" ? "只读访问" : "G1 · 开发合成资源"}</span>
         </div>
         <div className="sidebar-footer">
-          <span className="status-dot" /> 本地开发环境 <span>WAVE 2</span>
+          <span className="status-dot" /> {section === "connections" ? "合成数据环境" : <>本地开发环境 <span>WAVE 2</span></>}
         </div>
       </div>
     </aside>
@@ -108,7 +108,7 @@ export function Workspace({ identity, children, section }: { identity: PlatformI
         </div>
         <div className="topbar-actions">
           <span className="environment">
-            <span className="status-dot" /> Development</span>
+            <span className="status-dot" /> {section === "connections" ? "内部实验" : "Development"}</span>
           <span className="topbar-divider" />
           <button className="icon-button" aria-label="切换深浅主题" onClick={toggleTheme}>
             <Icon name="sun" />

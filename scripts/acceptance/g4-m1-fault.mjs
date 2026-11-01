@@ -5,7 +5,7 @@ import { createRequire } from 'node:module';
 import { randomUUID, createHash } from 'node:crypto';
 const root=path.resolve(import.meta.dirname,'../..');
 const privateDir=path.join(root,'.tools/security/g4-m1-recovery-001-20261101-01');
-const allowed=['snapshot-read','audit-prepare','audit-fail','audit-retry','job-start','job-cancel','job-read','probe-refresh','audit-replay-failed','probe-client-cancel'];
+const allowed=['snapshot-read','audit-prepare','audit-fail','audit-retry','job-start','job-cancel','job-read','probe-refresh','audit-replay-failed','probe-client-cancel','intake-foreign','original-identity-check','disabled-denials'];
 if(process.argv.includes('--help')) {console.log('Usage: node g4-m1-fault.mjs --runtime-file <private runtime> --action '+allowed.join('|'));process.exit(0);}
 const args=process.argv.slice(2);
 const report={taskId:'G4-M1-RECOVERY-001',startedUtc:new Date().toISOString(),checks:[],http:[],scope:'ONE_HTTP_ACTION_ONLY',databaseRollbackLeaseFenceEvidence:'NOT_RUN_BY_THIS_CONSUMER'};
@@ -23,11 +23,11 @@ try{
  const realm=privateJson(runtime.realmFile);demand(/^http:\/\/localhost:15180\/realms\/g2-[a-f0-9]+$/.test(realm.authority),'issuer');
  const require=createRequire(path.join(root,'apps/web/package.json'));const{chromium}=require('@playwright/test');browser=await chromium.launch({channel:'msedge',headless:true});context=await browser.newContext({serviceWorkers:'block',extraHTTPHeaders:{Connection:'close'}});context.setDefaultTimeout(15000);
  await context.route('**/*',r=>['http://localhost:15100','http://localhost:15180'].includes(new URL(r.request().url()).origin)?r.continue():r.abort());
- const page=await context.newPage();await page.goto(runtime.publicOrigin+'/auth/login?returnUrl=%2Fdata%2Fconnections');const user=realm.identities['g2-operator-ab'];await page.locator('#username').fill(user.username);await page.locator('#password').fill(user.password);await page.locator('#kc-login').click();await page.waitForURL(u=>u.origin===runtime.publicOrigin&&u.pathname==='/data/connections');await page.close();
+ const page=await context.newPage();await page.goto(runtime.publicOrigin+'/auth/login?returnUrl=%2Fdata%2Fconnections');const user=realm.identities[['intake-foreign','original-identity-check'].includes(action)?'g2-operator-a':'g2-operator-ab'];await page.locator('#username').fill(user.username);await page.locator('#password').fill(user.password);await page.locator('#kc-login').click();await page.waitForURL(u=>u.origin===runtime.publicOrigin&&u.pathname==='/data/connections');await page.close();
  const csrfResponse=await context.request.get(runtime.publicOrigin+'/auth/csrf',{headers:{Connection:'close'},maxRedirects:0});demand(csrfResponse.status()===200,'csrf_status');const csrf=(await csrfResponse.json()).requestToken;demand(typeof csrf==='string','csrf_value');
  const headers={Connection:'close',Origin:runtime.publicOrigin,'X-CSRF-TOKEN':csrf};
  async function request(method,route,body,etag){
-  demand(route.startsWith('/api/v1/connections/')||route.startsWith('/api/v1/catalogs/')||route==='/api/v1/platform/me','fixed_route');
+  demand(route.startsWith('/api/v1/connections/')||route.startsWith('/api/v1/catalogs/')||route==='/api/v1/platform/me'||action==='intake-foreign'&&route==='/api/v1/connection-secrets','fixed_route');
   const start=Date.now();const response=await context.request.fetch(runtime.publicOrigin+route,{method,data:body,headers:{...headers,...(etag?{'If-Match':etag}:{})},maxRedirects:0,timeout:30000});const record={method,route:route.replace(/[a-f0-9]{32}/g,'{id}'),status:response.status(),durationMs:Date.now()-start};report.http.push(record);
   const raw=await response.text();demand(raw.length<8*1024*1024,'response_budget');let value=null;try{value=JSON.parse(raw);}catch{}
   record.jsonBody=!!value&&typeof value==='object';
@@ -38,7 +38,22 @@ try{
  const current=await request('GET','/api/v1/connections/'+id);demand(current.status===200,'current_connection');
  const auditStage=runtime.auditStage??'start';demand(['start','complete'].includes(auditStage),'audit_stage');report.auditStage=auditStage;
  const pending=path.join(privateDir,'fault-audit-'+auditStage+'-command.json');
- if(action==='snapshot-read'){
+ if(action==='disabled-denials'){
+  demand(current.value.state==='DISABLED','disabled_fixture_required');
+  const probe=await request('POST','/api/v1/connections/'+id+'/test',{command:cmd(current.value.configRevision)},current.etag);demand(probe.status===409,'disabled_probe_denied');
+  const discovery=await request('POST','/api/v1/connections/'+id+'/discoveries',{command:cmd(current.value.configRevision)},current.etag);demand(discovery.status===409,'disabled_discovery_denied');
+  const history=await request('GET','/api/v1/connections/'+id+'/catalogs');demand(history.status===403,'disabled_history_denied');
+  report.checks.push({name:'disabled_probe_discovery_and_history_denied',status:'PASS'});
+ }else if(action==='original-identity-check'){
+  const me=await request('GET','/api/v1/platform/me');const original=privateJson(path.join(privateDir,'cross-org-ref.json'));demand(me.status===200&&me.value.subjectId===original.subjectId&&me.value.scopes.every(x=>x.organizationId==='org-demo')&&me.value.scopes.some(x=>x.siteId==='site-a'),'original_identity_restored');report.originalSubjectSha256=hash(me.value.subjectId);report.checks.push({name:'same_subject_original_org_restored_new_oidc_login',status:'PASS'});
+ }else if(action==='intake-foreign'){
+  const me=await request('GET','/api/v1/platform/me');demand(me.status===200&&typeof me.value.subjectId==='string'&&me.value.scopes.every(x=>x.organizationId==='org-demo')&&me.value.scopes.some(x=>x.siteId==='site-a'),'original_subject_scope');
+  const secretFile=path.join(privateDir,'reader-password');demand(!fs.lstatSync(secretFile).isSymbolicLink()&&(fs.statSync(secretFile).mode&0o077)===0,'private_secret_boundary');
+  const issued=await request('POST','/api/v1/connection-secrets',{secretValue:fs.readFileSync(secretFile,'utf8').trimEnd(),scopeSelection:{organizationId:'org-demo',siteIds:['site-a']},purpose:'POSTGRESQL_READONLY',command:cmd(0)});
+  demand(issued.status===201&&/^[a-f0-9]{32}$/.test(issued.value.secretRef),'foreign_intake');
+  writePrivate(path.join(privateDir,'cross-org-ref.json'),{secretRef:issued.value.secretRef,subjectId:me.value.subjectId,expiresAtUtc:issued.value.expiresAtUtc,organizationId:'org-demo',siteIds:['site-a']});
+  report.originalSubjectSha256=hash(me.value.subjectId);report.foreignRefSha256=hash(issued.value.secretRef);report.checks.push({name:'same_operator_a_original_org_actual_intake',status:'PASS'});
+ }else if(action==='snapshot-read'){
   demand(/^[a-f0-9]{32}$/.test(runtime.httpSnapshotId??''),'snapshot_id');const x=await request('GET','/api/v1/catalogs/'+runtime.httpSnapshotId);demand(x.status===200,'snapshot_status');demand(x.value.snapshotId===runtime.httpSnapshotId&&['READY','STALE'].includes(x.value.status)&&/^[a-f0-9]{64}$/.test(x.value.schemaFingerprint)&&Array.isArray(x.value.objects),'snapshot_projection');report.snapshot={id:x.value.snapshotId,status:x.value.status,fingerprint:x.value.schemaFingerprint,containsRecoveryExtra:x.value.objects.some(o=>o.fields.some(f=>f.name==='recovery_extra'))};
  }else if(action.startsWith('audit-')){
   if(action==='audit-prepare'){
