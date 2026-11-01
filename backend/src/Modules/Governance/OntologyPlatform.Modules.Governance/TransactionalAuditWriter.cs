@@ -14,6 +14,8 @@ public sealed class TransactionalAuditWriter : ITransactionalAuditWriter, IAudit
     /// <summary>本轮批准的固定审计事件，禁止把来源、Prompt或异常当作事件。</summary>
     private static readonly HashSet<string> Actions = new(StringComparer.Ordinal)
     {
+        "connection.secret.intake", "connection.create", "connection.update", "connection.secret.rotate", "connection.probe.start", "connection.probe.complete",
+        "connection.enable", "connection.disable", "connection.catalog.start", "connection.catalog.finish", "connection.catalog.cancel",
         "ontology.create", "ontology.save", "ontology.edit", "ontology.validate", "ontology.assess", "ontology.impact.generate", "ontology.read", "ontology.list", "ontology.diff",
         "release.proposal.create", "release.approval.decide", "release.activate", "release.rollback",
         "semantic.query", "semantic.evidence.read", "execution.run.create", "execution.run.start", "execution.run.tool",

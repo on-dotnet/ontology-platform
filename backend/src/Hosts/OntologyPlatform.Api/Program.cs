@@ -20,6 +20,7 @@ public static class Program
         await using var app = PlatformApiHost.CreateApplication(args);
         await PlatformApiHost.InitializeDevelopmentAsync(app);
         await G2Composition.InitializeG2DevelopmentAsync(app);
+        await G4Composition.InitializeG4Async(app);
         await app.RunAsync();
     }
 }

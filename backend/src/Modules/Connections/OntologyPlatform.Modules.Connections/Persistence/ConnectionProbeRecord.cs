@@ -3,6 +3,15 @@ namespace OntologyPlatform.Modules.Connections;
 /// <summary>Connections模块独占的ConnectionProbeRecord持久记录，不映射外部源业务表。</summary>
 public sealed class ConnectionProbeRecord
 {
+    /// <summary>开始时修订，阻止同内容编辑后的旧探测提交。</summary>
+    public long Revision { get; set; }
+
+    /// <summary>恢复使用的准确幂等键。</summary>
+    public string CommandKey { get; set; } = string.Empty;
+
+    /// <summary>用于原始操作恢复审计的可信主体快照。</summary>
+    public string ActorJson { get; set; } = string.Empty;
+
     /// <summary>记录唯一标识。</summary>
     public string Id { get; set; } = string.Empty;
 

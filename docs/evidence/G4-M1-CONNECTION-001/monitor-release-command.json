@@ -1,0 +1,9 @@
+{
+  "pid": 55301,
+  "expectedCommand": "scripts/maintenance/host_continuity.py monitor --task-id G4-M1-CONNECTION-001 --output artifacts/g4-m1/host-monitor.jsonl --seconds 21600 --interval 15",
+  "before": "EXACT_PID_AND_TASK_MATCH",
+  "command": "os.kill(exact_owned_pid, SIGTERM)",
+  "exitCode": 0,
+  "after": "PENDING_PROCESS_EXIT",
+  "releasedSystemSettings": false
+}

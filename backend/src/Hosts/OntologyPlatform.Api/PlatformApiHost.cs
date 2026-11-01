@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using OntologyPlatform.Api.Contracts;
 using OntologyPlatform.Api.G2;
+using OntologyPlatform.Api.G4;
 using OntologyPlatform.Api.Security;
 using OntologyPlatform.Modules.Governance;
 using OntologyPlatform.ServiceDefaults;
@@ -122,6 +123,7 @@ public static class PlatformApiHost
             .Configure<PostgresTicketStore>((options, store) => options.SessionStore = store);
         builder.Services.AddAuthorization();
         builder.AddG2Modules();
+        builder.AddG4Module();
         builder.Services.AddOpenApi(options => options.AddPlatformContracts());
         builder.Services.AddReverseProxy().LoadFromMemory(
             [new RouteConfig { RouteId = "web", ClusterId = "next", Match = new RouteMatch { Path = "/{**webPath}" } }],
@@ -255,6 +257,7 @@ public static class PlatformApiHost
         app.MapOpenApi();
         app.MapPlatformEndpoints(security);
         app.MapG2Endpoints();
+        if (app.Configuration.GetValue<bool>("G4:Enabled")) app.MapG4Endpoints();
         // 保留技术及API前缀的未知路径也不能落入Web代理。
         foreach (var prefix in new[] { "api", "auth", "health", "openapi" })
         {

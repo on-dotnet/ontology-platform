@@ -3,6 +3,9 @@ namespace OntologyPlatform.Modules.Connections;
 /// <summary>Connections模块独占的ConnectionCommandRecord持久记录，不映射外部源业务表。</summary>
 public sealed class ConnectionCommandRecord
 {
+    /// <summary>失败预约的固定错误码，不携异常详情。</summary>
+    public string? ErrorCode { get; set; }
+
     /// <summary>actor组织操作目标和幂等键SHA256。</summary>
     public string Id { get; set; } = string.Empty;
 
@@ -20,4 +23,9 @@ public sealed class ConnectionCommandRecord
 
     /// <summary>创建时间。</summary>
     public DateTimeOffset CreatedAtUtc { get; set; } = default;
+    /// <summary>原始响应强ETag，重放不替换为当前修订。</summary>
+    public string? Etag { get; set; }
+
+    /// <summary>原始成功状态码。</summary>
+    public int StatusCode { get; set; } = 200;
 }

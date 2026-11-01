@@ -1,0 +1,49 @@
+{
+  "utc": "2026-11-01T12:02:34.498619+00:00",
+  "context": "desktop-linux",
+  "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016",
+  "serverVersion": "29.9.2",
+  "containers": [],
+  "volumes": [
+    "g2-ef979bd04cc0-alloy-data",
+    "g2-ef979bd04cc0-fuseki-data",
+    "g2-ef979bd04cc0-grafana-data",
+    "g2-ef979bd04cc0-loki-data",
+    "g2-ef979bd04cc0-postgres-data",
+    "g2-ef979bd04cc0-prometheus-data",
+    "g2-ef979bd04cc0-rustfs-data",
+    "g2-ef979bd04cc0-tempo-data"
+  ],
+  "networks": [
+    "ad0236b9fa0ea7f713e3d29ff58bc5e28a0aec605f7a3d4461a8fc1cd37ff058 bridge",
+    "80ac07a0bfc7ad5bdedefec78a3a66c97c4c74093c4a8533f05f4cb96bcbc4d0 host",
+    "e66d65cfe0714eb9fde22ab801d77393aeb653344362c0faac45292d829dab8e none"
+  ],
+  "images": [
+    "sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c ontology-platform-fuseki:context-4fbf23514516632dcb651b5c05bf04e9992da52491607b6cf58de1f7348ff9ab sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c",
+    "sha256:cc1591ccefc0ab280cfd1fef2ebc5315de7d2f39d8d1c1d690c37e305810a9b2 hlc-iov-release-postgis:18.6-3.6.3 sha256:cc1591ccefc0ab280cfd1fef2ebc5315de7d2f39d8d1c1d690c37e305810a9b2",
+    "sha256:39b0fb6616a466a05b2ff8c691bb14a63557c70118d433a4b70fd1068b1bef60 ontology-platform-fuseki:context-1e45f836d9837cbc75d23adb3ad37b0ff79a545ef06102a87aa246feea9cc1e5 sha256:39b0fb6616a466a05b2ff8c691bb14a63557c70118d433a4b70fd1068b1bef60",
+    "sha256:401e1fbc58c27b08c3103e00c86b22bd175a1cdd8f8a7d61965133f27a24437f ontology-platform-g2-fuseki:6.2.0 sha256:401e1fbc58c27b08c3103e00c86b22bd175a1cdd8f8a7d61965133f27a24437f",
+    "sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b quay.io/keycloak/keycloak:<none> ",
+    "sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18 grafana/alloy:<none> ",
+    "sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044 grafana/tempo:<none> ",
+    "sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2 prom/prometheus:<none> ",
+    "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6 hlc-iov-release-pg-base:18.6 <none>",
+    "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6 postgres:<none> ",
+    "sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28 grafana/loki:<none> ",
+    "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b rustfs/rustfs:<none> ",
+    "sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f grafana/grafana:<none> ",
+    "sha256:93b8a14ea2f412782e4e842651273b4d903e35cc496284f178fbbe2d67d00976 docker.m.daocloud.io/library/maven:3.9-eclipse-temurin-25 sha256:93b8a14ea2f412782e4e842651273b4d903e35cc496284f178fbbe2d67d00976"
+  ],
+  "sameContextAndEngine": true,
+  "preexistingObjectsPreserved": {
+    "containers": true,
+    "volumes": true,
+    "networks": true,
+    "images": false
+  },
+  "taskDockerCreated": 0,
+  "taskDockerDeleted": 0,
+  "dockerCleanup": "NOT_APPLICABLE_NO_TASK_DOCKER_OBJECTS_CREATED",
+  "oldResources": "KEEP: preexisting G3/G6/other projects; release only by their own reviewed lifecycle."
+}

@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 1,
+  "taskId": "G4-M1-CONNECTION-001",
+  "status": "BLOCKED",
+  "gate": "complete-image-license-before-pull",
+  "observedAtUtc": "2026-11-01T12:01:39.695723+00:00",
+  "reviewer": "/root/m1_reviewer",
+  "runtimeLayerDownloads": 0,
+  "newContainers": 0,
+  "fullProductAcceptance": "NOT_RUN",
+  "reason": "Attachment docs/06-M1-COMPOSE-RESOURCES.md requires complete image licensing. Exact platform manifests exist, but complete exact-image component licensing remains unverified. Project licenses/signatures/provenance do not replace this gate.",
+  "manifestVerification": {
+    "queries": 12,
+    "exitCodes": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "indexAndPlatformDigests": "MATCH image-candidates.json",
+    "arm64CompressedBytes": 600460317,
+    "arm64DeduplicatedBytes": 570246821,
+    "bothPlatformsCompressedBytes": 1207045092,
+    "approvedLimitBytes": 3221225472
+  },
+  "perImageCompressedBytes": {
+    "postgres": {
+      "amd64": 162498589,
+      "arm64": 161112442
+    },
+    "keycloak": {
+      "amd64": 265459448,
+      "arm64": 263927495
+    },
+    "aspnet": {
+      "amd64": 95928438,
+      "arm64": 92392505
+    },
+    "node": {
+      "amd64": 82698300,
+      "arm64": 83027875
+    }
+  },
+  "sbomQueries": {
+    "command": "docker buildx imagetools inspect --format '{{json .SBOM}}' <exact-index-reference>",
+    "postgres": {
+      "result": "TimeoutExpired",
+      "timeoutSeconds": 45,
+      "exitCode": null
+    },
+    "node": {
+      "result": "TimeoutExpired",
+      "timeoutSeconds": 45,
+      "exitCode": null
+    },
+    "keycloak": {
+      "exitCode": 0,
+      "result": {}
+    },
+    "aspnet": {
+      "exitCode": 0,
+      "result": {}
+    }
+  },
+  "attestations": {
+    "command": "docker buildx imagetools inspect --raw <exact-reference>",
+    "postgres": {
+      "reference": "postgres@sha256:316659847625da3b939ed0f6b76847f78e87a1fb3df901943147e1ccab52030f",
+      "exitCode": 0,
+      "predicates": [
+        "SPDX",
+        "SLSA"
+      ],
+      "spdxSha256": "cd43b3a0e922128fb99e638c605f8df23c0985eca8895dff6946bd975699fedc",
+      "spdxBytes": 5969302,
+      "packages": 206,
+      "noAssertion": 15
+    },
+    "node": {
+      "reference": "node@sha256:e9214d5021926cef69dfedab3e722ef26f7a61a06b778188dd786d49d6e70a42",
+      "exitCode": 0,
+      "predicates": [
+        "SPDX",
+        "SLSA"
+      ],
+      "spdxSha256": "b3c592ff9bcfb43eedb83002d36a482fccbcabf7b22a14d435bb694a0c63b2e8",
+      "spdxBytes": 2205320,
+      "packages": 260,
+      "noAssertion": 7
+    },
+    "keycloak": {
+      "reference": "quay.io/keycloak/keycloak@sha256:c9ff6443f6a03502beb8ad4852ff5faf7d44e72cca0411abe8922b55657b7973",
+      "exitCode": 0,
+      "predicates": [
+        "SLSA"
+      ]
+    }
+  },
+  "unresolved": [
+    {
+      "component": "libxcrypt 1:4.4.38-1",
+      "observation": "Exact copyright and metadata URL queries returned HTTP404; official source API lists version. License text acquisition failed; not proof license absent."
+    },
+    {
+      "component": "tzdata 2026e-0+deb13u1",
+      "observation": "Exact copyright URL HTTP404; version not listed by queried source API; neighboring versions not substituted."
+    },
+    {
+      "component": "Keycloak ARM64 e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4",
+      "observation": "OCI referrers only SLSA attestation; no exact running-image RPM/JDK/UBI license inventory. Project third party notice 7523238 bytes SHA256 14c17647c43f27315d148812a0be6b97b3cc9585463588ebbe67f7282cfe661d does not cover full OS composition."
+    },
+    {
+      "component": "ASP.NET ARM64 3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55",
+      "observation": "OCI referrers only Notary artifact c59455368524a5c56a7c74a5be9790b7c996e1cd711db21237df38e3450cea99. Verified config d558e2a91f9574fe27662c4a66fc80795942781a283e8cbaa2c808e0e892436c identifies Ubuntu24.04 and .NET/ASP.NET10.0.13; no exact installed OS versions/full license inventory."
+    }
+  ],
+  "resumeCondition": "Obtain verifiable exact-image full component license evidence and independent admission review. Existing approval permits continuing within approved budget after gate passes; no permission to waive gate is inferred.",
+  "sources": [
+    "https://www.postgresql.org/about/licence/",
+    "https://raw.githubusercontent.com/keycloak/keycloak/26.8.1/LICENSE.txt",
+    "https://raw.githubusercontent.com/dotnet/aspnetcore/v10.0.13/LICENSE.txt",
+    "https://raw.githubusercontent.com/nodejs/node/v24.22.1/LICENSE",
+    "https://github.com/keycloak/keycloak/releases/download/26.8.1/third-party-notice-keycloak.html",
+    "https://github.com/dotnet/dotnet-docker/blob/main/documentation/image-artifact-details.md"
+  ],
+  "limitations": "Reviewer reports are attributed actual observations. SBOM blobs held in reviewer memory only; hashes/precise sources retained, not redistributed in ZIP. No claim all CVEs absent or signatures validated."
+}

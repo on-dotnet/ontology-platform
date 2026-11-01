@@ -101,7 +101,10 @@ public sealed class PostgresTicketStore : ITicketStore
         }
         try
         {
-            return TicketSerializer.Default.Deserialize(protector.Unprotect(session.ProtectedTicket));
+            // 仅通过真实票据读取后提供内部引用，HTTP正文不能提供该值。
+            var ticket = TicketSerializer.Default.Deserialize(protector.Unprotect(session.ProtectedTicket));
+            if (ticket is not null && accessor.HttpContext is { } context) context.Items["G4SessionReference"] = key;
+            return ticket;
         }
         catch (CryptographicException)
         {

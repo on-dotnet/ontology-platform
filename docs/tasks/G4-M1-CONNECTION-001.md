@@ -1,6 +1,6 @@
 # G4-M1-CONNECTION-001
 
-状态 IN_PROGRESS / P0-P1。授权见 ../evidence/G4-M1-CONNECTION-001/authorization.md。
+状态 BLOCKED / DRAFT / PARTIAL（完整镜像许可下载门禁）；阶段未完成。详见 ../evidence/G4-M1-CONNECTION-001/blocked-delivery.md。授权见 ../evidence/G4-M1-CONNECTION-001/authorization.md。
 BaseSha=8afc5d4dfd32e7adb48262cce6587057c0e68715，origin/main=d1a61daffe844475b07705797e3ad325cc3f2945。
 Master 分支 codex/g4-m1-connection-master；托管树 /Users/chasen/.codex/worktrees/g4-m1-connection-master/ontology-platform。
 

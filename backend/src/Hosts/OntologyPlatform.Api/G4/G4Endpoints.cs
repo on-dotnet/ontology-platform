@@ -56,7 +56,7 @@ public static class G4Endpoints
                 Operation = operation, Actor = actor, Body = body,
                 Id = context.Request.RouteValues["id"] as string,
                 ChildId = context.Request.RouteValues["probeId"] as string ?? context.Request.RouteValues["jobId"] as string ?? context.Request.RouteValues["snapshotId"] as string,
-                Etag = context.Request.Headers.IfMatch.Count == 1 ? context.Request.Headers.IfMatch[0] : null,
+                Etag = context.Request.Headers.IfMatch.Count == 0 ? null : context.Request.Headers.IfMatch.Count == 1 ? context.Request.Headers.IfMatch[0] : string.Empty,
                 Cursor = context.Request.Query["cursor"], Type = context.Request.Query["type"], State = context.Request.Query["state"],
                 SessionReference = context.Items["G4SessionReference"] as string ?? string.Empty
             };
