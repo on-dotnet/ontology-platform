@@ -15,7 +15,9 @@ Runtime JSON (private, under this checkout .tools/security):
 realmFile uses existing bootstrap shape: authority plus identities[g2-operator-ab,
 g2-viewer-ab,g2-auditor-ab], each username/password. All auth origins must be loopback.
 Source is fixed synthetic pg-source:5432/fixture/fixture_reader, VerifyFull, production.
-Scenarios: baseline, source-unavailable, catalog-cancel, source-permission-limited.
+Scenarios: baseline, layout-only, source-unavailable, catalog-cancel, source-permission-limited.
+layout-only logs real resize geometry/hit testing and four stable viewport screenshots.
+It does not run U01-U05 or change CSS, navigation state, animation duration or fixture data.
 Fault scenarios require Master to establish actual fixture fault and supply connectionId.
 Evidence must be below artifacts/g4-m1-recovery-001 or docs/evidence/G4-M1-RECOVERY-001.
 Each run creates a unique directory. No passwords, SecretRef, CSRF, raw errors or URLs
@@ -93,8 +95,8 @@ try {
   requireTrue(runtime.publicOrigin === 'http://localhost:15100', 'public_origin_denied');
   requireTrue(runtime.scope?.organizationId === 'org-demo' && JSON.stringify(runtime.scope.siteIds) === '["site-a"]', 'synthetic_scope_required');
   const scenario = runtime.scenario ?? 'baseline';
-  requireTrue(['baseline', 'source-unavailable', 'catalog-cancel', 'source-permission-limited'].includes(scenario), 'scenario_invalid');
-  requireTrue(scenario === 'baseline' || /^[A-Za-z0-9_-]{1,100}$/.test(runtime.connectionId), 'fault_connection_required');
+  requireTrue(['baseline', 'layout-only', 'source-unavailable', 'catalog-cancel', 'source-permission-limited'].includes(scenario), 'scenario_invalid');
+  requireTrue(['baseline', 'layout-only'].includes(scenario) || /^[A-Za-z0-9_-]{1,100}$/.test(runtime.connectionId), 'fault_connection_required');
   requireTrue(!runtime.browserChannel || runtime.browserChannel === 'msedge', 'browser_channel_denied');
   const realm = JSON.parse(await privateFile(runtime.realmFile));
   const authority = new URL(realm.authority);
@@ -156,8 +158,72 @@ try {
     requireTrue(report.screenshots.length < 4, 'screenshot_budget'); await noLeak(page);
     requireTrue(new URL(page.url()).pathname.startsWith('/data/connections'), 'screenshot_route_denied');
     requireTrue((await page.locator('input[type=password]').evaluateAll(inputs => inputs.every(input => input.value === ''))), 'screenshot_secret_input');
-    const file = name + '.png'; await page.screenshot({ path: resolve(output, file), fullPage: true, mask: [page.locator('input[type=password]')] });
+    const file = name + '.png'; await page.screenshot({ path: resolve(output, file), fullPage: false, animations: 'disabled', mask: [page.locator('input[type=password]')] });
     report.screenshots.push(file);
+  }
+  /** 保留实际布局数值与命中布尔，不保存页面文字、URL或任意属性。 */
+  async function layoutEvidence(page, theme, size, moment) {
+    const evidence = await page.evaluate(() => {
+      const rectangle = element => {
+        if (!element) return null;
+        const value = element.getBoundingClientRect();
+        return Object.fromEntries(['x','y','width','height','left','right','top','bottom'].map(key => [key, Math.round(value[key] * 100) / 100]));
+      };
+      const navigation = document.querySelector('#platform-navigation');
+      const selectors = {
+        heading: '.connections-workspace h1',
+        type_filter: '.connection-actions label:first-child select',
+        state_filter: '.connection-actions label:nth-child(2) select',
+        create_action: '.connection-heading a[href="/data/connections/new"]',
+        first_connection_name: '.connection-scroll tbody tr:first-child td:first-child a',
+      };
+      const targets = Object.entries(selectors).map(([name, selector]) => {
+        const all = document.querySelectorAll(selector); const element = all[0];
+        const bounds = rectangle(element);
+        if (!element || !bounds) return { name, count: all.length, bounds: null, hits: [], unobstructed: false };
+        const actual = element.getBoundingClientRect();
+        let left = Math.max(0, actual.left), right = Math.min(innerWidth, actual.right);
+        let top = Math.max(0, actual.top), bottom = Math.min(innerHeight, actual.bottom);
+        // 合法表格横向滚动只检查当前裁剪区，不把隐藏列当作页面遮挡。
+        for (let parent = element.parentElement; parent; parent = parent.parentElement) {
+          const style = getComputedStyle(parent); const box = parent.getBoundingClientRect();
+          if (['auto','scroll','hidden','clip'].includes(style.overflowX)) { left = Math.max(left, box.left); right = Math.min(right, box.right); }
+          if (['auto','scroll','hidden','clip'].includes(style.overflowY)) { top = Math.max(top, box.top); bottom = Math.min(bottom, box.bottom); }
+        }
+        const hits = right > left && bottom > top ? [0.2,0.5,0.8].map(ratio => {
+          const x = left + (right - left) * ratio; const y = top + (bottom - top) / 2;
+          const hit = document.elementFromPoint(x, y);
+          return { x: Math.round(x * 100) / 100, y: Math.round(y * 100) / 100, targetOrDescendant: !!hit && (hit === element || element.contains(hit)), hitTag: hit?.tagName ?? null };
+        }) : [];
+        return { name, count: all.length, bounds, hits, unobstructed: hits.length === 3 && hits.every(hit => hit.targetOrDescendant) };
+      });
+      return { viewport: { width: innerWidth, height: innerHeight }, scroll: { x: scrollX, y: scrollY }, documentWidth: document.documentElement.scrollWidth,
+        sidebar: { count: document.querySelectorAll('#platform-navigation').length, bounds: rectangle(navigation), open: navigation?.classList.contains('is-open') ?? false, inert: navigation?.inert ?? false, transform: navigation ? getComputedStyle(navigation).transform : null },
+        topbarCount: document.querySelectorAll('.topbar').length, targets };
+    });
+    report.layout ??= []; report.layout.push({ theme, size, moment, ...evidence }); return evidence;
+  }
+  /** 等待真实抽屉关闭和连续三帧几何稳定；不覆盖产品CSS或强行隐藏元素。 */
+  async function settleLayout(page, narrow) {
+    await page.evaluate(async () => {
+      window.scrollTo(0, 0); await document.fonts.ready;
+      window.__g4LayoutSample = null; window.__g4LayoutStableFrames = 0;
+      await new Promise(done => requestAnimationFrame(() => requestAnimationFrame(done)));
+    });
+    if (narrow) await page.waitForFunction(() => {
+      const sidebar = document.querySelector('#platform-navigation');
+      return sidebar && !sidebar.classList.contains('is-open') && sidebar.inert && sidebar.getBoundingClientRect().right <= 0;
+    }, undefined, { polling: 'raf', timeout: 5000 });
+    await page.waitForFunction(() => {
+      const selected = ['#platform-navigation','.shell-body','.topbar','.connections-workspace','.connection-actions','.connection-scroll'];
+      const sample = JSON.stringify(selected.map(selector => {
+        const element = document.querySelector(selector); if (!element) return null;
+        const value = element.getBoundingClientRect(); return [value.x,value.y,value.width,value.height];
+      }));
+      window.__g4LayoutStableFrames = sample === window.__g4LayoutSample ? window.__g4LayoutStableFrames + 1 : 0;
+      window.__g4LayoutSample = sample;
+      return window.__g4LayoutStableFrames >= 3;
+    }, undefined, { polling: 'raf', timeout: 5000 });
   }
   /** 使用控件名或唯一语义定位；选择后仍验证实际值与可编辑状态。 */
   async function choose(control, value, step) {
@@ -309,6 +375,8 @@ try {
       await expectation(page.getByText('此连接已禁用，生命周期已终止。如需再次连接，请新建连接并重新测试。')).toBeVisible();
       await noLeak(page); note('edit_invalidates_probe_retest_enable_disable_refresh');
     });
+  }
+  if (['baseline', 'layout-only'].includes(scenario)) {
     await runCase('M1-U06', async () => {
       await page.goto(operator.origin + '/data/connections'); await expectation(page.getByRole('heading', { name: '数据源', exact: true })).toBeVisible();
       for (const theme of ['light', 'dark']) {
@@ -318,13 +386,22 @@ try {
         for (const [width, height, size] of [[1440,1000,'wide'], [390,844,'narrow']]) {
           phase = 'U06_' + theme + '_' + size + '_viewport';
           await page.setViewportSize({ width, height });
+          await layoutEvidence(page, theme, size, 'after_resize_before_settle');
+          phase = 'U06_' + theme + '_' + size + '_layout_stability';
+          await settleLayout(page, size === 'narrow');
+          const geometry = await layoutEvidence(page, theme, size, 'stable_before_screenshot');
           requireTrue(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), 'page_horizontal_overflow');
           phase = 'U06_' + theme + '_' + size + '_create_action';
           await expectation(page.getByRole('link', { name: '新建连接', exact: true })).toBeVisible();
           phase = 'U06_' + theme + '_' + size + '_visible_copy';
           requireTrue(!/TODO|Mock|组件测试|研发提示|NOT_RUN/.test(await page.locator('main').innerText()), 'development_hint_visible');
           phase = 'U06_' + theme + '_' + size + '_screenshot';
-          await screenshot(page, theme + '-' + size); note(theme + '_' + size + '_viewport_and_theme');
+          await screenshot(page, theme + '-' + size);
+          phase = 'U06_' + theme + '_' + size + '_hit_testing';
+          requireTrue(geometry.sidebar.count === 1 && geometry.topbarCount === 1, 'duplicate_shell_elements');
+          requireTrue(geometry.targets.every(target => target.count === 1 && target.unobstructed), 'main_content_obstructed');
+          if (size === 'narrow') requireTrue(geometry.sidebar.bounds.right <= 0 && !geometry.sidebar.open && geometry.sidebar.inert, 'closed_sidebar_overlaps_content');
+          note(theme + '_' + size + '_stable_viewport_and_unobstructed_controls');
         }
       }
       note('screenshots_require_independent_visual_review');
