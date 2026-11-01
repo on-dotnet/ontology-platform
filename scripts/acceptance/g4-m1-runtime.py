@@ -99,8 +99,8 @@ def main():
     elif args.mode == 'configure-api':
         realm=json.loads(Path(runtime['realmFile']).read_text())
         if not realm['authority'].startswith('http://localhost:15180/realms/g2-'): raise ValueError('ISSUER_BOUNDARY')
-        password=(PRIVATE/'platform-password').read_text()
-        config={'ConnectionStrings':{'governance':'Host=platform-pg;Database=platform;Username=platform;Password='+password},
+        platform_password=(PRIVATE/'platform-password').read_text()
+        config={'ConnectionStrings':{'governance':'Host=platform-pg;Database=platform;Username=platform;Password='+platform_password},
           'Security':{'Authority':realm['authority'],'ClientId':realm['clientId'],'ClientSecret':realm['clientSecret'],
           'PublicOrigin':runtime['publicOrigin'],'KeyRingPath':'/keyring','CertificatePath':'/private/api/keyring.pfx',
           'CertificatePassword':runtime['certificatePassword'],'HealthKey':runtime['healthKey']},

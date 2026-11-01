@@ -10,6 +10,11 @@ public static class G4OpenApi
     public static OpenApiOptions AddG4Contracts(this OpenApiOptions options)
     {
         options.ShouldInclude = description => description.GroupName == "g4";
+        options.AddDocumentTransformer((document, _, _) =>
+        {
+            document.Servers = [new OpenApiServer { Url = "/" }];
+            return Task.CompletedTask;
+        });
         options.AddSchemaTransformer((schema, context, _) =>
         {
             // G4运行入口禁用Web的数字字符串宽容选项，文档必须一致。

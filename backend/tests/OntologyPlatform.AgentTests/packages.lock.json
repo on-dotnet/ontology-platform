@@ -329,6 +329,7 @@
           "Microsoft.AspNetCore.OpenApi": "[10.0.13, )",
           "OntologyPlatform.Contracts": "[1.0.0, )",
           "OntologyPlatform.Modules.Agents": "[1.0.0, )",
+          "OntologyPlatform.Modules.Connections": "[1.0.0, )",
           "OntologyPlatform.Modules.Governance": "[1.0.0, )",
           "OntologyPlatform.Modules.Ontology": "[1.0.0, )",
           "OntologyPlatform.Modules.Publishing": "[1.0.0, )",
@@ -347,6 +348,14 @@
           "Microsoft.EntityFrameworkCore.Relational": "[10.0.13, )",
           "Microsoft.Extensions.AI": "[10.11.0, )",
           "ModelContextProtocol.AspNetCore": "[2.3.0, )",
+          "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.3, )",
+          "OntologyPlatform.Contracts": "[1.0.0, )"
+        }
+      },
+      "ontologyplatform.modules.connections": {
+        "type": "Project",
+        "dependencies": {
+          "Microsoft.EntityFrameworkCore.Relational": "[10.0.13, )",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.3, )",
           "OntologyPlatform.Contracts": "[1.0.0, )"
         }
