@@ -15,10 +15,13 @@ Runtime JSON (private, under this checkout .tools/security):
 realmFile uses existing bootstrap shape: authority plus identities[g2-operator-ab,
 g2-viewer-ab,g2-auditor-ab], each username/password. All auth origins must be loopback.
 Source is fixed synthetic pg-source:5432/fixture/fixture_reader, VerifyFull, production.
-Scenarios: baseline, layout-only, source-unavailable, catalog-cancel, source-permission-limited.
+Scenarios: baseline, layout-only, source-unavailable, source-timeout, catalog-cancel, source-permission-limited.
 layout-only logs real resize geometry/hit testing and four stable viewport screenshots.
 It does not run U01-U05 or change CSS, navigation state, animation duration or fixture data.
 Fault scenarios require Master to establish actual fixture fault and supply connectionId.
+source-timeout requires Master to pause only the task PG source for <=20s with finally
+unpause; NETWORK must PASS, TLS must FAIL/source_unavailable after >=8s, and UI must
+show failure plus an enabled retry action. Immediate connection refusal is not timeout.
 Evidence must be below artifacts/g4-m1-recovery-001 or docs/evidence/G4-M1-RECOVERY-001.
 Each run creates a unique directory. No passwords, SecretRef, CSRF, raw errors or URLs
 are persisted. At most 4 masked screenshots per run; keep <=12 in final package.
@@ -95,7 +98,7 @@ try {
   requireTrue(runtime.publicOrigin === 'http://localhost:15100', 'public_origin_denied');
   requireTrue(runtime.scope?.organizationId === 'org-demo' && JSON.stringify(runtime.scope.siteIds) === '["site-a"]', 'synthetic_scope_required');
   const scenario = runtime.scenario ?? 'baseline';
-  requireTrue(['baseline', 'layout-only', 'source-unavailable', 'catalog-cancel', 'source-permission-limited'].includes(scenario), 'scenario_invalid');
+  requireTrue(['baseline', 'layout-only', 'source-unavailable', 'source-timeout', 'catalog-cancel', 'source-permission-limited'].includes(scenario), 'scenario_invalid');
   requireTrue(['baseline', 'layout-only'].includes(scenario) || /^[A-Za-z0-9_-]{1,100}$/.test(runtime.connectionId), 'fault_connection_required');
   requireTrue(!runtime.browserChannel || runtime.browserChannel === 'msedge', 'browser_channel_denied');
   const realm = JSON.parse(await privateFile(runtime.realmFile));
@@ -117,10 +120,23 @@ try {
     contexts.push(result);
     // 仅观察真实 DOM 状态变化；不延迟、替换或伪造服务端响应。
     await result.addInitScript(() => {
-      window.__g4LoadingObserved = false;
+      window.__g4LoadingObserved = false; window.__g4PendingCategories = [];
       addEventListener('DOMContentLoaded', () => {
-        const observe = () => { if ([...document.querySelectorAll('[role=status]')].some(node => /正在读取|正在测试/.test(node.textContent ?? ''))) window.__g4LoadingObserved = true; };
-        new MutationObserver(observe).observe(document.body, { childList: true, subtree: true, characterData: true }); observe();
+        const observe = () => {
+          const categories = new Set(window.__g4PendingCategories);
+          for (const node of document.querySelectorAll('[role=status]')) {
+            const bounds = node.getBoundingClientRect(); const style = getComputedStyle(node);
+            if (!node.getClientRects().length || bounds.bottom <= 0 || bounds.top >= innerHeight || style.display === 'none' || style.visibility !== 'visible') continue;
+            const text = node.textContent?.trim() ?? '';
+            if (/^正在读取/.test(text)) categories.add('READ_LOADING');
+            if (/^正在测试|^测试中$/.test(text)) categories.add('PROBE_RUNNING');
+            if (/^正在执行/.test(text)) categories.add('EXECUTION_RUNNING');
+            if (/^正在(?:保存|录入|启用|禁用|轮换|刷新)/.test(text)) categories.add('MUTATION_RUNNING');
+            if (/^目录发现：(?:运行中|等待执行)/.test(text)) categories.add('CATALOG_PENDING');
+          }
+          window.__g4PendingCategories = [...categories]; window.__g4LoadingObserved = categories.size > 0;
+        };
+        new MutationObserver(observe).observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true }); observe();
       }, { once: true });
     });
     // 浏览器只访问当前合成应用和已配置的本地身份提供者。
@@ -233,13 +249,24 @@ try {
     await control.selectOption(value);
     await expectation(control).toHaveValue(value);
   }
-  async function clicked(page, label, path, method, status) {
-    phase = label;
+  async function clicked(page, label, path, method, status, options = {}) {
+    phase = options.phase ?? label;
+    if (options.observePending) await page.evaluate(() => { window.__g4PendingCategories = []; });
+    const started = performance.now();
+    let responseArrived = false; let pendingBeforeResponse = false; let pendingCategories = [];
     const [response] = await Promise.all([
-      page.waitForResponse(value => new URL(value.url()).pathname === path && value.request().method() === method),
-      page.getByRole('button', { name: label, exact: true }).click(),
+      page.waitForResponse(value => new URL(value.url()).pathname === path && value.request().method() === method, { timeout: options.timeoutMs ?? 15000 }).then(value => { responseArrived = true; return value; }),
+      (async () => {
+        await page.getByRole('button', { name: label, exact: true }).click();
+        if (options.observePending) {
+          await page.waitForFunction(() => window.__g4PendingCategories?.includes('PROBE_RUNNING'), undefined, { polling: 'raf', timeout: 3000 });
+          pendingBeforeResponse = !responseArrived;
+          pendingCategories = await page.evaluate(() => window.__g4PendingCategories.filter(value => ['READ_LOADING','PROBE_RUNNING','EXECUTION_RUNNING','MUTATION_RUNNING','CATALOG_PENDING'].includes(value)));
+        }
+      })(),
     ]);
-    report.http.push({ method, route: path.replace(/\/connections\/[^/]+/, '/connections/{id}'), status: response.status() });
+    report.http.push({ method, route: path.replace(/\/connections\/[^/]+/, '/connections/{id}'), status: response.status(), durationMs: Math.round(performance.now() - started),
+      ...(options.observePending ? { pendingBeforeResponse, pendingCategories } : {}) });
     return jsonResponse(response, status);
   }
   const operator = await identity('operator-ab'); const page = operator.page;
@@ -410,7 +437,31 @@ try {
     await runCase('M1-U05', async () => {
       await page.goto(operator.origin + '/data/connections/' + connectionId);
       await expectation(page.getByRole('button', { name: '刷新详情', exact: true })).toBeVisible();
-      if (scenario === 'source-unavailable') {
+      if (scenario === 'source-timeout') {
+        const probe = await clicked(page, '重新测试', connectionPath() + '/test', 'POST', 200, { timeoutMs: 20000, observePending: true, phase: 'U05_source_timeout_probe' });
+        const request = report.http.at(-1);
+        const network = probe.stages.find(stage => stage.name === 'NETWORK');
+        const tls = probe.stages.find(stage => stage.name === 'TLS');
+        const elapsed = Date.parse(probe.completedAtUtc) - Date.parse(probe.startedAtUtc);
+        // 仅固定分类、数值和布尔进入证据，既保留期限误分类又不复制响应正文。
+        report.timeoutObservation = { clientDurationMs: request.durationMs, reportDurationMs: Number.isFinite(elapsed) ? elapsed : null,
+          tlsDurationMs: Number.isFinite(tls?.durationMs) ? tls.durationMs : null, networkPassed: network?.status === 'PASS', tlsFailed: tls?.status === 'FAIL',
+          probeStatus: ['TEST_FAILED','CANCELLED','TEST_OK','RUNNING'].includes(probe.status) ? probe.status : 'UNKNOWN',
+          diagnosticCode: ['connection_source_unavailable','connection_cancelled','connection_tls_untrusted'].includes(tls?.diagnosticCode) ? tls.diagnosticCode : 'OTHER',
+          pendingBeforeResponse: request.pendingBeforeResponse, pendingCategories: request.pendingCategories };
+        requireTrue(request.pendingBeforeResponse && request.pendingCategories.includes('PROBE_RUNNING'), 'timeout_loading_not_observed_before_response');
+        observedU05.add('actual_probe_pending_before_response');
+        requireTrue(network?.status === 'PASS' && tls?.status === 'FAIL' && tls.durationMs >= 8000 && elapsed >= 8000 && request.durationMs >= 8000, 'timeout_duration_or_tcp_tls_stage_not_proven');
+        requireTrue(probe.status === 'TEST_FAILED' && tls.diagnosticCode === 'connection_source_unavailable', 'timeout_terminal_classification_unexpected');
+        phase = 'U05_source_timeout_visible_failure';
+        await expectation(page.getByRole('region', { name: '连接测试报告' })).toContainText('测试失败');
+        await expectation(page.getByText('源服务暂不可用，请检查服务后重试。')).toBeVisible();
+        phase = 'U05_source_timeout_retry_action';
+        await expectation(page.getByRole('button', { name: '重新测试', exact: true })).toBeVisible();
+        await expectation(page.getByRole('button', { name: '重新测试', exact: true })).toBeEnabled();
+        observedU05.add('real_tcp_connected_tls_timeout_at_least_eight_seconds');
+        observedU05.add('timeout_failure_and_enabled_retry_action_no_second_paused_probe');
+      } else if (scenario === 'source-unavailable') {
         const probe = await clicked(page, '重新测试', connectionPath() + '/test', 'POST', 200);
         requireTrue(probe.status === 'TEST_FAILED' && probe.stages.some(stage => stage.diagnosticCode === 'connection_source_unavailable'), 'source_fault_not_observed');
         await expectation(page.getByText('源服务暂不可用，请检查服务后重试。')).toBeVisible(); observedU05.add('source_unavailable_error');
