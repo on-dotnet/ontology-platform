@@ -64,6 +64,7 @@ export function ConnectionDetail({ id, canManage }: { id: string; canManage: boo
   }
   function test() {
     if (!view) return;
+    setProbe(null);
     const body = { command: command(view.configRevision, "重新测试已保存连接") };
     void perform("测试连接", async () => { setProbe((await client.test(id, body, etag)).data); await refresh(); });
   }
