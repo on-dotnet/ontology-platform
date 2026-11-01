@@ -31,6 +31,18 @@ let browser, output, activeCase, phase = 'configuration';
 const contexts = [];
 let expectation;
 /** 固定错误码取代异常正文，避免 Playwright 调用日志泄漏输入。 */
+/** 只从异常内存文本提取固定网络代码；原 message/stack 永不进入证据。 */
+function safeFailure(error, fallback) {
+  const codes = new Set(['ECONNRESET','ECONNREFUSED','ECONNABORTED','ETIMEDOUT','EPIPE','ENOTFOUND','EAI_AGAIN','ENETUNREACH','EHOSTUNREACH','ERR_SOCKET_CLOSED',
+    'net::ERR_CONNECTION_RESET','net::ERR_CONNECTION_REFUSED','net::ERR_CONNECTION_CLOSED','net::ERR_CONNECTION_ABORTED','net::ERR_CONNECTION_TIMED_OUT',
+    'net::ERR_TIMED_OUT','net::ERR_EMPTY_RESPONSE','net::ERR_NETWORK_CHANGED','net::ERR_ABORTED','net::ERR_FAILED','net::ERR_INVALID_RESPONSE',
+    'net::ERR_SOCKET_NOT_CONNECTED','net::ERR_HTTP_RESPONSE_CODE_FAILURE','net::ERR_HTTP2_PROTOCOL_ERROR','net::ERR_INTERNET_DISCONNECTED']);
+  const candidates = typeof error?.message === 'string' ? error.message.match(/\b(?:net::[A-Z_]+|E[A-Z_]+)\b/g) ?? [] : [];
+  const networkCode = [error?.code, ...candidates].find(value => codes.has(value));
+  const category = networkCode ? 'network' : error?.name === 'TimeoutError' ? 'timeout' : error?.name === 'TypeError' ? 'type_error' : error?.name === 'SyntaxError' ? 'invalid_json' : 'runtime';
+  const code = typeof error?.safeCode === 'string' && /^[a-z0-9_]{1,80}$/.test(error.safeCode) ? error.safeCode : category === 'timeout' ? 'browser_timeout' : fallback;
+  return { code, category, ...(networkCode ? { networkCode } : {}) };
+}
 function requireTrue(condition, code) { if (!condition) { const error = new Error(); error.safeCode = code; throw error; } }
 function note(name) { if (activeCase) cases[activeCase].observed.push(name); }
 function command(revision) { return { commandId: randomUUID(), idempotencyKey: randomUUID(), expectedRevision: revision, reason: 'Synthetic G4 recovery acceptance' }; }
@@ -49,14 +61,14 @@ function containsSecret(text) { return [...sensitive].some(value => text.include
 /** 仅将状态码和固定路由模板写入证据，响应正文仅用于内存断言。 */
 async function http(user, method, path, template, data, headers = {}) {
   const started = Date.now();
-  const response = await user.api.fetch(user.origin + path, { method, data, headers, maxRedirects: 0, timeout: 20000 });
+  const response = await user.api.fetch(user.origin + path, { method, data, headers: { ...headers, Connection: 'close' }, maxRedirects: 0, timeout: 20000 });
   report.http.push({ method, route: template, status: response.status(), durationMs: Date.now() - started });
   return response;
 }
 async function runCase(id, action) {
   activeCase = id; phase = id;
   try { await action(); cases[id].status = 'PASS'; delete cases[id].reason; }
-  catch (error) { cases[id].status = 'FAIL'; cases[id].reason = error.safeCode ?? (error.name === 'TimeoutError' ? 'browser_timeout' : 'browser_or_transport_error'); cases[id].phase = phase; }
+  catch (error) { const failure = safeFailure(error, 'browser_or_transport_error'); cases[id].status = 'FAIL'; cases[id].reason = failure.code; cases[id].failure = failure; cases[id].phase = phase; }
   finally { activeCase = null; }
 }
 /** 输出根目录也拒绝符号链接；每次唯一目录保留先前失败。 */
@@ -99,7 +111,7 @@ try {
   report.productExecution = true;
   const allowedOrigins = new Set([runtime.publicOrigin, authority.origin]);
   async function context() {
-    const result = await browser.newContext({ viewport: { width: 1440, height: 1000 }, serviceWorkers: 'block' });
+    const result = await browser.newContext({ viewport: { width: 1440, height: 1000 }, serviceWorkers: 'block', extraHTTPHeaders: { Connection: 'close' } });
     contexts.push(result);
     // 仅观察真实 DOM 状态变化；不延迟、替换或伪造服务端响应。
     await result.addInitScript(() => {
@@ -114,18 +126,24 @@ try {
     result.setDefaultTimeout(15000); return result;
   }
   async function identity(label) {
-    phase = 'oidc_' + label;
+    const previousPhase = phase;
+    const identityStep = stage => { phase = 'oidc_' + label + '_' + stage; };
+    identityStep('user_lookup');
     const user = realm.identities['g2-' + label]; requireTrue(user?.username && user?.password, 'bootstrap_identity_missing');
-    const session = await context(); const page = await session.newPage();
-    await page.goto(runtime.publicOrigin + '/auth/login?returnUrl=%2Fdata%2Fconnections');
-    await page.locator('#username').fill(user.username); await page.locator('#password').fill(user.password); await page.locator('#kc-login').click();
-    await page.waitForURL(url => url.origin === runtime.publicOrigin && url.pathname === '/data/connections');
-    const cookie = (await session.cookies()).find(item => item.name === '.OntologyPlatform.Session');
+    identityStep('context_create'); const session = await context();
+    identityStep('page_create'); const page = await session.newPage();
+    identityStep('login_navigation'); await page.goto(runtime.publicOrigin + '/auth/login?returnUrl=%2Fdata%2Fconnections');
+    identityStep('username_input'); await page.locator('#username').fill(user.username);
+    identityStep('password_input'); await page.locator('#password').fill(user.password);
+    identityStep('login_submit'); await page.locator('#kc-login').click();
+    identityStep('callback_navigation'); await page.waitForURL(url => url.origin === runtime.publicOrigin && url.pathname === '/data/connections');
+    identityStep('cookie_check'); const cookie = (await session.cookies()).find(item => item.name === '.OntologyPlatform.Session');
     requireTrue(cookie?.httpOnly && cookie.sameSite === 'Lax', 'real_session_cookie_missing'); remember(cookie.value);
     const actor = { context: session, page, api: session.request, origin: runtime.publicOrigin };
-    const csrf = await http(actor, 'GET', '/auth/csrf', '/auth/csrf'); requireTrue(csrf.status() === 200, 'csrf_issue_failed');
-    const token = (await csrf.json()).requestToken; requireTrue(typeof token === 'string', 'csrf_missing'); remember(token);
-    actor.headers = { Origin: actor.origin, 'X-CSRF-TOKEN': token }; return actor;
+    identityStep('csrf_request'); const csrf = await http(actor, 'GET', '/auth/csrf', '/auth/csrf'); requireTrue(csrf.status() === 200, 'csrf_issue_failed');
+    identityStep('csrf_decode'); const token = (await csrf.json()).requestToken; requireTrue(typeof token === 'string', 'csrf_missing'); remember(token);
+    actor.headers = { Origin: actor.origin, 'X-CSRF-TOKEN': token, Connection: 'close' };
+    phase = previousPhase; return actor;
   }
   async function jsonResponse(response, expected) { requireTrue(response.status() === expected, 'unexpected_http_status'); return response.json(); }
   async function noLeak(page) {
@@ -315,7 +333,7 @@ try {
   cases['M1-U05'].observed.push(...observedU05);
   if (cases['M1-U05'].status !== 'FAIL') { cases['M1-U05'].status = 'NOT_RUN'; cases['M1-U05'].reason = 'aggregate_requires_loading_timeout_cancel_partial_and_refresh_evidence_across_controlled_runs'; }
 } catch (error) {
-  report.failure = { phase, code: error.safeCode ?? (error.name === 'TimeoutError' ? 'browser_timeout' : 'configuration_or_runtime_error') };
+  report.failure = { phase, ...safeFailure(error, 'configuration_or_runtime_error') };
 } finally {
   for (const context of contexts) await context.close().catch(() => {});
   await browser?.close().catch(() => {});

@@ -42,6 +42,18 @@ const report = { schemaVersion: 1, taskId: 'G4-M1-RECOVERY-001', startedAtUtc: n
 const secrets = new Set(); const contexts = []; const completedSteps = new Set();
 let browser, output, phase = 'configuration', responseLeakFound = false, responseScanCount = 0;
 /** 固定错误码进入证据；绝不输出 Playwright 错误 message/stack。 */
+/** 只从异常内存文本提取固定网络代码；原 message/stack 永不进入证据。 */
+function safeFailure(error, fallback) {
+  const codes = new Set(['ECONNRESET','ECONNREFUSED','ECONNABORTED','ETIMEDOUT','EPIPE','ENOTFOUND','EAI_AGAIN','ENETUNREACH','EHOSTUNREACH','ERR_SOCKET_CLOSED',
+    'net::ERR_CONNECTION_RESET','net::ERR_CONNECTION_REFUSED','net::ERR_CONNECTION_CLOSED','net::ERR_CONNECTION_ABORTED','net::ERR_CONNECTION_TIMED_OUT',
+    'net::ERR_TIMED_OUT','net::ERR_EMPTY_RESPONSE','net::ERR_NETWORK_CHANGED','net::ERR_ABORTED','net::ERR_FAILED','net::ERR_INVALID_RESPONSE',
+    'net::ERR_SOCKET_NOT_CONNECTED','net::ERR_HTTP_RESPONSE_CODE_FAILURE','net::ERR_HTTP2_PROTOCOL_ERROR','net::ERR_INTERNET_DISCONNECTED']);
+  const candidates = typeof error?.message === 'string' ? error.message.match(/\b(?:net::[A-Z_]+|E[A-Z_]+)\b/g) ?? [] : [];
+  const networkCode = [error?.code, ...candidates].find(value => codes.has(value));
+  const category = networkCode ? 'network' : error?.name === 'TimeoutError' ? 'timeout' : error?.name === 'TypeError' ? 'type_error' : error?.name === 'SyntaxError' ? 'invalid_json' : 'runtime';
+  const code = typeof error?.safeCode === 'string' && /^[a-z0-9_]{1,80}$/.test(error.safeCode) ? error.safeCode : category === 'timeout' ? 'browser_timeout' : fallback;
+  return { code, category, ...(networkCode ? { networkCode } : {}) };
+}
 function demand(condition, code) { if (!condition) { const error = new Error(); error.safeCode = code; throw error; } }
 function remember(value) { if (typeof value === 'string' && value.length >= 8) secrets.add(value); }
 function leaked(text) { return [...secrets].some(secret => text.includes(secret)); }
@@ -86,7 +98,7 @@ async function step(name, ids, work) {
   phase = name;
   try { await work(); }
   catch (error) {
-    report.checks.push({ name, status: 'FAIL', code: error.safeCode ?? (error.name === 'TimeoutError' ? 'browser_timeout' : 'runtime_or_transport_error') });
+    report.checks.push({ name, phase, status: 'FAIL', ...safeFailure(error, 'runtime_or_transport_error') });
     // 一组前置失败不把尚未执行的其他矩阵项伪标为 FAIL；保留阶段失败和候选范围。
     report.checks.at(-1).candidateMatrixIds = ids;
     return false;
@@ -100,7 +112,7 @@ function routeTemplate(path) {
 function publicId(value) { demand(typeof value === 'string' && /^[a-f0-9]{32}$/.test(value), 'public_id_invalid'); return value; }
 async function request(actor, method, path, body, options = {}) {
   demand(path.startsWith('/api/v1/') || path === '/auth/csrf' || path === '/openapi/g4.json', 'route_denied');
-  const headers = { ...(method === 'GET' ? {} : actor.headers), ...options.headers };
+  const headers = { ...(method === 'GET' ? {} : actor.headers), ...options.headers, Connection: 'close' };
   if (body !== undefined) headers['Content-Type'] = 'application/json';
   if (options.noCsrf) delete headers['X-CSRF-TOKEN'];
   const began = Date.now();
@@ -158,21 +170,26 @@ try {
   const require = createRequire(resolve(root, 'apps/web/package.json')); const { chromium } = require('@playwright/test');
   browser = await chromium.launch({ channel: 'msedge', headless: true }); report.productExecution = true;
   async function identity(label) {
-    const context = await browser.newContext({ serviceWorkers: 'block' }); contexts.push(context);
+    const previousPhase = phase;
+    const identityStep = stage => { phase = 'oidc_' + (label ?? 'anonymous') + '_' + stage; };
+    identityStep('context_create');
+    const context = await browser.newContext({ serviceWorkers: 'block', extraHTTPHeaders: { Connection: 'close' } }); contexts.push(context);
     await context.route('**/*', route => ['http://localhost:15100','http://localhost:15180'].includes(new URL(route.request().url()).origin) ? route.continue() : route.abort());
     context.setDefaultTimeout(15000);
-    const actor = { api: context.request, headers: {}, context };
-    if (!label) return actor;
-    const user = realm.identities['g2-' + label]; demand(user?.username && user?.password, 'identity_missing');
-    const page = await context.newPage();
-    await page.goto('http://localhost:15100/auth/login?returnUrl=%2Fdata%2Fconnections');
-    await page.locator('#username').fill(user.username); await page.locator('#password').fill(user.password); await page.locator('#kc-login').click();
-    await page.waitForURL(url => url.origin === 'http://localhost:15100' && url.pathname === '/data/connections');
-    const cookie = (await context.cookies()).find(item => item.name === '.OntologyPlatform.Session');
+    const actor = { api: context.request, headers: { Connection: 'close' }, context };
+    if (!label) { phase = previousPhase; return actor; }
+    identityStep('user_lookup'); const user = realm.identities['g2-' + label]; demand(user?.username && user?.password, 'identity_missing');
+    identityStep('page_create'); const page = await context.newPage();
+    identityStep('login_navigation'); await page.goto('http://localhost:15100/auth/login?returnUrl=%2Fdata%2Fconnections');
+    identityStep('username_input'); await page.locator('#username').fill(user.username);
+    identityStep('password_input'); await page.locator('#password').fill(user.password);
+    identityStep('login_submit'); await page.locator('#kc-login').click();
+    identityStep('callback_navigation'); await page.waitForURL(url => url.origin === 'http://localhost:15100' && url.pathname === '/data/connections');
+    identityStep('cookie_check'); const cookie = (await context.cookies()).find(item => item.name === '.OntologyPlatform.Session');
     demand(cookie?.httpOnly && cookie.sameSite === 'Lax', 'oidc_session_missing'); remember(cookie.value);
-    const csrf = status(await request(actor, 'GET', '/auth/csrf'), 200).requestToken;
-    demand(typeof csrf === 'string', 'csrf_missing'); actor.headers = { Origin: 'http://localhost:15100', 'X-CSRF-TOKEN': csrf };
-    await page.close(); return actor;
+    identityStep('csrf_request'); const csrf = status(await request(actor, 'GET', '/auth/csrf'), 200).requestToken;
+    identityStep('csrf_decode'); demand(typeof csrf === 'string', 'csrf_missing'); actor.headers = { Origin: 'http://localhost:15100', 'X-CSRF-TOKEN': csrf, Connection: 'close' };
+    identityStep('page_close'); await page.close(); phase = previousPhase; return actor;
   }
   phase = 'oidc_operator'; const operator = await identity('operator-ab');
   phase = 'oidc_auditor'; const auditor = await identity('auditor-ab');
@@ -426,7 +443,7 @@ try {
   if (!responseLeakFound && responseScanCount > 0) observe('M1-P08','executed_http_responses_scanned_in_memory_no_sensitive_values',true,{responseScanCount});
   matrix['M1-C11'].remaining=['Full priority/error taxonomy still needs all transport and fixture failure classes.'];
 } catch (error) {
-  report.failure = { phase, code: error.safeCode ?? (error.name==='TimeoutError'?'browser_timeout':'configuration_or_runtime_error') };
+  report.failure = { phase, ...safeFailure(error, 'configuration_or_runtime_error') };
 } finally {
   for (const context of contexts) await context.close().catch(()=>{});
   await browser?.close().catch(()=>{});
