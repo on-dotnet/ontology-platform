@@ -20,7 +20,7 @@ export function CatalogPanel({ connection, etag, canManage, onDenied }: { connec
   const [paused, setPaused] = useState(false);
   const [replay, setReplay] = useState<(() => Promise<void>) | null>(null);
   const disabled = connection.state === "DISABLED";
-  function failure(cause: unknown) { setError(cause); setSnapshot(null); setHistory(null); if (cause instanceof PlatformApiError && [401, 403].includes(cause.status)) { setJob(null); onDenied(cause); } }
+  function failure(cause: unknown) { setError(cause); if (cause instanceof PlatformApiError && [401, 403].includes(cause.status)) { setSnapshot(null); setHistory(null); setJob(null); onDenied(cause); } }
   useEffect(() => {
     if (disabled) return;
     const controller = new AbortController();
@@ -62,8 +62,8 @@ export function CatalogPanel({ connection, etag, canManage, onDenied }: { connec
       {job && <div className="connection-alert" role="status"><strong>目录发现：{stateLabels[job.status] ?? job.status}</strong><p>创建于 {job.createdAtUtc} · 关联标识 {job.traceId}</p>{["FAILED", "PARTIAL"].includes(job.status) && <p>发现未完整完成，不能将此结果视为没有对象。此前快照仅供历史参考。</p>}{running && canManage && <button disabled={busy} onClick={cancel}>取消发现</button>}{paused && <button onClick={() => { setPaused(false); setRefresh(value => value + 1); }}>继续读取任务状态</button>}</div>}
       {replay && !busy && <button onClick={() => void run(replay!)}>恢复上次目录操作结果</button>}
       {history && !history.items.length && <p>尚无目录快照。启用连接后可发现可见目录。</p>}
-      {history && history.items.length > 0 && <><h3>目录快照历史</h3><ul className="catalog-history">{history.items.map(item => <li key={item.snapshotId}><button disabled={busy} onClick={() => { setSnapshot(null); void run(async () => setSnapshot((await client.catalog(item.snapshotId)).data)); }}>{item.capturedAtUtc} · 修订 {item.configRevision} · {item.objects.length} 个对象</button><span className="tag">{stateLabels[item.status] ?? item.status}</span></li>)}</ul>{history.nextCursor && <button disabled={busy} onClick={() => void run(async () => setHistory((await client.catalogs(connection.id, history.nextCursor!)).data))}>下一页历史</button>}</>}
-      {snapshot && <CatalogSnapshot snapshot={snapshot} stale={!["SUCCEEDED"].includes(job?.status ?? "SUCCEEDED")} />}
+      {history && history.items.length > 0 && <><h3>目录快照历史</h3><ul className="catalog-history">{history.items.map(item => <li key={item.snapshotId}><button disabled={busy} onClick={() => { void run(async () => setSnapshot((await client.catalog(item.snapshotId)).data)); }}>{item.capturedAtUtc} · 修订 {item.configRevision} · {item.objects.length} 个对象</button><span className="tag">{stateLabels[item.status] ?? item.status}</span></li>)}</ul>{history.nextCursor && <button disabled={busy} onClick={() => void run(async () => setHistory((await client.catalogs(connection.id, history.nextCursor!)).data))}>下一页历史</button>}</>}
+      {snapshot && <CatalogSnapshot snapshot={snapshot} stale={!!error || !["SUCCEEDED"].includes(job?.status ?? "SUCCEEDED")} />}
     </>}
   </section>;
 }
