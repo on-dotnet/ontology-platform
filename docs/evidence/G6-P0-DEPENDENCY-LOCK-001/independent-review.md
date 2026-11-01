@@ -1,0 +1,13 @@
+# 非作者独立源码审查
+
+Reviewer：GPT-6 Astra / High，独立quality_reviewer上下文，未编辑文件。Master根据真实回执转录，非实现者自审。
+
+首审REQUEST_CHANGES：P1 legacy manylinux未绑定machine，两平台各混入7个错误架构候选；P2前导C0/空格URL和NaN/Infinity接受、profile仅hash未实际绑定。原源码、hash、错误文件见reviewer-initial-findings.source.json。此前19 tests PASS不覆盖此缺陷，保留原失败。
+
+复审PASS_FOR_SOURCE，无未关闭P0/P1。独立24 tests/exit0，输出重算与保存JSON完全一致；T1/T2各54包79条声明57候选，错误架构tag0。双向legacy/多tag/实际全部候选架构断言、URL/JSON严格输入、profile/root漂移拒绝已验。
+
+SHA256：observe.py c8afea3b3f0e12f3e0d571d7961c1c9c6820663b8e996c2043f4238d82c1015c；test_observe.py 3e8e400889b028472335b6ae70359c659c0570420fb74031222ee25a242114da；per-platform-results.json f1479dc1ef8734505e0e25cc6b3ecfaf274baee1947a5709af7414263a7a3dc7；profile e8dc90289623258d8474b72d4772f1ef523dcb3c26939b19cd65da3c01cdec5a。
+
+PREP复用29个mode/blob/path完全相同，SHA256 335f4dd6abfd69f8ae8a8dca4291b6ec1bf1e910f852d7a6adf835441841e85b；pip5个源码hash及MIT许可hash独立重算一致。快照冲突只证doclang0.9.0不满足<0.9，不能称全版本UNSAT。两次GET实际命令/退出0/投影stdout和限量代码可查；原HTTP原字节未保存，rawhash独立重算NOT_VERIFIED，不阻断本轮BLOCKED交付。Reviewer自身无网络/求解/下载/模型/Docker/文件写入。
+
+当前复审仅源码与已列证据；完整SelfTest、提交绑定、资源白名单和唯一V3独立重开以各后置回执为准，不预填交付PASS。

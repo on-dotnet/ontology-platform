@@ -1,0 +1,74 @@
+{
+  "mode": "PROPOSED_EXACT_WHITELIST",
+  "objects": [
+    {
+      "path": "/tmp/g6_lock_setup.py",
+      "size": 4649,
+      "sha256": "66eaaee3a7ae6cd3e0607d2b59f1532dfa243ee7162232a45dc0029ff6764354",
+      "action": "UNLINK_EXACT_FILE",
+      "owner": "G6-P0-DEPENDENCY-LOCK-001",
+      "purpose": "Task scaffolding, current source/evidence already stored separately",
+      "releaseCondition": "Source Review accepted and SelfTest done"
+    },
+    {
+      "path": "/tmp/g6_observe.py",
+      "size": 12051,
+      "sha256": "9a9a00d5aa6919a37caf20475df2d13f8f683bca98ca93376506d80900f9419c",
+      "action": "UNLINK_EXACT_FILE",
+      "owner": "G6-P0-DEPENDENCY-LOCK-001",
+      "purpose": "Task scaffolding, current source/evidence already stored separately",
+      "releaseCondition": "Source Review accepted and SelfTest done"
+    },
+    {
+      "path": "/tmp/g6_test_observe.py",
+      "size": 7721,
+      "sha256": "05ed2364414d0a630d81ccfae12ce821ebddc2578929335e9493f1a8978291c5",
+      "action": "UNLINK_EXACT_FILE",
+      "owner": "G6-P0-DEPENDENCY-LOCK-001",
+      "purpose": "Task scaffolding, current source/evidence already stored separately",
+      "releaseCondition": "Source Review accepted and SelfTest done"
+    },
+    {
+      "path": "/tmp/g6_capture.py",
+      "size": 1330,
+      "sha256": "e9eb585d4f25da5b176bac3dba53e71c9accbdb2ab8ed8fc4315ac71a66db12d",
+      "action": "UNLINK_EXACT_FILE",
+      "owner": "G6-P0-DEPENDENCY-LOCK-001",
+      "purpose": "Task scaffolding, current source/evidence already stored separately",
+      "releaseCondition": "Source Review accepted and SelfTest done"
+    },
+    {
+      "path": "/tmp/g6_docs.py",
+      "size": 12440,
+      "sha256": "4551c4aaad2ac7e1ac147a4c9749be28c1203dbe5eedba67f43a3da9e45fd1fa",
+      "action": "UNLINK_EXACT_FILE",
+      "owner": "G6-P0-DEPENDENCY-LOCK-001",
+      "purpose": "Task scaffolding, current source/evidence already stored separately",
+      "releaseCondition": "Source Review accepted and SelfTest done"
+    },
+    {
+      "path": "/tmp/g6_network_record.py",
+      "size": 3906,
+      "sha256": "d2f3090561a7d64d3fa4fc71f06a7b5e13279ab7ad50e6f83b994e6b0ea7d243",
+      "action": "UNLINK_EXACT_FILE",
+      "owner": "G6-P0-DEPENDENCY-LOCK-001",
+      "purpose": "Task scaffolding, current source/evidence already stored separately",
+      "releaseCondition": "Source Review accepted and SelfTest done"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g6-p0-dependency-lock-001/ontology-platform/.tools/pythonlibs",
+      "target": "/Users/chasen/Developer/repos/ontology-platform/.tools/pythonlibs",
+      "action": "UNLINK_SYMLINK_ONLY",
+      "owner": "G6-P0-DEPENDENCY-LOCK-001",
+      "purpose": "Temporary discovery of existing approved tools",
+      "releaseCondition": "SelfTest done; never touch target"
+    }
+  ],
+  "protected": [
+    "primary main",
+    "all other worktrees",
+    "all existing Docker",
+    "shared pythonlibs target",
+    "current task tree and evidence"
+  ]
+}

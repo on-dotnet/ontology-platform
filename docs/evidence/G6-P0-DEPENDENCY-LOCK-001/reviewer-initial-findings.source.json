@@ -1,0 +1,202 @@
+{
+  "status": "REQUEST_CHANGES",
+  "severity": "P1",
+  "reviewer": "GPT-6 Astra High non-author",
+  "originalObserverSha256": "9a9a00d5aa6919a37caf20475df2d13f8f683bca98ca93376506d80900f9419c",
+  "originalResultsSha256": "9d975bfa7766c230cc7b8559e56e35ed5e03b7260becba910596c48cec2dce86",
+  "originalObserverUtf8": "\"\"\"观察既有单版本快照；使用现有pip的PEP解析器，不搜索版本、不执行求解。\"\"\"\nimport hashlib\nimport json\nfrom pathlib import Path\nimport re\nfrom urllib.parse import urlsplit, unquote\n\nfrom pip._vendor.packaging.requirements import Requirement\nfrom pip._vendor.packaging.specifiers import SpecifierSet\nfrom pip._vendor.packaging.tags import cpython_tags, compatible_tags\nfrom pip._vendor.packaging.utils import canonicalize_name, parse_wheel_filename\nfrom pip._vendor.packaging.version import Version\n\nROOT = Path(__file__).resolve().parents[3]\nHERE = Path(__file__).resolve().parent\nBASE = \"851fa7eb2153c660b7989c0a7a6dd0e1c8e1b63c\"\nEXTRAS = [\"convert-core\", \"format-pdf\", \"format-office\", \"format-markdown\"]\n\n\ndef digest(raw):\n    return hashlib.sha256(raw).hexdigest()\n\n\ndef strict_json(raw):\n    def unique(pairs):\n        out = {}\n        for k, v in pairs:\n            if k in out:\n                raise ValueError(\"DUPLICATE_JSON_KEY\")\n            out[k] = v\n        return out\n    return json.loads(raw, object_pairs_hook=unique)\n\n\ndef safe_filename(name):\n    if (not isinstance(name, str) or not re.fullmatch(r\"[A-Za-z0-9][A-Za-z0-9_.+-]*\", name)\n            or \"..\" in name):\n        raise ValueError(\"UNSAFE_FILENAME\")\n\n\ndef official_url(value, host, filename=None):\n    if not isinstance(value, str):\n        raise ValueError(\"UNSAFE_URL\")\n    u = urlsplit(value)\n    if (u.scheme != \"https\" or u.netloc != host or u.username is not None\n            or any(x in value for x in [\"?\", \"#\", \"\\\\\", \"\\r\", \"\\n\", \"\\t\"])\n            or any(x in unquote(u.path).split(\"/\") for x in [\".\", \"..\"])):\n        raise ValueError(\"UNSAFE_URL\")\n    if filename and unquote(u.path.rsplit(\"/\", 1)[-1]) != filename:\n        raise ValueError(\"URL_FILENAME_MISMATCH\")\n\n\ndef validate_nodes(nodes):\n    if not isinstance(nodes, dict) or not nodes:\n        raise ValueError(\"INVALID_NODES\")\n    seen = set()\n    for key, n in nodes.items():\n        if not isinstance(n, dict) or not isinstance(n.get(\"name\"), str):\n            raise ValueError(\"INVALID_NODE\")\n        name = canonicalize_name(n[\"name\"])\n        if not re.fullmatch(r\"[a-z0-9]+(?:-[a-z0-9]+)*\", name) or name in seen or canonicalize_name(key) != name:\n            raise ValueError(\"DUPLICATE_OR_INVALID_NAME\")\n        seen.add(name)\n        Version(n[\"version\"])\n        official_url(n[\"source\"], \"pypi.org\")\n        if unquote(urlsplit(n[\"source\"]).path) not in [f\"/pypi/{name}/json\", f\"/pypi/{name}/{n['version']}/json\"]:\n            raise ValueError(\"SOURCE_IDENTITY_MISMATCH\")\n        for field in [\"requiresDist\", \"providesExtra\", \"artifacts\"]:\n            if not isinstance(n.get(field), list):\n                raise ValueError(\"INVALID_NODE_LIST\")\n        for raw in n[\"requiresDist\"]:\n            q = Requirement(raw)\n            if q.url:\n                raise ValueError(\"DIRECT_URL_REQUIREMENT_REFUSED\")\n        SpecifierSet(n.get(\"requiresPython\") or \"\")\n        artifacts = set()\n        for a in n[\"artifacts\"]:\n            if not isinstance(a, dict):\n                raise ValueError(\"INVALID_ARTIFACT\")\n            safe_filename(a[\"filename\"])\n            if a[\"filename\"].casefold() in artifacts:\n                raise ValueError(\"DUPLICATE_ARTIFACT\")\n            artifacts.add(a[\"filename\"].casefold())\n            if (type(a.get(\"size\")) is not int or a[\"size\"] <= 0\n                    or not re.fullmatch(r\"[0-9a-f]{64}\", a.get(\"sha256\", \"\"))\n                    or type(a.get(\"yanked\")) is not bool):\n                raise ValueError(\"INVALID_ARTIFACT_FIELDS\")\n            official_url(a[\"url\"], \"files.pythonhosted.org\", a[\"filename\"])\n            SpecifierSet(a.get(\"requiresPython\") or \"\")\n            if a[\"filename\"].endswith(\".whl\"):\n                wn, wv, _, _ = parse_wheel_filename(a[\"filename\"])\n                if canonicalize_name(wn) != name or wv != Version(n[\"version\"]) or a[\"packagetype\"] != \"bdist_wheel\":\n                    raise ValueError(\"WHEEL_IDENTITY_MISMATCH\")\n    return nodes\n\n\ndef python_condition(spec):\n    \"\"\"只有整minor界限可确定；patch界限保留条件，绝不假设3.12.0。\"\"\"\n    clauses = list(SpecifierSet(spec or \"\"))\n    # 对3.12整minor明显排除的范围可拒绝；任何patch级界限均保守未知。\n    if any(len(c.version.rstrip(\".*\").split(\".\")) > 2 or c.operator == \"~=\"\n           or (c.version == \"3.12\" and c.operator in [\"==\", \"!=\", \"<=\", \">\"])\n           for c in clauses):\n        return \"UNKNOWN_PATCH\"\n    return \"MATCH_MINOR\" if SpecifierSet(spec or \"\").contains(\"3.12.0\") else \"REJECT_MINOR\"\n\n\ndef marker_value(q, extras, machine):\n    if not q.marker:\n        return True\n    text = str(q.marker)\n    unknown = [\"python_full_version\", \"implementation_version\", \"platform_release\", \"platform_version\"]\n    if any(re.search(r\"\\b\" + k + r\"\\b\", text) for k in unknown):\n        return None\n    env = dict(implementation_name=\"cpython\", platform_python_implementation=\"CPython\",\n               os_name=\"posix\", sys_platform=\"linux\", platform_system=\"Linux\",\n               platform_machine=machine, python_version=\"3.12\",\n               python_full_version=\"UNKNOWN\", implementation_version=\"UNKNOWN\",\n               platform_release=\"UNKNOWN\", platform_version=\"UNKNOWN\")\n    return any(q.marker.evaluate(dict(env, extra=e)) for e in [\"\"] + sorted(extras))\n\n\ndef wheel_candidates(n, machine):\n    if python_condition(n.get(\"requiresPython\")) == \"REJECT_MINOR\":\n        return []\n    rows = []\n    for a in n[\"artifacts\"]:\n        if a[\"packagetype\"] != \"bdist_wheel\" or a[\"yanked\"]:\n            continue\n        _, _, _, tags = parse_wheel_filename(a[\"filename\"])\n        matching = []\n        for t in sorted(tags, key=str):\n            floor = None\n            if t.platform != \"any\":\n                m = re.fullmatch(r\"manylinux_(\\d+)_(\\d+)_\" + re.escape(machine), t.platform)\n                legacy = {\"manylinux1_x86_64\": [2, 5], \"manylinux2010_x86_64\": [2, 12],\n                          \"manylinux2014_x86_64\": [2, 17], \"manylinux2014_aarch64\": [2, 17]}\n                if m:\n                    floor = [int(m[1]), int(m[2])]\n                elif t.platform in legacy:\n                    floor = legacy[t.platform]\n                else:\n                    continue\n            supported = set(cpython_tags((3, 12), abis=[\"cp312\"], platforms=[t.platform]))\n            supported.update(compatible_tags((3, 12), interpreter=\"cp312\", platforms=[t.platform]))\n            if t in supported:\n                matching.append(dict(tag=str(t), minimumGlibc=floor))\n        if matching and python_condition(a.get(\"requiresPython\")) != \"REJECT_MINOR\":\n            rows.append(dict(filename=a[\"filename\"], sha256=a[\"sha256\"], size=a[\"size\"],\n                             url=a[\"url\"], tags=matching, requiresPython=a.get(\"requiresPython\"),\n                             pythonCondition=python_condition(a.get(\"requiresPython\")),\n                             status=\"CONDITIONAL_REGISTRY_CANDIDATE_NOT_SELECTED\",\n                             hashKind=\"REGISTRY_DECLARED_NOT_PAYLOAD_VERIFIED\"))\n    return sorted(rows, key=lambda r: r[\"filename\"])\n\n\ndef observe(nodes, machine):\n    \"\"\"传播单快照已观察节点，不回溯、不选择、不报告UNSAT。\"\"\"\n    active = {\"docling-slim\": set(EXTRAS)}\n    changed = True\n    while changed:\n        changed = False\n        for name, extras in list(active.items()):\n            if name not in nodes:\n                continue\n            for raw in nodes[name][\"requiresDist\"]:\n                q = Requirement(raw)\n                if marker_value(q, extras, machine) is True:\n                    dep = canonicalize_name(q.name)\n                    if dep not in active:\n                        active[dep] = set(); changed = True\n                    before = len(active[dep]); active[dep].update(q.extras)\n                    changed |= len(active[dep]) != before\n    edges, conflicts, unknown = [], [], []\n    for name, extras in sorted(active.items()):\n        if name not in nodes:\n            unknown.append(dict(code=\"MISSING_SNAPSHOT_NODE\", name=name)); continue\n        for raw in nodes[name][\"requiresDist\"]:\n            q = Requirement(raw); m = marker_value(q, extras, machine)\n            if m is None:\n                unknown.append(dict(code=\"UNKNOWN_TARGET_MARKER\", parent=name, requirement=raw))\n            elif m:\n                dep = canonicalize_name(q.name); n = nodes.get(dep)\n                ok = n is not None and q.specifier.contains(n[\"version\"])\n                edge = dict(parent=name, requirement=raw, dependency=dep,\n                            observedVersion=n[\"version\"] if n else None, observedSatisfies=ok)\n                edges.append(edge)\n                if not ok:\n                    conflicts.append(edge)\n        absent = extras - set(nodes[name][\"providesExtra\"])\n        if absent:\n            unknown.append(dict(code=\"UNKNOWN_EXTRA\", name=name, extras=sorted(absent)))\n    rows = []\n    for name, extras in sorted(active.items()):\n        if name not in nodes:\n            continue\n        n = nodes[name]; wheels = wheel_candidates(n, machine)\n        rows.append(dict(name=name, observedVersion=n[\"version\"], selectedExtras=sorted(extras),\n                         requiresPython=n[\"requiresPython\"], pythonCondition=python_condition(n[\"requiresPython\"]),\n                         metadataSource=n[\"source\"], metadataRawSha256=n[\"rawMetadataSha256\"],\n                         metadataRetrievedAtUtc=n[\"retrievedAtUtc\"],\n                         licenseExpression=n.get(\"licenseExpression\"), licenseDeclared=n.get(\"licenseDeclared\"),\n                         licenseStatus=\"DECLARED_ONLY_NOTICE_NOT_VERIFIED\", securityAudit=None,\n                         securityExplanation=\"PyPI advisory metadata is not an independent security audit\",\n                         artifactNotice=\"NOT_VERIFIED\", selectedWheel=None, candidates=wheels,\n                         status=\"METADATA_OBSERVED\" if wheels else \"BLOCKED_NO_WHEEL_IN_OBSERVED_VERSION\"))\n    return dict(machine=machine, status=\"BLOCKED_WITH_WITNESS\", resolverRun=\"NOT_RUN\", solution=None,\n                selectedWheels=None, packages=rows, declarations=edges, snapshotConflicts=conflicts,\n                unknown=unknown, noWheelObserved=[r[\"name\"] for r in rows if not r[\"candidates\"]],\n                warning=\"No version search; snapshot conflicts/missing wheels are not proof of global UNSAT\")\n\n\ndef require_real_solution(result):\n    if (result.get(\"resolverRun\") != \"SUCCESS\" or result.get(\"solution\") is None\n            or result.get(\"selectedWheels\") is None):\n        raise ValueError(\"NOT_A_LOCK_NO_SUCCESSFUL_RESOLVER\")\n\n\ndef build():\n    source = ROOT / \"experiments/g6-p0/supply-chain/pypi-metadata.json\"\n    raw = source.read_bytes(); nodes = validate_nodes(strict_json(raw)[\"nodes\"])\n    inputs = {}\n    for p in sorted((ROOT / \"experiments/g6-p0/supply-chain\").glob(\"*.json\")):\n        inputs[str(p.relative_to(ROOT))] = digest(p.read_bytes())\n    for name in [\"docling-lite-profile.json\", \"observe.py\"]:\n        inputs[str((HERE / name).relative_to(ROOT))] = digest((HERE / name).read_bytes())\n    return dict(schemaVersion=1, kind=\"OBSERVED_SINGLE_VERSION_GRAPH_NOT_LOCK\", baseSha=BASE,\n                inputSha256=inputs, profileSha256=inputs[\"experiments/g6-p0/locks/docling-lite-profile.json\"],\n                metadataSnapshotSha256=digest(raw), status=\"BLOCKED_WITH_WITNESS\",\n                blocker=dict(code=\"RESOLVER_TOOL_APPROVAL_REQUIRED\", installedTool=\"pip 26.2.2\",\n                             witness=\"pip prepare.py lines 507-511, 664, 735: metadata fallback can unpack/download wheel; dry-run does not forbid it\",\n                             solverExecuted=False, payloadDownloaded=False),\n                scope=\"Conditional CPython3.12 manylinux candidates; Python patch/glibc/image not frozen\",\n                platforms={k: observe(nodes, m) for k, m in [(\"T1\", \"aarch64\"), (\"T2\", \"x86_64\")]})\n\n\nif __name__ == \"__main__\":\n    print(json.dumps(build(), ensure_ascii=False, indent=2))\n",
+  "wrongArchitectureCandidates": {
+    "T1": [
+      {
+        "name": "charset-normalizer",
+        "filename": "charset_normalizer-3.5.2-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl",
+        "tags": [
+          {
+            "tag": "cp312-cp312-manylinux2014_x86_64",
+            "minimumGlibc": [
+              2,
+              17
+            ]
+          }
+        ]
+      },
+      {
+        "name": "charset-normalizer",
+        "filename": "charset_normalizer-3.5.2-cp37-abi3-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl",
+        "tags": [
+          {
+            "tag": "cp37-abi3-manylinux1_x86_64",
+            "minimumGlibc": [
+              2,
+              5
+            ]
+          }
+        ]
+      },
+      {
+        "name": "lxml",
+        "filename": "lxml-6.1.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl",
+        "tags": [
+          {
+            "tag": "cp312-cp312-manylinux2014_x86_64",
+            "minimumGlibc": [
+              2,
+              17
+            ]
+          }
+        ]
+      },
+      {
+        "name": "pydantic-core",
+        "filename": "pydantic_core-2.50.2-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl",
+        "tags": [
+          {
+            "tag": "cp312-cp312-manylinux2014_x86_64",
+            "minimumGlibc": [
+              2,
+              17
+            ]
+          }
+        ]
+      },
+      {
+        "name": "pypdfium2",
+        "filename": "pypdfium2-5.14.0-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+        "tags": [
+          {
+            "tag": "py3-none-manylinux2014_x86_64",
+            "minimumGlibc": [
+              2,
+              17
+            ]
+          }
+        ]
+      },
+      {
+        "name": "pyyaml",
+        "filename": "pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl",
+        "tags": [
+          {
+            "tag": "cp312-cp312-manylinux2014_x86_64",
+            "minimumGlibc": [
+              2,
+              17
+            ]
+          }
+        ]
+      },
+      {
+        "name": "rpds-py",
+        "filename": "rpds_py-2026.9.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+        "tags": [
+          {
+            "tag": "cp312-cp312-manylinux2014_x86_64",
+            "minimumGlibc": [
+              2,
+              17
+            ]
+          }
+        ]
+      }
+    ],
+    "T2": [
+      {
+        "name": "charset-normalizer",
+        "filename": "charset_normalizer-3.5.2-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl",
+        "tags": [
+          {
+            "tag": "cp312-cp312-manylinux2014_aarch64",
+            "minimumGlibc": [
+              2,
+              17
+            ]
+          }
+        ]
+      },
+      {
+        "name": "charset-normalizer",
+        "filename": "charset_normalizer-3.5.2-cp37-abi3-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl",
+        "tags": [
+          {
+            "tag": "cp37-abi3-manylinux2014_aarch64",
+            "minimumGlibc": [
+              2,
+              17
+            ]
+          }
+        ]
+      },
+      {
+        "name": "lxml",
+        "filename": "lxml-6.1.3-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.whl",
+        "tags": [
+          {
+            "tag": "cp312-cp312-manylinux2014_aarch64",
+            "minimumGlibc": [
+              2,
+              17
+            ]
+          }
+        ]
+      },
+      {
+        "name": "pydantic-core",
+        "filename": "pydantic_core-2.50.2-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.whl",
+        "tags": [
+          {
+            "tag": "cp312-cp312-manylinux2014_aarch64",
+            "minimumGlibc": [
+              2,
+              17
+            ]
+          }
+        ]
+      },
+      {
+        "name": "pypdfium2",
+        "filename": "pypdfium2-5.14.0-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl",
+        "tags": [
+          {
+            "tag": "py3-none-manylinux2014_aarch64",
+            "minimumGlibc": [
+              2,
+              17
+            ]
+          }
+        ]
+      },
+      {
+        "name": "pyyaml",
+        "filename": "pyyaml-6.0.3-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl",
+        "tags": [
+          {
+            "tag": "cp312-cp312-manylinux2014_aarch64",
+            "minimumGlibc": [
+              2,
+              17
+            ]
+          }
+        ]
+      },
+      {
+        "name": "rpds-py",
+        "filename": "rpds_py-2026.9.1-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl",
+        "tags": [
+          {
+            "tag": "cp312-cp312-manylinux2014_aarch64",
+            "minimumGlibc": [
+              2,
+              17
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "initialTargetedTests": "19 passed; legacy cross-architecture coverage missing",
+  "additionalFindings": [
+    "P2 leading C0/space URL accepted",
+    "P2 NaN/Infinity JSON accepted"
+  ],
+  "fixed": false
+}

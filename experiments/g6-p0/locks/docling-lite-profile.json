@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "kind": "TASK_SPECIFIC_OBSERVATION_PROFILE_NOT_UNIVERSAL_LOCK_MODEL",
+  "status": "BLOCKED_WITH_WITNESS",
+  "root": "docling-slim[convert-core,format-pdf,format-office,format-markdown]==2.145.0",
+  "name": "docling-slim",
+  "version": "2.145.0",
+  "extras": [
+    "convert-core",
+    "format-pdf",
+    "format-office",
+    "format-markdown"
+  ],
+  "pythonMinor": "3.12",
+  "pythonPatch": null,
+  "pythonPatchStatus": "BLOCKED_OFFICIAL_SUPPORT_AND_IMAGE_NOT_FROZEN",
+  "glibc": null,
+  "baseImageDigest": null,
+  "targets": [
+    {
+      "id": "T1",
+      "oci": "linux/arm64",
+      "machine": "aarch64"
+    },
+    {
+      "id": "T2",
+      "oci": "linux/amd64",
+      "machine": "x86_64"
+    }
+  ],
+  "excluded": [
+    "standard",
+    "all",
+    "cli",
+    "feat-ocr-*",
+    "models-local",
+    "PaddleOCR"
+  ],
+  "modelsLocal": {
+    "status": "NOT_RUN",
+    "reason": "Base profile not resolved; conditional second profile gate not met"
+  },
+  "cpuRuntime": "NOT_RUN",
+  "resolver": "NOT_RUN"
+}

@@ -1,0 +1,34 @@
+{
+  "status": "OBSERVED_NOT_RESOLVER_RUN",
+  "pythonVersion": "3.13.17",
+  "pipVersion": "26.2.2",
+  "vendoredPackagingVersion": "26.2",
+  "toolPath": "/opt/homebrew/lib/python3.13/site-packages/pip",
+  "sourceHashes": {
+    "_internal/commands/install.py": "0d11142c0f9319b08a86a0412e4adb0cacedc90e79ed06c37ba649518ba1db29",
+    "_internal/operations/prepare.py": "ccb9153120eef5c511d0a9c39b76d9dd0bc879a12b8492abaf5d3d5320cc94a4",
+    "_vendor/packaging/requirements.py": "43e05d107556e4aefce46057b7b45c3f8504b1d20a5a8585aa5ac78d1e16579d",
+    "_vendor/packaging/tags.py": "00d607671610569f4194e41838753902b0cd548a53165e0a95ba1c6150569c5b",
+    "_vendor/packaging/specifiers.py": "dd705c4ac966f984041043bfcebbf817a751e70471b3812b26f274be33417c63"
+  },
+  "sourceSnippets": {
+    "499-511": "            )\n            return None\n        if self.require_hashes:\n            logger.debug(\n                \"Metadata-only fetching is not used as hash checking is required\",\n            )\n            return None\n        # Try PEP 658 metadata first, then fall back to lazy wheel if unavailable.\n        return self._fetch_metadata_using_link_data_attr(\n            req\n        ) or self._fetch_metadata_using_lazy_wheel(req.link)\n\n    def _fetch_metadata_using_link_data_attr(",
+    "650-665": "            else:\n                # The file is not available, attempt to fetch only metadata\n                metadata_dist = self._fetch_metadata_only(req)\n                if metadata_dist is not None:\n                    req.needs_more_preparation = True\n                    req.set_dist(metadata_dist)\n                    # Ensure download_info is available even in dry-run mode\n                    if req.download_info is None:\n                        req.download_info = direct_url_from_link(\n                            req.link, req.source_dir\n                        )\n                    return metadata_dist\n\n            # None of the optimizations worked, fully prepare the requirement\n            return self._prepare_linked_requirement(req, parallel_builds)\n",
+    "730-744": "\n        if link.is_existing_dir():\n            local_file = None\n        elif link.url not in self._downloaded:\n            try:\n                local_file = unpack_url(\n                    link,\n                    req.source_dir,\n                    self._download,\n                    self.verbosity,\n                    self.download_dir,\n                    hashes,\n                )\n            except NetworkConnectionError as exc:\n                raise InstallationError("
+  },
+  "license": {
+    "indicator": "MIT",
+    "path": "/opt/homebrew/lib/python3.13/site-packages/pip-26.2.2.dist-info/licenses/LICENSE.txt",
+    "sha256": "634300a669d49aeae65b12c6c48c924c51a4cdf3d1ff086dc3456dc8bcaa2104"
+  },
+  "missingPathTools": [
+    "uv",
+    "pdm",
+    "poetry",
+    "conda"
+  ],
+  "solverInvocations": 0,
+  "networkDuringToolInspection": 0,
+  "command": "python3 -m pip --version; inspect local pip package files only",
+  "notes": "pip dry-run is not a no-download guarantee; local pip26.2.2 capability inspected, not recommended as latest stable"
+}

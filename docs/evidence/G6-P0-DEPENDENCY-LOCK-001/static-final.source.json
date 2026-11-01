@@ -1,0 +1,17 @@
+{
+  "taskId": "G6-P0-DEPENDENCY-LOCK-001",
+  "command": [
+    "pwsh",
+    "-NoProfile",
+    "-File",
+    "scripts/verify.ps1"
+  ],
+  "startUtc": "2026-11-01T01:38:32.481226+00:00",
+  "endUtc": "2026-11-01T01:38:35.446240+00:00",
+  "exitCode": 0,
+  "durationSeconds": 2.965121375003946,
+  "sizeBytes": 491,
+  "sha256": "7e7b2a134ac30176bffa704008806836ac61833778f9eddda2f808e2206c0f8e",
+  "raw_base64": "CkNoZWNrICAgICAgICAgICAgIFN0YXR1cyBNZXNzYWdlCi0tLS0tICAgICAgICAgICAgIC0tLS0tLSAtLS0tLS0tCnJlcG9zaXRvcnktc3RhdGljIFBBU1MgICDmo4Dmn6UzODgy5Liq5paH5Lu277ya6K+t5rOVL+agvOW8jy/nm7jlr7npk77mjqUv5pyJ6ZmQ5py65a+G5qih5byPL+Wfuue6v+KApgoKTk9UX1JVTjogLk5FVOWOn+eUn+ajgOafpemcgOaYvuW8jy1SdW5OYXRpdmXlj4rlr7nlupTku7vliqHmjojmnYPjgIIKTk9UX1JVTjogV2Vi54us56uL5qOA5p+l6ZyA55yf5a6e55uu5qCH5Y+K5pi+5byPLVJ1bk5hdGl2ZeOAggpOT1RfUlVOOiDmtY/op4jlmajnnJ/lrp5PSURDL0UyRemcgOeLrOeri+WPl+aOp+iBlOiwg++8jOS4jemakOW8j+a3t+WFpeW3peeoi+ajgOafpeOAggpQQVNTOiDmiYDpgInlt6XnqIvmo4Dmn6XvvJvojIPlm7Tku6XpgJDpobnovpPlh7rkuLrlh4bvvIzkuI3ooajnpLrkuJrliqHjgIHliY3nq6/miJbmlbTkuKpHMemAmui/h+OAggo=",
+  "utf8Text": "\nCheck             Status Message\n-----             ------ -------\nrepository-static PASS   检查3882个文件：语法/格式/相对链接/有限机密模式/基线…\n\nNOT_RUN: .NET原生检查需显式-RunNative及对应任务授权。\nNOT_RUN: Web独立检查需真实目标及显式-RunNative。\nNOT_RUN: 浏览器真实OIDC/E2E需独立受控联调，不隐式混入工程检查。\nPASS: 所选工程检查；范围以逐项输出为准，不表示业务、前端或整个G1通过。\n"
+}
