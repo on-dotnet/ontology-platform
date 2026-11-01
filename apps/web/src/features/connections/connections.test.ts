@@ -9,6 +9,7 @@ import ConnectionDetailPage from "../../app/data/connections/[id]/page";
 import type { PlatformIdentity } from "../../lib/api/generated";
 import { ProbeReport, RequestError } from "./status";
 import { CatalogPanel, CatalogSnapshot } from "./catalog";
+import { ConnectionDetail } from "./detail";
 import { createConnectionsClient } from "./api";
 import { decodeDraft, encodeDraft, draftCacheKey } from "./draft-cache";
 import { PlatformApiError } from "../../lib/api/client";
@@ -35,18 +36,25 @@ const catalogHarness = vi.hoisted(() => {
     return [host.slots[index] as T, next => { host.slots[index] = typeof next === "function" ? (next as (previous: T) => T)(host.slots[index] as T) : next; }];
   }
   function ref<T>(initial: T) { const [value] = state({ current: initial }); return value; }
+  function callback<T>(value: T, dependencies: readonly unknown[]): T {
+    const host = active.at(-1)!; const index = host.cursor++;
+    const previous = host.slots[index] as { value: T; dependencies: readonly unknown[] } | undefined;
+    if (!previous || previous.dependencies.length !== dependencies.length || !dependencies.every((item, offset) => Object.is(item, previous.dependencies[offset]))) host.slots[index] = { value, dependencies };
+    return (host.slots[index] as { value: T }).value;
+  }
   function effect(setup: () => void | (() => void), dependencies?: readonly unknown[]) {
     const host = active.at(-1)!; const index = host.cursor++; const previous = host.slots[index] as Effect | undefined;
     if (previous && dependencies && previous.dependencies?.length === dependencies.length && dependencies.every((value, offset) => Object.is(value, previous.dependencies![offset]))) return;
     const next: Effect = { dependencies }; host.slots[index] = next;
     host.effects.push(() => { if (typeof previous?.cleanup === "function") previous.cleanup(); next.cleanup = setup(); });
   }
-  return { Host, state, ref, effect, active: () => active.length > 0, jobId: "", replace: vi.fn(), api: { get: vi.fn(), job: vi.fn(), catalogs: vi.fn(), catalog: vi.fn(), discover: vi.fn(), cancel: vi.fn() } };
+  return { Host, state, ref, effect, callback, active: () => active.length > 0, jobId: "", replace: vi.fn(), api: { get: vi.fn(), probe: vi.fn(), transition: vi.fn(), job: vi.fn(), catalogs: vi.fn(), catalog: vi.fn(), discover: vi.fn(), cancel: vi.fn() } };
 });
 vi.mock("react", async original => {
   const actual = await original<typeof import("react")>();
   return { ...actual,
     useState: <T,>(initial: T | (() => T)) => catalogHarness.active() ? catalogHarness.state(initial) : actual.useState(initial),
+    useCallback: <T,>(callback: T, dependencies: readonly unknown[]) => catalogHarness.active() ? catalogHarness.callback(callback, dependencies) : actual.useCallback(callback as (...args: unknown[]) => unknown, dependencies),
     useRef: <T,>(initial: T) => catalogHarness.active() ? catalogHarness.ref(initial) : actual.useRef(initial),
     useEffect: (setup: () => void | (() => void), dependencies?: readonly unknown[]) => catalogHarness.active() ? catalogHarness.effect(setup, dependencies) : actual.useEffect(setup, dependencies),
   };
@@ -375,4 +383,148 @@ describe("目录拒绝后的任务诊断与权限重验（组件回归）", () =
     view.render(); await settle(); complete({ data: job }); await settle();
     expect(view.onDenied).toHaveBeenCalled(); expect(view.html()).not.toContain("发现未完整完成"); view.host.unmount();
   });
+});
+
+/** 调度真实父子事件与 key 卸载，延迟的是客户端 Promise，不替代浏览器或真实网络验收。 */
+describe("详情与目录操作的异步互锁（组件回归）", () => {
+  async function settle() { for (let index = 0; index < 30; index++) await Promise.resolve(); }
+  function elements(node: ReactNode): Array<React.ReactElement<Record<string, unknown>>> {
+    if (Array.isArray(node)) return node.flatMap(elements);
+    if (!isValidElement<Record<string, unknown>>(node)) return [];
+    return [node, ...elements(node.props.children as ReactNode)];
+  }
+  function button(node: ReactNode, label: string) {
+    const result = elements(node).find(element => element.type === "button" && element.props.children === label);
+    expect(result).toBeDefined(); return result!;
+  }
+  function click(node: ReactNode, label: string) {
+    const target = button(node, label);
+    if (!target.props.disabled) (target.props.onClick as () => void)();
+  }
+  function setup(state = "DRAFT") {
+    catalogHarness.jobId = ""; catalogHarness.replace.mockReset();
+    for (const mock of Object.values(catalogHarness.api)) mock.mockReset();
+    const connection = { id: "connection", displayName: "合成连接", config: configFromForm(validForms.POSTGRESQL), scope, state, probeFresh: true, lastProbeId: "probe", configRevision: 1 } as ConnectionView;
+    const job = { jobId: "discovered-job", connectionId: connection.id, status: "QUEUED" } as CatalogDiscoveryJobView;
+    catalogHarness.api.get.mockResolvedValue({ data: connection, etag: '"1"' });
+    catalogHarness.api.probe.mockResolvedValue({ data: { probeId: "probe", stages: [], status: "TEST_OK" } });
+    catalogHarness.api.catalogs.mockResolvedValue({ data: { items: [], nextCursor: null } });
+    catalogHarness.api.transition.mockResolvedValue({ data: { ...connection, state: "ACTIVE" }, etag: '"1"' });
+    catalogHarness.api.discover.mockResolvedValue({ data: job });
+    const parent = new catalogHarness.Host(); let child = new catalogHarness.Host(); let key: string | null = null;
+    function render() {
+      const detail = parent.render(() => ConnectionDetail({ id: connection.id, canManage: true }));
+      const panel = elements(detail).find(element => element.type === CatalogPanel);
+      if (!panel) return { detail, catalog: null };
+      if (key !== panel.key) { child.unmount(); child = new catalogHarness.Host(); key = panel.key; }
+      const catalog = child.render(() => CatalogPanel(panel.props as Parameters<typeof CatalogPanel>[0]));
+      return { detail, catalog };
+    }
+    return { connection, job, render, remountCatalog: () => { child.unmount(); child = new catalogHarness.Host(); key = null; }, unmount: () => { child.unmount(); parent.unmount(); } };
+  }
+  it("启用已返回但父级刷新未结束时不发送发现，完成后恢复发现并保存 job URL", async () => {
+    const view = setup(); view.render(); await settle();
+    let finishRefresh!: (value: unknown) => void;
+    catalogHarness.api.get.mockReturnValue(new Promise(resolve => { finishRefresh = resolve; }));
+    click(view.render().detail, "明确启用连接"); await settle();
+    const pending = view.render();
+    expect(renderToStaticMarkup(pending.detail)).toContain("正在启用连接");
+    // 即使真实 DOM 会禁止单击，也直接调用事件验证入口不会绕过父级忙碌保护。
+    (button(pending.catalog, "发现目录").props.onClick as () => void)(); await settle();
+    expect(catalogHarness.api.discover).toHaveBeenCalledTimes(0);
+    expect(button(pending.catalog, "发现目录").props.disabled).toBe(true);
+    finishRefresh({ data: { ...view.connection, state: "ACTIVE" }, etag: '"1"' }); await settle();
+    const ready = view.render(); expect(button(ready.catalog, "发现目录").props.disabled).toBe(false);
+    click(ready.catalog, "发现目录"); await settle();
+    expect(catalogHarness.api.discover).toHaveBeenCalledTimes(1);
+    expect(catalogHarness.replace).toHaveBeenCalledWith("/data/connections?job=discovered-job"); view.unmount();
+  });
+  it("目录发现先开始时父级刷新不能卸载该任务，返回后恢复刷新且保留 job URL", async () => {
+    const view = setup("ACTIVE"); view.render(); await settle();
+    let finishDiscover!: (value: unknown) => void;
+    catalogHarness.api.discover.mockReturnValue(new Promise(resolve => { finishDiscover = resolve; }));
+    click(view.render().catalog, "发现目录"); await settle();
+    const pending = view.render(); const calls = catalogHarness.api.get.mock.calls.length;
+    click(pending.detail, "刷新详情"); await settle(); view.render();
+    expect(catalogHarness.api.get).toHaveBeenCalledTimes(calls);
+    expect(button(pending.detail, "刷新详情").props.disabled).toBe(true);
+    finishDiscover({ data: view.job }); await settle();
+    expect(catalogHarness.replace).toHaveBeenCalledWith("/data/connections?job=discovered-job");
+    expect(button(view.render().detail, "刷新详情").props.disabled).toBe(false); view.unmount();
+  });
+  it("旧面板卸载后的迟到 finally 不得释放新面板正在执行的锁", async () => {
+    const view = setup("ACTIVE"); view.render(); await settle();
+    let finishOld!: (value: unknown) => void; let finishNew!: (value: unknown) => void;
+    catalogHarness.api.discover.mockReturnValueOnce(new Promise(resolve => { finishOld = resolve; })).mockReturnValueOnce(new Promise(resolve => { finishNew = resolve; }));
+    click(view.render().catalog, "发现目录"); await settle();
+    view.remountCatalog(); const remounted = view.render(); click(remounted.catalog, "发现目录"); await settle();
+    finishOld({ data: { ...view.job, jobId: "old-job" } }); await settle();
+    expect(catalogHarness.replace).not.toHaveBeenCalled();
+    const pending = view.render(); expect(button(pending.detail, "刷新详情").props.disabled).toBe(true);
+    const calls = catalogHarness.api.get.mock.calls.length;
+    (button(pending.detail, "刷新详情").props.onClick as () => void)(); await settle();
+    expect(catalogHarness.api.get).toHaveBeenCalledTimes(calls);
+    finishNew({ data: view.job }); await settle();
+    expect(catalogHarness.replace).toHaveBeenCalledWith("/data/connections?job=discovered-job");
+    expect(button(view.render().detail, "刷新详情").props.disabled).toBe(false); view.unmount();
+  });
+  it("目录请求失败释放父锁并保留可用的明确恢复入口", async () => {
+    const view = setup("ACTIVE"); view.render(); await settle();
+    catalogHarness.api.discover.mockRejectedValueOnce(new PlatformApiError(503, "request_failed"));
+    click(view.render().catalog, "发现目录"); await settle();
+    const failed = view.render(); expect(button(failed.detail, "刷新详情").props.disabled).toBe(false);
+    expect(button(failed.catalog, "恢复上次目录操作结果").props.disabled).toBe(false);
+    click(failed.catalog, "恢复上次目录操作结果"); await settle();
+    expect(catalogHarness.replace).toHaveBeenCalledWith("/data/connections?job=discovered-job"); view.unmount();
+  });
+  it("已运行任务不占据 HTTP 操作锁，父刷新期间禁止取消且完成后可以取消", async () => {
+    const view = setup("ACTIVE"); catalogHarness.jobId = "running-job";
+    catalogHarness.api.job.mockResolvedValue({ data: { ...view.job, status: "RUNNING" } });
+    catalogHarness.api.cancel.mockResolvedValue({ data: { ...view.job, status: "CANCELLED" } });
+    view.render(); await settle();
+    expect(button(view.render().detail, "刷新详情").props.disabled).toBe(false);
+    let finishRefresh!: (value: unknown) => void;
+    catalogHarness.api.get.mockReturnValue(new Promise(resolve => { finishRefresh = resolve; }));
+    click(view.render().detail, "刷新详情"); await settle();
+    const pending = view.render(); const cancel = button(pending.catalog, "取消发现");
+    expect(cancel.props.disabled).toBe(true); (cancel.props.onClick as () => void)(); await settle();
+    expect(catalogHarness.api.cancel).not.toHaveBeenCalled();
+    finishRefresh({ data: view.connection, etag: '\"1\"' }); await settle(); view.render(); await settle();
+    const ready = view.render(); expect(button(ready.catalog, "取消发现").props.disabled).toBe(false);
+    click(ready.catalog, "取消发现"); await settle(); expect(catalogHarness.api.cancel).toHaveBeenCalledTimes(1); view.unmount();
+  });
+
+  it.each(["parent-first", "catalog-first"])("%s 同周期旧事件闭包也不能越过同步互锁", async order => {
+    const view = setup("ACTIVE"); view.render(); await settle();
+    let finish!: (value: unknown) => void;
+    const pending = new Promise(resolve => { finish = resolve; });
+    const before = view.render(); const initialGets = catalogHarness.api.get.mock.calls.length;
+    if (order === "parent-first") {
+      catalogHarness.api.get.mockReturnValue(pending);
+      click(before.detail, "刷新详情"); click(before.catalog, "发现目录");
+      expect(catalogHarness.api.discover).not.toHaveBeenCalled();
+      finish({ data: view.connection, etag: '\"1\"' });
+    } else {
+      catalogHarness.api.discover.mockReturnValue(pending);
+      click(before.catalog, "发现目录"); click(before.detail, "刷新详情");
+      expect(catalogHarness.api.get).toHaveBeenCalledTimes(initialGets);
+      finish({ data: view.job });
+    }
+    await settle(); view.unmount();
+  });
+  it("目录授权撤销立即释放操作令牌，迟到响应不再释放或恢复路由", async () => {
+    const view = setup("ACTIVE"); const lock = vi.fn(); const denied = vi.fn();
+    let rejectHistory!: (cause: unknown) => void; let finish!: (value: unknown) => void;
+    catalogHarness.api.catalogs.mockReturnValue(new Promise((_, reject) => { rejectHistory = reject; }));
+    catalogHarness.api.discover.mockReturnValue(new Promise(resolve => { finish = resolve; }));
+    const host = new catalogHarness.Host();
+    const render = () => host.render(() => CatalogPanel({ connection: view.connection, etag: '\"1\"', canManage: true, onDenied: denied, onBusyChange: lock }));
+    render(); await settle(); click(render(), "发现目录");
+    const owner = lock.mock.calls[0][0]; expect(lock.mock.calls).toEqual([[owner, true]]);
+    rejectHistory(new PlatformApiError(401, "authentication_required")); await settle();
+    expect(denied).toHaveBeenCalled(); expect(lock.mock.calls).toEqual([[owner, true], [owner, false]]);
+    finish({ data: view.job }); await settle();
+    expect(lock.mock.calls).toEqual([[owner, true], [owner, false]]); expect(catalogHarness.replace).not.toHaveBeenCalled(); host.unmount(); view.unmount();
+  });
+
 });

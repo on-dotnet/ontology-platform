@@ -8,7 +8,7 @@ import { createConnectionsClient } from "./api";
 import { RequestError, stateLabels } from "./status";
 const client = createConnectionsClient();
 /** 持久任务由jobId恢复；有界轮询、明确取消，历史每次读取都重新授权。 */
-export function CatalogPanel({ connection, etag, canManage, onDenied }: { connection: ConnectionView; etag: string; canManage: boolean; onDenied: (error: unknown) => void }) {
+export function CatalogPanel({ connection, etag, canManage, onDenied, parentBusy = false, onBusyChange }: { connection: ConnectionView; etag: string; canManage: boolean; onDenied: (error: unknown) => void; parentBusy?: boolean; onBusyChange?: (owner: symbol, busy: boolean) => boolean | void }) {
   const router = useRouter(); const pathname = usePathname(); const params = useSearchParams();
   const jobId = params.get("job") ?? "";
   const [job, setJob] = useState<CatalogDiscoveryJobView | null>(null);
@@ -22,6 +22,17 @@ export function CatalogPanel({ connection, etag, canManage, onDenied }: { connec
   const disabled = connection.state === "DISABLED";
   const access = useRef({ generation: 0, revoked: false });
   const [revalidating, setRevalidating] = useState(false);
+  // 每次短 HTTP 操作独占令牌；迟到 finally 不得释放另一操作或新挂载面板的锁。
+  const activeOperation = useRef<symbol | null>(null);
+  function releaseOperation(owner: symbol | null) {
+    if (!owner || activeOperation.current !== owner) return;
+    activeOperation.current = null; setBusy(false); onBusyChange?.(owner, false);
+  }
+  useEffect(() => () => {
+    const owner = activeOperation.current;
+    activeOperation.current = null;
+    if (owner) onBusyChange?.(owner, false);
+  }, [onBusyChange]);
   useEffect(() => {
     access.current = { generation: access.current.generation + 1, revoked: false };
     return () => { access.current = { generation: access.current.generation + 1, revoked: true }; };
@@ -31,14 +42,14 @@ export function CatalogPanel({ connection, etag, canManage, onDenied }: { connec
     setError(cause);
     if (cause instanceof PlatformApiError && [401, 403].includes(cause.status)) {
       access.current = { generation: access.current.generation + 1, revoked: true };
-      setSnapshot(null); setHistory(null); setJob(null); setReplay(null); setBusy(false); setRevalidating(false); onDenied(cause);
+      setSnapshot(null); setHistory(null); setJob(null); setReplay(null); releaseOperation(activeOperation.current); setRevalidating(false); onDenied(cause);
     }
   }
   /** 源目录拒绝不等于任务拒绝；清空旧目录后重新验证连接和任务，绝不沿用旧投影。 */
   async function catalogFailure(cause: unknown, signal?: AbortSignal) {
     if (!(cause instanceof PlatformApiError) || cause.status !== 403 || cause.code !== "catalog_access_forbidden") { failure(cause); return; }
     const generation = ++access.current.generation;
-    setError(cause); setSnapshot(null); setHistory(null); setJob(null); setReplay(null); setBusy(false); setRevalidating(true);
+    setError(cause); setSnapshot(null); setHistory(null); setJob(null); setReplay(null); releaseOperation(activeOperation.current); setRevalidating(true);
     try {
       const latest = await client.get(connection.id, signal);
       if (!current(generation, signal)) return;
@@ -90,32 +101,43 @@ export function CatalogPanel({ connection, etag, canManage, onDenied }: { connec
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [connection.id, jobId, disabled, refresh]);
   async function run(work: () => Promise<void>) {
+    if (parentBusy || activeOperation.current || revalidating || access.current.revoked) return;
     const generation = access.current.generation;
+    const owner = Symbol("catalog-operation");
+    // 父级同步裁决补足 props 尚未重渲染的同周期窗口。
+    if (onBusyChange?.(owner, true) === false) return;
+    activeOperation.current = owner;
     setBusy(true); setError(null); setReplay(() => work);
     try { await work(); if (current(generation)) setReplay(null); }
     catch (cause) { if (current(generation)) failure(cause); }
-    finally { if (current(generation)) setBusy(false); }
+    finally { releaseOperation(owner); }
   }
   function discover() {
+    if (parentBusy || activeOperation.current) return;
     const generation = access.current.generation;
     const body = { command: command(connection.configRevision, "发现只读源目录") };
     void run(async () => { const result = await client.discover(connection.id, body, etag); if (!current(generation)) return; setJob(result.data); const next = new URLSearchParams(params); next.set("job", result.data.jobId); router.replace(`${pathname}?${next}`); });
   }
   function cancel() {
-    if (!job) return;
+    if (parentBusy || activeOperation.current || !job) return;
     const generation = access.current.generation;
     const body = { command: command(connection.configRevision, "取消目录发现") };
     void run(async () => { const result = await client.cancel(connection.id, job.jobId, body, etag); if (!current(generation)) return; setJob(result.data); setRefresh(value => value + 1); });
   }
+  function resume() {
+    if (parentBusy || activeOperation.current || revalidating) return;
+    setError(null); setPaused(false); setRefresh(value => value + 1);
+  }
+  const interactionBusy = parentBusy || busy || revalidating;
   const running = !!job && ["QUEUED", "RUNNING"].includes(job.status);
-  return <section className="connection-card"><div className="connection-heading"><div><h2>源目录</h2><p>仅包含当前允许的表、视图与字段，不读取业务行。</p></div>{canManage && <button disabled={disabled || busy || revalidating || running || connection.state !== "ACTIVE" || !connection.probeFresh || !etag} onClick={discover}>发现目录</button>}</div>
-    <RequestError error={error} retry={() => { setError(null); setPaused(false); setRefresh(value => value + 1); }} />
+  return <section className="connection-card"><div className="connection-heading"><div><h2>源目录</h2><p>仅包含当前允许的表、视图与字段，不读取业务行。</p></div>{canManage && <button disabled={disabled || interactionBusy || running || connection.state !== "ACTIVE" || !connection.probeFresh || !etag} onClick={discover}>发现目录</button>}</div>
+    <RequestError error={error} retry={interactionBusy ? undefined : resume} />
     {disabled ? <p>连接已禁用，目录访问已停止。历史仍保留，但不能绕过当前访问控制。</p> : <>
       {!history && !error && <p role="status">正在读取目录历史…</p>}
-      {job && <div className="connection-alert" role="status"><strong>目录发现：{stateLabels[job.status] ?? job.status}</strong><p>创建于 {job.createdAtUtc} · 关联标识 {job.traceId}</p>{["FAILED", "PARTIAL"].includes(job.status) && <p>发现未完整完成，不能将此结果视为没有对象。此前快照仅供历史参考。</p>}{running && canManage && <button disabled={busy} onClick={cancel}>取消发现</button>}{paused && <button onClick={() => { setPaused(false); setRefresh(value => value + 1); }}>继续读取任务状态</button>}</div>}
-      {replay && !busy && <button onClick={() => void run(replay!)}>恢复上次目录操作结果</button>}
+      {job && <div className="connection-alert" role="status"><strong>目录发现：{stateLabels[job.status] ?? job.status}</strong><p>创建于 {job.createdAtUtc} · 关联标识 {job.traceId}</p>{["FAILED", "PARTIAL"].includes(job.status) && <p>发现未完整完成，不能将此结果视为没有对象。此前快照仅供历史参考。</p>}{running && canManage && <button disabled={interactionBusy} onClick={cancel}>取消发现</button>}{paused && <button disabled={interactionBusy} onClick={resume}>继续读取任务状态</button>}</div>}
+      {replay && !busy && <button disabled={interactionBusy} onClick={() => void run(replay!)}>恢复上次目录操作结果</button>}
       {history && !history.items.length && <p>尚无目录快照。启用连接后可发现可见目录。</p>}
-      {history && history.items.length > 0 && <><h3>目录快照历史</h3><ul className="catalog-history">{history.items.map(item => <li key={item.snapshotId}><button disabled={busy || revalidating} onClick={() => { void run(() => readSnapshot(item.snapshotId)); }}>{item.capturedAtUtc} · 修订 {item.configRevision} · {item.objects.length} 个对象</button><span className="tag">{stateLabels[item.status] ?? item.status}</span></li>)}</ul>{history.nextCursor && <button disabled={busy || revalidating} onClick={() => void run(() => readCatalogs(history.nextCursor!))}>下一页历史</button>}</>}
+      {history && history.items.length > 0 && <><h3>目录快照历史</h3><ul className="catalog-history">{history.items.map(item => <li key={item.snapshotId}><button disabled={interactionBusy} onClick={() => { void run(() => readSnapshot(item.snapshotId)); }}>{item.capturedAtUtc} · 修订 {item.configRevision} · {item.objects.length} 个对象</button><span className="tag">{stateLabels[item.status] ?? item.status}</span></li>)}</ul>{history.nextCursor && <button disabled={interactionBusy} onClick={() => void run(() => readCatalogs(history.nextCursor!))}>下一页历史</button>}</>}
       {snapshot && <CatalogSnapshot snapshot={snapshot} stale={!!error || !["SUCCEEDED"].includes(job?.status ?? "SUCCEEDED")} />}
     </>}
   </section>;
