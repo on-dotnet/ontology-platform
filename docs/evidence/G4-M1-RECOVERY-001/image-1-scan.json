@@ -1,0 +1,39 @@
+{
+  "command": [
+    "docker",
+    "--context",
+    "desktop-linux",
+    "scout",
+    "sbom",
+    "--format",
+    "json",
+    "--platform",
+    "linux/arm64",
+    "--output",
+    "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/artifacts/g4-m1-recovery-001/forensics/image-1.sbom.json",
+    "oci-dir://1"
+  ],
+  "exitCode": -9,
+  "status": "TIMEOUT",
+  "startedAtUtc": "2026-11-01T13:17:28.816396+00:00",
+  "elapsedSeconds": 190.86994233301084,
+  "peakObservedTaskBytes": 441908930,
+  "offline": true,
+  "cacheDir": "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/artifacts/g4-m1-recovery-001/forensics/scout-cache",
+  "image": {
+    "reference": "quay.io/keycloak/keycloak:26.8.1",
+    "officialIndexDigest": "sha256:3f3c5f8e03c614774b4bd9173b88391fefa4153bfc010d8012d59ad825377332",
+    "platformDigest": "sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4",
+    "configDigest": "sha256:24959b9b2ff0ec6bd9445588d3b488b84dffbe06e6a6ccb50e3d074f7ec581dd",
+    "platform": {
+      "architecture": "arm64",
+      "os": "linux"
+    },
+    "layerBytes": 263927495,
+    "layers": 4,
+    "budgetReservedBytes": 1221163381,
+    "receivedBytes": 549883270,
+    "containerExecution": false,
+    "status": "VERIFIED_OCI_LAYOUT"
+  }
+}

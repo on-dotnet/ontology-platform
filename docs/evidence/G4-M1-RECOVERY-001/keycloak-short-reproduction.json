@@ -1,0 +1,25 @@
+{
+  "layer": {
+    "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+    "digest": "sha256:88202ac232a9ad53c5b04e32b6f3f6b4498772f8d069fbbde1d007f8dd31d981",
+    "size": 173795289
+  },
+  "requests": [
+    {
+      "host": "quay.io",
+      "reservedBytes": 1114112,
+      "receivedBytes": 0,
+      "status": "RANGE_REDIRECT_BODY_NOT_READ",
+      "httpStatus": 302,
+      "redirectHost": "cdn01.quay.io"
+    },
+    {
+      "host": "cdn01.quay.io",
+      "reservedBytes": 1114112,
+      "receivedBytes": 1048576,
+      "status": "RANGE_PROBE_COMPLETE",
+      "httpStatus": 206,
+      "elapsedSeconds": 8.17153020799742
+    }
+  ]
+}

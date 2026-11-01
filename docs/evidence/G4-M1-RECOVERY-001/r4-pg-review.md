@@ -1,0 +1,7 @@
+# R4 最短PG独立运行审查
+
+非作者 /root/recovery_reviewer 对两固定已准入镜像、2容器1536MiB、512MiB tmpfs卷、内部source网络/无映射端口、只读root/capdrop、初始chown后原PG入口降权、测试host UID单文件0600 secret bind批准。原compose SHA cf22c7bab9cbdbc0fde9ace95aec2cd7313b115fcaa150a04be790dcdb40dd89。实际隔离见pg-actual-isolation.json。
+
+首测试MTP写/tests/TestResults失败，Reviewer批准仅指定已有32MiB /tmp/TestResults，不放宽只读。第二失败真实NETWORK/TLS/AUTH通过、READ_ONLY失败、METADATA未运行。独立SQL诊断确定PUBLIC pg_settings UPDATE，批准只收紧本任务fixture库，源Adapter不放宽。收紧后另一失败为优化器重排使has_sequence_privilege对非sequence报错。Reviewer根据PostgreSQL18官方SQL表达式求值规则批准CASE隔离函数类型；真实序列授予USAGE后仍拒绝、撤回后通过，见pg-sequence-guard-regression.json。
+
+已批准正常12项及错误SAN1项，真实输出均0skip；证据保留首失败与每次短复现，不把组件或healthy代替产品验收。错误SAN通过后恢复正常证书。此审查只覆盖PG最短范围，不包含完整API/UI。

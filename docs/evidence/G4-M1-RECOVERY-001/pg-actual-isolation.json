@@ -1,0 +1,520 @@
+{
+  "status": "PASS",
+  "containers": [
+    {
+      "Id": "523cd0c968e8103bdd446f47f480bbe674343e8869dc8730e8d8b8b23321de73",
+      "Name": "/ontology-g4-m1-recovery-001-pg-first",
+      "Image": "sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55",
+      "State": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 940,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-11-01T13:40:02.793203591Z",
+        "FinishedAt": "0001-01-01T00:00:00Z"
+      },
+      "Mounts": [
+        {
+          "Type": "bind",
+          "Source": "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/artifacts/g4-m1-recovery-001/pg-tests",
+          "Destination": "/tests",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        },
+        {
+          "Type": "bind",
+          "Source": "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/adapter-input.json",
+          "Destination": "/run/secrets/adapter-input.json",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        },
+        {
+          "Type": "bind",
+          "Source": "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/ca.crt",
+          "Destination": "/run/secrets/ca.crt",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        },
+        {
+          "Type": "bind",
+          "Source": "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/reader-password",
+          "Destination": "/run/secrets/reader-password",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        },
+        {
+          "Type": "bind",
+          "Source": "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/wrong-ca.crt",
+          "Destination": "/run/secrets/wrong-ca.crt",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        }
+      ],
+      "NetworkSettings": {
+        "SandboxID": "58976adf512aed751c22e9cdf5fdb92ab56f85aaea6ded4a1dbfd581b9186057",
+        "SandboxKey": "/var/run/docker/netns/58976adf512a",
+        "Ports": {},
+        "Networks": {
+          "ontology-g4-m1-recovery-001_source": {
+            "IPAMConfig": null,
+            "Links": null,
+            "Aliases": [
+              "ontology-g4-m1-recovery-001-pg-first"
+            ],
+            "DriverOpts": null,
+            "GwPriority": 0,
+            "NetworkID": "7fdadd3b921be9f3057dd2871794e6d108e6b58fec13b2f70281f5110c3bc240",
+            "EndpointID": "d8fac11bb29665868f1fb7311dfb21a89bfc455129a46efb937388221d2c47af",
+            "Gateway": "",
+            "IPAddress": "172.18.0.3",
+            "MacAddress": "02:9d:af:b4:82:6e",
+            "IPPrefixLen": 16,
+            "IPv6Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "DNSNames": [
+              "ontology-g4-m1-recovery-001-pg-first",
+              "523cd0c968e8"
+            ]
+          }
+        }
+      },
+      "HostConfig": {
+        "Binds": [
+          "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/ca.crt:/run/secrets/ca.crt:ro",
+          "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/wrong-ca.crt:/run/secrets/wrong-ca.crt:ro",
+          "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/artifacts/g4-m1-recovery-001/pg-tests:/tests:ro",
+          "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/adapter-input.json:/run/secrets/adapter-input.json:ro",
+          "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/reader-password:/run/secrets/reader-password:ro"
+        ],
+        "ContainerIDFile": "",
+        "LogConfig": {
+          "Type": "local",
+          "Config": {}
+        },
+        "NetworkMode": "ontology-g4-m1-recovery-001_source",
+        "PortBindings": {},
+        "RestartPolicy": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "AutoRemove": false,
+        "VolumeDriver": "",
+        "VolumesFrom": null,
+        "ConsoleSize": [
+          0,
+          0
+        ],
+        "CapAdd": null,
+        "CapDrop": [
+          "ALL"
+        ],
+        "CgroupnsMode": "private",
+        "Dns": null,
+        "DnsOptions": null,
+        "DnsSearch": null,
+        "ExtraHosts": [],
+        "GroupAdd": null,
+        "IpcMode": "private",
+        "Cgroup": "",
+        "Links": null,
+        "OomScoreAdj": 0,
+        "PidMode": "",
+        "Privileged": false,
+        "PublishAllPorts": false,
+        "ReadonlyRootfs": true,
+        "SecurityOpt": [
+          "no-new-privileges:true"
+        ],
+        "Tmpfs": {
+          "/tmp": "size=32m,mode=1777"
+        },
+        "UTSMode": "",
+        "UsernsMode": "",
+        "ShmSize": 67108864,
+        "Runtime": "runc",
+        "Isolation": "",
+        "CpuShares": 0,
+        "Memory": 805306368,
+        "NanoCpus": 2000000000,
+        "CgroupParent": "",
+        "BlkioWeight": 0,
+        "BlkioWeightDevice": null,
+        "BlkioDeviceReadBps": null,
+        "BlkioDeviceWriteBps": null,
+        "BlkioDeviceReadIOps": null,
+        "BlkioDeviceWriteIOps": null,
+        "CpuPeriod": 0,
+        "CpuQuota": 0,
+        "CpuRealtimePeriod": 0,
+        "CpuRealtimeRuntime": 0,
+        "CpusetCpus": "",
+        "CpusetMems": "",
+        "Devices": null,
+        "DeviceCgroupRules": null,
+        "DeviceRequests": null,
+        "MemoryReservation": 0,
+        "MemorySwap": 1610612736,
+        "MemorySwappiness": null,
+        "OomKillDisable": null,
+        "PidsLimit": 128,
+        "Ulimits": null,
+        "CpuCount": 0,
+        "CpuPercent": 0,
+        "IOMaximumIOps": 0,
+        "IOMaximumBandwidth": 0,
+        "MaskedPaths": [
+          "/proc/acpi",
+          "/proc/asound",
+          "/proc/interrupts",
+          "/proc/kcore",
+          "/proc/keys",
+          "/proc/latency_stats",
+          "/proc/sched_debug",
+          "/proc/scsi",
+          "/proc/timer_list",
+          "/proc/timer_stats",
+          "/sys/devices/virtual/powercap",
+          "/sys/firmware"
+        ],
+        "ReadonlyPaths": [
+          "/proc/bus",
+          "/proc/fs",
+          "/proc/irq",
+          "/proc/sys",
+          "/proc/sysrq-trigger"
+        ]
+      }
+    },
+    {
+      "Id": "30d5643bf7033bc9084378d55c22069cfc5667eac24cbaf226c189344e8940d9",
+      "Name": "/ontology-g4-m1-recovery-001-pg-source-1",
+      "Image": "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+      "State": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 618,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-11-01T13:39:43.724097013Z",
+        "FinishedAt": "0001-01-01T00:00:00Z",
+        "Health": {
+          "Status": "healthy",
+          "FailingStreak": 0,
+          "Log": [
+            {
+              "Start": "2026-11-01T13:40:44.719835055Z",
+              "End": "2026-11-01T13:40:44.738076472Z",
+              "ExitCode": 0,
+              "Output": "/var/run/postgresql:5432 - accepting connections\n"
+            },
+            {
+              "Start": "2026-11-01T13:40:46.748525375Z",
+              "End": "2026-11-01T13:40:46.76700325Z",
+              "ExitCode": 0,
+              "Output": "/var/run/postgresql:5432 - accepting connections\n"
+            },
+            {
+              "Start": "2026-11-01T13:40:48.777878543Z",
+              "End": "2026-11-01T13:40:48.796681626Z",
+              "ExitCode": 0,
+              "Output": "/var/run/postgresql:5432 - accepting connections\n"
+            },
+            {
+              "Start": "2026-11-01T13:40:50.798249627Z",
+              "End": "2026-11-01T13:40:50.818700294Z",
+              "ExitCode": 0,
+              "Output": "/var/run/postgresql:5432 - accepting connections\n"
+            },
+            {
+              "Start": "2026-11-01T13:40:52.829215295Z",
+              "End": "2026-11-01T13:40:52.85149217Z",
+              "ExitCode": 0,
+              "Output": "/var/run/postgresql:5432 - accepting connections\n"
+            }
+          ]
+        }
+      },
+      "Mounts": [
+        {
+          "Type": "bind",
+          "Source": "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/init.sql",
+          "Destination": "/run/secrets/init.sql",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        },
+        {
+          "Type": "bind",
+          "Source": "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/pg_hba.conf",
+          "Destination": "/run/secrets/pg_hba.conf",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        },
+        {
+          "Type": "bind",
+          "Source": "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/postgres-password",
+          "Destination": "/run/secrets/postgres-password",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        },
+        {
+          "Type": "bind",
+          "Source": "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/server.crt",
+          "Destination": "/run/secrets/server.crt",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        },
+        {
+          "Type": "bind",
+          "Source": "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/server.key",
+          "Destination": "/run/secrets/server.key",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        },
+        {
+          "Type": "volume",
+          "Name": "ontology-g4-m1-recovery-001_source-data",
+          "Source": "/var/lib/docker/volumes/ontology-g4-m1-recovery-001_source-data/_data",
+          "Destination": "/var/lib/postgresql",
+          "Driver": "local",
+          "Mode": "rw",
+          "RW": true,
+          "Propagation": ""
+        }
+      ],
+      "NetworkSettings": {
+        "SandboxID": "06e4dd39036d622608d4c90578672e595a77463f6ef23962af0bbab7d30a7ef9",
+        "SandboxKey": "/var/run/docker/netns/06e4dd39036d",
+        "Ports": {
+          "5432/tcp": null
+        },
+        "Networks": {
+          "ontology-g4-m1-recovery-001_source": {
+            "IPAMConfig": null,
+            "Links": null,
+            "Aliases": [
+              "ontology-g4-m1-recovery-001-pg-source-1",
+              "pg-source"
+            ],
+            "DriverOpts": null,
+            "GwPriority": 0,
+            "NetworkID": "7fdadd3b921be9f3057dd2871794e6d108e6b58fec13b2f70281f5110c3bc240",
+            "EndpointID": "d095ce054572f54f1ec0c80453062f58f1984a57db817da18bc12e4932c34e82",
+            "Gateway": "",
+            "IPAddress": "172.18.0.2",
+            "MacAddress": "02:47:f9:a8:e6:55",
+            "IPPrefixLen": 16,
+            "IPv6Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "DNSNames": [
+              "ontology-g4-m1-recovery-001-pg-source-1",
+              "pg-source",
+              "30d5643bf703"
+            ]
+          }
+        }
+      },
+      "HostConfig": {
+        "Binds": [
+          "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/postgres-password:/run/secrets/postgres-password:ro",
+          "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/init.sql:/run/secrets/init.sql:ro",
+          "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/pg_hba.conf:/run/secrets/pg_hba.conf:ro",
+          "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/server.crt:/run/secrets/server.crt:ro",
+          "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/server.key:/run/secrets/server.key:ro",
+          "ontology-g4-m1-recovery-001_source-data:/var/lib/postgresql:rw"
+        ],
+        "ContainerIDFile": "",
+        "LogConfig": {
+          "Type": "local",
+          "Config": {}
+        },
+        "NetworkMode": "ontology-g4-m1-recovery-001_source",
+        "PortBindings": {},
+        "RestartPolicy": {
+          "Name": "no",
+          "MaximumRetryCount": 0
+        },
+        "AutoRemove": false,
+        "VolumeDriver": "",
+        "VolumesFrom": null,
+        "ConsoleSize": [
+          0,
+          0
+        ],
+        "CapAdd": [
+          "CAP_CHOWN",
+          "CAP_DAC_OVERRIDE",
+          "CAP_FOWNER",
+          "CAP_SETGID",
+          "CAP_SETUID"
+        ],
+        "CapDrop": [
+          "ALL"
+        ],
+        "CgroupnsMode": "private",
+        "Dns": null,
+        "DnsOptions": null,
+        "DnsSearch": null,
+        "ExtraHosts": [],
+        "GroupAdd": null,
+        "IpcMode": "private",
+        "Cgroup": "",
+        "Links": null,
+        "OomScoreAdj": 0,
+        "PidMode": "",
+        "Privileged": false,
+        "PublishAllPorts": false,
+        "ReadonlyRootfs": true,
+        "SecurityOpt": [
+          "no-new-privileges:true"
+        ],
+        "Tmpfs": {
+          "/docker-entrypoint-initdb.d": "size=4m,mode=0755",
+          "/tmp": "size=16m,mode=1777",
+          "/var/run/postgresql": "size=4m,mode=3775,uid=999,gid=999"
+        },
+        "UTSMode": "",
+        "UsernsMode": "",
+        "ShmSize": 67108864,
+        "Runtime": "runc",
+        "Isolation": "",
+        "CpuShares": 0,
+        "Memory": 805306368,
+        "NanoCpus": 2000000000,
+        "CgroupParent": "",
+        "BlkioWeight": 0,
+        "BlkioWeightDevice": null,
+        "BlkioDeviceReadBps": null,
+        "BlkioDeviceWriteBps": null,
+        "BlkioDeviceReadIOps": null,
+        "BlkioDeviceWriteIOps": null,
+        "CpuPeriod": 0,
+        "CpuQuota": 0,
+        "CpuRealtimePeriod": 0,
+        "CpuRealtimeRuntime": 0,
+        "CpusetCpus": "",
+        "CpusetMems": "",
+        "Devices": null,
+        "DeviceCgroupRules": null,
+        "DeviceRequests": null,
+        "MemoryReservation": 0,
+        "MemorySwap": 1610612736,
+        "MemorySwappiness": null,
+        "OomKillDisable": null,
+        "PidsLimit": 128,
+        "Ulimits": null,
+        "CpuCount": 0,
+        "CpuPercent": 0,
+        "IOMaximumIOps": 0,
+        "IOMaximumBandwidth": 0,
+        "MaskedPaths": [
+          "/proc/acpi",
+          "/proc/asound",
+          "/proc/interrupts",
+          "/proc/kcore",
+          "/proc/keys",
+          "/proc/latency_stats",
+          "/proc/sched_debug",
+          "/proc/scsi",
+          "/proc/timer_list",
+          "/proc/timer_stats",
+          "/sys/devices/virtual/powercap",
+          "/sys/firmware"
+        ],
+        "ReadonlyPaths": [
+          "/proc/bus",
+          "/proc/fs",
+          "/proc/irq",
+          "/proc/sys",
+          "/proc/sysrq-trigger"
+        ]
+      }
+    }
+  ],
+  "network": [
+    {
+      "Name": "ontology-g4-m1-recovery-001_source",
+      "Id": "7fdadd3b921be9f3057dd2871794e6d108e6b58fec13b2f70281f5110c3bc240",
+      "Created": "2026-11-01T13:39:43.493533263Z",
+      "Scope": "local",
+      "Driver": "bridge",
+      "EnableIPv4": true,
+      "EnableIPv6": false,
+      "IPAM": {
+        "Driver": "default",
+        "Options": null,
+        "Config": [
+          {
+            "Subnet": "172.18.0.0/16",
+            "Gateway": "172.18.0.1"
+          }
+        ]
+      },
+      "Internal": true,
+      "Attachable": false,
+      "Ingress": false,
+      "ConfigFrom": {
+        "Network": ""
+      },
+      "ConfigOnly": false,
+      "Options": {
+        "com.docker.network.enable_ipv4": "true",
+        "com.docker.network.enable_ipv6": "false"
+      },
+      "Labels": {
+        "com.docker.compose.config-hash": "4006581e9cc412f0e0fb510a2885078cc9754ea860e9cf77e39c012cbfcf8eea",
+        "com.docker.compose.network": "source",
+        "com.docker.compose.project": "ontology-g4-m1-recovery-001",
+        "com.docker.compose.version": "5.6.1",
+        "ontology.run-id": "recovery-20261101-01",
+        "ontology.task-id": "G4-M1-RECOVERY-001"
+      },
+      "Containers": {
+        "30d5643bf7033bc9084378d55c22069cfc5667eac24cbaf226c189344e8940d9": {
+          "Name": "ontology-g4-m1-recovery-001-pg-source-1",
+          "EndpointID": "d095ce054572f54f1ec0c80453062f58f1984a57db817da18bc12e4932c34e82",
+          "MacAddress": "02:47:f9:a8:e6:55",
+          "IPv4Address": "172.18.0.2/16",
+          "IPv6Address": ""
+        },
+        "523cd0c968e8103bdd446f47f480bbe674343e8869dc8730e8d8b8b23321de73": {
+          "Name": "ontology-g4-m1-recovery-001-pg-first",
+          "EndpointID": "d8fac11bb29665868f1fb7311dfb21a89bfc455129a46efb937388221d2c47af",
+          "MacAddress": "02:9d:af:b4:82:6e",
+          "IPv4Address": "172.18.0.3/16",
+          "IPv6Address": ""
+        }
+      },
+      "Status": {
+        "IPAM": {
+          "Subnets": {
+            "172.18.0.0/16": {
+              "IPsInUse": 5,
+              "DynamicIPsAvailable": 65531
+            }
+          }
+        }
+      }
+    }
+  ]
+}

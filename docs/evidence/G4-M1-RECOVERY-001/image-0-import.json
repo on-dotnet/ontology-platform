@@ -1,0 +1,19 @@
+{
+  "command": [
+    "docker",
+    "--context",
+    "desktop-linux",
+    "image",
+    "load",
+    "--platform",
+    "linux/arm64",
+    "--input",
+    "artifacts/g4-m1-recovery-001/forensics/image-0.oci.tar"
+  ],
+  "exitCode": 0,
+  "stdout": "Loaded image: postgres@sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437\n",
+  "stderr": "",
+  "platformDigest": "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+  "configDigest": "sha256:07ee628d2e71f8956c85fc5466906a6d4038cf00f6db07f067d810ef8fec8161",
+  "containerExecution": false
+}

@@ -30,7 +30,7 @@ public sealed partial class PgSourceAdapter
                             pg_catalog.has_table_privilege(r.oid, c.oid, 'INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER,MAINTAIN')
                             OR pg_catalog.has_any_column_privilege(r.oid, c.oid, 'INSERT,UPDATE,REFERENCES')))
                     OR EXISTS (SELECT 1 FROM pg_catalog.pg_class c
-                        WHERE c.relkind = 'S' AND pg_catalog.has_sequence_privilege(r.oid, c.oid, 'USAGE,UPDATE'))
+                        WHERE CASE WHEN c.relkind = 'S' THEN pg_catalog.has_sequence_privilege(r.oid, c.oid, 'USAGE,UPDATE') ELSE false END)
             )
         """;
 

@@ -1,0 +1,26 @@
+{
+  "layer": {
+    "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+    "size": 34455908,
+    "digest": "sha256:59a63478dc4bc439321221551264a8824b65f489044e0ed81b8005da691126de"
+  },
+  "requests": [
+    {
+      "host": "mcr.microsoft.com",
+      "reservedBytes": 1114112,
+      "receivedBytes": 0,
+      "status": "RANGE_REDIRECT_BODY_NOT_READ",
+      "httpStatus": 307,
+      "redirectHost": "westus.data.mcr.microsoft.com"
+    },
+    {
+      "host": "westus.data.mcr.microsoft.com",
+      "reservedBytes": 1114112,
+      "receivedBytes": 1048576,
+      "status": "RANGE_PROBE_COMPLETE",
+      "httpStatus": 206,
+      "contentRange": "bytes 0-1048575/34455908",
+      "elapsedSeconds": 5.861421249996056
+    }
+  ]
+}

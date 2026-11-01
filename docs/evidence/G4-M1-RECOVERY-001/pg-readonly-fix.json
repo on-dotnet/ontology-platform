@@ -1,0 +1,21 @@
+{
+  "command": [
+    "docker",
+    "--context",
+    "desktop-linux",
+    "exec",
+    "30d5643bf7033bc9084378d55c22069cfc5667eac24cbaf226c189344e8940d9",
+    "psql",
+    "-U",
+    "postgres",
+    "-d",
+    "fixture",
+    "-v",
+    "ON_ERROR_STOP=1",
+    "-Atc",
+    "REVOKE UPDATE ON pg_catalog.pg_settings FROM PUBLIC; SELECT has_table_privilege('fixture_reader','pg_catalog.pg_settings','UPDATE'),has_any_column_privilege('fixture_reader','pg_catalog.pg_settings','UPDATE');"
+  ],
+  "exitCode": 0,
+  "stdout": "REVOKE\nf|f\n",
+  "stderr": ""
+}

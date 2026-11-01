@@ -1,0 +1,414 @@
+{
+  "taskId": "G4-M1-RECOVERY-001",
+  "deleted": 6,
+  "objects": [
+    {
+      "name": "ontology-g4-m1-recovery-001-pg-first",
+      "id": "523cd0c968e8103bdd446f47f480bbe674343e8869dc8730e8d8b8b23321de73",
+      "before": {
+        "Status": "exited",
+        "Running": false,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 0,
+        "ExitCode": 143,
+        "Error": "",
+        "StartedAt": "2026-11-01T13:40:02.793203591Z",
+        "FinishedAt": "2026-11-01T13:41:17.223844667Z"
+      },
+      "mounts": [
+        {
+          "Type": "bind",
+          "Source": "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/artifacts/g4-m1-recovery-001/pg-tests",
+          "Destination": "/tests",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        },
+        {
+          "Type": "bind",
+          "Source": "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/adapter-input.json",
+          "Destination": "/run/secrets/adapter-input.json",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        },
+        {
+          "Type": "bind",
+          "Source": "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/ca.crt",
+          "Destination": "/run/secrets/ca.crt",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        },
+        {
+          "Type": "bind",
+          "Source": "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/reader-password",
+          "Destination": "/run/secrets/reader-password",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        },
+        {
+          "Type": "bind",
+          "Source": "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/wrong-ca.crt",
+          "Destination": "/run/secrets/wrong-ca.crt",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        }
+      ],
+      "command": [
+        "docker",
+        "container",
+        "rm",
+        "523cd0c968e8103bdd446f47f480bbe674343e8869dc8730e8d8b8b23321de73"
+      ],
+      "exitCode": 0,
+      "afterInspectExit": 1,
+      "afterError": "Error response from daemon: No such container: 523cd0c968e8103bdd446f47f480bbe674343e8869dc8730e8d8b8b23321de73"
+    },
+    {
+      "name": "ontology-g4-m1-recovery-001-pg-short",
+      "id": "483fc903a6dab0686fcd149b9f133dd33f675259d5145fa504a88efd4b52a137",
+      "before": {
+        "Status": "exited",
+        "Running": false,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 0,
+        "ExitCode": 2,
+        "Error": "",
+        "StartedAt": "2026-11-01T13:41:17.402781459Z",
+        "FinishedAt": "2026-11-01T13:41:17.665070376Z"
+      },
+      "mounts": [
+        {
+          "Type": "bind",
+          "Source": "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/artifacts/g4-m1-recovery-001/pg-tests",
+          "Destination": "/tests",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        },
+        {
+          "Type": "bind",
+          "Source": "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/adapter-input.json",
+          "Destination": "/run/secrets/adapter-input.json",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        },
+        {
+          "Type": "bind",
+          "Source": "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/ca.crt",
+          "Destination": "/run/secrets/ca.crt",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        },
+        {
+          "Type": "bind",
+          "Source": "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/reader-password",
+          "Destination": "/run/secrets/reader-password",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        },
+        {
+          "Type": "bind",
+          "Source": "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/wrong-ca.crt",
+          "Destination": "/run/secrets/wrong-ca.crt",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        }
+      ],
+      "command": [
+        "docker",
+        "container",
+        "rm",
+        "483fc903a6dab0686fcd149b9f133dd33f675259d5145fa504a88efd4b52a137"
+      ],
+      "exitCode": 0,
+      "afterInspectExit": 1,
+      "afterError": "Error response from daemon: No such container: 483fc903a6dab0686fcd149b9f133dd33f675259d5145fa504a88efd4b52a137"
+    },
+    {
+      "name": "ontology-g4-m1-recovery-001-pg-short-fixed",
+      "id": "27ce9e8221505bf5050205f3282deb1533e624bf0a6cdb039b73f7dcabd9e8f2",
+      "before": {
+        "Status": "exited",
+        "Running": false,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 0,
+        "ExitCode": 2,
+        "Error": "",
+        "StartedAt": "2026-11-01T13:43:08.470528719Z",
+        "FinishedAt": "2026-11-01T13:43:08.715182344Z"
+      },
+      "mounts": [
+        {
+          "Type": "bind",
+          "Source": "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/artifacts/g4-m1-recovery-001/pg-tests",
+          "Destination": "/tests",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        },
+        {
+          "Type": "bind",
+          "Source": "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/adapter-input.json",
+          "Destination": "/run/secrets/adapter-input.json",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        },
+        {
+          "Type": "bind",
+          "Source": "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/ca.crt",
+          "Destination": "/run/secrets/ca.crt",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        },
+        {
+          "Type": "bind",
+          "Source": "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/reader-password",
+          "Destination": "/run/secrets/reader-password",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        },
+        {
+          "Type": "bind",
+          "Source": "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/wrong-ca.crt",
+          "Destination": "/run/secrets/wrong-ca.crt",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        }
+      ],
+      "command": [
+        "docker",
+        "container",
+        "rm",
+        "27ce9e8221505bf5050205f3282deb1533e624bf0a6cdb039b73f7dcabd9e8f2"
+      ],
+      "exitCode": 0,
+      "afterInspectExit": 1,
+      "afterError": "Error response from daemon: No such container: 27ce9e8221505bf5050205f3282deb1533e624bf0a6cdb039b73f7dcabd9e8f2"
+    },
+    {
+      "name": "ontology-g4-m1-recovery-001-pg-guard-fixed",
+      "id": "dba0cc116daac168759e23057e5175d4829884b1728ebdf14d3ebfb70a84d758",
+      "before": {
+        "Status": "exited",
+        "Running": false,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 0,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-11-01T13:45:31.904679716Z",
+        "FinishedAt": "2026-11-01T13:45:32.195609841Z"
+      },
+      "mounts": [
+        {
+          "Type": "bind",
+          "Source": "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/artifacts/g4-m1-recovery-001/pg-tests",
+          "Destination": "/tests",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        },
+        {
+          "Type": "bind",
+          "Source": "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/adapter-input.json",
+          "Destination": "/run/secrets/adapter-input.json",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        },
+        {
+          "Type": "bind",
+          "Source": "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/ca.crt",
+          "Destination": "/run/secrets/ca.crt",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        },
+        {
+          "Type": "bind",
+          "Source": "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/reader-password",
+          "Destination": "/run/secrets/reader-password",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        },
+        {
+          "Type": "bind",
+          "Source": "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/wrong-ca.crt",
+          "Destination": "/run/secrets/wrong-ca.crt",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        }
+      ],
+      "command": [
+        "docker",
+        "container",
+        "rm",
+        "dba0cc116daac168759e23057e5175d4829884b1728ebdf14d3ebfb70a84d758"
+      ],
+      "exitCode": 0,
+      "afterInspectExit": 1,
+      "afterError": "Error response from daemon: No such container: dba0cc116daac168759e23057e5175d4829884b1728ebdf14d3ebfb70a84d758"
+    },
+    {
+      "name": "ontology-g4-m1-recovery-001-pg-normal",
+      "id": "fbf46a6d9f3eb0e3d7ffbfc62d586eaf0d269f3570fd776bffb6fc44d951ad0e",
+      "before": {
+        "Status": "exited",
+        "Running": false,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 0,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-11-01T13:46:26.505965088Z",
+        "FinishedAt": "2026-11-01T13:46:26.866171547Z"
+      },
+      "mounts": [
+        {
+          "Type": "bind",
+          "Source": "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/artifacts/g4-m1-recovery-001/pg-tests",
+          "Destination": "/tests",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        },
+        {
+          "Type": "bind",
+          "Source": "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/adapter-input.json",
+          "Destination": "/run/secrets/adapter-input.json",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        },
+        {
+          "Type": "bind",
+          "Source": "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/ca.crt",
+          "Destination": "/run/secrets/ca.crt",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        },
+        {
+          "Type": "bind",
+          "Source": "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/reader-password",
+          "Destination": "/run/secrets/reader-password",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        },
+        {
+          "Type": "bind",
+          "Source": "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/wrong-ca.crt",
+          "Destination": "/run/secrets/wrong-ca.crt",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        }
+      ],
+      "command": [
+        "docker",
+        "container",
+        "rm",
+        "fbf46a6d9f3eb0e3d7ffbfc62d586eaf0d269f3570fd776bffb6fc44d951ad0e"
+      ],
+      "exitCode": 0,
+      "afterInspectExit": 1,
+      "afterError": "Error response from daemon: No such container: fbf46a6d9f3eb0e3d7ffbfc62d586eaf0d269f3570fd776bffb6fc44d951ad0e"
+    },
+    {
+      "name": "ontology-g4-m1-recovery-001-pg-wrong-san",
+      "id": "06a82ebef264e9c207defba268721b55883b3db7112d9f537bc9d59996d6cfe9",
+      "before": {
+        "Status": "exited",
+        "Running": false,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 0,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-11-01T13:49:08.438447219Z",
+        "FinishedAt": "2026-11-01T13:49:08.634743802Z"
+      },
+      "mounts": [
+        {
+          "Type": "bind",
+          "Source": "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/artifacts/g4-m1-recovery-001/pg-tests",
+          "Destination": "/tests",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        },
+        {
+          "Type": "bind",
+          "Source": "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/adapter-input.json",
+          "Destination": "/run/secrets/adapter-input.json",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        },
+        {
+          "Type": "bind",
+          "Source": "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/ca.crt",
+          "Destination": "/run/secrets/ca.crt",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        },
+        {
+          "Type": "bind",
+          "Source": "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/reader-password",
+          "Destination": "/run/secrets/reader-password",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        },
+        {
+          "Type": "bind",
+          "Source": "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/wrong-ca.crt",
+          "Destination": "/run/secrets/wrong-ca.crt",
+          "Mode": "ro",
+          "RW": false,
+          "Propagation": "rprivate"
+        }
+      ],
+      "command": [
+        "docker",
+        "container",
+        "rm",
+        "06a82ebef264e9c207defba268721b55883b3db7112d9f537bc9d59996d6cfe9"
+      ],
+      "exitCode": 0,
+      "afterInspectExit": 1,
+      "afterError": "Error response from daemon: No such container: 06a82ebef264e9c207defba268721b55883b3db7112d9f537bc9d59996d6cfe9"
+    }
+  ]
+}

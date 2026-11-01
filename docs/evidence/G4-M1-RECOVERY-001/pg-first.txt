@@ -1,0 +1,13 @@
+ Container ontology-g4-m1-recovery-001-pg-first Creating 
+ Container ontology-g4-m1-recovery-001-pg-first Created 
+Unhandled exception. System.IO.IOException: Read-only file system : '/tests/TestResults'
+   at System.IO.FileSystem.CreateDirectory(String fullPath, UnixFileMode unixCreateMode)
+   at System.IO.Directory.CreateDirectory(String path)
+   at Microsoft.Testing.Platform.Helpers.SystemFileSystem.CreateDirectory(String path)
+   at Microsoft.Testing.Platform.Configurations.AggregatedConfiguration.CheckTestResultsDirectoryOverrideAndCreateItAsync(IFileLoggerProvider fileLoggerProvider)
+   at Microsoft.Testing.Platform.Hosts.TestHostBuilder.SetupCommonServicesAsync(ApplicationLoggingState loggingState, TestApplicationOptions testApplicationOptions, IUnhandledExceptionsHandler unhandledExceptionsHandler, DateTimeOffset createBuilderStart)
+   at Microsoft.Testing.Platform.Hosts.TestHostBuilder.BuildAsync(ApplicationLoggingState loggingState, TestApplicationOptions testApplicationOptions, IUnhandledExceptionsHandler unhandledExceptionsHandler, DateTimeOffset createBuilderStart)
+   at Microsoft.Testing.Platform.Builder.TestApplicationBuilder.BuildAsync()
+   at OntologyPlatform.ConnectionsTests.MicrosoftTestingPlatformApplication.RunAsync(String[] args) in /Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/backend/tests/OntologyPlatform.ConnectionsTests/obj/Release/net10.0/MicrosoftTestingPlatformEntryPoint.cs:line 16
+   at OntologyPlatform.ConnectionsTests.MicrosoftTestingPlatformEntryPoint.<Main>(String[] args)
+

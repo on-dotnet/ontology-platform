@@ -15,7 +15,7 @@ import urllib.request
 LIMIT = 3 * 1024**3
 DISK_LIMIT = 12 * 1024**3
 # 首轮未知CDN一律暂停，非作者审核准确主机后才扩展此表。
-HOSTS = {'registry-1.docker.io', 'auth.docker.io', 'quay.io', 'mcr.microsoft.com', 'production.cloudfront.docker.com'}
+HOSTS = {'registry-1.docker.io', 'auth.docker.io', 'quay.io', 'mcr.microsoft.com', 'production.cloudfront.docker.com', 'cdn01.quay.io', 'westus.data.mcr.microsoft.com'}
 MEDIA = 'application/vnd.oci.image.index.v1+json, application/vnd.oci.image.manifest.v1+json, application/vnd.docker.distribution.manifest.list.v2+json, application/vnd.docker.distribution.manifest.v2+json'
 
 
@@ -50,7 +50,7 @@ class Download:
         if size + additional > DISK_LIMIT or shutil.disk_usage(self.root).free < additional + 4 * 1024**3:
             raise RuntimeError('TASK_DISK_BUDGET_EXCEEDED')
 
-    def get(self, url, maximum, token=None, registry=None):
+    def get(self, url, maximum, token=None, registry=None, deadline=180):
         """请求前按最坏正文及64KiB协议开销预留，失败不退预算，不自动重试。"""
         for hop in range(5):
             parsed = urllib.parse.urlsplit(url)
@@ -90,7 +90,7 @@ class Download:
             data = bytearray(); started = time.monotonic()
             try:
                 while True:
-                    if time.monotonic() - started > 180:
+                    if time.monotonic() - started > deadline:
                         raise RuntimeError('RESPONSE_TIME_BUDGET')
                     block = response.read(min(1024**2, maximum + 1 - len(data)))
                     if not block: break
@@ -112,7 +112,21 @@ class Download:
         if target.exists():
             data = target.read_bytes()
         else:
-            data = self.get(url, size, token, registry)
+            # 该层实测180秒不足；独立Review只准此准确层一次360秒重试。
+            deadline = 180
+            if digest == 'sha256:88202ac232a9ad53c5b04e32b6f3f6b4498772f8d069fbbde1d007f8dd31d981':
+                if self.state.get('keycloakExtendedAttempted'):
+                    raise RuntimeError('REPEATED_EXPENSIVE_FAILURE_BLOCKED')
+                self.state['keycloakExtendedAttempted'] = True
+                self.save()
+                deadline = 360
+            if digest == 'sha256:59a63478dc4bc439321221551264a8824b65f489044e0ed81b8005da691126de':
+                if self.state.get('aspnetExtendedAttempted'):
+                    raise RuntimeError('REPEATED_EXPENSIVE_FAILURE_BLOCKED')
+                self.state['aspnetExtendedAttempted'] = True
+                self.save()
+                deadline = 360
+            data = self.get(url, size, token, registry, deadline)
         if len(data) != size or hashlib.sha256(data).hexdigest() != digest[7:]:
             raise RuntimeError('CONTENT_IDENTITY_MISMATCH')
         target.parent.mkdir(parents=True, exist_ok=True)

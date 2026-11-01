@@ -1,0 +1,29 @@
+{
+  "status": "PASS",
+  "checks": [
+    {
+      "sql": "CREATE SEQUENCE production.recovery_readonly_guard; GRANT USAGE ON SEQUENCE production.recovery_readonly_guard TO fixture_reader;",
+      "exitCode": 0,
+      "stdout": "CREATE SEQUENCE\nGRANT\n",
+      "stderr": ""
+    },
+    {
+      "sql": "SET SESSION AUTHORIZATION fixture_reader; SET search_path=pg_catalog; BEGIN READ ONLY; \n        WITH reachable AS (\n            SELECT r.* FROM pg_catalog.pg_roles r\n            WHERE r.rolname = current_user OR pg_catalog.pg_has_role(current_user, r.oid, 'MEMBER')\n        )\n        SELECT current_user = 'fixture_reader' AND session_user = 'fixture_reader'\n            AND current_database() = 'fixture'\n            AND current_setting('transaction_read_only') = 'on'\n            AND NOT EXISTS (\n                SELECT 1 FROM reachable r\n                WHERE r.rolsuper OR r.rolcreatedb OR r.rolcreaterole OR r.rolbypassrls OR r.rolreplication\n                    OR r.rolname IN ('pg_write_all_data', 'pg_write_server_files', 'pg_execute_server_program',\n                        'pg_signal_backend', 'pg_checkpoint', 'pg_maintain', 'pg_database_owner')\n                    OR pg_catalog.has_database_privilege(r.oid, current_database(), 'CREATE,TEMP')\n                    OR EXISTS (SELECT 1 FROM pg_catalog.pg_shdepend d WHERE d.refclassid = 'pg_catalog.pg_authid'::regclass\n                        AND d.refobjid = r.oid AND d.deptype = 'o')\n                    OR EXISTS (SELECT 1 FROM pg_catalog.pg_namespace n\n                        WHERE n.nspowner = r.oid OR pg_catalog.has_schema_privilege(r.oid, n.oid, 'CREATE'))\n                    OR EXISTS (SELECT 1 FROM pg_catalog.pg_class c WHERE c.relowner = r.oid)\n                    OR EXISTS (SELECT 1 FROM pg_catalog.pg_proc p WHERE p.proowner = r.oid)\n                    OR EXISTS (SELECT 1 FROM pg_catalog.pg_type t WHERE t.typowner = r.oid)\n                    OR EXISTS (SELECT 1 FROM pg_catalog.pg_class c\n                        WHERE c.relkind IN ('r','p','v','m','f') AND (\n                            pg_catalog.has_table_privilege(r.oid, c.oid, 'INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER,MAINTAIN')\n                            OR pg_catalog.has_any_column_privilege(r.oid, c.oid, 'INSERT,UPDATE,REFERENCES')))\n                    OR EXISTS (SELECT 1 FROM pg_catalog.pg_class c\n                        WHERE CASE WHEN c.relkind = 'S' THEN pg_catalog.has_sequence_privilege(r.oid, c.oid, 'USAGE,UPDATE') ELSE false END)\n            )\n        ; ROLLBACK;",
+      "exitCode": 0,
+      "stdout": "SET\nSET\nBEGIN\nf\nROLLBACK\n",
+      "stderr": ""
+    },
+    {
+      "sql": "DROP SEQUENCE IF EXISTS production.recovery_readonly_guard;",
+      "exitCode": 0,
+      "stdout": "DROP SEQUENCE\n",
+      "stderr": ""
+    },
+    {
+      "sql": "SET SESSION AUTHORIZATION fixture_reader; SET search_path=pg_catalog; BEGIN READ ONLY; \n        WITH reachable AS (\n            SELECT r.* FROM pg_catalog.pg_roles r\n            WHERE r.rolname = current_user OR pg_catalog.pg_has_role(current_user, r.oid, 'MEMBER')\n        )\n        SELECT current_user = 'fixture_reader' AND session_user = 'fixture_reader'\n            AND current_database() = 'fixture'\n            AND current_setting('transaction_read_only') = 'on'\n            AND NOT EXISTS (\n                SELECT 1 FROM reachable r\n                WHERE r.rolsuper OR r.rolcreatedb OR r.rolcreaterole OR r.rolbypassrls OR r.rolreplication\n                    OR r.rolname IN ('pg_write_all_data', 'pg_write_server_files', 'pg_execute_server_program',\n                        'pg_signal_backend', 'pg_checkpoint', 'pg_maintain', 'pg_database_owner')\n                    OR pg_catalog.has_database_privilege(r.oid, current_database(), 'CREATE,TEMP')\n                    OR EXISTS (SELECT 1 FROM pg_catalog.pg_shdepend d WHERE d.refclassid = 'pg_catalog.pg_authid'::regclass\n                        AND d.refobjid = r.oid AND d.deptype = 'o')\n                    OR EXISTS (SELECT 1 FROM pg_catalog.pg_namespace n\n                        WHERE n.nspowner = r.oid OR pg_catalog.has_schema_privilege(r.oid, n.oid, 'CREATE'))\n                    OR EXISTS (SELECT 1 FROM pg_catalog.pg_class c WHERE c.relowner = r.oid)\n                    OR EXISTS (SELECT 1 FROM pg_catalog.pg_proc p WHERE p.proowner = r.oid)\n                    OR EXISTS (SELECT 1 FROM pg_catalog.pg_type t WHERE t.typowner = r.oid)\n                    OR EXISTS (SELECT 1 FROM pg_catalog.pg_class c\n                        WHERE c.relkind IN ('r','p','v','m','f') AND (\n                            pg_catalog.has_table_privilege(r.oid, c.oid, 'INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER,MAINTAIN')\n                            OR pg_catalog.has_any_column_privilege(r.oid, c.oid, 'INSERT,UPDATE,REFERENCES')))\n                    OR EXISTS (SELECT 1 FROM pg_catalog.pg_class c\n                        WHERE CASE WHEN c.relkind = 'S' THEN pg_catalog.has_sequence_privilege(r.oid, c.oid, 'USAGE,UPDATE') ELSE false END)\n            )\n        ; ROLLBACK;",
+      "exitCode": 0,
+      "stdout": "SET\nSET\nBEGIN\nt\nROLLBACK\n",
+      "stderr": ""
+    }
+  ]
+}

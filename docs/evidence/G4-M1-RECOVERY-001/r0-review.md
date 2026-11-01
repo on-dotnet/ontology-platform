@@ -15,3 +15,19 @@ Reviewer /root/recovery_reviewer，2026-11-01，实际模型/effort由宿主继�
 ## CDN增量独立准入
 
 Reviewer核实首个PG config GET的官方registry 307指向production.cloudfront.docker.com；执行器请求前拒绝，reserved17,396,932、received19,165，未读层。准许只追加此host，复用原budget不退预留。官方依据 https://docs.docker.com/docker-hub/release-notes/ （2026-05-20）及 https://docs.docker.com/desktop/enterprise/allow-list/ 。不向CDN转发Registry认证头，其他host仍停止。
+
+Quay增量：Reviewer核对quay.io config实际HTTP302（Master消息曾误写307，本记录纠正）指向cdn01.quay.io，reserved342,290,545/received161,160,812，未读Keycloak层。Red Hat官方网络文档明确此镜像CDN，准许只追加HTTPS443精确cdn01.quay.io；同预算和认证隔离保持。来源 https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.6/plan-assembly_network_ports_protocols 及 https://docs.redhat.com/en/documentation/openshift_container_platform/4.21/observability/installation_configuration/configuring-firewall 。
+
+## Keycloak定向吞吐修正
+
+层sha256:88202ac232a9ad53c5b04e32b6f3f6b4498772f8d069fbbde1d007f8dd31d981（173795289 bytes）原180秒实际读123731968 bytes后RESPONSE_TIME_BUDGET。已保存小层复用，原预留不退；原账本该request的STARTED保留历史原值，命令exit1见image-1-download-retry1.txt。1MiB/20秒短Range复现实际206、8.1715秒成功；Content-Range通过脚本当时断言但未保存原头，Reviewer不声称独立核实该头。非作者准许仅此层一次360秒重试，socket20秒和其余请求180秒不变；脚本持久keycloakExtendedAttempted拒绝重复昂贵失败。
+
+MCR增量：Reviewer独立核对mcr.microsoft.com config GET实际307指向westus.data.mcr.microsoft.com，执行器在请求新域前拒绝，失败预留保持。Microsoft官方 https://learn.microsoft.com/en-us/azure/iot-edge/production-checklist 说明data.mcr.microsoft.com内容交付端点；仅准许HTTPS443准确westus.data.mcr.microsoft.com，不加通配。跨域不转发Authorization，仍须ASP.NET R3。
+
+## ASP.NET定向吞吐修正
+
+Reviewer核对sha256:59a63478dc4bc439321221551264a8824b65f489044e0ed81b8005da691126de，34455908bytes，原180秒读取23068672bytes，短Range206/1048576bytes/5.86142125秒及已留Content-Range正确。仅准此层一次360秒、持久aspnetExtendedAttempted；其余180/socket20和原失败预算保持。再次失败停止。
+
+## 精确第三方NOTICE
+
+附件已指定Keycloak26.8.1许可URL的GitHub302必要跳转release-assets.githubusercontent.com经非作者批准，仅该URL/HTTPS443/≤8MiB/原长度与SHA，计同账本，不扩registry白名单、不跟随HTML链接。官方分发依据 https://docs.github.com/en/actions/reference/runners/github-hosted-runners 。实际取得7523238bytes、SHA25614c17647c43f27315d148812a0be6b97b3cc9585463588ebbe67f7282cfe661d，完全匹配历史绑定；不自动构成R3通过。

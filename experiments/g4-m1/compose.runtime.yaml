@@ -1,0 +1,119 @@
+x-labels: &labels
+  ontology.task-id: G4-M1-RECOVERY-001
+  ontology.run-id: ${G4_RUN_ID:?explicit task run required}
+  ontology.synthetic: "true"
+x-security: &security
+  platform: linux/arm64
+  pull_policy: never
+  read_only: true
+  security_opt: [no-new-privileges:true]
+  cap_drop: [ALL]
+  pids_limit: 256
+  cpus: 2
+  labels: *labels
+services:
+  platform-pg:
+    <<: *security
+    image: postgres@sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437
+    mem_limit: 768m
+    cap_add: [CHOWN, SETUID, SETGID, DAC_OVERRIDE, FOWNER]
+    environment:
+      POSTGRES_DB: platform
+      POSTGRES_USER: platform
+      POSTGRES_PASSWORD_FILE: /run/secrets/platform-password
+    entrypoint: [/bin/sh, -ec]
+    command: ['chown postgres:postgres /var/lib/postgresql; exec /usr/local/bin/docker-entrypoint.sh postgres -c log_statement=none -c log_min_error_statement=panic']
+    volumes:
+      - platform-data:/var/lib/postgresql
+      - ${G4_PRIVATE_DIR}/platform-password:/run/secrets/platform-password:ro
+    tmpfs: ["/tmp:size=16m,mode=1777", "/var/run/postgresql:size=4m,mode=3775,uid=999,gid=999"]
+    networks: [front]
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U platform -d platform]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+  keycloak-test:
+    <<: *security
+    image: quay.io/keycloak/keycloak@sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4
+    mem_limit: 1g
+    user: "${G4_HOST_UID}:${G4_HOST_GID}"
+    entrypoint: [/bin/bash, -ec]
+    command:
+      - |
+        runtime=/opt/keycloak/data/runtime
+        if [ ! -f "$$runtime/.recovery-built" ]; then
+          mkdir -p "$$runtime"
+          for item in bin conf lib providers themes LICENSE.txt README.md version.txt; do
+            if [ -e "/opt/keycloak/$$item" ]; then cp -R "/opt/keycloak/$$item" "$$runtime/"; fi
+          done
+          chmod -R u+rwX "$$runtime"
+          "$$runtime/bin/kc.sh" build --db=dev-file
+          touch "$$runtime/.recovery-built"
+        fi
+        export KC_BOOTSTRAP_ADMIN_USERNAME=wave2-bootstrap
+        export KC_BOOTSTRAP_ADMIN_PASSWORD="$$(cat /run/secrets/keycloak-password)"
+        exec "$$runtime/bin/kc.sh" start --optimized --http-enabled=true --http-port=8080 --hostname=http://localhost:15180 --hostname-strict=true --http-access-log-enabled=false
+    environment:
+      JAVA_OPTS_KC_HEAP: -Xms128m -Xmx512m
+    volumes:
+      - keycloak-data:/opt/keycloak/data
+      - ${G4_PRIVATE_DIR}/keycloak-password:/run/secrets/keycloak-password:ro
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+    networks: [front]
+  api:
+    <<: *security
+    image: mcr.microsoft.com/dotnet/aspnet@sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55
+    mem_limit: 1g
+    user: "${G4_HOST_UID}:${G4_HOST_GID}"
+    working_dir: /private/api
+    entrypoint: [/bin/sh, -ec]
+    command: ['while [ ! -f /private/api/appsettings.json ]; do sleep 1; done; exec dotnet /app/OntologyPlatform.Api.dll']
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://0.0.0.0:15100
+      DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+      DOTNET_EnableDiagnostics: "0"
+    volumes:
+      - ${G4_API_OUTPUT}:/app:ro
+      - ${G4_PRIVATE_DIR}/api:/private/api:ro
+      - api-keyring:/keyring
+    tmpfs: ["/tmp:size=64m,mode=1777"]
+    networks: [source, front]
+  web:
+    <<: *security
+    image: node@sha256:a52166d89cfcc66ea62d10535ca712d161cece5d77ff4cfa758866b6b75ccb3f
+    mem_limit: 1g
+    user: "${G4_HOST_UID}:${G4_HOST_GID}"
+    network_mode: service:api
+    entrypoint: [/bin/sh, -ec]
+    command: ['node /run/loopback-proxy.mjs & proxy=$$!; trap "kill $$proxy 2>/dev/null || true" EXIT; node /run/web-production.mjs ${G4_ROOT}/apps/web']
+    environment:
+      NEXT_TELEMETRY_DISABLED: "1"
+      NODE_ENV: production
+    volumes:
+      - ${G4_ROOT}/apps/web:${G4_ROOT}/apps/web:ro
+      - ${G4_SHARED_WEB_MODULES}:${G4_SHARED_WEB_MODULES}:ro
+      - ${G4_SHARED_ROOT_MODULES}:${G4_SHARED_ROOT_MODULES}:ro
+      - ${G4_ROOT}/experiments/g4-m1/loopback-proxy.mjs:/run/loopback-proxy.mjs:ro
+      - ${G4_ROOT}/experiments/g4-m1/stdio-relay.mjs:/run/stdio-relay.mjs:ro
+      - ${G4_ROOT}/experiments/g4-m1/web-production.mjs:/run/web-production.mjs:ro
+    tmpfs: ["/tmp:size=32m,mode=1777"]
+networks:
+  front:
+    internal: true
+    labels: *labels
+volumes:
+  platform-data:
+    driver: local
+    driver_opts: {type: tmpfs, device: tmpfs, o: "size=512m,mode=0700"}
+    labels: *labels
+  keycloak-data:
+    driver: local
+    driver_opts: {type: tmpfs, device: tmpfs, o: "size=512m,mode=0700,uid=${G4_HOST_UID},gid=${G4_HOST_GID}"}
+    labels: *labels
+  api-keyring:
+    driver: local
+    driver_opts: {type: tmpfs, device: tmpfs, o: "size=16m,mode=0700,uid=${G4_HOST_UID},gid=${G4_HOST_GID}"}
+    labels: *labels
