@@ -1,0 +1,1700 @@
+{
+  "schemaVersion": 1,
+  "taskId": "G4-M1-RECOVERY-001",
+  "startedAtUtc": "2026-11-01T14:32:07.467Z",
+  "cases": {
+    "M1-U01": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U02": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U03": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U04": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U05": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "aggregate_requires_loading_timeout_cancel_partial_and_refresh_evidence_across_controlled_runs"
+    },
+    "M1-U06": {
+      "status": "PASS",
+      "observed": [
+        "light_wide_stable_viewport_and_unobstructed_controls",
+        "light_narrow_stable_viewport_and_unobstructed_controls",
+        "dark_wide_stable_viewport_and_unobstructed_controls",
+        "dark_narrow_stable_viewport_and_unobstructed_controls",
+        "screenshots_require_independent_visual_review"
+      ]
+    }
+  },
+  "http": [
+    {
+      "method": "GET",
+      "route": "/auth/csrf",
+      "status": 200,
+      "durationMs": 78
+    }
+  ],
+  "screenshots": [
+    "light-wide.png",
+    "light-narrow.png",
+    "dark-wide.png",
+    "dark-narrow.png"
+  ],
+  "productExecution": true,
+  "runId": "recovery-20261101-01",
+  "scenario": "layout-only",
+  "driverSha256": "522f2a5c27c1aac0e93b6e670b0b937faccddc914b3f2834060a9da709097f08",
+  "layout": [
+    {
+      "theme": "light",
+      "size": "wide",
+      "moment": "after_resize_before_settle",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "documentWidth": 1440,
+      "sidebar": {
+        "count": 1,
+        "bounds": {
+          "x": 0,
+          "y": 0,
+          "width": 258,
+          "height": 1000,
+          "left": 0,
+          "right": 258,
+          "top": 0,
+          "bottom": 1000
+        },
+        "open": false,
+        "inert": false,
+        "transform": "none"
+      },
+      "topbarCount": 1,
+      "targets": [
+        {
+          "name": "heading",
+          "count": 1,
+          "bounds": {
+            "x": 296,
+            "y": 116,
+            "width": 357,
+            "height": 40.59,
+            "left": 296,
+            "right": 653,
+            "top": 116,
+            "bottom": 156.59
+          },
+          "hits": [
+            {
+              "x": 367.4,
+              "y": 136.3,
+              "targetOrDescendant": true,
+              "hitTag": "H1"
+            },
+            {
+              "x": 474.5,
+              "y": 136.3,
+              "targetOrDescendant": true,
+              "hitTag": "H1"
+            },
+            {
+              "x": 581.6,
+              "y": 136.3,
+              "targetOrDescendant": true,
+              "hitTag": "H1"
+            }
+          ],
+          "unobstructed": true
+        },
+        {
+          "name": "type_filter",
+          "count": 1,
+          "bounds": {
+            "x": 296,
+            "y": 246.38,
+            "width": 150,
+            "height": 42,
+            "left": 296,
+            "right": 446,
+            "top": 246.38,
+            "bottom": 288.38
+          },
+          "hits": [
+            {
+              "x": 326,
+              "y": 267.38,
+              "targetOrDescendant": true,
+              "hitTag": "SELECT"
+            },
+            {
+              "x": 371,
+              "y": 267.38,
+              "targetOrDescendant": true,
+              "hitTag": "SELECT"
+            },
+            {
+              "x": 416,
+              "y": 267.38,
+              "targetOrDescendant": true,
+              "hitTag": "SELECT"
+            }
+          ],
+          "unobstructed": true
+        },
+        {
+          "name": "state_filter",
+          "count": 1,
+          "bounds": {
+            "x": 458,
+            "y": 246.38,
+            "width": 150,
+            "height": 42,
+            "left": 458,
+            "right": 608,
+            "top": 246.38,
+            "bottom": 288.38
+          },
+          "hits": [
+            {
+              "x": 488,
+              "y": 267.38,
+              "targetOrDescendant": true,
+              "hitTag": "SELECT"
+            },
+            {
+              "x": 533,
+              "y": 267.38,
+              "targetOrDescendant": true,
+              "hitTag": "SELECT"
+            },
+            {
+              "x": 578,
+              "y": 267.38,
+              "targetOrDescendant": true,
+              "hitTag": "SELECT"
+            }
+          ],
+          "unobstructed": true
+        },
+        {
+          "name": "create_action",
+          "count": 1,
+          "bounds": {
+            "x": 1320.98,
+            "y": 127.89,
+            "width": 81.02,
+            "height": 39.19,
+            "left": 1320.98,
+            "right": 1402,
+            "top": 127.89,
+            "bottom": 167.08
+          },
+          "hits": [
+            {
+              "x": 1337.19,
+              "y": 147.48,
+              "targetOrDescendant": true,
+              "hitTag": "A"
+            },
+            {
+              "x": 1361.49,
+              "y": 147.48,
+              "targetOrDescendant": true,
+              "hitTag": "A"
+            },
+            {
+              "x": 1385.8,
+              "y": 147.48,
+              "targetOrDescendant": true,
+              "hitTag": "A"
+            }
+          ],
+          "unobstructed": true
+        },
+        {
+          "name": "first_connection_name",
+          "count": 0,
+          "bounds": null,
+          "hits": [],
+          "unobstructed": false
+        }
+      ]
+    },
+    {
+      "theme": "light",
+      "size": "wide",
+      "moment": "stable_before_screenshot",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "documentWidth": 1440,
+      "sidebar": {
+        "count": 1,
+        "bounds": {
+          "x": 0,
+          "y": 0,
+          "width": 258,
+          "height": 1000,
+          "left": 0,
+          "right": 258,
+          "top": 0,
+          "bottom": 1000
+        },
+        "open": false,
+        "inert": false,
+        "transform": "none"
+      },
+      "topbarCount": 1,
+      "targets": [
+        {
+          "name": "heading",
+          "count": 1,
+          "bounds": {
+            "x": 296,
+            "y": 116,
+            "width": 357,
+            "height": 40.59,
+            "left": 296,
+            "right": 653,
+            "top": 116,
+            "bottom": 156.59
+          },
+          "hits": [
+            {
+              "x": 367.4,
+              "y": 136.3,
+              "targetOrDescendant": true,
+              "hitTag": "H1"
+            },
+            {
+              "x": 474.5,
+              "y": 136.3,
+              "targetOrDescendant": true,
+              "hitTag": "H1"
+            },
+            {
+              "x": 581.6,
+              "y": 136.3,
+              "targetOrDescendant": true,
+              "hitTag": "H1"
+            }
+          ],
+          "unobstructed": true
+        },
+        {
+          "name": "type_filter",
+          "count": 1,
+          "bounds": {
+            "x": 296,
+            "y": 246.38,
+            "width": 150,
+            "height": 42,
+            "left": 296,
+            "right": 446,
+            "top": 246.38,
+            "bottom": 288.38
+          },
+          "hits": [
+            {
+              "x": 326,
+              "y": 267.38,
+              "targetOrDescendant": true,
+              "hitTag": "SELECT"
+            },
+            {
+              "x": 371,
+              "y": 267.38,
+              "targetOrDescendant": true,
+              "hitTag": "SELECT"
+            },
+            {
+              "x": 416,
+              "y": 267.38,
+              "targetOrDescendant": true,
+              "hitTag": "SELECT"
+            }
+          ],
+          "unobstructed": true
+        },
+        {
+          "name": "state_filter",
+          "count": 1,
+          "bounds": {
+            "x": 458,
+            "y": 246.38,
+            "width": 150,
+            "height": 42,
+            "left": 458,
+            "right": 608,
+            "top": 246.38,
+            "bottom": 288.38
+          },
+          "hits": [
+            {
+              "x": 488,
+              "y": 267.38,
+              "targetOrDescendant": true,
+              "hitTag": "SELECT"
+            },
+            {
+              "x": 533,
+              "y": 267.38,
+              "targetOrDescendant": true,
+              "hitTag": "SELECT"
+            },
+            {
+              "x": 578,
+              "y": 267.38,
+              "targetOrDescendant": true,
+              "hitTag": "SELECT"
+            }
+          ],
+          "unobstructed": true
+        },
+        {
+          "name": "create_action",
+          "count": 1,
+          "bounds": {
+            "x": 1320.98,
+            "y": 127.89,
+            "width": 81.02,
+            "height": 39.19,
+            "left": 1320.98,
+            "right": 1402,
+            "top": 127.89,
+            "bottom": 167.08
+          },
+          "hits": [
+            {
+              "x": 1337.19,
+              "y": 147.48,
+              "targetOrDescendant": true,
+              "hitTag": "A"
+            },
+            {
+              "x": 1361.49,
+              "y": 147.48,
+              "targetOrDescendant": true,
+              "hitTag": "A"
+            },
+            {
+              "x": 1385.8,
+              "y": 147.48,
+              "targetOrDescendant": true,
+              "hitTag": "A"
+            }
+          ],
+          "unobstructed": true
+        },
+        {
+          "name": "first_connection_name",
+          "count": 1,
+          "bounds": {
+            "x": 334,
+            "y": 413.16,
+            "width": 180.69,
+            "height": 18,
+            "left": 334,
+            "right": 514.69,
+            "top": 413.16,
+            "bottom": 431.16
+          },
+          "hits": [
+            {
+              "x": 370.14,
+              "y": 422.16,
+              "targetOrDescendant": true,
+              "hitTag": "A"
+            },
+            {
+              "x": 424.34,
+              "y": 422.16,
+              "targetOrDescendant": true,
+              "hitTag": "A"
+            },
+            {
+              "x": 478.55,
+              "y": 422.16,
+              "targetOrDescendant": true,
+              "hitTag": "A"
+            }
+          ],
+          "unobstructed": true
+        }
+      ]
+    },
+    {
+      "theme": "light",
+      "size": "narrow",
+      "moment": "after_resize_before_settle",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "documentWidth": 390,
+      "sidebar": {
+        "count": 1,
+        "bounds": {
+          "x": 0,
+          "y": 0,
+          "width": 230,
+          "height": 844,
+          "left": 0,
+          "right": 230,
+          "top": 0,
+          "bottom": 844
+        },
+        "open": false,
+        "inert": false,
+        "transform": "matrix(1, 0, 0, 1, 0, 0)"
+      },
+      "topbarCount": 1,
+      "targets": [
+        {
+          "name": "heading",
+          "count": 1,
+          "bounds": {
+            "x": 16,
+            "y": 94,
+            "width": 357,
+            "height": 34.8,
+            "left": 16,
+            "right": 373,
+            "top": 94,
+            "bottom": 128.8
+          },
+          "hits": [
+            {
+              "x": 87.4,
+              "y": 111.4,
+              "targetOrDescendant": false,
+              "hitTag": "DIV"
+            },
+            {
+              "x": 194.5,
+              "y": 111.4,
+              "targetOrDescendant": false,
+              "hitTag": "DIV"
+            },
+            {
+              "x": 301.6,
+              "y": 111.4,
+              "targetOrDescendant": true,
+              "hitTag": "H1"
+            }
+          ],
+          "unobstructed": false
+        },
+        {
+          "name": "type_filter",
+          "count": 1,
+          "bounds": {
+            "x": 16,
+            "y": 273.77,
+            "width": 358,
+            "height": 42,
+            "left": 16,
+            "right": 374,
+            "top": 273.77,
+            "bottom": 315.77
+          },
+          "hits": [
+            {
+              "x": 87.6,
+              "y": 294.77,
+              "targetOrDescendant": false,
+              "hitTag": "SPAN"
+            },
+            {
+              "x": 195,
+              "y": 294.77,
+              "targetOrDescendant": false,
+              "hitTag": "A"
+            },
+            {
+              "x": 302.4,
+              "y": 294.77,
+              "targetOrDescendant": true,
+              "hitTag": "SELECT"
+            }
+          ],
+          "unobstructed": false
+        },
+        {
+          "name": "state_filter",
+          "count": 1,
+          "bounds": {
+            "x": 16,
+            "y": 357.16,
+            "width": 358,
+            "height": 42,
+            "left": 16,
+            "right": 374,
+            "top": 357.16,
+            "bottom": 399.16
+          },
+          "hits": [
+            {
+              "x": 87.6,
+              "y": 378.16,
+              "targetOrDescendant": false,
+              "hitTag": "NAV"
+            },
+            {
+              "x": 195,
+              "y": 378.16,
+              "targetOrDescendant": false,
+              "hitTag": "NAV"
+            },
+            {
+              "x": 302.4,
+              "y": 378.16,
+              "targetOrDescendant": true,
+              "hitTag": "SELECT"
+            }
+          ],
+          "unobstructed": false
+        },
+        {
+          "name": "create_action",
+          "count": 1,
+          "bounds": {
+            "x": 16,
+            "y": 167.19,
+            "width": 81.02,
+            "height": 39.19,
+            "left": 16,
+            "right": 97.02,
+            "top": 167.19,
+            "bottom": 206.38
+          },
+          "hits": [
+            {
+              "x": 32.2,
+              "y": 186.78,
+              "targetOrDescendant": false,
+              "hitTag": "ASIDE"
+            },
+            {
+              "x": 56.51,
+              "y": 186.78,
+              "targetOrDescendant": false,
+              "hitTag": "ASIDE"
+            },
+            {
+              "x": 80.81,
+              "y": 186.78,
+              "targetOrDescendant": false,
+              "hitTag": "ASIDE"
+            }
+          ],
+          "unobstructed": false
+        },
+        {
+          "name": "first_connection_name",
+          "count": 1,
+          "bounds": {
+            "x": 46,
+            "y": 570.33,
+            "width": 180.69,
+            "height": 18,
+            "left": 46,
+            "right": 226.69,
+            "top": 570.33,
+            "bottom": 588.33
+          },
+          "hits": [
+            {
+              "x": 82.14,
+              "y": 579.33,
+              "targetOrDescendant": false,
+              "hitTag": "DIV"
+            },
+            {
+              "x": 136.34,
+              "y": 579.33,
+              "targetOrDescendant": false,
+              "hitTag": "DIV"
+            },
+            {
+              "x": 190.55,
+              "y": 579.33,
+              "targetOrDescendant": false,
+              "hitTag": "DIV"
+            }
+          ],
+          "unobstructed": false
+        }
+      ]
+    },
+    {
+      "theme": "light",
+      "size": "narrow",
+      "moment": "stable_before_screenshot",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "documentWidth": 390,
+      "sidebar": {
+        "count": 1,
+        "bounds": {
+          "x": -230,
+          "y": 0,
+          "width": 230,
+          "height": 844,
+          "left": -230,
+          "right": 0,
+          "top": 0,
+          "bottom": 844
+        },
+        "open": false,
+        "inert": true,
+        "transform": "matrix(1, 0, 0, 1, -230, 0)"
+      },
+      "topbarCount": 1,
+      "targets": [
+        {
+          "name": "heading",
+          "count": 1,
+          "bounds": {
+            "x": 16,
+            "y": 94,
+            "width": 357,
+            "height": 34.8,
+            "left": 16,
+            "right": 373,
+            "top": 94,
+            "bottom": 128.8
+          },
+          "hits": [
+            {
+              "x": 87.4,
+              "y": 111.4,
+              "targetOrDescendant": true,
+              "hitTag": "H1"
+            },
+            {
+              "x": 194.5,
+              "y": 111.4,
+              "targetOrDescendant": true,
+              "hitTag": "H1"
+            },
+            {
+              "x": 301.6,
+              "y": 111.4,
+              "targetOrDescendant": true,
+              "hitTag": "H1"
+            }
+          ],
+          "unobstructed": true
+        },
+        {
+          "name": "type_filter",
+          "count": 1,
+          "bounds": {
+            "x": 16,
+            "y": 273.77,
+            "width": 358,
+            "height": 42,
+            "left": 16,
+            "right": 374,
+            "top": 273.77,
+            "bottom": 315.77
+          },
+          "hits": [
+            {
+              "x": 87.6,
+              "y": 294.77,
+              "targetOrDescendant": true,
+              "hitTag": "SELECT"
+            },
+            {
+              "x": 195,
+              "y": 294.77,
+              "targetOrDescendant": true,
+              "hitTag": "SELECT"
+            },
+            {
+              "x": 302.4,
+              "y": 294.77,
+              "targetOrDescendant": true,
+              "hitTag": "SELECT"
+            }
+          ],
+          "unobstructed": true
+        },
+        {
+          "name": "state_filter",
+          "count": 1,
+          "bounds": {
+            "x": 16,
+            "y": 357.16,
+            "width": 358,
+            "height": 42,
+            "left": 16,
+            "right": 374,
+            "top": 357.16,
+            "bottom": 399.16
+          },
+          "hits": [
+            {
+              "x": 87.6,
+              "y": 378.16,
+              "targetOrDescendant": true,
+              "hitTag": "SELECT"
+            },
+            {
+              "x": 195,
+              "y": 378.16,
+              "targetOrDescendant": true,
+              "hitTag": "SELECT"
+            },
+            {
+              "x": 302.4,
+              "y": 378.16,
+              "targetOrDescendant": true,
+              "hitTag": "SELECT"
+            }
+          ],
+          "unobstructed": true
+        },
+        {
+          "name": "create_action",
+          "count": 1,
+          "bounds": {
+            "x": 16,
+            "y": 167.19,
+            "width": 81.02,
+            "height": 39.19,
+            "left": 16,
+            "right": 97.02,
+            "top": 167.19,
+            "bottom": 206.38
+          },
+          "hits": [
+            {
+              "x": 32.2,
+              "y": 186.78,
+              "targetOrDescendant": true,
+              "hitTag": "A"
+            },
+            {
+              "x": 56.51,
+              "y": 186.78,
+              "targetOrDescendant": true,
+              "hitTag": "A"
+            },
+            {
+              "x": 80.81,
+              "y": 186.78,
+              "targetOrDescendant": true,
+              "hitTag": "A"
+            }
+          ],
+          "unobstructed": true
+        },
+        {
+          "name": "first_connection_name",
+          "count": 1,
+          "bounds": {
+            "x": 46,
+            "y": 570.33,
+            "width": 180.69,
+            "height": 18,
+            "left": 46,
+            "right": 226.69,
+            "top": 570.33,
+            "bottom": 588.33
+          },
+          "hits": [
+            {
+              "x": 82.14,
+              "y": 579.33,
+              "targetOrDescendant": true,
+              "hitTag": "A"
+            },
+            {
+              "x": 136.34,
+              "y": 579.33,
+              "targetOrDescendant": true,
+              "hitTag": "A"
+            },
+            {
+              "x": 190.55,
+              "y": 579.33,
+              "targetOrDescendant": true,
+              "hitTag": "A"
+            }
+          ],
+          "unobstructed": true
+        }
+      ]
+    },
+    {
+      "theme": "dark",
+      "size": "wide",
+      "moment": "after_resize_before_settle",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "documentWidth": 1440,
+      "sidebar": {
+        "count": 1,
+        "bounds": {
+          "x": 0,
+          "y": 0,
+          "width": 258,
+          "height": 1000,
+          "left": 0,
+          "right": 258,
+          "top": 0,
+          "bottom": 1000
+        },
+        "open": false,
+        "inert": true,
+        "transform": "none"
+      },
+      "topbarCount": 1,
+      "targets": [
+        {
+          "name": "heading",
+          "count": 1,
+          "bounds": {
+            "x": 296,
+            "y": 116,
+            "width": 357,
+            "height": 40.59,
+            "left": 296,
+            "right": 653,
+            "top": 116,
+            "bottom": 156.59
+          },
+          "hits": [
+            {
+              "x": 367.4,
+              "y": 136.3,
+              "targetOrDescendant": true,
+              "hitTag": "H1"
+            },
+            {
+              "x": 474.5,
+              "y": 136.3,
+              "targetOrDescendant": true,
+              "hitTag": "H1"
+            },
+            {
+              "x": 581.6,
+              "y": 136.3,
+              "targetOrDescendant": true,
+              "hitTag": "H1"
+            }
+          ],
+          "unobstructed": true
+        },
+        {
+          "name": "type_filter",
+          "count": 1,
+          "bounds": {
+            "x": 296,
+            "y": 246.38,
+            "width": 150,
+            "height": 42,
+            "left": 296,
+            "right": 446,
+            "top": 246.38,
+            "bottom": 288.38
+          },
+          "hits": [
+            {
+              "x": 326,
+              "y": 267.38,
+              "targetOrDescendant": true,
+              "hitTag": "SELECT"
+            },
+            {
+              "x": 371,
+              "y": 267.38,
+              "targetOrDescendant": true,
+              "hitTag": "SELECT"
+            },
+            {
+              "x": 416,
+              "y": 267.38,
+              "targetOrDescendant": true,
+              "hitTag": "SELECT"
+            }
+          ],
+          "unobstructed": true
+        },
+        {
+          "name": "state_filter",
+          "count": 1,
+          "bounds": {
+            "x": 458,
+            "y": 246.38,
+            "width": 150,
+            "height": 42,
+            "left": 458,
+            "right": 608,
+            "top": 246.38,
+            "bottom": 288.38
+          },
+          "hits": [
+            {
+              "x": 488,
+              "y": 267.38,
+              "targetOrDescendant": true,
+              "hitTag": "SELECT"
+            },
+            {
+              "x": 533,
+              "y": 267.38,
+              "targetOrDescendant": true,
+              "hitTag": "SELECT"
+            },
+            {
+              "x": 578,
+              "y": 267.38,
+              "targetOrDescendant": true,
+              "hitTag": "SELECT"
+            }
+          ],
+          "unobstructed": true
+        },
+        {
+          "name": "create_action",
+          "count": 1,
+          "bounds": {
+            "x": 1320.98,
+            "y": 127.89,
+            "width": 81.02,
+            "height": 39.19,
+            "left": 1320.98,
+            "right": 1402,
+            "top": 127.89,
+            "bottom": 167.08
+          },
+          "hits": [
+            {
+              "x": 1337.19,
+              "y": 147.48,
+              "targetOrDescendant": true,
+              "hitTag": "A"
+            },
+            {
+              "x": 1361.49,
+              "y": 147.48,
+              "targetOrDescendant": true,
+              "hitTag": "A"
+            },
+            {
+              "x": 1385.8,
+              "y": 147.48,
+              "targetOrDescendant": true,
+              "hitTag": "A"
+            }
+          ],
+          "unobstructed": true
+        },
+        {
+          "name": "first_connection_name",
+          "count": 1,
+          "bounds": {
+            "x": 334,
+            "y": 413.16,
+            "width": 180.69,
+            "height": 18,
+            "left": 334,
+            "right": 514.69,
+            "top": 413.16,
+            "bottom": 431.16
+          },
+          "hits": [
+            {
+              "x": 370.14,
+              "y": 422.16,
+              "targetOrDescendant": true,
+              "hitTag": "A"
+            },
+            {
+              "x": 424.34,
+              "y": 422.16,
+              "targetOrDescendant": true,
+              "hitTag": "A"
+            },
+            {
+              "x": 478.55,
+              "y": 422.16,
+              "targetOrDescendant": true,
+              "hitTag": "A"
+            }
+          ],
+          "unobstructed": true
+        }
+      ]
+    },
+    {
+      "theme": "dark",
+      "size": "wide",
+      "moment": "stable_before_screenshot",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "documentWidth": 1440,
+      "sidebar": {
+        "count": 1,
+        "bounds": {
+          "x": 0,
+          "y": 0,
+          "width": 258,
+          "height": 1000,
+          "left": 0,
+          "right": 258,
+          "top": 0,
+          "bottom": 1000
+        },
+        "open": false,
+        "inert": false,
+        "transform": "none"
+      },
+      "topbarCount": 1,
+      "targets": [
+        {
+          "name": "heading",
+          "count": 1,
+          "bounds": {
+            "x": 296,
+            "y": 116,
+            "width": 357,
+            "height": 40.59,
+            "left": 296,
+            "right": 653,
+            "top": 116,
+            "bottom": 156.59
+          },
+          "hits": [
+            {
+              "x": 367.4,
+              "y": 136.3,
+              "targetOrDescendant": true,
+              "hitTag": "H1"
+            },
+            {
+              "x": 474.5,
+              "y": 136.3,
+              "targetOrDescendant": true,
+              "hitTag": "H1"
+            },
+            {
+              "x": 581.6,
+              "y": 136.3,
+              "targetOrDescendant": true,
+              "hitTag": "H1"
+            }
+          ],
+          "unobstructed": true
+        },
+        {
+          "name": "type_filter",
+          "count": 1,
+          "bounds": {
+            "x": 296,
+            "y": 246.38,
+            "width": 150,
+            "height": 42,
+            "left": 296,
+            "right": 446,
+            "top": 246.38,
+            "bottom": 288.38
+          },
+          "hits": [
+            {
+              "x": 326,
+              "y": 267.38,
+              "targetOrDescendant": true,
+              "hitTag": "SELECT"
+            },
+            {
+              "x": 371,
+              "y": 267.38,
+              "targetOrDescendant": true,
+              "hitTag": "SELECT"
+            },
+            {
+              "x": 416,
+              "y": 267.38,
+              "targetOrDescendant": true,
+              "hitTag": "SELECT"
+            }
+          ],
+          "unobstructed": true
+        },
+        {
+          "name": "state_filter",
+          "count": 1,
+          "bounds": {
+            "x": 458,
+            "y": 246.38,
+            "width": 150,
+            "height": 42,
+            "left": 458,
+            "right": 608,
+            "top": 246.38,
+            "bottom": 288.38
+          },
+          "hits": [
+            {
+              "x": 488,
+              "y": 267.38,
+              "targetOrDescendant": true,
+              "hitTag": "SELECT"
+            },
+            {
+              "x": 533,
+              "y": 267.38,
+              "targetOrDescendant": true,
+              "hitTag": "SELECT"
+            },
+            {
+              "x": 578,
+              "y": 267.38,
+              "targetOrDescendant": true,
+              "hitTag": "SELECT"
+            }
+          ],
+          "unobstructed": true
+        },
+        {
+          "name": "create_action",
+          "count": 1,
+          "bounds": {
+            "x": 1320.98,
+            "y": 127.89,
+            "width": 81.02,
+            "height": 39.19,
+            "left": 1320.98,
+            "right": 1402,
+            "top": 127.89,
+            "bottom": 167.08
+          },
+          "hits": [
+            {
+              "x": 1337.19,
+              "y": 147.48,
+              "targetOrDescendant": true,
+              "hitTag": "A"
+            },
+            {
+              "x": 1361.49,
+              "y": 147.48,
+              "targetOrDescendant": true,
+              "hitTag": "A"
+            },
+            {
+              "x": 1385.8,
+              "y": 147.48,
+              "targetOrDescendant": true,
+              "hitTag": "A"
+            }
+          ],
+          "unobstructed": true
+        },
+        {
+          "name": "first_connection_name",
+          "count": 1,
+          "bounds": {
+            "x": 334,
+            "y": 413.16,
+            "width": 180.69,
+            "height": 18,
+            "left": 334,
+            "right": 514.69,
+            "top": 413.16,
+            "bottom": 431.16
+          },
+          "hits": [
+            {
+              "x": 370.14,
+              "y": 422.16,
+              "targetOrDescendant": true,
+              "hitTag": "A"
+            },
+            {
+              "x": 424.34,
+              "y": 422.16,
+              "targetOrDescendant": true,
+              "hitTag": "A"
+            },
+            {
+              "x": 478.55,
+              "y": 422.16,
+              "targetOrDescendant": true,
+              "hitTag": "A"
+            }
+          ],
+          "unobstructed": true
+        }
+      ]
+    },
+    {
+      "theme": "dark",
+      "size": "narrow",
+      "moment": "after_resize_before_settle",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "documentWidth": 390,
+      "sidebar": {
+        "count": 1,
+        "bounds": {
+          "x": 0,
+          "y": 0,
+          "width": 230,
+          "height": 844,
+          "left": 0,
+          "right": 230,
+          "top": 0,
+          "bottom": 844
+        },
+        "open": false,
+        "inert": false,
+        "transform": "matrix(1, 0, 0, 1, 0, 0)"
+      },
+      "topbarCount": 1,
+      "targets": [
+        {
+          "name": "heading",
+          "count": 1,
+          "bounds": {
+            "x": 16,
+            "y": 94,
+            "width": 357,
+            "height": 34.8,
+            "left": 16,
+            "right": 373,
+            "top": 94,
+            "bottom": 128.8
+          },
+          "hits": [
+            {
+              "x": 87.4,
+              "y": 111.4,
+              "targetOrDescendant": false,
+              "hitTag": "DIV"
+            },
+            {
+              "x": 194.5,
+              "y": 111.4,
+              "targetOrDescendant": false,
+              "hitTag": "DIV"
+            },
+            {
+              "x": 301.6,
+              "y": 111.4,
+              "targetOrDescendant": true,
+              "hitTag": "H1"
+            }
+          ],
+          "unobstructed": false
+        },
+        {
+          "name": "type_filter",
+          "count": 1,
+          "bounds": {
+            "x": 16,
+            "y": 273.77,
+            "width": 358,
+            "height": 42,
+            "left": 16,
+            "right": 374,
+            "top": 273.77,
+            "bottom": 315.77
+          },
+          "hits": [
+            {
+              "x": 87.6,
+              "y": 294.77,
+              "targetOrDescendant": false,
+              "hitTag": "SPAN"
+            },
+            {
+              "x": 195,
+              "y": 294.77,
+              "targetOrDescendant": false,
+              "hitTag": "A"
+            },
+            {
+              "x": 302.4,
+              "y": 294.77,
+              "targetOrDescendant": true,
+              "hitTag": "SELECT"
+            }
+          ],
+          "unobstructed": false
+        },
+        {
+          "name": "state_filter",
+          "count": 1,
+          "bounds": {
+            "x": 16,
+            "y": 357.16,
+            "width": 358,
+            "height": 42,
+            "left": 16,
+            "right": 374,
+            "top": 357.16,
+            "bottom": 399.16
+          },
+          "hits": [
+            {
+              "x": 87.6,
+              "y": 378.16,
+              "targetOrDescendant": false,
+              "hitTag": "NAV"
+            },
+            {
+              "x": 195,
+              "y": 378.16,
+              "targetOrDescendant": false,
+              "hitTag": "NAV"
+            },
+            {
+              "x": 302.4,
+              "y": 378.16,
+              "targetOrDescendant": true,
+              "hitTag": "SELECT"
+            }
+          ],
+          "unobstructed": false
+        },
+        {
+          "name": "create_action",
+          "count": 1,
+          "bounds": {
+            "x": 16,
+            "y": 167.19,
+            "width": 81.02,
+            "height": 39.19,
+            "left": 16,
+            "right": 97.02,
+            "top": 167.19,
+            "bottom": 206.38
+          },
+          "hits": [
+            {
+              "x": 32.2,
+              "y": 186.78,
+              "targetOrDescendant": false,
+              "hitTag": "ASIDE"
+            },
+            {
+              "x": 56.51,
+              "y": 186.78,
+              "targetOrDescendant": false,
+              "hitTag": "ASIDE"
+            },
+            {
+              "x": 80.81,
+              "y": 186.78,
+              "targetOrDescendant": false,
+              "hitTag": "ASIDE"
+            }
+          ],
+          "unobstructed": false
+        },
+        {
+          "name": "first_connection_name",
+          "count": 1,
+          "bounds": {
+            "x": 46,
+            "y": 570.33,
+            "width": 180.69,
+            "height": 18,
+            "left": 46,
+            "right": 226.69,
+            "top": 570.33,
+            "bottom": 588.33
+          },
+          "hits": [
+            {
+              "x": 82.14,
+              "y": 579.33,
+              "targetOrDescendant": false,
+              "hitTag": "DIV"
+            },
+            {
+              "x": 136.34,
+              "y": 579.33,
+              "targetOrDescendant": false,
+              "hitTag": "DIV"
+            },
+            {
+              "x": 190.55,
+              "y": 579.33,
+              "targetOrDescendant": false,
+              "hitTag": "DIV"
+            }
+          ],
+          "unobstructed": false
+        }
+      ]
+    },
+    {
+      "theme": "dark",
+      "size": "narrow",
+      "moment": "stable_before_screenshot",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "documentWidth": 390,
+      "sidebar": {
+        "count": 1,
+        "bounds": {
+          "x": -230,
+          "y": 0,
+          "width": 230,
+          "height": 844,
+          "left": -230,
+          "right": 0,
+          "top": 0,
+          "bottom": 844
+        },
+        "open": false,
+        "inert": true,
+        "transform": "matrix(1, 0, 0, 1, -230, 0)"
+      },
+      "topbarCount": 1,
+      "targets": [
+        {
+          "name": "heading",
+          "count": 1,
+          "bounds": {
+            "x": 16,
+            "y": 94,
+            "width": 357,
+            "height": 34.8,
+            "left": 16,
+            "right": 373,
+            "top": 94,
+            "bottom": 128.8
+          },
+          "hits": [
+            {
+              "x": 87.4,
+              "y": 111.4,
+              "targetOrDescendant": true,
+              "hitTag": "H1"
+            },
+            {
+              "x": 194.5,
+              "y": 111.4,
+              "targetOrDescendant": true,
+              "hitTag": "H1"
+            },
+            {
+              "x": 301.6,
+              "y": 111.4,
+              "targetOrDescendant": true,
+              "hitTag": "H1"
+            }
+          ],
+          "unobstructed": true
+        },
+        {
+          "name": "type_filter",
+          "count": 1,
+          "bounds": {
+            "x": 16,
+            "y": 273.77,
+            "width": 358,
+            "height": 42,
+            "left": 16,
+            "right": 374,
+            "top": 273.77,
+            "bottom": 315.77
+          },
+          "hits": [
+            {
+              "x": 87.6,
+              "y": 294.77,
+              "targetOrDescendant": true,
+              "hitTag": "SELECT"
+            },
+            {
+              "x": 195,
+              "y": 294.77,
+              "targetOrDescendant": true,
+              "hitTag": "SELECT"
+            },
+            {
+              "x": 302.4,
+              "y": 294.77,
+              "targetOrDescendant": true,
+              "hitTag": "SELECT"
+            }
+          ],
+          "unobstructed": true
+        },
+        {
+          "name": "state_filter",
+          "count": 1,
+          "bounds": {
+            "x": 16,
+            "y": 357.16,
+            "width": 358,
+            "height": 42,
+            "left": 16,
+            "right": 374,
+            "top": 357.16,
+            "bottom": 399.16
+          },
+          "hits": [
+            {
+              "x": 87.6,
+              "y": 378.16,
+              "targetOrDescendant": true,
+              "hitTag": "SELECT"
+            },
+            {
+              "x": 195,
+              "y": 378.16,
+              "targetOrDescendant": true,
+              "hitTag": "SELECT"
+            },
+            {
+              "x": 302.4,
+              "y": 378.16,
+              "targetOrDescendant": true,
+              "hitTag": "SELECT"
+            }
+          ],
+          "unobstructed": true
+        },
+        {
+          "name": "create_action",
+          "count": 1,
+          "bounds": {
+            "x": 16,
+            "y": 167.19,
+            "width": 81.02,
+            "height": 39.19,
+            "left": 16,
+            "right": 97.02,
+            "top": 167.19,
+            "bottom": 206.38
+          },
+          "hits": [
+            {
+              "x": 32.2,
+              "y": 186.78,
+              "targetOrDescendant": true,
+              "hitTag": "A"
+            },
+            {
+              "x": 56.51,
+              "y": 186.78,
+              "targetOrDescendant": true,
+              "hitTag": "A"
+            },
+            {
+              "x": 80.81,
+              "y": 186.78,
+              "targetOrDescendant": true,
+              "hitTag": "A"
+            }
+          ],
+          "unobstructed": true
+        },
+        {
+          "name": "first_connection_name",
+          "count": 1,
+          "bounds": {
+            "x": 46,
+            "y": 570.33,
+            "width": 180.69,
+            "height": 18,
+            "left": 46,
+            "right": 226.69,
+            "top": 570.33,
+            "bottom": 588.33
+          },
+          "hits": [
+            {
+              "x": 82.14,
+              "y": 579.33,
+              "targetOrDescendant": true,
+              "hitTag": "A"
+            },
+            {
+              "x": 136.34,
+              "y": 579.33,
+              "targetOrDescendant": true,
+              "hitTag": "A"
+            },
+            {
+              "x": 190.55,
+              "y": 579.33,
+              "targetOrDescendant": true,
+              "hitTag": "A"
+            }
+          ],
+          "unobstructed": true
+        }
+      ]
+    }
+  ],
+  "completedAtUtc": "2026-11-01T14:32:10.180Z",
+  "exitCode": 2
+}

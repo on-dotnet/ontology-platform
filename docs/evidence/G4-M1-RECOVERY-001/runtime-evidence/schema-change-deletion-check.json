@@ -1,0 +1,63 @@
+{
+  "status": "PASS",
+  "snapshotId": "38cf1e5e4ab147c39c093e0ba590c769",
+  "storedSnapshotHadNewColumn": true,
+  "afterDropProjectionStale": true,
+  "afterDropProjectionHidesDeletedColumn": true,
+  "storedViewUnchanged": true,
+  "storedViewSha256": "c1142f4c4ad47239f98f96a4841a32d3acee54cbd457cb243cc55716a948dedb",
+  "command": [
+    "node",
+    "scripts/acceptance/g4-m1-fault.mjs",
+    "--runtime-file",
+    "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/http-deleted-column-snapshot.json",
+    "--action",
+    "snapshot-read"
+  ],
+  "exitCode": 0,
+  "stdout": "{\"action\":\"snapshot-read\",\"status\":\"PASS\",\"evidence\":\"artifacts/g4-m1-recovery-001/fault-http/e9f8dad4-4271-46e7-91c9-8cd7db76e6d5.json\"}\n",
+  "independentlyReopenableDatabaseReceipts": [
+    {
+      "name": "verify-stored-before",
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "ontology-g4-m1-recovery-001-platform-pg-1",
+        "psql",
+        "-U",
+        "platform",
+        "-d",
+        "platform",
+        "-Atc",
+        "SELECT \"ViewJson\" FROM connections.\"CatalogSnapshots\" WHERE \"Id\"='38cf1e5e4ab147c39c093e0ba590c769';"
+      ],
+      "exitCode": 0,
+      "hasRecoveryExtra": true,
+      "viewUtf8Sha256": "c1142f4c4ad47239f98f96a4841a32d3acee54cbd457cb243cc55716a948dedb",
+      "outputProjection": "Only boolean and hash retained; no source rows queried."
+    },
+    {
+      "name": "verify-stored-after",
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "ontology-g4-m1-recovery-001-platform-pg-1",
+        "psql",
+        "-U",
+        "platform",
+        "-d",
+        "platform",
+        "-Atc",
+        "SELECT \"ViewJson\" FROM connections.\"CatalogSnapshots\" WHERE \"Id\"='38cf1e5e4ab147c39c093e0ba590c769';"
+      ],
+      "exitCode": 0,
+      "hasRecoveryExtra": true,
+      "viewUtf8Sha256": "c1142f4c4ad47239f98f96a4841a32d3acee54cbd457cb243cc55716a948dedb",
+      "outputProjection": "Only boolean and hash retained; no source rows queried."
+    }
+  ]
+}

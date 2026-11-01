@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "taskId": "G4-M1-RECOVERY-001",
+  "startedAtUtc": "2026-11-01T14:59:43.243Z",
+  "cases": {
+    "M1-U01": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U02": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U03": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U04": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U05": {
+      "status": "NOT_RUN",
+      "observed": [
+        "actual_probe_pending_before_response",
+        "real_tcp_connected_tls_timeout_at_least_eight_seconds",
+        "timeout_failure_and_enabled_retry_action_no_second_paused_probe"
+      ],
+      "reason": "aggregate_requires_loading_timeout_cancel_partial_and_refresh_evidence_across_controlled_runs"
+    },
+    "M1-U06": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    }
+  },
+  "http": [
+    {
+      "method": "GET",
+      "route": "/auth/csrf",
+      "status": 200,
+      "durationMs": 61
+    },
+    {
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/test",
+      "status": 200,
+      "durationMs": 10168,
+      "pendingBeforeResponse": true,
+      "pendingCategories": [
+        "PROBE_RUNNING"
+      ]
+    }
+  ],
+  "screenshots": [],
+  "productExecution": true,
+  "runId": "recovery-20261101-01",
+  "scenario": "source-timeout",
+  "driverSha256": "d92739dc79781c999ba8427f11486ad1d45afc9a695642491357de0081f31965",
+  "sourcePauseHandshake": {
+    "status": "MARKER_ACKNOWLEDGED",
+    "readyAtUtc": "2026-11-01T14:59:45.033Z",
+    "acknowledgedAtUtc": "2026-11-01T14:59:45.074Z"
+  },
+  "timeoutObservation": {
+    "clientDurationMs": 10168,
+    "reportDurationMs": 10044,
+    "tlsDurationMs": 10009,
+    "networkPassed": true,
+    "tlsFailed": true,
+    "probeStatus": "TEST_FAILED",
+    "diagnosticCode": "connection_source_unavailable",
+    "pendingBeforeResponse": true,
+    "pendingCategories": [
+      "PROBE_RUNNING"
+    ]
+  },
+  "completedAtUtc": "2026-11-01T14:59:55.657Z",
+  "exitCode": 2
+}

@@ -1,0 +1,126 @@
+{
+  "taskId": "G4-M1-RECOVERY-001",
+  "status": "PASS",
+  "commands": [
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "pause",
+        "9dd83f34dd207529bea2975834c3d61baa63b8ca88e159506520bd786f0d7305"
+      ],
+      "input": null,
+      "exitCode": 0,
+      "stdout": "9dd83f34dd207529bea2975834c3d61baa63b8ca88e159506520bd786f0d7305\n",
+      "stderr": "",
+      "elapsedSeconds": 0.039294250003877096
+    },
+    {
+      "command": [
+        "node",
+        "scripts/acceptance/g4-m1-fault.mjs",
+        "--runtime-file",
+        "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/http-schema-change.json",
+        "--action",
+        "probe-client-cancel"
+      ],
+      "input": null,
+      "exitCode": 0,
+      "stdout": "{\"action\":\"probe-client-cancel\",\"status\":\"PASS\",\"evidence\":\"artifacts/g4-m1-recovery-001/fault-http/1e500460-0a73-49ab-82fa-e9ec9709388a.json\"}\n",
+      "stderr": "",
+      "elapsedSeconds": 3.0057722920028027
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "190ab49a8eff5f3a13c1526f38cda9b933c0e618de51c7b7e4da98be73cc130a",
+        "psql",
+        "-U",
+        "platform",
+        "-d",
+        "platform",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-qAt"
+      ],
+      "input": "SET statement_timeout='2s';SELECT coalesce(json_agg(json_build_object('id',\"Id\",'report',\"ReportJson\"::jsonb)),'[]') FROM connections.\"ConnectionProbes\" WHERE \"CommandKey\"='18356ff3a923a1e74c231fa4f4139db1433f8414cd7b85a08448553f968cd07b';",
+      "exitCode": 0,
+      "stdout": "[{\"id\" : \"2604e25eca2e44d28343c1c8a4e8036a\", \"report\" : {\"scope\": {\"siteIds\": [\"site-a\"], \"organizationId\": \"org-demo\"}, \"stale\": false, \"stages\": [{\"name\": \"NETWORK\", \"status\": \"PASS\", \"durationMs\": 0, \"diagnosticCode\": null}, {\"name\": \"TLS\", \"status\": \"FAIL\", \"durationMs\": 1471, \"diagnosticCode\": \"connection_cancelled\"}, {\"name\": \"AUTH\", \"status\": \"NOT_RUN\", \"durationMs\": 0, \"diagnosticCode\": null}, {\"name\": \"READ_ONLY\", \"status\": \"NOT_RUN\", \"durationMs\": 0, \"diagnosticCode\": null}, {\"name\": \"METADATA\", \"status\": \"NOT_RUN\", \"durationMs\": 0, \"diagnosticCode\": null}], \"status\": \"CANCELLED\", \"probeId\": \"2604e25eca2e44d28343c1c8a4e8036a\", \"traceId\": \"237b58c4bb546a21b2598208bc3242d9\", \"configHash\": \"36977d8313f923a56c6bf68590a8c68cc5dde85092205da8a02d154d619d2ac9\", \"connectionId\": \"1bf23f9d36bf4ceba09d745f04d8f743\", \"expiresAtUtc\": \"2026-11-01T15:10:09.0498203+00:00\", \"startedAtUtc\": \"2026-11-01T15:00:09.0498203+00:00\", \"secretVersion\": 1, \"completedAtUtc\": \"2026-11-01T15:00:10.5307092+00:00\"}}]\n",
+      "stderr": "",
+      "elapsedSeconds": 0.04500399999960791
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "unpause",
+        "9dd83f34dd207529bea2975834c3d61baa63b8ca88e159506520bd786f0d7305"
+      ],
+      "input": null,
+      "exitCode": 0,
+      "stdout": "9dd83f34dd207529bea2975834c3d61baa63b8ca88e159506520bd786f0d7305\n",
+      "stderr": "",
+      "elapsedSeconds": 0.01813229099207092
+    }
+  ],
+  "commandKey": "18356ff3a923a1e74c231fa4f4139db1433f8414cd7b85a08448553f968cd07b",
+  "probe": {
+    "scope": {
+      "siteIds": [
+        "site-a"
+      ],
+      "organizationId": "org-demo"
+    },
+    "stale": false,
+    "stages": [
+      {
+        "name": "NETWORK",
+        "status": "PASS",
+        "durationMs": 0,
+        "diagnosticCode": null
+      },
+      {
+        "name": "TLS",
+        "status": "FAIL",
+        "durationMs": 1471,
+        "diagnosticCode": "connection_cancelled"
+      },
+      {
+        "name": "AUTH",
+        "status": "NOT_RUN",
+        "durationMs": 0,
+        "diagnosticCode": null
+      },
+      {
+        "name": "READ_ONLY",
+        "status": "NOT_RUN",
+        "durationMs": 0,
+        "diagnosticCode": null
+      },
+      {
+        "name": "METADATA",
+        "status": "NOT_RUN",
+        "durationMs": 0,
+        "diagnosticCode": null
+      }
+    ],
+    "status": "CANCELLED",
+    "probeId": "2604e25eca2e44d28343c1c8a4e8036a",
+    "traceId": "237b58c4bb546a21b2598208bc3242d9",
+    "configHash": "36977d8313f923a56c6bf68590a8c68cc5dde85092205da8a02d154d619d2ac9",
+    "connectionId": "1bf23f9d36bf4ceba09d745f04d8f743",
+    "expiresAtUtc": "2026-11-01T15:10:09.0498203+00:00",
+    "startedAtUtc": "2026-11-01T15:00:09.0498203+00:00",
+    "secretVersion": 1,
+    "completedAtUtc": "2026-11-01T15:00:10.5307092+00:00"
+  },
+  "pausedAfter": false,
+  "cleanupErrors": [],
+  "driverSha256": "7565090f99002df2e046b87827255998378b8e24cdf1e8121e03bf20229d0a51"
+}

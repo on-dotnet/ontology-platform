@@ -1,0 +1,66 @@
+{
+  "commands": [
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "stop",
+        "--time",
+        "5",
+        "4346d3b82e0efd66dee0c55781d7c48a31dca609c0a93580ca245b0d288b69f3"
+      ],
+      "exitCode": 0,
+      "stdout": "Flag --time has been deprecated, use --timeout instead\n4346d3b82e0efd66dee0c55781d7c48a31dca609c0a93580ca245b0d288b69f3\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "stop",
+        "--time",
+        "5",
+        "24ea2c3e21b21fe604c1d86206285acdbf703002e0766776a816fca19ccd8801"
+      ],
+      "exitCode": 0,
+      "stdout": "Flag --time has been deprecated, use --timeout instead\n24ea2c3e21b21fe604c1d86206285acdbf703002e0766776a816fca19ccd8801\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "start",
+        "24ea2c3e21b21fe604c1d86206285acdbf703002e0766776a816fca19ccd8801"
+      ],
+      "exitCode": 0,
+      "stdout": "24ea2c3e21b21fe604c1d86206285acdbf703002e0766776a816fca19ccd8801\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "start",
+        "4346d3b82e0efd66dee0c55781d7c48a31dca609c0a93580ca245b0d288b69f3"
+      ],
+      "exitCode": 0,
+      "stdout": "4346d3b82e0efd66dee0c55781d7c48a31dca609c0a93580ca245b0d288b69f3\n",
+      "stderr": ""
+    }
+  ],
+  "inputs": {
+    "OntologyPlatform.Modules.Connections.dll": {
+      "before": "3f613923994f868708227456e86c5abd2d3624f224a4f5ff509a5343ac2c78a3",
+      "after": "bce34f90f44433c5940569e57fa8c7effa1e6bc19f3583f2071b33d3b34a1042"
+    },
+    "OntologyPlatform.Modules.Connections.pdb": {
+      "before": "30e6440a4ff9d253fe726c441d1e7b298074a709d048dee48e1f11164c7e1c87",
+      "after": "67c5c73db605acc7a169cabdb060e2f91027acc7a91c70dfd10a2cd4785f2766"
+    }
+  }
+}

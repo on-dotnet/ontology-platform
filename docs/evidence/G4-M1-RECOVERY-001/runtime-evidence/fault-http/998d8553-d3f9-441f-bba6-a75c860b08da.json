@@ -1,0 +1,33 @@
+{
+  "taskId": "G4-M1-RECOVERY-001",
+  "startedUtc": "2026-11-01T14:57:17.826Z",
+  "checks": [
+    {
+      "name": "real_five_stage_probe_refreshed",
+      "status": "PASS"
+    }
+  ],
+  "http": [
+    {
+      "method": "GET",
+      "route": "/api/v1/connections/{id}",
+      "status": 200,
+      "durationMs": 32,
+      "jsonBody": true
+    },
+    {
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/test",
+      "status": 200,
+      "durationMs": 61,
+      "jsonBody": true
+    }
+  ],
+  "scope": "ONE_HTTP_ACTION_ONLY",
+  "databaseRollbackLeaseFenceEvidence": "NOT_RUN_BY_THIS_CONSUMER",
+  "action": "probe-refresh",
+  "connectionId": "1bf23f9d36bf4ceba09d745f04d8f743",
+  "auditStage": "start",
+  "status": "PASS",
+  "completedUtc": "2026-11-01T14:57:19.202Z"
+}

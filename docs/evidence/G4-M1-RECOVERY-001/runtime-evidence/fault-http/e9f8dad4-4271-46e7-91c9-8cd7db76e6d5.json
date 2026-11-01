@@ -1,0 +1,33 @@
+{
+  "taskId": "G4-M1-RECOVERY-001",
+  "startedUtc": "2026-11-01T14:27:57.940Z",
+  "checks": [],
+  "http": [
+    {
+      "method": "GET",
+      "route": "/api/v1/connections/{id}",
+      "status": 200,
+      "durationMs": 33,
+      "jsonBody": true
+    },
+    {
+      "method": "GET",
+      "route": "/api/v1/catalogs/{id}",
+      "status": 200,
+      "durationMs": 42,
+      "jsonBody": true
+    }
+  ],
+  "scope": "ONE_HTTP_ACTION_ONLY",
+  "databaseRollbackLeaseFenceEvidence": "NOT_RUN_BY_THIS_CONSUMER",
+  "action": "snapshot-read",
+  "connectionId": "1bf23f9d36bf4ceba09d745f04d8f743",
+  "snapshot": {
+    "id": "38cf1e5e4ab147c39c093e0ba590c769",
+    "status": "STALE",
+    "fingerprint": "dda11f7b7e18eec3d073262609b01f4acf9fc047be9708c27f9da930a8afb0ae",
+    "containsRecoveryExtra": false
+  },
+  "status": "PASS",
+  "completedUtc": "2026-11-01T14:27:59.353Z"
+}

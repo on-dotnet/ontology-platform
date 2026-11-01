@@ -1,0 +1,42 @@
+{
+  "taskId": "G4-M1-RECOVERY-001",
+  "startedUtc": "2026-11-01T14:33:47.605Z",
+  "checks": [
+    {
+      "name": "same_command_replays_recovered_failure_without_false_success",
+      "status": "PASS"
+    }
+  ],
+  "http": [
+    {
+      "method": "GET",
+      "route": "/api/v1/connections/{id}",
+      "status": 200,
+      "durationMs": 34,
+      "jsonBody": true
+    },
+    {
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/test",
+      "status": 200,
+      "durationMs": 33,
+      "jsonBody": true
+    },
+    {
+      "method": "GET",
+      "route": "/api/v1/connections/{id}",
+      "status": 200,
+      "durationMs": 37,
+      "jsonBody": true
+    }
+  ],
+  "scope": "ONE_HTTP_ACTION_ONLY",
+  "databaseRollbackLeaseFenceEvidence": "NOT_RUN_BY_THIS_CONSUMER",
+  "action": "audit-replay-failed",
+  "connectionId": "1bf23f9d36bf4ceba09d745f04d8f743",
+  "auditStage": "complete",
+  "commandKey": "ab8c5e0d9aa3a8f0f928e40244c3f78c7a1462a87300d29c37b92cae2553d60a",
+  "probeId": "2bc59b8fc2de480b9c7f79a9230ec328",
+  "status": "PASS",
+  "completedUtc": "2026-11-01T14:33:48.982Z"
+}

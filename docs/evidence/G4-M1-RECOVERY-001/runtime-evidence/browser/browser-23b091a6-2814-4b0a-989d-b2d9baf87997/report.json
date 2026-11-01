@@ -1,0 +1,194 @@
+{
+  "schemaVersion": 1,
+  "taskId": "G4-M1-RECOVERY-001",
+  "startedAtUtc": "2026-11-01T14:24:45.064Z",
+  "cases": {
+    "M1-U01": {
+      "status": "PASS",
+      "observed": [
+        "real_pg_draft_probe_create_enable_catalog_refresh",
+        "edit_invalidates_probe_retest_enable_disable_refresh"
+      ]
+    },
+    "M1-U02": {
+      "status": "PASS",
+      "observed": [
+        "anonymous_real_http_401",
+        "viewer-ab_real_http_403",
+        "auditor-ab_real_http_403",
+        "authenticated_csrf_denied_before_binding"
+      ]
+    },
+    "M1-U03": {
+      "status": "PASS",
+      "observed": [
+        "POSTGRESQL_distinct_fields_positive_and_negative_format",
+        "ORACLE_distinct_fields_positive_and_negative_format",
+        "DORIS_distinct_fields_positive_and_negative_format",
+        "TDENGINE_distinct_fields_positive_and_negative_format",
+        "WEB_API_distinct_fields_positive_and_negative_format"
+      ]
+    },
+    "M1-U04": {
+      "status": "PASS",
+      "observed": [
+        "real_409_latest_server_and_retained_nonsecret_edit"
+      ]
+    },
+    "M1-U05": {
+      "status": "NOT_RUN",
+      "observed": [
+        "empty_list",
+        "five_probe_stages",
+        "job_refresh_recovery"
+      ],
+      "reason": "aggregate_requires_loading_timeout_cancel_partial_and_refresh_evidence_across_controlled_runs"
+    },
+    "M1-U06": {
+      "status": "PASS",
+      "observed": [
+        "light_wide_viewport_and_theme",
+        "light_narrow_viewport_and_theme",
+        "dark_wide_viewport_and_theme",
+        "dark_narrow_viewport_and_theme",
+        "screenshots_require_independent_visual_review"
+      ]
+    }
+  },
+  "http": [
+    {
+      "method": "GET",
+      "route": "/auth/csrf",
+      "status": 200,
+      "durationMs": 74
+    },
+    {
+      "method": "GET",
+      "route": "/connections",
+      "status": 401,
+      "durationMs": 57
+    },
+    {
+      "method": "POST",
+      "route": "/connection-secrets",
+      "status": 401,
+      "durationMs": 61
+    },
+    {
+      "method": "GET",
+      "route": "/auth/csrf",
+      "status": 200,
+      "durationMs": 63
+    },
+    {
+      "method": "POST",
+      "route": "/connections",
+      "status": 403,
+      "durationMs": 70
+    },
+    {
+      "method": "GET",
+      "route": "/auth/csrf",
+      "status": 200,
+      "durationMs": 53
+    },
+    {
+      "method": "POST",
+      "route": "/connections",
+      "status": 403,
+      "durationMs": 56
+    },
+    {
+      "method": "POST",
+      "route": "/connection-secrets",
+      "status": 403,
+      "durationMs": 47
+    },
+    {
+      "method": "POST",
+      "route": "/api/v1/connection-secrets",
+      "status": 201
+    },
+    {
+      "method": "POST",
+      "route": "/api/v1/connections/{id}",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "route": "/api/v1/connections",
+      "status": 201
+    },
+    {
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/test",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/enable",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/discoveries",
+      "status": 202
+    },
+    {
+      "method": "GET",
+      "route": "/connections/{id}/discoveries/{jobId}",
+      "status": 200,
+      "durationMs": 53
+    },
+    {
+      "method": "GET",
+      "route": "/connections/{id}",
+      "status": 200,
+      "durationMs": 38
+    },
+    {
+      "method": "PATCH",
+      "route": "/connections/{id}",
+      "status": 200,
+      "durationMs": 44
+    },
+    {
+      "method": "PATCH",
+      "route": "/api/v1/connections/{id}",
+      "status": 409
+    },
+    {
+      "method": "PATCH",
+      "route": "/api/v1/connections/{id}",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/test",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/enable",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/disable",
+      "status": 200
+    }
+  ],
+  "screenshots": [
+    "light-wide.png",
+    "light-narrow.png",
+    "dark-wide.png",
+    "dark-narrow.png"
+  ],
+  "productExecution": true,
+  "runId": "recovery-20261101-01",
+  "scenario": "baseline",
+  "driverSha256": "a25dce299ed918f702f38319c8db401a6e2d55f8fad66e0736ae886c19f4c124",
+  "connectionId": "f27d4ca882e741aca13049336fb22985",
+  "completedAtUtc": "2026-11-01T14:24:57.801Z",
+  "exitCode": 2
+}

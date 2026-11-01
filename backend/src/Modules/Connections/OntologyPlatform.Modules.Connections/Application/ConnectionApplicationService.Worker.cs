@@ -139,12 +139,11 @@ public sealed partial class ConnectionApplicationService
         if (status == "SUCCEEDED" && objects is not null)
         {
             // 排序后的内容和适配器版本构成指纹，捕获时间不参与内容相等性。
-            var canonical = objects.OrderBy(value => value.Schema, StringComparer.Ordinal).ThenBy(value => value.Name, StringComparer.Ordinal)
-                .ThenBy(value => value.Kind, StringComparer.Ordinal).Select(value => value with { Fields = value.Fields.OrderBy(field => field.Ordinal).ThenBy(field => field.Name, StringComparer.Ordinal).ToArray() }).ToArray();
+            var canonical = CanonicalCatalog(objects);
             // 快照是新行，绝不修改历史内容。
             var snapshot = new CatalogSnapshotView { SnapshotId = Guid.NewGuid().ToString("N"), ConnectionId = row.Id, ConfigRevision = job.Revision,
-                SecretVersion = job.SecretVersion, Scope = Scope(row), SchemaFingerprint = Hash(Encode(new { AdapterVersion = "pg-m1-v1", Objects = canonical })),
-                CapturedAtUtc = clock.GetUtcNow(), Status = "READY", Objects = canonical };
+                SecretVersion = job.SecretVersion, Scope = Scope(row), SchemaFingerprint = canonical.Fingerprint,
+                CapturedAtUtc = clock.GetUtcNow(), Status = "READY", Objects = canonical.Objects };
             finalDb.CatalogSnapshots.Add(new CatalogSnapshotRecord { Id = snapshot.SnapshotId, ConnectionId = row.Id,
                 OrganizationId = row.OrganizationId, SiteIds = row.SiteIds, ConfigHash = job.ConfigHash, SecretVersion = job.SecretVersion,
                 ViewJson = Encode(snapshot), CapturedAtUtc = snapshot.CapturedAtUtc });

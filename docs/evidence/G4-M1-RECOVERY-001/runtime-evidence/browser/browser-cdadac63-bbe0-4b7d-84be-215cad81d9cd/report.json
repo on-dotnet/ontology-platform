@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "taskId": "G4-M1-RECOVERY-001",
+  "startedAtUtc": "2026-11-01T14:11:41.861Z",
+  "cases": {
+    "M1-U01": {
+      "status": "FAIL",
+      "observed": [],
+      "reason": "browser_timeout",
+      "failure": {
+        "code": "browser_timeout",
+        "category": "timeout"
+      },
+      "phase": "M1-U01"
+    },
+    "M1-U02": {
+      "status": "PASS",
+      "observed": [
+        "anonymous_real_http_401",
+        "viewer-ab_real_http_403",
+        "auditor-ab_real_http_403",
+        "authenticated_csrf_denied_before_binding"
+      ]
+    },
+    "M1-U03": {
+      "status": "FAIL",
+      "observed": [],
+      "reason": "browser_timeout",
+      "failure": {
+        "code": "browser_timeout",
+        "category": "timeout"
+      },
+      "phase": "M1-U03"
+    },
+    "M1-U04": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U05": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "aggregate_requires_loading_timeout_cancel_partial_and_refresh_evidence_across_controlled_runs"
+    },
+    "M1-U06": {
+      "status": "FAIL",
+      "observed": [],
+      "reason": "browser_or_transport_error",
+      "failure": {
+        "code": "browser_or_transport_error",
+        "category": "runtime"
+      },
+      "phase": "M1-U06"
+    }
+  },
+  "http": [
+    {
+      "method": "GET",
+      "route": "/auth/csrf",
+      "status": 200,
+      "durationMs": 59
+    },
+    {
+      "method": "GET",
+      "route": "/connections",
+      "status": 401,
+      "durationMs": 71
+    },
+    {
+      "method": "POST",
+      "route": "/connection-secrets",
+      "status": 401,
+      "durationMs": 88
+    },
+    {
+      "method": "GET",
+      "route": "/auth/csrf",
+      "status": 200,
+      "durationMs": 50
+    },
+    {
+      "method": "POST",
+      "route": "/connections",
+      "status": 403,
+      "durationMs": 81
+    },
+    {
+      "method": "GET",
+      "route": "/auth/csrf",
+      "status": 200,
+      "durationMs": 52
+    },
+    {
+      "method": "POST",
+      "route": "/connections",
+      "status": 403,
+      "durationMs": 69
+    },
+    {
+      "method": "POST",
+      "route": "/connection-secrets",
+      "status": 403,
+      "durationMs": 44
+    }
+  ],
+  "screenshots": [],
+  "productExecution": true,
+  "runId": "recovery-20261101-01",
+  "scenario": "baseline",
+  "driverSha256": "758bf7c638752be285d2da386b356d4fb2143611a98019c1e61067b917351510",
+  "completedAtUtc": "2026-11-01T14:12:20.892Z",
+  "exitCode": 1
+}

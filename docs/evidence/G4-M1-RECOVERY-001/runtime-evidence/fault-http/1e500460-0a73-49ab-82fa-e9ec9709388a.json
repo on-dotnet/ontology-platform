@@ -1,0 +1,38 @@
+{
+  "taskId": "G4-M1-RECOVERY-001",
+  "startedUtc": "2026-11-01T15:00:07.767Z",
+  "checks": [
+    {
+      "name": "actual_request_aborted_during_source_wait",
+      "status": "PASS"
+    }
+  ],
+  "http": [
+    {
+      "method": "GET",
+      "route": "/api/v1/connections/{id}",
+      "status": 200,
+      "durationMs": 34,
+      "jsonBody": true
+    },
+    {
+      "method": "GET",
+      "route": "/api/v1/platform/me",
+      "status": 200,
+      "durationMs": 33,
+      "jsonBody": true
+    }
+  ],
+  "scope": "ONE_HTTP_ACTION_ONLY",
+  "databaseRollbackLeaseFenceEvidence": "NOT_RUN_BY_THIS_CONSUMER",
+  "action": "probe-client-cancel",
+  "connectionId": "1bf23f9d36bf4ceba09d745f04d8f743",
+  "auditStage": "start",
+  "commandKey": "18356ff3a923a1e74c231fa4f4139db1433f8414cd7b85a08448553f968cd07b",
+  "clientCancellation": {
+    "aborted": true,
+    "durationMs": 1502.5
+  },
+  "status": "PASS",
+  "completedUtc": "2026-11-01T15:00:10.741Z"
+}

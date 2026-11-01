@@ -1,0 +1,154 @@
+{
+  "connectionId": "1bf23f9d36bf4ceba09d745f04d8f743",
+  "snapshotId": "9e447b0dafcc44f5be84389a3e1f07bd",
+  "originalViewSha256": "7594bbb28911f61fdf7d31bb4f3b0dac67b51cc6091f7d556f4071454af46b65",
+  "snapshotImmutable": true,
+  "cleanup": "PASS",
+  "commands": [
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "190ab49a8eff5f3a13c1526f38cda9b933c0e618de51c7b7e4da98be73cc130a",
+        "psql",
+        "-U",
+        "platform",
+        "-d",
+        "platform",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-At"
+      ],
+      "sql": "SELECT \"ViewJson\" FROM connections.\"CatalogSnapshots\" WHERE \"Id\"='9e447b0dafcc44f5be84389a3e1f07bd';",
+      "exitCode": 0,
+      "stdoutSha256": "a9a05f1e2aa9bc2800ee197f271edcbfa1a77286550dcf96bfbbb7ec0b13a6c8",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "9dd83f34dd207529bea2975834c3d61baa63b8ca88e159506520bd786f0d7305",
+        "psql",
+        "-U",
+        "postgres",
+        "-d",
+        "fixture",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-At"
+      ],
+      "sql": "SELECT count(*) FROM information_schema.columns WHERE table_schema='production' AND table_name='heat_event' AND column_name='recovery_extra';",
+      "exitCode": 0,
+      "stdoutSha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "9dd83f34dd207529bea2975834c3d61baa63b8ca88e159506520bd786f0d7305",
+        "psql",
+        "-U",
+        "postgres",
+        "-d",
+        "fixture",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-At"
+      ],
+      "sql": "ALTER TABLE production.heat_event ADD COLUMN recovery_extra text;",
+      "exitCode": 0,
+      "stdoutSha256": "2f3ea809dd6ab08b3759423ecc8eed3099bc85e680461ed0321c3bf9dfa0fe78",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "scripts/acceptance/g4-m1-http.mjs",
+        "--runtime-file",
+        "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/http-schema-change.json",
+        "--evidence-dir",
+        "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/artifacts/g4-m1-recovery-001/http"
+      ],
+      "exitCode": 1,
+      "stdout": "{\"taskId\":\"G4-M1-RECOVERY-001\",\"scenario\":\"schema-change\",\"status\":\"FAIL\",\"counts\":{\"PASS\":0,\"FAIL\":1,\"NOT_RUN\":48},\"failure\":null}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "190ab49a8eff5f3a13c1526f38cda9b933c0e618de51c7b7e4da98be73cc130a",
+        "psql",
+        "-U",
+        "platform",
+        "-d",
+        "platform",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-At"
+      ],
+      "sql": "SELECT \"ViewJson\" FROM connections.\"CatalogSnapshots\" WHERE \"Id\"='9e447b0dafcc44f5be84389a3e1f07bd';",
+      "exitCode": 0,
+      "stdoutSha256": "a9a05f1e2aa9bc2800ee197f271edcbfa1a77286550dcf96bfbbb7ec0b13a6c8",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "9dd83f34dd207529bea2975834c3d61baa63b8ca88e159506520bd786f0d7305",
+        "psql",
+        "-U",
+        "postgres",
+        "-d",
+        "fixture",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-At"
+      ],
+      "sql": "ALTER TABLE production.heat_event DROP COLUMN recovery_extra;",
+      "exitCode": 0,
+      "stdoutSha256": "2f3ea809dd6ab08b3759423ecc8eed3099bc85e680461ed0321c3bf9dfa0fe78",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "9dd83f34dd207529bea2975834c3d61baa63b8ca88e159506520bd786f0d7305",
+        "psql",
+        "-U",
+        "postgres",
+        "-d",
+        "fixture",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-At"
+      ],
+      "sql": "SELECT count(*) FROM information_schema.columns WHERE table_schema='production' AND table_name='heat_event' AND column_name='recovery_extra';",
+      "exitCode": 0,
+      "stdoutSha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "stderr": ""
+    }
+  ]
+}

@@ -100,6 +100,8 @@ public sealed partial class ConnectionApplicationService
         if (after.Length > 0) query = query.Where(value => string.Compare(value.Id, after) > 0);
         // 本页最多返回50项，源目录总大小在Adapter受限。
         var records = await query.OrderBy(value => value.Id).Take(call.Operation == "catalog" ? 1 : 51).ToArrayAsync(token);
+        // 完整当前目录指纹同时识别新增对象、字段和属性变化，不仅识别旧字段消失。
+        var currentFingerprint = CanonicalCatalog(visible).Fingerprint;
         // 任何当前不可见字段都不能由历史快照恢复。
         var views = records.Take(50).Select(value =>
         {
@@ -110,10 +112,22 @@ public sealed partial class ConnectionApplicationService
                 && now.Name == item.Name && now.Kind == item.Kind && now.Fields.Any(column => column.Name == field.Name && column.NativeType == field.NativeType))).ToArray() })
                 .Where(item => item.Fields.Length > 0).ToArray();
             return snapshot with { Objects = objects, Status = value.ConfigHash == row.ConfigHash && value.SecretVersion == row.SecretVersion
-                && Encode(objects) == Encode(snapshot.Objects) ? snapshot.Status : "STALE" };
+                && snapshot.SchemaFingerprint == currentFingerprint && Encode(objects) == Encode(snapshot.Objects) ? snapshot.Status : "STALE" };
         }).ToArray();
         if (call.Operation == "catalog") return new ConnectionReply { Value = views.SingleOrDefault() ?? throw new SemanticOperationException(403, "catalog_access_forbidden") };
         return new ConnectionReply { Value = new CatalogSnapshotListPage { Items = views,
             NextCursor = records.Length > 50 ? Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(records[49].Id)) : null } };
     }
+
+    /// <summary>以冻结的适配器版本与排序规则生成目录及指纹，供快照写入和当前状态读取共用。</summary>
+    /// <param name="objects">当前授权范围内由真实适配器返回的有界目录。</param>
+    /// <returns>排序后的目录与保持历史字节规则的内容指纹。</returns>
+    private static (CatalogObject[] Objects, string Fingerprint) CanonicalCatalog(CatalogObject[] objects)
+    {
+        // 排序只规范化已有目录，不添加字段或改变旧快照内容。
+        var canonical = objects.OrderBy(value => value.Schema, StringComparer.Ordinal).ThenBy(value => value.Name, StringComparer.Ordinal)
+            .ThenBy(value => value.Kind, StringComparer.Ordinal).Select(value => value with { Fields = value.Fields.OrderBy(field => field.Ordinal).ThenBy(field => field.Name, StringComparer.Ordinal).ToArray() }).ToArray();
+        return (canonical, Hash(Encode(new { AdapterVersion = "pg-m1-v1", Objects = canonical })));
+    }
+
 }

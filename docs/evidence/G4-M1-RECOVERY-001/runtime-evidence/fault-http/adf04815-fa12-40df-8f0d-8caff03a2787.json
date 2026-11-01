@@ -1,0 +1,42 @@
+{
+  "taskId": "G4-M1-RECOVERY-001",
+  "startedUtc": "2026-11-01T14:32:39.584Z",
+  "checks": [
+    {
+      "name": "http_state_unchanged_after_targeted_audit_fault",
+      "status": "PASS"
+    }
+  ],
+  "http": [
+    {
+      "method": "GET",
+      "route": "/api/v1/connections/{id}",
+      "status": 200,
+      "durationMs": 34,
+      "jsonBody": true
+    },
+    {
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/test",
+      "status": 503,
+      "durationMs": 36,
+      "jsonBody": true,
+      "code": "dependency_unavailable"
+    },
+    {
+      "method": "GET",
+      "route": "/api/v1/connections/{id}",
+      "status": 200,
+      "durationMs": 33,
+      "jsonBody": true
+    }
+  ],
+  "scope": "ONE_HTTP_ACTION_ONLY",
+  "databaseRollbackLeaseFenceEvidence": "NOT_RUN_BY_THIS_CONSUMER",
+  "action": "audit-fail",
+  "connectionId": "1bf23f9d36bf4ceba09d745f04d8f743",
+  "auditStage": "start",
+  "commandKey": "c4905f6297d038821aa01ff27270422272bcd9fd86b3ecd61ba2dad1a500018a",
+  "status": "PASS",
+  "completedUtc": "2026-11-01T14:32:40.983Z"
+}

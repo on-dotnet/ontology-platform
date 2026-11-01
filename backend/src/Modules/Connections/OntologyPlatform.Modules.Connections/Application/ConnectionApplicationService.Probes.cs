@@ -92,6 +92,10 @@ public sealed partial class ConnectionApplicationService
             stages = stages.Select(value => value with { Status = "NOT_VERIFIED", DiagnosticCode = exception.Code }).ToArray();
         }
         finally { secret = null; }
+        // 应用自身截止传入驱动后看似调用方取消；只有原始请求未取消时才归为源超时。
+        if (deadline.IsCancellationRequested && !token.IsCancellationRequested)
+            stages = stages.Select(value => value.DiagnosticCode == "connection_cancelled"
+                ? value with { DiagnosticCode = "connection_source_unavailable" } : value).ToArray();
         // 独立有界完成期限允许客户端断开后写真实终态，绝不复用已取消请求token。
         using var completion = new CancellationTokenSource(TimeSpan.FromSeconds(5));
         // 会话注销后不把源成功提升为可用报告。

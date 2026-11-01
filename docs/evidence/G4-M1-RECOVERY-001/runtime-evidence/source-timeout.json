@@ -1,0 +1,55 @@
+{
+  "taskId": "G4-M1-RECOVERY-001",
+  "sourceId": "9dd83f34dd207529bea2975834c3d61baa63b8ca88e159506520bd786f0d7305",
+  "commands": [
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "pause",
+        "9dd83f34dd207529bea2975834c3d61baa63b8ca88e159506520bd786f0d7305"
+      ],
+      "exitCode": 0,
+      "stdout": "9dd83f34dd207529bea2975834c3d61baa63b8ca88e159506520bd786f0d7305\n",
+      "stderr": "",
+      "elapsedSeconds": 0.029330582998227328
+    },
+    {
+      "command": [
+        "node",
+        "scripts/acceptance/g4-m1-browser.mjs",
+        "--runtime-file",
+        "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/source-timeout.json",
+        "--evidence-dir",
+        "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/artifacts/g4-m1-recovery-001/browser"
+      ],
+      "exitCode": 1,
+      "stdout": "{\"event\":\"SOURCE_TIMEOUT_READY\",\"taskId\":\"G4-M1-RECOVERY-001\",\"runId\":\"recovery-20261101-01\",\"connectionId\":\"1bf23f9d36bf4ceba09d745f04d8f743\"}\n{\"taskId\":\"G4-M1-RECOVERY-001\",\"scenario\":\"source-timeout\",\"status\":\"FAIL\",\"caseStatuses\":{\"M1-U01\":\"NOT_RUN\",\"M1-U02\":\"NOT_RUN\",\"M1-U03\":\"NOT_RUN\",\"M1-U04\":\"NOT_RUN\",\"M1-U05\":\"FAIL\",\"M1-U06\":\"NOT_RUN\"},\"failure\":null}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "unpause",
+        "9dd83f34dd207529bea2975834c3d61baa63b8ca88e159506520bd786f0d7305"
+      ],
+      "exitCode": 0,
+      "stdout": "9dd83f34dd207529bea2975834c3d61baa63b8ca88e159506520bd786f0d7305\n",
+      "stderr": "",
+      "elapsedSeconds": 0.024902874996769242
+    }
+  ],
+  "status": "FAIL",
+  "ready": {
+    "event": "SOURCE_TIMEOUT_READY",
+    "taskId": "G4-M1-RECOVERY-001",
+    "runId": "recovery-20261101-01",
+    "connectionId": "1bf23f9d36bf4ceba09d745f04d8f743"
+  },
+  "pauseObserved": true,
+  "pausedAfter": false,
+  "driverSha256": "56fda13478b185c42caffba320c517a06020b54d056fccc2b2b66468634e7ae3"
+}
