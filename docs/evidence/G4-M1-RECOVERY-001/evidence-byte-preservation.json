@@ -1,0 +1,117 @@
+{
+  "taskId": "G4-M1-RECOVERY-001",
+  "historicalHead": "cdf9e0ce63c5a784f1473b7de0117ae07f4d912b",
+  "historicalDiffCheckExitCode": 2,
+  "failure": "Shell did not stop after staged diff-check failure; PARTIAL checkpoint was committed/pushed. No historical rewrite. Final gate remains required.",
+  "files": [
+    {
+      "source": "docs/evidence/G4-M1-RECOVERY-001/body-limit-baseline-tests.txt",
+      "packaged": "docs/evidence/G4-M1-RECOVERY-001/body-limit-baseline-tests.raw.json",
+      "rawSha256": "cf7511500af4c2cbc20b070b9fe2b4fa9072a66199e24151eca93e7e21f619e3",
+      "rawBytes": 10243,
+      "roundTrip": "PASS"
+    },
+    {
+      "source": "docs/evidence/G4-M1-RECOVERY-001/images/0-sbom.json",
+      "packaged": "docs/evidence/G4-M1-RECOVERY-001/images/0-sbom.json",
+      "transform": "Remove only trailing CR/LF bytes and append one LF; reconstruct by removing packaged trailing CR/LF and appending originalSuffixHex.",
+      "originalSuffixHex": "0a0a",
+      "rawBytes": 6689695,
+      "rawSha256": "34329b7a20eeee7d976e7d6eb1770e611a65e08aa81cec8e625fd24005fcfbac",
+      "packagedSha256": "54041d82bd8ec8620e0fe9e5297fe44714292ae9c8166e41508f0c9bb4201a60",
+      "roundTrip": "PASS"
+    },
+    {
+      "source": "docs/evidence/G4-M1-RECOVERY-001/images/1-release-third-party-notice.html",
+      "packaged": "docs/evidence/G4-M1-RECOVERY-001/images/1-release-third-party-notice.json",
+      "rawSha256": "14c17647c43f27315d148812a0be6b97b3cc9585463588ebbe67f7282cfe661d",
+      "rawBytes": 7523238,
+      "roundTrip": "PASS",
+      "historicalBlobSha256": "5fd2c86ab1f82b76ad63ed8c697d1a143c48e69f4b037f6b5cfdd19d7145f29d",
+      "historicalBlobBytes": 7523199,
+      "historicalTransformation": "Git removed 39 CR bytes from CRLF; normalized original equals historical Git blob. Wrapper restores exact original download, not the normalized historical blob."
+    },
+    {
+      "source": "docs/evidence/G4-M1-RECOVERY-001/images/2-sbom.json",
+      "packaged": "docs/evidence/G4-M1-RECOVERY-001/images/2-sbom.json",
+      "transform": "Remove only trailing CR/LF bytes and append one LF; reconstruct by removing packaged trailing CR/LF and appending originalSuffixHex.",
+      "originalSuffixHex": "0a0a",
+      "rawBytes": 3044161,
+      "rawSha256": "02d52725a329000177c26f43b003a5c2dca30e4caa9bbc3b27963bca79c23707",
+      "packagedSha256": "7b08b8f515915c51d4615ec85a2a207af572dacd6b3929aab93cdd8693b4e5bf",
+      "roundTrip": "PASS"
+    },
+    {
+      "source": "docs/evidence/G4-M1-RECOVERY-001/images/3-sbom.json",
+      "packaged": "docs/evidence/G4-M1-RECOVERY-001/images/3-sbom.json",
+      "transform": "Remove only trailing CR/LF bytes and append one LF; reconstruct by removing packaged trailing CR/LF and appending originalSuffixHex.",
+      "originalSuffixHex": "0a0a",
+      "rawBytes": 2156903,
+      "rawSha256": "406eaf3264aef3220f99d74720bc8955f7461d01ddba8fa3a6d139f987de89b8",
+      "packagedSha256": "cc098d44473adef8ff3d708063ba4554619e00975030f881dc22e9c13c4c2558",
+      "roundTrip": "PASS"
+    },
+    {
+      "source": "docs/evidence/G4-M1-RECOVERY-001/pg-first.txt",
+      "packaged": "docs/evidence/G4-M1-RECOVERY-001/pg-first.raw.json",
+      "rawSha256": "c7fe651d3e75ddbf231ae76ce542c8db70ec0e8548b82a5ca4d1d4fed5b5a2de",
+      "rawBytes": 1555,
+      "roundTrip": "PASS"
+    },
+    {
+      "source": "docs/evidence/G4-M1-RECOVERY-001/pg-guard-fixed.txt",
+      "packaged": "docs/evidence/G4-M1-RECOVERY-001/pg-guard-fixed.raw.json",
+      "rawSha256": "a9ce81e360c8a5270f3129c40682935ddc6959faff7e1336ccf5a0f4521aff03",
+      "rawBytes": 749,
+      "roundTrip": "PASS"
+    },
+    {
+      "source": "docs/evidence/G4-M1-RECOVERY-001/pg-normal.txt",
+      "packaged": "docs/evidence/G4-M1-RECOVERY-001/pg-normal.raw.json",
+      "rawSha256": "68de5efa7d2c99be69c68584b39c9ae2a2646425390a938ab7af83a6f03875cc",
+      "rawBytes": 1491,
+      "roundTrip": "PASS"
+    },
+    {
+      "source": "docs/evidence/G4-M1-RECOVERY-001/pg-readonly-exact-sql.txt",
+      "packaged": "docs/evidence/G4-M1-RECOVERY-001/pg-readonly-exact-sql.raw.json",
+      "rawSha256": "5ab297712ddb5d665cd46e73b77b143aca25ba0b02521e49efd08ccecc3c3ef3",
+      "rawBytes": 65,
+      "roundTrip": "PASS"
+    },
+    {
+      "source": "docs/evidence/G4-M1-RECOVERY-001/pg-short-fixed.txt",
+      "packaged": "docs/evidence/G4-M1-RECOVERY-001/pg-short-fixed.raw.json",
+      "rawSha256": "f930418f367609f5b344174458b58e964fb200710420c65fa7a12e82417c8666",
+      "rawBytes": 1398,
+      "roundTrip": "PASS"
+    },
+    {
+      "source": "docs/evidence/G4-M1-RECOVERY-001/pg-short.txt",
+      "packaged": "docs/evidence/G4-M1-RECOVERY-001/pg-short.raw.json",
+      "rawSha256": "d497e3b3ded4d4af4fd120868e0768d689fa688a98f694dad6ef172a29091565",
+      "rawBytes": 1348,
+      "roundTrip": "PASS"
+    },
+    {
+      "source": "docs/evidence/G4-M1-RECOVERY-001/pg-wrong-san.txt",
+      "packaged": "docs/evidence/G4-M1-RECOVERY-001/pg-wrong-san.raw.json",
+      "rawSha256": "1772472b7ac5d4563ebf56867a46ef6bce9c297a7e4262a1352c4ed9fb3f89d4",
+      "rawBytes": 833,
+      "roundTrip": "PASS"
+    }
+  ],
+  "independentReopen": {
+    "reviewer": "/root/recovery_reviewer",
+    "status": "PASS",
+    "reconstructedFiles": 12,
+    "sameAsHistoricalBlob": 11,
+    "noticeSameAsOriginalDownload": true,
+    "currentWorkingStagedAndBaseToWorkingDiffCheckExitCodes": [
+      0,
+      0,
+      0
+    ],
+    "finalCommittedHead": "NOT_YET_VERIFIED"
+  }
+}

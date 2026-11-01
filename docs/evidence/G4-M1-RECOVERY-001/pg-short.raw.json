@@ -1,0 +1,8 @@
+{
+  "encoding": "utf-8",
+  "rawUtf8": "time=\"2026-11-01T21:41:17+08:00\" level=warning msg=\"Found orphan containers (ontology-g4-m1-recovery-001-pg-first) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up.\"\n Container ontology-g4-m1-recovery-001-pg-short Creating \n Container ontology-g4-m1-recovery-001-pg-short Created \nMSTest v4.5.1 (UTC 10/07/2026) [linux-arm64 - .NET 10.0.13]\nfailed RealFixturePreservesAuthorizedMetadata (91ms)\n  Assertion failed. Expected condition to be true.\n  NETWORK:,TLS:,AUTH:,READ_ONLY:connection_readonly_unverified,METADATA:\n  \n  actual: false\n  \n  Assert.IsTrue(stages.All(stage => stage.Status == \"PASS\"))\n  Expected\n    true\n  Actual\n    false\n    at OntologyPlatform.ConnectionsTests.PgAdapterTests.RealFixturePreservesAuthorizedMetadata() in /Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/backend/tests/OntologyPlatform.ConnectionsTests/PgAdapterTests.cs:136\n    at Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.ExecuteInternalAsync(Object[] arguments, CancellationTokenSource timeoutTokenSource, TestInvocationState invocationState)\n\nTest run summary: Failed! - /tests/OntologyPlatform.ConnectionsTests.dll (net10.0|arm64)\n  total: 1\n  failed: 1\n  succeeded: 0\n  skipped: 0\n  duration: 156ms\n\n",
+  "rawSha256": "d497e3b3ded4d4af4fd120868e0768d689fa688a98f694dad6ef172a29091565",
+  "rawBytes": 1348,
+  "source": "docs/evidence/G4-M1-RECOVERY-001/pg-short.txt",
+  "originalCommandExitCode": "See corresponding command receipt / test summary; not inferred from text wrapping"
+}
