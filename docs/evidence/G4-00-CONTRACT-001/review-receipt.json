@@ -12,15 +12,17 @@
     "RC-02 workflow versus Draft wire states",
     "URI FormatChecker missing dependency and empty authority/NSS"
   ],
-  "inputAggregateSha256": "93e7fe1cd2a0bf7e8530febbe3585cca1df9e47bb75c5040ee1ae22174049c6a",
+  "inputAggregateSha256": "0067c5dcb8c8404f21354f1649e27900d495de6326e59353dd8e90e90fe05e7d",
   "inputPaths": {
-    "docs/contracts/g4-00-connections.md": "cb0b0cac3aca148d2995ef7b2e1db3771192b187402487269bd3877f2ae47020",
-    "docs/contracts/g4-00-mapping.md": "527b42874905fe56aaf08e44761423dbe6ff0678d553c39365c2ef5e3c64a083",
-    "docs/contracts/g4-00-query.md": "3aaa3778bfeeb6881346cfb176307c4a626d2e4548f1482bc0e57270774bf372",
-    "docs/contracts/g4-00-ui.md": "7ebbd43629a4655543704e64c99c594cb2cfbcacd8d9d4a0930e849b2edfbae7",
-    "docs/planning/g4-implementation-plan.md": "68d3b26e8ac3bd5b92da4c8a1629291f062374fe814ed2ecc9013b1aeb63fa8c",
+    "docs/contracts/g4-00-connections.md": "bc4ed892aab9602d3b100d2f9d271b0583a55a02513102ed7a52a183d6e5deb7",
+    "docs/contracts/g4-00-mapping.md": "33c228bed7ede6039f7195ac05f324802bf3d4e49dd2427d2a479e9daf9a8fd9",
+    "docs/contracts/g4-00-query.md": "fe96e4cea8212909a9728fa463a2be6b29c3f5fadfb3210b52d60a0cc548b7f4",
+    "docs/contracts/g4-00-ui.md": "a19e6f8f7840093832ec72a820683e87e40775e64a79825e74d7444dd110c4ba",
+    "docs/planning/g4-implementation-plan.md": "f34879f1a61cc8522898c72447d681864c9f5881f06e6251ceb78b234393e35f",
     "docs/evidence/G4-00-CONTRACT-001/g4-reviewed-design.schema.json": "6f3f5b56725bba410f8cc2c346984a857f5d72a2e6869be0fb6d883010ac10af",
-    "docs/evidence/G4-00-CONTRACT-001/check-review-cases.py": "c3b43d6f83dafc5014734f584f8ed94c5bf21daa135446e1f9b8050ef006decb"
+    "docs/evidence/G4-00-CONTRACT-001/check-review-cases.py": "c3b43d6f83dafc5014734f584f8ed94c5bf21daa135446e1f9b8050ef006decb",
+    "docs/evidence/G4-00-CONTRACT-001/input-original-bytes.json": "34255f900857e0f6475b5e617f4521e4cd9e4e66e6392340ce0148fcafcc7bef",
+    "docs/evidence/G4-00-CONTRACT-001/restore-input.py": "e4da956f88a247ff04d138e2174739eef20885e6edfb2d7c7fed707c309edc80"
   },
   "independentChecks": [
     {
@@ -56,5 +58,21 @@
     "V3 independent reopen"
   ],
   "cleanupApprovedInventory": "9fb4722b13737fb6b2e69deccfca8798d9c37e6a1947e6f8fe65b5b3e752bfbb",
-  "attackMatrix": "review-attack-matrix.md"
+  "attackMatrix": "review-attack-matrix.md",
+  "previousInputAggregateSha256": "93e7fe1cd2a0bf7e8530febbe3585cca1df9e47bb75c5040ee1ae22174049c6a",
+  "finalPrepackageReview": {
+    "status": "PASS",
+    "originalZipCrc": "PASS",
+    "originalZipSha256": "afc14831c13a6de61aced4d38c142f1be2c4969654c7dcaf86e9c54601cb34d7",
+    "restoredPayloadFiles": 24,
+    "restoredBytes": 283725,
+    "originalGitCommit": "7132c51203939d9b47de047d5c187f339910ba26",
+    "comparison": "all restored bytes match original ZIP and original Git blobs; derived05 differs only one trailing LF",
+    "baseToWorkingDiffCheckExit": 0,
+    "selfTestLogHash": "0639593cd1d2a98ec411c91b0f66a13bde763d49f516b28dd26d76875a54d2e4",
+    "selfTestLogBytes": 37440,
+    "reviewPackageTests": 103,
+    "expectedNegativeFixtureDiagnostics": "invalid.yml/toml FAIL lines are expected negative tests; suite passes",
+    "product": "NOT_RUN"
+  }
 }

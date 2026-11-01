@@ -15,3 +15,5 @@ execution_preflight.py check --milestone G4-00：exit2，支持M1/M2/M3/M4/M5，
 CI/.NET/浏览器/五源/Docker/模型/生产访问NOT_RUN；未运行不是失败或PASS。活跃Agent工时UNKNOWN。
 
 Reviewer新增定向反例首次exit1：jsonschema FormatChecker未注册uri，原prefix允许https://、urn:及带空白的伪URI。保留此失败；补rfc3986-validator精确任务依赖、assert uri注册及非空authority/URN限制，添加三个负例定向复验；不是产品SQL执行漏洞。
+
+最终diff-check首次返回2（input-v1.1/docs/05原文多余EOF空行、worktrees日志EOF空行）。同批shell未短路，生成7132c51但未push，不能称当时门禁通过。追加修正不改历史：input-v1.1是EOF规范化归档视图，05只移除一个末尾LF并更新派生Manifest/SHA；三个原文件逐字base64保存在input-original-bytes.json，其余21文件原样。restore-input.py恢复原24文件并验证原Manifest及原输入脚本，再运行Schema；原正式输入ZIP的hash不变。规范化不是输入合同内容变更。worktrees日志仅去EOF空行。最终全Base..Head必须diff-check0才构包。

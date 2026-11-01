@@ -205,4 +205,3 @@ TemporalSpec = { eventTimeField?, observedAtField?, timezonePolicy,
 - U10 异人审核从 `GET /api/v1/mapping-proposals?status=PENDING` 发现待审队列；打开 `GET /api/v1/mapping-proposals/{id}` 获得**一次固定**已提交 revision/hash/关联版本/提交者/过期时间及审查决定；继续 `GET /api/v1/mappings/{id}/revisions/{revision}` 和固定 diff/assessment。审核时不再依赖当前可变草稿状态；权限或输入变化导致审批/激活失败关闭，提交者不能自批。
 - U11 历史目录 `GET /api/v1/mappings` 与 `GET /api/v1/mapping-releases?mappingId=...`；查看 `GET /api/v1/mapping-releases/{id}` 的不可变版本及指针激活状态，`GET /api/v1/mappings/{id}/active` 读取 PG 权威指针，回滚仍需固定目标版本/审批/CAS，不能靠 GET 修改状态。
 - 列表/提案/版本的 cursor、组织厂区过滤、403/404/409/过期与已失效显示都由服务端校验；前端页面刷新、直链、审核人更换和历史访问要可恢复。
-
