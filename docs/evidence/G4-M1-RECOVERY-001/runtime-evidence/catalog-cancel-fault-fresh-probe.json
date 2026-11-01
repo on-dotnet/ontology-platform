@@ -1,0 +1,624 @@
+{
+  "taskId": "G4-M1-RECOVERY-001",
+  "status": "FAIL",
+  "commands": [
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "190ab49a8eff5f3a13c1526f38cda9b933c0e618de51c7b7e4da98be73cc130a",
+        "psql",
+        "-U",
+        "platform",
+        "-d",
+        "platform",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-qAt"
+      ],
+      "sql": "SELECT count(*) FROM connections.\"CatalogJobs\" WHERE \"Status\" IN ('QUEUED','RUNNING');",
+      "exitCode": 0,
+      "stdout": "0\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "190ab49a8eff5f3a13c1526f38cda9b933c0e618de51c7b7e4da98be73cc130a",
+        "psql",
+        "-U",
+        "platform",
+        "-d",
+        "platform",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-qAt"
+      ],
+      "sql": "SELECT json_build_object('status',\"Status\",'cancelRequested',\"CancelRequested\",'fence',\"Fence\",'snapshot',\"SnapshotId\",'diagnostic',\"DiagnosticCode\") FROM connections.\"CatalogJobs\" WHERE \"Id\"='75f491f14f33443ba6a1ee574819c996';",
+      "exitCode": 0,
+      "stdout": "{\"status\" : \"QUEUED\", \"cancelRequested\" : false, \"fence\" : 0, \"snapshot\" : null, \"diagnostic\" : null}\n",
+      "stderr": ""
+    },
+    {
+      "operation": "source_wait_observation",
+      "observedUtc": "2026-11-01T15:50:21.768292+00:00",
+      "value": []
+    },
+    {
+      "operation": "source_wait_observation",
+      "observedUtc": "2026-11-01T15:50:21.799418+00:00",
+      "value": [
+        {
+          "pid": 29073,
+          "state": "active",
+          "waitType": "Lock",
+          "wait": "relation",
+          "clientAddr": "172.18.0.3/32",
+          "user": "fixture_reader",
+          "database": "fixture"
+        }
+      ]
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "190ab49a8eff5f3a13c1526f38cda9b933c0e618de51c7b7e4da98be73cc130a",
+        "psql",
+        "-U",
+        "platform",
+        "-d",
+        "platform",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-qAt"
+      ],
+      "sql": "SELECT count(*) FROM pg_locks WHERE pid=29069 AND locktype='advisory';",
+      "exitCode": 0,
+      "stdout": "0\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "190ab49a8eff5f3a13c1526f38cda9b933c0e618de51c7b7e4da98be73cc130a",
+        "psql",
+        "-U",
+        "platform",
+        "-d",
+        "platform",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-qAt"
+      ],
+      "sql": "SELECT json_build_object('status',\"Status\",'cancelRequested',\"CancelRequested\",'fence',\"Fence\",'snapshot',\"SnapshotId\",'diagnostic',\"DiagnosticCode\") FROM connections.\"CatalogJobs\" WHERE \"Id\"='75f491f14f33443ba6a1ee574819c996';",
+      "exitCode": 0,
+      "stdout": "{\"status\" : \"QUEUED\", \"cancelRequested\" : false, \"fence\" : 0, \"snapshot\" : null, \"diagnostic\" : null}\n",
+      "stderr": ""
+    },
+    {
+      "operation": "source_wait_observation",
+      "observedUtc": "2026-11-01T15:50:21.874021+00:00",
+      "value": [
+        {
+          "pid": 29073,
+          "state": "active",
+          "waitType": "Lock",
+          "wait": "relation",
+          "clientAddr": "172.18.0.3/32",
+          "user": "fixture_reader",
+          "database": "fixture"
+        }
+      ]
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "190ab49a8eff5f3a13c1526f38cda9b933c0e618de51c7b7e4da98be73cc130a",
+        "psql",
+        "-U",
+        "platform",
+        "-d",
+        "platform",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-qAt"
+      ],
+      "sql": "SELECT json_build_object('status',\"Status\",'cancelRequested',\"CancelRequested\",'fence',\"Fence\",'snapshot',\"SnapshotId\",'diagnostic',\"DiagnosticCode\") FROM connections.\"CatalogJobs\" WHERE \"Id\"='75f491f14f33443ba6a1ee574819c996';",
+      "exitCode": 0,
+      "stdout": "{\"status\" : \"QUEUED\", \"cancelRequested\" : false, \"fence\" : 0, \"snapshot\" : null, \"diagnostic\" : null}\n",
+      "stderr": ""
+    },
+    {
+      "operation": "source_wait_observation",
+      "observedUtc": "2026-11-01T15:50:21.940003+00:00",
+      "value": [
+        {
+          "pid": 29073,
+          "state": "active",
+          "waitType": "Lock",
+          "wait": "relation",
+          "clientAddr": "172.18.0.3/32",
+          "user": "fixture_reader",
+          "database": "fixture"
+        }
+      ]
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "190ab49a8eff5f3a13c1526f38cda9b933c0e618de51c7b7e4da98be73cc130a",
+        "psql",
+        "-U",
+        "platform",
+        "-d",
+        "platform",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-qAt"
+      ],
+      "sql": "SELECT json_build_object('status',\"Status\",'cancelRequested',\"CancelRequested\",'fence',\"Fence\",'snapshot',\"SnapshotId\",'diagnostic',\"DiagnosticCode\") FROM connections.\"CatalogJobs\" WHERE \"Id\"='75f491f14f33443ba6a1ee574819c996';",
+      "exitCode": 0,
+      "stdout": "{\"status\" : \"QUEUED\", \"cancelRequested\" : false, \"fence\" : 0, \"snapshot\" : null, \"diagnostic\" : null}\n",
+      "stderr": ""
+    },
+    {
+      "operation": "source_wait_observation",
+      "observedUtc": "2026-11-01T15:50:22.014190+00:00",
+      "value": [
+        {
+          "pid": 29073,
+          "state": "active",
+          "waitType": "Lock",
+          "wait": "relation",
+          "clientAddr": "172.18.0.3/32",
+          "user": "fixture_reader",
+          "database": "fixture"
+        }
+      ]
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "190ab49a8eff5f3a13c1526f38cda9b933c0e618de51c7b7e4da98be73cc130a",
+        "psql",
+        "-U",
+        "platform",
+        "-d",
+        "platform",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-qAt"
+      ],
+      "sql": "SELECT json_build_object('status',\"Status\",'cancelRequested',\"CancelRequested\",'fence',\"Fence\",'snapshot',\"SnapshotId\",'diagnostic',\"DiagnosticCode\") FROM connections.\"CatalogJobs\" WHERE \"Id\"='75f491f14f33443ba6a1ee574819c996';",
+      "exitCode": 0,
+      "stdout": "{\"status\" : \"QUEUED\", \"cancelRequested\" : false, \"fence\" : 0, \"snapshot\" : null, \"diagnostic\" : null}\n",
+      "stderr": ""
+    },
+    {
+      "operation": "source_wait_observation",
+      "observedUtc": "2026-11-01T15:50:22.089470+00:00",
+      "value": [
+        {
+          "pid": 29073,
+          "state": "active",
+          "waitType": "Lock",
+          "wait": "relation",
+          "clientAddr": "172.18.0.3/32",
+          "user": "fixture_reader",
+          "database": "fixture"
+        }
+      ]
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "190ab49a8eff5f3a13c1526f38cda9b933c0e618de51c7b7e4da98be73cc130a",
+        "psql",
+        "-U",
+        "platform",
+        "-d",
+        "platform",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-qAt"
+      ],
+      "sql": "SELECT json_build_object('status',\"Status\",'cancelRequested',\"CancelRequested\",'fence',\"Fence\",'snapshot',\"SnapshotId\",'diagnostic',\"DiagnosticCode\") FROM connections.\"CatalogJobs\" WHERE \"Id\"='75f491f14f33443ba6a1ee574819c996';",
+      "exitCode": 0,
+      "stdout": "{\"status\" : \"RUNNING\", \"cancelRequested\" : false, \"fence\" : 1, \"snapshot\" : null, \"diagnostic\" : null}\n",
+      "stderr": ""
+    },
+    {
+      "operation": "source_wait_observation",
+      "observedUtc": "2026-11-01T15:50:22.163076+00:00",
+      "value": [
+        {
+          "pid": 29074,
+          "state": "active",
+          "waitType": "Lock",
+          "wait": "relation",
+          "clientAddr": "172.18.0.3/32",
+          "user": "fixture_reader",
+          "database": "fixture"
+        },
+        {
+          "pid": 29073,
+          "state": "active",
+          "waitType": "Lock",
+          "wait": "relation",
+          "clientAddr": "172.18.0.3/32",
+          "user": "fixture_reader",
+          "database": "fixture"
+        }
+      ]
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "190ab49a8eff5f3a13c1526f38cda9b933c0e618de51c7b7e4da98be73cc130a",
+        "psql",
+        "-U",
+        "platform",
+        "-d",
+        "platform",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-qAt"
+      ],
+      "sql": "SELECT json_build_object('status',\"Status\",'cancelRequested',\"CancelRequested\",'fence',\"Fence\",'snapshot',\"SnapshotId\",'diagnostic',\"DiagnosticCode\") FROM connections.\"CatalogJobs\" WHERE \"Id\"='75f491f14f33443ba6a1ee574819c996';",
+      "exitCode": 0,
+      "stdout": "{\"status\" : \"RUNNING\", \"cancelRequested\" : false, \"fence\" : 1, \"snapshot\" : null, \"diagnostic\" : null}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "190ab49a8eff5f3a13c1526f38cda9b933c0e618de51c7b7e4da98be73cc130a",
+        "psql",
+        "-U",
+        "platform",
+        "-d",
+        "platform",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-qAt"
+      ],
+      "sql": "SELECT json_build_object('status',\"Status\",'cancelRequested',\"CancelRequested\",'fence',\"Fence\",'snapshot',\"SnapshotId\",'diagnostic',\"DiagnosticCode\") FROM connections.\"CatalogJobs\" WHERE \"Id\"='75f491f14f33443ba6a1ee574819c996';",
+      "exitCode": 0,
+      "stdout": "{\"status\" : \"RUNNING\", \"cancelRequested\" : false, \"fence\" : 1, \"snapshot\" : null, \"diagnostic\" : null}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "190ab49a8eff5f3a13c1526f38cda9b933c0e618de51c7b7e4da98be73cc130a",
+        "psql",
+        "-U",
+        "platform",
+        "-d",
+        "platform",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-qAt"
+      ],
+      "sql": "SELECT json_build_object('status',\"Status\",'cancelRequested',\"CancelRequested\",'fence',\"Fence\",'snapshot',\"SnapshotId\",'diagnostic',\"DiagnosticCode\") FROM connections.\"CatalogJobs\" WHERE \"Id\"='75f491f14f33443ba6a1ee574819c996';",
+      "exitCode": 0,
+      "stdout": "{\"status\" : \"RUNNING\", \"cancelRequested\" : false, \"fence\" : 1, \"snapshot\" : null, \"diagnostic\" : null}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "190ab49a8eff5f3a13c1526f38cda9b933c0e618de51c7b7e4da98be73cc130a",
+        "psql",
+        "-U",
+        "platform",
+        "-d",
+        "platform",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-qAt"
+      ],
+      "sql": "SELECT json_build_object('status',\"Status\",'cancelRequested',\"CancelRequested\",'fence',\"Fence\",'snapshot',\"SnapshotId\",'diagnostic',\"DiagnosticCode\") FROM connections.\"CatalogJobs\" WHERE \"Id\"='75f491f14f33443ba6a1ee574819c996';",
+      "exitCode": 0,
+      "stdout": "{\"status\" : \"RUNNING\", \"cancelRequested\" : true, \"fence\" : 1, \"snapshot\" : null, \"diagnostic\" : null}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "190ab49a8eff5f3a13c1526f38cda9b933c0e618de51c7b7e4da98be73cc130a",
+        "psql",
+        "-U",
+        "platform",
+        "-d",
+        "platform",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-qAt"
+      ],
+      "sql": "SELECT json_build_object('status',\"Status\",'cancelRequested',\"CancelRequested\",'fence',\"Fence\",'snapshot',\"SnapshotId\",'diagnostic',\"DiagnosticCode\") FROM connections.\"CatalogJobs\" WHERE \"Id\"='75f491f14f33443ba6a1ee574819c996';",
+      "exitCode": 0,
+      "stdout": "{\"status\" : \"RUNNING\", \"cancelRequested\" : true, \"fence\" : 1, \"snapshot\" : null, \"diagnostic\" : null}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "190ab49a8eff5f3a13c1526f38cda9b933c0e618de51c7b7e4da98be73cc130a",
+        "psql",
+        "-U",
+        "platform",
+        "-d",
+        "platform",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-qAt"
+      ],
+      "sql": "SELECT json_build_object('status',\"Status\",'cancelRequested',\"CancelRequested\",'fence',\"Fence\",'snapshot',\"SnapshotId\",'diagnostic',\"DiagnosticCode\") FROM connections.\"CatalogJobs\" WHERE \"Id\"='75f491f14f33443ba6a1ee574819c996';",
+      "exitCode": 0,
+      "stdout": "{\"status\" : \"RUNNING\", \"cancelRequested\" : true, \"fence\" : 1, \"snapshot\" : null, \"diagnostic\" : null}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "190ab49a8eff5f3a13c1526f38cda9b933c0e618de51c7b7e4da98be73cc130a",
+        "psql",
+        "-U",
+        "platform",
+        "-d",
+        "platform",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-qAt"
+      ],
+      "sql": "SELECT json_build_object('status',\"Status\",'cancelRequested',\"CancelRequested\",'fence',\"Fence\",'snapshot',\"SnapshotId\",'diagnostic',\"DiagnosticCode\") FROM connections.\"CatalogJobs\" WHERE \"Id\"='75f491f14f33443ba6a1ee574819c996';",
+      "exitCode": 0,
+      "stdout": "{\"status\" : \"CANCELLED\", \"cancelRequested\" : true, \"fence\" : 1, \"snapshot\" : null, \"diagnostic\" : \"connection_cancelled\"}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "scripts/acceptance/g4-m1-browser.mjs",
+        "--runtime-file",
+        "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/catalog-cancel-fresh-probe.json",
+        "--evidence-dir",
+        "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/artifacts/g4-m1-recovery-001/browser"
+      ],
+      "exitCode": 1,
+      "stdout": "{\"taskId\":\"G4-M1-RECOVERY-001\",\"scenario\":\"catalog-cancel\",\"status\":\"FAIL\",\"caseStatuses\":{\"M1-U01\":\"NOT_RUN\",\"M1-U02\":\"NOT_RUN\",\"M1-U03\":\"NOT_RUN\",\"M1-U04\":\"NOT_RUN\",\"M1-U05\":\"FAIL\",\"M1-U06\":\"NOT_RUN\"},\"failure\":null}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "9dd83f34dd207529bea2975834c3d61baa63b8ca88e159506520bd786f0d7305",
+        "psql",
+        "-U",
+        "postgres",
+        "-d",
+        "fixture",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-qAt"
+      ],
+      "sql": "SET statement_timeout='2s';SELECT json_build_object('lockCount',(SELECT count(*) FROM pg_locks WHERE pid=29072),'backendCount',(SELECT count(*) FROM pg_stat_activity WHERE pid IN (29074,29073)));",
+      "exitCode": 0,
+      "stdout": "{\"lockCount\" : 0, \"backendCount\" : 0}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "190ab49a8eff5f3a13c1526f38cda9b933c0e618de51c7b7e4da98be73cc130a",
+        "psql",
+        "-U",
+        "platform",
+        "-d",
+        "platform",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-qAt"
+      ],
+      "sql": "SELECT count(*) FROM pg_locks WHERE pid=29069 AND locktype='advisory';",
+      "exitCode": 0,
+      "stdout": "0\n",
+      "stderr": ""
+    }
+  ],
+  "apiIdentity": {
+    "id": "24ea2c3e21b21fe604c1d86206285acdbf703002e0766776a816fca19ccd8801",
+    "addresses": [
+      "172.18.0.3",
+      "172.19.0.4"
+    ]
+  },
+  "ready": {
+    "event": "CATALOG_CANCEL_READY",
+    "taskId": "G4-M1-RECOVERY-001",
+    "runId": "recovery-20261101-01",
+    "connectionId": "1bf23f9d36bf4ceba09d745f04d8f743"
+  },
+  "sourceBefore": [],
+  "claimLock": {
+    "command": [
+      "docker",
+      "--context",
+      "desktop-linux",
+      "exec",
+      "-i",
+      "190ab49a8eff5f3a13c1526f38cda9b933c0e618de51c7b7e4da98be73cc130a",
+      "psql",
+      "-U",
+      "platform",
+      "-d",
+      "platform",
+      "-v",
+      "ON_ERROR_STOP=1",
+      "-qAt"
+    ],
+    "sql": "SET lock_timeout='2s';SET statement_timeout='10s';SET idle_in_transaction_session_timeout='10s';BEGIN;SELECT pg_advisory_xact_lock(hashtextextended('connection:catalog-claim',0));SELECT json_build_object('pid',pg_backend_pid(),'granted',exists(SELECT 1 FROM pg_locks WHERE pid=pg_backend_pid() AND locktype='advisory' AND granted));\n",
+    "held": {
+      "pid": 29069,
+      "granted": true
+    },
+    "exitCode": 0,
+    "releasedCount": 0
+  },
+  "lock": {
+    "command": [
+      "docker",
+      "--context",
+      "desktop-linux",
+      "exec",
+      "-i",
+      "9dd83f34dd207529bea2975834c3d61baa63b8ca88e159506520bd786f0d7305",
+      "psql",
+      "-U",
+      "postgres",
+      "-d",
+      "fixture",
+      "-v",
+      "ON_ERROR_STOP=1",
+      "-qAt"
+    ],
+    "sql": "SET application_name='g4_m1_recovery_cancel_lock'; SET lock_timeout='2s'; SET statement_timeout='15s'; SET idle_in_transaction_session_timeout='15s'; BEGIN; LOCK TABLE pg_catalog.pg_shdepend IN ACCESS EXCLUSIVE MODE; SELECT json_build_object('pid',pg_backend_pid(),'granted',exists(SELECT 1 FROM pg_locks WHERE pid=pg_backend_pid() AND relation='pg_catalog.pg_shdepend'::regclass AND mode='AccessExclusiveLock' AND granted));\n",
+    "held": {
+      "pid": 29072,
+      "granted": true
+    },
+    "exitCode": 0
+  },
+  "jobId": "75f491f14f33443ba6a1ee574819c996",
+  "uiSourcePidBaselineWhileJobQueued": [
+    {
+      "pid": 29073,
+      "state": "active",
+      "waitType": "Lock",
+      "wait": "relation",
+      "clientAddr": "172.18.0.3/32",
+      "user": "fixture_reader",
+      "database": "fixture"
+    }
+  ],
+  "sourceBlockedBeforeCancel": [
+    {
+      "pid": 29074,
+      "state": "active",
+      "waitType": "Lock",
+      "wait": "relation",
+      "clientAddr": "172.18.0.3/32",
+      "user": "fixture_reader",
+      "database": "fixture"
+    },
+    {
+      "pid": 29073,
+      "state": "active",
+      "waitType": "Lock",
+      "wait": "relation",
+      "clientAddr": "172.18.0.3/32",
+      "user": "fixture_reader",
+      "database": "fixture"
+    }
+  ],
+  "workerSourcePid": 29074,
+  "jobBeforeCancel": {
+    "status": "RUNNING",
+    "cancelRequested": false,
+    "fence": 1,
+    "snapshot": null,
+    "diagnostic": null
+  },
+  "jobCancelledWhileSourceLocked": {
+    "status": "CANCELLED",
+    "cancelRequested": true,
+    "fence": 1,
+    "snapshot": null,
+    "diagnostic": "connection_cancelled"
+  },
+  "sourceCancellationBeforeUnlock": {
+    "observedUtc": "2026-11-01T15:50:22.663649+00:00",
+    "elapsedAfterCancelAckMs": 500.52054099796806,
+    "lockCount": 1,
+    "backendCount": 0
+  },
+  "lockExit": 0,
+  "claimExit": 0,
+  "observerExit": 0,
+  "browserExit": 1,
+  "sourceAfter": {
+    "lockCount": 0,
+    "backendCount": 0
+  },
+  "claimLockAfter": 0,
+  "cleanupErrors": [],
+  "driverSha256": "dfa1820b0589739964cce582cf0f29b81ae70719ea469031906e38a7e6bdf831"
+}

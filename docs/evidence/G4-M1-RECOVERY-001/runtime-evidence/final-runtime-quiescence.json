@@ -1,0 +1,58 @@
+{
+  "taskId": "G4-M1-RECOVERY-001",
+  "status": "PASS",
+  "utc": "2026-11-01T16:28:40.558778+00:00",
+  "commands": [
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "190ab49a8eff5f3a13c1526f38cda9b933c0e618de51c7b7e4da98be73cc130a",
+        "psql",
+        "-U",
+        "platform",
+        "-d",
+        "platform",
+        "-qAt",
+        "-v",
+        "ON_ERROR_STOP=1"
+      ],
+      "sql": "SELECT json_build_object('activeJobs',(SELECT count(*) FROM connections.\"CatalogJobs\" WHERE \"Status\" IN ('QUEUED','RUNNING')),'activeProbes',(SELECT count(*) FROM connections.\"ConnectionProbes\" WHERE \"ReportJson\"::jsonb->>'status'='RUNNING'),'faultTriggers',(SELECT count(*) FROM pg_trigger WHERE tgname LIKE '%recovery%'),'wrongPurpose',(SELECT count(*) FROM connections.\"ConnectionSecrets\" WHERE \"Purpose\"='RECOVERY_WRONG_PURPOSE'));",
+      "exitCode": 0,
+      "result": {
+        "activeJobs": 0,
+        "activeProbes": 0,
+        "faultTriggers": 0,
+        "wrongPurpose": 0
+      }
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "9dd83f34dd207529bea2975834c3d61baa63b8ca88e159506520bd786f0d7305",
+        "psql",
+        "-U",
+        "postgres",
+        "-d",
+        "fixture",
+        "-qAt",
+        "-v",
+        "ON_ERROR_STOP=1"
+      ],
+      "sql": "SELECT json_build_object('businessRows',(SELECT count(*) FROM production.heat_event),'faultSessions',(SELECT count(*) FROM pg_stat_activity WHERE application_name LIKE 'g4_m1_recovery%'),'sourceClients',(SELECT count(*) FROM pg_stat_activity WHERE backend_type='client backend' AND client_addr IS NOT NULL));",
+      "exitCode": 0,
+      "result": {
+        "businessRows": 0,
+        "faultSessions": 0,
+        "sourceClients": 0
+      }
+    }
+  ]
+}

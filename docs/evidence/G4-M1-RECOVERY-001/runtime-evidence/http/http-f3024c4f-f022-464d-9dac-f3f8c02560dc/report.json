@@ -1,0 +1,799 @@
+{
+  "schemaVersion": 1,
+  "taskId": "G4-M1-RECOVERY-001",
+  "startedAtUtc": "2026-11-01T15:21:12.734Z",
+  "productExecution": true,
+  "matrix": {
+    "M1-C01": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-C02": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-C03": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-C04": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-C05": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-C06": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-C07": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-C08": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-C09": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-C10": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-C11": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "Full priority/error taxonomy still needs all transport and fixture failure classes."
+      ]
+    },
+    "M1-C12": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-C13": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-C14": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-C15": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-C16": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-P01": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-P02": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-P03": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-P04": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-P05": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-P06": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-P07": {
+      "status": "NOT_RUN",
+      "observed": [
+        "master_supplied_expired_ref_new_create_command_rejected",
+        "master_supplied_revoked_ref_new_create_command_rejected",
+        "previous_bound_ref_new_draft_probe_command_rejected",
+        "master_revoked_ref_new_draft_probe_command_rejected"
+      ],
+      "remaining": [
+        "HTTP 422 is shared by missing/used/expired/purpose/scope failures; Master must bind original unused expiry and revoked ciphertext-cleared witnesses, cross-org and other required cases. No business/source I/O absence is inferred."
+      ]
+    },
+    "M1-P08": {
+      "status": "NOT_RUN",
+      "observed": [
+        "executed_http_responses_scanned_in_memory_no_sensitive_values"
+      ],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-P09": {
+      "status": "NOT_RUN",
+      "observed": [
+        "original_password_real_probe_all_five_stages_pass",
+        "old_bound_physical_password_auth_rejected_after_real_source_change",
+        "rotation_increments_secret_version_and_invalidates_old_probe",
+        "new_password_real_probe_all_stages_and_current_version",
+        "old_password_still_auth_rejected_after_new_version_success",
+        "original_password_restored_real_draft_probe_all_stages_pass"
+      ],
+      "remaining": [
+        "Master independently confirms exact source password changes/restoration, old ciphertext clearing and Pooling=false source/build binding; HTTP observations alone do not inspect pools."
+      ]
+    },
+    "M1-P10": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-P11": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-P12": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-P13": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-P14": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-E01": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-E02": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-E03": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-E04": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-E05": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-E06": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-E07": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-E08": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-U01": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-U02": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-U03": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-U04": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-U05": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-U06": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-R01": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-R02": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-R03": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-R04": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-R05": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    }
+  },
+  "checks": [
+    {
+      "id": "M1-P07",
+      "name": "master_supplied_expired_ref_new_create_command_rejected",
+      "status": "PASS",
+      "facts": {
+        "responseIndex": 1,
+        "observedAfterProvidedExpiresAt": true
+      }
+    },
+    {
+      "id": "M1-P07",
+      "name": "master_supplied_revoked_ref_new_create_command_rejected",
+      "status": "PASS",
+      "facts": {
+        "responseIndex": 2
+      }
+    },
+    {
+      "id": "M1-P09",
+      "name": "original_password_real_probe_all_five_stages_pass",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-P09",
+      "name": "old_bound_physical_password_auth_rejected_after_real_source_change",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-P09",
+      "name": "rotation_increments_secret_version_and_invalidates_old_probe",
+      "status": "PASS",
+      "facts": {
+        "previousVersion": 1,
+        "currentVersion": 2
+      }
+    },
+    {
+      "id": "M1-P09",
+      "name": "new_password_real_probe_all_stages_and_current_version",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-P07",
+      "name": "previous_bound_ref_new_draft_probe_command_rejected",
+      "status": "PASS",
+      "facts": {
+        "responseIndex": 15
+      }
+    },
+    {
+      "id": "M1-P07",
+      "name": "master_revoked_ref_new_draft_probe_command_rejected",
+      "status": "PASS",
+      "facts": {
+        "responseIndex": 16
+      }
+    },
+    {
+      "id": "M1-P09",
+      "name": "old_password_still_auth_rejected_after_new_version_success",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-P09",
+      "name": "original_password_restored_real_draft_probe_all_stages_pass",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-P08",
+      "name": "executed_http_responses_scanned_in_memory_no_sensitive_values",
+      "status": "PASS",
+      "facts": {
+        "responseScanCount": 24
+      }
+    }
+  ],
+  "http": [
+    {
+      "index": 0,
+      "phase": "oidc_operator-ab_csrf_request",
+      "method": "GET",
+      "route": "/auth/csrf",
+      "status": 200,
+      "startedAtUtc": "2026-11-01T15:21:13.815Z",
+      "durationMs": 63,
+      "traceId": "b203eff78c5405d8c4244dc66e8b9d8b",
+      "expectedStatus": 200
+    },
+    {
+      "index": 1,
+      "phase": "credential_supplied_reference_rejections",
+      "method": "POST",
+      "route": "/api/v1/connections",
+      "status": 422,
+      "startedAtUtc": "2026-11-01T15:21:13.885Z",
+      "durationMs": 43,
+      "traceId": "815379220eebae12b209e8b25f33eea1",
+      "responseSha256": "a7900e5a366100cdae009f3a0f2f01ea145c4e0cf3d3ade987f8e92acd3f7c79",
+      "code": "connection_secret_expired",
+      "expectedStatus": 422,
+      "expectedCode": "connection_secret_expired"
+    },
+    {
+      "index": 2,
+      "phase": "credential_supplied_reference_rejections",
+      "method": "POST",
+      "route": "/api/v1/connections",
+      "status": 422,
+      "startedAtUtc": "2026-11-01T15:21:13.929Z",
+      "durationMs": 31,
+      "traceId": "d66212439be50cdf7294f0bac73aab8e",
+      "responseSha256": "60a55bae887d8c61769436e0b8c0c7e7812233ba93153b2186030ba30c123104",
+      "code": "connection_secret_expired",
+      "expectedStatus": 422,
+      "expectedCode": "connection_secret_expired"
+    },
+    {
+      "index": 3,
+      "phase": "credential_original_create_probe",
+      "method": "POST",
+      "route": "/api/v1/connection-secrets",
+      "status": 201,
+      "startedAtUtc": "2026-11-01T15:21:13.961Z",
+      "durationMs": 31,
+      "traceId": "2d6c25f0d04b5a291114e2feb34c18ec",
+      "expectedStatus": 201
+    },
+    {
+      "index": 4,
+      "phase": "credential_original_create_probe",
+      "method": "POST",
+      "route": "/api/v1/connections",
+      "status": 201,
+      "startedAtUtc": "2026-11-01T15:21:13.993Z",
+      "durationMs": 33,
+      "traceId": "84a6df90367946b50bccf49dd16198c1",
+      "responseSha256": "a4de31d1c8281cfd1e60e4ab369060c469a0f9cd728757b1c9e13e4dd665ca91",
+      "state": "DRAFT",
+      "expectedStatus": 201
+    },
+    {
+      "index": 5,
+      "phase": "credential_original_create_probe",
+      "method": "GET",
+      "route": "/api/v1/connections/{id}",
+      "status": 200,
+      "startedAtUtc": "2026-11-01T15:21:14.027Z",
+      "durationMs": 31,
+      "traceId": "8ad346e43f0841801c8d302603c17890",
+      "responseSha256": "24e352fa3d294e11b50ca2364abaf08fa302fea74c03e352956e63eed0c25ae6",
+      "state": "DRAFT",
+      "expectedStatus": 200
+    },
+    {
+      "index": 6,
+      "phase": "credential_original_create_probe",
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/test",
+      "status": "TEST_OK",
+      "startedAtUtc": "2026-11-01T15:21:14.058Z",
+      "durationMs": 45,
+      "traceId": "2cf98b4f7928704e2120727d8f6c3309",
+      "responseSha256": "cc59feef2af8b097ce64e64951e68c1cf633fdbcd782893fedf1b4f7868560f2",
+      "expectedStatus": 200
+    },
+    {
+      "index": 7,
+      "phase": "credential_old_bound_password_after_source_change",
+      "method": "GET",
+      "route": "/api/v1/connections/{id}",
+      "status": 200,
+      "startedAtUtc": "2026-11-01T15:21:14.149Z",
+      "durationMs": 33,
+      "traceId": "e042e7c99685a58997ea842c588fd95d",
+      "responseSha256": "f737061e1cd97b48924ac51790b174b99361d0972448a3227d073a2905ab14c4",
+      "state": "DRAFT",
+      "expectedStatus": 200
+    },
+    {
+      "index": 8,
+      "phase": "credential_old_bound_password_after_source_change",
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/test",
+      "status": "TEST_FAILED",
+      "startedAtUtc": "2026-11-01T15:21:14.182Z",
+      "durationMs": 40,
+      "traceId": "4ab8ed7c3d395cd1ad575b8f88d5b97c",
+      "responseSha256": "9903306778d1cb96ba1f0aaf741be3b4f0e9eabd3f9478f3ac77dcc8b10b5e82",
+      "expectedStatus": 200
+    },
+    {
+      "index": 9,
+      "phase": "credential_new_password_rotation",
+      "method": "POST",
+      "route": "/api/v1/connection-secrets",
+      "status": 201,
+      "startedAtUtc": "2026-11-01T15:21:14.223Z",
+      "durationMs": 33,
+      "traceId": "8a52dc82a466cf374ccbb66a476ef2bd",
+      "expectedStatus": 201
+    },
+    {
+      "index": 10,
+      "phase": "credential_new_password_rotation",
+      "method": "GET",
+      "route": "/api/v1/connections/{id}",
+      "status": 200,
+      "startedAtUtc": "2026-11-01T15:21:14.256Z",
+      "durationMs": 33,
+      "traceId": "a34abf54f63bb8df38bfd1225877ede4",
+      "responseSha256": "6526217c546c3e1dfe35e47b764bf7b7608684c1ccd359148927e0b23d68c956",
+      "state": "DRAFT",
+      "expectedStatus": 200
+    },
+    {
+      "index": 11,
+      "phase": "credential_new_password_rotation",
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/rotate-secret",
+      "status": 200,
+      "startedAtUtc": "2026-11-01T15:21:14.289Z",
+      "durationMs": 35,
+      "traceId": "8f2b853478a589b50774a11c61985432",
+      "responseSha256": "e9ba6cc4cea87634060cdaf729c1893f3abb506dfe49fc4444a765a96ced74c4",
+      "state": "DRAFT",
+      "expectedStatus": 200
+    },
+    {
+      "index": 12,
+      "phase": "credential_new_password_rotation",
+      "method": "GET",
+      "route": "/api/v1/connections/{id}/probes/{id}",
+      "status": "TEST_OK",
+      "startedAtUtc": "2026-11-01T15:21:14.324Z",
+      "durationMs": 34,
+      "traceId": "6796821ff870e8d23753a75865f53ea4",
+      "responseSha256": "eaedd8434ce4981ab52c18cafd4bdd5a89886f95c4032d58780e52e883eb4b84",
+      "expectedStatus": 200
+    },
+    {
+      "index": 13,
+      "phase": "credential_new_password_rotation",
+      "method": "GET",
+      "route": "/api/v1/connections/{id}",
+      "status": 200,
+      "startedAtUtc": "2026-11-01T15:21:14.359Z",
+      "durationMs": 31,
+      "traceId": "fa6c881c1c07ffcb74f2e83fea100da7",
+      "responseSha256": "c639ba5c48e64692a722f0b4c599b2204d27aa3a8f3bbac2cf907d784ff29854",
+      "state": "DRAFT",
+      "expectedStatus": 200
+    },
+    {
+      "index": 14,
+      "phase": "credential_new_password_rotation",
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/test",
+      "status": "TEST_OK",
+      "startedAtUtc": "2026-11-01T15:21:14.390Z",
+      "durationMs": 44,
+      "traceId": "33e38afc3a99ed4b558d84f97b19b414",
+      "responseSha256": "89f94a6cb3571ee81fb1c8f0901a3e5791e0a1428a1bc8a6a2ebc59deae35ec8",
+      "expectedStatus": 200
+    },
+    {
+      "index": 15,
+      "phase": "credential_old_reference_rejections_after_rotation",
+      "method": "POST",
+      "route": "/api/v1/connections/tests",
+      "status": 422,
+      "startedAtUtc": "2026-11-01T15:21:14.434Z",
+      "durationMs": 33,
+      "traceId": "2f7a96d1bc642ac1b478eceb81864c15",
+      "responseSha256": "4af14c942194bae11fb2c929a2ff1c4349703270324bc5d82edb7cf9adea4f02",
+      "code": "connection_secret_expired",
+      "expectedStatus": 422,
+      "expectedCode": "connection_secret_expired"
+    },
+    {
+      "index": 16,
+      "phase": "credential_old_reference_rejections_after_rotation",
+      "method": "POST",
+      "route": "/api/v1/connections/tests",
+      "status": 422,
+      "startedAtUtc": "2026-11-01T15:21:14.468Z",
+      "durationMs": 33,
+      "traceId": "5e57c0a65a6035f126f9d0b52bf6fc1a",
+      "responseSha256": "22a85514a2b3d090fcfd9306d5fd86cc0da08eaacbd76bb53babe8a0c571d5b4",
+      "code": "connection_secret_expired",
+      "expectedStatus": 422,
+      "expectedCode": "connection_secret_expired"
+    },
+    {
+      "index": 17,
+      "phase": "credential_old_password_after_new_version_success",
+      "method": "POST",
+      "route": "/api/v1/connection-secrets",
+      "status": 201,
+      "startedAtUtc": "2026-11-01T15:21:14.501Z",
+      "durationMs": 32,
+      "traceId": "881b6437a5ca95b15091be96390c51bb",
+      "expectedStatus": 201
+    },
+    {
+      "index": 18,
+      "phase": "credential_old_password_after_new_version_success",
+      "method": "POST",
+      "route": "/api/v1/connections/tests",
+      "status": "TEST_FAILED",
+      "startedAtUtc": "2026-11-01T15:21:14.533Z",
+      "durationMs": 39,
+      "traceId": "075f1786b6a386324eaf4b309a8934c5",
+      "responseSha256": "6f2285ed1a069a49bf2e635f49ecfc906643f3741ae09a636c195b774772949b",
+      "expectedStatus": 200
+    },
+    {
+      "index": 19,
+      "phase": "credential_restore_source_and_verify",
+      "method": "POST",
+      "route": "/api/v1/connection-secrets",
+      "status": 201,
+      "startedAtUtc": "2026-11-01T15:21:14.617Z",
+      "durationMs": 32,
+      "traceId": "2a0ee40f5badc2c4f045b63a30108329",
+      "expectedStatus": 201
+    },
+    {
+      "index": 20,
+      "phase": "credential_restore_source_and_verify",
+      "method": "POST",
+      "route": "/api/v1/connections/tests",
+      "status": "TEST_OK",
+      "startedAtUtc": "2026-11-01T15:21:14.649Z",
+      "durationMs": 43,
+      "traceId": "6902130f0526f60c5949cae3251fa094",
+      "responseSha256": "78f60895171f2e2ced3b13c8952ac0815573c6763b0738c7bbce27ad75780589",
+      "expectedStatus": 200
+    },
+    {
+      "index": 21,
+      "phase": "credential_disable_exact_created_connection",
+      "method": "GET",
+      "route": "/api/v1/connections/{id}",
+      "status": 200,
+      "startedAtUtc": "2026-11-01T15:21:14.692Z",
+      "durationMs": 31,
+      "traceId": "6beccdcf4cf4701a069877b07b67e055",
+      "responseSha256": "6bc36b57655c25078299fe3877aec26d832765498dd51b86513bb21cde162396",
+      "state": "DRAFT",
+      "expectedStatus": 200
+    },
+    {
+      "index": 22,
+      "phase": "credential_disable_exact_created_connection",
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/disable",
+      "status": 200,
+      "startedAtUtc": "2026-11-01T15:21:14.724Z",
+      "durationMs": 32,
+      "traceId": "36a8093a75ad0ad03504ec50f9707112",
+      "responseSha256": "485efd4b0931e7e6e0d691c55fb8591cf44ee66d7d3f5ff6837609d0b94ceeb0",
+      "state": "DISABLED",
+      "expectedStatus": 200
+    },
+    {
+      "index": 23,
+      "phase": "credential_disable_exact_created_connection",
+      "method": "GET",
+      "route": "/api/v1/connections/{id}",
+      "status": 200,
+      "startedAtUtc": "2026-11-01T15:21:14.757Z",
+      "durationMs": 32,
+      "traceId": "21bf333b6e204e8f8217c70d2f2fb1a2",
+      "responseSha256": "59e64f9ccfaa8a1e80b7e6f459d01758416989486dcc47c19c853dccdf1e36d3",
+      "state": "DISABLED",
+      "expectedStatus": 200
+    }
+  ],
+  "fixtures": {
+    "connectionId": "7c7b6aeb7daf48f5b170f2b36342d609",
+    "sourceRestorationRequired": false,
+    "sourceRestorationVerifiedByProbe": true,
+    "finalConnectionState": "DISABLED"
+  },
+  "requirements": {
+    "M1-P07": [
+      "Actual other-organization identity; natural 10-minute SecretRef expiry; controlled revoked-reference witness. Invalid purpose cannot be issued through public intake."
+    ],
+    "M1-P08": [
+      "Master scans ordinary logs, Trace, ZIP and browser storage separately; this runner only scans actual HTTP responses in memory."
+    ],
+    "M1-P09": [
+      "Change synthetic source password and prove old physical credentials cannot be reused; version increment alone does not prove pool eviction."
+    ],
+    "M1-P14": [
+      "Correlate denied post-disable requests with source-side absence of I/O; HTTP rejection alone does not prove no adapter call."
+    ],
+    "M1-E03": [
+      "Source DDL plus immutable stored snapshot witness, beyond repeated equal-content fingerprint."
+    ],
+    "M1-E06": [
+      "Hold real catalog work; persist cancel and observe Npgsql cancellation. Kill exact task API during RUNNING; restart after 30-second lease and verify fence/attempt from private platform DB."
+    ],
+    "M1-E07": [
+      "Inject failure only into Governance audit INSERT while Connections writes remain possible; verify transaction rollback through HTTP and private task DB. Do not replace with total DB outage."
+    ],
+    "M1-E08": [
+      "Master applies authorized no-row DDL on production.heat_event and compares old/new immutable DB snapshots with actual projected STALE read."
+    ],
+    "M1-R04": [
+      "Separate authorized G3 actual regression entry; this driver never writes G3 or publishes releases."
+    ]
+  },
+  "runId": "recovery-20261101-01",
+  "scenario": "credential-lifecycle",
+  "driverSha256": "758453d3ff78a0d6d63e40424b217fe1be6ed9f95647d095f7da05cba3549546",
+  "publicSourceConfigSha256": "c765d365fac6db8866d64acdd42ad007069faa5ea9508cbfbcdee47f0e4d05ed",
+  "credentialHandshakes": [
+    {
+      "event": "CREDENTIAL_ROTATION_READY",
+      "status": "MARKER_ACKNOWLEDGED",
+      "readyAtUtc": "2026-11-01T15:21:14.104Z",
+      "acknowledgedAtUtc": "2026-11-01T15:21:14.149Z"
+    },
+    {
+      "event": "CREDENTIAL_RESTORE_READY",
+      "status": "MARKER_ACKNOWLEDGED",
+      "readyAtUtc": "2026-11-01T15:21:14.572Z",
+      "acknowledgedAtUtc": "2026-11-01T15:21:14.617Z"
+    }
+  ],
+  "completedAtUtc": "2026-11-01T15:21:14.979Z",
+  "exitCode": 2
+}

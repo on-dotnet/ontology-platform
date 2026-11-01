@@ -1,0 +1,234 @@
+{
+  "stage": "start",
+  "before": {
+    "connection": {
+      "revision": 4,
+      "state": "ACTIVE",
+      "lastProbeId": "27374d6c823242849b297301d75bd405",
+      "configHash": "36977d8313f923a56c6bf68590a8c68cc5dde85092205da8a02d154d619d2ac9"
+    },
+    "commandCount": 0,
+    "probes": [],
+    "receiptStatus": null,
+    "auditStart": 2,
+    "auditComplete": 2
+  },
+  "failed": {
+    "connection": {
+      "revision": 4,
+      "state": "ACTIVE",
+      "lastProbeId": "27374d6c823242849b297301d75bd405",
+      "configHash": "36977d8313f923a56c6bf68590a8c68cc5dde85092205da8a02d154d619d2ac9"
+    },
+    "commandCount": 0,
+    "probes": [],
+    "receiptStatus": null,
+    "auditStart": 2,
+    "auditComplete": 2
+  },
+  "commands": [
+    {
+      "command": [
+        "node",
+        "scripts/acceptance/g4-m1-fault.mjs",
+        "--runtime-file",
+        "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/http-audit-start.json",
+        "--action",
+        "audit-prepare"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"action\":\"audit-prepare\",\"status\":\"PASS\",\"evidence\":\"artifacts/g4-m1-recovery-001/fault-http/7c6659d2-4201-4278-a1f9-2ca8d17fa3e7.json\"}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "190ab49a8eff5f3a13c1526f38cda9b933c0e618de51c7b7e4da98be73cc130a",
+        "psql",
+        "-U",
+        "platform",
+        "-d",
+        "platform",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-qAt"
+      ],
+      "sql": "SELECT json_build_object('connection',(SELECT json_build_object('revision',\"Revision\",'state',\"State\",'lastProbeId',\"LastProbeId\",'configHash',\"ConfigHash\") FROM connections.\"Connections\" WHERE \"Id\"='1bf23f9d36bf4ceba09d745f04d8f743'),'commandCount',(SELECT count(*) FROM connections.\"ConnectionCommands\" WHERE \"Id\"='c4905f6297d038821aa01ff27270422272bcd9fd86b3ecd61ba2dad1a500018a'),'probes',(SELECT coalesce(json_agg(json_build_object('id',\"Id\",'status',\"ReportJson\"::jsonb->>'status')),'[]'::json) FROM connections.\"ConnectionProbes\" WHERE \"CommandKey\"='c4905f6297d038821aa01ff27270422272bcd9fd86b3ecd61ba2dad1a500018a'),'receiptStatus',(SELECT \"ReceiptJson\"::jsonb->>'status' FROM connections.\"ConnectionCommands\" WHERE \"Id\"='c4905f6297d038821aa01ff27270422272bcd9fd86b3ecd61ba2dad1a500018a'),'auditStart',(SELECT count(*) FROM governance.audit_records WHERE \"Resource\"='connection:1bf23f9d36bf4ceba09d745f04d8f743' AND \"Action\"='connection.probe.start'),'auditComplete',(SELECT count(*) FROM governance.audit_records WHERE \"Resource\"='connection:1bf23f9d36bf4ceba09d745f04d8f743' AND \"Action\"='connection.probe.complete'));",
+      "exitCode": 0,
+      "stdout": "{\"connection\" : {\"revision\" : 4, \"state\" : \"ACTIVE\", \"lastProbeId\" : \"27374d6c823242849b297301d75bd405\", \"configHash\" : \"36977d8313f923a56c6bf68590a8c68cc5dde85092205da8a02d154d619d2ac9\"}, \"commandCount\" : 0, \"probes\" : [], \"receiptStatus\" : null, \"auditStart\" : 2, \"auditComplete\" : 2}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "190ab49a8eff5f3a13c1526f38cda9b933c0e618de51c7b7e4da98be73cc130a",
+        "psql",
+        "-U",
+        "platform",
+        "-d",
+        "platform",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-qAt"
+      ],
+      "sql": "SELECT count(*) FROM pg_proc p JOIN pg_namespace n ON p.pronamespace=n.oid WHERE n.nspname='governance' AND p.proname='recovery_audit_reject_001';",
+      "exitCode": 0,
+      "stdout": "0\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "190ab49a8eff5f3a13c1526f38cda9b933c0e618de51c7b7e4da98be73cc130a",
+        "psql",
+        "-U",
+        "platform",
+        "-d",
+        "platform",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-qAt"
+      ],
+      "sql": "SELECT count(*) FROM pg_trigger WHERE tgname='recovery_audit_reject_001';",
+      "exitCode": 0,
+      "stdout": "0\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "190ab49a8eff5f3a13c1526f38cda9b933c0e618de51c7b7e4da98be73cc130a",
+        "psql",
+        "-U",
+        "platform",
+        "-d",
+        "platform",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-qAt"
+      ],
+      "sql": "CREATE FUNCTION governance.recovery_audit_reject_001() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION 'recovery_audit_fault'; END $$; CREATE TRIGGER recovery_audit_reject_001 BEFORE INSERT ON governance.audit_records FOR EACH ROW WHEN (NEW.\"Action\"='connection.probe.start' AND NEW.\"Resource\"='connection:1bf23f9d36bf4ceba09d745f04d8f743') EXECUTE FUNCTION governance.recovery_audit_reject_001();",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "scripts/acceptance/g4-m1-fault.mjs",
+        "--runtime-file",
+        "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/http-audit-start.json",
+        "--action",
+        "audit-fail"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"action\":\"audit-fail\",\"status\":\"PASS\",\"evidence\":\"artifacts/g4-m1-recovery-001/fault-http/adf04815-fa12-40df-8f0d-8caff03a2787.json\"}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "190ab49a8eff5f3a13c1526f38cda9b933c0e618de51c7b7e4da98be73cc130a",
+        "psql",
+        "-U",
+        "platform",
+        "-d",
+        "platform",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-qAt"
+      ],
+      "sql": "SELECT json_build_object('connection',(SELECT json_build_object('revision',\"Revision\",'state',\"State\",'lastProbeId',\"LastProbeId\",'configHash',\"ConfigHash\") FROM connections.\"Connections\" WHERE \"Id\"='1bf23f9d36bf4ceba09d745f04d8f743'),'commandCount',(SELECT count(*) FROM connections.\"ConnectionCommands\" WHERE \"Id\"='c4905f6297d038821aa01ff27270422272bcd9fd86b3ecd61ba2dad1a500018a'),'probes',(SELECT coalesce(json_agg(json_build_object('id',\"Id\",'status',\"ReportJson\"::jsonb->>'status')),'[]'::json) FROM connections.\"ConnectionProbes\" WHERE \"CommandKey\"='c4905f6297d038821aa01ff27270422272bcd9fd86b3ecd61ba2dad1a500018a'),'receiptStatus',(SELECT \"ReceiptJson\"::jsonb->>'status' FROM connections.\"ConnectionCommands\" WHERE \"Id\"='c4905f6297d038821aa01ff27270422272bcd9fd86b3ecd61ba2dad1a500018a'),'auditStart',(SELECT count(*) FROM governance.audit_records WHERE \"Resource\"='connection:1bf23f9d36bf4ceba09d745f04d8f743' AND \"Action\"='connection.probe.start'),'auditComplete',(SELECT count(*) FROM governance.audit_records WHERE \"Resource\"='connection:1bf23f9d36bf4ceba09d745f04d8f743' AND \"Action\"='connection.probe.complete'));",
+      "exitCode": 0,
+      "stdout": "{\"connection\" : {\"revision\" : 4, \"state\" : \"ACTIVE\", \"lastProbeId\" : \"27374d6c823242849b297301d75bd405\", \"configHash\" : \"36977d8313f923a56c6bf68590a8c68cc5dde85092205da8a02d154d619d2ac9\"}, \"commandCount\" : 0, \"probes\" : [], \"receiptStatus\" : null, \"auditStart\" : 2, \"auditComplete\" : 2}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "190ab49a8eff5f3a13c1526f38cda9b933c0e618de51c7b7e4da98be73cc130a",
+        "psql",
+        "-U",
+        "platform",
+        "-d",
+        "platform",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-qAt"
+      ],
+      "sql": "DROP TRIGGER recovery_audit_reject_001 ON governance.audit_records; DROP FUNCTION governance.recovery_audit_reject_001();",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "190ab49a8eff5f3a13c1526f38cda9b933c0e618de51c7b7e4da98be73cc130a",
+        "psql",
+        "-U",
+        "platform",
+        "-d",
+        "platform",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-qAt"
+      ],
+      "sql": "SELECT count(*) FROM pg_proc p JOIN pg_namespace n ON p.pronamespace=n.oid WHERE n.nspname='governance' AND p.proname='recovery_audit_reject_001';",
+      "exitCode": 0,
+      "stdout": "0\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "190ab49a8eff5f3a13c1526f38cda9b933c0e618de51c7b7e4da98be73cc130a",
+        "psql",
+        "-U",
+        "platform",
+        "-d",
+        "platform",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-qAt"
+      ],
+      "sql": "SELECT count(*) FROM pg_trigger WHERE tgname='recovery_audit_reject_001';",
+      "exitCode": 0,
+      "stdout": "0\n",
+      "stderr": ""
+    }
+  ],
+  "cleanup": "PASS"
+}

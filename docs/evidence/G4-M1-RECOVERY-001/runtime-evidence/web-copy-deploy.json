@@ -1,0 +1,43 @@
+{
+  "taskId": "G4-M1-RECOVERY-001",
+  "baseCommit": "d7f3208893edc05a336d5d6ca3d5d9df9192be51",
+  "copySourceSha256": "4ce460e93469a28aab96ff020ab7ffaf664d27bed960e7a8a92a7ece897b12de",
+  "webId": "4346d3b82e0efd66dee0c55781d7c48a31dca609c0a93580ca245b0d288b69f3",
+  "startedUtc": "2026-11-01T16:24:23.669102+00:00",
+  "commands": [
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "stop",
+        "--time",
+        "10",
+        "4346d3b82e0efd66dee0c55781d7c48a31dca609c0a93580ca245b0d288b69f3"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "node",
+        "node_modules/next/dist/bin/next",
+        "build",
+        "--webpack"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "start",
+        "4346d3b82e0efd66dee0c55781d7c48a31dca609c0a93580ca245b0d288b69f3"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "buildStatus": "PASS",
+  "startExit": 0,
+  "completedUtc": "2026-11-01T16:24:39.051983+00:00"
+}

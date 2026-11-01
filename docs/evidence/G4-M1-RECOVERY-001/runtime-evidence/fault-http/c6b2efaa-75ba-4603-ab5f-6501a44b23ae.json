@@ -1,0 +1,42 @@
+{
+  "taskId": "G4-M1-RECOVERY-001",
+  "startedUtc": "2026-11-01T15:25:06.302Z",
+  "checks": [
+    {
+      "name": "same_operator_a_original_org_actual_intake",
+      "status": "PASS"
+    }
+  ],
+  "http": [
+    {
+      "method": "GET",
+      "route": "/api/v1/connections/{id}",
+      "status": 200,
+      "durationMs": 32,
+      "jsonBody": true
+    },
+    {
+      "method": "GET",
+      "route": "/api/v1/platform/me",
+      "status": 200,
+      "durationMs": 30,
+      "jsonBody": true
+    },
+    {
+      "method": "POST",
+      "route": "/api/v1/connection-secrets",
+      "status": 201,
+      "durationMs": 32,
+      "jsonBody": true
+    }
+  ],
+  "scope": "ONE_HTTP_ACTION_ONLY",
+  "databaseRollbackLeaseFenceEvidence": "NOT_RUN_BY_THIS_CONSUMER",
+  "action": "intake-foreign",
+  "connectionId": "1bf23f9d36bf4ceba09d745f04d8f743",
+  "auditStage": "start",
+  "originalSubjectSha256": "05a676e8230fec3868767ef986d7ea6fc0f9d94089d997f8bfc39206985fa4cf",
+  "foreignRefSha256": "da6aa62734f3e44755bb08827a812a84d1d0f8e07b635744f60610b70e40dacf",
+  "status": "PASS",
+  "completedUtc": "2026-11-01T15:25:07.695Z"
+}

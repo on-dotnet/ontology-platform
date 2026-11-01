@@ -1,0 +1,187 @@
+{
+  "evidenceSchemaVersion": 2,
+  "validationSource": "LOCAL",
+  "testedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+  "checks": [
+    {
+      "name": "input-package-integrity",
+      "command": "python3 tools/verify_package.py (exact extracted authorized input)",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "CRC/Manifest/SHA256 verified; input-binding.json and original payloads preserved."
+    },
+    {
+      "name": "four-exact-arm64-image-admission",
+      "command": null,
+      "status": "PARTIAL",
+      "exitCode": null,
+      "output": "Aggregate record, no invented single command exit: All four AMBER-A1 / LICENSE_PARTIAL only internal synthetic non-distribution; r3-review.md. CVE/signature/provenance NOT_VERIFIED. Budget received756971452B/reserved1663175540B below3GiB."
+    },
+    {
+      "name": "stable-solution-build",
+      "command": "dotnet build backend/OntologyPlatform.slnx -c Release --no-restore",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "solution-stable-47663df.txt; full actual solution; prior restore/project graph failures retained. Earlier full build ASPIRE010 warning not suppressed."
+    },
+    {
+      "name": "body-limit-real-kestrel",
+      "command": "dotnet backend/tests/OntologyPlatform.SecurityTests/bin/Release/net10.0/OntologyPlatform.SecurityTests.dll --filter FullyQualifiedName~G4RequestBodyLimitTests --minimum-expected-tests 18 --timeout 60s",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "18 actual fixed/chunked/no-Content-Length/HTTP2 boundary and oversize checks; no issue/handler/persistence side effects on rejection."
+    },
+    {
+      "name": "stable-contract-tests",
+      "command": "dotnet backend/tests/OntologyPlatform.G2ContractTests/bin/Release/net10.0/OntologyPlatform.G2ContractTests.dll --minimum-expected-tests 120 --timeout 60s",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "120PASS/1SKIP/0FAIL; exact G3 real V2 manifest case unavailable. Prior minimum121 invocation exit9 retained, not a product failure or hidden skip."
+    },
+    {
+      "name": "web-component-regression",
+      "command": "node vitest run connections.test.ts (exact worker receipt command)",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "109PASS; original positive/reverse parent-child races2FAIL/101PASS. TypeScript/ESLint0 and source SHA binding independently checked."
+    },
+    {
+      "name": "production-web-build",
+      "command": "node node_modules/next/dist/bin/next build --webpack",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Final web-copy-deploy.json and raw build output; exact same container restored. UI mutation behavior unchanged by final four connections-only environment copy branches."
+    },
+    {
+      "name": "final-http-baseline",
+      "command": "node scripts/acceptance/g4-m1-http.mjs --runtime-file <private fixed runtime> --evidence-dir <task/final-http>",
+      "status": "PARTIAL",
+      "exitCode": 2,
+      "output": "135 actual requests;13 complete cases PASS/0FAIL/36NOT_RUN by this consumer. Exit2 means scoped matrix incomplete, not total product PASS. Additional cases require explicit aggregate evidence."
+    },
+    {
+      "name": "final-ui-baseline",
+      "command": "node scripts/acceptance/g4-m1-browser.mjs --runtime-file <private fixed runtime> --evidence-dir <task/final-browser-interlock>",
+      "status": "PARTIAL",
+      "exitCode": 2,
+      "output": "U01/U02/U03/U04/U06 actual PASS; U05 aggregate intentionally NOT_RUN here. Positive/reverse real delayed-window witness PASS; prior final-browser failure retained."
+    },
+    {
+      "name": "final-layout-and-visual-review",
+      "command": "node scripts/acceptance/g4-m1-browser.mjs (layout-only) + non-author direct four PNG review",
+      "status": "PARTIAL",
+      "exitCode": 2,
+      "output": "Final4ab8 report; four screenshots435488B; G4-only stale G1/WAVE2 copy removed, other sections unchanged."
+    },
+    {
+      "name": "real-pg-tls-and-readonly",
+      "command": null,
+      "status": "PARTIAL",
+      "exitCode": null,
+      "output": "Aggregate record, no invented single command exit: Real 12+1 tests and short source privilege regressions; immutable source fixture/no business rows. No mock replacement."
+    },
+    {
+      "name": "fault-and-security-product-aggregation",
+      "command": null,
+      "status": "PARTIAL",
+      "exitCode": null,
+      "output": "Aggregate record, no invented single command exit: Audit rollback, credential rotation/revocation/expiry/same-subject cross-org/wrong-purpose, schema ADD/DROP, timeout/client cancel, real Npgsql catalog cancel, natural lease recovery independently reviewed. Wrapper failures and corrective evidence preserved."
+    },
+    {
+      "name": "repository-selftest",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1 -SelfTest",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "verify-selftest-carriers-fixed.txt: full engineering/maintenance suites and103ReviewPackage regressions. Original static failures preserved; four zero-byte logs reversible, not rewritten history."
+    },
+    {
+      "name": "source-and-real-log-secret-scan",
+      "command": "python3 experiments/g4-m1/scan_delivery.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "982entries/77known private patterns/24persisted SecretRef hashes;0findings. Accurate runtime log raw bytes preserved only after successful scan. Final ZIP scan remains external."
+    },
+    {
+      "name": "source-commit-diff-check",
+      "command": "git diff 59edb405dfb4acf4d4a259cffdc3551bafa90d2c 4efbeca1cbf33d52c2bd950e1968db20abe322d5 --check",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Final submitted source diff-check0; delivery Head repeated separately. Historical failed checkpoint retained."
+    },
+    {
+      "name": "exact-owned-docker-cleanup",
+      "command": "python3 experiments/g4-m1/closeout_resources.py --apply --expected-plan-sha256 619505cc5fe1cbf3e221c9326cdf35ac1e89b6ec8dcbec708fbbef995336bab1",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "16 exact objects deleted; independent live recheck0containers/13oldimages/8oldvolumes/3currentdefaultnetworks; no global prune/restart. Original bridge ID drift UNKNOWN/NOT_VERIFIED retained."
+    },
+    {
+      "name": "owned-process-and-filesystem-cleanup",
+      "command": "Exact PID/cwd/command SIGTERM plus reviewed file/hash whitelist and symlink-only unlink",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Two exact processes absent/exec0/no15100or15180listeners; original5s monitor wait failure retained.11own paths removed955220704logical bytes, donor identities preserved; no physical deduplicated reclaim claim."
+    },
+    {
+      "name": "valid-sourceconfig-change",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "C08 no second legal approved fixed source profile. Explicit new exact profile or independent applicability decision required."
+    },
+    {
+      "name": "g3-real-publishing-query-services",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "R04 four-image boundary excludes additional Fuseki/RustFS; no admitted available G3 stack. No shared persistent or formal G3 data touched."
+    },
+    {
+      "name": "native-windows-amd64",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "No Windows native run; ARM64 evidence does not imply Windows PASS."
+    },
+    {
+      "name": "final-zip-independent-reopen-and-sensitive-scan",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Requires final exact committed Head; external delivery receipt closes this after unique V3 generation, without circular claims in its own input."
+    },
+    {
+      "name": "csharp-format-final",
+      "command": "dotnet format whitespace backend/OntologyPlatform.slnx --verify-no-changes --no-restore --include backend/src/Hosts/OntologyPlatform.Api/G4 backend/src/Modules/Connections backend/tests/OntologyPlatform.SecurityTests/G4RequestBodyLimitTests.cs",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Final command exit0; workspace-loading warning preserved in raw log. No claim this replaces semantic Chinese-comment review."
+    },
+    {
+      "name": "final-repository-static",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1 (approved temporary pythonlibs symlink restored then unlinked)",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "4188files pass. Initial parser unavailable after tool-link cleanup and ignored external PYTHONPATH attempt retained; exact original approved link restored only for this check, then absent again and donor dev/inode unchanged."
+    }
+  ],
+  "ci": {
+    "status": "NOT_RUN",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  },
+  "metadata": {
+    "taskId": "G4-M1-RECOVERY-001",
+    "taskStatus": "BLOCKED_WITH_WITNESS",
+    "packageStatus": "BLOCKED",
+    "sourceBinding": "All actual tested/reviewed working inputs frozen in testedCommit; later delivery commits change evidence/tasks only. Backend source unchanged since47663df; stable full UI atd7f3208 plus scoped copy-only final production/layout review.",
+    "agentModelIdentity": "NOT_VERIFIED",
+    "wholeSessionContinuity": "NOT_VERIFIED: explicit measured resumed segment retained, no fabricated whole-task timing.",
+    "noMainMerge": true,
+    "noG6Change": true,
+    "noDownstream": true,
+    "commercialLicenseClearance": false
+  }
+}

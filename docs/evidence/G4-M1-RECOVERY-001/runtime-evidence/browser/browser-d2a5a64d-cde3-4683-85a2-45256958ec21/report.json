@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "taskId": "G4-M1-RECOVERY-001",
+  "startedAtUtc": "2026-11-01T15:28:46.144Z",
+  "cases": {
+    "M1-U01": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U02": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U03": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U04": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U05": {
+      "status": "FAIL",
+      "observed": [],
+      "reason": "catalog_cancel_query_marker_timeout",
+      "failure": {
+        "code": "catalog_cancel_query_marker_timeout",
+        "category": "runtime"
+      },
+      "phase": "U05_catalog_cancel_query_handshake"
+    },
+    "M1-U06": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    }
+  },
+  "http": [
+    {
+      "method": "GET",
+      "route": "/auth/csrf",
+      "status": 200,
+      "durationMs": 67
+    },
+    {
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/discoveries",
+      "status": 202,
+      "durationMs": 88
+    },
+    {
+      "method": "GET",
+      "route": "/connections/{id}/discoveries/{jobId}",
+      "status": 200,
+      "durationMs": 35
+    }
+  ],
+  "screenshots": [],
+  "productExecution": true,
+  "runId": "recovery-20261101-01",
+  "scenario": "catalog-cancel",
+  "driverSha256": "5918869646285dc175f174b1bd35811aa80257f65f6e5edd5fc6fb90be6a7f82",
+  "catalogCancelHandshakes": [
+    {
+      "event": "CATALOG_CANCEL_READY",
+      "status": "MARKER_ACKNOWLEDGED",
+      "readyAtUtc": "2026-11-01T15:28:47.687Z",
+      "acknowledgedAtUtc": "2026-11-01T15:28:47.753Z"
+    },
+    {
+      "event": "CATALOG_JOB_STARTED",
+      "status": "FAILED",
+      "readyAtUtc": "2026-11-01T15:28:47.878Z",
+      "failureCode": "catalog_cancel_query_marker_timeout"
+    }
+  ],
+  "cancelObservation": {
+    "jobId": "b0f90f4526a9437cb448dafbbe2429fb",
+    "createdStatus": "QUEUED",
+    "persistedStatus": "QUEUED",
+    "terminalStatus": "NOT_VERIFIED"
+  },
+  "completedAtUtc": "2026-11-01T15:28:52.883Z",
+  "exitCode": 1
+}

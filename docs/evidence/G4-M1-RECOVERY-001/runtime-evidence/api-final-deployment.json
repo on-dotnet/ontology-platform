@@ -1,0 +1,421 @@
+{
+  "taskId": "G4-M1-RECOVERY-001",
+  "commit": "47663df81f7b59c97a5dc2ae022b31f36cd237ad",
+  "startedUtc": "2026-11-01T16:01:28.846561+00:00",
+  "commands": [
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "stop",
+        "--time",
+        "10",
+        "4346d3b82e0efd66dee0c55781d7c48a31dca609c0a93580ca245b0d288b69f3"
+      ],
+      "exitCode": 0,
+      "stdout": "Flag --time has been deprecated, use --timeout instead\n4346d3b82e0efd66dee0c55781d7c48a31dca609c0a93580ca245b0d288b69f3\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "stop",
+        "--time",
+        "10",
+        "24ea2c3e21b21fe604c1d86206285acdbf703002e0766776a816fca19ccd8801"
+      ],
+      "exitCode": 0,
+      "stdout": "Flag --time has been deprecated, use --timeout instead\n24ea2c3e21b21fe604c1d86206285acdbf703002e0766776a816fca19ccd8801\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "start",
+        "24ea2c3e21b21fe604c1d86206285acdbf703002e0766776a816fca19ccd8801"
+      ],
+      "exitCode": 0,
+      "stdout": "24ea2c3e21b21fe604c1d86206285acdbf703002e0766776a816fca19ccd8801\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "start",
+        "4346d3b82e0efd66dee0c55781d7c48a31dca609c0a93580ca245b0d288b69f3"
+      ],
+      "exitCode": 0,
+      "stdout": "4346d3b82e0efd66dee0c55781d7c48a31dca609c0a93580ca245b0d288b69f3\n",
+      "stderr": ""
+    }
+  ],
+  "copied": [
+    {
+      "path": "OntologyPlatform.Api.dll",
+      "sha256": "7d88dd0f025e83c92d516e06b32554cd7c2c6368cfb2b855ed5e6324ae3eeab0"
+    },
+    {
+      "path": "OntologyPlatform.Contracts.xml",
+      "sha256": "8adbe5eb78776e4ddabf798c14883fdbbac1fb26c3a7c5a40141f60b88eaf8fb"
+    },
+    {
+      "path": "Microsoft.Extensions.DependencyInjection.AutoActivation.dll",
+      "sha256": "050802eb79c8d7ce48f40c89753ddca2a68ec1b7e6a6d646a810cd87cd8e9f78"
+    },
+    {
+      "path": "OntologyPlatform.Modules.Ontology.dll",
+      "sha256": "01c286a051b9dd64026df70f68b34819ff55f614225bc9049e43d27403547ddd"
+    },
+    {
+      "path": "Microsoft.IdentityModel.Logging.dll",
+      "sha256": "2bc4582ae62236f066901a7dcb2a88d04a181ad1978f2db2f4314df6ae1a50c6"
+    },
+    {
+      "path": "Microsoft.Agents.AI.dll",
+      "sha256": "a50738c2a10f47e87a622be67c3011fb16cae63677a3104d380d433f39dee977"
+    },
+    {
+      "path": "OntologyPlatform.Modules.Publishing.Domain.xml",
+      "sha256": "bd774c9507482b2562aca1b74ccf14bb8ac450a8c88b879292755c877cdc6fba"
+    },
+    {
+      "path": "OpenTelemetry.Exporter.OpenTelemetryProtocol.dll",
+      "sha256": "65fb06071dcda27215f1dd42d6c8de8cc98691cef0225b36c8fb22f995fd1759"
+    },
+    {
+      "path": "OntologyPlatform.Modules.SemanticQuery.dll",
+      "sha256": "cb489b1d1a511420335d6fdef799c5856ad75b594e7c6b44c57728b7cfc9d367"
+    },
+    {
+      "path": "OntologyPlatform.Modules.Agents.dll",
+      "sha256": "65ca85ff49d42d0f4151ed6f37babe162205c5d878e9e6f92793d950cc4d94cf"
+    },
+    {
+      "path": "Npgsql.EntityFrameworkCore.PostgreSQL.dll",
+      "sha256": "94fcf66e8e953fdb02c40c72ca89821dd5eed5324d4c0f12a7219ea8cd3d5a5e"
+    },
+    {
+      "path": "Microsoft.Extensions.Http.Resilience.dll",
+      "sha256": "b28b929922d42b1c979ee403f454387f4522bf973c149753f5300ae959d70531"
+    },
+    {
+      "path": "OntologyPlatform.Modules.Ontology.Domain.dll",
+      "sha256": "373e61b2f565a15eacf602fa9af6cf3ff91feae1160195a8ab59f089d93cf684"
+    },
+    {
+      "path": "Microsoft.EntityFrameworkCore.dll",
+      "sha256": "87faf0bf54de5f62c7d30eb686018b11c53d4acf6c280adb39965b303c5b2b59"
+    },
+    {
+      "path": "Google.Protobuf.dll",
+      "sha256": "b71be7a4e721d1b79456a0b52602a01a4414eb09bab4a04400f6f9d8a3895157"
+    },
+    {
+      "path": "OntologyPlatform.Modules.Publishing.xml",
+      "sha256": "1145c59022c29737e345552327e1e0cfa859002f115226fa055ac119ac3d3e90"
+    },
+    {
+      "path": "OntologyPlatform.Modules.Connections.dll",
+      "sha256": "c213ca2093cc69d35dd8d1192aceeb2b61ff9e50b49cf9401091098be4bbd1c7"
+    },
+    {
+      "path": "ModelContextProtocol.dll",
+      "sha256": "45c63242855e574fd6bdb35aad7d6e4af16b67517e20a775b6d19103fad38c63"
+    },
+    {
+      "path": "ModelContextProtocol.Core.dll",
+      "sha256": "80757dd4fde30eaed2d99849915c5642d2428487059c711373690a3336caa9b4"
+    },
+    {
+      "path": "OntologyPlatform.Modules.Governance.xml",
+      "sha256": "9bb539e2b55c95ccdce8c729a6113f3065891ad70dd0cd4b118862ebc81dc0c2"
+    },
+    {
+      "path": "Microsoft.EntityFrameworkCore.Abstractions.dll",
+      "sha256": "24596b62ac0546c641e308a06bb9ea4bb153e9a776ed2311e730832465f34f5d"
+    },
+    {
+      "path": "Microsoft.ML.Tokenizers.dll",
+      "sha256": "04b9cb9a6bce333071e071c6735a8914bb55e1ea1f197707ed71bf4cabf6ca77"
+    },
+    {
+      "path": "OntologyPlatform.ServiceDefaults.pdb",
+      "sha256": "5db51f3323762205851e6aa4ffe4423599ae5ef50c539a31a4341ce24fee1594"
+    },
+    {
+      "path": "OpenTelemetry.Extensions.Hosting.dll",
+      "sha256": "442d9c18f5cc9ffa65e3f486874f01b375866854b0ad08e40e6367139eb9b35a"
+    },
+    {
+      "path": "Polly.Core.dll",
+      "sha256": "37762ea6fcf05154685b0a616461705c837c2f07d98e4037dc3a0e4b4c186ea5"
+    },
+    {
+      "path": "Microsoft.Extensions.AI.Abstractions.dll",
+      "sha256": "a3216886dec2b2528b2d7212c438d21c3d6de2061b500bd2ea505a41f896f8d3"
+    },
+    {
+      "path": "Microsoft.IdentityModel.Protocols.OpenIdConnect.dll",
+      "sha256": "7921aef6fa1da2e563a237dda129b12407ac6c56448bb0eb7eebc59bb6c6babb"
+    },
+    {
+      "path": "System.Numerics.Tensors.dll",
+      "sha256": "93b9f90181b475e4abdb2ad66561c9472d7da97ba9e9576c016402ad6e6a4cf6"
+    },
+    {
+      "path": "OntologyPlatform.Modules.SemanticQuery.pdb",
+      "sha256": "07227c6ace7b85bd03a2a910807ae3bd1843b601ebf25b495ad20cb3748808d5"
+    },
+    {
+      "path": "OpenTelemetry.Api.dll",
+      "sha256": "bd75bbab25a4bf769727ec6c17457d4bf189a8c2c70034e5c212ae345132591d"
+    },
+    {
+      "path": "OntologyPlatform.Modules.Agents.pdb",
+      "sha256": "141e792f0560b19a4a436d39bf3f5d58bea2cc99a502de89d7aedacceb86e981"
+    },
+    {
+      "path": "Microsoft.Extensions.ServiceDiscovery.Abstractions.dll",
+      "sha256": "58ac3be03e3c4ae03486b8ec619ca769bf94befd38f432d61b32b1fba8d7d193"
+    },
+    {
+      "path": "OpenTelemetry.dll",
+      "sha256": "63fb9724258d4a1ac76c7ddffc2e0b18ee5125a1c8ff4b242a570a3410c97fc6"
+    },
+    {
+      "path": "OntologyPlatform.Api.deps.json",
+      "sha256": "d1df99d5c5522de6a52fadfae01a6d8049b24c296be85c700d075bb41e99112e"
+    },
+    {
+      "path": "Polly.RateLimiting.dll",
+      "sha256": "afe3042cd4062438857d42880623845f32575375f460fd1ac07f705ea0211804"
+    },
+    {
+      "path": "OntologyPlatform.Modules.Ontology.Domain.pdb",
+      "sha256": "1e1386aa3a2b5100ad61206c0c6e3c4f6336da99e671e0ff6e25e17ffa29d064"
+    },
+    {
+      "path": "OntologyPlatform.Api.pdb",
+      "sha256": "d2071014b9a0a7401b09f9e81b12d0a158471a43b31a57355b3a25898ab1171c"
+    },
+    {
+      "path": "web.config",
+      "sha256": "4177874adff2e02cf6c7cfb605a3b3e99c2df7251987ebfe52e72dcad8700f4c"
+    },
+    {
+      "path": "Microsoft.IdentityModel.Protocols.dll",
+      "sha256": "40ada0b98384788970117cadf63863edd99bd5bd6fb8076f6da68d65f6dbda4f"
+    },
+    {
+      "path": "Microsoft.AspNetCore.Authentication.OpenIdConnect.dll",
+      "sha256": "b0b139e6396b5b473513e3abc50d5007009a7e38d3b0b27663cede04211e5c65"
+    },
+    {
+      "path": "ModelContextProtocol.AspNetCore.dll",
+      "sha256": "b89eff1c8b94f81345d3281220c2b18adb36061dcbaf63767303af9ba393a85d"
+    },
+    {
+      "path": "Microsoft.Bcl.Cryptography.dll",
+      "sha256": "91c6bab93638c268569a38bc87770a5e3ef9932676f5b7a6d47aef4208062925"
+    },
+    {
+      "path": "OntologyPlatform.Modules.Ontology.pdb",
+      "sha256": "0848100e4f6721cff4703a8808166f9ed08a803beefaf7a94575bb4ba760a1d7"
+    },
+    {
+      "path": "Npgsql.dll",
+      "sha256": "e2bcafe1660fe4543fe9dfcabed972ec8d32259e5ea8009462ce1de23c7034c2"
+    },
+    {
+      "path": "Microsoft.OpenApi.dll",
+      "sha256": "dae97412c5804da0906639014cb6bd73b2cf37ad02da95437ded59578946e6e9"
+    },
+    {
+      "path": "Microsoft.EntityFrameworkCore.Relational.dll",
+      "sha256": "078ad42527c893d858e1c48b7edc5a0ec755c60b28395e996bc438ede3555cf0"
+    },
+    {
+      "path": "Microsoft.Extensions.Diagnostics.ExceptionSummarization.dll",
+      "sha256": "6ae3665434f016222e9d75a54a44a62d01c412ef63b5d7462c3a22ad9757c4d8"
+    },
+    {
+      "path": "OntologyPlatform.ServiceDefaults.dll",
+      "sha256": "7519d34de85322f0b979048988df0dc1a9e6d937bccc176528d9a320356d3eb7"
+    },
+    {
+      "path": "OpenTelemetry.Instrumentation.Http.dll",
+      "sha256": "bdd562d21bc152308cd5935394038551137adef50068eb41ab2ca7a820987287"
+    },
+    {
+      "path": "OntologyPlatform.Api",
+      "sha256": "e0a5bdd802097a681928242ae3d0f43449b17c7e94d95e61d5f9cb77fdee83c2"
+    },
+    {
+      "path": "OntologyPlatform.Modules.Connections.pdb",
+      "sha256": "bd44d856ff79990897be19cf6991e3ed5d18f14ead6d02ef6112dfb97ef78cd0"
+    },
+    {
+      "path": "OntologyPlatform.Modules.Publishing.Domain.pdb",
+      "sha256": "5d7ea39a24a0d210d440fef81b5bcf43e68a1efb9ed2ead783dcef0623eb3491"
+    },
+    {
+      "path": "System.IO.Hashing.dll",
+      "sha256": "53726755857b538b3676cabc39989874be072028fd5b39360a7580d73a14e562"
+    },
+    {
+      "path": "Microsoft.Extensions.ServiceDiscovery.dll",
+      "sha256": "3646d627b519e017c3392219b17416b04377c815a918248a503557fd40db9e0a"
+    },
+    {
+      "path": "Microsoft.Agents.AI.Abstractions.dll",
+      "sha256": "74a2253cc783b30408b9f787dc8cac0f9ad8dcb42891c19bb21a2a2d497fd050"
+    },
+    {
+      "path": "Microsoft.AspNetCore.OpenApi.dll",
+      "sha256": "ed704f63de95981f91ded8d0cc7642ad73c455b54e741b18dd42e9e44e60c51f"
+    },
+    {
+      "path": "OntologyPlatform.Api.runtimeconfig.json",
+      "sha256": "eff38a9750f7cca2407b1d639a963d56ffea92088e6da971bbbfa74e3dcd7224"
+    },
+    {
+      "path": "OntologyPlatform.Api.staticwebassets.endpoints.json",
+      "sha256": "c1686417e8d5c31bba969f12b6f3d2b35e6609adb5ca42f212261a3a02771aac"
+    },
+    {
+      "path": "OntologyPlatform.Contracts.pdb",
+      "sha256": "7951952670edabf94f523f6fba204ab82fe2bf723ad816d269ecc4e3995af4ca"
+    },
+    {
+      "path": "Microsoft.Extensions.VectorData.Abstractions.dll",
+      "sha256": "9a978aedcb83ff5c5a1f8f3b2137dca8608db2a1030e28b6f281a91046c869ed"
+    },
+    {
+      "path": "Yarp.ReverseProxy.dll",
+      "sha256": "9605717516fe01c60d2a32d5a891f8d253ac83b50fb2434f0db36151c7662ada"
+    },
+    {
+      "path": "Microsoft.IdentityModel.JsonWebTokens.dll",
+      "sha256": "4f61fd3d3f5003951a09cdd27ffdc3c4841a158d27a6d7247be3e5939e7dab32"
+    },
+    {
+      "path": "Microsoft.IdentityModel.Abstractions.dll",
+      "sha256": "84a6c307fe84453c9fc3a1af45bf2302b5d2aba4d5b9bfb7d581d6a28787461f"
+    },
+    {
+      "path": "OntologyPlatform.Modules.Governance.pdb",
+      "sha256": "bffc533326476d5ca8da2ee1fca252ba4fac221e279f0f8ba8228332f87afb93"
+    },
+    {
+      "path": "OpenTelemetry.Instrumentation.Runtime.dll",
+      "sha256": "5d222223d95be5d1507a5d581a2eebd268b46dfaca0d73b1724b16c8fe25558a"
+    },
+    {
+      "path": "OntologyPlatform.ServiceDefaults.xml",
+      "sha256": "76de92235d4e82c62af8c36508e6a97227fc92f3fcbe90b3c225d14541b3c01f"
+    },
+    {
+      "path": "Microsoft.Extensions.Compliance.Abstractions.dll",
+      "sha256": "e4df4358dd2dd57be430a9e7f220bc49bef26ab00007c732605c0defc207e065"
+    },
+    {
+      "path": "Microsoft.Extensions.Telemetry.Abstractions.dll",
+      "sha256": "57af8ce079eb3bcec63fd176f1034012f8199c44d38f10168438cc78364a9030"
+    },
+    {
+      "path": "Microsoft.Extensions.Http.Diagnostics.dll",
+      "sha256": "56da1ed94fe5551db5b67292820634136fe8b6d991626288aebdce7ee25400ee"
+    },
+    {
+      "path": "OntologyPlatform.Modules.Publishing.pdb",
+      "sha256": "1c863dfe1f7941b51b043dfa107e9eb9633477682a9fe46190e34fc9549ca53e"
+    },
+    {
+      "path": "System.IdentityModel.Tokens.Jwt.dll",
+      "sha256": "3d55b14eabadaf18aefea2c4eb085428e0485063ae3ea91cac072e3b5f951a83"
+    },
+    {
+      "path": "OpenTelemetry.Api.ProviderBuilderExtensions.dll",
+      "sha256": "dfaab1ecfb87773ccef2737aafbf1eb22a9f074c44e9fdd31947702da59234bc"
+    },
+    {
+      "path": "OntologyPlatform.Api.xml",
+      "sha256": "03d5292ae482432214aca1fbd4779f6763a6ff070d774cfe418f7e24e6142e27"
+    },
+    {
+      "path": "Microsoft.Extensions.AI.dll",
+      "sha256": "46b9555315e477312fec8744243b83800b2b79b6d87f482ca6c8fa61da1eb512"
+    },
+    {
+      "path": "OntologyPlatform.Contracts.dll",
+      "sha256": "0b062ba3c9377a2eaf550a0382ee0e17af0eb7fcb24c4eec815a4823993d59bc"
+    },
+    {
+      "path": "Microsoft.Extensions.Resilience.dll",
+      "sha256": "e7cee26992c26c4484b62da5663601456f7af2c9c10e8da4e47ec0df3b078aa4"
+    },
+    {
+      "path": "Microsoft.Extensions.AI.Evaluation.dll",
+      "sha256": "6efe08bbeea4e782341941e4714133fa47c131c5e4e349e31293cea3bfef4147"
+    },
+    {
+      "path": "OntologyPlatform.Modules.Ontology.xml",
+      "sha256": "fd748304f51538b13ce2551e89b8c5e4f57a2fd3078263c7709431986f63f774"
+    },
+    {
+      "path": "Microsoft.IdentityModel.Tokens.dll",
+      "sha256": "106db045348a9b767f3002d4ec3bb582c9141f6d8e9966e1e0ad58a71ba42b8b"
+    },
+    {
+      "path": "OntologyPlatform.Modules.Publishing.Domain.dll",
+      "sha256": "3a9d95c97bbe4427fba9e4827196693b34db996b89d3fe121a37b6084a6ddf23"
+    },
+    {
+      "path": "OntologyPlatform.Modules.SemanticQuery.xml",
+      "sha256": "e0625eb1e7d073b2e87c7e4599e89fba582c517873704033cd8a2a2ddf392f0f"
+    },
+    {
+      "path": "Microsoft.Extensions.Telemetry.dll",
+      "sha256": "cca41d630de69f9afda79cff76c26976c87ee28aec216cba63c2e81241b8f7f5"
+    },
+    {
+      "path": "OntologyPlatform.Modules.Agents.xml",
+      "sha256": "21f839a9af6709ccb71d0990933cb9be001dc7e4c985b6c4e7efcbcc822ecf3b"
+    },
+    {
+      "path": "OntologyPlatform.Modules.Ontology.Domain.xml",
+      "sha256": "2a7e06f1186b404d3f8faa237f525a453807524c369e2e73dfbb521e918759c6"
+    },
+    {
+      "path": "Polly.Extensions.dll",
+      "sha256": "8adac7a20cd056b9a8623efb6e6f9b99a82e18d3c7b7f6c788f7fc4b20ce5f18"
+    },
+    {
+      "path": "OpenTelemetry.Instrumentation.AspNetCore.dll",
+      "sha256": "369897ccfe1a4483ab92c09aa1846d562c1353afd93ee103ada4e638bcdfbce5"
+    },
+    {
+      "path": "OntologyPlatform.Modules.Publishing.dll",
+      "sha256": "c1fa09750f79b6f3d6a5773a99e4066dcc9bb768ed3f772f21cf069373e53d2d"
+    },
+    {
+      "path": "OntologyPlatform.Modules.Connections.xml",
+      "sha256": "12ae1589d75831beee0243c618c23237b500893119f6f6de9c03ca1e8709c5be"
+    },
+    {
+      "path": "OntologyPlatform.Modules.Governance.dll",
+      "sha256": "47d58a23342179c82462f7de6dce966d09514ec5d7b9ab326d1718a449cf6363"
+    },
+    {
+      "path": "Microsoft.Extensions.AmbientMetadata.Application.dll",
+      "sha256": "aa3fbb981085778df80185ba391253467c363d069308ca5e12213d7a7e689377"
+    }
+  ]
+}

@@ -1,0 +1,83 @@
+{
+  "status": "PASS",
+  "connectionId": "4ae041d5064b463099d4d2fdadb7f725",
+  "sourceContainerId": "9dd83f34dd207529bea2975834c3d61baa63b8ca88e159506520bd786f0d7305",
+  "activeWorkBefore": 0,
+  "sourceTcpPassiveOpenDelta": 0,
+  "scope": "source-container network namespace TCP accepts; no concurrent source work; Unix Docker exec counter reads do not create TCP",
+  "commands": [
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "9dd83f34dd207529bea2975834c3d61baa63b8ca88e159506520bd786f0d7305",
+        "cat",
+        "/proc/net/snmp"
+      ],
+      "exitCode": 0,
+      "observedUtc": "2026-11-01T15:41:42.343277+00:00",
+      "tcp": {
+        "RtoAlgorithm": 1,
+        "RtoMin": 200,
+        "RtoMax": 120000,
+        "MaxConn": -1,
+        "ActiveOpens": 0,
+        "PassiveOpens": 150,
+        "AttemptFails": 0,
+        "EstabResets": 147,
+        "CurrEstab": 0,
+        "InSegs": 2266,
+        "OutSegs": 1964,
+        "RetransSegs": 2,
+        "InErrs": 0,
+        "OutRsts": 8,
+        "InCsumErrors": 0
+      }
+    },
+    {
+      "command": [
+        "node",
+        "scripts/acceptance/g4-m1-fault.mjs",
+        "--runtime-file",
+        "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/disabled-denials.json",
+        "--action",
+        "disabled-denials"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"action\":\"disabled-denials\",\"status\":\"PASS\",\"evidence\":\"artifacts/g4-m1-recovery-001/fault-http/591225ff-ff3f-49fb-8d92-c43ba2eb160a.json\"}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "9dd83f34dd207529bea2975834c3d61baa63b8ca88e159506520bd786f0d7305",
+        "cat",
+        "/proc/net/snmp"
+      ],
+      "exitCode": 0,
+      "observedUtc": "2026-11-01T15:41:43.818964+00:00",
+      "tcp": {
+        "RtoAlgorithm": 1,
+        "RtoMin": 200,
+        "RtoMax": 120000,
+        "MaxConn": -1,
+        "ActiveOpens": 0,
+        "PassiveOpens": 150,
+        "AttemptFails": 0,
+        "EstabResets": 147,
+        "CurrEstab": 0,
+        "InSegs": 2266,
+        "OutSegs": 1964,
+        "RetransSegs": 2,
+        "InErrs": 0,
+        "OutRsts": 8,
+        "InCsumErrors": 0
+      }
+    }
+  ]
+}

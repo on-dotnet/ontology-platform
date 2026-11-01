@@ -1,0 +1,417 @@
+{
+  "taskId": "G4-M1-RECOVERY-001",
+  "caseId": "M1-C12",
+  "status": "PASS",
+  "commands": [
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "inspect",
+        "--format",
+        "{\"id\":{{json .Id}},\"name\":{{json .Name}},\"taskId\":{{json (index .Config.Labels \"ontology.task-id\")}},\"runId\":{{json (index .Config.Labels \"ontology.run-id\")}},\"project\":{{json (index .Config.Labels \"com.docker.compose.project\")}},\"service\":{{json (index .Config.Labels \"com.docker.compose.service\")}},\"running\":{{json .State.Running}},\"paused\":{{json .State.Paused}}}",
+        "190ab49a8eff5f3a13c1526f38cda9b933c0e618de51c7b7e4da98be73cc130a"
+      ],
+      "timeoutSeconds": 12,
+      "startedAtUtc": "2026-11-01T16:02:42.494291+00:00",
+      "exitCode": 0,
+      "stdoutBytes": 281,
+      "stderrBytes": 0
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "190ab49a8eff5f3a13c1526f38cda9b933c0e618de51c7b7e4da98be73cc130a",
+        "psql",
+        "-X",
+        "-qAt",
+        "-U",
+        "platform",
+        "-d",
+        "platform",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-f",
+        "-"
+      ],
+      "timeoutSeconds": 12,
+      "startedAtUtc": "2026-11-01T16:02:42.513168+00:00",
+      "sql": "BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY;\nSET LOCAL statement_timeout='5s';\nSET LOCAL lock_timeout='1s';\nSELECT json_build_object(\n'connection',(SELECT json_build_object('id',\"Id\",'revision',\"Revision\",'configHash',\"ConfigHash\",'secretVersion',\"SecretVersion\",'updatedAtUtc',\"UpdatedAtUtc\") FROM connections.\"Connections\" WHERE \"Id\"='4ae041d5064b463099d4d2fdadb7f725'),\n'probes',(SELECT coalesce(json_agg(p),'[]'::json) FROM (SELECT \"Id\" AS id,\"ConnectionId\" AS \"connectionId\",\"Revision\" AS revision,\"ConfigHash\" AS \"configHash\",\"SecretVersion\" AS \"secretVersion\",\"ExpiresAtUtc\" AS \"expiresAtUtc\",\n\"ReportJson\"::jsonb->>'probeId' AS \"reportProbeId\",\"ReportJson\"::jsonb->>'connectionId' AS \"reportConnectionId\",\"ReportJson\"::jsonb->>'configHash' AS \"reportConfigHash\",(\"ReportJson\"::jsonb->>'secretVersion')::bigint AS \"reportSecretVersion\",\n\"ReportJson\"::jsonb->>'traceId' AS \"traceId\",\"ReportJson\"::jsonb->>'startedAtUtc' AS \"startedAtUtc\",\"ReportJson\"::jsonb->>'completedAtUtc' AS \"completedAtUtc\",\"ReportJson\"::jsonb->>'expiresAtUtc' AS \"reportExpiresAtUtc\"\nFROM connections.\"ConnectionProbes\" WHERE \"ConnectionId\"='4ae041d5064b463099d4d2fdadb7f725' AND (\"Id\"='ed1a56cb20bc4b698b63a735ba88d7b9' OR \"ReportJson\"::jsonb->>'traceId' IN ('461f9fe4d23d571ef404be701266809e','0dce8dc1ba9b54d70bc62e4e09a1bd5b','11e63a6cbc52e61656b3f5a2b8e7fca6','be59881ec52d1aea10856c3718972caf','00cc8b256e48b80c4319ca6e31e3b67a','bb2ad1346712d6f50e6fe565647e4c68','f4b8ddd05b100aff7a1b8ddcd2d54d87','932f90f0b61c4f6400522e36b2563a87','ee9b030153d222607e2b36a16982d5b8')) ORDER BY \"Id\" LIMIT 17) p),\n'job',(SELECT json_build_object('id',\"Id\",'connectionId',\"ConnectionId\",'revision',\"Revision\",'configHash',\"ConfigHash\",'secretVersion',\"SecretVersion\",'traceId',\"TraceId\",'createdAtUtc',\"CreatedAtUtc\",'completedAtUtc',\"CompletedAtUtc\",'snapshotId',\"SnapshotId\") FROM connections.\"CatalogJobs\" WHERE \"Id\"='f45bf5ccf2da415f84cf58e6ead8c98f' AND \"ConnectionId\"='4ae041d5064b463099d4d2fdadb7f725'),\n'snapshot',(SELECT json_build_object('id',\"Id\",'connectionId',\"ConnectionId\",'configHash',\"ConfigHash\",'secretVersion',\"SecretVersion\",'capturedAtUtc',\"CapturedAtUtc\",'viewSnapshotId',\"ViewJson\"::jsonb->>'snapshotId','viewConnectionId',\"ViewJson\"::jsonb->>'connectionId','viewRevision',(\"ViewJson\"::jsonb->>'configRevision')::bigint,'viewSecretVersion',(\"ViewJson\"::jsonb->>'secretVersion')::bigint,'viewCapturedAtUtc',\"ViewJson\"::jsonb->>'capturedAtUtc','schemaFingerprint',\"ViewJson\"::jsonb->>'schemaFingerprint') FROM connections.\"CatalogSnapshots\" WHERE \"Id\"='7dd966ce82eb4e63a0190f7bed4f1a2e' AND \"ConnectionId\"='4ae041d5064b463099d4d2fdadb7f725'),\n'audits',(SELECT coalesce(json_agg(a),'[]'::json) FROM (SELECT \"Action\" AS action,\"Resource\" AS resource,\"Outcome\" AS outcome,\"TraceId\" AS \"traceId\",\"OccurredAtUtc\" AS \"occurredAtUtc\" FROM governance.audit_records WHERE \"TraceId\" IN ('461f9fe4d23d571ef404be701266809e','0dce8dc1ba9b54d70bc62e4e09a1bd5b','11e63a6cbc52e61656b3f5a2b8e7fca6','be59881ec52d1aea10856c3718972caf','00cc8b256e48b80c4319ca6e31e3b67a','bb2ad1346712d6f50e6fe565647e4c68','f4b8ddd05b100aff7a1b8ddcd2d54d87','932f90f0b61c4f6400522e36b2563a87','ee9b030153d222607e2b36a16982d5b8') AND \"Action\" IN ('connection.create','connection.probe.start','connection.probe.complete','connection.catalog.start','connection.catalog.finish','connection.enable','connection.disable') AND \"Resource\" IN ('connection:new','connection:4ae041d5064b463099d4d2fdadb7f725') ORDER BY \"OccurredAtUtc\" LIMIT 65) a));\nCOMMIT;\n",
+      "sqlSha256": "22d08af8071dbb8d509e1f1529f4b6f4d9bc74558eb316936b478eda90b33cf4",
+      "exitCode": 0,
+      "stdoutBytes": 5820,
+      "stderrBytes": 0
+    }
+  ],
+  "checks": [
+    {
+      "name": "all_exact_rows_present_and_bounded",
+      "status": "PASS"
+    },
+    {
+      "name": "connection_job_snapshot_ids",
+      "status": "PASS"
+    },
+    {
+      "name": "job_created_in_original_discover_post_window",
+      "status": "PASS"
+    },
+    {
+      "name": "historical_probe_candidate_exists",
+      "status": "PASS"
+    },
+    {
+      "name": "probe_columns_match_camelcase_report",
+      "status": "PASS"
+    },
+    {
+      "name": "probe_original_post_window_and_order",
+      "status": "PASS"
+    },
+    {
+      "name": "snapshot_captured_job_revision_hash_secret",
+      "status": "PASS"
+    },
+    {
+      "name": "job_snapshot_time_order",
+      "status": "PASS"
+    },
+    {
+      "name": "current_connection_not_misused_as_historical_revision",
+      "status": "PASS"
+    },
+    {
+      "name": "current_connection_has_separate_captured_probe",
+      "status": "PASS"
+    },
+    {
+      "name": "current_probe_post_and_column_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "connection.probe.start_unique_original_post_audit",
+      "status": "PASS"
+    },
+    {
+      "name": "connection.probe.start_outcome_and_time",
+      "status": "PASS"
+    },
+    {
+      "name": "connection.probe.complete_unique_original_post_audit",
+      "status": "PASS"
+    },
+    {
+      "name": "connection.probe.complete_outcome_and_time",
+      "status": "PASS"
+    },
+    {
+      "name": "connection.catalog.start_unique_original_post_audit",
+      "status": "PASS"
+    },
+    {
+      "name": "connection.catalog.start_outcome_and_time",
+      "status": "PASS"
+    },
+    {
+      "name": "connection.catalog.finish_unique_original_post_audit",
+      "status": "PASS"
+    },
+    {
+      "name": "connection.catalog.finish_outcome_and_time",
+      "status": "PASS"
+    },
+    {
+      "name": "connection.create_unique_original_post_audit",
+      "status": "PASS"
+    },
+    {
+      "name": "connection.create_outcome_and_time",
+      "status": "PASS"
+    },
+    {
+      "name": "current_connection_update_matches_disable_post",
+      "status": "PASS"
+    },
+    {
+      "name": "connection.disable_unique_original_post_audit",
+      "status": "PASS"
+    },
+    {
+      "name": "connection.disable_outcome_and_time",
+      "status": "PASS"
+    }
+  ],
+  "clockToleranceSeconds": 2,
+  "sourceSha256": "0cb858ed1134c5870e155607a9054ffff2f7b6c27ab024d8b1e92e4790231aba",
+  "limitations": [
+    "Only selected baseline lineage; no raw HTTP response reconstruction or secret/audit-detail reads."
+  ],
+  "runId": "recovery-20261101-01",
+  "baselineSha256": "b20f934a24661ac74b46290235763be8c23c70f771541ac03c1c059cc049e212",
+  "fixtures": {
+    "connectionId": "4ae041d5064b463099d4d2fdadb7f725",
+    "probeId": "ed1a56cb20bc4b698b63a735ba88d7b9",
+    "jobId": "f45bf5ccf2da415f84cf58e6ead8c98f",
+    "snapshotId": "7dd966ce82eb4e63a0190f7bed4f1a2e"
+  },
+  "originalPosts": [
+    {
+      "index": 57,
+      "route": "/api/v1/connections",
+      "traceId": "461f9fe4d23d571ef404be701266809e",
+      "startedAtUtc": "2026-11-01T14:10:58.373Z",
+      "durationMs": 41
+    },
+    {
+      "index": 58,
+      "route": "/api/v1/connections",
+      "traceId": "0dce8dc1ba9b54d70bc62e4e09a1bd5b",
+      "startedAtUtc": "2026-11-01T14:10:58.415Z",
+      "durationMs": 33
+    },
+    {
+      "index": 86,
+      "route": "/api/v1/connections/{id}/test",
+      "traceId": "11e63a6cbc52e61656b3f5a2b8e7fca6",
+      "startedAtUtc": "2026-11-01T14:11:00.075Z",
+      "durationMs": 91
+    },
+    {
+      "index": 87,
+      "route": "/api/v1/connections/{id}/test",
+      "traceId": "be59881ec52d1aea10856c3718972caf",
+      "startedAtUtc": "2026-11-01T14:11:00.166Z",
+      "durationMs": 34
+    },
+    {
+      "index": 91,
+      "route": "/api/v1/connections/{id}/discoveries",
+      "traceId": "00cc8b256e48b80c4319ca6e31e3b67a",
+      "startedAtUtc": "2026-11-01T14:11:00.319Z",
+      "durationMs": 43
+    },
+    {
+      "index": 99,
+      "route": "/api/v1/connections/{id}/discoveries",
+      "traceId": "bb2ad1346712d6f50e6fe565647e4c68",
+      "startedAtUtc": "2026-11-01T14:11:02.425Z",
+      "durationMs": 34
+    },
+    {
+      "index": 113,
+      "route": "/api/v1/connections/{id}/test",
+      "traceId": "f4b8ddd05b100aff7a1b8ddcd2d54d87",
+      "startedAtUtc": "2026-11-01T14:11:03.987Z",
+      "durationMs": 46
+    },
+    {
+      "index": 120,
+      "route": "/api/v1/connections/{id}/test",
+      "traceId": "932f90f0b61c4f6400522e36b2563a87",
+      "startedAtUtc": "2026-11-01T14:11:04.237Z",
+      "durationMs": 46
+    },
+    {
+      "index": 128,
+      "route": "/api/v1/connections/{id}/disable",
+      "traceId": "ee9b030153d222607e2b36a16982d5b8",
+      "startedAtUtc": "2026-11-01T14:11:04.500Z",
+      "durationMs": 36
+    }
+  ],
+  "sourceInputs": {
+    "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Application/ConnectionApplicationService.cs": "b4950eae70385c9db813f43fe54d9df5b9dedab5974670c10672dcdb711636c7",
+    "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Application/ConnectionApplicationService.Probes.cs": "0d0ae9ca6f1c15d88e301de30d76cc79256ac5b56611755214bf11f716efee8b",
+    "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Application/ConnectionApplicationService.Worker.cs": "304f83ec7ccf4f14c77244cfafdc6695fab5018140114075543c858838038f48",
+    "backend/src/Contracts/OntologyPlatform.Contracts/G4ConnectionModels.cs": "23cb3e751d08d4ab9dee1340ca6cd5ef7ab4cb4b5a57083b23b81264151b239c",
+    "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs": "2a460770cff2b3cb412182e595a07daee73fe103d8a9ef0882ce9251a92a87b1"
+  },
+  "platformIdentity": {
+    "id": "190ab49a8eff5f3a13c1526f38cda9b933c0e618de51c7b7e4da98be73cc130a",
+    "name": "/ontology-g4-m1-recovery-001-platform-pg-1",
+    "taskId": "G4-M1-RECOVERY-001",
+    "runId": "recovery-20261101-01",
+    "project": "ontology-g4-m1-recovery-001",
+    "service": "platform-pg",
+    "running": true,
+    "paused": false
+  },
+  "projection": {
+    "connection": {
+      "id": "4ae041d5064b463099d4d2fdadb7f725",
+      "revision": 8,
+      "configHash": "e4c3ae53844d99d3267c08e2d7bb17785b1095154bfed309fd2306d5bc79d9ba",
+      "secretVersion": 2,
+      "updatedAtUtc": "2026-11-01T14:11:04.533608+00:00"
+    },
+    "probes": [
+      {
+        "id": "6a5bf31132da4e09a7ad05a5c1a16192",
+        "connectionId": "4ae041d5064b463099d4d2fdadb7f725",
+        "revision": 6,
+        "configHash": "e4c3ae53844d99d3267c08e2d7bb17785b1095154bfed309fd2306d5bc79d9ba",
+        "secretVersion": 2,
+        "expiresAtUtc": "2026-11-01T14:21:04.26959+00:00",
+        "reportProbeId": "6a5bf31132da4e09a7ad05a5c1a16192",
+        "reportConnectionId": "4ae041d5064b463099d4d2fdadb7f725",
+        "reportConfigHash": "e4c3ae53844d99d3267c08e2d7bb17785b1095154bfed309fd2306d5bc79d9ba",
+        "reportSecretVersion": 2,
+        "traceId": "932f90f0b61c4f6400522e36b2563a87",
+        "startedAtUtc": "2026-11-01T14:11:04.2695909+00:00",
+        "completedAtUtc": "2026-11-01T14:11:04.2804149+00:00",
+        "reportExpiresAtUtc": "2026-11-01T14:21:04.2695909+00:00"
+      },
+      {
+        "id": "aed60499ddce4630ad9f2bf19f535118",
+        "connectionId": "4ae041d5064b463099d4d2fdadb7f725",
+        "revision": 5,
+        "configHash": "e4c3ae53844d99d3267c08e2d7bb17785b1095154bfed309fd2306d5bc79d9ba",
+        "secretVersion": 1,
+        "expiresAtUtc": "2026-11-01T14:21:04.019407+00:00",
+        "reportProbeId": "aed60499ddce4630ad9f2bf19f535118",
+        "reportConnectionId": "4ae041d5064b463099d4d2fdadb7f725",
+        "reportConfigHash": "e4c3ae53844d99d3267c08e2d7bb17785b1095154bfed309fd2306d5bc79d9ba",
+        "reportSecretVersion": 1,
+        "traceId": "f4b8ddd05b100aff7a1b8ddcd2d54d87",
+        "startedAtUtc": "2026-11-01T14:11:04.0194078+00:00",
+        "completedAtUtc": "2026-11-01T14:11:04.0302557+00:00",
+        "reportExpiresAtUtc": "2026-11-01T14:21:04.0194078+00:00"
+      },
+      {
+        "id": "ed1a56cb20bc4b698b63a735ba88d7b9",
+        "connectionId": "4ae041d5064b463099d4d2fdadb7f725",
+        "revision": 3,
+        "configHash": "89d52dee8fc74e9470be69426176f12e8a97a4b7f93423693c2b55fc049d0759",
+        "secretVersion": 1,
+        "expiresAtUtc": "2026-11-01T14:21:00.10883+00:00",
+        "reportProbeId": "ed1a56cb20bc4b698b63a735ba88d7b9",
+        "reportConnectionId": "4ae041d5064b463099d4d2fdadb7f725",
+        "reportConfigHash": "89d52dee8fc74e9470be69426176f12e8a97a4b7f93423693c2b55fc049d0759",
+        "reportSecretVersion": 1,
+        "traceId": "11e63a6cbc52e61656b3f5a2b8e7fca6",
+        "startedAtUtc": "2026-11-01T14:11:00.1088308+00:00",
+        "completedAtUtc": "2026-11-01T14:11:00.1622345+00:00",
+        "reportExpiresAtUtc": "2026-11-01T14:21:00.1088308+00:00"
+      }
+    ],
+    "job": {
+      "id": "f45bf5ccf2da415f84cf58e6ead8c98f",
+      "connectionId": "4ae041d5064b463099d4d2fdadb7f725",
+      "revision": 4,
+      "configHash": "89d52dee8fc74e9470be69426176f12e8a97a4b7f93423693c2b55fc049d0759",
+      "secretVersion": 1,
+      "traceId": "00cc8b256e48b80c4319ca6e31e3b67a",
+      "createdAtUtc": "2026-11-01T14:11:00.352758+00:00",
+      "completedAtUtc": "2026-11-01T14:11:01.320461+00:00",
+      "snapshotId": "7dd966ce82eb4e63a0190f7bed4f1a2e"
+    },
+    "snapshot": {
+      "id": "7dd966ce82eb4e63a0190f7bed4f1a2e",
+      "connectionId": "4ae041d5064b463099d4d2fdadb7f725",
+      "configHash": "89d52dee8fc74e9470be69426176f12e8a97a4b7f93423693c2b55fc049d0759",
+      "secretVersion": 1,
+      "capturedAtUtc": "2026-11-01T14:11:01.321382+00:00",
+      "viewSnapshotId": "7dd966ce82eb4e63a0190f7bed4f1a2e",
+      "viewConnectionId": "4ae041d5064b463099d4d2fdadb7f725",
+      "viewRevision": 4,
+      "viewSecretVersion": 1,
+      "viewCapturedAtUtc": "2026-11-01T14:11:01.321382+00:00",
+      "schemaFingerprint": "9cf411b58de54ba238b6cecd271d80fe7a367cdb10ac7bd36656e2218755a139"
+    },
+    "audits": [
+      {
+        "action": "connection.create",
+        "resource": "connection:new",
+        "outcome": "allowed",
+        "traceId": "461f9fe4d23d571ef404be701266809e",
+        "occurredAtUtc": "2026-11-01T14:10:58.411993+00:00"
+      },
+      {
+        "action": "connection.probe.start",
+        "resource": "connection:4ae041d5064b463099d4d2fdadb7f725",
+        "outcome": "allowed",
+        "traceId": "11e63a6cbc52e61656b3f5a2b8e7fca6",
+        "occurredAtUtc": "2026-11-01T14:11:00.115136+00:00"
+      },
+      {
+        "action": "connection.probe.complete",
+        "resource": "connection:4ae041d5064b463099d4d2fdadb7f725",
+        "outcome": "allowed",
+        "traceId": "11e63a6cbc52e61656b3f5a2b8e7fca6",
+        "occurredAtUtc": "2026-11-01T14:11:00.163934+00:00"
+      },
+      {
+        "action": "connection.catalog.start",
+        "resource": "connection:4ae041d5064b463099d4d2fdadb7f725",
+        "outcome": "allowed",
+        "traceId": "00cc8b256e48b80c4319ca6e31e3b67a",
+        "occurredAtUtc": "2026-11-01T14:11:00.359752+00:00"
+      },
+      {
+        "action": "connection.catalog.finish",
+        "resource": "connection:4ae041d5064b463099d4d2fdadb7f725",
+        "outcome": "allowed",
+        "traceId": "00cc8b256e48b80c4319ca6e31e3b67a",
+        "occurredAtUtc": "2026-11-01T14:11:01.326861+00:00"
+      },
+      {
+        "action": "connection.catalog.start",
+        "resource": "connection:4ae041d5064b463099d4d2fdadb7f725",
+        "outcome": "allowed",
+        "traceId": "bb2ad1346712d6f50e6fe565647e4c68",
+        "occurredAtUtc": "2026-11-01T14:11:02.457379+00:00"
+      },
+      {
+        "action": "connection.catalog.finish",
+        "resource": "connection:4ae041d5064b463099d4d2fdadb7f725",
+        "outcome": "allowed",
+        "traceId": "bb2ad1346712d6f50e6fe565647e4c68",
+        "occurredAtUtc": "2026-11-01T14:11:03.36826+00:00"
+      },
+      {
+        "action": "connection.probe.start",
+        "resource": "connection:4ae041d5064b463099d4d2fdadb7f725",
+        "outcome": "allowed",
+        "traceId": "f4b8ddd05b100aff7a1b8ddcd2d54d87",
+        "occurredAtUtc": "2026-11-01T14:11:04.019855+00:00"
+      },
+      {
+        "action": "connection.probe.complete",
+        "resource": "connection:4ae041d5064b463099d4d2fdadb7f725",
+        "outcome": "allowed",
+        "traceId": "f4b8ddd05b100aff7a1b8ddcd2d54d87",
+        "occurredAtUtc": "2026-11-01T14:11:04.03076+00:00"
+      },
+      {
+        "action": "connection.probe.start",
+        "resource": "connection:4ae041d5064b463099d4d2fdadb7f725",
+        "outcome": "allowed",
+        "traceId": "932f90f0b61c4f6400522e36b2563a87",
+        "occurredAtUtc": "2026-11-01T14:11:04.270028+00:00"
+      },
+      {
+        "action": "connection.probe.complete",
+        "resource": "connection:4ae041d5064b463099d4d2fdadb7f725",
+        "outcome": "allowed",
+        "traceId": "932f90f0b61c4f6400522e36b2563a87",
+        "occurredAtUtc": "2026-11-01T14:11:04.28094+00:00"
+      },
+      {
+        "action": "connection.disable",
+        "resource": "connection:4ae041d5064b463099d4d2fdadb7f725",
+        "outcome": "allowed",
+        "traceId": "ee9b030153d222607e2b36a16982d5b8",
+        "occurredAtUtc": "2026-11-01T14:11:04.534164+00:00"
+      }
+    ]
+  },
+  "selectedHistoricalProbeId": "ed1a56cb20bc4b698b63a735ba88d7b9",
+  "fixtureProbeUsedAsHistoricalProbe": true,
+  "selectedCurrentConfigProbeId": "6a5bf31132da4e09a7ad05a5c1a16192",
+  "completedAtUtc": "2026-11-01T16:02:42.556916+00:00"
+}

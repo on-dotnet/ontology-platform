@@ -1,0 +1,27 @@
+{
+  "taskId": "G4-M1-RECOVERY-001",
+  "status": "PASS",
+  "base": "d1a61daffe844475b07705797e3ad325cc3f2945",
+  "head": "47663df81f7b59c97a5dc2ae022b31f36cd237ad",
+  "protectedPaths": [
+    "docs/contracts",
+    "backend/src/Contracts",
+    "backend/src/Modules/Ontology",
+    "backend/src/Modules/Publishing",
+    "backend/src/Modules/SemanticQuery",
+    "backend/src/Modules/Agents"
+  ],
+  "actualChangedPaths": [
+    "backend/src/Contracts/OntologyPlatform.Contracts/G4ConnectionModels.cs",
+    "backend/src/Contracts/OntologyPlatform.Contracts/G4ConnectionRules.cs",
+    "docs/contracts/g4-00-connections.md",
+    "docs/contracts/g4-00-mapping.md",
+    "docs/contracts/g4-00-query.md",
+    "docs/contracts/g4-00-ui.md",
+    "docs/contracts/g4-connections.openapi.json",
+    "docs/contracts/g4-m1-connections.md"
+  ],
+  "formalG2G3ContractAndModuleChanges": [],
+  "runtimeG3PublishingQuery": "NOT_RUN",
+  "scope": "Byte comparison of tracked formal contracts/modules; does not replace G3 product runtime."
+}

@@ -1,0 +1,133 @@
+{
+  "taskId": "G4-M1-RECOVERY-001",
+  "status": "FAIL",
+  "commands": [
+    {
+      "operation": "source_wait_observation",
+      "observedUtc": "2026-11-01T15:28:47.880079+00:00",
+      "value": []
+    },
+    {
+      "operation": "source_wait_observation",
+      "observedUtc": "2026-11-01T15:28:47.921098+00:00",
+      "value": []
+    },
+    {
+      "operation": "source_wait_observation",
+      "observedUtc": "2026-11-01T15:28:47.952545+00:00",
+      "value": [
+        {
+          "pid": 23969,
+          "state": "active",
+          "waitType": "Lock",
+          "wait": "relation",
+          "clientAddr": "172.18.0.3/32",
+          "user": "fixture_reader",
+          "database": "fixture"
+        }
+      ]
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "190ab49a8eff5f3a13c1526f38cda9b933c0e618de51c7b7e4da98be73cc130a",
+        "psql",
+        "-U",
+        "platform",
+        "-d",
+        "platform",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-qAt"
+      ],
+      "sql": "SELECT json_build_object('status',\"Status\",'cancelRequested',\"CancelRequested\",'fence',\"Fence\",'snapshot',\"SnapshotId\",'diagnostic',\"DiagnosticCode\") FROM connections.\"CatalogJobs\" WHERE \"Id\"='b0f90f4526a9437cb448dafbbe2429fb';",
+      "exitCode": 0,
+      "stdout": "{\"status\" : \"QUEUED\", \"cancelRequested\" : false, \"fence\" : 0, \"snapshot\" : null, \"diagnostic\" : null}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "9dd83f34dd207529bea2975834c3d61baa63b8ca88e159506520bd786f0d7305",
+        "psql",
+        "-U",
+        "postgres",
+        "-d",
+        "fixture",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-qAt"
+      ],
+      "sql": "SET statement_timeout='2s';SELECT json_build_object('lockCount',(SELECT count(*) FROM pg_locks WHERE pid=23968),'backendCount',(SELECT count(*) FROM pg_stat_activity WHERE pid IN (23969)));",
+      "exitCode": 0,
+      "stdout": "{\"lockCount\" : 0, \"backendCount\" : 0}\n",
+      "stderr": ""
+    }
+  ],
+  "apiIdentity": {
+    "id": "24ea2c3e21b21fe604c1d86206285acdbf703002e0766776a816fca19ccd8801",
+    "addresses": [
+      "172.18.0.3",
+      "172.19.0.4"
+    ]
+  },
+  "ready": {
+    "event": "CATALOG_CANCEL_READY",
+    "taskId": "G4-M1-RECOVERY-001",
+    "runId": "recovery-20261101-01",
+    "connectionId": "1bf23f9d36bf4ceba09d745f04d8f743"
+  },
+  "sourceBefore": [],
+  "lock": {
+    "command": [
+      "docker",
+      "--context",
+      "desktop-linux",
+      "exec",
+      "-i",
+      "9dd83f34dd207529bea2975834c3d61baa63b8ca88e159506520bd786f0d7305",
+      "psql",
+      "-U",
+      "postgres",
+      "-d",
+      "fixture",
+      "-v",
+      "ON_ERROR_STOP=1",
+      "-qAt"
+    ],
+    "sql": "SET application_name='g4_m1_recovery_cancel_lock'; SET lock_timeout='2s'; SET statement_timeout='15s'; SET idle_in_transaction_session_timeout='15s'; BEGIN; LOCK TABLE pg_catalog.pg_shdepend IN ACCESS EXCLUSIVE MODE; SELECT json_build_object('pid',pg_backend_pid(),'granted',exists(SELECT 1 FROM pg_locks WHERE pid=pg_backend_pid() AND relation='pg_catalog.pg_shdepend'::regclass AND mode='AccessExclusiveLock' AND granted));\n",
+    "held": {
+      "pid": 23968,
+      "granted": true
+    }
+  },
+  "jobId": "b0f90f4526a9437cb448dafbbe2429fb",
+  "sourceBlockedBeforeCancel": [
+    {
+      "pid": 23969,
+      "state": "active",
+      "waitType": "Lock",
+      "wait": "relation",
+      "clientAddr": "172.18.0.3/32",
+      "user": "fixture_reader",
+      "database": "fixture"
+    }
+  ],
+  "lockExit": 0,
+  "observerExit": 0,
+  "browserExit": 1,
+  "sourceAfter": {
+    "lockCount": 0,
+    "backendCount": 0
+  },
+  "cleanupErrors": [],
+  "driverSha256": "3790a71c3cf919eff6523469bf83aa8240c42380c1706f0d526ce3e920560674"
+}

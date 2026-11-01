@@ -1,0 +1,149 @@
+{
+  "status": "PASS",
+  "scope": "lease_takeover_and_no_observed_duplicate_after_original_resumed_not_full_E06",
+  "api": {
+    "id": "24ea2c3e21b21fe604c1d86206285acdbf703002e0766776a816fca19ccd8801",
+    "name": "/ontology-g4-m1-recovery-001-api-1",
+    "running": true,
+    "paused": false,
+    "labels": {
+      "com.docker.compose.config-hash": "ca8cc772780c4574699d7d892974ded2e6b2bcf63047a15deacc4c9faa906d41",
+      "com.docker.compose.container-number": "1",
+      "com.docker.compose.depends_on": "",
+      "com.docker.compose.image": "sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55",
+      "com.docker.compose.oneoff": "False",
+      "com.docker.compose.project": "ontology-g4-m1-recovery-001",
+      "com.docker.compose.project.config_files": "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/experiments/g4-m1/compose.m1.yaml,/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/experiments/g4-m1/compose.runtime.yaml",
+      "com.docker.compose.project.working_dir": "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/experiments/g4-m1",
+      "com.docker.compose.replace": "api-1",
+      "com.docker.compose.service": "api",
+      "com.docker.compose.version": "5.6.1",
+      "ontology.run-id": "recovery-20261101-01",
+      "ontology.synthetic": "true",
+      "ontology.task-id": "G4-M1-RECOVERY-001",
+      "org.opencontainers.image.version": "24.04"
+    },
+    "observedUtc": "2026-11-01T15:17:22.262097+00:00"
+  },
+  "replicaId": "39960d05ac9929ae13c6c91d77bc86430469d9512433fa905ec224c8b0d1e7aa",
+  "replicaAbsent": true,
+  "samples": [
+    {
+      "status": "SUCCEEDED",
+      "fence": 2,
+      "attempt": 2,
+      "snapshot": "6aa6098802a443d5bb3d81a6f97830f0",
+      "snapshotTotal": 7,
+      "finishAuditTotal": 12
+    },
+    {
+      "status": "SUCCEEDED",
+      "fence": 2,
+      "attempt": 2,
+      "snapshot": "6aa6098802a443d5bb3d81a6f97830f0",
+      "snapshotTotal": 7,
+      "finishAuditTotal": 12
+    }
+  ],
+  "commands": [
+    {
+      "startedUtc": "2026-11-01T15:17:22.262234+00:00",
+      "completedUtc": "2026-11-01T15:17:22.292710+00:00",
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "inspect",
+        "39960d05ac9929ae13c6c91d77bc86430469d9512433fa905ec224c8b0d1e7aa"
+      ],
+      "sql": null,
+      "exitCode": 1,
+      "stdout": "[]\n",
+      "stderr": "error: no such object: 39960d05ac9929ae13c6c91d77bc86430469d9512433fa905ec224c8b0d1e7aa\n"
+    },
+    {
+      "startedUtc": "2026-11-01T15:17:22.292731+00:00",
+      "completedUtc": "2026-11-01T15:17:22.306815+00:00",
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "ps",
+        "-aq",
+        "--filter",
+        "name=^/ontology-g4-m1-recovery-001-api-recovery-1$"
+      ],
+      "sql": null,
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "startedUtc": "2026-11-01T15:17:22.306840+00:00",
+      "completedUtc": "2026-11-01T15:17:22.359220+00:00",
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "ontology-g4-m1-recovery-001-platform-pg-1",
+        "psql",
+        "-U",
+        "platform",
+        "-d",
+        "platform",
+        "-qAt"
+      ],
+      "sql": "SELECT json_build_object('status',\"Status\",'fence',\"Fence\",'attempt',\"Attempt\",'snapshot',\"SnapshotId\",'snapshotTotal',(SELECT count(*) FROM connections.\"CatalogSnapshots\" WHERE \"ConnectionId\"='1bf23f9d36bf4ceba09d745f04d8f743'),'finishAuditTotal',(SELECT count(*) FROM governance.audit_records WHERE \"Resource\"='connection:1bf23f9d36bf4ceba09d745f04d8f743' AND \"Action\"='connection.catalog.finish')) FROM connections.\"CatalogJobs\" WHERE \"Id\"='573e1e140fef4c53be83fc35b4f97a8b';",
+      "exitCode": 0,
+      "stdout": "{\"status\" : \"SUCCEEDED\", \"fence\" : 2, \"attempt\" : 2, \"snapshot\" : \"6aa6098802a443d5bb3d81a6f97830f0\", \"snapshotTotal\" : 7, \"finishAuditTotal\" : 12}\n",
+      "stderr": ""
+    },
+    {
+      "startedUtc": "2026-11-01T15:17:27.869332+00:00",
+      "completedUtc": "2026-11-01T15:17:27.956747+00:00",
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "ontology-g4-m1-recovery-001-platform-pg-1",
+        "psql",
+        "-U",
+        "platform",
+        "-d",
+        "platform",
+        "-qAt"
+      ],
+      "sql": "SELECT json_build_object('status',\"Status\",'fence',\"Fence\",'attempt',\"Attempt\",'snapshot',\"SnapshotId\",'snapshotTotal',(SELECT count(*) FROM connections.\"CatalogSnapshots\" WHERE \"ConnectionId\"='1bf23f9d36bf4ceba09d745f04d8f743'),'finishAuditTotal',(SELECT count(*) FROM governance.audit_records WHERE \"Resource\"='connection:1bf23f9d36bf4ceba09d745f04d8f743' AND \"Action\"='connection.catalog.finish')) FROM connections.\"CatalogJobs\" WHERE \"Id\"='573e1e140fef4c53be83fc35b4f97a8b';",
+      "exitCode": 0,
+      "stdout": "{\"status\" : \"SUCCEEDED\", \"fence\" : 2, \"attempt\" : 2, \"snapshot\" : \"6aa6098802a443d5bb3d81a6f97830f0\", \"snapshotTotal\" : 7, \"finishAuditTotal\" : 12}\n",
+      "stderr": ""
+    },
+    {
+      "startedUtc": "2026-11-01T15:17:27.956904+00:00",
+      "completedUtc": "2026-11-01T15:17:28.017922+00:00",
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "ontology-g4-m1-recovery-001-pg-source-1",
+        "psql",
+        "-U",
+        "postgres",
+        "-d",
+        "fixture",
+        "-qAt"
+      ],
+      "sql": "SELECT json_build_object('lockCount',(SELECT count(*) FROM pg_locks WHERE pid=19221),'oldBackendCount',(SELECT count(*) FROM pg_stat_activity WHERE pid=19230));",
+      "exitCode": 0,
+      "stdout": "{\"lockCount\" : 0, \"oldBackendCount\" : 0}\n",
+      "stderr": ""
+    }
+  ],
+  "earlierDiagnosticMatcherFailure": "Expected capitalized No; actual Docker says error: no such object; read-only assertion failed before sampling, corrected exact diagnostic"
+}

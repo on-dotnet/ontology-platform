@@ -9,10 +9,10 @@
 - 真实PG TLS、只读拒绝、错误CA/SAN及权限核验通过，PG catalog sequence类型守卫实际负例通过。
 - HTTP baseline 135请求：13完整矩阵项通过，其余不自动提升；报告http-d46c95ce-fc2c-4ece-9e05-a5d215d13ea6。
 - 实际UI发现canonical平台角色误判，修复后三文件流程U01–U04通过（browser-23b091a6-2814-4b0a-989d-b2d9baf87997）。U06原窄屏截图被独立审查撤回FAIL：拍在0.2秒sidebar过渡中。保留原图；严格稳定布局/点击命中检查后新四图独立视觉通过（browser-8e65806d-971f-4735-8153-62d3fd0f5288，共334209字节）。
-- 实际schema ADD/DROP发现旧快照未标STALE，修复CanonicalCatalog共享排序与fingerprint判定。新字段出现/删除后历史快照字节保持不变、公开投影及STALE变化实测；尚未提交源码。
+- 实际schema ADD/DROP发现旧快照未标STALE，修复CanonicalCatalog共享排序与fingerprint判定。新字段出现/删除后历史快照字节保持不变、公开投影及STALE变化实测；已随b70b142提交源码。
 - E07审计start与complete分别精确触发器故障：503不产生成功状态；start事务完全回滚后同命令成功；complete保留RUNNING后恢复同Probe为TEST_FAILED、同命令无重复审计/实体。非作者独立PASS，两个触发器/函数实际count0。start SHA 3a90642b4fba0ccee36077aad10630e7db10a04c23b2722f9c6a093a721bbb5e；complete SHA e045e5e6aaec9e365adb6b4750f8d0143b36c31d57c3b5d7ab275525b43cf03a。
 - 真实10秒TLS超时原错误归为CANCELLED：browser-200826c2-53cd-478d-9ccc-28832d066dfe。修复只在应用deadline到期且原请求未取消时重分类诊断，保留时限与真实阶段。相同真实超时复验TEST_FAILED/source_unavailable；1.5秒浏览器Abort负例对应CommandKey的持久Probe仍CANCELLED/connection_cancelled。非作者双向审查PASS。source-timeout-fixed SHA 001a3e12d523878c4b6aec7a568c553dca7c7dd19f5ea37db6fc5a7cd4501afc；client-cancel-fault SHA 9560f58cf6884d168b35f70bfcd370b8451da159e72bfe477f4f0b147ad6cda9。源最终Paused=false。
-- 权限不足HTTP实测PARTIAL，但页面在目录GET403后清掉已授权Job诊断，原真实FAIL保留。Worker最小修复CatalogPanel：目录拒绝清空历史/快照，重验connection/job授权再仅显示诊断，真正401/范围拒绝保持全清；迟到结果有代际保护。101组件测试通过，tsc/ESLint/diff通过，非作者审查PASS；真实页面待重建复验。
+- 权限不足HTTP实测PARTIAL，但页面在目录GET403后清掉已授权Job诊断，原真实FAIL保留。Worker最小修复CatalogPanel：目录拒绝清空历史/快照，重验connection/job授权再仅显示诊断，真正401/范围拒绝保持全清；迟到结果有代际保护。101组件测试通过，tsc/ESLint/diff通过，非作者审查PASS；真实页面重建后PARTIAL与刷新恢复复验通过。
 
 ## 租约故障实验的廉价失败与纠正
 
@@ -29,3 +29,19 @@
 R04真实G3发布/查询主要服务启动保持NOT_RUN：恢复合同R1明确仅四候选、不添加Fuseki/RustFS/额外镜像；没有已准入正在运行的G3主要栈可直接验收。不启动额外服务或读取共享持久数据来凑PASS。真实认证/CSRF及G3合同/生成兼容分项仍需实测/核对后分别记录。最小解除条件：额外明确批准准确镜像/资源/隔离与合成输入，或提供已准入可复用且不触及正式数据的准确现成环境。
 
 以上授权缺口决定本轮最终只能BLOCKED_WITH_WITNESS；其余授权内修复、验收、准确资源回收、已提交输入绑定与唯一V3交付继续。
+
+## 后续真实子项与工程入口
+
+- 自然lease过期后第二API取得Fence2/Attempt2并SUCCEEDED；原API恢复后同Snapshot、快照6→7及finish审计11→12保持。执行器因未采到短暂RUNNING而AssertionError以及observerExit3仍为历史FAIL；不声称第二实例受同源锁阻塞。独立只读补证含UTC间隔5.51秒、原API running/Paused=false、准确replica inspect no such object/name缺席、原源backend和锁0；该租约接手子项审PASS，非完整E06。
+- 真实原密码成功→源端密码改变后旧AUTH拒绝→SecretVersion2/旧Probe stale→新密码五阶段成功→旧密码仍拒绝→源原密码恢复后的真实draftProbe五阶段成功，最后本测试连接DISABLED。首父进程未在最终摘要后关闭stdin导致90秒超时，consumer实际先已完成；已真实OS管道短复现并修正parent close，第二完整回执PASS，原失败保留。
+- 同一operator-a subject在org-demo原签发未用有效Ref，只有组织临时改org-other后真实HTTP拒绝。Keycloak初始普通user表示隐藏unmanaged属性，首前置失败保留；临时仅在本任务realm添加两个admin-only managed属性后原属性正常显露（未repair数据）。完成后原用户属性、完整原profile均深等恢复，新的OIDC登录再次确认same subject/org-demo/site-a。
+- 已禁用连接真实test/discovery409、catalog403；无并发活动任务，准确源容器网络命名空间Tcp.PassiveOpens前后增量0。此源网络证据与历史范围拒绝共同支撑P14，不把HTTP拒绝自身等同无IO。
+- 完整solution首次路径错误MSB1009保留；实际backend入口因缺本树assets失败。空本地NuGet源/既有缓存locked restore仅发现QueryTests/AgentTests两个旧项目引用图缺Connections；候选各+9行Project元数据，所有包版本/contentHash逐项未变，无网络下载。修正后完整solution构建0error，保留既有ASPIRE010（不安装CLI bundle、不改全局）。最终安全18/18、合同120PASS/1SKIP（真实G3 V2主栈manifest未导出）；SKIP如实绑定R04未运行。
+
+## 最终稳定输入与真实收尾
+
+受测源码4efbeca1cbf33d52c2bd950e1968db20abe322d5已push，仅任务分支。后端完整构建/18安全/120合同+1真实G3跳过通过；最低执行数121误包含skip导致exit9保留，修正120后exit0。SelfTest完整通过。UI双向互锁原失败保留，109组件及真实双向窗口、完整U01–04通过；四处仅连接页文案修正后的四图独立视觉通过。
+
+Docker真实删除6容器/2网/4卷/4镜像，独立复核当前保护资源都在。原default bridge早先换ID原因UNKNOWN，保留原Before；不是本轮清理的删除目标。精确两临时进程正常退出、无回环监听；首次5秒等待monitor断言失败及后续30秒心跳正常SIGTERM退出均保留。精确11文件/目录/链接清理955220704逻辑字节；物理去重回收量NOT_VERIFIED，私有输入/canonical取证/原始日志/当前产物/活动树待本关口复审KEEP。
+
+不合main，不触碰G6，不进入M2。C08/R04阻断不放宽；最终唯一V3/独立重开/ZIP秘密扫描以包外真实回执绑定本Head。

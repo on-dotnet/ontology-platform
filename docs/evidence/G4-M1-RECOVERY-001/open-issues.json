@@ -1,0 +1,62 @@
+{
+  "taskId": "G4-M1-RECOVERY-001",
+  "overall": "G4_M1_RECOVERY_BLOCKED_WITH_WITNESS",
+  "issues": [
+    {
+      "id": "C08",
+      "status": "NOT_RUN",
+      "kind": "AUTHORIZATION_BLOCKER",
+      "issue": "没有第二个合法获准SourceConfig，不能以displayName或SecretVersion修改冒充。",
+      "minimumReleaseCondition": "明确批准第二个准确受控合成profile，或ChatGPT独立复审明确裁定本固定profile阶段不适用。"
+    },
+    {
+      "id": "R04",
+      "status": "NOT_RUN",
+      "kind": "AUTHORIZATION_BLOCKER",
+      "issue": "未启动G3主要发布/查询服务；四镜像合同不许可新增Fuseki/RustFS，也无已准入隔离现成栈。",
+      "minimumReleaseCondition": "准确补充镜像/预算/隔离/合成输入授权，或提供已批准且不触及正式数据的现成环境。"
+    },
+    {
+      "id": "WINDOWS",
+      "status": "NOT_RUN",
+      "kind": "PLATFORM_LIMITATION",
+      "issue": "Windows原生AMD64未实际执行。",
+      "minimumReleaseCondition": "在获准Windows环境按相同提交/输入执行并独立审查；ARM64不能替代。"
+    },
+    {
+      "id": "COMMERCIAL_LICENSE",
+      "status": "NOT_VERIFIED",
+      "kind": "FUTURE_GATE_NOT_CURRENT_AUTHORIZATION",
+      "issue": "四镜像AMBER-A1/LICENSE_PARTIAL，仅内部合成非分发；CVE/签名/provenance与完整分发义务未确认。",
+      "minimumReleaseCondition": "G8商业部署前完成精确SBOM/许可证/NOTICE/安全合规门禁，不能由本轮A1推导。"
+    },
+    {
+      "id": "DEFAULT_BRIDGE_ID",
+      "status": "NOT_VERIFIED",
+      "kind": "HISTORICAL_RESOURCE_WITNESS",
+      "issue": "原Before默认bridge在13:39:15换ID，原因UNKNOWN；当前清理保护其新ID，未将其纳入删除。",
+      "minimumReleaseCondition": "只读核对该时段Docker daemon生命周期证据；不得重启/改DB/清全局资源来掩盖。"
+    },
+    {
+      "id": "WHOLE_SESSION_TIMING",
+      "status": "NOT_VERIFIED",
+      "kind": "EVIDENCE_LIMITATION",
+      "issue": "恢复段205心跳/6134471ms等真实观测可用；整个跨会话任务连续性与总active时间不可验证。",
+      "minimumReleaseCondition": "仅报告可确认日志窗口；不补造历史时长或锁屏试验。"
+    },
+    {
+      "id": "EARLIER_CANCELLATION_UI_ASSERTION",
+      "status": "NOT_VERIFIED",
+      "kind": "HISTORICAL_DIAGNOSTIC_LIMITATION",
+      "issue": "原取消wrapper最后可见状态断言失败的准确因果未确定；底层取消、同任务新会话与reload已实际补证通过，原FAIL保留。",
+      "minimumReleaseCondition": "如后续复审要求根因分析，基于原trace/时序另定最短受控复现；不抹掉旧FAIL，不盲跑原昂贵故障。"
+    },
+    {
+      "id": "P08_R05_PACKAGE_SELF_REFERENCE",
+      "status": "NOT_RUN",
+      "kind": "FREEZE_TIME_EXTERNAL_CLOSURE",
+      "issue": "冻结输入中不能声称其自身尚未生成的ZIP已扫描和独立重开。",
+      "minimumReleaseCondition": "唯一已提交Head V3生成后，实际CRC/Manifest/SHA/路径/绑定独立重开及ZIP秘密扫描的包外回执。"
+    }
+  ]
+}

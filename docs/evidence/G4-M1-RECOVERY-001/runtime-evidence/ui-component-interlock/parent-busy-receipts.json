@@ -1,0 +1,53 @@
+{
+  "scope": "组件调度回归与静态检查；非真实 React/browser/HTTP 产品验收",
+  "baseline": {
+    "failed": 2,
+    "passed": 101
+  },
+  "fixed": {
+    "passed": 109
+  },
+  "checks": [
+    {
+      "name": "baseline",
+      "command": "node apps/web/node_modules/vitest/vitest.mjs run src/features/connections/connections.test.ts --root apps/web --config ../../artifacts/g4-m1-recovery-001/ui-role-fix/vitest.config.mts --configLoader runner",
+      "cwd": "/Users/chasen/.codex/worktrees/g4-m1-recovery-http-tests/ontology-platform",
+      "exitCode": 1,
+      "log": "/Users/chasen/.codex/worktrees/g4-m1-recovery-http-tests/ontology-platform/artifacts/g4-m1-recovery-001/ui-role-fix/parent-busy-baseline.log",
+      "sha256": "a8956e0a88e0e46a11370c0184dfb2cb5ca3e4ef955a20e4ec270bf27d250e1f"
+    },
+    {
+      "name": "fixed",
+      "command": "node apps/web/node_modules/vitest/vitest.mjs run src/features/connections/connections.test.ts --root apps/web --config ../../artifacts/g4-m1-recovery-001/ui-role-fix/vitest.config.mts --configLoader runner",
+      "cwd": "/Users/chasen/.codex/worktrees/g4-m1-recovery-http-tests/ontology-platform",
+      "exitCode": 0,
+      "log": "/Users/chasen/.codex/worktrees/g4-m1-recovery-http-tests/ontology-platform/artifacts/g4-m1-recovery-001/ui-role-fix/parent-busy-fixed.log",
+      "sha256": "310e6516f1a0af80f675cea1ef7a871d632a9948e16031a919a04fca9459bd08"
+    },
+    {
+      "name": "tsc",
+      "command": "node apps/web/node_modules/typescript/bin/tsc --noEmit --incremental false -p apps/web/tsconfig.json",
+      "cwd": "/Users/chasen/.codex/worktrees/g4-m1-recovery-http-tests/ontology-platform",
+      "exitCode": 0,
+      "log": "/Users/chasen/.codex/worktrees/g4-m1-recovery-http-tests/ontology-platform/artifacts/g4-m1-recovery-001/ui-role-fix/parent-busy-tsc.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "eslint",
+      "command": "node node_modules/eslint/bin/eslint.js src/features/connections/detail.tsx src/features/connections/catalog.tsx src/features/connections/connections.test.ts",
+      "cwd": "/Users/chasen/.codex/worktrees/g4-m1-recovery-http-tests/ontology-platform/apps/web",
+      "exitCode": 0,
+      "log": "/Users/chasen/.codex/worktrees/g4-m1-recovery-http-tests/ontology-platform/artifacts/g4-m1-recovery-001/ui-role-fix/parent-busy-eslint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "sources": {
+    "apps/web/src/features/connections/detail.tsx": "5cf77b3dcb2cf52b483d359ce363e99ce7a3b60f187a85fc3adce4978fa8791e",
+    "apps/web/src/features/connections/catalog.tsx": "57160bd85c5e7f5d5172676e1393bf124d4f4df69d00b1a0cbc1728f2fd1ecd1",
+    "apps/web/src/features/connections/connections.test.ts": "90f5919ec98b00d2c17038a6f0b218f313f345b3d8c52ea8a691fb234b552a7f"
+  },
+  "diffCheck": {
+    "command": "git diff --check",
+    "exitCode": 0
+  }
+}

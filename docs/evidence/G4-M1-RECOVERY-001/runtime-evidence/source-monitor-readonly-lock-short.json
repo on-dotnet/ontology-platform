@@ -1,0 +1,201 @@
+{
+  "lockPid": 22817,
+  "lockExit": 0,
+  "observerExit": 0,
+  "commands": [
+    {
+      "operation": "open_source_observer",
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "9dd83f34dd207529bea2975834c3d61baa63b8ca88e159506520bd786f0d7305",
+        "psql",
+        "-U",
+        "postgres",
+        "-d",
+        "fixture",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-qAt"
+      ],
+      "pid": 52763
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "SET application_name='g4_m1_recovery_observer'; SET statement_timeout='2s'; SET idle_session_timeout='90s'; SET plan_cache_mode=force_generic_plan; PREPARE recovery_activity AS SELECT coalesce(json_agg(json_build_object('pid',pid,'state',state,'waitType',wait_event_type,'wait',wait_event,'user',usename,'database',datname,'clientAddr',client_addr::text)),'[]') FROM pg_stat_activity WHERE backend_type='client backend' AND client_addr IS NOT NULL; EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": [
+        {
+          "pid": 22819,
+          "state": "active",
+          "waitType": "Lock",
+          "wait": "relation",
+          "user": "fixture_reader",
+          "database": "fixture",
+          "clientAddr": "172.18.0.3/32"
+        }
+      ]
+    }
+  ],
+  "probeExit": 0,
+  "probeOutput": "{\"action\":\"probe-refresh\",\"status\":\"PASS\",\"evidence\":\"artifacts/g4-m1-recovery-001/fault-http/38c5f0b5-50c7-491e-a1cd-c10de2506a00.json\"}\n",
+  "probeError": "",
+  "samples": [
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [
+      {
+        "pid": 22819,
+        "state": "active",
+        "waitType": "Lock",
+        "wait": "relation",
+        "user": "fixture_reader",
+        "database": "fixture",
+        "clientAddr": "172.18.0.3/32"
+      }
+    ]
+  ]
+}

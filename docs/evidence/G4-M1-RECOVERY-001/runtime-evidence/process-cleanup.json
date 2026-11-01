@@ -1,0 +1,70 @@
+{
+  "taskId": "G4-M1-RECOVERY-001",
+  "status": "PASS",
+  "observedUtc": "2026-11-01T16:32:41.465022+00:00",
+  "initialCommandExitCode": 1,
+  "initialFailure": "After validating both exact PID/command/cwd and sending SIGTERM, five-second exit polling asserted before monitor completed its next 30s heartbeat. No further kill/restart was attempted.",
+  "signal": "SIGTERM",
+  "processes": [
+    {
+      "pid": 35950,
+      "sourceReceipt": "host-ingress-process-35950.json",
+      "execSessionExitCode": 0,
+      "stopEvent": {
+        "utc": "2026-11-01T16:30:54.593Z",
+        "pid": 35950,
+        "event": "stopped",
+        "exitCode": 0,
+        "remainingChildren": 0
+      }
+    },
+    {
+      "pid": 36010,
+      "sourceReceipt": "continuity-resume.json (JSONL)",
+      "execSessionExitCode": 0,
+      "stoppedBySignal": true,
+      "endedAtUtc": "2026-11-01T16:31:12.934719+00:00",
+      "heartbeatCount": 205,
+      "lockedHeartbeatCount": 191,
+      "lockedDisplayOffHeartbeatCount": 190,
+      "measuredElapsedMs": 6134471,
+      "wholeSessionContinuity": "NOT_VERIFIED"
+    }
+  ],
+  "afterChecks": [
+    {
+      "command": [
+        "ps",
+        "-p",
+        "35950",
+        "-o",
+        "pid=,command="
+      ],
+      "exitCode": 1,
+      "stdoutEmpty": true
+    },
+    {
+      "command": [
+        "ps",
+        "-p",
+        "36010",
+        "-o",
+        "pid=,command="
+      ],
+      "exitCode": 1,
+      "stdoutEmpty": true
+    },
+    {
+      "command": [
+        "lsof",
+        "-nP",
+        "-iTCP:15100",
+        "-iTCP:15180",
+        "-sTCP:LISTEN"
+      ],
+      "exitCode": 1,
+      "stdoutEmpty": true
+    }
+  ],
+  "globalPowerSettingsChanged": false
+}

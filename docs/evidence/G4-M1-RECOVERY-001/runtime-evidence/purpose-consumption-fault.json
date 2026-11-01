@@ -1,0 +1,203 @@
+{
+  "taskId": "G4-M1-RECOVERY-001",
+  "status": "PASS",
+  "commands": [
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "190ab49a8eff5f3a13c1526f38cda9b933c0e618de51c7b7e4da98be73cc130a",
+        "psql",
+        "-U",
+        "platform",
+        "-d",
+        "platform",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-qAt"
+      ],
+      "operation": "safe_reference_projection",
+      "exitCode": 0,
+      "sql": "SUPPRESSED_PRIVATE_REFERENCE",
+      "stderrBytes": 0
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "190ab49a8eff5f3a13c1526f38cda9b933c0e618de51c7b7e4da98be73cc130a",
+        "psql",
+        "-U",
+        "platform",
+        "-d",
+        "platform",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-qAt"
+      ],
+      "operation": "active_work_count",
+      "exitCode": 0,
+      "sql": "SUPPRESSED_PRIVATE_REFERENCE",
+      "stderrBytes": 0
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "190ab49a8eff5f3a13c1526f38cda9b933c0e618de51c7b7e4da98be73cc130a",
+        "psql",
+        "-U",
+        "platform",
+        "-d",
+        "platform",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-qAt"
+      ],
+      "operation": "change_exact_unused_reference_purpose",
+      "exitCode": 0,
+      "sql": "SUPPRESSED_PRIVATE_REFERENCE",
+      "stderrBytes": 0
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "190ab49a8eff5f3a13c1526f38cda9b933c0e618de51c7b7e4da98be73cc130a",
+        "psql",
+        "-U",
+        "platform",
+        "-d",
+        "platform",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-qAt"
+      ],
+      "operation": "safe_reference_projection",
+      "exitCode": 0,
+      "sql": "SUPPRESSED_PRIVATE_REFERENCE",
+      "stderrBytes": 0
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "190ab49a8eff5f3a13c1526f38cda9b933c0e618de51c7b7e4da98be73cc130a",
+        "psql",
+        "-U",
+        "platform",
+        "-d",
+        "platform",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-qAt"
+      ],
+      "operation": "restore_exact_reference_purpose",
+      "exitCode": 0,
+      "sql": "SUPPRESSED_PRIVATE_REFERENCE",
+      "stderrBytes": 0
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "190ab49a8eff5f3a13c1526f38cda9b933c0e618de51c7b7e4da98be73cc130a",
+        "psql",
+        "-U",
+        "platform",
+        "-d",
+        "platform",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-qAt"
+      ],
+      "operation": "safe_reference_projection",
+      "exitCode": 0,
+      "sql": "SUPPRESSED_PRIVATE_REFERENCE",
+      "stderrBytes": 0
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "190ab49a8eff5f3a13c1526f38cda9b933c0e618de51c7b7e4da98be73cc130a",
+        "psql",
+        "-U",
+        "platform",
+        "-d",
+        "platform",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-qAt"
+      ],
+      "operation": "safe_reference_projection",
+      "exitCode": 0,
+      "sql": "SUPPRESSED_PRIVATE_REFERENCE",
+      "stderrBytes": 0
+    }
+  ],
+  "http": [
+    {
+      "route": "/api/v1/connection-secrets",
+      "status": 201
+    },
+    {
+      "route": "/api/v1/connections",
+      "status": 422
+    }
+  ],
+  "cleanupErrors": [],
+  "refSha256": "edb17732732035963a9f4d0c510c88534ad8fff6a43576d069f7199a653631eb",
+  "before": {
+    "purpose": "POSTGRESQL_READONLY",
+    "ownerHash": "0c743c53bf0e921458daf2d6caafd1b6c79b90ecd5c3f95230dde26df75bc2d3",
+    "org": "org-demo",
+    "unused": true,
+    "unexpired": true,
+    "cipherHash": "51a14595af442efa49c409beb4523d1fa694b38b2c1a7f27a751fd7d13f151bf"
+  },
+  "injected": {
+    "purpose": "RECOVERY_WRONG_PURPOSE",
+    "affectedRows": 1
+  },
+  "rejectionCode": "connection_secret_expired",
+  "passiveOpenDelta": 0,
+  "afterRejected": {
+    "purpose": "RECOVERY_WRONG_PURPOSE",
+    "ownerHash": "0c743c53bf0e921458daf2d6caafd1b6c79b90ecd5c3f95230dde26df75bc2d3",
+    "org": "org-demo",
+    "unused": true,
+    "unexpired": true,
+    "cipherHash": "51a14595af442efa49c409beb4523d1fa694b38b2c1a7f27a751fd7d13f151bf"
+  },
+  "restored": {
+    "purpose": "POSTGRESQL_READONLY",
+    "ownerHash": "0c743c53bf0e921458daf2d6caafd1b6c79b90ecd5c3f95230dde26df75bc2d3",
+    "org": "org-demo",
+    "unused": true,
+    "unexpired": true,
+    "cipherHash": "51a14595af442efa49c409beb4523d1fa694b38b2c1a7f27a751fd7d13f151bf"
+  },
+  "driverSha256": "a7758c3b3095636d7b54777d59cb2911e6afc7a357bc037877a2611df684c349"
+}

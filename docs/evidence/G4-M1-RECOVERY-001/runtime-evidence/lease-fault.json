@@ -1,0 +1,94 @@
+{
+  "taskId": "G4-M1-RECOVERY-001",
+  "status": "FAIL",
+  "commands": [
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "ps",
+        "-aq",
+        "--filter",
+        "name=^/ontology-g4-m1-recovery-001-api-recovery-1$"
+      ],
+      "input": null,
+      "exitCode": 0,
+      "elapsedSeconds": 0.013107834005495533,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "compose",
+        "-f",
+        "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/experiments/g4-m1/compose.m1.yaml",
+        "-f",
+        "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/experiments/g4-m1/compose.runtime.yaml",
+        "-f",
+        "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/experiments/g4-m1/compose.recovery-fault.yaml",
+        "--profile",
+        "recovery-fault",
+        "create",
+        "--no-deps",
+        "api-recovery"
+      ],
+      "input": null,
+      "exitCode": 1,
+      "elapsedSeconds": 0.022795165990828536,
+      "stdout": "",
+      "stderr": "unknown flag: --no-deps\n"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "9dd83f34dd207529bea2975834c3d61baa63b8ca88e159506520bd786f0d7305",
+        "psql",
+        "-U",
+        "postgres",
+        "-d",
+        "fixture",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-qAt"
+      ],
+      "input": "SET statement_timeout='2s'; SELECT coalesce(json_agg(json_build_object('pid',pid,'state',state,'waitType',wait_event_type,'wait',wait_event)),'[]') FROM pg_stat_activity WHERE datname='fixture' AND usename='fixture_reader';",
+      "exitCode": 0,
+      "elapsedSeconds": 0.05590291600674391,
+      "stdout": "[]\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "ps",
+        "-aq",
+        "--filter",
+        "name=^/ontology-g4-m1-recovery-001-api-recovery-1$"
+      ],
+      "input": null,
+      "exitCode": 0,
+      "elapsedSeconds": 0.011985583012574352,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "replicaNameAbsentBefore": true,
+  "failureType": "AssertionError",
+  "cleanup": {
+    "apiPaused": false,
+    "sourceSessions": [],
+    "replicaAbsent": true
+  },
+  "cleanupErrors": [],
+  "driverSha256": "b27e1c175fd0f977767eeca1abb8a7ed4ddc6b8f85e909407c134d3461a4db7d"
+}

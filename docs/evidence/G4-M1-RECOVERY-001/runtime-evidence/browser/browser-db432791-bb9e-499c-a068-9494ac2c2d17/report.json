@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "taskId": "G4-M1-RECOVERY-001",
+  "startedAtUtc": "2026-11-01T15:58:18.588Z",
+  "cases": {
+    "M1-U01": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U02": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U03": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U04": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U05": {
+      "status": "NOT_RUN",
+      "observed": [
+        "source_unavailable_error"
+      ],
+      "reason": "aggregate_requires_loading_timeout_cancel_partial_and_refresh_evidence_across_controlled_runs"
+    },
+    "M1-U06": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    }
+  },
+  "http": [
+    {
+      "method": "GET",
+      "route": "/auth/csrf",
+      "status": 200,
+      "durationMs": 60
+    },
+    {
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/test",
+      "status": 200,
+      "durationMs": 153
+    }
+  ],
+  "screenshots": [],
+  "productExecution": true,
+  "runId": "recovery-20261101-01",
+  "scenario": "source-unavailable",
+  "driverSha256": "5918869646285dc175f174b1bd35811aa80257f65f6e5edd5fc6fb90be6a7f82",
+  "completedAtUtc": "2026-11-01T15:58:20.410Z",
+  "exitCode": 2
+}

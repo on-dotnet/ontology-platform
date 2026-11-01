@@ -1,0 +1,139 @@
+{
+  "taskId": "G4-M1-RECOVERY-001",
+  "status": "PASS",
+  "commands": [
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "ontology-g4-m1-recovery-001-platform-pg-1",
+        "psql",
+        "-U",
+        "platform",
+        "-d",
+        "platform",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-qAt"
+      ],
+      "sql": "Exact private issuedRef and subjectId read; original query private-memory only",
+      "exitCode": 0,
+      "stdout": "PRIVATE_MEMORY_ONLY"
+    },
+    {
+      "method": "POST",
+      "path": "/realms/master/protocol/openid-connect/token",
+      "status": 200,
+      "body": "PRIVATE_MEMORY_ONLY"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/realms/g2-05cf1b097c1a74bb/users?username=g2-operator-a&exact=true",
+      "status": 200,
+      "body": "PRIVATE_MEMORY_ONLY"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/realms/g2-05cf1b097c1a74bb/users/profile",
+      "status": 200,
+      "body": "PRIVATE_MEMORY_ONLY"
+    },
+    {
+      "method": "PUT",
+      "path": "/admin/realms/g2-05cf1b097c1a74bb/users/profile",
+      "status": 200,
+      "body": "PRIVATE_MEMORY_ONLY"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/realms/g2-05cf1b097c1a74bb/users/profile",
+      "status": 200,
+      "body": "PRIVATE_MEMORY_ONLY"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/realms/g2-05cf1b097c1a74bb/users/ad7a2d5c-2c30-4e1f-a6f0-908f54e54c79",
+      "status": 200,
+      "body": "PRIVATE_MEMORY_ONLY"
+    },
+    {
+      "method": "PUT",
+      "path": "/admin/realms/g2-05cf1b097c1a74bb/users/ad7a2d5c-2c30-4e1f-a6f0-908f54e54c79",
+      "status": 204,
+      "body": "PRIVATE_MEMORY_ONLY"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/realms/g2-05cf1b097c1a74bb/users/ad7a2d5c-2c30-4e1f-a6f0-908f54e54c79",
+      "status": 200,
+      "body": "PRIVATE_MEMORY_ONLY"
+    },
+    {
+      "command": [
+        "node",
+        "scripts/acceptance/g4-m1-http.mjs",
+        "--runtime-file",
+        "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/cross-org-secret-managed.json",
+        "--evidence-dir",
+        "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/artifacts/g4-m1-recovery-001/http"
+      ],
+      "exitCode": 2,
+      "stdout": "{\"taskId\":\"G4-M1-RECOVERY-001\",\"scenario\":\"cross-org-secret\",\"status\":\"INCOMPLETE\",\"counts\":{\"PASS\":0,\"FAIL\":0,\"NOT_RUN\":49},\"failure\":null}\n",
+      "stderr": ""
+    },
+    {
+      "method": "PUT",
+      "path": "/admin/realms/g2-05cf1b097c1a74bb/users/ad7a2d5c-2c30-4e1f-a6f0-908f54e54c79",
+      "status": 204,
+      "body": "PRIVATE_MEMORY_ONLY"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/realms/g2-05cf1b097c1a74bb/users/ad7a2d5c-2c30-4e1f-a6f0-908f54e54c79",
+      "status": 200,
+      "body": "PRIVATE_MEMORY_ONLY"
+    },
+    {
+      "method": "PUT",
+      "path": "/admin/realms/g2-05cf1b097c1a74bb/users/profile",
+      "status": 200,
+      "body": "PRIVATE_MEMORY_ONLY"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/realms/g2-05cf1b097c1a74bb/users/profile",
+      "status": 200,
+      "body": "PRIVATE_MEMORY_ONLY"
+    },
+    {
+      "command": [
+        "node",
+        "scripts/acceptance/g4-m1-fault.mjs",
+        "--runtime-file",
+        "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/http-schema-change.json",
+        "--action",
+        "original-identity-check"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"action\":\"original-identity-check\",\"status\":\"PASS\",\"evidence\":\"artifacts/g4-m1-recovery-001/fault-http/3f051279-9d8b-49ee-bdeb-ac3767fe1f12.json\"}\n",
+      "stderr": ""
+    }
+  ],
+  "foreignRefProvenance": {
+    "expiresAtUtc": "2026-11-01T15:45:30.514516+00:00",
+    "usedAtUtc": null,
+    "organizationId": "org-demo",
+    "serverNow": "2026-11-01T15:36:12.902864+00:00",
+    "refSha256": "980b5809adf7af1d0b810ea2bbfd96e9c3621d6cb7b1702e0d413632680d966a",
+    "ownerSha256": "05a676e8230fec3868767ef986d7ea6fc0f9d94089d997f8bfc39206985fa4cf"
+  },
+  "originalAttributeSource": "managed_original_attributes",
+  "userAttributesVerifiedBeforeProfileRestore": true,
+  "originalProfileRestored": true,
+  "originalIdentityNewLoginVerified": true,
+  "cleanupErrors": [],
+  "driverSha256": "5d0e1b15e463d928a2359abe01853e18b86865de96bafcbb51b672c78d2b4187"
+}

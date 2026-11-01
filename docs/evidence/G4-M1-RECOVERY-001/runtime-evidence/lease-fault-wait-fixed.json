@@ -1,0 +1,470 @@
+{
+  "taskId": "G4-M1-RECOVERY-001",
+  "status": "FAIL",
+  "commands": [
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "ps",
+        "-aq",
+        "--filter",
+        "name=^/ontology-g4-m1-recovery-001-api-recovery-1$"
+      ],
+      "input": null,
+      "exitCode": 0,
+      "elapsedSeconds": 0.012813249995815568,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "compose",
+        "-f",
+        "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/experiments/g4-m1/compose.m1.yaml",
+        "-f",
+        "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/experiments/g4-m1/compose.runtime.yaml",
+        "-f",
+        "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/experiments/g4-m1/compose.recovery-fault.yaml",
+        "--profile",
+        "recovery-fault",
+        "create",
+        "--no-build",
+        "--no-recreate",
+        "--pull",
+        "never",
+        "api-recovery"
+      ],
+      "input": null,
+      "exitCode": 0,
+      "elapsedSeconds": 0.0975028749962803,
+      "stdout": "",
+      "stderr": "time=\"2026-11-01T23:02:22+08:00\" level=warning msg=\"Found orphan containers (ontology-g4-m1-recovery-001-pg-restored) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up.\"\n Container ontology-g4-m1-recovery-001-api-recovery-1 Creating \n Container ontology-g4-m1-recovery-001-api-recovery-1 Created \n"
+    },
+    {
+      "command": [
+        "node",
+        "scripts/acceptance/g4-m1-fault.mjs",
+        "--runtime-file",
+        "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/http-schema-change.json",
+        "--action",
+        "probe-refresh"
+      ],
+      "input": null,
+      "exitCode": 0,
+      "elapsedSeconds": 1.3932949169975473,
+      "stdout": "{\"action\":\"probe-refresh\",\"status\":\"PASS\",\"evidence\":\"artifacts/g4-m1-recovery-001/fault-http/4f58296a-2ccf-4124-8b36-d422f30227d9.json\"}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "190ab49a8eff5f3a13c1526f38cda9b933c0e618de51c7b7e4da98be73cc130a",
+        "psql",
+        "-U",
+        "platform",
+        "-d",
+        "platform",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-qAt"
+      ],
+      "input": "SET lock_timeout='2s'; SET statement_timeout='5s';SELECT json_build_object('snapshots',(SELECT count(*) FROM connections.\"CatalogSnapshots\" WHERE \"ConnectionId\"='1bf23f9d36bf4ceba09d745f04d8f743'),'finishAudits',(SELECT count(*) FROM governance.audit_records WHERE \"Resource\"='connection:1bf23f9d36bf4ceba09d745f04d8f743' AND \"Action\"='connection.catalog.finish'));",
+      "exitCode": 0,
+      "elapsedSeconds": 0.031056084000738338,
+      "stdout": "{\"snapshots\" : 5, \"finishAudits\" : 8}\n",
+      "stderr": ""
+    },
+    {
+      "operation": "open_source_observer",
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "9dd83f34dd207529bea2975834c3d61baa63b8ca88e159506520bd786f0d7305",
+        "psql",
+        "-U",
+        "postgres",
+        "-d",
+        "fixture",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-qAt"
+      ],
+      "pid": 44166
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "SET application_name='g4_m1_recovery_observer'; SET statement_timeout='2s'; SET idle_session_timeout='90s'; SET plan_cache_mode=force_generic_plan; PREPARE recovery_activity AS SELECT coalesce(json_agg(json_build_object('pid',pid,'state',state,'waitType',wait_event_type,'wait',wait_event)),'[]') FROM pg_stat_activity WHERE datname='fixture' AND usename='fixture_reader'; EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "command": [
+        "node",
+        "scripts/acceptance/g4-m1-fault.mjs",
+        "--runtime-file",
+        "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/http-schema-change.json",
+        "--action",
+        "job-start"
+      ],
+      "input": null,
+      "exitCode": 0,
+      "elapsedSeconds": 1.3000017079903046,
+      "stdout": "{\"action\":\"job-start\",\"status\":\"PASS\",\"evidence\":\"artifacts/g4-m1-recovery-001/fault-http/ab1b1b52-34e5-442f-964c-7f456b72421d.json\"}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "190ab49a8eff5f3a13c1526f38cda9b933c0e618de51c7b7e4da98be73cc130a",
+        "psql",
+        "-U",
+        "platform",
+        "-d",
+        "platform",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-qAt"
+      ],
+      "input": "SET lock_timeout='2s'; SET statement_timeout='5s';SELECT json_build_object('status',\"Status\",'fence',\"Fence\",'attempt',\"Attempt\",'leaseUntil',\"LeaseUntil\",'expired',\"LeaseUntil\"<now(),'snapshot',\"SnapshotId\",'diagnostic',\"DiagnosticCode\") FROM connections.\"CatalogJobs\" WHERE \"Id\"='a9b166ec8fcf4a528f8746d8c93b36dd';",
+      "exitCode": 0,
+      "elapsedSeconds": 0.047082250006496906,
+      "stdout": "{\"status\" : \"QUEUED\", \"fence\" : 0, \"attempt\" : 0, \"leaseUntil\" : null, \"expired\" : null, \"snapshot\" : null, \"diagnostic\" : null}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "190ab49a8eff5f3a13c1526f38cda9b933c0e618de51c7b7e4da98be73cc130a",
+        "psql",
+        "-U",
+        "platform",
+        "-d",
+        "platform",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-qAt"
+      ],
+      "input": "SET lock_timeout='2s'; SET statement_timeout='5s';SELECT json_build_object('status',\"Status\",'fence',\"Fence\",'attempt',\"Attempt\",'leaseUntil',\"LeaseUntil\",'expired',\"LeaseUntil\"<now(),'snapshot',\"SnapshotId\",'diagnostic',\"DiagnosticCode\") FROM connections.\"CatalogJobs\" WHERE \"Id\"='a9b166ec8fcf4a528f8746d8c93b36dd';",
+      "exitCode": 0,
+      "elapsedSeconds": 0.038848832991789095,
+      "stdout": "{\"status\" : \"RUNNING\", \"fence\" : 1, \"attempt\" : 1, \"leaseUntil\" : \"2026-11-01T15:02:54.927578+00:00\", \"expired\" : false, \"snapshot\" : null, \"diagnostic\" : null}\n",
+      "stderr": ""
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "stop",
+        "--time",
+        "5",
+        "fab2d80ba0a05123011f2097f1afeb6235e2f45023c083445a01cb1fce5c5f62"
+      ],
+      "input": null,
+      "exitCode": 0,
+      "elapsedSeconds": 0.021751374995801598,
+      "stdout": "Flag --time has been deprecated, use --timeout instead\nfab2d80ba0a05123011f2097f1afeb6235e2f45023c083445a01cb1fce5c5f62\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "rm",
+        "fab2d80ba0a05123011f2097f1afeb6235e2f45023c083445a01cb1fce5c5f62"
+      ],
+      "input": null,
+      "exitCode": 0,
+      "elapsedSeconds": 0.03213908401085064,
+      "stdout": "fab2d80ba0a05123011f2097f1afeb6235e2f45023c083445a01cb1fce5c5f62\n",
+      "stderr": ""
+    },
+    {
+      "operation": "prepared_source_observer",
+      "sql": "EXECUTE recovery_activity;",
+      "value": []
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "ps",
+        "-aq",
+        "--filter",
+        "name=^/ontology-g4-m1-recovery-001-api-recovery-1$"
+      ],
+      "input": null,
+      "exitCode": 0,
+      "elapsedSeconds": 0.013912209004047327,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "9dd83f34dd207529bea2975834c3d61baa63b8ca88e159506520bd786f0d7305",
+        "psql",
+        "-U",
+        "postgres",
+        "-d",
+        "fixture",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-qAt"
+      ],
+      "input": "SET statement_timeout='2s'; SELECT count(*) FROM pg_locks WHERE pid=17568 AND relation='pg_catalog.pg_attribute'::regclass;",
+      "exitCode": 0,
+      "elapsedSeconds": 0.03827058299793862,
+      "stdout": "0\n",
+      "stderr": ""
+    }
+  ],
+  "replicaNameAbsentBefore": true,
+  "replicaId": "fab2d80ba0a05123011f2097f1afeb6235e2f45023c083445a01cb1fce5c5f62",
+  "before": {
+    "snapshots": 5,
+    "finishAudits": 8
+  },
+  "sourceLock": {
+    "command": [
+      "docker",
+      "--context",
+      "desktop-linux",
+      "exec",
+      "-i",
+      "9dd83f34dd207529bea2975834c3d61baa63b8ca88e159506520bd786f0d7305",
+      "psql",
+      "-U",
+      "postgres",
+      "-d",
+      "fixture",
+      "-v",
+      "ON_ERROR_STOP=1",
+      "-qAt"
+    ],
+    "input": "SET application_name='g4_m1_recovery_lease_lock'; SET lock_timeout='2s'; SET statement_timeout='60s'; SET idle_in_transaction_session_timeout='60s'; BEGIN; LOCK TABLE pg_catalog.pg_attribute IN ACCESS EXCLUSIVE MODE; SELECT json_build_object('lockPid',pg_backend_pid(),'granted',exists(SELECT 1 FROM pg_locks WHERE pid=pg_backend_pid() AND relation='pg_catalog.pg_attribute'::regclass AND mode='AccessExclusiveLock' AND granted));\n",
+    "ready": {
+      "lockPid": 17568,
+      "granted": true
+    }
+  },
+  "jobId": "a9b166ec8fcf4a528f8746d8c93b36dd",
+  "failureType": "AssertionError",
+  "cleanup": {
+    "apiPaused": false,
+    "sourceSessions": [],
+    "replicaAbsent": true,
+    "sourceLockCount": 0
+  },
+  "observerExit": {
+    "pid": 44166,
+    "exitCode": 0
+  },
+  "cleanupErrors": [],
+  "driverSha256": "13b27c5a45e2224cf9ef04f278db933e88141be62345cb0ec89423c169515b15"
+}

@@ -1,0 +1,72 @@
+{
+  "taskId": "G4-M1-RECOVERY-001",
+  "status": "FAIL",
+  "commands": [
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "-i",
+        "ontology-g4-m1-recovery-001-platform-pg-1",
+        "psql",
+        "-U",
+        "platform",
+        "-d",
+        "platform",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-qAt"
+      ],
+      "sql": "Exact private issuedRef and subjectId read; original query private-memory only",
+      "exitCode": 0,
+      "stdout": "PRIVATE_MEMORY_ONLY"
+    },
+    {
+      "method": "POST",
+      "path": "/realms/master/protocol/openid-connect/token",
+      "status": 200,
+      "body": "PRIVATE_MEMORY_ONLY"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/realms/g2-05cf1b097c1a74bb/users?username=g2-operator-a&exact=true",
+      "status": 200,
+      "body": "PRIVATE_MEMORY_ONLY"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/realms/g2-05cf1b097c1a74bb/users/ad7a2d5c-2c30-4e1f-a6f0-908f54e54c79",
+      "status": 200,
+      "body": "PRIVATE_MEMORY_ONLY"
+    },
+    {
+      "method": "PUT",
+      "path": "/admin/realms/g2-05cf1b097c1a74bb/users/ad7a2d5c-2c30-4e1f-a6f0-908f54e54c79",
+      "status": 204,
+      "body": "PRIVATE_MEMORY_ONLY"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/realms/g2-05cf1b097c1a74bb/users/ad7a2d5c-2c30-4e1f-a6f0-908f54e54c79",
+      "status": 200,
+      "body": "PRIVATE_MEMORY_ONLY"
+    }
+  ],
+  "foreignRefProvenance": {
+    "expiresAtUtc": "2026-11-01T15:35:07.511495+00:00",
+    "usedAtUtc": null,
+    "organizationId": "org-demo",
+    "serverNow": "2026-11-01T15:25:46.088681+00:00",
+    "refSha256": "da6aa62734f3e44755bb08827a812a84d1d0f8e07b635744f60610b70e40dacf",
+    "ownerSha256": "05a676e8230fec3868767ef986d7ea6fc0f9d94089d997f8bfc39206985fa4cf"
+  },
+  "cleanupErrors": [
+    {
+      "operation": "verify_original_attributes",
+      "errorType": "KeyError"
+    }
+  ],
+  "driverSha256": "4f768a037f641b0a24b53b79ae32b21d4f2300ddf9a7c5299d19ef458bbfcb6b"
+}

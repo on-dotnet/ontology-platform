@@ -1,0 +1,87 @@
+{
+  "taskId": "G4-M1-RECOVERY-001",
+  "status": "PASS",
+  "deleted": [
+    {
+      "path": "artifacts/g4-m1-recovery-001/forensics/image-0.oci.tar",
+      "operation": "unlink_exact_file",
+      "exitCode": 0,
+      "afterAbsent": true,
+      "logicalBytes": 161157120
+    },
+    {
+      "path": "artifacts/g4-m1-recovery-001/forensics/image-1.oci.tar",
+      "operation": "unlink_exact_file",
+      "exitCode": 0,
+      "afterAbsent": true,
+      "logicalBytes": 263956480
+    },
+    {
+      "path": "artifacts/g4-m1-recovery-001/forensics/image-2.oci.tar",
+      "operation": "unlink_exact_file",
+      "exitCode": 0,
+      "afterAbsent": true,
+      "logicalBytes": 92426240
+    },
+    {
+      "path": "artifacts/g4-m1-recovery-001/forensics/image-3.oci.tar",
+      "operation": "unlink_exact_file",
+      "exitCode": 0,
+      "afterAbsent": true,
+      "logicalBytes": 83056640
+    },
+    {
+      "path": "artifacts/g4-m1-recovery-001/api-final",
+      "operation": "rmtree_exact_owned_regenerable_directory",
+      "exitCode": 0,
+      "afterAbsent": true,
+      "logicalBytes": 20139490
+    },
+    {
+      "path": "artifacts/g4-m1-recovery-001/web-before-interlock",
+      "operation": "rmtree_exact_owned_regenerable_directory",
+      "exitCode": 0,
+      "afterAbsent": true,
+      "logicalBytes": 180662743
+    },
+    {
+      "path": "artifacts/g4-m1-recovery-001/web-before-copy",
+      "operation": "rmtree_exact_owned_regenerable_directory",
+      "exitCode": 0,
+      "afterAbsent": true,
+      "logicalBytes": 153821991
+    },
+    {
+      "path": "node_modules",
+      "operation": "unlink_symlink_only",
+      "exitCode": 0,
+      "afterAbsent": true,
+      "donorUnchangedIdentity": true
+    },
+    {
+      "path": "apps/web/node_modules",
+      "operation": "unlink_symlink_only",
+      "exitCode": 0,
+      "afterAbsent": true,
+      "donorUnchangedIdentity": true
+    },
+    {
+      "path": ".tools/pnpm",
+      "operation": "unlink_symlink_only",
+      "exitCode": 0,
+      "afterAbsent": true,
+      "donorUnchangedIdentity": true
+    },
+    {
+      "path": ".tools/pythonlibs",
+      "operation": "unlink_symlink_only",
+      "exitCode": 0,
+      "afterAbsent": true,
+      "donorUnchangedIdentity": true
+    }
+  ],
+  "planSha256": "87e6c80873b11e84919f36979bf47bb15d97b1d91261e2a9013c68d3e670eff4",
+  "deletedLogicalBytes": 955220704,
+  "physicalDiskReclaimed": "NOT_VERIFIED: logical deleted file sizes are not deduplicated APFS/containerd physical reclaim.",
+  "completedUtc": "2026-11-01T16:33:57.934786+00:00"
+}

@@ -1,0 +1,93 @@
+{
+  "taskId": "G4-M1-RECOVERY-001",
+  "status": "PASS",
+  "commands": [
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "network",
+        "disconnect",
+        "7fdadd3b921be9f3057dd2871794e6d108e6b58fec13b2f70281f5110c3bc240",
+        "9dd83f34dd207529bea2975834c3d61baa63b8ca88e159506520bd786f0d7305"
+      ],
+      "startedUtc": "2026-11-01T15:58:18.498529+00:00",
+      "elapsedSeconds": 0.046298750006826594,
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "scripts/acceptance/g4-m1-browser.mjs",
+        "--runtime-file",
+        "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/source-network-unavailable.json",
+        "--evidence-dir",
+        "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/artifacts/g4-m1-recovery-001/browser"
+      ],
+      "exitCode": 2,
+      "stdout": "{\"taskId\":\"G4-M1-RECOVERY-001\",\"scenario\":\"source-unavailable\",\"status\":\"INCOMPLETE\",\"caseStatuses\":{\"M1-U01\":\"NOT_RUN\",\"M1-U02\":\"NOT_RUN\",\"M1-U03\":\"NOT_RUN\",\"M1-U04\":\"NOT_RUN\",\"M1-U05\":\"NOT_RUN\",\"M1-U06\":\"NOT_RUN\"},\"failure\":null}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "network",
+        "connect",
+        "--ip",
+        "172.18.0.2",
+        "--alias",
+        "ontology-g4-m1-recovery-001-pg-source-1",
+        "--alias",
+        "pg-source",
+        "7fdadd3b921be9f3057dd2871794e6d108e6b58fec13b2f70281f5110c3bc240",
+        "9dd83f34dd207529bea2975834c3d61baa63b8ca88e159506520bd786f0d7305"
+      ],
+      "startedUtc": "2026-11-01T15:58:20.443901+00:00",
+      "elapsedSeconds": 0.0256511670013424,
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "scripts/acceptance/g4-m1-fault.mjs",
+        "--runtime-file",
+        "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform/.tools/security/g4-m1-recovery-001-20261101-01/final-probe-refresh.json",
+        "--action",
+        "probe-refresh"
+      ],
+      "startedUtc": "2026-11-01T15:58:20.484363+00:00",
+      "elapsedSeconds": 1.3676252919976832,
+      "exitCode": 0,
+      "stdout": "{\"action\":\"probe-refresh\",\"status\":\"PASS\",\"evidence\":\"artifacts/g4-m1-recovery-001/fault-http/41dee555-1ed0-4eba-8db8-6c7272d775ec.json\"}\n",
+      "stderr": ""
+    }
+  ],
+  "claim": "Real source network unavailable; PostgreSQL process remains running.",
+  "before": {
+    "containerId": "9dd83f34dd207529bea2975834c3d61baa63b8ca88e159506520bd786f0d7305",
+    "networkId": "7fdadd3b921be9f3057dd2871794e6d108e6b58fec13b2f70281f5110c3bc240",
+    "ip": "172.18.0.2",
+    "aliases": [
+      "ontology-g4-m1-recovery-001-pg-source-1",
+      "pg-source"
+    ]
+  },
+  "restored": {
+    "networkId": "7fdadd3b921be9f3057dd2871794e6d108e6b58fec13b2f70281f5110c3bc240",
+    "ip": "172.18.0.2",
+    "aliases": [
+      "ontology-g4-m1-recovery-001-pg-source-1",
+      "pg-source"
+    ]
+  },
+  "cleanupErrors": [],
+  "watchdogExpired": false,
+  "driverSha256": "126d4a37c2599a7efc42c4553a97dd9329bf922967bfbe64c3166237011a89a6"
+}

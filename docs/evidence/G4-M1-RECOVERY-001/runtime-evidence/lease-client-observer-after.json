@@ -1,0 +1,42 @@
+[
+  {
+    "command": [
+      "docker",
+      "--context",
+      "desktop-linux",
+      "exec",
+      "-i",
+      "ontology-g4-m1-recovery-001-pg-source-1",
+      "psql",
+      "-U",
+      "postgres",
+      "-d",
+      "fixture",
+      "-qAt"
+    ],
+    "sql": "SELECT json_build_object('lockCount',(SELECT count(*) FROM pg_locks WHERE pid=19221),'oldBackendCount',(SELECT count(*) FROM pg_stat_activity WHERE pid=19230));",
+    "exitCode": 0,
+    "stdout": "{\"lockCount\" : 0, \"oldBackendCount\" : 0}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "docker",
+      "--context",
+      "desktop-linux",
+      "exec",
+      "-i",
+      "ontology-g4-m1-recovery-001-platform-pg-1",
+      "psql",
+      "-U",
+      "platform",
+      "-d",
+      "platform",
+      "-qAt"
+    ],
+    "sql": "SELECT json_build_object('status',\"Status\",'fence',\"Fence\",'attempt',\"Attempt\",'snapshot',\"SnapshotId\",'snapshotTotal',(SELECT count(*) FROM connections.\"CatalogSnapshots\" WHERE \"ConnectionId\"='1bf23f9d36bf4ceba09d745f04d8f743'),'finishAuditTotal',(SELECT count(*) FROM governance.audit_records WHERE \"Resource\"='connection:1bf23f9d36bf4ceba09d745f04d8f743' AND \"Action\"='connection.catalog.finish')) FROM connections.\"CatalogJobs\" WHERE \"Id\"='573e1e140fef4c53be83fc35b4f97a8b';",
+    "exitCode": 0,
+    "stdout": "{\"status\" : \"SUCCEEDED\", \"fence\" : 2, \"attempt\" : 2, \"snapshot\" : \"6aa6098802a443d5bb3d81a6f97830f0\", \"snapshotTotal\" : 7, \"finishAuditTotal\" : 12}\n",
+    "stderr": ""
+  }
+]
