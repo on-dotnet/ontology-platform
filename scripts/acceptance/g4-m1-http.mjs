@@ -12,10 +12,30 @@ Uses Master private runtime.json under this checkout .tools/security:
 Existing realm authority must be http://localhost:15180/realms/g2-* and contain
  g2-operator-ab, g2-operator-a, g2-viewer-ab, g2-auditor-ab identities.
 Optional httpScenario: baseline(default), contracts, provision, source-unavailable,
- source-permission-limited, catalog-cancel, schema-change, recover-job.
+ source-permission-limited, catalog-cancel, schema-change, recover-job, credential-lifecycle, cross-org-secret.
 Fault scenarios require httpConnectionId; schema-change also httpSnapshotId;
  recover-job also httpJobId. These IDs are public synthetic objects, never secrets.
 Master must establish actual source/DDL/restart/permission faults beforehand.
+credential-lifecycle requires expiredSecretRef, expiredSecretExpiresAtUtc (original
+intake receipt), revokedSecretRef and rotationSecretFile (0600, same real private
+directory as sourceSecretFile, different password). Ref values never enter evidence.
+Run this source password experiment alone, with no other active source probes/jobs.
+After original-password success, stdout CREDENTIAL_ROTATION_READY carries only taskId,
+runId and connectionId; Master changes only fixture_reader then sends exactly
+SOURCE_PASSWORD_ROTATED followed by LF. Keep stdin open. In finally, stdout
+CREDENTIAL_RESTORE_READY requests restoration; reply SOURCE_PASSWORD_RESTORED plus LF.
+Both markers are <=64 bytes with 30s deadlines. Master must independently restore in
+finally even if either marker fails. Marker acknowledgement is not source-state proof.
+After restore acknowledgement the original-password draft probe must pass; the exact
+created connection is disabled using a fresh revision/ETag even when earlier work fails.
+cross-org-secret requires private foreignSecretRef issued to org-demo/operator-ab.
+Master temporarily moves only g2-operator-a to org-other, then restores it independently
+in finally and verifies a new login. The driver logs in only that actor, requires /me
+canonical operator role and actual org-other/site-a scopes, then expects the foreign
+reference create to return exactly 422/connection_secret_expired. No fabricated body
+organization is accepted as identity evidence. Ref provenance remains Master evidence.
+ExpiresAt and HTTP 422 cannot independently prove natural expiry/unused/revoked DB
+state or absence of source I/O; Master supplies those witnesses. P07/P09 stay partial.
 Source is fixed pg-source:5432/fixture/fixture_reader/production, TLS VerifyFull.
 Baseline creates one connection then disables it; provision deliberately leaves an
 ACTIVE connection for subsequent controlled faults and reports its public IDs.
@@ -105,6 +125,38 @@ async function step(name, ids, work) {
   }
   completedSteps.add(name); return true;
 }
+/** 固定双阶段标准输入协议；不调用 Docker、数据库或任意控制文件。 */
+function credentialSignal(kind, connectionId) {
+  const protocol = { rotate: ['CREDENTIAL_ROTATION_READY', 'SOURCE_PASSWORD_ROTATED\n'], restore: ['CREDENTIAL_RESTORE_READY', 'SOURCE_PASSWORD_RESTORED\n'] }[kind];
+  demand(!!protocol, 'credential_handshake_kind_invalid');
+  const receipt = { event: protocol[0], status: 'READY', readyAtUtc: new Date().toISOString() };
+  report.credentialHandshakes ??= []; report.credentialHandshakes.push(receipt);
+  return new Promise((resolve, reject) => {
+    // 原始输入最多驻留 64 字节，所有终止路径均清除期限和监听。
+    let pending = Buffer.alloc(0); let settled = false;
+    const finish = code => {
+      if (settled) return; settled = true; clearTimeout(timer);
+      process.stdin.removeListener('data', onData); process.stdin.removeListener('end', onEnd); process.stdin.removeListener('error', onError); process.stdin.pause();
+      if (code) { receipt.status = 'FAILED'; receipt.failureCode = code; const error = new Error(); error.safeCode = code; reject(error); }
+      else { receipt.status = 'MARKER_ACKNOWLEDGED'; receipt.acknowledgedAtUtc = new Date().toISOString(); resolve(); }
+    };
+    const onData = chunk => {
+      const bytes = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+      if (pending.length + bytes.length > 64) { finish('credential_marker_too_large'); return; }
+      pending = Buffer.concat([pending, bytes]); const expected = Buffer.from(protocol[1]);
+      if (pending.length > expected.length || !expected.subarray(0, pending.length).equals(pending)) { finish('credential_marker_invalid'); return; }
+      if (pending.equals(expected)) finish();
+    };
+    const onEnd = () => finish('credential_stdin_closed'); const onError = () => finish('credential_stdin_error');
+    const timer = setTimeout(() => finish('credential_marker_timeout'), 30000);
+    process.stdin.on('data', onData); process.stdin.on('end', onEnd); process.stdin.on('error', onError);
+    try {
+      // 即使输入已关闭，恢复事件仍发给 Master；其独立 finally 是恢复保底。
+      process.stdout.write(JSON.stringify({ event: protocol[0], taskId: report.taskId, runId: report.runId, connectionId }) + '\n');
+      if (process.stdin.readableEnded || process.stdin.destroyed) finish('credential_stdin_closed'); else process.stdin.resume();
+    } catch { finish('credential_transport_error'); }
+  });
+}
 /** 路由来自脚本常量和已验证公开ID；请求/响应正文只用于内存判断。 */
 function routeTemplate(path) {
   return path.split('?')[0].replace(/[a-f0-9]{32}/g, '{id}');
@@ -158,11 +210,25 @@ try {
   demand(runtime.taskId === report.taskId && /^[A-Za-z0-9_-]{1,80}$/.test(runtime.runId) && runtime.publicOrigin === 'http://localhost:15100', 'runtime_identity_invalid');
   demand(runtime.scope?.organizationId === 'org-demo' && JSON.stringify(runtime.scope.siteIds) === '["site-a"]', 'synthetic_scope_required');
   const scenario = runtime.httpScenario ?? 'baseline';
-  demand(['baseline','contracts','provision','source-unavailable','source-permission-limited','catalog-cancel','schema-change','recover-job'].includes(scenario), 'scenario_invalid');
+  demand(['baseline','contracts','provision','source-unavailable','source-permission-limited','catalog-cancel','schema-change','recover-job','credential-lifecycle','cross-org-secret'].includes(scenario), 'scenario_invalid');
   const realm = JSON.parse(await privateText(runtime.realmFile));
   const authority = new URL(realm.authority);
   demand(authority.origin === 'http://localhost:15180' && /^\/realms\/g2-[a-f0-9]+$/.test(authority.pathname) && !authority.search && !authority.hash && !authority.username && !authority.password, 'authority_denied');
   const sourceSecret = (await privateText(runtime.sourceSecretFile)).trimEnd(); demand(sourceSecret.length >= 8, 'source_secret_invalid');
+  if (scenario === 'cross-org-secret') {
+    demand(typeof runtime.foreignSecretRef === 'string' && /^[a-f0-9]{32}$/.test(runtime.foreignSecretRef), 'foreign_secret_ref_invalid'); remember(runtime.foreignSecretRef);
+  }
+  let rotationSecret;
+  if (scenario === 'credential-lifecycle') {
+    demand(typeof runtime.expiredSecretRef === 'string' && /^[a-f0-9]{32}$/.test(runtime.expiredSecretRef) && typeof runtime.revokedSecretRef === 'string' && /^[a-f0-9]{32}$/.test(runtime.revokedSecretRef) && runtime.expiredSecretRef !== runtime.revokedSecretRef, 'credential_fixture_refs_invalid');
+    remember(runtime.expiredSecretRef); remember(runtime.revokedSecretRef);
+    const expiry = Date.parse(runtime.expiredSecretExpiresAtUtc);
+    demand(typeof runtime.expiredSecretExpiresAtUtc === 'string' && Number.isFinite(expiry) && expiry <= Date.now(), 'credential_fixture_expiry_not_elapsed');
+    rotationSecret = (await privateText(runtime.rotationSecretFile)).trimEnd();
+    demand(dirname(await realpath(runtime.rotationSecretFile)) === dirname(await realpath(runtime.sourceSecretFile)), 'rotation_secret_directory_denied');
+    demand(((await lstat(runtime.rotationSecretFile)).mode & 0o777) === 0o600, 'rotation_secret_mode_invalid');
+    demand(rotationSecret.length >= 8 && rotationSecret !== sourceSecret, 'rotation_secret_not_distinct'); remember(rotationSecret);
+  }
   remember(sourceSecret); remember(realm.clientSecret); remember(runtime.certificatePassword); remember(runtime.healthKey);
   for (const value of Object.values(realm.identities ?? {})) remember(value.password);
   report.runId = runtime.runId; report.scenario = scenario;
@@ -191,8 +257,8 @@ try {
     identityStep('csrf_decode'); demand(typeof csrf === 'string', 'csrf_missing'); actor.headers = { Origin: 'http://localhost:15100', 'X-CSRF-TOKEN': csrf, Connection: 'close' };
     identityStep('page_close'); await page.close(); phase = previousPhase; return actor;
   }
-  phase = 'oidc_operator'; const operator = await identity('operator-ab');
-  phase = 'oidc_auditor'; const auditor = await identity('auditor-ab');
+  phase = 'oidc_operator'; const operator = await identity(scenario === 'cross-org-secret' ? 'operator-a' : 'operator-ab');
+  phase = 'oidc_auditor'; const auditor = ['credential-lifecycle','cross-org-secret'].includes(scenario) ? null : await identity('auditor-ab');
   const scope = runtime.scope;
   const config = { type: 'POSTGRESQL', profile: { host: 'pg-source', port: 5432, database: 'fixture', username: 'fixture_reader', sslMode: 'VerifyFull', allowedSchemas: ['production'] } };
   report.publicSourceConfigSha256 = createHash('sha256').update(JSON.stringify(config)).digest('hex');
@@ -414,6 +480,81 @@ try {
         });
       } else { report.fixtures.finalConnectionState=(await current(id)).data.state; if (scenario==='baseline') report.fixtures.keepReason='dependent_source_or_catalog_phase_failed_preserve_for_short_reproduction'; }
     }
+  } else if (scenario === 'cross-org-secret') {
+    matrix['M1-P07'].remaining = ['Master binds foreign reference to a different organization/owner with unused/unexpired safe DB witness and confirms account restoration via a new login; expiry/replay/purpose/revocation cases require separate evidence.'];
+    await step('credential_actual_cross_org_identity_and_reference', ['M1-P07'], async () => {
+      const me = status(await request(operator, 'GET', '/api/v1/platform/me'), 200);
+      demand(Array.isArray(me.roles) && me.roles.includes('platform.operator') && Array.isArray(me.scopes) && me.scopes.length > 0
+        && me.scopes.every(value => value.organizationId === 'org-other') && me.scopes.some(value => value.siteId === 'site-a'), 'cross_org_actual_identity_not_confirmed');
+      observe('M1-P07', 'actual_other_organization_oidc_operator_identity_confirmed', true,
+        { identityLabel: 'operator-a', organizationId: 'org-other', selectedSiteId: 'site-a', canonicalOperatorRole: true });
+      const rejected = await request(operator, 'POST', '/api/v1/connections', createBody(runtime.foreignSecretRef, { organizationId: 'org-other', siteIds: ['site-a'] }));
+      status(rejected, 422, 'connection_secret_expired');
+      observe('M1-P07', 'actual_cross_org_actor_foreign_reference_new_command_rejected', true, { responseIndex: rejected.index });
+    });
+  } else if (scenario === 'credential-lifecycle') {
+    matrix['M1-P07'].remaining = ['HTTP 422 is shared by missing/used/expired/purpose/scope failures; Master must bind original unused expiry and revoked ciphertext-cleared witnesses, cross-org and other required cases. No business/source I/O absence is inferred.'];
+    matrix['M1-P09'].remaining = ['Master independently confirms exact source password changes/restoration, old ciphertext clearing and Pooling=false source/build binding; HTTP observations alone do not inspect pools.'];
+    await step('credential_supplied_reference_rejections', ['M1-P07'], async () => {
+      for (const [label, ref] of [['expired', runtime.expiredSecretRef], ['revoked', runtime.revokedSecretRef]]) {
+        const rejected = await request(operator, 'POST', '/api/v1/connections', createBody(ref));
+        status(rejected, 422, 'connection_secret_expired');
+        observe('M1-P07', 'master_supplied_' + label + '_ref_new_create_command_rejected', true, { responseIndex: rejected.index,
+          ...(label === 'expired' ? { observedAfterProvidedExpiresAt: Date.now() >= Date.parse(runtime.expiredSecretExpiresAtUtc) } : {}) });
+      }
+    });
+    await step('credential_real_source_rotation', ['M1-P07','M1-P09'], async () => {
+      let needsRestore = false;
+      try {
+        phase = 'credential_original_create_probe';
+        const original = await intake(); const created = status(await request(operator, 'POST', '/api/v1/connections', createBody(original.ref)), 201);
+        id = publicId(created.id); report.fixtures.connectionId = id;
+        const beforeChange = await probe(id);
+        observe('M1-P09', 'original_password_real_probe_all_five_stages_pass', successfulProbe(beforeChange.value));
+        phase = 'credential_rotation_handshake'; needsRestore = true; report.fixtures.sourceRestorationRequired = true; report.fixtures.sourceRestorationVerifiedByProbe = false;
+        await credentialSignal('rotate', id);
+        phase = 'credential_old_bound_password_after_source_change';
+        const rejectedOld = await probe(id);
+        const authRejected = value => value.status === 'TEST_FAILED' && ['NETWORK','TLS'].every(name => value.stages.some(stage => stage.name === name && stage.status === 'PASS'))
+          && value.stages.some(stage => stage.name === 'AUTH' && stage.status === 'FAIL' && stage.diagnosticCode === 'connection_auth_failed')
+          && ['READ_ONLY','METADATA'].every(name => value.stages.some(stage => stage.name === name && stage.status === 'NOT_RUN'));
+        observe('M1-P09', 'old_bound_physical_password_auth_rejected_after_real_source_change', authRejected(rejectedOld.value));
+        phase = 'credential_new_password_rotation';
+        const next = await intake(rotationSecret); const beforeRotate = await current(id);
+        const rotated = status(await mutate(id, 'rotate-secret', { secretRef: next.ref, command: contextCommand(beforeRotate.data.configRevision) }, beforeRotate), 200);
+        const oldProbe = status(await request(operator, 'GET', '/api/v1/connections/' + id + '/probes/' + beforeChange.value.probeId), 200);
+        observe('M1-P09', 'rotation_increments_secret_version_and_invalidates_old_probe', rotated.secretVersion === beforeRotate.data.secretVersion + 1 && rotated.lastProbeId === null && !rotated.probeFresh && rotated.state === 'DRAFT' && oldProbe.stale,
+          { previousVersion: beforeRotate.data.secretVersion, currentVersion: rotated.secretVersion });
+        const newProbe = await probe(id);
+        observe('M1-P09', 'new_password_real_probe_all_stages_and_current_version', successfulProbe(newProbe.value) && newProbe.value.secretVersion === rotated.secretVersion);
+        phase = 'credential_old_reference_rejections_after_rotation';
+        for (const [label, ref] of [['previous_bound', original.ref], ['master_revoked', runtime.revokedSecretRef]]) {
+          const rejected = await request(operator, 'POST', '/api/v1/connections/tests', { scopeSelection: scope, config, secretRef: ref, command: contextCommand(0) });
+          status(rejected, 422, 'connection_secret_expired'); observe('M1-P07', label + '_ref_new_draft_probe_command_rejected', true, { responseIndex: rejected.index });
+        }
+        phase = 'credential_old_password_after_new_version_success';
+        const oldValue = await intake(sourceSecret);
+        const oldDraft = status(await request(operator, 'POST', '/api/v1/connections/tests', { scopeSelection: scope, config, secretRef: oldValue.ref, command: contextCommand(0) }), 200);
+        observe('M1-P09', 'old_password_still_auth_rejected_after_new_version_success', authRejected(oldDraft));
+      } finally {
+        const interruptedPhase = phase;
+        if (needsRestore) {
+          await step('credential_restore_source_and_verify', ['M1-P09'], async () => {
+            await credentialSignal('restore', id);
+            const restored = await intake(sourceSecret);
+            const draft = status(await request(operator, 'POST', '/api/v1/connections/tests', { scopeSelection: scope, config, secretRef: restored.ref, command: contextCommand(0) }), 200);
+            observe('M1-P09', 'original_password_restored_real_draft_probe_all_stages_pass', successfulProbe(draft));
+            report.fixtures.sourceRestorationVerifiedByProbe = true; report.fixtures.sourceRestorationRequired = false;
+          });
+        }
+        if (id) await step('credential_disable_exact_created_connection', ['M1-P09'], async () => {
+          const beforeDisable = await current(id);
+          if (beforeDisable.data.state !== 'DISABLED') status(await mutate(id, 'disable', { command: contextCommand(beforeDisable.data.configRevision) }, beforeDisable), 200);
+          const disabled = await current(id); demand(disabled.data.state === 'DISABLED', 'credential_cleanup_disable_failed'); report.fixtures.finalConnectionState = 'DISABLED';
+        });
+        phase = interruptedPhase;
+      }
+    });
   } else if (scenario!=='contracts') {
     id=publicId(runtime.httpConnectionId); report.fixtures.connectionId=id;
     await step('controlled_'+scenario, ['M1-P13','M1-E04','M1-E06','M1-E08'], async () => {
