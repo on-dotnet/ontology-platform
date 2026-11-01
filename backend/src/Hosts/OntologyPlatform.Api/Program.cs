@@ -1,4 +1,5 @@
 using OntologyPlatform.Api.G2;
+using OntologyPlatform.Api.G4;
 
 namespace OntologyPlatform.Api;
 
@@ -10,6 +11,11 @@ public static class Program
     /// <returns>服务停止后完成的任务。</returns>
     public static async Task Main(string[] args)
     {
+        if (args is ["--export-g4-openapi", var outputPath])
+        {
+            await G4ContractExport.WriteAsync(outputPath);
+            return;
+        }
         // 宿主独立于开发InfraAPI，正式提供身份、资源和探针。
         await using var app = PlatformApiHost.CreateApplication(args);
         await PlatformApiHost.InitializeDevelopmentAsync(app);

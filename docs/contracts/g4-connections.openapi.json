@@ -1,0 +1,1447 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "OntologyPlatform.Api | g4",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:53357/"
+    }
+  ],
+  "paths": {
+    "/api/v1/connections": {
+      "get": {
+        "tags": [
+          "Connections"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectionListPage"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Connections"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConnectionCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectionView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/connections/{id}": {
+      "get": {
+        "tags": [
+          "Connections"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectionView"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Connections"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConnectionPatchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectionView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/connection-secrets": {
+      "post": {
+        "tags": [
+          "Connections"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConnectionSecretIntakeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SecretIntakeReceipt"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/connections/tests": {
+      "post": {
+        "tags": [
+          "Connections"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConnectionDraftProbeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectionProbeView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/connections/{id}/rotate-secret": {
+      "post": {
+        "tags": [
+          "Connections"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConnectionRotateSecretRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectionView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/connections/{id}/test": {
+      "post": {
+        "tags": [
+          "Connections"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConnectionMutationCommand"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectionProbeView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/connections/{id}/probes/{probeId}": {
+      "get": {
+        "tags": [
+          "Connections"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectionProbeView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/connections/{id}/enable": {
+      "post": {
+        "tags": [
+          "Connections"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConnectionMutationCommand"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectionView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/connections/{id}/disable": {
+      "post": {
+        "tags": [
+          "Connections"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConnectionMutationCommand"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectionView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/connections/{id}/discoveries": {
+      "post": {
+        "tags": [
+          "Connections"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConnectionMutationCommand"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CatalogDiscoveryJobView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/connections/{id}/discoveries/{jobId}": {
+      "get": {
+        "tags": [
+          "Connections"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CatalogDiscoveryJobView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/connections/{id}/discoveries/{jobId}/cancel": {
+      "post": {
+        "tags": [
+          "Connections"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConnectionMutationCommand"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CatalogDiscoveryJobView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/connections/{id}/catalogs": {
+      "get": {
+        "tags": [
+          "Connections"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CatalogSnapshotListPage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/catalogs/{snapshotId}": {
+      "get": {
+        "tags": [
+          "Connections"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CatalogSnapshotView"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CatalogDiscoveryJobView": {
+        "required": [
+          "jobId",
+          "connectionId",
+          "configRevision",
+          "status",
+          "createdAtUtc",
+          "completedAtUtc",
+          "snapshotId",
+          "traceId"
+        ],
+        "type": "object",
+        "properties": {
+          "jobId": {
+            "type": "string",
+            "description": "任务标识。"
+          },
+          "connectionId": {
+            "type": "string",
+            "description": "来源连接。"
+          },
+          "configRevision": {
+            "type": "integer",
+            "description": "请求配置修订。",
+            "format": "int64"
+          },
+          "status": {
+            "type": "string",
+            "description": "持久任务状态。"
+          },
+          "createdAtUtc": {
+            "type": "string",
+            "description": "创建时间。",
+            "format": "date-time"
+          },
+          "completedAtUtc": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "终态时间。",
+            "format": "date-time"
+          },
+          "snapshotId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "产生的快照标识。"
+          },
+          "traceId": {
+            "type": "string",
+            "description": "脱敏关联标识。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "可恢复且可取消的持久发现任务。"
+      },
+      "CatalogField": {
+        "required": [
+          "name",
+          "nativeType",
+          "nullable",
+          "ordinal",
+          "precision",
+          "scale"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "列名称。"
+          },
+          "nativeType": {
+            "type": "string",
+            "description": "保真原生类型。"
+          },
+          "nullable": {
+            "type": "boolean",
+            "description": "是否允许空值。"
+          },
+          "ordinal": {
+            "type": "integer",
+            "description": "列序号。",
+            "format": "int32"
+          },
+          "precision": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "description": "原生精度。",
+            "format": "int32"
+          },
+          "scale": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "description": "原生小数位。",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false,
+        "description": "原生列类型与精度元数据，不包含业务行。"
+      },
+      "CatalogObject": {
+        "required": [
+          "schema",
+          "name",
+          "kind",
+          "fields"
+        ],
+        "type": "object",
+        "properties": {
+          "schema": {
+            "type": "string",
+            "description": "Schema名称。"
+          },
+          "name": {
+            "type": "string",
+            "description": "对象名称。"
+          },
+          "kind": {
+            "type": "string",
+            "description": "TABLE或VIEW。"
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CatalogField"
+            },
+            "description": "可见字段集合。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "源角色和允许Schema交集内的可见对象。"
+      },
+      "CatalogSnapshotListPage": {
+        "required": [
+          "items",
+          "nextCursor"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CatalogSnapshotView"
+            },
+            "description": "当前页面。"
+          },
+          "nextCursor": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "下一页不透明游标。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "授权过滤后的目录历史分页。"
+      },
+      "CatalogSnapshotView": {
+        "required": [
+          "snapshotId",
+          "connectionId",
+          "configRevision",
+          "secretVersion",
+          "scope",
+          "schemaFingerprint",
+          "capturedAtUtc",
+          "status",
+          "objects"
+        ],
+        "type": "object",
+        "properties": {
+          "snapshotId": {
+            "type": "string",
+            "description": "快照标识。"
+          },
+          "connectionId": {
+            "type": "string",
+            "description": "来源连接标识。"
+          },
+          "configRevision": {
+            "type": "integer",
+            "description": "捕获时配置修订。",
+            "format": "int64"
+          },
+          "secretVersion": {
+            "type": "integer",
+            "description": "捕获时凭据版本。",
+            "format": "int64"
+          },
+          "scope": {
+            "description": "捕获范围。",
+            "$ref": "#/components/schemas/ResourceScope"
+          },
+          "schemaFingerprint": {
+            "type": "string",
+            "description": "排序规范化内容SHA256。"
+          },
+          "capturedAtUtc": {
+            "type": "string",
+            "description": "捕获时间。",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string",
+            "description": "READY或PARTIAL或STALE。"
+          },
+          "objects": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CatalogObject"
+            },
+            "description": "授权可见元数据。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "不可变目录快照及当前过期状态投影。"
+      },
+      "CommandContext": {
+        "required": [
+          "commandId",
+          "idempotencyKey",
+          "expectedRevision",
+          "reason"
+        ],
+        "type": "object",
+        "properties": {
+          "commandId": {
+            "type": "string",
+            "description": "本次命令标识。"
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "description": "同范围与操作内唯一的幂等键。"
+          },
+          "expectedRevision": {
+            "type": "integer",
+            "description": "期望修订；创建时为零。",
+            "format": "int64"
+          },
+          "reason": {
+            "type": "string",
+            "description": "仅存业务审计的操作理由，不写普通日志。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "用于明确修订与幂等语义的受控命令上下文。"
+      },
+      "ConnectionConfig": {
+        "required": [
+          "type"
+        ],
+        "type": "object",
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/ConnectionConfigPgConnectionConfig"
+          },
+          {
+            "$ref": "#/components/schemas/ConnectionConfigOracleConnectionConfig"
+          },
+          {
+            "$ref": "#/components/schemas/ConnectionConfigDorisConnectionConfig"
+          },
+          {
+            "$ref": "#/components/schemas/ConnectionConfigTdengineConnectionConfig"
+          },
+          {
+            "$ref": "#/components/schemas/ConnectionConfigWebApiConnectionConfig"
+          }
+        ],
+        "description": "五类连接配置的唯一判别联合，M1仅PostgreSQL具备运行能力。",
+        "discriminator": {
+          "propertyName": "type",
+          "mapping": {
+            "POSTGRESQL": "#/components/schemas/ConnectionConfigPgConnectionConfig",
+            "ORACLE": "#/components/schemas/ConnectionConfigOracleConnectionConfig",
+            "DORIS": "#/components/schemas/ConnectionConfigDorisConnectionConfig",
+            "TDENGINE": "#/components/schemas/ConnectionConfigTdengineConnectionConfig",
+            "WEB_API": "#/components/schemas/ConnectionConfigWebApiConnectionConfig"
+          }
+        }
+      },
+      "ConnectionConfigDorisConnectionConfig": {
+        "required": [
+          "profile",
+          "type"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "DORIS"
+            ],
+            "type": "string"
+          },
+          "profile": {
+            "description": "当前类型唯一的连接参数。",
+            "$ref": "#/components/schemas/DorisConnectionProfile"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Doris类型化配置分支，禁止夹带连接串或身份字段。"
+      },
+      "ConnectionConfigOracleConnectionConfig": {
+        "required": [
+          "profile",
+          "type"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "ORACLE"
+            ],
+            "type": "string"
+          },
+          "profile": {
+            "description": "当前类型唯一的连接参数。",
+            "$ref": "#/components/schemas/OracleConnectionProfile"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Oracle类型化配置分支，禁止夹带连接串或身份字段。"
+      },
+      "ConnectionConfigPgConnectionConfig": {
+        "required": [
+          "profile",
+          "type"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "POSTGRESQL"
+            ],
+            "type": "string"
+          },
+          "profile": {
+            "description": "当前类型唯一的连接参数。",
+            "$ref": "#/components/schemas/PgConnectionProfile"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Pg类型化配置分支，禁止夹带连接串或身份字段。"
+      },
+      "ConnectionConfigTdengineConnectionConfig": {
+        "required": [
+          "profile",
+          "type"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "TDENGINE"
+            ],
+            "type": "string"
+          },
+          "profile": {
+            "description": "当前类型唯一的连接参数。",
+            "$ref": "#/components/schemas/TdengineConnectionProfile"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Tdengine类型化配置分支，禁止夹带连接串或身份字段。"
+      },
+      "ConnectionConfigWebApiConnectionConfig": {
+        "required": [
+          "profile",
+          "type"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "WEB_API"
+            ],
+            "type": "string"
+          },
+          "profile": {
+            "description": "当前类型唯一的连接参数。",
+            "$ref": "#/components/schemas/WebApiConnectionProfile"
+          }
+        },
+        "additionalProperties": false,
+        "description": "WebApi类型化配置分支，禁止夹带连接串或身份字段。"
+      },
+      "ConnectionCreateRequest": {
+        "required": [
+          "displayName",
+          "scopeSelection",
+          "config",
+          "secretRef",
+          "command"
+        ],
+        "type": "object",
+        "properties": {
+          "displayName": {
+            "type": "string",
+            "description": "连接显示名称。"
+          },
+          "scopeSelection": {
+            "description": "客户端申请的组织厂区子集。",
+            "$ref": "#/components/schemas/ResourceScope"
+          },
+          "config": {
+            "description": "唯一类型化配置。",
+            "$ref": "#/components/schemas/ConnectionConfig"
+          },
+          "secretRef": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "仅专用密钥入口签发的引用。"
+          },
+          "command": {
+            "description": "创建修订为零的命令。",
+            "$ref": "#/components/schemas/CommandContext"
+          }
+        },
+        "additionalProperties": false,
+        "description": "创建草稿，禁止自动启用。"
+      },
+      "ConnectionDraftProbeRequest": {
+        "required": [
+          "scopeSelection",
+          "config",
+          "secretRef",
+          "command"
+        ],
+        "type": "object",
+        "properties": {
+          "scopeSelection": {
+            "description": "探测所选授权范围。",
+            "$ref": "#/components/schemas/ResourceScope"
+          },
+          "config": {
+            "description": "待测试的唯一配置。",
+            "$ref": "#/components/schemas/ConnectionConfig"
+          },
+          "secretRef": {
+            "type": "string",
+            "description": "未绑定且有效的秘密引用。"
+          },
+          "command": {
+            "description": "探测幂等命令。",
+            "$ref": "#/components/schemas/CommandContext"
+          }
+        },
+        "additionalProperties": false,
+        "description": "未保存草稿的真实只读探测请求。"
+      },
+      "ConnectionListPage": {
+        "required": [
+          "items",
+          "nextCursor"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ConnectionView"
+            },
+            "description": "当前页面。"
+          },
+          "nextCursor": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "下一页不透明游标。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "授权过滤后的有界连接分页。"
+      },
+      "ConnectionMutationCommand": {
+        "required": [
+          "command"
+        ],
+        "type": "object",
+        "properties": {
+          "command": {
+            "description": "包含幂等键与当前修订的命令。",
+            "$ref": "#/components/schemas/CommandContext"
+          }
+        },
+        "additionalProperties": false,
+        "description": "连接与发现任务的版本化变更命令。"
+      },
+      "ConnectionPatchRequest": {
+        "required": [
+          "command"
+        ],
+        "type": "object",
+        "properties": {
+          "displayName": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "新的显示名称。"
+          },
+          "scopeSelection": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "新的授权范围子集。",
+                "$ref": "#/components/schemas/ResourceScope"
+              }
+            ]
+          },
+          "config": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "新的类型化配置。",
+                "$ref": "#/components/schemas/ConnectionConfig"
+              }
+            ]
+          },
+          "command": {
+            "description": "包含正修订的编辑命令。",
+            "$ref": "#/components/schemas/CommandContext"
+          }
+        },
+        "additionalProperties": false,
+        "description": "CAS编辑非秘密配置，成功后旧Probe失效。"
+      },
+      "ConnectionProbeStage": {
+        "required": [
+          "name",
+          "status",
+          "durationMs",
+          "diagnosticCode"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "NETWORK或TLS或AUTH或READ_ONLY或METADATA。"
+          },
+          "status": {
+            "type": "string",
+            "description": "PASS或FAIL或NOT_VERIFIED或NOT_RUN。"
+          },
+          "durationMs": {
+            "type": "integer",
+            "description": "阶段实际耗时毫秒。",
+            "format": "int64"
+          },
+          "diagnosticCode": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "固定脱敏诊断码。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "真实探测的一个阶段，未观测不能标通过。"
+      },
+      "ConnectionProbeView": {
+        "required": [
+          "probeId",
+          "connectionId",
+          "configHash",
+          "secretVersion",
+          "scope",
+          "status",
+          "stages",
+          "startedAtUtc",
+          "completedAtUtc",
+          "expiresAtUtc",
+          "traceId",
+          "stale"
+        ],
+        "type": "object",
+        "properties": {
+          "probeId": {
+            "type": "string",
+            "description": "探测标识。"
+          },
+          "connectionId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "已保存连接标识，草稿为空。"
+          },
+          "configHash": {
+            "type": "string",
+            "description": "配置绑定SHA256。"
+          },
+          "secretVersion": {
+            "type": "integer",
+            "description": "使用的凭据版本。",
+            "format": "int64"
+          },
+          "scope": {
+            "description": "探测授权范围。",
+            "$ref": "#/components/schemas/ResourceScope"
+          },
+          "status": {
+            "type": "string",
+            "description": "探测状态，独立于连接状态。"
+          },
+          "stages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ConnectionProbeStage"
+            },
+            "description": "五个固定阶段。"
+          },
+          "startedAtUtc": {
+            "type": "string",
+            "description": "开始时刻。",
+            "format": "date-time"
+          },
+          "completedAtUtc": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "完成时刻。",
+            "format": "date-time"
+          },
+          "expiresAtUtc": {
+            "type": "string",
+            "description": "有效性截止。",
+            "format": "date-time"
+          },
+          "traceId": {
+            "type": "string",
+            "description": "脱敏关联标识。"
+          },
+          "stale": {
+            "type": "boolean",
+            "description": "是否已经失效。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "不可变探测报告及当前失效投影。"
+      },
+      "ConnectionRotateSecretRequest": {
+        "required": [
+          "secretRef",
+          "command"
+        ],
+        "type": "object",
+        "properties": {
+          "secretRef": {
+            "type": "string",
+            "description": "新签发的未绑定秘密引用。"
+          },
+          "command": {
+            "description": "正修订轮换命令。",
+            "$ref": "#/components/schemas/CommandContext"
+          }
+        },
+        "additionalProperties": false,
+        "description": "原子CAS轮换凭据并撤销旧探测。"
+      },
+      "ConnectionSecretIntakeRequest": {
+        "required": [
+          "secretValue",
+          "scopeSelection",
+          "purpose",
+          "command"
+        ],
+        "type": "object",
+        "properties": {
+          "secretValue": {
+            "type": "string",
+            "description": "仅服务器内存处理的合成凭据。"
+          },
+          "scopeSelection": {
+            "description": "密钥使用范围。",
+            "$ref": "#/components/schemas/ResourceScope"
+          },
+          "purpose": {
+            "type": "string",
+            "description": "唯一批准的凭据用途。"
+          },
+          "command": {
+            "description": "密钥签发命令。",
+            "$ref": "#/components/schemas/CommandContext"
+          }
+        },
+        "additionalProperties": false,
+        "description": "专用敏感入口请求，禁止普通日志序列化。"
+      },
+      "ConnectionView": {
+        "required": [
+          "id",
+          "displayName",
+          "scope",
+          "config",
+          "configRevision",
+          "state",
+          "secretConfigured",
+          "secretVersion",
+          "probeFresh",
+          "lastProbeId",
+          "updatedAtUtc"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "连接标识。"
+          },
+          "displayName": {
+            "type": "string",
+            "description": "显示名称。"
+          },
+          "scope": {
+            "description": "已授权资源范围。",
+            "$ref": "#/components/schemas/ResourceScope"
+          },
+          "config": {
+            "description": "非秘密受控配置。",
+            "$ref": "#/components/schemas/ConnectionConfig"
+          },
+          "configRevision": {
+            "type": "integer",
+            "description": "资源CAS修订。",
+            "format": "int64"
+          },
+          "state": {
+            "type": "string",
+            "description": "DRAFT或ACTIVE或DISABLED。"
+          },
+          "secretConfigured": {
+            "type": "boolean",
+            "description": "凭据是否已绑定。"
+          },
+          "secretVersion": {
+            "type": "integer",
+            "description": "当前凭据版本。",
+            "format": "int64"
+          },
+          "probeFresh": {
+            "type": "boolean",
+            "description": "当前完整探测是否仍有效。"
+          },
+          "lastProbeId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "最近探测标识。"
+          },
+          "updatedAtUtc": {
+            "type": "string",
+            "description": "最近更新时刻。",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false,
+        "description": "不包含秘密引用或密文的连接视图。"
+      },
+      "DorisConnectionProfile": {
+        "required": [
+          "feHost",
+          "queryPort",
+          "catalog",
+          "database",
+          "username",
+          "tls"
+        ],
+        "type": "object",
+        "properties": {
+          "feHost": {
+            "type": "string",
+            "description": "前端节点名称。"
+          },
+          "queryPort": {
+            "type": "integer",
+            "description": "查询端口。",
+            "format": "int32"
+          },
+          "catalog": {
+            "type": "string",
+            "description": "目录名称。"
+          },
+          "database": {
+            "type": "string",
+            "description": "数据库名称。"
+          },
+          "username": {
+            "type": "string",
+            "description": "账号名称。"
+          },
+          "tls": {
+            "type": "boolean",
+            "description": "是否要求加密。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Doris配置预览，本阶段不可连接。"
+      },
+      "OracleConnectionProfile": {
+        "required": [
+          "host",
+          "port",
+          "serviceName",
+          "username",
+          "tls",
+          "allowedOwners"
+        ],
+        "type": "object",
+        "properties": {
+          "host": {
+            "type": "string",
+            "description": "服务器名称。"
+          },
+          "port": {
+            "type": "integer",
+            "description": "服务端口。",
+            "format": "int32"
+          },
+          "serviceName": {
+            "type": "string",
+            "description": "Oracle服务名称。"
+          },
+          "username": {
+            "type": "string",
+            "description": "账号名称。"
+          },
+          "tls": {
+            "type": "boolean",
+            "description": "是否要求加密。"
+          },
+          "allowedOwners": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "允许的Owner集合。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Oracle配置预览，本阶段不可连接。"
+      },
+      "PgConnectionProfile": {
+        "required": [
+          "host",
+          "port",
+          "database",
+          "username",
+          "sslMode",
+          "allowedSchemas"
+        ],
+        "type": "object",
+        "properties": {
+          "host": {
+            "type": "string",
+            "description": "源服务受控主机名。"
+          },
+          "port": {
+            "type": "integer",
+            "description": "源服务端口。",
+            "format": "int32"
+          },
+          "database": {
+            "type": "string",
+            "description": "目标数据库名称。"
+          },
+          "username": {
+            "type": "string",
+            "description": "只读源账号。"
+          },
+          "sslMode": {
+            "type": "string",
+            "description": "TLS身份验证模式。"
+          },
+          "allowedSchemas": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "允许发现的Schema集合。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "PostgreSQL受控连接配置，证书信任仅来自服务器。"
+      },
+      "ResourceScope": {
+        "required": [
+          "organizationId",
+          "siteIds"
+        ],
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "type": "string",
+            "description": "资源所属组织。"
+          },
+          "siteIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "完整且规范化的非空厂区集合。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "不可由客户端扩大的资源组织与完整厂区范围。"
+      },
+      "SecretIntakeReceipt": {
+        "required": [
+          "secretRef",
+          "expiresAtUtc",
+          "usageLimit",
+          "credentialVersion"
+        ],
+        "type": "object",
+        "properties": {
+          "secretRef": {
+            "type": "string",
+            "description": "随机不透明引用。"
+          },
+          "expiresAtUtc": {
+            "type": "string",
+            "description": "未绑定引用过期时间。",
+            "format": "date-time"
+          },
+          "usageLimit": {
+            "type": "integer",
+            "description": "允许绑定次数。",
+            "format": "int32"
+          },
+          "credentialVersion": {
+            "type": "integer",
+            "description": "凭据版本。",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false,
+        "description": "只返回一次短寿命引用，不回显密钥。"
+      },
+      "TdengineConnectionProfile": {
+        "required": [
+          "wsUrl",
+          "database",
+          "timePrecision",
+          "timeZone"
+        ],
+        "type": "object",
+        "properties": {
+          "wsUrl": {
+            "type": "string",
+            "description": "受控WebSocket地址。"
+          },
+          "database": {
+            "type": "string",
+            "description": "数据库名称。"
+          },
+          "timePrecision": {
+            "type": "string",
+            "description": "时间精度。"
+          },
+          "timeZone": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "时间区域。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "TDengine配置预览，本阶段不可连接。"
+      },
+      "WebApiConnectionProfile": {
+        "required": [
+          "baseOrigin",
+          "operationId",
+          "method",
+          "approvedPath",
+          "authentication",
+          "pagination",
+          "hostPolicyRef"
+        ],
+        "type": "object",
+        "properties": {
+          "baseOrigin": {
+            "type": "string",
+            "description": "已批准源站。"
+          },
+          "operationId": {
+            "type": "string",
+            "description": "已批准操作标识。"
+          },
+          "method": {
+            "type": "string",
+            "description": "只读HTTP方法。"
+          },
+          "approvedPath": {
+            "type": "string",
+            "description": "已批准相对路径。"
+          },
+          "authentication": {
+            "type": "string",
+            "description": "认证方式。"
+          },
+          "pagination": {
+            "type": "string",
+            "description": "分页策略。"
+          },
+          "hostPolicyRef": {
+            "type": "string",
+            "description": "服务器网络策略引用。"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Web API配置预览，本阶段不发送请求。"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Connections"
+    }
+  ]
+}

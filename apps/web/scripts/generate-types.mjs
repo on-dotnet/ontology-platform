@@ -2,7 +2,7 @@ import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { declarationsFor } from "./openapi-types.mjs";
 
 /** 只从Master冻结或真实导出的OpenAPI生成类型，业务适配与生成内容分开维护。 */
-for (const [sourceName, targetName] of [["g1-platform.openapi.json", "generated.ts"], ["g2-platform.openapi.json", "g2-generated.ts"]]) {
+for (const [sourceName, targetName] of [["g1-platform.openapi.json", "generated.ts"], ["g2-platform.openapi.json", "g2-generated.ts"], ["g4-connections.openapi.json", "g4-generated.ts"]]) {
   const path = new URL(`../../../docs/contracts/${sourceName}`, import.meta.url);
   if (!existsSync(path)) continue;
   const source = JSON.parse(readFileSync(path, "utf8"));

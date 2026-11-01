@@ -23,7 +23,7 @@ function getMobileNavigationSnapshot() { return window.matchMedia(mobileNavigati
 function getServerNavigationSnapshot() { return true; }
 const views = [{ id: "resources" as const, title: "平台资源", icon: "grid", note: "授权资源工作区" }, { id: "audit" as const, title: "访问审计", icon: "activity", note: "事件与 Trace 关联" }, { id: "scope" as const, title: "授权范围", icon: "shield", note: "身份与访问边界" }];
 /** 仅保存真实请求结果；失败时清除旧数据并区分认证、无权和依赖故障。 */
-export function Workspace({ identity, children, section }: { identity: PlatformIdentity; children?: React.ReactNode; section?: "ontologies" | "releases" | "analysis" }) {
+export function Workspace({ identity, children, section }: { identity: PlatformIdentity; children?: React.ReactNode; section?: "ontologies" | "releases" | "analysis" | "connections" }) {
   const [view, setView] = useState<View>("resources");
   const [sidebar, setSidebar] = useState(false);
   const mobileNavigation = useSyncExternalStore(subscribeMobileNavigation, getMobileNavigationSnapshot, getServerNavigationSnapshot);
@@ -37,7 +37,7 @@ export function Workspace({ identity, children, section }: { identity: PlatformI
   const [csrf, setCsrf] = useState("");
   const [logoutError, setLogoutError] = useState(false);
   const logoutForm = useRef<HTMLFormElement>(null);
-  const currentView = section ? { title: { ontologies: "本体资产", releases: "发布治理", analysis: "语义分析" }[section], note: "G2 真实语义工作区" } : views.find(item => item.id === view)!;
+  const currentView = section ? { title: { ontologies: "本体资产", releases: "发布治理", analysis: "语义分析", connections: "数据源" }[section], note: section === "connections" ? "连接管理与结构目录" : "G2 真实语义工作区" } : views.find(item => item.id === view)!;
   useEffect(() => {
     if (section || view === "scope") return;
     const controller = new AbortController();
@@ -81,7 +81,7 @@ export function Workspace({ identity, children, section }: { identity: PlatformI
         <span className="tiny-dot" />
       </div>
       <p className="nav-caption">工作台</p>
-      <nav>{[{ href: "/ontologies", title: "本体资产", id: "ontologies" }, { href: "/releases", title: "发布治理", id: "releases" }, { href: "/analysis", title: "语义分析", id: "analysis" }].map(item => <Link key={item.id} href={item.href} className={`nav-item ${section === item.id ? "active" : ""}`} aria-current={section === item.id ? "page" : undefined}><Icon name="box" /><span>{item.title}</span></Link>)}{section && <Link href="/" className="nav-item"><Icon name="grid" /><span>平台治理</span></Link>}{!section && views.map(item => <button key={item.id} className={`nav-item ${view === item.id ? "active" : ""}`} onClick={() => changeView(item.id)} aria-current={view === item.id ? "page" : undefined}>
+      <nav>{[{ href: "/ontologies", title: "本体资产", id: "ontologies" }, { href: "/releases", title: "发布治理", id: "releases" }, { href: "/analysis", title: "语义分析", id: "analysis" }].map(item => <Link key={item.id} href={item.href} className={`nav-item ${section === item.id ? "active" : ""}`} aria-current={section === item.id ? "page" : undefined}><Icon name="box" /><span>{item.title}</span></Link>)}{identity.roles.some(role => role === "platform.operator" || role === "platform.auditor") && <Link href="/data/connections" className={`nav-item ${section === "connections" ? "active" : ""}`} aria-current={section === "connections" ? "page" : undefined}><Icon name="box" /><span>数据源</span></Link>}{section && <Link href="/" className="nav-item"><Icon name="grid" /><span>平台治理</span></Link>}{!section && views.map(item => <button key={item.id} className={`nav-item ${view === item.id ? "active" : ""}`} onClick={() => changeView(item.id)} aria-current={view === item.id ? "page" : undefined}>
         <Icon name={item.icon} />
         <span>{item.title}</span>{view === item.id && <span className="nav-indicator" />}</button>)}</nav>
       <div className="sidebar-bottom">
