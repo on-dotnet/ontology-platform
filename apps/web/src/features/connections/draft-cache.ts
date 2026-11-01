@@ -4,9 +4,15 @@ import { connectionTypes, formFields, type ConnectionForm } from "./form-model";
 export function draftCacheKey(identity: PlatformIdentity) {
   return `connection-form:${JSON.stringify([identity.subjectId, [...identity.roles].sort(), identity.scopes.map(scope => [scope.organizationId, scope.siteId]).sort()])}`;
 }
-/** 误贴连接串或含凭据URL的任何输入不进入缓存，主机额外要求合法单一名称。 */
+/** URL只缓存无参数、片段及用户信息的值；误贴连接串和非法主机不进入缓存。 */
 function cacheValue(key: string, value: string): string {
-  if (/:\/\/[^/]*@/.test(value) || /(?:^|[;\s])(?:password|pwd|secret|token|access[_-]?token)\s*=/i.test(value)) return "";
+  if (/:\/\/[^/]*@/.test(value) || /(?:^|[;\s?&#])(?:password|pwd|secret|token|access[_-]?token)\s*=/i.test(value)) return "";
+  if (["wsUrl", "baseOrigin", "approvedPath"].includes(key)) {
+    try {
+      const url = key === "approvedPath" ? new URL(value, "https://draft.invalid") : new URL(value);
+      if (url.username || url.password || value.includes("?") || value.includes("#")) return "";
+    } catch { return ""; }
+  }
   if (["host", "feHost"].includes(key) && !/^[A-Za-z0-9][A-Za-z0-9.-]*$/.test(value)) return "";
   return value;
 }
