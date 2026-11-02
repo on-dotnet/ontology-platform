@@ -8,17 +8,17 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const containerId = process.argv[2];
 if (process.argv.length !== 3 || !/^[a-f0-9]{64}$/.test(containerId ?? '')) process.exit(2);
 const inspect = JSON.parse(execFileSync('docker', ['--context', 'desktop-linux', 'inspect', containerId], { encoding: 'utf8', maxBuffer: 1024 * 1024 }))[0];
-if (inspect.Config.Labels['ontology.task-id'] !== 'G4-M1-FINAL-GATES-001' || inspect.Config.Labels['ontology.run-id'] !== 'final-gates-20261102-r04' || inspect.Name !== '/ontology-g4-m1-final-gates-001-r04-web-1' || !inspect.State.Running || !inspect.HostConfig.NetworkMode.startsWith('container:')) process.exit(2);
+if (inspect.Config.Labels['ontology.task-id'] !== 'G4-M1-FINAL-GATES-001' || inspect.Config.Labels['ontology.run-id'] !== 'final-gates-20261102-r04-final' || inspect.Name !== '/ontology-g4-m1-final-gates-001-r04-final-web-1' || !inspect.State.Running || !inspect.HostConfig.NetworkMode.startsWith('container:')) process.exit(2);
 const image = JSON.parse(execFileSync('docker', ['--context', 'desktop-linux', 'image', 'inspect', inspect.Image], { encoding: 'utf8', maxBuffer: 1024 * 1024 }))[0];
 if (image.Descriptor.digest !== 'sha256:a52166d89cfcc66ea62d10535ca712d161cece5d77ff4cfa758866b6b75ccb3f' || image.Os !== 'linux' || image.Architecture !== 'arm64') process.exit(2);
 const apiId = inspect.HostConfig.NetworkMode.slice('container:'.length);
 const api = JSON.parse(execFileSync('docker', ['--context', 'desktop-linux', 'inspect', apiId], { encoding: 'utf8', maxBuffer: 1024 * 1024 }))[0];
-if (api.Name !== '/ontology-g4-m1-final-gates-001-r04-api-1' || api.Config.Labels['ontology.task-id'] !== 'G4-M1-FINAL-GATES-001' || api.Config.Labels['ontology.run-id'] !== 'final-gates-20261102-r04') process.exit(2);
+if (api.Name !== '/ontology-g4-m1-final-gates-001-r04-final-api-1' || api.Config.Labels['ontology.task-id'] !== 'G4-M1-FINAL-GATES-001' || api.Config.Labels['ontology.run-id'] !== 'final-gates-20261102-r04-final') process.exit(2);
 const active = new Set();
 const servers = [];
 let closing = false;
-const receipt = path.join(root, `artifacts/g4-m1-final-gates-001/r04/host-ingress-process-${process.pid}.json`);
-const events = path.join(root, 'artifacts/g4-m1-final-gates-001/r04/host-ingress-events.jsonl');
+const receipt = path.join(root, `artifacts/g4-m1-final-gates-001/r04-final/host-ingress-process-${process.pid}.json`);
+const events = path.join(root, 'artifacts/g4-m1-final-gates-001/r04-final/host-ingress-events.jsonl');
 function event(name, details = {}) { fs.appendFileSync(events, JSON.stringify({ utc: new Date().toISOString(), pid: process.pid, event: name, ...details }) + '\n'); }
 let listening = 0;
 fs.writeFileSync(receipt, JSON.stringify({ taskId: 'G4-M1-FINAL-GATES-001', pid: process.pid, containerId, apiId, ports: [15100, 15180], bind: '127.0.0.1', maxConcurrent: 8, absoluteConnectionSeconds: 30, processMaxSeconds: 7200, startedUtc: new Date().toISOString() }, null, 2), { flag: 'wx' });

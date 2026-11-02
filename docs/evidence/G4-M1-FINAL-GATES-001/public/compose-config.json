@@ -1,0 +1,200 @@
+{
+  "name": "ontology-g4-m1-final-gates-001-public",
+  "networks": {
+    "source": {
+      "name": "ontology-g4-m1-final-gates-001-public_source",
+      "ipam": {},
+      "internal": true,
+      "labels": {
+        "ontology.run-id": "final-gates-20261102-public",
+        "ontology.task-id": "G4-M1-FINAL-GATES-001"
+      }
+    }
+  },
+  "services": {
+    "pg-adapter-test": {
+      "profiles": [
+        "pg-test"
+      ],
+      "cap_drop": [
+        "ALL"
+      ],
+      "cpus": 2,
+      "command": [
+        "/bin/sh",
+        "-ec",
+        "sleep 3600"
+      ],
+      "entrypoint": null,
+      "environment": {
+        "DOTNET_CLI_TELEMETRY_OPTOUT": "1",
+        "DOTNET_EnableDiagnostics": "0",
+        "G4_PG_ADAPTER_TEST_INPUT": "/run/secrets/adapter-input.json"
+      },
+      "image": "mcr.microsoft.com/dotnet/aspnet@sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55",
+      "labels": {
+        "ontology.run-id": "final-gates-20261102-public",
+        "ontology.synthetic": "true",
+        "ontology.task-id": "G4-M1-FINAL-GATES-001"
+      },
+      "mem_limit": "805306368",
+      "networks": {
+        "source": null
+      },
+      "pids_limit": 128,
+      "platform": "linux/arm64",
+      "pull_policy": "never",
+      "read_only": true,
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "tmpfs": [
+        "/tmp:size=32m,mode=1777"
+      ],
+      "user": "501:20",
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/.tools/security/g4-m1-final-gates-001-public-20261102/adapter-input.json",
+          "target": "/run/secrets/adapter-input.json",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/.tools/security/g4-m1-final-gates-001-public-20261102/reader-password",
+          "target": "/run/secrets/reader-password",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/.tools/security/g4-m1-final-gates-001-public-20261102/ca.crt",
+          "target": "/run/secrets/ca.crt",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/.tools/security/g4-m1-final-gates-001-public-20261102/wrong-ca.crt",
+          "target": "/run/secrets/wrong-ca.crt",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/artifacts/g4-m1-final-gates-001/public-tests",
+          "target": "/tests",
+          "read_only": true
+        }
+      ],
+      "working_dir": "/tmp"
+    },
+    "pg-source": {
+      "cap_add": [
+        "CHOWN",
+        "SETUID",
+        "SETGID",
+        "DAC_OVERRIDE",
+        "FOWNER"
+      ],
+      "cap_drop": [
+        "ALL"
+      ],
+      "cpus": 2,
+      "command": [
+        "chown postgres:postgres /var/lib/postgresql\ncp /run/secrets/postgres-password /var/lib/postgresql/postgres-password\ncp /run/secrets/server.crt /var/lib/postgresql/server.crt\ncp /run/secrets/server.key /var/lib/postgresql/server.key\ncp /run/secrets/pg_hba.conf /var/lib/postgresql/pg_hba.conf\ncp /run/secrets/init.sql /docker-entrypoint-initdb.d/10-fixture.sql\nchown postgres:postgres /var/lib/postgresql/postgres-password /var/lib/postgresql/server.crt /var/lib/postgresql/server.key /var/lib/postgresql/pg_hba.conf /docker-entrypoint-initdb.d/10-fixture.sql\nchmod 600 /var/lib/postgresql/postgres-password /var/lib/postgresql/server.crt /var/lib/postgresql/server.key /var/lib/postgresql/pg_hba.conf /docker-entrypoint-initdb.d/10-fixture.sql\nexec /usr/local/bin/docker-entrypoint.sh postgres -c ssl=on -c ssl_cert_file=/var/lib/postgresql/server.crt -c ssl_key_file=/var/lib/postgresql/server.key -c hba_file=/var/lib/postgresql/pg_hba.conf -c log_statement=none -c log_min_error_statement=panic\n"
+      ],
+      "entrypoint": [
+        "/bin/sh",
+        "-ec"
+      ],
+      "environment": {
+        "POSTGRES_DB": "fixture",
+        "POSTGRES_PASSWORD_FILE": "/var/lib/postgresql/postgres-password",
+        "POSTGRES_USER": "postgres"
+      },
+      "image": "postgres@sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+      "labels": {
+        "ontology.run-id": "final-gates-20261102-public",
+        "ontology.synthetic": "true",
+        "ontology.task-id": "G4-M1-FINAL-GATES-001"
+      },
+      "mem_limit": "805306368",
+      "networks": {
+        "source": null
+      },
+      "pids_limit": 128,
+      "platform": "linux/arm64",
+      "pull_policy": "never",
+      "read_only": true,
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "tmpfs": [
+        "/tmp:size=16m,mode=1777",
+        "/var/run/postgresql:size=4m,mode=3775,uid=999,gid=999",
+        "/docker-entrypoint-initdb.d:size=4m,mode=0755"
+      ],
+      "volumes": [
+        {
+          "type": "volume",
+          "source": "source-data",
+          "target": "/var/lib/postgresql",
+          "volume": {}
+        },
+        {
+          "type": "bind",
+          "source": "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/.tools/security/g4-m1-final-gates-001-public-20261102/postgres-password",
+          "target": "/run/secrets/postgres-password",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/.tools/security/g4-m1-final-gates-001-public-20261102/init.sql",
+          "target": "/run/secrets/init.sql",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/.tools/security/g4-m1-final-gates-001-public-20261102/pg_hba.conf",
+          "target": "/run/secrets/pg_hba.conf",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/.tools/security/g4-m1-final-gates-001-public-20261102/server.crt",
+          "target": "/run/secrets/server.crt",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/.tools/security/g4-m1-final-gates-001-public-20261102/server.key",
+          "target": "/run/secrets/server.key",
+          "read_only": true
+        }
+      ],
+      "healthcheck": {
+        "test": [
+          "CMD-SHELL",
+          "pg_isready -U postgres -d fixture"
+        ],
+        "timeout": "2s",
+        "interval": "2s",
+        "retries": 15
+      }
+    }
+  },
+  "volumes": {
+    "source-data": {
+      "name": "ontology-g4-m1-final-gates-001-public_source-data",
+      "driver": "local",
+      "driver_opts": {
+        "device": "tmpfs",
+        "o": "size=512m,mode=0700",
+        "type": "tmpfs"
+      },
+      "labels": {
+        "ontology.run-id": "final-gates-20261102-public",
+        "ontology.synthetic": "true",
+        "ontology.task-id": "G4-M1-FINAL-GATES-001"
+      }
+    }
+  }
+}

@@ -1,8 +1,8 @@
 """只修改本任务realm的合成operator-a组织属性，独立恢复并实测跨组织引用拒绝。"""
 from pathlib import Path
 import copy,hashlib,json,os,re,subprocess,threading,urllib.request,urllib.parse,urllib.error
-ROOT=Path(__file__).resolve().parents[2];ART=ROOT/'artifacts/g4-m1-final-gates-001/r04'
-PRIVATE=ROOT/'.tools/security/g4-m1-final-gates-001-r04-20261102';records=[];errors=[];original=None;user_path=None;token=None;original_profile=None;profile_changed=False;user_changed=False
+ROOT=Path(__file__).resolve().parents[2];ART=ROOT/'artifacts/g4-m1-final-gates-001/r04-final'
+PRIVATE=ROOT/'.tools/security/g4-m1-final-gates-001-r04-final-20261102';records=[];errors=[];original=None;user_path=None;token=None;original_profile=None;profile_changed=False;user_changed=False
 restore_lock=threading.RLock()
 guard_expired=threading.Event()
 report=dict(taskId='G4-M1-FINAL-GATES-001',status='FAIL',commands=records)
@@ -28,8 +28,8 @@ def request(method,path,body=None,form=False):
 try:
     realm=json.loads((PRIVATE/'realm.json').read_text());realm_name=realm['authority'].rsplit('/',1)[1]
     assert re.fullmatch('g2-[a-f0-9]+',realm_name)
-    obj=json.loads(subprocess.check_output(['docker','--context','desktop-linux','inspect','ontology-g4-m1-final-gates-001-r04-keycloak-test-1'],text=True))[0]
-    assert obj['Config']['Labels']['ontology.task-id']==report['taskId'] and obj['Config']['Labels']['ontology.run-id']=='final-gates-20261102-r04'
+    obj=json.loads(subprocess.check_output(['docker','--context','desktop-linux','inspect','ontology-g4-m1-final-gates-001-r04-final-keycloak-test-1'],text=True))[0]
+    assert obj['Config']['Labels']['ontology.task-id']==report['taskId'] and obj['Config']['Labels']['ontology.run-id']=='final-gates-20261102-r04-final'
     token=request('POST','/realms/master/protocol/openid-connect/token',{'grant_type':'password','client_id':'admin-cli','username':'wave2-bootstrap','password':(PRIVATE/'keycloak-password').read_text()},True)['access_token']
     base='/admin/realms/'+realm_name+'/users'
     profile=request('GET',base+'/profile')

@@ -1,0 +1,20 @@
+{
+  "command": [
+    "docker",
+    "--context",
+    "desktop-linux",
+    "compose",
+    "-f",
+    "experiments/g4-m1-final-gates/compose.public.yaml",
+    "--profile",
+    "pg-test",
+    "up",
+    "-d",
+    "--no-build",
+    "--pull",
+    "never"
+  ],
+  "exitCode": 0,
+  "stdout": "",
+  "stderr": " Network ontology-g4-m1-final-gates-001-public_source Creating \n Network ontology-g4-m1-final-gates-001-public_source Creating \n Volume ontology-g4-m1-final-gates-001-public_source-data Creating \n Volume ontology-g4-m1-final-gates-001-public_source-data Creating \n Volume ontology-g4-m1-final-gates-001-public_source-data Created \n Volume ontology-g4-m1-final-gates-001-public_source-data Created \n Network ontology-g4-m1-final-gates-001-public_source Created \n Network ontology-g4-m1-final-gates-001-public_source Created \n Container ontology-g4-m1-final-gates-001-public-pg-source-1 Creating \n Container ontology-g4-m1-final-gates-001-public-pg-adapter-test-1 Creating \n Container ontology-g4-m1-final-gates-001-public-pg-adapter-test-1 Created \n Container ontology-g4-m1-final-gates-001-public-pg-source-1 Created \n Container ontology-g4-m1-final-gates-001-public-pg-adapter-test-1 Starting \n Container ontology-g4-m1-final-gates-001-public-pg-source-1 Starting \n Container ontology-g4-m1-final-gates-001-public-pg-adapter-test-1 Started \n Container ontology-g4-m1-final-gates-001-public-pg-source-1 Started \n"
+}

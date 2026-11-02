@@ -208,7 +208,7 @@ function status(result, expected, code) {
 try {
   const args=process.argv.slice(2);demand(args.length===4 && args[0]==='--runtime-file' && args[2]==='--evidence-dir','arguments_invalid');
   output=await prepareEvidence(args[3]);const runtime=JSON.parse(await privateText(resolve(args[1])));
-  demand(runtime.taskId===report.taskId && runtime.runId==='final-gates-20261102-r04','runtime_identity_invalid');
+  demand(runtime.taskId===report.taskId && runtime.runId==='final-gates-20261102-r04-final','runtime_identity_invalid');
   const realm=JSON.parse(await privateText(runtime.realmFile));
   demand(/^http:\/\/localhost:15180\/realms\/g2-[a-f0-9]+$/.test(realm.authority),'issuer_denied');
   remember(realm.clientSecret);remember(runtime.certificatePassword);remember(runtime.healthKey);
@@ -276,33 +276,35 @@ try {
   let releases=await get(operator,'/api/v1/releases');const r1=releases.find(x=>x.isActive&&x.manifest.assetId===draft.assetId);demand(r1,'release_one_missing');report.releases=[r1];
   const capabilities=await get(operator,'/api/v1/capabilities');const cap=capabilities.find(x=>x.id==='resolve_entity');demand(cap,'resolve_capability_missing');
   const plan={capabilityId:'resolve_entity',capabilityVersion:cap.version,assetId:draft.assetId,releaseId:null,entityType:null,entityIri:null,externalId:'heat-1',siteId:'site-a',relationshipIris:[],depth:5,maxRows:100,timeoutMs:5000};
-  async function query(expected){
+  async function query(expected, expectedLabel){
     phase='query';const result=await post(operator,'/api/v1/semantic/queries',plan);(report.queries??=[]).push(result);
+    check('actual_version_specific_entity',result.data[0]?.entity?.label===expectedLabel);
     check('Jena_result_bound',result.status==='FOUND' && JSON.stringify(result.snapshot)===JSON.stringify(expected.manifest.snapshot));
-    demand(result.evidence.length>0,'evidence_missing');const evidence=await get(operator,'/api/v1/evidence/'+result.evidence[0].evidenceId);(report.evidence??=[]).push(evidence);
+    demand(result.evidence.length>0,'evidence_missing');const evidence=await get(operator,'/api/v1/evidence/'+result.evidence.find(x=>x.predicateIri==='http://www.w3.org/2000/01/rdf-schema#label').evidenceId);(report.evidence??=[]).push(evidence);
     check('evidence_same_version',evidence.releaseId===expected.manifest.releaseId && evidence.contentHash===expected.manifest.hashes.dataHash && evidence.sourceObjectKey===expected.manifest.artifactObjects.at(-1).objectKey && evidence.graphIri===expected.manifest.dataGraphIri);
     status(await request(foreign,'POST','/api/v1/semantic/queries',plan),403);check('foreign_query_denied');
     status(await request(foreign,'GET','/api/v1/evidence/'+evidence.evidenceId),403);check('foreign_evidence_denied');return result;
   }
-  await query(r1);
-  phase='revision2';draft=status(await request(operator,'PUT','/api/v1/ontology-drafts/'+draft.draftId,{name:draft.name,sources:{...sources,ontologyTurtle:sources.ontologyTurtle+'\n# Synthetic final-gates revision two\n'},command:contextCommand(draft.revision)},{headers:{'If-Match':'"'+draft.revision+'"'}}),200);report.drafts.push(draft);
+  await query(r1,'炉次heat-1');
+  phase='revision2';draft=status(await request(operator,'PUT','/api/v1/ontology-drafts/'+draft.draftId,{name:draft.name,sources:{...sources,dataTurtle:sources.dataTurtle.replaceAll('炉次heat-1','炉次heat-1-R04-v2')},command:contextCommand(draft.revision)},{headers:{'If-Match':'"'+draft.revision+'"'}}),200);report.drafts.push(draft);
   const p2=await proposal(draft);
-  phase='store_fault';const docker=['--context','desktop-linux'];const name='ontology-g4-m1-final-gates-001-r04-rustfs-1';
+  phase='store_fault';const docker=['--context','desktop-linux'];const name='ontology-g4-m1-final-gates-001-r04-final-rustfs-1';
   const inspect=JSON.parse(execFileSync('docker',[...docker,'inspect',name,'--format','{{json .}}'],{encoding:'utf8'}));
   demand(inspect.Config.Labels['ontology.task-id']===report.taskId&&inspect.Config.Labels['ontology.run-id']===runtime.runId&&inspect.State.Running&&!inspect.State.Paused,'fault_ownership');
-  const id=inspect.Id;report.fault={containerId:id,beforeActive:r1.manifest.releaseId,commands:[]};
+  const id=inspect.Id;report.fault={containerId:id,beforeActive:r1,commands:[]};
   try{
     execFileSync('docker',[...docker,'pause',id]);report.fault.commands.push({command:['docker',...docker,'pause',id],exitCode:0});
     const failed=await request(operator,'POST','/api/v1/release-activations',{proposalId:p2.proposalId,expectedActivationRevision:a1.activationRevision,expectedActiveReleaseId:r1.manifest.releaseId,command:contextCommand(p2.revision)},{headers:{'If-Match':'"'+p2.revision+'"'}});
-    status(failed,503);report.fault.rejection=failed.data.code;
+    status(failed,503,'artifact_store_timeout');report.fault.rejection=failed.data.code;
   }finally{execFileSync('docker',[...docker,'unpause',id]);report.fault.commands.push({command:['docker',...docker,'unpause',id],exitCode:0});}
-  releases=await get(operator,'/api/v1/releases');check('fault_active_unchanged',releases.filter(x=>x.isActive).length===1&&releases.find(x=>x.isActive).manifest.releaseId===r1.manifest.releaseId);
-  await query(r1);
+  releases=await get(operator,'/api/v1/releases');report.fault.afterActive=releases.filter(x=>x.isActive);check('fault_active_unchanged',releases.filter(x=>x.isActive).length===1&&releases.find(x=>x.isActive).manifest.releaseId===r1.manifest.releaseId && releases.find(x=>x.isActive).manifestHash===r1.manifestHash && releases.find(x=>x.isActive).activationRevision===a1.activationRevision);
+  await query(r1,'炉次heat-1');
   phase='publish2';const a2=await activate(p2,a1.activationRevision,r1.manifest.releaseId);report.activations.push(a2);
-  releases=await get(operator,'/api/v1/releases');const r2=releases.find(x=>x.isActive);report.releases.push(r2);check('second_release_distinct',r2.manifest.releaseId!==r1.manifest.releaseId&&r2.manifest.hashes.bundleHash!==r1.manifest.hashes.bundleHash);await query(r2);
+  releases=await get(operator,'/api/v1/releases');const r2=releases.find(x=>x.isActive);report.releases.push(r2);check('second_release_distinct',r2.manifest.releaseId!==r1.manifest.releaseId&&r2.manifest.hashes.bundleHash!==r1.manifest.hashes.bundleHash && r2.manifest.hashes.dataHash!==r1.manifest.hashes.dataHash);await query(r2,'炉次heat-1-R04-v2');
   phase='rollback';const rollback=await approve(await post(operator,'/api/v1/release-proposals',{kind:'ROLLBACK',draftId:null,draftRevision:null,hashes:null,validationReportId:null,targetReleaseId:r1.manifest.releaseId,targetManifestHash:r1.manifestHash,command:contextCommand(0)}));
   report.activations.push(await activate(rollback,a2.activationRevision,r2.manifest.releaseId));
-  releases=await get(operator,'/api/v1/releases');const rolled=releases.find(x=>x.isActive);check('rollback_exact_complete_manifest',rolled.manifest.releaseId===r1.manifest.releaseId&&JSON.stringify(rolled.manifest)===JSON.stringify(r1.manifest));await query(r1);
+  releases=await get(operator,'/api/v1/releases');const rolled=releases.find(x=>x.isActive);check('rollback_exact_complete_manifest',rolled.manifest.releaseId===r1.manifest.releaseId&&JSON.stringify(rolled.manifest)===JSON.stringify(r1.manifest));await query(r1,'炉次heat-1');
+  check('activation_revisions_contiguous',report.activations.map(x=>x.activationRevision).join(',')==='1,2,3');
   report.audit=await get(auditor,'/api/v1/platform/audit?limit=100');check('real_audit_present',report.audit.length>0);complete('M1-R04');
 }catch(error){report.failure={phase,...safeFailure(error,'r04_runtime_error')};}
 finally{

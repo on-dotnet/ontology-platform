@@ -12,9 +12,9 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[2]
 TASK = 'G4-M1-FINAL-GATES-001'
-RUN = 'final-gates-20261102-r04'
-PRIVATE = ROOT / '.tools/security/g4-m1-final-gates-001-r04-20261102'
-ARTIFACTS = ROOT / 'artifacts/g4-m1-final-gates-001/r04'
+RUN = 'final-gates-20261102-r04-final'
+PRIVATE = ROOT / '.tools/security/g4-m1-final-gates-001-r04-final-20261102'
+ARTIFACTS = ROOT / 'artifacts/g4-m1-final-gates-001/r04-final'
 
 
 def write_private(path, value):

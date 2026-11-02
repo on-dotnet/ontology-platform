@@ -1,0 +1,4 @@
+# public补测及下一次R04准入独立复核
+非作者 /root/final_gates_reviewer：public 7状态真实PASS，每次1 passed/0 skipped，A恒成功、B精确拒绝/目录等价，baseline/restored/sourceFinal一致。报告SHA256 37f364b0159a53ecdbf022c66fff38fe276f57b7f4792e6b3bcef289d9d5c514，测试源码匹配48d53eee，启动器失败保留。
+清理PASS_FOR_APPLY：04dad77c186e5340017c43428c48f4bcc5e8195c5cb0ba2ac6de47cc42c2a92f，4对象2容器1卷1网络身份全匹配，16镜像8旧卷3旧网KEEP。
+最终R04运行准入PASS_FOR_SCOPED_RUNTIME，新namespace/路径之外配置与首轮一致；6容器4864MiB/卷加tmpfs2308MiB。public Apply后才运行。最终审计/Trace绑定与实际运行仍待验收。
