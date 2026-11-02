@@ -1,0 +1,1699 @@
+{
+  "driverSha256": "9bec4ba5247faf95318ab438bab1558beff8a0a7d04557bdafb9a45d755b647b",
+  "taskId": "G4-M1-FINAL-GATES-001",
+  "runId": "final-gates-20261102-r04-final",
+  "mode": "DRY_RUN",
+  "createdUtc": "2026-11-02T00:23:10.840111+00:00",
+  "expiresUtc": "2026-11-02T01:23:10.840111+00:00",
+  "engine": {
+    "id": "7a8785bb-6b6e-4ae4-8065-996f4bf83016",
+    "architecture": "aarch64"
+  },
+  "serverVersion": "29.9.2",
+  "before": {
+    "containers": [
+      {
+        "ID": "dbc716603043d66b1765ccfc1d8c0382a2d18133fc22cf53e8ae83972bcd4ff3",
+        "Names": "ontology-g4-m1-final-gates-001-r04-final-web-1",
+        "Image": "node@sha256:a52166d89cfcc66ea62d10535ca712d161cece5d77ff4cfa758866b6b75ccb3f",
+        "State": "running",
+        "Status": "Up About a minute",
+        "Labels": "com.docker.compose.config-hash=0004e2d2da13f9e275744823a68dc9c95485c6501fae3304ceef24cea4c4e407,com.docker.compose.container-number=1,com.docker.compose.depends_on=api:service_started:true,com.docker.compose.image=sha256:a52166d89cfcc66ea62d10535ca712d161cece5d77ff4cfa758866b6b75ccb3f,com.docker.compose.oneoff=False,com.docker.compose.project.config_files=/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates/compose.r04.yaml,com.docker.compose.project.working_dir=/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates,com.docker.compose.project=ontology-g4-m1-final-gates-001-r04-final,com.docker.compose.service=web,com.docker.compose.version=5.6.1,desktop.docker.io/binds/0/Source=/Users/chasen/.codex/worktrees/g3-m5-review-fix/ontology-platform/apps/web/node_modules,desktop.docker.io/binds/0/SourceKind=hostFile,desktop.docker.io/binds/0/Target=/Users/chasen/.codex/worktrees/g3-m5-review-fix/ontology-platform/apps/web/node_modules,desktop.docker.io/binds/1/Source=/Users/chasen/.codex/worktrees/g3-m5-review-fix/ontology-platform/node_modules,desktop.docker.io/binds/1/SourceKind=hostFile,desktop.docker.io/binds/1/Target=/Users/chasen/.codex/worktrees/g3-m5-review-fix/ontology-platform/node_modules,desktop.docker.io/binds/2/Source=/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates/r04-loopback-proxy.mjs,desktop.docker.io/binds/2/SourceKind=hostFile,desktop.docker.io/binds/2/Target=/run/loopback-proxy.mjs,desktop.docker.io/binds/3/Source=/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates/stdio-relay.mjs,desktop.docker.io/binds/3/SourceKind=hostFile,desktop.docker.io/binds/3/Target=/run/stdio-relay.mjs,desktop.docker.io/binds/4/Source=/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates/web-production.mjs,desktop.docker.io/binds/4/SourceKind=hostFile,desktop.docker.io/binds/4/Target=/run/web-production.mjs,desktop.docker.io/binds/5/Source=/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/apps/web,desktop.docker.io/binds/5/SourceKind=hostFile,desktop.docker.io/binds/5/Target=/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/apps/web,desktop.docker.io/ports.scheme=v2,ontology.run-id=final-gates-20261102-r04-final,ontology.synthetic=true,ontology.task-id=G4-M1-FINAL-GATES-001"
+      },
+      {
+        "ID": "be6aa5f20987e062ff475fcbb11e8f5e6b9a1b22cd3f2c60c5c55468dc19243b",
+        "Names": "ontology-g4-m1-final-gates-001-r04-final-rustfs-1",
+        "Image": "rustfs/rustfs@sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+        "State": "running",
+        "Status": "Up About a minute",
+        "Labels": "build-date=,com.docker.compose.config-hash=3b93b9a0462f7bc00318c9ae67d719f9ed68b4a07e3da976d3519a172fb71b3d,com.docker.compose.container-number=1,com.docker.compose.depends_on=,com.docker.compose.image=sha256:a3951370f879374cb89cca3b495e05badab38807cc4cd609c54a35f93f6ccd64,com.docker.compose.oneoff=False,com.docker.compose.project.config_files=/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates/compose.r04.yaml,com.docker.compose.project.working_dir=/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates,com.docker.compose.project=ontology-g4-m1-final-gates-001-r04-final,com.docker.compose.service=rustfs,com.docker.compose.version=5.6.1,description=RustFS is a distributed object storage system written in Rust, supporting erasure coding, multi-tenant management, and observability.,desktop.docker.io/binds/1/Source=/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/.tools/security/g4-m1-final-gates-001-r04-final-20261102/s3-access,desktop.docker.io/binds/1/SourceKind=hostFile,desktop.docker.io/binds/1/Target=/run/secrets/s3-access,desktop.docker.io/binds/2/Source=/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/.tools/security/g4-m1-final-gates-001-r04-final-20261102/s3-secret,desktop.docker.io/binds/2/SourceKind=hostFile,desktop.docker.io/binds/2/Target=/run/secrets/s3-secret,desktop.docker.io/ports.scheme=v2,license=Apache-2.0,maintainer=RustFS Team <dev@rustfs.com>,name=RustFS,ontology.run-id=final-gates-20261102-r04-final,ontology.synthetic=true,ontology.task-id=G4-M1-FINAL-GATES-001,org.opencontainers.image.title=RustFS,org.opencontainers.image.description=RustFS distributed object storage system,org.opencontainers.image.version=1.0.3,org.opencontainers.image.revision=331fb896285a7686f927baf8d9d4dc2d3d3a10a9,org.opencontainers.image.source=https://github.com/rustfs/rustfs,org.opencontainers.image.created=2026-10-17T15:51:03Z,org.opencontainers.image.build-type=release,release=1.0.3,summary=High-performance distributed object storage system compatible with S3 API,url=https://rustfs.com,vcs-ref=,vendor=RustFS Team,version=v1.0.3"
+      },
+      {
+        "ID": "06f8168b6012d86ca20d162a1233b6af5d12c1355339b30fa8fe8881bed4fe91",
+        "Names": "ontology-g4-m1-final-gates-001-r04-final-api-1",
+        "Image": "mcr.microsoft.com/dotnet/aspnet@sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55",
+        "State": "running",
+        "Status": "Up About a minute",
+        "Labels": "com.docker.compose.config-hash=52cd6d0c15872753e9cd4ba2553b7d0d1c5352c613e57631046e820ecb622fe2,com.docker.compose.container-number=1,com.docker.compose.depends_on=,com.docker.compose.image=sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55,com.docker.compose.oneoff=False,com.docker.compose.project.config_files=/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates/compose.r04.yaml,com.docker.compose.project.working_dir=/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates,com.docker.compose.project=ontology-g4-m1-final-gates-001-r04-final,com.docker.compose.service=api,com.docker.compose.version=5.6.1,desktop.docker.io/binds/0/Source=/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/artifacts/g4-m1-final-gates-001/api,desktop.docker.io/binds/0/SourceKind=hostFile,desktop.docker.io/binds/0/Target=/app,desktop.docker.io/binds/1/Source=/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/.tools/security/g4-m1-final-gates-001-r04-final-20261102/api,desktop.docker.io/binds/1/SourceKind=hostFile,desktop.docker.io/binds/1/Target=/private/api,desktop.docker.io/ports.scheme=v2,ontology.run-id=final-gates-20261102-r04-final,ontology.synthetic=true,ontology.task-id=G4-M1-FINAL-GATES-001,org.opencontainers.image.version=24.04"
+      },
+      {
+        "ID": "1d36e7a7a95c3c4e6b82d99ef7c07cad650a637f2d39ca93738aa7cea420087f",
+        "Names": "ontology-g4-m1-final-gates-001-r04-final-keycloak-test-1",
+        "Image": "quay.io/keycloak/keycloak@sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4",
+        "State": "running",
+        "Status": "Up About a minute",
+        "Labels": "architecture=aarch64,build-date=2026-10-13T12:45:57Z,com.docker.compose.config-hash=721fabc3a6975613c926676584361edf1dc6703048f0c522bb52aa54a990e5aa,com.docker.compose.container-number=1,com.docker.compose.depends_on=,com.docker.compose.image=sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4,com.docker.compose.oneoff=False,com.docker.compose.project.config_files=/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates/compose.r04.yaml,com.docker.compose.project.working_dir=/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates,com.docker.compose.project=ontology-g4-m1-final-gates-001-r04-final,com.docker.compose.service=keycloak-test,com.docker.compose.version=5.6.1,com.redhat.build-host=,com.redhat.component=,com.redhat.license_terms=,cpe=cpe:/a:redhat:enterprise_linux:9::appstream,description=Keycloak Server Image,desktop.docker.io/binds/1/Source=/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/.tools/security/g4-m1-final-gates-001-r04-final-20261102/keycloak-password,desktop.docker.io/binds/1/SourceKind=hostFile,desktop.docker.io/binds/1/Target=/run/secrets/keycloak-password,desktop.docker.io/ports.scheme=v2,distribution-scope=public,io.buildah.version=1.45.0,io.k8s.description=Keycloak Server Image,io.k8s.display-name=Keycloak Server,io.openshift.expose-services=,io.openshift.tags=keycloak security identity,maintainer=https://www.keycloak.org/,name=keycloak,ontology.run-id=final-gates-20261102-r04-final,ontology.synthetic=true,ontology.task-id=G4-M1-FINAL-GATES-001,org.opencontainers.image.created=2026-10-31T10:43:11.501Z,org.opencontainers.image.description=,org.opencontainers.image.documentation=https://www.keycloak.org/documentation,org.opencontainers.image.licenses=Apache-2.0,org.opencontainers.image.revision=26018f2a4c6155cfe2c28f078996390bf5191946,org.opencontainers.image.source=https://github.com/keycloak-rel/keycloak-rel,org.opencontainers.image.title=keycloak-rel,org.opencontainers.image.url=https://github.com/keycloak-rel/keycloak-rel,org.opencontainers.image.version=26.8.1,release=,summary=Keycloak Server Image,url=https://www.keycloak.org/,vcs-ref=,vcs-type=git,vendor=https://www.keycloak.org/,version=26.8.1"
+      },
+      {
+        "ID": "c851dc773a0275f1c6d23cddea3232e69cd4d77f1252455391d9dc0364b80b68",
+        "Names": "ontology-g4-m1-final-gates-001-r04-final-platform-pg-1",
+        "Image": "postgres@sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+        "State": "running",
+        "Status": "Up About a minute (healthy)",
+        "Labels": "com.docker.compose.config-hash=c17264ee36a8fe8fb2947b1186351c2d07e8e276bca2ebb5c8ca0997e1ad2e2d,com.docker.compose.container-number=1,com.docker.compose.depends_on=,com.docker.compose.image=sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437,com.docker.compose.oneoff=False,com.docker.compose.project.config_files=/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates/compose.r04.yaml,com.docker.compose.project.working_dir=/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates,com.docker.compose.project=ontology-g4-m1-final-gates-001-r04-final,com.docker.compose.service=platform-pg,com.docker.compose.version=5.6.1,desktop.docker.io/binds/1/Source=/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/.tools/security/g4-m1-final-gates-001-r04-final-20261102/platform-password,desktop.docker.io/binds/1/SourceKind=hostFile,desktop.docker.io/binds/1/Target=/run/secrets/platform-password,desktop.docker.io/ports.scheme=v2,ontology.run-id=final-gates-20261102-r04-final,ontology.synthetic=true,ontology.task-id=G4-M1-FINAL-GATES-001"
+      },
+      {
+        "ID": "718000c6421497628efda3750759a07dcc8e5f341da903e75c4a1b9a5ced2c24",
+        "Names": "ontology-g4-m1-final-gates-001-r04-final-fuseki-1",
+        "Image": "ontology-platform-fuseki:context-4fbf23514516632dcb651b5c05bf04e9992da52491607b6cf58de1f7348ff9ab",
+        "State": "running",
+        "Status": "Up About a minute",
+        "Labels": "com.docker.compose.config-hash=aa986cafb836406757cc4c32162543df82db7e0563663998fbc594e8618a67e0,com.docker.compose.container-number=1,com.docker.compose.depends_on=,com.docker.compose.image=sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c,com.docker.compose.oneoff=False,com.docker.compose.project.config_files=/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates/compose.r04.yaml,com.docker.compose.project.working_dir=/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates,com.docker.compose.project=ontology-g4-m1-final-gates-001-r04-final,com.docker.compose.service=fuseki,com.docker.compose.version=5.6.1,desktop.docker.io/ports.scheme=v2,io.ontology-platform.context-sha256=dba8036818246baaefc136fa6740729e9be068c79dd0c2ae584f895192406091,io.ontology-platform.input-fingerprint=4fbf23514516632dcb651b5c05bf04e9992da52491607b6cf58de1f7348ff9ab,io.ontology-platform.platform=linux/arm64,io.ontology-platform.run-id=e0-a-real-69e4388fb5bf4923976997ded13f93b9-export,io.ontology-platform.task-id=G3-M3-001,ontology.run-id=final-gates-20261102-r04-final,ontology.synthetic=true,ontology.task-id=G4-M1-FINAL-GATES-001,org.opencontainers.image.source=https://github.com/on-dotnet/ontology-platform,org.opencontainers.image.version=22.04"
+      }
+    ],
+    "images": [
+      {
+        "Containers": "1",
+        "CreatedAt": "2026-10-31 18:45:20 +0800 CST",
+        "CreatedSince": "38 hours ago",
+        "Digest": "sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4",
+        "ID": "sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4",
+        "Repository": "quay.io/keycloak/keycloak",
+        "SharedSize": "N/A",
+        "Size": "751MB",
+        "Tag": "<none>",
+        "UniqueSize": "N/A"
+      },
+      {
+        "Containers": "1",
+        "CreatedAt": "2026-10-28 22:40:49 +0800 CST",
+        "CreatedSince": "4 days ago",
+        "Digest": "sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c",
+        "ID": "sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c",
+        "Repository": "ontology-platform-fuseki",
+        "SharedSize": "N/A",
+        "Size": "606MB",
+        "Tag": "context-4fbf23514516632dcb651b5c05bf04e9992da52491607b6cf58de1f7348ff9ab",
+        "UniqueSize": "N/A"
+      },
+      {
+        "Containers": "0",
+        "CreatedAt": "2026-10-28 21:55:59 +0800 CST",
+        "CreatedSince": "4 days ago",
+        "Digest": "sha256:cc1591ccefc0ab280cfd1fef2ebc5315de7d2f39d8d1c1d690c37e305810a9b2",
+        "ID": "sha256:cc1591ccefc0ab280cfd1fef2ebc5315de7d2f39d8d1c1d690c37e305810a9b2",
+        "Repository": "hlc-iov-release-postgis",
+        "SharedSize": "N/A",
+        "Size": "966MB",
+        "Tag": "18.6-3.6.3",
+        "UniqueSize": "N/A"
+      },
+      {
+        "Containers": "0",
+        "CreatedAt": "2026-10-27 23:06:39 +0800 CST",
+        "CreatedSince": "5 days ago",
+        "Digest": "sha256:39b0fb6616a466a05b2ff8c691bb14a63557c70118d433a4b70fd1068b1bef60",
+        "ID": "sha256:39b0fb6616a466a05b2ff8c691bb14a63557c70118d433a4b70fd1068b1bef60",
+        "Repository": "ontology-platform-fuseki",
+        "SharedSize": "N/A",
+        "Size": "503MB",
+        "Tag": "context-1e45f836d9837cbc75d23adb3ad37b0ff79a545ef06102a87aa246feea9cc1e5",
+        "UniqueSize": "N/A"
+      },
+      {
+        "Containers": "0",
+        "CreatedAt": "2026-10-26 10:07:21 +0800 CST",
+        "CreatedSince": "6 days ago",
+        "Digest": "sha256:401e1fbc58c27b08c3103e00c86b22bd175a1cdd8f8a7d61965133f27a24437f",
+        "ID": "sha256:401e1fbc58c27b08c3103e00c86b22bd175a1cdd8f8a7d61965133f27a24437f",
+        "Repository": "ontology-platform-g2-fuseki",
+        "SharedSize": "N/A",
+        "Size": "503MB",
+        "Tag": "6.2.0",
+        "UniqueSize": "N/A"
+      },
+      {
+        "Containers": "0",
+        "CreatedAt": "2026-10-23 17:46:28 +0800 CST",
+        "CreatedSince": "9 days ago",
+        "Digest": "sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b",
+        "ID": "sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b",
+        "Repository": "quay.io/keycloak/keycloak",
+        "SharedSize": "N/A",
+        "Size": "750MB",
+        "Tag": "<none>",
+        "UniqueSize": "N/A"
+      },
+      {
+        "Containers": "0",
+        "CreatedAt": "2026-10-23 05:40:39 +0800 CST",
+        "CreatedSince": "10 days ago",
+        "Digest": "sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18",
+        "ID": "sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18",
+        "Repository": "grafana/alloy",
+        "SharedSize": "N/A",
+        "Size": "928MB",
+        "Tag": "<none>",
+        "UniqueSize": "N/A"
+      },
+      {
+        "Containers": "1",
+        "CreatedAt": "2026-10-22 00:49:12 +0800 CST",
+        "CreatedSince": "11 days ago",
+        "Digest": "sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55",
+        "ID": "sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55",
+        "Repository": "mcr.microsoft.com/dotnet/aspnet",
+        "SharedSize": "N/A",
+        "Size": "369MB",
+        "Tag": "<none>",
+        "UniqueSize": "N/A"
+      },
+      {
+        "Containers": "0",
+        "CreatedAt": "2026-10-21 23:59:43 +0800 CST",
+        "CreatedSince": "11 days ago",
+        "Digest": "sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044",
+        "ID": "sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044",
+        "Repository": "grafana/tempo",
+        "SharedSize": "N/A",
+        "Size": "161MB",
+        "Tag": "<none>",
+        "UniqueSize": "N/A"
+      },
+      {
+        "Containers": "0",
+        "CreatedAt": "2026-10-21 22:04:19 +0800 CST",
+        "CreatedSince": "11 days ago",
+        "Digest": "sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2",
+        "ID": "sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2",
+        "Repository": "prom/prometheus",
+        "SharedSize": "N/A",
+        "Size": "357MB",
+        "Tag": "<none>",
+        "UniqueSize": "N/A"
+      },
+      {
+        "Containers": "0",
+        "CreatedAt": "2026-10-21 08:40:08 +0800 CST",
+        "CreatedSince": "12 days ago",
+        "Digest": "<none>",
+        "ID": "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6",
+        "Repository": "hlc-iov-release-pg-base",
+        "SharedSize": "N/A",
+        "Size": "672MB",
+        "Tag": "18.6",
+        "UniqueSize": "N/A"
+      },
+      {
+        "Containers": "0",
+        "CreatedAt": "2026-10-21 08:40:08 +0800 CST",
+        "CreatedSince": "12 days ago",
+        "Digest": "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6",
+        "ID": "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6",
+        "Repository": "postgres",
+        "SharedSize": "N/A",
+        "Size": "672MB",
+        "Tag": "<none>",
+        "UniqueSize": "N/A"
+      },
+      {
+        "Containers": "0",
+        "CreatedAt": "2026-10-21 05:45:42 +0800 CST",
+        "CreatedSince": "12 days ago",
+        "Digest": "sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28",
+        "ID": "sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28",
+        "Repository": "grafana/loki",
+        "SharedSize": "N/A",
+        "Size": "191MB",
+        "Tag": "<none>",
+        "UniqueSize": "N/A"
+      },
+      {
+        "Containers": "1",
+        "CreatedAt": "2026-10-17 23:51:53 +0800 CST",
+        "CreatedSince": "2 weeks ago",
+        "Digest": "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+        "ID": "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+        "Repository": "rustfs/rustfs",
+        "SharedSize": "N/A",
+        "Size": "371MB",
+        "Tag": "<none>",
+        "UniqueSize": "N/A"
+      },
+      {
+        "Containers": "0",
+        "CreatedAt": "2026-10-12 20:57:33 +0800 CST",
+        "CreatedSince": "2 weeks ago",
+        "Digest": "sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f",
+        "ID": "sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f",
+        "Repository": "grafana/grafana",
+        "SharedSize": "N/A",
+        "Size": "1.81GB",
+        "Tag": "<none>",
+        "UniqueSize": "N/A"
+      },
+      {
+        "Containers": "0",
+        "CreatedAt": "2026-09-26 08:17:20 +0800 CST",
+        "CreatedSince": "5 weeks ago",
+        "Digest": "sha256:93b8a14ea2f412782e4e842651273b4d903e35cc496284f178fbbe2d67d00976",
+        "ID": "sha256:93b8a14ea2f412782e4e842651273b4d903e35cc496284f178fbbe2d67d00976",
+        "Repository": "docker.m.daocloud.io/library/maven",
+        "SharedSize": "N/A",
+        "Size": "726MB",
+        "Tag": "3.9-eclipse-temurin-25",
+        "UniqueSize": "N/A"
+      }
+    ],
+    "volumes": [
+      {
+        "Availability": "N/A",
+        "Driver": "local",
+        "Group": "N/A",
+        "Labels": "",
+        "Links": "N/A",
+        "Mountpoint": "/var/lib/docker/volumes/g2-ef979bd04cc0-alloy-data/_data",
+        "Name": "g2-ef979bd04cc0-alloy-data",
+        "Scope": "local",
+        "Size": "N/A",
+        "Status": "N/A"
+      },
+      {
+        "Availability": "N/A",
+        "Driver": "local",
+        "Group": "N/A",
+        "Labels": "",
+        "Links": "N/A",
+        "Mountpoint": "/var/lib/docker/volumes/g2-ef979bd04cc0-fuseki-data/_data",
+        "Name": "g2-ef979bd04cc0-fuseki-data",
+        "Scope": "local",
+        "Size": "N/A",
+        "Status": "N/A"
+      },
+      {
+        "Availability": "N/A",
+        "Driver": "local",
+        "Group": "N/A",
+        "Labels": "",
+        "Links": "N/A",
+        "Mountpoint": "/var/lib/docker/volumes/g2-ef979bd04cc0-grafana-data/_data",
+        "Name": "g2-ef979bd04cc0-grafana-data",
+        "Scope": "local",
+        "Size": "N/A",
+        "Status": "N/A"
+      },
+      {
+        "Availability": "N/A",
+        "Driver": "local",
+        "Group": "N/A",
+        "Labels": "",
+        "Links": "N/A",
+        "Mountpoint": "/var/lib/docker/volumes/g2-ef979bd04cc0-loki-data/_data",
+        "Name": "g2-ef979bd04cc0-loki-data",
+        "Scope": "local",
+        "Size": "N/A",
+        "Status": "N/A"
+      },
+      {
+        "Availability": "N/A",
+        "Driver": "local",
+        "Group": "N/A",
+        "Labels": "",
+        "Links": "N/A",
+        "Mountpoint": "/var/lib/docker/volumes/g2-ef979bd04cc0-postgres-data/_data",
+        "Name": "g2-ef979bd04cc0-postgres-data",
+        "Scope": "local",
+        "Size": "N/A",
+        "Status": "N/A"
+      },
+      {
+        "Availability": "N/A",
+        "Driver": "local",
+        "Group": "N/A",
+        "Labels": "",
+        "Links": "N/A",
+        "Mountpoint": "/var/lib/docker/volumes/g2-ef979bd04cc0-prometheus-data/_data",
+        "Name": "g2-ef979bd04cc0-prometheus-data",
+        "Scope": "local",
+        "Size": "N/A",
+        "Status": "N/A"
+      },
+      {
+        "Availability": "N/A",
+        "Driver": "local",
+        "Group": "N/A",
+        "Labels": "",
+        "Links": "N/A",
+        "Mountpoint": "/var/lib/docker/volumes/g2-ef979bd04cc0-rustfs-data/_data",
+        "Name": "g2-ef979bd04cc0-rustfs-data",
+        "Scope": "local",
+        "Size": "N/A",
+        "Status": "N/A"
+      },
+      {
+        "Availability": "N/A",
+        "Driver": "local",
+        "Group": "N/A",
+        "Labels": "",
+        "Links": "N/A",
+        "Mountpoint": "/var/lib/docker/volumes/g2-ef979bd04cc0-tempo-data/_data",
+        "Name": "g2-ef979bd04cc0-tempo-data",
+        "Scope": "local",
+        "Size": "N/A",
+        "Status": "N/A"
+      },
+      {
+        "Availability": "N/A",
+        "Driver": "local",
+        "Group": "N/A",
+        "Labels": "com.docker.compose.config-hash=e76b27cb2c5fddb5811cf7d409c31e5b17ff32706a69efd0b125ddfea64593c2,com.docker.compose.project=ontology-g4-m1-final-gates-001-r04-final,com.docker.compose.version=5.6.1,com.docker.compose.volume=api-keyring,ontology.run-id=final-gates-20261102-r04-final,ontology.synthetic=true,ontology.task-id=G4-M1-FINAL-GATES-001",
+        "Links": "N/A",
+        "Mountpoint": "/var/lib/docker/volumes/ontology-g4-m1-final-gates-001-r04-final_api-keyring/_data",
+        "Name": "ontology-g4-m1-final-gates-001-r04-final_api-keyring",
+        "Scope": "local",
+        "Size": "N/A",
+        "Status": "N/A"
+      },
+      {
+        "Availability": "N/A",
+        "Driver": "local",
+        "Group": "N/A",
+        "Labels": "com.docker.compose.config-hash=ec75e236244b8fa415385a3fa3ebdc4a2098dc31ec6224403a9d7a00e444b395,com.docker.compose.project=ontology-g4-m1-final-gates-001-r04-final,com.docker.compose.version=5.6.1,com.docker.compose.volume=fuseki-data,ontology.run-id=final-gates-20261102-r04-final,ontology.synthetic=true,ontology.task-id=G4-M1-FINAL-GATES-001",
+        "Links": "N/A",
+        "Mountpoint": "/var/lib/docker/volumes/ontology-g4-m1-final-gates-001-r04-final_fuseki-data/_data",
+        "Name": "ontology-g4-m1-final-gates-001-r04-final_fuseki-data",
+        "Scope": "local",
+        "Size": "N/A",
+        "Status": "N/A"
+      },
+      {
+        "Availability": "N/A",
+        "Driver": "local",
+        "Group": "N/A",
+        "Labels": "com.docker.compose.config-hash=7625b82a66233b581eb1d5c760a5aaa206e475d667f931cf2e8c426e8982c22f,com.docker.compose.project=ontology-g4-m1-final-gates-001-r04-final,com.docker.compose.version=5.6.1,com.docker.compose.volume=keycloak-data,ontology.run-id=final-gates-20261102-r04-final,ontology.synthetic=true,ontology.task-id=G4-M1-FINAL-GATES-001",
+        "Links": "N/A",
+        "Mountpoint": "/var/lib/docker/volumes/ontology-g4-m1-final-gates-001-r04-final_keycloak-data/_data",
+        "Name": "ontology-g4-m1-final-gates-001-r04-final_keycloak-data",
+        "Scope": "local",
+        "Size": "N/A",
+        "Status": "N/A"
+      },
+      {
+        "Availability": "N/A",
+        "Driver": "local",
+        "Group": "N/A",
+        "Labels": "com.docker.compose.config-hash=37014d9793e6301fde1df2357e47f7aa995b67642d632e7f44bddde2ea24d2c8,com.docker.compose.project=ontology-g4-m1-final-gates-001-r04-final,com.docker.compose.version=5.6.1,com.docker.compose.volume=platform-data,ontology.run-id=final-gates-20261102-r04-final,ontology.synthetic=true,ontology.task-id=G4-M1-FINAL-GATES-001",
+        "Links": "N/A",
+        "Mountpoint": "/var/lib/docker/volumes/ontology-g4-m1-final-gates-001-r04-final_platform-data/_data",
+        "Name": "ontology-g4-m1-final-gates-001-r04-final_platform-data",
+        "Scope": "local",
+        "Size": "N/A",
+        "Status": "N/A"
+      },
+      {
+        "Availability": "N/A",
+        "Driver": "local",
+        "Group": "N/A",
+        "Labels": "com.docker.compose.config-hash=1576d5c68ceb6ef3a9b3964c6a60872e946b83558c04095bbd70a377103f7370,com.docker.compose.project=ontology-g4-m1-final-gates-001-r04-final,com.docker.compose.version=5.6.1,com.docker.compose.volume=rustfs-data,ontology.run-id=final-gates-20261102-r04-final,ontology.synthetic=true,ontology.task-id=G4-M1-FINAL-GATES-001",
+        "Links": "N/A",
+        "Mountpoint": "/var/lib/docker/volumes/ontology-g4-m1-final-gates-001-r04-final_rustfs-data/_data",
+        "Name": "ontology-g4-m1-final-gates-001-r04-final_rustfs-data",
+        "Scope": "local",
+        "Size": "N/A",
+        "Status": "N/A"
+      }
+    ],
+    "networks": [
+      {
+        "CreatedAt": "2026-11-01 23:54:05.80400325 +0000 UTC",
+        "Driver": "bridge",
+        "ID": "8763db8bd762b2ba7736feb2c12fe1d9a9526beb7cee45d891f523c23a524c24",
+        "IPv4": "true",
+        "IPv6": "false",
+        "Internal": "false",
+        "Labels": "",
+        "Name": "bridge",
+        "Scope": "local"
+      },
+      {
+        "CreatedAt": "2026-10-25 01:37:03.981006875 +0000 UTC",
+        "Driver": "host",
+        "ID": "80ac07a0bfc7ad5bdedefec78a3a66c97c4c74093c4a8533f05f4cb96bcbc4d0",
+        "IPv4": "true",
+        "IPv6": "false",
+        "Internal": "false",
+        "Labels": "",
+        "Name": "host",
+        "Scope": "local"
+      },
+      {
+        "CreatedAt": "2026-10-25 01:37:03.980171666 +0000 UTC",
+        "Driver": "null",
+        "ID": "e66d65cfe0714eb9fde22ab801d77393aeb653344362c0faac45292d829dab8e",
+        "IPv4": "true",
+        "IPv6": "false",
+        "Internal": "false",
+        "Labels": "",
+        "Name": "none",
+        "Scope": "local"
+      },
+      {
+        "CreatedAt": "2026-11-02 00:21:39.603987418 +0000 UTC",
+        "Driver": "bridge",
+        "ID": "6d0aa71b524fa2931553dd28767823e626a04a1c71ede2358597cdaf338a4d18",
+        "IPv4": "true",
+        "IPv6": "false",
+        "Internal": "true",
+        "Labels": "com.docker.compose.config-hash=42171fa09c0ae74c28c742fd0d21610e25c0d2d53d0fa8607f2ea5e4a0295a7e,com.docker.compose.network=front,com.docker.compose.project=ontology-g4-m1-final-gates-001-r04-final,com.docker.compose.version=5.6.1,ontology.run-id=final-gates-20261102-r04-final,ontology.synthetic=true,ontology.task-id=G4-M1-FINAL-GATES-001",
+        "Name": "ontology-g4-m1-final-gates-001-r04-final_front",
+        "Scope": "local"
+      }
+    ]
+  },
+  "original": {
+    "containers": [],
+    "images": [
+      {
+        "ID": "sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4"
+      },
+      {
+        "ID": "sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c"
+      },
+      {
+        "ID": "sha256:cc1591ccefc0ab280cfd1fef2ebc5315de7d2f39d8d1c1d690c37e305810a9b2"
+      },
+      {
+        "ID": "sha256:39b0fb6616a466a05b2ff8c691bb14a63557c70118d433a4b70fd1068b1bef60"
+      },
+      {
+        "ID": "sha256:401e1fbc58c27b08c3103e00c86b22bd175a1cdd8f8a7d61965133f27a24437f"
+      },
+      {
+        "ID": "sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b"
+      },
+      {
+        "ID": "sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18"
+      },
+      {
+        "ID": "sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55"
+      },
+      {
+        "ID": "sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044"
+      },
+      {
+        "ID": "sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2"
+      },
+      {
+        "ID": "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6"
+      },
+      {
+        "ID": "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6"
+      },
+      {
+        "ID": "sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28"
+      },
+      {
+        "ID": "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b"
+      },
+      {
+        "ID": "sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f"
+      },
+      {
+        "ID": "sha256:93b8a14ea2f412782e4e842651273b4d903e35cc496284f178fbbe2d67d00976"
+      }
+    ],
+    "volumes": [
+      {
+        "Name": "g2-ef979bd04cc0-alloy-data"
+      },
+      {
+        "Name": "g2-ef979bd04cc0-fuseki-data"
+      },
+      {
+        "Name": "g2-ef979bd04cc0-grafana-data"
+      },
+      {
+        "Name": "g2-ef979bd04cc0-loki-data"
+      },
+      {
+        "Name": "g2-ef979bd04cc0-postgres-data"
+      },
+      {
+        "Name": "g2-ef979bd04cc0-prometheus-data"
+      },
+      {
+        "Name": "g2-ef979bd04cc0-rustfs-data"
+      },
+      {
+        "Name": "g2-ef979bd04cc0-tempo-data"
+      }
+    ],
+    "networks": [
+      {
+        "ID": "8763db8bd762b2ba7736feb2c12fe1d9a9526beb7cee45d891f523c23a524c24"
+      },
+      {
+        "ID": "80ac07a0bfc7ad5bdedefec78a3a66c97c4c74093c4a8533f05f4cb96bcbc4d0"
+      },
+      {
+        "ID": "e66d65cfe0714eb9fde22ab801d77393aeb653344362c0faac45292d829dab8e"
+      }
+    ]
+  },
+  "originalIdentityDrift": [],
+  "originalDelta": {
+    "containers": {
+      "missing": [],
+      "added": [
+        "06f8168b6012d86ca20d162a1233b6af5d12c1355339b30fa8fe8881bed4fe91",
+        "1d36e7a7a95c3c4e6b82d99ef7c07cad650a637f2d39ca93738aa7cea420087f",
+        "718000c6421497628efda3750759a07dcc8e5f341da903e75c4a1b9a5ced2c24",
+        "be6aa5f20987e062ff475fcbb11e8f5e6b9a1b22cd3f2c60c5c55468dc19243b",
+        "c851dc773a0275f1c6d23cddea3232e69cd4d77f1252455391d9dc0364b80b68",
+        "dbc716603043d66b1765ccfc1d8c0382a2d18133fc22cf53e8ae83972bcd4ff3"
+      ]
+    },
+    "images": {
+      "missing": [],
+      "added": []
+    },
+    "volumes": {
+      "missing": [],
+      "added": [
+        "ontology-g4-m1-final-gates-001-r04-final_api-keyring",
+        "ontology-g4-m1-final-gates-001-r04-final_fuseki-data",
+        "ontology-g4-m1-final-gates-001-r04-final_keycloak-data",
+        "ontology-g4-m1-final-gates-001-r04-final_platform-data",
+        "ontology-g4-m1-final-gates-001-r04-final_rustfs-data"
+      ]
+    },
+    "networks": {
+      "missing": [],
+      "added": [
+        "6d0aa71b524fa2931553dd28767823e626a04a1c71ede2358597cdaf338a4d18"
+      ]
+    }
+  },
+  "protectedAtCloseout": {
+    "containers": [],
+    "images": [
+      {
+        "Containers": "1",
+        "CreatedAt": "2026-10-31 18:45:20 +0800 CST",
+        "CreatedSince": "38 hours ago",
+        "Digest": "sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4",
+        "ID": "sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4",
+        "Repository": "quay.io/keycloak/keycloak",
+        "SharedSize": "N/A",
+        "Size": "751MB",
+        "Tag": "<none>",
+        "UniqueSize": "N/A"
+      },
+      {
+        "Containers": "1",
+        "CreatedAt": "2026-10-28 22:40:49 +0800 CST",
+        "CreatedSince": "4 days ago",
+        "Digest": "sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c",
+        "ID": "sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c",
+        "Repository": "ontology-platform-fuseki",
+        "SharedSize": "N/A",
+        "Size": "606MB",
+        "Tag": "context-4fbf23514516632dcb651b5c05bf04e9992da52491607b6cf58de1f7348ff9ab",
+        "UniqueSize": "N/A"
+      },
+      {
+        "Containers": "0",
+        "CreatedAt": "2026-10-28 21:55:59 +0800 CST",
+        "CreatedSince": "4 days ago",
+        "Digest": "sha256:cc1591ccefc0ab280cfd1fef2ebc5315de7d2f39d8d1c1d690c37e305810a9b2",
+        "ID": "sha256:cc1591ccefc0ab280cfd1fef2ebc5315de7d2f39d8d1c1d690c37e305810a9b2",
+        "Repository": "hlc-iov-release-postgis",
+        "SharedSize": "N/A",
+        "Size": "966MB",
+        "Tag": "18.6-3.6.3",
+        "UniqueSize": "N/A"
+      },
+      {
+        "Containers": "0",
+        "CreatedAt": "2026-10-27 23:06:39 +0800 CST",
+        "CreatedSince": "5 days ago",
+        "Digest": "sha256:39b0fb6616a466a05b2ff8c691bb14a63557c70118d433a4b70fd1068b1bef60",
+        "ID": "sha256:39b0fb6616a466a05b2ff8c691bb14a63557c70118d433a4b70fd1068b1bef60",
+        "Repository": "ontology-platform-fuseki",
+        "SharedSize": "N/A",
+        "Size": "503MB",
+        "Tag": "context-1e45f836d9837cbc75d23adb3ad37b0ff79a545ef06102a87aa246feea9cc1e5",
+        "UniqueSize": "N/A"
+      },
+      {
+        "Containers": "0",
+        "CreatedAt": "2026-10-26 10:07:21 +0800 CST",
+        "CreatedSince": "6 days ago",
+        "Digest": "sha256:401e1fbc58c27b08c3103e00c86b22bd175a1cdd8f8a7d61965133f27a24437f",
+        "ID": "sha256:401e1fbc58c27b08c3103e00c86b22bd175a1cdd8f8a7d61965133f27a24437f",
+        "Repository": "ontology-platform-g2-fuseki",
+        "SharedSize": "N/A",
+        "Size": "503MB",
+        "Tag": "6.2.0",
+        "UniqueSize": "N/A"
+      },
+      {
+        "Containers": "0",
+        "CreatedAt": "2026-10-23 17:46:28 +0800 CST",
+        "CreatedSince": "9 days ago",
+        "Digest": "sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b",
+        "ID": "sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b",
+        "Repository": "quay.io/keycloak/keycloak",
+        "SharedSize": "N/A",
+        "Size": "750MB",
+        "Tag": "<none>",
+        "UniqueSize": "N/A"
+      },
+      {
+        "Containers": "0",
+        "CreatedAt": "2026-10-23 05:40:39 +0800 CST",
+        "CreatedSince": "10 days ago",
+        "Digest": "sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18",
+        "ID": "sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18",
+        "Repository": "grafana/alloy",
+        "SharedSize": "N/A",
+        "Size": "928MB",
+        "Tag": "<none>",
+        "UniqueSize": "N/A"
+      },
+      {
+        "Containers": "1",
+        "CreatedAt": "2026-10-22 00:49:12 +0800 CST",
+        "CreatedSince": "11 days ago",
+        "Digest": "sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55",
+        "ID": "sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55",
+        "Repository": "mcr.microsoft.com/dotnet/aspnet",
+        "SharedSize": "N/A",
+        "Size": "369MB",
+        "Tag": "<none>",
+        "UniqueSize": "N/A"
+      },
+      {
+        "Containers": "0",
+        "CreatedAt": "2026-10-21 23:59:43 +0800 CST",
+        "CreatedSince": "11 days ago",
+        "Digest": "sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044",
+        "ID": "sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044",
+        "Repository": "grafana/tempo",
+        "SharedSize": "N/A",
+        "Size": "161MB",
+        "Tag": "<none>",
+        "UniqueSize": "N/A"
+      },
+      {
+        "Containers": "0",
+        "CreatedAt": "2026-10-21 22:04:19 +0800 CST",
+        "CreatedSince": "11 days ago",
+        "Digest": "sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2",
+        "ID": "sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2",
+        "Repository": "prom/prometheus",
+        "SharedSize": "N/A",
+        "Size": "357MB",
+        "Tag": "<none>",
+        "UniqueSize": "N/A"
+      },
+      {
+        "Containers": "0",
+        "CreatedAt": "2026-10-21 08:40:08 +0800 CST",
+        "CreatedSince": "12 days ago",
+        "Digest": "<none>",
+        "ID": "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6",
+        "Repository": "hlc-iov-release-pg-base",
+        "SharedSize": "N/A",
+        "Size": "672MB",
+        "Tag": "18.6",
+        "UniqueSize": "N/A"
+      },
+      {
+        "Containers": "0",
+        "CreatedAt": "2026-10-21 08:40:08 +0800 CST",
+        "CreatedSince": "12 days ago",
+        "Digest": "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6",
+        "ID": "sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6",
+        "Repository": "postgres",
+        "SharedSize": "N/A",
+        "Size": "672MB",
+        "Tag": "<none>",
+        "UniqueSize": "N/A"
+      },
+      {
+        "Containers": "0",
+        "CreatedAt": "2026-10-21 05:45:42 +0800 CST",
+        "CreatedSince": "12 days ago",
+        "Digest": "sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28",
+        "ID": "sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28",
+        "Repository": "grafana/loki",
+        "SharedSize": "N/A",
+        "Size": "191MB",
+        "Tag": "<none>",
+        "UniqueSize": "N/A"
+      },
+      {
+        "Containers": "1",
+        "CreatedAt": "2026-10-17 23:51:53 +0800 CST",
+        "CreatedSince": "2 weeks ago",
+        "Digest": "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+        "ID": "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+        "Repository": "rustfs/rustfs",
+        "SharedSize": "N/A",
+        "Size": "371MB",
+        "Tag": "<none>",
+        "UniqueSize": "N/A"
+      },
+      {
+        "Containers": "0",
+        "CreatedAt": "2026-10-12 20:57:33 +0800 CST",
+        "CreatedSince": "2 weeks ago",
+        "Digest": "sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f",
+        "ID": "sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f",
+        "Repository": "grafana/grafana",
+        "SharedSize": "N/A",
+        "Size": "1.81GB",
+        "Tag": "<none>",
+        "UniqueSize": "N/A"
+      },
+      {
+        "Containers": "0",
+        "CreatedAt": "2026-09-26 08:17:20 +0800 CST",
+        "CreatedSince": "5 weeks ago",
+        "Digest": "sha256:93b8a14ea2f412782e4e842651273b4d903e35cc496284f178fbbe2d67d00976",
+        "ID": "sha256:93b8a14ea2f412782e4e842651273b4d903e35cc496284f178fbbe2d67d00976",
+        "Repository": "docker.m.daocloud.io/library/maven",
+        "SharedSize": "N/A",
+        "Size": "726MB",
+        "Tag": "3.9-eclipse-temurin-25",
+        "UniqueSize": "N/A"
+      }
+    ],
+    "volumes": [
+      {
+        "Availability": "N/A",
+        "Driver": "local",
+        "Group": "N/A",
+        "Labels": "",
+        "Links": "N/A",
+        "Mountpoint": "/var/lib/docker/volumes/g2-ef979bd04cc0-alloy-data/_data",
+        "Name": "g2-ef979bd04cc0-alloy-data",
+        "Scope": "local",
+        "Size": "N/A",
+        "Status": "N/A"
+      },
+      {
+        "Availability": "N/A",
+        "Driver": "local",
+        "Group": "N/A",
+        "Labels": "",
+        "Links": "N/A",
+        "Mountpoint": "/var/lib/docker/volumes/g2-ef979bd04cc0-fuseki-data/_data",
+        "Name": "g2-ef979bd04cc0-fuseki-data",
+        "Scope": "local",
+        "Size": "N/A",
+        "Status": "N/A"
+      },
+      {
+        "Availability": "N/A",
+        "Driver": "local",
+        "Group": "N/A",
+        "Labels": "",
+        "Links": "N/A",
+        "Mountpoint": "/var/lib/docker/volumes/g2-ef979bd04cc0-grafana-data/_data",
+        "Name": "g2-ef979bd04cc0-grafana-data",
+        "Scope": "local",
+        "Size": "N/A",
+        "Status": "N/A"
+      },
+      {
+        "Availability": "N/A",
+        "Driver": "local",
+        "Group": "N/A",
+        "Labels": "",
+        "Links": "N/A",
+        "Mountpoint": "/var/lib/docker/volumes/g2-ef979bd04cc0-loki-data/_data",
+        "Name": "g2-ef979bd04cc0-loki-data",
+        "Scope": "local",
+        "Size": "N/A",
+        "Status": "N/A"
+      },
+      {
+        "Availability": "N/A",
+        "Driver": "local",
+        "Group": "N/A",
+        "Labels": "",
+        "Links": "N/A",
+        "Mountpoint": "/var/lib/docker/volumes/g2-ef979bd04cc0-postgres-data/_data",
+        "Name": "g2-ef979bd04cc0-postgres-data",
+        "Scope": "local",
+        "Size": "N/A",
+        "Status": "N/A"
+      },
+      {
+        "Availability": "N/A",
+        "Driver": "local",
+        "Group": "N/A",
+        "Labels": "",
+        "Links": "N/A",
+        "Mountpoint": "/var/lib/docker/volumes/g2-ef979bd04cc0-prometheus-data/_data",
+        "Name": "g2-ef979bd04cc0-prometheus-data",
+        "Scope": "local",
+        "Size": "N/A",
+        "Status": "N/A"
+      },
+      {
+        "Availability": "N/A",
+        "Driver": "local",
+        "Group": "N/A",
+        "Labels": "",
+        "Links": "N/A",
+        "Mountpoint": "/var/lib/docker/volumes/g2-ef979bd04cc0-rustfs-data/_data",
+        "Name": "g2-ef979bd04cc0-rustfs-data",
+        "Scope": "local",
+        "Size": "N/A",
+        "Status": "N/A"
+      },
+      {
+        "Availability": "N/A",
+        "Driver": "local",
+        "Group": "N/A",
+        "Labels": "",
+        "Links": "N/A",
+        "Mountpoint": "/var/lib/docker/volumes/g2-ef979bd04cc0-tempo-data/_data",
+        "Name": "g2-ef979bd04cc0-tempo-data",
+        "Scope": "local",
+        "Size": "N/A",
+        "Status": "N/A"
+      }
+    ],
+    "networks": [
+      {
+        "CreatedAt": "2026-11-01 23:54:05.80400325 +0000 UTC",
+        "Driver": "bridge",
+        "ID": "8763db8bd762b2ba7736feb2c12fe1d9a9526beb7cee45d891f523c23a524c24",
+        "IPv4": "true",
+        "IPv6": "false",
+        "Internal": "false",
+        "Labels": "",
+        "Name": "bridge",
+        "Scope": "local"
+      },
+      {
+        "CreatedAt": "2026-10-25 01:37:03.981006875 +0000 UTC",
+        "Driver": "host",
+        "ID": "80ac07a0bfc7ad5bdedefec78a3a66c97c4c74093c4a8533f05f4cb96bcbc4d0",
+        "IPv4": "true",
+        "IPv6": "false",
+        "Internal": "false",
+        "Labels": "",
+        "Name": "host",
+        "Scope": "local"
+      },
+      {
+        "CreatedAt": "2026-10-25 01:37:03.980171666 +0000 UTC",
+        "Driver": "null",
+        "ID": "e66d65cfe0714eb9fde22ab801d77393aeb653344362c0faac45292d829dab8e",
+        "IPv4": "true",
+        "IPv6": "false",
+        "Internal": "false",
+        "Labels": "",
+        "Name": "none",
+        "Scope": "local"
+      }
+    ]
+  },
+  "objects": [
+    {
+      "kind": "container",
+      "identity": "dbc716603043d66b1765ccfc1d8c0382a2d18133fc22cf53e8ae83972bcd4ff3",
+      "expected": {
+        "id": "dbc716603043d66b1765ccfc1d8c0382a2d18133fc22cf53e8ae83972bcd4ff3",
+        "name": "/ontology-g4-m1-final-gates-001-r04-final-web-1",
+        "image": "sha256:a52166d89cfcc66ea62d10535ca712d161cece5d77ff4cfa758866b6b75ccb3f",
+        "created": "2026-11-02T00:21:39.648195376Z",
+        "labels": {
+          "com.docker.compose.config-hash": "0004e2d2da13f9e275744823a68dc9c95485c6501fae3304ceef24cea4c4e407",
+          "com.docker.compose.container-number": "1",
+          "com.docker.compose.depends_on": "api:service_started:true",
+          "com.docker.compose.image": "sha256:a52166d89cfcc66ea62d10535ca712d161cece5d77ff4cfa758866b6b75ccb3f",
+          "com.docker.compose.oneoff": "False",
+          "com.docker.compose.project": "ontology-g4-m1-final-gates-001-r04-final",
+          "com.docker.compose.project.config_files": "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates/compose.r04.yaml",
+          "com.docker.compose.project.working_dir": "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates",
+          "com.docker.compose.service": "web",
+          "com.docker.compose.version": "5.6.1",
+          "ontology.run-id": "final-gates-20261102-r04-final",
+          "ontology.synthetic": "true",
+          "ontology.task-id": "G4-M1-FINAL-GATES-001"
+        },
+        "memory": 268435456,
+        "mounts": [
+          {
+            "Destination": "/run/loopback-proxy.mjs",
+            "Mode": "ro",
+            "Propagation": "rprivate",
+            "RW": false,
+            "Source": "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates/r04-loopback-proxy.mjs",
+            "Type": "bind"
+          },
+          {
+            "Destination": "/run/stdio-relay.mjs",
+            "Mode": "ro",
+            "Propagation": "rprivate",
+            "RW": false,
+            "Source": "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates/stdio-relay.mjs",
+            "Type": "bind"
+          },
+          {
+            "Destination": "/run/web-production.mjs",
+            "Mode": "ro",
+            "Propagation": "rprivate",
+            "RW": false,
+            "Source": "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates/web-production.mjs",
+            "Type": "bind"
+          },
+          {
+            "Destination": "/Users/chasen/.codex/worktrees/g3-m5-review-fix/ontology-platform/node_modules",
+            "Mode": "ro",
+            "Propagation": "rprivate",
+            "RW": false,
+            "Source": "/Users/chasen/.codex/worktrees/g3-m5-review-fix/ontology-platform/node_modules",
+            "Type": "bind"
+          },
+          {
+            "Destination": "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/apps/web",
+            "Mode": "ro",
+            "Propagation": "rprivate",
+            "RW": false,
+            "Source": "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/apps/web",
+            "Type": "bind"
+          },
+          {
+            "Destination": "/Users/chasen/.codex/worktrees/g3-m5-review-fix/ontology-platform/apps/web/node_modules",
+            "Mode": "ro",
+            "Propagation": "rprivate",
+            "RW": false,
+            "Source": "/Users/chasen/.codex/worktrees/g3-m5-review-fix/ontology-platform/apps/web/node_modules",
+            "Type": "bind"
+          }
+        ]
+      }
+    },
+    {
+      "kind": "container",
+      "identity": "be6aa5f20987e062ff475fcbb11e8f5e6b9a1b22cd3f2c60c5c55468dc19243b",
+      "expected": {
+        "id": "be6aa5f20987e062ff475fcbb11e8f5e6b9a1b22cd3f2c60c5c55468dc19243b",
+        "name": "/ontology-g4-m1-final-gates-001-r04-final-rustfs-1",
+        "image": "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+        "created": "2026-11-02T00:21:39.619256626Z",
+        "labels": {
+          "build-date": "",
+          "com.docker.compose.config-hash": "3b93b9a0462f7bc00318c9ae67d719f9ed68b4a07e3da976d3519a172fb71b3d",
+          "com.docker.compose.container-number": "1",
+          "com.docker.compose.depends_on": "",
+          "com.docker.compose.image": "sha256:a3951370f879374cb89cca3b495e05badab38807cc4cd609c54a35f93f6ccd64",
+          "com.docker.compose.oneoff": "False",
+          "com.docker.compose.project": "ontology-g4-m1-final-gates-001-r04-final",
+          "com.docker.compose.project.config_files": "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates/compose.r04.yaml",
+          "com.docker.compose.project.working_dir": "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates",
+          "com.docker.compose.service": "rustfs",
+          "com.docker.compose.version": "5.6.1",
+          "description": "RustFS is a distributed object storage system written in Rust, supporting erasure coding, multi-tenant management, and observability.",
+          "license": "Apache-2.0",
+          "maintainer": "RustFS Team <dev@rustfs.com>",
+          "name": "RustFS",
+          "ontology.run-id": "final-gates-20261102-r04-final",
+          "ontology.synthetic": "true",
+          "ontology.task-id": "G4-M1-FINAL-GATES-001",
+          "org.opencontainers.image.title": "RustFS,org.opencontainers.image.description=RustFS distributed object storage system,org.opencontainers.image.version=1.0.3,org.opencontainers.image.revision=331fb896285a7686f927baf8d9d4dc2d3d3a10a9,org.opencontainers.image.source=https://github.com/rustfs/rustfs,org.opencontainers.image.created=2026-10-17T15:51:03Z,org.opencontainers.image.build-type=release",
+          "release": "1.0.3",
+          "summary": "High-performance distributed object storage system compatible with S3 API",
+          "url": "https://rustfs.com",
+          "vcs-ref": "",
+          "vendor": "RustFS Team",
+          "version": "v1.0.3"
+        },
+        "memory": 805306368,
+        "mounts": [
+          {
+            "Destination": "/data",
+            "Driver": "local",
+            "Mode": "rw",
+            "Name": "ontology-g4-m1-final-gates-001-r04-final_rustfs-data",
+            "Propagation": "",
+            "RW": true,
+            "Source": "/var/lib/docker/volumes/ontology-g4-m1-final-gates-001-r04-final_rustfs-data/_data",
+            "Type": "volume"
+          },
+          {
+            "Destination": "/run/secrets/s3-access",
+            "Mode": "ro",
+            "Propagation": "rprivate",
+            "RW": false,
+            "Source": "/host_mnt/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/.tools/security/g4-m1-final-gates-001-r04-final-20261102/s3-access",
+            "Type": "bind"
+          },
+          {
+            "Destination": "/run/secrets/s3-secret",
+            "Mode": "ro",
+            "Propagation": "rprivate",
+            "RW": false,
+            "Source": "/host_mnt/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/.tools/security/g4-m1-final-gates-001-r04-final-20261102/s3-secret",
+            "Type": "bind"
+          }
+        ]
+      }
+    },
+    {
+      "kind": "container",
+      "identity": "06f8168b6012d86ca20d162a1233b6af5d12c1355339b30fa8fe8881bed4fe91",
+      "expected": {
+        "id": "06f8168b6012d86ca20d162a1233b6af5d12c1355339b30fa8fe8881bed4fe91",
+        "name": "/ontology-g4-m1-final-gates-001-r04-final-api-1",
+        "image": "sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55",
+        "created": "2026-11-02T00:21:39.617049126Z",
+        "labels": {
+          "com.docker.compose.config-hash": "52cd6d0c15872753e9cd4ba2553b7d0d1c5352c613e57631046e820ecb622fe2",
+          "com.docker.compose.container-number": "1",
+          "com.docker.compose.depends_on": "",
+          "com.docker.compose.image": "sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55",
+          "com.docker.compose.oneoff": "False",
+          "com.docker.compose.project": "ontology-g4-m1-final-gates-001-r04-final",
+          "com.docker.compose.project.config_files": "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates/compose.r04.yaml",
+          "com.docker.compose.project.working_dir": "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates",
+          "com.docker.compose.service": "api",
+          "com.docker.compose.version": "5.6.1",
+          "ontology.run-id": "final-gates-20261102-r04-final",
+          "ontology.synthetic": "true",
+          "ontology.task-id": "G4-M1-FINAL-GATES-001",
+          "org.opencontainers.image.version": "24.04"
+        },
+        "memory": 1073741824,
+        "mounts": [
+          {
+            "Destination": "/app",
+            "Mode": "ro",
+            "Propagation": "rprivate",
+            "RW": false,
+            "Source": "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/artifacts/g4-m1-final-gates-001/api",
+            "Type": "bind"
+          },
+          {
+            "Destination": "/keyring",
+            "Driver": "local",
+            "Mode": "rw",
+            "Name": "ontology-g4-m1-final-gates-001-r04-final_api-keyring",
+            "Propagation": "",
+            "RW": true,
+            "Source": "/var/lib/docker/volumes/ontology-g4-m1-final-gates-001-r04-final_api-keyring/_data",
+            "Type": "volume"
+          },
+          {
+            "Destination": "/private/api",
+            "Mode": "ro",
+            "Propagation": "rprivate",
+            "RW": false,
+            "Source": "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/.tools/security/g4-m1-final-gates-001-r04-final-20261102/api",
+            "Type": "bind"
+          }
+        ]
+      }
+    },
+    {
+      "kind": "container",
+      "identity": "1d36e7a7a95c3c4e6b82d99ef7c07cad650a637f2d39ca93738aa7cea420087f",
+      "expected": {
+        "id": "1d36e7a7a95c3c4e6b82d99ef7c07cad650a637f2d39ca93738aa7cea420087f",
+        "name": "/ontology-g4-m1-final-gates-001-r04-final-keycloak-test-1",
+        "image": "sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4",
+        "created": "2026-11-02T00:21:39.616660835Z",
+        "labels": {
+          "architecture": "aarch64",
+          "build-date": "2026-10-13T12:45:57Z",
+          "com.docker.compose.config-hash": "721fabc3a6975613c926676584361edf1dc6703048f0c522bb52aa54a990e5aa",
+          "com.docker.compose.container-number": "1",
+          "com.docker.compose.depends_on": "",
+          "com.docker.compose.image": "sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4",
+          "com.docker.compose.oneoff": "False",
+          "com.docker.compose.project": "ontology-g4-m1-final-gates-001-r04-final",
+          "com.docker.compose.project.config_files": "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates/compose.r04.yaml",
+          "com.docker.compose.project.working_dir": "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates",
+          "com.docker.compose.service": "keycloak-test",
+          "com.docker.compose.version": "5.6.1",
+          "com.redhat.build-host": "",
+          "com.redhat.component": "",
+          "com.redhat.license_terms": "",
+          "cpe": "cpe:/a:redhat:enterprise_linux:9::appstream",
+          "description": "Keycloak Server Image",
+          "distribution-scope": "public",
+          "io.buildah.version": "1.45.0",
+          "io.k8s.description": "Keycloak Server Image",
+          "io.k8s.display-name": "Keycloak Server",
+          "io.openshift.expose-services": "",
+          "io.openshift.tags": "keycloak security identity",
+          "maintainer": "https://www.keycloak.org/",
+          "name": "keycloak",
+          "ontology.run-id": "final-gates-20261102-r04-final",
+          "ontology.synthetic": "true",
+          "ontology.task-id": "G4-M1-FINAL-GATES-001",
+          "org.opencontainers.image.created": "2026-10-31T10:43:11.501Z",
+          "org.opencontainers.image.description": "",
+          "org.opencontainers.image.documentation": "https://www.keycloak.org/documentation",
+          "org.opencontainers.image.licenses": "Apache-2.0",
+          "org.opencontainers.image.revision": "26018f2a4c6155cfe2c28f078996390bf5191946",
+          "org.opencontainers.image.source": "https://github.com/keycloak-rel/keycloak-rel",
+          "org.opencontainers.image.title": "keycloak-rel",
+          "org.opencontainers.image.url": "https://github.com/keycloak-rel/keycloak-rel",
+          "org.opencontainers.image.version": "26.8.1",
+          "release": "",
+          "summary": "Keycloak Server Image",
+          "url": "https://www.keycloak.org/",
+          "vcs-ref": "",
+          "vcs-type": "git",
+          "vendor": "https://www.keycloak.org/",
+          "version": "26.8.1"
+        },
+        "memory": 1073741824,
+        "mounts": [
+          {
+            "Destination": "/opt/keycloak/data",
+            "Driver": "local",
+            "Mode": "rw",
+            "Name": "ontology-g4-m1-final-gates-001-r04-final_keycloak-data",
+            "Propagation": "",
+            "RW": true,
+            "Source": "/var/lib/docker/volumes/ontology-g4-m1-final-gates-001-r04-final_keycloak-data/_data",
+            "Type": "volume"
+          },
+          {
+            "Destination": "/run/secrets/keycloak-password",
+            "Mode": "ro",
+            "Propagation": "rprivate",
+            "RW": false,
+            "Source": "/host_mnt/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/.tools/security/g4-m1-final-gates-001-r04-final-20261102/keycloak-password",
+            "Type": "bind"
+          }
+        ]
+      }
+    },
+    {
+      "kind": "container",
+      "identity": "c851dc773a0275f1c6d23cddea3232e69cd4d77f1252455391d9dc0364b80b68",
+      "expected": {
+        "id": "c851dc773a0275f1c6d23cddea3232e69cd4d77f1252455391d9dc0364b80b68",
+        "name": "/ontology-g4-m1-final-gates-001-r04-final-platform-pg-1",
+        "image": "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+        "created": "2026-11-02T00:21:39.616064876Z",
+        "labels": {
+          "com.docker.compose.config-hash": "c17264ee36a8fe8fb2947b1186351c2d07e8e276bca2ebb5c8ca0997e1ad2e2d",
+          "com.docker.compose.container-number": "1",
+          "com.docker.compose.depends_on": "",
+          "com.docker.compose.image": "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+          "com.docker.compose.oneoff": "False",
+          "com.docker.compose.project": "ontology-g4-m1-final-gates-001-r04-final",
+          "com.docker.compose.project.config_files": "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates/compose.r04.yaml",
+          "com.docker.compose.project.working_dir": "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates",
+          "com.docker.compose.service": "platform-pg",
+          "com.docker.compose.version": "5.6.1",
+          "ontology.run-id": "final-gates-20261102-r04-final",
+          "ontology.synthetic": "true",
+          "ontology.task-id": "G4-M1-FINAL-GATES-001"
+        },
+        "memory": 805306368,
+        "mounts": [
+          {
+            "Destination": "/run/secrets/platform-password",
+            "Mode": "ro",
+            "Propagation": "rprivate",
+            "RW": false,
+            "Source": "/host_mnt/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/.tools/security/g4-m1-final-gates-001-r04-final-20261102/platform-password",
+            "Type": "bind"
+          },
+          {
+            "Destination": "/var/lib/postgresql",
+            "Driver": "local",
+            "Mode": "rw",
+            "Name": "ontology-g4-m1-final-gates-001-r04-final_platform-data",
+            "Propagation": "",
+            "RW": true,
+            "Source": "/var/lib/docker/volumes/ontology-g4-m1-final-gates-001-r04-final_platform-data/_data",
+            "Type": "volume"
+          }
+        ]
+      }
+    },
+    {
+      "kind": "container",
+      "identity": "718000c6421497628efda3750759a07dcc8e5f341da903e75c4a1b9a5ced2c24",
+      "expected": {
+        "id": "718000c6421497628efda3750759a07dcc8e5f341da903e75c4a1b9a5ced2c24",
+        "name": "/ontology-g4-m1-final-gates-001-r04-final-fuseki-1",
+        "image": "sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c",
+        "created": "2026-11-02T00:21:39.61513021Z",
+        "labels": {
+          "com.docker.compose.config-hash": "aa986cafb836406757cc4c32162543df82db7e0563663998fbc594e8618a67e0",
+          "com.docker.compose.container-number": "1",
+          "com.docker.compose.depends_on": "",
+          "com.docker.compose.image": "sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c",
+          "com.docker.compose.oneoff": "False",
+          "com.docker.compose.project": "ontology-g4-m1-final-gates-001-r04-final",
+          "com.docker.compose.project.config_files": "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates/compose.r04.yaml",
+          "com.docker.compose.project.working_dir": "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates",
+          "com.docker.compose.service": "fuseki",
+          "com.docker.compose.version": "5.6.1",
+          "io.ontology-platform.context-sha256": "dba8036818246baaefc136fa6740729e9be068c79dd0c2ae584f895192406091",
+          "io.ontology-platform.input-fingerprint": "4fbf23514516632dcb651b5c05bf04e9992da52491607b6cf58de1f7348ff9ab",
+          "io.ontology-platform.platform": "linux/arm64",
+          "io.ontology-platform.run-id": "e0-a-real-69e4388fb5bf4923976997ded13f93b9-export",
+          "io.ontology-platform.task-id": "G3-M3-001",
+          "ontology.run-id": "final-gates-20261102-r04-final",
+          "ontology.synthetic": "true",
+          "ontology.task-id": "G4-M1-FINAL-GATES-001",
+          "org.opencontainers.image.source": "https://github.com/on-dotnet/ontology-platform",
+          "org.opencontainers.image.version": "22.04"
+        },
+        "memory": 1073741824,
+        "mounts": [
+          {
+            "Destination": "/fuseki",
+            "Driver": "local",
+            "Mode": "rw",
+            "Name": "ontology-g4-m1-final-gates-001-r04-final_fuseki-data",
+            "Propagation": "",
+            "RW": true,
+            "Source": "/var/lib/docker/volumes/ontology-g4-m1-final-gates-001-r04-final_fuseki-data/_data",
+            "Type": "volume"
+          }
+        ]
+      }
+    },
+    {
+      "kind": "volume",
+      "identity": "ontology-g4-m1-final-gates-001-r04-final_api-keyring",
+      "expected": {
+        "name": "ontology-g4-m1-final-gates-001-r04-final_api-keyring",
+        "created": "2026-11-02T00:21:39Z",
+        "driver": "local",
+        "labels": {
+          "com.docker.compose.config-hash": "e76b27cb2c5fddb5811cf7d409c31e5b17ff32706a69efd0b125ddfea64593c2",
+          "com.docker.compose.project": "ontology-g4-m1-final-gates-001-r04-final",
+          "com.docker.compose.version": "5.6.1",
+          "com.docker.compose.volume": "api-keyring",
+          "ontology.run-id": "final-gates-20261102-r04-final",
+          "ontology.synthetic": "true",
+          "ontology.task-id": "G4-M1-FINAL-GATES-001"
+        },
+        "options": {
+          "device": "tmpfs",
+          "o": "size=16m,mode=0700,uid=501,gid=20",
+          "type": "tmpfs"
+        }
+      }
+    },
+    {
+      "kind": "volume",
+      "identity": "ontology-g4-m1-final-gates-001-r04-final_fuseki-data",
+      "expected": {
+        "name": "ontology-g4-m1-final-gates-001-r04-final_fuseki-data",
+        "created": "2026-11-02T00:21:39Z",
+        "driver": "local",
+        "labels": {
+          "com.docker.compose.config-hash": "ec75e236244b8fa415385a3fa3ebdc4a2098dc31ec6224403a9d7a00e444b395",
+          "com.docker.compose.project": "ontology-g4-m1-final-gates-001-r04-final",
+          "com.docker.compose.version": "5.6.1",
+          "com.docker.compose.volume": "fuseki-data",
+          "ontology.run-id": "final-gates-20261102-r04-final",
+          "ontology.synthetic": "true",
+          "ontology.task-id": "G4-M1-FINAL-GATES-001"
+        },
+        "options": {
+          "device": "tmpfs",
+          "o": "size=512m,mode=0700,uid=10001,gid=10001",
+          "type": "tmpfs"
+        }
+      }
+    },
+    {
+      "kind": "volume",
+      "identity": "ontology-g4-m1-final-gates-001-r04-final_keycloak-data",
+      "expected": {
+        "name": "ontology-g4-m1-final-gates-001-r04-final_keycloak-data",
+        "created": "2026-11-02T00:21:39Z",
+        "driver": "local",
+        "labels": {
+          "com.docker.compose.config-hash": "7625b82a66233b581eb1d5c760a5aaa206e475d667f931cf2e8c426e8982c22f",
+          "com.docker.compose.project": "ontology-g4-m1-final-gates-001-r04-final",
+          "com.docker.compose.version": "5.6.1",
+          "com.docker.compose.volume": "keycloak-data",
+          "ontology.run-id": "final-gates-20261102-r04-final",
+          "ontology.synthetic": "true",
+          "ontology.task-id": "G4-M1-FINAL-GATES-001"
+        },
+        "options": {
+          "device": "tmpfs",
+          "o": "size=512m,mode=0700,uid=501,gid=20",
+          "type": "tmpfs"
+        }
+      }
+    },
+    {
+      "kind": "volume",
+      "identity": "ontology-g4-m1-final-gates-001-r04-final_platform-data",
+      "expected": {
+        "name": "ontology-g4-m1-final-gates-001-r04-final_platform-data",
+        "created": "2026-11-02T00:21:39Z",
+        "driver": "local",
+        "labels": {
+          "com.docker.compose.config-hash": "37014d9793e6301fde1df2357e47f7aa995b67642d632e7f44bddde2ea24d2c8",
+          "com.docker.compose.project": "ontology-g4-m1-final-gates-001-r04-final",
+          "com.docker.compose.version": "5.6.1",
+          "com.docker.compose.volume": "platform-data",
+          "ontology.run-id": "final-gates-20261102-r04-final",
+          "ontology.synthetic": "true",
+          "ontology.task-id": "G4-M1-FINAL-GATES-001"
+        },
+        "options": {
+          "device": "tmpfs",
+          "o": "size=512m,mode=0700",
+          "type": "tmpfs"
+        }
+      }
+    },
+    {
+      "kind": "volume",
+      "identity": "ontology-g4-m1-final-gates-001-r04-final_rustfs-data",
+      "expected": {
+        "name": "ontology-g4-m1-final-gates-001-r04-final_rustfs-data",
+        "created": "2026-11-02T00:21:39Z",
+        "driver": "local",
+        "labels": {
+          "com.docker.compose.config-hash": "1576d5c68ceb6ef3a9b3964c6a60872e946b83558c04095bbd70a377103f7370",
+          "com.docker.compose.project": "ontology-g4-m1-final-gates-001-r04-final",
+          "com.docker.compose.version": "5.6.1",
+          "com.docker.compose.volume": "rustfs-data",
+          "ontology.run-id": "final-gates-20261102-r04-final",
+          "ontology.synthetic": "true",
+          "ontology.task-id": "G4-M1-FINAL-GATES-001"
+        },
+        "options": {
+          "device": "tmpfs",
+          "o": "size=512m,mode=0700,uid=501,gid=20",
+          "type": "tmpfs"
+        }
+      }
+    },
+    {
+      "kind": "network",
+      "identity": "6d0aa71b524fa2931553dd28767823e626a04a1c71ede2358597cdaf338a4d18",
+      "expected": {
+        "id": "6d0aa71b524fa2931553dd28767823e626a04a1c71ede2358597cdaf338a4d18",
+        "name": "ontology-g4-m1-final-gates-001-r04-final_front",
+        "created": "2026-11-02T00:21:39.603987418Z",
+        "labels": {
+          "com.docker.compose.config-hash": "42171fa09c0ae74c28c742fd0d21610e25c0d2d53d0fa8607f2ea5e4a0295a7e",
+          "com.docker.compose.network": "front",
+          "com.docker.compose.project": "ontology-g4-m1-final-gates-001-r04-final",
+          "com.docker.compose.version": "5.6.1",
+          "ontology.run-id": "final-gates-20261102-r04-final",
+          "ontology.synthetic": "true",
+          "ontology.task-id": "G4-M1-FINAL-GATES-001"
+        },
+        "internal": true
+      }
+    }
+  ],
+  "commands": [
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "version",
+        "--format",
+        "{{json .Server}}"
+      ],
+      "startedUtc": "2026-11-02T00:23:10.540649+00:00",
+      "exitCode": 0,
+      "stdout": "{\"Platform\":{\"Name\":\"Docker Desktop 4.96.3 (244472)\"},\"Version\":\"29.9.2\",\"ApiVersion\":\"1.56\",\"MinAPIVersion\":\"1.40\",\"Os\":\"linux\",\"Arch\":\"arm64\",\"Components\":[{\"Name\":\"Engine\",\"Version\":\"29.9.2\",\"Details\":{\"ApiVersion\":\"1.56\",\"Arch\":\"arm64\",\"BuildTime\":\"Tue Oct 20 18:44:14 2026\",\"Experimental\":\"false\",\"GitCommit\":\"0367cbe\",\"GoVersion\":\"go1.26.10\",\"KernelVersion\":\"7.0.14-linuxkit\",\"MinAPIVersion\":\"1.40\",\"Module\":\"github.com/moby/moby/v2\",\"ModuleVersion\":\"v2.0.0+unknown\",\"Os\":\"linux\"}},{\"Name\":\"containerd\",\"Version\":\"v2.4.2\",\"Details\":{\"GitCommit\":\"b7a25261e029d68978bbf290df0a62fc819b3c51\"}},{\"Name\":\"runc\",\"Version\":\"1.5.2\",\"Details\":{\"GitCommit\":\"v1.5.2-0-g29dd3dc2\"}},{\"Name\":\"docker-init\",\"Version\":\"0.19.0\",\"Details\":{\"GitCommit\":\"de40ad0\"}}],\"GitCommit\":\"0367cbe\",\"GoVersion\":\"go1.26.10\",\"KernelVersion\":\"7.0.14-linuxkit\",\"BuildTime\":\"2026-10-20T18:44:14.000000000+00:00\"}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "info",
+        "--format",
+        "{\"id\":{{json .ID}},\"architecture\":{{json .Architecture}}}"
+      ],
+      "startedUtc": "2026-11-02T00:23:10.554492+00:00",
+      "exitCode": 0,
+      "stdout": "{\"id\":\"7a8785bb-6b6e-4ae4-8065-996f4bf83016\",\"architecture\":\"aarch64\"}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "ps",
+        "-a",
+        "--no-trunc",
+        "--format",
+        "{\"ID\":{{json .ID}},\"Names\":{{json .Names}},\"Image\":{{json .Image}},\"State\":{{json .State}},\"Status\":{{json .Status}},\"Labels\":{{json .Labels}}}"
+      ],
+      "startedUtc": "2026-11-02T00:23:10.615375+00:00",
+      "exitCode": 0,
+      "stdout": "{\"ID\":\"dbc716603043d66b1765ccfc1d8c0382a2d18133fc22cf53e8ae83972bcd4ff3\",\"Names\":\"ontology-g4-m1-final-gates-001-r04-final-web-1\",\"Image\":\"node@sha256:a52166d89cfcc66ea62d10535ca712d161cece5d77ff4cfa758866b6b75ccb3f\",\"State\":\"running\",\"Status\":\"Up About a minute\",\"Labels\":\"com.docker.compose.config-hash=0004e2d2da13f9e275744823a68dc9c95485c6501fae3304ceef24cea4c4e407,com.docker.compose.container-number=1,com.docker.compose.depends_on=api:service_started:true,com.docker.compose.image=sha256:a52166d89cfcc66ea62d10535ca712d161cece5d77ff4cfa758866b6b75ccb3f,com.docker.compose.oneoff=False,com.docker.compose.project.config_files=/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates/compose.r04.yaml,com.docker.compose.project.working_dir=/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates,com.docker.compose.project=ontology-g4-m1-final-gates-001-r04-final,com.docker.compose.service=web,com.docker.compose.version=5.6.1,desktop.docker.io/binds/0/Source=/Users/chasen/.codex/worktrees/g3-m5-review-fix/ontology-platform/apps/web/node_modules,desktop.docker.io/binds/0/SourceKind=hostFile,desktop.docker.io/binds/0/Target=/Users/chasen/.codex/worktrees/g3-m5-review-fix/ontology-platform/apps/web/node_modules,desktop.docker.io/binds/1/Source=/Users/chasen/.codex/worktrees/g3-m5-review-fix/ontology-platform/node_modules,desktop.docker.io/binds/1/SourceKind=hostFile,desktop.docker.io/binds/1/Target=/Users/chasen/.codex/worktrees/g3-m5-review-fix/ontology-platform/node_modules,desktop.docker.io/binds/2/Source=/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates/r04-loopback-proxy.mjs,desktop.docker.io/binds/2/SourceKind=hostFile,desktop.docker.io/binds/2/Target=/run/loopback-proxy.mjs,desktop.docker.io/binds/3/Source=/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates/stdio-relay.mjs,desktop.docker.io/binds/3/SourceKind=hostFile,desktop.docker.io/binds/3/Target=/run/stdio-relay.mjs,desktop.docker.io/binds/4/Source=/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates/web-production.mjs,desktop.docker.io/binds/4/SourceKind=hostFile,desktop.docker.io/binds/4/Target=/run/web-production.mjs,desktop.docker.io/binds/5/Source=/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/apps/web,desktop.docker.io/binds/5/SourceKind=hostFile,desktop.docker.io/binds/5/Target=/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/apps/web,desktop.docker.io/ports.scheme=v2,ontology.run-id=final-gates-20261102-r04-final,ontology.synthetic=true,ontology.task-id=G4-M1-FINAL-GATES-001\"}\n{\"ID\":\"be6aa5f20987e062ff475fcbb11e8f5e6b9a1b22cd3f2c60c5c55468dc19243b\",\"Names\":\"ontology-g4-m1-final-gates-001-r04-final-rustfs-1\",\"Image\":\"rustfs/rustfs@sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b\",\"State\":\"running\",\"Status\":\"Up About a minute\",\"Labels\":\"build-date=,com.docker.compose.config-hash=3b93b9a0462f7bc00318c9ae67d719f9ed68b4a07e3da976d3519a172fb71b3d,com.docker.compose.container-number=1,com.docker.compose.depends_on=,com.docker.compose.image=sha256:a3951370f879374cb89cca3b495e05badab38807cc4cd609c54a35f93f6ccd64,com.docker.compose.oneoff=False,com.docker.compose.project.config_files=/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates/compose.r04.yaml,com.docker.compose.project.working_dir=/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates,com.docker.compose.project=ontology-g4-m1-final-gates-001-r04-final,com.docker.compose.service=rustfs,com.docker.compose.version=5.6.1,description=RustFS is a distributed object storage system written in Rust, supporting erasure coding, multi-tenant management, and observability.,desktop.docker.io/binds/1/Source=/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/.tools/security/g4-m1-final-gates-001-r04-final-20261102/s3-access,desktop.docker.io/binds/1/SourceKind=hostFile,desktop.docker.io/binds/1/Target=/run/secrets/s3-access,desktop.docker.io/binds/2/Source=/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/.tools/security/g4-m1-final-gates-001-r04-final-20261102/s3-secret,desktop.docker.io/binds/2/SourceKind=hostFile,desktop.docker.io/binds/2/Target=/run/secrets/s3-secret,desktop.docker.io/ports.scheme=v2,license=Apache-2.0,maintainer=RustFS Team <dev@rustfs.com>,name=RustFS,ontology.run-id=final-gates-20261102-r04-final,ontology.synthetic=true,ontology.task-id=G4-M1-FINAL-GATES-001,org.opencontainers.image.title=RustFS,org.opencontainers.image.description=RustFS distributed object storage system,org.opencontainers.image.version=1.0.3,org.opencontainers.image.revision=331fb896285a7686f927baf8d9d4dc2d3d3a10a9,org.opencontainers.image.source=https://github.com/rustfs/rustfs,org.opencontainers.image.created=2026-10-17T15:51:03Z,org.opencontainers.image.build-type=release,release=1.0.3,summary=High-performance distributed object storage system compatible with S3 API,url=https://rustfs.com,vcs-ref=,vendor=RustFS Team,version=v1.0.3\"}\n{\"ID\":\"06f8168b6012d86ca20d162a1233b6af5d12c1355339b30fa8fe8881bed4fe91\",\"Names\":\"ontology-g4-m1-final-gates-001-r04-final-api-1\",\"Image\":\"mcr.microsoft.com/dotnet/aspnet@sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55\",\"State\":\"running\",\"Status\":\"Up About a minute\",\"Labels\":\"com.docker.compose.config-hash=52cd6d0c15872753e9cd4ba2553b7d0d1c5352c613e57631046e820ecb622fe2,com.docker.compose.container-number=1,com.docker.compose.depends_on=,com.docker.compose.image=sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55,com.docker.compose.oneoff=False,com.docker.compose.project.config_files=/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates/compose.r04.yaml,com.docker.compose.project.working_dir=/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates,com.docker.compose.project=ontology-g4-m1-final-gates-001-r04-final,com.docker.compose.service=api,com.docker.compose.version=5.6.1,desktop.docker.io/binds/0/Source=/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/artifacts/g4-m1-final-gates-001/api,desktop.docker.io/binds/0/SourceKind=hostFile,desktop.docker.io/binds/0/Target=/app,desktop.docker.io/binds/1/Source=/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/.tools/security/g4-m1-final-gates-001-r04-final-20261102/api,desktop.docker.io/binds/1/SourceKind=hostFile,desktop.docker.io/binds/1/Target=/private/api,desktop.docker.io/ports.scheme=v2,ontology.run-id=final-gates-20261102-r04-final,ontology.synthetic=true,ontology.task-id=G4-M1-FINAL-GATES-001,org.opencontainers.image.version=24.04\"}\n{\"ID\":\"1d36e7a7a95c3c4e6b82d99ef7c07cad650a637f2d39ca93738aa7cea420087f\",\"Names\":\"ontology-g4-m1-final-gates-001-r04-final-keycloak-test-1\",\"Image\":\"quay.io/keycloak/keycloak@sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4\",\"State\":\"running\",\"Status\":\"Up About a minute\",\"Labels\":\"architecture=aarch64,build-date=2026-10-13T12:45:57Z,com.docker.compose.config-hash=721fabc3a6975613c926676584361edf1dc6703048f0c522bb52aa54a990e5aa,com.docker.compose.container-number=1,com.docker.compose.depends_on=,com.docker.compose.image=sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4,com.docker.compose.oneoff=False,com.docker.compose.project.config_files=/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates/compose.r04.yaml,com.docker.compose.project.working_dir=/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates,com.docker.compose.project=ontology-g4-m1-final-gates-001-r04-final,com.docker.compose.service=keycloak-test,com.docker.compose.version=5.6.1,com.redhat.build-host=,com.redhat.component=,com.redhat.license_terms=,cpe=cpe:/a:redhat:enterprise_linux:9::appstream,description=Keycloak Server Image,desktop.docker.io/binds/1/Source=/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/.tools/security/g4-m1-final-gates-001-r04-final-20261102/keycloak-password,desktop.docker.io/binds/1/SourceKind=hostFile,desktop.docker.io/binds/1/Target=/run/secrets/keycloak-password,desktop.docker.io/ports.scheme=v2,distribution-scope=public,io.buildah.version=1.45.0,io.k8s.description=Keycloak Server Image,io.k8s.display-name=Keycloak Server,io.openshift.expose-services=,io.openshift.tags=keycloak security identity,maintainer=https://www.keycloak.org/,name=keycloak,ontology.run-id=final-gates-20261102-r04-final,ontology.synthetic=true,ontology.task-id=G4-M1-FINAL-GATES-001,org.opencontainers.image.created=2026-10-31T10:43:11.501Z,org.opencontainers.image.description=,org.opencontainers.image.documentation=https://www.keycloak.org/documentation,org.opencontainers.image.licenses=Apache-2.0,org.opencontainers.image.revision=26018f2a4c6155cfe2c28f078996390bf5191946,org.opencontainers.image.source=https://github.com/keycloak-rel/keycloak-rel,org.opencontainers.image.title=keycloak-rel,org.opencontainers.image.url=https://github.com/keycloak-rel/keycloak-rel,org.opencontainers.image.version=26.8.1,release=,summary=Keycloak Server Image,url=https://www.keycloak.org/,vcs-ref=,vcs-type=git,vendor=https://www.keycloak.org/,version=26.8.1\"}\n{\"ID\":\"c851dc773a0275f1c6d23cddea3232e69cd4d77f1252455391d9dc0364b80b68\",\"Names\":\"ontology-g4-m1-final-gates-001-r04-final-platform-pg-1\",\"Image\":\"postgres@sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437\",\"State\":\"running\",\"Status\":\"Up About a minute (healthy)\",\"Labels\":\"com.docker.compose.config-hash=c17264ee36a8fe8fb2947b1186351c2d07e8e276bca2ebb5c8ca0997e1ad2e2d,com.docker.compose.container-number=1,com.docker.compose.depends_on=,com.docker.compose.image=sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437,com.docker.compose.oneoff=False,com.docker.compose.project.config_files=/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates/compose.r04.yaml,com.docker.compose.project.working_dir=/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates,com.docker.compose.project=ontology-g4-m1-final-gates-001-r04-final,com.docker.compose.service=platform-pg,com.docker.compose.version=5.6.1,desktop.docker.io/binds/1/Source=/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/.tools/security/g4-m1-final-gates-001-r04-final-20261102/platform-password,desktop.docker.io/binds/1/SourceKind=hostFile,desktop.docker.io/binds/1/Target=/run/secrets/platform-password,desktop.docker.io/ports.scheme=v2,ontology.run-id=final-gates-20261102-r04-final,ontology.synthetic=true,ontology.task-id=G4-M1-FINAL-GATES-001\"}\n{\"ID\":\"718000c6421497628efda3750759a07dcc8e5f341da903e75c4a1b9a5ced2c24\",\"Names\":\"ontology-g4-m1-final-gates-001-r04-final-fuseki-1\",\"Image\":\"ontology-platform-fuseki:context-4fbf23514516632dcb651b5c05bf04e9992da52491607b6cf58de1f7348ff9ab\",\"State\":\"running\",\"Status\":\"Up About a minute\",\"Labels\":\"com.docker.compose.config-hash=aa986cafb836406757cc4c32162543df82db7e0563663998fbc594e8618a67e0,com.docker.compose.container-number=1,com.docker.compose.depends_on=,com.docker.compose.image=sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c,com.docker.compose.oneoff=False,com.docker.compose.project.config_files=/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates/compose.r04.yaml,com.docker.compose.project.working_dir=/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates,com.docker.compose.project=ontology-g4-m1-final-gates-001-r04-final,com.docker.compose.service=fuseki,com.docker.compose.version=5.6.1,desktop.docker.io/ports.scheme=v2,io.ontology-platform.context-sha256=dba8036818246baaefc136fa6740729e9be068c79dd0c2ae584f895192406091,io.ontology-platform.input-fingerprint=4fbf23514516632dcb651b5c05bf04e9992da52491607b6cf58de1f7348ff9ab,io.ontology-platform.platform=linux/arm64,io.ontology-platform.run-id=e0-a-real-69e4388fb5bf4923976997ded13f93b9-export,io.ontology-platform.task-id=G3-M3-001,ontology.run-id=final-gates-20261102-r04-final,ontology.synthetic=true,ontology.task-id=G4-M1-FINAL-GATES-001,org.opencontainers.image.source=https://github.com/on-dotnet/ontology-platform,org.opencontainers.image.version=22.04\"}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "image",
+        "ls",
+        "--no-trunc",
+        "--digests",
+        "--format",
+        "{{json .}}"
+      ],
+      "startedUtc": "2026-11-02T00:23:10.636030+00:00",
+      "exitCode": 0,
+      "stdout": "{\"Containers\":\"1\",\"CreatedAt\":\"2026-10-31 18:45:20 +0800 CST\",\"CreatedSince\":\"38 hours ago\",\"Digest\":\"sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4\",\"ID\":\"sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4\",\"Repository\":\"quay.io/keycloak/keycloak\",\"SharedSize\":\"N/A\",\"Size\":\"751MB\",\"Tag\":\"\\u003cnone\\u003e\",\"UniqueSize\":\"N/A\"}\n{\"Containers\":\"1\",\"CreatedAt\":\"2026-10-28 22:40:49 +0800 CST\",\"CreatedSince\":\"4 days ago\",\"Digest\":\"sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c\",\"ID\":\"sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c\",\"Repository\":\"ontology-platform-fuseki\",\"SharedSize\":\"N/A\",\"Size\":\"606MB\",\"Tag\":\"context-4fbf23514516632dcb651b5c05bf04e9992da52491607b6cf58de1f7348ff9ab\",\"UniqueSize\":\"N/A\"}\n{\"Containers\":\"0\",\"CreatedAt\":\"2026-10-28 21:55:59 +0800 CST\",\"CreatedSince\":\"4 days ago\",\"Digest\":\"sha256:cc1591ccefc0ab280cfd1fef2ebc5315de7d2f39d8d1c1d690c37e305810a9b2\",\"ID\":\"sha256:cc1591ccefc0ab280cfd1fef2ebc5315de7d2f39d8d1c1d690c37e305810a9b2\",\"Repository\":\"hlc-iov-release-postgis\",\"SharedSize\":\"N/A\",\"Size\":\"966MB\",\"Tag\":\"18.6-3.6.3\",\"UniqueSize\":\"N/A\"}\n{\"Containers\":\"0\",\"CreatedAt\":\"2026-10-27 23:06:39 +0800 CST\",\"CreatedSince\":\"5 days ago\",\"Digest\":\"sha256:39b0fb6616a466a05b2ff8c691bb14a63557c70118d433a4b70fd1068b1bef60\",\"ID\":\"sha256:39b0fb6616a466a05b2ff8c691bb14a63557c70118d433a4b70fd1068b1bef60\",\"Repository\":\"ontology-platform-fuseki\",\"SharedSize\":\"N/A\",\"Size\":\"503MB\",\"Tag\":\"context-1e45f836d9837cbc75d23adb3ad37b0ff79a545ef06102a87aa246feea9cc1e5\",\"UniqueSize\":\"N/A\"}\n{\"Containers\":\"0\",\"CreatedAt\":\"2026-10-26 10:07:21 +0800 CST\",\"CreatedSince\":\"6 days ago\",\"Digest\":\"sha256:401e1fbc58c27b08c3103e00c86b22bd175a1cdd8f8a7d61965133f27a24437f\",\"ID\":\"sha256:401e1fbc58c27b08c3103e00c86b22bd175a1cdd8f8a7d61965133f27a24437f\",\"Repository\":\"ontology-platform-g2-fuseki\",\"SharedSize\":\"N/A\",\"Size\":\"503MB\",\"Tag\":\"6.2.0\",\"UniqueSize\":\"N/A\"}\n{\"Containers\":\"0\",\"CreatedAt\":\"2026-10-23 17:46:28 +0800 CST\",\"CreatedSince\":\"9 days ago\",\"Digest\":\"sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b\",\"ID\":\"sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b\",\"Repository\":\"quay.io/keycloak/keycloak\",\"SharedSize\":\"N/A\",\"Size\":\"750MB\",\"Tag\":\"\\u003cnone\\u003e\",\"UniqueSize\":\"N/A\"}\n{\"Containers\":\"0\",\"CreatedAt\":\"2026-10-23 05:40:39 +0800 CST\",\"CreatedSince\":\"10 days ago\",\"Digest\":\"sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18\",\"ID\":\"sha256:89a5a320168387336b9ac3c850609c3ba7757eadd4ae5f1d819deb35e9854b18\",\"Repository\":\"grafana/alloy\",\"SharedSize\":\"N/A\",\"Size\":\"928MB\",\"Tag\":\"\\u003cnone\\u003e\",\"UniqueSize\":\"N/A\"}\n{\"Containers\":\"1\",\"CreatedAt\":\"2026-10-22 00:49:12 +0800 CST\",\"CreatedSince\":\"11 days ago\",\"Digest\":\"sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55\",\"ID\":\"sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55\",\"Repository\":\"mcr.microsoft.com/dotnet/aspnet\",\"SharedSize\":\"N/A\",\"Size\":\"369MB\",\"Tag\":\"\\u003cnone\\u003e\",\"UniqueSize\":\"N/A\"}\n{\"Containers\":\"0\",\"CreatedAt\":\"2026-10-21 23:59:43 +0800 CST\",\"CreatedSince\":\"11 days ago\",\"Digest\":\"sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044\",\"ID\":\"sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044\",\"Repository\":\"grafana/tempo\",\"SharedSize\":\"N/A\",\"Size\":\"161MB\",\"Tag\":\"\\u003cnone\\u003e\",\"UniqueSize\":\"N/A\"}\n{\"Containers\":\"0\",\"CreatedAt\":\"2026-10-21 22:04:19 +0800 CST\",\"CreatedSince\":\"11 days ago\",\"Digest\":\"sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2\",\"ID\":\"sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2\",\"Repository\":\"prom/prometheus\",\"SharedSize\":\"N/A\",\"Size\":\"357MB\",\"Tag\":\"\\u003cnone\\u003e\",\"UniqueSize\":\"N/A\"}\n{\"Containers\":\"0\",\"CreatedAt\":\"2026-10-21 08:40:08 +0800 CST\",\"CreatedSince\":\"12 days ago\",\"Digest\":\"\\u003cnone\\u003e\",\"ID\":\"sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6\",\"Repository\":\"hlc-iov-release-pg-base\",\"SharedSize\":\"N/A\",\"Size\":\"672MB\",\"Tag\":\"18.6\",\"UniqueSize\":\"N/A\"}\n{\"Containers\":\"0\",\"CreatedAt\":\"2026-10-21 08:40:08 +0800 CST\",\"CreatedSince\":\"12 days ago\",\"Digest\":\"sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6\",\"ID\":\"sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6\",\"Repository\":\"postgres\",\"SharedSize\":\"N/A\",\"Size\":\"672MB\",\"Tag\":\"\\u003cnone\\u003e\",\"UniqueSize\":\"N/A\"}\n{\"Containers\":\"0\",\"CreatedAt\":\"2026-10-21 05:45:42 +0800 CST\",\"CreatedSince\":\"12 days ago\",\"Digest\":\"sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28\",\"ID\":\"sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28\",\"Repository\":\"grafana/loki\",\"SharedSize\":\"N/A\",\"Size\":\"191MB\",\"Tag\":\"\\u003cnone\\u003e\",\"UniqueSize\":\"N/A\"}\n{\"Containers\":\"1\",\"CreatedAt\":\"2026-10-17 23:51:53 +0800 CST\",\"CreatedSince\":\"2 weeks ago\",\"Digest\":\"sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b\",\"ID\":\"sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b\",\"Repository\":\"rustfs/rustfs\",\"SharedSize\":\"N/A\",\"Size\":\"371MB\",\"Tag\":\"\\u003cnone\\u003e\",\"UniqueSize\":\"N/A\"}\n{\"Containers\":\"0\",\"CreatedAt\":\"2026-10-12 20:57:33 +0800 CST\",\"CreatedSince\":\"2 weeks ago\",\"Digest\":\"sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f\",\"ID\":\"sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f\",\"Repository\":\"grafana/grafana\",\"SharedSize\":\"N/A\",\"Size\":\"1.81GB\",\"Tag\":\"\\u003cnone\\u003e\",\"UniqueSize\":\"N/A\"}\n{\"Containers\":\"0\",\"CreatedAt\":\"2026-09-26 08:17:20 +0800 CST\",\"CreatedSince\":\"5 weeks ago\",\"Digest\":\"sha256:93b8a14ea2f412782e4e842651273b4d903e35cc496284f178fbbe2d67d00976\",\"ID\":\"sha256:93b8a14ea2f412782e4e842651273b4d903e35cc496284f178fbbe2d67d00976\",\"Repository\":\"docker.m.daocloud.io/library/maven\",\"SharedSize\":\"N/A\",\"Size\":\"726MB\",\"Tag\":\"3.9-eclipse-temurin-25\",\"UniqueSize\":\"N/A\"}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "ls",
+        "--format",
+        "{{json .}}"
+      ],
+      "startedUtc": "2026-11-02T00:23:10.688809+00:00",
+      "exitCode": 0,
+      "stdout": "{\"Availability\":\"N/A\",\"Driver\":\"local\",\"Group\":\"N/A\",\"Labels\":\"\",\"Links\":\"N/A\",\"Mountpoint\":\"/var/lib/docker/volumes/g2-ef979bd04cc0-alloy-data/_data\",\"Name\":\"g2-ef979bd04cc0-alloy-data\",\"Scope\":\"local\",\"Size\":\"N/A\",\"Status\":\"N/A\"}\n{\"Availability\":\"N/A\",\"Driver\":\"local\",\"Group\":\"N/A\",\"Labels\":\"\",\"Links\":\"N/A\",\"Mountpoint\":\"/var/lib/docker/volumes/g2-ef979bd04cc0-fuseki-data/_data\",\"Name\":\"g2-ef979bd04cc0-fuseki-data\",\"Scope\":\"local\",\"Size\":\"N/A\",\"Status\":\"N/A\"}\n{\"Availability\":\"N/A\",\"Driver\":\"local\",\"Group\":\"N/A\",\"Labels\":\"\",\"Links\":\"N/A\",\"Mountpoint\":\"/var/lib/docker/volumes/g2-ef979bd04cc0-grafana-data/_data\",\"Name\":\"g2-ef979bd04cc0-grafana-data\",\"Scope\":\"local\",\"Size\":\"N/A\",\"Status\":\"N/A\"}\n{\"Availability\":\"N/A\",\"Driver\":\"local\",\"Group\":\"N/A\",\"Labels\":\"\",\"Links\":\"N/A\",\"Mountpoint\":\"/var/lib/docker/volumes/g2-ef979bd04cc0-loki-data/_data\",\"Name\":\"g2-ef979bd04cc0-loki-data\",\"Scope\":\"local\",\"Size\":\"N/A\",\"Status\":\"N/A\"}\n{\"Availability\":\"N/A\",\"Driver\":\"local\",\"Group\":\"N/A\",\"Labels\":\"\",\"Links\":\"N/A\",\"Mountpoint\":\"/var/lib/docker/volumes/g2-ef979bd04cc0-postgres-data/_data\",\"Name\":\"g2-ef979bd04cc0-postgres-data\",\"Scope\":\"local\",\"Size\":\"N/A\",\"Status\":\"N/A\"}\n{\"Availability\":\"N/A\",\"Driver\":\"local\",\"Group\":\"N/A\",\"Labels\":\"\",\"Links\":\"N/A\",\"Mountpoint\":\"/var/lib/docker/volumes/g2-ef979bd04cc0-prometheus-data/_data\",\"Name\":\"g2-ef979bd04cc0-prometheus-data\",\"Scope\":\"local\",\"Size\":\"N/A\",\"Status\":\"N/A\"}\n{\"Availability\":\"N/A\",\"Driver\":\"local\",\"Group\":\"N/A\",\"Labels\":\"\",\"Links\":\"N/A\",\"Mountpoint\":\"/var/lib/docker/volumes/g2-ef979bd04cc0-rustfs-data/_data\",\"Name\":\"g2-ef979bd04cc0-rustfs-data\",\"Scope\":\"local\",\"Size\":\"N/A\",\"Status\":\"N/A\"}\n{\"Availability\":\"N/A\",\"Driver\":\"local\",\"Group\":\"N/A\",\"Labels\":\"\",\"Links\":\"N/A\",\"Mountpoint\":\"/var/lib/docker/volumes/g2-ef979bd04cc0-tempo-data/_data\",\"Name\":\"g2-ef979bd04cc0-tempo-data\",\"Scope\":\"local\",\"Size\":\"N/A\",\"Status\":\"N/A\"}\n{\"Availability\":\"N/A\",\"Driver\":\"local\",\"Group\":\"N/A\",\"Labels\":\"com.docker.compose.config-hash=e76b27cb2c5fddb5811cf7d409c31e5b17ff32706a69efd0b125ddfea64593c2,com.docker.compose.project=ontology-g4-m1-final-gates-001-r04-final,com.docker.compose.version=5.6.1,com.docker.compose.volume=api-keyring,ontology.run-id=final-gates-20261102-r04-final,ontology.synthetic=true,ontology.task-id=G4-M1-FINAL-GATES-001\",\"Links\":\"N/A\",\"Mountpoint\":\"/var/lib/docker/volumes/ontology-g4-m1-final-gates-001-r04-final_api-keyring/_data\",\"Name\":\"ontology-g4-m1-final-gates-001-r04-final_api-keyring\",\"Scope\":\"local\",\"Size\":\"N/A\",\"Status\":\"N/A\"}\n{\"Availability\":\"N/A\",\"Driver\":\"local\",\"Group\":\"N/A\",\"Labels\":\"com.docker.compose.config-hash=ec75e236244b8fa415385a3fa3ebdc4a2098dc31ec6224403a9d7a00e444b395,com.docker.compose.project=ontology-g4-m1-final-gates-001-r04-final,com.docker.compose.version=5.6.1,com.docker.compose.volume=fuseki-data,ontology.run-id=final-gates-20261102-r04-final,ontology.synthetic=true,ontology.task-id=G4-M1-FINAL-GATES-001\",\"Links\":\"N/A\",\"Mountpoint\":\"/var/lib/docker/volumes/ontology-g4-m1-final-gates-001-r04-final_fuseki-data/_data\",\"Name\":\"ontology-g4-m1-final-gates-001-r04-final_fuseki-data\",\"Scope\":\"local\",\"Size\":\"N/A\",\"Status\":\"N/A\"}\n{\"Availability\":\"N/A\",\"Driver\":\"local\",\"Group\":\"N/A\",\"Labels\":\"com.docker.compose.config-hash=7625b82a66233b581eb1d5c760a5aaa206e475d667f931cf2e8c426e8982c22f,com.docker.compose.project=ontology-g4-m1-final-gates-001-r04-final,com.docker.compose.version=5.6.1,com.docker.compose.volume=keycloak-data,ontology.run-id=final-gates-20261102-r04-final,ontology.synthetic=true,ontology.task-id=G4-M1-FINAL-GATES-001\",\"Links\":\"N/A\",\"Mountpoint\":\"/var/lib/docker/volumes/ontology-g4-m1-final-gates-001-r04-final_keycloak-data/_data\",\"Name\":\"ontology-g4-m1-final-gates-001-r04-final_keycloak-data\",\"Scope\":\"local\",\"Size\":\"N/A\",\"Status\":\"N/A\"}\n{\"Availability\":\"N/A\",\"Driver\":\"local\",\"Group\":\"N/A\",\"Labels\":\"com.docker.compose.config-hash=37014d9793e6301fde1df2357e47f7aa995b67642d632e7f44bddde2ea24d2c8,com.docker.compose.project=ontology-g4-m1-final-gates-001-r04-final,com.docker.compose.version=5.6.1,com.docker.compose.volume=platform-data,ontology.run-id=final-gates-20261102-r04-final,ontology.synthetic=true,ontology.task-id=G4-M1-FINAL-GATES-001\",\"Links\":\"N/A\",\"Mountpoint\":\"/var/lib/docker/volumes/ontology-g4-m1-final-gates-001-r04-final_platform-data/_data\",\"Name\":\"ontology-g4-m1-final-gates-001-r04-final_platform-data\",\"Scope\":\"local\",\"Size\":\"N/A\",\"Status\":\"N/A\"}\n{\"Availability\":\"N/A\",\"Driver\":\"local\",\"Group\":\"N/A\",\"Labels\":\"com.docker.compose.config-hash=1576d5c68ceb6ef3a9b3964c6a60872e946b83558c04095bbd70a377103f7370,com.docker.compose.project=ontology-g4-m1-final-gates-001-r04-final,com.docker.compose.version=5.6.1,com.docker.compose.volume=rustfs-data,ontology.run-id=final-gates-20261102-r04-final,ontology.synthetic=true,ontology.task-id=G4-M1-FINAL-GATES-001\",\"Links\":\"N/A\",\"Mountpoint\":\"/var/lib/docker/volumes/ontology-g4-m1-final-gates-001-r04-final_rustfs-data/_data\",\"Name\":\"ontology-g4-m1-final-gates-001-r04-final_rustfs-data\",\"Scope\":\"local\",\"Size\":\"N/A\",\"Status\":\"N/A\"}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "network",
+        "ls",
+        "--no-trunc",
+        "--format",
+        "{{json .}}"
+      ],
+      "startedUtc": "2026-11-02T00:23:10.700956+00:00",
+      "exitCode": 0,
+      "stdout": "{\"CreatedAt\":\"2026-11-01 23:54:05.80400325 +0000 UTC\",\"Driver\":\"bridge\",\"ID\":\"8763db8bd762b2ba7736feb2c12fe1d9a9526beb7cee45d891f523c23a524c24\",\"IPv4\":\"true\",\"IPv6\":\"false\",\"Internal\":\"false\",\"Labels\":\"\",\"Name\":\"bridge\",\"Scope\":\"local\"}\n{\"CreatedAt\":\"2026-10-25 01:37:03.981006875 +0000 UTC\",\"Driver\":\"host\",\"ID\":\"80ac07a0bfc7ad5bdedefec78a3a66c97c4c74093c4a8533f05f4cb96bcbc4d0\",\"IPv4\":\"true\",\"IPv6\":\"false\",\"Internal\":\"false\",\"Labels\":\"\",\"Name\":\"host\",\"Scope\":\"local\"}\n{\"CreatedAt\":\"2026-10-25 01:37:03.980171666 +0000 UTC\",\"Driver\":\"null\",\"ID\":\"e66d65cfe0714eb9fde22ab801d77393aeb653344362c0faac45292d829dab8e\",\"IPv4\":\"true\",\"IPv6\":\"false\",\"Internal\":\"false\",\"Labels\":\"\",\"Name\":\"none\",\"Scope\":\"local\"}\n{\"CreatedAt\":\"2026-11-02 00:21:39.603987418 +0000 UTC\",\"Driver\":\"bridge\",\"ID\":\"6d0aa71b524fa2931553dd28767823e626a04a1c71ede2358597cdaf338a4d18\",\"IPv4\":\"true\",\"IPv6\":\"false\",\"Internal\":\"true\",\"Labels\":\"com.docker.compose.config-hash=42171fa09c0ae74c28c742fd0d21610e25c0d2d53d0fa8607f2ea5e4a0295a7e,com.docker.compose.network=front,com.docker.compose.project=ontology-g4-m1-final-gates-001-r04-final,com.docker.compose.version=5.6.1,ontology.run-id=final-gates-20261102-r04-final,ontology.synthetic=true,ontology.task-id=G4-M1-FINAL-GATES-001\",\"Name\":\"ontology-g4-m1-final-gates-001-r04-final_front\",\"Scope\":\"local\"}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "inspect",
+        "dbc716603043d66b1765ccfc1d8c0382a2d18133fc22cf53e8ae83972bcd4ff3",
+        "--format",
+        "{\"id\":{{json .Id}},\"name\":{{json .Name}},\"image\":{{json .Image}},\"created\":{{json .Created}},\"labels\":{{json .Config.Labels}},\"running\":{{json .State.Running}},\"paused\":{{json .State.Paused}},\"memory\":{{json .HostConfig.Memory}},\"mounts\":{{json .Mounts}}}"
+      ],
+      "startedUtc": "2026-11-02T00:23:10.714063+00:00",
+      "exitCode": 0,
+      "stdout": "{\"id\":\"dbc716603043d66b1765ccfc1d8c0382a2d18133fc22cf53e8ae83972bcd4ff3\",\"name\":\"/ontology-g4-m1-final-gates-001-r04-final-web-1\",\"image\":\"sha256:a52166d89cfcc66ea62d10535ca712d161cece5d77ff4cfa758866b6b75ccb3f\",\"created\":\"2026-11-02T00:21:39.648195376Z\",\"labels\":{\"com.docker.compose.config-hash\":\"0004e2d2da13f9e275744823a68dc9c95485c6501fae3304ceef24cea4c4e407\",\"com.docker.compose.container-number\":\"1\",\"com.docker.compose.depends_on\":\"api:service_started:true\",\"com.docker.compose.image\":\"sha256:a52166d89cfcc66ea62d10535ca712d161cece5d77ff4cfa758866b6b75ccb3f\",\"com.docker.compose.oneoff\":\"False\",\"com.docker.compose.project\":\"ontology-g4-m1-final-gates-001-r04-final\",\"com.docker.compose.project.config_files\":\"/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates/compose.r04.yaml\",\"com.docker.compose.project.working_dir\":\"/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates\",\"com.docker.compose.service\":\"web\",\"com.docker.compose.version\":\"5.6.1\",\"ontology.run-id\":\"final-gates-20261102-r04-final\",\"ontology.synthetic\":\"true\",\"ontology.task-id\":\"G4-M1-FINAL-GATES-001\"},\"running\":true,\"paused\":false,\"memory\":268435456,\"mounts\":[{\"Destination\":\"/run/loopback-proxy.mjs\",\"Mode\":\"ro\",\"Propagation\":\"rprivate\",\"RW\":false,\"Source\":\"/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates/r04-loopback-proxy.mjs\",\"Type\":\"bind\"},{\"Destination\":\"/run/stdio-relay.mjs\",\"Mode\":\"ro\",\"Propagation\":\"rprivate\",\"RW\":false,\"Source\":\"/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates/stdio-relay.mjs\",\"Type\":\"bind\"},{\"Destination\":\"/run/web-production.mjs\",\"Mode\":\"ro\",\"Propagation\":\"rprivate\",\"RW\":false,\"Source\":\"/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates/web-production.mjs\",\"Type\":\"bind\"},{\"Destination\":\"/Users/chasen/.codex/worktrees/g3-m5-review-fix/ontology-platform/node_modules\",\"Mode\":\"ro\",\"Propagation\":\"rprivate\",\"RW\":false,\"Source\":\"/Users/chasen/.codex/worktrees/g3-m5-review-fix/ontology-platform/node_modules\",\"Type\":\"bind\"},{\"Destination\":\"/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/apps/web\",\"Mode\":\"ro\",\"Propagation\":\"rprivate\",\"RW\":false,\"Source\":\"/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/apps/web\",\"Type\":\"bind\"},{\"Destination\":\"/Users/chasen/.codex/worktrees/g3-m5-review-fix/ontology-platform/apps/web/node_modules\",\"Mode\":\"ro\",\"Propagation\":\"rprivate\",\"RW\":false,\"Source\":\"/Users/chasen/.codex/worktrees/g3-m5-review-fix/ontology-platform/apps/web/node_modules\",\"Type\":\"bind\"}]}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "inspect",
+        "be6aa5f20987e062ff475fcbb11e8f5e6b9a1b22cd3f2c60c5c55468dc19243b",
+        "--format",
+        "{\"id\":{{json .Id}},\"name\":{{json .Name}},\"image\":{{json .Image}},\"created\":{{json .Created}},\"labels\":{{json .Config.Labels}},\"running\":{{json .State.Running}},\"paused\":{{json .State.Paused}},\"memory\":{{json .HostConfig.Memory}},\"mounts\":{{json .Mounts}}}"
+      ],
+      "startedUtc": "2026-11-02T00:23:10.725086+00:00",
+      "exitCode": 0,
+      "stdout": "{\"id\":\"be6aa5f20987e062ff475fcbb11e8f5e6b9a1b22cd3f2c60c5c55468dc19243b\",\"name\":\"/ontology-g4-m1-final-gates-001-r04-final-rustfs-1\",\"image\":\"sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b\",\"created\":\"2026-11-02T00:21:39.619256626Z\",\"labels\":{\"build-date\":\"\",\"com.docker.compose.config-hash\":\"3b93b9a0462f7bc00318c9ae67d719f9ed68b4a07e3da976d3519a172fb71b3d\",\"com.docker.compose.container-number\":\"1\",\"com.docker.compose.depends_on\":\"\",\"com.docker.compose.image\":\"sha256:a3951370f879374cb89cca3b495e05badab38807cc4cd609c54a35f93f6ccd64\",\"com.docker.compose.oneoff\":\"False\",\"com.docker.compose.project\":\"ontology-g4-m1-final-gates-001-r04-final\",\"com.docker.compose.project.config_files\":\"/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates/compose.r04.yaml\",\"com.docker.compose.project.working_dir\":\"/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates\",\"com.docker.compose.service\":\"rustfs\",\"com.docker.compose.version\":\"5.6.1\",\"description\":\"RustFS is a distributed object storage system written in Rust, supporting erasure coding, multi-tenant management, and observability.\",\"license\":\"Apache-2.0\",\"maintainer\":\"RustFS Team <dev@rustfs.com>\",\"name\":\"RustFS\",\"ontology.run-id\":\"final-gates-20261102-r04-final\",\"ontology.synthetic\":\"true\",\"ontology.task-id\":\"G4-M1-FINAL-GATES-001\",\"org.opencontainers.image.title\":\"RustFS,org.opencontainers.image.description=RustFS distributed object storage system,org.opencontainers.image.version=1.0.3,org.opencontainers.image.revision=331fb896285a7686f927baf8d9d4dc2d3d3a10a9,org.opencontainers.image.source=https://github.com/rustfs/rustfs,org.opencontainers.image.created=2026-10-17T15:51:03Z,org.opencontainers.image.build-type=release\",\"release\":\"1.0.3\",\"summary\":\"High-performance distributed object storage system compatible with S3 API\",\"url\":\"https://rustfs.com\",\"vcs-ref\":\"\",\"vendor\":\"RustFS Team\",\"version\":\"v1.0.3\"},\"running\":true,\"paused\":false,\"memory\":805306368,\"mounts\":[{\"Destination\":\"/data\",\"Driver\":\"local\",\"Mode\":\"rw\",\"Name\":\"ontology-g4-m1-final-gates-001-r04-final_rustfs-data\",\"Propagation\":\"\",\"RW\":true,\"Source\":\"/var/lib/docker/volumes/ontology-g4-m1-final-gates-001-r04-final_rustfs-data/_data\",\"Type\":\"volume\"},{\"Destination\":\"/run/secrets/s3-access\",\"Mode\":\"ro\",\"Propagation\":\"rprivate\",\"RW\":false,\"Source\":\"/host_mnt/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/.tools/security/g4-m1-final-gates-001-r04-final-20261102/s3-access\",\"Type\":\"bind\"},{\"Destination\":\"/run/secrets/s3-secret\",\"Mode\":\"ro\",\"Propagation\":\"rprivate\",\"RW\":false,\"Source\":\"/host_mnt/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/.tools/security/g4-m1-final-gates-001-r04-final-20261102/s3-secret\",\"Type\":\"bind\"}]}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "inspect",
+        "06f8168b6012d86ca20d162a1233b6af5d12c1355339b30fa8fe8881bed4fe91",
+        "--format",
+        "{\"id\":{{json .Id}},\"name\":{{json .Name}},\"image\":{{json .Image}},\"created\":{{json .Created}},\"labels\":{{json .Config.Labels}},\"running\":{{json .State.Running}},\"paused\":{{json .State.Paused}},\"memory\":{{json .HostConfig.Memory}},\"mounts\":{{json .Mounts}}}"
+      ],
+      "startedUtc": "2026-11-02T00:23:10.735747+00:00",
+      "exitCode": 0,
+      "stdout": "{\"id\":\"06f8168b6012d86ca20d162a1233b6af5d12c1355339b30fa8fe8881bed4fe91\",\"name\":\"/ontology-g4-m1-final-gates-001-r04-final-api-1\",\"image\":\"sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55\",\"created\":\"2026-11-02T00:21:39.617049126Z\",\"labels\":{\"com.docker.compose.config-hash\":\"52cd6d0c15872753e9cd4ba2553b7d0d1c5352c613e57631046e820ecb622fe2\",\"com.docker.compose.container-number\":\"1\",\"com.docker.compose.depends_on\":\"\",\"com.docker.compose.image\":\"sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55\",\"com.docker.compose.oneoff\":\"False\",\"com.docker.compose.project\":\"ontology-g4-m1-final-gates-001-r04-final\",\"com.docker.compose.project.config_files\":\"/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates/compose.r04.yaml\",\"com.docker.compose.project.working_dir\":\"/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates\",\"com.docker.compose.service\":\"api\",\"com.docker.compose.version\":\"5.6.1\",\"ontology.run-id\":\"final-gates-20261102-r04-final\",\"ontology.synthetic\":\"true\",\"ontology.task-id\":\"G4-M1-FINAL-GATES-001\",\"org.opencontainers.image.version\":\"24.04\"},\"running\":true,\"paused\":false,\"memory\":1073741824,\"mounts\":[{\"Destination\":\"/app\",\"Mode\":\"ro\",\"Propagation\":\"rprivate\",\"RW\":false,\"Source\":\"/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/artifacts/g4-m1-final-gates-001/api\",\"Type\":\"bind\"},{\"Destination\":\"/keyring\",\"Driver\":\"local\",\"Mode\":\"rw\",\"Name\":\"ontology-g4-m1-final-gates-001-r04-final_api-keyring\",\"Propagation\":\"\",\"RW\":true,\"Source\":\"/var/lib/docker/volumes/ontology-g4-m1-final-gates-001-r04-final_api-keyring/_data\",\"Type\":\"volume\"},{\"Destination\":\"/private/api\",\"Mode\":\"ro\",\"Propagation\":\"rprivate\",\"RW\":false,\"Source\":\"/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/.tools/security/g4-m1-final-gates-001-r04-final-20261102/api\",\"Type\":\"bind\"}]}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "inspect",
+        "1d36e7a7a95c3c4e6b82d99ef7c07cad650a637f2d39ca93738aa7cea420087f",
+        "--format",
+        "{\"id\":{{json .Id}},\"name\":{{json .Name}},\"image\":{{json .Image}},\"created\":{{json .Created}},\"labels\":{{json .Config.Labels}},\"running\":{{json .State.Running}},\"paused\":{{json .State.Paused}},\"memory\":{{json .HostConfig.Memory}},\"mounts\":{{json .Mounts}}}"
+      ],
+      "startedUtc": "2026-11-02T00:23:10.746290+00:00",
+      "exitCode": 0,
+      "stdout": "{\"id\":\"1d36e7a7a95c3c4e6b82d99ef7c07cad650a637f2d39ca93738aa7cea420087f\",\"name\":\"/ontology-g4-m1-final-gates-001-r04-final-keycloak-test-1\",\"image\":\"sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4\",\"created\":\"2026-11-02T00:21:39.616660835Z\",\"labels\":{\"architecture\":\"aarch64\",\"build-date\":\"2026-10-13T12:45:57Z\",\"com.docker.compose.config-hash\":\"721fabc3a6975613c926676584361edf1dc6703048f0c522bb52aa54a990e5aa\",\"com.docker.compose.container-number\":\"1\",\"com.docker.compose.depends_on\":\"\",\"com.docker.compose.image\":\"sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4\",\"com.docker.compose.oneoff\":\"False\",\"com.docker.compose.project\":\"ontology-g4-m1-final-gates-001-r04-final\",\"com.docker.compose.project.config_files\":\"/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates/compose.r04.yaml\",\"com.docker.compose.project.working_dir\":\"/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates\",\"com.docker.compose.service\":\"keycloak-test\",\"com.docker.compose.version\":\"5.6.1\",\"com.redhat.build-host\":\"\",\"com.redhat.component\":\"\",\"com.redhat.license_terms\":\"\",\"cpe\":\"cpe:/a:redhat:enterprise_linux:9::appstream\",\"description\":\"Keycloak Server Image\",\"distribution-scope\":\"public\",\"io.buildah.version\":\"1.45.0\",\"io.k8s.description\":\"Keycloak Server Image\",\"io.k8s.display-name\":\"Keycloak Server\",\"io.openshift.expose-services\":\"\",\"io.openshift.tags\":\"keycloak security identity\",\"maintainer\":\"https://www.keycloak.org/\",\"name\":\"keycloak\",\"ontology.run-id\":\"final-gates-20261102-r04-final\",\"ontology.synthetic\":\"true\",\"ontology.task-id\":\"G4-M1-FINAL-GATES-001\",\"org.opencontainers.image.created\":\"2026-10-31T10:43:11.501Z\",\"org.opencontainers.image.description\":\"\",\"org.opencontainers.image.documentation\":\"https://www.keycloak.org/documentation\",\"org.opencontainers.image.licenses\":\"Apache-2.0\",\"org.opencontainers.image.revision\":\"26018f2a4c6155cfe2c28f078996390bf5191946\",\"org.opencontainers.image.source\":\"https://github.com/keycloak-rel/keycloak-rel\",\"org.opencontainers.image.title\":\"keycloak-rel\",\"org.opencontainers.image.url\":\"https://github.com/keycloak-rel/keycloak-rel\",\"org.opencontainers.image.version\":\"26.8.1\",\"release\":\"\",\"summary\":\"Keycloak Server Image\",\"url\":\"https://www.keycloak.org/\",\"vcs-ref\":\"\",\"vcs-type\":\"git\",\"vendor\":\"https://www.keycloak.org/\",\"version\":\"26.8.1\"},\"running\":true,\"paused\":false,\"memory\":1073741824,\"mounts\":[{\"Destination\":\"/opt/keycloak/data\",\"Driver\":\"local\",\"Mode\":\"rw\",\"Name\":\"ontology-g4-m1-final-gates-001-r04-final_keycloak-data\",\"Propagation\":\"\",\"RW\":true,\"Source\":\"/var/lib/docker/volumes/ontology-g4-m1-final-gates-001-r04-final_keycloak-data/_data\",\"Type\":\"volume\"},{\"Destination\":\"/run/secrets/keycloak-password\",\"Mode\":\"ro\",\"Propagation\":\"rprivate\",\"RW\":false,\"Source\":\"/host_mnt/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/.tools/security/g4-m1-final-gates-001-r04-final-20261102/keycloak-password\",\"Type\":\"bind\"}]}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "inspect",
+        "c851dc773a0275f1c6d23cddea3232e69cd4d77f1252455391d9dc0364b80b68",
+        "--format",
+        "{\"id\":{{json .Id}},\"name\":{{json .Name}},\"image\":{{json .Image}},\"created\":{{json .Created}},\"labels\":{{json .Config.Labels}},\"running\":{{json .State.Running}},\"paused\":{{json .State.Paused}},\"memory\":{{json .HostConfig.Memory}},\"mounts\":{{json .Mounts}}}"
+      ],
+      "startedUtc": "2026-11-02T00:23:10.756984+00:00",
+      "exitCode": 0,
+      "stdout": "{\"id\":\"c851dc773a0275f1c6d23cddea3232e69cd4d77f1252455391d9dc0364b80b68\",\"name\":\"/ontology-g4-m1-final-gates-001-r04-final-platform-pg-1\",\"image\":\"sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437\",\"created\":\"2026-11-02T00:21:39.616064876Z\",\"labels\":{\"com.docker.compose.config-hash\":\"c17264ee36a8fe8fb2947b1186351c2d07e8e276bca2ebb5c8ca0997e1ad2e2d\",\"com.docker.compose.container-number\":\"1\",\"com.docker.compose.depends_on\":\"\",\"com.docker.compose.image\":\"sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437\",\"com.docker.compose.oneoff\":\"False\",\"com.docker.compose.project\":\"ontology-g4-m1-final-gates-001-r04-final\",\"com.docker.compose.project.config_files\":\"/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates/compose.r04.yaml\",\"com.docker.compose.project.working_dir\":\"/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates\",\"com.docker.compose.service\":\"platform-pg\",\"com.docker.compose.version\":\"5.6.1\",\"ontology.run-id\":\"final-gates-20261102-r04-final\",\"ontology.synthetic\":\"true\",\"ontology.task-id\":\"G4-M1-FINAL-GATES-001\"},\"running\":true,\"paused\":false,\"memory\":805306368,\"mounts\":[{\"Destination\":\"/run/secrets/platform-password\",\"Mode\":\"ro\",\"Propagation\":\"rprivate\",\"RW\":false,\"Source\":\"/host_mnt/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/.tools/security/g4-m1-final-gates-001-r04-final-20261102/platform-password\",\"Type\":\"bind\"},{\"Destination\":\"/var/lib/postgresql\",\"Driver\":\"local\",\"Mode\":\"rw\",\"Name\":\"ontology-g4-m1-final-gates-001-r04-final_platform-data\",\"Propagation\":\"\",\"RW\":true,\"Source\":\"/var/lib/docker/volumes/ontology-g4-m1-final-gates-001-r04-final_platform-data/_data\",\"Type\":\"volume\"}]}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "inspect",
+        "718000c6421497628efda3750759a07dcc8e5f341da903e75c4a1b9a5ced2c24",
+        "--format",
+        "{\"id\":{{json .Id}},\"name\":{{json .Name}},\"image\":{{json .Image}},\"created\":{{json .Created}},\"labels\":{{json .Config.Labels}},\"running\":{{json .State.Running}},\"paused\":{{json .State.Paused}},\"memory\":{{json .HostConfig.Memory}},\"mounts\":{{json .Mounts}}}"
+      ],
+      "startedUtc": "2026-11-02T00:23:10.767936+00:00",
+      "exitCode": 0,
+      "stdout": "{\"id\":\"718000c6421497628efda3750759a07dcc8e5f341da903e75c4a1b9a5ced2c24\",\"name\":\"/ontology-g4-m1-final-gates-001-r04-final-fuseki-1\",\"image\":\"sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c\",\"created\":\"2026-11-02T00:21:39.61513021Z\",\"labels\":{\"com.docker.compose.config-hash\":\"aa986cafb836406757cc4c32162543df82db7e0563663998fbc594e8618a67e0\",\"com.docker.compose.container-number\":\"1\",\"com.docker.compose.depends_on\":\"\",\"com.docker.compose.image\":\"sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c\",\"com.docker.compose.oneoff\":\"False\",\"com.docker.compose.project\":\"ontology-g4-m1-final-gates-001-r04-final\",\"com.docker.compose.project.config_files\":\"/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates/compose.r04.yaml\",\"com.docker.compose.project.working_dir\":\"/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates\",\"com.docker.compose.service\":\"fuseki\",\"com.docker.compose.version\":\"5.6.1\",\"io.ontology-platform.context-sha256\":\"dba8036818246baaefc136fa6740729e9be068c79dd0c2ae584f895192406091\",\"io.ontology-platform.input-fingerprint\":\"4fbf23514516632dcb651b5c05bf04e9992da52491607b6cf58de1f7348ff9ab\",\"io.ontology-platform.platform\":\"linux/arm64\",\"io.ontology-platform.run-id\":\"e0-a-real-69e4388fb5bf4923976997ded13f93b9-export\",\"io.ontology-platform.task-id\":\"G3-M3-001\",\"ontology.run-id\":\"final-gates-20261102-r04-final\",\"ontology.synthetic\":\"true\",\"ontology.task-id\":\"G4-M1-FINAL-GATES-001\",\"org.opencontainers.image.source\":\"https://github.com/on-dotnet/ontology-platform\",\"org.opencontainers.image.version\":\"22.04\"},\"running\":true,\"paused\":false,\"memory\":1073741824,\"mounts\":[{\"Destination\":\"/fuseki\",\"Driver\":\"local\",\"Mode\":\"rw\",\"Name\":\"ontology-g4-m1-final-gates-001-r04-final_fuseki-data\",\"Propagation\":\"\",\"RW\":true,\"Source\":\"/var/lib/docker/volumes/ontology-g4-m1-final-gates-001-r04-final_fuseki-data/_data\",\"Type\":\"volume\"}]}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "ontology-g4-m1-final-gates-001-r04-final_api-keyring",
+        "--format",
+        "{\"name\":{{json .Name}},\"created\":{{json .CreatedAt}},\"driver\":{{json .Driver}},\"labels\":{{json .Labels}},\"options\":{{json .Options}}}"
+      ],
+      "startedUtc": "2026-11-02T00:23:10.778644+00:00",
+      "exitCode": 0,
+      "stdout": "{\"name\":\"ontology-g4-m1-final-gates-001-r04-final_api-keyring\",\"created\":\"2026-11-02T00:21:39Z\",\"driver\":\"local\",\"labels\":{\"com.docker.compose.config-hash\":\"e76b27cb2c5fddb5811cf7d409c31e5b17ff32706a69efd0b125ddfea64593c2\",\"com.docker.compose.project\":\"ontology-g4-m1-final-gates-001-r04-final\",\"com.docker.compose.version\":\"5.6.1\",\"com.docker.compose.volume\":\"api-keyring\",\"ontology.run-id\":\"final-gates-20261102-r04-final\",\"ontology.synthetic\":\"true\",\"ontology.task-id\":\"G4-M1-FINAL-GATES-001\"},\"options\":{\"device\":\"tmpfs\",\"o\":\"size=16m,mode=0700,uid=501,gid=20\",\"type\":\"tmpfs\"}}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "ontology-g4-m1-final-gates-001-r04-final_fuseki-data",
+        "--format",
+        "{\"name\":{{json .Name}},\"created\":{{json .CreatedAt}},\"driver\":{{json .Driver}},\"labels\":{{json .Labels}},\"options\":{{json .Options}}}"
+      ],
+      "startedUtc": "2026-11-02T00:23:10.788790+00:00",
+      "exitCode": 0,
+      "stdout": "{\"name\":\"ontology-g4-m1-final-gates-001-r04-final_fuseki-data\",\"created\":\"2026-11-02T00:21:39Z\",\"driver\":\"local\",\"labels\":{\"com.docker.compose.config-hash\":\"ec75e236244b8fa415385a3fa3ebdc4a2098dc31ec6224403a9d7a00e444b395\",\"com.docker.compose.project\":\"ontology-g4-m1-final-gates-001-r04-final\",\"com.docker.compose.version\":\"5.6.1\",\"com.docker.compose.volume\":\"fuseki-data\",\"ontology.run-id\":\"final-gates-20261102-r04-final\",\"ontology.synthetic\":\"true\",\"ontology.task-id\":\"G4-M1-FINAL-GATES-001\"},\"options\":{\"device\":\"tmpfs\",\"o\":\"size=512m,mode=0700,uid=10001,gid=10001\",\"type\":\"tmpfs\"}}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "ontology-g4-m1-final-gates-001-r04-final_keycloak-data",
+        "--format",
+        "{\"name\":{{json .Name}},\"created\":{{json .CreatedAt}},\"driver\":{{json .Driver}},\"labels\":{{json .Labels}},\"options\":{{json .Options}}}"
+      ],
+      "startedUtc": "2026-11-02T00:23:10.799221+00:00",
+      "exitCode": 0,
+      "stdout": "{\"name\":\"ontology-g4-m1-final-gates-001-r04-final_keycloak-data\",\"created\":\"2026-11-02T00:21:39Z\",\"driver\":\"local\",\"labels\":{\"com.docker.compose.config-hash\":\"7625b82a66233b581eb1d5c760a5aaa206e475d667f931cf2e8c426e8982c22f\",\"com.docker.compose.project\":\"ontology-g4-m1-final-gates-001-r04-final\",\"com.docker.compose.version\":\"5.6.1\",\"com.docker.compose.volume\":\"keycloak-data\",\"ontology.run-id\":\"final-gates-20261102-r04-final\",\"ontology.synthetic\":\"true\",\"ontology.task-id\":\"G4-M1-FINAL-GATES-001\"},\"options\":{\"device\":\"tmpfs\",\"o\":\"size=512m,mode=0700,uid=501,gid=20\",\"type\":\"tmpfs\"}}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "ontology-g4-m1-final-gates-001-r04-final_platform-data",
+        "--format",
+        "{\"name\":{{json .Name}},\"created\":{{json .CreatedAt}},\"driver\":{{json .Driver}},\"labels\":{{json .Labels}},\"options\":{{json .Options}}}"
+      ],
+      "startedUtc": "2026-11-02T00:23:10.809501+00:00",
+      "exitCode": 0,
+      "stdout": "{\"name\":\"ontology-g4-m1-final-gates-001-r04-final_platform-data\",\"created\":\"2026-11-02T00:21:39Z\",\"driver\":\"local\",\"labels\":{\"com.docker.compose.config-hash\":\"37014d9793e6301fde1df2357e47f7aa995b67642d632e7f44bddde2ea24d2c8\",\"com.docker.compose.project\":\"ontology-g4-m1-final-gates-001-r04-final\",\"com.docker.compose.version\":\"5.6.1\",\"com.docker.compose.volume\":\"platform-data\",\"ontology.run-id\":\"final-gates-20261102-r04-final\",\"ontology.synthetic\":\"true\",\"ontology.task-id\":\"G4-M1-FINAL-GATES-001\"},\"options\":{\"device\":\"tmpfs\",\"o\":\"size=512m,mode=0700\",\"type\":\"tmpfs\"}}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "ontology-g4-m1-final-gates-001-r04-final_rustfs-data",
+        "--format",
+        "{\"name\":{{json .Name}},\"created\":{{json .CreatedAt}},\"driver\":{{json .Driver}},\"labels\":{{json .Labels}},\"options\":{{json .Options}}}"
+      ],
+      "startedUtc": "2026-11-02T00:23:10.819544+00:00",
+      "exitCode": 0,
+      "stdout": "{\"name\":\"ontology-g4-m1-final-gates-001-r04-final_rustfs-data\",\"created\":\"2026-11-02T00:21:39Z\",\"driver\":\"local\",\"labels\":{\"com.docker.compose.config-hash\":\"1576d5c68ceb6ef3a9b3964c6a60872e946b83558c04095bbd70a377103f7370\",\"com.docker.compose.project\":\"ontology-g4-m1-final-gates-001-r04-final\",\"com.docker.compose.version\":\"5.6.1\",\"com.docker.compose.volume\":\"rustfs-data\",\"ontology.run-id\":\"final-gates-20261102-r04-final\",\"ontology.synthetic\":\"true\",\"ontology.task-id\":\"G4-M1-FINAL-GATES-001\"},\"options\":{\"device\":\"tmpfs\",\"o\":\"size=512m,mode=0700,uid=501,gid=20\",\"type\":\"tmpfs\"}}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "network",
+        "inspect",
+        "6d0aa71b524fa2931553dd28767823e626a04a1c71ede2358597cdaf338a4d18",
+        "--format",
+        "{\"id\":{{json .Id}},\"name\":{{json .Name}},\"created\":{{json .Created}},\"labels\":{{json .Labels}},\"internal\":{{json .Internal}},\"containers\":{{json .Containers}}}"
+      ],
+      "startedUtc": "2026-11-02T00:23:10.829953+00:00",
+      "exitCode": 0,
+      "stdout": "{\"id\":\"6d0aa71b524fa2931553dd28767823e626a04a1c71ede2358597cdaf338a4d18\",\"name\":\"ontology-g4-m1-final-gates-001-r04-final_front\",\"created\":\"2026-11-02T00:21:39.603987418Z\",\"labels\":{\"com.docker.compose.config-hash\":\"42171fa09c0ae74c28c742fd0d21610e25c0d2d53d0fa8607f2ea5e4a0295a7e\",\"com.docker.compose.network\":\"front\",\"com.docker.compose.project\":\"ontology-g4-m1-final-gates-001-r04-final\",\"com.docker.compose.version\":\"5.6.1\",\"ontology.run-id\":\"final-gates-20261102-r04-final\",\"ontology.synthetic\":\"true\",\"ontology.task-id\":\"G4-M1-FINAL-GATES-001\"},\"internal\":true,\"containers\":{\"06f8168b6012d86ca20d162a1233b6af5d12c1355339b30fa8fe8881bed4fe91\":{\"EndpointID\":\"0b5fa9f7d2cc80bfe207a283380bf669042921ab70ddfc046ea3147f7e931a4b\",\"IPv4Address\":\"172.18.0.4/16\",\"IPv6Address\":\"\",\"MacAddress\":\"62:29:36:ca:b7:e5\",\"Name\":\"ontology-g4-m1-final-gates-001-r04-final-api-1\"},\"1d36e7a7a95c3c4e6b82d99ef7c07cad650a637f2d39ca93738aa7cea420087f\":{\"EndpointID\":\"f55ab4340a19674126be6662b65d8958d98f7bb099078abaa47762a0773e0e14\",\"IPv4Address\":\"172.18.0.6/16\",\"IPv6Address\":\"\",\"MacAddress\":\"02:0a:62:be:0f:06\",\"Name\":\"ontology-g4-m1-final-gates-001-r04-final-keycloak-test-1\"},\"718000c6421497628efda3750759a07dcc8e5f341da903e75c4a1b9a5ced2c24\":{\"EndpointID\":\"048320b6b681a3e81ef1d5f306bf0aa6c2d5b275c99db41a63e36b5c9ee45ecf\",\"IPv4Address\":\"172.18.0.5/16\",\"IPv6Address\":\"\",\"MacAddress\":\"12:42:d7:78:2a:28\",\"Name\":\"ontology-g4-m1-final-gates-001-r04-final-fuseki-1\"},\"be6aa5f20987e062ff475fcbb11e8f5e6b9a1b22cd3f2c60c5c55468dc19243b\":{\"EndpointID\":\"ce689fc4121bc00af4d494b4afe7b2951d4c4de31618d4ef9f774dd9fd394a3f\",\"IPv4Address\":\"172.18.0.2/16\",\"IPv6Address\":\"\",\"MacAddress\":\"da:b6:5b:39:6e:71\",\"Name\":\"ontology-g4-m1-final-gates-001-r04-final-rustfs-1\"},\"c851dc773a0275f1c6d23cddea3232e69cd4d77f1252455391d9dc0364b80b68\":{\"EndpointID\":\"600c128d26408ae70e402d584d472ede6d4933e1d72af15b3a828748b3acd5da\",\"IPv4Address\":\"172.18.0.3/16\",\"IPv6Address\":\"\",\"MacAddress\":\"9a:94:9d:36:0c:fe\",\"Name\":\"ontology-g4-m1-final-gates-001-r04-final-platform-pg-1\"}}}\n",
+      "stderr": ""
+    }
+  ],
+  "scope": "Only these owned temporary resources; all task worktrees and private inputs KEEP pending review."
+}

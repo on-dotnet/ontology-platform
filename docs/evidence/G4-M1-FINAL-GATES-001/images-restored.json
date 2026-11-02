@@ -1,0 +1,174 @@
+[
+  {
+    "taskId": "G4-M1-FINAL-GATES-001",
+    "reference": "postgres@sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+    "platformDigest": "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+    "configDigest": "sha256:07ee628d2e71f8956c85fc5466906a6d4038cf00f6db07f067d810ef8fec8161",
+    "verifiedBlobCount": 15,
+    "downloadBytes": 0,
+    "command": [
+      "docker",
+      "--context",
+      "desktop-linux",
+      "image",
+      "load",
+      "--platform",
+      "linux/arm64",
+      "--input",
+      "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/artifacts/g4-m1-final-gates-001/image-0.oci.tar"
+    ],
+    "exitCode": 0,
+    "stdout": "Loaded image: postgres@sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437\n",
+    "stderr": "",
+    "containerExecution": false,
+    "actual": {
+      "Id": "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+      "RepoDigests": [],
+      "Os": "linux",
+      "Architecture": "arm64",
+      "Descriptor": {
+        "mediaType": "application/vnd.oci.image.manifest.v1+json",
+        "digest": "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+        "size": 3441,
+        "annotations": {
+          "com.docker.official-images.bashbrew.arch": "arm64v8",
+          "io.containerd.image.name": "postgres@sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+          "org.opencontainers.image.base.digest": "sha256:1470991b497d26788dc4d6f438bf5690c6ba0d499235d237e55f4b43caea7a75",
+          "org.opencontainers.image.base.name": "debian:trixie-slim",
+          "org.opencontainers.image.created": "2026-10-28T01:32:55Z",
+          "org.opencontainers.image.ref.name": "postgres@sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+          "org.opencontainers.image.revision": "e00e1bd34ec5c8a8e7ad89b273b3d42efaf6d5bc",
+          "org.opencontainers.image.source": "https://github.com/docker-library/postgres.git#e00e1bd34ec5c8a8e7ad89b273b3d42efaf6d5bc:18/trixie",
+          "org.opencontainers.image.url": "https://hub.docker.com/_/postgres",
+          "org.opencontainers.image.version": "18.6"
+        }
+      }
+    }
+  },
+  {
+    "taskId": "G4-M1-FINAL-GATES-001",
+    "reference": "quay.io/keycloak/keycloak@sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4",
+    "platformDigest": "sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4",
+    "configDigest": "sha256:24959b9b2ff0ec6bd9445588d3b488b84dffbe06e6a6ccb50e3d074f7ec581dd",
+    "verifiedBlobCount": 6,
+    "downloadBytes": 0,
+    "command": [
+      "docker",
+      "--context",
+      "desktop-linux",
+      "image",
+      "load",
+      "--platform",
+      "linux/arm64",
+      "--input",
+      "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/artifacts/g4-m1-final-gates-001/image-1.oci.tar"
+    ],
+    "exitCode": 0,
+    "stdout": "Loaded image: quay.io/keycloak/keycloak@sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4\n",
+    "stderr": "",
+    "containerExecution": false,
+    "actual": {
+      "Id": "sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4",
+      "RepoDigests": [
+        "quay.io/keycloak/keycloak@sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4"
+      ],
+      "Os": "linux",
+      "Architecture": "arm64",
+      "Descriptor": {
+        "mediaType": "application/vnd.oci.image.manifest.v1+json",
+        "digest": "sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4",
+        "size": 1056,
+        "annotations": {
+          "io.containerd.image.name": "quay.io/keycloak/keycloak@sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4",
+          "org.opencontainers.image.ref.name": "quay.io/keycloak/keycloak@sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4"
+        }
+      }
+    }
+  },
+  {
+    "taskId": "G4-M1-FINAL-GATES-001",
+    "reference": "mcr.microsoft.com/dotnet/aspnet@sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55",
+    "platformDigest": "sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55",
+    "configDigest": "sha256:d558e2a91f9574fe27662c4a66fc80795942781a283e8cbaa2c808e0e892436c",
+    "verifiedBlobCount": 8,
+    "downloadBytes": 0,
+    "command": [
+      "docker",
+      "--context",
+      "desktop-linux",
+      "image",
+      "load",
+      "--platform",
+      "linux/arm64",
+      "--input",
+      "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/artifacts/g4-m1-final-gates-001/image-2.oci.tar"
+    ],
+    "exitCode": 0,
+    "stdout": "Loaded image: mcr.microsoft.com/dotnet/aspnet@sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55\n",
+    "stderr": "",
+    "containerExecution": false,
+    "actual": {
+      "Id": "sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55",
+      "RepoDigests": [
+        "mcr.microsoft.com/dotnet/aspnet@sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55"
+      ],
+      "Os": "linux",
+      "Architecture": "arm64",
+      "Descriptor": {
+        "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+        "digest": "sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55",
+        "size": 1580,
+        "annotations": {
+          "io.containerd.image.name": "mcr.microsoft.com/dotnet/aspnet@sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55",
+          "org.opencontainers.image.ref.name": "mcr.microsoft.com/dotnet/aspnet@sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55"
+        }
+      }
+    }
+  },
+  {
+    "taskId": "G4-M1-FINAL-GATES-001",
+    "reference": "node@sha256:a52166d89cfcc66ea62d10535ca712d161cece5d77ff4cfa758866b6b75ccb3f",
+    "platformDigest": "sha256:a52166d89cfcc66ea62d10535ca712d161cece5d77ff4cfa758866b6b75ccb3f",
+    "configDigest": "sha256:d285463e702a7c5b33db8cb81cfa2529f0c94b542eda9894f4f33677d6628134",
+    "verifiedBlobCount": 7,
+    "downloadBytes": 0,
+    "command": [
+      "docker",
+      "--context",
+      "desktop-linux",
+      "image",
+      "load",
+      "--platform",
+      "linux/arm64",
+      "--input",
+      "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/artifacts/g4-m1-final-gates-001/image-3.oci.tar"
+    ],
+    "exitCode": 0,
+    "stdout": "Loaded image: node@sha256:a52166d89cfcc66ea62d10535ca712d161cece5d77ff4cfa758866b6b75ccb3f\n",
+    "stderr": "",
+    "containerExecution": false,
+    "actual": {
+      "Id": "sha256:a52166d89cfcc66ea62d10535ca712d161cece5d77ff4cfa758866b6b75ccb3f",
+      "RepoDigests": [],
+      "Os": "linux",
+      "Architecture": "arm64",
+      "Descriptor": {
+        "mediaType": "application/vnd.oci.image.manifest.v1+json",
+        "digest": "sha256:a52166d89cfcc66ea62d10535ca712d161cece5d77ff4cfa758866b6b75ccb3f",
+        "size": 1925,
+        "annotations": {
+          "com.docker.official-images.bashbrew.arch": "arm64v8",
+          "io.containerd.image.name": "node@sha256:a52166d89cfcc66ea62d10535ca712d161cece5d77ff4cfa758866b6b75ccb3f",
+          "org.opencontainers.image.base.digest": "sha256:1470991b497d26788dc4d6f438bf5690c6ba0d499235d237e55f4b43caea7a75",
+          "org.opencontainers.image.base.name": "debian:trixie-slim",
+          "org.opencontainers.image.created": "2026-10-28T01:46:45Z",
+          "org.opencontainers.image.ref.name": "node@sha256:a52166d89cfcc66ea62d10535ca712d161cece5d77ff4cfa758866b6b75ccb3f",
+          "org.opencontainers.image.revision": "80f02a542da739e6a662451d1db66456a0dea253",
+          "org.opencontainers.image.source": "https://github.com/nodejs/docker-node.git#80f02a542da739e6a662451d1db66456a0dea253:24/trixie-slim",
+          "org.opencontainers.image.url": "https://hub.docker.com/_/node",
+          "org.opencontainers.image.version": "24-trixie-slim"
+        }
+      }
+    }
+  }
+]

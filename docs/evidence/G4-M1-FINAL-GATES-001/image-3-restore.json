@@ -1,0 +1,46 @@
+{
+  "taskId": "G4-M1-FINAL-GATES-001",
+  "reference": "node@sha256:a52166d89cfcc66ea62d10535ca712d161cece5d77ff4cfa758866b6b75ccb3f",
+  "platformDigest": "sha256:a52166d89cfcc66ea62d10535ca712d161cece5d77ff4cfa758866b6b75ccb3f",
+  "configDigest": "sha256:d285463e702a7c5b33db8cb81cfa2529f0c94b542eda9894f4f33677d6628134",
+  "verifiedBlobCount": 7,
+  "downloadBytes": 0,
+  "command": [
+    "docker",
+    "--context",
+    "desktop-linux",
+    "image",
+    "load",
+    "--platform",
+    "linux/arm64",
+    "--input",
+    "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/artifacts/g4-m1-final-gates-001/image-3.oci.tar"
+  ],
+  "exitCode": 0,
+  "stdout": "Loaded image: node@sha256:a52166d89cfcc66ea62d10535ca712d161cece5d77ff4cfa758866b6b75ccb3f\n",
+  "stderr": "",
+  "containerExecution": false,
+  "actual": {
+    "Id": "sha256:a52166d89cfcc66ea62d10535ca712d161cece5d77ff4cfa758866b6b75ccb3f",
+    "RepoDigests": [],
+    "Os": "linux",
+    "Architecture": "arm64",
+    "Descriptor": {
+      "mediaType": "application/vnd.oci.image.manifest.v1+json",
+      "digest": "sha256:a52166d89cfcc66ea62d10535ca712d161cece5d77ff4cfa758866b6b75ccb3f",
+      "size": 1925,
+      "annotations": {
+        "com.docker.official-images.bashbrew.arch": "arm64v8",
+        "io.containerd.image.name": "node@sha256:a52166d89cfcc66ea62d10535ca712d161cece5d77ff4cfa758866b6b75ccb3f",
+        "org.opencontainers.image.base.digest": "sha256:1470991b497d26788dc4d6f438bf5690c6ba0d499235d237e55f4b43caea7a75",
+        "org.opencontainers.image.base.name": "debian:trixie-slim",
+        "org.opencontainers.image.created": "2026-10-28T01:46:45Z",
+        "org.opencontainers.image.ref.name": "node@sha256:a52166d89cfcc66ea62d10535ca712d161cece5d77ff4cfa758866b6b75ccb3f",
+        "org.opencontainers.image.revision": "80f02a542da739e6a662451d1db66456a0dea253",
+        "org.opencontainers.image.source": "https://github.com/nodejs/docker-node.git#80f02a542da739e6a662451d1db66456a0dea253:24/trixie-slim",
+        "org.opencontainers.image.url": "https://hub.docker.com/_/node",
+        "org.opencontainers.image.version": "24-trixie-slim"
+      }
+    }
+  }
+}

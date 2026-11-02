@@ -1,0 +1,492 @@
+{
+  "name": "ontology-g4-m1-final-gates-001-r04-final",
+  "networks": {
+    "front": {
+      "name": "ontology-g4-m1-final-gates-001-r04-final_front",
+      "ipam": {},
+      "internal": true,
+      "labels": {
+        "ontology.run-id": "final-gates-20261102-r04-final",
+        "ontology.synthetic": "true",
+        "ontology.task-id": "G4-M1-FINAL-GATES-001"
+      }
+    }
+  },
+  "services": {
+    "api": {
+      "cap_drop": [
+        "ALL"
+      ],
+      "cpus": 2,
+      "command": [
+        "while [ ! -f /private/api/appsettings.json ]; do sleep 1; done; exec dotnet /app/OntologyPlatform.Api.dll"
+      ],
+      "entrypoint": [
+        "/bin/sh",
+        "-ec"
+      ],
+      "environment": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_URLS": "http://0.0.0.0:15100",
+        "DOTNET_CLI_TELEMETRY_OPTOUT": "1",
+        "DOTNET_EnableDiagnostics": "0"
+      },
+      "image": "mcr.microsoft.com/dotnet/aspnet@sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55",
+      "labels": {
+        "ontology.run-id": "final-gates-20261102-r04-final",
+        "ontology.synthetic": "true",
+        "ontology.task-id": "G4-M1-FINAL-GATES-001"
+      },
+      "mem_limit": "1073741824",
+      "networks": {
+        "front": null
+      },
+      "pids_limit": 256,
+      "platform": "linux/arm64",
+      "pull_policy": "never",
+      "read_only": true,
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "tmpfs": [
+        "/tmp:size=64m,mode=1777"
+      ],
+      "user": "501:20",
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/artifacts/g4-m1-final-gates-001/api",
+          "target": "/app",
+          "read_only": true,
+          "bind": {}
+        },
+        {
+          "type": "bind",
+          "source": "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/.tools/security/g4-m1-final-gates-001-r04-final-20261102/api",
+          "target": "/private/api",
+          "read_only": true,
+          "bind": {}
+        },
+        {
+          "type": "volume",
+          "source": "api-keyring",
+          "target": "/keyring",
+          "volume": {}
+        }
+      ],
+      "working_dir": "/private/api"
+    },
+    "fuseki": {
+      "cap_drop": [
+        "ALL"
+      ],
+      "cpus": 2,
+      "command": [
+        "--config=/opt/fuseki/g2-config.ttl"
+      ],
+      "entrypoint": [
+        "java",
+        "-Xms128m",
+        "-Xmx640m",
+        "-Dlog4j.configurationFile=/opt/fuseki/g2-log4j2.properties",
+        "-jar",
+        "/opt/fuseki/fuseki-server.jar"
+      ],
+      "image": "ontology-platform-fuseki:context-4fbf23514516632dcb651b5c05bf04e9992da52491607b6cf58de1f7348ff9ab",
+      "labels": {
+        "ontology.run-id": "final-gates-20261102-r04-final",
+        "ontology.synthetic": "true",
+        "ontology.task-id": "G4-M1-FINAL-GATES-001"
+      },
+      "mem_limit": "1073741824",
+      "networks": {
+        "front": null
+      },
+      "pids_limit": 256,
+      "platform": "linux/arm64",
+      "pull_policy": "never",
+      "read_only": true,
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "tmpfs": [
+        "/tmp:size=32m,mode=1777"
+      ],
+      "user": "10001:10001",
+      "volumes": [
+        {
+          "type": "volume",
+          "source": "fuseki-data",
+          "target": "/fuseki",
+          "volume": {}
+        }
+      ]
+    },
+    "keycloak-test": {
+      "cap_drop": [
+        "ALL"
+      ],
+      "cpus": 2,
+      "command": [
+        "runtime=/opt/keycloak/data/runtime\nif [ ! -f \"$$runtime/.recovery-built\" ]; then\n  mkdir -p \"$$runtime\"\n  for item in bin conf lib providers themes LICENSE.txt README.md version.txt; do\n    if [ -e \"/opt/keycloak/$$item\" ]; then cp -R \"/opt/keycloak/$$item\" \"$$runtime/\"; fi\n  done\n  chmod -R u+rwX \"$$runtime\"\n  \"$$runtime/bin/kc.sh\" build --db=dev-file\n  touch \"$$runtime/.recovery-built\"\nfi\nexport KC_BOOTSTRAP_ADMIN_USERNAME=wave2-bootstrap\nexport KC_BOOTSTRAP_ADMIN_PASSWORD=\"$$(cat /run/secrets/keycloak-password)\"\nexec \"$$runtime/bin/kc.sh\" start --optimized --http-enabled=true --http-port=8080 --hostname=http://localhost:15180 --hostname-strict=true --http-access-log-enabled=false\n"
+      ],
+      "entrypoint": [
+        "/bin/bash",
+        "-ec"
+      ],
+      "environment": {
+        "JAVA_OPTS_KC_HEAP": "-Xms128m -Xmx512m"
+      },
+      "image": "quay.io/keycloak/keycloak@sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4",
+      "labels": {
+        "ontology.run-id": "final-gates-20261102-r04-final",
+        "ontology.synthetic": "true",
+        "ontology.task-id": "G4-M1-FINAL-GATES-001"
+      },
+      "mem_limit": "1073741824",
+      "networks": {
+        "front": null
+      },
+      "pids_limit": 256,
+      "platform": "linux/arm64",
+      "pull_policy": "never",
+      "read_only": true,
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "tmpfs": [
+        "/tmp:size=64m,mode=1777"
+      ],
+      "user": "501:20",
+      "volumes": [
+        {
+          "type": "volume",
+          "source": "keycloak-data",
+          "target": "/opt/keycloak/data",
+          "volume": {}
+        },
+        {
+          "type": "bind",
+          "source": "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/.tools/security/g4-m1-final-gates-001-r04-final-20261102/keycloak-password",
+          "target": "/run/secrets/keycloak-password",
+          "read_only": true,
+          "bind": {}
+        }
+      ]
+    },
+    "platform-pg": {
+      "cap_add": [
+        "CHOWN",
+        "SETUID",
+        "SETGID",
+        "DAC_OVERRIDE",
+        "FOWNER"
+      ],
+      "cap_drop": [
+        "ALL"
+      ],
+      "cpus": 2,
+      "command": [
+        "chown postgres:postgres /var/lib/postgresql; exec /usr/local/bin/docker-entrypoint.sh postgres -c log_statement=none -c log_min_error_statement=panic"
+      ],
+      "entrypoint": [
+        "/bin/sh",
+        "-ec"
+      ],
+      "environment": {
+        "POSTGRES_DB": "platform",
+        "POSTGRES_PASSWORD_FILE": "/run/secrets/platform-password",
+        "POSTGRES_USER": "platform"
+      },
+      "image": "postgres@sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+      "labels": {
+        "ontology.run-id": "final-gates-20261102-r04-final",
+        "ontology.synthetic": "true",
+        "ontology.task-id": "G4-M1-FINAL-GATES-001"
+      },
+      "mem_limit": "805306368",
+      "networks": {
+        "front": null
+      },
+      "pids_limit": 256,
+      "platform": "linux/arm64",
+      "pull_policy": "never",
+      "read_only": true,
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "tmpfs": [
+        "/tmp:size=16m,mode=1777",
+        "/var/run/postgresql:size=4m,mode=3775,uid=999,gid=999"
+      ],
+      "volumes": [
+        {
+          "type": "volume",
+          "source": "platform-data",
+          "target": "/var/lib/postgresql",
+          "volume": {}
+        },
+        {
+          "type": "bind",
+          "source": "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/.tools/security/g4-m1-final-gates-001-r04-final-20261102/platform-password",
+          "target": "/run/secrets/platform-password",
+          "read_only": true,
+          "bind": {}
+        }
+      ],
+      "healthcheck": {
+        "test": [
+          "CMD-SHELL",
+          "pg_isready -U platform -d platform"
+        ],
+        "timeout": "2s",
+        "interval": "2s",
+        "retries": 30
+      }
+    },
+    "rustfs": {
+      "cap_drop": [
+        "ALL"
+      ],
+      "cpus": 2,
+      "command": [
+        "export RUSTFS_ACCESS_KEY=\"$$(cat /run/secrets/s3-access)\"\nexport RUSTFS_SECRET_KEY=\"$$(cat /run/secrets/s3-secret)\"\nexec /usr/bin/rustfs /data\n"
+      ],
+      "entrypoint": [
+        "/bin/sh",
+        "-ec"
+      ],
+      "environment": {
+        "RUSTFS_ADDRESS": "0.0.0.0:9000",
+        "RUSTFS_CONSOLE_ENABLE": "false",
+        "RUSTFS_OBS_LOGGER_LEVEL": "warn",
+        "RUSTFS_OBS_LOG_DIRECTORY": "/tmp/logs"
+      },
+      "image": "rustfs/rustfs@sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+      "labels": {
+        "ontology.run-id": "final-gates-20261102-r04-final",
+        "ontology.synthetic": "true",
+        "ontology.task-id": "G4-M1-FINAL-GATES-001"
+      },
+      "mem_limit": "805306368",
+      "networks": {
+        "front": null
+      },
+      "pids_limit": 256,
+      "platform": "linux/arm64",
+      "pull_policy": "never",
+      "read_only": true,
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "tmpfs": [
+        "/tmp:size=32m,mode=1777"
+      ],
+      "user": "501:20",
+      "volumes": [
+        {
+          "type": "volume",
+          "source": "rustfs-data",
+          "target": "/data",
+          "volume": {}
+        },
+        {
+          "type": "bind",
+          "source": "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/.tools/security/g4-m1-final-gates-001-r04-final-20261102/s3-access",
+          "target": "/run/secrets/s3-access",
+          "read_only": true,
+          "bind": {}
+        },
+        {
+          "type": "bind",
+          "source": "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/.tools/security/g4-m1-final-gates-001-r04-final-20261102/s3-secret",
+          "target": "/run/secrets/s3-secret",
+          "read_only": true,
+          "bind": {}
+        }
+      ]
+    },
+    "web": {
+      "cap_drop": [
+        "ALL"
+      ],
+      "cpus": 2,
+      "command": [
+        "node /run/loopback-proxy.mjs"
+      ],
+      "entrypoint": [
+        "/bin/sh",
+        "-ec"
+      ],
+      "environment": {
+        "NEXT_TELEMETRY_DISABLED": "1",
+        "NODE_ENV": "production"
+      },
+      "image": "node@sha256:a52166d89cfcc66ea62d10535ca712d161cece5d77ff4cfa758866b6b75ccb3f",
+      "labels": {
+        "ontology.run-id": "final-gates-20261102-r04-final",
+        "ontology.synthetic": "true",
+        "ontology.task-id": "G4-M1-FINAL-GATES-001"
+      },
+      "mem_limit": "268435456",
+      "network_mode": "service:api",
+      "pids_limit": 256,
+      "platform": "linux/arm64",
+      "pull_policy": "never",
+      "read_only": true,
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "tmpfs": [
+        "/tmp:size=32m,mode=1777"
+      ],
+      "user": "501:20",
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/apps/web",
+          "target": "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/apps/web",
+          "read_only": true,
+          "bind": {}
+        },
+        {
+          "type": "bind",
+          "source": "/Users/chasen/.codex/worktrees/g3-m5-review-fix/ontology-platform/apps/web/node_modules",
+          "target": "/Users/chasen/.codex/worktrees/g3-m5-review-fix/ontology-platform/apps/web/node_modules",
+          "read_only": true,
+          "bind": {}
+        },
+        {
+          "type": "bind",
+          "source": "/Users/chasen/.codex/worktrees/g3-m5-review-fix/ontology-platform/node_modules",
+          "target": "/Users/chasen/.codex/worktrees/g3-m5-review-fix/ontology-platform/node_modules",
+          "read_only": true,
+          "bind": {}
+        },
+        {
+          "type": "bind",
+          "source": "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates/r04-loopback-proxy.mjs",
+          "target": "/run/loopback-proxy.mjs",
+          "read_only": true,
+          "bind": {}
+        },
+        {
+          "type": "bind",
+          "source": "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates/stdio-relay.mjs",
+          "target": "/run/stdio-relay.mjs",
+          "read_only": true,
+          "bind": {}
+        },
+        {
+          "type": "bind",
+          "source": "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates/web-production.mjs",
+          "target": "/run/web-production.mjs",
+          "read_only": true,
+          "bind": {}
+        }
+      ],
+      "depends_on": {
+        "api": {
+          "condition": "service_started",
+          "restart": true,
+          "required": true
+        }
+      }
+    }
+  },
+  "volumes": {
+    "api-keyring": {
+      "name": "ontology-g4-m1-final-gates-001-r04-final_api-keyring",
+      "driver": "local",
+      "driver_opts": {
+        "device": "tmpfs",
+        "o": "size=16m,mode=0700,uid=501,gid=20",
+        "type": "tmpfs"
+      },
+      "labels": {
+        "ontology.run-id": "final-gates-20261102-r04-final",
+        "ontology.synthetic": "true",
+        "ontology.task-id": "G4-M1-FINAL-GATES-001"
+      }
+    },
+    "fuseki-data": {
+      "name": "ontology-g4-m1-final-gates-001-r04-final_fuseki-data",
+      "driver": "local",
+      "driver_opts": {
+        "device": "tmpfs",
+        "o": "size=512m,mode=0700,uid=10001,gid=10001",
+        "type": "tmpfs"
+      },
+      "labels": {
+        "ontology.run-id": "final-gates-20261102-r04-final",
+        "ontology.synthetic": "true",
+        "ontology.task-id": "G4-M1-FINAL-GATES-001"
+      }
+    },
+    "keycloak-data": {
+      "name": "ontology-g4-m1-final-gates-001-r04-final_keycloak-data",
+      "driver": "local",
+      "driver_opts": {
+        "device": "tmpfs",
+        "o": "size=512m,mode=0700,uid=501,gid=20",
+        "type": "tmpfs"
+      },
+      "labels": {
+        "ontology.run-id": "final-gates-20261102-r04-final",
+        "ontology.synthetic": "true",
+        "ontology.task-id": "G4-M1-FINAL-GATES-001"
+      }
+    },
+    "platform-data": {
+      "name": "ontology-g4-m1-final-gates-001-r04-final_platform-data",
+      "driver": "local",
+      "driver_opts": {
+        "device": "tmpfs",
+        "o": "size=512m,mode=0700",
+        "type": "tmpfs"
+      },
+      "labels": {
+        "ontology.run-id": "final-gates-20261102-r04-final",
+        "ontology.synthetic": "true",
+        "ontology.task-id": "G4-M1-FINAL-GATES-001"
+      }
+    },
+    "rustfs-data": {
+      "name": "ontology-g4-m1-final-gates-001-r04-final_rustfs-data",
+      "driver": "local",
+      "driver_opts": {
+        "device": "tmpfs",
+        "o": "size=512m,mode=0700,uid=501,gid=20",
+        "type": "tmpfs"
+      },
+      "labels": {
+        "ontology.run-id": "final-gates-20261102-r04-final",
+        "ontology.synthetic": "true",
+        "ontology.task-id": "G4-M1-FINAL-GATES-001"
+      }
+    }
+  },
+  "x-labels": {
+    "ontology.run-id": "final-gates-20261102-r04-final",
+    "ontology.synthetic": "true",
+    "ontology.task-id": "G4-M1-FINAL-GATES-001"
+  },
+  "x-security": {
+    "cap_drop": [
+      "ALL"
+    ],
+    "cpus": 2,
+    "labels": {
+      "ontology.run-id": "final-gates-20261102-r04-final",
+      "ontology.synthetic": "true",
+      "ontology.task-id": "G4-M1-FINAL-GATES-001"
+    },
+    "pids_limit": 256,
+    "platform": "linux/arm64",
+    "pull_policy": "never",
+    "read_only": true,
+    "security_opt": [
+      "no-new-privileges:true"
+    ]
+  }
+}

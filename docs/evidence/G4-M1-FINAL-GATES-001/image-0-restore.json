@@ -1,0 +1,46 @@
+{
+  "taskId": "G4-M1-FINAL-GATES-001",
+  "reference": "postgres@sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+  "platformDigest": "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+  "configDigest": "sha256:07ee628d2e71f8956c85fc5466906a6d4038cf00f6db07f067d810ef8fec8161",
+  "verifiedBlobCount": 15,
+  "downloadBytes": 0,
+  "command": [
+    "docker",
+    "--context",
+    "desktop-linux",
+    "image",
+    "load",
+    "--platform",
+    "linux/arm64",
+    "--input",
+    "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/artifacts/g4-m1-final-gates-001/image-0.oci.tar"
+  ],
+  "exitCode": 0,
+  "stdout": "Loaded image: postgres@sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437\n",
+  "stderr": "",
+  "containerExecution": false,
+  "actual": {
+    "Id": "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+    "RepoDigests": [],
+    "Os": "linux",
+    "Architecture": "arm64",
+    "Descriptor": {
+      "mediaType": "application/vnd.oci.image.manifest.v1+json",
+      "digest": "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+      "size": 3441,
+      "annotations": {
+        "com.docker.official-images.bashbrew.arch": "arm64v8",
+        "io.containerd.image.name": "postgres@sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+        "org.opencontainers.image.base.digest": "sha256:1470991b497d26788dc4d6f438bf5690c6ba0d499235d237e55f4b43caea7a75",
+        "org.opencontainers.image.base.name": "debian:trixie-slim",
+        "org.opencontainers.image.created": "2026-10-28T01:32:55Z",
+        "org.opencontainers.image.ref.name": "postgres@sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+        "org.opencontainers.image.revision": "e00e1bd34ec5c8a8e7ad89b273b3d42efaf6d5bc",
+        "org.opencontainers.image.source": "https://github.com/docker-library/postgres.git#e00e1bd34ec5c8a8e7ad89b273b3d42efaf6d5bc:18/trixie",
+        "org.opencontainers.image.url": "https://hub.docker.com/_/postgres",
+        "org.opencontainers.image.version": "18.6"
+      }
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "taskId": "G4-M1-FINAL-GATES-001",
+  "reference": "quay.io/keycloak/keycloak@sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4",
+  "platformDigest": "sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4",
+  "configDigest": "sha256:24959b9b2ff0ec6bd9445588d3b488b84dffbe06e6a6ccb50e3d074f7ec581dd",
+  "verifiedBlobCount": 6,
+  "downloadBytes": 0,
+  "command": [
+    "docker",
+    "--context",
+    "desktop-linux",
+    "image",
+    "load",
+    "--platform",
+    "linux/arm64",
+    "--input",
+    "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/artifacts/g4-m1-final-gates-001/image-1.oci.tar"
+  ],
+  "exitCode": 0,
+  "stdout": "Loaded image: quay.io/keycloak/keycloak@sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4\n",
+  "stderr": "",
+  "containerExecution": false,
+  "actual": {
+    "Id": "sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4",
+    "RepoDigests": [
+      "quay.io/keycloak/keycloak@sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4"
+    ],
+    "Os": "linux",
+    "Architecture": "arm64",
+    "Descriptor": {
+      "mediaType": "application/vnd.oci.image.manifest.v1+json",
+      "digest": "sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4",
+      "size": 1056,
+      "annotations": {
+        "io.containerd.image.name": "quay.io/keycloak/keycloak@sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4",
+        "org.opencontainers.image.ref.name": "quay.io/keycloak/keycloak@sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4"
+      }
+    }
+  }
+}

@@ -1,0 +1,830 @@
+{
+  "taskId": "G4-M1-FINAL-GATES-001",
+  "runId": "final-gates-20261102-r04-final",
+  "containerId": "c851dc773a0275f1c6d23cddea3232e69cd4d77f1252455391d9dc0364b80b68",
+  "operation": "fixed read-only audit/activation query",
+  "exitCode": 0,
+  "data": {
+    "audits": [
+      {
+        "Id": "009e7fcf93644f72a15f92fe3dc3d717",
+        "OccurredAtUtc": "2026-11-02T00:22:24.038705+00:00",
+        "Actor": "2ca305cc-e81a-4390-8431-16d616c01927",
+        "Action": "authentication.login",
+        "Resource": "session",
+        "Outcome": "allowed",
+        "TraceId": "ff0518edbd190a946c442426468e00b8",
+        "CorrelationId": "d3b204c5f2dd46afb157ca38140ebd62",
+        "OrganizationId": "org-demo",
+        "SiteId": null,
+        "ScopeSiteIds": [
+          "site-a",
+          "site-b"
+        ]
+      },
+      {
+        "Id": "758f24beb26243529ac6fe1ebc41ed88",
+        "OccurredAtUtc": "2026-11-02T00:22:24.666091+00:00",
+        "Actor": "4e559fc0-d782-4b71-a4a2-b355bf99dbe9",
+        "Action": "authentication.login",
+        "Resource": "session",
+        "Outcome": "allowed",
+        "TraceId": "14347fac37e1adcb165a94e0fafb6c1d",
+        "CorrelationId": "6bbd43d3aeff4ed79b72b2031066435a",
+        "OrganizationId": "org-demo",
+        "SiteId": null,
+        "ScopeSiteIds": [
+          "site-a",
+          "site-b"
+        ]
+      },
+      {
+        "Id": "9f917f7200fb48b993a5bbfb1b93a6d9",
+        "OccurredAtUtc": "2026-11-02T00:22:25.213679+00:00",
+        "Actor": "aece13d1-6ea3-4251-9892-aba3397b322f",
+        "Action": "authentication.login",
+        "Resource": "session",
+        "Outcome": "allowed",
+        "TraceId": "05c9cf714971a420f233508d24947853",
+        "CorrelationId": "2de183deb4664ceb92bcb07556d89c45",
+        "OrganizationId": "org-demo",
+        "SiteId": null,
+        "ScopeSiteIds": [
+          "site-a",
+          "site-b"
+        ]
+      },
+      {
+        "Id": "a4b0709e62164d029ac0062ce96d0059",
+        "OccurredAtUtc": "2026-11-02T00:22:25.775439+00:00",
+        "Actor": "8f202013-48d5-47b2-8fb1-6b0cfbd6c631",
+        "Action": "authentication.login",
+        "Resource": "session",
+        "Outcome": "allowed",
+        "TraceId": "53d0c2dcbffd6564ffc6efa0d37e47f1",
+        "CorrelationId": "1da1251071114d448d2fbb2cb3268dbd",
+        "OrganizationId": "org-other",
+        "SiteId": "site-a",
+        "ScopeSiteIds": [
+          "site-a"
+        ]
+      },
+      {
+        "Id": "425b3b652f594282b39b64995ac8a382",
+        "OccurredAtUtc": "2026-11-02T00:22:26.020555+00:00",
+        "Actor": "2ca305cc-e81a-4390-8431-16d616c01927",
+        "Action": "csrf.denied",
+        "Resource": "g2.api",
+        "Outcome": "denied",
+        "TraceId": "47e8e4d6bdb668e2599101d9243d429d",
+        "CorrelationId": "f2aac2e9a2714616ad85c21525c47599",
+        "OrganizationId": "org-demo",
+        "SiteId": null,
+        "ScopeSiteIds": [
+          "site-a",
+          "site-b"
+        ]
+      },
+      {
+        "Id": "6b8d8b490dfa42e8802a6a992c120d58",
+        "OccurredAtUtc": "2026-11-02T00:22:26.056234+00:00",
+        "Actor": "aece13d1-6ea3-4251-9892-aba3397b322f",
+        "Action": "authorization.denied",
+        "Resource": "g2.api",
+        "Outcome": "denied",
+        "TraceId": "fd5715b08ccd19e346a3e939a51d919b",
+        "CorrelationId": "349cbb6ec0464af8966765d220f93479",
+        "OrganizationId": "org-demo",
+        "SiteId": null,
+        "ScopeSiteIds": [
+          "site-a",
+          "site-b"
+        ]
+      },
+      {
+        "Id": "8a5aa2b7d09e4773870dd74e4312e0e9",
+        "OccurredAtUtc": "2026-11-02T00:22:26.615233+00:00",
+        "Actor": "2ca305cc-e81a-4390-8431-16d616c01927",
+        "Action": "ontology.create",
+        "Resource": "1126f77e55a04a9d9c0f070c89d90349",
+        "Outcome": "allowed",
+        "TraceId": "631b26bfb09445d2aa7cbcd8f471c9d7",
+        "CorrelationId": "ae2fea0f7136486bbc20a529f0fcd831",
+        "OrganizationId": "org-demo",
+        "SiteId": null,
+        "ScopeSiteIds": [
+          "site-a",
+          "site-b"
+        ]
+      },
+      {
+        "Id": "042d270ac76f4c32a3bd55d1a9443ec0",
+        "OccurredAtUtc": "2026-11-02T00:22:26.674908+00:00",
+        "Actor": "8f202013-48d5-47b2-8fb1-6b0cfbd6c631",
+        "Action": "authorization.denied",
+        "Resource": "g2.api",
+        "Outcome": "denied",
+        "TraceId": "e057a508f8a6dc92eddb36568b5390e3",
+        "CorrelationId": "bddb828493734b51852b2886a8993784",
+        "OrganizationId": "org-other",
+        "SiteId": "site-a",
+        "ScopeSiteIds": [
+          "site-a"
+        ]
+      },
+      {
+        "Id": "ae868c9517194dbda98bfa8e139f4551",
+        "OccurredAtUtc": "2026-11-02T00:22:27.172147+00:00",
+        "Actor": "2ca305cc-e81a-4390-8431-16d616c01927",
+        "Action": "ontology.assess",
+        "Resource": "1126f77e55a04a9d9c0f070c89d90349",
+        "Outcome": "allowed",
+        "TraceId": "f58047bd6552aef328989ce3f058cf99",
+        "CorrelationId": "f5b772eaa9ae4801a2fed73129df6c99",
+        "OrganizationId": "org-demo",
+        "SiteId": null,
+        "ScopeSiteIds": [
+          "site-a",
+          "site-b"
+        ]
+      },
+      {
+        "Id": "7f9569145f3043f29a748d22a78d19f8",
+        "OccurredAtUtc": "2026-11-02T00:22:27.697929+00:00",
+        "Actor": "2ca305cc-e81a-4390-8431-16d616c01927",
+        "Action": "ontology.impact.generate",
+        "Resource": "9b161350cd5e42c086a1fe9831a7cbff",
+        "Outcome": "allowed",
+        "TraceId": "cbeebed2347191292e0d0b68dd92098e",
+        "CorrelationId": "050953163bb14ca1ad9c605d66b4f236",
+        "OrganizationId": "org-demo",
+        "SiteId": null,
+        "ScopeSiteIds": [
+          "site-a",
+          "site-b"
+        ]
+      },
+      {
+        "Id": "4284607768d04a85ae5270438bd3e698",
+        "OccurredAtUtc": "2026-11-02T00:22:27.790898+00:00",
+        "Actor": "2ca305cc-e81a-4390-8431-16d616c01927",
+        "Action": "release.proposal.create",
+        "Resource": "a78af3b58890416c8edb53d669c737fe",
+        "Outcome": "allowed",
+        "TraceId": "82ef4ff3b6b44fd156bcc6cf5ba98a35",
+        "CorrelationId": "0788d536c1674dd793e42c61c729d76a",
+        "OrganizationId": "org-demo",
+        "SiteId": null,
+        "ScopeSiteIds": [
+          "site-a",
+          "site-b"
+        ]
+      },
+      {
+        "Id": "f563dc3dab5d45e0a855f6c0896c93a3",
+        "OccurredAtUtc": "2026-11-02T00:22:27.841015+00:00",
+        "Actor": "2ca305cc-e81a-4390-8431-16d616c01927",
+        "Action": "authorization.denied",
+        "Resource": "g2.api",
+        "Outcome": "denied",
+        "TraceId": "2fa641e9b6bcd67592217e68228d5ee3",
+        "CorrelationId": "f8445fb65d044ea4ba770942e7c55348",
+        "OrganizationId": "org-demo",
+        "SiteId": null,
+        "ScopeSiteIds": [
+          "site-a",
+          "site-b"
+        ]
+      },
+      {
+        "Id": "68c07b5feffa4db29f91c386574bebf6",
+        "OccurredAtUtc": "2026-11-02T00:22:27.907005+00:00",
+        "Actor": "4e559fc0-d782-4b71-a4a2-b355bf99dbe9",
+        "Action": "release.approval.decide",
+        "Resource": "a78af3b58890416c8edb53d669c737fe",
+        "Outcome": "allowed",
+        "TraceId": "4dce32010140a5ba299ba4fa0f9d3268",
+        "CorrelationId": "00cd1928158d420d87bb10717a34e3a7",
+        "OrganizationId": "org-demo",
+        "SiteId": null,
+        "ScopeSiteIds": [
+          "site-a",
+          "site-b"
+        ]
+      },
+      {
+        "Id": "156a41aedeec485dada2ebb5c1f43c7c",
+        "OccurredAtUtc": "2026-11-02T00:22:28.636017+00:00",
+        "Actor": "2ca305cc-e81a-4390-8431-16d616c01927",
+        "Action": "release.activate",
+        "Resource": "5a12582a239f4930b2d2bd9eea1a02fa",
+        "Outcome": "allowed",
+        "TraceId": "8280702422229c0fe40b25fb9f98d0f9",
+        "CorrelationId": "02d006d7fc8a4c8c99125f47f21f1b78",
+        "OrganizationId": "org-demo",
+        "SiteId": null,
+        "ScopeSiteIds": [
+          "site-a",
+          "site-b"
+        ]
+      },
+      {
+        "Id": "9f76ce789f624dd6877f35a5eccf3c67",
+        "OccurredAtUtc": "2026-11-02T00:22:29.757777+00:00",
+        "Actor": "2ca305cc-e81a-4390-8431-16d616c01927",
+        "Action": "semantic.query",
+        "Resource": "semantic.gateway",
+        "Outcome": "allowed",
+        "TraceId": "853075afa3d391b402fba5d4012a3752",
+        "CorrelationId": "9341e0d174db40888105891a5a77f7e4",
+        "OrganizationId": "org-demo",
+        "SiteId": null,
+        "ScopeSiteIds": [
+          "site-a",
+          "site-b"
+        ]
+      },
+      {
+        "Id": "7cf529e5b9f9406d87abfe7fab02cc8a",
+        "OccurredAtUtc": "2026-11-02T00:22:30.274538+00:00",
+        "Actor": "2ca305cc-e81a-4390-8431-16d616c01927",
+        "Action": "semantic.evidence.read",
+        "Resource": "semantic.gateway",
+        "Outcome": "allowed",
+        "TraceId": "2d35feea3deac01ad9a46006439f0a3b",
+        "CorrelationId": "14e2be234bf7410fb7d5dcc5d68e0176",
+        "OrganizationId": "org-demo",
+        "SiteId": null,
+        "ScopeSiteIds": [
+          "site-a",
+          "site-b"
+        ]
+      },
+      {
+        "Id": "1d8ad00c4024477599becbda27962646",
+        "OccurredAtUtc": "2026-11-02T00:22:30.322737+00:00",
+        "Actor": "8f202013-48d5-47b2-8fb1-6b0cfbd6c631",
+        "Action": "semantic.query",
+        "Resource": "semantic.gateway",
+        "Outcome": "denied",
+        "TraceId": "9f5ac79789d1d157604b9f9022e0b927",
+        "CorrelationId": "d8bbb44a62ae4fdbada9424f6ddd9dbf",
+        "OrganizationId": "org-other",
+        "SiteId": "site-a",
+        "ScopeSiteIds": [
+          "site-a"
+        ]
+      },
+      {
+        "Id": "e3afbbdb14f54d2082eca86a58fa23e1",
+        "OccurredAtUtc": "2026-11-02T00:22:30.323227+00:00",
+        "Actor": "8f202013-48d5-47b2-8fb1-6b0cfbd6c631",
+        "Action": "authorization.denied",
+        "Resource": "g2.api",
+        "Outcome": "denied",
+        "TraceId": "9f5ac79789d1d157604b9f9022e0b927",
+        "CorrelationId": "d8bbb44a62ae4fdbada9424f6ddd9dbf",
+        "OrganizationId": "org-other",
+        "SiteId": "site-a",
+        "ScopeSiteIds": [
+          "site-a"
+        ]
+      },
+      {
+        "Id": "8ba4d33daf5e47a592f33f2ddd7b3ca3",
+        "OccurredAtUtc": "2026-11-02T00:22:30.365746+00:00",
+        "Actor": "8f202013-48d5-47b2-8fb1-6b0cfbd6c631",
+        "Action": "semantic.evidence.read",
+        "Resource": "semantic.gateway",
+        "Outcome": "denied",
+        "TraceId": "0df8e5bae310f865858d4fdc8e8f315c",
+        "CorrelationId": "e937cb4e8be24bfbbf8acb6c6bb367aa",
+        "OrganizationId": "org-other",
+        "SiteId": "site-a",
+        "ScopeSiteIds": [
+          "site-a"
+        ]
+      },
+      {
+        "Id": "8a88ed906df24cae997ae6bd34016f83",
+        "OccurredAtUtc": "2026-11-02T00:22:30.366177+00:00",
+        "Actor": "8f202013-48d5-47b2-8fb1-6b0cfbd6c631",
+        "Action": "authorization.denied",
+        "Resource": "g2.api",
+        "Outcome": "denied",
+        "TraceId": "0df8e5bae310f865858d4fdc8e8f315c",
+        "CorrelationId": "e937cb4e8be24bfbbf8acb6c6bb367aa",
+        "OrganizationId": "org-other",
+        "SiteId": "site-a",
+        "ScopeSiteIds": [
+          "site-a"
+        ]
+      },
+      {
+        "Id": "9097cde4bb3443e8a454aeecd8873ac3",
+        "OccurredAtUtc": "2026-11-02T00:22:30.858359+00:00",
+        "Actor": "2ca305cc-e81a-4390-8431-16d616c01927",
+        "Action": "ontology.save",
+        "Resource": "1126f77e55a04a9d9c0f070c89d90349",
+        "Outcome": "allowed",
+        "TraceId": "76acb3e708140dc66a519aaefc15a015",
+        "CorrelationId": "78e8dea1ef334a3f86affc1f7a71027e",
+        "OrganizationId": "org-demo",
+        "SiteId": null,
+        "ScopeSiteIds": [
+          "site-a",
+          "site-b"
+        ]
+      },
+      {
+        "Id": "6536e441260a4ba49f2f3427b32162b5",
+        "OccurredAtUtc": "2026-11-02T00:22:31.282552+00:00",
+        "Actor": "2ca305cc-e81a-4390-8431-16d616c01927",
+        "Action": "ontology.assess",
+        "Resource": "1126f77e55a04a9d9c0f070c89d90349",
+        "Outcome": "allowed",
+        "TraceId": "e3ff377e2518bcb055d85029c1e4a980",
+        "CorrelationId": "845528ed216340c5ad1b69774a13da49",
+        "OrganizationId": "org-demo",
+        "SiteId": null,
+        "ScopeSiteIds": [
+          "site-a",
+          "site-b"
+        ]
+      },
+      {
+        "Id": "fce44fdc06b8452eb4ec925f26f3ceea",
+        "OccurredAtUtc": "2026-11-02T00:22:32.343934+00:00",
+        "Actor": "2ca305cc-e81a-4390-8431-16d616c01927",
+        "Action": "ontology.impact.generate",
+        "Resource": "8eafae23734246efbbeda21822834d16",
+        "Outcome": "allowed",
+        "TraceId": "636a1b5d9db9dcaeb34e52c2f03780e2",
+        "CorrelationId": "fce9cc330d06448e997e669377938176",
+        "OrganizationId": "org-demo",
+        "SiteId": null,
+        "ScopeSiteIds": [
+          "site-a",
+          "site-b"
+        ]
+      },
+      {
+        "Id": "3276111b05ad481fa1cf045bcdc7029d",
+        "OccurredAtUtc": "2026-11-02T00:22:32.403345+00:00",
+        "Actor": "2ca305cc-e81a-4390-8431-16d616c01927",
+        "Action": "release.proposal.create",
+        "Resource": "fdc31de4f73e4f9a9d9f446150926e10",
+        "Outcome": "allowed",
+        "TraceId": "c4c922a38105812f25b0dd33ec77f4f3",
+        "CorrelationId": "1a5fc63e554743e196e2a4634d33c7c4",
+        "OrganizationId": "org-demo",
+        "SiteId": null,
+        "ScopeSiteIds": [
+          "site-a",
+          "site-b"
+        ]
+      },
+      {
+        "Id": "264bf6936ef24fd184e70ab5a7feb91d",
+        "OccurredAtUtc": "2026-11-02T00:22:32.446489+00:00",
+        "Actor": "2ca305cc-e81a-4390-8431-16d616c01927",
+        "Action": "authorization.denied",
+        "Resource": "g2.api",
+        "Outcome": "denied",
+        "TraceId": "238de954fde32e960197894a8af86ba1",
+        "CorrelationId": "6e5cd59f4d1d41dfb67ca1daf352ab65",
+        "OrganizationId": "org-demo",
+        "SiteId": null,
+        "ScopeSiteIds": [
+          "site-a",
+          "site-b"
+        ]
+      },
+      {
+        "Id": "9ba210ea9eae4d8fb9cb701f798593a9",
+        "OccurredAtUtc": "2026-11-02T00:22:32.490011+00:00",
+        "Actor": "4e559fc0-d782-4b71-a4a2-b355bf99dbe9",
+        "Action": "release.approval.decide",
+        "Resource": "fdc31de4f73e4f9a9d9f446150926e10",
+        "Outcome": "allowed",
+        "TraceId": "1ddf557331461a03825d20bd6a8830b2",
+        "CorrelationId": "02ec8c5a56544150b928ed26cd2babff",
+        "OrganizationId": "org-demo",
+        "SiteId": null,
+        "ScopeSiteIds": [
+          "site-a",
+          "site-b"
+        ]
+      },
+      {
+        "Id": "cabd0710c9864f2b8e12101504e3d3ca",
+        "OccurredAtUtc": "2026-11-02T00:22:38.69669+00:00",
+        "Actor": "2ca305cc-e81a-4390-8431-16d616c01927",
+        "Action": "semantic.query",
+        "Resource": "semantic.gateway",
+        "Outcome": "allowed",
+        "TraceId": "b90b145c007962b0035b8f823d812958",
+        "CorrelationId": "c59696659f4e4175aba93a40c5bcaa9b",
+        "OrganizationId": "org-demo",
+        "SiteId": null,
+        "ScopeSiteIds": [
+          "site-a",
+          "site-b"
+        ]
+      },
+      {
+        "Id": "a8a3d9b4de0045e1a4abb33bf6495be5",
+        "OccurredAtUtc": "2026-11-02T00:22:39.264096+00:00",
+        "Actor": "2ca305cc-e81a-4390-8431-16d616c01927",
+        "Action": "semantic.evidence.read",
+        "Resource": "semantic.gateway",
+        "Outcome": "allowed",
+        "TraceId": "4be1622a352b75498ae7b4a1387cfad8",
+        "CorrelationId": "009e956963f847b3a3de56eb399d1a5e",
+        "OrganizationId": "org-demo",
+        "SiteId": null,
+        "ScopeSiteIds": [
+          "site-a",
+          "site-b"
+        ]
+      },
+      {
+        "Id": "ee60ff180df34d51a0ad919e9effe4b4",
+        "OccurredAtUtc": "2026-11-02T00:22:39.322929+00:00",
+        "Actor": "8f202013-48d5-47b2-8fb1-6b0cfbd6c631",
+        "Action": "semantic.query",
+        "Resource": "semantic.gateway",
+        "Outcome": "denied",
+        "TraceId": "a66a5339bb1ef1a27bd0b82c8519bd66",
+        "CorrelationId": "848c801a46334805baafabb0c5e0ba07",
+        "OrganizationId": "org-other",
+        "SiteId": "site-a",
+        "ScopeSiteIds": [
+          "site-a"
+        ]
+      },
+      {
+        "Id": "eb5826fb415840be80b34febb6f71c30",
+        "OccurredAtUtc": "2026-11-02T00:22:39.370219+00:00",
+        "Actor": "8f202013-48d5-47b2-8fb1-6b0cfbd6c631",
+        "Action": "semantic.evidence.read",
+        "Resource": "semantic.gateway",
+        "Outcome": "denied",
+        "TraceId": "ae587661668b4943115795b51cbf7bc2",
+        "CorrelationId": "6450bda317b24176b07c44be074a6a21",
+        "OrganizationId": "org-other",
+        "SiteId": "site-a",
+        "ScopeSiteIds": [
+          "site-a"
+        ]
+      },
+      {
+        "Id": "a463b99026a6473cb79c996b2bfa132f",
+        "OccurredAtUtc": "2026-11-02T00:22:39.904832+00:00",
+        "Actor": "2ca305cc-e81a-4390-8431-16d616c01927",
+        "Action": "release.activate",
+        "Resource": "c7193082154b43d4bc534cad3be372fd",
+        "Outcome": "allowed",
+        "TraceId": "5c4f01455910b1e68635ab1c80f46bc0",
+        "CorrelationId": "4a786f4b8c6c46729475b9aeec2e4e47",
+        "OrganizationId": "org-demo",
+        "SiteId": null,
+        "ScopeSiteIds": [
+          "site-a",
+          "site-b"
+        ]
+      },
+      {
+        "Id": "8d348c5c10dd446b89c0da93171ee3c5",
+        "OccurredAtUtc": "2026-11-02T00:22:41.143946+00:00",
+        "Actor": "2ca305cc-e81a-4390-8431-16d616c01927",
+        "Action": "semantic.query",
+        "Resource": "semantic.gateway",
+        "Outcome": "allowed",
+        "TraceId": "aeba468e4b297b44a7b7de6b905d706f",
+        "CorrelationId": "fd55c17d728743b7ab726884d7669735",
+        "OrganizationId": "org-demo",
+        "SiteId": null,
+        "ScopeSiteIds": [
+          "site-a",
+          "site-b"
+        ]
+      },
+      {
+        "Id": "2a97892e72824ed08bd69a057fab879a",
+        "OccurredAtUtc": "2026-11-02T00:22:41.696704+00:00",
+        "Actor": "2ca305cc-e81a-4390-8431-16d616c01927",
+        "Action": "semantic.evidence.read",
+        "Resource": "semantic.gateway",
+        "Outcome": "allowed",
+        "TraceId": "00b2f9070c0439a0f0c466303320148a",
+        "CorrelationId": "72627a32ed9a4d759f2dd522f6a14286",
+        "OrganizationId": "org-demo",
+        "SiteId": null,
+        "ScopeSiteIds": [
+          "site-a",
+          "site-b"
+        ]
+      },
+      {
+        "Id": "4b07a142fe2a45728afd06afe1f247ed",
+        "OccurredAtUtc": "2026-11-02T00:22:41.73286+00:00",
+        "Actor": "8f202013-48d5-47b2-8fb1-6b0cfbd6c631",
+        "Action": "semantic.query",
+        "Resource": "semantic.gateway",
+        "Outcome": "denied",
+        "TraceId": "728cd7e999f99b2344f16eea04f99c3c",
+        "CorrelationId": "2f160683e0e64ab7a04ed44de1dfbabb",
+        "OrganizationId": "org-other",
+        "SiteId": "site-a",
+        "ScopeSiteIds": [
+          "site-a"
+        ]
+      },
+      {
+        "Id": "a56b2b39b71145a5bec5d2ba88f4dbbd",
+        "OccurredAtUtc": "2026-11-02T00:22:41.765721+00:00",
+        "Actor": "8f202013-48d5-47b2-8fb1-6b0cfbd6c631",
+        "Action": "semantic.evidence.read",
+        "Resource": "semantic.gateway",
+        "Outcome": "denied",
+        "TraceId": "4ccfe8e3896ced924ebac45e070fe8e0",
+        "CorrelationId": "b2610e0987204ae798ab6e614430f6b3",
+        "OrganizationId": "org-other",
+        "SiteId": "site-a",
+        "ScopeSiteIds": [
+          "site-a"
+        ]
+      },
+      {
+        "Id": "b54157de74c74cd2baf6fc4dea1ae01c",
+        "OccurredAtUtc": "2026-11-02T00:22:42.105473+00:00",
+        "Actor": "2ca305cc-e81a-4390-8431-16d616c01927",
+        "Action": "release.proposal.create",
+        "Resource": "de05889284aa40539f5baf76f68d734f",
+        "Outcome": "allowed",
+        "TraceId": "61f4afcc267ca1a15bc4a7436a4244fd",
+        "CorrelationId": "a2d4bbd0a6e04fbf843a09f64c8fb839",
+        "OrganizationId": "org-demo",
+        "SiteId": null,
+        "ScopeSiteIds": [
+          "site-a",
+          "site-b"
+        ]
+      },
+      {
+        "Id": "88749af323c74ffa8772689e4b7b45ba",
+        "OccurredAtUtc": "2026-11-02T00:22:42.18879+00:00",
+        "Actor": "4e559fc0-d782-4b71-a4a2-b355bf99dbe9",
+        "Action": "release.approval.decide",
+        "Resource": "de05889284aa40539f5baf76f68d734f",
+        "Outcome": "allowed",
+        "TraceId": "aca709901a033bbf9dfb487603917ab6",
+        "CorrelationId": "9979a95147024d42bf149259b8b39957",
+        "OrganizationId": "org-demo",
+        "SiteId": null,
+        "ScopeSiteIds": [
+          "site-a",
+          "site-b"
+        ]
+      },
+      {
+        "Id": "f139f920a8e54dfd95543a48cd161952",
+        "OccurredAtUtc": "2026-11-02T00:22:42.443291+00:00",
+        "Actor": "2ca305cc-e81a-4390-8431-16d616c01927",
+        "Action": "release.rollback",
+        "Resource": "5a12582a239f4930b2d2bd9eea1a02fa",
+        "Outcome": "allowed",
+        "TraceId": "7aa55cf0c44a2df453c25fc8a3f8a6b3",
+        "CorrelationId": "a58fddc491864c2d8baa3ce639155865",
+        "OrganizationId": "org-demo",
+        "SiteId": null,
+        "ScopeSiteIds": [
+          "site-a",
+          "site-b"
+        ]
+      },
+      {
+        "Id": "596e25ef5c84470d9bc9f27d825d55f8",
+        "OccurredAtUtc": "2026-11-02T00:22:43.99614+00:00",
+        "Actor": "2ca305cc-e81a-4390-8431-16d616c01927",
+        "Action": "semantic.query",
+        "Resource": "semantic.gateway",
+        "Outcome": "allowed",
+        "TraceId": "6da427fd429144948d1897ac46aea104",
+        "CorrelationId": "64287c169600410aab30c12a3736864c",
+        "OrganizationId": "org-demo",
+        "SiteId": null,
+        "ScopeSiteIds": [
+          "site-a",
+          "site-b"
+        ]
+      },
+      {
+        "Id": "f3650dd5d99b4c088289d2a528525f50",
+        "OccurredAtUtc": "2026-11-02T00:22:44.612515+00:00",
+        "Actor": "2ca305cc-e81a-4390-8431-16d616c01927",
+        "Action": "semantic.evidence.read",
+        "Resource": "semantic.gateway",
+        "Outcome": "allowed",
+        "TraceId": "a15af1c571c44ec707f7ea18b05427a6",
+        "CorrelationId": "0a755f827bc249aaa81a67783a77c601",
+        "OrganizationId": "org-demo",
+        "SiteId": null,
+        "ScopeSiteIds": [
+          "site-a",
+          "site-b"
+        ]
+      },
+      {
+        "Id": "a070429f8cc94da0a9df992bab88c039",
+        "OccurredAtUtc": "2026-11-02T00:22:44.676318+00:00",
+        "Actor": "8f202013-48d5-47b2-8fb1-6b0cfbd6c631",
+        "Action": "authorization.denied",
+        "Resource": "g2.api",
+        "Outcome": "denied",
+        "TraceId": "cadf8c090c33f898294a3a013ca937ae",
+        "CorrelationId": "a07d17e3feec4c42955e37dc34fdb896",
+        "OrganizationId": "org-other",
+        "SiteId": "site-a",
+        "ScopeSiteIds": [
+          "site-a"
+        ]
+      },
+      {
+        "Id": "87c466a1bc1c48a2bd1089300e1a55c5",
+        "OccurredAtUtc": "2026-11-02T00:22:44.720819+00:00",
+        "Actor": "8f202013-48d5-47b2-8fb1-6b0cfbd6c631",
+        "Action": "authorization.denied",
+        "Resource": "g2.api",
+        "Outcome": "denied",
+        "TraceId": "7f8f6e791d8a79d233b2dfc16a2c103c",
+        "CorrelationId": "77e751c3eebc4f72b14a2cc75c3c483e",
+        "OrganizationId": "org-other",
+        "SiteId": "site-a",
+        "ScopeSiteIds": [
+          "site-a"
+        ]
+      },
+      {
+        "Id": "136ea83ba16e45d09c9bde6eed54449b",
+        "OccurredAtUtc": "2026-11-02T00:22:44.765591+00:00",
+        "Actor": "4e559fc0-d782-4b71-a4a2-b355bf99dbe9",
+        "Action": "platform.audit.read",
+        "Resource": "platform.audit",
+        "Outcome": "allowed",
+        "TraceId": "9cc66c07d69f6719fa3221267525f1cb",
+        "CorrelationId": "65b46c037faf42f5b54a4261281f4e4b",
+        "OrganizationId": "org-demo",
+        "SiteId": null,
+        "ScopeSiteIds": [
+          "site-a",
+          "site-b"
+        ]
+      },
+      {
+        "Id": "ab19cc59e74d4735a6aad487d323b367",
+        "OccurredAtUtc": "2026-11-02T00:22:39.323533+00:00",
+        "Actor": "8f202013-48d5-47b2-8fb1-6b0cfbd6c631",
+        "Action": "authorization.denied",
+        "Resource": "g2.api",
+        "Outcome": "denied",
+        "TraceId": "a66a5339bb1ef1a27bd0b82c8519bd66",
+        "CorrelationId": "848c801a46334805baafabb0c5e0ba07",
+        "OrganizationId": "org-other",
+        "SiteId": "site-a",
+        "ScopeSiteIds": [
+          "site-a"
+        ]
+      },
+      {
+        "Id": "0718640014cb4323aa9d46667b680ea4",
+        "OccurredAtUtc": "2026-11-02T00:22:39.370644+00:00",
+        "Actor": "8f202013-48d5-47b2-8fb1-6b0cfbd6c631",
+        "Action": "authorization.denied",
+        "Resource": "g2.api",
+        "Outcome": "denied",
+        "TraceId": "ae587661668b4943115795b51cbf7bc2",
+        "CorrelationId": "6450bda317b24176b07c44be074a6a21",
+        "OrganizationId": "org-other",
+        "SiteId": "site-a",
+        "ScopeSiteIds": [
+          "site-a"
+        ]
+      },
+      {
+        "Id": "ea1095422197442797285bd1149c9e21",
+        "OccurredAtUtc": "2026-11-02T00:22:41.733319+00:00",
+        "Actor": "8f202013-48d5-47b2-8fb1-6b0cfbd6c631",
+        "Action": "authorization.denied",
+        "Resource": "g2.api",
+        "Outcome": "denied",
+        "TraceId": "728cd7e999f99b2344f16eea04f99c3c",
+        "CorrelationId": "2f160683e0e64ab7a04ed44de1dfbabb",
+        "OrganizationId": "org-other",
+        "SiteId": "site-a",
+        "ScopeSiteIds": [
+          "site-a"
+        ]
+      },
+      {
+        "Id": "630f982a6de84024bc9dde9adea65009",
+        "OccurredAtUtc": "2026-11-02T00:22:41.76612+00:00",
+        "Actor": "8f202013-48d5-47b2-8fb1-6b0cfbd6c631",
+        "Action": "authorization.denied",
+        "Resource": "g2.api",
+        "Outcome": "denied",
+        "TraceId": "4ccfe8e3896ced924ebac45e070fe8e0",
+        "CorrelationId": "b2610e0987204ae798ab6e614430f6b3",
+        "OrganizationId": "org-other",
+        "SiteId": "site-a",
+        "ScopeSiteIds": [
+          "site-a"
+        ]
+      },
+      {
+        "Id": "bc64a03f98a54447a3315598fb7e010d",
+        "OccurredAtUtc": "2026-11-02T00:22:42.147294+00:00",
+        "Actor": "2ca305cc-e81a-4390-8431-16d616c01927",
+        "Action": "authorization.denied",
+        "Resource": "g2.api",
+        "Outcome": "denied",
+        "TraceId": "5eb43f28e42b11db1764d22d774172f3",
+        "CorrelationId": "f52fcdda63094da4a0c775d70a7168ea",
+        "OrganizationId": "org-demo",
+        "SiteId": null,
+        "ScopeSiteIds": [
+          "site-a",
+          "site-b"
+        ]
+      },
+      {
+        "Id": "2c9cb6c750674cfbb6da28bb85f9d6b1",
+        "OccurredAtUtc": "2026-11-02T00:22:44.67574+00:00",
+        "Actor": "8f202013-48d5-47b2-8fb1-6b0cfbd6c631",
+        "Action": "semantic.query",
+        "Resource": "semantic.gateway",
+        "Outcome": "denied",
+        "TraceId": "cadf8c090c33f898294a3a013ca937ae",
+        "CorrelationId": "a07d17e3feec4c42955e37dc34fdb896",
+        "OrganizationId": "org-other",
+        "SiteId": "site-a",
+        "ScopeSiteIds": [
+          "site-a"
+        ]
+      },
+      {
+        "Id": "f8e961392a4a4697adf4f1ee413c6492",
+        "OccurredAtUtc": "2026-11-02T00:22:44.720404+00:00",
+        "Actor": "8f202013-48d5-47b2-8fb1-6b0cfbd6c631",
+        "Action": "semantic.evidence.read",
+        "Resource": "semantic.gateway",
+        "Outcome": "denied",
+        "TraceId": "7f8f6e791d8a79d233b2dfc16a2c103c",
+        "CorrelationId": "77e751c3eebc4f72b14a2cc75c3c483e",
+        "OrganizationId": "org-other",
+        "SiteId": "site-a",
+        "ScopeSiteIds": [
+          "site-a"
+        ]
+      }
+    ],
+    "active": [
+      {
+        "AssetId": "f1c001055ae041ae94501a18255cc77a",
+        "OrganizationId": "org-demo",
+        "SiteIds": [
+          "site-a",
+          "site-b"
+        ],
+        "ReleaseId": "5a12582a239f4930b2d2bd9eea1a02fa",
+        "Revision": 3
+      }
+    ],
+    "activations": [
+      {
+        "ActivationId": "7d7d9d935bb44ddb94b486a76e8bcb52",
+        "AssetId": "f1c001055ae041ae94501a18255cc77a",
+        "Revision": 1,
+        "ReleaseId": "5a12582a239f4930b2d2bd9eea1a02fa",
+        "ResultJson": "{\"ActivationId\":\"7d7d9d935bb44ddb94b486a76e8bcb52\",\"ActivationRevision\":1,\"ReleaseId\":\"5a12582a239f4930b2d2bd9eea1a02fa\",\"PreviousReleaseId\":null,\"ManifestHash\":\"7b66ceb6535838b18a95037c364df9f32688b93b6f6fa700035ac2d1623c5ee2\",\"Manifest\":{\"SchemaVersion\":2,\"ReleaseId\":\"5a12582a239f4930b2d2bd9eea1a02fa\",\"AssetId\":\"f1c001055ae041ae94501a18255cc77a\",\"Scope\":{\"OrganizationId\":\"org-demo\",\"SiteIds\":[\"site-a\",\"site-b\"]},\"DraftId\":\"1126f77e55a04a9d9c0f070c89d90349\",\"Revision\":1,\"Hashes\":{\"OntologyHash\":\"52b95ac6e85c3e9e3c7fdea1b4c9b5abc6a5e1801b7f459c41072b5f90f9dc73\",\"ShapesHash\":\"78b6b7cc5cf635825b58664fe23031c0d298cc51d7def446fb5b9aeb17cc9270\",\"VocabularyHash\":\"aa272d8683bfdbe6213424be830415d47f0a454191788ee852709bf52e26d93b\",\"DataHash\":\"349ee83ff47883b13644c6291f98ab0ea925afaca053779d92184ee5d73dcb7e\",\"BundleHash\":\"acc859674554bb4afb99a1e9372cf0015c8a0d7c2c951e75b78aec1167382a77\"},\"OntologyGraphIri\":\"urn:ontology-platform:release:5a12582a239f4930b2d2bd9eea1a02fa:ontology\",\"DataGraphIri\":\"urn:ontology-platform:release:5a12582a239f4930b2d2bd9eea1a02fa:data\",\"ImportLocks\":[],\"Snapshot\":{\"ReleaseId\":\"5a12582a239f4930b2d2bd9eea1a02fa\",\"OntologyHash\":\"52b95ac6e85c3e9e3c7fdea1b4c9b5abc6a5e1801b7f459c41072b5f90f9dc73\",\"ShapesHash\":\"78b6b7cc5cf635825b58664fe23031c0d298cc51d7def446fb5b9aeb17cc9270\",\"VocabularyHash\":\"aa272d8683bfdbe6213424be830415d47f0a454191788ee852709bf52e26d93b\",\"DataHash\":\"349ee83ff47883b13644c6291f98ab0ea925afaca053779d92184ee5d73dcb7e\",\"OntologyGraphIri\":\"urn:ontology-platform:release:5a12582a239f4930b2d2bd9eea1a02fa:ontology\",\"DataGraphIri\":\"urn:ontology-platform:release:5a12582a239f4930b2d2bd9eea1a02fa:data\",\"MappingVersions\":[],\"MetricVersions\":[],\"RuleVersions\":[],\"CapabilityVersions\":[{\"AssetId\":\"describe_ontology\",\"Version\":\"b43b6f2215120a378a806b3ce10e4b138cf448b6dba49be863250de8ce897d3b\"},{\"AssetId\":\"resolve_entity\",\"Version\":\"cca97444799b1ffcc271de21a093b26b1d38712b727aabd3bae1177f3d5992bd\"},{\"AssetId\":\"traverse_relationships\",\"Version\":\"2220f16bf9106c12b9ceccee954db7f68a3f6972dba04d304b7027760def3dd7\"}]},\"ArtifactObjects\":[{\"ObjectKey\":\"releases/5a12582a239f4930b2d2bd9eea1a02fa/source-0-52b95ac6e85c3e9e3c7fdea1b4c9b5abc6a5e1801b7f459c41072b5f90f9dc73.ttl\",\"Hash\":\"52b95ac6e85c3e9e3c7fdea1b4c9b5abc6a5e1801b7f459c41072b5f90f9dc73\",\"SizeBytes\":1506,\"ContentType\":\"text/turtle\"},{\"ObjectKey\":\"releases/5a12582a239f4930b2d2bd9eea1a02fa/source-1-78b6b7cc5cf635825b58664fe23031c0d298cc51d7def446fb5b9aeb17cc9270.ttl\",\"Hash\":\"78b6b7cc5cf635825b58664fe23031c0d298cc51d7def446fb5b9aeb17cc9270\",\"SizeBytes\":3466,\"ContentType\":\"text/turtle\"},{\"ObjectKey\":\"releases/5a12582a239f4930b2d2bd9eea1a02fa/source-2-aa272d8683bfdbe6213424be830415d47f0a454191788ee852709bf52e26d93b.ttl\",\"Hash\":\"aa272d8683bfdbe6213424be830415d47f0a454191788ee852709bf52e26d93b\",\"SizeBytes\":461,\"ContentType\":\"text/turtle\"},{\"ObjectKey\":\"releases/5a12582a239f4930b2d2bd9eea1a02fa/source-3-349ee83ff47883b13644c6291f98ab0ea925afaca053779d92184ee5d73dcb7e.ttl\",\"Hash\":\"349ee83ff47883b13644c6291f98ab0ea925afaca053779d92184ee5d73dcb7e\",\"SizeBytes\":56984,\"ContentType\":\"text/turtle\"}],\"CreatedAtUtc\":\"2026-11-02T00:22:27.9617935+00:00\",\"Semantics\":{\"ProfileVersion\":\"4\",\"ProfileHash\":\"d97c4d43986d272cac15970d7bbf30b9a7fa2d9288ba6f464cf1762e11d21605\",\"AssessmentId\":\"b52cdb0c18424693bb3540fa50ee42e0\",\"AssessmentHash\":\"36480f6178b4264d4ad5f9aa0643037ccbf1742569bba4c43cdbfeb449203b92\"}},\"AuditId\":\"156a41aedeec485dada2ebb5c1f43c7c\",\"OutboxEventId\":\"318184c1eb04459e85f2fb863e9d84ec\",\"ActivatedAtUtc\":\"2026-11-02T00:22:28.6364494+00:00\",\"TraceId\":\"8280702422229c0fe40b25fb9f98d0f9\"}"
+      },
+      {
+        "ActivationId": "7d0a8e8d83a248fb820135b0ee55555b",
+        "AssetId": "f1c001055ae041ae94501a18255cc77a",
+        "Revision": 2,
+        "ReleaseId": "c7193082154b43d4bc534cad3be372fd",
+        "ResultJson": "{\"ActivationId\":\"7d0a8e8d83a248fb820135b0ee55555b\",\"ActivationRevision\":2,\"ReleaseId\":\"c7193082154b43d4bc534cad3be372fd\",\"PreviousReleaseId\":\"5a12582a239f4930b2d2bd9eea1a02fa\",\"ManifestHash\":\"3a938c862b31266cab56e3470fd6f96fd8b8bd2302c4b05bfd8dd6dcec48e3aa\",\"Manifest\":{\"SchemaVersion\":2,\"ReleaseId\":\"c7193082154b43d4bc534cad3be372fd\",\"AssetId\":\"f1c001055ae041ae94501a18255cc77a\",\"Scope\":{\"OrganizationId\":\"org-demo\",\"SiteIds\":[\"site-a\",\"site-b\"]},\"DraftId\":\"1126f77e55a04a9d9c0f070c89d90349\",\"Revision\":2,\"Hashes\":{\"OntologyHash\":\"52b95ac6e85c3e9e3c7fdea1b4c9b5abc6a5e1801b7f459c41072b5f90f9dc73\",\"ShapesHash\":\"78b6b7cc5cf635825b58664fe23031c0d298cc51d7def446fb5b9aeb17cc9270\",\"VocabularyHash\":\"aa272d8683bfdbe6213424be830415d47f0a454191788ee852709bf52e26d93b\",\"DataHash\":\"a5a59e96bc25c5193894150e0013d65cdae44a2bb0741eaf53778c208ed25d6c\",\"BundleHash\":\"7b31e5bcc4400d8067ab8f17fdf0b71b4077bd846a0d694e3d37a7399548f0b8\"},\"OntologyGraphIri\":\"urn:ontology-platform:release:c7193082154b43d4bc534cad3be372fd:ontology\",\"DataGraphIri\":\"urn:ontology-platform:release:c7193082154b43d4bc534cad3be372fd:data\",\"ImportLocks\":[],\"Snapshot\":{\"ReleaseId\":\"c7193082154b43d4bc534cad3be372fd\",\"OntologyHash\":\"52b95ac6e85c3e9e3c7fdea1b4c9b5abc6a5e1801b7f459c41072b5f90f9dc73\",\"ShapesHash\":\"78b6b7cc5cf635825b58664fe23031c0d298cc51d7def446fb5b9aeb17cc9270\",\"VocabularyHash\":\"aa272d8683bfdbe6213424be830415d47f0a454191788ee852709bf52e26d93b\",\"DataHash\":\"a5a59e96bc25c5193894150e0013d65cdae44a2bb0741eaf53778c208ed25d6c\",\"OntologyGraphIri\":\"urn:ontology-platform:release:c7193082154b43d4bc534cad3be372fd:ontology\",\"DataGraphIri\":\"urn:ontology-platform:release:c7193082154b43d4bc534cad3be372fd:data\",\"MappingVersions\":[],\"MetricVersions\":[],\"RuleVersions\":[],\"CapabilityVersions\":[{\"AssetId\":\"describe_ontology\",\"Version\":\"b43b6f2215120a378a806b3ce10e4b138cf448b6dba49be863250de8ce897d3b\"},{\"AssetId\":\"resolve_entity\",\"Version\":\"cca97444799b1ffcc271de21a093b26b1d38712b727aabd3bae1177f3d5992bd\"},{\"AssetId\":\"traverse_relationships\",\"Version\":\"2220f16bf9106c12b9ceccee954db7f68a3f6972dba04d304b7027760def3dd7\"}]},\"ArtifactObjects\":[{\"ObjectKey\":\"releases/c7193082154b43d4bc534cad3be372fd/source-0-52b95ac6e85c3e9e3c7fdea1b4c9b5abc6a5e1801b7f459c41072b5f90f9dc73.ttl\",\"Hash\":\"52b95ac6e85c3e9e3c7fdea1b4c9b5abc6a5e1801b7f459c41072b5f90f9dc73\",\"SizeBytes\":1506,\"ContentType\":\"text/turtle\"},{\"ObjectKey\":\"releases/c7193082154b43d4bc534cad3be372fd/source-1-78b6b7cc5cf635825b58664fe23031c0d298cc51d7def446fb5b9aeb17cc9270.ttl\",\"Hash\":\"78b6b7cc5cf635825b58664fe23031c0d298cc51d7def446fb5b9aeb17cc9270\",\"SizeBytes\":3466,\"ContentType\":\"text/turtle\"},{\"ObjectKey\":\"releases/c7193082154b43d4bc534cad3be372fd/source-2-aa272d8683bfdbe6213424be830415d47f0a454191788ee852709bf52e26d93b.ttl\",\"Hash\":\"aa272d8683bfdbe6213424be830415d47f0a454191788ee852709bf52e26d93b\",\"SizeBytes\":461,\"ContentType\":\"text/turtle\"},{\"ObjectKey\":\"releases/c7193082154b43d4bc534cad3be372fd/source-3-a5a59e96bc25c5193894150e0013d65cdae44a2bb0741eaf53778c208ed25d6c.ttl\",\"Hash\":\"a5a59e96bc25c5193894150e0013d65cdae44a2bb0741eaf53778c208ed25d6c\",\"SizeBytes\":57012,\"ContentType\":\"text/turtle\"}],\"CreatedAtUtc\":\"2026-11-02T00:22:32.5710689+00:00\",\"Semantics\":{\"ProfileVersion\":\"4\",\"ProfileHash\":\"d97c4d43986d272cac15970d7bbf30b9a7fa2d9288ba6f464cf1762e11d21605\",\"AssessmentId\":\"09ffe9a4c8c94fc696b25e4f37e78dba\",\"AssessmentHash\":\"a01d2e2e9b7833788aac9545376e4b0d619077b7277bcd060e67754792dc7f11\"}},\"AuditId\":\"a463b99026a6473cb79c996b2bfa132f\",\"OutboxEventId\":\"b1eef389cfdf4e1495965ab638f88838\",\"ActivatedAtUtc\":\"2026-11-02T00:22:39.9052327+00:00\",\"TraceId\":\"5c4f01455910b1e68635ab1c80f46bc0\"}"
+      },
+      {
+        "ActivationId": "47f69a5c5d274f5da9444d825b37e3ed",
+        "AssetId": "f1c001055ae041ae94501a18255cc77a",
+        "Revision": 3,
+        "ReleaseId": "5a12582a239f4930b2d2bd9eea1a02fa",
+        "ResultJson": "{\"ActivationId\":\"47f69a5c5d274f5da9444d825b37e3ed\",\"ActivationRevision\":3,\"ReleaseId\":\"5a12582a239f4930b2d2bd9eea1a02fa\",\"PreviousReleaseId\":\"c7193082154b43d4bc534cad3be372fd\",\"ManifestHash\":\"7b66ceb6535838b18a95037c364df9f32688b93b6f6fa700035ac2d1623c5ee2\",\"Manifest\":{\"SchemaVersion\":2,\"ReleaseId\":\"5a12582a239f4930b2d2bd9eea1a02fa\",\"AssetId\":\"f1c001055ae041ae94501a18255cc77a\",\"Scope\":{\"OrganizationId\":\"org-demo\",\"SiteIds\":[\"site-a\",\"site-b\"]},\"DraftId\":\"1126f77e55a04a9d9c0f070c89d90349\",\"Revision\":1,\"Hashes\":{\"OntologyHash\":\"52b95ac6e85c3e9e3c7fdea1b4c9b5abc6a5e1801b7f459c41072b5f90f9dc73\",\"ShapesHash\":\"78b6b7cc5cf635825b58664fe23031c0d298cc51d7def446fb5b9aeb17cc9270\",\"VocabularyHash\":\"aa272d8683bfdbe6213424be830415d47f0a454191788ee852709bf52e26d93b\",\"DataHash\":\"349ee83ff47883b13644c6291f98ab0ea925afaca053779d92184ee5d73dcb7e\",\"BundleHash\":\"acc859674554bb4afb99a1e9372cf0015c8a0d7c2c951e75b78aec1167382a77\"},\"OntologyGraphIri\":\"urn:ontology-platform:release:5a12582a239f4930b2d2bd9eea1a02fa:ontology\",\"DataGraphIri\":\"urn:ontology-platform:release:5a12582a239f4930b2d2bd9eea1a02fa:data\",\"ImportLocks\":[],\"Snapshot\":{\"ReleaseId\":\"5a12582a239f4930b2d2bd9eea1a02fa\",\"OntologyHash\":\"52b95ac6e85c3e9e3c7fdea1b4c9b5abc6a5e1801b7f459c41072b5f90f9dc73\",\"ShapesHash\":\"78b6b7cc5cf635825b58664fe23031c0d298cc51d7def446fb5b9aeb17cc9270\",\"VocabularyHash\":\"aa272d8683bfdbe6213424be830415d47f0a454191788ee852709bf52e26d93b\",\"DataHash\":\"349ee83ff47883b13644c6291f98ab0ea925afaca053779d92184ee5d73dcb7e\",\"OntologyGraphIri\":\"urn:ontology-platform:release:5a12582a239f4930b2d2bd9eea1a02fa:ontology\",\"DataGraphIri\":\"urn:ontology-platform:release:5a12582a239f4930b2d2bd9eea1a02fa:data\",\"MappingVersions\":[],\"MetricVersions\":[],\"RuleVersions\":[],\"CapabilityVersions\":[{\"AssetId\":\"describe_ontology\",\"Version\":\"b43b6f2215120a378a806b3ce10e4b138cf448b6dba49be863250de8ce897d3b\"},{\"AssetId\":\"resolve_entity\",\"Version\":\"cca97444799b1ffcc271de21a093b26b1d38712b727aabd3bae1177f3d5992bd\"},{\"AssetId\":\"traverse_relationships\",\"Version\":\"2220f16bf9106c12b9ceccee954db7f68a3f6972dba04d304b7027760def3dd7\"}]},\"ArtifactObjects\":[{\"ObjectKey\":\"releases/5a12582a239f4930b2d2bd9eea1a02fa/source-0-52b95ac6e85c3e9e3c7fdea1b4c9b5abc6a5e1801b7f459c41072b5f90f9dc73.ttl\",\"Hash\":\"52b95ac6e85c3e9e3c7fdea1b4c9b5abc6a5e1801b7f459c41072b5f90f9dc73\",\"SizeBytes\":1506,\"ContentType\":\"text/turtle\"},{\"ObjectKey\":\"releases/5a12582a239f4930b2d2bd9eea1a02fa/source-1-78b6b7cc5cf635825b58664fe23031c0d298cc51d7def446fb5b9aeb17cc9270.ttl\",\"Hash\":\"78b6b7cc5cf635825b58664fe23031c0d298cc51d7def446fb5b9aeb17cc9270\",\"SizeBytes\":3466,\"ContentType\":\"text/turtle\"},{\"ObjectKey\":\"releases/5a12582a239f4930b2d2bd9eea1a02fa/source-2-aa272d8683bfdbe6213424be830415d47f0a454191788ee852709bf52e26d93b.ttl\",\"Hash\":\"aa272d8683bfdbe6213424be830415d47f0a454191788ee852709bf52e26d93b\",\"SizeBytes\":461,\"ContentType\":\"text/turtle\"},{\"ObjectKey\":\"releases/5a12582a239f4930b2d2bd9eea1a02fa/source-3-349ee83ff47883b13644c6291f98ab0ea925afaca053779d92184ee5d73dcb7e.ttl\",\"Hash\":\"349ee83ff47883b13644c6291f98ab0ea925afaca053779d92184ee5d73dcb7e\",\"SizeBytes\":56984,\"ContentType\":\"text/turtle\"}],\"CreatedAtUtc\":\"2026-11-02T00:22:27.9617935+00:00\",\"Semantics\":{\"ProfileVersion\":\"4\",\"ProfileHash\":\"d97c4d43986d272cac15970d7bbf30b9a7fa2d9288ba6f464cf1762e11d21605\",\"AssessmentId\":\"b52cdb0c18424693bb3540fa50ee42e0\",\"AssessmentHash\":\"36480f6178b4264d4ad5f9aa0643037ccbf1742569bba4c43cdbfeb449203b92\"}},\"AuditId\":\"f139f920a8e54dfd95543a48cd161952\",\"OutboxEventId\":\"dcb8f54537f941fbb96a6178a714cb58\",\"ActivatedAtUtc\":\"2026-11-02T00:22:42.4435821+00:00\",\"TraceId\":\"7aa55cf0c44a2df453c25fc8a3f8a6b3\"}"
+      }
+    ],
+    "releaseCount": 2,
+    "connectionsCount": 0
+  }
+}

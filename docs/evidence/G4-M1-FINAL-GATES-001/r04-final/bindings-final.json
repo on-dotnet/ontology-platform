@@ -1,0 +1,475 @@
+{
+  "taskId": "G4-M1-FINAL-GATES-001",
+  "status": "PASS",
+  "checks": [
+    {
+      "name": "three_committed_activations",
+      "status": "PASS",
+      "facts": null
+    },
+    {
+      "name": "activation_audit_0",
+      "status": "PASS",
+      "facts": {
+        "auditId": "156a41aedeec485dada2ebb5c1f43c7c",
+        "traceId": "8280702422229c0fe40b25fb9f98d0f9"
+      }
+    },
+    {
+      "name": "activation_persistence_0",
+      "status": "PASS",
+      "facts": null
+    },
+    {
+      "name": "activation_audit_1",
+      "status": "PASS",
+      "facts": {
+        "auditId": "a463b99026a6473cb79c996b2bfa132f",
+        "traceId": "5c4f01455910b1e68635ab1c80f46bc0"
+      }
+    },
+    {
+      "name": "activation_persistence_1",
+      "status": "PASS",
+      "facts": null
+    },
+    {
+      "name": "activation_audit_2",
+      "status": "PASS",
+      "facts": {
+        "auditId": "f139f920a8e54dfd95543a48cd161952",
+        "traceId": "7aa55cf0c44a2df453c25fc8a3f8a6b3"
+      }
+    },
+    {
+      "name": "activation_persistence_2",
+      "status": "PASS",
+      "facts": null
+    },
+    {
+      "name": "active_matches_rollback",
+      "status": "PASS",
+      "facts": null
+    },
+    {
+      "name": "fault_active_full_identity",
+      "status": "PASS",
+      "facts": null
+    },
+    {
+      "name": "denied_audit_7",
+      "status": "PASS",
+      "facts": {
+        "route": "/api/v1/ontology-drafts",
+        "traceId": "47e8e4d6bdb668e2599101d9243d429d",
+        "actions": [
+          "csrf.denied"
+        ]
+      }
+    },
+    {
+      "name": "denied_audit_8",
+      "status": "PASS",
+      "facts": {
+        "route": "/api/v1/ontology-drafts",
+        "traceId": "fd5715b08ccd19e346a3e939a51d919b",
+        "actions": [
+          "authorization.denied"
+        ]
+      }
+    },
+    {
+      "name": "positive_audit_9",
+      "status": "PASS",
+      "facts": {
+        "action": "ontology.create",
+        "traceId": "631b26bfb09445d2aa7cbcd8f471c9d7"
+      }
+    },
+    {
+      "name": "denied_audit_10",
+      "status": "PASS",
+      "facts": {
+        "route": "/api/v1/ontology-drafts/{id}",
+        "traceId": "e057a508f8a6dc92eddb36568b5390e3",
+        "actions": [
+          "authorization.denied"
+        ]
+      }
+    },
+    {
+      "name": "positive_audit_11",
+      "status": "PASS",
+      "facts": {
+        "action": "ontology.assess",
+        "traceId": "f58047bd6552aef328989ce3f058cf99"
+      }
+    },
+    {
+      "name": "positive_audit_13",
+      "status": "PASS",
+      "facts": {
+        "action": "ontology.impact.generate",
+        "traceId": "cbeebed2347191292e0d0b68dd92098e"
+      }
+    },
+    {
+      "name": "positive_audit_14",
+      "status": "PASS",
+      "facts": {
+        "action": "release.proposal.create",
+        "traceId": "82ef4ff3b6b44fd156bcc6cf5ba98a35"
+      }
+    },
+    {
+      "name": "denied_audit_15",
+      "status": "PASS",
+      "facts": {
+        "route": "/api/v1/approvals/{id}/decisions",
+        "traceId": "2fa641e9b6bcd67592217e68228d5ee3",
+        "actions": [
+          "authorization.denied"
+        ]
+      }
+    },
+    {
+      "name": "positive_audit_16",
+      "status": "PASS",
+      "facts": {
+        "action": "release.approval.decide",
+        "traceId": "4dce32010140a5ba299ba4fa0f9d3268"
+      }
+    },
+    {
+      "name": "positive_audit_20",
+      "status": "PASS",
+      "facts": {
+        "action": "semantic.query",
+        "traceId": "853075afa3d391b402fba5d4012a3752"
+      }
+    },
+    {
+      "name": "positive_audit_21",
+      "status": "PASS",
+      "facts": {
+        "action": "semantic.evidence.read",
+        "traceId": "2d35feea3deac01ad9a46006439f0a3b"
+      }
+    },
+    {
+      "name": "denied_audit_22",
+      "status": "PASS",
+      "facts": {
+        "route": "/api/v1/semantic/queries",
+        "traceId": "9f5ac79789d1d157604b9f9022e0b927",
+        "actions": [
+          "semantic.query",
+          "authorization.denied"
+        ]
+      }
+    },
+    {
+      "name": "denied_audit_23",
+      "status": "PASS",
+      "facts": {
+        "route": "/api/v1/evidence/{id}.{id}{id}",
+        "traceId": "0df8e5bae310f865858d4fdc8e8f315c",
+        "actions": [
+          "semantic.evidence.read",
+          "authorization.denied"
+        ]
+      }
+    },
+    {
+      "name": "positive_audit_24",
+      "status": "PASS",
+      "facts": {
+        "action": "ontology.save",
+        "traceId": "76acb3e708140dc66a519aaefc15a015"
+      }
+    },
+    {
+      "name": "positive_audit_25",
+      "status": "PASS",
+      "facts": {
+        "action": "ontology.assess",
+        "traceId": "e3ff377e2518bcb055d85029c1e4a980"
+      }
+    },
+    {
+      "name": "positive_audit_27",
+      "status": "PASS",
+      "facts": {
+        "action": "ontology.impact.generate",
+        "traceId": "636a1b5d9db9dcaeb34e52c2f03780e2"
+      }
+    },
+    {
+      "name": "positive_audit_28",
+      "status": "PASS",
+      "facts": {
+        "action": "release.proposal.create",
+        "traceId": "c4c922a38105812f25b0dd33ec77f4f3"
+      }
+    },
+    {
+      "name": "denied_audit_29",
+      "status": "PASS",
+      "facts": {
+        "route": "/api/v1/approvals/{id}/decisions",
+        "traceId": "238de954fde32e960197894a8af86ba1",
+        "actions": [
+          "authorization.denied"
+        ]
+      }
+    },
+    {
+      "name": "positive_audit_30",
+      "status": "PASS",
+      "facts": {
+        "action": "release.approval.decide",
+        "traceId": "1ddf557331461a03825d20bd6a8830b2"
+      }
+    },
+    {
+      "name": "fault_no_committed_activation",
+      "status": "PASS",
+      "facts": null
+    },
+    {
+      "name": "positive_audit_33",
+      "status": "PASS",
+      "facts": {
+        "action": "semantic.query",
+        "traceId": "b90b145c007962b0035b8f823d812958"
+      }
+    },
+    {
+      "name": "positive_audit_34",
+      "status": "PASS",
+      "facts": {
+        "action": "semantic.evidence.read",
+        "traceId": "4be1622a352b75498ae7b4a1387cfad8"
+      }
+    },
+    {
+      "name": "denied_audit_35",
+      "status": "PASS",
+      "facts": {
+        "route": "/api/v1/semantic/queries",
+        "traceId": "a66a5339bb1ef1a27bd0b82c8519bd66",
+        "actions": [
+          "semantic.query",
+          "authorization.denied"
+        ]
+      }
+    },
+    {
+      "name": "denied_audit_36",
+      "status": "PASS",
+      "facts": {
+        "route": "/api/v1/evidence/{id}.{id}{id}",
+        "traceId": "ae587661668b4943115795b51cbf7bc2",
+        "actions": [
+          "semantic.evidence.read",
+          "authorization.denied"
+        ]
+      }
+    },
+    {
+      "name": "positive_audit_39",
+      "status": "PASS",
+      "facts": {
+        "action": "semantic.query",
+        "traceId": "aeba468e4b297b44a7b7de6b905d706f"
+      }
+    },
+    {
+      "name": "positive_audit_40",
+      "status": "PASS",
+      "facts": {
+        "action": "semantic.evidence.read",
+        "traceId": "00b2f9070c0439a0f0c466303320148a"
+      }
+    },
+    {
+      "name": "denied_audit_41",
+      "status": "PASS",
+      "facts": {
+        "route": "/api/v1/semantic/queries",
+        "traceId": "728cd7e999f99b2344f16eea04f99c3c",
+        "actions": [
+          "semantic.query",
+          "authorization.denied"
+        ]
+      }
+    },
+    {
+      "name": "denied_audit_42",
+      "status": "PASS",
+      "facts": {
+        "route": "/api/v1/evidence/{id}.{id}{id}",
+        "traceId": "4ccfe8e3896ced924ebac45e070fe8e0",
+        "actions": [
+          "semantic.evidence.read",
+          "authorization.denied"
+        ]
+      }
+    },
+    {
+      "name": "positive_audit_43",
+      "status": "PASS",
+      "facts": {
+        "action": "release.proposal.create",
+        "traceId": "61f4afcc267ca1a15bc4a7436a4244fd"
+      }
+    },
+    {
+      "name": "denied_audit_44",
+      "status": "PASS",
+      "facts": {
+        "route": "/api/v1/approvals/{id}/decisions",
+        "traceId": "5eb43f28e42b11db1764d22d774172f3",
+        "actions": [
+          "authorization.denied"
+        ]
+      }
+    },
+    {
+      "name": "positive_audit_45",
+      "status": "PASS",
+      "facts": {
+        "action": "release.approval.decide",
+        "traceId": "aca709901a033bbf9dfb487603917ab6"
+      }
+    },
+    {
+      "name": "positive_audit_48",
+      "status": "PASS",
+      "facts": {
+        "action": "semantic.query",
+        "traceId": "6da427fd429144948d1897ac46aea104"
+      }
+    },
+    {
+      "name": "positive_audit_49",
+      "status": "PASS",
+      "facts": {
+        "action": "semantic.evidence.read",
+        "traceId": "a15af1c571c44ec707f7ea18b05427a6"
+      }
+    },
+    {
+      "name": "denied_audit_50",
+      "status": "PASS",
+      "facts": {
+        "route": "/api/v1/semantic/queries",
+        "traceId": "cadf8c090c33f898294a3a013ca937ae",
+        "actions": [
+          "authorization.denied",
+          "semantic.query"
+        ]
+      }
+    },
+    {
+      "name": "denied_audit_51",
+      "status": "PASS",
+      "facts": {
+        "route": "/api/v1/evidence/{id}.{id}{id}",
+        "traceId": "7f8f6e791d8a79d233b2dfc16a2c103c",
+        "actions": [
+          "authorization.denied",
+          "semantic.evidence.read"
+        ]
+      }
+    },
+    {
+      "name": "v1_faultv1_v2_rollbackv1_content",
+      "status": "PASS",
+      "facts": [
+        "\u7089\u6b21heat-1",
+        "\u7089\u6b21heat-1",
+        "\u7089\u6b21heat-1-R04-v2",
+        "\u7089\u6b21heat-1"
+      ]
+    },
+    {
+      "name": "query_trace_0",
+      "status": "PASS",
+      "facts": null
+    },
+    {
+      "name": "label_evidence_0",
+      "status": "PASS",
+      "facts": null
+    },
+    {
+      "name": "query_trace_1",
+      "status": "PASS",
+      "facts": null
+    },
+    {
+      "name": "label_evidence_1",
+      "status": "PASS",
+      "facts": null
+    },
+    {
+      "name": "query_trace_2",
+      "status": "PASS",
+      "facts": null
+    },
+    {
+      "name": "label_evidence_2",
+      "status": "PASS",
+      "facts": null
+    },
+    {
+      "name": "query_trace_3",
+      "status": "PASS",
+      "facts": null
+    },
+    {
+      "name": "label_evidence_3",
+      "status": "PASS",
+      "facts": null
+    },
+    {
+      "name": "resource_budget",
+      "status": "PASS",
+      "facts": null
+    },
+    {
+      "name": "exact_image_platform-pg",
+      "status": "PASS",
+      "facts": null
+    },
+    {
+      "name": "exact_image_keycloak-test",
+      "status": "PASS",
+      "facts": null
+    },
+    {
+      "name": "exact_image_api",
+      "status": "PASS",
+      "facts": null
+    },
+    {
+      "name": "exact_image_web",
+      "status": "PASS",
+      "facts": null
+    },
+    {
+      "name": "exact_image_fuseki",
+      "status": "PASS",
+      "facts": null
+    },
+    {
+      "name": "exact_image_rustfs",
+      "status": "PASS",
+      "facts": null
+    }
+  ],
+  "reportSha256": "3759c99cd8a8ce437ddc86425514de50340fd9de6da05793039020a3edd08837",
+  "dbSha256": "0b52a7843e320de7f9b18b92043f035fdb920dcabaf6f07f05c8bfd6774e4c8e",
+  "driverSha256": "e7f0f971af18f5faaf8ddc9afcec41fa40148ba09641bc5a6e46f4428f0540a6"
+}

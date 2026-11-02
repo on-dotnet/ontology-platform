@@ -1,0 +1,53 @@
+{
+  "taskId": "G4-M1-FINAL-GATES-001",
+  "status": "PASS",
+  "commands": [
+    {
+      "method": "POST",
+      "path": "/realms/master/protocol/openid-connect/token",
+      "status": 200,
+      "body": "PRIVATE_MEMORY_ONLY"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/realms/g2-0d695d1a607b46c5/users/profile",
+      "status": 200,
+      "body": "PRIVATE_MEMORY_ONLY"
+    },
+    {
+      "method": "PUT",
+      "path": "/admin/realms/g2-0d695d1a607b46c5/users/profile",
+      "status": 200,
+      "body": "PRIVATE_MEMORY_ONLY"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/realms/g2-0d695d1a607b46c5/users?username=g2-operator-a&exact=true",
+      "status": 200,
+      "body": "PRIVATE_MEMORY_ONLY"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/realms/g2-0d695d1a607b46c5/users/8f202013-48d5-47b2-8fb1-6b0cfbd6c631",
+      "status": 200,
+      "body": "PRIVATE_MEMORY_ONLY"
+    },
+    {
+      "method": "PUT",
+      "path": "/admin/realms/g2-0d695d1a607b46c5/users/8f202013-48d5-47b2-8fb1-6b0cfbd6c631",
+      "status": 204,
+      "body": "PRIVATE_MEMORY_ONLY"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/realms/g2-0d695d1a607b46c5/users/8f202013-48d5-47b2-8fb1-6b0cfbd6c631",
+      "status": 200,
+      "body": "PRIVATE_MEMORY_ONLY"
+    }
+  ],
+  "realm": "g2-0d695d1a607b46c5",
+  "subjectSha256": "9b460547dedb3ef49b2fdec1bf8088f2ccc6523703f485624882f7d7ec1acc5f",
+  "organizationId": "org-other",
+  "disposal": "Task-only realm volume exact cleanup",
+  "driverSha256": "9322f7c5369d2d34b73c531cdad7e5c0c533424520bb3997c2945c4bc1fd74b3"
+}

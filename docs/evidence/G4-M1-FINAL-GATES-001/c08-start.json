@@ -1,0 +1,23 @@
+{
+  "command": [
+    "docker",
+    "--context",
+    "desktop-linux",
+    "compose",
+    "-f",
+    "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates/compose.m1.yaml",
+    "-f",
+    "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/experiments/g4-m1-final-gates/compose.runtime.yaml",
+    "up",
+    "-d",
+    "pg-source",
+    "platform-pg",
+    "keycloak-test",
+    "api",
+    "web"
+  ],
+  "exitCode": 0,
+  "durationSeconds": 0.45627004202106036,
+  "stdout": "",
+  "stderr": " Volume ontology-g4-m1-final-gates-001_platform-data Creating \n Network ontology-g4-m1-final-gates-001_source Creating \n Volume ontology-g4-m1-final-gates-001_platform-data Creating \n Network ontology-g4-m1-final-gates-001_source Creating \n Volume ontology-g4-m1-final-gates-001_api-keyring Creating \n Volume ontology-g4-m1-final-gates-001_api-keyring Creating \n Volume ontology-g4-m1-final-gates-001_source-data Creating \n Volume ontology-g4-m1-final-gates-001_source-data Creating \n Network ontology-g4-m1-final-gates-001_front Creating \n Volume ontology-g4-m1-final-gates-001_keycloak-data Creating \n Volume ontology-g4-m1-final-gates-001_keycloak-data Creating \n Network ontology-g4-m1-final-gates-001_front Creating \n Volume ontology-g4-m1-final-gates-001_platform-data Created \n Volume ontology-g4-m1-final-gates-001_platform-data Created \n Volume ontology-g4-m1-final-gates-001_source-data Created \n Volume ontology-g4-m1-final-gates-001_source-data Created \n Volume ontology-g4-m1-final-gates-001_api-keyring Created \n Volume ontology-g4-m1-final-gates-001_api-keyring Created \n Volume ontology-g4-m1-final-gates-001_keycloak-data Created \n Volume ontology-g4-m1-final-gates-001_keycloak-data Created \n Network ontology-g4-m1-final-gates-001_source Created \n Network ontology-g4-m1-final-gates-001_source Created \n Container ontology-g4-m1-final-gates-001-pg-source-1 Creating \n Network ontology-g4-m1-final-gates-001_front Created \n Network ontology-g4-m1-final-gates-001_front Created \n Container ontology-g4-m1-final-gates-001-api-1 Creating \n Container ontology-g4-m1-final-gates-001-platform-pg-1 Creating \n Container ontology-g4-m1-final-gates-001-keycloak-test-1 Creating \n Container ontology-g4-m1-final-gates-001-pg-source-1 Created \n Container ontology-g4-m1-final-gates-001-keycloak-test-1 Created \n Container ontology-g4-m1-final-gates-001-platform-pg-1 Created \n Container ontology-g4-m1-final-gates-001-api-1 Created \n Container ontology-g4-m1-final-gates-001-web-1 Creating \n Container ontology-g4-m1-final-gates-001-web-1 Created \n Container ontology-g4-m1-final-gates-001-pg-source-1 Starting \n Container ontology-g4-m1-final-gates-001-platform-pg-1 Starting \n Container ontology-g4-m1-final-gates-001-api-1 Starting \n Container ontology-g4-m1-final-gates-001-keycloak-test-1 Starting \n Container ontology-g4-m1-final-gates-001-pg-source-1 Started \n Container ontology-g4-m1-final-gates-001-platform-pg-1 Started \n Container ontology-g4-m1-final-gates-001-api-1 Started \n Container ontology-g4-m1-final-gates-001-web-1 Starting \n Container ontology-g4-m1-final-gates-001-keycloak-test-1 Started \n Container ontology-g4-m1-final-gates-001-web-1 Started \n"
+}

@@ -1,0 +1,85 @@
+{
+  "measure": "du KiB in exact task mounted volume paths; not backing disk reclaimed bytes",
+  "results": [
+    {
+      "containerId": "c851dc773a0275f1c6d23cddea3232e69cd4d77f1252455391d9dc0364b80b68",
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "c851dc773a0275f1c6d23cddea3232e69cd4d77f1252455391d9dc0364b80b68",
+        "du",
+        "-sk",
+        "/var/lib/postgresql"
+      ],
+      "exitCode": 0,
+      "stdout": "49552\t/var/lib/postgresql\n",
+      "stderr": ""
+    },
+    {
+      "containerId": "1d36e7a7a95c3c4e6b82d99ef7c07cad650a637f2d39ca93738aa7cea420087f",
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "1d36e7a7a95c3c4e6b82d99ef7c07cad650a637f2d39ca93738aa7cea420087f",
+        "du",
+        "-sk",
+        "/opt/keycloak/data"
+      ],
+      "exitCode": 0,
+      "stdout": "189184\t/opt/keycloak/data\n",
+      "stderr": ""
+    },
+    {
+      "containerId": "06f8168b6012d86ca20d162a1233b6af5d12c1355339b30fa8fe8881bed4fe91",
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "06f8168b6012d86ca20d162a1233b6af5d12c1355339b30fa8fe8881bed4fe91",
+        "du",
+        "-sk",
+        "/keyring"
+      ],
+      "exitCode": 0,
+      "stdout": "4\t/keyring\n",
+      "stderr": ""
+    },
+    {
+      "containerId": "718000c6421497628efda3750759a07dcc8e5f341da903e75c4a1b9a5ced2c24",
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "718000c6421497628efda3750759a07dcc8e5f341da903e75c4a1b9a5ced2c24",
+        "du",
+        "-sk",
+        "/fuseki"
+      ],
+      "exitCode": 0,
+      "stdout": "1636\t/fuseki\n",
+      "stderr": ""
+    },
+    {
+      "containerId": "be6aa5f20987e062ff475fcbb11e8f5e6b9a1b22cd3f2c60c5c55468dc19243b",
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "exec",
+        "be6aa5f20987e062ff475fcbb11e8f5e6b9a1b22cd3f2c60c5c55468dc19243b",
+        "du",
+        "-sk",
+        "/data"
+      ],
+      "exitCode": 0,
+      "stdout": "240\t/data\n",
+      "stderr": ""
+    }
+  ]
+}
