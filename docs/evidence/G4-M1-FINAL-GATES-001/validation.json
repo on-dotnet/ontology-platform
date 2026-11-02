@@ -1,0 +1,53 @@
+{
+  "evidenceSchemaVersion": 2,
+  "validationSource": "LOCAL",
+  "testedCommit": "e9c51d75b19e75276a7517a721e1e45cc30fb8be",
+  "checks": [
+    {
+      "name": "C08-real-HTTP",
+      "command": "node experiments/g4-m1-final-gates/c08.mjs --runtime-file PRIVATE --evidence-dir artifacts/g4-m1-final-gates-001/c08",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "c08-http.json: 15 checks; source and binaries bound in c08-source-binary-binding.json; nonauthor review PASS"
+    },
+    {
+      "name": "Exact-source-policy",
+      "command": "dotnet test --project backend/tests/OntologyPlatform.ConnectionsTests/OntologyPlatform.ConnectionsTests.csproj --no-restore --filter FullyQualifiedName~PgAdapterTests",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "adapter-policy-final.txt: 23 PASS, 0 skipped"
+    },
+    {
+      "name": "SelfTest",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1 -SelfTest",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "verify-selftest-c08.txt; review package 103 tests, 0 failures; product checked separately"
+    },
+    {
+      "name": "C08-exact-cleanup",
+      "command": "python3 experiments/g4-m1-final-gates/closeout.py --apply --expected-plan-sha256 56192c871e62bc4079d94d973e0acb444250291e3b5f665c88b0afdb0326343f",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "c08-cleanup-receipt.json: 12 deleted, old protected identities preserved"
+    },
+    {
+      "name": "R04-actual-isolated-regression",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Running; no completion claim"
+    }
+  ],
+  "ci": {
+    "status": "NOT_RUN",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  },
+  "metadata": {
+    "taskId": "G4-M1-FINAL-GATES-001",
+    "actualAgentActiveTime": "UNKNOWN"
+  }
+}

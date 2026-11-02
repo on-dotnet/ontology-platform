@@ -35,6 +35,49 @@ public sealed class PgFixtureSecurityTests
         Assert.IsFalse(await reader.ReadAsync());
     }
 
+    /// <summary>对Master独立注入的public状态实测精确B策略，并确认A目录保持原样。</summary>
+    /// <returns>当前隔离源正反测试任务。</returns>
+    [TestMethod]
+    [TestCategory("RealPgPublicFixture")]
+    public async Task ExactPublicSchemaBoundaryUsesActualCatalog()
+    {
+        // 只接收当前任务入口的有限预期，不允许任意错误被当作成功。
+        var expected = Environment.GetEnvironmentVariable("G4_PUBLIC_EXPECTATION");
+        if (expected is not ("PASS" or "catalog_access_forbidden" or "catalog_permission_limited"))
+            Assert.Inconclusive("NOT_RUN: explicit bounded public-schema fault required.");
+        // 凭据仍来自已有受控私有夹具输入。
+        var input = await ReadInputAsync();
+        // 本次服务器明确准入B，默认服务器A的拒绝另有策略测试覆盖。
+        var adapter = new PgSourceAdapter(new PgAdapterOptions { RootCertificatePath = input.RootCertificate, AllowedSchemas = ["production", "public"] });
+        // A必须在每个故障状态依然通过，排除源不可用或读写ACL故障冒充B边界。
+        var stagesA = await adapter.ProbeAsync(Profile(), input.Secret, CancellationToken.None);
+        Assert.IsTrue(stagesA.All(stage => stage.Status == "PASS"));
+        // 固定A目录是B不泄漏其它Schema且保持类型元数据的真实基线。
+        var catalogA = await adapter.DiscoverAsync(Profile(), input.Secret, CancellationToken.None);
+        // 精确B仅多出已获准的public，不改变其它连接属性。
+        var profileB = Profile() with { AllowedSchemas = ["production", "public"] };
+        // 五阶段必须正确区分元数据阶段拒绝和前置成功。
+        var stagesB = await adapter.ProbeAsync(profileB, input.Secret, CancellationToken.None);
+        Assert.IsTrue(stagesB.Take(4).All(stage => stage.Status == "PASS"));
+        if (expected == "PASS")
+        {
+            Assert.IsTrue(stagesB.All(stage => stage.Status == "PASS"));
+            // 空public下两个真实目录必须按完整对象/字段序列化完全一致。
+            var catalogB = await adapter.DiscoverAsync(profileB, input.Secret, CancellationToken.None);
+            Assert.AreEqual(JsonSerializer.Serialize(catalogA), JsonSerializer.Serialize(catalogB));
+            Assert.IsTrue(catalogB.Length > 0 && catalogB.All(item => item.Schema == "production"));
+        }
+        else
+        {
+            Assert.AreEqual("FAIL", stagesB[4].Status);
+            Assert.AreEqual(expected, stagesB[4].DiagnosticCode);
+            // Discover不能依赖历史Probe成功来绕过当前public状态。
+            var failure = await Assert.ThrowsAsync<PgSourceException>(() => adapter.DiscoverAsync(profileB, input.Secret, CancellationToken.None));
+            Assert.AreEqual(expected, failure.Code);
+            Assert.IsNull(failure.InnerException);
+        }
+    }
+
     /// <summary>不受信根在认证之前拒绝，后续权限与目录保持未运行。</summary>
     /// <returns>真实TLS拒绝任务。</returns>
     [TestMethod]
