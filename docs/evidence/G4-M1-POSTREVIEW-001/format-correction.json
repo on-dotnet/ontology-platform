@@ -1,0 +1,16 @@
+{
+  "utc": "2026-11-02T13:26:44.920008+00:00",
+  "historicalCommit": "f5985f270a9ca44ddb0e46cbeb95ea7ad24491eb",
+  "failedCommand": [
+    "git",
+    "diff",
+    "--cached",
+    "--check"
+  ],
+  "reproducedCommittedDiffCheck": {
+    "exitCode": 2,
+    "output": "docs/evidence/G4-M1-POSTREVIEW-001/selftest-output.txt:6: new blank line at EOF.\n"
+  },
+  "cause": "Raw 248-byte SelfTest stdout ends in blank line; staged check was not fail-fast and commit followed. History retained; no amend.",
+  "correction": "Lossless base64 JSON carrier; raw bytes and SHA unchanged. Final two-layer diff-check required before package."
+}

@@ -23,3 +23,5 @@ Reviewer提出未来另批原字节JSONL改名+消费者/恢复索引，或必�
 ## 最终precommit只读复审
 
 Reviewer再次确认可封存BLOCKED_WITH_WITNESS证据包，无新增P0/P1；9PASS+1BLOCKED、SelfTest入口FAIL/套件NOT_RUN与原49继承分列正确，补救仅未来待批。独立核对当时34个变更/未跟踪路径均在owned范围，任务工具hash未变、本任务JSON合法，两层及未提交diff-check均exit0；独立执行test-review-evidence.ps1 -ExpectedHead b357fcb8a04b9b57c6f27cd3a10d530e3b556247 exit0（6checks/0screenshots，EVIDENCE_SCHEMA_ONLY）。后补的原始计时、远端复核和资源措辞更正已通知Reviewer。最终Head与唯一包重开仍由包外回执记录。
+
+最终格式修正另经同Reviewer只读确认：Base到当前工作区及未提交diff-check均0；base64解码与f5985f2原日志逐字节相同（248字节、原SHA不变）；历史格式失败exit2独立复现。可追加修正提交；仅证据载体变化，产品/工具未变，BLOCKED结论不变。
