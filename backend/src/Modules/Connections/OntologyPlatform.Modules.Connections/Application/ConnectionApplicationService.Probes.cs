@@ -20,8 +20,14 @@ public sealed partial class ConnectionApplicationService
         // 捕获范围也需仍被当前身份完整覆盖。
         var report = Decode<ConnectionProbeView>(probe.ReportJson);
         DemandScope(call.Actor, report.Scope);
-        return new ConnectionReply { Value = report with { Stale = report.Stale || row.LastProbeId != probe.Id || row.State == "DISABLED"
-            || report.ConfigHash != row.ConfigHash || report.SecretVersion != row.SecretVersion || report.ExpiresAtUtc <= clock.GetUtcNow() } };
+        return new ConnectionReply
+        {
+            Value = report with
+            {
+                Stale = report.Stale || row.LastProbeId != probe.Id || row.State == "DISABLED"
+            || report.ConfigHash != row.ConfigHash || report.SecretVersion != row.SecretVersion || report.ExpiresAtUtc <= clock.GetUtcNow()
+            }
+        };
     }
 
     /// <summary>先提交RUNNING与审计，再在事务外调用源；重试只读取原探测。</summary>
@@ -59,14 +65,38 @@ public sealed partial class ConnectionApplicationService
             // 真实开始时刻是唯一期限依据。
             var now = clock.GetUtcNow();
             // 没执行的阶段明确NOT_RUN。
-            var report = new ConnectionProbeView { ProbeId = Guid.NewGuid().ToString("N"), ConnectionId = row?.Id,
-                ConfigHash = row?.ConfigHash ?? Hash(Encode(new { Scope = scope, draft!.Config })), SecretVersion = credential.Version,
-                Scope = scope, Status = "RUNNING", Stages = new[] { "NETWORK", "TLS", "AUTH", "READ_ONLY", "METADATA" }
+            var report = new ConnectionProbeView
+            {
+                ProbeId = Guid.NewGuid().ToString("N"),
+                ConnectionId = row?.Id,
+                ConfigHash = row?.ConfigHash ?? Hash(Encode(new { Scope = scope, draft!.Config })),
+                SecretVersion = credential.Version,
+                Scope = scope,
+                Status = "RUNNING",
+                Stages = new[] { "NETWORK", "TLS", "AUTH", "READ_ONLY", "METADATA" }
                     .Select(name => new ConnectionProbeStage { Name = name, Status = "NOT_RUN", DurationMs = 0, DiagnosticCode = null }).ToArray(),
-                StartedAtUtc = now, CompletedAtUtc = null, ExpiresAtUtc = now.AddMinutes(10), TraceId = call.Actor.TraceId, Stale = false };
-            db.ConnectionProbes.Add(new ConnectionProbeRecord { Revision = row?.Revision ?? 0, CommandKey = CommandKey(call, command), ActorJson = Encode(call.Actor), Id = report.ProbeId, OrganizationId = scope.OrganizationId, SiteIds = scope.SiteIds,
-                ConnectionId = row?.Id, Owner = call.Actor.SubjectId, ReportJson = Encode(report), ConfigHash = report.ConfigHash,
-                SecretVersion = report.SecretVersion, ExpiresAtUtc = report.ExpiresAtUtc, Deadline = now.AddSeconds(15) });
+                StartedAtUtc = now,
+                CompletedAtUtc = null,
+                ExpiresAtUtc = now.AddMinutes(10),
+                TraceId = call.Actor.TraceId,
+                Stale = false
+            };
+            db.ConnectionProbes.Add(new ConnectionProbeRecord
+            {
+                Revision = row?.Revision ?? 0,
+                CommandKey = CommandKey(call, command),
+                ActorJson = Encode(call.Actor),
+                Id = report.ProbeId,
+                OrganizationId = scope.OrganizationId,
+                SiteIds = scope.SiteIds,
+                ConnectionId = row?.Id,
+                Owner = call.Actor.SubjectId,
+                ReportJson = Encode(report),
+                ConfigHash = report.ConfigHash,
+                SecretVersion = report.SecretVersion,
+                ExpiresAtUtc = report.ExpiresAtUtc,
+                Deadline = now.AddSeconds(15)
+            });
             return (report, scope, scope, row is null ? null : Etag(row));
         }, token);
         if (profile is null || secret is null) return reserved;
@@ -115,8 +145,13 @@ public sealed partial class ConnectionApplicationService
         var stale = !current || record.Deadline <= clock.GetUtcNow() || connection is not null && (connection.Revision != record.Revision || connection.State == "DISABLED" || connection.ConfigHash != original.ConfigHash
             || connection.SecretVersion != original.SecretVersion);
         // 报告中的成功必须真实完整且没有取消或失效。
-        var reportDone = original with { Stages = stages, CompletedAtUtc = clock.GetUtcNow(), Stale = stale,
-            Status = !stale && stages.All(value => value.Status == "PASS") ? "TEST_OK" : stages.Any(value => value.DiagnosticCode == "connection_cancelled") ? "CANCELLED" : "TEST_FAILED" };
+        var reportDone = original with
+        {
+            Stages = stages,
+            CompletedAtUtc = clock.GetUtcNow(),
+            Stale = stale,
+            Status = !stale && stages.All(value => value.Status == "PASS") ? "TEST_OK" : stages.Any(value => value.DiagnosticCode == "connection_cancelled") ? "CANCELLED" : "TEST_FAILED"
+        };
         record.ReportJson = Encode(reportDone);
         record.Deadline = clock.GetUtcNow();
         if (connection is not null && !stale) connection.LastProbeId = original.ProbeId;

@@ -221,10 +221,20 @@ public sealed class PgFixtureSecurityTests
         // 固定安全参数，诊断不包含秘密与原始源错误细节。
         var builder = new NpgsqlConnectionStringBuilder
         {
-            Host = "pg-source", Port = 5432, Database = "fixture", Username = "fixture_reader", Password = input.Secret,
-            SslMode = SslMode.VerifyFull, RootCertificate = input.RootCertificate, Pooling = false,
-            Timeout = 3, CommandTimeout = 3, IncludeErrorDetail = false, LogParameters = false,
-            GssEncryptionMode = GssEncryptionMode.Disable, SearchPath = "pg_catalog"
+            Host = "pg-source",
+            Port = 5432,
+            Database = "fixture",
+            Username = "fixture_reader",
+            Password = input.Secret,
+            SslMode = SslMode.VerifyFull,
+            RootCertificate = input.RootCertificate,
+            Pooling = false,
+            Timeout = 3,
+            CommandTimeout = 3,
+            IncludeErrorDetail = false,
+            LogParameters = false,
+            GssEncryptionMode = GssEncryptionMode.Disable,
+            SearchPath = "pg_catalog"
         };
         return new NpgsqlConnection(builder.ConnectionString);
     }
@@ -233,8 +243,12 @@ public sealed class PgFixtureSecurityTests
     /// <returns>当前任务批准的只读PG配置。</returns>
     private static PgConnectionProfile Profile() => new()
     {
-        Host = "pg-source", Port = 5432, Database = "fixture", Username = "fixture_reader",
-        SslMode = "VerifyFull", AllowedSchemas = ["production"]
+        Host = "pg-source",
+        Port = 5432,
+        Database = "fixture",
+        Username = "fixture_reader",
+        SslMode = "VerifyFull",
+        AllowedSchemas = ["production"]
     };
 
     /// <summary>合成输入只在内存保存，不参与自动记录或公开响应。</summary>

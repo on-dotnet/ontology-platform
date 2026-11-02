@@ -9,8 +9,14 @@ public sealed partial class ConnectionApplicationService
     /// <summary>公开任务不携会话、秘密、内部故障或租约信息。</summary>
     private static CatalogDiscoveryJobView JobView(CatalogJobRecord job) => new()
     {
-        JobId = job.Id, ConnectionId = job.ConnectionId, ConfigRevision = job.Revision, Status = job.Status,
-        CreatedAtUtc = job.CreatedAtUtc, CompletedAtUtc = job.CompletedAtUtc, SnapshotId = job.SnapshotId, TraceId = job.TraceId
+        JobId = job.Id,
+        ConnectionId = job.ConnectionId,
+        ConfigRevision = job.Revision,
+        Status = job.Status,
+        CreatedAtUtc = job.CreatedAtUtc,
+        CompletedAtUtc = job.CompletedAtUtc,
+        SnapshotId = job.SnapshotId,
+        TraceId = job.TraceId
     };
 
     /// <summary>发现先持久排队并在同一事务审计，后台才访问真实源。</summary>
@@ -25,9 +31,20 @@ public sealed partial class ConnectionApplicationService
             if (await db.CatalogJobs.AnyAsync(value => value.ConnectionId == row.Id && (value.Status == "QUEUED" || value.Status == "RUNNING"), ct))
                 throw new SemanticOperationException(409, "connection_version_conflict");
             // 捕获当前输入版本和受保护会话引用，后台每次重新验证。
-            var job = new CatalogJobRecord { Id = Guid.NewGuid().ToString("N"), ConnectionId = row.Id, OrganizationId = row.OrganizationId,
-                SiteIds = row.SiteIds, Revision = row.Revision, SecretVersion = row.SecretVersion, ConfigHash = row.ConfigHash,
-                ActorJson = Encode(call.Actor), SessionReference = call.SessionReference, TraceId = call.Actor.TraceId, CreatedAtUtc = clock.GetUtcNow() };
+            var job = new CatalogJobRecord
+            {
+                Id = Guid.NewGuid().ToString("N"),
+                ConnectionId = row.Id,
+                OrganizationId = row.OrganizationId,
+                SiteIds = row.SiteIds,
+                Revision = row.Revision,
+                SecretVersion = row.SecretVersion,
+                ConfigHash = row.ConfigHash,
+                ActorJson = Encode(call.Actor),
+                SessionReference = call.SessionReference,
+                TraceId = call.Actor.TraceId,
+                CreatedAtUtc = clock.GetUtcNow()
+            };
             db.CatalogJobs.Add(job);
             return (JobView(job), Scope(row), Scope(row), Etag(row));
         }, token);
@@ -108,15 +125,28 @@ public sealed partial class ConnectionApplicationService
             // 每一快照的状态投影不修改持久原文。
             var snapshot = Decode<CatalogSnapshotView>(value.ViewJson);
             // 比较对象和字段的精确身份，不将旧字段套给新对象。
-            var objects = snapshot.Objects.Select(item => item with { Fields = item.Fields.Where(field => visible.Any(now => now.Schema == item.Schema
-                && now.Name == item.Name && now.Kind == item.Kind && now.Fields.Any(column => column.Name == field.Name && column.NativeType == field.NativeType))).ToArray() })
+            var objects = snapshot.Objects.Select(item => item with
+            {
+                Fields = item.Fields.Where(field => visible.Any(now => now.Schema == item.Schema
+                && now.Name == item.Name && now.Kind == item.Kind && now.Fields.Any(column => column.Name == field.Name && column.NativeType == field.NativeType))).ToArray()
+            })
                 .Where(item => item.Fields.Length > 0).ToArray();
-            return snapshot with { Objects = objects, Status = value.ConfigHash == row.ConfigHash && value.SecretVersion == row.SecretVersion
-                && snapshot.SchemaFingerprint == currentFingerprint && Encode(objects) == Encode(snapshot.Objects) ? snapshot.Status : "STALE" };
+            return snapshot with
+            {
+                Objects = objects,
+                Status = value.ConfigHash == row.ConfigHash && value.SecretVersion == row.SecretVersion
+                && snapshot.SchemaFingerprint == currentFingerprint && Encode(objects) == Encode(snapshot.Objects) ? snapshot.Status : "STALE"
+            };
         }).ToArray();
         if (call.Operation == "catalog") return new ConnectionReply { Value = views.SingleOrDefault() ?? throw new SemanticOperationException(403, "catalog_access_forbidden") };
-        return new ConnectionReply { Value = new CatalogSnapshotListPage { Items = views,
-            NextCursor = records.Length > 50 ? Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(records[49].Id)) : null } };
+        return new ConnectionReply
+        {
+            Value = new CatalogSnapshotListPage
+            {
+                Items = views,
+                NextCursor = records.Length > 50 ? Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(records[49].Id)) : null
+            }
+        };
     }
 
     /// <summary>以冻结的适配器版本与排序规则生成目录及指纹，供快照写入和当前状态读取共用。</summary>

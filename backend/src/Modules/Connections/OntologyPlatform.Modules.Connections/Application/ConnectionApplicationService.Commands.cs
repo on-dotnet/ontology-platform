@@ -29,9 +29,15 @@ public sealed partial class ConnectionApplicationService
         {
             DemandScope(call.Actor, request.ScopeSelection);
             // 创建随机不透明ID，不把actor、host或密码编码到引用。
-            var row = new ConnectionSecretRecord { Id = Guid.NewGuid().ToString("N"), Owner = call.Actor.SubjectId,
-                OrganizationId = request.ScopeSelection.OrganizationId, SiteIds = Normalize(request.ScopeSelection).SiteIds,
-                Purpose = request.Purpose, ExpiresAtUtc = clock.GetUtcNow().AddMinutes(10) };
+            var row = new ConnectionSecretRecord
+            {
+                Id = Guid.NewGuid().ToString("N"),
+                Owner = call.Actor.SubjectId,
+                OrganizationId = request.ScopeSelection.OrganizationId,
+                SiteIds = Normalize(request.ScopeSelection).SiteIds,
+                Purpose = request.Purpose,
+                ExpiresAtUtc = clock.GetUtcNow().AddMinutes(10)
+            };
             cipher.Encrypt(row, request.SecretValue);
             db.ConnectionSecrets.Add(row);
             // 此回执仅从专用HTTPS/可信本地Intake返回。
@@ -52,9 +58,16 @@ public sealed partial class ConnectionApplicationService
             // 先验证引用owner/用途/TTL，再创建绑定对象。
             var secret = await UnboundSecretAsync(db, call.Actor, request.SecretRef!, request.ScopeSelection, ct);
             // 创建仅使用当前可信scope，不把草稿Probe当已保存成功事实。
-            var row = new ConnectionRecord { Id = Guid.NewGuid().ToString("N"), DisplayName = request.DisplayName,
-                OrganizationId = request.ScopeSelection.OrganizationId, SiteIds = Normalize(request.ScopeSelection).SiteIds,
-                ConfigJson = Encode(request.Config), SecretId = secret.Id, UpdatedAtUtc = clock.GetUtcNow() };
+            var row = new ConnectionRecord
+            {
+                Id = Guid.NewGuid().ToString("N"),
+                DisplayName = request.DisplayName,
+                OrganizationId = request.ScopeSelection.OrganizationId,
+                SiteIds = Normalize(request.ScopeSelection).SiteIds,
+                ConfigJson = Encode(request.Config),
+                SecretId = secret.Id,
+                UpdatedAtUtc = clock.GetUtcNow()
+            };
             secret.UsedAtUtc = clock.GetUtcNow();
             secret.ConnectionId = row.Id;
             Rehash(row);

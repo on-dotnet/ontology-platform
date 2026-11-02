@@ -65,11 +65,15 @@ public static class G4Endpoints
             // 会话引用由服务端票据加载设置，绝不从HTTP头或正文读取。
             var invocation = new ConnectionInvocation
             {
-                Operation = operation, Actor = actor, Body = body,
+                Operation = operation,
+                Actor = actor,
+                Body = body,
                 Id = context.Request.RouteValues["id"] as string,
                 ChildId = context.Request.RouteValues["probeId"] as string ?? context.Request.RouteValues["jobId"] as string ?? context.Request.RouteValues["snapshotId"] as string,
                 Etag = context.Request.Headers.IfMatch.Count == 0 ? null : context.Request.Headers.IfMatch.Count == 1 ? context.Request.Headers.IfMatch[0] : string.Empty,
-                Cursor = context.Request.Query["cursor"], Type = context.Request.Query["type"], State = context.Request.Query["state"],
+                Cursor = context.Request.Query["cursor"],
+                Type = context.Request.Query["type"],
+                State = context.Request.Query["state"],
                 SessionReference = context.Items["G4SessionReference"] as string ?? string.Empty
             };
             // 所有成功响应均等待应用事务提交，202仅表示持久任务受理。

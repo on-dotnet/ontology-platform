@@ -198,8 +198,14 @@ public static class ImpactContractRules
     {
         // 按来源名索引，不依赖调用方数组枚举顺序。
         var values = sources.ToDictionary(source => source.SourceId, source => target ? source.TargetHash : source.BaseHash, StringComparer.Ordinal);
-        return new SourceHashes { OntologyHash = values["ontology"]!, ShapesHash = values["shapes"]!, VocabularyHash = values["vocabulary"], DataHash = values["data"]!,
-            BundleHash = TextHash(string.Join('\n', values["ontology"], values["shapes"], values["vocabulary"] ?? "absent", values["data"]))! };
+        return new SourceHashes
+        {
+            OntologyHash = values["ontology"]!,
+            ShapesHash = values["shapes"]!,
+            VocabularyHash = values["vocabulary"],
+            DataHash = values["data"]!,
+            BundleHash = TextHash(string.Join('\n', values["ontology"], values["shapes"], values["vocabulary"] ?? "absent", values["data"]))!
+        };
     }
 
     /// <summary>原始UTF8身份不归一化换行、BOM或Unicode。</summary>

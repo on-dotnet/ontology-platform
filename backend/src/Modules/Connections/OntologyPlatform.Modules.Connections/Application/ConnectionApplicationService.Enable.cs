@@ -38,8 +38,16 @@ public sealed partial class ConnectionApplicationService
             // 凭据仅在完整授权通过后解密。
             var credential = await db.ConnectionSecrets.SingleAsync(value => value.Id == row.SecretId, token);
             secret = cipher.Decrypt(credential);
-            db.ConnectionCommands.Add(new ConnectionCommandRecord { Id = key, RequestHash = requestHash, ScopeJson = Encode(Scope(row)),
-                ResultScopeJson = Encode(Scope(row)), ReceiptJson = "null", CreatedAtUtc = clock.GetUtcNow(), StatusCode = 102 });
+            db.ConnectionCommands.Add(new ConnectionCommandRecord
+            {
+                Id = key,
+                RequestHash = requestHash,
+                ScopeJson = Encode(Scope(row)),
+                ResultScopeJson = Encode(Scope(row)),
+                ReceiptJson = "null",
+                CreatedAtUtc = clock.GetUtcNow(),
+                StatusCode = 102
+            });
             await db.SaveChangesAsync(token);
             await transaction.CommitAsync(token);
         }

@@ -69,7 +69,13 @@ public sealed class ConnectionSecretCipher : IDisposable
     /// <summary>构造无歧义的完整AEAD关联数据。</summary>
     private static byte[] Aad(ConnectionSecretRecord record) => JsonSerializer.SerializeToUtf8Bytes(new
     {
-        record.Id, record.Owner, record.OrganizationId, Sites = record.SiteIds.Order(StringComparer.Ordinal).ToArray(), record.Purpose, record.Version, record.KeyVersion
+        record.Id,
+        record.Owner,
+        record.OrganizationId,
+        Sites = record.SiteIds.Order(StringComparer.Ordinal).ToArray(),
+        record.Purpose,
+        record.Version,
+        record.KeyVersion
     });
 
     /// <summary>服务停止时擦除当前进程拥有的KEK缓冲区。</summary>

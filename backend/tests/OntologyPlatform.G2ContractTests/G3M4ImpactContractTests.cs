@@ -61,8 +61,15 @@ public sealed class G3M4ImpactContractTests
     public void ProposalReferenceIsPairedAndRollbackCannotCarryImpact()
     {
         // 历史线协议的必需字段原样保留，新业务资格由服务层强制。
-        var legacy = new CreateProposalRequest { Kind = ProposalKind.Publish, DraftId = "draft-synthetic", DraftRevision = 2,
-            Hashes = Hashes("target"), ValidationReportId = "validation-synthetic", Command = new CommandContext() };
+        var legacy = new CreateProposalRequest
+        {
+            Kind = ProposalKind.Publish,
+            DraftId = "draft-synthetic",
+            DraftRevision = 2,
+            Hashes = Hashes("target"),
+            ValidationReportId = "validation-synthetic",
+            Command = new CommandContext()
+        };
         // omitNull避免向历史对象字节追加两个null字段。
         var text = JsonSerializer.Serialize(legacy, Options);
         Assert.DoesNotContain("impactHash", text);
@@ -83,11 +90,19 @@ public sealed class G3M4ImpactContractTests
         // 合成报告具有真实四槽位及完整RdfTerm，使用生产canonical算法。
         var report = Report();
         // 不同运行耗时或枚举顺序不是不同语义结论。
-        var other = report with { ReportId = "different-first-id", GeneratedAtUtc = report.GeneratedAtUtc.AddHours(1), ExpiresAtUtc = report.ExpiresAtUtc.AddHours(1),
-            Diff = report.Diff with { Scope = report.Diff.Scope with { SiteIds = ["site-b", "site-a", "site-a"] },
-                Sources = report.Diff.Sources.Reverse().Select(source => source with { Graph = source.Graph with { ElapsedMilliseconds = 987, VisitedNodes = 654 } }).ToArray() },
+        var other = report with
+        {
+            ReportId = "different-first-id",
+            GeneratedAtUtc = report.GeneratedAtUtc.AddHours(1),
+            ExpiresAtUtc = report.ExpiresAtUtc.AddHours(1),
+            Diff = report.Diff with
+            {
+                Scope = report.Diff.Scope with { SiteIds = ["site-b", "site-a", "site-a"] },
+                Sources = report.Diff.Sources.Reverse().Select(source => source with { Graph = source.Graph with { ElapsedMilliseconds = 987, VisitedNodes = 654 } }).ToArray()
+            },
             ChangedIris = report.ChangedIris.Reverse().Concat(report.ChangedIris).ToArray(),
-            KnownImpacts = report.KnownImpacts.Reverse().ToArray() };
+            KnownImpacts = report.KnownImpacts.Reverse().ToArray()
+        };
         Assert.AreEqual(ImpactContractRules.CanonicalHash(report), ImpactContractRules.CanonicalHash(other));
         Assert.AreEqual(ImpactContractRules.InputFingerprint(report.Diff, report.BaselineKind, report.TargetSemantics, report.ProfileVersion, report.ProfileHash),
             ImpactContractRules.InputFingerprint(other.Diff, other.BaselineKind, other.TargetSemantics, other.ProfileVersion, other.ProfileHash));
@@ -118,10 +133,13 @@ public sealed class G3M4ImpactContractTests
         }
         // 同文字但语言或datatype不同是不同完整RDF项。
         var first = report.Diff.Sources[0];
-        Assert.AreNotEqual(original, ImpactContractRules.CanonicalHash(report with { Diff = report.Diff with
+        Assert.AreNotEqual(original, ImpactContractRules.CanonicalHash(report with
         {
-            Sources = [first with { AddedTriples = first.AddedTriples.Select(triple => triple with { Object = triple.Object with { Language = "en" } }).ToArray() }, .. report.Diff.Sources.Skip(1)]
-        } }));
+            Diff = report.Diff with
+            {
+                Sources = [first with { AddedTriples = first.AddedTriples.Select(triple => triple with { Object = triple.Object with { Language = "en" } }).ToArray() }, .. report.Diff.Sources.Skip(1)]
+            }
+        }));
     }
 
     /// <summary>缺席、空源码和缺来源槽位不能在协议中混为同一输入。</summary>
@@ -207,31 +225,72 @@ public sealed class G3M4ImpactContractTests
         // 目标与同资产草稿的第二个固定修订一致。
         var to = baseVersion with { Revision = 2 };
         // 语言literal保持完整字段，不用显示文本代替身份。
-        var triple = new RdfTriple { Subject = new RdfTerm { Kind = RdfTermKind.Iri, Value = "urn:synthetic:m4:C" },
-            Predicate = "http://www.w3.org/2000/01/rdf-schema#label", Object = new RdfTerm { Kind = RdfTermKind.Literal, Value = "合成类", Language = "zh" } };
+        var triple = new RdfTriple
+        {
+            Subject = new RdfTerm { Kind = RdfTermKind.Iri, Value = "urn:synthetic:m4:C" },
+            Predicate = "http://www.w3.org/2000/01/rdf-schema#label",
+            Object = new RdfTerm { Kind = RdfTermKind.Literal, Value = "合成类", Language = "zh" }
+        };
         // 明确生成四源身份与真实UTF8散列。
-        var diff = new VersionDiff { AssetId = "asset-synthetic", Scope = new ResourceScope { OrganizationId = "org-synthetic", SiteIds = ["site-a", "site-b"] },
-            From = baseVersion, To = to, BaseHashes = Hashes("base"), TargetHashes = Hashes("target"),
+        var diff = new VersionDiff
+        {
+            AssetId = "asset-synthetic",
+            Scope = new ResourceScope { OrganizationId = "org-synthetic", SiteIds = ["site-a", "site-b"] },
+            From = baseVersion,
+            To = to,
+            BaseHashes = Hashes("base"),
+            TargetHashes = Hashes("target"),
             Sources = new[] { "ontology", "shapes", "vocabulary", "data" }.Select(id => new SourceVersionDiff
             {
-                SourceId = id, BaseText = SourceText("base", id), TargetText = SourceText("target", id),
-                BaseHash = Hash(SourceText("base", id)), TargetHash = Hash(SourceText("target", id)), SourceChanged = true,
+                SourceId = id,
+                BaseText = SourceText("base", id),
+                TargetText = SourceText("target", id),
+                BaseHash = Hash(SourceText("base", id)),
+                TargetHash = Hash(SourceText("target", id)),
+                SourceChanged = true,
                 Graph = new GraphComparisonResult { Status = GraphComparisonStatus.Different, Code = "graph_different", ElapsedMilliseconds = 1, VisitedNodes = 2 },
-                BaseTripleCount = 1, TargetTripleCount = 1, AddedTriples = [triple], RemovedTriples = [triple with { Object = triple.Object with { Value = "旧合成类" } }], TripleDeltaStatus = TripleDeltaStatus.Exact
-            }).ToArray() };
+                BaseTripleCount = 1,
+                TargetTripleCount = 1,
+                AddedTriples = [triple],
+                RemovedTriples = [triple with { Object = triple.Object with { Value = "旧合成类" } }],
+                TripleDeltaStatus = TripleDeltaStatus.Exact
+            }).ToArray()
+        };
         // 证据只引用固定目标源，不伪造正式图或时间。
-        var evidence = new ImpactEvidenceReference { Version = to, SourceId = "ontology", SourceHash = diff.TargetHashes.OntologyHash, Triple = triple,
-            FocusIri = triple.Subject.Value, Path = triple.Predicate };
+        var evidence = new ImpactEvidenceReference
+        {
+            Version = to,
+            SourceId = "ontology",
+            SourceHash = diff.TargetHashes.OntologyHash,
+            Triple = triple,
+            FocusIri = triple.Subject.Value,
+            Path = triple.Predicate
+        };
         // 日期只作持久envelope，纯canonical算法明确排除。
         var time = new DateTimeOffset(2026, 10, 30, 0, 0, 0, TimeSpan.Zero);
         // 完整评估引用来自固定合成fixture，不作为真实引擎结果。
         var semantics = new PublicationSemantics { ProfileVersion = "4", ProfileHash = Hash("profile"), AssessmentId = "assessment-synthetic", AssessmentHash = Hash("assessment") };
-        return new ImpactReport { SchemaVersion = 1, ReportId = "report-synthetic", InputFingerprint = ImpactContractRules.InputFingerprint(diff, ImpactBaselineKind.VersionPair, semantics, "4", semantics.ProfileHash),
-            ExecutorVersion = ImpactContractRules.ExecutorVersion, BudgetIdentity = ImpactContractRules.BudgetIdentity,
-            GeneratedAtUtc = time, ExpiresAtUtc = time.AddHours(24), BaselineKind = ImpactBaselineKind.VersionPair, Diff = diff, ProfileVersion = "4", ProfileHash = semantics.ProfileHash,
-            TargetSemantics = semantics, ChangedIris = ["urn:synthetic:m4:C", "urn:synthetic:m4:D"], AssetReferences = [diff.AssetId],
+        return new ImpactReport
+        {
+            SchemaVersion = 1,
+            ReportId = "report-synthetic",
+            InputFingerprint = ImpactContractRules.InputFingerprint(diff, ImpactBaselineKind.VersionPair, semantics, "4", semantics.ProfileHash),
+            ExecutorVersion = ImpactContractRules.ExecutorVersion,
+            BudgetIdentity = ImpactContractRules.BudgetIdentity,
+            GeneratedAtUtc = time,
+            ExpiresAtUtc = time.AddHours(24),
+            BaselineKind = ImpactBaselineKind.VersionPair,
+            Diff = diff,
+            ProfileVersion = "4",
+            ProfileHash = semantics.ProfileHash,
+            TargetSemantics = semantics,
+            ChangedIris = ["urn:synthetic:m4:C", "urn:synthetic:m4:D"],
+            AssetReferences = [diff.AssetId],
             KnownImpacts = [new ImpactConclusion { Code = "asserted_added", Message = "显式新增合成标签。", AffectedIris = [triple.Subject.Value], AssetReferences = [diff.AssetId], Evidence = [evidence] }],
-            Blockers = [], UnknownCoverage = [], PublishEligible = true };
+            Blockers = [],
+            UnknownCoverage = [],
+            PublishEligible = true
+        };
     }
 
     /// <summary>生成一致四源组合身份，缺席词汇标记与原合同一致。</summary>
@@ -246,31 +305,49 @@ public sealed class G3M4ImpactContractTests
     private static ImpactReport Seal(ImpactReport report)
     {
         // 此fixture已知结论只引用目标；变更目标时显式重新绑定版本与对应源hash。
-        var conclusions = report.KnownImpacts.Select(item => item with { Evidence = item.Evidence.Select(evidence => evidence with
+        var conclusions = report.KnownImpacts.Select(item => item with
         {
-            Version = report.Diff.To,
-            SourceHash = evidence.SourceId switch
+            Evidence = item.Evidence.Select(evidence => evidence with
             {
-                "ontology" => report.Diff.TargetHashes.OntologyHash,
-                "shapes" => report.Diff.TargetHashes.ShapesHash,
-                "vocabulary" => report.Diff.TargetHashes.VocabularyHash!,
-                "data" => report.Diff.TargetHashes.DataHash,
-                _ => report.Diff.TargetHashes.BundleHash
-            }
-        }).ToArray() }).ToArray();
-        return report with { KnownImpacts = conclusions,
-            InputFingerprint = ImpactContractRules.InputFingerprint(report.Diff, report.BaselineKind, report.TargetSemantics, report.ProfileVersion, report.ProfileHash) };
+                Version = report.Diff.To,
+                SourceHash = evidence.SourceId switch
+                {
+                    "ontology" => report.Diff.TargetHashes.OntologyHash,
+                    "shapes" => report.Diff.TargetHashes.ShapesHash,
+                    "vocabulary" => report.Diff.TargetHashes.VocabularyHash!,
+                    "data" => report.Diff.TargetHashes.DataHash,
+                    _ => report.Diff.TargetHashes.BundleHash
+                }
+            }).ToArray()
+        }).ToArray();
+        return report with
+        {
+            KnownImpacts = conclusions,
+            InputFingerprint = ImpactContractRules.InputFingerprint(report.Diff, report.BaselineKind, report.TargetSemantics, report.ProfileVersion, report.ProfileHash)
+        };
     }
 
     /// <summary>首次发布仍使用真实自比no-op，但单独报告资产首次引入。</summary>
     private static ImpactReport InitialReport(ImpactReport report)
     {
         // 两侧固定定位和原文完全相同，不能只改Baseline枚举伪装自比。
-        var sources = report.Diff.Sources.Select(source => source with { BaseText = source.TargetText, BaseHash = source.TargetHash, SourceChanged = false,
-            BaseTripleCount = source.TargetTripleCount, AddedTriples = [], RemovedTriples = [], TripleDeltaStatus = TripleDeltaStatus.Equivalent,
-            Graph = source.Graph with { Status = GraphComparisonStatus.Equivalent, Code = "graph_equivalent" } }).ToArray();
-        return Seal(report with { BaselineKind = ImpactBaselineKind.Initial, Diff = BindSources(report.Diff with { From = report.Diff.To }, sources),
-            KnownImpacts = report.KnownImpacts.Select(item => item with { Code = "initial_asset_introduction", Message = "首次引入合成资产的显式事实。" }).ToArray() });
+        var sources = report.Diff.Sources.Select(source => source with
+        {
+            BaseText = source.TargetText,
+            BaseHash = source.TargetHash,
+            SourceChanged = false,
+            BaseTripleCount = source.TargetTripleCount,
+            AddedTriples = [],
+            RemovedTriples = [],
+            TripleDeltaStatus = TripleDeltaStatus.Equivalent,
+            Graph = source.Graph with { Status = GraphComparisonStatus.Equivalent, Code = "graph_equivalent" }
+        }).ToArray();
+        return Seal(report with
+        {
+            BaselineKind = ImpactBaselineKind.Initial,
+            Diff = BindSources(report.Diff with { From = report.Diff.To }, sources),
+            KnownImpacts = report.KnownImpacts.Select(item => item with { Code = "initial_asset_introduction", Message = "首次引入合成资产的显式事实。" }).ToArray()
+        });
     }
 
     /// <summary>按精确槽位原文重新绑定真实hash，避免合法正例使用自相矛盾的身份。</summary>
@@ -281,8 +358,14 @@ public sealed class G3M4ImpactContractTests
         {
             // 每项原文已在场景中明确指定，缺词汇保持null。
             var values = sources.ToDictionary(item => item.SourceId, item => target ? item.TargetHash : item.BaseHash);
-            return new SourceHashes { OntologyHash = values["ontology"]!, ShapesHash = values["shapes"]!, VocabularyHash = values["vocabulary"], DataHash = values["data"]!,
-                BundleHash = Hash(string.Join('\n', values["ontology"], values["shapes"], values["vocabulary"] ?? "absent", values["data"])) };
+            return new SourceHashes
+            {
+                OntologyHash = values["ontology"]!,
+                ShapesHash = values["shapes"]!,
+                VocabularyHash = values["vocabulary"],
+                DataHash = values["data"]!,
+                BundleHash = Hash(string.Join('\n', values["ontology"], values["shapes"], values["vocabulary"] ?? "absent", values["data"]))
+            };
         }
         return diff with { Sources = sources, BaseHashes = Side(false), TargetHashes = Side(true) };
     }

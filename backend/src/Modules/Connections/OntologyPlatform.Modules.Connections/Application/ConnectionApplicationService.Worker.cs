@@ -141,12 +141,29 @@ public sealed partial class ConnectionApplicationService
             // 排序后的内容和适配器版本构成指纹，捕获时间不参与内容相等性。
             var canonical = CanonicalCatalog(objects);
             // 快照是新行，绝不修改历史内容。
-            var snapshot = new CatalogSnapshotView { SnapshotId = Guid.NewGuid().ToString("N"), ConnectionId = row.Id, ConfigRevision = job.Revision,
-                SecretVersion = job.SecretVersion, Scope = Scope(row), SchemaFingerprint = canonical.Fingerprint,
-                CapturedAtUtc = clock.GetUtcNow(), Status = "READY", Objects = canonical.Objects };
-            finalDb.CatalogSnapshots.Add(new CatalogSnapshotRecord { Id = snapshot.SnapshotId, ConnectionId = row.Id,
-                OrganizationId = row.OrganizationId, SiteIds = row.SiteIds, ConfigHash = job.ConfigHash, SecretVersion = job.SecretVersion,
-                ViewJson = Encode(snapshot), CapturedAtUtc = snapshot.CapturedAtUtc });
+            var snapshot = new CatalogSnapshotView
+            {
+                SnapshotId = Guid.NewGuid().ToString("N"),
+                ConnectionId = row.Id,
+                ConfigRevision = job.Revision,
+                SecretVersion = job.SecretVersion,
+                Scope = Scope(row),
+                SchemaFingerprint = canonical.Fingerprint,
+                CapturedAtUtc = clock.GetUtcNow(),
+                Status = "READY",
+                Objects = canonical.Objects
+            };
+            finalDb.CatalogSnapshots.Add(new CatalogSnapshotRecord
+            {
+                Id = snapshot.SnapshotId,
+                ConnectionId = row.Id,
+                OrganizationId = row.OrganizationId,
+                SiteIds = row.SiteIds,
+                ConfigHash = job.ConfigHash,
+                SecretVersion = job.SecretVersion,
+                ViewJson = Encode(snapshot),
+                CapturedAtUtc = snapshot.CapturedAtUtc
+            });
             job.SnapshotId = snapshot.SnapshotId;
         }
         await SaveAuditAsync(finalDb, actor, "connection.catalog.finish", row.Id, Scope(row), completion.Token);

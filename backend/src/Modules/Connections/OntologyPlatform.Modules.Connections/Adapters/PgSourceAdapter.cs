@@ -159,10 +159,21 @@ public sealed partial class PgSourceAdapter : IPgSourceAdapter
         // 固定SearchPath防止源Schema中同名函数遮蔽系统元数据函数。
         var builder = new NpgsqlConnectionStringBuilder
         {
-            Host = "pg-source", Port = 5432, Database = "fixture", Username = "fixture_reader", Password = secret,
-            SslMode = SslMode.VerifyFull, RootCertificate = rootCertificatePath, Pooling = false,
-            Timeout = 3, CommandTimeout = 3, CancellationTimeout = 250, SearchPath = "pg_catalog",
-            IncludeErrorDetail = false, LogParameters = false, GssEncryptionMode = GssEncryptionMode.Disable
+            Host = "pg-source",
+            Port = 5432,
+            Database = "fixture",
+            Username = "fixture_reader",
+            Password = secret,
+            SslMode = SslMode.VerifyFull,
+            RootCertificate = rootCertificatePath,
+            Pooling = false,
+            Timeout = 3,
+            CommandTimeout = 3,
+            CancellationTimeout = 250,
+            SearchPath = "pg_catalog",
+            IncludeErrorDetail = false,
+            LogParameters = false,
+            GssEncryptionMode = GssEncryptionMode.Disable
         };
         return new NpgsqlConnection(builder.ConnectionString);
     }
@@ -193,7 +204,8 @@ public sealed partial class PgSourceAdapter : IPgSourceAdapter
         using var tls = new SslStream(stream, leaveInnerStreamOpen: true);
         await tls.AuthenticateAsClientAsync(new SslClientAuthenticationOptions
         {
-            TargetHost = "pg-source", CertificateChainPolicy = chainPolicy,
+            TargetHost = "pg-source",
+            CertificateChainPolicy = chainPolicy,
             EnabledSslProtocols = SslProtocols.Tls12 | SslProtocols.Tls13
         }, cancellationToken);
     }
@@ -310,8 +322,12 @@ public sealed partial class PgSourceAdapter : IPgSourceAdapter
             // format_type保留numeric修饰、时区、数组和domain原生名称。
             var field = new CatalogField
             {
-                Name = reader.GetString(3), NativeType = reader.GetString(4), Nullable = reader.GetBoolean(5), Ordinal = reader.GetInt16(6),
-                Precision = reader.IsDBNull(7) ? null : reader.GetInt32(7), Scale = reader.IsDBNull(8) ? null : reader.GetInt32(8)
+                Name = reader.GetString(3),
+                NativeType = reader.GetString(4),
+                Nullable = reader.GetBoolean(5),
+                Ordinal = reader.GetInt16(6),
+                Precision = reader.IsDBNull(7) ? null : reader.GetInt32(7),
+                Scale = reader.IsDBNull(8) ? null : reader.GetInt32(8)
             };
             bytes += JsonSerializer.SerializeToUtf8Bytes(field, G4ConnectionJson.Options).Length + 1;
             if (bytes > 2 * 1024 * 1024)

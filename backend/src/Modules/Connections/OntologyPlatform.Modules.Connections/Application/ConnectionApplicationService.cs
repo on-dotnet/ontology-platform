@@ -188,8 +188,14 @@ public sealed partial class ConnectionApplicationService : IConnectionRequestHan
         DemandScope(call.Actor, result.After);
         db.ConnectionCommands.Add(new ConnectionCommandRecord
         {
-            Id = key, RequestHash = requestHash, ScopeJson = Encode(result.Before), ResultScopeJson = Encode(result.After),
-            ReceiptJson = Encode(result.Value), CreatedAtUtc = clock.GetUtcNow(), Etag = result.Etag, StatusCode = status
+            Id = key,
+            RequestHash = requestHash,
+            ScopeJson = Encode(result.Before),
+            ResultScopeJson = Encode(result.After),
+            ReceiptJson = Encode(result.Value),
+            CreatedAtUtc = clock.GetUtcNow(),
+            Etag = result.Etag,
+            StatusCode = status
         });
         await SaveAuditAsync(db, call.Actor, action, call.Id ?? "new", result.After, token);
         await transaction.CommitAsync(token);
@@ -227,9 +233,20 @@ public sealed partial class ConnectionApplicationService : IConnectionRequestHan
         var config = Decode<ConnectionConfig>(row.ConfigJson);
         if (!actor.Roles.Contains("platform.operator") && config is PgConnectionConfig pg)
             config = pg with { Profile = pg.Profile with { Host = "redacted", Database = "redacted", Username = "redacted", AllowedSchemas = ["redacted"] } };
-        return new ConnectionView { Id = row.Id, DisplayName = row.DisplayName, Scope = Scope(row), Config = config,
-            ConfigRevision = row.Revision, State = row.State, SecretConfigured = true, SecretVersion = row.SecretVersion,
-            ProbeFresh = await FreshAsync(db, row, token), LastProbeId = row.LastProbeId, UpdatedAtUtc = row.UpdatedAtUtc };
+        return new ConnectionView
+        {
+            Id = row.Id,
+            DisplayName = row.DisplayName,
+            Scope = Scope(row),
+            Config = config,
+            ConfigRevision = row.Revision,
+            State = row.State,
+            SecretConfigured = true,
+            SecretVersion = row.SecretVersion,
+            ProbeFresh = await FreshAsync(db, row, token),
+            LastProbeId = row.LastProbeId,
+            UpdatedAtUtc = row.UpdatedAtUtc
+        };
     }
 
     /// <summary>分页游标只编码固定ID，非法格式不能变为SQL。</summary>

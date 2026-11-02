@@ -143,8 +143,13 @@ internal sealed class QueryFixture : IDisposable
         Assert.IsTrue(impact.PublishEligible);
         return await Service.CreateProposalAsync(Author, new CreateProposalRequest
         {
-            Kind = ProposalKind.Publish, DraftId = draft.DraftId, DraftRevision = draft.Revision, Hashes = draft.Hashes,
-            ValidationReportId = assessment.ValidationReportId, ImpactReportId = impact.ReportId, ImpactHash = impact.CanonicalHash,
+            Kind = ProposalKind.Publish,
+            DraftId = draft.DraftId,
+            DraftRevision = draft.Revision,
+            Hashes = draft.Hashes,
+            ValidationReportId = assessment.ValidationReportId,
+            ImpactReportId = impact.ReportId,
+            ImpactHash = impact.CanonicalHash,
             Command = Command(draft.Revision)
         }, default);
     }
