@@ -1,0 +1,55 @@
+{
+  "taskId": "G4-M1-VERIFY-RECOVERY-001",
+  "command": [
+    "python3",
+    "-B",
+    "docs/evidence/G4-M1-VERIFY-RECOVERY-001/host-adapter.py",
+    "preflight",
+    "--output",
+    "artifacts/g4-m1-verify-recovery-001/host-preflight.json"
+  ],
+  "wrapper": [
+    "/opt/homebrew/opt/python@3.13/bin/python3.13",
+    "-B",
+    "/Users/chasen/.codex/worktrees/g4-m1-verify-recovery-001/ontology-platform/scripts/maintenance/task_run_timeline.py",
+    "run",
+    "--path",
+    "/Users/chasen/.codex/worktrees/g4-m1-verify-recovery-001/ontology-platform/artifacts/g4-m1-verify-recovery-001/timeline.jsonl",
+    "--task-id",
+    "G4-M1-VERIFY-RECOVERY-001",
+    "--run-id",
+    "verify-recovery",
+    "--step-id",
+    "host-preflight",
+    "--input-fingerprint",
+    "ad3e92cbf354543874f1558d2909570608dd06891268c842287b8243ec21d755",
+    "--command-label",
+    "host-preflight",
+    "--task-type",
+    "TEST",
+    "--",
+    "python3",
+    "-B",
+    "docs/evidence/G4-M1-VERIFY-RECOVERY-001/host-adapter.py",
+    "preflight",
+    "--output",
+    "artifacts/g4-m1-verify-recovery-001/host-preflight.json"
+  ],
+  "startedAtUtc": "2026-11-02T13:59:41.883620+00:00",
+  "endedAtUtc": "2026-11-02T13:59:41.985894+00:00",
+  "elapsedSeconds": 0.102,
+  "exitCode": 0,
+  "timingStatus": "COMPLETED",
+  "head": "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea",
+  "inputFingerprint": "ad3e92cbf354543874f1558d2909570608dd06891268c842287b8243ec21d755",
+  "stdout": {
+    "bytes": 548,
+    "sha256": "721f2675ee0d0ec67a0dd1379835dc9604bf606cb70c7d8e593cea12653caba7",
+    "base64": "eyJzY2hlbWFWZXJzaW9uIjogMSwgInV0YyI6ICIyMDI2LTExLTAyVDEzOjU5OjQxLjkyNTcxMiswMDowMCIsICJvcyI6ICJEYXJ3aW4iLCAiYXJjaGl0ZWN0dXJlIjogImFybTY0IiwgInBpZCI6IDI5OTE2LCAidGFza0lkIjogIkc0LU0xLVZFUklGWS1SRUNPVkVSWS0wMDEiLCAiYXNzdXJhbmNlIjogIlBPTElDWV9SRUFEWSIsICJsb2NrRGlzcGxheVRyaWFsIjogIk5PVF9WRVJJRklFRCIsICJzZXNzaW9uQ29udGludWl0eSI6ICJOT1RfVkVSSUZJRUQiLCAiYWNQb3dlciI6IHRydWUsICJwb2xpY3kiOiB7ImRpc3BsYXlzbGVlcCI6IDEwLCAic2xlZXAiOiAwfSwgImFzc2VydGlvbnMiOiB7IlByZXZlbnRVc2VySWRsZURpc3BsYXlTbGVlcCI6IDAsICJQcmV2ZW50U3lzdGVtU2xlZXAiOiAwLCAiUHJldmVudFVzZXJJZGxlU3lzdGVtU2xlZXAiOiAxfSwgImRpc3BsYXlzIjogeyJzdGF0dXMiOiAiT0JTRVJWRUQiLCAiZXh0ZXJuYWxEaXNwbGF5Q291bnQiOiAxLCAiZXh0ZXJuYWxEaXNwbGF5c0FzbGVlcCI6IGZhbHNlfSwgInNjcmVlbkxvY2tlZCI6IGZhbHNlfQo="
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "base64": ""
+  }
+}

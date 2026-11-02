@@ -1,0 +1,51 @@
+{
+  "taskId": "G4-M1-VERIFY-RECOVERY-001",
+  "command": [
+    "pwsh",
+    "-NoProfile",
+    "-File",
+    "scripts/tests/StructuredFiles.Tests.ps1"
+  ],
+  "wrapper": [
+    "/opt/homebrew/opt/python@3.13/bin/python3.13",
+    "-B",
+    "/Users/chasen/.codex/worktrees/g4-m1-verify-recovery-001/ontology-platform/scripts/maintenance/task_run_timeline.py",
+    "run",
+    "--path",
+    "/Users/chasen/.codex/worktrees/g4-m1-verify-recovery-001/ontology-platform/artifacts/g4-m1-verify-recovery-001/timeline.jsonl",
+    "--task-id",
+    "G4-M1-VERIFY-RECOVERY-001",
+    "--run-id",
+    "verify-recovery",
+    "--step-id",
+    "structured-local",
+    "--input-fingerprint",
+    "0ebd8fa0232f9abc8b1606568eb94f75822a930675e64c9c849d8e1ed840ffbb",
+    "--command-label",
+    "structured-local",
+    "--task-type",
+    "TEST",
+    "--",
+    "pwsh",
+    "-NoProfile",
+    "-File",
+    "scripts/tests/StructuredFiles.Tests.ps1"
+  ],
+  "startedAtUtc": "2026-11-02T14:03:22.931031+00:00",
+  "endedAtUtc": "2026-11-02T14:03:27.142737+00:00",
+  "elapsedSeconds": 4.212,
+  "exitCode": 0,
+  "timingStatus": "COMPLETED",
+  "head": "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea",
+  "inputFingerprint": "0ebd8fa0232f9abc8b1606568eb94f75822a930675e64c9c849d8e1ed840ffbb",
+  "stdout": {
+    "bytes": 229,
+    "sha256": "4e10bf02f0e2b029d020321af42fd92547e5fe82f41def7e88801a9658b43fe4",
+    "base64": "UEFTUzogWUFNTC9UT01MIHN5bnRheCwgMSBmaWxlczsgcnVudGltZSBjb21wYXRpYmlsaXR5IG5vdCBpbXBsaWVkLgpGQUlMOiBzdHJ1Y3R1cmVkIHN5bnRheCBpbnZhbGlkLnltbCAoUGFyc2VyRXJyb3IpCkZBSUw6IHN0cnVjdHVyZWQgc3ludGF4IGludmFsaWQudG9tbCAoVE9NTERlY29kZUVycm9yKQpQQVNTOiBzdHJ1Y3R1cmVkIHBhcnNlciA0IHJlYWwgcG9zaXRpdmUvbmVnYXRpdmUgY2FzZXMuCg=="
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "base64": ""
+  }
+}

@@ -36,6 +36,38 @@ function Test-FrozenEvidenceFormat {
     return [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($RawBytes)).ToLowerInvariant() -ceq '9e632706bbf9ee27e070711dcd6901c3b02fbc0204eee171a28542f8d6a9d0e5'
 }
 
+function Test-FrozenJsonlEvidence {
+    param([string]$RelativePath, [byte[]]$RawBytes)
+    # 仅识别原已审M1监测证据；散列基于原始字节，不规范化或改写历史。
+    if ($RelativePath -cne 'docs/evidence/G4-M1-FINAL-GATES-001/host-monitor.json') { return $false }
+    if ([Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($RawBytes)).ToLowerInvariant() -cne '6e425cb7ad191dd6a6fa8a2261a55d8599c2686ff4cb11d5c6d8bdd93a712122') { return $false }
+    try {
+        if ($RawBytes.Length -ne 44070 -or ($RawBytes[0] -eq 239 -and $RawBytes[1] -eq 187 -and $RawBytes[2] -eq 191)) { return $false }
+        $decoded = [Text.UTF8Encoding]::new($false, $true).GetString($RawBytes)
+        if ($decoded.Contains("`r") -or -not $decoded.EndsWith("`n", [StringComparison]::Ordinal)) { return $false }
+        $lines = $decoded.Split("`n")
+        if ($lines.Count -ne 77 -or $lines[76] -cne '') { return $false }
+        for ($index = 0; $index -lt 76; $index++) {
+            if ([string]::IsNullOrWhiteSpace($lines[$index])) { return $false }
+            # 默认严格JSON选项拒绝注释、尾随逗号及多个根值；及时释放逐行文档。
+            $document = [System.Text.Json.JsonDocument]::Parse([string]$lines[$index])
+            try {
+                $row = $document.RootElement
+                if ($row.ValueKind -ne [System.Text.Json.JsonValueKind]::Object) { return $false }
+                $task = $row.GetProperty('taskId')
+                $schema = $row.GetProperty('schemaVersion')
+                $sequence = $row.GetProperty('sequence')
+                $schemaNumber = 0
+                $sequenceNumber = 0
+                if ($task.ValueKind -ne [System.Text.Json.JsonValueKind]::String -or $task.GetString() -cne 'G4-M1-FINAL-GATES-001' -or
+                    $schema.ValueKind -ne [System.Text.Json.JsonValueKind]::Number -or -not $schema.TryGetInt32([ref]$schemaNumber) -or $schemaNumber -ne 1 -or
+                    $sequence.ValueKind -ne [System.Text.Json.JsonValueKind]::Number -or -not $sequence.TryGetInt32([ref]$sequenceNumber) -or $sequenceNumber -ne $index) { return $false }
+            } finally { $document.Dispose() }
+        }
+        return $true
+    } catch { return $false }
+}
+
 function Test-Repository {
     param([string]$RepositoryRoot)
     # 每项结果只打印位置和原因，不打印疑似机密内容。
@@ -62,8 +94,14 @@ function Test-Repository {
             }
         }
         if ($file.Extension -eq '.json') {
-            try { $jsonValues[$relative] = ConvertFrom-Json -InputObject $text -AsHashtable -ErrorAction Stop }
-            catch { Record 'json' 'FAIL' "$relative JSON无效" }
+            if ($relative -ceq 'docs/evidence/G4-M1-FINAL-GATES-001/host-monitor.json') {
+                if (-not (Test-FrozenJsonlEvidence $relative ([IO.File]::ReadAllBytes($file.FullName)))) {
+                    Record 'json' 'FAIL' "$relative 历史JSONL原字节或结构无效"
+                }
+            } else {
+                try { $jsonValues[$relative] = ConvertFrom-Json -InputObject $text -AsHashtable -ErrorAction Stop }
+                catch { Record 'json' 'FAIL' "$relative JSON无效" }
+            }
         }
         if ($file.Extension -in @('.csproj', '.props', '.targets', '.slnx', '.Config')) {
             try { $null = [xml]$text } catch { Record 'xml' 'FAIL' "$relative XML无效" }
