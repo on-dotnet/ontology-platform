@@ -1,0 +1,67 @@
+{
+  "evidenceSchemaVersion": 2,
+  "validationSource": "LOCAL",
+  "testedCommit": "279f9230225ddcea7baf9840b66fb3b6875c4a28",
+  "checks": [
+    {
+      "name": "frozen-jsonl-positive-negative",
+      "command": "pwsh -NoProfile -File scripts/tests/FrozenEvidence.Tests.ps1",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Original G3-M4 5 plus new 64 assertions; helper and real Test-Repository rejection; exact-path valid ordinary JSON also rejected."
+    },
+    {
+      "name": "cached-structured-parser",
+      "command": "pwsh -NoProfile -File scripts/tests/StructuredFiles.Tests.ps1",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "4 real parser positive/negative cases, task-local PyYAML6.0.3 import verified; 26 readonly copied files."
+    },
+    {
+      "name": "full-engineering-selftest",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1 -SelfTest",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "27/27 suites completed, 17 Python suites 314 cases, Node6, Frozen5+64, ReviewPackage103/0; 420.938s at exact TestedCommit."
+    },
+    {
+      "name": "independent-nonauthor-review",
+      "command": "Independent reviewer: pwsh -NoProfile -Command <archived entrance script>; python3 -B <archived final read-only audit>",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Independent 5 entrance checks, exact TestedCommit tool/source bindings, all suites/raw SHA/cache/history verified; 0 P0/P1."
+    },
+    {
+      "name": "two-layer-diff-check",
+      "command": "git diff --check d40e6ab67360cc46aadd7ec013bd514b3f61a6ea 279f9230225ddcea7baf9840b66fb3b6875c4a28; git diff --check d1a61daffe844475b07705797e3ad325cc3f2945 279f9230225ddcea7baf9840b66fb3b6875c4a28",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Both committed comparisons exit0, task whitelist exact; inherited G4 588 paths separately indexed."
+    },
+    {
+      "name": "unique-v3-independent-reopen",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Post-publication result belongs to package-external final receipt; never prefilled before ZIP exists."
+    }
+  ],
+  "ci": {
+    "status": "NOT_RUN",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  },
+  "metadata": {
+    "taskId": "G4-M1-VERIFY-RECOVERY-001",
+    "originalProduct49": "INHERITED_NOT_RERUN",
+    "nativeBuild": "NOT_RUN",
+    "windows": "NOT_RUN",
+    "productRegression": "NOT_RUN",
+    "supplyChain": "NOT_VERIFIED",
+    "mainIntegration": "NOT_AUTHORIZED_NOT_EXECUTED",
+    "m2": "NOT_AUTHORIZED_NOT_EXECUTED",
+    "finalDisposition": "See immutable ZIP external final receipt; package timing pending is intentional"
+  }
+}

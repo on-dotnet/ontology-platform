@@ -1,6 +1,6 @@
 # G4-M1-VERIFY-RECOVERY-001
 
-状态 IN_PROGRESS。用户明确批准原计划及执行附件强制补充。授权原字节见本任务 authorization.json。
+状态 ENGINEERING_PASSED_DELIVERY_PENDING。用户明确批准原计划及执行附件强制补充。授权原字节见本任务 authorization.json。
 
 Base=d40e6ab67360cc46aadd7ec013bd514b3f61a6ea；只读参考=7f526e10e9b4044f85dcb7fdb332b9103c148508；origin/main=d1a61daffe844475b07705797e3ad325cc3f2945。
 分支 codex/g4-m1-verify-recovery-001；独立托管树 /Users/chasen/.codex/worktrees/g4-m1-verify-recovery-001/ontology-platform。
@@ -16,3 +16,9 @@ VR01身份；02历史字节；03唯一精确识别；04全部正反；05入口�
 
 旧49项INHERITED_NOT_RERUN。CI/Windows/原生构建/产品回归NOT_RUN；未验供应链NOT_VERIFIED。不合main、不M2/G6/生产/新依赖/容器。保护旧树/分支/ZIP及主树6个.DS_Store。
 SelfTest预算900秒、构包/重开各600秒、短命令60秒；有界宿主监测≤7200秒，不改变机器能源设置。只精确回收自身临时缓存/夹具/进程，待审工作树和分支KEEP至后续明确集成/退休决定。交付后停止等ChatGPT复审。
+
+## 已完成工程门禁与交付时序
+
+稳定TestedCommit=279f9230225ddcea7baf9840b66fb3b6875c4a28。完整真实SelfTest exit0/420.938秒，27/27套件全部运行通过；非作者 /root/verify_reviewer 最终源码/缓存/历史字节/完整日志独立Review PASS，无开放P0/P1。独立入口5项通过，包含必需两类负例。新增64断言及原5保留；不将工程计数混入旧产品49项。
+任务13个行为文件与TestedCommit逐字绑定，后续只新增说明/事实证据。唯一V3重开与最终Head校验在包外回执后置记录；包内VR-11待验不是事前PASS。原始输出、时间、失败与监测限制均保留。
+恢复缓存只允许从cache-provenance.json的原目录按既有逐文件SHA复制原26文件并设文件444/目录555、禁pyc；不得联网或用全局包替代。共享源必须先重验。原工作树及任务分支等待复审，未整合不删除。

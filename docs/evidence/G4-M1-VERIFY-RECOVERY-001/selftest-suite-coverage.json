@@ -1,0 +1,296 @@
+{
+  "status": "PASS",
+  "testedCommit": "279f9230225ddcea7baf9840b66fb3b6875c4a28",
+  "command": [
+    "pwsh",
+    "-NoProfile",
+    "-File",
+    "scripts/verify.ps1",
+    "-SelfTest"
+  ],
+  "exitCode": 0,
+  "timingStatus": "COMPLETED",
+  "elapsedSeconds": 420.938,
+  "suiteCounts": {
+    "expected": 27,
+    "ran": 27,
+    "passed": 27,
+    "failed": 0,
+    "notRun": 0
+  },
+  "suites": [
+    {
+      "path": "docs/evidence/G1-ENG-001/verify.tests.ps1",
+      "status": "PASS",
+      "passed": 8,
+      "failed": 0,
+      "notRun": 0,
+      "unit": "assertions",
+      "stream": "stdout",
+      "actualMarker": "Checker tests: 8 passed; application tests: NOT_RUN."
+    },
+    {
+      "path": "scripts/tests/Doctor.Tests.ps1",
+      "status": "PASS",
+      "passed": 2,
+      "failed": 0,
+      "notRun": 0,
+      "unit": "assertions",
+      "stream": "stdout",
+      "actualMarker": "PASS: Doctor discovers real macOS ARM64 Node from isolated path with spaces."
+    },
+    {
+      "path": "scripts/tests/StructuredFiles.Tests.ps1",
+      "status": "PASS",
+      "passed": 4,
+      "failed": 0,
+      "notRun": 0,
+      "unit": "assertions",
+      "stream": "stdout",
+      "actualMarker": "PASS: structured parser 4 real positive/negative cases."
+    },
+    {
+      "path": "scripts/tests/Environment.Tests.ps1",
+      "status": "PASS",
+      "passed": 3,
+      "failed": 0,
+      "notRun": 0,
+      "unit": "state groups plus cleanup",
+      "stream": "stdout",
+      "actualMarker": "Environment regression: 3 state groups and structured-suite cleanup passed; native calls are synthetic, product tests NOT_RUN."
+    },
+    {
+      "path": "scripts/tests/WebToolchain.Tests.ps1",
+      "status": "PASS",
+      "passed": 4,
+      "failed": 0,
+      "notRun": 0,
+      "unit": "assertions",
+      "stream": "stdout",
+      "actualMarker": "PASS: toolchain archives accept two exact digests and reject two tampered byte cases."
+    },
+    {
+      "path": "scripts/tests/CleanupResources.Tests.py",
+      "status": "PASS",
+      "passed": 60,
+      "failed": 0,
+      "notRun": 0,
+      "unit": "unittest cases",
+      "stream": "stderr",
+      "actualMarker": "Ran 60 tests in 91.143s; OK"
+    },
+    {
+      "path": "scripts/tests/PublicHistory.Tests.py",
+      "status": "PASS",
+      "passed": 9,
+      "failed": 0,
+      "notRun": 0,
+      "unit": "unittest cases",
+      "stream": "stderr",
+      "actualMarker": "Ran 9 tests in 1.118s; OK"
+    },
+    {
+      "path": "scripts/tests/InspectorResources.Tests.py",
+      "status": "PASS",
+      "passed": 9,
+      "failed": 0,
+      "notRun": 0,
+      "unit": "unittest cases",
+      "stream": "stderr",
+      "actualMarker": "Ran 9 tests in 11.604s; OK"
+    },
+    {
+      "path": "scripts/tests/G3Evidence.Tests.py",
+      "status": "PASS",
+      "passed": 3,
+      "failed": 0,
+      "notRun": 0,
+      "unit": "unittest cases",
+      "stream": "stderr",
+      "actualMarker": "Ran 3 tests in 0.003s; OK"
+    },
+    {
+      "path": "scripts/tests/G3Acceptance.Tests.py",
+      "status": "PASS",
+      "passed": 25,
+      "failed": 0,
+      "notRun": 0,
+      "unit": "unittest cases",
+      "stream": "stderr",
+      "actualMarker": "Ran 25 tests in 2.130s; OK"
+    },
+    {
+      "path": "scripts/tests/G3Compatibility.Tests.py",
+      "status": "PASS",
+      "passed": 3,
+      "failed": 0,
+      "notRun": 0,
+      "unit": "unittest cases",
+      "stream": "stderr",
+      "actualMarker": "Ran 3 tests in 0.006s; OK"
+    },
+    {
+      "path": "scripts/tests/CloseoutGovernance.Tests.py",
+      "status": "PASS",
+      "passed": 4,
+      "failed": 0,
+      "notRun": 0,
+      "unit": "unittest cases",
+      "stream": "stderr",
+      "actualMarker": "Ran 4 tests in 0.000s; OK"
+    },
+    {
+      "path": "scripts/tests/CanonicalFuseki.Tests.py",
+      "status": "PASS",
+      "passed": 34,
+      "failed": 0,
+      "notRun": 0,
+      "unit": "unittest cases",
+      "stream": "stderr",
+      "actualMarker": "Ran 34 tests in 17.882s; OK"
+    },
+    {
+      "path": "scripts/tests/FusekiCache.Tests.py",
+      "status": "PASS",
+      "passed": 66,
+      "failed": 0,
+      "notRun": 0,
+      "unit": "unittest cases",
+      "stream": "stderr",
+      "actualMarker": "Ran 66 tests in 1.735s; OK"
+    },
+    {
+      "path": "scripts/tests/ResourceLifecycle.Tests.py",
+      "status": "PASS",
+      "passed": 12,
+      "failed": 0,
+      "notRun": 0,
+      "unit": "unittest cases",
+      "stream": "stderr",
+      "actualMarker": "Ran 12 tests in 0.007s; OK"
+    },
+    {
+      "path": "scripts/tests/TaskRunTimeline.Tests.py",
+      "status": "PASS",
+      "passed": 17,
+      "failed": 0,
+      "notRun": 0,
+      "unit": "unittest cases",
+      "stream": "stderr",
+      "actualMarker": "Ran 17 tests in 0.541s; OK"
+    },
+    {
+      "path": "scripts/tests/HostContinuity.Tests.py",
+      "status": "PASS",
+      "passed": 12,
+      "failed": 0,
+      "notRun": 0,
+      "unit": "unittest cases",
+      "stream": "stderr",
+      "actualMarker": "Ran 12 tests in 0.076s; OK"
+    },
+    {
+      "path": "scripts/tests/ExecutionPreflight.Tests.py",
+      "status": "PASS",
+      "passed": 12,
+      "failed": 0,
+      "notRun": 0,
+      "unit": "unittest cases",
+      "stream": "stderr",
+      "actualMarker": "Ran 12 tests in 0.244s; OK"
+    },
+    {
+      "path": "scripts/tests/ObservabilityInputs.Tests.py",
+      "status": "PASS",
+      "passed": 5,
+      "failed": 0,
+      "notRun": 0,
+      "unit": "unittest cases",
+      "stream": "stderr",
+      "actualMarker": "Ran 5 tests in 0.001s; OK"
+    },
+    {
+      "path": "scripts/tests/FusekiCiCache.Tests.py",
+      "status": "PASS",
+      "passed": 8,
+      "failed": 0,
+      "notRun": 0,
+      "unit": "unittest cases",
+      "stream": "stderr",
+      "actualMarker": "Ran 8 tests in 0.019s; OK"
+    },
+    {
+      "path": "scripts/tests/FusekiTransfer.Tests.py",
+      "status": "PASS",
+      "passed": 17,
+      "failed": 0,
+      "notRun": 0,
+      "unit": "unittest cases",
+      "stream": "stderr",
+      "actualMarker": "Ran 17 tests in 0.066s; OK"
+    },
+    {
+      "path": "scripts/tests/OwnedTestContainers.Tests.py",
+      "status": "PASS",
+      "passed": 18,
+      "failed": 0,
+      "notRun": 0,
+      "unit": "unittest cases",
+      "stream": "stderr",
+      "actualMarker": "Ran 18 tests in 0.060s; OK"
+    },
+    {
+      "path": "scripts/tests/G3BrowserDispatch.Tests.mjs",
+      "status": "PASS",
+      "passed": 6,
+      "failed": 0,
+      "notRun": 0,
+      "unit": "node tests",
+      "stream": "stdout",
+      "actualMarker": "ℹ tests 6\nℹ suites 0\nℹ pass 6\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0"
+    },
+    {
+      "path": "scripts/tests/FrozenEvidence.Tests.ps1",
+      "status": "PASS",
+      "passed": 69,
+      "failed": 0,
+      "notRun": 0,
+      "unit": "assertions",
+      "stream": "stdout",
+      "actualMarker": "FrozenJsonl: 64 assertions PASS; original G3-M4 5 checks retained."
+    },
+    {
+      "path": "scripts/tests/PreflightLogs.Tests.ps1",
+      "status": "PASS",
+      "passed": 3,
+      "failed": 0,
+      "notRun": 0,
+      "unit": "assertions",
+      "stream": "stdout",
+      "actualMarker": "PreflightLogs: 3 boundary/concurrent/source checks PASS; not product validation."
+    },
+    {
+      "path": "scripts/tests/EvidencePreflight.Tests.ps1",
+      "status": "PASS",
+      "passed": 23,
+      "failed": 0,
+      "notRun": 0,
+      "unit": "assertions",
+      "stream": "stdout",
+      "actualMarker": "EvidencePreflight: 23 checks PASS; schema only, CI/product NOT_RUN."
+    },
+    {
+      "path": "scripts/tests/ReviewPackage.Tests.ps1",
+      "status": "PASS",
+      "passed": 103,
+      "failed": 0,
+      "notRun": 0,
+      "unit": "assertions",
+      "stream": "stdout",
+      "actualMarker": "ReviewPackage: 103 tests, 0 failures; product/container tests NOT_RUN."
+    }
+  ],
+  "stdoutSha256": "5c3bd132a1e7fc73bd15709c87d634a1780d1b60336f7952990bef2184554deb",
+  "stderrSha256": "d5a95400c3f28d6d05d281cab112ec3cd6a74052eefca8ded7c724c17b992bb5",
+  "interpretation": "Expected negative fixture FAIL/usage outputs are asserted protection behavior. Existing isolated G1 fixture calls mock dotnet and uses -RunNative/-SkipWeb internally; top-level actual command has no bypass flags. No product/container tests were run. Counts have heterogeneous units and are not summed into product coverage."
+}

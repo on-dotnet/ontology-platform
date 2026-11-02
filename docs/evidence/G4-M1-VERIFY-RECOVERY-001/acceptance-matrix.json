@@ -1,0 +1,79 @@
+{
+  "taskId": "G4-M1-VERIFY-RECOVERY-001",
+  "state": "ENGINEERING_PASSED_DELIVERY_PENDING",
+  "rows": [
+    {
+      "id": "VR-01",
+      "title": "Identity and exact base/remote main",
+      "status": "PASS",
+      "evidence": "preflight-identity.json"
+    },
+    {
+      "id": "VR-02",
+      "title": "Original bytes/blob/SHA/76 records",
+      "status": "PASS",
+      "evidence": "historical-inputs.json"
+    },
+    {
+      "id": "VR-03",
+      "title": "Single exact historical JSONL fail-closed",
+      "status": "PASS",
+      "evidence": "fix-description.md"
+    },
+    {
+      "id": "VR-04",
+      "title": "All mutations and ordinary JSON controls",
+      "status": "PASS",
+      "evidence": "frozen-local.raw.json"
+    },
+    {
+      "id": "VR-05",
+      "title": "Real entrance refusal and original G3 five",
+      "status": "PASS",
+      "evidence": "independent-negative-review.json"
+    },
+    {
+      "id": "VR-06",
+      "title": "Unchanged rules and all original suites",
+      "status": "PASS",
+      "evidence": "selftest-suite-coverage.json"
+    },
+    {
+      "id": "VR-07",
+      "title": "Local readonly cache provenance, source untouched",
+      "status": "PASS",
+      "evidence": "cache-provenance.json"
+    },
+    {
+      "id": "VR-08",
+      "title": "Complete SelfTest at committed inputs",
+      "status": "PASS",
+      "evidence": "full-selftest.raw.json"
+    },
+    {
+      "id": "VR-09",
+      "title": "Independent final source review",
+      "status": "PASS",
+      "evidence": "independent-final-review.json"
+    },
+    {
+      "id": "VR-10",
+      "title": "Two-layer diff checks, whitelist/history boundaries",
+      "status": "PASS",
+      "evidence": "two-layer-tested-diff.json"
+    },
+    {
+      "id": "VR-11",
+      "title": "Unique LOCAL V3 and independent reopen",
+      "status": "NOT_RUN",
+      "evidence": "External final receipt after publication"
+    },
+    {
+      "id": "VR-12",
+      "title": "Scope/status separation",
+      "status": "PASS",
+      "evidence": "validation.json"
+    }
+  ],
+  "postPublicationRule": "VR-11 final outcome and final Head checks recorded only in external final receipt; no ZIP rewrite"
+}

@@ -1,0 +1,30 @@
+{
+  "taskId": "G4-M1-VERIFY-RECOVERY-001",
+  "delete": [
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-verify-recovery-001/ontology-platform/.tools/pythonlibs",
+      "identity": "Exact 26-file inventory cache-provenance.json.copy; rehash and reject extra paths before removal",
+      "review": "/root/verify_reviewer approved after independent cache checks",
+      "action": "Set only task-copy directories writable for unlink, unlink exact files, rmdir exact empty directories"
+    }
+  ],
+  "keep": [
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-verify-recovery-001/ontology-platform",
+      "reason": "Unmerged task source awaiting ChatGPT review",
+      "releaseCondition": "Explicit later integration/retirement approval"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-verify-recovery-001/ontology-platform/artifacts/g4-m1-verify-recovery-001",
+      "reason": "Raw logs, independent review and post-publication receipts retained for audit",
+      "releaseCondition": "Review complete and evidence recoverability checked"
+    }
+  ],
+  "protected": [
+    "Shared source cache",
+    "All preexisting worktrees/branches/ZIPs/resources",
+    "Main 6 untracked .DS_Store files"
+  ],
+  "runtime": "No task-created Docker/database/image/volume; no product services started",
+  "monitor": "Exact own supervised PID only; close after independent package reopen and record external receipt"
+}

@@ -1,0 +1,63 @@
+{
+  "reviewer": "/root/verify_reviewer",
+  "testedCommit": "279f9230225ddcea7baf9840b66fb3b6875c4a28",
+  "command": [
+    "pwsh",
+    "-NoProfile",
+    "-Command",
+    "$ErrorActionPreference='Stop'\n. (Join-Path $env:REVIEW_SOURCE 'scripts/verify.ps1') -Library\n$fixture=$env:REVIEW_FIXTURE\n$relative='docs/evidence/G4-M1-FINAL-GATES-001/host-monitor.json'\n$target=Join-Path $fixture $relative\n$raw=[IO.File]::ReadAllBytes($target)\n$results=[Collections.Generic.List[object]]::new()\nfunction Check-Entrance([string]$name,[string]$expected) {\n $checks=@(Test-Repository -RepositoryRoot $fixture)\n $failures=@($checks | Where-Object Status -eq FAIL)\n if ($expected -eq '') {if ($failures.Count -ne 0) {throw 'clean fixture rejected'}}\n else {if ($failures.Count -ne 1 -or $failures[0].Check -cne 'json' -or -not $failures[0].Message.StartsWith($expected+' ',[StringComparison]::Ordinal)) {throw 'wrong rejection or runner failure'}}\n $results.Add([pscustomobject]@{name=$name;actualFailures=$failures;status='PASS'})\n}\nCheck-Entrance 'original historical bytes accepted' ''\n$changed=[byte[]]$raw.Clone()\n# Change one digit inside first record, keeping JSONL syntax and text formatting valid.\n$text=[Text.Encoding]::UTF8.GetString($changed)\n$offset=$text.IndexOf('G4-M1-FINAL-GATES-001',[StringComparison]::Ordinal)\nif ($offset -lt 0) {throw 'mutation target missing'}\n$changed[$offset + 18]=[byte][char]'2'\nif ([Linq.Enumerable]::SequenceEqual[byte]($raw,$changed)) {throw 'mutation ineffective'}\n[IO.File]::WriteAllBytes($target,$changed)\nCheck-Entrance 'same path exactly one changed byte' $relative\n[IO.File]::WriteAllText($target,\"{}`n\")\nCheck-Entrance 'same path valid ordinary JSON cannot fallback' $relative\nRemove-Item -LiteralPath $target\n[IO.File]::WriteAllBytes((Join-Path $fixture 'source.json'),$raw)\nCheck-Entrance 'other path exact original bytes' 'source.json'\n[IO.File]::WriteAllText((Join-Path $fixture 'source.json'),\"{`\"ok`\":true}`n\")\nCheck-Entrance 'ordinary valid JSON accepted' ''\n$results | ConvertTo-Json -Depth 8 -Compress\n"
+  ],
+  "commandScriptSha256": "1e6de06c17678e102cb712737440e86a13f0f0b403de4cabc7f4671660e09ebb",
+  "exitCode": 0,
+  "stdoutBase64": "W3sibmFtZSI6Im9yaWdpbmFsIGhpc3RvcmljYWwgYnl0ZXMgYWNjZXB0ZWQiLCJhY3R1YWxGYWlsdXJlcyI6W10sInN0YXR1cyI6IlBBU1MifSx7Im5hbWUiOiJzYW1lIHBhdGggZXhhY3RseSBvbmUgY2hhbmdlZCBieXRlIiwiYWN0dWFsRmFpbHVyZXMiOlt7IkNoZWNrIjoianNvbiIsIlN0YXR1cyI6IkZBSUwiLCJNZXNzYWdlIjoiZG9jcy9ldmlkZW5jZS9HNC1NMS1GSU5BTC1HQVRFUy0wMDEvaG9zdC1tb25pdG9yLmpzb24g5Y6G5Y+ySlNPTkzljp/lrZfoioLmiJbnu5PmnoTml6DmlYgifV0sInN0YXR1cyI6IlBBU1MifSx7Im5hbWUiOiJzYW1lIHBhdGggdmFsaWQgb3JkaW5hcnkgSlNPTiBjYW5ub3QgZmFsbGJhY2siLCJhY3R1YWxGYWlsdXJlcyI6W3siQ2hlY2siOiJqc29uIiwiU3RhdHVzIjoiRkFJTCIsIk1lc3NhZ2UiOiJkb2NzL2V2aWRlbmNlL0c0LU0xLUZJTkFMLUdBVEVTLTAwMS9ob3N0LW1vbml0b3IuanNvbiDljoblj7JKU09OTOWOn+Wtl+iKguaIlue7k+aehOaXoOaViCJ9XSwic3RhdHVzIjoiUEFTUyJ9LHsibmFtZSI6Im90aGVyIHBhdGggZXhhY3Qgb3JpZ2luYWwgYnl0ZXMiLCJhY3R1YWxGYWlsdXJlcyI6W3siQ2hlY2siOiJqc29uIiwiU3RhdHVzIjoiRkFJTCIsIk1lc3NhZ2UiOiJzb3VyY2UuanNvbiBKU09O5peg5pWIIn1dLCJzdGF0dXMiOiJQQVNTIn0seyJuYW1lIjoib3JkaW5hcnkgdmFsaWQgSlNPTiBhY2NlcHRlZCIsImFjdHVhbEZhaWx1cmVzIjpbXSwic3RhdHVzIjoiUEFTUyJ9XQo=",
+  "stdoutSha256": "82ca6e7677f0f71e16413d72d6e6c17d107858b9c9b6f88500201294b83c7236",
+  "stderrBytes": 0,
+  "checks": [
+    {
+      "name": "original historical bytes accepted",
+      "actualFailures": [],
+      "status": "PASS"
+    },
+    {
+      "name": "same path exactly one changed byte",
+      "actualFailures": [
+        {
+          "Check": "json",
+          "Status": "FAIL",
+          "Message": "docs/evidence/G4-M1-FINAL-GATES-001/host-monitor.json 历史JSONL原字节或结构无效"
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "name": "same path valid ordinary JSON cannot fallback",
+      "actualFailures": [
+        {
+          "Check": "json",
+          "Status": "FAIL",
+          "Message": "docs/evidence/G4-M1-FINAL-GATES-001/host-monitor.json 历史JSONL原字节或结构无效"
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "name": "other path exact original bytes",
+      "actualFailures": [
+        {
+          "Check": "json",
+          "Status": "FAIL",
+          "Message": "source.json JSON无效"
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "name": "ordinary valid JSON accepted",
+      "actualFailures": [],
+      "status": "PASS"
+    }
+  ],
+  "fixture": "artifacts/g4-m1-verify-recovery-001/reviewer-negative-j396_gay",
+  "fixtureAfterExists": false,
+  "fixturePreparation": "Independent Python TemporaryDirectory: copied 14 required configs, synthetic four AGENTS/PLANS Markdown files; historical bytes from git show exact TestedCommit:path; finally cleanup. REVIEW_SOURCE task tree; REVIEW_FIXTURE isolated directory; PYTHONDONTWRITEBYTECODE=1 NO_COLOR=1."
+}

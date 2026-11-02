@@ -1,0 +1,59 @@
+{
+  "taskId": "G4-M1-VERIFY-RECOVERY-001",
+  "command": [
+    "pwsh",
+    "-NoProfile",
+    "-File",
+    "scripts/test-review-evidence.ps1",
+    "-EvidenceFile",
+    "docs/evidence/G4-M1-VERIFY-RECOVERY-001/validation.json",
+    "-ExpectedHead",
+    "279f9230225ddcea7baf9840b66fb3b6875c4a28"
+  ],
+  "wrapper": [
+    "/opt/homebrew/opt/python@3.13/bin/python3.13",
+    "-B",
+    "/Users/chasen/.codex/worktrees/g4-m1-verify-recovery-001/ontology-platform/scripts/maintenance/task_run_timeline.py",
+    "run",
+    "--path",
+    "/Users/chasen/.codex/worktrees/g4-m1-verify-recovery-001/ontology-platform/artifacts/g4-m1-verify-recovery-001/timeline.jsonl",
+    "--task-id",
+    "G4-M1-VERIFY-RECOVERY-001",
+    "--run-id",
+    "verify-recovery",
+    "--step-id",
+    "schema-final",
+    "--input-fingerprint",
+    "0ebd8fa0232f9abc8b1606568eb94f75822a930675e64c9c849d8e1ed840ffbb",
+    "--command-label",
+    "schema-final",
+    "--task-type",
+    "TEST",
+    "--",
+    "pwsh",
+    "-NoProfile",
+    "-File",
+    "scripts/test-review-evidence.ps1",
+    "-EvidenceFile",
+    "docs/evidence/G4-M1-VERIFY-RECOVERY-001/validation.json",
+    "-ExpectedHead",
+    "279f9230225ddcea7baf9840b66fb3b6875c4a28"
+  ],
+  "startedAtUtc": "2026-11-02T14:17:30.449489+00:00",
+  "endedAtUtc": "2026-11-02T14:17:31.150645+00:00",
+  "elapsedSeconds": 0.701,
+  "exitCode": 0,
+  "timingStatus": "COMPLETED",
+  "head": "279f9230225ddcea7baf9840b66fb3b6875c4a28",
+  "inputFingerprint": "0ebd8fa0232f9abc8b1606568eb94f75822a930675e64c9c849d8e1ed840ffbb",
+  "stdout": {
+    "bytes": 156,
+    "sha256": "a93befe7d972a907f562f013b915a324568167b8caa4e9a1f80b171cc3924a67",
+    "base64": "eyJzY3JlZW5zaG90Q291bnQiOjAsInNjcmVlbnNob3RDb21wcmVzc2VkQnl0ZXMiOjAsInNjb3BlIjoiRVZJREVOQ0VfU0NIRU1BX09OTFkiLCJhY3R1YWxDaSI6Ik5PVF9WRVJJRklFRCIsInByb2R1Y3QiOiJOT1RfUlVOIiwic3RhdHVzIjoiUEFTUyIsImNoZWNrcyI6Nn0K"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "base64": ""
+  }
+}
