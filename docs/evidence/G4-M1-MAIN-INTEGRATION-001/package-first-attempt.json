@@ -1,0 +1,30 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "label": "create-blocked-v3",
+  "command": [
+    "pwsh",
+    "-NoProfile",
+    "-File",
+    "scripts/create-review-package.ps1",
+    "-BaseSha",
+    "d1a61daffe844475b07705797e3ad325cc3f2945",
+    "-HeadSha",
+    "3f15546a2821c76508a004666899689a32374db5",
+    "-TaskId",
+    "G4-M1-MAIN-INTEGRATION-001",
+    "-Status",
+    "BLOCKED",
+    "-EvidencePath",
+    "docs/evidence/G4-M1-MAIN-INTEGRATION-001/validation.json",
+    "-ValidationSource",
+    "LOCAL"
+  ],
+  "head": "3f15546a2821c76508a004666899689a32374db5",
+  "exitCode": 1,
+  "startedAtUtc": "2026-11-02T16:24:53.445243+00:00",
+  "endedAtUtc": "2026-11-02T16:25:14.743235+00:00",
+  "elapsedSeconds": 21.2978404169844,
+  "logSha256": "3e53472e59cd389476b62b3012235d8384bdab501e7ae35e8799dea9265a5122",
+  "stdout": "FAIL: SECRET_PATTERN: committed source; suspected value suppressed; finite scan only\n",
+  "stderr": ""
+}

@@ -8,7 +8,7 @@ P0 的当前远端、47 提交链、VR-11 历史交付、镜像内容映射和�
 
 ## 精确申请
 
-请仅追加以下15文件的空白格式修复，以及正式Connections迁移文件的UTF-8 BOM移除。可审阅补丁是 [proposed-format-only.patch](proposed-format-only.patch)，仅生成于ignored隔离副本；产品源码未应用。每个原始/建议散列见 [补丁输入绑定](proposed-format-only.json)。不改行为、SQL、迁移ID、namespace、规则、锁或依赖；仅警告的旧迁移不在申请内。获批后需独立Review、新TestedCommit和适用完整验收，不能直接沿用初步结果。
+请仅追加以下15文件的空白格式修复，以及正式Connections迁移文件的UTF-8 BOM移除。可审阅补丁是 [精确补丁归档](proposed-format-only.payload.json)，仅生成于ignored隔离副本；产品源码未应用。每个原始/建议散列见 [补丁输入绑定](proposed-format-only.json)。不改行为、SQL、迁移ID、namespace、规则、锁或依赖；仅警告的旧迁移不在申请内。获批后需独立Review、新TestedCommit和适用完整验收，不能直接沿用初步结果。
 
 ```text
 backend/src/Contracts/OntologyPlatform.Contracts/ImpactContractRules.cs
@@ -45,3 +45,5 @@ CI/Windows/Intel：NOT_RUN；当前在线签名、CVE、完整许可证：NOT_VE
 后续顺序：获批精确格式修复 → 先短复验 → 完成专用消费者/正反Review → 冻结新T → I01–I08完整验收 → 独立交付 → 另行main审批。
 
 稳定部分验证提交：`e84b32e8b5e9c3eaefd32abe7b5f5e4c5e5ddaae`。已普通推送任务分支。实际回收48个精确可再生目录，逻辑字节2,697,464,462；不宣称物理释放同等空间。4391跟踪文件散列保持，1283链接未跟随，主树六个DS_Store不变；任务容器/卷/网络创建0，宿主监测进程退出0并确认PID缺席。见 [实际资源回执](resource-closeout.json) 与 [本地验证](validation.json)。
+
+首次构包因补丁展开的一行C#属性成员引用命中有限秘密规则而拒绝（exit 1），未生成ZIP。非作者确认不是凭证字面量且同表达式在S/T已存在；未改扫描器。现以base64/SHA/字节数归档完整原补丁，ignored保留可读副本，最终重开须独立解码核验。原始失败见 [构包诊断](package-first-attempt.json)。
