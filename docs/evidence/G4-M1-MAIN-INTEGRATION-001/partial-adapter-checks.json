@@ -1,0 +1,59 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "syntax": [
+    {
+      "path": "experiments/g4-m1-main-integration/pg_fixture.py",
+      "sha256": "168b8e5fae595213c908a74710a108f885ecb68d7d1b1b613f3233121b77afc1",
+      "check": "Python AST parse",
+      "exitCode": 0
+    },
+    {
+      "path": "experiments/g4-m1-main-integration/host_continuity.py",
+      "sha256": "abd4385e1b05a86f5a12582a7e95a1fcc4a29c333eb23d2d952229744ed68984",
+      "check": "Python AST parse",
+      "exitCode": 0
+    },
+    {
+      "path": "experiments/g4-m1-main-integration/tests.py",
+      "sha256": "2fbe2137ccb37858a45f5601a754ae94e99600103a8c0831c21ff1d4f44953ed",
+      "check": "Python AST parse",
+      "exitCode": 0
+    },
+    {
+      "path": "experiments/g4-m1-main-integration/fault.mjs",
+      "sha256": "309a5365b9cda16943e7329f491a78bc9b04ae51a809466725889d265f42c62d",
+      "check": "node --check",
+      "exitCode": 0
+    },
+    {
+      "path": "experiments/g4-m1-main-integration/browser.mjs",
+      "sha256": "b3d6673d594c357a8caa4c6dc613404152157f22f355a1ce1846babe528a4931",
+      "check": "node --check",
+      "exitCode": 0
+    },
+    {
+      "path": "experiments/g4-m1-main-integration/g3-compatibility.mjs",
+      "sha256": "e1b54cfb4d8128fec99897bd06d9473578556cf7a20fd131cda7784537e65040",
+      "check": "node --check",
+      "exitCode": 0
+    },
+    {
+      "path": "experiments/g4-m1-main-integration/http.mjs",
+      "sha256": "eef59e21ef8f04f295095eb060ab5e4c2344867355794a8d809bb61e621cb7ad",
+      "check": "node --check",
+      "exitCode": 0
+    }
+  ],
+  "hostBoundaryTests": {
+    "command": [
+      "python3",
+      "-B",
+      "experiments/g4-m1-main-integration/tests.py"
+    ],
+    "tests": 4,
+    "exitCode": 0,
+    "logSha256": "9a3006cb585fa665e60dea79248a0bd6c07979c5f2722b9b791c490c315ee887"
+  },
+  "runtimeAcceptance": "NOT_RUN",
+  "fixtureSecurityTests": "NOT_RUN"
+}

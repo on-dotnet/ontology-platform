@@ -1,0 +1,29 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "observedAtUtc": "2026-11-02T15:23:30.464272+00:00",
+  "authorization": "PLAN_ACCEPTED_WITH_GATES / P0_AUTHORIZED / B_CONDITIONAL / C_NOT_AUTHORIZED / M2_NOT_AUTHORIZED",
+  "phaseBStartRequires": [
+    "current exact remote refs",
+    "exact candidate chain and historical VR11",
+    "admissible replayable image content/provenance mapping",
+    "available exact tools with basic legitimate-use evidence"
+  ],
+  "approvedResourceCeiling": {
+    "simultaneousContainers": 6,
+    "containerMemoryGiB": 6,
+    "newVolumeObservedStopGiB": 3,
+    "volumeLimitIsHardQuota": false,
+    "downloads": 0,
+    "gpu": 0,
+    "paidServices": 0
+  },
+  "mainMutation": "NOT_AUTHORIZED_NOT_EXECUTED",
+  "productAndSharedToolsMutation": "NOT_AUTHORIZED_NOT_EXECUTED",
+  "ci": "NOT_RUN",
+  "windows": "NOT_RUN",
+  "intel": "NOT_RUN",
+  "macArm64Native": "MANDATORY_FOR_B",
+  "runtimeResourcesCreated": 0,
+  "phaseB": "NOT_STARTED",
+  "planAmendment": "Latest approval constraints override prior proposed authorization wording; historical plan and approvals are preserved."
+}

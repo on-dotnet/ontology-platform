@@ -1,0 +1,160 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "phase": "P0",
+  "status": "PARTIAL",
+  "approvedMain": "d1a61daffe844475b07705797e3ad325cc3f2945",
+  "candidateSourceHead": "99753df6f03b184e40b431a5b5aba89d8fa67087",
+  "approval": {
+    "path": "/Users/chasen/Downloads/Codex-G4-M1-MAIN-INTEGRATION-001-PLAN-REVIEW-APPROVAL.md",
+    "sha256": "ae653f2d17623f9bb89a25f997c73e6134d330b75f9ebf0e1f7d784977bab898",
+    "bytes": 9619
+  },
+  "commands": [
+    {
+      "command": [
+        "git",
+        "status",
+        "--porcelain"
+      ],
+      "startedAtUtc": "2026-11-02T15:21:25.201461+00:00",
+      "exitCode": 0,
+      "stdout": "?? .DS_Store\n?? backend/.DS_Store\n?? backend/src/.DS_Store\n?? docs/.DS_Store\n?? docs/evidence/.DS_Store\n?? infra/.DS_Store\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "remote",
+        "get-url",
+        "origin"
+      ],
+      "startedAtUtc": "2026-11-02T15:21:25.218250+00:00",
+      "exitCode": 0,
+      "stdout": "https://github.com/on-dotnet/ontology-platform.git\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "merge-base",
+        "--is-ancestor",
+        "d1a61daffe844475b07705797e3ad325cc3f2945",
+        "99753df6f03b184e40b431a5b5aba89d8fa67087"
+      ],
+      "startedAtUtc": "2026-11-02T15:21:25.221792+00:00",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "merge-base",
+        "--is-ancestor",
+        "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea",
+        "99753df6f03b184e40b431a5b5aba89d8fa67087"
+      ],
+      "startedAtUtc": "2026-11-02T15:21:25.226905+00:00",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "rev-list",
+        "--count",
+        "d1a61daffe844475b07705797e3ad325cc3f2945..99753df6f03b184e40b431a5b5aba89d8fa67087"
+      ],
+      "startedAtUtc": "2026-11-02T15:21:25.230579+00:00",
+      "exitCode": 0,
+      "stdout": "47\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "log",
+        "--reverse",
+        "--format=%H %P %s",
+        "d1a61daffe844475b07705797e3ad325cc3f2945..99753df6f03b184e40b431a5b5aba89d8fa67087"
+      ],
+      "startedAtUtc": "2026-11-02T15:21:25.234370+00:00",
+      "exitCode": 0,
+      "stdout": "7132c51203939d9b47de047d5c187f339910ba26 d1a61daffe844475b07705797e3ad325cc3f2945 docs(g4): archive reviewed five-source contracts and design evidence (PARTIAL)\na919d624ef85fdc5c1ff75c404052ec427296295 7132c51203939d9b47de047d5c187f339910ba26 docs(g4): preserve original input bytes and close final format gate\n8afc5d4dfd32e7adb48262cce6587057c0e68715 a919d624ef85fdc5c1ff75c404052ec427296295 docs(g4): bind local contract validation to reviewed commit\nceadd5393a377e537539c29d144ddd59ce51d103 8afc5d4dfd32e7adb48262cce6587057c0e68715 feat(g4): freeze reviewed M1 connection contracts and dispatch gates (PARTIAL)\n719aaca36ca6988f28e7daf71725f92684ae7e87 ceadd5393a377e537539c29d144ddd59ce51d103 build(g4): add owned connection adapter test project (PARTIAL)\n18cd1f7b89286af354f844c8f4b253fcc659f517 719aaca36ca6988f28e7daf71725f92684ae7e87 feat(g4): export native API contracts and isolate metadata storage (PARTIAL)\n1dbf66ae1114c83fe4894f51c46496f4654a1f2d 18cd1f7b89286af354f844c8f4b253fcc659f517 feat(g4): implement bounded read-only PostgreSQL source adapter (PARTIAL)\nde9bbe5f2b273eb3c404cdce445c5e225032f2d4 1dbf66ae1114c83fe4894f51c46496f4654a1f2d fix(g4): freeze schema query scope across async source calls\n79610f79c0b4e710e8c6e25097e94b4b7504f654 de9bbe5f2b273eb3c404cdce445c5e225032f2d4 feat(web): add connection lifecycle UI slice (DRAFT)\n607b7d1ae780ba52ba74be4940f012497e6211f4 79610f79c0b4e710e8c6e25097e94b4b7504f654 fix(web): preserve safe connection drafts and stale recovery\n2c2b2804d3c39e5973d7151a0c305d9c60c90d0f 607b7d1ae780ba52ba74be4940f012497e6211f4 fix(web): clear obsolete probe display and guard draft credentials\nf31767117a9b99879c973a1f6be31ed6697396ae 2c2b2804d3c39e5973d7151a0c305d9c60c90d0f fix(web): align source diagnostics and reject credential-bearing drafts\nee6fb15942ed849845c8a9e8d8524d22fb64086c f31767117a9b99879c973a1f6be31ed6697396ae fix(web): keep parameterized connection URLs out of draft cache\n958dc6c4eb121958ae889213d1a523a7e7914ce8 ee6fb15942ed849845c8a9e8d8524d22fb64086c feat(connections): persist lifecycle draft; block runtime on image license gate\n59edb405dfb4acf4d4a259cffdc3551bafa90d2c 958dc6c4eb121958ae889213d1a523a7e7914ce8 docs(g4-m1): bind partial tests and precise cleanup to blocked witness\n840155b9ca707ecb8208c6ee57dead14b014a03d 59edb405dfb4acf4d4a259cffdc3551bafa90d2c test(g4): reproduce streamed request body limit bypass\ncb40815090bce36ce982b6365f50c4346776a568 840155b9ca707ecb8208c6ee57dead14b014a03d fix(g4): bound streamed request bodies and admit controlled recovery forensics\n7527ae6bccb6f6869f4a85ac867d1feb26ec117f cb40815090bce36ce982b6365f50c4346776a568 test(g4): add isolated PostgreSQL TLS and ACL fixtures\n605acc98d98b9cbddae0d0ffd9227f764deea0ac 7527ae6bccb6f6869f4a85ac867d1feb26ec117f docs(g4): preserve offline Keycloak component and license evidence\n37a65f9aad5247373b86c9f842d4c61fe38bc734 605acc98d98b9cbddae0d0ffd9227f764deea0ac test(g4): add real OIDC browser acceptance driver\n6ceb0de58aea9630c82c86afdd75022e6629adaf 37a65f9aad5247373b86c9f842d4c61fe38bc734 test(g4): add real OIDC HTTP recovery acceptance driver\ncdf9e0ce63c5a784f1473b7de0117ae07f4d912b 6ceb0de58aea9630c82c86afdd75022e6629adaf feat(g4): recover audited ARM64 synthetic runtime and real PG validation (PARTIAL)\n3e3d5bf6d2aff80f8ec6dddfcca088ff659baf62 cdf9e0ce63c5a784f1473b7de0117ae07f4d912b test(g4): close acceptance connections and classify OIDC failures\nee10927ff27a714733d3059a9f449c0703098daf 3e3d5bf6d2aff80f8ec6dddfcca088ff659baf62 docs(g4): preserve raw evidence bytes with reviewable JSON envelopes\n1fb6982ecbad4822062d0a9e56725c249dcd6ac4 ee10927ff27a714733d3059a9f449c0703098daf fix(g4): honor canonical operator role in connection UI\n1c9779ec8cadc71c931a89c9c5deb1369b5dc180 1fb6982ecbad4822062d0a9e56725c249dcd6ac4 test(g4): verify settled viewport layout and hit targets\nf34a5597c6857090662288bf8711a9ef95085987 1c9779ec8cadc71c931a89c9c5deb1369b5dc180 test(g4): distinguish real source timeout from connection refusal\n188e2b51adcdc161be7687788e7e86019d248c7e f34a5597c6857090662288bf8711a9ef95085987 test(g4): synchronize bounded source timeout pause handshake\n35631fef44a936cd31709a5974966f876d611bb3 188e2b51adcdc161be7687788e7e86019d248c7e fix(g4): retain authorized job diagnostics after catalog denial\n5703f4600b8047411d41ec758636cd546b0d811e 35631fef44a936cd31709a5974966f876d611bb3 test(g4): cover credential rotation and actual cross-org rejection\nb70b142c5b002c1033e47af1580b4802ba1a3845 5703f4600b8047411d41ec758636cd546b0d811e fix(g4): preserve snapshot freshness and distinguish real request cancellation (PARTIAL)\nd0cf54ed6d42aef6cedb266a55fcaa31f55268f5 b70b142c5b002c1033e47af1580b4802ba1a3845 test(g4): coordinate real catalog cancellation witness\n9b9b39e58c2cbd968935c137e412bc2ec2ffa9f0 d0cf54ed6d42aef6cedb266a55fcaa31f55268f5 test(g4): isolate organization change for same credential subject\n47663df81f7b59c97a5dc2ae022b31f36cd237ad 9b9b39e58c2cbd968935c137e412bc2ec2ffa9f0 fix(g4): stabilize OpenAPI origin and restore project graph\nd7f3208893edc05a336d5d6ca3d5d9df9192be51 47663df81f7b59c97a5dc2ae022b31f36cd237ad fix(g4): serialize connection and catalog UI operations\n4efbeca1cbf33d52c2bd950e1968db20abe322d5 d7f3208893edc05a336d5d6ca3d5d9df9192be51 test(g4): freeze reviewed recovery witnesses and scoped UI copy\n1399364ad1367f3d1bfdee4d9901fdb33b48c15d 4efbeca1cbf33d52c2bd950e1968db20abe322d5 docs(g4): record blocked recovery acceptance and exact cleanup\nfbe822f2a43170fb34a4542880673ac7c2d2cc54 1399364ad1367f3d1bfdee4d9901fdb33b48c15d feat(g4): close C08 exact PostgreSQL profile gate with reviewed evidence\ne9c51d75b19e75276a7517a721e1e45cc30fb8be fbe822f2a43170fb34a4542880673ac7c2d2cc54 docs(g4): normalize SBOM EOF with original-byte receipt\n48d53eee02eb3c545593b35dfca673b222c42eda e9c51d75b19e75276a7517a721e1e45cc30fb8be test(g4): preserve first R04 witness and add targeted public schema fault test\n954a2b8e8eab6bc709139eda4921633e5931958c 48d53eee02eb3c545593b35dfca673b222c42eda test(g4): prove public fault boundaries and strengthen isolated G3 version witnesses\n48be53e807cab22622ea31c6b39d6cb8805e9771 954a2b8e8eab6bc709139eda4921633e5931958c test(g4): compare stored and HTTP activation field naming accurately\n53c34a28ba3c6b0a2050219038412a42e59ddc9b 48be53e807cab22622ea31c6b39d6cb8805e9771 docs(g4): freeze independently passed final gates runtime witnesses\n7da6363d1a891cba11318f9c9bd883033e65f1cb 53c34a28ba3c6b0a2050219038412a42e59ddc9b docs(g4): freeze scoped acceptance matrix and approved resource closeout\nd40e6ab67360cc46aadd7ec013bd514b3f61a6ea 7da6363d1a891cba11318f9c9bd883033e65f1cb docs(g4): finalize reviewed local validation and delivery gate evidence\n279f9230225ddcea7baf9840b66fb3b6875c4a28 d40e6ab67360cc46aadd7ec013bd514b3f61a6ea fix(verify): recognize exact frozen G4 JSONL evidence\n99753df6f03b184e40b431a5b5aba89d8fa67087 279f9230225ddcea7baf9840b66fb3b6875c4a28 docs(verify): bind full selftest review and scoped cleanup evidence\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "fsck",
+        "--connectivity-only",
+        "--no-dangling",
+        "99753df6f03b184e40b431a5b5aba89d8fa67087"
+      ],
+      "startedAtUtc": "2026-11-02T15:21:25.242239+00:00",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check",
+        "d1a61daffe844475b07705797e3ad325cc3f2945",
+        "99753df6f03b184e40b431a5b5aba89d8fa67087"
+      ],
+      "startedAtUtc": "2026-11-02T15:21:25.349774+00:00",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check",
+        "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea",
+        "99753df6f03b184e40b431a5b5aba89d8fa67087"
+      ],
+      "startedAtUtc": "2026-11-02T15:21:25.479110+00:00",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "-C",
+        "/Users/chasen/.codex/worktrees/g4-m1-verify-recovery-001/ontology-platform",
+        "status",
+        "--porcelain"
+      ],
+      "startedAtUtc": "2026-11-02T15:21:25.485281+00:00",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "historicalDelivery": {
+    "status": "VERIFIED",
+    "receiptSha256": "0cf01e22a457a69834a323d76e2660f7fafb3908c0552d2e8160f0842fdc7e35",
+    "zipPath": "/Users/chasen/.codex/worktrees/g4-m1-verify-recovery-001/ontology-platform/artifacts/reviews/OntologyPlatform-Review-G4-M1-VERIFY-RECOVERY-001-99753df6f03b.zip",
+    "zipSha256": "faf807f07550b949136e80c41d0012e556a081dce99adbf845212649c8b51c93",
+    "members": 830,
+    "memberHashes": 829,
+    "sourceBlobBindings": 827,
+    "externalArtifactHashes": 49,
+    "historicalVerifyOnlyExitCode": 0
+  },
+  "remote": "PENDING_PERSISTED_QUERY",
+  "images": "PENDING",
+  "tools": "PENDING",
+  "B": "NOT_STARTED",
+  "C": "NOT_AUTHORIZED_NOT_EXECUTED",
+  "M2": "NOT_AUTHORIZED_NOT_EXECUTED",
+  "tlsOverrideEnvironment": {
+    "GIT_SSL_NO_VERIFY": "UNSET"
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "phase": "P0",
+  "status": "PASS_LIMITED_ADMISSION",
+  "observedAtUtc": "2026-11-02T15:34:30.506172+00:00",
+  "approvedMain": "d1a61daffe844475b07705797e3ad325cc3f2945",
+  "candidateSourceHead": "99753df6f03b184e40b431a5b5aba89d8fa67087",
+  "checks": {
+    "liveRemoteRefs": "VERIFIED",
+    "defaultTrustedTls": "VERIFIED",
+    "sourceCommitChain": "VERIFIED_47_LINEAR",
+    "historicalVR11": "VERIFIED",
+    "sixImageContentAndArchivedProvenance": "VERIFIED",
+    "toolsOfflineReuse": "VERIFIED_WITH_COPY_CONDITIONS",
+    "hostPowerPolicy": "POLICY_READY"
+  },
+  "phaseB": "CONDITIONAL_PREREQUISITES_SATISFIED_NOT_YET_STARTED",
+  "phaseC": "NOT_AUTHORIZED_NOT_EXECUTED",
+  "m2": "NOT_AUTHORIZED_NOT_EXECUTED",
+  "resourcesCreated": {
+    "containers": 0,
+    "volumes": 0,
+    "networks": 0,
+    "worktrees": 0
+  },
+  "downloads": 0,
+  "ci": "NOT_RUN",
+  "windows": "NOT_RUN",
+  "intel": "NOT_RUN",
+  "productI01ToI08": "NOT_RUN",
+  "historicalProduct49": "INHERITED_NOT_RERUN",
+  "limitations": [
+    "All six images remain AMBER-A1 / LICENSE_PARTIAL for approved internal synthetic unmodified non-distribution testing only",
+    "Current online publisher/signature/CVE/full-license and release qualification not established",
+    "Browser has not been launched; host full-session/lock-display trial NOT_VERIFIED",
+    "Private copies, locks, generated shims and fixture identities must be validated before B tests"
+  ],
+  "openBlockers": [],
+  "evidence": [
+    {
+      "path": "PLAN-with-approval.md",
+      "sha256": "224ed45a9bf9568b60c01c1930ce887fb3daf2963ffa51fa18ef8a8b3e546b4e",
+      "bytes": 27239
+    },
+    {
+      "path": "approval-constraints.json",
+      "sha256": "33d266bc599d86f1ca220c74f239484202ca4321431880e673570d103a114f17",
+      "bytes": 1103
+    },
+    {
+      "path": "approval-original.md",
+      "sha256": "ae653f2d17623f9bb89a25f997c73e6134d330b75f9ebf0e1f7d784977bab898",
+      "bytes": 9619
+    },
+    {
+      "path": "browser-signature-unsandboxed.json",
+      "sha256": "7e391610ae86229e5c47b4ca3ce5cac48911479ace4d8ecdf66be45ea1dee6c0",
+      "bytes": 1773
+    },
+    {
+      "path": "browser-signature-witness.json",
+      "sha256": "a1d6e1d6d16a1144c2b50b9488c191ad8fe5a6129841dc760ea341027c6e458c",
+      "bytes": 1954
+    },
+    {
+      "path": "fetch.json",
+      "sha256": "a9cb5bd94391d35bad697b3c3047e1ee991a5c91f421d87a01cbab00afb55f0a",
+      "bytes": 363
+    },
+    {
+      "path": "git-and-delivery.json",
+      "sha256": "7e4a4d2f618bfe7e236d6f4e5a6567da73c7cd711b506329e914443d4c3aea8b",
+      "bytes": 11440
+    },
+    {
+      "path": "host-preflight.json",
+      "sha256": "9ed0bc1b812b4b5bdccd1cde9818e246b387c86b2b4fa6665fdbaaa86887f511",
+      "bytes": 807
+    },
+    {
+      "path": "image-review-first-four.json",
+      "sha256": "bf14ed74b93e478cbb64594370c21f781b26a4fa6199c856b15c112565e65a1b",
+      "bytes": 4589
+    },
+    {
+      "path": "images-admission.json",
+      "sha256": "a5ce12e3a20668694bfaf2b8e21c248f0ae2c2cdea8c954cb9a420a5b01234e8",
+      "bytes": 13323
+    },
+    {
+      "path": "p0-consistency-review.json",
+      "sha256": "59debcddee11438807072f0222cb0ec5c3b1aebc309f5d8725140b078f245c9c",
+      "bytes": 419
+    },
+    {
+      "path": "plan-original.md",
+      "sha256": "76881d0682f2ac5c04d8b08451f5356a3fba03e73e5752e794e17120521e30cd",
+      "bytes": 26581
+    },
+    {
+      "path": "remote-and-tls.json",
+      "sha256": "1b2bbe3a4f084005afa3e99652163308ae666b7d9f9f5f5ebb40e5ddc0dd0477",
+      "bytes": 1638
+    },
+    {
+      "path": "replay-image-content.py",
+      "sha256": "9ea2662a149bc7e2c21b2f65f23816b30c00659008599b1ecf97c6e06beed4a3",
+      "bytes": 4242
+    },
+    {
+      "path": "tools-admission.json",
+      "sha256": "65d7f8ceb5416e29ebd76ce651f455ccabae0cf5c3d7a25e7137af16ce6149e0",
+      "bytes": 5752
+    }
+  ],
+  "earlierPendingClosure": {
+    "git-and-delivery.json.remote": "remote-and-tls.json",
+    "git-and-delivery.json.images": "images-admission.json",
+    "git-and-delivery.json.tools": "tools-admission.json"
+  }
+}

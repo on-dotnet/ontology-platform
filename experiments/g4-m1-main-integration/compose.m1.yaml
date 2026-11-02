@@ -1,0 +1,331 @@
+name: ontology-g4-main-${G4_RUN_ID:?explicit current run required}
+services:
+  pg-source:
+    image: postgres@sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437
+    platform: linux/arm64
+    pull_policy: never
+    mem_limit: 768m
+    cpus: 2
+    pids_limit: 128
+    read_only: true
+    security_opt:
+    - no-new-privileges:true
+    cap_drop:
+    - ALL
+    cap_add:
+    - CHOWN
+    - SETUID
+    - SETGID
+    - DAC_OVERRIDE
+    - FOWNER
+    labels:
+      ontology.task-id: G4-M1-MAIN-INTEGRATION-001
+      ontology.run-id: ${G4_RUN_ID:?explicit task run required}
+      ontology.synthetic: 'true'
+    environment:
+      POSTGRES_DB: fixture
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD_FILE: /var/lib/postgresql/postgres-password
+    entrypoint:
+    - /bin/sh
+    - -ec
+    command:
+    - 'chown postgres:postgres /var/lib/postgresql
+
+      cp /run/secrets/postgres-password /var/lib/postgresql/postgres-password
+
+      cp /run/secrets/server.crt /var/lib/postgresql/server.crt
+
+      cp /run/secrets/server.key /var/lib/postgresql/server.key
+
+      cp /run/secrets/pg_hba.conf /var/lib/postgresql/pg_hba.conf
+
+      cp /run/secrets/init.sql /docker-entrypoint-initdb.d/10-fixture.sql
+
+      chown postgres:postgres /var/lib/postgresql/postgres-password /var/lib/postgresql/server.crt /var/lib/postgresql/server.key
+      /var/lib/postgresql/pg_hba.conf /docker-entrypoint-initdb.d/10-fixture.sql
+
+      chmod 600 /var/lib/postgresql/postgres-password /var/lib/postgresql/server.crt /var/lib/postgresql/server.key /var/lib/postgresql/pg_hba.conf
+      /docker-entrypoint-initdb.d/10-fixture.sql
+
+      exec /usr/local/bin/docker-entrypoint.sh postgres -c ssl=on -c ssl_cert_file=/var/lib/postgresql/server.crt -c ssl_key_file=/var/lib/postgresql/server.key
+      -c hba_file=/var/lib/postgresql/pg_hba.conf -c log_statement=none -c log_min_error_statement=panic
+
+      '
+    volumes:
+    - source-data:/var/lib/postgresql
+    - type: bind
+      source: ${G4_PRIVATE_DIR:?explicit private task directory required}/postgres-password
+      target: /run/secrets/postgres-password
+      read_only: true
+    - type: bind
+      source: ${G4_PRIVATE_DIR:?explicit private task directory required}/init.sql
+      target: /run/secrets/init.sql
+      read_only: true
+    - type: bind
+      source: ${G4_PRIVATE_DIR:?explicit private task directory required}/pg_hba.conf
+      target: /run/secrets/pg_hba.conf
+      read_only: true
+    - type: bind
+      source: ${G4_PRIVATE_DIR:?explicit private task directory required}/${G4_CERTIFICATE_VARIANT:-server}.crt
+      target: /run/secrets/server.crt
+      read_only: true
+    - type: bind
+      source: ${G4_PRIVATE_DIR:?explicit private task directory required}/${G4_CERTIFICATE_VARIANT:-server}.key
+      target: /run/secrets/server.key
+      read_only: true
+    tmpfs:
+    - /tmp:size=16m,mode=1777
+    - /var/run/postgresql:size=4m,mode=3775,uid=999,gid=999
+    - /docker-entrypoint-initdb.d:size=4m,mode=0755
+    networks:
+    - source
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - pg_isready -U postgres -d fixture
+      interval: 2s
+      timeout: 2s
+      retries: 15
+  pg-adapter-test:
+    image: mcr.microsoft.com/dotnet/aspnet@sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55
+    platform: linux/arm64
+    pull_policy: never
+    profiles:
+    - pg-test
+    user: ${G4_HOST_UID:?explicit host uid}:${G4_HOST_GID:?explicit host gid}
+    mem_limit: 768m
+    cpus: 2
+    pids_limit: 128
+    read_only: true
+    security_opt:
+    - no-new-privileges:true
+    cap_drop:
+    - ALL
+    labels:
+      ontology.task-id: G4-M1-MAIN-INTEGRATION-001
+      ontology.run-id: ${G4_RUN_ID:?explicit task run required}
+      ontology.synthetic: 'true'
+    environment:
+      G4_PG_ADAPTER_TEST_INPUT: /run/secrets/adapter-input.json
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+      DOTNET_EnableDiagnostics: '0'
+    working_dir: /tmp
+    command:
+    - dotnet
+    - /tests/OntologyPlatform.ConnectionsTests.dll
+    - --filter
+    - FullyQualifiedName~RealFixturePreservesAuthorizedMetadata
+    - --minimum-expected-tests
+    - '1'
+    - --results-directory
+    - /tmp/TestResults
+    - --no-ansi
+    - --output
+    - Detailed
+    volumes:
+    - type: bind
+      source: ${G4_PRIVATE_DIR:?explicit private task directory required}/adapter-input.json
+      target: /run/secrets/adapter-input.json
+      read_only: true
+    - type: bind
+      source: ${G4_PRIVATE_DIR:?explicit private task directory required}/reader-password
+      target: /run/secrets/reader-password
+      read_only: true
+    - type: bind
+      source: ${G4_PRIVATE_DIR:?explicit private task directory required}/ca.crt
+      target: /run/secrets/ca.crt
+      read_only: true
+    - type: bind
+      source: ${G4_PRIVATE_DIR:?explicit private task directory required}/wrong-ca.crt
+      target: /run/secrets/wrong-ca.crt
+      read_only: true
+    - type: bind
+      source: ${G4_PG_TEST_OUTPUT:?explicit published test output required}
+      target: /tests
+      read_only: true
+    tmpfs:
+    - /tmp:size=32m,mode=1777
+    networks:
+    - source
+  platform-pg:
+    platform: linux/arm64
+    pull_policy: never
+    read_only: true
+    security_opt: &id001
+    - no-new-privileges:true
+    cap_drop: &id002
+    - ALL
+    pids_limit: 256
+    cpus: 2
+    labels: &id003
+      ontology.task-id: G4-M1-MAIN-INTEGRATION-001
+      ontology.run-id: ${G4_RUN_ID:?explicit task run required}
+      ontology.synthetic: 'true'
+    image: postgres@sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437
+    mem_limit: 768m
+    cap_add:
+    - CHOWN
+    - SETUID
+    - SETGID
+    - DAC_OVERRIDE
+    - FOWNER
+    environment:
+      POSTGRES_DB: platform
+      POSTGRES_USER: platform
+      POSTGRES_PASSWORD_FILE: /run/secrets/platform-password
+    entrypoint:
+    - /bin/sh
+    - -ec
+    command:
+    - chown postgres:postgres /var/lib/postgresql; exec /usr/local/bin/docker-entrypoint.sh postgres -c log_statement=none
+      -c log_min_error_statement=panic
+    volumes:
+    - platform-data:/var/lib/postgresql
+    - ${G4_PRIVATE_DIR}/platform-password:/run/secrets/platform-password:ro
+    tmpfs:
+    - /tmp:size=16m,mode=1777
+    - /var/run/postgresql:size=4m,mode=3775,uid=999,gid=999
+    networks:
+    - front
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - pg_isready -U platform -d platform
+      interval: 2s
+      timeout: 2s
+      retries: 30
+  keycloak-test:
+    platform: linux/arm64
+    pull_policy: never
+    read_only: true
+    security_opt: *id001
+    cap_drop: *id002
+    pids_limit: 256
+    cpus: 2
+    labels: *id003
+    image: quay.io/keycloak/keycloak@sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4
+    mem_limit: 1g
+    user: ${G4_HOST_UID}:${G4_HOST_GID}
+    entrypoint:
+    - /bin/bash
+    - -ec
+    command:
+    - "runtime=/opt/keycloak/data/runtime\nif [ ! -f \"$$runtime/.recovery-built\" ]; then\n  mkdir -p \"$$runtime\"\n  for\
+      \ item in bin conf lib providers themes LICENSE.txt README.md version.txt; do\n    if [ -e \"/opt/keycloak/$$item\"\
+      \ ]; then cp -R \"/opt/keycloak/$$item\" \"$$runtime/\"; fi\n  done\n  chmod -R u+rwX \"$$runtime\"\n  \"$$runtime/bin/kc.sh\"\
+      \ build --db=dev-file\n  touch \"$$runtime/.recovery-built\"\nfi\nexport KC_BOOTSTRAP_ADMIN_USERNAME=wave2-bootstrap\n\
+      export KC_BOOTSTRAP_ADMIN_PASSWORD=\"$$(cat /run/secrets/keycloak-password)\"\nexec \"$$runtime/bin/kc.sh\" start --optimized\
+      \ --http-enabled=true --http-port=8080 --hostname=http://localhost:15180 --hostname-strict=true --http-access-log-enabled=false\n"
+    environment:
+      JAVA_OPTS_KC_HEAP: -Xms128m -Xmx512m
+    volumes:
+    - keycloak-data:/opt/keycloak/data
+    - ${G4_PRIVATE_DIR}/keycloak-password:/run/secrets/keycloak-password:ro
+    tmpfs:
+    - /tmp:size=64m,mode=1777
+    networks:
+    - front
+  api:
+    platform: linux/arm64
+    pull_policy: never
+    read_only: true
+    security_opt: *id001
+    cap_drop: *id002
+    pids_limit: 256
+    cpus: 2
+    labels: *id003
+    image: mcr.microsoft.com/dotnet/aspnet@sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55
+    mem_limit: 1g
+    user: ${G4_HOST_UID}:${G4_HOST_GID}
+    working_dir: /private/api
+    entrypoint:
+    - /bin/sh
+    - -ec
+    command:
+    - while [ ! -f /private/api/appsettings.json ]; do sleep 1; done; exec dotnet /app/OntologyPlatform.Api.dll
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://0.0.0.0:15100
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+      DOTNET_EnableDiagnostics: '0'
+    volumes:
+    - ${G4_API_OUTPUT}:/app:ro
+    - ${G4_PRIVATE_DIR}/api:/private/api:ro
+    - api-keyring:/keyring
+    tmpfs:
+    - /tmp:size=64m,mode=1777
+    networks:
+    - source
+    - front
+  web:
+    platform: linux/arm64
+    pull_policy: never
+    read_only: true
+    security_opt: *id001
+    cap_drop: *id002
+    pids_limit: 256
+    cpus: 2
+    labels: *id003
+    image: node@sha256:a52166d89cfcc66ea62d10535ca712d161cece5d77ff4cfa758866b6b75ccb3f
+    mem_limit: 1g
+    user: ${G4_HOST_UID}:${G4_HOST_GID}
+    network_mode: service:api
+    entrypoint:
+    - /bin/sh
+    - -ec
+    command:
+    - node /run/loopback-proxy.mjs
+    environment:
+      NEXT_TELEMETRY_DISABLED: '1'
+      NODE_ENV: production
+    volumes:
+    - ${G4_ROOT}/apps/web:${G4_ROOT}/apps/web:ro
+    - ${G4_SHARED_WEB_MODULES}:${G4_SHARED_WEB_MODULES}:ro
+    - ${G4_SHARED_ROOT_MODULES}:${G4_SHARED_ROOT_MODULES}:ro
+    - ${G4_HELPERS}/loopback-proxy.mjs:/run/loopback-proxy.mjs:ro
+    - ${G4_HELPERS}/stdio-relay.mjs:/run/stdio-relay.mjs:ro
+    - ${G4_HELPERS}/web-production.mjs:/run/web-production.mjs:ro
+    tmpfs:
+    - /tmp:size=32m,mode=1777
+networks:
+  source:
+    internal: true
+    labels:
+      ontology.task-id: G4-M1-MAIN-INTEGRATION-001
+      ontology.run-id: ${G4_RUN_ID:?explicit task run required}
+  front:
+    internal: true
+    labels: *id003
+volumes:
+  source-data:
+    driver: local
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+      o: size=512m,mode=0700
+    labels:
+      ontology.task-id: G4-M1-MAIN-INTEGRATION-001
+      ontology.run-id: ${G4_RUN_ID:?explicit task run required}
+      ontology.synthetic: 'true'
+  platform-data:
+    driver: local
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+      o: size=512m,mode=0700
+    labels: *id003
+  keycloak-data:
+    driver: local
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+      o: size=512m,mode=0700,uid=${G4_HOST_UID},gid=${G4_HOST_GID}
+    labels: *id003
+  api-keyring:
+    driver: local
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+      o: size=16m,mode=0700,uid=${G4_HOST_UID},gid=${G4_HOST_GID}
+    labels: *id003

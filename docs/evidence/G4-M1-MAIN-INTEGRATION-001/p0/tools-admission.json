@@ -1,0 +1,177 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "observedAtUtc": "2026-11-02T15:32:06.661190+00:00",
+  "status": "LOCAL_REUSE_INPUTS_VERIFIED_WITH_LIMITATIONS",
+  "commands": [
+    {
+      "command": [
+        "/usr/local/share/dotnet/dotnet",
+        "--list-sdks"
+      ],
+      "exitCode": 0,
+      "stdout": "10.0.402 [/usr/local/share/dotnet/sdk]\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/usr/local/share/dotnet/dotnet",
+        "/Users/chasen/.nuget/packages/dotnet-ef/10.0.13/tools/net8.0/any/dotnet-ef.dll",
+        "--version"
+      ],
+      "exitCode": 0,
+      "stdout": "Entity Framework Core .NET Command-line Tools\n10.0.13\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/opt/homebrew/opt/node@24/bin/node",
+        "--version"
+      ],
+      "exitCode": 0,
+      "stdout": "v24.22.1\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/opt/homebrew/opt/node@24/bin/node",
+        "/Users/chasen/Developer/repos/ontology-platform/.tools/pnpm/package/bin/pnpm.cjs",
+        "--version"
+      ],
+      "exitCode": 0,
+      "stdout": "11.28.8\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-Command",
+        "$PSVersionTable.PSVersion.ToString()"
+      ],
+      "exitCode": 0,
+      "stdout": "7.6.8\n",
+      "stderr": ""
+    }
+  ],
+  "files": [
+    {
+      "path": "/usr/local/share/dotnet/dotnet",
+      "bytes": 141392,
+      "sha256": "11b517e7b00d0efa20e9b3ab6fe433f135d828a4c95c9c6ca7a9cf1328b6ada4"
+    },
+    {
+      "path": "/usr/local/share/dotnet/sdk/10.0.402/dotnet.dll",
+      "bytes": 4050216,
+      "sha256": "6e5ca819b58022dfcfe443535676a1e0733663ef98472af37e2699f826b83fca"
+    },
+    {
+      "path": "/usr/local/share/dotnet/LICENSE.txt",
+      "bytes": 1116,
+      "sha256": "cfc21f5e8bd655ae997eec916138b707b1d290b83272c02a95c9f821b8c87310"
+    },
+    {
+      "path": "/usr/local/share/dotnet/ThirdPartyNotices.txt",
+      "bytes": 77436,
+      "sha256": "2dc8f8c5a39401e928b5784ab564eb8b3ceb99ead3df8f260e0cab7e0bbecc7a"
+    },
+    {
+      "path": "/Users/chasen/.nuget/packages/dotnet-ef/10.0.13/dotnet-ef.nuspec",
+      "bytes": 1368,
+      "sha256": "ed5d504b866a1e22f56461c9ddcbd849012a79ccdf37bda2cd04676ac6e2b14d"
+    },
+    {
+      "path": "/Users/chasen/.nuget/packages/dotnet-ef/10.0.13/dotnet-ef.10.0.13.nupkg",
+      "bytes": 622108,
+      "sha256": "31553eeaf3c1d6d5cfd4e48165671ad24081ead0ace4fac7cec1e2dc15314e28"
+    },
+    {
+      "path": "/opt/homebrew/Cellar/node@24/24.22.1/bin/node",
+      "bytes": 50320,
+      "sha256": "0d78c9bca217f53c2dc21a067246ee4a81c1f4fa111ee64d572b45fa1ff39189"
+    },
+    {
+      "path": "/opt/homebrew/Cellar/node@24/24.22.1/lib/libnode.137.dylib",
+      "bytes": 68458736,
+      "sha256": "6a92935915ce490773793512b5e1ccbdac35028fd2bd9284490dfc7be2f9f993"
+    },
+    {
+      "path": "/opt/homebrew/Cellar/node@24/24.22.1/LICENSE",
+      "bytes": 157609,
+      "sha256": "5888dbb9a1d2b18f2c3e6c5f6af1b39de658372b402a0577b002777f14c62ace"
+    },
+    {
+      "path": "/opt/homebrew/Cellar/node@24/24.22.1/INSTALL_RECEIPT.json",
+      "bytes": 4738,
+      "sha256": "6180e8a3c4e30be6dde7950f58e4ffbba43284e2f80a56eaef81d43e05cf1a2d"
+    },
+    {
+      "path": "/Users/chasen/Developer/repos/ontology-platform/.tools/pnpm/package/LICENSE",
+      "bytes": 1170,
+      "sha256": "e0a867ff513ea7be2a0ddc339ac6a031e459a38668e077b8f0e649544062f9f2"
+    }
+  ],
+  "webSource": {
+    "root": "/Users/chasen/.codex/worktrees/g3-m5-review-fix/ontology-platform",
+    "lockSha256": "9c0c20bf43a8d664026e0d8b0beb40a8ee03d3e6f0b215ebc8fbb89b267dafe8",
+    "threeLocksEqual": true,
+    "packagesAndWorkspaceInputsEqual": true,
+    "regularFiles": 26361,
+    "symlinks": 1283,
+    "externalOrBrokenSymlinks": 0,
+    "pendingBuilds": [],
+    "independentObserver": "/root/gate_inventory",
+    "generatedShimRebaseRequired": true
+  },
+  "pnpm": {
+    "archive": "/Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform/.tools/downloads/pnpm-11.28.8.tgz",
+    "integrity": "sha512-9piKMgRrmj9419fuB0eSa76QX/nf9zvxmruHvX0ZBqKskNk/c74ytfnhTCiZVpvLDJxeyKGeCD9dcburbdnguA==",
+    "installedFilesByteMatched": 454,
+    "license": "MIT"
+  },
+  "pyyaml": {
+    "version": "6.0.3",
+    "sharedSource": "/Users/chasen/Developer/repos/ontology-platform/.tools/pythonlibs",
+    "sourceFilesMatched": 44,
+    "copyFileCount": 26,
+    "license": "MIT",
+    "copyCreated": false
+  },
+  "playwrightAndAjv": {
+    "observer": "/root/gate_inventory",
+    "store": "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform/.tools/pnpm-store/v11/index.db",
+    "readMode": "sqlite mode=ro immutable=1",
+    "versions": [
+      "@playwright/test@1.64.1",
+      "playwright@1.64.1",
+      "playwright-core@1.64.1",
+      "ajv@6.15.0"
+    ],
+    "lockedIndexedFilesSha512Verified": 278,
+    "failures": 0,
+    "licenses": [
+      "Apache-2.0",
+      "MIT"
+    ],
+    "indexBlobHashes": [
+      "9353d50bd2dd4e8499c9e643166cf09948bc015eb75a3d4a1b463caa2e0365c7",
+      "8521b02dea2feedcccbfb755167cb9aece8ac6be093dc9f3109644dbf471a8f9",
+      "e5f743aba17f2fcdb2698126e7830dd0b026eb566b1fea289efa01718bb2afd9",
+      "573d553ba57e99bece7053a085f9ad0fba1c1304307cf27b4575ec7700766ac4"
+    ]
+  },
+  "edge": {
+    "version": "156.0.4314.58",
+    "signature": "VERIFIED_UNSANDBOXED",
+    "rawReceipt": "browser-signature-unsandboxed.json",
+    "initialSandboxFailure": "PRESERVED_ENVIRONMENT_DIFFERENCE",
+    "browserLaunches": 0
+  },
+  "blockers": [],
+  "limitations": [
+    "Not a full supplier signature/CVE or dependency closure audit",
+    "Private copies and generated shim relocation must be checked before B execution",
+    "I01-I08 product tests NOT_RUN"
+  ],
+  "downloads": 0,
+  "installs": 0
+}

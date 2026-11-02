@@ -1,0 +1,329 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "reporter": "/root/scope_review",
+  "reportKind": "independent-read-only-agent-observations",
+  "status": "VERIFIED_CONTENT_AND_ARCHIVED_PROVENANCE",
+  "images": [
+    {
+      "name": "postgres",
+      "localImageId": "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+      "verifiedPublisherOrBuildProvenance": "VERIFIED_CONTENT_TO_ARCHIVED_OFFICIAL_SOURCE",
+      "architectureManifestChain": {
+        "index": "3a4264520e121176619f54ff867d12774bc81e95e7b84db58d63bccdb6144b81",
+        "platform": "linux/arm64",
+        "manifest": "9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+        "config": "07ee628d2e71f8956c85fc5466906a6d4038cf00f6db07f067d810ef8fec8161",
+        "allContentBlobHashesAndSizesVerified": true,
+        "diffIdsEqualCurrentInspect": true
+      },
+      "licenseRiskDisposition": "AMBER-A1 / LICENSE_PARTIAL; approved internal synthetic unmodified non-distribution use only; complete license inventory/signature/CVE NOT_VERIFIED",
+      "dockerSaveExit": 0,
+      "blobCount": 15,
+      "blobBytes": 161125945,
+      "licenseReport": {
+        "path": "/Users/chasen/.codex/worktrees/g4-m1-verify-recovery-001/ontology-platform/docs/evidence/G4-M1-RECOVERY-001/images/0-licenses.json",
+        "sha256": "db4749d9a0e126fe0dea7bf382030c4e28c9cada993163fd2316cfd607dfa3f3",
+        "bytes": 3369162
+      },
+      "commands": [
+        {
+          "argv": [
+            "docker",
+            "--context",
+            "desktop-linux",
+            "image",
+            "save",
+            "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437"
+          ],
+          "exitCode": 0,
+          "scope": "read-only stream; all blobs SHA256 and size checked by independent reviewer"
+        },
+        {
+          "argv": [
+            "docker",
+            "--context",
+            "desktop-linux",
+            "image",
+            "inspect",
+            "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437"
+          ],
+          "exitCode": 0
+        }
+      ]
+    },
+    {
+      "name": "node",
+      "localImageId": "sha256:a52166d89cfcc66ea62d10535ca712d161cece5d77ff4cfa758866b6b75ccb3f",
+      "verifiedPublisherOrBuildProvenance": "VERIFIED_CONTENT_TO_ARCHIVED_OFFICIAL_SOURCE",
+      "architectureManifestChain": {
+        "index": "89c5244bc22a9bc3287d89ebc7e49b9cb5bb84cd40e6175ac3421d5a9f68b95a",
+        "platform": "linux/arm64",
+        "manifest": "a52166d89cfcc66ea62d10535ca712d161cece5d77ff4cfa758866b6b75ccb3f",
+        "config": "d285463e702a7c5b33db8cb81cfa2529f0c94b542eda9894f4f33677d6628134",
+        "allContentBlobHashesAndSizesVerified": true,
+        "diffIdsEqualCurrentInspect": true
+      },
+      "licenseRiskDisposition": "AMBER-A1 / LICENSE_PARTIAL; approved internal synthetic unmodified non-distribution use only; complete license inventory/signature/CVE NOT_VERIFIED",
+      "dockerSaveExit": 0,
+      "blobCount": 7,
+      "blobBytes": 83036583,
+      "licenseReport": {
+        "path": "/Users/chasen/.codex/worktrees/g4-m1-verify-recovery-001/ontology-platform/docs/evidence/G4-M1-RECOVERY-001/images/3-licenses.json",
+        "sha256": "c7dfdce4ef842a526a846250c8b9d2fbcc2f2a69eaeb054e90e53856d47ec893",
+        "bytes": 2260893
+      },
+      "commands": [
+        {
+          "argv": [
+            "docker",
+            "--context",
+            "desktop-linux",
+            "image",
+            "save",
+            "sha256:a52166d89cfcc66ea62d10535ca712d161cece5d77ff4cfa758866b6b75ccb3f"
+          ],
+          "exitCode": 0,
+          "scope": "read-only stream; all blobs SHA256 and size checked by independent reviewer"
+        },
+        {
+          "argv": [
+            "docker",
+            "--context",
+            "desktop-linux",
+            "image",
+            "inspect",
+            "sha256:a52166d89cfcc66ea62d10535ca712d161cece5d77ff4cfa758866b6b75ccb3f"
+          ],
+          "exitCode": 0
+        }
+      ]
+    },
+    {
+      "name": "rustfs",
+      "localImageId": "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+      "verifiedPublisherOrBuildProvenance": "VERIFIED_CONTENT_TO_ARCHIVED_OFFICIAL_SOURCE",
+      "architectureManifestChain": {
+        "index": "9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+        "platform": "linux/arm64",
+        "manifest": "a3951370f879374cb89cca3b495e05badab38807cc4cd609c54a35f93f6ccd64",
+        "config": "42fa39ec98fa40d8b80fa15322487f923e5555291dfb242f7df014996c0eee84",
+        "allContentBlobHashesAndSizesVerified": true,
+        "diffIdsEqualCurrentInspect": true
+      },
+      "licenseRiskDisposition": "AMBER-A1 / LICENSE_PARTIAL; approved internal synthetic unmodified non-distribution use only; complete license inventory/signature/CVE NOT_VERIFIED",
+      "dockerSaveExit": 0,
+      "blobCount": 14,
+      "blobBytes": 109869732,
+      "licenseReport": {
+        "path": "/Users/chasen/.codex/worktrees/g4-m1-verify-recovery-001/ontology-platform/docs/evidence/G4-M1-FINAL-GATES-001/images/rustfs-licenses.json",
+        "sha256": "1db09fdcf9b801794d263597a4bc8737a3f01b208a624c4874d5ef557786f1ef",
+        "bytes": 12497
+      },
+      "commands": [
+        {
+          "argv": [
+            "docker",
+            "--context",
+            "desktop-linux",
+            "image",
+            "save",
+            "rustfs/rustfs@sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b"
+          ],
+          "exitCode": 0,
+          "scope": "read-only stream; all blobs SHA256 and size checked by independent reviewer"
+        },
+        {
+          "argv": [
+            "docker",
+            "--context",
+            "desktop-linux",
+            "image",
+            "inspect",
+            "rustfs/rustfs@sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b"
+          ],
+          "exitCode": 0
+        }
+      ]
+    },
+    {
+      "name": "fuseki",
+      "localImageId": "sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c",
+      "verifiedPublisherOrBuildProvenance": "VERIFIED_CANONICAL_BUILD_BINDING",
+      "architectureManifestChain": {
+        "index": null,
+        "platform": "linux/arm64",
+        "manifest": "715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c",
+        "config": "b3253da354a9dc8dca7273fb4af6224465b0a2aa1beee2ece96f54542f934ed8",
+        "allContentBlobHashesAndSizesVerified": true,
+        "diffIdsEqualCurrentInspect": true
+      },
+      "licenseRiskDisposition": "AMBER-A1 / LICENSE_PARTIAL; approved internal synthetic unmodified non-distribution use only; complete license inventory/signature/CVE NOT_VERIFIED",
+      "dockerSaveExit": 0,
+      "blobCount": 12,
+      "blobBytes": 198883240,
+      "licenseReport": {
+        "path": "/Users/chasen/.codex/worktrees/g4-m1-verify-recovery-001/ontology-platform/docs/evidence/G4-M1-FINAL-GATES-001/images/fuseki-licenses.json",
+        "sha256": "83f5fc3b5c04c262e5b521c9dc8d1e1253e5fbf732da6e19f261876a1fa1249b",
+        "bytes": 2383422
+      },
+      "commands": [
+        {
+          "argv": [
+            "docker",
+            "--context",
+            "desktop-linux",
+            "image",
+            "save",
+            "ontology-platform-fuseki:context-4fbf23514516632dcb651b5c05bf04e9992da52491607b6cf58de1f7348ff9ab"
+          ],
+          "exitCode": 0,
+          "scope": "read-only stream; all blobs SHA256 and size checked by independent reviewer"
+        },
+        {
+          "argv": [
+            "docker",
+            "--context",
+            "desktop-linux",
+            "image",
+            "inspect",
+            "ontology-platform-fuseki:context-4fbf23514516632dcb651b5c05bf04e9992da52491607b6cf58de1f7348ff9ab"
+          ],
+          "exitCode": 0
+        }
+      ]
+    },
+    {
+      "name": "keycloak",
+      "localImageId": "sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4",
+      "verifiedPublisherOrBuildProvenance": "VERIFIED_CONTENT_TO_ARCHIVED_OFFICIAL_SOURCE",
+      "architectureManifestChain": {
+        "index": "3f3c5f8e03c614774b4bd9173b88391fefa4153bfc010d8012d59ad825377332",
+        "platform": "linux/arm64",
+        "manifest": "e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4",
+        "config": "24959b9b2ff0ec6bd9445588d3b488b84dffbe06e6a6ccb50e3d074f7ec581dd",
+        "allContentBlobHashesAndSizesVerified": true,
+        "diffIdsEqualCurrentInspect": true
+      },
+      "licenseRiskDisposition": "AMBER-A1 / LICENSE_PARTIAL; restricted internal synthetic unmodified non-distribution use only",
+      "dockerSaveExit": 0,
+      "dockerInspectExit": 0,
+      "blobCount": 6,
+      "blobBytes": 263938242,
+      "archiveBytes": 263948288,
+      "archiveSha256": "b659e075f3205ca98c482c511f97d2e2bc835dd992c3e1d7a3f0e38a0d710965",
+      "licenseReport": {
+        "path": "/Users/chasen/.codex/worktrees/g4-m1-verify-recovery-001/ontology-platform/docs/evidence/G4-M1-RECOVERY-001/images/1-manual-licenses.json",
+        "sha256": "8080f7d3d479918f1c5f3fb51e85ce767018ea98c04a5709de9150940218a1d3",
+        "bytes": 7423222
+      },
+      "commands": [
+        {
+          "argv": [
+            "docker",
+            "--context",
+            "desktop-linux",
+            "image",
+            "save",
+            "quay.io/keycloak/keycloak@sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4"
+          ],
+          "exitCode": 0,
+          "scope": "read-only stream; all blobs SHA256 and size checked by independent reviewer"
+        },
+        {
+          "argv": [
+            "docker",
+            "--context",
+            "desktop-linux",
+            "image",
+            "inspect",
+            "quay.io/keycloak/keycloak@sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4"
+          ],
+          "exitCode": 0
+        }
+      ]
+    },
+    {
+      "name": "aspnet",
+      "localImageId": "sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55",
+      "verifiedPublisherOrBuildProvenance": "VERIFIED_CONTENT_TO_ARCHIVED_OFFICIAL_SOURCE",
+      "architectureManifestChain": {
+        "index": "8af87eba5e7cdafb1514d7388be287365da97c132509e84dfe252ffd552398ca",
+        "platform": "linux/arm64",
+        "manifest": "3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55",
+        "config": "d558e2a91f9574fe27662c4a66fc80795942781a283e8cbaa2c808e0e892436c",
+        "allContentBlobHashesAndSizesVerified": true,
+        "diffIdsEqualCurrentInspect": true
+      },
+      "licenseRiskDisposition": "AMBER-A1 / LICENSE_PARTIAL; restricted internal synthetic unmodified non-distribution use only",
+      "dockerSaveExit": 0,
+      "dockerInspectExit": 0,
+      "blobCount": 8,
+      "blobBytes": 92397214,
+      "archiveBytes": 92409344,
+      "archiveSha256": "fc453392c8a648b51ee78f2db2ceff5d7b032f4d5cf91d16e44bfac1b82c64bd",
+      "licenseReport": {
+        "path": "/Users/chasen/.codex/worktrees/g4-m1-verify-recovery-001/ontology-platform/docs/evidence/G4-M1-RECOVERY-001/images/2-licenses.json",
+        "sha256": "5556d37c699eebf5f512aa910dd6515ae38a9313c77afe750097f463dacf302a",
+        "bytes": 1980416
+      },
+      "commands": [
+        {
+          "argv": [
+            "docker",
+            "--context",
+            "desktop-linux",
+            "image",
+            "save",
+            "mcr.microsoft.com/dotnet/aspnet@sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55"
+          ],
+          "exitCode": 0,
+          "scope": "read-only stream; all blobs SHA256 and size checked by independent reviewer"
+        },
+        {
+          "argv": [
+            "docker",
+            "--context",
+            "desktop-linux",
+            "image",
+            "inspect",
+            "mcr.microsoft.com/dotnet/aspnet@sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55"
+          ],
+          "exitCode": 0
+        }
+      ]
+    }
+  ],
+  "containerStarts": 0,
+  "downloads": 0,
+  "writesByReviewer": 0,
+  "remainingImages": [],
+  "currentNetworkPublisherReverification": "NOT_RUN",
+  "canonical": {
+    "producerHead": "1990742c1bbe97c427121a37e1cfe775d79c89b9",
+    "producerFilesByteIdentical": 7,
+    "contextSha256": "dba8036818246baaefc136fa6740729e9be068c79dd0c2ae584f895192406091",
+    "helperSha256": "ed4a3aa22c89cb32ef0e40969641ff606de77865bc5b8f5e9ef73a54fc03e75b",
+    "inputFingerprint": "4fbf23514516632dcb651b5c05bf04e9992da52491607b6cf58de1f7348ff9ab",
+    "baseDigest": "sha256:affcab5356e1270ac35d2361ee83135af2f03e8d580eca78a6d5d6fdbf048db0",
+    "jenaVersion": "6.2.0",
+    "jenaArchiveBytes": 51398669,
+    "jenaArchiveSha512Verified": true
+  },
+  "observedUtcStart": "2026-11-02T15:28:57.592435+00:00",
+  "observedUtcEnd": "2026-11-02T15:29:01.561295+00:00",
+  "engineBeforeAndAfter": {
+    "context": "desktop-linux",
+    "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016",
+    "serverVersion": "29.9.2",
+    "osType": "linux",
+    "architecture": "aarch64",
+    "containers": 0,
+    "images": 17,
+    "unchanged": true
+  },
+  "limitations": [
+    "Current online publisher revalidation NOT_RUN",
+    "Signatures/CVE/full license inventory NOT_VERIFIED",
+    "No product release or main update authorization"
+  ]
+}

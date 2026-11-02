@@ -1,0 +1,33 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "sources": [
+    {
+      "source": "experiments/g4-m1-final-gates/pg_fixture.py",
+      "sourceSha256": "04dea051bb04689a193457a522e1dfde22a18fb9e30885e50aadb6bb837e3e58",
+      "destination": "experiments/g4-m1-main-integration/pg_fixture.py"
+    },
+    {
+      "source": "scripts/acceptance/g4-m1-http.mjs",
+      "sourceSha256": "3cb0ee1791bce6714d82a99508f0758c76797c3fd2ad7d16eb2488c6e7f455e0",
+      "destination": "experiments/g4-m1-main-integration/http.mjs"
+    },
+    {
+      "source": "scripts/acceptance/g4-m1-browser.mjs",
+      "sourceSha256": "5918869646285dc175f174b1bd35811aa80257f65f6e5edd5fc6fb90be6a7f82",
+      "destination": "experiments/g4-m1-main-integration/browser.mjs"
+    },
+    {
+      "source": "scripts/acceptance/g4-m1-fault.mjs",
+      "sourceSha256": "983bb23ceab49263fd5b92775e2286c4f9e52229f61ee9fe6e66028579b697e4",
+      "destination": "experiments/g4-m1-main-integration/fault.mjs"
+    },
+    {
+      "source": "experiments/g4-m1-final-gates/r04.mjs",
+      "sourceSha256": "83aeff6cf4286eb5c67439e5d6c2f2cf936b2a9fc3cbb8e0d1b9a59b6cf8ed80",
+      "destination": "experiments/g4-m1-main-integration/g3-compatibility.mjs"
+    }
+  ],
+  "status": "DRAFT_NOT_RUNTIME_VERIFIED",
+  "g3Change": "Requires G4 route 404 rather than historical coexistence 200",
+  "fixtureChange": "Only two exact identity allowlists extended"
+}

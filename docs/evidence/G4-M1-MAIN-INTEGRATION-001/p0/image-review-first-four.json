@@ -1,0 +1,95 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "reporter": "/root/scope_review",
+  "reportKind": "independent-read-only-agent-observations",
+  "status": "PARTIAL_AWAITING_TWO_IMAGES",
+  "images": [
+    {
+      "name": "postgres",
+      "localImageId": "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+      "verifiedPublisherOrBuildProvenance": "VERIFIED_CONTENT_TO_ARCHIVED_OFFICIAL_SOURCE",
+      "architectureManifestChain": {
+        "index": "3a4264520e121176619f54ff867d12774bc81e95e7b84db58d63bccdb6144b81",
+        "platform": "linux/arm64",
+        "manifest": "9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+        "config": "07ee628d2e71f8956c85fc5466906a6d4038cf00f6db07f067d810ef8fec8161",
+        "allContentBlobHashesAndSizesVerified": true,
+        "diffIdsEqualCurrentInspect": true
+      },
+      "licenseRiskDisposition": "AMBER-A1 / LICENSE_PARTIAL; approved internal synthetic unmodified non-distribution use only; complete license inventory/signature/CVE NOT_VERIFIED",
+      "dockerSaveExit": 0,
+      "blobCount": 15,
+      "blobBytes": 161125945
+    },
+    {
+      "name": "node",
+      "localImageId": "sha256:a52166d89cfcc66ea62d10535ca712d161cece5d77ff4cfa758866b6b75ccb3f",
+      "verifiedPublisherOrBuildProvenance": "VERIFIED_CONTENT_TO_ARCHIVED_OFFICIAL_SOURCE",
+      "architectureManifestChain": {
+        "index": "89c5244bc22a9bc3287d89ebc7e49b9cb5bb84cd40e6175ac3421d5a9f68b95a",
+        "platform": "linux/arm64",
+        "manifest": "a52166d89cfcc66ea62d10535ca712d161cece5d77ff4cfa758866b6b75ccb3f",
+        "config": "d285463e702a7c5b33db8cb81cfa2529f0c94b542eda9894f4f33677d6628134",
+        "allContentBlobHashesAndSizesVerified": true,
+        "diffIdsEqualCurrentInspect": true
+      },
+      "licenseRiskDisposition": "AMBER-A1 / LICENSE_PARTIAL; approved internal synthetic unmodified non-distribution use only; complete license inventory/signature/CVE NOT_VERIFIED",
+      "dockerSaveExit": 0,
+      "blobCount": 7,
+      "blobBytes": 83036583
+    },
+    {
+      "name": "rustfs",
+      "localImageId": "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+      "verifiedPublisherOrBuildProvenance": "VERIFIED_CONTENT_TO_ARCHIVED_OFFICIAL_SOURCE",
+      "architectureManifestChain": {
+        "index": "9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+        "platform": "linux/arm64",
+        "manifest": "a3951370f879374cb89cca3b495e05badab38807cc4cd609c54a35f93f6ccd64",
+        "config": "42fa39ec98fa40d8b80fa15322487f923e5555291dfb242f7df014996c0eee84",
+        "allContentBlobHashesAndSizesVerified": true,
+        "diffIdsEqualCurrentInspect": true
+      },
+      "licenseRiskDisposition": "AMBER-A1 / LICENSE_PARTIAL; approved internal synthetic unmodified non-distribution use only; complete license inventory/signature/CVE NOT_VERIFIED",
+      "dockerSaveExit": 0,
+      "blobCount": 14,
+      "blobBytes": 109869732
+    },
+    {
+      "name": "fuseki",
+      "localImageId": "sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c",
+      "verifiedPublisherOrBuildProvenance": "VERIFIED_CANONICAL_BUILD_BINDING",
+      "architectureManifestChain": {
+        "index": null,
+        "platform": "linux/arm64",
+        "manifest": "715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c",
+        "config": "b3253da354a9dc8dca7273fb4af6224465b0a2aa1beee2ece96f54542f934ed8",
+        "allContentBlobHashesAndSizesVerified": true,
+        "diffIdsEqualCurrentInspect": true
+      },
+      "licenseRiskDisposition": "AMBER-A1 / LICENSE_PARTIAL; approved internal synthetic unmodified non-distribution use only; complete license inventory/signature/CVE NOT_VERIFIED",
+      "dockerSaveExit": 0,
+      "blobCount": 12,
+      "blobBytes": 198883240
+    }
+  ],
+  "containerStarts": 0,
+  "downloads": 0,
+  "writesByReviewer": 0,
+  "remainingImages": [
+    "keycloak",
+    "aspnet"
+  ],
+  "currentNetworkPublisherReverification": "NOT_RUN",
+  "canonical": {
+    "producerHead": "1990742c1bbe97c427121a37e1cfe775d79c89b9",
+    "producerFilesByteIdentical": 7,
+    "contextSha256": "dba8036818246baaefc136fa6740729e9be068c79dd0c2ae584f895192406091",
+    "helperSha256": "ed4a3aa22c89cb32ef0e40969641ff606de77865bc5b8f5e9ef73a54fc03e75b",
+    "inputFingerprint": "4fbf23514516632dcb651b5c05bf04e9992da52491607b6cf58de1f7348ff9ab",
+    "baseDigest": "sha256:affcab5356e1270ac35d2361ee83135af2f03e8d580eca78a6d5d6fdbf048db0",
+    "jenaVersion": "6.2.0",
+    "jenaArchiveBytes": 51398669,
+    "jenaArchiveSha512Verified": true
+  }
+}

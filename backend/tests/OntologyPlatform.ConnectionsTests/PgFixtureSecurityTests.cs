@@ -180,7 +180,7 @@ public sealed class PgFixtureSecurityTests
     [TestCategory("RealPgWrongSanFixture")]
     public async Task WrongServerNameIsRejectedBeforeAuthentication()
     {
-        if (Environment.GetEnvironmentVariable("G4_PG_WRONG_SAN_FIXTURE") is not ("G4-M1-RECOVERY-001" or "G4-M1-FINAL-GATES-001"))
+        if (Environment.GetEnvironmentVariable("G4_PG_WRONG_SAN_FIXTURE") is not ("G4-M1-RECOVERY-001" or "G4-M1-FINAL-GATES-001" or "G4-M1-MAIN-INTEGRATION-001"))
             Assert.Inconclusive("NOT_RUN: requires explicit current-task wrong-SAN server configuration.");
         // 使用正确CA，唯一预期差异是服务器已换成本任务错误SAN叶证书。
         var input = await ReadInputAsync();
@@ -206,7 +206,7 @@ public sealed class PgFixtureSecurityTests
         using var document = JsonDocument.Parse(await File.ReadAllTextAsync(path));
         // 预期挂载位置来自冻结夹具，而非任意宿主私有文件路径。
         var root = document.RootElement;
-        Assert.IsTrue(root.GetProperty("fixtureIdentity").GetString() is "G4-M1-RECOVERY-001" or "G4-M1-FINAL-GATES-001");
+        Assert.IsTrue(root.GetProperty("fixtureIdentity").GetString() is "G4-M1-RECOVERY-001" or "G4-M1-FINAL-GATES-001" or "G4-M1-MAIN-INTEGRATION-001");
         Assert.AreEqual("/run/secrets/reader-password", root.GetProperty("secretFile").GetString());
         Assert.AreEqual("/run/secrets/ca.crt", root.GetProperty("rootCertificatePath").GetString());
         Assert.AreEqual("/run/secrets/wrong-ca.crt", root.GetProperty("wrongRootCertificatePath").GetString());

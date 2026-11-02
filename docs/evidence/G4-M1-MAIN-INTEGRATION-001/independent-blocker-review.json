@@ -1,0 +1,30 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "reviewers": [
+    "/root/scope_review",
+    "/root/gate_inventory"
+  ],
+  "status": "BLOCKED_WITH_WITNESS",
+  "reviewMethod": "Independent read-only file/Git/approval inspection; Master transcribed agent responses",
+  "witnessSha256": "d5f79281d02ffdb3c02598bef9aa66b2889681fcce994d96e3355390b2617020",
+  "actualExitCode": 2,
+  "errors": {
+    "WHITESPACE": 274,
+    "CHARSET": 1
+  },
+  "errorFiles": 15,
+  "warnings": {
+    "IDE0161": 2
+  },
+  "wholeErrorFilesByteIdenticalToSource": 14,
+  "otherFile": "PgFixtureSecurityTests.cs has only two approved identity additions; all failing lines unchanged",
+  "scopeConclusion": "P1 integration gate blocker; no product runtime defect established; exact extra formatting/encoding authorization required",
+  "partialTools": "DRAFT_ONLY_NOT_RUNTIME_APPROVED",
+  "knownIncomplete": [
+    "fault.mjs fixed historical runId/private date remains",
+    "g3-compatibility.mjs hardcoded container differs from Compose project",
+    "run.py/consumer_check.py/runtime.py and other planned consumers absent"
+  ],
+  "reviewerMutations": 0,
+  "reviewerProductRuns": 0
+}

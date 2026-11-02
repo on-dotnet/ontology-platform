@@ -1,0 +1,58 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "status": "VERIFIED",
+  "refs": {
+    "refs/heads/codex/g4-m1-verify-recovery-001": "99753df6f03b184e40b431a5b5aba89d8fa67087",
+    "refs/heads/main": "d1a61daffe844475b07705797e3ad325cc3f2945"
+  },
+  "commands": [
+    {
+      "command": [
+        "git",
+        "ls-remote",
+        "origin",
+        "refs/heads/main",
+        "refs/heads/codex/g4-m1-verify-recovery-001",
+        "refs/heads/codex/g4-m1-main-integration-001"
+      ],
+      "startedAtUtc": "2026-11-02T15:21:55.188394+00:00",
+      "exitCode": 0,
+      "stdout": "99753df6f03b184e40b431a5b5aba89d8fa67087\trefs/heads/codex/g4-m1-verify-recovery-001\nd1a61daffe844475b07705797e3ad325cc3f2945\trefs/heads/main\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "config",
+        "--get-urlmatch",
+        "http.sslVerify",
+        "https://github.com/on-dotnet/ontology-platform.git"
+      ],
+      "startedAtUtc": "2026-11-02T15:21:56.699319+00:00",
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "curl",
+        "--head",
+        "--silent",
+        "--show-error",
+        "--max-time",
+        "20",
+        "--output",
+        "/dev/null",
+        "--write-out",
+        "http_code=%{http_code} ssl_verify_result=%{ssl_verify_result}\n",
+        "https://github.com/on-dotnet/ontology-platform"
+      ],
+      "startedAtUtc": "2026-11-02T15:21:56.713369+00:00",
+      "exitCode": 0,
+      "stdout": "http_code=200 ssl_verify_result=0\n",
+      "stderr": ""
+    }
+  ],
+  "certificateVerificationDisabled": false,
+  "originChanged": false
+}

@@ -1,0 +1,25 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "pid": 67737,
+  "command": [
+    "python3",
+    "-B",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/experiments/g4-m1-main-integration/host_continuity.py",
+    "monitor",
+    "--output",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/host-monitor.jsonl",
+    "--seconds",
+    "14400",
+    "--interval",
+    "10"
+  ],
+  "startedAtUtc": "2026-11-02T15:42:13.591701+00:00",
+  "sourceSha256": "abd4385e1b05a86f5a12582a7e95a1fcc4a29c333eb23d2d952229744ed68984",
+  "reviewer": "/root/scope_review",
+  "reviewStatus": "PASS_FOR_SCOPED_HOST_MONITOR_START",
+  "preflightNegativeTests": {
+    "tests": 4,
+    "exitCode": 0
+  },
+  "secondsIsObservationLoopBudget": true
+}

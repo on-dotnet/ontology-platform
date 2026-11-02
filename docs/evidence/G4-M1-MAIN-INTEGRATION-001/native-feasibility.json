@@ -1,0 +1,42 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "records": [
+    {
+      "label": "offline-restore",
+      "command": [
+        "/usr/local/share/dotnet/dotnet",
+        "restore",
+        "backend/OntologyPlatform.slnx",
+        "--locked-mode",
+        "--source",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/nuget",
+        "-p:NuGetAudit=false",
+        "--disable-parallel"
+      ],
+      "exitCode": 0,
+      "startedAtUtc": "2026-11-02T15:42:50.788663+00:00",
+      "elapsedSeconds": 1.626,
+      "logPath": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/offline-restore.log",
+      "logSha256": "d615c31da5ca581e70cb73a4615597d3b183295202a7f1e67678185cb3ff6a35",
+      "scope": "Preliminary feasibility only; not I01 stable-commit acceptance"
+    },
+    {
+      "label": "preliminary-build",
+      "command": [
+        "/usr/local/share/dotnet/dotnet",
+        "build",
+        "backend/OntologyPlatform.slnx",
+        "--no-restore"
+      ],
+      "exitCode": 0,
+      "startedAtUtc": "2026-11-02T15:42:52.414454+00:00",
+      "elapsedSeconds": 4.66,
+      "logPath": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/preliminary-build.log",
+      "logSha256": "cc4e337cd9390f0297eb379d874c62e4bfc4d5cfcbf22da93cd48ebbd5921c4e",
+      "scope": "Preliminary feasibility only; not I01 stable-commit acceptance"
+    }
+  ],
+  "sharedCacheWrites": 0,
+  "downloads": 0,
+  "privateCache": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/nuget"
+}

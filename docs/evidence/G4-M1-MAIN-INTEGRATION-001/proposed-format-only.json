@@ -1,0 +1,179 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "status": "PROPOSAL_ONLY_NOT_APPLIED",
+  "command": [
+    "/usr/local/share/dotnet/dotnet",
+    "format",
+    "whitespace",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/format-proposal",
+    "--folder"
+  ],
+  "exitCode": 0,
+  "initialAttempt": {
+    "exitCode": 1,
+    "reason": "CLI rejects --folder with --no-restore before execution; no csproj exists in isolated folder",
+    "logSha256": "57f8d6bf1e16d4bfd705b83e6a8b740c10653494589945bc790c6806e0360144"
+  },
+  "files": [
+    {
+      "path": "backend/src/Contracts/OntologyPlatform.Contracts/ImpactContractRules.cs",
+      "beforeSha256": "13510e20c3a5af7ea9835f4e72bf9b0a3ceaca68eabc0c2bcf0738d02fa9066a",
+      "proposedSha256": "2b050daf4e5e891c27fad6f15b536381bf8bdad33537917abcf4ee90e16900c6",
+      "changed": true,
+      "nonWhitespaceBytesEqual": true,
+      "liveSourceUnchanged": true,
+      "bomBefore": false,
+      "bomAfter": false
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/G4/G4Endpoints.cs",
+      "beforeSha256": "71acb4fd4863b7c5d7c746806e7b2d884d43ad10bbad4023f847d46715991633",
+      "proposedSha256": "0c1d2ed4d3f493401c0550191c480a4481661eff9231181a008dbbbda6c74d2c",
+      "changed": true,
+      "nonWhitespaceBytesEqual": true,
+      "liveSourceUnchanged": true,
+      "bomBefore": false,
+      "bomAfter": false
+    },
+    {
+      "path": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Adapters/PgSourceAdapter.cs",
+      "beforeSha256": "38a6ee743aae802be97d4a71347be1d621426d171a556091adf1dceeadd78e50",
+      "proposedSha256": "79ed3e5a753140aea25534d5b1b3d3bf95c3b63375e7460798d4d6b486445d02",
+      "changed": true,
+      "nonWhitespaceBytesEqual": true,
+      "liveSourceUnchanged": true,
+      "bomBefore": false,
+      "bomAfter": false
+    },
+    {
+      "path": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Application/ConnectionApplicationService.Catalog.cs",
+      "beforeSha256": "aff36de322ab901622c8aeff0d5c2fe645170345b385863ec01fd6b3ab229ab3",
+      "proposedSha256": "e3852a880b784740af9e02f8c356735ecfca92bbe6788d477715cf135bc08b86",
+      "changed": true,
+      "nonWhitespaceBytesEqual": true,
+      "liveSourceUnchanged": true,
+      "bomBefore": false,
+      "bomAfter": false
+    },
+    {
+      "path": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Application/ConnectionApplicationService.Commands.cs",
+      "beforeSha256": "18e0ec18afb4b0eebfda8b32dc879036439546cf3a7afe0a3ca08a4c68bbcc93",
+      "proposedSha256": "f1287a0c92f32b755be15be4d49f8b456888715a0fc3b9f824df2d88e7c9bb4d",
+      "changed": true,
+      "nonWhitespaceBytesEqual": true,
+      "liveSourceUnchanged": true,
+      "bomBefore": false,
+      "bomAfter": false
+    },
+    {
+      "path": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Application/ConnectionApplicationService.cs",
+      "beforeSha256": "d8475f82eeada14cefb01085f88937f867c02421d6c7d3b246c605646f4975ce",
+      "proposedSha256": "83418c6605d0dcb8f73a49a794733d0c6c85a1fe18fa1cd39302ab93496f654b",
+      "changed": true,
+      "nonWhitespaceBytesEqual": true,
+      "liveSourceUnchanged": true,
+      "bomBefore": false,
+      "bomAfter": false
+    },
+    {
+      "path": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Application/ConnectionApplicationService.Enable.cs",
+      "beforeSha256": "d8bbfe814437495312a6cd46445d8545fd255de64f98b9144ee5fec98fedf3dc",
+      "proposedSha256": "649ab60c733b1c4e17aa72b8bbdd7d713f25bd94ebff02614c43251699829d0e",
+      "changed": true,
+      "nonWhitespaceBytesEqual": true,
+      "liveSourceUnchanged": true,
+      "bomBefore": false,
+      "bomAfter": false
+    },
+    {
+      "path": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Application/ConnectionApplicationService.Probes.cs",
+      "beforeSha256": "0d0ae9ca6f1c15d88e301de30d76cc79256ac5b56611755214bf11f716efee8b",
+      "proposedSha256": "6af149a88ce5eb751271724d226dd2eda309e91f8a41ea4ad126f1f56e6f83c3",
+      "changed": true,
+      "nonWhitespaceBytesEqual": true,
+      "liveSourceUnchanged": true,
+      "bomBefore": false,
+      "bomAfter": false
+    },
+    {
+      "path": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Application/ConnectionApplicationService.Worker.cs",
+      "beforeSha256": "304f83ec7ccf4f14c77244cfafdc6695fab5018140114075543c858838038f48",
+      "proposedSha256": "7db4f427f0dc6dd9a3850fbcfbcbfe77a40803cf092ce2b2701ce33fa744791b",
+      "changed": true,
+      "nonWhitespaceBytesEqual": true,
+      "liveSourceUnchanged": true,
+      "bomBefore": false,
+      "bomAfter": false
+    },
+    {
+      "path": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/ConnectionSecretCipher.cs",
+      "beforeSha256": "0bd8e363d5053c14dfd263f25b3c291f473a67173d2473a9dc0e48e52d61fd40",
+      "proposedSha256": "1e0c55e6b0deae30ec76cecd2083e37ee6008b9ed786d94a33226651773dae55",
+      "changed": true,
+      "nonWhitespaceBytesEqual": true,
+      "liveSourceUnchanged": true,
+      "bomBefore": false,
+      "bomAfter": false
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.AgentTests/AgentFixture.cs",
+      "beforeSha256": "71814fea62582a9ea2369b91c0d57c7630d0e23531f1eeee35e93e62c76dc7fd",
+      "proposedSha256": "64f2c25d018015a621e02e26622b46677d327ab865072d1ed407032a2d1e1968",
+      "changed": true,
+      "nonWhitespaceBytesEqual": true,
+      "liveSourceUnchanged": true,
+      "bomBefore": false,
+      "bomAfter": false
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.ConnectionsTests/PgFixtureSecurityTests.cs",
+      "beforeSha256": "4c58b3e43ef3d69d33952e4709ff9162c2c4643a9dc2db59ef8e620afeecb5d5",
+      "proposedSha256": "79421cd2173d6ed6a0bbddce42a7bba0467cbb369146103d5a76bb77f4cee78b",
+      "changed": true,
+      "nonWhitespaceBytesEqual": true,
+      "liveSourceUnchanged": true,
+      "bomBefore": false,
+      "bomAfter": false
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.G2ContractTests/G3M4ImpactContractTests.cs",
+      "beforeSha256": "150a8c1e1b38e3f98a86d101ae37cba0aab398b12460ebcb32833f962e06ec38",
+      "proposedSha256": "ce99e1fddfe7bcde205497cee22bdc70dfb482dd02624e5823e9f4dee59a1991",
+      "changed": true,
+      "nonWhitespaceBytesEqual": true,
+      "liveSourceUnchanged": true,
+      "bomBefore": false,
+      "bomAfter": false
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.QueryTests/QueryFixture.cs",
+      "beforeSha256": "953415ea695563f00d5f8e452e9b824ae37e3fa82e8921d09d0233ecacf5c478",
+      "proposedSha256": "62d76dd778fcbbce2f25bfbf113cfd70384e687f56b380276ce44ed23a18d2a7",
+      "changed": true,
+      "nonWhitespaceBytesEqual": true,
+      "liveSourceUnchanged": true,
+      "bomBefore": false,
+      "bomAfter": false
+    },
+    {
+      "path": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Migrations/20261101115947_InitialConnections.cs",
+      "beforeSha256": "fe112c28be328f9c14eee535b55be3e58e6182cc0657b218e0d98836e6e7273d",
+      "proposedSha256": "df2f6304359d23bcd442e6fb30f6283e17e86990ea0f83316948658f33f3935c",
+      "changed": true,
+      "nonWhitespaceBytesEqual": true,
+      "liveSourceUnchanged": true,
+      "bomBefore": true,
+      "bomAfter": false
+    }
+  ],
+  "scope": "15 isolated review copies only; no live product edits; whitespace byte equality is not semantic/token proof",
+  "requiredAuthorization": "Extend owned_paths to these exact 15 files for formatter whitespace and removal of migration UTF-8 BOM only; no behavior/SQL/migration ID/config or lock changes",
+  "patchSha256": "a99ccaa90787d110674d1b7d5a0a28a7d11ee4dfccd95347bb0ba686feeac668",
+  "patchContextLines": 0,
+  "applicationNote": "Proposal only; zero-context patch requires git apply --unidiff-zero if later explicitly approved; do not apply now.",
+  "earlierContextPatch": {
+    "sha256": "94bd97d73417dcebed7b5a4c213f480594cadf7549c4807ec41ea1577f7e4706",
+    "retained": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/proposed-format-only-with-context.patch",
+    "stagingDiffCheck": "exit 2: blank context markers considered trailing whitespace; reserialized with zero context, proposal bytes unchanged"
+  }
+}

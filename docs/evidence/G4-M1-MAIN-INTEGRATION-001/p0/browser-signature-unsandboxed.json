@@ -1,0 +1,30 @@
+{
+  "observedAtUtc": "2026-11-02T15:24:32.083843+00:00",
+  "commands": [
+    {
+      "command": [
+        "codesign",
+        "--verify",
+        "--deep",
+        "--strict",
+        "/Applications/Microsoft Edge.app"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "codesign",
+        "--display",
+        "--verbose=4",
+        "/Applications/Microsoft Edge.app"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "Executable=/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge\nIdentifier=com.microsoft.edgemac\nFormat=app bundle with Mach-O thin (arm64)\nCodeDirectory v=20500 size=769 flags=0x12a00(kill,restrict,library-validation,runtime) hashes=13+7 location=embedded\nVersionPlatform=1\nVersionMin=851968\nVersionSDK=1705216\nHash type=sha256 size=32\nCandidateCDHash sha256=adaec233eb93eb6a44c9c940f32e7162191c74bf\nCandidateCDHashFull sha256=adaec233eb93eb6a44c9c940f32e7162191c74bfab704dbcc117b06a8995189d\nHash choices=sha256\nCMSDigest=adaec233eb93eb6a44c9c940f32e7162191c74bfab704dbcc117b06a8995189d\nCMSDigestType=2\nExecutable Segment base=0\nExecutable Segment limit=16384\nExecutable Segment flags=0x1\nPage size=4096\nCDHash=adaec233eb93eb6a44c9c940f32e7162191c74bf\nSignature size=9012\nAuthority=Developer ID Application: Microsoft Corporation (UBF8T346G9)\nAuthority=Developer ID Certification Authority\nAuthority=Apple Root CA\nTimestamp=Oct 30, 2026 at 12:12:14\nInfo.plist entries=45\nTeamIdentifier=UBF8T346G9\nRuntime Version=26.5.0\nSealed Resources version=2 rules=13 files=94\nInternal requirements count=1 size=184\nTotal signatures=1\nChosen signature=1\n"
+    }
+  ],
+  "sandbox": "require_escalated read-only diagnostic",
+  "browserStarted": false
+}
