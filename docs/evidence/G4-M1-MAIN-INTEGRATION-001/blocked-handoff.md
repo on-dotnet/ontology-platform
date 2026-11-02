@@ -32,7 +32,7 @@ backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Migrations/
 
 | Gate | 状态与范围 |
 |---|---|
-| I01 | BLOCKED：初步格式见证失败；完整稳定SelfTest/native/Web门禁未完成 |
+| I01 | BLOCKED：初步格式见证失败；稳定T的27套工程SelfTest与4项宿主测试通过，完整native/Web门禁未完成 |
 | I02–I07 | NOT_RUN：未启动任何任务容器、源库或浏览器 |
 | I08 | PARTIAL：阻断见证/Review/唯一V3/资源收尾；不是全门禁闭合 |
 
@@ -43,3 +43,5 @@ CI/Windows/Intel：NOT_RUN；当前在线签名、CVE、完整许可证：NOT_VE
 资源收尾记录在本任务resource-closeout证据；工作树、任务分支、原始日志、审查ZIP与审批恢复材料保留，解除条件为后续明确修复/集成和生命周期批准。旧树、旧ZIP、主树六个DS_Store及共享缓存保持原样。
 
 后续顺序：获批精确格式修复 → 先短复验 → 完成专用消费者/正反Review → 冻结新T → I01–I08完整验收 → 独立交付 → 另行main审批。
+
+稳定部分验证提交：`e84b32e8b5e9c3eaefd32abe7b5f5e4c5e5ddaae`。已普通推送任务分支。实际回收48个精确可再生目录，逻辑字节2,697,464,462；不宣称物理释放同等空间。4391跟踪文件散列保持，1283链接未跟随，主树六个DS_Store不变；任务容器/卷/网络创建0，宿主监测进程退出0并确认PID缺席。见 [实际资源回执](resource-closeout.json) 与 [本地验证](validation.json)。

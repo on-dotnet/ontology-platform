@@ -1,0 +1,138 @@
+{
+  "evidenceSchemaVersion": 2,
+  "checks": [
+    {
+      "name": "p0-current-remote",
+      "command": "git ls-remote origin refs/heads/main refs/heads/codex/g4-m1-verify-recovery-001",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Observed exact approved main and candidate source refs; default trusted TLS; P0 receipt preserves Git/VR11/tool/image evidence. Not product acceptance."
+    },
+    {
+      "name": "p0-limited-admission",
+      "command": null,
+      "status": "PARTIAL",
+      "exitCode": null,
+      "output": "Six image content/provenance chains and local tools verified for internal synthetic non-distribution use; full license/CVE/signature/current-online checks NOT_VERIFIED. See p0 receipt."
+    },
+    {
+      "name": "stable-selftest",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1 -SelfTest",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "27 existing engineering suites completed on T; raw output SHA256 6b4ad26ba1649c8d42759a371c5d5d4c154b2550b49a49b2dd28cef0420ff8f3; not native/Web/DB/browser acceptance."
+    },
+    {
+      "name": "stable-host-tests",
+      "command": "python3 -B experiments/g4-m1-main-integration/tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "4 host boundary tests completed on T; raw output SHA256 3015a479c39e91b187a0994c15fdba8d4235385905f97196fd1421bb6d97012e; not native/Web/DB/browser acceptance."
+    },
+    {
+      "name": "I01-preliminary-format",
+      "command": "/usr/local/share/dotnet/dotnet format backend/OntologyPlatform.slnx --verify-no-changes --no-restore",
+      "status": "FAIL",
+      "exitCode": 2,
+      "output": "275 inherited errors in 15 files: 274 WHITESPACE and 1 CHARSET; outside allowed edit scope; raw output SHA256 d5f79281d02ffdb3c02598bef9aa66b2889681fcce994d96e3355390b2617020. Preliminary dirty B feasibility, not full stable acceptance."
+    },
+    {
+      "name": "I01-short-reproduction",
+      "command": "/usr/local/share/dotnet/dotnet format whitespace backend/src/Hosts/OntologyPlatform.Api/OntologyPlatform.Api.csproj --verify-no-changes --no-restore --include backend/src/Hosts/OntologyPlatform.Api/G4/G4Endpoints.cs",
+      "status": "FAIL",
+      "exitCode": 2,
+      "output": "Unmodified API file reproduces 4 whitespace errors in 1.79 seconds. No full unchanged failing stack rerun."
+    },
+    {
+      "name": "I01-native-web-complete",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Complete stable native build/test/format and Web suite stopped at inherited format blocker; preliminary earlier restore/build are feasibility only."
+    },
+    {
+      "name": "I02",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Dependent product gate stopped; current adapters remain incomplete DRAFT. No task containers, DB/source or browser runtime started."
+    },
+    {
+      "name": "I03",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Dependent product gate stopped; current adapters remain incomplete DRAFT. No task containers, DB/source or browser runtime started."
+    },
+    {
+      "name": "I04",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Dependent product gate stopped; current adapters remain incomplete DRAFT. No task containers, DB/source or browser runtime started."
+    },
+    {
+      "name": "I05",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Dependent product gate stopped; current adapters remain incomplete DRAFT. No task containers, DB/source or browser runtime started."
+    },
+    {
+      "name": "I06",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Dependent product gate stopped; current adapters remain incomplete DRAFT. No task containers, DB/source or browser runtime started."
+    },
+    {
+      "name": "I07",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Dependent product gate stopped; current adapters remain incomplete DRAFT. No task containers, DB/source or browser runtime started."
+    },
+    {
+      "name": "owned-resource-closeout",
+      "command": "python3 -B /Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/cleanup-owned-copies.py --apply --expected-dry-run-sha 909f35f78329f2a316e20c11f223da25b768e94912d29511d2b6cf956a1c9cd6",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "48 exact task-owned cache/build directories removed; 2697464462 logical bytes (not physical APFS space claim), 4391 tracked files unchanged; each target ENOENT; 1283 links unlinked without following; source apps/web preserved."
+    },
+    {
+      "name": "I08-complete",
+      "command": null,
+      "status": "BLOCKED",
+      "exitCode": null,
+      "output": "BLOCKED candidate handoff only. I01 unresolved and I02-I07 NOT_RUN. Unique LOCAL BLOCKED V3 and independent reopen recorded separately; no main approval readiness."
+    }
+  ],
+  "ci": {
+    "status": "NOT_RUN",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  },
+  "metadata": {
+    "taskId": "G4-M1-MAIN-INTEGRATION-001",
+    "actualAgentActiveTime": "UNKNOWN",
+    "status": "BLOCKED_WITH_WITNESS",
+    "approvedMain": "d1a61daffe844475b07705797e3ad325cc3f2945",
+    "candidateSourceHead": "99753df6f03b184e40b431a5b5aba89d8fa67087",
+    "sourceReview": "PASS_FOR_BLOCKED_DRAFT_SAVE only",
+    "windows": "NOT_RUN",
+    "intel": "NOT_RUN",
+    "m2": "NOT_AUTHORIZED_NOT_EXECUTED",
+    "phaseC": "NOT_AUTHORIZED_NOT_EXECUTED",
+    "actualExecutedEvidenceDriverHashes": {
+      "cleanup-executor.txt": "3962b8a9777d8a69702f83ceab49d7b1378c86236c94818cf731468b419d51b4",
+      "reviewer-lexical-replay.txt": "4294feda606003ed00af511d4d0df9d8a0bfd59080abe41f5f27e7bd4f2c932a"
+    },
+    "timelineCoverage": "Two formal stable engineering/host checks only; preceding receipts are not falsely reconstructed as full schema2 timeline",
+    "historicalProduct49": "INHERITED_NOT_RERUN",
+    "repairProposal": "15-file whitespace/BOM-only preview NOT_APPLIED; separate exact authorization required"
+  },
+  "validationSource": "LOCAL",
+  "testedCommit": "e84b32e8b5e9c3eaefd32abe7b5f5e4c5e5ddaae"
+}

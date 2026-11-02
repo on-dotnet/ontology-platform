@@ -1,0 +1,56 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "reviewer": "/root/scope_review",
+  "review": "PASS_FOR_BLOCKED_DRAFT_SAVE",
+  "testedSourceCommit": "e84b32e8b5e9c3eaefd32abe7b5f5e4c5e5ddaae",
+  "worktreeCleanAtReview": true,
+  "diffCheckExit": 0,
+  "phaseB": "BLOCKED_WITH_WITNESS",
+  "phaseC": "NOT_AUTHORIZED",
+  "proposal": {
+    "status": "NOT_APPLIED",
+    "files": 15,
+    "beforeAndProposedHashesVerified": true,
+    "patchReconstructedByteExactly": true,
+    "patchSha256": "a99ccaa90787d110674d1b7d5a0a28a7d11ee4dfccd95347bb0ba686feeac668",
+    "roslynComparisonExit": 0,
+    "tokenKindsTextValuesEqual": true,
+    "nonWhitespaceTriviaEqual": true,
+    "sqlAndMigrationIdentifiersUnchanged": true,
+    "replayScriptSha256": "4294feda606003ed00af511d4d0df9d8a0bfd59080abe41f5f27e7bd4f2c932a",
+    "executedByReviewer": true,
+    "command": [
+      "/Users/chasen/.dotnet/tools/pwsh",
+      "-NoProfile",
+      "-Command",
+      "<exact reviewer-lexical-replay.txt UTF-8 contents>"
+    ],
+    "assembly": "Microsoft.CodeAnalysis.CSharp, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35",
+    "assemblyPath": "/Users/chasen/.dotnet/tools/.store/powershell/7.6.8/powershell/7.6.8/tools/net10.0/any/unix/Microsoft.CodeAnalysis.CSharp.dll",
+    "authorizationToApply": false
+  },
+  "evidence": {
+    "p0ReceiptReferencesVerified": 15,
+    "archivedOriginalDocumentsVerified": 3,
+    "p0ReceiptSha256": "fee528805ed9b9208825f3788b9a636c1ec6c8ee44eedeb2bd3d9aa9c8251cee",
+    "rawLogCopiesVerified": 6
+  },
+  "cleanup": {
+    "review": "PASS_FOR_EXACT_48_NOFOLLOW_TARGETS_AFTER_TESTS",
+    "manifestSha256": "954a89ee6811a87e43017d6f15a55d04d97bd1ca00bfb7c2153d6c8a4e0f1a9e",
+    "topLevelTargets": 6,
+    "backendBinObjTargets": 42,
+    "trackedSourceIntersection": 0,
+    "hardlinks": 0,
+    "symlinkTargetsOutsideWorktree": 0,
+    "requiredProtection": "Only unlink symlink itself; preserve live apps/web"
+  },
+  "limitations": [
+    "I01 format blocker remains; incomplete adapters not approved for runtime",
+    "Formal SelfTest, actual cleanup and final ZIP reopen await later receipts",
+    "Reviewer ps command was denied by sandbox exit127; no independent PID absence claim",
+    "Early explicit SDK Roslyn load failed; successful lexical compare used PowerShell existing assembly",
+    "Lexical equivalence does not establish runtime correctness"
+  ],
+  "transcribedByMasterAtUtc": "2026-11-02T16:14:30.523125+00:00"
+}

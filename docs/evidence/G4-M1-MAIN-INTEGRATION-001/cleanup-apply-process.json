@@ -1,0 +1,17 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "command": [
+    "python3",
+    "-B",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/cleanup-owned-copies.py",
+    "--apply",
+    "--expected-dry-run-sha",
+    "909f35f78329f2a316e20c11f223da25b768e94912d29511d2b6cf956a1c9cd6"
+  ],
+  "executorSha256": "3962b8a9777d8a69702f83ceab49d7b1378c86236c94818cf731468b419d51b4",
+  "dryRunSha256": "909f35f78329f2a316e20c11f223da25b768e94912d29511d2b6cf956a1c9cd6",
+  "exitCode": 0,
+  "stdout": "{\"status\": \"PASS_EXACT_REGENERABLE_COPIES_REMOVED\", \"targets\": 48, \"sourceProtected\": 4391}\n",
+  "stderr": "",
+  "finishedAtUtc": "2026-11-02T16:18:28.925746+00:00"
+}

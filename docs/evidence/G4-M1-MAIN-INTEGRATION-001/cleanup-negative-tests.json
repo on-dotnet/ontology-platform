@@ -1,0 +1,33 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "records": [
+    {
+      "name": "optimized-python",
+      "command": [
+        "python3",
+        "-O",
+        "-B",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/cleanup-owned-copies.py"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/cleanup-owned-copies.py\", line 120, in <module>\n    main()\n    ~~~~^^\n  File \"/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/cleanup-owned-copies.py\", line 29, in main\n    raise RuntimeError(\"Optimized Python disables required assertions\")\nRuntimeError: Optimized Python disables required assertions\n",
+      "refusedBeforeDeletion": true
+    },
+    {
+      "name": "wrong-dry-run-sha",
+      "command": [
+        "python3",
+        "-B",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/cleanup-owned-copies.py",
+        "--apply",
+        "--expected-dry-run-sha",
+        "0000000000000000000000000000000000000000000000000000000000000000"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/cleanup-owned-copies.py\", line 120, in <module>\n    main()\n    ~~~~^^\n  File \"/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/cleanup-owned-copies.py\", line 75, in main\n    assert sha(dry_bytes) == args.expected_dry_run_sha, 'DryRun receipt drift'\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: DryRun receipt drift\n",
+      "refusedBeforeDeletion": true
+    }
+  ]
+}

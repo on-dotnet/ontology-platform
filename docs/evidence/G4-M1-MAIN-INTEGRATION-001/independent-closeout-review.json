@@ -1,0 +1,34 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "reviewer": "/root/scope_review",
+  "status": "PASS_FOR_BLOCKED_PARTIAL_CLOSEOUT",
+  "scope": "Independent read-only post-execution verification; permits evidence H and BLOCKED V3 only",
+  "stableTests": {
+    "rawHashesMatch": true,
+    "selfTestExit": 0,
+    "reviewPackageTests": 103,
+    "reviewPackageFailures": 0,
+    "hostBoundaryTests": 4,
+    "hostExit": 0
+  },
+  "cleanup": {
+    "dryAndApplyBindingsMatch": true,
+    "exactTargetsIndependentlyLstat": 48,
+    "allTargets": "ENOENT",
+    "regularFiles": 36495,
+    "logicalBytes": 2697464462,
+    "symlinks": 1283,
+    "negativeCasesRefusedBeforeDelete": 2,
+    "appsWebSourcePreserved": true
+  },
+  "source": {
+    "changesSinceT": "Task evidence only",
+    "mainAndOriginMain": "d1a61daffe844475b07705797e3ad325cc3f2945",
+    "sixDsStorePreserved": true
+  },
+  "limitations": [
+    "PID/Docker accepted from archived raw command receipts; not independently rerun",
+    "I01 remains failed, I02-I07 NOT_RUN, I08 blocked; not full phase B approval",
+    "Final ZIP independent reopen pending"
+  ]
+}

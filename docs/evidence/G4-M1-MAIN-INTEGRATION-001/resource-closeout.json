@@ -1,0 +1,94 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "status": "PASS_EXACT_RESOURCE_CLOSEOUT",
+  "deletedDirectories": 48,
+  "deletedRegularFiles": 36495,
+  "logicalBytesRemoved": 2697464462,
+  "physicalDiskBytesReclaimed": "NOT_MEASURED_APFS_CLONED_DATA",
+  "linksUnlinkedWithoutFollowing": 1283,
+  "allTargetLstat": "ENOENT",
+  "trackedSourceFilesPreserved": 4391,
+  "mainAndOriginMain": [
+    "d1a61daffe844475b07705797e3ad325cc3f2945",
+    "d1a61daffe844475b07705797e3ad325cc3f2945"
+  ],
+  "mainTreeUntrackedPreserved": [
+    "?? .DS_Store",
+    "?? backend/.DS_Store",
+    "?? backend/src/.DS_Store",
+    "?? docs/.DS_Store",
+    "?? docs/evidence/.DS_Store",
+    "?? infra/.DS_Store"
+  ],
+  "docker": [
+    {
+      "kind": "containers",
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "ps",
+        "-aq"
+      ],
+      "exitCode": 0,
+      "stdout": ""
+    },
+    {
+      "kind": "task-volumes",
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "ls",
+        "-q",
+        "--filter",
+        "label=ontology.task-id=G4-M1-MAIN-INTEGRATION-001"
+      ],
+      "exitCode": 0,
+      "stdout": ""
+    },
+    {
+      "kind": "task-networks",
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "network",
+        "ls",
+        "-q",
+        "--filter",
+        "label=ontology.task-id=G4-M1-MAIN-INTEGRATION-001"
+      ],
+      "exitCode": 0,
+      "stdout": ""
+    }
+  ],
+  "hostMonitor": {
+    "pid": 67737,
+    "processExitCode": 0,
+    "absenceCommand": [
+      "ps",
+      "-p",
+      "67737",
+      "-o",
+      "pid=,command="
+    ],
+    "absenceExitCode": 1,
+    "stdout": ""
+  },
+  "keep": {
+    "worktree": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform",
+    "branch": "codex/g4-m1-main-integration-001",
+    "artifacts": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001",
+    "reviewDirectory": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/reviews",
+    "releaseCondition": "Explicit later repair/integration and lifecycle approval"
+  },
+  "restore": "Reverify P0 current refs/tools/cache identities; private APFS copies as recorded, offline locked restore; complete task adapters and new T full acceptance. Never execute current incomplete runtime consumers.",
+  "review": {
+    "reviewer": "/root/scope_review",
+    "sourceStatus": "PASS_FOR_BOUNDED_CLEANUP_EXECUTION",
+    "executorSha256": "3962b8a9777d8a69702f83ceab49d7b1378c86236c94818cf731468b419d51b4"
+  },
+  "observedAtUtc": "2026-11-02T16:20:24.716477+00:00"
+}

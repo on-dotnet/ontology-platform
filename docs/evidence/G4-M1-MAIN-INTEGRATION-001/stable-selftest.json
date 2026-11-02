@@ -1,0 +1,18 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "testedCommit": "e84b32e8b5e9c3eaefd32abe7b5f5e4c5e5ddaae",
+  "name": "stable-selftest",
+  "command": [
+    "pwsh",
+    "-NoProfile",
+    "-File",
+    "scripts/verify.ps1",
+    "-SelfTest"
+  ],
+  "exitCode": 0,
+  "startedAtUtc": "2026-11-02T16:08:52.487109+00:00",
+  "endedAtUtc": "2026-11-02T16:15:41.554426+00:00",
+  "elapsedSeconds": 409.05489800000214,
+  "logSha256": "6b4ad26ba1649c8d42759a371c5d5d4c154b2550b49a49b2dd28cef0420ff8f3",
+  "scope": "Engineering/host boundary only; I01 remains blocked by inherited format failure"
+}
