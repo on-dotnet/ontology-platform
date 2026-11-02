@@ -1,0 +1,43 @@
+{
+  "utc": "2026-11-02T13:15:28.994599+00:00",
+  "status": "BLOCKED_WITH_WITNESS",
+  "mainIntegration": "MAIN_INTEGRATION_BLOCKED",
+  "immutableInput": {
+    "commit": "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea",
+    "path": "docs/evidence/G4-M1-FINAL-GATES-001/host-monitor.json",
+    "blob": "b73b6b1d33e58dddeb59644a550791d71ddae20f",
+    "sha256": "6e425cb7ad191dd6a6fa8a2261a55d8599c2686ff4cb11d5c6d8bdd93a712122",
+    "bytes": 44070,
+    "jsonParse": {
+      "message": "Extra data",
+      "line": 2,
+      "column": 1
+    },
+    "jsonLineCount": 76
+  },
+  "isolatedParser": {
+    "command": [
+      "python3",
+      "scripts/validate-structured-files.py",
+      "/Users/chasen/.codex/worktrees/g4-m1-postreview-001/ontology-platform"
+    ],
+    "exitCode": 0,
+    "output": "PASS: YAML/TOML syntax, 21 files; runtime compatibility not implied.\n",
+    "stderr": "",
+    "dependencySource": "/Users/chasen/Developer/repos/ontology-platform/.tools/pythonlibs",
+    "installed": false
+  },
+  "fullStaticWithExistingParser": {
+    "command": [
+      "pwsh",
+      "-NoProfile",
+      "-Command",
+      ". '/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/scripts/verify.ps1' -Library; $r = @(Test-Repository -RepositoryRoot '/Users/chasen/.codex/worktrees/g4-m1-postreview-001/ontology-platform'); $r | ConvertTo-Json -Depth 5; if (@($r | Where-Object Status -eq 'FAIL').Count -gt 0) { exit 1 }"
+    ],
+    "exitCode": 1,
+    "output": "{\n  \"Check\": \"json\",\n  \"Status\": \"FAIL\",\n  \"Message\": \"docs/evidence/G4-M1-FINAL-GATES-001/host-monitor.json JSON无效\"\n}\n",
+    "stderr": ""
+  },
+  "product49": "INHERITED_UNCHANGED_NOT_RERUN",
+  "notFixed": "Old evidence and shared verifier outside current owned_paths; no sanitization or skip"
+}

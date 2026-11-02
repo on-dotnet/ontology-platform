@@ -1873,13 +1873,15 @@
       ],
       "implementationAuthorization": "WITHIN_RECORDED_IMPLEMENTATION_SCOPE",
       "mainIntegration": "NOT_AUTHORIZED_PENDING_SEPARATE_DECISION",
-      "scopeReview": "最终本地绑定和非作者审查；包外49PASS另存不重写ZIP",
-      "eligibility": "CANDIDATE_FOR_EXPLICIT_MAIN_DECISION_NOT_AUTHORIZED",
+      "scopeReview": "最终本地绑定和非作者审查；包外49PASS另存不重写ZIP；新增实测R09：此提交加入host-monitor.json JSONL导致工程门禁失败，不能直接快进",
+      "eligibility": "MAIN_INTEGRATION_BLOCKED_ENGINEERING_INPUT",
       "riskTags": [
         "P1_MAIN_APPROVAL_PENDING",
-        "P2_EVIDENCE_EVOLUTION_PRESERVE_HISTORY"
+        "P2_EVIDENCE_EVOLUTION_PRESERVE_HISTORY",
+        "P1_R09_HISTORICAL_JSONL_FAILS_STATIC_GATE"
       ]
     }
   ],
-  "duplicatePatchIds": {}
+  "duplicatePatchIds": {},
+  "terminalGate": "MAIN_INTEGRATION_BLOCKED_R09"
 }

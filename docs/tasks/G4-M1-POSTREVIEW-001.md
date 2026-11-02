@@ -1,6 +1,6 @@
 # G4-M1-POSTREVIEW-001 执行计划（四项修订合并版）
 
-状态DRAFT / EXECUTION_STARTED。授权见本任务authorization.md；Master唯一写者，非作者Reviewer初稿冻结后只读审查。Base=d40e6ab67360cc46aadd7ec013bd514b3f61a6ea；窄fetch exit0确认origin/main=d1a61daffe844475b07705797e3ad325cc3f2945、旧任务远端Head=Base。分支codex/g4-m1-postreview-001；托管树/Users/chasen/.codex/worktrees/g4-m1-postreview-001/ontology-platform。先提交本Plan再执行。
+状态BLOCKED_WITH_WITNESS / DELIVERY_PENDING。授权见本任务authorization.md；Master唯一写者，非作者Reviewer初稿冻结后只读审查。Base=d40e6ab67360cc46aadd7ec013bd514b3f61a6ea；窄fetch exit0确认origin/main=d1a61daffe844475b07705797e3ad325cc3f2945、旧任务远端Head=Base。分支codex/g4-m1-postreview-001；托管树/Users/chasen/.codex/worktrees/g4-m1-postreview-001/ontology-platform。先提交本Plan再执行。
 
 owned_paths：本任务卡与docs/evidence/G4-M1-POSTREVIEW-001/**；全部其它路径read_only_dependencies。不改当前授权索引、产品、Host、Contract、迁移、锁、共享脚本、部署、旧证据。main、G3/G6、旧树/ZIP/容器/卷/镜像及主树6个未跟踪.DS_Store均保护。
 
@@ -30,3 +30,9 @@ PR01旧输入链；PR02当前历史main分列；PR03逐提交依赖；PR04模拟
 真实verify.ps1 -SelfTest、证据schema、两层diff-check/路径检查。任务工具TaskId/失败传播/越界链接/覆写负例及hash绑定，证据豁免不免工具重验。格式→有限验证→非作者Review→commit/push→新Tested/Head→唯一LOCAL V3→独立VerifyOnly→包外最终回执。ZIP软10MiB硬15MiB，零截图，历史证据可恢复索引。封包后Head/hash/重开结论只写包外避免自引用。CI/Windows/产品49项/供应链未实测不记PASS。
 
 必交任务卡、输入、逐提交DAG、模拟、两份申请、风险/外联/资源、Review、schema2 validation与回执。只清自身登记临时文件，旧资源不动；无运行资源写NO_TASK_OWNED_RUNTIME_RESOURCES。最终READY_FOR_CHATGPT_INTEGRATION_DECISION或BLOCKED_WITH_WITNESS后停止等下一次审查，不自动执行两份申请。
+
+## 实际执行收口增量
+
+已建独立树并推送DRAFT；45提交/588路径、26树前后模拟、原899成员ZIP重开、官方30次查询、两份申请已完成。旧ZIP首次因新树dirty拒绝，改用原干净Root成功，原失败保留。独立Reviewer闭合外联batch8遗漏及Web认证枚举歧义。
+
+真实SelfTest于b357fcb8a04b9b57c6f27cd3a10d530e3b556247入口FAIL，后续套件NOT_RUN。原因R09旧已审Head加入JSONL名为.json；R10新树解析库缺口单独只读复现后21YAML/TOML通过，未抵消原FAIL。旧证据/共享工具禁止修改，故本任务不修复，工程MAIN_INTEGRATION_BLOCKED并以BLOCKED V3交付。原49/49仅继承，不撤销产品实测。本任务host适配13项PASS，非作者另9只读断言PASS；最终封包回执在包外，PR09保留BLOCKED。

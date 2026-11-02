@@ -8,7 +8,7 @@
 
 建议批准后从源Head创建独立integration任务树。先补新任务专属验收身份和回归，不直接运行旧任务runtime：现有g4-m1-runtime.py及HTTP/browser入口硬编码RECOVERY TaskId/路径；final-gates实验也硬编码旧身份。未来任务须单列允许修改的任务适配入口及正反身份测试，不能借旧ID运行或使用旧私有输入。它们是待申请工具变更，不在本次修改。
 
-最小后续提交序列：①新任务计划/准确消费者适配与测试（Master公共单写，独立Review）；②新任务完整验收与资源/绑定证据（说明增量）。没有已证实需改产品的P0/P1；若发现须另批最小修复，保持原45提交顺序，禁止静默挑选或丢弃。最终候选IntegrationHead=源Head+以上明确新增提交；必须逐项独立Review后向人类呈报准确SHA再纳入main。POSTREVIEW分支文档不自动包含在产品集成序列中。
+最小后续提交序列：①新任务计划/准确消费者适配与测试（Master公共单写，独立Review）；②新任务完整验收与资源/绑定证据（说明增量）。已发现R09工程P1，原d40不能直接快进并宣称门禁通过。必须先另批下述精确兼容修复，产品源码无当前修复授权；其他问题若发现须另批最小修复，保持原45提交顺序，禁止静默挑选或丢弃。最终候选IntegrationHead=源Head+以上明确新增提交；必须逐项独立Review后向人类呈报准确SHA再纳入main。POSTREVIEW分支文档不自动包含在产品集成序列中。
 
 执行main前再次窄fetch并核实parent。若仍祖先且所有资格通过，由唯一Master执行已批准的快进并普通push；任何分叉、并发main变化或未知提交都停止，重新提交模拟/冲突申请。不能用旧45结论套新Head；不force、不rebase、不真实cherry-pick试错。
 
@@ -38,3 +38,13 @@ Master独占Host/Contracts/迁移/生成器/锁/CI与main，产品Worker仅在�
 ## 申请批准的边界
 
 仅批准可审的源码集成及隔离验证，不批准生产、商业分发、M2、G6、付费模型、额外依赖。R01主线许可与R05运行供应链准入是独立决策。未获明确决定前，全部实施命令保持NOT_EXECUTED。
+
+## 新增工程阻断及准确补救申请
+
+**MAIN_INTEGRATION_BLOCKED**：见blocked-witness.json及独立Review。原SelfTest入口FAIL，套件在静态检查前置退出后NOT_RUN；不能沿用旧SelfTest PASS推断当前Head工程可通过，原49产品继承结论不降级。
+
+推荐未来最小候选：仅修改scripts/verify.ps1及scripts/tests/FrozenEvidence.Tests.ps1，增加对唯一历史路径docs/evidence/G4-M1-FINAL-GATES-001/host-monitor.json与精确SHA256的JSONL兼容解析；每行必须严格合法JSON且与冻结76记录结构一致，任意字节变化、坏行、截断或其它.json仍拒绝。保留旧文件/旧Git对象/原ZIP原字节，不用整目录豁免。此选择为申请，不在POSTREVIEW实施；人类若选择改名方案须另批消费者与恢复索引，不能仅改后缀逃过校验。
+
+同时在后续任务工具资源清单登记已有主树.tools/pythonlibs的准确只读复用方式；因verify覆写PYTHONPATH，外层设置变量不足。允许的最小未来方式为任务树.tools/pythonlibs→已登记现有缓存的只读使用链接，核实PyYAML6.0.3身份及目标不被写入，结束仅移除自身链接。没有依赖安装/升级权限。若不准共享链接，应另行批准受控ToolRoot参数支持，当前不改共享入口。
+
+未来顺序更新为：补救批准→精确解析兼容正反/工具身份→完整SelfTest→产品回归/供应链准入→非作者Review→提交绑定→提交准确IntegrationHead供main批准。当前d40第45提交资格为BLOCKED_ENGINEERING_INPUT；其余44项仍只是范围可追溯候选，不能绕过末端阻断摘取集成。

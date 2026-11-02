@@ -29,7 +29,7 @@
 
 **TDengine：** 只受控单WS endpoint，明确WebSocket协议/TLS，禁止Native/REST fallback、地址列表/自动发现扩网。database/timezone/timePrecision与服务精度交叉核验，stable/subtable/tags分类保真。ns不得只靠DateTime tick或浮点；拟保留整数epoch+unit并进行字节往返，现有Catalog仅元数据，不解锁M4数据查询。官方显示TIMESTAMP映射DateTime及DECIMAL溢出路径，所以无损读取能力必须真实证明。真实WS验证ms/us/ns、负epoch/时区、标签与子表ACL、权限撤销、取消/超时/断线、SecretRef轮换后旧连接失效。服务许可及精确制品不明则BLOCKED，不能用客户端MIT代替。预计3–5工程日。
 
-**Web API：** 首切片仅自有合成HTTPS固定origin与已登记GET operation，固定服务端参数/分页模板，不允许用户输入任意URL/OpenAPI远端ref。候选首切片支持NONE与已有SecretRef绑定Bearer；OAuth/代理未批准时显式拒绝，未来需单列认证端点和每跳政策。禁自动redirect、系统代理、cookie及非GET；只准明确同origin分页，拒绝跨origin next。DNS解析全地址校验、实际socket连接已验证地址并保持TLS/SNI；连接池/重连重验，防DNS rebinding、IPv4-mapped IPv6、私网/loopback/link-local/metadata目标。测试夹具仅精确测试网络例外，不放宽通用私网。双重重定向在首跳拒绝即有明确负例，不能声称已支持安全跟随。真实隔离HTTP/TLS检验坏CA/SAN、DNS换址、代理环境变量、OAuth目标、超大/深JSON、missing/null/精确number、游标循环、跨origin分页、取消/响应泄密。预计3–4工程日。
+**Web API：** 首切片仅自有合成HTTPS固定origin与已登记GET operation，固定服务端参数/分页模板，不允许用户输入任意URL/OpenAPI远端ref。候选首切片仅使用现有wire枚举NONE与API_KEY_REF；API_KEY_REF凭据仍由顶层SecretRef绑定，header名称和载荷格式由服务器operation注册限定，不新增BEARER枚举。若需要Bearer格式，须先在operation准入中明确该固定传输格式；OAuth/代理未批准时显式拒绝，未来需单列认证端点和每跳政策。禁自动redirect、系统代理、cookie及非GET；只准明确同origin分页，拒绝跨origin next。DNS解析全地址校验、实际socket连接已验证地址并保持TLS/SNI；连接池/重连重验，防DNS rebinding、IPv4-mapped IPv6、私网/loopback/link-local/metadata目标。测试夹具仅精确测试网络例外，不放宽通用私网。双重重定向在首跳拒绝即有明确负例，不能声称已支持安全跟随。真实隔离HTTP/TLS检验坏CA/SAN、DNS换址、代理环境变量、OAuth目标、超大/深JSON、missing/null/精确number、游标循环、跨origin分页、取消/响应泄密。预计3–4工程日。
 
 接口/类型/合成用例只能证明候选设计；四类产品准入均须真实隔离服务、真实权限及拒绝路径，缺环境NOT_RUN，不用mock晋级。
 

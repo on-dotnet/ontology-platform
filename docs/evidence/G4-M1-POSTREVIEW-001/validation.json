@@ -1,12 +1,49 @@
 {
   "evidenceSchemaVersion": 2,
+  "validationSource": "LOCAL",
+  "testedCommit": "b357fcb8a04b9b57c6f27cd3a10d530e3b556247",
   "checks": [
     {
-      "name": "task-validation",
+      "name": "scoped-preflight-checks",
+      "command": "python3 one-shot assertions: git rev-list/diff-tree/diff --check/path scope, protected snapshots, hashes and observed receipts",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "62 scoped assertions passed; scoped-validation.json"
+    },
+    {
+      "name": "host-adapter-tests",
+      "command": "python3 docs/evidence/G4-M1-POSTREVIEW-001/test-host-adapter.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "13 tests; exact tested source hashes separately bound"
+    },
+    {
+      "name": "previous-zip-reopen",
+      "command": "pwsh -NoProfile -File scripts/create-review-package.ps1 -Root <old clean root> -VerifyOnly -PackagePath <previous exact ZIP>",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "899 members; exact actual command in old-zip-verify-clean-root.json; product not rerun"
+    },
+    {
+      "name": "engineering-selftest-entry",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1 -SelfTest",
+      "status": "FAIL",
+      "exitCode": 1,
+      "output": "Inherited host-monitor.json is JSONL; repository static precheck fails before SelfTest suite. See blocked-witness.json. Initial missing parser separately localized."
+    },
+    {
+      "name": "engineering-selftest-suites",
       "command": null,
       "status": "NOT_RUN",
       "exitCode": null,
-      "output": "No task validation has been executed; replace only with actual observations."
+      "output": "Not reached because repository precheck failed; no masking or blanket exemption"
+    },
+    {
+      "name": "structured-parser-isolation",
+      "command": "PYTHONPATH=<existing registered pythonlibs> PYTHONDONTWRITEBYTECODE=1 python3 scripts/validate-structured-files.py <task root>",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "21 YAML/TOML syntax files; no dependency install; does not override SelfTest FAIL"
     }
   ],
   "ci": {
@@ -17,13 +54,28 @@
     "conclusion": null
   },
   "metadata": {
-    "actualAgentActiveTime": "UNKNOWN",
     "taskId": "G4-M1-POSTREVIEW-001",
-    "phase": "PRE_TEST_DRAFT",
-    "note": "骨架提交SHA已通过git rev-parse替换手工占位，未用于验证或构包",
-    "oldProduct": "PASS_FOR_LOCAL_EVIDENCE_CLOSEOUT_INHERITED_NOT_RERUN",
-    "newProduct": "NOT_RUN"
-  },
-  "validationSource": "LOCAL",
-  "testedCommit": "abe952d2c1e8b97ca00b5a9e2fb65faa11738cf9"
+    "status": "BLOCKED_WITH_WITNESS",
+    "prCounts": {
+      "PASS": 9,
+      "BLOCKED": 1,
+      "NOT_RUN": 0
+    },
+    "reviewer": "/root/postreview_reviewer",
+    "runtimeProduct": "NOT_RUN",
+    "previousProduct": "PASS_FOR_LOCAL_EVIDENCE_CLOSEOUT_INHERITED",
+    "mainIntegration": "MAIN_INTEGRATION_BLOCKED",
+    "m2": "NOT_STARTED_NOT_AUTHORIZED",
+    "toolHashes": {
+      "host-adapter.py": "631c9220c6fc22f479511390762ba89a9ba8b77decc306707177734b20fa32de",
+      "test-host-adapter.py": "4c1f823795a63a204879c76be8a5271ea9228b37f1174f69903c3de164b70f09"
+    },
+    "packaging": "PENDING_EXTERNAL_NOT_SELF_REFERENTIAL",
+    "historicalFailures": [
+      "sandbox first write denial",
+      "old ZIP dirty-root rejection",
+      "SelfTest entry fail"
+    ],
+    "actualAgentActiveTime": "UNKNOWN"
+  }
 }

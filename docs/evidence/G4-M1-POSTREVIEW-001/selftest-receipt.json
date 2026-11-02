@@ -1,0 +1,42 @@
+{
+  "command": [
+    "python3",
+    "scripts/maintenance/task_run_timeline.py",
+    "run",
+    "--path",
+    "/Users/chasen/.codex/worktrees/g4-m1-postreview-001/ontology-platform/artifacts/g4-m1-postreview-001/timeline.jsonl",
+    "--task-id",
+    "G4-M1-POSTREVIEW-001",
+    "--run-id",
+    "postreview-20261102-01",
+    "--step-id",
+    "selftest",
+    "--input-fingerprint",
+    "7fab83198ccdb73152504016e70967673076ac980c4879847c9fba3443d10ac6",
+    "--command-label",
+    "verify-selftest",
+    "--task-type",
+    "TEST",
+    "--",
+    "pwsh",
+    "-NoProfile",
+    "-File",
+    "scripts/verify.ps1",
+    "-SelfTest"
+  ],
+  "testedCommit": "b357fcb8a04b9b57c6f27cd3a10d530e3b556247",
+  "inputFingerprint": "7fab83198ccdb73152504016e70967673076ac980c4879847c9fba3443d10ac6",
+  "exitCode": 1,
+  "outputPath": "/Users/chasen/.codex/worktrees/g4-m1-postreview-001/ontology-platform/artifacts/g4-m1-postreview-001/verify-selftest.txt",
+  "sha256": "a5983f894ace39f3f64ab62e6b8c11cf6d8aab0d42c9af9935b1ac677d9a5318",
+  "bytes": 248,
+  "scope": "ENGINEERING_SELFTEST_NOT_PRODUCT",
+  "tail": [
+    "",
+    "Check             Status Message",
+    "-----             ------ -------",
+    "json              FAIL   docs/evidence/G4-M1-FINAL-GATES-001/host-monitor.json…",
+    "structured-syntax FAIL   YAML/TOML解析失败或项目解析器不可用；请按requirements…",
+    ""
+  ]
+}

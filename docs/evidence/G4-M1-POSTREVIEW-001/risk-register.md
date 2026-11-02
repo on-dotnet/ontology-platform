@@ -12,6 +12,9 @@
 |R06|P2 / HISTORY_PRESERVED|链内有EOF与原证据封装变更：G4-00 input-original-bytes、恢复evidence-byte-preservation、final evidence-format-originals/sbom-format-receipt；原对象与失败可恢复|逐提交保留前后blob；不重写历史、不把47/2改成包内49/0；旧VerifyOnly通过不是产品复跑|
 |R07|P1 / M2_ADMISSION_PENDING|三个驱动候选元数据可查，精确二进制/传递依赖/许可证及平台实测未执行；TD文档3.2.2和NuGet3.2.1存在版本展示差异|逐Adapter独立版本/许可/环境/网络/预算批准；不假设最新文档全部适用于旧候选|
 |R08|P2 / PACKAGE_PENDING|新任务只能修改owned_paths，host工具位于evidence可被LOCAL输入排除|工具单独hash绑定及负例重验；最终两层diff-check、路径核验、独立重开|
+|R09|P1 / MAIN_INTEGRATION_BLOCKED / BLOCKED_WITH_WITNESS|d40e6ab新增旧host-monitor.json为76条JSONL，44070字节、SHA256=6e425cb7ad191dd6a6fa8a2261a55d8599c2686ff4cb11d5c6d8bdd93a712122；verify.ps1:64–66按单JSON拒绝，171–172在SelfTest套件前退出。该文件不在旧Tested48be53e中|另批精确历史JSONL兼容修复及坏行/截断负例，保全原字节/原ZIP/原49事实；修复后真实完整SelfTest及新Tested/Head绑定|
+|R10|P2 / ENVIRONMENT_GAP_IDENTIFIED|新树.tools/pythonlibs不存在；verify会覆写PYTHONPATH。直接只读复用已登记PyYAML后21文件PASS，但未恢复原SelfTest入口|另批/登记只读工具复用入口；不安装、不宽泛跳过。与R09独立，不能用解析器通过抵消JSON失败|
+
 
 ## 配置及部署范围
 
