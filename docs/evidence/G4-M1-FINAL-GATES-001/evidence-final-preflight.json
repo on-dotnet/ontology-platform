@@ -1,0 +1,16 @@
+{
+  "command": [
+    "pwsh",
+    "-NoProfile",
+    "-File",
+    "scripts/test-review-evidence.ps1",
+    "-EvidenceFile",
+    "docs/evidence/G4-M1-FINAL-GATES-001/validation.json",
+    "-ExpectedHead",
+    "7da6363d1a891cba11318f9c9bd883033e65f1cb"
+  ],
+  "exitCode": 0,
+  "stdout": "{\"checks\":15,\"status\":\"PASS\",\"scope\":\"EVIDENCE_SCHEMA_ONLY\",\"actualCi\":\"NOT_VERIFIED\",\"product\":\"NOT_RUN\",\"screenshotCompressedBytes\":0,\"screenshotCount\":0}\n",
+  "stderr": "",
+  "priorInvocationError": "Malformed manually transcribed expected Head; corrected by actual git rev-parse HEAD, no source/runtime change"
+}

@@ -1,0 +1,48 @@
+{
+  "taskId": "G4-M1-FINAL-GATES-001",
+  "links": [
+    {
+      "path": "node_modules",
+      "target": "/Users/chasen/.codex/worktrees/g3-m5-review-fix/ontology-platform/node_modules",
+      "operation": "unlink task-owned symlink only",
+      "exitCode": 0,
+      "targetPreserved": true
+    },
+    {
+      "path": "apps/web/node_modules",
+      "target": "/Users/chasen/.codex/worktrees/g3-m5-review-fix/ontology-platform/apps/web/node_modules",
+      "operation": "unlink task-owned symlink only",
+      "exitCode": 0,
+      "targetPreserved": true
+    }
+  ],
+  "monitor": {
+    "pid": 65020,
+    "command": "/opt/homebrew/Cellar/python@3.13/3.13.17/Frameworks/Python.framework/Versions/3.13/Resources/Python.app/Contents/MacOS/Python scripts/maintenance/host_continuity.py monitor --task-id G4-M1-FINAL-GATES-001 --output artifacts/g4-m1-final-gates-001/host-monitor.json --seconds 7200 --interval 30",
+    "signal": "SIGTERM",
+    "absence": "VERIFIED",
+    "absenceExitCode": 1
+  },
+  "utc": "2026-11-02T00:32:39.670076+00:00",
+  "processes": [
+    {
+      "pid": 66169,
+      "operation": "ps -p exact recorded PID -o command=",
+      "exitCode": 1,
+      "absenceVerified": true
+    },
+    {
+      "pid": 87409,
+      "operation": "ps -p exact recorded PID -o command=",
+      "exitCode": 1,
+      "absenceVerified": true
+    },
+    {
+      "pid": 91002,
+      "operation": "ps -p exact recorded PID -o command=",
+      "exitCode": 1,
+      "absenceVerified": true
+    }
+  ],
+  "status": "PASS"
+}

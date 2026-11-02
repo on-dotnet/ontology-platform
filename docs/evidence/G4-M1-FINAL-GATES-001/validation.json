@@ -1,7 +1,7 @@
 {
   "evidenceSchemaVersion": 2,
   "validationSource": "LOCAL",
-  "testedCommit": "e9c51d75b19e75276a7517a721e1e45cc30fb8be",
+  "testedCommit": "48be53e807cab22622ea31c6b39d6cb8805e9771",
   "checks": [
     {
       "name": "C08-real-HTTP",
@@ -22,7 +22,7 @@
       "command": "pwsh -NoProfile -File scripts/verify.ps1 -SelfTest",
       "status": "PASS",
       "exitCode": 0,
-      "output": "verify-selftest-c08.txt; review package 103 tests, 0 failures; product checked separately"
+      "output": "verify-selftest-final.txt: actual exit 0, 103 ReviewPackage tests 0 failures plus all selected engineering checks; actual product tests separately recorded."
     },
     {
       "name": "C08-exact-cleanup",
@@ -32,11 +32,81 @@
       "output": "c08-cleanup-receipt.json: 12 deleted, old protected identities preserved"
     },
     {
-      "name": "R04-actual-isolated-regression",
+      "name": "PG-real-security",
+      "command": "docker exec exact-task-pg-security dotnet tests",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "pg-security-real.json: 12 PASS / 0 SKIP"
+    },
+    {
+      "name": "Public-schema-faults",
+      "command": "python3 experiments/g4-m1-final-gates/public_faults.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "public/public-faults-1793578771290852000.json: 7 actual states, 7 passed tests / 0 SKIP"
+    },
+    {
+      "name": "R04-real-product",
+      "command": "node experiments/g4-m1-final-gates/r04.mjs --runtime-file PRIVATE --evidence-dir TASK_ARTIFACTS",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "r04-final/report.json: 38 assertions / 53 HTTP; producer 954a2b8, runtime input bytes unchanged at TestedCommit"
+    },
+    {
+      "name": "R04-persistence-bindings",
+      "command": "python3 experiments/g4-m1-final-gates/verify_r04.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "r04-final/bindings-final.json: 60 PASS at TestedCommit, complete values and arrays; original naming-comparison failure preserved"
+    },
+    {
+      "name": "Runtime-independent-review",
+      "command": "independent nonauthor reviewer separate read-only recomputation",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "r04-final/independent-review.md and public/independent-review.md: PASS"
+    },
+    {
+      "name": "Docker-exact-cleanup",
+      "command": "reviewed task-only closeout.py/closeout_r04.py/closeout_public.py/closeout_final.py Apply",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "resource-inventory.json and four receipts: 40 unique deletions with exact absence diagnostics, no protected identity loss"
+    },
+    {
+      "name": "Local-archive-cleanup",
+      "command": "python3 local_archive_cleanup.py --apply --expected-plan-sha256 9596ce224e5bbacc41a4021b6bbbe0bc1a4a0a037c780689339fbecf56060e19",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "local-archive-cleanup-receipt.json: 6 files / 909368832 logical bytes deleted, physical reclaimed bytes NOT_MEASURED"
+    },
+    {
+      "name": "Source-known-secret-scan",
+      "command": "python3 delivery_scan.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "delivery-source-scan.json: 300 known patterns, 889 entries, zero findings"
+    },
+    {
+      "name": "Final-diff-check",
+      "command": "git diff --check 1399364ad1367f3d1bfdee4d9901fdb33b48c15d HEAD",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "actual exit 0; historical formatting failures retained"
+    },
+    {
+      "name": "Current-ZIP-known-secret-scan",
       "command": null,
       "status": "NOT_RUN",
       "exitCode": null,
-      "output": "Running; no completion claim"
+      "output": "PENDING_EXTERNAL: only after unique ZIP exists; final external receipt/matrix binds exact ZIP SHA and Head without repackaging."
+    },
+    {
+      "name": "Current-ZIP-independent-reopen",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "PENDING_EXTERNAL: only after unique ZIP exists; final external receipt/matrix binds exact ZIP SHA and Head without repackaging."
     }
   ],
   "ci": {
@@ -48,6 +118,9 @@
   },
   "metadata": {
     "taskId": "G4-M1-FINAL-GATES-001",
-    "actualAgentActiveTime": "UNKNOWN"
+    "actualAgentActiveTime": "UNKNOWN",
+    "scope": "Only C08/R04; 49-row frozen matrix 47 PASS + 2 external delivery checks pending",
+    "producerCommit": "954a2b8e8eab6bc709139eda4921633e5931958c",
+    "finalInputDelta": "954a2b8 to TestedCommit changes only read-only evidence comparison field naming; actual product/driver/config bytes unchanged"
   }
 }

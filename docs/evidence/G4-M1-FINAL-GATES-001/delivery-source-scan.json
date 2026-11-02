@@ -1,0 +1,4456 @@
+{
+  "taskId": "G4-M1-FINAL-GATES-001",
+  "status": "PASS",
+  "mode": "SOURCE_CURRENT_EVIDENCE_AND_PATCH",
+  "knownPrivatePatternCount": 300,
+  "findings": [],
+  "entries": [
+    {
+      "path": ".codex/agents/explorer.toml",
+      "bytes": 469,
+      "sha256": "5f934728afd3bd6e0a8fddd2a239f97fb82b899a662de4549c775a218acbb4f7"
+    },
+    {
+      "path": ".codex/agents/platform_worker.toml",
+      "bytes": 761,
+      "sha256": "fa489a4dbb301ef590a8025348c931724c095cb61ef01541fd57607aaeab8e06"
+    },
+    {
+      "path": ".codex/agents/quality_reviewer.toml",
+      "bytes": 456,
+      "sha256": "52ebdcb768af7968601be2af1e1c7efc7e3d63fb6fd6256d3c268cdbbdaf82d6"
+    },
+    {
+      "path": ".codex/config.toml",
+      "bytes": 63,
+      "sha256": "af00171d0ae3470aa41fb82e4165d91e5871e912d635e7545f9dc8f4a7752fc9"
+    },
+    {
+      "path": ".config/dotnet-tools.json",
+      "bytes": 140,
+      "sha256": "eaea32d0eea34e6d61dede69d3f0272f1d73e77c988b034fd0bea3043ce5e031"
+    },
+    {
+      "path": ".dockerignore",
+      "bytes": 93,
+      "sha256": "0883fe45b65a734b95a9bd45f232706490cd3ca30e1ffdad191dec058382f354"
+    },
+    {
+      "path": ".editorconfig",
+      "bytes": 471,
+      "sha256": "1f838988a09e5d5f6283063a12b554351eaf5189513f55b204ca338a4dec3549"
+    },
+    {
+      "path": ".env.example",
+      "bytes": 126,
+      "sha256": "129e6510ec93b96c41be71a2b4cb8ba14bfefc0d6e533b98d5cbc1bd46900765"
+    },
+    {
+      "path": ".gitattributes",
+      "bytes": 71,
+      "sha256": "2c2d77e1018570f4a62c3c39481be0cb10252e4048cafbd43441523cda92ef6f"
+    },
+    {
+      "path": ".github/CODEOWNERS",
+      "bytes": 303,
+      "sha256": "f5e32cad135d952dc14ad6b6186b0e24b3600b5f1946f4882a7e14a6f64934b2"
+    },
+    {
+      "path": ".github/ISSUE_TEMPLATE/task.md",
+      "bytes": 413,
+      "sha256": "d757a48c9dbeed86a80d17f767656a9a2da2804974753c3e3e5eee641c554138"
+    },
+    {
+      "path": ".github/pull_request_template.md",
+      "bytes": 434,
+      "sha256": "3d4ff5e36356128153c92918b5d759969b3770384bf4c0cbdd3ac2d5380bb694"
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "bytes": 10460,
+      "sha256": "125e31e1af0f7def8cda31a98370597e64df73023d28ca10722a82a3d6e31546"
+    },
+    {
+      "path": ".gitignore",
+      "bytes": 186,
+      "sha256": "ec35fb52df40dd553e23251957dbfe8e76901ce4571fe0c1602a78925b54b011"
+    },
+    {
+      "path": ".node-version",
+      "bytes": 8,
+      "sha256": "d9f318747a126ce2247661af67852b185def7789492eabfad7bba322be087c33"
+    },
+    {
+      "path": "AGENTS.md",
+      "bytes": 9748,
+      "sha256": "18321f960020e9749e8b39208cdd9e50a0ac8ad310268f3c5926b115f833180a"
+    },
+    {
+      "path": "Directory.Build.props",
+      "bytes": 607,
+      "sha256": "720ef39405d3a628d3b26c6e0688329cdd02ca08e454f35545e36881ae663b8f"
+    },
+    {
+      "path": "Directory.Packages.props",
+      "bytes": 1752,
+      "sha256": "f73a1444263faf31bb1419ad5112d748475be0b73f63e5ac6f03e0b8c8643221"
+    },
+    {
+      "path": "NuGet.Config",
+      "bytes": 355,
+      "sha256": "cb93c65e28718aa9075fce221e9f9cea9e72d3fe1b30462383448a591f5b3aa1"
+    },
+    {
+      "path": "PLANS.md",
+      "bytes": 9132,
+      "sha256": "9f22d6927395eccf799434e2cbaf0f660d31f07ba9a187038f060be8dd7d1a4d"
+    },
+    {
+      "path": "README.md",
+      "bytes": 3399,
+      "sha256": "d75840ea84690f7152e1a4f63a7defb8aa83b7c2a242f9f2b634e6049cccaca1"
+    },
+    {
+      "path": "apps/web/.gitignore",
+      "bytes": 47,
+      "sha256": "290706b0480a4f9e55cd9c3d08a60f3e4ec7f3d2fc2ad750f21257d372e83cfe"
+    },
+    {
+      "path": "apps/web/AGENTS.md",
+      "bytes": 1730,
+      "sha256": "aab2517964698e68a59c464feab33e0cb9b0b2f5f4bff30000bca0c05e748f80"
+    },
+    {
+      "path": "apps/web/eslint.config.mjs",
+      "bytes": 336,
+      "sha256": "0c9e2f6635a1999b8a1c45a1f66bca03b37587720ffbde41cd2417e95b95a45e"
+    },
+    {
+      "path": "apps/web/next-env.d.ts",
+      "bytes": 288,
+      "sha256": "1862ac4bbbc5192d4bf562161df66ea547ed3e67173100656ab606ae9797db2b"
+    },
+    {
+      "path": "apps/web/next.config.ts",
+      "bytes": 118,
+      "sha256": "7eba77a1bee720ae17a4df36386ea1351c3d1ec624106af44efe37e40057bd54"
+    },
+    {
+      "path": "apps/web/package.json",
+      "bytes": 923,
+      "sha256": "6f3cdb23fee359047d8447b37e16fddbca281598af1b2c0b9a9015669092425c"
+    },
+    {
+      "path": "apps/web/playwright.config.ts",
+      "bytes": 740,
+      "sha256": "abdf4fe2cb8e891a515f9045d3d38bb8269f745381c6645039359f9c39613bfa"
+    },
+    {
+      "path": "apps/web/playwright.layout.config.ts",
+      "bytes": 478,
+      "sha256": "4e6ccf78a7786f9d5fdba47a093d1eef3a6227ee1182e38e63833b67b4474460"
+    },
+    {
+      "path": "apps/web/playwright.oidc.config.ts",
+      "bytes": 648,
+      "sha256": "f1f18c460e88971304a79cabcd10ca91b49c78ecf1307171af9ba10d04ca7fcb"
+    },
+    {
+      "path": "apps/web/postcss.config.mjs",
+      "bytes": 83,
+      "sha256": "b783348d5618047d0f37e12acd15c5a2c5f02809d8711e0764c9cea52750346c"
+    },
+    {
+      "path": "apps/web/scripts/generate-types.mjs",
+      "bytes": 1055,
+      "sha256": "3d1a8d839817a22de11762b8582739793bbcc2fa47acf21d00e6c5b960d27a85"
+    },
+    {
+      "path": "apps/web/scripts/openapi-types.mjs",
+      "bytes": 2497,
+      "sha256": "4a03017a1e3c28e5bf27a24476d96e2719b13193bebad03b9e468fd9734ace57"
+    },
+    {
+      "path": "apps/web/scripts/run-oidc-tests.mjs",
+      "bytes": 2704,
+      "sha256": "87ec8cd2b4b68d01c75002aacc9b69548afb26ee91e80350ebac2c587a07d4e2"
+    },
+    {
+      "path": "apps/web/src/app/analysis/page.tsx",
+      "bytes": 354,
+      "sha256": "162c98228c8447d22e3e034ae9eb25025c849ea61fe2f8464074da13e559b18e"
+    },
+    {
+      "path": "apps/web/src/app/data/connections/[id]/page.tsx",
+      "bytes": 600,
+      "sha256": "d1bdd01f142b068226bfee9b602310baebd11f5da468e2cc35879607620ccc5e"
+    },
+    {
+      "path": "apps/web/src/app/data/connections/new/page.tsx",
+      "bytes": 336,
+      "sha256": "4ade42dd9947c5552bf0fde1a4edd392ea85ae5f0e2f87ccbf19f57b8d12aa42"
+    },
+    {
+      "path": "apps/web/src/app/data/connections/page.tsx",
+      "bytes": 494,
+      "sha256": "84be364ed475df7a4d145409861f70543e178a6e6b896f86994bcdc1e1d8ec7e"
+    },
+    {
+      "path": "apps/web/src/app/error.tsx",
+      "bytes": 402,
+      "sha256": "a91e65fcd01e7dd61be7983a428cc2326975dec5ae14f83b95fc51d234410e0c"
+    },
+    {
+      "path": "apps/web/src/app/icon.svg",
+      "bytes": 265,
+      "sha256": "2c296a481033ea56f2ee22caa087149a93e4df92fe307ca6c9774de8cd4cbd98"
+    },
+    {
+      "path": "apps/web/src/app/layout.tsx",
+      "bytes": 850,
+      "sha256": "6e78814bc59459d0a60e9c65283ae3622062a887a0e713a453c50a53bbad7788"
+    },
+    {
+      "path": "apps/web/src/app/loading.tsx",
+      "bytes": 339,
+      "sha256": "a2fcf405e5af426d2202823d85df19d1b39f884c25cb0574fcb9ccb60ed17860"
+    },
+    {
+      "path": "apps/web/src/app/ontologies/page.tsx",
+      "bytes": 388,
+      "sha256": "227767e9ae7690150b0a0303bb6b8432aea1183363cb4243f1ac116138f157a4"
+    },
+    {
+      "path": "apps/web/src/app/page.tsx",
+      "bytes": 1217,
+      "sha256": "a896fc41ffd72038d76424fa6c815bb67572358a79b70a1d70f487460fea4ccd"
+    },
+    {
+      "path": "apps/web/src/app/releases/page.tsx",
+      "bytes": 387,
+      "sha256": "eb2be0e0213a1511841d52f639d7454b62dbf45d634a7b45b94516179dc571e2"
+    },
+    {
+      "path": "apps/web/src/app/signed-out/page.tsx",
+      "bytes": 1392,
+      "sha256": "dbf8f164069d254149573652eb92b95ba814e1a8445925e2ae7d1597a203f857"
+    },
+    {
+      "path": "apps/web/src/components/ui/icon.tsx",
+      "bytes": 1539,
+      "sha256": "27a81c4bc576dea07c655ba0ac8dd9f1933f472805a64cb6c3e1b3a38d238240"
+    },
+    {
+      "path": "apps/web/src/components/ui/resource-dialog.tsx",
+      "bytes": 1400,
+      "sha256": "65e72cf09a898d2394501dbdde8e37546d88710aa13062ec60a3c3592b5377bd"
+    },
+    {
+      "path": "apps/web/src/components/ui/semantic-feedback.test.ts",
+      "bytes": 3279,
+      "sha256": "3f60e2ece4f10226e23989ed055cf6850b7700a0d72a367b226b702bd577db13"
+    },
+    {
+      "path": "apps/web/src/components/ui/semantic-feedback.tsx",
+      "bytes": 5938,
+      "sha256": "2b6fe5a2fe26a17aa4138221c37f37a2d9c69c524797045dca186e68cd6e64bb"
+    },
+    {
+      "path": "apps/web/src/features/agent/event-schema.ts",
+      "bytes": 11665,
+      "sha256": "164c4fd0b0eda55ae5ca016719dd4c37c186c1daea124bd89b10ac2e0d549c2b"
+    },
+    {
+      "path": "apps/web/src/features/agent/event-stream.test.ts",
+      "bytes": 8359,
+      "sha256": "a8d067d7dfb6a7b71a38cc8f3e78d97520b54ae8120c6de65fe332072b6362e5"
+    },
+    {
+      "path": "apps/web/src/features/agent/event-stream.ts",
+      "bytes": 2190,
+      "sha256": "7868d711086c997c6f6249b53f7cd832fe793d0d89d3b0b0112f2110c7e1f0e7"
+    },
+    {
+      "path": "apps/web/src/features/agent/run-workspace.tsx",
+      "bytes": 8212,
+      "sha256": "f9fc2ca5225131953225b41908353b7a088dfff1c89c16758a19a65449780782"
+    },
+    {
+      "path": "apps/web/src/features/connections/api.ts",
+      "bytes": 4258,
+      "sha256": "12ecf73e7ec87ad1a9189cdd0747cd3aae5fa4e6ff226b52cc68f5bceb9d1595"
+    },
+    {
+      "path": "apps/web/src/features/connections/catalog.tsx",
+      "bytes": 11898,
+      "sha256": "57160bd85c5e7f5d5172676e1393bf124d4f4df69d00b1a0cbc1728f2fd1ecd1"
+    },
+    {
+      "path": "apps/web/src/features/connections/connections.css",
+      "bytes": 3324,
+      "sha256": "b67c234b4ddfb2d66d3033df9582e7dd04ba0bcd0ce882020d8882d53704ab61"
+    },
+    {
+      "path": "apps/web/src/features/connections/connections.test.ts",
+      "bytes": 41082,
+      "sha256": "90f5919ec98b00d2c17038a6f0b218f313f345b3d8c52ea8a691fb234b552a7f"
+    },
+    {
+      "path": "apps/web/src/features/connections/create.tsx",
+      "bytes": 8476,
+      "sha256": "06a7e2bac90fa20e9046bec1bdb5dacb56894b89793e5b5fef6d349e97688e20"
+    },
+    {
+      "path": "apps/web/src/features/connections/detail.tsx",
+      "bytes": 11349,
+      "sha256": "5cf77b3dcb2cf52b483d359ce363e99ce7a3b60f187a85fc3adce4978fa8791e"
+    },
+    {
+      "path": "apps/web/src/features/connections/draft-cache.ts",
+      "bytes": 2642,
+      "sha256": "29ab64e2c783f2c0613c79249eaa7e95c70cf731269aa699fd4ef536d61eda7c"
+    },
+    {
+      "path": "apps/web/src/features/connections/form-model.ts",
+      "bytes": 7430,
+      "sha256": "1dd71e929f8537ab2821f806c84ea3abc5acebdd8f35cb043d9c36b22124f8be"
+    },
+    {
+      "path": "apps/web/src/features/connections/form.tsx",
+      "bytes": 2393,
+      "sha256": "f96c6d6630eae726aaa729715d4bea01fadbd5f83dcdec00e61cacae8361b6ba"
+    },
+    {
+      "path": "apps/web/src/features/connections/list.tsx",
+      "bytes": 3954,
+      "sha256": "0f074a6e902f940f4ee8ccb3a17ae13c237310d4bc707ac5290db61b0bde4293"
+    },
+    {
+      "path": "apps/web/src/features/connections/server-page.tsx",
+      "bytes": 1194,
+      "sha256": "7013d347a845f8871f2ab0136680ef2be557635c587600dc450c7b65e86f999f"
+    },
+    {
+      "path": "apps/web/src/features/connections/status.tsx",
+      "bytes": 4238,
+      "sha256": "f5223afa8e3546d595b1ebce62fbcb6511803497658bf87d5e88e69f0e6c1ba4"
+    },
+    {
+      "path": "apps/web/src/features/ontology/assessment-panel.tsx",
+      "bytes": 6457,
+      "sha256": "d10cf7b9305758a75a6dd72e709e38cce91cbe314538f45ef140957754735f46"
+    },
+    {
+      "path": "apps/web/src/features/ontology/diagnostic-card.tsx",
+      "bytes": 2248,
+      "sha256": "10330847df080df79bea823b14c99bd9c3d679a93111720e39423266246611f7"
+    },
+    {
+      "path": "apps/web/src/features/ontology/draft-state.test.ts",
+      "bytes": 1133,
+      "sha256": "95b7cbcd311fb1f73d406302f26cc385f7e93a16b3c3f186337b2102a0e6bc09"
+    },
+    {
+      "path": "apps/web/src/features/ontology/draft-state.ts",
+      "bytes": 1573,
+      "sha256": "5b00df5de0824a314f91033103ca1eaa2997014e71d6ab56e1784504566c0d2c"
+    },
+    {
+      "path": "apps/web/src/features/ontology/entity-tree.tsx",
+      "bytes": 3594,
+      "sha256": "a0c8628829f4187caaf00eb279f74de09ab14a453fb189d5dbbb18ed5360cadc"
+    },
+    {
+      "path": "apps/web/src/features/ontology/expression-model.test.ts",
+      "bytes": 13819,
+      "sha256": "bd7a41e95c71191a7cff3bd725298774d34060185f5c2978f25ff98adc6c23bc"
+    },
+    {
+      "path": "apps/web/src/features/ontology/expression-model.ts",
+      "bytes": 8051,
+      "sha256": "10d42d6de88186c6dd6598dd14c3db6adc97384d475e88d546840c2a29cfe997"
+    },
+    {
+      "path": "apps/web/src/features/ontology/expression-tree.css",
+      "bytes": 603,
+      "sha256": "415fa1f89c54319d386535301fd0d8a0a8f11482994734c5319a12bac8e95646"
+    },
+    {
+      "path": "apps/web/src/features/ontology/expression-tree.tsx",
+      "bytes": 11532,
+      "sha256": "7348c1a9eb529007a9312e3dd6970fba31f05b5865349ae817148bd2bc2d15d0"
+    },
+    {
+      "path": "apps/web/src/features/ontology/fixed-version-comparison.tsx",
+      "bytes": 8594,
+      "sha256": "0a101bbe101cbf7e57027335b79597f5705dfac21be2beaa99dd15b33a955e91"
+    },
+    {
+      "path": "apps/web/src/features/ontology/identity-time-model.test.ts",
+      "bytes": 8903,
+      "sha256": "4ee0caf429b7a0527a2dc68dad345965b477c692aa8e41f7a8b5fca904a0ec15"
+    },
+    {
+      "path": "apps/web/src/features/ontology/identity-time-model.ts",
+      "bytes": 13814,
+      "sha256": "708c6d1ebd50302e8ac2904a492fef121403f130f1ca7c9c38d60d3d5414ad5f"
+    },
+    {
+      "path": "apps/web/src/features/ontology/identity-time-views.test.ts",
+      "bytes": 1974,
+      "sha256": "d682f00d1d11b9f09c02fc842d8db93eb3e82da43cc021d2a240993d9128bb56"
+    },
+    {
+      "path": "apps/web/src/features/ontology/identity-time-workbench.tsx",
+      "bytes": 18529,
+      "sha256": "9cb7bc48d5dd71ff7ae9711bbd303d2e66ed1091c33360838e4c8d49afc2cf9d"
+    },
+    {
+      "path": "apps/web/src/features/ontology/impact-model.test.ts",
+      "bytes": 9721,
+      "sha256": "cfaa97990f41dd2f1ca27e83aebfeeded82fa9b1b4e08a37ee82c371f63be053"
+    },
+    {
+      "path": "apps/web/src/features/ontology/impact-model.ts",
+      "bytes": 13161,
+      "sha256": "c23a4e52f8751a7f5470c892d4be88c2588c97ca5bfe39a269264f919f9c10e9"
+    },
+    {
+      "path": "apps/web/src/features/ontology/impact-report-view.tsx",
+      "bytes": 5895,
+      "sha256": "a46eb951ad3abe5e16586d92cbc5c698bdd4b8140f85aacc7f4d3546e7c7a6c5"
+    },
+    {
+      "path": "apps/web/src/features/ontology/m1-behavior.test.ts",
+      "bytes": 4857,
+      "sha256": "63633299c70b9cde17d99175fdc8f74e09027301a04a90351f0e96fd2405a018"
+    },
+    {
+      "path": "apps/web/src/features/ontology/m1-views.test.ts",
+      "bytes": 5963,
+      "sha256": "8d1fa7fc8cf432ede3ddfea116b6a0e159dba083a4c3f8c97bdda45b0c6f61e6"
+    },
+    {
+      "path": "apps/web/src/features/ontology/m2-diagnostics.test.ts",
+      "bytes": 2512,
+      "sha256": "e9deaa61be7e9fe728a19cca5e7f72e5f8740066fd32d5c15c479849a1ac0914"
+    },
+    {
+      "path": "apps/web/src/features/ontology/m2-structure.test.ts",
+      "bytes": 4964,
+      "sha256": "e12d27a5aba1cb134adbb9ede591487350949edcb8eebd184a2d73ace842e585"
+    },
+    {
+      "path": "apps/web/src/features/ontology/m2-workbench.test.ts",
+      "bytes": 3666,
+      "sha256": "b89ee4fdd57918152de29a988ebd462f313e348a6f4c9573cc89df521b5effbd"
+    },
+    {
+      "path": "apps/web/src/features/ontology/publication-impact-panel.tsx",
+      "bytes": 7200,
+      "sha256": "b34bbcbb1486630a987e305fbe527c0b837ebb9a2cef402d1b9de4c80bb308f2"
+    },
+    {
+      "path": "apps/web/src/features/ontology/released-identity-time.tsx",
+      "bytes": 2472,
+      "sha256": "420cd919d8a2bbb6d74feb199b43312ecbb194ec546149a09363769fd3075a6d"
+    },
+    {
+      "path": "apps/web/src/features/ontology/released-vocabulary.tsx",
+      "bytes": 2520,
+      "sha256": "d8bfc3d28ad3fd541e77c77cc96d8c8f3724d2da55d479d3ab74be4440867162"
+    },
+    {
+      "path": "apps/web/src/features/ontology/semantic-graph.tsx",
+      "bytes": 4392,
+      "sha256": "2634cdb087e7b808206b0a9398a61e46d9f8e935044df24385051c892d47c020"
+    },
+    {
+      "path": "apps/web/src/features/ontology/semantic-status.ts",
+      "bytes": 4109,
+      "sha256": "c55f51067d2d358f915e013ae5dfad42935b9cdcf1370d7fe76bd53fb793350a"
+    },
+    {
+      "path": "apps/web/src/features/ontology/server-page.tsx",
+      "bytes": 1225,
+      "sha256": "74880ef3156e7d9e493f1e59aaacc30a7cb44545076aacb00f059274cac01a00"
+    },
+    {
+      "path": "apps/web/src/features/ontology/source-bytes.test.ts",
+      "bytes": 705,
+      "sha256": "cd3d2123a6c9a86ec17c006506f735db24b13304a1564ef29050df92e78e177a"
+    },
+    {
+      "path": "apps/web/src/features/ontology/source-bytes.ts",
+      "bytes": 580,
+      "sha256": "d09c406115f0d0c6a771451f37af6b20707b1cc0f6951b232fda6cf4de0812af"
+    },
+    {
+      "path": "apps/web/src/features/ontology/source-editor.tsx",
+      "bytes": 4760,
+      "sha256": "c5d1b2323d655fdda356027a98dcd4b7fa0065b68a74cc86e45dcb3436a5eafa"
+    },
+    {
+      "path": "apps/web/src/features/ontology/source-import-race.test.ts",
+      "bytes": 15735,
+      "sha256": "5f2ff2cfc0ceb9ccc76e518b772575178592ed052d914cfcf05422e99df36f1a"
+    },
+    {
+      "path": "apps/web/src/features/ontology/source-import.ts",
+      "bytes": 1674,
+      "sha256": "297442151b9363c654c781b3c29b3addd206739d85f0f441388e1e59b091b3eb"
+    },
+    {
+      "path": "apps/web/src/features/ontology/structural-edit.ts",
+      "bytes": 3770,
+      "sha256": "efbc1a1dbf9d24af2191a41b943b338a7f9ba51bef63e226eb29d78c82b6721f"
+    },
+    {
+      "path": "apps/web/src/features/ontology/structural-form.tsx",
+      "bytes": 8335,
+      "sha256": "dbbf670b9ac8e4c2b99ed07d7555b05779b58ba43670d9f86934ed94af2764f3"
+    },
+    {
+      "path": "apps/web/src/features/ontology/support-profile.tsx",
+      "bytes": 3430,
+      "sha256": "751fded01973d208485151cf70a563b8863f1fe660212821bfc58c588baadc66"
+    },
+    {
+      "path": "apps/web/src/features/ontology/version-comparison.tsx",
+      "bytes": 4896,
+      "sha256": "bb8e83155c06e8a681b761b5ddcedcc6dff30e9f2d97f1003e0234bc9aa401dc"
+    },
+    {
+      "path": "apps/web/src/features/ontology/version-diff-model.test.ts",
+      "bytes": 6731,
+      "sha256": "2168d146c08d3df818bb14aebb99522c7f72cb975a9dae721b368c62bac2b6b9"
+    },
+    {
+      "path": "apps/web/src/features/ontology/version-diff-model.ts",
+      "bytes": 9461,
+      "sha256": "190a3f87d59d3b4db83daaaed3b07110ea1fef25f59bd4c0591c34f6b135e623"
+    },
+    {
+      "path": "apps/web/src/features/ontology/version-diff-view.tsx",
+      "bytes": 5462,
+      "sha256": "2f14d571c56777166fe3c401cecf632a01568d3c383a0ddadd0544567cb122d1"
+    },
+    {
+      "path": "apps/web/src/features/ontology/vocabulary-model.test.ts",
+      "bytes": 3662,
+      "sha256": "041a35d0cd957a4722d6ab3e25c46d94c121d72a1623487d17b9fdfd2ea3c71d"
+    },
+    {
+      "path": "apps/web/src/features/ontology/vocabulary-model.ts",
+      "bytes": 5935,
+      "sha256": "fbfdd608bd40613aca4d004525a1ad8eb1fd8b8b66cf76a0c1818a4e0c2855bf"
+    },
+    {
+      "path": "apps/web/src/features/ontology/vocabulary-views.test.ts",
+      "bytes": 1610,
+      "sha256": "9c6bccbdd2bc06bd8b9add20c994711d7bb88e2d8c9ae6d08ede3a5de8024123"
+    },
+    {
+      "path": "apps/web/src/features/ontology/vocabulary-workbench.tsx",
+      "bytes": 17983,
+      "sha256": "a58bff1828e0155082fff6f3f406dc73c7c16218dd7a4e39a586befa13a9c51d"
+    },
+    {
+      "path": "apps/web/src/features/ontology/workspace-state.test.ts",
+      "bytes": 4052,
+      "sha256": "785f18f8a93792b138695889401638fac321ce09ebf03c6e740077dbfdcf2e88"
+    },
+    {
+      "path": "apps/web/src/features/ontology/workspace-state.ts",
+      "bytes": 2438,
+      "sha256": "322bb74cc89f76c1be697ddb6a849b0d3f5a22b7919ce0e53f838da6fa3b90d8"
+    },
+    {
+      "path": "apps/web/src/features/ontology/workspace.css",
+      "bytes": 5500,
+      "sha256": "783e3b8d80c7af84fae4a54da3173bc6b0cec36eb0cf12db5134446b2550c0ec"
+    },
+    {
+      "path": "apps/web/src/features/ontology/workspace.tsx",
+      "bytes": 31457,
+      "sha256": "297703c30dfdde990ad30a199c59478381e6c68723b5d55a9c5c1ac065c7fe83"
+    },
+    {
+      "path": "apps/web/src/features/platform/workspace.tsx",
+      "bytes": 20324,
+      "sha256": "4ce460e93469a28aab96ff020ab7ffaf664d27bed960e7a8a92a7ece897b12de"
+    },
+    {
+      "path": "apps/web/src/features/publishing/impact-reference.tsx",
+      "bytes": 4078,
+      "sha256": "0b7ad105e1ff5852c366b2e6d24b6199de09d8ed055dd28aab26b57069e6d97b"
+    },
+    {
+      "path": "apps/web/src/features/publishing/impact-views.test.ts",
+      "bytes": 5361,
+      "sha256": "79b340eb5cb88c1699ca1c487151d22e322da03b0de5db2a5b583ec82872c76d"
+    },
+    {
+      "path": "apps/web/src/features/publishing/review.tsx",
+      "bytes": 12008,
+      "sha256": "746c29edf5e229500165aca436af6a53226d0b2eae954cdccddd43740ab99c2a"
+    },
+    {
+      "path": "apps/web/src/features/semantic/query-workspace.tsx",
+      "bytes": 11519,
+      "sha256": "fed62ac63db4d568d8bd3e2b28d056bb6d3ea14d054b580ad7b1f2f3947bcd88"
+    },
+    {
+      "path": "apps/web/src/lib/api/client.test.ts",
+      "bytes": 1645,
+      "sha256": "d0b18711aaf83c1b5b17e9aad5de89a60c578bfcfc67d364928263605f4cc27a"
+    },
+    {
+      "path": "apps/web/src/lib/api/client.ts",
+      "bytes": 1972,
+      "sha256": "b318141881b3798729f190cc5a316b542c8666d966325378daa14b652ab242d9"
+    },
+    {
+      "path": "apps/web/src/lib/api/g2-client.test.ts",
+      "bytes": 7089,
+      "sha256": "1130e1d03166d34bb0f3733a1cd7b9685f569d4fb20f7b41d1d850354b690cf6"
+    },
+    {
+      "path": "apps/web/src/lib/api/g2-client.ts",
+      "bytes": 9126,
+      "sha256": "bfb27ef278f7ac00d67014d8ced4f93ef895926fe4962d9a196a251778fc8196"
+    },
+    {
+      "path": "apps/web/src/lib/api/g2-generated.ts",
+      "bytes": 24952,
+      "sha256": "8ddd4379164ccc1313aefe7846db391c665e093d349cfe0a2f62edcb9bfa9b17"
+    },
+    {
+      "path": "apps/web/src/lib/api/g4-generated.ts",
+      "bytes": 4742,
+      "sha256": "1bde16a67d02216d0389205e2d29993be7a6992818e2c847e98e8a704d6e8a44"
+    },
+    {
+      "path": "apps/web/src/lib/api/generated.ts",
+      "bytes": 1192,
+      "sha256": "725dc4b85709aac229b6743e5f5309d981e7a6a8a46a06212206acf1a71e918d"
+    },
+    {
+      "path": "apps/web/src/lib/api/openapi-types.test.ts",
+      "bytes": 2468,
+      "sha256": "c63b6217828d5663307186420c8ef819f16a6780772a567a4bb420cd28975984"
+    },
+    {
+      "path": "apps/web/src/lib/api/server-config.ts",
+      "bytes": 665,
+      "sha256": "adb1351d153c383fbac3c9966981cb9c1f011482d643379f4a03bac2ea218beb"
+    },
+    {
+      "path": "apps/web/src/styles/globals.css",
+      "bytes": 25066,
+      "sha256": "383b2a88b09ec5eaca5d5d70f59ef27ccf714f7c2b9ce7b868512a36f1fe7233"
+    },
+    {
+      "path": "apps/web/tests/fixture-server.mjs",
+      "bytes": 584,
+      "sha256": "b2f8c5887694f3ee45ef0567cb101ca115878eca80ea17f532db263fe32f20a3"
+    },
+    {
+      "path": "apps/web/tests/g2/fixture-server.mjs",
+      "bytes": 681,
+      "sha256": "e4fccc951088d96089478dc1e51483e27aabfee7d0238f428ede141731a14ff7"
+    },
+    {
+      "path": "apps/web/tests/g2/lifecycle.spec.ts",
+      "bytes": 18992,
+      "sha256": "1f4a58b5daab3ac70e145726c4049ca19d512a76d2e00ce698893f9ef155db7d"
+    },
+    {
+      "path": "apps/web/tests/g2/long-layout.spec.ts",
+      "bytes": 11176,
+      "sha256": "b7ba29e7f22f8b895f534c7eab0ee8b3b3ea577db68a5780aa36cebc840630e1"
+    },
+    {
+      "path": "apps/web/tests/g2/m3-vocabulary.spec.ts",
+      "bytes": 6565,
+      "sha256": "76ac94ec73b10aaa56bc815c2446cb21dddf1adb4318bc202901c047e1b1bb86"
+    },
+    {
+      "path": "apps/web/tests/g2/playwright.config.ts",
+      "bytes": 851,
+      "sha256": "cacc5323cd2f8aad3a00ab76a91c63d56d8dd7763c934432e3a414695824b1b6"
+    },
+    {
+      "path": "apps/web/tests/g2/workspace.spec.ts",
+      "bytes": 11867,
+      "sha256": "dca771eed41ddf39542bb83b8d8b007fa442582fd1e1e7ffb18ff1b7b22320fa"
+    },
+    {
+      "path": "apps/web/tests/oidc/auth.spec.ts",
+      "bytes": 4415,
+      "sha256": "75c1ed1713aa3791703a3ea1297107a0465c813a92659e4aa7995a2bcf16ba46"
+    },
+    {
+      "path": "apps/web/tests/oidc/safe-reporter.ts",
+      "bytes": 1099,
+      "sha256": "ab06ffc2f56501e1daa6b43f4b4ac02d2bb1ed3d2e87624835029526296e45fb"
+    },
+    {
+      "path": "apps/web/tests/ui/mobile-navigation.spec.ts",
+      "bytes": 6884,
+      "sha256": "868b462d5ac30f07d2aa79546bc5a7e1601893c4f7f927bef7769c98427063f4"
+    },
+    {
+      "path": "apps/web/tests/ui/workspace.spec.ts",
+      "bytes": 7524,
+      "sha256": "13d72c0d0149246d11e7ece82384bc06d037e734018bb7c024e0f08387bf506e"
+    },
+    {
+      "path": "apps/web/tsconfig.json",
+      "bytes": 702,
+      "sha256": "5e84bc0c9bf901d0c2af53c37e00e4bd0704739deafb086fb9a9162ad8258f18"
+    },
+    {
+      "path": "apps/web/vitest.config.ts",
+      "bytes": 141,
+      "sha256": "d41e78be6eb331a48fbb85ebbaf4ae3ea4e65260f80f357744e6f42d6049e55f"
+    },
+    {
+      "path": "backend/AGENTS.md",
+      "bytes": 1945,
+      "sha256": "e722c538fc586494b89b9922fc1188c70fa8a9dbfc15684805f4dd310c5cf648"
+    },
+    {
+      "path": "backend/OntologyPlatform.slnx",
+      "bytes": 2731,
+      "sha256": "9f481eaa7a0570cf6e02d11a004f21696dff370d2a280d47edfaea5482bbb29c"
+    },
+    {
+      "path": "backend/src/AppHost/CanonicalFusekiImage.cs",
+      "bytes": 3196,
+      "sha256": "1056edc3711ee2dd604d7b42803947abaa6aa9ae58e8081f2b31986fb5281b02"
+    },
+    {
+      "path": "backend/src/AppHost/DevelopmentInfrastructure.cs",
+      "bytes": 6609,
+      "sha256": "5d8f76f30c95e9afc0970b582d39efcbd3edd697ece3ad3dc358ac3fd7749f01"
+    },
+    {
+      "path": "backend/src/AppHost/G2Infrastructure.cs",
+      "bytes": 2979,
+      "sha256": "cd58c79f68eb7ce5b1d870b4e18334c0aa92f55664436ee4402bacb3203406be"
+    },
+    {
+      "path": "backend/src/AppHost/OntologyPlatform.AppHost.csproj",
+      "bytes": 695,
+      "sha256": "c4af0d4e0db2383c5eb29a7e455150221bb4cab35420ab73cc6eaf5102c719ee"
+    },
+    {
+      "path": "backend/src/AppHost/Program.cs",
+      "bytes": 1042,
+      "sha256": "4fc3e2f17dc039a2db04af873b9da962c1bdbd4e47ddfe264de34a469aa962b9"
+    },
+    {
+      "path": "backend/src/AppHost/Properties/launchSettings.json",
+      "bytes": 507,
+      "sha256": "21b395037bc6353aace032984ec5fa963be1cc0221e699ff632bbeed5644a5c1"
+    },
+    {
+      "path": "backend/src/AppHost/ResourceLifecycle.cs",
+      "bytes": 2689,
+      "sha256": "7b4b9613fedb032a830296d0a5ebfb78839fcf137e6ab5fa306fd64542341de9"
+    },
+    {
+      "path": "backend/src/AppHost/Wave2Infrastructure.cs",
+      "bytes": 13437,
+      "sha256": "846c1699913b1cf9c4fa439f0fc90af4f6d17b9ed8b3576161f8d3a9ecb80f58"
+    },
+    {
+      "path": "backend/src/AppHost/packages.linux-x64.lock.json",
+      "bytes": 33812,
+      "sha256": "471da805b230676ec198a3c92882899a223831bb87fc4083f51b0fbb205dae88"
+    },
+    {
+      "path": "backend/src/AppHost/packages.osx-arm64.lock.json",
+      "bytes": 33812,
+      "sha256": "11da2cad657005538d213939cb753d7e3c2be7068a344762a4c9622f9dab97e4"
+    },
+    {
+      "path": "backend/src/AppHost/packages.win-x64.lock.json",
+      "bytes": 33808,
+      "sha256": "058d3eb1cda5283f51e0b63eb5fc6b1b765f1b9b587a702df56ddd37c9bb923b"
+    },
+    {
+      "path": "backend/src/Contracts/OntologyPlatform.Contracts/G2Models.g.cs",
+      "bytes": 138642,
+      "sha256": "bf267b2b18ef5458cfbb7b86487124dea5df6365579b0b7af67f30f9938b8caa"
+    },
+    {
+      "path": "backend/src/Contracts/OntologyPlatform.Contracts/G2Services.cs",
+      "bytes": 15533,
+      "sha256": "599804cd43b693d7b7390d384464ac6d937e696356ec53f8825c8e4e6b1d4495"
+    },
+    {
+      "path": "backend/src/Contracts/OntologyPlatform.Contracts/G2WireRules.cs",
+      "bytes": 6577,
+      "sha256": "4ef117f2294d36b7f3e0c38e2dc8a46909a486f0a49f9a0a41410598eb9fefe1"
+    },
+    {
+      "path": "backend/src/Contracts/OntologyPlatform.Contracts/G3ExpressionServices.cs",
+      "bytes": 1356,
+      "sha256": "447da2a5923be13cbbfa0072105bf637986c6c2ce12e73a3d77f064119acb4cf"
+    },
+    {
+      "path": "backend/src/Contracts/OntologyPlatform.Contracts/G3IdentityTimeServices.cs",
+      "bytes": 1740,
+      "sha256": "f2a260e6c36247a4871e764680501d6219b9af7a71dc47b97d1cd2c9b6145492"
+    },
+    {
+      "path": "backend/src/Contracts/OntologyPlatform.Contracts/G3ImpactServices.cs",
+      "bytes": 3355,
+      "sha256": "24e6c5b06555ce0c29a6ac87cfdce6b5d080ce32c4a8ddac5e332a9b32d1efed"
+    },
+    {
+      "path": "backend/src/Contracts/OntologyPlatform.Contracts/G3Services.cs",
+      "bytes": 2299,
+      "sha256": "9d610be7a6cc8ce8a82212a052ca44e510171d414f51b112dd2c92d86af42c25"
+    },
+    {
+      "path": "backend/src/Contracts/OntologyPlatform.Contracts/G3VocabularyServices.cs",
+      "bytes": 2807,
+      "sha256": "0a1b4dfa821076507b8b3a1dc61fca31ba528f0c1ac30105c2c9467f6bb87516"
+    },
+    {
+      "path": "backend/src/Contracts/OntologyPlatform.Contracts/G4ConnectionModels.cs",
+      "bytes": 18515,
+      "sha256": "23cb3e751d08d4ab9dee1340ca6cd5ef7ab4cb4b5a57083b23b81264151b239c"
+    },
+    {
+      "path": "backend/src/Contracts/OntologyPlatform.Contracts/G4ConnectionRules.cs",
+      "bytes": 7695,
+      "sha256": "799faa0d2af056368e92aa1d7c3ac370e32747a4b62adf2cdc806030795d5a53"
+    },
+    {
+      "path": "backend/src/Contracts/OntologyPlatform.Contracts/ImpactContractRules.cs",
+      "bytes": 14496,
+      "sha256": "13510e20c3a5af7ea9835f4e72bf9b0a3ceaca68eabc0c2bcf0738d02fa9066a"
+    },
+    {
+      "path": "backend/src/Contracts/OntologyPlatform.Contracts/OntologyPlatform.Contracts.csproj",
+      "bytes": 36,
+      "sha256": "8d654c44b7bebb6b31a9f2f606927f45b5072193adc4eef8cce3f3cf3b278df3"
+    },
+    {
+      "path": "backend/src/Contracts/OntologyPlatform.Contracts/ReleaseManifestCompatibility.cs",
+      "bytes": 2978,
+      "sha256": "c3cc17e416fcc2b0ba285eccf071bfa693bf31b185eb8254d655a6e3ea0856a0"
+    },
+    {
+      "path": "backend/src/Contracts/OntologyPlatform.Contracts/SemanticOperationException.cs",
+      "bytes": 885,
+      "sha256": "df6316b7dc398ea28116aacc1d444414e6ecb341d7bd83831b75c96069b30ee3"
+    },
+    {
+      "path": "backend/src/Contracts/OntologyPlatform.Contracts/StrictStringEnumConverter.cs",
+      "bytes": 579,
+      "sha256": "48883ac92224f3e60f8574e9f9fff7dd5bdcecf100a554c0e3881ef69509970f"
+    },
+    {
+      "path": "backend/src/Contracts/OntologyPlatform.Contracts/TemporalContractRules.cs",
+      "bytes": 2819,
+      "sha256": "4ef260b43c14f2db2e6e8e640e208334f4020c84f50f5c287cca874622d0a4d3"
+    },
+    {
+      "path": "backend/src/Contracts/OntologyPlatform.Contracts/packages.lock.json",
+      "bytes": 62,
+      "sha256": "1624731bf151ec2ac6993023046a4abbac7c6ddc71ed2e242e8285bbc69d561e"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/Contracts/PlatformModels.cs",
+      "bytes": 5154,
+      "sha256": "b0b628a0d69e93d19e039705c38e2a375ca47252b957e188e38e9c99c777cf3c"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/Contracts/PlatformOpenApi.cs",
+      "bytes": 6837,
+      "sha256": "3258970bb2065e75d9b817ce30760b3652cd75e3c772573ef3449184bc60a50b"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/Contracts/PlatformProblem.cs",
+      "bytes": 1466,
+      "sha256": "7454ae483625a432d810b647a83f76a526ed6d2be828fa0c7811f8d901b6552a"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/G2/ExecutionEndpoints.cs",
+      "bytes": 6983,
+      "sha256": "9df32ebcc54440f92f8572b680415d0ae906ec3cce086c33a1519cc6e92db6f7"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/G2/ExpressionEndpoints.cs",
+      "bytes": 2104,
+      "sha256": "a10d2a02173dccea3de6d6adbfc7a56328d7aef8e38d45e35dc226d4104a358c"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/G2/G2Authorization.cs",
+      "bytes": 2700,
+      "sha256": "71446ac89d5f04fde80dbc243141c3041575111dd450498ec3b3b893e84bcbb9"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/G2/G2AuthorizationResultHandler.cs",
+      "bytes": 2445,
+      "sha256": "ad0144633647eddc7867aec68b6dc5cd49b8f14fddf85e56bdd87873c8a15185"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/G2/G2Composition.cs",
+      "bytes": 4736,
+      "sha256": "677ac97cdb0e4f9a68e0cae76bfac3c5185c23e2d7ebc67f1b48c91a0fc1bf87"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/G2/G2EndpointGuard.cs",
+      "bytes": 11099,
+      "sha256": "c540b6430dacefe2090d68cb2532ef7b25e0dae017e80553f62ab4fb2400bd01"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/G2/G2OpenApi.cs",
+      "bytes": 5753,
+      "sha256": "34984361262323c210c25afa458c334bca5899262ece4b95bee10beef316995e"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/G2/G2Readiness.cs",
+      "bytes": 7666,
+      "sha256": "6b6e6dc336192b6970ff56cb8d84a99e76e26af928f3a78ed5ca0aaa152b62f5"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/G2/G2StreamSession.cs",
+      "bytes": 2688,
+      "sha256": "802cb86a4f5807e9f900d1b6210a23e6e0eb0dda152e0cf72b480c212234874b"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/G2/G3Endpoints.cs",
+      "bytes": 2973,
+      "sha256": "1e3d124f283d8d60a8031bd9e126392c211b2c397d3a103f5f31659487af9fd0"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/G2/IdentityTimeEndpoints.cs",
+      "bytes": 2660,
+      "sha256": "91b88ffeb4f6145948396b24f63bd33c841900b6b09e06e6776e3403909919a3"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/G2/ImpactEndpoints.cs",
+      "bytes": 2607,
+      "sha256": "8c1bca4902797423b1e0f28be277d59652cba4c5ccb617950673f4fa9b97c77b"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/G2/McpEndpoints.cs",
+      "bytes": 4121,
+      "sha256": "15fe4fdfc5b579b64c2063486b1b16b1c90eaebbea700d4766c2ab32f4422f78"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/G2/OntologyEndpoints.cs",
+      "bytes": 4584,
+      "sha256": "4ef52e1201e9f005df5816c12ecb97f669064ac9a3462d2cdea33260ceb67d55"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/G2/PublishingEndpoints.cs",
+      "bytes": 3726,
+      "sha256": "51f189c7186c50b5171eb493e882e50bcc55e12e45fe3cecb3baa4896289b2bd"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/G2/SemanticEndpoints.cs",
+      "bytes": 2517,
+      "sha256": "83dc73bd3be7f3a2853e634b75730672e9620b14747cd1e97e428b8fb8b00842"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/G2/VocabularyEndpoints.cs",
+      "bytes": 2613,
+      "sha256": "8c84a788186e7eef7898a2949aaf1422a396a9811fca502fd7346c13cd55f268"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/G4/G4Composition.cs",
+      "bytes": 5751,
+      "sha256": "89b5f2bba26d33832ead29c9469b5d95ff6c993c9d36256e52759fba8e5dc403"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/G4/G4ContractExport.cs",
+      "bytes": 1516,
+      "sha256": "e2285d8f3b5bb78a3d4be56e069fdc5b6ab0fc6228baa6e6bd337f00c97e0905"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/G4/G4Endpoints.cs",
+      "bytes": 8665,
+      "sha256": "71acb4fd4863b7c5d7c746806e7b2d884d43ad10bbad4023f847d46715991633"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/G4/G4OpenApi.cs",
+      "bytes": 1492,
+      "sha256": "1fc42ddeea0cd7e371e96c0be35cd5964ea384dbd788adbab11927061d758b95"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/OntologyPlatform.Api.csproj",
+      "bytes": 1456,
+      "sha256": "2ecf04e85550b183ab8419e7a1b3c811f4018216834a6fe92f6c8d4275654f21"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/PlatformApiHost.cs",
+      "bytes": 24793,
+      "sha256": "ffd2bca92c15d2a7075e7dbc8060c063e9ffc9b4fb4dd7ac0489521e57de3547"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/PlatformEndpoints.cs",
+      "bytes": 17248,
+      "sha256": "bf951b51b3e0d004473035228a25b2fbc2ab1392108c69f17cb70c2d1aacecd4"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/PlatformFailure.cs",
+      "bytes": 3122,
+      "sha256": "d87c5f42d554bbb02a83802103bb13f91980a733df53e633e8f50a77dc3bf033"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/PlatformProblem.cs",
+      "bytes": 1274,
+      "sha256": "4886f710c39348829c098c26164abf36b305d48149bd74016c8fac779c03d838"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/PlatformTelemetry.cs",
+      "bytes": 3727,
+      "sha256": "2e13ecc39d5ce06c25a6b64f3ae407fafb7a24c509e8432b580317b10d57e072"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/Program.cs",
+      "bytes": 1022,
+      "sha256": "081fb9045d01289b356784ccee5ccdd35bfeab6058109c596883a3d25bb185ec"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/Security/AuditService.cs",
+      "bytes": 3405,
+      "sha256": "195fb8a2fb86d686943a5d221e706eec52fd882806978ed117ae1deb962e772f"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/Security/PlatformSecurityOptions.cs",
+      "bytes": 4306,
+      "sha256": "f43d12fdba4d488fb9212019e04b9508e04dfbfc238e16d66a9853f7e3c45f7a"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/Security/PostgresTicketStore.cs",
+      "bytes": 7068,
+      "sha256": "05d9e87ad91c3e71785ba855be010c5f47d94ed7d763407328258948471ed1ec"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/Security/SecurityBoundary.cs",
+      "bytes": 2087,
+      "sha256": "6dc40988719f300fb361c8e19d9c0ef940479b41b9d7c7abc1b5a8616cc74d36"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/packages.lock.json",
+      "bytes": 20210,
+      "sha256": "ec8449b8dd2e9b10386a5fb5a581d175297dc20fdfc10b6c678cb05a602d90a2"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.InfrastructureApi/InfrastructureApiHost.cs",
+      "bytes": 1471,
+      "sha256": "3e3551dba51ff171a917ad25d7f696a30a0e5b27f1cc95e3c73e9ed6f8e784fd"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.InfrastructureApi/OntologyPlatform.InfrastructureApi.csproj",
+      "bytes": 175,
+      "sha256": "1f43ed351908e92aa34589d4ca44cfdc5a349512dd0b52d844d7b8b65866e68a"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.InfrastructureApi/packages.lock.json",
+      "bytes": 7759,
+      "sha256": "c6de077de89bca2884eaf5a3580a7b3f196b370f9c2511af650e456fc6c96d75"
+    },
+    {
+      "path": "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/AgentRunExecutor.cs",
+      "bytes": 9693,
+      "sha256": "e0ce6637c5c98f6e23dfb749dfc83ad3ac5cc169fdf1dbc40552410c14269a49"
+    },
+    {
+      "path": "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/AgentsDbContext.cs",
+      "bytes": 2108,
+      "sha256": "a25b18db08e6e6825ddbfc863b26d0cb2f59f94a605af4d082b445f4945b89f1"
+    },
+    {
+      "path": "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/AgentsDesignTimeFactory.cs",
+      "bytes": 1050,
+      "sha256": "1a42d36ca8046890fded46e993a577264b3447eea08ce30128914b17508d9f70"
+    },
+    {
+      "path": "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/AgentsModule.cs",
+      "bytes": 2773,
+      "sha256": "52cfd4b4a88d752981db982296434b42bf05128468adb589b9691c96accef992"
+    },
+    {
+      "path": "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/DeterministicRunClient.cs",
+      "bytes": 4445,
+      "sha256": "3024b1d9c6551a761e3822e710eaf7aecbc8df0e72a9f5d497b5da4c94dc68a7"
+    },
+    {
+      "path": "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/ExecutionRunService.cs",
+      "bytes": 25408,
+      "sha256": "4bd167641c5f0f8c71a9cc30543ec6d8410b28b7191b3d375fff614af6ffd828"
+    },
+    {
+      "path": "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/Migrations/20261026024046_InitialAgents.Designer.cs",
+      "bytes": 6318,
+      "sha256": "8c19b6e94498ad1b79486451a1863d5d93c9ddfad94e2e706f534051fee01918"
+    },
+    {
+      "path": "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/Migrations/20261026024046_InitialAgents.cs",
+      "bytes": 5951,
+      "sha256": "276e315e2cb95a365f401ad47940b52fa9aff931ffc877a8c90e2112e9163a50"
+    },
+    {
+      "path": "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/Migrations/AgentsDbContextModelSnapshot.cs",
+      "bytes": 6220,
+      "sha256": "264dc4d538bbe41c78330324720cbb975bd6545103a8da78fbc3775465caa877"
+    },
+    {
+      "path": "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/OntologyPlatform.Modules.Agents.csproj",
+      "bytes": 799,
+      "sha256": "1f305446985f311af0a4593977fc1c82802d8027c7ddb46022bf6cd53ba6694d"
+    },
+    {
+      "path": "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/RunCommandRecord.cs",
+      "bytes": 630,
+      "sha256": "b394e7831a195c0c254681c3fb3ef35943b2d6645155614998a8132a22b4dc39"
+    },
+    {
+      "path": "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/RunEventRecord.cs",
+      "bytes": 617,
+      "sha256": "58fcf68a164a257d969342866d394454c22f13d5d614d074dcbac0d89f8f2a31"
+    },
+    {
+      "path": "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/RunRecord.cs",
+      "bytes": 2618,
+      "sha256": "643ea34acbf568c6f69c8cb68dc39b5fb945f895c747828688abd7da99477a75"
+    },
+    {
+      "path": "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/SemanticMcpTools.cs",
+      "bytes": 6872,
+      "sha256": "09d7adb4aa3a55417e225853ec8a773e46f6ddcab9697505da6ad4430d95946c"
+    },
+    {
+      "path": "backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/packages.lock.json",
+      "bytes": 13230,
+      "sha256": "09a833f314723d71e12ddb2a5938d41acb4d412a28b80d91bee2b92a2195ebaa"
+    },
+    {
+      "path": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Abstractions/IConnectionRequestHandler.cs",
+      "bytes": 2033,
+      "sha256": "f8a2ec6cd61b1f7fa398cc3460ddc050c9ddcf4b2eb9902090ed9033cf25e904"
+    },
+    {
+      "path": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Abstractions/IConnectionSessionAuthority.cs",
+      "bytes": 694,
+      "sha256": "3156989183c5730f1f480333ecf85b4be5d0835d877f835511c868ef8b6bad97"
+    },
+    {
+      "path": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Abstractions/IPgSourceAdapter.cs",
+      "bytes": 3404,
+      "sha256": "abbc81600b592978a496f313ec9df1aa92af7b2508e700926b263e5704052c27"
+    },
+    {
+      "path": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Adapters/PgSourceAdapter.Sql.cs",
+      "bytes": 4318,
+      "sha256": "e30775a2fb20a7f9fc58a0abb133151c7f79ecac25c1137c55d25af9278fdbde"
+    },
+    {
+      "path": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Adapters/PgSourceAdapter.cs",
+      "bytes": 20877,
+      "sha256": "38a6ee743aae802be97d4a71347be1d621426d171a556091adf1dceeadd78e50"
+    },
+    {
+      "path": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Application/CatalogWorker.cs",
+      "bytes": 2047,
+      "sha256": "863322e05e188b898846217ead19fb37296e289c954e04f76b3affd9cb207ac3"
+    },
+    {
+      "path": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Application/ConnectionApplicationService.Catalog.cs",
+      "bytes": 10309,
+      "sha256": "aff36de322ab901622c8aeff0d5c2fe645170345b385863ec01fd6b3ab229ab3"
+    },
+    {
+      "path": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Application/ConnectionApplicationService.Commands.cs",
+      "bytes": 8585,
+      "sha256": "18e0ec18afb4b0eebfda8b32dc879036439546cf3a7afe0a3ca08a4c68bbcc93"
+    },
+    {
+      "path": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Application/ConnectionApplicationService.Enable.cs",
+      "bytes": 5943,
+      "sha256": "d8bbfe814437495312a6cd46445d8545fd255de64f98b9144ee5fec98fedf3dc"
+    },
+    {
+      "path": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Application/ConnectionApplicationService.Probes.cs",
+      "bytes": 9819,
+      "sha256": "0d0ae9ca6f1c15d88e301de30d76cc79256ac5b56611755214bf11f716efee8b"
+    },
+    {
+      "path": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Application/ConnectionApplicationService.Worker.cs",
+      "bytes": 11626,
+      "sha256": "304f83ec7ccf4f14c77244cfafdc6695fab5018140114075543c858838038f48"
+    },
+    {
+      "path": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Application/ConnectionApplicationService.cs",
+      "bytes": 18272,
+      "sha256": "d8475f82eeada14cefb01085f88937f867c02421d6c7d3b246c605646f4975ce"
+    },
+    {
+      "path": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/ConnectionSecretCipher.cs",
+      "bytes": 3508,
+      "sha256": "0bd8e363d5053c14dfd263f25b3c291f473a67173d2473a9dc0e48e52d61fd40"
+    },
+    {
+      "path": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Migrations/20261101115947_InitialConnections.Designer.cs",
+      "bytes": 12291,
+      "sha256": "98209783e908dbc39290a226c0eb903ce2839c880d2f3e3fe0d080e65333a336"
+    },
+    {
+      "path": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Migrations/20261101115947_InitialConnections.cs",
+      "bytes": 11410,
+      "sha256": "fe112c28be328f9c14eee535b55be3e58e6182cc0657b218e0d98836e6e7273d"
+    },
+    {
+      "path": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Migrations/ConnectionsDbContextModelSnapshot.cs",
+      "bytes": 12188,
+      "sha256": "0ebfb1d134dc83e39dd8988a6dc60422bb7ed1be736b514250cf154da6e0a789"
+    },
+    {
+      "path": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/OntologyPlatform.Modules.Connections.csproj",
+      "bytes": 618,
+      "sha256": "b37f0ae3a5541a8a971a11da68a79bbfdb8c12eb06806f98e998151cc0ff175a"
+    },
+    {
+      "path": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Persistence/CatalogJobRecord.cs",
+      "bytes": 2210,
+      "sha256": "f57810b51057e3e1399b2f8ad2cae2016c8157c62a437bf7246388e982fe9c1b"
+    },
+    {
+      "path": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Persistence/CatalogSnapshotRecord.cs",
+      "bytes": 1048,
+      "sha256": "5ff913f33259d6c2924152dcd691576ec2771c695fd7fb634a733857eda90b70"
+    },
+    {
+      "path": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Persistence/ConnectionCommandRecord.cs",
+      "bytes": 1275,
+      "sha256": "1e50635f2d873fe0577f32213e2cedbd00bbdee97f30d5cd9358f9fe9aa714ad"
+    },
+    {
+      "path": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Persistence/ConnectionProbeRecord.cs",
+      "bytes": 1671,
+      "sha256": "4b82b677c178d3d96d40a6074bd163f6b9e48a14243ed5ed242bca493b07776e"
+    },
+    {
+      "path": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Persistence/ConnectionRecord.cs",
+      "bytes": 1462,
+      "sha256": "adb7f78ac6b074de16905f349c158f8f7c4272085d62cf36974a8d8e4ea3aff5"
+    },
+    {
+      "path": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Persistence/ConnectionSecretRecord.cs",
+      "bytes": 1558,
+      "sha256": "06744dc1a66520523da14922e5c596fb446eb07eb9d7b8668bc09d900ac66332"
+    },
+    {
+      "path": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Persistence/ConnectionsDbContext.cs",
+      "bytes": 3331,
+      "sha256": "03122925a4fb1e9b56950a9b3b619e041705f12b254c1605d56f4398bd611ba0"
+    },
+    {
+      "path": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Persistence/ConnectionsDesignTimeFactory.cs",
+      "bytes": 852,
+      "sha256": "34cbe2d0185ad5e15a478f10586779ce57212b065a353ac5525c535b9c7b24c0"
+    },
+    {
+      "path": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/packages.lock.json",
+      "bytes": 9012,
+      "sha256": "fd470531bc3af648612a05fff87d4fce45483544080b98803a05261f492bc0f7"
+    },
+    {
+      "path": "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/AuditRecord.cs",
+      "bytes": 1579,
+      "sha256": "9a517cbf21023f48ebc67384bbc78cbd4085c02266531994803f522843814874"
+    },
+    {
+      "path": "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/GovernanceDbContext.cs",
+      "bytes": 3204,
+      "sha256": "ca6b9d7244579d5f60dabfdb1913df46a8fe7315442427de4f351c084f4686a5"
+    },
+    {
+      "path": "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/GovernanceDesignTimeFactory.cs",
+      "bytes": 1283,
+      "sha256": "df7f976c937c551229894a3ee4a19e88ee34e73706c65e48f687a4269bf28a0d"
+    },
+    {
+      "path": "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/Migrations/20261025062847_InitialGovernance.Designer.cs",
+      "bytes": 5223,
+      "sha256": "e61a0f6538092da450d22fbd0f688c3d2b4e3c3223e5f642fb269d4bcf1e61cd"
+    },
+    {
+      "path": "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/Migrations/20261025062847_InitialGovernance.cs",
+      "bytes": 4907,
+      "sha256": "cd676e6caa548b799700021dc266d2e8e52290866295a60e721ce068a1c1d10f"
+    },
+    {
+      "path": "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/Migrations/20261025144246_AuditScopeSites.Designer.cs",
+      "bytes": 5341,
+      "sha256": "0c20c3191d1d431aed86479117678aeab3320dd3ee2f8bb00f9eafd035b55b88"
+    },
+    {
+      "path": "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/Migrations/20261025144246_AuditScopeSites.cs",
+      "bytes": 1585,
+      "sha256": "0d1cc0c751e3b49a4a1b7046cd0a5620c58710ecc443e13d4e737d52ed1f86b4"
+    },
+    {
+      "path": "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/Migrations/GovernanceDbContextModelSnapshot.cs",
+      "bytes": 5243,
+      "sha256": "5c2edc022b2764fdeca31700019d4e5ebfe4a744eca6de204cdf7e37a8b25b9d"
+    },
+    {
+      "path": "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/OntologyPlatform.Modules.Governance.csproj",
+      "bytes": 621,
+      "sha256": "e94d77c39d64462c71705c7a77b57b9b5c87da1e2b567235cf54c0ecb1573d69"
+    },
+    {
+      "path": "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/ServerSession.cs",
+      "bytes": 698,
+      "sha256": "db052f53f43f09089da2c987682b87ce3e31044b97712c6e82c36d9da52e2715"
+    },
+    {
+      "path": "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/SyntheticResource.cs",
+      "bytes": 728,
+      "sha256": "ab76d1b72a7f022b6cdba78d22f84d6021b689318bd62f1b8c989e2f297d82e2"
+    },
+    {
+      "path": "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/TransactionalAuditWriter.cs",
+      "bytes": 7617,
+      "sha256": "2a460770cff2b3cb412182e595a07daee73fe103d8a9ef0882ce9251a92a87b1"
+    },
+    {
+      "path": "backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/packages.lock.json",
+      "bytes": 13133,
+      "sha256": "3478e5e3e54b4977de77d10a3295299079aa6ee66b3a1f807a727ba05de73f69"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/OntologyPlatform.Modules.Ontology.Domain.csproj",
+      "bytes": 189,
+      "sha256": "9a182b8fd6d14bcfd5f19a0a30cfd5d24c8d05fc5bc3a2626206311617817aaa"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/OntologyRules.cs",
+      "bytes": 1835,
+      "sha256": "f2ac851ca6963be9798bc983a43473d391de8e139d1d3de3fddcf6595564cc4a"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/packages.lock.json",
+      "bytes": 139,
+      "sha256": "1aaaf7d62e2a7033e58cef4178d5e772c3b3b7ac54d82a69079a15b20508f777"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/AssessmentRecord.cs",
+      "bytes": 763,
+      "sha256": "328205b8d0181e9282a72ea576507b53469d031557836e387c2e3d323a0e4817"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/CommandRecord.cs",
+      "bytes": 691,
+      "sha256": "abbe5e42e4078d38890cb78491adbfa5e3c3faf385e5bcee1ad4288da21cbf44"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/DraftRecord.cs",
+      "bytes": 1155,
+      "sha256": "83882ec388f15a0bf8721842e1d7342536be8b47dad7403aac2bd46b6854befc"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/DraftRevisionRecord.cs",
+      "bytes": 737,
+      "sha256": "fa37a85f06c7ab7c01ef0061b57135d274b296f87b5302673cc6dacd95f36b2d"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/ExactGraphComparison.cs",
+      "bytes": 10616,
+      "sha256": "e1bf6289c2a7a528f58c348142b14ceec08e210a3d265c9c415d5c8b262c8d4f"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/IdentityTimeGovernance.cs",
+      "bytes": 13283,
+      "sha256": "c0d9fb68c4bc2f59c32b6607ed9882f768b30aab90f0dab3209bbb549944471d"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/IdentityTimePolicy.cs",
+      "bytes": 9740,
+      "sha256": "3f9aacd14630b972ee950d3fa70db9d0ea9917e43cb4aa2893ff71db2dd5ea4c"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/ImpactAnalysis.cs",
+      "bytes": 24427,
+      "sha256": "6738a6f97828977276a93752a3b06d9c72aa1bcbdc78b9d97d25b9d6eb2efe06"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/ImpactReportRecord.cs",
+      "bytes": 1752,
+      "sha256": "70dca7f5709c00f150977481692bc5f3f8a36b3c97f355afe97e093cad9900e9"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaComparison.cs",
+      "bytes": 9679,
+      "sha256": "5309d2a23f2b01425a5580d487fec2e118ed930f9e9b31db039b1c68ddfc0432"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaExpressions.cs",
+      "bytes": 2192,
+      "sha256": "84fb243f6327bf7954a1fb4f5db3bcd073b00a2de3869f1a50dddc5b563c7323"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaRdfCodec.cs",
+      "bytes": 8242,
+      "sha256": "2080323b741b45d239e9ebd4613641e9f3a57e02b255ced8f6cc72a94c238f0b"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaSemanticRuntime.cs",
+      "bytes": 34096,
+      "sha256": "2dfe526822d44b1efe47c46648125d1564e752795f138cf3a84ff6b6f64a84fb"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/JenaVocabulary.cs",
+      "bytes": 6931,
+      "sha256": "093f9b18ad18139500a6ecd831d61ffc2b03de880798039d1977a5ae574ef076"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/Migrations/20261026003221_InitialOntology.Designer.cs",
+      "bytes": 5926,
+      "sha256": "1daa6de46382838d2b423bf1d6e8d02e6a1a09a237df9ae34817b5662e3fd0be"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/Migrations/20261026003221_InitialOntology.cs",
+      "bytes": 5844,
+      "sha256": "a384908a7e5ade8e39fee59069e3d0d770fcfb365a45caa0f0633ae5251cb4f2"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/Migrations/20261027032135_G3Assessments.Designer.cs",
+      "bytes": 7693,
+      "sha256": "9e110017369a2ea3b645fe780e5bfc143223c21205bb93461474f60ee96df665"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/Migrations/20261027032135_G3Assessments.cs",
+      "bytes": 2743,
+      "sha256": "4eb5d3bf8b98da79f8221e74137339de00626c77871fda99c407d19ee5c53673"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/Migrations/20261030155129_G3M4ImpactReports.Designer.cs",
+      "bytes": 10377,
+      "sha256": "ccc978dbab6fbb1f37567dbcea8a2cad21af8eeeb876a9bb9f1b4b2e2d7e4ead"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/Migrations/20261030155129_G3M4ImpactReports.cs",
+      "bytes": 4143,
+      "sha256": "acfc10eadbd100c5ca8b875a8a713bb30dada8dd3564d22b3d76b8f62f81bf5d"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/Migrations/OntologyDbContextModelSnapshot.cs",
+      "bytes": 10273,
+      "sha256": "367e143529b7982eed9347e6c4f06aac6de5803666069d984277d66183f022c3"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyAssessment.cs",
+      "bytes": 16715,
+      "sha256": "b9a12163c73bcf67474fa001ecb3a2f8333a960eabe8acd0c4113076f5d34faf"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyDbContext.cs",
+      "bytes": 3845,
+      "sha256": "acd3202d70674f2311f42c474ef198066cc3a8e9151dd3eb05469bf555f9f277"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyDesignTimeFactory.cs",
+      "bytes": 1269,
+      "sha256": "7afc182f8b9cdebad6cc3e513a1c2188929293bb4b792e9b8c6ca329873ac699"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyExpressions.cs",
+      "bytes": 2432,
+      "sha256": "69bc873d7e70ade5cd32ed9663291df58ede39995816f298969db60c27d7acaa"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyIdentityTime.cs",
+      "bytes": 5965,
+      "sha256": "ece67399734d7c62d897d2a62d6616a70aba1c23c13de2ba4da5b9a4724a3346"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyImpact.cs",
+      "bytes": 2342,
+      "sha256": "e0bd3e3c83396fba50db335cf6062891e208d279dd3809aa579b74754b1263ea"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyImpactGeneration.cs",
+      "bytes": 16920,
+      "sha256": "9a30a0e48da5265bfca02d43f4773468ef4f8d8727fd9ff124f8d3c7be09dd1b"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyImpactPublication.cs",
+      "bytes": 5361,
+      "sha256": "1207b55951ff0e6f55d973ead76d9b7824366e450a9442adf853dc14e5914dfd"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyModule.cs",
+      "bytes": 2717,
+      "sha256": "eb562d4dc671693031a92018f6687a08d580d1f6356449a72c1bd6a7ae1544f4"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyPlatform.Modules.Ontology.csproj",
+      "bytes": 745,
+      "sha256": "85e83f6499f717814b1d4001c1e034cfadd617db464cede59c14cecbad580780"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyService.cs",
+      "bytes": 28204,
+      "sha256": "9acbc2acf1b4c457d2f85b0ac0e0e20c0729f51a940c7801b903c11637fe9e10"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OntologyVocabulary.cs",
+      "bytes": 7142,
+      "sha256": "936a748b56c2639a5f5275f1ed233122f23edefe98b55dab2a4c033301d2b175"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/OwlExpressionProjection.cs",
+      "bytes": 24434,
+      "sha256": "c85fd3eeb7930352839ca44301a6799186b8098a0f99e024b437e0dca0ee2f5f"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/SemanticProfile.cs",
+      "bytes": 6491,
+      "sha256": "89cb492558994a4c8933894dce243f3206c8727f07ff1b431dda07b71707b0c1"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/SemanticSupportPolicy.cs",
+      "bytes": 10151,
+      "sha256": "a04f361fbce83d8c6ebfc077cad4108c3607b10373d037b2e3809e0c3cf1d952"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/ShapePolicy.cs",
+      "bytes": 4127,
+      "sha256": "95b5e93d38783f252b37e8dacee12a47c255da92c69fc923cdfa8a0ca33fb599"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/UnitGovernance.cs",
+      "bytes": 12321,
+      "sha256": "f1fd9b6dcbcc2625afaa42bf81ca20fe48bd14b16c668b888ca1a646d0b5d449"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/ValidationRecord.cs",
+      "bytes": 836,
+      "sha256": "93c4ec035524408c637003a927546a3f938f28bd5c820df0820596a580a224b6"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/VocabularyGovernance.cs",
+      "bytes": 19870,
+      "sha256": "cd9f66379f18390c666a733c183a5d160e977fca8b41f4634abc98cd62c24604"
+    },
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/packages.lock.json",
+      "bytes": 9188,
+      "sha256": "c31cc3c12a12804f023ab12027c56b8042681d6005a6a8a0d3f4f32ec2045c77"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/OntologyPlatform.Modules.Publishing.Domain.csproj",
+      "bytes": 189,
+      "sha256": "9a182b8fd6d14bcfd5f19a0a30cfd5d24c8d05fc5bc3a2626206311617817aaa"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/PublishingPolicy.cs",
+      "bytes": 540,
+      "sha256": "7a6225aae1f1a966b84ec796ead86993c9f7cb94d8e1f6d5e62a8b432bd3092d"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/packages.lock.json",
+      "bytes": 139,
+      "sha256": "1aaaf7d62e2a7033e58cef4178d5e772c3b3b7ac54d82a69079a15b20508f777"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/ActivationRecord.cs",
+      "bytes": 717,
+      "sha256": "d7921c3605bc130e005d059a75de62004e64b8d685a67bbaccef791c6b8d88c9"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/ActiveReleaseRecord.cs",
+      "bytes": 703,
+      "sha256": "a5abea791c8fd6a01396fcf94c611b3f18aee2dee1c49a6e5b9bb19ed8e2b255"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/Migrations/20261026015031_InitialPublishing.Designer.cs",
+      "bytes": 11537,
+      "sha256": "c429d5de0a8d60e9b39d48bc8d840948323cc124cac1c414ed4eff51eb7fa5fe"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/Migrations/20261026015031_InitialPublishing.cs",
+      "bytes": 11394,
+      "sha256": "a0a639763f458765069b7ef55dcb37695f31e1a33e20872e027f957d6d89bdba"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/Migrations/PublishingDbContextModelSnapshot.cs",
+      "bytes": 11435,
+      "sha256": "fd41a07c03e81ec805f434fcdbe8a9d6b58dd0c1c51466944462abc49b56b07a"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/OntologyPlatform.Modules.Publishing.csproj",
+      "bytes": 749,
+      "sha256": "62cb280af80bc5d0e40518781c46cbea9d50030444e7d6d79e30a14c163a47cc"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/OutboxReceiptRecord.cs",
+      "bytes": 660,
+      "sha256": "72bb2341d2db9dd0b4cb222b21cadf51faf6868938a5c7b10d7cc86291d4723e"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/OutboxRecord.cs",
+      "bytes": 1577,
+      "sha256": "01188f15eb779db1bd5106508c2f061d267d728f456954795e3eb951d6fc3b89"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/ProposalRecord.cs",
+      "bytes": 921,
+      "sha256": "0b987fcae706a189a5a80fd76ff93e28fb6d18c6acd925244d57b9a78dd196f2"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/PublishingActivation.cs",
+      "bytes": 20162,
+      "sha256": "e7c73e8daa1c7444b3c7cb2195f20ccbafb331ed31c9348e71c9c42dc89d990d"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/PublishingCatalog.cs",
+      "bytes": 3781,
+      "sha256": "28e7fc6d317bc16ce27f664b90a3883c63b128ceba6cef94bac052c440b6b8d7"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/PublishingCommandRecord.cs",
+      "bytes": 762,
+      "sha256": "dd4f8d26961423cd6b4538efbe8b51443d102df39559088e1ba9b4c7cb5dc320"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/PublishingDbContext.cs",
+      "bytes": 4026,
+      "sha256": "590c8dc471ea13b5f24f256a309ae474e0dae831f22f64a23313993c1a4de059"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/PublishingDesignTimeFactory.cs",
+      "bytes": 1129,
+      "sha256": "c4b2617783fcf14f0c386774ed058091b818096b3d6a1ad76422e23eabbc7bde"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/PublishingImpact.cs",
+      "bytes": 4327,
+      "sha256": "089ed1751d14358e4962f1bb74bb688afe88ba5294b8c606be32c78f53a8a4ae"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/PublishingModule.cs",
+      "bytes": 1474,
+      "sha256": "3fe1f18d0404167022378ae8703571e6edace7b25c0ade9ad6117a28f4bc69cd"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/PublishingRules.cs",
+      "bytes": 3882,
+      "sha256": "ff7f70425ce41e9d990ceed6d7ccbd737b8f6d4d89f809f9d150035acf74724c"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/PublishingService.cs",
+      "bytes": 17804,
+      "sha256": "7872aa58943c11a2084325d34cd52077950fe11bdbcf30b9cb2ecd9d47644313"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/PublishingTelemetry.cs",
+      "bytes": 1121,
+      "sha256": "df841c69ecd4153c5000bc8a23a6413682616eddf8ee896f4df7f9457798c671"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/ReleaseOutboxDispatcher.cs",
+      "bytes": 5861,
+      "sha256": "75d39caa7f2395c2f35460f647c877f0f154e8dbd23d84d9118958e9e263cf59"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/ReleaseRecord.cs",
+      "bytes": 1564,
+      "sha256": "36eaace89362cbdfb3cfce471812aa52e272339a0be060d66ea846ab5b289522"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/ReleaseVerifier.cs",
+      "bytes": 3685,
+      "sha256": "4cd42635305e1c78752a38e20f8e163314ed4eb2c9e9348f7efef9c06d3c5c5e"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/RustfsArtifactStore.cs",
+      "bytes": 11121,
+      "sha256": "fc0ecfb9bc3f73c08297b9ed049f569c4cf845c615e7a8913f4c15eb7d24c6b7"
+    },
+    {
+      "path": "backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/packages.lock.json",
+      "bytes": 9190,
+      "sha256": "a8d3704d59181837954fed2a8921fb65ec4de2df4799f8cbe383f45fca5941ef"
+    },
+    {
+      "path": "backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/CapabilityRegistry.cs",
+      "bytes": 6814,
+      "sha256": "36ac3da6b3fab35194eadcec06f92d2c40731a0478c0e3878d3bb3f791dada67"
+    },
+    {
+      "path": "backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/EvidenceService.cs",
+      "bytes": 3872,
+      "sha256": "199c9db3f57d7b5c59c5ee434a6f2f344cfd2de17919dddd590f3cad1aa37d23"
+    },
+    {
+      "path": "backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/OntologyPlatform.Modules.SemanticQuery.csproj",
+      "bytes": 393,
+      "sha256": "5b590004e470a810d824957c0ac9e1cb04c45ca15dbf04d16df709bb4e8445dd"
+    },
+    {
+      "path": "backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/PublishedGraph.cs",
+      "bytes": 12678,
+      "sha256": "6f36400eb93608bd300aa90b7ad8705847c8abdd98bfa24afcea0b26fafb6297"
+    },
+    {
+      "path": "backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/QueryRules.cs",
+      "bytes": 5585,
+      "sha256": "a6fbe97b575d5ecc566c0dbe0eba7b1e794765fc69632d3474bbef3aff491906"
+    },
+    {
+      "path": "backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/SemanticGateway.cs",
+      "bytes": 13983,
+      "sha256": "b301d25506b68b5813c46635ea7da76a24f005267f4841b90270403f72ea63d7"
+    },
+    {
+      "path": "backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/SemanticQueryModule.cs",
+      "bytes": 898,
+      "sha256": "f007582ece442f36335a99df6fe5cf59839aa43d37135eb8add9134023e7f8ca"
+    },
+    {
+      "path": "backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/VerifiedReleaseSources.cs",
+      "bytes": 4974,
+      "sha256": "d3e4d33f70f80038b9291c0db956ea894c64690848b4c87846f620954cefdf06"
+    },
+    {
+      "path": "backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/packages.lock.json",
+      "bytes": 139,
+      "sha256": "1aaaf7d62e2a7033e58cef4178d5e772c3b3b7ac54d82a69079a15b20508f777"
+    },
+    {
+      "path": "backend/src/ServiceDefaults/OntologyPlatform.ServiceDefaults.csproj",
+      "bytes": 741,
+      "sha256": "4596673f8170aa86616f52ae9439080f10840946ce57ef29e45d3383daf83afd"
+    },
+    {
+      "path": "backend/src/ServiceDefaults/ServiceDefaultsExtensions.cs",
+      "bytes": 4119,
+      "sha256": "c9634873fb2bfe6ccc20e55a191ec2484ad994ee33340098302019d64ddd58eb"
+    },
+    {
+      "path": "backend/src/ServiceDefaults/packages.lock.json",
+      "bytes": 7109,
+      "sha256": "36612c947be998d4f072affc98698cd9b55b39f4ff2b3bc4c4a97b7909fb8d8a"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.AgentTests/AgentFixture.cs",
+      "bytes": 15561,
+      "sha256": "71814fea62582a9ea2369b91c0d57c7630d0e23531f1eeee35e93e62c76dc7fd"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.AgentTests/AgentHttpFixture.cs",
+      "bytes": 9234,
+      "sha256": "ae999ba48b4538a9644a8412787e78a47afbd1e1ec73ed2b7ca34edb831e6638"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.AgentTests/AgentMigrationTests.cs",
+      "bytes": 4824,
+      "sha256": "835c8dfc77af155d0431ded1fb738b32fbcdf6f2856e3a6a8b367e7505e2efc7"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.AgentTests/MessageChunkTests.cs",
+      "bytes": 8353,
+      "sha256": "6961fcf6ab55104eed0b88829cb214d887182b4a7a19d72e796d959954240483"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.AgentTests/OntologyPlatform.AgentTests.csproj",
+      "bytes": 1148,
+      "sha256": "6ddb4c2b2f3f397409fc26bb082c493dd0cdc1677d80c9bee509031d6e93884f"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.AgentTests/PersistenceTests.cs",
+      "bytes": 649,
+      "sha256": "dda6f6b873c988a56e284754043e8967ec69f5f091ceaa8705ae9d1c244d39b0"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.AgentTests/RunFaultTests.cs",
+      "bytes": 10524,
+      "sha256": "a38f431149f3d1707c90ad16f212341d70fb5c64b711e97bb3160988ab2fab64"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.AgentTests/RunFlowTests.cs",
+      "bytes": 19091,
+      "sha256": "8e72fb7f05039cebe675b76bd79c480b473319d22f8c941542e3dfdff20b93eb"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.AgentTests/TransportTests.cs",
+      "bytes": 17596,
+      "sha256": "ffb174bc1c099e4de6171995679f40087662f447100d720f8b7c3dd31913f68a"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.AgentTests/packages.lock.json",
+      "bytes": 23822,
+      "sha256": "992ae28d7e3d29ffb79cf85bd1d4b9f1df8ebe7b6b8857be4f481ce724591ec8"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.ConnectionsTests/OntologyPlatform.ConnectionsTests.csproj",
+      "bytes": 372,
+      "sha256": "4bcd17a43a184a2535848b0242d4d9e181ae4e8c6a67de02ad29299a21b25052"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.ConnectionsTests/PgAdapterTests.cs",
+      "bytes": 12667,
+      "sha256": "83936773d6bdab4bdf7872a825eebe832ecfb6d1e04a6fe1768344839a5a57f7"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.ConnectionsTests/PgFixtureSecurityTests.cs",
+      "bytes": 14967,
+      "sha256": "1570a35643d9f2c77ccb5c0e79f0a2c0c0080fb5e6f346da0408a4ce7d0693fc"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.ConnectionsTests/packages.lock.json",
+      "bytes": 5215,
+      "sha256": "72e35c7670eff3a9c35dfc3f5760d25a9a011e67950a9184898532ecf38a35bd"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.G2ContractTests/G3M2EditContractTests.cs",
+      "bytes": 5076,
+      "sha256": "36b3aa6ed82d8b60002fe8b893e2ecfd98e3b85689e70e5fdc05a5219d0ba8d9"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.G2ContractTests/G3M3VocabularyContractTests.cs",
+      "bytes": 6370,
+      "sha256": "ef23b22ad7986a65913dc147f6e77d20507c786e5dbf4d3046c196fec10deeaa"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.G2ContractTests/G3M4IdentityTimeContractTests.cs",
+      "bytes": 5024,
+      "sha256": "d6d1499c98d94526d0d72f0bb3a4e759c3684d1148d1ec331dfd4c4487b4caf6"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.G2ContractTests/G3M4ImpactContractTests.cs",
+      "bytes": 23179,
+      "sha256": "150a8c1e1b38e3f98a86d101ae37cba0aab398b12460ebcb32833f962e06ec38"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.G2ContractTests/G3ManifestContractTests.cs",
+      "bytes": 5546,
+      "sha256": "cf13e1de28bcef9062ef72d527d9537563fc88d6fcdcff1a882011041f5dd634"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.G2ContractTests/G4WireContractTests.cs",
+      "bytes": 4479,
+      "sha256": "9ca0d67c2f68428bfd288bfc6ff7b0f1d44ba45455922f9e61f65029c4934c4c"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.G2ContractTests/OntologyPlatform.G2ContractTests.csproj",
+      "bytes": 342,
+      "sha256": "cb252a22af5e6e7e4e9efce1225e5d7d1b2d3b2f50e1771940f79ad5f63b1d87"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.G2ContractTests/WireContractTests.cs",
+      "bytes": 9595,
+      "sha256": "3328d9ffc0d18d3480a0eab3b9d2fad56538fcf8a6665fef58fce2317407cefd"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.G2ContractTests/packages.lock.json",
+      "bytes": 2954,
+      "sha256": "8a92e3de2bdd39b5e0271cd29dcf2c9ca582bb09b2fa00f5c28fc2b2c0700bf0"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.InfrastructureTests/OntologyPlatform.InfrastructureTests.csproj",
+      "bytes": 362,
+      "sha256": "701654339caea6149af067d30d20d787d7090353ac4657fbc61aca6972787354"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.InfrastructureTests/ServiceDefaultsTests.cs",
+      "bytes": 6611,
+      "sha256": "42ebf33ea66af359bc6adb7c652e5b9bb81cfb741cd4f243253f83b299dac558"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.InfrastructureTests/packages.lock.json",
+      "bytes": 10750,
+      "sha256": "2a7c138b085f629ab6e4a5baba939234a0fe6b84e663f8d681092f63b0a1db78"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.PublishingTests/ApprovalPolicyTests.cs",
+      "bytes": 1407,
+      "sha256": "ee8f285e720e7929f7b50ecc2b260f903d0b493afede9d7a92d5861dea3b0e75"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.PublishingTests/ArtifactTests.cs",
+      "bytes": 5071,
+      "sha256": "b0eaf7c16934e01b55780ed932933d8a6a814bbb402ada364c32b9b10c74e2e9"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.PublishingTests/G3BindingTests.cs",
+      "bytes": 2541,
+      "sha256": "63af793f7452f5d7e880dffbf354cb80cf4b96353edcc121ab1042abab8043b8"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.PublishingTests/G3LegacyTests.cs",
+      "bytes": 24368,
+      "sha256": "27256c06b363b72537dfc413c76866b5da4d0ac0a9512f586a1d4b587933ce62"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.PublishingTests/G3M3PublishingTests.cs",
+      "bytes": 19436,
+      "sha256": "fd68398231d656ad5c5080069c32084478bc728750a56a6567d1ad0f24f641d1"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.PublishingTests/G3M4ImpactPublishingTests.cs",
+      "bytes": 14751,
+      "sha256": "07db5e58876e2d4a0722ad148107bad51e77c26833549071587d0399cc778476"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.PublishingTests/G3M4ImpactTimePrecisionTests.cs",
+      "bytes": 6892,
+      "sha256": "732130e5e25137529187adb4d9ffdbbf634c3a95e35d7362d7c4c3307a1933a0"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.PublishingTests/G3M4PublishingTests.cs",
+      "bytes": 19213,
+      "sha256": "b15f9d57a1c49af04c85f92f08d0fb6ee69461281f7e4a7e5b8557028cca75b6"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.PublishingTests/G3MetadataTests.cs",
+      "bytes": 4475,
+      "sha256": "45cda1e7b3468629c08ade9070b9f0dcf3ec74aadce9c971d9fa38f607230cb6"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.PublishingTests/OntologyPlatform.PublishingTests.csproj",
+      "bytes": 767,
+      "sha256": "03353d7eeece34ee3293e20fd6153889ea990c216617129fe811de8630b09697"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.PublishingTests/OutboxTests.cs",
+      "bytes": 6096,
+      "sha256": "d5da66390939565d90362c9b97750c22649711b143b71e059e7156f43e95ed8f"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.PublishingTests/ProposalContractTests.cs",
+      "bytes": 2134,
+      "sha256": "21627e2738f0740be890fefaf9edc1ababa3ad9a612d74e3171117a8622af26c"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.PublishingTests/PublicationFaultTests.cs",
+      "bytes": 13129,
+      "sha256": "d1373fb735f4d0d6fa6e3647ee4f09ae5627559a0aba2b54360df908c506e036"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.PublishingTests/PublishedIntegrityTests.cs",
+      "bytes": 3682,
+      "sha256": "241f73b722954e2496c6e7a35b598246e02497e1b0f20b6fc052c008a7837f79"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.PublishingTests/PublishingFixture.cs",
+      "bytes": 10942,
+      "sha256": "e5811311bc75a9e061b4ba216d17f9c68bc65310ef87a4b1b5676f673840d6ea"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.PublishingTests/PublishingFlowTests.cs",
+      "bytes": 10232,
+      "sha256": "40d003e29326d173f4de24192ffca74997bb2b6594b62b1deef1d8b9c8d6f2e0"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.PublishingTests/PublishingMigrationTests.cs",
+      "bytes": 4859,
+      "sha256": "14deb3297de0357c11bcad77c1b21a4197ea27c9576b38e1eff86cdd8844e067"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.PublishingTests/RollbackBoundaryTests.cs",
+      "bytes": 13050,
+      "sha256": "93f390ecc6abb27d6f71b0f4755cec479431cc46e1a271d81a49b2d17d96bb49"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.PublishingTests/packages.lock.json",
+      "bytes": 6370,
+      "sha256": "9f6c8fa1eeab745bbd8110bc3c39420e5904d7a53b2c6743f76f6670eb8b98bc"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.QueryTests/GatewayTests.cs",
+      "bytes": 11542,
+      "sha256": "c0c94d26588b245ce16e7751fe7b8e22f239dc5dec619620bcbdb434367d92b5"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.QueryTests/OntologyPlatform.QueryTests.csproj",
+      "bytes": 1021,
+      "sha256": "a515d10cb3c97d264c4feaf5ba062d35f3030c0cf3ae6773adc00491f77f2b22"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.QueryTests/QueryFaultTests.cs",
+      "bytes": 17040,
+      "sha256": "10227b3d232fe1ee0c999014e33c0667eab8e63a66632485cd99c92f1e36bc78"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.QueryTests/QueryFixture.cs",
+      "bytes": 15386,
+      "sha256": "953415ea695563f00d5f8e452e9b824ae37e3fa82e8921d09d0233ecacf5c478"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.QueryTests/QueryHttpTests.cs",
+      "bytes": 12941,
+      "sha256": "4a435c8dbac25bac5e9fd72302a16122ac0bff497f8becae6a3937fbbb42f373"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.QueryTests/RegistryTests.cs",
+      "bytes": 2778,
+      "sha256": "ca2482418aa8eff7d373e6a15710a38e3133a5bb2b6afee34e6ae681b4c5b599"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.QueryTests/ReviewRegressionTests.cs",
+      "bytes": 12102,
+      "sha256": "6b851026e4f331f8f746435920f6c51a7a730ea57380cdd49cfb431cf33ce842"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.QueryTests/VerifiedSourcesTests.cs",
+      "bytes": 4697,
+      "sha256": "997add312f443ad133122119d6826529a838c450f6133e6a16780d38e30d4680"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.QueryTests/packages.lock.json",
+      "bytes": 23822,
+      "sha256": "992ae28d7e3d29ffb79cf85bd1d4b9f1df8ebe7b6b8857be4f481ce724591ec8"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/AuditReadTests.cs",
+      "bytes": 24671,
+      "sha256": "d3bb98a34a7b522f61192286b2212348742a92d23641c23788cdfc1dac0f6175"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/AuditScopeMigrationTests.cs",
+      "bytes": 13348,
+      "sha256": "82be36623d7277bb148b5beacfed71e6d0d4602895e4c449d1030ea7d854276e"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/G2AuditTransactionTests.cs",
+      "bytes": 18312,
+      "sha256": "a97664e0457c66c91164440db9028663ad878ff7f6c6dac897e67439e71c47c2"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/G2CompositionTests.cs",
+      "bytes": 1528,
+      "sha256": "2fc1fd2451f746b9d16d1f5fea5ef53057dc782c8093769116ccddca45e25682"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/G2ExecutionEndpointTests.cs",
+      "bytes": 5076,
+      "sha256": "042769e8033ecde51be223a25405b8c5078ab6292875d79f01f440be31b364fe"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/G2OpenApiSchemaTests.cs",
+      "bytes": 6837,
+      "sha256": "01b821c734e625b3d0571ac3eece64c107934a40457291d8a8d700664d72742a"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/G2PublishingAuthorizationTests.cs",
+      "bytes": 11547,
+      "sha256": "8bd9b9d98fdaa8332cb63caf4dc719c323fd030d073784b2171f0480f7fc5859"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/G2ReadinessBudgetTests.cs",
+      "bytes": 9879,
+      "sha256": "b511579fdbe1795eb802f4bd2df3e4da7486187041e45442b81503b63fe34cfc"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/G2ReadinessGssTests.cs",
+      "bytes": 8661,
+      "sha256": "4847e571a302c1490b114610ff6472632045dac896716a9bafb41b36e80fb7c6"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/G2ReadinessPostgresTests.cs",
+      "bytes": 17131,
+      "sha256": "59954880e85278e381ef8e3cdc1ab4012212855e13d178bac651e94fe4edde4f"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/G2ReadinessTests.cs",
+      "bytes": 7155,
+      "sha256": "d3928693006f3a1d7aee28a42bf52e6b67edb03b360ec8c51e70e1f1e501b697"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/G2SecurityTests.cs",
+      "bytes": 32683,
+      "sha256": "970a3c93ab356d99b4c0b5612a81089dc9428389e09988dcf8148c2e50319154"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/G2TransportTests.cs",
+      "bytes": 3750,
+      "sha256": "e22be18a9545d8c1134fb283d8d60ebaa7367268c05119cbb82ceba12e503adc"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/G3EndpointBoundaryTests.cs",
+      "bytes": 5033,
+      "sha256": "5daab6ed0c01d504b2afc0ae6dcbb03beb4d2ac5866c133d9a60d4eb218baeff"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/G3M2EndpointTests.cs",
+      "bytes": 5164,
+      "sha256": "dec8d56bd6f2534572c993d252f80d4983ec4804ef8f7c4107a72613414fbae7"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/G3M3EndpointTests.cs",
+      "bytes": 6477,
+      "sha256": "0354b796fcfa79e67878eccb3cc3270c4555d111ea5ebea6792c78076cacb9c1"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/G3M4EndpointTests.cs",
+      "bytes": 10428,
+      "sha256": "a3c8f620b66efe2b620b2886d2b0c3016f748586ee5e423a514679ea48d30b01"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/G3M5CompositionTests.cs",
+      "bytes": 3928,
+      "sha256": "245b6dceb6d8690c935dc70e882ec10857fd5fdcf1d85c303f7e2d7bac00e899"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/G4RequestBodyLimitTests.cs",
+      "bytes": 15258,
+      "sha256": "a76c6a73ebc4820f46c3f67e23a12daef7cded79c9e2d7eb47fb97543b13c066"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/HttpSecurityTests.cs",
+      "bytes": 27669,
+      "sha256": "ac1a7c45534f9e619fdc04f3b5a4404d0f6f239905edf7a940ac99968508eba8"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/ObservabilityFailureTests.cs",
+      "bytes": 26924,
+      "sha256": "6e7f77a46a3491f01a2870b6fc194ad46d551d49e7ee0835c77f852e29853fba"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/OntologyPlatform.SecurityTests.csproj",
+      "bytes": 439,
+      "sha256": "c6defdaa11f47c4d85f68f6a215b4bcb117198e074d9212bda7bfb8f142887b2"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/PostgresSessionTests.cs",
+      "bytes": 10739,
+      "sha256": "d51568ea838c65df9845c138f40479eeabfc6951bbf88b97685252addcd749e9"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/SecurityBoundaryTests.cs",
+      "bytes": 2051,
+      "sha256": "b5fe57a28758730678c3120eec3700b51410ee2fbee010f9e3e1f06451b538ba"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SecurityTests/packages.lock.json",
+      "bytes": 23822,
+      "sha256": "992ae28d7e3d29ffb79cf85bd1d4b9f1df8ebe7b6b8857be4f481ce724591ec8"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+      "bytes": 73311,
+      "sha256": "2779b2eb6b545c4d6c2dc96b234606f917d13ad12667cc96406218e4ed818b63"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SemanticTests/G3BoundaryTests.cs",
+      "bytes": 15102,
+      "sha256": "1a7cab83d965451e1be8dbb80e4b21c12dc20d7db23c84cd0fede4773efdcdb3"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SemanticTests/G3M2EditingTests.cs",
+      "bytes": 11606,
+      "sha256": "009d6e55f2d6e10e35dedbd8897cd127d13d4f378bfdcce5abdcae2867bf058e"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3GovernanceTests.cs",
+      "bytes": 7391,
+      "sha256": "e13bccbc4003062e769f369d510caf56c6d606cac53772f43a1fe9881870d141"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3PublicationPolicyTests.cs",
+      "bytes": 6010,
+      "sha256": "0206be727c1a5aea6c686e414f696eecdabccc6303ded536d04849786b9f2d00"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3ServiceTests.cs",
+      "bytes": 13734,
+      "sha256": "268f7692863c7d392812845592241a497ff980b97a2d0559777969a8ac83d3f6"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3UnitTests.cs",
+      "bytes": 8339,
+      "sha256": "a07ce8990979b4ff9ca7f8aa5ec065a8561dd38cb6e5950855368bd0bec1396c"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3VocabularyTests.cs",
+      "bytes": 8121,
+      "sha256": "c224b5b6d38ef714ad4c3555a201ec8d82d75633d90ea9831f07b2399b96db35"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4IdentityTimeTests.cs",
+      "bytes": 11391,
+      "sha256": "642585610c86bf729246c3c6e367055da2faedf349a20cad2843e6dc8e047dc8"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactDependencyTests.cs",
+      "bytes": 9744,
+      "sha256": "7e0a421b1e25cfc5ef2197283743bfde86526c45fe4b365bcf0cf1ce463f42fd"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactMigrationContractTests.cs",
+      "bytes": 1200,
+      "sha256": "70aac60b44562cac2d6c887d154c802115c861c5d04b7a884aa3962135b731cd"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs",
+      "bytes": 14896,
+      "sha256": "40037aefaac1a5fc171971341532d57e1cadbbabd3a47c88e5e2e8233bd4482d"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4ServiceTests.cs",
+      "bytes": 25963,
+      "sha256": "0c633b36bbda59225b031c15b88be659627b690e874cf6d716736d55cf7c3fc4"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4VersionDiffTests.cs",
+      "bytes": 11430,
+      "sha256": "e9c7c039c2c715e0310904d84b8b983f5ea9cd09683e97aa3d7449ba2e9b52e8"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SemanticTests/G3M5ExpressionTests.cs",
+      "bytes": 27506,
+      "sha256": "3767dd3ab4c6ca6428adc1af4f8884a788dfeba92ce7ffd2f83088c1775387d7"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SemanticTests/G3M5ServiceTests.cs",
+      "bytes": 18408,
+      "sha256": "d167d324e968fa3bd3b013e666c941a7e25c6cf898d58dd2011ef9379e70922f"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SemanticTests/OntologyPlatform.SemanticTests.csproj",
+      "bytes": 622,
+      "sha256": "10983307b325493c897a3e58a5f5a948c1ef9d3a9da3462d420ca45d85aafeb7"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SemanticTests/RoundtripTests.cs",
+      "bytes": 24602,
+      "sha256": "259f0fc7bbf62d7027fab0c0b5186005caec0fa0ee9c4f8d117869c84460047e"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SemanticTests/SemanticFixture.cs",
+      "bytes": 5040,
+      "sha256": "86f205ab93d384d41315bca0d00afdf128198bb8c2e01ede4533567f2b4c8916"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SemanticTests/ShaclTests.cs",
+      "bytes": 4807,
+      "sha256": "839825def05c78411206497adfc8480e716fd2691f5230e3c2532c0d55e80bf1"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs",
+      "bytes": 32760,
+      "sha256": "66b023c9d44aa9bbf8956f3c8a7db466858c81b4a9fa561f3e6f86a05e83f062"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.SemanticTests/packages.lock.json",
+      "bytes": 5818,
+      "sha256": "fd601242b55c9a844772a4958e559ed2f8950074fcdb730e8b5537f01115d4c9"
+    },
+    {
+      "path": "docs/adr/ADR-001-design-system-location.md",
+      "bytes": 1468,
+      "sha256": "2962f724bc5300178074923a8aa6fce800e1e235fc395f0156684c2cf333c5ef"
+    },
+    {
+      "path": "docs/adr/ADR-003-next-aspire-boundary.md",
+      "bytes": 1223,
+      "sha256": "c2290c92445dd7afe9bc5d4263710bce6a6b395822aa2994f020f12c97bd8163"
+    },
+    {
+      "path": "docs/adr/ADR-005-toolchain-and-spike-order.md",
+      "bytes": 1697,
+      "sha256": "26135c6980e8f1774bee8a54e3d3332962e2031263a769b5d45a858310fab5c8"
+    },
+    {
+      "path": "docs/adr/ADR-006-parallel-git-review-delivery.md",
+      "bytes": 1142,
+      "sha256": "0b43e1d7c22044c569be5e6e6bf073680019d4147ade89b2f4a47f2f1e49c994"
+    },
+    {
+      "path": "docs/adr/ADR-007-main-protection-proposal.md",
+      "bytes": 2657,
+      "sha256": "53aa809fa385a6f16fb206afc2de291652aea06e21a0500626209fff650f725a"
+    },
+    {
+      "path": "docs/adr/ADR-008-g1-closeout-topology-and-scope.md",
+      "bytes": 2227,
+      "sha256": "d02996993d6f9bdb12affebc72150aa2981456ea7f74b509f1062690907d0628"
+    },
+    {
+      "path": "docs/adr/ADR-009-g2-semantic-release-execution.md",
+      "bytes": 2869,
+      "sha256": "5f29d26ba1055e8dbc34b8870bdc4306a7f52b5c2683e0340e51156f0ae26cf6"
+    },
+    {
+      "path": "docs/bootstrap/ontology-platform-codex-master-plan-bootstrap-v1.0.md",
+      "bytes": 35896,
+      "sha256": "d20ae19ea8a5b1c2a6157ae040b8047e94bb3afd8bb5000869bdecdb986ecdde"
+    },
+    {
+      "path": "docs/contracts/g1-platform-contracts.md",
+      "bytes": 12440,
+      "sha256": "8f6d184beff2c0b98872a19795ab2e757131cf9c667c508d200d880033d54eaa"
+    },
+    {
+      "path": "docs/contracts/g1-platform.openapi.json",
+      "bytes": 18744,
+      "sha256": "e7ddc88d71fd7c4af70237c4fd4ba510ebb828a93a81d314ef62f8ba3fba1397"
+    },
+    {
+      "path": "docs/contracts/g2-models.json",
+      "bytes": 95638,
+      "sha256": "bd652d1fbe23a33b896e33f5f2669608636ae7ee33f6f05b614752106ee53046"
+    },
+    {
+      "path": "docs/contracts/g2-platform.openapi.json",
+      "bytes": 296965,
+      "sha256": "7ad5dec1ca59f319dac46870af6ffbd45dd8a8f06cbda20c7e93d44bfc4b3604"
+    },
+    {
+      "path": "docs/contracts/g2-schemas.openapi.json",
+      "bytes": 153995,
+      "sha256": "fa6bfbc05c8651a990c21f0a945ba565895bae8e2312d77d26ebf51e3fb568df"
+    },
+    {
+      "path": "docs/contracts/g2-thin-slice-contracts.md",
+      "bytes": 32492,
+      "sha256": "6ee96821df82b51dd55d6856b68ed66c5454f075f5b62ba562a5009abac3e7f2"
+    },
+    {
+      "path": "docs/contracts/g3-m1-contracts.md",
+      "bytes": 9516,
+      "sha256": "ff91c74712aa81ccad8cec5a17ee2f66b880c022478cca87175f37b12da98c05"
+    },
+    {
+      "path": "docs/contracts/g3-m2-contracts.md",
+      "bytes": 8580,
+      "sha256": "fdeb6c5d9177a5332e5eeb70b63e34a56dae160838e74eeec1d5e40829896d04"
+    },
+    {
+      "path": "docs/contracts/g3-m3-contracts.md",
+      "bytes": 12464,
+      "sha256": "ba181cb12403178b71f8ed11e94f80c52f1206ac4b4959fe5a4fd80b2205a3be"
+    },
+    {
+      "path": "docs/contracts/g3-m3-e0-contracts.md",
+      "bytes": 11331,
+      "sha256": "f7d586a612aa8d55821118f9a4ff8d1026d9938c8c6b9b3fab5732b85924b9c4"
+    },
+    {
+      "path": "docs/contracts/g3-m4-contract-a.md",
+      "bytes": 8378,
+      "sha256": "bfbc6dbccc86e052f5c7226154a8be6f2fb870e79b381bb9531ea59ba4cfa3ba"
+    },
+    {
+      "path": "docs/contracts/g3-m4-contract-b.md",
+      "bytes": 10710,
+      "sha256": "3740f2819898a79bc94ded4c0c1c6e45dcdaa11b0b7dcc7aa296ce7d4c25f019"
+    },
+    {
+      "path": "docs/contracts/g3-m5-contracts.md",
+      "bytes": 6654,
+      "sha256": "3ca94de480b1cfc0992421d3a8b053c0ec614ef4c66e255f82807244e0e19cf6"
+    },
+    {
+      "path": "docs/contracts/g4-00-connections.md",
+      "bytes": 4382,
+      "sha256": "bc4ed892aab9602d3b100d2f9d271b0583a55a02513102ed7a52a183d6e5deb7"
+    },
+    {
+      "path": "docs/contracts/g4-00-mapping.md",
+      "bytes": 5315,
+      "sha256": "33c228bed7ede6039f7195ac05f324802bf3d4e49dd2427d2a479e9daf9a8fd9"
+    },
+    {
+      "path": "docs/contracts/g4-00-query.md",
+      "bytes": 5948,
+      "sha256": "fe96e4cea8212909a9728fa463a2be6b29c3f5fadfb3210b52d60a0cc548b7f4"
+    },
+    {
+      "path": "docs/contracts/g4-00-ui.md",
+      "bytes": 3166,
+      "sha256": "a19e6f8f7840093832ec72a820683e87e40775e64a79825e74d7444dd110c4ba"
+    },
+    {
+      "path": "docs/contracts/g4-connections.openapi.json",
+      "bytes": 39380,
+      "sha256": "a38327b30c71844347d5bba10edce272a008eb7fd3855f73ef277d3eedfe862f"
+    },
+    {
+      "path": "docs/contracts/g4-m1-connections.md",
+      "bytes": 9549,
+      "sha256": "6c33960b2277abc881d24d62a9f70a750af70bf6d95ab5bb589e7109e1081978"
+    },
+    {
+      "path": "docs/development/ai-development-efficiency.md",
+      "bytes": 10475,
+      "sha256": "0b9020518ae7f3f397efe49bab4ea4e9608639b79b7707d53852b1f2fd80f774"
+    },
+    {
+      "path": "docs/development/g2-local-development-and-operations.md",
+      "bytes": 5714,
+      "sha256": "049709b5de85154686a78415610b7aa0a97e54262e41c8c62de67cbc0785b3ee"
+    },
+    {
+      "path": "docs/development/git-parallel-workflow.md",
+      "bytes": 1424,
+      "sha256": "327564e239ef13e3078c53ad1bd0d0cfb46f9a069a42c963e3154d2619011692"
+    },
+    {
+      "path": "docs/development/local-infrastructure.md",
+      "bytes": 9305,
+      "sha256": "f715ca7cc9c34efa741afdab700a40b65f95ed3026abb40b45cb32b0dbd4275c"
+    },
+    {
+      "path": "docs/development/local-validation-policy.md",
+      "bytes": 4604,
+      "sha256": "3d9b091f6361734181eb0d70d8e8a40d5d8e9f44a9b5f6eecbd112de8e246aac"
+    },
+    {
+      "path": "docs/development/macos-setup.md",
+      "bytes": 7322,
+      "sha256": "fa537f9dbe5438bfe0f7e44cc8617f68e46fd5bc51dc3db953c7dba32a361393"
+    },
+    {
+      "path": "docs/development/observability.md",
+      "bytes": 9434,
+      "sha256": "cab232d07df36b08391a94f9d3845bc390d6807ef14721e651ff7a72c9f4eef9"
+    },
+    {
+      "path": "docs/development/resource-lifecycle.md",
+      "bytes": 13412,
+      "sha256": "f4b87f24f2665765a94993ad449e3cf38715101519cdd5b59b3e7193a73e2c70"
+    },
+    {
+      "path": "docs/development/review-package-spec.md",
+      "bytes": 19545,
+      "sha256": "00f05fcaee39ff89d688f42a8e7fabf42e37bdebf0b44a0942e996c48d961c98"
+    },
+    {
+      "path": "docs/development/security.md",
+      "bytes": 9459,
+      "sha256": "ab40bc58166b0a406a0512fefd48a30d460898cf77d9f8cea08b8e745ac3afa9"
+    },
+    {
+      "path": "docs/development/wave2-local-development.md",
+      "bytes": 4936,
+      "sha256": "8c8f454ce26170f62cc94da6aaceea8d87a1f4b8869e0921419c37f99bea35e2"
+    },
+    {
+      "path": "docs/development/web.md",
+      "bytes": 3993,
+      "sha256": "104c428940669597ea74f310e4a516fc95b3306571df3108fb25836768396ee4"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/acceptance-matrix.json",
+      "bytes": 58323,
+      "sha256": "9f3525fe5588cd37b2a19a5e90850f239c25d5935900752f382cfbe415439c41"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/acceptance-matrix.md",
+      "bytes": 3011,
+      "sha256": "97754a01a556e19e82b28497694b0baeaac694606be1546a5ab04df5d9e4a9a4"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/adapter-policy-final.txt",
+      "bytes": 893,
+      "sha256": "e92bd97886a8bf863604bda97cde852bb0be3b8ffdf28ef1fce3c97140cf4ebe"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/adapter-policy-tests.txt",
+      "bytes": 1463,
+      "sha256": "96cc38de0bb94b470768236957c57176b56f25ab7d5cebdbb82da55319d82ab6"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/api-publish-portable.txt",
+      "bytes": 2650,
+      "sha256": "bdaf625a885bf115b40eee1f7db9ae47739b7d2c559d90a4022e175f7d7c4246"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/api-restore.txt",
+      "bytes": 9450,
+      "sha256": "f36b863a8a079fbac2a36f4f5fa663cbc2e1eb70ed1811bc4435572f838aa882"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/authorization.md",
+      "bytes": 1531,
+      "sha256": "b33534db1658fe764cf5b8949736d438bc624f34416efc8057600b1400ac48e0"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/c08-cleanup-plan.json",
+      "bytes": 130941,
+      "sha256": "56192c871e62bc4079d94d973e0acb444250291e3b5f665c88b0afdb0326343f"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/c08-cleanup-receipt.json",
+      "bytes": 177365,
+      "sha256": "77e7ff1bb01f0e2a070656b0592179385b550d953a02af6d9b1d372adf18e57c"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/c08-contract-addendum.md",
+      "bytes": 1876,
+      "sha256": "57240b7016689ed7372aca0ad016a4e67a0388c9810572a13ef9f1a2f4c86c0a"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/c08-failures/http-56a1cc4d-fb31-4cdd-872c-65593b97eae8.json",
+      "bytes": 9176,
+      "sha256": "3371dd2531846422e8489a977098e9139f9faa3330a83f0a18edf35015df7cdc"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/c08-failures/http-b6bb2fb8-89a9-46c5-9117-ea1960a82ce9.json",
+      "bytes": 18987,
+      "sha256": "0fea0bada90eced8dc684048042706c87c1f204ec8ba9817ba050af7dd2b5952"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/c08-http.json",
+      "bytes": 28850,
+      "sha256": "f057cb20ea53fbcc42a6dd3d5912d96335d9cf8d27e24dfd67a15ab0a9797e2d"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/c08-independent-review.md",
+      "bytes": 816,
+      "sha256": "43aa7b1239e0b45f99b1847aa1d962248627d626b2983d77e8470544fddd0a89"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/c08-ingress-stop.json",
+      "bytes": 282,
+      "sha256": "5a3d20948660bfcca32cd9068b0dceca69e202e7015d1fe607e4173769d5efb3"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/c08-readback.json",
+      "bytes": 10480,
+      "sha256": "2a4779dac98364d135a9a04a096527ca86b641017fd4b57a9fac865bc0db471b"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/c08-source-binary-binding.json",
+      "bytes": 76620,
+      "sha256": "9bd2b7b29b67780ad068a0e73d0d18fb093ebfa02e4cb3d804325e78650c7f76"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/c08-start.json",
+      "bytes": 3274,
+      "sha256": "e1bb433de2d260ec4302f0b78d704fb2b461be0afccc2cf6f9af45455517c9ef"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/delivery-readme.md",
+      "bytes": 3549,
+      "sha256": "17e0272f8a053042bdfac04824c9713a58742442e7e4b442f17bf2a807dfe9c8"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/delivery-scan.py",
+      "bytes": 3805,
+      "sha256": "093825de10b4fc25b9717f0b0b1b69861b721f9e60dc339d7e9e867fedfef01f"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/evidence-format-originals.json",
+      "bytes": 41792,
+      "sha256": "17a39696155ad75148c532d042a5e2bbe5ab42879293ae977c1d6a5be3a74bc5"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/f0-independent-review.md",
+      "bytes": 1376,
+      "sha256": "757c9c3655b6ce8ef19701cb302e99ce097fdb0121d4780f3a2807574cd18abb"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/g3-image-identities.json",
+      "bytes": 3356,
+      "sha256": "12000ddd9edb5b1d77ff46293a269fb4b8672b81592420f21e6ea9c88669d556"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/g3-license-review.md",
+      "bytes": 1804,
+      "sha256": "24bf4da53f065735a22f94e51aac1738ecd67020ef60c984445e7b20057469e6"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/historical-reference-check.json",
+      "bytes": 22652,
+      "sha256": "15db6fdc4f8b428b8c0c1c9b857e0fec2c7e3d849aefb8f0131afff494e88253"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/host-preflight.json",
+      "bytes": 544,
+      "sha256": "922835c38be204cfd3759f9bbf647fb3d75f53ca6eba8c957921bf304a6491ec"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/image-0-restore.json",
+      "bytes": 2166,
+      "sha256": "622f949635e52e6d246b6d7cfe51d5b0493c44332ea0c8aa48f0a97d50d8b33b"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/image-1-restore.json",
+      "bytes": 1660,
+      "sha256": "ff0e77ca74b020f26570410820366c903c0d86d3041bec166c226da51b18eec3"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/image-2-restore.json",
+      "bytes": 1700,
+      "sha256": "ac7e00607e35b391f9c03f376161e4b151ad6cca9225a3e21b1d7469de2613d7"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/image-3-restore.json",
+      "bytes": 2155,
+      "sha256": "c6935fd6ff017b02ba901573dc901428c34f389a98c29add5ac8497f6cccfefb"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/images-restored.json",
+      "bytes": 8032,
+      "sha256": "636ee01a1cd1de89fe9723448329ee9b5649b768b866d3665e0589749fde871e"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/images/download-budget.json",
+      "bytes": 834,
+      "sha256": "2dbb2e116b0ba5a6750058a8ffa35f188917cdc09253bc75a6b5f55510cbd69f"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/images/fuseki-licenses.json",
+      "bytes": 2383422,
+      "sha256": "83f5fc3b5c04c262e5b521c9dc8d1e1253e5fbf732da6e19f261876a1fa1249b"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/images/fuseki-receipt.json",
+      "bytes": 405,
+      "sha256": "ed30bcf95f8207838f083ce84dc4c8256dffce7d8243b4f05074bec01b6dd1eb"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/images/fuseki-sbom.json",
+      "bytes": 4078992,
+      "sha256": "a3b0d3ea1adbca32ce54a31c070c2beeb5726a5a84d29cf93c92be65518660d3"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/images/rustfs-licenses.json",
+      "bytes": 12497,
+      "sha256": "1db09fdcf9b801794d263597a4bc8737a3f01b208a624c4874d5ef557786f1ef"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/images/rustfs-official-index.json",
+      "bytes": 1612,
+      "sha256": "6f9d88f9e28fa902c24519005aa8e2b0d3f8e65896b5e390acf04dd19e58134a"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/images/rustfs-official-platform.json",
+      "bytes": 1623,
+      "sha256": "e7c6fa56b5e65abba57517b9e3c39638d80c4ddc91c5b81bb3958b4223f2670a"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/images/rustfs-receipt.json",
+      "bytes": 392,
+      "sha256": "24dc9ca6f612be995ebd060250f5b8fdae9f17532d829d5e53bbfa2db7ffccf6"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/images/rustfs-sbom.json",
+      "bytes": 371015,
+      "sha256": "275992234b2a136070e60b38aff808fe2f0a776bd5eb66e323a9374122104bdf"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/input-original-bytes.json",
+      "bytes": 35337,
+      "sha256": "6544e04c59be77131a66e48e3b5dff0daef79e6ab0e99fd2fc4d0562261cf888"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/input-verify.json",
+      "bytes": 146,
+      "sha256": "21883cccc76032e47c0e74cbeb47f880d2311adc6788eeffc086622cbb4b885d"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/local-archive-cleanup-plan.json",
+      "bytes": 3091,
+      "sha256": "9596ce224e5bbacc41a4021b6bbbe0bc1a4a0a037c780689339fbecf56060e19"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/local-archive-cleanup-receipt.json",
+      "bytes": 5641,
+      "sha256": "50aa8b195258226c91794033e97e8ae297ab67f4e3bcbf337c77d733bb6a4190"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/local-archive-cleanup.py",
+      "bytes": 3897,
+      "sha256": "57bd1704db01b9ebedf2966a431da8c674f9848ef09eaa0664cf2039b0764821"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/local-archive-dryrun.json",
+      "bytes": 128,
+      "sha256": "902464e93673a3dc7897ec4d19cb7d3a5e2c3712f6522fcc955e051bd46e9016"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/local-archive-review.md",
+      "bytes": 457,
+      "sha256": "05a6bc396541ba86afe98bccdbaad264d8cabee6d3d9fbb6dab7efd907e39d1f"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/pg-fixture.json",
+      "bytes": 643,
+      "sha256": "5dfae881a4da693fe9f39caf5d620b6577a33f126504a0cf2dd7c8b0ab2d0a82"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/pg-security-real.json",
+      "bytes": 2003,
+      "sha256": "260f94786fc4e235f2257969030ac9cd160765dbd26f64a1e5d775a6b035d7e2"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/pg-test-publish.txt",
+      "bytes": 814,
+      "sha256": "abcf52f9389d7df2832d5804b3ca581ab31b286132a5e79eb409d6ca7d38e8d3"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/public/cleanup-plan-final.json",
+      "bytes": 71502,
+      "sha256": "04dad77c186e5340017c43428c48f4bcc5e8195c5cb0ba2ac6de47cc42c2a92f"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/public/cleanup-receipt.json",
+      "bytes": 107274,
+      "sha256": "5fad4f2c705011d9559369a9def284ba5a7e0a1345461fdc3f93b72e73856e0f"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/public/compose-config.json",
+      "bytes": 7323,
+      "sha256": "3e322af81440c77f0638a63fcff258c1574ab3df05744416449ada0fd9713e70"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/public/independent-review.md",
+      "bytes": 732,
+      "sha256": "fe2e8664cf84a54dbc4ab186fe2e8a22b0d509b3c791fd15d66331d80a32da07"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/public/public-faults-1793578771290852000.json",
+      "bytes": 36229,
+      "sha256": "37f364b0159a53ecdbf022c66fff38fe276f57b7f4792e6b3bcef289d9d5c514"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/public/public-faults.json",
+      "bytes": 6079,
+      "sha256": "dfcbf519a7ac1d87fc972937d284f2b2b6eebfbb0637b6e2a2c3359f8431035a"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/public/start.json",
+      "bytes": 1430,
+      "sha256": "1eb68f5892d8ee6be7d7e5b9b6bb989fcc59fc7f059f0b889f6c68c150e39257"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/public/tests-publish.txt",
+      "bytes": 818,
+      "sha256": "b9f7bff6c842874a9c8b3ddd98fa8def3a09251073169aa573fb7bfc4142bb01"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/r04-final/api-log.json",
+      "bytes": 2786,
+      "sha256": "ee4417cca0ab67d35cc3397147a1c191b5ec58f3da6c0182fca9720564a3d494"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/r04-final/bindings-final.json",
+      "bytes": 11031,
+      "sha256": "6adfa48070c32fc2a88be2a1a15f1d9a0fd30ab073115db83ddf601ce9743160"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/r04-final/bindings.json",
+      "bytes": 740,
+      "sha256": "788d59b5d7fff0fbb0253514cc046b4976d0ba742a671c1ebeb9bbcc4e533530"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/r04-final/cleanup-plan-final.json",
+      "bytes": 126505,
+      "sha256": "7a7b982eeddbdbce61051f306393320b62443e905aa5d1805d8ad3a2dd3f330e"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/r04-final/cleanup-receipt.json",
+      "bytes": 174185,
+      "sha256": "3f8ce32f99e92b8bad715742ad7dc2fb4ed96db4ee435e826cb6c20f72275497"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/r04-final/db-readback.json",
+      "bytes": 40123,
+      "sha256": "0b52a7843e320de7f9b18b92043f035fdb920dcabaf6f07f05c8bfd6774e4c8e"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/r04-final/foreign-identity.json",
+      "bytes": 1591,
+      "sha256": "5e24f9c192aa36f8c5ce731dffe2f999361aa1972f7d7867e7dd2a20b992bffc"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/r04-final/fuseki-log.json",
+      "bytes": 374,
+      "sha256": "a4a85aaec6d5ef99736ebe87a361effa83e19e0d85129250132e51a0817d7b21"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/r04-final/independent-review.md",
+      "bytes": 924,
+      "sha256": "369b76f42e05c38e53589add4350c7593f98f9709b94c4b222d5697fe9ec7967"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/r04-final/ingress-stop.json",
+      "bytes": 179,
+      "sha256": "aec2502524ab01406f4e7a9aafc64d70ae9d08813381dba7271eb1fea36d45aa"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/r04-final/keycloak-test-log.json",
+      "bytes": 6523,
+      "sha256": "3ba7b9316b7dfdb4acf2cf797ca0ce34bcf9d6ca7a919d75ad2ce016cdfacdde"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/r04-final/platform-pg-log.json",
+      "bytes": 4282,
+      "sha256": "f0dcd8eba578125c7b1ea6bda2db3149bc2c21e11961a97147e2828df5512de8"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/r04-final/report.json",
+      "bytes": 664798,
+      "sha256": "3759c99cd8a8ce437ddc86425514de50340fd9de6da05793039020a3edd08837"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/r04-final/runtime-compose-config.json",
+      "bytes": 15192,
+      "sha256": "5189db2552d41d15e70c7df474c1ffd7eade4ebed783a12cd33f138327eb93c0"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/r04-final/runtime-witness.json",
+      "bytes": 25834,
+      "sha256": "0acc50d2b58ee91196af009af4284f6a40d61b884a02ee79b53be0c164603c1c"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/r04-final/rustfs-log.json",
+      "bytes": 374,
+      "sha256": "2075bef4591c1c493757433e25c113551d183aa6313514b35b3a429a8c1c2e1c"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/r04-final/start.json",
+      "bytes": 3934,
+      "sha256": "f9541335a68dd40c7cbe48e57ea81127ae9f7c13c065bbdb2df1809cdd925fa6"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/r04-final/volume-usage.json",
+      "bytes": 2197,
+      "sha256": "22fbcb2d041176c1f619ef0c4d934d9d8ca55ca1410ce4a25eb339c1b0fcdf5c"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/r04-final/web-log.json",
+      "bytes": 374,
+      "sha256": "c0c7bc23a5e32bc42f658566e2d6c5f7de4dd32372b3a9116b3ae7b4bff74cfc"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/r04-first/api-log.json",
+      "bytes": 2786,
+      "sha256": "d654f6dbb930dc35571888ae073f06d071b109b5a76d6b9c3cd8293b3d0eed4f"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/r04-first/cleanup-plan-final.json",
+      "bytes": 125193,
+      "sha256": "b7bfa5d2b502c95781237997c97011477039e618f4d3e8e302b88ed8d368bc50"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/r04-first/cleanup-receipt.json",
+      "bytes": 172789,
+      "sha256": "e4a125b340547fadfd5c2a4fd815a8ec1755fcae9252abba43a2a94c5829e1ed"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/r04-first/db-readback.json",
+      "bytes": 40114,
+      "sha256": "96d59d8968f71d13f7488c8a4347c1b47e260f0eb168c7d3bd4196e3e2bd960a"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/r04-first/foreign-identity.json",
+      "bytes": 1591,
+      "sha256": "678365bed4f722dbb52cb2a067ce48996c6bc3b44f01d07e864b88388fdcf9c1"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/r04-first/fuseki-log.json",
+      "bytes": 374,
+      "sha256": "8ac68ab9e7e4d72624ec237b34ab506d595512d0139c3d4ba0e4cf589a4f062e"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/r04-first/ingress-stop.json",
+      "bytes": 179,
+      "sha256": "44d421b104502b33b1f9213d0f03388287964600f7471bd0cd527dd89e018f79"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/r04-first/keycloak-test-log.json",
+      "bytes": 6523,
+      "sha256": "49e0a29d5491aed428839ffa3b528c772fca373344b5cf6982da3953a4ae3e3c"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/r04-first/platform-pg-log.json",
+      "bytes": 4282,
+      "sha256": "119dadf1d27ca2341dfc0696b9145a4880bd2d3021eaf9d6c84089f15249c47d"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/r04-first/report.json",
+      "bytes": 634675,
+      "sha256": "f198bb798fa105abbe219b04e3017ba7577af3a2cfbdc499a6b624f9609b3bfa"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/r04-first/runtime-witness.json",
+      "bytes": 25684,
+      "sha256": "94302b0eb38692e20bace2a38a7a67b4bbcc6f996f494ffb4433ceaffd1d0420"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/r04-first/rustfs-log.json",
+      "bytes": 374,
+      "sha256": "0553295002af19a2448db1fe9b760cd7606fd6ea808fd60e61626f92db9bb346"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/r04-first/start.json",
+      "bytes": 3640,
+      "sha256": "ff8c4a289511f9421e4e8135eab0c45a770ff192f157bd362c79133766c81368"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/r04-first/web-log.json",
+      "bytes": 374,
+      "sha256": "497f5862bfee37a159f37f33409787a847fc4d34f143c76682c572531369b92e"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/r04-runtime-review.md",
+      "bytes": 863,
+      "sha256": "ea79506bd8268d1517b2d1951a41fd58cc6ee948f65098b7b46814c6b1bda5ba"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/resource-inventory.json",
+      "bytes": 2440,
+      "sha256": "66b88d63033ac06e202ccda5f66f22155e24d78978c87a129c120265fc5e716e"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/resources-before.json",
+      "bytes": 1843,
+      "sha256": "74f496853ff89d61c1738659d2ad80f0567d1c3f986628adea2d0a5ddb03da41"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/sbom-format-receipt.json",
+      "bytes": 823,
+      "sha256": "6c1abcbfc2b6d4924469b9de84896e338307eec87a42c36afc3dc79ea50b9b3d"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/targeted-review-followup.md",
+      "bytes": 719,
+      "sha256": "0df6be7b3116d84e121585eace6ec3588e523db495b4241a505e4bf5adbfea9d"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/validation.json",
+      "bytes": 1855,
+      "sha256": "048ba0bf36b74dd72bfce39a4673adab5dd175d54f4ebf650abade4b9881ae3f"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/verify-selftest-c08.txt",
+      "bytes": 37442,
+      "sha256": "afd8a621f67c20525d1897b9a0561fd5463d40844db81bda7ec68b8cc815db47"
+    },
+    {
+      "path": "docs/evidence/G4-M1-FINAL-GATES-001/verify-selftest-format-failure.txt",
+      "bytes": 219,
+      "sha256": "37044d8ec12e242b9b30125f3eb47d5cfa6eccf40488a3dc1811c8cd1128f4e8"
+    },
+    {
+      "path": "docs/handoffs/2026-10-25-g1-wave2-master.md",
+      "bytes": 1650,
+      "sha256": "0a197d75e0a4707d4aafeeaabe430c1b98c54719920162ee2d39d6ef6e001a62"
+    },
+    {
+      "path": "docs/handoffs/2026-10-25-mac-master.md",
+      "bytes": 3930,
+      "sha256": "90112ef106bddfebcb265f46f32ffc690580c8b35e131cdf93622174dd3ac9f7"
+    },
+    {
+      "path": "docs/handoffs/2026-10-26-g1-closeout-master.md",
+      "bytes": 2195,
+      "sha256": "76555257a780b490edc57dc289192bf8fb1ba3e941b97b31338a02c9c0943555"
+    },
+    {
+      "path": "docs/handoffs/2026-10-26-g2-master.md",
+      "bytes": 3371,
+      "sha256": "d22bfefb034a1b15a5e93a9b89fb02c996748c6929c5b03527f465b634c3c237"
+    },
+    {
+      "path": "docs/handoffs/2026-10-26-pre-g3-cleanup-fix.md",
+      "bytes": 4543,
+      "sha256": "a71b98bbd2cb5ac1e2911a3de534f0323feb5ac84a08da445b56ccb24f0149a7"
+    },
+    {
+      "path": "docs/handoffs/2026-10-26-pre-g3-hygiene.md",
+      "bytes": 3310,
+      "sha256": "f3e2440c20c7384ffefa3d5afa7de9de6b677c6f6a034a487b09428243913b82"
+    },
+    {
+      "path": "docs/handoffs/2026-10-27-g3-m1-master.md",
+      "bytes": 3235,
+      "sha256": "b86481e12bcefc5dc812b4cad5d604b87200711dc6bf7bf645e04b05353ee98a"
+    },
+    {
+      "path": "docs/handoffs/2026-10-28-g3-m2-master.md",
+      "bytes": 4575,
+      "sha256": "549276c4a8c87ba784dd57332134cbbb16468a6872339d90f01de875d57687c5"
+    },
+    {
+      "path": "docs/planning/00-current-state-audit.md",
+      "bytes": 5136,
+      "sha256": "ad35420918b0dba677b28341eea98e2cca9ca60841c937e6b42b1a59ac03d73d"
+    },
+    {
+      "path": "docs/planning/01-decisions-and-nongoals.md",
+      "bytes": 6221,
+      "sha256": "fc62af2c236626a63d5ee060acf7676e4e2575a06618277e85ef8a7f077ade80"
+    },
+    {
+      "path": "docs/planning/02-target-architecture.md",
+      "bytes": 8877,
+      "sha256": "54893ccd366142df1b02e511594801bf9711473f0cd9da876608972467168ee5"
+    },
+    {
+      "path": "docs/planning/03-module-feature-matrix.md",
+      "bytes": 3983,
+      "sha256": "1d2ca6747e6caa5ba43a3d13e6c84f234a1f8fcfb306ee1d0eb067d33fba1568"
+    },
+    {
+      "path": "docs/planning/04-roadmap-and-dependency-dag.md",
+      "bytes": 3399,
+      "sha256": "15dbddaf2012b742d61e2d8703792fa1773779c2857f1b8a025366e04cad9975"
+    },
+    {
+      "path": "docs/planning/05-agent-team-and-task-contracts.md",
+      "bytes": 7615,
+      "sha256": "534a462b52040ff05798668d4e9f237d51e63a3b1b7262c8303401de13f4ffe3"
+    },
+    {
+      "path": "docs/planning/06-spikes-and-acceptance.md",
+      "bytes": 5154,
+      "sha256": "1b0ac741b35314cb5362e229b5352d6405322b6307f58a9c3c39b596d7f95145"
+    },
+    {
+      "path": "docs/planning/07-risk-register.md",
+      "bytes": 2576,
+      "sha256": "103b825f285800cd36e48276cfb53289a932c336b862418959cbb4310bc7f17b"
+    },
+    {
+      "path": "docs/planning/08-agents-and-repo-standards-proposal.md",
+      "bytes": 10419,
+      "sha256": "c34620d6f9644055f3b3b62354117bc40b4551b69911cc3672cfef020f6d9710"
+    },
+    {
+      "path": "docs/planning/09-review-request.md",
+      "bytes": 3199,
+      "sha256": "dd922f65f94a81db74a43dfd10842ff53a2c2abaea8ce2ff016d9e816e293fd3"
+    },
+    {
+      "path": "docs/planning/10-g0-review-record.md",
+      "bytes": 6033,
+      "sha256": "367bf3a42e2f1ab37394366a158fcd9a6c637a850898ee922dd1cb365e28c8a5"
+    },
+    {
+      "path": "docs/planning/g1-closeout-acceptance.md",
+      "bytes": 7650,
+      "sha256": "5d380eb6531944fe6073121c91d3c71bc413bc85910da40a1fe4715b515bf509"
+    },
+    {
+      "path": "docs/planning/g2-readiness-readonly.md",
+      "bytes": 3375,
+      "sha256": "43a9b5bae31e37bfdd1f3c9bf880baaee798b3fafabc291ca92f670dc8350018"
+    },
+    {
+      "path": "docs/planning/g3-ontology-modeling-and-governance-plan.md",
+      "bytes": 9365,
+      "sha256": "a1917df29a0489addaef6b2d3bdc97a292e9ebb03d0d2802a240642af697a8a3"
+    },
+    {
+      "path": "docs/planning/g4-implementation-plan.md",
+      "bytes": 3820,
+      "sha256": "f34879f1a61cc8522898c72447d681864c9f5881f06e6251ceb78b234393e35f"
+    },
+    {
+      "path": "docs/tasks/G1-CLOSE-001.md",
+      "bytes": 8636,
+      "sha256": "1b2c20680cd231d2ea650650ccea1f2a13d2a40827c588c807531844ccd89b4f"
+    },
+    {
+      "path": "docs/tasks/G1-CLOSE-OBS.md",
+      "bytes": 794,
+      "sha256": "85803058af7c6916fd1135003eb599c4cb63508b2cf01eceb998bc27593e6512"
+    },
+    {
+      "path": "docs/tasks/G1-CLOSE-SEC.md",
+      "bytes": 794,
+      "sha256": "07c40e07d205dd93da7c844f4a2a38988dc8ad5e3f8c6cf4db39f7c4ab115116"
+    },
+    {
+      "path": "docs/tasks/G1-ENG-001.md",
+      "bytes": 3413,
+      "sha256": "ca01f32e059aeb43c246f1f9e07115f831c4e8150f8b75717cb1ec2856d9edeb"
+    },
+    {
+      "path": "docs/tasks/G1-FE-001.md",
+      "bytes": 1688,
+      "sha256": "0cc207a4aef151460af4b070e67c605283134394fa49a40971fded42be1fb708"
+    },
+    {
+      "path": "docs/tasks/G1-INFRA-001.md",
+      "bytes": 3133,
+      "sha256": "c76106304ac36689a7bc7a7a9351f368dcc9f984337b63e8daa023a1461d754b"
+    },
+    {
+      "path": "docs/tasks/G1-OBS-001.md",
+      "bytes": 1680,
+      "sha256": "88f593c40e245c1bc78d4c7deb1ea1e8ca0832b8cedf973ff7edfb43db073b99"
+    },
+    {
+      "path": "docs/tasks/G1-SEC-001.md",
+      "bytes": 1683,
+      "sha256": "bcc10939c21ed8a92a400872b071f698e430b534d07db0d06bfca4d360799b2c"
+    },
+    {
+      "path": "docs/tasks/G1-WAVE2.md",
+      "bytes": 4521,
+      "sha256": "4ebdfac6ce7c32ff818f72128704f58ec2270ec357a6d57e56ab5365979bffde"
+    },
+    {
+      "path": "docs/tasks/G2-AI-001.md",
+      "bytes": 6672,
+      "sha256": "f7e3611ee03aa61edf72725892f5c14c16d368a090a29451ada09a02b34da388"
+    },
+    {
+      "path": "docs/tasks/G2-FE-001.md",
+      "bytes": 3758,
+      "sha256": "7a23beee3b5b2a5d20f05f96b7e6919a0dcc11111891027034145a9d7132f930"
+    },
+    {
+      "path": "docs/tasks/G2-FINAL-FIX.md",
+      "bytes": 3167,
+      "sha256": "77b68ef405f930d2d23b17c536cebf138b8b1d2958a6b89368e99dd4f0291db1"
+    },
+    {
+      "path": "docs/tasks/G2-HOST-FIX.md",
+      "bytes": 2586,
+      "sha256": "c4fe13c5bc0b38b500a5225e68484c56b0f70b451951fb96d2d30bd1af27b2d5"
+    },
+    {
+      "path": "docs/tasks/G2-OBS-SUPPORT.md",
+      "bytes": 3771,
+      "sha256": "d5b06aa9daeb21c087eb086110d5071e53c1cff1ff824313335c6771679ffe4d"
+    },
+    {
+      "path": "docs/tasks/G2-PUB-001.md",
+      "bytes": 5424,
+      "sha256": "a5b6c8f583ec6b028605ceaa8f5cab9eed43189c78f39db529c689ccb046cd01"
+    },
+    {
+      "path": "docs/tasks/G2-QA-001.md",
+      "bytes": 2520,
+      "sha256": "1fed6e9eee6525f9c39982a606c6b719590bfcb1cf50dd274936675d4a77d776"
+    },
+    {
+      "path": "docs/tasks/G2-QRY-001.md",
+      "bytes": 5070,
+      "sha256": "29864ad07beac8178e8c68fef3ef5b4f9b61450d3d049f5b2876582cc1591a41"
+    },
+    {
+      "path": "docs/tasks/G2-READINESS-TEST.md",
+      "bytes": 3104,
+      "sha256": "e765cbbdb8414e04a8b136918292e54c61179f7c35c94a928df8f3833889585b"
+    },
+    {
+      "path": "docs/tasks/G2-SEC-SUPPORT.md",
+      "bytes": 4127,
+      "sha256": "d5d92a68f382ddca6be812807ced081076e7f098cf97271d07716dc774ee785b"
+    },
+    {
+      "path": "docs/tasks/G2-SEM-001.md",
+      "bytes": 3862,
+      "sha256": "f97c9d268d1d8fbdffccfbf274f6940e7b66cb0a64b67e9256edfe892a107216"
+    },
+    {
+      "path": "docs/tasks/G2-THIN-SLICE-001.md",
+      "bytes": 20012,
+      "sha256": "31aca57150985cdf10bac926346e552146bb02756364587c4a256bf1a1da0b56"
+    },
+    {
+      "path": "docs/tasks/G3-M1-001.md",
+      "bytes": 5638,
+      "sha256": "3a34ac4e9edcbe362bc9094a75e4cec3728a53276bdc55835564eea3e43125ce"
+    },
+    {
+      "path": "docs/tasks/G3-M1-CLOSEOUT-002.md",
+      "bytes": 4842,
+      "sha256": "77c84dbfb7474e3086ef61aea53e60a7d98caab89b40612bb7f10bef642824cf"
+    },
+    {
+      "path": "docs/tasks/G3-M2-001.md",
+      "bytes": 5855,
+      "sha256": "baccf2fc5c6a53a9dbbb44c6fabba19b069eeba7c014b11c3bd94ff323b1287e"
+    },
+    {
+      "path": "docs/tasks/G3-M3-001-arm64-transfer-approval.md",
+      "bytes": 5539,
+      "sha256": "d2e3e6448648a763e8d738a3ccaa8ee8fe6ec0616910ba041d5ad2fd4e041dfa"
+    },
+    {
+      "path": "docs/tasks/G3-M3-001-cache-approval.md",
+      "bytes": 3229,
+      "sha256": "db4e8214a1c60910a55060786087f8e12e09418f5230bdf0efa27f197a47314d"
+    },
+    {
+      "path": "docs/tasks/G3-M3-001-fixture-lifecycle.md",
+      "bytes": 1462,
+      "sha256": "71603b07f1e1fe4461fb75c5668b8a96b70568320dbeec054cde46554f4b67cb"
+    },
+    {
+      "path": "docs/tasks/G3-M3-001-language-boundary.md",
+      "bytes": 1153,
+      "sha256": "9fe5cd0e658e6ed315780b64045a55bc5d575f93e9aaf71488661bd7ec0801f2"
+    },
+    {
+      "path": "docs/tasks/G3-M3-001-plan.md",
+      "bytes": 5036,
+      "sha256": "7033b9654e4ff0230e45bc8275996ed9a31a8d0d1d5e3fbc1475653956b9b839"
+    },
+    {
+      "path": "docs/tasks/G3-M3-001.md",
+      "bytes": 4068,
+      "sha256": "1813e82794f98087d19ba06ea787c6bf462a24011d6acbf34aea6331a65356a1"
+    },
+    {
+      "path": "docs/tasks/G3-M4-001-handoff.md",
+      "bytes": 3839,
+      "sha256": "f09a95e429c3d9ab8e0078214d67ee7979634a99b263c8a52a644924abb1821d"
+    },
+    {
+      "path": "docs/tasks/G3-M4-001.md",
+      "bytes": 7133,
+      "sha256": "6e3050a664aaf47cceb09b53407bdccbfb09fcb8ce5b01074c09d577f96cb2e6"
+    },
+    {
+      "path": "docs/tasks/G3-M4-SEM-A.md",
+      "bytes": 1915,
+      "sha256": "115a9c352fb318f8a4c93445dd4cf14fb0d43a054f592ba1cde8ee1c7e42b927"
+    },
+    {
+      "path": "docs/tasks/G3-M4-SEM-B.md",
+      "bytes": 2484,
+      "sha256": "b2d1564cbad27fd89e669e6fd11d1c653bcb069ae6fe744615b8538718f575ce"
+    },
+    {
+      "path": "docs/tasks/G3-M4-WEB-A.md",
+      "bytes": 1639,
+      "sha256": "dd1553bfcd2ead3b4cbc3f2f341f7da50591bf5636d70a1c880304edb8fe79b7"
+    },
+    {
+      "path": "docs/tasks/G3-M4-WEB-B.md",
+      "bytes": 2281,
+      "sha256": "661b15797d549a4fa536eab6d93172efd07e5bdcd851f261f551a1895e106752"
+    },
+    {
+      "path": "docs/tasks/G3-M5-001-handoff.md",
+      "bytes": 3299,
+      "sha256": "91b385f0affb129a19e5e4791de3f2d0baa461e10ceb8814c628d6a2d560336c"
+    },
+    {
+      "path": "docs/tasks/G3-M5-001.md",
+      "bytes": 3033,
+      "sha256": "92bb69409a1badac4c9fbea80a4826c5e7d769b7aac3950fb6158bea131d0f8e"
+    },
+    {
+      "path": "docs/tasks/G3-M5-REVIEW-FIX-001.md",
+      "bytes": 3477,
+      "sha256": "d23c10517a01404eb370048cd75a2d9397f4faffe3e299e55d505d2c6b9f53f4"
+    },
+    {
+      "path": "docs/tasks/G4-00-CONTRACT-001.md",
+      "bytes": 3433,
+      "sha256": "faf715bb1cd84c9c985a3513cb0384cb95ac65b757c64c392e574cfc9d1826b9"
+    },
+    {
+      "path": "docs/tasks/G4-M1-CONNECTION-001.md",
+      "bytes": 2388,
+      "sha256": "6242817c5ca212700dfba7f7288cfd85523e450a676ec0d9435bc20b0f7a24de"
+    },
+    {
+      "path": "docs/tasks/G4-M1-FINAL-GATES-001.md",
+      "bytes": 2640,
+      "sha256": "3cd845eb2890090da26536a4cf4eac29ffd8f9b1b7c87535f32d1cbd7b56f169"
+    },
+    {
+      "path": "docs/tasks/G4-M1-RECOVERY-001.md",
+      "bytes": 3500,
+      "sha256": "4cf2d8e90cd66f4054eb9d09ed70e2f7d040d211a81855710c433fe746e55a24"
+    },
+    {
+      "path": "docs/tasks/M0-MAC-PORTABILITY-001.md",
+      "bytes": 5902,
+      "sha256": "5882cdfe5d3c7016888cc8ed3ca0977742ff45b7743bcf6baa438c35ad995348"
+    },
+    {
+      "path": "docs/tasks/PRE-G3-CLEANUP-FIX-002.md",
+      "bytes": 5864,
+      "sha256": "24b91d9ac06bdf65ec927beaf3beb2da57d8b7d58a40cce5173a763e4066eea2"
+    },
+    {
+      "path": "docs/tasks/PRE-G3-HYGIENE-001.md",
+      "bytes": 4678,
+      "sha256": "3d5ec7a31ce42bc17aeb09f708e093354fb71d64f06a06fe8a181e2cf71551f8"
+    },
+    {
+      "path": "docs/tasks/current-authorization.md",
+      "bytes": 15499,
+      "sha256": "64af504aeec95cb1a719ea27797c2db9609b6e29167bc63eb34878390be3c8b8"
+    },
+    {
+      "path": "experiments/g4-m1-final-gates/c08.mjs",
+      "bytes": 31971,
+      "sha256": "21d592d614685ae6821833d7bc598056cf6c9689f3826076221ab9a779c9e28c"
+    },
+    {
+      "path": "experiments/g4-m1-final-gates/c08_readback.py",
+      "bytes": 4313,
+      "sha256": "de7a403d4f86e8641968ca147c471c9c79b9315c73527836a5efd1b27fab4258"
+    },
+    {
+      "path": "experiments/g4-m1-final-gates/closeout.py",
+      "bytes": 10482,
+      "sha256": "b7b6e3e79bb16d0b997037a49b5bf3aa1dbecdf3a9141f8f9783d166930be609"
+    },
+    {
+      "path": "experiments/g4-m1-final-gates/closeout_final.py",
+      "bytes": 10516,
+      "sha256": "9bec4ba5247faf95318ab438bab1558beff8a0a7d04557bdafb9a45d755b647b"
+    },
+    {
+      "path": "experiments/g4-m1-final-gates/closeout_public.py",
+      "bytes": 10507,
+      "sha256": "9a2aacd734c240c7d648489591d48cfcfe8282d2bd96071072e2578ebb121eb7"
+    },
+    {
+      "path": "experiments/g4-m1-final-gates/closeout_r04.py",
+      "bytes": 10498,
+      "sha256": "ab07bcf0a719e91573e88e2f855cdb72335dd16ecb08a05a47efc60ece861781"
+    },
+    {
+      "path": "experiments/g4-m1-final-gates/collect_r04.py",
+      "bytes": 3877,
+      "sha256": "a71b93b7abbc26eb4a7870d5c0a7392c1f2794200617ad018dff1265b7ab681b"
+    },
+    {
+      "path": "experiments/g4-m1-final-gates/compose.m1.yaml",
+      "bytes": 5458,
+      "sha256": "0c33fe88be41490c4037114947270d1abcf03836becee5c29bdc596a6414fe3b"
+    },
+    {
+      "path": "experiments/g4-m1-final-gates/compose.public.yaml",
+      "bytes": 5269,
+      "sha256": "6d5920fd7a622448b20be6d3a4dd00d036ea28f9f809c8cea33dc28691996759"
+    },
+    {
+      "path": "experiments/g4-m1-final-gates/compose.r04.yaml",
+      "bytes": 6340,
+      "sha256": "68595dcc1c4c7bf1ae6081da627f2c1ee4ce9ab16e023be5976c7aecbd4c6fdb"
+    },
+    {
+      "path": "experiments/g4-m1-final-gates/compose.runtime.yaml",
+      "bytes": 4721,
+      "sha256": "c2b70e6a72d5232b2227932b3ad3896756823ab0a5f9e514472320623d1b9a7f"
+    },
+    {
+      "path": "experiments/g4-m1-final-gates/g3_forensics.py",
+      "bytes": 1709,
+      "sha256": "a98fe0ea89401a4de3392a30f05b5f9708b6e99b25226c4b1a574366b0e0725b"
+    },
+    {
+      "path": "experiments/g4-m1-final-gates/g3_licenses.py",
+      "bytes": 3762,
+      "sha256": "dc7846a465f46eba5105e0a9b0ce6517e5cdd723acb03c4f6a1127b4b6ea3a15"
+    },
+    {
+      "path": "experiments/g4-m1-final-gates/g3_metadata.py",
+      "bytes": 1698,
+      "sha256": "577cbbeb259c4b9b1c76afad2f98ce6a4623442c778b16b115d95424d859df57"
+    },
+    {
+      "path": "experiments/g4-m1-final-gates/host-ingress.mjs",
+      "bytes": 4621,
+      "sha256": "d175e51ac973b05cc994f74666eff7202725c3f9a0e387310607215a94f55f09"
+    },
+    {
+      "path": "experiments/g4-m1-final-gates/loopback-proxy.mjs",
+      "bytes": 772,
+      "sha256": "d0f82fd64b6d37c01d929dfce2166e7eed084506bf9a1748d71c51d65d365b00"
+    },
+    {
+      "path": "experiments/g4-m1-final-gates/pg_fixture.py",
+      "bytes": 7048,
+      "sha256": "04dea051bb04689a193457a522e1dfde22a18fb9e30885e50aadb6bb837e3e58"
+    },
+    {
+      "path": "experiments/g4-m1-final-gates/public_faults.py",
+      "bytes": 4788,
+      "sha256": "98243509ddf3035fb960a5315c561466ea43336fe7a67811f1872b4c4cd47df8"
+    },
+    {
+      "path": "experiments/g4-m1-final-gates/r04-host-ingress.mjs",
+      "bytes": 4675,
+      "sha256": "906ecc0fd2d1d5df9b6905612588384a24b547b9cd5833e4f43596f13275ded0"
+    },
+    {
+      "path": "experiments/g4-m1-final-gates/r04-loopback-proxy.mjs",
+      "bytes": 903,
+      "sha256": "ecb5b46409e5df4a95bd2045ac4cb19dfc9e9c8f13234a6f6932d621ab1bf6cb"
+    },
+    {
+      "path": "experiments/g4-m1-final-gates/r04.mjs",
+      "bytes": 29837,
+      "sha256": "83aeff6cf4286eb5c67439e5d6c2f2cf936b2a9fc3cbb8e0d1b9a59b6cf8ed80"
+    },
+    {
+      "path": "experiments/g4-m1-final-gates/r04_identity.py",
+      "bytes": 3897,
+      "sha256": "9322f7c5369d2d34b73c531cdad7e5c0c533424520bb3997c2945c4bc1fd74b3"
+    },
+    {
+      "path": "experiments/g4-m1-final-gates/r04_runtime.py",
+      "bytes": 8060,
+      "sha256": "0e5ef60272196cfb8c0387aa63600052550c4a43c0c22a88aada5bc5a5af9420"
+    },
+    {
+      "path": "experiments/g4-m1-final-gates/restore_images.py",
+      "bytes": 3217,
+      "sha256": "848c8badb7117370b868a34ef96268b1c9a72978e3658bc608b89b8799a3d32d"
+    },
+    {
+      "path": "experiments/g4-m1-final-gates/runtime.py",
+      "bytes": 7774,
+      "sha256": "c023c4e7b53dc87f3b415a733cb2372cfa461d40e89c229b79d61829ea6afb40"
+    },
+    {
+      "path": "experiments/g4-m1-final-gates/stdio-relay.mjs",
+      "bytes": 885,
+      "sha256": "33b8826bb18cd5a461a1700ecbc4e8e813fa45b6d95b4d2f7a5a1a868eea1d57"
+    },
+    {
+      "path": "experiments/g4-m1-final-gates/verify_r04.py",
+      "bytes": 5611,
+      "sha256": "e7f0f971af18f5faaf8ddc9afcec41fa40148ba09641bc5a6e46f4428f0540a6"
+    },
+    {
+      "path": "experiments/g4-m1-final-gates/web-production.mjs",
+      "bytes": 929,
+      "sha256": "db16c94175d32af00d6e25674f9e99ca20da56b2ad4e06364c7860a628318fb4"
+    },
+    {
+      "path": "experiments/g4-m1/catalog_cancel_fault.py",
+      "bytes": 11928,
+      "sha256": "dfa1820b0589739964cce582cf0f29b81ae70719ea469031906e38a7e6bdf831"
+    },
+    {
+      "path": "experiments/g4-m1/catalog_cancel_readback.mjs",
+      "bytes": 3998,
+      "sha256": "a6d6649e849affec05b7b8e0ddab5cf5959d9649200017dad00fdae66e532d0e"
+    },
+    {
+      "path": "experiments/g4-m1/client_cancel_fault.py",
+      "bytes": 3596,
+      "sha256": "7565090f99002df2e046b87827255998378b8e24cdf1e8121e03bf20229d0a51"
+    },
+    {
+      "path": "experiments/g4-m1/closeout_resources.py",
+      "bytes": 11456,
+      "sha256": "882a4ab655ff67ca682d73c57d2844a421c37a6f749f3bb5ad70f362805a61f6"
+    },
+    {
+      "path": "experiments/g4-m1/compose.m1.yaml",
+      "bytes": 5443,
+      "sha256": "54c558d2a088d977965b82a5169ad94a65572eeb5846491b4f6236e7835e7672"
+    },
+    {
+      "path": "experiments/g4-m1/compose.recovery-fault.yaml",
+      "bytes": 415,
+      "sha256": "961e3014af942cdb178200f9361964db7af25f05310ac68c43d4f2bbc353b8e8"
+    },
+    {
+      "path": "experiments/g4-m1/compose.runtime.yaml",
+      "bytes": 4790,
+      "sha256": "b27cf0675b8a0bbbd46b2742560430bd525bbf0a511558c734168fceb6aaa85a"
+    },
+    {
+      "path": "experiments/g4-m1/compose_stage.py",
+      "bytes": 1702,
+      "sha256": "d495bfa1370b25e7ffd5a7c02f796994fc35faa56d38358d2028dbe5fd8e56f1"
+    },
+    {
+      "path": "experiments/g4-m1/credential_fault.py",
+      "bytes": 5114,
+      "sha256": "2f0de9a49dd321c2db6bb0ffb52b125b99fd9f8aa0c8d66304d35f24718338e1"
+    },
+    {
+      "path": "experiments/g4-m1/cross_org_fault.py",
+      "bytes": 9340,
+      "sha256": "5d0e1b15e463d928a2359abe01853e18b86865de96bafcbb51b672c78d2b4187"
+    },
+    {
+      "path": "experiments/g4-m1/forensic_images.py",
+      "bytes": 10886,
+      "sha256": "00c7a1bbdab4e01927a69524ce84f597b8f40964e99703e64b6f87cc69c6fda7"
+    },
+    {
+      "path": "experiments/g4-m1/host-ingress.mjs",
+      "bytes": 4594,
+      "sha256": "4dddeaa70cc9b8f9959d69f51f9efef0d0c9aa5f72c7607bea79c8284ac91d7b"
+    },
+    {
+      "path": "experiments/g4-m1/keycloak_notice.py",
+      "bytes": 3756,
+      "sha256": "cd323b915d9b0b987d0217ed10781971edef60cb1fc93137821b8a9c23328707"
+    },
+    {
+      "path": "experiments/g4-m1/keycloak_sbom.py",
+      "bytes": 23619,
+      "sha256": "fa634dd7c9311b3d3747b9cf9f0b2801794fb1088f1009a85264b2b8dc38983d"
+    },
+    {
+      "path": "experiments/g4-m1/lease_fault.py",
+      "bytes": 13328,
+      "sha256": "334f7a6f2cb91aec5a1d53845b07a9dfc35cfd9e46df29b9b4dd3993e66e32e0"
+    },
+    {
+      "path": "experiments/g4-m1/license_inventory.py",
+      "bytes": 2504,
+      "sha256": "63919abed38704d04db971cdc30827dbf24fbfa000a25bb2682a3820fd7aa47b"
+    },
+    {
+      "path": "experiments/g4-m1/loopback-proxy.mjs",
+      "bytes": 772,
+      "sha256": "d0f82fd64b6d37c01d929dfce2166e7eed084506bf9a1748d71c51d65d365b00"
+    },
+    {
+      "path": "experiments/g4-m1/network_fault.py",
+      "bytes": 4526,
+      "sha256": "126d4a37c2599a7efc42c4553a97dd9329bf922967bfbe64c3166237011a89a6"
+    },
+    {
+      "path": "experiments/g4-m1/permission_fault.py",
+      "bytes": 3132,
+      "sha256": "da23441c4f311f70627564906821df8b22ad6019428fb154d2da65d075c8faf2"
+    },
+    {
+      "path": "experiments/g4-m1/pg_fixture.py",
+      "bytes": 7036,
+      "sha256": "230aeb25331197edb6e84f2c58688f02d55df7d4ef9a152381d9a47f9f69bf89"
+    },
+    {
+      "path": "experiments/g4-m1/purpose_fault.mjs",
+      "bytes": 8399,
+      "sha256": "a7758c3b3095636d7b54777d59cb2911e6afc7a357bc037877a2611df684c349"
+    },
+    {
+      "path": "experiments/g4-m1/relationship_readback.py",
+      "bytes": 20585,
+      "sha256": "0cb858ed1134c5870e155607a9054ffff2f7b6c27ab024d8b1e92e4790231aba"
+    },
+    {
+      "path": "experiments/g4-m1/scan_delivery.py",
+      "bytes": 6455,
+      "sha256": "1a9ec1e046c261c79f0d0e265d452b6fd3a5d8df418c3a8e3471691b37e7cf25"
+    },
+    {
+      "path": "experiments/g4-m1/scan_image.py",
+      "bytes": 1979,
+      "sha256": "099bcace7a6221ba6b971b3bb6b5faca289db064192ff134a820a71ebfb76cc1"
+    },
+    {
+      "path": "experiments/g4-m1/stdio-relay.mjs",
+      "bytes": 885,
+      "sha256": "33b8826bb18cd5a461a1700ecbc4e8e813fa45b6d95b4d2f7a5a1a868eea1d57"
+    },
+    {
+      "path": "experiments/g4-m1/test_forensic_images.py",
+      "bytes": 3617,
+      "sha256": "f86076ad6c8de321f83ef09be6f987ba6b420e6912827b43aae469be10800166"
+    },
+    {
+      "path": "experiments/g4-m1/timeout_fault.py",
+      "bytes": 3185,
+      "sha256": "5477db5b88ae9b30803b48692251526f0aae6a4d4948a62da1863fef69a1d76a"
+    },
+    {
+      "path": "experiments/g4-m1/ui_interlock_witness.mjs",
+      "bytes": 6580,
+      "sha256": "d88543661d7cf24412377e9daa386dc6bc8a2002e063ed81dedaa969f531a2cf"
+    },
+    {
+      "path": "experiments/g4-m1/web-production.mjs",
+      "bytes": 926,
+      "sha256": "419f4984bcfa1f7642680388831eb9be26843682c71f1b14c85d9a064211417f"
+    },
+    {
+      "path": "global.json",
+      "bytes": 165,
+      "sha256": "ab4eed8da9aaee0671a10b49fe4ff1b27b3341b264f317ee88785607c0711e9a"
+    },
+    {
+      "path": "infra/development/README.md",
+      "bytes": 478,
+      "sha256": "0e173eb221dee39d4598598ef749502a83948edb75153436498a683cdfa37ffe"
+    },
+    {
+      "path": "infra/development/fuseki/.dockerignore",
+      "bytes": 83,
+      "sha256": "812e9da64837996d6d180a4f91b84d475cbf339fd7085fb98755f6772ca9df41"
+    },
+    {
+      "path": "infra/development/fuseki/Dockerfile",
+      "bytes": 2167,
+      "sha256": "534f20652cf476c8fc8d354635234969fed8f3f430ff76305d9a41b193f23ab1"
+    },
+    {
+      "path": "infra/development/fuseki/entrypoint.sh",
+      "bytes": 176,
+      "sha256": "30a89837207cdcec6f8142b23e40139be3279604ae339bfe2815c530e834685c"
+    },
+    {
+      "path": "infra/development/fuseki/fetch-fuseki.sh",
+      "bytes": 2164,
+      "sha256": "75e55f553d1a19d7c4c3ab652c0f649414489d4d4e117bd60afc2526383f567d"
+    },
+    {
+      "path": "infra/development/fuseki/g2-config.ttl",
+      "bytes": 1044,
+      "sha256": "71809808ed0ef0321ad5438098523e8c987450f643c1f1c32238622bd582db73"
+    },
+    {
+      "path": "infra/development/fuseki/g2-log4j2.properties",
+      "bytes": 175,
+      "sha256": "04f0f089ecb26682d64da62399c570dfd98c6d213e8f75d3d227334cecfddea6"
+    },
+    {
+      "path": "infra/development/test-resource-persistence.ps1",
+      "bytes": 9569,
+      "sha256": "bc97d5d339da3e39404e72e5d8f1dd90c41fc5a8a1478c04eba21355e8daa025"
+    },
+    {
+      "path": "infra/observability/alloy/config.alloy",
+      "bytes": 5245,
+      "sha256": "ece43d2e118aa18138f2cfc66e8f06a1077f19dbf0983e5900668e7d76e4b6a7"
+    },
+    {
+      "path": "infra/observability/events/behavior-event.schema.json",
+      "bytes": 1171,
+      "sha256": "b2bbad79fe734c77ee326af9caf62bef49eb86fd06e6f5e966808e937440d916"
+    },
+    {
+      "path": "infra/observability/grafana/dashboards/platform-api.json",
+      "bytes": 4797,
+      "sha256": "6ae355781dca8d3890a1c90b9d3e41bebb303500ac3b3dc0f0ac241a6d066851"
+    },
+    {
+      "path": "infra/observability/grafana/dashboards/platform-dependencies.json",
+      "bytes": 3875,
+      "sha256": "3582f1b38b124badb0f2261234cf8e3edab078e73bed44c8d3d4dfb6a4b7aac4"
+    },
+    {
+      "path": "infra/observability/grafana/dashboards/platform-errors.json",
+      "bytes": 3202,
+      "sha256": "92d68d9653ccc75ba081f16b1e42d0c66d61ced1de05a799167687576290a8d6"
+    },
+    {
+      "path": "infra/observability/grafana/dashboards/platform-overview.json",
+      "bytes": 6352,
+      "sha256": "084c24bc01570e152dba38cedac3eff318f9b614d1366a81356b7fe79ed39853"
+    },
+    {
+      "path": "infra/observability/grafana/grafana.ini",
+      "bytes": 500,
+      "sha256": "4a0087fc93c2b0c13578cd977c51410a10bb4d7b3f686495291ae164cf0b14a3"
+    },
+    {
+      "path": "infra/observability/grafana/provisioning/dashboards/dashboards.yaml",
+      "bytes": 206,
+      "sha256": "a0ad788c527d54b9590b8082c2c4e56d510287e9b410acaee00d902935ceba78"
+    },
+    {
+      "path": "infra/observability/grafana/provisioning/datasources/datasources.yaml",
+      "bytes": 1171,
+      "sha256": "98d247a5a9ae81c9bf2d1c1288e43d1d59e8f961069e0c237caea673f3a90c7a"
+    },
+    {
+      "path": "infra/observability/inspect-dependencies.py",
+      "bytes": 3669,
+      "sha256": "1cef36f5e678b102440ad5b825d151b5ae21659e33f373a2807b47dc44e22a60"
+    },
+    {
+      "path": "infra/observability/loki/loki.yaml",
+      "bytes": 948,
+      "sha256": "2bed3d40843c430a4ef6913e32259f3e3b33e441c140cc9b6102c8481315559f"
+    },
+    {
+      "path": "infra/observability/prometheus/alert-tests.yaml",
+      "bytes": 3476,
+      "sha256": "b53537b108704d9557652a9aff5203efe9c2c34d7dc37510b84e1cef982b4f6c"
+    },
+    {
+      "path": "infra/observability/prometheus/alerts.yaml",
+      "bytes": 1028,
+      "sha256": "12809d3e660172c6abca2fb0a0fbeddee41fa6445fdcc5f5ce485f544ee91f6b"
+    },
+    {
+      "path": "infra/observability/prometheus/prometheus.yaml",
+      "bytes": 557,
+      "sha256": "30c276628092ed310b7ba96e2a738b4b845534d0d4f24ca18ab72be8a9f27c79"
+    },
+    {
+      "path": "infra/observability/query-runtime.py",
+      "bytes": 16676,
+      "sha256": "c5f06f2be09aab0bfa1d10d62adece6d733d420ce21edf013a8c60efcaf275c0"
+    },
+    {
+      "path": "infra/observability/resources.json",
+      "bytes": 7371,
+      "sha256": "7e777255e5e9800a7532eddfb64f42b4820304c3b53782e3efbe19c2ce07ab05"
+    },
+    {
+      "path": "infra/observability/tempo/tempo.yaml",
+      "bytes": 466,
+      "sha256": "60cc7db7d58f0ed9dc8c0535471fc6f02ca5a1060526f9d888ef2659ca0d1235"
+    },
+    {
+      "path": "infra/observability/tests/test_runtime_queries.py",
+      "bytes": 3865,
+      "sha256": "734ed1597d783ef2c3c30ca1d188f32847ca278d259e47779225efafb1a74ceb"
+    },
+    {
+      "path": "infra/observability/validate-config.py",
+      "bytes": 4546,
+      "sha256": "b1ab7e3176c61a585224a9b9e827da76914ca86b13a674541a0139f7b8fa6780"
+    },
+    {
+      "path": "infra/security/bootstrap-keycloak.py",
+      "bytes": 8397,
+      "sha256": "b397271399a40c63b9320cb133b58272d5198a86f278e564b382f2e08bec6c95"
+    },
+    {
+      "path": "infra/security/test_bootstrap_keycloak.py",
+      "bytes": 4936,
+      "sha256": "fedd78b4ea71ae94e9aef082c1878b7a57936a4026aaf4a291fb6a7a18c4d1cc"
+    },
+    {
+      "path": "infra/security/test_oidc_harness.py",
+      "bytes": 2642,
+      "sha256": "1b8ee5669c9e7f8e50ab80841849757efa7621371460c98c1376031a670efec7"
+    },
+    {
+      "path": "infra/security/verify-oidc.py",
+      "bytes": 13449,
+      "sha256": "329b20f0d90e67a97bde1ca5cd9d1dffc796d629cc13bae731a3609ac03f7751"
+    },
+    {
+      "path": "package.json",
+      "bytes": 289,
+      "sha256": "66ca524d296b8374ed595daca9b602c5ac740f61c094bb4dd1c136eacdf97d98"
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "bytes": 163213,
+      "sha256": "9c0c20bf43a8d664026e0d8b0beb40a8ee03d3e6f0b215ebc8fbb89b267dafe8"
+    },
+    {
+      "path": "pnpm-workspace.yaml",
+      "bytes": 81,
+      "sha256": "0c80113b8c5a8e07d0b82aec272e17237b43e80bccadb110ff426a8c4f407903"
+    },
+    {
+      "path": "samples/g2/data.ttl",
+      "bytes": 56984,
+      "sha256": "349ee83ff47883b13644c6291f98ab0ea925afaca053779d92184ee5d73dcb7e"
+    },
+    {
+      "path": "samples/g2/invalid-data.ttl",
+      "bytes": 541,
+      "sha256": "982d697df1b03c1c7981d9bfd1f7425445e880c49fb99aa4c5df007218f885a6"
+    },
+    {
+      "path": "samples/g2/ontology.ttl",
+      "bytes": 1506,
+      "sha256": "52b95ac6e85c3e9e3c7fdea1b4c9b5abc6a5e1801b7f459c41072b5f90f9dc73"
+    },
+    {
+      "path": "samples/g2/shapes.ttl",
+      "bytes": 3466,
+      "sha256": "78b6b7cc5cf635825b58664fe23031c0d298cc51d7def446fb5b9aeb17cc9270"
+    },
+    {
+      "path": "samples/g2/vocabulary.ttl",
+      "bytes": 461,
+      "sha256": "aa272d8683bfdbe6213424be830415d47f0a454191788ee852709bf52e26d93b"
+    },
+    {
+      "path": "samples/g3-m1/01-iri.ttl",
+      "bytes": 233,
+      "sha256": "0fe5fc093b46ef29ebdf2c7ac9cac29aa97fcfde40974b9f8820086b399a88da"
+    },
+    {
+      "path": "samples/g3-m1/02-class.ttl",
+      "bytes": 198,
+      "sha256": "c47f0f03140e19b80436a6b90a7c0ac96d9d1ef2eba098705b4baafaa54a94cb"
+    },
+    {
+      "path": "samples/g3-m1/03-subclass.ttl",
+      "bytes": 240,
+      "sha256": "88bbe89551f16c045d1fba65ca2f81e3bd9afc85f7e672e551842e31128dbef4"
+    },
+    {
+      "path": "samples/g3-m1/04-object-property.ttl",
+      "bytes": 224,
+      "sha256": "46d697059047710a5ceaabe7788f86dec6c29cbae890dffdf9a7efc9ac74c58b"
+    },
+    {
+      "path": "samples/g3-m1/05-datatype-property.ttl",
+      "bytes": 239,
+      "sha256": "11980f67dd90a7920e7bc3baec6b76b32101b62289f517ee004199bd808dfe44"
+    },
+    {
+      "path": "samples/g3-m1/06-domain-range.ttl",
+      "bytes": 250,
+      "sha256": "c6cb7ea917760f062f9e73d721f5ef62e6c7322289c643f435de3b0cdb9d0d75"
+    },
+    {
+      "path": "samples/g3-m1/07-annotation.ttl",
+      "bytes": 251,
+      "sha256": "6caffbc0c55ad6c55b6e57d268b80cb986d79a59cc5abe75665e607e8b36a31e"
+    },
+    {
+      "path": "samples/g3-m1/08-individual.ttl",
+      "bytes": 214,
+      "sha256": "1293ed2fdde0f3912fa426aba43425e726fb7c2b99d6598693ca07c3360b464a"
+    },
+    {
+      "path": "samples/g3-m1/09-equivalent.ttl",
+      "bytes": 244,
+      "sha256": "2d6d2f26fb0de15398862e7b258c1cc3e2351fcd0ee076dfe9dcecfb365872c1"
+    },
+    {
+      "path": "samples/g3-m1/10-disjoint.ttl",
+      "bytes": 241,
+      "sha256": "717bbe315a8d52ed34686b5f4e8901d53f15c38a296222f843c4a82113bfca92"
+    },
+    {
+      "path": "samples/g3-m1/11-inverse.ttl",
+      "bytes": 256,
+      "sha256": "063aceb39db53e3a45cd177a13071deb65dadc0d0999edb2010544fd55c72610"
+    },
+    {
+      "path": "samples/g3-m1/12-features.ttl",
+      "bytes": 231,
+      "sha256": "59340be0913d7201c4cd272564eb7f2380de7d041e63597ac0bf410d715cc166"
+    },
+    {
+      "path": "samples/g3-m1/13-some-all.ttl",
+      "bytes": 275,
+      "sha256": "ba6777b61878b953d2e25b153a2b6c4e550b69fad8a2bbe804b94c990c0e72d2"
+    },
+    {
+      "path": "samples/g3-m1/14-has-value.ttl",
+      "bytes": 273,
+      "sha256": "e9b418a4da35e36278700e6d5508a8320fd016d564b4cf0da32257a9efcea743"
+    },
+    {
+      "path": "samples/g3-m1/15-cardinality.ttl",
+      "bytes": 269,
+      "sha256": "406a91623da2d27635e134d09038bf2d8a63f29da81ad2d534e920f846ab3862"
+    },
+    {
+      "path": "samples/g3-m1/16-boolean.ttl",
+      "bytes": 212,
+      "sha256": "dd4be75a6d32da785d55c01263eda8c7605f0672061cf71d203622b997643fb5"
+    },
+    {
+      "path": "samples/g3-m1/17-chain.ttl",
+      "bytes": 223,
+      "sha256": "094d6fd5b4b6dbb1d2c9151a3be9819f61e20f2868366ed0530813c5b8b77f7c"
+    },
+    {
+      "path": "samples/g3-m1/18-imports.ttl",
+      "bytes": 249,
+      "sha256": "0f2eb191911a3310ff40dab4e6696d330180aab1519641c7cd08bc920a094fdf"
+    },
+    {
+      "path": "samples/g3-m1/19-identity.ttl",
+      "bytes": 202,
+      "sha256": "96ed2795338c84040034da5c657b94850ea850e2ef521e84e31f6641f9b0fb8d"
+    },
+    {
+      "path": "samples/g3-m1/20-time.ttl",
+      "bytes": 230,
+      "sha256": "74747452ab51dc554c7e4452b90b6fda2dfeb65e3b89d8be110319df203ebf05"
+    },
+    {
+      "path": "samples/g3-m1/README.md",
+      "bytes": 265,
+      "sha256": "9ff506558bb401e285c8011f72dd9f87f8fe2be4541f5972c621a2e72ed07faf"
+    },
+    {
+      "path": "samples/g3-m3/units.ttl",
+      "bytes": 2272,
+      "sha256": "a7bc90509e79273a900d4a632e9e633a201da6ce200348f263bf834f3053d852"
+    },
+    {
+      "path": "samples/g3/m5/advanced.owl.ttl",
+      "bytes": 1996,
+      "sha256": "598b59c5973f7b23c391783b047f366987512e4e3c2abe98c38638c684a63197"
+    },
+    {
+      "path": "scripts/acceptance/browser-entry-report.mjs",
+      "bytes": 492,
+      "sha256": "8185f4073dd994af987c51fcfd5442b0ac642d450c6f9afa28eb453c216cad82"
+    },
+    {
+      "path": "scripts/acceptance/capture-grafana.mjs",
+      "bytes": 2927,
+      "sha256": "ad3f73ca85defd02fe69d0a0244ac96c7e7279327aa3529cd4aa5f8954343528"
+    },
+    {
+      "path": "scripts/acceptance/draft-revision.py",
+      "bytes": 428,
+      "sha256": "ccbb45485fb0af55c40010ef0d42ca45cd209a9f0434f759fb58593c48ae3a0e"
+    },
+    {
+      "path": "scripts/acceptance/evidence-paths.mjs",
+      "bytes": 800,
+      "sha256": "16bec46d3b431f8765a04977b0fec9e406fbba1aa62182694d60b888a1be8f06"
+    },
+    {
+      "path": "scripts/acceptance/evidence_paths.py",
+      "bytes": 878,
+      "sha256": "674fa50df84cd57742bc8458443c6417e87e2107d2e06cf4af591e14de421956"
+    },
+    {
+      "path": "scripts/acceptance/full-g2-e2e.py",
+      "bytes": 3407,
+      "sha256": "65557a206aa741081029c41fd2fbfefd3025c5075eeb32bd4b49ee993bc00a15"
+    },
+    {
+      "path": "scripts/acceptance/g1-regression.py",
+      "bytes": 2695,
+      "sha256": "98ab846f02b808a013520602285dd073cd9f49a153979795c7a2cc434e009b7b"
+    },
+    {
+      "path": "scripts/acceptance/g2-acceptance-runtime.py",
+      "bytes": 5013,
+      "sha256": "187e92412c18555ccb75c4526be40a776399b3dac658b26e433d896731aac76f"
+    },
+    {
+      "path": "scripts/acceptance/g2-full-chain.mjs",
+      "bytes": 21279,
+      "sha256": "5ca836e9503558793121ccc82e079514f30ccc1b04e4b205e3aece975520d427"
+    },
+    {
+      "path": "scripts/acceptance/g2-integration.ps1",
+      "bytes": 2097,
+      "sha256": "8444e7adba1778790a5b4afa7b41cd73022c1811c1e424fe9d69a1ed08ab7a83"
+    },
+    {
+      "path": "scripts/acceptance/g2-live-browser.mjs",
+      "bytes": 25728,
+      "sha256": "f28b6711be9bdbe3aa0e4178e0b741ed1dc0caa7330fb0cf112355c1f5c2fa6a"
+    },
+    {
+      "path": "scripts/acceptance/g2-metric-boundary.py",
+      "bytes": 17207,
+      "sha256": "5c405ec19a9199ec99a834358d1d9882ef9319d1ccb570a6c52c2b1a4c3815dc"
+    },
+    {
+      "path": "scripts/acceptance/g2-observability.py",
+      "bytes": 13663,
+      "sha256": "a21ec697cd72faf5ec54a662830f59f083e500867fd2f5f15d1d9e07b1c047ee"
+    },
+    {
+      "path": "scripts/acceptance/g2-readiness-fault.py",
+      "bytes": 4026,
+      "sha256": "23c2ebcb4c26e1afa5183980ffea0c89e563d9c7ce51875386ff1472c5c68f08"
+    },
+    {
+      "path": "scripts/acceptance/g2-runtime.py",
+      "bytes": 1537,
+      "sha256": "93556025056b5fdb79be258b5f3205279e67d962555a01bf674b99cdcf81f773"
+    },
+    {
+      "path": "scripts/acceptance/g2-thin-slice.ps1",
+      "bytes": 1848,
+      "sha256": "7ffa06cf310d079dc68038ff0b86e789781a6b1a57db5cb90962044aadcd69c1"
+    },
+    {
+      "path": "scripts/acceptance/g2-trace-browser.mjs",
+      "bytes": 4546,
+      "sha256": "a333409493efe4adaf1b14ee5fd5359e173e14cb7e980eb26994f183df3a6251"
+    },
+    {
+      "path": "scripts/acceptance/g3-acceptance-runtime.py",
+      "bytes": 15132,
+      "sha256": "c9e74f493bf86fb8b29a3884676ef96d7c0ddfacac762a4fac9dc2ed79aca8a7"
+    },
+    {
+      "path": "scripts/acceptance/g3-compatibility.py",
+      "bytes": 5876,
+      "sha256": "d90609ad40980e6c83cf84c012890f26cdb0daccc990814db03435a8f6440936"
+    },
+    {
+      "path": "scripts/acceptance/g3-governance.ps1",
+      "bytes": 7264,
+      "sha256": "b91f35b1d1a53098eb554aa1eee6f5371e0d956a372c73360bedc935b7f0a440"
+    },
+    {
+      "path": "scripts/acceptance/g3-impact-publication.mjs",
+      "bytes": 1556,
+      "sha256": "9d36ea63bba514a4fb6b9153211bacb27809eccb1dec631e47f9f14a1c8a05a9"
+    },
+    {
+      "path": "scripts/acceptance/g3-m1-browser.mjs",
+      "bytes": 14682,
+      "sha256": "62785a70e16ec4959be7725cf14ee8201fbf805bca7e1674b7100255ab8f8e44"
+    },
+    {
+      "path": "scripts/acceptance/g3-m2-browser.mjs",
+      "bytes": 13950,
+      "sha256": "7c487b212037b37062aee59c2cbeb2ced7462382b5d74cb08f41e0b827e2ddac"
+    },
+    {
+      "path": "scripts/acceptance/g3-m3-browser.mjs",
+      "bytes": 23859,
+      "sha256": "2c46996d9e5f2a2f18af1d2770222e447264a34d9e0df670c33f32a56b4384c7"
+    },
+    {
+      "path": "scripts/acceptance/g3-m4-browser.mjs",
+      "bytes": 17035,
+      "sha256": "ae7d67be978e52fa1fc3c7414e2a9a9b093faf7f1a0cbdf84de69c1dcd23bd16"
+    },
+    {
+      "path": "scripts/acceptance/g3-m4-diff-browser.mjs",
+      "bytes": 10499,
+      "sha256": "bbff0e799761b47d6e143f66f77302f19d8e72e468b019dd8828237104308889"
+    },
+    {
+      "path": "scripts/acceptance/g3-m4-impact-browser.mjs",
+      "bytes": 10965,
+      "sha256": "555641721eda30a8b98e5ee42fcf82548fb81fa4f4c6bbafdf06c49d64233fb1"
+    },
+    {
+      "path": "scripts/acceptance/g3-m5-browser.mjs",
+      "bytes": 12702,
+      "sha256": "38a821ae1b03d418d98a2166ba793ed0edc53129338f2f0bf33776c05379a59a"
+    },
+    {
+      "path": "scripts/acceptance/g3-read-backpressure.mjs",
+      "bytes": 1164,
+      "sha256": "ef914142dad2df6e49c4bb306ce85da290722dfe25669f3ebf7719663e7e69c3"
+    },
+    {
+      "path": "scripts/acceptance/g3-runtime.py",
+      "bytes": 1651,
+      "sha256": "d1060c2ba1f18e95189a1b8626a2468d002fd6e14cf8201acff09e43b26e7905"
+    },
+    {
+      "path": "scripts/acceptance/g4-m1-browser.mjs",
+      "bytes": 50653,
+      "sha256": "5918869646285dc175f174b1bd35811aa80257f65f6e5edd5fc6fb90be6a7f82"
+    },
+    {
+      "path": "scripts/acceptance/g4-m1-fault.mjs",
+      "bytes": 14908,
+      "sha256": "983bb23ceab49263fd5b92775e2286c4f9e52229f61ee9fe6e66028579b697e4"
+    },
+    {
+      "path": "scripts/acceptance/g4-m1-http.mjs",
+      "bytes": 59130,
+      "sha256": "3cb0ee1791bce6714d82a99508f0758c76797c3fd2ad7d16eb2488c6e7f455e0"
+    },
+    {
+      "path": "scripts/acceptance/g4-m1-runtime.py",
+      "bytes": 7708,
+      "sha256": "9a156ea37060ebe32d3290937922bdc488ab48b39e527609e08b417be134e0ff"
+    },
+    {
+      "path": "scripts/acceptance/mcp-agent.py",
+      "bytes": 11757,
+      "sha256": "d4b705e1843b429d024f651f62fb524798654f225272d0d5a48a5948ed88da3a"
+    },
+    {
+      "path": "scripts/acceptance/new-wave2-certificate.ps1",
+      "bytes": 1270,
+      "sha256": "2553091336663a0727778b054def9f1d6e3d3ef81d8ee71509c17e31b160fc4e"
+    },
+    {
+      "path": "scripts/acceptance/owned_test_containers.py",
+      "bytes": 7822,
+      "sha256": "df3bd4ea2854fd2b420144a898145247a44de83cc993398942a27874bbf962b9"
+    },
+    {
+      "path": "scripts/acceptance/performance-baseline.py",
+      "bytes": 3161,
+      "sha256": "c0c6b24e27dcf339bd30d6186eb17512b2431fa85edf4b4dd6eb711a8f6fe1d0"
+    },
+    {
+      "path": "scripts/acceptance/query-plan.py",
+      "bytes": 8918,
+      "sha256": "312ec5562fdfd29577e9c388186facbc83f46ad66c136f6f9a2956d9519978ae"
+    },
+    {
+      "path": "scripts/acceptance/release-faults.py",
+      "bytes": 8388,
+      "sha256": "95464997e2883c0569994d58255d93c465a771b97af0887cd88c0c380dc86feb"
+    },
+    {
+      "path": "scripts/acceptance/semantic-roundtrip.py",
+      "bytes": 8005,
+      "sha256": "06c73e56e5715da5417696b2c16803f57ea11eafe6ef93ff06694508c3641c3b"
+    },
+    {
+      "path": "scripts/acceptance/shacl-validate.py",
+      "bytes": 439,
+      "sha256": "75d6ad648534f053b393738956cc24e65e510d68185795b9cea29e6fc4a6f153"
+    },
+    {
+      "path": "scripts/acceptance/sse-replay.py",
+      "bytes": 411,
+      "sha256": "becc5edc7b70e72cd3160fff2a762b5b1817c31e86ca65c3cf8fe6c1ef66475a"
+    },
+    {
+      "path": "scripts/acceptance/test-governance.py",
+      "bytes": 6535,
+      "sha256": "0e09e52fb84d7bfba210de1f8ccacf3a4dab63d03f848a459c6f98c06ea730ab"
+    },
+    {
+      "path": "scripts/acceptance/verify-alert.py",
+      "bytes": 3744,
+      "sha256": "0172681fc6051c6ca95fac3718fa374d06be9d5d69cbf4ca97fbcd058dd48b02"
+    },
+    {
+      "path": "scripts/acceptance/verify-api-restart.py",
+      "bytes": 3185,
+      "sha256": "1863f5213595f18b2eb9816e1143f472f84e759c45d79cfc7d101303bdcbbcfe"
+    },
+    {
+      "path": "scripts/acceptance/verify-closeout-observability.py",
+      "bytes": 10034,
+      "sha256": "016b83b382e7859f6660b54b057e101acdd648a294da496f4d2634e7b11d3093"
+    },
+    {
+      "path": "scripts/acceptance/verify-dependency-fault.py",
+      "bytes": 5542,
+      "sha256": "4e3680dcc92dad5050d143f3ccfb0b3af48ece5ddbb0736cd98c6fdb16978302"
+    },
+    {
+      "path": "scripts/acceptance/verify-openapi.py",
+      "bytes": 6471,
+      "sha256": "7365d011fc0bed0e2fd20f524e87021906a902181f46ce7215b8038c082409a5"
+    },
+    {
+      "path": "scripts/acceptance/verify-persistence.py",
+      "bytes": 8696,
+      "sha256": "b1f448636bc043f67187578e80828dc4c7951297fc5178cf8086a670271f54b9"
+    },
+    {
+      "path": "scripts/acceptance/verify-proxy.py",
+      "bytes": 2280,
+      "sha256": "48e023126a63610b1aa8df6e571d34e08244e200e935f67bc72deffe1fa911a7"
+    },
+    {
+      "path": "scripts/acceptance/wave2-runtime.py",
+      "bytes": 15610,
+      "sha256": "e6fa9a7f8dfed2cc4f3c05b13799e7fe99362260161be6ab54fbc4320a41c245"
+    },
+    {
+      "path": "scripts/acceptance/workspace-smoke.mjs",
+      "bytes": 8134,
+      "sha256": "076423fde567aabf37a29e948577f5cf1c334c8328d8100cebd153da48b5062b"
+    },
+    {
+      "path": "scripts/bootstrap-web-tools.ps1",
+      "bytes": 4080,
+      "sha256": "1fda8a0aca44c145c9efc765a4cdf5ad73b0392996524cde2c78ea922a38722e"
+    },
+    {
+      "path": "scripts/check-tsx-readability.py",
+      "bytes": 1536,
+      "sha256": "35c39736064758e44a3573cc4169e78174923950e19daa2b812a4e89e983a42c"
+    },
+    {
+      "path": "scripts/create-review-package.ps1",
+      "bytes": 60874,
+      "sha256": "c7d3c847c4e38c16c938fd2bfee43de6c434b9057339e65ac65fbda53baa919c"
+    },
+    {
+      "path": "scripts/doctor.ps1",
+      "bytes": 5248,
+      "sha256": "126db6212e299e7e8fdc29ad5f7b350c2e770087e01024852fe7d2c668c147e5"
+    },
+    {
+      "path": "scripts/generate-g2-contracts.py",
+      "bytes": 8597,
+      "sha256": "f651c856d6fe0e21d67f9eac5fa7ae11a2decc69c284c4d01872cd6749d3675d"
+    },
+    {
+      "path": "scripts/maintenance/audit-public-history.py",
+      "bytes": 9983,
+      "sha256": "dab18f09113dbb3b49e349a7422ffe09827d4b85b36181a9fb8cdc7eda3a25c7"
+    },
+    {
+      "path": "scripts/maintenance/canonical_fuseki.py",
+      "bytes": 78348,
+      "sha256": "ed4a3aa22c89cb32ef0e40969641ff606de77865bc5b8f5e9ef73a54fc03e75b"
+    },
+    {
+      "path": "scripts/maintenance/ci_scope.py",
+      "bytes": 1677,
+      "sha256": "a289b9bd51eaf9e6184eab849fb84087bd140e3b2643d70635f2b26a8e4a165a"
+    },
+    {
+      "path": "scripts/maintenance/cleanup-resources.ps1",
+      "bytes": 1621,
+      "sha256": "b3ba0ae232a6044209193336b279ae0ddf68493e3ab58b2e8ae40f38e97909a7"
+    },
+    {
+      "path": "scripts/maintenance/cleanup_resources.py",
+      "bytes": 51821,
+      "sha256": "1d9473a985a3d315321a707c4e3406ad4478c3c6be85cd47f4a461a7d24a2126"
+    },
+    {
+      "path": "scripts/maintenance/docker_inventory.py",
+      "bytes": 5307,
+      "sha256": "ad8613f7d9a65b3dc1b6cbcc73cdb2d8df619bbd698d3de45a7ab935e301e883"
+    },
+    {
+      "path": "scripts/maintenance/execution_preflight.py",
+      "bytes": 17958,
+      "sha256": "6342af2725cfdf9f05b231b8e6f68b803fae6d04bb9d5dea065d997793c31632"
+    },
+    {
+      "path": "scripts/maintenance/fuseki_ci_cache.py",
+      "bytes": 4590,
+      "sha256": "a06074ed4d7b3f3bda27d67505c00c287c85112730dfc45b10cead7fd4bb6a1a"
+    },
+    {
+      "path": "scripts/maintenance/fuseki_transfer.py",
+      "bytes": 12571,
+      "sha256": "705f56a22ac0c0fe668854f603bd80a53aea432626079deed7a86ec29479c84f"
+    },
+    {
+      "path": "scripts/maintenance/g4_m1_preflight.py",
+      "bytes": 2675,
+      "sha256": "026dd3b0433f9b15a2d06149120fc56ff6f92d4ea647ab2e492ecc3abe1a8b54"
+    },
+    {
+      "path": "scripts/maintenance/host_continuity.py",
+      "bytes": 13071,
+      "sha256": "7fc0de549a0334463d95f04429252c5e7c0874a3b1848a5581385631dee29d21"
+    },
+    {
+      "path": "scripts/maintenance/inspect-resources.ps1",
+      "bytes": 17243,
+      "sha256": "dc719146e4501d4d701d26f76e3c303ab6c6e8594a156ef91b5ee4fa8cf60430"
+    },
+    {
+      "path": "scripts/maintenance/task_run_timeline.py",
+      "bytes": 17377,
+      "sha256": "571f3bd8f6c3189ca7e99f8b3981514e260ff4ef7efbe46418ac40190326749d"
+    },
+    {
+      "path": "scripts/new-review-evidence.ps1",
+      "bytes": 1238,
+      "sha256": "cdf7664bd89bd7ad50f9cb5d230a68e57112344e18b63a9c35cb0ed02adc9a73"
+    },
+    {
+      "path": "scripts/test-review-evidence.ps1",
+      "bytes": 3698,
+      "sha256": "88ec2eb998a6c380032fe9069403719c70acdc494d98fc713dfa3c8067ab02da"
+    },
+    {
+      "path": "scripts/tests/CanonicalFuseki.Real.Tests.py",
+      "bytes": 5721,
+      "sha256": "8ff01ac9e988e359c0fec3a455c05c8a4dbe98a39036086e4c56f21d6420e0bd"
+    },
+    {
+      "path": "scripts/tests/CanonicalFuseki.Tests.py",
+      "bytes": 31537,
+      "sha256": "92bf9a5b866173b3749434c30c615c19c94eebcc6b4ea3b5e1547f755720e302"
+    },
+    {
+      "path": "scripts/tests/CleanupResources.Tests.py",
+      "bytes": 65457,
+      "sha256": "4d866882910b0a229587f52254f6fbd4bb0845bd594ba89f83650ad107040a56"
+    },
+    {
+      "path": "scripts/tests/CloseoutGovernance.Tests.py",
+      "bytes": 1702,
+      "sha256": "d7401405e78851f9a00abd62a25234775609d658ec712e4863db120e5a979eb0"
+    },
+    {
+      "path": "scripts/tests/Doctor.Tests.ps1",
+      "bytes": 2559,
+      "sha256": "2230e402f72c94931af1abe98f2cd6c7eae8ef669658efb83c0653229278d368"
+    },
+    {
+      "path": "scripts/tests/Environment.Tests.ps1",
+      "bytes": 3510,
+      "sha256": "1875a0a046059c3ea7d9a63d60c6970765443f73299b154e3a2848fd8796fe69"
+    },
+    {
+      "path": "scripts/tests/EvidencePreflight.Tests.ps1",
+      "bytes": 6753,
+      "sha256": "c049793456f2690f258bdbd2afdac8375eea2eec4c1434b89b71e9b4dd569503"
+    },
+    {
+      "path": "scripts/tests/ExecutionPreflight.Tests.py",
+      "bytes": 10588,
+      "sha256": "c3b8bfb04966e4ed620b31da05f9eab1654ee7eb1e488bb365142e0c828e6ba4"
+    },
+    {
+      "path": "scripts/tests/FrozenEvidence.Tests.ps1",
+      "bytes": 996,
+      "sha256": "0bc0050cd60ad9087aaae2c277cac0fe85374056be6d8a96da81914c743a26aa"
+    },
+    {
+      "path": "scripts/tests/FusekiCache.Tests.py",
+      "bytes": 55645,
+      "sha256": "e443644e47c194a554d177bf1fed3a62eefe63cb8e761da380f6de431402471b"
+    },
+    {
+      "path": "scripts/tests/FusekiCiCache.Tests.py",
+      "bytes": 6284,
+      "sha256": "fb25fbb676950bb09375b4c7ecc860db769d36ae2f55d5e569392b9c3a5a1252"
+    },
+    {
+      "path": "scripts/tests/FusekiTransfer.Tests.py",
+      "bytes": 12202,
+      "sha256": "7dea7deca46eabba07e163adb98d3aa6f7277c628b8f107fc564d7bc9319db4d"
+    },
+    {
+      "path": "scripts/tests/G2Acceptance.Tests.py",
+      "bytes": 23898,
+      "sha256": "393e9bbb2295f58d88c8e83975262dc9d29417bfde2d10f133b963d5c50eda67"
+    },
+    {
+      "path": "scripts/tests/G3Acceptance.Tests.py",
+      "bytes": 18904,
+      "sha256": "69b992c1a7b79a78239de3568998d57c0d3df7ed52d0fe12fe68031967e2df64"
+    },
+    {
+      "path": "scripts/tests/G3AppHost.Tests.py",
+      "bytes": 1827,
+      "sha256": "177d8fa84fe448c4df7064cc6350d0dae32193ef465bc181179c268828569030"
+    },
+    {
+      "path": "scripts/tests/G3BrowserDispatch.Tests.mjs",
+      "bytes": 2849,
+      "sha256": "cfa32fed2107ef32ee512745b8c1b194601bba155f107da3486db7233c2615a4"
+    },
+    {
+      "path": "scripts/tests/G3BrowserReport.Tests.mjs",
+      "bytes": 1515,
+      "sha256": "581198b017155f9d2d31c91ab9b90f8deb8d9101670a538128794d5941c72db7"
+    },
+    {
+      "path": "scripts/tests/G3Compatibility.Tests.py",
+      "bytes": 2629,
+      "sha256": "4e67f002e4d81b768d3afe59ac949ef488a964a9e611ae787d4bdd8ef448e211"
+    },
+    {
+      "path": "scripts/tests/G3Evidence.Tests.py",
+      "bytes": 2514,
+      "sha256": "cb0930b6aa26e27c237391896ffee3283549acf876526c6546062536b5583fdd"
+    },
+    {
+      "path": "scripts/tests/G3ReadBackpressure.Tests.mjs",
+      "bytes": 3337,
+      "sha256": "74fd94c202beddcc2fb0fe081cb2183db053539bd463a82305e54a6664d83b93"
+    },
+    {
+      "path": "scripts/tests/HostContinuity.Tests.py",
+      "bytes": 6414,
+      "sha256": "708237f54ac52d9040442db260fa1277041f410a7c23ab21ff5e5ca3e70f1b0e"
+    },
+    {
+      "path": "scripts/tests/InspectorResources.Tests.py",
+      "bytes": 6794,
+      "sha256": "1f07f36810d636ffaf2a0db471572adc45db8d0b50e0811064467d2ae60b1e5f"
+    },
+    {
+      "path": "scripts/tests/ObservabilityInputs.Tests.py",
+      "bytes": 3110,
+      "sha256": "77949e0ced55fd0ee7e229081f31d1b8d914370d5cdc7ef0f7db1f1d11dfdda9"
+    },
+    {
+      "path": "scripts/tests/OwnedTestContainers.Tests.py",
+      "bytes": 16999,
+      "sha256": "88b403698cf91265a8cb46d193949e2bb011d21dec41a48835533fdb5339f94b"
+    },
+    {
+      "path": "scripts/tests/PreflightLogs.Tests.ps1",
+      "bytes": 2250,
+      "sha256": "61361a87433c3390e2fb9b0d9facec057d96ce9664752aedf00a68f6c7e2493b"
+    },
+    {
+      "path": "scripts/tests/PublicHistory.Tests.py",
+      "bytes": 7040,
+      "sha256": "a6da9d65d3fcf810bb0be8df769af161a4acc9c549aa97afb5d8c5e44d5bc1b5"
+    },
+    {
+      "path": "scripts/tests/ResourceLifecycle.Tests.py",
+      "bytes": 8274,
+      "sha256": "6c843f68e29fdd30c283187a708dd364259897601c037a330ab713c736c7f53d"
+    },
+    {
+      "path": "scripts/tests/ReviewPackage.Tests.ps1",
+      "bytes": 64123,
+      "sha256": "5fa0c7ae67652654198ae3494c5f6e898f639b15246a3d2a1f9d9ff0da9cca56"
+    },
+    {
+      "path": "scripts/tests/StructuredFiles.Tests.ps1",
+      "bytes": 2429,
+      "sha256": "12fa9d001a78ba4cf5aacba4ed9693dfdf49e8bfba1045066a2d8243b1298918"
+    },
+    {
+      "path": "scripts/tests/TaskRunTimeline.Tests.py",
+      "bytes": 13471,
+      "sha256": "351c13f4232e5885d23ccb179f0a8a67c75341457d30c510b3e1505f87c64cf8"
+    },
+    {
+      "path": "scripts/tests/Wave2Runtime.Tests.py",
+      "bytes": 2521,
+      "sha256": "e57bcc5676d761956c00a752a77edb59de1b5363a7cf8fc93315f65682f8ed85"
+    },
+    {
+      "path": "scripts/tests/WebToolchain.Tests.ps1",
+      "bytes": 1628,
+      "sha256": "c960933cc934932bcc453791acb0147eddd70d7a8071be27632b69681d449bb9"
+    },
+    {
+      "path": "scripts/toolchain-artifacts.json",
+      "bytes": 758,
+      "sha256": "41a8da5e0a6d622f61824f4f719728b5c8012fa1fc3d7843c7e6cd4565334632"
+    },
+    {
+      "path": "scripts/validate-structured-files.py",
+      "bytes": 1818,
+      "sha256": "6070c69729d71c57173d97cca7bcfc5b063d0b14211e3005562162cee7c53f49"
+    },
+    {
+      "path": "scripts/verification-requirements.txt",
+      "bytes": 368,
+      "sha256": "29a0e3047d5474b4ddc08517c181d29d9bc621d4b5db4e769fc734e896a075c0"
+    },
+    {
+      "path": "scripts/verify-web.ps1",
+      "bytes": 1392,
+      "sha256": "4c85a3319f960fdf88da342c4dfd1ddec1754a615938484534bf834354250216"
+    },
+    {
+      "path": "scripts/verify.ps1",
+      "bytes": 17657,
+      "sha256": "543a274a28aefb00740ec9c36243473f58b99b907c457633fc6188e67f025ab2"
+    },
+    {
+      "path": "turbo.json",
+      "bytes": 407,
+      "sha256": "2ec833d822ba80a26367963e77321d0dfaf05ce9f4ffdcd111321cb9d6c34b8d"
+    },
+    {
+      "path": "Base-to-current.patch",
+      "bytes": 10297270,
+      "sha256": "ffcff7baee6b7183674de9daa25a86f07f8a055cf4e12b2c581d3e077dc3917d"
+    }
+  ],
+  "driverSha256": "093825de10b4fc25b9717f0b0b1b69861b721f9e60dc339d7e9e867fedfef01f",
+  "scope": "Known values from four current-task private directories; original C08 HTTP intake references scanned in-memory by its driver, not recovered after database deletion. Historical P08 browser/SecretRef coverage reused by unchanged inputs. Not a general-purpose secret or vulnerability scanner."
+}

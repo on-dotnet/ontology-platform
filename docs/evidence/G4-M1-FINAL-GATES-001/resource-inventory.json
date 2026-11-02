@@ -1,0 +1,53 @@
+{
+  "taskId": "G4-M1-FINAL-GATES-001",
+  "status": "PASS",
+  "dockerDeletedCount": 40,
+  "dockerDeletedUniqueIdentities": 40,
+  "afterCounts": {
+    "containers": 0,
+    "images": 15,
+    "volumes": 8,
+    "networks": 3
+  },
+  "preexistingIdentityMissing": false,
+  "localArchivesDeletedCount": 6,
+  "localArchivesDeletedLogicalBytes": 909368832,
+  "physicalReclaimedBytes": "NOT_MEASURED",
+  "downloadReceivedBytes": 8720,
+  "peakContainers": 6,
+  "peakContainerMemoryMiB": 5376,
+  "peakVolumeAndTmpfsMiB": 2308,
+  "keeps": [
+    {
+      "object": "codex/g4-m1-final-gates-001 and /Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform",
+      "reason": "Unmerged reviewed task source; current user review gate active",
+      "releaseCondition": "ChatGPT review and later explicit integration/retirement decision"
+    },
+    {
+      "object": "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/.tools/security/g4-m1-final-gates-001-*",
+      "reason": "Four task-only private fixture directories; no live container references; not packaged",
+      "releaseCondition": "Independent review complete and exact next cleanup plan; never scan their contents into evidence"
+    },
+    {
+      "object": "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/artifacts/g4-m1-final-gates-001/api; /Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/artifacts/g4-m1-final-gates-001/pg-tests; /Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/artifacts/g4-m1-final-gates-001/public-tests",
+      "reason": "Small reproducible tested binaries with hashes, retained for audit",
+      "releaseCondition": "Review complete and rerun no longer needed"
+    },
+    {
+      "object": "15 unique image identities (16 image-list rows), 8 old named volumes, 3 old networks enumerated in r04-final/cleanup-receipt.json.after",
+      "reason": "Protected preexisting/shared content identities; no exclusive ownership for deletion",
+      "releaseCondition": "Separate lifecycle ownership review; no task-wide prune"
+    },
+    {
+      "object": "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/.tools/pnpm; /Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/.tools/pythonlibs",
+      "reason": "Task-local links to approved shared tools; no target modification",
+      "releaseCondition": "Task worktree retirement; target remains protected"
+    }
+  ],
+  "phaseContainerMemoryMiB": {
+    "C08_max_six": 5376,
+    "public_two": 1536,
+    "R04_six": 4864
+  },
+  "imageListRowCount": 16
+}

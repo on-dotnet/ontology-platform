@@ -10,10 +10,12 @@ C08真实15断言、39HTTP请求及持久PG/审计回读；23精确策略测试�
 
 受测输入分段：C08产品源码/89构建输出用c08-source-binary-binding.json固定，最终独立Review确认产品字节仍一致；新增public测试源码在48d53eee提交；最终R04生产者运行于954a2b8e8eab6bc709139eda4921633e5931958c，全部实际产品、镜像、运行器输入至TestedCommit不变，954→48be只修正证据消费者的PascalCase/camelCase字段命名比较并实跑60断言。初次消费者FAIL与修正后的PASS同时保留。Tested→交付只允许证据/任务说明增量，由V3工具对全部非说明tracked输入重新散列校验。
 
-四轮任务Docker精确收尾40个唯一对象，逐一rm成功后准确inspect不存在；原资源身份保留。六镜像均在准确Digest及人类批准AMBER-A1/LICENSE_PARTIAL内部合成非分发范围使用。镜像CVE、签名及完整构建来源NOT_VERIFIED，不构成生产或商业许可结论。峰值6容器4864MiB；单阶段最大卷+tmpfs2308MiB。官方固定元数据新下载8720字节，镜像本地恢复/取证不产生新下载。
+四轮任务Docker精确收尾40个唯一对象，逐一rm成功后准确inspect不存在；原资源身份保留。六镜像均在准确Digest及人类批准AMBER-A1/LICENSE_PARTIAL内部合成非分发范围使用。镜像CVE、签名及完整构建来源NOT_VERIFIED，不构成生产或商业许可结论。全任务峰值6容器5376MiB（C08）；R04为4864MiB；单阶段最大卷+tmpfs2308MiB。官方固定元数据新下载8720字节，镜像本地恢复/取证不产生新下载。
 
 失败见证保留：C08回调目标和显示名hash断言修正、PG短入口就绪/只读TestResults修正、R04首轮数据不可区分及审计绑定不足、JSON终止换行、SBOM额外EOF空行、证据消费者字段命名。以上均未修改产品安全边界来制造通过；独立Reviewer要求的定向补证已完成。
 
 CI按本地优先政策NOT_RUN；Windows原生AMD64 NOT_RUN；宿主锁屏/显示器休眠有连续观察但完整会话连续性证明NOT_VERIFIED。无G6、G4-M2、付费模型、main合并或旧正式G3写入。源码及私有输入保留待独立复审，私有材料不入包。Review V3的历史证据通过精确Git对象索引恢复，并非完全离线历史归档。
 
 交付后停止，等待ChatGPT独立复审。任何当前外部检查未通过则输出BLOCKED_WITH_WITNESS，不提前升级49项。
+
+数量口径澄清：早期Reviewer摘要的“16镜像”指image ls列表16行，去重为15个镜像ID；最终资源清单按唯一ID计数。
