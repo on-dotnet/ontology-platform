@@ -1,0 +1,19 @@
+# G4-M1-FINAL-GATES-001 Review V3
+
+仅关闭 M1-C08、M1-R04。Base 1399364ad1367f3d1bfdee4d9901fdb33b48c15d；TestedCommit 48be53e807cab22622ea31c6b39d6cb8805e9771；交付Head由本包manifest.headSha给出。任务分支codex/g4-m1-final-gates-001，main维持d1a61daffe844475b07705797e3ad325cc3f2945，未合并。
+
+C08真实15断言、39HTTP请求及持久PG/审计回读；23精确策略测试、12真实TLS/ACL测试均零跳过；新增public安全补测7状态每次1 PASS/0 SKIP，涵盖关系/函数/类型/缺失schema/缺失USAGE，A保持正常，B精确拒绝，恢复后目录相同。产品变更仅Development默认关闭开关、应用精确A/B上限和适配器空public安全检查。
+
+最终R04在全新合成命名空间真实执行53HTTP/38产品断言，加60条数据库/审计/Trace/镜像身份绑定。两次发布和一次回滚revision为1/2/3；实际查询值v1→故障后v1→v2→回滚v1。故障artifact_store_timeout，active完整manifest/hash/revision不漂移。数据Hash/命名图/证据内容/对象键一致，14个403均有同Trace拒绝审计。原G3产品源码、DTO、样例文件及旧持久资源未改。
+
+47个已审历史PASS按103证据引用散列和真实输入影响分类复用，详见acceptance-matrix.json。包内冻结矩阵47 PASS/2 PENDING_EXTERNAL：P08及R05保留历史PASS，但本次ZIP秘密扫描/独立重开必须在ZIP生成后实测。最终包外49项矩阵绑定本ZIP文件名/bytes/SHA、Head、TestedCommit、包内矩阵SHA及扫描/独立重开回执，仅升级这两项。不得用本段文字提前宣称ZIP检查通过，也不为写回自引用结果重包。
+
+受测输入分段：C08产品源码/89构建输出用c08-source-binary-binding.json固定，最终独立Review确认产品字节仍一致；新增public测试源码在48d53eee提交；最终R04生产者运行于954a2b8e8eab6bc709139eda4921633e5931958c，全部实际产品、镜像、运行器输入至TestedCommit不变，954→48be只修正证据消费者的PascalCase/camelCase字段命名比较并实跑60断言。初次消费者FAIL与修正后的PASS同时保留。Tested→交付只允许证据/任务说明增量，由V3工具对全部非说明tracked输入重新散列校验。
+
+四轮任务Docker精确收尾40个唯一对象，逐一rm成功后准确inspect不存在；原资源身份保留。六镜像均在准确Digest及人类批准AMBER-A1/LICENSE_PARTIAL内部合成非分发范围使用。镜像CVE、签名及完整构建来源NOT_VERIFIED，不构成生产或商业许可结论。峰值6容器4864MiB；单阶段最大卷+tmpfs2308MiB。官方固定元数据新下载8720字节，镜像本地恢复/取证不产生新下载。
+
+失败见证保留：C08回调目标和显示名hash断言修正、PG短入口就绪/只读TestResults修正、R04首轮数据不可区分及审计绑定不足、JSON终止换行、SBOM额外EOF空行、证据消费者字段命名。以上均未修改产品安全边界来制造通过；独立Reviewer要求的定向补证已完成。
+
+CI按本地优先政策NOT_RUN；Windows原生AMD64 NOT_RUN；宿主锁屏/显示器休眠有连续观察但完整会话连续性证明NOT_VERIFIED。无G6、G4-M2、付费模型、main合并或旧正式G3写入。源码及私有输入保留待独立复审，私有材料不入包。Review V3的历史证据通过精确Git对象索引恢复，并非完全离线历史归档。
+
+交付后停止，等待ChatGPT独立复审。任何当前外部检查未通过则输出BLOCKED_WITH_WITNESS，不提前升级49项。

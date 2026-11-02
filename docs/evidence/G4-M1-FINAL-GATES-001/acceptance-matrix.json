@@ -1,0 +1,1179 @@
+{
+  "taskId": "G4-M1-FINAL-GATES-001",
+  "baseSha": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+  "testedCommit": "48be53e807cab22622ea31c6b39d6cb8805e9771",
+  "caseCount": 49,
+  "currentCounts": {
+    "PASS": 47,
+    "PENDING_EXTERNAL": 2
+  },
+  "historicalEffectiveCounts": {
+    "PASS": 47,
+    "NOT_RUN": 2
+  },
+  "deliveryRule": "Final external matrix binds unique ZIP/head/testedCommit/internal matrix hash and real scan plus independent reopen; only P08/R05 may upgrade after those checks. No package bytes rewritten.",
+  "cases": [
+    {
+      "id": "M1-C01",
+      "requirement": "`POST /connections` body唯一 `config:{type,profile}` / top-level secretRef / command，未知字段和旧`connectionProfile/secretInput`拒绝",
+      "historicalStatus": "PASS",
+      "historicalArchivedStatus": "PASS",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/final-http/http-2bfea077-5bfd-4fdf-bf02-430d35979c06/report.json",
+          "sha256": "7de1983f03fad4cb40ec0c057b51c5268289df3ecf4a035d22eae7a78abf125e"
+        }
+      ],
+      "currentStatus": "PASS",
+      "currentEvidence": [],
+      "impact": "Affected product diff limited to exact PostgreSQL target policy, schema boundary and Development composition flag; this case implementation/DTO/UI/frozen dependency bytes unchanged; reuse bound actual historical evidence"
+    },
+    {
+      "id": "M1-C02",
+      "requirement": "`CommandContext` create expectedRevision=0，更新 expectedRevision>=1 + If-Match；null/bool/字符串伪整数拒绝",
+      "historicalStatus": "PASS",
+      "historicalArchivedStatus": "PASS",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/final-http/http-2bfea077-5bfd-4fdf-bf02-430d35979c06/report.json",
+          "sha256": "7de1983f03fad4cb40ec0c057b51c5268289df3ecf4a035d22eae7a78abf125e"
+        }
+      ],
+      "currentStatus": "PASS",
+      "currentEvidence": [],
+      "impact": "Affected product diff limited to exact PostgreSQL target policy, schema boundary and Development composition flag; this case implementation/DTO/UI/frozen dependency bytes unchanged; reuse bound actual historical evidence"
+    },
+    {
+      "id": "M1-C03",
+      "requirement": "五类型profile精确字段；TD无第二个credentialRef，Web NONE=null；PG本批启用的安全子集明确",
+      "historicalStatus": "PASS",
+      "historicalArchivedStatus": "PASS",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/final-http/http-2bfea077-5bfd-4fdf-bf02-430d35979c06/report.json",
+          "sha256": "7de1983f03fad4cb40ec0c057b51c5268289df3ecf4a035d22eae7a78abf125e"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/final-browser-interlock/browser-293a1099-0699-40ef-82a5-a44fa1f17345/report.json",
+          "sha256": "6898f81ddea8df33e8d63b77bb599429d584395f44104b15f38c9ef3c47eeff6"
+        }
+      ],
+      "currentStatus": "PASS",
+      "currentEvidence": [
+        "c08-http.json",
+        "pg-security-real.json",
+        "adapter-policy-final.txt",
+        "public/public-faults-1793578771290852000.json"
+      ],
+      "impact": "Exact A/B policy and schema parameter directly affected; historical unchanged subrequirements retained"
+    },
+    {
+      "id": "M1-C04",
+      "requirement": "schemaKind/payload仅设计测试包装，真实 HTTP body 无该包装",
+      "historicalStatus": "PASS",
+      "historicalArchivedStatus": "PASS",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/final-http/http-2bfea077-5bfd-4fdf-bf02-430d35979c06/report.json",
+          "sha256": "7de1983f03fad4cb40ec0c057b51c5268289df3ecf4a035d22eae7a78abf125e"
+        }
+      ],
+      "currentStatus": "PASS",
+      "currentEvidence": [],
+      "impact": "Affected product diff limited to exact PostgreSQL target policy, schema boundary and Development composition flag; this case implementation/DTO/UI/frozen dependency bytes unchanged; reuse bound actual historical evidence"
+    },
+    {
+      "id": "M1-C05",
+      "requirement": "G2/G3全部正式接口、SourceBundle、G3 dataTurtle / MCP及已有11字段query未改变",
+      "historicalStatus": "PASS",
+      "historicalArchivedStatus": "PASS",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/formal-contract-unchanged.json",
+          "sha256": "166d9bfd21c8bb1c8ecde09fed8fab68f01751d57b80ba0a04f74fecfe28cda2"
+        }
+      ],
+      "currentStatus": "PASS",
+      "currentEvidence": [],
+      "impact": "Affected product diff limited to exact PostgreSQL target policy, schema boundary and Development composition flag; this case implementation/DTO/UI/frozen dependency bytes unchanged; reuse bound actual historical evidence"
+    },
+    {
+      "id": "M1-C06",
+      "requirement": "NuGet版本/License/hash与平台恢复记录；未审依赖阻断而不自动新增",
+      "historicalStatus": "PASS",
+      "historicalArchivedStatus": "PASS",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/npgsql-provenance.json",
+          "sha256": "2bb9f7f82dc249e6eea4ce3383a01fab64211d6b1f4226d12013b88c13adfeed"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/lock-project-graph-update.json",
+          "sha256": "a9f52b3badccb85a022956447a66ae0196e4f9e9a15cf8ac8e8ba02bdbf1a34f"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/solution-offline-restore-fixed.raw.json",
+          "sha256": "d1e2196fe03fd90df1603804bf4cb521301e0e0aaf7365a376d8da46596e3388"
+        }
+      ],
+      "currentStatus": "PASS",
+      "currentEvidence": [],
+      "impact": "Affected product diff limited to exact PostgreSQL target policy, schema boundary and Development composition flag; this case implementation/DTO/UI/frozen dependency bytes unchanged; reuse bound actual historical evidence"
+    },
+    {
+      "id": "M1-C07",
+      "requirement": "Frontend 类型来自真实 OpenAPI 生成链，非手写独立DTO漂移",
+      "historicalStatus": "PASS",
+      "historicalArchivedStatus": "PASS",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/g4-openapi-final-binding.json",
+          "sha256": "0b6a884cffa4b0d7fcabf17c4c693ab62499852bdd29a1e7cb11375225b859e9"
+        }
+      ],
+      "currentStatus": "PASS",
+      "currentEvidence": [],
+      "impact": "Affected product diff limited to exact PostgreSQL target policy, schema boundary and Development composition flag; this case implementation/DTO/UI/frozen dependency bytes unchanged; reuse bound actual historical evidence"
+    },
+    {
+      "id": "M1-C08",
+      "requirement": "SourceConfig修改后 configHash/probe失效，SecretVersion改变后probe失效",
+      "historicalStatus": "NOT_RUN",
+      "historicalArchivedStatus": "NOT_RUN",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/final-http/http-2bfea077-5bfd-4fdf-bf02-430d35979c06/report.json",
+          "sha256": "7de1983f03fad4cb40ec0c057b51c5268289df3ecf4a035d22eae7a78abf125e"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/credential-fault-fixed.json",
+          "sha256": "7faab34d3919880e341b6b6f73dcfdef03e0147935bbbdc2e6779e71170338c2"
+        }
+      ],
+      "currentStatus": "PASS",
+      "currentEvidence": [
+        "c08-http.json",
+        "c08-readback.json",
+        "c08-source-binary-binding.json",
+        "c08-independent-review.md",
+        "public/independent-review.md"
+      ],
+      "impact": "New real configuration change gate fully executed"
+    },
+    {
+      "id": "M1-C09",
+      "requirement": "Probe/Connection/Catalog状态是不同对象，不写混用枚举",
+      "historicalStatus": "PASS",
+      "historicalArchivedStatus": "PASS",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/final-http/http-2bfea077-5bfd-4fdf-bf02-430d35979c06/report.json",
+          "sha256": "7de1983f03fad4cb40ec0c057b51c5268289df3ecf4a035d22eae7a78abf125e"
+        }
+      ],
+      "currentStatus": "PASS",
+      "currentEvidence": [
+        "c08-http.json",
+        "c08-readback.json",
+        "pg-security-real.json",
+        "adapter-policy-final.txt"
+      ],
+      "impact": "Targeted current HTTP/CAS/Probe/audit/ACL tests support modified path; unchanged historical subrequirements retained"
+    },
+    {
+      "id": "M1-C10",
+      "requirement": "六个Policy均服务器执行且resourceScope判断不靠客户端提供ActorContext",
+      "historicalStatus": "PASS",
+      "historicalArchivedStatus": "PASS",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/final-http/http-2bfea077-5bfd-4fdf-bf02-430d35979c06/report.json",
+          "sha256": "7de1983f03fad4cb40ec0c057b51c5268289df3ecf4a035d22eae7a78abf125e"
+        }
+      ],
+      "currentStatus": "PASS",
+      "currentEvidence": [],
+      "impact": "Affected product diff limited to exact PostgreSQL target policy, schema boundary and Development composition flag; this case implementation/DTO/UI/frozen dependency bytes unchanged; reuse bound actual historical evidence"
+    },
+    {
+      "id": "M1-C11",
+      "requirement": "严格安全错误优先级和ProblemDetails，非授权场景不得返回内部host/表名",
+      "historicalStatus": "PASS",
+      "historicalArchivedStatus": "PASS",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/final-http/http-2bfea077-5bfd-4fdf-bf02-430d35979c06/report.json",
+          "sha256": "7de1983f03fad4cb40ec0c057b51c5268289df3ecf4a035d22eae7a78abf125e"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/r4-code-review.md",
+          "sha256": "7c8eb7de5653a3be618b979fb2b4d46767bd1992deddd5001e2d3ab022d5ffe9"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/body-limit-stable-47663df.raw.json",
+          "sha256": "19d3747167f5a88c2a4918e43e2330aa9afae1aa2516bb21ddcd788ee7640aa0"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/pg-normal.raw.json",
+          "sha256": "3d4f392bb5fe431992f202b504f2d0c89f61e88558d9395ec3cb872766328ad7"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/pg-wrong-san.raw.json",
+          "sha256": "4561c5f0518e05678c7c1c2bcc394c56801e530ea9aeaa8f82867e4997c1b65c"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/credential-fault-fixed.json",
+          "sha256": "7faab34d3919880e341b6b6f73dcfdef03e0147935bbbdc2e6779e71170338c2"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/permission-fault-fixed.json",
+          "sha256": "af214d7d6dc4c5fdb53407ac56ce8dc06f1fedda8ec34478128455d275b172c5"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/source-timeout-fixed.json",
+          "sha256": "001a3e12d523878c4b6aec7a568c553dca7c7dd19f5ea37db6fc5a7cd4501afc"
+        }
+      ],
+      "currentStatus": "PASS",
+      "currentEvidence": [
+        "c08-http.json",
+        "c08-readback.json",
+        "pg-security-real.json",
+        "adapter-policy-final.txt"
+      ],
+      "impact": "Targeted current HTTP/CAS/Probe/audit/ACL tests support modified path; unchanged historical subrequirements retained"
+    },
+    {
+      "id": "M1-C12",
+      "requirement": "Probe/Connection/Job的ID、版本、hash、时间、审计与真实Trace匹配",
+      "historicalStatus": "PASS",
+      "historicalArchivedStatus": "PASS",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/relationship-readback.json",
+          "sha256": "d67f38618805a1d3cd56e9ca8d9a4b1db594beec3ff7a3c4a8889a9e3cf9177c"
+        }
+      ],
+      "currentStatus": "PASS",
+      "currentEvidence": [
+        "c08-http.json",
+        "c08-readback.json",
+        "pg-security-real.json",
+        "adapter-policy-final.txt"
+      ],
+      "impact": "Targeted current HTTP/CAS/Probe/audit/ACL tests support modified path; unchanged historical subrequirements retained"
+    },
+    {
+      "id": "M1-C13",
+      "requirement": "G4审计 action只白名单不接受任意字符串",
+      "historicalStatus": "PASS",
+      "historicalArchivedStatus": "PASS",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/final-http/http-2bfea077-5bfd-4fdf-bf02-430d35979c06/report.json",
+          "sha256": "7de1983f03fad4cb40ec0c057b51c5268289df3ecf4a035d22eae7a78abf125e"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/r5-independent-review.md",
+          "sha256": "f6ac4f4e508f4283987083b594ef974b47d0d463423b1bfad19978652ae2fb98"
+        }
+      ],
+      "currentStatus": "PASS",
+      "currentEvidence": [],
+      "impact": "Affected product diff limited to exact PostgreSQL target policy, schema boundary and Development composition flag; this case implementation/DTO/UI/frozen dependency bytes unchanged; reuse bound actual historical evidence"
+    },
+    {
+      "id": "M1-C14",
+      "requirement": "M1不产生正式MappingRelease、不注册新MCP、不连接外部模型",
+      "historicalStatus": "PASS",
+      "historicalArchivedStatus": "PASS",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/formal-contract-unchanged.json",
+          "sha256": "166d9bfd21c8bb1c8ecde09fed8fab68f01751d57b80ba0a04f74fecfe28cda2"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/fullstack-isolation-check.json",
+          "sha256": "fcfa0402b568ff136e76384a613bb1b02e3da05f94bbc4dbd6849c9aa14b0871"
+        }
+      ],
+      "currentStatus": "PASS",
+      "currentEvidence": [],
+      "impact": "Affected product diff limited to exact PostgreSQL target policy, schema boundary and Development composition flag; this case implementation/DTO/UI/frozen dependency bytes unchanged; reuse bound actual historical evidence"
+    },
+    {
+      "id": "M1-C15",
+      "requirement": "No real business rows / no customer production data / Synthetic provenance clear",
+      "historicalStatus": "PASS",
+      "historicalArchivedStatus": "PASS",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/pg-fixture-generation.json",
+          "sha256": "31f46aae3f9f590eb368e3c88a33cbc7c6c001993f33a3e078f91af4a0618f62"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/pg-normal.raw.json",
+          "sha256": "3d4f392bb5fe431992f202b504f2d0c89f61e88558d9395ec3cb872766328ad7"
+        }
+      ],
+      "currentStatus": "PASS",
+      "currentEvidence": [],
+      "impact": "Affected product diff limited to exact PostgreSQL target policy, schema boundary and Development composition flag; this case implementation/DTO/UI/frozen dependency bytes unchanged; reuse bound actual historical evidence"
+    },
+    {
+      "id": "M1-C16",
+      "requirement": "新的G4接口OpenAPI与前端运行时调用一致，CLI及文档URL无双定义",
+      "historicalStatus": "PASS",
+      "historicalArchivedStatus": "PASS",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/g4-openapi-final-binding.json",
+          "sha256": "0b6a884cffa4b0d7fcabf17c4c693ab62499852bdd29a1e7cb11375225b859e9"
+        }
+      ],
+      "currentStatus": "PASS",
+      "currentEvidence": [],
+      "impact": "Affected product diff limited to exact PostgreSQL target policy, schema boundary and Development composition flag; this case implementation/DTO/UI/frozen dependency bytes unchanged; reuse bound actual historical evidence"
+    },
+    {
+      "id": "M1-P01",
+      "requirement": "启用合成PG TLS VerifyFull，真实连接、证书/hostname verified，返回阶段报告",
+      "historicalStatus": "PASS",
+      "historicalArchivedStatus": "PASS",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/final-http/http-2bfea077-5bfd-4fdf-bf02-430d35979c06/report.json",
+          "sha256": "7de1983f03fad4cb40ec0c057b51c5268289df3ecf4a035d22eae7a78abf125e"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/pg-normal.raw.json",
+          "sha256": "3d4f392bb5fe431992f202b504f2d0c89f61e88558d9395ec3cb872766328ad7"
+        }
+      ],
+      "currentStatus": "PASS",
+      "currentEvidence": [
+        "c08-http.json",
+        "c08-readback.json",
+        "pg-security-real.json",
+        "adapter-policy-final.txt"
+      ],
+      "impact": "Targeted current HTTP/CAS/Probe/audit/ACL tests support modified path; unchanged historical subrequirements retained"
+    },
+    {
+      "id": "M1-P02",
+      "requirement": "非受信 CA 拒绝，证书身份错误不默默回退 Require/Prefer",
+      "historicalStatus": "PASS",
+      "historicalArchivedStatus": "PASS",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/pg-normal.raw.json",
+          "sha256": "3d4f392bb5fe431992f202b504f2d0c89f61e88558d9395ec3cb872766328ad7"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/pg-wrong-san.raw.json",
+          "sha256": "4561c5f0518e05678c7c1c2bcc394c56801e530ea9aeaa8f82867e4997c1b65c"
+        }
+      ],
+      "currentStatus": "PASS",
+      "currentEvidence": [],
+      "impact": "Affected product diff limited to exact PostgreSQL target policy, schema boundary and Development composition flag; this case implementation/DTO/UI/frozen dependency bytes unchanged; reuse bound actual historical evidence"
+    },
+    {
+      "id": "M1-P03",
+      "requirement": "错误密码认证失败，限定重试/敏感诊断脱敏",
+      "historicalStatus": "PASS",
+      "historicalArchivedStatus": "PASS",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/final-http/http-2bfea077-5bfd-4fdf-bf02-430d35979c06/report.json",
+          "sha256": "7de1983f03fad4cb40ec0c057b51c5268289df3ecf4a035d22eae7a78abf125e"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/credential-fault-fixed.json",
+          "sha256": "7faab34d3919880e341b6b6f73dcfdef03e0147935bbbdc2e6779e71170338c2"
+        }
+      ],
+      "currentStatus": "PASS",
+      "currentEvidence": [
+        "c08-http.json",
+        "c08-readback.json",
+        "pg-security-real.json",
+        "adapter-policy-final.txt"
+      ],
+      "impact": "Targeted current HTTP/CAS/Probe/audit/ACL tests support modified path; unchanged historical subrequirements retained"
+    },
+    {
+      "id": "M1-P04",
+      "requirement": "仅TCP连通但没有schema访问时全Probe不是TEST_OK",
+      "historicalStatus": "PASS",
+      "historicalArchivedStatus": "PASS",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/permission-fault-fixed.json",
+          "sha256": "af214d7d6dc4c5fdb53407ac56ce8dc06f1fedda8ec34478128455d275b172c5"
+        }
+      ],
+      "currentStatus": "PASS",
+      "currentEvidence": [
+        "c08-http.json",
+        "pg-security-real.json",
+        "adapter-policy-final.txt",
+        "public/public-faults-1793578771290852000.json"
+      ],
+      "impact": "Exact A/B policy and schema parameter directly affected; historical unchanged subrequirements retained"
+    },
+    {
+      "id": "M1-P05",
+      "requirement": "fixture_reader只允许 production指定表 SELECT，maintenance/otherplant访问拒绝",
+      "historicalStatus": "PASS",
+      "historicalArchivedStatus": "PASS",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/pg-normal.raw.json",
+          "sha256": "3d4f392bb5fe431992f202b504f2d0c89f61e88558d9395ec3cb872766328ad7"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/pg-sequence-guard-regression.json",
+          "sha256": "08553ea15b947e14ea40f7bdd8b6797f01cf288044fbc770d368296be727d97d"
+        }
+      ],
+      "currentStatus": "PASS",
+      "currentEvidence": [
+        "c08-http.json",
+        "pg-security-real.json",
+        "adapter-policy-final.txt",
+        "public/public-faults-1793578771290852000.json"
+      ],
+      "impact": "Exact A/B policy and schema parameter directly affected; historical unchanged subrequirements retained"
+    },
+    {
+      "id": "M1-P06",
+      "requirement": "文本拼接SQL、任意函数/CTE写/多语句及非法schema名均无法达到Adapter执行层",
+      "historicalStatus": "PASS",
+      "historicalArchivedStatus": "PASS",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/final-http/http-2bfea077-5bfd-4fdf-bf02-430d35979c06/report.json",
+          "sha256": "7de1983f03fad4cb40ec0c057b51c5268289df3ecf4a035d22eae7a78abf125e"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/r4-code-review.md",
+          "sha256": "7c8eb7de5653a3be618b979fb2b4d46767bd1992deddd5001e2d3ab022d5ffe9"
+        }
+      ],
+      "currentStatus": "PASS",
+      "currentEvidence": [
+        "c08-http.json",
+        "pg-security-real.json",
+        "adapter-policy-final.txt",
+        "public/public-faults-1793578771290852000.json"
+      ],
+      "impact": "Exact A/B policy and schema parameter directly affected; historical unchanged subrequirements retained"
+    },
+    {
+      "id": "M1-P07",
+      "requirement": "SecretRef跨org、跨actor、过期、重放、不同用途、撤销全部拒绝",
+      "historicalStatus": "PASS",
+      "historicalArchivedStatus": "PASS",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/final-http/http-2bfea077-5bfd-4fdf-bf02-430d35979c06/report.json",
+          "sha256": "7de1983f03fad4cb40ec0c057b51c5268289df3ecf4a035d22eae7a78abf125e"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/credential-private-input-provenance.json",
+          "sha256": "7f1db309e538375912583aa565c8f124bddc293f3d03beac54e1ea992771fa5c"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/credential-fault-fixed.json",
+          "sha256": "7faab34d3919880e341b6b6f73dcfdef03e0147935bbbdc2e6779e71170338c2"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/cross-org-fault-profile-fixed.json",
+          "sha256": "f50b23eb350125f4f2cb8b0c30c8442d10ce26dcbe8eff0ffdf0cc474b1028bf"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/purpose-consumption-fault.json",
+          "sha256": "a78d5a320126dac7e437eaa0442c3f17e1b8f29cc158e2282967466064e16d64"
+        }
+      ],
+      "currentStatus": "PASS",
+      "currentEvidence": [],
+      "impact": "Affected product diff limited to exact PostgreSQL target policy, schema boundary and Development composition flag; this case implementation/DTO/UI/frozen dependency bytes unchanged; reuse bound actual historical evidence"
+    },
+    {
+      "id": "M1-P08",
+      "requirement": "秘密不出现在GET/响应错误/普通日志/OpenAPI示例/ZIP/Trace/前端localStorage/浏览器URL",
+      "historicalStatus": "PASS",
+      "historicalArchivedStatus": "NOT_RUN",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/delivery-source-sensitive-scan.json",
+          "sha256": "23d3b7e753f0b3fa8ebb584287fd3e2e437333ea19fb4a78c3e043d73cd1e7c1"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/final-http/http-2bfea077-5bfd-4fdf-bf02-430d35979c06/report.json",
+          "sha256": "7de1983f03fad4cb40ec0c057b51c5268289df3ecf4a035d22eae7a78abf125e"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/final-browser-interlock/browser-293a1099-0699-40ef-82a5-a44fa1f17345/report.json",
+          "sha256": "6898f81ddea8df33e8d63b77bb599429d584395f44104b15f38c9ef3c47eeff6"
+        }
+      ],
+      "currentStatus": "PENDING_EXTERNAL",
+      "currentEvidence": [
+        "delivery-readme.md"
+      ],
+      "impact": "Historical PASS is the attached independent review decision, not an upgrade of archived NOT_RUN. This new delivery ZIP scan/reopen cannot be claimed before package exists.",
+      "historicalDecision": "verified input docs/01-REVIEW-DECISION.md preserved in input-original-bytes.json"
+    },
+    {
+      "id": "M1-P09",
+      "requirement": "Secret版本轮换后旧Probe无效、原pool不能用于下一次旧配置",
+      "historicalStatus": "PASS",
+      "historicalArchivedStatus": "PASS",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/credential-fault-fixed.json",
+          "sha256": "7faab34d3919880e341b6b6f73dcfdef03e0147935bbbdc2e6779e71170338c2"
+        }
+      ],
+      "currentStatus": "PASS",
+      "currentEvidence": [],
+      "impact": "Affected product diff limited to exact PostgreSQL target policy, schema boundary and Development composition flag; this case implementation/DTO/UI/frozen dependency bytes unchanged; reuse bound actual historical evidence"
+    },
+    {
+      "id": "M1-P10",
+      "requirement": "连接创建后只DRAFT，不因probe或保存自动ACTIVE",
+      "historicalStatus": "PASS",
+      "historicalArchivedStatus": "PASS",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/final-http/http-2bfea077-5bfd-4fdf-bf02-430d35979c06/report.json",
+          "sha256": "7de1983f03fad4cb40ec0c057b51c5268289df3ecf4a035d22eae7a78abf125e"
+        }
+      ],
+      "currentStatus": "PASS",
+      "currentEvidence": [
+        "c08-http.json",
+        "c08-readback.json",
+        "pg-security-real.json",
+        "adapter-policy-final.txt"
+      ],
+      "impact": "Targeted current HTTP/CAS/Probe/audit/ACL tests support modified path; unchanged historical subrequirements retained"
+    },
+    {
+      "id": "M1-P11",
+      "requirement": "同IdempotencyKey异payload 409，响应/持久实体/审计无重复副作用",
+      "historicalStatus": "PASS",
+      "historicalArchivedStatus": "PASS",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/final-http/http-2bfea077-5bfd-4fdf-bf02-430d35979c06/report.json",
+          "sha256": "7de1983f03fad4cb40ec0c057b51c5268289df3ecf4a035d22eae7a78abf125e"
+        }
+      ],
+      "currentStatus": "PASS",
+      "currentEvidence": [
+        "c08-http.json",
+        "c08-readback.json",
+        "pg-security-real.json",
+        "adapter-policy-final.txt"
+      ],
+      "impact": "Targeted current HTTP/CAS/Probe/audit/ACL tests support modified path; unchanged historical subrequirements retained"
+    },
+    {
+      "id": "M1-P12",
+      "requirement": "Concurrent PATCH/enable/dsiable（错ETag）409，旧状态不被覆盖",
+      "historicalStatus": "PASS",
+      "historicalArchivedStatus": "PASS",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/final-http/http-2bfea077-5bfd-4fdf-bf02-430d35979c06/report.json",
+          "sha256": "7de1983f03fad4cb40ec0c057b51c5268289df3ecf4a035d22eae7a78abf125e"
+        }
+      ],
+      "currentStatus": "PASS",
+      "currentEvidence": [
+        "c08-http.json",
+        "c08-readback.json",
+        "pg-security-real.json",
+        "adapter-policy-final.txt"
+      ],
+      "impact": "Targeted current HTTP/CAS/Probe/audit/ACL tests support modified path; unchanged historical subrequirements retained"
+    },
+    {
+      "id": "M1-P13",
+      "requirement": "关闭真实PG源/超时后显示失败或PARTIAL，不能把失败显示为EMPTY",
+      "historicalStatus": "PASS",
+      "historicalArchivedStatus": "PASS",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/source-network-unavailable.json",
+          "sha256": "90d52aae43b804b056a9cd6e4f57058c76cfda949406f367252ae34638b0d176"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/source-timeout-fixed.json",
+          "sha256": "001a3e12d523878c4b6aec7a568c553dca7c7dd19f5ea37db6fc5a7cd4501afc"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/permission-fault-fixed.json",
+          "sha256": "af214d7d6dc4c5fdb53407ac56ce8dc06f1fedda8ec34478128455d275b172c5"
+        }
+      ],
+      "currentStatus": "PASS",
+      "currentEvidence": [],
+      "impact": "Affected product diff limited to exact PostgreSQL target policy, schema boundary and Development composition flag; this case implementation/DTO/UI/frozen dependency bytes unchanged; reuse bound actual historical evidence"
+    },
+    {
+      "id": "M1-P14",
+      "requirement": "禁用后新Probe/Discover不能调源；历史读取受当前scope和类型权限限制",
+      "historicalStatus": "PASS",
+      "historicalArchivedStatus": "PASS",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/final-http/http-2bfea077-5bfd-4fdf-bf02-430d35979c06/report.json",
+          "sha256": "7de1983f03fad4cb40ec0c057b51c5268289df3ecf4a035d22eae7a78abf125e"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/disabled-source-no-io.json",
+          "sha256": "41e1442d359cd1d7c6b68e51077944abc969351714ee7926a20b89c653646fc8"
+        }
+      ],
+      "currentStatus": "PASS",
+      "currentEvidence": [],
+      "impact": "Affected product diff limited to exact PostgreSQL target policy, schema boundary and Development composition flag; this case implementation/DTO/UI/frozen dependency bytes unchanged; reuse bound actual historical evidence"
+    },
+    {
+      "id": "M1-E01",
+      "requirement": "schema发现只返回当前源角色和Connection.allowedSchemas下的对象/字段",
+      "historicalStatus": "PASS",
+      "historicalArchivedStatus": "PASS",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/final-http/http-2bfea077-5bfd-4fdf-bf02-430d35979c06/report.json",
+          "sha256": "7de1983f03fad4cb40ec0c057b51c5268289df3ecf4a035d22eae7a78abf125e"
+        }
+      ],
+      "currentStatus": "PASS",
+      "currentEvidence": [
+        "c08-http.json",
+        "pg-security-real.json",
+        "adapter-policy-final.txt",
+        "public/public-faults-1793578771290852000.json"
+      ],
+      "impact": "Exact A/B policy and schema parameter directly affected; historical unchanged subrequirements retained"
+    },
+    {
+      "id": "M1-E02",
+      "requirement": "对 numeric(8,2), timestamptz, timestamp, jsonb, array, nullable的native类型保持可辨",
+      "historicalStatus": "PASS",
+      "historicalArchivedStatus": "PASS",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/final-http/http-2bfea077-5bfd-4fdf-bf02-430d35979c06/report.json",
+          "sha256": "7de1983f03fad4cb40ec0c057b51c5268289df3ecf4a035d22eae7a78abf125e"
+        }
+      ],
+      "currentStatus": "PASS",
+      "currentEvidence": [
+        "c08-http.json",
+        "c08-readback.json",
+        "pg-security-real.json",
+        "adapter-policy-final.txt"
+      ],
+      "impact": "Targeted current HTTP/CAS/Probe/audit/ACL tests support modified path; unchanged historical subrequirements retained"
+    },
+    {
+      "id": "M1-E03",
+      "requirement": "首次发现生成不可变SchemaSnapshot/fingerprint，重复同内容hash稳定；变更可比较",
+      "historicalStatus": "PASS",
+      "historicalArchivedStatus": "PASS",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/final-http/http-2bfea077-5bfd-4fdf-bf02-430d35979c06/report.json",
+          "sha256": "7de1983f03fad4cb40ec0c057b51c5268289df3ecf4a035d22eae7a78abf125e"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/schema-change-fixed.json",
+          "sha256": "1f4663559facf8d3899ad0071be94288eb5fd8356badeacc4a9e4aaec07f46d5"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/schema-change-deletion-check.json",
+          "sha256": "454d1c2b3b6207fdfd69ab85b29ac133a94c98dcd2796f239b6fdd6430736cd3"
+        }
+      ],
+      "currentStatus": "PASS",
+      "currentEvidence": [
+        "public/public-faults-1793578771290852000.json"
+      ],
+      "impact": "Metadata query now accepts exact B; actual A/B full catalog equality in seven public states and restored source catalog hash; historical snapshot/DDL behavior implementation unchanged"
+    },
+    {
+      "id": "M1-E04",
+      "requirement": "无权schema/字段不列出；零对象权限受限不表示“没有表”",
+      "historicalStatus": "PASS",
+      "historicalArchivedStatus": "PASS",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/permission-fault-fixed.json",
+          "sha256": "af214d7d6dc4c5fdb53407ac56ce8dc06f1fedda8ec34478128455d275b172c5"
+        }
+      ],
+      "currentStatus": "PASS",
+      "currentEvidence": [
+        "c08-http.json",
+        "pg-security-real.json",
+        "adapter-policy-final.txt",
+        "public/public-faults-1793578771290852000.json"
+      ],
+      "impact": "Exact A/B policy and schema parameter directly affected; historical unchanged subrequirements retained"
+    },
+    {
+      "id": "M1-E05",
+      "requirement": "Discovery 先有持久jobId，刷新/跨窗口GET可恢复，不靠单个HTTP会话",
+      "historicalStatus": "PASS",
+      "historicalArchivedStatus": "PASS",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/final-http/http-2bfea077-5bfd-4fdf-bf02-430d35979c06/report.json",
+          "sha256": "7de1983f03fad4cb40ec0c057b51c5268289df3ecf4a035d22eae7a78abf125e"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/final-browser-interlock/browser-293a1099-0699-40ef-82a5-a44fa1f17345/report.json",
+          "sha256": "6898f81ddea8df33e8d63b77bb599429d584395f44104b15f38c9ef3c47eeff6"
+        }
+      ],
+      "currentStatus": "PASS",
+      "currentEvidence": [],
+      "impact": "Affected product diff limited to exact PostgreSQL target policy, schema boundary and Development composition flag; this case implementation/DTO/UI/frozen dependency bytes unchanged; reuse bound actual historical evidence"
+    },
+    {
+      "id": "M1-E06",
+      "requirement": "Cancel真正持久、传播到底层Npgsql，超时/失败/租约恢复准确终态",
+      "historicalStatus": "PASS",
+      "historicalArchivedStatus": "PASS",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/catalog-cancel-fault-fresh-probe.json",
+          "sha256": "cb3f417c8b8205272f076bf4e84aed686357ff2ffc2bdffd54ccdf32beaeabc8"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/catalog-cancel-reload-asserted.json",
+          "sha256": "1b85b770ab18b6849ab8b0ef40ea0aa36c83715284e1286d01b4f0123463d783"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/client-cancel-fault.json",
+          "sha256": "9560f58cf6884d168b35f70bfcd370b8451da159e72bfe477f4f0b147ad6cda9"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/lease-fault-client-observer.json",
+          "sha256": "6c2b43b023c0c7a17eba701b691fae3ec0369689779d49f8a2e1670ec590a986"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/lease-final-readonly-receipt.json",
+          "sha256": "5da5e8c33f7a7741a0ba2c4d32da7cd4c6f067d5f125588277d74ed476ae68ef"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/source-timeout-fixed.json",
+          "sha256": "001a3e12d523878c4b6aec7a568c553dca7c7dd19f5ea37db6fc5a7cd4501afc"
+        }
+      ],
+      "currentStatus": "PASS",
+      "currentEvidence": [],
+      "impact": "Affected product diff limited to exact PostgreSQL target policy, schema boundary and Development composition flag; this case implementation/DTO/UI/frozen dependency bytes unchanged; reuse bound actual historical evidence"
+    },
+    {
+      "id": "M1-E07",
+      "requirement": "Probe审计+状态同事务；审计失败不留下成功/启用记录",
+      "historicalStatus": "PASS",
+      "historicalArchivedStatus": "PASS",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/audit-start-fault-complete.json",
+          "sha256": "3a90642b4fba0ccee36077aad10630e7db10a04c23b2722f9c6a093a721bbb5e"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/audit-complete-fault-complete.json",
+          "sha256": "e045e5e6aaec9e365adb6b4750f8d0143b36c31d57c3b5d7ab275525b43cf03a"
+        }
+      ],
+      "currentStatus": "PASS",
+      "currentEvidence": [],
+      "impact": "Affected product diff limited to exact PostgreSQL target policy, schema boundary and Development composition flag; this case implementation/DTO/UI/frozen dependency bytes unchanged; reuse bound actual historical evidence"
+    },
+    {
+      "id": "M1-E08",
+      "requirement": "Schema目标删除/变更后新版Snapshot/STALE状态准确，旧快照可审计但禁用于新探测",
+      "historicalStatus": "PASS",
+      "historicalArchivedStatus": "PASS",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/schema-change-fixed.json",
+          "sha256": "1f4663559facf8d3899ad0071be94288eb5fd8356badeacc4a9e4aaec07f46d5"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/schema-change-deletion-check.json",
+          "sha256": "454d1c2b3b6207fdfd69ab85b29ac133a94c98dcd2796f239b6fdd6430736cd3"
+        }
+      ],
+      "currentStatus": "PASS",
+      "currentEvidence": [
+        "public/public-faults-1793578771290852000.json"
+      ],
+      "impact": "Metadata query now accepts exact B; actual A/B full catalog equality in seven public states and restored source catalog hash; historical snapshot/DDL behavior implementation unchanged"
+    },
+    {
+      "id": "M1-U01",
+      "requirement": "UI-E2E-01完整PG配置→测试→保存→启用→发现→编辑→重测→禁用，真实HTTP/OIDC",
+      "historicalStatus": "PASS",
+      "historicalArchivedStatus": "PASS",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/final-browser-interlock/browser-293a1099-0699-40ef-82a5-a44fa1f17345/report.json",
+          "sha256": "6898f81ddea8df33e8d63b77bb599429d584395f44104b15f38c9ef3c47eeff6"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/ui-interlock-real.json",
+          "sha256": "7e28247aeae04e76748d4145f1a4496fd9064d93585ca9a5ef980738845bfbbd"
+        }
+      ],
+      "currentStatus": "PASS",
+      "currentEvidence": [],
+      "impact": "Affected product diff limited to exact PostgreSQL target policy, schema boundary and Development composition flag; this case implementation/DTO/UI/frozen dependency bytes unchanged; reuse bound actual historical evidence"
+    },
+    {
+      "id": "M1-U02",
+      "requirement": "用户无权403/未登录401，CSS/隐藏按钮不能代替HTTP拒绝",
+      "historicalStatus": "PASS",
+      "historicalArchivedStatus": "PASS",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/final-browser-interlock/browser-293a1099-0699-40ef-82a5-a44fa1f17345/report.json",
+          "sha256": "6898f81ddea8df33e8d63b77bb599429d584395f44104b15f38c9ef3c47eeff6"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/final-http/http-2bfea077-5bfd-4fdf-bf02-430d35979c06/report.json",
+          "sha256": "7de1983f03fad4cb40ec0c057b51c5268289df3ecf4a035d22eae7a78abf125e"
+        }
+      ],
+      "currentStatus": "PASS",
+      "currentEvidence": [],
+      "impact": "Affected product diff limited to exact PostgreSQL target policy, schema boundary and Development composition flag; this case implementation/DTO/UI/frozen dependency bytes unchanged; reuse bound actual historical evidence"
+    },
+    {
+      "id": "M1-U03",
+      "requirement": "五类型表单字段实测；非PG四类不伪联通",
+      "historicalStatus": "PASS",
+      "historicalArchivedStatus": "PASS",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/final-browser-interlock/browser-293a1099-0699-40ef-82a5-a44fa1f17345/report.json",
+          "sha256": "6898f81ddea8df33e8d63b77bb599429d584395f44104b15f38c9ef3c47eeff6"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/final-http/http-2bfea077-5bfd-4fdf-bf02-430d35979c06/report.json",
+          "sha256": "7de1983f03fad4cb40ec0c057b51c5268289df3ecf4a035d22eae7a78abf125e"
+        }
+      ],
+      "currentStatus": "PASS",
+      "currentEvidence": [],
+      "impact": "Affected product diff limited to exact PostgreSQL target policy, schema boundary and Development composition flag; this case implementation/DTO/UI/frozen dependency bytes unchanged; reuse bound actual historical evidence"
+    },
+    {
+      "id": "M1-U04",
+      "requirement": "409冲突展示新版、保留非敏草稿；敏感输入不持久",
+      "historicalStatus": "PASS",
+      "historicalArchivedStatus": "PASS",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/final-browser-interlock/browser-293a1099-0699-40ef-82a5-a44fa1f17345/report.json",
+          "sha256": "6898f81ddea8df33e8d63b77bb599429d584395f44104b15f38c9ef3c47eeff6"
+        }
+      ],
+      "currentStatus": "PASS",
+      "currentEvidence": [],
+      "impact": "Affected product diff limited to exact PostgreSQL target policy, schema boundary and Development composition flag; this case implementation/DTO/UI/frozen dependency bytes unchanged; reuse bound actual historical evidence"
+    },
+    {
+      "id": "M1-U05",
+      "requirement": "Probe分阶段、空/加载/错误/取消/超时/Partial以及刷新恢复均有动作",
+      "historicalStatus": "PASS",
+      "historicalArchivedStatus": "PASS",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/final-browser-interlock/browser-293a1099-0699-40ef-82a5-a44fa1f17345/report.json",
+          "sha256": "6898f81ddea8df33e8d63b77bb599429d584395f44104b15f38c9ef3c47eeff6"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/source-timeout-fixed.json",
+          "sha256": "001a3e12d523878c4b6aec7a568c553dca7c7dd19f5ea37db6fc5a7cd4501afc"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/source-network-unavailable.json",
+          "sha256": "90d52aae43b804b056a9cd6e4f57058c76cfda949406f367252ae34638b0d176"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/permission-fault-fixed.json",
+          "sha256": "af214d7d6dc4c5fdb53407ac56ce8dc06f1fedda8ec34478128455d275b172c5"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/catalog-cancel-reload-asserted.json",
+          "sha256": "1b85b770ab18b6849ab8b0ef40ea0aa36c83715284e1286d01b4f0123463d783"
+        }
+      ],
+      "currentStatus": "PASS",
+      "currentEvidence": [],
+      "impact": "Affected product diff limited to exact PostgreSQL target policy, schema boundary and Development composition flag; this case implementation/DTO/UI/frozen dependency bytes unchanged; reuse bound actual historical evidence"
+    },
+    {
+      "id": "M1-U06",
+      "requirement": "浅/深主题与窄屏检查，代表截图≤12张，不在页面展示研发提示",
+      "historicalStatus": "PASS",
+      "historicalArchivedStatus": "PASS",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/review-screenshots.json",
+          "sha256": "8bf93ed140fe4123079019e7154956cd1c4b18763cfac8adf0b2ca610ae123e4"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/final-layout/browser-4ab8f414-e3ce-47f7-bdc3-08867f3b19d9/report.json",
+          "sha256": "260c9e4cf047019e2d18ff382dc58e5e101627afeb3a271212d023c6b0aad665"
+        }
+      ],
+      "currentStatus": "PASS",
+      "currentEvidence": [],
+      "impact": "Affected product diff limited to exact PostgreSQL target policy, schema boundary and Development composition flag; this case implementation/DTO/UI/frozen dependency bytes unchanged; reuse bound actual historical evidence"
+    },
+    {
+      "id": "M1-R01",
+      "requirement": "独立Compose project before/after真实ID/labels/volume/fingerprint与KEEP/销毁回执",
+      "historicalStatus": "PASS",
+      "historicalArchivedStatus": "PASS",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/resources-before.json",
+          "sha256": "eefb97bcbf84e239c2c3076e299971b27f7a5a4aa370bd5093c07cf61247d312"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/cleanup-plan-final.json",
+          "sha256": "619505cc5fe1cbf3e221c9326cdf35ac1e89b6ec8dcbec708fbbef995336bab1"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/cleanup-receipt.json",
+          "sha256": "983a6028f528ab64b5689d99a68afdeec02eeb7940d7941c7e3362ae14c84944"
+        }
+      ],
+      "currentStatus": "PASS",
+      "currentEvidence": [
+        "resources-before.json",
+        "c08-cleanup-receipt.json",
+        "r04-first/cleanup-receipt.json",
+        "public/cleanup-receipt.json",
+        "r04-final/cleanup-receipt.json"
+      ],
+      "impact": "Current task resource identities and actual cleanup replace old task-only resource scope"
+    },
+    {
+      "id": "M1-R02",
+      "requirement": "任务临时容器/网络/临时卷在精确条件满足时真实清理，其他G3/G6资源无触碰",
+      "historicalStatus": "PASS",
+      "historicalArchivedStatus": "PASS",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/cleanup-receipt.json",
+          "sha256": "983a6028f528ab64b5689d99a68afdeec02eeb7940d7941c7e3362ae14c84944"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/process-cleanup.json",
+          "sha256": "4f374073a4b4c6f1f1aa91533830be36facbc16ff2257689e19ae948838b176e"
+        }
+      ],
+      "currentStatus": "PASS",
+      "currentEvidence": [
+        "resources-before.json",
+        "c08-cleanup-receipt.json",
+        "r04-first/cleanup-receipt.json",
+        "public/cleanup-receipt.json",
+        "r04-final/cleanup-receipt.json"
+      ],
+      "impact": "Current task resource identities and actual cleanup replace old task-only resource scope"
+    },
+    {
+      "id": "M1-R03",
+      "requirement": "Mac ARM64原生容器与实际测试结果实证；Windows AMD64不可用时NOT_RUN单列",
+      "historicalStatus": "PASS",
+      "historicalArchivedStatus": "PASS",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/pg-normal.raw.json",
+          "sha256": "3d4f392bb5fe431992f202b504f2d0c89f61e88558d9395ec3cb872766328ad7"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/pg-wrong-san.raw.json",
+          "sha256": "4561c5f0518e05678c7c1c2bcc394c56801e530ea9aeaa8f82867e4997c1b65c"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/final-execution-preflight.json",
+          "sha256": "ac78edb79ad1db083df3e1134618de69750af45626170399f7897e9e8b2e49ae"
+        }
+      ],
+      "currentStatus": "PASS",
+      "currentEvidence": [
+        "r04-final/runtime-witness.json",
+        "pg-security-real.json",
+        "public/public-faults-1793578771290852000.json"
+      ],
+      "impact": "Actual Mac ARM64 all six admitted images; Windows AMD64 NOT_RUN separately, no platform extrapolation"
+    },
+    {
+      "id": "M1-R04",
+      "requirement": "G3回归（认证、CSRF、发布/查询）在受影响范围无破坏，真实主要服务启动",
+      "historicalStatus": "NOT_RUN",
+      "historicalArchivedStatus": "NOT_RUN",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/recovery-progress.md",
+          "sha256": "e0220196b9e5caeba1546d4c561f8f76a8519074bf241f8cc63ce7f2d2063fd8"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/contracts-stable-minimum-fixed.raw.json",
+          "sha256": "f0d532076e9e67e135896fd6045e220cb5c8e5756aca52e2febad575dd05c9c3"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/runtime-evidence/final-http/http-2bfea077-5bfd-4fdf-bf02-430d35979c06/report.json",
+          "sha256": "7de1983f03fad4cb40ec0c057b51c5268289df3ecf4a035d22eae7a78abf125e"
+        }
+      ],
+      "currentStatus": "PASS",
+      "currentEvidence": [
+        "r04-final/report.json",
+        "r04-final/bindings-final.json",
+        "r04-final/db-readback.json",
+        "r04-final/runtime-witness.json",
+        "r04-final/independent-review.md"
+      ],
+      "impact": "New isolated real G3/G4 coexistent gate fully executed and independently recomputed"
+    },
+    {
+      "id": "M1-R05",
+      "requirement": "末次稳定完整本地验收 + 独立Review + 单一V3+Git重开输入绑定；CI按需NOT_RUN",
+      "historicalStatus": "PASS",
+      "historicalArchivedStatus": "NOT_RUN",
+      "historicalBase": "1399364ad1367f3d1bfdee4d9901fdb33b48c15d",
+      "historicalTestedCommit": "4efbeca1cbf33d52c2bd950e1968db20abe322d5",
+      "historicalReferences": [
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/validation.json",
+          "sha256": "7aee52c146981f5c49ddb8e9b624f94a81d612ca6bbf495e14aef7433a68b22b"
+        },
+        {
+          "path": "docs/evidence/G4-M1-RECOVERY-001/r5-independent-review.md",
+          "sha256": "f6ac4f4e508f4283987083b594ef974b47d0d463423b1bfad19978652ae2fb98"
+        }
+      ],
+      "currentStatus": "PENDING_EXTERNAL",
+      "currentEvidence": [
+        "delivery-readme.md"
+      ],
+      "impact": "Historical PASS is the attached independent review decision, not an upgrade of archived NOT_RUN. This new delivery ZIP scan/reopen cannot be claimed before package exists.",
+      "historicalDecision": "verified input docs/01-REVIEW-DECISION.md preserved in input-original-bytes.json"
+    }
+  ]
+}
