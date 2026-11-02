@@ -3,6 +3,11 @@ import json,hashlib
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2];ART=ROOT/'artifacts/g4-m1-final-gates-001/r04-final'
 reports=list((ART/'http').glob('http-*/report.json'));assert len(reports)==1
+def wire_keys(value):
+    # 持久化默认PascalCase与HTTP camelCase字段名不同；仅转换字段首字母，值与数组完整比较。
+    if isinstance(value,dict):return {k[:1].lower()+k[1:]:wire_keys(v) for k,v in value.items()}
+    if isinstance(value,list):return [wire_keys(v) for v in value]
+    return value
 raw=reports[0].read_bytes();r=json.loads(raw);assert r['exitCode']==0
 w=json.loads((ART/'db-readback.json').read_text());db=w['data'];audits=db['audits'];checks=[]
 def check(name,passed,facts=None):
@@ -12,7 +17,7 @@ try:
     for i,activation in enumerate(r['activations']):
         matches=[x for x in audits if x['Id']==activation['auditId']]
         check('activation_audit_'+str(i),len(matches)==1 and matches[0]['TraceId']==activation['traceId'] and matches[0]['Action']==('release.rollback' if i==2 else 'release.activate') and matches[0]['Resource']==activation['releaseId'] and matches[0]['Outcome']=='allowed',{'auditId':activation['auditId'],'traceId':activation['traceId']})
-        record=next(x for x in db['activations'] if x['ActivationId']==activation['activationId']);check('activation_persistence_'+str(i),json.loads(record['ResultJson'])==activation)
+        record=next(x for x in db['activations'] if x['ActivationId']==activation['activationId']);check('activation_persistence_'+str(i),wire_keys(json.loads(record['ResultJson']))==activation)
     check('active_matches_rollback',len(db['active'])==1 and db['active'][0]['Revision']==3 and db['active'][0]['ReleaseId']==r['activations'][0]['releaseId'])
     check('fault_active_full_identity',r['fault']['rejection']=='artifact_store_timeout' and len(r['fault']['afterActive'])==1 and all(r['fault']['beforeActive'][key]==r['fault']['afterActive'][0][key] for key in ['manifest','manifestHash','activationRevision']))
     for h in r['http']:
@@ -40,5 +45,5 @@ try:
     for obj in resources:check('exact_image_'+obj['name'],obj['descriptor']['digest']=='sha256:'+expected[obj['name']])
 finally:
     value={'taskId':'G4-M1-FINAL-GATES-001','status':'PASS' if checks and all(x['status']=='PASS' for x in checks) else 'FAIL','checks':checks,'reportSha256':hashlib.sha256(raw).hexdigest(),'dbSha256':hashlib.sha256((ART/'db-readback.json').read_bytes()).hexdigest(),'driverSha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest()}
-    with open(ART/'bindings.json','x') as stream:json.dump(value,stream,indent=2);stream.write('\n')
+    with open(ART/'bindings-final.json','x') as stream:json.dump(value,stream,indent=2);stream.write('\n')
     print(json.dumps({'status':value['status'],'checks':len(checks)}))
