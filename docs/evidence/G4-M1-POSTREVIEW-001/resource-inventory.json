@@ -1,0 +1,37 @@
+{
+  "taskId": "G4-M1-POSTREVIEW-001",
+  "created": [
+    {
+      "object": "/Users/chasen/.codex/worktrees/g4-m1-postreview-001/ontology-platform",
+      "kind": "managed-worktree",
+      "status": "KEEP_UNINTEGRATED",
+      "releaseCondition": "Separate explicit integration/retirement review"
+    },
+    {
+      "object": "refs/heads/codex/g4-m1-postreview-001",
+      "kind": "local-and-origin-task-branch",
+      "status": "KEEP_UNINTEGRATED",
+      "releaseCondition": "After human review and confirmed integration"
+    },
+    {
+      "object": "/Users/chasen/.codex/worktrees/g4-m1-postreview-001/ontology-platform/artifacts/g4-m1-postreview-001",
+      "kind": "task-artifacts",
+      "status": "KEEP_EVIDENCE",
+      "releaseCondition": "After unique ZIP independent verification and separately reviewed exact whitelist"
+    },
+    {
+      "object": "/Users/chasen/.codex/worktrees/g4-m1-postreview-001/ontology-platform/artifacts/g4-m1-postreview-001/host-monitor.json",
+      "kind": "bounded-monitor",
+      "status": "ACTIVE",
+      "pid": 15341,
+      "releaseCondition": "Signal exact owner PID at task closeout"
+    }
+  ],
+  "runtimeResources": "NO_TASK_OWNED_RUNTIME_RESOURCES",
+  "docker": "NOT_RUN_NO_DOCKER_ACCESS_REQUESTED",
+  "protected": "All previous worktrees, refs, ZIP, private runtime and Docker resources; six original untracked .DS_Store files",
+  "fixture": "{\"status\": \"PASS\", \"checks\": [\"exact-task-identity\", \"blocked-policy-propagates\", \"unknown-propagates\", \"monitor-sleep-propagates\", \"ready-does-not-invent-continuity\", \"valid-output\", \"outside-task\", \"parent-traversal\", \"existing-output\", \"existing-summary\", \"symlink-parent\", \"bounded-cli-rejection\", \"fixture-cleaned\"], \"count\": 13, \"sourceSha256\": \"631c9220c6fc22f479511390762ba89a9ba8b77decc306707177734b20fa32de\", \"fixturePath\": \"/Users/chasen/.codex/worktrees/g4-m1-postreview-001/ontology-platform/artifacts/g4-m1-postreview-001/host-test-d2z66c_x\", \"fixtureAfterExists\": false, \"scope\": \"HOST_ADAPTER_ONLY_PRODUCT_NOT_RUN\"}\n",
+  "freeBytes": 361999925248,
+  "physicalReclaimedBytes": "NOT_MEASURED",
+  "selfTestTemporaryResources": "Existing tests create isolated temporary Git/filesystem fixtures with built-in exact cleanup; no real Docker services"
+}

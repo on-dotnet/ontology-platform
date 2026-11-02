@@ -1,0 +1,5219 @@
+[
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "rev-parse",
+      "origin/main"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "1a79956c0cd54c57f949055a1b35f15fa1091f25864762c3aca43eb95e1cbab2",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "for-each-ref",
+      "--format=%(refname) %(objectname)"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "8672251856415d99ed6159ceb9421ec0c638b8d0d52c36429292d0a9a3d8dbfa",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "cat-file",
+      "--batch-all-objects",
+      "--batch-check=%(objectname) %(objecttype)"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "d7819ebc6dda7227541b1065784a5e615325b503a072c5ce5a81fb13cac4aa22",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "worktree",
+      "list",
+      "--porcelain"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "b501af96fb4e382f1e5654306c0a4f9d7f1b06e1ad9a305a5e7f0de60eb3a9e6",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/Developer/repos/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "7e9cbb47fff12942c8e3dce4fc27c9ebe7eccd6413755aabfa0a43845c38a185",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/Developer/repos/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "da3e40f0f5748b143dfd8576c3282d3dd07e0c54b1ee8d67860fc089f50b0b80",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/Developer/repos/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/Developer/repos/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "1a79956c0cd54c57f949055a1b35f15fa1091f25864762c3aca43eb95e1cbab2",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/320c/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/320c/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "8ae5f60726a098bfd5527491ca9293f303a43d4e6bd30f6992de5fafe7e3a24d",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/320c/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/320c/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "7d7940763ed08c61cca0b2c5cf1e1906b0f2cca7c83e22d8510878f7af840c52",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "f42bc463a0f46d42c66fb40edab50d6846fb84cabf99e4e6cb6e4a04ca4f9ee3",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "8ebc8a3bdefe5ff64cef059a00ce1e61c52692d22482bc6b247ec7fef40718bf",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "fbb84eb01482d18fac63bbd4f28f0d1a46d14dca5b878f9770d83c6b8b3c7b85",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "b3d3137a60ecade3c9e07e826d3130b81a0ab29319f2c1ea7cec596113950a39",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m1-closeout-package/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m1-closeout-package/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "5d2bf5d1312d3bd0d324b26180c3921b7ce3e87fc7bf54fdecb41aaab7565653",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m1-closeout-package/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m1-closeout-package/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "22bebeb41a9fd5ecc73d363356ea0cbafa3a7d3bcb321189cb77dfc5e426ed65",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m1-closeout-resources/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m1-closeout-resources/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "1243f37ef8a5ed56a6163cf3568593d8a6b59b07d1e45533d0870731c10dee77",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m1-closeout-resources/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m1-closeout-resources/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e2e6860914f3782f92975e594eb4a49a4d21961fc70546a6ad3b6e995b4cddd5",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "d3da5560dc8fe4f1974dc550eacec3fdb461f06f41f035cb7a2a7d58a41f7ff8",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "adee6fc3bcfc9b95a67f9283c7b48878ae093c814e02a4e8ab86e765ea652cd9",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e9dea68d68cd8a4c494e326d18cdf7f52fe3f35592e150f49dc6cec3d1107eff",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "795ef2aefeffbce816ae4d1cf92d13b89571ce0ec8b626f80e00afb155af128b",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e472e5329c340ca43eb3ba5da03a67fc0a5af6b3fd90b38576e059b79c0a1bf4",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "4262c6c8178e7e1ba6148f1b79f11f904f7d7e1329ddcb819b9eaed4db40e9d9",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "ced16b83a813d556492c67ed903b89aebd76c18c026770737ccf68ec15b71311",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "3a8d0aff28f56360b93df4cb4fb86aa2d2ead91f85566b815d3abec16d104b09",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "11b5559c4c5d1d441ab5606058efd874109e3f01a2d0687b2b9a26d1bbc8805d",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "40ab2345447f5feda62879d62886cebb9f1101ed3139ed468001ee122c9c28c4",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m4-web-a/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m4-web-a/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "3e9c6dc430806e4acfe6693f84b6d7f7278bb3372091caab92f643879093d8b1",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m4-web-a/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m4-web-a/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "f7da6ebcf03960056033e23f504a3aa207b974e82d5b6a9d669b75cd988c3eae",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m5-e0/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m5-e0/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "6bfa41306b59bedc1d5a403ffa863858dd2548fc70e7a44e9c121c460ab2d50a",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m5-e0/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m5-e0/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "3a3e6a300d80204f097a65c328391170a81adcdac30b2aae9d2f41b59402fa79",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m5-review-fix/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m5-review-fix/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "2126abb4d1b8fb91074b706e86d0639c5bf18e504ad6b03cd3e46b2844c02206",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m5-review-fix/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m5-review-fix/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "1a79956c0cd54c57f949055a1b35f15fa1091f25864762c3aca43eb95e1cbab2",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-00-contract-001/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "f69c40d11d398aa7b278e5ec32df39b92772827cdb9215036460ca9bf1d7f4e0",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-00-contract-001/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "fb9c241d5ee368384774a4b019c3a74a3cf0d45dba6bb9c730fef002e4318598",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-00-contract-001/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-00-contract-001/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "73a166b30b2431cbbb182e52613cf307eafa0e0c3b7c3f8e580d6ac2b0f05e7b",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-connection-master/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "8bd35fd0730368c707db88b736efddb865d3aa7c84a96df1f7ffe46520261d71",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-connection-master/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "6dd245bc03bf35aadb727e3fe844cea2edeb0450b3186291ac2ce7b8b56a235a",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-connection-master/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-connection-master/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "c6fafba274c596dead6165aa67dfa459c97f07acad4dc2994d8fb6e48eaabc0d",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-connection-ui/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-connection-ui/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "af0f55eecdab6d9501faf1498930ef8d5accf357992feeae95b904a4dd618bda",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-connection-ui/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-connection-ui/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "2ba9003365f656d227be466a10bd677fffa0a92db47bb51f9e3e4d6dac3b9e68",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e209c62b580f9e71e51f583d9fc98c8428ed0c4cb39ef287fa2439f59fbaedbf",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "d6340be9dfd4b160dafb491cef78bc28cb70780352fcbd6a0210e936c2e2655c",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-pg-adapter/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-pg-adapter/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "eb8fd05f7609b3654ec9e3e6434ca90d79f826fa3b78da8fbb4b1811844a3f49",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-pg-adapter/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-pg-adapter/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "a9e602965c8b302441aa64e4d1fee19ed2ec3920ad355c449dd6b6fe13e0bc80",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-postreview-001/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "7b9eb4acafb21b8f2122324b8a796b6b873a78b19627d0d8e4a22b364c657894",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-postreview-001/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "17e5c05f15cf04933ff643a2652ffd5cbee8d18bd4549b17d374e7dd9acf5d4a",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-postreview-001/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-postreview-001/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "f9493036c40d91bbecbb3e2c20024df56dfbf27d53fb122a3d380cc813182975",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "b0c731158164297b6f0b7040c3c5d17bc2a278e0a40fc29e86318b3057fd476e",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "085f0b392e6ff91f039bd225ac5b51fb8d7d7ea03a00e0ab9c76ee49c1bb7c0e",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-recovery-http-tests/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "5a4b97fba625d739ad043921361b0d34faf5b20ea9c0f854b48ef6cca92f2c2e",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-recovery-http-tests/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "4d49e65ab04799d37113762957c6709625676ffd6f7b5461033f6a3e71ac2201",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-recovery-http-tests/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-recovery-http-tests/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "cd5e29f2aadcc10fe60bb41f533f48d9b8458b2e654b8482abb67163fcca7438",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g6-p0-dependency-lock-001/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g6-p0-dependency-lock-001/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "f962ce30047146c12fc5acc25d7ac168620b2dc482b4df7137aa71fec242ba0b",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g6-p0-dependency-lock-001/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g6-p0-dependency-lock-001/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "7fc21a4ea38695ed9d09d39e1a2c4bc3cbfae5a4cbd0b785691611cb5ccc4b6c",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g6-p0-parser-prep-master/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "8bd35fd0730368c707db88b736efddb865d3aa7c84a96df1f7ffe46520261d71",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g6-p0-parser-prep-master/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "10b5d69ec9473cebae91474a14aa6fa07314b282ec7e3bc93c78cc8db1cd4d38",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g6-p0-parser-prep-master/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g6-p0-parser-prep-master/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "1a4598b10a84548ac271fdd767e12fa6d72276cd7ef820af48c929c992bdd595",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g6-p0-parser-prep-parser/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g6-p0-parser-prep-parser/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "da8ef0c094c9adb9479267d55dbcd181d2ad9423ef037e5b8f794a3b4f2c9979",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g6-p0-parser-prep-parser/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g6-p0-parser-prep-parser/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "94dc4533bfe5eab0b13f8f46c8582598a4a27b930dcc6755400b93efea3c6b58",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "2361d9c1ff5ea8b212eceffd2731a00c22e02d5997e61d743043d6ad4903e419",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "2c5e1609c94414afa41f588149a1dc28de91188358fbc34ff6f1c3c1224bca07",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "merge-base",
+      "d1a61daffe844475b07705797e3ad325cc3f2945",
+      "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "1a79956c0cd54c57f949055a1b35f15fa1091f25864762c3aca43eb95e1cbab2",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "rev-list",
+      "--left-right",
+      "--count",
+      "d1a61daffe844475b07705797e3ad325cc3f2945...d40e6ab67360cc46aadd7ec013bd514b3f61a6ea"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "6656ebb38a527d4ecb8d490eac516ea0e6e537814452fd4c14af6115fe2f7f58",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "merge-base",
+      "--is-ancestor",
+      "d1a61daffe844475b07705797e3ad325cc3f2945",
+      "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "rev-parse",
+      "d1a61daffe844475b07705797e3ad325cc3f2945^{tree}"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "b69af6154905b3a4bbe9a2f3098e08f231d35572f84ba0118f126f4b8e158081",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "rev-parse",
+      "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea^{tree}"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "367927e00b89b8c906af90d933dfbc574580650db368a2cc9ad447dc271ccdda",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff",
+      "--check",
+      "d1a61daffe844475b07705797e3ad325cc3f2945",
+      "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff",
+      "--check",
+      "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "for-each-ref",
+      "--format=%(refname) %(objectname)"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "8672251856415d99ed6159ceb9421ec0c638b8d0d52c36429292d0a9a3d8dbfa",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "cat-file",
+      "--batch-all-objects",
+      "--batch-check=%(objectname) %(objecttype)"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "d7819ebc6dda7227541b1065784a5e615325b503a072c5ce5a81fb13cac4aa22",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "worktree",
+      "list",
+      "--porcelain"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "b501af96fb4e382f1e5654306c0a4f9d7f1b06e1ad9a305a5e7f0de60eb3a9e6",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/Developer/repos/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "7e9cbb47fff12942c8e3dce4fc27c9ebe7eccd6413755aabfa0a43845c38a185",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/Developer/repos/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "da3e40f0f5748b143dfd8576c3282d3dd07e0c54b1ee8d67860fc089f50b0b80",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/Developer/repos/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/Developer/repos/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "1a79956c0cd54c57f949055a1b35f15fa1091f25864762c3aca43eb95e1cbab2",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/320c/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/320c/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "8ae5f60726a098bfd5527491ca9293f303a43d4e6bd30f6992de5fafe7e3a24d",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/320c/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/320c/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "7d7940763ed08c61cca0b2c5cf1e1906b0f2cca7c83e22d8510878f7af840c52",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "f42bc463a0f46d42c66fb40edab50d6846fb84cabf99e4e6cb6e4a04ca4f9ee3",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/b389/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "8ebc8a3bdefe5ff64cef059a00ce1e61c52692d22482bc6b247ec7fef40718bf",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "fbb84eb01482d18fac63bbd4f28f0d1a46d14dca5b878f9770d83c6b8b3c7b85",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m1-closeout-master/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "b3d3137a60ecade3c9e07e826d3130b81a0ab29319f2c1ea7cec596113950a39",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m1-closeout-package/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m1-closeout-package/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "5d2bf5d1312d3bd0d324b26180c3921b7ce3e87fc7bf54fdecb41aaab7565653",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m1-closeout-package/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m1-closeout-package/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "22bebeb41a9fd5ecc73d363356ea0cbafa3a7d3bcb321189cb77dfc5e426ed65",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m1-closeout-resources/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m1-closeout-resources/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "1243f37ef8a5ed56a6163cf3568593d8a6b59b07d1e45533d0870731c10dee77",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m1-closeout-resources/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m1-closeout-resources/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e2e6860914f3782f92975e594eb4a49a4d21961fc70546a6ad3b6e995b4cddd5",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "d3da5560dc8fe4f1974dc550eacec3fdb461f06f41f035cb7a2a7d58a41f7ff8",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m3-efficiency/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "adee6fc3bcfc9b95a67f9283c7b48878ae093c814e02a4e8ab86e765ea652cd9",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e9dea68d68cd8a4c494e326d18cdf7f52fe3f35592e150f49dc6cec3d1107eff",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m3-master/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "795ef2aefeffbce816ae4d1cf92d13b89571ce0ec8b626f80e00afb155af128b",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e472e5329c340ca43eb3ba5da03a67fc0a5af6b3fd90b38576e059b79c0a1bf4",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m3-sem/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "4262c6c8178e7e1ba6148f1b79f11f904f7d7e1329ddcb819b9eaed4db40e9d9",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "ced16b83a813d556492c67ed903b89aebd76c18c026770737ccf68ec15b71311",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m3-web/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "3a8d0aff28f56360b93df4cb4fb86aa2d2ead91f85566b815d3abec16d104b09",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "11b5559c4c5d1d441ab5606058efd874109e3f01a2d0687b2b9a26d1bbc8805d",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m4-sem-a/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "40ab2345447f5feda62879d62886cebb9f1101ed3139ed468001ee122c9c28c4",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m4-web-a/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m4-web-a/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "3e9c6dc430806e4acfe6693f84b6d7f7278bb3372091caab92f643879093d8b1",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m4-web-a/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m4-web-a/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "f7da6ebcf03960056033e23f504a3aa207b974e82d5b6a9d669b75cd988c3eae",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m5-e0/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m5-e0/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "6bfa41306b59bedc1d5a403ffa863858dd2548fc70e7a44e9c121c460ab2d50a",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m5-e0/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m5-e0/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "3a3e6a300d80204f097a65c328391170a81adcdac30b2aae9d2f41b59402fa79",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m5-review-fix/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m5-review-fix/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "2126abb4d1b8fb91074b706e86d0639c5bf18e504ad6b03cd3e46b2844c02206",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m5-review-fix/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g3-m5-review-fix/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "1a79956c0cd54c57f949055a1b35f15fa1091f25864762c3aca43eb95e1cbab2",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-00-contract-001/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "f69c40d11d398aa7b278e5ec32df39b92772827cdb9215036460ca9bf1d7f4e0",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-00-contract-001/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "fb9c241d5ee368384774a4b019c3a74a3cf0d45dba6bb9c730fef002e4318598",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-00-contract-001/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-00-contract-001/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "73a166b30b2431cbbb182e52613cf307eafa0e0c3b7c3f8e580d6ac2b0f05e7b",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-connection-master/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "8bd35fd0730368c707db88b736efddb865d3aa7c84a96df1f7ffe46520261d71",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-connection-master/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "6dd245bc03bf35aadb727e3fe844cea2edeb0450b3186291ac2ce7b8b56a235a",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-connection-master/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-connection-master/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "c6fafba274c596dead6165aa67dfa459c97f07acad4dc2994d8fb6e48eaabc0d",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-connection-ui/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-connection-ui/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "af0f55eecdab6d9501faf1498930ef8d5accf357992feeae95b904a4dd618bda",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-connection-ui/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-connection-ui/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "2ba9003365f656d227be466a10bd677fffa0a92db47bb51f9e3e4d6dac3b9e68",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e209c62b580f9e71e51f583d9fc98c8428ed0c4cb39ef287fa2439f59fbaedbf",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "d6340be9dfd4b160dafb491cef78bc28cb70780352fcbd6a0210e936c2e2655c",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-pg-adapter/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-pg-adapter/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "eb8fd05f7609b3654ec9e3e6434ca90d79f826fa3b78da8fbb4b1811844a3f49",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-pg-adapter/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-pg-adapter/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "a9e602965c8b302441aa64e4d1fee19ed2ec3920ad355c449dd6b6fe13e0bc80",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-postreview-001/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "7b9eb4acafb21b8f2122324b8a796b6b873a78b19627d0d8e4a22b364c657894",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-postreview-001/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "17e5c05f15cf04933ff643a2652ffd5cbee8d18bd4549b17d374e7dd9acf5d4a",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-postreview-001/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-postreview-001/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "f9493036c40d91bbecbb3e2c20024df56dfbf27d53fb122a3d380cc813182975",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "b0c731158164297b6f0b7040c3c5d17bc2a278e0a40fc29e86318b3057fd476e",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-recovery-001/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "085f0b392e6ff91f039bd225ac5b51fb8d7d7ea03a00e0ab9c76ee49c1bb7c0e",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-recovery-http-tests/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "5a4b97fba625d739ad043921361b0d34faf5b20ea9c0f854b48ef6cca92f2c2e",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-recovery-http-tests/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "4d49e65ab04799d37113762957c6709625676ffd6f7b5461033f6a3e71ac2201",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-recovery-http-tests/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g4-m1-recovery-http-tests/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "cd5e29f2aadcc10fe60bb41f533f48d9b8458b2e654b8482abb67163fcca7438",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g6-p0-dependency-lock-001/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g6-p0-dependency-lock-001/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "f962ce30047146c12fc5acc25d7ac168620b2dc482b4df7137aa71fec242ba0b",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g6-p0-dependency-lock-001/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g6-p0-dependency-lock-001/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "7fc21a4ea38695ed9d09d39e1a2c4bc3cbfae5a4cbd0b785691611cb5ccc4b6c",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g6-p0-parser-prep-master/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "8bd35fd0730368c707db88b736efddb865d3aa7c84a96df1f7ffe46520261d71",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g6-p0-parser-prep-master/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "10b5d69ec9473cebae91474a14aa6fa07314b282ec7e3bc93c78cc8db1cd4d38",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g6-p0-parser-prep-master/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g6-p0-parser-prep-master/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "1a4598b10a84548ac271fdd767e12fa6d72276cd7ef820af48c929c992bdd595",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g6-p0-parser-prep-parser/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g6-p0-parser-prep-parser/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "da8ef0c094c9adb9479267d55dbcd181d2ad9423ef037e5b8f794a3b4f2c9979",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g6-p0-parser-prep-parser/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/g6-p0-parser-prep-parser/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "94dc4533bfe5eab0b13f8f46c8582598a4a27b930dcc6755400b93efea3c6b58",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform",
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      "index"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "2361d9c1ff5ea8b212eceffd2731a00c22e02d5997e61d743043d6ad4903e419",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform",
+      "diff",
+      "--no-ext-diff",
+      "--no-textconv",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "-C",
+      "/Users/chasen/.codex/worktrees/pre-g3-hygiene/ontology-platform",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "2c5e1609c94414afa41f588149a1dc28de91188358fbc34ff6f1c3c1224bca07",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "rev-list",
+      "--reverse",
+      "--topo-order",
+      "d1a61daffe844475b07705797e3ad325cc3f2945..d40e6ab67360cc46aadd7ec013bd514b3f61a6ea"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "1541deb71f4bce45bab4a05218f6db419570e2936ebdee9c7d4521f3e296cfa7",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff-tree",
+      "--no-commit-id",
+      "--name-status",
+      "-r",
+      "7132c51203939d9b47de047d5c187f339910ba26"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "1d315b9c1da0250ddc5aa183326de274dec9d9c41522b8de089ea3873db27a32",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%P",
+      "7132c51203939d9b47de047d5c187f339910ba26"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "1a79956c0cd54c57f949055a1b35f15fa1091f25864762c3aca43eb95e1cbab2",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%s",
+      "7132c51203939d9b47de047d5c187f339910ba26"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "8a8b96efa5d5cf8379afc9acde57aa1561ebc0b33db8832be38d268cb25efaa3",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff-tree",
+      "--no-commit-id",
+      "--name-status",
+      "-r",
+      "a919d624ef85fdc5c1ff75c404052ec427296295"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "259481ef4df67af20966455e5ad529418b94d732611b38682f07e1ad59c49463",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%P",
+      "a919d624ef85fdc5c1ff75c404052ec427296295"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "a2e198cc7617d47d81d76cab1c8b3ad143020e738a51ee6d36ef4462e508a28c",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%s",
+      "a919d624ef85fdc5c1ff75c404052ec427296295"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "eb82e923cffb1a13c5b281f177676e8a672a3b1d4e16d28470333a93ec9afc46",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff-tree",
+      "--no-commit-id",
+      "--name-status",
+      "-r",
+      "8afc5d4dfd32e7adb48262cce6587057c0e68715"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "87cfdb55bd7e93bcb94a6c7fda929e9475365f62c7d8216b2834a04c70d11faf",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%P",
+      "8afc5d4dfd32e7adb48262cce6587057c0e68715"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "a8f2ba2f87c2085e124ab4079af82842f7806a3213bc445dba12d1494f1a8ad3",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%s",
+      "8afc5d4dfd32e7adb48262cce6587057c0e68715"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "adba83177daaf306982fe559ea8b7cebf593fcf0163c1e2afb25b5d961b7bbca",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff-tree",
+      "--no-commit-id",
+      "--name-status",
+      "-r",
+      "ceadd5393a377e537539c29d144ddd59ce51d103"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "7b688b12ed7c51073709080e16426c0dfcecff41cf365a388504a272ccec58ac",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%P",
+      "ceadd5393a377e537539c29d144ddd59ce51d103"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "73a166b30b2431cbbb182e52613cf307eafa0e0c3b7c3f8e580d6ac2b0f05e7b",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%s",
+      "ceadd5393a377e537539c29d144ddd59ce51d103"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "26bb06d806feb72deec80c022c7317b865c31c1f168ec1931f74a842520133b3",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff-tree",
+      "--no-commit-id",
+      "--name-status",
+      "-r",
+      "719aaca36ca6988f28e7daf71725f92684ae7e87"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "63bf4527fd837560e00ecc4f54d31ae84e7e7ed3729820c28540ec558b6ecf30",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%P",
+      "719aaca36ca6988f28e7daf71725f92684ae7e87"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "a5f24cb5e96eaf4bb6722169a07298de1124516c94d7f8650463f302da764e06",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%s",
+      "719aaca36ca6988f28e7daf71725f92684ae7e87"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "0257c032c97d0392c311338704ab495379b7e265bf571b5d44c3599cc1e5538b",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff-tree",
+      "--no-commit-id",
+      "--name-status",
+      "-r",
+      "18cd1f7b89286af354f844c8f4b253fcc659f517"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "3b7f3e96c328cb1d56e0b86f738ef437db3dccde6732e844e6fd09528db85fbf",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%P",
+      "18cd1f7b89286af354f844c8f4b253fcc659f517"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "3bfe053f8695bb5daa9c8e56ab8ba133274aa076e458af0e2d9424fd50071eeb",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%s",
+      "18cd1f7b89286af354f844c8f4b253fcc659f517"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "2e47f262aee76350639b2871fb14e852542507ddb6d128a16d1b99493619f2e9",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff-tree",
+      "--no-commit-id",
+      "--name-status",
+      "-r",
+      "1dbf66ae1114c83fe4894f51c46496f4654a1f2d"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "0f51e6ebf4d48ff5c56bd880560fcc5d000cdc1fb81b9c89ae464c0cfffc6895",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%P",
+      "1dbf66ae1114c83fe4894f51c46496f4654a1f2d"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "5667710da4728052b4ddafe9098ea881f03b9487f84f423834e801b2e08a5dd9",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%s",
+      "1dbf66ae1114c83fe4894f51c46496f4654a1f2d"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "91b0087b44d0feffcaac3dc87f01ff1882a82a1818c57f914dcf343164508cef",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff-tree",
+      "--no-commit-id",
+      "--name-status",
+      "-r",
+      "de9bbe5f2b273eb3c404cdce445c5e225032f2d4"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "8c0fabef23e230e6069c603bafe0f0d93af2f7d635fad253238d9fa4d9cbdc3e",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%P",
+      "de9bbe5f2b273eb3c404cdce445c5e225032f2d4"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "d9d5b16afdf740fc5bca521bfbfbefabc30fccaaf9a4ef6a6a3bdd3b9b7907c1",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%s",
+      "de9bbe5f2b273eb3c404cdce445c5e225032f2d4"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e0e4ef0d5ad71f3b3366dc2562484416c32949b9dcade41bbad6c10d7a007aa4",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff-tree",
+      "--no-commit-id",
+      "--name-status",
+      "-r",
+      "79610f79c0b4e710e8c6e25097e94b4b7504f654"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "d96e3786931b208d3385165a6aed802d93bc1ff92faaf9425b9b118c000a1d6e",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%P",
+      "79610f79c0b4e710e8c6e25097e94b4b7504f654"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "db81d8ded02d178cb4dc8f82dff04819391b200bd582a4f142ade0e68c35d418",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%s",
+      "79610f79c0b4e710e8c6e25097e94b4b7504f654"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "5d7c283657bf60c838ff061b65a838750d096d543a6e2a2bc310f70de0cd7155",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff-tree",
+      "--no-commit-id",
+      "--name-status",
+      "-r",
+      "607b7d1ae780ba52ba74be4940f012497e6211f4"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "82770471a9bf17e7044ca5f1555b0472439c84a009cdb5b66558cb753bf05be7",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%P",
+      "607b7d1ae780ba52ba74be4940f012497e6211f4"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "096a5ce424da5ea71de54b0678a096e3a6188a561774f6162ce8207896d1dabd",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%s",
+      "607b7d1ae780ba52ba74be4940f012497e6211f4"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "f9dddd44078bbb5e0c3968ef58eb4e40d22396b32472c0a42fdd9a10ec4ab953",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff-tree",
+      "--no-commit-id",
+      "--name-status",
+      "-r",
+      "2c2b2804d3c39e5973d7151a0c305d9c60c90d0f"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "26b9235ee254c63f0169fbf6e2b2ff99bf7dda85f0b5ac7d308d55a0d64d0da9",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%P",
+      "2c2b2804d3c39e5973d7151a0c305d9c60c90d0f"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "c02e084a490aa44e31b5eaab3cbf5e06906cb5181fd65d8f6b2b8989361ab1f0",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%s",
+      "2c2b2804d3c39e5973d7151a0c305d9c60c90d0f"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "b62b159419a809b059a8bfad38c6be818ffc152ed75f4ab3109421dc5476a55c",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff-tree",
+      "--no-commit-id",
+      "--name-status",
+      "-r",
+      "f31767117a9b99879c973a1f6be31ed6697396ae"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "5fa25e6bf09881625c484cee49f4eee99d349baa53d44581cc2addc7b0824da4",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%P",
+      "f31767117a9b99879c973a1f6be31ed6697396ae"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "50c858f903eff3dc98cf368b995193bcdbc4ecb67133870a9ebd1ce777fb0361",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%s",
+      "f31767117a9b99879c973a1f6be31ed6697396ae"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "dcf6ab6a3fe3d58ed339b357d702f8b63c9ea2f019adf2a7de0dc4b055d678e5",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff-tree",
+      "--no-commit-id",
+      "--name-status",
+      "-r",
+      "ee6fb15942ed849845c8a9e8d8524d22fb64086c"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "9d337279cf9e84c0b12996369ffcacc73fb1c33a44f9098be373583bab7826bc",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%P",
+      "ee6fb15942ed849845c8a9e8d8524d22fb64086c"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "25fc018745fa996213612448d025290b60d88bdef74962d5d2b464ef3c9bc9f2",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%s",
+      "ee6fb15942ed849845c8a9e8d8524d22fb64086c"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "4049740f4967bb158fa4d637ea47a43015b61961f3aeed45de4d650a22367701",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff-tree",
+      "--no-commit-id",
+      "--name-status",
+      "-r",
+      "958dc6c4eb121958ae889213d1a523a7e7914ce8"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "3d2d96cac033b849a6bf28bbffb354a8d3005685890a41788ada9e6b158aa712",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%P",
+      "958dc6c4eb121958ae889213d1a523a7e7914ce8"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "2bcc6b71e065de96cecc738552470b583ef6b4603efe7a26f7c71859c95115bb",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%s",
+      "958dc6c4eb121958ae889213d1a523a7e7914ce8"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "09a5baa684a4bb061151587ac746585732cfd6e5cf159cf93e5f7c7b2c785225",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff-tree",
+      "--no-commit-id",
+      "--name-status",
+      "-r",
+      "59edb405dfb4acf4d4a259cffdc3551bafa90d2c"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "1d6cf69be81ed2b3394b438c021b03517913d600dc2d22544a868c24a2433ddc",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%P",
+      "59edb405dfb4acf4d4a259cffdc3551bafa90d2c"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "68675e30ca950c7f9ba41e5b6210a87259121484a1b3cc67264e50ac6c1f6fce",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%s",
+      "59edb405dfb4acf4d4a259cffdc3551bafa90d2c"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "6c798294617c4ee539c7d541afd8da873dc66aed8471136e176c763fd9dafe20",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff-tree",
+      "--no-commit-id",
+      "--name-status",
+      "-r",
+      "840155b9ca707ecb8208c6ee57dead14b014a03d"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "b141e56762935e31d4c8c8fa04f5d28f4d9930f01234245a1ea0220ad42fa7a8",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%P",
+      "840155b9ca707ecb8208c6ee57dead14b014a03d"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "c6fafba274c596dead6165aa67dfa459c97f07acad4dc2994d8fb6e48eaabc0d",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%s",
+      "840155b9ca707ecb8208c6ee57dead14b014a03d"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e0905d3a7d6f0debd313a18f5f94b142e9f40206cfea27d0e46d2227826c8aca",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff-tree",
+      "--no-commit-id",
+      "--name-status",
+      "-r",
+      "cb40815090bce36ce982b6365f50c4346776a568"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "ad047df26defbdb9e1ca6ecec0d56bfeaf6ccaa0b366239dab13266d94465bce",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%P",
+      "cb40815090bce36ce982b6365f50c4346776a568"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "f839590ee83748094e17e95188b301bd7771e788f0a075e75fcb3ec69cdab817",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%s",
+      "cb40815090bce36ce982b6365f50c4346776a568"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "d96e480dd16d1b4cc82cbd50b294af0f5d118a9d70ecc608e8fa1ef664748a47",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff-tree",
+      "--no-commit-id",
+      "--name-status",
+      "-r",
+      "7527ae6bccb6f6869f4a85ac867d1feb26ec117f"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "43538783c77d97d2b1983b70e557e397ed4154a10c4ac5554160b824545ce0fb",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%P",
+      "7527ae6bccb6f6869f4a85ac867d1feb26ec117f"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "c927664dacf658053a82e727b121af33a44c5f11a14806b8f75f594a7376d5e4",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%s",
+      "7527ae6bccb6f6869f4a85ac867d1feb26ec117f"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "cc744b00c300880ec3ba27ec935a7be9c48d490532f61ef6086b1d5670527589",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff-tree",
+      "--no-commit-id",
+      "--name-status",
+      "-r",
+      "605acc98d98b9cbddae0d0ffd9227f764deea0ac"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "b0fc9490cbb1e8d45bedc645d48ab5810cbb3017ea4eee55f0e330017d58be0c",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%P",
+      "605acc98d98b9cbddae0d0ffd9227f764deea0ac"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "20e63840208d89b22fa756226d215d08ca9acbd71a78c9582be19145e436915c",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%s",
+      "605acc98d98b9cbddae0d0ffd9227f764deea0ac"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "ae543d75e7f80effe086f7e056c76a773abcaac3c4a341c41ed1a740257b893c",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff-tree",
+      "--no-commit-id",
+      "--name-status",
+      "-r",
+      "37a65f9aad5247373b86c9f842d4c61fe38bc734"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "937c6086ff2366b0738f7aa370398933e90a386fd4df7d098b676388274777df",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%P",
+      "37a65f9aad5247373b86c9f842d4c61fe38bc734"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "84128875ce83e50749660acee6666a9053fe26974e9c5f510611008566dafdd8",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%s",
+      "37a65f9aad5247373b86c9f842d4c61fe38bc734"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "c5d415bbe11f12d011b425e9aa71896096343dd1c47a4196e4e03349f5513e7b",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff-tree",
+      "--no-commit-id",
+      "--name-status",
+      "-r",
+      "6ceb0de58aea9630c82c86afdd75022e6629adaf"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "b6ba5952ddd37b02abff78f567591e71ed74ed91039798eb88c19402e0fa4f81",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%P",
+      "6ceb0de58aea9630c82c86afdd75022e6629adaf"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "32e52ed2dce7757750a6ffbef1e4b8506e01501ba47a0c58017e4fad39e19851",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%s",
+      "6ceb0de58aea9630c82c86afdd75022e6629adaf"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "3f38d4cec5d88ff45c94ad326d67382bab8ec682811be0ecb359f09128eddddf",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff-tree",
+      "--no-commit-id",
+      "--name-status",
+      "-r",
+      "cdf9e0ce63c5a784f1473b7de0117ae07f4d912b"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "af7fe8844cb458542bbdc6e48fbf1b559736277b586a76dd4d9b02852a950df1",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%P",
+      "cdf9e0ce63c5a784f1473b7de0117ae07f4d912b"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "719dbd65b681477ce5c4326676c6d0e3fb0f94782d89a4449e087a2a13cea552",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%s",
+      "cdf9e0ce63c5a784f1473b7de0117ae07f4d912b"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "c0007544b9de7454e8ad86f4901a8d8a7e69f42e3f52923a76bb07f03c2589a6",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff-tree",
+      "--no-commit-id",
+      "--name-status",
+      "-r",
+      "3e3d5bf6d2aff80f8ec6dddfcca088ff659baf62"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "5d4661a8852700b51759de27dedb496b3df3dc9a63417989b4b7df50f7f7ca68",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%P",
+      "3e3d5bf6d2aff80f8ec6dddfcca088ff659baf62"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "1d15930bd3194bf93f06ab4be1ccc051a163dc040f14bda6818eeba93da6b892",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%s",
+      "3e3d5bf6d2aff80f8ec6dddfcca088ff659baf62"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "b053221a17a204cb0a89338d9c6a3bc5888b74c010f4afa3bd42aa65fac354a0",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff-tree",
+      "--no-commit-id",
+      "--name-status",
+      "-r",
+      "ee10927ff27a714733d3059a9f449c0703098daf"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "cdc965a58c56b19470aa3a1611f5fa4bfd1febf388d2abbd49a2314a093dbaca",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%P",
+      "ee10927ff27a714733d3059a9f449c0703098daf"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "7e7b900f5fea87ce414bcd3adf2c665ece2b771e81cb784018326dec68e158ed",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%s",
+      "ee10927ff27a714733d3059a9f449c0703098daf"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "6564072e0c5a6128fde28c5678529cc476647dfdc6c7a48cdca025df3e812f69",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff-tree",
+      "--no-commit-id",
+      "--name-status",
+      "-r",
+      "1fb6982ecbad4822062d0a9e56725c249dcd6ac4"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "3a0c011ae2a0cddbf561b7e30429f6f4139aa344b3539faddc6076928164ad90",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%P",
+      "1fb6982ecbad4822062d0a9e56725c249dcd6ac4"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "70a95f108f2643928a48e9cb88b49423717fa6c8d83f4a8817f10c90cff648a1",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%s",
+      "1fb6982ecbad4822062d0a9e56725c249dcd6ac4"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "eec42f4a0870e031a11da3955bb9da022de165562d3ca68325dab0735b397b19",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff-tree",
+      "--no-commit-id",
+      "--name-status",
+      "-r",
+      "1c9779ec8cadc71c931a89c9c5deb1369b5dc180"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "0824e03452b89b7dba04d20c5c874c4f392ada569a2f15cc026d79815e8622ea",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%P",
+      "1c9779ec8cadc71c931a89c9c5deb1369b5dc180"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "aac9ef388b8c84271ffd45c67e6a61533c758b9ae124b61ccf00919d8f1a28d8",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%s",
+      "1c9779ec8cadc71c931a89c9c5deb1369b5dc180"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "22853ad6d8e5b837598191ef0f4dfbddf5de150cfa536af858834fb8b0d77b69",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff-tree",
+      "--no-commit-id",
+      "--name-status",
+      "-r",
+      "f34a5597c6857090662288bf8711a9ef95085987"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "0824e03452b89b7dba04d20c5c874c4f392ada569a2f15cc026d79815e8622ea",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%P",
+      "f34a5597c6857090662288bf8711a9ef95085987"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "6f45eff5cef76a132c991ed36c4c3e035f31c77c3f7f9a722ff66e223d1444a2",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%s",
+      "f34a5597c6857090662288bf8711a9ef95085987"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "fc88f04259a9a07cac552c0958a37838305d4ff7fe57576f4eb7247bc067a7d0",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff-tree",
+      "--no-commit-id",
+      "--name-status",
+      "-r",
+      "188e2b51adcdc161be7687788e7e86019d248c7e"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "0824e03452b89b7dba04d20c5c874c4f392ada569a2f15cc026d79815e8622ea",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%P",
+      "188e2b51adcdc161be7687788e7e86019d248c7e"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "408d7683e1013984822d5accfb99fc2a6e529178fdfc3e2c0f2f6e632981ec5b",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%s",
+      "188e2b51adcdc161be7687788e7e86019d248c7e"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "a04c53bd9cabae4a1ac84021bd84e2bbbe397ac56fd291ce4b6f5d6231e3d228",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff-tree",
+      "--no-commit-id",
+      "--name-status",
+      "-r",
+      "35631fef44a936cd31709a5974966f876d611bb3"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "4ed8eddb2f3941ff669a3cf96e1856dcb907d8161c9ad7a90ad43fdd69075371",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%P",
+      "35631fef44a936cd31709a5974966f876d611bb3"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "499ecf789cfdfca8dad6079d5d9d30722fb3d3eb9fd5c00ba0657d1a9a7cf3ff",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%s",
+      "35631fef44a936cd31709a5974966f876d611bb3"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "dc304e0f207e0449ce7cd7c2d61a4d1fe490bce11c06c3a4f87861757716fad6",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff-tree",
+      "--no-commit-id",
+      "--name-status",
+      "-r",
+      "5703f4600b8047411d41ec758636cd546b0d811e"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "818415867f29785b242688c52cdb1d134729de94b44c9af7cde1e440f26d0555",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%P",
+      "5703f4600b8047411d41ec758636cd546b0d811e"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e24367ae633925b769fd6896f9487fc7b145273b1cd023b85e3722d18893d91c",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%s",
+      "5703f4600b8047411d41ec758636cd546b0d811e"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "571329608211e632552e6bcd98a02f840d847a573c61b274df7e37b347c6f429",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff-tree",
+      "--no-commit-id",
+      "--name-status",
+      "-r",
+      "b70b142c5b002c1033e47af1580b4802ba1a3845"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "dcc88e9219b2041dd9b8839c0bafaccdafc1c643a55495a10c78f37b63db4f0b",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%P",
+      "b70b142c5b002c1033e47af1580b4802ba1a3845"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "780996cfcd0d1ca710f0db0c5255871f6eb43b4ea033aec29e83485b42525e98",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%s",
+      "b70b142c5b002c1033e47af1580b4802ba1a3845"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "760de5afcd885412af8b97936251c63e1420bb4c2851075ee6ebbde6ee9396a5",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff-tree",
+      "--no-commit-id",
+      "--name-status",
+      "-r",
+      "d0cf54ed6d42aef6cedb266a55fcaa31f55268f5"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "0824e03452b89b7dba04d20c5c874c4f392ada569a2f15cc026d79815e8622ea",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%P",
+      "d0cf54ed6d42aef6cedb266a55fcaa31f55268f5"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "0f1b7ecc9052a53a79de8d4bffa042f96e259caf828ec33bcf2eddf9be10245d",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%s",
+      "d0cf54ed6d42aef6cedb266a55fcaa31f55268f5"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "9c0cd2eb5aec3c582bac8832962a1ba1f82fc97d7d5de42a7b24a48b97162306",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff-tree",
+      "--no-commit-id",
+      "--name-status",
+      "-r",
+      "9b9b39e58c2cbd968935c137e412bc2ec2ffa9f0"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "818415867f29785b242688c52cdb1d134729de94b44c9af7cde1e440f26d0555",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%P",
+      "9b9b39e58c2cbd968935c137e412bc2ec2ffa9f0"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "887379dd62ca7c8f0ea2681b807c2735474b6cfe9910e8b80f1f6e47bf4a9110",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%s",
+      "9b9b39e58c2cbd968935c137e412bc2ec2ffa9f0"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "d534faa5616e52aaa8c1e0287e0b9546c59981a0d03c2e8d45b414503021cc69",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff-tree",
+      "--no-commit-id",
+      "--name-status",
+      "-r",
+      "47663df81f7b59c97a5dc2ae022b31f36cd237ad"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "ab7b9ff2bcd251914b9325fab6a75886a23ed9e0617b749c53541d0932dd546d",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%P",
+      "47663df81f7b59c97a5dc2ae022b31f36cd237ad"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "25a7e4ea35b8bc469ea89ea8b09cefb4fd7268c97dbed6a475c364aaa317ec17",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%s",
+      "47663df81f7b59c97a5dc2ae022b31f36cd237ad"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "fa2cb2b3b4f6dc7587504bac165214328d22c819b36c09e41032d2f0880ccbc6",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff-tree",
+      "--no-commit-id",
+      "--name-status",
+      "-r",
+      "d7f3208893edc05a336d5d6ca3d5d9df9192be51"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "1ec28dddcaeb6b03f7b9205bd7365dcb41d55d66c19fb0c7f448b65747fe9697",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%P",
+      "d7f3208893edc05a336d5d6ca3d5d9df9192be51"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "1ce169e6ca16f7ef4dfedf30380fc01fd62f47b5834d7e217b9c7e101581f730",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%s",
+      "d7f3208893edc05a336d5d6ca3d5d9df9192be51"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "4de15b3fd208c489878ea7d638ce87f7ad3b22a1cc0631049a092c403f8141b8",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff-tree",
+      "--no-commit-id",
+      "--name-status",
+      "-r",
+      "4efbeca1cbf33d52c2bd950e1968db20abe322d5"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "6d6ed24686ad5df98b059d704886875c3de5c09b78ac29da37b09713150472a7",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%P",
+      "4efbeca1cbf33d52c2bd950e1968db20abe322d5"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "aa423c37d7a0a185d04701eb3bb10095324c7c9f3980b51b51a0c4d1a863219f",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%s",
+      "4efbeca1cbf33d52c2bd950e1968db20abe322d5"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e28294f7908f1c0a869d1406c5a9a9a5a95a7d50e71f44d48c545322db729027",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff-tree",
+      "--no-commit-id",
+      "--name-status",
+      "-r",
+      "1399364ad1367f3d1bfdee4d9901fdb33b48c15d"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "d39840b454fea4a2b4aef44515b565c2d84db0c9cb7a25154050805a113990c0",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%P",
+      "1399364ad1367f3d1bfdee4d9901fdb33b48c15d"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "0a23f383ac5425c04ebe6cbf2ed528718cf20682be4f0b29d39df649fd801dc6",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%s",
+      "1399364ad1367f3d1bfdee4d9901fdb33b48c15d"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "f92ae1442834efdc3f55cc1985513d53d8561eceea05a982d81574b6538df115",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff-tree",
+      "--no-commit-id",
+      "--name-status",
+      "-r",
+      "fbe822f2a43170fb34a4542880673ac7c2d2cc54"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "035043257c83697304eb7f581446e9a41e64cc05381e5782a99080cbe9078522",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%P",
+      "fbe822f2a43170fb34a4542880673ac7c2d2cc54"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "085f0b392e6ff91f039bd225ac5b51fb8d7d7ea03a00e0ab9c76ee49c1bb7c0e",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%s",
+      "fbe822f2a43170fb34a4542880673ac7c2d2cc54"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "2d7a80b27fe8b2a8820ea57bc3de395f439fa00ebf232214db5c2c1f2627cd7b",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff-tree",
+      "--no-commit-id",
+      "--name-status",
+      "-r",
+      "e9c51d75b19e75276a7517a721e1e45cc30fb8be"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "ec4bba27979fa82d8f86fb5c3476c79073b7dc99dc0f97db7b0dbd22e6a3021e",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%P",
+      "e9c51d75b19e75276a7517a721e1e45cc30fb8be"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "d9d18ecc6212ed953d03bb8430caea5b5ccc88dc2c8db51128b767048305afea",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%s",
+      "e9c51d75b19e75276a7517a721e1e45cc30fb8be"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "af329b2a6bbbdcc7d0e24dd7a05797d9d52fd3708e978e8174cf20b5111f90b7",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff-tree",
+      "--no-commit-id",
+      "--name-status",
+      "-r",
+      "48d53eee02eb3c545593b35dfca673b222c42eda"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "ae60105fddf69e3e4700a08ffe07186120cd5e5c83776c40f8b63910a1763630",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%P",
+      "48d53eee02eb3c545593b35dfca673b222c42eda"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "18695646334adfdb1f7558f3c6967120afea254e3c2dc4242b754370d4ac23c6",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%s",
+      "48d53eee02eb3c545593b35dfca673b222c42eda"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "85f3cde30e34ccbd259c1e112c8c0e1c9b003291fe2856bab4753f2192adb7b0",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff-tree",
+      "--no-commit-id",
+      "--name-status",
+      "-r",
+      "954a2b8e8eab6bc709139eda4921633e5931958c"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "427820b5a0a06b6ea884be9ccccfb2d97cdb7f91c59a9bb709d173fa655e3904",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%P",
+      "954a2b8e8eab6bc709139eda4921633e5931958c"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "95dfeb71db187292d17aa4a12d3de231bac598d2c82e4777e267d081af8f3641",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%s",
+      "954a2b8e8eab6bc709139eda4921633e5931958c"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "d60aa45cf86ab031a5878df48f08b011c7870282e193ec53b9cf63e5d1d9687f",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff-tree",
+      "--no-commit-id",
+      "--name-status",
+      "-r",
+      "48be53e807cab22622ea31c6b39d6cb8805e9771"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "ee2540c7657a70358836e9ec4c4e76e38992bbbc33697215e6f9a8cffe3ed590",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%P",
+      "48be53e807cab22622ea31c6b39d6cb8805e9771"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "3104a1e810664e62c53aa450a5a0236b09d9d99b67275f2f0517c2f6783b0102",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%s",
+      "48be53e807cab22622ea31c6b39d6cb8805e9771"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "99752804f0c62faeb6b5b604ce5262252109e964d2085f84f73305b61d9cbf0b",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff-tree",
+      "--no-commit-id",
+      "--name-status",
+      "-r",
+      "53c34a28ba3c6b0a2050219038412a42e59ddc9b"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "ce4172e4ba30f9ddafd302f14f48661e72068231e8f7a78ff5b17e45d218c731",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%P",
+      "53c34a28ba3c6b0a2050219038412a42e59ddc9b"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "172dae0045a62713f1686549099fe3abb564c1930c037a383c12d9dd63b24fb9",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%s",
+      "53c34a28ba3c6b0a2050219038412a42e59ddc9b"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "f1e17b648fa75476f8f0e379ff5167c6b633d3bff9183829946473d570fbc321",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff-tree",
+      "--no-commit-id",
+      "--name-status",
+      "-r",
+      "7da6363d1a891cba11318f9c9bd883033e65f1cb"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "029c11ead7eee5e1cb6cf7866a98475a0509ee00ff45dd023ffdc7c278abd2f6",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%P",
+      "7da6363d1a891cba11318f9c9bd883033e65f1cb"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "f9b6b3de7219e36dd8a86733a2e1bf934a5516f745ccdcc04b4397df60154e56",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%s",
+      "7da6363d1a891cba11318f9c9bd883033e65f1cb"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e4666bef3910b950f457009e8942d8a4a14716eafc39ce06fd40b0cbba92a411",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff-tree",
+      "--no-commit-id",
+      "--name-status",
+      "-r",
+      "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "a5a2f7dbf705918a153f7c34f56dc6dc0ee0ed073757722e38fc499b8e26f4f5",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%P",
+      "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "c2403948e97942dbdb7f6c08c5f5cb0b3e03a10ffc27e3c1269900a42376aad4",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "show",
+      "-s",
+      "--format=%s",
+      "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e979802961caf0bba74462e73003244e8fa4076d56834044c5dd235c14b614fc",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "diff",
+      "--name-status",
+      "d1a61daffe844475b07705797e3ad325cc3f2945",
+      "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "60fbb90932b72a684c4bb2f5f80fb6fda90358d31f2c31b63207e24cb083aee8",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "rev-parse",
+      "--verify",
+      "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea:AGENTS.md"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "00e97ec5253bf91fe65da3c4fd7f2e2d2a64140e1dcefe722542660126bd35e1",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "rev-parse",
+      "--verify",
+      "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea:PLANS.md"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "7e7e0f9eefc2a33a53cbc1f6a055b24fb1cdb712ebb23251a399d39090ac53ab",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "rev-parse",
+      "--verify",
+      "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea:docs/tasks/current-authorization.md"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "5669d38f0b1b550f544f5ddfe344fe99dbd0921fb2d5b5c0a6590b0e6101d89b",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "rev-parse",
+      "--verify",
+      "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea:docs/development/ai-development-efficiency.md"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "ae96fa67259b2388e50e9003ba4b5c09f9721f246ce7b5ff2b3e23da7ca86e2a",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "rev-parse",
+      "--verify",
+      "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea:docs/development/review-package-spec.md"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "521e09f14cec5c9cd6fd6cb09cdc44ed71080443a3134626e5961d6920d650d0",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "rev-parse",
+      "--verify",
+      "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea:docs/development/resource-lifecycle.md"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "2074c8e9e5c15c8b6a27af77c1cd68fb1a72bd19fcf36eca0104dd27e261cd77",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "rev-parse",
+      "--verify",
+      "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea:docs/development/local-validation-policy.md"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "1549f7b8e0f350ad0c6b7bffdf978ee9398766342ba45e75c799bf87b69217ae",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "rev-parse",
+      "--verify",
+      "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea:docs/bootstrap/ontology-platform-codex-master-plan-bootstrap-v1.0.md"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "d9ab7d5814747e41a8185c5d9c97845eb1c050e5e7f1b6499759769c66b348b1",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "rev-parse",
+      "--verify",
+      "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea:docs/planning/g4-implementation-plan.md"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e36aaaf63c7a565b7985eea3439ddc0398315cb812b6062c4600f43f513f540c",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "rev-parse",
+      "--verify",
+      "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea:docs/contracts/g4-00-connections.md"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "3c38cc9a981f83d4ecc8f4506ec6103bf09405f993c5bbfa195c5ad793340888",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "rev-parse",
+      "--verify",
+      "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea:docs/contracts/g4-00-mapping.md"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "1b689615b80d7567b22c9c5cf8b3b62d772d15cfb61eda0fc1a4e3253c01668d",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "rev-parse",
+      "--verify",
+      "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea:docs/contracts/g4-00-query.md"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e5682591fd72a60e353ae2433f32cea6e654f480f72fb6a2293c8f0bc85a3644",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "rev-parse",
+      "--verify",
+      "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea:docs/contracts/g4-00-ui.md"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "07add35ecdcc480125c681945fd68fa6952efdf21af89543f7c5adbb2e60a114",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "rev-parse",
+      "--verify",
+      "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea:docs/contracts/g4-m1-connections.md"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "41061cc31934f7375a8ecd7a4a14815a419557f4df5017875bc141fb52372dfc",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "rev-parse",
+      "--verify",
+      "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea:docs/tasks/G4-00-CONTRACT-001.md"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "de4a7ec13d50409224e506936c5a0601668365c2e2a5d2cb5892bf8e789426bc",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "rev-parse",
+      "--verify",
+      "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea:docs/tasks/G4-M1-CONNECTION-001.md"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "bf9fc4516aceb4dd821b1ca9776cfb3f821fc4264339d15ca3d3e8103a722200",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "rev-parse",
+      "--verify",
+      "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea:docs/tasks/G4-M1-RECOVERY-001.md"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "9e82ee6713adbe92c019e826403bcec30c1bb98595f42b2f7f928179b874d2a3",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "rev-parse",
+      "--verify",
+      "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea:docs/tasks/G4-M1-FINAL-GATES-001.md"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "7dd968b3e27f56829da8c342bc552e993d55ff64ad7b801924f491d3190bbf13",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "rev-parse",
+      "--verify",
+      "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea:docs/evidence/G4-00-CONTRACT-001/review-receipt.json"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "1ab7be86ebbc44a8360c41e5b0937802718e924c54e4ed3096687cd3ccd67c58",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "rev-parse",
+      "--verify",
+      "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea:docs/evidence/G4-M1-CONNECTION-001/authorization.md"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "bb1141e7d2c832847afb3ad4afed84abd2310a37551c4777325db9a8e857d808",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "rev-parse",
+      "--verify",
+      "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea:docs/evidence/G4-M1-CONNECTION-001/independent-component-review.md"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "ea5c5cab91205d6e07dda05bd0d0555a83e9b60c5c680c4a0c03ebf95e729e59",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "rev-parse",
+      "--verify",
+      "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea:docs/evidence/G4-M1-FINAL-GATES-001/authorization.md"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "736f59a32b441a2b3a0f9f19121d640a13af538f2555495024eb435482cfec55",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "rev-parse",
+      "--verify",
+      "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea:docs/evidence/G4-M1-FINAL-GATES-001/final-independent-review.md"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "fd3f489bffab87eb599c6c64c471b85498b77b8d6581338d51025d35520c92ab",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "rev-parse",
+      "--verify",
+      "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea:docs/evidence/G4-M1-RECOVERY-001/authorization.md"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "7b5e3f981b2958e22726dc1358ef702cb02e57a0a4d4816a79cdc7745ed1d43b",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "rev-parse",
+      "--verify",
+      "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea:docs/evidence/G4-M1-RECOVERY-001/r5-independent-review.md"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "68e90e27cc630322e18a87ddf954aef37d06aacef261da52e2ccc5e1302f31ce",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "--no-optional-locks",
+      "rev-parse",
+      "--verify",
+      "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea:docs/tasks/G4-00-CONTRACT-001.md"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "de4a7ec13d50409224e506936c5a0601668365c2e2a5d2cb5892bf8e789426bc",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+]

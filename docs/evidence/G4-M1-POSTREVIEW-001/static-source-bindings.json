@@ -1,0 +1,64 @@
+{
+  "sources": [
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/G4/G4Composition.cs",
+      "commit": "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea",
+      "blob": "eaf6d4711e1267ffd1a7f4d9d8777222d1b4c947",
+      "sha256": "89b5f2bba26d33832ead29c9469b5d95ff6c993c9d36256e52759fba8e5dc403"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/PlatformApiHost.cs",
+      "commit": "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea",
+      "blob": "17d2db6b1e927c5f4f322454f6bde2c3ee6b7cdc",
+      "sha256": "ffd2bca92c15d2a7075e7dbc8060c063e9ffc9b4fb4dd7ac0489521e57de3547"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/Program.cs",
+      "commit": "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea",
+      "blob": "48524869bc3ada225c9e2bd109da2d94bc02be47",
+      "sha256": "081fb9045d01289b356784ccee5ccdd35bfeab6058109c596883a3d25bb185ec"
+    },
+    {
+      "path": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Persistence/ConnectionsDbContext.cs",
+      "commit": "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea",
+      "blob": "ec673746cc6a13f3302dca02065ebbef71086acf",
+      "sha256": "03122925a4fb1e9b56950a9b3b619e041705f12b254c1605d56f4398bd611ba0"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/G4/G4ContractExport.cs",
+      "commit": "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea",
+      "blob": "717d71d590e3a000d9cd5f8fb495cfe855a5e76f",
+      "sha256": "e2285d8f3b5bb78a3d4be56e069fdc5b6ab0fc6228baa6e6bd337f00c97e0905"
+    },
+    {
+      "path": "backend/src/Hosts/OntologyPlatform.Api/G4/G4Endpoints.cs",
+      "commit": "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea",
+      "blob": "49ff450ea558b772855e1d1cb22dc412f14c6535",
+      "sha256": "71acb4fd4863b7c5d7c746806e7b2d884d43ad10bbad4023f847d46715991633"
+    }
+  ],
+  "configSearch": {
+    "command": [
+      "git",
+      "grep",
+      "-n",
+      "-e",
+      "G4:Enabled",
+      "-e",
+      "AllowEmptyPublicSchema",
+      "-e",
+      "ASPNETCORE_ENVIRONMENT",
+      "-e",
+      "DOTNET_ENVIRONMENT",
+      "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea",
+      "--",
+      "backend/src/Hosts",
+      "infra",
+      ".github",
+      "experiments",
+      "apps/web/scripts"
+    ],
+    "exitCode": 0,
+    "output": "d40e6ab67360cc46aadd7ec013bd514b3f61a6ea:backend/src/Hosts/OntologyPlatform.Api/G4/G4Composition.cs:18:        if (!builder.Configuration.GetValue<bool>(\"G4:Enabled\")) return;\nd40e6ab67360cc46aadd7ec013bd514b3f61a6ea:backend/src/Hosts/OntologyPlatform.Api/G4/G4Composition.cs:40:            AllowedSchemas = builder.Configuration.GetValue<bool>(\"G4:AllowEmptyPublicSchema\") ? [\"production\", \"public\"] : [\"production\"]\nd40e6ab67360cc46aadd7ec013bd514b3f61a6ea:backend/src/Hosts/OntologyPlatform.Api/G4/G4Composition.cs:54:        if (!app.Configuration.GetValue<bool>(\"G4:Enabled\") || !app.Configuration.GetValue<bool>(\"G4:ApplyMigrations\")) return;\nd40e6ab67360cc46aadd7ec013bd514b3f61a6ea:backend/src/Hosts/OntologyPlatform.Api/PlatformApiHost.cs:260:        if (app.Configuration.GetValue<bool>(\"G4:Enabled\")) app.MapG4Endpoints();\nd40e6ab67360cc46aadd7ec013bd514b3f61a6ea:experiments/g4-m1-final-gates/compose.r04.yaml:75:      ASPNETCORE_ENVIRONMENT: Development\nd40e6ab67360cc46aadd7ec013bd514b3f61a6ea:experiments/g4-m1-final-gates/compose.runtime.yaml:74:      ASPNETCORE_ENVIRONMENT: Development\nd40e6ab67360cc46aadd7ec013bd514b3f61a6ea:experiments/g4-m1-final-gates/r04_runtime.py:108:          'G4':{'Enabled':True,'ApplyMigrations':True,'KeyFile':'/private/api/g4-key','SourceCaPath':'/private/api/ca.crt','AllowEmptyPublicSchema':True},\nd40e6ab67360cc46aadd7ec013bd514b3f61a6ea:experiments/g4-m1-final-gates/runtime.py:108:          'G4':{'Enabled':True,'ApplyMigrations':True,'KeyFile':'/private/api/g4-key','SourceCaPath':'/private/api/ca.crt','AllowEmptyPublicSchema':True},\nd40e6ab67360cc46aadd7ec013bd514b3f61a6ea:experiments/g4-m1/compose.runtime.yaml:74:      ASPNETCORE_ENVIRONMENT: Development\n"
+  }
+}

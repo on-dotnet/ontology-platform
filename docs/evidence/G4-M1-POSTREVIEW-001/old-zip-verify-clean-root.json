@@ -1,0 +1,20 @@
+{
+  "command": [
+    "pwsh",
+    "-NoProfile",
+    "-File",
+    "scripts/create-review-package.ps1",
+    "-Root",
+    "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform",
+    "-VerifyOnly",
+    "-PackagePath",
+    "/Users/chasen/.codex/worktrees/g4-m1-final-gates-001/ontology-platform/artifacts/reviews/OntologyPlatform-Review-G4-M1-FINAL-GATES-001-d40e6ab67360.zip"
+  ],
+  "startedAtUtc": "2026-11-02T12:53:26.179241+00:00",
+  "endedAtUtc": "2026-11-02T12:53:53.352151+00:00",
+  "durationMs": 27173,
+  "exitCode": 0,
+  "scope": "ARCHIVE_INTEGRITY_ONLY_PRODUCT_NOT_RERUN",
+  "output": "{\"status\":\"PASS\",\"checks\":[\"reopen\",\"paths\",\"forbidden-members\",\"finite-secret-patterns\",\"complete-member-set\",\"member-sha256\",\"source-blob-and-head\",\"full-base-head-diff\"],\"memberCount\":899}",
+  "stderr": ""
+}
