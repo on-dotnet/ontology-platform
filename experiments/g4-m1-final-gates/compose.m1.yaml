@@ -1,0 +1,128 @@
+name: ontology-g4-m1-final-gates-001
+services:
+  pg-source:
+    image: postgres@sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437
+    platform: linux/arm64
+    pull_policy: never
+    mem_limit: 768m
+    cpus: 2
+    pids_limit: 128
+    read_only: true
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    cap_add: [CHOWN, SETUID, SETGID, DAC_OVERRIDE, FOWNER]
+    labels:
+      ontology.task-id: G4-M1-FINAL-GATES-001
+      ontology.run-id: ${G4_RUN_ID:?explicit task run required}
+      ontology.synthetic: "true"
+    environment:
+      POSTGRES_DB: fixture
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD_FILE: /var/lib/postgresql/postgres-password
+    entrypoint: [/bin/sh, -ec]
+    command:
+      - |
+        chown postgres:postgres /var/lib/postgresql
+        cp /run/secrets/postgres-password /var/lib/postgresql/postgres-password
+        cp /run/secrets/server.crt /var/lib/postgresql/server.crt
+        cp /run/secrets/server.key /var/lib/postgresql/server.key
+        cp /run/secrets/pg_hba.conf /var/lib/postgresql/pg_hba.conf
+        cp /run/secrets/init.sql /docker-entrypoint-initdb.d/10-fixture.sql
+        chown postgres:postgres /var/lib/postgresql/postgres-password /var/lib/postgresql/server.crt /var/lib/postgresql/server.key /var/lib/postgresql/pg_hba.conf /docker-entrypoint-initdb.d/10-fixture.sql
+        chmod 600 /var/lib/postgresql/postgres-password /var/lib/postgresql/server.crt /var/lib/postgresql/server.key /var/lib/postgresql/pg_hba.conf /docker-entrypoint-initdb.d/10-fixture.sql
+        exec /usr/local/bin/docker-entrypoint.sh postgres -c ssl=on -c ssl_cert_file=/var/lib/postgresql/server.crt -c ssl_key_file=/var/lib/postgresql/server.key -c hba_file=/var/lib/postgresql/pg_hba.conf -c log_statement=none -c log_min_error_statement=panic
+    volumes:
+      - source-data:/var/lib/postgresql
+      - type: bind
+        source: ${G4_PRIVATE_DIR:?explicit private task directory required}/postgres-password
+        target: /run/secrets/postgres-password
+        read_only: true
+      - type: bind
+        source: ${G4_PRIVATE_DIR:?explicit private task directory required}/init.sql
+        target: /run/secrets/init.sql
+        read_only: true
+      - type: bind
+        source: ${G4_PRIVATE_DIR:?explicit private task directory required}/pg_hba.conf
+        target: /run/secrets/pg_hba.conf
+        read_only: true
+      - type: bind
+        source: ${G4_PRIVATE_DIR:?explicit private task directory required}/${G4_CERTIFICATE_VARIANT:-server}.crt
+        target: /run/secrets/server.crt
+        read_only: true
+      - type: bind
+        source: ${G4_PRIVATE_DIR:?explicit private task directory required}/${G4_CERTIFICATE_VARIANT:-server}.key
+        target: /run/secrets/server.key
+        read_only: true
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+      - /var/run/postgresql:size=4m,mode=3775,uid=999,gid=999
+      - /docker-entrypoint-initdb.d:size=4m,mode=0755
+    networks: [source]
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U postgres -d fixture]
+      interval: 2s
+      timeout: 2s
+      retries: 15
+  pg-adapter-test:
+    image: mcr.microsoft.com/dotnet/aspnet@sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55
+    platform: linux/arm64
+    pull_policy: never
+    profiles: [pg-test]
+    user: "${G4_HOST_UID:?explicit host uid}:${G4_HOST_GID:?explicit host gid}"
+    mem_limit: 768m
+    cpus: 2
+    pids_limit: 128
+    read_only: true
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    labels:
+      ontology.task-id: G4-M1-FINAL-GATES-001
+      ontology.run-id: ${G4_RUN_ID:?explicit task run required}
+      ontology.synthetic: "true"
+    environment:
+      G4_PG_ADAPTER_TEST_INPUT: /run/secrets/adapter-input.json
+      DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+      DOTNET_EnableDiagnostics: "0"
+    working_dir: /tmp
+    command: [dotnet, /tests/OntologyPlatform.ConnectionsTests.dll, --filter, FullyQualifiedName~RealFixturePreservesAuthorizedMetadata, --minimum-expected-tests, "1", --results-directory, /tmp/TestResults, --no-ansi, --output, Detailed]
+    volumes:
+      - type: bind
+        source: ${G4_PRIVATE_DIR:?explicit private task directory required}/adapter-input.json
+        target: /run/secrets/adapter-input.json
+        read_only: true
+      - type: bind
+        source: ${G4_PRIVATE_DIR:?explicit private task directory required}/reader-password
+        target: /run/secrets/reader-password
+        read_only: true
+      - type: bind
+        source: ${G4_PRIVATE_DIR:?explicit private task directory required}/ca.crt
+        target: /run/secrets/ca.crt
+        read_only: true
+      - type: bind
+        source: ${G4_PRIVATE_DIR:?explicit private task directory required}/wrong-ca.crt
+        target: /run/secrets/wrong-ca.crt
+        read_only: true
+      - type: bind
+        source: ${G4_PG_TEST_OUTPUT:?explicit published test output required}
+        target: /tests
+        read_only: true
+    tmpfs:
+      - /tmp:size=32m,mode=1777
+    networks: [source]
+networks:
+  source:
+    internal: true
+    labels:
+      ontology.task-id: G4-M1-FINAL-GATES-001
+      ontology.run-id: ${G4_RUN_ID:?explicit task run required}
+volumes:
+  source-data:
+    driver: local
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+      o: size=512m,mode=0700
+    labels:
+      ontology.task-id: G4-M1-FINAL-GATES-001
+      ontology.run-id: ${G4_RUN_ID:?explicit task run required}
+      ontology.synthetic: "true"

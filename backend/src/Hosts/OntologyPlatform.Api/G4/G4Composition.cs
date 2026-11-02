@@ -34,7 +34,11 @@ public static class G4Composition
         });
         builder.Services.AddDbContextFactory<ConnectionsDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("governance"),
             database => database.MigrationsHistoryTable("__EFMigrationsHistory", "connections")));
-        builder.Services.AddSingleton(new PgAdapterOptions { RootCertificatePath = builder.Configuration["G4:SourceCaPath"] ?? string.Empty });
+        builder.Services.AddSingleton(new PgAdapterOptions
+        {
+            RootCertificatePath = builder.Configuration["G4:SourceCaPath"] ?? string.Empty,
+            AllowedSchemas = builder.Configuration.GetValue<bool>("G4:AllowEmptyPublicSchema") ? ["production", "public"] : ["production"]
+        });
         builder.Services.AddSingleton<IPgSourceAdapter, PgSourceAdapter>();
         builder.Services.AddSingleton(provider => new ConnectionSecretCipher(builder.Configuration["G4:KeyFile"] ?? string.Empty));
         builder.Services.AddSingleton<IConnectionSessionAuthority, G4SessionAuthority>();

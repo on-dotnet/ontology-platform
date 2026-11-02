@@ -1,0 +1,328 @@
+{
+  "taskId": "G4-M1-FINAL-GATES-001",
+  "status": "PASS",
+  "source": {
+    "containerId": "092dc2aaa1f0812da77239f71b6bb10ba200c5a3e61ae1f46af2228103d2be49",
+    "exitCode": 0,
+    "sqlSha256": "baa4b259afeb85a4354d387cfe78874b5304f60172a5afe6f2794f530c233d4e",
+    "result": {
+      "database": "fixture",
+      "readerExists": true,
+      "publicObjects": 0,
+      "publicUsage": true,
+      "publicCreate": false,
+      "productionSelect": true,
+      "databaseCreateTemp": false
+    }
+  },
+  "persistence": {
+    "containerId": "88dfb4a3086fb6b5f98263b02967dfa455c22b814e5f6ce5b4d5bd15fec289d7",
+    "exitCode": 0,
+    "sqlSha256": "6c514e6952dc51421a99064b78df9e79795a5f2dad7ad5e910c4554aec5d9767",
+    "result": {
+      "connection": {
+        "id": "c5e2f71031f34ff491929a8594051bc5",
+        "revision": 6,
+        "configHash": "79d5db8a35274eb2fd8897fee538874effe0640f7c392e952125157ebe9a329f",
+        "state": "DISABLED",
+        "lastProbeId": null,
+        "secretVersion": 1,
+        "config": {
+          "type": "POSTGRESQL",
+          "profile": {
+            "host": "pg-source",
+            "port": 5432,
+            "database": "fixture",
+            "username": "fixture_reader",
+            "sslMode": "VerifyFull",
+            "allowedSchemas": [
+              "production"
+            ]
+          }
+        }
+      },
+      "probes": [
+        {
+          "id": "92c9f960965f4231adcf36c97bd68bed",
+          "revision": 1,
+          "configHash": "79d5db8a35274eb2fd8897fee538874effe0640f7c392e952125157ebe9a329f",
+          "secretVersion": 1,
+          "report": {
+            "probeId": "92c9f960965f4231adcf36c97bd68bed",
+            "connectionId": "c5e2f71031f34ff491929a8594051bc5",
+            "configHash": "79d5db8a35274eb2fd8897fee538874effe0640f7c392e952125157ebe9a329f",
+            "secretVersion": 1,
+            "scope": {
+              "organizationId": "org-demo",
+              "siteIds": [
+                "site-a"
+              ]
+            },
+            "status": "TEST_OK",
+            "stages": [
+              {
+                "name": "NETWORK",
+                "status": "PASS",
+                "durationMs": 0,
+                "diagnosticCode": null
+              },
+              {
+                "name": "TLS",
+                "status": "PASS",
+                "durationMs": 2,
+                "diagnosticCode": null
+              },
+              {
+                "name": "AUTH",
+                "status": "PASS",
+                "durationMs": 3,
+                "diagnosticCode": null
+              },
+              {
+                "name": "READ_ONLY",
+                "status": "PASS",
+                "durationMs": 2,
+                "diagnosticCode": null
+              },
+              {
+                "name": "METADATA",
+                "status": "PASS",
+                "durationMs": 1,
+                "diagnosticCode": null
+              }
+            ],
+            "startedAtUtc": "2026-11-02T00:01:20.1562564+00:00",
+            "completedAtUtc": "2026-11-02T00:01:20.1699731+00:00",
+            "expiresAtUtc": "2026-11-02T00:11:20.1562564+00:00",
+            "traceId": "60058437d6e3f665bd2c68414cdf7c38",
+            "stale": false
+          }
+        },
+        {
+          "id": "0a515a4b347d4c03b3ac73376b17c783",
+          "revision": 5,
+          "configHash": "79d5db8a35274eb2fd8897fee538874effe0640f7c392e952125157ebe9a329f",
+          "secretVersion": 1,
+          "report": {
+            "probeId": "0a515a4b347d4c03b3ac73376b17c783",
+            "connectionId": "c5e2f71031f34ff491929a8594051bc5",
+            "configHash": "79d5db8a35274eb2fd8897fee538874effe0640f7c392e952125157ebe9a329f",
+            "secretVersion": 1,
+            "scope": {
+              "organizationId": "org-demo",
+              "siteIds": [
+                "site-a"
+              ]
+            },
+            "status": "TEST_OK",
+            "stages": [
+              {
+                "name": "NETWORK",
+                "status": "PASS",
+                "durationMs": 0,
+                "diagnosticCode": null
+              },
+              {
+                "name": "TLS",
+                "status": "PASS",
+                "durationMs": 1,
+                "diagnosticCode": null
+              },
+              {
+                "name": "AUTH",
+                "status": "PASS",
+                "durationMs": 3,
+                "diagnosticCode": null
+              },
+              {
+                "name": "READ_ONLY",
+                "status": "PASS",
+                "durationMs": 2,
+                "diagnosticCode": null
+              },
+              {
+                "name": "METADATA",
+                "status": "PASS",
+                "durationMs": 0,
+                "diagnosticCode": null
+              }
+            ],
+            "startedAtUtc": "2026-11-02T00:01:22.2877705+00:00",
+            "completedAtUtc": "2026-11-02T00:01:22.2983246+00:00",
+            "expiresAtUtc": "2026-11-02T00:11:22.2877705+00:00",
+            "traceId": "c1bfe7e8d63856f12ba37b12f1d139a4",
+            "stale": false
+          }
+        },
+        {
+          "id": "f2fb3c8c7d7c4eb889810fce6bfbcf0b",
+          "revision": 3,
+          "configHash": "767b4bc7c7bb30fe09c9f1eb5d35293024e84c1e5b15a1b6f35e3f1d531f2905",
+          "secretVersion": 1,
+          "report": {
+            "probeId": "f2fb3c8c7d7c4eb889810fce6bfbcf0b",
+            "connectionId": "c5e2f71031f34ff491929a8594051bc5",
+            "configHash": "767b4bc7c7bb30fe09c9f1eb5d35293024e84c1e5b15a1b6f35e3f1d531f2905",
+            "secretVersion": 1,
+            "scope": {
+              "organizationId": "org-demo",
+              "siteIds": [
+                "site-a"
+              ]
+            },
+            "status": "TEST_OK",
+            "stages": [
+              {
+                "name": "NETWORK",
+                "status": "PASS",
+                "durationMs": 0,
+                "diagnosticCode": null
+              },
+              {
+                "name": "TLS",
+                "status": "PASS",
+                "durationMs": 1,
+                "diagnosticCode": null
+              },
+              {
+                "name": "AUTH",
+                "status": "PASS",
+                "durationMs": 2,
+                "diagnosticCode": null
+              },
+              {
+                "name": "READ_ONLY",
+                "status": "PASS",
+                "durationMs": 2,
+                "diagnosticCode": null
+              },
+              {
+                "name": "METADATA",
+                "status": "PASS",
+                "durationMs": 1,
+                "diagnosticCode": null
+              }
+            ],
+            "startedAtUtc": "2026-11-02T00:01:20.6299238+00:00",
+            "completedAtUtc": "2026-11-02T00:01:20.6410165+00:00",
+            "expiresAtUtc": "2026-11-02T00:11:20.6299238+00:00",
+            "traceId": "3c5662a951b364ca3232a32b0afd4a6f",
+            "stale": false
+          }
+        }
+      ],
+      "audits": [
+        {
+          "action": "connection.create",
+          "outcome": "allowed",
+          "traceId": "a4aa0d74c8704097f9ce73135edaaac1"
+        },
+        {
+          "action": "connection.probe.start",
+          "outcome": "allowed",
+          "traceId": "60058437d6e3f665bd2c68414cdf7c38"
+        },
+        {
+          "action": "connection.probe.complete",
+          "outcome": "allowed",
+          "traceId": "60058437d6e3f665bd2c68414cdf7c38"
+        },
+        {
+          "action": "connection.update",
+          "outcome": "allowed",
+          "traceId": "2992b82aba5dd687053692fb2d41038a"
+        },
+        {
+          "action": "connection.update",
+          "outcome": "allowed",
+          "traceId": "e6c55eab3ecb3ca73597ba3dff471cd8"
+        },
+        {
+          "action": "connection.probe.start",
+          "outcome": "allowed",
+          "traceId": "3c5662a951b364ca3232a32b0afd4a6f"
+        },
+        {
+          "action": "connection.probe.complete",
+          "outcome": "allowed",
+          "traceId": "3c5662a951b364ca3232a32b0afd4a6f"
+        },
+        {
+          "action": "connection.enable",
+          "outcome": "allowed",
+          "traceId": "b1da46dbe04228a7a2edb9432b216075"
+        },
+        {
+          "action": "connection.catalog.start",
+          "outcome": "allowed",
+          "traceId": "6d43a8bc29750c1515d082f184b38fe5"
+        },
+        {
+          "action": "connection.catalog.finish",
+          "outcome": "allowed",
+          "traceId": "6d43a8bc29750c1515d082f184b38fe5"
+        },
+        {
+          "action": "connection.update",
+          "outcome": "allowed",
+          "traceId": "7b192e6e0c43ce127dbb3d3938225292"
+        },
+        {
+          "action": "connection.probe.start",
+          "outcome": "allowed",
+          "traceId": "c1bfe7e8d63856f12ba37b12f1d139a4"
+        },
+        {
+          "action": "connection.probe.complete",
+          "outcome": "allowed",
+          "traceId": "c1bfe7e8d63856f12ba37b12f1d139a4"
+        },
+        {
+          "action": "connection.disable",
+          "outcome": "allowed",
+          "traceId": "582ea3f0fe793c4fe7536bb271bca3bf"
+        }
+      ]
+    }
+  },
+  "auditCounts": {
+    "connection.create": 1,
+    "connection.probe.start": 3,
+    "connection.probe.complete": 3,
+    "connection.update": 3,
+    "connection.enable": 1,
+    "connection.catalog.start": 1,
+    "connection.catalog.finish": 1,
+    "connection.disable": 1
+  },
+  "reportFlow": [
+    {
+      "stage": "A",
+      "revision": 1,
+      "etag": "\"1-79d5db8a35274eb2fd8897fee538874effe0640f7c392e952125157ebe9a329f\"",
+      "configHash": "79d5db8a35274eb2fd8897fee538874effe0640f7c392e952125157ebe9a329f",
+      "probeId": "92c9f960965f4231adcf36c97bd68bed",
+      "secretVersion": 1
+    },
+    {
+      "stage": "B",
+      "revision": 2,
+      "etag": "\"2-35e6f7bef6b4693c156943e877e5213e1a0ae1928572d7e7d2cb15dfa6353b53\"",
+      "configHash": "35e6f7bef6b4693c156943e877e5213e1a0ae1928572d7e7d2cb15dfa6353b53"
+    },
+    {
+      "stage": "B_reprobe",
+      "revision": 3,
+      "configHash": "767b4bc7c7bb30fe09c9f1eb5d35293024e84c1e5b15a1b6f35e3f1d531f2905",
+      "probeId": "f2fb3c8c7d7c4eb889810fce6bfbcf0b",
+      "secretVersion": 1
+    },
+    {
+      "stage": "return_A_reprobe",
+      "revision": 5,
+      "configHash": "79d5db8a35274eb2fd8897fee538874effe0640f7c392e952125157ebe9a329f",
+      "probeId": "0a515a4b347d4c03b3ac73376b17c783",
+      "secretVersion": 1
+    }
+  ]
+}

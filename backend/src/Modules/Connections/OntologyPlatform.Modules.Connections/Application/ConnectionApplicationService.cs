@@ -25,12 +25,15 @@ public sealed partial class ConnectionApplicationService : IConnectionRequestHan
     /// <summary>后台任务实时身份重验。</summary>
     private readonly IConnectionSessionAuthority authority;
 
+    /// <summary>服务器明确批准的空public合成例外，默认关闭。</summary>
+    private readonly bool allowEmptyPublic;
+
     /// <summary>统一可测试UTC时钟。</summary>
     private readonly TimeProvider clock;
 
     /// <summary>依赖均由Master组合，不跨模块写治理表。</summary>
     public ConnectionApplicationService(IDbContextFactory<ConnectionsDbContext> factory, ITransactionalAuditWriter audit,
-        IPgSourceAdapter adapter, ConnectionSecretCipher cipher, IConnectionSessionAuthority authority, TimeProvider clock)
+        IPgSourceAdapter adapter, ConnectionSecretCipher cipher, IConnectionSessionAuthority authority, TimeProvider clock, PgAdapterOptions options)
     {
         this.factory = factory;
         this.audit = audit;
@@ -38,6 +41,14 @@ public sealed partial class ConnectionApplicationService : IConnectionRequestHan
         this.cipher = cipher;
         this.authority = authority;
         this.clock = clock;
+        // 同步复制服务器上限；只有精确B显式允许空public，默认A不受后续数组修改影响。
+        var serverSchemas = options.AllowedSchemas?.ToArray();
+        allowEmptyPublic = serverSchemas switch
+        {
+            ["production"] => false,
+            ["production", "public"] => true,
+            _ => throw new PgSourceException("connection_network_forbidden")
+        };
     }
 
     /// <summary>执行固定操作并重新检查身份角色；未来传输不能绕过HTTP已做的字段规则。</summary>
@@ -94,13 +105,13 @@ public sealed partial class ConnectionApplicationService : IConnectionRequestHan
     }
 
     /// <summary>唯一受控PG运行子集，其他配置只能用于表单预览。</summary>
-    private static PgConnectionProfile Pg(ConnectionConfig config)
+    private PgConnectionProfile Pg(ConnectionConfig config)
     {
         G4ConnectionRules.Config(config);
         if (config is not PgConnectionConfig pg) throw new SemanticOperationException(422, "connector_not_enabled");
         if (pg.Profile.SslMode != "VerifyFull") throw new SemanticOperationException(422, "connection_tls_untrusted");
         if (pg.Profile.Host != "pg-source" || pg.Profile.Port != 5432 || pg.Profile.Database != "fixture"
-            || pg.Profile.Username != "fixture_reader" || pg.Profile.AllowedSchemas.Any(schema => schema != "production"))
+            || pg.Profile.Username != "fixture_reader" || (pg.Profile.AllowedSchemas is not ["production"] && !(allowEmptyPublic && pg.Profile.AllowedSchemas is ["production", "public"])))
             throw new SemanticOperationException(403, "connection_network_forbidden");
         return pg.Profile;
     }

@@ -22,6 +22,7 @@ public sealed class PgAdapterTests
     [DataRow("schema-sql", "catalog_access_forbidden")]
     [DataRow("schema-empty", "catalog_access_forbidden")]
     [DataRow("schema-null", "catalog_access_forbidden")]
+    [DataRow("schema-public", "catalog_access_forbidden")]
     [DataRow("schema-duplicate", "catalog_access_forbidden")]
     public async Task RejectsBypassedTargetPolicy(string mutation, string code)
     {
@@ -40,6 +41,7 @@ public sealed class PgAdapterTests
             "schema-sql" => Profile() with { AllowedSchemas = ["production; SELECT pg_sleep(10)"] },
             "schema-empty" => Profile() with { AllowedSchemas = [] },
             "schema-null" => Profile() with { AllowedSchemas = null! },
+            "schema-public" => Profile() with { AllowedSchemas = ["production", "public"] },
             _ => Profile() with { AllowedSchemas = ["production", "production"] }
         };
         // 两个入口都必须返回安全异常，原始输入不会出现在异常消息或InnerException。
@@ -48,6 +50,31 @@ public sealed class PgAdapterTests
         // 发现入口不能依赖曾经通过的Probe或HTTP校验。
         var discover = await Assert.ThrowsAsync<PgSourceException>(() => adapter.DiscoverAsync(profile, "synthetic-not-a-real-password", CancellationToken.None));
         AssertSafe(discover, code);
+    }
+
+    /// <summary>显式B服务器只允许精确A/B，且构造后修改原数组不能扩大权限。</summary>
+    [TestMethod]
+    public async Task ExplicitPublicPolicyIsBoundedAndFrozen()
+    {
+        // 服务器配置在构造时冻结，之后的外部数组变更不影响适配器。
+        string[] upper = ["production", "public"];
+        // 不存在的CA和预先取消使本测试只证明策略边界，不冒充真实源成功。
+        var adapter = new PgSourceAdapter(new PgAdapterOptions { RootCertificatePath = "/nonexistent/g4-fixture-ca.pem", AllowedSchemas = upper });
+        upper[1] = "maintenance";
+        // 先取消以确认合法B越过目标策略并保留未执行阶段。
+        using var cancellation = new CancellationTokenSource();
+        cancellation.Cancel();
+        // B必须进入网络阶段的取消，而不是被当作任意Schema拒绝。
+        var stages = await adapter.ProbeAsync(Profile() with { AllowedSchemas = ["production", "public"] }, "synthetic", cancellation.Token);
+        Assert.AreEqual("connection_cancelled", stages[0].DiagnosticCode);
+        Assert.IsTrue(stages.Skip(1).All(stage => stage.Status == "NOT_RUN"));
+        // 逐项覆盖反序、第三Schema、重复以及单独public均不能借B授权扩大。
+        string[][] rejected = [["public", "production"], ["production", "public", "maintenance"], ["production", "public", "public"], ["public"], ["production", "maintenance"]];
+        foreach (var schemas in rejected)
+        {
+            AssertSafe(await Assert.ThrowsAsync<PgSourceException>(() => adapter.ProbeAsync(Profile() with { AllowedSchemas = schemas }, "synthetic", cancellation.Token)), "catalog_access_forbidden");
+            AssertSafe(await Assert.ThrowsAsync<PgSourceException>(() => adapter.DiscoverAsync(Profile() with { AllowedSchemas = schemas }, "synthetic", cancellation.Token)), "catalog_access_forbidden");
+        }
     }
 
     /// <summary>服务器配置也不能把固定隔离目标扩展到外部主机、管理员或其它Schema。</summary>

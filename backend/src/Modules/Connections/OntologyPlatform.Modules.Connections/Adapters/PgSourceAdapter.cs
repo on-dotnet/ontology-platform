@@ -15,6 +15,9 @@ public sealed partial class PgSourceAdapter : IPgSourceAdapter
     /// <summary>服务器指定的信任根路径；构造时复制，避免调用方修改选项扩大目标。</summary>
     private readonly string rootCertificatePath;
 
+    /// <summary>构造时冻结服务器对空public的精确准入，调用方不能异步扩大。</summary>
+    private readonly bool allowEmptyPublic;
+
     /// <summary>固定阶段顺序，失败后续阶段保持未执行。</summary>
     private static readonly string[] StageNames = ["NETWORK", "TLS", "AUTH", "READ_ONLY", "METADATA"];
 
@@ -23,8 +26,7 @@ public sealed partial class PgSourceAdapter : IPgSourceAdapter
     public PgSourceAdapter(PgAdapterOptions options)
     {
         if (options.AllowedHost != "pg-source" || options.AllowedPort != 5432 ||
-            options.AllowedDatabase != "fixture" || options.AllowedUsername != "fixture_reader" ||
-            options.AllowedSchemas is not ["production"])
+            options.AllowedDatabase != "fixture" || options.AllowedUsername != "fixture_reader")
         {
             throw new PgSourceException("connection_network_forbidden");
         }
@@ -33,6 +35,14 @@ public sealed partial class PgSourceAdapter : IPgSourceAdapter
             throw new PgSourceException("connection_tls_untrusted");
         }
         rootCertificatePath = options.RootCertificatePath;
+        // 明确区分服务器声明上限与请求集合；默认A不能接受B。
+        var serverSchemas = options.AllowedSchemas?.ToArray();
+        allowEmptyPublic = serverSchemas switch
+        {
+            ["production"] => false,
+            ["production", "public"] => true,
+            _ => throw new PgSourceException("connection_network_forbidden")
+        };
     }
 
     /// <summary>独立实测五阶段，失败只返回固定诊断，绝不将后续未观测阶段标为通过。</summary>
@@ -42,6 +52,8 @@ public sealed partial class PgSourceAdapter : IPgSourceAdapter
     /// <returns>按固定顺序返回真实阶段结果。</returns>
     public async Task<ConnectionProbeStage[]> ProbeAsync(PgConnectionProfile profile, string secret, CancellationToken cancellationToken)
     {
+        // 在任何异步等待前复制数组；后续权限与目录查询只消费已验快照。
+        profile = profile with { AllowedSchemas = profile.AllowedSchemas?.ToArray()! };
         ValidateTarget(profile, secret);
         // 每次探测共享十秒总期限，阶段不能各自重复获得十秒。
         using var deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
@@ -71,7 +83,7 @@ public sealed partial class PgSourceAdapter : IPgSourceAdapter
             await using var transaction = await BeginReadOnlyAsync(connection, deadline.Token);
             await VerifyReadOnlyAsync(connection, transaction, deadline.Token);
             CompleteStage(stages, stage++, clock);
-            await ReadCatalogAsync(connection, transaction, deadline.Token);
+            await ReadCatalogAsync(connection, transaction, profile.AllowedSchemas, deadline.Token);
             CompleteStage(stages, stage, clock);
         }
         catch (Exception exception)
@@ -90,6 +102,8 @@ public sealed partial class PgSourceAdapter : IPgSourceAdapter
     /// <returns>最多一百对象、两千字段和二MiB的完整可见元数据。</returns>
     public async Task<CatalogObject[]> DiscoverAsync(PgConnectionProfile profile, string secret, CancellationToken cancellationToken)
     {
+        // 在任何异步等待前复制数组；后续权限与目录查询只消费已验快照。
+        profile = profile with { AllowedSchemas = profile.AllowedSchemas?.ToArray()! };
         ValidateTarget(profile, secret);
         // 发现总期限覆盖连接、只读核验和全部目录读取。
         using var deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
@@ -106,7 +120,7 @@ public sealed partial class PgSourceAdapter : IPgSourceAdapter
             await using var transaction = await BeginReadOnlyAsync(connection, deadline.Token);
             await VerifyReadOnlyAsync(connection, transaction, deadline.Token);
             stage = 4;
-            return await ReadCatalogAsync(connection, transaction, deadline.Token);
+            return await ReadCatalogAsync(connection, transaction, profile.AllowedSchemas, deadline.Token);
         }
         catch (Exception exception)
         {
@@ -117,7 +131,7 @@ public sealed partial class PgSourceAdapter : IPgSourceAdapter
     /// <summary>拒绝绕过HTTP规则层的目标、Schema和TLS输入。</summary>
     /// <param name="profile">待验证配置。</param>
     /// <param name="secret">内存凭据，仅检查是否存在及有界。</param>
-    private static void ValidateTarget(PgConnectionProfile profile, string secret)
+    private void ValidateTarget(PgConnectionProfile profile, string secret)
     {
         if (profile.Host != "pg-source" || profile.Port != 5432 || profile.Database != "fixture" || profile.Username != "fixture_reader")
         {
@@ -127,7 +141,7 @@ public sealed partial class PgSourceAdapter : IPgSourceAdapter
         {
             throw new PgSourceException("connection_tls_untrusted");
         }
-        if (profile.AllowedSchemas is not ["production"])
+        if (profile.AllowedSchemas is not ["production"] && !(allowEmptyPublic && profile.AllowedSchemas is ["production", "public"]))
         {
             throw new PgSourceException("catalog_access_forbidden");
         }
@@ -223,12 +237,25 @@ public sealed partial class PgSourceAdapter : IPgSourceAdapter
     /// <summary>以参数化Schema交集读取原生类型，不访问业务表行或用户函数。</summary>
     /// <param name="connection">受控连接。</param>
     /// <param name="transaction">只读事务。</param>
+    /// <param name="schemas">同步冻结并已通过精确策略校验的Schema集合。</param>
     /// <param name="cancellationToken">总期限与取消。</param>
     /// <returns>完整有界的可见对象集合。</returns>
-    private static async Task<CatalogObject[]> ReadCatalogAsync(NpgsqlConnection connection, NpgsqlTransaction transaction, CancellationToken cancellationToken)
+    private static async Task<CatalogObject[]> ReadCatalogAsync(NpgsqlConnection connection, NpgsqlTransaction transaction, string[] schemas, CancellationToken cancellationToken)
     {
-        // 独立固定数组避免调用方在异步等待期间修改profile数组扩大Schema交集。
-        string[] schemas = ["production"];
+        if (schemas.Length == 2)
+        {
+            // 系统目录验证public真实无对象，不能用无SELECT权限或空投影代替。
+            await using var emptyPublic = new NpgsqlCommand("""
+                SELECT EXISTS (SELECT 1 FROM pg_catalog.pg_namespace WHERE nspname = 'public')
+                    AND NOT EXISTS (SELECT 1 FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = 'public')
+                    AND NOT EXISTS (SELECT 1 FROM pg_catalog.pg_proc p JOIN pg_catalog.pg_namespace n ON n.oid = p.pronamespace WHERE n.nspname = 'public')
+                    AND NOT EXISTS (SELECT 1 FROM pg_catalog.pg_type t JOIN pg_catalog.pg_namespace n ON n.oid = t.typnamespace WHERE n.nspname = 'public')
+                """, connection, transaction);
+            if (await emptyPublic.ExecuteScalarAsync(cancellationToken) is not true)
+            {
+                throw new PgSourceException("catalog_access_forbidden");
+            }
+        }
         // Schema访问必须明确成立，不能用空目录推断源不存在。
         await using var access = new NpgsqlCommand("SELECT count(*) = cardinality(@schemas) FROM pg_catalog.pg_namespace WHERE nspname = ANY(@schemas) AND pg_catalog.has_schema_privilege(oid, 'USAGE')", connection, transaction);
         access.Parameters.AddWithValue("schemas", schemas);
