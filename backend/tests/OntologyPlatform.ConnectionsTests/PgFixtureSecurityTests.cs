@@ -225,7 +225,6 @@ public sealed class PgFixtureSecurityTests
             Port = 5432,
             Database = "fixture",
             Username = "fixture_reader",
-            Password = input.Secret,
             SslMode = SslMode.VerifyFull,
             RootCertificate = input.RootCertificate,
             Pooling = false,
@@ -236,6 +235,7 @@ public sealed class PgFixtureSecurityTests
             GssEncryptionMode = GssEncryptionMode.Disable,
             SearchPath = "pg_catalog"
         };
+        builder.Password = input.Secret;
         return new NpgsqlConnection(builder.ConnectionString);
     }
 
