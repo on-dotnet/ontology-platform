@@ -1,0 +1,21 @@
+$ErrorActionPreference = "Stop"
+$root = "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform"
+$path = "backend/tests/OntologyPlatform.ConnectionsTests/PgFixtureSecurityTests.cs"
+$a = [Microsoft.CodeAnalysis.CSharp.SyntaxFactory]::ParseCompilationUnit([IO.File]::ReadAllText("$root/$path"))
+$b = [Microsoft.CodeAnalysis.CSharp.SyntaxFactory]::ParseCompilationUnit([IO.File]::ReadAllText("$root/artifacts/g4-m1-main-integration-001/three-file-apply-20261103-01/isolated/$path"))
+$am = @($a.DescendantNodes() | Where-Object { $_.GetType().Name -eq "MethodDeclarationSyntax" -and $_.Identifier.ValueText -ceq "Connection" })
+$bm = @($b.DescendantNodes() | Where-Object { $_.GetType().Name -eq "MethodDeclarationSyntax" -and $_.Identifier.ValueText -ceq "Connection" })
+if ($am.Count -ne 1 -or $bm.Count -ne 1 -or $am[0].Body.Statements.Count -ne 2 -or $bm[0].Body.Statements.Count -ne 3) { throw "Unexpected method shape" }
+$av = $am[0].Body.Statements[0].Declaration.Variables[0]
+$bv = $bm[0].Body.Statements[0].Declaration.Variables[0]
+if ($av.Identifier.ValueText -cne "builder" -or $bv.Identifier.ValueText -cne "builder") { throw "Builder changed" }
+$aa = @($av.Initializer.Value.Initializer.Expressions)
+$ba = @($bv.Initializer.Value.Initializer.Expressions)
+$secret = @($aa | Where-Object { $_.Left.ToString() -ceq "Password" })
+$others = @($aa | Where-Object { $_.Left.ToString() -cne "Password" })
+if ($secret.Count -ne 1 -or $secret[0].Right.ToString() -cne "input.Secret" -or $others.Count -ne $ba.Count) { throw "Assignment source/count changed" }
+for ($i=0; $i -lt $others.Count; $i++) { if (-not $others[$i].IsEquivalentTo($ba[$i],$false)) { throw "Other option changed" } }
+$moved = $bm[0].Body.Statements[1].Expression
+if ($moved.Left.ToString() -cne "builder.Password" -or -not $moved.Right.IsEquivalentTo($secret[0].Right,$false)) { throw "Moved expression changed" }
+if (-not $am[0].Body.Statements[1].IsEquivalentTo($bm[0].Body.Statements[2],$false)) { throw "Connection creation changed" }
+[ordered]@{status="PASS_EXACT_BUILDER_RELOCATION"; originalAssignmentCount=1; movedAssignmentCount=1; otherOptionsEquivalent=$true; connectionCreationEquivalent=$true} | ConvertTo-Json -Compress

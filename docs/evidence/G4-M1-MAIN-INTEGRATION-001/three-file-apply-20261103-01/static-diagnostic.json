@@ -1,0 +1,22 @@
+{
+  "commandInputHashes": {},
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "three-file-apply-20261103-01",
+  "name": "static-diagnostic",
+  "command": [
+    "pwsh",
+    "-NoProfile",
+    "-Command",
+    ". ./scripts/verify.ps1 -Library; Test-Repository -RepositoryRoot (Get-Location).Path | ConvertTo-Json -Depth 5"
+  ],
+  "cwd": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform",
+  "head": "8753fb92fa0a3375c539f192525c85a5b2fee844",
+  "startedAtUtc": "2026-11-03T14:34:35.283435+00:00",
+  "endedAtUtc": "2026-11-03T14:34:40.014705+00:00",
+  "elapsedSeconds": 4.731222000031266,
+  "exitCode": 0,
+  "timingStatus": "OBSERVED",
+  "logSha256": "979b98228ad3760842b568125089a19b709c32662d6b901856e909364f18634a",
+  "driverSha256": "3912c71367240a4362b2fdb14fad92b8062991d8c9462b20593f9a86ba981fac",
+  "scope": "Exact three-file repair validation; not complete B product acceptance"
+}

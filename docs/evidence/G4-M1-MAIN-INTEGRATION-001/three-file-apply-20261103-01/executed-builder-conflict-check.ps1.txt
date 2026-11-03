@@ -1,0 +1,30 @@
+$ErrorActionPreference = 'Stop'
+$assembly = '/Users/chasen/.nuget/packages/npgsql/10.0.3/lib/net10.0/Npgsql.dll'
+Add-Type -Path '/Users/chasen/.nuget/packages/microsoft.extensions.logging.abstractions/10.0.13/lib/net10.0/Microsoft.Extensions.Logging.Abstractions.dll'
+Add-Type -Path $assembly
+$cases = @('ordinary', 'semi;quote"value', '中文测试', '', $null, 'x;Host=other;SslMode=Disable;Pooling=true;Password=clash')
+$results = @()
+foreach ($i in 0..($cases.Count - 1)) {
+    $builders = @()
+    foreach ($move in @($false, $true)) {
+        $b = [Npgsql.NpgsqlConnectionStringBuilder]::new()
+        $b.Host = 'pg-source'; $b.Port = 5432; $b.Database = 'fixture'; $b.Username = 'fixture_reader'
+        if (-not $move) { $b.Password = $cases[$i] }
+        $b.SslMode = [Npgsql.SslMode]::VerifyFull; $b.RootCertificate = '/synthetic/no-file-ca.pem'
+        $b.Pooling = $false; $b.Timeout = 3; $b.CommandTimeout = 3
+        $b.IncludeErrorDetail = $false; $b.LogParameters = $false
+        $b.GssEncryptionMode = [Npgsql.GssEncryptionMode]::Disable; $b.SearchPath = 'pg_catalog'
+        if ($move) { $b.Password = $cases[$i] }
+        $builders += $b
+    }
+    $keys = @($builders[0].Keys) + @($builders[1].Keys) | Sort-Object -Unique
+    foreach ($key in $keys) {
+        if ($builders[0][$key] -cne $builders[1][$key]) { throw "Effective setting mismatch, case $i" }
+    }
+    $a = [Npgsql.NpgsqlConnection]::new($builders[0].ConnectionString)
+    $b = [Npgsql.NpgsqlConnection]::new($builders[1].ConnectionString)
+    if ($a.State -ne 'Closed' -or $b.State -ne 'Closed') { throw 'Unexpected connection state' }
+    $results += [ordered]@{ caseId=$i; effectiveSettingsEqual=$true; connectionStringByteEqual=($builders[0].ConnectionString -ceq $builders[1].ConnectionString); beforeState=$a.State.ToString(); afterState=$b.State.ToString() }
+    $a.Dispose(); $b.Dispose()
+}
+[ordered]@{ scope='Synthetic local builder comparison only; no database, network or TLS connection'; assemblySha256=(Get-FileHash $assembly -Algorithm SHA256).Hash.ToLowerInvariant(); assemblyVersion=[Npgsql.NpgsqlConnection].Assembly.GetName().Version.ToString(); cases=$results } | ConvertTo-Json -Depth 8

@@ -1,0 +1,26 @@
+$ErrorActionPreference = 'Stop'
+$root = (Get-Location).Path
+$out = Join-Path $root 'artifacts/g4-m1-main-integration-001/three-file-apply-20261103-01'
+. ./scripts/verify.ps1 -Library
+. ./scripts/create-review-package.ps1 -Library
+$meta = Get-Content -Raw (Join-Path $out 'preflight-isolated.json') | ConvertFrom-Json
+foreach ($path in $meta.allowedPaths) { Assert-ReviewContent ([IO.File]::ReadAllBytes((Join-Path $root $path))) 'approved live source' }
+$fixture = Join-Path $out 'security-negative-fixture-v2'
+if (Test-Path $fixture) { throw 'Fixture already exists' }
+$null = New-Item -ItemType Directory $fixture
+foreach ($rel in @('package.json','apps/web/package.json','global.json','pnpm-workspace.yaml','.github/workflows/ci.yml')) {
+    $target = Join-Path $fixture $rel
+    $null = New-Item -ItemType Directory -Force (Split-Path $target -Parent)
+    [IO.File]::WriteAllBytes($target, [IO.File]::ReadAllBytes((Join-Path $root $rel)))
+}
+$synthetic = ('api' + '_key = "' + ('synthetic' * 5) + '"' + "`n")
+$probe = Join-Path $fixture 'probe.txt'
+[IO.File]::WriteAllText($probe, $synthetic)
+$results = @(Test-Repository -RepositoryRoot $fixture)
+$rejects = @($results | Where-Object { $_.Check -eq 'secret-patterns' -and $_.Status -eq 'FAIL' })
+if ($rejects.Count -ne 1) { throw 'Original root scanner did not reject synthetic literal' }
+$packageRejected = $false
+try { Assert-ReviewContent ([Text.Encoding]::UTF8.GetBytes($synthetic)) 'synthetic negative' }
+catch { if ($_.Exception.Message -notlike 'SECRET_PATTERN:*') { throw }; $packageRejected = $true }
+if (-not $packageRejected) { throw 'Original package scanner accepted synthetic literal' }
+[ordered]@{liveSourcePositive=3; originalRootScannerNegativeRejected=1; originalPackageScannerNegativeRejected=1; fixtureOtherMissingBaselineErrors='Expected in isolated negative fixture; not repository acceptance'; valuesLogged=$false; verifyScriptSha256=(Get-FileHash scripts/verify.ps1 -Algorithm SHA256).Hash.ToLowerInvariant(); packageScriptSha256=(Get-FileHash scripts/create-review-package.ps1 -Algorithm SHA256).Hash.ToLowerInvariant()} | ConvertTo-Json

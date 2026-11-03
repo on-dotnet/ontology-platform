@@ -1,0 +1,19 @@
+import datetime, hashlib, json, os, subprocess, sys, time
+from pathlib import Path
+root = Path(__file__).resolve().parents[3]
+out = Path(__file__).resolve().parent
+name, *command = sys.argv[1:]
+assert name and '/' not in name and not (out / (name + '.json')).exists()
+env = os.environ.copy()
+env.update(DOTNET_ROOT='/usr/local/share/dotnet', DOTNET_CLI_HOME=str(root / '.tools/dotnet-home'), NUGET_PACKAGES=str(root / '.tools/nuget'), DOTNET_CLI_TELEMETRY_OPTOUT='1', DOTNET_SKIP_FIRST_TIME_EXPERIENCE='1', DOTNET_CLI_WORKLOAD_UPDATE_NOTIFY_DISABLE='true', DOTNET_NOLOGO='1', PYTHONPATH=str(root / '.tools/pythonlibs'), PYTHONDONTWRITEBYTECODE='1')
+env['PATH'] = '/opt/homebrew/opt/node@24/bin:/usr/local/share/dotnet:' + env['PATH']
+inputs = {str(Path(x).resolve()): hashlib.sha256(Path(x).read_bytes()).hexdigest() for x in command if Path(x).is_file()}
+start = datetime.datetime.now(datetime.timezone.utc).isoformat(); tick = time.monotonic()
+r = subprocess.run(command, cwd=root, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+log = out / (name + '.txt'); log.write_bytes(r.stdout)
+assert all(hashlib.sha256(Path(x).read_bytes()).hexdigest() == h for x,h in inputs.items()), 'Executed input changed during command'
+row = dict(commandInputHashes=inputs, taskId='G4-M1-MAIN-INTEGRATION-001', runId=out.name, name=name, command=command, cwd=str(root), head=subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip(), startedAtUtc=start, endedAtUtc=datetime.datetime.now(datetime.timezone.utc).isoformat(), elapsedSeconds=time.monotonic()-tick, exitCode=r.returncode, timingStatus='OBSERVED', logSha256=hashlib.sha256(r.stdout).hexdigest(), driverSha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(), scope='Exact three-file repair validation; not complete B product acceptance')
+(out / (name + '.json')).write_text(json.dumps(row,indent=2)+'\n')
+print(json.dumps(dict(name=name,exitCode=r.returncode,elapsedSeconds=row['elapsedSeconds'],logSha256=row['logSha256'])))
+if r.returncode: print(r.stdout.decode(errors='replace')[-1800:])
+sys.exit(r.returncode)

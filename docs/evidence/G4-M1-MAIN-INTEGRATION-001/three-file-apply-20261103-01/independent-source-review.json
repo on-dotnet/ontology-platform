@@ -1,0 +1,84 @@
+{
+  "reviewer": "/root/scope_review",
+  "role": "Independent read-only nonauthor",
+  "authorizationSha256": "ed4bbf1b10ff175b5592bb2bcd3492ce46d43dd8d6a50381aa791f0ee0b75eb9",
+  "sourceHead": "8753fb92fa0a3375c539f192525c85a5b2fee844",
+  "patchSha256": "3443614b8dd4b7da720d5c08d781e18074d3cb06daac9cf612cc96fa60f62b20",
+  "patchBytes": 31032,
+  "files": 3,
+  "hunks": 13,
+  "before": "3/3",
+  "isolatedAfter": "3/3",
+  "liveAfter": "3/3",
+  "review": "PASS_FOR_EXACT_PATCH_APPLY_AND_EXACT_LIVE_SOURCE",
+  "migrationAst": {
+    "exitCode": 0,
+    "scriptSha256": "a504b02edfbe114dd1735cdfd35343ba88142a50ce83231daf2d61faf0a7dbdd",
+    "upDownAndDesignerIdentityPreserved": true,
+    "retainedTokenCounts": [
+      498,
+      1884
+    ]
+  },
+  "builderAst": {
+    "exitCode": 0,
+    "scriptSha256": "5f64fb98538d2804cdd662ac626ef5898c047dab2fcd56a3140ede71e002b19c",
+    "originalAssignmentCount": 1,
+    "movedAssignmentCount": 1,
+    "otherOptionsEquivalent": true,
+    "connectionCreationEquivalent": true
+  },
+  "syntheticBuilder": {
+    "cases": 6,
+    "settingsEquivalent": true,
+    "allConnectionsClosed": true,
+    "scope": "No PG/TLS runtime acceptance"
+  },
+  "evidenceArchive": "PASS_FOR_LOSSLESS_EVIDENCE_ARCHIVAL; original 8753 Git object and ignored raw log unchanged",
+  "replayNote": "AST scripts preserved as actually executed before live application. Reproduce against sourceHead 8753 snapshot and isolated approved After bytes, not already-patched live files.",
+  "noProductPassClaim": true,
+  "validationReview": {
+    "status": "PASS_LIMITED_EXACT_REPAIR_VALIDATION",
+    "archiveExactBytesVerified": true,
+    "formatExitCode": 0,
+    "buildExitCode": 0,
+    "compiledMigrations": 2,
+    "connections": {
+      "pass": 23,
+      "skip": 14
+    },
+    "semantic": {
+      "pass": 56,
+      "skip": 246
+    },
+    "hostTests": 4,
+    "timingLimitation": "format/build/affected tests ran before source commit with live exact After bytes; preserve observed old HEAD in receipts. New T source equivalence separately verified. SelfTest not yet concluded at this review."
+  },
+  "finalSelfTestReview": {
+    "exitCode": 0,
+    "suites": 27,
+    "rawLogSha256": "56d9074e36154352c077581e33d44dc931723ec858bbbc443c8da10ed69d1e42",
+    "packageTests": 103,
+    "packageFailures": 0
+  },
+  "cleanupReview": {
+    "status": "PASS_FOR_EXACT_48_CLOSEOUT",
+    "executorSha256": "473250ebeb1010e59124571502636bde4bfa9c21dd6bad6a606067f2f09daeb5",
+    "manifestSha256": "f13bd37ccbcebd8c05dd6c152f36f3d7639fbea64d81788d84254777b7add439",
+    "dryRunSha256": "25a558c0e3269b2cd47a21f1e3149255e26168ab353c271f2bcaa68c17f2cb83",
+    "targets": 48,
+    "files": 9708,
+    "logicalBytes": 2187081625
+  },
+  "finalEvidenceReview": {
+    "status": "PASS_FOR_PARTIAL_REPAIR_DELIVERY",
+    "indexedFilesVerified": 50,
+    "rawLogsReconstructed": 16,
+    "executedScriptsVerified": 10,
+    "unchangedSharedInputs": 7,
+    "schemaChecks": 18,
+    "actualRemovedTargets": 48,
+    "executionSourceUnchangedSinceT": true,
+    "packageVerifyOnly": "PENDING_SEPARATE_RECEIPT"
+  }
+}

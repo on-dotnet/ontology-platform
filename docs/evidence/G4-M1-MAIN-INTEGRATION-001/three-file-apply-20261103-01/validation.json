@@ -1,0 +1,170 @@
+{
+  "evidenceSchemaVersion": 2,
+  "checks": [
+    {
+      "name": "builder-conflict-check",
+      "status": "PASS",
+      "command": "pwsh -NoProfile -File artifacts/g4-m1-main-integration-001/three-file-apply-20261103-01/builder-conflict-check.ps1",
+      "exitCode": 0,
+      "output": "Actual exit0; raw output SHA 7934f63156421173baed6b22dae9503348f2666796b8cadbcc0d4a6d954a5857"
+    },
+    {
+      "name": "security-boundary-v2",
+      "status": "PASS",
+      "command": "pwsh -NoProfile -File artifacts/g4-m1-main-integration-001/three-file-apply-20261103-01/security-boundary-v2.ps1",
+      "exitCode": 0,
+      "output": "Actual exit0; raw output SHA 203ca76ecaaa85b55bd572a901e301990be568e03bea2e4e48db7a1abf56feae"
+    },
+    {
+      "name": "repository-static-after-archive",
+      "status": "PASS",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1",
+      "exitCode": 0,
+      "output": "Actual exit0; raw output SHA ab57c074818f1537f3a4349566a2df33490b7daac75f664c07b61ae2a43e4d62"
+    },
+    {
+      "name": "format",
+      "status": "PASS",
+      "command": "/usr/local/share/dotnet/dotnet format backend/OntologyPlatform.slnx --verify-no-changes --no-restore",
+      "exitCode": 0,
+      "output": "Actual exit0; raw output SHA fb25c53ec6ad8b6761b82a2fdbddfdacfd4dc86bcbc70e6292fda3bd54fcdbf4; precommit exact After source bytes equal T; original receipt HEAD remains 8753"
+    },
+    {
+      "name": "build",
+      "status": "PASS",
+      "command": "/usr/local/share/dotnet/dotnet build backend/OntologyPlatform.slnx --no-restore",
+      "exitCode": 0,
+      "output": "Actual exit0; raw output SHA 09ff14b6d2a0eff19ee5f5a34e70f78a7ac413f3760e9ab3bdd1aba60473b9a3; precommit exact After source bytes equal T; original receipt HEAD remains 8753"
+    },
+    {
+      "name": "compiled-migrations",
+      "status": "PASS",
+      "command": "pwsh -NoProfile -File artifacts/g4-m1-main-integration-001/three-file-apply-20261103-01/compiled-migrations.ps1",
+      "exitCode": 0,
+      "output": "Actual exit0; raw output SHA 44fb10a2a54092da38f753f8abc73ab7f85c829aaf82c02bcbc34c9489fa88be"
+    },
+    {
+      "name": "stable-selftest",
+      "status": "PASS",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1 -SelfTest",
+      "exitCode": 0,
+      "output": "Actual exit0; raw output SHA 56d9074e36154352c077581e33d44dc931723ec858bbbc443c8da10ed69d1e42; 27/27 suites completed on new T; not product/container acceptance"
+    },
+    {
+      "name": "host-tests",
+      "status": "PASS",
+      "command": "python3 -B experiments/g4-m1-main-integration/tests.py",
+      "exitCode": 0,
+      "output": "Actual exit0; raw output SHA 071cf75d71350855814fe915ae738b974421fd04e284bc2aa4333098a4c73345"
+    },
+    {
+      "name": "affected-native-tests",
+      "status": "PARTIAL",
+      "command": null,
+      "exitCode": null,
+      "output": "Two directly affected projects: 339 total, 79 passed, 260 fixture skips, 0 failed. Exact commands and per-case skips preserved; old four-project 90 skips not closed."
+    },
+    {
+      "name": "I01-complete",
+      "status": "PARTIAL",
+      "command": null,
+      "exitCode": null,
+      "output": "Three-file repair validation and full engineering SelfTest complete. Full Web/native fixture/consumer gate not completed in this scope."
+    },
+    {
+      "name": "I02",
+      "status": "NOT_RUN",
+      "command": null,
+      "exitCode": null,
+      "output": "No full B product gate executed; adapters remain incomplete DRAFT."
+    },
+    {
+      "name": "I03",
+      "status": "NOT_RUN",
+      "command": null,
+      "exitCode": null,
+      "output": "No full B product gate executed; adapters remain incomplete DRAFT."
+    },
+    {
+      "name": "I04",
+      "status": "NOT_RUN",
+      "command": null,
+      "exitCode": null,
+      "output": "No full B product gate executed; adapters remain incomplete DRAFT."
+    },
+    {
+      "name": "I05",
+      "status": "NOT_RUN",
+      "command": null,
+      "exitCode": null,
+      "output": "No full B product gate executed; adapters remain incomplete DRAFT."
+    },
+    {
+      "name": "I06",
+      "status": "NOT_RUN",
+      "command": null,
+      "exitCode": null,
+      "output": "No full B product gate executed; adapters remain incomplete DRAFT."
+    },
+    {
+      "name": "I07",
+      "status": "NOT_RUN",
+      "command": null,
+      "exitCode": null,
+      "output": "No full B product gate executed; adapters remain incomplete DRAFT."
+    },
+    {
+      "name": "I08-complete",
+      "status": "PARTIAL",
+      "command": null,
+      "exitCode": null,
+      "output": "This repair delivery only; unique new LOCAL PARTIAL V3 and reopen recorded in external receipt; not ready for main merge approval."
+    },
+    {
+      "name": "owned-resource-closeout",
+      "status": "PASS",
+      "command": "python3 -B /Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/three-file-apply-20261103-01/cleanup-owned-copies.py --apply --expected-dry-run-sha 25a558c0e3269b2cd47a21f1e3149255e26168ab353c271f2bcaa68c17f2cb83",
+      "exitCode": 0,
+      "output": "48 exact owned regenerable directories removed; every lstat ENOENT; 4474 tracked files unchanged; logical bytes 2187081625, physical freed not measured."
+    }
+  ],
+  "ci": {
+    "status": "NOT_RUN",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  },
+  "metadata": {
+    "taskId": "G4-M1-MAIN-INTEGRATION-001",
+    "actualAgentActiveTime": "UNKNOWN",
+    "status": "THREE_FILE_PATCH_VERIFIED_B_INCOMPLETE",
+    "sourceHead": "8753fb92fa0a3375c539f192525c85a5b2fee844",
+    "sourceCommit": "2b5af7b81fbd78143ea2a76c787bfc2fa402e30d",
+    "approvedMain": "d1a61daffe844475b07705797e3ad325cc3f2945",
+    "authorizationSha256": "ed4bbf1b10ff175b5592bb2bcd3492ce46d43dd8d6a50381aa791f0ee0b75eb9",
+    "patchSha256": "3443614b8dd4b7da720d5c08d781e18074d3cb06daac9cf612cc96fa60f62b20",
+    "sourcePaths": 3,
+    "phaseC": "NOT_AUTHORIZED_NOT_EXECUTED",
+    "m2": "NOT_AUTHORIZED_NOT_EXECUTED",
+    "windows": "NOT_RUN",
+    "intel": "NOT_RUN",
+    "supplyChain": "AMBER-A1/LICENSE_PARTIAL; full CVE/signature/license NOT_VERIFIED",
+    "historicalFailuresPreserved": true,
+    "hostSessionContinuity": "NOT_VERIFIED",
+    "executedEvidenceDriverHashes": {
+      "cleanup-owned-copies.py": "473250ebeb1010e59124571502636bde4bfa9c21dd6bad6a606067f2f09daeb5",
+      "builder-check.ps1": "feced879e7e6e6a19669ba423163683555adaeb4edef84f4052167327490ebdb",
+      "reviewer-migration-ast.txt": "a504b02edfbe114dd1735cdfd35343ba88142a50ce83231daf2d61faf0a7dbdd",
+      "builder-conflict-check.ps1": "d2b4752640a68993451eefc1595ef569cd263022d2ac8ad651468596a14d5a39",
+      "record-command.py": "aa358f77d422079212dcdc05801b564d1eb0c139e0145bdf50254c5249a6207b",
+      "security-boundary-v2.ps1": "80d9a35f19e8a5cc4925f7f4a1c582771c8dc136c6cd1d0fe9de13a4aa8dde81",
+      "reviewer-builder-ast.txt": "5f64fb98538d2804cdd662ac626ef5898c047dab2fcd56a3140ede71e002b19c",
+      "compiled-migrations.ps1": "9eaede1ab9dd0da846d9bdb34d76dff9807a5f9418790fb2b922624fd713cac2",
+      "record-command-v2.py": "3912c71367240a4362b2fdb14fad92b8062991d8c9462b20593f9a86ba981fac",
+      "security-boundary.ps1": "d4f63c11fd16be02192535b1fb9d3e020e7d799e5faad9fb13cc261a9ce46f6e"
+    }
+  },
+  "validationSource": "LOCAL",
+  "testedCommit": "8c7e43ab4f8f27d231d9d83b42c96ef17a1918fe"
+}

@@ -1,0 +1,1080 @@
+{
+  "scope": "Actual two directly affected project invocations; no fixture skips upgraded",
+  "groups": [
+    {
+      "project": "ConnectionsTests",
+      "actualSkippedCases": 14,
+      "reasons": {
+        "Assert.Inconclusive。 NOT_RUN: requires explicit current-task isolated PostgreSQL fixture input.": 1,
+        "Assert.Inconclusive。 NOT_RUN: requires explicit current-task isolated PostgreSQL input.": 11,
+        "Assert.Inconclusive。 NOT_RUN: explicit bounded public-schema fault required.": 1,
+        "Assert.Inconclusive。 NOT_RUN: requires explicit current-task wrong-SAN server configuration.": 1
+      },
+      "cases": [
+        {
+          "case": "RealFixturePreservesAuthorizedMetadata",
+          "reason": "Assert.Inconclusive。 NOT_RUN: requires explicit current-task isolated PostgreSQL fixture input."
+        },
+        {
+          "case": "VerifyFullAndAuthorizedSelectSucceed",
+          "reason": "Assert.Inconclusive。 NOT_RUN: requires explicit current-task isolated PostgreSQL input."
+        },
+        {
+          "case": "ExactPublicSchemaBoundaryUsesActualCatalog",
+          "reason": "Assert.Inconclusive。 NOT_RUN: explicit bounded public-schema fault required."
+        },
+        {
+          "case": "UntrustedRootIsRejectedBeforeAuthentication",
+          "reason": "Assert.Inconclusive。 NOT_RUN: requires explicit current-task isolated PostgreSQL input."
+        },
+        {
+          "case": "WrongPasswordIsRejectedAfterVerifiedTls",
+          "reason": "Assert.Inconclusive。 NOT_RUN: requires explicit current-task isolated PostgreSQL input."
+        },
+        {
+          "case": "SourceAclRejectsEveryUnapprovedOperation (\"insert\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: requires explicit current-task isolated PostgreSQL input."
+        },
+        {
+          "case": "SourceAclRejectsEveryUnapprovedOperation (\"update\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: requires explicit current-task isolated PostgreSQL input."
+        },
+        {
+          "case": "SourceAclRejectsEveryUnapprovedOperation (\"delete\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: requires explicit current-task isolated PostgreSQL input."
+        },
+        {
+          "case": "SourceAclRejectsEveryUnapprovedOperation (\"create-table\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: requires explicit current-task isolated PostgreSQL input."
+        },
+        {
+          "case": "SourceAclRejectsEveryUnapprovedOperation (\"create-schema\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: requires explicit current-task isolated PostgreSQL input."
+        },
+        {
+          "case": "SourceAclRejectsEveryUnapprovedOperation (\"temporary\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: requires explicit current-task isolated PostgreSQL input."
+        },
+        {
+          "case": "SourceAclRejectsEveryUnapprovedOperation (\"maintenance\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: requires explicit current-task isolated PostgreSQL input."
+        },
+        {
+          "case": "SourceAclRejectsEveryUnapprovedOperation (\"otherplant\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: requires explicit current-task isolated PostgreSQL input."
+        },
+        {
+          "case": "WrongServerNameIsRejectedBeforeAuthentication",
+          "reason": "Assert.Inconclusive。 NOT_RUN: requires explicit current-task wrong-SAN server configuration."
+        }
+      ],
+      "rawLogSha256": "c94a1291f0bfbf6969764482b805428f98c1b3cdfe347f7e9ddeed9e4e5ad798"
+    },
+    {
+      "project": "SemanticTests",
+      "actualSkippedCases": 246,
+      "reasons": {
+        "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。": 31,
+        "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。": 123,
+        "Assert.Inconclusive。 NOT_RUN: 缺少本轮隔离样例目录。": 1,
+        "Assert.Inconclusive。 NOT_RUN: 缺少隔离Jena。": 11,
+        "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。": 26,
+        "Assert.Inconclusive。 NOT_RUN: 需要隔离PG/Jena测试入口。": 7,
+        "NOT_RUN: requires real Jena fixture": 1,
+        "NOT_RUN: real PG/Jena required": 8,
+        "NOT_RUN: real PG/Jena fixture required": 9,
+        "NOT_RUN: requires real PG/Jena fixture": 24,
+        "NOT_RUN: real PG required": 1,
+        "Assert.Inconclusive。 NOT_RUN: 需要本轮隔离PG/RIOT服务。": 4
+      },
+      "cases": [
+        {
+          "case": "RenamePersistsThroughReopenListReplayAndStructuralEdit",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。"
+        },
+        {
+          "case": "RenameFailureAndNameBoundsLeaveCommittedNameUnchanged",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。"
+        },
+        {
+          "case": "SourceHistoryValidationAndPublicationBindingAreReal",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。"
+        },
+        {
+          "case": "UnicodeEditPersistsExactHistoryAndHonestSourceDiff",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。"
+        },
+        {
+          "case": "LeadingBomCreateSaveAndNoOpKeepExactSourceHistory",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。"
+        },
+        {
+          "case": "ConcurrentSaveHasOneWinnerAndNoLostUpdate",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。"
+        },
+        {
+          "case": "CommittedCreateAndSaveReplayWithoutJena",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。"
+        },
+        {
+          "case": "AuditFailureRollsBackEveryWrite",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。"
+        },
+        {
+          "case": "FullPlatformRolesAndWholeScopeAreEnforced",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。"
+        },
+        {
+          "case": "InvalidSourceAndStaleRevisionNeverPersist",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。"
+        },
+        {
+          "case": "CloneInheritsOnlyTheCatalogAssetAndExactScope",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。"
+        },
+        {
+          "case": "MigrationDownRefusesConcurrentAndNonemptyHistory",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。"
+        },
+        {
+          "case": "InitialOnlyDatabaseKeepsOriginalLockAndNonemptyDownGuards",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。"
+        },
+        {
+          "case": "ConcurrentIdempotencyHasOneCommit (False)",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。"
+        },
+        {
+          "case": "ConcurrentIdempotencyHasOneCommit (True)",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。"
+        },
+        {
+          "case": "G3MergedShaclDiagnosticNeverGuessesDataSource (\"ontology\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。"
+        },
+        {
+          "case": "G3MergedShaclDiagnosticNeverGuessesDataSource (\"vocabulary\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。"
+        },
+        {
+          "case": "G3MergedShaclDiagnosticNeverGuessesDataSource (\"data\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。"
+        },
+        {
+          "case": "G3MergedShaclDiagnosticNeverGuessesDataSource (\"ambiguous\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。"
+        },
+        {
+          "case": "G3SupportDiagnosticRetainsProvenSingleSourceHash (\"ontology\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。"
+        },
+        {
+          "case": "G3SupportDiagnosticRetainsProvenSingleSourceHash (\"vocabulary\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。"
+        },
+        {
+          "case": "G3SupportDiagnosticRetainsProvenSingleSourceHash (\"data\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。"
+        },
+        {
+          "case": "G3AssessmentPersistsReplaysAndReauthorizesWholeScope",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。"
+        },
+        {
+          "case": "G3AssessmentLockRejectsInvalidPersistentFacts (\"expired\",\"assessment_expired\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。"
+        },
+        {
+          "case": "G3AssessmentLockRejectsInvalidPersistentFacts (\"profile\",\"assessment_binding_conflict\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。"
+        },
+        {
+          "case": "G3AssessmentLockRejectsInvalidPersistentFacts (\"tampered\",\"assessment_binding_conflict\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。"
+        },
+        {
+          "case": "G3AssessmentLockRejectsInvalidPersistentFacts (\"legacy\",\"assessment_required\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。"
+        },
+        {
+          "case": "G3AssessmentLockRejectsInvalidPersistentFacts (\"ineligible\",\"assessment_not_eligible\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。"
+        },
+        {
+          "case": "G3FourSourceBytesAndFixedRevisionComparisonRemainExact",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。"
+        },
+        {
+          "case": "M2NamedEditAssessmentAndFailurePreserveCommittedSources",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。"
+        },
+        {
+          "case": "M2BasicModelingSequencePersistsEachRevisionAndKeepsOtherSourcesExact",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。"
+        },
+        {
+          "case": "RenamedBlankNodesCompareExactlyAndNearMissIsDifferent",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "TwentyCorpusRowsUseAssertedOnlySupportAndShapesBlankException",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 缺少本轮隔离样例目录。"
+        },
+        {
+          "case": "ComparisonBudgetOrCancellationRevokesAllPartialResults (\"blank_node_budget\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "ComparisonBudgetOrCancellationRevokesAllPartialResults (\"comparison_cancelled\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "ComparisonBudgetOrCancellationRevokesAllPartialResults (\"comparison_timeout\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 缺少隔离Jena。"
+        },
+        {
+          "case": "ComparisonPreservesAbsentBytesAndRejectsInvalidOrOversizedBundles",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "UndeclaredCustomFactsRequireAnExplicitPropertyOrAnnotation",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "CancellationDuringRiotParsingAndExact128BlankBoundary",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 缺少隔离Jena。"
+        },
+        {
+          "case": "ParsingAcrossAllFourSourcesSharesOneFiveSecondBudget",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 缺少隔离Jena。"
+        },
+        {
+          "case": "SymmetricNonIsomorphicGraphsExhaustTheSharedSearchBudget",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "NamedAxiomEditPreservesOtherSourcesAndRequiresBothDeclarations (\"equivalentClass\",\"Class\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "NamedAxiomEditPreservesOtherSourcesAndRequiresBothDeclarations (\"disjointWith\",\"Class\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "NamedAxiomEditPreservesOtherSourcesAndRequiresBothDeclarations (\"inverseOf\",\"ObjectProperty\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "InvalidMetadataFailsBeforeAnyNoOpOrSerialization (\"iri-language\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "InvalidMetadataFailsBeforeAnyNoOpOrSerialization (\"iri-datatype\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "InvalidMetadataFailsBeforeAnyNoOpOrSerialization (\"literal-conflict\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "InvalidMetadataFailsBeforeAnyNoOpOrSerialization (\"langString-without-language\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "RiotLanguageTermCanBeCopiedAndDeletedPrecisely",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "EquivalentLiteralRepresentationsPreserveExactSourceBytes (\"language-datatype\",False)",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "EquivalentLiteralRepresentationsPreserveExactSourceBytes (\"language-datatype\",True)",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "EquivalentLiteralRepresentationsPreserveExactSourceBytes (\"plain-string\",False)",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "EquivalentLiteralRepresentationsPreserveExactSourceBytes (\"plain-string\",True)",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "EquivalentLiteralRepresentationsPreserveExactSourceBytes (\"language-case\",False)",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "EquivalentLiteralRepresentationsPreserveExactSourceBytes (\"language-case\",True)",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "SkosPolicyReturnsExactSourceDiagnostic (\"s14\",\"skos_pref_label_conflict\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "SkosPolicyReturnsExactSourceDiagnostic (\"s13\",\"skos_label_relation_conflict\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "SkosPolicyReturnsExactSourceDiagnostic (\"no-language\",\"skos_label_language_required\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "SkosPolicyReturnsExactSourceDiagnostic (\"unknown-language\",\"language_policy_unknown\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "SkosPolicyReturnsExactSourceDiagnostic (\"invalid-term\",\"skos_label_term_invalid\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "SkosPolicyReturnsExactSourceDiagnostic (\"missing-scheme\",\"skos_scheme_reference_missing\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "SkosPolicyReturnsExactSourceDiagnostic (\"missing-concept\",\"skos_concept_reference_missing\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "SkosPolicyReturnsExactSourceDiagnostic (\"cycle\",\"skos_hierarchy_cycle\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "SkosPolicyReturnsExactSourceDiagnostic (\"related\",\"skos_related_hierarchy_conflict\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "SkosPolicyReturnsExactSourceDiagnostic (\"notation\",\"skos_notation_duplicate\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "SkosPolicyReturnsExactSourceDiagnostic (\"mapping-scheme\",\"skos_mapping_scheme_conflict\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "SkosPolicyReturnsExactSourceDiagnostic (\"s46\",\"skos_mapping_relation_conflict\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "SkosPolicyReturnsExactSourceDiagnostic (\"deprecated\",\"semantic_reference_deprecated\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "LanguageTagSubtagsRespectBcp47Uniqueness (\"en-u-ca-gregory-u-nu-latn\",False)",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "LanguageTagSubtagsRespectBcp47Uniqueness (\"en-1901-1901\",False)",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "LanguageTagSubtagsRespectBcp47Uniqueness (\"en-a-bbb-x-a-ccc\",True)",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "ValidMultilingualAndCrossSchemeMappingHaveNoDiagnostics",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "CrossSourceDuplicateFocusUsesBundleHash",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "DirectV3EntrypointsCannotBypassGovernance (\"skos\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "DirectV3EntrypointsCannotBypassGovernance (\"precision\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。"
+        },
+        {
+          "case": "DirectV3EntrypointsCannotBypassGovernance (\"dimension\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。"
+        },
+        {
+          "case": "DirectV3EntrypointsCannotBypassGovernance (\"deprecated-canonical\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。"
+        },
+        {
+          "case": "ExactLegacyM2ProfileKeepsHistoricalPolicy",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "AtomicVocabularyBatchUsesExistingRevisionAndAuditTransaction",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要隔离PG/Jena测试入口。"
+        },
+        {
+          "case": "GovernanceIsIndependentOfRealShaclReport",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要隔离PG/Jena测试入口。"
+        },
+        {
+          "case": "DuplicateLanguageTagSubtagsBlockAssessmentPublication",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要隔离PG/Jena测试入口。"
+        },
+        {
+          "case": "UnitGovernanceBindsRealAssessment (\"valid\",Pass)",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要隔离PG/Jena测试入口。"
+        },
+        {
+          "case": "UnitGovernanceBindsRealAssessment (\"unknown\",Indeterminate)",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要隔离PG/Jena测试入口。"
+        },
+        {
+          "case": "UnitGovernanceBindsRealAssessment (\"mismatch\",Fail)",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要隔离PG/Jena测试入口。"
+        },
+        {
+          "case": "UnitGovernanceBindsRealAssessment (\"deprecated-canonical\",Fail)",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要隔离PG/Jena测试入口。"
+        },
+        {
+          "case": "CompleteSyntheticUnitsAndOrdinaryPropertyAreValid",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "UnitFailuresHaveExactSourceDiagnostics (\"version\",\"unit_version_reference_missing\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。"
+        },
+        {
+          "case": "UnitFailuresHaveExactSourceDiagnostics (\"duplicate\",\"unit_definition_conflict\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。"
+        },
+        {
+          "case": "UnitFailuresHaveExactSourceDiagnostics (\"quantity\",\"quantity_kind_reference_missing\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。"
+        },
+        {
+          "case": "UnitFailuresHaveExactSourceDiagnostics (\"dimension\",\"dimension_reference_missing\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。"
+        },
+        {
+          "case": "UnitFailuresHaveExactSourceDiagnostics (\"exponent\",\"dimension_definition_invalid\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。"
+        },
+        {
+          "case": "UnitFailuresHaveExactSourceDiagnostics (\"exponent-range\",\"dimension_definition_invalid\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。"
+        },
+        {
+          "case": "UnitFailuresHaveExactSourceDiagnostics (\"exponent-type\",\"dimension_definition_invalid\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。"
+        },
+        {
+          "case": "UnitFailuresHaveExactSourceDiagnostics (\"source\",\"unit_source_required\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。"
+        },
+        {
+          "case": "UnitFailuresHaveExactSourceDiagnostics (\"source-duplicate\",\"unit_source_required\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。"
+        },
+        {
+          "case": "UnitFailuresHaveExactSourceDiagnostics (\"source-label\",\"unit_source_required\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。"
+        },
+        {
+          "case": "UnitFailuresHaveExactSourceDiagnostics (\"precision\",\"unit_precision_unknown\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。"
+        },
+        {
+          "case": "UnitFailuresHaveExactSourceDiagnostics (\"property-missing\",\"property_unit_binding_invalid\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。"
+        },
+        {
+          "case": "UnitFailuresHaveExactSourceDiagnostics (\"property-duplicate\",\"property_unit_binding_invalid\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。"
+        },
+        {
+          "case": "UnitFailuresHaveExactSourceDiagnostics (\"unit-missing\",\"unit_reference_missing\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。"
+        },
+        {
+          "case": "UnitFailuresHaveExactSourceDiagnostics (\"dimension-mismatch\",\"unit_dimension_mismatch\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。"
+        },
+        {
+          "case": "UnitFailuresHaveExactSourceDiagnostics (\"quantity-mismatch\",\"unit_quantity_kind_mismatch\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。"
+        },
+        {
+          "case": "UnitFailuresHaveExactSourceDiagnostics (\"same-exponents\",\"unit_dimension_mismatch\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。"
+        },
+        {
+          "case": "UnitFailuresHaveExactSourceDiagnostics (\"quantity-duplicate\",\"quantity_kind_reference_missing\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。"
+        },
+        {
+          "case": "UnitFailuresHaveExactSourceDiagnostics (\"deprecated-canonical\",\"semantic_reference_deprecated\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。"
+        },
+        {
+          "case": "StandardSourceFailureKeepsExactPredicate (\"synthetic\",\"urn:ontology-platform:semantics:synthetic\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。"
+        },
+        {
+          "case": "StandardSourceFailureKeepsExactPredicate (\"provenance\",\"http://www.w3.org/ns/prov#wasDerivedFrom\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。"
+        },
+        {
+          "case": "DuplicateAddsThenDeleteUseRdfSetSemantics (False)",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "DuplicateAddsThenDeleteUseRdfSetSemantics (True)",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "EquivalentLiteralAddThenDeleteRemovesOriginal (\"language\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "EquivalentLiteralAddThenDeleteRemovesOriginal (\"datatype\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "FourSourcesAndAtomicChangesUseRealRiot",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "LegacyVersionThreeStillRejectsTheSameControlledTimeCorpus",
+          "reason": "NOT_RUN: requires real Jena fixture"
+        },
+        {
+          "case": "ControlledTemplatesAndIdentityRelations (\"valid\",null)",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "ControlledTemplatesAndIdentityRelations (\"different-site\",null)",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "ControlledTemplatesAndIdentityRelations (\"different-namespace\",null)",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "ControlledTemplatesAndIdentityRelations (\"adjacent\",null)",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "ControlledTemplatesAndIdentityRelations (\"overlap\",\"identity_ambiguous\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "ControlledTemplatesAndIdentityRelations (\"unknown\",\"identity_relation_indeterminate\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "ControlledTemplatesAndIdentityRelations (\"no-zone\",\"time_timezone_required\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "ControlledTemplatesAndIdentityRelations (\"reverse\",\"time_interval_reversed\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "ControlledTemplatesAndIdentityRelations (\"missing-point\",\"time_reference_missing\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "ControlledTemplatesAndIdentityRelations (\"double-time\",\"time_lexical_invalid\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "ControlledTemplatesAndIdentityRelations (\"unsupported\",\"time_template_unsupported\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "ControlledTemplatesAndIdentityRelations (\"unknown-target\",\"identity_claim_invalid\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "ControlledTemplatesAndIdentityRelations (\"double-key\",\"identity_claim_invalid\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "ControlledTemplatesAndIdentityRelations (\"event-missing\",\"event_time_invalid\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "ControlledTemplatesAndIdentityRelations (\"observer-zone\",\"time_timezone_required\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "ControlledTemplatesAndIdentityRelations (\"double-type\",\"time_template_unsupported\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "CrossSourceTimestampDiagnosticUsesBundleEvidence",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "OnlyExactBuiltinOrLocalClassDeclarationResolvesType (\"w3-fake\",True)",
+          "reason": "NOT_RUN: real PG/Jena required"
+        },
+        {
+          "case": "OnlyExactBuiltinOrLocalClassDeclarationResolvesType (\"platform-fake\",True)",
+          "reason": "NOT_RUN: real PG/Jena required"
+        },
+        {
+          "case": "OnlyExactBuiltinOrLocalClassDeclarationResolvesType (\"builtin-owl\",False)",
+          "reason": "NOT_RUN: real PG/Jena required"
+        },
+        {
+          "case": "OnlyExactBuiltinOrLocalClassDeclarationResolvesType (\"business-local\",False)",
+          "reason": "NOT_RUN: real PG/Jena required"
+        },
+        {
+          "case": "DefinitionRemovalUsesExactKindAndConsumerRole (\"class-masked-by-individual\",True)",
+          "reason": "NOT_RUN: real PG/Jena required"
+        },
+        {
+          "case": "DefinitionRemovalUsesExactKindAndConsumerRole (\"object-property-masked\",True)",
+          "reason": "NOT_RUN: real PG/Jena required"
+        },
+        {
+          "case": "DefinitionRemovalUsesExactKindAndConsumerRole (\"datatype-property-masked\",True)",
+          "reason": "NOT_RUN: real PG/Jena required"
+        },
+        {
+          "case": "DefinitionRemovalUsesExactKindAndConsumerRole (\"keep-class-drop-individual\",False)",
+          "reason": "NOT_RUN: real PG/Jena required"
+        },
+        {
+          "case": "ReportIdentityIdempotencyAndAuditAreFrozenToFirstInput",
+          "reason": "NOT_RUN: real PG/Jena fixture required"
+        },
+        {
+          "case": "ConcurrentInputCreatesOneReportAndOneBusinessAudit",
+          "reason": "NOT_RUN: real PG/Jena fixture required"
+        },
+        {
+          "case": "ActualUnknownAndTechnicalBlockersHaveBoundEvidence (\"missing\",\"impact_assessment_required\")",
+          "reason": "NOT_RUN: real PG/Jena fixture required"
+        },
+        {
+          "case": "ActualUnknownAndTechnicalBlockersHaveBoundEvidence (\"unsupported\",\"impact_unsupported_axiom\")",
+          "reason": "NOT_RUN: real PG/Jena fixture required"
+        },
+        {
+          "case": "ActualUnknownAndTechnicalBlockersHaveBoundEvidence (\"imports\",\"impact_imports_unresolved\")",
+          "reason": "NOT_RUN: real PG/Jena fixture required"
+        },
+        {
+          "case": "ActualUnknownAndTechnicalBlockersHaveBoundEvidence (\"blank\",\"impact_blank_alignment_indeterminate\")",
+          "reason": "NOT_RUN: real PG/Jena fixture required"
+        },
+        {
+          "case": "ActualUnknownAndTechnicalBlockersHaveBoundEvidence (\"blank-budget\",\"impact_comparison_indeterminate\")",
+          "reason": "NOT_RUN: real PG/Jena fixture required"
+        },
+        {
+          "case": "ActualUnknownAndTechnicalBlockersHaveBoundEvidence (\"conclusion-budget\",\"impact_conclusion_budget\")",
+          "reason": "NOT_RUN: real PG/Jena fixture required"
+        },
+        {
+          "case": "ReadRejectsPartialScopeAndPersistedCanonicalTamper",
+          "reason": "NOT_RUN: real PG/Jena fixture required"
+        },
+        {
+          "case": "ValidHistoryCannotBeReplacedOrUnlockedByUnrelatedError (\"target\")",
+          "reason": "NOT_RUN: requires real PG/Jena fixture"
+        },
+        {
+          "case": "ValidHistoryCannotBeReplacedOrUnlockedByUnrelatedError (\"from\")",
+          "reason": "NOT_RUN: requires real PG/Jena fixture"
+        },
+        {
+          "case": "ValidHistoryCannotBeReplacedOrUnlockedByUnrelatedError (\"delete\")",
+          "reason": "NOT_RUN: requires real PG/Jena fixture"
+        },
+        {
+          "case": "ValidHistoryCannotBeReplacedOrUnlockedByUnrelatedError (\"type\")",
+          "reason": "NOT_RUN: requires real PG/Jena fixture"
+        },
+        {
+          "case": "ValidHistoryCannotBeReplacedOrUnlockedByUnrelatedError (\"expand\")",
+          "reason": "NOT_RUN: requires real PG/Jena fixture"
+        },
+        {
+          "case": "ValidHistoryCannotBeReplacedOrUnlockedByUnrelatedError (\"hide-with-error\")",
+          "reason": "NOT_RUN: requires real PG/Jena fixture"
+        },
+        {
+          "case": "InitiallyInvalidClaimCanBeRepairedWithoutErasingSourceRevision",
+          "reason": "NOT_RUN: requires real PG/Jena fixture"
+        },
+        {
+          "case": "ClaimScopeCannotExceedAuthoritativeDraftScope (\"site\")",
+          "reason": "NOT_RUN: requires real PG/Jena fixture"
+        },
+        {
+          "case": "ClaimScopeCannotExceedAuthoritativeDraftScope (\"organization\")",
+          "reason": "NOT_RUN: requires real PG/Jena fixture"
+        },
+        {
+          "case": "ControlledEditClosesValidityThenReplaysExactlyOnce",
+          "reason": "NOT_RUN: requires real PG/Jena fixture"
+        },
+        {
+          "case": "DedicatedEditCannotDeleteValidClaimType",
+          "reason": "NOT_RUN: requires real PG/Jena fixture"
+        },
+        {
+          "case": "AmbiguousAndUnknownClaimsBlockAssessment (False)",
+          "reason": "NOT_RUN: requires real PG/Jena fixture"
+        },
+        {
+          "case": "AmbiguousAndUnknownClaimsBlockAssessment (True)",
+          "reason": "NOT_RUN: requires real PG/Jena fixture"
+        },
+        {
+          "case": "ExactBatchCountBoundariesDoNotBypassCas (0)",
+          "reason": "NOT_RUN: requires real PG/Jena fixture"
+        },
+        {
+          "case": "ExactBatchCountBoundariesDoNotBypassCas (1)",
+          "reason": "NOT_RUN: requires real PG/Jena fixture"
+        },
+        {
+          "case": "ExactBatchCountBoundariesDoNotBypassCas (64)",
+          "reason": "NOT_RUN: requires real PG/Jena fixture"
+        },
+        {
+          "case": "ExactBatchCountBoundariesDoNotBypassCas (65)",
+          "reason": "NOT_RUN: requires real PG/Jena fixture"
+        },
+        {
+          "case": "TwoConcurrentWritersHaveOneCasWinnerAndOneAudit",
+          "reason": "NOT_RUN: requires real PG/Jena fixture"
+        },
+        {
+          "case": "RoleAndCompleteScopePrecedeAnyJenaAccess (True)",
+          "reason": "NOT_RUN: requires real PG/Jena fixture"
+        },
+        {
+          "case": "RoleAndCompleteScopePrecedeAnyJenaAccess (False)",
+          "reason": "NOT_RUN: requires real PG/Jena fixture"
+        },
+        {
+          "case": "NewControlledBatchReturnsDeterministicDiagnosticCode (\"overlap\",\"identity_ambiguous\")",
+          "reason": "NOT_RUN: requires real PG/Jena fixture"
+        },
+        {
+          "case": "NewControlledBatchReturnsDeterministicDiagnosticCode (\"unknown\",\"identity_relation_indeterminate\")",
+          "reason": "NOT_RUN: requires real PG/Jena fixture"
+        },
+        {
+          "case": "NewControlledBatchReturnsDeterministicDiagnosticCode (\"zone\",\"time_timezone_required\")",
+          "reason": "NOT_RUN: requires real PG/Jena fixture"
+        },
+        {
+          "case": "NewControlledBatchReturnsDeterministicDiagnosticCode (\"reverse\",\"time_interval_reversed\")",
+          "reason": "NOT_RUN: requires real PG/Jena fixture"
+        },
+        {
+          "case": "FourSourcesKeepExactTextHashesAndGroundDelta",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "BlankIsomorphismAndChangedBlankScopesRemainExplicit",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "AbsentVocabularyAndEmptyFileHaveDifferentSourceIdentity",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "SharedBudgetFailureIsIndeterminateForAllFourSources (False)",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "SharedBudgetFailureIsIndeterminateForAllFourSources (True)",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "VersionDiffBindsActualPersistedSourcesAndRejectsCrossAssetOrTamper",
+          "reason": "NOT_RUN: real PG required"
+        },
+        {
+          "case": "RealRiotReadsAdvancedFixtureWithoutLosingSourceOrEnablingPublish",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "RealRiotSeparatesFourSourceBlankScopesAndPreservesLiteralMetadata",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "RealRiotMalformedOwlHasExplicitProjectionDiagnostics (\"broken\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "RealRiotMalformedOwlHasExplicitProjectionDiagnostics (\"cycle\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "RealRiotMalformedOwlHasExplicitProjectionDiagnostics (\"cardinality\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "RealRiotMalformedOwlHasExplicitProjectionDiagnostics (\"unknown\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "RealRiotRestrictionNegativeShapesPreserveSourceHash (\"missing-on-property\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "RealRiotRestrictionNegativeShapesPreserveSourceHash (\"some-literal\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "RealRiotRestrictionNegativeShapesPreserveSourceHash (\"all-literal\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "RealRiotRestrictionNegativeShapesPreserveSourceHash (\"qualified-literal-property\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "RealRiotRestrictionNegativeShapesPreserveSourceHash (\"multiple-constructors\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "RealRiotNodeBudgetPreservesSourceAndFailsClosed",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "RealReadOnlySnapshotPreservesRawBytesAndDoesNotWrite",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要本轮隔离PG/RIOT服务。"
+        },
+        {
+          "case": "RealHistoricalSnapshotAndReimportRetainExactSourceAndBlankGraph",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要本轮隔离PG/RIOT服务。"
+        },
+        {
+          "case": "RealScopeAuthorizationPrecedesProjectionRequests",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要本轮隔离PG/RIOT服务。"
+        },
+        {
+          "case": "RealTamperedRevisionHashCannotProducePreservedSnapshot",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要本轮隔离PG/RIOT服务。"
+        },
+        {
+          "case": "RealRiotPreservesUnsupportedSourceAndTypedLexical",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "NoOpRetainsExactBytesAndInvalidSourceFails",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "PublishedGraphsAreIsolatedAndLexicalMismatchIsRejected",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "EmptyGraphStillProducesRealShaclReport",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "LegalEmptyDocumentsKeepExactHashesAndProduceEmptyGraph (\"# comment\\n\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "LegalEmptyDocumentsKeepExactHashesAndProduceEmptyGraph (\" \\t\\r\\n\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "LegalEmptyDocumentsKeepExactHashesAndProduceEmptyGraph (\"@prefix ex: <urn:empty:> .\\n\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "EditingLegalEmptyDocumentExportsOnlyRequestedTriple",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "LostOrReplacedTemporaryGraphRemainsUnavailable (False)",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 缺少隔离Jena。"
+        },
+        {
+          "case": "LostOrReplacedTemporaryGraphRemainsUnavailable (True)",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 缺少隔离Jena。"
+        },
+        {
+          "case": "MissingPublishedGraphRemainsUnavailable",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "PublishedShaclUsesTheSameOntologyContext",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "RelativeIriAndExactEditPreserveRemainingGraph",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "SourceTripleAndProjectionBudgetsFailExplicitly",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "ThirdConcurrentOperationIsRejected",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 缺少隔离Jena。"
+        },
+        {
+          "case": "CancellationAndTimeoutDoNotLeaveTemporaryGraphs (True)",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 缺少隔离Jena。"
+        },
+        {
+          "case": "CancellationAndTimeoutDoNotLeaveTemporaryGraphs (False)",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 缺少隔离Jena。"
+        },
+        {
+          "case": "StandardSampleConforms",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "StandardNegativeReportsLocateRealFailure (\"\",\"MinCountConstraintComponent\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "StandardNegativeReportsLocateRealFailure (\"<urn:x> <urn:ontology-platform:vocabulary:externalId> 12 .\",\"DatatypeConstraintComponent\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "StandardNegativeReportsLocateRealFailure (\"<urn:x> <urn:ontology-platform:vocabulary:weight> 101.0 .\",\"MaxInclusiveConstraintComponent\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "StandardNegativeReportsLocateRealFailure (\"<urn:h> a <urn:synthetic:metals:Heat> ; <urn:synthetic:metals:castIn> <urn:x> .\",\"ClassConstraintComponent\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "UnsafeShapesRejectedBeforeExecution (\"<urn:s> <http://www.w3.org/ns/shacl#sparql> <urn:q> .\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "UnsafeShapesRejectedBeforeExecution (\"<urn:s> <http://www.w3.org/ns/shacl#js> <urn:q> .\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "UnsafeShapesRejectedBeforeExecution (\"<urn:s> <http://www.w3.org/ns/shacl#node> <urn:s> .\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "UnsafeShapesRejectedBeforeExecution (\"<urn:s> <http://www.w3.org/2002/07/owl#imports> <http://192.0.2.1/never> .\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "UnsafeShapesRejectedBeforeExecution (\"<urn:s> <http://www.w3.org/ns/shacl#path> [ <http://www.w3.org/ns/shacl#inversePath> <urn:p> ] .\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "UnsafeShapesRejectedBeforeExecution (\"<urn:s> <http://www.w3.org/ns/shacl#property> <urn:s> ; <http://www.w3.org/ns/shacl#path> <urn:p> .\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "EnumerationListIsBoundedAndAcyclic",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "VerifiedReadReturnsExactlyTheComparedBatch",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "ChangedPublishedGraphCannotReturnOldHashData (\"ontology\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "ChangedPublishedGraphCannotReturnOldHashData (\"data\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "ChangedPublishedGraphCannotReturnOldHashData (\"delete\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "ChangedPublishedGraphCannotReturnOldHashData (\"lexical\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "EveryManifestSnapshotAndSourceBindingIsChecked",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "OptionalVocabularyAndMissingBindingFailClosed",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "VerifiedReadCancellationAndTimeoutCleanTemporaryGraphs (True)",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "VerifiedReadCancellationAndTimeoutCleanTemporaryGraphs (False)",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "TemporaryMarkerDoesNotConsumeBusinessTripleBudget (4999)",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "TemporaryMarkerDoesNotConsumeBusinessTripleBudget (5000)",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "TemporaryMarkerDoesNotConsumeBusinessTripleBudget (5001)",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "VerifiedReadRetainsAggregateBusinessTripleBudget (4999)",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 缺少隔离Jena。"
+        },
+        {
+          "case": "VerifiedReadRetainsAggregateBusinessTripleBudget (5000)",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 缺少隔离Jena。"
+        },
+        {
+          "case": "VerifiedReadRetainsAggregateBusinessTripleBudget (5001)",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 缺少隔离Jena。"
+        },
+        {
+          "case": "PublishedGraphDoesNotReceiveTemporaryMarkerAllowance",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "SyntheticNonBmpLabelSurvivesValidationAndPublication (\"😀\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。"
+        },
+        {
+          "case": "SyntheticNonBmpLabelSurvivesValidationAndPublication (\"𠀀\")",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。"
+        },
+        {
+          "case": "NonBmpLiteralEditIsLosslessAndCannotInjectTriples (True)",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "NonBmpLiteralEditIsLosslessAndCannotInjectTriples (False)",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "InvalidSurrogateLiteralIsRejectedWithoutReplacement (True)",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "InvalidSurrogateLiteralIsRejectedWithoutReplacement (False)",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "LeadingBomSourcesKeepExactBytesAndRelativeIris (True)",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        },
+        {
+          "case": "LeadingBomSourcesKeepExactBytesAndRelativeIris (False)",
+          "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。"
+        }
+      ],
+      "rawLogSha256": "3adf325b301ab02547d5ccd341f0810d0d4f3c69fcf4e5665071082d21f0bb2b"
+    }
+  ],
+  "previousFourProject90Skips": "HISTORICAL_NOT_CLOSED; previous G2/Agent/Query invocations not rerun in this three-file scope"
+}

@@ -1,0 +1,736 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "mode": "APPLY",
+  "startedAtUtc": "2026-11-03T14:48:23.489339+00:00",
+  "testedCommit": "8c7e43ab4f8f27d231d9d83b42c96ef17a1918fe",
+  "dryRunSha256": "25a558c0e3269b2cd47a21f1e3149255e26168ab353c271f2bcaa68c17f2cb83",
+  "reviewedManifestSha256": "f13bd37ccbcebd8c05dd6c152f36f3d7639fbea64d81788d84254777b7add439",
+  "executorSha256": "473250ebeb1010e59124571502636bde4bfa9c21dd6bad6a606067f2f09daeb5",
+  "metadataHelperSha256": "1d9473a985a3d315321a707c4e3406ad4478c3c6be85cd47f4a461a7d24a2126",
+  "records": [
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/pythonlibs",
+      "beforeEntries": 31,
+      "beforeMetadataSha256": "30d2f0ea02411226a862009d2074ce2b5184113dcae1d1e16067a2ea50e0fe75",
+      "beforeRegularFiles": 26,
+      "beforeLogicalBytes": 606501,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/pythonlibs"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/nuget",
+      "beforeEntries": 10842,
+      "beforeMetadataSha256": "e78dd6f3bb7b1ed92507989ccb868e074ab64e3329360cea1f572c979b466474",
+      "beforeRegularFiles": 7488,
+      "beforeLogicalBytes": 1943722790,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/nuget"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/dotnet-home",
+      "beforeEntries": 8,
+      "beforeMetadataSha256": "016216af73c487bd1185f84cbf9f6174729279f3c7d684b9cf81e4f8cc095c19",
+      "beforeRegularFiles": 4,
+      "beforeLogicalBytes": 205,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/dotnet-home"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/AppHost/bin",
+      "beforeEntries": 153,
+      "beforeMetadataSha256": "9fd974c0c580e1d83b0db310daed7d49f6c56d3bebdf553544435bd86687528e",
+      "beforeRegularFiles": 114,
+      "beforeLogicalBytes": 47997751,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/AppHost/bin"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/AppHost/obj",
+      "beforeEntries": 33,
+      "beforeMetadataSha256": "384f9f6db1453c51408c7a651a7aa9550cc8852d5fe0b4819879a11f0c67107d",
+      "beforeRegularFiles": 26,
+      "beforeLogicalBytes": 611611,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/AppHost/obj"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/bin",
+      "beforeEntries": 7,
+      "beforeMetadataSha256": "70a1a22b6e061b3b83b00636add7fc7a8b45f9f6c1456800c0ffa9d1f08b5872",
+      "beforeRegularFiles": 4,
+      "beforeLogicalBytes": 634548,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/bin"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/obj",
+      "beforeEntries": 24,
+      "beforeMetadataSha256": "65a48b8679b806cdbccd95bbb5d0c954e22d9844af5940f61079e7f0f113c322",
+      "beforeRegularFiles": 19,
+      "beforeLogicalBytes": 955148,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/obj"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/bin",
+      "beforeEntries": 92,
+      "beforeMetadataSha256": "c1483257a45b6f21e840588817ca828f0c73fd537b474c6099a99a51f7b3d8f9",
+      "beforeRegularFiles": 89,
+      "beforeLogicalBytes": 20270738,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/bin"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/obj",
+      "beforeEntries": 37,
+      "beforeMetadataSha256": "4895df86130fb2c9371c806435268e018b836d5dd312d080655d48c31e98b527",
+      "beforeRegularFiles": 31,
+      "beforeLogicalBytes": 1746617,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/obj"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Hosts/OntologyPlatform.InfrastructureApi/bin",
+      "beforeEntries": 35,
+      "beforeMetadataSha256": "8cb5b2d0c24358779a8b2800e15e9bac6c6cb027cbd5660f30787c3195b4090c",
+      "beforeRegularFiles": 32,
+      "beforeLogicalBytes": 2120508,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Hosts/OntologyPlatform.InfrastructureApi/bin"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Hosts/OntologyPlatform.InfrastructureApi/obj",
+      "beforeEntries": 36,
+      "beforeMetadataSha256": "7dc07a94e1e24abf73831f72ccb88cc45bc13bf05b3ebfacc3e532dd48166ac5",
+      "beforeRegularFiles": 30,
+      "beforeLogicalBytes": 370334,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Hosts/OntologyPlatform.InfrastructureApi/obj"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/bin",
+      "beforeEntries": 11,
+      "beforeMetadataSha256": "ae4646824f27ce7a5d0f87eec59050595821b6dabd28eb49d8e7a927356de1b7",
+      "beforeRegularFiles": 8,
+      "beforeLogicalBytes": 849721,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/bin"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/obj",
+      "beforeEntries": 27,
+      "beforeMetadataSha256": "126851b64f0444ddeb1d7d85fc4ba4453940c9b8d538ba0eed891c79bbd4fb73",
+      "beforeRegularFiles": 22,
+      "beforeLogicalBytes": 552446,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/obj"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/bin",
+      "beforeEntries": 11,
+      "beforeMetadataSha256": "2b7dafe13022c6bd331eb7cfae2cf7be6c926d935f1df835e7951ed23d260454",
+      "beforeRegularFiles": 8,
+      "beforeLogicalBytes": 992132,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/bin"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/obj",
+      "beforeEntries": 27,
+      "beforeMetadataSha256": "8bc7325fcbefd85df45bd704176a3c45906cb6caa2ca7834289c9bb1fc6c750b",
+      "beforeRegularFiles": 22,
+      "beforeLogicalBytes": 679792,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/obj"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/bin",
+      "beforeEntries": 11,
+      "beforeMetadataSha256": "3629dc9c13355a548107900af117ade1c6ecaac9fbb0a4930fdfb10fa66c73aa",
+      "beforeRegularFiles": 8,
+      "beforeLogicalBytes": 743852,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/bin"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/obj",
+      "beforeEntries": 27,
+      "beforeMetadataSha256": "6943dd4feab71731bb80641149954e7332a8f04071f747858f57e9dd26595928",
+      "beforeRegularFiles": 22,
+      "beforeLogicalBytes": 405833,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/obj"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/bin",
+      "beforeEntries": 14,
+      "beforeMetadataSha256": "05eb4cb2ba9fb64203bd3909431a68b866f526b6012e6c18ee6037e4af6ca8eb",
+      "beforeRegularFiles": 11,
+      "beforeLogicalBytes": 1194328,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/bin"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/obj",
+      "beforeEntries": 27,
+      "beforeMetadataSha256": "4b8147eb585b40f805066cb2f23696f8f5322b8dd986091bc3c3bdb46965e2ad",
+      "beforeRegularFiles": 22,
+      "beforeLogicalBytes": 928112,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/obj"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/bin",
+      "beforeEntries": 10,
+      "beforeMetadataSha256": "a7b21b0e5344c125239086b077fa58a631a14d12f2e51fe10f5906da6629b638",
+      "beforeRegularFiles": 7,
+      "beforeLogicalBytes": 655684,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/bin"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/obj",
+      "beforeEntries": 26,
+      "beforeMetadataSha256": "a1d0806c8648f0b09ac632c220646078bfbefa6c0e7d1b0cc4cd4b61df81d4e6",
+      "beforeRegularFiles": 21,
+      "beforeLogicalBytes": 113113,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/obj"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/bin",
+      "beforeEntries": 14,
+      "beforeMetadataSha256": "9d4e19a3976628577581fc7761b8b8b586f2f41ab75041ee1aa77ff50c3a3440",
+      "beforeRegularFiles": 11,
+      "beforeLogicalBytes": 921193,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/bin"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/obj",
+      "beforeEntries": 27,
+      "beforeMetadataSha256": "f9154fa87f381de1f68257d2c9b4d3242fed700207ed82dbd8d05cd513352790",
+      "beforeRegularFiles": 22,
+      "beforeLogicalBytes": 603653,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/obj"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/bin",
+      "beforeEntries": 10,
+      "beforeMetadataSha256": "77801741134f43ffc66dd816215ab4dc16a8cf794140e6c8243b70a1f82fc9c8",
+      "beforeRegularFiles": 7,
+      "beforeLogicalBytes": 652835,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/bin"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/obj",
+      "beforeEntries": 26,
+      "beforeMetadataSha256": "21deabe732d005f19f5a755e2bdf8b475c0417be8ef6ba343b445e2a504ed5ab",
+      "beforeRegularFiles": 21,
+      "beforeLogicalBytes": 109406,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/obj"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/bin",
+      "beforeEntries": 10,
+      "beforeMetadataSha256": "9cc99de74f956c6ec012d9eb7925ba63b5a2ca012a7260b78a8ddb3ad4d74352",
+      "beforeRegularFiles": 7,
+      "beforeLogicalBytes": 898885,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/bin"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/obj",
+      "beforeEntries": 26,
+      "beforeMetadataSha256": "47edef32c7317113100bc77285b97d8818f844ff8bf8f2e3bc9f1df2a81d84a0",
+      "beforeRegularFiles": 21,
+      "beforeLogicalBytes": 395327,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/obj"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/ServiceDefaults/bin",
+      "beforeEntries": 7,
+      "beforeMetadataSha256": "373dc4438e482731cf30e1a31d7389f43f0a0efeb166ea814cf2a3424b37d1ee",
+      "beforeRegularFiles": 4,
+      "beforeLogicalBytes": 59262,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/ServiceDefaults/bin"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/ServiceDefaults/obj",
+      "beforeEntries": 25,
+      "beforeMetadataSha256": "16370435d8b72655d66554599aed262c2646eb720fcbf2842bb0dd1cf63c633e",
+      "beforeRegularFiles": 20,
+      "beforeLogicalBytes": 221605,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/ServiceDefaults/obj"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin",
+      "beforeEntries": 228,
+      "beforeMetadataSha256": "f899d586d39af0d66b3bb0a7c95ef5eb976ccf46c153ac48131d0ad85c926374",
+      "beforeRegularFiles": 212,
+      "beforeLogicalBytes": 27713019,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.AgentTests/obj",
+      "beforeEntries": 32,
+      "beforeMetadataSha256": "904fded738cfb96f8211460e93ece513a169858e56165ae293db308a0d12c949",
+      "beforeRegularFiles": 27,
+      "beforeLogicalBytes": 1273381,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.AgentTests/obj"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.ConnectionsTests/bin",
+      "beforeEntries": 150,
+      "beforeMetadataSha256": "557a2bd78a16d6b398fcaae54c07b8213680e1f5c321ccbcda7462b0a9c354eb",
+      "beforeRegularFiles": 134,
+      "beforeLogicalBytes": 15384484,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.ConnectionsTests/bin"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.ConnectionsTests/obj",
+      "beforeEntries": 32,
+      "beforeMetadataSha256": "6d8cf59b7dbb6684f6f550b3772511419d6f0fe50b207e4d0cb079bf3c3f94ee",
+      "beforeRegularFiles": 27,
+      "beforeLogicalBytes": 548479,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.ConnectionsTests/obj"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin",
+      "beforeEntries": 142,
+      "beforeMetadataSha256": "2c325bcced39e1e7271e17d2e45b727a6eb6e53bf45a23f5b5cf4f83600df61f",
+      "beforeRegularFiles": 126,
+      "beforeLogicalBytes": 7872089,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/obj",
+      "beforeEntries": 32,
+      "beforeMetadataSha256": "479bfe618db4a428c11cf98a6acddfb2d2323792a3ad75e81dc7a051f6b2d21f",
+      "beforeRegularFiles": 27,
+      "beforeLogicalBytes": 546868,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/obj"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/bin",
+      "beforeEntries": 171,
+      "beforeMetadataSha256": "fa361e969a7c8893eaa6649587b17bb3218f2de8d6448f5032c914e9de2c8085",
+      "beforeRegularFiles": 155,
+      "beforeLogicalBytes": 9289265,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/bin"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/obj",
+      "beforeEntries": 32,
+      "beforeMetadataSha256": "048cf2f1f33f20edbf94b421324d567d80598e8422b3cfddb23386bdf43d743f",
+      "beforeRegularFiles": 27,
+      "beforeLogicalBytes": 567276,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/obj"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin",
+      "beforeEntries": 162,
+      "beforeMetadataSha256": "c2d10416fa17d46d318b86f5f17bea3430de1809dd0b5c50fd215cffb2cc529f",
+      "beforeRegularFiles": 146,
+      "beforeLogicalBytes": 16187742,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/obj",
+      "beforeEntries": 32,
+      "beforeMetadataSha256": "a0f6bed9bb86e8cc7ee0d35992ebd0be3982a4d66329118712f52ee3df5ad376",
+      "beforeRegularFiles": 27,
+      "beforeLogicalBytes": 977717,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/obj"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin",
+      "beforeEntries": 228,
+      "beforeMetadataSha256": "1a95f181225045e317c513e06663569879dcb89c994616d1553724e2c8758b3a",
+      "beforeRegularFiles": 212,
+      "beforeLogicalBytes": 27701816,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.QueryTests/obj",
+      "beforeEntries": 32,
+      "beforeMetadataSha256": "8f75c53324ba4fbf089b5a7ade114eee0e448c63e6f0ee572f68e319e7c50aeb",
+      "beforeRegularFiles": 27,
+      "beforeLogicalBytes": 1281982,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.QueryTests/obj"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin",
+      "beforeEntries": 228,
+      "beforeMetadataSha256": "420a25ce643cc49792cda9bd0a6c8baecbda9d8b811a423c5f22870f2b4d2ef8",
+      "beforeRegularFiles": 212,
+      "beforeLogicalBytes": 28095265,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/bin"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/obj",
+      "beforeEntries": 32,
+      "beforeMetadataSha256": "cdcc074def5c8795037b08bd78a57c311580bf4272a1400c8920aa7668e4e32e",
+      "beforeRegularFiles": 27,
+      "beforeLogicalBytes": 1760835,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/obj"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin",
+      "beforeEntries": 156,
+      "beforeMetadataSha256": "6acfde64cf935d053fe639b9b37a44f50f5e13f27dbc4b0eb055e97de99ba843",
+      "beforeRegularFiles": 140,
+      "beforeLogicalBytes": 16338740,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/obj",
+      "beforeEntries": 32,
+      "beforeMetadataSha256": "1c585f4dd173e4c58918f7c7261532a52ca2da3e41be28f57ba1245a3bb3fcb9",
+      "beforeRegularFiles": 27,
+      "beforeLogicalBytes": 1459781,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/obj"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/three-file-apply-20261103-01/isolated",
+      "beforeEntries": 42,
+      "beforeMetadataSha256": "9e73d5197eb038b8e8f3e1a11c0f7f578fc5d70c326fc39e7c0a7370357a30b9",
+      "beforeRegularFiles": 21,
+      "beforeLogicalBytes": 56922,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/three-file-apply-20261103-01/isolated"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/three-file-apply-20261103-01/security-negative-fixture",
+      "beforeEntries": 2,
+      "beforeMetadataSha256": "1d380b20f6ba8e5691228a21e0f4576bbd5bbeaf29d9cc087149a437209bd0f5",
+      "beforeRegularFiles": 1,
+      "beforeLogicalBytes": 58,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/three-file-apply-20261103-01/security-negative-fixture"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    },
+    {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/three-file-apply-20261103-01/security-negative-fixture-v2",
+      "beforeEntries": 11,
+      "beforeMetadataSha256": "4098d976e96889e466aeb7b97d9db040e59c720c7ecd2683bd8d840d9309f93b",
+      "beforeRegularFiles": 6,
+      "beforeLogicalBytes": 11976,
+      "symlinksNotFollowed": 0,
+      "command": [
+        "shutil.rmtree",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/three-file-apply-20261103-01/security-negative-fixture-v2"
+      ],
+      "commandExecuted": true,
+      "operationExitCode": 0,
+      "afterLstat": "ENOENT"
+    }
+  ],
+  "status": "PASS_EXACT_REGENERABLE_COPIES_REMOVED",
+  "protectedTrackedFiles": 4474,
+  "protectedTrackedHashesUnchanged": true,
+  "endedAtUtc": "2026-11-03T14:48:24.344445+00:00"
+}

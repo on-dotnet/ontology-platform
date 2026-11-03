@@ -1,0 +1,23 @@
+$ErrorActionPreference = 'Stop'
+$dir = Join-Path (Get-Location) 'backend/src/Hosts/OntologyPlatform.Api/bin/Debug/net10.0'
+foreach ($name in @('Microsoft.EntityFrameworkCore.Abstractions.dll','Microsoft.EntityFrameworkCore.dll','Microsoft.EntityFrameworkCore.Relational.dll')) {
+    $null = [Reflection.Assembly]::LoadFrom((Join-Path $dir $name))
+}
+$expected = @(
+    @('OntologyPlatform.Modules.Ontology.dll','OntologyPlatform.Modules.Ontology.Migrations.G3M4ImpactReports','20261030155129_G3M4ImpactReports'),
+    @('OntologyPlatform.Modules.Connections.dll','OntologyPlatform.Modules.Connections.Migrations.InitialConnections','20261101115947_InitialConnections')
+)
+$rows = @()
+foreach ($entry in $expected) {
+    $file = Join-Path $dir $entry[0]
+    $assembly = [Reflection.Assembly]::LoadFrom($file)
+    $type = $assembly.GetType($entry[1],$true)
+    $attributes = @($type.GetCustomAttributesData() | Where-Object { $_.AttributeType.FullName -eq 'Microsoft.EntityFrameworkCore.Migrations.MigrationAttribute' })
+    if ($attributes.Count -ne 1 -or $attributes[0].ConstructorArguments[0].Value -cne $entry[2]) { throw 'Compiled migration ID mismatch' }
+    foreach ($name in @('Up','Down')) {
+        $method = $type.GetMethod($name,[Reflection.BindingFlags]'NonPublic,Instance,DeclaredOnly')
+        if ($null -eq $method -or $method.DeclaringType -ne $type) { throw 'Compiled migration method missing' }
+    }
+    $rows += [ordered]@{typeName=$type.FullName; migrationId=$entry[2]; upDownPresent=$true; assemblySha256=(Get-FileHash $file -Algorithm SHA256).Hash.ToLowerInvariant()}
+}
+[ordered]@{scope='Compiled type and MigrationAttribute metadata inspection only; no migration executed'; files=$rows} | ConvertTo-Json -Depth 5

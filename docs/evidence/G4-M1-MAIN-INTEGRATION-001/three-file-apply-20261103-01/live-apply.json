@@ -1,0 +1,72 @@
+{
+  "appliedAtUtc": "2026-11-03T14:33:15.112695+00:00",
+  "sourceHead": "8753fb92fa0a3375c539f192525c85a5b2fee844",
+  "patchSha256": "3443614b8dd4b7da720d5c08d781e18074d3cb06daac9cf612cc96fa60f62b20",
+  "before": "3/3",
+  "after": "3/3",
+  "changedPaths": [
+    "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Migrations/20261101115947_InitialConnections.cs",
+    "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/Migrations/20261030155129_G3M4ImpactReports.cs",
+    "backend/tests/OntologyPlatform.ConnectionsTests/PgFixtureSecurityTests.cs"
+  ],
+  "commands": [
+    {
+      "command": [
+        "git",
+        "apply",
+        "--unidiff-zero",
+        "--check",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/three-file-apply-20261103-01/approved.patch"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "apply",
+        "--unidiff-zero",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/three-file-apply-20261103-01/approved.patch"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check",
+        "8753fb92fa0a3375c539f192525c85a5b2fee844"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check",
+        "d1a61daffe844475b07705797e3ad325cc3f2945"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check",
+        "99753df6f03b184e40b431a5b5aba89d8fa67087"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "reviewer": "/root/scope_review",
+  "review": "PASS_FOR_EXACT_PATCH_APPLY"
+}

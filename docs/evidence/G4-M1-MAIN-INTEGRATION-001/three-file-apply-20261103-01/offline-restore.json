@@ -1,0 +1,29 @@
+{
+  "commandInputHashes": {
+    "/usr/local/share/dotnet/dotnet": "11b517e7b00d0efa20e9b3ab6fe433f135d828a4c95c9c6ca7a9cf1328b6ada4",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/OntologyPlatform.slnx": "9f481eaa7a0570cf6e02d11a004f21696dff370d2a280d47edfaea5482bbb29c"
+  },
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "three-file-apply-20261103-01",
+  "name": "offline-restore",
+  "command": [
+    "/usr/local/share/dotnet/dotnet",
+    "restore",
+    "backend/OntologyPlatform.slnx",
+    "--locked-mode",
+    "--source",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/nuget",
+    "-p:NuGetAudit=false",
+    "--disable-parallel"
+  ],
+  "cwd": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform",
+  "head": "8753fb92fa0a3375c539f192525c85a5b2fee844",
+  "startedAtUtc": "2026-11-03T14:33:59.138776+00:00",
+  "endedAtUtc": "2026-11-03T14:34:00.821415+00:00",
+  "elapsedSeconds": 1.6825995419640094,
+  "exitCode": 0,
+  "timingStatus": "OBSERVED",
+  "logSha256": "68d50f5801b7ad10dd41bf33f4cffceb25e3570dc8c16ff12a73c326cf628ad4",
+  "driverSha256": "3912c71367240a4362b2fdb14fad92b8062991d8c9462b20593f9a86ba981fac",
+  "scope": "Exact three-file repair validation; not complete B product acceptance"
+}
