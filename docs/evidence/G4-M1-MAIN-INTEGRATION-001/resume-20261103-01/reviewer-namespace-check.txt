@@ -1,0 +1,44 @@
+$ErrorActionPreference = "Stop"
+$root = "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform"
+$dir = "$root/artifacts/g4-m1-main-integration-001/resume-20261103-01"
+$meta = Get-Content -Raw "$dir/namespace-proposal.json" | ConvertFrom-Json
+$rows = @()
+function Signature($tokens) {
+    @($tokens | ForEach-Object { [ordered]@{ kind=$_.RawKind; text=$_.Text; value=$_.ValueText } }) | ConvertTo-Json -Depth 8 -Compress
+}
+function TriviaSignature($tokens) {
+    @($tokens | ForEach-Object { $_.LeadingTrivia; $_.TrailingTrivia } | Where-Object { $_.RawKind -notin @([int][Microsoft.CodeAnalysis.CSharp.SyntaxKind]::WhitespaceTrivia,[int][Microsoft.CodeAnalysis.CSharp.SyntaxKind]::EndOfLineTrivia) } | ForEach-Object { [ordered]@{kind=$_.RawKind; text=$(if ($_.RawKind -eq [int][Microsoft.CodeAnalysis.CSharp.SyntaxKind]::SingleLineDocumentationCommentTrivia) { [regex]::Replace($_.ToFullString(), "(?m)^[\t ]+(?=///)", "") } else { $_.ToFullString() })} }) | ConvertTo-Json -Depth 8 -Compress
+}
+foreach ($item in $meta.files) {
+    $aText = [IO.File]::ReadAllText("$root/$($item.path)")
+    $bText = [IO.File]::ReadAllText("$($meta.proposalDirectory)/$($item.path)")
+    $aRoot = [Microsoft.CodeAnalysis.CSharp.SyntaxFactory]::ParseCompilationUnit($aText)
+    $bRoot = [Microsoft.CodeAnalysis.CSharp.SyntaxFactory]::ParseCompilationUnit($bText)
+    if (@($aRoot.GetDiagnostics() | Where-Object { $_.Severity.ToString() -eq "Error" }).Count -or @($bRoot.GetDiagnostics() | Where-Object { $_.Severity.ToString() -eq "Error" }).Count) { throw "Parse errors" }
+    if ($aRoot.Members.Count -ne 1 -or $bRoot.Members.Count -ne 1) { throw "Unexpected top-level members" }
+    $aNs = $aRoot.Members[0]; $bNs = $bRoot.Members[0]
+    if ($aNs.GetType().Name -ne "NamespaceDeclarationSyntax" -or $bNs.GetType().Name -ne "FileScopedNamespaceDeclarationSyntax") { throw "Namespace kind mismatch" }
+    if ($aNs.Name.ToString() -cne $bNs.Name.ToString() -or $aNs.Name.ToString() -cne $item.namespace) { throw "Namespace name mismatch" }
+    $aAll = @([Microsoft.CodeAnalysis.CSharp.SyntaxFactory]::ParseTokens($aText))
+    $bAll = @([Microsoft.CodeAnalysis.CSharp.SyntaxFactory]::ParseTokens($bText))
+    $aKept = @($aAll | Where-Object { $_.SpanStart -notin @($aNs.OpenBraceToken.SpanStart,$aNs.CloseBraceToken.SpanStart) })
+    $bKept = @($bAll | Where-Object { $_.SpanStart -ne $bNs.SemicolonToken.SpanStart })
+    if ((Signature $aKept) -cne (Signature $bKept)) { throw "Non-namespace tokens differ" }
+    if ((TriviaSignature $aAll) -cne (TriviaSignature $bAll)) { throw "Non-whitespace trivia differs" }
+    if ($aNs.Members.Count -ne $bNs.Members.Count) { throw "Member count mismatch" }
+    for ($i=0; $i -lt $aNs.Members.Count; $i++) {
+        if (-not $aNs.Members[$i].IsEquivalentTo($bNs.Members[$i], $false)) { throw "Member subtree differs" }
+    }
+    foreach ($property in @("Usings","Externs","AttributeLists")) {
+        $left = @($aRoot.$property | ForEach-Object { $_.DescendantTokens() })
+        $right = @($bRoot.$property | ForEach-Object { $_.DescendantTokens() })
+        if ((Signature $left) -cne (Signature $right)) { throw "Compilation-unit scope differs" }
+    }
+    foreach ($property in @("Usings","Externs")) {
+        $left = @($aNs.$property | ForEach-Object { $_.DescendantTokens() })
+        $right = @($bNs.$property | ForEach-Object { $_.DescendantTokens() })
+        if ((Signature $left) -cne (Signature $right)) { throw "Namespace scope differs" }
+    }
+    $rows += [ordered]@{memberSubtreesEquivalent=$true; usingExternAttributeScopesEqual=$true; path=$item.path; namespaceNameEqual=$true; allTokensExceptNamespaceDelimitersEqual=$true; nonWhitespaceTriviaEqual=$true; memberCount=$aNs.Members.Count; retainedTokenCount=$aKept.Count}
+}
+[ordered]@{status="PASS_NAMESPACE_SYNTAX_ONLY"; assembly=[Microsoft.CodeAnalysis.CSharp.SyntaxFactory].Assembly.FullName; files=$rows} | ConvertTo-Json -Depth 8 -Compress

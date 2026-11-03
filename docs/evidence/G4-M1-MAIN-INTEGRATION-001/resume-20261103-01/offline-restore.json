@@ -1,0 +1,21 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "resume-20261103-01",
+  "name": "offline-restore",
+  "command": [
+    "/usr/local/share/dotnet/dotnet",
+    "restore",
+    "backend/OntologyPlatform.slnx",
+    "--locked-mode",
+    "--source",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/nuget",
+    "-p:NuGetAudit=false",
+    "--disable-parallel"
+  ],
+  "exitCode": 0,
+  "startedAtUtc": "2026-11-02T23:48:47.053633+00:00",
+  "endedAtUtc": "2026-11-02T23:50:01.024641+00:00",
+  "elapsedSeconds": 73.9707512089808,
+  "logSha256": "7bc04dec2249ca0dc99ca942575cfa320c3b74df696071a2e31971329570e693",
+  "scope": "Exact approved patch targeted verification before dedicated format commit; not final stable I01"
+}

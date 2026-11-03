@@ -1,0 +1,32 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "status": "NOT_AUTHORIZED_NOT_APPLIED",
+  "sourceCommit": "80af5bb3a5c6cbe3906bb6aee8a78c2bc7536f7e",
+  "proposalDirectory": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/resume-20261103-01/repair-proposal",
+  "files": [
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/Migrations/20261030155129_G3M4ImpactReports.cs",
+      "beforeSha256": "acfc10eadbd100c5ca8b875a8a713bb30dada8dd3564d22b3d76b8f62f81bf5d",
+      "proposedSha256": "722b63e254412f9369ccce1c03fc11ca89929ec32c442b4d35a7445238379e7d",
+      "namespace": "OntologyPlatform.Modules.Ontology.Migrations",
+      "liveUnchanged": true
+    },
+    {
+      "path": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Migrations/20261101115947_InitialConnections.cs",
+      "beforeSha256": "df2f6304359d23bcd442e6fb30f6283e17e86990ea0f83316948658f33f3935c",
+      "proposedSha256": "a5177f7dadafb946c1d45b289b0cf3279603901423d75e29b46e44b1202d574c",
+      "namespace": "OntologyPlatform.Modules.Connections.Migrations",
+      "liveUnchanged": true
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.ConnectionsTests/PgFixtureSecurityTests.cs",
+      "beforeSha256": "79421cd2173d6ed6a0bbddce42a7bba0467cbb369146103d5a76bb77f4cee78b",
+      "proposedSha256": "ebb76c8f430dff47bf9ef1167101e3a4fa5dd8fa6a73d2f98b68691868356b82",
+      "change": "Move same Password member assignment after initializer and before unopened connection construction",
+      "liveUnchanged": true
+    }
+  ],
+  "patchSha256": "3443614b8dd4b7da720d5c08d781e18074d3cb06daac9cf612cc96fa60f62b20",
+  "patchBytes": 31032,
+  "scope": "Two migration namespace syntax conversions and one synthetic-test builder assignment relocation; shared verification/scanner unchanged"
+}

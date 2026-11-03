@@ -1,0 +1,35 @@
+{
+  "reviewer": "/root/scope_review",
+  "role": "non-author read-only",
+  "exactPatch": "PASS_EXACT_LIVE_SOURCE: 15 before/after and lexical equality verified independently before/after apply",
+  "namespaceProposal": {
+    "status": "PASS_NAMESPACE_SYNTAX_ONLY",
+    "exitCode": 0,
+    "driverSha256": "da7ab52e81737c05133af4be8c35238145a5ebef509c108031bdfed58617906c",
+    "notes": "Members/scopes/non-namespace tokens and non-whitespace comments equal. Earlier checker trials rejected raw documentation indentation and incorrect EOL enum; checker normalization corrected, not product changes."
+  },
+  "threeFileProposal": "PASS_FOR_PROPOSAL_ONLY_NOT_AUTHORIZED",
+  "builder": "PASS_LIMITED_BUILDER_SETTINGS_EQUIVALENCE: 5 settings equivalent, all connections Closed; four byte ordering differences; not PG/TLS acceptance",
+  "cleanup": {
+    "status": "PASS_FOR_EXACT_46_BLOCKED_CLOSEOUT",
+    "executorSha256": "47575d4df7287fe909e7adcbf05740804bec106912883f043928b9f9973b18c2",
+    "manifestSha256": "4ed3e9fcd1ad406513db516100177e860e0f68a5a8e0010786322e00c169968d",
+    "dryRunSha256": "b16608c38d877ef9b32ce4eb2ed2688e78c543945cb755cf7db569ec25d2d644"
+  },
+  "limitation": "Reviewer messages transcribed by Master; exact replay driver bytes separately bound; this is not product PASS",
+  "finalEvidenceReview": {
+    "status": "PASS_FOR_BLOCKED_EVIDENCE_SAVE",
+    "schemaExitCode": 0,
+    "checks": 14,
+    "independentOldZipHashMatched": true,
+    "sourceEqual80af": true,
+    "cleanup46ENOENT": true,
+    "correctionsApplied": [
+      "Actual cleanup command",
+      "Affected tests summary command null and exact receipts cited",
+      "sharedSources existence-only clarified",
+      "Evidence index refreshed"
+    ],
+    "notProductPass": true
+  }
+}

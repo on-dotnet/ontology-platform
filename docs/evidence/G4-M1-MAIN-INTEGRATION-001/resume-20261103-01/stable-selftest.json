@@ -1,0 +1,19 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "resume-20261103-01",
+  "testedCommit": "80af5bb3a5c6cbe3906bb6aee8a78c2bc7536f7e",
+  "name": "stable-selftest",
+  "command": [
+    "pwsh",
+    "-NoProfile",
+    "-File",
+    "scripts/verify.ps1",
+    "-SelfTest"
+  ],
+  "exitCode": 1,
+  "startedAtUtc": "2026-11-02T23:56:22.408909+00:00",
+  "endedAtUtc": "2026-11-02T23:56:26.496384+00:00",
+  "elapsedSeconds": 4.087363458995242,
+  "logSha256": "30615763481f8034bb1019b63e00156d3411cb106200e86ab5226f726bc0cdc2",
+  "scope": "New exact-patch commit engineering/host regression only; full I01 remains IDE0161 blocked"
+}

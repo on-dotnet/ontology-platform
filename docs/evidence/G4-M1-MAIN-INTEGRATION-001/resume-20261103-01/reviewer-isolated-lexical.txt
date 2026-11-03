@@ -1,0 +1,21 @@
+$ErrorActionPreference = "Stop"
+$root = "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform"
+$meta = Get-Content -Raw "$root/docs/evidence/G4-M1-MAIN-INTEGRATION-001/proposed-format-only.json" | ConvertFrom-Json
+$rows = @()
+foreach ($item in $meta.files) {
+    $before = [IO.File]::ReadAllText("$root/$($item.path)")
+    $after = [IO.File]::ReadAllText("/private/tmp/g4-m1-exact-format-6b4wikf5/$($item.path)")
+    $a = @([Microsoft.CodeAnalysis.CSharp.SyntaxFactory]::ParseTokens($before))
+    $b = @([Microsoft.CodeAnalysis.CSharp.SyntaxFactory]::ParseTokens($after))
+    if ($a.Count -ne $b.Count) { throw "Token count mismatch: $($item.path)" }
+    for ($i = 0; $i -lt $a.Count; $i++) {
+        if ($a[$i].RawKind -ne $b[$i].RawKind -or $a[$i].Text -cne $b[$i].Text -or $a[$i].ValueText -cne $b[$i].ValueText) { throw "Token mismatch: $($item.path):$i" }
+    }
+    $ignored = @([int][Microsoft.CodeAnalysis.CSharp.SyntaxKind]::WhitespaceTrivia, [int][Microsoft.CodeAnalysis.CSharp.SyntaxKind]::EndOfLineTrivia)
+    $ta = @($a | ForEach-Object { $_.LeadingTrivia; $_.TrailingTrivia } | Where-Object { $_.RawKind -notin $ignored } | ForEach-Object { $_.RawKind.ToString() + ":" + $_.ToFullString() })
+    $tb = @($b | ForEach-Object { $_.LeadingTrivia; $_.TrailingTrivia } | Where-Object { $_.RawKind -notin $ignored } | ForEach-Object { $_.RawKind.ToString() + ":" + $_.ToFullString() })
+    if (($ta | ConvertTo-Json -Compress) -cne ($tb | ConvertTo-Json -Compress)) { throw "Non-whitespace trivia mismatch: $($item.path)" }
+    $rows += [ordered]@{ path = $item.path; tokenCount = $a.Count; tokenKindsTextValuesEqual = $true; nonWhitespaceTriviaEqual = $true }
+}
+$assembly = [Microsoft.CodeAnalysis.CSharp.SyntaxFactory].Assembly
+[ordered]@{ status = "PASS_LEXICAL_EQUIVALENCE"; assembly = $assembly.FullName; assemblyPath = $assembly.Location; files = $rows } | ConvertTo-Json -Depth 8 -Compress

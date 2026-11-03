@@ -1,0 +1,22 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "name": "remaining-style-short-repro",
+  "command": [
+    "/usr/local/share/dotnet/dotnet",
+    "format",
+    "style",
+    "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/OntologyPlatform.Modules.Connections.csproj",
+    "--verify-no-changes",
+    "--no-restore",
+    "--include",
+    "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Migrations/20261101115947_InitialConnections.cs",
+    "--diagnostics",
+    "IDE0161"
+  ],
+  "exitCode": 2,
+  "startedAtUtc": "2026-11-02T23:52:50.308199+00:00",
+  "endedAtUtc": "2026-11-02T23:52:52.099222+00:00",
+  "elapsedSeconds": 1.791037042014068,
+  "logSha256": "8f64d0257e438f16f2e5eb272a2f1a81e8f7f411ca2bbf872286fbc110800804",
+  "scope": "Diagnostic split only; original full format gate unchanged, no severity reduction or rule changes"
+}

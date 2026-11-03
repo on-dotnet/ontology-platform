@@ -1,0 +1,94 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "sourceHead": "e7e6e28e2b6e07c5e5ccddeb91e04610bce0d14b",
+  "patchSha256": "a99ccaa90787d110674d1b7d5a0a28a7d11ee4dfccd95347bb0ba686feeac668",
+  "before": "15/15",
+  "after": "15/15",
+  "actualChangedPaths": [
+    "backend/src/Contracts/OntologyPlatform.Contracts/ImpactContractRules.cs",
+    "backend/src/Hosts/OntologyPlatform.Api/G4/G4Endpoints.cs",
+    "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Adapters/PgSourceAdapter.cs",
+    "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Application/ConnectionApplicationService.Catalog.cs",
+    "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Application/ConnectionApplicationService.Commands.cs",
+    "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Application/ConnectionApplicationService.Enable.cs",
+    "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Application/ConnectionApplicationService.Probes.cs",
+    "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Application/ConnectionApplicationService.Worker.cs",
+    "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Application/ConnectionApplicationService.cs",
+    "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/ConnectionSecretCipher.cs",
+    "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Migrations/20261101115947_InitialConnections.cs",
+    "backend/tests/OntologyPlatform.AgentTests/AgentFixture.cs",
+    "backend/tests/OntologyPlatform.ConnectionsTests/PgFixtureSecurityTests.cs",
+    "backend/tests/OntologyPlatform.G2ContractTests/G3M4ImpactContractTests.cs",
+    "backend/tests/OntologyPlatform.QueryTests/QueryFixture.cs"
+  ],
+  "commands": [
+    {
+      "command": [
+        "git",
+        "apply",
+        "--unidiff-zero",
+        "--check",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/proposed-format-only.patch"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "apply",
+        "--unidiff-zero",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/proposed-format-only.patch"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check",
+        "e7e6e28e2b6e07c5e5ccddeb91e04610bce0d14b"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check",
+        "99753df6f03b184e40b431a5b5aba89d8fa67087"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check",
+        "d1a61daffe844475b07705797e3ad325cc3f2945"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "observedAtUtc": "2026-11-02T23:48:07.521023+00:00",
+  "review": {
+    "reviewer": "/root/scope_review",
+    "status": "PASS_FOR_EXACT_ONCE_LIVE_PATCH",
+    "isolatedAfter": 15,
+    "tokenAndTriviaEqual": true,
+    "roslynExitCode": 0,
+    "elapsedSeconds": 1.094329707993893,
+    "executedScriptSha256": "7f6a28cc78557c85918342599895ece9916c00cbec227d09fe08394bb9562826"
+  },
+  "applicationCount": 1,
+  "mainUnchanged": true
+}

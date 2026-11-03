@@ -1,0 +1,18 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "name": "approved-whitespace-only-check",
+  "command": [
+    "/usr/local/share/dotnet/dotnet",
+    "format",
+    "whitespace",
+    "backend/OntologyPlatform.slnx",
+    "--verify-no-changes",
+    "--no-restore"
+  ],
+  "exitCode": 0,
+  "startedAtUtc": "2026-11-02T23:52:47.363798+00:00",
+  "endedAtUtc": "2026-11-02T23:52:50.307796+00:00",
+  "elapsedSeconds": 2.943895083008101,
+  "logSha256": "fb25c53ec6ad8b6761b82a2fdbddfdacfd4dc86bcbc70e6292fda3bd54fcdbf4",
+  "scope": "Diagnostic split only; original full format gate unchanged, no severity reduction or rule changes"
+}

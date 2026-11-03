@@ -374,3 +374,7 @@ P0_AUTHORIZED / B_CONDITIONAL / C_NOT_AUTHORIZED / M2_NOT_AUTHORIZED。最新审
 P0 已真实核验通过限定准入，历史阻断描述保留。本计划归档将唯一绝对 Markdown 链接改为代码路径；完整原始字节与审批文档保存在本任务 p0/original-documents.json 的 base64 字段，原始 SHA 不变。
 
 B 在廉价原生格式检查发现继承输入的 275 项错误（274 WHITESPACE / 1 CHARSET，15 个文件）后停止。I01 BLOCKED，I02–I07 NOT_RUN，I08 仅进行阻断部分交付；不进入主线审批就绪。精确补丁仅在 ignored 独立副本生成供审阅，未应用到产品。
+
+## 2026-11-03 执行增量
+
+按用户精确15文件追加审批执行，单独提交80af5bb3a5c6cbe3906bb6aee8a78c2bc7536f7e。原格式空白/BOM问题闭合，但IDE0161及有限秘密扫描误报阻断完整I01/新V3。按照追加审批停止受影响高成本入口，完整实测矩阵、资源回收和未应用三文件提案见本任务resume-20261103-01/blocked-handoff.md。历史段落保持当时事实；未达到READY_FOR_CHATGPT_MAIN_MERGE_APPROVAL，不执行C或M2。

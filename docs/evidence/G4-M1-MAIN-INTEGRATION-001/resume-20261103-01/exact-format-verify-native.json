@@ -1,0 +1,19 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "resume-20261103-01",
+  "name": "exact-format-verify-native",
+  "command": [
+    "/usr/local/share/dotnet/dotnet",
+    "format",
+    "backend/OntologyPlatform.slnx",
+    "--verify-no-changes",
+    "--no-restore"
+  ],
+  "exitCode": 2,
+  "startedAtUtc": "2026-11-02T23:50:58.312048+00:00",
+  "endedAtUtc": "2026-11-02T23:51:07.031934+00:00",
+  "elapsedSeconds": 8.719871125009377,
+  "logSha256": "b3de070f37aa729be61500a6bcd2e738b0c0096cfe19a998e21100ebac7a7669",
+  "scope": "Targeted exact patch checks, not stable final I01",
+  "context": "Native approved execution; prior sandbox attempts interrupted, never PASS"
+}

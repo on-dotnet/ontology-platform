@@ -1,0 +1,126 @@
+#!/usr/bin/env python3
+"""Only the reviewed 46 task-local cache/build directories; default dry-run."""
+import argparse
+import datetime
+import hashlib
+import importlib.util
+import json
+import os
+from pathlib import Path
+import shutil
+import stat
+import subprocess
+import sys
+
+ROOT = Path('/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform')
+OUT = ROOT / 'artifacts/g4-m1-main-integration-001/resume-20261103-01'
+TASK = 'G4-M1-MAIN-INTEGRATION-001'
+HEAD = '80af5bb3a5c6cbe3906bb6aee8a78c2bc7536f7e'
+MANIFEST_SHA = '4ed3e9fcd1ad406513db516100177e860e0f68a5a8e0010786322e00c169968d'
+
+def sha(data):
+    return hashlib.sha256(data).hexdigest()
+
+def git(*args):
+    return subprocess.check_output(['git', *args], cwd=ROOT)
+
+def main():
+    if sys.flags.optimize != 0:
+        raise RuntimeError("Optimized Python disables required assertions")
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--apply', action='store_true')
+    parser.add_argument('--expected-dry-run-sha')
+    args = parser.parse_args()
+    assert Path.cwd() == ROOT and ROOT.resolve() == ROOT
+    assert git('rev-parse', 'HEAD').decode().strip() == HEAD
+    assert git('branch', '--show-current').decode().strip() == 'codex/g4-m1-main-integration-001'
+    manifest_bytes = (OUT / 'cleanup-manifest.json').read_bytes()
+    assert sha(manifest_bytes) == MANIFEST_SHA
+    manifest = json.loads(manifest_bytes)
+    age = (datetime.datetime.now(datetime.timezone.utc) - datetime.datetime.fromisoformat(manifest['createdAtUtc'])).total_seconds()
+    assert 0 <= age <= 3600, 'Expired approved target list'
+    assert manifest['taskId'] == TASK and len(manifest['targets']) == 46
+    source = ROOT / 'scripts/maintenance/cleanup_resources.py'
+    assert source.read_bytes() == git('show', HEAD + ':scripts/maintenance/cleanup_resources.py'), 'Helper source drift'
+    assert subprocess.run(['git', 'diff', 'HEAD', '--exit-code'], cwd=ROOT, stdout=subprocess.DEVNULL).returncode == 0, 'Tracked source drift'
+    spec = importlib.util.spec_from_file_location('approved_cleanup_metadata', source)
+    helper = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(helper)
+    assert shutil.rmtree.avoids_symlink_attacks, 'Descriptor-safe rmtree required'
+    tracked = [ROOT / n.decode() for n in git('ls-files', '-z').split(b'\0') if n]
+    protected = {str(p): sha(p.read_bytes()) for p in tracked}
+    targets = [Path(x['path']) for x in manifest['targets']]
+    assert len(set(targets)) == 46
+    for target in targets:
+        assert (target.is_relative_to(ROOT) or target == Path('/private/tmp/g4-m1-exact-format-6b4wikf5')) and target != ROOT and target.is_dir() and not target.is_symlink()
+        assert not any(p.is_symlink() for p in target.parents)
+        assert not any(p.is_relative_to(target) for p in tracked)
+        rel = str(target.relative_to(ROOT)) if target.is_relative_to(ROOT) else str(target)
+        assert rel in ('.tools/pythonlibs', '.tools/nuget', '.tools/dotnet-home', '/private/tmp/g4-m1-exact-format-6b4wikf5') or (rel.startswith('backend/') and target.name in ('bin', 'obj'))
+    result = json.loads((OUT / 'stable-selftest.json').read_text())
+    assert result['exitCode'] == 1 and result['testedCommit'] == HEAD
+    assert sha((OUT / 'stable-selftest.txt').read_bytes()) == result['logSha256'] == '30615763481f8034bb1019b63e00156d3411cb106200e86ab5226f726bc0cdc2'
+    assert json.loads((OUT / 'host-monitor-process-receipt.json').read_text())['exitCode'] == 0
+    temp = Path('/private/tmp/g4-m1-exact-format-6b4wikf5')
+    assert subprocess.run(['git', '-C', str(temp), 'rev-parse', '--verify', 'HEAD'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode == 128
+    assert subprocess.check_output(['git', '-C', str(temp), 'for-each-ref']) == b''
+    isolated = json.loads((OUT / 'isolated-apply.json').read_text())
+    for row in isolated['files']:
+        rel = row['path']
+        assert (temp / rel).read_bytes() == git('show', HEAD + ':' + rel)
+    snapshots = {str(p): helper.metadata_entries(p) for p in targets}
+    by_target = {x['path']: x for x in manifest['targets']}
+    for target, entries in snapshots.items():
+        approved = by_target[target]
+        assert sum(stat.S_ISREG(x['mode']) for x in entries) == approved['files'], 'Reviewed file count drift'
+        assert sum(x['size'] for x in entries if stat.S_ISREG(x['mode'])) == approved['logicalBytes'], 'Reviewed byte count drift'
+        assert sum(stat.S_ISLNK(x['mode']) for x in entries) == approved['symlinksNotFollowed'], 'Reviewed symlink count drift'
+    if args.apply:
+        assert args.expected_dry_run_sha and len(args.expected_dry_run_sha) == 64
+        dry_bytes = (OUT / 'cleanup-dry-run.json').read_bytes()
+        assert sha(dry_bytes) == args.expected_dry_run_sha, 'DryRun receipt drift'
+        dry = json.loads(dry_bytes)
+        assert dry['status'] == 'DRY_RUN_NO_DELETE' and dry['executorSha256'] == sha(Path(__file__).read_bytes())
+        assert dry['reviewedManifestSha256'] == MANIFEST_SHA and dry['testedCommit'] == HEAD
+        assert len(dry['records']) == 46
+        frozen = {x['path']: x['beforeMetadataSha256'] for x in dry['records']}
+        assert set(frozen) == set(snapshots)
+        assert all(helper.digest(entries) == frozen[target] for target, entries in snapshots.items()), 'Metadata changed after DryRun'
+    else:
+        assert args.expected_dry_run_sha is None
+    report = dict(taskId=TASK, mode='APPLY' if args.apply else 'DRY_RUN', startedAtUtc=datetime.datetime.now(datetime.timezone.utc).isoformat(), testedCommit=HEAD, dryRunSha256=args.expected_dry_run_sha, reviewedManifestSha256=MANIFEST_SHA, executorSha256=sha(Path(__file__).read_bytes()), metadataHelperSha256=sha(source.read_bytes()), records=[])
+    output = OUT / ('cleanup-apply.json' if args.apply else 'cleanup-dry-run.json')
+    assert not output.exists()
+    def save():
+        output.write_text(json.dumps(report, indent=2) + '\n')
+    save()
+    for target in targets:
+        entries = snapshots[str(target)]
+        before_hash = helper.digest(entries)
+        assert helper.digest(helper.metadata_entries(target)) == before_hash
+        row = dict(path=str(target), beforeEntries=len(entries), beforeMetadataSha256=before_hash, beforeRegularFiles=sum(stat.S_ISREG(x['mode']) for x in entries), beforeLogicalBytes=sum(x['size'] for x in entries if stat.S_ISREG(x['mode'])), symlinksNotFollowed=sum(stat.S_ISLNK(x['mode']) for x in entries), command=['shutil.rmtree', str(target)], commandExecuted=False, operationExitCode=None)
+        report['records'].append(row)
+        save()
+        if args.apply:
+            try:
+                shutil.rmtree(target)
+                row['commandExecuted'] = True
+                row['operationExitCode'] = 0
+                try:
+                    target.lstat()
+                    raise AssertionError('Target survived deletion')
+                except FileNotFoundError:
+                    row['afterLstat'] = 'ENOENT'
+            except BaseException:
+                row['operationExitCode'] = 1
+                save()
+                raise
+        save()
+    assert ROOT.joinpath('apps/web').is_dir()
+    assert all(Path(p).is_file() and sha(Path(p).read_bytes()) == value for p, value in protected.items())
+    report.update(status='PASS_EXACT_REGENERABLE_COPIES_REMOVED' if args.apply else 'DRY_RUN_NO_DELETE', protectedTrackedFiles=len(protected), protectedTrackedHashesUnchanged=True, endedAtUtc=datetime.datetime.now(datetime.timezone.utc).isoformat())
+    save()
+    print(json.dumps(dict(status=report['status'], targets=len(targets), sourceProtected=len(protected))))
+
+if __name__ == '__main__':
+    main()

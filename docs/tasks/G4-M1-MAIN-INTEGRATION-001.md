@@ -13,3 +13,7 @@ owned_paths：计划第2节精确任务文档、证据、experiments/g4-m1-main-
 严格停止：任一产品缺陷需越界修复、工具/镜像身份不符、输入漂移或资源边界失败时保存见证并停止对应入口。最终B交唯一LOCAL V3与包外回执，只有全I01-I08和独立Review通过才READY_FOR_CHATGPT_MAIN_MERGE_APPROVAL；不得执行C/main更新或M2/G6。
 
 具体阻断、未完成适配和精确修复申请见 [阻断交接](../evidence/G4-M1-MAIN-INTEGRATION-001/blocked-handoff.md)。本次任何提交/ZIP只交付阻断见证及DRAFT，不代表B完成；不授权C。
+
+## 2026-11-03 精确格式补丁续执行
+
+最新明确授权为精确15文件格式/BOM追加审批；独立源码提交80af5bb3a5c6cbe3906bb6aee8a78c2bc7536f7e，15/15校验并普通推送。原owned_paths仅追加该审批表的精确字节例外。whitespace通过、完整format仍exit2，新T SelfTest初始扫描exit1，状态保持BLOCKED_WITH_WITNESS。当前结果和未应用三文件最小申请见[本轮阻断交接](../evidence/G4-M1-MAIN-INTEGRATION-001/resume-20261103-01/blocked-handoff.md)。旧证据/ZIP原样保留，三文件提案未授权未应用。

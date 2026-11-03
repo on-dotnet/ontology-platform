@@ -1,0 +1,24 @@
+{
+  "checkedAtUtc": "2026-11-03T00:08:32.793946+00:00",
+  "oldZipSha256": "4e4255f9f98e5e8847b1f1b18152ecadeaf4c5395c76b89dc626d842819bc636",
+  "oldZipBytes": 10504304,
+  "mainTreeStatus": "?? .DS_Store\n?? backend/.DS_Store\n?? backend/src/.DS_Store\n?? docs/.DS_Store\n?? docs/evidence/.DS_Store\n?? infra/.DS_Store\n",
+  "mainSha": "d1a61daffe844475b07705797e3ad325cc3f2945",
+  "scope": "Tracked sources protected by cleanup; main six DS_Store preserved; old ZIP actual SHA checked. sharedSources is existence-only, not content verification; preflight provenance is separately recorded.",
+  "sharedSources": {
+    "/Users/chasen/.nuget/packages": true,
+    "/Users/chasen/Developer/repos/ontology-platform/.tools/pythonlibs": true,
+    "/Applications/Microsoft Edge.app": true,
+    "/usr/local/share/dotnet/dotnet": true
+  },
+  "dockerReadOnlyChecks": {
+    "commands": [
+      "docker --context desktop-linux ps -aq",
+      "docker --context desktop-linux volume ls --filter label=TaskId=G4-M1-MAIN-INTEGRATION-001 --format {{.Name}}",
+      "docker --context desktop-linux network ls --filter label=TaskId=G4-M1-MAIN-INTEGRATION-001 --format {{.ID}}"
+    ],
+    "observedOutput": "empty",
+    "combinedShellExitCode": 0,
+    "scope": "Read-only listings; lifecycle record confirms no task creation. No Docker deletion performed."
+  }
+}

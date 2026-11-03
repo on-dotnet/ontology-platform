@@ -1,0 +1,132 @@
+{
+  "evidenceSchemaVersion": 2,
+  "checks": [
+    {
+      "name": "approved-whitespace-only-check",
+      "command": "/usr/local/share/dotnet/dotnet format whitespace backend/OntologyPlatform.slnx --verify-no-changes --no-restore",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "WHITESPACE/CHARSET closed; diagnostic split only, not complete format acceptance; log SHA256 fb25c53ec6ad8b6761b82a2fdbddfdacfd4dc86bcbc70e6292fda3bd54fcdbf4"
+    },
+    {
+      "name": "exact-patch-build-native",
+      "command": "/usr/local/share/dotnet/dotnet build backend/OntologyPlatform.slnx --no-restore",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Targeted build passed before commit with exact approved source bytes; not complete stable I01; log SHA256 20d36a48f15b544d4c9eb1fa2709b473965cdaf98f54f9bdee4281d1ff71f2fe"
+    },
+    {
+      "name": "I01-complete-format",
+      "command": "/usr/local/share/dotnet/dotnet format backend/OntologyPlatform.slnx --verify-no-changes --no-restore",
+      "status": "FAIL",
+      "exitCode": 2,
+      "output": "Two IDE0161 diagnostics remain; no rule changed; b3de070f37aa729be61500a6bcd2e738b0c0096cfe19a998e21100ebac7a7669"
+    },
+    {
+      "name": "stable-selftest",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1 -SelfTest",
+      "status": "FAIL",
+      "exitCode": 1,
+      "output": "Initial finite secret-pattern scan rejects test member assignment; 27 suites NOT_RUN; 30615763481f8034bb1019b63e00156d3411cb106200e86ab5226f726bc0cdc2"
+    },
+    {
+      "name": "affected-tests",
+      "command": null,
+      "status": "PARTIAL",
+      "exitCode": 0,
+      "output": "240 total: 150 passed, 90 skipped, zero failures; actual command and output recorded per project; no PG/Jena/S3 fixture acceptance; summary only, exact commands: AgentTests.json, ConnectionsTests.json, G2ContractTests.json, QueryTests.json"
+    },
+    {
+      "name": "I01-complete",
+      "command": null,
+      "status": "BLOCKED",
+      "exitCode": null,
+      "output": "Full stable native/Web/host acceptance not completed; no inheritance of prior T results"
+    },
+    {
+      "name": "I02",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Dependent gate stopped; task adapters remain incomplete DRAFT"
+    },
+    {
+      "name": "I03",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Dependent gate stopped; task adapters remain incomplete DRAFT"
+    },
+    {
+      "name": "I04",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Dependent gate stopped; task adapters remain incomplete DRAFT"
+    },
+    {
+      "name": "I05",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Dependent gate stopped; task adapters remain incomplete DRAFT"
+    },
+    {
+      "name": "I06",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Dependent gate stopped; task adapters remain incomplete DRAFT"
+    },
+    {
+      "name": "I07",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Dependent gate stopped; task adapters remain incomplete DRAFT"
+    },
+    {
+      "name": "owned-resource-closeout",
+      "command": "python3 -B /Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/resume-20261103-01/cleanup-owned-copies.py --apply --expected-dry-run-sha b16608c38d877ef9b32ce4eb2ed2688e78c543945cb755cf7db569ec25d2d644",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "46 own regenerable directories removed; 2187235684 logical bytes; all tracked sources unchanged; each ENOENT; no task container created"
+    },
+    {
+      "name": "I08-complete",
+      "command": null,
+      "status": "BLOCKED",
+      "exitCode": null,
+      "output": "Cannot reach main approval. New V3 source scan blocked; exact final package attempt recorded outside committed Head. Old package preserved."
+    }
+  ],
+  "ci": {
+    "status": "NOT_RUN",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  },
+  "metadata": {
+    "taskId": "G4-M1-MAIN-INTEGRATION-001",
+    "actualAgentActiveTime": "UNKNOWN",
+    "status": "BLOCKED_WITH_WITNESS",
+    "approvedMain": "d1a61daffe844475b07705797e3ad325cc3f2945",
+    "sourceHead": "e7e6e28e2b6e07c5e5ccddeb91e04610bce0d14b",
+    "patchSha256": "a99ccaa90787d110674d1b7d5a0a28a7d11ee4dfccd95347bb0ba686feeac668",
+    "windows": "NOT_RUN",
+    "intel": "NOT_RUN",
+    "phaseC": "NOT_AUTHORIZED_NOT_EXECUTED",
+    "m2": "NOT_AUTHORIZED_NOT_EXECUTED",
+    "supplyChain": "AMBER-A1/LICENSE_PARTIAL; full CVE/signature/license/current online NOT_VERIFIED",
+    "hostSessionContinuity": "NOT_VERIFIED",
+    "executedEvidenceDriverHashes": {
+      "cleanup-owned-copies.py.txt": "47575d4df7287fe909e7adcbf05740804bec106912883f043928b9f9973b18c2",
+      "proposal-builder-check.ps1.txt": "e763db31e8d068f549362f7166b4a5a296dd7a1d696fb10986228029d1a842d2",
+      "reviewer-namespace-check.txt": "da7ab52e81737c05133af4be8c35238145a5ebef509c108031bdfed58617906c",
+      "reviewer-isolated-lexical.txt": "7f6a28cc78557c85918342599895ece9916c00cbec227d09fe08394bb9562826"
+    }
+  },
+  "validationSource": "LOCAL",
+  "testedCommit": "80af5bb3a5c6cbe3906bb6aee8a78c2bc7536f7e"
+}
