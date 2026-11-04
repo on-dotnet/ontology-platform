@@ -168,7 +168,7 @@ services:
     cpus: 2
     labels: *id001
     image: sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c
-    mem_limit: 1g
+    mem_limit: 2g
     user: 10001:10001
     entrypoint:
     - java
@@ -254,7 +254,7 @@ volumes:
     driver_opts:
       type: tmpfs
       device: tmpfs
-      o: size=512m,mode=0700,uid=10001,gid=10001
+      o: size=1024m,mode=0700,uid=10001,gid=10001
     labels: *id001
   rustfs-data:
     driver: local

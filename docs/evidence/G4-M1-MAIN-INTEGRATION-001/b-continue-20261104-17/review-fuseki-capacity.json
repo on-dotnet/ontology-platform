@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "reviewer": "/root/consumer_review",
+  "scope": "THREE_TASK_FILES_ONLY",
+  "rawReview": "独立实际Compose及正反测试通过，无本差异P0/P1。G3 5888MiB、模块3584MiB、命名卷2576MiB、匿名tmpfs244MiB，合2820MiB；image及JVM640MiB不变。最终46测试OK，原TypeError保留。满卷原始日志和45字节IOException实核；扩大容量尚待新T实测，Query仍BLOCKED。",
+  "files": {
+    "consumer_check.py": "b8a12a744de5eb8e321ccc065d24f1c95ba81c449ab52e5c17c17f4aecd63fe4",
+    "compose.g3.yaml": "f4ff313a0825c9fa818a10509366db97823578bba5315a62cf991cb075e44e66",
+    "tests.py": "eaf773e3489350fd93acf55a64bdf037c6ab9c30649647c5869b5be60113424c"
+  },
+  "testLogSha256": "529b795a4a2ff0d54e9cde7d2ffc70cb25849f351b4fe6ce1c4caa67c2437efe",
+  "cleanupAdmission": {
+    "docker": "3容器1网络3卷精确一致；KEEP3网络8卷；ingress79057身份匹配，695连接闭合，695Exec实际exit0。",
+    "toolCopyPlanSha256": "2d695b4e44c4db90348917ca1b5bde6bb196854f375d544023f0c1a9eeaf68b7",
+    "toolCopies": "四目录指纹/无tracked/4lsof exit1空流/KEEP/copyreceipt实核，期限内准入Apply。"
+  }
+}

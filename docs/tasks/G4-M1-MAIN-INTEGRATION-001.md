@@ -77,3 +77,8 @@ Run15 / T897d8fcb7f3111fa8b335370009d51dcf46366b3：R2及独立后验PASS（5.60
 Run16 / Tf3cc2ce34fb5e083f3e92f4fb8c62d724f388685：R2及独立后验PASS（5.657秒），原27套SelfTest368.57秒、46任务测试、native/Web通过，780总344PASS436SKIP0FAIL、Web379；I05 PASS/I03 PARTIAL。Semantic137方法302案例按方法隔离完整PASS、0容量拒绝，246个原skip已有同T实际PASS见证，但整体fixture closure尚未运行。随后原Publishing单进程78案例31PASS47FAIL、94容量拒绝，I02阻断；首失败方法新进程1PASS仅诊断，全部47原因仍未逐一确认。
 
 任务入口现统一四模块方法隔离：Semantic137/302、Publishing42/78、Query39/49、Agent26/33，共244方法462案例，按(project,case)精确多重集合而非全局去重。保留每方法全部参数、方法内竞争/并发、原外部持久设施以及Agent唯一MCP方法的两次输出；全部模块成功后才Ajv。仅module-tests/tests变更，46任务测试与独立复审PASS；新T完整四模块验收NOT_RUN，旧单进程失败不升级。末次模块资源2.5GiB内存限额、卷106209280字节，未超预算；正在精确收尾后冻结新T，无新V3/main/M2。
+
+
+Run17 / Ta85b2cf3c40455518fa120359520c3b19a73ac01：R2严格离线及独立后验PASS（5.641秒），原27套SelfTest370.93秒、46任务测试、native/Web通过，780总344PASS436SKIP0FAIL，Web379；I05 PASS/I03 PARTIAL。Semantic137方法302案例及Publishing42方法78案例全部PASS，零ingress容量拒绝；Query前12方法14案例通过，m013在发布的GSP PUT收到500。精确合成诊断PUT实际返回45字节IOException No space left on device，/fuseki 512MiB已100%满，/tmp尚有空间；memory.events max2093/oom0/oom_kill0。保留原失败与私有原始输出，不把无OOM解释为门禁PASS。
+
+仅任务compose.g3/consumer_check/tests调整Fuseki数据tmpfs为1024MiB及内存2GiB，精确限制唯一Fuseki消费者；其余卷上限不变。G3内存5888MiB、模块3584MiB、全部命名卷及匿名tmpfs2820MiB，仍在已批6GiB/3GiB；镜像和JVM640MiB堆未变。46任务正反测试与独立审查PASS，原测试夹具TypeError保留。Run17精确7Docker对象及ingress、宿主monitor、4工具副本已回收，事故KEEP保留；须新T完整验收，扩大容量尚未证明产品通过。无新V3/main/M2。详见b-continue-20261104-17/index.json。

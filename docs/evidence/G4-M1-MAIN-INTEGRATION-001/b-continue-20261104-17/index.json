@@ -1,0 +1,111 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-17",
+  "testedCommit": "a85b2cf3c40455518fa120359520c3b19a73ac01",
+  "status": "BLOCKED_WITH_WITNESS",
+  "gates": {
+    "R2": "PASS",
+    "I01": "PARTIAL",
+    "I05": "PASS",
+    "I03": "PARTIAL",
+    "I02": "BLOCKED_WITH_WITNESS",
+    "I04": "NOT_RUN",
+    "I06": "NOT_RUN",
+    "I07": "NOT_RUN",
+    "I08": "NOT_RUN"
+  },
+  "native": {
+    "total": 780,
+    "passed": 344,
+    "skipped": 436,
+    "failed": 0
+  },
+  "webTests": 379,
+  "selfTestSuites": 27,
+  "taskTestsAtT": 46,
+  "semantic": {
+    "methods": 137,
+    "total": 302,
+    "PASS": 302,
+    "FAIL": 0,
+    "SKIP": 0
+  },
+  "publishing": {
+    "methods": 42,
+    "total": 78,
+    "PASS": 78,
+    "FAIL": 0,
+    "SKIP": 0
+  },
+  "query": {
+    "passedMethods": 12,
+    "passedCases": 14,
+    "failedMethod": "OntologyPlatform.QueryTests.QueryFaultTests.DepthBudgetReportsIncompleteGraph",
+    "failedCases": 1
+  },
+  "moduleCapacityRefusals": 0,
+  "sameTSkippedPassWitnesses": {
+    "SemanticTests": 246,
+    "PublishingTests": 70
+  },
+  "formalFixtureClosure": "NOT_RUN",
+  "failureWitness": {
+    "gspStatus": 500,
+    "bodyBytes": 45,
+    "bodySha256": "a11585e25726d42bfe4886f1f763b0f86e35dd5233ea267661a0da326633e30a",
+    "message": "java.io.IOException: No space left on device",
+    "fusekiTotalKiB": 524288,
+    "fusekiUsedKiB": 524288,
+    "fusekiFreeKiB": 0,
+    "memoryCurrentBytes": 1013645312,
+    "memoryPeakBytes": 1073827840,
+    "memoryMaxBytes": 1073741824,
+    "memoryEventsMax": 2093,
+    "oom": 0,
+    "oomKill": 0
+  },
+  "nextCapacity": {
+    "fusekiMemMiB": 2048,
+    "fusekiDataMiB": 1024,
+    "g3MemMiB": 5888,
+    "moduleMemMiB": 3584,
+    "namedVolumeMiB": 2576,
+    "allTmpfsMiB": 2820,
+    "jvmHeapMiB": 640
+  },
+  "newTAndFullRunRequired": true,
+  "ciWindowsIntel": "NOT_RUN",
+  "supplyChain": "AMBER-A1_LICENSE_PARTIAL_NOT_VERIFIED",
+  "ignoredLargeInputs": [
+    {
+      "path": "r2-sdk-before-mstest-imports.xml",
+      "bytes": 1628467,
+      "sha256": "466a1bf1f6b848b4edda34463806ac0992e307201bf5300dffe164789af5bff1"
+    },
+    {
+      "path": "r2-sdk-after-aspire-imports.xml",
+      "bytes": 1616931,
+      "sha256": "2e077ddce3aad8300a4277212e0e3945c3eb52471dc04bc2facea0d271678970"
+    },
+    {
+      "path": "r2-sdk-before-aspire-imports.xml",
+      "bytes": 1616931,
+      "sha256": "99008ca79397089727c44ac49b18e82b4324743d6966cea0489db8a14fcf815f"
+    },
+    {
+      "path": "r2-sdk-after-mstest-imports.xml",
+      "bytes": 1628467,
+      "sha256": "7353d6fdd59fbf0754c5df3b3feef8173b5b980cb49cf8c1509f39a4c0227ab0"
+    },
+    {
+      "path": "restore-stdout.txt",
+      "bytes": 52463319,
+      "sha256": "0ba402eef234640b03adbe760ee2380fd236dab1dc5f68cc821d950830095b89"
+    },
+    {
+      "path": "web-cache-files.json",
+      "bytes": 8821586,
+      "sha256": "fec5f0dc296535f8510e086370de3e6fbe9ac494715683721cdd24ef64f6beba"
+    }
+  ]
+}

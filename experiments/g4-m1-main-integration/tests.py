@@ -390,6 +390,27 @@ class ComposeBoundaryTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError,code):cc.check_compose(m,bad,group)
             bad=copy.deepcopy(config);bad['volumes']['platform-data']['driver_opts']['o']='size=65536m'
             with self.assertRaisesRegex(ValueError,'VOLUME_CAPACITY'):cc.check_compose(m,bad,group)
+            if group=='g3':
+                enlarged=copy.deepcopy(config)
+                enlarged['services']['fuseki']['mem_limit']=2*1024**3
+                enlarged['volumes']['fuseki-data']['driver_opts']['o']='size=1024m,mode=0700,uid=10001,gid=10001'
+                self.assertEqual(cc.check_compose(m,enlarged,group)['memoryBytes'],5888*1024**2)
+                for volume,size in (('fuseki-data',1025),('platform-data',1024),('rustfs-data',513),('keycloak-data',513)):
+                    bad=copy.deepcopy(enlarged);bad['volumes'][volume]['driver_opts']['o']='size='+str(size)+'m'
+                    with self.subTest(volume=volume),self.assertRaisesRegex(ValueError,'VOLUME_CAPACITY'):cc.check_compose(m,bad,group)
+                bad=copy.deepcopy(enlarged);bad['services']['fuseki']['mem_limit']=1024**3
+                with self.assertRaisesRegex(ValueError,'FUSEKI_MEMORY_CAPACITY'):cc.check_compose(m,bad,group)
+                bad=copy.deepcopy(enlarged);bad['services']['platform-pg']['volumes'].append({'type':'volume','source':'fuseki-data','target':'/unexpected'})
+                with self.assertRaisesRegex(ValueError,'FUSEKI_VOLUME_CONSUMER'):cc.check_compose(m,bad,group)
+                edge=copy.deepcopy(enlarged);edge['services']['platform-pg']['mem_limit']=int(edge['services']['platform-pg']['mem_limit'])+256*1024**2
+                self.assertEqual(cc.check_compose(m,edge,group)['memoryBytes'],6*1024**3)
+                edge['services']['platform-pg']['mem_limit']+=1
+                with self.assertRaisesRegex(ValueError,'MEMORY_BUDGET'):cc.check_compose(m,edge,group)
+                bad=copy.deepcopy(enlarged);bad['volumes']['extra-data']=copy.deepcopy(bad['volumes']['platform-data']);bad['volumes']['extra-data']['name']=config['name']+'_extra-data'
+                with self.assertRaisesRegex(ValueError,'TOTAL_VOLUME_CAPACITY'):cc.check_compose(m,bad,group)
+            else:
+                bad=copy.deepcopy(config);bad['volumes']['fuseki-data']=copy.deepcopy(bad['volumes']['platform-data']);bad['volumes']['fuseki-data']['name']=config['name']+'_fuseki-data';bad['volumes']['fuseki-data']['driver_opts']['o']='size=1024m'
+                with self.assertRaisesRegex(ValueError,'VOLUME_CAPACITY'):cc.check_compose(m,bad,group)
 
 
 class PushRaceTests(unittest.TestCase):

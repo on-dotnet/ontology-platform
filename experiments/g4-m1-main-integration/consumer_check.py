@@ -54,7 +54,12 @@ def check_compose(m, config, group):
         rt.require(not volume.get('external') and volume['driver'] == 'local', 'VOLUME_EXTERNAL')
         rt.require(volume['driver_opts'].get('type') == 'tmpfs' and volume['driver_opts'].get('device')=='tmpfs', 'VOLUME_PERSISTENCE')
         size=re.search(r'(?:^|,)size=(\d+)m(?:,|$)',volume['driver_opts'].get('o',''))
-        rt.require(size and 0<int(size[1])<=512,'VOLUME_CAPACITY')
+        limit=1024 if group=='g3' and name=='fuseki-data' else 512
+        rt.require(size and 0<int(size[1])<=limit,'VOLUME_CAPACITY')
+        if limit==1024:
+            rt.require('fuseki' in services and int(services['fuseki']['mem_limit'])>=2*1024**3,'FUSEKI_MEMORY_CAPACITY')
+            consumers=[(service,mount.get('target')) for service,entry in services.items() for mount in entry.get('volumes',[]) if mount.get('type')=='volume' and mount.get('source')==name]
+            rt.require(consumers==[('fuseki','/fuseki')],'FUSEKI_VOLUME_CONSUMER')
         volume_bytes+=int(size[1])*1024**2
         rt.require(volume['labels'].get('ontology.task-id') == rt.TASK and volume['labels'].get('ontology.run-id') == m['runId'], 'VOLUME_LABEL')
         rt.require(volume['name'] == config['name'] + '_' + name, 'VOLUME_NAME')
