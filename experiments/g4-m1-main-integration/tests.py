@@ -384,8 +384,8 @@ class OfflineFeedTests(unittest.TestCase):
             raw=archive.read_bytes();(package/archive.name).write_bytes(raw)
             (package/'lib').mkdir();payload=package/'lib/payload.dll';payload.write_bytes(b'approved payload')
             (package/(archive.name+'.sha512')).write_bytes(base64.b64encode(hashlib.sha512(raw).digest()))
-            (package/'.nupkg.metadata').write_text('{}')
-            entry={'files':['lib/payload.dll',archive.name+'.sha512'],'sha512':'metadata-unchanged'}
+            (package/'.nupkg.metadata').write_text(json.dumps({'source':str(root),'contentHash':'metadata-unchanged'}))
+            entry={'files':['lib/payload.dll',archive.name+'.sha512','.nupkg.metadata'],'sha512':'metadata-unchanged'}
             run.verify_restored_package(package,entry,archive,runtime.digest(raw))
             payload.write_bytes(b'polluted payload')
             with self.assertRaisesRegex(ValueError,'RESTORED_PAYLOAD_DRIFT'):

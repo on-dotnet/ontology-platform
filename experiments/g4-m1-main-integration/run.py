@@ -254,6 +254,8 @@ def verify_restored_package(package,entry,archive,expected_sha):
     """恢复文件逐字节回绑已审归档，元数据不能替代实际payload。"""
     raw=archive.read_bytes();rt.require(rt.digest(raw)==expected_sha,'RESTORE_ARCHIVE_DRIFT')
     rt.require((package/archive.name).read_bytes()==raw,'RESTORED_NUPKG_DRIFT')
+    metadata=json.loads((package/'.nupkg.metadata').read_text())
+    rt.require(metadata['source']==str(archive.parent) and metadata['contentHash']==entry['sha512'],'PACKAGE_PROVENANCE')
     with zipfile.ZipFile(io.BytesIO(raw)) as z:
         members={str(Path(i.filename)).casefold():i for i in z.infolist() if not i.is_dir()}
         rt.require(all(not Path(i.filename).is_absolute() and '..' not in Path(i.filename).parts for i in z.infolist()),'RESTORED_ARCHIVE_PATH')
@@ -261,6 +263,7 @@ def verify_restored_package(package,entry,archive,expected_sha):
         for relative in entry['files']:
             item=rt.boundary(package/relative,package,exists=True)
             rt.require(item.is_file() and item.stat().st_nlink==1,'PACKAGE_FILE_BOUNDARY')
+            if relative=='.nupkg.metadata':continue
             if relative==archive.name+'.sha512':expected=base64.b64encode(hashlib.sha512(raw).digest())
             else:
                 rt.require(relative.casefold() in members,'RESTORED_MEMBER_UNBOUND');expected=z.read(members[relative.casefold()])
@@ -279,7 +282,7 @@ def verify_assets(m):
         path=rt.ROOT/Path(project['project']).parent/'obj/project.assets.json'
         rt.require(path.is_file(),'PROJECT_RESTORE_SKIPPED')
         v=json.loads(path.read_text());restore=v['project']['restore']
-        rt.require(set(v['packageFolders'])=={str(packages)+'/'},'ASSET_PACKAGE_SOURCE')
+        rt.require(set(v['packageFolders']) in ({str(packages)},{str(packages)+'/'}),'ASSET_PACKAGE_SOURCE')
         rt.require(set(restore['sources'])=={str(feed)} and restore['configFilePaths']==[str(a/'offline-nuget.config')],'ASSET_CONFIG_SOURCE')
         rt.require(not restore.get('fallbackFolders') and not any(x.get('level')=='Error' for x in v.get('logs',[])),'ASSET_RESTORE_ERROR')
         actual={k.lower():x for k,x in v['libraries'].items() if x['type']=='package'}
