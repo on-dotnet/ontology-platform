@@ -32,3 +32,10 @@ owned_paths：计划第2节精确任务文档、证据、experiments/g4-m1-main-
 B0独立审查及新T尚待冻结，I01–I08本轮均NOT_RUN。执行顺序保持B0→T→I01→I05→I03拒绝→I02→I04/I03正例→I06→I07→I08；依赖缓存缺失、真实产品失败、输入漂移或超预算时停止依赖步骤并保留见证。此前阻断和PARTIAL交付段落保留历史时点，不作为本轮通过依据。当前仍不授权main/M2/G6，不生成重复中间ZIP。
 
 B0补充独立审查通过，最终19项驱动清单SHA21c6b08b1246a16c501f1148269d5a18e822af93d66d7807ac702a378d7e1a73，17项边界测试exit0，无开放P0/P1/P2。获准沿用既有B授权冻结新T并开始PREFLIGHT/I01；真实产品门禁仍NOT_RUN，不将本审查当作B完成。
+
+
+## 2026-11-04 真实 I01 与离线边界事件
+
+新T e09a8c8fc7f21ac1f3d447e8f67493c5f85059f0上原SelfTest27套和任务17项通过；全solution restore失败，后续原生/Web/产品门禁未运行。本任务入口漏读Mac专用锁，SDK解析还绕过项目离线源产生NuGet HTTP缓存；原始事实保留，零下载门禁未满足。此前B0/PREFLIGHT的边界充分性结论被真实运行推翻，不能据此继续标PASS。
+
+四个任务工具完成修复，168锁包本地只读核验、SDK/OS/首次运行隔离probe及22任务测试通过，非作者修复Review通过；尚无修复后完整新T验收，保持BLOCKED_WITH_WITNESS。详见[阻断与恢复交接](../evidence/G4-M1-MAIN-INTEGRATION-001/b-continue-20261104-02/blocked-handoff.md)。仅收尾证据与已审安全副本回收，真实门禁停止，无新V3/main/M2。

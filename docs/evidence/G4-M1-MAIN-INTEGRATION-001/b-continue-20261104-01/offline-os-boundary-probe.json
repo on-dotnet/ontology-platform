@@ -1,0 +1,31 @@
+{
+  "status": "PASS",
+  "scope": "isolated OS network-denial fixture only; no restore/build/product gates resumed",
+  "driverSha256": "c0a9479828689531a8a27892a1dd3ff5061ceb6341fa7baf02aa385a55737ec5",
+  "rows": [
+    {
+      "case": "deny-all",
+      "exitCode": 0,
+      "profile": "(version 1) (allow default) (deny network*)",
+      "probeSha256": "1e795f56981b2efd29e8138deb16e3fdfa66787422bc0f311001162ab49c1200",
+      "stdout": "{\"connected\": false, \"errno\": 1}",
+      "stderr": ""
+    },
+    {
+      "case": "allow-registered-loopback",
+      "exitCode": 0,
+      "profile": "(version 1) (allow default) (deny network-outbound (remote ip \"*:*\")) (allow network-outbound (remote ip \"localhost:*\"))",
+      "probeSha256": "1e795f56981b2efd29e8138deb16e3fdfa66787422bc0f311001162ab49c1200",
+      "stdout": "{\"connected\": true}",
+      "stderr": ""
+    },
+    {
+      "case": "deny-unlisted-loopback-address",
+      "exitCode": 0,
+      "profile": "(version 1) (allow default) (deny network-outbound (remote ip \"*:*\")) (allow network-outbound (remote ip \"localhost:*\"))",
+      "probeSha256": "1e795f56981b2efd29e8138deb16e3fdfa66787422bc0f311001162ab49c1200",
+      "stdout": "{\"connected\": false, \"errno\": 1}",
+      "stderr": ""
+    }
+  ]
+}

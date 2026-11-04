@@ -1,0 +1,35 @@
+{
+  "status": "PASS",
+  "scope": "fresh private CLI_HOME template listing only; public localhost certificate identifiers unchanged; not proof of earlier run store delta",
+  "command": [
+    "/usr/bin/sandbox-exec",
+    "-p",
+    "(version 1) (allow default) (deny network*)",
+    "/usr/local/share/dotnet/dotnet",
+    "new",
+    "list"
+  ],
+  "environment": {
+    "DOTNET_CLI_HOME": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-02/fresh-cli-home",
+    "DOTNET_GENERATE_ASPNET_CERTIFICATE": "false"
+  },
+  "before": {
+    "exitCode": 0,
+    "stdoutSha256": "721eb13c7e1b9e3be373b60408acdd05d33648b06b7e312d956cb5c79ad555f7",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "publicCertificateCount": 1,
+    "identifierSetSha256": "8b0cf01f0c65c399bb6cae27be887af69952ed0ad1730ccc8c48c95d2c738dc1"
+  },
+  "after": {
+    "exitCode": 0,
+    "stdoutSha256": "721eb13c7e1b9e3be373b60408acdd05d33648b06b7e312d956cb5c79ad555f7",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "publicCertificateCount": 1,
+    "identifierSetSha256": "8b0cf01f0c65c399bb6cae27be887af69952ed0ad1730ccc8c48c95d2c738dc1"
+  },
+  "exitCode": 0,
+  "rawSha256": "3a96746205c423cb96abc8ab0d59c586ea3399e70a18e9f577a38db92c480ab5",
+  "driverSha256": "43f9067a135170c8161f3567134b5a70be696c9751e9226baf653cb9bf7e466d",
+  "httpCacheCreated": false,
+  "rawReceiptSha256": "6536884104435ac2e05f4ce28217169b1ed299188a86f98cf02d9a0d9e9af797"
+}

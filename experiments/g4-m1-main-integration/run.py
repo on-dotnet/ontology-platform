@@ -3,6 +3,7 @@
 import argparse
 import base64
 import hashlib
+import io
 import importlib.util
 import json
 import os
@@ -13,6 +14,8 @@ import shlex
 import sqlite3
 import struct
 import tarfile
+import zipfile
+import stat
 import subprocess
 import sys
 import time
@@ -39,7 +42,8 @@ def binding(m):
 def locked_packages():
     """锁文件同名版本若出现矛盾也立即拒绝。"""
     packages={}
-    for path in (rt.ROOT/'backend').rglob('packages.lock.json'):
+    for path in sorted((rt.ROOT/'backend').rglob('packages*.lock.json')):
+        if path.name not in ('packages.lock.json','packages.osx-arm64.lock.json'):continue
         for entries in json.loads(path.read_text())['dependencies'].values():
             for name,value in entries.items():
                 if 'resolved' in value and 'contentHash' in value:
@@ -126,6 +130,75 @@ def verify_web_cache(web):
     return verified
 
 
+SDK_ARCHIVES = {
+    'Aspire.AppHost.Sdk':('13.6.3','cb8c5abad85fb542e2bb4807dd31a2ee4c22f56b7762e0258b74a803c1035ad0','eav786xkHaGl9QluDj4mDgTn4f8fdg+fFEx+vAb7YVWM5DYe0yEUJKqdj+PHxPkffLtKc+/CBgAvf7NbYT4Yfg=='),
+    'MSTest.Sdk':('4.5.1','984c1fa3338a950aaee3afa8bdda314cd732af483e0dc8b4138ec51aa0327c2b','uWWZsmVXHQfTC3JLGz1fXF28WirAhh5JKBwYyVh4I/cjBKYNbO13ZvIh0NVEBa50no5FKmN+czZCivdQfPXNXQ==')}
+
+
+def sdk_payload(name):
+    """只从已校验不可变字节构造完整SDK文件集，避免重开共享归档。"""
+    version,sha,content_hash=SDK_ARCHIVES[name]
+    archive=Path('/Users/chasen/.nuget/packages')/name.lower()/version/(name.lower()+'.'+version+'.nupkg')
+    raw=archive.read_bytes();rt.require(rt.digest(raw)==sha,'SDK_ARCHIVE_DRIFT')
+    payload={};folded=set()
+    with zipfile.ZipFile(io.BytesIO(raw)) as package:
+        for item in package.infolist():
+            relative=Path(item.filename)
+            rt.require(not relative.is_absolute() and '..' not in relative.parts and stat.S_IFMT(item.external_attr>>16)!=stat.S_IFLNK,'SDK_ARCHIVE_PATH')
+            if item.is_dir():continue
+            rt.require(item.filename.casefold() not in folded,'SDK_DUPLICATE_MEMBER');folded.add(item.filename.casefold())
+            payload[item.filename]=package.read(item)
+    metadata={'version':2,'contentHash':content_hash,'source':str(rt.ROOT/'.tools/nuget')}
+    payload.update({archive.name:raw,archive.name+'.sha512':content_hash.encode(),'.nupkg.metadata':json.dumps(metadata,indent=2).encode()})
+    target=rt.ROOT/'.tools/nuget'/name.lower()/version
+    row={'name':name,'version':version,'archiveSha256':sha,'contentHash':content_hash,'files':[{'path':str((target/key).relative_to(rt.ROOT)),'sha256':rt.digest(data),'bytes':len(data)} for key,data in sorted(payload.items())]}
+    return target,payload,row
+
+
+def prepare_sdk_copies(m):
+    """预存SDK精确归档与完整私有成员绑定；外网由OS拒绝。"""
+    import xml.etree.ElementTree as ET
+    observed=set()
+    for project in (rt.ROOT/'backend').rglob('*.csproj'):
+        tree=ET.parse(project).getroot();declared=tree.get('Sdk','')
+        if '/' in declared:observed.add(tuple(declared.split('/',1)))
+        for sdk in tree.findall('Sdk'):observed.add((sdk.attrib['Name'],sdk.attrib['Version']))
+    rt.require(observed=={(name,value[0]) for name,value in SDK_ARCHIVES.items()},'SDK_DECLARATION_DRIFT')
+    rows=[]
+    for name in SDK_ARCHIVES:
+        target,payload,row=sdk_payload(name);rt.require(not target.exists(),'EXISTING_SDK_COPY')
+        for relative,data in payload.items():
+            path=target/relative;path.parent.mkdir(parents=True,exist_ok=True)
+            with path.open('xb') as stream:stream.write(data)
+        rt.require((target/'Sdk/Sdk.props').is_file(),'SDK_PROPS_MISSING');rows.append(row)
+    rt.write_json(rt.ARTIFACTS/m['runId']/'sdk-copies.json',rows)
+    return rows
+
+
+def verify_sdk_copies(m):
+    """期望集合来自固定SHA归档，ignored清单仅作回执；遗漏/增项/篡改均拒绝。"""
+    receipt=json.loads((rt.ARTIFACTS/m['runId']/'sdk-copies.json').read_text());expected=[]
+    for name in SDK_ARCHIVES:
+        target,payload,row=sdk_payload(name);expected.append(row)
+        rt.boundary(target,rt.ROOT/'.tools/nuget',exists=True)
+        actual=set()
+        for path in target.rglob('*'):
+            rt.require(not path.is_symlink(),'SDK_COPY_LINK')
+            if path.is_file():actual.add(str(path.relative_to(target)))
+            else:rt.require(path.is_dir(),'SDK_COPY_SPECIAL')
+        rt.require(actual==set(payload),'SDK_COPY_MEMBER_SET')
+        for relative,data in payload.items():
+            path=rt.boundary(target/relative,target,exists=True)
+            rt.require(path.read_bytes()==data,'SDK_COPY_DRIFT')
+    rt.require(receipt==expected,'SDK_COPY_RECEIPT_DRIFT')
+
+
+def restore_command(m):
+    """OS边界先拒绝所有网络，再允许锁定本地恢复；SDK解析不能绕过。"""
+    rt.require(sys.platform=='darwin' and Path('/usr/bin/sandbox-exec').is_file(),'OFFLINE_OS_BOUNDARY_UNAVAILABLE')
+    return rt.offline_command([DOTNET,'restore',str(rt.ROOT/'backend/OntologyPlatform.slnx'),'--locked-mode','--configfile',str(rt.ARTIFACTS/m['runId']/'offline-nuget.config'),'-p:NuGetAudit=false','--disable-parallel','--disable-build-servers'])
+
+
 def prepare_tools(m):
     """已有锁定制品独立复制，不运行install、不链接共享可变源。"""
     d=rt.ROOT/'.tools';d.mkdir(exist_ok=True)
@@ -143,7 +216,7 @@ $rows=@(); foreach($entry in $expected.GetEnumerator()) {
  if($actual -cne $entry.Value){throw 'LOCKED_CONTENT_MISMATCH'}
  $rows+=@{package=$entry.Key;contentHash=$actual;archiveSha256=(Get-FileHash -LiteralPath $file -Algorithm SHA256).Hash.ToLowerInvariant()}
 }; $rows | ConvertTo-Json -Depth 3'''
-    verified_raw=rt.execute(m,'nuget-content-hash',['pwsh','-NoProfile','-Command',command],env=env)
+    verified_raw=rt.execute(m,'nuget-content-hash',rt.offline_command(['pwsh','-NoProfile','-Command',command]),env=env)
     verified_archives={row['package']:row['archiveSha256'] for row in json.loads(verified_raw)}
     rt.require(shutil.disk_usage(rt.ROOT).free>8*1024**3,'DISK_HEADROOM')
     rt.require(not (d/'nuget').exists(),'EXISTING_TOOL_COPY')
@@ -155,6 +228,7 @@ $rows=@(); foreach($entry in $expected.GetEnumerator()) {
         rt.require(rt.digest(target.read_bytes())==verified_archives[key],'NUGET_COPY_DRIFT')
         archive_rows.append({'package':key,'archiveSha256':rt.digest(target.read_bytes())})
     rt.write_json(rt.ARTIFACTS/m['runId']/'nuget-archive-copies.json',archive_rows)
+    prepare_sdk_copies(m)
     from xml.sax.saxutils import quoteattr
     config=rt.ARTIFACTS/m['runId']/'offline-nuget.config'
     rt.require(not config.exists(),'EXISTING_OFFLINE_CONFIG')
@@ -215,12 +289,14 @@ $rows=@(); foreach($entry in $expected.GetEnumerator()) {
 
 def engineering(m):
     """真实原样完整入口；离线恢复先行，实际skip不被掩盖。"""
-    rt.execute(m,'selftest',['pwsh','-NoProfile','-File','scripts/verify.ps1','-SelfTest'],timeout=1800)
+    verify_sdk_copies(m)
+    rt.execute(m,'selftest',rt.offline_command(['pwsh','-NoProfile','-File','scripts/verify.ps1','-SelfTest'],loopback=True),timeout=1800)
     rt.execute(m,'task-tests',['python3','-B',str(rt.HERE/'tests.py')],timeout=120)
     solution=rt.ROOT/'backend/OntologyPlatform.slnx'
     rt.require(solution.is_file(),'SOLUTION')
-    rt.execute(m,'offline-restore',[DOTNET,'restore',str(solution),'--locked-mode','--configfile',str(rt.ARTIFACTS/m['runId']/'offline-nuget.config'),'-p:NuGetAudit=false','--disable-parallel'],timeout=600)
-    raw=rt.execute(m,'native-web',['pwsh','-NoProfile','-File','scripts/verify.ps1','-RunNative','-RunTests'],timeout=1800)
+    rt.execute(m,'offline-restore',restore_command(m),timeout=600)
+    verify_sdk_copies(m)
+    raw=rt.execute(m,'native-web',rt.offline_command(['pwsh','-NoProfile','-File','scripts/verify.ps1','-RunNative','-RunTests'],loopback=True),timeout=1800)
     text=raw.decode(errors='replace')
     skips=re.findall(r'(?:已跳过|Skipped)\s+([^\r\n]+)',text)
     rt.write_json(rt.ARTIFACTS/m['runId']/'build-inputs.json',{'testedCommit':m['_head'],'files':rt.build_fingerprint()})

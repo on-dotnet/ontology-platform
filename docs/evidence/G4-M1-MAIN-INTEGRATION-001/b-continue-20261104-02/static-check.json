@@ -1,0 +1,15 @@
+{
+  "command": [
+    "/usr/bin/sandbox-exec",
+    "-p",
+    "(version 1) (allow default) (deny network*)",
+    "pwsh",
+    "-NoProfile",
+    "-File",
+    "scripts/verify.ps1"
+  ],
+  "exitCode": 0,
+  "timedOut": false,
+  "rawSha256": "c2e5c7304fd0824ab554ae685f272921c735cb97fff199d60763144064925dc2",
+  "scope": "static source/evidence only; new JSON envelope final newlines fixed, original artifact bytes preserved"
+}

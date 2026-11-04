@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-01",
+  "approvedMain": "d1a61daffe844475b07705797e3ad325cc3f2945",
+  "root": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform",
+  "docker": {
+    "context": "desktop-linux",
+    "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016",
+    "version": "29.9.2"
+  },
+  "budget": {
+    "containers": 6,
+    "memoryBytes": 6442450944,
+    "volumeStopBytes": 3221225472,
+    "downloads": 0,
+    "gpu": 0,
+    "fees": 0
+  },
+  "privateDirectory": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261104-01",
+  "riskDisposition": "AMBER-A1_INTERNAL_SYNTHETIC_NON_DISTRIBUTION",
+  "approvalSha256": "0d1f2785222d3cfb646cdb2cba9cd4c5857c0b09dc420e5fc06b9678782415a9",
+  "images": {
+    "postgres": "postgres@sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+    "keycloak": "quay.io/keycloak/keycloak@sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4",
+    "aspnet": "mcr.microsoft.com/dotnet/aspnet@sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55",
+    "node": "node@sha256:a52166d89cfcc66ea62d10535ca712d161cece5d77ff4cfa758866b6b75ccb3f",
+    "rustfs": "rustfs/rustfs@sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+    "fuseki": "sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c"
+  },
+  "tools": {
+    "/usr/local/share/dotnet/dotnet": "11b517e7b00d0efa20e9b3ab6fe433f135d828a4c95c9c6ca7a9cf1328b6ada4",
+    "/usr/local/share/dotnet/sdk/10.0.402/dotnet.dll": "6e5ca819b58022dfcfe443535676a1e0733663ef98472af37e2699f826b83fca",
+    "/usr/local/share/dotnet/LICENSE.txt": "cfc21f5e8bd655ae997eec916138b707b1d290b83272c02a95c9f821b8c87310",
+    "/usr/local/share/dotnet/ThirdPartyNotices.txt": "2dc8f8c5a39401e928b5784ab564eb8b3ceb99ead3df8f260e0cab7e0bbecc7a",
+    "/Users/chasen/.nuget/packages/dotnet-ef/10.0.13/dotnet-ef.nuspec": "ed5d504b866a1e22f56461c9ddcbd849012a79ccdf37bda2cd04676ac6e2b14d",
+    "/Users/chasen/.nuget/packages/dotnet-ef/10.0.13/dotnet-ef.10.0.13.nupkg": "31553eeaf3c1d6d5cfd4e48165671ad24081ead0ace4fac7cec1e2dc15314e28",
+    "/opt/homebrew/Cellar/node@24/24.22.1/bin/node": "0d78c9bca217f53c2dc21a067246ee4a81c1f4fa111ee64d572b45fa1ff39189",
+    "/opt/homebrew/Cellar/node@24/24.22.1/lib/libnode.137.dylib": "6a92935915ce490773793512b5e1ccbdac35028fd2bd9284490dfc7be2f9f993",
+    "/opt/homebrew/Cellar/node@24/24.22.1/LICENSE": "5888dbb9a1d2b18f2c3e6c5f6af1b39de658372b402a0577b002777f14c62ace",
+    "/opt/homebrew/Cellar/node@24/24.22.1/INSTALL_RECEIPT.json": "6180e8a3c4e30be6dde7950f58e4ffbba43284e2f80a56eaef81d43e05cf1a2d",
+    "/Users/chasen/Developer/repos/ontology-platform/.tools/pnpm/package/LICENSE": "e0a867ff513ea7be2a0ddc339ac6a031e459a38668e077b8f0e649544062f9f2"
+  },
+  "drivers": {
+    "run.py": "d0d77b0bc66b77aa850a58ffd4fb636274c1874548f7dab7c62cb94fde0ec0ee",
+    "consumer_check.py": "ca1f7d6b02053b7d6962253d169a0af2e9a33a45b28c856a64796f194de0c768",
+    "runtime.py": "eeb3e0e071254761540c531a2428c9cae8e9be19f964d03d32625deb799b8d7f",
+    "pg_fixture.py": "0b3e95134d76bb356fa2f14f21da58886675d6c553b2daf2f643895dc4591f51",
+    "module-tests.py": "7892cce89b683b90c246c99a113c269909e2ce7f7f1f0dec9e9f353def56a9ce",
+    "startup-boundary.py": "818465c1aae691880691b7070aa276e4af1a16f94b58886405f6b4c087d1226c",
+    "migration-boundary.py": "01a7f6d2e9d9ef43e38708d7ffb54b0b94d4cc9cda36d0c1b481c99e7bb1184c",
+    "contract-check.mjs": "d3cdd0b27e77952e7003e6922d3b341f7d82d8562c5836f745f751813dbdcddd",
+    "http.mjs": "c98e018d1748a3bb57a2ee70e71574633a1616e238528eb2f45c02aba83281eb",
+    "browser.mjs": "b2558c334e3896db180a3cb82f35345bfc208edb65266b963901a0d10ffdb758",
+    "fault.mjs": "1d16d0ddd208dc54aa67696854f77cf968d59f81f471bcbc66ffe8314d122e3f",
+    "g3-compatibility.mjs": "48dbc12affa5e28853ceb55d70d75ca6400d5487f95916f3c1aaf32faf7d46d3",
+    "readback.py": "0384e0ae38673c835228cdc3a1ce66e89cc86322530f4385072e9f1afe51fa3b",
+    "closeout.py": "7eef7cdf0f36d4000b0d3b67c66fc71a5d48d380fccfe565120f665fa654f4d0",
+    "tests.py": "e86dc4c1d503daa566789b3e2e8a55cd5f31366531d38f6c2e7015c29971daf9",
+    "host_continuity.py": "abd4385e1b05a86f5a12582a7e95a1fcc4a29c333eb23d2d952229744ed68984",
+    "compose.m1.yaml": "4f66652b69d9893d4c4372111a1b595558c33a7d9fda40398c5f674de79c413e",
+    "compose.g3.yaml": "e459e9c3a608806057cbdd25bdf27de14fcc8c9e09944062a0baf0fcbc803526",
+    "hooks/pre-push": "5eaef2482b8b75cb1deb7cca9703f591a0a15c2459e49c5192b4382ccb7ad474"
+  },
+  "testedCommit": "e09a8c8fc7f21ac1f3d447e8f67493c5f85059f0",
+  "b0ReviewSha256": "26a627f249c5b103f28782f47b175a96182e7a7df4f7a6c982c51681002a1f92"
+}

@@ -1,0 +1,23 @@
+{
+  "status": "PASS",
+  "rows": [
+    {
+      "case": "valid-private-sdk",
+      "status": "PASS"
+    },
+    {
+      "case": "missing",
+      "status": "REJECTED",
+      "code": "PATH_MISSING"
+    },
+    {
+      "case": "tampered",
+      "status": "REJECTED",
+      "code": "SDK_COPY_DRIFT"
+    }
+  ],
+  "restored": true,
+  "httpCacheCreated": false,
+  "scope": "isolated SDK cache only; no full gate resumed",
+  "driverSha256": "d48212d22253cb08c1dd9cf07b3d0de1a5750afed4d9870d5c932e6b60f4aece"
+}

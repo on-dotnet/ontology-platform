@@ -254,6 +254,79 @@ class SourceIoWitnessTests(unittest.TestCase):
                 readback.require_no_reader_io({},positive+health,positive)
 
 
+class OfflineRestoreBoundaryTests(unittest.TestCase):
+    def test_mac_platform_lock_is_included(self):
+        import run
+        packages=run.locked_packages()
+        for name in ('aspire.hosting.apphost','aspire.hosting.postgresql','aspire.dashboard.sdk.osx-arm64','aspire.hosting.orchestration.osx-arm64'):
+            self.assertIn(name+'/13.6.3',packages)
+
+    def test_restore_denies_network_before_dotnet(self):
+        import run
+        command=run.restore_command({'runId':'b-continue-20261104-02'})
+        self.assertEqual(command[:3],['/usr/bin/sandbox-exec','-p','(version 1) (allow default) (deny network*)'])
+        self.assertIn('--locked-mode',command)
+        self.assertIn('--disable-build-servers',command)
+        import runtime
+        self.assertEqual(runtime.environment()['DOTNET_GENERATE_ASPNET_CERTIFICATE'],'false')
+
+
+class ToolCleanupBoundaryTests(unittest.TestCase):
+    def test_exact_fingerprint_and_link_rejections(self):
+        import closeout,os
+        with tempfile.TemporaryDirectory(dir=ARTIFACTS) as directory:
+            root=Path(directory);target=root/'copy';target.mkdir();file=target/'input';file.write_bytes(b'original')
+            before=closeout.tool_tree(target);file.write_bytes(b'changed')
+            self.assertNotEqual(before['fingerprint'],closeout.tool_tree(target)['fingerprint'])
+            link=target/'escape';link.symlink_to('/private/tmp')
+            with self.assertRaisesRegex(ValueError,'TOOL_LINK_ESCAPE'):closeout.tool_tree(target)
+            link.unlink();os.link(file,target/'hardlink')
+            with self.assertRaisesRegex(ValueError,'TOOL_HARDLINK'):closeout.tool_tree(target)
+            (target/'hardlink').unlink();outside=root/'root-link';outside.symlink_to(target)
+            with self.assertRaisesRegex(ValueError,'SYMLINK'):closeout.tool_tree(outside)
+
+
+class DurableCleanupTests(unittest.TestCase):
+    def fixture(self):
+        from contextlib import ExitStack
+        from unittest.mock import patch
+        import closeout,runtime
+        stack=ExitStack();directory=stack.enter_context(tempfile.TemporaryDirectory(dir=ARTIFACTS));root=Path(directory)
+        for path in ('copies','.tools/dotnet-home','artifacts/reviews'):(root/path).mkdir(parents=True)
+        (root/'copies/input').write_bytes(b'regenerable');(root/'.tools/dotnet-home/cache').write_bytes(b'keep')
+        (root/'artifacts/reviews/OntologyPlatform-Review-G4-M1-MAIN-INTEGRATION-001-test.zip').write_bytes(b'keep')
+        stack.enter_context(patch.object(runtime,'ROOT',root));stack.enter_context(patch.object(runtime,'ARTIFACTS',root/'artifacts/g4-m1-main-integration-001'))
+        stack.enter_context(patch.object(runtime,'git',side_effect=lambda *args:'1'*40 if args[0]=='rev-parse' else ''))
+        stack.enter_context(patch.object(closeout,'TOOL_COPY_PATHS',('copies',)))
+        stack.enter_context(patch('subprocess.check_output',return_value=b''))
+        return stack,root
+
+    def test_expired_plan_rejected_before_delete(self):
+        import closeout,runtime,datetime
+        with self.fixture()[0] as stack:
+            root=runtime.ROOT;run='b-continue-20261104-01';closeout.freeze_tool_cleanup(run,'1'*40)
+            path=runtime.ARTIFACTS/run/'cleanup-tools-plan.json';plan=json.loads(path.read_text());plan['expiresAtUtc']=(datetime.datetime.now(datetime.timezone.utc)-datetime.timedelta(seconds=1)).isoformat();path.write_text(json.dumps(plan))
+            with self.assertRaisesRegex(ValueError,'CLEANUP_PLAN_EXPIRED'):closeout.apply_tool_cleanup(run,runtime.digest(path.read_bytes()))
+            self.assertTrue((root/'copies/input').is_file())
+
+    def test_partial_delete_failure_has_durable_before_after(self):
+        import closeout,runtime,errno
+        from unittest.mock import patch
+        with self.fixture()[0] as stack:
+            root=runtime.ROOT;run='b-continue-20261104-01';closeout.freeze_tool_cleanup(run,'1'*40)
+            path=runtime.ARTIFACTS/run/'cleanup-tools-plan.json';journal=path.with_name('cleanup-tools-journal.jsonl')
+            def failure(target):
+                rows=[json.loads(line) for line in journal.read_text().splitlines()]
+                self.assertEqual(rows[-1]['phase'],'BEFORE');self.assertEqual(rows[-1]['status'],'PENDING')
+                (target/'input').unlink();raise PermissionError(errno.EACCES,'synthetic cleanup failure')
+            failure.avoids_symlink_attacks=True
+            with patch('shutil.rmtree',new=failure):
+                with self.assertRaises(PermissionError):closeout.apply_tool_cleanup(run,runtime.digest(path.read_bytes()))
+            result=json.loads(path.with_name('cleanup-tools-result.json').read_text())
+            self.assertEqual(result['status'],'FAIL');self.assertEqual(result['commands'][0]['errorErrno'],errno.EACCES)
+            self.assertEqual([json.loads(x)['phase'] for x in journal.read_text().splitlines()],['START','BEFORE','AFTER'])
+
+
 if __name__ == '__main__':
     ARTIFACTS.mkdir(parents=True, exist_ok=True)
     unittest.main(verbosity=2)

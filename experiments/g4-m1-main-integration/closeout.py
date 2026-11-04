@@ -113,3 +113,107 @@ def verify_secret_hygiene(m):
     rt.write_json(rt.ARTIFACTS/m['runId']/'secret-hygiene.json',result)
     rt.require(not findings,'SECRET_HYGIENE_FAILED')
     return result
+
+
+TOOL_COPY_PATHS = (
+    '.tools/nuget', '.tools/pythonlibs', '.tools/pnpm/package', 'node_modules',
+    'apps/web/node_modules', '.tools/msbuild-sdks',
+    'artifacts/g4-m1-main-integration-001/b-continue-20261104-02/sdk-boundary-fixture',
+    'artifacts/g4-m1-main-integration-001/b-continue-20261104-02/sdk-boundary-fixture-v2',
+    'artifacts/g4-m1-main-integration-001/b-continue-20261104-02/fresh-cli-home')
+
+
+def tool_tree(path):
+    """不跟随链接的精确副本清单；目录/链接元数据与实际文件SHA共同拒绝漂移。"""
+    import os
+    import stat
+    rt.boundary(path,rt.ROOT,exists=True)
+    rt.require(path.is_dir() and not path.is_symlink(),'TOOL_COPY_ROOT')
+    rows=[];files=0;size=0;links=0
+    def visit(current):
+        nonlocal files,size,links
+        info=current.lstat();relative=str(current.relative_to(path))
+        row={'path':relative,'mode':info.st_mode,'device':info.st_dev,'inode':info.st_ino,'mtimeNs':info.st_mtime_ns}
+        if stat.S_ISLNK(info.st_mode):
+            rt.require(current.resolve().is_relative_to(rt.ROOT),'TOOL_LINK_ESCAPE')
+            row['link']=os.readlink(current);links+=1
+        elif stat.S_ISREG(info.st_mode):
+            rt.require(info.st_nlink==1,'TOOL_HARDLINK')
+            row.update(bytes=info.st_size,sha256=rt.digest(current.read_bytes()));files+=1;size+=info.st_size
+        else:rt.require(stat.S_ISDIR(info.st_mode),'TOOL_SPECIAL_FILE')
+        rows.append(row)
+        if stat.S_ISDIR(info.st_mode):
+            for child in sorted(current.iterdir()):visit(child)
+    visit(path)
+    return {'files':files,'bytes':size,'links':links,'entries':len(rows),'fingerprint':rt.digest(json.dumps(rows,sort_keys=True).encode())}
+
+
+def freeze_tool_cleanup(run, head):
+    """只冻结本轮已登记副本；默认不删除，旧runtime/包/HTTP事件原件均保留。"""
+    import subprocess
+    rt.run_id(run);rt.require(run=='b-continue-20261104-01','EXACT_INCIDENT_RUN');rt.require(rt.git('rev-parse','HEAD')==head,'CLEANUP_HEAD')
+    rt.require(not rt.git('status','--porcelain'),'CLEANUP_DIRTY_SOURCE')
+    candidates=[]
+    for relative in TOOL_COPY_PATHS:
+        path=rt.ROOT/relative
+        rt.require(not subprocess.check_output(['git','ls-files','--',relative],cwd=rt.ROOT),'TRACKED_TOOL_COPY')
+        candidates.append({'path':relative,**tool_tree(path)})
+    keeps={}
+    for path in sorted((rt.ROOT/'artifacts/reviews').glob('OntologyPlatform-Review-G4-M1-MAIN-INTEGRATION-001-*.zip')):
+        keeps[str(path.relative_to(rt.ROOT))]=rt.digest(path.read_bytes())
+    rt.require(keeps,'HISTORICAL_PACKAGES_MISSING')
+    incident_home=tool_tree(rt.ROOT/'.tools/dotnet-home')
+    now=datetime.datetime.now(datetime.timezone.utc)
+    plan={'createdAtUtc':now.isoformat(),'expiresAtUtc':(now+datetime.timedelta(minutes=15)).isoformat(),'taskId':rt.TASK,'runId':run,'root':str(rt.ROOT),'head':head,'sourceSha256':rt.digest(__import__('pathlib').Path(__file__).read_bytes()),'candidates':candidates,'keepPackages':keeps,'keepIncidentHome':incident_home,'mode':'DRY_RUN','globalCertificateStores':'KEEP_NOT_TOUCHED'}
+    path=rt.ARTIFACTS/run/'cleanup-tools-plan.json';rt.write_json(path,plan);return plan
+
+
+def apply_tool_cleanup(run, expected_plan_sha):
+    """准确SHA白名单Apply，命令前复验与lstat ENOENT后验，禁止全局或宽泛清理。"""
+    import errno
+    import shutil
+    import os
+    rt.run_id(run);rt.require(run=='b-continue-20261104-01','EXACT_INCIDENT_RUN');path=rt.ARTIFACTS/run/'cleanup-tools-plan.json'
+    rt.boundary(path,rt.ARTIFACTS/run,exists=True)
+    rt.require(rt.digest(path.read_bytes())==expected_plan_sha,'CLEANUP_PLAN_DRIFT')
+    plan=json.loads(path.read_text())
+    rt.require(shutil.rmtree.avoids_symlink_attacks,'UNSAFE_RMTREE_IMPLEMENTATION')
+    now=datetime.datetime.now(datetime.timezone.utc)
+    rt.require(datetime.datetime.fromisoformat(plan['createdAtUtc'])<=now<=datetime.datetime.fromisoformat(plan['expiresAtUtc']),'CLEANUP_PLAN_EXPIRED')
+    rt.require(plan['taskId']==rt.TASK and plan['runId']==run and plan['root']==str(rt.ROOT),'CLEANUP_PLAN_IDENTITY')
+    rt.require(rt.git('rev-parse','HEAD')==plan['head'] and not rt.git('status','--porcelain'),'CLEANUP_INPUT_DRIFT')
+    rt.require(rt.digest(__import__('pathlib').Path(__file__).read_bytes())==plan['sourceSha256'],'CLEANUP_EXECUTOR_DRIFT')
+    rt.require([x['path'] for x in plan['candidates']]==list(TOOL_COPY_PATHS),'CLEANUP_PATH_SET')
+    for row in plan['candidates']:
+        rt.require(tool_tree(rt.ROOT/row['path'])=={k:v for k,v in row.items() if k!='path'},'CLEANUP_COPY_DRIFT')
+    result={'taskId':rt.TASK,'runId':run,'head':plan['head'],'planSha256':expected_plan_sha,'status':'FAIL','commands':[]}
+    output=rt.ARTIFACTS/run/'cleanup-tools-result.json';rt.require(not output.exists(),'EXISTING_CLEANUP_RECEIPT')
+    journal=output.with_name('cleanup-tools-journal.jsonl')
+    rt.require(not journal.exists() and not journal.is_symlink(),'EXISTING_CLEANUP_JOURNAL')
+    with os.fdopen(os.open(journal,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600),'w') as stream:
+        def persist(row):
+            stream.write(json.dumps(row,sort_keys=True)+'\n');stream.flush();os.fsync(stream.fileno())
+        persist({'phase':'START','planSha256':expected_plan_sha,'head':plan['head']})
+        try:
+            for row in plan['candidates']:
+                target=rt.ROOT/row['path'];before=tool_tree(target)
+                rt.require(before=={k:v for k,v in row.items() if k!='path'},'CLEANUP_COPY_DRIFT')
+                command={'operation':'shutil.rmtree exact frozen directory without following links','path':row['path'],'before':before,'status':'PENDING','exitCode':None}
+                result['commands'].append(command);persist({'phase':'BEFORE',**command})
+                try:
+                    shutil.rmtree(target)
+                    try:target.lstat()
+                    except OSError as error:
+                        rt.require(error.errno==errno.ENOENT,'CLEANUP_ABSENCE_DIAGNOSTIC');absent=error.errno
+                    else:raise ValueError('TOOL_COPY_STILL_EXISTS')
+                    command.update(status='PASS',exitCode=0,afterErrno=absent)
+                except BaseException as error:
+                    command.update(status='FAIL',exitCode=1,errorType=type(error).__name__,errorErrno=getattr(error,'errno',None),afterExists=target.exists())
+                    persist({'phase':'AFTER',**command});raise
+                persist({'phase':'AFTER',**command})
+            for name,sha in plan['keepPackages'].items():rt.require(rt.digest((rt.ROOT/name).read_bytes())==sha,'KEEP_PACKAGE_DRIFT')
+            rt.require(tool_tree(rt.ROOT/'.tools/dotnet-home')==plan['keepIncidentHome'],'KEEP_INCIDENT_HOME_DRIFT')
+            rt.require(rt.git('rev-parse','HEAD')==plan['head'] and not rt.git('status','--porcelain'),'CLEANUP_SOURCE_DRIFT')
+            result.update(status='PASS',keptPackages=len(plan['keepPackages']),incidentHomeKept=True,deletedFiles=sum(x['files'] for x in plan['candidates']),deletedLogicalBytes=sum(x['bytes'] for x in plan['candidates']),globalCertificateStores='NOT_TOUCHED')
+            return result
+        finally:rt.write_json(output,result)

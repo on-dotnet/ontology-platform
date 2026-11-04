@@ -1,0 +1,34 @@
+{
+  "status": "PASS",
+  "rows": [
+    {
+      "case": "empty-manifest",
+      "status": "REJECTED",
+      "code": "SDK_COPY_RECEIPT_DRIFT"
+    },
+    {
+      "case": "missing",
+      "status": "REJECTED",
+      "code": "SDK_COPY_MEMBER_SET"
+    },
+    {
+      "case": "tamper",
+      "status": "REJECTED",
+      "code": "SDK_COPY_DRIFT"
+    },
+    {
+      "case": "extra",
+      "status": "REJECTED",
+      "code": "SDK_COPY_MEMBER_SET"
+    },
+    {
+      "case": "symlink",
+      "status": "REJECTED",
+      "code": "SDK_COPY_LINK"
+    }
+  ],
+  "positiveBeforeAfter": true,
+  "driverSha256": "75aefb81b308e2abbc55e727084b23e6c104ac14135743e1ca278fa74453c2dd",
+  "receiptBeforeSha256": "d06cb2e8337ca418d01b73800a1f1368d0ba8d5ec774ca85a0f1b33d8e0a9e6d",
+  "receiptAfterSha256": "f997bb89d689bac8e06f2f6d5a1265fb3234abed0f28a3c747d953d20db7d24e"
+}

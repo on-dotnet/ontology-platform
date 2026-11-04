@@ -1,0 +1,13 @@
+# 阶段 B — BLOCKED_WITH_WITNESS
+
+TaskId: G4-M1-MAIN-INTEGRATION-001。继续原分支与工作树；ApprovedMain=d1a61daffe844475b07705797e3ad325cc3f2945，恢复Head=720c9cb72a22b9d905a1adade65c042de79a5ad0。
+
+实际测试T=e09a8c8fc7f21ac1f3d447e8f67493c5f85059f0，RunId=b-continue-20261104-01。真实原样SelfTest exit0、27套；任务边界17项exit0。全solution离线restore exit1，AppHost四包NU1101。原生build/format/test、Web及I02–I07均未运行；此前260跳过已逐案映射当前源码与设施，0项在本轮实际关闭。
+
+原因在本任务入口，不是已确认产品缺陷：只收集通用packages.lock.json，遗漏准确Mac ARM64锁的76个包；项目--configfile也没有覆盖MSBuild的SDK解析。新任务HTTP缓存实际包含Aspire.AppHost.Sdk13.6.3的2,046,462字节、MSTest.Sdk4.5.1的42,412字节及漏洞/源元数据，总缓存2,880,808字节。两个SDK原件本来均已存在于本地。缓存与元数据证明零下载边界未满足；无网络流量采集，网络总字节NOT_VERIFIED。原样日志还报告安装开发HTTPS证书，但失败前后的全局证书增量未观测，不宣称已回滚或清理。未执行全局钥匙串清理或人工修改；SDK当时是否新增证书仍未验证。
+
+后续仅在原白名单工具内修复与低成本复验：普通及Mac锁168份本地归档全部签名内容hash核验；两个SDK从预存固定SHA原始字节构造完整私有缓存，实际SDK属性查询在OS完全断网时指向私有路径；缺失/篡改/额外成员/软链接/空回执均拒绝。恢复进程OS拒绝全部网络，工程入口仅开放loopback。首次运行证书开关关闭，在新的私有CLI目录中公开localhost证书标识1→1、无HTTP缓存。任务测试22项exit0，独立修复Review通过。这些结果不是新T上的完整产品验收，不能追溯抹去先前事件。
+
+实际门禁保持停止，状态不提升为READY。恢复前须复核新远端/Head、事件及修复输入，使用新的唯一Run与稳定T，重新完成适用完整验收；不得从旧PREFLIGHT或旧T SelfTest直接跳到I05。没有新的V3 ZIP；720c等历史ZIP完整保留，不制造重复中间PARTIAL包。CI/Windows/Intel及完整许可证/CVE/签名限制保持NOT_RUN或NOT_VERIFIED，不进入main/M2/G6。
+
+本轮将按独立审查的精确清单回收可再生工具与低成本fixture；原始HTTP事件目录.tools/dotnet-home、全部失败日志、分支/工作树和历史包保持KEEP，解除条件为后续事件复审和明确生命周期决定。监测PID21487已准确释放。最终回收与远端回读由包外回执补充，不把尚未执行的清理标PASS。

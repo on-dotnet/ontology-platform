@@ -1,0 +1,45 @@
+{
+  "status": "OBSERVED",
+  "scope": "SDK property evaluation, OS deny-all, isolated cache; no restore/build/product gates",
+  "fixtureRoot": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-02/sdk-boundary-fixture-v2",
+  "rows": [
+    {
+      "case": "apphost",
+      "command": [
+        "/usr/bin/sandbox-exec",
+        "-p",
+        "(version 1) (allow default) (deny network*)",
+        "/usr/local/share/dotnet/dotnet",
+        "msbuild",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/AppHost/OntologyPlatform.AppHost.csproj",
+        "-nologo",
+        "-getProperty:MSBuildSDKsPath",
+        "-getProperty:MSBuildAllProjects",
+        "-nodeReuse:false"
+      ],
+      "exitCode": 0,
+      "rawSha256": "b563f29e9d8119d75df026f6b64971b1c725989931cd77d4c6ca9b58d5bcdb8b",
+      "bytes": 463
+    },
+    {
+      "case": "mstest",
+      "command": [
+        "/usr/bin/sandbox-exec",
+        "-p",
+        "(version 1) (allow default) (deny network*)",
+        "/usr/local/share/dotnet/dotnet",
+        "msbuild",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.ConnectionsTests/OntologyPlatform.ConnectionsTests.csproj",
+        "-nologo",
+        "-getProperty:MSBuildSDKsPath",
+        "-getProperty:MSBuildAllProjects",
+        "-nodeReuse:false"
+      ],
+      "exitCode": 0,
+      "rawSha256": "d3592656a72ede41a9c6d1a11f55a81fef947517b77dcf5e5da2e81dc7f5c3cc",
+      "bytes": 454
+    }
+  ],
+  "driverSha256": "d48212d22253cb08c1dd9cf07b3d0de1a5750afed4d9870d5c932e6b60f4aece",
+  "runtimeSha256": "43f9067a135170c8161f3567134b5a70be696c9751e9226baf653cb9bf7e466d"
+}

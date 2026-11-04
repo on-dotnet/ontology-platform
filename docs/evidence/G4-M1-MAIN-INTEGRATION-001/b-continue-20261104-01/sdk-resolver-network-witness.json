@@ -1,0 +1,381 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-01",
+  "testedCommit": "e09a8c8fc7f21ac1f3d447e8f67493c5f85059f0",
+  "status": "BLOCKED_WITH_WITNESS",
+  "event": "MSBuild SDK resolver populated fresh task NuGet HTTP cache despite local project restore source",
+  "source": "https://api.nuget.org/v3/index.json",
+  "package": "Aspire.AppHost.Sdk",
+  "version": "13.6.3",
+  "archiveBytes": 2046462,
+  "archiveSha256": "cb8c5abad85fb542e2bb4807dd31a2ee4c22f56b7762e0258b74a803c1035ad0",
+  "matchesPreexistingLocalArchive": true,
+  "preexistingLocalArchiveCreatedAtUtc": "2026-10-25T02:04:18.611898+00:00",
+  "files": [
+    {
+      "path": ".tools/dotnet-home/.local/share/NuGet/http-cache/670c1461c29885f9aa22c281d8b7da90845b38e4$ps:_api.nuget.org_v3_index.json/list_aspire.apphost.sdk.dat",
+      "bytes": 745,
+      "sha256": "963492436f3d3568d87319802f24ed9d0d6ad12844e9bd98c9636d072fb8ed4a",
+      "modifiedAtUtc": "2026-11-04T13:17:43.604939+00:00",
+      "createdAtUtc": "2026-11-04T13:17:43.604683+00:00"
+    },
+    {
+      "path": ".tools/dotnet-home/.local/share/NuGet/http-cache/670c1461c29885f9aa22c281d8b7da90845b38e4$ps:_api.nuget.org_v3_index.json/list_mstest.sdk.dat",
+      "bytes": 1021,
+      "sha256": "57707c0849ba365fcb396221f6353ae71533e094f6fd77b337dcfa93ea4be012",
+      "modifiedAtUtc": "2026-11-04T13:17:44.750727+00:00",
+      "createdAtUtc": "2026-11-04T13:17:44.750572+00:00"
+    },
+    {
+      "path": ".tools/dotnet-home/.local/share/NuGet/http-cache/670c1461c29885f9aa22c281d8b7da90845b38e4$ps:_api.nuget.org_v3_index.json/nupkg_aspire.apphost.sdk.13.6.3.dat",
+      "bytes": 2046462,
+      "sha256": "cb8c5abad85fb542e2bb4807dd31a2ee4c22f56b7762e0258b74a803c1035ad0",
+      "modifiedAtUtc": "2026-11-04T13:17:46.749443+00:00",
+      "createdAtUtc": "2026-11-04T13:17:44.413141+00:00"
+    },
+    {
+      "path": ".tools/dotnet-home/.local/share/NuGet/http-cache/670c1461c29885f9aa22c281d8b7da90845b38e4$ps:_api.nuget.org_v3_index.json/nupkg_mstest.sdk.4.5.1.dat",
+      "bytes": 42412,
+      "sha256": "984c1fa3338a950aaee3afa8bdda314cd732af483e0dc8b4138ec51aa0327c2b",
+      "modifiedAtUtc": "2026-11-04T13:17:45.611471+00:00",
+      "createdAtUtc": "2026-11-04T13:17:45.573613+00:00"
+    },
+    {
+      "path": ".tools/dotnet-home/.local/share/NuGet/http-cache/670c1461c29885f9aa22c281d8b7da90845b38e4$ps:_api.nuget.org_v3_index.json/repository_signatures_5.0.0.dat",
+      "bytes": 2007,
+      "sha256": "5f45cbf2d7f8a4b57fea6e43bb603d29a0682058a71eb61d900db74860d210b0",
+      "modifiedAtUtc": "2026-11-04T13:17:43.337017+00:00",
+      "createdAtUtc": "2026-11-04T13:17:43.336626+00:00"
+    },
+    {
+      "path": ".tools/dotnet-home/.local/share/NuGet/http-cache/670c1461c29885f9aa22c281d8b7da90845b38e4$ps:_api.nuget.org_v3_index.json/service_index.dat",
+      "bytes": 9272,
+      "sha256": "cea4d74624be767e0569c891597c0e6f5329f19f6c9b7fcf8b8c9e9f4933a4bb",
+      "modifiedAtUtc": "2026-11-04T13:17:42.874252+00:00",
+      "createdAtUtc": "2026-11-04T13:17:42.871802+00:00"
+    },
+    {
+      "path": ".tools/dotnet-home/.local/share/NuGet/http-cache/670c1461c29885f9aa22c281d8b7da90845b38e4$ps:_api.nuget.org_v3_index.json/vuln_data_base.dat",
+      "bytes": 778382,
+      "sha256": "8d105ef94f62680f091a0550b51b4289a3fe380a9d828b91c9d56ab384ab90c4",
+      "modifiedAtUtc": "2026-11-04T13:17:47.054545+00:00",
+      "createdAtUtc": "2026-11-04T13:17:47.053590+00:00"
+    },
+    {
+      "path": ".tools/dotnet-home/.local/share/NuGet/http-cache/670c1461c29885f9aa22c281d8b7da90845b38e4$ps:_api.nuget.org_v3_index.json/vuln_data_update.dat",
+      "bytes": 2,
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "modifiedAtUtc": "2026-11-04T13:17:47.255132+00:00",
+      "createdAtUtc": "2026-11-04T13:17:47.254894+00:00"
+    },
+    {
+      "path": ".tools/dotnet-home/.local/share/NuGet/http-cache/670c1461c29885f9aa22c281d8b7da90845b38e4$ps:_api.nuget.org_v3_index.json/vuln_index.dat",
+      "bytes": 505,
+      "sha256": "58c0bcce007c394479145f8e854acf7e6bdf905135f4d778c720b70d643dec11",
+      "modifiedAtUtc": "2026-11-04T13:17:45.890079+00:00",
+      "createdAtUtc": "2026-11-04T13:17:45.889966+00:00"
+    },
+    {
+      "path": ".tools/nuget/aspire.apphost.sdk/13.6.3/.nupkg.metadata",
+      "bytes": 178,
+      "sha256": "2f601a8e2fadd94d07687993ee59124df72e381ad5d25d02f707afd4221b6a55",
+      "modifiedAtUtc": "2026-11-04T13:17:46.795199+00:00",
+      "createdAtUtc": "2026-11-04T13:17:46.795017+00:00"
+    },
+    {
+      "path": ".tools/nuget/aspire.apphost.sdk/13.6.3/.signature.p7s",
+      "bytes": 25987,
+      "sha256": "5c7ea0791d0df1985da4df91c120b8870ffa4d19f7e74d0b046d6c5c63f6ec21",
+      "modifiedAtUtc": "2026-10-21T15:27:06+00:00",
+      "createdAtUtc": "2026-11-04T13:17:46.789273+00:00"
+    },
+    {
+      "path": ".tools/nuget/aspire.apphost.sdk/13.6.3/Icon.png",
+      "bytes": 5074,
+      "sha256": "76b8d0aeb4ae1ec8fbe9aaf5b45c90b49460bf14209d90819ae3a902218d782b",
+      "modifiedAtUtc": "2026-10-21T18:10:42+00:00",
+      "createdAtUtc": "2026-11-04T13:17:46.758911+00:00"
+    },
+    {
+      "path": ".tools/nuget/aspire.apphost.sdk/13.6.3/Sdk/AutoImport.props",
+      "bytes": 13,
+      "sha256": "5c10e0dca89d53fa828e2b8ad817f7ddeccb7775bef36c1e75dba0d87a103ee6",
+      "modifiedAtUtc": "2026-10-21T18:10:42+00:00",
+      "createdAtUtc": "2026-11-04T13:17:46.759314+00:00"
+    },
+    {
+      "path": ".tools/nuget/aspire.apphost.sdk/13.6.3/Sdk/Sdk.props",
+      "bytes": 846,
+      "sha256": "ca71bd547af676ddded447e66d1483ebdb1a9fce93132d6ac09e1c520070c4e2",
+      "modifiedAtUtc": "2026-10-21T18:10:42+00:00",
+      "createdAtUtc": "2026-11-04T13:17:46.759542+00:00"
+    },
+    {
+      "path": ".tools/nuget/aspire.apphost.sdk/13.6.3/Sdk/Sdk.targets",
+      "bytes": 13349,
+      "sha256": "9741776af822cad68ee7cb2cf9df5fc2d6778587bfe673c24ab9d1eaf1518bee",
+      "modifiedAtUtc": "2026-10-21T18:10:42+00:00",
+      "createdAtUtc": "2026-11-04T13:17:46.759773+00:00"
+    },
+    {
+      "path": ".tools/nuget/aspire.apphost.sdk/13.6.3/THIRD-PARTY-NOTICES.TXT",
+      "bytes": 17523,
+      "sha256": "9c7477edc1ae28500d78b6d2f9bf737928e749738d08e5c68238f9f7bba3de5f",
+      "modifiedAtUtc": "2026-10-21T18:10:42+00:00",
+      "createdAtUtc": "2026-11-04T13:17:46.758531+00:00"
+    },
+    {
+      "path": ".tools/nuget/aspire.apphost.sdk/13.6.3/aspire.apphost.sdk.13.6.3.nupkg",
+      "bytes": 2046462,
+      "sha256": "cb8c5abad85fb542e2bb4807dd31a2ee4c22f56b7762e0258b74a803c1035ad0",
+      "modifiedAtUtc": "2026-11-04T13:17:46.756306+00:00",
+      "createdAtUtc": "2026-11-04T13:17:46.754602+00:00"
+    },
+    {
+      "path": ".tools/nuget/aspire.apphost.sdk/13.6.3/aspire.apphost.sdk.13.6.3.nupkg.sha512",
+      "bytes": 88,
+      "sha256": "5aa36a68b01dc76e7d671c88ecf7ec70b1110d21e7d2cbc5209ec631ca0ada5c",
+      "modifiedAtUtc": "2026-11-04T13:17:46.792035+00:00",
+      "createdAtUtc": "2026-11-04T13:17:46.791983+00:00"
+    },
+    {
+      "path": ".tools/nuget/aspire.apphost.sdk/13.6.3/aspire.apphost.sdk.nuspec",
+      "bytes": 977,
+      "sha256": "9cfcd27529e903a2e9819cf374f36b26252c7474341dbf3c3eb101ea5c3a2ff1",
+      "modifiedAtUtc": "2026-10-21T18:10:42+00:00",
+      "createdAtUtc": "2026-11-04T13:17:46.757783+00:00"
+    },
+    {
+      "path": ".tools/nuget/aspire.apphost.sdk/13.6.3/tools/net8.0/Aspire.RuntimeIdentifier.Tool.deps.json",
+      "bytes": 13557,
+      "sha256": "3b6a303f8120a55bd868b99304bf5ee631cc9de22e4ff5b67e58da199203c973",
+      "modifiedAtUtc": "2026-10-21T18:10:42+00:00",
+      "createdAtUtc": "2026-11-04T13:17:46.760292+00:00"
+    },
+    {
+      "path": ".tools/nuget/aspire.apphost.sdk/13.6.3/tools/net8.0/Aspire.RuntimeIdentifier.Tool.dll",
+      "bytes": 28472,
+      "sha256": "9ebff023c341e2cb320f59b9eb63c9a2b5927851f8e76dcb636f18b4ff29fcb2",
+      "modifiedAtUtc": "2026-10-21T18:10:42+00:00",
+      "createdAtUtc": "2026-11-04T13:17:46.760559+00:00"
+    },
+    {
+      "path": ".tools/nuget/aspire.apphost.sdk/13.6.3/tools/net8.0/Aspire.RuntimeIdentifier.Tool.runtimeconfig.json",
+      "bytes": 369,
+      "sha256": "2f12d184f41a138229b30afb4ee068f453b442ad19a6626de01bdc7df8e45d7a",
+      "modifiedAtUtc": "2026-10-21T18:10:42+00:00",
+      "createdAtUtc": "2026-11-04T13:17:46.761086+00:00"
+    },
+    {
+      "path": ".tools/nuget/aspire.apphost.sdk/13.6.3/tools/net8.0/Aspire.RuntimeIdentifier.Tool.xml",
+      "bytes": 154,
+      "sha256": "4c184c82f84dba0199e5eda5e9f90461dfbadd2bafb142642a66412d562f91bd",
+      "modifiedAtUtc": "2026-10-21T18:10:42+00:00",
+      "createdAtUtc": "2026-11-04T13:17:46.761480+00:00"
+    },
+    {
+      "path": ".tools/nuget/aspire.apphost.sdk/13.6.3/tools/net8.0/Microsoft.Bcl.Cryptography.dll",
+      "bytes": 296232,
+      "sha256": "8f823022ed438de62eb61a56d708519a4d442c0825c8b3cb5e23a5f70bdf324a",
+      "modifiedAtUtc": "2026-10-21T18:10:42+00:00",
+      "createdAtUtc": "2026-11-04T13:17:46.761850+00:00"
+    },
+    {
+      "path": ".tools/nuget/aspire.apphost.sdk/13.6.3/tools/net8.0/Newtonsoft.Json.dll",
+      "bytes": 723368,
+      "sha256": "a28c251dfe36d881e9e2462e171441b8b0ec156fe3f452602c9149b1b9efe05b",
+      "modifiedAtUtc": "2026-10-21T18:10:42+00:00",
+      "createdAtUtc": "2026-11-04T13:17:46.763773+00:00"
+    },
+    {
+      "path": ".tools/nuget/aspire.apphost.sdk/13.6.3/tools/net8.0/NuGet.Common.dll",
+      "bytes": 107832,
+      "sha256": "c863232a273017d8a82a8bfe058c1ccc95322e2e5076b2138c78112ab63eca5b",
+      "modifiedAtUtc": "2026-10-21T18:10:42+00:00",
+      "createdAtUtc": "2026-11-04T13:17:46.767155+00:00"
+    },
+    {
+      "path": ".tools/nuget/aspire.apphost.sdk/13.6.3/tools/net8.0/NuGet.Configuration.dll",
+      "bytes": 171832,
+      "sha256": "6566f9cc2a6db2052caab346a53ae89f178ded40c1384bc4441dbe2224d6a5ab",
+      "modifiedAtUtc": "2026-10-21T18:10:42+00:00",
+      "createdAtUtc": "2026-11-04T13:17:46.767950+00:00"
+    },
+    {
+      "path": ".tools/nuget/aspire.apphost.sdk/13.6.3/tools/net8.0/NuGet.DependencyResolver.Core.dll",
+      "bytes": 94008,
+      "sha256": "1063d0214bed8cc718a8fa71d8b398804429501b9a681ff01dd958a322a97a24",
+      "modifiedAtUtc": "2026-10-21T18:10:42+00:00",
+      "createdAtUtc": "2026-11-04T13:17:46.769081+00:00"
+    },
+    {
+      "path": ".tools/nuget/aspire.apphost.sdk/13.6.3/tools/net8.0/NuGet.Frameworks.dll",
+      "bytes": 123192,
+      "sha256": "52c4e004a50f6e0552ae73843cff4d68f05c94531287f8fa3da78283166b1949",
+      "modifiedAtUtc": "2026-10-21T18:10:42+00:00",
+      "createdAtUtc": "2026-11-04T13:17:46.769719+00:00"
+    },
+    {
+      "path": ".tools/nuget/aspire.apphost.sdk/13.6.3/tools/net8.0/NuGet.LibraryModel.dll",
+      "bytes": 52024,
+      "sha256": "0bba3e72a1af0d22f25ec9f329456afbf4d11922899fe0a021036fb2d1c073de",
+      "modifiedAtUtc": "2026-10-21T18:10:42+00:00",
+      "createdAtUtc": "2026-11-04T13:17:46.770451+00:00"
+    },
+    {
+      "path": ".tools/nuget/aspire.apphost.sdk/13.6.3/tools/net8.0/NuGet.Packaging.dll",
+      "bytes": 735032,
+      "sha256": "80fb5126f79664c8ad628f18041cb13d2c887b071edc9d8b353b14af24bc59d1",
+      "modifiedAtUtc": "2026-10-21T18:10:42+00:00",
+      "createdAtUtc": "2026-11-04T13:17:46.770981+00:00"
+    },
+    {
+      "path": ".tools/nuget/aspire.apphost.sdk/13.6.3/tools/net8.0/NuGet.ProjectModel.dll",
+      "bytes": 240440,
+      "sha256": "af95942df4c58a4b1a62f52cf269f2dce8678c7d35fa0c6a83019ee9954d3c70",
+      "modifiedAtUtc": "2026-10-21T18:10:42+00:00",
+      "createdAtUtc": "2026-11-04T13:17:46.774186+00:00"
+    },
+    {
+      "path": ".tools/nuget/aspire.apphost.sdk/13.6.3/tools/net8.0/NuGet.Protocol.dll",
+      "bytes": 1148216,
+      "sha256": "a64543c57997a71dfc0de2453ab4934ee30a2ff0a574004b0e0a82733256ed20",
+      "modifiedAtUtc": "2026-10-21T18:10:42+00:00",
+      "createdAtUtc": "2026-11-04T13:17:46.775305+00:00"
+    },
+    {
+      "path": ".tools/nuget/aspire.apphost.sdk/13.6.3/tools/net8.0/NuGet.Versioning.dll",
+      "bytes": 62264,
+      "sha256": "fc2f75a7a5f3be9b4c3dcfc21644b871bb5a41ada8615c92d778713d2a310670",
+      "modifiedAtUtc": "2026-10-21T18:10:42+00:00",
+      "createdAtUtc": "2026-11-04T13:17:46.779149+00:00"
+    },
+    {
+      "path": ".tools/nuget/aspire.apphost.sdk/13.6.3/tools/net8.0/System.CommandLine.dll",
+      "bytes": 151352,
+      "sha256": "2b5ee7c20fdbd08af6c5dd7271c4e6b53fedab72864ee85abee94a647aba704e",
+      "modifiedAtUtc": "2026-10-21T18:10:42+00:00",
+      "createdAtUtc": "2026-11-04T13:17:46.779986+00:00"
+    },
+    {
+      "path": ".tools/nuget/aspire.apphost.sdk/13.6.3/tools/net8.0/System.Formats.Asn1.dll",
+      "bytes": 95568,
+      "sha256": "9e2aee89be42c7725910a2583919c767ecf40642cdf8b3bb0d59604996275505",
+      "modifiedAtUtc": "2026-10-21T18:10:42+00:00",
+      "createdAtUtc": "2026-11-04T13:17:46.780972+00:00"
+    },
+    {
+      "path": ".tools/nuget/aspire.apphost.sdk/13.6.3/tools/net8.0/System.Security.Cryptography.Pkcs.dll",
+      "bytes": 285992,
+      "sha256": "416b3a4d6a008975a2ec42b5efe14b5b6902e82531b20ab2dd3dabc14a616e9d",
+      "modifiedAtUtc": "2026-10-21T18:10:42+00:00",
+      "createdAtUtc": "2026-11-04T13:17:46.781561+00:00"
+    },
+    {
+      "path": ".tools/nuget/aspire.apphost.sdk/13.6.3/tools/net8.0/System.Security.Cryptography.ProtectedData.dll",
+      "bytes": 36616,
+      "sha256": "5e04d6cff3b6fe9706908970cd594861f0c08b3824f7827b2331b5f4fcee1bd1",
+      "modifiedAtUtc": "2026-10-21T18:10:42+00:00",
+      "createdAtUtc": "2026-11-04T13:17:46.782818+00:00"
+    },
+    {
+      "path": ".tools/nuget/aspire.apphost.sdk/13.6.3/tools/net8.0/cs/cs/System.CommandLine.resources.dll",
+      "bytes": 18744,
+      "sha256": "9db74abed424f28057b2b946df78f892f14dd8683c74906c4e79a7b454303415",
+      "modifiedAtUtc": "2026-10-21T18:10:42+00:00",
+      "createdAtUtc": "2026-11-04T13:17:46.783250+00:00"
+    },
+    {
+      "path": ".tools/nuget/aspire.apphost.sdk/13.6.3/tools/net8.0/de/de/System.CommandLine.resources.dll",
+      "bytes": 18744,
+      "sha256": "017380f95f4c1057b701311342e5921ed5bdf5013d8553cb5ac4a8889d132081",
+      "modifiedAtUtc": "2026-10-21T18:10:42+00:00",
+      "createdAtUtc": "2026-11-04T13:17:46.783640+00:00"
+    },
+    {
+      "path": ".tools/nuget/aspire.apphost.sdk/13.6.3/tools/net8.0/es/es/System.CommandLine.resources.dll",
+      "bytes": 18784,
+      "sha256": "0277fb8bfbf2ec45923a20e34935356b6988f83cff9e3d5ffc985f9ab3c53b0d",
+      "modifiedAtUtc": "2026-10-21T18:10:42+00:00",
+      "createdAtUtc": "2026-11-04T13:17:46.783980+00:00"
+    },
+    {
+      "path": ".tools/nuget/aspire.apphost.sdk/13.6.3/tools/net8.0/fr/fr/System.CommandLine.resources.dll",
+      "bytes": 18784,
+      "sha256": "511dbc4ce34e929433b206b32912db5562f8cb53b46b483468ae770bbd75f00e",
+      "modifiedAtUtc": "2026-10-21T18:10:42+00:00",
+      "createdAtUtc": "2026-11-04T13:17:46.784309+00:00"
+    },
+    {
+      "path": ".tools/nuget/aspire.apphost.sdk/13.6.3/tools/net8.0/it/it/System.CommandLine.resources.dll",
+      "bytes": 18744,
+      "sha256": "58c2f07c08d99a4823e441a0f9402a3a07e4f8902543ec97ea6bbc8961af5330",
+      "modifiedAtUtc": "2026-10-21T18:10:42+00:00",
+      "createdAtUtc": "2026-11-04T13:17:46.784634+00:00"
+    },
+    {
+      "path": ".tools/nuget/aspire.apphost.sdk/13.6.3/tools/net8.0/ja/ja/System.CommandLine.resources.dll",
+      "bytes": 18744,
+      "sha256": "6f30fcd99bb1597f7b81f4bc26ed9582dc33d013aab211feaf96ab491a35a0b3",
+      "modifiedAtUtc": "2026-10-21T18:10:42+00:00",
+      "createdAtUtc": "2026-11-04T13:17:46.784982+00:00"
+    },
+    {
+      "path": ".tools/nuget/aspire.apphost.sdk/13.6.3/tools/net8.0/ko/ko/System.CommandLine.resources.dll",
+      "bytes": 18784,
+      "sha256": "ab5c8b013a53f7a02fef7068434ffc46345f1f07963dd0ef6e26e3ff4b46b763",
+      "modifiedAtUtc": "2026-10-21T18:10:42+00:00",
+      "createdAtUtc": "2026-11-04T13:17:46.785310+00:00"
+    },
+    {
+      "path": ".tools/nuget/aspire.apphost.sdk/13.6.3/tools/net8.0/pl/pl/System.CommandLine.resources.dll",
+      "bytes": 18744,
+      "sha256": "fa37fc6307053ace1003e6dcc72a33cc972dac719a0e1a40965936e1e8413bde",
+      "modifiedAtUtc": "2026-10-21T18:10:42+00:00",
+      "createdAtUtc": "2026-11-04T13:17:46.785597+00:00"
+    },
+    {
+      "path": ".tools/nuget/aspire.apphost.sdk/13.6.3/tools/net8.0/pt-BR/pt-BR/System.CommandLine.resources.dll",
+      "bytes": 18784,
+      "sha256": "f648dfab8b24d44177a4455ff9bcd4fefa06210ee5c06e4c6e447fd6f4963d51",
+      "modifiedAtUtc": "2026-10-21T18:10:42+00:00",
+      "createdAtUtc": "2026-11-04T13:17:46.785939+00:00"
+    },
+    {
+      "path": ".tools/nuget/aspire.apphost.sdk/13.6.3/tools/net8.0/ru/ru/System.CommandLine.resources.dll",
+      "bytes": 19296,
+      "sha256": "e3984a1494df49ecccf720346fa3096f5ec546aff797e2e6d9b86df9686ed260",
+      "modifiedAtUtc": "2026-10-21T18:10:42+00:00",
+      "createdAtUtc": "2026-11-04T13:17:46.786230+00:00"
+    },
+    {
+      "path": ".tools/nuget/aspire.apphost.sdk/13.6.3/tools/net8.0/runtimes/win/lib/net8.0/runtimes/win/lib/net8.0/System.Security.Cryptography.Pkcs.dll",
+      "bytes": 339752,
+      "sha256": "c887b8402952a9660c497ba4ba1d405dd643c860cde9a0824670bec42277571d",
+      "modifiedAtUtc": "2026-10-21T18:10:42+00:00",
+      "createdAtUtc": "2026-11-04T13:17:46.786910+00:00"
+    },
+    {
+      "path": ".tools/nuget/aspire.apphost.sdk/13.6.3/tools/net8.0/tr/tr/System.CommandLine.resources.dll",
+      "bytes": 18744,
+      "sha256": "38361ec14998f14dbefb3f75e8793830a56e6e18d3a5737b238a6247cfcd72a2",
+      "modifiedAtUtc": "2026-10-21T18:10:42+00:00",
+      "createdAtUtc": "2026-11-04T13:17:46.788489+00:00"
+    },
+    {
+      "path": ".tools/nuget/aspire.apphost.sdk/13.6.3/tools/net8.0/zh-Hans/zh-Hans/System.CommandLine.resources.dll",
+      "bytes": 18744,
+      "sha256": "425e40dd37692cc9c4fe2d75af4c39d884f7c982bb6ac80e2e34e341331437b6",
+      "modifiedAtUtc": "2026-10-21T18:10:42+00:00",
+      "createdAtUtc": "2026-11-04T13:17:46.788749+00:00"
+    },
+    {
+      "path": ".tools/nuget/aspire.apphost.sdk/13.6.3/tools/net8.0/zh-Hant/zh-Hant/System.CommandLine.resources.dll",
+      "bytes": 18744,
+      "sha256": "b3a5d4992b4729d3f9bc1bde92f5bda23cbab6515af11f3cc317ae48a3cfed9c",
+      "modifiedAtUtc": "2026-10-21T18:10:42+00:00",
+      "createdAtUtc": "2026-11-04T13:17:46.789067+00:00"
+    }
+  ],
+  "limits": "No network packet trace; HTTP cache and package metadata demonstrate resolver source. Exact total network byte count NOT_VERIFIED. No containers/product runtime started."
+}

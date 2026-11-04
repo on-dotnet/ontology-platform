@@ -1,0 +1,32 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-01",
+  "testedCommit": "e09a8c8fc7f21ac1f3d447e8f67493c5f85059f0",
+  "command": [
+    "/usr/local/share/dotnet/dotnet",
+    "restore",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/OntologyPlatform.slnx",
+    "--locked-mode",
+    "--configfile",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-01/offline-nuget.config",
+    "-p:NuGetAudit=false",
+    "--disable-parallel"
+  ],
+  "startedAtUtc": "2026-11-04T13:17:40.756385+00:00",
+  "endedAtUtc": "2026-11-04T13:17:49.112958+00:00",
+  "elapsedSeconds": 8.35654812499979,
+  "exitCode": 1,
+  "timingStatus": "OBSERVED",
+  "timedOut": false,
+  "executedInputDrift": false,
+  "inputHashes": {
+    "/usr/local/share/dotnet/dotnet": "11b517e7b00d0efa20e9b3ab6fe433f135d828a4c95c9c6ca7a9cf1328b6ada4",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/OntologyPlatform.slnx": "9f481eaa7a0570cf6e02d11a004f21696dff370d2a280d47edfaea5482bbb29c",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-01/offline-nuget.config": "4d89bebae60b700fbd3b7429a0c74c0b3871d5fff7df8b1ec6f97eed9e83ae49"
+  },
+  "manifestSha256": "799566f2627cb90ac2f4ce1cfdac035690674df880cde590f471ac23b699ea5f",
+  "commandSha256": "f223ed190db8f24b007654a4005ff3a3da60546c17b3aadc600899b9b086eeca",
+  "logSha256": "34c673e2ad231aa43845fb1442f7ece4d999390948e7f1e4359b7ad00fbefd29",
+  "logBytes": 6415,
+  "logVisibility": "TASK_EVIDENCE"
+}

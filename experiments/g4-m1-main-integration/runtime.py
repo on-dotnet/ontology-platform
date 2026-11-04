@@ -172,12 +172,14 @@ def load_manifest(path, run, expected_head, *, check_head=True):
 
 def environment():
     """所有版本固定在已有本地制品；不继承测试夹具或包源注入。"""
-    env = {k: v for k, v in os.environ.items() if not k.startswith(('G2_', 'G4_', 'ConnectionStrings__', 'NUGET_', 'DOTNET_', 'PNPM_', 'Security__', 'G3_', 'RUSTFS_', 'ASPNETCORE_', 'G2__', 'G4__'))}
+    env = {k: v for k, v in os.environ.items() if not k.startswith(('G2_', 'G4_', 'ConnectionStrings__', 'NUGET_', 'DOTNET_', 'PNPM_', 'Security__', 'G3_', 'RUSTFS_', 'ASPNETCORE_', 'G2__', 'G4__')) and not k.lower().startswith('msbuild')}
     env.update(DOTNET_ROOT='/usr/local/share/dotnet', DOTNET_CLI_HOME=str(ROOT / '.tools/dotnet-home'),
                NUGET_PACKAGES=str(ROOT / '.tools/nuget'), DOTNET_CLI_TELEMETRY_OPTOUT='1',
                DOTNET_SKIP_FIRST_TIME_EXPERIENCE='1', DOTNET_CLI_WORKLOAD_UPDATE_NOTIFY_DISABLE='true',
                PYTHONPATH=str(ROOT / '.tools/pythonlibs'), PYTHONDONTWRITEBYTECODE='1',
-               NEXT_TELEMETRY_DISABLED='1', PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD='1')
+               NEXT_TELEMETRY_DISABLED='1', PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD='1',
+               DOTNET_GENERATE_ASPNET_CERTIFICATE='false',NUGET_CERT_REVOCATION_MODE='offline',
+               DOTNET_CLI_USE_MSBUILD_SERVER='0',MSBUILDDISABLENODEREUSE='1')
     env['PATH'] = '/opt/homebrew/opt/node@24/bin:/usr/local/share/dotnet:' + env.get('PATH', '')
     return env
 
@@ -196,6 +198,15 @@ def command_file_inputs(command):
         except OSError:
             continue
     return result
+
+
+def offline_command(command, *, loopback=False):
+    """Mac内核拒绝外网；工程用例可显式保留loopback，依赖恢复拒绝全部网络。"""
+    require(sys.platform=='darwin' and Path('/usr/bin/sandbox-exec').is_file(),'OFFLINE_OS_BOUNDARY_UNAVAILABLE')
+    profile='(version 1) (allow default) (deny network*)'
+    if loopback:
+        profile='(version 1) (allow default) (deny network-outbound (remote ip "*:*")) (allow network-outbound (remote ip "localhost:*"))'
+    return ['/usr/bin/sandbox-exec','-p',profile,*command]
 
 
 def execute(m, name, command, *, env=None, timeout=900, sensitive=False, cwd=ROOT, allowed_codes=(0,)):
