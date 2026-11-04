@@ -110,6 +110,38 @@ finally:print('DISPATCH_EVENTS='+json.dumps(events))
 class RuntimeBoundaryTests(unittest.TestCase):
     """真实边界负例，不调用Docker或读取旧私有运行时。"""
 
+    def test_semantic_method_partition_preserves_parameter_rows_and_rejects_ambiguity(self):
+        """同方法全部DataRow保留；源码歧义、缺项、非法案例和重复均失败关闭。"""
+        import importlib.util
+        spec=importlib.util.spec_from_file_location('method_partition',HERE/'module-tests.py')
+        module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+        source='namespace Fixture;\npublic sealed class Cases\n{\n    public async Task Check(string value)\n'
+        cases=[{'case':'Check ("one")'},{'case':'Check ("two")'}]
+        plan=module.semantic_partition(cases,{'Cases.cs':source})
+        self.assertEqual(plan[0]['method'],'Fixture.Cases.Check')
+        self.assertEqual(plan[0]['cases'],[r['case'] for r in cases])
+        for rows,sources in ((cases,{}),(cases,{'a.cs':source,'b.cs':source}),(cases+cases,{'a.cs':source}),([{'case':'Check|Injected'}],{'a.cs':source})):
+            with self.subTest(rows=rows,sources=list(sources)),self.assertRaises(ValueError):module.semantic_partition(rows,sources)
+        for actual in (['one','one'],['one'],['one','two','extra']):
+            with self.subTest(actual=actual),self.assertRaises(ValueError):module.exact_cases(['one','two'],actual)
+        module.exact_cases(['one','two'],['two','one'])
+
+    def test_semantic_idle_counts_prevalidation_reservation_and_real_exec_exit(self):
+        """核验前占槽和已断客户端的远端Exec均不能漏计，null退出码不是证明。"""
+        import importlib.util
+        spec=importlib.util.spec_from_file_location('method_idle',HERE/'module-tests.py')
+        module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+        rows=[{'event':'ready','pid':123},{'event':'reserved','pid':123,'token':'one'}]
+        def inspect():return module.module_ingress_snapshot(b'\n'.join(json.dumps(r).encode() for r in rows),123)
+        self.assertFalse(inspect()['idle'])
+        rows.extend([{'event':'exec_created','pid':123,'token':'one','execId':'id'},{'event':'connection_closed','pid':123,'token':'one'}])
+        self.assertFalse(inspect()['idle'])
+        rows.append({'event':'exec_exited','pid':123,'execId':'id','running':False,'exitCode':None})
+        self.assertFalse(inspect()['idle']);rows[-1]['exitCode']=0
+        self.assertTrue(inspect()['idle'])
+        rows[-1]['pid']=456
+        with self.assertRaises(ValueError):inspect()
+
     def test_run_identity(self):
         import runtime as rt
         self.assertEqual(rt.run_id('b-continue-20261104-01'), 'b-continue-20261104-01')
@@ -637,6 +669,10 @@ class CaseProjectionTests(unittest.TestCase):
         numeric=raw.replace('Example (\"insert\") (12ms)','Example (0) (12ms)').replace('skipped Other','skipped Other (4999)')
         cases=runtime.parse_test_cases(numeric)['cases']
         self.assertEqual([c['case'] for c in cases],['Example (0)','Other (4999)'])
+        for duration in ('1s 118ms','1m 2s','1h 2m 3s','1秒 118毫秒'):
+            sample='  passed Numeric (4999) ('+duration+')\n  passed Text ("1s 118ms") ('+duration+')\n  total: 2\n  failed: 0\n  succeeded: 2\n  skipped: 0\n'
+            parsed=runtime.parse_test_cases(sample)
+            self.assertEqual([r['case'] for r in parsed['cases']],['Numeric (4999)','Text ("1s 118ms")'])
         with self.assertRaises(ValueError):runtime.parse_test_cases(raw.replace('total: 2','total: 3'))
         with self.assertRaises(ValueError):runtime.parse_test_cases('  total: 1\n  failed: 0\n  succeeded: 1\n  skipped: 0\n')
 

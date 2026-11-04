@@ -1,0 +1,88 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-15",
+  "testedCommit": "897d8fcb7f3111fa8b335370009d51dcf46366b3",
+  "status": "BLOCKED_WITH_WITNESS",
+  "gates": {
+    "R2": "PASS",
+    "I01": "PARTIAL",
+    "I05": "PASS",
+    "I03": "PARTIAL",
+    "I02": "BLOCKED_WITH_WITNESS",
+    "I04": "NOT_RUN",
+    "I06": "NOT_RUN",
+    "I07": "NOT_RUN",
+    "I08": "NOT_RUN"
+  },
+  "native": {
+    "total": 780,
+    "passed": 344,
+    "skipped": 436,
+    "failed": 0,
+    "closedSkippedCases": 0
+  },
+  "webTests": 379,
+  "selfTestSuites": 27,
+  "taskTestsAtT": 44,
+  "targetedTestsAfterFix": 46,
+  "realModuleMigrations": {
+    "Governance": 0,
+    "Ontology": 0,
+    "Publishing": 0,
+    "Agents": 0
+  },
+  "semanticSingleProcess": {
+    "total": 302,
+    "PASS": 83,
+    "FAIL": 219,
+    "SKIP": 0,
+    "capacityRefusals": 441,
+    "allFailuresExplained": false
+  },
+  "shortReproductions": {
+    "firstFailedMethod": {
+      "total": 5,
+      "PASS": 5
+    },
+    "largestParameterizedMethod": {
+      "total": 19,
+      "PASS": 19
+    }
+  },
+  "proposal": "ALL_302_CASES_137_METHOD_PROCESS_ISOLATION; exact multiset closure; no capacity refusal; preserve method-internal concurrency; full run not yet executed",
+  "newTAndFullRunRequired": true,
+  "ciWindowsIntel": "NOT_RUN",
+  "supplyChain": "AMBER-A1_LICENSE_PARTIAL_NOT_VERIFIED",
+  "ignoredLargeInputs": [
+    {
+      "path": "r2-sdk-before-mstest-imports.xml",
+      "bytes": 1628467,
+      "sha256": "9e453ff67ae1c55e9e5ba429403648b1392e65e90a5a857a9cc51a7c95d34768"
+    },
+    {
+      "path": "r2-sdk-after-aspire-imports.xml",
+      "bytes": 1616931,
+      "sha256": "f29ea2558bec1bc1957d5c42116d225e77af31fff72e4661cb87e49f2a57b1ce"
+    },
+    {
+      "path": "r2-sdk-before-aspire-imports.xml",
+      "bytes": 1616931,
+      "sha256": "a4802ab7aea61aab551cc5a4bea1b112644ed0d4b1daaa5d6a78ef3bdab7d648"
+    },
+    {
+      "path": "r2-sdk-after-mstest-imports.xml",
+      "bytes": 1628467,
+      "sha256": "f66cec7d7e198be1ef000ef0fa76404ab20894b35f8e619189bcc8a210890804"
+    },
+    {
+      "path": "restore-stdout.txt",
+      "bytes": 52463317,
+      "sha256": "d6e9fe10825130df44b6193ae7514b539f1e4e3872355c19160e13a3a84c346b"
+    },
+    {
+      "path": "web-cache-files.json",
+      "bytes": 8821586,
+      "sha256": "fec5f0dc296535f8510e086370de3e6fbe9ac494715683721cdd24ef64f6beba"
+    }
+  ]
+}

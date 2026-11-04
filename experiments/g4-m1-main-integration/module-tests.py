@@ -3,6 +3,10 @@
 import json
 import re
 import zipfile
+import collections
+import os
+import time
+import subprocess
 from pathlib import Path
 import runtime as rt
 
@@ -40,6 +44,92 @@ def verify_ef_payload(archive,expected_sha):
     return files
 
 
+def semantic_partition(cases,sources):
+    """由同构建逐案例身份匹配唯一源码FQN；保留同方法全部参数及内部并发。"""
+    expected=[row['case'] for row in cases]
+    rt.require(expected and len(expected)==len(set(expected)),'SEMANTIC_CASE_AMBIGUOUS')
+    grouped={}
+    for case in expected:
+        match=re.fullmatch(r'([A-Za-z_][A-Za-z0-9_]*)(?: \(.*\))?',case)
+        rt.require(match,'SEMANTIC_CASE_NAME');grouped.setdefault(match[1],[]).append(case)
+    plan=[]
+    for method,names in sorted(grouped.items()):
+        matches=[]
+        for path,source in sources.items():
+            declarations=re.findall(r'(?m)^    public (?:async )?(?:Task|void) '+re.escape(method)+r'\(',source)
+            if not declarations:continue
+            namespaces=re.findall(r'(?m)^namespace ([A-Za-z0-9_.]+);$',source)
+            classes=re.findall(r'(?m)^public sealed class ([A-Za-z0-9_]+)$',source)
+            rt.require(len(declarations)==len(namespaces)==len(classes)==1,'SEMANTIC_SOURCE_AMBIGUOUS')
+            matches.append({'method':namespaces[0]+'.'+classes[0]+'.'+method,'source':path,'sourceSha256':rt.digest(source.encode()),'cases':sorted(names)})
+        rt.require(len(matches)==1,'SEMANTIC_METHOD_MAPPING');plan.append(matches[0])
+    return plan
+
+
+def exact_cases(expected,actual):
+    """案例多重集合逐项匹配，禁止用相同总数掩盖遗漏、重复或新增案例。"""
+    rt.require(collections.Counter(expected)==collections.Counter(actual),'SEMANTIC_CASE_SET_DRIFT')
+
+
+def module_ingress_snapshot(raw,pid):
+    """同一日志快照计算占槽与退出；核验前已占槽但尚未建Exec也不能称为空闲。"""
+    rows=[json.loads(line) for line in raw.splitlines()]
+    rt.require(rows and any(r['event']=='ready' for r in rows) and all(row['pid']==pid for row in rows),'SEMANTIC_INGRESS_PID')
+    opened={r['token'] for r in rows if r['event']=='reserved'}
+    rt.require(all(r['token'] in opened for r in rows if r['event'] in ('connection','connection_closed','exec_created')),'SEMANTIC_RESERVATION_MISSING')
+    closed={r['token'] for r in rows if r['event']=='connection_closed'}
+    created={r['execId'] for r in rows if r['event']=='exec_created'}
+    exited={r['execId'] for r in rows if r['event']=='exec_exited' and r['running'] is False and type(r['exitCode']) is int}
+    return {'idle':opened<=closed and created<=exited,'connections':len(opened),'execs':len(created),'capacityRefusals':sum(r['event']=='refused_capacity' for r in rows),'eventsSha256':rt.digest(raw)}
+
+
+def wait_module_ingress_idle(m):
+    """批次间等待准确进程的连接和远端Exec退出；不掐断测试连接或提升容量。"""
+    a=rt.ARTIFACTS/m['runId'];ready=json.loads((a/'ingress-modules-ready.json').read_text())
+    rt.require(ready['taskId']==rt.TASK and ready['runId']==m['runId'] and ready['testedCommit']==m['_head'] and ready['manifestSha256']==m['_sha256'],'SEMANTIC_INGRESS_BINDING')
+    process=json.loads((a/'ingress-modules-process.json').read_text())
+    rt.require(process['pid']==ready['pid'] and process['taskId']==rt.TASK and process['runId']==m['runId'] and process['testedCommit']==m['_head'] and process['runtimeSha256']==ready['runtimeSha256']==m['drivers']['runtime.py'],'SEMANTIC_INGRESS_PROCESS_BINDING')
+    deadline=time.monotonic()+15
+    while time.monotonic()<deadline:
+        os.kill(ready['pid'],0)
+        rt.require(subprocess.check_output(['ps','-p',str(ready['pid']),'-o','lstart='],text=True).strip()==process['birth'],'SEMANTIC_INGRESS_PID_REUSED')
+        raw=(a/'ingress-modules-events.jsonl').read_bytes()
+        try:snapshot=module_ingress_snapshot(raw,ready['pid'])
+        except json.JSONDecodeError:time.sleep(.05);continue
+        if snapshot['idle']:return snapshot
+        time.sleep(.05)
+    raise ValueError('SEMANTIC_INGRESS_NOT_IDLE')
+
+
+def run_semantic_methods(m,env):
+    """所有Semantic案例按方法进程隔离；原完整单进程失败保持历史见证。"""
+    suffix='SemanticTests';a=rt.ARTIFACTS/m['runId'];baseline=json.loads((a/'case-projections/baseline-SemanticTests.json').read_text())
+    receipt=a/'commands/baseline-SemanticTests.json';original=json.loads(receipt.read_text());raw=(a/'commands/baseline-SemanticTests.log').read_bytes()
+    rt.require(baseline['testedCommit']==m['_head'] and original['manifestSha256']==m['_sha256'] and original['exitCode']==0,'SEMANTIC_BASELINE_BINDING')
+    rt.require(rt.digest(raw)==original['logSha256']==baseline['rawLogSha256'] and rt.digest(receipt.read_bytes())==baseline['commandReceiptSha256'],'SEMANTIC_BASELINE_HASH')
+    rt.require(rt.parse_test_cases(raw.decode())['cases']==baseline['cases'],'SEMANTIC_BASELINE_CASES')
+    sources={p.relative_to(rt.ROOT).as_posix():p.read_bytes().decode('utf-8') for p in (rt.ROOT/'backend/tests/OntologyPlatform.SemanticTests').glob('*.cs')}
+    plan=semantic_partition(baseline['cases'],sources)
+    dll=rt.ROOT/f'backend/tests/OntologyPlatform.{suffix}/bin/Debug/net10.0/OntologyPlatform.{suffix}.dll'
+    rt.require(rt.digest(dll.read_bytes())==baseline['assemblySha256'],'SEMANTIC_ASSEMBLY_DRIFT')
+    rt.write_json(a/'semantic-method-plan.json',{'taskId':rt.TASK,'runId':m['runId'],'testedCommit':m['_head'],'assemblySha256':baseline['assemblySha256'],'baselineSha256':rt.digest((a/'case-projections/baseline-SemanticTests.json').read_bytes()),'methods':plan,'scope':'ALL_CASES_METHOD_PROCESS_ISOLATION'})
+    observed=[];batches=[]
+    for index,item in enumerate(plan,1):
+        before=wait_module_ingress_idle(m);name='module-SemanticTests-m'+str(index).zfill(3)
+        command=['/usr/local/share/dotnet/dotnet',str(dll),'--filter','FullyQualifiedName='+item['method'],'--minimum-expected-tests','1','--no-ansi','--output','Detailed','--results-directory',str(a/'test-results'/name)]
+        output=rt.execute(m,name,rt.offline_command(command,loopback=True),env=env,sensitive=True,timeout=90)
+        parsed=rt.parse_test_cases(output.decode());actual=[row['case'] for row in parsed['cases']]
+        exact_cases(item['cases'],actual)
+        rt.require(parsed['summary']['SKIP']==0 and parsed['summary']['FAIL']==0,'MODULE_REQUIRED_FIXTURES_SKIPPED')
+        after=wait_module_ingress_idle(m)
+        rt.require(after['capacityRefusals']==before['capacityRefusals'],'SEMANTIC_FIXTURE_CAPACITY_REFUSAL')
+        rt.test_projection(m,name,suffix,output);observed.extend(actual)
+        batches.append({'command':name,'method':item['method'],'summary':parsed['summary'],'before':before,'after':after})
+    exact_cases([row['case'] for row in baseline['cases']],observed)
+    rt.write_json(a/'semantic-method-results.json',{'taskId':rt.TASK,'runId':m['runId'],'testedCommit':m['_head'],'status':'PASS','scope':'ALL_CASES_METHOD_PROCESS_ISOLATION','total':len(observed),'batches':batches})
+    return dict(project=suffix,total=len(observed),skipped=[],status='PASS',executionMode='METHOD_PROCESS_ISOLATION',methods=len(plan))
+
+
 def run_modules(m):
     """实际测试数与skip逐项留下，任何skip不提升为PASS。"""
     r=rt.runtime_value(m)
@@ -67,6 +157,8 @@ def run_modules(m):
     env['G2_AI_SCHEMA_OUTPUT']=str(schema)
     results=[]
     for suffix in ('SemanticTests','PublishingTests','QueryTests','AgentTests'):
+        if suffix=='SemanticTests':
+            results.append(run_semantic_methods(m,env));continue
         command=['/usr/local/share/dotnet/dotnet',str(rt.ROOT/f'backend/tests/OntologyPlatform.{suffix}/bin/Debug/net10.0/OntologyPlatform.{suffix}.dll'),'--minimum-expected-tests','1','--no-ansi','--output','Detailed']
         command+=['--results-directory',str(rt.ARTIFACTS/m['runId']/'test-results'/('module-'+suffix))]
         raw=rt.execute(m,'module-'+suffix,rt.offline_command(command,loopback=True),env=env,sensitive=True,timeout=300)

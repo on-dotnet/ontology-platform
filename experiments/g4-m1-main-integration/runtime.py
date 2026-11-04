@@ -259,7 +259,8 @@ def parse_test_cases(text):
     for number,line in enumerate(text.splitlines(),1):
         match=re.fullmatch(r'\s*(passed|已通过|成功|failed|失败|skipped|已跳过)\s+([A-Za-z_][^\r\n]*)',line,re.IGNORECASE)
         if not match:continue
-        name=re.sub(r'\s+\(\d[\d., ]*(?:ms|s|秒|毫秒|分钟)\)$','',match[2])
+        duration=r'\d[\d.,]*\s*(?:ms|s|m|h|毫秒|秒|分钟|小时)'
+        name=re.sub(r'\s+\('+duration+r'(?:\s+'+duration+r')*\)$','',match[2])
         cases.append({'case':name,'status':states[match[1].lower()],'line':number})
     summary={}
     for key,labels in {'total':'total|总计','PASS':'succeeded|passed|成功|已通过','FAIL':'failed|失败','SKIP':'skipped|已跳过'}.items():
@@ -796,6 +797,7 @@ async def ingress_daemon(m,group,*,evidence_directory=None):
         task=asyncio.current_task();active.add(task);pipe=None;exec_id=None
         token='g4-relay-'+m['runId']+'-'+uuid.uuid4().hex
         active_tokens.add(token);reservations.add(token)
+        event('reserved',token=token,hostPort=route['hostPort'])
         async def serve():
             nonlocal exec_id,pipe
             require(await async_ingress_routes(m,engine,group)==routes,'INGRESS_ROUTE_DRIFT')

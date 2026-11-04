@@ -67,3 +67,8 @@ Run12 / T0ed73cf1a82f73ee3e2be455c431fea1fa978685 在prepare_nuget前误调用R2
 
 
 Run14 / T4a64070ac6f9be906512d11956252909085e9a8b：R2严格离线及独立后验PASS（21项目168包，5.534秒）；原27套SelfTest368.24秒、42任务测试、native/Web通过，780总344PASS436SKIP0FAIL，Web379。I05 PASS、I03拒绝/DI图PARTIAL。I02正式ingress CLI被runtime早期__main__旧parser拒绝，未执行模块；此前直接daemon诊断未覆盖正式入口，相关可执行性推断撤回。现仅runtime/tests统一底部单入口，两模式实际文件子进程正反及44任务测试通过，独立Review PASS；stub派发测试不是设施/产品PASS。七Docker对象已精确回收，monitor释放；需新T/Run完整验收，旧记录不重写，无新V3/main/M2。详见b-continue-20261104-14/index.json。
+
+
+Run15 / T897d8fcb7f3111fa8b335370009d51dcf46366b3：R2及独立后验PASS（5.605秒），27套SelfTest370.44秒、44任务测试和native/Web通过；780总344PASS436SKIP0FAIL、Web379。I05 PASS/I03 PARTIAL；I02正式ingress入口及四模块迁移通过，Semantic单进程302案例83PASS219FAIL0SKIP、exit2，记录441次32活连接容量拒绝。新进程同T首失败方法5/5和最大参数化方法19/19通过，但不能据此认定所有219已解释。
+
+任务入口拟仅Semantic采用137精确FQN方法分进程，保留302全部参数化案例及方法内并发；每批Counter精确匹配、无新增容量拒绝、核验占槽/连接/Exec退出后才下一批。原单进程失败保留，不冒充已恢复；其余模块原入口不变。独立复审发现复合耗时解析及核验前占槽盲点，已在任务runtime修复并补正反回归，46任务测试通过；完整分批产品验收NOT_RUN，须新T全流程。原始失败私有日志KEEP，原错误案例名投影保留，另附修正解析视图；无新V3/main/M2。
