@@ -1,0 +1,38 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-19",
+  "testedCommit": "648d692684221d39a2cf8ce323254d7ef061e256",
+  "command": [
+    "/usr/bin/sandbox-exec",
+    "-p",
+    "(version 1) (allow default) (deny network-outbound (remote ip \"*:*\")) (allow network-outbound (remote ip \"localhost:*\"))",
+    "/usr/local/share/dotnet/dotnet",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll",
+    "--filter",
+    "FullyQualifiedName=OntologyPlatform.PublishingTests.PublishingFlowTests.ApprovalBoundaries",
+    "--minimum-expected-tests",
+    "1",
+    "--no-ansi",
+    "--output",
+    "Detailed",
+    "--results-directory",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-19/test-results/module-PublishingTests-m003"
+  ],
+  "startedAtUtc": "2026-11-04T20:30:19.720953+00:00",
+  "endedAtUtc": "2026-11-04T20:30:21.707666+00:00",
+  "elapsedSeconds": 1.9867075000001932,
+  "exitCode": 0,
+  "timingStatus": "OBSERVED",
+  "timedOut": false,
+  "executedInputDrift": false,
+  "inputHashes": {
+    "/usr/bin/sandbox-exec": "58839ef01b4eef8aac0d2aa8f9d1c074ae45aafe3533965b030672450064acc8",
+    "/usr/local/share/dotnet/dotnet": "11b517e7b00d0efa20e9b3ab6fe433f135d828a4c95c9c6ca7a9cf1328b6ada4",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll": "233d734482488689784c6df2fd63de1146094919dfdeba6dfd02239be705fb5d"
+  },
+  "manifestSha256": "8b120856bc74f3ae5f99febe80eef192c1d01fed4a547a75e4d3b2dc3b0ded05",
+  "commandSha256": "7f4eed42953d1e7caa55e10884f621d62f624c1b28c94f3bc43780b4809ae91c",
+  "logSha256": "8bf0b26efe610efa42856de0fd8f5a29f14f1a8467d646e81fb13b7ae68fed76",
+  "logBytes": 507,
+  "logVisibility": "PRIVATE"
+}

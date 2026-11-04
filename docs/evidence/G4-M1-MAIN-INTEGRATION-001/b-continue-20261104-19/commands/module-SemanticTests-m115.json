@@ -1,0 +1,38 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-19",
+  "testedCommit": "648d692684221d39a2cf8ce323254d7ef061e256",
+  "command": [
+    "/usr/bin/sandbox-exec",
+    "-p",
+    "(version 1) (allow default) (deny network-outbound (remote ip \"*:*\")) (allow network-outbound (remote ip \"localhost:*\"))",
+    "/usr/local/share/dotnet/dotnet",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll",
+    "--filter",
+    "FullyQualifiedName=OntologyPlatform.SemanticTests.RoundtripTests.SourceTripleAndProjectionBudgetsFailExplicitly",
+    "--minimum-expected-tests",
+    "1",
+    "--no-ansi",
+    "--output",
+    "Detailed",
+    "--results-directory",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-19/test-results/module-SemanticTests-m115"
+  ],
+  "startedAtUtc": "2026-11-04T20:29:49.051187+00:00",
+  "endedAtUtc": "2026-11-04T20:29:49.466380+00:00",
+  "elapsedSeconds": 0.4151875409988861,
+  "exitCode": 0,
+  "timingStatus": "OBSERVED",
+  "timedOut": false,
+  "executedInputDrift": false,
+  "inputHashes": {
+    "/usr/bin/sandbox-exec": "58839ef01b4eef8aac0d2aa8f9d1c074ae45aafe3533965b030672450064acc8",
+    "/usr/local/share/dotnet/dotnet": "11b517e7b00d0efa20e9b3ab6fe433f135d828a4c95c9c6ca7a9cf1328b6ada4",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll": "db5376947a7ed40af6145e9a49cf68b68c363d5a94d0755c2fbdf2dd3a83a247"
+  },
+  "manifestSha256": "8b120856bc74f3ae5f99febe80eef192c1d01fed4a547a75e4d3b2dc3b0ded05",
+  "commandSha256": "e8ac69437afe1b2d5dda4cca5c0a0cfb990bc9ba9a3ac56eb56e0fb7c57b07f9",
+  "logSha256": "78eb1ed02342d0626b13c322d0a52cddf93dbde5a895a7657bbcd0ea1dec155c",
+  "logBytes": 362,
+  "logVisibility": "PRIVATE"
+}

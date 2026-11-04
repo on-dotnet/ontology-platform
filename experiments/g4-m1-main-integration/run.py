@@ -634,9 +634,7 @@ def main():
         elif args.gate=='I02':
             v=require_gate(m,'I03',partial=True);rt.require(v['result'].get('rejectionPathsPassed'),'STARTUP_REJECTION_NOT_PASSED')
             rt.runtime_value(m)
-            rt.start_group(m,'g3',modules=True)
             results=module('module-tests').run_modules(m)
-            closeout.reclaim(m,'modules',apply=True)
             rt.require(all(x['status']=='PASS' for x in results),'MODULE_SKIP_NOT_CLOSED')
             rt.start_group(m,'g3');compat=consumer(m,'g3-compatibility')
             fixture_tests=module('module-tests').g3_fixture_tests(m)

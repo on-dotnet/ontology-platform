@@ -1,0 +1,383 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-19",
+  "testedCommit": "648d692684221d39a2cf8ce323254d7ef061e256",
+  "project": "PublishingTests",
+  "assemblySha256": "233d734482488689784c6df2fd63de1146094919dfdeba6dfd02239be705fb5d",
+  "baselineSha256": "2a88560e802bd48f104673db8f0aa7de5bde8fe2e04d03015687efb131baae6f",
+  "methods": [
+    {
+      "method": "OntologyPlatform.PublishingTests.PublishingFlowTests.ActivationBoundaries",
+      "source": "backend/tests/OntologyPlatform.PublishingTests/PublishingFlowTests.cs",
+      "sourceSha256": "40d003e29326d173f4de24192ffca74997bb2b6594b62b1deef1d8b9c8d6f2e0",
+      "cases": [
+        "ActivationBoundaries (\"cas\")",
+        "ActivationBoundaries (\"changed\")",
+        "ActivationBoundaries (\"expiry\")",
+        "ActivationBoundaries (\"pending\")",
+        "ActivationBoundaries (\"rejected\")"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.PublishingTests.PublishingMigrationTests.ActualMigrationDownGuard",
+      "source": "backend/tests/OntologyPlatform.PublishingTests/PublishingMigrationTests.cs",
+      "sourceSha256": "14deb3297de0357c11bcad77c1b21a4197ea27c9576b38e1eff86cdd8844e067",
+      "cases": [
+        "ActualMigrationDownGuard (\"concurrent\")",
+        "ActualMigrationDownGuard (\"empty\")",
+        "ActualMigrationDownGuard (\"nonempty\")"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.PublishingTests.PublishingFlowTests.ApprovalBoundaries",
+      "source": "backend/tests/OntologyPlatform.PublishingTests/PublishingFlowTests.cs",
+      "sourceSha256": "40d003e29326d173f4de24192ffca74997bb2b6594b62b1deef1d8b9c8d6f2e0",
+      "cases": [
+        "ApprovalBoundaries (\"expiry\",409)",
+        "ApprovalBoundaries (\"role\",403)",
+        "ApprovalBoundaries (\"scope\",403)",
+        "ApprovalBoundaries (\"self\",403)"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.PublishingTests.G3M4ImpactPublishingTests.ApprovalRejectsChangedAssessmentOrProfile",
+      "source": "backend/tests/OntologyPlatform.PublishingTests/G3M4ImpactPublishingTests.cs",
+      "sourceSha256": "07db5e58876e2d4a0722ad148107bad51e77c26833549071587d0399cc778476",
+      "cases": [
+        "ApprovalRejectsChangedAssessmentOrProfile (False)",
+        "ApprovalRejectsChangedAssessmentOrProfile (True)"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.PublishingTests.OutboxTests.BackgroundRestartAndDuplicateConsume",
+      "source": "backend/tests/OntologyPlatform.PublishingTests/OutboxTests.cs",
+      "sourceSha256": "d5da66390939565d90362c9b97750c22649711b143b71e059e7156f43e95ed8f",
+      "cases": [
+        "BackgroundRestartAndDuplicateConsume"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.PublishingTests.ArtifactTests.CallerCancellationPropagates",
+      "source": "backend/tests/OntologyPlatform.PublishingTests/ArtifactTests.cs",
+      "sourceSha256": "b0eaf7c16934e01b55780ed932933d8a6a814bbb402ada364c32b9b10c74e2e9",
+      "cases": [
+        "CallerCancellationPropagates"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.PublishingTests.ArtifactTests.ConcurrentDifferentBytesCannotOverwrite",
+      "source": "backend/tests/OntologyPlatform.PublishingTests/ArtifactTests.cs",
+      "sourceSha256": "b0eaf7c16934e01b55780ed932933d8a6a814bbb402ada364c32b9b10c74e2e9",
+      "cases": [
+        "ConcurrentDifferentBytesCannotOverwrite"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.PublishingTests.PublicationFaultTests.ConcurrentDifferentProposalsOnlyOneCasWinner",
+      "source": "backend/tests/OntologyPlatform.PublishingTests/PublicationFaultTests.cs",
+      "sourceSha256": "d1373fb735f4d0d6fa6e3647ee4f09ae5627559a0aba2b54360df908c506e036",
+      "cases": [
+        "ConcurrentDifferentProposalsOnlyOneCasWinner"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.PublishingTests.PublicationFaultTests.ConcurrentIdenticalActivationReturnsSameFact",
+      "source": "backend/tests/OntologyPlatform.PublishingTests/PublicationFaultTests.cs",
+      "sourceSha256": "d1373fb735f4d0d6fa6e3647ee4f09ae5627559a0aba2b54360df908c506e036",
+      "cases": [
+        "ConcurrentIdenticalActivationReturnsSameFact"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.PublishingTests.PublishedIntegrityTests.DamagedPublishedGraphUnavailableAndReconciliationRetries",
+      "source": "backend/tests/OntologyPlatform.PublishingTests/PublishedIntegrityTests.cs",
+      "sourceSha256": "241f73b722954e2496c6e7a35b598246e02497e1b0f20b6fc052c008a7837f79",
+      "cases": [
+        "DamagedPublishedGraphUnavailableAndReconciliationRetries"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.PublishingTests.G3M4ImpactPublishingTests.EveryPublicationBoundaryRechecksImpact",
+      "source": "backend/tests/OntologyPlatform.PublishingTests/G3M4ImpactPublishingTests.cs",
+      "sourceSha256": "07db5e58876e2d4a0722ad148107bad51e77c26833549071587d0399cc778476",
+      "cases": [
+        "EveryPublicationBoundaryRechecksImpact (\"approval\")",
+        "EveryPublicationBoundaryRechecksImpact (\"final\")",
+        "EveryPublicationBoundaryRechecksImpact (\"prepare\")",
+        "EveryPublicationBoundaryRechecksImpact (\"retry\")"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.PublishingTests.ApprovalPolicyTests.ExactExpiryDenied",
+      "source": "backend/tests/OntologyPlatform.PublishingTests/ApprovalPolicyTests.cs",
+      "sourceSha256": "ee8f285e720e7929f7b50ecc2b260f903d0b493afede9d7a92d5861dea3b0e75",
+      "cases": [
+        "ExactExpiryDenied"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.PublishingTests.G3M3PublishingTests.ExactLegacyV2ReleaseReadsAndRollsBackWithoutRepublishingOldAssessment",
+      "source": "backend/tests/OntologyPlatform.PublishingTests/G3M3PublishingTests.cs",
+      "sourceSha256": "fd68398231d656ad5c5080069c32084478bc728750a56a6567d1ad0f24f641d1",
+      "cases": [
+        "ExactLegacyV2ReleaseReadsAndRollsBackWithoutRepublishingOldAssessment"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.PublishingTests.G3MetadataTests.ExistingValidToProvenancePublishesButUnknownMetadataDoesNot",
+      "source": "backend/tests/OntologyPlatform.PublishingTests/G3MetadataTests.cs",
+      "sourceSha256": "45cda1e7b3468629c08ade9070b9f0dcf3ec74aadce9c971d9fa38f607230cb6",
+      "cases": [
+        "ExistingValidToProvenancePublishesButUnknownMetadataDoesNot (\"validToUtc\",True)",
+        "ExistingValidToProvenancePublishesButUnknownMetadataDoesNot (\"validUntilUtc\",False)"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.PublishingTests.PublicationFaultTests.ExternalPhaseFailurePreservesOldActiveAndRetry",
+      "source": "backend/tests/OntologyPlatform.PublishingTests/PublicationFaultTests.cs",
+      "sourceSha256": "d1373fb735f4d0d6fa6e3647ee4f09ae5627559a0aba2b54360df908c506e036",
+      "cases": [
+        "ExternalPhaseFailurePreservesOldActiveAndRetry (\"jena-read\")",
+        "ExternalPhaseFailurePreservesOldActiveAndRetry (\"jena-shacl\")",
+        "ExternalPhaseFailurePreservesOldActiveAndRetry (\"jena-write\")",
+        "ExternalPhaseFailurePreservesOldActiveAndRetry (\"s3-read\")",
+        "ExternalPhaseFailurePreservesOldActiveAndRetry (\"s3-write\")"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.PublishingTests.G3M4ImpactTimePrecisionTests.FixedSevenDigitClockUsesConsistentEnvelopePrecision",
+      "source": "backend/tests/OntologyPlatform.PublishingTests/G3M4ImpactTimePrecisionTests.cs",
+      "sourceSha256": "732130e5e25137529187adb4d9ffdbbf634c3a95e35d7362d7c4c3307a1933a0",
+      "cases": [
+        "FixedSevenDigitClockUsesConsistentEnvelopePrecision (False)",
+        "FixedSevenDigitClockUsesConsistentEnvelopePrecision (True)"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.PublishingTests.G3M4PublishingTests.FormalIdentityReadRejectsPartialScopeBeforeExternalRead",
+      "source": "backend/tests/OntologyPlatform.PublishingTests/G3M4PublishingTests.cs",
+      "sourceSha256": "b15f9d57a1c49af04c85f92f08d0fb6ee69461281f7e4a7e5b8557028cca75b6",
+      "cases": [
+        "FormalIdentityReadRejectsPartialScopeBeforeExternalRead"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.PublishingTests.G3LegacyTests.HistoricalM1ProfileV1ManifestV2ReadsAndRollsBackAfterCurrentProfileUpgrade",
+      "source": "backend/tests/OntologyPlatform.PublishingTests/G3LegacyTests.cs",
+      "sourceSha256": "27256c06b363b72537dfc413c76866b5da4d0ac0a9512f586a1d4b587933ce62",
+      "cases": [
+        "HistoricalM1ProfileV1ManifestV2ReadsAndRollsBackAfterCurrentProfileUpgrade"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.PublishingTests.G3M4PublishingTests.IdentityGovernanceCannotBeOverriddenByReviewer",
+      "source": "backend/tests/OntologyPlatform.PublishingTests/G3M4PublishingTests.cs",
+      "sourceSha256": "b15f9d57a1c49af04c85f92f08d0fb6ee69461281f7e4a7e5b8557028cca75b6",
+      "cases": [
+        "IdentityGovernanceCannotBeOverriddenByReviewer (False)",
+        "IdentityGovernanceCannotBeOverriddenByReviewer (True)"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.PublishingTests.ArtifactTests.ImmutableRoundtripAndDifferentContentRejected",
+      "source": "backend/tests/OntologyPlatform.PublishingTests/ArtifactTests.cs",
+      "sourceSha256": "b0eaf7c16934e01b55780ed932933d8a6a814bbb402ada364c32b9b10c74e2e9",
+      "cases": [
+        "ImmutableRoundtripAndDifferentContentRejected"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.PublishingTests.ApprovalPolicyTests.IndependentAuditorAllowed",
+      "source": "backend/tests/OntologyPlatform.PublishingTests/ApprovalPolicyTests.cs",
+      "sourceSha256": "ee8f285e720e7929f7b50ecc2b260f903d0b493afede9d7a92d5861dea3b0e75",
+      "cases": [
+        "IndependentAuditorAllowed"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.PublishingTests.G3M4ImpactPublishingTests.InitialApprovalCannotSurviveActiveBaselineOrMissingBinding",
+      "source": "backend/tests/OntologyPlatform.PublishingTests/G3M4ImpactPublishingTests.cs",
+      "sourceSha256": "07db5e58876e2d4a0722ad148107bad51e77c26833549071587d0399cc778476",
+      "cases": [
+        "InitialApprovalCannotSurviveActiveBaselineOrMissingBinding"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.PublishingTests.ProposalContractTests.InvalidDiscriminatedRequestRejectedBeforeDependencies",
+      "source": "backend/tests/OntologyPlatform.PublishingTests/ProposalContractTests.cs",
+      "sourceSha256": "21627e2738f0740be890fefaf9edc1ababa3ad9a612d74e3171117a8622af26c",
+      "cases": [
+        "InvalidDiscriminatedRequestRejectedBeforeDependencies (\"hash-invalid\")",
+        "InvalidDiscriminatedRequestRejectedBeforeDependencies (\"missing-publish\")",
+        "InvalidDiscriminatedRequestRejectedBeforeDependencies (\"mixed-rollback\")"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.PublishingTests.G3BindingTests.LegacyBindingIsExactAndNewBindingIncludesSemantics",
+      "source": "backend/tests/OntologyPlatform.PublishingTests/G3BindingTests.cs",
+      "sourceSha256": "63af793f7452f5d7e880dffbf354cb80cf4b96353edcc121ab1042abab8043b8",
+      "cases": [
+        "LegacyBindingIsExactAndNewBindingIncludesSemantics"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.PublishingTests.G3LegacyTests.LegacyV1CorruptArtifactRollbackFailsClosed",
+      "source": "backend/tests/OntologyPlatform.PublishingTests/G3LegacyTests.cs",
+      "sourceSha256": "27256c06b363b72537dfc413c76866b5da4d0ac0a9512f586a1d4b587933ce62",
+      "cases": [
+        "LegacyV1CorruptArtifactRollbackFailsClosed"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.PublishingTests.G3LegacyTests.LegacyV1ReadsAndRollsBackWithoutCurrentDraftAssessment",
+      "source": "backend/tests/OntologyPlatform.PublishingTests/G3LegacyTests.cs",
+      "sourceSha256": "27256c06b363b72537dfc413c76866b5da4d0ac0a9512f586a1d4b587933ce62",
+      "cases": [
+        "LegacyV1ReadsAndRollsBackWithoutCurrentDraftAssessment"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.PublishingTests.PublicationFaultTests.PostgreSqlWriteFailureRollsBackWholeActivation",
+      "source": "backend/tests/OntologyPlatform.PublishingTests/PublicationFaultTests.cs",
+      "sourceSha256": "d1373fb735f4d0d6fa6e3647ee4f09ae5627559a0aba2b54360df908c506e036",
+      "cases": [
+        "PostgreSqlWriteFailureRollsBackWholeActivation (\"activation\")",
+        "PostgreSqlWriteFailureRollsBackWholeActivation (\"active\")",
+        "PostgreSqlWriteFailureRollsBackWholeActivation (\"audit\")",
+        "PostgreSqlWriteFailureRollsBackWholeActivation (\"outbox\")"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.PublishingTests.G3M4ImpactPublishingTests.ProposalRejectsUnboundReports",
+      "source": "backend/tests/OntologyPlatform.PublishingTests/G3M4ImpactPublishingTests.cs",
+      "sourceSha256": "07db5e58876e2d4a0722ad148107bad51e77c26833549071587d0399cc778476",
+      "cases": [
+        "ProposalRejectsUnboundReports (\"cross-version\",409,\"impact_target_conflict\")",
+        "ProposalRejectsUnboundReports (\"expired\",409,\"impact_expired\")",
+        "ProposalRejectsUnboundReports (\"forged\",409,\"impact_binding_conflict\")",
+        "ProposalRejectsUnboundReports (\"missing\",422,\"impact_required\")"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.PublishingTests.G3M4ImpactPublishingTests.PublicationTracesImpactAndRecoversSuccessfulReceipt",
+      "source": "backend/tests/OntologyPlatform.PublishingTests/G3M4ImpactPublishingTests.cs",
+      "sourceSha256": "07db5e58876e2d4a0722ad148107bad51e77c26833549071587d0399cc778476",
+      "cases": [
+        "PublicationTracesImpactAndRecoversSuccessfulReceipt"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.PublishingTests.PublishingFlowTests.PublishTwoVersionsRollbackOldCompleteManifestAndReplay",
+      "source": "backend/tests/OntologyPlatform.PublishingTests/PublishingFlowTests.cs",
+      "sourceSha256": "40d003e29326d173f4de24192ffca74997bb2b6594b62b1deef1d8b9c8d6f2e0",
+      "cases": [
+        "PublishTwoVersionsRollbackOldCompleteManifestAndReplay"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.PublishingTests.G3M3PublishingTests.RealM3VocabularyReleaseStaysBoundToImmutableSources",
+      "source": "backend/tests/OntologyPlatform.PublishingTests/G3M3PublishingTests.cs",
+      "sourceSha256": "fd68398231d656ad5c5080069c32084478bc728750a56a6567d1ad0f24f641d1",
+      "cases": [
+        "RealM3VocabularyReleaseStaysBoundToImmutableSources"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.PublishingTests.G3M3PublishingTests.RealProposalRejectsUnitGovernanceEvenWhenShaclConforms",
+      "source": "backend/tests/OntologyPlatform.PublishingTests/G3M3PublishingTests.cs",
+      "sourceSha256": "fd68398231d656ad5c5080069c32084478bc728750a56a6567d1ad0f24f641d1",
+      "cases": [
+        "RealProposalRejectsUnitGovernanceEvenWhenShaclConforms (\"dimension\")",
+        "RealProposalRejectsUnitGovernanceEvenWhenShaclConforms (\"precision\")"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.PublishingTests.RollbackBoundaryTests.RollbackFailurePreservesCurrentAndSameCommandRecovers",
+      "source": "backend/tests/OntologyPlatform.PublishingTests/RollbackBoundaryTests.cs",
+      "sourceSha256": "93f390ecc6abb27d6f71b0f4755cec479431cc46e1a271d81a49b2d17d96bb49",
+      "cases": [
+        "RollbackFailurePreservesCurrentAndSameCommandRecovers (\"artifact\")",
+        "RollbackFailurePreservesCurrentAndSameCommandRecovers (\"audit\")",
+        "RollbackFailurePreservesCurrentAndSameCommandRecovers (\"outbox\")"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.PublishingTests.RollbackBoundaryTests.RollbackProposalReceiptSurvivesExternalOutage",
+      "source": "backend/tests/OntologyPlatform.PublishingTests/RollbackBoundaryTests.cs",
+      "sourceSha256": "93f390ecc6abb27d6f71b0f4755cec479431cc46e1a271d81a49b2d17d96bb49",
+      "cases": [
+        "RollbackProposalReceiptSurvivesExternalOutage (\"payload\")",
+        "RollbackProposalReceiptSurvivesExternalOutage (\"replay\")",
+        "RollbackProposalReceiptSurvivesExternalOutage (\"scope\")",
+        "RollbackProposalReceiptSurvivesExternalOutage (\"subject\")"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.PublishingTests.RollbackBoundaryTests.RollbackRequiresFreshIndependentBoundApproval",
+      "source": "backend/tests/OntologyPlatform.PublishingTests/RollbackBoundaryTests.cs",
+      "sourceSha256": "93f390ecc6abb27d6f71b0f4755cec479431cc46e1a271d81a49b2d17d96bb49",
+      "cases": [
+        "RollbackRequiresFreshIndependentBoundApproval (\"binding\")",
+        "RollbackRequiresFreshIndependentBoundApproval (\"expiry\")",
+        "RollbackRequiresFreshIndependentBoundApproval (\"self\")"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.PublishingTests.ApprovalPolicyTests.SelfApprovalDenied",
+      "source": "backend/tests/OntologyPlatform.PublishingTests/ApprovalPolicyTests.cs",
+      "sourceSha256": "ee8f285e720e7929f7b50ecc2b260f903d0b493afede9d7a92d5861dea3b0e75",
+      "cases": [
+        "SelfApprovalDenied"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.PublishingTests.ApprovalPolicyTests.ShortRoleDenied",
+      "source": "backend/tests/OntologyPlatform.PublishingTests/ApprovalPolicyTests.cs",
+      "sourceSha256": "ee8f285e720e7929f7b50ecc2b260f903d0b493afede9d7a92d5861dea3b0e75",
+      "cases": [
+        "ShortRoleDenied"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.PublishingTests.ArtifactTests.SlowDependencyBecomesUnavailable",
+      "source": "backend/tests/OntologyPlatform.PublishingTests/ArtifactTests.cs",
+      "sourceSha256": "b0eaf7c16934e01b55780ed932933d8a6a814bbb402ada364c32b9b10c74e2e9",
+      "cases": [
+        "SlowDependencyBecomesUnavailable"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.PublishingTests.OutboxTests.StaleFenceCannotCommitConsumption",
+      "source": "backend/tests/OntologyPlatform.PublishingTests/OutboxTests.cs",
+      "sourceSha256": "d5da66390939565d90362c9b97750c22649711b143b71e059e7156f43e95ed8f",
+      "cases": [
+        "StaleFenceCannotCommitConsumption"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.PublishingTests.PublishingFlowTests.TamperedRollbackTargetRejected",
+      "source": "backend/tests/OntologyPlatform.PublishingTests/PublishingFlowTests.cs",
+      "sourceSha256": "40d003e29326d173f4de24192ffca74997bb2b6594b62b1deef1d8b9c8d6f2e0",
+      "cases": [
+        "TamperedRollbackTargetRejected"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.PublishingTests.G3M4PublishingTests.VersionFourIdentityPublicationAndExactVersionThreeRollback",
+      "source": "backend/tests/OntologyPlatform.PublishingTests/G3M4PublishingTests.cs",
+      "sourceSha256": "b15f9d57a1c49af04c85f92f08d0fb6ee69461281f7e4a7e5b8557028cca75b6",
+      "cases": [
+        "VersionFourIdentityPublicationAndExactVersionThreeRollback"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.PublishingTests.ArtifactTests.WrongHashAndMissingObjectFailClosed",
+      "source": "backend/tests/OntologyPlatform.PublishingTests/ArtifactTests.cs",
+      "sourceSha256": "b0eaf7c16934e01b55780ed932933d8a6a814bbb402ada364c32b9b10c74e2e9",
+      "cases": [
+        "WrongHashAndMissingObjectFailClosed"
+      ]
+    }
+  ],
+  "scope": "ALL_CASES_METHOD_PROCESS_ISOLATION"
+}

@@ -1,0 +1,35 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-19",
+  "testedCommit": "648d692684221d39a2cf8ce323254d7ef061e256",
+  "status": "BLOCKED_WITH_WITNESS",
+  "moduleTotals": {
+    "SemanticTests": 302,
+    "PublishingTests": 78,
+    "QueryTests": 49
+  },
+  "agentPassedCases": 9,
+  "agentPassedMethods": 7,
+  "failedMethod": "OntologyPlatform.AgentTests.RunFlowTests.DisabledProviderCannotPretendCompletion",
+  "failurePhase": "PublishingService.ActivateAsync during fixture PublishAsync before disabled-provider assertion",
+  "observedJvmSignal": "SIGBUS",
+  "containerExitCode": 127,
+  "oomKilled": false,
+  "priorVolumeUsedKiB": 742240,
+  "priorVolumeCapacityKiB": 1048576,
+  "priorMemoryCurrentBytes": 2143948800,
+  "priorMemoryPeakBytes": 2147483648,
+  "priorMemoryMaxBytes": 2147483648,
+  "priorMemoryEvents": {
+    "max": 197,
+    "oom": 0,
+    "oom_kill": 0,
+    "sock_throttled": 37
+  },
+  "crashReportCopy": "FAILED_FILE_NOT_FOUND",
+  "crashFinalVolumeUsage": "NOT_VERIFIED",
+  "directCrashCause": "NOT_VERIFIED",
+  "diagnosedLifetimeDifference": "Four module projects share one three-service fixture, while original four drivers create and reclaim their own fixtures; published release graphs persist across project boundaries.",
+  "proposal": "Fixed four project phases with independent complete three-service lifecycles, all method cases and internal concurrency preserved; no product/test/image/heap change",
+  "replayAfterFix": "NOT_RUN"
+}

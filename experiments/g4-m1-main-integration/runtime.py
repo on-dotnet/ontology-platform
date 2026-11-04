@@ -20,6 +20,8 @@ TASK = 'G4-M1-MAIN-INTEGRATION-001'
 ARTIFACTS = ROOT / 'artifacts/g4-m1-main-integration-001'
 MAIN = 'd1a61daffe844475b07705797e3ad325cc3f2945'
 ENGINE = '7a8785bb-6b6e-4ae4-8065-996f4bf83016'
+MODULE_PHASES = {'SemanticTests':'modules-semantic','PublishingTests':'modules-publishing','QueryTests':'modules-query','AgentTests':'modules-agent'}
+INGRESS_GROUPS = ('modules','g3','m1',*MODULE_PHASES.values())
 NAMES = ('run.py', 'consumer_check.py', 'runtime.py', 'pg_fixture.py', 'module-tests.py',
          'startup-boundary.py', 'migration-boundary.py', 'contract-check.mjs', 'http.mjs',
          'browser.mjs', 'fault.mjs', 'g3-compatibility.mjs', 'readback.py', 'closeout.py',
@@ -340,7 +342,7 @@ def runtime_value(m):
 def cli():
     """统一入口先绑定身份；仅显式ingress模式启动固定组监听。"""
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--ingress', choices=('modules','g3','m1'))
+    parser.add_argument('--ingress', choices=INGRESS_GROUPS)
     parser.add_argument('--run-id', required=True)
     parser.add_argument('--expected-head', required=True)
     parser.add_argument('--resource-manifest', required=True)
@@ -501,8 +503,8 @@ print join(',',sort {$a<=>$b} @found);
 
 def ingress_services(group):
     """三个冻结运行组；不接受外部端口、地址或命令。"""
-    require(group in ('modules','g3','m1'),'INGRESS_GROUP')
-    return ('platform-pg','fuseki','rustfs') if group=='modules' else (
+    require(group in INGRESS_GROUPS,'INGRESS_GROUP')
+    return ('platform-pg','fuseki','rustfs') if group=='modules' or group in MODULE_PHASES.values() else (
         ('platform-pg','keycloak-test','api','web','fuseki','rustfs') if group=='g3' else
         ('platform-pg','keycloak-test','api','web'))
 
@@ -712,9 +714,18 @@ def ingress_network_projection(m,networks,observed):
         require(value['Name']==networks[value['Id']] and value['Internal'] is True and value['Driver']=='bridge' and value['Labels'].get('ontology.task-id')==TASK and value['Labels'].get('ontology.run-id')==m['runId'],'INGRESS_NETWORK_ISOLATION')
 
 
+def ingress_runtime_group(value, group):
+    """模块phase既绑定三服务路由，也绑定当前运行状态，拒绝旧phase复用。"""
+    ingress_services(group)
+    expected='g3' if group=='modules' or group in MODULE_PHASES.values() else group
+    require(value['group']==expected,'INGRESS_GROUP_RUNTIME')
+    if group in MODULE_PHASES.values():require(value.get('modulePhase')==group,'INGRESS_MODULE_PHASE')
+    return expected
+
+
 def ingress_routes(m,engine,group):
     """仅启动前同步冻结；运行中的复核使用下方可取消异步入口。"""
-    value=runtime_value(m);require(value['group']==('g3' if group=='modules' else group),'INGRESS_GROUP_RUNTIME')
+    value=runtime_value(m);ingress_runtime_group(value,group)
     ids=value['containerIds'];listed=engine.request('GET',engine.list_path([ids[s] for s in ingress_services(group)]))
     routes,networks=ingress_route_projection(m,engine,group,ids,listed)
     ingress_network_projection(m,networks,[engine.request('GET','/networks/'+ident) for ident in networks])
@@ -724,7 +735,7 @@ def ingress_routes(m,engine,group):
 async def async_ingress_routes(m,engine,group):
     """整条每连接复核可取消；无后台同步线程延长退出期限。"""
     import asyncio
-    value=runtime_value(m);require(value['group']==('g3' if group=='modules' else group),'INGRESS_GROUP_RUNTIME')
+    value=runtime_value(m);ingress_runtime_group(value,group)
     ids=value['containerIds'];listed=await engine.async_request('GET',engine.list_path([ids[s] for s in ingress_services(group)]))
     routes,networks=ingress_route_projection(m,engine,group,ids,listed)
     ingress_network_projection(m,networks,await asyncio.gather(*[engine.async_request('GET','/networks/'+ident) for ident in networks]))
@@ -1006,21 +1017,23 @@ def resource_snapshot(m, group, name):
     return result
 
 
-def start_group(m, group, *, modules=False):
+def start_group(m, group, *, modules=False, module_phase=None):
     """真实Compose受控启动，调用前全部绑定且不得叠加运行组。"""
     import consumer_check
+    require((modules and group=='g3' and module_phase in MODULE_PHASES.values()) or (not modules and module_phase is None),'MODULE_PHASE')
     verify_engine(m);check_build(m);consumer_check.check_all(m)
     r=runtime_value(m)
     require(not r['containerIds'],'PREVIOUS_GROUP_NOT_RECLAIMED')
     helper=ARTIFACTS/m['runId']/'helpers/loopback-proxy.mjs'
     require(digest(helper.read_bytes())==digest(WEB_HELPER.replace('__ROOT__',json.dumps(str(ROOT))).encode()),'HELPER_DRIFT')
     services=['platform-pg','fuseki','rustfs'] if modules else (['platform-pg','keycloak-test','api','web','fuseki','rustfs'] if group=='g3' else ['pg-source','platform-pg','keycloak-test','api','web'])
-    tag='modules' if modules else group
+    tag=module_phase if modules else group
     command=compose_command(group)+['up','-d','--no-build','--pull','never',*services]
     import closeout
     before=closeout.inventory(m)
     require(all(not before[k]['owned'] for k in before),'PREEXISTING_RUN_RESOURCE')
     write_json(ARTIFACTS/m['runId']/('resources-'+tag+'-before.json'),before)
+    update_runtime(m,modulePhase=module_phase)
     try:
         execute(m,'start-'+tag,command,env=compose_environment(m),timeout=180,sensitive=True)
     finally:

@@ -1,0 +1,77 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-19",
+  "testedCommit": "648d692684221d39a2cf8ce323254d7ef061e256",
+  "status": "BLOCKED_WITH_WITNESS",
+  "gates": {
+    "R2": "PASS",
+    "I01": "PARTIAL",
+    "I05": "PASS",
+    "I03": "PARTIAL",
+    "I02": "BLOCKED_WITH_WITNESS",
+    "I04": "NOT_RUN",
+    "I06": "NOT_RUN",
+    "I07": "NOT_RUN",
+    "I08": "NOT_RUN"
+  },
+  "native": {
+    "total": 780,
+    "passed": 344,
+    "skipped": 436,
+    "failed": 0
+  },
+  "webTests": 379,
+  "selfTestSuites": 27,
+  "selfTestSeconds": 383.0645303750025,
+  "taskTestsAtT": 48,
+  "fullModulePassCases": {
+    "SemanticTests": 302,
+    "PublishingTests": 78,
+    "QueryTests": 49
+  },
+  "agent": {
+    "passedMethods": 7,
+    "passedCases": 9,
+    "failedMethods": 1,
+    "failedCases": 1,
+    "failedMethod": "OntologyPlatform.AgentTests.RunFlowTests.DisabledProviderCannotPretendCompletion"
+  },
+  "formalFixtureClosure": "NOT_RUN",
+  "failureDiagnosis": "fuseki-failure-diagnosis.json",
+  "proposedFix": "Independent whole three-service lifecycle for each of four modules; no cross-module published graph accumulation. Direct SIGBUS cause NOT_VERIFIED.",
+  "newTAndFullRunRequired": true,
+  "ciWindowsIntel": "NOT_RUN",
+  "supplyChain": "AMBER-A1_LICENSE_PARTIAL_NOT_VERIFIED",
+  "ignoredLargeInputs": [
+    {
+      "path": "r2-sdk-before-mstest-imports.xml",
+      "bytes": 1628467,
+      "sha256": "3c17a72786f12eab84651bbb5fffcb11801f048dab9ceae882510a2b324a44ef"
+    },
+    {
+      "path": "r2-sdk-after-aspire-imports.xml",
+      "bytes": 1616931,
+      "sha256": "c0b07649b7f2c1db7a07a58213efe63238c53ae27bee16cace5f06c19ed29d5f"
+    },
+    {
+      "path": "r2-sdk-before-aspire-imports.xml",
+      "bytes": 1616931,
+      "sha256": "2341dccbe1b5dc680507de3efaab6a4263d8851ed3a21223f3a2b6cb5eeb3717"
+    },
+    {
+      "path": "r2-sdk-after-mstest-imports.xml",
+      "bytes": 1628467,
+      "sha256": "ad414568245ff91aa12e41fcdc60eef13e7311ef3d58478ec5998ce4521fcab0"
+    },
+    {
+      "path": "restore-stdout.txt",
+      "bytes": 52463321,
+      "sha256": "f58335baf4a0620f60fccbb1a46c0639c70dbb6edd0f27d852ecb93f6a990e37"
+    },
+    {
+      "path": "web-cache-files.json",
+      "bytes": 8821586,
+      "sha256": "fec5f0dc296535f8510e086370de3e6fbe9ac494715683721cdd24ef64f6beba"
+    }
+  ]
+}

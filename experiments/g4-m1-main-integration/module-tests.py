@@ -9,6 +9,7 @@ import time
 import subprocess
 from pathlib import Path
 import runtime as rt
+import closeout
 
 # 只复用已审断言常量，不执行历史main或restore入口。
 SCHEMA_CHECK = "\nconst fs = require('fs');\nconst Ajv = require(process.argv[2]);\nconst bundle = JSON.parse(fs.readFileSync(process.argv[1], 'utf8'));\nconst allowed = new Set(['$schema','$ref','$defs','type','properties','required','additionalProperties','items','enum','oneOf','anyOf','allOf','not','description','format','minimum','maximum','minLength','maxLength','const','discriminator']);\nconst keywords = new Set();\nfunction scan(schema) {\n  if (typeof schema === 'boolean') return;\n  for (const [key, value] of Object.entries(schema)) {\n    if (!allowed.has(key)) throw new Error('Unsupported schema keyword: ' + key);\n    keywords.add(key);\n    if (key === '$defs' || key === 'properties') Object.values(value).forEach(scan);\n    if (['oneOf','anyOf','allOf'].includes(key)) value.forEach(scan);\n    if (['items','not','additionalProperties'].includes(key) && typeof value === 'object') scan(value);\n  }\n}\nscan(bundle.schema);\nconst ajv = new Ajv({validateSchema:false, allErrors:true, unknownFormats:'ignore', logger:false});\nconst validate = ajv.compile(bundle.schema);\nif (!validate(bundle.result)) throw new Error('Actual MCP payload failed output contract: ' + JSON.stringify(validate.errors));\nfor (const result of bundle.additionalResults || []) if (!validate(result)) throw new Error('Another actual MCP tool failed output contract');\nconst mutations = [\n  value => { delete value.status; },\n  value => { value.status = 'INVENTED'; },\n  value => { value.injectedActor = 'admin'; },\n  value => { value.snapshot = null; },\n  value => { value.evidence = null; },\n  value => { value.data[0].ontology = {classIris:[],objectPropertyIris:[],datatypePropertyIris:[],labels:[],supportedAxioms:[],diagnostics:[]}; }\n];\nfor (const mutate of mutations) {\n  const value = structuredClone(bundle.result);\n  mutate(value);\n  if (validate(value)) throw new Error('Invalid MCP payload unexpectedly passed output contract');\n}\nconsole.log(JSON.stringify({status:'PASS', validator:'repo-locked ajv6.15.0', scope:'observed common keyword subset; not full 2020-12 dialect certification', schemaKeywords:[...keywords].sort(), positive:1+(bundle.additionalResults||[]).length, negative:mutations.length, mediaTypes:bundle.mediaTypes}));\n"
@@ -94,15 +95,17 @@ def module_ingress_snapshot(raw,pid):
 
 def wait_module_ingress_idle(m):
     """批次间等待准确进程的连接和远端Exec退出；不掐断测试连接或提升容量。"""
-    a=rt.ARTIFACTS/m['runId'];ready=json.loads((a/'ingress-modules-ready.json').read_text())
+    a=rt.ARTIFACTS/m['runId'];phase=rt.runtime_value(m).get('modulePhase')
+    rt.require(phase in rt.MODULE_PHASES.values(),'MODULE_PHASE')
+    ready=json.loads((a/('ingress-'+phase+'-ready.json')).read_text())
     rt.require(ready['taskId']==rt.TASK and ready['runId']==m['runId'] and ready['testedCommit']==m['_head'] and ready['manifestSha256']==m['_sha256'],'SEMANTIC_INGRESS_BINDING')
-    process=json.loads((a/'ingress-modules-process.json').read_text())
+    process=json.loads((a/('ingress-'+phase+'-process.json')).read_text())
     rt.require(process['pid']==ready['pid'] and process['taskId']==rt.TASK and process['runId']==m['runId'] and process['testedCommit']==m['_head'] and process['runtimeSha256']==ready['runtimeSha256']==m['drivers']['runtime.py'],'SEMANTIC_INGRESS_PROCESS_BINDING')
     deadline=time.monotonic()+15
     while time.monotonic()<deadline:
         os.kill(ready['pid'],0)
         rt.require(subprocess.check_output(['ps','-p',str(ready['pid']),'-o','lstart='],text=True).strip()==process['birth'],'SEMANTIC_INGRESS_PID_REUSED')
-        raw=(a/'ingress-modules-events.jsonl').read_bytes()
+        raw=(a/('ingress-'+phase+'-events.jsonl')).read_bytes()
         try:snapshot=module_ingress_snapshot(raw,ready['pid'])
         except json.JSONDecodeError:time.sleep(.05);continue
         if snapshot['idle']:return snapshot
@@ -112,6 +115,7 @@ def wait_module_ingress_idle(m):
 
 def run_module_methods(m,env,suffix):
     """完整模块案例按方法隔离进程，保留方法内并发及参数；不修改正式断言。"""
+    rt.require(rt.runtime_value(m).get('modulePhase')==rt.MODULE_PHASES[suffix],'MODULE_PROJECT_PHASE')
     project=module_project(suffix);a=rt.ARTIFACTS/m['runId'];baseline_path=a/'case-projections'/('baseline-'+suffix+'.json');baseline=json.loads(baseline_path.read_text())
     receipt=a/'commands'/('baseline-'+suffix+'.json');original=json.loads(receipt.read_text());raw=(a/'commands'/('baseline-'+suffix+'.log')).read_bytes()
     rt.require(baseline['testedCommit']==m['_head'] and original['manifestSha256']==m['_sha256'] and original['exitCode']==0,'SEMANTIC_BASELINE_BINDING')
@@ -140,33 +144,52 @@ def run_module_methods(m,env,suffix):
     return dict(project=suffix,total=len(observed),skipped=[],status='PASS',executionMode='METHOD_PROCESS_ISOLATION',methods=len(plan))
 
 
-def run_modules(m):
-    """实际测试数与skip逐项留下，任何skip不提升为PASS。"""
-    r=rt.runtime_value(m)
-    for service in ('platform-pg','fuseki','rustfs'):
-        rt.require(rt.inspect_owned(m,r['containerIds'][service],service)['State']['Running'],'MODULE_RESOURCE_DOWN')
-    env=rt.environment(m['runId'])
-    private=rt.private_dir(m['runId'])
+def module_environment(m):
+    """同Run私有身份供每个全新模块fixture使用；不保留前项目的数据库状态。"""
+    env=rt.environment(m['runId']);private=rt.private_dir(m['runId'])
     pg='Host=127.0.0.1;Port=15432;Database=platform;Username=platform;Password='+(private/'platform-password').read_text()
     env.update(ConnectionStrings__governance=pg,RUSTFS_ACCESS_KEY=(private/'s3-access').read_text(),RUSTFS_SECRET_KEY=(private/'s3-secret').read_text())
+    env.update(G2_SEM_JENA_ORIGIN='http://127.0.0.1:15303',G2_SEM_SAMPLES=str(rt.ROOT/'samples/g2'),G2_SEM_PG_CONNECTION=pg)
+    for prefix in ('PUB','QRY','AI'):
+        env.update({f'G2_{prefix}_PG':pg,f'G2_{prefix}_JENA':'http://127.0.0.1:15303',f'G2_{prefix}_S3':'http://127.0.0.1:15900',f'G2_{prefix}_SAMPLES':str(rt.ROOT/'samples/g2')})
+    return env
+
+
+def migrate_module_phase(m, env, phase):
+    """每项目全新平台库运行原四模块正式迁移，命令及EF字节绑定独立phase。"""
+    rt.require(phase in rt.MODULE_PHASES.values(),'MODULE_PHASE')
+    r=rt.runtime_value(m);rt.require(r.get('modulePhase')==phase,'MODULE_PROJECT_PHASE')
+    for service in ('platform-pg','fuseki','rustfs'):
+        rt.require(rt.inspect_owned(m,r['containerIds'][service],service)['State']['Running'],'MODULE_RESOURCE_DOWN')
     ef=Path('/Users/chasen/.nuget/packages/dotnet-ef/10.0.13/tools/net8.0/any/dotnet-ef.dll')
-    rt.require(ef.is_file(),'EXACT_EF_TOOL_MISSING')
-    ef_before=verify_ef(m)
+    rt.require(ef.is_file(),'EXACT_EF_TOOL_MISSING');ef_before=verify_ef(m)
     for name in ('Governance','Ontology','Publishing','Agents'):
         project=rt.ROOT/f'backend/src/Modules/{name}/OntologyPlatform.Modules.{name}/OntologyPlatform.Modules.{name}.csproj'
         rt.require(project.is_file(),'MODULE_PROJECT_MISSING')
         command=['/usr/local/share/dotnet/dotnet',str(ef),'database','update','--project',str(project),'--startup-project',str(project),'--configuration','Debug','--no-build']
-        rt.execute(m,'module-migrate-'+name,rt.offline_command(command,loopback=True),env=env,sensitive=True,timeout=90)
+        rt.execute(m,phase+'-migrate-'+name,rt.offline_command(command,loopback=True),env=env,sensitive=True,timeout=90)
     rt.require(verify_ef(m)==ef_before,'EF_EXECUTED_INPUT_DRIFT')
-    rt.write_json(rt.ARTIFACTS/m['runId']/'ef-tool-inputs.json',{'taskId':rt.TASK,'runId':m['runId'],'testedCommit':m['_head'],'files':ef_before})
-    env.update(G2_SEM_JENA_ORIGIN='http://127.0.0.1:15303',G2_SEM_SAMPLES=str(rt.ROOT/'samples/g2'),G2_SEM_PG_CONNECTION=pg)
-    for prefix in ('PUB','QRY','AI'):
-        env.update({f'G2_{prefix}_PG':pg,f'G2_{prefix}_JENA':'http://127.0.0.1:15303',f'G2_{prefix}_S3':'http://127.0.0.1:15900',f'G2_{prefix}_SAMPLES':str(rt.ROOT/'samples/g2')})
-    schema=rt.ARTIFACTS/m['runId']/'agent-schema-result.json'
-    rt.require(not schema.exists(),'EXISTING_SCHEMA_RESULT')
-    env['G2_AI_SCHEMA_OUTPUT']=str(schema)
+    rt.write_json(rt.ARTIFACTS/m['runId']/('ef-tool-inputs-'+phase+'.json'),{'taskId':rt.TASK,'runId':m['runId'],'testedCommit':m['_head'],'phase':phase,'files':ef_before})
+
+
+def run_modules(m):
+    """四项目分别拥有完整三服务寿命；全部案例、方法内并发和MCP后验不缩减。"""
+    env=module_environment(m);schema=rt.ARTIFACTS/m['runId']/'agent-schema-result.json'
+    rt.require(not schema.exists(),'EXISTING_SCHEMA_RESULT');env['G2_AI_SCHEMA_OUTPUT']=str(schema)
     results=[]
-    for suffix in MODULE_PROJECTS:results.append(run_module_methods(m,env,suffix))
+    for suffix in MODULE_PROJECTS:
+        phase=rt.MODULE_PHASES[suffix]
+        rt.start_group(m,'g3',modules=True,module_phase=phase)
+        migrate_module_phase(m,env,phase)
+        result=run_module_methods(m,env,suffix)
+        rt.require(result['status']=='PASS','MODULE_REQUIRED_CASES')
+        rt.resource_snapshot(m,'g3','resources-'+phase+'-completed')
+        retired=closeout.reclaim(m,phase,apply=True)
+        receipt=rt.ARTIFACTS/m['runId']/('cleanup-'+phase+'-result.json')
+        rt.write_json(receipt,retired)
+        rt.require(retired['status']=='PASS','MODULE_PHASE_NOT_RECLAIMED')
+        result.update(fixturePhase=phase,cleanupReceiptSha256=rt.digest(receipt.read_bytes()))
+        results.append(result)
     rt.require(schema.is_file(),'MCP_SCHEMA_OUTPUT_MISSING')
     rt.execute(m,'mcp-schema-positive-negative',['/opt/homebrew/opt/node@24/bin/node','-e',SCHEMA_CHECK,str(schema),str(rt.ROOT/'node_modules/.pnpm/ajv@6.15.0/node_modules/ajv')])
     return results

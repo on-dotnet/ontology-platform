@@ -1,0 +1,29 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-19",
+  "testedCommit": "648d692684221d39a2cf8ce323254d7ef061e256",
+  "command": [
+    "docker",
+    "--context",
+    "desktop-linux",
+    "exec",
+    "17a18862a24a1f329c516a7962dfe93d33b5c0efd5dbd0e26ce07b413a1a7d3b",
+    "df",
+    "-kP",
+    "/fuseki",
+    "/tmp"
+  ],
+  "startedAtUtc": "2026-11-04T20:28:21.811759+00:00",
+  "endedAtUtc": "2026-11-04T20:28:24.842477+00:00",
+  "elapsedSeconds": 3.0306045830002404,
+  "exitCode": 0,
+  "timingStatus": "OBSERVED",
+  "timedOut": false,
+  "executedInputDrift": false,
+  "inputHashes": {},
+  "manifestSha256": "8b120856bc74f3ae5f99febe80eef192c1d01fed4a547a75e4d3b2dc3b0ded05",
+  "commandSha256": "bb0f5240bbd305de9f79978efc862b1be084cc10e1e5be5cd7f1f71b02eb7499",
+  "logSha256": "4f8074cd02af5e15f5a21063c6919db12d12d642a3a7183d332c0f1063ea7d26",
+  "logBytes": 180,
+  "logVisibility": "TASK_EVIDENCE"
+}

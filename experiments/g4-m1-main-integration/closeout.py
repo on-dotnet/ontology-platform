@@ -26,7 +26,7 @@ def inventory(m):
 
 def reclaim(m, label, *, apply=False):
     """先冻结清单、重查身份/创建版本，再停止并删除；不调用prune或Compose down。"""
-    rt.require(label in ('modules','g3','m1','failure'),'CLEANUP_GROUP')
+    rt.require(label in (*rt.INGRESS_GROUPS,'failure'),'CLEANUP_GROUP')
     rt.verify_engine(m)
     before=inventory(m)
     registered=rt.ARTIFACTS/m['runId']/('resources-'+label+'-owned.json')
@@ -39,7 +39,7 @@ def reclaim(m, label, *, apply=False):
     if not apply:return plan
     rt.require(inventory(m)==before,'RESOURCE_DRIFT')
     # failure也必须释放本Run所有已登记listener，不依赖故障目标仍存活。
-    ingress={group:rt.stop_ingress(m,group) for group in ('modules','g3','m1')}
+    ingress={group:rt.stop_ingress(m,group) for group in rt.INGRESS_GROUPS}
     commands=[]
     try:
         for row in before['container']['owned']:
@@ -64,7 +64,7 @@ def reclaim(m, label, *, apply=False):
                 expected=('No such object' if kind=='container' else ('not found' if kind=='network' else 'no such volume'))
                 rt.require(p.returncode!=0 and expected.lower() in p.stderr.decode().lower(),'ABSENCE_DIAGNOSTIC')
                 diagnostics.append({'kind':kind,'id':row['id'],'exitCode':p.returncode,'stderrSha256':rt.digest(p.stderr),'exactAbsent':True})
-        rt.update_runtime(m,containerIds={},group=None)
+        rt.update_runtime(m,containerIds={},group=None,modulePhase=None)
         config=rt.private_dir(m['runId'])/'api/appsettings.json'
         if config.exists():config.rename(config.with_name('appsettings-closed-'+label+'.json'))
         return {'status':'PASS','deleted':sum(len(before[k]['owned']) for k in before),'absence':diagnostics,'keepVerified':True,'ingress':ingress}

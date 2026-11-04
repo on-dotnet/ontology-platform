@@ -22,7 +22,7 @@ class HostBoundaryTests(unittest.TestCase):
         self.assertEqual(help_result.returncode,0)
         self.assertIn('--ingress',help_result.stdout)
         binding=['--run-id','b-continue-20261104-14','--expected-head','invalid','--resource-manifest',str(ARTIFACTS/'missing.json')]
-        for mode in ([],['--ingress','modules'],['--ingress','g3'],['--ingress','m1']):
+        for mode in ([],['--ingress','modules'],['--ingress','g3'],['--ingress','m1'],*([ '--ingress', 'modules-'+phase] for phase in ('semantic','publishing','query','agent'))):
             with self.subTest(mode=mode):
                 result=subprocess.run(command+mode+binding,cwd=ROOT,capture_output=True,text=True,timeout=5)
                 self.assertEqual(result.returncode,2)
@@ -48,7 +48,7 @@ finally:print('DISPATCH_EVENTS='+json.dumps(events))
 '''
         command=[sys.executable,'-B','-c',script,str(HERE/'runtime.py')]
         binding=['--run-id','b-continue-20261104-14','--expected-head','a'*40,'--resource-manifest','fixture']
-        for mode in ([],['--ingress','modules'],['--ingress','g3'],['--ingress','m1']):
+        for mode in ([],['--ingress','modules'],['--ingress','g3'],['--ingress','m1'],*([ '--ingress', 'modules-'+phase] for phase in ('semantic','publishing','query','agent'))):
             with self.subTest(mode=mode):
                 result=subprocess.run(command+mode+binding,cwd=ROOT,capture_output=True,text=True,timeout=5)
                 self.assertEqual(result.returncode,0,result.stderr)
@@ -589,6 +589,62 @@ class DurableCleanupTests(unittest.TestCase):
             result=json.loads(path.with_name('cleanup-tools-result.json').read_text())
             self.assertEqual(result['status'],'FAIL');self.assertEqual(result['commands'][0]['errorErrno'],errno.EACCES)
             self.assertEqual([json.loads(x)['phase'] for x in journal.read_text().splitlines()],['START','BEFORE','AFTER'])
+
+
+class ModulePhaseTests(unittest.TestCase):
+    """四项目设施寿命独立；跨phase错绑及不完整回收均不得进入下一项目。"""
+
+    def test_exact_phase_routes_and_runtime_binding(self):
+        import runtime
+        from unittest.mock import patch
+        expected={'SemanticTests':'modules-semantic','PublishingTests':'modules-publishing','QueryTests':'modules-query','AgentTests':'modules-agent'}
+        self.assertEqual(runtime.MODULE_PHASES,expected)
+        for phase in expected.values():
+            self.assertEqual(runtime.ingress_services(phase),('platform-pg','fuseki','rustfs'))
+            self.assertEqual(runtime.ingress_runtime_group({'group':'g3','modulePhase':phase},phase),'g3')
+            with self.assertRaisesRegex(ValueError,'INGRESS_MODULE_PHASE'):
+                runtime.ingress_runtime_group({'group':'g3','modulePhase':'other'},phase)
+        with self.assertRaisesRegex(ValueError,'INGRESS_GROUP'):runtime.ingress_services('modules-foreign')
+        with patch.object(runtime,'verify_engine') as verify:
+            for kwargs in ({'modules':True},{'modules':True,'module_phase':'foreign'},{'module_phase':'modules-agent'}):
+                with self.assertRaisesRegex(ValueError,'MODULE_PHASE'):runtime.start_group({},'g3',**kwargs)
+            verify.assert_not_called()
+
+    def test_four_full_lifecycles_and_failure_stop(self):
+        import runtime,run
+        from contextlib import ExitStack
+        from unittest.mock import patch
+        module=run.module('module-tests');totals={'SemanticTests':302,'PublishingTests':78,'QueryTests':49,'AgentTests':33}
+        for failure in (None,'tests','cleanup'):
+            with self.subTest(failure=failure),ExitStack() as stack:
+                root=Path(stack.enter_context(tempfile.TemporaryDirectory(dir=ARTIFACTS)));rid='b-continue-20261104-20';(root/rid).mkdir();events=[];active=[]
+                stack.enter_context(patch.object(runtime,'ARTIFACTS',root));stack.enter_context(patch.object(module,'module_environment',return_value={}))
+                def start(m,group,**kw):
+                    self.assertFalse(active);self.assertEqual(group,'g3');self.assertTrue(kw['modules']);active.append(kw['module_phase']);events.append(('start',active[0]))
+                def migrate(m,env,phase):self.assertEqual(active,[phase]);events.append(('migrate',phase))
+                def methods(m,env,project):
+                    phase=runtime.MODULE_PHASES[project];self.assertEqual(active,[phase]);events.append(('tests',phase))
+                    if failure=='tests' and project=='PublishingTests':raise ValueError('SYNTHETIC_TEST_FAILURE')
+                    if project=='AgentTests':(root/rid/'agent-schema-result.json').write_text('{}')
+                    return {'project':project,'status':'PASS','total':totals[project]}
+                def cleanup(m,phase,apply=False):
+                    self.assertTrue(apply);self.assertEqual(active,[phase]);events.append(('cleanup',phase))
+                    if failure=='cleanup' and phase=='modules-publishing':raise ValueError('SYNTHETIC_CLEANUP_FAILURE')
+                    active.clear();return {'status':'PASS'}
+                def execute(m,name,*args,**kw):
+                    self.assertEqual(name,'mcp-schema-positive-negative');self.assertFalse(active);self.assertEqual(len([e for e in events if e[0]=='cleanup']),4);events.append(('schema',name));return b''
+                stack.enter_context(patch.object(runtime,'start_group',side_effect=start));stack.enter_context(patch.object(module,'migrate_module_phase',side_effect=migrate))
+                stack.enter_context(patch.object(module,'run_module_methods',side_effect=methods));stack.enter_context(patch.object(runtime,'resource_snapshot',return_value={}))
+                stack.enter_context(patch.object(module.closeout,'reclaim',side_effect=cleanup));stack.enter_context(patch.object(runtime,'execute',side_effect=execute))
+                if failure:
+                    with self.assertRaises(ValueError):module.run_modules({'runId':rid})
+                    self.assertEqual([e[1] for e in events if e[0]=='start'],['modules-semantic','modules-publishing']);self.assertFalse(any(e[0]=='schema' for e in events))
+                else:
+                    result=module.run_modules({'runId':rid});self.assertEqual(sum(r['total'] for r in result),462)
+                    self.assertEqual(events[:-1],[(action,phase) for phase in runtime.MODULE_PHASES.values() for action in ('start','migrate','tests','cleanup')])
+                    for row in result:
+                        phase=runtime.MODULE_PHASES[row['project']];path=root/rid/('cleanup-'+phase+'-result.json')
+                        self.assertTrue(path.is_file());self.assertEqual(row['fixturePhase'],phase);self.assertEqual(row['cleanupReceiptSha256'],runtime.digest(path.read_bytes()))
 
 
 class TransitionVolumeTests(unittest.TestCase):
