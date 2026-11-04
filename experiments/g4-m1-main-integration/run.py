@@ -196,7 +196,7 @@ def verify_sdk_copies(m):
 def restore_command(m):
     """OS边界先拒绝所有网络，再允许锁定本地恢复；SDK解析不能绕过。"""
     rt.require(sys.platform=='darwin' and Path('/usr/bin/sandbox-exec').is_file(),'OFFLINE_OS_BOUNDARY_UNAVAILABLE')
-    return rt.offline_command([DOTNET,'restore',str(rt.ROOT/'backend/OntologyPlatform.slnx'),'--locked-mode','--configfile',str(rt.ARTIFACTS/m['runId']/'offline-nuget.config'),'-p:NuGetAudit=false','--disable-parallel','--disable-build-servers','--verbosity','diagnostic'])
+    return rt.offline_command([DOTNET,'restore',str(rt.ROOT/'backend/OntologyPlatform.slnx'),'--locked-mode','--configfile',str(rt.ARTIFACTS/m['runId']/'offline-nuget.config'),'-p:NuGetAudit=false','--disable-parallel','--disable-build-servers','-m:1','--verbosity','diagnostic'])
 
 
 def recovery_environment(m):
@@ -326,9 +326,9 @@ def strict_restore(m):
     text=stdout.read_text(errors='replace')+'\n'+stderr.read_text(errors='replace')
     attempts=re.findall(r'(?im)^.*(?:\b(?:GET|POST|CACHE) https?://|NU1101|NU1301|Permission denied|Operation not permitted|网络不可达|无法加载.*服务索引).*$' ,text)
     same=closeout.tool_tree(rt.ROOT/'.tools/dotnet-home')['fingerprint']==incident
-    row={'exitCode':code,'pid':process.pid,'startedAtUtc':start,'endedAtUtc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'elapsedSeconds':time.monotonic()-tick,'timingStatus':'OBSERVED','stdoutSha256':rt.digest(stdout.read_bytes()),'stderrSha256':rt.digest(stderr.read_bytes()),'networkOrRestoreDiagnostics':attempts,'incidentUnchanged':same,'osNetworkPolicy':'DENY_ALL','globalWritePolicy':'DENY_EXCEPT_RUN_AND_PROJECT_OBJ','historicalActualNetworkBytes':'NOT_VERIFIED'}
+    row={'exitCode':code,'pid':process.pid,'startedAtUtc':start,'endedAtUtc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'elapsedSeconds':time.monotonic()-tick,'timingStatus':'OBSERVED','stdoutSha256':rt.digest(stdout.read_bytes()),'stderrSha256':rt.digest(stderr.read_bytes()),'networkOrRestoreDiagnostics':attempts,'incidentUnchanged':same,'osNetworkPolicy':'DENY_ALL','globalWritePolicy':'DENY_EXCEPT_RUN_AND_PROJECT_OBJ','historicalActualNetworkBytes':'NOT_VERIFIED','operatorStopRequested':(a/'restore-stop-request.json').exists()}
     rt.write_json(a/'restore-result.json',row)
-    rt.require(code==0 and not attempts and same,'STRICT_RESTORE_FAILED')
+    rt.require(code==0 and not attempts and same and not row['operatorStopRequested'],'STRICT_RESTORE_FAILED')
     assets=verify_assets(m);after=sdk_resolution(m,'r2-sdk-after');verify_feed(m);verify_sdk_copies(m)
     rt.write_json(a/'restore-provenance.json',{'sdkBefore':before,'sdkAfter':after,'assets':assets,'httpCacheFiles':[str(p.relative_to(a)) for p in (a/'nuget-http-cache').rglob('*') if p.is_file()]})
     return {'status':'PASS','scope':'OFFLINE_RESTORE_PASS_WITH_OS_NETWORK_DENY','projects':len(assets),'packages':len(locked_packages()),'exitCode':code,'networkObservationLimit':'Kernel denies network; diagnostic matching is finite, not a historical byte measurement'}

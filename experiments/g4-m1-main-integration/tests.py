@@ -267,6 +267,7 @@ class OfflineRestoreBoundaryTests(unittest.TestCase):
         self.assertEqual(command[:3],['/usr/bin/sandbox-exec','-p','(version 1) (allow default) (deny network*)'])
         self.assertIn('--locked-mode',command)
         self.assertIn('--disable-build-servers',command)
+        self.assertIn('-m:1',command)
         import runtime
         self.assertEqual(runtime.environment()['DOTNET_GENERATE_ASPNET_CERTIFICATE'],'false')
 
