@@ -698,6 +698,84 @@ def lease_fence(m):
     return result
 
 
+def g3_organization_trial(m, request, base, subject, work):
+    """仅切换准确合成用户；原属性先私有存档，所有退出路径恢复后才允许继续。"""
+    import copy
+    rt.require(re.fullmatch('/admin/realms/g2-[a-f0-9]+',base) and re.fullmatch('[a-f0-9-]{36}',subject),'G3_IDENTITY_BOUNDARY')
+    users=request('GET',base+'/users?username=g2-operator-a&exact=true')
+    rt.require(len(users)==1 and users[0]['id']==subject and users[0]['username']=='g2-operator-a','G3_EXACT_SUBJECT')
+    profile=request('GET',base+'/users/profile');desired=copy.deepcopy(profile)
+    rt.require(not any(x['name'] in ('organization_id','site_ids') for x in desired['attributes']),'G3_PROFILE_ALREADY_MANAGED')
+    desired['attributes'].extend([{'name':'organization_id','multivalued':False,'permissions':{'view':['admin'],'edit':['admin']}},{'name':'site_ids','multivalued':True,'permissions':{'view':['admin'],'edit':['admin']}}])
+    original=None;result={'status':'FAIL','restored':False,'subjectSha256':rt.digest(subject.encode())}
+    restore=rt.private_dir(m['runId'])/'g3-identity-restore.json'
+    rt.write_json(restore,{'realm':base,'subject':subject,'profile':profile,'user':None},private=True)
+    try:
+        request('PUT',base+'/users/profile',desired)
+        original=request('GET',base+'/users/'+subject)
+        rt.write_json(rt.private_dir(m['runId'])/'g3-identity-original-user.json',original,private=True)
+        rt.require(original.get('attributes',{}).get('organization_id')==['org-demo'] and original['attributes'].get('site_ids')==['site-a'],'G3_ORIGINAL_ATTRIBUTES')
+        changed=copy.deepcopy(original);changed['attributes']['organization_id']=['org-other']
+        request('PUT',base+'/users/'+subject,changed)
+        rt.require(request('GET',base+'/users/'+subject)['attributes']==changed['attributes'],'G3_FOREIGN_ATTRIBUTES')
+        value=work();result['status']='PASS';return value
+    finally:
+        result['restoration']={}
+        try:
+            if original is not None:
+                request('PUT',base+'/users/'+subject,original)
+                rt.require(request('GET',base+'/users/'+subject)['attributes']==original['attributes'],'G3_USER_NOT_RESTORED')
+            result['restoration']['user']={'status':'PASS' if original is not None else 'NOT_MUTATED'}
+        except Exception as failure:
+            result['restoration']['user']={'status':'FAIL','category':type(failure).__name__}
+        try:
+            request('PUT',base+'/users/profile',profile)
+            rt.require(request('GET',base+'/users/profile')==profile,'G3_PROFILE_NOT_RESTORED')
+            result['restoration']['profile']={'status':'PASS'}
+        except Exception as failure:
+            result['restoration']['profile']={'status':'FAIL','category':type(failure).__name__}
+        result['restored']=all(x['status'] in ('PASS','NOT_MUTATED') for x in result['restoration'].values())
+        if not result['restored']:result['status']='FAIL'
+        rt.write_json(rt.ARTIFACTS/m['runId']/'g3-identity-transition.json',result)
+        rt.require(result['restored'],'G3_IDENTITY_RESTORE_FAILED')
+
+
+def g3_compatibility(m):
+    """OIDC原组织正例→受控跨组织兼容→精确恢复→全新OIDC复验。"""
+    import run
+    import urllib.parse
+    import urllib.request
+    run.consumer(m,'g3-compatibility',scenario='identity-original')
+    before=reports(m,'g3-compatibility-identity-original')['identity']
+    private=rt.private_dir(m['runId']);r=rt.runtime_value(m)
+    rt.inspect_owned(m,r['containerIds']['keycloak-test'],'keycloak-test')
+    realm=json.loads(Path(r['realmFile']).read_text());name=realm['authority'].rsplit('/',1)[-1]
+    rt.require(re.fullmatch('g2-[a-f0-9]+',name),'G3_REALM_BOUNDARY')
+    token=None;token_time=0
+    class NoRedirect(urllib.request.HTTPRedirectHandler):
+        def redirect_request(self,*args,**kwargs):return None
+    opener=urllib.request.build_opener(urllib.request.ProxyHandler({}),NoRedirect())
+    def request(method,path,value=None,form=False):
+        nonlocal token,token_time
+        rt.require(path=='/realms/master/protocol/openid-connect/token' or path.startswith('/admin/realms/'+name+'/users'),'G3_ADMIN_BOUNDARY')
+        if path.startswith('/admin/') and (token is None or time.monotonic()-token_time>=20):
+            token=request('POST','/realms/master/protocol/openid-connect/token',{'grant_type':'password','client_id':'admin-cli','username':'wave2-bootstrap','password':(private/'keycloak-password').read_text()},True)['access_token']
+            token_time=time.monotonic()
+        data=(urllib.parse.urlencode(value).encode() if form else json.dumps(value).encode()) if value is not None else None
+        headers={'Content-Type':'application/x-www-form-urlencoded' if form else 'application/json'}
+        if token:headers['Authorization']='Bearer '+token
+        with opener.open(urllib.request.Request('http://localhost:15180'+path,data=data,headers=headers,method=method),timeout=8) as response:
+            raw=response.read(1024*1024+1);rt.require(len(raw)<=1024*1024,'G3_ADMIN_OUTPUT_LIMIT');return json.loads(raw) if raw else None
+    token=request('POST','/realms/master/protocol/openid-connect/token',{'grant_type':'password','client_id':'admin-cli','username':'wave2-bootstrap','password':(private/'keycloak-password').read_text()},True)['access_token']
+    token_time=time.monotonic()
+    try:
+        return g3_organization_trial(m,request,'/admin/realms/'+name,before['subjectId'],lambda:run.consumer(m,'g3-compatibility',scenario='baseline'))
+    finally:
+        run.consumer(m,'g3-compatibility',scenario='identity-restored')
+        after=reports(m,'g3-compatibility-identity-restored')['identity']
+        rt.require(after==before,'G3_OIDC_IDENTITY_NOT_RESTORED')
+
+
 def cross_org_secret(m):
     """同一真实OIDC subject改变合成组织，再验证旧组织Ref不能消费，最后复原。"""
     import copy

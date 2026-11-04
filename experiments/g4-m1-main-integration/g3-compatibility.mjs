@@ -264,6 +264,14 @@ try {
     identityStep('page_close'); await page.close(); phase = previousPhase; return actor;
   }
 
+  const scenario=runtime.httpScenario??'baseline';
+  demand(['baseline','identity-original','identity-restored'].includes(scenario),'g3_scenario');
+  if(scenario!=='baseline'){
+    const original=await identity('operator-a');const me=status(await request(original,'GET','/api/v1/platform/me'),200);
+    demand(/^[a-f0-9-]{36}$/.test(me.subjectId)&&me.roles.includes('platform.operator')&&me.scopes.length===1&&me.scopes[0].organizationId==='org-demo'&&me.scopes[0].siteId==='site-a','g3_original_identity');
+    report.identity={subjectId:me.subjectId,roles:[...me.roles].sort(),scopes:me.scopes};
+    observe('M1-R04','fresh_oidc_original_identity',true);complete('M1-R04');
+  }else{
   const operator=await identity('operator-ab'),auditor=await identity('auditor-ab'),viewer=await identity('viewer-ab'),foreign=await identity('operator-a'),anonymous=await identity(null);
   const check=(name,condition=true,facts)=>observe('M1-R04',name,condition,facts);
   const get=async(actor,path)=>status(await request(actor,'GET',path),200);
@@ -337,6 +345,7 @@ if(item.Id===id&&item.Config.Labels['ontology.task-id']===task&&item.Config.Labe
   releases=await get(operator,'/api/v1/releases');const rolled=releases.find(x=>x.isActive);check('rollback_exact_complete_manifest',rolled.manifest.releaseId===r1.manifest.releaseId&&JSON.stringify(rolled.manifest)===JSON.stringify(r1.manifest));await query(r1,'炉次heat-1');
   check('activation_revisions_contiguous',report.activations.map(x=>x.activationRevision).join(',')==='1,2,3');
   report.audit=await get(auditor,'/api/v1/platform/audit?limit=100');check('real_audit_present',report.audit.length>0);complete('M1-R04');
+  }
 }catch(error){report.failure={phase,...safeFailure(error,'r04_runtime_error')};}
 finally{
   for(const context of contexts)await context.close().catch(()=>{});await browser?.close().catch(()=>{});

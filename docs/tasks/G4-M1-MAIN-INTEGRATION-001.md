@@ -95,3 +95,8 @@ Run19 / T648d692684221d39a2cf8ce323254d7ef061e256：R2及独立后验PASS（5.54
 Run20 / T7bb08672c354fb97ed39ad4ad7492d2cbe297aad：R2严格离线及独立后验PASS（5.505秒），原27套SelfTest383.26秒、50任务测试、native/Web通过（780总344PASS436SKIP0FAIL、Web379）；I05 PASS/I03 PARTIAL。四模块各自独立设施已实际运行；Semantic302、Publishing78、Query49全部PASS并逐组精确回收。Agent前21方法28案例PASS，m022 SlowSse在HTTP启动前的连续大消息Append失败，后4方法及Ajv/G3整栈NOT_RUN。失败数据库投影显示223次消息后接近10秒lease到期，直接false分支未插桩，不改产品lease或正式断言。
 
 同设施只读SELECT A/B证实任务PG转发12KiB上传中位42.2678ms、24KiB44.0111ms；只为5432设置并读回TCP_NODELAY后分别0.3583ms/0.3936ms。A/B精确helper/实际Perl字节绑定、两实际失败关闭负例及永久五行runtime修复通过独立审查，50任务测试通过；这仍是诊断，不代表正式SlowSse恢复。原失败PGDMP私有KEEP，公开只存SHA/大小/命令；所有28个分阶段Docker对象实际回收（同名卷按CreatedAt世代区分）、全部ingress/monitor及四工具副本已释放，旧KEEP保留。须新T/Run完整验收，I01夹具闭合未运行，无新V3/main/M2。详见b-continue-20261104-20/index.json。
+
+
+Run21 / T9d865b1335f6b396759533984801405726a0f399：R1/R2独立准入及后验PASS，完整严格离线21项目168包Restore实际5.578秒exit0；尚未启动PREFLIGHT/I01及设施。前置只读核查发现G3跨组织驱动要求operator-a为org-other，但共享bootstrap全部生成org-demo，实际后续必败；不启动无关完整验收。仅任务run/readback/g3-compatibility/tests补原组织真实OIDC→准确realm/user临时切换→全部原兼容断言→原属性/profile恢复→全新OIDC相同subject复验。精确私有原始输入可恢复，进程强杀时保留现场且不宣称恢复。
+
+独立审查提出用户恢复失败会跳过profile恢复，实际负例RED复现后分离两恢复尝试，每项独立记录且任一失败拒绝；共7分支及51任务测试通过。第一次全套因外层sandbox拒绝3本机socket测试而失败，原日志保留，授权本机socket边界下最终通过。此为任务适配验证，不是G3身份真实PASS；须新T/Run完整验收，不转绑Run21 R2，无新V3/main/M2。

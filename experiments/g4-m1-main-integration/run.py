@@ -636,7 +636,7 @@ def main():
             rt.runtime_value(m)
             results=module('module-tests').run_modules(m)
             rt.require(all(x['status']=='PASS' for x in results),'MODULE_SKIP_NOT_CLOSED')
-            rt.start_group(m,'g3');compat=consumer(m,'g3-compatibility')
+            rt.start_group(m,'g3');compat=module('readback').g3_compatibility(m)
             fixture_tests=module('module-tests').g3_fixture_tests(m)
             result={'status':'PASS','modules':results,'compatibility':compat,'securityAndManifest':fixture_tests}
         elif args.gate=='I04':

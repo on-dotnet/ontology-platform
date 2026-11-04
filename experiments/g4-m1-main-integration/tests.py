@@ -110,6 +110,48 @@ finally:print('DISPATCH_EVENTS='+json.dumps(events))
 class RuntimeBoundaryTests(unittest.TestCase):
     """真实边界负例，不调用Docker或读取旧私有运行时。"""
 
+    def test_g3_foreign_identity_restores_exact_user_and_profile_on_success_and_failure(self):
+        """真实任务事务函数在正常、消费者失败和身份漂移时均复原原始输入。"""
+        import copy
+        from unittest.mock import patch
+        import readback
+        subject='11111111-1111-1111-1111-111111111111';base='/admin/realms/g2-0123456789abcdef'
+        initial_profile={'attributes':[{'name':'username'}]}
+        initial_user={'id':subject,'username':'g2-operator-a','attributes':{'organization_id':['org-demo'],'site_ids':['site-a'],'preserved':['value']}}
+        for failure in (None,'work','unexpected_org','profile_put','user_restore','profile_restore','restore_readback'):
+            with self.subTest(failure=failure),tempfile.TemporaryDirectory(dir=ARTIFACTS) as directory:
+                state={'profile':copy.deepcopy(initial_profile),'user':copy.deepcopy(initial_user)};events=[];once=[]
+                if failure=='unexpected_org':state['user']['attributes']['organization_id']=['foreign']
+                original=copy.deepcopy(state['user'])
+                def request(method,path,value=None):
+                    events.append((method,path))
+                    if path==base+'/users?username=g2-operator-a&exact=true':return [copy.deepcopy(state['user'])]
+                    key='profile' if path==base+'/users/profile' else 'user'
+                    self.assertIn(path,(base+'/users/profile',base+'/users/'+subject))
+                    if method=='PUT':
+                        if failure=='user_restore' and key=='user' and value['attributes']['organization_id']==['org-demo']:raise RuntimeError('synthetic_restore_failure')
+                        if failure=='profile_restore' and key=='profile' and value==initial_profile:raise RuntimeError('synthetic_profile_restore_failure')
+                        if failure=='restore_readback' and key=='user' and value['attributes']['organization_id']==['org-demo']:return None
+                        state[key]=copy.deepcopy(value)
+                        if failure=='profile_put' and key=='profile' and not once:once.append(True);raise RuntimeError('synthetic_profile_failure')
+                        return None
+                    return copy.deepcopy(state[key])
+                def work():
+                    self.assertEqual(state['user']['attributes']['organization_id'],['org-other'])
+                    if failure=='work':raise RuntimeError('synthetic_work_failure')
+                    return {'consumer':'PASS'}
+                out=Path(directory);m={'runId':'fixture','_head':'a'*40}
+                with patch.object(readback.rt,'private_dir',return_value=out),patch.object(readback.rt,'ARTIFACTS',out),patch.object(readback.rt,'write_json') as save:
+                    if failure:
+                        with self.assertRaises((ValueError,RuntimeError)):readback.g3_organization_trial(m,request,base,subject,work)
+                    else:self.assertEqual(readback.g3_organization_trial(m,request,base,subject,work),{'consumer':'PASS'})
+                    if failure!='profile_restore':self.assertEqual(state['profile'],initial_profile)
+                    if failure not in ('user_restore','restore_readback'):self.assertEqual(state['user'],original)
+                    self.assertTrue(any(call.args[0].name=='g3-identity-restore.json' and call.kwargs.get('private') for call in save.call_args_list))
+                    self.assertEqual(save.call_args_list[-1].args[1]['restored'],failure not in ('user_restore','profile_restore','restore_readback'))
+                    if failure in ('user_restore','profile_restore','restore_readback'):self.assertEqual(save.call_args_list[-1].args[1]['status'],'FAIL')
+
+
     def test_semantic_method_partition_preserves_parameter_rows_and_rejects_ambiguity(self):
         """同方法全部DataRow保留；源码歧义、缺项、非法案例和重复均失败关闭。"""
         import importlib.util

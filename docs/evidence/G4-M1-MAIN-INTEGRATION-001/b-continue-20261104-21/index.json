@@ -1,0 +1,48 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-21",
+  "testedCommit": "9d865b1335f6b396759533984801405726a0f399",
+  "status": "PARTIAL_PREFLIGHT_ADAPTER_REPAIR",
+  "gates": {
+    "R1": "PASS",
+    "R2": "PASS",
+    "PREFLIGHT": "NOT_RUN",
+    "I01": "NOT_RUN",
+    "I02": "NOT_RUN",
+    "I03": "NOT_RUN",
+    "I04": "NOT_RUN",
+    "I05": "NOT_RUN",
+    "I06": "NOT_RUN",
+    "I07": "NOT_RUN",
+    "I08": "NOT_RUN"
+  },
+  "reason": "Readonly preflight found G3 cross-organization consumer expects org-other but shared bootstrap supplies only org-demo. Repair task adapter before expensive stable-input validation.",
+  "independentFinding": "/root/gate_inventory: g3-compatibility.mjs267-271 requires org-other; bootstrap-keycloak.py86-103 creates all org-demo; no existing foreign actor. I04/I06/I07 static investigation found no other confirmed blocker.",
+  "ignoredInputs": [
+    {
+      "path": "r2-sdk-before-mstest-imports.xml",
+      "bytes": 1628467,
+      "sha256": "a1a29052c2952760707bed0096f2b7b3c48cd6b08d2937e942c95fcf7812102e"
+    },
+    {
+      "path": "r2-sdk-after-aspire-imports.xml",
+      "bytes": 1616931,
+      "sha256": "1495ee033f777b1e0dbc8ce92d4e357b7e5fef56da4be46f4c3bd6e55db5d834"
+    },
+    {
+      "path": "r2-sdk-before-aspire-imports.xml",
+      "bytes": 1616931,
+      "sha256": "5b26ab2d20c5af04751bd0c0ea5ca2642a5afd212e8b88a58eeb9721cf3633ba"
+    },
+    {
+      "path": "r2-sdk-after-mstest-imports.xml",
+      "bytes": 1628467,
+      "sha256": "855092200640ea4c49c3f8dad60b6a05efeca7d86d7bf2d1ce09984532ce006f"
+    },
+    {
+      "path": "restore-stdout.txt",
+      "bytes": 52463316,
+      "sha256": "4ea9ddca4abfce818ac6838975e03ebb015df009adff0178073c8821262c88df"
+    }
+  ]
+}
