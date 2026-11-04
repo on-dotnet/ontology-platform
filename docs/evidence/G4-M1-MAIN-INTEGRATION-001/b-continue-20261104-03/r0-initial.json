@@ -1,0 +1,73 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-03",
+  "utc": "2026-11-04T14:52:08.039840+00:00",
+  "commands": [
+    {
+      "command": [
+        "git",
+        "status",
+        "--short"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD",
+        "origin/main",
+        "origin/codex/g4-m1-main-integration-001"
+      ],
+      "exitCode": 0,
+      "stdout": "00c6f472c40bbe75d7b577a6144ca6046221a5d4\nd1a61daffe844475b07705797e3ad325cc3f2945\n00c6f472c40bbe75d7b577a6144ca6046221a5d4\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "merge-base",
+        "--is-ancestor",
+        "d1a61daffe844475b07705797e3ad325cc3f2945",
+        "HEAD"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "merge-base",
+        "--is-ancestor",
+        "99753df6f03b184e40b431a5b5aba89d8fa67087",
+        "HEAD"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "dsStore": {
+    "path": "docs/evidence/G4-M1-MAIN-INTEGRATION-001/.DS_Store",
+    "bytes": 6148,
+    "sha256": "57d561ccd2d93912fc811b851d1461ad7b8d402471abf4986c8ffbcf039d1510",
+    "purpose": "Finder metadata; no task or product input",
+    "authorization": "user permits removal of useless .DS_Store",
+    "before": "untracked",
+    "after": "ENOENT"
+  },
+  "approvalSha256": "af474229e97eaf40e00f1c60e7a4d2aafc3a4c9570133712755683572595c624",
+  "approvalUtf8": "# Codex Master 执行指令｜G4-M1-MAIN-INTEGRATION-001 阶段 B 离线恢复门禁与后续真实验收\n\n状态：`APPROVED_BOUNDED_RECOVERY_ONLY` → 只有新稳定 TestedCommit 上的离线/原生门禁真正通过后，才恢复原阶段 B 的其他真实门禁。**本指令不是 main 合并授权，也不是 G4-M2 授权。**\n\n## 0. 恢复上下文，禁止把旧结果升级为当前 PASS\n\n继续**原 Codex Master、原托管工作树、原任务分支**，不要重新开 Master、重建 G4-M1 或增加新的大任务分支。\n\n- `TaskId = G4-M1-MAIN-INTEGRATION-001`\n- `ApprovedMain = d1a61daffe844475b07705797e3ad325cc3f2945`\n- 当前已报告分支 `codex/g4-m1-main-integration-001`\n- 当前已报告 `HEAD = 00c6f472c40bbe75d7b577a6144ca6046221a5d4`\n- 之前通过 27/27 SelfTest 的 `TestedCommit = e09a8c8fc7f21ac1f3d447e8f67493c5f85059f0`，**不是**恢复后的新完整 TestedCommit。\n- 中间修复提交 `26e394b7eaae31d967a110302370792da78b1884`；其后仍有提交，必须以当前真实 Git 树重新锁定源码和测试工具身份。\n- 已报告的 `newFullTestedCommit = NOT_FROZEN_NOT_RUN`；I01=BLOCKED；I02–I07=NOT_RUN；I08=PARTIAL；main/M2/G6均未授权。\n- 历史 49 项产品验收保持 `INHERITED_NOT_RERUN`；上一轮 260 个跳过项仅逐案映射，本轮**0 项被实际关闭**。\n\n先真实执行 `git status`、`git rev-parse HEAD`、`git ls-remote` 和祖先检查；当前 remote main、任务分支、工作树与既有记录不一致，立即停止相关操作并留原始见证。不得 reset/rebase/cherry-pick/force、覆盖历史提交或修改既有证据。\n\n## 1. 本轮核实的失败和已取得的修复证据\n\n按原回执如实记录两层不同状态：\n\n**既有失败事实：** 原任务入口遗漏 `packages.osx-arm64.lock.json` 对应的部分本地依赖，`AppHost` 离线 Restore 报 4 项 `NU1101`；`--configfile` 未充分约束 MSBuild 的 NuGet SDK Resolver。隔离 CLI Home 中出现 `Aspire.AppHost.Sdk 13.6.3`（2,046,462 字节）、`MSTest.Sdk 4.5.1`（42,412 字节）以及相关缓存和元数据（约 2.88 MB）。该次执行违反既定零下载/零外联门禁；**实际传输字节数 NOT_VERIFIED**，不得把“发现缓存”说成已经精确测得网络下载量，更不能倒推没有网络外联。\n\n**本轮已报告的针对性修复：** 通用及 Mac ARM64 锁定依赖共 168 份本地归档内容散列核验；两个 SDK 的私有缓存及真实私有解析，5 项 SDK 负例、3 项 OS 断网负例；新 CLI Home 的公开 localhost 开发证书标识数量 1→1；23 项任务测试通过，非作者 Reviewer 仅审查修复范围。所有这些结果均为**针对性证据**，不替代完整 Restore/Build/Web/真实业务验收。\n\n历史开发证书首次初始化的全局证书存储变化仍为 `NOT_VERIFIED`。保存 `.tools/dotnet-home` 事件目录、首次 HTTP 缓存与失败原始日志，**只读保留，不运行全局钥匙串/证书清理，不修改共享缓存/机器级设置**。\n\n## 2. 授权范围（严格小于整个产品改造）\n\n**允许：** 在原计划已授权的 `experiments/g4-m1-main-integration/**` 精确白名单内，修复任务入口、SDK Resolver 的私有来源控制、Restore 前置验证及相关测试；在当前任务 `docs/tasks/G4-M1-MAIN-INTEGRATION-001*`、`docs/evidence/G4-M1-MAIN-INTEGRATION-001/**` 和任务专属 ignored artifacts 中留证。必要的、已有批准的合成环境设施和运行时副本只能按原资源清单重建。\n\n**禁止：** 修改 `backend/src/**` 产品业务/Host/DTO/迁移、正式 `backend/tests/**` 断言、`apps/web/**` 产品逻辑、共享 `scripts/**`、根 NuGet/MSBuild/CI/lockfile/config、正式安全扫描器、权限或审计策略；禁止新增依赖、换版本、隐式 install/restore from Internet、`docker pull/load`、付费模型、客户/生产库和 G6/M2 实施。如发现必须变更上述范围，停止并单列精确修改申请，不以测试绕过代替修复。\n\n既有阶段 B 的资源上限不变：最多 6 个任务容器、容器内存合计 6 GiB、新卷 3 GiB 观测停止阈值、GPU 0、下载 0、费用 0；独立的主机进程、磁盘占用和证书/网络行为另行计量。主线和既有其他任务资源不动。\n\n## 3. 执行顺序：先解决离线 Restore，不要直接启动整栈\n\n### R0｜重核身份与事故隔离\n\n1. 复核 Head、origin/main、当前分支远端引用、工作树 clean、之前审批及 `sourceCommit`，记录 UTC、退出码和逐项源码 SHA。\n2. 将首次 SDK 事件目录及日志设为 KEEP/只读，只使用**全新、每 Run 独立**的 `DOTNET_CLI_HOME`、`NUGET_PACKAGES`、NuGet HTTP 缓存目录与临时目录。不得复用/改写历史 `.tools/dotnet-home`。\n3. 在任何 `dotnet` 命令前，明确限制首次运行的开发证书生成，并记录已核验的配置与生效范围（例如 `DOTNET_GENERATE_ASPNET_CERTIFICATE=false`，按当前 SDK 版本实际验证）。不对系统证书信任存储做导入、删除或“修复”。\n4. 对 SDK、NuGet、pnpm、Python、浏览器及本地镜像的既定版本/哈希与 Mac ARM64 运行环境逐项检查。没有证据即 `ENVIRONMENT_BLOCKED`，不得自行联网补齐。\n\n### R1｜冻结完整离线依赖集和 SDK 来源\n\n1. 逐项目读取实际 `packages.lock.json` **以及 RID 特定的** `packages.osx-arm64.lock.json`，按锁文件和目标框架/RID 生成完整去重依赖清单；不能只扫描通用锁文件。记录 168 份已核验归档与本次真实需求集的交集、缺项和超集，不能据“168”假定足够覆盖所有间接输入。\n2. 从**既存、已审、哈希精确匹配**的本地原始包创建任务私有离线 NuGet feed/packages 缓存和两个版本锁定的 SDK 缓存；只复制，不硬链接共享源、不触碰原件、不上传到 Git 或 V3。\n3. 独立追踪 **MSBuild SDK Resolver** 实际解析路径和全量包恢复路径（普通 `--configfile` 不自动证明 SDK Resolver 受限）。隔离配置只允许显式本地来源，禁止私有和机器级源回退。保留 SDK 实际版本、解析出的项目 SDK 路径、NuGet 依赖源、项目资产文件与输入字节指纹。\n4. 用负例证明：缺失/篡改某一 SDK 或 RID 包、错误版本、软链接指向外部、额外来源、空证据、被污染的全局缓存、非法目标路径、跨 RunId 均**失败关闭**。不得通过 `--ignore-failed-sources`、减少 solution/project、跳过 AppHost、修改锁文件或只验证缓存存在性取得假 PASS。\n5. 仅在这个阶段完成后，独立 Reviewer 只读审查差异和负例，确认没有越权修改及实际外联依赖。\n\n### R2｜单次可见的严格离线 Restore 复验\n\n1. 冻结一个**新的完整 TestedCommit=T**，绑定本轮实际验证脚本/工具/环境配置哈希；在 T 上使用新 RunId 开始真实完整 Restore。发现任何驱动修改，重新提交/冻结 T 并重跑受影响验证，禁止继承旧 T 结果。\n2. 在独立进程与**操作系统级网络禁止**条件下运行完整 `backend/OntologyPlatform.slnx` 锁定 Restore，源只允许本次任务私有本地路径。Restore 前后记录精确进程、环境指纹、源列表、实际包解析、SDK 解析、返回码、原始 stdout/stderr、诊断缓存/文件变化和网络拒绝/尝试见证。\n3. Restore 若非 exit 0、出现 `NU1101`、项目被跳过、SDK 解析超出任务私有来源、实际外联尝试、数据写到历史 CLI Home 或未知全局目录，则立即 `BLOCKED_WITH_WITNESS`。不得在不改变失败条件时重复整栈重试。\n4. 若 OS 层确实禁止一切外部访问且 Restore 成功，可对**本轮**表述 `OFFLINE_RESTORE_PASS_WITH_OS_NETWORK_DENY`；但不能反向修改上轮“外联字节未验证”的历史状态。即使显示“无 HTTP 缓存新内容”，也不单独作为无外联的证明。\n5. 原生恢复及运行时测试如果确实需要 loopback，区分仅 Restore 的全网络禁止与后续本地合成栈的 **仅 loopback/白名单**，不得为方便开发改为任意出站。\n\n### R3｜按原依赖顺序恢复阶段 B 的真实门禁\n\n只有 R2 通过、独立 Reviewer 放行且新 T 身份未变化才开始：\n\n- **I01：** 原样 `verify.ps1 -SelfTest` 27 套、全部适用 native build/format/test，以及 Web lint/typecheck/unit/build；逐项目记录 PASS/FAIL/SKIP 和真实执行数。以前 260 个跳过测试逐案核对其是否已通过本轮真实夹具执行；不允许把 260 个 skip 归并为通过，也不应要求消除所有设计上合理的 skip，只能按适用性、证据和门禁逐案裁决。\n- **I05/I03：** 绑定同一实际 API 构建和 OpenAPI→客户端生成链；环境 G4 enabled/disabled 的运行时正反路径、真实迁移禁入边界按已批准计划执行。\n- **I02/I04：** 合成 G3/G4 兼容与隔离 PostgreSQL 迁移，真实持久层读回；断言必须来自本轮，不得引用旧 RunId 的运行资源。\n- **I06/I07：** 只有前置门禁满足后，启动隔离的 PostgreSQL TLS、Keycloak、API、Web 及浏览器 E2E；受控异常注入、权限、取消、审计、状态恢复等按原 I01–I08 合同执行。\n- **I08：** 完整适用门禁都 PASS、无开放 P0/P1 后，才生成本任务唯一**新的最终** LOCAL V3，并独立 `VerifyOnly`、包外最终回执、精准资源收尾。缺硬门禁时保留 BLOCKED/PARTIAL 原始证据，**不要为每次失败重复构中间 V3**。\n\n上述 I01–I08 的原审批测试标准、模块所有权、串行资源组合、供应链限定准入、数据安全和超限停止条件全部继续有效；本指令不降低标准。\n\n## 4. 特别防止三类误报\n\n- **缓存不等于实际网络流量测量：** 记录已见的缓存副作用；前一轮 `actualNetworkBytes=NOT_VERIFIED` 永久保留，不可改为“零外联”或“精确下载 2.88 MB”。\n- **测试数不能跨提交/运行合并：** 旧 T 的 27 套、任务边界旧 17 项和新 Head 的 23 项只记作历史/针对性证据；新 T 要重新执行适用的完整验收。\n- **V3 重开不等于产品已通过：** 旧 `720c` V3 属于历史 PARTIAL；新 Head `00c6` 无完整 V3。无真实硬门禁 PASS 就不得宣称 READY_FOR_CHATGPT_MAIN_MERGE_APPROVAL。\n\n## 5. 独立 Review、交付与停止\n\n安排非作者 Reviewer 审查：SDK/锁文件覆盖、OS 断网事实、空/污染缓存负例、证书副作用隔离、工具受控性、新 T 与实际结果的字节关联、历史事故保全、受影响权限、资源精准归属与回收。Reviewer 只读；不能以自己的模拟报告代替真实产品验收。\n\n交付必须包含：\n\n- `ApprovedMain`、旧 Head、最新 Base/T/Head、所有真实远端引用和祖先检查；`RunId` 与所有消费者指纹。\n- 初次失败与新运行分开的证据；R0–R3 完成/阻断状态矩阵。尤其给出**实际离线 Restore 的原始命令/exitCode、OS deny 证据、全部 SDK 解析路径和零外联证据边界**。\n- I01–I08 项目/项目内子项的真实 `PASS/FAIL/SKIP/NOT_RUN`，260 项跳过的适用性和实际关闭情况；原生与 Web 的实际计数；测试执行源码和工具指纹。\n- 非作者 Reviewer 结论、`git diff --check`（ApprovedMain→H 与本轮源 Head→H）、资源 before/after、历史事故目录 KEEP 回执；后续成功时新唯一 V3 的精确 SHA/成员数及独立重开。\n- CI/Windows/Intel 若未执行继续 `NOT_RUN`；供应链若仅 AMBER-A1/许可证部分核验继续 `NOT_VERIFIED`；锁屏/熄屏没有实证时仍 `NOT_VERIFIED`。\n\n任一前提不满足、真实外联、需更改产品/正式测试/共享工具、源文件不匹配、资源越界或新的独立安全阻断，都立即停止相关步骤并提交 `BLOCKED_WITH_WITNESS` 和原始见证；其余不依赖工作可按权限继续，不得盲跑。\n\n**最终状态只能按事实：** 当前离线恢复仍失败→`BLOCKED_WITH_WITNESS`；全部阶段 B 真实验收及 I08 完成→`READY_FOR_CHATGPT_MAIN_MERGE_APPROVAL`。两者都不构成更新 main 的权限，实际 main 更新和 G4-M2 均需新的明确批准。\n",
+  "incidentKEEP": {
+    "files": 13,
+    "bytes": 2881013,
+    "links": 0,
+    "entries": 22,
+    "fingerprint": "158a3c213251c4331033147bd4926409a23b6eab151f2a820d1fe182d435cfa5"
+  },
+  "state": "R0_IN_PROGRESS_R1_NOT_RUN",
+  "skillPlanLocation": "Task-owned artifacts ledger replaces out-of-scope .superpowers directory"
+}

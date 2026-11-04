@@ -1,0 +1,37 @@
+{
+  "observer": "/root/gate_inventory",
+  "status": "LOCAL_INPUTS_VERIFIED",
+  "projects": 21,
+  "sourceProjects": 13,
+  "testProjects": 8,
+  "tfm": "net10.0",
+  "genericLocks": 20,
+  "macLocks": 1,
+  "packages": 168,
+  "intersection": 168,
+  "missing": 0,
+  "superset": 0,
+  "currentArchiveManifestSha256": "c7abe11d05dc69cdcede00ef226863e5306f128a5d6c428a32c8f8c451b3cd01",
+  "sdkResolverSha256": "767afb4893f0b55b6e56f285083d5657b71273fc85b2b415b5299ed844c657d4",
+  "toolHashes": "all existing p0 tool input hashes match",
+  "pnpmArchiveSha256": "02bf6cec47fe28f30a224204f924175c2d8750c60e84e315a25cba57ce84da6a",
+  "pnpmArchiveMembersMatched": 454,
+  "pyyamlSourceMembersMatched": 26,
+  "edgeVersion": "156.0.4314.58",
+  "edgeCdHash": "adaec233eb93eb6a44c9c940f32e7162191c74bf",
+  "edgeSignature": "codesign deep strict exit0",
+  "imageReplay": {
+    "command": "python3 docs/evidence/G4-M1-MAIN-INTEGRATION-001/p0/replay-image-content.py",
+    "exitCode": 0,
+    "images": 6,
+    "blobs": 62,
+    "streamedBytes": 909250956,
+    "platform": "linux/arm64",
+    "diskCopiesCreated": 0
+  },
+  "limitations": [
+    "initial ordinary sandbox Docker inspect permission denied; controlled escalation read-only succeeded",
+    "supplier license/CVE/signatures NOT_VERIFIED",
+    "native/Web/Restore/product gates NOT_RUN"
+  ]
+}

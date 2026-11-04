@@ -26,7 +26,7 @@ NAMES = ('run.py', 'consumer_check.py', 'runtime.py', 'pg_fixture.py', 'module-t
          'tests.py', 'host_continuity.py', 'compose.m1.yaml', 'compose.g3.yaml', 'hooks/pre-push')
 
 
-APPROVAL_SHA = '0d1f2785222d3cfb646cdb2cba9cd4c5857c0b09dc420e5fc06b9678782415a9'
+APPROVAL_SHA = 'af474229e97eaf40e00f1c60e7a4d2aafc3a4c9570133712755683572595c624'
 IMAGES = {
     'postgres':'postgres@sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437',
     'keycloak':'quay.io/keycloak/keycloak@sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4',
@@ -174,9 +174,14 @@ def environment(run=None):
     """所有版本固定在已有本地制品；不继承测试夹具或包源注入。"""
     cli_home=ARTIFACTS/run_id(run)/'dotnet-cli-home' if run is not None else ROOT/'.tools/dotnet-offline-home'
     boundary(cli_home,ROOT)
+    cache_root=cli_home.parent if run is not None else cli_home
     env = {k: v for k, v in os.environ.items() if not k.startswith(('G2_', 'G4_', 'ConnectionStrings__', 'NUGET_', 'DOTNET_', 'PNPM_', 'Security__', 'G3_', 'RUSTFS_', 'ASPNETCORE_', 'G2__', 'G4__')) and not k.lower().startswith('msbuild')}
     env.update(DOTNET_ROOT='/usr/local/share/dotnet', DOTNET_CLI_HOME=str(cli_home),
-               NUGET_PACKAGES=str(ROOT / '.tools/nuget'), DOTNET_CLI_TELEMETRY_OPTOUT='1',
+               NUGET_PACKAGES=str(cache_root/'nuget-packages'),
+               NUGET_HTTP_CACHE_PATH=str(cache_root/'nuget-http-cache'),
+               NUGET_SCRATCH=str(cache_root/'nuget-scratch'),
+               TMPDIR=str(cache_root/'tmp'), TMP=str(cache_root/'tmp'), TEMP=str(cache_root/'tmp'),
+               DOTNET_CLI_TELEMETRY_OPTOUT='1',
                DOTNET_SKIP_FIRST_TIME_EXPERIENCE='1', DOTNET_CLI_WORKLOAD_UPDATE_NOTIFY_DISABLE='true',
                PYTHONPATH=str(ROOT / '.tools/pythonlibs'), PYTHONDONTWRITEBYTECODE='1',
                NEXT_TELEMETRY_DISABLED='1', PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD='1',

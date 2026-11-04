@@ -338,6 +338,126 @@ class CliHomeIsolationTests(unittest.TestCase):
             self.assertNotEqual(value,str(ROOT/'.tools/dotnet-home'))
 
 
+class RecoveryIsolationTests(unittest.TestCase):
+    def test_review_cannot_be_replayed_across_runs(self):
+        import run,runtime
+        from unittest.mock import patch
+        with tempfile.TemporaryDirectory(dir=ARTIFACTS) as directory:
+            with patch.object(runtime,'ARTIFACTS',Path(directory)):
+                m={'runId':'b-continue-20990101-95','_head':'1'*40,'_sha256':'2'*64,'drivers':{'run.py':'3'*64}}
+                a=runtime.ARTIFACTS/m['runId'];a.mkdir()
+                receipt={'status':'PASS','reviewer':'/root/reviewer','rawReview':'PASS source','drivers':m['drivers'],'testedCommit':m['_head'],'taskId':runtime.TASK,'runId':'b-continue-20990101-94','manifestSha256':m['_sha256']}
+                (a/'review-R1.json').write_text(json.dumps(receipt))
+                with self.assertRaises(ValueError):run.require_reviewer(m,'R1')
+
+    def test_caches_and_temp_are_private_for_each_run(self):
+        """共享缓存或继承全局缓存注入必须不能污染另一Run。"""
+        import runtime,os
+        from unittest.mock import patch
+        with patch.dict(os.environ,{'NUGET_HTTP_CACHE_PATH':'/tmp/foreign','TMPDIR':'/tmp/foreign','NUGET_PACKAGES':'/tmp/foreign'}):
+            first=runtime.environment('b-continue-20261104-03')
+            second=runtime.environment('b-continue-20261104-04')
+        for key in ('DOTNET_CLI_HOME','NUGET_PACKAGES','NUGET_HTTP_CACHE_PATH','NUGET_SCRATCH','TMPDIR'):
+            with self.subTest(key=key):
+                self.assertTrue(Path(first.get(key,"/missing")).is_relative_to(ARTIFACTS/'b-continue-20261104-03'))
+                self.assertTrue(Path(second.get(key,"/missing")).is_relative_to(ARTIFACTS/'b-continue-20261104-04'))
+                self.assertNotEqual(first[key],second[key])
+
+    def test_i01_rejects_missing_offline_restore_before_execution(self):
+        """缺少本Run离线恢复和独立放行时，不得启动昂贵SelfTest。"""
+        import run
+        try:
+            run.engineering({'runId':'b-continue-20990101-98','_head':'0'*40,'_sha256':'0'*64})
+        except Exception as failure:
+            self.assertIsInstance(failure,ValueError)
+            self.assertEqual(str(failure),'PREREQUISITE_R2')
+        else:self.fail('I01 started without R2')
+
+
+class OfflineFeedTests(unittest.TestCase):
+    def test_unpacked_payload_tamper_is_rejected_with_unchanged_metadata(self):
+        import run,runtime,zipfile,hashlib,base64
+        with tempfile.TemporaryDirectory(dir=ARTIFACTS) as directory:
+            root=Path(directory);archive=root/'fixture.1.0.0.nupkg';package=root/'package';package.mkdir()
+            with zipfile.ZipFile(archive,'w') as z:z.writestr('lib//payload.dll',b'approved payload')
+            raw=archive.read_bytes();(package/archive.name).write_bytes(raw)
+            (package/'lib').mkdir();payload=package/'lib/payload.dll';payload.write_bytes(b'approved payload')
+            (package/(archive.name+'.sha512')).write_bytes(base64.b64encode(hashlib.sha512(raw).digest()))
+            (package/'.nupkg.metadata').write_text('{}')
+            entry={'files':['lib/payload.dll',archive.name+'.sha512'],'sha512':'metadata-unchanged'}
+            run.verify_restored_package(package,entry,archive,runtime.digest(raw))
+            payload.write_bytes(b'polluted payload')
+            with self.assertRaisesRegex(ValueError,'RESTORED_PAYLOAD_DRIFT'):
+                run.verify_restored_package(package,entry,archive,runtime.digest(raw))
+
+    def test_rid_archive_and_source_mutations_fail_closed(self):
+        """使用真实文件验证缺包、改字节、异版、外部链接和额外源。"""
+        import run,runtime,hashlib
+        from unittest.mock import patch
+        with tempfile.TemporaryDirectory(dir=ARTIFACTS) as directory:
+            base=Path(directory);a=base/'b-continue-20990101-97';a.mkdir();feed=a/'nuget-feed';feed.mkdir()
+            package=feed/'fixture.rid.1.0.0.nupkg';package.write_bytes(b'locked RID archive')
+            rows=[{'package':'fixture.rid/1.0.0','archiveSha256':hashlib.sha256(package.read_bytes()).hexdigest()}]
+            (a/'nuget-archive-copies.json').write_text(json.dumps(rows))
+            config=a/'offline-nuget.config'
+            config.write_text('<configuration><packageSources><clear/><add key="approved-local" value="'+str(feed)+'"/></packageSources><packageSourceMapping><clear/><packageSource key="approved-local"><package pattern="*"/></packageSource></packageSourceMapping></configuration>')
+            m={'runId':a.name}
+            with patch.object(runtime,'ARTIFACTS',base),patch.object(run,'approved_archives',create=True,return_value={row['package']:row for row in rows}):
+                if not hasattr(run,'verify_feed'):self.fail('offline feed validation absent')
+                run.verify_feed(m)
+                original=package.read_bytes();package.unlink()
+                with self.assertRaises(ValueError):run.verify_feed(m)
+                package.write_bytes(b'polluted')
+                with self.assertRaises(ValueError):run.verify_feed(m)
+                package.unlink();package.symlink_to('/tmp/foreign')
+                with self.assertRaises(ValueError):run.verify_feed(m)
+                package.unlink();package.write_bytes(original)
+                wrong=feed/'fixture.rid.2.0.0.nupkg';wrong.write_bytes(original)
+                with self.assertRaises(ValueError):run.verify_feed(m)
+                wrong.unlink();before=config.read_text();config.write_text(before.replace('</packageSources>','<add key="external" value="https://example.invalid"/></packageSources>'))
+                with self.assertRaises(ValueError):run.verify_feed(m)
+                config.write_text(before);(a/'nuget-archive-copies.json').write_text('[]')
+                with self.assertRaises(ValueError):run.verify_feed(m)
+                (a/'nuget-archive-copies.json').write_text(json.dumps(rows));run.verify_feed(m)
+
+
+class SdkCopyMutationTests(unittest.TestCase):
+    def test_actual_sdk_members_and_receipt_cannot_be_substituted(self):
+        """对精确已审SDK归档的私有副本执行真实字节及路径负例。"""
+        import run,runtime
+        from unittest.mock import patch
+        with tempfile.TemporaryDirectory(dir=ARTIFACTS) as directory:
+            with patch.object(runtime,'ARTIFACTS',Path(directory)):
+                m={'runId':'b-continue-20990101-96'}
+                run.prepare_sdk_copies(m);run.verify_sdk_copies(m)
+                run.verify_empty_restore_cache(m)
+                polluted=runtime.ARTIFACTS/m['runId']/'nuget-packages/polluted';polluted.mkdir()
+                with self.assertRaisesRegex(ValueError,'PREPOPULATED_PACKAGE_CACHE'):run.verify_empty_restore_cache(m)
+                polluted.rmdir()
+                for name in run.SDK_ARCHIVES:
+                    target,_,_=run.sdk_payload(name,m);p=target/'Sdk/Sdk.props';original=p.read_bytes()
+                    try:
+                        p.write_bytes(b'changed')
+                        with self.assertRaises(ValueError):run.verify_sdk_copies(m)
+                        p.unlink()
+                        with self.assertRaises(ValueError):run.verify_sdk_copies(m)
+                        p.symlink_to('/tmp/foreign')
+                        with self.assertRaises(ValueError):run.verify_sdk_copies(m)
+                    finally:
+                        if p.exists() or p.is_symlink():p.unlink()
+                        p.write_bytes(original)
+                    wrong=target.with_name('0.0.0');target.rename(wrong)
+                    try:
+                        with self.assertRaises(ValueError):run.verify_sdk_copies(m)
+                    finally:wrong.rename(target)
+                receipt=runtime.ARTIFACTS/m['runId']/'sdk-copies.json';original=receipt.read_bytes()
+                try:
+                    receipt.write_text('[]')
+                    with self.assertRaises(ValueError):run.verify_sdk_copies(m)
+                finally:receipt.write_bytes(original)
+                run.verify_sdk_copies(m)
+
+
 if __name__ == '__main__':
     ARTIFACTS.mkdir(parents=True, exist_ok=True)
     unittest.main(verbosity=2)

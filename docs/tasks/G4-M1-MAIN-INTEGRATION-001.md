@@ -41,3 +41,9 @@ B0补充独立审查通过，最终19项驱动清单SHA21c6b08b1246a16c501f11482
 四个任务工具完成修复，168锁包本地只读核验、SDK/OS/首次运行隔离probe及22任务测试通过，非作者修复Review通过；尚无修复后完整新T验收，保持BLOCKED_WITH_WITNESS。详见[阻断与恢复交接](../evidence/G4-M1-MAIN-INTEGRATION-001/b-continue-20261104-02/blocked-handoff.md)。仅收尾证据与已审安全副本回收，真实门禁停止，无新V3/main/M2。
 
 本轮安全回收已实际完成并独立后验：9目录、30,324文件、1,058,341,260逻辑字节；旧事件CLI目录和历史包KEEP。最后补充按Run隔离CLI_HOME，23项任务测试与只读Review通过；真实门禁仍停止，修复后完整新T未运行，最后Head见包外回执。
+
+## 2026-11-04 严格离线恢复续执行
+
+最新明确授权为 OFFLINE-RESTORE-RECOVERY-20261104，原文及SHA见本任务 b-continue-20261104-03/r0-initial.json。原Head 00c6f472c40bbe75d7b577a6144ca6046221a5d4，ApprovedMain不变；Master唯一作者，Reviewer只读，产品/正式测试/共享配置继续只读。R0身份及168锁包+两个额外SDK输入已核验；R1补齐每Run独立CLI/packages/HTTP/scratch/temp、实际SDK预处理导入、OS拒绝网络/全局写入、空缓存及解包字节验证、审查回执防跨Run重放。29任务边界测试通过，不代表完整Restore或产品通过。
+
+本轮顺序为R1独立Review→新T→全新Run R2完整solution严格离线Restore→R2独立Review→PREFLIGHT/I01及原有后续门禁。旧事件目录只读KEEP，旧失败与外联实际字节NOT_VERIFIED不改写；260历史跳过仍0项被本轮关闭。全程不更新main，不进入M2/G6，失败不重复构中间V3。
