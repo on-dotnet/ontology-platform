@@ -1,3 +1,28 @@
+/** 直接调用也必须先验证冻结身份；校验失败不读取凭据、不启动浏览器。 */
+import { execFileSync as verifyConsumerProcess } from 'node:child_process';
+import { resolve as resolveConsumerPath } from 'node:path';
+const consumerArgs = process.argv.slice(2);
+const consumerBinding = {};
+for (const key of ['run-id', 'expected-head', 'resource-manifest']) {
+  const flag = '--' + key;
+  const index = consumerArgs.indexOf(flag);
+  if (index >= 0 && consumerArgs.lastIndexOf(flag) === index && index + 1 < consumerArgs.length) {
+    consumerBinding[key] = consumerArgs[index + 1]; consumerArgs.splice(index, 2);
+  }
+}
+if (!consumerArgs.includes('--help')) {
+  const runtimeIndex = consumerArgs.indexOf('--runtime-file');
+  const evidenceIndex = consumerArgs.indexOf('--evidence-dir');
+  try {
+    if (Object.keys(consumerBinding).length !== 3 || runtimeIndex < 0 || evidenceIndex < 0) throw new Error('binding');
+    const check = [resolveConsumerPath(import.meta.dirname, 'consumer_check.py'), '--consumer', 'browser',
+      '--run-id', consumerBinding['run-id'], '--expected-head', consumerBinding['expected-head'],
+      '--resource-manifest', consumerBinding['resource-manifest'], '--runtime-file', consumerArgs[runtimeIndex + 1]];
+    if (evidenceIndex >= 0) check.push('--evidence-dir', consumerArgs[evidenceIndex + 1]);
+    verifyConsumerProcess('python3', ['-B', ...check], {stdio: 'pipe', timeout: 30000});
+  } catch { console.error('REFUSED_CONSUMER_BOUNDARY'); process.exit(2); }
+}
+process.argv = [...process.argv.slice(0, 2), ...consumerArgs];
 /** G4-M1 真实浏览器验收；私有凭据只驻留内存，不录制网络、会话或登录页面。 */
 import { createRequire } from 'node:module';
 import { readFile, writeFile, mkdir, realpath, lstat } from 'node:fs/promises';
@@ -5,9 +30,9 @@ import { resolve, relative, isAbsolute, sep, dirname } from 'node:path';
 import { randomUUID, createHash } from 'node:crypto';
 
 const help = `G4-M1 real browser acceptance (no service lifecycle operations)
-Usage: node scripts/acceptance/g4-m1-browser.mjs --runtime-file PATH --evidence-dir PATH
+Usage: node experiments/g4-m1-main-integration/browser.mjs --run-id RUN --expected-head HEAD --resource-manifest PATH --runtime-file PATH --evidence-dir NEW_PATH
 Runtime JSON (private, under this checkout .tools/security):
-{ "taskId":"G4-M1-MAIN-INTEGRATION-001", "runId":"synthetic-001",
+{ "taskId":"G4-M1-MAIN-INTEGRATION-001", "runId":"b-continue-YYYYMMDD-NN",
   "publicOrigin":"http://localhost:15100", "realmFile":"ABS_PRIVATE_REALM_JSON",
   "sourceSecretFile":"ABS_PRIVATE_READER_PASSWORD", "browserChannel":"msedge",
   "scope":{"organizationId":"org-demo","siteIds":["site-a"]},
@@ -125,7 +150,7 @@ function waitForSourceControl(kind, connectionId, jobId) {
 async function privateFile(path) {
   requireTrue(typeof path === 'string' && isAbsolute(path), 'private_path_required');
   const actual = await realpath(path);
-  requireTrue(within(await realpath(resolve(root, '.tools/security')), actual), 'private_path_denied');
+  requireTrue(within(await realpath(resolve(root, '.tools/security/g4-m1-main-integration-001-' + consumerBinding['run-id'])), actual), 'private_path_denied');
   const stat = await lstat(actual);
   requireTrue(stat.isFile() && (stat.mode & 0o077) === 0 && stat.size < 1024 * 1024, 'private_file_permissions_or_size');
   return readFile(actual, 'utf8');
@@ -163,7 +188,7 @@ try {
   requireTrue(args.length === 4 && args[0] === '--runtime-file' && args[2] === '--evidence-dir', 'arguments_invalid');
   output = await evidenceDirectory(args[3]);
   const runtime = JSON.parse(await privateFile(resolve(args[1])));
-  requireTrue(runtime.taskId === report.taskId && /^[A-Za-z0-9_-]{1,80}$/.test(runtime.runId), 'runtime_identity_invalid');
+  requireTrue(runtime.taskId === report.taskId && runtime.runId === consumerBinding['run-id'], 'runtime_identity_invalid');
   requireTrue(runtime.publicOrigin === 'http://localhost:15100', 'public_origin_denied');
   requireTrue(runtime.scope?.organizationId === 'org-demo' && JSON.stringify(runtime.scope.siteIds) === '["site-a"]', 'synthetic_scope_required');
   const scenario = runtime.scenario ?? 'baseline';

@@ -1,3 +1,28 @@
+/** 直接调用也必须先验证冻结身份；校验失败不读取凭据、不启动浏览器。 */
+import { execFileSync as verifyConsumerProcess } from 'node:child_process';
+import { resolve as resolveConsumerPath } from 'node:path';
+const consumerArgs = process.argv.slice(2);
+const consumerBinding = {};
+for (const key of ['run-id', 'expected-head', 'resource-manifest']) {
+  const flag = '--' + key;
+  const index = consumerArgs.indexOf(flag);
+  if (index >= 0 && consumerArgs.lastIndexOf(flag) === index && index + 1 < consumerArgs.length) {
+    consumerBinding[key] = consumerArgs[index + 1]; consumerArgs.splice(index, 2);
+  }
+}
+if (!consumerArgs.includes('--help')) {
+  const runtimeIndex = consumerArgs.indexOf('--runtime-file');
+  const evidenceIndex = consumerArgs.indexOf('--evidence-dir');
+  try {
+    if (Object.keys(consumerBinding).length !== 3 || runtimeIndex < 0 || evidenceIndex < 0) throw new Error('binding');
+    const check = [resolveConsumerPath(import.meta.dirname, 'consumer_check.py'), '--consumer', 'http',
+      '--run-id', consumerBinding['run-id'], '--expected-head', consumerBinding['expected-head'],
+      '--resource-manifest', consumerBinding['resource-manifest'], '--runtime-file', consumerArgs[runtimeIndex + 1]];
+    if (evidenceIndex >= 0) check.push('--evidence-dir', consumerArgs[evidenceIndex + 1]);
+    verifyConsumerProcess('python3', ['-B', ...check], {stdio: 'pipe', timeout: 30000});
+  } catch { console.error('REFUSED_CONSUMER_BOUNDARY'); process.exit(2); }
+}
+process.argv = [...process.argv.slice(0, 2), ...consumerArgs];
 /** 真实 OIDC/HTTP 补充验收；不启动服务，不保存凭据、SecretRef、原始响应或异常正文。 */
 import { createRequire } from 'node:module';
 import { readFile, writeFile, mkdir, lstat, realpath } from 'node:fs/promises';
@@ -5,7 +30,7 @@ import { resolve, relative, dirname, isAbsolute, sep } from 'node:path';
 import { randomUUID, createHash } from 'node:crypto';
 
 const help = `G4-M1 real HTTP acceptance
-Usage: node scripts/acceptance/g4-m1-http.mjs --runtime-file PATH --evidence-dir PATH
+Usage: node experiments/g4-m1-main-integration/http.mjs --run-id RUN --expected-head HEAD --resource-manifest PATH --runtime-file PATH --evidence-dir NEW_PATH
 Uses Master private runtime.json under this checkout .tools/security:
  taskId=G4-M1-MAIN-INTEGRATION-001, runId, publicOrigin=http://localhost:15100,
  realmFile, sourceSecretFile, scope={organizationId:org-demo,siteIds:[site-a]}.
@@ -96,9 +121,9 @@ async function rejectSymlinks(path) {
   }
 }
 async function privateText(path) {
-  demand(typeof path === 'string' && isAbsolute(path) && inside(resolve(root, '.tools/security'), path), 'private_path_denied');
+  demand(typeof path === 'string' && isAbsolute(path) && inside(resolve(root, '.tools/security/g4-m1-main-integration-001-' + consumerBinding['run-id']), path), 'private_path_denied');
   await rejectSymlinks(path); const actual = await realpath(path); const stat = await lstat(actual);
-  demand(inside(resolve(root, '.tools/security'), actual) && stat.isFile() && !(stat.mode & 0o077) && stat.size < 1048576, 'private_file_denied');
+  demand(inside(resolve(root, '.tools/security/g4-m1-main-integration-001-' + consumerBinding['run-id']), actual) && stat.isFile() && !(stat.mode & 0o077) && stat.size < 1048576, 'private_file_denied');
   return readFile(actual, 'utf8');
 }
 async function prepareEvidence(path) {
@@ -208,7 +233,7 @@ try {
   demand(args.length === 4 && args[0] === '--runtime-file' && args[2] === '--evidence-dir', 'arguments_invalid');
   output = await prepareEvidence(args[3]);
   const runtime = JSON.parse(await privateText(resolve(args[1])));
-  demand(runtime.taskId === report.taskId && /^[A-Za-z0-9_-]{1,80}$/.test(runtime.runId) && runtime.publicOrigin === 'http://localhost:15100', 'runtime_identity_invalid');
+  demand(runtime.taskId === report.taskId && runtime.runId === consumerBinding['run-id'] && runtime.publicOrigin === 'http://localhost:15100', 'runtime_identity_invalid');
   demand(runtime.scope?.organizationId === 'org-demo' && JSON.stringify(runtime.scope.siteIds) === '["site-a"]', 'synthetic_scope_required');
   const scenario = runtime.httpScenario ?? 'baseline';
   demand(['baseline','contracts','provision','source-unavailable','source-permission-limited','catalog-cancel','schema-change','recover-job','credential-lifecycle','cross-org-secret'].includes(scenario), 'scenario_invalid');

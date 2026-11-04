@@ -1,12 +1,37 @@
+/** 直接调用也必须先验证冻结身份；校验失败不读取凭据、不启动浏览器。 */
+import { execFileSync as verifyConsumerProcess } from 'node:child_process';
+import { resolve as resolveConsumerPath } from 'node:path';
+const consumerArgs = process.argv.slice(2);
+const consumerBinding = {};
+for (const key of ['run-id', 'expected-head', 'resource-manifest']) {
+  const flag = '--' + key;
+  const index = consumerArgs.indexOf(flag);
+  if (index >= 0 && consumerArgs.lastIndexOf(flag) === index && index + 1 < consumerArgs.length) {
+    consumerBinding[key] = consumerArgs[index + 1]; consumerArgs.splice(index, 2);
+  }
+}
+if (!consumerArgs.includes('--help')) {
+  const runtimeIndex = consumerArgs.indexOf('--runtime-file');
+  const evidenceIndex = consumerArgs.indexOf('--evidence-dir');
+  try {
+    if (Object.keys(consumerBinding).length !== 3 || runtimeIndex < 0 || evidenceIndex < 0) throw new Error('binding');
+    const check = [resolveConsumerPath(import.meta.dirname, 'consumer_check.py'), '--consumer', 'g3-compatibility',
+      '--run-id', consumerBinding['run-id'], '--expected-head', consumerBinding['expected-head'],
+      '--resource-manifest', consumerBinding['resource-manifest'], '--runtime-file', consumerArgs[runtimeIndex + 1]];
+    if (evidenceIndex >= 0) check.push('--evidence-dir', consumerArgs[evidenceIndex + 1]);
+    verifyConsumerProcess('python3', ['-B', ...check], {stdio: 'pipe', timeout: 30000});
+  } catch { console.error('REFUSED_CONSUMER_BOUNDARY'); process.exit(2); }
+}
+process.argv = [...process.argv.slice(0, 2), ...consumerArgs];
 /** 真实 OIDC/HTTP 补充验收；不启动服务，不保存凭据、SecretRef、原始响应或异常正文。 */
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawn } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { readFile, writeFile, mkdir, lstat, realpath } from 'node:fs/promises';
 import { resolve, relative, dirname, isAbsolute, sep } from 'node:path';
 import { randomUUID, createHash } from 'node:crypto';
 
 const help = `G4-M1 real HTTP acceptance
-Usage: node scripts/acceptance/g4-m1-http.mjs --runtime-file PATH --evidence-dir PATH
+Usage: node experiments/g4-m1-main-integration/g3-compatibility.mjs --run-id RUN --expected-head HEAD --resource-manifest PATH --runtime-file PATH --evidence-dir NEW_PATH
 Uses Master private runtime.json under this checkout .tools/security:
  taskId=G4-M1-MAIN-INTEGRATION-001, runId, publicOrigin=http://localhost:15100,
  realmFile, sourceSecretFile, scope={organizationId:org-demo,siteIds:[site-a]}.
@@ -98,9 +123,9 @@ async function rejectSymlinks(path) {
   }
 }
 async function privateText(path) {
-  demand(typeof path === 'string' && isAbsolute(path) && inside(resolve(root, '.tools/security'), path), 'private_path_denied');
+  demand(typeof path === 'string' && isAbsolute(path) && inside(resolve(root, '.tools/security/g4-m1-main-integration-001-' + consumerBinding['run-id']), path), 'private_path_denied');
   await rejectSymlinks(path); const actual = await realpath(path); const stat = await lstat(actual);
-  demand(inside(resolve(root, '.tools/security'), actual) && stat.isFile() && !(stat.mode & 0o077) && stat.size < 1048576, 'private_file_denied');
+  demand(inside(resolve(root, '.tools/security/g4-m1-main-integration-001-' + consumerBinding['run-id']), actual) && stat.isFile() && !(stat.mode & 0o077) && stat.size < 1048576, 'private_file_denied');
   return readFile(actual, 'utf8');
 }
 async function prepareEvidence(path) {
@@ -208,7 +233,7 @@ function status(result, expected, code) {
 try {
   const args=process.argv.slice(2);demand(args.length===4 && args[0]==='--runtime-file' && args[2]==='--evidence-dir','arguments_invalid');
   output=await prepareEvidence(args[3]);const runtime=JSON.parse(await privateText(resolve(args[1])));
-  demand(runtime.taskId===report.taskId && runtime.runId==='final-gates-20261102-r04-final','runtime_identity_invalid');
+  demand(runtime.taskId===report.taskId && runtime.runId===consumerBinding['run-id'],'runtime_identity_invalid');
   const realm=JSON.parse(await privateText(runtime.realmFile));
   demand(/^http:\/\/localhost:15180\/realms\/g2-[a-f0-9]+$/.test(realm.authority),'issuer_denied');
   remember(realm.clientSecret);remember(runtime.certificatePassword);remember(runtime.healthKey);
@@ -288,15 +313,21 @@ try {
   await query(r1,'炉次heat-1');
   phase='revision2';draft=status(await request(operator,'PUT','/api/v1/ontology-drafts/'+draft.draftId,{name:draft.name,sources:{...sources,dataTurtle:sources.dataTurtle.replaceAll('炉次heat-1','炉次heat-1-R04-v2')},command:contextCommand(draft.revision)},{headers:{'If-Match':'"'+draft.revision+'"'}}),200);report.drafts.push(draft);
   const p2=await proposal(draft);
-  phase='store_fault';const docker=['--context','desktop-linux'];const name='ontology-g4-m1-main-integration-001-r04-final-rustfs-1';
+  phase='store_fault';const docker=['--context','desktop-linux'];const name=runtime.rustfsContainerId; demand(/^[a-f0-9]{64}$/.test(name??''),'rustfs_id');
   const inspect=JSON.parse(execFileSync('docker',[...docker,'inspect',name,'--format','{{json .}}'],{encoding:'utf8'}));
   demand(inspect.Config.Labels['ontology.task-id']===report.taskId&&inspect.Config.Labels['ontology.run-id']===runtime.runId&&inspect.State.Running&&!inspect.State.Paused,'fault_ownership');
   const id=inspect.Id;report.fault={containerId:id,beforeActive:r1,commands:[]};
+  const guardScript = `const {execFileSync}=require('node:child_process');
+const [id,task,run]=process.argv.slice(1);
+setTimeout(()=>{try{const item=JSON.parse(execFileSync('docker',['--context','desktop-linux','inspect',id,'--format','{{json .}}'],{encoding:'utf8',timeout:5000}));
+if(item.Id===id&&item.Config.Labels['ontology.task-id']===task&&item.Config.Labels['ontology.run-id']===run&&item.State.Paused)execFileSync('docker',['--context','desktop-linux','unpause',id],{timeout:5000});}catch{process.exitCode=1;}},18000);`;
+  const unpauseGuard=spawn(process.execPath,['-e',guardScript,id,report.taskId,runtime.runId],{detached:true,stdio:'ignore'});
+  unpauseGuard.unref();report.fault.guard={pid:unpauseGuard.pid,deadlineMs:18000,scriptSha256:createHash('sha256').update(guardScript).digest('hex')};
   try{
-    execFileSync('docker',[...docker,'pause',id]);report.fault.commands.push({command:['docker',...docker,'pause',id],exitCode:0});
+    execFileSync('docker',[...docker,'pause',id],{timeout:5000});report.fault.commands.push({command:['docker',...docker,'pause',id],exitCode:0});
     const failed=await request(operator,'POST','/api/v1/release-activations',{proposalId:p2.proposalId,expectedActivationRevision:a1.activationRevision,expectedActiveReleaseId:r1.manifest.releaseId,command:contextCommand(p2.revision)},{headers:{'If-Match':'"'+p2.revision+'"'}});
     status(failed,503,'artifact_store_timeout');report.fault.rejection=failed.data.code;
-  }finally{execFileSync('docker',[...docker,'unpause',id]);report.fault.commands.push({command:['docker',...docker,'unpause',id],exitCode:0});}
+  }finally{const paused=JSON.parse(execFileSync('docker',[...docker,'inspect',id,'--format','{{json .State.Paused}}'],{encoding:'utf8',timeout:5000}));if(paused){execFileSync('docker',[...docker,'unpause',id],{timeout:5000});report.fault.commands.push({command:['docker',...docker,'unpause',id],exitCode:0});}else{report.fault.restoreObservation={state:'ALREADY_UNPAUSED',containerId:id,unpauseCommandExecuted:false};}const restored=JSON.parse(execFileSync('docker',[...docker,'inspect',id,'--format','{{json .State.Paused}}'],{encoding:'utf8',timeout:5000}));demand(restored===false,'fault_restore');unpauseGuard.kill('SIGTERM');report.fault.guard.releasedAfterVerifiedRestore=true;}
   releases=await get(operator,'/api/v1/releases');report.fault.afterActive=releases.filter(x=>x.isActive);check('fault_active_unchanged',releases.filter(x=>x.isActive).length===1&&releases.find(x=>x.isActive).manifest.releaseId===r1.manifest.releaseId && releases.find(x=>x.isActive).manifestHash===r1.manifestHash && releases.find(x=>x.isActive).activationRevision===a1.activationRevision);
   await query(r1,'炉次heat-1');
   phase='publish2';const a2=await activate(p2,a1.activationRevision,r1.manifest.releaseId);report.activations.push(a2);

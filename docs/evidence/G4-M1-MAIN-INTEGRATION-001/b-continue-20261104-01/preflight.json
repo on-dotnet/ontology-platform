@@ -1,0 +1,146 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-01",
+  "head": "720c9cb72a22b9d905a1adade65c042de79a5ad0",
+  "authorizationSha256": "0d1f2785222d3cfb646cdb2cba9cd4c5857c0b09dc420e5fc06b9678782415a9",
+  "clean": true,
+  "ancestors": [
+    {
+      "base": "d1a61daffe844475b07705797e3ad325cc3f2945",
+      "exitCode": 0
+    },
+    {
+      "base": "99753df6f03b184e40b431a5b5aba89d8fa67087",
+      "exitCode": 0
+    },
+    {
+      "base": "2b5af7b81fbd78143ea2a76c787bfc2fa402e30d",
+      "exitCode": 0
+    }
+  ],
+  "files": [
+    {
+      "path": "backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/Migrations/20261030155129_G3M4ImpactReports.cs",
+      "sha256": "722b63e254412f9369ccce1c03fc11ca89929ec32c442b4d35a7445238379e7d"
+    },
+    {
+      "path": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Migrations/20261101115947_InitialConnections.cs",
+      "sha256": "a5177f7dadafb946c1d45b289b0cf3279603901423d75e29b46e44b1202d574c"
+    },
+    {
+      "path": "backend/tests/OntologyPlatform.ConnectionsTests/PgFixtureSecurityTests.cs",
+      "sha256": "ebb76c8f430dff47bf9ef1167101e3a4fa5dd8fa6a73d2f98b68691868356b82"
+    },
+    {
+      "path": "experiments/g4-m1-main-integration/browser.mjs",
+      "sha256": "b3d6673d594c357a8caa4c6dc613404152157f22f355a1ce1846babe528a4931"
+    },
+    {
+      "path": "experiments/g4-m1-main-integration/compose.g3.yaml",
+      "sha256": "6cdc9ebd005d89016cadc35f607198f99f0dd922aa2cfc844fecfa6d873eacca"
+    },
+    {
+      "path": "experiments/g4-m1-main-integration/compose.m1.yaml",
+      "sha256": "0a1d785c0c1a04dcae461bd9adcb8b986031f197a26c54e7e86611d272712215"
+    },
+    {
+      "path": "experiments/g4-m1-main-integration/fault.mjs",
+      "sha256": "309a5365b9cda16943e7329f491a78bc9b04ae51a809466725889d265f42c62d"
+    },
+    {
+      "path": "experiments/g4-m1-main-integration/g3-compatibility.mjs",
+      "sha256": "e1b54cfb4d8128fec99897bd06d9473578556cf7a20fd131cda7784537e65040"
+    },
+    {
+      "path": "experiments/g4-m1-main-integration/host_continuity.py",
+      "sha256": "abd4385e1b05a86f5a12582a7e95a1fcc4a29c333eb23d2d952229744ed68984"
+    },
+    {
+      "path": "experiments/g4-m1-main-integration/http.mjs",
+      "sha256": "eef59e21ef8f04f295095eb060ab5e4c2344867355794a8d809bb61e621cb7ad"
+    },
+    {
+      "path": "experiments/g4-m1-main-integration/pg_fixture.py",
+      "sha256": "168b8e5fae595213c908a74710a108f885ecb68d7d1b1b613f3233121b77afc1"
+    },
+    {
+      "path": "experiments/g4-m1-main-integration/tests.py",
+      "sha256": "2fbe2137ccb37858a45f5601a754ae94e99600103a8c0831c21ff1d4f44953ed"
+    }
+  ],
+  "tools": [
+    {
+      "path": "/usr/local/share/dotnet/dotnet",
+      "expectedSha256": "11b517e7b00d0efa20e9b3ab6fe433f135d828a4c95c9c6ca7a9cf1328b6ada4",
+      "actualSha256": "11b517e7b00d0efa20e9b3ab6fe433f135d828a4c95c9c6ca7a9cf1328b6ada4",
+      "matches": true
+    },
+    {
+      "path": "/usr/local/share/dotnet/sdk/10.0.402/dotnet.dll",
+      "expectedSha256": "6e5ca819b58022dfcfe443535676a1e0733663ef98472af37e2699f826b83fca",
+      "actualSha256": "6e5ca819b58022dfcfe443535676a1e0733663ef98472af37e2699f826b83fca",
+      "matches": true
+    },
+    {
+      "path": "/usr/local/share/dotnet/LICENSE.txt",
+      "expectedSha256": "cfc21f5e8bd655ae997eec916138b707b1d290b83272c02a95c9f821b8c87310",
+      "actualSha256": "cfc21f5e8bd655ae997eec916138b707b1d290b83272c02a95c9f821b8c87310",
+      "matches": true
+    },
+    {
+      "path": "/usr/local/share/dotnet/ThirdPartyNotices.txt",
+      "expectedSha256": "2dc8f8c5a39401e928b5784ab564eb8b3ceb99ead3df8f260e0cab7e0bbecc7a",
+      "actualSha256": "2dc8f8c5a39401e928b5784ab564eb8b3ceb99ead3df8f260e0cab7e0bbecc7a",
+      "matches": true
+    },
+    {
+      "path": "/Users/chasen/.nuget/packages/dotnet-ef/10.0.13/dotnet-ef.nuspec",
+      "expectedSha256": "ed5d504b866a1e22f56461c9ddcbd849012a79ccdf37bda2cd04676ac6e2b14d",
+      "actualSha256": "ed5d504b866a1e22f56461c9ddcbd849012a79ccdf37bda2cd04676ac6e2b14d",
+      "matches": true
+    },
+    {
+      "path": "/Users/chasen/.nuget/packages/dotnet-ef/10.0.13/dotnet-ef.10.0.13.nupkg",
+      "expectedSha256": "31553eeaf3c1d6d5cfd4e48165671ad24081ead0ace4fac7cec1e2dc15314e28",
+      "actualSha256": "31553eeaf3c1d6d5cfd4e48165671ad24081ead0ace4fac7cec1e2dc15314e28",
+      "matches": true
+    },
+    {
+      "path": "/opt/homebrew/Cellar/node@24/24.22.1/bin/node",
+      "expectedSha256": "0d78c9bca217f53c2dc21a067246ee4a81c1f4fa111ee64d572b45fa1ff39189",
+      "actualSha256": "0d78c9bca217f53c2dc21a067246ee4a81c1f4fa111ee64d572b45fa1ff39189",
+      "matches": true
+    },
+    {
+      "path": "/opt/homebrew/Cellar/node@24/24.22.1/lib/libnode.137.dylib",
+      "expectedSha256": "6a92935915ce490773793512b5e1ccbdac35028fd2bd9284490dfc7be2f9f993",
+      "actualSha256": "6a92935915ce490773793512b5e1ccbdac35028fd2bd9284490dfc7be2f9f993",
+      "matches": true
+    },
+    {
+      "path": "/opt/homebrew/Cellar/node@24/24.22.1/LICENSE",
+      "expectedSha256": "5888dbb9a1d2b18f2c3e6c5f6af1b39de658372b402a0577b002777f14c62ace",
+      "actualSha256": "5888dbb9a1d2b18f2c3e6c5f6af1b39de658372b402a0577b002777f14c62ace",
+      "matches": true
+    },
+    {
+      "path": "/opt/homebrew/Cellar/node@24/24.22.1/INSTALL_RECEIPT.json",
+      "expectedSha256": "6180e8a3c4e30be6dde7950f58e4ffbba43284e2f80a56eaef81d43e05cf1a2d",
+      "actualSha256": "6180e8a3c4e30be6dde7950f58e4ffbba43284e2f80a56eaef81d43e05cf1a2d",
+      "matches": true
+    },
+    {
+      "path": "/Users/chasen/Developer/repos/ontology-platform/.tools/pnpm/package/LICENSE",
+      "expectedSha256": "e0a867ff513ea7be2a0ddc339ac6a031e459a38668e077b8f0e649544062f9f2",
+      "actualSha256": "e0a867ff513ea7be2a0ddc339ac6a031e459a38668e077b8f0e649544062f9f2",
+      "matches": true
+    }
+  ],
+  "diskFreeBytes": 364544000000,
+  "oldPackageSha256": "1898922404de37c17a28251cf60bd75aa1a1bd89f485a7552b119d5075da6d2e",
+  "remoteObserved": {
+    "main": "d1a61daffe844475b07705797e3ad325cc3f2945",
+    "task": "720c9cb72a22b9d905a1adade65c042de79a5ad0"
+  },
+  "observedAtUtc": "2026-11-04T11:56:18.814323+00:00"
+}

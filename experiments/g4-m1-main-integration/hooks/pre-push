@@ -1,0 +1,53 @@
+#!/usr/bin/env python3
+"""仅接受阶段C另行批准的单条main更新；B阶段无许可文件时必拒绝。"""
+import json
+import os
+from pathlib import Path
+import re
+import subprocess
+import sys
+
+
+def validate(remote_name, remote_url, lines, approval):
+    """Git通告中的旧OID必须精确等于批准基线，服务器负责其后的原子比较。"""
+    if remote_name != 'origin' or remote_url != approval['origin']:
+        raise ValueError('REMOTE')
+    if approval.get('taskId') != 'G4-M1-MAIN-INTEGRATION-001' or approval.get('phase') != 'C_EXPLICIT_APPROVAL':
+        raise ValueError('PHASE_C_NOT_APPROVED')
+    if len(lines) != 1 or len(lines[0].split()) != 4:
+        raise ValueError('SINGLE_UPDATE_REQUIRED')
+    local_ref, local_oid, remote_ref, remote_oid = lines[0].split()
+    if not all(re.fullmatch('[a-f0-9]{40}',x) and x != '0'*40 for x in (local_oid,remote_oid)):
+        raise ValueError('OID')
+    if remote_ref != 'refs/heads/main' or local_ref != local_oid or local_oid != approval['head'] or remote_oid != approval['approvedMain']:
+        raise ValueError('EXACT_UPDATE_REQUIRED')
+
+
+def main():
+    """批准文件必须在本任务ignored目录，拒绝任意环境变量替代目标仓库。"""
+    root=Path(__file__).resolve().parents[3]
+    path=root/'artifacts/g4-m1-main-integration-001/main-update-approval.json'
+    if any(p.is_symlink() for p in (path,*path.parents)) or not path.is_file():
+        raise ValueError('PHASE_C_NOT_APPROVED')
+    approval=json.loads(path.read_text())
+    if approval.get('origin')!='https://github.com/on-dotnet/ontology-platform.git':
+        raise ValueError('ORIGIN')
+    main_root=Path('/Users/chasen/Developer/repos/ontology-platform')
+    if Path.cwd()!=main_root or len(sys.argv)!=3:
+        raise ValueError('CONTEXT')
+    common=Path(subprocess.check_output(['git','rev-parse','--git-common-dir'],text=True).strip()).resolve()
+    if common!=main_root/'.git':
+        raise ValueError('COMMON_REPOSITORY')
+    configured=subprocess.check_output(['git','remote','get-url','origin'],cwd=root,text=True).strip()
+    if configured!=approval['origin']:
+        raise ValueError('CONFIGURED_ORIGIN')
+    raw=sys.stdin.buffer.read(4097)
+    if len(raw)>4096: raise ValueError('INPUT_LIMIT')
+    validate(sys.argv[1],sys.argv[2],raw.decode('ascii').splitlines(),approval)
+
+
+if __name__=='__main__':
+    try: main()
+    except (ValueError,KeyError,OSError,subprocess.SubprocessError):
+        print('REFUSED_EXACT_MAIN_UPDATE',file=sys.stderr)
+        raise SystemExit(1)

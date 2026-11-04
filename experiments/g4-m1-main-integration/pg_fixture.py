@@ -9,6 +9,7 @@ import secrets
 import shutil
 import subprocess
 import sys
+import runtime as rt
 
 TASK = "G4-M1-MAIN-INTEGRATION-001"
 ROOT = Path(__file__).resolve().parents[2]
@@ -36,7 +37,9 @@ def generate(directory):
         raise RuntimeError("EXISTING_OPENSSL_REQUIRED")
     directory = directory.absolute()
     private_root = ROOT / ".tools" / "security"
-    if directory.parent != private_root or not directory.name.startswith("g4-m1-main-integration-001-"):
+    run = directory.name.removeprefix("g4-m1-main-integration-001-")
+    rt.run_id(run)
+    if directory != rt.private_dir(run):
         raise ValueError("TASK_PRIVATE_DIRECTORY_REQUIRED")
     if any(path.is_symlink() for path in (ROOT / ".tools", private_root, directory)):
         raise ValueError("SYMLINK_REFUSED")
@@ -120,8 +123,13 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--private-dir", type=Path, required=True,
                         help="全新本树 .tools/security/g4-m1-main-integration-001-* 目录；生成后由 Master 审查挂载")
+    parser.add_argument('--run-id',required=True)
+    parser.add_argument('--expected-head',required=True)
+    parser.add_argument('--resource-manifest',required=True)
     arguments = parser.parse_args()
     try:
+        rt.load_manifest(arguments.resource_manifest,arguments.run_id,arguments.expected_head)
+        rt.require(arguments.private_dir == rt.private_dir(arguments.run_id),'EXACT_PRIVATE_RUN')
         print(json.dumps(generate(arguments.private_dir), ensure_ascii=False))
         return 0
     except (OSError, ValueError, RuntimeError, subprocess.TimeoutExpired) as failure:

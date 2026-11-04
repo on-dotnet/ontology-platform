@@ -16,6 +16,8 @@ x-security:
   labels: *id001
 services:
   platform-pg:
+    ports:
+    - "127.0.0.1:15432:5432"
     platform: linux/arm64
     pull_policy: never
     read_only: true
@@ -58,6 +60,8 @@ services:
       timeout: 2s
       retries: 30
   keycloak-test:
+    ports:
+    - "127.0.0.1:15180:8080"
     platform: linux/arm64
     pull_policy: never
     read_only: true
@@ -89,6 +93,8 @@ services:
     networks:
     - front
   api:
+    ports:
+    - "127.0.0.1:15100:15100"
     platform: linux/arm64
     pull_policy: never
     read_only: true
@@ -140,16 +146,19 @@ services:
     environment:
       NEXT_TELEMETRY_DISABLED: '1'
       NODE_ENV: production
+      G4_ROOT: ${G4_ROOT}
+      G4_RUN_ID: ${G4_RUN_ID}
+      G4_GROUP: g3
     volumes:
     - ${G4_ROOT}/apps/web:${G4_ROOT}/apps/web:ro
     - ${G4_SHARED_WEB_MODULES}:${G4_SHARED_WEB_MODULES}:ro
     - ${G4_SHARED_ROOT_MODULES}:${G4_SHARED_ROOT_MODULES}:ro
-    - ${G4_HELPERS}/r04-loopback-proxy.mjs:/run/loopback-proxy.mjs:ro
-    - ${G4_HELPERS}/stdio-relay.mjs:/run/stdio-relay.mjs:ro
-    - ${G4_HELPERS}/web-production.mjs:/run/web-production.mjs:ro
+    - ${G4_HELPERS}/loopback-proxy.mjs:/run/loopback-proxy.mjs:ro
     tmpfs:
     - /tmp:size=32m,mode=1777
   fuseki:
+    ports:
+    - "127.0.0.1:15303:3030"
     platform: linux/arm64
     pull_policy: never
     read_only: true
@@ -158,7 +167,7 @@ services:
     pids_limit: 256
     cpus: 2
     labels: *id001
-    image: ontology-platform-fuseki:context-4fbf23514516632dcb651b5c05bf04e9992da52491607b6cf58de1f7348ff9ab
+    image: sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c
     mem_limit: 1g
     user: 10001:10001
     entrypoint:
@@ -177,6 +186,8 @@ services:
     networks:
     - front
   rustfs:
+    ports:
+    - "127.0.0.1:15900:9000"
     platform: linux/arm64
     pull_policy: never
     read_only: true

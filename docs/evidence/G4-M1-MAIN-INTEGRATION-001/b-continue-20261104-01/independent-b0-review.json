@@ -1,0 +1,33 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-01",
+  "reviewer": "/root/consumer_review",
+  "role": "non-author read-only reviewer",
+  "author": "/root",
+  "status": "B0_PASS",
+  "receivedAtUtc": "2026-11-04T13:09:39.292740+00:00",
+  "driverManifest": "b0-driver-sha-final2.json",
+  "driverManifestSha256": "21c6b08b1246a16c501f1148269d5a18e822af93d66d7807ac702a378d7e1a73",
+  "driverFilesVerified": 19,
+  "openP0": 0,
+  "openP1": 0,
+  "openP2": 0,
+  "independentChecks": [
+    "Web391packages26176files",
+    "pnpm archive SHA512 and454members",
+    "four actualComposeconfigs and security negatives",
+    "timeout process group and long argv",
+    "TCP-only badTLS truncatedlog missingpositive sourceIO rejection",
+    "G3finally actualcode paused/already-unpaused branches",
+    "final two local-variable renames reversed to exact prior hashes"
+  ],
+  "reviewedEvidence": [
+    "17 task tests exit0",
+    "actual isolated bare push races",
+    "detached guard survives parent SIGKILL"
+  ],
+  "scope": "B0 identity, inputs, consumers and resource boundaries only",
+  "productGates": "NOT_RUN",
+  "main": "NOT_AUTHORIZED",
+  "M2": "NOT_AUTHORIZED"
+}

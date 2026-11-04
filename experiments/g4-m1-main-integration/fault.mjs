@@ -1,14 +1,42 @@
+/** 直接调用也必须先验证冻结身份；校验失败不读取凭据、不启动浏览器。 */
+import { execFileSync as verifyConsumerProcess } from 'node:child_process';
+import { resolve as resolveConsumerPath } from 'node:path';
+const consumerArgs = process.argv.slice(2);
+const consumerBinding = {};
+for (const key of ['run-id', 'expected-head', 'resource-manifest']) {
+  const flag = '--' + key;
+  const index = consumerArgs.indexOf(flag);
+  if (index >= 0 && consumerArgs.lastIndexOf(flag) === index && index + 1 < consumerArgs.length) {
+    consumerBinding[key] = consumerArgs[index + 1]; consumerArgs.splice(index, 2);
+  }
+}
+if (!consumerArgs.includes('--help')) {
+  const runtimeIndex = consumerArgs.indexOf('--runtime-file');
+  const evidenceIndex = consumerArgs.indexOf('--evidence-dir');
+  try {
+    if (Object.keys(consumerBinding).length !== 3 || runtimeIndex < 0 || evidenceIndex < 0) throw new Error('binding');
+    const check = [resolveConsumerPath(import.meta.dirname, 'consumer_check.py'), '--consumer', 'fault',
+      '--run-id', consumerBinding['run-id'], '--expected-head', consumerBinding['expected-head'],
+      '--resource-manifest', consumerBinding['resource-manifest'], '--runtime-file', consumerArgs[runtimeIndex + 1]];
+    if (evidenceIndex >= 0) check.push('--evidence-dir', consumerArgs[evidenceIndex + 1]);
+    verifyConsumerProcess('python3', ['-B', ...check], {stdio: 'pipe', timeout: 30000});
+  } catch { console.error('REFUSED_CONSUMER_BOUNDARY'); process.exit(2); }
+}
+const outputIndex = consumerArgs.indexOf('--evidence-dir');
+const faultEvidenceDirectory = outputIndex >= 0 ? consumerArgs[outputIndex + 1] : null;
+if (outputIndex >= 0) consumerArgs.splice(outputIndex, 2);
+process.argv = [...process.argv.slice(0, 2), ...consumerArgs];
 /** 真实故障验收的固定HTTP操作；夹具变更由Master在准确任务数据库另行执行并恢复。 */
 import fs from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
 import { randomUUID, createHash } from 'node:crypto';
 const root=path.resolve(import.meta.dirname,'../..');
-const privateDir=path.join(root,'.tools/security/g4-m1-main-integration-001-20261101-01');
-const allowed=['snapshot-read','audit-prepare','audit-fail','audit-retry','job-start','job-cancel','job-read','probe-refresh','audit-replay-failed','probe-client-cancel','intake-foreign','original-identity-check','disabled-denials'];
-if(process.argv.includes('--help')) {console.log('Usage: node g4-m1-fault.mjs --runtime-file <private runtime> --action '+allowed.join('|'));process.exit(0);}
+const privateDir=path.join(root,'.tools/security/g4-m1-main-integration-001-'+consumerBinding['run-id']);
+const allowed=['snapshot-read','audit-prepare','audit-fail','audit-retry','job-start','job-cancel','job-read','probe-refresh','audit-replay-failed','probe-client-cancel','intake-foreign','original-identity-check','disabled-denials','intake-lifecycle','probe-denial','purpose-denial'];
+if(process.argv.includes('--help')) {console.log('Usage: node experiments/g4-m1-main-integration/fault.mjs --run-id RUN --expected-head HEAD --resource-manifest PATH --evidence-dir NEW_PATH --runtime-file <private runtime> --action '+allowed.join('|'));process.exit(0);}
 const args=process.argv.slice(2);
-const report={taskId:'G4-M1-MAIN-INTEGRATION-001',startedUtc:new Date().toISOString(),checks:[],http:[],scope:'ONE_HTTP_ACTION_ONLY',databaseRollbackLeaseFenceEvidence:'NOT_RUN_BY_THIS_CONSUMER'};
+const report={taskId:'G4-M1-MAIN-INTEGRATION-001',runId:consumerBinding['run-id'],testedCommit:consumerBinding['expected-head'],startedUtc:new Date().toISOString(),checks:[],http:[],scope:'ONE_HTTP_ACTION_ONLY',databaseRollbackLeaseFenceEvidence:'NOT_RUN_BY_THIS_CONSUMER'};
 let browser,context;
 function demand(value,code){if(!value){const e=new Error();e.safeCode=code;throw e;}}
 function privateJson(file){demand(fs.realpathSync(privateDir)===privateDir&&!fs.lstatSync(privateDir).isSymbolicLink()&&(fs.statSync(privateDir).mode&0o077)===0,'private_directory');demand(path.dirname(file)===privateDir&&!fs.lstatSync(file).isSymbolicLink()&&(fs.statSync(file).mode&0o077)===0,'private_boundary');return JSON.parse(fs.readFileSync(file,'utf8'));}
@@ -18,7 +46,7 @@ const cmd=revision=>({commandId:randomUUID(),idempotencyKey:randomUUID(),expecte
 try{
  demand(args.length===4&&args[0]==='--runtime-file'&&args[2]==='--action'&&allowed.includes(args[3]),'arguments');
  const action=args[3];report.action=action;const runtime=privateJson(path.resolve(args[1]));
- demand(runtime.taskId===report.taskId&&runtime.runId==='recovery-20261101-01'&&runtime.publicOrigin==='http://localhost:15100','task_binding');
+ demand(runtime.taskId===report.taskId&&runtime.runId===consumerBinding['run-id']&&runtime.publicOrigin==='http://localhost:15100','task_binding');
  const id=runtime.httpConnectionId;demand(/^[a-f0-9]{32}$/.test(id??''),'connection_id');report.connectionId=id;
  const realm=privateJson(runtime.realmFile);demand(/^http:\/\/localhost:15180\/realms\/g2-[a-f0-9]+$/.test(realm.authority),'issuer');
  const require=createRequire(path.join(root,'apps/web/package.json'));const{chromium}=require('@playwright/test');browser=await chromium.launch({channel:'msedge',headless:true});context=await browser.newContext({serviceWorkers:'block',extraHTTPHeaders:{Connection:'close'}});context.setDefaultTimeout(15000);
@@ -27,7 +55,7 @@ try{
  const csrfResponse=await context.request.get(runtime.publicOrigin+'/auth/csrf',{headers:{Connection:'close'},maxRedirects:0});demand(csrfResponse.status()===200,'csrf_status');const csrf=(await csrfResponse.json()).requestToken;demand(typeof csrf==='string','csrf_value');
  const headers={Connection:'close',Origin:runtime.publicOrigin,'X-CSRF-TOKEN':csrf};
  async function request(method,route,body,etag){
-  demand(route.startsWith('/api/v1/connections/')||route.startsWith('/api/v1/catalogs/')||route==='/api/v1/platform/me'||action==='intake-foreign'&&route==='/api/v1/connection-secrets','fixed_route');
+  demand((action==='purpose-denial'&&route==='/api/v1/connections')||route.startsWith('/api/v1/connections/')||route.startsWith('/api/v1/catalogs/')||route==='/api/v1/platform/me'||['intake-foreign','intake-lifecycle'].includes(action)&&route==='/api/v1/connection-secrets','fixed_route');
   const start=Date.now();const response=await context.request.fetch(runtime.publicOrigin+route,{method,data:body,headers:{...headers,...(etag?{'If-Match':etag}:{})},maxRedirects:0,timeout:30000});const record={method,route:route.replace(/[a-f0-9]{32}/g,'{id}'),status:response.status(),durationMs:Date.now()-start};report.http.push(record);
   const raw=await response.text();demand(raw.length<8*1024*1024,'response_budget');let value=null;try{value=JSON.parse(raw);}catch{}
   record.jsonBody=!!value&&typeof value==='object';
@@ -38,7 +66,22 @@ try{
  const current=await request('GET','/api/v1/connections/'+id);demand(current.status===200,'current_connection');
  const auditStage=runtime.auditStage??'start';demand(['start','complete'].includes(auditStage),'audit_stage');report.auditStage=auditStage;
  const pending=path.join(privateDir,'fault-audit-'+auditStage+'-command.json');
- if(action==='disabled-denials'){
+ if(action==='intake-lifecycle'){
+  const secretFile=path.join(privateDir,'reader-password');demand(!fs.lstatSync(secretFile).isSymbolicLink()&&(fs.statSync(secretFile).mode&0o077)===0,'source_secret_boundary');
+  const issue=async()=>{const x=await request('POST','/api/v1/connection-secrets',{secretValue:fs.readFileSync(secretFile,'utf8').trimEnd(),scopeSelection:{organizationId:'org-demo',siteIds:['site-a']},purpose:'POSTGRESQL_READONLY',command:cmd(0)});demand(x.status===201&&/^[a-f0-9]{32}$/.test(x.value.secretRef),'lifecycle_intake');return x.value;};
+  const expiring=await issue(),revoked=await issue(),purpose=await issue();
+  writePrivate(path.join(privateDir,'lifecycle-refs.json'),{expiredSecretRef:expiring.secretRef,expiredSecretExpiresAtUtc:expiring.expiresAtUtc,revokedSecretRef:revoked.secretRef,purposeSecretRef:purpose.secretRef});
+  report.checks.push({name:'two_actual_intake_receipts_kept_private',status:'PASS'});report.naturalExpiry=expiring.expiresAtUtc;
+ }else if(action==='purpose-denial'){
+  const issued=privateJson(path.join(privateDir,'lifecycle-refs.json'));demand(/^[a-f0-9]{32}$/.test(issued.purposeSecretRef),'purpose_ref');
+  const x=await request('POST','/api/v1/connections',{displayName:'Synthetic purpose rejection',scopeSelection:{organizationId:'org-demo',siteIds:['site-a']},config:{type:'POSTGRESQL',profile:{host:'pg-source',port:5432,database:'fixture',username:'fixture_reader',sslMode:'VerifyFull',allowedSchemas:['production']}},secretRef:issued.purposeSecretRef,command:cmd(0)});
+  demand(x.status===422&&x.value.code==='connection_secret_expired','purpose_consumption_denied');report.checks.push({name:'actual_wrong_purpose_reference_not_consumed',status:'PASS'});
+ }else if(action==='probe-denial'){
+  demand(['connection_readonly_unverified','connection_auth_failed','connection_tls_untrusted','catalog_permission_limited'].includes(runtime.expectedProbeDiagnostic),'probe_expected_code');
+  const x=await request('POST','/api/v1/connections/'+id+'/test',{command:cmd(current.value.configRevision)},current.etag);
+  demand(x.status===200&&x.value.status==='TEST_FAILED'&&x.value.stages.some(s=>s.status==='FAIL'&&s.diagnosticCode===runtime.expectedProbeDiagnostic),'real_probe_denial');
+  demand(/^[a-f0-9]{32}$/.test(x.value.probeId),'probe_id');report.probeId=x.value.probeId;report.stages=x.value.stages;report.checks.push({name:'exact_source_fault_diagnostic',status:'PASS'});
+ }else if(action==='disabled-denials'){
   demand(current.value.state==='DISABLED','disabled_fixture_required');
   const probe=await request('POST','/api/v1/connections/'+id+'/test',{command:cmd(current.value.configRevision)},current.etag);demand(probe.status===409,'disabled_probe_denied');
   const discovery=await request('POST','/api/v1/connections/'+id+'/discoveries',{command:cmd(current.value.configRevision)},current.etag);demand(discovery.status===409,'disabled_discovery_denied');
@@ -91,4 +134,4 @@ try{
  }
  report.status='PASS';
 }catch(error){report.status='FAIL';report.failure={code:error.safeCode??'bounded_runtime_error',category:error.name==='TimeoutError'?'timeout':'runtime'};process.exitCode=1;}
-finally{await context?.close().catch(()=>{});await browser?.close().catch(()=>{});report.completedUtc=new Date().toISOString();const dir=path.join(root,'artifacts/g4-m1-main-integration-001/fault-http');fs.mkdirSync(dir,{recursive:true});const file=path.join(dir,randomUUID()+'.json');fs.writeFileSync(file,JSON.stringify(report,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify({action:report.action,status:report.status,evidence:path.relative(root,file),failure:report.failure}));}
+finally{await context?.close().catch(()=>{});await browser?.close().catch(()=>{});report.completedUtc=new Date().toISOString();const dir=faultEvidenceDirectory;fs.mkdirSync(dir,{recursive:false});const file=path.join(dir,randomUUID()+'.json');fs.writeFileSync(file,JSON.stringify(report,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify({action:report.action,status:report.status,evidence:path.relative(root,file),failure:report.failure}));}

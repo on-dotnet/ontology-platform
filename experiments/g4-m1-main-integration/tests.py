@@ -61,6 +61,199 @@ class HostBoundaryTests(unittest.TestCase):
         self.assertIn('unrecognized arguments', result.stderr)
 
 
+class RuntimeBoundaryTests(unittest.TestCase):
+    """真实边界负例，不调用Docker或读取旧私有运行时。"""
+
+    def test_run_identity(self):
+        import runtime as rt
+        self.assertEqual(rt.run_id('b-continue-20261104-01'), 'b-continue-20261104-01')
+        for value in ('recovery-20261101-01', 'final-gates-20261102-r04-final', '../x', '', None):
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                rt.run_id(value)
+
+    def test_binding_rejects_image_and_tool_substitution(self):
+        import runtime as rt
+        report=json.loads((ROOT/'docs/evidence/G4-M1-MAIN-INTEGRATION-001/p0/tools-admission.json').read_text())
+        baseline={'approvalSha256':rt.APPROVAL_SHA,'images':rt.IMAGES,'tools':{x['path']:x['sha256'] for x in report['files']}}
+        rt.validate_admission(baseline)
+        for key,value,code in [('images',{'postgres':'postgres:latest'},'IMAGE_ADMISSION'),('tools',{},'TOOL_ADMISSION'),('approvalSha256','0'*64,'APPROVAL_BINDING')]:
+            with self.subTest(key=key), self.assertRaisesRegex(ValueError,code):
+                rt.validate_admission(dict(baseline,**{key:value}))
+
+    def test_cli_rejects_old_identity_before_secret_read(self):
+        for name in ('http.mjs', 'browser.mjs', 'fault.mjs', 'g3-compatibility.mjs'):
+            result = subprocess.run(['/opt/homebrew/opt/node@24/bin/node',str(HERE/name),
+                '--run-id','recovery-20261101-01','--expected-head','0'*40,
+                '--resource-manifest',str(ARTIFACTS/'not-created.json'),
+                '--runtime-file','/no-private-secret-read/runtime.json','--evidence-dir',str(ARTIFACTS/'never-created')], capture_output=True, timeout=10)
+            self.assertNotEqual(result.returncode,0,name)
+
+    def test_download_and_existing_output_refused(self):
+        import runtime as rt
+        m={'runId':'b-continue-20990101-99'}
+        for verb in ('install','pull','load'):
+            with self.subTest(verb=verb), self.assertRaisesRegex(ValueError,'DOWNLOAD_OR_FORCE_REFUSED'):
+                rt.execute(m,'negative-download',['not-executed',verb])
+
+    def test_lexical_and_link_path_refused(self):
+        import runtime as rt
+        for path in (ARTIFACTS/'../escape',Path('/tmp/foreign')):
+            with self.assertRaises(ValueError): rt.boundary(path,ARTIFACTS)
+        with tempfile.TemporaryDirectory(dir=ARTIFACTS) as d:
+            link=Path(d)/'link'; link.symlink_to('/tmp')
+            with self.assertRaises(ValueError): rt.boundary(link/'out',ARTIFACTS)
+
+    def test_deadline_terminates_process_group(self):
+        import runtime as rt
+        raw,code,timed_out=rt.bounded_process([sys.executable,'-c','import time; time.sleep(20)'],
+            cwd=ROOT,env=rt.environment(),timeout=0.1)
+        self.assertTrue(timed_out)
+        self.assertIsNotNone(code)
+
+
+class ExecutionRegressionTests(unittest.TestCase):
+    def test_long_command_argument_is_not_a_path(self):
+        import runtime as rt
+        self.assertEqual(rt.command_file_inputs(['python3','-c','x'*10000]), {})
+
+    def test_hook_ref_binding(self):
+        import importlib.machinery, importlib.util
+        loader=importlib.machinery.SourceFileLoader('task_hook',str(HERE/'hooks/pre-push'))
+        spec=importlib.util.spec_from_loader(loader.name,loader);hook=importlib.util.module_from_spec(spec);loader.exec_module(hook)
+        approval={'taskId':'G4-M1-MAIN-INTEGRATION-001','phase':'C_EXPLICIT_APPROVAL','origin':'fixture','head':'a'*40,'approvedMain':'b'*40}
+        line='a'*40+' '+'a'*40+' refs/heads/main '+'b'*40
+        hook.validate('origin','fixture',[line],approval)
+        for lines in ([],[line,line],[line.replace('b'*40,'c'*40)],[line.replace('refs/heads/main','refs/heads/other')],[line.replace('a'*40,'0'*40)]):
+            with self.subTest(lines=lines),self.assertRaises(ValueError):hook.validate('origin','fixture',lines,approval)
+
+
+class ComposeBoundaryTests(unittest.TestCase):
+    def test_actual_config_positive_and_mutations(self):
+        import copy
+        import runtime as rt, consumer_check as cc
+        m={'runId':'b-continue-20990101-98','privateDirectory':str(rt.private_dir('b-continue-20990101-98')),'images':rt.IMAGES}
+        for group in ('m1','g3'):
+            p=subprocess.run(rt.compose_command(group)+['config','--format','json'],env=rt.compose_environment(m),capture_output=True,timeout=20)
+            self.assertEqual(p.returncode,0,p.stderr.decode())
+            config=json.loads(p.stdout);cc.check_compose(m,config,group)
+            mutations=[('image','postgres:latest','COMPOSE_IMAGE'),('pull_policy','always','COMPOSE_IMAGE'),
+                ('cap_add',['SYS_ADMIN'],'EXTRA_CAPABILITY'),('gpus','all','COMPOSE_PRIVILEGE'),
+                ('mem_limit',7*1024**3,'MEMORY_BUDGET'),('network_mode','host','COMPOSE_NETWORK_MODE'),
+                ('networks',{'default':{}},'UNDECLARED_NETWORK'),('ports',[{'host_ip':'0.0.0.0','target':5432,'published':'15432'}],'LOOPBACK_ONLY')]
+            for key,value,code in mutations:
+                bad=copy.deepcopy(config);bad['services']['platform-pg'][key]=value
+                with self.subTest(group=group,key=key),self.assertRaisesRegex(ValueError,code):cc.check_compose(m,bad,group)
+            for field,value,code in [('name','old-project','COMPOSE_PROJECT')]:
+                bad=copy.deepcopy(config);bad[field]=value
+                with self.assertRaisesRegex(ValueError,code):cc.check_compose(m,bad,group)
+            bad=copy.deepcopy(config);bad['volumes']['platform-data']['driver_opts']['o']='size=65536m'
+            with self.assertRaisesRegex(ValueError,'VOLUME_CAPACITY'):cc.check_compose(m,bad,group)
+
+
+class PushRaceTests(unittest.TestCase):
+    def test_real_bare_push_races(self):
+        import os
+        with tempfile.TemporaryDirectory(prefix='g4-main-push-fixture-',dir=ARTIFACTS) as d:
+            base=Path(d);repo=base/'author';bare=base/'remote.git';hooks=base/'hooks';hooks.mkdir()
+            env=dict(os.environ,GIT_AUTHOR_NAME='Synthetic Fixture',GIT_AUTHOR_EMAIL='fixture@example.invalid',GIT_COMMITTER_NAME='Synthetic Fixture',GIT_COMMITTER_EMAIL='fixture@example.invalid',GIT_CONFIG_NOSYSTEM='1',GIT_CONFIG_GLOBAL=os.devnull)
+            def git(*args,cwd=None,ok=True,input=None):
+                result=subprocess.run(['git',*map(str,args)],cwd=cwd or base,env=env,input=input,text=True,capture_output=True,timeout=15)
+                if ok:self.assertEqual(result.returncode,0,result.stderr)
+                return result
+            git('init','--bare',bare);git('init',repo)
+            tree=git('hash-object','-w','-t','tree','--stdin',cwd=repo,input='').stdout.strip()
+            initial=git('commit-tree',tree,'-m','base',cwd=repo).stdout.strip()
+            concurrent=git('commit-tree',tree,'-p',initial,'-m','concurrent',cwd=repo).stdout.strip()
+            candidate=git('commit-tree',tree,'-p',concurrent,'-m','candidate',cwd=repo).stdout.strip()
+            git('remote','add','origin',bare,cwd=repo)
+            git('push','origin',initial+':refs/heads/main',concurrent+':refs/heads/fixture-concurrent',cwd=repo)
+            approval={'taskId':'G4-M1-MAIN-INTEGRATION-001','phase':'C_EXPLICIT_APPROVAL','origin':str(bare),'head':candidate,'approvedMain':initial}
+            wrapper="#!/usr/bin/env python3\nimport importlib.machinery,importlib.util,json,subprocess,sys\n"
+            wrapper+="loader=importlib.machinery.SourceFileLoader('h',"+repr(str(HERE/'hooks/pre-push'))+");spec=importlib.util.spec_from_loader(loader.name,loader);h=importlib.util.module_from_spec(spec);loader.exec_module(h)\n"
+            wrapper+="approval="+repr(approval)+"\nh.validate(sys.argv[1],sys.argv[2],sys.stdin.read().splitlines(),approval)\n"
+            hook=hooks/'pre-push';hook.write_text(wrapper);hook.chmod(0o755)
+            # 通告前服务器已前进：hook必须拒绝旧批准。
+            git('--git-dir',bare,'update-ref','refs/heads/main',concurrent,initial)
+            failed=git('-c','core.hooksPath='+str(hooks),'push','origin',candidate+':refs/heads/main',cwd=repo,ok=False)
+            self.assertNotEqual(failed.returncode,0)
+            self.assertIn('EXACT_UPDATE_REQUIRED',failed.stderr)
+            self.assertEqual(git('--git-dir',bare,'rev-parse','main').stdout.strip(),concurrent)
+            # 此回退只发生在自建无业务bare夹具，不触碰真实main。
+            git('--git-dir',bare,'update-ref','refs/heads/main',initial,concurrent)
+            race=wrapper+"subprocess.run(['git','--git-dir',"+repr(str(bare))+",'update-ref','refs/heads/main',"+repr(concurrent)+","+repr(initial)+"],check=True)\n"
+            hook.write_text(race)
+            failed=git('-c','core.hooksPath='+str(hooks),'push','origin',candidate+':refs/heads/main',cwd=repo,ok=False)
+            self.assertNotEqual(failed.returncode,0)
+            self.assertIn('incorrect old value provided',failed.stderr)
+            self.assertIn('but expected '+initial,failed.stderr)
+            self.assertEqual(git('--git-dir',bare,'rev-parse','main').stdout.strip(),concurrent)
+            git('--git-dir',bare,'update-ref','refs/heads/main',initial,concurrent)
+            hook.write_text(wrapper)
+            git('-c','core.hooksPath='+str(hooks),'push','origin',candidate+':refs/heads/main',cwd=repo)
+            self.assertEqual(git('--git-dir',bare,'rev-parse','main').stdout.strip(),candidate)
+
+
+class RecoveryGuardTests(unittest.TestCase):
+    def test_existing_log_rejected_before_command(self):
+        import runtime as rt
+        with tempfile.TemporaryDirectory(dir=ARTIFACTS) as d:
+            directory=Path(d);commands=directory/'commands';commands.mkdir()
+            (commands/'occupied.log').write_text('preserve')
+            marker=directory/'must-not-exist'
+            with self.assertRaisesRegex(ValueError,'EXISTING_OUTPUT'):
+                rt.execute({'runId':directory.name},'occupied',[sys.executable,'-c','from pathlib import Path;Path('+repr(str(marker))+').touch()'])
+            self.assertFalse(marker.exists())
+            self.assertEqual((commands/'occupied.log').read_text(),'preserve')
+
+    def test_guard_restores_after_parent_killed(self):
+        import os,signal,time,selectors
+        with tempfile.TemporaryDirectory(dir=ARTIFACTS) as d:
+            directory=Path(d);fake=directory/'docker';state=directory/'state.json'
+            ident='f'*64;run='b-continue-20990101-97'
+            value={'Id':ident,'Config':{'Labels':{'ontology.task-id':'G4-M1-MAIN-INTEGRATION-001','ontology.run-id':run,'com.docker.compose.service':'pg-source'}},'State':{'Running':True,'Paused':False},'unpauseCalls':0}
+            state.write_text(json.dumps(value))
+            code="#!/usr/bin/env python3\nimport os,json,sys\nfrom pathlib import Path\np=Path(os.environ['GUARD_FIXTURE_STATE']);v=json.loads(p.read_text());a=sys.argv[3:]\nassert sys.argv[1:3]==['--context','desktop-linux'] and a[1]==v['Id']\nif a[0]=='inspect':print(json.dumps([v]))\nelif a[0] in ('pause','unpause'):\n v['State']['Paused']=a[0]=='pause';v['unpauseCalls']+=int(a[0]=='unpause');p.write_text(json.dumps(v))\nelse:sys.exit(2)\n"
+            fake.write_text(code);fake.chmod(0o755)
+            child_code="import sys,time;from pathlib import Path;sys.path.insert(0,"+repr(str(HERE))+");import runtime as r;r.ARTIFACTS=Path("+repr(str(directory))+");r.runtime_value=lambda m:{'containerIds':{'pg-source':"+repr(ident)+"}};guard=r.PauseGuard({'runId':"+repr(run)+"},'pg-source',1);guard.__enter__();print(guard.guard.pid,flush=True);time.sleep(60)"
+            env=dict(os.environ,PATH=str(directory)+os.pathsep+os.environ['PATH'],GUARD_FIXTURE_STATE=str(state),PYTHONDONTWRITEBYTECODE='1')
+            child=subprocess.Popen([sys.executable,'-B','-c',child_code],env=env,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,start_new_session=True)
+            guard_pid=None
+            try:
+                selector=selectors.DefaultSelector();selector.register(child.stdout,selectors.EVENT_READ)
+                self.assertTrue(selector.select(4));guard_pid=int(child.stdout.readline());selector.close()
+                self.assertTrue(json.loads(state.read_text())['State']['Paused'])
+                os.killpg(child.pid,signal.SIGKILL);child.wait(timeout=3)
+                deadline=time.monotonic()+4
+                while json.loads(state.read_text())['State']['Paused'] and time.monotonic()<deadline:time.sleep(.05)
+                after=json.loads(state.read_text());self.assertFalse(after['State']['Paused']);self.assertEqual(after['unpauseCalls'],1)
+            finally:
+                if child.poll() is None:os.killpg(child.pid,signal.SIGKILL);child.wait(timeout=3)
+                if guard_pid:
+                    try:os.kill(guard_pid,signal.SIGTERM)
+                    except ProcessLookupError:pass
+                child.stdout.close();child.stderr.close()
+
+
+class SourceIoWitnessTests(unittest.TestCase):
+    def test_health_connections_are_separate_and_reader_drift_is_rejected(self):
+        import readback
+        from unittest.mock import patch
+        positive=b'2026 [1] LOG: connection received: host=172.19.0.3 port=50123\n2026 [1] LOG: connection authorized: user=fixture_reader database=fixture SSL enabled\n'
+        health=b'2026 [2] LOG: connection received: host=[local]\n2026 [2] LOG: connection authorized: user=postgres database=fixture application_name=pg_isready\n'
+        with patch.object(readback,'sql',return_value='0'):
+            result=readback.require_no_reader_io({},positive,positive+health)
+            self.assertEqual(result['afterNetworkConnections'],1)
+            with self.assertRaisesRegex(ValueError,'UNEXPECTED_SOURCE_NETWORK_IO'):
+                readback.require_no_reader_io({},positive,positive+positive)
+            for tcp_only in (b'2026 [3] LOG: connection received: host=172.19.0.4 port=55000\n', b'2026 [4] LOG: connection received: host=172.19.0.4 port=55001\n2026 [4] LOG: could not accept SSL connection\n'):
+                with self.assertRaisesRegex(ValueError,'UNEXPECTED_SOURCE_NETWORK_IO'):
+                    readback.require_no_reader_io({},positive,positive+tcp_only)
+            with self.assertRaisesRegex(ValueError,'SOURCE_IO_POSITIVE_CONTROL_MISSING'):
+                readback.require_no_reader_io({},health,health)
+            with self.assertRaisesRegex(ValueError,'SOURCE_LOG_TRUNCATED'):
+                readback.require_no_reader_io({},positive+health,positive)
+
+
 if __name__ == '__main__':
     ARTIFACTS.mkdir(parents=True, exist_ok=True)
     unittest.main(verbosity=2)
