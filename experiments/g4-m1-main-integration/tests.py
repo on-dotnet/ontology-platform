@@ -71,6 +71,58 @@ class RuntimeBoundaryTests(unittest.TestCase):
             with self.subTest(value=value), self.assertRaises(ValueError):
                 rt.run_id(value)
 
+    def test_ingress_routes_and_engine_frame_boundary(self):
+        """入口仅接受冻结运行组，Docker帧不得混入未知流或无界长度。"""
+        import runtime as rt
+        self.assertEqual(rt.ingress_services('modules'),('platform-pg','fuseki','rustfs'))
+        self.assertEqual(len(rt.ingress_services('g3')),6)
+        for group in ('old','',None):
+            with self.assertRaises(ValueError):rt.ingress_services(group)
+        self.assertEqual(rt.engine_frame_header(bytes([1,0,0,0,0,0,0,7])),(1,7))
+        for header in (b'',bytes([0,0,0,0,0,0,0,7]),bytes([1,1,0,0,0,0,0,7]),bytes([1,0,0,0,127,0,0,0])):
+            with self.assertRaises(ValueError):rt.engine_frame_header(header)
+
+    def test_ingress_exec_rejects_unregistered_targets_commands_and_identity(self):
+        """错误目的地和旧Run在任何Engine写操作前拒绝；正例固定低权限。"""
+        import runtime as rt
+        engine=object.__new__(rt.TaskEngine);engine.m={'runId':'b-continue-20990101-99'}
+        engine.allowed_targets={('127.0.0.1',5432)};engine.created_execs=set();calls=[]
+        engine.owned=lambda *_:None
+        engine.request=lambda method,path,body: calls.append(body) or {'Id':'a'*64}
+        token='g4-relay-b-continue-20990101-99-'+'1'*32
+        command=['perl','-e',rt.RELAY_PERL,'127.0.0.1','5432',token,'120']
+        engine.create('b'*64,command)
+        self.assertEqual(calls[0]['User'],'999:999');self.assertFalse(calls[0]['Privileged']);self.assertFalse(calls[0]['Tty'])
+        for index,value in ((0,'sh'),(2,'arbitrary program'),(3,'192.0.2.1'),(3,'127.0.0.2'),(4,'9000'),(5,token.replace('20990101','20990102')),(6,'121')):
+            changed=command.copy();changed[index]=value
+            with self.subTest(index=index,value=value),self.assertRaises(ValueError):engine.create('b'*64,changed)
+        self.assertEqual(len(calls),1)
+
+    def test_ingress_m1_exact_networks_namespace_and_owner(self):
+        """M1双internal网络与Web共享API正例；额外网络、旧身份和镜像串换拒绝。"""
+        import copy
+        import runtime as rt
+        run='b-continue-20990101-99';m={'runId':run};engine=object.__new__(rt.TaskEngine);engine.m=m
+        front='ontology-g4-main-'+run+'_front';source='ontology-g4-main-'+run+'_source'
+        services=rt.ingress_services('m1');ids={s:str(i+1)*64 for i,s in enumerate(services)};rows=[]
+        for i,service in enumerate(services):
+            networks={front:{'NetworkID':'a'*64,'IPAddress':'172.18.0.'+str(i+2)}}
+            if service=='api':networks[source]={'NetworkID':'b'*64,'IPAddress':'172.19.0.3'}
+            if service=='web':networks={}
+            rows.append({'Id':ids[service],'Image':rt.INGRESS_IMAGES[service],'ImageID':'sha256:'+'c'*64,'State':'running','Status':'Up',
+                'Labels':{'ontology.task-id':rt.TASK,'ontology.run-id':run,'com.docker.compose.service':service},
+                'HostConfig':{'NetworkMode':'container:'+ids['api'] if service=='web' else front},'NetworkSettings':{'Networks':networks}})
+        routes,networks=rt.ingress_route_projection(m,engine,'m1',ids,rows)
+        self.assertEqual(routes[-1]['providerId'],ids['api']);self.assertEqual(set(networks),{'a'*64,'b'*64})
+        for mutation in ('old-run','wrong-image','extra-network','wrong-namespace','missing-id'):
+            changed=copy.deepcopy(rows)
+            if mutation=='old-run':changed[0]['Labels']['ontology.run-id']='b-continue-20990101-98'
+            elif mutation=='wrong-image':changed[0]['Image']=rt.IMAGES['node']
+            elif mutation=='extra-network':changed[2]['NetworkSettings']['Networks']['foreign']={'NetworkID':'d'*64,'IPAddress':'172.20.0.2'}
+            elif mutation=='wrong-namespace':changed[3]['HostConfig']['NetworkMode']='container:'+'d'*64
+            else:changed.pop()
+            with self.subTest(mutation=mutation),self.assertRaises(ValueError):rt.ingress_route_projection(m,engine,'m1',ids,changed)
+
     def test_binding_rejects_image_and_tool_substitution(self):
         import runtime as rt
         report=json.loads((ROOT/'docs/evidence/G4-M1-MAIN-INTEGRATION-001/p0/tools-admission.json').read_text())
@@ -135,6 +187,91 @@ class RuntimeBoundaryTests(unittest.TestCase):
 
 
 class ExecutionRegressionTests(unittest.TestCase):
+    def test_engine_stall_keeps_event_loop_and_cancel_responsive(self):
+        """真实Unix对端不响应时，控制循环继续运行且取消准确释放连接。"""
+        import asyncio
+        import runtime as rt
+        async def trial(directory):
+            socket_path='engine.sock';accepted=[];closed=asyncio.Event()
+            async def stalled(reader,writer):
+                accepted.append(True)
+                await reader.read();writer.close();await writer.wait_closed();closed.set()
+            server=await asyncio.start_unix_server(stalled,socket_path)
+            engine=object.__new__(rt.TaskEngine);engine.path=socket_path
+            task=asyncio.create_task(engine.async_request('GET','/version'))
+            ticks=0
+            for _ in range(5):await asyncio.sleep(.01);ticks+=1
+            self.assertTrue(accepted);self.assertEqual(ticks,5);self.assertFalse(task.done())
+            task.cancel()
+            with self.assertRaises(asyncio.CancelledError):await task
+            await asyncio.wait_for(closed.wait(),1);server.close();await server.wait_closed()
+        import os
+        with tempfile.TemporaryDirectory(dir=ARTIFACTS) as d:
+            previous=Path.cwd()
+            try:os.chdir(d);asyncio.run(trial(d))
+            finally:os.chdir(previous)
+
+    def test_remote_half_close_still_accepts_upstream_bytes(self):
+        """对端先关闭发送方向，客户端仍可发送完整上行数据再半关闭。"""
+        import asyncio
+        import runtime as rt
+        async def trial():
+            received=[];jobs=[]
+            def frame(stream,data):return bytes([stream,0,0,0])+len(data).to_bytes(4,'big')+data
+            async def peer(reader,writer):
+                writer.write(frame(2,b'PIDS 123 124\nOUTPUT_EOF 0\n'));await writer.drain()
+                received.append(await reader.read());writer.close();await writer.wait_closed()
+            engine=await asyncio.start_server(peer,'127.0.0.1',0)
+            async def bridge(reader,writer):
+                er,ew=await asyncio.open_connection('127.0.0.1',engine.sockets[0].getsockname()[1])
+                try:await rt.relay_copy(reader,writer,er,ew,lambda _:None)
+                finally:ew.close();writer.close();await ew.wait_closed();await writer.wait_closed()
+            server=await asyncio.start_server(lambda r,w:jobs.append(asyncio.create_task(bridge(r,w))),'127.0.0.1',0)
+            try:
+                reader,writer=await asyncio.open_connection('127.0.0.1',server.sockets[0].getsockname()[1])
+                self.assertEqual(await reader.read(),b'')
+                payload=bytes(range(256))*1024;writer.write(payload);await writer.drain();writer.write_eof()
+                await asyncio.gather(*jobs);self.assertEqual(received,[payload]);writer.close();await writer.wait_closed()
+            finally:server.close();engine.close();await server.wait_closed();await engine.wait_closed()
+        asyncio.run(asyncio.wait_for(trial(),5))
+
+    def test_relay_binary_backpressure_and_half_close(self):
+        """实际loopback双向字节流跨分片Docker帧，半关闭后仍可接收完整响应。"""
+        import asyncio
+        import runtime as rt
+        payload=bytes(range(256))*8192
+        async def trial():
+            controls=[];jobs=[];observed=[]
+            def frame(stream,data):return bytes([stream,0,0,0])+len(data).to_bytes(4,'big')+data
+            async def peer(reader,writer):
+                writer.write(frame(2,b'PIDS 123 124\n')+frame(1,b'greeting\0'));await writer.drain()
+                data=await reader.read();observed.append(data)
+                # Docker的stderr控制帧可以先于尚未读出的stdout尾帧抵达。
+                writer.write(frame(2,('OUTPUT_EOF '+str(9+len(data)+10)+'\n').encode()))
+                for i in range(0,len(data),32768):
+                    packet=frame(1,data[i:i+32768])
+                    if i==0:
+                        for part in (packet[:2],packet[2:7],packet[7:]):writer.write(part);await writer.drain();await asyncio.sleep(.001)
+                    else:writer.write(packet);await writer.drain()
+                writer.write(frame(1,b'after-eof\0'));await writer.drain();writer.close();await writer.wait_closed()
+            engine=await asyncio.start_server(peer,'127.0.0.1',0)
+            async def bridge(reader,writer):
+                er,ew=await asyncio.open_connection('127.0.0.1',engine.sockets[0].getsockname()[1])
+                try:await rt.relay_copy(reader,writer,er,ew,controls.append)
+                finally:ew.close();writer.close();await ew.wait_closed();await writer.wait_closed()
+            def accepted(reader,writer):jobs.append(asyncio.create_task(bridge(reader,writer)))
+            relay=await asyncio.start_server(accepted,'127.0.0.1',0)
+            try:
+                reader,writer=await asyncio.open_connection('127.0.0.1',relay.sockets[0].getsockname()[1])
+                self.assertEqual(await reader.readexactly(9),b'greeting\0')
+                writer.write(payload);await writer.drain();writer.write_eof()
+                result=bytearray()
+                while data:=await reader.read(16384):result.extend(data);await asyncio.sleep(.001)
+                self.assertEqual(bytes(result),payload+b'after-eof\0');self.assertEqual(observed,[payload]);self.assertEqual(controls,[[123,124]])
+                writer.close();await writer.wait_closed();await asyncio.gather(*jobs)
+            finally:relay.close();engine.close();await relay.wait_closed();await engine.wait_closed()
+        asyncio.run(asyncio.wait_for(trial(),10))
+
     def test_long_command_argument_is_not_a_path(self):
         import runtime as rt
         self.assertEqual(rt.command_file_inputs(['python3','-c','x'*10000]), {})

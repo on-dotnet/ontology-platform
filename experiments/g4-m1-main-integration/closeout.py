@@ -38,6 +38,8 @@ def reclaim(m, label, *, apply=False):
     rt.write_json(path,plan)
     if not apply:return plan
     rt.require(inventory(m)==before,'RESOURCE_DRIFT')
+    # failure也必须释放本Run所有已登记listener，不依赖故障目标仍存活。
+    ingress={group:rt.stop_ingress(m,group) for group in ('modules','g3','m1')}
     commands=[]
     try:
         for row in before['container']['owned']:
@@ -65,7 +67,7 @@ def reclaim(m, label, *, apply=False):
         rt.update_runtime(m,containerIds={},group=None)
         config=rt.private_dir(m['runId'])/'api/appsettings.json'
         if config.exists():config.rename(config.with_name('appsettings-closed-'+label+'.json'))
-        return {'status':'PASS','deleted':sum(len(before[k]['owned']) for k in before),'absence':diagnostics,'keepVerified':True}
+        return {'status':'PASS','deleted':sum(len(before[k]['owned']) for k in before),'absence':diagnostics,'keepVerified':True,'ingress':ingress}
     finally:
         rt.write_json(rt.ARTIFACTS/m['runId']/('cleanup-'+label+'-commands.json'),{'before':before,'commands':commands,'after':inventory(m)})
 

@@ -1,0 +1,54 @@
+[
+  {
+    "service": "fuseki",
+    "containerId": "2992e9bd93f95c074b08e0fdd46e32cfb162a199942c3b097ae283fc02c18fce",
+    "command": [
+      "docker",
+      "--context",
+      "desktop-linux",
+      "exec",
+      "2992e9bd93f95c074b08e0fdd46e32cfb162a199942c3b097ae283fc02c18fce",
+      "curl",
+      "--noproxy",
+      "*",
+      "--max-time",
+      "5",
+      "--silent",
+      "--output",
+      "/dev/null",
+      "--write-out",
+      "%{http_code}",
+      "http://127.0.0.1:3030/$/ping"
+    ],
+    "exitCode": 0,
+    "httpStatus": "200",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "elapsedSeconds": 3.1313952919990697
+  },
+  {
+    "service": "rustfs",
+    "containerId": "98bcd0b894d0ca153728a809ab1af7b208daef9305780330d448b82adaec27a5",
+    "command": [
+      "docker",
+      "--context",
+      "desktop-linux",
+      "exec",
+      "98bcd0b894d0ca153728a809ab1af7b208daef9305780330d448b82adaec27a5",
+      "curl",
+      "--noproxy",
+      "*",
+      "--max-time",
+      "5",
+      "--silent",
+      "--output",
+      "/dev/null",
+      "--write-out",
+      "%{http_code}",
+      "http://127.0.0.1:9000/health/ready"
+    ],
+    "exitCode": 0,
+    "httpStatus": "200",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "elapsedSeconds": 3.0894992499997898
+  }
+]

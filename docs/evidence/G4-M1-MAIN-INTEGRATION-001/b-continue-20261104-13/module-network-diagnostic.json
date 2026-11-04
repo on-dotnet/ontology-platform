@@ -1,0 +1,144 @@
+[
+  {
+    "service": "rustfs",
+    "containerId": "98bcd0b894d0ca153728a809ab1af7b208daef9305780330d448b82adaec27a5",
+    "networks": [
+      {
+        "Name": "ontology-g4-main-b-continue-20261104-13_front",
+        "Id": "a495d7c9da690184c367815f6aad459b5e3a0e54db0fe92730d4226d8661dd0c",
+        "Driver": "bridge",
+        "Internal": true,
+        "EnableIPv4": true,
+        "EnableIPv6": false,
+        "IPAM": {
+          "Driver": "default",
+          "Options": null,
+          "Config": [
+            {
+              "Subnet": "172.18.0.0/16",
+              "Gateway": "172.18.0.1"
+            }
+          ]
+        },
+        "Options": {
+          "com.docker.network.enable_ipv4": "true",
+          "com.docker.network.enable_ipv6": "false"
+        },
+        "Labels": {
+          "com.docker.compose.config-hash": "deaa78e032f856e62c9150b21175e91372a72422e1d6c60a4ad87ce1d2add82a",
+          "com.docker.compose.network": "front",
+          "com.docker.compose.project": "ontology-g4-main-b-continue-20261104-13",
+          "com.docker.compose.version": "5.6.1",
+          "ontology.run-id": "b-continue-20261104-13",
+          "ontology.synthetic": "true",
+          "ontology.task-id": "G4-M1-MAIN-INTEGRATION-001"
+        }
+      }
+    ],
+    "availableRelayExecutables": [
+      "/usr/bin/nc",
+      "/usr/bin/curl",
+      "/usr/bin/wget"
+    ],
+    "probeExitCode": 0,
+    "privateLog": {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261104-13/diagnostic-rustfs.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  {
+    "service": "platform-pg",
+    "containerId": "2368a53f893d9fe0f89a5e968a7573b66bf27593f0e62dca9faf92b9a6abd61d",
+    "networks": [
+      {
+        "Name": "ontology-g4-main-b-continue-20261104-13_front",
+        "Id": "a495d7c9da690184c367815f6aad459b5e3a0e54db0fe92730d4226d8661dd0c",
+        "Driver": "bridge",
+        "Internal": true,
+        "EnableIPv4": true,
+        "EnableIPv6": false,
+        "IPAM": {
+          "Driver": "default",
+          "Options": null,
+          "Config": [
+            {
+              "Subnet": "172.18.0.0/16",
+              "Gateway": "172.18.0.1"
+            }
+          ]
+        },
+        "Options": {
+          "com.docker.network.enable_ipv4": "true",
+          "com.docker.network.enable_ipv6": "false"
+        },
+        "Labels": {
+          "com.docker.compose.config-hash": "deaa78e032f856e62c9150b21175e91372a72422e1d6c60a4ad87ce1d2add82a",
+          "com.docker.compose.network": "front",
+          "com.docker.compose.project": "ontology-g4-main-b-continue-20261104-13",
+          "com.docker.compose.version": "5.6.1",
+          "ontology.run-id": "b-continue-20261104-13",
+          "ontology.synthetic": "true",
+          "ontology.task-id": "G4-M1-MAIN-INTEGRATION-001"
+        }
+      }
+    ],
+    "availableRelayExecutables": [
+      "/usr/bin/bash"
+    ],
+    "probeExitCode": 0,
+    "privateLog": {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261104-13/diagnostic-platform-pg.log",
+      "bytes": 2402,
+      "sha256": "0ba281fb52d0a1fa0072cda37b48884fbaef22a3b768b0c06159ce05ac3818d7"
+    }
+  },
+  {
+    "service": "fuseki",
+    "containerId": "2992e9bd93f95c074b08e0fdd46e32cfb162a199942c3b097ae283fc02c18fce",
+    "networks": [
+      {
+        "Name": "ontology-g4-main-b-continue-20261104-13_front",
+        "Id": "a495d7c9da690184c367815f6aad459b5e3a0e54db0fe92730d4226d8661dd0c",
+        "Driver": "bridge",
+        "Internal": true,
+        "EnableIPv4": true,
+        "EnableIPv6": false,
+        "IPAM": {
+          "Driver": "default",
+          "Options": null,
+          "Config": [
+            {
+              "Subnet": "172.18.0.0/16",
+              "Gateway": "172.18.0.1"
+            }
+          ]
+        },
+        "Options": {
+          "com.docker.network.enable_ipv4": "true",
+          "com.docker.network.enable_ipv6": "false"
+        },
+        "Labels": {
+          "com.docker.compose.config-hash": "deaa78e032f856e62c9150b21175e91372a72422e1d6c60a4ad87ce1d2add82a",
+          "com.docker.compose.network": "front",
+          "com.docker.compose.project": "ontology-g4-main-b-continue-20261104-13",
+          "com.docker.compose.version": "5.6.1",
+          "ontology.run-id": "b-continue-20261104-13",
+          "ontology.synthetic": "true",
+          "ontology.task-id": "G4-M1-MAIN-INTEGRATION-001"
+        }
+      }
+    ],
+    "availableRelayExecutables": [
+      "/usr/bin/bash",
+      "/usr/bin/curl",
+      "/usr/bin/wget"
+    ],
+    "probeExitCode": 0,
+    "privateLog": {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261104-13/diagnostic-fuseki.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+]

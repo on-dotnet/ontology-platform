@@ -1,0 +1,306 @@
+{
+  "status": "TARGETED_PASS_ONLY",
+  "runtimeSha256": "05b7fd548dae8d7bd095451e6780368c9404f810859db0e8badad84131ecdbea",
+  "driverSha256": "b8e5f0615d4032fffb4fcbb8688410ff7b22f2a97f2d00882e704c795b832a7f",
+  "cases": [
+    {
+      "case": "port-conflict",
+      "exitCode": 1,
+      "cleanup": {
+        "status": "PASS",
+        "taskId": "G4-M1-MAIN-INTEGRATION-001",
+        "runId": "b-continue-20261104-13",
+        "testedCommit": "0ed73cf1a82f73ee3e2be455c431fea1fa978685",
+        "pid": 89526,
+        "processReceiptSha256": "c079d8070e85c80428f6e9887bd90638414bcbeed3accecb2442e8ac3dd5c5f4",
+        "portsReleased": [
+          15432
+        ],
+        "execExits": [],
+        "remoteObservations": []
+      },
+      "occupiedFixturePreserved": true
+    },
+    {
+      "case": "capacity-and-parent-kill",
+      "exitCode": -9,
+      "capacity": 32,
+      "cleanup": {
+        "status": "PASS",
+        "taskId": "G4-M1-MAIN-INTEGRATION-001",
+        "runId": "b-continue-20261104-13",
+        "testedCommit": "0ed73cf1a82f73ee3e2be455c431fea1fa978685",
+        "pid": 89531,
+        "processReceiptSha256": "0456d00530ed73478ac6c2092b41128af0e16505a418f2c64c760ead7de6feec",
+        "portsReleased": [
+          15432,
+          15303,
+          15900
+        ],
+        "execExits": [
+          {
+            "utc": "2026-11-04T18:06:35.641406+00:00",
+            "pid": 89531,
+            "event": "exec_exited",
+            "execId": "73427f506a432c1e76d051632117e2026800ec87fad30178120522ac79d96cb6",
+            "token": "g4-relay-b-continue-20261104-13-9a7d8e086b4f43df81e207f68e4ad526",
+            "containerId": "2368a53f893d9fe0f89a5e968a7573b66bf27593f0e62dca9faf92b9a6abd61d",
+            "running": false,
+            "exitCode": 0
+          },
+          {
+            "utc": "2026-11-04T18:06:35.686069+00:00",
+            "pid": 89531,
+            "event": "exec_exited",
+            "execId": "a398be287c515ec740d73c77c3ad83e51c09b39a65146591dc322874ece7254e",
+            "token": "g4-relay-b-continue-20261104-13-ca8b11cadc4a48f09188899b647ecb70",
+            "containerId": "2368a53f893d9fe0f89a5e968a7573b66bf27593f0e62dca9faf92b9a6abd61d",
+            "running": false,
+            "exitCode": 0
+          },
+          {
+            "execId": "0baf5f95f127a9918a631eb62003831939acd55c2955a1b13bfd0be8f7e99166",
+            "containerId": "2368a53f893d9fe0f89a5e968a7573b66bf27593f0e62dca9faf92b9a6abd61d",
+            "running": false,
+            "exitCode": 0
+          },
+          {
+            "execId": "4933839f009fc4dbbe71127e2ecfde84ea5bdddd14fd0f6e32e7633dee007a91",
+            "containerId": "2368a53f893d9fe0f89a5e968a7573b66bf27593f0e62dca9faf92b9a6abd61d",
+            "running": false,
+            "exitCode": 0
+          },
+          {
+            "execId": "b06a46c3f9aa3db3f9b066305aaeeba9734121619536caa9611805d31780a026",
+            "containerId": "2368a53f893d9fe0f89a5e968a7573b66bf27593f0e62dca9faf92b9a6abd61d",
+            "running": false,
+            "exitCode": 0
+          },
+          {
+            "execId": "d88453d6c237af803c978174cce940369f4aac9638810d66fe7f17dce075439f",
+            "containerId": "2368a53f893d9fe0f89a5e968a7573b66bf27593f0e62dca9faf92b9a6abd61d",
+            "running": false,
+            "exitCode": 0
+          },
+          {
+            "execId": "0db8f864d6ead8f870c8f4051843458f7387b6df8f9c33ea7fd7514fcfa73e7b",
+            "containerId": "2368a53f893d9fe0f89a5e968a7573b66bf27593f0e62dca9faf92b9a6abd61d",
+            "running": false,
+            "exitCode": 0
+          },
+          {
+            "execId": "21b32778ef0bcc766dcf9dd9ef12d58bde1636be656a6a9d92d34f1fd9a37172",
+            "containerId": "2368a53f893d9fe0f89a5e968a7573b66bf27593f0e62dca9faf92b9a6abd61d",
+            "running": false,
+            "exitCode": 0
+          },
+          {
+            "execId": "3a4fd677ca44804ebfbaaa9f3a21cf2f6b2b3ce2bfe8472c020d82c4dc2f3aa8",
+            "containerId": "2368a53f893d9fe0f89a5e968a7573b66bf27593f0e62dca9faf92b9a6abd61d",
+            "running": false,
+            "exitCode": 0
+          },
+          {
+            "execId": "0a9be00bb6502c142d6535b7f0ade61dc579c3686ab9734de1deee81a6632b63",
+            "containerId": "2368a53f893d9fe0f89a5e968a7573b66bf27593f0e62dca9faf92b9a6abd61d",
+            "running": false,
+            "exitCode": 0
+          },
+          {
+            "execId": "4c03c67eabc5246386911123f7dbfedd5773a17e492eab3cea6d2e5651bd8268",
+            "containerId": "2368a53f893d9fe0f89a5e968a7573b66bf27593f0e62dca9faf92b9a6abd61d",
+            "running": false,
+            "exitCode": 0
+          },
+          {
+            "execId": "90e796f7de9adb839555ae2bbe0779258602ed5ae1fc4709ca2da5e1d3dbb361",
+            "containerId": "2368a53f893d9fe0f89a5e968a7573b66bf27593f0e62dca9faf92b9a6abd61d",
+            "running": false,
+            "exitCode": 0
+          },
+          {
+            "execId": "a9bf0ad64eef005a394b4b571adb7ef8424999a40e75d2f241669f5406de2154",
+            "containerId": "2368a53f893d9fe0f89a5e968a7573b66bf27593f0e62dca9faf92b9a6abd61d",
+            "running": false,
+            "exitCode": 0
+          },
+          {
+            "execId": "a9d6bfe9598479de3872ab3c628aca6f1568a421624d1d5a69ac4ceb5feaa261",
+            "containerId": "2368a53f893d9fe0f89a5e968a7573b66bf27593f0e62dca9faf92b9a6abd61d",
+            "running": false,
+            "exitCode": 0
+          },
+          {
+            "execId": "eae1f44b4da6270e4c5207f53eb9b53fda1f7f7c5e6b1fdf97d54dca98d2362e",
+            "containerId": "2368a53f893d9fe0f89a5e968a7573b66bf27593f0e62dca9faf92b9a6abd61d",
+            "running": false,
+            "exitCode": 0
+          },
+          {
+            "execId": "6e156f7fe30c1518ff5c937264380e71ddeac18bbf2139b7f67dcc0b9648fd5c",
+            "containerId": "2368a53f893d9fe0f89a5e968a7573b66bf27593f0e62dca9faf92b9a6abd61d",
+            "running": false,
+            "exitCode": 0
+          },
+          {
+            "execId": "5aa647147ce16415d808d5c82511574d6adb8922ffd56926d1228e638da8b477",
+            "containerId": "2368a53f893d9fe0f89a5e968a7573b66bf27593f0e62dca9faf92b9a6abd61d",
+            "running": false,
+            "exitCode": 0
+          },
+          {
+            "execId": "492893eae504427cc5ac64f635f92766a2516a5ca6f6f655c55409f66714704a",
+            "containerId": "2368a53f893d9fe0f89a5e968a7573b66bf27593f0e62dca9faf92b9a6abd61d",
+            "running": false,
+            "exitCode": 0
+          },
+          {
+            "execId": "bdabf9950bc18b725ac0a876e018dbcacc368ee42b837a275934887435ff27d5",
+            "containerId": "2368a53f893d9fe0f89a5e968a7573b66bf27593f0e62dca9faf92b9a6abd61d",
+            "running": false,
+            "exitCode": 0
+          },
+          {
+            "execId": "5089b82dcbd2db24f574416c31861e2764c5a45a5ebb769f4027ef1e317d6d7e",
+            "containerId": "2368a53f893d9fe0f89a5e968a7573b66bf27593f0e62dca9faf92b9a6abd61d",
+            "running": false,
+            "exitCode": 0
+          },
+          {
+            "execId": "84f0fb7258d57fcb8464eb1eca70975e7faed875f539c8006484bfaa5a8b2a70",
+            "containerId": "2368a53f893d9fe0f89a5e968a7573b66bf27593f0e62dca9faf92b9a6abd61d",
+            "running": false,
+            "exitCode": 0
+          },
+          {
+            "execId": "8ab78c98aa56e001132874e713c8e11224f75e6f852345c2b6f5da9fe14697be",
+            "containerId": "2368a53f893d9fe0f89a5e968a7573b66bf27593f0e62dca9faf92b9a6abd61d",
+            "running": false,
+            "exitCode": 0
+          },
+          {
+            "execId": "1d5155fbadba9440eeecc052f6873b5b56558d32908754e96e4d70ef3017afba",
+            "containerId": "2368a53f893d9fe0f89a5e968a7573b66bf27593f0e62dca9faf92b9a6abd61d",
+            "running": false,
+            "exitCode": 0
+          },
+          {
+            "execId": "6cda216a336775b587110d0e678f69849d354d1b466500b586de9fc4b93fed59",
+            "containerId": "2368a53f893d9fe0f89a5e968a7573b66bf27593f0e62dca9faf92b9a6abd61d",
+            "running": false,
+            "exitCode": 0
+          },
+          {
+            "execId": "5627158ddc0b061250875e22e49ad9cceaae2820797d133a3bdab4745b762729",
+            "containerId": "2368a53f893d9fe0f89a5e968a7573b66bf27593f0e62dca9faf92b9a6abd61d",
+            "running": false,
+            "exitCode": 0
+          },
+          {
+            "execId": "d4867a9ad0ad1818edb77f96a6d2bba421620e74fb9b1a4a58932796e602afe7",
+            "containerId": "2368a53f893d9fe0f89a5e968a7573b66bf27593f0e62dca9faf92b9a6abd61d",
+            "running": false,
+            "exitCode": 0
+          },
+          {
+            "execId": "35b2665eb681299ebaa35151d0848c358a5dc5689de6382d298403d4707fc3c7",
+            "containerId": "2368a53f893d9fe0f89a5e968a7573b66bf27593f0e62dca9faf92b9a6abd61d",
+            "running": false,
+            "exitCode": 0
+          },
+          {
+            "execId": "68c4bbd3e3308a7a7926a41b0c9460155bfe6f7cb540e270ebb00535ee61f61c",
+            "containerId": "2368a53f893d9fe0f89a5e968a7573b66bf27593f0e62dca9faf92b9a6abd61d",
+            "running": false,
+            "exitCode": 0
+          },
+          {
+            "execId": "e3939a9d16bbce803ed0eb4d2576a4389396db3c8f23084b050e8199ef95a4f7",
+            "containerId": "2368a53f893d9fe0f89a5e968a7573b66bf27593f0e62dca9faf92b9a6abd61d",
+            "running": false,
+            "exitCode": 0
+          },
+          {
+            "execId": "3b3ca4c138aab7582f9efed7cd5005a2216c48cb34511085fc336fbfd6579865",
+            "containerId": "2368a53f893d9fe0f89a5e968a7573b66bf27593f0e62dca9faf92b9a6abd61d",
+            "running": false,
+            "exitCode": 0
+          },
+          {
+            "execId": "560ccf6d612f37d0ffc41f9d80ed8c45453a01a363cf08575a339fcb25053781",
+            "containerId": "2368a53f893d9fe0f89a5e968a7573b66bf27593f0e62dca9faf92b9a6abd61d",
+            "running": false,
+            "exitCode": 0
+          },
+          {
+            "execId": "b79f301404acafeb9f6740bcdb3d6c87436a91cea073fdb731933be1bd479f2e",
+            "containerId": "2368a53f893d9fe0f89a5e968a7573b66bf27593f0e62dca9faf92b9a6abd61d",
+            "running": false,
+            "exitCode": 0
+          },
+          {
+            "execId": "e461ae0c4c138eaeb6cb36e1bb500648cfc988f24ba3722615e7831acc3e0c30",
+            "containerId": "2368a53f893d9fe0f89a5e968a7573b66bf27593f0e62dca9faf92b9a6abd61d",
+            "running": false,
+            "exitCode": 0
+          },
+          {
+            "execId": "504243b18b1504d9cb45c2137c8a29d4706a2b17079b4a6d2a27f1572dc48e6b",
+            "containerId": "2368a53f893d9fe0f89a5e968a7573b66bf27593f0e62dca9faf92b9a6abd61d",
+            "running": false,
+            "exitCode": 0
+          }
+        ],
+        "remoteObservations": [
+          {
+            "event": "reap_exec_created",
+            "execId": "d84c6fc7d865a82ac97f6e0ecaf02c751121fea0d61fbfd25e65bb60f4af4d87",
+            "mode": "terminate"
+          },
+          {
+            "event": "reap_exec_created",
+            "execId": "0ac286858ac8cc968b10b81d7fe20c8ee47a4ccdacc3c6286fd59c4baba68de7",
+            "mode": "inspect"
+          },
+          {
+            "event": "remote_reaped",
+            "observations": [
+              {
+                "execId": "d84c6fc7d865a82ac97f6e0ecaf02c751121fea0d61fbfd25e65bb60f4af4d87",
+                "mode": "terminate",
+                "pids": [],
+                "exitCode": 0
+              },
+              {
+                "execId": "0ac286858ac8cc968b10b81d7fe20c8ee47a4ccdacc3c6286fd59c4baba68de7",
+                "mode": "inspect",
+                "pids": [],
+                "exitCode": 0
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "case": "target-already-stopped",
+      "targetId": "2992e9bd93f95c074b08e0fdd46e32cfb162a199942c3b097ae283fc02c18fce",
+      "exitCode": 0,
+      "cleanup": {
+        "status": "PASS",
+        "taskId": "G4-M1-MAIN-INTEGRATION-001",
+        "runId": "b-continue-20261104-13",
+        "testedCommit": "0ed73cf1a82f73ee3e2be455c431fea1fa978685",
+        "pid": 89550,
+        "processReceiptSha256": "c420360066e3d600eb23d0e3d20958e2ff018dd3f84fd769e2fc72c5ad9c00da",
+        "portsReleased": [
+          15432,
+          15303,
+          15900
+        ],
+        "execExits": [],
+        "remoteObservations": []
+      }
+    }
+  ]
+}

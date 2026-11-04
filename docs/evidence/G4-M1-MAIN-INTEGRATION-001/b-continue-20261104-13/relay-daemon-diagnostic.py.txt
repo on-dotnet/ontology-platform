@@ -1,0 +1,93 @@
+"""Exact task-only daemon lifecycle spike; all outputs remain DIAGNOSTIC_ONLY."""
+import asyncio,json,sys,subprocess,socket,time,os,signal,urllib.request
+from pathlib import Path
+W=Path('/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform')
+sys.path.insert(0,str(W/'experiments/g4-m1-main-integration'))
+import runtime as rt
+A=rt.ARTIFACTS/'b-continue-20261104-13';p=A/'resource-manifest.json'
+m=json.loads(p.read_text());m.update(_path=str(p),_head=m['testedCommit'],_sha256=rt.digest(p.read_bytes()))
+
+if len(sys.argv)==3 and sys.argv[1]=='child':
+    directory=rt.boundary(sys.argv[2],A,exists=True)
+    asyncio.run(rt.ingress_daemon(m,'modules',evidence_directory=directory));raise SystemExit(0)
+
+def start(name):
+    directory=A/name;directory.mkdir()
+    command=[sys.executable,'-B',str(Path(__file__).resolve()),'child',str(directory)]
+    with (directory/'process.log').open('xb') as stream:
+        process=subprocess.Popen(command,cwd=W,stdout=stream,stderr=subprocess.STDOUT,start_new_session=True)
+    birth=subprocess.check_output(['ps','-p',str(process.pid),'-o','lstart='],text=True).strip()
+    rt.write_json(directory/'ingress-modules-process.json',{'pid':process.pid,'birth':birth,'command':command,'taskId':rt.TASK,'runId':m['runId'],'testedCommit':m['_head'],'runtimeSha256':rt.digest((rt.HERE/'runtime.py').read_bytes()),'scope':'DIAGNOSTIC_ONLY'})
+    return directory,process
+
+def wait_ready(directory,process):
+    deadline=time.monotonic()+20
+    while time.monotonic()<deadline:
+        rt.require(process.poll() is None,'DIAGNOSTIC_DAEMON_FAILED')
+        if (directory/'ingress-modules-ready.json').exists():return
+        time.sleep(.1)
+    raise ValueError('DIAGNOSTIC_READY_TIMEOUT')
+
+def rows(directory):
+    p=directory/'ingress-modules-events.jsonl'
+    return [json.loads(line) for line in p.read_text().splitlines()] if p.exists() else []
+
+results=[]
+occupied=socket.socket();occupied.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1);occupied.bind(('127.0.0.1',15303));occupied.listen()
+directory,process=start('relay-port-conflict')
+try:
+    code=process.wait(timeout=20);rt.require(code!=0 and not (directory/'ingress-modules-ready.json').exists(),'PORT_CONFLICT_NOT_REFUSED')
+    closed=rt.stop_ingress(m,'modules',evidence_directory=directory)
+    rt.require(closed['portsReleased']==[15432] and occupied.getsockname()[1]==15303,'PARTIAL_LISTENER_RECOVERY')
+    results.append({'case':'port-conflict','exitCode':code,'cleanup':closed,'occupiedFixturePreserved':True})
+finally:
+    occupied.close()
+    if process.poll() is None:process.kill();process.wait()
+
+directory,process=start('relay-parent-killed');clients=[]
+try:
+    wait_ready(directory,process)
+    opener=urllib.request.build_opener(urllib.request.ProxyHandler({}))
+    for url in ('http://127.0.0.1:15303/$/ping','http://127.0.0.1:15900/health/ready'):
+        with opener.open(url,timeout=10) as response:rt.require(response.status==200,'ACTUAL_INGRESS_HTTP')
+    # Wait for those two requests to release their remote reservations before capacity test.
+    deadline=time.monotonic()+10
+    while time.monotonic()<deadline:
+        r=rows(directory)
+        if len([x for x in r if x['event']=='exec_exited'])==2:break
+        time.sleep(.1)
+    for _ in range(rt.INGRESS_LIMIT):clients.append(socket.create_connection(('127.0.0.1',15432),timeout=2))
+    deadline=time.monotonic()+20
+    while time.monotonic()<deadline:
+        if len([x for x in rows(directory) if x['event']=='remote_pids'])==rt.INGRESS_LIMIT+2:break
+        time.sleep(.1)
+    else:raise ValueError('CAPACITY_CONNECTIONS_NOT_STARTED')
+    extra=socket.create_connection(('127.0.0.1',15432),timeout=2);extra.settimeout(2)
+    try:
+        try:refused=extra.recv(1)==b''
+        except ConnectionResetError:refused=True
+        rt.require(refused,'CAPACITY_NOT_REFUSED')
+    finally:extra.close()
+    os.kill(process.pid,signal.SIGKILL);code=process.wait(timeout=5)
+    for client in clients:client.close()
+    closed=rt.stop_ingress(m,'modules',evidence_directory=directory)
+    rt.require(len(closed['execExits'])==rt.INGRESS_LIMIT+2 and all(not x['running'] for x in closed['execExits']),'PARENT_KILL_EXEC_CLOSURE')
+    results.append({'case':'capacity-and-parent-kill','exitCode':code,'capacity':rt.INGRESS_LIMIT,'cleanup':closed})
+finally:
+    for client in clients:client.close()
+    if process.poll() is None:process.terminate();process.wait(timeout=15)
+
+directory,process=start('relay-target-stopped')
+try:
+    wait_ready(directory,process)
+    ident=rt.runtime_value(m)['containerIds']['fuseki'];rt.inspect_owned(m,ident,'fuseki')
+    rt.docker(m,['stop','--time','10',ident])
+    process.terminate();code=process.wait(timeout=15)
+    closed=rt.stop_ingress(m,'modules',evidence_directory=directory)
+    rt.require(code==0 and closed['portsReleased']==[15432,15303,15900],'TARGET_STOP_PREVENTED_CLEANUP')
+    results.append({'case':'target-already-stopped','targetId':ident,'exitCode':code,'cleanup':closed})
+finally:
+    if process.poll() is None:process.kill();process.wait()
+
+rt.write_json(A/'relay-daemon-diagnostic-result.json',{'status':'TARGETED_PASS_ONLY','runtimeSha256':rt.digest((rt.HERE/'runtime.py').read_bytes()),'driverSha256':rt.digest(Path(__file__).read_bytes()),'cases':results})
+print('DAEMON_PORT_CAPACITY_PARENT_KILL_TARGET_STOP_PASS')

@@ -59,3 +59,8 @@ Run10 / T636c7b46924f8e09d98cd915fa9dcb7cb226ffbe：R2及独立后验PASS，PREF
 
 
 Run11 / Tbf7fb4719a1ec7084076c7f7ff16c3ddf43f5269：R2及独立后验PASS，27套SelfTest、35任务测试、完整native/Web通过；780总/344PASS/436SKIP/0FAIL，Web379。I01 PARTIAL，436夹具跳过仍0关闭。I05真实生成链及6负例PASS；I03四启动拒绝及六实际DI图PASS，正例未闭合。I02创建三模块容器后因Docker Desktop bind Source带/host_mnt前缀触发PATH_BOUNDARY，尚未模块迁移或测试；精确7资源实际回收及独立后验PASS。任务检查现按实际Compose声明精确接受native或对应Desktop映射，36测试与已保存实际Mounts重放通过，并补RustFS有界就绪等待；URLError底层原因未验证。须新T/Run完整门禁；旧结果不移用，无新V3/main/M2。详情见b-continue-20261104-11。
+
+
+Run12 / T0ed73cf1a82f73ee3e2be455c431fea1fa978685 在prepare_nuget前误调用R2，被PATH_MISSING拒绝，未启动Restore；原回执保留。相同T的新Run13完成私有依赖准备、R1/R2独立审查、完整严格离线Restore及I01全工程（27套SelfTest376.75秒、36任务测试、native/Web exit0、780总344PASS436SKIP0FAIL、Web379）。I05真实生成链/6负例通过，I03拒绝及注册图部分通过。I02挂载审计已通过，但internal-only网络不发布宿主端口，HTTP_READY_TIMEOUT；容器内Fuseki/RustFS健康200，模块尚未执行，436skip仍0闭合。
+
+本轮仅任务runtime/closeout/migration适配器及tests补精确loopback ingress：固定本机Engine Unix API、准确完整容器ID/Task/Run/镜像/同Run internal网络与IP、低权限Perl透明TCP，32连接、120秒连接期限和4小时进程期限；生产调用路径未改变，未增加网络/镜像/依赖。2MiB真实传输曾发现stdout/stderr跨流EOF乱序，修复后定向通过；真实daemon v3端口冲突/容量/父SIGKILL外部回收/目标已停止回收通过，远端deadline124与子SIGKILL137传播通过。42任务测试及最终19driver独立Review PASS，详见Run13/relay-final-inputs.json。必须再冻结新T/Run完成全流程，不能移用旧T的产品结果；无新V3/main/M2。

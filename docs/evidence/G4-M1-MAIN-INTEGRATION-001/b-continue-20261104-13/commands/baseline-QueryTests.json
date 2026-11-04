@@ -1,0 +1,36 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-13",
+  "testedCommit": "0ed73cf1a82f73ee3e2be455c431fea1fa978685",
+  "command": [
+    "/usr/bin/sandbox-exec",
+    "-p",
+    "(version 1) (allow default) (deny network-outbound (remote ip \"*:*\")) (allow network-outbound (remote ip \"localhost:*\"))",
+    "/usr/local/share/dotnet/dotnet",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll",
+    "--minimum-expected-tests",
+    "1",
+    "--no-ansi",
+    "--output",
+    "Detailed",
+    "--results-directory",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-13/test-results/baseline-QueryTests"
+  ],
+  "startedAtUtc": "2026-11-04T17:23:47.472957+00:00",
+  "endedAtUtc": "2026-11-04T17:23:47.786054+00:00",
+  "elapsedSeconds": 0.3131062499996915,
+  "exitCode": 0,
+  "timingStatus": "OBSERVED",
+  "timedOut": false,
+  "executedInputDrift": false,
+  "inputHashes": {
+    "/usr/bin/sandbox-exec": "58839ef01b4eef8aac0d2aa8f9d1c074ae45aafe3533965b030672450064acc8",
+    "/usr/local/share/dotnet/dotnet": "11b517e7b00d0efa20e9b3ab6fe433f135d828a4c95c9c6ca7a9cf1328b6ada4",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll": "fa459d07815a965e6d4c875eb694fb41a14460510b998eede468ab653987c1f0"
+  },
+  "manifestSha256": "e5da40a6db9c478750a1d135cdfccaac1caabe4cc5b4543748f75f78f8b3c5d2",
+  "commandSha256": "f4d463afe8e9557397867041c403a522cec7caa5f79c0ea2af067370107bc37e",
+  "logSha256": "87003df1b21038f38c4c99692bda330a087abb46d8b8c9ae72371cb721ade851",
+  "logBytes": 6817,
+  "logVisibility": "TASK_EVIDENCE"
+}

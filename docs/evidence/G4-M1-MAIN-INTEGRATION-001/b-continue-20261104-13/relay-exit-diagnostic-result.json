@@ -1,0 +1,31 @@
+{
+  "status": "TARGETED_PASS_ONLY",
+  "runtimeSha256": "05b7fd548dae8d7bd095451e6780368c9404f810859db0e8badad84131ecdbea",
+  "driverSha256": "68854aabeb36c8858eb146711fe8ef52b2debfebbf035ae11fc751bff4835378",
+  "beforeStart": {
+    "event": "before_start",
+    "execId": "0e5c0903ee7853bc9a1c1ee0af7546125dcea5c5810d4c9a2ecc44a9b6d4f4bf",
+    "running": false,
+    "exitCode": null,
+    "pid": 0
+  },
+  "cases": [
+    {
+      "execId": "0e5c0903ee7853bc9a1c1ee0af7546125dcea5c5810d4c9a2ecc44a9b6d4f4bf",
+      "containerId": "2368a53f893d9fe0f89a5e968a7573b66bf27593f0e62dca9faf92b9a6abd61d",
+      "running": false,
+      "exitCode": 124,
+      "case": "remote-two-second-deadline",
+      "elapsedSeconds": 2.028614082999411,
+      "control": "PIDS 11005 11012\n"
+    },
+    {
+      "execId": "ae60e28ca3ec3896be7b063c71a66d311c905a2d0250ce4f6aefa4643b307812",
+      "containerId": "2368a53f893d9fe0f89a5e968a7573b66bf27593f0e62dca9faf92b9a6abd61d",
+      "running": false,
+      "exitCode": 137,
+      "case": "child-sigkill-propagates",
+      "containerChildPid": 11034
+    }
+  ]
+}

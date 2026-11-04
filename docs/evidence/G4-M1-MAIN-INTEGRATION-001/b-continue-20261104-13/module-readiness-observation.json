@@ -1,0 +1,54 @@
+[
+  {
+    "service": "fuseki",
+    "url": "http://127.0.0.1:15303/$/ping",
+    "error": "URLError",
+    "reasonClass": "ConnectionRefusedError",
+    "errno": 61,
+    "elapsedSeconds": 0.0013811249991704244,
+    "containerId": "2992e9bd93f95c074b08e0fdd46e32cfb162a199942c3b097ae283fc02c18fce",
+    "state": {
+      "Running": true,
+      "Paused": false,
+      "Restarting": false,
+      "ExitCode": 0
+    },
+    "portBindings": {
+      "3030/tcp": [
+        {
+          "HostIp": "127.0.0.1",
+          "HostPort": "15303"
+        }
+      ]
+    },
+    "publishedPorts": {
+      "3030/tcp": []
+    }
+  },
+  {
+    "service": "rustfs",
+    "url": "http://127.0.0.1:15900/health/ready",
+    "error": "URLError",
+    "reasonClass": "ConnectionRefusedError",
+    "errno": 61,
+    "elapsedSeconds": 0.00010145900159841403,
+    "containerId": "98bcd0b894d0ca153728a809ab1af7b208daef9305780330d448b82adaec27a5",
+    "state": {
+      "Running": true,
+      "Paused": false,
+      "Restarting": false,
+      "ExitCode": 0
+    },
+    "portBindings": {
+      "9000/tcp": [
+        {
+          "HostIp": "127.0.0.1",
+          "HostPort": "15900"
+        }
+      ]
+    },
+    "publishedPorts": {
+      "9000/tcp": []
+    }
+  }
+]

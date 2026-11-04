@@ -1,0 +1,74 @@
+"""Bounded task exec deadline and child-failure evidence, not product acceptance."""
+import asyncio,json,sys,uuid,time
+from pathlib import Path
+W=Path('/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform')
+sys.path.insert(0,str(W/'experiments/g4-m1-main-integration'))
+import runtime as rt
+A=rt.ARTIFACTS/'b-continue-20261104-13';p=A/'resource-manifest.json'
+m=json.loads(p.read_text());m.update(_path=str(p),_head=m['testedCommit'],_sha256=rt.digest(p.read_bytes()))
+FIXTURE=r'''use strict;use warnings;use Socket;my($token)=@ARGV;
+$SIG{ALRM}=sub{exit(124)};alarm(20);
+socket(my $server,PF_INET,SOCK_STREAM,0) or die "SOCKET";setsockopt($server,SOL_SOCKET,SO_REUSEADDR,pack('l',1));
+bind($server,sockaddr_in(9000,inet_aton('127.0.0.1'))) or die "BIND";listen($server,1);print STDERR "READY $$\n";
+accept(my $client,$server);close $server;shutdown($client,1);while(sysread($client,my $buf,65536)){}close $client;exit(0);
+'''
+KILL_CHILD=r'''use strict;use warnings;my($pid,$token)=@ARGV;die "ARGS" unless $pid=~/^\d+$/ && $token=~/^g4-relay-[a-z0-9-]+$/;
+open my $f,'<',"/proc/$pid/cmdline" or die "MISSING";local $/;my $raw=<$f>;close $f;
+my @args=split(/\0/,$raw);die "OWNER" unless $args[0] eq 'perl' && $args[1] eq '-e' && grep {$_ eq $token} @args;
+kill 'KILL',$pid or die "SIGNAL";print "KILLED $pid";
+'''
+
+async def main():
+    engine=rt.TaskEngine(m);broker=rt.runtime_value(m)['containerIds']['platform-pg'];engine.owned(broker,'platform-pg')
+    events=[];tokens=set();pipes=[];rows=[]
+    def event(kind,**v):events.append({'event':kind,**v})
+    async def create(command):
+        value=await engine.async_request('POST','/containers/'+broker+'/exec',{'AttachStdin':True,'AttachStdout':True,'AttachStderr':True,'Tty':False,'Privileged':False,'User':'999:999','Cmd':command})
+        ident=value['Id'];engine.created_execs.add(ident);event('exec_created',execId=ident,commandSha256=rt.digest(json.dumps(command).encode()));return ident
+    async def frames(reader):
+        output=b'';control=b''
+        while True:
+            try:header=await asyncio.wait_for(reader.readexactly(8),8)
+            except asyncio.IncompleteReadError as error:rt.require(not error.partial,'FRAME');break
+            stream,size=rt.engine_frame_header(header);data=await reader.readexactly(size)
+            if stream==1:output+=data
+            else:control+=data
+        return output,control
+    async def finished(ident,expected):
+        for _ in range(50):
+            value=await engine.async_request('GET','/exec/'+ident+'/json')
+            if not value['Running'] and value['ExitCode'] is not None:break
+            await asyncio.sleep(.1)
+        rt.require(value['ContainerID']==broker and not value['Running'] and value['ExitCode']==expected,'EXIT_CODE_DRIFT')
+        return {'execId':ident,'containerId':broker,'running':False,'exitCode':value['ExitCode']}
+    try:
+        token='g4-relay-'+m['runId']+'-'+uuid.uuid4().hex;tokens.add(token)
+        ident=await create(['perl','-e',rt.RELAY_PERL,'127.0.0.1','5432',token,'2'])
+        before=await engine.async_request('GET','/exec/'+ident+'/json')
+        event('before_start',execId=ident,running=before['Running'],exitCode=before['ExitCode'],pid=before['Pid'])
+        reader,writer=await engine.attach(ident);pipes.append(writer);start=time.monotonic()
+        output,control=await frames(reader);elapsed=time.monotonic()-start
+        result=await finished(ident,124);result.update(case='remote-two-second-deadline',elapsedSeconds=elapsed,control=control.decode());rows.append(result)
+        rt.require(1.5<=elapsed<5 and not output,'DEADLINE_NOT_BOUNDED')
+
+        fixture_token='g4-relay-'+m['runId']+'-'+uuid.uuid4().hex;tokens.add(fixture_token)
+        fixture=await create(['perl','-e',FIXTURE,fixture_token]);fr,fw=await engine.attach(fixture);pipes.append(fw)
+        stream,size=rt.engine_frame_header(await fr.readexactly(8));rt.require(stream==2 and (await fr.readexactly(size)).startswith(b'READY '),'FIXTURE_READY')
+        token='g4-relay-'+m['runId']+'-'+uuid.uuid4().hex;tokens.add(token)
+        ident=await create(['perl','-e',rt.RELAY_PERL,'127.0.0.1','9000',token,'120']);reader,writer=await engine.attach(ident);pipes.append(writer)
+        control=b''
+        while b'OUTPUT_EOF 0\n' not in control:
+            stream,size=rt.engine_frame_header(await asyncio.wait_for(reader.readexactly(8),5));data=await reader.readexactly(size);rt.require(stream==2,'UNEXPECTED_PAYLOAD');control+=data
+        pidline=next(line for line in control.splitlines() if line.startswith(b'PIDS '));child=int(pidline.split()[2])
+        killer=await create(['perl','-e',KILL_CHILD,str(child),token]);kr,kw=await engine.attach(killer);pipes.append(kw);kw.write_eof();kill_out,_=await frames(kr)
+        rt.require(kill_out==('KILLED '+str(child)).encode(),'EXACT_CHILD_SIGNAL');await finished(killer,0)
+        await frames(reader);result=await finished(ident,137);result.update(case='child-sigkill-propagates',containerChildPid=child);rows.append(result)
+        await frames(fr);await finished(fixture,0)
+        rt.write_json(A/'relay-exit-diagnostic-result.json',{'status':'TARGETED_PASS_ONLY','runtimeSha256':rt.digest((rt.HERE/'runtime.py').read_bytes()),'driverSha256':rt.digest(Path(__file__).read_bytes()),'beforeStart':events[1],'cases':rows})
+        print('REMOTE_DEADLINE_AND_CHILD_FAILURE_PASS')
+    finally:
+        for writer in pipes:writer.close();await writer.wait_closed()
+        await engine.reap(broker,tokens,event)
+        rt.write_json(A/'relay-exit-diagnostic-cleanup.json',events)
+
+asyncio.run(main())

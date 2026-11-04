@@ -1,0 +1,112 @@
+[
+  {
+    "path": "/v1.56/containers/2368a53f893d9fe0f89a5e968a7573b66bf27593f0e62dca9faf92b9a6abd61d/json?size=false",
+    "status": 200,
+    "elapsedSeconds": 3.0086399169995275,
+    "bytes": 8538
+  },
+  {
+    "path": "/v1.56/containers/json?all=1&filters=%7B%22id%22%3A%5B%2298bcd0b894d0ca153728a809ab1af7b208daef9305780330d448b82adaec27a5%22%2C%222368a53f893d9fe0f89a5e968a7573b66bf27593f0e62dca9faf92b9a6abd61d%22%2C%222992e9bd93f95c074b08e0fdd46e32cfb162a199942c3b097ae283fc02c18fce%22%5D%7D",
+    "status": 200,
+    "elapsedSeconds": 0.01716649999798392,
+    "bytes": 12489,
+    "selected": [
+      {
+        "Id": "98bcd0b894d0ca153728a809ab1af7b208daef9305780330d448b82adaec27a5",
+        "Image": "rustfs/rustfs@sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+        "ImageID": "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+        "State": "running",
+        "HostConfig": {
+          "NetworkMode": "ontology-g4-main-b-continue-20261104-13_front"
+        },
+        "NetworkSettings": {
+          "Networks": {
+            "ontology-g4-main-b-continue-20261104-13_front": {
+              "IPAMConfig": null,
+              "Links": null,
+              "Aliases": null,
+              "DriverOpts": null,
+              "GwPriority": 0,
+              "NetworkID": "a495d7c9da690184c367815f6aad459b5e3a0e54db0fe92730d4226d8661dd0c",
+              "EndpointID": "a84ea24d92a58cb6236b6699bf2f5f6cee950444e7a0f447653c9ebc073d195f",
+              "Gateway": "",
+              "IPAddress": "172.18.0.4",
+              "MacAddress": "5e:2b:dd:7c:8d:99",
+              "IPPrefixLen": 16,
+              "IPv6Gateway": "",
+              "GlobalIPv6Address": "",
+              "GlobalIPv6PrefixLen": 0,
+              "DNSNames": null
+            }
+          }
+        }
+      },
+      {
+        "Id": "2368a53f893d9fe0f89a5e968a7573b66bf27593f0e62dca9faf92b9a6abd61d",
+        "Image": "postgres@sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+        "ImageID": "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+        "State": "running",
+        "HostConfig": {
+          "NetworkMode": "ontology-g4-main-b-continue-20261104-13_front"
+        },
+        "NetworkSettings": {
+          "Networks": {
+            "ontology-g4-main-b-continue-20261104-13_front": {
+              "IPAMConfig": null,
+              "Links": null,
+              "Aliases": null,
+              "DriverOpts": null,
+              "GwPriority": 0,
+              "NetworkID": "a495d7c9da690184c367815f6aad459b5e3a0e54db0fe92730d4226d8661dd0c",
+              "EndpointID": "d4313aaf125905261483d4557fb1326f2a4afe332fb8ecedddd4d59f03f85976",
+              "Gateway": "",
+              "IPAddress": "172.18.0.2",
+              "MacAddress": "3a:e8:2b:b1:4b:5a",
+              "IPPrefixLen": 16,
+              "IPv6Gateway": "",
+              "GlobalIPv6Address": "",
+              "GlobalIPv6PrefixLen": 0,
+              "DNSNames": null
+            }
+          }
+        }
+      },
+      {
+        "Id": "2992e9bd93f95c074b08e0fdd46e32cfb162a199942c3b097ae283fc02c18fce",
+        "Image": "sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c",
+        "ImageID": "sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c",
+        "State": "running",
+        "HostConfig": {
+          "NetworkMode": "ontology-g4-main-b-continue-20261104-13_front"
+        },
+        "NetworkSettings": {
+          "Networks": {
+            "ontology-g4-main-b-continue-20261104-13_front": {
+              "IPAMConfig": null,
+              "Links": null,
+              "Aliases": null,
+              "DriverOpts": null,
+              "GwPriority": 0,
+              "NetworkID": "a495d7c9da690184c367815f6aad459b5e3a0e54db0fe92730d4226d8661dd0c",
+              "EndpointID": "23ab610108e6ea47aa0bfb6f2a8419ce9130e108189451548fb4b4f52ac3c3b7",
+              "Gateway": "",
+              "IPAddress": "172.18.0.3",
+              "MacAddress": "3a:30:a0:22:84:2e",
+              "IPPrefixLen": 16,
+              "IPv6Gateway": "",
+              "GlobalIPv6Address": "",
+              "GlobalIPv6PrefixLen": 0,
+              "DNSNames": null
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "path": "/_ping",
+    "status": 200,
+    "elapsedSeconds": 0.0017492910010332707,
+    "bytes": 2
+  }
+]

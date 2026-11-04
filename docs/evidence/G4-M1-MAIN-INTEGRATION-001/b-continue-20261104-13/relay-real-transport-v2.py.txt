@@ -1,0 +1,74 @@
+"""Exact bounded diagnostic fixture; not a product gate or stable-T acceptance."""
+import asyncio,json,sys,uuid,time
+from pathlib import Path
+W=Path('/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform')
+sys.path.insert(0,str(W/'experiments/g4-m1-main-integration'))
+import runtime as rt
+A=rt.ARTIFACTS/'b-continue-20261104-13'
+p=A/'resource-manifest.json';m=json.loads(p.read_text());m.update(_path=str(p),_head=m['testedCommit'],_sha256=rt.digest(p.read_bytes()))
+# A temporary socket only in this task container's loopback namespace; no host publication.
+FIXTURE=r'''use strict;use warnings;use Socket;
+my($token)=@ARGV;die "TOKEN" unless $token=~/^g4-relay-[a-z0-9-]+$/;
+$SIG{ALRM}=sub{exit(124)};alarm(30);$SIG{PIPE}='IGNORE';
+socket(my $server,PF_INET,SOCK_STREAM,0) or die "SOCKET";
+setsockopt($server,SOL_SOCKET,SO_REUSEADDR,pack('l',1));
+bind($server,sockaddr_in(9000,inet_aton('127.0.0.1'))) or die "BIND";
+listen($server,1) or die "LISTEN";print STDERR "READY $$\n";
+accept(my $client,$server) or die "ACCEPT";close $server;
+syswrite($client,"greeting\0");
+while(1){my $n=sysread($client,my $buf,65536);die "READ" unless defined $n;last unless $n;
+ my $offset=0;while($offset<$n){my $w=syswrite($client,$buf,$n-$offset,$offset);die "WRITE" unless $w;$offset+=$w;}}
+syswrite($client,"after-eof\0");shutdown($client,1);close $client;exit(0);
+'''
+
+async def main():
+    engine=rt.TaskEngine(m);routes=rt.ingress_routes(m,engine,'modules');broker=routes[0]['brokerId']
+    tokens=['g4-relay-'+m['runId']+'-'+uuid.uuid4().hex for _ in range(2)]
+    events=[];execs=[];pipes=[];servers=[];jobs=[];start=time.monotonic()
+    def event(kind,**value):
+        row={'event':kind,**value};events.append(row)
+        with (A/'relay-real-transport-v2-events.jsonl').open('a') as f:f.write(json.dumps(row)+'\n');f.flush()
+    # Independent fixture creation: exact program/IP/port/deadline, same nonprivileged user.
+    def fixture_exec(command):
+        engine.owned(broker,'platform-pg')
+        result=engine.request('POST','/containers/'+broker+'/exec',{'AttachStdin':True,'AttachStdout':True,'AttachStderr':True,'Tty':False,'Privileged':False,'User':'999:999','Cmd':command})
+        ident=result['Id'];engine.created_execs.add(ident);execs.append(ident);event('created',execId=ident);return ident
+    try:
+        fixture=fixture_exec(['perl','-e',FIXTURE,tokens[0]])
+        fr,fw=await engine.attach(fixture);pipes.append(fw)
+        stream,size=rt.engine_frame_header(await asyncio.wait_for(fr.readexactly(8),5));ready=await fr.readexactly(size)
+        rt.require(stream==2 and ready.startswith(b'READY '),'FIXTURE_NOT_READY');event('fixture_ready',pid=int(ready.split()[1]))
+        # Exercise the actual frozen Perl byte program independently of route policy.
+        relay=fixture_exec(['perl','-e',rt.RELAY_PERL,'127.0.0.1','9000',tokens[1],'120'])
+        er,ew=await engine.attach(relay);pipes.append(ew)
+        async def bridge(reader,writer):
+            try:await rt.relay_copy(reader,writer,er,ew,lambda pids:event('remote_pids',pids=pids))
+            finally:writer.close();await writer.wait_closed()
+        server=await asyncio.start_server(lambda r,w:jobs.append(asyncio.create_task(bridge(r,w))),'127.0.0.1',0);servers.append(server)
+        port=server.sockets[0].getsockname()[1];event('loopback_fixture_listener',port=port)
+        reader,writer=await asyncio.open_connection('127.0.0.1',port)
+        rt.require(await asyncio.wait_for(reader.readexactly(9),5)==b'greeting\0','DUPLEX_GREETING')
+        payload=bytes(range(256))*8192
+        async def send():
+            for offset in range(0,len(payload),65536):writer.write(payload[offset:offset+65536]);await writer.drain()
+            writer.write_eof()
+        async def receive():
+            result=bytearray()
+            while data:=await reader.read(16384):result.extend(data);await asyncio.sleep(.001)
+            return bytes(result)
+        _,received=await asyncio.wait_for(asyncio.gather(send(),receive()),20)
+        rt.require(received==payload+b'after-eof\0','BINARY_OR_HALF_CLOSE_DRIFT')
+        writer.close();await writer.wait_closed();await asyncio.gather(*jobs)
+        await asyncio.sleep(.2);exits=[]
+        for ident in execs:
+            value=engine.request('GET','/exec/'+ident+'/json');rt.require(value['ContainerID']==broker and value['Running'] is False and value['ExitCode']==0,'EXEC_EXIT')
+            exits.append({'execId':ident,'containerId':broker,'running':False,'exitCode':value['ExitCode']})
+        rt.write_json(A/'relay-real-transport-v2-result.json',{'status':'TARGETED_PASS_ONLY','bytes':len(payload),'payloadSha256':rt.digest(payload),'returnedSha256':rt.digest(received),'elapsedSeconds':time.monotonic()-start,'execs':exits,'runtimeSha256':rt.digest((rt.HERE/'runtime.py').read_bytes()),'fixtureDriverSha256':rt.digest(Path(__file__).read_bytes())})
+        print('ACTUAL_BINARY_DUPLEX_HALF_CLOSE_PASS')
+    finally:
+        for server in servers:server.close();await server.wait_closed()
+        for writer in pipes:writer.close();await writer.wait_closed()
+        await engine.reap(broker,set(tokens),event)
+        rt.write_json(A/'relay-real-transport-v2-cleanup.json',{'events':events,'portsClosed':True})
+
+asyncio.run(main())

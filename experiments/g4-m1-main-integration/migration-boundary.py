@@ -58,6 +58,7 @@ def verify_all(m):
     rt.require(platform_sql(m,"SELECT count(*) FROM pg_namespace WHERE nspname='connections';")=='0','G4_DISABLED_MIGRATED')
     before_resources=closeout.inventory(m)
     rt.write_json(rt.ARTIFACTS/m['runId']/'migration-g3-before.json',{'rows':before,'resources':before_resources})
+    ingress_before=rt.stop_ingress(m,'g3')
     # 先回收4个已登记服务，保留本轮PG、OIDC和其合成卷；最大仍5容器。
     for service in ('web','api','fuseki','rustfs'):
         ident=r['containerIds'][service];rt.inspect_owned(m,ident,service)
@@ -70,6 +71,8 @@ def verify_all(m):
         rt.write_json(rt.ARTIFACTS/m['runId']/'resources-m1-owned.json',closeout.inventory(m))
         rt.resource_snapshot(m,'m1','resources-m1-created')
     rt.wait_pg(m)
+    rt.start_ingress(m,'m1')
+    rt.write_json(rt.ARTIFACTS/m['runId']/'migration-ingress-transition.json',{'g3Closed':ingress_before,'m1ReadySha256':rt.digest((rt.ARTIFACTS/m['runId']/'ingress-m1-ready.json').read_bytes())})
     source_before=readback.snapshot(m,'migration-source-before',source=True)
     rt.require(source_before[2]['rows']==['0'],'SOURCE_PLATFORM_SCHEMA')
     rt.configure_api(m,'m1',apply=False)
