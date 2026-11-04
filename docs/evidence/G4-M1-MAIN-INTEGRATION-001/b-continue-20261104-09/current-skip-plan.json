@@ -1,0 +1,5680 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-09",
+  "testedCommit": "43f18e80d769bc0eea6373cbd40252e988fa6233",
+  "rawLogSha256": "925afd5c8987f0f094efc1a91081f5eb7a2ac233d8d5843b0c1c07d78ece0276",
+  "historical": 260,
+  "current": 436,
+  "closed": 0,
+  "cases": [
+    {
+      "project": "G2ContractTests",
+      "case": "CompatibilityBinaryReadsActualV2Manifest",
+      "reason": "Assert.Inconclusive。 真实主栈尚未导出V2清单；该项由g3-compatibility单独强制执行。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.G2ContractTests/G3ManifestContractTests.cs",
+        "line": 13
+      },
+      "rawLogLine": 38,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "QueryTests",
+      "case": "DescriptionUsesPublishedSchemaAndRegistry",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.QueryTests/GatewayTests.cs",
+        "line": 14
+      },
+      "rawLogLine": 50,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "QueryTests",
+      "case": "FoundEvidenceSurvivesNewServiceInstance",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.QueryTests/GatewayTests.cs",
+        "line": 31
+      },
+      "rawLogLine": 53,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "QueryTests",
+      "case": "AmbiguousIdentityIsNeverStringJoined",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.QueryTests/GatewayTests.cs",
+        "line": 55
+      },
+      "rawLogLine": 56,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "QueryTests",
+      "case": "MissingEntityIsEmpty",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.QueryTests/GatewayTests.cs",
+        "line": 75
+      },
+      "rawLogLine": 59,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "QueryTests",
+      "case": "TraversalPreservesManyToManyAndBudget",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.QueryTests/GatewayTests.cs",
+        "line": 90
+      },
+      "rawLogLine": 62,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "QueryTests",
+      "case": "MissingProvenanceIsPartial",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.QueryTests/GatewayTests.cs",
+        "line": 113
+      },
+      "rawLogLine": 65,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "QueryTests",
+      "case": "ExplicitOutOfScopeEntityIsUnauthorized",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.QueryTests/GatewayTests.cs",
+        "line": 131
+      },
+      "rawLogLine": 68,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "QueryTests",
+      "case": "EvidenceIsReauthorizedAndIdsCannotChooseObjects",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.QueryTests/GatewayTests.cs",
+        "line": 147
+      },
+      "rawLogLine": 71,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "QueryTests",
+      "case": "InvalidPlansAreRejected",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.QueryTests/GatewayTests.cs",
+        "line": 165
+      },
+      "rawLogLine": 74,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "QueryTests",
+      "case": "AbsentReleaseAndRoleAreExplicitErrors",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.QueryTests/GatewayTests.cs",
+        "line": 183
+      },
+      "rawLogLine": 77,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "QueryTests",
+      "case": "DependencyFailureAfterSnapshotIsUnavailableAndRecoverable",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.QueryTests/QueryFaultTests.cs",
+        "line": 14
+      },
+      "rawLogLine": 80,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "QueryTests",
+      "case": "CorruptedSourceHashFailsQueryAndEvidence",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.QueryTests/QueryFaultTests.cs",
+        "line": 33
+      },
+      "rawLogLine": 83,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "QueryTests",
+      "case": "ChangedOrMissingGraphIsUnavailable (False)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.QueryTests/QueryFaultTests.cs",
+        "line": 63
+      },
+      "rawLogLine": 86,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "QueryTests",
+      "case": "ChangedOrMissingGraphIsUnavailable (True)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.QueryTests/QueryFaultTests.cs",
+        "line": 63
+      },
+      "rawLogLine": 89,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "QueryTests",
+      "case": "CancellationAndBudgetReachDependency",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.QueryTests/QueryFaultTests.cs",
+        "line": 87
+      },
+      "rawLogLine": 92,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "QueryTests",
+      "case": "ConcurrentActivationCannotChangeRequestSnapshot",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.QueryTests/QueryFaultTests.cs",
+        "line": 119
+      },
+      "rawLogLine": 95,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "QueryTests",
+      "case": "QueryAndEvidenceCommitIndependentAudit",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.QueryTests/QueryFaultTests.cs",
+        "line": 149
+      },
+      "rawLogLine": 98,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "QueryTests",
+      "case": "ReverseLineageUsesActualEdges",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.QueryTests/QueryFaultTests.cs",
+        "line": 165
+      },
+      "rawLogLine": 101,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "QueryTests",
+      "case": "CrossSiteEdgesAndMissingRelationshipsDoNotInventFacts",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.QueryTests/QueryFaultTests.cs",
+        "line": 178
+      },
+      "rawLogLine": 104,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "QueryTests",
+      "case": "DeclaredScopeIsAuthorizedBeforeExternalReads",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.QueryTests/QueryFaultTests.cs",
+        "line": 201
+      },
+      "rawLogLine": 107,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "QueryTests",
+      "case": "DepthBudgetReportsIncompleteGraph",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.QueryTests/QueryFaultTests.cs",
+        "line": 217
+      },
+      "rawLogLine": 110,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "QueryTests",
+      "case": "AuditFailureIsUnavailableAndRecovers",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.QueryTests/QueryFaultTests.cs",
+        "line": 232
+      },
+      "rawLogLine": 113,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "QueryTests",
+      "case": "QueryRouteMatchesFrozenContract",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.QueryTests/QueryHttpTests.cs",
+        "line": 33
+      },
+      "rawLogLine": 116,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "QueryTests",
+      "case": "QueryPostRequiresNativeCsrf (null)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.QueryTests/QueryHttpTests.cs",
+        "line": 49
+      },
+      "rawLogLine": 119,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "QueryTests",
+      "case": "QueryPostRequiresNativeCsrf (\"synthetic-forged-csrf\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.QueryTests/QueryHttpTests.cs",
+        "line": 49
+      },
+      "rawLogLine": 122,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "QueryTests",
+      "case": "QueryPostRequiresExactOrigin (\"https://external.invalid\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.QueryTests/QueryHttpTests.cs",
+        "line": 70
+      },
+      "rawLogLine": 125,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "QueryTests",
+      "case": "QueryPostRequiresExactOrigin (\"http://platform.test/path\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.QueryTests/QueryHttpTests.cs",
+        "line": 70
+      },
+      "rawLogLine": 128,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "QueryTests",
+      "case": "QueryPostRequiresExactOrigin (\"null\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.QueryTests/QueryHttpTests.cs",
+        "line": 70
+      },
+      "rawLogLine": 131,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "QueryTests",
+      "case": "AuthenticationAndAuthorizationPrecedeBodyBinding (null,401)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.QueryTests/QueryHttpTests.cs",
+        "line": 91
+      },
+      "rawLogLine": 134,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "QueryTests",
+      "case": "AuthenticationAndAuthorizationPrecedeBodyBinding (\"unapproved-role\",403)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.QueryTests/QueryHttpTests.cs",
+        "line": 91
+      },
+      "rawLogLine": 137,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "QueryTests",
+      "case": "QueryEndpointsDeclareAuthorizationAndProblems",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.QueryTests/QueryHttpTests.cs",
+        "line": 108
+      },
+      "rawLogLine": 140,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "QueryTests",
+      "case": "ValidQueryPostReturnsRealPublishedResult",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.QueryTests/QueryHttpTests.cs",
+        "line": 126
+      },
+      "rawLogLine": 143,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "QueryTests",
+      "case": "TimeoutMinimumMatchesFrozenContract (99,422)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.QueryTests/ReviewRegressionTests.cs",
+        "line": 17
+      },
+      "rawLogLine": 146,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "QueryTests",
+      "case": "TimeoutMinimumMatchesFrozenContract (100,404)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.QueryTests/ReviewRegressionTests.cs",
+        "line": 17
+      },
+      "rawLogLine": 149,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "QueryTests",
+      "case": "QueryRejectsGraphChangedAfterCatalogVerification",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.QueryTests/ReviewRegressionTests.cs",
+        "line": 32
+      },
+      "rawLogLine": 152,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "QueryTests",
+      "case": "EvidenceRejectsGraphChangedAfterCatalogVerification",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.QueryTests/ReviewRegressionTests.cs",
+        "line": 49
+      },
+      "rawLogLine": 155,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "QueryTests",
+      "case": "SuccessfulAuditCannotOutliveQueryBudget",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.QueryTests/ReviewRegressionTests.cs",
+        "line": 66
+      },
+      "rawLogLine": 158,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "QueryTests",
+      "case": "FailureAuditIsBoundedAndNotHidden",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.QueryTests/ReviewRegressionTests.cs",
+        "line": 91
+      },
+      "rawLogLine": 161,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "QueryTests",
+      "case": "CallerCancellationDuringAuditPropagates",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.QueryTests/ReviewRegressionTests.cs",
+        "line": 115
+      },
+      "rawLogLine": 164,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "QueryTests",
+      "case": "UnavailableResultIsCountedOnce",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.QueryTests/ReviewRegressionTests.cs",
+        "line": 133
+      },
+      "rawLogLine": 167,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "QueryTests",
+      "case": "RestoresActualPublishedSources (True)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.QueryTests/VerifiedSourcesTests.cs",
+        "line": 16
+      },
+      "rawLogLine": 170,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "QueryTests",
+      "case": "RestoresActualPublishedSources (False)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.QueryTests/VerifiedSourcesTests.cs",
+        "line": 16
+      },
+      "rawLogLine": 173,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "QueryTests",
+      "case": "RejectsManifestSourceBindingMismatch (\"slots\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.QueryTests/VerifiedSourcesTests.cs",
+        "line": 33
+      },
+      "rawLogLine": 176,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "QueryTests",
+      "case": "RejectsManifestSourceBindingMismatch (\"snapshot\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.QueryTests/VerifiedSourcesTests.cs",
+        "line": 33
+      },
+      "rawLogLine": 179,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "QueryTests",
+      "case": "RejectsManifestSourceBindingMismatch (\"bundle\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.QueryTests/VerifiedSourcesTests.cs",
+        "line": 33
+      },
+      "rawLogLine": 182,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "QueryTests",
+      "case": "RejectsManifestSourceBindingMismatch (\"key\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.QueryTests/VerifiedSourcesTests.cs",
+        "line": 33
+      },
+      "rawLogLine": 185,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "QueryTests",
+      "case": "RejectsHashValidInvalidUtf8",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过query-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.QueryTests/VerifiedSourcesTests.cs",
+        "line": 55
+      },
+      "rawLogLine": 188,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SecurityTests",
+      "case": "SuccessfulRepeatedAndConcurrentReadsCommitExactlyOnceWithoutSelf",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 未注入本轮隔离PG连接。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SecurityTests/AuditReadTests.cs",
+        "line": 24
+      },
+      "rawLogLine": 209,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SecurityTests",
+      "case": "ScopeFilterRequiresNonemptyOrganizationAndCompleteArraySubset (\"site-a\",\"A\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 未注入本轮隔离PG连接。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SecurityTests/AuditReadTests.cs",
+        "line": 55
+      },
+      "rawLogLine": 212,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SecurityTests",
+      "case": "ScopeFilterRequiresNonemptyOrganizationAndCompleteArraySubset (\"site-b\",\"B\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 未注入本轮隔离PG连接。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SecurityTests/AuditReadTests.cs",
+        "line": 55
+      },
+      "rawLogLine": 215,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SecurityTests",
+      "case": "ScopeFilterRequiresNonemptyOrganizationAndCompleteArraySubset (\"site-a,site-b\",\"A,B,AB\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 未注入本轮隔离PG连接。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SecurityTests/AuditReadTests.cs",
+        "line": 55
+      },
+      "rawLogLine": 218,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SecurityTests",
+      "case": "EmptyResultsAndMissingScopesStillCommitReadFact (\"valid\",True)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 未注入本轮隔离PG连接。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SecurityTests/AuditReadTests.cs",
+        "line": 83
+      },
+      "rawLogLine": 221,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SecurityTests",
+      "case": "EmptyResultsAndMissingScopesStillCommitReadFact (\"valid\",False)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 未注入本轮隔离PG连接。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SecurityTests/AuditReadTests.cs",
+        "line": 83
+      },
+      "rawLogLine": 224,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SecurityTests",
+      "case": "EmptyResultsAndMissingScopesStillCommitReadFact (\"missing\",True)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 未注入本轮隔离PG连接。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SecurityTests/AuditReadTests.cs",
+        "line": 83
+      },
+      "rawLogLine": 227,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SecurityTests",
+      "case": "EmptyResultsAndMissingScopesStillCommitReadFact (\"empty\",True)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 未注入本轮隔离PG连接。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SecurityTests/AuditReadTests.cs",
+        "line": 83
+      },
+      "rawLogLine": 230,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SecurityTests",
+      "case": "EmptyResultsAndMissingScopesStillCommitReadFact (\"blank\",True)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 未注入本轮隔离PG连接。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SecurityTests/AuditReadTests.cs",
+        "line": 83
+      },
+      "rawLogLine": 233,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SecurityTests",
+      "case": "DeniedRoleAndExpiredSessionNeverProduceSuccessfulRead",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 未注入本轮隔离PG连接。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SecurityTests/AuditReadTests.cs",
+        "line": 109
+      },
+      "rawLogLine": 236,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SecurityTests",
+      "case": "LimitAppliesAfterScopeFilterAndInvalidLimitDoesNotAuditSuccess",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 未注入本轮隔离PG连接。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SecurityTests/AuditReadTests.cs",
+        "line": 129
+      },
+      "rawLogLine": 239,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SecurityTests",
+      "case": "InsertOnlyFailureNeverReturnsSuccessOrAuditIdAndRecovers",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 未注入本轮隔离PG连接。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SecurityTests/AuditReadTests.cs",
+        "line": 161
+      },
+      "rawLogLine": 242,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SecurityTests",
+      "case": "ResourceReadAuditsTrustedFullScopeOrAuthorizedExplicitSite",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 未注入本轮隔离PG连接。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SecurityTests/AuditReadTests.cs",
+        "line": 202
+      },
+      "rawLogLine": 245,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SecurityTests",
+      "case": "ScopeMigrationPreservesLegacyAndRefusesDestructiveRollback",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 未注入本轮临时PG配置。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SecurityTests/AuditScopeMigrationTests.cs",
+        "line": 18
+      },
+      "rawLogLine": 248,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SecurityTests",
+      "case": "ConcurrentFirstScopeWriteCannotBeLostByRollback",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 未注入本轮临时PG配置。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SecurityTests/AuditScopeMigrationTests.cs",
+        "line": 110
+      },
+      "rawLogLine": 251,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SecurityTests",
+      "case": "SharedPhysicalTransactionCommitsBothAndPreservesMultisite",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 未注入本轮临时PG配置。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SecurityTests/G2AuditTransactionTests.cs",
+        "line": 19
+      },
+      "rawLogLine": 254,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SecurityTests",
+      "case": "SharedPhysicalTransactionRollsBackBoth",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 未注入本轮临时PG配置。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SecurityTests/G2AuditTransactionTests.cs",
+        "line": 48
+      },
+      "rawLogLine": 257,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SecurityTests",
+      "case": "AuditDatabaseFailureInvalidatesWholeBusinessTransaction",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 未注入本轮临时PG配置。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SecurityTests/G2AuditTransactionTests.cs",
+        "line": 67
+      },
+      "rawLogLine": 260,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SecurityTests",
+      "case": "MatchingConnectionStringDoesNotCountAsSharedTransaction",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 未注入本轮临时PG配置。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SecurityTests/G2AuditTransactionTests.cs",
+        "line": 97
+      },
+      "rawLogLine": 263,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SecurityTests",
+      "case": "InvalidConnectionPreconditionInvalidatesExistingBusinessTransaction (True)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 未注入本轮临时PG配置。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SecurityTests/G2AuditTransactionTests.cs",
+        "line": 120
+      },
+      "rawLogLine": 266,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SecurityTests",
+      "case": "InvalidConnectionPreconditionInvalidatesExistingBusinessTransaction (False)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 未注入本轮临时PG配置。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SecurityTests/G2AuditTransactionTests.cs",
+        "line": 120
+      },
+      "rawLogLine": 269,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SecurityTests",
+      "case": "StandaloneAuditCommitsBeforeReturningAndKeepsScopeSemantics",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 未注入本轮临时PG配置。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SecurityTests/G2AuditTransactionTests.cs",
+        "line": 147
+      },
+      "rawLogLine": 272,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SecurityTests",
+      "case": "HttpAuthorizationDenialPersistsAuditBefore403",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 未注入本轮临时PG配置。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SecurityTests/G2AuditTransactionTests.cs",
+        "line": 171
+      },
+      "rawLogLine": 275,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SecurityTests",
+      "case": "ActualPublishingPostsAuthorizeBeforeMalformedBindingAndPersistDenial",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 未注入本轮临时PG配置。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SecurityTests/G2PublishingAuthorizationTests.cs",
+        "line": 24
+      },
+      "rawLogLine": 278,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SecurityTests",
+      "case": "ActualPublishingDenialAuditFailureFailsClosed",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 未注入本轮临时PG配置。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SecurityTests/G2PublishingAuthorizationTests.cs",
+        "line": 55
+      },
+      "rawLogLine": 281,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SecurityTests",
+      "case": "MiddlewarePersistsForbiddenAuditBeforeMalformedBodyBinding",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 未注入本轮临时PG配置。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SecurityTests/G2SecurityTests.cs",
+        "line": 224
+      },
+      "rawLogLine": 284,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SecurityTests",
+      "case": "MiddlewareAuditFailurePropagatesWithoutFalse403",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 未注入本轮临时PG配置。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SecurityTests/G2SecurityTests.cs",
+        "line": 258
+      },
+      "rawLogLine": 287,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SecurityTests",
+      "case": "RealIssuerPushRetainsCodePkceStateAndNonce",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 未注入本轮专用Keycloak运行时配置。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SecurityTests/HttpSecurityTests.cs",
+        "line": 212
+      },
+      "rawLogLine": 290,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SecurityTests",
+      "case": "ExpiredServerSessionCookieReturnsHttp401",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 未注入本轮隔离PG连接。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SecurityTests/PostgresSessionTests.cs",
+        "line": 25
+      },
+      "rawLogLine": 293,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SecurityTests",
+      "case": "SharedEncryptedTicketRevocationAndExpiryUsePostgresFacts",
+      "reason": "Assert.Inconclusive。 NOT_RUN: G1_SEC_PG_CONNECTION未注入隔离PG；需要Master先应用Governance迁移。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SecurityTests/PostgresSessionTests.cs",
+        "line": 90
+      },
+      "rawLogLine": 296,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "ConnectionsTests",
+      "case": "RealFixturePreservesAuthorizedMetadata",
+      "reason": "Assert.Inconclusive。 NOT_RUN: requires explicit current-task isolated PostgreSQL fixture input.",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.ConnectionsTests/PgAdapterTests.cs",
+        "line": 146
+      },
+      "rawLogLine": 308,
+      "fixtureGate": "I06",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "ConnectionsTests",
+      "case": "VerifyFullAndAuthorizedSelectSucceed",
+      "reason": "Assert.Inconclusive。 NOT_RUN: requires explicit current-task isolated PostgreSQL input.",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.ConnectionsTests/PgFixtureSecurityTests.cs",
+        "line": 16
+      },
+      "rawLogLine": 311,
+      "fixtureGate": "I06",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "ConnectionsTests",
+      "case": "ExactPublicSchemaBoundaryUsesActualCatalog",
+      "reason": "Assert.Inconclusive。 NOT_RUN: explicit bounded public-schema fault required.",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.ConnectionsTests/PgFixtureSecurityTests.cs",
+        "line": 42
+      },
+      "rawLogLine": 314,
+      "fixtureGate": "I06",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "ConnectionsTests",
+      "case": "UntrustedRootIsRejectedBeforeAuthentication",
+      "reason": "Assert.Inconclusive。 NOT_RUN: requires explicit current-task isolated PostgreSQL input.",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.ConnectionsTests/PgFixtureSecurityTests.cs",
+        "line": 85
+      },
+      "rawLogLine": 317,
+      "fixtureGate": "I06",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "ConnectionsTests",
+      "case": "WrongPasswordIsRejectedAfterVerifiedTls",
+      "reason": "Assert.Inconclusive。 NOT_RUN: requires explicit current-task isolated PostgreSQL input.",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.ConnectionsTests/PgFixtureSecurityTests.cs",
+        "line": 103
+      },
+      "rawLogLine": 320,
+      "fixtureGate": "I06",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "ConnectionsTests",
+      "case": "SourceAclRejectsEveryUnapprovedOperation (\"insert\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: requires explicit current-task isolated PostgreSQL input.",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.ConnectionsTests/PgFixtureSecurityTests.cs",
+        "line": 130
+      },
+      "rawLogLine": 323,
+      "fixtureGate": "I06",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "ConnectionsTests",
+      "case": "SourceAclRejectsEveryUnapprovedOperation (\"update\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: requires explicit current-task isolated PostgreSQL input.",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.ConnectionsTests/PgFixtureSecurityTests.cs",
+        "line": 130
+      },
+      "rawLogLine": 326,
+      "fixtureGate": "I06",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "ConnectionsTests",
+      "case": "SourceAclRejectsEveryUnapprovedOperation (\"delete\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: requires explicit current-task isolated PostgreSQL input.",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.ConnectionsTests/PgFixtureSecurityTests.cs",
+        "line": 130
+      },
+      "rawLogLine": 329,
+      "fixtureGate": "I06",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "ConnectionsTests",
+      "case": "SourceAclRejectsEveryUnapprovedOperation (\"create-table\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: requires explicit current-task isolated PostgreSQL input.",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.ConnectionsTests/PgFixtureSecurityTests.cs",
+        "line": 130
+      },
+      "rawLogLine": 332,
+      "fixtureGate": "I06",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "ConnectionsTests",
+      "case": "SourceAclRejectsEveryUnapprovedOperation (\"create-schema\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: requires explicit current-task isolated PostgreSQL input.",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.ConnectionsTests/PgFixtureSecurityTests.cs",
+        "line": 130
+      },
+      "rawLogLine": 335,
+      "fixtureGate": "I06",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "ConnectionsTests",
+      "case": "SourceAclRejectsEveryUnapprovedOperation (\"temporary\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: requires explicit current-task isolated PostgreSQL input.",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.ConnectionsTests/PgFixtureSecurityTests.cs",
+        "line": 130
+      },
+      "rawLogLine": 338,
+      "fixtureGate": "I06",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "ConnectionsTests",
+      "case": "SourceAclRejectsEveryUnapprovedOperation (\"maintenance\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: requires explicit current-task isolated PostgreSQL input.",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.ConnectionsTests/PgFixtureSecurityTests.cs",
+        "line": 130
+      },
+      "rawLogLine": 341,
+      "fixtureGate": "I06",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "ConnectionsTests",
+      "case": "SourceAclRejectsEveryUnapprovedOperation (\"otherplant\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: requires explicit current-task isolated PostgreSQL input.",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.ConnectionsTests/PgFixtureSecurityTests.cs",
+        "line": 130
+      },
+      "rawLogLine": 344,
+      "fixtureGate": "I06",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "ConnectionsTests",
+      "case": "WrongServerNameIsRejectedBeforeAuthentication",
+      "reason": "Assert.Inconclusive。 NOT_RUN: requires explicit current-task wrong-SAN server configuration.",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.ConnectionsTests/PgFixtureSecurityTests.cs",
+        "line": 181
+      },
+      "rawLogLine": 347,
+      "fixtureGate": "I06",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "AgentTests",
+      "case": "ActualMigrationDownGuard (\"empty\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 缺少当前临时PG。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.AgentTests/AgentMigrationTests.cs",
+        "line": 18
+      },
+      "rawLogLine": 359,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "AgentTests",
+      "case": "ActualMigrationDownGuard (\"nonempty\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 缺少当前临时PG。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.AgentTests/AgentMigrationTests.cs",
+        "line": 18
+      },
+      "rawLogLine": 362,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "AgentTests",
+      "case": "ActualMigrationDownGuard (\"concurrent\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 缺少当前临时PG。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.AgentTests/AgentMigrationTests.cs",
+        "line": 18
+      },
+      "rawLogLine": 365,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "AgentTests",
+      "case": "NonBmpResultLabelSurvivesMessageBoundaryAndReplay (\"😀\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.AgentTests/MessageChunkTests.cs",
+        "line": 17
+      },
+      "rawLogLine": 368,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "AgentTests",
+      "case": "NonBmpResultLabelSurvivesMessageBoundaryAndReplay (\"𠀀\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.AgentTests/MessageChunkTests.cs",
+        "line": 17
+      },
+      "rawLogLine": 371,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "AgentTests",
+      "case": "PublishedUnicodeLabelSurvivesRealGatewayAndMaf (\"😀\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.AgentTests/MessageChunkTests.cs",
+        "line": 62
+      },
+      "rawLogLine": 374,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "AgentTests",
+      "case": "PublishedUnicodeLabelSurvivesRealGatewayAndMaf (\"𠀀\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.AgentTests/MessageChunkTests.cs",
+        "line": 62
+      },
+      "rawLogLine": 377,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "AgentTests",
+      "case": "AuditFailureRollsBackRunAndIdempotencyReceipt",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.AgentTests/RunFaultTests.cs",
+        "line": 15
+      },
+      "rawLogLine": 380,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "AgentTests",
+      "case": "ConcurrentCreateHasSingleCommittedRun",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.AgentTests/RunFaultTests.cs",
+        "line": 51
+      },
+      "rawLogLine": 383,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "AgentTests",
+      "case": "ToolAndAbsoluteTimeBudgetsFailClosed",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.AgentTests/RunFaultTests.cs",
+        "line": 72
+      },
+      "rawLogLine": 386,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "AgentTests",
+      "case": "OversizedToolEventPersistsOnlySafeFailure",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.AgentTests/RunFaultTests.cs",
+        "line": 99
+      },
+      "rawLogLine": 389,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "AgentTests",
+      "case": "PersistentCancelPropagatesToDownstreamToken",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.AgentTests/RunFaultTests.cs",
+        "line": 122
+      },
+      "rawLogLine": 392,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "AgentTests",
+      "case": "MafInvokesRealPublishedGatewayAndPersistsEvents",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.AgentTests/RunFlowTests.cs",
+        "line": 16
+      },
+      "rawLogLine": 395,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "AgentTests",
+      "case": "DeterministicModeRequiresDevelopmentHost",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.AgentTests/RunFlowTests.cs",
+        "line": 48
+      },
+      "rawLogLine": 398,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "AgentTests",
+      "case": "CommittedRunReplaysAfterGrantOrProviderConfigChange",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.AgentTests/RunFlowTests.cs",
+        "line": 59
+      },
+      "rawLogLine": 401,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "AgentTests",
+      "case": "DisabledProviderCannotPretendCompletion",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.AgentTests/RunFlowTests.cs",
+        "line": 81
+      },
+      "rawLogLine": 404,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "AgentTests",
+      "case": "ProviderIdempotencyOwnerAndCompleteScopeFailClosed",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.AgentTests/RunFlowTests.cs",
+        "line": 98
+      },
+      "rawLogLine": 407,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "AgentTests",
+      "case": "CancelUsesCurrentSequenceAndFencesWorker",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.AgentTests/RunFlowTests.cs",
+        "line": 122
+      },
+      "rawLogLine": 410,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "AgentTests",
+      "case": "LeaseTakeoverRejectsStaleFencingToken",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.AgentTests/RunFlowTests.cs",
+        "line": 147
+      },
+      "rawLogLine": 413,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "AgentTests",
+      "case": "MessageAndEventCountBudgetsPersistFailure",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.AgentTests/RunFlowTests.cs",
+        "line": 172
+      },
+      "rawLogLine": 416,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "AgentTests",
+      "case": "InvalidAndFutureCursorRejected",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.AgentTests/RunFlowTests.cs",
+        "line": 198
+      },
+      "rawLogLine": 419,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "AgentTests",
+      "case": "OldRunKeepsSnapshotAcrossNewPublishAndRollback",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.AgentTests/RunFlowTests.cs",
+        "line": 214
+      },
+      "rawLogLine": 422,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "AgentTests",
+      "case": "RealMcpSdkListsExactlyThreeAndCallsPublishedGateway",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.AgentTests/TransportTests.cs",
+        "line": 17
+      },
+      "rawLogLine": 425,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "AgentTests",
+      "case": "HttpSecurityRejectsAnonymousCsrfOriginAndMalformedIdentity",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.AgentTests/TransportTests.cs",
+        "line": 72
+      },
+      "rawLogLine": 428,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "AgentTests",
+      "case": "SseReplaysAndLogoutRevokesExistingConnection",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.AgentTests/TransportTests.cs",
+        "line": 96
+      },
+      "rawLogLine": 431,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "AgentTests",
+      "case": "SseRechecksChangedScopeAndAbsoluteSessionExpiry",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.AgentTests/TransportTests.cs",
+        "line": 147
+      },
+      "rawLogLine": 434,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "AgentTests",
+      "case": "SlowSseConnectionIsBoundedAndDisconnectDoesNotCancel",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.AgentTests/TransportTests.cs",
+        "line": 185
+      },
+      "rawLogLine": 437,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "AgentTests",
+      "case": "SseHttpCursorErrorsAreAccurate",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过agent-plan.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.AgentTests/TransportTests.cs",
+        "line": 213
+      },
+      "rawLogLine": 440,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "ImmutableRoundtripAndDifferentContentRejected",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/ArtifactTests.cs",
+        "line": 12
+      },
+      "rawLogLine": 452,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "ConcurrentDifferentBytesCannotOverwrite",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/ArtifactTests.cs",
+        "line": 30
+      },
+      "rawLogLine": 455,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "WrongHashAndMissingObjectFailClosed",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/ArtifactTests.cs",
+        "line": 56
+      },
+      "rawLogLine": 458,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "SlowDependencyBecomesUnavailable",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/ArtifactTests.cs",
+        "line": 68
+      },
+      "rawLogLine": 461,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "CallerCancellationPropagates",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/ArtifactTests.cs",
+        "line": 81
+      },
+      "rawLogLine": 464,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "LegacyV1ReadsAndRollsBackWithoutCurrentDraftAssessment",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/G3LegacyTests.cs",
+        "line": 18
+      },
+      "rawLogLine": 467,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "HistoricalM1ProfileV1ManifestV2ReadsAndRollsBackAfterCurrentProfileUpgrade",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/G3LegacyTests.cs",
+        "line": 77
+      },
+      "rawLogLine": 470,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "LegacyV1CorruptArtifactRollbackFailsClosed",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/G3LegacyTests.cs",
+        "line": 160
+      },
+      "rawLogLine": 473,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "RealM3VocabularyReleaseStaysBoundToImmutableSources",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/G3M3PublishingTests.cs",
+        "line": 18
+      },
+      "rawLogLine": 476,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "RealProposalRejectsUnitGovernanceEvenWhenShaclConforms (\"precision\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/G3M3PublishingTests.cs",
+        "line": 59
+      },
+      "rawLogLine": 479,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "RealProposalRejectsUnitGovernanceEvenWhenShaclConforms (\"dimension\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/G3M3PublishingTests.cs",
+        "line": 59
+      },
+      "rawLogLine": 482,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "ExactLegacyV2ReleaseReadsAndRollsBackWithoutRepublishingOldAssessment",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/G3M3PublishingTests.cs",
+        "line": 79
+      },
+      "rawLogLine": 485,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "PublicationTracesImpactAndRecoversSuccessfulReceipt",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/G3M4ImpactPublishingTests.cs",
+        "line": 15
+      },
+      "rawLogLine": 488,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "ProposalRejectsUnboundReports (\"missing\",422,\"impact_required\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/G3M4ImpactPublishingTests.cs",
+        "line": 54
+      },
+      "rawLogLine": 491,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "ProposalRejectsUnboundReports (\"forged\",409,\"impact_binding_conflict\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/G3M4ImpactPublishingTests.cs",
+        "line": 54
+      },
+      "rawLogLine": 494,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "ProposalRejectsUnboundReports (\"expired\",409,\"impact_expired\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/G3M4ImpactPublishingTests.cs",
+        "line": 54
+      },
+      "rawLogLine": 497,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "ProposalRejectsUnboundReports (\"cross-version\",409,\"impact_target_conflict\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/G3M4ImpactPublishingTests.cs",
+        "line": 54
+      },
+      "rawLogLine": 500,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "EveryPublicationBoundaryRechecksImpact (\"approval\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/G3M4ImpactPublishingTests.cs",
+        "line": 88
+      },
+      "rawLogLine": 503,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "EveryPublicationBoundaryRechecksImpact (\"prepare\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/G3M4ImpactPublishingTests.cs",
+        "line": 88
+      },
+      "rawLogLine": 506,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "EveryPublicationBoundaryRechecksImpact (\"final\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/G3M4ImpactPublishingTests.cs",
+        "line": 88
+      },
+      "rawLogLine": 509,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "EveryPublicationBoundaryRechecksImpact (\"retry\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/G3M4ImpactPublishingTests.cs",
+        "line": 88
+      },
+      "rawLogLine": 512,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "ApprovalRejectsChangedAssessmentOrProfile (False)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/G3M4ImpactPublishingTests.cs",
+        "line": 139
+      },
+      "rawLogLine": 515,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "ApprovalRejectsChangedAssessmentOrProfile (True)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/G3M4ImpactPublishingTests.cs",
+        "line": 139
+      },
+      "rawLogLine": 518,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "InitialApprovalCannotSurviveActiveBaselineOrMissingBinding",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/G3M4ImpactPublishingTests.cs",
+        "line": 169
+      },
+      "rawLogLine": 521,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "FixedSevenDigitClockUsesConsistentEnvelopePrecision (False)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/G3M4ImpactTimePrecisionTests.cs",
+        "line": 19
+      },
+      "rawLogLine": 524,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "FixedSevenDigitClockUsesConsistentEnvelopePrecision (True)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/G3M4ImpactTimePrecisionTests.cs",
+        "line": 19
+      },
+      "rawLogLine": 527,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "VersionFourIdentityPublicationAndExactVersionThreeRollback",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/G3M4PublishingTests.cs",
+        "line": 18
+      },
+      "rawLogLine": 530,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "IdentityGovernanceCannotBeOverriddenByReviewer (False)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/G3M4PublishingTests.cs",
+        "line": 75
+      },
+      "rawLogLine": 533,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "IdentityGovernanceCannotBeOverriddenByReviewer (True)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/G3M4PublishingTests.cs",
+        "line": 75
+      },
+      "rawLogLine": 536,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "FormalIdentityReadRejectsPartialScopeBeforeExternalRead",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/G3M4PublishingTests.cs",
+        "line": 95
+      },
+      "rawLogLine": 539,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "ExistingValidToProvenancePublishesButUnknownMetadataDoesNot (\"validToUtc\",True)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/G3MetadataTests.cs",
+        "line": 14
+      },
+      "rawLogLine": 542,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "ExistingValidToProvenancePublishesButUnknownMetadataDoesNot (\"validUntilUtc\",False)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/G3MetadataTests.cs",
+        "line": 14
+      },
+      "rawLogLine": 545,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "BackgroundRestartAndDuplicateConsume",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/OutboxTests.cs",
+        "line": 13
+      },
+      "rawLogLine": 548,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "StaleFenceCannotCommitConsumption",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/OutboxTests.cs",
+        "line": 43
+      },
+      "rawLogLine": 551,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "ExternalPhaseFailurePreservesOldActiveAndRetry (\"s3-write\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/PublicationFaultTests.cs",
+        "line": 19
+      },
+      "rawLogLine": 554,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "ExternalPhaseFailurePreservesOldActiveAndRetry (\"s3-read\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/PublicationFaultTests.cs",
+        "line": 19
+      },
+      "rawLogLine": 557,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "ExternalPhaseFailurePreservesOldActiveAndRetry (\"jena-write\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/PublicationFaultTests.cs",
+        "line": 19
+      },
+      "rawLogLine": 560,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "ExternalPhaseFailurePreservesOldActiveAndRetry (\"jena-read\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/PublicationFaultTests.cs",
+        "line": 19
+      },
+      "rawLogLine": 563,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "ExternalPhaseFailurePreservesOldActiveAndRetry (\"jena-shacl\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/PublicationFaultTests.cs",
+        "line": 19
+      },
+      "rawLogLine": 566,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "PostgreSqlWriteFailureRollsBackWholeActivation (\"active\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/PublicationFaultTests.cs",
+        "line": 68
+      },
+      "rawLogLine": 569,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "PostgreSqlWriteFailureRollsBackWholeActivation (\"activation\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/PublicationFaultTests.cs",
+        "line": 68
+      },
+      "rawLogLine": 572,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "PostgreSqlWriteFailureRollsBackWholeActivation (\"audit\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/PublicationFaultTests.cs",
+        "line": 68
+      },
+      "rawLogLine": 575,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "PostgreSqlWriteFailureRollsBackWholeActivation (\"outbox\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/PublicationFaultTests.cs",
+        "line": 68
+      },
+      "rawLogLine": 578,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "ConcurrentIdenticalActivationReturnsSameFact",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/PublicationFaultTests.cs",
+        "line": 131
+      },
+      "rawLogLine": 581,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "ConcurrentDifferentProposalsOnlyOneCasWinner",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/PublicationFaultTests.cs",
+        "line": 167
+      },
+      "rawLogLine": 584,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "DamagedPublishedGraphUnavailableAndReconciliationRetries",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/PublishedIntegrityTests.cs",
+        "line": 16
+      },
+      "rawLogLine": 587,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "PublishTwoVersionsRollbackOldCompleteManifestAndReplay",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/PublishingFlowTests.cs",
+        "line": 16
+      },
+      "rawLogLine": 590,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "ApprovalBoundaries (\"self\",403)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/PublishingFlowTests.cs",
+        "line": 76
+      },
+      "rawLogLine": 593,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "ApprovalBoundaries (\"role\",403)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/PublishingFlowTests.cs",
+        "line": 76
+      },
+      "rawLogLine": 596,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "ApprovalBoundaries (\"scope\",403)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/PublishingFlowTests.cs",
+        "line": 76
+      },
+      "rawLogLine": 599,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "ApprovalBoundaries (\"expiry\",409)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/PublishingFlowTests.cs",
+        "line": 76
+      },
+      "rawLogLine": 602,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "ActivationBoundaries (\"pending\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/PublishingFlowTests.cs",
+        "line": 104
+      },
+      "rawLogLine": 605,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "ActivationBoundaries (\"rejected\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/PublishingFlowTests.cs",
+        "line": 104
+      },
+      "rawLogLine": 608,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "ActivationBoundaries (\"expiry\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/PublishingFlowTests.cs",
+        "line": 104
+      },
+      "rawLogLine": 611,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "ActivationBoundaries (\"changed\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/PublishingFlowTests.cs",
+        "line": 104
+      },
+      "rawLogLine": 614,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "ActivationBoundaries (\"cas\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/PublishingFlowTests.cs",
+        "line": 104
+      },
+      "rawLogLine": 617,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "TamperedRollbackTargetRejected",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/PublishingFlowTests.cs",
+        "line": 124
+      },
+      "rawLogLine": 620,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "ActualMigrationDownGuard (\"empty\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 缺少当前临时PG。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/PublishingMigrationTests.cs",
+        "line": 18
+      },
+      "rawLogLine": 623,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "ActualMigrationDownGuard (\"nonempty\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 缺少当前临时PG。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/PublishingMigrationTests.cs",
+        "line": 18
+      },
+      "rawLogLine": 626,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "ActualMigrationDownGuard (\"concurrent\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 缺少当前临时PG。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/PublishingMigrationTests.cs",
+        "line": 18
+      },
+      "rawLogLine": 629,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "RollbackProposalReceiptSurvivesExternalOutage (\"replay\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/RollbackBoundaryTests.cs",
+        "line": 17
+      },
+      "rawLogLine": 632,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "RollbackProposalReceiptSurvivesExternalOutage (\"payload\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/RollbackBoundaryTests.cs",
+        "line": 17
+      },
+      "rawLogLine": 635,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "RollbackProposalReceiptSurvivesExternalOutage (\"scope\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/RollbackBoundaryTests.cs",
+        "line": 17
+      },
+      "rawLogLine": 638,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "RollbackProposalReceiptSurvivesExternalOutage (\"subject\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/RollbackBoundaryTests.cs",
+        "line": 17
+      },
+      "rawLogLine": 641,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "RollbackRequiresFreshIndependentBoundApproval (\"self\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/RollbackBoundaryTests.cs",
+        "line": 60
+      },
+      "rawLogLine": 644,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "RollbackRequiresFreshIndependentBoundApproval (\"expiry\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/RollbackBoundaryTests.cs",
+        "line": 60
+      },
+      "rawLogLine": 647,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "RollbackRequiresFreshIndependentBoundApproval (\"binding\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/RollbackBoundaryTests.cs",
+        "line": 60
+      },
+      "rawLogLine": 650,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "RollbackFailurePreservesCurrentAndSameCommandRecovers (\"artifact\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/RollbackBoundaryTests.cs",
+        "line": 103
+      },
+      "rawLogLine": 653,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "RollbackFailurePreservesCurrentAndSameCommandRecovers (\"audit\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/RollbackBoundaryTests.cs",
+        "line": 103
+      },
+      "rawLogLine": 656,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "PublishingTests",
+      "case": "RollbackFailurePreservesCurrentAndSameCommandRecovers (\"outbox\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 请通过release-faults.py创建隔离资源。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.PublishingTests/RollbackBoundaryTests.cs",
+        "line": 103
+      },
+      "rawLogLine": 659,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "RenamePersistsThroughReopenListReplayAndStructuralEdit",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+        "line": 22
+      },
+      "rawLogLine": 671,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "RenameFailureAndNameBoundsLeaveCommittedNameUnchanged",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+        "line": 60
+      },
+      "rawLogLine": 674,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "SourceHistoryValidationAndPublicationBindingAreReal",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+        "line": 94
+      },
+      "rawLogLine": 677,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "UnicodeEditPersistsExactHistoryAndHonestSourceDiff",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+        "line": 158
+      },
+      "rawLogLine": 680,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "LeadingBomCreateSaveAndNoOpKeepExactSourceHistory",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+        "line": 199
+      },
+      "rawLogLine": 683,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ConcurrentSaveHasOneWinnerAndNoLostUpdate",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+        "line": 256
+      },
+      "rawLogLine": 686,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "CommittedCreateAndSaveReplayWithoutJena",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+        "line": 284
+      },
+      "rawLogLine": 689,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "AuditFailureRollsBackEveryWrite",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+        "line": 313
+      },
+      "rawLogLine": 692,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "FullPlatformRolesAndWholeScopeAreEnforced",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+        "line": 333
+      },
+      "rawLogLine": 695,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "InvalidSourceAndStaleRevisionNeverPersist",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+        "line": 363
+      },
+      "rawLogLine": 698,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "CloneInheritsOnlyTheCatalogAssetAndExactScope",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+        "line": 381
+      },
+      "rawLogLine": 701,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "MigrationDownRefusesConcurrentAndNonemptyHistory",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+        "line": 409
+      },
+      "rawLogLine": 704,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "InitialOnlyDatabaseKeepsOriginalLockAndNonemptyDownGuards",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+        "line": 440
+      },
+      "rawLogLine": 707,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ConcurrentIdempotencyHasOneCommit (False)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+        "line": 488
+      },
+      "rawLogLine": 710,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ConcurrentIdempotencyHasOneCommit (True)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+        "line": 488
+      },
+      "rawLogLine": 713,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "G3MergedShaclDiagnosticNeverGuessesDataSource (\"ontology\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+        "line": 523
+      },
+      "rawLogLine": 716,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "G3MergedShaclDiagnosticNeverGuessesDataSource (\"vocabulary\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+        "line": 523
+      },
+      "rawLogLine": 719,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "G3MergedShaclDiagnosticNeverGuessesDataSource (\"data\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+        "line": 523
+      },
+      "rawLogLine": 722,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "G3MergedShaclDiagnosticNeverGuessesDataSource (\"ambiguous\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+        "line": 523
+      },
+      "rawLogLine": 725,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "G3SupportDiagnosticRetainsProvenSingleSourceHash (\"ontology\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+        "line": 555
+      },
+      "rawLogLine": 728,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "G3SupportDiagnosticRetainsProvenSingleSourceHash (\"vocabulary\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+        "line": 555
+      },
+      "rawLogLine": 731,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "G3SupportDiagnosticRetainsProvenSingleSourceHash (\"data\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+        "line": 555
+      },
+      "rawLogLine": 734,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "G3AssessmentPersistsReplaysAndReauthorizesWholeScope",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+        "line": 580
+      },
+      "rawLogLine": 737,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "G3AssessmentLockRejectsInvalidPersistentFacts (\"expired\",\"assessment_expired\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+        "line": 625
+      },
+      "rawLogLine": 740,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "G3AssessmentLockRejectsInvalidPersistentFacts (\"profile\",\"assessment_binding_conflict\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+        "line": 625
+      },
+      "rawLogLine": 743,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "G3AssessmentLockRejectsInvalidPersistentFacts (\"tampered\",\"assessment_binding_conflict\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+        "line": 625
+      },
+      "rawLogLine": 746,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "G3AssessmentLockRejectsInvalidPersistentFacts (\"legacy\",\"assessment_required\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+        "line": 625
+      },
+      "rawLogLine": 749,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "G3AssessmentLockRejectsInvalidPersistentFacts (\"ineligible\",\"assessment_not_eligible\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+        "line": 625
+      },
+      "rawLogLine": 752,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "G3FourSourceBytesAndFixedRevisionComparisonRemainExact",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+        "line": 664
+      },
+      "rawLogLine": 755,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "M2NamedEditAssessmentAndFailurePreserveCommittedSources",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+        "line": 691
+      },
+      "rawLogLine": 758,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "M2BasicModelingSequencePersistsEachRevisionAndKeepsOtherSourcesExact",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要draft-revision.py创建临时PG与真实迁移。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+        "line": 743
+      },
+      "rawLogLine": 761,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "RenamedBlankNodesCompareExactlyAndNearMissIsDifferent",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3BoundaryTests.cs",
+        "line": 49
+      },
+      "rawLogLine": 764,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "TwentyCorpusRowsUseAssertedOnlySupportAndShapesBlankException",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 缺少本轮隔离样例目录。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3BoundaryTests.cs",
+        "line": 66
+      },
+      "rawLogLine": 767,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ComparisonBudgetOrCancellationRevokesAllPartialResults (\"blank_node_budget\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3BoundaryTests.cs",
+        "line": 101
+      },
+      "rawLogLine": 770,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ComparisonBudgetOrCancellationRevokesAllPartialResults (\"comparison_cancelled\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3BoundaryTests.cs",
+        "line": 101
+      },
+      "rawLogLine": 773,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ComparisonBudgetOrCancellationRevokesAllPartialResults (\"comparison_timeout\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 缺少隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3BoundaryTests.cs",
+        "line": 101
+      },
+      "rawLogLine": 776,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ComparisonPreservesAbsentBytesAndRejectsInvalidOrOversizedBundles",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3BoundaryTests.cs",
+        "line": 125
+      },
+      "rawLogLine": 779,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "UndeclaredCustomFactsRequireAnExplicitPropertyOrAnnotation",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3BoundaryTests.cs",
+        "line": 144
+      },
+      "rawLogLine": 782,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "CancellationDuringRiotParsingAndExact128BlankBoundary",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 缺少隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3BoundaryTests.cs",
+        "line": 158
+      },
+      "rawLogLine": 785,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ParsingAcrossAllFourSourcesSharesOneFiveSecondBudget",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 缺少隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3BoundaryTests.cs",
+        "line": 185
+      },
+      "rawLogLine": 788,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "SymmetricNonIsomorphicGraphsExhaustTheSharedSearchBudget",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3BoundaryTests.cs",
+        "line": 201
+      },
+      "rawLogLine": 791,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "NamedAxiomEditPreservesOtherSourcesAndRequiresBothDeclarations (\"equivalentClass\",\"Class\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M2EditingTests.cs",
+        "line": 38
+      },
+      "rawLogLine": 794,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "NamedAxiomEditPreservesOtherSourcesAndRequiresBothDeclarations (\"disjointWith\",\"Class\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M2EditingTests.cs",
+        "line": 38
+      },
+      "rawLogLine": 797,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "NamedAxiomEditPreservesOtherSourcesAndRequiresBothDeclarations (\"inverseOf\",\"ObjectProperty\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M2EditingTests.cs",
+        "line": 38
+      },
+      "rawLogLine": 800,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "InvalidMetadataFailsBeforeAnyNoOpOrSerialization (\"iri-language\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M2EditingTests.cs",
+        "line": 73
+      },
+      "rawLogLine": 803,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "InvalidMetadataFailsBeforeAnyNoOpOrSerialization (\"iri-datatype\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M2EditingTests.cs",
+        "line": 73
+      },
+      "rawLogLine": 806,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "InvalidMetadataFailsBeforeAnyNoOpOrSerialization (\"literal-conflict\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M2EditingTests.cs",
+        "line": 73
+      },
+      "rawLogLine": 809,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "InvalidMetadataFailsBeforeAnyNoOpOrSerialization (\"langString-without-language\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M2EditingTests.cs",
+        "line": 73
+      },
+      "rawLogLine": 812,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "RiotLanguageTermCanBeCopiedAndDeletedPrecisely",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M2EditingTests.cs",
+        "line": 98
+      },
+      "rawLogLine": 815,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "EquivalentLiteralRepresentationsPreserveExactSourceBytes (\"language-datatype\",False)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M2EditingTests.cs",
+        "line": 128
+      },
+      "rawLogLine": 818,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "EquivalentLiteralRepresentationsPreserveExactSourceBytes (\"language-datatype\",True)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M2EditingTests.cs",
+        "line": 128
+      },
+      "rawLogLine": 821,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "EquivalentLiteralRepresentationsPreserveExactSourceBytes (\"plain-string\",False)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M2EditingTests.cs",
+        "line": 128
+      },
+      "rawLogLine": 824,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "EquivalentLiteralRepresentationsPreserveExactSourceBytes (\"plain-string\",True)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M2EditingTests.cs",
+        "line": 128
+      },
+      "rawLogLine": 827,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "EquivalentLiteralRepresentationsPreserveExactSourceBytes (\"language-case\",False)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M2EditingTests.cs",
+        "line": 128
+      },
+      "rawLogLine": 830,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "EquivalentLiteralRepresentationsPreserveExactSourceBytes (\"language-case\",True)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M2EditingTests.cs",
+        "line": 128
+      },
+      "rawLogLine": 833,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "SkosPolicyReturnsExactSourceDiagnostic (\"s14\",\"skos_pref_label_conflict\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3GovernanceTests.cs",
+        "line": 25
+      },
+      "rawLogLine": 836,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "SkosPolicyReturnsExactSourceDiagnostic (\"s13\",\"skos_label_relation_conflict\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3GovernanceTests.cs",
+        "line": 25
+      },
+      "rawLogLine": 839,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "SkosPolicyReturnsExactSourceDiagnostic (\"no-language\",\"skos_label_language_required\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3GovernanceTests.cs",
+        "line": 25
+      },
+      "rawLogLine": 842,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "SkosPolicyReturnsExactSourceDiagnostic (\"unknown-language\",\"language_policy_unknown\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3GovernanceTests.cs",
+        "line": 25
+      },
+      "rawLogLine": 845,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "SkosPolicyReturnsExactSourceDiagnostic (\"invalid-term\",\"skos_label_term_invalid\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3GovernanceTests.cs",
+        "line": 25
+      },
+      "rawLogLine": 848,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "SkosPolicyReturnsExactSourceDiagnostic (\"missing-scheme\",\"skos_scheme_reference_missing\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3GovernanceTests.cs",
+        "line": 25
+      },
+      "rawLogLine": 851,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "SkosPolicyReturnsExactSourceDiagnostic (\"missing-concept\",\"skos_concept_reference_missing\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3GovernanceTests.cs",
+        "line": 25
+      },
+      "rawLogLine": 854,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "SkosPolicyReturnsExactSourceDiagnostic (\"cycle\",\"skos_hierarchy_cycle\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3GovernanceTests.cs",
+        "line": 25
+      },
+      "rawLogLine": 857,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "SkosPolicyReturnsExactSourceDiagnostic (\"related\",\"skos_related_hierarchy_conflict\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3GovernanceTests.cs",
+        "line": 25
+      },
+      "rawLogLine": 860,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "SkosPolicyReturnsExactSourceDiagnostic (\"notation\",\"skos_notation_duplicate\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3GovernanceTests.cs",
+        "line": 25
+      },
+      "rawLogLine": 863,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "SkosPolicyReturnsExactSourceDiagnostic (\"mapping-scheme\",\"skos_mapping_scheme_conflict\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3GovernanceTests.cs",
+        "line": 25
+      },
+      "rawLogLine": 866,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "SkosPolicyReturnsExactSourceDiagnostic (\"s46\",\"skos_mapping_relation_conflict\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3GovernanceTests.cs",
+        "line": 25
+      },
+      "rawLogLine": 869,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "SkosPolicyReturnsExactSourceDiagnostic (\"deprecated\",\"semantic_reference_deprecated\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3GovernanceTests.cs",
+        "line": 25
+      },
+      "rawLogLine": 872,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "LanguageTagSubtagsRespectBcp47Uniqueness (\"en-u-ca-gregory-u-nu-latn\",False)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3GovernanceTests.cs",
+        "line": 61
+      },
+      "rawLogLine": 875,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "LanguageTagSubtagsRespectBcp47Uniqueness (\"en-1901-1901\",False)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3GovernanceTests.cs",
+        "line": 61
+      },
+      "rawLogLine": 878,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "LanguageTagSubtagsRespectBcp47Uniqueness (\"en-a-bbb-x-a-ccc\",True)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3GovernanceTests.cs",
+        "line": 61
+      },
+      "rawLogLine": 881,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ValidMultilingualAndCrossSchemeMappingHaveNoDiagnostics",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3GovernanceTests.cs",
+        "line": 86
+      },
+      "rawLogLine": 884,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "CrossSourceDuplicateFocusUsesBundleHash",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3GovernanceTests.cs",
+        "line": 97
+      },
+      "rawLogLine": 887,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "DirectV3EntrypointsCannotBypassGovernance (\"skos\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3PublicationPolicyTests.cs",
+        "line": 17
+      },
+      "rawLogLine": 890,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "DirectV3EntrypointsCannotBypassGovernance (\"precision\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3PublicationPolicyTests.cs",
+        "line": 17
+      },
+      "rawLogLine": 893,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "DirectV3EntrypointsCannotBypassGovernance (\"dimension\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3PublicationPolicyTests.cs",
+        "line": 17
+      },
+      "rawLogLine": 896,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "DirectV3EntrypointsCannotBypassGovernance (\"deprecated-canonical\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3PublicationPolicyTests.cs",
+        "line": 17
+      },
+      "rawLogLine": 899,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ExactLegacyM2ProfileKeepsHistoricalPolicy",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3PublicationPolicyTests.cs",
+        "line": 37
+      },
+      "rawLogLine": 902,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "AtomicVocabularyBatchUsesExistingRevisionAndAuditTransaction",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要隔离PG/Jena测试入口。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3ServiceTests.cs",
+        "line": 17
+      },
+      "rawLogLine": 905,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "GovernanceIsIndependentOfRealShaclReport",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要隔离PG/Jena测试入口。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3ServiceTests.cs",
+        "line": 54
+      },
+      "rawLogLine": 908,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "DuplicateLanguageTagSubtagsBlockAssessmentPublication",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要隔离PG/Jena测试入口。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3ServiceTests.cs",
+        "line": 81
+      },
+      "rawLogLine": 911,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "UnitGovernanceBindsRealAssessment (\"valid\",Pass)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要隔离PG/Jena测试入口。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3ServiceTests.cs",
+        "line": 108
+      },
+      "rawLogLine": 914,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "UnitGovernanceBindsRealAssessment (\"unknown\",Indeterminate)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要隔离PG/Jena测试入口。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3ServiceTests.cs",
+        "line": 108
+      },
+      "rawLogLine": 917,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "UnitGovernanceBindsRealAssessment (\"mismatch\",Fail)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要隔离PG/Jena测试入口。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3ServiceTests.cs",
+        "line": 108
+      },
+      "rawLogLine": 920,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "UnitGovernanceBindsRealAssessment (\"deprecated-canonical\",Fail)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要隔离PG/Jena测试入口。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3ServiceTests.cs",
+        "line": 108
+      },
+      "rawLogLine": 923,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "CompleteSyntheticUnitsAndOrdinaryPropertyAreValid",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3UnitTests.cs",
+        "line": 12
+      },
+      "rawLogLine": 926,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "UnitFailuresHaveExactSourceDiagnostics (\"version\",\"unit_version_reference_missing\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3UnitTests.cs",
+        "line": 41
+      },
+      "rawLogLine": 929,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "UnitFailuresHaveExactSourceDiagnostics (\"duplicate\",\"unit_definition_conflict\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3UnitTests.cs",
+        "line": 41
+      },
+      "rawLogLine": 932,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "UnitFailuresHaveExactSourceDiagnostics (\"quantity\",\"quantity_kind_reference_missing\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3UnitTests.cs",
+        "line": 41
+      },
+      "rawLogLine": 935,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "UnitFailuresHaveExactSourceDiagnostics (\"dimension\",\"dimension_reference_missing\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3UnitTests.cs",
+        "line": 41
+      },
+      "rawLogLine": 938,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "UnitFailuresHaveExactSourceDiagnostics (\"exponent\",\"dimension_definition_invalid\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3UnitTests.cs",
+        "line": 41
+      },
+      "rawLogLine": 941,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "UnitFailuresHaveExactSourceDiagnostics (\"exponent-range\",\"dimension_definition_invalid\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3UnitTests.cs",
+        "line": 41
+      },
+      "rawLogLine": 944,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "UnitFailuresHaveExactSourceDiagnostics (\"exponent-type\",\"dimension_definition_invalid\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3UnitTests.cs",
+        "line": 41
+      },
+      "rawLogLine": 947,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "UnitFailuresHaveExactSourceDiagnostics (\"source\",\"unit_source_required\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3UnitTests.cs",
+        "line": 41
+      },
+      "rawLogLine": 950,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "UnitFailuresHaveExactSourceDiagnostics (\"source-duplicate\",\"unit_source_required\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3UnitTests.cs",
+        "line": 41
+      },
+      "rawLogLine": 953,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "UnitFailuresHaveExactSourceDiagnostics (\"source-label\",\"unit_source_required\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3UnitTests.cs",
+        "line": 41
+      },
+      "rawLogLine": 956,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "UnitFailuresHaveExactSourceDiagnostics (\"precision\",\"unit_precision_unknown\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3UnitTests.cs",
+        "line": 41
+      },
+      "rawLogLine": 959,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "UnitFailuresHaveExactSourceDiagnostics (\"property-missing\",\"property_unit_binding_invalid\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3UnitTests.cs",
+        "line": 41
+      },
+      "rawLogLine": 962,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "UnitFailuresHaveExactSourceDiagnostics (\"property-duplicate\",\"property_unit_binding_invalid\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3UnitTests.cs",
+        "line": 41
+      },
+      "rawLogLine": 965,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "UnitFailuresHaveExactSourceDiagnostics (\"unit-missing\",\"unit_reference_missing\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3UnitTests.cs",
+        "line": 41
+      },
+      "rawLogLine": 968,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "UnitFailuresHaveExactSourceDiagnostics (\"dimension-mismatch\",\"unit_dimension_mismatch\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3UnitTests.cs",
+        "line": 41
+      },
+      "rawLogLine": 971,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "UnitFailuresHaveExactSourceDiagnostics (\"quantity-mismatch\",\"unit_quantity_kind_mismatch\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3UnitTests.cs",
+        "line": 41
+      },
+      "rawLogLine": 974,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "UnitFailuresHaveExactSourceDiagnostics (\"same-exponents\",\"unit_dimension_mismatch\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3UnitTests.cs",
+        "line": 41
+      },
+      "rawLogLine": 977,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "UnitFailuresHaveExactSourceDiagnostics (\"quantity-duplicate\",\"quantity_kind_reference_missing\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3UnitTests.cs",
+        "line": 41
+      },
+      "rawLogLine": 980,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "UnitFailuresHaveExactSourceDiagnostics (\"deprecated-canonical\",\"semantic_reference_deprecated\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3UnitTests.cs",
+        "line": 41
+      },
+      "rawLogLine": 983,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "StandardSourceFailureKeepsExactPredicate (\"synthetic\",\"urn:ontology-platform:semantics:synthetic\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3UnitTests.cs",
+        "line": 85
+      },
+      "rawLogLine": 986,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "StandardSourceFailureKeepsExactPredicate (\"provenance\",\"http://www.w3.org/ns/prov#wasDerivedFrom\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3UnitTests.cs",
+        "line": 85
+      },
+      "rawLogLine": 989,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "DuplicateAddsThenDeleteUseRdfSetSemantics (False)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3VocabularyTests.cs",
+        "line": 38
+      },
+      "rawLogLine": 992,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "DuplicateAddsThenDeleteUseRdfSetSemantics (True)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3VocabularyTests.cs",
+        "line": 38
+      },
+      "rawLogLine": 995,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "EquivalentLiteralAddThenDeleteRemovesOriginal (\"language\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3VocabularyTests.cs",
+        "line": 59
+      },
+      "rawLogLine": 998,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "EquivalentLiteralAddThenDeleteRemovesOriginal (\"datatype\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3VocabularyTests.cs",
+        "line": 59
+      },
+      "rawLogLine": 1001,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "FourSourcesAndAtomicChangesUseRealRiot",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M3VocabularyTests.cs",
+        "line": 80
+      },
+      "rawLogLine": 1004,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "LegacyVersionThreeStillRejectsTheSameControlledTimeCorpus",
+      "reason": "NOT_RUN: requires real Jena fixture",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4IdentityTimeTests.cs",
+        "line": 31
+      },
+      "rawLogLine": 1007,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ControlledTemplatesAndIdentityRelations (\"valid\",null)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4IdentityTimeTests.cs",
+        "line": 79
+      },
+      "rawLogLine": 1010,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ControlledTemplatesAndIdentityRelations (\"different-site\",null)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4IdentityTimeTests.cs",
+        "line": 79
+      },
+      "rawLogLine": 1013,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ControlledTemplatesAndIdentityRelations (\"different-namespace\",null)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4IdentityTimeTests.cs",
+        "line": 79
+      },
+      "rawLogLine": 1016,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ControlledTemplatesAndIdentityRelations (\"adjacent\",null)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4IdentityTimeTests.cs",
+        "line": 79
+      },
+      "rawLogLine": 1019,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ControlledTemplatesAndIdentityRelations (\"overlap\",\"identity_ambiguous\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4IdentityTimeTests.cs",
+        "line": 79
+      },
+      "rawLogLine": 1022,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ControlledTemplatesAndIdentityRelations (\"unknown\",\"identity_relation_indeterminate\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4IdentityTimeTests.cs",
+        "line": 79
+      },
+      "rawLogLine": 1025,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ControlledTemplatesAndIdentityRelations (\"no-zone\",\"time_timezone_required\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4IdentityTimeTests.cs",
+        "line": 79
+      },
+      "rawLogLine": 1028,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ControlledTemplatesAndIdentityRelations (\"reverse\",\"time_interval_reversed\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4IdentityTimeTests.cs",
+        "line": 79
+      },
+      "rawLogLine": 1031,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ControlledTemplatesAndIdentityRelations (\"missing-point\",\"time_reference_missing\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4IdentityTimeTests.cs",
+        "line": 79
+      },
+      "rawLogLine": 1034,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ControlledTemplatesAndIdentityRelations (\"double-time\",\"time_lexical_invalid\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4IdentityTimeTests.cs",
+        "line": 79
+      },
+      "rawLogLine": 1037,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ControlledTemplatesAndIdentityRelations (\"unsupported\",\"time_template_unsupported\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4IdentityTimeTests.cs",
+        "line": 79
+      },
+      "rawLogLine": 1040,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ControlledTemplatesAndIdentityRelations (\"unknown-target\",\"identity_claim_invalid\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4IdentityTimeTests.cs",
+        "line": 79
+      },
+      "rawLogLine": 1043,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ControlledTemplatesAndIdentityRelations (\"double-key\",\"identity_claim_invalid\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4IdentityTimeTests.cs",
+        "line": 79
+      },
+      "rawLogLine": 1046,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ControlledTemplatesAndIdentityRelations (\"event-missing\",\"event_time_invalid\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4IdentityTimeTests.cs",
+        "line": 79
+      },
+      "rawLogLine": 1049,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ControlledTemplatesAndIdentityRelations (\"observer-zone\",\"time_timezone_required\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4IdentityTimeTests.cs",
+        "line": 79
+      },
+      "rawLogLine": 1052,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ControlledTemplatesAndIdentityRelations (\"double-type\",\"time_template_unsupported\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4IdentityTimeTests.cs",
+        "line": 79
+      },
+      "rawLogLine": 1055,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "CrossSourceTimestampDiagnosticUsesBundleEvidence",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4IdentityTimeTests.cs",
+        "line": 123
+      },
+      "rawLogLine": 1058,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "OnlyExactBuiltinOrLocalClassDeclarationResolvesType (\"w3-fake\",True)",
+      "reason": "NOT_RUN: real PG/Jena required",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactDependencyTests.cs",
+        "line": 21
+      },
+      "rawLogLine": 1061,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "OnlyExactBuiltinOrLocalClassDeclarationResolvesType (\"platform-fake\",True)",
+      "reason": "NOT_RUN: real PG/Jena required",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactDependencyTests.cs",
+        "line": 21
+      },
+      "rawLogLine": 1064,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "OnlyExactBuiltinOrLocalClassDeclarationResolvesType (\"builtin-owl\",False)",
+      "reason": "NOT_RUN: real PG/Jena required",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactDependencyTests.cs",
+        "line": 21
+      },
+      "rawLogLine": 1067,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "OnlyExactBuiltinOrLocalClassDeclarationResolvesType (\"business-local\",False)",
+      "reason": "NOT_RUN: real PG/Jena required",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactDependencyTests.cs",
+        "line": 21
+      },
+      "rawLogLine": 1070,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "DefinitionRemovalUsesExactKindAndConsumerRole (\"class-masked-by-individual\",True)",
+      "reason": "NOT_RUN: real PG/Jena required",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactDependencyTests.cs",
+        "line": 57
+      },
+      "rawLogLine": 1073,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "DefinitionRemovalUsesExactKindAndConsumerRole (\"object-property-masked\",True)",
+      "reason": "NOT_RUN: real PG/Jena required",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactDependencyTests.cs",
+        "line": 57
+      },
+      "rawLogLine": 1076,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "DefinitionRemovalUsesExactKindAndConsumerRole (\"datatype-property-masked\",True)",
+      "reason": "NOT_RUN: real PG/Jena required",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactDependencyTests.cs",
+        "line": 57
+      },
+      "rawLogLine": 1079,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "DefinitionRemovalUsesExactKindAndConsumerRole (\"keep-class-drop-individual\",False)",
+      "reason": "NOT_RUN: real PG/Jena required",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactDependencyTests.cs",
+        "line": 57
+      },
+      "rawLogLine": 1082,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ReportIdentityIdempotencyAndAuditAreFrozenToFirstInput",
+      "reason": "NOT_RUN: real PG/Jena fixture required",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs",
+        "line": 16
+      },
+      "rawLogLine": 1085,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ConcurrentInputCreatesOneReportAndOneBusinessAudit",
+      "reason": "NOT_RUN: real PG/Jena fixture required",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs",
+        "line": 59
+      },
+      "rawLogLine": 1088,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ActualUnknownAndTechnicalBlockersHaveBoundEvidence (\"missing\",\"impact_assessment_required\")",
+      "reason": "NOT_RUN: real PG/Jena fixture required",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs",
+        "line": 88
+      },
+      "rawLogLine": 1091,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ActualUnknownAndTechnicalBlockersHaveBoundEvidence (\"unsupported\",\"impact_unsupported_axiom\")",
+      "reason": "NOT_RUN: real PG/Jena fixture required",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs",
+        "line": 88
+      },
+      "rawLogLine": 1094,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ActualUnknownAndTechnicalBlockersHaveBoundEvidence (\"imports\",\"impact_imports_unresolved\")",
+      "reason": "NOT_RUN: real PG/Jena fixture required",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs",
+        "line": 88
+      },
+      "rawLogLine": 1097,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ActualUnknownAndTechnicalBlockersHaveBoundEvidence (\"blank\",\"impact_blank_alignment_indeterminate\")",
+      "reason": "NOT_RUN: real PG/Jena fixture required",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs",
+        "line": 88
+      },
+      "rawLogLine": 1100,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ActualUnknownAndTechnicalBlockersHaveBoundEvidence (\"blank-budget\",\"impact_comparison_indeterminate\")",
+      "reason": "NOT_RUN: real PG/Jena fixture required",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs",
+        "line": 88
+      },
+      "rawLogLine": 1103,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ActualUnknownAndTechnicalBlockersHaveBoundEvidence (\"conclusion-budget\",\"impact_conclusion_budget\")",
+      "reason": "NOT_RUN: real PG/Jena fixture required",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs",
+        "line": 88
+      },
+      "rawLogLine": 1106,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ReadRejectsPartialScopeAndPersistedCanonicalTamper",
+      "reason": "NOT_RUN: real PG/Jena fixture required",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs",
+        "line": 117
+      },
+      "rawLogLine": 1109,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ValidHistoryCannotBeReplacedOrUnlockedByUnrelatedError (\"target\")",
+      "reason": "NOT_RUN: requires real PG/Jena fixture",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4ServiceTests.cs",
+        "line": 23
+      },
+      "rawLogLine": 1112,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ValidHistoryCannotBeReplacedOrUnlockedByUnrelatedError (\"from\")",
+      "reason": "NOT_RUN: requires real PG/Jena fixture",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4ServiceTests.cs",
+        "line": 23
+      },
+      "rawLogLine": 1115,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ValidHistoryCannotBeReplacedOrUnlockedByUnrelatedError (\"delete\")",
+      "reason": "NOT_RUN: requires real PG/Jena fixture",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4ServiceTests.cs",
+        "line": 23
+      },
+      "rawLogLine": 1118,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ValidHistoryCannotBeReplacedOrUnlockedByUnrelatedError (\"type\")",
+      "reason": "NOT_RUN: requires real PG/Jena fixture",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4ServiceTests.cs",
+        "line": 23
+      },
+      "rawLogLine": 1121,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ValidHistoryCannotBeReplacedOrUnlockedByUnrelatedError (\"expand\")",
+      "reason": "NOT_RUN: requires real PG/Jena fixture",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4ServiceTests.cs",
+        "line": 23
+      },
+      "rawLogLine": 1124,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ValidHistoryCannotBeReplacedOrUnlockedByUnrelatedError (\"hide-with-error\")",
+      "reason": "NOT_RUN: requires real PG/Jena fixture",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4ServiceTests.cs",
+        "line": 23
+      },
+      "rawLogLine": 1127,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "InitiallyInvalidClaimCanBeRepairedWithoutErasingSourceRevision",
+      "reason": "NOT_RUN: requires real PG/Jena fixture",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4ServiceTests.cs",
+        "line": 60
+      },
+      "rawLogLine": 1130,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ClaimScopeCannotExceedAuthoritativeDraftScope (\"site\")",
+      "reason": "NOT_RUN: requires real PG/Jena fixture",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4ServiceTests.cs",
+        "line": 84
+      },
+      "rawLogLine": 1133,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ClaimScopeCannotExceedAuthoritativeDraftScope (\"organization\")",
+      "reason": "NOT_RUN: requires real PG/Jena fixture",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4ServiceTests.cs",
+        "line": 84
+      },
+      "rawLogLine": 1136,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ControlledEditClosesValidityThenReplaysExactlyOnce",
+      "reason": "NOT_RUN: requires real PG/Jena fixture",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4ServiceTests.cs",
+        "line": 104
+      },
+      "rawLogLine": 1139,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "DedicatedEditCannotDeleteValidClaimType",
+      "reason": "NOT_RUN: requires real PG/Jena fixture",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4ServiceTests.cs",
+        "line": 140
+      },
+      "rawLogLine": 1142,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "AmbiguousAndUnknownClaimsBlockAssessment (False)",
+      "reason": "NOT_RUN: requires real PG/Jena fixture",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4ServiceTests.cs",
+        "line": 162
+      },
+      "rawLogLine": 1145,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "AmbiguousAndUnknownClaimsBlockAssessment (True)",
+      "reason": "NOT_RUN: requires real PG/Jena fixture",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4ServiceTests.cs",
+        "line": 162
+      },
+      "rawLogLine": 1148,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ExactBatchCountBoundariesDoNotBypassCas (0)",
+      "reason": "NOT_RUN: requires real PG/Jena fixture",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4ServiceTests.cs",
+        "line": 189
+      },
+      "rawLogLine": 1151,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ExactBatchCountBoundariesDoNotBypassCas (1)",
+      "reason": "NOT_RUN: requires real PG/Jena fixture",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4ServiceTests.cs",
+        "line": 189
+      },
+      "rawLogLine": 1154,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ExactBatchCountBoundariesDoNotBypassCas (64)",
+      "reason": "NOT_RUN: requires real PG/Jena fixture",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4ServiceTests.cs",
+        "line": 189
+      },
+      "rawLogLine": 1157,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ExactBatchCountBoundariesDoNotBypassCas (65)",
+      "reason": "NOT_RUN: requires real PG/Jena fixture",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4ServiceTests.cs",
+        "line": 189
+      },
+      "rawLogLine": 1160,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "TwoConcurrentWritersHaveOneCasWinnerAndOneAudit",
+      "reason": "NOT_RUN: requires real PG/Jena fixture",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4ServiceTests.cs",
+        "line": 220
+      },
+      "rawLogLine": 1163,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "RoleAndCompleteScopePrecedeAnyJenaAccess (True)",
+      "reason": "NOT_RUN: requires real PG/Jena fixture",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4ServiceTests.cs",
+        "line": 245
+      },
+      "rawLogLine": 1166,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "RoleAndCompleteScopePrecedeAnyJenaAccess (False)",
+      "reason": "NOT_RUN: requires real PG/Jena fixture",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4ServiceTests.cs",
+        "line": 245
+      },
+      "rawLogLine": 1169,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "NewControlledBatchReturnsDeterministicDiagnosticCode (\"overlap\",\"identity_ambiguous\")",
+      "reason": "NOT_RUN: requires real PG/Jena fixture",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4ServiceTests.cs",
+        "line": 276
+      },
+      "rawLogLine": 1172,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "NewControlledBatchReturnsDeterministicDiagnosticCode (\"unknown\",\"identity_relation_indeterminate\")",
+      "reason": "NOT_RUN: requires real PG/Jena fixture",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4ServiceTests.cs",
+        "line": 276
+      },
+      "rawLogLine": 1175,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "NewControlledBatchReturnsDeterministicDiagnosticCode (\"zone\",\"time_timezone_required\")",
+      "reason": "NOT_RUN: requires real PG/Jena fixture",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4ServiceTests.cs",
+        "line": 276
+      },
+      "rawLogLine": 1178,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "NewControlledBatchReturnsDeterministicDiagnosticCode (\"reverse\",\"time_interval_reversed\")",
+      "reason": "NOT_RUN: requires real PG/Jena fixture",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4ServiceTests.cs",
+        "line": 276
+      },
+      "rawLogLine": 1181,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "FourSourcesKeepExactTextHashesAndGroundDelta",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4VersionDiffTests.cs",
+        "line": 16
+      },
+      "rawLogLine": 1184,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "BlankIsomorphismAndChangedBlankScopesRemainExplicit",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4VersionDiffTests.cs",
+        "line": 41
+      },
+      "rawLogLine": 1187,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "AbsentVocabularyAndEmptyFileHaveDifferentSourceIdentity",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4VersionDiffTests.cs",
+        "line": 69
+      },
+      "rawLogLine": 1190,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "SharedBudgetFailureIsIndeterminateForAllFourSources (False)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4VersionDiffTests.cs",
+        "line": 89
+      },
+      "rawLogLine": 1193,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "SharedBudgetFailureIsIndeterminateForAllFourSources (True)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4VersionDiffTests.cs",
+        "line": 89
+      },
+      "rawLogLine": 1196,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "VersionDiffBindsActualPersistedSourcesAndRejectsCrossAssetOrTamper",
+      "reason": "NOT_RUN: real PG required",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M4VersionDiffTests.cs",
+        "line": 105
+      },
+      "rawLogLine": 1199,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "RealRiotReadsAdvancedFixtureWithoutLosingSourceOrEnablingPublish",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M5ExpressionTests.cs",
+        "line": 267
+      },
+      "rawLogLine": 1202,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "RealRiotSeparatesFourSourceBlankScopesAndPreservesLiteralMetadata",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M5ExpressionTests.cs",
+        "line": 296
+      },
+      "rawLogLine": 1205,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "RealRiotMalformedOwlHasExplicitProjectionDiagnostics (\"broken\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M5ExpressionTests.cs",
+        "line": 314
+      },
+      "rawLogLine": 1208,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "RealRiotMalformedOwlHasExplicitProjectionDiagnostics (\"cycle\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M5ExpressionTests.cs",
+        "line": 314
+      },
+      "rawLogLine": 1211,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "RealRiotMalformedOwlHasExplicitProjectionDiagnostics (\"cardinality\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M5ExpressionTests.cs",
+        "line": 314
+      },
+      "rawLogLine": 1214,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "RealRiotMalformedOwlHasExplicitProjectionDiagnostics (\"unknown\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M5ExpressionTests.cs",
+        "line": 314
+      },
+      "rawLogLine": 1217,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "RealRiotRestrictionNegativeShapesPreserveSourceHash (\"missing-on-property\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M5ExpressionTests.cs",
+        "line": 338
+      },
+      "rawLogLine": 1220,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "RealRiotRestrictionNegativeShapesPreserveSourceHash (\"some-literal\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M5ExpressionTests.cs",
+        "line": 338
+      },
+      "rawLogLine": 1223,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "RealRiotRestrictionNegativeShapesPreserveSourceHash (\"all-literal\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M5ExpressionTests.cs",
+        "line": 338
+      },
+      "rawLogLine": 1226,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "RealRiotRestrictionNegativeShapesPreserveSourceHash (\"qualified-literal-property\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M5ExpressionTests.cs",
+        "line": 338
+      },
+      "rawLogLine": 1229,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "RealRiotRestrictionNegativeShapesPreserveSourceHash (\"multiple-constructors\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M5ExpressionTests.cs",
+        "line": 338
+      },
+      "rawLogLine": 1232,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "RealRiotNodeBudgetPreservesSourceAndFailsClosed",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M5ExpressionTests.cs",
+        "line": 367
+      },
+      "rawLogLine": 1235,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "RealReadOnlySnapshotPreservesRawBytesAndDoesNotWrite",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要本轮隔离PG/RIOT服务。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M5ServiceTests.cs",
+        "line": 73
+      },
+      "rawLogLine": 1238,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "RealHistoricalSnapshotAndReimportRetainExactSourceAndBlankGraph",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要本轮隔离PG/RIOT服务。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M5ServiceTests.cs",
+        "line": 121
+      },
+      "rawLogLine": 1241,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "RealScopeAuthorizationPrecedesProjectionRequests",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要本轮隔离PG/RIOT服务。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M5ServiceTests.cs",
+        "line": 165
+      },
+      "rawLogLine": 1244,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "RealTamperedRevisionHashCannotProducePreservedSnapshot",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要本轮隔离PG/RIOT服务。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/G3M5ServiceTests.cs",
+        "line": 192
+      },
+      "rawLogLine": 1247,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "RealRiotPreservesUnsupportedSourceAndTypedLexical",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/RoundtripTests.cs",
+        "line": 23
+      },
+      "rawLogLine": 1250,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "NoOpRetainsExactBytesAndInvalidSourceFails",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/RoundtripTests.cs",
+        "line": 49
+      },
+      "rawLogLine": 1253,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "PublishedGraphsAreIsolatedAndLexicalMismatchIsRejected",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/RoundtripTests.cs",
+        "line": 65
+      },
+      "rawLogLine": 1256,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "EmptyGraphStillProducesRealShaclReport",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/RoundtripTests.cs",
+        "line": 99
+      },
+      "rawLogLine": 1259,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "LegalEmptyDocumentsKeepExactHashesAndProduceEmptyGraph (\"# comment\\n\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/RoundtripTests.cs",
+        "line": 114
+      },
+      "rawLogLine": 1262,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "LegalEmptyDocumentsKeepExactHashesAndProduceEmptyGraph (\" \\t\\r\\n\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/RoundtripTests.cs",
+        "line": 114
+      },
+      "rawLogLine": 1265,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "LegalEmptyDocumentsKeepExactHashesAndProduceEmptyGraph (\"@prefix ex: <urn:empty:> .\\n\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/RoundtripTests.cs",
+        "line": 114
+      },
+      "rawLogLine": 1268,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "EditingLegalEmptyDocumentExportsOnlyRequestedTriple",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/RoundtripTests.cs",
+        "line": 135
+      },
+      "rawLogLine": 1271,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "LostOrReplacedTemporaryGraphRemainsUnavailable (False)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 缺少隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/RoundtripTests.cs",
+        "line": 154
+      },
+      "rawLogLine": 1274,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "LostOrReplacedTemporaryGraphRemainsUnavailable (True)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 缺少隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/RoundtripTests.cs",
+        "line": 154
+      },
+      "rawLogLine": 1277,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "MissingPublishedGraphRemainsUnavailable",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/RoundtripTests.cs",
+        "line": 179
+      },
+      "rawLogLine": 1280,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "PublishedShaclUsesTheSameOntologyContext",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/RoundtripTests.cs",
+        "line": 210
+      },
+      "rawLogLine": 1283,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "RelativeIriAndExactEditPreserveRemainingGraph",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/RoundtripTests.cs",
+        "line": 234
+      },
+      "rawLogLine": 1286,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "SourceTripleAndProjectionBudgetsFailExplicitly",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/RoundtripTests.cs",
+        "line": 259
+      },
+      "rawLogLine": 1289,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ThirdConcurrentOperationIsRejected",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 缺少隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/RoundtripTests.cs",
+        "line": 285
+      },
+      "rawLogLine": 1292,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "CancellationAndTimeoutDoNotLeaveTemporaryGraphs (True)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 缺少隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/RoundtripTests.cs",
+        "line": 323
+      },
+      "rawLogLine": 1295,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "CancellationAndTimeoutDoNotLeaveTemporaryGraphs (False)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 缺少隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/RoundtripTests.cs",
+        "line": 323
+      },
+      "rawLogLine": 1298,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "StandardSampleConforms",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/ShaclTests.cs",
+        "line": 12
+      },
+      "rawLogLine": 1301,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "StandardNegativeReportsLocateRealFailure (\"\",\"MinCountConstraintComponent\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/ShaclTests.cs",
+        "line": 30
+      },
+      "rawLogLine": 1304,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "StandardNegativeReportsLocateRealFailure (\"<urn:x> <urn:ontology-platform:vocabulary:externalId> 12 .\",\"DatatypeConstraintComponent\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/ShaclTests.cs",
+        "line": 30
+      },
+      "rawLogLine": 1307,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "StandardNegativeReportsLocateRealFailure (\"<urn:x> <urn:ontology-platform:vocabulary:weight> 101.0 .\",\"MaxInclusiveConstraintComponent\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/ShaclTests.cs",
+        "line": 30
+      },
+      "rawLogLine": 1310,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "StandardNegativeReportsLocateRealFailure (\"<urn:h> a <urn:synthetic:metals:Heat> ; <urn:synthetic:metals:castIn> <urn:x> .\",\"ClassConstraintComponent\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/ShaclTests.cs",
+        "line": 30
+      },
+      "rawLogLine": 1313,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "UnsafeShapesRejectedBeforeExecution (\"<urn:s> <http://www.w3.org/ns/shacl#sparql> <urn:q> .\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/ShaclTests.cs",
+        "line": 50
+      },
+      "rawLogLine": 1316,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "UnsafeShapesRejectedBeforeExecution (\"<urn:s> <http://www.w3.org/ns/shacl#js> <urn:q> .\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/ShaclTests.cs",
+        "line": 50
+      },
+      "rawLogLine": 1319,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "UnsafeShapesRejectedBeforeExecution (\"<urn:s> <http://www.w3.org/ns/shacl#node> <urn:s> .\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/ShaclTests.cs",
+        "line": 50
+      },
+      "rawLogLine": 1322,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "UnsafeShapesRejectedBeforeExecution (\"<urn:s> <http://www.w3.org/2002/07/owl#imports> <http://192.0.2.1/never> .\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/ShaclTests.cs",
+        "line": 50
+      },
+      "rawLogLine": 1325,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "UnsafeShapesRejectedBeforeExecution (\"<urn:s> <http://www.w3.org/ns/shacl#path> [ <http://www.w3.org/ns/shacl#inversePath> <urn:p> ] .\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/ShaclTests.cs",
+        "line": 50
+      },
+      "rawLogLine": 1328,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "UnsafeShapesRejectedBeforeExecution (\"<urn:s> <http://www.w3.org/ns/shacl#property> <urn:s> ; <http://www.w3.org/ns/shacl#path> <urn:p> .\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/ShaclTests.cs",
+        "line": 50
+      },
+      "rawLogLine": 1331,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "EnumerationListIsBoundedAndAcyclic",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/ShaclTests.cs",
+        "line": 62
+      },
+      "rawLogLine": 1334,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "VerifiedReadReturnsExactlyTheComparedBatch",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs",
+        "line": 26
+      },
+      "rawLogLine": 1337,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ChangedPublishedGraphCannotReturnOldHashData (\"ontology\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs",
+        "line": 64
+      },
+      "rawLogLine": 1340,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ChangedPublishedGraphCannotReturnOldHashData (\"data\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs",
+        "line": 64
+      },
+      "rawLogLine": 1343,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ChangedPublishedGraphCannotReturnOldHashData (\"delete\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs",
+        "line": 64
+      },
+      "rawLogLine": 1346,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "ChangedPublishedGraphCannotReturnOldHashData (\"lexical\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs",
+        "line": 64
+      },
+      "rawLogLine": 1349,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "EveryManifestSnapshotAndSourceBindingIsChecked",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs",
+        "line": 86
+      },
+      "rawLogLine": 1352,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "OptionalVocabularyAndMissingBindingFailClosed",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs",
+        "line": 129
+      },
+      "rawLogLine": 1355,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "VerifiedReadCancellationAndTimeoutCleanTemporaryGraphs (True)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs",
+        "line": 151
+      },
+      "rawLogLine": 1358,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "VerifiedReadCancellationAndTimeoutCleanTemporaryGraphs (False)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs",
+        "line": 151
+      },
+      "rawLogLine": 1361,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "TemporaryMarkerDoesNotConsumeBusinessTripleBudget (4999)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs",
+        "line": 187
+      },
+      "rawLogLine": 1364,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "TemporaryMarkerDoesNotConsumeBusinessTripleBudget (5000)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs",
+        "line": 187
+      },
+      "rawLogLine": 1367,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "TemporaryMarkerDoesNotConsumeBusinessTripleBudget (5001)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs",
+        "line": 187
+      },
+      "rawLogLine": 1370,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "VerifiedReadRetainsAggregateBusinessTripleBudget (4999)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 缺少隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs",
+        "line": 214
+      },
+      "rawLogLine": 1373,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "VerifiedReadRetainsAggregateBusinessTripleBudget (5000)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 缺少隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs",
+        "line": 214
+      },
+      "rawLogLine": 1376,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "VerifiedReadRetainsAggregateBusinessTripleBudget (5001)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 缺少隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs",
+        "line": 214
+      },
+      "rawLogLine": 1379,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "PublishedGraphDoesNotReceiveTemporaryMarkerAllowance",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs",
+        "line": 247
+      },
+      "rawLogLine": 1382,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "SyntheticNonBmpLabelSurvivesValidationAndPublication (\"😀\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs",
+        "line": 273
+      },
+      "rawLogLine": 1385,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "SyntheticNonBmpLabelSurvivesValidationAndPublication (\"𠀀\")",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py显式提供合成样例目录。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs",
+        "line": 273
+      },
+      "rawLogLine": 1388,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "NonBmpLiteralEditIsLosslessAndCannotInjectTriples (True)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs",
+        "line": 302
+      },
+      "rawLogLine": 1391,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "NonBmpLiteralEditIsLosslessAndCannotInjectTriples (False)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs",
+        "line": 302
+      },
+      "rawLogLine": 1394,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "InvalidSurrogateLiteralIsRejectedWithoutReplacement (True)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs",
+        "line": 345
+      },
+      "rawLogLine": 1397,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "InvalidSurrogateLiteralIsRejectedWithoutReplacement (False)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs",
+        "line": 345
+      },
+      "rawLogLine": 1400,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "LeadingBomSourcesKeepExactBytesAndRelativeIris (True)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs",
+        "line": 361
+      },
+      "rawLogLine": 1403,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    },
+    {
+      "project": "SemanticTests",
+      "case": "LeadingBomSourcesKeepExactBytesAndRelativeIris (False)",
+      "reason": "Assert.Inconclusive。 NOT_RUN: 需要semantic-roundtrip.py创建的真实隔离Jena。",
+      "source": {
+        "path": "backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs",
+        "line": 361
+      },
+      "rawLogLine": 1406,
+      "fixtureGate": "I02",
+      "status": "NOT_RUN",
+      "witnesses": []
+    }
+  ],
+  "reviewer": "/root/gate_inventory; 51 source files, 0 ambiguous/unmapped, all required fixture cases, no justified N/A"
+}

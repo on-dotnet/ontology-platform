@@ -422,6 +422,15 @@ $rows=@(); foreach($entry in $expected.GetEnumerator()) {
     verify_feed(m);verify_sdk_copies(m)
 
 
+def relocate_workspace_state(state,source,target,manifests):
+    """仅重定位两个已核验项目，丢弃旧缓存证明，由pnpm原强门禁重新验证。"""
+    rt.require(set(manifests)=={'','/apps/web'} and state.get('projects')=={source+p:v for p,v in manifests.items()},'WORKSPACE_COPY_PROJECTS')
+    rt.require(state.get('pnpmfiles')==[] and state.get('filteredInstall') is False and isinstance(state.get('settings'),dict),'WORKSPACE_COPY_HOOK_OR_PARTIAL')
+    value=json.loads(json.dumps(state));value['projects']={target+p:v for p,v in manifests.items()}
+    value['lastValidatedTimestamp']=0;value.pop('validation',None)
+    return value
+
+
 def prepare_tools(m):
     """已有锁定Web/Python制品独立复制，不运行install。"""
     d=rt.ROOT/'.tools';d.mkdir(exist_ok=True)
@@ -475,8 +484,20 @@ def prepare_tools(m):
                 after=('#!/bin/sh\nexec '+shlex.quote(NODE)+' '+shlex.quote(str(target))+' "$@"\n').encode()
                 path.write_bytes(after);path.chmod(0o755)
                 rebased.append({'path':str(path.relative_to(rt.ROOT)),'before':rt.digest(raw),'after':rt.digest(after),'target':relative,'method':'deterministic shim from integrity-bound package bin declaration'})
-    rt.write_json(rt.ARTIFACTS/m['runId']/'tool-copies.json',{'pyyaml':rows,'shimRebases':rebased,'download':0,'install':0})
+    state_path=rt.ROOT/'node_modules/.pnpm-workspace-state-v1.json'
+    original=(web/'node_modules/.pnpm-workspace-state-v1.json').read_bytes()
+    rt.require(state_path.read_bytes()==original,'WORKSPACE_COPY_STATE_DRIFT')
+    manifests={}
+    for rel in ('','/apps/web'):
+        manifest=json.loads((rt.ROOT/(rel.lstrip('/')+'/package.json' if rel else 'package.json')).read_text())
+        manifests[rel]={k:manifest[k] for k in ('name','version') if k in manifest}
+    moved=relocate_workspace_state(json.loads(original),str(web),str(rt.ROOT),manifests)
+    state_path.write_text(json.dumps(moved,ensure_ascii=False,indent=2)+'\n')
+    workspace={'path':str(state_path.relative_to(rt.ROOT)),'beforeSha256':rt.digest(original),'afterSha256':rt.digest(state_path.read_bytes()),'method':'exact project root relocation; discard cached validation; force actual pnpm verifyDepsBeforeRun=error; no install'}
+    rt.write_json(rt.ARTIFACTS/m['runId']/'tool-copies.json',{'pyyaml':rows,'shimRebases':rebased,'workspaceState':workspace,'download':0,'install':0})
     rt.execute(m,'pnpm-version',[NODE,str(d/'pnpm/package/bin/pnpm.cjs'),'--version'])
+    rt.execute(m,'pnpm-workspace-validation',rt.offline_command([NODE,str(d/'pnpm/package/bin/pnpm.cjs'),'--config.verifyDepsBeforeRun=error','--dir','apps/web','run','lint','--help']),timeout=30)
+    rt.write_json(rt.ARTIFACTS/m['runId']/'workspace-state-validated.json',{'taskId':rt.TASK,'runId':m['runId'],'testedCommit':m['_head'],'sha256':rt.digest(state_path.read_bytes()),'validatedBy':'actual unchanged pinned pnpm verifyDepsBeforeRun=error; eslint help is not lint PASS'})
 
 
 def engineering(m):

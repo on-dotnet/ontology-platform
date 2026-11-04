@@ -377,6 +377,18 @@ class RecoveryIsolationTests(unittest.TestCase):
 
 
 class CaseProjectionTests(unittest.TestCase):
+    def test_workspace_copy_relocation_forces_real_revalidation(self):
+        import run,copy
+        manifests={'':{'name':'ontology-platform'},'/apps/web':{'name':'@ontology-platform/web','version':'0.1.0'}}
+        state={'projects':{'/old'+p:v for p,v in manifests.items()},'lastValidatedTimestamp':123,'validation':{'lockfile':'untrusted cached proof'},'settings':{},'pnpmfiles':[],'filteredInstall':False}
+        moved=run.relocate_workspace_state(state,'/old','/new',manifests)
+        self.assertEqual(set(moved['projects']),{'/new','/new/apps/web'})
+        self.assertNotIn('validation',moved);self.assertEqual(moved['lastValidatedTimestamp'],0)
+        self.assertIn('validation',state)
+        for mutate in (lambda v:v['projects'].update({'/foreign':{'name':'foreign'}}),lambda v:v.update(pnpmfiles=['/foreign/hook.cjs']),lambda v:v['projects']['/old'].update(name='forged'),lambda v:v.update(filteredInstall=True)):
+            bad=copy.deepcopy(state);mutate(bad)
+            with self.assertRaises(ValueError):run.relocate_workspace_state(bad,'/old','/new',manifests)
+
     def test_ef_archive_rejects_additional_runtime_config_and_link(self):
         import run,runtime,zipfile,os
         module=run.module('module-tests')

@@ -1,0 +1,49 @@
+{
+  "beforeUtf8": "{\n  \"lastValidatedTimestamp\": 1793429072779,\n  \"projects\": {\n    \"/Users/chasen/.codex/worktrees/g3-m5-review-fix/ontology-platform\": {\n      \"name\": \"ontology-platform\"\n    },\n    \"/Users/chasen/.codex/worktrees/g3-m5-review-fix/ontology-platform/apps/web\": {\n      \"name\": \"@ontology-platform/web\",\n      \"version\": \"0.1.0\"\n    }\n  },\n  \"pnpmfiles\": [],\n  \"settings\": {\n    \"allowBuilds\": {\n      \"unrs-resolver\": false\n    },\n    \"autoInstallPeers\": true,\n    \"catalogs\": {},\n    \"dedupeDirectDeps\": false,\n    \"dedupeInjectedDeps\": true,\n    \"dedupePeerDependents\": true,\n    \"dedupePeers\": false,\n    \"dev\": true,\n    \"excludeLinksFromLockfile\": false,\n    \"hoistPattern\": [\n      \"*\"\n    ],\n    \"hoistWorkspacePackages\": true,\n    \"injectWorkspacePackages\": false,\n    \"linkWorkspacePackages\": false,\n    \"minimumReleaseAge\": 1440,\n    \"minimumReleaseAgeIgnoreMissingTime\": true,\n    \"nodeLinker\": \"isolated\",\n    \"optional\": true,\n    \"peersSuffixMaxLength\": 1000,\n    \"preferWorkspacePackages\": false,\n    \"production\": true,\n    \"publicHoistPattern\": [],\n    \"workspacePackagePatterns\": [\n      \"apps/web\"\n    ]\n  },\n  \"filteredInstall\": false,\n  \"validation\": {\n    \"recordedAtNs\": 1793429072779823600,\n    \"files\": {\n      \"/Users/chasen/.codex/worktrees/g3-m5-review-fix/ontology-platform/pnpm-lock.yaml\": {\n        \"mtimeNs\": 1793428938271327500,\n        \"ctimeNs\": 1793428938271327500,\n        \"size\": 163213,\n        \"digest\": \"9c0c20bf43a8d664026e0d8b0beb40a8\"\n      }\n    },\n    \"lockfile\": \"9c0c20bf43a8d664026e0d8b0beb40a8\",\n    \"manifests\": {\n      \".\": \"9502e894328a0c3fdc386dac356b93b6\",\n      \"apps/web\": \"05661698a6d1d9d652fc34dd88309848\"\n    }\n  }\n}\n",
+  "beforeSha256": "060d758f9b3968fb490d114fc5ae055ae7e55f8d5cc2cb2587f29b65e115a889",
+  "method": "rebase two exact project roots; discard old cached validation and force actual pnpm revalidation; verifyDepsBeforeRun stays error; no install",
+  "after": {
+    "lastValidatedTimestamp": 0,
+    "projects": {
+      "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform": {
+        "name": "ontology-platform"
+      },
+      "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/apps/web": {
+        "name": "@ontology-platform/web",
+        "version": "0.1.0"
+      }
+    },
+    "pnpmfiles": [],
+    "settings": {
+      "allowBuilds": {
+        "unrs-resolver": false
+      },
+      "autoInstallPeers": true,
+      "catalogs": {},
+      "dedupeDirectDeps": false,
+      "dedupeInjectedDeps": true,
+      "dedupePeerDependents": true,
+      "dedupePeers": false,
+      "dev": true,
+      "excludeLinksFromLockfile": false,
+      "hoistPattern": [
+        "*"
+      ],
+      "hoistWorkspacePackages": true,
+      "injectWorkspacePackages": false,
+      "linkWorkspacePackages": false,
+      "minimumReleaseAge": 1440,
+      "minimumReleaseAgeIgnoreMissingTime": true,
+      "nodeLinker": "isolated",
+      "optional": true,
+      "peersSuffixMaxLength": 1000,
+      "preferWorkspacePackages": false,
+      "production": true,
+      "publicHoistPattern": [],
+      "workspacePackagePatterns": [
+        "apps/web"
+      ]
+    },
+    "filteredInstall": false
+  }
+}

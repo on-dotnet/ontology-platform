@@ -52,3 +52,5 @@ B0补充独立审查通过，最终19项驱动清单SHA21c6b08b1246a16c501f11482
 
 
 Run07 / T d5c7a9f9eba2f9025e19cc38c10b36f58d53545c 的完整严格离线 Restore 已 exit0，21项目资产、168包与两个SDK实际来源核验通过，独立R2 Review通过。该结论仅绑定Run07/T；其后I01原SelfTest在HostContinuity临时输出边界测试失败，native/Web及真实后续门禁未运行。原始失败与R2见证见 b-continue-20261104-07。任务临时目录现移至本Run私有.tools目录并登记manifest；正式测试保持只读。同时任务适配器补齐按参数逐案闭合、真实模块迁移/Security/OIDC/V2输入、审计旧行集合、凭据DB见证和UI精确故障映射。新批次仅针对性验证，须独立Review、新T、新Run R2及完整I01后再继续。任何歧义SKIP拒绝闭合；旧260项本轮仍0已闭合，无新V3/main/M2/G6。
+
+Run09 / T43f18e80d769bc0eea6373cbd40252e988fa6233：严格离线R2及独立后验PASS；原27套SelfTest exit0（382.874秒）、33任务测试通过。.NET build/format和8项目正式测试完成：780总计、344PASS、436SKIP、0FAIL；保留已有ASPIRE010警告。原完整I01因复制pnpm workspace状态仍指向旧树而在Weblint前失败。所有436跳过逐案唯一映射，历史260包含其中，0已闭合。仅改变本树ignored副本路径记录并丢弃旧validation缓存后，原pnpm强校验及Web lint/typecheck/379测试/build针对性通过；原失败不改写。任务入口现固化精确重定位/重新验证，34任务测试通过，待独立Review/新T/新Run完整验收。详情见b-continue-20261104-09，无新ZIP/main/M2。

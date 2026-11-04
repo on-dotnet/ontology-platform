@@ -1,0 +1,42 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-09",
+  "testedCommit": "43f18e80d769bc0eea6373cbd40252e988fa6233",
+  "R2": "PASS with OS network deny and independent review",
+  "selfTestSuites": 27,
+  "selfTestExitCode": 0,
+  "taskTestsAtT": 33,
+  "native": {
+    "build": "PASS with existing ASPIRE010 warning",
+    "format": "PASS",
+    "testProjects": 8,
+    "total": 780,
+    "passed": 344,
+    "failed": 0,
+    "skipped": 436
+  },
+  "I01": "BLOCKED pnpm copied workspace state contains old absolute roots",
+  "webTargetedAfterCopyMetadataChange": {
+    "lint": "PASS",
+    "typecheck": "PASS",
+    "files": 23,
+    "tests": 379,
+    "build": "PASS",
+    "qualification": "not full I01 PASS; next stable T full validation required"
+  },
+  "newDriverTargetedTests": 34,
+  "I02-I08": "NOT_RUN",
+  "skipsClosed": 0,
+  "stdoutKeep": {
+    "restore-stdout.txt": {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-09/restore-stdout.txt",
+      "bytes": 52463320,
+      "sha256": "9b235ac811726e639a7fdafcea21045b3bade8edb6ec67b413146c3d81f494b1"
+    },
+    "restore-stderr.txt": {
+      "path": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-09/restore-stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+}

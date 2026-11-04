@@ -1,0 +1,35 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-09",
+  "testedCommit": "43f18e80d769bc0eea6373cbd40252e988fa6233",
+  "manifestSha256": "9dc2aadf1167ddd2b940ac24c0e2ca6ced13b2aad253aa430ba6fa143aaa849f",
+  "drivers": {
+    "run.py": "dfb3e7481ddde3919272ba1f218c4969863870ae9a394b9fd1ad9e95dffcf212",
+    "consumer_check.py": "ca1f7d6b02053b7d6962253d169a0af2e9a33a45b28c856a64796f194de0c768",
+    "runtime.py": "9aae533748e52b11c0ac251bfcc3cf5a380f6d2317da195980af422dd8375a12",
+    "pg_fixture.py": "0b3e95134d76bb356fa2f14f21da58886675d6c553b2daf2f643895dc4591f51",
+    "module-tests.py": "283d4f3d8d9ac293d02e2ca5baa3934d2db15b195661d522db180558ed446a99",
+    "startup-boundary.py": "256bba53361f407d0a4071c9c7bd951019418e2193e56aaa604155510d04289c",
+    "migration-boundary.py": "478e3817fccde79b1356d96ac8bc9124731dd5470c5eb17ea1b74c39711f1772",
+    "contract-check.mjs": "d3cdd0b27e77952e7003e6922d3b341f7d82d8562c5836f745f751813dbdcddd",
+    "http.mjs": "c98e018d1748a3bb57a2ee70e71574633a1616e238528eb2f45c02aba83281eb",
+    "browser.mjs": "b2558c334e3896db180a3cb82f35345bfc208edb65266b963901a0d10ffdb758",
+    "fault.mjs": "69557b1f546ded5125ac8b425eb3f8872c8d788a8246fd577f86f9551b1f5939",
+    "g3-compatibility.mjs": "48dbc12affa5e28853ceb55d70d75ca6400d5487f95916f3c1aaf32faf7d46d3",
+    "readback.py": "51afad2d4284dff92dbc011744c76dc2d5dec6888fdeb79a6929ed7568508293",
+    "closeout.py": "f8b2a813b6de2ae3996cbfce0498f885911bfa129cb40c9c6283a9c0a2e9e7d3",
+    "tests.py": "e9acfb02585735dcc438aba77931c31663a86248311a72ecb68ffe1d75bf9580",
+    "host_continuity.py": "abd4385e1b05a86f5a12582a7e95a1fcc4a29c333eb23d2d952229744ed68984",
+    "compose.m1.yaml": "4f66652b69d9893d4c4372111a1b595558c33a7d9fda40398c5f674de79c413e",
+    "compose.g3.yaml": "e459e9c3a608806057cbdd25bdf27de14fcc8c9e09944062a0baf0fcbc803526",
+    "hooks/pre-push": "5eaef2482b8b75cb1deb7cca9703f591a0a15c2459e49c5192b4382ccb7ad474"
+  },
+  "status": "PASS",
+  "reviewer": "/root/consumer_review",
+  "evidenceHashes": {
+    "gate-R2.json": "a4e40b475d738f5f90004841dc0a1fd1eca3258e000ce139919e77c178c69ae4",
+    "restore-result.json": "344a274acc8da125b37b1714677ef3a7adc33597ab034564cb2fdf5cb8f8cc3e",
+    "restore-provenance.json": "9dcb0fd7734ddfe3bb1d82ad984eb1de9acb92e52f65ceca87e2cfef943afbdb"
+  },
+  "rawReview": "R2独立后验PASS，允许同T同Run PREFLIGHT/I01。HEAD/clean/19drivers/工具/R1绑定核验通过；实际私有feed、2SDK全payload、21assets168包重新只读核验与provenance一致；4真实SDK预处理散列一致均本Run私有；实际命令/环境符合OS全断网与全局写/共享缓存读拒绝；PID97644实际exit0 5.573秒，stdout52463320B/stderr0B，0warnings0errors；无停止标记/HTTPcache为空，事件KEEP指纹未变。未重跑Restore/产品或创建资源。不代表I01-I08通过，不授权main，历史事故保持。"
+}

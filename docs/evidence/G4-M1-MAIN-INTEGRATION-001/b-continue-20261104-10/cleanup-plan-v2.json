@@ -1,0 +1,102 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "root": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform",
+  "createdAtUtc": "2026-11-04T16:17:31.739452+00:00",
+  "expiresAtUtc": "2026-11-04T17:02:31.739452+00:00",
+  "expectedHead": "43f18e80d769bc0eea6373cbd40252e988fa6233",
+  "executorSha256": "839c5d12caf7079ad99acc3d83378b9606345eb66e68b9f1cc3d91454ffe40d1",
+  "candidates": [
+    {
+      "path": ".tools/pythonlibs",
+      "files": 26,
+      "bytes": 606501,
+      "links": 0,
+      "entries": 31,
+      "fingerprint": "d2ea2761b78f727e1354623d6e79d71ca1b7b1eef3dc5407c62f277283df39c5"
+    },
+    {
+      "path": ".tools/pnpm/package",
+      "files": 454,
+      "bytes": 22861430,
+      "links": 0,
+      "entries": 560,
+      "fingerprint": "9f24065bb5bcb6ee1656893c55181ddf2647f15e651ef775b83b181ffbbfa746"
+    },
+    {
+      "path": "node_modules",
+      "files": 26430,
+      "bytes": 489111443,
+      "links": 1268,
+      "entries": 31190,
+      "fingerprint": "b78841bbd4e73bc270d7abcb25b1f5601ef052f9c31f7b2d8a820039144045a2"
+    },
+    {
+      "path": "apps/web/node_modules",
+      "files": 9,
+      "bytes": 4490,
+      "links": 15,
+      "entries": 34,
+      "fingerprint": "2f86fb6768273c61e3aa951dd601e56a4ea89623ad7f553e029df35fbb8e41b8"
+    }
+  ],
+  "keep": {
+    ".tools/dotnet-home": {
+      "files": 13,
+      "bytes": 2881013,
+      "links": 0,
+      "entries": 22,
+      "fingerprint": "158a3c213251c4331033147bd4926409a23b6eab151f2a820d1fe182d435cfa5"
+    }
+  },
+  "occupancy": [
+    {
+      "path": ".tools/pythonlibs",
+      "command": [
+        "/usr/sbin/lsof",
+        "-nP",
+        "+D",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/pythonlibs"
+      ],
+      "exitCode": 1,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".tools/pnpm/package",
+      "command": [
+        "/usr/sbin/lsof",
+        "-nP",
+        "+D",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/pnpm/package"
+      ],
+      "exitCode": 1,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "node_modules",
+      "command": [
+        "/usr/sbin/lsof",
+        "-nP",
+        "+D",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/node_modules"
+      ],
+      "exitCode": 1,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/web/node_modules",
+      "command": [
+        "/usr/sbin/lsof",
+        "-nP",
+        "+D",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/apps/web/node_modules"
+      ],
+      "exitCode": 1,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "copyReceiptSha256": "231c84f741bc7ad3976310f3294eafd17c3c175a1a0154710de6843f62301c6a"
+}
