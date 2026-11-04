@@ -1,0 +1,23 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "status": "APPLIED_EXACT_SINGLE_FILE_LOSSLESS_MIGRATION",
+  "approvedBy": "user explicit chat instruction 2026-11-05 Asia/Shanghai",
+  "authorizationText": "批准这份单文件无损归档迁移方案，保留原始字节、Git blob 和恢复映射，在现有任务分支继续完整验收，不更新 main、不进入 M2。",
+  "beforeHead": "5549dc235fbb077fa34a45f707fc1aceac373f44",
+  "originalPath": "docs/evidence/G4-M1-MAIN-INTEGRATION-001/b-continue-20261104-20/agent-schema-result.json",
+  "originalCommit": "9d865b1335f6b396759533984801405726a0f399",
+  "originalBlobOid": "027186ecde6c56d7a4711c5f7d4970494fa2ed0b",
+  "bytes": 102104,
+  "sha256": "1fd721a4677ffe0d589609d96ac4db9f75a1bd8bdc811ae8c92843b2641ea51a",
+  "envelopePath": "docs/evidence/G4-M1-MAIN-INTEGRATION-001/b-continue-20261104-22/proposed-agent-schema-archive.json",
+  "envelopeSha256": "644095d7dcbc2feaaae474cade964f4426562bf86dc027052091a8dd66aa471b",
+  "recovery": "json.loads(envelope.read_text())[\"utf8\"].encode(\"utf-8\")",
+  "restorationWitness": "artifacts/g4-m1-main-integration-001/b-continue-20261104-23/agent-schema-restored-exact.json",
+  "ignoredOriginal": "artifacts/g4-m1-main-integration-001/b-continue-20261104-20/agent-schema-result.json",
+  "utc": "2026-11-04T22:49:23.757443+00:00",
+  "after": "original current-tree path lstat ENOENT; committed envelope/original Git blob/ignored raw unchanged",
+  "removedPaths": [
+    "docs/evidence/G4-M1-MAIN-INTEGRATION-001/b-continue-20261104-20/agent-schema-result.json"
+  ],
+  "exitCode": 0
+}

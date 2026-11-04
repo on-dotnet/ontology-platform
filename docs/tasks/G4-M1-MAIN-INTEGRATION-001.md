@@ -105,3 +105,6 @@ Run21 / T9d865b1335f6b396759533984801405726a0f399：R1/R2独立准入及后验PA
 Run22 / T3783cdff00ec97e1ed1138549f2b2692587c68f9：R1/R2独立PASS，严格离线Restore5.531秒exit0；PREFLIGHT通过。I01于5.359秒的格式扫描exit1，27套及native/Web/产品门禁未启动。唯一已定位项是Run20原始agent-schema-result.json缺末尾LF；原输出102104字节SHA1fd721a4677ffe0d589609d96ac4db9f75a1bd8bdc811ae8c92843b2641ea51a。无损封装已准备，原件仍保留。自动审批拒绝封装后删除已提交原件，要求明确证据迁移授权，未执行被拒命令；精确申请及原始见证见Run22目录。宿主monitor已释放，本Run未启动容器，四可再生工具副本按独立审查白名单收尾；不构中间V3，不更新main或进入M2。
 
 Run22收尾补充：只读Reviewer调用共享检查器时遗漏禁写bytecode环境，产生本树PyYAML17个pyc/258636字节；原26文件/其余3副本/事故KEEP不变。原四副本计划被INPUT_DRIFT安全拒绝，未删除；Reviewer已撤回无写入声明。新v3准确计划独立准入后实际回收4目录、26858文件/510837724逻辑字节，保留旧plan/失败/副作用证据。Run20原始JSON仍在原路径且SHA不变，证据迁移未获明确批准、未执行。
+
+
+2026-11-05 用户明确批准Run22精确单文件无损归档迁移。原102104字节、SHA1fd721a4677ffe0d589609d96ac4db9f75a1bd8bdc811ae8c92843b2641ea51a已与已提交封装utf8还原、原Git blob及ignored原件逐字节复核，并实际恢复到本任务ignored见证。仅移除当前树Run20/agent-schema-result.json旧路径；原blob/提交/ignored输出及提案封装均不改字节，恢复映射与执行回执见Run23/archive-migration-applied.json。原Run22失败不升级，后续冻结新T继续完整验收；main/M2未授权。
