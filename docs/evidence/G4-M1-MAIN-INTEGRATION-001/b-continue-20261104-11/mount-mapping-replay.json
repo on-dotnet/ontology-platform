@@ -1,0 +1,43 @@
+{
+  "status": "TARGETED_PASS_ONLY",
+  "sourceWitnessSha256": "0f6cc698bbc9fcf7965b09587b3fbc2d2f1bf77373f09014c4329b0e34c5c811",
+  "runtimeSha256": "4be392a4e8278cd8dcf8d9b0d189343fa255693c881c7e5d317433c14b0573d3",
+  "composeConfigSha256": "1f74d6bfee2e83cdf3a4754455019027278a4bda00e10b03c856bca6001cdfff",
+  "rows": [
+    {
+      "id": "90b89b9bf5d5b8f7ddba96a8072fcc450e1ae38d05abdcc0545058fd9a023288",
+      "service": "rustfs",
+      "bindings": [
+        {
+          "nativeSource": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261104-11/s3-access",
+          "daemonSource": "/host_mnt/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261104-11/s3-access",
+          "destination": "/run/secrets/s3-access",
+          "readOnly": true
+        },
+        {
+          "nativeSource": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261104-11/s3-secret",
+          "daemonSource": "/host_mnt/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261104-11/s3-secret",
+          "destination": "/run/secrets/s3-secret",
+          "readOnly": true
+        }
+      ]
+    },
+    {
+      "id": "ca8afe463099fd826332e22be9af08666ec7590fc975c259f586b1d062945f52",
+      "service": "platform-pg",
+      "bindings": [
+        {
+          "nativeSource": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261104-11/platform-password",
+          "daemonSource": "/host_mnt/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261104-11/platform-password",
+          "destination": "/run/secrets/platform-password",
+          "readOnly": true
+        }
+      ]
+    },
+    {
+      "id": "426a412114212b6e90dc3e5cbe77234ed8145c50774d5a3d98d8833c9e61d069",
+      "service": "fuseki",
+      "bindings": []
+    }
+  ]
+}

@@ -103,6 +103,29 @@ class RuntimeBoundaryTests(unittest.TestCase):
             link=Path(d)/'link'; link.symlink_to('/tmp')
             with self.assertRaises(ValueError): rt.boundary(link/'out',ARTIFACTS)
 
+    def test_actual_bind_mounts_match_declared_native_or_desktop_path(self):
+        """真实目录只接受逐项声明的原生或Docker Desktop路径及只读目标。"""
+        import runtime as rt
+        with tempfile.TemporaryDirectory(dir=ARTIFACTS) as d:
+            source=Path(d)/'input';source.write_text('synthetic')
+            declared=[{'type':'bind','source':str(source),'target':'/input','read_only':True}]
+            actual={'Type':'bind','Source':str(source),'Destination':'/input','RW':False}
+            for prefix in ('','/host_mnt'):
+                row=dict(actual,Source=prefix+str(source))
+                self.assertEqual(rt.validate_bind_mounts([row],declared)[0]['nativeSource'],str(source))
+            for rows in ([],[actual,actual],[dict(actual,Source='/host_mnt/tmp/foreign')],
+                         [dict(actual,Source='/host_mnt'+d+'/../input')],
+                         [dict(actual,Source='/host_mnt/host_mnt'+str(source))],
+                         [dict(actual,Destination='/other')],[dict(actual,RW=True)],
+                         [actual,dict(actual,Destination='/extra')]):
+                with self.subTest(rows=rows),self.assertRaises(ValueError):
+                    rt.validate_bind_mounts(rows,declared)
+            for declarations in ([dict(declared[0],read_only=False)],declared*2):
+                with self.assertRaises(ValueError):rt.validate_bind_mounts([actual],declarations)
+            source.unlink();source.symlink_to('/tmp')
+            with self.assertRaisesRegex(ValueError,'SYMLINK'):
+                rt.validate_bind_mounts([actual],declared)
+
     def test_deadline_terminates_process_group(self):
         import runtime as rt
         raw,code,timed_out=rt.bounded_process([sys.executable,'-c','import time; time.sleep(20)'],

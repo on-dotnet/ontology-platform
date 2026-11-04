@@ -456,21 +456,48 @@ def wait_pg(m, service='pg-source', timeout=60):
     raise ValueError('PG_READINESS_TIMEOUT')
 
 
+def validate_bind_mounts(actual, declared):
+    """逐项目录匹配；Desktop映射只能是已登记原生路径前加准确/host_mnt。"""
+    expected={}
+    for mount in declared:
+        if mount['type']!='bind':continue
+        source=str(boundary(mount['source'],ROOT,exists=True))
+        target=mount['target']
+        require(target not in expected and mount.get('read_only') is True,'DECLARED_BIND_BOUNDARY')
+        expected[target]=source
+    seen=set();rows=[]
+    for mount in actual:
+        if mount['Type']!='bind':continue
+        target=mount['Destination']
+        require(target in expected and target not in seen,'ACTUAL_BIND_SET')
+        source=expected[target]
+        require(mount['Source'] in (source,'/host_mnt'+source),'ACTUAL_BIND_SOURCE')
+        require(mount.get('RW') is False,'ACTUAL_WRITABLE_BIND')
+        seen.add(target)
+        rows.append({'nativeSource':source,'daemonSource':mount['Source'],'destination':target,'readOnly':True})
+    require(seen==set(expected),'ACTUAL_BIND_SET')
+    return rows
+
+
 def resource_snapshot(m, group, name):
     """实际资源ID/镜像/限额/挂载检查；不归档Env或秘密。"""
     ids = docker(m,['ps','-aq','--no-trunc','--filter','label=ontology.task-id='+TASK,
                      '--filter','label=ontology.run-id='+m['runId']]).decode().split()
     require(len(ids)<=6,'ACTUAL_CONTAINER_BUDGET')
+    verify_engine(m)
+    # 全profile仅取得声明目录；运行预算仍由实际容器计数和内存核实。
+    configured=subprocess.run(compose_command(group)+['--profile','*','config','--format','json'],
+        env=compose_environment(m),capture_output=True,timeout=30)
+    require(configured.returncode==0,'COMPOSE_CONFIG')
+    declarations=json.loads(configured.stdout)['services']
     rows=[];memory=0;container_ids={};volumes={}
     for ident in ids:
         item=inspect_owned(m,ident);service=item['Config']['Labels']['com.docker.compose.service']
+        require(service in declarations and service not in container_ids,'ACTUAL_SERVICE_SET')
         require(item['Config']['Image'] in IMAGES.values(),'ACTUAL_IMAGE')
         memory+=item['HostConfig']['Memory'];require(item['HostConfig']['Memory']>0,'UNBOUNDED_MEMORY')
         require(not item['HostConfig']['Privileged'] and item['HostConfig']['ReadonlyRootfs'],'ACTUAL_PRIVILEGE')
-        for mount in item['Mounts']:
-            if mount['Type']=='bind':
-                boundary(mount['Source'],ROOT,exists=True)
-                require(not mount['RW'],'ACTUAL_WRITABLE_BIND')
+        bindings=validate_bind_mounts(item['Mounts'],declarations[service].get('volumes',[]))
         for mount in item['Mounts']:
             if mount['Type']=='volume' and item['State']['Running'] and not item['State']['Paused'] and mount['Name'] not in volumes:
                 info=json.loads(docker(m,['volume','inspect',mount['Name']]))[0]
@@ -480,11 +507,11 @@ def resource_snapshot(m, group, name):
                 require(len(observed)>=6 and observed[2].isdigit(),'VOLUME_USAGE_FORMAT')
                 volumes[mount['Name']]={'usedBytes':int(observed[2])*1024,'containerId':ident,'destination':mount['Destination']}
         container_ids[service]=ident
-        rows.append(dict(id=ident,service=service,image=item['Image'],running=item['State']['Running'],paused=item['State']['Paused'],memoryBytes=item['HostConfig']['Memory'],mounts=[{k:v for k,v in x.items() if k in ('Type','Name','Source','Destination','RW')} for x in item['Mounts']]))
+        rows.append(dict(id=ident,service=service,image=item['Image'],running=item['State']['Running'],paused=item['State']['Paused'],memoryBytes=item['HostConfig']['Memory'],bindMappings=bindings,mounts=[{k:v for k,v in x.items() if k in ('Type','Name','Source','Destination','RW')} for x in item['Mounts']]))
     require(memory<=6*1024**3,'ACTUAL_MEMORY_BUDGET')
     used=sum(v['usedBytes'] for v in volumes.values())
     require(used<3*1024**3,'VOLUME_STOP_THRESHOLD')
-    result=dict(taskId=TASK,runId=m['runId'],group=group,containers=rows,totalMemoryBytes=memory,observedVolumes=volumes,observedVolumeUsedBytes=used)
+    result=dict(taskId=TASK,runId=m['runId'],group=group,composeConfigSha256=digest(configured.stdout),containers=rows,totalMemoryBytes=memory,observedVolumes=volumes,observedVolumeUsedBytes=used)
     write_json(ARTIFACTS/m['runId']/(name+'.json'),result)
     update_runtime(m,containerIds=container_ids,group=group,**({'rustfsContainerId':container_ids['rustfs']} if 'rustfs' in container_ids else {}))
     return result
@@ -516,6 +543,7 @@ def start_group(m, group, *, modules=False):
     if group=='m1':wait_pg(m)
     if modules:
         wait_http('http://127.0.0.1:15303/$/ping')
+        wait_http('http://127.0.0.1:15900/health/ready')
         return
     wait_http('http://localhost:15180/realms/master/.well-known/openid-configuration',180)
     d=private_dir(m['runId'])

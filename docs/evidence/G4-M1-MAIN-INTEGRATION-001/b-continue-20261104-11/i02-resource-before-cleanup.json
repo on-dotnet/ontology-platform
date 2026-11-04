@@ -1,0 +1,51 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-11",
+  "containers": [
+    {
+      "id": "90b89b9bf5d5b8f7ddba96a8072fcc450e1ae38d05abdcc0545058fd9a023288",
+      "memoryBytes": 805306368,
+      "running": true,
+      "volumes": [
+        {
+          "name": "ontology-g4-main-b-continue-20261104-11_rustfs-data",
+          "destination": "/data",
+          "raw": "Filesystem     1024-blocks  Used Available Capacity Mounted on\ntmpfs               524288    40    524248       1% /data\n",
+          "sha256": "302a5598069b34aa684daa49f230f9cd0672ab38972cd40e3550353612aa796a"
+        }
+      ]
+    },
+    {
+      "id": "ca8afe463099fd826332e22be9af08666ec7590fc975c259f586b1d062945f52",
+      "memoryBytes": 805306368,
+      "running": true,
+      "volumes": [
+        {
+          "name": "ontology-g4-main-b-continue-20261104-11_platform-data",
+          "destination": "/var/lib/postgresql",
+          "raw": "Filesystem     1024-blocks  Used Available Capacity Mounted on\ntmpfs               524288 47696    476592      10% /var/lib/postgresql\n",
+          "sha256": "b90eb243aa572bb882ade0c575e77bf4e553b559983b037f3c54a7b286729336"
+        }
+      ]
+    },
+    {
+      "id": "426a412114212b6e90dc3e5cbe77234ed8145c50774d5a3d98d8833c9e61d069",
+      "memoryBytes": 1073741824,
+      "running": true,
+      "volumes": [
+        {
+          "name": "ontology-g4-main-b-continue-20261104-11_fuseki-data",
+          "destination": "/fuseki",
+          "raw": "Filesystem     1024-blocks  Used Available Capacity Mounted on\ntmpfs               524288   244    524044       1% /fuseki\n",
+          "sha256": "96e03241e5604afb958ce5e4792872a548c9261f2ece38ef4f364b7ead3afacb"
+        }
+      ]
+    }
+  ],
+  "totalMemoryBytes": 2684354560,
+  "rustfsReadiness": {
+    "status": "NOT_VERIFIED",
+    "category": "URLError"
+  },
+  "scope": "resource diagnostic only, no module test executed"
+}
