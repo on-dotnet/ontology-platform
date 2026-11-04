@@ -1,0 +1,43 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-20",
+  "testedCommit": "7bb08672c354fb97ed39ad4ad7492d2cbe297aad",
+  "scope": "READ_ONLY_SYNTHETIC_DB_WITNESS_KEEP_PRIVATE_NOT_PACKAGE",
+  "containerId": "64011b89486f84b5f2029fe5216a5b52c0f6bd9b0ae7560245b77104046ad595",
+  "command": [
+    "docker",
+    "--context",
+    "desktop-linux",
+    "exec",
+    "-u",
+    "999:999",
+    "64011b89486f84b5f2029fe5216a5b52c0f6bd9b0ae7560245b77104046ad595",
+    "pg_dump",
+    "-U",
+    "platform",
+    "-d",
+    "platform",
+    "-Fc"
+  ],
+  "exitCode": 0,
+  "privatePath": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261104-20/logs/slow-sse-platform-failure.dump",
+  "bytes": 968438,
+  "sha256": "21b5debd9315303193b1afdd03f74c044e7c3b82a2a1591e12af33d699971ff9",
+  "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "verifyCommand": [
+    "docker",
+    "--context",
+    "desktop-linux",
+    "exec",
+    "-i",
+    "-u",
+    "999:999",
+    "64011b89486f84b5f2029fe5216a5b52c0f6bd9b0ae7560245b77104046ad595",
+    "pg_restore",
+    "--list"
+  ],
+  "verifyExitCode": 0,
+  "tocSha256": "962fc0fd19321ee60d4aae346feb5a5f7ae598d12e160418467ffb607d885fea",
+  "containsRunsAndEvents": true,
+  "executedRuntimeSourceSha256": "465e772abd26de6092413cda02b3109575c8bfe3fc03a61fc6175c0081aa6e7f"
+}

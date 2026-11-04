@@ -1,0 +1,44 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-20",
+  "scope": "READ_ONLY_DIAGNOSTIC_NOT_GATE",
+  "rawSha256": "59c753fb4ef8e414cd5ba500d394d5ea20deb3cfbae123edd0a00f084c55e1da",
+  "samples": [
+    {
+      "inputBytes": 1,
+      "medianMs": 0.2962,
+      "minMs": 0.26,
+      "name": "small-in-small-out",
+      "p95Ms": 0.3375,
+      "samples": 30,
+      "totalMs": 8.8698
+    },
+    {
+      "inputBytes": 12288,
+      "medianMs": 42.0235,
+      "minMs": 0.4606,
+      "name": "12KiB-in-small-out",
+      "p95Ms": 49.0846,
+      "samples": 30,
+      "totalMs": 732.2725
+    },
+    {
+      "inputBytes": 24576,
+      "medianMs": 43.0705,
+      "minMs": 0.9665,
+      "name": "24KiB-in-small-out",
+      "p95Ms": 50.4273,
+      "samples": 30,
+      "totalMs": 1244.7604000000003
+    },
+    {
+      "inputBytes": 1,
+      "medianMs": 1.4016,
+      "minMs": 1.3329,
+      "name": "small-in-12KiB-out",
+      "p95Ms": 1.5621,
+      "samples": 30,
+      "totalMs": 42.39840000000002
+    }
+  ]
+}

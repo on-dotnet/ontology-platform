@@ -1,0 +1,33 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-20",
+  "testedCommit": "7bb08672c354fb97ed39ad4ad7492d2cbe297aad",
+  "command": [
+    "/usr/bin/sandbox-exec",
+    "-p",
+    "(version 1) (allow default) (deny network-outbound (remote ip \"*:*\")) (allow network-outbound (remote ip \"localhost:*\"))",
+    "/usr/local/share/dotnet/dotnet",
+    "/usr/local/share/dotnet/sdk/10.0.402/FSharp/fsi.dll",
+    "--readline-",
+    "--exec",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-20/helpers/pg-latency-v2.fsx"
+  ],
+  "startedAtUtc": "2026-11-04T21:11:10.066229+00:00",
+  "endedAtUtc": "2026-11-04T21:11:10.645218+00:00",
+  "elapsedSeconds": 0.5788828339937027,
+  "exitCode": 1,
+  "timingStatus": "OBSERVED",
+  "timedOut": false,
+  "executedInputDrift": false,
+  "inputHashes": {
+    "/usr/bin/sandbox-exec": "58839ef01b4eef8aac0d2aa8f9d1c074ae45aafe3533965b030672450064acc8",
+    "/usr/local/share/dotnet/dotnet": "11b517e7b00d0efa20e9b3ab6fe433f135d828a4c95c9c6ca7a9cf1328b6ada4",
+    "/usr/local/share/dotnet/sdk/10.0.402/FSharp/fsi.dll": "02244412fdf08e5761856d31b3a452878b24f6a556117a78c289da2ba0e683cb",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-20/helpers/pg-latency-v2.fsx": "9a76b7405d805277f3acb3e7de027d2621317a2f9a0f41553e0131f059cb4f7e"
+  },
+  "manifestSha256": "9a4cd4e3103c418d6efcbf1fd76f679a801fb79bd2c971303deeb03a33298a33",
+  "commandSha256": "cf4320639673a0acb642630198676aecbc45ebe02e60a2d1b1f5ab9cf83d4cba",
+  "logSha256": "5e1f3d63034f3fb3ffcb66335293be0e9dcb3220f4cb14d4a1d8764b315a0c35",
+  "logBytes": 950,
+  "logVisibility": "PRIVATE"
+}

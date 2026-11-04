@@ -1,0 +1,1528 @@
+{
+  "cases": [
+    {
+      "case": "RenamePersistsThroughReopenListReplayAndStructuralEdit",
+      "status": "SKIP",
+      "line": 1
+    },
+    {
+      "case": "RenameFailureAndNameBoundsLeaveCommittedNameUnchanged",
+      "status": "SKIP",
+      "line": 3
+    },
+    {
+      "case": "SourceHistoryValidationAndPublicationBindingAreReal",
+      "status": "SKIP",
+      "line": 5
+    },
+    {
+      "case": "UnicodeEditPersistsExactHistoryAndHonestSourceDiff",
+      "status": "SKIP",
+      "line": 7
+    },
+    {
+      "case": "LeadingBomCreateSaveAndNoOpKeepExactSourceHistory",
+      "status": "SKIP",
+      "line": 9
+    },
+    {
+      "case": "ConcurrentSaveHasOneWinnerAndNoLostUpdate",
+      "status": "SKIP",
+      "line": 11
+    },
+    {
+      "case": "CommittedCreateAndSaveReplayWithoutJena",
+      "status": "SKIP",
+      "line": 13
+    },
+    {
+      "case": "AuditFailureRollsBackEveryWrite",
+      "status": "SKIP",
+      "line": 15
+    },
+    {
+      "case": "FullPlatformRolesAndWholeScopeAreEnforced",
+      "status": "SKIP",
+      "line": 17
+    },
+    {
+      "case": "InvalidSourceAndStaleRevisionNeverPersist",
+      "status": "SKIP",
+      "line": 19
+    },
+    {
+      "case": "CloneInheritsOnlyTheCatalogAssetAndExactScope",
+      "status": "SKIP",
+      "line": 21
+    },
+    {
+      "case": "MigrationDownRefusesConcurrentAndNonemptyHistory",
+      "status": "SKIP",
+      "line": 23
+    },
+    {
+      "case": "InitialOnlyDatabaseKeepsOriginalLockAndNonemptyDownGuards",
+      "status": "SKIP",
+      "line": 25
+    },
+    {
+      "case": "ConcurrentIdempotencyHasOneCommit (False)",
+      "status": "SKIP",
+      "line": 27
+    },
+    {
+      "case": "ConcurrentIdempotencyHasOneCommit (True)",
+      "status": "SKIP",
+      "line": 29
+    },
+    {
+      "case": "G3MergedShaclDiagnosticNeverGuessesDataSource (\"ontology\")",
+      "status": "SKIP",
+      "line": 31
+    },
+    {
+      "case": "G3MergedShaclDiagnosticNeverGuessesDataSource (\"vocabulary\")",
+      "status": "SKIP",
+      "line": 33
+    },
+    {
+      "case": "G3MergedShaclDiagnosticNeverGuessesDataSource (\"data\")",
+      "status": "SKIP",
+      "line": 35
+    },
+    {
+      "case": "G3MergedShaclDiagnosticNeverGuessesDataSource (\"ambiguous\")",
+      "status": "SKIP",
+      "line": 37
+    },
+    {
+      "case": "G3SupportDiagnosticRetainsProvenSingleSourceHash (\"ontology\")",
+      "status": "SKIP",
+      "line": 39
+    },
+    {
+      "case": "G3SupportDiagnosticRetainsProvenSingleSourceHash (\"vocabulary\")",
+      "status": "SKIP",
+      "line": 41
+    },
+    {
+      "case": "G3SupportDiagnosticRetainsProvenSingleSourceHash (\"data\")",
+      "status": "SKIP",
+      "line": 43
+    },
+    {
+      "case": "G3AssessmentPersistsReplaysAndReauthorizesWholeScope",
+      "status": "SKIP",
+      "line": 45
+    },
+    {
+      "case": "G3AssessmentLockRejectsInvalidPersistentFacts (\"expired\",\"assessment_expired\")",
+      "status": "SKIP",
+      "line": 47
+    },
+    {
+      "case": "G3AssessmentLockRejectsInvalidPersistentFacts (\"profile\",\"assessment_binding_conflict\")",
+      "status": "SKIP",
+      "line": 49
+    },
+    {
+      "case": "G3AssessmentLockRejectsInvalidPersistentFacts (\"tampered\",\"assessment_binding_conflict\")",
+      "status": "SKIP",
+      "line": 51
+    },
+    {
+      "case": "G3AssessmentLockRejectsInvalidPersistentFacts (\"legacy\",\"assessment_required\")",
+      "status": "SKIP",
+      "line": 53
+    },
+    {
+      "case": "G3AssessmentLockRejectsInvalidPersistentFacts (\"ineligible\",\"assessment_not_eligible\")",
+      "status": "SKIP",
+      "line": 55
+    },
+    {
+      "case": "G3FourSourceBytesAndFixedRevisionComparisonRemainExact",
+      "status": "SKIP",
+      "line": 57
+    },
+    {
+      "case": "M2NamedEditAssessmentAndFailurePreserveCommittedSources",
+      "status": "SKIP",
+      "line": 59
+    },
+    {
+      "case": "M2BasicModelingSequencePersistsEachRevisionAndKeepsOtherSourcesExact",
+      "status": "SKIP",
+      "line": 61
+    },
+    {
+      "case": "G3ProductionBoundariesExist",
+      "status": "PASS",
+      "line": 63
+    },
+    {
+      "case": "ProfileHasExactMatrixAndStableHash",
+      "status": "PASS",
+      "line": 64
+    },
+    {
+      "case": "RenamedBlankNodesCompareExactlyAndNearMissIsDifferent",
+      "status": "SKIP",
+      "line": 65
+    },
+    {
+      "case": "TwentyCorpusRowsUseAssertedOnlySupportAndShapesBlankException",
+      "status": "SKIP",
+      "line": 67
+    },
+    {
+      "case": "ComparisonBudgetOrCancellationRevokesAllPartialResults (\"blank_node_budget\")",
+      "status": "SKIP",
+      "line": 69
+    },
+    {
+      "case": "ComparisonBudgetOrCancellationRevokesAllPartialResults (\"comparison_cancelled\")",
+      "status": "SKIP",
+      "line": 71
+    },
+    {
+      "case": "ComparisonBudgetOrCancellationRevokesAllPartialResults (\"comparison_timeout\")",
+      "status": "SKIP",
+      "line": 73
+    },
+    {
+      "case": "ComparisonPreservesAbsentBytesAndRejectsInvalidOrOversizedBundles",
+      "status": "SKIP",
+      "line": 75
+    },
+    {
+      "case": "UndeclaredCustomFactsRequireAnExplicitPropertyOrAnnotation",
+      "status": "SKIP",
+      "line": 77
+    },
+    {
+      "case": "CancellationDuringRiotParsingAndExact128BlankBoundary",
+      "status": "SKIP",
+      "line": 79
+    },
+    {
+      "case": "ParsingAcrossAllFourSourcesSharesOneFiveSecondBudget",
+      "status": "SKIP",
+      "line": 81
+    },
+    {
+      "case": "SymmetricNonIsomorphicGraphsExhaustTheSharedSearchBudget",
+      "status": "SKIP",
+      "line": 83
+    },
+    {
+      "case": "CurrentProfileIsVersionTwoAndLegacyGoldenRemainsRegistered",
+      "status": "PASS",
+      "line": 85
+    },
+    {
+      "case": "NamedAxiomEditPreservesOtherSourcesAndRequiresBothDeclarations (\"equivalentClass\",\"Class\")",
+      "status": "SKIP",
+      "line": 86
+    },
+    {
+      "case": "NamedAxiomEditPreservesOtherSourcesAndRequiresBothDeclarations (\"disjointWith\",\"Class\")",
+      "status": "SKIP",
+      "line": 88
+    },
+    {
+      "case": "NamedAxiomEditPreservesOtherSourcesAndRequiresBothDeclarations (\"inverseOf\",\"ObjectProperty\")",
+      "status": "SKIP",
+      "line": 90
+    },
+    {
+      "case": "InvalidMetadataFailsBeforeAnyNoOpOrSerialization (\"iri-language\")",
+      "status": "SKIP",
+      "line": 92
+    },
+    {
+      "case": "InvalidMetadataFailsBeforeAnyNoOpOrSerialization (\"iri-datatype\")",
+      "status": "SKIP",
+      "line": 94
+    },
+    {
+      "case": "InvalidMetadataFailsBeforeAnyNoOpOrSerialization (\"literal-conflict\")",
+      "status": "SKIP",
+      "line": 96
+    },
+    {
+      "case": "InvalidMetadataFailsBeforeAnyNoOpOrSerialization (\"langString-without-language\")",
+      "status": "SKIP",
+      "line": 98
+    },
+    {
+      "case": "RiotLanguageTermCanBeCopiedAndDeletedPrecisely",
+      "status": "SKIP",
+      "line": 100
+    },
+    {
+      "case": "EquivalentLiteralRepresentationsPreserveExactSourceBytes (\"language-datatype\",False)",
+      "status": "SKIP",
+      "line": 102
+    },
+    {
+      "case": "EquivalentLiteralRepresentationsPreserveExactSourceBytes (\"language-datatype\",True)",
+      "status": "SKIP",
+      "line": 104
+    },
+    {
+      "case": "EquivalentLiteralRepresentationsPreserveExactSourceBytes (\"plain-string\",False)",
+      "status": "SKIP",
+      "line": 106
+    },
+    {
+      "case": "EquivalentLiteralRepresentationsPreserveExactSourceBytes (\"plain-string\",True)",
+      "status": "SKIP",
+      "line": 108
+    },
+    {
+      "case": "EquivalentLiteralRepresentationsPreserveExactSourceBytes (\"language-case\",False)",
+      "status": "SKIP",
+      "line": 110
+    },
+    {
+      "case": "EquivalentLiteralRepresentationsPreserveExactSourceBytes (\"language-case\",True)",
+      "status": "SKIP",
+      "line": 112
+    },
+    {
+      "case": "SkosPolicyReturnsExactSourceDiagnostic (\"s14\",\"skos_pref_label_conflict\")",
+      "status": "SKIP",
+      "line": 114
+    },
+    {
+      "case": "SkosPolicyReturnsExactSourceDiagnostic (\"s13\",\"skos_label_relation_conflict\")",
+      "status": "SKIP",
+      "line": 116
+    },
+    {
+      "case": "SkosPolicyReturnsExactSourceDiagnostic (\"no-language\",\"skos_label_language_required\")",
+      "status": "SKIP",
+      "line": 118
+    },
+    {
+      "case": "SkosPolicyReturnsExactSourceDiagnostic (\"unknown-language\",\"language_policy_unknown\")",
+      "status": "SKIP",
+      "line": 120
+    },
+    {
+      "case": "SkosPolicyReturnsExactSourceDiagnostic (\"invalid-term\",\"skos_label_term_invalid\")",
+      "status": "SKIP",
+      "line": 122
+    },
+    {
+      "case": "SkosPolicyReturnsExactSourceDiagnostic (\"missing-scheme\",\"skos_scheme_reference_missing\")",
+      "status": "SKIP",
+      "line": 124
+    },
+    {
+      "case": "SkosPolicyReturnsExactSourceDiagnostic (\"missing-concept\",\"skos_concept_reference_missing\")",
+      "status": "SKIP",
+      "line": 126
+    },
+    {
+      "case": "SkosPolicyReturnsExactSourceDiagnostic (\"cycle\",\"skos_hierarchy_cycle\")",
+      "status": "SKIP",
+      "line": 128
+    },
+    {
+      "case": "SkosPolicyReturnsExactSourceDiagnostic (\"related\",\"skos_related_hierarchy_conflict\")",
+      "status": "SKIP",
+      "line": 130
+    },
+    {
+      "case": "SkosPolicyReturnsExactSourceDiagnostic (\"notation\",\"skos_notation_duplicate\")",
+      "status": "SKIP",
+      "line": 132
+    },
+    {
+      "case": "SkosPolicyReturnsExactSourceDiagnostic (\"mapping-scheme\",\"skos_mapping_scheme_conflict\")",
+      "status": "SKIP",
+      "line": 134
+    },
+    {
+      "case": "SkosPolicyReturnsExactSourceDiagnostic (\"s46\",\"skos_mapping_relation_conflict\")",
+      "status": "SKIP",
+      "line": 136
+    },
+    {
+      "case": "SkosPolicyReturnsExactSourceDiagnostic (\"deprecated\",\"semantic_reference_deprecated\")",
+      "status": "SKIP",
+      "line": 138
+    },
+    {
+      "case": "LanguageTagSubtagsRespectBcp47Uniqueness (\"en-u-ca-gregory-u-nu-latn\",False)",
+      "status": "SKIP",
+      "line": 140
+    },
+    {
+      "case": "LanguageTagSubtagsRespectBcp47Uniqueness (\"en-1901-1901\",False)",
+      "status": "SKIP",
+      "line": 142
+    },
+    {
+      "case": "LanguageTagSubtagsRespectBcp47Uniqueness (\"en-a-bbb-x-a-ccc\",True)",
+      "status": "SKIP",
+      "line": 144
+    },
+    {
+      "case": "ValidMultilingualAndCrossSchemeMappingHaveNoDiagnostics",
+      "status": "SKIP",
+      "line": 146
+    },
+    {
+      "case": "CrossSourceDuplicateFocusUsesBundleHash",
+      "status": "SKIP",
+      "line": 148
+    },
+    {
+      "case": "DirectV3EntrypointsCannotBypassGovernance (\"skos\")",
+      "status": "SKIP",
+      "line": 150
+    },
+    {
+      "case": "DirectV3EntrypointsCannotBypassGovernance (\"precision\")",
+      "status": "SKIP",
+      "line": 152
+    },
+    {
+      "case": "DirectV3EntrypointsCannotBypassGovernance (\"dimension\")",
+      "status": "SKIP",
+      "line": 154
+    },
+    {
+      "case": "DirectV3EntrypointsCannotBypassGovernance (\"deprecated-canonical\")",
+      "status": "SKIP",
+      "line": 156
+    },
+    {
+      "case": "ExactLegacyM2ProfileKeepsHistoricalPolicy",
+      "status": "SKIP",
+      "line": 158
+    },
+    {
+      "case": "AtomicVocabularyBatchUsesExistingRevisionAndAuditTransaction",
+      "status": "SKIP",
+      "line": 160
+    },
+    {
+      "case": "GovernanceIsIndependentOfRealShaclReport",
+      "status": "SKIP",
+      "line": 162
+    },
+    {
+      "case": "DuplicateLanguageTagSubtagsBlockAssessmentPublication",
+      "status": "SKIP",
+      "line": 164
+    },
+    {
+      "case": "UnitGovernanceBindsRealAssessment (\"valid\",Pass)",
+      "status": "SKIP",
+      "line": 166
+    },
+    {
+      "case": "UnitGovernanceBindsRealAssessment (\"unknown\",Indeterminate)",
+      "status": "SKIP",
+      "line": 168
+    },
+    {
+      "case": "UnitGovernanceBindsRealAssessment (\"mismatch\",Fail)",
+      "status": "SKIP",
+      "line": 170
+    },
+    {
+      "case": "UnitGovernanceBindsRealAssessment (\"deprecated-canonical\",Fail)",
+      "status": "SKIP",
+      "line": 172
+    },
+    {
+      "case": "CompleteSyntheticUnitsAndOrdinaryPropertyAreValid",
+      "status": "SKIP",
+      "line": 174
+    },
+    {
+      "case": "UnitFailuresHaveExactSourceDiagnostics (\"version\",\"unit_version_reference_missing\")",
+      "status": "SKIP",
+      "line": 176
+    },
+    {
+      "case": "UnitFailuresHaveExactSourceDiagnostics (\"duplicate\",\"unit_definition_conflict\")",
+      "status": "SKIP",
+      "line": 178
+    },
+    {
+      "case": "UnitFailuresHaveExactSourceDiagnostics (\"quantity\",\"quantity_kind_reference_missing\")",
+      "status": "SKIP",
+      "line": 180
+    },
+    {
+      "case": "UnitFailuresHaveExactSourceDiagnostics (\"dimension\",\"dimension_reference_missing\")",
+      "status": "SKIP",
+      "line": 182
+    },
+    {
+      "case": "UnitFailuresHaveExactSourceDiagnostics (\"exponent\",\"dimension_definition_invalid\")",
+      "status": "SKIP",
+      "line": 184
+    },
+    {
+      "case": "UnitFailuresHaveExactSourceDiagnostics (\"exponent-range\",\"dimension_definition_invalid\")",
+      "status": "SKIP",
+      "line": 186
+    },
+    {
+      "case": "UnitFailuresHaveExactSourceDiagnostics (\"exponent-type\",\"dimension_definition_invalid\")",
+      "status": "SKIP",
+      "line": 188
+    },
+    {
+      "case": "UnitFailuresHaveExactSourceDiagnostics (\"source\",\"unit_source_required\")",
+      "status": "SKIP",
+      "line": 190
+    },
+    {
+      "case": "UnitFailuresHaveExactSourceDiagnostics (\"source-duplicate\",\"unit_source_required\")",
+      "status": "SKIP",
+      "line": 192
+    },
+    {
+      "case": "UnitFailuresHaveExactSourceDiagnostics (\"source-label\",\"unit_source_required\")",
+      "status": "SKIP",
+      "line": 194
+    },
+    {
+      "case": "UnitFailuresHaveExactSourceDiagnostics (\"precision\",\"unit_precision_unknown\")",
+      "status": "SKIP",
+      "line": 196
+    },
+    {
+      "case": "UnitFailuresHaveExactSourceDiagnostics (\"property-missing\",\"property_unit_binding_invalid\")",
+      "status": "SKIP",
+      "line": 198
+    },
+    {
+      "case": "UnitFailuresHaveExactSourceDiagnostics (\"property-duplicate\",\"property_unit_binding_invalid\")",
+      "status": "SKIP",
+      "line": 200
+    },
+    {
+      "case": "UnitFailuresHaveExactSourceDiagnostics (\"unit-missing\",\"unit_reference_missing\")",
+      "status": "SKIP",
+      "line": 202
+    },
+    {
+      "case": "UnitFailuresHaveExactSourceDiagnostics (\"dimension-mismatch\",\"unit_dimension_mismatch\")",
+      "status": "SKIP",
+      "line": 204
+    },
+    {
+      "case": "UnitFailuresHaveExactSourceDiagnostics (\"quantity-mismatch\",\"unit_quantity_kind_mismatch\")",
+      "status": "SKIP",
+      "line": 206
+    },
+    {
+      "case": "UnitFailuresHaveExactSourceDiagnostics (\"same-exponents\",\"unit_dimension_mismatch\")",
+      "status": "SKIP",
+      "line": 208
+    },
+    {
+      "case": "UnitFailuresHaveExactSourceDiagnostics (\"quantity-duplicate\",\"quantity_kind_reference_missing\")",
+      "status": "SKIP",
+      "line": 210
+    },
+    {
+      "case": "UnitFailuresHaveExactSourceDiagnostics (\"deprecated-canonical\",\"semantic_reference_deprecated\")",
+      "status": "SKIP",
+      "line": 212
+    },
+    {
+      "case": "StandardSourceFailureKeepsExactPredicate (\"synthetic\",\"urn:ontology-platform:semantics:synthetic\")",
+      "status": "SKIP",
+      "line": 214
+    },
+    {
+      "case": "StandardSourceFailureKeepsExactPredicate (\"provenance\",\"http://www.w3.org/ns/prov#wasDerivedFrom\")",
+      "status": "SKIP",
+      "line": 216
+    },
+    {
+      "case": "VersionThreeKeepsHistoricalProfiles",
+      "status": "PASS",
+      "line": 218
+    },
+    {
+      "case": "VocabularyInterfacesAreImplemented",
+      "status": "PASS",
+      "line": 219
+    },
+    {
+      "case": "DuplicateAddsThenDeleteUseRdfSetSemantics (False)",
+      "status": "SKIP",
+      "line": 220
+    },
+    {
+      "case": "DuplicateAddsThenDeleteUseRdfSetSemantics (True)",
+      "status": "SKIP",
+      "line": 222
+    },
+    {
+      "case": "EquivalentLiteralAddThenDeleteRemovesOriginal (\"language\")",
+      "status": "SKIP",
+      "line": 224
+    },
+    {
+      "case": "EquivalentLiteralAddThenDeleteRemovesOriginal (\"datatype\")",
+      "status": "SKIP",
+      "line": 226
+    },
+    {
+      "case": "FourSourcesAndAtomicChangesUseRealRiot",
+      "status": "SKIP",
+      "line": 228
+    },
+    {
+      "case": "CurrentProfileRetainsExactHistoricalFactories",
+      "status": "PASS",
+      "line": 230
+    },
+    {
+      "case": "LegacyVersionThreeStillRejectsTheSameControlledTimeCorpus",
+      "status": "SKIP",
+      "line": 231
+    },
+    {
+      "case": "ControlledTemplatesAndIdentityRelations (\"valid\",null)",
+      "status": "SKIP",
+      "line": 233
+    },
+    {
+      "case": "ControlledTemplatesAndIdentityRelations (\"different-site\",null)",
+      "status": "SKIP",
+      "line": 235
+    },
+    {
+      "case": "ControlledTemplatesAndIdentityRelations (\"different-namespace\",null)",
+      "status": "SKIP",
+      "line": 237
+    },
+    {
+      "case": "ControlledTemplatesAndIdentityRelations (\"adjacent\",null)",
+      "status": "SKIP",
+      "line": 239
+    },
+    {
+      "case": "ControlledTemplatesAndIdentityRelations (\"overlap\",\"identity_ambiguous\")",
+      "status": "SKIP",
+      "line": 241
+    },
+    {
+      "case": "ControlledTemplatesAndIdentityRelations (\"unknown\",\"identity_relation_indeterminate\")",
+      "status": "SKIP",
+      "line": 243
+    },
+    {
+      "case": "ControlledTemplatesAndIdentityRelations (\"no-zone\",\"time_timezone_required\")",
+      "status": "SKIP",
+      "line": 245
+    },
+    {
+      "case": "ControlledTemplatesAndIdentityRelations (\"reverse\",\"time_interval_reversed\")",
+      "status": "SKIP",
+      "line": 247
+    },
+    {
+      "case": "ControlledTemplatesAndIdentityRelations (\"missing-point\",\"time_reference_missing\")",
+      "status": "SKIP",
+      "line": 249
+    },
+    {
+      "case": "ControlledTemplatesAndIdentityRelations (\"double-time\",\"time_lexical_invalid\")",
+      "status": "SKIP",
+      "line": 251
+    },
+    {
+      "case": "ControlledTemplatesAndIdentityRelations (\"unsupported\",\"time_template_unsupported\")",
+      "status": "SKIP",
+      "line": 253
+    },
+    {
+      "case": "ControlledTemplatesAndIdentityRelations (\"unknown-target\",\"identity_claim_invalid\")",
+      "status": "SKIP",
+      "line": 255
+    },
+    {
+      "case": "ControlledTemplatesAndIdentityRelations (\"double-key\",\"identity_claim_invalid\")",
+      "status": "SKIP",
+      "line": 257
+    },
+    {
+      "case": "ControlledTemplatesAndIdentityRelations (\"event-missing\",\"event_time_invalid\")",
+      "status": "SKIP",
+      "line": 259
+    },
+    {
+      "case": "ControlledTemplatesAndIdentityRelations (\"observer-zone\",\"time_timezone_required\")",
+      "status": "SKIP",
+      "line": 261
+    },
+    {
+      "case": "ControlledTemplatesAndIdentityRelations (\"double-type\",\"time_template_unsupported\")",
+      "status": "SKIP",
+      "line": 263
+    },
+    {
+      "case": "CrossSourceTimestampDiagnosticUsesBundleEvidence",
+      "status": "SKIP",
+      "line": 265
+    },
+    {
+      "case": "OnlyExactBuiltinOrLocalClassDeclarationResolvesType (\"w3-fake\",True)",
+      "status": "SKIP",
+      "line": 267
+    },
+    {
+      "case": "OnlyExactBuiltinOrLocalClassDeclarationResolvesType (\"platform-fake\",True)",
+      "status": "SKIP",
+      "line": 269
+    },
+    {
+      "case": "OnlyExactBuiltinOrLocalClassDeclarationResolvesType (\"builtin-owl\",False)",
+      "status": "SKIP",
+      "line": 271
+    },
+    {
+      "case": "OnlyExactBuiltinOrLocalClassDeclarationResolvesType (\"business-local\",False)",
+      "status": "SKIP",
+      "line": 273
+    },
+    {
+      "case": "DefinitionRemovalUsesExactKindAndConsumerRole (\"class-masked-by-individual\",True)",
+      "status": "SKIP",
+      "line": 275
+    },
+    {
+      "case": "DefinitionRemovalUsesExactKindAndConsumerRole (\"object-property-masked\",True)",
+      "status": "SKIP",
+      "line": 277
+    },
+    {
+      "case": "DefinitionRemovalUsesExactKindAndConsumerRole (\"datatype-property-masked\",True)",
+      "status": "SKIP",
+      "line": 279
+    },
+    {
+      "case": "DefinitionRemovalUsesExactKindAndConsumerRole (\"keep-class-drop-individual\",False)",
+      "status": "SKIP",
+      "line": 281
+    },
+    {
+      "case": "ImpactMigrationCreatesOwnedTableAndRefusesDestructiveDown",
+      "status": "PASS",
+      "line": 283
+    },
+    {
+      "case": "ReportIdentityIdempotencyAndAuditAreFrozenToFirstInput",
+      "status": "SKIP",
+      "line": 284
+    },
+    {
+      "case": "ConcurrentInputCreatesOneReportAndOneBusinessAudit",
+      "status": "SKIP",
+      "line": 286
+    },
+    {
+      "case": "ActualUnknownAndTechnicalBlockersHaveBoundEvidence (\"missing\",\"impact_assessment_required\")",
+      "status": "SKIP",
+      "line": 288
+    },
+    {
+      "case": "ActualUnknownAndTechnicalBlockersHaveBoundEvidence (\"unsupported\",\"impact_unsupported_axiom\")",
+      "status": "SKIP",
+      "line": 290
+    },
+    {
+      "case": "ActualUnknownAndTechnicalBlockersHaveBoundEvidence (\"imports\",\"impact_imports_unresolved\")",
+      "status": "SKIP",
+      "line": 292
+    },
+    {
+      "case": "ActualUnknownAndTechnicalBlockersHaveBoundEvidence (\"blank\",\"impact_blank_alignment_indeterminate\")",
+      "status": "SKIP",
+      "line": 294
+    },
+    {
+      "case": "ActualUnknownAndTechnicalBlockersHaveBoundEvidence (\"blank-budget\",\"impact_comparison_indeterminate\")",
+      "status": "SKIP",
+      "line": 296
+    },
+    {
+      "case": "ActualUnknownAndTechnicalBlockersHaveBoundEvidence (\"conclusion-budget\",\"impact_conclusion_budget\")",
+      "status": "SKIP",
+      "line": 298
+    },
+    {
+      "case": "ReadRejectsPartialScopeAndPersistedCanonicalTamper",
+      "status": "SKIP",
+      "line": 300
+    },
+    {
+      "case": "ValidHistoryCannotBeReplacedOrUnlockedByUnrelatedError (\"target\")",
+      "status": "SKIP",
+      "line": 302
+    },
+    {
+      "case": "ValidHistoryCannotBeReplacedOrUnlockedByUnrelatedError (\"from\")",
+      "status": "SKIP",
+      "line": 304
+    },
+    {
+      "case": "ValidHistoryCannotBeReplacedOrUnlockedByUnrelatedError (\"delete\")",
+      "status": "SKIP",
+      "line": 306
+    },
+    {
+      "case": "ValidHistoryCannotBeReplacedOrUnlockedByUnrelatedError (\"type\")",
+      "status": "SKIP",
+      "line": 308
+    },
+    {
+      "case": "ValidHistoryCannotBeReplacedOrUnlockedByUnrelatedError (\"expand\")",
+      "status": "SKIP",
+      "line": 310
+    },
+    {
+      "case": "ValidHistoryCannotBeReplacedOrUnlockedByUnrelatedError (\"hide-with-error\")",
+      "status": "SKIP",
+      "line": 312
+    },
+    {
+      "case": "InitiallyInvalidClaimCanBeRepairedWithoutErasingSourceRevision",
+      "status": "SKIP",
+      "line": 314
+    },
+    {
+      "case": "ClaimScopeCannotExceedAuthoritativeDraftScope (\"site\")",
+      "status": "SKIP",
+      "line": 316
+    },
+    {
+      "case": "ClaimScopeCannotExceedAuthoritativeDraftScope (\"organization\")",
+      "status": "SKIP",
+      "line": 318
+    },
+    {
+      "case": "ControlledEditClosesValidityThenReplaysExactlyOnce",
+      "status": "SKIP",
+      "line": 320
+    },
+    {
+      "case": "DedicatedEditCannotDeleteValidClaimType",
+      "status": "SKIP",
+      "line": 322
+    },
+    {
+      "case": "AmbiguousAndUnknownClaimsBlockAssessment (False)",
+      "status": "SKIP",
+      "line": 324
+    },
+    {
+      "case": "AmbiguousAndUnknownClaimsBlockAssessment (True)",
+      "status": "SKIP",
+      "line": 326
+    },
+    {
+      "case": "ExactBatchCountBoundariesDoNotBypassCas (0)",
+      "status": "SKIP",
+      "line": 328
+    },
+    {
+      "case": "ExactBatchCountBoundariesDoNotBypassCas (1)",
+      "status": "SKIP",
+      "line": 330
+    },
+    {
+      "case": "ExactBatchCountBoundariesDoNotBypassCas (64)",
+      "status": "SKIP",
+      "line": 332
+    },
+    {
+      "case": "ExactBatchCountBoundariesDoNotBypassCas (65)",
+      "status": "SKIP",
+      "line": 334
+    },
+    {
+      "case": "TwoConcurrentWritersHaveOneCasWinnerAndOneAudit",
+      "status": "SKIP",
+      "line": 336
+    },
+    {
+      "case": "RoleAndCompleteScopePrecedeAnyJenaAccess (True)",
+      "status": "SKIP",
+      "line": 338
+    },
+    {
+      "case": "RoleAndCompleteScopePrecedeAnyJenaAccess (False)",
+      "status": "SKIP",
+      "line": 340
+    },
+    {
+      "case": "NewControlledBatchReturnsDeterministicDiagnosticCode (\"overlap\",\"identity_ambiguous\")",
+      "status": "SKIP",
+      "line": 342
+    },
+    {
+      "case": "NewControlledBatchReturnsDeterministicDiagnosticCode (\"unknown\",\"identity_relation_indeterminate\")",
+      "status": "SKIP",
+      "line": 344
+    },
+    {
+      "case": "NewControlledBatchReturnsDeterministicDiagnosticCode (\"zone\",\"time_timezone_required\")",
+      "status": "SKIP",
+      "line": 346
+    },
+    {
+      "case": "NewControlledBatchReturnsDeterministicDiagnosticCode (\"reverse\",\"time_interval_reversed\")",
+      "status": "SKIP",
+      "line": 348
+    },
+    {
+      "case": "FourSourcesKeepExactTextHashesAndGroundDelta",
+      "status": "SKIP",
+      "line": 350
+    },
+    {
+      "case": "BlankIsomorphismAndChangedBlankScopesRemainExplicit",
+      "status": "SKIP",
+      "line": 352
+    },
+    {
+      "case": "AbsentVocabularyAndEmptyFileHaveDifferentSourceIdentity",
+      "status": "SKIP",
+      "line": 354
+    },
+    {
+      "case": "SharedBudgetFailureIsIndeterminateForAllFourSources (False)",
+      "status": "SKIP",
+      "line": 356
+    },
+    {
+      "case": "SharedBudgetFailureIsIndeterminateForAllFourSources (True)",
+      "status": "SKIP",
+      "line": 358
+    },
+    {
+      "case": "VersionDiffBindsActualPersistedSourcesAndRejectsCrossAssetOrTamper",
+      "status": "SKIP",
+      "line": 360
+    },
+    {
+      "case": "ProjectionCardinalityPreservesLexicalAndDiagnosesInvalid (\"0\",True)",
+      "status": "PASS",
+      "line": 362
+    },
+    {
+      "case": "ProjectionCardinalityPreservesLexicalAndDiagnosesInvalid (\"+0002\",True)",
+      "status": "PASS",
+      "line": 363
+    },
+    {
+      "case": "ProjectionCardinalityPreservesLexicalAndDiagnosesInvalid (\"-0\",True)",
+      "status": "PASS",
+      "line": 364
+    },
+    {
+      "case": "ProjectionCardinalityPreservesLexicalAndDiagnosesInvalid (\" 12 \",True)",
+      "status": "PASS",
+      "line": 365
+    },
+    {
+      "case": "ProjectionCardinalityPreservesLexicalAndDiagnosesInvalid (\"123456789012345678901234567890\",True)",
+      "status": "PASS",
+      "line": 366
+    },
+    {
+      "case": "ProjectionCardinalityPreservesLexicalAndDiagnosesInvalid (\"-1\",False)",
+      "status": "PASS",
+      "line": 367
+    },
+    {
+      "case": "ProjectionCardinalityPreservesLexicalAndDiagnosesInvalid (\"1.0\",False)",
+      "status": "PASS",
+      "line": 368
+    },
+    {
+      "case": "ProjectionCardinalityPreservesLexicalAndDiagnosesInvalid (\"1e2\",False)",
+      "status": "PASS",
+      "line": 369
+    },
+    {
+      "case": "ProjectionCardinalityPreservesLexicalAndDiagnosesInvalid (\"1 2\",False)",
+      "status": "PASS",
+      "line": 370
+    },
+    {
+      "case": "ProjectionCardinalityPreservesLexicalAndDiagnosesInvalid (\"+\",False)",
+      "status": "PASS",
+      "line": 371
+    },
+    {
+      "case": "ProjectionCardinalityPreservesLexicalAndDiagnosesInvalid (\"１２\",False)",
+      "status": "PASS",
+      "line": 372
+    },
+    {
+      "case": "ProjectionCardinalityRejectsWrongTypeAndLanguage",
+      "status": "PASS",
+      "line": 373
+    },
+    {
+      "case": "ProjectionQualifiedCardinalityRequiresUniqueQualifier (\"onClass\")",
+      "status": "PASS",
+      "line": 374
+    },
+    {
+      "case": "ProjectionQualifiedCardinalityRequiresUniqueQualifier (\"onDataRange\")",
+      "status": "PASS",
+      "line": 375
+    },
+    {
+      "case": "ProjectionBlankPrefixSharedReferencesAndSourcesAreIsolated",
+      "status": "PASS",
+      "line": 376
+    },
+    {
+      "case": "ProjectionRestrictionQuantifierHasLegalTarget (\"someValuesFrom\")",
+      "status": "PASS",
+      "line": 377
+    },
+    {
+      "case": "ProjectionRestrictionQuantifierHasLegalTarget (\"allValuesFrom\")",
+      "status": "PASS",
+      "line": 378
+    },
+    {
+      "case": "ProjectionRestrictionHasValuePreservesSupportedValueKinds",
+      "status": "PASS",
+      "line": 379
+    },
+    {
+      "case": "ProjectionRestrictionRejectsAmbiguousOrMalformedShape (\"missing-property\")",
+      "status": "PASS",
+      "line": 380
+    },
+    {
+      "case": "ProjectionRestrictionRejectsAmbiguousOrMalformedShape (\"literal-property\")",
+      "status": "PASS",
+      "line": 381
+    },
+    {
+      "case": "ProjectionRestrictionRejectsAmbiguousOrMalformedShape (\"blank-property\")",
+      "status": "PASS",
+      "line": 382
+    },
+    {
+      "case": "ProjectionRestrictionRejectsAmbiguousOrMalformedShape (\"two-properties\")",
+      "status": "PASS",
+      "line": 383
+    },
+    {
+      "case": "ProjectionRestrictionRejectsAmbiguousOrMalformedShape (\"two-constructors\")",
+      "status": "PASS",
+      "line": 384
+    },
+    {
+      "case": "ProjectionRestrictionRejectsAmbiguousOrMalformedShape (\"two-cardinalities\")",
+      "status": "PASS",
+      "line": 385
+    },
+    {
+      "case": "ProjectionRestrictionRejectsAmbiguousOrMalformedShape (\"ordinary-qualifier\")",
+      "status": "PASS",
+      "line": 386
+    },
+    {
+      "case": "ProjectionRestrictionRejectsAmbiguousOrMalformedShape (\"no-constructor\")",
+      "status": "PASS",
+      "line": 387
+    },
+    {
+      "case": "ProjectionRestrictionRejectsAmbiguousOrMalformedShape (\"missing-type\")",
+      "status": "PASS",
+      "line": 388
+    },
+    {
+      "case": "ProjectionRestrictionRejectsAmbiguousOrMalformedShape (\"qualified-literal-property\")",
+      "status": "PASS",
+      "line": 389
+    },
+    {
+      "case": "ProjectionListOrderAndLongListDoNotUseExpressionDepth",
+      "status": "PASS",
+      "line": 390
+    },
+    {
+      "case": "ProjectionMalformedListsNeverBecomeComplete (\"broken\")",
+      "status": "PASS",
+      "line": 391
+    },
+    {
+      "case": "ProjectionMalformedListsNeverBecomeComplete (\"branch\")",
+      "status": "PASS",
+      "line": 392
+    },
+    {
+      "case": "ProjectionMalformedListsNeverBecomeComplete (\"cycle\")",
+      "status": "PASS",
+      "line": 393
+    },
+    {
+      "case": "ProjectionSharedListTailDoesNotBecomeCycle",
+      "status": "PASS",
+      "line": 394
+    },
+    {
+      "case": "ProjectionAnonymousCycleAndNamedSubclassCycleAreDistinct",
+      "status": "PASS",
+      "line": 395
+    },
+    {
+      "case": "ProjectionUnknownTermsAndImportsHaveSeparateSupport",
+      "status": "PASS",
+      "line": 396
+    },
+    {
+      "case": "ProjectionNodeAndDepthBudgetFailClosed",
+      "status": "PASS",
+      "line": 397
+    },
+    {
+      "case": "ProjectionCancellationPropagates",
+      "status": "PASS",
+      "line": 398
+    },
+    {
+      "case": "RealRiotReadsAdvancedFixtureWithoutLosingSourceOrEnablingPublish",
+      "status": "SKIP",
+      "line": 399
+    },
+    {
+      "case": "RealRiotSeparatesFourSourceBlankScopesAndPreservesLiteralMetadata",
+      "status": "SKIP",
+      "line": 401
+    },
+    {
+      "case": "RealRiotMalformedOwlHasExplicitProjectionDiagnostics (\"broken\")",
+      "status": "SKIP",
+      "line": 403
+    },
+    {
+      "case": "RealRiotMalformedOwlHasExplicitProjectionDiagnostics (\"cycle\")",
+      "status": "SKIP",
+      "line": 405
+    },
+    {
+      "case": "RealRiotMalformedOwlHasExplicitProjectionDiagnostics (\"cardinality\")",
+      "status": "SKIP",
+      "line": 407
+    },
+    {
+      "case": "RealRiotMalformedOwlHasExplicitProjectionDiagnostics (\"unknown\")",
+      "status": "SKIP",
+      "line": 409
+    },
+    {
+      "case": "RealRiotRestrictionNegativeShapesPreserveSourceHash (\"missing-on-property\")",
+      "status": "SKIP",
+      "line": 411
+    },
+    {
+      "case": "RealRiotRestrictionNegativeShapesPreserveSourceHash (\"some-literal\")",
+      "status": "SKIP",
+      "line": 413
+    },
+    {
+      "case": "RealRiotRestrictionNegativeShapesPreserveSourceHash (\"all-literal\")",
+      "status": "SKIP",
+      "line": 415
+    },
+    {
+      "case": "RealRiotRestrictionNegativeShapesPreserveSourceHash (\"qualified-literal-property\")",
+      "status": "SKIP",
+      "line": 417
+    },
+    {
+      "case": "RealRiotRestrictionNegativeShapesPreserveSourceHash (\"multiple-constructors\")",
+      "status": "SKIP",
+      "line": 419
+    },
+    {
+      "case": "RealRiotNodeBudgetPreservesSourceAndFailsClosed",
+      "status": "SKIP",
+      "line": 421
+    },
+    {
+      "case": "GuardRoleRunsBeforePersistenceAndSemanticRuntime (\"role\")",
+      "status": "PASS",
+      "line": 423
+    },
+    {
+      "case": "GuardRoleRunsBeforePersistenceAndSemanticRuntime (\"subject\")",
+      "status": "PASS",
+      "line": 424
+    },
+    {
+      "case": "GuardInvalidVersionNeverConnectsToServices (\"null\")",
+      "status": "PASS",
+      "line": 425
+    },
+    {
+      "case": "GuardInvalidVersionNeverConnectsToServices (\"empty-id\")",
+      "status": "PASS",
+      "line": 426
+    },
+    {
+      "case": "GuardInvalidVersionNeverConnectsToServices (\"long-id\")",
+      "status": "PASS",
+      "line": 427
+    },
+    {
+      "case": "GuardInvalidVersionNeverConnectsToServices (\"missing-revision\")",
+      "status": "PASS",
+      "line": 428
+    },
+    {
+      "case": "GuardInvalidVersionNeverConnectsToServices (\"zero-revision\")",
+      "status": "PASS",
+      "line": 429
+    },
+    {
+      "case": "GuardInvalidVersionNeverConnectsToServices (\"release-revision\")",
+      "status": "PASS",
+      "line": 430
+    },
+    {
+      "case": "GuardInvalidVersionNeverConnectsToServices (\"unknown-kind\")",
+      "status": "PASS",
+      "line": 431
+    },
+    {
+      "case": "GuardReleaseNeedsAuthoritativeCatalog",
+      "status": "PASS",
+      "line": 432
+    },
+    {
+      "case": "RealReadOnlySnapshotPreservesRawBytesAndDoesNotWrite",
+      "status": "SKIP",
+      "line": 433
+    },
+    {
+      "case": "RealHistoricalSnapshotAndReimportRetainExactSourceAndBlankGraph",
+      "status": "SKIP",
+      "line": 435
+    },
+    {
+      "case": "RealScopeAuthorizationPrecedesProjectionRequests",
+      "status": "SKIP",
+      "line": 437
+    },
+    {
+      "case": "RealTamperedRevisionHashCannotProducePreservedSnapshot",
+      "status": "SKIP",
+      "line": 439
+    },
+    {
+      "case": "RuntimeMustImplementCanonicalBoundary",
+      "status": "PASS",
+      "line": 441
+    },
+    {
+      "case": "RealRiotPreservesUnsupportedSourceAndTypedLexical",
+      "status": "SKIP",
+      "line": 442
+    },
+    {
+      "case": "NoOpRetainsExactBytesAndInvalidSourceFails",
+      "status": "SKIP",
+      "line": 444
+    },
+    {
+      "case": "PublishedGraphsAreIsolatedAndLexicalMismatchIsRejected",
+      "status": "SKIP",
+      "line": 446
+    },
+    {
+      "case": "EmptyGraphStillProducesRealShaclReport",
+      "status": "SKIP",
+      "line": 448
+    },
+    {
+      "case": "LegalEmptyDocumentsKeepExactHashesAndProduceEmptyGraph (\"# comment\\n\")",
+      "status": "SKIP",
+      "line": 450
+    },
+    {
+      "case": "LegalEmptyDocumentsKeepExactHashesAndProduceEmptyGraph (\" \\t\\r\\n\")",
+      "status": "SKIP",
+      "line": 452
+    },
+    {
+      "case": "LegalEmptyDocumentsKeepExactHashesAndProduceEmptyGraph (\"@prefix ex: <urn:empty:> .\\n\")",
+      "status": "SKIP",
+      "line": 454
+    },
+    {
+      "case": "EditingLegalEmptyDocumentExportsOnlyRequestedTriple",
+      "status": "SKIP",
+      "line": 456
+    },
+    {
+      "case": "LostOrReplacedTemporaryGraphRemainsUnavailable (False)",
+      "status": "SKIP",
+      "line": 458
+    },
+    {
+      "case": "LostOrReplacedTemporaryGraphRemainsUnavailable (True)",
+      "status": "SKIP",
+      "line": 460
+    },
+    {
+      "case": "MissingPublishedGraphRemainsUnavailable",
+      "status": "SKIP",
+      "line": 462
+    },
+    {
+      "case": "PublishedShaclUsesTheSameOntologyContext",
+      "status": "SKIP",
+      "line": 464
+    },
+    {
+      "case": "RelativeIriAndExactEditPreserveRemainingGraph",
+      "status": "SKIP",
+      "line": 466
+    },
+    {
+      "case": "SourceTripleAndProjectionBudgetsFailExplicitly",
+      "status": "SKIP",
+      "line": 468
+    },
+    {
+      "case": "ThirdConcurrentOperationIsRejected",
+      "status": "SKIP",
+      "line": 470
+    },
+    {
+      "case": "CancellationAndTimeoutDoNotLeaveTemporaryGraphs (True)",
+      "status": "SKIP",
+      "line": 472
+    },
+    {
+      "case": "CancellationAndTimeoutDoNotLeaveTemporaryGraphs (False)",
+      "status": "SKIP",
+      "line": 474
+    },
+    {
+      "case": "StandardSampleConforms",
+      "status": "SKIP",
+      "line": 476
+    },
+    {
+      "case": "StandardNegativeReportsLocateRealFailure (\"\",\"MinCountConstraintComponent\")",
+      "status": "SKIP",
+      "line": 478
+    },
+    {
+      "case": "StandardNegativeReportsLocateRealFailure (\"<urn:x> <urn:ontology-platform:vocabulary:externalId> 12 .\",\"DatatypeConstraintComponent\")",
+      "status": "SKIP",
+      "line": 480
+    },
+    {
+      "case": "StandardNegativeReportsLocateRealFailure (\"<urn:x> <urn:ontology-platform:vocabulary:weight> 101.0 .\",\"MaxInclusiveConstraintComponent\")",
+      "status": "SKIP",
+      "line": 482
+    },
+    {
+      "case": "StandardNegativeReportsLocateRealFailure (\"<urn:h> a <urn:synthetic:metals:Heat> ; <urn:synthetic:metals:castIn> <urn:x> .\",\"ClassConstraintComponent\")",
+      "status": "SKIP",
+      "line": 484
+    },
+    {
+      "case": "UnsafeShapesRejectedBeforeExecution (\"<urn:s> <http://www.w3.org/ns/shacl#sparql> <urn:q> .\")",
+      "status": "SKIP",
+      "line": 486
+    },
+    {
+      "case": "UnsafeShapesRejectedBeforeExecution (\"<urn:s> <http://www.w3.org/ns/shacl#js> <urn:q> .\")",
+      "status": "SKIP",
+      "line": 488
+    },
+    {
+      "case": "UnsafeShapesRejectedBeforeExecution (\"<urn:s> <http://www.w3.org/ns/shacl#node> <urn:s> .\")",
+      "status": "SKIP",
+      "line": 490
+    },
+    {
+      "case": "UnsafeShapesRejectedBeforeExecution (\"<urn:s> <http://www.w3.org/2002/07/owl#imports> <http://192.0.2.1/never> .\")",
+      "status": "SKIP",
+      "line": 492
+    },
+    {
+      "case": "UnsafeShapesRejectedBeforeExecution (\"<urn:s> <http://www.w3.org/ns/shacl#path> [ <http://www.w3.org/ns/shacl#inversePath> <urn:p> ] .\")",
+      "status": "SKIP",
+      "line": 494
+    },
+    {
+      "case": "UnsafeShapesRejectedBeforeExecution (\"<urn:s> <http://www.w3.org/ns/shacl#property> <urn:s> ; <http://www.w3.org/ns/shacl#path> <urn:p> .\")",
+      "status": "SKIP",
+      "line": 496
+    },
+    {
+      "case": "EnumerationListIsBoundedAndAcyclic",
+      "status": "SKIP",
+      "line": 498
+    },
+    {
+      "case": "LegacyAdapterCannotFallbackToUnverifiedRead",
+      "status": "PASS",
+      "line": 500
+    },
+    {
+      "case": "VerifiedReadReturnsExactlyTheComparedBatch",
+      "status": "SKIP",
+      "line": 501
+    },
+    {
+      "case": "ChangedPublishedGraphCannotReturnOldHashData (\"ontology\")",
+      "status": "SKIP",
+      "line": 503
+    },
+    {
+      "case": "ChangedPublishedGraphCannotReturnOldHashData (\"data\")",
+      "status": "SKIP",
+      "line": 505
+    },
+    {
+      "case": "ChangedPublishedGraphCannotReturnOldHashData (\"delete\")",
+      "status": "SKIP",
+      "line": 507
+    },
+    {
+      "case": "ChangedPublishedGraphCannotReturnOldHashData (\"lexical\")",
+      "status": "SKIP",
+      "line": 509
+    },
+    {
+      "case": "EveryManifestSnapshotAndSourceBindingIsChecked",
+      "status": "SKIP",
+      "line": 511
+    },
+    {
+      "case": "OptionalVocabularyAndMissingBindingFailClosed",
+      "status": "SKIP",
+      "line": 513
+    },
+    {
+      "case": "VerifiedReadCancellationAndTimeoutCleanTemporaryGraphs (True)",
+      "status": "SKIP",
+      "line": 515
+    },
+    {
+      "case": "VerifiedReadCancellationAndTimeoutCleanTemporaryGraphs (False)",
+      "status": "SKIP",
+      "line": 517
+    },
+    {
+      "case": "TemporaryMarkerDoesNotConsumeBusinessTripleBudget (4999)",
+      "status": "SKIP",
+      "line": 519
+    },
+    {
+      "case": "TemporaryMarkerDoesNotConsumeBusinessTripleBudget (5000)",
+      "status": "SKIP",
+      "line": 521
+    },
+    {
+      "case": "TemporaryMarkerDoesNotConsumeBusinessTripleBudget (5001)",
+      "status": "SKIP",
+      "line": 523
+    },
+    {
+      "case": "VerifiedReadRetainsAggregateBusinessTripleBudget (4999)",
+      "status": "SKIP",
+      "line": 525
+    },
+    {
+      "case": "VerifiedReadRetainsAggregateBusinessTripleBudget (5000)",
+      "status": "SKIP",
+      "line": 527
+    },
+    {
+      "case": "VerifiedReadRetainsAggregateBusinessTripleBudget (5001)",
+      "status": "SKIP",
+      "line": 529
+    },
+    {
+      "case": "PublishedGraphDoesNotReceiveTemporaryMarkerAllowance",
+      "status": "SKIP",
+      "line": 531
+    },
+    {
+      "case": "SyntheticNonBmpLabelSurvivesValidationAndPublication (\"😀\")",
+      "status": "SKIP",
+      "line": 533
+    },
+    {
+      "case": "SyntheticNonBmpLabelSurvivesValidationAndPublication (\"𠀀\")",
+      "status": "SKIP",
+      "line": 535
+    },
+    {
+      "case": "NonBmpLiteralEditIsLosslessAndCannotInjectTriples (True)",
+      "status": "SKIP",
+      "line": 537
+    },
+    {
+      "case": "NonBmpLiteralEditIsLosslessAndCannotInjectTriples (False)",
+      "status": "SKIP",
+      "line": 539
+    },
+    {
+      "case": "InvalidSurrogateLiteralIsRejectedWithoutReplacement (True)",
+      "status": "SKIP",
+      "line": 541
+    },
+    {
+      "case": "InvalidSurrogateLiteralIsRejectedWithoutReplacement (False)",
+      "status": "SKIP",
+      "line": 543
+    },
+    {
+      "case": "LeadingBomSourcesKeepExactBytesAndRelativeIris (True)",
+      "status": "SKIP",
+      "line": 545
+    },
+    {
+      "case": "LeadingBomSourcesKeepExactBytesAndRelativeIris (False)",
+      "status": "SKIP",
+      "line": 547
+    }
+  ],
+  "summary": {
+    "total": 302,
+    "PASS": 56,
+    "FAIL": 0,
+    "SKIP": 246
+  },
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-20",
+  "testedCommit": "7bb08672c354fb97ed39ad4ad7492d2cbe297aad",
+  "project": "SemanticTests",
+  "assemblySha256": "472f4ea30dd9d3380db8e2dd9dbca4eadab10ddec9d60954231b0b34559052b6",
+  "rawLogSha256": "c29b505c60cac6960431b043918057eb43238d13a6fc5537db9f89051d09d43e",
+  "commandReceiptSha256": "98687a5e1d3f91f04dbe7006d8792b13015712ebac9b03d6d311562717c1d936",
+  "command": "baseline-SemanticTests"
+}

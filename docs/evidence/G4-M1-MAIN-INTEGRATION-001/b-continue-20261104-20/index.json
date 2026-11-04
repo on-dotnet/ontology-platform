@@ -1,0 +1,85 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-20",
+  "testedCommit": "7bb08672c354fb97ed39ad4ad7492d2cbe297aad",
+  "status": "BLOCKED_WITH_WITNESS",
+  "gates": {
+    "R2": "PASS",
+    "I01": "PARTIAL",
+    "I05": "PASS",
+    "I03": "PARTIAL",
+    "I02": "BLOCKED_WITH_WITNESS",
+    "I04": "NOT_RUN",
+    "I06": "NOT_RUN",
+    "I07": "NOT_RUN",
+    "I08": "NOT_RUN"
+  },
+  "native": {
+    "total": 780,
+    "passed": 344,
+    "skipped": 436,
+    "failed": 0
+  },
+  "webTests": 379,
+  "selfTestSuites": 27,
+  "selfTestSeconds": 383.255632,
+  "taskTestsAtT": 50,
+  "fullModulePassCases": {
+    "SemanticTests": 302,
+    "PublishingTests": 78,
+    "QueryTests": 49
+  },
+  "agent": {
+    "passedMethods": 21,
+    "passedCases": 28,
+    "failedMethods": 1,
+    "failedCases": 1,
+    "notRunMethods": 4,
+    "failedMethod": "OntologyPlatform.AgentTests.TransportTests.SlowSseConnectionIsBoundedAndDisconnectDoesNotCancel"
+  },
+  "formalFixtureClosure": "NOT_RUN",
+  "failureDiagnosis": "transport-ab-results.json",
+  "proposedFix": "Only task PG relay sets TCP_NODELAY and verifies getsockopt before connect; actual A/B SELECT diagnostic, not formal SlowSse PASS. Formal test assertions and 10s lease unchanged.",
+  "newTAndFullRunRequired": true,
+  "ciWindowsIntel": "NOT_RUN",
+  "supplyChain": "AMBER-A1_LICENSE_PARTIAL_NOT_VERIFIED",
+  "ignoredLargeInputs": [
+    {
+      "path": "r2-sdk-before-mstest-imports.xml",
+      "bytes": 1628467,
+      "sha256": "af43d14487bf463af7dbb19cba53616809842b4eaa50ff3bdaa82bb51803a236"
+    },
+    {
+      "path": "r2-sdk-after-aspire-imports.xml",
+      "bytes": 1616931,
+      "sha256": "feaabbb2787d3a59951ede8ea70dd89ab31e8a2ac00f1aceb64ae4441852759e"
+    },
+    {
+      "path": "r2-sdk-before-aspire-imports.xml",
+      "bytes": 1616931,
+      "sha256": "1c7e07b621754ca210c77cfed8da00b2fe50ed46b15f6febffc8c498a35a136d"
+    },
+    {
+      "path": "r2-sdk-after-mstest-imports.xml",
+      "bytes": 1628467,
+      "sha256": "9342e501acae2873d2b8271803858af538e1d5160dd0f6f08a3ee4bdf0d74b8f"
+    },
+    {
+      "path": "restore-stdout.txt",
+      "bytes": 52463321,
+      "sha256": "a2f006e073583fc417be17f03e0742ef27369eaf390b255bef7f48b8c1363bf9"
+    },
+    {
+      "path": "web-cache-files.json",
+      "bytes": 8821586,
+      "sha256": "fec5f0dc296535f8510e086370de3e6fbe9ac494715683721cdd24ef64f6beba"
+    }
+  ],
+  "diagnosticLimitations": [
+    "Original failed Run DB projection unchanged after SELECT A/B; private PGDMP retained by exact hash, excluded from Git/V3.",
+    "Initial FSI compile/reference failures retained privately; successful final script independently bound.",
+    "First negative probe exit29 inherited errno; v2 sets errno0 for deterministic exit255, both reject before connect.",
+    "transport-ab-plan.json is superseded unexecuted draft; executed input is plan-v2.",
+    "Host lock/display continuity NOT_VERIFIED; CI Windows Intel NOT_RUN."
+  ]
+}

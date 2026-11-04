@@ -1,0 +1,109 @@
+{
+  "scope": "DIAGNOSTIC_ONLY_NOT_FORMAL_GATE",
+  "variant": "nodelay",
+  "status": "OBSERVED",
+  "launcherSha256": "55cbfd4e73b4b266b6880fb8c2c3a664b02149e56b63a8bef35eb1ea42b4368c",
+  "helperSha256": "2224d2ec18621df2100b517d1599860af8d9396bd614863fe82851692684daca",
+  "samples": [
+    {
+      "inputBytes": 1,
+      "medianMs": 0.3121,
+      "minMs": 0.2856,
+      "name": "small-in-small-out",
+      "p95Ms": 0.3389,
+      "samples": 30,
+      "totalMs": 9.387400000000003
+    },
+    {
+      "inputBytes": 12288,
+      "medianMs": 0.3583,
+      "minMs": 0.3034,
+      "name": "12KiB-in-small-out",
+      "p95Ms": 0.4181,
+      "samples": 30,
+      "totalMs": 10.606200000000003
+    },
+    {
+      "inputBytes": 24576,
+      "medianMs": 0.3936,
+      "minMs": 0.3309,
+      "name": "24KiB-in-small-out",
+      "p95Ms": 0.4527,
+      "samples": 30,
+      "totalMs": 11.985000000000001
+    },
+    {
+      "inputBytes": 1,
+      "medianMs": 0.366,
+      "minMs": 0.3398,
+      "name": "small-in-12KiB-out",
+      "p95Ms": 0.3994,
+      "samples": 30,
+      "totalMs": 11.047100000000002
+    }
+  ],
+  "idle": {
+    "idle": true,
+    "connections": 1,
+    "execs": 1,
+    "capacityRefusals": 0,
+    "eventsSha256": "c0b6d33d223594e74f0e964be0265f5b4185e1d426072a84989a2175853226f7"
+  },
+  "queryReceiptSha256": "77166d23c4ce3c8a7cdf497182d1f174cfefd5d4dc17276798fab5d51a86a71a",
+  "variantInputsSha256": "e0f4cae90427079e6e65a3564d946e34a03b36b19489280575fc4575df8f8f77",
+  "release": {
+    "status": "PASS",
+    "taskId": "G4-M1-MAIN-INTEGRATION-001",
+    "runId": "b-continue-20261104-20",
+    "testedCommit": "7bb08672c354fb97ed39ad4ad7492d2cbe297aad",
+    "pid": 37193,
+    "processReceiptSha256": "1193954772c507b0ac1bdb27e3f0eb24e4f2e3ad304aeb17caf9897cb92c45d8",
+    "portsReleased": [
+      15432,
+      15303,
+      15900
+    ],
+    "execExits": [
+      {
+        "utc": "2026-11-04T21:18:53.567995+00:00",
+        "pid": 37193,
+        "event": "exec_exited",
+        "execId": "2c9382036dc18f304269a2c3927772595230968c0aecfb0b6332504e93adfc2e",
+        "token": "g4-relay-b-continue-20261104-20-1b8924ea587a49369129980bec40f7bb",
+        "containerId": "64011b89486f84b5f2029fe5216a5b52c0f6bd9b0ae7560245b77104046ad595",
+        "running": false,
+        "exitCode": 0
+      }
+    ],
+    "remoteObservations": [
+      {
+        "event": "reap_exec_created",
+        "execId": "3b1f18af797da625305a3a53cb76cba7b55efa5028a6551d0cc312d08784b22e",
+        "mode": "terminate"
+      },
+      {
+        "event": "reap_exec_created",
+        "execId": "edb895da800bd7af89c2dd54fca6579a9ee10892cfc91c6e467e4fd6f2449e31",
+        "mode": "inspect"
+      },
+      {
+        "event": "remote_reaped",
+        "observations": [
+          {
+            "execId": "3b1f18af797da625305a3a53cb76cba7b55efa5028a6551d0cc312d08784b22e",
+            "mode": "terminate",
+            "pids": [],
+            "exitCode": 0
+          },
+          {
+            "execId": "edb895da800bd7af89c2dd54fca6579a9ee10892cfc91c6e467e4fd6f2449e31",
+            "mode": "inspect",
+            "pids": [],
+            "exitCode": 0
+          }
+        ]
+      }
+    ]
+  },
+  "helperExitCode": 0
+}

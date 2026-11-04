@@ -1,0 +1,38 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-20",
+  "testedCommit": "7bb08672c354fb97ed39ad4ad7492d2cbe297aad",
+  "command": [
+    "/usr/bin/sandbox-exec",
+    "-p",
+    "(version 1) (allow default) (deny network-outbound (remote ip \"*:*\")) (allow network-outbound (remote ip \"localhost:*\"))",
+    "/usr/local/share/dotnet/dotnet",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll",
+    "--filter",
+    "FullyQualifiedName=OntologyPlatform.SemanticTests.G3M5ExpressionTests.ProjectionNodeAndDepthBudgetFailClosed",
+    "--minimum-expected-tests",
+    "1",
+    "--no-ansi",
+    "--output",
+    "Detailed",
+    "--results-directory",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-20/test-results/module-SemanticTests-m083"
+  ],
+  "startedAtUtc": "2026-11-04T20:56:55.246824+00:00",
+  "endedAtUtc": "2026-11-04T20:56:55.487464+00:00",
+  "elapsedSeconds": 0.24064324999926612,
+  "exitCode": 0,
+  "timingStatus": "OBSERVED",
+  "timedOut": false,
+  "executedInputDrift": false,
+  "inputHashes": {
+    "/usr/bin/sandbox-exec": "58839ef01b4eef8aac0d2aa8f9d1c074ae45aafe3533965b030672450064acc8",
+    "/usr/local/share/dotnet/dotnet": "11b517e7b00d0efa20e9b3ab6fe433f135d828a4c95c9c6ca7a9cf1328b6ada4",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll": "472f4ea30dd9d3380db8e2dd9dbca4eadab10ddec9d60954231b0b34559052b6"
+  },
+  "manifestSha256": "9a4cd4e3103c418d6efcbf1fd76f679a801fb79bd2c971303deeb03a33298a33",
+  "commandSha256": "c8f7491cdc644119c9d6fdb3b236c247dd14b7a84ea66c312fea0792d0969870",
+  "logSha256": "8ffe077e180e2931eb1cefde58abb8b32c0f1e64dfcd2dbcd4c40d4f67b49b25",
+  "logBytes": 353,
+  "logVisibility": "PRIVATE"
+}

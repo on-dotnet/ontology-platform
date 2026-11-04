@@ -1,0 +1,14 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-20",
+  "testedCommit": "7bb08672c354fb97ed39ad4ad7492d2cbe297aad",
+  "scope": "DIAGNOSTIC_ONLY_NOT_FORMAL_GATE",
+  "variant": "original",
+  "getsockoptExpected": 0,
+  "helperSha256": "2224d2ec18621df2100b517d1599860af8d9396bd614863fe82851692684daca",
+  "runtimeSourceSha256": "9abde73309d2c838f13bc179e4abe30a8dcd96c34f11b2fa69a7e59751ccaba4",
+  "originalRelaySha256": "6c696d8609020e5db1ef1804b5a168b5a1f738a7ba1a7bea41e70756c829bffc",
+  "effectiveRelaySha256": "caca18d57760516be383e21d4619ba407d2ec1cedb4b92a33afa77ceb68fc30e",
+  "effectiveRelay": "use strict; use warnings; use Socket; use POSIX ':sys_wait_h';\nmy ($ip,$port,$token,$seconds)=@ARGV;\ndie \"ARGS\\n\" unless @ARGV==4 && $ip=~/^\\d+\\.\\d+\\.\\d+\\.\\d+$/ && $port=~/^\\d+$/ && $seconds>=1 && $seconds<=120 && $token=~/^g4-relay-[a-z0-9-]+$/;\n$SIG{PIPE}='IGNORE'; my $child;\nsub finish { if($child){kill 'TERM',$child;waitpid($child,0);} exit($_[0]); }\n$SIG{TERM}=sub{finish(0)}; $SIG{INT}=sub{finish(0)}; $SIG{ALRM}=sub{finish(124)}; alarm($seconds);\nsocket(my $tcp,PF_INET,SOCK_STREAM,0) or die \"SOCKET\\n\";\nif($port==5432){\n\nmy $nodelay=getsockopt($tcp,Socket::IPPROTO_TCP(),Socket::TCP_NODELAY());\ndie \"TCP_NODELAY_READBACK\\n\" unless defined($nodelay) && unpack(\"i\",$nodelay)==0;\n}\nconnect($tcp,sockaddr_in($port,inet_aton($ip))) or die \"CONNECT\\n\";\nbinmode STDIN;binmode STDOUT;binmode $tcp;\n$child=fork();defined $child or die \"FORK\\n\";\nif(!$child){\n $SIG{TERM}=sub{exit(0)};$SIG{INT}=sub{exit(0)};$SIG{ALRM}=sub{exit(124)};alarm($seconds);\n while(1){my $n=sysread(STDIN,my $buf,65536);exit(2) unless defined $n;last unless $n;\n  my $offset=0;while($offset<$n){my $w=syswrite($tcp,$buf,$n-$offset,$offset);exit(2) unless $w;$offset+=$w;}}\n shutdown($tcp,1);exit(0);\n}\nprint STDERR \"PIDS $$ $child\\n\";\nmy $sent=0;\nwhile(1){my $n=sysread($tcp,my $buf,65536);finish(2) unless defined $n;last unless $n;\n my $offset=0;while($offset<$n){my $w=syswrite(STDOUT,$buf,$n-$offset,$offset);finish(2) unless $w;$offset+=$w;$sent+=$w;}}\nprint STDERR \"OUTPUT_EOF $sent\\n\";close STDOUT;waitpid($child,0);my $status=$?;$child=0;\nexit(($status & 127) ? 128+($status & 127) : ($status >> 8));\n",
+  "mutation": "Variant changes only platform PG port5432 TCP_NODELAY=1, requires actual getsockopt==1 before connect; all other allowed routes, bytes, queries and budgets unchanged"
+}

@@ -1,0 +1,31 @@
+{
+  "status": "PASS",
+  "reviewer": "/root/consumer_review",
+  "stage": "R1",
+  "rawReview": "Run20 R1只读准入PASS，可一次正式R2。clean源码19驱动匹配blob；21项目锁168归档实际GetContentHash、2SDK完整载荷通过。普通cache仅2SDK，CLI/HTTP/scratch/tmp空；OS全网络拒绝/准确写入白名单/共享cache拒读/证书关闭保持，事故KEEP未变。未执行Restore，R2后须独立后验。",
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-20",
+  "testedCommit": "7bb08672c354fb97ed39ad4ad7492d2cbe297aad",
+  "drivers": {
+    "run.py": "ec50059258c2dd455b0e24cdfe36237eb18c722b11bafa2761785ed097728fb0",
+    "consumer_check.py": "b8a12a744de5eb8e321ccc065d24f1c95ba81c449ab52e5c17c17f4aecd63fe4",
+    "runtime.py": "9abde73309d2c838f13bc179e4abe30a8dcd96c34f11b2fa69a7e59751ccaba4",
+    "pg_fixture.py": "0b3e95134d76bb356fa2f14f21da58886675d6c553b2daf2f643895dc4591f51",
+    "module-tests.py": "970ef5245c6adc8ed64af9c7bd1153c4a8d7a790db787fdacd41d80cd9aa81d5",
+    "startup-boundary.py": "256bba53361f407d0a4071c9c7bd951019418e2193e56aaa604155510d04289c",
+    "migration-boundary.py": "b154843cda9e7195804063e103ba252115051696185e0e3ca648077a3272588d",
+    "contract-check.mjs": "3a7f662352a1d182f0f53f96703cfbb1f8d6f152443d3ab5bc8b2a525c5b01ea",
+    "http.mjs": "c98e018d1748a3bb57a2ee70e71574633a1616e238528eb2f45c02aba83281eb",
+    "browser.mjs": "b2558c334e3896db180a3cb82f35345bfc208edb65266b963901a0d10ffdb758",
+    "fault.mjs": "69557b1f546ded5125ac8b425eb3f8872c8d788a8246fd577f86f9551b1f5939",
+    "g3-compatibility.mjs": "48dbc12affa5e28853ceb55d70d75ca6400d5487f95916f3c1aaf32faf7d46d3",
+    "readback.py": "51afad2d4284dff92dbc011744c76dc2d5dec6888fdeb79a6929ed7568508293",
+    "closeout.py": "fd6b97e94348e72d4dced2e1197b5686971ad01c160a1db0a2af97a7b15f449b",
+    "tests.py": "ffe2699e4c17635845f1683530bd00b291fe263b5f7ee845e1490b566fbdd3bb",
+    "host_continuity.py": "abd4385e1b05a86f5a12582a7e95a1fcc4a29c333eb23d2d952229744ed68984",
+    "compose.m1.yaml": "4f66652b69d9893d4c4372111a1b595558c33a7d9fda40398c5f674de79c413e",
+    "compose.g3.yaml": "f4ff313a0825c9fa818a10509366db97823578bba5315a62cf991cb075e44e66",
+    "hooks/pre-push": "5eaef2482b8b75cb1deb7cca9703f591a0a15c2459e49c5192b4382ccb7ad474"
+  },
+  "manifestSha256": "9a4cd4e3103c418d6efcbf1fd76f679a801fb79bd2c971303deeb03a33298a33"
+}

@@ -1,0 +1,27 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-20",
+  "testedCommit": "7bb08672c354fb97ed39ad4ad7492d2cbe297aad",
+  "command": [
+    "docker",
+    "--context",
+    "desktop-linux",
+    "exec",
+    "07fb07f9ca654622a1345ab5af33636417b145bf4bbfc2c9818281fa58438b9b",
+    "cat",
+    "/sys/fs/cgroup/memory.events"
+  ],
+  "startedAtUtc": "2026-11-04T21:00:01.849624+00:00",
+  "endedAtUtc": "2026-11-04T21:00:04.874645+00:00",
+  "elapsedSeconds": 3.0250167499980307,
+  "exitCode": 0,
+  "timingStatus": "OBSERVED",
+  "timedOut": false,
+  "executedInputDrift": false,
+  "inputHashes": {},
+  "manifestSha256": "9a4cd4e3103c418d6efcbf1fd76f679a801fb79bd2c971303deeb03a33298a33",
+  "commandSha256": "9431da4bc81a88f3af0e2cc13c7274e6bf18bacdf06d246a4161b0d1eeb5362c",
+  "logSha256": "0a2d4e7982066cc7dc914627e7b195ccba88b82a5a996201809e529142d2f380",
+  "logBytes": 70,
+  "logVisibility": "TASK_EVIDENCE"
+}

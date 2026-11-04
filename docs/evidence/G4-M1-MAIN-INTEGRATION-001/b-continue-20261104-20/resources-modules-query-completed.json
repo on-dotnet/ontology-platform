@@ -1,0 +1,119 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-20",
+  "group": "g3",
+  "composeConfigSha256": "3ebbb8525f5ec0b6b7348e8b80ef759398d3cc64779badc24b54e6d5fa3574b2",
+  "containers": [
+    {
+      "id": "bfd9af021188b6acf2e6ea0760fee8caffa4345aee8b11a42e24edf592a20ca8",
+      "service": "rustfs",
+      "image": "sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b",
+      "running": true,
+      "paused": false,
+      "memoryBytes": 805306368,
+      "bindMappings": [
+        {
+          "nativeSource": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261104-20/s3-access",
+          "daemonSource": "/host_mnt/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261104-20/s3-access",
+          "destination": "/run/secrets/s3-access",
+          "readOnly": true
+        },
+        {
+          "nativeSource": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261104-20/s3-secret",
+          "daemonSource": "/host_mnt/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261104-20/s3-secret",
+          "destination": "/run/secrets/s3-secret",
+          "readOnly": true
+        }
+      ],
+      "mounts": [
+        {
+          "Type": "volume",
+          "Name": "ontology-g4-main-b-continue-20261104-20_rustfs-data",
+          "Source": "/var/lib/docker/volumes/ontology-g4-main-b-continue-20261104-20_rustfs-data/_data",
+          "Destination": "/data",
+          "RW": true
+        },
+        {
+          "Type": "bind",
+          "Source": "/host_mnt/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261104-20/s3-access",
+          "Destination": "/run/secrets/s3-access",
+          "RW": false
+        },
+        {
+          "Type": "bind",
+          "Source": "/host_mnt/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261104-20/s3-secret",
+          "Destination": "/run/secrets/s3-secret",
+          "RW": false
+        }
+      ]
+    },
+    {
+      "id": "48af8ef2bb1df8204e03a6e4e7f2b05bd85148ebe9a5d5d091206eddba3ca9cc",
+      "service": "platform-pg",
+      "image": "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+      "running": true,
+      "paused": false,
+      "memoryBytes": 805306368,
+      "bindMappings": [
+        {
+          "nativeSource": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261104-20/platform-password",
+          "daemonSource": "/host_mnt/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261104-20/platform-password",
+          "destination": "/run/secrets/platform-password",
+          "readOnly": true
+        }
+      ],
+      "mounts": [
+        {
+          "Type": "bind",
+          "Source": "/host_mnt/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261104-20/platform-password",
+          "Destination": "/run/secrets/platform-password",
+          "RW": false
+        },
+        {
+          "Type": "volume",
+          "Name": "ontology-g4-main-b-continue-20261104-20_platform-data",
+          "Source": "/var/lib/docker/volumes/ontology-g4-main-b-continue-20261104-20_platform-data/_data",
+          "Destination": "/var/lib/postgresql",
+          "RW": true
+        }
+      ]
+    },
+    {
+      "id": "f2fa91b7f25d88711f0392beba9d2207bc40393008f072a0930295a9063f1bc4",
+      "service": "fuseki",
+      "image": "sha256:715703f0cdb98680f3b71ebbfcdea126ec1ddc3f483f4341afde2cc63b1a817c",
+      "running": true,
+      "paused": false,
+      "memoryBytes": 2147483648,
+      "bindMappings": [],
+      "mounts": [
+        {
+          "Type": "volume",
+          "Name": "ontology-g4-main-b-continue-20261104-20_fuseki-data",
+          "Source": "/var/lib/docker/volumes/ontology-g4-main-b-continue-20261104-20_fuseki-data/_data",
+          "Destination": "/fuseki",
+          "RW": true
+        }
+      ]
+    }
+  ],
+  "totalMemoryBytes": 3758096384,
+  "observedVolumes": {
+    "ontology-g4-main-b-continue-20261104-20_rustfs-data": {
+      "usedBytes": 3698688,
+      "containerId": "bfd9af021188b6acf2e6ea0760fee8caffa4345aee8b11a42e24edf592a20ca8",
+      "destination": "/data"
+    },
+    "ontology-g4-main-b-continue-20261104-20_platform-data": {
+      "usedBytes": 71188480,
+      "containerId": "48af8ef2bb1df8204e03a6e4e7f2b05bd85148ebe9a5d5d091206eddba3ca9cc",
+      "destination": "/var/lib/postgresql"
+    },
+    "ontology-g4-main-b-continue-20261104-20_fuseki-data": {
+      "usedBytes": 182968320,
+      "containerId": "f2fa91b7f25d88711f0392beba9d2207bc40393008f072a0930295a9063f1bc4",
+      "destination": "/fuseki"
+    }
+  },
+  "observedVolumeUsedBytes": 257855488
+}

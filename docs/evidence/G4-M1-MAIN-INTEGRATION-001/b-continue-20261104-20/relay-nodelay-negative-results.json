@@ -1,0 +1,29 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-20",
+  "scope": "TARGETED_ADAPTER_CANDIDATE_NOT_PRODUCT_GATE",
+  "baseTestedCommit": "7bb08672c354fb97ed39ad4ad7492d2cbe297aad",
+  "candidateRelaySha256": "4ff6cb6b54c5ab77b2132ca087293f59a13b9ead3fdb62c53bb8d06f0919368b",
+  "containerId": "64011b89486f84b5f2029fe5216a5b52c0f6bd9b0ae7560245b77104046ad595",
+  "user": "999:999",
+  "status": "PASS",
+  "cases": [
+    {
+      "case": "set-failure",
+      "exitCode": 255,
+      "observedOutputSha256": "dc96d6ac53bbf288e7430eff2bb978aff4c8b20491f8947e44b3ed002851dfac",
+      "probeSha256": "6cf2dbf0387326e06b848f370cb6a8f25336ec1480e752756ba9766ecfa3f487",
+      "connectTrapReached": false,
+      "commandReceiptSha256": "c5de178902248dfd5506dc2c0dae6a35ba9e0f596c47bd5344c539acdc2013d4"
+    },
+    {
+      "case": "readback-failure",
+      "exitCode": 255,
+      "observedOutputSha256": "7794d9660de45fbf999ce4814fb448930666069a952dc1c0529ff8bcbb062201",
+      "probeSha256": "ce9f75963d998330b6d1f16e14a9f98e8a70a9af4bdea31b43da08fa3de13382",
+      "connectTrapReached": false,
+      "commandReceiptSha256": "ba54987583c2e64e7e5cbc883259c6e488b2bc4335c243c71668b0f685bbfc48"
+    }
+  ],
+  "priorFixtureCorrection": "First set-failure correctly refused before connect with errno-derived exit29; v2 stubs reset synthetic errno to0 so expected die255 is deterministic. Original receipt retained."
+}

@@ -90,3 +90,8 @@ Run18 / Tbaed2f8763dc645858df02add5798fe6ff4f3ec9：R1/R2独立准入及后验PA
 Run19 / T648d692684221d39a2cf8ce323254d7ef061e256：R2及独立后验PASS（5.543秒），原27套SelfTest383.06秒、48任务测试、native/Web通过（780总344PASS436SKIP0FAIL、Web379）；I05 PASS/I03 PARTIAL。Semantic302、Publishing78、Query49全部案例PASS；Agent前7方法9案例PASS，第8方法在真实发布准备阶段失败。Fuseki JVM SIGBUS退出127、Docker OOMKilled=false；前测数据卷71%、内存峰值达到2GiB、max197/oom0/oom_kill0，崩溃时最终占用及直接原因NOT_VERIFIED。停止后hs_err复制失败原文保留，不将SIGBUS推定为OOM或满盘。
 
 只读调查证实当前四项目共享一次设施，持续累积持久发布图；旧四drivers各自新建与回收。任务入口修为四固定phase独立三服务寿命，每phase四正式EF迁移、全部原方法/参数及并发、准确资源观测和精确回收；MCP唯一方法输出及全部完成后的Ajv保留。仅任务5文件改动，50任务测试通过，待独立Review和新T完整验收；原失败不升级。Run19 825个Exec实际退出为824×0/1×113，精确7Docker对象、ingress/monitor及4工具副本已回收，KEEP不变。无新V3/main/M2。
+
+
+Run20 / T7bb08672c354fb97ed39ad4ad7492d2cbe297aad：R2严格离线及独立后验PASS（5.505秒），原27套SelfTest383.26秒、50任务测试、native/Web通过（780总344PASS436SKIP0FAIL、Web379）；I05 PASS/I03 PARTIAL。四模块各自独立设施已实际运行；Semantic302、Publishing78、Query49全部PASS并逐组精确回收。Agent前21方法28案例PASS，m022 SlowSse在HTTP启动前的连续大消息Append失败，后4方法及Ajv/G3整栈NOT_RUN。失败数据库投影显示223次消息后接近10秒lease到期，直接false分支未插桩，不改产品lease或正式断言。
+
+同设施只读SELECT A/B证实任务PG转发12KiB上传中位42.2678ms、24KiB44.0111ms；只为5432设置并读回TCP_NODELAY后分别0.3583ms/0.3936ms。A/B精确helper/实际Perl字节绑定、两实际失败关闭负例及永久五行runtime修复通过独立审查，50任务测试通过；这仍是诊断，不代表正式SlowSse恢复。原失败PGDMP私有KEEP，公开只存SHA/大小/命令；所有28个分阶段Docker对象实际回收（同名卷按CreatedAt世代区分）、全部ingress/monitor及四工具副本已释放，旧KEEP保留。须新T/Run完整验收，I01夹具闭合未运行，无新V3/main/M2。详见b-continue-20261104-20/index.json。

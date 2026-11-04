@@ -1,0 +1,87 @@
+{
+  "status": "PASS",
+  "deleted": 7,
+  "absence": [
+    {
+      "kind": "container",
+      "id": "9a881260cbcb3ce9d16e3dbc15b522b242342d20c9acd2b5b3adbcf89a3dd773",
+      "exitCode": 1,
+      "stderrSha256": "87b84bba777a6929b007701dc7c96036903240fdac69d7230b53e6d308effe65",
+      "exactAbsent": true
+    },
+    {
+      "kind": "container",
+      "id": "64011b89486f84b5f2029fe5216a5b52c0f6bd9b0ae7560245b77104046ad595",
+      "exitCode": 1,
+      "stderrSha256": "a6c3f5272c8f02c82e5c39f54f160a7350d08f8b31c937b24e2028f87bdab0ff",
+      "exactAbsent": true
+    },
+    {
+      "kind": "container",
+      "id": "53d0c1495aa7e580e47c14be4f01bf60ff8ed7ecbed64519cbf9d8ec0f5f5630",
+      "exitCode": 1,
+      "stderrSha256": "bd1bd38f5eefd3d75c93ce959dc12e04ea490e74797e26aaf496818acb8ca7ab",
+      "exactAbsent": true
+    },
+    {
+      "kind": "network",
+      "id": "3fd932314d6cb2660355eae66565d451d8a22c053a7c353a2b0dbb40ae19a751",
+      "exitCode": 1,
+      "stderrSha256": "d9f60583888ab70cdeb550ea095f2a32097c9cad66b5949a9cb0525daadfc35c",
+      "exactAbsent": true
+    },
+    {
+      "kind": "volume",
+      "id": "ontology-g4-main-b-continue-20261104-20_fuseki-data",
+      "exitCode": 1,
+      "stderrSha256": "0a9fe045f0e811703071a983eb838e186f20f34e068353992fc0ed541ea7cf67",
+      "exactAbsent": true
+    },
+    {
+      "kind": "volume",
+      "id": "ontology-g4-main-b-continue-20261104-20_platform-data",
+      "exitCode": 1,
+      "stderrSha256": "00ffa4a8de44f634ccdd5ba31b6351600a84f51d1818659648a6235538ebd597",
+      "exactAbsent": true
+    },
+    {
+      "kind": "volume",
+      "id": "ontology-g4-main-b-continue-20261104-20_rustfs-data",
+      "exitCode": 1,
+      "stderrSha256": "b2eea3a9950bd9c2b1d0ed46fa413a81b14097b4896496e62993512c399033e6",
+      "exactAbsent": true
+    }
+  ],
+  "keepVerified": true,
+  "ingress": {
+    "modules": {
+      "status": "NOT_STARTED"
+    },
+    "g3": {
+      "status": "NOT_STARTED"
+    },
+    "m1": {
+      "status": "NOT_STARTED"
+    },
+    "modules-semantic": {
+      "status": "ALREADY_CLOSED",
+      "receiptSha256": "217076c5d77014129ca0cc70185768507b746122c41a5c297753c7e3822073ab"
+    },
+    "modules-publishing": {
+      "status": "ALREADY_CLOSED",
+      "receiptSha256": "34d0b152f50df2f97e6eefbd35f48587a1d11b996a2412426fd342494bd2832c"
+    },
+    "modules-query": {
+      "status": "ALREADY_CLOSED",
+      "receiptSha256": "082c5c8c2cdfa509648e2e8ba406dd3dff7a395672c51009df74b46d0a923259"
+    },
+    "modules-agent": {
+      "status": "ALREADY_CLOSED",
+      "receiptSha256": "b22b2bb797b00743edd779c820fb23c9292c04504518e93e62bdc0a88648c4fe"
+    }
+  },
+  "executionInputs": {
+    "runtime.py": "465e772abd26de6092413cda02b3109575c8bfe3fc03a61fc6175c0081aa6e7f",
+    "closeout.py": "fd6b97e94348e72d4dced2e1197b5686971ad01c160a1db0a2af97a7b15f449b"
+  }
+}

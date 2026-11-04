@@ -470,6 +470,11 @@ $SIG{PIPE}='IGNORE'; my $child;
 sub finish { if($child){kill 'TERM',$child;waitpid($child,0);} exit($_[0]); }
 $SIG{TERM}=sub{finish(0)}; $SIG{INT}=sub{finish(0)}; $SIG{ALRM}=sub{finish(124)}; alarm($seconds);
 socket(my $tcp,PF_INET,SOCK_STREAM,0) or die "SOCKET\n";
+if($port==5432){
+setsockopt($tcp,Socket::IPPROTO_TCP(),Socket::TCP_NODELAY(),pack("i",1)) or die "TCP_NODELAY\n";
+my $nodelay=getsockopt($tcp,Socket::IPPROTO_TCP(),Socket::TCP_NODELAY());
+die "TCP_NODELAY_READBACK\n" unless defined($nodelay) && unpack("i",$nodelay)==1;
+}
 connect($tcp,sockaddr_in($port,inet_aton($ip))) or die "CONNECT\n";
 binmode STDIN;binmode STDOUT;binmode $tcp;
 $child=fork();defined $child or die "FORK\n";

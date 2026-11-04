@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "reviewer": "/root/consumer_review",
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-20",
+  "stage": "permanent NODELAY repair and exact cleanup after",
+  "rawReview": "Run20/A21回收独立后验PASS。Agent七对象逐项实测不存在，诊断散列匹配；旧KEEP3网络8卷完整。PID34269/37137/37193/12182均不存在。A21四目录实测lstat ENOENT；日志完整，事故KEEP指纹不变。私有失败dump968438字节0600 PGDMP，SHA21b5debd9315303193b1afdd03f74c044e7c3b82a2a1591e12af33d699971ff9，未进行数据库恢复测试。永久五行NODELAY修复PASS，runtime SHA465e772abd26de6092413cda02b3109575c8bfe3fc03a61fc6175c0081aa6e7f；Perl与实际B变体逐字节一致。实际A/B降低大消息上行延迟；两项连接前拒绝负例及50任务测试通过。原SlowSse仍未闭合，须新T实测。",
+  "evidenceHashes": {
+    "i02-failure-resource-cleanup.json": "b5503893812b637f54e6fdbb1afb125103c709608e8939f7ed490edf9ad941ce",
+    "cleanup-modules-agent-commands.json": "3f13e9c67dbc6548ec2df4e7bcd39a24462ec7b73e7ce3314e7093bf71173061",
+    "transport-ab-results.json": "d181d684815b0642de709ade0829e152c2100cad0e240a7f740b9b1a67b3d891",
+    "relay-nodelay-negative-results.json": "0ac9ad323fca64bb5a2a3d1a4c8f78e0d778b6b9a4f466a71dcd0a3ec570eeef",
+    "permanent-nodelay-binding.json": "1a44c0860cd856c2f4fc40be874c5db1fd5c459a122ef689a552fe23bf701e31",
+    "nodelay-task-tests.log": "637474384a32104d8804e8d3f368c4f0524c940bb34336190db79107eb37ad29"
+  },
+  "copyCleanupSha256": "fe5d5feb817dc67f421ddc0c8cc8be8f8c5d691728e01d5eac9186e901b5e938"
+}

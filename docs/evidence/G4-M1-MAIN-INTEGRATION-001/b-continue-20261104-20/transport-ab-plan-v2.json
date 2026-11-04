@@ -1,0 +1,19 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-20",
+  "testedCommit": "7bb08672c354fb97ed39ad4ad7492d2cbe297aad",
+  "scope": "DIAGNOSTIC_ONLY_NOT_FORMAL_GATE",
+  "supersedesUnexecutedPlan": "transport-ab-plan.json",
+  "files": {
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-20/helpers/relay-nodelay-diagnostic.py": "2224d2ec18621df2100b517d1599860af8d9396bd614863fe82851692684daca",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-20/helpers/transport-ab-launcher.py": "55cbfd4e73b4b266b6880fb8c2c3a664b02149e56b63a8bef35eb1ea42b4368c",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-20/helpers/pg-latency-v3.fsx": "11882645385ffd28114de06041ad20ef0c02827fc2099c249ff60d3177171385"
+  },
+  "launchCommand": [
+    "/opt/homebrew/opt/python@3.13/bin/python3.13",
+    "-B",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-20/helpers/transport-ab-launcher.py"
+  ],
+  "lifecycle": "formal exact release -> Popen/PID/birth/argv/TaskRunT+helper+runtime SHA -> ready binding -> identical SELECT -> idle Exec checks -> finally exact stop_ingress and wait -> immutable per-variant receipt",
+  "tcpObservation": "original requires actual getsockopt==0; nodelay sets and requires actual getsockopt==1; only platform port5432 modified"
+}

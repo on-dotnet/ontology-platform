@@ -1,0 +1,48 @@
+{
+  "pid": 32128,
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-20",
+  "testedCommit": "7bb08672c354fb97ed39ad4ad7492d2cbe297aad",
+  "manifestSha256": "9a4cd4e3103c418d6efcbf1fd76f679a801fb79bd2c971303deeb03a33298a33",
+  "runtimeSha256": "9abde73309d2c838f13bc179e4abe30a8dcd96c34f11b2fa69a7e59751ccaba4",
+  "engineSocket": "unix:///Users/chasen/.docker/run/docker.sock",
+  "apiVersion": "1.56",
+  "routes": [
+    {
+      "service": "platform-pg",
+      "targetId": "cad03525afa51e65e4f01413186b64c0ff7d23b0c496da9fd8a5861d672e08d2",
+      "providerId": "cad03525afa51e65e4f01413186b64c0ff7d23b0c496da9fd8a5861d672e08d2",
+      "brokerId": "cad03525afa51e65e4f01413186b64c0ff7d23b0c496da9fd8a5861d672e08d2",
+      "networkId": "80de8c8f0887cf9a9f89ff60a82e49ea3ff20690ef01cbd15dd1e987576795a1",
+      "targetIp": "172.18.0.3",
+      "connectIp": "127.0.0.1",
+      "port": 5432,
+      "hostPort": 15432
+    },
+    {
+      "service": "fuseki",
+      "targetId": "07fb07f9ca654622a1345ab5af33636417b145bf4bbfc2c9818281fa58438b9b",
+      "providerId": "07fb07f9ca654622a1345ab5af33636417b145bf4bbfc2c9818281fa58438b9b",
+      "brokerId": "cad03525afa51e65e4f01413186b64c0ff7d23b0c496da9fd8a5861d672e08d2",
+      "networkId": "80de8c8f0887cf9a9f89ff60a82e49ea3ff20690ef01cbd15dd1e987576795a1",
+      "targetIp": "172.18.0.4",
+      "connectIp": "172.18.0.4",
+      "port": 3030,
+      "hostPort": 15303
+    },
+    {
+      "service": "rustfs",
+      "targetId": "da6bb527b605b7ea239fb040f06a9fdfd420e8663e72cb7cd5bf277f2ea5afbd",
+      "providerId": "da6bb527b605b7ea239fb040f06a9fdfd420e8663e72cb7cd5bf277f2ea5afbd",
+      "brokerId": "cad03525afa51e65e4f01413186b64c0ff7d23b0c496da9fd8a5861d672e08d2",
+      "networkId": "80de8c8f0887cf9a9f89ff60a82e49ea3ff20690ef01cbd15dd1e987576795a1",
+      "targetIp": "172.18.0.2",
+      "connectIp": "172.18.0.2",
+      "port": 9000,
+      "hostPort": 15900
+    }
+  ],
+  "maxConcurrent": 32,
+  "connectionSeconds": 120,
+  "processSeconds": 14400
+}

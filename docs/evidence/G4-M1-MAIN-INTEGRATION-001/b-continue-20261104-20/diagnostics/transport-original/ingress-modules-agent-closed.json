@@ -1,0 +1,54 @@
+{
+  "status": "PASS",
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-20",
+  "testedCommit": "7bb08672c354fb97ed39ad4ad7492d2cbe297aad",
+  "pid": 37137,
+  "processReceiptSha256": "9eade108972179b47a92784070197730fff0c8ee506bd419d38094b32c5ee0cf",
+  "portsReleased": [
+    15432,
+    15303,
+    15900
+  ],
+  "execExits": [
+    {
+      "utc": "2026-11-04T21:18:48.495326+00:00",
+      "pid": 37137,
+      "event": "exec_exited",
+      "execId": "4b10ec76302bdbee2376f9575e2668dcc4264f1f274673387b446de59b628d57",
+      "token": "g4-relay-b-continue-20261104-20-3908185121a84278aa6408ef1af8d8ce",
+      "containerId": "64011b89486f84b5f2029fe5216a5b52c0f6bd9b0ae7560245b77104046ad595",
+      "running": false,
+      "exitCode": 0
+    }
+  ],
+  "remoteObservations": [
+    {
+      "event": "reap_exec_created",
+      "execId": "c0eeb40e6c307b65131b559822445a2b6e22b4b63b7ea32f5eb54f876b598969",
+      "mode": "terminate"
+    },
+    {
+      "event": "reap_exec_created",
+      "execId": "37e9b774ee0f23216145a361d6eb817238d1a1b05ed7daa2d1e07af33216c630",
+      "mode": "inspect"
+    },
+    {
+      "event": "remote_reaped",
+      "observations": [
+        {
+          "execId": "c0eeb40e6c307b65131b559822445a2b6e22b4b63b7ea32f5eb54f876b598969",
+          "mode": "terminate",
+          "pids": [],
+          "exitCode": 0
+        },
+        {
+          "execId": "37e9b774ee0f23216145a361d6eb817238d1a1b05ed7daa2d1e07af33216c630",
+          "mode": "inspect",
+          "pids": [],
+          "exitCode": 0
+        }
+      ]
+    }
+  ]
+}

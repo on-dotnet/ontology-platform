@@ -1,0 +1,623 @@
+{
+  "cases": [
+    {
+      "case": "ExactEditRoundtripRetainsNullAndLanguage",
+      "status": "PASS",
+      "line": 1
+    },
+    {
+      "case": "MissingEditMemberCannotBecomeImplicitMutation (\"subjectIri\")",
+      "status": "PASS",
+      "line": 2
+    },
+    {
+      "case": "MissingEditMemberCannotBecomeImplicitMutation (\"predicateIri\")",
+      "status": "PASS",
+      "line": 3
+    },
+    {
+      "case": "MissingEditMemberCannotBecomeImplicitMutation (\"oldObject\")",
+      "status": "PASS",
+      "line": 4
+    },
+    {
+      "case": "MissingEditMemberCannotBecomeImplicitMutation (\"newObject\")",
+      "status": "PASS",
+      "line": 5
+    },
+    {
+      "case": "UnknownEditFieldsAndMalformedJsonAreRejected (\"actor\")",
+      "status": "PASS",
+      "line": 6
+    },
+    {
+      "case": "UnknownEditFieldsAndMalformedJsonAreRejected (\"publishEligible\")",
+      "status": "PASS",
+      "line": 7
+    },
+    {
+      "case": "UnknownEditFieldsAndMalformedJsonAreRejected (\"sourceId\")",
+      "status": "PASS",
+      "line": 8
+    },
+    {
+      "case": "UnknownAndNumericTermKindAreRejected (\"\\\"unknown\\\"\")",
+      "status": "PASS",
+      "line": 9
+    },
+    {
+      "case": "UnknownAndNumericTermKindAreRejected (\"0\")",
+      "status": "PASS",
+      "line": 10
+    },
+    {
+      "case": "AssessmentShapeIsOptionalAndRoundtripsWithoutChangingLegacyBytes",
+      "status": "PASS",
+      "line": 11
+    },
+    {
+      "case": "ValidBatchKeepsSourceIdentityLanguageAndHashes",
+      "status": "PASS",
+      "line": 12
+    },
+    {
+      "case": "MissingBatchFieldsAreRejected (\"hashes\")",
+      "status": "PASS",
+      "line": 13
+    },
+    {
+      "case": "MissingBatchFieldsAreRejected (\"changes\")",
+      "status": "PASS",
+      "line": 14
+    },
+    {
+      "case": "MissingBatchFieldsAreRejected (\"command\")",
+      "status": "PASS",
+      "line": 15
+    },
+    {
+      "case": "InvalidSourceCannotDefaultToOntology (\"\\\"shapes\\\"\")",
+      "status": "PASS",
+      "line": 16
+    },
+    {
+      "case": "InvalidSourceCannotDefaultToOntology (\"\\\"data\\\"\")",
+      "status": "PASS",
+      "line": 17
+    },
+    {
+      "case": "InvalidSourceCannotDefaultToOntology (\"\\\"unknown\\\"\")",
+      "status": "PASS",
+      "line": 18
+    },
+    {
+      "case": "InvalidSourceCannotDefaultToOntology (\"0\")",
+      "status": "PASS",
+      "line": 19
+    },
+    {
+      "case": "InvalidSourceCannotDefaultToOntology (\"null\")",
+      "status": "PASS",
+      "line": 20
+    },
+    {
+      "case": "IncompleteAndForgedBatchesAreRejected (\"missing-source\")",
+      "status": "PASS",
+      "line": 21
+    },
+    {
+      "case": "IncompleteAndForgedBatchesAreRejected (\"extra-change\")",
+      "status": "PASS",
+      "line": 22
+    },
+    {
+      "case": "IncompleteAndForgedBatchesAreRejected (\"extra-root\")",
+      "status": "PASS",
+      "line": 23
+    },
+    {
+      "case": "IncompleteAndForgedBatchesAreRejected (\"null-array-item\")",
+      "status": "PASS",
+      "line": 24
+    },
+    {
+      "case": "SnapshotRequiresExplicitReleaseContextAndSourceProvenance",
+      "status": "PASS",
+      "line": 25
+    },
+    {
+      "case": "ExactIdentityCommandRoundtrips",
+      "status": "PASS",
+      "line": 26
+    },
+    {
+      "case": "InvalidIdentityEnvelopeFailsClosed (\"missing-command\")",
+      "status": "PASS",
+      "line": 27
+    },
+    {
+      "case": "InvalidIdentityEnvelopeFailsClosed (\"missing-hashes\")",
+      "status": "PASS",
+      "line": 28
+    },
+    {
+      "case": "InvalidIdentityEnvelopeFailsClosed (\"missing-changes\")",
+      "status": "PASS",
+      "line": 29
+    },
+    {
+      "case": "InvalidIdentityEnvelopeFailsClosed (\"null-changes\")",
+      "status": "PASS",
+      "line": 30
+    },
+    {
+      "case": "InvalidIdentityEnvelopeFailsClosed (\"null-item\")",
+      "status": "PASS",
+      "line": 31
+    },
+    {
+      "case": "InvalidIdentityEnvelopeFailsClosed (\"extra-actor\")",
+      "status": "PASS",
+      "line": 32
+    },
+    {
+      "case": "InvalidIdentityEnvelopeFailsClosed (\"numeric-source\")",
+      "status": "PASS",
+      "line": 33
+    },
+    {
+      "case": "InvalidIdentityEnvelopeFailsClosed (\"unknown-source\")",
+      "status": "PASS",
+      "line": 34
+    },
+    {
+      "case": "ExplicitTimezoneAndExactLexicalBoundary (\"2026-01-01T00:00:00Z\",True)",
+      "status": "PASS",
+      "line": 35
+    },
+    {
+      "case": "ExplicitTimezoneAndExactLexicalBoundary (\"2026-01-01T08:00:00+08:00\",True)",
+      "status": "PASS",
+      "line": 36
+    },
+    {
+      "case": "ExplicitTimezoneAndExactLexicalBoundary (\"2026-01-01T00:00:00.1234567-05:30\",True)",
+      "status": "PASS",
+      "line": 37
+    },
+    {
+      "case": "ExplicitTimezoneAndExactLexicalBoundary (\"2026-01-01T00:00:00\",False)",
+      "status": "PASS",
+      "line": 38
+    },
+    {
+      "case": "ExplicitTimezoneAndExactLexicalBoundary (\"2026-02-30T00:00:00Z\",False)",
+      "status": "PASS",
+      "line": 39
+    },
+    {
+      "case": "ExplicitTimezoneAndExactLexicalBoundary (\"2026-01-01\",False)",
+      "status": "PASS",
+      "line": 40
+    },
+    {
+      "case": "ExplicitTimezoneAndExactLexicalBoundary (\"2026-01-01T24:00:00Z\",False)",
+      "status": "PASS",
+      "line": 41
+    },
+    {
+      "case": "ExplicitTimezoneAndExactLexicalBoundary (\"2026-01-01T00:00:60Z\",False)",
+      "status": "PASS",
+      "line": 42
+    },
+    {
+      "case": "ExplicitTimezoneAndExactLexicalBoundary (\"2026-01-01T00:00:00+14:01\",False)",
+      "status": "PASS",
+      "line": 43
+    },
+    {
+      "case": "ExplicitTimezoneAndExactLexicalBoundary (\"2026-01-01T00:00:00.12345678Z\",False)",
+      "status": "PASS",
+      "line": 44
+    },
+    {
+      "case": "ExplicitTimezoneAndExactLexicalBoundary (\"2026-01-01T00:00:00Z \",False)",
+      "status": "PASS",
+      "line": 45
+    },
+    {
+      "case": "ExplicitTimezoneAndExactLexicalBoundary (\"2026-01-01T00:00:00Z\\n\",False)",
+      "status": "PASS",
+      "line": 46
+    },
+    {
+      "case": "ExplicitTimezoneAndExactLexicalBoundary (\"2026-01-01T00:00:00Z\\r\\n\",False)",
+      "status": "PASS",
+      "line": 47
+    },
+    {
+      "case": "ExplicitTimezoneAndExactLexicalBoundary (\"\\t2026-01-01T00:00:00Z\",False)",
+      "status": "PASS",
+      "line": 48
+    },
+    {
+      "case": "ExplicitTimezoneAndExactLexicalBoundary (\"2026-01-01T00:00:00Z\\t\",False)",
+      "status": "PASS",
+      "line": 49
+    },
+    {
+      "case": "IntervalRelationsKeepUnknownDistinct",
+      "status": "PASS",
+      "line": 50
+    },
+    {
+      "case": "ExplicitInitialBaselineRoundtrips",
+      "status": "PASS",
+      "line": 51
+    },
+    {
+      "case": "InvalidGenerationRequestFailsClosed (\"missing-from\")",
+      "status": "PASS",
+      "line": 52
+    },
+    {
+      "case": "InvalidGenerationRequestFailsClosed (\"missing-to\")",
+      "status": "PASS",
+      "line": 53
+    },
+    {
+      "case": "InvalidGenerationRequestFailsClosed (\"missing-assessmentId\")",
+      "status": "PASS",
+      "line": 54
+    },
+    {
+      "case": "InvalidGenerationRequestFailsClosed (\"missing-command\")",
+      "status": "PASS",
+      "line": 55
+    },
+    {
+      "case": "InvalidGenerationRequestFailsClosed (\"null-from\")",
+      "status": "PASS",
+      "line": 56
+    },
+    {
+      "case": "InvalidGenerationRequestFailsClosed (\"unknown-baseline\")",
+      "status": "PASS",
+      "line": 57
+    },
+    {
+      "case": "InvalidGenerationRequestFailsClosed (\"numeric-baseline\")",
+      "status": "PASS",
+      "line": 58
+    },
+    {
+      "case": "InvalidGenerationRequestFailsClosed (\"forged-publishEligible\")",
+      "status": "PASS",
+      "line": 59
+    },
+    {
+      "case": "InvalidGenerationRequestFailsClosed (\"different-initial-target\")",
+      "status": "PASS",
+      "line": 60
+    },
+    {
+      "case": "InvalidGenerationRequestFailsClosed (\"release-with-revision\")",
+      "status": "PASS",
+      "line": 61
+    },
+    {
+      "case": "ProposalReferenceIsPairedAndRollbackCannotCarryImpact",
+      "status": "PASS",
+      "line": 62
+    },
+    {
+      "case": "CanonicalHashIgnoresEnvelopeTelemetryAndSetOrdering",
+      "status": "PASS",
+      "line": 63
+    },
+    {
+      "case": "MeaningfulInputsAndEvidenceCannotReuseCanonicalHash",
+      "status": "PASS",
+      "line": 64
+    },
+    {
+      "case": "FourSourceAndAbsenceContractIsStrict",
+      "status": "PASS",
+      "line": 65
+    },
+    {
+      "case": "UnstableOrUnboundContentIsRejected (\"slot-hash\")",
+      "status": "PASS",
+      "line": 66
+    },
+    {
+      "case": "UnstableOrUnboundContentIsRejected (\"bundle-hash\")",
+      "status": "PASS",
+      "line": 67
+    },
+    {
+      "case": "UnstableOrUnboundContentIsRejected (\"text-hash\")",
+      "status": "PASS",
+      "line": 68
+    },
+    {
+      "case": "UnstableOrUnboundContentIsRejected (\"changed-flag\")",
+      "status": "PASS",
+      "line": 69
+    },
+    {
+      "case": "UnstableOrUnboundContentIsRejected (\"blank-delta\")",
+      "status": "PASS",
+      "line": 70
+    },
+    {
+      "case": "UnstableOrUnboundContentIsRejected (\"blank-evidence\")",
+      "status": "PASS",
+      "line": 71
+    },
+    {
+      "case": "UnstableOrUnboundContentIsRejected (\"blank-focus\")",
+      "status": "PASS",
+      "line": 72
+    },
+    {
+      "case": "UnstableOrUnboundContentIsRejected (\"evidence-hash\")",
+      "status": "PASS",
+      "line": 73
+    },
+    {
+      "case": "UnstableOrUnboundContentIsRejected (\"evidence-version\")",
+      "status": "PASS",
+      "line": 74
+    },
+    {
+      "case": "UnstableOrUnboundContentIsRejected (\"missing-evidence\")",
+      "status": "PASS",
+      "line": 75
+    },
+    {
+      "case": "UnstableOrUnboundContentIsRejected (\"equivalent-with-delta\")",
+      "status": "PASS",
+      "line": 76
+    },
+    {
+      "case": "UnstableOrUnboundContentIsRejected (\"indeterminate-eligible\")",
+      "status": "PASS",
+      "line": 77
+    },
+    {
+      "case": "UnstableOrUnboundContentIsRejected (\"different-equivalent-delta\")",
+      "status": "PASS",
+      "line": 78
+    },
+    {
+      "case": "UnstableOrUnboundContentIsRejected (\"different-empty-exact\")",
+      "status": "PASS",
+      "line": 79
+    },
+    {
+      "case": "UnstableOrUnboundContentIsRejected (\"unnamed-focus\")",
+      "status": "PASS",
+      "line": 80
+    },
+    {
+      "case": "UnstableOrUnboundContentIsRejected (\"unnamed-delta\")",
+      "status": "PASS",
+      "line": 81
+    },
+    {
+      "case": "InitialReportRequiresRealSelfBaseline",
+      "status": "PASS",
+      "line": 82
+    },
+    {
+      "case": "CompatibilityBinaryReadsActualV2Manifest",
+      "status": "SKIP",
+      "line": 83
+    },
+    {
+      "case": "LegacyManifestDoesNotInventSemanticBinding",
+      "status": "PASS",
+      "line": 85
+    },
+    {
+      "case": "V2RoundtripRetainsExactAssessmentBinding",
+      "status": "PASS",
+      "line": 86
+    },
+    {
+      "case": "NewOrUnknownManifestCannotSkipBinding",
+      "status": "PASS",
+      "line": 87
+    },
+    {
+      "case": "V2RejectsEmptyMissingAndInconsistentSourceHashes",
+      "status": "PASS",
+      "line": 88
+    },
+    {
+      "case": "FiveProfilesRoundtripAndRejectInjectedField (\"POSTGRESQL\",\"{\\\"host\\\":\\\"pg-source\\\",\\\"port\\\":5432,\\\"database\\\":\\\"fixture\\\",\\\"username\\\":\\\"fixture_reader\\\",\\\"sslMode\\\":\\\"VerifyFull\\\",\\\"allowedSchemas\\\":[\\\"production\\\"]}\")",
+      "status": "PASS",
+      "line": 89
+    },
+    {
+      "case": "FiveProfilesRoundtripAndRejectInjectedField (\"ORACLE\",\"{\\\"host\\\":\\\"oracle\\\",\\\"port\\\":1521,\\\"serviceName\\\":\\\"svc\\\",\\\"username\\\":\\\"reader\\\",\\\"tls\\\":true,\\\"allowedOwners\\\":[\\\"OWNER\\\"]}\")",
+      "status": "PASS",
+      "line": 90
+    },
+    {
+      "case": "FiveProfilesRoundtripAndRejectInjectedField (\"DORIS\",\"{\\\"feHost\\\":\\\"doris\\\",\\\"queryPort\\\":9030,\\\"catalog\\\":\\\"internal\\\",\\\"database\\\":\\\"fixture\\\",\\\"username\\\":\\\"reader\\\",\\\"tls\\\":true}\")",
+      "status": "PASS",
+      "line": 91
+    },
+    {
+      "case": "FiveProfilesRoundtripAndRejectInjectedField (\"TDENGINE\",\"{\\\"wsUrl\\\":\\\"wss://td.invalid\\\",\\\"database\\\":\\\"fixture\\\",\\\"timePrecision\\\":\\\"UNKNOWN\\\",\\\"timeZone\\\":null}\")",
+      "status": "PASS",
+      "line": 92
+    },
+    {
+      "case": "FiveProfilesRoundtripAndRejectInjectedField (\"WEB_API\",\"{\\\"baseOrigin\\\":\\\"https://api.invalid\\\",\\\"operationId\\\":\\\"read\\\",\\\"method\\\":\\\"GET\\\",\\\"approvedPath\\\":\\\"/items\\\",\\\"authentication\\\":\\\"NONE\\\",\\\"pagination\\\":\\\"NONE\\\",\\\"hostPolicyRef\\\":\\\"synthetic\\\"}\")",
+      "status": "PASS",
+      "line": 93
+    },
+    {
+      "case": "CommandRevisionRejectsNonInteger (\"null\")",
+      "status": "PASS",
+      "line": 94
+    },
+    {
+      "case": "CommandRevisionRejectsNonInteger (\"true\")",
+      "status": "PASS",
+      "line": 95
+    },
+    {
+      "case": "CommandRevisionRejectsNonInteger (\"\\\"0\\\"\")",
+      "status": "PASS",
+      "line": 96
+    },
+    {
+      "case": "CommandRevisionRejectsNonInteger (\"1.5\")",
+      "status": "PASS",
+      "line": 97
+    },
+    {
+      "case": "InvalidPgValuesCannotReachAdapter (\"port\")",
+      "status": "PASS",
+      "line": 98
+    },
+    {
+      "case": "InvalidPgValuesCannotReachAdapter (\"database\")",
+      "status": "PASS",
+      "line": 99
+    },
+    {
+      "case": "InvalidPgValuesCannotReachAdapter (\"tls\")",
+      "status": "PASS",
+      "line": 100
+    },
+    {
+      "case": "InvalidPgValuesCannotReachAdapter (\"schema-null\")",
+      "status": "PASS",
+      "line": 101
+    },
+    {
+      "case": "InvalidPgValuesCannotReachAdapter (\"schema-sql\")",
+      "status": "PASS",
+      "line": 102
+    },
+    {
+      "case": "EmptyPatchFailsSemanticValidation",
+      "status": "PASS",
+      "line": 103
+    },
+    {
+      "case": "NumericEnumCannotBypassSemanticProtocol",
+      "status": "PASS",
+      "line": 104
+    },
+    {
+      "case": "SourceBundleRejectsInjectedIdentityField",
+      "status": "PASS",
+      "line": 105
+    },
+    {
+      "case": "PersistentEventPayloadUsesCanonicalDiscriminator",
+      "status": "PASS",
+      "line": 106
+    },
+    {
+      "case": "SemanticDatumRejectsEmptyMismatchedAndMultipleBranches",
+      "status": "PASS",
+      "line": 107
+    },
+    {
+      "case": "EventEnvelopeRejectsMismatchedPayloadAndUnsupportedVersion",
+      "status": "PASS",
+      "line": 108
+    },
+    {
+      "case": "TerminalPayloadRejectsOtherExecutionStates",
+      "status": "PASS",
+      "line": 109
+    },
+    {
+      "case": "RequiredReferenceCannotBeNullButNullableFieldCan",
+      "status": "PASS",
+      "line": 110
+    },
+    {
+      "case": "EachSemanticBranchRoundtrips (\"ontology\")",
+      "status": "PASS",
+      "line": 111
+    },
+    {
+      "case": "EachSemanticBranchRoundtrips (\"entity\")",
+      "status": "PASS",
+      "line": 112
+    },
+    {
+      "case": "EachSemanticBranchRoundtrips (\"relationship\")",
+      "status": "PASS",
+      "line": 113
+    },
+    {
+      "case": "EveryEventPayloadRoundtripsWithMatchingEnvelope (\"run.started\")",
+      "status": "PASS",
+      "line": 114
+    },
+    {
+      "case": "EveryEventPayloadRoundtripsWithMatchingEnvelope (\"tool.started\")",
+      "status": "PASS",
+      "line": 115
+    },
+    {
+      "case": "EveryEventPayloadRoundtripsWithMatchingEnvelope (\"tool.completed\")",
+      "status": "PASS",
+      "line": 116
+    },
+    {
+      "case": "EveryEventPayloadRoundtripsWithMatchingEnvelope (\"evidence.added\")",
+      "status": "PASS",
+      "line": 117
+    },
+    {
+      "case": "EveryEventPayloadRoundtripsWithMatchingEnvelope (\"message.delta\")",
+      "status": "PASS",
+      "line": 118
+    },
+    {
+      "case": "EveryEventPayloadRoundtripsWithMatchingEnvelope (\"approval.required\")",
+      "status": "PASS",
+      "line": 119
+    },
+    {
+      "case": "EveryEventPayloadRoundtripsWithMatchingEnvelope (\"run.completed\")",
+      "status": "PASS",
+      "line": 120
+    },
+    {
+      "case": "EveryEventPayloadRoundtripsWithMatchingEnvelope (\"run.failed\")",
+      "status": "PASS",
+      "line": 121
+    },
+    {
+      "case": "EveryEventPayloadRoundtripsWithMatchingEnvelope (\"run.cancelled\")",
+      "status": "PASS",
+      "line": 122
+    }
+  ],
+  "summary": {
+    "total": 121,
+    "PASS": 120,
+    "FAIL": 0,
+    "SKIP": 1
+  },
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-20",
+  "testedCommit": "7bb08672c354fb97ed39ad4ad7492d2cbe297aad",
+  "project": "G2ContractTests",
+  "assemblySha256": "bcea2e251b2266be1581922ed9ef1cd27635272893873586d124cf1fad81cb4e",
+  "rawLogSha256": "f6bb06955a3908eec08d2ea143e570d1d3edce5e0643c7f40130b2499b2ac1dc",
+  "commandReceiptSha256": "9c015c6193fb590f2f9893e491f8f82acf0c339e5d4e4b2612a30f074ae0e104",
+  "command": "baseline-G2ContractTests"
+}
