@@ -15,7 +15,7 @@ def platform_sql(m, sql):
     return rt.docker(m,['exec','-i',ident,'psql','-X','-qAt','-U','platform','-d','platform','-v','ON_ERROR_STOP=1'],input_bytes=("SET statement_timeout='5s'; SET lock_timeout='2s';"+sql).encode()).decode().strip()
 
 
-def g3_rows(m):
+def g3_rows(m,audit_ids=None):
     """只输出现有G3表的计数和整行摘要，不导出行内容、票据或审计详情。"""
     names=platform_sql(m,"BEGIN READ ONLY; SELECT schemaname||'.'||tablename FROM pg_tables WHERE schemaname IN ('ontology','publishing') ORDER BY 1; COMMIT;").splitlines()
     import re
@@ -26,6 +26,11 @@ def g3_rows(m):
         value=platform_sql(m,'BEGIN READ ONLY; SELECT count(*)::text||\'|\'||coalesce(md5(string_agg(to_jsonb(t)::text,\'\' ORDER BY to_jsonb(t)::text)),\'empty\') FROM "'+schema+'"."'+table+'" t; COMMIT;')
         result[name]=value
     rt.require(result,'G3_ROWS_MISSING')
+    if audit_ids is None:
+        audit_ids=json.loads(platform_sql(m,'BEGIN READ ONLY; SELECT coalesce(json_agg("Id"::text ORDER BY "Id"),\'[]\'::json) FROM governance.audit_records; COMMIT;'))
+    rt.require(audit_ids and all(re.fullmatch('[a-f0-9-]{32,36}',x) for x in audit_ids),'G3_AUDIT_IDS')
+    ids=','.join("'"+x+"'" for x in audit_ids)
+    result['governance.audit_records']={'ids':audit_ids,'summary':platform_sql(m,'BEGIN READ ONLY; SELECT count(*)::text||\'|\'||coalesce(md5(string_agg(to_jsonb(t)::text,\'\' ORDER BY to_jsonb(t)::text)),\'empty\') FROM governance.audit_records t WHERE "Id"::text IN ('+ids+'); COMMIT;')}
     return result
 
 
@@ -92,7 +97,7 @@ def verify_all(m):
     rt.require(first[-1]['rows']==['20261101115947_InitialConnections|10.0.13'],'EXACT_HISTORY')
     restart(m);second=readback.snapshot(m,'migration-repeat-success')
     rt.require(first==second,'REPEATED_MIGRATION_DRIFT')
-    after=g3_rows(m);rt.require(before==after,'G3_ROW_DRIFT')
+    after=g3_rows(m,before['governance.audit_records']['ids']);rt.require(before==after,'G3_ROW_DRIFT')
     source_after=readback.snapshot(m,'migration-source-after',source=True)
     rt.require(source_before[:3]==source_after[:3],'SOURCE_SCHEMA_DRIFT')
     result={'status':'PASS','applyFalseNoMigration':True,'createPrivilegeDenied':{'exitCode':state['ExitCode'],'logSha256':rt.digest(raw)},'firstAndRepeatHistory':first[-1],'g3Before':before,'g3After':after,'sourceUnchanged':True}

@@ -140,6 +140,11 @@ def private_dir(run):
     return ROOT / '.tools/security' / ('g4-m1-main-integration-001-' + run_id(run))
 
 
+def run_temp(run):
+    """Run独立临时目录位于ignored工具树，避免混入正式artifacts输出边界。"""
+    return boundary(ROOT/'.tools/g4-m1-main-integration-001'/run_id(run)/'tmp',ROOT)
+
+
 def load_manifest(path, run, expected_head, *, check_head=True):
     """清单固定准入与所有工具散列；清单不能追加执行命令或提升预算。"""
     run_id(run)
@@ -153,6 +158,7 @@ def load_manifest(path, run, expected_head, *, check_head=True):
     require(m.get('docker') == {'context': 'desktop-linux', 'engineId': ENGINE, 'version': '29.9.2'}, 'ENGINE_BINDING')
     require(m.get('budget') == {'containers': 6, 'memoryBytes': 6 * 1024**3, 'volumeStopBytes': 3 * 1024**3, 'downloads': 0, 'gpu': 0, 'fees': 0}, 'RESOURCE_BUDGET')
     require(m.get('privateDirectory') == str(private_dir(run)), 'PRIVATE_RUN_BINDING')
+    require(m.get('temporaryDirectory') == str(run_temp(run)), 'TEMP_RUN_BINDING')
     require(m.get('riskDisposition') == 'AMBER-A1_INTERNAL_SYNTHETIC_NON_DISTRIBUTION', 'RISK_ADMISSION')
     validate_admission(m)
     require(set(m.get('drivers', {})) == set(NAMES), 'CONSUMER_SET')
@@ -175,12 +181,13 @@ def environment(run=None):
     cli_home=ARTIFACTS/run_id(run)/'dotnet-cli-home' if run is not None else ROOT/'.tools/dotnet-offline-home'
     boundary(cli_home,ROOT)
     cache_root=cli_home.parent if run is not None else cli_home
-    env = {k: v for k, v in os.environ.items() if not k.startswith(('G2_', 'G4_', 'ConnectionStrings__', 'NUGET_', 'DOTNET_', 'PNPM_', 'Security__', 'G3_', 'RUSTFS_', 'ASPNETCORE_', 'G2__', 'G4__')) and not k.lower().startswith('msbuild')}
+    temporary=run_temp(run) if run is not None else cli_home/'tmp'
+    env = {k: v for k, v in os.environ.items() if not k.startswith(('G1_', 'G2_', 'G4_', 'ConnectionStrings__', 'NUGET_', 'DOTNET_', 'PNPM_', 'Security__', 'G3_', 'RUSTFS_', 'ASPNETCORE_', 'G2__', 'G4__')) and not k.lower().startswith('msbuild')}
     env.update(DOTNET_ROOT='/usr/local/share/dotnet', DOTNET_CLI_HOME=str(cli_home),
                NUGET_PACKAGES=str(cache_root/'nuget-packages'),
                NUGET_HTTP_CACHE_PATH=str(cache_root/'nuget-http-cache'),
                NUGET_SCRATCH=str(cache_root/'nuget-scratch'),
-               TMPDIR=str(cache_root/'tmp'), TMP=str(cache_root/'tmp'), TEMP=str(cache_root/'tmp'),
+               TMPDIR=str(temporary), TMP=str(temporary), TEMP=str(temporary),
                DOTNET_CLI_TELEMETRY_OPTOUT='1',
                DOTNET_SKIP_FIRST_TIME_EXPERIENCE='1', DOTNET_CLI_WORKLOAD_UPDATE_NOTIFY_DISABLE='true',
                PYTHONPATH=str(ROOT / '.tools/pythonlibs'), PYTHONDONTWRITEBYTECODE='1',
@@ -244,6 +251,35 @@ def execute(m, name, command, *, env=None, timeout=900, sensitive=False, cwd=ROO
     require(not drift, 'EXECUTED_INPUT_DRIFT')
     require(not timed_out and code in allowed_codes, 'COMMAND_FAILED_' + name)
     return raw
+
+
+def parse_test_cases(text):
+    """只接受真实Detailed逐案例与摘要一致，保留参数化身份。"""
+    cases=[];states={'passed':'PASS','已通过':'PASS','成功':'PASS','failed':'FAIL','失败':'FAIL','skipped':'SKIP','已跳过':'SKIP'}
+    for number,line in enumerate(text.splitlines(),1):
+        match=re.fullmatch(r'\s*(passed|已通过|成功|failed|失败|skipped|已跳过)\s+([A-Za-z_][^\r\n]*)',line,re.IGNORECASE)
+        if not match:continue
+        name=re.sub(r'\s+\(\d[\d., ]*(?:ms|s|秒|毫秒|分钟)\)$','',match[2])
+        cases.append({'case':name,'status':states[match[1].lower()],'line':number})
+    summary={}
+    for key,labels in {'total':'total|总计','PASS':'succeeded|passed|成功|已通过','FAIL':'failed|失败','SKIP':'skipped|已跳过'}.items():
+        values=re.findall(r'^\s+(?:'+labels+r'):\s*(\d+)\s*$',text,re.MULTILINE|re.IGNORECASE)
+        require(len(values)==1,'TEST_SUMMARY_CARDINALITY');summary[key]=int(values[0])
+    require(cases and len(cases)==summary['total'],'TEST_CASE_CARDINALITY')
+    require(all(sum(r['status']==status for r in cases)==summary[status] for status in ('PASS','FAIL','SKIP')),'TEST_CASE_SUMMARY_MISMATCH')
+    return {'cases':cases,'summary':summary}
+
+
+def test_projection(m,name,project,raw):
+    """公开投影仅保存正式用例身份和结果；真实原始日志另按敏感级别保留。"""
+    value=parse_test_cases(raw.decode(errors='replace'))
+    receipt=ARTIFACTS/m['runId']/'commands'/(name+'.json')
+    observed=json.loads(receipt.read_text())
+    require(observed['testedCommit']==m['_head'] and observed['manifestSha256']==m['_sha256'] and observed['logSha256']==digest(raw) and observed['exitCode']==0,'TEST_PROJECTION_BINDING')
+    assembly=ROOT/f'backend/tests/OntologyPlatform.{project}/bin/Debug/net10.0/OntologyPlatform.{project}.dll'
+    value.update(taskId=TASK,runId=m['runId'],testedCommit=m['_head'],project=project,assemblySha256=digest(assembly.read_bytes()),rawLogSha256=digest(raw),commandReceiptSha256=digest(receipt.read_bytes()),command=name)
+    write_json(ARTIFACTS/m['runId']/'case-projections'/(name+'.json'),value)
+    return value
 
 
 def docker(m, args, *, input_bytes=None):

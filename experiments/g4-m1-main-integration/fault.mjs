@@ -33,7 +33,7 @@ import { createRequire } from 'node:module';
 import { randomUUID, createHash } from 'node:crypto';
 const root=path.resolve(import.meta.dirname,'../..');
 const privateDir=path.join(root,'.tools/security/g4-m1-main-integration-001-'+consumerBinding['run-id']);
-const allowed=['snapshot-read','audit-prepare','audit-fail','audit-retry','job-start','job-cancel','job-read','probe-refresh','audit-replay-failed','probe-client-cancel','intake-foreign','original-identity-check','disabled-denials','intake-lifecycle','probe-denial','purpose-denial'];
+const allowed=['snapshot-read','audit-prepare','audit-fail','audit-retry','job-start','job-cancel','job-read','probe-refresh','audit-replay-failed','probe-client-cancel','intake-foreign','original-identity-check','disabled-denials','intake-lifecycle','intake-revocation','probe-denial','purpose-denial'];
 if(process.argv.includes('--help')) {console.log('Usage: node experiments/g4-m1-main-integration/fault.mjs --run-id RUN --expected-head HEAD --resource-manifest PATH --evidence-dir NEW_PATH --runtime-file <private runtime> --action '+allowed.join('|'));process.exit(0);}
 const args=process.argv.slice(2);
 const report={taskId:'G4-M1-MAIN-INTEGRATION-001',runId:consumerBinding['run-id'],testedCommit:consumerBinding['expected-head'],startedUtc:new Date().toISOString(),checks:[],http:[],scope:'ONE_HTTP_ACTION_ONLY',databaseRollbackLeaseFenceEvidence:'NOT_RUN_BY_THIS_CONSUMER'};
@@ -55,7 +55,7 @@ try{
  const csrfResponse=await context.request.get(runtime.publicOrigin+'/auth/csrf',{headers:{Connection:'close'},maxRedirects:0});demand(csrfResponse.status()===200,'csrf_status');const csrf=(await csrfResponse.json()).requestToken;demand(typeof csrf==='string','csrf_value');
  const headers={Connection:'close',Origin:runtime.publicOrigin,'X-CSRF-TOKEN':csrf};
  async function request(method,route,body,etag){
-  demand((action==='purpose-denial'&&route==='/api/v1/connections')||route.startsWith('/api/v1/connections/')||route.startsWith('/api/v1/catalogs/')||route==='/api/v1/platform/me'||['intake-foreign','intake-lifecycle'].includes(action)&&route==='/api/v1/connection-secrets','fixed_route');
+  demand((action==='purpose-denial'&&route==='/api/v1/connections')||route.startsWith('/api/v1/connections/')||route.startsWith('/api/v1/catalogs/')||route==='/api/v1/platform/me'||['intake-foreign','intake-lifecycle','intake-revocation'].includes(action)&&route==='/api/v1/connection-secrets','fixed_route');
   const start=Date.now();const response=await context.request.fetch(runtime.publicOrigin+route,{method,data:body,headers:{...headers,...(etag?{'If-Match':etag}:{})},maxRedirects:0,timeout:30000});const record={method,route:route.replace(/[a-f0-9]{32}/g,'{id}'),status:response.status(),durationMs:Date.now()-start};report.http.push(record);
   const raw=await response.text();demand(raw.length<8*1024*1024,'response_budget');let value=null;try{value=JSON.parse(raw);}catch{}
   record.jsonBody=!!value&&typeof value==='object';
@@ -66,12 +66,16 @@ try{
  const current=await request('GET','/api/v1/connections/'+id);demand(current.status===200,'current_connection');
  const auditStage=runtime.auditStage??'start';demand(['start','complete'].includes(auditStage),'audit_stage');report.auditStage=auditStage;
  const pending=path.join(privateDir,'fault-audit-'+auditStage+'-command.json');
- if(action==='intake-lifecycle'){
+ if(['intake-lifecycle','intake-revocation'].includes(action)){
   const secretFile=path.join(privateDir,'reader-password');demand(!fs.lstatSync(secretFile).isSymbolicLink()&&(fs.statSync(secretFile).mode&0o077)===0,'source_secret_boundary');
   const issue=async()=>{const x=await request('POST','/api/v1/connection-secrets',{secretValue:fs.readFileSync(secretFile,'utf8').trimEnd(),scopeSelection:{organizationId:'org-demo',siteIds:['site-a']},purpose:'POSTGRESQL_READONLY',command:cmd(0)});demand(x.status===201&&/^[a-f0-9]{32}$/.test(x.value.secretRef),'lifecycle_intake');return x.value;};
+  if(action==='intake-revocation'){
+   const fresh=await issue();writePrivate(path.join(privateDir,'fresh-revocation-ref.json'),fresh);report.checks.push({name:'fresh_unexpired_revocation_intake',status:'PASS'});
+  }else{
   const expiring=await issue(),revoked=await issue(),purpose=await issue();
   writePrivate(path.join(privateDir,'lifecycle-refs.json'),{expiredSecretRef:expiring.secretRef,expiredSecretExpiresAtUtc:expiring.expiresAtUtc,revokedSecretRef:revoked.secretRef,purposeSecretRef:purpose.secretRef});
   report.checks.push({name:'two_actual_intake_receipts_kept_private',status:'PASS'});report.naturalExpiry=expiring.expiresAtUtc;
+  }
  }else if(action==='purpose-denial'){
   const issued=privateJson(path.join(privateDir,'lifecycle-refs.json'));demand(/^[a-f0-9]{32}$/.test(issued.purposeSecretRef),'purpose_ref');
   const x=await request('POST','/api/v1/connections',{displayName:'Synthetic purpose rejection',scopeSelection:{organizationId:'org-demo',siteIds:['site-a']},config:{type:'POSTGRESQL',profile:{host:'pg-source',port:5432,database:'fixture',username:'fixture_reader',sslMode:'VerifyFull',allowedSchemas:['production']}},secretRef:issued.purposeSecretRef,command:cmd(0)});

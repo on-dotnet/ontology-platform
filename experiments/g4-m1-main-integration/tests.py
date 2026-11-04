@@ -358,11 +358,64 @@ class RecoveryIsolationTests(unittest.TestCase):
         with patch.dict(os.environ,{'NUGET_HTTP_CACHE_PATH':'/tmp/foreign','TMPDIR':'/tmp/foreign','NUGET_PACKAGES':'/tmp/foreign'}):
             first=runtime.environment('b-continue-20261104-03')
             second=runtime.environment('b-continue-20261104-04')
-        for key in ('DOTNET_CLI_HOME','NUGET_PACKAGES','NUGET_HTTP_CACHE_PATH','NUGET_SCRATCH','TMPDIR'):
+        for key in ('DOTNET_CLI_HOME','NUGET_PACKAGES','NUGET_HTTP_CACHE_PATH','NUGET_SCRATCH'):
             with self.subTest(key=key):
                 self.assertTrue(Path(first.get(key,"/missing")).is_relative_to(ARTIFACTS/'b-continue-20261104-03'))
                 self.assertTrue(Path(second.get(key,"/missing")).is_relative_to(ARTIFACTS/'b-continue-20261104-04'))
                 self.assertNotEqual(first[key],second[key])
+        self.assertEqual(first['TMPDIR'],str(ROOT/'.tools/g4-m1-main-integration-001/b-continue-20261104-03/tmp'))
+        self.assertNotEqual(first['TMPDIR'],second['TMPDIR'])
+
+    def test_private_temp_preserves_formal_host_output_boundary_test(self):
+        import runtime,shutil
+        run_id='b-continue-20990101-93';directory=runtime.run_temp(run_id)
+        self.assertFalse(directory.exists());directory.mkdir(parents=True)
+        try:
+            result=subprocess.run([sys.executable,'-B',str(ROOT/'scripts/tests/HostContinuity.Tests.py'),'HostTests.test_output_rejects_source_and_symlink'],env=runtime.environment(run_id),capture_output=True,timeout=20)
+            self.assertEqual(result.returncode,0,result.stderr.decode())
+        finally:shutil.rmtree(directory.parent)
+
+
+class CaseProjectionTests(unittest.TestCase):
+    def test_ef_archive_rejects_additional_runtime_config_and_link(self):
+        import run,runtime,zipfile,os
+        module=run.module('module-tests')
+        with tempfile.TemporaryDirectory(dir=ARTIFACTS) as directory:
+            root=Path(directory);archive=root/'ef.nupkg';tool=root/'tools/ef.dll';tool.parent.mkdir();tool.write_bytes(b'locked payload')
+            with zipfile.ZipFile(archive,'w') as z:z.writestr('tools/ef.dll',tool.read_bytes())
+            expected=runtime.digest(archive.read_bytes())
+            self.assertEqual(len(module.verify_ef_payload(archive,expected)),1)
+            extra=tool.with_suffix('.runtimeconfig.dev.json');extra.write_text('{}')
+            with self.assertRaisesRegex(ValueError,'EF_EXTRA_RUNTIME_INPUT'):module.verify_ef_payload(archive,expected)
+            extra.unlink();extra.symlink_to(tool)
+            with self.assertRaises(ValueError):module.verify_ef_payload(archive,expected)
+            extra.unlink();os.link(tool,extra)
+            with self.assertRaisesRegex(ValueError,'EF_HARDLINK'):module.verify_ef_payload(archive,expected)
+
+    def test_ui_closure_rejects_keyword_only_and_unproven_timeout(self):
+        import readback,copy
+        expected={'baseline':['five_probe_stages','empty_list','job_refresh_recovery'],'source-unavailable':['source_unavailable_error'],'source-timeout':['actual_probe_pending_before_response','real_tcp_connected_tls_timeout_at_least_eight_seconds','timeout_failure_and_enabled_retry_action_no_second_paused_probe'],'source-permission-limited':['partial_catalog','job_refresh_recovery'],'catalog-cancel':['cancelled_job_refresh','cancelled_ui_and_enabled_discover_refresh_actions']}
+        reports={k:{'scenario':k,'productExecution':True,'cases':{'M1-U05':{'status':'NOT_RUN','observed':v}}} for k,v in expected.items()}
+        reports['source-timeout']['timeoutObservation']={'pendingBeforeResponse':True,'pendingCategories':['PROBE_RUNNING'],'clientDurationMs':9000,'reportDurationMs':9000,'tlsDurationMs':9000,'networkPassed':True,'tlsFailed':True,'probeStatus':'TEST_FAILED','diagnosticCode':'connection_source_unavailable'}
+        reports['catalog-cancel']['cancelObservation']={'jobId':'a'*32,'createdStatus':'QUEUED','persistedStatus':'RUNNING','terminalStatus':'CANCELLED','completedAtPresent':True,'snapshotAbsent':True}
+        source={'status':'PASS','source':{'jobId':'a'*32,'sourceLockHeldAtBackendDisappearance':True},'durable':{'status':'PASS','jobStatus':'CANCELLED','jobId':'a'*32,'snapshotId':None}}
+        self.assertEqual(readback.validate_ui_closure(reports,source)['status'],'PASS')
+        for mutate in (lambda x:x['baseline']['cases']['M1-U05'].update(observed=['partial timeout cancel']),lambda x:x['source-timeout']['timeoutObservation'].update(tlsDurationMs=1),lambda x:x['catalog-cancel']['cancelObservation'].update(jobId='b'*32),lambda x:x['source-unavailable'].update(productExecution=False)):
+            altered=copy.deepcopy(reports);mutate(altered)
+            with self.assertRaises(ValueError):readback.validate_ui_closure(altered,source)
+
+    def test_parameterized_cases_and_count_mismatch(self):
+        import runtime
+        raw='passed Example ("insert") (12ms)\nskipped Other\n  total: 2\n  failed: 0\n  succeeded: 1\n  skipped: 1\n'
+        self.assertTrue(hasattr(runtime,'parse_test_cases'),'per-case parser required')
+        result=runtime.parse_test_cases(raw)
+        self.assertEqual(result['cases'][0]['case'],'Example ("insert")')
+        self.assertEqual(result['cases'][1]['status'],'SKIP')
+        numeric=raw.replace('Example (\"insert\") (12ms)','Example (0) (12ms)').replace('skipped Other','skipped Other (4999)')
+        cases=runtime.parse_test_cases(numeric)['cases']
+        self.assertEqual([c['case'] for c in cases],['Example (0)','Other (4999)'])
+        with self.assertRaises(ValueError):runtime.parse_test_cases(raw.replace('total: 2','total: 3'))
+        with self.assertRaises(ValueError):runtime.parse_test_cases('  total: 1\n  failed: 0\n  succeeded: 1\n  skipped: 0\n')
 
     def test_i01_rejects_missing_offline_restore_before_execution(self):
         """缺少本Run离线恢复和独立放行时，不得启动昂贵SelfTest。"""

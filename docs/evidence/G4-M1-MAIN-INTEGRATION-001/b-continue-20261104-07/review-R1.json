@@ -1,0 +1,31 @@
+{
+  "status": "PASS",
+  "reviewer": "/root/consumer_review",
+  "stage": "R1_ASSET_VALIDATOR_CORRECTION",
+  "rawReview": "最小修正复审通过，可冻结新T并使用新Run重做完整R2。独立核验Run06的21assets/168私有包字节，唯一允许准确私有目录末尾斜杠差异；metadata先验证本Run来源和锁contentHash再作为生成元数据处理，其余包逐字节校验。stdout/stderr散列、29tests OK、事件目录指纹保持。原R2 BLOCKED不改写。无新增P0/P1；本次是修复放行，不能将Run06复用为新T的R2 PASS。",
+  "drivers": {
+    "run.py": "19f1519b7ee78a496290754e8a8c8fa7dc24abf49521461157acd9bc4942119c",
+    "consumer_check.py": "ca1f7d6b02053b7d6962253d169a0af2e9a33a45b28c856a64796f194de0c768",
+    "runtime.py": "d21e7355f458627c09d6fdef2f4d840be1ca344ff2624365c815d475dc873a6b",
+    "pg_fixture.py": "0b3e95134d76bb356fa2f14f21da58886675d6c553b2daf2f643895dc4591f51",
+    "module-tests.py": "639e7d023705aac9e66780f1ea1450bb529ae83d38cf939f25c6e55505c569c4",
+    "startup-boundary.py": "256bba53361f407d0a4071c9c7bd951019418e2193e56aaa604155510d04289c",
+    "migration-boundary.py": "01a7f6d2e9d9ef43e38708d7ffb54b0b94d4cc9cda36d0c1b481c99e7bb1184c",
+    "contract-check.mjs": "d3cdd0b27e77952e7003e6922d3b341f7d82d8562c5836f745f751813dbdcddd",
+    "http.mjs": "c98e018d1748a3bb57a2ee70e71574633a1616e238528eb2f45c02aba83281eb",
+    "browser.mjs": "b2558c334e3896db180a3cb82f35345bfc208edb65266b963901a0d10ffdb758",
+    "fault.mjs": "1d16d0ddd208dc54aa67696854f77cf968d59f81f471bcbc66ffe8314d122e3f",
+    "g3-compatibility.mjs": "48dbc12affa5e28853ceb55d70d75ca6400d5487f95916f3c1aaf32faf7d46d3",
+    "readback.py": "8debc8cc7424012948b01982fe50c20a700bdf4d2b99236ad03d3a16418f4797",
+    "closeout.py": "f8b2a813b6de2ae3996cbfce0498f885911bfa129cb40c9c6283a9c0a2e9e7d3",
+    "tests.py": "414f1f949ac0a32707ff61202116e1f3aa87ac95698b9d5964ca1c887ae6cb2f",
+    "host_continuity.py": "abd4385e1b05a86f5a12582a7e95a1fcc4a29c333eb23d2d952229744ed68984",
+    "compose.m1.yaml": "4f66652b69d9893d4c4372111a1b595558c33a7d9fda40398c5f674de79c413e",
+    "compose.g3.yaml": "e459e9c3a608806057cbdd25bdf27de14fcc8c9e09944062a0baf0fcbc803526",
+    "hooks/pre-push": "5eaef2482b8b75cb1deb7cca9703f591a0a15c2459e49c5192b4382ccb7ad474"
+  },
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-07",
+  "testedCommit": "d5c7a9f9eba2f9025e19cc38c10b36f58d53545c",
+  "manifestSha256": "b39c69753c3fe491602a54b3df63f3ebd27f14ee5d9fac65e1c9f993cc7d59cf"
+}

@@ -194,6 +194,12 @@ def reports(m, name):
     return value
 
 
+def report_sha(m,name):
+    """绑定唯一原始报告字节，不把重新序列化摘要当作原文件散列。"""
+    reports(m,name)
+    return rt.digest(next((rt.ARTIFACTS/m['runId']/name).rglob('report.json')).read_bytes())
+
+
 def action(m, name, label):
     """真实OIDC/CSRF故障消费者，公开报告只允许本Run新目录。"""
     import run
@@ -229,11 +235,9 @@ def test_pg(m, category, label, *, expectation=None):
         command+=['-e','G4_PUBLIC_EXPECTATION='+expectation]
     command += [ident,'dotnet','/tests/OntologyPlatform.ConnectionsTests.dll','--filter','TestCategory='+category,'--minimum-expected-tests','1','--results-directory','/tmp/TestResults','--no-ansi','--output','Detailed']
     raw=rt.execute(m,'pg-'+label,command,sensitive=True,timeout=180)
-    text=raw.decode(errors='replace');match=re.search(r'(?:总计|total):\s*(\d+)',text,re.IGNORECASE)
-    rt.require(match and int(match[1])>0,'PG_ZERO_TESTS')
-    skips=re.search(r'(?:已跳过|skipped):\s*([1-9]\d*)',text,re.IGNORECASE)
-    rt.require(not skips,'PG_FIXTURE_SKIPPED')
-    return {'category':category,'label':label,'total':int(match[1]),'exitCode':0,'status':'PASS'}
+    projection=rt.test_projection(m,'pg-'+label,'ConnectionsTests',raw)
+    rt.require(projection['summary']['SKIP']==0 and projection['summary']['FAIL']==0,'PG_FIXTURE_SKIPPED')
+    return {'category':category,'label':label,'total':projection['summary']['total'],'exitCode':0,'status':'PASS'}
 
 
 def refresh_registry(m, label):
@@ -416,6 +420,21 @@ def run_interactive(m, consumer_name, scenario, callback, *, timeout=120):
         rt.write_json(rt.ARTIFACTS/m['runId']/('interactive-'+consumer_name+'-'+scenario+'.json'),{'taskId':rt.TASK,'runId':m['runId'],'testedCommit':m['_head'],'command':command,'pid':child.pid,'startedAtUtc':started,'exitCode':child.returncode,'logSha256':rt.digest(raw.encode())})
 
 
+def reference_state(m,ref):
+    """精确私有引用仅用于谓词，输出布尔和到期时间，不导出秘密字段。"""
+    ref=identifier(ref);connection=identifier(rt.runtime_value(m)['httpConnectionId'])
+    return json.loads(sql(m,'''BEGIN READ ONLY; SELECT json_build_object(
+'unused',s."UsedAtUtc" IS NULL,'unbound',s."ConnectionId" IS NULL,'unexpired',s."ExpiresAtUtc">clock_timestamp(),'expiresAtUtc',s."ExpiresAtUtc",
+'purposeMatches',s."Purpose"='POSTGRESQL_READONLY','scopeMatches',s."OrganizationId"='org-demo' AND s."SiteIds"=ARRAY['site-a']::text[] AND s."Owner"=(SELECT prior."Owner" FROM connections."Connections" c JOIN connections."ConnectionSecrets" prior ON prior."Id"=c."SecretId" WHERE c."Id"='''+"'"+connection+"'"+'''),
+'encryptedPresent',s."Ciphertext"<>'' AND s."Nonce"<>'' AND s."Tag"<>'','encryptedCleared',s."Ciphertext"='' AND s."Nonce"='' AND s."Tag"='') FROM connections."ConnectionSecrets" s WHERE s."Id"='''+"'"+ref+"'; COMMIT;"))
+
+
+def current_secret_state(m,connection):
+    """绑定当前真实连接版本，不返回SecretId或任何加密材料。"""
+    connection=identifier(connection)
+    return json.loads(sql(m,'''BEGIN READ ONLY; SELECT json_build_object('connectionVersion',c."SecretVersion",'secretVersion',s."Version",'bound',s."ConnectionId"=c."Id",'consumed',s."UsedAtUtc" IS NOT NULL,'encryptedPresent',s."Ciphertext"<>'' AND s."Nonce"<>'' AND s."Tag"<>'') FROM connections."Connections" c JOIN connections."ConnectionSecrets" s ON s."Id"=c."SecretId" WHERE c."Id"='''+"'"+connection+"'; COMMIT;"))
+
+
 def credential_lifecycle(m):
     """使用自然过期的原始签发回执，并实际轮换源密码后恢复。"""
     private=rt.private_dir(m['runId']);issued=json.loads((private/'lifecycle-refs.json').read_text())
@@ -424,6 +443,19 @@ def credential_lifecycle(m):
     rt.require(expires-dt.datetime.now(dt.timezone.utc)<dt.timedelta(minutes=11),'EXPIRY_BUDGET')
     while dt.datetime.now(dt.timezone.utc)<=expires:
         time.sleep(min(10,max(.1,(expires-dt.datetime.now(dt.timezone.utc)).total_seconds())))
+    expiry_before=reference_state(m,issued['expiredSecretRef'])
+    rt.require(all(expiry_before[k] for k in ('unused','unbound','purposeMatches','scopeMatches','encryptedPresent')) and not expiry_before['unexpired'] and timestamp(expiry_before['expiresAtUtc'])==expires,'NATURAL_EXPIRY_ONLY_CAUSE')
+    initial=json.loads((rt.ARTIFACTS/m['runId']/'credential-natural-expiry-initial.json').read_text())
+    rt.require(initial['referenceSha256']==rt.digest(issued['expiredSecretRef'].encode()) and timestamp(initial['state']['expiresAtUtc'])==expires and all(initial['state'][k] for k in ('unused','unbound','unexpired','purposeMatches','scopeMatches','encryptedPresent')),'NATURAL_EXPIRY_INITIAL_BINDING')
+    # 等自然到期后重新真实签发撤销负例，排除撤销引用也已到期的混因。
+    action(m,'intake-revocation','intake-fresh-revocation')
+    fresh=json.loads((private/'fresh-revocation-ref.json').read_text());revoked=identifier(fresh['secretRef']);issued['revokedSecretRef']=revoked
+    revoke_before=reference_state(m,revoked)
+    rt.require(all(revoke_before[k] for k in ('unused','unbound','unexpired','purposeMatches','scopeMatches','encryptedPresent')),'FRESH_REVOCATION_SCOPE')
+    count=sql(m,'WITH changed AS (UPDATE connections."ConnectionSecrets" SET "UsedAtUtc"=now(),"Ciphertext"=\'\',"Nonce"=\'\',"Tag"=\'\' WHERE "Id"=\''+revoked+'\' AND "UsedAtUtc" IS NULL AND "ConnectionId" IS NULL AND "ExpiresAtUtc">clock_timestamp() RETURNING 1) SELECT count(*) FROM changed;')
+    rt.require(count=='1','EXACT_SYNTHETIC_REVOCATION')
+    revoke_after=reference_state(m,revoked)
+    rt.require(not revoke_after['unused'] and all(revoke_after[k] for k in ('unbound','unexpired','purposeMatches','scopeMatches','encryptedCleared')),'REVOCATION_STATE')
     rt.update_runtime(m,httpScenario='credential-lifecycle',**issued,rotationSecretFile=str(private/'rotation-password'))
     def set_password(restore):
         path=private/('reader-password' if restore else 'rotation-password')
@@ -440,16 +472,29 @@ subprocess.run(base+['exec','-i',ident,'psql','-U','postgres','-d','fixture','-v
 '''
     source=rt.runtime_value(m)['containerIds']['pg-source']
     guard=subprocess.Popen([__import__('sys').executable,'-B','-c',script,source,rt.TASK,m['runId'],str(private)],start_new_session=True,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
-    changed=False
+    changed=False;versions={};connection=None
     def callback(value):
-        nonlocal changed
+        nonlocal changed,connection
+        actual=identifier(value['connectionId'])
         if value['event']=='CREDENTIAL_ROTATION_READY':
+            connection=actual;versions['before']=current_secret_state(m,connection)
+            rt.require(all(versions['before'][k] for k in ('bound','consumed','encryptedPresent')) and versions['before']['connectionVersion']==versions['before']['secretVersion'],'ORIGINAL_SECRET_BINDING')
             rt.require(not changed,'DUPLICATE_ROTATE');set_password(False);changed=True;return 'SOURCE_PASSWORD_ROTATED'
-        rt.require(value['event']=='CREDENTIAL_RESTORE_READY' and changed,'CREDENTIAL_HANDSHAKE')
+        rt.require(value['event']=='CREDENTIAL_RESTORE_READY' and changed and actual==connection,'CREDENTIAL_HANDSHAKE')
+        previous=versions['before']['secretVersion'];rt.require(isinstance(previous,int) and previous>0,'SECRET_VERSION')
+        versions['old']=json.loads(sql(m,'BEGIN READ ONLY; SELECT json_build_object(\'version\',s."Version",\'consumed\',s."UsedAtUtc" IS NOT NULL,\'encryptedCleared\',s."Ciphertext"=\'\' AND s."Nonce"=\'\' AND s."Tag"=\'\',\'notCurrent\',c."SecretId"<>s."Id",\'advanced\',c."SecretVersion"=s."Version"+1) FROM connections."ConnectionSecrets" s JOIN connections."Connections" c ON c."Id"=s."ConnectionId" WHERE c."Id"=\''+connection+'\' AND s."Version"='+str(previous)+'; COMMIT;'))
+        versions['after']=current_secret_state(m,connection)
+        rt.require(all(versions['old'][k] for k in ('consumed','encryptedCleared','notCurrent','advanced')) and all(versions['after'][k] for k in ('bound','consumed','encryptedPresent')) and versions['after']['secretVersion']==previous+1,'ROTATION_PERSISTENT_STATE')
         set_password(True);changed=False;return 'SOURCE_PASSWORD_RESTORED'
     try:
         report=run_interactive(m,'http','credential-lifecycle',callback,timeout=90)
-        rt.require(report['fixtures']['sourceRestorationVerifiedByProbe'] and not changed,'SOURCE_PASSWORD_NOT_VERIFIED_RESTORED')
+        rt.require(report['fixtures']['connectionId']==connection and report['fixtures']['sourceRestorationVerifiedByProbe'] and not report['fixtures']['sourceRestorationRequired'] and report['fixtures']['finalConnectionState']=='DISABLED' and not changed,'SOURCE_PASSWORD_NOT_VERIFIED_RESTORED')
+        expiry_after=reference_state(m,issued['expiredSecretRef']);revoke_final=reference_state(m,revoked)
+        rt.require(expiry_after==expiry_before and revoke_final==revoke_after,'REFERENCE_REJECTION_PERSISTENCE')
+        version_checks=[x for x in report['checks'] if x.get('name')=='rotation_increments_secret_version_and_invalidates_old_probe']
+        rt.require(len(version_checks)==1 and version_checks[0]['facts']['previousVersion']==versions['before']['secretVersion'] and version_checks[0]['facts']['currentVersion']==versions['after']['secretVersion'],'HTTP_DB_VERSION_BINDING')
+        rt.check_build(m)
+        rt.write_json(rt.ARTIFACTS/m['runId']/'credential-db-closure.json',{'taskId':rt.TASK,'runId':m['runId'],'testedCommit':m['_head'],'status':'PASS','connectionId':connection,'naturalExpiryInitial':initial,'naturalExpiryBefore':expiry_before,'naturalExpiryAfter':expiry_after,'revocationBefore':revoke_before,'revocationAfter':revoke_after,'revocationFinal':revoke_final,'revocationMethod':'synthetic exact unbound reference consumed and encrypted payload cleared; not a product revoke API','versions':versions,'httpReportSha256':report_sha(m,'http-credential-lifecycle'),'closedCases':['M1-P07 expiry/revocation witnesses','M1-P09 rotation/payload/source restoration'],'referenceHashes':{k:rt.digest(issued[k].encode()) for k in ('expiredSecretRef','revokedSecretRef')}})
         return report
     finally:
         set_password(True)
@@ -518,12 +563,12 @@ def lifecycle_and_faults(m):
     fixtures=provision['fixtures'];rt.update_runtime(m,httpConnectionId=identifier(fixtures['connectionId']),httpSnapshotId=identifier(fixtures['snapshotId']))
     action(m,'intake-lifecycle','intake-lifecycle')
     private=rt.private_dir(m['runId'])
-    issued=json.loads((private/'lifecycle-refs.json').read_text());revoked=identifier(issued['revokedSecretRef'])
-    count=sql(m,'WITH changed AS (UPDATE connections."ConnectionSecrets" SET "UsedAtUtc"=now() WHERE "Id"=\''+revoked+'\' AND "UsedAtUtc" IS NULL AND "ConnectionId" IS NULL RETURNING 1) SELECT count(*) FROM changed;')
-    rt.require(count=='1','EXACT_SYNTHETIC_REVOCATION')
+    issued=json.loads((private/'lifecycle-refs.json').read_text());expired=identifier(issued['expiredSecretRef'])
+    initial=reference_state(m,expired)
+    rt.require(all(initial[k] for k in ('unused','unbound','unexpired','purposeMatches','scopeMatches','encryptedPresent')),'NATURAL_EXPIRY_INITIAL_STATE')
+    rt.write_json(rt.ARTIFACTS/m['runId']/'credential-natural-expiry-initial.json',{'taskId':rt.TASK,'runId':m['runId'],'referenceSha256':rt.digest(expired.encode()),'state':initial})
     import secrets,pg_fixture
     pg_fixture.private_file(private,'rotation-password',secrets.token_urlsafe(40))
-    rt.write_json(rt.ARTIFACTS/m['runId']/'credential-revocation.json',{'taskId':rt.TASK,'runId':m['runId'],'referenceSha256':rt.digest(revoked.encode()),'affectedRows':1,'method':'consume exact unused synthetic reference; physical source password unchanged'})
     purpose=purpose_fault(m)
     roles=source_role_faults(m)
     audit=audit_rollback(m)
@@ -535,6 +580,22 @@ def lifecycle_and_faults(m):
     cross_org=cross_org_secret(m)
     result={'status':'PASS','pgGroups':groups,'lineage':lineage_result['status'],'secretPurpose':purpose['status'],'sourceRoleFaults':len(roles),'auditRollbackCases':len(audit),'clientCancel':cancel['status'],'catalogCancel':catalog['status'],'leaseFence':lease['status'],'schemaImmutable':schema['status'],'credentialLifecycle':credentials['fixtures'],'crossOrganization':cross_org['status']}
     rt.write_json(rt.ARTIFACTS/m['runId']/'lifecycle-complete.json',result);return result
+
+
+def validate_ui_closure(values,cancelled):
+    """逐场景要求精确观察及实际时长/取消源IO，不以关键词合并误判。"""
+    expected={'baseline':{'five_probe_stages','empty_list','job_refresh_recovery'},'source-unavailable':{'source_unavailable_error'},'source-timeout':{'actual_probe_pending_before_response','real_tcp_connected_tls_timeout_at_least_eight_seconds','timeout_failure_and_enabled_retry_action_no_second_paused_probe'},'source-permission-limited':{'partial_catalog','job_refresh_recovery'},'catalog-cancel':{'cancelled_job_refresh','cancelled_ui_and_enabled_discover_refresh_actions'}}
+    rows=[]
+    for name,markers in expected.items():
+        report=values[name]
+        rt.require(report['scenario']==name and report.get('productExecution') is True and not report.get('failure') and all(c['status']!='FAIL' for c in report['cases'].values()),'UI_SCENARIO_FAILED')
+        rt.require(markers<=set(report['cases']['M1-U05']['observed']),'UI_EXACT_OBSERVATIONS_MISSING')
+        rows.append({'scenario':name,'requiredObservations':sorted(markers),'status':'PASS'})
+    timeout=values['source-timeout']['timeoutObservation']
+    rt.require(timeout['pendingBeforeResponse'] is True and 'PROBE_RUNNING' in timeout['pendingCategories'] and all(isinstance(timeout[k],(int,float)) and timeout[k]>=8000 for k in ('clientDurationMs','reportDurationMs','tlsDurationMs')) and timeout['networkPassed'] is True and timeout['tlsFailed'] is True and timeout['probeStatus']=='TEST_FAILED' and timeout['diagnosticCode']=='connection_source_unavailable','UI_TIMEOUT_PROOF_MISSING')
+    cancel=values['catalog-cancel']['cancelObservation']
+    rt.require(cancel['createdStatus'] in ('QUEUED','RUNNING') and cancel['persistedStatus'] in ('QUEUED','RUNNING') and cancel['terminalStatus']=='CANCELLED' and cancel['completedAtPresent'] is True and cancel['snapshotAbsent'] is True and cancel['jobId']==cancelled['source']['jobId'] and cancelled['source']['sourceLockHeldAtBackendDisappearance'] is True and cancelled['durable']['status']=='PASS' and cancelled['durable']['jobStatus']=='CANCELLED' and cancelled['durable']['jobId']==cancel['jobId'] and cancelled['durable']['snapshotId'] is None and cancelled['status']=='PASS','UI_CANCEL_PROOF_MISSING')
+    return {'status':'PASS','case':'M1-U05','requirements':rows,'timeoutObservation':timeout,'cancelObservation':cancel}
 
 
 def browser_faults(m):
@@ -569,11 +630,12 @@ def browser_faults(m):
     finally:sql(m,'GRANT SELECT ON production.heat_event TO fixture_reader;',source=True)
     action(m,'probe-refresh','ui-permission-restored')
     cancelled=browser_cancel(m)
-    observed=set()
-    for name in ('baseline','source-unavailable','source-timeout','source-permission-limited','catalog-cancel'):
-        observed.update(reports(m,'browser-'+name)['cases']['M1-U05']['observed'])
-    rt.require(any('cancel' in x for x in observed) and any('timeout' in x for x in observed) and any('partial' in x for x in observed),'UI_FAULT_STATES_INCOMPLETE')
-    result={'status':'PASS','baseline':{k:v['status'] for k,v in baseline['cases'].items()},'observedU05':sorted(observed),'sourceRestored':True,'catalogCancel':cancelled['status']}
+    names=('baseline','source-unavailable','source-timeout','source-permission-limited','catalog-cancel')
+    closure=validate_ui_closure({name:reports(m,'browser-'+name) for name in names},cancelled)
+    closure['reportHashes']={name:report_sha(m,'browser-'+name) for name in names}
+    closure['sourceCancellationSha256']=rt.digest((rt.ARTIFACTS/m['runId']/'browser-cancel-source.json').read_bytes())
+    closure['restorationReceipts']={name:rt.digest((rt.ARTIFACTS/m['runId']/'commands'/('fault-'+name+'.json')).read_bytes()) for name in ('ui-probe-refresh','ui-timeout-restored','ui-permission-restored')}
+    result={'taskId':rt.TASK,'runId':m['runId'],'testedCommit':m['_head'],'status':'PASS','baseline':{k:v['status'] for k,v in baseline['cases'].items()},'U05':closure,'sourceRestored':True,'catalogCancel':cancelled['status']}
     rt.write_json(rt.ARTIFACTS/m['runId']/'browser-complete.json',result);return result
 
 

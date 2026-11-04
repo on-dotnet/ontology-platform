@@ -208,7 +208,7 @@ def recovery_environment(m):
 def recovery_command(m,command):
     """内核禁止网络及全局写入，只允许本Run和21项目obj写入。"""
     wrapped=rt.offline_command(command)
-    writable=[rt.ARTIFACTS/rt.run_id(m['runId'])]+[rt.ROOT/Path(r['project']).parent/'obj' for r in lock_inventory()]
+    writable=[rt.ARTIFACTS/rt.run_id(m['runId']),rt.run_temp(m['runId'])]+[rt.ROOT/Path(r['project']).parent/'obj' for r in lock_inventory()]
     for p in writable:rt.boundary(p,rt.ROOT)
     wrapped[2]+=' (deny file-write*) (allow file-write* (literal "/dev/null") '+ ' '.join('(subpath '+json.dumps(str(p))+')' for p in writable)+')'
     wrapped[2]+=' (deny file-read* (subpath "/Users/chasen/.nuget/packages"))'
@@ -388,7 +388,8 @@ def prepare_nuget(m):
     # NuGet签名包GetContentHash不是完整ZIP的SHA512。使用SDK本身校验，保留两种散列。
     env=rt.environment(m['runId'])
     for key in ('DOTNET_CLI_HOME','NUGET_PACKAGES','NUGET_HTTP_CACHE_PATH','NUGET_SCRATCH','TMPDIR'):
-        target=rt.boundary(env[key],rt.ARTIFACTS/m['runId']);target.mkdir(parents=True,exist_ok=False)
+        allowed=rt.run_temp(m['runId']) if key=='TMPDIR' else rt.ARTIFACTS/m['runId']
+        target=rt.boundary(env[key],allowed);target.mkdir(parents=True,exist_ok=False)
     env['G4_PACKAGE_EXPECTATIONS']=json.dumps(packages)
     command=r'''[Reflection.Assembly]::LoadFrom('/usr/local/share/dotnet/sdk/10.0.402/NuGet.Packaging.dll') | Out-Null
 $expected=$env:G4_PACKAGE_EXPECTATIONS | ConvertFrom-Json -AsHashtable
@@ -489,9 +490,16 @@ def engineering(m):
     rt.require(solution.is_file(),'SOLUTION')
     raw=rt.execute(m,'native-web',rt.offline_command(['pwsh','-NoProfile','-File','scripts/verify.ps1','-RunNative','-RunTests'],loopback=True),timeout=1800)
     text=raw.decode(errors='replace')
-    skips=re.findall(r'(?:已跳过|Skipped)\s+([^\r\n]+)',text)
+    skips=re.findall(r'(?:已跳过|Skipped)\s+([^\r\n]+)',text,re.IGNORECASE)
+    cases=[]
+    for project in sorted((rt.ROOT/'backend/tests').glob('*/*.csproj')):
+        suffix=project.stem.removeprefix('OntologyPlatform.')
+        dll=project.parent/'bin/Debug/net10.0'/(project.stem+'.dll')
+        tag='baseline-'+suffix
+        raw=rt.execute(m,tag,rt.offline_command([DOTNET,str(dll),'--minimum-expected-tests','1','--no-ansi','--output','Detailed','--results-directory',str(rt.ARTIFACTS/m['runId']/'test-results'/tag)],loopback=True),timeout=300)
+        cases.append(rt.test_projection(m,tag,suffix,raw))
     rt.write_json(rt.ARTIFACTS/m['runId']/'build-inputs.json',{'testedCommit':m['_head'],'files':rt.build_fingerprint()})
-    return {'status':'PARTIAL' if skips else 'PASS','nativeAndWebExitCode':0,'skipped':skips,'fixtureClosureRequired':True}
+    return {'status':'PARTIAL','nativeAndWebExitCode':0,'skipped':skips,'caseSummaries':{r['project']:r['summary'] for r in cases},'fixtureClosureRequired':True}
 
 
 def contracts(m):
@@ -531,6 +539,48 @@ def require_gate(m, gate, *, partial=False):
     return value
 
 
+def close_fixture_cases(m):
+    """历史260与本轮全部跳过逐案取并集；原始Detailed日志重新解析防投影伪造。"""
+    historical=rt.ROOT/'docs/evidence/G4-M1-MAIN-INTEGRATION-001/three-file-apply-20261103-01/skipped-cases.json'
+    old=json.loads((rt.ROOT/'docs/evidence/G4-M1-MAIN-INTEGRATION-001/b-continue-20261104-01/required-skip-closure-plan.json').read_text())
+    rt.require(rt.digest(historical.read_bytes())==old['historicalSha256'],'HISTORICAL_CASE_BINDING')
+    def identity(name):
+        match=re.fullmatch(r'([A-Za-z_][A-Za-z0-9_.]*)(.*)',name)
+        rt.require(match,'TEST_CASE_NAME');return match[1].rsplit('.',1)[-1]+match[2]
+    required={(r['project'],identity(r['case'])) for r in old['cases']};passed={};baselines=set();proofs=[];baseline_counts={}
+    for path in sorted((rt.ARTIFACTS/m['runId']/'case-projections').glob('*.json')):
+        value=json.loads(path.read_text());tag=value['command'];project=value['project']
+        rt.require(value['taskId']==rt.TASK and value['runId']==m['runId'] and value['testedCommit']==m['_head'],'CASE_RUN_BINDING')
+        receipt=rt.ARTIFACTS/m['runId']/'commands'/(tag+'.json');observed=json.loads(receipt.read_text())
+        log=(rt.private_dir(m['runId'])/'logs' if observed['logVisibility']=='PRIVATE' else receipt.parent)/(tag+'.log')
+        raw=log.read_bytes();parsed=rt.parse_test_cases(raw.decode(errors='replace'))
+        rt.require(observed['testedCommit']==m['_head'] and observed['manifestSha256']==m['_sha256'] and observed['exitCode']==0 and rt.digest(raw)==value['rawLogSha256']==observed['logSha256'] and rt.digest(receipt.read_bytes())==value['commandReceiptSha256'],'CASE_LOG_BINDING')
+        rt.require(parsed['cases']==value['cases'] and parsed['summary']==value['summary'],'CASE_PROJECTION_DRIFT')
+        assembly=rt.ROOT/f'backend/tests/OntologyPlatform.{project}/bin/Debug/net10.0/OntologyPlatform.{project}.dll'
+        rt.require(value['assemblySha256']==rt.digest(assembly.read_bytes()),'CASE_ASSEMBLY_DRIFT')
+        if tag.startswith('baseline-'):
+            baselines.add(project)
+            for row in value['cases']:
+                key=(project,identity(row['case']));baseline_counts[key]=baseline_counts.get(key,0)+1
+        for row in value['cases']:
+            key=(project,identity(row['case']))
+            if tag.startswith('baseline-') and row['status']=='SKIP':required.add(key)
+            if row['status']=='PASS' and sum(identity(other['case'])==key[1] for other in value['cases'])==1:passed.setdefault(key,[]).append({'command':tag,'projectionSha256':rt.digest(path.read_bytes()),'rawLogSha256':value['rawLogSha256'],'line':row['line']})
+    expected={p.stem.removeprefix('OntologyPlatform.') for p in (rt.ROOT/'backend/tests').glob('*/*.csproj')}
+    rt.require(baselines==expected,'BASELINE_PROJECT_SET')
+    public={'pg-empty-public','pg-public-relation','pg-public-function','pg-public-type','pg-public-missing','pg-public-usage','pg-public-restored'}
+    for key in sorted(required):
+        rt.require(baseline_counts.get(key)==1,'AMBIGUOUS_OR_MISSING_BASELINE_CASE_REQUIRES_CLASS_EVIDENCE')
+        witnesses=passed.get(key,[])
+        if key==('ConnectionsTests','ExactPublicSchemaBoundaryUsesActualCatalog'):
+            rt.require(public<={w['command'] for w in witnesses},'PUBLIC_SEVEN_SCENARIOS_REQUIRED')
+        proofs.append({'project':key[0],'case':key[1],'applicability':'REQUIRED','status':'PASS' if witnesses else 'NOT_RUN','witnesses':witnesses})
+    result={'taskId':rt.TASK,'runId':m['runId'],'testedCommit':m['_head'],'historicalCases':len(old['cases']),'requiredCases':len(required),'closedCases':sum(bool(x['witnesses']) for x in proofs),'cases':proofs}
+    rt.write_json(rt.ARTIFACTS/m['runId']/'fixture-case-closure.json',result)
+    rt.require(result['closedCases']==result['requiredCases'],'APPLICABLE_CASES_NOT_CLOSED')
+    return result
+
+
 def main():
     """唯一参数合同；重复/任意TaskId和非法门禁均拒绝。"""
     parser=argparse.ArgumentParser(description=__doc__)
@@ -568,7 +618,8 @@ def main():
             closeout.reclaim(m,'modules',apply=True)
             rt.require(all(x['status']=='PASS' for x in results),'MODULE_SKIP_NOT_CLOSED')
             rt.start_group(m,'g3');compat=consumer(m,'g3-compatibility')
-            result={'status':'PASS','modules':results,'compatibility':compat}
+            fixture_tests=module('module-tests').g3_fixture_tests(m)
+            result={'status':'PASS','modules':results,'compatibility':compat,'securityAndManifest':fixture_tests}
         elif args.gate=='I04':
             require_gate(m,'I02')
             result=module('migration-boundary').verify_all(m)
@@ -577,6 +628,7 @@ def main():
             original=require_gate(m,'I01',partial=True);modules=require_gate(m,'I02')['result']['modules']
             rt.require(original['result']['nativeAndWebExitCode']==0 and all(x['status']=='PASS' for x in modules),'NATIVE_FIXTURE_CLOSURE')
             rt.require(sum(x['total'] for x in result['pgGroups'] if x['category']=='RealPgFixture')>=12 and any(x['category']=='RealPgWrongSanFixture' for x in result['pgGroups']) and any(x['category']=='RealPgPublicFixture' for x in result['pgGroups']),'PG_FIXTURE_CLOSURE')
+            close_fixture_cases(m)
             for gate in ('I01','I03'):
                 rt.write_json(gate_path(m,gate).with_name('gate-'+gate+'-closure.json'),{'taskId':rt.TASK,'runId':m['runId'],'testedCommit':m['_head'],'manifestSha256':m['_sha256'],'result':{'status':'PASS','originalReceiptSha256':rt.digest(gate_path(m,gate).read_bytes()),'closureInputs':{'I02':rt.digest(gate_path(m,'I02').read_bytes()),'I04':rt.digest(gate_path(m,'I04').read_bytes()),'pgSecurity':rt.digest((rt.ARTIFACTS/m['runId']/'pg-security.json').read_bytes())},'historicalSkipsRetained':True}})
         elif args.gate=='I07':
