@@ -44,7 +44,16 @@ def verify_ef_payload(archive,expected_sha):
     return files
 
 
-def semantic_partition(cases,sources):
+MODULE_PROJECTS=('SemanticTests','PublishingTests','QueryTests','AgentTests')
+
+
+def module_project(suffix):
+    """方法隔离只适用于已批准三服务组的四个正式程序集。"""
+    rt.require(suffix in MODULE_PROJECTS,'MODULE_PROJECT_ALLOWLIST')
+    return rt.ROOT/f'backend/tests/OntologyPlatform.{suffix}'
+
+
+def module_partition(cases,sources):
     """由同构建逐案例身份匹配唯一源码FQN；保留同方法全部参数及内部并发。"""
     expected=[row['case'] for row in cases]
     rt.require(expected and len(expected)==len(set(expected)),'SEMANTIC_CASE_AMBIGUOUS')
@@ -101,21 +110,22 @@ def wait_module_ingress_idle(m):
     raise ValueError('SEMANTIC_INGRESS_NOT_IDLE')
 
 
-def run_semantic_methods(m,env):
-    """所有Semantic案例按方法进程隔离；原完整单进程失败保持历史见证。"""
-    suffix='SemanticTests';a=rt.ARTIFACTS/m['runId'];baseline=json.loads((a/'case-projections/baseline-SemanticTests.json').read_text())
-    receipt=a/'commands/baseline-SemanticTests.json';original=json.loads(receipt.read_text());raw=(a/'commands/baseline-SemanticTests.log').read_bytes()
+def run_module_methods(m,env,suffix):
+    """完整模块案例按方法隔离进程，保留方法内并发及参数；不修改正式断言。"""
+    project=module_project(suffix);a=rt.ARTIFACTS/m['runId'];baseline_path=a/'case-projections'/('baseline-'+suffix+'.json');baseline=json.loads(baseline_path.read_text())
+    receipt=a/'commands'/('baseline-'+suffix+'.json');original=json.loads(receipt.read_text());raw=(a/'commands'/('baseline-'+suffix+'.log')).read_bytes()
     rt.require(baseline['testedCommit']==m['_head'] and original['manifestSha256']==m['_sha256'] and original['exitCode']==0,'SEMANTIC_BASELINE_BINDING')
     rt.require(rt.digest(raw)==original['logSha256']==baseline['rawLogSha256'] and rt.digest(receipt.read_bytes())==baseline['commandReceiptSha256'],'SEMANTIC_BASELINE_HASH')
     rt.require(rt.parse_test_cases(raw.decode())['cases']==baseline['cases'],'SEMANTIC_BASELINE_CASES')
-    sources={p.relative_to(rt.ROOT).as_posix():p.read_bytes().decode('utf-8') for p in (rt.ROOT/'backend/tests/OntologyPlatform.SemanticTests').glob('*.cs')}
-    plan=semantic_partition(baseline['cases'],sources)
+    sources={p.relative_to(rt.ROOT).as_posix():p.read_bytes().decode('utf-8') for p in project.glob('*.cs')}
+    plan=module_partition(baseline['cases'],sources)
+    rt.require(baseline['project']==suffix and all(item['method'].startswith('OntologyPlatform.'+suffix+'.') for item in plan),'MODULE_METHOD_PROJECT_BINDING')
     dll=rt.ROOT/f'backend/tests/OntologyPlatform.{suffix}/bin/Debug/net10.0/OntologyPlatform.{suffix}.dll'
     rt.require(rt.digest(dll.read_bytes())==baseline['assemblySha256'],'SEMANTIC_ASSEMBLY_DRIFT')
-    rt.write_json(a/'semantic-method-plan.json',{'taskId':rt.TASK,'runId':m['runId'],'testedCommit':m['_head'],'assemblySha256':baseline['assemblySha256'],'baselineSha256':rt.digest((a/'case-projections/baseline-SemanticTests.json').read_bytes()),'methods':plan,'scope':'ALL_CASES_METHOD_PROCESS_ISOLATION'})
+    rt.write_json(a/('module-method-plan-'+suffix+'.json'),{'taskId':rt.TASK,'runId':m['runId'],'testedCommit':m['_head'],'project':suffix,'assemblySha256':baseline['assemblySha256'],'baselineSha256':rt.digest(baseline_path.read_bytes()),'methods':plan,'scope':'ALL_CASES_METHOD_PROCESS_ISOLATION'})
     observed=[];batches=[]
     for index,item in enumerate(plan,1):
-        before=wait_module_ingress_idle(m);name='module-SemanticTests-m'+str(index).zfill(3)
+        before=wait_module_ingress_idle(m);name='module-'+suffix+'-m'+str(index).zfill(3)
         command=['/usr/local/share/dotnet/dotnet',str(dll),'--filter','FullyQualifiedName='+item['method'],'--minimum-expected-tests','1','--no-ansi','--output','Detailed','--results-directory',str(a/'test-results'/name)]
         output=rt.execute(m,name,rt.offline_command(command,loopback=True),env=env,sensitive=True,timeout=90)
         parsed=rt.parse_test_cases(output.decode());actual=[row['case'] for row in parsed['cases']]
@@ -126,7 +136,7 @@ def run_semantic_methods(m,env):
         rt.test_projection(m,name,suffix,output);observed.extend(actual)
         batches.append({'command':name,'method':item['method'],'summary':parsed['summary'],'before':before,'after':after})
     exact_cases([row['case'] for row in baseline['cases']],observed)
-    rt.write_json(a/'semantic-method-results.json',{'taskId':rt.TASK,'runId':m['runId'],'testedCommit':m['_head'],'status':'PASS','scope':'ALL_CASES_METHOD_PROCESS_ISOLATION','total':len(observed),'batches':batches})
+    rt.write_json(a/('module-method-results-'+suffix+'.json'),{'taskId':rt.TASK,'runId':m['runId'],'testedCommit':m['_head'],'project':suffix,'status':'PASS','scope':'ALL_CASES_METHOD_PROCESS_ISOLATION','total':len(observed),'batches':batches})
     return dict(project=suffix,total=len(observed),skipped=[],status='PASS',executionMode='METHOD_PROCESS_ISOLATION',methods=len(plan))
 
 
@@ -156,15 +166,7 @@ def run_modules(m):
     rt.require(not schema.exists(),'EXISTING_SCHEMA_RESULT')
     env['G2_AI_SCHEMA_OUTPUT']=str(schema)
     results=[]
-    for suffix in ('SemanticTests','PublishingTests','QueryTests','AgentTests'):
-        if suffix=='SemanticTests':
-            results.append(run_semantic_methods(m,env));continue
-        command=['/usr/local/share/dotnet/dotnet',str(rt.ROOT/f'backend/tests/OntologyPlatform.{suffix}/bin/Debug/net10.0/OntologyPlatform.{suffix}.dll'),'--minimum-expected-tests','1','--no-ansi','--output','Detailed']
-        command+=['--results-directory',str(rt.ARTIFACTS/m['runId']/'test-results'/('module-'+suffix))]
-        raw=rt.execute(m,'module-'+suffix,rt.offline_command(command,loopback=True),env=env,sensitive=True,timeout=300)
-        projection=rt.test_projection(m,'module-'+suffix,suffix,raw)
-        rt.require(projection['summary']['SKIP']==0 and projection['summary']['FAIL']==0,'MODULE_REQUIRED_FIXTURES_SKIPPED')
-        results.append(dict(project=suffix,total=projection['summary']['total'],skipped=[],status='PASS'))
+    for suffix in MODULE_PROJECTS:results.append(run_module_methods(m,env,suffix))
     rt.require(schema.is_file(),'MCP_SCHEMA_OUTPUT_MISSING')
     rt.execute(m,'mcp-schema-positive-negative',['/opt/homebrew/opt/node@24/bin/node','-e',SCHEMA_CHECK,str(schema),str(rt.ROOT/'node_modules/.pnpm/ajv@6.15.0/node_modules/ajv')])
     return results

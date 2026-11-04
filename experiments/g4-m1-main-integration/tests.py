@@ -117,14 +117,18 @@ class RuntimeBoundaryTests(unittest.TestCase):
         module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
         source='namespace Fixture;\npublic sealed class Cases\n{\n    public async Task Check(string value)\n'
         cases=[{'case':'Check ("one")'},{'case':'Check ("two")'}]
-        plan=module.semantic_partition(cases,{'Cases.cs':source})
+        plan=module.module_partition(cases,{'Cases.cs':source})
         self.assertEqual(plan[0]['method'],'Fixture.Cases.Check')
         self.assertEqual(plan[0]['cases'],[r['case'] for r in cases])
         for rows,sources in ((cases,{}),(cases,{'a.cs':source,'b.cs':source}),(cases+cases,{'a.cs':source}),([{'case':'Check|Injected'}],{'a.cs':source})):
-            with self.subTest(rows=rows,sources=list(sources)),self.assertRaises(ValueError):module.semantic_partition(rows,sources)
+            with self.subTest(rows=rows,sources=list(sources)),self.assertRaises(ValueError):module.module_partition(rows,sources)
         for actual in (['one','one'],['one'],['one','two','extra']):
             with self.subTest(actual=actual),self.assertRaises(ValueError):module.exact_cases(['one','two'],actual)
         module.exact_cases(['one','two'],['two','one'])
+        for suffix in ('SemanticTests','PublishingTests','QueryTests','AgentTests'):
+            self.assertEqual(module.module_project(suffix),ROOT/('backend/tests/OntologyPlatform.'+suffix))
+        for suffix in ('../SecurityTests','SecurityTests','ConnectionsTests','',None):
+            with self.subTest(project=suffix),self.assertRaises(ValueError):module.module_project(suffix)
 
     def test_semantic_idle_counts_prevalidation_reservation_and_real_exec_exit(self):
         """核验前占槽和已断客户端的远端Exec均不能漏计，null退出码不是证明。"""

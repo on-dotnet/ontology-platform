@@ -1,0 +1,36 @@
+{
+  "status": "PASS",
+  "reviewer": "/root/consumer_review",
+  "stage": "R2",
+  "rawReview": "Run16 R2独立后验PASS，可同T同Run PREFLIGHT/I01。PID38365 exit0/5.657秒，零警告错误。21assets168包载荷、两SDK前后导入与OS拒绝策略匹配，HTTP缓存空，事故KEEP未变。只读未再次Restore。",
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-16",
+  "testedCommit": "f3cc2ce34fb5e083f3e92f4fb8c62d724f388685",
+  "drivers": {
+    "run.py": "d8ffe64f521778115d4bdd52d463d21a616a2d4edd66abd94c307d31efc84dd2",
+    "consumer_check.py": "ca1f7d6b02053b7d6962253d169a0af2e9a33a45b28c856a64796f194de0c768",
+    "runtime.py": "d5349b33ea83b5c3200a0c65da246a6fc699619687cc408594f189485fd11066",
+    "pg_fixture.py": "0b3e95134d76bb356fa2f14f21da58886675d6c553b2daf2f643895dc4591f51",
+    "module-tests.py": "be45f98a5f24467646496ceebc35ecde6f367262d6d7c4ed093c5214d85c77bb",
+    "startup-boundary.py": "256bba53361f407d0a4071c9c7bd951019418e2193e56aaa604155510d04289c",
+    "migration-boundary.py": "1b3d09ae95abe434ba4c4edfaf180ecbaea289cdd4989efdb8f9ec63ce73b44e",
+    "contract-check.mjs": "3a7f662352a1d182f0f53f96703cfbb1f8d6f152443d3ab5bc8b2a525c5b01ea",
+    "http.mjs": "c98e018d1748a3bb57a2ee70e71574633a1616e238528eb2f45c02aba83281eb",
+    "browser.mjs": "b2558c334e3896db180a3cb82f35345bfc208edb65266b963901a0d10ffdb758",
+    "fault.mjs": "69557b1f546ded5125ac8b425eb3f8872c8d788a8246fd577f86f9551b1f5939",
+    "g3-compatibility.mjs": "48dbc12affa5e28853ceb55d70d75ca6400d5487f95916f3c1aaf32faf7d46d3",
+    "readback.py": "51afad2d4284dff92dbc011744c76dc2d5dec6888fdeb79a6929ed7568508293",
+    "closeout.py": "3d034d254009f01eeefedb3d482c37f40c5907697f0058d39640ae013badeebb",
+    "tests.py": "18a6f611c15a2a9de98369f4973db6e7b384bafe043876f51dc461b1d4f19f56",
+    "host_continuity.py": "abd4385e1b05a86f5a12582a7e95a1fcc4a29c333eb23d2d952229744ed68984",
+    "compose.m1.yaml": "4f66652b69d9893d4c4372111a1b595558c33a7d9fda40398c5f674de79c413e",
+    "compose.g3.yaml": "e459e9c3a608806057cbdd25bdf27de14fcc8c9e09944062a0baf0fcbc803526",
+    "hooks/pre-push": "5eaef2482b8b75cb1deb7cca9703f591a0a15c2459e49c5192b4382ccb7ad474"
+  },
+  "manifestSha256": "0c6d37ce5564fd149c9a9229f4bd76f8f05608a0c5719b18ef8446ba6cbe5bb4",
+  "evidenceHashes": {
+    "gate-R2.json": "80061e96e833287bdb7a68d3ad2e85a9489b75e540be2b7272c31c801ec55fb8",
+    "restore-result.json": "e640eaeab0bf95defc43761308cff5e7edde99d160f28de494561b3234bea6bc",
+    "restore-provenance.json": "8a567fb888eef818e432bfef63a477346b91566602486836215e09830407586c"
+  }
+}

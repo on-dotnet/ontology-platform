@@ -72,3 +72,8 @@ Run14 / T4a64070ac6f9be906512d11956252909085e9a8b：R2严格离线及独立后�
 Run15 / T897d8fcb7f3111fa8b335370009d51dcf46366b3：R2及独立后验PASS（5.605秒），27套SelfTest370.44秒、44任务测试和native/Web通过；780总344PASS436SKIP0FAIL、Web379。I05 PASS/I03 PARTIAL；I02正式ingress入口及四模块迁移通过，Semantic单进程302案例83PASS219FAIL0SKIP、exit2，记录441次32活连接容量拒绝。新进程同T首失败方法5/5和最大参数化方法19/19通过，但不能据此认定所有219已解释。
 
 任务入口拟仅Semantic采用137精确FQN方法分进程，保留302全部参数化案例及方法内并发；每批Counter精确匹配、无新增容量拒绝、核验占槽/连接/Exec退出后才下一批。原单进程失败保留，不冒充已恢复；其余模块原入口不变。独立复审发现复合耗时解析及核验前占槽盲点，已在任务runtime修复并补正反回归，46任务测试通过；完整分批产品验收NOT_RUN，须新T全流程。原始失败私有日志KEEP，原错误案例名投影保留，另附修正解析视图；无新V3/main/M2。
+
+
+Run16 / Tf3cc2ce34fb5e083f3e92f4fb8c62d724f388685：R2及独立后验PASS（5.657秒），原27套SelfTest368.57秒、46任务测试、native/Web通过，780总344PASS436SKIP0FAIL、Web379；I05 PASS/I03 PARTIAL。Semantic137方法302案例按方法隔离完整PASS、0容量拒绝，246个原skip已有同T实际PASS见证，但整体fixture closure尚未运行。随后原Publishing单进程78案例31PASS47FAIL、94容量拒绝，I02阻断；首失败方法新进程1PASS仅诊断，全部47原因仍未逐一确认。
+
+任务入口现统一四模块方法隔离：Semantic137/302、Publishing42/78、Query39/49、Agent26/33，共244方法462案例，按(project,case)精确多重集合而非全局去重。保留每方法全部参数、方法内竞争/并发、原外部持久设施以及Agent唯一MCP方法的两次输出；全部模块成功后才Ajv。仅module-tests/tests变更，46任务测试与独立复审PASS；新T完整四模块验收NOT_RUN，旧单进程失败不升级。末次模块资源2.5GiB内存限额、卷106209280字节，未超预算；正在精确收尾后冻结新T，无新V3/main/M2。

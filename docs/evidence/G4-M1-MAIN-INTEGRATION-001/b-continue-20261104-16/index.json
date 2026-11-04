@@ -1,0 +1,86 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-16",
+  "testedCommit": "f3cc2ce34fb5e083f3e92f4fb8c62d724f388685",
+  "status": "BLOCKED_WITH_WITNESS",
+  "gates": {
+    "R2": "PASS",
+    "I01": "PARTIAL",
+    "I05": "PASS",
+    "I03": "PARTIAL",
+    "I02": "BLOCKED_WITH_WITNESS",
+    "I04": "NOT_RUN",
+    "I06": "NOT_RUN",
+    "I07": "NOT_RUN",
+    "I08": "NOT_RUN"
+  },
+  "native": {
+    "total": 780,
+    "passed": 344,
+    "skipped": 436,
+    "failed": 0
+  },
+  "sameTSemanticSkippedCasePassWitnesses": 246,
+  "formalFixtureClosure": "NOT_RUN",
+  "webTests": 379,
+  "selfTestSuites": 27,
+  "taskTestsAtT": 46,
+  "semantic": {
+    "methods": 137,
+    "total": 302,
+    "PASS": 302,
+    "FAIL": 0,
+    "SKIP": 0,
+    "mode": "METHOD_PROCESS_ISOLATION",
+    "capacityRefusals": 0
+  },
+  "publishingSingleProcess": {
+    "total": 78,
+    "PASS": 31,
+    "FAIL": 47,
+    "SKIP": 0,
+    "capacityRefusals": 94,
+    "allFailuresExplained": false
+  },
+  "publishingFreshProcessShort": {
+    "total": 1,
+    "PASS": 1,
+    "scope": "DIAGNOSTIC_ONLY"
+  },
+  "nextProposal": "FOUR_MODULES_244_METHODS_462_CASES_WITH_PROJECT_QUALIFIED_MULTISET",
+  "newTAndFullRunRequired": true,
+  "ciWindowsIntel": "NOT_RUN",
+  "supplyChain": "AMBER-A1_LICENSE_PARTIAL_NOT_VERIFIED",
+  "ignoredLargeInputs": [
+    {
+      "path": "r2-sdk-before-mstest-imports.xml",
+      "bytes": 1628467,
+      "sha256": "04fb2f61b9e4c80d8eaa5cdf23dfdaaf6abe3208e355de906840637083fc15c2"
+    },
+    {
+      "path": "r2-sdk-after-aspire-imports.xml",
+      "bytes": 1616931,
+      "sha256": "15fb27f74f0eeac0a8d4e80fb63f30e25249dc0f467bbd3f1a09e5c9242cec55"
+    },
+    {
+      "path": "r2-sdk-before-aspire-imports.xml",
+      "bytes": 1616931,
+      "sha256": "acaf7789a309d4c2d520bef85eb0fe5402a02f85bec3baa4d13b05aa9240327d"
+    },
+    {
+      "path": "r2-sdk-after-mstest-imports.xml",
+      "bytes": 1628467,
+      "sha256": "7817e12c3b24c8dd2a6efabbcd8e4158ccdaeea930e275833b197facfb1f2689"
+    },
+    {
+      "path": "restore-stdout.txt",
+      "bytes": 52463319,
+      "sha256": "333c788553c375b1cae0d52d5c7cdf62fdd46619de08d4515285554e13121ef8"
+    },
+    {
+      "path": "web-cache-files.json",
+      "bytes": 8821586,
+      "sha256": "fec5f0dc296535f8510e086370de3e6fbe9ac494715683721cdd24ef64f6beba"
+    }
+  ]
+}

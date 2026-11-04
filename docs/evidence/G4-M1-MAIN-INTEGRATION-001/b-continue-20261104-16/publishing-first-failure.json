@@ -1,0 +1,407 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-16",
+  "testedCommit": "f3cc2ce34fb5e083f3e92f4fb8c62d724f388685",
+  "rawLogSha256": "04ee6436f9f844f3ffb170f7c0e2419ed3db2c1b29ea669f83bca7aefeb453e1",
+  "rawLogVisibility": "PRIVATE_KEEP",
+  "summary": {
+    "total": 78,
+    "PASS": 31,
+    "FAIL": 47,
+    "SKIP": 0
+  },
+  "cases": [
+    {
+      "case": "SelfApprovalDenied",
+      "status": "PASS",
+      "line": 1
+    },
+    {
+      "case": "ShortRoleDenied",
+      "status": "PASS",
+      "line": 2
+    },
+    {
+      "case": "ExactExpiryDenied",
+      "status": "PASS",
+      "line": 3
+    },
+    {
+      "case": "IndependentAuditorAllowed",
+      "status": "PASS",
+      "line": 4
+    },
+    {
+      "case": "ImmutableRoundtripAndDifferentContentRejected",
+      "status": "PASS",
+      "line": 5
+    },
+    {
+      "case": "ConcurrentDifferentBytesCannotOverwrite",
+      "status": "PASS",
+      "line": 6
+    },
+    {
+      "case": "WrongHashAndMissingObjectFailClosed",
+      "status": "PASS",
+      "line": 7
+    },
+    {
+      "case": "SlowDependencyBecomesUnavailable",
+      "status": "PASS",
+      "line": 8
+    },
+    {
+      "case": "CallerCancellationPropagates",
+      "status": "PASS",
+      "line": 9
+    },
+    {
+      "case": "LegacyBindingIsExactAndNewBindingIncludesSemantics",
+      "status": "PASS",
+      "line": 10
+    },
+    {
+      "case": "LegacyV1ReadsAndRollsBackWithoutCurrentDraftAssessment",
+      "status": "PASS",
+      "line": 11
+    },
+    {
+      "case": "HistoricalM1ProfileV1ManifestV2ReadsAndRollsBackAfterCurrentProfileUpgrade",
+      "status": "PASS",
+      "line": 12
+    },
+    {
+      "case": "LegacyV1CorruptArtifactRollbackFailsClosed",
+      "status": "PASS",
+      "line": 13
+    },
+    {
+      "case": "RealM3VocabularyReleaseStaysBoundToImmutableSources",
+      "status": "PASS",
+      "line": 14
+    },
+    {
+      "case": "RealProposalRejectsUnitGovernanceEvenWhenShaclConforms (\"precision\")",
+      "status": "PASS",
+      "line": 15
+    },
+    {
+      "case": "RealProposalRejectsUnitGovernanceEvenWhenShaclConforms (\"dimension\")",
+      "status": "PASS",
+      "line": 16
+    },
+    {
+      "case": "ExactLegacyV2ReleaseReadsAndRollsBackWithoutRepublishingOldAssessment",
+      "status": "PASS",
+      "line": 17
+    },
+    {
+      "case": "PublicationTracesImpactAndRecoversSuccessfulReceipt",
+      "status": "PASS",
+      "line": 18
+    },
+    {
+      "case": "ProposalRejectsUnboundReports (\"missing\",422,\"impact_required\")",
+      "status": "PASS",
+      "line": 19
+    },
+    {
+      "case": "ProposalRejectsUnboundReports (\"forged\",409,\"impact_binding_conflict\")",
+      "status": "PASS",
+      "line": 20
+    },
+    {
+      "case": "ProposalRejectsUnboundReports (\"expired\",409,\"impact_expired\")",
+      "status": "PASS",
+      "line": 21
+    },
+    {
+      "case": "ProposalRejectsUnboundReports (\"cross-version\",409,\"impact_target_conflict\")",
+      "status": "PASS",
+      "line": 22
+    },
+    {
+      "case": "EveryPublicationBoundaryRechecksImpact (\"approval\")",
+      "status": "PASS",
+      "line": 23
+    },
+    {
+      "case": "EveryPublicationBoundaryRechecksImpact (\"prepare\")",
+      "status": "PASS",
+      "line": 24
+    },
+    {
+      "case": "EveryPublicationBoundaryRechecksImpact (\"final\")",
+      "status": "PASS",
+      "line": 25
+    },
+    {
+      "case": "EveryPublicationBoundaryRechecksImpact (\"retry\")",
+      "status": "PASS",
+      "line": 26
+    },
+    {
+      "case": "ApprovalRejectsChangedAssessmentOrProfile (False)",
+      "status": "PASS",
+      "line": 27
+    },
+    {
+      "case": "ApprovalRejectsChangedAssessmentOrProfile (True)",
+      "status": "PASS",
+      "line": 28
+    },
+    {
+      "case": "InitialApprovalCannotSurviveActiveBaselineOrMissingBinding",
+      "status": "FAIL",
+      "line": 29
+    },
+    {
+      "case": "FixedSevenDigitClockUsesConsistentEnvelopePrecision (False)",
+      "status": "FAIL",
+      "line": 39
+    },
+    {
+      "case": "FixedSevenDigitClockUsesConsistentEnvelopePrecision (True)",
+      "status": "FAIL",
+      "line": 48
+    },
+    {
+      "case": "VersionFourIdentityPublicationAndExactVersionThreeRollback",
+      "status": "FAIL",
+      "line": 57
+    },
+    {
+      "case": "IdentityGovernanceCannotBeOverriddenByReviewer (False)",
+      "status": "FAIL",
+      "line": 66
+    },
+    {
+      "case": "IdentityGovernanceCannotBeOverriddenByReviewer (True)",
+      "status": "FAIL",
+      "line": 75
+    },
+    {
+      "case": "FormalIdentityReadRejectsPartialScopeBeforeExternalRead",
+      "status": "FAIL",
+      "line": 84
+    },
+    {
+      "case": "ExistingValidToProvenancePublishesButUnknownMetadataDoesNot (\"validToUtc\",True)",
+      "status": "FAIL",
+      "line": 93
+    },
+    {
+      "case": "ExistingValidToProvenancePublishesButUnknownMetadataDoesNot (\"validUntilUtc\",False)",
+      "status": "FAIL",
+      "line": 101
+    },
+    {
+      "case": "BackgroundRestartAndDuplicateConsume",
+      "status": "FAIL",
+      "line": 110
+    },
+    {
+      "case": "StaleFenceCannotCommitConsumption",
+      "status": "FAIL",
+      "line": 120
+    },
+    {
+      "case": "InvalidDiscriminatedRequestRejectedBeforeDependencies (\"missing-publish\")",
+      "status": "PASS",
+      "line": 130
+    },
+    {
+      "case": "InvalidDiscriminatedRequestRejectedBeforeDependencies (\"mixed-rollback\")",
+      "status": "PASS",
+      "line": 131
+    },
+    {
+      "case": "InvalidDiscriminatedRequestRejectedBeforeDependencies (\"hash-invalid\")",
+      "status": "PASS",
+      "line": 132
+    },
+    {
+      "case": "ExternalPhaseFailurePreservesOldActiveAndRetry (\"s3-write\")",
+      "status": "FAIL",
+      "line": 133
+    },
+    {
+      "case": "ExternalPhaseFailurePreservesOldActiveAndRetry (\"s3-read\")",
+      "status": "FAIL",
+      "line": 143
+    },
+    {
+      "case": "ExternalPhaseFailurePreservesOldActiveAndRetry (\"jena-write\")",
+      "status": "FAIL",
+      "line": 153
+    },
+    {
+      "case": "ExternalPhaseFailurePreservesOldActiveAndRetry (\"jena-read\")",
+      "status": "FAIL",
+      "line": 163
+    },
+    {
+      "case": "ExternalPhaseFailurePreservesOldActiveAndRetry (\"jena-shacl\")",
+      "status": "FAIL",
+      "line": 173
+    },
+    {
+      "case": "PostgreSqlWriteFailureRollsBackWholeActivation (\"active\")",
+      "status": "FAIL",
+      "line": 183
+    },
+    {
+      "case": "PostgreSqlWriteFailureRollsBackWholeActivation (\"activation\")",
+      "status": "FAIL",
+      "line": 193
+    },
+    {
+      "case": "PostgreSqlWriteFailureRollsBackWholeActivation (\"audit\")",
+      "status": "FAIL",
+      "line": 203
+    },
+    {
+      "case": "PostgreSqlWriteFailureRollsBackWholeActivation (\"outbox\")",
+      "status": "FAIL",
+      "line": 213
+    },
+    {
+      "case": "ConcurrentIdenticalActivationReturnsSameFact",
+      "status": "FAIL",
+      "line": 223
+    },
+    {
+      "case": "ConcurrentDifferentProposalsOnlyOneCasWinner",
+      "status": "FAIL",
+      "line": 233
+    },
+    {
+      "case": "DamagedPublishedGraphUnavailableAndReconciliationRetries",
+      "status": "FAIL",
+      "line": 243
+    },
+    {
+      "case": "PublishTwoVersionsRollbackOldCompleteManifestAndReplay",
+      "status": "FAIL",
+      "line": 253
+    },
+    {
+      "case": "ApprovalBoundaries (\"self\",403)",
+      "status": "FAIL",
+      "line": 263
+    },
+    {
+      "case": "ApprovalBoundaries (\"role\",403)",
+      "status": "FAIL",
+      "line": 273
+    },
+    {
+      "case": "ApprovalBoundaries (\"scope\",403)",
+      "status": "FAIL",
+      "line": 283
+    },
+    {
+      "case": "ApprovalBoundaries (\"expiry\",409)",
+      "status": "FAIL",
+      "line": 293
+    },
+    {
+      "case": "ActivationBoundaries (\"pending\")",
+      "status": "FAIL",
+      "line": 303
+    },
+    {
+      "case": "ActivationBoundaries (\"rejected\")",
+      "status": "FAIL",
+      "line": 313
+    },
+    {
+      "case": "ActivationBoundaries (\"expiry\")",
+      "status": "FAIL",
+      "line": 323
+    },
+    {
+      "case": "ActivationBoundaries (\"changed\")",
+      "status": "FAIL",
+      "line": 333
+    },
+    {
+      "case": "ActivationBoundaries (\"cas\")",
+      "status": "FAIL",
+      "line": 343
+    },
+    {
+      "case": "TamperedRollbackTargetRejected",
+      "status": "FAIL",
+      "line": 353
+    },
+    {
+      "case": "ActualMigrationDownGuard (\"empty\")",
+      "status": "FAIL",
+      "line": 363
+    },
+    {
+      "case": "ActualMigrationDownGuard (\"nonempty\")",
+      "status": "FAIL",
+      "line": 391
+    },
+    {
+      "case": "ActualMigrationDownGuard (\"concurrent\")",
+      "status": "FAIL",
+      "line": 419
+    },
+    {
+      "case": "RollbackProposalReceiptSurvivesExternalOutage (\"replay\")",
+      "status": "FAIL",
+      "line": 447
+    },
+    {
+      "case": "RollbackProposalReceiptSurvivesExternalOutage (\"payload\")",
+      "status": "FAIL",
+      "line": 457
+    },
+    {
+      "case": "RollbackProposalReceiptSurvivesExternalOutage (\"scope\")",
+      "status": "FAIL",
+      "line": 467
+    },
+    {
+      "case": "RollbackProposalReceiptSurvivesExternalOutage (\"subject\")",
+      "status": "FAIL",
+      "line": 477
+    },
+    {
+      "case": "RollbackRequiresFreshIndependentBoundApproval (\"self\")",
+      "status": "FAIL",
+      "line": 487
+    },
+    {
+      "case": "RollbackRequiresFreshIndependentBoundApproval (\"expiry\")",
+      "status": "FAIL",
+      "line": 497
+    },
+    {
+      "case": "RollbackRequiresFreshIndependentBoundApproval (\"binding\")",
+      "status": "FAIL",
+      "line": 507
+    },
+    {
+      "case": "RollbackFailurePreservesCurrentAndSameCommandRecovers (\"artifact\")",
+      "status": "FAIL",
+      "line": 517
+    },
+    {
+      "case": "RollbackFailurePreservesCurrentAndSameCommandRecovers (\"audit\")",
+      "status": "FAIL",
+      "line": 527
+    },
+    {
+      "case": "RollbackFailurePreservesCurrentAndSameCommandRecovers (\"outbox\")",
+      "status": "FAIL",
+      "line": 537
+    }
+  ],
+  "capacityRefusals": 94,
+  "all47CausesVerified": false
+}
