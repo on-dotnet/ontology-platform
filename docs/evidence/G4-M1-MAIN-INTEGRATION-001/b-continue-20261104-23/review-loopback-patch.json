@@ -1,0 +1,16 @@
+{
+  "status": "PASS",
+  "reviewer": "/root/consumer_review",
+  "scope": "two task files only; no product or official assertions changed",
+  "files": {
+    "experiments/g4-m1-main-integration/runtime.py": "4010d3c29f580acd544ce589bbcb06da257cab4d99d9b9935030123e47c50173",
+    "experiments/g4-m1-main-integration/tests.py": "6ff4d83443eeb63cd178708745672d713d5411621b2f10cbde74353e5d25e9f9"
+  },
+  "findings": [],
+  "notes": [
+    "Numeric loopback matches frozen product contract",
+    "G3-only exact two routes; M1 KC-only; unknown group refuses",
+    "30 seconds is socket idle timeout, not absolute lifetime",
+    "53 task tests pass; short real diagnostic 500 to 403 and exact cleanup; formal new T required"
+  ]
+}

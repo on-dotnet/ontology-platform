@@ -1,0 +1,263 @@
+{
+  "cases": [
+    {
+      "case": "DescriptionUsesPublishedSchemaAndRegistry",
+      "status": "SKIP",
+      "line": 1
+    },
+    {
+      "case": "FoundEvidenceSurvivesNewServiceInstance",
+      "status": "SKIP",
+      "line": 3
+    },
+    {
+      "case": "AmbiguousIdentityIsNeverStringJoined",
+      "status": "SKIP",
+      "line": 5
+    },
+    {
+      "case": "MissingEntityIsEmpty",
+      "status": "SKIP",
+      "line": 7
+    },
+    {
+      "case": "TraversalPreservesManyToManyAndBudget",
+      "status": "SKIP",
+      "line": 9
+    },
+    {
+      "case": "MissingProvenanceIsPartial",
+      "status": "SKIP",
+      "line": 11
+    },
+    {
+      "case": "ExplicitOutOfScopeEntityIsUnauthorized",
+      "status": "SKIP",
+      "line": 13
+    },
+    {
+      "case": "EvidenceIsReauthorizedAndIdsCannotChooseObjects",
+      "status": "SKIP",
+      "line": 15
+    },
+    {
+      "case": "InvalidPlansAreRejected",
+      "status": "SKIP",
+      "line": 17
+    },
+    {
+      "case": "AbsentReleaseAndRoleAreExplicitErrors",
+      "status": "SKIP",
+      "line": 19
+    },
+    {
+      "case": "DependencyFailureAfterSnapshotIsUnavailableAndRecoverable",
+      "status": "SKIP",
+      "line": 21
+    },
+    {
+      "case": "CorruptedSourceHashFailsQueryAndEvidence",
+      "status": "SKIP",
+      "line": 23
+    },
+    {
+      "case": "ChangedOrMissingGraphIsUnavailable (False)",
+      "status": "SKIP",
+      "line": 25
+    },
+    {
+      "case": "ChangedOrMissingGraphIsUnavailable (True)",
+      "status": "SKIP",
+      "line": 27
+    },
+    {
+      "case": "CancellationAndBudgetReachDependency",
+      "status": "SKIP",
+      "line": 29
+    },
+    {
+      "case": "ConcurrentActivationCannotChangeRequestSnapshot",
+      "status": "SKIP",
+      "line": 31
+    },
+    {
+      "case": "QueryAndEvidenceCommitIndependentAudit",
+      "status": "SKIP",
+      "line": 33
+    },
+    {
+      "case": "ReverseLineageUsesActualEdges",
+      "status": "SKIP",
+      "line": 35
+    },
+    {
+      "case": "CrossSiteEdgesAndMissingRelationshipsDoNotInventFacts",
+      "status": "SKIP",
+      "line": 37
+    },
+    {
+      "case": "DeclaredScopeIsAuthorizedBeforeExternalReads",
+      "status": "SKIP",
+      "line": 39
+    },
+    {
+      "case": "DepthBudgetReportsIncompleteGraph",
+      "status": "SKIP",
+      "line": 41
+    },
+    {
+      "case": "AuditFailureIsUnavailableAndRecovers",
+      "status": "SKIP",
+      "line": 43
+    },
+    {
+      "case": "QueryRouteMatchesFrozenContract",
+      "status": "SKIP",
+      "line": 45
+    },
+    {
+      "case": "QueryPostRequiresNativeCsrf (null)",
+      "status": "SKIP",
+      "line": 47
+    },
+    {
+      "case": "QueryPostRequiresNativeCsrf (\"synthetic-forged-csrf\")",
+      "status": "SKIP",
+      "line": 49
+    },
+    {
+      "case": "QueryPostRequiresExactOrigin (\"https://external.invalid\")",
+      "status": "SKIP",
+      "line": 51
+    },
+    {
+      "case": "QueryPostRequiresExactOrigin (\"http://platform.test/path\")",
+      "status": "SKIP",
+      "line": 53
+    },
+    {
+      "case": "QueryPostRequiresExactOrigin (\"null\")",
+      "status": "SKIP",
+      "line": 55
+    },
+    {
+      "case": "AuthenticationAndAuthorizationPrecedeBodyBinding (null,401)",
+      "status": "SKIP",
+      "line": 57
+    },
+    {
+      "case": "AuthenticationAndAuthorizationPrecedeBodyBinding (\"unapproved-role\",403)",
+      "status": "SKIP",
+      "line": 59
+    },
+    {
+      "case": "QueryEndpointsDeclareAuthorizationAndProblems",
+      "status": "SKIP",
+      "line": 61
+    },
+    {
+      "case": "ValidQueryPostReturnsRealPublishedResult",
+      "status": "SKIP",
+      "line": 63
+    },
+    {
+      "case": "ModuleRegistersSharedContracts",
+      "status": "PASS",
+      "line": 65
+    },
+    {
+      "case": "SchemaUsesCompleteGeneratedClosureAndStableVersions",
+      "status": "PASS",
+      "line": 66
+    },
+    {
+      "case": "TimeoutMinimumMatchesFrozenContract (99,422)",
+      "status": "SKIP",
+      "line": 67
+    },
+    {
+      "case": "TimeoutMinimumMatchesFrozenContract (100,404)",
+      "status": "SKIP",
+      "line": 69
+    },
+    {
+      "case": "QueryRejectsGraphChangedAfterCatalogVerification",
+      "status": "SKIP",
+      "line": 71
+    },
+    {
+      "case": "EvidenceRejectsGraphChangedAfterCatalogVerification",
+      "status": "SKIP",
+      "line": 73
+    },
+    {
+      "case": "SuccessfulAuditCannotOutliveQueryBudget",
+      "status": "SKIP",
+      "line": 75
+    },
+    {
+      "case": "FailureAuditIsBoundedAndNotHidden",
+      "status": "SKIP",
+      "line": 77
+    },
+    {
+      "case": "CallerCancellationDuringAuditPropagates",
+      "status": "SKIP",
+      "line": 79
+    },
+    {
+      "case": "UnavailableResultIsCountedOnce",
+      "status": "SKIP",
+      "line": 81
+    },
+    {
+      "case": "RestoresActualPublishedSources (True)",
+      "status": "SKIP",
+      "line": 83
+    },
+    {
+      "case": "RestoresActualPublishedSources (False)",
+      "status": "SKIP",
+      "line": 85
+    },
+    {
+      "case": "RejectsManifestSourceBindingMismatch (\"slots\")",
+      "status": "SKIP",
+      "line": 87
+    },
+    {
+      "case": "RejectsManifestSourceBindingMismatch (\"snapshot\")",
+      "status": "SKIP",
+      "line": 89
+    },
+    {
+      "case": "RejectsManifestSourceBindingMismatch (\"bundle\")",
+      "status": "SKIP",
+      "line": 91
+    },
+    {
+      "case": "RejectsManifestSourceBindingMismatch (\"key\")",
+      "status": "SKIP",
+      "line": 93
+    },
+    {
+      "case": "RejectsHashValidInvalidUtf8",
+      "status": "SKIP",
+      "line": 95
+    }
+  ],
+  "summary": {
+    "total": 49,
+    "PASS": 2,
+    "FAIL": 0,
+    "SKIP": 47
+  },
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-23",
+  "testedCommit": "1abf641d5f5f45356561bccb4c262ef573a738ef",
+  "project": "QueryTests",
+  "assemblySha256": "f7612ae8db20a9a919b1acdd32fd187b6f363a141244a52548ea6915dfca3cbd",
+  "rawLogSha256": "488250ad4033bfaaefa309afabb5b1310de6b924bd7b06bf8b9931e074f2fcc7",
+  "commandReceiptSha256": "ce47d45b69df02dc4b5d90320df1370f8e32fa3a2dbb0667e9d0acb3558a44b7",
+  "command": "baseline-QueryTests"
+}

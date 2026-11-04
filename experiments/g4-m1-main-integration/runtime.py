@@ -399,14 +399,28 @@ WEB_HELPER = r'''import net from 'node:net';
 import fs from 'node:fs';
 import path from 'node:path';
 import {createRequire} from 'node:module';
-const root=process.env.G4_ROOT, run=process.env.G4_RUN_ID;
-if(root!==__ROOT__ || !/^b-continue-[0-9]{8}-[0-9]{2}$/.test(run)) process.exit(2);
-const server=net.createServer(client=>{
-  const remote=net.connect({host:'keycloak-test',port:8080});
-  client.on('error',()=>remote.destroy()); remote.on('error',()=>client.destroy());
-  client.pipe(remote);remote.pipe(client);
+const root=process.env.G4_ROOT, run=process.env.G4_RUN_ID, group=process.env.G4_GROUP;
+if(root!==__ROOT__ || !/^b-continue-[0-9]{8}-[0-9]{2}$/.test(run) || !['g3','m1'].includes(group)) process.exit(2);
+// API 与 Web 共用网络命名空间；仅 G3 注册产品合同要求的内部回环服务。
+const mappings=[[15180,'keycloak-test',8080],...(group==='g3'?[[15303,'fuseki',3030],[15900,'rustfs',9000]]:[])];
+const sockets=new Set();
+const servers=mappings.map(([port,host,target])=>{
+  const server=net.createServer(client=>{
+    const remote=net.connect({host,port:target});
+    sockets.add(client);sockets.add(remote);
+    const close=()=>{client.destroy();remote.destroy();sockets.delete(client);sockets.delete(remote);};
+    for(const socket of [client,remote]){
+      socket.setTimeout(30000,close);socket.on('error',close);socket.on('close',close);
+    }
+    client.pipe(remote);remote.pipe(client);
+  });
+  server.maxConnections=64;server.listen(port,'127.0.0.1');return server;
 });
-server.listen(15180,'127.0.0.1');
+for(const signal of ['SIGTERM','SIGINT'])process.on(signal,()=>{
+  for(const server of servers)server.close();
+  for(const socket of sockets)socket.destroy();
+  setTimeout(()=>process.exit(0),1000).unref();
+});
 const dir=path.join(root,'apps/web');
 const manifest=JSON.parse(fs.readFileSync(path.join(dir,'.next/required-server-files.json'),'utf8'));
 process.env.__NEXT_PRIVATE_STANDALONE_CONFIG=JSON.stringify(manifest.config);
@@ -1076,8 +1090,8 @@ def configure_api(m, group, *, apply=True):
       'G4':{'Enabled':group=='m1','ApplyMigrations':group=='m1' and apply,'KeyFile':'/private/api/g4-key','SourceCaPath':'/private/api/ca.crt','AllowEmptyPublicSchema':True},
       'Governance':{'ApplyMigrations':True,'SeedDevelopmentResources':True},'Logging':{'LogLevel':{'Default':'Warning'}}}
     if group=='g3':
-        config.update(Semantics={'ValidationOrigin':'http://fuseki:3030/validation','PublishedOrigin':'http://fuseki:3030/ontology'},
-            Publishing={'S3Endpoint':'http://rustfs:9000','AccessKey':(d/'s3-access').read_text(),'SecretKey':(d/'s3-secret').read_text(),'Bucket':'g4-main-synthetic'})
+        config.update(Semantics={'ValidationOrigin':'http://127.0.0.1:15303/validation','PublishedOrigin':'http://127.0.0.1:15303/ontology'},
+            Publishing={'S3Endpoint':'http://127.0.0.1:15900','AccessKey':(d/'s3-access').read_text(),'SecretKey':(d/'s3-secret').read_text(),'Bucket':'g4-main-synthetic'})
     path=d/'api/appsettings.json'
     if path.exists():
         boundary(path,d,private=True)

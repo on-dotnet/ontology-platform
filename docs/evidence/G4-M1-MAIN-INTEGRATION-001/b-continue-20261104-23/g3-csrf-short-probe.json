@@ -1,0 +1,51 @@
+{
+  "scope": "DIAGNOSTIC_ONLY_NOT_FORMAL_GATE",
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-23",
+  "rows": [
+    {
+      "actor": "operator-ab",
+      "meStatus": 200,
+      "subjectValid": true,
+      "roles": [
+        "platform.operator"
+      ],
+      "scopes": [
+        {
+          "organizationId": "org-demo",
+          "siteId": "site-a"
+        },
+        {
+          "organizationId": "org-demo",
+          "siteId": "site-b"
+        }
+      ],
+      "rejection": {
+        "status": 500,
+        "code": "internal_error",
+        "traceId": "3602249c9002e21f22249623f5ea4933",
+        "responseSha256": "b6d942be96c02fd8a1d1fd79f5a46d5b3ec196dbbb0908cb6d17630a384c9f79"
+      }
+    },
+    {
+      "actor": "operator-a",
+      "meStatus": 200,
+      "subjectValid": true,
+      "roles": [
+        "platform.operator"
+      ],
+      "scopes": [
+        {
+          "organizationId": "org-demo",
+          "siteId": "site-a"
+        }
+      ],
+      "rejection": {
+        "status": 500,
+        "code": "internal_error",
+        "traceId": "717e1db5d26437f73715c9445ba69cdd",
+        "responseSha256": "4671faae38016889d9435288973dd52f0c9e50452b17353ab0351789865f2ab4"
+      }
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-23",
+  "testedCommit": "1abf641d5f5f45356561bccb4c262ef573a738ef",
+  "command": [
+    "/usr/bin/sandbox-exec",
+    "-p",
+    "(version 1) (allow default) (deny network-outbound (remote ip \"*:*\")) (allow network-outbound (remote ip \"localhost:*\"))",
+    "/usr/local/share/dotnet/dotnet",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll",
+    "--filter",
+    "FullyQualifiedName=OntologyPlatform.PublishingTests.PublishingFlowTests.PublishTwoVersionsRollbackOldCompleteManifestAndReplay",
+    "--minimum-expected-tests",
+    "1",
+    "--no-ansi",
+    "--output",
+    "Detailed",
+    "--results-directory",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-23/test-results/module-PublishingTests-m030"
+  ],
+  "startedAtUtc": "2026-11-04T23:10:01.883418+00:00",
+  "endedAtUtc": "2026-11-04T23:10:05.695582+00:00",
+  "elapsedSeconds": 3.8121352910020505,
+  "exitCode": 0,
+  "timingStatus": "OBSERVED",
+  "timedOut": false,
+  "executedInputDrift": false,
+  "inputHashes": {
+    "/usr/bin/sandbox-exec": "58839ef01b4eef8aac0d2aa8f9d1c074ae45aafe3533965b030672450064acc8",
+    "/usr/local/share/dotnet/dotnet": "11b517e7b00d0efa20e9b3ab6fe433f135d828a4c95c9c6ca7a9cf1328b6ada4",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll": "af54c7ea717310939c09f7e237e061b3363e05a571be5ead579601f8b2ae2ecb"
+  },
+  "manifestSha256": "15e7af0718942fb0236feb6dd689ec82a8cf53cdb75cbe80cd9159bafaa6364c",
+  "commandSha256": "d5103204beb1f4680c5bebed3b5bb061dacef4b8014845785d1a1b42c18c2401",
+  "logSha256": "e51e8c5e5490e747b9ad94d481f23d63a6ebd56cb2d7e9fc2ec1f7339a92897f",
+  "logBytes": 380,
+  "logVisibility": "PRIVATE"
+}

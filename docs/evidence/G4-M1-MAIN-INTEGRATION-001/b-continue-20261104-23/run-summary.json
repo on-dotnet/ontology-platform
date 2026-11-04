@@ -1,0 +1,71 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-23",
+  "testedCommit": "1abf641d5f5f45356561bccb4c262ef573a738ef",
+  "status": "BLOCKED_WITH_WITNESS",
+  "gates": {
+    "R1": "PASS",
+    "R2": "PASS",
+    "PREFLIGHT": "PASS",
+    "I01": "PARTIAL_FIXTURE_CLOSURE_PENDING",
+    "I05": "PASS",
+    "I03": "PARTIAL",
+    "I02": "BLOCKED_WITH_WITNESS",
+    "I04": "NOT_RUN",
+    "I06": "NOT_RUN",
+    "I07": "NOT_RUN",
+    "I08": "NOT_RUN"
+  },
+  "engineering": {
+    "selfTestSuites": 27,
+    "selfTestExit": 0,
+    "selfTestSeconds": 398.432,
+    "taskTestsAtT": 51,
+    "nativeWebExit": 0,
+    "dotnet": {
+      "total": 780,
+      "pass": 344,
+      "skip": 436,
+      "fail": 0
+    },
+    "web": {
+      "files": 23,
+      "pass": 379
+    }
+  },
+  "actualModules": {
+    "SemanticTests": 302,
+    "PublishingTests": 78,
+    "QueryTests": 49,
+    "AgentTests": 33,
+    "all": "PASS",
+    "slowSseFormalPass": true,
+    "mcpSchema": "PASS"
+  },
+  "g3Failure": {
+    "phase": "security",
+    "actual": 500,
+    "expected": 403,
+    "code": "internal_error",
+    "identityRestored": true,
+    "cause": "task G3 facilities supplied Docker DNS endpoints; product constructors require loopback before CSRF guard"
+  },
+  "taskRepair": {
+    "files": [
+      "runtime.py",
+      "tests.py"
+    ],
+    "taskTestsAfterRepair": 53,
+    "shortActualDiagnostic": "PASS_403_csrf_rejected_BOTH_OPERATORS",
+    "newStableTRequired": true
+  },
+  "mainUpdated": false,
+  "M2": "NOT_AUTHORIZED_NOT_EXECUTED",
+  "platformLimitations": {
+    "CI": "NOT_RUN",
+    "Windows": "NOT_RUN",
+    "Intel": "NOT_RUN",
+    "supplyChain": "AMBER_A1_LICENSE_PARTIAL",
+    "lockScreenContinuity": "NOT_VERIFIED"
+  }
+}

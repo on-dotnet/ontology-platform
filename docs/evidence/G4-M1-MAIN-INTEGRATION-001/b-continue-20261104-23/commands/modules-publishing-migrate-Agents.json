@@ -1,0 +1,39 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-23",
+  "testedCommit": "1abf641d5f5f45356561bccb4c262ef573a738ef",
+  "command": [
+    "/usr/bin/sandbox-exec",
+    "-p",
+    "(version 1) (allow default) (deny network-outbound (remote ip \"*:*\")) (allow network-outbound (remote ip \"localhost:*\"))",
+    "/usr/local/share/dotnet/dotnet",
+    "/Users/chasen/.nuget/packages/dotnet-ef/10.0.13/tools/net8.0/any/dotnet-ef.dll",
+    "database",
+    "update",
+    "--project",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/OntologyPlatform.Modules.Agents.csproj",
+    "--startup-project",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/OntologyPlatform.Modules.Agents.csproj",
+    "--configuration",
+    "Debug",
+    "--no-build"
+  ],
+  "startedAtUtc": "2026-11-04T23:09:09.445920+00:00",
+  "endedAtUtc": "2026-11-04T23:09:10.516701+00:00",
+  "elapsedSeconds": 1.070787417003885,
+  "exitCode": 0,
+  "timingStatus": "OBSERVED",
+  "timedOut": false,
+  "executedInputDrift": false,
+  "inputHashes": {
+    "/usr/bin/sandbox-exec": "58839ef01b4eef8aac0d2aa8f9d1c074ae45aafe3533965b030672450064acc8",
+    "/usr/local/share/dotnet/dotnet": "11b517e7b00d0efa20e9b3ab6fe433f135d828a4c95c9c6ca7a9cf1328b6ada4",
+    "/Users/chasen/.nuget/packages/dotnet-ef/10.0.13/tools/net8.0/any/dotnet-ef.dll": "08dfaae30df9791b5b9450027fd30e6e3f700f3579964b8da1a86793017fe0f4",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/OntologyPlatform.Modules.Agents.csproj": "1f305446985f311af0a4593977fc1c82802d8027c7ddb46022bf6cd53ba6694d"
+  },
+  "manifestSha256": "15e7af0718942fb0236feb6dd689ec82a8cf53cdb75cbe80cd9159bafaa6364c",
+  "commandSha256": "2543e5ffc37fbf586b9102e952c6b70adc61ef701b23e53fb977791bd188f3a2",
+  "logSha256": "c819b4568c4bc93dd344bbb1d780b76a55c782687422f2ebaf1e75c6cb503f50",
+  "logBytes": 393,
+  "logVisibility": "PRIVATE"
+}

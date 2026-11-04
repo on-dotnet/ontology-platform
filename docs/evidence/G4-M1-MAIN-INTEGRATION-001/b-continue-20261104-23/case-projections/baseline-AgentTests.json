@@ -1,0 +1,183 @@
+{
+  "cases": [
+    {
+      "case": "ActualMigrationDownGuard (\"empty\")",
+      "status": "SKIP",
+      "line": 1
+    },
+    {
+      "case": "ActualMigrationDownGuard (\"nonempty\")",
+      "status": "SKIP",
+      "line": 3
+    },
+    {
+      "case": "ActualMigrationDownGuard (\"concurrent\")",
+      "status": "SKIP",
+      "line": 5
+    },
+    {
+      "case": "NonBmpResultLabelSurvivesMessageBoundaryAndReplay (\"😀\")",
+      "status": "SKIP",
+      "line": 7
+    },
+    {
+      "case": "NonBmpResultLabelSurvivesMessageBoundaryAndReplay (\"𠀀\")",
+      "status": "SKIP",
+      "line": 9
+    },
+    {
+      "case": "PublishedUnicodeLabelSurvivesRealGatewayAndMaf (\"😀\")",
+      "status": "SKIP",
+      "line": 11
+    },
+    {
+      "case": "PublishedUnicodeLabelSurvivesRealGatewayAndMaf (\"𠀀\")",
+      "status": "SKIP",
+      "line": 13
+    },
+    {
+      "case": "EmptyAndAsciiTextPreserveExactLength (0,0)",
+      "status": "PASS",
+      "line": 15
+    },
+    {
+      "case": "EmptyAndAsciiTextPreserveExactLength (4096,1)",
+      "status": "PASS",
+      "line": 16
+    },
+    {
+      "case": "EmptyAndAsciiTextPreserveExactLength (4097,2)",
+      "status": "PASS",
+      "line": 17
+    },
+    {
+      "case": "EmptyAndAsciiTextPreserveExactLength (8193,3)",
+      "status": "PASS",
+      "line": 18
+    },
+    {
+      "case": "AgentsHaveRealMigration",
+      "status": "PASS",
+      "line": 19
+    },
+    {
+      "case": "AuditFailureRollsBackRunAndIdempotencyReceipt",
+      "status": "SKIP",
+      "line": 20
+    },
+    {
+      "case": "ConcurrentCreateHasSingleCommittedRun",
+      "status": "SKIP",
+      "line": 22
+    },
+    {
+      "case": "ToolAndAbsoluteTimeBudgetsFailClosed",
+      "status": "SKIP",
+      "line": 24
+    },
+    {
+      "case": "OversizedToolEventPersistsOnlySafeFailure",
+      "status": "SKIP",
+      "line": 26
+    },
+    {
+      "case": "PersistentCancelPropagatesToDownstreamToken",
+      "status": "SKIP",
+      "line": 28
+    },
+    {
+      "case": "MafInvokesRealPublishedGatewayAndPersistsEvents",
+      "status": "SKIP",
+      "line": 30
+    },
+    {
+      "case": "DeterministicModeRequiresDevelopmentHost",
+      "status": "SKIP",
+      "line": 32
+    },
+    {
+      "case": "CommittedRunReplaysAfterGrantOrProviderConfigChange",
+      "status": "SKIP",
+      "line": 34
+    },
+    {
+      "case": "DisabledProviderCannotPretendCompletion",
+      "status": "SKIP",
+      "line": 36
+    },
+    {
+      "case": "ProviderIdempotencyOwnerAndCompleteScopeFailClosed",
+      "status": "SKIP",
+      "line": 38
+    },
+    {
+      "case": "CancelUsesCurrentSequenceAndFencesWorker",
+      "status": "SKIP",
+      "line": 40
+    },
+    {
+      "case": "LeaseTakeoverRejectsStaleFencingToken",
+      "status": "SKIP",
+      "line": 42
+    },
+    {
+      "case": "MessageAndEventCountBudgetsPersistFailure",
+      "status": "SKIP",
+      "line": 44
+    },
+    {
+      "case": "InvalidAndFutureCursorRejected",
+      "status": "SKIP",
+      "line": 46
+    },
+    {
+      "case": "OldRunKeepsSnapshotAcrossNewPublishAndRollback",
+      "status": "SKIP",
+      "line": 48
+    },
+    {
+      "case": "RealMcpSdkListsExactlyThreeAndCallsPublishedGateway",
+      "status": "SKIP",
+      "line": 50
+    },
+    {
+      "case": "HttpSecurityRejectsAnonymousCsrfOriginAndMalformedIdentity",
+      "status": "SKIP",
+      "line": 52
+    },
+    {
+      "case": "SseReplaysAndLogoutRevokesExistingConnection",
+      "status": "SKIP",
+      "line": 54
+    },
+    {
+      "case": "SseRechecksChangedScopeAndAbsoluteSessionExpiry",
+      "status": "SKIP",
+      "line": 56
+    },
+    {
+      "case": "SlowSseConnectionIsBoundedAndDisconnectDoesNotCancel",
+      "status": "SKIP",
+      "line": 58
+    },
+    {
+      "case": "SseHttpCursorErrorsAreAccurate",
+      "status": "SKIP",
+      "line": 60
+    }
+  ],
+  "summary": {
+    "total": 33,
+    "PASS": 5,
+    "FAIL": 0,
+    "SKIP": 28
+  },
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-23",
+  "testedCommit": "1abf641d5f5f45356561bccb4c262ef573a738ef",
+  "project": "AgentTests",
+  "assemblySha256": "d6b8c13b609c38a0fa1e1478e04c7f47062916c1cacb53de28b543f9b4e59b0c",
+  "rawLogSha256": "73878bfd1e9b53f7f84f0211e7563309e9791c1d01b70fde81ba7b4f7fe69b93",
+  "commandReceiptSha256": "3ab0b0ec807c7b330795449bbd8458ab3c29bfd1cdeea8552ed273854b1a884d",
+  "command": "baseline-AgentTests"
+}

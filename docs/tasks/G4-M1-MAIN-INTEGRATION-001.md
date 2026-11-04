@@ -108,3 +108,10 @@ Run22收尾补充：只读Reviewer调用共享检查器时遗漏禁写bytecode�
 
 
 2026-11-05 用户明确批准Run22精确单文件无损归档迁移。原102104字节、SHA1fd721a4677ffe0d589609d96ac4db9f75a1bd8bdc811ae8c92843b2641ea51a已与已提交封装utf8还原、原Git blob及ignored原件逐字节复核，并实际恢复到本任务ignored见证。仅移除当前树Run20/agent-schema-result.json旧路径；原blob/提交/ignored输出及提案封装均不改字节，恢复映射与执行回执见Run23/archive-migration-applied.json。原Run22失败不升级，后续冻结新T继续完整验收；main/M2未授权。
+
+
+Run23 / T1abf641d5f5f45356561bccb4c262ef573a738ef：已授权单文件无损迁移后，R1/R2独立PASS（Restore5.836秒），原27套SelfTest398.432秒exit0、51任务测试、native/Web通过（780总344PASS436SKIP0FAIL、Web379）；I05 PASS、I03 PARTIAL。四独立模块Semantic302/Publishing78/Query49/Agent33全部PASS，正式SlowSse及MCP正反也通过。I01仍等待全部适用fixture逐案闭合。
+
+G3六容器真实OIDC跨组织切换及finally恢复通过；首个缺CSRF POST实际500而非403，I02停止。已核实任务配置向产品构造器提供Docker DNS地址，违反既有loopback约束。只修runtime与任务测试为G3数字loopback及Web/API共享命名空间两固定内部映射，M1不新增G3服务；53测试通过。现有夹具短诊断两operator均由500变403 csrf_rejected、两内部健康200，随后原配置精确恢复、代理PID/端口释放；诊断不提升原T的I02结果。须新T完整重跑。
+
+本Run四模块28个分阶段对象及G3后续12对象均已准确回收、KEEP3网络8卷不变，宿主monitor/ingress已释放。四可再生工具副本26919文件512583866逻辑字节已按独立审查v5准确清单删除；两个node_modules残留系统VM只读FD，冻结PID/出生/完整路径/553条只读FD集合且零容器后有限准入，不操作VM，物理空间及FD回收NOT_VERIFIED。事故目录、私有原始日志、归档恢复映射均KEEP。原失败与首次清理拒绝不改写；无新V3/main/M2。详情见b-continue-20261104-23/run-summary.json与公开产物索引。

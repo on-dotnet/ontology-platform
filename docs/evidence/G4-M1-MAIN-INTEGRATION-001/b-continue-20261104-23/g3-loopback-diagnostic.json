@@ -1,0 +1,93 @@
+{
+  "scope": "DIAGNOSTIC_ONLY_NOT_FORMAL_GATE",
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-23",
+  "originalTestedCommit": "1abf641d5f5f45356561bccb4c262ef573a738ef",
+  "actualRuntimeSha256": "4010d3c29f580acd544ce589bbcb06da257cab4d99d9b9935030123e47c50173",
+  "helperSha256": "b5cb635476143dc1ce7fa95240085fb4caeef8f0174e9d809190ebc86221f138",
+  "configBeforeSha256": "d35ab7f6b3cb7a12267ad82854a078961791bb6d6d9d4ad28631b656e011721c",
+  "routes": [
+    [
+      15303,
+      "127.0.0.1",
+      "fuseki",
+      3030
+    ],
+    [
+      15900,
+      "127.0.0.1",
+      "rustfs",
+      9000
+    ]
+  ],
+  "deadlineSeconds": 90,
+  "webContainerId": "60237d649ec3e0fdb63aa6558716aaefdee64714b2ef1e9fc93677ab9522e092",
+  "hostPid": 87708,
+  "remotePid": 18,
+  "configDiagnosticSha256": "179317bd84c01be5aec68034b9b642b49809c499fd1eb9f651fa0bc56f2e1137",
+  "health": [
+    {
+      "url": "http://127.0.0.1:15303/$/ping",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:15900/health/ready",
+      "status": 200
+    }
+  ],
+  "http": {
+    "scope": "DIAGNOSTIC_ONLY_NOT_FORMAL_GATE",
+    "taskId": "G4-M1-MAIN-INTEGRATION-001",
+    "runId": "b-continue-20261104-23",
+    "rows": [
+      {
+        "actor": "operator-ab",
+        "meStatus": 200,
+        "subjectValid": true,
+        "roles": [
+          "platform.operator"
+        ],
+        "scopes": [
+          {
+            "organizationId": "org-demo",
+            "siteId": "site-a"
+          },
+          {
+            "organizationId": "org-demo",
+            "siteId": "site-b"
+          }
+        ],
+        "rejection": {
+          "status": 403,
+          "code": "csrf_rejected",
+          "traceId": "f8afc2e5fad75d8f63c4966dea8fc39b",
+          "responseSha256": "b6f93d61476ae0c1e8f199e5999cc039cebeb20ffb6b0e04100e15b49be0a5e9"
+        }
+      },
+      {
+        "actor": "operator-a",
+        "meStatus": 200,
+        "subjectValid": true,
+        "roles": [
+          "platform.operator"
+        ],
+        "scopes": [
+          {
+            "organizationId": "org-demo",
+            "siteId": "site-a"
+          }
+        ],
+        "rejection": {
+          "status": 403,
+          "code": "csrf_rejected",
+          "traceId": "4779548e5380706630747fd39cf0354e",
+          "responseSha256": "02df7717164f35e6bb42f7e7c5dc7605dc77238bf008825bd6f7dd4b4c7c2c65"
+        }
+      }
+    ]
+  },
+  "status": "PASS",
+  "configRestored": true,
+  "relayExitCode": 0,
+  "relayStderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

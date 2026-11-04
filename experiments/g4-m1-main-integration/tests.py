@@ -110,6 +110,55 @@ finally:print('DISPATCH_EVENTS='+json.dumps(events))
 class RuntimeBoundaryTests(unittest.TestCase):
     """真实边界负例，不调用Docker或读取旧私有运行时。"""
 
+    def test_g3_config_keeps_product_numeric_loopback_contract(self):
+        """实际配置生成器只能为G3填写容器内固定回环地址，M1不能带G3配置。"""
+        from unittest.mock import patch
+        import runtime as rt
+        with tempfile.TemporaryDirectory(dir=ARTIFACTS) as directory:
+            d=Path(directory);(d/'api').mkdir();(d/'realm.json').write_text(json.dumps({'authority':'http://localhost:15180/realms/g2-1234','clientId':'fixture','clientSecret':'fixture'}))
+            for name in ('platform-password','s3-access','s3-secret'):(d/name).write_text('fixture')
+            value={'realmFile':str(d/'realm.json'),'publicOrigin':'http://localhost:15100','certificatePassword':'fixture','healthKey':'fixture'}
+            for group in ('g3','m1'):
+                with patch.object(rt,'runtime_value',return_value=value),patch.object(rt,'private_dir',return_value=d):rt.configure_api({'runId':'fixture'},group)
+                config=json.loads((d/'api/appsettings.json').read_text())
+                if group=='g3':
+                    self.assertEqual(config['Semantics'],{'ValidationOrigin':'http://127.0.0.1:15303/validation','PublishedOrigin':'http://127.0.0.1:15303/ontology'})
+                    self.assertEqual(config['Publishing']['S3Endpoint'],'http://127.0.0.1:15900')
+                else:self.assertNotIn('Semantics',config);self.assertNotIn('Publishing',config)
+
+
+    def test_container_loopback_relay_group_and_lifecycle(self):
+        """执行生成helper的真实启动段；错误组不能监听，断开/超时必须关闭双端。"""
+        import runtime as rt
+        prefix=rt.WEB_HELPER.split("const dir=path.join(root,'apps/web');")[0]
+        prefix='\n'.join(line for line in prefix.splitlines() if not line.startswith('import ')).replace('__ROOT__',json.dumps(str(ROOT)))
+        harness=r"""const vm=require('node:vm'),assert=require('node:assert/strict');
+const input=JSON.parse(require('node:fs').readFileSync(0,'utf8'));
+for(const group of ['g3','m1','foreign','',undefined]){
+ const servers=[],connections=[],signals={};
+ const socket=()=>({events:{},destroyed:false,on(k,f){this.events[k]=f;return this},setTimeout(ms,f){this.timeout=ms;this.expire=f;return this},destroy(){this.destroyed=true},pipe(other){this.peer=other;return other}});
+ const net={createServer(callback){const s={callback,listen(port,host){this.address={port,host}},close(){this.closed=true},on(){return this}};servers.push(s);return s},connect(target){const s=socket();s.target=target;connections.push(s);return s}};
+ const process={env:{G4_ROOT:input.root,G4_RUN_ID:'b-continue-20261104-23',G4_GROUP:group},exit(code){throw Error('EXIT_'+code)},on(k,f){signals[k]=f}};
+ try{vm.runInNewContext(input.source,{net,process,setTimeout(){return {unref(){}}},Set});assert.ok(['g3','m1'].includes(group))}
+ catch(e){if(['g3','m1'].includes(group))throw e;assert.equal(e.message,'EXIT_2');assert.equal(servers.length,0);continue}
+ assert.deepEqual(servers.map(s=>s.address),group==='g3'?[{port:15180,host:'127.0.0.1'},{port:15303,host:'127.0.0.1'},{port:15900,host:'127.0.0.1'}]:[{port:15180,host:'127.0.0.1'}]);
+ for(const [i,server]of servers.entries()){
+  assert.equal(server.maxConnections,64);
+  for(const trigger of ['clientError','upstreamError','clientClose','upstreamClose','clientTimeout','upstreamTimeout']){
+   const c=socket();server.callback(c);const u=connections.at(-1);
+   assert.deepEqual(JSON.parse(JSON.stringify(u.target)),[{host:'keycloak-test',port:8080},{host:'fuseki',port:3030},{host:'rustfs',port:9000}][i]);
+   assert.equal(c.peer,u);assert.equal(u.peer,c);assert.equal(c.timeout,30000);assert.equal(u.timeout,30000);
+   ({clientError:()=>c.events.error(),upstreamError:()=>u.events.error(),clientClose:()=>c.events.close(),upstreamClose:()=>u.events.close(),clientTimeout:()=>c.expire(),upstreamTimeout:()=>u.expire()})[trigger]();
+   assert.ok(c.destroyed&&u.destroyed,trigger);
+  }
+ }
+ const active=socket();servers[0].callback(active);const upstream=connections.at(-1);
+ signals.SIGTERM();assert.ok(active.destroyed&&upstream.destroyed);assert.ok(servers.every(s=>s.closed));
+}
+console.log('group and bounded relay lifecycle PASS');"""
+        result=subprocess.run(['/opt/homebrew/opt/node@24/bin/node','-e',harness],input=json.dumps({'source':prefix,'root':str(ROOT)}),text=True,capture_output=True,timeout=10)
+        self.assertEqual(result.returncode,0,result.stderr)
+
     def test_g3_foreign_identity_restores_exact_user_and_profile_on_success_and_failure(self):
         """真实任务事务函数在正常、消费者失败和身份漂移时均复原原始输入。"""
         import copy

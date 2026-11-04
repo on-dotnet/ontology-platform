@@ -1,0 +1,37 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-23",
+  "testedCommit": "1abf641d5f5f45356561bccb4c262ef573a738ef",
+  "command": [
+    "/opt/homebrew/opt/node@24/bin/node",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/experiments/g4-m1-main-integration/g3-compatibility.mjs",
+    "--run-id",
+    "b-continue-20261104-23",
+    "--expected-head",
+    "1abf641d5f5f45356561bccb4c262ef573a738ef",
+    "--resource-manifest",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-23/resource-manifest.json",
+    "--runtime-file",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261104-23/runtime.json",
+    "--evidence-dir",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-23/g3-compatibility-baseline"
+  ],
+  "startedAtUtc": "2026-11-04T23:18:31.877941+00:00",
+  "endedAtUtc": "2026-11-04T23:18:47.220164+00:00",
+  "elapsedSeconds": 15.342163415996765,
+  "exitCode": 1,
+  "timingStatus": "OBSERVED",
+  "timedOut": false,
+  "executedInputDrift": false,
+  "inputHashes": {
+    "/opt/homebrew/opt/node@24/bin/node": "0d78c9bca217f53c2dc21a067246ee4a81c1f4fa111ee64d572b45fa1ff39189",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/experiments/g4-m1-main-integration/g3-compatibility.mjs": "705d972ae2f48107c445be8ae575096ee39b55b3b01112e26d1a206923437c9d",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-23/resource-manifest.json": "15e7af0718942fb0236feb6dd689ec82a8cf53cdb75cbe80cd9159bafaa6364c",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261104-23/runtime.json": "744748fed467975128a870da800e3d00565285a900bb3bbecff508d717060fd4"
+  },
+  "manifestSha256": "15e7af0718942fb0236feb6dd689ec82a8cf53cdb75cbe80cd9159bafaa6364c",
+  "commandSha256": "05a79a8880c99fec8484ed70e21d97203e460b7d5a00b863505df7cf258b19d7",
+  "logSha256": "d4064a84670cd6346d478640f3f079b4f5b7763424f06ccfcc2d95eee8d16ff4",
+  "logBytes": 362,
+  "logVisibility": "PRIVATE"
+}
