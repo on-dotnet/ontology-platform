@@ -960,6 +960,14 @@ def validate_bind_mounts(actual, declared):
     return rows
 
 
+def observed_volume_usage(m, volumes):
+    """每个本Run卷都必须有实际占用观测，脱离挂载的遗留卷不能静默漏算。"""
+    owned=docker(m,['volume','ls','-q','--filter','label=ontology.task-id='+TASK,
+                    '--filter','label=ontology.run-id='+m['runId']]).decode().split()
+    require(len(owned)==len(set(owned)) and set(owned)==set(volumes),'UNOBSERVED_OWNED_VOLUME')
+    return sum(value['usedBytes'] for value in volumes.values())
+
+
 def resource_snapshot(m, group, name):
     """实际资源ID/镜像/限额/挂载检查；不归档Env或秘密。"""
     ids = docker(m,['ps','-aq','--no-trunc','--filter','label=ontology.task-id='+TASK,
@@ -990,7 +998,7 @@ def resource_snapshot(m, group, name):
         container_ids[service]=ident
         rows.append(dict(id=ident,service=service,image=item['Image'],running=item['State']['Running'],paused=item['State']['Paused'],memoryBytes=item['HostConfig']['Memory'],bindMappings=bindings,mounts=[{k:v for k,v in x.items() if k in ('Type','Name','Source','Destination','RW')} for x in item['Mounts']]))
     require(memory<=6*1024**3,'ACTUAL_MEMORY_BUDGET')
-    used=sum(v['usedBytes'] for v in volumes.values())
+    used=observed_volume_usage(m,volumes)
     require(used<3*1024**3,'VOLUME_STOP_THRESHOLD')
     result=dict(taskId=TASK,runId=m['runId'],group=group,composeConfigSha256=digest(configured.stdout),containers=rows,totalMemoryBytes=memory,observedVolumes=volumes,observedVolumeUsedBytes=used)
     write_json(ARTIFACTS/m['runId']/(name+'.json'),result)

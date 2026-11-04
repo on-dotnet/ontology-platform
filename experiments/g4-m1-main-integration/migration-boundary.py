@@ -3,6 +3,7 @@
 import json
 import os
 import secrets
+import subprocess
 import time
 import runtime as rt
 import readback
@@ -50,6 +51,69 @@ def restart(m):
     rt.wait_http('http://localhost:15100/health/live',60,headers={'X-Health-Key':rt.runtime_value(m)['healthKey']})
 
 
+def retire_g3_volumes(m, registered, *, apply=False):
+    """仅回收本Run已登记、无容器引用的两卷；平台PG/OIDC与外部保留集不变。"""
+    names=['ontology-g4-main-'+m['runId']+'_'+name for name in ('fuseki-data','rustfs-data')]
+    before=closeout.inventory(m)
+    rt.require(before['volume']==registered['volume'] and before['network']==registered['network'],'TRANSITION_REGISTRY_DRIFT')
+    rt.require(all(before[k]['keep']==registered[k]['keep'] for k in before),'TRANSITION_KEEP_DRIFT')
+    rows={row['id']:row for row in before['volume']['owned']}
+    rt.require(all(name in rows for name in names),'TRANSITION_VOLUME_UNREGISTERED')
+    def validate(name):
+        value=json.loads(rt.docker(m,['volume','inspect',name]))[0]
+        rt.require(value['Name']==name and value['CreatedAt']==rows[name]['created'],'TRANSITION_VOLUME_VERSION')
+        labels=value.get('Labels') or {}
+        rt.require(labels.get('ontology.task-id')==rt.TASK and labels.get('ontology.run-id')==m['runId'],'TRANSITION_VOLUME_OWNER')
+        rt.require(not rt.docker(m,['ps','-aq','--no-trunc','--filter','volume='+name]).strip(),'TRANSITION_VOLUME_ATTACHED')
+    for name in names:validate(name)
+    result={'status':'DRY_RUN','taskId':rt.TASK,'runId':m['runId'],'before':before,'candidates':names,'commands':[],'deleted':[]}
+    if not apply:return result
+    rt.require(closeout.inventory(m)==before,'TRANSITION_RESOURCE_DRIFT')
+    rt.write_json(rt.ARTIFACTS/m['runId']/'migration-volume-retirement-plan.json',result)
+    journal=rt.ARTIFACTS/m['runId']/'migration-volume-retirement-commands.jsonl'
+    rt.require(not journal.exists(),'TRANSITION_EXISTING_JOURNAL')
+    def log(value):
+        with journal.open('a') as output:
+            output.write(json.dumps(value)+'\n');output.flush();os.fsync(output.fileno())
+    def observed_command(command):
+        try:
+            value=subprocess.run(command,capture_output=True,timeout=20)
+            return {'command':command,'exitCode':value.returncode,'timingStatus':'COMPLETED','stdoutSha256':rt.digest(value.stdout),'stderrSha256':rt.digest(value.stderr)},value.stderr
+        except subprocess.TimeoutExpired as error:
+            return {'command':command,'exitCode':None,'timingStatus':'TIMEOUT_EXIT_NOT_VERIFIED','stdoutSha256':rt.digest(error.output or b''),'stderrSha256':rt.digest(error.stderr or b'')},b''
+        except OSError as error:
+            return {'command':command,'exitCode':None,'timingStatus':'START_FAILED','errorType':type(error).__name__,'errorErrno':error.errno},b''
+    result['status']='FAIL'
+    try:
+        for name in names:
+            validate(name)
+            command=['docker','--context','desktop-linux','volume','rm',name]
+            log({'phase':'BEFORE','command':command,'expectedCreated':rows[name]['created']})
+            removed,_=observed_command(command);result['commands'].append(removed)
+            log({'phase':'COMMAND_EXIT',**removed})
+            observed,stderr=observed_command(['docker','--context','desktop-linux','volume','inspect',name])
+            absent=observed['timingStatus']=='COMPLETED' and observed['exitCode']!=0 and b'no such volume' in stderr.lower() and name.encode() in stderr
+            observed['exactAbsent']=absent;result['commands'].append(observed)
+            log({'phase':'AFTER',**observed})
+            rt.require(removed['exitCode']==0,'TRANSITION_VOLUME_REMOVE_FAILED')
+            rt.require(absent,'TRANSITION_VOLUME_ABSENCE')
+            result['deleted'].append(name)
+        after=closeout.inventory(m)
+        expected=json.loads(json.dumps(before));expected['volume']['owned']=[row for row in expected['volume']['owned'] if row['id'] not in names]
+        rt.require(after==expected,'TRANSITION_RETAINED_RESOURCE_DRIFT')
+        result['status']='PASS'
+    except BaseException as error:
+        result['errorType']=type(error).__name__
+        raise
+    finally:
+        try:result['after']=closeout.inventory(m)
+        except BaseException as error:
+            result['status']='FAIL';result['afterObservationError']=type(error).__name__
+        rt.write_json(rt.ARTIFACTS/m['runId']/'migration-volume-retirement.json',result)
+    rt.require(result['status']=='PASS','TRANSITION_AFTER_OBSERVATION_FAILED')
+    return result
+
+
 def verify_all(m):
     """G3保持原行，串行替换设施；真实Host首次、重复、权限恢复三类实测。"""
     rt.check_build(m);r=rt.runtime_value(m)
@@ -57,12 +121,15 @@ def verify_all(m):
     before=g3_rows(m)
     rt.require(platform_sql(m,"SELECT count(*) FROM pg_namespace WHERE nspname='connections';")=='0','G4_DISABLED_MIGRATED')
     before_resources=closeout.inventory(m)
+    creation=json.loads((rt.ARTIFACTS/m['runId']/'resources-g3-owned.json').read_text())
+    rt.require(all(creation[k]['owned']==before_resources[k]['owned'] for k in before_resources),'TRANSITION_CREATION_DRIFT')
     rt.write_json(rt.ARTIFACTS/m['runId']/'migration-g3-before.json',{'rows':before,'resources':before_resources})
     ingress_before=rt.stop_ingress(m,'g3')
     # 先回收4个已登记服务，保留本轮PG、OIDC和其合成卷；最大仍5容器。
     for service in ('web','api','fuseki','rustfs'):
         ident=r['containerIds'][service];rt.inspect_owned(m,ident,service)
         rt.docker(m,['stop','--time','10',ident]);rt.docker(m,['rm',ident])
+    retire_g3_volumes(m,before_resources,apply=True)
     path=rt.private_dir(m['runId'])/'api/appsettings.json'
     path.rename(path.with_name('appsettings-g3-closed.json'))
     try:

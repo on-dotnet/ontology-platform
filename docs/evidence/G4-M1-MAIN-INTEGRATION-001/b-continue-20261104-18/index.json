@@ -1,0 +1,47 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-18",
+  "testedCommit": "baed2f8763dc645858df02add5798fe6ff4f3ec9",
+  "status": "PARTIAL_INPUT_REVISION_REQUIRED",
+  "gates": {
+    "R2": "PASS",
+    "I01": "NOT_RUN",
+    "I02": "NOT_RUN",
+    "I03": "NOT_RUN",
+    "I04": "NOT_RUN",
+    "I05": "NOT_RUN",
+    "I06": "NOT_RUN",
+    "I07": "NOT_RUN",
+    "I08": "NOT_RUN"
+  },
+  "reason": "Readonly preflight found detached G3 volumes omitted from subsequent M1 usage accounting. Stop before I01, revise task transition and freeze new T. No observed resource overrun.",
+  "targetedTaskTests": 48,
+  "newTAndFullRunRequired": true,
+  "ignoredLargeInputs": [
+    {
+      "path": "r2-sdk-before-mstest-imports.xml",
+      "bytes": 1628467,
+      "sha256": "68b503a592bcdd615f308cd8896106373392b6bfc194f004637ca90e1c28841d"
+    },
+    {
+      "path": "r2-sdk-after-aspire-imports.xml",
+      "bytes": 1616931,
+      "sha256": "7067b6fe86d59c287dcb055b50ca9b6d404bbaf51a38121e3818ab49002a6a54"
+    },
+    {
+      "path": "r2-sdk-before-aspire-imports.xml",
+      "bytes": 1616931,
+      "sha256": "fd88ff559023ac2a3f63ea6bb6d0af91a4eae1bd149ab320c7d00342341c4f0b"
+    },
+    {
+      "path": "r2-sdk-after-mstest-imports.xml",
+      "bytes": 1628467,
+      "sha256": "74bcbfbdaea28680bf1ed1a9fb3d370b147dda5f9e0d3b4ce7616b4d0d64212d"
+    },
+    {
+      "path": "restore-stdout.txt",
+      "bytes": 52463317,
+      "sha256": "c3d94ee005e0b5533e3fb629b801eec579d20a684baaa37a1024fadfa1606991"
+    }
+  ]
+}

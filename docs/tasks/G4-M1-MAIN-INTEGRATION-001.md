@@ -82,3 +82,6 @@ Run16 / Tf3cc2ce34fb5e083f3e92f4fb8c62d724f388685：R2及独立后验PASS（5.65
 Run17 / Ta85b2cf3c40455518fa120359520c3b19a73ac01：R2严格离线及独立后验PASS（5.641秒），原27套SelfTest370.93秒、46任务测试、native/Web通过，780总344PASS436SKIP0FAIL，Web379；I05 PASS/I03 PARTIAL。Semantic137方法302案例及Publishing42方法78案例全部PASS，零ingress容量拒绝；Query前12方法14案例通过，m013在发布的GSP PUT收到500。精确合成诊断PUT实际返回45字节IOException No space left on device，/fuseki 512MiB已100%满，/tmp尚有空间；memory.events max2093/oom0/oom_kill0。保留原失败与私有原始输出，不把无OOM解释为门禁PASS。
 
 仅任务compose.g3/consumer_check/tests调整Fuseki数据tmpfs为1024MiB及内存2GiB，精确限制唯一Fuseki消费者；其余卷上限不变。G3内存5888MiB、模块3584MiB、全部命名卷及匿名tmpfs2820MiB，仍在已批6GiB/3GiB；镜像和JVM640MiB堆未变。46任务正反测试与独立审查PASS，原测试夹具TypeError保留。Run17精确7Docker对象及ingress、宿主monitor、4工具副本已回收，事故KEEP保留；须新T完整验收，扩大容量尚未证明产品通过。无新V3/main/M2。详见b-continue-20261104-17/index.json。
+
+
+Run18 / Tbaed2f8763dc645858df02add5798fe6ff4f3ec9：R1/R2独立准入及后验PASS，OS全网络拒绝的完整21项目/168包Restore实际5.565秒exit0。I01尚未启动，前置只读审查发现G3→M1切换遗留Fuseki/RustFS两个脱离挂载卷，后续snapshot只统计运行挂载而可能漏算；这不是已观察资源超限。仅任务migration/runtime/tests补准确两卷回收及全部owned卷实测集合闭合，保留平台PG/OIDC及KEEP，删除失败/假缺席拒绝并持久记录。48任务正反测试通过，待独立复审和新T/Run完整验收；Run18恢复不转绑新T，无新V3/main/M2。

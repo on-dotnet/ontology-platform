@@ -591,6 +591,81 @@ class DurableCleanupTests(unittest.TestCase):
             self.assertEqual([json.loads(x)['phase'] for x in journal.read_text().splitlines()],['START','BEFORE','AFTER'])
 
 
+class TransitionVolumeTests(unittest.TestCase):
+    """切换时仅删准确可再生卷，缺席必须有真实诊断，资源计量拒绝遗漏。"""
+
+    def test_orphan_volume_is_not_silently_omitted(self):
+        import runtime
+        from unittest.mock import patch
+        m={'runId':'fixture'}
+        with patch.object(runtime,'docker',return_value=b'volume-a\nvolume-b\n'):
+            with self.assertRaisesRegex(ValueError,'UNOBSERVED_OWNED_VOLUME'):
+                runtime.observed_volume_usage(m,{'volume-a':{'usedBytes':10}})
+            self.assertEqual(runtime.observed_volume_usage(m,{'volume-a':{'usedBytes':10},'volume-b':{'usedBytes':20}}),30)
+        with patch.object(runtime,'docker',return_value=b'volume-a\n'):
+            with self.assertRaisesRegex(ValueError,'UNOBSERVED_OWNED_VOLUME'):
+                runtime.observed_volume_usage(m,{'volume-a':{'usedBytes':10},'foreign':{'usedBytes':1}})
+
+    def test_transition_exact_pair_and_failed_absence(self):
+        import run,runtime,copy
+        from unittest.mock import patch
+        from contextlib import ExitStack
+        module=run.module('migration-boundary');rid='b-continue-20261104-18';prefix='ontology-g4-main-'+rid+'_'
+        m={'runId':rid};names=[prefix+'fuseki-data',prefix+'rustfs-data']
+        before={k:{'owned':[],'keep':['foreign-'+k]} for k in ('container','network','volume')}
+        before['volume']['owned']=[{'id':n,'created':'frozen'} for n in names+[prefix+'platform-data',prefix+'keycloak-data']]
+        for failure in ('none','dryrun','version','owner','attached','absence','keep','remove','timeout','observe'):
+            with self.subTest(failure=failure),ExitStack() as stack:
+                directory=stack.enter_context(tempfile.TemporaryDirectory(dir=ARTIFACTS));root=Path(directory)
+                stack.enter_context(patch.object(runtime,'ARTIFACTS',root));(root/rid).mkdir()
+                state=copy.deepcopy(before);calls=[]
+                def docker(manifest,args,**kw):
+                    calls.append(args)
+                    if args[:2]==['volume','inspect']:
+                        name=args[2]
+                        return json.dumps([{'Name':name,'CreatedAt':'changed' if failure=='version' else 'frozen','Labels':{'ontology.task-id':'foreign' if failure=='owner' else runtime.TASK,'ontology.run-id':rid}}]).encode()
+                    if args[:2]==['ps','-aq']:return b'container' if failure=='attached' else b''
+                    raise AssertionError(args)
+                stack.enter_context(patch.object(runtime,'docker',side_effect=docker))
+                def inventory(m):
+                    if failure=='observe' and any(c[:2]==['volume','rm'] for c in calls):raise ValueError('SIMULATED_OBSERVATION_FAILURE')
+                    return copy.deepcopy(state)
+                stack.enter_context(patch.object(module.closeout,'inventory',side_effect=inventory))
+                def command(cmd,**kw):
+                    args=cmd[3:];calls.append(args)
+                    if args[:2]==['volume','rm']:
+                        if failure=='timeout':raise subprocess.TimeoutExpired(cmd,20,output=b'partial',stderr=b'timeout')
+                        if failure=='remove':return subprocess.CompletedProcess(cmd,17,b'partial',b'synthetic failure')
+                        state['volume']['owned']=[x for x in state['volume']['owned'] if x['id']!=args[2]]
+                        if failure=='keep':state['network']['keep']=[]
+                        return subprocess.CompletedProcess(cmd,0,args[2].encode(),b'')
+                    self.assertEqual(args[:2],['volume','inspect'])
+                    return subprocess.CompletedProcess(cmd,1,b'',b'permission denied' if failure=='absence' else b'Error response from daemon: get '+cmd[-1].encode()+b': no such volume')
+                stack.enter_context(patch.object(module.subprocess,'run',side_effect=command))
+                if failure=='dryrun':
+                    self.assertEqual(module.retire_g3_volumes(m,before)['status'],'DRY_RUN')
+                    self.assertFalse(any(c[:2]==['volume','rm'] for c in calls))
+                elif failure=='none':
+                    result=module.retire_g3_volumes(m,before,apply=True)
+                    self.assertEqual(result['deleted'],names)
+                    self.assertEqual([c for c in calls if c[:2]==['volume','rm']],[['volume','rm',n] for n in names])
+                else:
+                    with self.assertRaises(ValueError):module.retire_g3_volumes(m,before,apply=True)
+                    if failure in ('version','owner','attached'):
+                        self.assertFalse(any(c[:2]==['volume','rm'] for c in calls))
+                    else:
+                        self.assertTrue((root/rid/'migration-volume-retirement.json').exists())
+                        rows=[json.loads(x) for x in (root/rid/'migration-volume-retirement-commands.jsonl').read_text().splitlines()]
+                        self.assertEqual(rows[0]['phase'],'BEFORE')
+                        if failure in ('remove','timeout'):
+                            self.assertEqual([r['phase'] for r in rows],['BEFORE','COMMAND_EXIT','AFTER'])
+                            self.assertEqual(rows[1]['exitCode'],17 if failure=='remove' else None)
+                            self.assertIn('stderrSha256',rows[1])
+                        if failure=='observe':
+                            result=json.loads((root/rid/'migration-volume-retirement.json').read_text())
+                            self.assertEqual(result['status'],'FAIL');self.assertEqual(result['afterObservationError'],'ValueError')
+
+
 class CliHomeIsolationTests(unittest.TestCase):
     def test_actual_runs_never_reuse_kept_incident_home(self):
         import runtime
