@@ -205,7 +205,7 @@ def prepare_tools(m):
     source=Path('/Users/chasen/.nuget/packages')
     packages=locked_packages()
     # NuGet签名包GetContentHash不是完整ZIP的SHA512。使用SDK本身校验，保留两种散列。
-    env=rt.environment();env['G4_PACKAGE_EXPECTATIONS']=json.dumps(packages)
+    env=rt.environment(m['runId']);env['G4_PACKAGE_EXPECTATIONS']=json.dumps(packages)
     command=r'''[Reflection.Assembly]::LoadFrom('/usr/local/share/dotnet/sdk/10.0.402/NuGet.Packaging.dll') | Out-Null
 $expected=$env:G4_PACKAGE_EXPECTATIONS | ConvertFrom-Json -AsHashtable
 $rows=@(); foreach($entry in $expected.GetEnumerator()) {

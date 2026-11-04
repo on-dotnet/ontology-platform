@@ -327,6 +327,17 @@ class DurableCleanupTests(unittest.TestCase):
             self.assertEqual([json.loads(x)['phase'] for x in journal.read_text().splitlines()],['START','BEFORE','AFTER'])
 
 
+class CliHomeIsolationTests(unittest.TestCase):
+    def test_actual_runs_never_reuse_kept_incident_home(self):
+        import runtime
+        first=runtime.environment('b-continue-20261104-01')['DOTNET_CLI_HOME']
+        second=runtime.environment('b-continue-20261104-02')['DOTNET_CLI_HOME']
+        self.assertEqual(first,str(ARTIFACTS/'b-continue-20261104-01/dotnet-cli-home'))
+        self.assertNotEqual(first,second)
+        for value in (first,second,runtime.environment()['DOTNET_CLI_HOME']):
+            self.assertNotEqual(value,str(ROOT/'.tools/dotnet-home'))
+
+
 if __name__ == '__main__':
     ARTIFACTS.mkdir(parents=True, exist_ok=True)
     unittest.main(verbosity=2)

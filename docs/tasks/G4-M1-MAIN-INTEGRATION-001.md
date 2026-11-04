@@ -39,3 +39,5 @@ B0补充独立审查通过，最终19项驱动清单SHA21c6b08b1246a16c501f11482
 新T e09a8c8fc7f21ac1f3d447e8f67493c5f85059f0上原SelfTest27套和任务17项通过；全solution restore失败，后续原生/Web/产品门禁未运行。本任务入口漏读Mac专用锁，SDK解析还绕过项目离线源产生NuGet HTTP缓存；原始事实保留，零下载门禁未满足。此前B0/PREFLIGHT的边界充分性结论被真实运行推翻，不能据此继续标PASS。
 
 四个任务工具完成修复，168锁包本地只读核验、SDK/OS/首次运行隔离probe及22任务测试通过，非作者修复Review通过；尚无修复后完整新T验收，保持BLOCKED_WITH_WITNESS。详见[阻断与恢复交接](../evidence/G4-M1-MAIN-INTEGRATION-001/b-continue-20261104-02/blocked-handoff.md)。仅收尾证据与已审安全副本回收，真实门禁停止，无新V3/main/M2。
+
+本轮安全回收已实际完成并独立后验：9目录、30,324文件、1,058,341,260逻辑字节；旧事件CLI目录和历史包KEEP。最后补充按Run隔离CLI_HOME，23项任务测试与只读Review通过；真实门禁仍停止，修复后完整新T未运行，最后Head见包外回执。

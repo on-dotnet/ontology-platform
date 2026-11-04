@@ -13,7 +13,7 @@ def run_modules(m):
     r=rt.runtime_value(m)
     for service in ('platform-pg','fuseki','rustfs'):
         rt.require(rt.inspect_owned(m,r['containerIds'][service],service)['State']['Running'],'MODULE_RESOURCE_DOWN')
-    env=rt.environment()
+    env=rt.environment(m['runId'])
     private=rt.private_dir(m['runId'])
     pg='Host=127.0.0.1;Port=15432;Database=platform;Username=platform;Password='+(private/'platform-password').read_text()
     env.update(ConnectionStrings__governance=pg,RUSTFS_ACCESS_KEY=(private/'s3-access').read_text(),RUSTFS_SECRET_KEY=(private/'s3-secret').read_text())

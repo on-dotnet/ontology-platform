@@ -170,10 +170,12 @@ def load_manifest(path, run, expected_head, *, check_head=True):
     return m
 
 
-def environment():
+def environment(run=None):
     """所有版本固定在已有本地制品；不继承测试夹具或包源注入。"""
+    cli_home=ARTIFACTS/run_id(run)/'dotnet-cli-home' if run is not None else ROOT/'.tools/dotnet-offline-home'
+    boundary(cli_home,ROOT)
     env = {k: v for k, v in os.environ.items() if not k.startswith(('G2_', 'G4_', 'ConnectionStrings__', 'NUGET_', 'DOTNET_', 'PNPM_', 'Security__', 'G3_', 'RUSTFS_', 'ASPNETCORE_', 'G2__', 'G4__')) and not k.lower().startswith('msbuild')}
-    env.update(DOTNET_ROOT='/usr/local/share/dotnet', DOTNET_CLI_HOME=str(ROOT / '.tools/dotnet-home'),
+    env.update(DOTNET_ROOT='/usr/local/share/dotnet', DOTNET_CLI_HOME=str(cli_home),
                NUGET_PACKAGES=str(ROOT / '.tools/nuget'), DOTNET_CLI_TELEMETRY_OPTOUT='1',
                DOTNET_SKIP_FIRST_TIME_EXPERIENCE='1', DOTNET_CLI_WORKLOAD_UPDATE_NOTIFY_DISABLE='true',
                PYTHONPATH=str(ROOT / '.tools/pythonlibs'), PYTHONDONTWRITEBYTECODE='1',
@@ -223,7 +225,7 @@ def execute(m, name, command, *, env=None, timeout=900, sensitive=False, cwd=ROO
     require(not any(x in ('install', 'pull', 'load', '--force', '--force-with-lease') for x in command), 'DOWNLOAD_OR_FORCE_REFUSED')
     inputs = command_file_inputs(command)
     started, tick = datetime.datetime.now(datetime.timezone.utc).isoformat(), time.monotonic()
-    raw, code, timed_out = bounded_process(command, cwd=cwd, env=env or environment(), timeout=timeout)
+    raw, code, timed_out = bounded_process(command, cwd=cwd, env=env or environment(m['runId']), timeout=timeout)
     drift = any(digest(Path(p).read_bytes()) != h for p, h in inputs.items())
     log.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
     with os.fdopen(os.open(log, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600), 'wb') as stream:
@@ -256,7 +258,7 @@ def verify_engine(m):
 
 def compose_environment(m):
     """只有本树登记绑定，不允许共享旧私有目录。"""
-    env = environment()
+    env = environment(m['runId'])
     env.update(G4_RUN_ID=m['runId'], G4_PRIVATE_DIR=m['privateDirectory'], G4_ROOT=str(ROOT),
                G4_HOST_UID=str(os.getuid()), G4_HOST_GID=str(os.getgid()),
                G4_API_OUTPUT=str(ROOT / 'backend/src/Hosts/OntologyPlatform.Api/bin/Debug/net10.0'),
@@ -479,7 +481,7 @@ def start_group(m, group, *, modules=False):
     # 每组新OIDC状态保存到独立文件；旧组认证材料仍保留至审查后精确回收。
     realm=d/('realm-'+group+'.json')
     update_runtime(m,realmFile=str(realm))
-    env=environment();env['WAVE2_KEYCLOAK_ADMIN_PASSWORD']=(d/'keycloak-password').read_text()
+    env=environment(m['runId']);env['WAVE2_KEYCLOAK_ADMIN_PASSWORD']=(d/'keycloak-password').read_text()
     execute(m,'bootstrap-'+group,['python3','-B',str(ROOT/'infra/security/bootstrap-keycloak.py'),'--profile','g2','--keycloak-origin','http://localhost:15180','--public-origin','http://localhost:15100','--runtime-output',str(realm)],env=env,sensitive=True)
     configure_api(m,group)
     wait_http('http://localhost:15100/health/live',120,headers={'X-Health-Key':runtime_value(m)['healthKey']})

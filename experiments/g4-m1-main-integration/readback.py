@@ -379,7 +379,7 @@ def run_interactive(m, consumer_name, scenario, callback, *, timeout=120):
     rt.require(consumer_name in ('http','browser'),'INTERACTIVE_CONSUMER')
     output=rt.ARTIFACTS/m['runId']/(consumer_name+'-'+scenario)
     command=[run.NODE,str(rt.HERE/(consumer_name+'.mjs')),*run.binding(m),'--runtime-file',str(rt.private_dir(m['runId'])/'runtime.json'),'--evidence-dir',str(output)]
-    child=subprocess.Popen(command,cwd=rt.ROOT,env=rt.environment(),stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,bufsize=1,start_new_session=True)
+    child=subprocess.Popen(command,cwd=rt.ROOT,env=rt.environment(m['runId']),stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,bufsize=1,start_new_session=True)
     selector=selectors.DefaultSelector();selector.register(child.stdout,selectors.EVENT_READ)
     deadline=time.monotonic()+timeout;lines=[];started=dt.datetime.now(dt.timezone.utc).isoformat()
     try:

@@ -11,3 +11,8 @@ TaskId: G4-M1-MAIN-INTEGRATION-001。继续原分支与工作树；ApprovedMain=
 实际门禁保持停止，状态不提升为READY。恢复前须复核新远端/Head、事件及修复输入，使用新的唯一Run与稳定T，重新完成适用完整验收；不得从旧PREFLIGHT或旧T SelfTest直接跳到I05。没有新的V3 ZIP；720c等历史ZIP完整保留，不制造重复中间PARTIAL包。CI/Windows/Intel及完整许可证/CVE/签名限制保持NOT_RUN或NOT_VERIFIED，不进入main/M2/G6。
 
 本轮将按独立审查的精确清单回收可再生工具与低成本fixture；原始HTTP事件目录.tools/dotnet-home、全部失败日志、分支/工作树和历史包保持KEEP，解除条件为后续事件复审和明确生命周期决定。监测PID21487已准确释放。最终回收与远端回读由包外回执补充，不把尚未执行的清理标PASS。
+
+
+收尾实测补充：在26e394b7eaae31d967a110302370792da78b1884完成精确回收，9目录全部lstat ENOENT、30,324文件／1,058,341,260逻辑字节；不声称物理磁盘等量释放。2个本树历史ZIP及事件CLI目录指纹不变，非作者后验通过。进程核查无本任务I01/监测或dotnet残留，Docker0容器／17镜像，main仍ApprovedMain，主树原6个DS_Store保留。
+
+为避免后续运行改写事件原件，最后将实际消费者CLI_HOME绑定到各Run的artifacts目录；未重新使用旧.tools/dotnet-home。补充源码Review、23项任务测试和输入散列通过，未创建新的运行资源或重启真实门禁。最后源码提交/交付Head及远端以包外final-receipt.json为准；修复后的新完整TestedCommit仍NOT_FROZEN/NOT_RUN。后续须重新冻结T并完成所有硬门禁，不能复用e09上的部分结果。

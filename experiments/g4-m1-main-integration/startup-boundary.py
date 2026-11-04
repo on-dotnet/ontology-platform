@@ -26,7 +26,7 @@ def rejection_cases(m):
                         'PublicOrigin':'https://localhost:15100','KeyRingPath':str(private/'host-keyring'),'CertificatePath':runtime['certificatePath'],
                         'CertificatePassword':runtime['certificatePassword'],'HealthKey':runtime['healthKey']},
                     'Web':{'Origin':'http://127.0.0.1:15300'},'G4':{'Enabled':False},'Governance':{'ApplyMigrations':False}},private=True)
-                env = rt.environment()
+                env = rt.environment(m['runId'])
                 env.update(ASPNETCORE_ENVIRONMENT=environment, DOTNET_ENVIRONMENT=environment, G4__Enabled='true' if override == 'environment' else 'false')
                 args = ['/usr/local/share/dotnet/dotnet', str(dll), '--contentRoot', str(p)]
                 if override == 'command-line': args += ['--G4:Enabled=true']
