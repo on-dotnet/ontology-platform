@@ -1,0 +1,32 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-14",
+  "testedCommit": "4a64070ac6f9be906512d11956252909085e9a8b",
+  "command": [
+    "/usr/bin/sandbox-exec",
+    "-p",
+    "(version 1) (allow default) (deny network-outbound (remote ip \"*:*\")) (allow network-outbound (remote ip \"localhost:*\"))",
+    "pwsh",
+    "-NoProfile",
+    "-File",
+    "scripts/verify.ps1",
+    "-RunNative",
+    "-RunTests"
+  ],
+  "startedAtUtc": "2026-11-04T18:36:25.470866+00:00",
+  "endedAtUtc": "2026-11-04T18:37:37.364783+00:00",
+  "elapsedSeconds": 71.89349904100163,
+  "exitCode": 0,
+  "timingStatus": "OBSERVED",
+  "timedOut": false,
+  "executedInputDrift": false,
+  "inputHashes": {
+    "/usr/bin/sandbox-exec": "58839ef01b4eef8aac0d2aa8f9d1c074ae45aafe3533965b030672450064acc8",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/scripts/verify.ps1": "02422e9a55ba5f5e8b59c56d42d8a230dd4eec1389e7eae090185eafc7e4f6fa"
+  },
+  "manifestSha256": "75da74022b74732f1bc837fb238af54a2397ebee28f01509cc15c2d08f2e36a2",
+  "commandSha256": "f4fe2d3300207c436ffe3317183e642ddd8a6fda91dd92f5b64090c8357488bd",
+  "logSha256": "0ac4c14fb7c33de1843c515185030fb8df5fed14306ff15e213549434ff8312d",
+  "logBytes": 162366,
+  "logVisibility": "TASK_EVIDENCE"
+}

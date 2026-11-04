@@ -1,0 +1,33 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-14",
+  "testedCommit": "4a64070ac6f9be906512d11956252909085e9a8b",
+  "command": [
+    "/usr/bin/sandbox-exec",
+    "-p",
+    "(version 1) (allow default) (deny network*) (deny file-write*) (allow file-write* (literal \"/dev/null\") (subpath \"/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-14\") (subpath \"/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/g4-m1-main-integration-001/b-continue-20261104-14/tmp\") (subpath \"/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Contracts/OntologyPlatform.Contracts/obj\") (subpath \"/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Modules/Agents/OntologyPlatform.Modules.Agents/obj\") (subpath \"/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Modules/SemanticQuery/OntologyPlatform.Modules.SemanticQuery/obj\") (subpath \"/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing/obj\") (subpath \"/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Modules/Publishing/OntologyPlatform.Modules.Publishing.Domain/obj\") (subpath \"/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology/obj\") (subpath \"/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Modules/Ontology/OntologyPlatform.Modules.Ontology.Domain/obj\") (subpath \"/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/obj\") (subpath \"/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Modules/Governance/OntologyPlatform.Modules.Governance/obj\") (subpath \"/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/AppHost/obj\") (subpath \"/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/ServiceDefaults/obj\") (subpath \"/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Hosts/OntologyPlatform.InfrastructureApi/obj\") (subpath \"/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/obj\") (subpath \"/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/obj\") (subpath \"/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.AgentTests/obj\") (subpath \"/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.ConnectionsTests/obj\") (subpath \"/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/obj\") (subpath \"/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/obj\") (subpath \"/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.QueryTests/obj\") (subpath \"/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.SecurityTests/obj\") (subpath \"/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.InfrastructureTests/obj\")) (deny file-read* (subpath \"/Users/chasen/.nuget/packages\"))",
+    "/usr/local/share/dotnet/dotnet",
+    "msbuild",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/AppHost/OntologyPlatform.AppHost.csproj",
+    "-nologo",
+    "-preprocess:/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-14/r2-sdk-before-aspire-imports.xml",
+    "-nodeReuse:false"
+  ],
+  "startedAtUtc": "2026-11-04T18:28:21.973435+00:00",
+  "endedAtUtc": "2026-11-04T18:28:22.322154+00:00",
+  "elapsedSeconds": 0.34859200000209967,
+  "exitCode": 0,
+  "timingStatus": "OBSERVED",
+  "timedOut": false,
+  "executedInputDrift": false,
+  "inputHashes": {
+    "/usr/bin/sandbox-exec": "58839ef01b4eef8aac0d2aa8f9d1c074ae45aafe3533965b030672450064acc8",
+    "/usr/local/share/dotnet/dotnet": "11b517e7b00d0efa20e9b3ab6fe433f135d828a4c95c9c6ca7a9cf1328b6ada4",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/AppHost/OntologyPlatform.AppHost.csproj": "c4af0d4e0db2383c5eb29a7e455150221bb4cab35420ab73cc6eaf5102c719ee"
+  },
+  "manifestSha256": "75da74022b74732f1bc837fb238af54a2397ebee28f01509cc15c2d08f2e36a2",
+  "commandSha256": "bdb66bdd24f87ac70021bae96453c8e6acb5ed8269e2a210d7fd0c214cbb6a8b",
+  "logSha256": "6d3ce42688010fa726bf8329a083cfc3fc190dade530fa357b4ed8d53d2e900f",
+  "logBytes": 570,
+  "logVisibility": "TASK_EVIDENCE"
+}

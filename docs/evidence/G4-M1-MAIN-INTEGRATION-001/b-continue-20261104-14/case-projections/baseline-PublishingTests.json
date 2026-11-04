@@ -1,0 +1,408 @@
+{
+  "cases": [
+    {
+      "case": "SelfApprovalDenied",
+      "status": "PASS",
+      "line": 1
+    },
+    {
+      "case": "ShortRoleDenied",
+      "status": "PASS",
+      "line": 2
+    },
+    {
+      "case": "ExactExpiryDenied",
+      "status": "PASS",
+      "line": 3
+    },
+    {
+      "case": "IndependentAuditorAllowed",
+      "status": "PASS",
+      "line": 4
+    },
+    {
+      "case": "ImmutableRoundtripAndDifferentContentRejected",
+      "status": "SKIP",
+      "line": 5
+    },
+    {
+      "case": "ConcurrentDifferentBytesCannotOverwrite",
+      "status": "SKIP",
+      "line": 7
+    },
+    {
+      "case": "WrongHashAndMissingObjectFailClosed",
+      "status": "SKIP",
+      "line": 9
+    },
+    {
+      "case": "SlowDependencyBecomesUnavailable",
+      "status": "SKIP",
+      "line": 11
+    },
+    {
+      "case": "CallerCancellationPropagates",
+      "status": "SKIP",
+      "line": 13
+    },
+    {
+      "case": "LegacyBindingIsExactAndNewBindingIncludesSemantics",
+      "status": "PASS",
+      "line": 15
+    },
+    {
+      "case": "LegacyV1ReadsAndRollsBackWithoutCurrentDraftAssessment",
+      "status": "SKIP",
+      "line": 16
+    },
+    {
+      "case": "HistoricalM1ProfileV1ManifestV2ReadsAndRollsBackAfterCurrentProfileUpgrade",
+      "status": "SKIP",
+      "line": 18
+    },
+    {
+      "case": "LegacyV1CorruptArtifactRollbackFailsClosed",
+      "status": "SKIP",
+      "line": 20
+    },
+    {
+      "case": "RealM3VocabularyReleaseStaysBoundToImmutableSources",
+      "status": "SKIP",
+      "line": 22
+    },
+    {
+      "case": "RealProposalRejectsUnitGovernanceEvenWhenShaclConforms (\"precision\")",
+      "status": "SKIP",
+      "line": 24
+    },
+    {
+      "case": "RealProposalRejectsUnitGovernanceEvenWhenShaclConforms (\"dimension\")",
+      "status": "SKIP",
+      "line": 26
+    },
+    {
+      "case": "ExactLegacyV2ReleaseReadsAndRollsBackWithoutRepublishingOldAssessment",
+      "status": "SKIP",
+      "line": 28
+    },
+    {
+      "case": "PublicationTracesImpactAndRecoversSuccessfulReceipt",
+      "status": "SKIP",
+      "line": 30
+    },
+    {
+      "case": "ProposalRejectsUnboundReports (\"missing\",422,\"impact_required\")",
+      "status": "SKIP",
+      "line": 32
+    },
+    {
+      "case": "ProposalRejectsUnboundReports (\"forged\",409,\"impact_binding_conflict\")",
+      "status": "SKIP",
+      "line": 34
+    },
+    {
+      "case": "ProposalRejectsUnboundReports (\"expired\",409,\"impact_expired\")",
+      "status": "SKIP",
+      "line": 36
+    },
+    {
+      "case": "ProposalRejectsUnboundReports (\"cross-version\",409,\"impact_target_conflict\")",
+      "status": "SKIP",
+      "line": 38
+    },
+    {
+      "case": "EveryPublicationBoundaryRechecksImpact (\"approval\")",
+      "status": "SKIP",
+      "line": 40
+    },
+    {
+      "case": "EveryPublicationBoundaryRechecksImpact (\"prepare\")",
+      "status": "SKIP",
+      "line": 42
+    },
+    {
+      "case": "EveryPublicationBoundaryRechecksImpact (\"final\")",
+      "status": "SKIP",
+      "line": 44
+    },
+    {
+      "case": "EveryPublicationBoundaryRechecksImpact (\"retry\")",
+      "status": "SKIP",
+      "line": 46
+    },
+    {
+      "case": "ApprovalRejectsChangedAssessmentOrProfile (False)",
+      "status": "SKIP",
+      "line": 48
+    },
+    {
+      "case": "ApprovalRejectsChangedAssessmentOrProfile (True)",
+      "status": "SKIP",
+      "line": 50
+    },
+    {
+      "case": "InitialApprovalCannotSurviveActiveBaselineOrMissingBinding",
+      "status": "SKIP",
+      "line": 52
+    },
+    {
+      "case": "FixedSevenDigitClockUsesConsistentEnvelopePrecision (False)",
+      "status": "SKIP",
+      "line": 54
+    },
+    {
+      "case": "FixedSevenDigitClockUsesConsistentEnvelopePrecision (True)",
+      "status": "SKIP",
+      "line": 56
+    },
+    {
+      "case": "VersionFourIdentityPublicationAndExactVersionThreeRollback",
+      "status": "SKIP",
+      "line": 58
+    },
+    {
+      "case": "IdentityGovernanceCannotBeOverriddenByReviewer (False)",
+      "status": "SKIP",
+      "line": 60
+    },
+    {
+      "case": "IdentityGovernanceCannotBeOverriddenByReviewer (True)",
+      "status": "SKIP",
+      "line": 62
+    },
+    {
+      "case": "FormalIdentityReadRejectsPartialScopeBeforeExternalRead",
+      "status": "SKIP",
+      "line": 64
+    },
+    {
+      "case": "ExistingValidToProvenancePublishesButUnknownMetadataDoesNot (\"validToUtc\",True)",
+      "status": "SKIP",
+      "line": 66
+    },
+    {
+      "case": "ExistingValidToProvenancePublishesButUnknownMetadataDoesNot (\"validUntilUtc\",False)",
+      "status": "SKIP",
+      "line": 68
+    },
+    {
+      "case": "BackgroundRestartAndDuplicateConsume",
+      "status": "SKIP",
+      "line": 70
+    },
+    {
+      "case": "StaleFenceCannotCommitConsumption",
+      "status": "SKIP",
+      "line": 72
+    },
+    {
+      "case": "InvalidDiscriminatedRequestRejectedBeforeDependencies (\"missing-publish\")",
+      "status": "PASS",
+      "line": 74
+    },
+    {
+      "case": "InvalidDiscriminatedRequestRejectedBeforeDependencies (\"mixed-rollback\")",
+      "status": "PASS",
+      "line": 75
+    },
+    {
+      "case": "InvalidDiscriminatedRequestRejectedBeforeDependencies (\"hash-invalid\")",
+      "status": "PASS",
+      "line": 76
+    },
+    {
+      "case": "ExternalPhaseFailurePreservesOldActiveAndRetry (\"s3-write\")",
+      "status": "SKIP",
+      "line": 77
+    },
+    {
+      "case": "ExternalPhaseFailurePreservesOldActiveAndRetry (\"s3-read\")",
+      "status": "SKIP",
+      "line": 79
+    },
+    {
+      "case": "ExternalPhaseFailurePreservesOldActiveAndRetry (\"jena-write\")",
+      "status": "SKIP",
+      "line": 81
+    },
+    {
+      "case": "ExternalPhaseFailurePreservesOldActiveAndRetry (\"jena-read\")",
+      "status": "SKIP",
+      "line": 83
+    },
+    {
+      "case": "ExternalPhaseFailurePreservesOldActiveAndRetry (\"jena-shacl\")",
+      "status": "SKIP",
+      "line": 85
+    },
+    {
+      "case": "PostgreSqlWriteFailureRollsBackWholeActivation (\"active\")",
+      "status": "SKIP",
+      "line": 87
+    },
+    {
+      "case": "PostgreSqlWriteFailureRollsBackWholeActivation (\"activation\")",
+      "status": "SKIP",
+      "line": 89
+    },
+    {
+      "case": "PostgreSqlWriteFailureRollsBackWholeActivation (\"audit\")",
+      "status": "SKIP",
+      "line": 91
+    },
+    {
+      "case": "PostgreSqlWriteFailureRollsBackWholeActivation (\"outbox\")",
+      "status": "SKIP",
+      "line": 93
+    },
+    {
+      "case": "ConcurrentIdenticalActivationReturnsSameFact",
+      "status": "SKIP",
+      "line": 95
+    },
+    {
+      "case": "ConcurrentDifferentProposalsOnlyOneCasWinner",
+      "status": "SKIP",
+      "line": 97
+    },
+    {
+      "case": "DamagedPublishedGraphUnavailableAndReconciliationRetries",
+      "status": "SKIP",
+      "line": 99
+    },
+    {
+      "case": "PublishTwoVersionsRollbackOldCompleteManifestAndReplay",
+      "status": "SKIP",
+      "line": 101
+    },
+    {
+      "case": "ApprovalBoundaries (\"self\",403)",
+      "status": "SKIP",
+      "line": 103
+    },
+    {
+      "case": "ApprovalBoundaries (\"role\",403)",
+      "status": "SKIP",
+      "line": 105
+    },
+    {
+      "case": "ApprovalBoundaries (\"scope\",403)",
+      "status": "SKIP",
+      "line": 107
+    },
+    {
+      "case": "ApprovalBoundaries (\"expiry\",409)",
+      "status": "SKIP",
+      "line": 109
+    },
+    {
+      "case": "ActivationBoundaries (\"pending\")",
+      "status": "SKIP",
+      "line": 111
+    },
+    {
+      "case": "ActivationBoundaries (\"rejected\")",
+      "status": "SKIP",
+      "line": 113
+    },
+    {
+      "case": "ActivationBoundaries (\"expiry\")",
+      "status": "SKIP",
+      "line": 115
+    },
+    {
+      "case": "ActivationBoundaries (\"changed\")",
+      "status": "SKIP",
+      "line": 117
+    },
+    {
+      "case": "ActivationBoundaries (\"cas\")",
+      "status": "SKIP",
+      "line": 119
+    },
+    {
+      "case": "TamperedRollbackTargetRejected",
+      "status": "SKIP",
+      "line": 121
+    },
+    {
+      "case": "ActualMigrationDownGuard (\"empty\")",
+      "status": "SKIP",
+      "line": 123
+    },
+    {
+      "case": "ActualMigrationDownGuard (\"nonempty\")",
+      "status": "SKIP",
+      "line": 125
+    },
+    {
+      "case": "ActualMigrationDownGuard (\"concurrent\")",
+      "status": "SKIP",
+      "line": 127
+    },
+    {
+      "case": "RollbackProposalReceiptSurvivesExternalOutage (\"replay\")",
+      "status": "SKIP",
+      "line": 129
+    },
+    {
+      "case": "RollbackProposalReceiptSurvivesExternalOutage (\"payload\")",
+      "status": "SKIP",
+      "line": 131
+    },
+    {
+      "case": "RollbackProposalReceiptSurvivesExternalOutage (\"scope\")",
+      "status": "SKIP",
+      "line": 133
+    },
+    {
+      "case": "RollbackProposalReceiptSurvivesExternalOutage (\"subject\")",
+      "status": "SKIP",
+      "line": 135
+    },
+    {
+      "case": "RollbackRequiresFreshIndependentBoundApproval (\"self\")",
+      "status": "SKIP",
+      "line": 137
+    },
+    {
+      "case": "RollbackRequiresFreshIndependentBoundApproval (\"expiry\")",
+      "status": "SKIP",
+      "line": 139
+    },
+    {
+      "case": "RollbackRequiresFreshIndependentBoundApproval (\"binding\")",
+      "status": "SKIP",
+      "line": 141
+    },
+    {
+      "case": "RollbackFailurePreservesCurrentAndSameCommandRecovers (\"artifact\")",
+      "status": "SKIP",
+      "line": 143
+    },
+    {
+      "case": "RollbackFailurePreservesCurrentAndSameCommandRecovers (\"audit\")",
+      "status": "SKIP",
+      "line": 145
+    },
+    {
+      "case": "RollbackFailurePreservesCurrentAndSameCommandRecovers (\"outbox\")",
+      "status": "SKIP",
+      "line": 147
+    }
+  ],
+  "summary": {
+    "total": 78,
+    "PASS": 8,
+    "FAIL": 0,
+    "SKIP": 70
+  },
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-14",
+  "testedCommit": "4a64070ac6f9be906512d11956252909085e9a8b",
+  "project": "PublishingTests",
+  "assemblySha256": "cbe69f05e3ff8207bfcd58c452e5f5549dcfa2651103d233fc4ebb8a229ed9d0",
+  "rawLogSha256": "876c3f917f8d32f6725378c4772353c28e3235ddeaea0b8538b655db9c8334c3",
+  "commandReceiptSha256": "ef3fa2b83fd0accaf3b522c734d548205b51f1df391becd2a6468e5789b9da70",
+  "command": "baseline-PublishingTests"
+}

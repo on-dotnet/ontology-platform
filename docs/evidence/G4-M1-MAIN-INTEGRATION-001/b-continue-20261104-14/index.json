@@ -1,0 +1,63 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-14",
+  "testedCommit": "4a64070ac6f9be906512d11956252909085e9a8b",
+  "status": "BLOCKED_WITH_WITNESS",
+  "gates": {
+    "R2": "PASS",
+    "I01": "PARTIAL",
+    "I05": "PASS",
+    "I03": "PARTIAL",
+    "I02": "BLOCKED_WITH_WITNESS",
+    "I04": "NOT_RUN",
+    "I06": "NOT_RUN",
+    "I07": "NOT_RUN",
+    "I08": "NOT_RUN"
+  },
+  "native": {
+    "total": 780,
+    "passed": 344,
+    "skipped": 436,
+    "failed": 0,
+    "closedSkippedCases": 0
+  },
+  "webTests": 379,
+  "selfTestSuites": 27,
+  "taskTestsAtT": 42,
+  "targetedTestsAfterFix": 44,
+  "rootCause": "two __main__ blocks; earlier parser rejected --ingress before daemon was reachable",
+  "productModulesExecuted": false,
+  "newTAndFullRunRequired": true,
+  "ignoredLargeInputs": [
+    {
+      "path": "r2-sdk-before-mstest-imports.xml",
+      "bytes": 1628467,
+      "sha256": "edfe0347ae1690d223e189cde1843f3c411290891fd111d682bd543b2fc59f36"
+    },
+    {
+      "path": "r2-sdk-after-aspire-imports.xml",
+      "bytes": 1616931,
+      "sha256": "36e000fc0cc06b08a4cd3c0dbacb5a6b41deac859260b842af8d3de072ffa1a3"
+    },
+    {
+      "path": "r2-sdk-before-aspire-imports.xml",
+      "bytes": 1616931,
+      "sha256": "1ec49f2c41ff79192767e85a6f8708ab5a90fe573d57f4f7d5dc876cdf7bd533"
+    },
+    {
+      "path": "r2-sdk-after-mstest-imports.xml",
+      "bytes": 1628467,
+      "sha256": "a681715e0d9fe675a086fb79108fb13e2999a2c69945aa1eefd654ed67fadb6f"
+    },
+    {
+      "path": "restore-stdout.txt",
+      "bytes": 52463318,
+      "sha256": "983784d31a288c7f85bb038524f589b46b669a09c1943c39e5a8bf452c31ddb6"
+    },
+    {
+      "path": "web-cache-files.json",
+      "bytes": 8821586,
+      "sha256": "fec5f0dc296535f8510e086370de3e6fbe9ac494715683721cdd24ef64f6beba"
+    }
+  ]
+}

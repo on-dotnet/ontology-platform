@@ -64,3 +64,6 @@ Run11 / Tbf7fb4719a1ec7084076c7f7ff16c3ddf43f5269：R2及独立后验PASS，27�
 Run12 / T0ed73cf1a82f73ee3e2be455c431fea1fa978685 在prepare_nuget前误调用R2，被PATH_MISSING拒绝，未启动Restore；原回执保留。相同T的新Run13完成私有依赖准备、R1/R2独立审查、完整严格离线Restore及I01全工程（27套SelfTest376.75秒、36任务测试、native/Web exit0、780总344PASS436SKIP0FAIL、Web379）。I05真实生成链/6负例通过，I03拒绝及注册图部分通过。I02挂载审计已通过，但internal-only网络不发布宿主端口，HTTP_READY_TIMEOUT；容器内Fuseki/RustFS健康200，模块尚未执行，436skip仍0闭合。
 
 本轮仅任务runtime/closeout/migration适配器及tests补精确loopback ingress：固定本机Engine Unix API、准确完整容器ID/Task/Run/镜像/同Run internal网络与IP、低权限Perl透明TCP，32连接、120秒连接期限和4小时进程期限；生产调用路径未改变，未增加网络/镜像/依赖。2MiB真实传输曾发现stdout/stderr跨流EOF乱序，修复后定向通过；真实daemon v3端口冲突/容量/父SIGKILL外部回收/目标已停止回收通过，远端deadline124与子SIGKILL137传播通过。42任务测试及最终19driver独立Review PASS，详见Run13/relay-final-inputs.json。必须再冻结新T/Run完成全流程，不能移用旧T的产品结果；无新V3/main/M2。
+
+
+Run14 / T4a64070ac6f9be906512d11956252909085e9a8b：R2严格离线及独立后验PASS（21项目168包，5.534秒）；原27套SelfTest368.24秒、42任务测试、native/Web通过，780总344PASS436SKIP0FAIL，Web379。I05 PASS、I03拒绝/DI图PARTIAL。I02正式ingress CLI被runtime早期__main__旧parser拒绝，未执行模块；此前直接daemon诊断未覆盖正式入口，相关可执行性推断撤回。现仅runtime/tests统一底部单入口，两模式实际文件子进程正反及44任务测试通过，独立Review PASS；stub派发测试不是设施/产品PASS。七Docker对象已精确回收，monitor释放；需新T/Run完整验收，旧记录不重写，无新V3/main/M2。详见b-continue-20261104-14/index.json。

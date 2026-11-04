@@ -15,6 +15,52 @@ ARTIFACTS = ROOT / 'artifacts/g4-m1-main-integration-001'
 class HostBoundaryTests(unittest.TestCase):
     """观测开始前必须拒绝目录越界、历史身份和已存在的证据。"""
 
+    def test_runtime_real_cli_reaches_shared_binding_for_both_modes(self):
+        """真实脚本入口解析两模式；非法Head须由共同绑定拒绝而不是旧解析器截断。"""
+        command=[sys.executable,'-B',str(HERE/'runtime.py')]
+        help_result=subprocess.run(command+['--help'],cwd=ROOT,capture_output=True,text=True,timeout=5)
+        self.assertEqual(help_result.returncode,0)
+        self.assertIn('--ingress',help_result.stdout)
+        binding=['--run-id','b-continue-20261104-14','--expected-head','invalid','--resource-manifest',str(ARTIFACTS/'missing.json')]
+        for mode in ([],['--ingress','modules'],['--ingress','g3'],['--ingress','m1']):
+            with self.subTest(mode=mode):
+                result=subprocess.run(command+mode+binding,cwd=ROOT,capture_output=True,text=True,timeout=5)
+                self.assertEqual(result.returncode,2)
+                self.assertIn('REFUSED_RUNTIME_BOUNDARY',result.stderr)
+                self.assertNotIn('unrecognized arguments',result.stderr)
+
+    def test_runtime_file_dispatches_once_after_all_definitions(self):
+        """子进程执行实际文件，只替换外部效果；两模式均须经过绑定且只派发一次。"""
+        script='''import json,runpy,sys
+path,*args=sys.argv[1:];sys.argv=[path,*args];events=[]
+def trace(frame,event,arg):
+ if event=='call' and frame.f_code.co_name=='cli' and frame.f_code.co_filename==path:
+  g=frame.f_globals
+  def load(*values):events.append(['binding',list(values)]);return {'runId':'fixture'}
+  def verify(m):events.append(['verify',m])
+  async def daemon(m,group):events.append(['ingress',m,group])
+  assert 'ingress_daemon' in g
+  g.update(load_manifest=load,verify_engine=verify,ingress_daemon=daemon);sys.settrace(None)
+ return trace
+sys.settrace(trace)
+try:runpy.run_path(path,run_name='__main__')
+finally:print('DISPATCH_EVENTS='+json.dumps(events))
+'''
+        command=[sys.executable,'-B','-c',script,str(HERE/'runtime.py')]
+        binding=['--run-id','b-continue-20261104-14','--expected-head','a'*40,'--resource-manifest','fixture']
+        for mode in ([],['--ingress','modules'],['--ingress','g3'],['--ingress','m1']):
+            with self.subTest(mode=mode):
+                result=subprocess.run(command+mode+binding,cwd=ROOT,capture_output=True,text=True,timeout=5)
+                self.assertEqual(result.returncode,0,result.stderr)
+                events=json.loads(result.stdout.split('DISPATCH_EVENTS=')[1])
+                self.assertEqual([row[0] for row in events],['binding','ingress' if mode else 'verify'])
+                if mode:self.assertEqual(events[1][2],mode[1])
+        for args in (binding+['--run-id','duplicate'],binding[:-2],['--ingress','foreign']+binding,binding+['--task-id','old']):
+            with self.subTest(args=args):
+                result=subprocess.run(command+args,cwd=ROOT,capture_output=True,text=True,timeout=5)
+                self.assertEqual(result.returncode,2)
+                self.assertIn('DISPATCH_EVENTS=[]',result.stdout)
+
     def invoke(self, path, *args):
         """固定解释器和有界子进程，不运行默认长监测。"""
         return subprocess.run([sys.executable, '-B', str(HERE / 'host_continuity.py'),

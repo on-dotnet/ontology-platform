@@ -1,0 +1,79 @@
+{
+  "status": "PASS",
+  "deleted": 7,
+  "absence": [
+    {
+      "kind": "container",
+      "id": "5852211f0741efd8c5ae745577abc77fd4836394ad8d2f8aa44eeee7f5e6a8aa",
+      "exitCode": 1,
+      "stderrSha256": "1dcb5b67fff5bf8dc18bd2b72f092501c5594b89bd7c44b298c7ddf2f1b3b613",
+      "exactAbsent": true
+    },
+    {
+      "kind": "container",
+      "id": "75c5fdeeba4a4ea257626ff94c828187b1a8777deca0f143757a124fa7ff9d27",
+      "exitCode": 1,
+      "stderrSha256": "d6350755c933e717de0d3cedd90fda5ee5c67009a4c8c88f5f92fac021e3ded8",
+      "exactAbsent": true
+    },
+    {
+      "kind": "container",
+      "id": "c8c370adf780f219bda266ff4a89c170251379b61d75cbb7d08edbd19b8b55d4",
+      "exitCode": 1,
+      "stderrSha256": "fcf3767d6eb6645e62545510f98dc50161df1df319b68a314686768146d58e75",
+      "exactAbsent": true
+    },
+    {
+      "kind": "network",
+      "id": "91a2fe7d0f04cfeebf035a2f88e63be0561207c3da5fe56b937d00630eaf238f",
+      "exitCode": 1,
+      "stderrSha256": "102cc8b0aae926edec8f8eb579e3d0b2a35fcf0be28184329933d769ba27f534",
+      "exactAbsent": true
+    },
+    {
+      "kind": "volume",
+      "id": "ontology-g4-main-b-continue-20261104-14_fuseki-data",
+      "exitCode": 1,
+      "stderrSha256": "bc1ba1a159b7d29e67e69229478ee42b47dd7a8df25e43f3e3ff2440e561132c",
+      "exactAbsent": true
+    },
+    {
+      "kind": "volume",
+      "id": "ontology-g4-main-b-continue-20261104-14_platform-data",
+      "exitCode": 1,
+      "stderrSha256": "4d6d07e913dc18200654ed5881974f0a2030d64113ce71d2443f1f23c8fb6e52",
+      "exactAbsent": true
+    },
+    {
+      "kind": "volume",
+      "id": "ontology-g4-main-b-continue-20261104-14_rustfs-data",
+      "exitCode": 1,
+      "stderrSha256": "a96cf6db69ffed50ed541858488d59df292d3cb360fe4cb83c9411e04fdc46f9",
+      "exactAbsent": true
+    }
+  ],
+  "keepVerified": true,
+  "ingress": {
+    "modules": {
+      "status": "PASS",
+      "taskId": "G4-M1-MAIN-INTEGRATION-001",
+      "runId": "b-continue-20261104-14",
+      "testedCommit": "4a64070ac6f9be906512d11956252909085e9a8b",
+      "pid": 13730,
+      "processReceiptSha256": "10ceed468cc66d023380e0787d9bc8edcd3bba207763e11de16b563fdb1085c0",
+      "portsReleased": [],
+      "execExits": [],
+      "remoteObservations": []
+    },
+    "g3": {
+      "status": "NOT_STARTED"
+    },
+    "m1": {
+      "status": "NOT_STARTED"
+    }
+  },
+  "executionInputs": {
+    "runtime.py": "52fa756e8bb619acb38b15981c9eaa1ed3d13fde7176b45fa284892987aaa88b",
+    "closeout.py": "3d034d254009f01eeefedb3d482c37f40c5907697f0058d39640ae013badeebb"
+  }
+}

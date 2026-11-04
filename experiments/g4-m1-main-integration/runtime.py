@@ -337,23 +337,21 @@ def runtime_value(m):
 
 
 def cli():
-    """只读CLI用于所有JS消费者同一边界；无隐式资源创建。"""
+    """统一入口先绑定身份；仅显式ingress模式启动固定组监听。"""
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--ingress', choices=('modules','g3','m1'))
     parser.add_argument('--run-id', required=True)
     parser.add_argument('--expected-head', required=True)
     parser.add_argument('--resource-manifest', required=True)
     args = parser.parse_args()
+    require(len(sys.argv)==(9 if args.ingress else 7) and len(set(sys.argv[1::2]))==(4 if args.ingress else 3),'EXACT_ARGUMENT_SET')
     m = load_manifest(args.resource_manifest, args.run_id, args.expected_head)
+    if args.ingress:
+        import asyncio
+        asyncio.run(ingress_daemon(m,args.ingress))
+        return
     verify_engine(m)
     print(json.dumps({'taskId': TASK, 'runId': args.run_id, 'status': 'IDENTITY_VERIFIED'}))
-
-
-if __name__ == '__main__':
-    try:
-        cli()
-    except (ValueError, OSError, subprocess.SubprocessError):
-        print('REFUSED_RUNTIME_BOUNDARY', file=sys.stderr)
-        raise SystemExit(2)
 
 
 def build_fingerprint():
@@ -1095,13 +1093,9 @@ if p.returncode==0:
         write_json(ARTIFACTS/self.m['runId']/('pause-'+self.service+'-'+str(self.guard.pid)+'-end.json'),dict(self.record,pausedAfter=False,guardExitCode=self.guard.returncode))
 
 
-if __name__=='__main__':
-    import argparse,asyncio,sys
-    parser=argparse.ArgumentParser(description='Task-only fixed loopback ingress')
-    parser.add_argument('--ingress',choices=('modules','g3','m1'),required=True)
-    parser.add_argument('--run-id',required=True)
-    parser.add_argument('--expected-head',required=True)
-    parser.add_argument('--resource-manifest',required=True)
-    args=parser.parse_args()
-    require(len(sys.argv)==9 and len(set(sys.argv[1::2]))==4,'EXACT_ARGUMENT_SET')
-    asyncio.run(ingress_daemon(load_manifest(args.resource_manifest,args.run_id,args.expected_head),args.ingress))
+if __name__ == '__main__':
+    try:
+        cli()
+    except (ValueError, OSError, subprocess.SubprocessError):
+        print('REFUSED_RUNTIME_BOUNDARY', file=sys.stderr)
+        raise SystemExit(2)
