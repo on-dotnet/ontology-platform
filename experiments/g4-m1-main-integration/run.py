@@ -528,8 +528,8 @@ def contracts(m):
     rt.check_build(m)
     output=rt.ARTIFACTS/m['runId']/'g4-export.json'
     rt.require(not output.exists(),'EXISTING_EXPORT')
-    rt.execute(m,'openapi-export',[DOTNET,str(rt.ROOT/'backend/src/Hosts/OntologyPlatform.Api/bin/Debug/net10.0/OntologyPlatform.Api.dll'),'--export-g4-openapi',str(output)])
-    raw=rt.execute(m,'contract-chain',[NODE,str(rt.HERE/'contract-check.mjs'),'--runtime-openapi',str(output),'--output',str(rt.ARTIFACTS/m['runId']/'regenerated')])
+    rt.execute(m,'openapi-export',rt.offline_command([DOTNET,str(rt.ROOT/'backend/src/Hosts/OntologyPlatform.Api/bin/Debug/net10.0/OntologyPlatform.Api.dll'),'--export-g4-openapi',str(output)],loopback=True),timeout=30)
+    raw=rt.execute(m,'contract-chain',rt.offline_command([NODE,str(rt.HERE/'contract-check.mjs'),'--runtime-openapi',str(output),'--output',str(rt.ARTIFACTS/m['runId']/'regenerated')]),timeout=30)
     return json.loads(raw)
 
 

@@ -1,0 +1,28 @@
+{
+  "status": "PASS",
+  "reviewer": "/root/consumer_review",
+  "stage": "R1_CONTRACT_NEGATIVE_FIX",
+  "drivers": {
+    "run.py": "d8ffe64f521778115d4bdd52d463d21a616a2d4edd66abd94c307d31efc84dd2",
+    "consumer_check.py": "ca1f7d6b02053b7d6962253d169a0af2e9a33a45b28c856a64796f194de0c768",
+    "runtime.py": "9aae533748e52b11c0ac251bfcc3cf5a380f6d2317da195980af422dd8375a12",
+    "pg_fixture.py": "0b3e95134d76bb356fa2f14f21da58886675d6c553b2daf2f643895dc4591f51",
+    "module-tests.py": "283d4f3d8d9ac293d02e2ca5baa3934d2db15b195661d522db180558ed446a99",
+    "startup-boundary.py": "256bba53361f407d0a4071c9c7bd951019418e2193e56aaa604155510d04289c",
+    "migration-boundary.py": "478e3817fccde79b1356d96ac8bc9124731dd5470c5eb17ea1b74c39711f1772",
+    "contract-check.mjs": "3a7f662352a1d182f0f53f96703cfbb1f8d6f152443d3ab5bc8b2a525c5b01ea",
+    "http.mjs": "c98e018d1748a3bb57a2ee70e71574633a1616e238528eb2f45c02aba83281eb",
+    "browser.mjs": "b2558c334e3896db180a3cb82f35345bfc208edb65266b963901a0d10ffdb758",
+    "fault.mjs": "69557b1f546ded5125ac8b425eb3f8872c8d788a8246fd577f86f9551b1f5939",
+    "g3-compatibility.mjs": "48dbc12affa5e28853ceb55d70d75ca6400d5487f95916f3c1aaf32faf7d46d3",
+    "readback.py": "51afad2d4284dff92dbc011744c76dc2d5dec6888fdeb79a6929ed7568508293",
+    "closeout.py": "f8b2a813b6de2ae3996cbfce0498f885911bfa129cb40c9c6283a9c0a2e9e7d3",
+    "tests.py": "7025bd9658ba5cef5a6f4fa3692e453dc7160b86833f5ee372e733d2e044adc9",
+    "host_continuity.py": "abd4385e1b05a86f5a12582a7e95a1fcc4a29c333eb23d2d952229744ed68984",
+    "compose.m1.yaml": "4f66652b69d9893d4c4372111a1b595558c33a7d9fda40398c5f674de79c413e",
+    "compose.g3.yaml": "e459e9c3a608806057cbdd25bdf27de14fcc8c9e09944062a0baf0fcbc803526",
+    "hooks/pre-push": "5eaef2482b8b75cb1deb7cca9703f591a0a15c2459e49c5192b4382ccb7ad474"
+  },
+  "testsSha256": "13a86f14ee77728628e18e06e7117b1768544deb5ab2f7313120d3916e2b7213",
+  "rawReview": "最小修复独立PASS可冻结新T。19驱动清单SHA20f40e5fc679a813cc142f8b9e4cd1319b357b7b4c3060c4de57bcc62fc2b65e核对；实际PG properties.type.enum负例保留required/DTO和三客户端负例，独立实际合同正反通过。短诊断导出及三再生hash一致，35tests原始日志PASS。入口明确外网禁止、export仅loopback、两步各30秒；diff-check通过。这不是I05 PASS，须新T/Run R2独立后验及完整I01/I05。精确A11四副本plan d76214b17f31a2fd53526bfe881f06eb5fda5ca90b2a0617c0bf2a5f0d1e6c5e获准Apply，实际lsof全部exit1双流0B，事故KEEP重验匹配。"
+}

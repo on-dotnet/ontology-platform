@@ -18,6 +18,16 @@ export function compareDocument(actual, expected) {
 export function compareTypes(actual, expected) {
   if (actual !== expected) throw new Error('GENERATED_CLIENT_DRIFT');
 }
+export function schemaMutations(frozen) {
+  const schemas = frozen.components.schemas;
+  const requiredKey = Object.keys(schemas).find(k => schemas[k].required?.length);
+  const discriminator = schemas.ConnectionConfigPgConnectionConfig?.properties?.type;
+  if (!requiredKey || canonical(discriminator?.enum) !== canonical(['POSTGRESQL'])) throw new Error('NEGATIVE_SCHEMA_MISSING');
+  const requiredMutation=structuredClone(frozen); requiredMutation.components.schemas[requiredKey].required=[];
+  const enumMutation=structuredClone(frozen); enumMutation.components.schemas.ConnectionConfigPgConnectionConfig.properties.type.enum.push('INVALID_TEST_ENUM');
+  const dtoMutation=structuredClone(frozen); dtoMutation.components.schemas[requiredKey].properties.testAddedField={type:'string'};
+  return [requiredMutation,enumMutation,dtoMutation];
+}
 function reject(work) { let caught = false; try { work(); } catch { caught = true; } if (!caught) throw new Error('NEGATIVE_ACCEPTED'); }
 if (process.argv[1] === import.meta.filename) {
   const args = process.argv.slice(2);
@@ -43,13 +53,6 @@ if (process.argv[1] === import.meta.filename) {
     writeFileSync(resolve(output,target),text,{flag:'wx'}); generated.push({source,target,sha256:sha(text)});
     reject(()=>compareTypes(text+'\n// changed client',text));
   }
-  const schemas = frozen.components.schemas;
-  const requiredKey = Object.keys(schemas).find(k => schemas[k].required?.length);
-  const enumKey = Object.keys(schemas).find(k => schemas[k].enum?.length);
-  if (!requiredKey || !enumKey) throw new Error('NEGATIVE_SCHEMA_MISSING');
-  const requiredMutation=structuredClone(frozen); requiredMutation.components.schemas[requiredKey].required=[];
-  const enumMutation=structuredClone(frozen); enumMutation.components.schemas[enumKey].enum.push('INVALID_TEST_ENUM');
-  const dtoMutation=structuredClone(frozen); dtoMutation.components.schemas[requiredKey].properties.testAddedField={type:'string'};
-  for(const mutation of [requiredMutation,enumMutation,dtoMutation]) reject(()=>compareDocument(mutation,frozen));
+  for(const mutation of schemaMutations(frozen)) reject(()=>compareDocument(mutation,frozen));
   console.log(JSON.stringify({status:'PASS',scope:'Actual exported G4 OpenAPI + frozen G1/G2/G4 generators; G3 contract schema is in G2',generated,negativeCases:6,runtimeSha256:sha(readFileSync(runtimeFile))}));
 }

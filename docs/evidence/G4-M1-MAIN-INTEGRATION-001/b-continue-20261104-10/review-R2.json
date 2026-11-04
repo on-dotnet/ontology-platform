@@ -1,0 +1,35 @@
+{
+  "status": "PASS",
+  "reviewer": "/root/consumer_review",
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-10",
+  "testedCommit": "636c7b46924f8e09d98cd915fa9dcb7cb226ffbe",
+  "manifestSha256": "92cdee0805d0068a10a7e889441e64a111f50cb351f9a3bb7a67548e2cc01171",
+  "drivers": {
+    "run.py": "c626ad12965480d9f4348036692b7134a461de8f7604bf36f984f7bc6662e64f",
+    "consumer_check.py": "ca1f7d6b02053b7d6962253d169a0af2e9a33a45b28c856a64796f194de0c768",
+    "runtime.py": "9aae533748e52b11c0ac251bfcc3cf5a380f6d2317da195980af422dd8375a12",
+    "pg_fixture.py": "0b3e95134d76bb356fa2f14f21da58886675d6c553b2daf2f643895dc4591f51",
+    "module-tests.py": "283d4f3d8d9ac293d02e2ca5baa3934d2db15b195661d522db180558ed446a99",
+    "startup-boundary.py": "256bba53361f407d0a4071c9c7bd951019418e2193e56aaa604155510d04289c",
+    "migration-boundary.py": "478e3817fccde79b1356d96ac8bc9124731dd5470c5eb17ea1b74c39711f1772",
+    "contract-check.mjs": "d3cdd0b27e77952e7003e6922d3b341f7d82d8562c5836f745f751813dbdcddd",
+    "http.mjs": "c98e018d1748a3bb57a2ee70e71574633a1616e238528eb2f45c02aba83281eb",
+    "browser.mjs": "b2558c334e3896db180a3cb82f35345bfc208edb65266b963901a0d10ffdb758",
+    "fault.mjs": "69557b1f546ded5125ac8b425eb3f8872c8d788a8246fd577f86f9551b1f5939",
+    "g3-compatibility.mjs": "48dbc12affa5e28853ceb55d70d75ca6400d5487f95916f3c1aaf32faf7d46d3",
+    "readback.py": "51afad2d4284dff92dbc011744c76dc2d5dec6888fdeb79a6929ed7568508293",
+    "closeout.py": "f8b2a813b6de2ae3996cbfce0498f885911bfa129cb40c9c6283a9c0a2e9e7d3",
+    "tests.py": "fc06319499676c36c5d813f7fd89b7b53f64f3a93cc975200818f61116b9cab7",
+    "host_continuity.py": "abd4385e1b05a86f5a12582a7e95a1fcc4a29c333eb23d2d952229744ed68984",
+    "compose.m1.yaml": "4f66652b69d9893d4c4372111a1b595558c33a7d9fda40398c5f674de79c413e",
+    "compose.g3.yaml": "e459e9c3a608806057cbdd25bdf27de14fcc8c9e09944062a0baf0fcbc803526",
+    "hooks/pre-push": "5eaef2482b8b75cb1deb7cca9703f591a0a15c2459e49c5192b4382ccb7ad474"
+  },
+  "evidenceHashes": {
+    "gate-R2.json": "91d6e25b64e24979c7cca853d8f663a8385a58b46ec0a14123b036d30bd1576d",
+    "restore-result.json": "e41d4fff9bba5ff73545d0823a63f1f528744bfd33d13e3b3910341c80b856ad",
+    "restore-provenance.json": "109c116665b6043460eff759fcb82c8225b087a863bf8259cd9fa7082b64886a"
+  },
+  "rawReview": "Run10 R2独立后验PASS，允许同T/Run PREFLIGHT/I01。独立重验HEAD/源码/工具/R1、私有feed、两个SDK完整载荷、21assets168包、4份实际SDK预处理全部匹配；命令环境符合OS全断网及精确写入白名单。PID19446实际exit0 5.596秒0warning/error，原始双流散列匹配，无停止标记，HTTP缓存空，旧事件KEEP不变。仅只读核验，不代表I01-I08通过，不授权main。"
+}

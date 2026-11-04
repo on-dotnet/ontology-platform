@@ -377,6 +377,11 @@ class RecoveryIsolationTests(unittest.TestCase):
 
 
 class CaseProjectionTests(unittest.TestCase):
+    def test_real_contract_nested_enum_mutations_are_all_rejected(self):
+        script="""import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';import {compareDocument,schemaMutations} from './experiments/g4-m1-main-integration/contract-check.mjs';const doc=JSON.parse(readFileSync('docs/contracts/g4-connections.openapi.json'));const before=JSON.stringify(doc);compareDocument(doc,doc);const changes=schemaMutations(doc);assert.equal(changes.length,3);for(const changed of changes)assert.throws(()=>compareDocument(changed,doc),/OPENAPI_DRIFT/);assert.deepEqual(changes[1].components.schemas.ConnectionConfigPgConnectionConfig.properties.type.enum,['POSTGRESQL','INVALID_TEST_ENUM']);assert.equal(JSON.stringify(doc),before);console.log('actual frozen nested enum: positive + 3 negatives PASS');"""
+        result=subprocess.run(['/opt/homebrew/opt/node@24/bin/node','--input-type=module','-e',script],cwd=ROOT,capture_output=True,timeout=10)
+        self.assertEqual(result.returncode,0,result.stderr.decode())
+
     def test_workspace_copy_relocation_forces_real_revalidation(self):
         import run,copy
         manifests={'':{'name':'ontology-platform'},'/apps/web':{'name':'@ontology-platform/web','version':'0.1.0'}}

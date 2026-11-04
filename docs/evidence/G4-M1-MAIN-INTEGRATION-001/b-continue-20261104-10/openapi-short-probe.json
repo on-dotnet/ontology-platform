@@ -1,0 +1,20 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-10",
+  "testedCommit": "636c7b46924f8e09d98cd915fa9dcb7cb226ffbe",
+  "command": [
+    "/usr/bin/sandbox-exec",
+    "-p",
+    "(version 1) (allow default) (deny network-outbound (remote ip \"*:*\")) (allow network-outbound (remote ip \"localhost:*\"))",
+    "/usr/local/share/dotnet/dotnet",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/bin/Debug/net10.0/OntologyPlatform.Api.dll",
+    "--export-g4-openapi",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-10/g4-export-short-probe.json"
+  ],
+  "changedCondition": "parent execution outside desktop restricted filesystem sandbox, explicit task OS external network deny with loopback allowed",
+  "exitCode": 0,
+  "timedOut": false,
+  "elapsedSeconds": 0.25780145800308674,
+  "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "exportExists": true
+}

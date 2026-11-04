@@ -1,0 +1,44 @@
+{
+  "qualification": "targeted dirty task-driver correction; not I05 PASS",
+  "parentT": "636c7b46924f8e09d98cd915fa9dcb7cb226ffbe",
+  "command": [
+    "/usr/bin/sandbox-exec",
+    "-p",
+    "(version 1) (allow default) (deny network*)",
+    "/opt/homebrew/opt/node@24/bin/node",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/experiments/g4-m1-main-integration/contract-check.mjs",
+    "--runtime-openapi",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-10/g4-export-short-probe.json",
+    "--output",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-10/regenerated-fixed-probe"
+  ],
+  "driverSha256": "3a7f662352a1d182f0f53f96703cfbb1f8d6f152443d3ab5bc8b2a525c5b01ea",
+  "exportSha256": "a38327b30c71844347d5bba10edce272a008eb7fd3855f73ef277d3eedfe862f",
+  "exitCode": 0,
+  "timedOut": false,
+  "elapsedSeconds": 0.06995462499980931,
+  "stdoutSha256": "60f0fe3218a3117c199f7f907ce450f71c7ee5397e45162cbec9da57b5666cd6",
+  "result": {
+    "status": "PASS",
+    "scope": "Actual exported G4 OpenAPI + frozen G1/G2/G4 generators; G3 contract schema is in G2",
+    "generated": [
+      {
+        "source": "g1-platform.openapi.json",
+        "target": "generated.ts",
+        "sha256": "725dc4b85709aac229b6743e5f5309d981e7a6a8a46a06212206acf1a71e918d"
+      },
+      {
+        "source": "g2-platform.openapi.json",
+        "target": "g2-generated.ts",
+        "sha256": "8ddd4379164ccc1313aefe7846db391c665e093d349cfe0a2f62edcb9bfa9b17"
+      },
+      {
+        "source": "g4-connections.openapi.json",
+        "target": "g4-generated.ts",
+        "sha256": "1bde16a67d02216d0389205e2d29993be7a6992818e2c847e98e8a704d6e8a44"
+      }
+    ],
+    "negativeCases": 6,
+    "runtimeSha256": "a38327b30c71844347d5bba10edce272a008eb7fd3855f73ef277d3eedfe862f"
+  }
+}

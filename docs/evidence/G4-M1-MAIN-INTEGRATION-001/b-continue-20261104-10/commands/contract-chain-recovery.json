@@ -1,0 +1,34 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-10",
+  "testedCommit": "636c7b46924f8e09d98cd915fa9dcb7cb226ffbe",
+  "command": [
+    "/usr/bin/sandbox-exec",
+    "-p",
+    "(version 1) (allow default) (deny network*)",
+    "/opt/homebrew/opt/node@24/bin/node",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/experiments/g4-m1-main-integration/contract-check.mjs",
+    "--runtime-openapi",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-10/g4-export-short-probe.json",
+    "--output",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-10/regenerated-recovery"
+  ],
+  "startedAtUtc": "2026-11-04T16:37:39.660847+00:00",
+  "endedAtUtc": "2026-11-04T16:37:39.723646+00:00",
+  "elapsedSeconds": 0.06267116599701694,
+  "exitCode": 1,
+  "timingStatus": "OBSERVED",
+  "timedOut": false,
+  "executedInputDrift": false,
+  "inputHashes": {
+    "/usr/bin/sandbox-exec": "58839ef01b4eef8aac0d2aa8f9d1c074ae45aafe3533965b030672450064acc8",
+    "/opt/homebrew/opt/node@24/bin/node": "0d78c9bca217f53c2dc21a067246ee4a81c1f4fa111ee64d572b45fa1ff39189",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/experiments/g4-m1-main-integration/contract-check.mjs": "d3cdd0b27e77952e7003e6922d3b341f7d82d8562c5836f745f751813dbdcddd",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-10/g4-export-short-probe.json": "a38327b30c71844347d5bba10edce272a008eb7fd3855f73ef277d3eedfe862f"
+  },
+  "manifestSha256": "92cdee0805d0068a10a7e889441e64a111f50cb351f9a3bb7a67548e2cc01171",
+  "commandSha256": "70db03c1465111717ef0f03dd7363d7f723bd8b99f2a1767d039492d54e1e273",
+  "logSha256": "b3f974ab5e9cd61560e025a9a80dc79c33b465a351fb67ad858243b99ae8ec0f",
+  "logBytes": 660,
+  "logVisibility": "TASK_EVIDENCE"
+}
