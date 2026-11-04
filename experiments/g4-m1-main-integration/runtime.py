@@ -300,10 +300,11 @@ def verify_engine(m):
     require(info['MemoryLimit'] and info['MemTotal'] >= 6 * 1024**3, 'ENGINE_CAPACITY')
 
 
-def compose_environment(m):
+def compose_environment(m, *, certificate_variant='server'):
     """只有本树登记绑定，不允许共享旧私有目录。"""
+    require(certificate_variant in ('server','wrong-san'),'CERTIFICATE_VARIANT')
     env = environment(m['runId'])
-    env.update(G4_RUN_ID=m['runId'], G4_PRIVATE_DIR=m['privateDirectory'], G4_ROOT=str(ROOT),
+    env.update(G4_CERTIFICATE_VARIANT=certificate_variant,G4_RUN_ID=m['runId'], G4_PRIVATE_DIR=m['privateDirectory'], G4_ROOT=str(ROOT),
                G4_HOST_UID=str(os.getuid()), G4_HOST_GID=str(os.getgid()),
                G4_API_OUTPUT=str(ROOT / 'backend/src/Hosts/OntologyPlatform.Api/bin/Debug/net10.0'),
                G4_PG_TEST_OUTPUT=str(ROOT / 'backend/tests/OntologyPlatform.ConnectionsTests/bin/Debug/net10.0'),
@@ -998,15 +999,16 @@ def observed_volume_usage(m, volumes):
     return sum(value['usedBytes'] for value in volumes.values())
 
 
-def resource_snapshot(m, group, name):
+def resource_snapshot(m, group, name, *, certificate_variant='server'):
     """实际资源ID/镜像/限额/挂载检查；不归档Env或秘密。"""
+    require(certificate_variant in ('server','wrong-san') and (certificate_variant=='server' or group=='m1'),'CERTIFICATE_VARIANT')
     ids = docker(m,['ps','-aq','--no-trunc','--filter','label=ontology.task-id='+TASK,
                      '--filter','label=ontology.run-id='+m['runId']]).decode().split()
     require(len(ids)<=6,'ACTUAL_CONTAINER_BUDGET')
     verify_engine(m)
     # 全profile仅取得声明目录；运行预算仍由实际容器计数和内存核实。
     configured=subprocess.run(compose_command(group)+['--profile','*','config','--format','json'],
-        env=compose_environment(m),capture_output=True,timeout=30)
+        env=compose_environment(m,certificate_variant=certificate_variant),capture_output=True,timeout=30)
     require(configured.returncode==0,'COMPOSE_CONFIG')
     declarations=json.loads(configured.stdout)['services']
     rows=[];memory=0;container_ids={};volumes={}
@@ -1030,7 +1032,7 @@ def resource_snapshot(m, group, name):
     require(memory<=6*1024**3,'ACTUAL_MEMORY_BUDGET')
     used=observed_volume_usage(m,volumes)
     require(used<3*1024**3,'VOLUME_STOP_THRESHOLD')
-    result=dict(taskId=TASK,runId=m['runId'],group=group,composeConfigSha256=digest(configured.stdout),containers=rows,totalMemoryBytes=memory,observedVolumes=volumes,observedVolumeUsedBytes=used)
+    result=dict(taskId=TASK,runId=m['runId'],group=group,certificateVariant=certificate_variant,composeConfigSha256=digest(configured.stdout),containers=rows,totalMemoryBytes=memory,observedVolumes=volumes,observedVolumeUsedBytes=used)
     write_json(ARTIFACTS/m['runId']/(name+'.json'),result)
     update_runtime(m,containerIds=container_ids,group=group,**({'rustfsContainerId':container_ids['rustfs']} if 'rustfs' in container_ids else {}))
     return result

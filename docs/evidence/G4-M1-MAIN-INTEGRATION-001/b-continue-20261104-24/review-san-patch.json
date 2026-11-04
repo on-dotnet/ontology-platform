@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "reviewer": "/root/consumer_review",
+  "scope": "task wrong-san configuration binding only",
+  "files": {
+    "runtime.py": "bef46b5bf36bf4a1414e0866f5ff7412b93a186cc766e3eff5585725b32486dc",
+    "readback.py": "235b9eab13b47054cf904e3f714350b1ad3b5a8fab891fe885ea95f57513a05e",
+    "tests.py": "af5215493f08695a43fc551fd69e73c896381812ffc0b3d72351a5f20f310635"
+  },
+  "rawReview": "实际调用链贯通，恢复明确server；非法值在registry重命名前拒绝，G3快照拒绝wrong-san，通用挂载检查未放宽；实际Compose两变体与非法值复核，RED/GREEN和55测试、diff-check通过；未启动容器。新T完整验收仍必需。"
+}

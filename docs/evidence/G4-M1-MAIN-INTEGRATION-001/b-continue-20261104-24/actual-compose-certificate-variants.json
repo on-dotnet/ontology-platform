@@ -1,0 +1,71 @@
+{
+  "status": "PASS",
+  "scope": "CONFIG_ONLY_NOT_TLS_PRODUCT_PASS",
+  "actualRuntimeSha256": "bef46b5bf36bf4a1414e0866f5ff7412b93a186cc766e3eff5585725b32486dc",
+  "rows": [
+    {
+      "variant": "server",
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "compose",
+        "-f",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/experiments/g4-m1-main-integration/compose.m1.yaml",
+        "--profile",
+        "*",
+        "config",
+        "--format",
+        "json"
+      ],
+      "exitCode": 0,
+      "composeConfigSha256": "50a92bfa7b2f83bf3843005b5a18a6baa94bbf5e458fe276aa00a8012978a49f",
+      "certificateBinds": [
+        {
+          "type": "bind",
+          "source": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261104-24/server.crt",
+          "target": "/run/secrets/server.crt",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261104-24/server.key",
+          "target": "/run/secrets/server.key",
+          "read_only": true
+        }
+      ]
+    },
+    {
+      "variant": "wrong-san",
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "compose",
+        "-f",
+        "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/experiments/g4-m1-main-integration/compose.m1.yaml",
+        "--profile",
+        "*",
+        "config",
+        "--format",
+        "json"
+      ],
+      "exitCode": 0,
+      "composeConfigSha256": "1dd3bb0bd8b8d76314d0f8cc8d5f92afc8687348ca937f548018db4e4ac3ccac",
+      "certificateBinds": [
+        {
+          "type": "bind",
+          "source": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261104-24/wrong-san.crt",
+          "target": "/run/secrets/server.crt",
+          "read_only": true
+        },
+        {
+          "type": "bind",
+          "source": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261104-24/wrong-san.key",
+          "target": "/run/secrets/server.key",
+          "read_only": true
+        }
+      ]
+    }
+  ]
+}

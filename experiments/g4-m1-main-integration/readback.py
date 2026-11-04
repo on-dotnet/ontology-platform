@@ -240,15 +240,16 @@ def test_pg(m, category, label, *, expectation=None):
     return {'category':category,'label':label,'total':projection['summary']['total'],'exitCode':0,'status':'PASS'}
 
 
-def refresh_registry(m, label):
+def refresh_registry(m, label, *, certificate_variant='server'):
     """受控替换前后的创建清单保留版本；后续回收只使用最新精确ID。"""
+    rt.require(certificate_variant in ('server','wrong-san'),'CERTIFICATE_VARIANT')
     import closeout
     current=rt.ARTIFACTS/m['runId']/'resources-m1-owned.json'
     previous=current.with_name('resources-m1-before-'+label+'.json')
     rt.require(not previous.exists(),'EXISTING_RESOURCE_VERSION')
     os.rename(current,previous)
     rt.write_json(current,closeout.inventory(m))
-    rt.resource_snapshot(m,'m1','resources-'+label)
+    rt.resource_snapshot(m,'m1','resources-'+label,certificate_variant=certificate_variant)
 
 
 def pg_security(m):
@@ -269,10 +270,10 @@ def pg_security(m):
         try:rows.append(test_pg(m,'RealPgPublicFixture','public-'+name,expectation=expectation))
         finally:sql(m,restore,source=True)
     rows.append(test_pg(m,'RealPgPublicFixture','public-restored',expectation='PASS'))
-    env=rt.compose_environment(m);env['G4_CERTIFICATE_VARIANT']='wrong-san'
+    env=rt.compose_environment(m,certificate_variant='wrong-san')
     try:
         rt.execute(m,'source-wrong-san',rt.compose_command('m1')+['up','-d','--no-build','--pull','never','pg-source'],env=env,sensitive=True)
-        refresh_registry(m,'wrong-san');rt.wait_pg(m)
+        refresh_registry(m,'wrong-san',certificate_variant='wrong-san');rt.wait_pg(m)
         rows.append(test_pg(m,'RealPgWrongSanFixture','wrong-san'))
     finally:
         rt.execute(m,'source-san-restore',rt.compose_command('m1')+['up','-d','--no-build','--pull','never','pg-source'],env=rt.compose_environment(m),sensitive=True)

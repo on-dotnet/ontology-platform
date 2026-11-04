@@ -328,6 +328,62 @@ console.log('group and bounded relay lifecycle PASS');"""
             link=Path(d)/'link'; link.symlink_to('/tmp')
             with self.assertRaises(ValueError): rt.boundary(link/'out',ARTIFACTS)
 
+    def test_wrong_san_transition_binds_snapshot_variant_and_restores(self):
+        """实际故障编排须把同一证书变体传给快照，测试失败也恢复server。"""
+        from unittest.mock import patch
+        from contextlib import ExitStack
+        import runtime as rt,readback
+        for fail in (False,True):
+            events=[]
+            def test(m,category,label,**kwargs):
+                if category=='RealPgWrongSanFixture' and fail:raise ValueError('SYNTHETIC_TLS_TEST_FAILURE')
+                return {'status':'PASS'}
+            with ExitStack() as stack:
+                stack.enter_context(patch.object(rt,'execute',side_effect=lambda m,n,c,**kw:events.append(('execute',n,kw['env'].get('G4_CERTIFICATE_VARIANT','server')))))
+                stack.enter_context(patch.object(readback,'refresh_registry',side_effect=lambda m,n,**kw:events.append(('snapshot',n,kw.get('certificate_variant','server')))))
+                stack.enter_context(patch.object(readback,'test_pg',side_effect=test));stack.enter_context(patch.object(readback,'sql',return_value='0'))
+                for name in ('wait_pg','inspect_owned','docker','write_json'):stack.enter_context(patch.object(rt,name))
+                stack.enter_context(patch.object(rt,'runtime_value',return_value={'containerIds':{'pg-adapter-test':'synthetic'}}))
+                m={'runId':'b-continue-20261104-24','privateDirectory':str(ARTIFACTS/'synthetic')}
+                if fail:
+                    with self.assertRaisesRegex(ValueError,'SYNTHETIC_TLS_TEST_FAILURE'):readback.pg_security(m)
+                else:readback.pg_security(m)
+            self.assertIn(('execute','source-wrong-san','wrong-san'),events)
+            self.assertIn(('snapshot','wrong-san','wrong-san'),events)
+            self.assertIn(('execute','source-san-restore','server'),events)
+            self.assertIn(('snapshot','san-restored','server'),events)
+
+    def test_snapshot_uses_exact_certificate_variant_declaration(self):
+        """真实挂载校验在匹配变体时通过、默认错配与任意变体时拒绝。"""
+        from unittest.mock import patch
+        from contextlib import ExitStack
+        import runtime as rt,readback,closeout
+        with tempfile.TemporaryDirectory(dir=ARTIFACTS) as directory:
+            d=Path(directory);run='b-continue-20261104-24'
+            for n in ('server.crt','server.key','wrong-san.crt','wrong-san.key'):(d/n).write_text('synthetic')
+            m={'runId':run,'privateDirectory':str(d)};seen=[]
+            (d/run).mkdir();(d/run/'resources-m1-owned.json').write_text('{}\n')
+            def configured(command,**kwargs):
+                variant=kwargs['env'].get('G4_CERTIFICATE_VARIANT','server');seen.append(variant)
+                declaration={'services':{'pg-source':{'volumes':[{'type':'bind','source':str(d/(variant+ext)),'target':'/cert'+ext,'read_only':True} for ext in ('.crt','.key')]}}}
+                return subprocess.CompletedProcess(command,0,json.dumps(declaration).encode(),b'')
+            actual={'Config':{'Labels':{'com.docker.compose.service':'pg-source'},'Image':rt.IMAGES['postgres']},'Image':'sha256:fixture','HostConfig':{'Memory':1024,'Privileged':False,'ReadonlyRootfs':True},'State':{'Running':True,'Paused':False},'Mounts':[{'Type':'bind','Source':str(d/('wrong-san'+ext)),'Destination':'/cert'+ext,'RW':False} for ext in ('.crt','.key')]}
+            with ExitStack() as stack:
+                stack.enter_context(patch.object(rt,'ARTIFACTS',d));stack.enter_context(patch.object(rt,'docker',return_value=b'fixture\n'));stack.enter_context(patch.object(rt,'verify_engine'))
+                stack.enter_context(patch.object(rt.subprocess,'run',side_effect=configured));stack.enter_context(patch.object(rt,'inspect_owned',return_value=actual));stack.enter_context(patch.object(rt,'observed_volume_usage',return_value=0));stack.enter_context(patch.object(rt,'update_runtime'))
+                stack.enter_context(patch.object(closeout,'inventory',return_value={}))
+                readback.refresh_registry(m,'wrong-san',certificate_variant='wrong-san')
+                result=json.loads((d/run/'resources-wrong-san.json').read_text())
+                self.assertEqual(result['certificateVariant'],'wrong-san');self.assertEqual(len(result['containers'][0]['bindMappings']),2)
+                self.assertEqual(result['composeConfigSha256'],rt.digest(configured([],env={'G4_CERTIFICATE_VARIANT':'wrong-san'}).stdout))
+                with self.assertRaisesRegex(ValueError,'CERTIFICATE_VARIANT'):readback.refresh_registry(m,'invalid',certificate_variant='foreign')
+                self.assertFalse((d/run/'resources-m1-before-invalid.json').exists())
+                with self.assertRaisesRegex(ValueError,'ACTUAL_BIND_SOURCE'):rt.resource_snapshot(m,'m1','default-mismatch')
+                for bad in ('foreign','../wrong-san',''):
+                    with self.assertRaisesRegex(ValueError,'CERTIFICATE_VARIANT'):rt.resource_snapshot(m,'m1','invalid',certificate_variant=bad)
+                with self.assertRaisesRegex(ValueError,'CERTIFICATE_VARIANT'):rt.resource_snapshot(m,'g3','invalid',certificate_variant='wrong-san')
+            self.assertEqual(seen,['wrong-san','wrong-san','server'])
+
     def test_actual_bind_mounts_match_declared_native_or_desktop_path(self):
         """真实目录只接受逐项声明的原生或Docker Desktop路径及只读目标。"""
         import runtime as rt

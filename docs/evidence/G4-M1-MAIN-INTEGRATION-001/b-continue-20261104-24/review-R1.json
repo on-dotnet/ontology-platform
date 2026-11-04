@@ -1,0 +1,31 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-24",
+  "testedCommit": "efecfb0ee33bca8b8217e66359efaf956f653f63",
+  "drivers": {
+    "run.py": "5b116dbecb5be44588f83ba48be243a8eecb39677c666dd61835dfcf444e2f57",
+    "consumer_check.py": "b8a12a744de5eb8e321ccc065d24f1c95ba81c449ab52e5c17c17f4aecd63fe4",
+    "runtime.py": "4010d3c29f580acd544ce589bbcb06da257cab4d99d9b9935030123e47c50173",
+    "pg_fixture.py": "0b3e95134d76bb356fa2f14f21da58886675d6c553b2daf2f643895dc4591f51",
+    "module-tests.py": "970ef5245c6adc8ed64af9c7bd1153c4a8d7a790db787fdacd41d80cd9aa81d5",
+    "startup-boundary.py": "256bba53361f407d0a4071c9c7bd951019418e2193e56aaa604155510d04289c",
+    "migration-boundary.py": "b154843cda9e7195804063e103ba252115051696185e0e3ca648077a3272588d",
+    "contract-check.mjs": "3a7f662352a1d182f0f53f96703cfbb1f8d6f152443d3ab5bc8b2a525c5b01ea",
+    "http.mjs": "c98e018d1748a3bb57a2ee70e71574633a1616e238528eb2f45c02aba83281eb",
+    "browser.mjs": "b2558c334e3896db180a3cb82f35345bfc208edb65266b963901a0d10ffdb758",
+    "fault.mjs": "69557b1f546ded5125ac8b425eb3f8872c8d788a8246fd577f86f9551b1f5939",
+    "g3-compatibility.mjs": "705d972ae2f48107c445be8ae575096ee39b55b3b01112e26d1a206923437c9d",
+    "readback.py": "e3351ec8d0a9d30de6c80c92ad5ecb5873a28c4db4e3983a5bb4ccb83bdd7c7c",
+    "closeout.py": "fd6b97e94348e72d4dced2e1197b5686971ad01c160a1db0a2af97a7b15f449b",
+    "tests.py": "6ff4d83443eeb63cd178708745672d713d5411621b2f10cbde74353e5d25e9f9",
+    "host_continuity.py": "abd4385e1b05a86f5a12582a7e95a1fcc4a29c333eb23d2d952229744ed68984",
+    "compose.m1.yaml": "4f66652b69d9893d4c4372111a1b595558c33a7d9fda40398c5f674de79c413e",
+    "compose.g3.yaml": "f4ff313a0825c9fa818a10509366db97823578bba5315a62cf991cb075e44e66",
+    "hooks/pre-push": "5eaef2482b8b75cb1deb7cca9703f591a0a15c2459e49c5192b4382ccb7ad474"
+  },
+  "status": "PASS",
+  "reviewer": "/root/consumer_review",
+  "stage": "R1",
+  "manifestSha256": "7aee74a122c2d6c68fec43e55e5bbe79c813c8773b0a2f32910a7cd29c083d2c",
+  "rawReview": "Run24 R1独立准入PASS，允许单次正式R2。clean T/19驱动；21锁含Mac RID；168归档及实际GetContentHash；两SDK完整私有载荷；普通包未预置，CLI/HTTP/scratch/tmp空；每Run隔离、证书关闭、OS网络及全局写入拒绝；事故KEEP指纹不变。未执行Restore。"
+}

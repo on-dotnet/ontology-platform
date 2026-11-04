@@ -1,0 +1,43 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-24",
+  "testedCommit": "efecfb0ee33bca8b8217e66359efaf956f653f63",
+  "status": "BLOCKED_WITH_WITNESS",
+  "gates": {
+    "R1": "PASS",
+    "R2": "PASS",
+    "PREFLIGHT": "PASS",
+    "I01": "INTERRUPTED_WITH_WITNESS",
+    "I02": "NOT_RUN",
+    "I03": "NOT_RUN",
+    "I04": "NOT_RUN",
+    "I05": "NOT_RUN",
+    "I06": "NOT_RUN",
+    "I07": "NOT_RUN",
+    "I08": "NOT_RUN"
+  },
+  "I01": {
+    "selfTestExitCode": -15,
+    "elapsedSeconds": 83.538006458999,
+    "timedOut": false,
+    "executedInputDrift": false,
+    "cause": "deliberate stop after independent early review found deterministic later I06 task certificate variant mismatch",
+    "fullSuiteCompleted": false,
+    "nativeAndWeb": "NOT_RUN"
+  },
+  "taskRepair": {
+    "files": [
+      "runtime.py",
+      "readback.py",
+      "tests.py"
+    ],
+    "tests": 55,
+    "testSeconds": 5.98,
+    "actualComposeVariants": "PASS_CONFIG_ONLY",
+    "realTlsSan": "NOT_RUN",
+    "newStableTRequired": true
+  },
+  "resourcesStarted": false,
+  "mainUpdated": false,
+  "M2": "NOT_AUTHORIZED_NOT_EXECUTED"
+}
