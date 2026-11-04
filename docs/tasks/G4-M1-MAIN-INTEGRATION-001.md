@@ -100,3 +100,8 @@ Run20 / T7bb08672c354fb97ed39ad4ad7492d2cbe297aad：R2严格离线及独立后�
 Run21 / T9d865b1335f6b396759533984801405726a0f399：R1/R2独立准入及后验PASS，完整严格离线21项目168包Restore实际5.578秒exit0；尚未启动PREFLIGHT/I01及设施。前置只读核查发现G3跨组织驱动要求operator-a为org-other，但共享bootstrap全部生成org-demo，实际后续必败；不启动无关完整验收。仅任务run/readback/g3-compatibility/tests补原组织真实OIDC→准确realm/user临时切换→全部原兼容断言→原属性/profile恢复→全新OIDC相同subject复验。精确私有原始输入可恢复，进程强杀时保留现场且不宣称恢复。
 
 独立审查提出用户恢复失败会跳过profile恢复，实际负例RED复现后分离两恢复尝试，每项独立记录且任一失败拒绝；共7分支及51任务测试通过。第一次全套因外层sandbox拒绝3本机socket测试而失败，原日志保留，授权本机socket边界下最终通过。此为任务适配验证，不是G3身份真实PASS；须新T/Run完整验收，不转绑Run21 R2，无新V3/main/M2。
+
+
+Run22 / T3783cdff00ec97e1ed1138549f2b2692587c68f9：R1/R2独立PASS，严格离线Restore5.531秒exit0；PREFLIGHT通过。I01于5.359秒的格式扫描exit1，27套及native/Web/产品门禁未启动。唯一已定位项是Run20原始agent-schema-result.json缺末尾LF；原输出102104字节SHA1fd721a4677ffe0d589609d96ac4db9f75a1bd8bdc811ae8c92843b2641ea51a。无损封装已准备，原件仍保留。自动审批拒绝封装后删除已提交原件，要求明确证据迁移授权，未执行被拒命令；精确申请及原始见证见Run22目录。宿主monitor已释放，本Run未启动容器，四可再生工具副本按独立审查白名单收尾；不构中间V3，不更新main或进入M2。
+
+Run22收尾补充：只读Reviewer调用共享检查器时遗漏禁写bytecode环境，产生本树PyYAML17个pyc/258636字节；原26文件/其余3副本/事故KEEP不变。原四副本计划被INPUT_DRIFT安全拒绝，未删除；Reviewer已撤回无写入声明。新v3准确计划独立准入后实际回收4目录、26858文件/510837724逻辑字节，保留旧plan/失败/副作用证据。Run20原始JSON仍在原路径且SHA不变，证据迁移未获明确批准、未执行。

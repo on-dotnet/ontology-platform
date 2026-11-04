@@ -1,0 +1,71 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-22",
+  "testedCommit": "3783cdff00ec97e1ed1138549f2b2692587c68f9",
+  "status": "BLOCKED_WITH_WITNESS",
+  "gates": {
+    "R1": "PASS",
+    "R2": "PASS",
+    "PREFLIGHT": "PASS",
+    "I01": "BLOCKED_WITH_WITNESS",
+    "I02": "NOT_RUN",
+    "I03": "NOT_RUN",
+    "I04": "NOT_RUN",
+    "I05": "NOT_RUN",
+    "I06": "NOT_RUN",
+    "I07": "NOT_RUN",
+    "I08": "NOT_RUN"
+  },
+  "selfTest": {
+    "exitCode": 1,
+    "seconds": 5.3591043750057,
+    "suiteCount": 0,
+    "cause": "Tracked Run20 agent-schema-result.json missing terminal LF"
+  },
+  "nativeAndWeb": "NOT_RUN",
+  "resourcesStarted": false,
+  "automaticApprovalRejection": {
+    "action": "Lossless envelope followed by removing tracked Run20 raw JSON from current tree",
+    "reason": "Deletion of committed evidence conflicts with historical evidence preservation without explicit migration approval",
+    "executed": false
+  },
+  "proposal": {
+    "file": "proposed-agent-schema-archive.json",
+    "sha256": "644095d7dcbc2feaaae474cade964f4426562bf86dc027052091a8dd66aa471b",
+    "rawBytes": 102104,
+    "rawSha256": "1fd721a4677ffe0d589609d96ac4db9f75a1bd8bdc811ae8c92843b2641ea51a",
+    "originalRetained": true
+  },
+  "ignoredLargeInputs": [
+    {
+      "path": "r2-sdk-before-mstest-imports.xml",
+      "bytes": 1628467,
+      "sha256": "2ea2bb8ec23940f226eccdb39906b9636115dcb5e0dcc28507941701158410e3"
+    },
+    {
+      "path": "r2-sdk-after-aspire-imports.xml",
+      "bytes": 1616931,
+      "sha256": "554fb537a21771c030fe82106756f72603aae45e6d61cd11ea2d05b1901d9434"
+    },
+    {
+      "path": "r2-sdk-before-aspire-imports.xml",
+      "bytes": 1616931,
+      "sha256": "78ea6ff2162b724d9e84e70b084942701013c8bd54e7685eb3e18bafb355a6bc"
+    },
+    {
+      "path": "r2-sdk-after-mstest-imports.xml",
+      "bytes": 1628467,
+      "sha256": "0a5d4684495f96c95e2a54595410766fe913af4a400296b14cccf38371837cff"
+    },
+    {
+      "path": "restore-stdout.txt",
+      "bytes": 52463322,
+      "sha256": "d85a07f36163fc61d46f7fe8b51ad95f47db6d14476813c71d8f99cc453769d4"
+    },
+    {
+      "path": "web-cache-files.json",
+      "bytes": 8821586,
+      "sha256": "fec5f0dc296535f8510e086370de3e6fbe9ac494715683721cdd24ef64f6beba"
+    }
+  ]
+}
