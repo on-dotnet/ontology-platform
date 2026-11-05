@@ -1,0 +1,24 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-32",
+  "testedCommit": "57858697a1738cd8ee65a39c8597dd637372440d",
+  "command": [
+    "python3",
+    "-B",
+    "-c",
+    "import yaml,pathlib; assert yaml.__version__=='6.0.3'; assert pathlib.Path(yaml.__file__).resolve().is_relative_to(pathlib.Path('.tools/pythonlibs').resolve()); print(yaml.__version__)"
+  ],
+  "startedAtUtc": "2026-11-05T05:55:11.936239+00:00",
+  "endedAtUtc": "2026-11-05T05:55:12.973501+00:00",
+  "elapsedSeconds": 1.0371662499965169,
+  "exitCode": 0,
+  "timingStatus": "OBSERVED",
+  "timedOut": false,
+  "executedInputDrift": false,
+  "inputHashes": {},
+  "manifestSha256": "f69661c33c02cb4aaa1f847b88c94ebe224dbfd659a5b170049a1d73788582d2",
+  "commandSha256": "167664707788ca7f01c4deb6ef353affbbfa39e58cc803fd16781033a60cc243",
+  "logSha256": "1f74ac9075fd39230aa56323c819e2db112b69906238b4ab3e5e97f8cd267b46",
+  "logBytes": 6,
+  "logVisibility": "TASK_EVIDENCE"
+}

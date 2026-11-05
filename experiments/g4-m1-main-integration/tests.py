@@ -749,6 +749,28 @@ class InteractiveCompletionTests(unittest.TestCase):
                     else:self.assertEqual(readback.run_interactive({'runId':'fixture','_head':'b'*40},'browser','catalog-cancel',lambda value:None,timeout=.5),report)
 
 
+class JobProjectionContractTests(unittest.TestCase):
+    def test_actual_node_projection_matches_frozen_contract_and_rejects_internal_fields(self):
+        import run,copy
+        source=(HERE/'fault.mjs').read_text();start=source.index('function validateJobProjection(');end=source.index('/** 固定取消握手',start)
+        function=source[start:end]
+        schema=json.loads((ROOT/'docs/contracts/g4-connections.openapi.json').read_text())['components']['schemas']['CatalogDiscoveryJobView']
+        value={'jobId':'a'*32,'connectionId':'b'*32,'configRevision':1,'status':'CANCELLED','createdAtUtc':'2026-11-05T06:35:09.891Z','completedAtUtc':'2026-11-05T06:35:11.061794+00:00','snapshotId':None,'traceId':'c'*32}
+        self.assertEqual(set(value),set(schema['required']));self.assertEqual(set(value),set(schema['properties']));self.assertIs(schema['additionalProperties'],False)
+        cases=[{'value':value,'expected':True},{'value':dict(value,status='RUNNING',completedAtUtc=None),'expected':True},{'value':dict(value,status='SUCCEEDED',snapshotId='d'*32),'expected':True}]
+        for key in value:
+            changed=copy.deepcopy(value);changed.pop(key);cases.append({'value':changed,'expected':False})
+        for key in ('diagnosticCode','leaseUntil','secretRef'):
+            cases.append({'value':dict(value,**{key:None}),'expected':False})
+        for key,changed in [('jobId','d'*32),('connectionId','d'*32),('jobId',123),('status','UNKNOWN'),('configRevision','1'),('configRevision',1.5),('createdAtUtc',None),('createdAtUtc','invalid'),('completedAtUtc',False),('snapshotId',False),('snapshotId','invalid'),('traceId',None)]:
+            cases.append({'value':dict(value,**{key:changed}),'expected':False})
+        cases.extend({'value':x,'expected':False} for x in (None,[],{}))
+        with tempfile.TemporaryDirectory(dir=ARTIFACTS) as directory:
+            p=Path(directory)/'job-projection.mjs';p.write_text("function demand(value,code){if(!value){let e=new Error();e.safeCode=code;throw e;}}\n"+function+"\nconst cases="+json.dumps(cases)+";console.log(JSON.stringify(cases.map(x=>{try{validateJobProjection(x.value,'"+'b'*32+"','"+'a'*32+"');return true}catch{return false}})));\n")
+            result=subprocess.run([run.NODE,str(p)],capture_output=True,text=True,timeout=3)
+            self.assertEqual(result.returncode,0,result.stderr);self.assertEqual(json.loads(result.stdout),[x['expected'] for x in cases])
+
+
 class SchemaPreconditionTests(unittest.TestCase):
     def test_failed_real_refresh_or_stale_binding_prevents_ddl(self):
         import readback

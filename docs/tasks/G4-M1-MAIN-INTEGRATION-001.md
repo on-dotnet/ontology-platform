@@ -177,3 +177,12 @@ Run31 / Tfccf1bc967fc92f921f866c6b6232677e191ddac：R1/R2独立PASS，严格离�
 独立Review发现的终态/exit矛盾P1先六反例真实RED后闭合；74任务测试11.056秒、工程静态检查及四文件Review PASS。此前72测试沙箱socket三项PermissionError原记录保留，相同输入扩大沙箱后72项10.251秒通过。新fault热三段完整真实门禁尚未运行，须新T/Run32稳定完整验收，不复用短诊断作门禁PASS。
 
 Run31收尾：模块分组28对象、G3切换6对象及最终5容器2网4卷均精确回收，最后11对象具有完整Apply返回/准确absence及独立实时后验；当前外部KEEP3网8卷未变，旧默认bridge代际问题仍保持Run30记录。monitor38978及M1 ingress64840释放。四可再生副本26936文件512842479逻辑字节按VM57485/556只读FD精确计划实际删除，事故KEEP不变；VM不操作，物理释放NOT_VERIFIED。已知本Run58秘密模式扫描12383项无发现。私有runtime、日志、失败及恢复映射保留。未创建新V3，容量上限问题仍独立阻断且无放宽授权；main/M2保持未执行。
+
+
+Run32 / T57858697a1738cd8ee65a39c8597dd637372440d：R1/R2独立PASS，严格离线21项目168包Restore5.931秒exit0；原27套SelfTest412.165秒、74任务测试10.942秒、native/Web68.717秒通过。I05实际生成链及6负例PASS；I03拒绝/Host图PARTIAL。I02四模块462案例、G3兼容及Security/G2Contract真实通过；I04真实迁移权限故障/恢复/重复与G3保留PASS。后台流水线于2026-11-05T06:35:22.299Z在I06停止：热取消三段握手已exit0，作业最终GET200/CANCELLED，但任务fault消费者错误要求公开合同不存在的diagnosticCode，报diagnostic_projection。正式I06 BLOCKED，I01/I03最终闭合和I07/I08 NOT_RUN；原回执不改。
+
+续程只读确认DTO/Host投影/OpenAPI均恰好8字段且additionalProperties=false，实际HTTP也没有diagnosticCode；准确原job0791d6efc958430da9a16c6e352dd5f9在06:35:11.061794Z完成CANCELLED，DB无snapshot、cancelRequested=true、Fence/Attempt1。仅fault/tests修复为八字段封闭校验、类型/准确身份及状态检查，拒绝多出的内部诊断/租约/秘密；不改产品或公开合同。75任务测试14.195秒、静态及非作者Review PASS，候选只读live replay实际PASS，执行字节独立绑定、finally恢复候选源码；不提升旧T正式I06。I07窄只读早检未见确定必现错误，不代表产品验收。须新T/Run33稳定完整验收。
+
+原宿主monitor05:51:50Z至09:51:50Z有界结束，覆盖全部本轮正式执行；原M1 ingress亦四小时自然结束。用户续程后首只读helper未到HTTP而失败，原记录保留；精确核对旧进程/exec后，五份原始ingress文件按字节/inode/权限映射保存至ingress-before-continuation，新建同Run入口用于只读诊断。续程独立宿主monitor重新记录，空档不补写连续性结论。原始失败、恢复映射和单文件归档Git blob均保留，main/M2未执行。
+
+Run32收尾：模块分组28对象、G3切换6对象及最后11对象准确回收，当前外部KEEP3网8卷从创建登记至回收后集合一致；全部新旧ingress和monitor均结束/释放。四可再生副本26936文件512842498逻辑字节按最新VM181/556只读FD精确计划删除，事故KEEP未变；VM未操作，物理释放NOT_VERIFIED。52种已知本Run秘密扫描13206项无发现。原入口到期失败、正式取消回读失败及候选复验分别保留。最终V3仍受15MiB限制，64MiB单任务例外仅提案已审、未获用户批准、未实施共享工具变更；没有新V3/main/M2。

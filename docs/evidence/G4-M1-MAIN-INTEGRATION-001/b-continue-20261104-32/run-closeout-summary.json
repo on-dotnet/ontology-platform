@@ -1,0 +1,32 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-32",
+  "testedCommit": "57858697a1738cd8ee65a39c8597dd637372440d",
+  "formal": {
+    "I01": "PARTIAL_FIXTURE_CLOSURE_NOT_RUN",
+    "I05": "PASS",
+    "I03": "PARTIAL",
+    "I02": "PASS",
+    "I04": "PASS",
+    "I06": "BLOCKED_COMMAND_FAILED_fault-cancel-job-final",
+    "I07": "NOT_RUN",
+    "I08": "NOT_RUN"
+  },
+  "diagnostics": {
+    "hotCatalogCancelHandshake": "PASS_FORMAL_INTERMEDIATE_ONLY",
+    "actualJobReadonlyShape": "PASS_DIAGNOSTIC_ONLY",
+    "candidateJobReadonlyReplay": "PASS_DIAGNOSTIC_ONLY",
+    "durableJob": "CANCELLED_NO_SNAPSHOT"
+  },
+  "sourceChanges": [
+    "fault.mjs",
+    "tests.py"
+  ],
+  "taskTests": 75,
+  "taskTestsSeconds": 14.195,
+  "sourceReview": "PASS",
+  "nextStableFullRun": "b-continue-20261104-33",
+  "mainUpdated": false,
+  "M2": "NOT_STARTED",
+  "capacityException": "PROPOSAL_REVIEWED_NOT_APPROVED"
+}

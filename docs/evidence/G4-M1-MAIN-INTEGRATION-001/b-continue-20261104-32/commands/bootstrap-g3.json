@@ -1,0 +1,33 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-32",
+  "testedCommit": "57858697a1738cd8ee65a39c8597dd637372440d",
+  "command": [
+    "python3",
+    "-B",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/infra/security/bootstrap-keycloak.py",
+    "--profile",
+    "g2",
+    "--keycloak-origin",
+    "http://localhost:15180",
+    "--public-origin",
+    "http://localhost:15100",
+    "--runtime-output",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261104-32/realm-g3.json"
+  ],
+  "startedAtUtc": "2026-11-05T06:18:05.309186+00:00",
+  "endedAtUtc": "2026-11-05T06:18:06.004534+00:00",
+  "elapsedSeconds": 0.6953662079904461,
+  "exitCode": 0,
+  "timingStatus": "OBSERVED",
+  "timedOut": false,
+  "executedInputDrift": false,
+  "inputHashes": {
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/infra/security/bootstrap-keycloak.py": "b397271399a40c63b9320cb133b58272d5198a86f278e564b382f2e08bec6c95"
+  },
+  "manifestSha256": "f69661c33c02cb4aaa1f847b88c94ebe224dbfd659a5b170049a1d73788582d2",
+  "commandSha256": "f27b32117fbb4429660648483886f3a2d6ff59fcc17567e8cab187f0e34f3020",
+  "logSha256": "29170c41b00506f3c533544fa198b0281c5545e083b35ead2068aa6374472fd3",
+  "logBytes": 227,
+  "logVisibility": "PRIVATE"
+}

@@ -1,0 +1,39 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-32",
+  "testedCommit": "57858697a1738cd8ee65a39c8597dd637372440d",
+  "command": [
+    "/opt/homebrew/opt/node@24/bin/node",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-32/job-contract-readback.mjs",
+    "--run-id",
+    "b-continue-20261104-32",
+    "--expected-head",
+    "57858697a1738cd8ee65a39c8597dd637372440d",
+    "--resource-manifest",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-32/resource-manifest.json",
+    "--runtime-file",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261104-32/runtime.json",
+    "--action",
+    "job-read",
+    "--evidence-dir",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-32/fault-job-contract-readback-v2"
+  ],
+  "startedAtUtc": "2026-11-05T12:47:29.967921+00:00",
+  "endedAtUtc": "2026-11-05T12:47:41.035411+00:00",
+  "elapsedSeconds": 11.06734324998979,
+  "exitCode": 0,
+  "timingStatus": "OBSERVED",
+  "timedOut": false,
+  "executedInputDrift": false,
+  "inputHashes": {
+    "/opt/homebrew/opt/node@24/bin/node": "0d78c9bca217f53c2dc21a067246ee4a81c1f4fa111ee64d572b45fa1ff39189",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-32/job-contract-readback.mjs": "96ab3e114eb3208a0cc6576a03613258448e7a39b55f99c2c0fc736e27cb6a9c",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-32/resource-manifest.json": "f69661c33c02cb4aaa1f847b88c94ebe224dbfd659a5b170049a1d73788582d2",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261104-32/runtime.json": "43d9fa61dc10ac63990a1a1fc8412d2ec05d96aff52ede2828618dc642e883cb"
+  },
+  "manifestSha256": "f69661c33c02cb4aaa1f847b88c94ebe224dbfd659a5b170049a1d73788582d2",
+  "commandSha256": "78e5aac7d2b1954d977c89e23f0e948066335f52c755b22b0310635734a125b5",
+  "logSha256": "a02a4f095b360f18b5d768a9d35c1a5d8fba61f79787d3dbf3eeb26a4217a392",
+  "logBytes": 277,
+  "logVisibility": "PRIVATE"
+}

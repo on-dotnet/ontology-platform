@@ -1,0 +1,33 @@
+{
+  "cases": [
+    {
+      "case": "LegalEmptyDocumentsKeepExactHashesAndProduceEmptyGraph (\"# comment\\n\")",
+      "status": "PASS",
+      "line": 1
+    },
+    {
+      "case": "LegalEmptyDocumentsKeepExactHashesAndProduceEmptyGraph (\" \\t\\r\\n\")",
+      "status": "PASS",
+      "line": 2
+    },
+    {
+      "case": "LegalEmptyDocumentsKeepExactHashesAndProduceEmptyGraph (\"@prefix ex: <urn:empty:> .\\n\")",
+      "status": "PASS",
+      "line": 3
+    }
+  ],
+  "summary": {
+    "total": 3,
+    "PASS": 3,
+    "FAIL": 0,
+    "SKIP": 0
+  },
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-32",
+  "testedCommit": "57858697a1738cd8ee65a39c8597dd637372440d",
+  "project": "SemanticTests",
+  "assemblySha256": "d807ed32a518460c46c46faa8efc6e5bc1448cef78fbad8cca14ee6e8193ca04",
+  "rawLogSha256": "e496d6185972ff395d98effc44d625637741d16b190542a07114330281110b8a",
+  "commandReceiptSha256": "44f35ef650e50b6ad9dba78bd058d95b6bd616e9063127aee1c6b464e2adf846",
+  "command": "module-SemanticTests-m062"
+}

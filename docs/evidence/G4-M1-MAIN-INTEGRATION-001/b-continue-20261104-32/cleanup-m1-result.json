@@ -1,0 +1,774 @@
+{
+  "status": "PASS",
+  "deleted": 11,
+  "absence": [
+    {
+      "kind": "container",
+      "id": "526c51254c627a23ccade8d40dc0d06c917e288227382906f446f05add1524d1",
+      "exitCode": 1,
+      "stderrSha256": "112da9fe8e0747573ab9c657dd44b4d87c51b8fb9c76bf45377becde41575488",
+      "exactAbsent": true
+    },
+    {
+      "kind": "container",
+      "id": "13ef01d384c795a6ee882fd85e54056b0da861a7f62a61bbf238827730297eff",
+      "exitCode": 1,
+      "stderrSha256": "59beb6666d5c959245d1e67914697845486152ce1b24d5d478fe156d3700104a",
+      "exactAbsent": true
+    },
+    {
+      "kind": "container",
+      "id": "c909144814d61737cd79e6ed0ab7c5ff4223b7432ed1ee008ae9521814707eb4",
+      "exitCode": 1,
+      "stderrSha256": "1e2ba76c54bafcb849d424aeb053bb86204d0cd7292fed2313d38f9792493cec",
+      "exactAbsent": true
+    },
+    {
+      "kind": "container",
+      "id": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+      "exitCode": 1,
+      "stderrSha256": "f3865abbdb2a882740da126187fce6c54c82238193e86fb6386fc5931bc5047e",
+      "exactAbsent": true
+    },
+    {
+      "kind": "container",
+      "id": "a3f814f515647dbb6d21575f17152d24e299c77d084756db775d56fefc0b8766",
+      "exitCode": 1,
+      "stderrSha256": "4dafbee7128bcd752136228db48ab3d5502ef21f5d49bb96379278d01ccf0a86",
+      "exactAbsent": true
+    },
+    {
+      "kind": "network",
+      "id": "f7f10ef61b7aec53b72a35c909bc68e7ea6ea6bb09483efc0119fc2093f303d2",
+      "exitCode": 1,
+      "stderrSha256": "06e0d43858e67c6acabb02d672b50d77b029cdd7037ce54ed4a7af0176ef1325",
+      "exactAbsent": true
+    },
+    {
+      "kind": "network",
+      "id": "acc2b5706e51cb8dddb308557bf013a4a03546316dde50f8b9ae715d7ab50e7e",
+      "exitCode": 1,
+      "stderrSha256": "87ab68a105020c1f5d564bdee59543bfecac55ec9b01ccd78fcd982d5283a2f8",
+      "exactAbsent": true
+    },
+    {
+      "kind": "volume",
+      "id": "ontology-g4-main-b-continue-20261104-32_api-keyring",
+      "exitCode": 1,
+      "stderrSha256": "f0dafd7bc003a63787726c1c7211b9bf467250278d818a0bc912988f34c20b0b",
+      "exactAbsent": true
+    },
+    {
+      "kind": "volume",
+      "id": "ontology-g4-main-b-continue-20261104-32_keycloak-data",
+      "exitCode": 1,
+      "stderrSha256": "e574ffc4f2fde822d9315a33831e78b7e764f8882c6d4e9c827a7ef351920867",
+      "exactAbsent": true
+    },
+    {
+      "kind": "volume",
+      "id": "ontology-g4-main-b-continue-20261104-32_platform-data",
+      "exitCode": 1,
+      "stderrSha256": "c3f89e4d921f9c67b89fcce4cf47027265991f99ff631f2dfa130316db7f9a34",
+      "exactAbsent": true
+    },
+    {
+      "kind": "volume",
+      "id": "ontology-g4-main-b-continue-20261104-32_source-data",
+      "exitCode": 1,
+      "stderrSha256": "8e69e119d6716ec98496018ab0887bc8b06b748f58db507bdca5c9417d4585b0",
+      "exactAbsent": true
+    }
+  ],
+  "keepVerified": true,
+  "ingress": {
+    "modules": {
+      "status": "NOT_STARTED"
+    },
+    "g3": {
+      "status": "ALREADY_CLOSED",
+      "receiptSha256": "66611bcba88c81c7934316141a4b6a33a40169d4622dd3db7c1afa64bc8429e1"
+    },
+    "m1": {
+      "status": "PASS",
+      "taskId": "G4-M1-MAIN-INTEGRATION-001",
+      "runId": "b-continue-20261104-32",
+      "testedCommit": "57858697a1738cd8ee65a39c8597dd637372440d",
+      "pid": 69337,
+      "processReceiptSha256": "077232808dd97abb5a4a91eaa183ededbabce43f6b0da2c4f3d5ed8e9e84bec4",
+      "portsReleased": [
+        15432,
+        15180,
+        15100,
+        15300
+      ],
+      "execExits": [
+        {
+          "utc": "2026-11-05T12:47:40.378569+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "aa9836f3a097c95492ea03ef6a185fa7305e28bdbedfef9391bda52f30acb888",
+          "token": "g4-relay-b-continue-20261104-32-9589423c146b4e8c9794fc0ab06566d7",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:47:40.414197+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "97e1b4a98a11f7d18ac11bb84c098ec3ba5dd4cbf67281d53c11ac78cd57fbcf",
+          "token": "g4-relay-b-continue-20261104-32-a9023caf831b422bae04df34e5765071",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:47:40.447142+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "dcdc9977c9bef12291fc2d9bbc709a3aa1a62d46af6bec11244d6d354f43c332",
+          "token": "g4-relay-b-continue-20261104-32-ae2c8a025c76438ba5b4fcc245055e0a",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:47:40.523374+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "c24a488d4414059fe5f6370a06c27f60921a5badc537e84a149eeed73e7458b1",
+          "token": "g4-relay-b-continue-20261104-32-18c80aed88c5447db2ebe9e801cbb693",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:47:40.523521+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "22a82f1681bdf5e29382cab6713e2b02ab53c661d104c685f174c2ed2595afdb",
+          "token": "g4-relay-b-continue-20261104-32-db11178b4dfc4017ad954f69ba315c07",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:47:40.523625+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "71644f92f1b805a8c04f712447f29e5dae445ef0b75a08a6490aa542d8a26bfd",
+          "token": "g4-relay-b-continue-20261104-32-1d3e3a86b19749549ceddd7c768bf532",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:47:40.535450+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "e269db0bc74c0d85cbe89543350117377649aa141cecc840ba9291676ffd58bd",
+          "token": "g4-relay-b-continue-20261104-32-75aed963c1e34f54a11597820ac16098",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:47:40.535651+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "2fde2cb01c6a0099e7352ff5c547c260a279c7ecd21a45df13713be8d861aaf0",
+          "token": "g4-relay-b-continue-20261104-32-289fbc47af864a7aaecadc6245ab9f9b",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:47:40.584987+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "28532651d77060dfbe173ff49e9ee015a084bba9f65639f7d2b95d60615259d0",
+          "token": "g4-relay-b-continue-20261104-32-ce287f58e4964b3b930586155d34d7c6",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:47:40.593580+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "d3987b70b719f432e1dd0a649ed78eebccb25b7dabe913ac7cf16317d0ef726c",
+          "token": "g4-relay-b-continue-20261104-32-748d84c682d2457fb212fb17a4de9b46",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:47:40.593811+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "5002169aaf64b059199d375d5e1a1c6a1acffbb44f70e8045db19671e3865f09",
+          "token": "g4-relay-b-continue-20261104-32-810a89a03e4842c7b1d3a525bef8a7d1",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:47:40.598277+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "af7edd61a7907732d96765e1a07dab3811ef469e3a56b7a0550ac107969b88f7",
+          "token": "g4-relay-b-continue-20261104-32-23cf66868530477c8d7253a7af54cd81",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:47:40.598464+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "bf6fe769a08d9bdda9ad09f671d3f20661d06f0c74ac5259630f9b7f0c4af7ec",
+          "token": "g4-relay-b-continue-20261104-32-49f54d96414a45f093a2c74ede909d3f",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:47:40.711397+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "93754cf56a40f94c006730f4b269fb9743e6dc75fbe8680b9ed53cf3bc0cc475",
+          "token": "g4-relay-b-continue-20261104-32-c08d0364e4f24fc5aa7ad8d4cd4b1a30",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:47:40.776114+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "7cb752f20d0d95b82a4235d1f5f00f2f17b1c63a2b80162abd5f7ef8e33fea21",
+          "token": "g4-relay-b-continue-20261104-32-a7a4c3a5869c40e3870c51291d58a4c5",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:47:40.852243+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "d24ca050c061621e50111b0e9ccd8387548fed39e120bc017c812a82a000113a",
+          "token": "g4-relay-b-continue-20261104-32-777ec80e615443a69bb19126070c0793",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:47:40.912024+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "2d6b22abc7b356cc65d4a704e8b1ae5f6443bb628595d5e45ba21f149e524979",
+          "token": "g4-relay-b-continue-20261104-32-f42bb46761d84152be2d43eced6c65d5",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:47:40.912188+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "510fe97ddbd4cf60f58cb98bdf6db543f276bb4f3b4e2031269744e4c304593f",
+          "token": "g4-relay-b-continue-20261104-32-eb012c91400b4862bf51e9d199649749",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:47:40.945428+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "126b6af4a7a8e4cc837ef8251771a21a4a4c8b14147f152dfc19344a59ab92d1",
+          "token": "g4-relay-b-continue-20261104-32-65bc34c085b342b785f2e018c70af9a9",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:47:40.945542+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "6e4d867ed8bb352843aded73c5f26a00297df979d6ca9709ec8ea67b99975346",
+          "token": "g4-relay-b-continue-20261104-32-427f1fddc4e24d3d925359a872ebc1d7",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:47:40.953810+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "9b565d485f4d7a14c3d6f4084ab77cd9b1e67121e11a460a043d704b9532d353",
+          "token": "g4-relay-b-continue-20261104-32-a03f683aefc945ae8d69a2886c64ce32",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:47:40.953875+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "328fd3d0ccf94202143d6e349ab485467b216132dcfb825def8f267f75234e7c",
+          "token": "g4-relay-b-continue-20261104-32-dcfa3ecc654f487ba084e3c8ac398c78",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:47:40.954709+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "d3b4c3dd04f6ec7953c2f8ad7382b155cae21803686583d645f19f593912475f",
+          "token": "g4-relay-b-continue-20261104-32-fe9df2b0621643aa9e28114468187f12",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:47:40.956041+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "3cc1f040a39e78b1a61281318e70fd07659b5b3cded35edc27d3bc4bec649daf",
+          "token": "g4-relay-b-continue-20261104-32-3d8f7970e3374d0c9af9c74abb8a61ca",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:47:40.983609+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "7fa9e977238ffbd88a9f7f3a614d1d3cddfd190c333bd3d4db10be1c93d47c0c",
+          "token": "g4-relay-b-continue-20261104-32-23a509bae8ca454ba0af4efd80a524ae",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:47:40.994070+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "621df736032360a910b0f5552919e480f8c4dec75c95e8d85c61b220a57e6d5a",
+          "token": "g4-relay-b-continue-20261104-32-ee174d4cf39146179519d0ec7b52a335",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:47:40.996103+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "f9850bdbd7888d9aaa2a8b4f3db53a9f8a41e0cb161ec8850da39d44717f8f90",
+          "token": "g4-relay-b-continue-20261104-32-3e2b950db8964db6a28611f23433cb9c",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:47:41.031128+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "bb13c087e8c61614af2c0b8a5f70001cabc17d38634420f3be156a267eeec9e0",
+          "token": "g4-relay-b-continue-20261104-32-aacddd47e78444eab0954f4a1fa6d32a",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:47:41.050481+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "97d1701a4d6ec85e70a6299b9a445ba4c49d8f93cb2926e37b6dfc04cf827827",
+          "token": "g4-relay-b-continue-20261104-32-62191cfb74c54b43add20f0e0519b95e",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:47:41.078707+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "7ef3e69686acfb6010fafcee6a0998bc7b24e0707e8e46735a1329b727d8edc0",
+          "token": "g4-relay-b-continue-20261104-32-8bd3aaabe8be425eb4c6f06c5b092c27",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:47:41.104894+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "470984d557afc14ecf0b2a7bbe1e85a4ce492641a3f966b7149ba92842849c77",
+          "token": "g4-relay-b-continue-20261104-32-fae6666e4f48483683bfeb8e7aa5b557",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:51:22.773823+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "d1ede1db9d6196215f24e4612b7db23c98bf7621c4679f9d619168d32eee5e8f",
+          "token": "g4-relay-b-continue-20261104-32-bf41a3cfbc3b41c58e2eb1a3bfd6091e",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:51:22.803586+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "3e34eba01e2b404dc48b280a8a2f7377d49189a760b0e2fcafb9876009bdec36",
+          "token": "g4-relay-b-continue-20261104-32-d4430ad58ee14708a7a545151135555f",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:51:22.831151+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "e800570e31fc01f6dc3950aaaba08496893b77c4d9af8e51d492d7782e095e7d",
+          "token": "g4-relay-b-continue-20261104-32-ec5b59715a1f499d8b05328ca3f2bb19",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:51:22.888262+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "35ab5f967ad706b039bc459de3ce427394af34f8d53fca3d686e7dd9051cb58e",
+          "token": "g4-relay-b-continue-20261104-32-4160b08286254733af8290de4b4081dc",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:51:22.888419+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "ed24500b1ded32502f9776b9bd90c3cc22a3a6a2ba0872ee9a2c19299eb485e7",
+          "token": "g4-relay-b-continue-20261104-32-0bd44b3947704c848fe057ac6736c1e3",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:51:22.888613+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "4a4a750a4ecd32df9ef0bec7298ce81b0460b1e47b78127d486e240f46624a99",
+          "token": "g4-relay-b-continue-20261104-32-34bb3dd0b26d4574944fdeaca13a42fa",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:51:22.889449+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "83eb3fc9734de8e6678eb809a820989bd380eb0052044d107f9f1bae97731502",
+          "token": "g4-relay-b-continue-20261104-32-0f8715f5bbd04be3a376411410be5f50",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:51:22.891353+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "0aa5055e635c53ce420d6fc2e0870750a7c5ea70a859f1fbcab054438145db37",
+          "token": "g4-relay-b-continue-20261104-32-f178b4c415724149b58636fb68477dd9",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:51:22.935408+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "e68de48b2816779e36386ce9f13a4dff560efe6945f5418910db716d80d68175",
+          "token": "g4-relay-b-continue-20261104-32-bd481b626ae743beb0be78dce91b2025",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:51:22.935464+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "eee6ec4e273839c6c9206fec0e0695e541a3287c3152088f620aee0e67e41776",
+          "token": "g4-relay-b-continue-20261104-32-5d0fc157555443399d77a57158ba32f5",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:51:22.935514+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "5b52e2575b6e71746c5a6f40d1445b268a0476287b07c6994078b79cd5aedfe2",
+          "token": "g4-relay-b-continue-20261104-32-c8bb4572c7234065a21b7948aefdb443",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:51:22.935743+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "e055980224e0d8225db31079426580125edef6fafd5b9ee5d1e3cf8c1075cb04",
+          "token": "g4-relay-b-continue-20261104-32-ba2a1a5414ce494ea43bfc31415a5789",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:51:22.944842+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "3f68cd1c49c0a6e9718a2565b3a5bb698fe194b39da9397594a0fd189b3b1e1e",
+          "token": "g4-relay-b-continue-20261104-32-8a0530622c7b430aade30c30f031b617",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:51:23.051246+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "dd2bd6da1bce232e0772953894444cf517aeee3bde215b0727b480107d6c904a",
+          "token": "g4-relay-b-continue-20261104-32-7ff3862df36e45b081eb4c8c66c2f566",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:51:23.094706+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "6b03700a577b5671e530e046ffa65664291eeacbba807f775ffde974cd78519a",
+          "token": "g4-relay-b-continue-20261104-32-715449fe36704cb698442a113710c43e",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:51:23.121117+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "a9a05f49529d5625f91c45b6cfe2bd050e57b9d43876bbb6c4a7dcd68c961a17",
+          "token": "g4-relay-b-continue-20261104-32-9ed59bd143884276a559503fa9b3e9e0",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:51:23.166524+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "6e05e8ecbd7515b3ee331366346570166e2b4e17cea7cb060a05013e2803b9b0",
+          "token": "g4-relay-b-continue-20261104-32-8f501254c048495ebe148f09d8189c6c",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:51:23.174614+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "10bc2025923b6666025a9dba0ac6abff691a04d4ec6bbabd66999017fc030588",
+          "token": "g4-relay-b-continue-20261104-32-c395421678994303920a45ed701df296",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:51:23.218480+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "45204652d9b8559231164021f3ddb04b60eec0e1a753ef531d905ecf13e8b345",
+          "token": "g4-relay-b-continue-20261104-32-9288776f239c4f1f96da5069a5401de7",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:51:23.221846+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "adf342aba20fdf2469408c280b408abcc7e5e32b2d1295621a04ed326b1c4923",
+          "token": "g4-relay-b-continue-20261104-32-d538d42f575944448f5e0b430fab80e6",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:51:23.221925+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "b917640016f3bf4a89cf60e333c1de2a4ee7281e9a944e1c4344cffd9f90eb3f",
+          "token": "g4-relay-b-continue-20261104-32-8d9969cdf9664d418e334e2ce3a171ce",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:51:23.222036+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "2eefc456dfeaf46260de3d0acb864c7eca7e42fc4ee263891d00a48605a4fdf0",
+          "token": "g4-relay-b-continue-20261104-32-f7afea0214c341da9aac10c25bd030c0",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:51:23.222869+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "d5d7c50bfa4c0a9ca45bb4fbaadcb35ecb12239bb27dd21ce0d5884ab553afed",
+          "token": "g4-relay-b-continue-20261104-32-95ae735e99f14f1cb218b3183e6bc509",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:51:23.223191+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "04a4259577fa2dc6438d3977a5248d0b830339dd4ca8c3850b376291436f4135",
+          "token": "g4-relay-b-continue-20261104-32-f3e0a6979e0c4364a5ee696933c21a28",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:51:23.252846+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "cf00df2c2d865356e9e961cd3441227dd52b76c866b44b0f3860a700e36d59d7",
+          "token": "g4-relay-b-continue-20261104-32-bd5be8df098949bda29d07e657e6c96f",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:51:23.252924+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "11bb8126b2b8d0aaae75f33799f4792e5e07383f2d908c7928bdd7889df95bdf",
+          "token": "g4-relay-b-continue-20261104-32-245bedfcbd3e4d57aaddbf2494dfc44e",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:51:23.265571+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "70a511e93d47c6a9eac0e09428ed3ac03e0871fb16cde59679dd436e77b872c9",
+          "token": "g4-relay-b-continue-20261104-32-d3e9cb5dcdaf403ab41ca2e5a7f6fb97",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:51:23.295537+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "5a1212374945dde90f0a3ccfb8932156c1159582264a1364bdfb583c7c9f7690",
+          "token": "g4-relay-b-continue-20261104-32-81ff75faa96e406c8dcea0d2a485225d",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:51:23.315784+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "518c54e00f77edbc476d783e257f5f683f833262d4cffd533ebcc8a4c47d0f62",
+          "token": "g4-relay-b-continue-20261104-32-80d4bec90ff749559af8118e6e27b803",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:51:23.340525+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "db4b589671e8b5d98e1a20d4632c909243c5d2b3f3a1c16492bcf2052469c421",
+          "token": "g4-relay-b-continue-20261104-32-fe49d2d739bf40399bca219f2f469c7e",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        },
+        {
+          "utc": "2026-11-05T12:51:23.365911+00:00",
+          "pid": 69337,
+          "event": "exec_exited",
+          "execId": "0e0c05dd0768ed31ff48cd6100b397622416a0e6e448028dbbf4830610481aec",
+          "token": "g4-relay-b-continue-20261104-32-2fa1078dd1e7465e8d64ad9efa1adde3",
+          "containerId": "d99666933ec0b037667b47475ea25cc157ce4e53576f16ff0491e22fddc236d0",
+          "running": false,
+          "exitCode": 0
+        }
+      ],
+      "remoteObservations": [
+        {
+          "event": "reap_exec_created",
+          "execId": "c5443929f3117164061bc3ae0e22f8cdd798a2368da152716128aa2967e85d1b",
+          "mode": "terminate"
+        },
+        {
+          "event": "reap_exec_created",
+          "execId": "dd535e598b646bcc2f3e7dd5c4989beeabdab930593aa13fb2b7e4d3ef0ed67f",
+          "mode": "inspect"
+        },
+        {
+          "event": "remote_reaped",
+          "observations": [
+            {
+              "execId": "c5443929f3117164061bc3ae0e22f8cdd798a2368da152716128aa2967e85d1b",
+              "mode": "terminate",
+              "pids": [],
+              "exitCode": 0
+            },
+            {
+              "execId": "dd535e598b646bcc2f3e7dd5c4989beeabdab930593aa13fb2b7e4d3ef0ed67f",
+              "mode": "inspect",
+              "pids": [],
+              "exitCode": 0
+            }
+          ]
+        }
+      ]
+    },
+    "modules-semantic": {
+      "status": "ALREADY_CLOSED",
+      "receiptSha256": "204950c7f9e3cf9383d45ac905cf13475bb775fd45ec0527b8bc33c50d83ac26"
+    },
+    "modules-publishing": {
+      "status": "ALREADY_CLOSED",
+      "receiptSha256": "21883e55a83cbc262fbc859b8ec0661a897ef4bdec4a5497967bc258da469d12"
+    },
+    "modules-query": {
+      "status": "ALREADY_CLOSED",
+      "receiptSha256": "5c96356372b5b71dbfe6cd8605adfc03581ab78ee01c246c8b549dd9e5d81bf6"
+    },
+    "modules-agent": {
+      "status": "ALREADY_CLOSED",
+      "receiptSha256": "fdcf6b7a9ae44b293ae061ea86f59f0304e0043d56b3b4c04ee25a66807a136e"
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "scope": "readonly candidate driver live replay; original T boundary checks; diagnostic only",
+  "testedCommit": "57858697a1738cd8ee65a39c8597dd637372440d",
+  "scriptSha256": "3ca83934ea89ca63da3b9fe40249350bb7f7895f32d4ad69e6cd191d05297ed2",
+  "helperSha256": "5234dc7639262cef154271131df5b6f285e10f256271326e6cd185720f08f9d3",
+  "candidateFiles": {
+    "fault.mjs": "2b8c1b5a2951d5c9f3789ef469d0ec796009a7762e3fa4f957ccf3fdc3a5af48",
+    "tests.py": "3602c8b12230f35a31abdfff82c165520ac7b869723ffac0f821f5bbbe7beae1"
+  },
+  "originalFiles": {
+    "fault.mjs": "1a8f803691f0bee9953a0fce86986925c8a6e68fb0e78ef84d12599486467f42",
+    "tests.py": "8223bf51c490a0aad5fb35d09aba4fb9ecefbdf29fff76a836c3ce75c6e20c54"
+  },
+  "relocationOnly": [
+    "absolute original consumer_check.py",
+    "fixed same worktree root"
+  ]
+}

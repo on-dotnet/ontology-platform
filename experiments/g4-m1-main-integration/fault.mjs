@@ -41,6 +41,17 @@ let browser,context;
 function demand(value,code){if(!value){const e=new Error();e.safeCode=code;throw e;}}
 function privateJson(file){demand(fs.realpathSync(privateDir)===privateDir&&!fs.lstatSync(privateDir).isSymbolicLink()&&(fs.statSync(privateDir).mode&0o077)===0,'private_directory');demand(path.dirname(file)===privateDir&&!fs.lstatSync(file).isSymbolicLink()&&(fs.statSync(file).mode&0o077)===0,'private_boundary');return JSON.parse(fs.readFileSync(file,'utf8'));}
 function writePrivate(file,value){fs.writeFileSync(file,JSON.stringify(value),{flag:'wx',mode:0o600});}
+/** 冻结的公开任务投影只有八字段，内部诊断/租约/秘密字段不能跨越合同。 */
+function validateJobProjection(value, connectionId, jobId=null) {
+ const keys=['jobId','connectionId','configRevision','status','createdAtUtc','completedAtUtc','snapshotId','traceId'];
+ demand(value!==null&&typeof value==='object'&&!Array.isArray(value)&&Object.keys(value).length===keys.length&&keys.every(key=>Object.hasOwn(value,key)),'job_projection_fields');
+ const id=value=>typeof value==='string'&&/^[a-f0-9]{32}$/.test(value);
+ const time=value=>typeof value==='string'&&/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,7})?(?:Z|[+-]\d{2}:\d{2})$/.test(value)&&Number.isFinite(Date.parse(value));
+ demand(id(value.jobId)&&id(value.connectionId)&&value.connectionId===connectionId&&(jobId===null||value.jobId===jobId),'job_projection_identity');
+ demand(Number.isSafeInteger(value.configRevision)&&value.configRevision>0&&['QUEUED','RUNNING','SUCCEEDED','FAILED','PARTIAL','CANCELLED'].includes(value.status),'job_projection_state');
+ demand(time(value.createdAtUtc)&&(value.completedAtUtc===null||time(value.completedAtUtc))&&(value.snapshotId===null||id(value.snapshotId))&&id(value.traceId),'job_projection_types');
+ return value;
+}
 /** 固定取消握手；认证与全部消费者校验在加锁前完成。 */
 function waitForCatalogControl(kind, connectionId, jobId) {
  const protocol={
@@ -168,20 +179,22 @@ try{
   await waitForCatalogControl('ready',id);
   const started=await request('POST','/api/v1/connections/'+id+'/discoveries',{command:cmd(current.value.configRevision)},current.etag);
   demand(started.status===202&&/^[a-f0-9]{32}$/.test(started.value.jobId)&&['QUEUED','RUNNING','SUCCEEDED','FAILED','PARTIAL','CANCELLED'].includes(started.value.status),'job_start');
+  validateJobProjection(started.value,id);
   report.jobId=started.value.jobId;report.createdStatus=started.value.status;
   await waitForCatalogControl('started',id,report.jobId);
   const cancelled=await request('POST','/api/v1/connections/'+id+'/discoveries/'+report.jobId+'/cancel',{command:cmd(current.value.configRevision)},current.etag);
   demand(cancelled.status===200&&cancelled.value.jobId===report.jobId&&['QUEUED','RUNNING','SUCCEEDED','FAILED','PARTIAL','CANCELLED'].includes(cancelled.value.status),'job_cancel');
+  validateJobProjection(cancelled.value,id,report.jobId);
   demand(cancelled.value.snapshotId===null,'cancel_snapshot_absent');report.jobStatus=cancelled.value.status;report.snapshotId=null;
   await waitForCatalogControl('cancelled',id,report.jobId);
   report.checks.push({name:'warm_authenticated_start_cancel_with_source_witness_handshake',status:'PASS'});
  }else if(action==='job-start'){
-  const x=await request('POST','/api/v1/connections/'+id+'/discoveries',{command:cmd(current.value.configRevision)},current.etag);demand(x.status===202,'job_start');demand(/^[a-f0-9]{32}$/.test(x.value.jobId)&&['QUEUED','RUNNING','SUCCEEDED','FAILED','PARTIAL','CANCELLED'].includes(x.value.status),'job_projection');report.jobId=x.value.jobId;report.jobStatus=x.value.status;
+  const x=await request('POST','/api/v1/connections/'+id+'/discoveries',{command:cmd(current.value.configRevision)},current.etag);demand(x.status===202,'job_start');validateJobProjection(x.value,id);report.jobId=x.value.jobId;report.jobStatus=x.value.status;
  }else{
   demand(/^[a-f0-9]{32}$/.test(runtime.httpJobId??''),'job_id');let x;
   if(action==='job-cancel')x=await request('POST','/api/v1/connections/'+id+'/discoveries/'+runtime.httpJobId+'/cancel',{command:cmd(current.value.configRevision)},current.etag);
   else x=await request('GET','/api/v1/connections/'+id+'/discoveries/'+runtime.httpJobId);
-  demand(x.status===200&&x.value.jobId===runtime.httpJobId,'job_response');demand(/^[a-f0-9]{32}$/.test(x.value.jobId)&&['QUEUED','RUNNING','SUCCEEDED','FAILED','PARTIAL','CANCELLED'].includes(x.value.status),'job_projection');report.jobId=x.value.jobId;report.jobStatus=x.value.status;demand(x.value.snapshotId===null||/^[a-f0-9]{32}$/.test(x.value.snapshotId),'snapshot_projection');demand(x.value.diagnosticCode===null||['connection_source_unavailable','catalog_permission_limited','catalog_budget_exceeded','connection_cancelled','connection_readonly_unverified','connection_tls_untrusted','connection_auth_failed','connection_network_forbidden','catalog_access_forbidden'].includes(x.value.diagnosticCode),'diagnostic_projection');report.snapshotId=x.value.snapshotId;report.diagnosticCode=x.value.diagnosticCode;
+  demand(x.status===200,'job_response');validateJobProjection(x.value,id,runtime.httpJobId);report.jobId=x.value.jobId;report.jobStatus=x.value.status;report.snapshotId=x.value.snapshotId;
  }
  report.status='PASS';
 }catch(error){report.status='FAIL';report.failure={code:error.safeCode??'bounded_runtime_error',category:error.name==='TimeoutError'?'timeout':'runtime'};process.exitCode=1;}

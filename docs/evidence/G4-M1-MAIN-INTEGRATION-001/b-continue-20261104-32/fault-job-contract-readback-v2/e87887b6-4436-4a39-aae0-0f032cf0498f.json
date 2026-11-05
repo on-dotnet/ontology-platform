@@ -1,0 +1,54 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-32",
+  "testedCommit": "57858697a1738cd8ee65a39c8597dd637372440d",
+  "startedUtc": "2026-11-05T12:47:39.604Z",
+  "checks": [],
+  "http": [
+    {
+      "method": "GET",
+      "route": "/api/v1/connections/{id}",
+      "status": 200,
+      "durationMs": 28,
+      "jsonBody": true
+    },
+    {
+      "method": "GET",
+      "route": "/api/v1/connections/{id}/discoveries/{id}",
+      "status": 200,
+      "durationMs": 24,
+      "jsonBody": true
+    }
+  ],
+  "scope": "ONE_HTTP_ACTION_ONLY",
+  "databaseRollbackLeaseFenceEvidence": "NOT_RUN_BY_THIS_CONSUMER",
+  "action": "job-read",
+  "connectionId": "0b49a6e2bd774a71ba6edc19840d651d",
+  "auditStage": "complete",
+  "jobId": "0791d6efc958430da9a16c6e352dd5f9",
+  "jobStatus": "CANCELLED",
+  "actualJobKeys": [
+    "completedAtUtc",
+    "configRevision",
+    "connectionId",
+    "createdAtUtc",
+    "jobId",
+    "snapshotId",
+    "status",
+    "traceId"
+  ],
+  "diagnosticCodePresent": false,
+  "publicJob": {
+    "jobId": "0791d6efc958430da9a16c6e352dd5f9",
+    "connectionId": "0b49a6e2bd774a71ba6edc19840d651d",
+    "configRevision": 4,
+    "status": "CANCELLED",
+    "createdAtUtc": "2026-11-05T06:35:09.887875+00:00",
+    "completedAtUtc": "2026-11-05T06:35:11.061794+00:00",
+    "snapshotId": null,
+    "traceId": "53721d7d132249052cc0672796c9a2c7"
+  },
+  "snapshotId": null,
+  "status": "PASS",
+  "completedUtc": "2026-11-05T12:47:41.031Z"
+}

@@ -1,0 +1,66 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-32",
+  "testedCommit": "57858697a1738cd8ee65a39c8597dd637372440d",
+  "startedUtc": "2026-11-05T06:35:08.826Z",
+  "checks": [
+    {
+      "name": "warm_authenticated_start_cancel_with_source_witness_handshake",
+      "status": "PASS"
+    }
+  ],
+  "http": [
+    {
+      "method": "GET",
+      "route": "/api/v1/connections/{id}",
+      "status": 200,
+      "durationMs": 25,
+      "jsonBody": true
+    },
+    {
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/discoveries",
+      "status": 202,
+      "durationMs": 25,
+      "jsonBody": true
+    },
+    {
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/discoveries/{id}/cancel",
+      "status": 200,
+      "durationMs": 53,
+      "jsonBody": true
+    }
+  ],
+  "scope": "CATALOG_CANCEL_HANDSHAKE_ONLY",
+  "databaseRollbackLeaseFenceEvidence": "NOT_RUN_BY_THIS_CONSUMER",
+  "action": "catalog-cancel",
+  "connectionId": "0b49a6e2bd774a71ba6edc19840d651d",
+  "auditStage": "complete",
+  "controlHandshakes": [
+    {
+      "event": "CATALOG_CANCEL_READY",
+      "status": "MARKER_ACKNOWLEDGED",
+      "readyAtUtc": "2026-11-05T06:35:09.863Z",
+      "acknowledgedAtUtc": "2026-11-05T06:35:09.866Z"
+    },
+    {
+      "event": "CATALOG_JOB_STARTED",
+      "status": "MARKER_ACKNOWLEDGED",
+      "readyAtUtc": "2026-11-05T06:35:09.891Z",
+      "acknowledgedAtUtc": "2026-11-05T06:35:10.804Z"
+    },
+    {
+      "event": "CATALOG_CANCEL_REQUESTED",
+      "status": "MARKER_ACKNOWLEDGED",
+      "readyAtUtc": "2026-11-05T06:35:10.857Z",
+      "acknowledgedAtUtc": "2026-11-05T06:35:11.069Z"
+    }
+  ],
+  "jobId": "0791d6efc958430da9a16c6e352dd5f9",
+  "createdStatus": "QUEUED",
+  "jobStatus": "RUNNING",
+  "snapshotId": null,
+  "status": "PASS",
+  "completedUtc": "2026-11-05T06:35:11.304Z"
+}
