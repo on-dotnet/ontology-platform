@@ -1,0 +1,31 @@
+{
+  "status": "PASS",
+  "reviewer": "/root/consumer_review",
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-30",
+  "testedCommit": "ea40ae69f4bab301b26e0844874462d5e4938d21",
+  "manifestSha256": "7aca7bb887a46354f9b7019d98d7dbfd5f235ccca2400eb55abf3613e7e4130e",
+  "drivers": {
+    "run.py": "5b116dbecb5be44588f83ba48be243a8eecb39677c666dd61835dfcf444e2f57",
+    "consumer_check.py": "a76a6729baacff296880419cdc434dd927c8272afd3bbd3779661a442f29e450",
+    "runtime.py": "60b45c4d8b1536de28ed8bde2158ac5550935a532710c6704f235792b8f84d1d",
+    "pg_fixture.py": "0b3e95134d76bb356fa2f14f21da58886675d6c553b2daf2f643895dc4591f51",
+    "module-tests.py": "0d8485fab6d9f037ce1851984f4c6d0f40b628775f66302cc4740ed2f2ca0d96",
+    "startup-boundary.py": "256bba53361f407d0a4071c9c7bd951019418e2193e56aaa604155510d04289c",
+    "migration-boundary.py": "c5c154ee542faa2120276fcd9e096e81b3084194fc2060d6e614d8d270257a18",
+    "contract-check.mjs": "3a7f662352a1d182f0f53f96703cfbb1f8d6f152443d3ab5bc8b2a525c5b01ea",
+    "http.mjs": "c98e018d1748a3bb57a2ee70e71574633a1616e238528eb2f45c02aba83281eb",
+    "browser.mjs": "b2558c334e3896db180a3cb82f35345bfc208edb65266b963901a0d10ffdb758",
+    "fault.mjs": "69557b1f546ded5125ac8b425eb3f8872c8d788a8246fd577f86f9551b1f5939",
+    "g3-compatibility.mjs": "705d972ae2f48107c445be8ae575096ee39b55b3b01112e26d1a206923437c9d",
+    "readback.py": "5631509c90ff87a5858ad66d31c4ad4daf90527f0f244b0cc0a50975eeca4a1d",
+    "closeout.py": "fd6b97e94348e72d4dced2e1197b5686971ad01c160a1db0a2af97a7b15f449b",
+    "tests.py": "d334451ed976c67d8c1c417010a3359ac948820d06fd7f99ed97b580d9911d78",
+    "host_continuity.py": "abd4385e1b05a86f5a12582a7e95a1fcc4a29c333eb23d2d952229744ed68984",
+    "compose.m1.yaml": "7a3b6ffc11ca7283e3bdaa5d61223df6d1f1b84a2e7c769f3f28aa7a5eea329f",
+    "compose.g3.yaml": "3231f1f0ff3c3d9aabcd8b58b589d1adc0d267c8e2af1335d2b1e5777416c53d",
+    "hooks/pre-push": "5eaef2482b8b75cb1deb7cca9703f591a0a15c2459e49c5192b4382ccb7ad474"
+  },
+  "rawReview": "Run30 R1独立准入PASS，允许一次正式R2。源码干净、19驱动、21含Mac锁、168实际GetContentHash/批准归档/feed、两完整私有SDK一致；普通cache空，CLI/HTTP/scratch/tmp独立空，OS全拒网与全局写入限制/共享缓存读拒绝/证书禁用，事故KEEP不变。未Restore，不继承旧产品验收。",
+  "contentHashReceiptSha256": "2157ad39b00d1ae0358eb8509f3969c55afdba949123813e77e0adb0ae6296af"
+}

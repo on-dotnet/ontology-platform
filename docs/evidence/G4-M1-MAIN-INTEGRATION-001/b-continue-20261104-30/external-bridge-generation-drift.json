@@ -1,0 +1,73 @@
+{
+  "observedAtUtc": "2026-11-05T04:19:39.992119+00:00",
+  "networks": [
+    {
+      "id": "fd1ae18b7606e64cb4e41fe67030f82eaf885d9c93a5174b69cdef8b227b2a8a",
+      "exitCode": 1,
+      "stdout": [],
+      "stderr": "Error response from daemon: network fd1ae18b7606e64cb4e41fe67030f82eaf885d9c93a5174b69cdef8b227b2a8a not found\n"
+    },
+    {
+      "id": "bdccf8842a668d6de5c2d6bc327944d785e79582d73925c7c251497e37f89235",
+      "exitCode": 0,
+      "stdout": [
+        {
+          "Name": "bridge",
+          "Id": "bdccf8842a668d6de5c2d6bc327944d785e79582d73925c7c251497e37f89235",
+          "Created": "2026-11-05T04:17:14.070742Z",
+          "Scope": "local",
+          "Driver": "bridge",
+          "EnableIPv4": true,
+          "EnableIPv6": false,
+          "IPAM": {
+            "Driver": "default",
+            "Options": null,
+            "Config": [
+              {
+                "Subnet": "172.17.0.0/16",
+                "Gateway": "172.17.0.1"
+              }
+            ]
+          },
+          "Internal": false,
+          "Attachable": false,
+          "Ingress": false,
+          "ConfigFrom": {
+            "Network": ""
+          },
+          "ConfigOnly": false,
+          "Options": {
+            "com.docker.network.bridge.default_bridge": "true",
+            "com.docker.network.bridge.enable_icc": "true",
+            "com.docker.network.bridge.enable_ip_masquerade": "true",
+            "com.docker.network.bridge.host_binding_ipv4": "0.0.0.0",
+            "com.docker.network.bridge.name": "docker0",
+            "com.docker.network.driver.mtu": "65535"
+          },
+          "Labels": {},
+          "Containers": {},
+          "Status": {
+            "IPAM": {
+              "Subnets": {
+                "172.17.0.0/16": {
+                  "IPsInUse": 3,
+                  "DynamicIPsAvailable": 65533
+                }
+              }
+            }
+          }
+        }
+      ],
+      "stderr": ""
+    }
+  ],
+  "engine": {
+    "ID": "7a8785bb-6b6e-4ae4-8065-996f4bf83016",
+    "ServerVersion": "29.9.2",
+    "SystemTime": "2026-11-05T04:19:39.979934054Z",
+    "OperatingSystem": "Docker Desktop",
+    "Name": "docker-desktop"
+  },
+  "attribution": "NOT_VERIFIED",
+  "policy": "external default bridge KEEP; no change or removal authorized/performed by this task; prior KEEP timing claim not extended"
+}

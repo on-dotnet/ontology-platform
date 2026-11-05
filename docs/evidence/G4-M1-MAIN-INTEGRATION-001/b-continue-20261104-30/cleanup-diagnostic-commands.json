@@ -1,0 +1,57 @@
+{
+  "before": {
+    "container": {
+      "owned": [
+        {
+          "id": "6630f49122989661e2b5467ddfd9630a328669a40546ca2ceefc4338f2da1069",
+          "created": "2026-11-05T04:17:14.623036167Z"
+        }
+      ],
+      "keep": []
+    },
+    "network": {
+      "owned": [],
+      "keep": [
+        "80ac07a0bfc7ad5bdedefec78a3a66c97c4c74093c4a8533f05f4cb96bcbc4d0",
+        "bdccf8842a668d6de5c2d6bc327944d785e79582d73925c7c251497e37f89235",
+        "e66d65cfe0714eb9fde22ab801d77393aeb653344362c0faac45292d829dab8e"
+      ]
+    },
+    "volume": {
+      "owned": [],
+      "keep": [
+        "g2-ef979bd04cc0-alloy-data",
+        "g2-ef979bd04cc0-fuseki-data",
+        "g2-ef979bd04cc0-grafana-data",
+        "g2-ef979bd04cc0-loki-data",
+        "g2-ef979bd04cc0-postgres-data",
+        "g2-ef979bd04cc0-prometheus-data",
+        "g2-ef979bd04cc0-rustfs-data",
+        "g2-ef979bd04cc0-tempo-data"
+      ]
+    }
+  },
+  "commands": [
+    {
+      "command": [
+        "stop",
+        "--time",
+        "10",
+        "6630f49122989661e2b5467ddfd9630a328669a40546ca2ceefc4338f2da1069"
+      ],
+      "exitCode": 0,
+      "stdout": "Flag --time has been deprecated, use --timeout instead\n6630f49122989661e2b5467ddfd9630a328669a40546ca2ceefc4338f2da1069\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "rm",
+        "6630f49122989661e2b5467ddfd9630a328669a40546ca2ceefc4338f2da1069"
+      ],
+      "exitCode": 0,
+      "stdout": "6630f49122989661e2b5467ddfd9630a328669a40546ca2ceefc4338f2da1069\n",
+      "stderr": ""
+    }
+  ],
+  "executorSha256": "d09ac00906090afbf2fe3628468a92f610b179e8eab4933a5d211b28bbf9ab7a"
+}

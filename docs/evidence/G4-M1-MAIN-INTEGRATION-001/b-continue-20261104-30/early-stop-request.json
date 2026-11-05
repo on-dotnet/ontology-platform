@@ -1,0 +1,11 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-30",
+  "testedCommit": "ea40ae69f4bab301b26e0844874462d5e4938d21",
+  "pid": 35483,
+  "processGroup": 35483,
+  "before": "35458 35483 pwsh -NoProfile -File scripts/verify.ps1 -SelfTest\n",
+  "signal": "SIGTERM",
+  "reason": "Independent static review: four SourceSession query SQL boolean t outputs incompatible with json.loads. Stop known-invalid input full run before later expensive gates; not product failure or PASS.",
+  "observedAtUtc": "2026-11-05T04:16:15.366796+00:00"
+}

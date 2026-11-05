@@ -676,6 +676,25 @@ class RecoveryGuardTests(unittest.TestCase):
 
 
 class SourceSessionEvidenceTests(unittest.TestCase):
+    def test_psql_boolean_acknowledgement_requires_json_wire_format(self):
+        import readback
+        from unittest.mock import patch
+        original=subprocess.Popen
+        for wire in ('t','true'):
+            with self.subTest(wire=wire),tempfile.TemporaryDirectory(dir=ARTIFACTS) as directory:
+                root=Path(directory);private=root/'private';private.mkdir(mode=0o700);(root/'fixture').mkdir()
+                script="import sys;sys.stdin.readline();print("+repr(wire)+",flush=True);sys.stdin.readline();sys.stdin.readline()"
+                def launch(command,**kwargs):return original([sys.executable,'-B','-c',script],**kwargs)
+                with patch.object(readback.rt,'private_dir',return_value=private),patch.object(readback.rt,'ARTIFACTS',root),patch.object(readback.rt,'runtime_value',return_value={'containerIds':{'pg-source':'a'*64}}),patch.object(readback.rt,'inspect_owned'),patch.object(readback.subprocess,'Popen',side_effect=launch):
+                    if wire=='t':
+                        with self.assertRaises(json.JSONDecodeError):
+                            with readback.SourceSession({'runId':'fixture','_head':'b'*40}) as session:session.query('SELECT true;')
+                    else:
+                        with readback.SourceSession({'runId':'fixture','_head':'b'*40}) as session:self.assertIs(session.query('SELECT to_json(true);'),True)
+                receipt=json.loads(next((root/'fixture').glob('source-session-*.json')).read_text())
+                self.assertEqual(receipt['failureCode'],'JSONDecodeError' if wire=='t' else None)
+                self.assertEqual(receipt['exitCode'],0)
+
     def test_json_then_nonzero_exit_is_not_success(self):
         import readback
         from unittest.mock import patch

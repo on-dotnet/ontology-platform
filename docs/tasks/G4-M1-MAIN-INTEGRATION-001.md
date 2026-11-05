@@ -159,3 +159,10 @@ I06真实PG九组20执行、HTTP基线59检查、三种源角色拒绝与ACL恢�
 五个任务文件限定修复：源PG声明与实际HostConfig.Init严格true；SourceSession保留私有stderr原始bytes、公开散列/真实exitCode及查询时间，非零退出拒绝，父退出也清理准确自建进程组，stderr读取2秒/1MiB界限且不完整即失败。两个独立审查P1先真实RED后GREEN，65任务测试5.453秒及工程静态门禁通过；非作者Review PASS。既有产品SQL、期限、断言未改，processGroupReleased不代表容器端锁后验。必须新T/Run30完整验收。
 
 四模块28对象、G3切换6对象、诊断退休旧源容器及最终11对象均准确回收，旧KEEP3网络8卷保持。Apply返回值未序列化的事实保留，实际命令日志和新的逐对象缺席后验支持回收；monitor94850释放。四工具副本26936文件512842494逻辑字节按新计划/VM14085的556只读FD子集实际删除，事故KEEP不变；初次零占用拒绝保存，不操作VM，物理释放NOT_VERIFIED。原始失败、同T准备恢复、init A/B及源码修复分开记录。单文件归档迁移原字节/Git blob/恢复映射保持，无新V3/main/M2；V3硬容量问题仍未获放宽授权。
+
+
+Run30 / Tea40ae69f4bab301b26e0844874462d5e4938d21：R1/R2独立PASS，OS全网络禁止Restore21项目168包5.795秒exit0，PREFLIGHT PASS。对尚未到达路径的只读提前Review发现四处SourceSession SQL确认SELECT true输出t，与json.loads协议不符，I06 lease和I07 cancel必报JSONDecodeError。准确停止SelfTest独立PGID35483；实际79.361秒exit-15、executedInputDrift=false，原始输出及I01 BLOCKED保留；native/Web和产品门禁NOT_RUN，不作产品失败或PASS。
+
+单个本任务network none/768MiB/tmpfs源PG诊断逐一执行四条真实SQL并经过SourceSession，原t四例JSONDecodeError；仅四处改为to_json(true)后同容器四例真实True。新增文本布尔拒绝/JSON布尔接受的真实子进程回归，66任务测试5.503秒、工程静态检查及两文件独立Review PASS，锁/事务/期限/产品断言保持。诊断不转绑为产品门禁；须新T/Run31完整验收。
+
+唯一诊断容器准确stop/rm并exit1准确缺席；其tmpfs无持久数据或卷。回收前独立发现外部默认bridge从fd1ae18b…变为bdccf8842a668d6de5c2d6bc327944d785e79582d73925c7c251497e37f89235，新Created2026-11-05T04:17:14.070742Z紧邻诊断启动，原因NOT_VERIFIED，禁止归因或声称旧三网全保持。Engine ID/version不变，其余两网八卷保持；清理前后实际新三网八卷一致，外部网络未被本任务修改/删除。monitor34526释放；四可再生副本26841文件510579088逻辑字节按严格零占用审查计划回收，事故KEEP不变。原始失败、诊断、修复、外部代际漂移分别保留，无新V3/main/M2。

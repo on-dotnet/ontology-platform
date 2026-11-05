@@ -740,7 +740,7 @@ def lease_fence(m):
                         if takeover['fence']>=2:break
                         rt.require(time.monotonic()<deadline,'LEASE_NOT_TAKEN');time.sleep(.05)
                     rt.require(takeover['attempt']>=2,'LEASE_ATTEMPT')
-                    lock.query("ROLLBACK; SELECT true;")
+                    lock.query("ROLLBACK; SELECT to_json(true);")
                     deadline=time.monotonic()+15
                     while True:
                         terminal=state(job)
@@ -969,13 +969,13 @@ def browser_cancel(m):
         def callback(value):
             nonlocal held,job,watcher
             if value['event']=='CATALOG_CANCEL_READY':
-                claim.query("SET statement_timeout='10s'; SET idle_in_transaction_session_timeout='10s'; SET lock_timeout='2s'; BEGIN; DO $$ BEGIN PERFORM pg_advisory_xact_lock(hashtextextended('connection:catalog-claim',0)); END $$; SELECT true;")
+                claim.query("SET statement_timeout='10s'; SET idle_in_transaction_session_timeout='10s'; SET lock_timeout='2s'; BEGIN; DO $$ BEGIN PERFORM pg_advisory_xact_lock(hashtextextended('connection:catalog-claim',0)); END $$; SELECT to_json(true);")
                 held=source_lock.query("SET statement_timeout='15s'; SET idle_in_transaction_session_timeout='15s'; SET lock_timeout='2s'; BEGIN; LOCK TABLE pg_catalog.pg_shdepend IN ACCESS EXCLUSIVE MODE; SELECT json_build_object('pid',pg_backend_pid(),'held',true);")
                 return 'SOURCE_LOCKED'
             rt.require(value['event']=='CATALOG_JOB_STARTED','UI_CANCEL_EVENT')
             job=identifier(value['jobId']);rt.update_runtime(m,httpJobId=job)
             baseline=observer.query('EXECUTE ui_cancel_activity;');baseline_pids={x['pid'] for x in baseline}
-            claim.query('ROLLBACK; SELECT true;')
+            claim.query('ROLLBACK; SELECT to_json(true);')
             deadline=time.monotonic()+3
             while True:
                 source=observer.query('EXECUTE ui_cancel_activity;')
@@ -993,7 +993,7 @@ def browser_cancel(m):
                     rt.require(observer.query('EXECUTE ui_cancel_lock('+str(int(held['pid']))+');')==1,'UI_SOURCE_LOCK_EARLY_RELEASE')
                     observed.update(after=after,sourceLockHeldAtBackendDisappearance=True)
                 except Exception as error:observed['failure']=type(error).__name__
-                finally:source_lock.query('ROLLBACK; SELECT true;')
+                finally:source_lock.query('ROLLBACK; SELECT to_json(true);')
             watcher=threading.Thread(target=watch,daemon=True);watcher.start()
             return 'SOURCE_QUERY_WAITING'
         try:
