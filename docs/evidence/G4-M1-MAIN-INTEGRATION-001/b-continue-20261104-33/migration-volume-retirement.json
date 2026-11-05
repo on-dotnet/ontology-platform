@@ -1,0 +1,189 @@
+{
+  "status": "PASS",
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-33",
+  "before": {
+    "container": {
+      "owned": [
+        {
+          "id": "088df92721f53be277145b89130e0b8ff9ad7b192f11dd37f2971cdd8863ef8b",
+          "created": "2026-11-05T13:27:06.645805339Z"
+        },
+        {
+          "id": "f837f02c902fd92bcfa442870fbe85ce995727f4c5e9bf644d443b863280bb86",
+          "created": "2026-11-05T13:27:06.644323006Z"
+        }
+      ],
+      "keep": []
+    },
+    "network": {
+      "owned": [
+        {
+          "id": "a95563a231af37987132014d7cbee00041ae0c9b0e0c5422825e49a7caa7357f",
+          "created": "2026-11-05T13:27:06.630312339Z"
+        }
+      ],
+      "keep": [
+        "80ac07a0bfc7ad5bdedefec78a3a66c97c4c74093c4a8533f05f4cb96bcbc4d0",
+        "8873e3e7f0cab715d552b41cc5702f08a4da15876fbfea83b61fea067c11dc8b",
+        "e66d65cfe0714eb9fde22ab801d77393aeb653344362c0faac45292d829dab8e"
+      ]
+    },
+    "volume": {
+      "owned": [
+        {
+          "id": "ontology-g4-main-b-continue-20261104-33_api-keyring",
+          "created": "2026-11-05T13:27:06Z"
+        },
+        {
+          "id": "ontology-g4-main-b-continue-20261104-33_fuseki-data",
+          "created": "2026-11-05T13:27:06Z"
+        },
+        {
+          "id": "ontology-g4-main-b-continue-20261104-33_keycloak-data",
+          "created": "2026-11-05T13:27:06Z"
+        },
+        {
+          "id": "ontology-g4-main-b-continue-20261104-33_platform-data",
+          "created": "2026-11-05T13:27:06Z"
+        },
+        {
+          "id": "ontology-g4-main-b-continue-20261104-33_rustfs-data",
+          "created": "2026-11-05T13:27:06Z"
+        }
+      ],
+      "keep": [
+        "g2-ef979bd04cc0-alloy-data",
+        "g2-ef979bd04cc0-fuseki-data",
+        "g2-ef979bd04cc0-grafana-data",
+        "g2-ef979bd04cc0-loki-data",
+        "g2-ef979bd04cc0-postgres-data",
+        "g2-ef979bd04cc0-prometheus-data",
+        "g2-ef979bd04cc0-rustfs-data",
+        "g2-ef979bd04cc0-tempo-data"
+      ]
+    }
+  },
+  "candidates": [
+    "ontology-g4-main-b-continue-20261104-33_fuseki-data",
+    "ontology-g4-main-b-continue-20261104-33_rustfs-data"
+  ],
+  "commands": [
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "rm",
+        "ontology-g4-main-b-continue-20261104-33_fuseki-data"
+      ],
+      "exitCode": 0,
+      "timingStatus": "COMPLETED",
+      "stdoutSha256": "a8a71cce5a4d3d1d479f85f461fafa39179cc832acdbacbb9dc3f334282f0e90",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "ontology-g4-main-b-continue-20261104-33_fuseki-data"
+      ],
+      "exitCode": 1,
+      "timingStatus": "COMPLETED",
+      "stdoutSha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "stderrSha256": "5977d97d44e5446a02ae2f92feaee863bb6a0f9578d7db881dc18146eabd15ab",
+      "exactAbsent": true
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "rm",
+        "ontology-g4-main-b-continue-20261104-33_rustfs-data"
+      ],
+      "exitCode": 0,
+      "timingStatus": "COMPLETED",
+      "stdoutSha256": "231a7b3c3706ecf732c7c7b5d46b354af8303163aff771f0a7421dda6e014ac2",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "volume",
+        "inspect",
+        "ontology-g4-main-b-continue-20261104-33_rustfs-data"
+      ],
+      "exitCode": 1,
+      "timingStatus": "COMPLETED",
+      "stdoutSha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "stderrSha256": "32569d07c7edfaec33fc7c1ada4079f4ae53388c630a14df175a0c9e2c0c20d1",
+      "exactAbsent": true
+    }
+  ],
+  "deleted": [
+    "ontology-g4-main-b-continue-20261104-33_fuseki-data",
+    "ontology-g4-main-b-continue-20261104-33_rustfs-data"
+  ],
+  "after": {
+    "container": {
+      "owned": [
+        {
+          "id": "088df92721f53be277145b89130e0b8ff9ad7b192f11dd37f2971cdd8863ef8b",
+          "created": "2026-11-05T13:27:06.645805339Z"
+        },
+        {
+          "id": "f837f02c902fd92bcfa442870fbe85ce995727f4c5e9bf644d443b863280bb86",
+          "created": "2026-11-05T13:27:06.644323006Z"
+        }
+      ],
+      "keep": []
+    },
+    "network": {
+      "owned": [
+        {
+          "id": "a95563a231af37987132014d7cbee00041ae0c9b0e0c5422825e49a7caa7357f",
+          "created": "2026-11-05T13:27:06.630312339Z"
+        }
+      ],
+      "keep": [
+        "80ac07a0bfc7ad5bdedefec78a3a66c97c4c74093c4a8533f05f4cb96bcbc4d0",
+        "8873e3e7f0cab715d552b41cc5702f08a4da15876fbfea83b61fea067c11dc8b",
+        "e66d65cfe0714eb9fde22ab801d77393aeb653344362c0faac45292d829dab8e"
+      ]
+    },
+    "volume": {
+      "owned": [
+        {
+          "id": "ontology-g4-main-b-continue-20261104-33_api-keyring",
+          "created": "2026-11-05T13:27:06Z"
+        },
+        {
+          "id": "ontology-g4-main-b-continue-20261104-33_keycloak-data",
+          "created": "2026-11-05T13:27:06Z"
+        },
+        {
+          "id": "ontology-g4-main-b-continue-20261104-33_platform-data",
+          "created": "2026-11-05T13:27:06Z"
+        }
+      ],
+      "keep": [
+        "g2-ef979bd04cc0-alloy-data",
+        "g2-ef979bd04cc0-fuseki-data",
+        "g2-ef979bd04cc0-grafana-data",
+        "g2-ef979bd04cc0-loki-data",
+        "g2-ef979bd04cc0-postgres-data",
+        "g2-ef979bd04cc0-prometheus-data",
+        "g2-ef979bd04cc0-rustfs-data",
+        "g2-ef979bd04cc0-tempo-data"
+      ]
+    }
+  }
+}

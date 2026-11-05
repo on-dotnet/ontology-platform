@@ -1,0 +1,89 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-33",
+  "testedCommit": "9ce7326a1d15642762a56316c170f2ae7895029b",
+  "manifestSha256": "2df2f5d70324b57f1b3b4a8b762e1070002f22ba46d2b7395591ed279566cc2a",
+  "result": {
+    "status": "PASS",
+    "pgGroups": [
+      {
+        "category": "RealPgFixture",
+        "label": "real-tls-acl",
+        "total": 12,
+        "exitCode": 0,
+        "status": "PASS"
+      },
+      {
+        "category": "RealPgPublicFixture",
+        "label": "empty-public",
+        "total": 1,
+        "exitCode": 0,
+        "status": "PASS"
+      },
+      {
+        "category": "RealPgPublicFixture",
+        "label": "public-relation",
+        "total": 1,
+        "exitCode": 0,
+        "status": "PASS"
+      },
+      {
+        "category": "RealPgPublicFixture",
+        "label": "public-function",
+        "total": 1,
+        "exitCode": 0,
+        "status": "PASS"
+      },
+      {
+        "category": "RealPgPublicFixture",
+        "label": "public-type",
+        "total": 1,
+        "exitCode": 0,
+        "status": "PASS"
+      },
+      {
+        "category": "RealPgPublicFixture",
+        "label": "public-missing",
+        "total": 1,
+        "exitCode": 0,
+        "status": "PASS"
+      },
+      {
+        "category": "RealPgPublicFixture",
+        "label": "public-usage",
+        "total": 1,
+        "exitCode": 0,
+        "status": "PASS"
+      },
+      {
+        "category": "RealPgPublicFixture",
+        "label": "public-restored",
+        "total": 1,
+        "exitCode": 0,
+        "status": "PASS"
+      },
+      {
+        "category": "RealPgWrongSanFixture",
+        "label": "wrong-san",
+        "total": 1,
+        "exitCode": 0,
+        "status": "PASS"
+      }
+    ],
+    "lineage": "PASS",
+    "secretPurpose": "PASS",
+    "sourceRoleFaults": 3,
+    "auditRollbackCases": 2,
+    "clientCancel": "PASS",
+    "catalogCancel": "PASS",
+    "leaseFence": "PASS",
+    "schemaImmutable": "PASS",
+    "credentialLifecycle": {
+      "connectionId": "7328df63786145fe805ad9176fd06956",
+      "sourceRestorationRequired": false,
+      "sourceRestorationVerifiedByProbe": true,
+      "finalConnectionState": "DISABLED"
+    },
+    "crossOrganization": "PASS"
+  }
+}

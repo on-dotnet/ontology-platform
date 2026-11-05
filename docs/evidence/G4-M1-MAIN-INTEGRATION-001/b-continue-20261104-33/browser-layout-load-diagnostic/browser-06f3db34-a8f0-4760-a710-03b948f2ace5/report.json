@@ -1,0 +1,164 @@
+{
+  "schemaVersion": 1,
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "startedAtUtc": "2026-11-05T14:11:13.688Z",
+  "cases": {
+    "M1-U01": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U02": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U03": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U04": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U05": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "aggregate_requires_loading_timeout_cancel_partial_and_refresh_evidence_across_controlled_runs"
+    },
+    "M1-U06": {
+      "status": "FAIL",
+      "observed": [],
+      "reason": "browser_timeout",
+      "failure": {
+        "code": "browser_timeout",
+        "category": "timeout"
+      },
+      "phase": "U06_list_readiness"
+    }
+  },
+  "http": [
+    {
+      "method": "GET",
+      "route": "/auth/csrf",
+      "status": 200,
+      "durationMs": 57
+    }
+  ],
+  "screenshots": [],
+  "productExecution": true,
+  "runId": "b-continue-20261104-33",
+  "scenario": "layout-only",
+  "driverSha256": "a29a944c6ea2f869f5fac5d9fee5eb67339d2aa744f344b828655627632069f8",
+  "pageDiagnostics": {
+    "responses": [
+      {
+        "path": "/data/connections",
+        "status": 200
+      },
+      {
+        "path": "/_next/static/chunks/3-qiz_2qtnjht.css",
+        "status": 200
+      },
+      {
+        "path": "/_next/static/chunks/2ktojal10tlga.css",
+        "status": 200
+      },
+      {
+        "path": "/_next/static/chunks/3ir57bubrzl5r.js",
+        "status": 200
+      },
+      {
+        "path": "/_next/static/chunks/3l2w704hibblk.js",
+        "status": 200
+      },
+      {
+        "path": "/_next/static/chunks/1gub3li78tic7.js",
+        "status": 200
+      },
+      {
+        "path": "/_next/static/chunks/3fpw7r9p25_g4.js",
+        "status": 200
+      },
+      {
+        "path": "/_next/static/chunks/turbopack-3-ry682tkyiqk.js",
+        "status": 200
+      }
+    ],
+    "failed": [
+      {
+        "path": "APP_ROUTE",
+        "code": "request_failed",
+        "category": "network",
+        "networkCode": "net::ERR_ABORTED"
+      },
+      {
+        "path": "APP_ROUTE",
+        "code": "request_failed",
+        "category": "network",
+        "networkCode": "net::ERR_ABORTED"
+      },
+      {
+        "path": "APP_ROUTE",
+        "code": "request_failed",
+        "category": "network",
+        "networkCode": "net::ERR_ABORTED"
+      },
+      {
+        "path": "/_next/static/chunks/2pjgbt2kgaj7u.js",
+        "code": "request_failed",
+        "category": "network",
+        "networkCode": "net::ERR_CONNECTION_RESET"
+      },
+      {
+        "path": "/_next/static/chunks/2oexneeu1y8vz.js",
+        "code": "request_failed",
+        "category": "network",
+        "networkCode": "net::ERR_CONNECTION_RESET"
+      },
+      {
+        "path": "/_next/static/chunks/2l4c-30lmsd57.js",
+        "code": "request_failed",
+        "category": "network",
+        "networkCode": "net::ERR_CONNECTION_RESET"
+      },
+      {
+        "path": "/_next/static/chunks/115gfruh7a57s.js",
+        "code": "request_failed",
+        "category": "network",
+        "networkCode": "net::ERR_CONNECTION_RESET"
+      }
+    ],
+    "errors": [],
+    "console": [
+      {
+        "chunkLoad": false,
+        "hydration": false,
+        "csp": false,
+        "resource": true
+      },
+      {
+        "chunkLoad": false,
+        "hydration": false,
+        "csp": false,
+        "resource": true
+      },
+      {
+        "chunkLoad": false,
+        "hydration": false,
+        "csp": false,
+        "resource": true
+      },
+      {
+        "chunkLoad": false,
+        "hydration": false,
+        "csp": false,
+        "resource": true
+      }
+    ]
+  },
+  "completedAtUtc": "2026-11-05T14:11:30.022Z",
+  "exitCode": 1
+}

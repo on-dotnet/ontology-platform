@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "startedAtUtc": "2026-11-05T13:55:07.149Z",
+  "cases": {
+    "M1-U01": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U02": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U03": {
+      "status": "PASS",
+      "observed": [
+        "POSTGRESQL_distinct_fields_positive_and_negative_format",
+        "ORACLE_distinct_fields_positive_and_negative_format",
+        "DORIS_distinct_fields_positive_and_negative_format",
+        "TDENGINE_distinct_fields_positive_and_negative_format",
+        "WEB_API_distinct_fields_positive_and_negative_format"
+      ]
+    },
+    "M1-U04": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U05": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "aggregate_requires_loading_timeout_cancel_partial_and_refresh_evidence_across_controlled_runs"
+    },
+    "M1-U06": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    }
+  },
+  "http": [
+    {
+      "method": "GET",
+      "route": "/auth/csrf",
+      "status": 200,
+      "durationMs": 47
+    }
+  ],
+  "screenshots": [],
+  "productExecution": true,
+  "runId": "b-continue-20261104-33",
+  "scenario": "baseline",
+  "driverSha256": "d2858da5d0d36983f593b14b45e85b565da71a233d949e7c009d825c57e91fca",
+  "diagnosticDom": [
+    {
+      "type": "POSTGRESQL",
+      "invalid": [],
+      "successCount": 1
+    },
+    {
+      "type": "ORACLE",
+      "invalid": [],
+      "successCount": 1
+    },
+    {
+      "type": "DORIS",
+      "invalid": [],
+      "successCount": 1
+    },
+    {
+      "type": "TDENGINE",
+      "invalid": [],
+      "successCount": 1
+    },
+    {
+      "type": "WEB_API",
+      "invalid": [],
+      "successCount": 1
+    }
+  ],
+  "completedAtUtc": "2026-11-05T13:55:09.544Z",
+  "exitCode": 2
+}

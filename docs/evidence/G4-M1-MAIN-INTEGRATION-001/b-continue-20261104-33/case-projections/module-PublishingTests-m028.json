@@ -1,0 +1,38 @@
+{
+  "cases": [
+    {
+      "case": "ProposalRejectsUnboundReports (\"missing\",422,\"impact_required\")",
+      "status": "PASS",
+      "line": 1
+    },
+    {
+      "case": "ProposalRejectsUnboundReports (\"forged\",409,\"impact_binding_conflict\")",
+      "status": "PASS",
+      "line": 2
+    },
+    {
+      "case": "ProposalRejectsUnboundReports (\"expired\",409,\"impact_expired\")",
+      "status": "PASS",
+      "line": 3
+    },
+    {
+      "case": "ProposalRejectsUnboundReports (\"cross-version\",409,\"impact_target_conflict\")",
+      "status": "PASS",
+      "line": 4
+    }
+  ],
+  "summary": {
+    "total": 4,
+    "PASS": 4,
+    "FAIL": 0,
+    "SKIP": 0
+  },
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-33",
+  "testedCommit": "9ce7326a1d15642762a56316c170f2ae7895029b",
+  "project": "PublishingTests",
+  "assemblySha256": "5edc6c9b7374955c2ac21b78441e8967ee16f8c5a78ed17a4c8a4129c4e54752",
+  "rawLogSha256": "6dec184694f119a1c390bbd030e26bb1448b7bde4f28170b5a742540613a661e",
+  "commandReceiptSha256": "a4e13222c5e37da077423b4e0cd8ace1a8be250fea18b747ea0dd96fc84af284",
+  "command": "module-PublishingTests-m028"
+}

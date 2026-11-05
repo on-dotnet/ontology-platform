@@ -416,6 +416,48 @@ console.log('group and bounded relay lifecycle PASS');"""
 
 
 class ExecutionRegressionTests(unittest.TestCase):
+    def test_closed_relay_wakes_single_observer_without_releasing_unproven_exec(self):
+        """关闭通知打断轮询等待，inspect期间通知不丢；真实退出证明前保留名额。"""
+        import asyncio,runtime as rt
+        async def trial(mode):
+            active={'token'};reserved={'token'};exited=set();wake=asyncio.Event();stopping=asyncio.Event();queried=asyncio.Queue();events=[]
+            state={'ContainerID':'broker','Running':True,'ExitCode':None};calls=0
+            class Engine:
+                async def async_request(self,method,path):
+                    nonlocal calls
+                    self_case.assertEqual((method,path),('GET','/exec/exec-id/json'));calls+=1
+                    result=dict(state)
+                    if mode=='during-inspect' and calls==1:
+                        active.clear();state.update(Running=False,ExitCode=0);wake.set()
+                        await asyncio.sleep(0)
+                    queried.put_nowait(calls);return result
+            task=asyncio.create_task(rt.observe_ingress_exit(Engine(),'exec-id','broker','token',active,reserved,exited,wake,stopping,lambda kind,**value:events.append((kind,value))))
+            try:
+                await asyncio.wait_for(queried.get(),.1)
+                if mode=='during-inspect':await asyncio.wait_for(asyncio.shield(task),.1)
+                else:
+                    active.clear()
+                    if mode=='wrong-container':state.update(ContainerID='foreign',Running=False,ExitCode=0)
+                    elif mode=='null-exit':state.update(Running=False,ExitCode=None)
+                    elif mode=='still-running':state.update(Running=True,ExitCode=0)
+                    else:state.update(Running=False,ExitCode=0)
+                    wake.set()
+                    if mode=='wrong-container':
+                        with self.assertRaisesRegex(ValueError,'EXEC_CONTAINER_DRIFT'):await asyncio.wait_for(asyncio.shield(task),.1)
+                        self.assertEqual(reserved,{'token'});self.assertFalse(exited);return
+                    if mode in ('null-exit','still-running'):
+                        await asyncio.wait_for(queried.get(),.1);await asyncio.sleep(0)
+                        self.assertFalse(task.done());self.assertEqual(reserved,{'token'});self.assertFalse(exited)
+                        state.update(Running=False,ExitCode=0);wake.set()
+                    await asyncio.wait_for(asyncio.shield(task),.1)
+                self.assertFalse(reserved);self.assertEqual(exited,{'exec-id'});self.assertEqual(len(events),1);self.assertEqual(events[0][0],'exec_exited');self.assertFalse(stopping.is_set())
+            finally:
+                if not task.done():task.cancel()
+                await asyncio.gather(task,return_exceptions=True)
+        self_case=self
+        for mode in ('closed','during-inspect','still-running','null-exit','wrong-container'):
+            with self.subTest(mode=mode):asyncio.run(trial(mode))
+
     def test_engine_stall_keeps_event_loop_and_cancel_responsive(self):
         """真实Unix对端不响应时，控制循环继续运行且取消准确释放连接。"""
         import asyncio
@@ -1432,6 +1474,79 @@ class SdkCopyMutationTests(unittest.TestCase):
                     with self.assertRaises(ValueError):run.verify_sdk_copies(m)
                 finally:receipt.write_bytes(original)
                 run.verify_sdk_copies(m)
+
+
+class BrowserFocusTests(unittest.TestCase):
+    def test_list_readiness_requires_completed_loading_and_rendered_result(self):
+        """SSR标题不等于可交互列表；真实异步结果出现前不能开始主题操作。"""
+        script=r"""import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';import {createRequire} from 'node:module';
+const require=createRequire(process.cwd()+'/apps/web/package.json');
+const {chromium,expect}=require('@playwright/test');
+const source=readFileSync('experiments/g4-m1-main-integration/browser.mjs','utf8');
+const match=source.match(/async function expectLoadedList\(page\) \{[\s\S]*?\n\}/);
+assert.ok(match,'actual driver must wait for loaded list, not SSR heading');
+const filter=source.match(/function isConnectionListResponse\(response, origin\) \{[\s\S]*?\n\}/);
+assert.ok(filter);const accepts=eval('('+filter[0]+')');
+const response=(url='http://localhost:15100/api/v1/connections',status=200,method='GET')=>({url:()=>url,status:()=>status,request:()=>({method:()=>method})});
+assert.equal(accepts(response(),'http://localhost:15100'),true);
+for(const rejected of [response('http://foreign.invalid/api/v1/connections'),response(undefined,403),response(undefined,500),response(undefined,200,'POST'),response('http://localhost:15100/api/v1/connections/other'),response('http://localhost:15100/api/v1/connections?type=ORACLE')]) assert.equal(accepts(rejected,'http://localhost:15100'),false);
+let limit=1500;const expectation=control=>expect(control,{timeout:limit});
+const loaded=eval('('+match[0]+')');
+const browser=await chromium.launch({channel:'msedge',headless:true});
+try {
+ const page=await browser.newPage();await page.route('**/*',r=>r.abort());
+ await page.setContent('<div class="connections-workspace"><h1>数据源</h1><p role="status">正在读取连接…</p></div>');
+ await page.evaluate(()=>{window.resultRendered=false;setTimeout(()=>{document.querySelector('[role=status]').remove();const s=document.createElement('section');s.className='connection-card';s.textContent='Synthetic result';document.querySelector('.connections-workspace').append(s);window.resultRendered=true;},100);});
+ await loaded(page);assert.equal(await page.evaluate(()=>window.resultRendered),true);
+ limit=150;
+ await page.locator('section').evaluate(x=>x.remove());
+ await assert.rejects(loaded(page),'missing result must fail even without loading text');
+ await page.evaluate(()=>{document.querySelector('.connections-workspace').insertAdjacentHTML('beforeend','<p role="status">正在读取连接…</p><section class="connection-card">Synthetic result</section>');});
+ await assert.rejects(loaded(page),'remaining loading state must fail despite a result card');
+ console.log('async result positive and missing-result/still-loading negatives PASS');
+} finally {await browser.close();}
+"""
+        result=subprocess.run(['/opt/homebrew/opt/node@24/bin/node','--input-type=module','-e',script],cwd=ROOT,capture_output=True,text=True,timeout=20)
+        self.assertEqual(result.returncode,0,result.stderr)
+        self.assertIn('negatives PASS',result.stdout)
+
+    def test_invalid_field_waits_for_actual_focus_before_next_fill(self):
+        """真实本地浏览器验证延后焦点已完成；缺焦点或缺错误标记必须拒绝。"""
+        script=r"""import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {createRequire} from 'node:module';
+const require=createRequire(process.cwd()+'/apps/web/package.json');
+const {chromium,expect}=require('@playwright/test');
+const source=readFileSync('experiments/g4-m1-main-integration/browser.mjs','utf8');
+const match=source.match(/async function expectInvalidFocus\(control\) \{[\s\S]*?\n\}/);
+assert.ok(match,'actual driver must synchronize the delayed invalid-field focus');
+let limit=1500;
+const expectation=control=>expect(control,{timeout:limit});
+const waitInvalid=eval('('+match[0]+')');
+const browser=await chromium.launch({channel:'msedge',headless:true});
+try {
+ const page=await browser.newPage();await page.route('**/*',r=>r.abort());
+ await page.setContent('<input id="invalid" aria-invalid="true"><input id="next"><button id="validate">validate</button>');
+ const invalid=page.locator('#invalid');
+ await page.locator('#validate').focus();
+ await page.evaluate(()=>{window.focusCompleted=false;setTimeout(()=>requestAnimationFrame(()=>{document.querySelector('#invalid').focus();window.focusCompleted=true;}),100);});
+ await waitInvalid(invalid);
+ assert.equal(await page.evaluate(()=>window.focusCompleted),true,'must not resolve on aria-invalid alone');
+ await page.locator('#next').fill('fixture_reader');
+ await expect(page.locator('#next')).toHaveValue('fixture_reader');
+ await expect(invalid).toHaveValue('');
+ limit=150;
+ await page.locator('#validate').focus();
+ await assert.rejects(waitInvalid(invalid),'missing focus must fail');
+ await invalid.evaluate(x=>x.setAttribute('aria-invalid','false'));await invalid.focus();
+ await assert.rejects(waitInvalid(invalid),'focused valid field must fail');
+ console.log('delayed focus positive and missing-focus/non-invalid negatives PASS');
+} finally {await browser.close();}
+"""
+        result=subprocess.run(['/opt/homebrew/opt/node@24/bin/node','--input-type=module','-e',script],cwd=ROOT,capture_output=True,text=True,timeout=20)
+        self.assertEqual(result.returncode,0,result.stderr)
+        self.assertIn('negatives PASS',result.stdout)
 
 
 class HandoffLifecycleTests(unittest.TestCase):

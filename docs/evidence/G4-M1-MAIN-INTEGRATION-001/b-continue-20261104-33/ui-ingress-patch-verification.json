@@ -1,0 +1,24 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-33",
+  "scope": "TASK_DRIVER_PATCH_TESTS_NOT_FORMAL_PRODUCT_ACCEPTANCE",
+  "tests": {
+    "command": "python3 -B experiments/g4-m1-main-integration/tests.py",
+    "exitCode": 0,
+    "count": 78,
+    "elapsedSeconds": 33.632,
+    "outputSha256": "a21496a8273be482d3bf40d2ebb12a461443ea85ec8283adff0e75e84a3a46cf"
+  },
+  "static": {
+    "command": "pwsh -NoProfile -File scripts/verify.ps1",
+    "exitCode": 0,
+    "outputSha256": "be30f63596f912d0557cd2ad8f999df0ed0a80faff57f9dcc49baedcb972842c"
+  },
+  "sourceHashes": {
+    "browser.mjs": "0af8da9bbd7202fb83d4c0e86f3b0b4122dd1ba995a7db6102a6a630c9cfbf8f",
+    "runtime.py": "e6edcd5b2b3385003b0ced4951bb19fa4b9d0e96eff39e6793c6cfd8df3efe35",
+    "tests.py": "b98fdbdbce003fa8b333512a0d7a7c461b1ed17dbd0148a43aef82eb94253352"
+  },
+  "formalI07": "BLOCKED_WITH_WITNESS_RETAINED",
+  "candidateI07": "DIAGNOSTIC_PASS_ONLY_NEW_T_FULL_ACCEPTANCE_REQUIRED"
+}

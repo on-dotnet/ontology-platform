@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "startedAtUtc": "2026-11-05T14:19:02.860Z",
+  "cases": {
+    "M1-U01": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U02": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U03": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U04": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U05": {
+      "status": "FAIL",
+      "observed": [],
+      "reason": "browser_or_transport_error",
+      "failure": {
+        "code": "browser_or_transport_error",
+        "category": "runtime"
+      },
+      "phase": "M1-U05"
+    },
+    "M1-U06": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    }
+  },
+  "http": [
+    {
+      "method": "GET",
+      "route": "/auth/csrf",
+      "status": 200,
+      "durationMs": 52
+    },
+    {
+      "method": "GET",
+      "route": "/api/v1/connections",
+      "status": 200,
+      "durationMs": 603,
+      "scope": "operator_initial_list_readiness"
+    }
+  ],
+  "screenshots": [],
+  "productExecution": true,
+  "runId": "b-continue-20261104-33",
+  "scenario": "source-unavailable",
+  "driverSha256": "3e468e791533d39c5b2594f1a95b2bd8cda6daf8ab1914031fd04cef3dd76b0a",
+  "staticFailures": [
+    {
+      "path": "/_next/static/chunks/2pjgbt2kgaj7u.js",
+      "code": "static_failed",
+      "category": "network",
+      "networkCode": "net::ERR_CONNECTION_RESET"
+    },
+    {
+      "path": "/_next/static/chunks/2oexneeu1y8vz.js",
+      "code": "static_failed",
+      "category": "network",
+      "networkCode": "net::ERR_CONNECTION_RESET"
+    },
+    {
+      "path": "/_next/static/chunks/2rolduqppundq.js",
+      "code": "static_failed",
+      "category": "network",
+      "networkCode": "net::ERR_CONNECTION_RESET"
+    },
+    {
+      "path": "/_next/static/chunks/115gfruh7a57s.js",
+      "code": "static_failed",
+      "category": "network",
+      "networkCode": "net::ERR_CONNECTION_RESET"
+    }
+  ],
+  "initialListReady": true,
+  "completedAtUtc": "2026-11-05T14:19:09.261Z",
+  "exitCode": 1
+}

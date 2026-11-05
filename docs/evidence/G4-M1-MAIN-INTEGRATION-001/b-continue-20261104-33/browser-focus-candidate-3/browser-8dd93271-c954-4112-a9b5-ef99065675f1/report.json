@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "startedAtUtc": "2026-11-05T13:58:35.769Z",
+  "cases": {
+    "M1-U01": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U02": {
+      "status": "PASS",
+      "observed": [
+        "anonymous_real_http_401",
+        "viewer-ab_real_http_403",
+        "auditor-ab_real_http_403",
+        "authenticated_csrf_denied_before_binding"
+      ]
+    },
+    "M1-U03": {
+      "status": "PASS",
+      "observed": [
+        "POSTGRESQL_distinct_fields_positive_and_negative_format",
+        "ORACLE_distinct_fields_positive_and_negative_format",
+        "DORIS_distinct_fields_positive_and_negative_format",
+        "TDENGINE_distinct_fields_positive_and_negative_format",
+        "WEB_API_distinct_fields_positive_and_negative_format"
+      ]
+    },
+    "M1-U04": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U05": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "aggregate_requires_loading_timeout_cancel_partial_and_refresh_evidence_across_controlled_runs"
+    },
+    "M1-U06": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    }
+  },
+  "http": [
+    {
+      "method": "GET",
+      "route": "/auth/csrf",
+      "status": 200,
+      "durationMs": 63
+    },
+    {
+      "method": "GET",
+      "route": "/connections",
+      "status": 401,
+      "durationMs": 37
+    },
+    {
+      "method": "POST",
+      "route": "/connection-secrets",
+      "status": 401,
+      "durationMs": 34
+    },
+    {
+      "method": "GET",
+      "route": "/auth/csrf",
+      "status": 200,
+      "durationMs": 41
+    },
+    {
+      "method": "POST",
+      "route": "/connections",
+      "status": 403,
+      "durationMs": 41
+    },
+    {
+      "method": "GET",
+      "route": "/auth/csrf",
+      "status": 200,
+      "durationMs": 40
+    },
+    {
+      "method": "POST",
+      "route": "/connections",
+      "status": 403,
+      "durationMs": 43
+    },
+    {
+      "method": "POST",
+      "route": "/connection-secrets",
+      "status": 403,
+      "durationMs": 39
+    }
+  ],
+  "screenshots": [],
+  "productExecution": true,
+  "runId": "b-continue-20261104-33",
+  "scenario": "baseline",
+  "driverSha256": "7ed48e949ddeccef86ef065c09da32275f9e59b42eda9e1ba653fca1a7161e55",
+  "completedAtUtc": "2026-11-05T13:58:39.593Z",
+  "exitCode": 2
+}

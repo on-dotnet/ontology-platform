@@ -800,6 +800,24 @@ async def relay_copy(client_reader,client_writer,engine_reader,engine_writer,on_
         await asyncio.gather(*tasks,return_exceptions=True)
 
 
+async def observe_ingress_exit(engine,ident,broker,token,active_tokens,reservations,exited,wakeup,stopping,event):
+    """单一观察者在连接结束时立即重验Exec；未获真实退出证明绝不释放名额。"""
+    import asyncio
+    deadline=time.monotonic()+INGRESS_SECONDS+10
+    while time.monotonic()<deadline:
+        # 先清通知再发起inspect，保留等待响应期间到达的关闭通知。
+        wakeup.clear()
+        result=await engine.async_request('GET','/exec/'+ident+'/json')
+        require(result['ContainerID']==broker,'EXEC_CONTAINER_DRIFT')
+        if result['Running'] is False and type(result['ExitCode']) is int:
+            exited.add(ident)
+            if token not in active_tokens:reservations.discard(token)
+            event('exec_exited',execId=ident,token=token,containerId=broker,running=False,exitCode=result['ExitCode']);return
+        try:await asyncio.wait_for(wakeup.wait(),.25)
+        except asyncio.TimeoutError:pass
+    event('exec_exit_unproven',execId=ident,token=token);stopping.set();raise ValueError('EXEC_EXIT_UNPROVEN')
+
+
 async def ingress_daemon(m,group,*,evidence_directory=None):
     """固定loopback守护进程，32连接/120秒/4小时；每次连接重验设施身份。"""
     import asyncio,signal,uuid,datetime
@@ -811,21 +829,10 @@ async def ingress_daemon(m,group,*,evidence_directory=None):
     journal=events.open('x');active=set();active_tokens=set();reservations=set();execs={};exited=set();watchers=set();stopping=asyncio.Event();servers=[]
     def event(kind,**values):
         journal.write(json.dumps({'utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'pid':os.getpid(),'event':kind,**values})+'\n');journal.flush();os.fsync(journal.fileno())
-    async def observe_exit(ident,broker,token):
-        deadline=time.monotonic()+INGRESS_SECONDS+10
-        while time.monotonic()<deadline:
-            result=await engine.async_request('GET','/exec/'+ident+'/json')
-            require(result['ContainerID']==broker,'EXEC_CONTAINER_DRIFT')
-            if not result['Running'] and type(result['ExitCode']) is int:
-                exited.add(ident)
-                if token not in active_tokens:reservations.discard(token)
-                event('exec_exited',execId=ident,token=token,containerId=broker,running=False,exitCode=result['ExitCode']);return
-            await asyncio.sleep(.25)
-        event('exec_exit_unproven',execId=ident,token=token);stopping.set();raise ValueError('EXEC_EXIT_UNPROVEN')
     async def accepted(reader,writer,route):
         if stopping.is_set() or len(reservations)>=INGRESS_LIMIT:
             event('refused_capacity',hostPort=route['hostPort']);writer.close();await writer.wait_closed();return
-        task=asyncio.current_task();active.add(task);pipe=None;exec_id=None
+        task=asyncio.current_task();active.add(task);pipe=None;exec_id=None;exit_wakeup=asyncio.Event()
         token='g4-relay-'+m['runId']+'-'+uuid.uuid4().hex
         active_tokens.add(token);reservations.add(token)
         event('reserved',token=token,hostPort=route['hostPort'])
@@ -836,7 +843,7 @@ async def ingress_daemon(m,group,*,evidence_directory=None):
             exec_id=await engine.async_create(route['brokerId'],['perl','-e',RELAY_PERL,route['connectIp'],str(route['port']),token,str(INGRESS_SECONDS)])
             execs[exec_id]=token;event('exec_created',execId=exec_id,token=token,brokerId=route['brokerId'])
             er,ew=await engine.attach(exec_id);pipe=ew
-            watcher=asyncio.create_task(observe_exit(exec_id,route['brokerId'],token));watchers.add(watcher)
+            watcher=asyncio.create_task(observe_ingress_exit(engine,exec_id,route['brokerId'],token,active_tokens,reservations,exited,exit_wakeup,stopping,event));watchers.add(watcher)
             def checked(done):
                 if not done.cancelled() and done.exception() is not None:
                     event('exec_observer_failed',execId=exec_id,token=token);stopping.set()
@@ -855,6 +862,7 @@ async def ingress_daemon(m,group,*,evidence_directory=None):
                 except OSError:pass
                 active.discard(task);active_tokens.discard(token)
                 if exec_id is None or exec_id in exited:reservations.discard(token)
+                exit_wakeup.set()
                 event('connection_closed',token=token,execId=exec_id)
     loop=asyncio.get_running_loop()
     for sig in (signal.SIGTERM,signal.SIGINT):loop.add_signal_handler(sig,stopping.set)

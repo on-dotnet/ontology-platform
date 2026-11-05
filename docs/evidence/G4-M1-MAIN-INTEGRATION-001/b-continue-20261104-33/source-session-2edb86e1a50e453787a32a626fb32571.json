@@ -1,0 +1,253 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-33",
+  "testedCommit": "9ce7326a1d15642762a56316c170f2ae7895029b",
+  "command": [
+    "docker",
+    "--context",
+    "desktop-linux",
+    "exec",
+    "-i",
+    "a29961cd2d7d6c762f6d62075610713ea4308a36eb023747ecf5fd50a4fd750f",
+    "psql",
+    "-X",
+    "-qAt",
+    "-U",
+    "postgres",
+    "-d",
+    "fixture",
+    "-v",
+    "ON_ERROR_STOP=1"
+  ],
+  "pid": 18783,
+  "startedAtUtc": "2026-11-05T14:30:47.457285+00:00",
+  "endedAtUtc": "2026-11-05T14:31:03.306763+00:00",
+  "elapsedSeconds": 15.849379915991449,
+  "exitCode": 0,
+  "timingStatus": "OBSERVED",
+  "stderrFile": "source-session-2edb86e1a50e453787a32a626fb32571.stderr",
+  "stderrSha256": "1171843e1276fce1fa40aadb886df7e20ce93fbc18a2a8478aa2524935de47d7",
+  "stderrBytes": 46,
+  "stderrComplete": true,
+  "processGroupReleased": true,
+  "failureCode": null,
+  "cleanupFailure": null,
+  "queries": [
+    {
+      "querySha256": "53daba909fede9196b1928dbdaaa45b4b55935b4bb2737dbd3aa82a568b83e04",
+      "startedAtUtc": "2026-11-05T14:30:50.504085+00:00",
+      "status": "RECEIVED_JSON",
+      "endedAtUtc": "2026-11-05T14:30:50.509976+00:00"
+    },
+    {
+      "querySha256": "3f3937eda38a522a6d15474dda099206a5bead96187ae173f9f1a0ba7b86ebc0",
+      "startedAtUtc": "2026-11-05T14:30:50.510007+00:00",
+      "status": "RECEIVED_JSON",
+      "endedAtUtc": "2026-11-05T14:30:50.511720+00:00"
+    },
+    {
+      "querySha256": "5fa61735443e4b4cb8dfaddc6af16408de55a2a3456ba3a1f1fe9ffe6cc98f00",
+      "startedAtUtc": "2026-11-05T14:31:01.714009+00:00",
+      "status": "RECEIVED_JSON",
+      "endedAtUtc": "2026-11-05T14:31:01.715059+00:00"
+    },
+    {
+      "querySha256": "5fa61735443e4b4cb8dfaddc6af16408de55a2a3456ba3a1f1fe9ffe6cc98f00",
+      "startedAtUtc": "2026-11-05T14:31:01.716190+00:00",
+      "status": "RECEIVED_JSON",
+      "endedAtUtc": "2026-11-05T14:31:01.717253+00:00"
+    },
+    {
+      "querySha256": "5fa61735443e4b4cb8dfaddc6af16408de55a2a3456ba3a1f1fe9ffe6cc98f00",
+      "startedAtUtc": "2026-11-05T14:31:01.748225+00:00",
+      "status": "RECEIVED_JSON",
+      "endedAtUtc": "2026-11-05T14:31:01.748995+00:00"
+    },
+    {
+      "querySha256": "5fa61735443e4b4cb8dfaddc6af16408de55a2a3456ba3a1f1fe9ffe6cc98f00",
+      "startedAtUtc": "2026-11-05T14:31:01.782424+00:00",
+      "status": "RECEIVED_JSON",
+      "endedAtUtc": "2026-11-05T14:31:01.782897+00:00"
+    },
+    {
+      "querySha256": "5fa61735443e4b4cb8dfaddc6af16408de55a2a3456ba3a1f1fe9ffe6cc98f00",
+      "startedAtUtc": "2026-11-05T14:31:01.782998+00:00",
+      "status": "RECEIVED_JSON",
+      "endedAtUtc": "2026-11-05T14:31:01.783351+00:00"
+    },
+    {
+      "querySha256": "5fa61735443e4b4cb8dfaddc6af16408de55a2a3456ba3a1f1fe9ffe6cc98f00",
+      "startedAtUtc": "2026-11-05T14:31:01.818419+00:00",
+      "status": "RECEIVED_JSON",
+      "endedAtUtc": "2026-11-05T14:31:01.819043+00:00"
+    },
+    {
+      "querySha256": "5fa61735443e4b4cb8dfaddc6af16408de55a2a3456ba3a1f1fe9ffe6cc98f00",
+      "startedAtUtc": "2026-11-05T14:31:01.854084+00:00",
+      "status": "RECEIVED_JSON",
+      "endedAtUtc": "2026-11-05T14:31:01.854641+00:00"
+    },
+    {
+      "querySha256": "5fa61735443e4b4cb8dfaddc6af16408de55a2a3456ba3a1f1fe9ffe6cc98f00",
+      "startedAtUtc": "2026-11-05T14:31:01.885132+00:00",
+      "status": "RECEIVED_JSON",
+      "endedAtUtc": "2026-11-05T14:31:01.885697+00:00"
+    },
+    {
+      "querySha256": "5fa61735443e4b4cb8dfaddc6af16408de55a2a3456ba3a1f1fe9ffe6cc98f00",
+      "startedAtUtc": "2026-11-05T14:31:01.919128+00:00",
+      "status": "RECEIVED_JSON",
+      "endedAtUtc": "2026-11-05T14:31:01.919844+00:00"
+    },
+    {
+      "querySha256": "5fa61735443e4b4cb8dfaddc6af16408de55a2a3456ba3a1f1fe9ffe6cc98f00",
+      "startedAtUtc": "2026-11-05T14:31:01.954899+00:00",
+      "status": "RECEIVED_JSON",
+      "endedAtUtc": "2026-11-05T14:31:01.956477+00:00"
+    },
+    {
+      "querySha256": "5fa61735443e4b4cb8dfaddc6af16408de55a2a3456ba3a1f1fe9ffe6cc98f00",
+      "startedAtUtc": "2026-11-05T14:31:01.988918+00:00",
+      "status": "RECEIVED_JSON",
+      "endedAtUtc": "2026-11-05T14:31:01.991044+00:00"
+    },
+    {
+      "querySha256": "5fa61735443e4b4cb8dfaddc6af16408de55a2a3456ba3a1f1fe9ffe6cc98f00",
+      "startedAtUtc": "2026-11-05T14:31:02.026153+00:00",
+      "status": "RECEIVED_JSON",
+      "endedAtUtc": "2026-11-05T14:31:02.028180+00:00"
+    },
+    {
+      "querySha256": "5fa61735443e4b4cb8dfaddc6af16408de55a2a3456ba3a1f1fe9ffe6cc98f00",
+      "startedAtUtc": "2026-11-05T14:31:02.059280+00:00",
+      "status": "RECEIVED_JSON",
+      "endedAtUtc": "2026-11-05T14:31:02.061575+00:00"
+    },
+    {
+      "querySha256": "5fa61735443e4b4cb8dfaddc6af16408de55a2a3456ba3a1f1fe9ffe6cc98f00",
+      "startedAtUtc": "2026-11-05T14:31:02.092797+00:00",
+      "status": "RECEIVED_JSON",
+      "endedAtUtc": "2026-11-05T14:31:02.095714+00:00"
+    },
+    {
+      "querySha256": "5fa61735443e4b4cb8dfaddc6af16408de55a2a3456ba3a1f1fe9ffe6cc98f00",
+      "startedAtUtc": "2026-11-05T14:31:02.127900+00:00",
+      "status": "RECEIVED_JSON",
+      "endedAtUtc": "2026-11-05T14:31:02.130276+00:00"
+    },
+    {
+      "querySha256": "5fa61735443e4b4cb8dfaddc6af16408de55a2a3456ba3a1f1fe9ffe6cc98f00",
+      "startedAtUtc": "2026-11-05T14:31:02.161352+00:00",
+      "status": "RECEIVED_JSON",
+      "endedAtUtc": "2026-11-05T14:31:02.163916+00:00"
+    },
+    {
+      "querySha256": "5fa61735443e4b4cb8dfaddc6af16408de55a2a3456ba3a1f1fe9ffe6cc98f00",
+      "startedAtUtc": "2026-11-05T14:31:02.197965+00:00",
+      "status": "RECEIVED_JSON",
+      "endedAtUtc": "2026-11-05T14:31:02.200692+00:00"
+    },
+    {
+      "querySha256": "5fa61735443e4b4cb8dfaddc6af16408de55a2a3456ba3a1f1fe9ffe6cc98f00",
+      "startedAtUtc": "2026-11-05T14:31:02.235810+00:00",
+      "status": "RECEIVED_JSON",
+      "endedAtUtc": "2026-11-05T14:31:02.237997+00:00"
+    },
+    {
+      "querySha256": "5fa61735443e4b4cb8dfaddc6af16408de55a2a3456ba3a1f1fe9ffe6cc98f00",
+      "startedAtUtc": "2026-11-05T14:31:02.271225+00:00",
+      "status": "RECEIVED_JSON",
+      "endedAtUtc": "2026-11-05T14:31:02.273402+00:00"
+    },
+    {
+      "querySha256": "5fa61735443e4b4cb8dfaddc6af16408de55a2a3456ba3a1f1fe9ffe6cc98f00",
+      "startedAtUtc": "2026-11-05T14:31:02.306478+00:00",
+      "status": "RECEIVED_JSON",
+      "endedAtUtc": "2026-11-05T14:31:02.309057+00:00"
+    },
+    {
+      "querySha256": "5fa61735443e4b4cb8dfaddc6af16408de55a2a3456ba3a1f1fe9ffe6cc98f00",
+      "startedAtUtc": "2026-11-05T14:31:02.339834+00:00",
+      "status": "RECEIVED_JSON",
+      "endedAtUtc": "2026-11-05T14:31:02.342652+00:00"
+    },
+    {
+      "querySha256": "5fa61735443e4b4cb8dfaddc6af16408de55a2a3456ba3a1f1fe9ffe6cc98f00",
+      "startedAtUtc": "2026-11-05T14:31:02.373261+00:00",
+      "status": "RECEIVED_JSON",
+      "endedAtUtc": "2026-11-05T14:31:02.375478+00:00"
+    },
+    {
+      "querySha256": "5fa61735443e4b4cb8dfaddc6af16408de55a2a3456ba3a1f1fe9ffe6cc98f00",
+      "startedAtUtc": "2026-11-05T14:31:02.407040+00:00",
+      "status": "RECEIVED_JSON",
+      "endedAtUtc": "2026-11-05T14:31:02.409860+00:00"
+    },
+    {
+      "querySha256": "5fa61735443e4b4cb8dfaddc6af16408de55a2a3456ba3a1f1fe9ffe6cc98f00",
+      "startedAtUtc": "2026-11-05T14:31:02.444240+00:00",
+      "status": "RECEIVED_JSON",
+      "endedAtUtc": "2026-11-05T14:31:02.446447+00:00"
+    },
+    {
+      "querySha256": "5fa61735443e4b4cb8dfaddc6af16408de55a2a3456ba3a1f1fe9ffe6cc98f00",
+      "startedAtUtc": "2026-11-05T14:31:02.481000+00:00",
+      "status": "RECEIVED_JSON",
+      "endedAtUtc": "2026-11-05T14:31:02.484068+00:00"
+    },
+    {
+      "querySha256": "5fa61735443e4b4cb8dfaddc6af16408de55a2a3456ba3a1f1fe9ffe6cc98f00",
+      "startedAtUtc": "2026-11-05T14:31:02.515299+00:00",
+      "status": "RECEIVED_JSON",
+      "endedAtUtc": "2026-11-05T14:31:02.517940+00:00"
+    },
+    {
+      "querySha256": "5fa61735443e4b4cb8dfaddc6af16408de55a2a3456ba3a1f1fe9ffe6cc98f00",
+      "startedAtUtc": "2026-11-05T14:31:02.553054+00:00",
+      "status": "RECEIVED_JSON",
+      "endedAtUtc": "2026-11-05T14:31:02.555718+00:00"
+    },
+    {
+      "querySha256": "5fa61735443e4b4cb8dfaddc6af16408de55a2a3456ba3a1f1fe9ffe6cc98f00",
+      "startedAtUtc": "2026-11-05T14:31:02.588881+00:00",
+      "status": "RECEIVED_JSON",
+      "endedAtUtc": "2026-11-05T14:31:02.591289+00:00"
+    },
+    {
+      "querySha256": "5fa61735443e4b4cb8dfaddc6af16408de55a2a3456ba3a1f1fe9ffe6cc98f00",
+      "startedAtUtc": "2026-11-05T14:31:02.623161+00:00",
+      "status": "RECEIVED_JSON",
+      "endedAtUtc": "2026-11-05T14:31:02.624499+00:00"
+    },
+    {
+      "querySha256": "5fa61735443e4b4cb8dfaddc6af16408de55a2a3456ba3a1f1fe9ffe6cc98f00",
+      "startedAtUtc": "2026-11-05T14:31:02.659578+00:00",
+      "status": "RECEIVED_JSON",
+      "endedAtUtc": "2026-11-05T14:31:02.660640+00:00"
+    },
+    {
+      "querySha256": "5fa61735443e4b4cb8dfaddc6af16408de55a2a3456ba3a1f1fe9ffe6cc98f00",
+      "startedAtUtc": "2026-11-05T14:31:02.695691+00:00",
+      "status": "RECEIVED_JSON",
+      "endedAtUtc": "2026-11-05T14:31:02.696427+00:00"
+    },
+    {
+      "querySha256": "5fa61735443e4b4cb8dfaddc6af16408de55a2a3456ba3a1f1fe9ffe6cc98f00",
+      "startedAtUtc": "2026-11-05T14:31:02.731465+00:00",
+      "status": "RECEIVED_JSON",
+      "endedAtUtc": "2026-11-05T14:31:02.731985+00:00"
+    },
+    {
+      "querySha256": "5fa61735443e4b4cb8dfaddc6af16408de55a2a3456ba3a1f1fe9ffe6cc98f00",
+      "startedAtUtc": "2026-11-05T14:31:02.767025+00:00",
+      "status": "RECEIVED_JSON",
+      "endedAtUtc": "2026-11-05T14:31:02.767685+00:00"
+    },
+    {
+      "querySha256": "924706c41a8208476d01a7bfe343d093e9f56e8de43e681966d62a80933a4b22",
+      "startedAtUtc": "2026-11-05T14:31:02.767708+00:00",
+      "status": "RECEIVED_JSON",
+      "endedAtUtc": "2026-11-05T14:31:02.768360+00:00"
+    }
+  ]
+}

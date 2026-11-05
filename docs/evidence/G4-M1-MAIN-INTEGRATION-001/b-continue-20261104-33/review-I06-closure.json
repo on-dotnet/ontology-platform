@@ -1,0 +1,38 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-33",
+  "testedCommit": "9ce7326a1d15642762a56316c170f2ae7895029b",
+  "manifestSha256": "2df2f5d70324b57f1b3b4a8b762e1070002f22ba46d2b7395591ed279566cc2a",
+  "reviewer": "/root/consumer_review",
+  "status": "PASS",
+  "scope": "I06 and I01/I03 fixture closure; excludes failed I07 and pending I08/delivery",
+  "observedAtUtc": "2026-11-05T13:59:29.664408+00:00",
+  "checks": {
+    "projectionsIndependentlyRecomputed": 263,
+    "baselineTotal": 780,
+    "baselinePass": 344,
+    "baselineSkip": 436,
+    "historicalCases": 260,
+    "requiredAndClosed": 436,
+    "pgGroups": 9,
+    "pgExecutions": 20,
+    "httpBaselineChecks": 59,
+    "httpBaselineRequests": 135,
+    "credentialChecks": 11,
+    "credentialRequests": 24,
+    "crossOrgChecks": 3,
+    "crossOrgRequests": 3,
+    "sourceBuildUnchanged": true,
+    "rawIncompleteExit2Preserved": true
+  },
+  "hashes": {
+    "gate-I06.json": "057df137b0c4ed0b030dbb1386bc22add515df28dddece58b222cf8ae26d81b0",
+    "fixture-case-closure.json": "4eac06bf75636d5ad3b70b678ee8b93116ca9b3e397d659fe08145b0eafeed68",
+    "gate-I01-closure.json": "9ae51a3b9639a9f1c534c2a284df414e6049e0c055540aece39c437a2e8cbd55",
+    "gate-I03-closure.json": "ef543d1dfef79389203db0fac9045d7aed4041011cf627f1be53cf9a47e6e6e9",
+    "credential-db-closure.json": "54d3bf95d03f0a614bebea89d50317ed9fdd39043044162adc3be94bb05fe7a7",
+    "credential-guard.json": "615c91a61d450049ce707255d1cebfe8befa962a826cafd4da84d8061292a717",
+    "cross-org.json": "37791e690b2afa4cc0492f587df688e58111679c868e089aeb5cacb55881fe80",
+    "freshOidcReport": "60effef91d936009b50a52ddcc882f4e0111ae1ee49995e303e21f579ca3f28b"
+  }
+}

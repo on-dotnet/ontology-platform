@@ -1,0 +1,24 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-33",
+  "testedCommit": "9ce7326a1d15642762a56316c170f2ae7895029b",
+  "manifestSha256": "2df2f5d70324b57f1b3b4a8b762e1070002f22ba46d2b7395591ed279566cc2a",
+  "reviewer": "/root/consumer_review",
+  "status": "PASS",
+  "scope": "I06 completed subitems only; credentials/cross-org/full closure/I07 pending",
+  "observedAtUtc": "2026-11-05T13:51:37.554373+00:00",
+  "checks": [
+    "20 command receipts and original logs match input/build",
+    "catalog three handshakes; backend absent under held lock; final CANCELLED no snapshot",
+    "lease natural expiry fence/attempt1-to2; one snapshot and finish audit; no duplicate after old worker resumed; six container budget observed",
+    "schema valid pre-DDL probe; old hash unchanged/new snapshot id",
+    "three role denials plus exact role/ACL restoration",
+    "two audit failures rollback and same-command recovery",
+    "client actual cancellation and durable CANCELLED"
+  ],
+  "hashes": {
+    "catalog-cancel.json": "c86e318dcbef6405f0f0ec2ee64352cd6b5c03fd92b3499f57a1f56aa916d322",
+    "lease-fence.json": "7f0999ae2e5262a53a8152ab7ceead50e6fb4e291001b82858b5ee85c0080d70",
+    "schema-immutability.json": "7acc988e819443e92c6889ecc35a87693b9d7a281688c8084a32e7ea42f67e10"
+  }
+}

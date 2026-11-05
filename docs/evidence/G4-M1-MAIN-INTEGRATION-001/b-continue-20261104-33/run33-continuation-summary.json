@@ -1,0 +1,53 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-33",
+  "testedCommit": "9ce7326a1d15642762a56316c170f2ae7895029b",
+  "formalStatus": {
+    "I01": "PASS_WITH_FIXTURE_CLOSURE",
+    "I02": "PASS",
+    "I03": "PASS_WITH_FIXTURE_CLOSURE",
+    "I04": "PASS",
+    "I05": "PASS",
+    "I06": "PASS",
+    "I07": "BLOCKED_WITH_WITNESS",
+    "I08": "NOT_RUN"
+  },
+  "originalFailure": {
+    "sha256": "6537615ef2868d3f59ed865ca56000dce6e2eda1ae36b787bd9779f6d2094bca",
+    "case": "M1-U03",
+    "phase": "U03_ORACLE_valid_configuration"
+  },
+  "findings": [
+    {
+      "scope": "task browser driver",
+      "evidence": "second short U02/U03 trial: username empty/invalid; displayName length30 instead16; invalid-form rAF focus may interleave subsequent fill",
+      "resolution": "await invalid field actual focus; verify each filled value",
+      "limitation": "length evidence alone does not prove complete event ordering"
+    },
+    {
+      "scope": "task ingress observer",
+      "evidence": "four static chunk resets align with capacity refusals; at14:19:03.959953Z32 reservations include25 closed awaiting exit proof within24.6-221.4ms",
+      "resolution": "single observer event wakeup after connection closure; clear before inspect; exact exit proof before release",
+      "limitsUnchanged": "32 reservations,120second connections,4hour process"
+    }
+  ],
+  "additionalDriverReadiness": "exact same-origin initial list GET200 completed and actual result DOM before subsequent operator navigation; layout reuses exact loaded URL; no repeated clicks or CSS override",
+  "candidateDiagnostic": {
+    "status": "PASS_DIAGNOSTIC_ONLY",
+    "resultSha256": "c8058ef7e8b2a7efd62a8ab24b60bf34bbf8ecd1b7a7e92accecba060658f394",
+    "inputSha256": "3b56b2e6b065449fd7677fdc78a471a7614d126511aa3aa6cd63b6223ef377fb",
+    "capacityRefusalDelta": 0,
+    "staticResourceFailures": 0,
+    "sourceRestored": true,
+    "newTestedCommitFullAcceptance": "REQUIRED"
+  },
+  "regressions": {
+    "tests": 78,
+    "seconds": 33.632,
+    "status": "PASS",
+    "static": "PASS"
+  },
+  "mainUpdate": "NOT_AUTHORIZED_NOT_EXECUTED",
+  "M2": "NOT_AUTHORIZED_NOT_EXECUTED",
+  "packageCapacity": "15MiB limit remains;64MiB proposal reviewed but not user approved;no new V3"
+}

@@ -1,0 +1,24 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-33",
+  "testedCommit": "9ce7326a1d15642762a56316c170f2ae7895029b",
+  "manifestSha256": "2df2f5d70324b57f1b3b4a8b762e1070002f22ba46d2b7395591ed279566cc2a",
+  "reviewer": "/root/consumer_review",
+  "status": "PASS",
+  "observedAtUtc": "2026-11-05T13:42:41.613272+00:00",
+  "scope": "I04 only; I06 and I01/I03 closure pending",
+  "checks": [
+    "actual exit134/42501 connections CREATE permission denial",
+    "first and repeated history identical after recovery",
+    "G3 rows and audit unchanged",
+    "source schema and history unchanged",
+    "three Web namespace sync and OIDC302 passed",
+    "G3 retired volumes exact absence and KEEP stable",
+    "build binding unchanged"
+  ],
+  "hashes": {
+    "gate-I04.json": "3e97ea9debe215113521a1613cc2f533eb974afd9e9a82c185546ec2f27b6d65",
+    "migration-result": "3e28ae5643047e51943d9c5df91767e47616f891f1c895314be38f971341c429",
+    "volume-retirement": "7315e134703ebe263e23e40a99f093c82b435a9b69895dfb434b7b239f689db5"
+  }
+}

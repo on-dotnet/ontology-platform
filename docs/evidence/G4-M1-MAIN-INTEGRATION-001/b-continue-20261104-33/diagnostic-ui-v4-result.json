@@ -1,0 +1,100 @@
+{
+  "scope": "DIAGNOSTIC_ONLY_NOT_FORMAL_I07",
+  "result": {
+    "taskId": "G4-M1-MAIN-INTEGRATION-001",
+    "runId": "b-continue-20261104-33",
+    "testedCommit": "9ce7326a1d15642762a56316c170f2ae7895029b",
+    "status": "PASS",
+    "baseline": {
+      "M1-U01": "PASS",
+      "M1-U02": "PASS",
+      "M1-U03": "PASS",
+      "M1-U04": "PASS",
+      "M1-U05": "NOT_RUN",
+      "M1-U06": "PASS"
+    },
+    "U05": {
+      "status": "PASS",
+      "case": "M1-U05",
+      "requirements": [
+        {
+          "scenario": "baseline",
+          "requiredObservations": [
+            "empty_list",
+            "five_probe_stages",
+            "job_refresh_recovery"
+          ],
+          "status": "PASS"
+        },
+        {
+          "scenario": "source-unavailable",
+          "requiredObservations": [
+            "source_unavailable_error"
+          ],
+          "status": "PASS"
+        },
+        {
+          "scenario": "source-timeout",
+          "requiredObservations": [
+            "actual_probe_pending_before_response",
+            "real_tcp_connected_tls_timeout_at_least_eight_seconds",
+            "timeout_failure_and_enabled_retry_action_no_second_paused_probe"
+          ],
+          "status": "PASS"
+        },
+        {
+          "scenario": "source-permission-limited",
+          "requiredObservations": [
+            "job_refresh_recovery",
+            "partial_catalog"
+          ],
+          "status": "PASS"
+        },
+        {
+          "scenario": "catalog-cancel",
+          "requiredObservations": [
+            "cancelled_job_refresh",
+            "cancelled_ui_and_enabled_discover_refresh_actions"
+          ],
+          "status": "PASS"
+        }
+      ],
+      "timeoutObservation": {
+        "clientDurationMs": 10080,
+        "reportDurationMs": 10003,
+        "tlsDurationMs": 9999,
+        "networkPassed": true,
+        "tlsFailed": true,
+        "probeStatus": "TEST_FAILED",
+        "diagnosticCode": "connection_source_unavailable",
+        "pendingBeforeResponse": true,
+        "pendingCategories": [
+          "PROBE_RUNNING"
+        ]
+      },
+      "cancelObservation": {
+        "jobId": "d777303d848e48af9072e80b1cb657ba",
+        "createdStatus": "QUEUED",
+        "persistedStatus": "QUEUED",
+        "terminalStatus": "CANCELLED",
+        "completedAtPresent": true,
+        "snapshotAbsent": true
+      },
+      "reportHashes": {
+        "baseline": "b4a6dbe85029d0e47fffaad24af9a4692caa347042debde66380c6a759e01392",
+        "source-unavailable": "94b8bb74a18fd92069434bc71dc31a1899462fa606352abc97dff371ae0f167f",
+        "source-timeout": "a0f0310c9bc2125d261fcb3f44d6ba98fe87eae4bb8f38311ce0d0f33c23048e",
+        "source-permission-limited": "e8827fafe898c3d9e5a4e9081e4267ea9e7bf10e2721c0def7e938e5ef07ee42",
+        "catalog-cancel": "40e5f8d3736e46592282a09d92f0e673e8cde09defe5bdd68f1747319da39a0a"
+      },
+      "sourceCancellationSha256": "3fb3703023147ba7b3d2c70b095d25a372041ee499212359fd4004b5b071db6c",
+      "restorationReceipts": {
+        "ui-probe-refresh": "663cc0a212f9875772a08ab9bca89cab0614880dbcd8367863c0e40847863bdd",
+        "ui-timeout-restored": "aac10540f6c2b187a0ed2eef59e28ff7c1f93692861b2ec7f508daa66905ecbf",
+        "ui-permission-restored": "867c277c893c003a1ee3810e81a993b19dd09f87c7ef3ef67434669c168e3fd6"
+      }
+    },
+    "sourceRestored": true,
+    "catalogCancel": "PASS"
+  }
+}

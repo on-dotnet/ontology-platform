@@ -1,0 +1,35 @@
+{
+  "status": "PASS",
+  "reviewer": "/root/consumer_review",
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-33",
+  "testedCommit": "9ce7326a1d15642762a56316c170f2ae7895029b",
+  "manifestSha256": "2df2f5d70324b57f1b3b4a8b762e1070002f22ba46d2b7395591ed279566cc2a",
+  "drivers": {
+    "run.py": "5b116dbecb5be44588f83ba48be243a8eecb39677c666dd61835dfcf444e2f57",
+    "consumer_check.py": "a76a6729baacff296880419cdc434dd927c8272afd3bbd3779661a442f29e450",
+    "runtime.py": "2975aff94e51cb2d7cf67de5b69b66cf0f5c0bc2dbcc4bc3f21b76f111353bcf",
+    "pg_fixture.py": "0b3e95134d76bb356fa2f14f21da58886675d6c553b2daf2f643895dc4591f51",
+    "module-tests.py": "0d8485fab6d9f037ce1851984f4c6d0f40b628775f66302cc4740ed2f2ca0d96",
+    "startup-boundary.py": "256bba53361f407d0a4071c9c7bd951019418e2193e56aaa604155510d04289c",
+    "migration-boundary.py": "c5c154ee542faa2120276fcd9e096e81b3084194fc2060d6e614d8d270257a18",
+    "contract-check.mjs": "3a7f662352a1d182f0f53f96703cfbb1f8d6f152443d3ab5bc8b2a525c5b01ea",
+    "http.mjs": "c98e018d1748a3bb57a2ee70e71574633a1616e238528eb2f45c02aba83281eb",
+    "browser.mjs": "b2558c334e3896db180a3cb82f35345bfc208edb65266b963901a0d10ffdb758",
+    "fault.mjs": "2b8c1b5a2951d5c9f3789ef469d0ec796009a7762e3fa4f957ccf3fdc3a5af48",
+    "g3-compatibility.mjs": "705d972ae2f48107c445be8ae575096ee39b55b3b01112e26d1a206923437c9d",
+    "readback.py": "1d5b6001c554043682b7dc94028d9829546e5f05791b170cd5267fd7310f453c",
+    "closeout.py": "fd6b97e94348e72d4dced2e1197b5686971ad01c160a1db0a2af97a7b15f449b",
+    "tests.py": "3602c8b12230f35a31abdfff82c165520ac7b869723ffac0f821f5bbbe7beae1",
+    "host_continuity.py": "abd4385e1b05a86f5a12582a7e95a1fcc4a29c333eb23d2d952229744ed68984",
+    "compose.m1.yaml": "7a3b6ffc11ca7283e3bdaa5d61223df6d1f1b84a2e7c769f3f28aa7a5eea329f",
+    "compose.g3.yaml": "3231f1f0ff3c3d9aabcd8b58b589d1adc0d267c8e2af1335d2b1e5777416c53d",
+    "hooks/pre-push": "5eaef2482b8b75cb1deb7cca9703f591a0a15c2459e49c5192b4382ccb7ad474"
+  },
+  "rawReview": "Run33 R2独立后验PASS，可同T同Run进入PREFLIGHT及已授权完整门禁。PID73266 exit0 5.760秒，21项目168实际包载荷/私有来源，两SDK前后导入/cleanHEAD/19drivers一致；OS全拒网/写白名单，stdout零警告错误/stderr空/HTTPcache空/事故KEEP不变。不重复Restore，不代表产品通过。",
+  "evidenceHashes": {
+    "gate-R2.json": "9bec9de97575d10f80fd5f3d70a8a8a94c2c7ced33622d9da8fdeec8f8b1b9bc",
+    "restore-result.json": "d533a008329cb0db0e0c70c3d1daca981648a35f24bbcfef4a6839401e746708",
+    "restore-provenance.json": "bbcc0ba7cc238e53ef729aa4ee54249a78d1233d7e33de7ccb6b15be2960102f"
+  }
+}

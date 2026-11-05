@@ -1,0 +1,50 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-33",
+  "testedCommit": "9ce7326a1d15642762a56316c170f2ae7895029b",
+  "startedUtc": "2026-11-05T13:39:44.571Z",
+  "checks": [
+    {
+      "name": "disabled_probe_discovery_and_history_denied",
+      "status": "PASS"
+    }
+  ],
+  "http": [
+    {
+      "method": "GET",
+      "route": "/api/v1/connections/{id}",
+      "status": 200,
+      "durationMs": 26,
+      "jsonBody": true
+    },
+    {
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/test",
+      "status": 409,
+      "durationMs": 25,
+      "jsonBody": true
+    },
+    {
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/discoveries",
+      "status": 409,
+      "durationMs": 25,
+      "jsonBody": true
+    },
+    {
+      "method": "GET",
+      "route": "/api/v1/connections/{id}/catalogs",
+      "status": 403,
+      "durationMs": 24,
+      "jsonBody": true,
+      "code": "catalog_access_forbidden"
+    }
+  ],
+  "scope": "ONE_HTTP_ACTION_ONLY",
+  "databaseRollbackLeaseFenceEvidence": "NOT_RUN_BY_THIS_CONSUMER",
+  "action": "disabled-denials",
+  "connectionId": "528d1ae050ae42b1ae80cef123c447a1",
+  "auditStage": "start",
+  "status": "PASS",
+  "completedUtc": "2026-11-05T13:39:45.940Z"
+}

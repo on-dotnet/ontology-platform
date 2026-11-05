@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "startedAtUtc": "2026-11-05T14:16:22.981Z",
+  "cases": {
+    "M1-U01": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U02": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U03": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U04": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U05": {
+      "status": "FAIL",
+      "observed": [],
+      "reason": "browser_timeout",
+      "failure": {
+        "code": "browser_timeout",
+        "category": "timeout"
+      },
+      "phase": "U05_source_timeout_initial_catalog"
+    },
+    "M1-U06": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    }
+  },
+  "http": [
+    {
+      "method": "GET",
+      "route": "/auth/csrf",
+      "status": 200,
+      "durationMs": 49
+    }
+  ],
+  "screenshots": [],
+  "productExecution": true,
+  "runId": "b-continue-20261104-33",
+  "scenario": "source-timeout",
+  "driverSha256": "f20b2a3a0440fe77a6b239a5ae1dd2cf818f97161080c8194cef8357931e1561",
+  "staticFailures": [
+    {
+      "path": "/_next/static/chunks/2pjgbt2kgaj7u.js",
+      "code": "static_failed",
+      "category": "network",
+      "networkCode": "net::ERR_CONNECTION_RESET"
+    },
+    {
+      "path": "/_next/static/chunks/2oexneeu1y8vz.js",
+      "code": "static_failed",
+      "category": "network",
+      "networkCode": "net::ERR_CONNECTION_RESET"
+    },
+    {
+      "path": "/_next/static/chunks/2rolduqppundq.js",
+      "code": "static_failed",
+      "category": "network",
+      "networkCode": "net::ERR_CONNECTION_RESET"
+    },
+    {
+      "path": "/_next/static/chunks/115gfruh7a57s.js",
+      "code": "static_failed",
+      "category": "network",
+      "networkCode": "net::ERR_CONNECTION_RESET"
+    }
+  ],
+  "completedAtUtc": "2026-11-05T14:16:39.224Z",
+  "exitCode": 1
+}

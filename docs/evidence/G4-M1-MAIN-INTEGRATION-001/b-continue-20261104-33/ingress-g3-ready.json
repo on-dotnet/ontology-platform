@@ -1,0 +1,81 @@
+{
+  "pid": 97397,
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-33",
+  "testedCommit": "9ce7326a1d15642762a56316c170f2ae7895029b",
+  "manifestSha256": "2df2f5d70324b57f1b3b4a8b762e1070002f22ba46d2b7395591ed279566cc2a",
+  "runtimeSha256": "2975aff94e51cb2d7cf67de5b69b66cf0f5c0bc2dbcc4bc3f21b76f111353bcf",
+  "engineSocket": "unix:///Users/chasen/.docker/run/docker.sock",
+  "apiVersion": "1.56",
+  "routes": [
+    {
+      "service": "platform-pg",
+      "targetId": "088df92721f53be277145b89130e0b8ff9ad7b192f11dd37f2971cdd8863ef8b",
+      "providerId": "088df92721f53be277145b89130e0b8ff9ad7b192f11dd37f2971cdd8863ef8b",
+      "brokerId": "088df92721f53be277145b89130e0b8ff9ad7b192f11dd37f2971cdd8863ef8b",
+      "networkId": "a95563a231af37987132014d7cbee00041ae0c9b0e0c5422825e49a7caa7357f",
+      "targetIp": "172.18.0.6",
+      "connectIp": "127.0.0.1",
+      "port": 5432,
+      "hostPort": 15432
+    },
+    {
+      "service": "keycloak-test",
+      "targetId": "f837f02c902fd92bcfa442870fbe85ce995727f4c5e9bf644d443b863280bb86",
+      "providerId": "f837f02c902fd92bcfa442870fbe85ce995727f4c5e9bf644d443b863280bb86",
+      "brokerId": "088df92721f53be277145b89130e0b8ff9ad7b192f11dd37f2971cdd8863ef8b",
+      "networkId": "a95563a231af37987132014d7cbee00041ae0c9b0e0c5422825e49a7caa7357f",
+      "targetIp": "172.18.0.2",
+      "connectIp": "172.18.0.2",
+      "port": 8080,
+      "hostPort": 15180
+    },
+    {
+      "service": "api",
+      "targetId": "f5abb7f6b1ad6127d9d6c57247f6ee6ff5e8016a4eab5839023cc45687e15023",
+      "providerId": "f5abb7f6b1ad6127d9d6c57247f6ee6ff5e8016a4eab5839023cc45687e15023",
+      "brokerId": "088df92721f53be277145b89130e0b8ff9ad7b192f11dd37f2971cdd8863ef8b",
+      "networkId": "a95563a231af37987132014d7cbee00041ae0c9b0e0c5422825e49a7caa7357f",
+      "targetIp": "172.18.0.4",
+      "connectIp": "172.18.0.4",
+      "port": 15100,
+      "hostPort": 15100
+    },
+    {
+      "service": "web",
+      "targetId": "8e025d3c7ebdbe05f3e085cce8cea1e07bba5b3feb0d424094b153e885fbfc95",
+      "providerId": "f5abb7f6b1ad6127d9d6c57247f6ee6ff5e8016a4eab5839023cc45687e15023",
+      "brokerId": "088df92721f53be277145b89130e0b8ff9ad7b192f11dd37f2971cdd8863ef8b",
+      "networkId": "a95563a231af37987132014d7cbee00041ae0c9b0e0c5422825e49a7caa7357f",
+      "targetIp": "172.18.0.4",
+      "connectIp": "172.18.0.4",
+      "port": 15300,
+      "hostPort": 15300
+    },
+    {
+      "service": "fuseki",
+      "targetId": "1c07e1619dcfd4132ce33de050ea444b28ec1cf60938c9b40ad14c84b21b5d9e",
+      "providerId": "1c07e1619dcfd4132ce33de050ea444b28ec1cf60938c9b40ad14c84b21b5d9e",
+      "brokerId": "088df92721f53be277145b89130e0b8ff9ad7b192f11dd37f2971cdd8863ef8b",
+      "networkId": "a95563a231af37987132014d7cbee00041ae0c9b0e0c5422825e49a7caa7357f",
+      "targetIp": "172.18.0.3",
+      "connectIp": "172.18.0.3",
+      "port": 3030,
+      "hostPort": 15303
+    },
+    {
+      "service": "rustfs",
+      "targetId": "b8637b37b6811d1a4dfe74d78742164027d06aa49d8478e5482f4c5eab3bfcf1",
+      "providerId": "b8637b37b6811d1a4dfe74d78742164027d06aa49d8478e5482f4c5eab3bfcf1",
+      "brokerId": "088df92721f53be277145b89130e0b8ff9ad7b192f11dd37f2971cdd8863ef8b",
+      "networkId": "a95563a231af37987132014d7cbee00041ae0c9b0e0c5422825e49a7caa7357f",
+      "targetIp": "172.18.0.5",
+      "connectIp": "172.18.0.5",
+      "port": 9000,
+      "hostPort": 15900
+    }
+  ],
+  "maxConcurrent": 32,
+  "connectionSeconds": 120,
+  "processSeconds": 14400
+}

@@ -1,0 +1,44 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-33",
+  "testedCommit": "9ce7326a1d15642762a56316c170f2ae7895029b",
+  "startedUtc": "2026-11-05T13:51:41.495Z",
+  "checks": [
+    {
+      "name": "same_operator_a_original_org_actual_intake",
+      "status": "PASS"
+    }
+  ],
+  "http": [
+    {
+      "method": "GET",
+      "route": "/api/v1/connections/{id}",
+      "status": 200,
+      "durationMs": 24,
+      "jsonBody": true
+    },
+    {
+      "method": "GET",
+      "route": "/api/v1/platform/me",
+      "status": 200,
+      "durationMs": 26,
+      "jsonBody": true
+    },
+    {
+      "method": "POST",
+      "route": "/api/v1/connection-secrets",
+      "status": 201,
+      "durationMs": 25,
+      "jsonBody": true
+    }
+  ],
+  "scope": "ONE_HTTP_ACTION_ONLY",
+  "databaseRollbackLeaseFenceEvidence": "NOT_RUN_BY_THIS_CONSUMER",
+  "action": "intake-foreign",
+  "connectionId": "1721eba71b5e42f9aa23337ec5c77ae2",
+  "auditStage": "complete",
+  "originalSubjectSha256": "123ef54f282c0f2c954d8b724cd9edf705dbc6b888b062c21749613eab4c3e56",
+  "foreignRefSha256": "6e630ec935743b080422e8fb490f2fbe784bb3906d5c267d16d018c897cf96f7",
+  "status": "PASS",
+  "completedUtc": "2026-11-05T13:51:42.808Z"
+}

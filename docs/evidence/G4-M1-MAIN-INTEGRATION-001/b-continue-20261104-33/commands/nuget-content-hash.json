@@ -1,0 +1,29 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-33",
+  "testedCommit": "9ce7326a1d15642762a56316c170f2ae7895029b",
+  "command": [
+    "/usr/bin/sandbox-exec",
+    "-p",
+    "(version 1) (allow default) (deny network*)",
+    "pwsh",
+    "-NoProfile",
+    "-Command",
+    "[Reflection.Assembly]::LoadFrom('/usr/local/share/dotnet/sdk/10.0.402/NuGet.Packaging.dll') | Out-Null\n$expected=$env:G4_PACKAGE_EXPECTATIONS | ConvertFrom-Json -AsHashtable\n$rows=@(); foreach($entry in $expected.GetEnumerator()) {\n $parts=$entry.Key.Split('/'); $file='/Users/chasen/.nuget/packages/'+$entry.Key+'/'+$parts[0]+'.'+$parts[1]+'.nupkg'\n if(!(Test-Path -LiteralPath $file)){throw 'OFFLINE_PACKAGE_MISSING'}\n $reader=[NuGet.Packaging.PackageArchiveReader]::new($file)\n try {$actual=$reader.GetContentHash([Threading.CancellationToken]::None,$null)} finally {$reader.Dispose()}\n if($actual -cne $entry.Value){throw 'LOCKED_CONTENT_MISMATCH'}\n $rows+=@{package=$entry.Key;contentHash=$actual;archiveSha256=(Get-FileHash -LiteralPath $file -Algorithm SHA256).Hash.ToLowerInvariant()}\n}; $rows | ConvertTo-Json -Depth 3"
+  ],
+  "startedAtUtc": "2026-11-05T13:01:12.638637+00:00",
+  "endedAtUtc": "2026-11-05T13:01:13.669784+00:00",
+  "elapsedSeconds": 1.031056083011208,
+  "exitCode": 0,
+  "timingStatus": "OBSERVED",
+  "timedOut": false,
+  "executedInputDrift": false,
+  "inputHashes": {
+    "/usr/bin/sandbox-exec": "58839ef01b4eef8aac0d2aa8f9d1c074ae45aafe3533965b030672450064acc8"
+  },
+  "manifestSha256": "2df2f5d70324b57f1b3b4a8b762e1070002f22ba46d2b7395591ed279566cc2a",
+  "commandSha256": "8ff48497c925d7231979a7d1c51ba62f780f2af36f9e9a6ce3d89990418c1412",
+  "logSha256": "e2cb1ae5ef8256ddf387587922948b7447fbd2565f534dc8fe7b60b189bf184e",
+  "logBytes": 44455,
+  "logVisibility": "TASK_EVIDENCE"
+}

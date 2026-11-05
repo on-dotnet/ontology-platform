@@ -72,6 +72,22 @@ const sensitive = new Set();
 let browser, output, activeCase, phase = 'configuration';
 const contexts = [];
 let expectation;
+/** 错误标记提交后仍须等待真实延后聚焦，避免下一字段输入被焦点恢复抢走。 */
+async function expectInvalidFocus(control) {
+  await expectation(control).toHaveAttribute('aria-invalid', 'true');
+  await expectation(control).toBeFocused();
+}
+/** 只接受当前源站准确列表读取成功，不以其它请求解除加载门禁。 */
+function isConnectionListResponse(response, origin) {
+  const url = new URL(response.url());
+  return url.origin === origin && url.pathname === '/api/v1/connections' && url.search === '' && response.request().method() === 'GET' && response.status() === 200;
+}
+/** SSR标题不能证明控件已接管；等待真实列表结果渲染后才操作主题。 */
+async function expectLoadedList(page) {
+  await expectation(page.getByRole('heading', { name: '数据源', exact: true })).toBeVisible();
+  await expectation(page.getByRole('status').filter({ hasText: '正在读取连接' })).toHaveCount(0);
+  await expectation(page.locator('.connections-workspace > section.connection-card')).toBeVisible();
+}
 /** 固定错误码取代异常正文，避免 Playwright 调用日志泄漏输入。 */
 /** 只从异常内存文本提取固定网络代码；原 message/stack 永不进入证据。 */
 function safeFailure(error, fallback) {
@@ -248,6 +264,11 @@ try {
     const user = realm.identities['g2-' + label]; requireTrue(user?.username && user?.password, 'bootstrap_identity_missing');
     identityStep('context_create'); const session = await context();
     identityStep('page_create'); const page = await session.newPage();
+    // 操作员先完成OIDC返回后的列表加载，避免初次资源未完成即导航挤满受控入口。
+    const initialListStarted = performance.now();
+    const initialList = label === 'operator-ab'
+      ? page.waitForResponse(response => isConnectionListResponse(response, runtime.publicOrigin), { timeout: 15000 }) : null;
+    if (initialList) initialList.catch(() => {}); // 后续准确await传播失败，避免登录期间未处理拒绝。
     identityStep('login_navigation'); await page.goto(runtime.publicOrigin + '/auth/login?returnUrl=%2Fdata%2Fconnections');
     identityStep('username_input'); await page.locator('#username').fill(user.username);
     identityStep('password_input'); await page.locator('#password').fill(user.password);
@@ -259,6 +280,14 @@ try {
     identityStep('csrf_request'); const csrf = await http(actor, 'GET', '/auth/csrf', '/auth/csrf'); requireTrue(csrf.status() === 200, 'csrf_issue_failed');
     identityStep('csrf_decode'); const token = (await csrf.json()).requestToken; requireTrue(typeof token === 'string', 'csrf_missing'); remember(token);
     actor.headers = { Origin: actor.origin, 'X-CSRF-TOKEN': token, Connection: 'close' };
+    if (initialList) {
+      identityStep('initial_list_readiness');
+      const response = await initialList;
+      requireTrue(await response.finished() === null, 'list_response_incomplete');
+      await expectLoadedList(page);
+      report.http.push({ method: 'GET', route: '/api/v1/connections', status: response.status(), durationMs: Math.round(performance.now() - initialListStarted), scope: 'operator_initial_list_readiness' });
+      report.initialListReady = true;
+    }
     phase = previousPhase; return actor;
   }
   async function jsonResponse(response, expected) { requireTrue(response.status() === expected, 'unexpected_http_status'); return response.json(); }
@@ -419,10 +448,14 @@ try {
         phase = 'U03_' + type + '_invalid_name';
         await page.locator('input[name=displayName]').fill('');
         await page.getByRole('button', { name: '校验配置', exact: true }).click();
-        await expectation(page.locator('input[name=displayName]')).toHaveAttribute('aria-invalid', 'true');
+        await expectInvalidFocus(page.locator('input[name=displayName]'));
         phase = 'U03_' + type + '_valid_configuration';
         await page.locator('input[name=displayName]').fill('Synthetic ' + type);
-        for (const [key, value] of Object.entries(profiles[type])) await page.locator('input[name=' + key + ']').fill(value);
+        await expectation(page.locator('input[name=displayName]')).toHaveValue('Synthetic ' + type);
+        for (const [key, value] of Object.entries(profiles[type])) {
+          await page.locator('input[name=' + key + ']').fill(value);
+          await expectation(page.locator('input[name=' + key + ']')).toHaveValue(value);
+        }
         await page.getByRole('button', { name: '校验配置', exact: true }).click();
         await expectation(page.getByText('配置格式校验通过；连接结果以实际测试为准。')).toBeVisible();
         if (type !== 'POSTGRESQL') {
@@ -435,7 +468,7 @@ try {
         const negativeKey = type === 'POSTGRESQL' || type === 'ORACLE' ? 'port' : type === 'DORIS' ? 'queryPort' : type === 'TDENGINE' ? 'wsUrl' : 'baseOrigin';
         await page.locator('input[name=' + negativeKey + ']').fill(negativeKey.toLowerCase().includes('port') ? '65536' : 'not-a-url');
         await page.getByRole('button', { name: '校验配置', exact: true }).click();
-        await expectation(page.locator('input[name=' + negativeKey + ']')).toHaveAttribute('aria-invalid', 'true');
+        await expectInvalidFocus(page.locator('input[name=' + negativeKey + ']'));
         note(type + '_distinct_fields_positive_and_negative_format');
       }
     });
@@ -503,7 +536,21 @@ try {
   }
   if (['baseline', 'layout-only'].includes(scenario)) {
     await runCase('M1-U06', async () => {
-      await page.goto(operator.origin + '/data/connections'); await expectation(page.getByRole('heading', { name: '数据源', exact: true })).toBeVisible();
+      phase = 'U06_list_readiness';
+      if (scenario === 'layout-only') {
+        requireTrue(report.initialListReady === true, 'initial_list_not_ready');
+        requireTrue(page.url() === operator.origin + '/data/connections', 'initial_list_route_changed');
+        await expectLoadedList(page);
+      } else {
+        const started = performance.now();
+        const [listResponse] = await Promise.all([
+          page.waitForResponse(response => isConnectionListResponse(response, operator.origin), { timeout: 15000 }),
+          page.goto(operator.origin + '/data/connections'),
+        ]);
+        requireTrue(await listResponse.finished() === null, 'list_response_incomplete');
+        await expectLoadedList(page);
+        report.http.push({ method: 'GET', route: '/api/v1/connections', status: listResponse.status(), durationMs: Math.round(performance.now() - started), scope: 'U06_list_readiness' });
+      }
       for (const theme of ['light', 'dark']) {
         phase = 'U06_' + theme + '_theme_toggle';
         if (await page.locator('html').getAttribute('data-theme') !== theme) await page.getByRole('button', { name: '切换深浅主题', exact: true }).click();
