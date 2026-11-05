@@ -1,0 +1,24 @@
+{
+  "owner": "postgres",
+  "acl": [
+    {
+      "grantee": "fixture_reader",
+      "grantor": "postgres",
+      "privilege": "SELECT",
+      "grantable": false
+    }
+  ],
+  "select": true,
+  "write": false,
+  "schemaUsage": true,
+  "role": {
+    "super": false,
+    "createDb": false,
+    "createRole": false,
+    "inherit": false,
+    "replication": false,
+    "bypassRls": false,
+    "login": true
+  },
+  "memberships": []
+}

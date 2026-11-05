@@ -1,0 +1,27 @@
+{
+  "reviewer": "/root/consumer_review",
+  "status": "PASS",
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-34",
+  "testedCommit": "464f732a38ce343229197eba100296cfe652eeb9",
+  "manifestSha256": "d05df774f61ce3fbff9cbf62bbc3f0d73c183cddc8c039c7c0705213e7d5704d",
+  "g3Checks": 38,
+  "securityCases": 156,
+  "g2ContractCases": 121,
+  "fail": 0,
+  "skip": 0,
+  "findings": [
+    "raw command logs/current assemblies/build binding match",
+    "fresh OIDC before/after identity restoration; subject roles scopes match; user/profile independently restored",
+    "actual V2 manifest matches G3 release report fieldwise; original bytes archived and generated path lstat ENOENT",
+    "four modules verified in review-modules-interim.json; no live facility access; I01/I03/I04 not concluded by this review"
+  ],
+  "hashes": {
+    "gate-I02.json": "4d22703b5ae72022f6a75aa4e0b2c0487f078a85eef31ae0ad78d078ac3011fe",
+    "g3Baseline": "d57f46d61080d7c864748d5337cb5b46789f306e9af42222f97f27c7765f429b",
+    "identityRestoration": "7f8d1e953df3f8ca66ed32a0e6ccd0f9a61c001720f233bb56b2abb9cde1e49a",
+    "actualV2Input": "b8217674b13bbcb0229868115d635b7d9339c26b0fb211c4bd38bd7eecceec51",
+    "actualV2Retired": "2b18abbe43e81ec70ab04421a1360f817b27b1daf50908646ecc0b885c81d5fc"
+  },
+  "observedAtUtc": "2026-11-05T15:21:13.622687+00:00"
+}

@@ -1,0 +1,38 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-34",
+  "testedCommit": "464f732a38ce343229197eba100296cfe652eeb9",
+  "command": [
+    "/usr/bin/sandbox-exec",
+    "-p",
+    "(version 1) (allow default) (deny network-outbound (remote ip \"*:*\")) (allow network-outbound (remote ip \"localhost:*\"))",
+    "/usr/local/share/dotnet/dotnet",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll",
+    "--filter",
+    "FullyQualifiedName=OntologyPlatform.PublishingTests.PublishingFlowTests.PublishTwoVersionsRollbackOldCompleteManifestAndReplay",
+    "--minimum-expected-tests",
+    "1",
+    "--no-ansi",
+    "--output",
+    "Detailed",
+    "--results-directory",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-34/test-results/module-PublishingTests-m030"
+  ],
+  "startedAtUtc": "2026-11-05T15:07:33.101164+00:00",
+  "endedAtUtc": "2026-11-05T15:07:37.432026+00:00",
+  "elapsedSeconds": 4.330845667005633,
+  "exitCode": 0,
+  "timingStatus": "OBSERVED",
+  "timedOut": false,
+  "executedInputDrift": false,
+  "inputHashes": {
+    "/usr/bin/sandbox-exec": "58839ef01b4eef8aac0d2aa8f9d1c074ae45aafe3533965b030672450064acc8",
+    "/usr/local/share/dotnet/dotnet": "11b517e7b00d0efa20e9b3ab6fe433f135d828a4c95c9c6ca7a9cf1328b6ada4",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll": "5338edb768092080d5161919fd2f95ef00f10e06a5a376d398903994e83a537e"
+  },
+  "manifestSha256": "d05df774f61ce3fbff9cbf62bbc3f0d73c183cddc8c039c7c0705213e7d5704d",
+  "commandSha256": "45fbff380e9d0d76b21c75d25834085067d8694865f9c48362eb75ebfdda9fad",
+  "logSha256": "5ace5cdac1185f0e4270dc7506effd3ce7983a3b39124ecf2f3384332398a68c",
+  "logBytes": 380,
+  "logVisibility": "PRIVATE"
+}

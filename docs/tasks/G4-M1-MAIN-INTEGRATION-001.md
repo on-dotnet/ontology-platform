@@ -196,3 +196,14 @@ Run33 / T9ce7326a1d15642762a56316c170f2ae7895029b：R1/R2独立PASS，严格离�
 三文件新增真实Edge焦点/异步列表正反及async退出通知竞态/仍运行/nullExit/错容器测试，均先RED后GREEN；78任务测试33.632秒、工程静态及独立源码Review PASS。候选v4仅诊断：六浏览器场景无FAIL/静态资源失败，U05原闭合函数通过；超时client10080/report10003/TLS9999ms且响应前PROBE_RUNNING，准确worker473在源锁仍持有时消失（另有PID474，不宣称所有源连接消失），最终准确job CANCELLED且无快照。候选入口capacity拒绝0，984准确Exec退出、8组远端检查和四端口释放。五份旧入口文件按bytes/hash/inode/mode无损归档，候选实际argv/hash单独绑定，三份候选源码finally恢复；原T仅绑定产品/设施，不把诊断解释为同输入正式PASS。须新T/Run34稳定完整验收。
 
 Run33收尾：模块28对象、G3切换6对象和最终5容器2网4卷均准确回收；最终16命令/11准确不存在诊断及独立实时后验，creation registry至最终外部KEEP3网8卷一致。四可再生副本26919文件512583857逻辑字节按本轮重读VM91544/556只读FD计划实际删除，事故KEEP不变，VM未操作、物理释放NOT_VERIFIED。63种已知本Run秘密扫描14167项无发现。monitor72923覆盖13:01:12Z–14:39:41Z，588心跳，观测日志窗0Sleep；未观测锁屏/熄屏连续性仍NOT_VERIFIED。候选入口17755、原入口99041及monitor均已释放，原始失败、诊断、私有恢复材料及单文件迁移Git blob保持。最终V3仍受15MiB限制，64MiB单任务例外仅提案已审未获用户批准，未实施共享工具变更；无新V3/main/M2。
+
+
+Run34 / T464f732a38ce343229197eba100296cfe652eeb9：在用户要求继续完整验收的原授权内，冻结已审浏览器就绪/焦点及入口退出通知修复，完整重新执行R1/R2与I01–I07。严格离线21项目168包Restore5.733秒；原27套SelfTest425.799秒、78任务测试33.824秒、native/Web75.137秒全部通过，Web23文件379测试。原生baseline780=344PASS+436SKIP；非作者逐一重解析263份投影/原始日志/命令/程序集，历史260与本轮跳过并集436/436真实闭合，原SKIP与专项exit2/INCOMPLETE矩阵不改写。I01/I03后置闭合PASS，I02/I04/I05/I06/I07正式PASS并各获独立Review。
+
+I02四模块244方法462案例、MCP3正6负、G3兼容38检查、Security156/G2Contract121通过；实际V2生成输入原字节归档后准确退休。I04权限拒绝exit134准确42501/connections/permission denied；首次/重复history一致，G3的15表投影/52既有审计及源库保持。I05真实DLL生成链及6负例通过。I06 PG9组20案例、HTTP59检查135请求、角色拒绝/ACL恢复、两类审计回滚、真实客户端和Catalog取消、自然租约接管Fence/Attempt1→2、schema一致性、凭据11检查24请求及跨组织3检查3请求全部闭合。
+
+I07六个真实浏览器场景完成，U01–U06通过（U05独立聚合闭合）；超时client10087/report10010/TLS10002ms，响应前实际PROBE_RUNNING，guard与恢复均有后验。准确取消worker463在源锁仍持有时消失，最终job CANCELLED且无snapshot；不宣称所有源会话消失。四张明暗宽窄PNG经独立实际目视审查，geometry/hit通过；baseline与layout对应图逐字节相同，仅选四张进入本轮交付。入口2477连接取得实际Exec退出证明，容量拒绝0。
+
+正式I08于同T执行，已知59秘密模式扫描15035项无发现；模块28对象、G3切换6对象及最后5容器2网络4卷准确回收，最终16命令/11准确缺席与独立实时后验，KEEP0容器3网络8卷保持。四可再生副本26919文件512583830逻辑字节按新VM41420/556只读FD精确计划删除，事故KEEP未变，VM未操作，物理空间释放NOT_VERIFIED。monitor22354首次因macOS实际Python路径与启动argv不等在信号前拒绝，原helper/失败保留；v2核对实际完整命令/出生/driverSHA后准确释放并独立ps确认不存在。398心跳含260锁屏熄屏心跳，观测日志0ms确认Sleep，sessionContinuity仍NOT_VERIFIED。
+
+本轮全部产品与运行资源门禁已完成；I08交付总体仍PARTIAL，唯一V3/独立重开/包外回执尚未完成，不能标READY_FOR_CHATGPT_MAIN_MERGE_APPROVAL。15MiB硬限制仍生效，64MiB单任务例外仅提案已审未获批准；共享合同/构包脚本/测试未改。当前仅增补本任务说明、无损证据及四张代表截图，旧失败、私有原件、单文件归档原始字节/Git blob/恢复映射保持；CI/Windows/Intel NOT_RUN、供应链限制保留；main未更新，M2未进入。

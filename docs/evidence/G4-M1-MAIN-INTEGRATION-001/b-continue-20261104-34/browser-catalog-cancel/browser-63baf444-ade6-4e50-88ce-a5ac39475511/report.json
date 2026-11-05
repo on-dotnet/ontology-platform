@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 1,
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "startedAtUtc": "2026-11-05T15:41:52.238Z",
+  "cases": {
+    "M1-U01": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U02": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U03": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U04": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U05": {
+      "status": "NOT_RUN",
+      "observed": [
+        "source_lock_and_backend_disappearance_require_independent_master_witness",
+        "cancelled_job_refresh",
+        "cancelled_ui_and_enabled_discover_refresh_actions"
+      ],
+      "reason": "aggregate_requires_loading_timeout_cancel_partial_and_refresh_evidence_across_controlled_runs"
+    },
+    "M1-U06": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    }
+  },
+  "http": [
+    {
+      "method": "GET",
+      "route": "/auth/csrf",
+      "status": 200,
+      "durationMs": 54
+    },
+    {
+      "method": "GET",
+      "route": "/api/v1/connections",
+      "status": 200,
+      "durationMs": 584,
+      "scope": "operator_initial_list_readiness"
+    },
+    {
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/discoveries",
+      "status": 202,
+      "durationMs": 90
+    },
+    {
+      "method": "GET",
+      "route": "/connections/{id}/discoveries/{jobId}",
+      "status": 200,
+      "durationMs": 27
+    },
+    {
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/discoveries/4320c0099e124b9d8555e58227525b74/cancel",
+      "status": 200,
+      "durationMs": 1003
+    },
+    {
+      "method": "GET",
+      "route": "/connections/{id}/discoveries/{jobId}",
+      "status": 200,
+      "durationMs": 43
+    }
+  ],
+  "screenshots": [],
+  "productExecution": true,
+  "runId": "b-continue-20261104-34",
+  "scenario": "catalog-cancel",
+  "driverSha256": "0af8da9bbd7202fb83d4c0e86f3b0b4122dd1ba995a7db6102a6a630c9cfbf8f",
+  "initialListReady": true,
+  "catalogCancelHandshakes": [
+    {
+      "event": "CATALOG_CANCEL_READY",
+      "status": "MARKER_ACKNOWLEDGED",
+      "readyAtUtc": "2026-11-05T15:41:53.498Z",
+      "acknowledgedAtUtc": "2026-11-05T15:41:53.501Z"
+    },
+    {
+      "event": "CATALOG_JOB_STARTED",
+      "status": "MARKER_ACKNOWLEDGED",
+      "readyAtUtc": "2026-11-05T15:41:53.620Z",
+      "acknowledgedAtUtc": "2026-11-05T15:41:53.700Z"
+    }
+  ],
+  "cancelObservation": {
+    "jobId": "4320c0099e124b9d8555e58227525b74",
+    "createdStatus": "QUEUED",
+    "persistedStatus": "QUEUED",
+    "terminalStatus": "CANCELLED",
+    "completedAtPresent": true,
+    "snapshotAbsent": true
+  },
+  "completedAtUtc": "2026-11-05T15:41:55.218Z",
+  "exitCode": 2
+}

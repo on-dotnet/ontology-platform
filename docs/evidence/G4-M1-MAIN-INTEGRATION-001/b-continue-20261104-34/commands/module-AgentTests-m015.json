@@ -1,0 +1,38 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-34",
+  "testedCommit": "464f732a38ce343229197eba100296cfe652eeb9",
+  "command": [
+    "/usr/bin/sandbox-exec",
+    "-p",
+    "(version 1) (allow default) (deny network-outbound (remote ip \"*:*\")) (allow network-outbound (remote ip \"localhost:*\"))",
+    "/usr/local/share/dotnet/dotnet",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll",
+    "--filter",
+    "FullyQualifiedName=OntologyPlatform.AgentTests.MessageChunkTests.NonBmpResultLabelSurvivesMessageBoundaryAndReplay",
+    "--minimum-expected-tests",
+    "1",
+    "--no-ansi",
+    "--output",
+    "Detailed",
+    "--results-directory",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-34/test-results/module-AgentTests-m015"
+  ],
+  "startedAtUtc": "2026-11-05T15:12:49.647680+00:00",
+  "endedAtUtc": "2026-11-05T15:12:52.446107+00:00",
+  "elapsedSeconds": 2.797443582996493,
+  "exitCode": 0,
+  "timingStatus": "OBSERVED",
+  "timedOut": false,
+  "executedInputDrift": false,
+  "inputHashes": {
+    "/usr/bin/sandbox-exec": "58839ef01b4eef8aac0d2aa8f9d1c074ae45aafe3533965b030672450064acc8",
+    "/usr/local/share/dotnet/dotnet": "11b517e7b00d0efa20e9b3ab6fe433f135d828a4c95c9c6ca7a9cf1328b6ada4",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll": "d5194b327e828470f00ea72e03f29dd6d8c8d93c7581452e54c04f6298cb1360"
+  },
+  "manifestSha256": "d05df774f61ce3fbff9cbf62bbc3f0d73c183cddc8c039c7c0705213e7d5704d",
+  "commandSha256": "f56de092d35471aee9583afd8f8f1959497f27fc00f5541b39f8e1af61b424ca",
+  "logSha256": "28608e17508e3846bbb8c524deb5d241cf9047d3e70305bc05225654626cb54c",
+  "logBytes": 451,
+  "logVisibility": "PRIVATE"
+}

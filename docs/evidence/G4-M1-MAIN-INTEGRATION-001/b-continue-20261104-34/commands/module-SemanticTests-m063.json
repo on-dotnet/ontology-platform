@@ -1,0 +1,38 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-34",
+  "testedCommit": "464f732a38ce343229197eba100296cfe652eeb9",
+  "command": [
+    "/usr/bin/sandbox-exec",
+    "-p",
+    "(version 1) (allow default) (deny network-outbound (remote ip \"*:*\")) (allow network-outbound (remote ip \"localhost:*\"))",
+    "/usr/local/share/dotnet/dotnet",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll",
+    "--filter",
+    "FullyQualifiedName=OntologyPlatform.SemanticTests.RoundtripTests.LostOrReplacedTemporaryGraphRemainsUnavailable",
+    "--minimum-expected-tests",
+    "1",
+    "--no-ansi",
+    "--output",
+    "Detailed",
+    "--results-directory",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-34/test-results/module-SemanticTests-m063"
+  ],
+  "startedAtUtc": "2026-11-05T15:04:04.888688+00:00",
+  "endedAtUtc": "2026-11-05T15:04:05.378417+00:00",
+  "elapsedSeconds": 0.48973191699769814,
+  "exitCode": 0,
+  "timingStatus": "OBSERVED",
+  "timedOut": false,
+  "executedInputDrift": false,
+  "inputHashes": {
+    "/usr/bin/sandbox-exec": "58839ef01b4eef8aac0d2aa8f9d1c074ae45aafe3533965b030672450064acc8",
+    "/usr/local/share/dotnet/dotnet": "11b517e7b00d0efa20e9b3ab6fe433f135d828a4c95c9c6ca7a9cf1328b6ada4",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.SemanticTests/bin/Debug/net10.0/OntologyPlatform.SemanticTests.dll": "5268fcac26ad34cef43053b41a075b7a96ecd05cfedebdd5bb587d58b60313cd"
+  },
+  "manifestSha256": "d05df774f61ce3fbff9cbf62bbc3f0d73c183cddc8c039c7c0705213e7d5704d",
+  "commandSha256": "4561f36143a9020117f0b297d4bc5292f4d11b6b9ab363699d251ba2b14a7e57",
+  "logSha256": "e3f7fdb1a0a731676dad26ee21443ab68f9c6afb9706221c1a0a9d5d54705943",
+  "logBytes": 441,
+  "logVisibility": "PRIVATE"
+}

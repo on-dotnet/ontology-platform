@@ -1,0 +1,29 @@
+{
+  "reviewer": "/root/consumer_review",
+  "status": "PASS",
+  "scope": "completed I06 subgates only; credential/cross-org/fixture closure excluded",
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-34",
+  "testedCommit": "464f732a38ce343229197eba100296cfe652eeb9",
+  "manifestSha256": "d05df774f61ce3fbff9cbf62bbc3f0d73c183cddc8c039c7c0705213e7d5704d",
+  "rawCommandsRechecked": 29,
+  "findings": [
+    "same source/build binding",
+    "PG9groups20cases zero FAIL/SKIP",
+    "three role rejections and exact ACL/roles/members restored",
+    "two audit failures and same commandKey recovery passed",
+    "client actual cancel1503.4ms persistent CANCELLED/source restored",
+    "catalog worker1834 disappeared under held lock; exact final job CANCELLED/no snapshot",
+    "lease natural expiry Fence/Attempt1to2; SUCCEEDED; snapshot2to3 audit3to4; old worker no duplicate; six-container budget and restored five-container snapshot",
+    "valid Probe before schema mutation; old snapshot hash unchanged/new different"
+  ],
+  "hashes": {
+    "catalog-cancel.json": "51875d5db8a2f0b1b477f194325418ea112d7e0570ca76d19c983770d7afcfed",
+    "lease-fence.json": "e53eddcd27243203b9ef7543d2f46f387e2611e613e6d17a042d5cd695062a71",
+    "schema-immutability.json": "789726ffed6b15ca02c6cf5b1d98f5628976fcf3e90280d275846844d2f1f5c1",
+    "source-role-faults.json": "ac9e5a79bfe6d3272e6b7aeaf635ff55a4e762a34383e8dc30d417eda986ab24",
+    "audit-rollback.json": "6d5c500a20d97ea3a4f9d24db673a72c23495ea414741b6a8e9934ff6c31a760",
+    "client-cancel.json": "3c38fb598f527b9f6acd5d24c2b521c993a8330a2e0a1e17a27229dd5729abe2"
+  },
+  "observedAtUtc": "2026-11-05T15:39:44.730545+00:00"
+}

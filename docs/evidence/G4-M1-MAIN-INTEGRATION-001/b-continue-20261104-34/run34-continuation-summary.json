@@ -1,0 +1,54 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-34",
+  "testedCommit": "464f732a38ce343229197eba100296cfe652eeb9",
+  "manifestSha256": "d05df774f61ce3fbff9cbf62bbc3f0d73c183cddc8c039c7c0705213e7d5704d",
+  "status": "LOCAL_GATES_PASSED_DELIVERY_BLOCKED",
+  "gates": {
+    "I01-closure": "PASS",
+    "I02": "PASS",
+    "I03-closure": "PASS",
+    "I04": "PASS",
+    "I05": "PASS",
+    "I06": "PASS",
+    "I07": "PASS",
+    "I08": "PARTIAL"
+  },
+  "fixtureClosure": {
+    "baseline": {
+      "total": 780,
+      "pass": 344,
+      "skip": 436
+    },
+    "uniqueRequired": 436,
+    "uniqueClosed": 436,
+    "rawProjections": 263
+  },
+  "runtimeCleanup": {
+    "moduleObjects": 28,
+    "transitionObjects": 6,
+    "finalObjects": 11,
+    "externalKeep": {
+      "containers": 0,
+      "networks": 3,
+      "volumes": 8
+    }
+  },
+  "toolCleanup": {
+    "directories": 4,
+    "files": 26919,
+    "logicalBytes": 512583830,
+    "physicalSpaceFreed": "NOT_VERIFIED",
+    "vmTouched": false
+  },
+  "limitations": [
+    "CI Windows Intel NOT_RUN",
+    "supply-chain AMBER-A1/LICENSE_PARTIAL retained",
+    "sessionContinuity NOT_VERIFIED",
+    "15MiB V3 cap still applies; proposed64MiB exception NOT_APPROVED",
+    "no finalZIP/VerifyOnly/package receipt; not READY_FOR_CHATGPT_MAIN_MERGE_APPROVAL"
+  ],
+  "originalEvidence": "all prior failures, original skip/exit2 matrices, private originals, archive bytes/blob/recovery mapping retained",
+  "mainUpdated": false,
+  "M2Started": false
+}

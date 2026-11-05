@@ -1,0 +1,38 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-34",
+  "testedCommit": "464f732a38ce343229197eba100296cfe652eeb9",
+  "command": [
+    "/usr/bin/sandbox-exec",
+    "-p",
+    "(version 1) (allow default) (deny network-outbound (remote ip \"*:*\")) (allow network-outbound (remote ip \"localhost:*\"))",
+    "/usr/local/share/dotnet/dotnet",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll",
+    "--filter",
+    "FullyQualifiedName=OntologyPlatform.QueryTests.QueryFaultTests.DeclaredScopeIsAuthorizedBeforeExternalReads",
+    "--minimum-expected-tests",
+    "1",
+    "--no-ansi",
+    "--output",
+    "Detailed",
+    "--results-directory",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-34/test-results/module-QueryTests-m011"
+  ],
+  "startedAtUtc": "2026-11-05T15:10:02.308712+00:00",
+  "endedAtUtc": "2026-11-05T15:10:03.759362+00:00",
+  "elapsedSeconds": 1.4506614169949898,
+  "exitCode": 0,
+  "timingStatus": "OBSERVED",
+  "timedOut": false,
+  "executedInputDrift": false,
+  "inputHashes": {
+    "/usr/bin/sandbox-exec": "58839ef01b4eef8aac0d2aa8f9d1c074ae45aafe3533965b030672450064acc8",
+    "/usr/local/share/dotnet/dotnet": "11b517e7b00d0efa20e9b3ab6fe433f135d828a4c95c9c6ca7a9cf1328b6ada4",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.QueryTests/bin/Debug/net10.0/OntologyPlatform.QueryTests.dll": "4e5363fa659e5727d5ada86c7179fe94fd4aeb4f931ed18c0f0fc53eccbc7927"
+  },
+  "manifestSha256": "d05df774f61ce3fbff9cbf62bbc3f0d73c183cddc8c039c7c0705213e7d5704d",
+  "commandSha256": "ae952888ef9d5b0207d46c3d29e3edf58cd8ea54de4ee5f22b5863358e8a0fe9",
+  "logSha256": "262cd77a3d36af7d0f28b106055bb1b67c91b033d7c9e9507623bd70cf56081d",
+  "logBytes": 360,
+  "logVisibility": "PRIVATE"
+}

@@ -1,0 +1,38 @@
+{
+  "cases": [
+    {
+      "case": "StandardNegativeReportsLocateRealFailure (\"\",\"MinCountConstraintComponent\")",
+      "status": "PASS",
+      "line": 1
+    },
+    {
+      "case": "StandardNegativeReportsLocateRealFailure (\"<urn:x> <urn:ontology-platform:vocabulary:externalId> 12 .\",\"DatatypeConstraintComponent\")",
+      "status": "PASS",
+      "line": 2
+    },
+    {
+      "case": "StandardNegativeReportsLocateRealFailure (\"<urn:x> <urn:ontology-platform:vocabulary:weight> 101.0 .\",\"MaxInclusiveConstraintComponent\")",
+      "status": "PASS",
+      "line": 3
+    },
+    {
+      "case": "StandardNegativeReportsLocateRealFailure (\"<urn:h> a <urn:synthetic:metals:Heat> ; <urn:synthetic:metals:castIn> <urn:x> .\",\"ClassConstraintComponent\")",
+      "status": "PASS",
+      "line": 4
+    }
+  ],
+  "summary": {
+    "total": 4,
+    "PASS": 4,
+    "FAIL": 0,
+    "SKIP": 0
+  },
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-34",
+  "testedCommit": "464f732a38ce343229197eba100296cfe652eeb9",
+  "project": "SemanticTests",
+  "assemblySha256": "5268fcac26ad34cef43053b41a075b7a96ecd05cfedebdd5bb587d58b60313cd",
+  "rawLogSha256": "b1a4e019ac68475ddf242e40406667b2fb039936cd9caa2e7a526008b350a75e",
+  "commandReceiptSha256": "488892ee560592b04653108b0180e518413ba09aed67ec2f18f47f53c69a9fc0",
+  "command": "module-SemanticTests-m116"
+}

@@ -1,0 +1,53 @@
+{
+  "reviewer": "/root/consumer_review",
+  "status": "PASS",
+  "scope": "four modules only; I02 not yet concluded",
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-34",
+  "testedCommit": "464f732a38ce343229197eba100296cfe652eeb9",
+  "manifestSha256": "d05df774f61ce3fbff9cbf62bbc3f0d73c183cddc8c039c7c0705213e7d5704d",
+  "modules": {
+    "Semantic": {
+      "methods": 137,
+      "cases": 302
+    },
+    "Publishing": {
+      "methods": 42,
+      "cases": 78
+    },
+    "Query": {
+      "methods": 39,
+      "cases": 49
+    },
+    "Agent": {
+      "methods": 26,
+      "cases": 33
+    }
+  },
+  "totalMethods": 244,
+  "totalCases": 462,
+  "fail": 0,
+  "skip": 0,
+  "verification": "all raw logs reparsed; projections/command receipts/current assembly SHA/baseline case Counter match; idle journal prefixes verified, no capacity refusal delta",
+  "mcp": {
+    "positive": 3,
+    "negative": 6,
+    "status": "PASS",
+    "limitation": "observed Ajv keyword subset retained"
+  },
+  "cleanup": {
+    "groups": 4,
+    "objectsPerGroup": 7,
+    "exactAbsenceVerified": true,
+    "keepUnchanged": true,
+    "reviewUsedLiveFacilities": false
+  },
+  "hashes": {
+    "Semantic": "e8014122c5fce5456a19b8fedea693a5880bf940106d317b71f7293801358ff6",
+    "Publishing": "ab285b7944c4c7bac0a4d80bc1330044739467debeed934f256cda550ba3c27f",
+    "Query": "7fe7984858a463707237f33e6f135c984713c4d3a2ebd212912d511f9570e23e",
+    "Agent": "e3392c10d3e59b0b80e1991201f694da3e5f63829fc3757316d582abd3177d61",
+    "mcpCommandReceipt": "09963fceb12c23a71fa1ed2ebd3f9a8d82264df7b99c9c487538a995887c7324"
+  },
+  "observedAtUtc": "2026-11-05T15:17:33.748838+00:00"
+}

@@ -1,0 +1,47 @@
+{
+  "reviewer": "/root/consumer_review",
+  "status": "PASS",
+  "scope": "I06 and I01/I03 fixture closure",
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-34",
+  "testedCommit": "464f732a38ce343229197eba100296cfe652eeb9",
+  "manifestSha256": "d05df774f61ce3fbff9cbf62bbc3f0d73c183cddc8c039c7c0705213e7d5704d",
+  "projectionsReparsed": 263,
+  "baseline": {
+    "total": 780,
+    "PASS": 344,
+    "SKIP": 436
+  },
+  "uniqueRequiredFixtureCases": 436,
+  "uniqueClosedFixtureCases": 436,
+  "historicalCases": 260,
+  "httpBaseline": {
+    "checks": 59,
+    "requests": 135
+  },
+  "credentials": {
+    "checks": 11,
+    "requests": 24
+  },
+  "crossOrg": {
+    "checks": 3,
+    "requests": 3
+  },
+  "findings": [
+    "source/build/input binding unchanged; raw logs/commands/assembly SHA independently checked",
+    "all seven public schema scenarios complete",
+    "natural expiry/unexpired synthetic revocation/old ciphertext cleared/version1to2/restored password Probe verified",
+    "user/profile restored separately and fresh OIDC confirms original subject; both guards exit-15",
+    "original SKIP and specialized exit2/INCOMPLETE matrices preserved; separate persistent/recovery evidence closes cases",
+    "remaining I06 subgates covered in interim review; I07/I08 not covered"
+  ],
+  "hashes": {
+    "gate-I06.json": "7e334c108abc1b6585e6a9e3170ba285b163164916f0bd74a959590682cec61a",
+    "fixture-case-closure.json": "aef7bf5590c887bd0a04c00f9f985a00583d768e5f2f8e48db6b2a54a22591ff",
+    "gate-I01-closure.json": "f463609c8cf569c79b7720c635d496a43e2445939b5c3da41b2106a77102eba6",
+    "gate-I03-closure.json": "bd17e9d3a9d0bf3be8c81a35005bffb81c69ecf76cc0a472621240a286411ba6",
+    "credential-db-closure.json": "876a126315549fbd9e8365f7a0157c9645227966a6e3b459e457876f81dbade5",
+    "cross-org.json": "65c092774fa61587f192db5b17f2ea501efeade541494c311bd38fbfa2399445"
+  },
+  "observedAtUtc": "2026-11-05T15:42:52.473454+00:00"
+}

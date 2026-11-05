@@ -1,0 +1,32 @@
+{
+  "reviewer": "/root/consumer_review",
+  "status": "PASS",
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-34",
+  "testedCommit": "464f732a38ce343229197eba100296cfe652eeb9",
+  "manifestSha256": "d05df774f61ce3fbff9cbf62bbc3f0d73c183cddc8c039c7c0705213e7d5704d",
+  "findings": [
+    "source19drivers/build unchanged; six browser reports/raw logs match",
+    "original INCOMPLETE/exit2 retained; exact observation sets close U05, U01-U06 PASS",
+    "actual PROBE_RUNNING; timeout client10087ms report10010ms TLS10002ms; guard pausedAfter false, restoration Probe PASS",
+    "exact job4320c0099e124b9d8555e58227525b74; worker463 disappeared under held source lock; persisted CANCELLED/no snapshot; not all source sessions claimed gone",
+    "42 browser HTTP records, original baseline59checks135requests preserved",
+    "2477 ingress connections all actual Exec exit records, capacity refusal0",
+    "four actual view_image visual reviews passed; no stable page horizontal overflow; geometry/hit pass; narrow table local scroll; sidebar inert and offscreen; baseline and layout-only screenshots byte-identical"
+  ],
+  "hashes": {
+    "gate-I07.json": "eb5e8883b5b687f0329b6584f4d19333a4f9d7494563fb0f1261ff765ca661e6",
+    "browser-complete.json": "4d234eba2744cf0ad02325739b1e5af2763385378680e1c15ec3df7b5fa6b590",
+    "browser-cancel-source.json": "5c9f98ba34a89824d1604a0933160a2443ccfb4a31ef99d37b77132371f7d4c2",
+    "light-wide.png": "db7645b3bb2cd1431fb8ba17c3c7969f1c24e6d909c46860f091aa436456bdbd",
+    "light-narrow.png": "4cb3506887cf979c5a16e174931dd6ad21501f3d509784b66927eda828797839",
+    "dark-wide.png": "8b2342734193a51312e88e4897159407f48f9a0aaa20c8fc3ef49a87de9ddf1c",
+    "dark-narrow.png": "6ed367fea812533f2506fd565c6e1deb114f7022cb48b9848abebf2982ba944c"
+  },
+  "observedAtUtc": "2026-11-05T15:49:54.989326+00:00",
+  "limitations": [
+    "I08/package not covered",
+    "CI Windows Intel NOT_RUN",
+    "15MiB default cap remains; no main/M2"
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-34",
+  "testedCommit": "464f732a38ce343229197eba100296cfe652eeb9",
+  "command": [
+    "/usr/bin/sandbox-exec",
+    "-p",
+    "(version 1) (allow default) (deny network-outbound (remote ip \"*:*\")) (allow network-outbound (remote ip \"localhost:*\"))",
+    "/usr/local/share/dotnet/dotnet",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll",
+    "--filter",
+    "FullyQualifiedName=OntologyPlatform.AgentTests.RunFlowTests.MafInvokesRealPublishedGatewayAndPersistsEvents",
+    "--minimum-expected-tests",
+    "1",
+    "--no-ansi",
+    "--output",
+    "Detailed",
+    "--results-directory",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-34/test-results/module-AgentTests-m013"
+  ],
+  "startedAtUtc": "2026-11-05T15:12:44.608714+00:00",
+  "endedAtUtc": "2026-11-05T15:12:46.339780+00:00",
+  "elapsedSeconds": 1.7301871249946998,
+  "exitCode": 0,
+  "timingStatus": "OBSERVED",
+  "timedOut": false,
+  "executedInputDrift": false,
+  "inputHashes": {
+    "/usr/bin/sandbox-exec": "58839ef01b4eef8aac0d2aa8f9d1c074ae45aafe3533965b030672450064acc8",
+    "/usr/local/share/dotnet/dotnet": "11b517e7b00d0efa20e9b3ab6fe433f135d828a4c95c9c6ca7a9cf1328b6ada4",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll": "d5194b327e828470f00ea72e03f29dd6d8c8d93c7581452e54c04f6298cb1360"
+  },
+  "manifestSha256": "d05df774f61ce3fbff9cbf62bbc3f0d73c183cddc8c039c7c0705213e7d5704d",
+  "commandSha256": "7de99e52e31d806a9b028871036469efc6db5144407a96df4b8ade7772d4b7b3",
+  "logSha256": "8086480f7cbf771ed836ddcc2fe9223a97a97ea8e7a218c858bce4aa395f74c5",
+  "logBytes": 363,
+  "logVisibility": "PRIVATE"
+}

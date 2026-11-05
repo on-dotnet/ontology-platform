@@ -1,0 +1,34 @@
+{
+  "reviewer": "/root/consumer_review",
+  "status": "PASS",
+  "scope": "I01 base/I03 rejection interim plus I05; I01/I03 remain PARTIAL pending436 real fixture cases",
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-34",
+  "testedCommit": "464f732a38ce343229197eba100296cfe652eeb9",
+  "manifestSha256": "d05df774f61ce3fbff9cbf62bbc3f0d73c183cddc8c039c7c0705213e7d5704d",
+  "selftestSeconds": 425.799,
+  "taskTests": 78,
+  "taskTestSeconds": 33.824,
+  "nativeWebSeconds": 75.137,
+  "baseline": {
+    "total": 780,
+    "PASS": 344,
+    "SKIP": 436,
+    "FAIL": 0
+  },
+  "web": {
+    "files": 23,
+    "tests": 379,
+    "status": "PASS"
+  },
+  "I05": "actual DLL export/three comparisons/six negatives PASS",
+  "I03": "four exact G4 Production/Staging refusals exit-6 non-timeout; six Host graphs match raw output",
+  "sourceBuildDrift": false,
+  "hashes": {
+    "gate-I01.json": "012aba754c4284740afb0864537bad89ffe56b3523429d3e7805a16a941a52ca",
+    "gate-I03.json": "7f66ed6f9401d15e365165303d2d6fbbfa4e8fd259fefe68f460e8b166803aa3",
+    "gate-I05.json": "31c1d9fbc033fbacd2d3b74a5a1537b52181b440c02c036b8b9d52745fa2e810",
+    "build-inputs.json": "9f7e90d0465354b935a91fd6c0b7bb9dc1d46a7b9e4893e954471bea9278322d"
+  },
+  "observedAtUtc": "2026-11-05T15:06:19.186561+00:00"
+}

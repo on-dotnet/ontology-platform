@@ -1,0 +1,71 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-34",
+  "testedCommit": "464f732a38ce343229197eba100296cfe652eeb9",
+  "manifestSha256": "d05df774f61ce3fbff9cbf62bbc3f0d73c183cddc8c039c7c0705213e7d5704d",
+  "result": {
+    "status": "PASS",
+    "modules": [
+      {
+        "project": "SemanticTests",
+        "total": 302,
+        "skipped": [],
+        "status": "PASS",
+        "executionMode": "METHOD_PROCESS_ISOLATION",
+        "methods": 137,
+        "fixturePhase": "modules-semantic",
+        "cleanupReceiptSha256": "ea6b35748d93705e16a2b50d3dde9d4af38c710c0db5b15c6b5a047b5a8157cd"
+      },
+      {
+        "project": "PublishingTests",
+        "total": 78,
+        "skipped": [],
+        "status": "PASS",
+        "executionMode": "METHOD_PROCESS_ISOLATION",
+        "methods": 42,
+        "fixturePhase": "modules-publishing",
+        "cleanupReceiptSha256": "1d912f9f886151217bf604f32a07e7b0e2e3021a1cda09857b72c6aa24d12c4c"
+      },
+      {
+        "project": "QueryTests",
+        "total": 49,
+        "skipped": [],
+        "status": "PASS",
+        "executionMode": "METHOD_PROCESS_ISOLATION",
+        "methods": 39,
+        "fixturePhase": "modules-query",
+        "cleanupReceiptSha256": "f469d4a5ca5b3eb8185a19120d097a1dc4706665d1107421aec7645c356200a2"
+      },
+      {
+        "project": "AgentTests",
+        "total": 33,
+        "skipped": [],
+        "status": "PASS",
+        "executionMode": "METHOD_PROCESS_ISOLATION",
+        "methods": 26,
+        "fixturePhase": "modules-agent",
+        "cleanupReceiptSha256": "7d976d8e3c21efb96104f837e5c477750c3b608e709ac962d098a22cf3255aa6"
+      }
+    ],
+    "compatibility": {
+      "consumer": "g3-compatibility",
+      "scenario": "baseline",
+      "exitCode": 0,
+      "stdoutSha256": "8eddd48fdce53b5b33aa24acc10704f15bf22558de8287ad930b0e17f5a4c7bd"
+    },
+    "securityAndManifest": [
+      {
+        "total": 156,
+        "PASS": 156,
+        "FAIL": 0,
+        "SKIP": 0
+      },
+      {
+        "total": 121,
+        "PASS": 121,
+        "FAIL": 0,
+        "SKIP": 0
+      }
+    ]
+  }
+}
