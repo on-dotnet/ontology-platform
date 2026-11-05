@@ -1,0 +1,38 @@
+{
+  "scope": "TWO_SESSION_BOUNDED_TASK_LOCK_DIAGNOSTIC_NO_PRODUCT_REQUEST",
+  "rows": [
+    {
+      "step": "observer-first",
+      "result": []
+    },
+    {
+      "step": "observer-lock-count",
+      "result": 0
+    },
+    {
+      "step": "lock",
+      "result": {
+        "pid": 2447,
+        "held": true
+      }
+    },
+    {
+      "step": "observer-while-locked",
+      "result": []
+    }
+  ],
+  "streams": [
+    {
+      "session": "lock",
+      "exitCode": 0,
+      "rawLogSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "session": "observer",
+      "exitCode": 0,
+      "rawLogSha256": "1171843e1276fce1fa40aadb886df7e20ce93fbc18a2a8478aa2524935de47d7",
+      "stderr": "WARNING:  there is no transaction in progress\n"
+    }
+  ]
+}

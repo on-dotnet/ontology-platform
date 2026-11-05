@@ -1,0 +1,39 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-29",
+  "testedCommit": "9dd30dcf3a4399d0497e858025fdfcdf5334b50e",
+  "command": [
+    "/opt/homebrew/opt/node@24/bin/node",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/experiments/g4-m1-main-integration/fault.mjs",
+    "--run-id",
+    "b-continue-20261104-29",
+    "--expected-head",
+    "9dd30dcf3a4399d0497e858025fdfcdf5334b50e",
+    "--resource-manifest",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-29/resource-manifest.json",
+    "--runtime-file",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261104-29/runtime.json",
+    "--action",
+    "probe-refresh",
+    "--evidence-dir",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-29/fault-diagnostic-cancel-probe-refresh"
+  ],
+  "startedAtUtc": "2026-11-05T03:42:07.787901+00:00",
+  "endedAtUtc": "2026-11-05T03:42:18.799603+00:00",
+  "elapsedSeconds": 11.011543833003088,
+  "exitCode": 0,
+  "timingStatus": "OBSERVED",
+  "timedOut": false,
+  "executedInputDrift": false,
+  "inputHashes": {
+    "/opt/homebrew/opt/node@24/bin/node": "0d78c9bca217f53c2dc21a067246ee4a81c1f4fa111ee64d572b45fa1ff39189",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/experiments/g4-m1-main-integration/fault.mjs": "69557b1f546ded5125ac8b425eb3f8872c8d788a8246fd577f86f9551b1f5939",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-29/resource-manifest.json": "ee4901479add7953953d7df2c4a26addd152a87dcbad5f281732a45c4779fd98",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261104-29/runtime.json": "4a320990130ee207b6a59bec273d9dcbabed4f3c05bd872f50b532063d717b2f"
+  },
+  "manifestSha256": "ee4901479add7953953d7df2c4a26addd152a87dcbad5f281732a45c4779fd98",
+  "commandSha256": "6c6caab9a362e621a6f4b47365c94373ef75bc3018650e230026737a68b53469",
+  "logSha256": "59010b3ad86196f028e02718dd01364217329739fc5c0a54c2fe14ee95ec6d62",
+  "logBytes": 196,
+  "logVisibility": "PRIVATE"
+}

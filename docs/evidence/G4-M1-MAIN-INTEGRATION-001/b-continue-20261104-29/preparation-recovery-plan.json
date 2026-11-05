@@ -1,0 +1,43 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-29",
+  "testedCommit": "9dd30dcf3a4399d0497e858025fdfcdf5334b50e",
+  "expiresAtUtc": "2026-11-05T03:34:09.686653+00:00",
+  "diagnosisSha256": "a98c4e4ab50ad3e9a66b5a7b0ea066ec4e446bfa468434a2976dd202e792d65d",
+  "moves": [
+    {
+      "source": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-29/helpers",
+      "destination": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-29/first-preparation/orchestration",
+      "operation": "rename preserving bytes/inodes",
+      "destinationExists": false
+    },
+    {
+      "source": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261104-29",
+      "destination": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261104-29-incomplete-keep",
+      "operation": "rename preserving bytes/inodes",
+      "destinationExists": false
+    },
+    {
+      "source": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-29/gate-I03.json",
+      "destination": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-29/first-preparation/gate-I03-original.json",
+      "operation": "rename preserving bytes/inodes",
+      "destinationExists": false
+    },
+    {
+      "source": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-29/commands/keyring-certificate.json",
+      "destination": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-29/first-preparation/keyring-certificate-original.json",
+      "operation": "rename preserving bytes/inodes",
+      "destinationExists": false
+    }
+  ],
+  "privateBackup": "KEEP; never consumed by rerun; no secret values published",
+  "rerun": "same original run.py I03 then I02 I04 I06 I07; no prior startup/product cases executed",
+  "unchanged": [
+    "19 committed drivers",
+    "source Head",
+    "I01 builds",
+    "resource manifest",
+    "I01 and I05 evidence"
+  ],
+  "preserveFailure": "first-preparation/gate-I03-original.json; full original stdout remains pipeline-I03.log"
+}

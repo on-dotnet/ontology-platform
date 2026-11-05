@@ -1,0 +1,35 @@
+{
+  "status": "PASS",
+  "reviewer": "/root/consumer_review",
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-29",
+  "testedCommit": "9dd30dcf3a4399d0497e858025fdfcdf5334b50e",
+  "manifestSha256": "ee4901479add7953953d7df2c4a26addd152a87dcbad5f281732a45c4779fd98",
+  "drivers": {
+    "run.py": "5b116dbecb5be44588f83ba48be243a8eecb39677c666dd61835dfcf444e2f57",
+    "consumer_check.py": "b58a3305461de319aca2a4a094f9d5c18c2411632adf67c57d6de1f3517fe9af",
+    "runtime.py": "fbb69803a679de9ef9612ba59adca212bbcda2fd1b2f4dee67b35491ed90a9cb",
+    "pg_fixture.py": "0b3e95134d76bb356fa2f14f21da58886675d6c553b2daf2f643895dc4591f51",
+    "module-tests.py": "0d8485fab6d9f037ce1851984f4c6d0f40b628775f66302cc4740ed2f2ca0d96",
+    "startup-boundary.py": "256bba53361f407d0a4071c9c7bd951019418e2193e56aaa604155510d04289c",
+    "migration-boundary.py": "c5c154ee542faa2120276fcd9e096e81b3084194fc2060d6e614d8d270257a18",
+    "contract-check.mjs": "3a7f662352a1d182f0f53f96703cfbb1f8d6f152443d3ab5bc8b2a525c5b01ea",
+    "http.mjs": "c98e018d1748a3bb57a2ee70e71574633a1616e238528eb2f45c02aba83281eb",
+    "browser.mjs": "b2558c334e3896db180a3cb82f35345bfc208edb65266b963901a0d10ffdb758",
+    "fault.mjs": "69557b1f546ded5125ac8b425eb3f8872c8d788a8246fd577f86f9551b1f5939",
+    "g3-compatibility.mjs": "705d972ae2f48107c445be8ae575096ee39b55b3b01112e26d1a206923437c9d",
+    "readback.py": "51c81d4a4af879255afb0227d6d379e1a3c3d7adf39c63a4bbabe0ff6a558be5",
+    "closeout.py": "fd6b97e94348e72d4dced2e1197b5686971ad01c160a1db0a2af97a7b15f449b",
+    "tests.py": "13d7c4225a72454de5b57d08482d9d01a2bb5f33d76546bbdaf4e47fa045a728",
+    "host_continuity.py": "abd4385e1b05a86f5a12582a7e95a1fcc4a29c333eb23d2d952229744ed68984",
+    "compose.m1.yaml": "765a3e9d2728c85cea051c9674af30b410747801bd134e8ccb708f86607f437f",
+    "compose.g3.yaml": "3231f1f0ff3c3d9aabcd8b58b589d1adc0d267c8e2af1335d2b1e5777416c53d",
+    "hooks/pre-push": "5eaef2482b8b75cb1deb7cca9703f591a0a15c2459e49c5192b4382ccb7ad474"
+  },
+  "rawReview": "Run29 R2独立后验PASS，同T同Run进入PREFLIGHT/I01。21assets、168完整包载荷与归档来源、两SDK前后实际导入实核，PID95235 exit0 5.842s，日志零警告错误、stderr/HTTP空、实际命令OS拒绝策略、事故KEEP未变。未重跑Restore。",
+  "evidenceHashes": {
+    "gate-R2.json": "88d2c3329c098e7198cd62c3fb655253a485f85c62c2fd5b9b5ba352a1488007",
+    "restore-result.json": "ed0758c0b2646b1d6c4b1df6a125b654c72deb89e3b964beab75ca391ffa9cfb",
+    "restore-provenance.json": "5b032a30e6a55dd92c6759d28bb6c4995a38103db3474ab16b64d1046aa31efa"
+  }
+}

@@ -327,11 +327,14 @@ class SourceSession:
     def __init__(self,m, *, source=True):
         import selectors
         self.selectors=selectors;self.m=m;self.source=source;self.process=None
+        self.session_id=__import__('uuid').uuid4().hex;self.queries=[]
     def __enter__(self):
         service='pg-source' if self.source else 'platform-pg'
         ident=rt.runtime_value(self.m)['containerIds'][service];rt.inspect_owned(self.m,ident,service)
         user,db=('postgres','fixture') if self.source else ('platform','platform')
-        self.process=subprocess.Popen(['docker','--context','desktop-linux','exec','-i',ident,'psql','-X','-qAt','-U',user,'-d',db,'-v','ON_ERROR_STOP=1'],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,bufsize=1,start_new_session=True)
+        self.command=['docker','--context','desktop-linux','exec','-i',ident,'psql','-X','-qAt','-U',user,'-d',db,'-v','ON_ERROR_STOP=1']
+        self.started=dt.datetime.now(dt.timezone.utc).isoformat();self.tick=time.monotonic()
+        self.process=subprocess.Popen(self.command,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,bufsize=1,start_new_session=True)
         return self
     def read(self,timeout=4):
         selector=self.selectors.DefaultSelector();selector.register(self.process.stdout,self.selectors.EVENT_READ)
@@ -340,13 +343,52 @@ class SourceSession:
             value=self.process.stdout.readline();rt.require(value,'PG_SESSION_EOF');return json.loads(value)
         finally:selector.close()
     def query(self,text):
-        self.process.stdin.write(text+'\n');self.process.stdin.flush();return self.read()
+        row={'querySha256':rt.digest(text.encode()),'startedAtUtc':dt.datetime.now(dt.timezone.utc).isoformat()};self.queries.append(row)
+        try:
+            self.process.stdin.write(text+'\n');self.process.stdin.flush();value=self.read();row['status']='RECEIVED_JSON';return value
+        except Exception as failure:row.update(status='FAILED',category=type(failure).__name__);raise
+        finally:row['endedAtUtc']=dt.datetime.now(dt.timezone.utc).isoformat()
     def __exit__(self,*exc):
-        if self.process.poll() is None:
-            try:self.process.stdin.write('ROLLBACK;\n\\q\n');self.process.stdin.flush();self.process.wait(timeout=5)
-            except (BrokenPipeError,subprocess.TimeoutExpired):
-                os.killpg(self.process.pid,__import__('signal').SIGTERM);self.process.wait(timeout=5)
-        for stream in (self.process.stdin,self.process.stdout,self.process.stderr):stream.close()
+        cleanup_failure=None;execution_failure=None;stderr_complete=False;group_released=False
+        original=exc[1] if exc else None
+        try:
+            if self.process.poll() is None:
+                try:self.process.stdin.write('ROLLBACK;\n\\q\n');self.process.stdin.flush();self.process.wait(timeout=5)
+                except (BrokenPipeError,subprocess.TimeoutExpired):
+                    if self.process.poll() is None:os.killpg(self.process.pid,__import__('signal').SIGTERM);self.process.wait(timeout=5)
+        except Exception as failure:cleanup_failure=failure
+        finally:
+            try:
+                # 独立会话的后代可能仍持有管道，父进程退出不等于整个进程组退出。
+                try:os.killpg(self.process.pid,__import__('signal').SIGKILL)
+                except ProcessLookupError:pass
+                group_released=True
+                if self.process.poll() is None:self.process.wait(timeout=5)
+                if self.process.returncode!=0:execution_failure=ValueError('PG_SESSION_EXIT')
+                chunks=[];size=0;deadline=time.monotonic()+2
+                selector=self.selectors.DefaultSelector();selector.register(self.process.stderr,self.selectors.EVENT_READ)
+                try:
+                    while time.monotonic()<deadline and size<1048576:
+                        if not selector.select(max(0,deadline-time.monotonic())):break
+                        chunk=os.read(self.process.stderr.fileno(),min(65536,1048576-size))
+                        if not chunk:stderr_complete=True;break
+                        chunks.append(chunk);size+=len(chunk)
+                finally:selector.close()
+                if not stderr_complete:cleanup_failure=cleanup_failure or ValueError('PG_SESSION_STDERR_INCOMPLETE')
+                raw=b''.join(chunks);name='source-session-'+self.session_id+'.stderr'
+                path=rt.private_dir(self.m['runId'])/'logs'/name;rt.boundary(path,rt.ROOT);path.parent.mkdir(mode=0o700,parents=True,exist_ok=True)
+                with os.fdopen(os.open(path,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600),'wb') as stream:stream.write(raw)
+                failure=original or execution_failure or cleanup_failure
+                code=str(failure) if isinstance(failure,ValueError) and re.fullmatch(r'PG_SESSION_[A-Z_]+',str(failure)) else (type(failure).__name__ if failure else None)
+                rt.write_json(rt.ARTIFACTS/self.m['runId']/('source-session-'+self.session_id+'.json'),{'taskId':rt.TASK,'runId':self.m['runId'],'testedCommit':self.m['_head'],'command':self.command,'pid':self.process.pid,'startedAtUtc':self.started,'endedAtUtc':dt.datetime.now(dt.timezone.utc).isoformat(),'elapsedSeconds':time.monotonic()-self.tick,'exitCode':self.process.returncode,'timingStatus':'OBSERVED','stderrFile':name,'stderrSha256':rt.digest(raw),'stderrBytes':len(raw),'stderrComplete':stderr_complete,'processGroupReleased':group_released,'failureCode':code,'cleanupFailure':type(cleanup_failure).__name__ if cleanup_failure else None,'queries':self.queries})
+            except Exception as failure:cleanup_failure=cleanup_failure or failure
+            finally:
+                for stream in (self.process.stdin,self.process.stdout,self.process.stderr):stream.close()
+        # 原异常优先；实际进程失败和收尾失败均不能提升为成功。
+        if not exc[0]:
+            if execution_failure is not None:raise execution_failure
+            if cleanup_failure is not None:raise cleanup_failure
+        return False
 
 
 def catalog_cancel(m):

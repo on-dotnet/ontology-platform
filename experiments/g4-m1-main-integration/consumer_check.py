@@ -21,6 +21,7 @@ def check_compose(m, config, group):
              rt.private_dir(m['runId']), rt.ARTIFACTS / m['runId'] / 'helpers']
     for name, s in services.items():
         if name in ('api','api-recovery'):rt.require(s.get('init') is True,'API_INIT_REQUIRED')
+        if name=='pg-source':rt.require(s.get('init') is True,'PG_SOURCE_INIT_REQUIRED')
         rt.require(s.get('image') in images and s.get('platform') == 'linux/arm64' and s.get('pull_policy') == 'never', 'COMPOSE_IMAGE')
         rt.require('build' not in s and not s.get('privileged') and not s.get('devices') and not s.get('gpus'), 'COMPOSE_PRIVILEGE')
         rt.require(not s.get('deploy',{}).get('resources',{}).get('reservations',{}).get('devices'),'GPU_REFUSED')

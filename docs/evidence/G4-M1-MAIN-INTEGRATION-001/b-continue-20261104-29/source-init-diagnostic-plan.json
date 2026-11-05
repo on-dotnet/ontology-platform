@@ -1,0 +1,141 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-29",
+  "testedCommit": "9dd30dcf3a4399d0497e858025fdfcdf5334b50e",
+  "createdAtUtc": "2026-11-05T03:47:41.774835+00:00",
+  "expiresAtUtc": "2026-11-05T04:32:41.775151+00:00",
+  "expectedSourceId": "1fec88e7975f9ce7d26b460ac48b66b85b0a1500a6a448889db7c56e4e23fca0",
+  "expectedCreated": "2026-11-05T03:29:43.102067506Z",
+  "image": "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+  "memory": 805306368,
+  "healthcheck": {
+    "Test": [
+      "CMD-SHELL",
+      "pg_isready -U postgres -d fixture"
+    ],
+    "Interval": 2000000000,
+    "Timeout": 2000000000,
+    "Retries": 15
+  },
+  "initBefore": null,
+  "overrideSha256": "e2065eb28418783dc5c72a5e0d6cea23d191f8a5551e5a2abed258f297e2f666",
+  "command": [
+    "docker",
+    "--context",
+    "desktop-linux",
+    "compose",
+    "-f",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/experiments/g4-m1-main-integration/compose.m1.yaml",
+    "-f",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-29/pg-init-diagnostic.yaml",
+    "up",
+    "-d",
+    "--no-build",
+    "--pull",
+    "never",
+    "pg-source"
+  ],
+  "inventoryBefore": {
+    "container": {
+      "owned": [
+        {
+          "id": "1fec88e7975f9ce7d26b460ac48b66b85b0a1500a6a448889db7c56e4e23fca0",
+          "created": "2026-11-05T03:29:43.102067506Z"
+        },
+        {
+          "id": "b047b7f8bf9e9253d5718810da5eba065d8a6278ea29967acbda24671ac7aed8",
+          "created": "2026-11-05T03:24:33.248601751Z"
+        },
+        {
+          "id": "949beb4cbf4a348d157028b3331424d9efbf9734e00b8a5898049475ff69d1bf",
+          "created": "2026-11-05T03:24:33.225023501Z"
+        },
+        {
+          "id": "e2fb9dfb6121e6e276a084aa0e6e33e3ee3a23a97d6fb27948ec894061669ce6",
+          "created": "2026-11-05T03:18:43.424272381Z"
+        },
+        {
+          "id": "d18d6777bf80fa6ba94e2336713fe2c190dc4d3f9bcc9ff9ea678649272e44c9",
+          "created": "2026-11-05T03:18:43.422084714Z"
+        }
+      ],
+      "keep": []
+    },
+    "network": {
+      "owned": [
+        {
+          "id": "434f597d10c7da24ef075105e8b5997902b0af926d4f34729b98a107c96f66a3",
+          "created": "2026-11-05T03:18:43.406731048Z"
+        },
+        {
+          "id": "76cd280b4fb76ecad5e0270ceea7eae41d0abe22a9be099a45099b05986c4502",
+          "created": "2026-11-05T03:24:33.212104126Z"
+        }
+      ],
+      "keep": [
+        "80ac07a0bfc7ad5bdedefec78a3a66c97c4c74093c4a8533f05f4cb96bcbc4d0",
+        "e66d65cfe0714eb9fde22ab801d77393aeb653344362c0faac45292d829dab8e",
+        "fd1ae18b7606e64cb4e41fe67030f82eaf885d9c93a5174b69cdef8b227b2a8a"
+      ]
+    },
+    "volume": {
+      "owned": [
+        {
+          "id": "ontology-g4-main-b-continue-20261104-29_api-keyring",
+          "created": "2026-11-05T03:18:43Z"
+        },
+        {
+          "id": "ontology-g4-main-b-continue-20261104-29_keycloak-data",
+          "created": "2026-11-05T03:18:43Z"
+        },
+        {
+          "id": "ontology-g4-main-b-continue-20261104-29_platform-data",
+          "created": "2026-11-05T03:18:43Z"
+        },
+        {
+          "id": "ontology-g4-main-b-continue-20261104-29_source-data",
+          "created": "2026-11-05T03:24:33Z"
+        }
+      ],
+      "keep": [
+        "g2-ef979bd04cc0-alloy-data",
+        "g2-ef979bd04cc0-fuseki-data",
+        "g2-ef979bd04cc0-grafana-data",
+        "g2-ef979bd04cc0-loki-data",
+        "g2-ef979bd04cc0-postgres-data",
+        "g2-ef979bd04cc0-prometheus-data",
+        "g2-ef979bd04cc0-rustfs-data",
+        "g2-ef979bd04cc0-tempo-data"
+      ]
+    }
+  },
+  "sourceRoleBefore": {
+    "owner": "postgres",
+    "acl": [
+      {
+        "grantee": "fixture_reader",
+        "grantor": "postgres",
+        "privilege": "SELECT",
+        "grantable": false
+      }
+    ],
+    "select": true,
+    "write": false,
+    "schemaUsage": true,
+    "role": {
+      "super": false,
+      "createDb": false,
+      "createRole": false,
+      "inherit": false,
+      "replication": false,
+      "bypassRls": false,
+      "login": true
+    },
+    "memberships": []
+  },
+  "sourceTablesBefore": "maintenance.private_event\notherplant.private_event\nproduction.heat_event",
+  "backupReceiptSha256": "9954164d4546c0de039cc75efc5c385f471ac68312c6694821b3017f8646105b",
+  "assertions": "exact other containers/volumes/networks KEEP; only source recreated with Engine init; image/memory/healthcheck unchanged; no simultaneous added container; fresh source init if tmpfs remount explicitly diagnostic; original failure retained; refreshed exact registry",
+  "oldSource": "remove only exact old source as Compose recreate; afterward exact No such object proof",
+  "newSource": "KEEP until audited Run29 cleanup; no product PASS from diagnosis"
+}

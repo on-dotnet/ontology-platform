@@ -1,0 +1,37 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-29",
+  "testedCommit": "9dd30dcf3a4399d0497e858025fdfcdf5334b50e",
+  "command": [
+    "docker",
+    "--context",
+    "desktop-linux",
+    "compose",
+    "-f",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/experiments/g4-m1-main-integration/compose.m1.yaml",
+    "-f",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-29/pg-init-diagnostic.yaml",
+    "up",
+    "-d",
+    "--no-build",
+    "--pull",
+    "never",
+    "pg-source"
+  ],
+  "startedAtUtc": "2026-11-05T03:50:25.974768+00:00",
+  "endedAtUtc": "2026-11-05T03:50:26.287512+00:00",
+  "elapsedSeconds": 0.3127585830006865,
+  "exitCode": 0,
+  "timingStatus": "OBSERVED",
+  "timedOut": false,
+  "executedInputDrift": false,
+  "inputHashes": {
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/experiments/g4-m1-main-integration/compose.m1.yaml": "765a3e9d2728c85cea051c9674af30b410747801bd134e8ccb708f86607f437f",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-29/pg-init-diagnostic.yaml": "e2065eb28418783dc5c72a5e0d6cea23d191f8a5551e5a2abed258f297e2f666"
+  },
+  "manifestSha256": "ee4901479add7953953d7df2c4a26addd152a87dcbad5f281732a45c4779fd98",
+  "commandSha256": "c884fa5498bef4646231b7f54fdec6b97a20cf92892047b4668670d3c745b406",
+  "logSha256": "97fdc5bb609b4686f3c06fac6fad0e6e3a0c37dde9e7eeefd2e9b8c7471e30d8",
+  "logBytes": 292,
+  "logVisibility": "PRIVATE"
+}

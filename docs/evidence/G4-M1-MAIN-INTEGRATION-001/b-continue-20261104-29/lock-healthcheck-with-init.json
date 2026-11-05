@@ -1,0 +1,134 @@
+{
+  "scope": "DIAGNOSTIC_ONLY_8_SECOND_LOCK_ACROSS_UNCHANGED_HEALTHCHECK",
+  "startedAtUtc": "2026-11-05T03:53:01.119396+00:00",
+  "containerId": "75b8e8e36a402bad0d0013e194d3d3c1fc129aec8df6b67d182f50a96f94624f",
+  "helperSha256": "12adb5e125ca610453de5dbb363a63a2f8a95abea3541de94776ebde8f331489",
+  "init": true,
+  "before": {
+    "pid": 738,
+    "held": true,
+    "postmasterStart": "2026-11-05T03:50:26.734943+00:00"
+  },
+  "heldSeconds": 8.207151083995996,
+  "after": {
+    "pid": 738,
+    "held": true,
+    "postmasterStart": "2026-11-05T03:50:26.734943+00:00"
+  },
+  "exitCode": 0,
+  "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "health": [
+    {
+      "Start": "2026-11-05T03:52:51.87634051Z",
+      "End": "2026-11-05T03:52:51.92389876Z",
+      "ExitCode": 0,
+      "Output": "/var/run/postgresql:5432 - accepting connections\n"
+    },
+    {
+      "Start": "2026-11-05T03:52:53.925844136Z",
+      "End": "2026-11-05T03:52:53.972798136Z",
+      "ExitCode": 0,
+      "Output": "/var/run/postgresql:5432 - accepting connections\n"
+    },
+    {
+      "Start": "2026-11-05T03:52:55.97440997Z",
+      "End": "2026-11-05T03:52:56.02384947Z",
+      "ExitCode": 0,
+      "Output": "/var/run/postgresql:5432 - accepting connections\n"
+    },
+    {
+      "Start": "2026-11-05T03:52:58.026959721Z",
+      "End": "2026-11-05T03:52:58.074750263Z",
+      "ExitCode": 0,
+      "Output": "/var/run/postgresql:5432 - accepting connections\n"
+    },
+    {
+      "Start": "2026-11-05T03:53:00.082554014Z",
+      "End": "2026-11-05T03:53:00.129423389Z",
+      "ExitCode": 0,
+      "Output": "/var/run/postgresql:5432 - accepting connections\n"
+    },
+    {
+      "Start": "2026-11-05T03:53:02.13370725Z",
+      "End": "2026-11-05T03:53:04.159984543Z",
+      "ExitCode": -1,
+      "Output": "Health check exceeded timeout (2s)"
+    },
+    {
+      "Start": "2026-11-05T03:53:06.164830586Z",
+      "End": "2026-11-05T03:53:08.194485753Z",
+      "ExitCode": -1,
+      "Output": "Health check exceeded timeout (2s)"
+    }
+  ],
+  "processObservations": [
+    {
+      "elapsedSeconds": 0.04707804200006649,
+      "processes": "Name:\tdocker-init\nPid:\t1\nPPid:\t0\nName:\tpostgres\nPid:\t7\nPPid:\t1\nName:\tpostgres\nPid:\t738\nPPid:\t7\nName:\tsh\nPid:\t739\nPPid:\t0\nName:\tpostgres\nPid:\t81\nPPid:\t7\nName:\tpostgres\nPid:\t82\nPPid:\t7\nName:\tpostgres\nPid:\t83\nPPid:\t7\nName:\tpostgres\nPid:\t84\nPPid:\t7\nName:\tpostgres\nPid:\t85\nPPid:\t7\nName:\tpostgres\nPid:\t87\nPPid:\t7\nName:\tpostgres\nPid:\t88\nPPid:\t7\nName:\tpostgres\nPid:\t89\nPPid:\t7\n"
+    },
+    {
+      "elapsedSeconds": 0.5664600000018254,
+      "processes": "Name:\tdocker-init\nPid:\t1\nPPid:\t0\nName:\tpostgres\nPid:\t7\nPPid:\t1\nName:\tpostgres\nPid:\t738\nPPid:\t7\nName:\tsh\nPid:\t770\nPPid:\t0\nName:\tpostgres\nPid:\t81\nPPid:\t7\nName:\tpostgres\nPid:\t82\nPPid:\t7\nName:\tpostgres\nPid:\t83\nPPid:\t7\nName:\tpostgres\nPid:\t84\nPPid:\t7\nName:\tpostgres\nPid:\t85\nPPid:\t7\nName:\tpostgres\nPid:\t87\nPPid:\t7\nName:\tpostgres\nPid:\t88\nPPid:\t7\nName:\tpostgres\nPid:\t89\nPPid:\t7\n"
+    },
+    {
+      "elapsedSeconds": 1.0731352090006112,
+      "processes": "Name:\tdocker-init\nPid:\t1\nPPid:\t0\nName:\tpostgres\nPid:\t7\nPPid:\t1\nName:\tpostgres\nPid:\t738\nPPid:\t7\nName:\tsh\nPid:\t801\nPPid:\t0\nName:\tpg_isready\nPid:\t807\nPPid:\t801\nName:\tpostgres\nPid:\t808\nPPid:\t7\nName:\tsh\nPid:\t809\nPPid:\t0\nName:\tpostgres\nPid:\t81\nPPid:\t7\nName:\tpostgres\nPid:\t82\nPPid:\t7\nName:\tpostgres\nPid:\t83\nPPid:\t7\nName:\tpostgres\nPid:\t84\nPPid:\t7\nName:\tpostgres\nPid:\t85\nPPid:\t7\nName:\tpostgres\nPid:\t87\nPPid:\t7\nName:\tpostgres\nPid:\t88\nPPid:\t7\nName:\tpostgres\nPid:\t89\nPPid:\t7\n"
+    },
+    {
+      "elapsedSeconds": 1.5988461669985554,
+      "processes": "Name:\tdocker-init\nPid:\t1\nPPid:\t0\nName:\tpostgres\nPid:\t7\nPPid:\t1\nName:\tpostgres\nPid:\t738\nPPid:\t7\nName:\tsh\nPid:\t801\nPPid:\t0\nName:\tpg_isready\nPid:\t807\nPPid:\t801\nName:\tpostgres\nPid:\t808\nPPid:\t7\nName:\tpostgres\nPid:\t81\nPPid:\t7\nName:\tpostgres\nPid:\t82\nPPid:\t7\nName:\tpostgres\nPid:\t83\nPPid:\t7\nName:\tpostgres\nPid:\t84\nPPid:\t7\nName:\tsh\nPid:\t846\nPPid:\t0\nName:\tpostgres\nPid:\t85\nPPid:\t7\nName:\tpostgres\nPid:\t87\nPPid:\t7\nName:\tpostgres\nPid:\t88\nPPid:\t7\nName:\tpostgres\nPid:\t89\nPPid:\t7\n"
+    },
+    {
+      "elapsedSeconds": 2.1211477920005564,
+      "processes": "Name:\tdocker-init\nPid:\t1\nPPid:\t0\nName:\tpostgres\nPid:\t7\nPPid:\t1\nName:\tpostgres\nPid:\t738\nPPid:\t7\nName:\tsh\nPid:\t801\nPPid:\t0\nName:\tpg_isready\nPid:\t807\nPPid:\t801\nName:\tpostgres\nPid:\t808\nPPid:\t7\nName:\tpostgres\nPid:\t81\nPPid:\t7\nName:\tpostgres\nPid:\t82\nPPid:\t7\nName:\tpostgres\nPid:\t83\nPPid:\t7\nName:\tpostgres\nPid:\t84\nPPid:\t7\nName:\tpostgres\nPid:\t85\nPPid:\t7\nName:\tpostgres\nPid:\t87\nPPid:\t7\nName:\tpostgres\nPid:\t88\nPPid:\t7\nName:\tsh\nPid:\t883\nPPid:\t0\nName:\tpostgres\nPid:\t89\nPPid:\t7\n"
+    },
+    {
+      "elapsedSeconds": 2.6421495000031427,
+      "processes": "Name:\tdocker-init\nPid:\t1\nPPid:\t0\nName:\tpostgres\nPid:\t7\nPPid:\t1\nName:\tpostgres\nPid:\t738\nPPid:\t7\nName:\tsh\nPid:\t801\nPPid:\t0\nName:\tpg_isready\nPid:\t807\nPPid:\t801\nName:\tpostgres\nPid:\t808\nPPid:\t7\nName:\tpostgres\nPid:\t81\nPPid:\t7\nName:\tpostgres\nPid:\t82\nPPid:\t7\nName:\tpostgres\nPid:\t83\nPPid:\t7\nName:\tpostgres\nPid:\t84\nPPid:\t7\nName:\tpostgres\nPid:\t85\nPPid:\t7\nName:\tpostgres\nPid:\t87\nPPid:\t7\nName:\tpostgres\nPid:\t88\nPPid:\t7\nName:\tpostgres\nPid:\t89\nPPid:\t7\nName:\tsh\nPid:\t920\nPPid:\t0\n"
+    },
+    {
+      "elapsedSeconds": 3.164231834001839,
+      "processes": "Name:\tdocker-init\nPid:\t1\nPPid:\t0\nName:\tpostgres\nPid:\t7\nPPid:\t1\nName:\tpostgres\nPid:\t738\nPPid:\t7\nName:\tpg_isready\nPid:\t807\nPPid:\t1\nName:\tpostgres\nPid:\t808\nPPid:\t7\nName:\tpostgres\nPid:\t81\nPPid:\t7\nName:\tpostgres\nPid:\t82\nPPid:\t7\nName:\tpostgres\nPid:\t83\nPPid:\t7\nName:\tpostgres\nPid:\t84\nPPid:\t7\nName:\tpostgres\nPid:\t85\nPPid:\t7\nName:\tpostgres\nPid:\t87\nPPid:\t7\nName:\tpostgres\nPid:\t88\nPPid:\t7\nName:\tpostgres\nPid:\t89\nPPid:\t7\nName:\tsh\nPid:\t957\nPPid:\t0\n"
+    },
+    {
+      "elapsedSeconds": 3.6789085420023184,
+      "processes": "Name:\tdocker-init\nPid:\t1\nPPid:\t0\nName:\tpostgres\nPid:\t7\nPPid:\t1\nName:\tpostgres\nPid:\t738\nPPid:\t7\nName:\tpg_isready\nPid:\t807\nPPid:\t1\nName:\tpostgres\nPid:\t808\nPPid:\t7\nName:\tpostgres\nPid:\t81\nPPid:\t7\nName:\tpostgres\nPid:\t82\nPPid:\t7\nName:\tpostgres\nPid:\t83\nPPid:\t7\nName:\tpostgres\nPid:\t84\nPPid:\t7\nName:\tpostgres\nPid:\t85\nPPid:\t7\nName:\tpostgres\nPid:\t87\nPPid:\t7\nName:\tpostgres\nPid:\t88\nPPid:\t7\nName:\tpostgres\nPid:\t89\nPPid:\t7\nName:\tsh\nPid:\t992\nPPid:\t0\n"
+    },
+    {
+      "elapsedSeconds": 4.197307750000618,
+      "processes": "Name:\tdocker-init\nPid:\t1\nPPid:\t0\nName:\tsh\nPid:\t1027\nPPid:\t0\nName:\tpostgres\nPid:\t7\nPPid:\t1\nName:\tpostgres\nPid:\t738\nPPid:\t7\nName:\tpostgres\nPid:\t808\nPPid:\t7\nName:\tpostgres\nPid:\t81\nPPid:\t7\nName:\tpostgres\nPid:\t82\nPPid:\t7\nName:\tpostgres\nPid:\t83\nPPid:\t7\nName:\tpostgres\nPid:\t84\nPPid:\t7\nName:\tpostgres\nPid:\t85\nPPid:\t7\nName:\tpostgres\nPid:\t87\nPPid:\t7\nName:\tpostgres\nPid:\t88\nPPid:\t7\nName:\tpostgres\nPid:\t89\nPPid:\t7\n"
+    },
+    {
+      "elapsedSeconds": 4.689172917001997,
+      "processes": "Name:\tdocker-init\nPid:\t1\nPPid:\t0\nName:\tsh\nPid:\t1060\nPPid:\t0\nName:\tpostgres\nPid:\t7\nPPid:\t1\nName:\tpostgres\nPid:\t738\nPPid:\t7\nName:\tpostgres\nPid:\t808\nPPid:\t7\nName:\tpostgres\nPid:\t81\nPPid:\t7\nName:\tpostgres\nPid:\t82\nPPid:\t7\nName:\tpostgres\nPid:\t83\nPPid:\t7\nName:\tpostgres\nPid:\t84\nPPid:\t7\nName:\tpostgres\nPid:\t85\nPPid:\t7\nName:\tpostgres\nPid:\t87\nPPid:\t7\nName:\tpostgres\nPid:\t88\nPPid:\t7\nName:\tpostgres\nPid:\t89\nPPid:\t7\n"
+    },
+    {
+      "elapsedSeconds": 5.210761292000825,
+      "processes": "Name:\tdocker-init\nPid:\t1\nPPid:\t0\nName:\tsh\nPid:\t1093\nPPid:\t0\nName:\tpg_isready\nPid:\t1099\nPPid:\t1093\nName:\tpostgres\nPid:\t1100\nPPid:\t7\nName:\tsh\nPid:\t1101\nPPid:\t0\nName:\tpostgres\nPid:\t7\nPPid:\t1\nName:\tpostgres\nPid:\t738\nPPid:\t7\nName:\tpostgres\nPid:\t808\nPPid:\t7\nName:\tpostgres\nPid:\t81\nPPid:\t7\nName:\tpostgres\nPid:\t82\nPPid:\t7\nName:\tpostgres\nPid:\t83\nPPid:\t7\nName:\tpostgres\nPid:\t84\nPPid:\t7\nName:\tpostgres\nPid:\t85\nPPid:\t7\nName:\tpostgres\nPid:\t87\nPPid:\t7\nName:\tpostgres\nPid:\t88\nPPid:\t7\nName:\tpostgres\nPid:\t89\nPPid:\t7\n"
+    },
+    {
+      "elapsedSeconds": 5.72791045899794,
+      "processes": "Name:\tdocker-init\nPid:\t1\nPPid:\t0\nName:\tsh\nPid:\t1093\nPPid:\t0\nName:\tpg_isready\nPid:\t1099\nPPid:\t1093\nName:\tpostgres\nPid:\t1100\nPPid:\t7\nName:\tsh\nPid:\t1141\nPPid:\t0\nName:\tpostgres\nPid:\t7\nPPid:\t1\nName:\tpostgres\nPid:\t738\nPPid:\t7\nName:\tpostgres\nPid:\t808\nPPid:\t7\nName:\tpostgres\nPid:\t81\nPPid:\t7\nName:\tpostgres\nPid:\t82\nPPid:\t7\nName:\tpostgres\nPid:\t83\nPPid:\t7\nName:\tpostgres\nPid:\t84\nPPid:\t7\nName:\tpostgres\nPid:\t85\nPPid:\t7\nName:\tpostgres\nPid:\t87\nPPid:\t7\nName:\tpostgres\nPid:\t88\nPPid:\t7\nName:\tpostgres\nPid:\t89\nPPid:\t7\n"
+    },
+    {
+      "elapsedSeconds": 6.24746733399661,
+      "processes": "Name:\tdocker-init\nPid:\t1\nPPid:\t0\nName:\tsh\nPid:\t1093\nPPid:\t0\nName:\tpg_isready\nPid:\t1099\nPPid:\t1093\nName:\tpostgres\nPid:\t1100\nPPid:\t7\nName:\tsh\nPid:\t1180\nPPid:\t0\nName:\tpostgres\nPid:\t7\nPPid:\t1\nName:\tpostgres\nPid:\t738\nPPid:\t7\nName:\tpostgres\nPid:\t808\nPPid:\t7\nName:\tpostgres\nPid:\t81\nPPid:\t7\nName:\tpostgres\nPid:\t82\nPPid:\t7\nName:\tpostgres\nPid:\t83\nPPid:\t7\nName:\tpostgres\nPid:\t84\nPPid:\t7\nName:\tpostgres\nPid:\t85\nPPid:\t7\nName:\tpostgres\nPid:\t87\nPPid:\t7\nName:\tpostgres\nPid:\t88\nPPid:\t7\nName:\tpostgres\nPid:\t89\nPPid:\t7\n"
+    },
+    {
+      "elapsedSeconds": 6.764671124998131,
+      "processes": "Name:\tdocker-init\nPid:\t1\nPPid:\t0\nName:\tsh\nPid:\t1093\nPPid:\t0\nName:\tpg_isready\nPid:\t1099\nPPid:\t1093\nName:\tpostgres\nPid:\t1100\nPPid:\t7\nName:\tsh\nPid:\t1219\nPPid:\t0\nName:\tpostgres\nPid:\t7\nPPid:\t1\nName:\tpostgres\nPid:\t738\nPPid:\t7\nName:\tpostgres\nPid:\t808\nPPid:\t7\nName:\tpostgres\nPid:\t81\nPPid:\t7\nName:\tpostgres\nPid:\t82\nPPid:\t7\nName:\tpostgres\nPid:\t83\nPPid:\t7\nName:\tpostgres\nPid:\t84\nPPid:\t7\nName:\tpostgres\nPid:\t85\nPPid:\t7\nName:\tpostgres\nPid:\t87\nPPid:\t7\nName:\tpostgres\nPid:\t88\nPPid:\t7\nName:\tpostgres\nPid:\t89\nPPid:\t7\n"
+    },
+    {
+      "elapsedSeconds": 7.287440499996592,
+      "processes": "Name:\tdocker-init\nPid:\t1\nPPid:\t0\nName:\tpg_isready\nPid:\t1099\nPPid:\t1\nName:\tpostgres\nPid:\t1100\nPPid:\t7\nName:\tsh\nPid:\t1258\nPPid:\t0\nName:\tpostgres\nPid:\t7\nPPid:\t1\nName:\tpostgres\nPid:\t738\nPPid:\t7\nName:\tpostgres\nPid:\t808\nPPid:\t7\nName:\tpostgres\nPid:\t81\nPPid:\t7\nName:\tpostgres\nPid:\t82\nPPid:\t7\nName:\tpostgres\nPid:\t83\nPPid:\t7\nName:\tpostgres\nPid:\t84\nPPid:\t7\nName:\tpostgres\nPid:\t85\nPPid:\t7\nName:\tpostgres\nPid:\t87\nPPid:\t7\nName:\tpostgres\nPid:\t88\nPPid:\t7\nName:\tpostgres\nPid:\t89\nPPid:\t7\n"
+    },
+    {
+      "elapsedSeconds": 7.802060709000216,
+      "processes": "Name:\tdocker-init\nPid:\t1\nPPid:\t0\nName:\tpg_isready\nPid:\t1099\nPPid:\t1\nName:\tpostgres\nPid:\t1100\nPPid:\t7\nName:\tsh\nPid:\t1295\nPPid:\t0\nName:\tpostgres\nPid:\t7\nPPid:\t1\nName:\tpostgres\nPid:\t738\nPPid:\t7\nName:\tpostgres\nPid:\t808\nPPid:\t7\nName:\tpostgres\nPid:\t81\nPPid:\t7\nName:\tpostgres\nPid:\t82\nPPid:\t7\nName:\tpostgres\nPid:\t83\nPPid:\t7\nName:\tpostgres\nPid:\t84\nPPid:\t7\nName:\tpostgres\nPid:\t85\nPPid:\t7\nName:\tpostgres\nPid:\t87\nPPid:\t7\nName:\tpostgres\nPid:\t88\nPPid:\t7\nName:\tpostgres\nPid:\t89\nPPid:\t7\n"
+    }
+  ],
+  "logSha256": "dc7f83b6ec30a9696a4ed9b8789c275df54d8c26aa99e7c704d74ffb6a82b6c4",
+  "crashLines": [],
+  "locksAfter": "0",
+  "status": "DIAGNOSTIC_PASS"
+}

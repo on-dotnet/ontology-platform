@@ -1,0 +1,26 @@
+{
+  "scope": "READ_ONLY_CRASH_WITNESS",
+  "containerId": "1fec88e7975f9ce7d26b460ac48b66b85b0a1500a6a448889db7c56e4e23fca0",
+  "memoryLimit": 805306368,
+  "state": {
+    "Running": true,
+    "OOMKilled": false,
+    "ExitCode": 0,
+    "StartedAt": "2026-11-05T03:29:43.215148381Z"
+  },
+  "restartCount": 0,
+  "rawLogSha256": "d8cdc44a1bbd9f064ed25d73583ca6cfa5c8aaebdb5458bc10da0ca71c7c2803",
+  "crashLines": [
+    "2026-11-05 03:35:00.177 UTC [1495] LOG:  SSL error: unexpected eof while reading",
+    "2026-11-05 03:35:40.022 UTC [1660] LOG:  SSL error: unexpected eof while reading",
+    "2026-11-05 03:36:33.084 UTC [1793] LOG:  SSL error: unexpected eof while reading",
+    "2026-11-05 03:36:37.559 UTC [1] LOG:  all server processes terminated; reinitializing",
+    "2026-11-05 03:36:37.580 UTC [1820] LOG:  database system was not properly shut down; automatic recovery in progress",
+    "2026-11-05 03:36:37.580 UTC [1821] LOG:  checkpoint starting: end-of-recovery immediate wait",
+    "2026-11-05 03:42:18.607 UTC [3196] LOG:  SSL error: unexpected eof while reading",
+    "2026-11-05 03:42:23.950 UTC [1] LOG:  all server processes terminated; reinitializing",
+    "2026-11-05 03:42:23.971 UTC [3230] LOG:  database system was not properly shut down; automatic recovery in progress",
+    "2026-11-05 03:42:23.971 UTC [3231] LOG:  checkpoint starting: end-of-recovery immediate wait"
+  ],
+  "memoryAndFilesystem": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n104800256\n118153216\n805306368\nFilesystem     1K-blocks  Used Available Use% Mounted on\ntmpfs             524288 63840    460448  13% /var/lib/postgresql\nshm                65536  1056     64480   2% /dev/shm\n"
+}

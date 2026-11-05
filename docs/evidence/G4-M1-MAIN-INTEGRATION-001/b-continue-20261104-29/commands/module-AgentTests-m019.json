@@ -1,0 +1,38 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-29",
+  "testedCommit": "9dd30dcf3a4399d0497e858025fdfcdf5334b50e",
+  "command": [
+    "/usr/bin/sandbox-exec",
+    "-p",
+    "(version 1) (allow default) (deny network-outbound (remote ip \"*:*\")) (allow network-outbound (remote ip \"localhost:*\"))",
+    "/usr/local/share/dotnet/dotnet",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll",
+    "--filter",
+    "FullyQualifiedName=OntologyPlatform.AgentTests.RunFlowTests.ProviderIdempotencyOwnerAndCompleteScopeFailClosed",
+    "--minimum-expected-tests",
+    "1",
+    "--no-ansi",
+    "--output",
+    "Detailed",
+    "--results-directory",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-29/test-results/module-AgentTests-m019"
+  ],
+  "startedAtUtc": "2026-11-05T03:17:06.236139+00:00",
+  "endedAtUtc": "2026-11-05T03:17:07.931979+00:00",
+  "elapsedSeconds": 1.695824915994308,
+  "exitCode": 0,
+  "timingStatus": "OBSERVED",
+  "timedOut": false,
+  "executedInputDrift": false,
+  "inputHashes": {
+    "/usr/bin/sandbox-exec": "58839ef01b4eef8aac0d2aa8f9d1c074ae45aafe3533965b030672450064acc8",
+    "/usr/local/share/dotnet/dotnet": "11b517e7b00d0efa20e9b3ab6fe433f135d828a4c95c9c6ca7a9cf1328b6ada4",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.AgentTests/bin/Debug/net10.0/OntologyPlatform.AgentTests.dll": "f2fc3b135ae364ab523c57eef1f888d1405ebdb9710f2aeb98f41bed91f9ea7c"
+  },
+  "manifestSha256": "ee4901479add7953953d7df2c4a26addd152a87dcbad5f281732a45c4779fd98",
+  "commandSha256": "3bd66ecf02b4956015acbf5400c259481139f25eb75729c6ec1e74e515d5145b",
+  "logSha256": "9559c94f4290abe1665e57ca3a40b62b65fb12e815bd690ecd27d519c9ad85cb",
+  "logBytes": 366,
+  "logVisibility": "PRIVATE"
+}

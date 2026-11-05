@@ -1016,6 +1016,7 @@ def resource_snapshot(m, group, name, *, certificate_variant='server'):
         item=inspect_owned(m,ident);service=item['Config']['Labels']['com.docker.compose.service']
         require(service in declarations and service not in container_ids,'ACTUAL_SERVICE_SET')
         if service in ('api','api-recovery'):require(item['HostConfig'].get('Init') is True,'ACTUAL_API_INIT_REQUIRED')
+        if service=='pg-source':require(item['HostConfig'].get('Init') is True,'ACTUAL_PG_SOURCE_INIT_REQUIRED')
         require(item['Config']['Image'] in IMAGES.values(),'ACTUAL_IMAGE')
         memory+=item['HostConfig']['Memory'];require(item['HostConfig']['Memory']>0,'UNBOUNDED_MEMORY')
         require(not item['HostConfig']['Privileged'] and item['HostConfig']['ReadonlyRootfs'],'ACTUAL_PRIVILEGE')

@@ -1,0 +1,23 @@
+{
+  "scope": "LOCK_ACROSS_HEALTHCHECK_NO_PRODUCT_REQUEST",
+  "startedAtUtc": "2026-11-05T03:45:49.261605+00:00",
+  "containerId": "1fec88e7975f9ce7d26b460ac48b66b85b0a1500a6a448889db7c56e4e23fca0",
+  "init": null,
+  "held": {
+    "pid": 4057,
+    "held": true
+  },
+  "failure": {
+    "type": "ValueError",
+    "code": "PG_SESSION_EOF"
+  },
+  "exitCode": 3,
+  "stderrSha256": "2930e07c50ebcc4f2d0ef3ae845d3caab76ead63b858bf2cdd473d9fc844a32a",
+  "stderr": "WARNING:  terminating connection because of crash of another server process\nDETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.\nHINT:  In a moment you should be able to reconnect to the database and repeat your command.\nserver closed the connection unexpectedly\n\tThis probably means the server terminated abnormally\n\tbefore or while processing the request.\n",
+  "logSha256": "fa962233ccdc63b2e54e2bf0d2c1fc175bd62a1026b3569205cab7d3bc18927a",
+  "crashLines": [
+    "2026-11-05 03:45:52.901 UTC [1] LOG:  untracked child process (PID 4064) exited with exit code 2",
+    "2026-11-05 03:45:52.901 UTC [1] LOG:  terminating any other active server processes",
+    "2026-11-05 03:45:52.903 UTC [1] LOG:  all server processes terminated; reinitializing"
+  ]
+}

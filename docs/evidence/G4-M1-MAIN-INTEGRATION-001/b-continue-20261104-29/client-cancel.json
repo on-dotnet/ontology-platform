@@ -1,0 +1,79 @@
+{
+  "status": "PASS",
+  "http": {
+    "taskId": "G4-M1-MAIN-INTEGRATION-001",
+    "runId": "b-continue-20261104-29",
+    "testedCommit": "9dd30dcf3a4399d0497e858025fdfcdf5334b50e",
+    "startedUtc": "2026-11-05T03:36:13.276Z",
+    "checks": [
+      {
+        "name": "actual_request_aborted_during_source_wait",
+        "status": "PASS"
+      }
+    ],
+    "http": [
+      {
+        "method": "GET",
+        "route": "/api/v1/connections/{id}",
+        "status": 200,
+        "durationMs": 25,
+        "jsonBody": true
+      },
+      {
+        "method": "GET",
+        "route": "/api/v1/platform/me",
+        "status": 200,
+        "durationMs": 25,
+        "jsonBody": true
+      }
+    ],
+    "scope": "ONE_HTTP_ACTION_ONLY",
+    "databaseRollbackLeaseFenceEvidence": "NOT_RUN_BY_THIS_CONSUMER",
+    "action": "probe-client-cancel",
+    "connectionId": "8f5a7553b6614c2db08142777c641b9a",
+    "auditStage": "complete",
+    "commandKey": "ecbc18ac5e8438d61ed7d05a3d221049543ca9fad1b88787a0482a989557b4c0",
+    "clientCancellation": {
+      "aborted": true,
+      "durationMs": 1502.8999999985099
+    },
+    "status": "PASS",
+    "completedUtc": "2026-11-05T03:36:16.174Z"
+  },
+  "persistentProbe": {
+    "status": "CANCELLED",
+    "stages": [
+      {
+        "name": "NETWORK",
+        "status": "PASS",
+        "durationMs": 0,
+        "diagnosticCode": null
+      },
+      {
+        "name": "TLS",
+        "status": "FAIL",
+        "durationMs": 1480,
+        "diagnosticCode": "connection_cancelled"
+      },
+      {
+        "name": "AUTH",
+        "status": "NOT_RUN",
+        "durationMs": 0,
+        "diagnosticCode": null
+      },
+      {
+        "name": "READ_ONLY",
+        "status": "NOT_RUN",
+        "durationMs": 0,
+        "diagnosticCode": null
+      },
+      {
+        "name": "METADATA",
+        "status": "NOT_RUN",
+        "durationMs": 0,
+        "diagnosticCode": null
+      }
+    ]
+  },
+  "sourceRestored": true
+}

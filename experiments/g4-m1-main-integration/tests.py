@@ -367,7 +367,7 @@ console.log('group and bounded relay lifecycle PASS');"""
                 variant=kwargs['env'].get('G4_CERTIFICATE_VARIANT','server');seen.append(variant)
                 declaration={'services':{'pg-source':{'volumes':[{'type':'bind','source':str(d/(variant+ext)),'target':'/cert'+ext,'read_only':True} for ext in ('.crt','.key')]}}}
                 return subprocess.CompletedProcess(command,0,json.dumps(declaration).encode(),b'')
-            actual={'Config':{'Labels':{'com.docker.compose.service':'pg-source'},'Image':rt.IMAGES['postgres']},'Image':'sha256:fixture','HostConfig':{'Memory':1024,'Privileged':False,'ReadonlyRootfs':True},'State':{'Running':True,'Paused':False},'Mounts':[{'Type':'bind','Source':str(d/('wrong-san'+ext)),'Destination':'/cert'+ext,'RW':False} for ext in ('.crt','.key')]}
+            actual={'Config':{'Labels':{'com.docker.compose.service':'pg-source'},'Image':rt.IMAGES['postgres']},'Image':'sha256:fixture','HostConfig':{'Memory':1024,'Privileged':False,'ReadonlyRootfs':True,'Init':True},'State':{'Running':True,'Paused':False},'Mounts':[{'Type':'bind','Source':str(d/('wrong-san'+ext)),'Destination':'/cert'+ext,'RW':False} for ext in ('.crt','.key')]}
             with ExitStack() as stack:
                 stack.enter_context(patch.object(rt,'ARTIFACTS',d));stack.enter_context(patch.object(rt,'docker',return_value=b'fixture\n'));stack.enter_context(patch.object(rt,'verify_engine'))
                 stack.enter_context(patch.object(rt.subprocess,'run',side_effect=configured));stack.enter_context(patch.object(rt,'inspect_owned',return_value=actual));stack.enter_context(patch.object(rt,'observed_volume_usage',return_value=0));stack.enter_context(patch.object(rt,'update_runtime'))
@@ -517,8 +517,8 @@ class ExecutionRegressionTests(unittest.TestCase):
 
 
 class ComposeBoundaryTests(unittest.TestCase):
-    def test_api_init_declared_and_actual_state_are_required(self):
-        """真实Compose及实际快照均拒绝API缺失/错误Init，覆盖恢复副本。"""
+    def test_api_and_source_init_declared_and_actual_state_are_required(self):
+        """真实Compose及实际快照拒绝API及源PG缺失/错误Init，覆盖恢复副本。"""
         import copy
         from unittest.mock import patch
         from contextlib import ExitStack
@@ -528,25 +528,25 @@ class ComposeBoundaryTests(unittest.TestCase):
             command=rt.compose_command(group)+(['--profile',profile] if profile else [])+['config','--format','json']
             result=subprocess.run(command,env=rt.compose_environment(m),capture_output=True,timeout=20);self.assertEqual(result.returncode,0,result.stderr)
             config=json.loads(result.stdout)
-            for name in ('api','api-recovery'):
+            for name in ('api','api-recovery','pg-source'):
                 if name not in config['services']:continue
                 self.assertIs(config['services'][name].get('init'),True)
                 for value in (None,False,'true',1):
                     bad=copy.deepcopy(config)
                     if value is None:bad['services'][name].pop('init')
                     else:bad['services'][name]['init']=value
-                    with self.assertRaisesRegex(ValueError,'API_INIT_REQUIRED'):cc.check_compose(m,bad,group)
+                    with self.assertRaisesRegex(ValueError,'PG_SOURCE_INIT_REQUIRED' if name=='pg-source' else 'API_INIT_REQUIRED'):cc.check_compose(m,bad,group)
         with tempfile.TemporaryDirectory(dir=ARTIFACTS) as directory:
-            for service in ('api','api-recovery'):
+            for service in ('api','api-recovery','pg-source'):
                 for number,init in enumerate((None,False,'true',1,True)):
-                    item={'Config':{'Labels':{'com.docker.compose.service':service},'Image':rt.IMAGES['aspnet']},'Image':'sha256:fixture','HostConfig':{'Memory':1024,'Privileged':False,'ReadonlyRootfs':True,'Init':init},'State':{'Running':True,'Paused':False},'Mounts':[]}
+                    item={'Config':{'Labels':{'com.docker.compose.service':service},'Image':rt.IMAGES['postgres' if service=='pg-source' else 'aspnet']},'Image':'sha256:fixture','HostConfig':{'Memory':1024,'Privileged':False,'ReadonlyRootfs':True,'Init':init},'State':{'Running':True,'Paused':False},'Mounts':[]}
                     result=subprocess.CompletedProcess([],0,json.dumps({'services':{service:{'volumes':[]}}}).encode(),b'')
                     with ExitStack() as stack:
                         stack.enter_context(patch.object(rt,'ARTIFACTS',Path(directory)));stack.enter_context(patch.object(rt,'docker',return_value=b'fixture\n'));stack.enter_context(patch.object(rt,'verify_engine'));stack.enter_context(patch.object(rt.subprocess,'run',return_value=result));stack.enter_context(patch.object(rt,'inspect_owned',return_value=item));stack.enter_context(patch.object(rt,'observed_volume_usage',return_value=0));stack.enter_context(patch.object(rt,'update_runtime'))
                         if init is True:
                             value=rt.resource_snapshot(m,'m1',service+str(number));self.assertIs(value['containers'][0]['init'],True)
                         else:
-                            with self.assertRaisesRegex(ValueError,'ACTUAL_API_INIT_REQUIRED'):rt.resource_snapshot(m,'m1',service+str(number))
+                            with self.assertRaisesRegex(ValueError,'ACTUAL_PG_SOURCE_INIT_REQUIRED' if service=='pg-source' else 'ACTUAL_API_INIT_REQUIRED'):rt.resource_snapshot(m,'m1',service+str(number))
 
     def test_actual_config_positive_and_mutations(self):
         import copy
@@ -673,6 +673,72 @@ class RecoveryGuardTests(unittest.TestCase):
                     try:os.kill(guard_pid,signal.SIGTERM)
                     except ProcessLookupError:pass
                 child.stdout.close();child.stderr.close()
+
+
+class SourceSessionEvidenceTests(unittest.TestCase):
+    def test_json_then_nonzero_exit_is_not_success(self):
+        import readback
+        from unittest.mock import patch
+        original=subprocess.Popen
+        with tempfile.TemporaryDirectory(dir=ARTIFACTS) as directory:
+            root=Path(directory);private=root/'private';private.mkdir(mode=0o700);(root/'fixture').mkdir()
+            script="import sys;sys.stdin.readline();print('[]',flush=True);sys.stdin.readline();sys.stderr.write('rollback failed\\n');sys.exit(3)"
+            def launch(command,**kwargs):return original([sys.executable,'-B','-c',script],**kwargs)
+            with patch.object(readback.rt,'private_dir',return_value=private),patch.object(readback.rt,'ARTIFACTS',root),patch.object(readback.rt,'runtime_value',return_value={'containerIds':{'pg-source':'a'*64}}),patch.object(readback.rt,'inspect_owned'),patch.object(readback.subprocess,'Popen',side_effect=launch):
+                with self.assertRaisesRegex(ValueError,'PG_SESSION_EXIT'):
+                    with readback.SourceSession({'runId':'fixture','_head':'b'*40}) as session:self.assertEqual(session.query('SELECT 1;'),[])
+            receipt=json.loads(next((root/'fixture').glob('source-session-*.json')).read_text());self.assertEqual(receipt['exitCode'],3);self.assertEqual(receipt['failureCode'],'PG_SESSION_EXIT')
+
+    def test_exited_parent_cannot_leave_child_holding_stderr(self):
+        import readback,time
+        from unittest.mock import patch
+        original=subprocess.Popen
+        with tempfile.TemporaryDirectory(dir=ARTIFACTS) as directory:
+            root=Path(directory);private=root/'private';private.mkdir(mode=0o700);(root/'fixture').mkdir()
+            script="import sys,os,time;sys.stdin.readline();child=os.fork()\nif child==0:time.sleep(5);os._exit(0)\nprint('[]',flush=True);os._exit(0)"
+            def launch(command,**kwargs):return original([sys.executable,'-B','-c',script],**kwargs)
+            started=time.monotonic()
+            with patch.object(readback.rt,'private_dir',return_value=private),patch.object(readback.rt,'ARTIFACTS',root),patch.object(readback.rt,'runtime_value',return_value={'containerIds':{'pg-source':'a'*64}}),patch.object(readback.rt,'inspect_owned'),patch.object(readback.subprocess,'Popen',side_effect=launch):
+                with readback.SourceSession({'runId':'fixture','_head':'b'*40}) as session:self.assertEqual(session.query('SELECT 1;'),[])
+            self.assertLess(time.monotonic()-started,3)
+            receipt=json.loads(next((root/'fixture').glob('source-session-*.json')).read_text());self.assertTrue(receipt['stderrComplete']);self.assertEqual(receipt['exitCode'],0)
+
+    def test_receipt_failure_preserves_original_error_and_blocks_success(self):
+        import readback
+        from unittest.mock import patch
+        original=subprocess.Popen
+        for failed_query in (True,False):
+            with self.subTest(failed_query=failed_query),tempfile.TemporaryDirectory(dir=ARTIFACTS) as directory:
+                root=Path(directory);private=root/'private';private.mkdir(mode=0o700);(root/'fixture').mkdir()
+                script="import sys;sys.stdin.readline();sys.stderr.write('synthetic SQL failure\\n');sys.exit(3)" if failed_query else "import sys;sys.stdin.readline();print('[]',flush=True);sys.stdin.readline();sys.stdin.readline()"
+                def launch(command,**kwargs):return original([sys.executable,'-B','-c',script],**kwargs)
+                with patch.object(readback.rt,'private_dir',return_value=private),patch.object(readback.rt,'ARTIFACTS',root),patch.object(readback.rt,'runtime_value',return_value={'containerIds':{'pg-source':'a'*64}}),patch.object(readback.rt,'inspect_owned'),patch.object(readback.subprocess,'Popen',side_effect=launch),patch.object(readback.rt,'write_json',side_effect=PermissionError('receipt refused')):
+                    with self.assertRaisesRegex(ValueError if failed_query else PermissionError,'PG_SESSION_EOF' if failed_query else 'receipt refused'):
+                        with readback.SourceSession({'runId':'fixture','_head':'b'*40}) as session:session.query('SELECT 1;')
+                self.assertIsNotNone(session.process.poll());self.assertEqual(len(list((private/'logs').glob('*.stderr'))),1)
+
+    def test_actual_child_stderr_and_exit_are_preserved_on_eof_and_success(self):
+        import readback,os
+        from unittest.mock import patch
+        original=subprocess.Popen
+        for mode in ('success','sql-error'):
+            with self.subTest(mode=mode),tempfile.TemporaryDirectory(dir=ARTIFACTS) as directory:
+                root=Path(directory);private=root/'private';private.mkdir(mode=0o700);(root/'fixture').mkdir()
+                script="import sys;sys.stdin.readline();sys.stderr.write('synthetic SQL failure\\n');sys.stderr.flush();sys.exit(3)" if mode=='sql-error' else "import sys;sys.stdin.readline();print('[]',flush=True);sys.stdin.readline();sys.stdin.readline()"
+                def launch(command,**kwargs):return original([sys.executable,'-B','-c',script],**kwargs)
+                with patch.object(readback.rt,'private_dir',return_value=private),patch.object(readback.rt,'ARTIFACTS',root),patch.object(readback.rt,'runtime_value',return_value={'containerIds':{'pg-source':'a'*64}}),patch.object(readback.rt,'inspect_owned'),patch.object(readback.subprocess,'Popen',side_effect=launch):
+                    if mode=='sql-error':
+                        with self.assertRaisesRegex(ValueError,'PG_SESSION_EOF'):
+                            with readback.SourceSession({'runId':'fixture','_head':'b'*40}) as session:session.query('SELECT 1;')
+                    else:
+                        with readback.SourceSession({'runId':'fixture','_head':'b'*40}) as session:
+                            self.assertEqual(session.query('SELECT 1;'),[])
+                receipts=list((root/'fixture').glob('source-session-*.json'));self.assertEqual(len(receipts),1)
+                value=json.loads(receipts[0].read_text());self.assertEqual(value['exitCode'],3 if mode=='sql-error' else 0)
+                raw=(private/'logs'/value['stderrFile']).read_bytes();self.assertEqual(readback.rt.digest(raw),value['stderrSha256']);self.assertEqual(len(raw),value['stderrBytes'])
+                self.assertEqual((private/'logs'/value['stderrFile']).stat().st_mode&0o777,0o600)
+                self.assertNotIn('synthetic SQL failure',receipts[0].read_text())
+                self.assertEqual(value['failureCode'],'PG_SESSION_EOF' if mode=='sql-error' else None)
 
 
 class SourceRoleRestorationTests(unittest.TestCase):

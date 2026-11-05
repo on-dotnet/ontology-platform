@@ -1,6 +1,7 @@
 name: ontology-g4-main-${G4_RUN_ID:?explicit current run required}
 services:
   pg-source:
+    init: true
     image: postgres@sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437
     platform: linux/arm64
     pull_policy: never

@@ -1,0 +1,113 @@
+{
+  "scope": "DIAGNOSTIC_ONLY_SAME_ASSERTIONS_NEW_ACTION_LABELS_STDERR_CAPTURE",
+  "testedCommit": "9dd30dcf3a4399d0497e858025fdfcdf5334b50e",
+  "helperSha256": "5dc06cbb77f02490747a793285bf7ff63999a82d4614540657a6747664356a86",
+  "driverSha256": "51c81d4a4af879255afb0227d6d379e1a3c3d7adf39c63a4bbabe0ff6a558be5",
+  "status": "DIAGNOSTIC_FAILED",
+  "failure": {
+    "type": "ValueError",
+    "code": "PG_SESSION_EOF"
+  },
+  "events": [
+    {
+      "event": "action",
+      "name": "probe-refresh",
+      "label": "cancel-probe-refresh",
+      "started": 58470.152206208,
+      "sessionStatesBefore": {},
+      "ended": 58481.17754375,
+      "sessionStatesAfter": {}
+    },
+    {
+      "event": "open",
+      "session": "session-0",
+      "pid": 27325,
+      "monotonic": 58481.191622125
+    },
+    {
+      "event": "query",
+      "session": "session-0",
+      "querySha256": "ad7c958397c6e092eb35f6c374adc7b65e206a66b55658d0f9dc323509c27446",
+      "started": 58481.191645708,
+      "processPollBefore": null,
+      "result": [],
+      "ended": 58481.224666541,
+      "processPollAfter": null
+    },
+    {
+      "event": "query",
+      "session": "session-0",
+      "querySha256": "53d133fc3045c3746fcdc0b1d2170d1cb5123c0deb5db1951b8e0544922ec998",
+      "started": 58481.224683666,
+      "processPollBefore": null,
+      "result": 0,
+      "ended": 58481.2252695,
+      "processPollAfter": null
+    },
+    {
+      "event": "open",
+      "session": "session-1",
+      "pid": 27327,
+      "monotonic": 58481.239640041
+    },
+    {
+      "event": "query",
+      "session": "session-1",
+      "querySha256": "9533260930c785793d2aea17fd8192104e3e915cdf6834f97a592d996015fc8e",
+      "started": 58481.239655208,
+      "processPollBefore": null,
+      "result": {
+        "pid": 3217,
+        "held": true
+      },
+      "ended": 58481.271448875,
+      "processPollAfter": null
+    },
+    {
+      "event": "action",
+      "name": "job-start",
+      "label": "cancel-job-start",
+      "started": 58481.271458625,
+      "sessionStatesBefore": {
+        "session-0": null,
+        "session-1": null
+      },
+      "ended": 58492.179542708,
+      "sessionStatesAfter": {
+        "session-0": null,
+        "session-1": null
+      }
+    },
+    {
+      "event": "query",
+      "session": "session-0",
+      "querySha256": "19d2ca4dc9d9d8fde37cd050f784a32688d9456b10c8b00101e32dd129fdec92",
+      "started": 58492.180017416,
+      "processPollBefore": null,
+      "failure": {
+        "type": "ValueError",
+        "code": "PG_SESSION_EOF"
+      },
+      "ended": 58492.186530458,
+      "processPollAfter": 3
+    },
+    {
+      "event": "exit",
+      "session": "session-1",
+      "pid": 27327,
+      "exitCode": 3,
+      "stderrSha256": "2930e07c50ebcc4f2d0ef3ae845d3caab76ead63b858bf2cdd473d9fc844a32a",
+      "stderrBytes": 497,
+      "errorLines": []
+    },
+    {
+      "event": "exit",
+      "session": "session-0",
+      "pid": 27325,
+      "exitCode": 3,
+      "stderrSha256": "2930e07c50ebcc4f2d0ef3ae845d3caab76ead63b858bf2cdd473d9fc844a32a",
+      "stderrBytes": 497,
+      "errorLines": []
+    }
+  ]
+}

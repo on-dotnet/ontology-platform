@@ -150,3 +150,12 @@ Run27四模块28对象、G3切换6对象及最终M1的11对象均准确回收，
 Run28 / Tbcdfe5d5880a81b85729aa6640d4fafefa7c2641：R1/R2独立准入与后验PASS，单次OS全网络禁止Restore21项目168包、PID93002、5.690秒exit0；PREFLIGHT PASS。I01首个静态检查5.338秒exit1，正式凭证模式命中readback/tests中行首password局部变量的Path/read_text表达式，原27套SelfTest及原生/产品门禁尚未执行。只改两局部变量及引用名称，AST独立确认行为、断言、正式扫描器均未变；既有工程静态检查exit0、61任务测试5.378秒通过。原I01 BLOCKED保留，须新T/Run29完整验收。
 
 Run28没有创建Docker对象，旧KEEP3网络8卷保持；monitor92647准确释放。四工具副本26858文件510837724逻辑字节严格零占用lsof复验后实际删除，事故KEEP未变，不使用VM占用例外。归档原始失败与修复见证，无新V3/main/M2。
+
+
+Run29 / T9dd30dcf3a4399d0497e858025fdfcdf5334b50e：R1/R2独立PASS，严格离线21项目168包Restore5.842秒exit0；原27套SelfTest422.295秒、61任务测试、native/Web70.512秒通过，原生780总344PASS436SKIP0FAIL。I05 PASS。I03首次因Master提前创建helpers目录而在准备阶段FileExistsError；原始23文件、字节/inode/权限精确保留，独立审查后同T新建尚未执行的私有输入并完成I03 PARTIAL，旧BLOCKED回执另名保留。四模块462案例、MCP正反、G3 38检查与OIDC恢复、Security156/G2Contract121全部通过，I02 PASS。I04 PASS，真实CREATE权限拒绝/恢复/重复迁移及三次netns同步有见证。
+
+I06真实PG九组20执行、HTTP基线59检查、三种源角色拒绝与ACL恢复、审计失败回滚、真实客户端取消均通过；Catalog取消在job-start202之后观察会话PG_SESSION_EOF，正式I06 BLOCKED，I07/I08 NOT_RUN。stderr和源PG日志证明超时pg_isready被PID1 postgres作为未知子进程回收，触发全部会话退出；无产品请求的8秒系统目录锁可重复，非OOM/容量故障。仅任务pg-source启用Engine内置init后的同锁8.207秒、同backend/postmaster稳定且healthcheck仍超时，实际pg_isready由docker-init接管。诊断替换中旧对象不存在文本大小写检查先失败，保留原见证并只读补完后验，未重复变更；正式Run29连续性INTERRUPTED，不复用为新T PASS。私有4600字节PGDMP和首次准备目录KEEP。
+
+五个任务文件限定修复：源PG声明与实际HostConfig.Init严格true；SourceSession保留私有stderr原始bytes、公开散列/真实exitCode及查询时间，非零退出拒绝，父退出也清理准确自建进程组，stderr读取2秒/1MiB界限且不完整即失败。两个独立审查P1先真实RED后GREEN，65任务测试5.453秒及工程静态门禁通过；非作者Review PASS。既有产品SQL、期限、断言未改，processGroupReleased不代表容器端锁后验。必须新T/Run30完整验收。
+
+四模块28对象、G3切换6对象、诊断退休旧源容器及最终11对象均准确回收，旧KEEP3网络8卷保持。Apply返回值未序列化的事实保留，实际命令日志和新的逐对象缺席后验支持回收；monitor94850释放。四工具副本26936文件512842494逻辑字节按新计划/VM14085的556只读FD子集实际删除，事故KEEP不变；初次零占用拒绝保存，不操作VM，物理释放NOT_VERIFIED。原始失败、同T准备恢复、init A/B及源码修复分开记录。单文件归档迁移原字节/Git blob/恢复映射保持，无新V3/main/M2；V3硬容量问题仍未获放宽授权。
