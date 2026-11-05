@@ -1,0 +1,39 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-31",
+  "testedCommit": "fccf1bc967fc92f921f866c6b6232677e191ddac",
+  "command": [
+    "/opt/homebrew/opt/node@24/bin/node",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/experiments/g4-m1-main-integration/fault.mjs",
+    "--run-id",
+    "b-continue-20261104-31",
+    "--expected-head",
+    "fccf1bc967fc92f921f866c6b6232677e191ddac",
+    "--resource-manifest",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-31/resource-manifest.json",
+    "--runtime-file",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261104-31/runtime.json",
+    "--action",
+    "audit-replay-failed",
+    "--evidence-dir",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-31/fault-audit-complete-recovered"
+  ],
+  "startedAtUtc": "2026-11-05T05:04:11.275949+00:00",
+  "endedAtUtc": "2026-11-05T05:04:22.385447+00:00",
+  "elapsedSeconds": 11.109412042002077,
+  "exitCode": 0,
+  "timingStatus": "OBSERVED",
+  "timedOut": false,
+  "executedInputDrift": false,
+  "inputHashes": {
+    "/opt/homebrew/opt/node@24/bin/node": "0d78c9bca217f53c2dc21a067246ee4a81c1f4fa111ee64d572b45fa1ff39189",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/experiments/g4-m1-main-integration/fault.mjs": "69557b1f546ded5125ac8b425eb3f8872c8d788a8246fd577f86f9551b1f5939",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-31/resource-manifest.json": "98ad38290fc99321b10040fa81be7662e1dea77ac451c3ed15aaacce4575ba08",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261104-31/runtime.json": "af9703593dfbf762c1d7ad7fd40c52b11abb42c08c54d7fc32761b689b5165c5"
+  },
+  "manifestSha256": "98ad38290fc99321b10040fa81be7662e1dea77ac451c3ed15aaacce4575ba08",
+  "commandSha256": "6d32fce6c43a9593764be67cfb62b9353613f6bc06909b81d75cfce1abc3a39d",
+  "logSha256": "cf5dbb785a8bce341571f5926d156d585380e3398765bf4d4d6f24ebd9ab56e8",
+  "logBytes": 195,
+  "logVisibility": "PRIVATE"
+}

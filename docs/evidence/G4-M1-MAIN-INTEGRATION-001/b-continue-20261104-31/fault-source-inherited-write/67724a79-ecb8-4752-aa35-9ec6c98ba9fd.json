@@ -1,0 +1,68 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-31",
+  "testedCommit": "fccf1bc967fc92f921f866c6b6232677e191ddac",
+  "startedUtc": "2026-11-05T05:02:08.333Z",
+  "checks": [
+    {
+      "name": "exact_source_fault_diagnostic",
+      "status": "PASS"
+    }
+  ],
+  "http": [
+    {
+      "method": "GET",
+      "route": "/api/v1/connections/{id}",
+      "status": 200,
+      "durationMs": 27,
+      "jsonBody": true
+    },
+    {
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/test",
+      "status": 200,
+      "durationMs": 36,
+      "jsonBody": true
+    }
+  ],
+  "scope": "ONE_HTTP_ACTION_ONLY",
+  "databaseRollbackLeaseFenceEvidence": "NOT_RUN_BY_THIS_CONSUMER",
+  "action": "probe-denial",
+  "connectionId": "629b1450c89f4ea2a307523d765b0c29",
+  "auditStage": "start",
+  "probeId": "2d677cd7d5f0410c90c25d54aac881a3",
+  "stages": [
+    {
+      "name": "NETWORK",
+      "status": "PASS",
+      "durationMs": 0,
+      "diagnosticCode": null
+    },
+    {
+      "name": "TLS",
+      "status": "PASS",
+      "durationMs": 2,
+      "diagnosticCode": null
+    },
+    {
+      "name": "AUTH",
+      "status": "PASS",
+      "durationMs": 3,
+      "diagnosticCode": null
+    },
+    {
+      "name": "READ_ONLY",
+      "status": "FAIL",
+      "durationMs": 1,
+      "diagnosticCode": "connection_readonly_unverified"
+    },
+    {
+      "name": "METADATA",
+      "status": "NOT_RUN",
+      "durationMs": 0,
+      "diagnosticCode": null
+    }
+  ],
+  "status": "PASS",
+  "completedUtc": "2026-11-05T05:02:09.718Z"
+}

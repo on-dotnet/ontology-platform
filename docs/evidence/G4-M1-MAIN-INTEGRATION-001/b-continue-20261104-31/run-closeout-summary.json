@@ -1,0 +1,32 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-31",
+  "testedCommit": "fccf1bc967fc92f921f866c6b6232677e191ddac",
+  "formal": {
+    "I01": "PARTIAL_FIXTURE_CLOSURE_NOT_RUN",
+    "I05": "PASS",
+    "I03": "PARTIAL",
+    "I02": "PASS",
+    "I04": "PASS",
+    "I06": "BLOCKED_WORKER_NOT_BLOCKED",
+    "I07": "NOT_RUN",
+    "I08": "NOT_RUN"
+  },
+  "diagnostics": {
+    "catalogLockPoint": "pg_attribute blocks connection startup; pg_shdepend exposes actual reader lock",
+    "warmBrowserCancel": "actual CANCELLED/no snapshot, parent INTERACTIVE_DEADLINE; first failure retained",
+    "leaseV2": "PASS_DIAGNOSTIC_ONLY",
+    "schemaV2": "PASS_DIAGNOSTIC_ONLY",
+    "credentialLifecycle": "PASS_DIAGNOSTIC_ONLY",
+    "crossOrganization": "PASS_DIAGNOSTIC_ONLY",
+    "newFaultHotHandshake": "NOT_RUN"
+  },
+  "sourceReview": "PASS",
+  "taskTests": 74,
+  "taskTestsSeconds": 11.056,
+  "static": "PASS",
+  "sourceChangesRequireNewTestedCommit": true,
+  "mainUpdated": false,
+  "M2": "NOT_STARTED",
+  "package": "NOT_CREATED_CAPACITY_BLOCKER"
+}

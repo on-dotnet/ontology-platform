@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "startedAtUtc": "2026-11-05T05:13:30.942Z",
+  "cases": {
+    "M1-U01": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U02": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U03": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U04": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U05": {
+      "status": "NOT_RUN",
+      "observed": [
+        "source_lock_and_backend_disappearance_require_independent_master_witness",
+        "cancelled_job_refresh",
+        "cancelled_ui_and_enabled_discover_refresh_actions"
+      ],
+      "reason": "aggregate_requires_loading_timeout_cancel_partial_and_refresh_evidence_across_controlled_runs"
+    },
+    "M1-U06": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    }
+  },
+  "http": [
+    {
+      "method": "GET",
+      "route": "/auth/csrf",
+      "status": 200,
+      "durationMs": 53
+    },
+    {
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/discoveries",
+      "status": 202,
+      "durationMs": 89
+    },
+    {
+      "method": "GET",
+      "route": "/connections/{id}/discoveries/{jobId}",
+      "status": 200,
+      "durationMs": 29
+    },
+    {
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/discoveries/eb618e19f275444fb6342e1755776e2a/cancel",
+      "status": 200,
+      "durationMs": 1007
+    },
+    {
+      "method": "GET",
+      "route": "/connections/{id}/discoveries/{jobId}",
+      "status": 200,
+      "durationMs": 48
+    }
+  ],
+  "screenshots": [],
+  "productExecution": true,
+  "runId": "b-continue-20261104-31",
+  "scenario": "catalog-cancel",
+  "driverSha256": "b2558c334e3896db180a3cb82f35345bfc208edb65266b963901a0d10ffdb758",
+  "catalogCancelHandshakes": [
+    {
+      "event": "CATALOG_CANCEL_READY",
+      "status": "MARKER_ACKNOWLEDGED",
+      "readyAtUtc": "2026-11-05T05:13:32.326Z",
+      "acknowledgedAtUtc": "2026-11-05T05:13:32.330Z"
+    },
+    {
+      "event": "CATALOG_JOB_STARTED",
+      "status": "MARKER_ACKNOWLEDGED",
+      "readyAtUtc": "2026-11-05T05:13:32.450Z",
+      "acknowledgedAtUtc": "2026-11-05T05:13:32.522Z"
+    }
+  ],
+  "cancelObservation": {
+    "jobId": "eb618e19f275444fb6342e1755776e2a",
+    "createdStatus": "QUEUED",
+    "persistedStatus": "QUEUED",
+    "terminalStatus": "CANCELLED",
+    "completedAtPresent": true,
+    "snapshotAbsent": true
+  },
+  "completedAtUtc": "2026-11-05T05:13:34.088Z",
+  "exitCode": 2
+}

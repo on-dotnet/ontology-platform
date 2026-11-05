@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "startedAtUtc": "2026-11-05T05:12:00.295Z",
+  "cases": {
+    "M1-U01": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U02": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U03": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U04": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U05": {
+      "status": "FAIL",
+      "observed": [],
+      "reason": "browser_timeout",
+      "failure": {
+        "code": "browser_timeout",
+        "category": "timeout"
+      },
+      "phase": "U05_catalog_cancel_initial_catalog"
+    },
+    "M1-U06": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    }
+  },
+  "http": [
+    {
+      "method": "GET",
+      "route": "/auth/csrf",
+      "status": 200,
+      "durationMs": 53
+    }
+  ],
+  "screenshots": [],
+  "productExecution": true,
+  "runId": "b-continue-20261104-31",
+  "scenario": "catalog-cancel",
+  "driverSha256": "b2558c334e3896db180a3cb82f35345bfc208edb65266b963901a0d10ffdb758",
+  "completedAtUtc": "2026-11-05T05:12:16.627Z",
+  "exitCode": 1
+}

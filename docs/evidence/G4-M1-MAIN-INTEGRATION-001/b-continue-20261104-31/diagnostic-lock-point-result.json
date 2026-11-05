@@ -1,0 +1,33 @@
+{
+  "scope": "diagnostic only, formal I06 remains BLOCKED",
+  "driverSha256": "54c06ef58b725f6dee26d33eefde935aa51a98af55138ca2044549af09290193",
+  "scriptSha256": "ed4214c7facc869c9b295248a9dca1860661c0d2de0bc3e99a01a5af5a63827b",
+  "results": [
+    {
+      "relation": "pg_attribute",
+      "job": {
+        "id": "c71e2fbb830e4da0841f4834949360dc",
+        "status": "FAILED",
+        "diagnostic": "connection_source_unavailable",
+        "attempt": 1,
+        "created": "2026-11-05T05:09:49.463988+00:00",
+        "completed": "2026-11-05T05:09:53.303361+00:00"
+      },
+      "observedReaderLock": false,
+      "nonemptySamples": 40
+    },
+    {
+      "relation": "pg_shdepend",
+      "job": {
+        "id": "4a8a8db379b647c198e76d01dd3829dc",
+        "status": "FAILED",
+        "diagnostic": "connection_source_unavailable",
+        "attempt": 1,
+        "created": "2026-11-05T05:10:22.823095+00:00",
+        "completed": "2026-11-05T05:10:26.577328+00:00"
+      },
+      "observedReaderLock": true,
+      "nonemptySamples": 28
+    }
+  ]
+}

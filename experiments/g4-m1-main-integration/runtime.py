@@ -1111,7 +1111,8 @@ class PauseGuard:
         self.ident=runtime_value(m)['containerIds'][service]
 
     def __enter__(self):
-        item=inspect_owned(self.m,self.ident,self.service)
+        # API完整inspect实测超过源命令窗口；复用准确ID列表的身份/镜像/运行态验证。
+        item=TaskEngine(self.m).owned(self.ident,self.service) if self.service=='api' else inspect_owned(self.m,self.ident,self.service)
         require(item['State']['Running'] and not item['State']['Paused'],'PAUSE_INITIAL_STATE')
         script='''import json,subprocess,sys,time
 ident,task,run,seconds=sys.argv[1:]

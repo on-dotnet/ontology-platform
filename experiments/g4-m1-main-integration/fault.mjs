@@ -33,7 +33,7 @@ import { createRequire } from 'node:module';
 import { randomUUID, createHash } from 'node:crypto';
 const root=path.resolve(import.meta.dirname,'../..');
 const privateDir=path.join(root,'.tools/security/g4-m1-main-integration-001-'+consumerBinding['run-id']);
-const allowed=['snapshot-read','audit-prepare','audit-fail','audit-retry','job-start','job-cancel','job-read','probe-refresh','audit-replay-failed','probe-client-cancel','intake-foreign','original-identity-check','disabled-denials','intake-lifecycle','intake-revocation','probe-denial','purpose-denial'];
+const allowed=['snapshot-read','audit-prepare','audit-fail','audit-retry','job-start','job-cancel','job-read','probe-refresh','audit-replay-failed','probe-client-cancel','intake-foreign','original-identity-check','disabled-denials','intake-lifecycle','intake-revocation','probe-denial','purpose-denial','catalog-cancel'];
 if(process.argv.includes('--help')) {console.log('Usage: node experiments/g4-m1-main-integration/fault.mjs --run-id RUN --expected-head HEAD --resource-manifest PATH --evidence-dir NEW_PATH --runtime-file <private runtime> --action '+allowed.join('|'));process.exit(0);}
 const args=process.argv.slice(2);
 const report={taskId:'G4-M1-MAIN-INTEGRATION-001',runId:consumerBinding['run-id'],testedCommit:consumerBinding['expected-head'],startedUtc:new Date().toISOString(),checks:[],http:[],scope:'ONE_HTTP_ACTION_ONLY',databaseRollbackLeaseFenceEvidence:'NOT_RUN_BY_THIS_CONSUMER'};
@@ -41,6 +41,41 @@ let browser,context;
 function demand(value,code){if(!value){const e=new Error();e.safeCode=code;throw e;}}
 function privateJson(file){demand(fs.realpathSync(privateDir)===privateDir&&!fs.lstatSync(privateDir).isSymbolicLink()&&(fs.statSync(privateDir).mode&0o077)===0,'private_directory');demand(path.dirname(file)===privateDir&&!fs.lstatSync(file).isSymbolicLink()&&(fs.statSync(file).mode&0o077)===0,'private_boundary');return JSON.parse(fs.readFileSync(file,'utf8'));}
 function writePrivate(file,value){fs.writeFileSync(file,JSON.stringify(value),{flag:'wx',mode:0o600});}
+/** 固定取消握手；认证与全部消费者校验在加锁前完成。 */
+function waitForCatalogControl(kind, connectionId, jobId) {
+ const protocol={
+  ready:{event:'CATALOG_CANCEL_READY',marker:'SOURCE_LOCKED\n',timeout:10000},
+  started:{event:'CATALOG_JOB_STARTED',marker:'SOURCE_QUERY_WAITING\n',timeout:5000},
+  cancelled:{event:'CATALOG_CANCEL_REQUESTED',marker:'SOURCE_QUERY_CANCELLED\n',timeout:5000},
+ }[kind];
+ demand(!!protocol,'cancel_control_kind');
+ demand(/^[a-f0-9]{32}$/.test(connectionId),'cancel_control_connection');
+ if(kind!=='ready')demand(/^[a-f0-9]{32}$/.test(jobId),'cancel_control_job');
+ const receipt={event:protocol.event,status:'READY',readyAtUtc:new Date().toISOString()};
+ (report.controlHandshakes??=[]).push(receipt);
+ return new Promise((resolve,reject)=>{
+  let pending=Buffer.alloc(0),settled=false;
+  const finish=code=>{
+   if(settled)return;settled=true;clearTimeout(timer);
+   process.stdin.removeListener('data',onData);process.stdin.removeListener('end',onEnd);process.stdin.removeListener('error',onError);process.stdin.pause();
+   if(code){receipt.status='FAILED';receipt.failureCode=code;const error=new Error();error.safeCode=code;reject(error);}
+   else{receipt.status='MARKER_ACKNOWLEDGED';receipt.acknowledgedAtUtc=new Date().toISOString();resolve();}
+  };
+  const onData=chunk=>{
+   const bytes=Buffer.isBuffer(chunk)?chunk:Buffer.from(chunk);
+   if(pending.length+bytes.length>64){finish('cancel_control_oversize');return;}
+   pending=Buffer.concat([pending,bytes]);const expected=Buffer.from(protocol.marker);
+   if(pending.length>expected.length||!expected.subarray(0,pending.length).equals(pending)){finish('cancel_control_marker');return;}
+   if(pending.equals(expected))finish();
+  };
+  const onEnd=()=>finish('cancel_control_eof'),onError=()=>finish('cancel_control_transport');
+  const timer=setTimeout(()=>finish('cancel_control_timeout'),protocol.timeout);
+  process.stdin.on('data',onData);process.stdin.on('end',onEnd);process.stdin.on('error',onError);
+  if(process.stdin.readableEnded||process.stdin.destroyed){finish('cancel_control_eof');return;}
+  try{process.stdout.write(JSON.stringify({taskId:report.taskId,runId:report.runId,event:protocol.event,connectionId,...(kind==='ready'?{}:{jobId})})+'\n');process.stdin.resume();}
+  catch{finish('cancel_control_transport');}
+ });
+}
 const hash=value=>createHash('sha256').update(value).digest('hex');
 const cmd=revision=>({commandId:randomUUID(),idempotencyKey:randomUUID(),expectedRevision:revision,reason:'Synthetic recovery fault acceptance'});
 try{
@@ -128,6 +163,18 @@ try{
   demand(result.aborted&&result.durationMs>=1400&&result.durationMs<5000,'actual_browser_request_abort');report.clientCancellation=result;report.checks.push({name:'actual_request_aborted_during_source_wait',status:'PASS'});await cancelPage.close();
  }else if(action==='probe-refresh'){
   const x=await request('POST','/api/v1/connections/'+id+'/test',{command:cmd(current.value.configRevision)},current.etag);demand(x.status===200&&x.value.status==='TEST_OK'&&Array.isArray(x.value.stages)&&x.value.stages.length===5&&['NETWORK','TLS','AUTH','READ_ONLY','METADATA'].every(name=>x.value.stages.filter(s=>s.name===name&&s.status==='PASS'&&s.durationMs>=0).length===1),'probe_refresh');report.checks.push({name:'real_five_stage_probe_refreshed',status:'PASS'});
+ }else if(action==='catalog-cancel'){
+  report.scope='CATALOG_CANCEL_HANDSHAKE_ONLY';
+  await waitForCatalogControl('ready',id);
+  const started=await request('POST','/api/v1/connections/'+id+'/discoveries',{command:cmd(current.value.configRevision)},current.etag);
+  demand(started.status===202&&/^[a-f0-9]{32}$/.test(started.value.jobId)&&['QUEUED','RUNNING','SUCCEEDED','FAILED','PARTIAL','CANCELLED'].includes(started.value.status),'job_start');
+  report.jobId=started.value.jobId;report.createdStatus=started.value.status;
+  await waitForCatalogControl('started',id,report.jobId);
+  const cancelled=await request('POST','/api/v1/connections/'+id+'/discoveries/'+report.jobId+'/cancel',{command:cmd(current.value.configRevision)},current.etag);
+  demand(cancelled.status===200&&cancelled.value.jobId===report.jobId&&['QUEUED','RUNNING','SUCCEEDED','FAILED','PARTIAL','CANCELLED'].includes(cancelled.value.status),'job_cancel');
+  demand(cancelled.value.snapshotId===null,'cancel_snapshot_absent');report.jobStatus=cancelled.value.status;report.snapshotId=null;
+  await waitForCatalogControl('cancelled',id,report.jobId);
+  report.checks.push({name:'warm_authenticated_start_cancel_with_source_witness_handshake',status:'PASS'});
  }else if(action==='job-start'){
   const x=await request('POST','/api/v1/connections/'+id+'/discoveries',{command:cmd(current.value.configRevision)},current.etag);demand(x.status===202,'job_start');demand(/^[a-f0-9]{32}$/.test(x.value.jobId)&&['QUEUED','RUNNING','SUCCEEDED','FAILED','PARTIAL','CANCELLED'].includes(x.value.status),'job_projection');report.jobId=x.value.jobId;report.jobStatus=x.value.status;
  }else{
@@ -138,4 +185,4 @@ try{
  }
  report.status='PASS';
 }catch(error){report.status='FAIL';report.failure={code:error.safeCode??'bounded_runtime_error',category:error.name==='TimeoutError'?'timeout':'runtime'};process.exitCode=1;}
-finally{await context?.close().catch(()=>{});await browser?.close().catch(()=>{});report.completedUtc=new Date().toISOString();const dir=faultEvidenceDirectory;fs.mkdirSync(dir,{recursive:false});const file=path.join(dir,randomUUID()+'.json');fs.writeFileSync(file,JSON.stringify(report,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify({action:report.action,status:report.status,evidence:path.relative(root,file),failure:report.failure}));}
+finally{await context?.close().catch(()=>{});await browser?.close().catch(()=>{});report.completedUtc=new Date().toISOString();const dir=faultEvidenceDirectory;fs.mkdirSync(dir,{recursive:false});const file=path.join(dir,randomUUID()+'.json');fs.writeFileSync(file,JSON.stringify(report,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify({taskId:report.taskId,runId:report.runId,scenario:report.action,action:report.action,status:report.status,evidence:path.relative(root,file),failure:report.failure}));}

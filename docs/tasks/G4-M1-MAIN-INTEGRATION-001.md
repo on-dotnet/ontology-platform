@@ -166,3 +166,14 @@ Run30 / Tea40ae69f4bab301b26e0844874462d5e4938d21：R1/R2独立PASS，OS全网�
 单个本任务network none/768MiB/tmpfs源PG诊断逐一执行四条真实SQL并经过SourceSession，原t四例JSONDecodeError；仅四处改为to_json(true)后同容器四例真实True。新增文本布尔拒绝/JSON布尔接受的真实子进程回归，66任务测试5.503秒、工程静态检查及两文件独立Review PASS，锁/事务/期限/产品断言保持。诊断不转绑为产品门禁；须新T/Run31完整验收。
 
 唯一诊断容器准确stop/rm并exit1准确缺席；其tmpfs无持久数据或卷。回收前独立发现外部默认bridge从fd1ae18b…变为bdccf8842a668d6de5c2d6bc327944d785e79582d73925c7c251497e37f89235，新Created2026-11-05T04:17:14.070742Z紧邻诊断启动，原因NOT_VERIFIED，禁止归因或声称旧三网全保持。Engine ID/version不变，其余两网八卷保持；清理前后实际新三网八卷一致，外部网络未被本任务修改/删除。monitor34526释放；四可再生副本26841文件510579088逻辑字节按严格零占用审查计划回收，事故KEEP不变。原始失败、诊断、修复、外部代际漂移分别保留，无新V3/main/M2。
+
+
+Run31 / Tfccf1bc967fc92f921f866c6b6232677e191ddac：R1/R2独立PASS，严格离线Restore21项目168包5.804秒exit0；原27套SelfTest429.623秒、66任务测试及native/Web通过，原生780总344PASS436SKIP0FAIL。I05 PASS，I03拒绝路径及Host图PARTIAL；I02四模块462案例、MCP正反、G3兼容38项、Security156/G2Contract121通过；I04真实迁移权限拒绝/恢复/重复及G3保留PASS。I06真实PG九组20执行、HTTP基线59检查、用途、三种角色拒绝/ACL恢复、审计回滚及真实客户端取消通过；Catalog取消WORKER_NOT_BLOCKED，正式I06 BLOCKED，I01/I03最终fixture闭合与I07/I08 NOT_RUN。
+
+准确锁点A/B证明pg_attribute锁阻塞连接启动（user空/state starting），pg_shdepend锁允许认证并观测fixture_reader查询等待；产品源命令固定3秒，而冷消费者准备约9.7秒，原路径无法及时取消。既有浏览器热握手实际CANCELLED且无快照，但终态后stdin未关导致父超时；真实最小子进程复现open stdin不退出，关闭后exit2。lease短诊断首次失败源于完整inspect实测约3秒、两次SQL路径约6秒，越过同一窗口；现有准确ID列表约0.01秒。候选lease-v2保持原期限，使用持久只读平台会话/clock_timestamp和准确API快速准入，Fence/Attempt1→2、自然过期、SUCCEEDED、快照2→3/finish审计7→8，完整六容器预算后验保留并恢复五容器，诊断PASS。
+
+仅四任务驱动修复：fault新增单次认证的三段精确取消握手；交互终态关闭stdin，并强制身份、次序、PASS→0/INCOMPLETE→2及报告一致性，FAIL拒绝；lease读回避开已实测控制窗口延迟，未改产品期限；schema在DDL前真实五阶段probe-refresh并核对当前版本/期限。schema首次409的探测于05:39:20.192833Z过期，POST于05:39:21.313Z发生，配置/凭据版本匹配；补真实前置后旧快照hash不变且新快照不同。凭据自然过期/合成撤销/密码轮换与恢复、跨组织拒绝及原user/profile恢复分别短诊断PASS。原失败和三份exit2/矩阵NOT_RUN报告保留，均不转绑为正式I06。临时恢复原T磁盘仅让原消费者执行完整绑定检查，候选Python执行字节独立散列，finally精确恢复待提交四文件。
+
+独立Review发现的终态/exit矛盾P1先六反例真实RED后闭合；74任务测试11.056秒、工程静态检查及四文件Review PASS。此前72测试沙箱socket三项PermissionError原记录保留，相同输入扩大沙箱后72项10.251秒通过。新fault热三段完整真实门禁尚未运行，须新T/Run32稳定完整验收，不复用短诊断作门禁PASS。
+
+Run31收尾：模块分组28对象、G3切换6对象及最终5容器2网4卷均精确回收，最后11对象具有完整Apply返回/准确absence及独立实时后验；当前外部KEEP3网8卷未变，旧默认bridge代际问题仍保持Run30记录。monitor38978及M1 ingress64840释放。四可再生副本26936文件512842479逻辑字节按VM57485/556只读FD精确计划实际删除，事故KEEP不变；VM不操作，物理释放NOT_VERIFIED。已知本Run58秘密模式扫描12383项无发现。私有runtime、日志、失败及恢复映射保留。未创建新V3，容量上限问题仍独立阻断且无放宽授权；main/M2保持未执行。

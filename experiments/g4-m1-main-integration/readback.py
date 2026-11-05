@@ -392,30 +392,43 @@ class SourceSession:
 
 
 def catalog_cancel(m):
-    """保持源锁直到真实worker连接消失，之后读取持久CANCELLED。"""
+    """先认证再握手控制真实查询取消；源锁在backend消失证据之后释放。"""
     action(m,'probe-refresh','cancel-probe-refresh')
-    with SourceSession(m) as observer:
-        observer.query("SET statement_timeout='2s'; SET idle_session_timeout='45s'; SET plan_cache_mode=force_generic_plan; PREPARE main_cancel_activity AS SELECT coalesce(json_agg(json_build_object('pid',pid,'wait',wait_event_type)),'[]') FROM pg_stat_activity WHERE usename='fixture_reader' AND backend_type='client backend'; EXECUTE main_cancel_activity;")
-        observer.query("PREPARE main_cancel_lock(int) AS SELECT count(*) FROM pg_locks WHERE pid=$1 AND relation='pg_catalog.pg_attribute'::regclass AND mode='AccessExclusiveLock' AND granted; EXECUTE main_cancel_lock(-1);")
-        with SourceSession(m) as lock:
-            held=lock.query("SET statement_timeout='25s'; SET idle_in_transaction_session_timeout='25s'; SET lock_timeout='2s'; BEGIN; LOCK TABLE pg_catalog.pg_attribute IN ACCESS EXCLUSIVE MODE; SELECT json_build_object('pid',pg_backend_pid(),'held',true);")
-            job=identifier(action(m,'job-start','cancel-job-start')['jobId']);rt.update_runtime(m,httpJobId=job)
-            deadline=time.monotonic()+4;waiting=[]
-            while not waiting:
-                waiting=observer.query('EXECUTE main_cancel_activity;')
-                if any(x['wait']=='Lock' for x in waiting):break
-                rt.require(time.monotonic()<deadline,'WORKER_NOT_BLOCKED');time.sleep(.05)
-            rt.require(any(x['wait']=='Lock' for x in waiting),'NO_SOURCE_LOCK_WAITER')
-            cancelled=action(m,'job-cancel','cancel-job-request')
-            deadline=time.monotonic()+5
+    connection=identifier(rt.runtime_value(m)['httpConnectionId']);observed={};phase=0;job=None;held=None
+    with SourceSession(m) as observer,SourceSession(m) as lock,SourceSession(m,source=False) as claim:
+        observer.query("SET statement_timeout='2s'; SET idle_session_timeout='100s'; SET plan_cache_mode=force_generic_plan; PREPARE main_cancel_activity AS SELECT coalesce(json_agg(json_build_object('pid',pid,'wait',wait_event_type)),'[]') FROM pg_stat_activity WHERE usename='fixture_reader' AND backend_type='client backend'; EXECUTE main_cancel_activity;")
+        observer.query("PREPARE main_cancel_lock(int) AS SELECT count(*) FROM pg_locks WHERE pid=$1 AND relation='pg_catalog.pg_shdepend'::regclass AND mode='AccessExclusiveLock' AND granted; EXECUTE main_cancel_lock(-1);")
+        def callback(value):
+            nonlocal phase,job,held
+            rt.require(value.get('connectionId')==connection,'CANCEL_CONNECTION')
+            events=('CATALOG_CANCEL_READY','CATALOG_JOB_STARTED','CATALOG_CANCEL_REQUESTED')
+            rt.require(phase<len(events) and value.get('event')==events[phase],'CANCEL_EVENT_ORDER')
+            if phase==0:
+                claim.query("SET statement_timeout='10s'; SET idle_in_transaction_session_timeout='10s'; SET lock_timeout='2s'; BEGIN; DO $$ BEGIN PERFORM pg_advisory_xact_lock(hashtextextended('connection:catalog-claim',0)); END $$; SELECT to_json(true);")
+                held=lock.query("SET statement_timeout='25s'; SET idle_in_transaction_session_timeout='25s'; SET lock_timeout='2s'; BEGIN; LOCK TABLE pg_catalog.pg_shdepend IN ACCESS EXCLUSIVE MODE; SELECT json_build_object('pid',pg_backend_pid(),'held',true);")
+                phase=1;return 'SOURCE_LOCKED'
+            if phase==1:
+                job=identifier(value.get('jobId'));rt.update_runtime(m,httpJobId=job)
+                baseline={x['pid'] for x in observer.query('EXECUTE main_cancel_activity;')}
+                claim.query('ROLLBACK; SELECT to_json(true);');deadline=time.monotonic()+4
+                while True:
+                    waiting=observer.query('EXECUTE main_cancel_activity;')
+                    workers=[x for x in waiting if x['pid'] not in baseline and x['wait']=='Lock']
+                    if len(workers)==1:break
+                    rt.require(time.monotonic()<deadline,'WORKER_NOT_BLOCKED');time.sleep(.03)
+                observed.update(before=waiting,workerPid=workers[0]['pid']);phase=2;return 'SOURCE_QUERY_WAITING'
+            rt.require(value.get('jobId')==job,'CANCEL_JOB_ID');deadline=time.monotonic()+5
             while True:
                 after=observer.query('EXECUTE main_cancel_activity;')
-                if not any(x['pid'] in {v['pid'] for v in waiting} for x in after):break
-                rt.require(time.monotonic()<deadline,'SOURCE_BACKEND_NOT_CANCELLED');time.sleep(.05)
+                if not any(x['pid']==observed['workerPid'] for x in after):break
+                rt.require(time.monotonic()<deadline,'SOURCE_BACKEND_NOT_CANCELLED');time.sleep(.03)
             rt.require(observer.query('EXECUTE main_cancel_lock('+str(int(held['pid']))+');')==1,'SOURCE_LOCK_RELEASED_TOO_EARLY')
-        final=action(m,'job-read','cancel-job-final')
-        rt.require(final['jobStatus']=='CANCELLED' and final['snapshotId'] is None,'JOB_CANCEL_NOT_DURABLE')
-    result={'status':'PASS','jobId':job,'sourceBeforeCancel':waiting,'sourceAfterCancel':after,'sourceLockHeldAtBackendDisappearance':True,'http':cancelled,'final':final}
+            observed.update(after=after,sourceLockHeldAtBackendDisappearance=True);phase=3;return 'SOURCE_QUERY_CANCELLED'
+        cancelled=run_interactive(m,'fault','catalog-cancel',callback,timeout=90)
+        rt.require(phase==3,'CANCEL_HANDSHAKE_INCOMPLETE')
+    final=action(m,'job-read','cancel-job-final')
+    rt.require(final['jobStatus']=='CANCELLED' and final['snapshotId'] is None,'JOB_CANCEL_NOT_DURABLE')
+    result={'status':'PASS','jobId':job,'sourceBeforeCancel':observed['before'],'sourceAfterCancel':observed['after'],'workerPid':observed['workerPid'],'sourceLockHeldAtBackendDisappearance':True,'http':cancelled,'final':final}
     rt.write_json(rt.ARTIFACTS/m['runId']/'catalog-cancel.json',result);return result
 
 
@@ -423,14 +436,15 @@ def run_interactive(m, consumer_name, scenario, callback, *, timeout=120):
     """真实浏览器/HTTP握手受固定事件约束，原始输出私有且有界。"""
     import run
     import selectors
-    rt.require(consumer_name in ('http','browser'),'INTERACTIVE_CONSUMER')
+    rt.require(consumer_name in ('http','browser','fault') and (consumer_name!='fault' or scenario=='catalog-cancel'),'INTERACTIVE_CONSUMER')
     output=rt.ARTIFACTS/m['runId']/(consumer_name+'-'+scenario)
     command=[run.NODE,str(rt.HERE/(consumer_name+'.mjs')),*run.binding(m),'--runtime-file',str(rt.private_dir(m['runId'])/'runtime.json'),'--evidence-dir',str(output)]
+    if consumer_name=='fault':command+=['--action',scenario]
     child=subprocess.Popen(command,cwd=rt.ROOT,env=rt.environment(m['runId']),stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,bufsize=1,start_new_session=True)
     selector=selectors.DefaultSelector();selector.register(child.stdout,selectors.EVENT_READ)
-    deadline=time.monotonic()+timeout;lines=[];started=dt.datetime.now(dt.timezone.utc).isoformat()
+    deadline=time.monotonic()+timeout;lines=[];terminal=None;started=dt.datetime.now(dt.timezone.utc).isoformat()
     try:
-        while child.poll() is None:
+        while True:
             rt.require(time.monotonic()<deadline,'INTERACTIVE_DEADLINE')
             if not selector.select(.5):continue
             line=child.stdout.readline()
@@ -438,14 +452,30 @@ def run_interactive(m, consumer_name, scenario, callback, *, timeout=120):
             rt.require(len(line)<16384,'INTERACTIVE_OUTPUT_BUDGET');lines.append(line)
             value=json.loads(line)
             rt.require(value.get('taskId')==rt.TASK,'INTERACTIVE_TASK')
+            rt.require(terminal is None,'INTERACTIVE_AFTER_TERMINAL')
             if 'event' in value:
                 rt.require(value.get('runId')==m['runId'],'INTERACTIVE_RUN')
                 response=callback(value)
-                rt.require(response in ('SOURCE_PASSWORD_ROTATED','SOURCE_PASSWORD_RESTORED','SOURCE_PAUSED','SOURCE_LOCKED','SOURCE_QUERY_WAITING'),'INTERACTIVE_ACK')
+                rt.require(response in ('SOURCE_PASSWORD_ROTATED','SOURCE_PASSWORD_RESTORED','SOURCE_PAUSED','SOURCE_LOCKED','SOURCE_QUERY_WAITING','SOURCE_QUERY_CANCELLED'),'INTERACTIVE_ACK')
                 child.stdin.write(response+'\n');child.stdin.flush()
+            else:
+                rt.require(value.get('scenario')==scenario,'INTERACTIVE_TERMINAL_SCENARIO')
+                rt.require(value.get('status') in ('PASS','INCOMPLETE','FAIL'),'INTERACTIVE_TERMINAL_STATUS')
+                rt.require('runId' not in value or value['runId']==m['runId'],'INTERACTIVE_RUN')
+                terminal=value;child.stdin.close()
         child.wait(timeout=5)
+        rt.require(terminal is not None,'INTERACTIVE_TERMINAL_REQUIRED')
         rt.require(child.returncode in (0,2),'INTERACTIVE_CONSUMER_FAILED')
-        return reports(m,consumer_name+'-'+scenario)
+        rt.require(terminal['status'] in ('PASS','INCOMPLETE') and {'PASS':0,'INCOMPLETE':2}.get(terminal['status'])==child.returncode and not terminal.get('failure'),'INTERACTIVE_TERMINAL_EXIT')
+        if consumer_name=='fault':
+            files=list(output.glob('*.json'));rt.require(len(files)==1,'FAULT_REPORT_CARDINALITY')
+            value=json.loads(files[0].read_text())
+            rt.require(value.get('taskId')==rt.TASK and value.get('runId')==m['runId'] and value.get('testedCommit')==m['_head'] and value.get('action')==scenario and value.get('status')=='PASS' and not value.get('failure') and child.returncode==0,'FAULT_FAILED')
+            return value
+        value=reports(m,consumer_name+'-'+scenario)
+        rt.require(value.get('scenario')==scenario,'INTERACTIVE_REPORT_SCENARIO')
+        rt.require(value.get('exitCode')==child.returncode,'INTERACTIVE_REPORT_EXIT')
+        return value
     finally:
         selector.close()
         if child.poll() is None:
@@ -460,7 +490,7 @@ def run_interactive(m, consumer_name, scenario, callback, *, timeout=120):
         private=rt.private_dir(m['runId'])/'logs'/('interactive-'+consumer_name+'-'+scenario+'.log')
         with open(private,'x') as stream:os.chmod(private,0o600);stream.write(raw)
         for stream in (child.stdin,child.stdout,child.stderr):stream.close()
-        rt.write_json(rt.ARTIFACTS/m['runId']/('interactive-'+consumer_name+'-'+scenario+'.json'),{'taskId':rt.TASK,'runId':m['runId'],'testedCommit':m['_head'],'command':command,'pid':child.pid,'startedAtUtc':started,'exitCode':child.returncode,'logSha256':rt.digest(raw.encode())})
+        rt.write_json(rt.ARTIFACTS/m['runId']/('interactive-'+consumer_name+'-'+scenario+'.json'),{'taskId':rt.TASK,'runId':m['runId'],'testedCommit':m['_head'],'command':command,'pid':child.pid,'startedAtUtc':started,'exitCode':child.returncode,'terminalObserved':terminal is not None,'logSha256':rt.digest(raw.encode())})
 
 
 def reference_state(m,ref):
@@ -705,9 +735,10 @@ def browser_faults(m):
 
 def lease_fence(m):
     """真实双worker租约接管；旧worker恢复后不得重复快照或finish审计。"""
-    connection=identifier(rt.runtime_value(m)['httpConnectionId']);replica=None
+    connection=identifier(rt.runtime_value(m)['httpConnectionId']);replica=None;platform=None
     def state(job):
-        return json.loads(sql(m,'BEGIN READ ONLY; SELECT json_build_object(\'status\',"Status",\'fence\',"Fence",\'attempt\',"Attempt",\'expired\',"LeaseUntil"<now(),\'snapshot\',"SnapshotId") FROM connections."CatalogJobs" WHERE "Id"=\''+identifier(job)+'\'; COMMIT;'))
+        rt.require(platform is not None,'LEASE_PLATFORM_SESSION')
+        return platform.query("EXECUTE main_lease_state('"+identifier(job)+"');")
     def counts():
         return json.loads(sql(m,'BEGIN READ ONLY; SELECT json_build_object(\'snapshots\',(SELECT count(*) FROM connections."CatalogSnapshots" WHERE "ConnectionId"=\''+connection+'\'),\'audits\',(SELECT count(*) FROM governance.audit_records WHERE "Resource"=\'connection:'+connection+'\' AND "Action"=\'connection.catalog.finish\')); COMMIT;'))
     action(m,'probe-refresh','lease-probe')
@@ -716,10 +747,11 @@ def lease_fence(m):
         rt.execute(m,'lease-replica-create',rt.compose_command('m1')+['--profile','lease','create','--no-build','--pull','never','api-recovery'],env=rt.compose_environment(m),sensitive=True)
         refresh_registry(m,'lease-created');replica=rt.runtime_value(m)['containerIds']['api-recovery']
         info=rt.inspect_owned(m,replica,'api-recovery');rt.require(not info['State']['Running'] and not info['HostConfig']['PortBindings'],'LEASE_REPLICA_BOUNDARY')
-        with SourceSession(m) as observer:
+        with SourceSession(m,source=False) as platform,SourceSession(m) as observer:
+            platform.query("SET default_transaction_read_only=on; SET statement_timeout='2s'; SET idle_session_timeout='100s'; PREPARE main_lease_state(text) AS SELECT json_build_object('status',\"Status\",'fence',\"Fence\",'attempt',\"Attempt\",'expired',\"LeaseUntil\"<clock_timestamp(),'snapshot',\"SnapshotId\") FROM connections.\"CatalogJobs\" WHERE \"Id\"=$1; SELECT to_json(true);")
             observer.query("SET statement_timeout='2s'; SET idle_session_timeout='100s'; SET plan_cache_mode=force_generic_plan; PREPARE main_lease_activity AS SELECT coalesce(json_agg(json_build_object('pid',pid,'wait',wait_event_type)),'[]') FROM pg_stat_activity WHERE usename='fixture_reader'; EXECUTE main_lease_activity;")
             with SourceSession(m) as lock:
-                held=lock.query("SET statement_timeout='55s'; SET idle_in_transaction_session_timeout='55s'; SET lock_timeout='2s'; BEGIN; LOCK TABLE pg_catalog.pg_attribute IN ACCESS EXCLUSIVE MODE; SELECT json_build_object('pid',pg_backend_pid(),'held',true);")
+                held=lock.query("SET statement_timeout='55s'; SET idle_in_transaction_session_timeout='55s'; SET lock_timeout='2s'; BEGIN; LOCK TABLE pg_catalog.pg_shdepend IN ACCESS EXCLUSIVE MODE; SELECT json_build_object('pid',pg_backend_pid(),'held',true);")
                 job=identifier(action(m,'job-start','lease-job')['jobId']);rt.update_runtime(m,httpJobId=job)
                 deadline=time.monotonic()+4
                 while True:
@@ -733,7 +765,9 @@ def lease_fence(m):
                         expired=state(job)
                         if expired['expired']:break
                         rt.require(time.monotonic()<deadline and expired['fence']==1,'LEASE_NOT_EXPIRED');time.sleep(.2)
-                    rt.docker(m,['start',replica]);rt.resource_snapshot(m,'m1','lease-two-workers')
+                    rt.docker(m,['start',replica])
+                    running=rt.inspect_owned(m,replica,'api-recovery')
+                    rt.require(running['State']['Running'] and not running['State']['Paused'],'LEASE_REPLICA_NOT_RUNNING')
                     deadline=time.monotonic()+10
                     while True:
                         takeover=state(job)
@@ -747,6 +781,7 @@ def lease_fence(m):
                         if terminal['status'] not in ('QUEUED','RUNNING'):break
                         rt.require(time.monotonic()<deadline,'LEASE_TERMINAL_TIMEOUT');time.sleep(.1)
                     rt.require(terminal['status']=='SUCCEEDED' and terminal['snapshot'],'LEASE_RECOVERY_NOT_SUCCESS')
+                    rt.resource_snapshot(m,'m1','lease-two-workers')
                     after=counts();rt.require(after=={'snapshots':before['snapshots']+1,'audits':before['audits']+1},'LEASE_DUPLICATE_WRITE')
                 deadline=time.monotonic()+10
                 while any(x['pid'] in {v['pid'] for v in waiting} for x in observer.query('EXECUTE main_lease_activity;')):
@@ -1009,7 +1044,11 @@ def browser_cancel(m):
 def schema_change(m):
     """真实无业务行DDL与不可变旧Snapshot，再读投影必须STALE。"""
     import run
+    refreshed=action(m,'probe-refresh','schema-probe-refresh')
     r=rt.runtime_value(m);old=identifier(r['httpSnapshotId'])
+    connection=identifier(r['httpConnectionId'])
+    probe=json.loads(sql(m,'BEGIN READ ONLY; SELECT json_build_object(\'probeId\',p."Id",\'expiresAtUtc\',p."ExpiresAtUtc",\'unexpired\',p."ExpiresAtUtc">clock_timestamp(),\'configMatches\',p."ConfigHash"=c."ConfigHash",\'secretVersionMatches\',p."SecretVersion"=c."SecretVersion") FROM connections."Connections" c JOIN connections."ConnectionProbes" p ON p."Id"=c."LastProbeId" WHERE c."Id"=\''+connection+'\'; COMMIT;'))
+    rt.require(probe and all(probe[k] is True for k in ('unexpired','configMatches','secretVersionMatches')),'SCHEMA_PROBE_NOT_FRESH')
     expression='SELECT md5("ViewJson") FROM connections."CatalogSnapshots" WHERE "Id"=\''+old+'\';'
     before=sql(m,'BEGIN READ ONLY; '+expression+' COMMIT;');rt.require(re.fullmatch('[a-f0-9]{32}',before),'SNAPSHOT_MISSING')
     sql(m,'ALTER TABLE production.heat_event ADD COLUMN recovery_extra integer;',source=True)
@@ -1019,7 +1058,7 @@ def schema_change(m):
         after=sql(m,'BEGIN READ ONLY; '+expression+' COMMIT;')
         rt.require(before==after,'OLD_SNAPSHOT_MUTATED')
         new=identifier(report['fixtures']['snapshotId']);rt.require(new!=old,'NEW_SNAPSHOT_REQUIRED')
-        result={'status':'PASS','oldSnapshotId':old,'newSnapshotId':new,'oldViewBeforeHash':before,'oldViewAfterHash':after,'httpReportSha256':rt.digest(json.dumps(report).encode())}
+        result={'status':'PASS','oldSnapshotId':old,'newSnapshotId':new,'oldViewBeforeHash':before,'oldViewAfterHash':after,'probeBeforeDdl':probe,'refreshStatus':refreshed['status'],'httpReportSha256':rt.digest(json.dumps(report).encode())}
     finally:sql(m,'ALTER TABLE production.heat_event DROP COLUMN recovery_extra;',source=True)
     rt.write_json(rt.ARTIFACTS/m['runId']/'schema-immutability.json',result);return result
 

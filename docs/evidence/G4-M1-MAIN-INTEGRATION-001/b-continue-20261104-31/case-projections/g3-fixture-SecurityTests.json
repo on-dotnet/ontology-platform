@@ -1,0 +1,798 @@
+{
+  "cases": [
+    {
+      "case": "SuccessfulRepeatedAndConcurrentReadsCommitExactlyOnceWithoutSelf",
+      "status": "PASS",
+      "line": 1
+    },
+    {
+      "case": "ScopeFilterRequiresNonemptyOrganizationAndCompleteArraySubset (\"site-a\",\"A\")",
+      "status": "PASS",
+      "line": 2
+    },
+    {
+      "case": "ScopeFilterRequiresNonemptyOrganizationAndCompleteArraySubset (\"site-b\",\"B\")",
+      "status": "PASS",
+      "line": 3
+    },
+    {
+      "case": "ScopeFilterRequiresNonemptyOrganizationAndCompleteArraySubset (\"site-a,site-b\",\"A,B,AB\")",
+      "status": "PASS",
+      "line": 4
+    },
+    {
+      "case": "EmptyResultsAndMissingScopesStillCommitReadFact (\"valid\",True)",
+      "status": "PASS",
+      "line": 5
+    },
+    {
+      "case": "EmptyResultsAndMissingScopesStillCommitReadFact (\"valid\",False)",
+      "status": "PASS",
+      "line": 6
+    },
+    {
+      "case": "EmptyResultsAndMissingScopesStillCommitReadFact (\"missing\",True)",
+      "status": "PASS",
+      "line": 7
+    },
+    {
+      "case": "EmptyResultsAndMissingScopesStillCommitReadFact (\"empty\",True)",
+      "status": "PASS",
+      "line": 8
+    },
+    {
+      "case": "EmptyResultsAndMissingScopesStillCommitReadFact (\"blank\",True)",
+      "status": "PASS",
+      "line": 9
+    },
+    {
+      "case": "DeniedRoleAndExpiredSessionNeverProduceSuccessfulRead",
+      "status": "PASS",
+      "line": 10
+    },
+    {
+      "case": "LimitAppliesAfterScopeFilterAndInvalidLimitDoesNotAuditSuccess",
+      "status": "PASS",
+      "line": 11
+    },
+    {
+      "case": "InsertOnlyFailureNeverReturnsSuccessOrAuditIdAndRecovers",
+      "status": "PASS",
+      "line": 12
+    },
+    {
+      "case": "ResourceReadAuditsTrustedFullScopeOrAuthorizedExplicitSite",
+      "status": "PASS",
+      "line": 13
+    },
+    {
+      "case": "ScopeMigrationPreservesLegacyAndRefusesDestructiveRollback",
+      "status": "PASS",
+      "line": 14
+    },
+    {
+      "case": "ConcurrentFirstScopeWriteCannotBeLostByRollback",
+      "status": "PASS",
+      "line": 15
+    },
+    {
+      "case": "SharedPhysicalTransactionCommitsBothAndPreservesMultisite",
+      "status": "PASS",
+      "line": 16
+    },
+    {
+      "case": "SharedPhysicalTransactionRollsBackBoth",
+      "status": "PASS",
+      "line": 17
+    },
+    {
+      "case": "AuditDatabaseFailureInvalidatesWholeBusinessTransaction",
+      "status": "PASS",
+      "line": 18
+    },
+    {
+      "case": "MatchingConnectionStringDoesNotCountAsSharedTransaction",
+      "status": "PASS",
+      "line": 19
+    },
+    {
+      "case": "InvalidConnectionPreconditionInvalidatesExistingBusinessTransaction (True)",
+      "status": "PASS",
+      "line": 20
+    },
+    {
+      "case": "InvalidConnectionPreconditionInvalidatesExistingBusinessTransaction (False)",
+      "status": "PASS",
+      "line": 21
+    },
+    {
+      "case": "StandaloneAuditCommitsBeforeReturningAndKeepsScopeSemantics",
+      "status": "PASS",
+      "line": 22
+    },
+    {
+      "case": "HttpAuthorizationDenialPersistsAuditBefore403",
+      "status": "PASS",
+      "line": 23
+    },
+    {
+      "case": "G2GuardUsesValidatedSecurityConfiguration",
+      "status": "PASS",
+      "line": 24
+    },
+    {
+      "case": "ActualRunRoutesDescribeResponsesAndNativeEventStream",
+      "status": "PASS",
+      "line": 25
+    },
+    {
+      "case": "ProductionHostDocumentsStrongRevisionAndPublishingProblems",
+      "status": "PASS",
+      "line": 26
+    },
+    {
+      "case": "RuntimeSchemaPreservesWireUnionsAndWriteHeaders",
+      "status": "PASS",
+      "line": 27
+    },
+    {
+      "case": "ActualPublishingPostsAuthorizeBeforeMalformedBindingAndPersistDenial",
+      "status": "PASS",
+      "line": 28
+    },
+    {
+      "case": "ActualPublishingDenialAuditFailureFailsClosed",
+      "status": "PASS",
+      "line": 29
+    },
+    {
+      "case": "AuthorizedPublishingPostsKeepBindingAndCsrfBoundaries",
+      "status": "PASS",
+      "line": 30
+    },
+    {
+      "case": "DatabaseAndBothHttpDependenciesShareRemainingBudget",
+      "status": "PASS",
+      "line": 31
+    },
+    {
+      "case": "HealthOptionsPreserveEffectiveGssRequirement",
+      "status": "PASS",
+      "line": 32
+    },
+    {
+      "case": "PausedPostgresCannotOutliveHealthBudget (False,False)",
+      "status": "PASS",
+      "line": 33
+    },
+    {
+      "case": "PausedPostgresCannotOutliveHealthBudget (True,False)",
+      "status": "PASS",
+      "line": 34
+    },
+    {
+      "case": "PausedPostgresCannotOutliveHealthBudget (True,True)",
+      "status": "PASS",
+      "line": 35
+    },
+    {
+      "case": "G2BudgetIncludesFirstGovernanceConnection",
+      "status": "PASS",
+      "line": 36
+    },
+    {
+      "case": "CallerCancellationStillReachesGovernance (True)",
+      "status": "PASS",
+      "line": 37
+    },
+    {
+      "case": "CallerCancellationStillReachesGovernance (False)",
+      "status": "PASS",
+      "line": 38
+    },
+    {
+      "case": "IdentityBoundaryRejectsBeforeBusiness (null,401)",
+      "status": "PASS",
+      "line": 39
+    },
+    {
+      "case": "IdentityBoundaryRejectsBeforeBusiness (\"platform.viewer\",403)",
+      "status": "PASS",
+      "line": 40
+    },
+    {
+      "case": "SharedPoliciesMatchApprovedRoles (\"platform.viewer\",\"semantic.read\",200)",
+      "status": "PASS",
+      "line": 41
+    },
+    {
+      "case": "SharedPoliciesMatchApprovedRoles (\"platform.operator\",\"semantic.read\",200)",
+      "status": "PASS",
+      "line": 42
+    },
+    {
+      "case": "SharedPoliciesMatchApprovedRoles (\"platform.auditor\",\"semantic.read\",200)",
+      "status": "PASS",
+      "line": 43
+    },
+    {
+      "case": "SharedPoliciesMatchApprovedRoles (\"platform.operator\",\"ontology.edit\",200)",
+      "status": "PASS",
+      "line": 44
+    },
+    {
+      "case": "SharedPoliciesMatchApprovedRoles (\"platform.auditor\",\"ontology.edit\",403)",
+      "status": "PASS",
+      "line": 45
+    },
+    {
+      "case": "SharedPoliciesMatchApprovedRoles (\"platform.auditor\",\"release.approve\",200)",
+      "status": "PASS",
+      "line": 46
+    },
+    {
+      "case": "SharedPoliciesMatchApprovedRoles (\"platform.operator\",\"release.approve\",403)",
+      "status": "PASS",
+      "line": 47
+    },
+    {
+      "case": "SharedPoliciesMatchApprovedRoles (\"platform.operator\",\"release.activate\",200)",
+      "status": "PASS",
+      "line": 48
+    },
+    {
+      "case": "SharedPoliciesMatchApprovedRoles (\"platform.auditor\",\"release.activate\",403)",
+      "status": "PASS",
+      "line": 49
+    },
+    {
+      "case": "OriginMustBeExactOrigin (\"https://external.invalid\")",
+      "status": "PASS",
+      "line": 50
+    },
+    {
+      "case": "OriginMustBeExactOrigin (\"null\")",
+      "status": "PASS",
+      "line": 51
+    },
+    {
+      "case": "OriginMustBeExactOrigin (\"http://platform.test/path\")",
+      "status": "PASS",
+      "line": 52
+    },
+    {
+      "case": "OriginMustBeExactOrigin (\"http://platform.test.evil.invalid\")",
+      "status": "PASS",
+      "line": 53
+    },
+    {
+      "case": "OriginMustBeExactOrigin (\"http://platform.test,http://platform.test\")",
+      "status": "PASS",
+      "line": 54
+    },
+    {
+      "case": "NativeCsrfRejectsMissingOrInvalidToken (null)",
+      "status": "PASS",
+      "line": 55
+    },
+    {
+      "case": "NativeCsrfRejectsMissingOrInvalidToken (\"synthetic-secret-marker\")",
+      "status": "PASS",
+      "line": 56
+    },
+    {
+      "case": "RevisionPreconditionMatchesCommand (null,428)",
+      "status": "PASS",
+      "line": 57
+    },
+    {
+      "case": "RevisionPreconditionMatchesCommand (\"W/\\\"2\\\"\",400)",
+      "status": "PASS",
+      "line": 58
+    },
+    {
+      "case": "RevisionPreconditionMatchesCommand (\"*\",400)",
+      "status": "PASS",
+      "line": 59
+    },
+    {
+      "case": "RevisionPreconditionMatchesCommand (\"\\\"-1\\\"\",400)",
+      "status": "PASS",
+      "line": 60
+    },
+    {
+      "case": "RevisionPreconditionMatchesCommand (\"\\\"02\\\"\",400)",
+      "status": "PASS",
+      "line": 61
+    },
+    {
+      "case": "RevisionPreconditionMatchesCommand (\"\\\"2\\\", \\\"3\\\"\",400)",
+      "status": "PASS",
+      "line": 62
+    },
+    {
+      "case": "RevisionPreconditionMatchesCommand (\"\\\"3\\\"\",409)",
+      "status": "PASS",
+      "line": 63
+    },
+    {
+      "case": "RevisionPreconditionMatchesCommand (\"\\\"2\\\"\",200)",
+      "status": "PASS",
+      "line": 64
+    },
+    {
+      "case": "InvalidCommandsNeverInvokeBusiness (\"command\")",
+      "status": "PASS",
+      "line": 65
+    },
+    {
+      "case": "InvalidCommandsNeverInvokeBusiness (\"key\")",
+      "status": "PASS",
+      "line": 66
+    },
+    {
+      "case": "InvalidCommandsNeverInvokeBusiness (\"reason\")",
+      "status": "PASS",
+      "line": 67
+    },
+    {
+      "case": "InvalidCommandsNeverInvokeBusiness (\"revision\")",
+      "status": "PASS",
+      "line": 68
+    },
+    {
+      "case": "ActorIgnoresClientIdentityHeaders",
+      "status": "PASS",
+      "line": 69
+    },
+    {
+      "case": "MiddlewareRejectsAnonymousBeforeMalformedBodyBinding",
+      "status": "PASS",
+      "line": 70
+    },
+    {
+      "case": "MiddlewarePersistsForbiddenAuditBeforeMalformedBodyBinding",
+      "status": "PASS",
+      "line": 71
+    },
+    {
+      "case": "MiddlewareAuditFailurePropagatesWithoutFalse403",
+      "status": "PASS",
+      "line": 72
+    },
+    {
+      "case": "MiddlewareSuccessContinuesToNativeBindingAndGuard (True)",
+      "status": "PASS",
+      "line": 73
+    },
+    {
+      "case": "MiddlewareSuccessContinuesToNativeBindingAndGuard (False)",
+      "status": "PASS",
+      "line": 74
+    },
+    {
+      "case": "MiddlewareCancellationPropagatesBeforeResponseStarts",
+      "status": "PASS",
+      "line": 75
+    },
+    {
+      "case": "MiddlewareUnexpectedAuditFailurePropagatesUnchanged",
+      "status": "PASS",
+      "line": 76
+    },
+    {
+      "case": "ControlledFailuresMapAndUnknownFailuresPropagate",
+      "status": "PASS",
+      "line": 77
+    },
+    {
+      "case": "NativeTransportPreservesBoundaryAndResult (null,\"semantic.read\",False,null,401)",
+      "status": "PASS",
+      "line": 78
+    },
+    {
+      "case": "NativeTransportPreservesBoundaryAndResult (\"platform.viewer\",\"ontology.edit\",False,null,403)",
+      "status": "PASS",
+      "line": 79
+    },
+    {
+      "case": "NativeTransportPreservesBoundaryAndResult (\"platform.viewer\",\"semantic.read\",False,null,202)",
+      "status": "PASS",
+      "line": 80
+    },
+    {
+      "case": "NativeTransportPreservesBoundaryAndResult (\"platform.viewer\",\"semantic.read\",True,\"http://platform.test\",403)",
+      "status": "PASS",
+      "line": 81
+    },
+    {
+      "case": "NativeTransportPreservesBoundaryAndResult (\"platform.viewer\",\"semantic.read\",True,\"http://untrusted.invalid\",403)",
+      "status": "PASS",
+      "line": 82
+    },
+    {
+      "case": "NativeTransportPreservesBoundaryAndResult (\"platform.viewer\",\"semantic.read\",True,\"http://platform.test\",202)",
+      "status": "PASS",
+      "line": 83
+    },
+    {
+      "case": "AssessmentAuthorizesBeforeMalformedBody",
+      "status": "PASS",
+      "line": 84
+    },
+    {
+      "case": "ComparisonRejectsMissingCsrfBeforeBusiness",
+      "status": "PASS",
+      "line": 85
+    },
+    {
+      "case": "EditAuthorizesBeforeMalformedBody (null,401)",
+      "status": "PASS",
+      "line": 86
+    },
+    {
+      "case": "EditAuthorizesBeforeMalformedBody (\"platform.viewer\",403)",
+      "status": "PASS",
+      "line": 87
+    },
+    {
+      "case": "EditRequiresStrongMatchingRevision (null,428)",
+      "status": "PASS",
+      "line": 88
+    },
+    {
+      "case": "EditRequiresStrongMatchingRevision (\"W/\\\"2\\\"\",400)",
+      "status": "PASS",
+      "line": 89
+    },
+    {
+      "case": "EditRequiresStrongMatchingRevision (\"\\\"1\\\"\",409)",
+      "status": "PASS",
+      "line": 90
+    },
+    {
+      "case": "EditAuthorizesBeforeMalformedBody (null,401)",
+      "status": "PASS",
+      "line": 91
+    },
+    {
+      "case": "EditAuthorizesBeforeMalformedBody (\"platform.viewer\",403)",
+      "status": "PASS",
+      "line": 92
+    },
+    {
+      "case": "EditRequiresStrongMatchingRevision (null,428)",
+      "status": "PASS",
+      "line": 93
+    },
+    {
+      "case": "EditRequiresStrongMatchingRevision (\"W/\\\"2\\\"\",400)",
+      "status": "PASS",
+      "line": 94
+    },
+    {
+      "case": "EditRequiresStrongMatchingRevision (\"\\\"1\\\"\",409)",
+      "status": "PASS",
+      "line": 95
+    },
+    {
+      "case": "EditAuthorizesBeforeMalformedBody (null,401)",
+      "status": "PASS",
+      "line": 96
+    },
+    {
+      "case": "EditAuthorizesBeforeMalformedBody (\"platform.viewer\",403)",
+      "status": "PASS",
+      "line": 97
+    },
+    {
+      "case": "EditRequiresStrongMatchingRevision (null,428)",
+      "status": "PASS",
+      "line": 98
+    },
+    {
+      "case": "EditRequiresStrongMatchingRevision (\"W/\\\"2\\\"\",400)",
+      "status": "PASS",
+      "line": 99
+    },
+    {
+      "case": "EditRequiresStrongMatchingRevision (\"\\\"1\\\"\",409)",
+      "status": "PASS",
+      "line": 100
+    },
+    {
+      "case": "ImpactAuthorizesBeforeMalformedBody (\"/api/v1/ontology-version-diffs\",null,401)",
+      "status": "PASS",
+      "line": 101
+    },
+    {
+      "case": "ImpactAuthorizesBeforeMalformedBody (\"/api/v1/impact-reports\",null,401)",
+      "status": "PASS",
+      "line": 102
+    },
+    {
+      "case": "ImpactAuthorizesBeforeMalformedBody (\"/api/v1/impact-reports\",\"platform.viewer\",403)",
+      "status": "PASS",
+      "line": 103
+    },
+    {
+      "case": "ImpactRequiresNativeCsrf (False)",
+      "status": "PASS",
+      "line": 104
+    },
+    {
+      "case": "ImpactRequiresNativeCsrf (True)",
+      "status": "PASS",
+      "line": 105
+    },
+    {
+      "case": "ActualCompositionResolvesBothExpressionContracts",
+      "status": "PASS",
+      "line": 106
+    },
+    {
+      "case": "MissingExpressionRegistrationFailsBeforeAnyRequest",
+      "status": "PASS",
+      "line": 107
+    },
+    {
+      "case": "EnforcesActualBytesBeforeApplication (\"length\",True,65536)",
+      "status": "PASS",
+      "line": 108
+    },
+    {
+      "case": "EnforcesActualBytesBeforeApplication (\"length\",True,65537)",
+      "status": "PASS",
+      "line": 109
+    },
+    {
+      "case": "EnforcesActualBytesBeforeApplication (\"length\",True,131072)",
+      "status": "PASS",
+      "line": 110
+    },
+    {
+      "case": "EnforcesActualBytesBeforeApplication (\"chunked\",True,65536)",
+      "status": "PASS",
+      "line": 111
+    },
+    {
+      "case": "EnforcesActualBytesBeforeApplication (\"chunked\",True,65537)",
+      "status": "PASS",
+      "line": 112
+    },
+    {
+      "case": "EnforcesActualBytesBeforeApplication (\"chunked\",True,131072)",
+      "status": "PASS",
+      "line": 113
+    },
+    {
+      "case": "EnforcesActualBytesBeforeApplication (\"http2\",True,65536)",
+      "status": "PASS",
+      "line": 114
+    },
+    {
+      "case": "EnforcesActualBytesBeforeApplication (\"http2\",True,65537)",
+      "status": "PASS",
+      "line": 115
+    },
+    {
+      "case": "EnforcesActualBytesBeforeApplication (\"http2\",True,131072)",
+      "status": "PASS",
+      "line": 116
+    },
+    {
+      "case": "EnforcesActualBytesBeforeApplication (\"length\",False,65536)",
+      "status": "PASS",
+      "line": 117
+    },
+    {
+      "case": "EnforcesActualBytesBeforeApplication (\"length\",False,65537)",
+      "status": "PASS",
+      "line": 118
+    },
+    {
+      "case": "EnforcesActualBytesBeforeApplication (\"length\",False,131072)",
+      "status": "PASS",
+      "line": 119
+    },
+    {
+      "case": "EnforcesActualBytesBeforeApplication (\"chunked\",False,65536)",
+      "status": "PASS",
+      "line": 120
+    },
+    {
+      "case": "EnforcesActualBytesBeforeApplication (\"chunked\",False,65537)",
+      "status": "PASS",
+      "line": 121
+    },
+    {
+      "case": "EnforcesActualBytesBeforeApplication (\"chunked\",False,131072)",
+      "status": "PASS",
+      "line": 122
+    },
+    {
+      "case": "EnforcesActualBytesBeforeApplication (\"http2\",False,65536)",
+      "status": "PASS",
+      "line": 123
+    },
+    {
+      "case": "EnforcesActualBytesBeforeApplication (\"http2\",False,65537)",
+      "status": "PASS",
+      "line": 124
+    },
+    {
+      "case": "EnforcesActualBytesBeforeApplication (\"http2\",False,131072)",
+      "status": "PASS",
+      "line": 125
+    },
+    {
+      "case": "ProductionRequiresExplicitMatchingAllowedHosts",
+      "status": "PASS",
+      "line": 126
+    },
+    {
+      "case": "AnonymousAndCorruptedCookieRemainUnauthenticated",
+      "status": "PASS",
+      "line": 127
+    },
+    {
+      "case": "ForwardedHeadersAndInvalidCallbackFailClosed",
+      "status": "PASS",
+      "line": 128
+    },
+    {
+      "case": "ProductionHealthRemainsProtectedAndDependencyAware",
+      "status": "PASS",
+      "line": 129
+    },
+    {
+      "case": "UntrustedHostNeverEntersPlatformRoutes",
+      "status": "PASS",
+      "line": 130
+    },
+    {
+      "case": "RuntimeOpenApiDeclaresRedirectsAndCompleteErrors",
+      "status": "PASS",
+      "line": 131
+    },
+    {
+      "case": "RealIssuerPushRetainsCodePkceStateAndNonce",
+      "status": "PASS",
+      "line": 132
+    },
+    {
+      "case": "PushedAuthorizationObservationContainsBooleansOnly",
+      "status": "PASS",
+      "line": 133
+    },
+    {
+      "case": "ProxyQueryNeverEntersLogBody",
+      "status": "PASS",
+      "line": 134
+    },
+    {
+      "case": "ReservedPrefixesNeverReachWebProxy",
+      "status": "PASS",
+      "line": 135
+    },
+    {
+      "case": "FaultsHaveBoundedClassificationAndNoSensitiveTelemetry (\"invalid_operation\",500,\"unexpected_failure\")",
+      "status": "PASS",
+      "line": 136
+    },
+    {
+      "case": "FaultsHaveBoundedClassificationAndNoSensitiveTelemetry (\"argument\",500,\"unexpected_failure\")",
+      "status": "PASS",
+      "line": 137
+    },
+    {
+      "case": "FaultsHaveBoundedClassificationAndNoSensitiveTelemetry (\"format\",500,\"unexpected_failure\")",
+      "status": "PASS",
+      "line": 138
+    },
+    {
+      "case": "FaultsHaveBoundedClassificationAndNoSensitiveTelemetry (\"access\",500,\"unexpected_failure\")",
+      "status": "PASS",
+      "line": 139
+    },
+    {
+      "case": "FaultsHaveBoundedClassificationAndNoSensitiveTelemetry (\"uncancelled_oce\",500,\"unexpected_failure\")",
+      "status": "PASS",
+      "line": 140
+    },
+    {
+      "case": "FaultsHaveBoundedClassificationAndNoSensitiveTelemetry (\"bad_request\",400,\"invalid_request\")",
+      "status": "PASS",
+      "line": 141
+    },
+    {
+      "case": "FaultsHaveBoundedClassificationAndNoSensitiveTelemetry (\"database_write\",503,\"database_write\")",
+      "status": "PASS",
+      "line": 142
+    },
+    {
+      "case": "FaultsHaveBoundedClassificationAndNoSensitiveTelemetry (\"database_failure\",503,\"database_failure\")",
+      "status": "PASS",
+      "line": 143
+    },
+    {
+      "case": "FaultsHaveBoundedClassificationAndNoSensitiveTelemetry (\"upstream\",503,\"upstream_unavailable\")",
+      "status": "PASS",
+      "line": 144
+    },
+    {
+      "case": "FaultsHaveBoundedClassificationAndNoSensitiveTelemetry (\"real_connection\",503,\"database_connection\")",
+      "status": "PASS",
+      "line": 145
+    },
+    {
+      "case": "UnwritableResponsesAbortWithoutEscapingOriginalFailure (\"cancelled\",\"request_cancelled\",\"request_cancelled\",499)",
+      "status": "PASS",
+      "line": 146
+    },
+    {
+      "case": "UnwritableResponsesAbortWithoutEscapingOriginalFailure (\"started\",\"response_aborted\",\"unexpected_failure\",200)",
+      "status": "PASS",
+      "line": 147
+    },
+    {
+      "case": "UnwritableResponsesAbortWithoutEscapingOriginalFailure (\"started_cancelled\",\"request_cancelled\",\"request_cancelled\",200)",
+      "status": "PASS",
+      "line": 148
+    },
+    {
+      "case": "UnwritableResponsesAbortWithoutEscapingOriginalFailure (\"abort_other\",\"response_aborted\",\"unexpected_failure\",500)",
+      "status": "PASS",
+      "line": 149
+    },
+    {
+      "case": "UnwritableResponsesAbortWithoutEscapingOriginalFailure (\"write_failure\",\"response_aborted\",\"unexpected_failure\",500)",
+      "status": "PASS",
+      "line": 150
+    },
+    {
+      "case": "ExistingHealthAndOidcStatusesRemainUnchanged",
+      "status": "PASS",
+      "line": 151
+    },
+    {
+      "case": "NativeOtlpExportContainsControlledFaultAndNoOriginalException",
+      "status": "PASS",
+      "line": 152
+    },
+    {
+      "case": "ExpiredServerSessionCookieReturnsHttp401",
+      "status": "PASS",
+      "line": 153
+    },
+    {
+      "case": "SharedEncryptedTicketRevocationAndExpiryUsePostgresFacts",
+      "status": "PASS",
+      "line": 154
+    },
+    {
+      "case": "ReturnAddressRejectsExternalAndAmbiguousPaths",
+      "status": "PASS",
+      "line": 155
+    },
+    {
+      "case": "SiteScopeNeverAcceptsAnotherOrganizationOrSite",
+      "status": "PASS",
+      "line": 156
+    }
+  ],
+  "summary": {
+    "total": 156,
+    "PASS": 156,
+    "FAIL": 0,
+    "SKIP": 0
+  },
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-31",
+  "testedCommit": "fccf1bc967fc92f921f866c6b6232677e191ddac",
+  "project": "SecurityTests",
+  "assemblySha256": "c108d0f4973ea2b9cbf6f4821874ad7c723526b551882e0c730f0199744b7cd9",
+  "rawLogSha256": "0e4bde162c23768b64da58432dfabfef568b3f1cc69fdaaf4a3ff3ca22f69954",
+  "commandReceiptSha256": "68ba9b33507965192deea75877b9e914a6e2e051009da21e94094d0441388e1d",
+  "command": "g3-fixture-SecurityTests"
+}

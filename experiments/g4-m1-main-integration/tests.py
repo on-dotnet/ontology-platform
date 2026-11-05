@@ -635,6 +635,30 @@ class PushRaceTests(unittest.TestCase):
 
 
 class RecoveryGuardTests(unittest.TestCase):
+    def test_api_pause_uses_exact_list_admission_before_critical_operation(self):
+        import runtime as rt
+        from unittest.mock import patch,Mock
+        for rejected in (False,True):
+            with self.subTest(rejected=rejected):
+                calls=[];state={'Running':True,'Paused':False};ident='a'*64;m={'runId':'fixture'}
+                engine=Mock()
+                def owned(actual,service):
+                    calls.append('owned');self.assertEqual((actual,service),(ident,'api'))
+                    if rejected:raise ValueError('INGRESS_OWNER')
+                    return {'State':dict(state)}
+                engine.owned.side_effect=owned
+                guard=Mock(pid=123);guard.poll.return_value=0
+                def docker(m,args,**kwargs):calls.append(args[0]);state['Paused']=args[0]=='pause';return b''
+                def inspect(*args):calls.append('inspect');return {'State':dict(state)}
+                with patch.object(rt,'runtime_value',return_value={'containerIds':{'api':ident}}),patch.object(rt,'TaskEngine',return_value=engine),patch.object(rt,'inspect_owned',side_effect=inspect),patch.object(rt,'docker',side_effect=docker),patch.object(rt,'write_json'),patch.object(rt.subprocess,'Popen',return_value=guard) as launch:
+                    if rejected:
+                        with self.assertRaisesRegex(ValueError,'INGRESS_OWNER'):
+                            with rt.PauseGuard(m,'api',100):pass
+                        launch.assert_not_called();self.assertEqual(calls,['owned'])
+                    else:
+                        with rt.PauseGuard(m,'api',100):self.assertTrue(state['Paused'])
+                        self.assertEqual(calls[:3],['owned','pause','inspect']);self.assertFalse(state['Paused'])
+
     def test_existing_log_rejected_before_command(self):
         import runtime as rt
         with tempfile.TemporaryDirectory(dir=ARTIFACTS) as d:
@@ -673,6 +697,113 @@ class RecoveryGuardTests(unittest.TestCase):
                     try:os.kill(guard_pid,signal.SIGTERM)
                     except ProcessLookupError:pass
                 child.stdout.close();child.stderr.close()
+
+
+class InteractiveCompletionTests(unittest.TestCase):
+    def test_terminal_receipt_closes_stdin_and_allows_real_child_exit(self):
+        import readback,run,os
+        from unittest.mock import patch
+        original=subprocess.Popen
+        with tempfile.TemporaryDirectory(dir=ARTIFACTS) as directory:
+            root=Path(directory);private=root/'private';(private/'logs').mkdir(parents=True);(root/'fixture').mkdir()
+            terminal={'taskId':'G4-M1-MAIN-INTEGRATION-001','scenario':'catalog-cancel','status':'INCOMPLETE'}
+            script="import sys;print("+repr(json.dumps(terminal))+",flush=True);sys.stdin.read();sys.exit(2)"
+            def launch(command,**kwargs):return original([sys.executable,'-B','-c',script],**kwargs)
+            with patch.object(readback.rt,'private_dir',return_value=private),patch.object(readback.rt,'ARTIFACTS',root),patch.object(readback.rt,'environment',return_value=dict(os.environ)),patch.object(run,'binding',return_value=[]),patch.object(readback,'reports',return_value={'observed':True,'scenario':'catalog-cancel','exitCode':2}),patch.object(readback.subprocess,'Popen',side_effect=launch):
+                result=readback.run_interactive({'runId':'fixture','_head':'b'*40},'browser','catalog-cancel',lambda value:None,timeout=.3)
+                self.assertTrue(result['observed'])
+            receipt=json.loads((root/'fixture/interactive-browser-catalog-cancel.json').read_text());self.assertEqual(receipt['exitCode'],2)
+
+    def test_terminal_identity_order_and_presence_are_enforced(self):
+        import readback,run,os
+        from unittest.mock import patch
+        original=subprocess.Popen
+        good={'taskId':'G4-M1-MAIN-INTEGRATION-001','scenario':'catalog-cancel','status':'INCOMPLETE'}
+        cases=[([dict(good,taskId='old')],'INTERACTIVE_TASK'),([dict(good,runId='old')],'INTERACTIVE_RUN'),([dict(good,scenario='other')],'INTERACTIVE_TERMINAL_SCENARIO'),([dict(good,status='UNKNOWN')],'INTERACTIVE_TERMINAL_STATUS'),([good,good],'INTERACTIVE_AFTER_TERMINAL'),([good,{'taskId':good['taskId'],'runId':'fixture','event':'late'}],'INTERACTIVE_AFTER_TERMINAL'),([],'INTERACTIVE_TERMINAL_REQUIRED')]
+        for lines,expected in cases:
+            with self.subTest(expected=expected),tempfile.TemporaryDirectory(dir=ARTIFACTS) as directory:
+                root=Path(directory);private=root/'private';(private/'logs').mkdir(parents=True);(root/'fixture').mkdir()
+                payload=''.join(json.dumps(x)+'\n' for x in lines)
+                script="import sys;sys.stdout.write("+repr(payload)+");sys.stdout.flush();"+("sys.stdin.read();" if lines else '')+"sys.exit(2)"
+                def launch(command,**kwargs):return original([sys.executable,'-B','-c',script],**kwargs)
+                with patch.object(readback.rt,'private_dir',return_value=private),patch.object(readback.rt,'ARTIFACTS',root),patch.object(readback.rt,'environment',return_value=dict(os.environ)),patch.object(run,'binding',return_value=[]),patch.object(readback,'reports') as reports,patch.object(readback.subprocess,'Popen',side_effect=launch):
+                    with self.assertRaisesRegex(ValueError,expected):readback.run_interactive({'runId':'fixture','_head':'b'*40},'browser','catalog-cancel',lambda value:'SOURCE_LOCKED',timeout=.5)
+                    reports.assert_not_called()
+
+    def test_terminal_exit_and_report_cannot_contradict_each_other(self):
+        import readback,run,os
+        from unittest.mock import patch
+        original=subprocess.Popen
+        cases=[('FAIL',0,0,'catalog-cancel','INTERACTIVE_TERMINAL_EXIT'),('INCOMPLETE',0,0,'catalog-cancel','INTERACTIVE_TERMINAL_EXIT'),('PASS',2,2,'catalog-cancel','INTERACTIVE_TERMINAL_EXIT'),('PASS',0,2,'catalog-cancel','INTERACTIVE_REPORT_EXIT'),('INCOMPLETE',2,0,'catalog-cancel','INTERACTIVE_REPORT_EXIT'),('PASS',0,0,'other','INTERACTIVE_REPORT_SCENARIO'),('PASS',0,0,'catalog-cancel',None),('INCOMPLETE',2,2,'catalog-cancel',None)]
+        for status,exit_code,report_exit,scenario,error in cases:
+            with self.subTest(status=status,exit=exit_code,report=report_exit,scenario=scenario),tempfile.TemporaryDirectory(dir=ARTIFACTS) as directory:
+                root=Path(directory);private=root/'private';(private/'logs').mkdir(parents=True);(root/'fixture').mkdir()
+                terminal={'taskId':'G4-M1-MAIN-INTEGRATION-001','scenario':'catalog-cancel','status':status}
+                script="import sys;print("+repr(json.dumps(terminal))+",flush=True);sys.stdin.read();sys.exit("+str(exit_code)+")"
+                def launch(command,**kwargs):return original([sys.executable,'-B','-c',script],**kwargs)
+                report={'scenario':scenario,'exitCode':report_exit}
+                with patch.object(readback.rt,'private_dir',return_value=private),patch.object(readback.rt,'ARTIFACTS',root),patch.object(readback.rt,'environment',return_value=dict(os.environ)),patch.object(run,'binding',return_value=[]),patch.object(readback,'reports',return_value=report) as reports,patch.object(readback.subprocess,'Popen',side_effect=launch):
+                    if error:
+                        with self.assertRaisesRegex(ValueError,error):readback.run_interactive({'runId':'fixture','_head':'b'*40},'browser','catalog-cancel',lambda value:None,timeout=.5)
+                        if error=='INTERACTIVE_TERMINAL_EXIT':reports.assert_not_called()
+                    else:self.assertEqual(readback.run_interactive({'runId':'fixture','_head':'b'*40},'browser','catalog-cancel',lambda value:None,timeout=.5),report)
+
+
+class SchemaPreconditionTests(unittest.TestCase):
+    def test_failed_real_refresh_or_stale_binding_prevents_ddl(self):
+        import readback
+        from unittest.mock import patch
+        m={'runId':'fixture'}
+        with patch.object(readback,'action',side_effect=ValueError('PROBE_FAILED')),patch.object(readback,'sql') as sql:
+            with self.assertRaisesRegex(ValueError,'PROBE_FAILED'):readback.schema_change(m)
+            sql.assert_not_called()
+        for key in ('unexpired','configMatches','secretVersionMatches'):
+            state={'unexpired':True,'configMatches':True,'secretVersionMatches':True};state[key]=False
+            with self.subTest(key=key),patch.object(readback,'action',return_value={'status':'PASS'}),patch.object(readback.rt,'runtime_value',return_value={'httpSnapshotId':'a'*32,'httpConnectionId':'b'*32}),patch.object(readback,'sql',return_value=json.dumps(state)) as sql:
+                with self.assertRaisesRegex(ValueError,'SCHEMA_PROBE_NOT_FRESH'):readback.schema_change(m)
+                self.assertEqual(sql.call_count,1);self.assertIn('BEGIN READ ONLY',sql.call_args.args[1])
+
+    def test_consumer_failure_still_restores_added_column(self):
+        import readback,run
+        from unittest.mock import patch
+        statements=[]
+        def sql(m,text,**kwargs):
+            statements.append(text)
+            if 'json_build_object' in text:return json.dumps({'unexpired':True,'configMatches':True,'secretVersionMatches':True})
+            return 'c'*32
+        with patch.object(readback,'action',return_value={'status':'PASS'}),patch.object(readback.rt,'runtime_value',return_value={'httpSnapshotId':'a'*32,'httpConnectionId':'b'*32}),patch.object(readback,'sql',side_effect=sql),patch.object(run,'consumer',side_effect=ValueError('HTTP_FAILED')):
+            with self.assertRaisesRegex(ValueError,'HTTP_FAILED'):readback.schema_change({'runId':'fixture'})
+        self.assertIn('ADD COLUMN recovery_extra',statements[-2]);self.assertIn('DROP COLUMN recovery_extra',statements[-1])
+
+
+class FaultControlProtocolTests(unittest.TestCase):
+    def harness(self,root,kind='ready',connection='a'*32,job='b'*32):
+        import run
+        text=(HERE/'fault.mjs').read_text();start=text.index('function waitForCatalogControl(');end=text.index('const hash=value=>',start)
+        function=text[start:end]
+        script=root/'protocol.mjs';script.write_text("const report={taskId:'G4-M1-MAIN-INTEGRATION-001',runId:'fixture'};function demand(v,c){if(!v){let e=new Error();e.safeCode=c;throw e}}\n"+function+"\ntry{await waitForCatalogControl("+json.dumps(kind)+","+json.dumps(connection)+","+json.dumps(job)+");console.log(JSON.stringify({result:'PASS',listeners:process.stdin.listenerCount('data')}))}catch(e){console.log(JSON.stringify({result:'FAIL',code:e.safeCode,listeners:process.stdin.listenerCount('data')}));process.exitCode=2}finally{process.stdin.destroy()}\n")
+        return [run.NODE,str(script)]
+
+    def test_actual_node_handshake_accepts_only_exact_phase_markers(self):
+        cases=[('ready','SOURCE_LOCKED\n',True),('started','SOURCE_QUERY_WAITING\n',True),('cancelled','SOURCE_QUERY_CANCELLED\n',True),('ready','SOURCE_QUERY_WAITING\n',False),('ready','SOURCE_LOCKED',False),('ready','X'*65,False),('ready','',False),('unknown','',False)]
+        for kind,marker,accepted in cases:
+            with self.subTest(kind=kind,marker=marker),tempfile.TemporaryDirectory(dir=ARTIFACTS) as d:
+                p=subprocess.run(self.harness(Path(d),kind),input=marker,text=True,capture_output=True,timeout=3)
+                last=json.loads(p.stdout.splitlines()[-1]);self.assertEqual(p.returncode,0 if accepted else 2);self.assertEqual(last['result'],'PASS' if accepted else 'FAIL');self.assertEqual(last['listeners'],0)
+        for key in ('connection','job'):
+            with tempfile.TemporaryDirectory(dir=ARTIFACTS) as d:
+                args={key:'invalid'};p=subprocess.run(self.harness(Path(d),'started',**args),input='',text=True,capture_output=True,timeout=3)
+                self.assertEqual(p.returncode,2);self.assertEqual(json.loads(p.stdout.splitlines()[-1])['code'],'cancel_control_'+key)
+
+    def test_missing_marker_times_out_and_releases_listener(self):
+        with tempfile.TemporaryDirectory(dir=ARTIFACTS) as d:
+            child=subprocess.Popen(self.harness(Path(d),'started'),stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True)
+            try:
+                self.assertEqual(json.loads(child.stdout.readline())['event'],'CATALOG_JOB_STARTED')
+                child.wait(timeout=7);lines=child.stdout.read().splitlines();last=json.loads(lines[-1]);self.assertEqual(child.returncode,2);self.assertEqual(last['code'],'cancel_control_timeout');self.assertEqual(last['listeners'],0)
+            finally:
+                if child.poll() is None:child.kill();child.wait(timeout=2)
+                for stream in (child.stdin,child.stdout,child.stderr):stream.close()
 
 
 class SourceSessionEvidenceTests(unittest.TestCase):

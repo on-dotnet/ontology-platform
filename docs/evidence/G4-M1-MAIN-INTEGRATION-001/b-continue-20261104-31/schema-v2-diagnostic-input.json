@@ -1,0 +1,21 @@
+{
+  "scope": "candidate Python controller + original product/build/JS consumers; no formal gate promotion",
+  "testedCommit": "fccf1bc967fc92f921f866c6b6232677e191ddac",
+  "scriptSha256": "affa0e088b6e50da15a3236a6a14835db6a6802579c5918aebe76b5632ffa1df",
+  "candidateFiles": {
+    "readback.py": "5233ecb3cafb199f48685fb25276ae250d88d0dfa8c77ae343430ceebef2f172",
+    "runtime.py": "2975aff94e51cb2d7cf67de5b69b66cf0f5c0bc2dbcc4bc3f21b76f111353bcf",
+    "fault.mjs": "1a8f803691f0bee9953a0fce86986925c8a6e68fb0e78ef84d12599486467f42",
+    "tests.py": "8b80f776c82196181769c0c4cc266227705cd93c9288b99a5d2173376067ac7c"
+  },
+  "onDiskConsumerFiles": {
+    "readback.py": "54c06ef58b725f6dee26d33eefde935aa51a98af55138ca2044549af09290193",
+    "runtime.py": "60b45c4d8b1536de28ed8bde2158ac5550935a532710c6704f235792b8f84d1d",
+    "fault.mjs": "69557b1f546ded5125ac8b425eb3f8872c8d788a8246fd577f86f9551b1f5939",
+    "tests.py": "6c95e796cd9d46797dca195e56d4711e8ff3f5a19ec7c4fda73a347085781b3a"
+  },
+  "functions": [
+    "probe-refresh then schema_change"
+  ],
+  "adjustment": "real five-stage probe before DDL; product TTL unchanged"
+}

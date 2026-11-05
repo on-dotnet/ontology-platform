@@ -1,0 +1,36 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-31",
+  "testedCommit": "fccf1bc967fc92f921f866c6b6232677e191ddac",
+  "startedUtc": "2026-11-05T05:41:54.147Z",
+  "checks": [
+    {
+      "name": "same_subject_original_org_restored_new_oidc_login",
+      "status": "PASS"
+    }
+  ],
+  "http": [
+    {
+      "method": "GET",
+      "route": "/api/v1/connections/{id}",
+      "status": 200,
+      "durationMs": 25,
+      "jsonBody": true
+    },
+    {
+      "method": "GET",
+      "route": "/api/v1/platform/me",
+      "status": 200,
+      "durationMs": 24,
+      "jsonBody": true
+    }
+  ],
+  "scope": "ONE_HTTP_ACTION_ONLY",
+  "databaseRollbackLeaseFenceEvidence": "NOT_RUN_BY_THIS_CONSUMER",
+  "action": "original-identity-check",
+  "connectionId": "629b1450c89f4ea2a307523d765b0c29",
+  "auditStage": "complete",
+  "originalSubjectSha256": "36993ce96b7fe9a1d1a1e9b9f6e72e1a1a25b38962431659a1072cba045cf844",
+  "status": "PASS",
+  "completedUtc": "2026-11-05T05:41:55.457Z"
+}
