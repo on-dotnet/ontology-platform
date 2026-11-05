@@ -828,8 +828,8 @@ def cross_org_restore_guard(path, parent_pid):
     def request(method,route,body=None):
         rt.require(route in (prefix+'/users/'+value['subject'],prefix+'/users/profile'),'GUARD_ROUTE')
         # 每次请求取新token；某项认证或写入失败不阻止另一恢复项独立尝试。
-        password=rt.boundary(private/'keycloak-password',private,exists=True,private=True).read_text()
-        data=urllib.parse.urlencode({'grant_type':'password','client_id':'admin-cli','username':'wave2-bootstrap','password':password}).encode()
+        bootstrap_value=rt.boundary(private/'keycloak-password',private,exists=True,private=True).read_text()
+        data=urllib.parse.urlencode({'grant_type':'password','client_id':'admin-cli','username':'wave2-bootstrap','password':bootstrap_value}).encode()
         with opener.open(urllib.request.Request('http://localhost:15180/realms/master/protocol/openid-connect/token',data=data,headers={'Content-Type':'application/x-www-form-urlencoded'},method='POST'),timeout=8) as response:
             raw=response.read(1024*1024+1);rt.require(len(raw)<=1024*1024,'GUARD_TOKEN_LIMIT');token=json.loads(raw)['access_token']
         req=urllib.request.Request('http://localhost:15180'+route,data=json.dumps(body).encode() if body is not None else None,headers={'Authorization':'Bearer '+token,'Content-Type':'application/json'},method=method)

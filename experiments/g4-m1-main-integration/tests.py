@@ -685,7 +685,7 @@ class SourceRoleRestorationTests(unittest.TestCase):
                 root=Path(directory);private=root/'private';private.mkdir(mode=0o700);(root/rid).mkdir()
                 original={'attributes':{'organization_id':['org-demo']}};profile={'attributes':[]}
                 path=private/'cross-org-independent-restore.json';path.write_text(json.dumps({'taskId':readback.rt.TASK,'runId':rid,'realm':'g2-0123456789abcdef','subject':subject,'user':original,'profile':profile,'keycloakId':'a'*64}));path.chmod(0o600)
-                password=private/'keycloak-password';password.write_text('synthetic');password.chmod(0o600)
+                credential_file=private/'keycloak-password';credential_file.write_text('synthetic');credential_file.chmod(0o600)
                 events=[];state={};tokens=[]
                 class Response:
                     def __init__(self,value):self.value=value

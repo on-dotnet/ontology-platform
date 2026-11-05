@@ -145,3 +145,8 @@ Run27 / T6b768b5e066760186882d1a385283dcf447fbcd4：R1/R2独立准入及后验PA
 只读源库和持久Probe证明任务owner往返丢失fixture_reader原SELECT ACL；准确补回后同构建五阶段Probe通过，独立确认属验收驱动恢复缺陷。仅readback/tests补原SELECT恢复、冻结源角色/排序ACL/成员关系基线及逐故障恢复比较；实际PG owner往返注入write=true，finally后精确等于基线。提前窄检另发现cross-org恢复串联P1，已改为用户/profile各自恢复及回读，独立guard按父退出/显式请求/960秒界限触发、每请求重新认证；主恢复失败即使兜底成功仍FAIL，成功后必须freshOIDC。61任务测试及两文件独立Review PASS，真实cross-org仍NOT_RUN，新T须完整验收。owner恢复SQL或后置读回抛错会阻断且不写PASS，但不能宣称每次finally都有比较回执。
 
 Run27四模块28对象、G3切换6对象及最终M1的11对象均准确回收，旧KEEP3网络8卷不变；宿主monitor60263已释放。四工具副本26919文件512583851逻辑字节按新计划/VM78412的556只读FD边界实际删除，事故目录保留，VM不操作，物理释放NOT_VERIFIED。首次失败、短复现、驱动字节、正式结果均分别保留；无新V3/main/M2。历史单文件无损迁移及Git blob/恢复映射保持。最终V3体积硬上限问题仍独立阻断，未获放宽或共享工具修改授权。
+
+
+Run28 / Tbcdfe5d5880a81b85729aa6640d4fafefa7c2641：R1/R2独立准入与后验PASS，单次OS全网络禁止Restore21项目168包、PID93002、5.690秒exit0；PREFLIGHT PASS。I01首个静态检查5.338秒exit1，正式凭证模式命中readback/tests中行首password局部变量的Path/read_text表达式，原27套SelfTest及原生/产品门禁尚未执行。只改两局部变量及引用名称，AST独立确认行为、断言、正式扫描器均未变；既有工程静态检查exit0、61任务测试5.378秒通过。原I01 BLOCKED保留，须新T/Run29完整验收。
+
+Run28没有创建Docker对象，旧KEEP3网络8卷保持；monitor92647准确释放。四工具副本26858文件510837724逻辑字节严格零占用lsof复验后实际删除，事故KEEP未变，不使用VM占用例外。归档原始失败与修复见证，无新V3/main/M2。

@@ -1,0 +1,29 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-28",
+  "testedCommit": "bcdfe5d5880a81b85729aa6640d4fafefa7c2641",
+  "command": [
+    "pwsh",
+    "-NoProfile",
+    "-File",
+    "scripts/test-review-evidence.ps1",
+    "-EvidenceFile",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-28/validation-draft.json"
+  ],
+  "startedAtUtc": "2026-11-05T02:43:52.859569+00:00",
+  "endedAtUtc": "2026-11-05T02:43:53.427704+00:00",
+  "elapsedSeconds": 0.5681360000016866,
+  "exitCode": 0,
+  "timingStatus": "OBSERVED",
+  "timedOut": false,
+  "executedInputDrift": false,
+  "inputHashes": {
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/scripts/test-review-evidence.ps1": "88ec2eb998a6c380032fe9069403719c70acdc494d98fc713dfa3c8067ab02da",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-28/validation-draft.json": "d3b226fd624466127e4ef3408d4b65e96fb5aacbf6bcde1c21b9b06065b3af55"
+  },
+  "manifestSha256": "9842bf5808dc20ec54fbeb719a860ebecd59c51593c1e43ea78d5fa034e0ee63",
+  "commandSha256": "05a06f739edab2b58f5104392e45dc55a24d46b623231bcd94bd3457588ff181",
+  "logSha256": "675e03f5867d3efbbe1139b2e0a72a46d361e4eaad935b3a592f0af328b9cc48",
+  "logBytes": 156,
+  "logVisibility": "TASK_EVIDENCE"
+}
