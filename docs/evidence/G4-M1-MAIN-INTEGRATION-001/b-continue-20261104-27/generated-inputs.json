@@ -1,0 +1,30 @@
+{
+  "pg": {
+    "taskId": "G4-M1-MAIN-INTEGRATION-001",
+    "status": "GENERATED_ONLY",
+    "containerExecution": "NOT_RUN",
+    "files": [
+      "adapter-input.json",
+      "ca.crt",
+      "init.sql",
+      "pg_hba.conf",
+      "postgres-password",
+      "reader-password",
+      "server.crt",
+      "server.key",
+      "wrong-ca.crt",
+      "wrong-san.crt",
+      "wrong-san.key"
+    ],
+    "publicCertificateSha256": {
+      "ca.crt": "bb47a491b407259bb4381ff75e2420cf75d39ba632c0f3f10e79f471fea1fa83",
+      "wrong-ca.crt": "e740eda3d9c5a5f81be040f6f9aa0cb1b53eb05df3013b5d0499e2c02398b813",
+      "server.crt": "8e0baec4ff7367dabb12ed2b53dcb5969526afc6d6f26f88382deadd87dd61f0",
+      "wrong-san.crt": "92c4dbafddb244c86121fd04bc2e56b2fda5d5fc4aa6dd36851adea8992efe02"
+    }
+  },
+  "helpers": {
+    "loopback-proxy.mjs": "44731289c6256fac49c665477e1484bb0788838654215c74bde9239eadc0845b"
+  },
+  "sourceDriverSha256": "fbb69803a679de9ef9612ba59adca212bbcda2fd1b2f4dee67b35491ed90a9cb"
+}

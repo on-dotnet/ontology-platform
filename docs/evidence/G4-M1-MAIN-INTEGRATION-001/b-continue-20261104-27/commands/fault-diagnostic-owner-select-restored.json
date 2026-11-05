@@ -1,0 +1,39 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-27",
+  "testedCommit": "6b768b5e066760186882d1a385283dcf447fbcd4",
+  "command": [
+    "/opt/homebrew/opt/node@24/bin/node",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/experiments/g4-m1-main-integration/fault.mjs",
+    "--run-id",
+    "b-continue-20261104-27",
+    "--expected-head",
+    "6b768b5e066760186882d1a385283dcf447fbcd4",
+    "--resource-manifest",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-27/resource-manifest.json",
+    "--runtime-file",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261104-27/runtime.json",
+    "--action",
+    "probe-refresh",
+    "--evidence-dir",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-27/fault-diagnostic-owner-select-restored"
+  ],
+  "startedAtUtc": "2026-11-05T02:29:50.996030+00:00",
+  "endedAtUtc": "2026-11-05T02:30:02.071286+00:00",
+  "elapsedSeconds": 11.075092582999787,
+  "exitCode": 0,
+  "timingStatus": "OBSERVED",
+  "timedOut": false,
+  "executedInputDrift": false,
+  "inputHashes": {
+    "/opt/homebrew/opt/node@24/bin/node": "0d78c9bca217f53c2dc21a067246ee4a81c1f4fa111ee64d572b45fa1ff39189",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/experiments/g4-m1-main-integration/fault.mjs": "69557b1f546ded5125ac8b425eb3f8872c8d788a8246fd577f86f9551b1f5939",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-27/resource-manifest.json": "21ff5185eedcc3448e17badb1d602649830cf2f96823b77c438ee267d4a7e4b1",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261104-27/runtime.json": "6ffb112348f198e62bc5dfa6de945a4f3d856f67a8cd734a367836c10eb0cc17"
+  },
+  "manifestSha256": "21ff5185eedcc3448e17badb1d602649830cf2f96823b77c438ee267d4a7e4b1",
+  "commandSha256": "7029d41dfbcfc6cbc8a7806bc4e8f7519ef39d38208d4fcb2b1db3b12915e2f2",
+  "logSha256": "082f36fc708af02451fdb68b6062f9f054a0184aa34d9107d31c5bd37a199751",
+  "logBytes": 197,
+  "logVisibility": "PRIVATE"
+}

@@ -1,0 +1,51 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-27",
+  "testedCommit": "6b768b5e066760186882d1a385283dcf447fbcd4",
+  "projections": [
+    {
+      "projection": "schema",
+      "rows": [
+        "connections",
+        "governance",
+        "ontology",
+        "public"
+      ],
+      "sha256": "3ff53744139c19b2d9f84ace149692c52838d4ed2ff3b41482bab8e76ccd512d",
+      "containerId": "e06896004464a2367bccdf3111ab603b1f216c128920c285de7314f36da5b06a"
+    },
+    {
+      "projection": "tables",
+      "rows": [
+        "connections|CatalogJobs",
+        "connections|CatalogSnapshots",
+        "connections|ConnectionCommands",
+        "connections|ConnectionProbes",
+        "connections|ConnectionSecrets",
+        "connections|Connections",
+        "connections|__EFMigrationsHistory",
+        "governance|__EFMigrationsHistory",
+        "governance|audit_records",
+        "governance|server_sessions",
+        "governance|synthetic_resources",
+        "ontology|Assessments",
+        "ontology|Commands",
+        "ontology|Drafts",
+        "ontology|ImpactReports",
+        "ontology|Revisions",
+        "ontology|Validations",
+        "ontology|__EFMigrationsHistory"
+      ],
+      "sha256": "4746ba2de7db1979dd4c63e3432a1063a174f8e28c474f62573b0a35108040ff",
+      "containerId": "e06896004464a2367bccdf3111ab603b1f216c128920c285de7314f36da5b06a"
+    },
+    {
+      "projection": "connections-history",
+      "rows": [
+        "20261101115947_InitialConnections|10.0.13"
+      ],
+      "sha256": "ee0f3d3bc15098ee756055b3b7179ec3985fcc682aea2dc7b6f3b6c3d8a51919",
+      "containerId": "e06896004464a2367bccdf3111ab603b1f216c128920c285de7314f36da5b06a"
+    }
+  ]
+}

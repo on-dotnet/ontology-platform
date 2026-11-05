@@ -1,0 +1,38 @@
+{
+  "cases": [
+    {
+      "case": "DevelopmentHostExposesOnlyHealthEndpoints",
+      "status": "PASS",
+      "line": 1
+    },
+    {
+      "case": "UnhealthyDependencyFailsReadinessWithoutFailingLiveness",
+      "status": "PASS",
+      "line": 2
+    },
+    {
+      "case": "ProductionHostDoesNotExposeDevelopmentHealthEndpoints",
+      "status": "PASS",
+      "line": 3
+    },
+    {
+      "case": "DefaultHttpClientResolvesConfiguredServiceEndpoint",
+      "status": "PASS",
+      "line": 4
+    }
+  ],
+  "summary": {
+    "total": 4,
+    "PASS": 4,
+    "FAIL": 0,
+    "SKIP": 0
+  },
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-27",
+  "testedCommit": "6b768b5e066760186882d1a385283dcf447fbcd4",
+  "project": "InfrastructureTests",
+  "assemblySha256": "67d5674ef355e4ded4e5e6308b6a4a8923256561fc4f1d49f7e35d6b03815d6d",
+  "rawLogSha256": "79bd7277b1e5ca512f462e97df6ac2a11c9cf86af14936b19c973ee37cd4df9e",
+  "commandReceiptSha256": "1e0d0bed0df6d834ce3171f0609cba0e1b1f98694180891b37cdce65c38c1241",
+  "command": "baseline-InfrastructureTests"
+}

@@ -503,23 +503,44 @@ subprocess.run(base+['exec','-i',ident,'psql','-U','postgres','-d','fixture','-v
         rt.write_json(rt.ARTIFACTS/m['runId']/'credential-guard.json',{'pid':guard.pid,'exitCode':guard.returncode,'scriptSha256':rt.digest(script.encode()),'originalPasswordRestored':True})
 
 
+def source_role_state(m):
+    """只读捕获源夹具角色、成员和排序ACL；用于故障前后精确恢复比较。"""
+    return json.loads(sql(m,"""BEGIN READ ONLY;
+SELECT json_build_object('owner',pg_get_userbyid(c.relowner),
+'acl',(SELECT coalesce(json_agg(x ORDER BY x.grantee,x.grantor,x.privilege),'[]'::json) FROM
+ (SELECT CASE WHEN a.grantee=0 THEN 'PUBLIC' ELSE pg_get_userbyid(a.grantee) END AS grantee,pg_get_userbyid(a.grantor) AS grantor,a.privilege_type AS privilege,a.is_grantable AS grantable FROM aclexplode(c.relacl) a WHERE a.grantee<>c.relowner) x),
+'select',has_table_privilege('fixture_reader','production.heat_event','SELECT'),
+'write',has_table_privilege('fixture_reader','production.heat_event','INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER,MAINTAIN'),
+'schemaUsage',has_schema_privilege('fixture_reader','production','USAGE'),
+'role',(SELECT json_build_object('super',rolsuper,'createDb',rolcreatedb,'createRole',rolcreaterole,'inherit',rolinherit,'replication',rolreplication,'bypassRls',rolbypassrls,'login',rolcanlogin) FROM pg_roles WHERE rolname='fixture_reader'),
+'memberships',(SELECT coalesce(json_agg(json_build_object('role',pg_get_userbyid(roleid),'grantor',pg_get_userbyid(grantor),'admin',admin_option,'inherit',inherit_option,'set',set_option) ORDER BY roleid,grantor),'[]'::json) FROM pg_auth_members WHERE member=(SELECT oid FROM pg_roles WHERE rolname='fixture_reader')))
+FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='production' AND c.relname='heat_event'; COMMIT;""",source=True))
+
+
 def source_role_faults(m):
     """真实源角色与物理密码拒绝，逐例恢复后真实Probe复核。"""
-    r=rt.runtime_value(m);private=rt.private_dir(m['runId'])
-    faults=[('owner','ALTER TABLE production.heat_event OWNER TO fixture_reader;','ALTER TABLE production.heat_event OWNER TO postgres;','connection_readonly_unverified'),
+    before=source_role_state(m)
+    expected={'owner':'postgres','acl':[{'grantee':'fixture_reader','grantor':'postgres','privilege':'SELECT','grantable':False}], 'select':True,'write':False,'schemaUsage':True,'role':{'super':False,'createDb':False,'createRole':False,'inherit':False,'replication':False,'bypassRls':False,'login':True},'memberships':[]}
+    rt.write_json(rt.ARTIFACTS/m['runId']/'source-role-baseline.json',before)
+    rt.require(before==expected,'SOURCE_ROLE_BASELINE_DRIFT')
+    faults=[('owner','ALTER TABLE production.heat_event OWNER TO fixture_reader;','ALTER TABLE production.heat_event OWNER TO postgres; GRANT SELECT ON production.heat_event TO fixture_reader;','connection_readonly_unverified'),
         ('superuser','ALTER ROLE fixture_reader SUPERUSER;','ALTER ROLE fixture_reader NOSUPERUSER;','connection_readonly_unverified'),
         ('inherited-write','CREATE ROLE main_write_role NOLOGIN; GRANT UPDATE ON production.heat_event TO main_write_role; GRANT main_write_role TO fixture_reader; ALTER ROLE fixture_reader INHERIT;','ALTER ROLE fixture_reader NOINHERIT; REVOKE main_write_role FROM fixture_reader; REVOKE UPDATE ON production.heat_event FROM main_write_role; DROP ROLE main_write_role;','connection_readonly_unverified')]
     rows=[]
     for label,setup,restore,expected in faults:
-        sql(m,setup,source=True)
         try:
+            sql(m,setup,source=True)
             rt.update_runtime(m,expectedProbeDiagnostic=expected)
             result=action(m,'probe-denial','source-'+label)
             probe=identifier(result['probeId'])
             projection=json.loads(sql(m,'BEGIN READ ONLY; SELECT json_build_object(\'id\',"Id",\'status\',"ReportJson"::jsonb->>\'status\',\'stages\',"ReportJson"::jsonb->\'stages\') FROM connections."ConnectionProbes" WHERE "Id"=\''+probe+'\'; COMMIT;'))
             rt.require(projection['status']=='TEST_FAILED','ROLE_FAILURE_NOT_PERSISTED')
             rows.append({'name':label,'http':result,'persistent':projection})
-        finally:sql(m,restore,source=True)
+        finally:
+            sql(m,restore,source=True)
+            after=source_role_state(m)
+            rt.write_json(rt.ARTIFACTS/m['runId']/('source-role-'+label+'-restoration.json'),{'before':before,'after':after,'equal':after==before})
+            rt.require(after==before,'SOURCE_ROLE_RESTORATION_DRIFT')
         action(m,'probe-refresh','source-'+label+'-restored')
     rt.write_json(rt.ARTIFACTS/m['runId']/'source-role-faults.json',{'status':'PASS','cases':rows});return rows
 
@@ -777,6 +798,48 @@ def g3_compatibility(m):
         rt.require(after==before,'G3_OIDC_IDENTITY_NOT_RESTORED')
 
 
+def restore_oidc_identity(request, prefix, subject, original, profile):
+    """两项恢复独立尝试并各自回读，失败仅记录类别，不泄露身份正文。"""
+    result={}
+    for label,path,body in (('user',prefix+'/users/'+subject,original),('profile',prefix+'/users/profile',profile)):
+        try:
+            request('PUT',path,body)
+            observed=request('GET',path)
+            rt.require(observed.get('attributes')==body.get('attributes') if label=='user' else observed==body,'IDENTITY_RESTORE_READBACK')
+            result[label]={'status':'PASS'}
+        except Exception as failure:result[label]={'status':'FAIL','category':type(failure).__name__}
+    return result
+
+
+def cross_org_restore_guard(path, parent_pid):
+    """父进程退出、请求兜底或有界期限到达时，重新认证后独立恢复两项身份。"""
+    import urllib.request,urllib.parse
+    path=Path(path);value=json.loads(path.read_text());rid=value['runId']
+    rt.require(value['taskId']==rt.TASK and re.fullmatch('b-continue-[0-9]{8}-[0-9]{2}',rid),'GUARD_TASK')
+    private=rt.private_dir(rid);rt.boundary(path,private,exists=True,private=True)
+    rt.require(path==private/'cross-org-independent-restore.json' and re.fullmatch('g2-[a-f0-9]+',value['realm']) and re.fullmatch('[a-f0-9-]{36}',value['subject']),'GUARD_BOUNDARY')
+    deadline=time.monotonic()+960;signal=private/'cross-org-restore-request.json'
+    while os.getppid()==parent_pid and not signal.exists() and time.monotonic()<deadline:time.sleep(.25)
+    rt.verify_engine({'runId':rid});rt.inspect_owned({'runId':rid},value['keycloakId'],'keycloak-test')
+    class NoRedirect(urllib.request.HTTPRedirectHandler):
+        def redirect_request(self,*args,**kwargs):return None
+    opener=urllib.request.build_opener(urllib.request.ProxyHandler({}),NoRedirect())
+    prefix='/admin/realms/'+value['realm']
+    def request(method,route,body=None):
+        rt.require(route in (prefix+'/users/'+value['subject'],prefix+'/users/profile'),'GUARD_ROUTE')
+        # 每次请求取新token；某项认证或写入失败不阻止另一恢复项独立尝试。
+        password=rt.boundary(private/'keycloak-password',private,exists=True,private=True).read_text()
+        data=urllib.parse.urlencode({'grant_type':'password','client_id':'admin-cli','username':'wave2-bootstrap','password':password}).encode()
+        with opener.open(urllib.request.Request('http://localhost:15180/realms/master/protocol/openid-connect/token',data=data,headers={'Content-Type':'application/x-www-form-urlencoded'},method='POST'),timeout=8) as response:
+            raw=response.read(1024*1024+1);rt.require(len(raw)<=1024*1024,'GUARD_TOKEN_LIMIT');token=json.loads(raw)['access_token']
+        req=urllib.request.Request('http://localhost:15180'+route,data=json.dumps(body).encode() if body is not None else None,headers={'Authorization':'Bearer '+token,'Content-Type':'application/json'},method=method)
+        with opener.open(req,timeout=8) as response:
+            raw=response.read(1024*1024+1);rt.require(len(raw)<=1024*1024,'GUARD_RESPONSE_LIMIT');return json.loads(raw) if raw else None
+    result=restore_oidc_identity(request,prefix,value['subject'],value['user'],value['profile'])
+    rt.write_json(rt.ARTIFACTS/rid/'cross-org-guard-restoration.json',{'restoration':result,'status':'PASS' if all(x['status']=='PASS' for x in result.values()) else 'FAIL'})
+    rt.require(all(x['status']=='PASS' for x in result.values()),'GUARD_RESTORE_FAILED')
+
+
 def cross_org_secret(m):
     """同一真实OIDC subject改变合成组织，再验证旧组织Ref不能消费，最后复原。"""
     import copy
@@ -788,12 +851,15 @@ def cross_org_secret(m):
     name=realm['authority'].rsplit('/',1)[-1];rt.require(re.fullmatch('g2-[a-f0-9]+',name),'EXACT_SYNTHETIC_REALM')
     issued=json.loads((private/'cross-org-ref.json').read_text());ref=identifier(issued['secretRef']);subject=issued['subjectId']
     rt.require(re.fullmatch('[a-f0-9-]{36}',subject),'SUBJECT_ID')
-    token=None
+    token=None;token_time=0
     class NoRedirect(urllib.request.HTTPRedirectHandler):
         def redirect_request(self,*args,**kwargs):return None
     opener=urllib.request.build_opener(urllib.request.ProxyHandler({}),NoRedirect())
     def request(method,path,value=None,form=False):
+        nonlocal token,token_time
         rt.require(path=='/realms/master/protocol/openid-connect/token' or path.startswith('/admin/realms/'+name+'/'),'ADMIN_REALM_BOUNDARY')
+        if path.startswith('/admin/') and (token is None or time.monotonic()-token_time>20):
+            token=request('POST','/realms/master/protocol/openid-connect/token',{'grant_type':'password','client_id':'admin-cli','username':'wave2-bootstrap','password':(private/'keycloak-password').read_text()},True)['access_token'];token_time=time.monotonic()
         data=(urllib.parse.urlencode(value).encode() if form else json.dumps(value).encode()) if value is not None else None
         headers={'Content-Type':'application/x-www-form-urlencoded' if form else 'application/json'}
         if token:headers['Authorization']='Bearer '+token
@@ -808,19 +874,9 @@ def cross_org_secret(m):
     original=request('GET',prefix+'/users/'+subject)
     original.setdefault('attributes',{}).update(organization_id=['org-demo'],site_ids=['site-a'])
     restore_file=private/'cross-org-independent-restore.json'
-    rt.write_json(restore_file,{'taskId':rt.TASK,'runId':m['runId'],'realm':name,'subject':subject,'profile':profile,'user':original,'token':token,'keycloakId':r['containerIds']['keycloak-test']},private=True)
-    script=r'''import json,sys,pathlib,subprocess,time,urllib.request
-path=pathlib.Path(sys.argv[1]);time.sleep(45);value=json.loads(path.read_text());assert not path.is_symlink() and path.stat().st_mode&0o077==0
-ident=value['keycloakId'];p=subprocess.run(['docker','--context','desktop-linux','inspect',ident],capture_output=True,check=True,timeout=5);item=json.loads(p.stdout)[0]
-assert item['Id']==ident and item['Config']['Labels']['ontology.task-id']==value['taskId'] and item['Config']['Labels']['ontology.run-id']==value['runId']
-class NoRedirect(urllib.request.HTTPRedirectHandler):
- def redirect_request(self,*args,**kwargs):return None
-opener=urllib.request.build_opener(urllib.request.ProxyHandler({}),NoRedirect())
-for suffix,body in [('users/'+value['subject'],value['user']),('users/profile',value['profile'])]:
- req=urllib.request.Request('http://localhost:15180/admin/realms/'+value['realm']+'/'+suffix,data=json.dumps(body).encode(),headers={'Authorization':'Bearer '+value['token'],'Content-Type':'application/json'},method='PUT')
- with opener.open(req,timeout=8) as response:assert response.status==204
-'''
-    guard=subprocess.Popen([__import__('sys').executable,'-B','-c',script,str(restore_file)],start_new_session=True,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+    rt.write_json(restore_file,{'taskId':rt.TASK,'runId':m['runId'],'realm':name,'subject':subject,'profile':profile,'user':original,'keycloakId':r['containerIds']['keycloak-test']},private=True)
+    script="import sys;sys.path.insert(0,sys.argv[3]);import readback;readback.cross_org_restore_guard(sys.argv[1],int(sys.argv[2]))"
+    guard=subprocess.Popen([__import__('sys').executable,'-B','-c',script,str(restore_file),str(os.getpid()),str(rt.HERE)],start_new_session=True,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
     changed=False;result={'status':'FAIL','restoreGuardPid':guard.pid,'restoreGuardScriptSha256':rt.digest(script.encode())}
     try:
         request('PUT',prefix+'/users/profile',desired)
@@ -837,15 +893,24 @@ for suffix,body in [('users/'+value['subject'],value['user']),('users/profile',v
         rt.require(unused=='1','CROSS_ORG_SECRET_CONSUMED')
         result.update(status='PASS',originalReferenceUnused=True,subjectSha256=rt.digest(subject.encode()),referenceSha256=rt.digest(ref.encode()))
     finally:
-        if original is not None:
-            request('PUT',prefix+'/users/'+subject,original)
-            rt.require(request('GET',prefix+'/users/'+subject)['attributes']==original['attributes'],'ORG_NOT_RESTORED')
-        request('PUT',prefix+'/users/profile',profile)
-        rt.require(request('GET',prefix+'/users/profile')==profile,'PROFILE_NOT_RESTORED')
-        result['restored']=True
-        if guard.poll() is None:guard.terminate();guard.wait(timeout=5)
-        result['restoreGuardExitCode']=guard.returncode
-        rt.write_json(rt.ARTIFACTS/m['runId']/'cross-org.json',result)
+        result['restoration']=restore_oidc_identity(request,prefix,subject,original,profile)
+        result['restored']=all(x['status']=='PASS' for x in result['restoration'].values())
+        try:
+            if guard.poll() is None:
+                if result['restored']:guard.terminate();guard.wait(timeout=5)
+                else:
+                    rt.write_json(private/'cross-org-restore-request.json',{'taskId':rt.TASK,'runId':m['runId']},private=True)
+                    guard.wait(timeout=75)
+            result['restoreGuardExitCode']=guard.returncode
+        except Exception as failure:
+            result['guardReleaseFailure']=type(failure).__name__;result['restored']=False
+        finally:
+            if guard.poll() is None:
+                guard.kill();guard.wait(timeout=5)
+            result['restoreGuardExitCode']=guard.returncode
+            if not result['restored']:result['status']='FAIL'
+            rt.write_json(rt.ARTIFACTS/m['runId']/'cross-org.json',result)
+        rt.require(result['restored'],'CROSS_ORG_RESTORE_FAILED')
     action(m,'original-identity-check','cross-org-restored')
     return result
 

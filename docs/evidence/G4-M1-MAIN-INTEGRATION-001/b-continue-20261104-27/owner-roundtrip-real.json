@@ -1,0 +1,71 @@
+{
+  "scope": "DIAGNOSTIC_ONLY_UNCOMMITTED_DRIVER",
+  "before": {
+    "owner": "postgres",
+    "acl": [
+      {
+        "grantee": "fixture_reader",
+        "grantor": "postgres",
+        "privilege": "SELECT",
+        "grantable": false
+      }
+    ],
+    "select": true,
+    "write": false,
+    "schemaUsage": true,
+    "role": {
+      "super": false,
+      "createDb": false,
+      "createRole": false,
+      "inherit": false,
+      "replication": false,
+      "bypassRls": false,
+      "login": true
+    },
+    "memberships": []
+  },
+  "injected": {
+    "owner": "fixture_reader",
+    "acl": [],
+    "select": true,
+    "write": true,
+    "schemaUsage": true,
+    "role": {
+      "super": false,
+      "createDb": false,
+      "createRole": false,
+      "inherit": false,
+      "replication": false,
+      "bypassRls": false,
+      "login": true
+    },
+    "memberships": []
+  },
+  "after": {
+    "owner": "postgres",
+    "acl": [
+      {
+        "grantee": "fixture_reader",
+        "grantor": "postgres",
+        "privilege": "SELECT",
+        "grantable": false
+      }
+    ],
+    "select": true,
+    "write": false,
+    "schemaUsage": true,
+    "role": {
+      "super": false,
+      "createDb": false,
+      "createRole": false,
+      "inherit": false,
+      "replication": false,
+      "bypassRls": false,
+      "login": true
+    },
+    "memberships": []
+  },
+  "equal": true,
+  "driverSha256": "e82181b89244020cc5d22c36510c826c496e7d852c9ea9faef5399d62c1000a7",
+  "helperSha256": "d6491297c67a06b119dbf220cb8a125d882f2cd21d9609f6646b2fa69b6def19"
+}

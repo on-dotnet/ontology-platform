@@ -1,0 +1,120 @@
+{
+  "source": {
+    "owner": "postgres",
+    "acl": "{postgres=arwdDxtm/postgres}",
+    "select": false,
+    "write": false,
+    "schemaUsage": true
+  },
+  "probes": [
+    {
+      "id": "a4670c22a70f42b69a57069ef903e5e7",
+      "status": "TEST_OK",
+      "stages": [
+        {
+          "name": "NETWORK",
+          "status": "PASS",
+          "durationMs": 0,
+          "diagnosticCode": null
+        },
+        {
+          "name": "TLS",
+          "status": "PASS",
+          "durationMs": 1,
+          "diagnosticCode": null
+        },
+        {
+          "name": "AUTH",
+          "status": "PASS",
+          "durationMs": 3,
+          "diagnosticCode": null
+        },
+        {
+          "name": "READ_ONLY",
+          "status": "PASS",
+          "durationMs": 2,
+          "diagnosticCode": null
+        },
+        {
+          "name": "METADATA",
+          "status": "PASS",
+          "durationMs": 1,
+          "diagnosticCode": null
+        }
+      ]
+    },
+    {
+      "id": "762cc90dd3854bab945d989ede495687",
+      "status": "TEST_FAILED",
+      "stages": [
+        {
+          "name": "NETWORK",
+          "status": "PASS",
+          "durationMs": 0,
+          "diagnosticCode": null
+        },
+        {
+          "name": "TLS",
+          "status": "PASS",
+          "durationMs": 2,
+          "diagnosticCode": null
+        },
+        {
+          "name": "AUTH",
+          "status": "PASS",
+          "durationMs": 3,
+          "diagnosticCode": null
+        },
+        {
+          "name": "READ_ONLY",
+          "status": "FAIL",
+          "durationMs": 1,
+          "diagnosticCode": "connection_readonly_unverified"
+        },
+        {
+          "name": "METADATA",
+          "status": "NOT_RUN",
+          "durationMs": 0,
+          "diagnosticCode": null
+        }
+      ]
+    },
+    {
+      "id": "46b7cf234e384e8e8c41e43036563cb0",
+      "status": "TEST_FAILED",
+      "stages": [
+        {
+          "name": "NETWORK",
+          "status": "PASS",
+          "durationMs": 0,
+          "diagnosticCode": null
+        },
+        {
+          "name": "TLS",
+          "status": "PASS",
+          "durationMs": 2,
+          "diagnosticCode": null
+        },
+        {
+          "name": "AUTH",
+          "status": "PASS",
+          "durationMs": 3,
+          "diagnosticCode": null
+        },
+        {
+          "name": "READ_ONLY",
+          "status": "PASS",
+          "durationMs": 2,
+          "diagnosticCode": null
+        },
+        {
+          "name": "METADATA",
+          "status": "FAIL",
+          "durationMs": 1,
+          "diagnosticCode": "catalog_permission_limited"
+        }
+      ]
+    }
+  ],
+  "buildUnchanged": true
+}

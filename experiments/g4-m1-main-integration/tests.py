@@ -675,6 +675,97 @@ class RecoveryGuardTests(unittest.TestCase):
                 child.stdout.close();child.stderr.close()
 
 
+class SourceRoleRestorationTests(unittest.TestCase):
+    def test_independent_identity_guard_renews_tokens_and_continues_after_failure(self):
+        import readback,copy,urllib.request
+        from unittest.mock import patch
+        rid='b-continue-20990101-98';subject='11111111-1111-1111-1111-111111111111'
+        for fail in (None,'user-auth','user-put','user-read'):
+            with self.subTest(fail=fail),tempfile.TemporaryDirectory(dir=ARTIFACTS) as directory:
+                root=Path(directory);private=root/'private';private.mkdir(mode=0o700);(root/rid).mkdir()
+                original={'attributes':{'organization_id':['org-demo']}};profile={'attributes':[]}
+                path=private/'cross-org-independent-restore.json';path.write_text(json.dumps({'taskId':readback.rt.TASK,'runId':rid,'realm':'g2-0123456789abcdef','subject':subject,'user':original,'profile':profile,'keycloakId':'a'*64}));path.chmod(0o600)
+                password=private/'keycloak-password';password.write_text('synthetic');password.chmod(0o600)
+                events=[];state={};tokens=[]
+                class Response:
+                    def __init__(self,value):self.value=value
+                    def __enter__(self):return self
+                    def __exit__(self,*args):pass
+                    def read(self,n):return json.dumps(self.value).encode() if self.value is not None else b''
+                class Opener:
+                    def open(self,req,timeout):
+                        route=req.full_url;method=req.get_method()
+                        if route.endswith('/token'):
+                            tokens.append('fresh-'+str(len(tokens)));events.append('auth')
+                            if fail=='user-auth' and len(tokens)==1:raise OSError('auth failure')
+                            return Response({'access_token':tokens[-1]})
+                        assert req.get_header('Authorization')=='Bearer '+tokens[-1]
+                        key='profile' if route.endswith('/profile') else 'user';events.append(key+'-'+method)
+                        if fail==key+'-'+('put' if method=='PUT' else 'read'):raise OSError('request failure')
+                        if method=='PUT':state[key]=json.loads(req.data);return Response(None)
+                        return Response(copy.deepcopy(state[key]))
+                with patch.object(readback.rt,'private_dir',return_value=private),patch.object(readback.rt,'ARTIFACTS',root),patch.object(readback.rt,'verify_engine'),patch.object(readback.rt,'inspect_owned'),patch.object(urllib.request,'build_opener',return_value=Opener()):
+                    if fail:
+                        with self.assertRaisesRegex(ValueError,'GUARD_RESTORE_FAILED'):readback.cross_org_restore_guard(path,0)
+                    else:readback.cross_org_restore_guard(path,0)
+                self.assertEqual(state['profile'],profile);self.assertIn('profile-GET',events)
+                receipt=json.loads((root/rid/'cross-org-guard-restoration.json').read_text());self.assertEqual(receipt['status'],'FAIL' if fail else 'PASS')
+                self.assertEqual(len(tokens),len([x for x in events if x=='auth']))
+                self.assertGreaterEqual(len(tokens),3)
+
+    def test_identity_restoration_attempts_both_objects_and_rejects_drift(self):
+        import readback,copy
+        user={'attributes':{'organization_id':['org-demo']}};profile={'attributes':[]};base='/admin/realms/g2-0123456789abcdef';subject='11111111-1111-1111-1111-111111111111'
+        for mode in ('pass','user-put','user-read','profile-put','profile-read'):
+            with self.subTest(mode=mode):
+                events=[];state={}
+                def request(method,path,value=None):
+                    key='profile' if path.endswith('/profile') else 'user';events.append((method,key))
+                    if mode==key+'-'+('put' if method=='PUT' else 'read'):raise OSError('synthetic request failure')
+                    if method=='PUT':state[key]=copy.deepcopy(value)
+                    else:return copy.deepcopy(state[key])
+                result=readback.restore_oidc_identity(request,base,subject,user,profile)
+                self.assertIn(('PUT','user'),events);self.assertIn(('PUT','profile'),events)
+                self.assertEqual(all(x['status']=='PASS' for x in result.values()),mode=='pass')
+                if mode.startswith('user-'):self.assertEqual(state['profile'],profile)
+
+    def test_owner_roundtrip_and_failure_restore_exact_baseline(self):
+        import copy
+        import readback
+        from unittest.mock import patch
+        baseline={'owner':'postgres','acl':[{'grantee':'fixture_reader','grantor':'postgres','privilege':'SELECT','grantable':False}], 'select':True,'write':False,'schemaUsage':True,'role':{'super':False,'createDb':False,'createRole':False,'inherit':False,'replication':False,'bypassRls':False,'login':True},'memberships':[]}
+        for mode in ('pass','http-failure','db-failure','missing-select','extra-write','role-drift','restore-failure','bad-baseline'):
+            with self.subTest(mode=mode),tempfile.TemporaryDirectory(dir=ARTIFACTS) as d:
+                state=copy.deepcopy(baseline);events=[]
+                if mode=='bad-baseline':state['select']=False
+                def database(m,command,source=False):
+                    if 'json_build_object' in command and source:return json.dumps(state)
+                    if not source:
+                        if mode=='db-failure':raise ValueError('DB_FAILURE')
+                        return json.dumps({'status':'TEST_FAILED','stages':[]})
+                    events.append(command)
+                    if 'OWNER TO fixture_reader' in command:state['owner']='fixture_reader';state['select']=False
+                    if 'OWNER TO postgres' in command:
+                        if mode=='restore-failure':raise ValueError('RESTORE_FAILURE')
+                        state['owner']='postgres'
+                        if 'GRANT SELECT' in command and mode!='missing-select':state['select']=True
+                        if mode=='extra-write':state['write']=True
+                        if mode=='role-drift':state['role']['inherit']=True
+                    return ''
+                def http(m,name,label):
+                    if mode=='http-failure':raise ValueError('HTTP_FAILURE')
+                    if name=='probe-refresh':self.assertEqual(state,baseline)
+                    return {'probeId':'a'*32}
+                m={'runId':'fixture','_head':'b'*40};(Path(d)/'fixture').mkdir()
+                with patch.object(readback.rt,'ARTIFACTS',Path(d)),patch.object(readback.rt,'runtime_value',return_value={}),patch.object(readback.rt,'private_dir',return_value=Path(d)),patch.object(readback.rt,'update_runtime'),patch.object(readback,'sql',side_effect=database),patch.object(readback,'action',side_effect=http):
+                    if mode=='pass':self.assertEqual(len(readback.source_role_faults(m)),3)
+                    else:
+                        with self.assertRaises(ValueError):readback.source_role_faults(m)
+                if mode in ('http-failure','db-failure'):self.assertEqual(state,baseline)
+                if mode=='bad-baseline':self.assertEqual(events,[])
+                if mode!='pass':self.assertFalse((Path(d)/'fixture/source-role-faults.json').exists())
+
+
 class SourceIoWitnessTests(unittest.TestCase):
     def test_health_connections_are_separate_and_reader_drift_is_rejected(self):
         import readback

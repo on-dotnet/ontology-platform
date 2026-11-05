@@ -1,0 +1,18 @@
+{
+  "reviewer": "/root/consumer_review",
+  "author": false,
+  "status": "PASS",
+  "openP0P1": false,
+  "sourceHashes": {
+    "readback.py": "e82181b89244020cc5d22c36510c826c496e7d852c9ea9faef5399d62c1000a7",
+    "tests.py": "92736c6da57ba20f0904ef358110f4ef04b556fddeec9a15076617e8a57a7db5"
+  },
+  "tests": {
+    "count": 59,
+    "seconds": 6.413,
+    "sha256": "04f01903f66b85ec540bd666457490f8288a9cadf3d46aa0b3f55f1b5995dfc5"
+  },
+  "realRoundtripSha256": "8c8a99d8ec39176fe7cfd41962be4a642b41021b0de6f5f881cffe6cd1f487af",
+  "scope": "task owner ACL restoration only; Run27 I06 remains BLOCKED; new T required",
+  "limitation": "Restoration comparison receipt requires successful restore SQL and post-read; either exception propagates without PASS. Not every finally produces a receipt."
+}

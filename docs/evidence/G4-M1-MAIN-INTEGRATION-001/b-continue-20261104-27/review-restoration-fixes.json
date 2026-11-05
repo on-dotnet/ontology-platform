@@ -1,0 +1,21 @@
+{
+  "reviewer": "/root/consumer_review",
+  "status": "PASS",
+  "scope": "task source owner ACL and cross-org restoration only; no product changes",
+  "closedFindings": [
+    "owner ACL restoration",
+    "cross-org chained restoration failure"
+  ],
+  "sourceHashes": {
+    "readback.py": "e7b4452fd5e2c115337b8313ebe7bb0f91fd8ab8e6ed368bc77fe596011e64a0",
+    "tests.py": "08f2b16bf9db7ffd2de81612196e278c76f58f09ee490a220cfb22c5dbbf8fec"
+  },
+  "tests": {
+    "count": 61,
+    "seconds": 5.408,
+    "sha256": "abd715323edf3d73059e223295a20cbb95878b681107756c42f809fa2a8947e0"
+  },
+  "formalI06": "BLOCKED_ORIGINAL_PRESERVED",
+  "newStableTRequired": true,
+  "limitation": "Owner restore SQL/post-read exceptions propagate without PASS; comparison receipt only created when those two operations succeed. Real cross-org NOT_RUN."
+}
