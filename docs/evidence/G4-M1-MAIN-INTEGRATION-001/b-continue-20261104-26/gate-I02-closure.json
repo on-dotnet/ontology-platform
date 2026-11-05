@@ -1,0 +1,71 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-26",
+  "testedCommit": "ac3db40fe8cb99871d02b197f3d41969823a647e",
+  "manifestSha256": "0948126be3b9db2b7bcbdd45deed72bd10b4927850eb77dc101f2ebf8e6a7af1",
+  "originalReceiptSha256": "76425c1039ae89cdfcc3f493e33c068de1e09e411718e3dd29f4a1246a9b0f60",
+  "reviewReceiptSha256": "9eb8b20abfa9e620bcae4a5a6574e0ec902035807f6f23f671d808ec894a72c5",
+  "closureEvidenceHashes": {
+    "gate-I02.json": "76425c1039ae89cdfcc3f493e33c068de1e09e411718e3dd29f4a1246a9b0f60",
+    "g3-fixture-resume-result.json": "11b734cef2911527b856280c59124b510aadd810028250fb42cd85cb2f8e0fe8",
+    "actual-v2-input.json": "7d55149c0bb576e88b28296d3a2aa3e72687f98974c19cab017adb5c49fc78e6",
+    "g3-identity-transition.json": "27252d14fbbd9a9bb5b39e3cafa6b7480043b810b0452a82d9f34d8b0d23f174",
+    "case-projections/g3-fixture-SecurityTests.json": "c32eef93781124d9dfe0c557acf4fd5d461fd56f7c47c70e5d5d7522b8168689",
+    "case-projections/g3-fixture-G2ContractTests.json": "8efad036a973d35df74e38498f19724b520c721f5685cfdc63a0ac89f2fb2651"
+  },
+  "result": {
+    "status": "PASS",
+    "modules": [
+      {
+        "project": "SemanticTests",
+        "status": "PASS",
+        "total": 302,
+        "evidence": "module-method-results-SemanticTests.json",
+        "sha256": "fb35fc824252afd9de697a0b73ad2b13c25fbaeb84a9b95cffb30fe672e59551"
+      },
+      {
+        "project": "PublishingTests",
+        "status": "PASS",
+        "total": 78,
+        "evidence": "module-method-results-PublishingTests.json",
+        "sha256": "d55e1f06adc850bbce42cff2ee67c93b1f31cbe51a0cf5bf8aedeab531385561"
+      },
+      {
+        "project": "QueryTests",
+        "status": "PASS",
+        "total": 49,
+        "evidence": "module-method-results-QueryTests.json",
+        "sha256": "abcb8ecf91af173bf5bd9cc382671aafafba53f68e36c3cdf830a47c9b7fe49b"
+      },
+      {
+        "project": "AgentTests",
+        "status": "PASS",
+        "total": 33,
+        "evidence": "module-method-results-AgentTests.json",
+        "sha256": "1d28018aab3d4647d298cea4b1fe7abf05f7543282b9d3396266ad552ecdbe98"
+      }
+    ],
+    "compatibility": {
+      "status": "PASS",
+      "checks": 38,
+      "sourceReportSha256": "3e348bd192ed7452bb91c81365996f309a7107bd68237247365be91c68efeb50",
+      "identityRestored": true
+    },
+    "securityAndManifest": [
+      {
+        "total": 156,
+        "PASS": 156,
+        "FAIL": 0,
+        "SKIP": 0
+      },
+      {
+        "total": 121,
+        "PASS": 121,
+        "FAIL": 0,
+        "SKIP": 0
+      }
+    ],
+    "originalFailureRetained": true,
+    "baselineHistoricalFixtureUse": "I01 baseline consumed prior Run25 generated manifest; current Run26 actual input fully retested"
+  }
+}

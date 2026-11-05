@@ -1,0 +1,88 @@
+{
+  "scope": "READ_ONLY_LOGIN_ENTRY_DIAGNOSTIC",
+  "status": 200,
+  "url": {
+    "origin": "http://localhost:15180",
+    "path": "/realms/g2-a96f316d28e6f4b1/login-actions/authenticate",
+    "queryKeys": [
+      "client_id",
+      "tab_id",
+      "client_data"
+    ]
+  },
+  "title": "Sign in to g2-a96f316d28e6f4b1",
+  "usernameInputs": 1,
+  "bodyCategory": {
+    "badGateway": false,
+    "internalServerError": false,
+    "invalidRedirect": false,
+    "errorText": false
+  },
+  "responses": [
+    {
+      "origin": "http://localhost:15100",
+      "path": "/auth/login",
+      "status": 302
+    },
+    {
+      "origin": "http://localhost:15180",
+      "path": "/realms/g2-a96f316d28e6f4b1/protocol/openid-connect/auth",
+      "status": 302
+    },
+    {
+      "origin": "http://localhost:15180",
+      "path": "/realms/g2-a96f316d28e6f4b1/login-actions/authenticate",
+      "status": 200
+    },
+    {
+      "origin": "http://localhost:15180",
+      "path": "/resources/69b2f/common/keycloak/vendor/patternfly-v5/patternfly.min.css",
+      "status": 200
+    },
+    {
+      "origin": "http://localhost:15180",
+      "path": "/resources/69b2f/login/keycloak.v2/css/styles.css",
+      "status": 200
+    },
+    {
+      "origin": "http://localhost:15180",
+      "path": "/resources/69b2f/common/keycloak/vendor/patternfly-v5/patternfly-addons.css",
+      "status": 200
+    },
+    {
+      "origin": "http://localhost:15180",
+      "path": "/resources/69b2f/login/keycloak.v2/img/keycloak-bg-darken.svg",
+      "status": 200
+    },
+    {
+      "origin": "http://localhost:15180",
+      "path": "/resources/69b2f/login/keycloak.v2/js/passwordVisibility.js",
+      "status": 200
+    },
+    {
+      "origin": "http://localhost:15180",
+      "path": "/resources/69b2f/login/keycloak.v2/js/authChecker.js",
+      "status": 200
+    },
+    {
+      "origin": "http://localhost:15180",
+      "path": "/resources/69b2f/common/keycloak/vendor/patternfly-v5/assets/fonts/RedHatText/RedHatText-Regular.woff2",
+      "status": 200
+    },
+    {
+      "origin": "http://localhost:15180",
+      "path": "/resources/69b2f/common/keycloak/vendor/patternfly-v5/assets/fonts/RedHatDisplay/RedHatDisplay-Medium.woff2",
+      "status": 200
+    },
+    {
+      "origin": "http://localhost:15180",
+      "path": "/resources/69b2f/common/keycloak/vendor/patternfly-v5/assets/fonts/RedHatText/RedHatText-Medium.woff2",
+      "status": 200
+    },
+    {
+      "origin": "http://localhost:15180",
+      "path": "/resources/69b2f/common/keycloak/vendor/patternfly-v5/assets/fonts/webfonts/fa-solid-900.woff2",
+      "status": 200
+    }
+  ]
+}

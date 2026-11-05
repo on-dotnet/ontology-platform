@@ -46,9 +46,45 @@ def replace_config(m, config, name):
 
 
 def restart(m):
+    """API健康重启后同步共享其网络的Web；实际命名空间及OIDC跳转均须重验。"""
+    import re
+    import urllib.request
+    import urllib.error
+    import urllib.parse
     ident=rt.runtime_value(m)['containerIds']['api'];rt.inspect_owned(m,ident,'api')
     rt.docker(m,['restart',ident])
     rt.wait_http('http://localhost:15100/health/live',60,headers={'X-Health-Key':rt.runtime_value(m)['healthKey']})
+    r=rt.runtime_value(m);web=r['containerIds']['web']
+    api_item=rt.inspect_owned(m,ident,'api');web_item=rt.inspect_owned(m,web,'web')
+    rt.require(web_item['HostConfig']['NetworkMode']=='container:'+ident,'WEB_NETWORK_OWNER')
+    def namespaces():
+        values={name:rt.docker(m,['exec',value,'readlink','/proc/1/ns/net']).decode().strip() for name,value in [('api',ident),('web',web)]}
+        rt.require(all(re.fullmatch(r'net:\[[0-9]+\]',value) for value in values.values()),'WEB_NETWORK_NAMESPACE_FORMAT')
+        return values
+    before=namespaces();version=rt.digest(api_item['State']['StartedAt'].encode())[:16]
+    rt.execute(m,'migration-web-restart-'+version,['docker','--context','desktop-linux','restart',web],timeout=40)
+    current=rt.inspect_owned(m,web,'web');api_after=rt.inspect_owned(m,ident,'api')
+    rt.require(current['Id']==web and current['Created']==web_item['Created'] and current['State']['Running'] and api_after['State']['StartedAt']==api_item['State']['StartedAt'],'WEB_RESTART_VERSION')
+    after=namespaces();rt.require(after['api']==after['web'],'WEB_NETWORK_NAMESPACE')
+    realm=json.loads(__import__('pathlib').Path(r['realmFile']).read_text());expected=urllib.parse.urlsplit(realm['authority'])
+    class NoRedirect(urllib.request.HTTPRedirectHandler):
+        def redirect_request(self,*args,**kwargs):return None
+    opener=urllib.request.build_opener(urllib.request.ProxyHandler({}),NoRedirect());deadline=time.monotonic()+15
+    while True:
+        try:
+            response=opener.open(urllib.request.Request('http://localhost:15100/auth/login?returnUrl=%2Fdata%2Fconnections'),timeout=2)
+        except urllib.error.HTTPError as error:
+            response=error
+        except urllib.error.URLError:
+            rt.require(time.monotonic()<deadline,'WEB_OIDC_READY_TIMEOUT');time.sleep(.2);continue
+        try:
+            if response.code==500:
+                rt.require(time.monotonic()<deadline,'WEB_OIDC_READY_TIMEOUT');time.sleep(.2);continue
+            target=urllib.parse.urlsplit(response.headers.get('Location',''))
+            rt.require(response.code==302 and (target.scheme,target.netloc,target.path)==(expected.scheme,expected.netloc,expected.path+'/protocol/openid-connect/auth'),'WEB_OIDC_REDIRECT')
+            break
+        finally:response.close()
+    rt.write_json(rt.ARTIFACTS/m['runId']/('migration-web-namespace-'+version+'.json'),{'taskId':rt.TASK,'runId':m['runId'],'testedCommit':m['_head'],'apiId':ident,'webId':web,'apiStartedAt':api_item['State']['StartedAt'],'before':before,'after':after,'loginStatus':302,'queryValues':'NOT_RECORDED'})
 
 
 def retire_g3_volumes(m, registered, *, apply=False):

@@ -1,0 +1,29 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-26",
+  "testedCommit": "ac3db40fe8cb99871d02b197f3d41969823a647e",
+  "status": "BLOCKED_WITH_WITNESS",
+  "gates": {
+    "R2": "PASS",
+    "PREFLIGHT": "PASS",
+    "I01": "PARTIAL",
+    "I02": "BLOCKED_WITH_WITNESS",
+    "I03": "PARTIAL",
+    "I04": "PASS",
+    "I05": "PASS",
+    "I06": "BLOCKED_WITH_WITNESS"
+  },
+  "I02Closure": "PASS after independently reviewed same-T unexecuted fixture resume; original BLOCKED retained",
+  "notRun": [
+    "I07",
+    "I08"
+  ],
+  "I06Completed": "real PG TLS/ACL12 + seven public-schema cases + wrong-SAN1 PASS",
+  "I06Failure": "HTTP baseline login input timeout; no HTTP checks executed",
+  "diagnostic": "API restarted during I04 while Web retained previous network namespace; same-ID Web restart restored exact OIDC form; source/build/config unchanged during first diagnosis",
+  "taskFixes": "three files: synchronize Web on healthy API restart and validate actual namespace/issuer; losslessly archive and retire current generated V2 fixture; 58 task tests PASS plus independent review",
+  "newTRequired": true,
+  "main": "NOT_UPDATED",
+  "M2": "NOT_STARTED",
+  "packageCapacity": "existing 15MiB limit unchanged; no V3 created"
+}

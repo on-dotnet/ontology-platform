@@ -129,3 +129,12 @@ I04在CREATE权限负例停止：真实日志准确42501/connections/permission 
 本轮四模块28对象、G3切换退役6对象、诊断旧Web/API及最终10对象均按准确登记完成回收，最终零容器、KEEP3网络8卷保持。monitor96363实际释放，锁屏/熄屏240次重叠心跳已观测，完整会话连续性仍NOT_VERIFIED。包容量只读预估已超过15MiB（估计26.44MiB且不含后续证据/元数据），未构包、不修改硬限制或删历史。继续独立产品验收，最终I08如受阻须单列具体审批；main/M2未执行。
 
 Run25四工具副本首版因占用拒绝，0删除；新v2冻结当前VM PID15481完整身份及553只读FD集合，独立审查后实际回收26919文件/512583869逻辑字节，四路径lstat ENOENT，事故KEEP不变。系统VM未操作，物理空间/FD释放NOT_VERIFIED。精确计划、原拒绝及实际日志均保留。
+
+
+Run26 / Tac3db40fe8cb99871d02b197f3d41969823a647e：R1/R2独立PASS（Restore5.605秒），PREFLIGHT通过，原27套SelfTest393.631秒exit0、56任务测试及native/Web通过，基线780总344PASS436SKIP0FAIL；I05 PASS、I03 PARTIAL。四模块462案例、MCP正反、G3 38检查及fresh OIDC身份恢复通过。I02随后因Run25遗留的非tracked actual-v2-manifest.json拒绝；原3659字节及SHA/来源先独占保存，精确退休后同T补跑尚未执行的Security156/G2Contract121全通过。独立重解析真实日志后追加I02 closure，原BLOCKED回执未改；I01 baseline曾读旧合成清单的事实保留，本Run实际清单重测覆盖。
+
+I04正式PASS：准确CREATE权限拒绝exit134、恢复首次/重复历史一致、G3原行/审计和源库结构保持。I06真实PG九组20用例PASS（TLS/ACL12、public各七组、wrong-SAN1），随后HTTP baseline在登录用户名控件超时，I06 BLOCKED/I07-I08 NOT_RUN。短只读GET证实/auth/login500；实际API/Web netns不同，I04重启API而Web仍在旧namespace。仅重启同ID Web后netns一致，登录302→Keycloak200、username1，配置和构建不变。产品源码未改，原失败保留。
+
+仅三文件任务补丁：migration-boundary的共同健康restart同步Web并验实际netns/精确issuer；选择每次健康重启维护共享网络依赖，原API60秒不变，新增Web入口15秒有界就绪。module-tests对本次生成V2输入先存原字节，finally以inode/mtime/字节/单link重验再退休；未知预存与漂移继续拒绝，不做跨Run自动搜索清理。两新增正反测试先RED后GREEN，58任务测试6.255秒及独立Review通过；已审新restart真实短诊断也PASS，明确不提升原I06。须新T稳定完整验收；main/M2未执行。
+
+Run26收尾：四模块分阶段28对象、G3切换6对象及最后11对象均准确回收，外部KEEP3网络8卷不变；monitor28976释放。唯一当前V2生成清单3660字节先原样归档再精确退休，构建目录ENOENT。四可再生副本按独立冻结PID47150/553只读FD子集计划删除26919文件512583860逻辑字节，事故KEEP保留；VM未操作，物理空间及FD回收NOT_VERIFIED。原失败、同T恢复、后续诊断分别保留。

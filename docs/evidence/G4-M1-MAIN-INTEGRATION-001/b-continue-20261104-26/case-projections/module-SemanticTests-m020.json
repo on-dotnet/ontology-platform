@@ -1,0 +1,98 @@
+{
+  "cases": [
+    {
+      "case": "ControlledTemplatesAndIdentityRelations (\"valid\",null)",
+      "status": "PASS",
+      "line": 1
+    },
+    {
+      "case": "ControlledTemplatesAndIdentityRelations (\"different-site\",null)",
+      "status": "PASS",
+      "line": 2
+    },
+    {
+      "case": "ControlledTemplatesAndIdentityRelations (\"different-namespace\",null)",
+      "status": "PASS",
+      "line": 3
+    },
+    {
+      "case": "ControlledTemplatesAndIdentityRelations (\"adjacent\",null)",
+      "status": "PASS",
+      "line": 4
+    },
+    {
+      "case": "ControlledTemplatesAndIdentityRelations (\"overlap\",\"identity_ambiguous\")",
+      "status": "PASS",
+      "line": 5
+    },
+    {
+      "case": "ControlledTemplatesAndIdentityRelations (\"unknown\",\"identity_relation_indeterminate\")",
+      "status": "PASS",
+      "line": 6
+    },
+    {
+      "case": "ControlledTemplatesAndIdentityRelations (\"no-zone\",\"time_timezone_required\")",
+      "status": "PASS",
+      "line": 7
+    },
+    {
+      "case": "ControlledTemplatesAndIdentityRelations (\"reverse\",\"time_interval_reversed\")",
+      "status": "PASS",
+      "line": 8
+    },
+    {
+      "case": "ControlledTemplatesAndIdentityRelations (\"missing-point\",\"time_reference_missing\")",
+      "status": "PASS",
+      "line": 9
+    },
+    {
+      "case": "ControlledTemplatesAndIdentityRelations (\"double-time\",\"time_lexical_invalid\")",
+      "status": "PASS",
+      "line": 10
+    },
+    {
+      "case": "ControlledTemplatesAndIdentityRelations (\"unsupported\",\"time_template_unsupported\")",
+      "status": "PASS",
+      "line": 11
+    },
+    {
+      "case": "ControlledTemplatesAndIdentityRelations (\"unknown-target\",\"identity_claim_invalid\")",
+      "status": "PASS",
+      "line": 12
+    },
+    {
+      "case": "ControlledTemplatesAndIdentityRelations (\"double-key\",\"identity_claim_invalid\")",
+      "status": "PASS",
+      "line": 13
+    },
+    {
+      "case": "ControlledTemplatesAndIdentityRelations (\"event-missing\",\"event_time_invalid\")",
+      "status": "PASS",
+      "line": 14
+    },
+    {
+      "case": "ControlledTemplatesAndIdentityRelations (\"observer-zone\",\"time_timezone_required\")",
+      "status": "PASS",
+      "line": 15
+    },
+    {
+      "case": "ControlledTemplatesAndIdentityRelations (\"double-type\",\"time_template_unsupported\")",
+      "status": "PASS",
+      "line": 16
+    }
+  ],
+  "summary": {
+    "total": 16,
+    "PASS": 16,
+    "FAIL": 0,
+    "SKIP": 0
+  },
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-26",
+  "testedCommit": "ac3db40fe8cb99871d02b197f3d41969823a647e",
+  "project": "SemanticTests",
+  "assemblySha256": "fc99ff53551bad4e8370c88d973891a95b83ef054ad7b47cbeff71210209bfc8",
+  "rawLogSha256": "85a2d5b4f64a7d70f1536827795716c1a0939a0506bdf09c7b37d6dc4f016232",
+  "commandReceiptSha256": "1d5ec242db3ad3e3869dc4c8c8cba10040c0597eab71a58bfd87bca7ee6bf5f8",
+  "command": "module-SemanticTests-m020"
+}

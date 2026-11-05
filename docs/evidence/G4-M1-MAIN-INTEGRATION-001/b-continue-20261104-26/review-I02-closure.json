@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "reviewer": "/root/consumer_review",
+  "testedCommit": "ac3db40fe8cb99871d02b197f3d41969823a647e",
+  "runId": "b-continue-20261104-26",
+  "evidenceHashes": {
+    "gate-I02.json": "76425c1039ae89cdfcc3f493e33c068de1e09e411718e3dd29f4a1246a9b0f60",
+    "g3-fixture-resume-result.json": "11b734cef2911527b856280c59124b510aadd810028250fb42cd85cb2f8e0fe8",
+    "actual-v2-input.json": "7d55149c0bb576e88b28296d3a2aa3e72687f98974c19cab017adb5c49fc78e6",
+    "g3-identity-transition.json": "27252d14fbbd9a9bb5b39e3cafa6b7480043b810b0452a82d9f34d8b0d23f174",
+    "case-projections/g3-fixture-SecurityTests.json": "c32eef93781124d9dfe0c557acf4fd5d461fd56f7c47c70e5d5d7522b8168689",
+    "case-projections/g3-fixture-G2ContractTests.json": "8efad036a973d35df74e38498f19724b520c721f5685cfdc63a0ac89f2fb2651"
+  },
+  "rawReview": "I02 closure独立准入PASS：实际重解析四模块462案例全部PASS/集合匹配baseline；Security156/G2Contract121零FAIL/SKIP；MCP正反、G3 38项及fresh OIDC身份恢复均通过。当前V2来自Run26、构建未变；Run25旧清单保留，原I02失败原字节保持，允许同T继续I04。I01 baseline曾消费旧夹具事实保留，当前Run26实际清单完整重测覆盖。"
+}

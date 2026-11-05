@@ -1,0 +1,38 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-26",
+  "testedCommit": "ac3db40fe8cb99871d02b197f3d41969823a647e",
+  "command": [
+    "/usr/bin/sandbox-exec",
+    "-p",
+    "(version 1) (allow default) (deny network-outbound (remote ip \"*:*\")) (allow network-outbound (remote ip \"localhost:*\"))",
+    "/usr/local/share/dotnet/dotnet",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll",
+    "--filter",
+    "FullyQualifiedName=OntologyPlatform.PublishingTests.G3LegacyTests.LegacyV1CorruptArtifactRollbackFailsClosed",
+    "--minimum-expected-tests",
+    "1",
+    "--no-ansi",
+    "--output",
+    "Detailed",
+    "--results-directory",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-26/test-results/module-PublishingTests-m025"
+  ],
+  "startedAtUtc": "2026-11-05T01:05:10.808750+00:00",
+  "endedAtUtc": "2026-11-05T01:05:11.904347+00:00",
+  "elapsedSeconds": 1.0956187920019147,
+  "exitCode": 0,
+  "timingStatus": "OBSERVED",
+  "timedOut": false,
+  "executedInputDrift": false,
+  "inputHashes": {
+    "/usr/bin/sandbox-exec": "58839ef01b4eef8aac0d2aa8f9d1c074ae45aafe3533965b030672450064acc8",
+    "/usr/local/share/dotnet/dotnet": "11b517e7b00d0efa20e9b3ab6fe433f135d828a4c95c9c6ca7a9cf1328b6ada4",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll": "b0a79b1fd34c99f8344fa4017f8aa8e0e815a73524f9ae06c91ef71641a07ac1"
+  },
+  "manifestSha256": "0948126be3b9db2b7bcbdd45deed72bd10b4927850eb77dc101f2ebf8e6a7af1",
+  "commandSha256": "6150b02891a03c88024ce89c34b8d472742873e318e86d77d3ed075ef5f19738",
+  "logSha256": "f87db17bac9f28390c53e523c5ba6cdfa83a577abd5a1b826e0124653962f641",
+  "logBytes": 365,
+  "logVisibility": "PRIVATE"
+}

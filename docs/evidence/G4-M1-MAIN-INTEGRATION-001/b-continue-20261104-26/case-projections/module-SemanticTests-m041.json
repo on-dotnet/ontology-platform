@@ -1,0 +1,43 @@
+{
+  "cases": [
+    {
+      "case": "G3AssessmentLockRejectsInvalidPersistentFacts (\"expired\",\"assessment_expired\")",
+      "status": "PASS",
+      "line": 1
+    },
+    {
+      "case": "G3AssessmentLockRejectsInvalidPersistentFacts (\"profile\",\"assessment_binding_conflict\")",
+      "status": "PASS",
+      "line": 2
+    },
+    {
+      "case": "G3AssessmentLockRejectsInvalidPersistentFacts (\"tampered\",\"assessment_binding_conflict\")",
+      "status": "PASS",
+      "line": 3
+    },
+    {
+      "case": "G3AssessmentLockRejectsInvalidPersistentFacts (\"legacy\",\"assessment_required\")",
+      "status": "PASS",
+      "line": 4
+    },
+    {
+      "case": "G3AssessmentLockRejectsInvalidPersistentFacts (\"ineligible\",\"assessment_not_eligible\")",
+      "status": "PASS",
+      "line": 5
+    }
+  ],
+  "summary": {
+    "total": 5,
+    "PASS": 5,
+    "FAIL": 0,
+    "SKIP": 0
+  },
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-26",
+  "testedCommit": "ac3db40fe8cb99871d02b197f3d41969823a647e",
+  "project": "SemanticTests",
+  "assemblySha256": "fc99ff53551bad4e8370c88d973891a95b83ef054ad7b47cbeff71210209bfc8",
+  "rawLogSha256": "bc2ad2fe840971ebe2a2845cda93e639aa3e1812dca8fd8ba4ac8b575e9baa85",
+  "commandReceiptSha256": "fff157e390cece9c0e93b9cd16c3185094d3ebd63a6635b6f32b6ac752c3db2e",
+  "command": "module-SemanticTests-m041"
+}

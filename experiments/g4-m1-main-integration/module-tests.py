@@ -207,11 +207,24 @@ def g3_fixture_tests(m):
     rt.require(not output.exists(),'EXISTING_COMPATIBILITY_MANIFEST');rt.write_json(output,manifests[-1])
     actual_hash=rt.digest(output.read_bytes())
     rt.write_json(rt.ARTIFACTS/m['runId']/'actual-v2-input.json',{'path':str(output),'sha256':actual_hash,'sourceReportSha256':readback.report_sha(m,'g3-compatibility-baseline'),'releaseId':manifests[-1]['releaseId']})
+    # 只管理本次刚创建的准确夹具；未知预存文件仍由上方拒绝，旧字节不覆盖。
+    original=output.read_bytes();archive=rt.ARTIFACTS/m['runId']/'actual-v2-manifest.json'
+    with archive.open('xb') as stream:stream.write(original)
+    created=output.lstat()
     results=[]
-    for suffix in ('SecurityTests','G2ContractTests'):
-        name='g3-fixture-'+suffix;dll=rt.ROOT/f'backend/tests/OntologyPlatform.{suffix}/bin/Debug/net10.0/OntologyPlatform.{suffix}.dll'
-        raw=rt.execute(m,name,rt.offline_command(['/usr/local/share/dotnet/dotnet',str(dll),'--minimum-expected-tests','1','--no-ansi','--output','Detailed','--results-directory',str(rt.ARTIFACTS/m['runId']/'test-results'/name)],loopback=True),env=env,sensitive=True,timeout=300)
-        projection=rt.test_projection(m,name,suffix,raw)
-        rt.require(projection['summary']['SKIP']==0 and projection['summary']['FAIL']==0,'G3_REQUIRED_FIXTURES_SKIPPED');results.append(projection['summary'])
-    rt.require(rt.digest(output.read_bytes())==actual_hash,'ACTUAL_V2_INPUT_DRIFT')
+    try:
+        for suffix in ('SecurityTests','G2ContractTests'):
+            name='g3-fixture-'+suffix;dll=rt.ROOT/f'backend/tests/OntologyPlatform.{suffix}/bin/Debug/net10.0/OntologyPlatform.{suffix}.dll'
+            raw=rt.execute(m,name,rt.offline_command(['/usr/local/share/dotnet/dotnet',str(dll),'--minimum-expected-tests','1','--no-ansi','--output','Detailed','--results-directory',str(rt.ARTIFACTS/m['runId']/'test-results'/name)],loopback=True),env=env,sensitive=True,timeout=300)
+            projection=rt.test_projection(m,name,suffix,raw)
+            rt.require(projection['summary']['SKIP']==0 and projection['summary']['FAIL']==0,'G3_REQUIRED_FIXTURES_SKIPPED');results.append(projection['summary'])
+    finally:
+        current=output.lstat()
+        rt.require(not output.is_symlink() and current.st_nlink==1 and (current.st_dev,current.st_ino,current.st_mtime_ns)==(created.st_dev,created.st_ino,created.st_mtime_ns) and output.read_bytes()==original and archive.read_bytes()==original,'ACTUAL_V2_INPUT_DRIFT')
+        rt.write_json(rt.ARTIFACTS/m['runId']/'actual-v2-retirement-before.json',{'path':str(output),'sha256':actual_hash,'archive':str(archive),'device':current.st_dev,'inode':current.st_ino,'operation':'unlink exact current-run generated fixture'})
+        output.unlink()
+        try:output.lstat()
+        except FileNotFoundError as error:rt.require(error.errno==2,'ACTUAL_V2_ABSENCE')
+        else:raise ValueError('ACTUAL_V2_REMAINS')
+        rt.write_json(rt.ARTIFACTS/m['runId']/'actual-v2-retired.json',{'taskId':rt.TASK,'runId':m['runId'],'testedCommit':m['_head'],'path':str(output),'sha256':actual_hash,'archive':str(archive),'exitCode':0,'absence':'lstat ENOENT'})
     return results

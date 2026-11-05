@@ -1,0 +1,83 @@
+{
+  "cases": [
+    {
+      "case": "SkosPolicyReturnsExactSourceDiagnostic (\"s14\",\"skos_pref_label_conflict\")",
+      "status": "PASS",
+      "line": 1
+    },
+    {
+      "case": "SkosPolicyReturnsExactSourceDiagnostic (\"s13\",\"skos_label_relation_conflict\")",
+      "status": "PASS",
+      "line": 2
+    },
+    {
+      "case": "SkosPolicyReturnsExactSourceDiagnostic (\"no-language\",\"skos_label_language_required\")",
+      "status": "PASS",
+      "line": 3
+    },
+    {
+      "case": "SkosPolicyReturnsExactSourceDiagnostic (\"unknown-language\",\"language_policy_unknown\")",
+      "status": "PASS",
+      "line": 4
+    },
+    {
+      "case": "SkosPolicyReturnsExactSourceDiagnostic (\"invalid-term\",\"skos_label_term_invalid\")",
+      "status": "PASS",
+      "line": 5
+    },
+    {
+      "case": "SkosPolicyReturnsExactSourceDiagnostic (\"missing-scheme\",\"skos_scheme_reference_missing\")",
+      "status": "PASS",
+      "line": 6
+    },
+    {
+      "case": "SkosPolicyReturnsExactSourceDiagnostic (\"missing-concept\",\"skos_concept_reference_missing\")",
+      "status": "PASS",
+      "line": 7
+    },
+    {
+      "case": "SkosPolicyReturnsExactSourceDiagnostic (\"cycle\",\"skos_hierarchy_cycle\")",
+      "status": "PASS",
+      "line": 8
+    },
+    {
+      "case": "SkosPolicyReturnsExactSourceDiagnostic (\"related\",\"skos_related_hierarchy_conflict\")",
+      "status": "PASS",
+      "line": 9
+    },
+    {
+      "case": "SkosPolicyReturnsExactSourceDiagnostic (\"notation\",\"skos_notation_duplicate\")",
+      "status": "PASS",
+      "line": 10
+    },
+    {
+      "case": "SkosPolicyReturnsExactSourceDiagnostic (\"mapping-scheme\",\"skos_mapping_scheme_conflict\")",
+      "status": "PASS",
+      "line": 11
+    },
+    {
+      "case": "SkosPolicyReturnsExactSourceDiagnostic (\"s46\",\"skos_mapping_relation_conflict\")",
+      "status": "PASS",
+      "line": 12
+    },
+    {
+      "case": "SkosPolicyReturnsExactSourceDiagnostic (\"deprecated\",\"semantic_reference_deprecated\")",
+      "status": "PASS",
+      "line": 13
+    }
+  ],
+  "summary": {
+    "total": 13,
+    "PASS": 13,
+    "FAIL": 0,
+    "SKIP": 0
+  },
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-26",
+  "testedCommit": "ac3db40fe8cb99871d02b197f3d41969823a647e",
+  "project": "SemanticTests",
+  "assemblySha256": "fc99ff53551bad4e8370c88d973891a95b83ef054ad7b47cbeff71210209bfc8",
+  "rawLogSha256": "7814dabdf2ccd39a4f5de634a1de835866ad2dab8c3091b05c14e9214091fc56",
+  "commandReceiptSha256": "1223e5351a2b0afbdc9678bad075d6c5b2012940cbd8d02caa1aaac1beaa48a4",
+  "command": "module-SemanticTests-m113"
+}

@@ -1,0 +1,947 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-26",
+  "testedCommit": "ac3db40fe8cb99871d02b197f3d41969823a647e",
+  "project": "QueryTests",
+  "status": "PASS",
+  "scope": "ALL_CASES_METHOD_PROCESS_ISOLATION",
+  "total": 49,
+  "batches": [
+    {
+      "command": "module-QueryTests-m001",
+      "method": "OntologyPlatform.QueryTests.GatewayTests.AbsentReleaseAndRoleAreExplicitErrors",
+      "summary": {
+        "total": 1,
+        "PASS": 1,
+        "FAIL": 0,
+        "SKIP": 0
+      },
+      "before": {
+        "idle": true,
+        "connections": 6,
+        "execs": 6,
+        "capacityRefusals": 0,
+        "eventsSha256": "826177d686783716cec71a2d04c63adccccd6f78dc1e3ac0d3379b848dfdb2bf"
+      },
+      "after": {
+        "idle": true,
+        "connections": 7,
+        "execs": 7,
+        "capacityRefusals": 0,
+        "eventsSha256": "46e944b7344b7f677cdb2577916979c35797b84f7d8d5ab79f9c00b24c6ad895"
+      }
+    },
+    {
+      "command": "module-QueryTests-m002",
+      "method": "OntologyPlatform.QueryTests.GatewayTests.AmbiguousIdentityIsNeverStringJoined",
+      "summary": {
+        "total": 1,
+        "PASS": 1,
+        "FAIL": 0,
+        "SKIP": 0
+      },
+      "before": {
+        "idle": true,
+        "connections": 7,
+        "execs": 7,
+        "capacityRefusals": 0,
+        "eventsSha256": "46e944b7344b7f677cdb2577916979c35797b84f7d8d5ab79f9c00b24c6ad895"
+      },
+      "after": {
+        "idle": true,
+        "connections": 10,
+        "execs": 10,
+        "capacityRefusals": 0,
+        "eventsSha256": "540b357b31ef3f0f388903b6bfc898fde2366ecf09e25283db409b67ca9cadf4"
+      }
+    },
+    {
+      "command": "module-QueryTests-m003",
+      "method": "OntologyPlatform.QueryTests.QueryFaultTests.AuditFailureIsUnavailableAndRecovers",
+      "summary": {
+        "total": 1,
+        "PASS": 1,
+        "FAIL": 0,
+        "SKIP": 0
+      },
+      "before": {
+        "idle": true,
+        "connections": 10,
+        "execs": 10,
+        "capacityRefusals": 0,
+        "eventsSha256": "540b357b31ef3f0f388903b6bfc898fde2366ecf09e25283db409b67ca9cadf4"
+      },
+      "after": {
+        "idle": true,
+        "connections": 13,
+        "execs": 13,
+        "capacityRefusals": 0,
+        "eventsSha256": "5e2695f642b9b15240ed5e316e525999536ea760d99e1800d9aac282c37c0274"
+      }
+    },
+    {
+      "command": "module-QueryTests-m004",
+      "method": "OntologyPlatform.QueryTests.QueryHttpTests.AuthenticationAndAuthorizationPrecedeBodyBinding",
+      "summary": {
+        "total": 2,
+        "PASS": 2,
+        "FAIL": 0,
+        "SKIP": 0
+      },
+      "before": {
+        "idle": true,
+        "connections": 13,
+        "execs": 13,
+        "capacityRefusals": 0,
+        "eventsSha256": "5e2695f642b9b15240ed5e316e525999536ea760d99e1800d9aac282c37c0274"
+      },
+      "after": {
+        "idle": true,
+        "connections": 14,
+        "execs": 14,
+        "capacityRefusals": 0,
+        "eventsSha256": "2889a240ade08bf44b043f6ff30cdcaa93e68c944baba68f2f71d1e8981030fe"
+      }
+    },
+    {
+      "command": "module-QueryTests-m005",
+      "method": "OntologyPlatform.QueryTests.ReviewRegressionTests.CallerCancellationDuringAuditPropagates",
+      "summary": {
+        "total": 1,
+        "PASS": 1,
+        "FAIL": 0,
+        "SKIP": 0
+      },
+      "before": {
+        "idle": true,
+        "connections": 14,
+        "execs": 14,
+        "capacityRefusals": 0,
+        "eventsSha256": "2889a240ade08bf44b043f6ff30cdcaa93e68c944baba68f2f71d1e8981030fe"
+      },
+      "after": {
+        "idle": true,
+        "connections": 18,
+        "execs": 18,
+        "capacityRefusals": 0,
+        "eventsSha256": "4f963d85e823e82913455978c1212feca64996b639570320e57121ef361a0aa9"
+      }
+    },
+    {
+      "command": "module-QueryTests-m006",
+      "method": "OntologyPlatform.QueryTests.QueryFaultTests.CancellationAndBudgetReachDependency",
+      "summary": {
+        "total": 1,
+        "PASS": 1,
+        "FAIL": 0,
+        "SKIP": 0
+      },
+      "before": {
+        "idle": true,
+        "connections": 18,
+        "execs": 18,
+        "capacityRefusals": 0,
+        "eventsSha256": "4f963d85e823e82913455978c1212feca64996b639570320e57121ef361a0aa9"
+      },
+      "after": {
+        "idle": true,
+        "connections": 21,
+        "execs": 21,
+        "capacityRefusals": 0,
+        "eventsSha256": "52a20820f0e0a59bd4a57fc0afd8a7cdef56fb6d8607c7134f6986d3513d4a2d"
+      }
+    },
+    {
+      "command": "module-QueryTests-m007",
+      "method": "OntologyPlatform.QueryTests.QueryFaultTests.ChangedOrMissingGraphIsUnavailable",
+      "summary": {
+        "total": 2,
+        "PASS": 2,
+        "FAIL": 0,
+        "SKIP": 0
+      },
+      "before": {
+        "idle": true,
+        "connections": 21,
+        "execs": 21,
+        "capacityRefusals": 0,
+        "eventsSha256": "52a20820f0e0a59bd4a57fc0afd8a7cdef56fb6d8607c7134f6986d3513d4a2d"
+      },
+      "after": {
+        "idle": true,
+        "connections": 28,
+        "execs": 28,
+        "capacityRefusals": 0,
+        "eventsSha256": "44591ed6d2d4af3ae1d17df3317436c519468fd2394e0def2029a67988dd96e9"
+      }
+    },
+    {
+      "command": "module-QueryTests-m008",
+      "method": "OntologyPlatform.QueryTests.QueryFaultTests.ConcurrentActivationCannotChangeRequestSnapshot",
+      "summary": {
+        "total": 1,
+        "PASS": 1,
+        "FAIL": 0,
+        "SKIP": 0
+      },
+      "before": {
+        "idle": true,
+        "connections": 28,
+        "execs": 28,
+        "capacityRefusals": 0,
+        "eventsSha256": "44591ed6d2d4af3ae1d17df3317436c519468fd2394e0def2029a67988dd96e9"
+      },
+      "after": {
+        "idle": true,
+        "connections": 31,
+        "execs": 31,
+        "capacityRefusals": 0,
+        "eventsSha256": "a14ba26c45127ab71ece9e164528ba7df96a0765823a281120b168fa1c0681d7"
+      }
+    },
+    {
+      "command": "module-QueryTests-m009",
+      "method": "OntologyPlatform.QueryTests.QueryFaultTests.CorruptedSourceHashFailsQueryAndEvidence",
+      "summary": {
+        "total": 1,
+        "PASS": 1,
+        "FAIL": 0,
+        "SKIP": 0
+      },
+      "before": {
+        "idle": true,
+        "connections": 31,
+        "execs": 31,
+        "capacityRefusals": 0,
+        "eventsSha256": "a14ba26c45127ab71ece9e164528ba7df96a0765823a281120b168fa1c0681d7"
+      },
+      "after": {
+        "idle": true,
+        "connections": 34,
+        "execs": 34,
+        "capacityRefusals": 0,
+        "eventsSha256": "1dcd21a006b3a4df013adfec31e89d1fd3dc064cbbd4c40db28aec5b3d524033"
+      }
+    },
+    {
+      "command": "module-QueryTests-m010",
+      "method": "OntologyPlatform.QueryTests.QueryFaultTests.CrossSiteEdgesAndMissingRelationshipsDoNotInventFacts",
+      "summary": {
+        "total": 1,
+        "PASS": 1,
+        "FAIL": 0,
+        "SKIP": 0
+      },
+      "before": {
+        "idle": true,
+        "connections": 34,
+        "execs": 34,
+        "capacityRefusals": 0,
+        "eventsSha256": "1dcd21a006b3a4df013adfec31e89d1fd3dc064cbbd4c40db28aec5b3d524033"
+      },
+      "after": {
+        "idle": true,
+        "connections": 37,
+        "execs": 37,
+        "capacityRefusals": 0,
+        "eventsSha256": "39cfd90556bb12e3e02ddb5c89c93f652e2b7a00ffbee043de0585ff51d21624"
+      }
+    },
+    {
+      "command": "module-QueryTests-m011",
+      "method": "OntologyPlatform.QueryTests.QueryFaultTests.DeclaredScopeIsAuthorizedBeforeExternalReads",
+      "summary": {
+        "total": 1,
+        "PASS": 1,
+        "FAIL": 0,
+        "SKIP": 0
+      },
+      "before": {
+        "idle": true,
+        "connections": 37,
+        "execs": 37,
+        "capacityRefusals": 0,
+        "eventsSha256": "39cfd90556bb12e3e02ddb5c89c93f652e2b7a00ffbee043de0585ff51d21624"
+      },
+      "after": {
+        "idle": true,
+        "connections": 40,
+        "execs": 40,
+        "capacityRefusals": 0,
+        "eventsSha256": "ccf08d9fcf97a1fa31796fd9eef96a8de7e696c2eaf88fe326dac496582917fa"
+      }
+    },
+    {
+      "command": "module-QueryTests-m012",
+      "method": "OntologyPlatform.QueryTests.QueryFaultTests.DependencyFailureAfterSnapshotIsUnavailableAndRecoverable",
+      "summary": {
+        "total": 1,
+        "PASS": 1,
+        "FAIL": 0,
+        "SKIP": 0
+      },
+      "before": {
+        "idle": true,
+        "connections": 40,
+        "execs": 40,
+        "capacityRefusals": 0,
+        "eventsSha256": "ccf08d9fcf97a1fa31796fd9eef96a8de7e696c2eaf88fe326dac496582917fa"
+      },
+      "after": {
+        "idle": true,
+        "connections": 43,
+        "execs": 43,
+        "capacityRefusals": 0,
+        "eventsSha256": "aaf4add5f290ebdb292a6712100fa6778f0913aae92e21742e8ae269bb74d7f4"
+      }
+    },
+    {
+      "command": "module-QueryTests-m013",
+      "method": "OntologyPlatform.QueryTests.QueryFaultTests.DepthBudgetReportsIncompleteGraph",
+      "summary": {
+        "total": 1,
+        "PASS": 1,
+        "FAIL": 0,
+        "SKIP": 0
+      },
+      "before": {
+        "idle": true,
+        "connections": 43,
+        "execs": 43,
+        "capacityRefusals": 0,
+        "eventsSha256": "aaf4add5f290ebdb292a6712100fa6778f0913aae92e21742e8ae269bb74d7f4"
+      },
+      "after": {
+        "idle": true,
+        "connections": 46,
+        "execs": 46,
+        "capacityRefusals": 0,
+        "eventsSha256": "503d231911531a78e991a407cbae28004bf1efce7152e13e6ab50a2edd1f0e5c"
+      }
+    },
+    {
+      "command": "module-QueryTests-m014",
+      "method": "OntologyPlatform.QueryTests.GatewayTests.DescriptionUsesPublishedSchemaAndRegistry",
+      "summary": {
+        "total": 1,
+        "PASS": 1,
+        "FAIL": 0,
+        "SKIP": 0
+      },
+      "before": {
+        "idle": true,
+        "connections": 46,
+        "execs": 46,
+        "capacityRefusals": 0,
+        "eventsSha256": "503d231911531a78e991a407cbae28004bf1efce7152e13e6ab50a2edd1f0e5c"
+      },
+      "after": {
+        "idle": true,
+        "connections": 49,
+        "execs": 49,
+        "capacityRefusals": 0,
+        "eventsSha256": "eca08eb862f9e99550015dd90d9af85e5090e1eaaa0e16d1923c8dd031f701f4"
+      }
+    },
+    {
+      "command": "module-QueryTests-m015",
+      "method": "OntologyPlatform.QueryTests.GatewayTests.EvidenceIsReauthorizedAndIdsCannotChooseObjects",
+      "summary": {
+        "total": 1,
+        "PASS": 1,
+        "FAIL": 0,
+        "SKIP": 0
+      },
+      "before": {
+        "idle": true,
+        "connections": 49,
+        "execs": 49,
+        "capacityRefusals": 0,
+        "eventsSha256": "eca08eb862f9e99550015dd90d9af85e5090e1eaaa0e16d1923c8dd031f701f4"
+      },
+      "after": {
+        "idle": true,
+        "connections": 52,
+        "execs": 52,
+        "capacityRefusals": 0,
+        "eventsSha256": "460a8121b2ea5f7a477febd1a580202f8c71c857959d677cfa9f9c02c0709701"
+      }
+    },
+    {
+      "command": "module-QueryTests-m016",
+      "method": "OntologyPlatform.QueryTests.ReviewRegressionTests.EvidenceRejectsGraphChangedAfterCatalogVerification",
+      "summary": {
+        "total": 1,
+        "PASS": 1,
+        "FAIL": 0,
+        "SKIP": 0
+      },
+      "before": {
+        "idle": true,
+        "connections": 52,
+        "execs": 52,
+        "capacityRefusals": 0,
+        "eventsSha256": "460a8121b2ea5f7a477febd1a580202f8c71c857959d677cfa9f9c02c0709701"
+      },
+      "after": {
+        "idle": true,
+        "connections": 56,
+        "execs": 56,
+        "capacityRefusals": 0,
+        "eventsSha256": "69ac82d81c655a1eed4437f43d7ba01a7610989d937ff21a2226fbb65b8841a9"
+      }
+    },
+    {
+      "command": "module-QueryTests-m017",
+      "method": "OntologyPlatform.QueryTests.GatewayTests.ExplicitOutOfScopeEntityIsUnauthorized",
+      "summary": {
+        "total": 1,
+        "PASS": 1,
+        "FAIL": 0,
+        "SKIP": 0
+      },
+      "before": {
+        "idle": true,
+        "connections": 56,
+        "execs": 56,
+        "capacityRefusals": 0,
+        "eventsSha256": "69ac82d81c655a1eed4437f43d7ba01a7610989d937ff21a2226fbb65b8841a9"
+      },
+      "after": {
+        "idle": true,
+        "connections": 59,
+        "execs": 59,
+        "capacityRefusals": 0,
+        "eventsSha256": "c3e1e21d3617769783070625dd0f54c48cde3f8a1c9ea387fab99b6332d37094"
+      }
+    },
+    {
+      "command": "module-QueryTests-m018",
+      "method": "OntologyPlatform.QueryTests.ReviewRegressionTests.FailureAuditIsBoundedAndNotHidden",
+      "summary": {
+        "total": 1,
+        "PASS": 1,
+        "FAIL": 0,
+        "SKIP": 0
+      },
+      "before": {
+        "idle": true,
+        "connections": 59,
+        "execs": 59,
+        "capacityRefusals": 0,
+        "eventsSha256": "c3e1e21d3617769783070625dd0f54c48cde3f8a1c9ea387fab99b6332d37094"
+      },
+      "after": {
+        "idle": true,
+        "connections": 63,
+        "execs": 63,
+        "capacityRefusals": 0,
+        "eventsSha256": "4270bb0700822888591616b0fb08b1b9b7f83f3e930824543ddba9dcbc34a19a"
+      }
+    },
+    {
+      "command": "module-QueryTests-m019",
+      "method": "OntologyPlatform.QueryTests.GatewayTests.FoundEvidenceSurvivesNewServiceInstance",
+      "summary": {
+        "total": 1,
+        "PASS": 1,
+        "FAIL": 0,
+        "SKIP": 0
+      },
+      "before": {
+        "idle": true,
+        "connections": 63,
+        "execs": 63,
+        "capacityRefusals": 0,
+        "eventsSha256": "4270bb0700822888591616b0fb08b1b9b7f83f3e930824543ddba9dcbc34a19a"
+      },
+      "after": {
+        "idle": true,
+        "connections": 66,
+        "execs": 66,
+        "capacityRefusals": 0,
+        "eventsSha256": "0384d101f388b6498c63f1f2099b0310f3859b1a194cca31d5d9aefc1d3e409c"
+      }
+    },
+    {
+      "command": "module-QueryTests-m020",
+      "method": "OntologyPlatform.QueryTests.GatewayTests.InvalidPlansAreRejected",
+      "summary": {
+        "total": 1,
+        "PASS": 1,
+        "FAIL": 0,
+        "SKIP": 0
+      },
+      "before": {
+        "idle": true,
+        "connections": 66,
+        "execs": 66,
+        "capacityRefusals": 0,
+        "eventsSha256": "0384d101f388b6498c63f1f2099b0310f3859b1a194cca31d5d9aefc1d3e409c"
+      },
+      "after": {
+        "idle": true,
+        "connections": 69,
+        "execs": 69,
+        "capacityRefusals": 0,
+        "eventsSha256": "20ca1d9ae2cede90e0015e61f7e1ddbbde5bb1fae41fe980e94c255c5c668a6c"
+      }
+    },
+    {
+      "command": "module-QueryTests-m021",
+      "method": "OntologyPlatform.QueryTests.GatewayTests.MissingEntityIsEmpty",
+      "summary": {
+        "total": 1,
+        "PASS": 1,
+        "FAIL": 0,
+        "SKIP": 0
+      },
+      "before": {
+        "idle": true,
+        "connections": 69,
+        "execs": 69,
+        "capacityRefusals": 0,
+        "eventsSha256": "20ca1d9ae2cede90e0015e61f7e1ddbbde5bb1fae41fe980e94c255c5c668a6c"
+      },
+      "after": {
+        "idle": true,
+        "connections": 72,
+        "execs": 72,
+        "capacityRefusals": 0,
+        "eventsSha256": "27e02a89c31e7b7cf80290fabace7fde2b02ba1f064f3b4ed285c87695bbe043"
+      }
+    },
+    {
+      "command": "module-QueryTests-m022",
+      "method": "OntologyPlatform.QueryTests.GatewayTests.MissingProvenanceIsPartial",
+      "summary": {
+        "total": 1,
+        "PASS": 1,
+        "FAIL": 0,
+        "SKIP": 0
+      },
+      "before": {
+        "idle": true,
+        "connections": 72,
+        "execs": 72,
+        "capacityRefusals": 0,
+        "eventsSha256": "27e02a89c31e7b7cf80290fabace7fde2b02ba1f064f3b4ed285c87695bbe043"
+      },
+      "after": {
+        "idle": true,
+        "connections": 75,
+        "execs": 75,
+        "capacityRefusals": 0,
+        "eventsSha256": "a5a37298693df3a95efd236751735e757c2773356eb28564c310d874729f09ae"
+      }
+    },
+    {
+      "command": "module-QueryTests-m023",
+      "method": "OntologyPlatform.QueryTests.RegistryTests.ModuleRegistersSharedContracts",
+      "summary": {
+        "total": 1,
+        "PASS": 1,
+        "FAIL": 0,
+        "SKIP": 0
+      },
+      "before": {
+        "idle": true,
+        "connections": 75,
+        "execs": 75,
+        "capacityRefusals": 0,
+        "eventsSha256": "a5a37298693df3a95efd236751735e757c2773356eb28564c310d874729f09ae"
+      },
+      "after": {
+        "idle": true,
+        "connections": 75,
+        "execs": 75,
+        "capacityRefusals": 0,
+        "eventsSha256": "a5a37298693df3a95efd236751735e757c2773356eb28564c310d874729f09ae"
+      }
+    },
+    {
+      "command": "module-QueryTests-m024",
+      "method": "OntologyPlatform.QueryTests.QueryFaultTests.QueryAndEvidenceCommitIndependentAudit",
+      "summary": {
+        "total": 1,
+        "PASS": 1,
+        "FAIL": 0,
+        "SKIP": 0
+      },
+      "before": {
+        "idle": true,
+        "connections": 75,
+        "execs": 75,
+        "capacityRefusals": 0,
+        "eventsSha256": "a5a37298693df3a95efd236751735e757c2773356eb28564c310d874729f09ae"
+      },
+      "after": {
+        "idle": true,
+        "connections": 78,
+        "execs": 78,
+        "capacityRefusals": 0,
+        "eventsSha256": "85cc52913c52300f21bba2e834a5c38056814c4c2d682b502648ab3eb5d02d60"
+      }
+    },
+    {
+      "command": "module-QueryTests-m025",
+      "method": "OntologyPlatform.QueryTests.QueryHttpTests.QueryEndpointsDeclareAuthorizationAndProblems",
+      "summary": {
+        "total": 1,
+        "PASS": 1,
+        "FAIL": 0,
+        "SKIP": 0
+      },
+      "before": {
+        "idle": true,
+        "connections": 78,
+        "execs": 78,
+        "capacityRefusals": 0,
+        "eventsSha256": "85cc52913c52300f21bba2e834a5c38056814c4c2d682b502648ab3eb5d02d60"
+      },
+      "after": {
+        "idle": true,
+        "connections": 78,
+        "execs": 78,
+        "capacityRefusals": 0,
+        "eventsSha256": "85cc52913c52300f21bba2e834a5c38056814c4c2d682b502648ab3eb5d02d60"
+      }
+    },
+    {
+      "command": "module-QueryTests-m026",
+      "method": "OntologyPlatform.QueryTests.QueryHttpTests.QueryPostRequiresExactOrigin",
+      "summary": {
+        "total": 3,
+        "PASS": 3,
+        "FAIL": 0,
+        "SKIP": 0
+      },
+      "before": {
+        "idle": true,
+        "connections": 78,
+        "execs": 78,
+        "capacityRefusals": 0,
+        "eventsSha256": "85cc52913c52300f21bba2e834a5c38056814c4c2d682b502648ab3eb5d02d60"
+      },
+      "after": {
+        "idle": true,
+        "connections": 85,
+        "execs": 85,
+        "capacityRefusals": 0,
+        "eventsSha256": "b246a336de506af51f62d2bbc607c9b41999efd3ff2135309d5f37a50755f599"
+      }
+    },
+    {
+      "command": "module-QueryTests-m027",
+      "method": "OntologyPlatform.QueryTests.QueryHttpTests.QueryPostRequiresNativeCsrf",
+      "summary": {
+        "total": 2,
+        "PASS": 2,
+        "FAIL": 0,
+        "SKIP": 0
+      },
+      "before": {
+        "idle": true,
+        "connections": 85,
+        "execs": 85,
+        "capacityRefusals": 0,
+        "eventsSha256": "b246a336de506af51f62d2bbc607c9b41999efd3ff2135309d5f37a50755f599"
+      },
+      "after": {
+        "idle": true,
+        "connections": 90,
+        "execs": 90,
+        "capacityRefusals": 0,
+        "eventsSha256": "5d2257fc01d561cd7e2f4a81d3a30b0fbb2d4eb0acb2cfb8666f44e0ec31916c"
+      }
+    },
+    {
+      "command": "module-QueryTests-m028",
+      "method": "OntologyPlatform.QueryTests.ReviewRegressionTests.QueryRejectsGraphChangedAfterCatalogVerification",
+      "summary": {
+        "total": 1,
+        "PASS": 1,
+        "FAIL": 0,
+        "SKIP": 0
+      },
+      "before": {
+        "idle": true,
+        "connections": 90,
+        "execs": 90,
+        "capacityRefusals": 0,
+        "eventsSha256": "5d2257fc01d561cd7e2f4a81d3a30b0fbb2d4eb0acb2cfb8666f44e0ec31916c"
+      },
+      "after": {
+        "idle": true,
+        "connections": 94,
+        "execs": 94,
+        "capacityRefusals": 0,
+        "eventsSha256": "1c169daee8471cf9739d71b1b9c2432da14a84b7e0f3a4eda3639d725a9ef65d"
+      }
+    },
+    {
+      "command": "module-QueryTests-m029",
+      "method": "OntologyPlatform.QueryTests.QueryHttpTests.QueryRouteMatchesFrozenContract",
+      "summary": {
+        "total": 1,
+        "PASS": 1,
+        "FAIL": 0,
+        "SKIP": 0
+      },
+      "before": {
+        "idle": true,
+        "connections": 94,
+        "execs": 94,
+        "capacityRefusals": 0,
+        "eventsSha256": "1c169daee8471cf9739d71b1b9c2432da14a84b7e0f3a4eda3639d725a9ef65d"
+      },
+      "after": {
+        "idle": true,
+        "connections": 94,
+        "execs": 94,
+        "capacityRefusals": 0,
+        "eventsSha256": "1c169daee8471cf9739d71b1b9c2432da14a84b7e0f3a4eda3639d725a9ef65d"
+      }
+    },
+    {
+      "command": "module-QueryTests-m030",
+      "method": "OntologyPlatform.QueryTests.VerifiedSourcesTests.RejectsHashValidInvalidUtf8",
+      "summary": {
+        "total": 1,
+        "PASS": 1,
+        "FAIL": 0,
+        "SKIP": 0
+      },
+      "before": {
+        "idle": true,
+        "connections": 94,
+        "execs": 94,
+        "capacityRefusals": 0,
+        "eventsSha256": "1c169daee8471cf9739d71b1b9c2432da14a84b7e0f3a4eda3639d725a9ef65d"
+      },
+      "after": {
+        "idle": true,
+        "connections": 97,
+        "execs": 97,
+        "capacityRefusals": 0,
+        "eventsSha256": "a2558b9881b5f8ad56c793ba27ddcedb5f5a74671020a0d1c477905cf7b700a0"
+      }
+    },
+    {
+      "command": "module-QueryTests-m031",
+      "method": "OntologyPlatform.QueryTests.VerifiedSourcesTests.RejectsManifestSourceBindingMismatch",
+      "summary": {
+        "total": 4,
+        "PASS": 4,
+        "FAIL": 0,
+        "SKIP": 0
+      },
+      "before": {
+        "idle": true,
+        "connections": 97,
+        "execs": 97,
+        "capacityRefusals": 0,
+        "eventsSha256": "a2558b9881b5f8ad56c793ba27ddcedb5f5a74671020a0d1c477905cf7b700a0"
+      },
+      "after": {
+        "idle": true,
+        "connections": 106,
+        "execs": 106,
+        "capacityRefusals": 0,
+        "eventsSha256": "eafebf71339e3a5d5c1f7d18f311945c6a4a86f5ef3d03ae2b0d2dd5828c65bc"
+      }
+    },
+    {
+      "command": "module-QueryTests-m032",
+      "method": "OntologyPlatform.QueryTests.VerifiedSourcesTests.RestoresActualPublishedSources",
+      "summary": {
+        "total": 2,
+        "PASS": 2,
+        "FAIL": 0,
+        "SKIP": 0
+      },
+      "before": {
+        "idle": true,
+        "connections": 106,
+        "execs": 106,
+        "capacityRefusals": 0,
+        "eventsSha256": "eafebf71339e3a5d5c1f7d18f311945c6a4a86f5ef3d03ae2b0d2dd5828c65bc"
+      },
+      "after": {
+        "idle": true,
+        "connections": 111,
+        "execs": 111,
+        "capacityRefusals": 0,
+        "eventsSha256": "0d0858a4b466a08c72fd49bda863f18ec3cc2d6fc1461f49369f30c0af6207db"
+      }
+    },
+    {
+      "command": "module-QueryTests-m033",
+      "method": "OntologyPlatform.QueryTests.QueryFaultTests.ReverseLineageUsesActualEdges",
+      "summary": {
+        "total": 1,
+        "PASS": 1,
+        "FAIL": 0,
+        "SKIP": 0
+      },
+      "before": {
+        "idle": true,
+        "connections": 111,
+        "execs": 111,
+        "capacityRefusals": 0,
+        "eventsSha256": "0d0858a4b466a08c72fd49bda863f18ec3cc2d6fc1461f49369f30c0af6207db"
+      },
+      "after": {
+        "idle": true,
+        "connections": 114,
+        "execs": 114,
+        "capacityRefusals": 0,
+        "eventsSha256": "c7c5de87a0b593298c78d46de2013bb7642b878b060d01a00e900848501866ed"
+      }
+    },
+    {
+      "command": "module-QueryTests-m034",
+      "method": "OntologyPlatform.QueryTests.RegistryTests.SchemaUsesCompleteGeneratedClosureAndStableVersions",
+      "summary": {
+        "total": 1,
+        "PASS": 1,
+        "FAIL": 0,
+        "SKIP": 0
+      },
+      "before": {
+        "idle": true,
+        "connections": 114,
+        "execs": 114,
+        "capacityRefusals": 0,
+        "eventsSha256": "c7c5de87a0b593298c78d46de2013bb7642b878b060d01a00e900848501866ed"
+      },
+      "after": {
+        "idle": true,
+        "connections": 114,
+        "execs": 114,
+        "capacityRefusals": 0,
+        "eventsSha256": "c7c5de87a0b593298c78d46de2013bb7642b878b060d01a00e900848501866ed"
+      }
+    },
+    {
+      "command": "module-QueryTests-m035",
+      "method": "OntologyPlatform.QueryTests.ReviewRegressionTests.SuccessfulAuditCannotOutliveQueryBudget",
+      "summary": {
+        "total": 1,
+        "PASS": 1,
+        "FAIL": 0,
+        "SKIP": 0
+      },
+      "before": {
+        "idle": true,
+        "connections": 114,
+        "execs": 114,
+        "capacityRefusals": 0,
+        "eventsSha256": "c7c5de87a0b593298c78d46de2013bb7642b878b060d01a00e900848501866ed"
+      },
+      "after": {
+        "idle": true,
+        "connections": 118,
+        "execs": 118,
+        "capacityRefusals": 0,
+        "eventsSha256": "e0c2cd3e9cac7bf6d7be2257563cf6bb96c9aafb765a44011dc0a81b8f8be01f"
+      }
+    },
+    {
+      "command": "module-QueryTests-m036",
+      "method": "OntologyPlatform.QueryTests.ReviewRegressionTests.TimeoutMinimumMatchesFrozenContract",
+      "summary": {
+        "total": 2,
+        "PASS": 2,
+        "FAIL": 0,
+        "SKIP": 0
+      },
+      "before": {
+        "idle": true,
+        "connections": 118,
+        "execs": 118,
+        "capacityRefusals": 0,
+        "eventsSha256": "e0c2cd3e9cac7bf6d7be2257563cf6bb96c9aafb765a44011dc0a81b8f8be01f"
+      },
+      "after": {
+        "idle": true,
+        "connections": 119,
+        "execs": 119,
+        "capacityRefusals": 0,
+        "eventsSha256": "dbefe23d73a7ffae91613861a23af5cb22e42e1a1329a2dde31357f4352ddef5"
+      }
+    },
+    {
+      "command": "module-QueryTests-m037",
+      "method": "OntologyPlatform.QueryTests.GatewayTests.TraversalPreservesManyToManyAndBudget",
+      "summary": {
+        "total": 1,
+        "PASS": 1,
+        "FAIL": 0,
+        "SKIP": 0
+      },
+      "before": {
+        "idle": true,
+        "connections": 119,
+        "execs": 119,
+        "capacityRefusals": 0,
+        "eventsSha256": "dbefe23d73a7ffae91613861a23af5cb22e42e1a1329a2dde31357f4352ddef5"
+      },
+      "after": {
+        "idle": true,
+        "connections": 122,
+        "execs": 122,
+        "capacityRefusals": 0,
+        "eventsSha256": "1b6676bbf80e623d062bc3b8694debe12c908c61dc97dddd19141709fb04f563"
+      }
+    },
+    {
+      "command": "module-QueryTests-m038",
+      "method": "OntologyPlatform.QueryTests.ReviewRegressionTests.UnavailableResultIsCountedOnce",
+      "summary": {
+        "total": 1,
+        "PASS": 1,
+        "FAIL": 0,
+        "SKIP": 0
+      },
+      "before": {
+        "idle": true,
+        "connections": 122,
+        "execs": 122,
+        "capacityRefusals": 0,
+        "eventsSha256": "1b6676bbf80e623d062bc3b8694debe12c908c61dc97dddd19141709fb04f563"
+      },
+      "after": {
+        "idle": true,
+        "connections": 125,
+        "execs": 125,
+        "capacityRefusals": 0,
+        "eventsSha256": "96678cde6f2a77562b38d46d1f4d9d2e6ca8c3500cc6e4ecf024a4b4a2481151"
+      }
+    },
+    {
+      "command": "module-QueryTests-m039",
+      "method": "OntologyPlatform.QueryTests.QueryHttpTests.ValidQueryPostReturnsRealPublishedResult",
+      "summary": {
+        "total": 1,
+        "PASS": 1,
+        "FAIL": 0,
+        "SKIP": 0
+      },
+      "before": {
+        "idle": true,
+        "connections": 125,
+        "execs": 125,
+        "capacityRefusals": 0,
+        "eventsSha256": "96678cde6f2a77562b38d46d1f4d9d2e6ca8c3500cc6e4ecf024a4b4a2481151"
+      },
+      "after": {
+        "idle": true,
+        "connections": 128,
+        "execs": 128,
+        "capacityRefusals": 0,
+        "eventsSha256": "4352d0f4fceb95f584890b2d7379b48c32717b282e382a7ddfe5d1a2faa4994f"
+      }
+    }
+  ]
+}

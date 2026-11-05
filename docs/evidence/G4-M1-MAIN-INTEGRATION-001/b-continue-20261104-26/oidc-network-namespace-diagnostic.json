@@ -1,0 +1,27 @@
+{
+  "containers": [
+    {
+      "service": "api",
+      "id": "374ebb54d1938578c9b5b6a7c5bb733fbe11318d695bb54a1410c329c347540d",
+      "startedAt": "2026-11-05T01:23:52.32114605Z",
+      "running": true,
+      "networkMode": "ontology-g4-main-b-continue-20261104-26_front",
+      "netNamespace": "net:[4026533221]"
+    },
+    {
+      "service": "web",
+      "id": "3c946278552998a18b1e7e13c773615fcdc99966351a47f8530edbc2f7b50486",
+      "startedAt": "2026-11-05T01:22:34.118116805Z",
+      "running": true,
+      "networkMode": "container:374ebb54d1938578c9b5b6a7c5bb733fbe11318d695bb54a1410c329c347540d",
+      "netNamespace": "net:[4026532832]"
+    }
+  ],
+  "sameNetworkNamespace": false,
+  "logSha256": "89c79d1dc461642b937f03a3fefef8d746728485979f7fdd6f7fb52cc3ca4027",
+  "exceptionTypes": [
+    "Npgsql.PostgresException"
+  ],
+  "codes": [],
+  "connectionRefused15180": false
+}

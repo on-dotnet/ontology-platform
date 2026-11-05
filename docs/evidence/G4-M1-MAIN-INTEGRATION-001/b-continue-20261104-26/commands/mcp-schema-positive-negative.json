@@ -1,0 +1,28 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-26",
+  "testedCommit": "ac3db40fe8cb99871d02b197f3d41969823a647e",
+  "command": [
+    "/opt/homebrew/opt/node@24/bin/node",
+    "-e",
+    "\nconst fs = require('fs');\nconst Ajv = require(process.argv[2]);\nconst bundle = JSON.parse(fs.readFileSync(process.argv[1], 'utf8'));\nconst allowed = new Set(['$schema','$ref','$defs','type','properties','required','additionalProperties','items','enum','oneOf','anyOf','allOf','not','description','format','minimum','maximum','minLength','maxLength','const','discriminator']);\nconst keywords = new Set();\nfunction scan(schema) {\n  if (typeof schema === 'boolean') return;\n  for (const [key, value] of Object.entries(schema)) {\n    if (!allowed.has(key)) throw new Error('Unsupported schema keyword: ' + key);\n    keywords.add(key);\n    if (key === '$defs' || key === 'properties') Object.values(value).forEach(scan);\n    if (['oneOf','anyOf','allOf'].includes(key)) value.forEach(scan);\n    if (['items','not','additionalProperties'].includes(key) && typeof value === 'object') scan(value);\n  }\n}\nscan(bundle.schema);\nconst ajv = new Ajv({validateSchema:false, allErrors:true, unknownFormats:'ignore', logger:false});\nconst validate = ajv.compile(bundle.schema);\nif (!validate(bundle.result)) throw new Error('Actual MCP payload failed output contract: ' + JSON.stringify(validate.errors));\nfor (const result of bundle.additionalResults || []) if (!validate(result)) throw new Error('Another actual MCP tool failed output contract');\nconst mutations = [\n  value => { delete value.status; },\n  value => { value.status = 'INVENTED'; },\n  value => { value.injectedActor = 'admin'; },\n  value => { value.snapshot = null; },\n  value => { value.evidence = null; },\n  value => { value.data[0].ontology = {classIris:[],objectPropertyIris:[],datatypePropertyIris:[],labels:[],supportedAxioms:[],diagnostics:[]}; }\n];\nfor (const mutate of mutations) {\n  const value = structuredClone(bundle.result);\n  mutate(value);\n  if (validate(value)) throw new Error('Invalid MCP payload unexpectedly passed output contract');\n}\nconsole.log(JSON.stringify({status:'PASS', validator:'repo-locked ajv6.15.0', scope:'observed common keyword subset; not full 2020-12 dialect certification', schemaKeywords:[...keywords].sort(), positive:1+(bundle.additionalResults||[]).length, negative:mutations.length, mediaTypes:bundle.mediaTypes}));\n",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-26/agent-schema-result.json",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/node_modules/.pnpm/ajv@6.15.0/node_modules/ajv"
+  ],
+  "startedAtUtc": "2026-11-05T01:12:35.866134+00:00",
+  "endedAtUtc": "2026-11-05T01:12:35.913881+00:00",
+  "elapsedSeconds": 0.047750416000781115,
+  "exitCode": 0,
+  "timingStatus": "OBSERVED",
+  "timedOut": false,
+  "executedInputDrift": false,
+  "inputHashes": {
+    "/opt/homebrew/opt/node@24/bin/node": "0d78c9bca217f53c2dc21a067246ee4a81c1f4fa111ee64d572b45fa1ff39189",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-26/agent-schema-result.json": "deaddb95c91e96e95c0e31257a1cf965fb38706a88470e02aaafd3b30baf7d99"
+  },
+  "manifestSha256": "0948126be3b9db2b7bcbdd45deed72bd10b4927850eb77dc101f2ebf8e6a7af1",
+  "commandSha256": "d0c7e2cd2454d8f49fe40846b8f4971e112330dc7ac9ca7d1332bb2b27f95780",
+  "logSha256": "54f58babc84f38a12df86c62e879ab668677c07861b40d69f64f6c1810ddc5a2",
+  "logBytes": 372,
+  "logVisibility": "TASK_EVIDENCE"
+}

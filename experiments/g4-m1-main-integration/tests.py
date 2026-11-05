@@ -1105,6 +1105,70 @@ class SdkCopyMutationTests(unittest.TestCase):
                 run.verify_sdk_copies(m)
 
 
+class HandoffLifecycleTests(unittest.TestCase):
+    def test_api_restart_rejoins_web_actual_namespace_and_checks_login_redirect(self):
+        """API重启后旧Web命名空间不能继续作为OIDC依赖；错命名空间/issuer均拒绝。"""
+        import run,runtime as rt,urllib.request,urllib.error
+        from unittest.mock import patch
+        from contextlib import ExitStack
+        module=run.module('migration-boundary')
+        for failure in (None,'namespace','issuer'):
+            with self.subTest(failure=failure),tempfile.TemporaryDirectory(dir=ARTIFACTS) as directory:
+                root=Path(directory);rid='b-continue-20990101-97';realm=root/'realm.json';realm.write_text(json.dumps({'authority':'http://localhost:15180/realms/g2-abc'}))
+                m={'runId':rid,'_head':'a'*40};state={'api':'net:[10]','web':'net:[10]'}
+                runtime={'containerIds':{'api':'api-id','web':'web-id'},'healthKey':'fixture','realmFile':str(realm)}
+                def inspect(_m,ident,service):
+                    return {'Id':ident,'Created':'fixed-created','HostConfig':{'NetworkMode':'container:api-id'},'State':{'Running':True,'StartedAt':'started-new-api'}}
+                def docker(_m,args,**kwargs):
+                    if args==['restart','api-id']:state['api']='net:[11]';return b'api-id'
+                    if args==['restart','web-id']:
+                        if failure!='namespace':state['web']=state['api']
+                        return b'web-id'
+                    if args[:1]==['exec']:return state['api' if args[1]=='api-id' else 'web'].encode()
+                    self.fail(str(args))
+                class Opener:
+                    def open(self,request,timeout):
+                        if state['api']!=state['web']:raise urllib.error.HTTPError(request.full_url,500,'unready',{},None)
+                        issuer='http://localhost:15180/realms/'+('foreign' if failure=='issuer' else 'g2-abc')
+                        raise urllib.error.HTTPError(request.full_url,302,'redirect',{'Location':issuer+'/protocol/openid-connect/auth?state=private'},None)
+                with ExitStack() as stack:
+                    stack.enter_context(patch.object(rt,'ARTIFACTS',root));stack.enter_context(patch.object(rt,'runtime_value',return_value=runtime));stack.enter_context(patch.object(rt,'inspect_owned',side_effect=inspect));stack.enter_context(patch.object(rt,'docker',side_effect=docker));stack.enter_context(patch.object(rt,'wait_http'));stack.enter_context(patch.object(rt,'execute',side_effect=lambda m,n,cmd,**kw:docker(m,cmd[3:])));stack.enter_context(patch.object(urllib.request,'build_opener',return_value=Opener()))
+                    if failure:
+                        with self.assertRaisesRegex(ValueError,'WEB_NETWORK_NAMESPACE|WEB_OIDC_REDIRECT'):module.restart(m)
+                    else:
+                        module.restart(m);self.assertEqual(state['web'],'net:[11]')
+                        receipt=json.loads(next((root/rid).glob('migration-web-namespace-*.json')).read_text());self.assertEqual(receipt['loginStatus'],302);self.assertEqual(receipt['after']['api'],receipt['after']['web']);self.assertNotIn('state=private',json.dumps(receipt))
+
+    def test_actual_manifest_is_losslessly_retired_on_success_or_test_failure(self):
+        """当前合成输入用完必须原样归档并退休；未知预存/执行期间漂移绝不删除。"""
+        import run,runtime as rt,readback
+        from unittest.mock import patch
+        from contextlib import ExitStack
+        module=run.module('module-tests')
+        for mode in ('pass','failure','unknown','drift'):
+            with self.subTest(mode=mode),tempfile.TemporaryDirectory(dir=ARTIFACTS) as directory:
+                root=Path(directory);rid='b-continue-20990101-96';a=root/'artifacts';private=root/'private';private.mkdir();(private/'platform-password').write_text('synthetic')
+                output=root/'backend/tests/OntologyPlatform.G2ContractTests/bin/Debug/actual-v2-manifest.json';output.parent.mkdir(parents=True)
+                if mode=='unknown':output.write_bytes(b'unknown prior output')
+                captured=[]
+                def execute(*args,**kwargs):
+                    captured.append(output.read_bytes());self.assertEqual(json.loads(captured[0])['releaseId'],'current-release')
+                    if mode=='failure':raise ValueError('FIXTURE_TEST_FAILED')
+                    if mode=='drift':output.write_bytes(b'changed input')
+                    return b'fixture output'
+                with ExitStack() as stack:
+                    for name,value in [('ROOT',root),('ARTIFACTS',a)]:stack.enter_context(patch.object(rt,name,value))
+                    stack.enter_context(patch.object(rt,'private_dir',return_value=private));stack.enter_context(patch.object(rt,'environment',return_value={}));stack.enter_context(patch.object(rt,'check_build'));stack.enter_context(patch.object(rt,'execute',side_effect=execute));stack.enter_context(patch.object(rt,'test_projection',return_value={'summary':{'total':1,'PASS':1,'FAIL':0,'SKIP':0}}));stack.enter_context(patch.object(readback,'reports',return_value={'releases':[{'manifest':{'schemaVersion':2,'releaseId':'current-release'}}]}));stack.enter_context(patch.object(readback,'report_sha',return_value='b'*64))
+                    m={'runId':rid,'_head':'a'*40}
+                    if mode=='pass':module.g3_fixture_tests(m)
+                    else:
+                        with self.assertRaisesRegex(ValueError,{'failure':'FIXTURE_TEST_FAILED','unknown':'EXISTING_COMPATIBILITY_MANIFEST','drift':'ACTUAL_V2_INPUT_DRIFT'}[mode]):module.g3_fixture_tests(m)
+                if mode in ('pass','failure'):
+                    self.assertFalse(output.exists());self.assertEqual((a/rid/'actual-v2-manifest.json').read_bytes(),captured[0]);self.assertEqual(json.loads((a/rid/'actual-v2-retired.json').read_text())['absence'],'lstat ENOENT')
+                elif mode=='unknown':self.assertEqual(output.read_bytes(),b'unknown prior output');self.assertFalse((a/rid/'actual-v2-manifest.json').exists())
+                else:self.assertEqual(output.read_bytes(),b'changed input');self.assertEqual((a/rid/'actual-v2-manifest.json').read_bytes(),captured[0])
+
+
 if __name__ == '__main__':
     ARTIFACTS.mkdir(parents=True, exist_ok=True)
     unittest.main(verbosity=2)
