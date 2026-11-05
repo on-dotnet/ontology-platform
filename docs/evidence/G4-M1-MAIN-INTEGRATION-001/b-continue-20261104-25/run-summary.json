@@ -1,0 +1,47 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-25",
+  "testedCommit": "9daa51a7dd08f5b9dc139419f4851a9212da231f",
+  "status": "BLOCKED_WITH_WITNESS",
+  "gates": {
+    "R2": "PASS",
+    "PREFLIGHT": "PASS",
+    "I01": "PARTIAL",
+    "I02": "PASS",
+    "I03": "PARTIAL",
+    "I04": "BLOCKED_WITH_WITNESS",
+    "I05": "PASS"
+  },
+  "notRun": [
+    "I06",
+    "I07",
+    "I08"
+  ],
+  "engineering": {
+    "originalSelfTestSuites": 27,
+    "selfTestExitCode": 0,
+    "taskTestsAtTestedCommit": 55,
+    "nativeDotnetTotal": 780,
+    "nativePassed": 344,
+    "nativeSkipped": 436,
+    "nativeFailed": 0,
+    "webPassed": 379
+  },
+  "I02": {
+    "semantic": 302,
+    "publishing": 78,
+    "query": 49,
+    "agent": 33,
+    "security": 156,
+    "g2Contracts": 121,
+    "g3Compatibility": "PASS"
+  },
+  "failure": "EXACT_MIGRATION_PERMISSION_FAILURE: accurate permission denial, original PID1 remained running",
+  "diagnostic": "Only task API init changed; real same build config now exits134 in3.322s; old formal I04 remains BLOCKED",
+  "newTaskTests": 56,
+  "next": "new committed T then complete stable-input validation",
+  "main": "NOT_UPDATED",
+  "M2": "NOT_STARTED",
+  "historicalEvidence": "UNCHANGED; all originals retained; new public logs lossless envelopes",
+  "packageCapacity": "read-only estimate exceeds15MiB; no V3 created; no exception assumed"
+}

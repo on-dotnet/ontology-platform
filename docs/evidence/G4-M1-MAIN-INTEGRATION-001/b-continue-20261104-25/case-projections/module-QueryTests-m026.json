@@ -1,0 +1,33 @@
+{
+  "cases": [
+    {
+      "case": "QueryPostRequiresExactOrigin (\"https://external.invalid\")",
+      "status": "PASS",
+      "line": 1
+    },
+    {
+      "case": "QueryPostRequiresExactOrigin (\"http://platform.test/path\")",
+      "status": "PASS",
+      "line": 2
+    },
+    {
+      "case": "QueryPostRequiresExactOrigin (\"null\")",
+      "status": "PASS",
+      "line": 3
+    }
+  ],
+  "summary": {
+    "total": 3,
+    "PASS": 3,
+    "FAIL": 0,
+    "SKIP": 0
+  },
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-25",
+  "testedCommit": "9daa51a7dd08f5b9dc139419f4851a9212da231f",
+  "project": "QueryTests",
+  "assemblySha256": "d41b2a76a56212ee19ab1d5880fe74f6d71ad1c1ea098725fd3949aba1719fab",
+  "rawLogSha256": "29dea14390566835f7c65c129d364542e7dc12f5f574211818d9692fdaf83c99",
+  "commandReceiptSha256": "b9e130611ba3fdddc6617740d36bbe74f9917d182d15dd7271b3b14d54b5ba48",
+  "command": "module-QueryTests-m026"
+}

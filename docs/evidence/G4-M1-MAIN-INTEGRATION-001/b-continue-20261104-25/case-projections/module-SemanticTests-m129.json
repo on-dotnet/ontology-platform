@@ -1,0 +1,48 @@
+{
+  "cases": [
+    {
+      "case": "UnsafeShapesRejectedBeforeExecution (\"<urn:s> <http://www.w3.org/ns/shacl#sparql> <urn:q> .\")",
+      "status": "PASS",
+      "line": 1
+    },
+    {
+      "case": "UnsafeShapesRejectedBeforeExecution (\"<urn:s> <http://www.w3.org/ns/shacl#js> <urn:q> .\")",
+      "status": "PASS",
+      "line": 2
+    },
+    {
+      "case": "UnsafeShapesRejectedBeforeExecution (\"<urn:s> <http://www.w3.org/ns/shacl#node> <urn:s> .\")",
+      "status": "PASS",
+      "line": 3
+    },
+    {
+      "case": "UnsafeShapesRejectedBeforeExecution (\"<urn:s> <http://www.w3.org/2002/07/owl#imports> <http://192.0.2.1/never> .\")",
+      "status": "PASS",
+      "line": 4
+    },
+    {
+      "case": "UnsafeShapesRejectedBeforeExecution (\"<urn:s> <http://www.w3.org/ns/shacl#path> [ <http://www.w3.org/ns/shacl#inversePath> <urn:p> ] .\")",
+      "status": "PASS",
+      "line": 5
+    },
+    {
+      "case": "UnsafeShapesRejectedBeforeExecution (\"<urn:s> <http://www.w3.org/ns/shacl#property> <urn:s> ; <http://www.w3.org/ns/shacl#path> <urn:p> .\")",
+      "status": "PASS",
+      "line": 6
+    }
+  ],
+  "summary": {
+    "total": 6,
+    "PASS": 6,
+    "FAIL": 0,
+    "SKIP": 0
+  },
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-25",
+  "testedCommit": "9daa51a7dd08f5b9dc139419f4851a9212da231f",
+  "project": "SemanticTests",
+  "assemblySha256": "e80c0033c96de532a6536a3fc578eb725a80e80687efd34066695b5d42f5c752",
+  "rawLogSha256": "c7747b26779023a8a9b12fc581592e90ce21472ef6a55b2c5792f322d04929c4",
+  "commandReceiptSha256": "9fea4432b6353f314174755345c8c47292fe48615b5f7de81321848415004298",
+  "command": "module-SemanticTests-m129"
+}

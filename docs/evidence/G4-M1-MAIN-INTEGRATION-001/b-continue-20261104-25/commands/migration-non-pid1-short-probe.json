@@ -1,0 +1,31 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-25",
+  "testedCommit": "9daa51a7dd08f5b9dc139419f4851a9212da231f",
+  "command": [
+    "docker",
+    "--context",
+    "desktop-linux",
+    "exec",
+    "ed9ebe77bf868404bd4436aea2927c7f6777c3507f0bf0ec8e1235c5ba7be05c",
+    "/usr/bin/timeout",
+    "--signal=TERM",
+    "--kill-after=2s",
+    "15s",
+    "dotnet",
+    "/app/OntologyPlatform.Api.dll"
+  ],
+  "startedAtUtc": "2026-11-05T00:26:51.679133+00:00",
+  "endedAtUtc": "2026-11-05T00:26:55.066504+00:00",
+  "elapsedSeconds": 3.3868860000002314,
+  "exitCode": 134,
+  "timingStatus": "OBSERVED",
+  "timedOut": false,
+  "executedInputDrift": false,
+  "inputHashes": {},
+  "manifestSha256": "762abecb4799f01ec16fd65ffcb1a1b2d98aba3a6cd4e3856f28d5717baddfa6",
+  "commandSha256": "7ec7c24ee68a9a2eba1c4e2c2eb801ce5bd0bcd4f5eb74030b23bd92f9785100",
+  "logSha256": "d504e7393b4e4adad7e9a23a30840a26a2a50154462ecaf00850293ccfd04ca3",
+  "logBytes": 5371,
+  "logVisibility": "PRIVATE"
+}

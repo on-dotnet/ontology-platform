@@ -1,0 +1,38 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-25",
+  "testedCommit": "9daa51a7dd08f5b9dc139419f4851a9212da231f",
+  "command": [
+    "/usr/bin/sandbox-exec",
+    "-p",
+    "(version 1) (allow default) (deny network-outbound (remote ip \"*:*\")) (allow network-outbound (remote ip \"localhost:*\"))",
+    "/usr/local/share/dotnet/dotnet",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll",
+    "--filter",
+    "FullyQualifiedName=OntologyPlatform.PublishingTests.ArtifactTests.ImmutableRoundtripAndDifferentContentRejected",
+    "--minimum-expected-tests",
+    "1",
+    "--no-ansi",
+    "--output",
+    "Detailed",
+    "--results-directory",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261104-25/test-results/module-PublishingTests-m020"
+  ],
+  "startedAtUtc": "2026-11-05T00:06:22.792413+00:00",
+  "endedAtUtc": "2026-11-05T00:06:23.154618+00:00",
+  "elapsedSeconds": 0.36219050000363495,
+  "exitCode": 0,
+  "timingStatus": "OBSERVED",
+  "timedOut": false,
+  "executedInputDrift": false,
+  "inputHashes": {
+    "/usr/bin/sandbox-exec": "58839ef01b4eef8aac0d2aa8f9d1c074ae45aafe3533965b030672450064acc8",
+    "/usr/local/share/dotnet/dotnet": "11b517e7b00d0efa20e9b3ab6fe433f135d828a4c95c9c6ca7a9cf1328b6ada4",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/tests/OntologyPlatform.PublishingTests/bin/Debug/net10.0/OntologyPlatform.PublishingTests.dll": "8c7dc811b92f51d6ec792e08a06dbeb511c40dad8ad2c5f65c456ee6fa40848d"
+  },
+  "manifestSha256": "762abecb4799f01ec16fd65ffcb1a1b2d98aba3a6cd4e3856f28d5717baddfa6",
+  "commandSha256": "cc48b402e319bfefc8e770cf111913da2e665033826ecf3699ae55e0debd678e",
+  "logSha256": "0b1e546cc20a0ff918ba2429aa4b6fc374d93df31dc9d322fa76fcd97b91e8a9",
+  "logBytes": 365,
+  "logVisibility": "PRIVATE"
+}

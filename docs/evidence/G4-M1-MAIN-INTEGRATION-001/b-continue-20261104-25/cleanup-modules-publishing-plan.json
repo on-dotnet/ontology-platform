@@ -1,0 +1,63 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-25",
+  "observedAtUtc": "2026-11-05T00:07:35.067062+00:00",
+  "resources": {
+    "container": {
+      "owned": [
+        {
+          "id": "c9e8c8995241d4c561702c61194c95d427fcaee4eb9a0cb1af5130c52fe49399",
+          "created": "2026-11-05T00:04:57.709010262Z"
+        },
+        {
+          "id": "4fbc967ba172f1f5fd342c0717cfa67a9f1ab7113cd92267978d835838837238",
+          "created": "2026-11-05T00:04:57.706632096Z"
+        },
+        {
+          "id": "a2d1fe2f1f6bfe17bf547e8b6812a3af319dc3773e0ee351b7e26e9bf0ff97bf",
+          "created": "2026-11-05T00:04:57.705400096Z"
+        }
+      ],
+      "keep": []
+    },
+    "network": {
+      "owned": [
+        {
+          "id": "67666b1552867cade9e6abfda5dc03237f3738d9edebaa0a140f4957aab3d392",
+          "created": "2026-11-05T00:04:57.693790721Z"
+        }
+      ],
+      "keep": [
+        "13cf8c0f38dd4e1182b53a6a9ede4babc7ff53454952db4cae6a0049429fa616",
+        "80ac07a0bfc7ad5bdedefec78a3a66c97c4c74093c4a8533f05f4cb96bcbc4d0",
+        "e66d65cfe0714eb9fde22ab801d77393aeb653344362c0faac45292d829dab8e"
+      ]
+    },
+    "volume": {
+      "owned": [
+        {
+          "id": "ontology-g4-main-b-continue-20261104-25_fuseki-data",
+          "created": "2026-11-05T00:04:57Z"
+        },
+        {
+          "id": "ontology-g4-main-b-continue-20261104-25_platform-data",
+          "created": "2026-11-05T00:04:57Z"
+        },
+        {
+          "id": "ontology-g4-main-b-continue-20261104-25_rustfs-data",
+          "created": "2026-11-05T00:04:57Z"
+        }
+      ],
+      "keep": [
+        "g2-ef979bd04cc0-alloy-data",
+        "g2-ef979bd04cc0-fuseki-data",
+        "g2-ef979bd04cc0-grafana-data",
+        "g2-ef979bd04cc0-loki-data",
+        "g2-ef979bd04cc0-postgres-data",
+        "g2-ef979bd04cc0-prometheus-data",
+        "g2-ef979bd04cc0-rustfs-data",
+        "g2-ef979bd04cc0-tempo-data"
+      ]
+    }
+  }
+}

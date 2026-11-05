@@ -1,0 +1,30 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-25",
+  "testedCommit": "9daa51a7dd08f5b9dc139419f4851a9212da231f",
+  "command": [
+    "docker",
+    "--context",
+    "desktop-linux",
+    "exec",
+    "ed9ebe77bf868404bd4436aea2927c7f6777c3507f0bf0ec8e1235c5ba7be05c",
+    "/bin/sh",
+    "-c",
+    "cat /proc/1/status; cat /proc/1/wchan; cat /proc/sys/kernel/core_pattern; cat /proc/1/limits"
+  ],
+  "startedAtUtc": "2026-11-05T00:24:13.515371+00:00",
+  "endedAtUtc": "2026-11-05T00:24:16.561394+00:00",
+  "elapsedSeconds": 3.045626415994775,
+  "exitCode": 0,
+  "timingStatus": "OBSERVED",
+  "timedOut": false,
+  "executedInputDrift": false,
+  "inputHashes": {
+    "/bin/sh": "84ca7f9b83021621e16059a1c7850df72a462d879e8239d566236ca6ddd00953"
+  },
+  "manifestSha256": "762abecb4799f01ec16fd65ffcb1a1b2d98aba3a6cd4e3856f28d5717baddfa6",
+  "commandSha256": "87f89f34145f428f184865826074f77e8ebaedc3c225b63c853898e1a1140ee6",
+  "logSha256": "a9cad93e80a4666462a8504d6f31ab24f2965c4b269f7f63f1aaca5790565919",
+  "logBytes": 2442,
+  "logVisibility": "PRIVATE"
+}

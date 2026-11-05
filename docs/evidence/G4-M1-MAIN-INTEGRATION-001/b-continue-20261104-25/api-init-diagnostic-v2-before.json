@@ -1,0 +1,102 @@
+{
+  "scope": "DIAGNOSTIC_ONLY_NOT_FORMAL_I04",
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-25",
+  "originalTestedCommit": "9daa51a7dd08f5b9dc139419f4851a9212da231f",
+  "actualDrivers": {
+    "run.py": "5b116dbecb5be44588f83ba48be243a8eecb39677c666dd61835dfcf444e2f57",
+    "consumer_check.py": "b58a3305461de319aca2a4a094f9d5c18c2411632adf67c57d6de1f3517fe9af",
+    "runtime.py": "fbb69803a679de9ef9612ba59adca212bbcda2fd1b2f4dee67b35491ed90a9cb",
+    "pg_fixture.py": "0b3e95134d76bb356fa2f14f21da58886675d6c553b2daf2f643895dc4591f51",
+    "module-tests.py": "970ef5245c6adc8ed64af9c7bd1153c4a8d7a790db787fdacd41d80cd9aa81d5",
+    "startup-boundary.py": "256bba53361f407d0a4071c9c7bd951019418e2193e56aaa604155510d04289c",
+    "migration-boundary.py": "b154843cda9e7195804063e103ba252115051696185e0e3ca648077a3272588d",
+    "contract-check.mjs": "3a7f662352a1d182f0f53f96703cfbb1f8d6f152443d3ab5bc8b2a525c5b01ea",
+    "http.mjs": "c98e018d1748a3bb57a2ee70e71574633a1616e238528eb2f45c02aba83281eb",
+    "browser.mjs": "b2558c334e3896db180a3cb82f35345bfc208edb65266b963901a0d10ffdb758",
+    "fault.mjs": "69557b1f546ded5125ac8b425eb3f8872c8d788a8246fd577f86f9551b1f5939",
+    "g3-compatibility.mjs": "705d972ae2f48107c445be8ae575096ee39b55b3b01112e26d1a206923437c9d",
+    "readback.py": "235b9eab13b47054cf904e3f714350b1ad3b5a8fab891fe885ea95f57513a05e",
+    "closeout.py": "fd6b97e94348e72d4dced2e1197b5686971ad01c160a1db0a2af97a7b15f449b",
+    "tests.py": "4e30ca39b7baf2578e7b1f8751f0553e1ede9db3de2d7f6757660c882ed51fb2",
+    "host_continuity.py": "abd4385e1b05a86f5a12582a7e95a1fcc4a29c333eb23d2d952229744ed68984",
+    "compose.m1.yaml": "765a3e9d2728c85cea051c9674af30b410747801bd134e8ccb708f86607f437f",
+    "compose.g3.yaml": "3231f1f0ff3c3d9aabcd8b58b589d1adc0d267c8e2af1335d2b1e5777416c53d",
+    "hooks/pre-push": "5eaef2482b8b75cb1deb7cca9703f591a0a15c2459e49c5192b4382ccb7ad474"
+  },
+  "configOriginalSha256": "f10500ae763e6e71bd8775c1f1165b53b2718cb5042692245e9500acf506032a",
+  "before": {
+    "container": {
+      "owned": [
+        {
+          "id": "593ad0989a8017e63d3ecf0caaa2435a85b0a48b6cd447336f4e1beafdbee7fd",
+          "created": "2026-11-05T00:19:58.135752679Z"
+        },
+        {
+          "id": "ed9ebe77bf868404bd4436aea2927c7f6777c3507f0bf0ec8e1235c5ba7be05c",
+          "created": "2026-11-05T00:19:58.133353596Z"
+        },
+        {
+          "id": "e5b35b69c791e6f103b8967b07577041c4036bc2a41324d94a83958ffe82be7f",
+          "created": "2026-11-05T00:13:52.90580176Z"
+        },
+        {
+          "id": "cdcc2d8e62eb4041a96b6f657b836d6c2059a5a41041f2c5f24c1215fa33dadc",
+          "created": "2026-11-05T00:13:52.905733052Z"
+        }
+      ],
+      "keep": []
+    },
+    "network": {
+      "owned": [
+        {
+          "id": "cd67a9cd0804932966d57da60af72a9caafe970251a29aecd3fc0d5c5b2c842f",
+          "created": "2026-11-05T00:13:52.892501593Z"
+        },
+        {
+          "id": "196364b4e56f4acc47c304b291a295979a27b1a8cf0cd6ba1cedf986142f5e30",
+          "created": "2026-11-05T00:19:58.120019513Z"
+        }
+      ],
+      "keep": [
+        "13cf8c0f38dd4e1182b53a6a9ede4babc7ff53454952db4cae6a0049429fa616",
+        "80ac07a0bfc7ad5bdedefec78a3a66c97c4c74093c4a8533f05f4cb96bcbc4d0",
+        "e66d65cfe0714eb9fde22ab801d77393aeb653344362c0faac45292d829dab8e"
+      ]
+    },
+    "volume": {
+      "owned": [
+        {
+          "id": "ontology-g4-main-b-continue-20261104-25_api-keyring",
+          "created": "2026-11-05T00:13:52Z"
+        },
+        {
+          "id": "ontology-g4-main-b-continue-20261104-25_keycloak-data",
+          "created": "2026-11-05T00:13:52Z"
+        },
+        {
+          "id": "ontology-g4-main-b-continue-20261104-25_platform-data",
+          "created": "2026-11-05T00:13:52Z"
+        },
+        {
+          "id": "ontology-g4-main-b-continue-20261104-25_source-data",
+          "created": "2026-11-05T00:19:58Z"
+        }
+      ],
+      "keep": [
+        "g2-ef979bd04cc0-alloy-data",
+        "g2-ef979bd04cc0-fuseki-data",
+        "g2-ef979bd04cc0-grafana-data",
+        "g2-ef979bd04cc0-loki-data",
+        "g2-ef979bd04cc0-postgres-data",
+        "g2-ef979bd04cc0-prometheus-data",
+        "g2-ef979bd04cc0-rustfs-data",
+        "g2-ef979bd04cc0-tempo-data"
+      ]
+    }
+  },
+  "retired": [],
+  "status": "FAIL",
+  "previousDiagnosticResultSha256": "c68b8c0a21037289e675a5d72e06b6c146068c5045e0d16bc4e2a389d6e1e503",
+  "executedHelperSha256": "7d47a3faa72b03f1286100ef49af5d34f8092fabdd4f6cf5b5b449d345290b15"
+}

@@ -1,0 +1,333 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-25",
+  "testedCommit": "9daa51a7dd08f5b9dc139419f4851a9212da231f",
+  "project": "QueryTests",
+  "assemblySha256": "d41b2a76a56212ee19ab1d5880fe74f6d71ad1c1ea098725fd3949aba1719fab",
+  "baselineSha256": "08c189feb0a93983cb11d2f5ab4dab71174a1685e7dc5333f002ef2e81d04217",
+  "methods": [
+    {
+      "method": "OntologyPlatform.QueryTests.GatewayTests.AbsentReleaseAndRoleAreExplicitErrors",
+      "source": "backend/tests/OntologyPlatform.QueryTests/GatewayTests.cs",
+      "sourceSha256": "c0c94d26588b245ce16e7751fe7b8e22f239dc5dec619620bcbdb434367d92b5",
+      "cases": [
+        "AbsentReleaseAndRoleAreExplicitErrors"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.QueryTests.GatewayTests.AmbiguousIdentityIsNeverStringJoined",
+      "source": "backend/tests/OntologyPlatform.QueryTests/GatewayTests.cs",
+      "sourceSha256": "c0c94d26588b245ce16e7751fe7b8e22f239dc5dec619620bcbdb434367d92b5",
+      "cases": [
+        "AmbiguousIdentityIsNeverStringJoined"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.QueryTests.QueryFaultTests.AuditFailureIsUnavailableAndRecovers",
+      "source": "backend/tests/OntologyPlatform.QueryTests/QueryFaultTests.cs",
+      "sourceSha256": "10227b3d232fe1ee0c999014e33c0667eab8e63a66632485cd99c92f1e36bc78",
+      "cases": [
+        "AuditFailureIsUnavailableAndRecovers"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.QueryTests.QueryHttpTests.AuthenticationAndAuthorizationPrecedeBodyBinding",
+      "source": "backend/tests/OntologyPlatform.QueryTests/QueryHttpTests.cs",
+      "sourceSha256": "4a435c8dbac25bac5e9fd72302a16122ac0bff497f8becae6a3937fbbb42f373",
+      "cases": [
+        "AuthenticationAndAuthorizationPrecedeBodyBinding (\"unapproved-role\",403)",
+        "AuthenticationAndAuthorizationPrecedeBodyBinding (null,401)"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.QueryTests.ReviewRegressionTests.CallerCancellationDuringAuditPropagates",
+      "source": "backend/tests/OntologyPlatform.QueryTests/ReviewRegressionTests.cs",
+      "sourceSha256": "6b851026e4f331f8f746435920f6c51a7a730ea57380cdd49cfb431cf33ce842",
+      "cases": [
+        "CallerCancellationDuringAuditPropagates"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.QueryTests.QueryFaultTests.CancellationAndBudgetReachDependency",
+      "source": "backend/tests/OntologyPlatform.QueryTests/QueryFaultTests.cs",
+      "sourceSha256": "10227b3d232fe1ee0c999014e33c0667eab8e63a66632485cd99c92f1e36bc78",
+      "cases": [
+        "CancellationAndBudgetReachDependency"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.QueryTests.QueryFaultTests.ChangedOrMissingGraphIsUnavailable",
+      "source": "backend/tests/OntologyPlatform.QueryTests/QueryFaultTests.cs",
+      "sourceSha256": "10227b3d232fe1ee0c999014e33c0667eab8e63a66632485cd99c92f1e36bc78",
+      "cases": [
+        "ChangedOrMissingGraphIsUnavailable (False)",
+        "ChangedOrMissingGraphIsUnavailable (True)"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.QueryTests.QueryFaultTests.ConcurrentActivationCannotChangeRequestSnapshot",
+      "source": "backend/tests/OntologyPlatform.QueryTests/QueryFaultTests.cs",
+      "sourceSha256": "10227b3d232fe1ee0c999014e33c0667eab8e63a66632485cd99c92f1e36bc78",
+      "cases": [
+        "ConcurrentActivationCannotChangeRequestSnapshot"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.QueryTests.QueryFaultTests.CorruptedSourceHashFailsQueryAndEvidence",
+      "source": "backend/tests/OntologyPlatform.QueryTests/QueryFaultTests.cs",
+      "sourceSha256": "10227b3d232fe1ee0c999014e33c0667eab8e63a66632485cd99c92f1e36bc78",
+      "cases": [
+        "CorruptedSourceHashFailsQueryAndEvidence"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.QueryTests.QueryFaultTests.CrossSiteEdgesAndMissingRelationshipsDoNotInventFacts",
+      "source": "backend/tests/OntologyPlatform.QueryTests/QueryFaultTests.cs",
+      "sourceSha256": "10227b3d232fe1ee0c999014e33c0667eab8e63a66632485cd99c92f1e36bc78",
+      "cases": [
+        "CrossSiteEdgesAndMissingRelationshipsDoNotInventFacts"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.QueryTests.QueryFaultTests.DeclaredScopeIsAuthorizedBeforeExternalReads",
+      "source": "backend/tests/OntologyPlatform.QueryTests/QueryFaultTests.cs",
+      "sourceSha256": "10227b3d232fe1ee0c999014e33c0667eab8e63a66632485cd99c92f1e36bc78",
+      "cases": [
+        "DeclaredScopeIsAuthorizedBeforeExternalReads"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.QueryTests.QueryFaultTests.DependencyFailureAfterSnapshotIsUnavailableAndRecoverable",
+      "source": "backend/tests/OntologyPlatform.QueryTests/QueryFaultTests.cs",
+      "sourceSha256": "10227b3d232fe1ee0c999014e33c0667eab8e63a66632485cd99c92f1e36bc78",
+      "cases": [
+        "DependencyFailureAfterSnapshotIsUnavailableAndRecoverable"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.QueryTests.QueryFaultTests.DepthBudgetReportsIncompleteGraph",
+      "source": "backend/tests/OntologyPlatform.QueryTests/QueryFaultTests.cs",
+      "sourceSha256": "10227b3d232fe1ee0c999014e33c0667eab8e63a66632485cd99c92f1e36bc78",
+      "cases": [
+        "DepthBudgetReportsIncompleteGraph"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.QueryTests.GatewayTests.DescriptionUsesPublishedSchemaAndRegistry",
+      "source": "backend/tests/OntologyPlatform.QueryTests/GatewayTests.cs",
+      "sourceSha256": "c0c94d26588b245ce16e7751fe7b8e22f239dc5dec619620bcbdb434367d92b5",
+      "cases": [
+        "DescriptionUsesPublishedSchemaAndRegistry"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.QueryTests.GatewayTests.EvidenceIsReauthorizedAndIdsCannotChooseObjects",
+      "source": "backend/tests/OntologyPlatform.QueryTests/GatewayTests.cs",
+      "sourceSha256": "c0c94d26588b245ce16e7751fe7b8e22f239dc5dec619620bcbdb434367d92b5",
+      "cases": [
+        "EvidenceIsReauthorizedAndIdsCannotChooseObjects"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.QueryTests.ReviewRegressionTests.EvidenceRejectsGraphChangedAfterCatalogVerification",
+      "source": "backend/tests/OntologyPlatform.QueryTests/ReviewRegressionTests.cs",
+      "sourceSha256": "6b851026e4f331f8f746435920f6c51a7a730ea57380cdd49cfb431cf33ce842",
+      "cases": [
+        "EvidenceRejectsGraphChangedAfterCatalogVerification"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.QueryTests.GatewayTests.ExplicitOutOfScopeEntityIsUnauthorized",
+      "source": "backend/tests/OntologyPlatform.QueryTests/GatewayTests.cs",
+      "sourceSha256": "c0c94d26588b245ce16e7751fe7b8e22f239dc5dec619620bcbdb434367d92b5",
+      "cases": [
+        "ExplicitOutOfScopeEntityIsUnauthorized"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.QueryTests.ReviewRegressionTests.FailureAuditIsBoundedAndNotHidden",
+      "source": "backend/tests/OntologyPlatform.QueryTests/ReviewRegressionTests.cs",
+      "sourceSha256": "6b851026e4f331f8f746435920f6c51a7a730ea57380cdd49cfb431cf33ce842",
+      "cases": [
+        "FailureAuditIsBoundedAndNotHidden"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.QueryTests.GatewayTests.FoundEvidenceSurvivesNewServiceInstance",
+      "source": "backend/tests/OntologyPlatform.QueryTests/GatewayTests.cs",
+      "sourceSha256": "c0c94d26588b245ce16e7751fe7b8e22f239dc5dec619620bcbdb434367d92b5",
+      "cases": [
+        "FoundEvidenceSurvivesNewServiceInstance"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.QueryTests.GatewayTests.InvalidPlansAreRejected",
+      "source": "backend/tests/OntologyPlatform.QueryTests/GatewayTests.cs",
+      "sourceSha256": "c0c94d26588b245ce16e7751fe7b8e22f239dc5dec619620bcbdb434367d92b5",
+      "cases": [
+        "InvalidPlansAreRejected"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.QueryTests.GatewayTests.MissingEntityIsEmpty",
+      "source": "backend/tests/OntologyPlatform.QueryTests/GatewayTests.cs",
+      "sourceSha256": "c0c94d26588b245ce16e7751fe7b8e22f239dc5dec619620bcbdb434367d92b5",
+      "cases": [
+        "MissingEntityIsEmpty"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.QueryTests.GatewayTests.MissingProvenanceIsPartial",
+      "source": "backend/tests/OntologyPlatform.QueryTests/GatewayTests.cs",
+      "sourceSha256": "c0c94d26588b245ce16e7751fe7b8e22f239dc5dec619620bcbdb434367d92b5",
+      "cases": [
+        "MissingProvenanceIsPartial"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.QueryTests.RegistryTests.ModuleRegistersSharedContracts",
+      "source": "backend/tests/OntologyPlatform.QueryTests/RegistryTests.cs",
+      "sourceSha256": "ca2482418aa8eff7d373e6a15710a38e3133a5bb2b6afee34e6ae681b4c5b599",
+      "cases": [
+        "ModuleRegistersSharedContracts"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.QueryTests.QueryFaultTests.QueryAndEvidenceCommitIndependentAudit",
+      "source": "backend/tests/OntologyPlatform.QueryTests/QueryFaultTests.cs",
+      "sourceSha256": "10227b3d232fe1ee0c999014e33c0667eab8e63a66632485cd99c92f1e36bc78",
+      "cases": [
+        "QueryAndEvidenceCommitIndependentAudit"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.QueryTests.QueryHttpTests.QueryEndpointsDeclareAuthorizationAndProblems",
+      "source": "backend/tests/OntologyPlatform.QueryTests/QueryHttpTests.cs",
+      "sourceSha256": "4a435c8dbac25bac5e9fd72302a16122ac0bff497f8becae6a3937fbbb42f373",
+      "cases": [
+        "QueryEndpointsDeclareAuthorizationAndProblems"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.QueryTests.QueryHttpTests.QueryPostRequiresExactOrigin",
+      "source": "backend/tests/OntologyPlatform.QueryTests/QueryHttpTests.cs",
+      "sourceSha256": "4a435c8dbac25bac5e9fd72302a16122ac0bff497f8becae6a3937fbbb42f373",
+      "cases": [
+        "QueryPostRequiresExactOrigin (\"http://platform.test/path\")",
+        "QueryPostRequiresExactOrigin (\"https://external.invalid\")",
+        "QueryPostRequiresExactOrigin (\"null\")"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.QueryTests.QueryHttpTests.QueryPostRequiresNativeCsrf",
+      "source": "backend/tests/OntologyPlatform.QueryTests/QueryHttpTests.cs",
+      "sourceSha256": "4a435c8dbac25bac5e9fd72302a16122ac0bff497f8becae6a3937fbbb42f373",
+      "cases": [
+        "QueryPostRequiresNativeCsrf (\"synthetic-forged-csrf\")",
+        "QueryPostRequiresNativeCsrf (null)"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.QueryTests.ReviewRegressionTests.QueryRejectsGraphChangedAfterCatalogVerification",
+      "source": "backend/tests/OntologyPlatform.QueryTests/ReviewRegressionTests.cs",
+      "sourceSha256": "6b851026e4f331f8f746435920f6c51a7a730ea57380cdd49cfb431cf33ce842",
+      "cases": [
+        "QueryRejectsGraphChangedAfterCatalogVerification"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.QueryTests.QueryHttpTests.QueryRouteMatchesFrozenContract",
+      "source": "backend/tests/OntologyPlatform.QueryTests/QueryHttpTests.cs",
+      "sourceSha256": "4a435c8dbac25bac5e9fd72302a16122ac0bff497f8becae6a3937fbbb42f373",
+      "cases": [
+        "QueryRouteMatchesFrozenContract"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.QueryTests.VerifiedSourcesTests.RejectsHashValidInvalidUtf8",
+      "source": "backend/tests/OntologyPlatform.QueryTests/VerifiedSourcesTests.cs",
+      "sourceSha256": "997add312f443ad133122119d6826529a838c450f6133e6a16780d38e30d4680",
+      "cases": [
+        "RejectsHashValidInvalidUtf8"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.QueryTests.VerifiedSourcesTests.RejectsManifestSourceBindingMismatch",
+      "source": "backend/tests/OntologyPlatform.QueryTests/VerifiedSourcesTests.cs",
+      "sourceSha256": "997add312f443ad133122119d6826529a838c450f6133e6a16780d38e30d4680",
+      "cases": [
+        "RejectsManifestSourceBindingMismatch (\"bundle\")",
+        "RejectsManifestSourceBindingMismatch (\"key\")",
+        "RejectsManifestSourceBindingMismatch (\"slots\")",
+        "RejectsManifestSourceBindingMismatch (\"snapshot\")"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.QueryTests.VerifiedSourcesTests.RestoresActualPublishedSources",
+      "source": "backend/tests/OntologyPlatform.QueryTests/VerifiedSourcesTests.cs",
+      "sourceSha256": "997add312f443ad133122119d6826529a838c450f6133e6a16780d38e30d4680",
+      "cases": [
+        "RestoresActualPublishedSources (False)",
+        "RestoresActualPublishedSources (True)"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.QueryTests.QueryFaultTests.ReverseLineageUsesActualEdges",
+      "source": "backend/tests/OntologyPlatform.QueryTests/QueryFaultTests.cs",
+      "sourceSha256": "10227b3d232fe1ee0c999014e33c0667eab8e63a66632485cd99c92f1e36bc78",
+      "cases": [
+        "ReverseLineageUsesActualEdges"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.QueryTests.RegistryTests.SchemaUsesCompleteGeneratedClosureAndStableVersions",
+      "source": "backend/tests/OntologyPlatform.QueryTests/RegistryTests.cs",
+      "sourceSha256": "ca2482418aa8eff7d373e6a15710a38e3133a5bb2b6afee34e6ae681b4c5b599",
+      "cases": [
+        "SchemaUsesCompleteGeneratedClosureAndStableVersions"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.QueryTests.ReviewRegressionTests.SuccessfulAuditCannotOutliveQueryBudget",
+      "source": "backend/tests/OntologyPlatform.QueryTests/ReviewRegressionTests.cs",
+      "sourceSha256": "6b851026e4f331f8f746435920f6c51a7a730ea57380cdd49cfb431cf33ce842",
+      "cases": [
+        "SuccessfulAuditCannotOutliveQueryBudget"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.QueryTests.ReviewRegressionTests.TimeoutMinimumMatchesFrozenContract",
+      "source": "backend/tests/OntologyPlatform.QueryTests/ReviewRegressionTests.cs",
+      "sourceSha256": "6b851026e4f331f8f746435920f6c51a7a730ea57380cdd49cfb431cf33ce842",
+      "cases": [
+        "TimeoutMinimumMatchesFrozenContract (100,404)",
+        "TimeoutMinimumMatchesFrozenContract (99,422)"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.QueryTests.GatewayTests.TraversalPreservesManyToManyAndBudget",
+      "source": "backend/tests/OntologyPlatform.QueryTests/GatewayTests.cs",
+      "sourceSha256": "c0c94d26588b245ce16e7751fe7b8e22f239dc5dec619620bcbdb434367d92b5",
+      "cases": [
+        "TraversalPreservesManyToManyAndBudget"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.QueryTests.ReviewRegressionTests.UnavailableResultIsCountedOnce",
+      "source": "backend/tests/OntologyPlatform.QueryTests/ReviewRegressionTests.cs",
+      "sourceSha256": "6b851026e4f331f8f746435920f6c51a7a730ea57380cdd49cfb431cf33ce842",
+      "cases": [
+        "UnavailableResultIsCountedOnce"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.QueryTests.QueryHttpTests.ValidQueryPostReturnsRealPublishedResult",
+      "source": "backend/tests/OntologyPlatform.QueryTests/QueryHttpTests.cs",
+      "sourceSha256": "4a435c8dbac25bac5e9fd72302a16122ac0bff497f8becae6a3937fbbb42f373",
+      "cases": [
+        "ValidQueryPostReturnsRealPublishedResult"
+      ]
+    }
+  ],
+  "scope": "ALL_CASES_METHOD_PROCESS_ISOLATION"
+}

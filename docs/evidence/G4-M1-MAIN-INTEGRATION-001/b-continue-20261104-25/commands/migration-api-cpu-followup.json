@@ -1,0 +1,30 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-25",
+  "testedCommit": "9daa51a7dd08f5b9dc139419f4851a9212da231f",
+  "command": [
+    "docker",
+    "--context",
+    "desktop-linux",
+    "exec",
+    "ed9ebe77bf868404bd4436aea2927c7f6777c3507f0bf0ec8e1235c5ba7be05c",
+    "/bin/sh",
+    "-c",
+    "for n in 1 2; do cat /proc/1/stat; sleep 1; done; cat /proc/uptime; ps -eo pid,ppid,stat,comm; sha256sum /private/api/appsettings.json"
+  ],
+  "startedAtUtc": "2026-11-05T00:25:23.486344+00:00",
+  "endedAtUtc": "2026-11-05T00:25:28.551393+00:00",
+  "elapsedSeconds": 5.065059125001426,
+  "exitCode": 0,
+  "timingStatus": "OBSERVED",
+  "timedOut": false,
+  "executedInputDrift": false,
+  "inputHashes": {
+    "/bin/sh": "84ca7f9b83021621e16059a1c7850df72a462d879e8239d566236ca6ddd00953"
+  },
+  "manifestSha256": "762abecb4799f01ec16fd65ffcb1a1b2d98aba3a6cd4e3856f28d5717baddfa6",
+  "commandSha256": "c94f3a03e27d381deae46317e164306c1e7a83f0ba93ef3c0b9debe72ca65152",
+  "logSha256": "5367ec3a8beee2025492a3770ff64c31ca647f9b4757b51d84eb448bb2c1cdfa",
+  "logBytes": 855,
+  "logVisibility": "PRIVATE"
+}

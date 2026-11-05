@@ -1,0 +1,20 @@
+{
+  "reviewer": "/root/consumer_review",
+  "status": "PASS",
+  "scope": "five-file task API init patch, diagnostic postcheck and exact Docker cleanup",
+  "drivers": {
+    "runtime.py": "fbb69803a679de9ef9612ba59adca212bbcda2fd1b2f4dee67b35491ed90a9cb",
+    "consumer_check.py": "b58a3305461de319aca2a4a094f9d5c18c2411632adf67c57d6de1f3517fe9af",
+    "tests.py": "4e30ca39b7baf2578e7b1f8751f0553e1ede9db3de2d7f6757660c882ed51fb2",
+    "compose.g3.yaml": "3231f1f0ff3c3d9aabcd8b58b589d1adc0d267c8e2af1335d2b1e5777416c53d",
+    "compose.m1.yaml": "765a3e9d2728c85cea051c9674af30b410747801bd134e8ccb708f86607f437f"
+  },
+  "evidenceHashes": {
+    "api-init-diagnostic-v2-result.json": "7fc99859190d1aaa17862f668384fb2861affbc1bbf3bec7e4824c1a25fbbd35",
+    "cleanup-m1-result.json": "00142c20f3cdb51786774e223f836e9578104fac00a1ca669ffcdfe599435e66",
+    "cleanup-m1-commands.json": "fa5e23876e6627dd0e5b75e4b8c57085f85fc2a38c96b58997558e5e92494bed",
+    "host-monitor-release.json": "2bc57dd8020450db20f51f7c7e9966da60205593be024920b18e11fe541a2d7e",
+    "task-tests-api-init-fix.log": "e7006cf2008c49b746819a6f5f7599c459ea68d44cdbe9ba16acaf5c2b1800ce"
+  },
+  "rawReview": "五文件源码Review PASS，字节复核未变。诊断实际init→dotnet、exit134/42501、配置恢复及同构建校验成立；原v1失败保留，正式I04不提升。十对象准确缺席及14条命令exit0、零容器、KEEP3网络8卷及monitor96363释放后验PASS。工具副本另行审查。"
+}

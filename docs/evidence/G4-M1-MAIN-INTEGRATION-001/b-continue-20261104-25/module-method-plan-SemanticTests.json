@@ -1,0 +1,1272 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-25",
+  "testedCommit": "9daa51a7dd08f5b9dc139419f4851a9212da231f",
+  "project": "SemanticTests",
+  "assemblySha256": "e80c0033c96de532a6536a3fc578eb725a80e80687efd34066695b5d42f5c752",
+  "baselineSha256": "69008488a40fea168b6c76ff8cb83324b6e3bae1536b7c3550bd50c08449031b",
+  "methods": [
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M4VersionDiffTests.AbsentVocabularyAndEmptyFileHaveDifferentSourceIdentity",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M4VersionDiffTests.cs",
+      "sourceSha256": "e9c7c039c2c715e0310904d84b8b983f5ea9cd09683e97aa3d7449ba2e9b52e8",
+      "cases": [
+        "AbsentVocabularyAndEmptyFileHaveDifferentSourceIdentity"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M4ImpactReportTests.ActualUnknownAndTechnicalBlockersHaveBoundEvidence",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs",
+      "sourceSha256": "40037aefaac1a5fc171971341532d57e1cadbbabd3a47c88e5e2e8233bd4482d",
+      "cases": [
+        "ActualUnknownAndTechnicalBlockersHaveBoundEvidence (\"blank\",\"impact_blank_alignment_indeterminate\")",
+        "ActualUnknownAndTechnicalBlockersHaveBoundEvidence (\"blank-budget\",\"impact_comparison_indeterminate\")",
+        "ActualUnknownAndTechnicalBlockersHaveBoundEvidence (\"conclusion-budget\",\"impact_conclusion_budget\")",
+        "ActualUnknownAndTechnicalBlockersHaveBoundEvidence (\"imports\",\"impact_imports_unresolved\")",
+        "ActualUnknownAndTechnicalBlockersHaveBoundEvidence (\"missing\",\"impact_assessment_required\")",
+        "ActualUnknownAndTechnicalBlockersHaveBoundEvidence (\"unsupported\",\"impact_unsupported_axiom\")"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M4ServiceTests.AmbiguousAndUnknownClaimsBlockAssessment",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M4ServiceTests.cs",
+      "sourceSha256": "0c633b36bbda59225b031c15b88be659627b690e874cf6d716736d55cf7c3fc4",
+      "cases": [
+        "AmbiguousAndUnknownClaimsBlockAssessment (False)",
+        "AmbiguousAndUnknownClaimsBlockAssessment (True)"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M3ServiceTests.AtomicVocabularyBatchUsesExistingRevisionAndAuditTransaction",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M3ServiceTests.cs",
+      "sourceSha256": "268f7692863c7d392812845592241a497ff980b97a2d0559777969a8ac83d3f6",
+      "cases": [
+        "AtomicVocabularyBatchUsesExistingRevisionAndAuditTransaction"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.DraftRevisionTests.AuditFailureRollsBackEveryWrite",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+      "sourceSha256": "2779b2eb6b545c4d6c2dc96b234606f917d13ad12667cc96406218e4ed818b63",
+      "cases": [
+        "AuditFailureRollsBackEveryWrite"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M4VersionDiffTests.BlankIsomorphismAndChangedBlankScopesRemainExplicit",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M4VersionDiffTests.cs",
+      "sourceSha256": "e9c7c039c2c715e0310904d84b8b983f5ea9cd09683e97aa3d7449ba2e9b52e8",
+      "cases": [
+        "BlankIsomorphismAndChangedBlankScopesRemainExplicit"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.RoundtripTests.CancellationAndTimeoutDoNotLeaveTemporaryGraphs",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/RoundtripTests.cs",
+      "sourceSha256": "259f0fc7bbf62d7027fab0c0b5186005caec0fa0ee9c4f8d117869c84460047e",
+      "cases": [
+        "CancellationAndTimeoutDoNotLeaveTemporaryGraphs (False)",
+        "CancellationAndTimeoutDoNotLeaveTemporaryGraphs (True)"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3BoundaryTests.CancellationDuringRiotParsingAndExact128BlankBoundary",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3BoundaryTests.cs",
+      "sourceSha256": "1a7cab83d965451e1be8dbb80e4b21c12dc20d7db23c84cd0fede4773efdcdb3",
+      "cases": [
+        "CancellationDuringRiotParsingAndExact128BlankBoundary"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.VerifiedReadTests.ChangedPublishedGraphCannotReturnOldHashData",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs",
+      "sourceSha256": "66b023c9d44aa9bbf8956f3c8a7db466858c81b4a9fa561f3e6f86a05e83f062",
+      "cases": [
+        "ChangedPublishedGraphCannotReturnOldHashData (\"data\")",
+        "ChangedPublishedGraphCannotReturnOldHashData (\"delete\")",
+        "ChangedPublishedGraphCannotReturnOldHashData (\"lexical\")",
+        "ChangedPublishedGraphCannotReturnOldHashData (\"ontology\")"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M4ServiceTests.ClaimScopeCannotExceedAuthoritativeDraftScope",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M4ServiceTests.cs",
+      "sourceSha256": "0c633b36bbda59225b031c15b88be659627b690e874cf6d716736d55cf7c3fc4",
+      "cases": [
+        "ClaimScopeCannotExceedAuthoritativeDraftScope (\"organization\")",
+        "ClaimScopeCannotExceedAuthoritativeDraftScope (\"site\")"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.DraftRevisionTests.CloneInheritsOnlyTheCatalogAssetAndExactScope",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+      "sourceSha256": "2779b2eb6b545c4d6c2dc96b234606f917d13ad12667cc96406218e4ed818b63",
+      "cases": [
+        "CloneInheritsOnlyTheCatalogAssetAndExactScope"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.DraftRevisionTests.CommittedCreateAndSaveReplayWithoutJena",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+      "sourceSha256": "2779b2eb6b545c4d6c2dc96b234606f917d13ad12667cc96406218e4ed818b63",
+      "cases": [
+        "CommittedCreateAndSaveReplayWithoutJena"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3BoundaryTests.ComparisonBudgetOrCancellationRevokesAllPartialResults",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3BoundaryTests.cs",
+      "sourceSha256": "1a7cab83d965451e1be8dbb80e4b21c12dc20d7db23c84cd0fede4773efdcdb3",
+      "cases": [
+        "ComparisonBudgetOrCancellationRevokesAllPartialResults (\"blank_node_budget\")",
+        "ComparisonBudgetOrCancellationRevokesAllPartialResults (\"comparison_cancelled\")",
+        "ComparisonBudgetOrCancellationRevokesAllPartialResults (\"comparison_timeout\")"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3BoundaryTests.ComparisonPreservesAbsentBytesAndRejectsInvalidOrOversizedBundles",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3BoundaryTests.cs",
+      "sourceSha256": "1a7cab83d965451e1be8dbb80e4b21c12dc20d7db23c84cd0fede4773efdcdb3",
+      "cases": [
+        "ComparisonPreservesAbsentBytesAndRejectsInvalidOrOversizedBundles"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M3UnitTests.CompleteSyntheticUnitsAndOrdinaryPropertyAreValid",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M3UnitTests.cs",
+      "sourceSha256": "a07ce8990979b4ff9ca7f8aa5ec065a8561dd38cb6e5950855368bd0bec1396c",
+      "cases": [
+        "CompleteSyntheticUnitsAndOrdinaryPropertyAreValid"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.DraftRevisionTests.ConcurrentIdempotencyHasOneCommit",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+      "sourceSha256": "2779b2eb6b545c4d6c2dc96b234606f917d13ad12667cc96406218e4ed818b63",
+      "cases": [
+        "ConcurrentIdempotencyHasOneCommit (False)",
+        "ConcurrentIdempotencyHasOneCommit (True)"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M4ImpactReportTests.ConcurrentInputCreatesOneReportAndOneBusinessAudit",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs",
+      "sourceSha256": "40037aefaac1a5fc171971341532d57e1cadbbabd3a47c88e5e2e8233bd4482d",
+      "cases": [
+        "ConcurrentInputCreatesOneReportAndOneBusinessAudit"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.DraftRevisionTests.ConcurrentSaveHasOneWinnerAndNoLostUpdate",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+      "sourceSha256": "2779b2eb6b545c4d6c2dc96b234606f917d13ad12667cc96406218e4ed818b63",
+      "cases": [
+        "ConcurrentSaveHasOneWinnerAndNoLostUpdate"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M4ServiceTests.ControlledEditClosesValidityThenReplaysExactlyOnce",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M4ServiceTests.cs",
+      "sourceSha256": "0c633b36bbda59225b031c15b88be659627b690e874cf6d716736d55cf7c3fc4",
+      "cases": [
+        "ControlledEditClosesValidityThenReplaysExactlyOnce"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M4IdentityTimeTests.ControlledTemplatesAndIdentityRelations",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M4IdentityTimeTests.cs",
+      "sourceSha256": "642585610c86bf729246c3c6e367055da2faedf349a20cad2843e6dc8e047dc8",
+      "cases": [
+        "ControlledTemplatesAndIdentityRelations (\"adjacent\",null)",
+        "ControlledTemplatesAndIdentityRelations (\"different-namespace\",null)",
+        "ControlledTemplatesAndIdentityRelations (\"different-site\",null)",
+        "ControlledTemplatesAndIdentityRelations (\"double-key\",\"identity_claim_invalid\")",
+        "ControlledTemplatesAndIdentityRelations (\"double-time\",\"time_lexical_invalid\")",
+        "ControlledTemplatesAndIdentityRelations (\"double-type\",\"time_template_unsupported\")",
+        "ControlledTemplatesAndIdentityRelations (\"event-missing\",\"event_time_invalid\")",
+        "ControlledTemplatesAndIdentityRelations (\"missing-point\",\"time_reference_missing\")",
+        "ControlledTemplatesAndIdentityRelations (\"no-zone\",\"time_timezone_required\")",
+        "ControlledTemplatesAndIdentityRelations (\"observer-zone\",\"time_timezone_required\")",
+        "ControlledTemplatesAndIdentityRelations (\"overlap\",\"identity_ambiguous\")",
+        "ControlledTemplatesAndIdentityRelations (\"reverse\",\"time_interval_reversed\")",
+        "ControlledTemplatesAndIdentityRelations (\"unknown\",\"identity_relation_indeterminate\")",
+        "ControlledTemplatesAndIdentityRelations (\"unknown-target\",\"identity_claim_invalid\")",
+        "ControlledTemplatesAndIdentityRelations (\"unsupported\",\"time_template_unsupported\")",
+        "ControlledTemplatesAndIdentityRelations (\"valid\",null)"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M3GovernanceTests.CrossSourceDuplicateFocusUsesBundleHash",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M3GovernanceTests.cs",
+      "sourceSha256": "e13bccbc4003062e769f369d510caf56c6d606cac53772f43a1fe9881870d141",
+      "cases": [
+        "CrossSourceDuplicateFocusUsesBundleHash"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M4IdentityTimeTests.CrossSourceTimestampDiagnosticUsesBundleEvidence",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M4IdentityTimeTests.cs",
+      "sourceSha256": "642585610c86bf729246c3c6e367055da2faedf349a20cad2843e6dc8e047dc8",
+      "cases": [
+        "CrossSourceTimestampDiagnosticUsesBundleEvidence"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M2EditingTests.CurrentProfileIsVersionTwoAndLegacyGoldenRemainsRegistered",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M2EditingTests.cs",
+      "sourceSha256": "009d6e55f2d6e10e35dedbd8897cd127d13d4f378bfdcce5abdcae2867bf058e",
+      "cases": [
+        "CurrentProfileIsVersionTwoAndLegacyGoldenRemainsRegistered"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M4IdentityTimeTests.CurrentProfileRetainsExactHistoricalFactories",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M4IdentityTimeTests.cs",
+      "sourceSha256": "642585610c86bf729246c3c6e367055da2faedf349a20cad2843e6dc8e047dc8",
+      "cases": [
+        "CurrentProfileRetainsExactHistoricalFactories"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M4ServiceTests.DedicatedEditCannotDeleteValidClaimType",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M4ServiceTests.cs",
+      "sourceSha256": "0c633b36bbda59225b031c15b88be659627b690e874cf6d716736d55cf7c3fc4",
+      "cases": [
+        "DedicatedEditCannotDeleteValidClaimType"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M4ImpactDependencyTests.DefinitionRemovalUsesExactKindAndConsumerRole",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactDependencyTests.cs",
+      "sourceSha256": "7e0a421b1e25cfc5ef2197283743bfde86526c45fe4b365bcf0cf1ce463f42fd",
+      "cases": [
+        "DefinitionRemovalUsesExactKindAndConsumerRole (\"class-masked-by-individual\",True)",
+        "DefinitionRemovalUsesExactKindAndConsumerRole (\"datatype-property-masked\",True)",
+        "DefinitionRemovalUsesExactKindAndConsumerRole (\"keep-class-drop-individual\",False)",
+        "DefinitionRemovalUsesExactKindAndConsumerRole (\"object-property-masked\",True)"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M3PublicationPolicyTests.DirectV3EntrypointsCannotBypassGovernance",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M3PublicationPolicyTests.cs",
+      "sourceSha256": "0206be727c1a5aea6c686e414f696eecdabccc6303ded536d04849786b9f2d00",
+      "cases": [
+        "DirectV3EntrypointsCannotBypassGovernance (\"deprecated-canonical\")",
+        "DirectV3EntrypointsCannotBypassGovernance (\"dimension\")",
+        "DirectV3EntrypointsCannotBypassGovernance (\"precision\")",
+        "DirectV3EntrypointsCannotBypassGovernance (\"skos\")"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M3VocabularyTests.DuplicateAddsThenDeleteUseRdfSetSemantics",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M3VocabularyTests.cs",
+      "sourceSha256": "c224b5b6d38ef714ad4c3555a201ec8d82d75633d90ea9831f07b2399b96db35",
+      "cases": [
+        "DuplicateAddsThenDeleteUseRdfSetSemantics (False)",
+        "DuplicateAddsThenDeleteUseRdfSetSemantics (True)"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M3ServiceTests.DuplicateLanguageTagSubtagsBlockAssessmentPublication",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M3ServiceTests.cs",
+      "sourceSha256": "268f7692863c7d392812845592241a497ff980b97a2d0559777969a8ac83d3f6",
+      "cases": [
+        "DuplicateLanguageTagSubtagsBlockAssessmentPublication"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.RoundtripTests.EditingLegalEmptyDocumentExportsOnlyRequestedTriple",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/RoundtripTests.cs",
+      "sourceSha256": "259f0fc7bbf62d7027fab0c0b5186005caec0fa0ee9c4f8d117869c84460047e",
+      "cases": [
+        "EditingLegalEmptyDocumentExportsOnlyRequestedTriple"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.RoundtripTests.EmptyGraphStillProducesRealShaclReport",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/RoundtripTests.cs",
+      "sourceSha256": "259f0fc7bbf62d7027fab0c0b5186005caec0fa0ee9c4f8d117869c84460047e",
+      "cases": [
+        "EmptyGraphStillProducesRealShaclReport"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.ShaclTests.EnumerationListIsBoundedAndAcyclic",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/ShaclTests.cs",
+      "sourceSha256": "839825def05c78411206497adfc8480e716fd2691f5230e3c2532c0d55e80bf1",
+      "cases": [
+        "EnumerationListIsBoundedAndAcyclic"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M3VocabularyTests.EquivalentLiteralAddThenDeleteRemovesOriginal",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M3VocabularyTests.cs",
+      "sourceSha256": "c224b5b6d38ef714ad4c3555a201ec8d82d75633d90ea9831f07b2399b96db35",
+      "cases": [
+        "EquivalentLiteralAddThenDeleteRemovesOriginal (\"datatype\")",
+        "EquivalentLiteralAddThenDeleteRemovesOriginal (\"language\")"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M2EditingTests.EquivalentLiteralRepresentationsPreserveExactSourceBytes",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M2EditingTests.cs",
+      "sourceSha256": "009d6e55f2d6e10e35dedbd8897cd127d13d4f378bfdcce5abdcae2867bf058e",
+      "cases": [
+        "EquivalentLiteralRepresentationsPreserveExactSourceBytes (\"language-case\",False)",
+        "EquivalentLiteralRepresentationsPreserveExactSourceBytes (\"language-case\",True)",
+        "EquivalentLiteralRepresentationsPreserveExactSourceBytes (\"language-datatype\",False)",
+        "EquivalentLiteralRepresentationsPreserveExactSourceBytes (\"language-datatype\",True)",
+        "EquivalentLiteralRepresentationsPreserveExactSourceBytes (\"plain-string\",False)",
+        "EquivalentLiteralRepresentationsPreserveExactSourceBytes (\"plain-string\",True)"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.VerifiedReadTests.EveryManifestSnapshotAndSourceBindingIsChecked",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs",
+      "sourceSha256": "66b023c9d44aa9bbf8956f3c8a7db466858c81b4a9fa561f3e6f86a05e83f062",
+      "cases": [
+        "EveryManifestSnapshotAndSourceBindingIsChecked"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M4ServiceTests.ExactBatchCountBoundariesDoNotBypassCas",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M4ServiceTests.cs",
+      "sourceSha256": "0c633b36bbda59225b031c15b88be659627b690e874cf6d716736d55cf7c3fc4",
+      "cases": [
+        "ExactBatchCountBoundariesDoNotBypassCas (0)",
+        "ExactBatchCountBoundariesDoNotBypassCas (1)",
+        "ExactBatchCountBoundariesDoNotBypassCas (64)",
+        "ExactBatchCountBoundariesDoNotBypassCas (65)"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M3PublicationPolicyTests.ExactLegacyM2ProfileKeepsHistoricalPolicy",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M3PublicationPolicyTests.cs",
+      "sourceSha256": "0206be727c1a5aea6c686e414f696eecdabccc6303ded536d04849786b9f2d00",
+      "cases": [
+        "ExactLegacyM2ProfileKeepsHistoricalPolicy"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M3VocabularyTests.FourSourcesAndAtomicChangesUseRealRiot",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M3VocabularyTests.cs",
+      "sourceSha256": "c224b5b6d38ef714ad4c3555a201ec8d82d75633d90ea9831f07b2399b96db35",
+      "cases": [
+        "FourSourcesAndAtomicChangesUseRealRiot"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M4VersionDiffTests.FourSourcesKeepExactTextHashesAndGroundDelta",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M4VersionDiffTests.cs",
+      "sourceSha256": "e9c7c039c2c715e0310904d84b8b983f5ea9cd09683e97aa3d7449ba2e9b52e8",
+      "cases": [
+        "FourSourcesKeepExactTextHashesAndGroundDelta"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.DraftRevisionTests.FullPlatformRolesAndWholeScopeAreEnforced",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+      "sourceSha256": "2779b2eb6b545c4d6c2dc96b234606f917d13ad12667cc96406218e4ed818b63",
+      "cases": [
+        "FullPlatformRolesAndWholeScopeAreEnforced"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.DraftRevisionTests.G3AssessmentLockRejectsInvalidPersistentFacts",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+      "sourceSha256": "2779b2eb6b545c4d6c2dc96b234606f917d13ad12667cc96406218e4ed818b63",
+      "cases": [
+        "G3AssessmentLockRejectsInvalidPersistentFacts (\"expired\",\"assessment_expired\")",
+        "G3AssessmentLockRejectsInvalidPersistentFacts (\"ineligible\",\"assessment_not_eligible\")",
+        "G3AssessmentLockRejectsInvalidPersistentFacts (\"legacy\",\"assessment_required\")",
+        "G3AssessmentLockRejectsInvalidPersistentFacts (\"profile\",\"assessment_binding_conflict\")",
+        "G3AssessmentLockRejectsInvalidPersistentFacts (\"tampered\",\"assessment_binding_conflict\")"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.DraftRevisionTests.G3AssessmentPersistsReplaysAndReauthorizesWholeScope",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+      "sourceSha256": "2779b2eb6b545c4d6c2dc96b234606f917d13ad12667cc96406218e4ed818b63",
+      "cases": [
+        "G3AssessmentPersistsReplaysAndReauthorizesWholeScope"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.DraftRevisionTests.G3FourSourceBytesAndFixedRevisionComparisonRemainExact",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+      "sourceSha256": "2779b2eb6b545c4d6c2dc96b234606f917d13ad12667cc96406218e4ed818b63",
+      "cases": [
+        "G3FourSourceBytesAndFixedRevisionComparisonRemainExact"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.DraftRevisionTests.G3MergedShaclDiagnosticNeverGuessesDataSource",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+      "sourceSha256": "2779b2eb6b545c4d6c2dc96b234606f917d13ad12667cc96406218e4ed818b63",
+      "cases": [
+        "G3MergedShaclDiagnosticNeverGuessesDataSource (\"ambiguous\")",
+        "G3MergedShaclDiagnosticNeverGuessesDataSource (\"data\")",
+        "G3MergedShaclDiagnosticNeverGuessesDataSource (\"ontology\")",
+        "G3MergedShaclDiagnosticNeverGuessesDataSource (\"vocabulary\")"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3BoundaryTests.G3ProductionBoundariesExist",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3BoundaryTests.cs",
+      "sourceSha256": "1a7cab83d965451e1be8dbb80e4b21c12dc20d7db23c84cd0fede4773efdcdb3",
+      "cases": [
+        "G3ProductionBoundariesExist"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.DraftRevisionTests.G3SupportDiagnosticRetainsProvenSingleSourceHash",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+      "sourceSha256": "2779b2eb6b545c4d6c2dc96b234606f917d13ad12667cc96406218e4ed818b63",
+      "cases": [
+        "G3SupportDiagnosticRetainsProvenSingleSourceHash (\"data\")",
+        "G3SupportDiagnosticRetainsProvenSingleSourceHash (\"ontology\")",
+        "G3SupportDiagnosticRetainsProvenSingleSourceHash (\"vocabulary\")"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M3ServiceTests.GovernanceIsIndependentOfRealShaclReport",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M3ServiceTests.cs",
+      "sourceSha256": "268f7692863c7d392812845592241a497ff980b97a2d0559777969a8ac83d3f6",
+      "cases": [
+        "GovernanceIsIndependentOfRealShaclReport"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M5ServiceTests.GuardInvalidVersionNeverConnectsToServices",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M5ServiceTests.cs",
+      "sourceSha256": "d167d324e968fa3bd3b013e666c941a7e25c6cf898d58dd2011ef9379e70922f",
+      "cases": [
+        "GuardInvalidVersionNeverConnectsToServices (\"empty-id\")",
+        "GuardInvalidVersionNeverConnectsToServices (\"long-id\")",
+        "GuardInvalidVersionNeverConnectsToServices (\"missing-revision\")",
+        "GuardInvalidVersionNeverConnectsToServices (\"null\")",
+        "GuardInvalidVersionNeverConnectsToServices (\"release-revision\")",
+        "GuardInvalidVersionNeverConnectsToServices (\"unknown-kind\")",
+        "GuardInvalidVersionNeverConnectsToServices (\"zero-revision\")"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M5ServiceTests.GuardReleaseNeedsAuthoritativeCatalog",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M5ServiceTests.cs",
+      "sourceSha256": "d167d324e968fa3bd3b013e666c941a7e25c6cf898d58dd2011ef9379e70922f",
+      "cases": [
+        "GuardReleaseNeedsAuthoritativeCatalog"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M5ServiceTests.GuardRoleRunsBeforePersistenceAndSemanticRuntime",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M5ServiceTests.cs",
+      "sourceSha256": "d167d324e968fa3bd3b013e666c941a7e25c6cf898d58dd2011ef9379e70922f",
+      "cases": [
+        "GuardRoleRunsBeforePersistenceAndSemanticRuntime (\"role\")",
+        "GuardRoleRunsBeforePersistenceAndSemanticRuntime (\"subject\")"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M4ImpactMigrationContractTests.ImpactMigrationCreatesOwnedTableAndRefusesDestructiveDown",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactMigrationContractTests.cs",
+      "sourceSha256": "70aac60b44562cac2d6c887d154c802115c861c5d04b7a884aa3962135b731cd",
+      "cases": [
+        "ImpactMigrationCreatesOwnedTableAndRefusesDestructiveDown"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.DraftRevisionTests.InitialOnlyDatabaseKeepsOriginalLockAndNonemptyDownGuards",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+      "sourceSha256": "2779b2eb6b545c4d6c2dc96b234606f917d13ad12667cc96406218e4ed818b63",
+      "cases": [
+        "InitialOnlyDatabaseKeepsOriginalLockAndNonemptyDownGuards"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M4ServiceTests.InitiallyInvalidClaimCanBeRepairedWithoutErasingSourceRevision",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M4ServiceTests.cs",
+      "sourceSha256": "0c633b36bbda59225b031c15b88be659627b690e874cf6d716736d55cf7c3fc4",
+      "cases": [
+        "InitiallyInvalidClaimCanBeRepairedWithoutErasingSourceRevision"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M2EditingTests.InvalidMetadataFailsBeforeAnyNoOpOrSerialization",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M2EditingTests.cs",
+      "sourceSha256": "009d6e55f2d6e10e35dedbd8897cd127d13d4f378bfdcce5abdcae2867bf058e",
+      "cases": [
+        "InvalidMetadataFailsBeforeAnyNoOpOrSerialization (\"iri-datatype\")",
+        "InvalidMetadataFailsBeforeAnyNoOpOrSerialization (\"iri-language\")",
+        "InvalidMetadataFailsBeforeAnyNoOpOrSerialization (\"langString-without-language\")",
+        "InvalidMetadataFailsBeforeAnyNoOpOrSerialization (\"literal-conflict\")"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.DraftRevisionTests.InvalidSourceAndStaleRevisionNeverPersist",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+      "sourceSha256": "2779b2eb6b545c4d6c2dc96b234606f917d13ad12667cc96406218e4ed818b63",
+      "cases": [
+        "InvalidSourceAndStaleRevisionNeverPersist"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.VerifiedReadTests.InvalidSurrogateLiteralIsRejectedWithoutReplacement",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs",
+      "sourceSha256": "66b023c9d44aa9bbf8956f3c8a7db466858c81b4a9fa561f3e6f86a05e83f062",
+      "cases": [
+        "InvalidSurrogateLiteralIsRejectedWithoutReplacement (False)",
+        "InvalidSurrogateLiteralIsRejectedWithoutReplacement (True)"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M3GovernanceTests.LanguageTagSubtagsRespectBcp47Uniqueness",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M3GovernanceTests.cs",
+      "sourceSha256": "e13bccbc4003062e769f369d510caf56c6d606cac53772f43a1fe9881870d141",
+      "cases": [
+        "LanguageTagSubtagsRespectBcp47Uniqueness (\"en-1901-1901\",False)",
+        "LanguageTagSubtagsRespectBcp47Uniqueness (\"en-a-bbb-x-a-ccc\",True)",
+        "LanguageTagSubtagsRespectBcp47Uniqueness (\"en-u-ca-gregory-u-nu-latn\",False)"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.DraftRevisionTests.LeadingBomCreateSaveAndNoOpKeepExactSourceHistory",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+      "sourceSha256": "2779b2eb6b545c4d6c2dc96b234606f917d13ad12667cc96406218e4ed818b63",
+      "cases": [
+        "LeadingBomCreateSaveAndNoOpKeepExactSourceHistory"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.VerifiedReadTests.LeadingBomSourcesKeepExactBytesAndRelativeIris",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs",
+      "sourceSha256": "66b023c9d44aa9bbf8956f3c8a7db466858c81b4a9fa561f3e6f86a05e83f062",
+      "cases": [
+        "LeadingBomSourcesKeepExactBytesAndRelativeIris (False)",
+        "LeadingBomSourcesKeepExactBytesAndRelativeIris (True)"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.VerifiedReadTests.LegacyAdapterCannotFallbackToUnverifiedRead",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs",
+      "sourceSha256": "66b023c9d44aa9bbf8956f3c8a7db466858c81b4a9fa561f3e6f86a05e83f062",
+      "cases": [
+        "LegacyAdapterCannotFallbackToUnverifiedRead"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M4IdentityTimeTests.LegacyVersionThreeStillRejectsTheSameControlledTimeCorpus",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M4IdentityTimeTests.cs",
+      "sourceSha256": "642585610c86bf729246c3c6e367055da2faedf349a20cad2843e6dc8e047dc8",
+      "cases": [
+        "LegacyVersionThreeStillRejectsTheSameControlledTimeCorpus"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.RoundtripTests.LegalEmptyDocumentsKeepExactHashesAndProduceEmptyGraph",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/RoundtripTests.cs",
+      "sourceSha256": "259f0fc7bbf62d7027fab0c0b5186005caec0fa0ee9c4f8d117869c84460047e",
+      "cases": [
+        "LegalEmptyDocumentsKeepExactHashesAndProduceEmptyGraph (\" \\t\\r\\n\")",
+        "LegalEmptyDocumentsKeepExactHashesAndProduceEmptyGraph (\"# comment\\n\")",
+        "LegalEmptyDocumentsKeepExactHashesAndProduceEmptyGraph (\"@prefix ex: <urn:empty:> .\\n\")"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.RoundtripTests.LostOrReplacedTemporaryGraphRemainsUnavailable",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/RoundtripTests.cs",
+      "sourceSha256": "259f0fc7bbf62d7027fab0c0b5186005caec0fa0ee9c4f8d117869c84460047e",
+      "cases": [
+        "LostOrReplacedTemporaryGraphRemainsUnavailable (False)",
+        "LostOrReplacedTemporaryGraphRemainsUnavailable (True)"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.DraftRevisionTests.M2BasicModelingSequencePersistsEachRevisionAndKeepsOtherSourcesExact",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+      "sourceSha256": "2779b2eb6b545c4d6c2dc96b234606f917d13ad12667cc96406218e4ed818b63",
+      "cases": [
+        "M2BasicModelingSequencePersistsEachRevisionAndKeepsOtherSourcesExact"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.DraftRevisionTests.M2NamedEditAssessmentAndFailurePreserveCommittedSources",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+      "sourceSha256": "2779b2eb6b545c4d6c2dc96b234606f917d13ad12667cc96406218e4ed818b63",
+      "cases": [
+        "M2NamedEditAssessmentAndFailurePreserveCommittedSources"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.DraftRevisionTests.MigrationDownRefusesConcurrentAndNonemptyHistory",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+      "sourceSha256": "2779b2eb6b545c4d6c2dc96b234606f917d13ad12667cc96406218e4ed818b63",
+      "cases": [
+        "MigrationDownRefusesConcurrentAndNonemptyHistory"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.RoundtripTests.MissingPublishedGraphRemainsUnavailable",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/RoundtripTests.cs",
+      "sourceSha256": "259f0fc7bbf62d7027fab0c0b5186005caec0fa0ee9c4f8d117869c84460047e",
+      "cases": [
+        "MissingPublishedGraphRemainsUnavailable"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M2EditingTests.NamedAxiomEditPreservesOtherSourcesAndRequiresBothDeclarations",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M2EditingTests.cs",
+      "sourceSha256": "009d6e55f2d6e10e35dedbd8897cd127d13d4f378bfdcce5abdcae2867bf058e",
+      "cases": [
+        "NamedAxiomEditPreservesOtherSourcesAndRequiresBothDeclarations (\"disjointWith\",\"Class\")",
+        "NamedAxiomEditPreservesOtherSourcesAndRequiresBothDeclarations (\"equivalentClass\",\"Class\")",
+        "NamedAxiomEditPreservesOtherSourcesAndRequiresBothDeclarations (\"inverseOf\",\"ObjectProperty\")"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M4ServiceTests.NewControlledBatchReturnsDeterministicDiagnosticCode",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M4ServiceTests.cs",
+      "sourceSha256": "0c633b36bbda59225b031c15b88be659627b690e874cf6d716736d55cf7c3fc4",
+      "cases": [
+        "NewControlledBatchReturnsDeterministicDiagnosticCode (\"overlap\",\"identity_ambiguous\")",
+        "NewControlledBatchReturnsDeterministicDiagnosticCode (\"reverse\",\"time_interval_reversed\")",
+        "NewControlledBatchReturnsDeterministicDiagnosticCode (\"unknown\",\"identity_relation_indeterminate\")",
+        "NewControlledBatchReturnsDeterministicDiagnosticCode (\"zone\",\"time_timezone_required\")"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.RoundtripTests.NoOpRetainsExactBytesAndInvalidSourceFails",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/RoundtripTests.cs",
+      "sourceSha256": "259f0fc7bbf62d7027fab0c0b5186005caec0fa0ee9c4f8d117869c84460047e",
+      "cases": [
+        "NoOpRetainsExactBytesAndInvalidSourceFails"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.VerifiedReadTests.NonBmpLiteralEditIsLosslessAndCannotInjectTriples",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs",
+      "sourceSha256": "66b023c9d44aa9bbf8956f3c8a7db466858c81b4a9fa561f3e6f86a05e83f062",
+      "cases": [
+        "NonBmpLiteralEditIsLosslessAndCannotInjectTriples (False)",
+        "NonBmpLiteralEditIsLosslessAndCannotInjectTriples (True)"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M4ImpactDependencyTests.OnlyExactBuiltinOrLocalClassDeclarationResolvesType",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactDependencyTests.cs",
+      "sourceSha256": "7e0a421b1e25cfc5ef2197283743bfde86526c45fe4b365bcf0cf1ce463f42fd",
+      "cases": [
+        "OnlyExactBuiltinOrLocalClassDeclarationResolvesType (\"builtin-owl\",False)",
+        "OnlyExactBuiltinOrLocalClassDeclarationResolvesType (\"business-local\",False)",
+        "OnlyExactBuiltinOrLocalClassDeclarationResolvesType (\"platform-fake\",True)",
+        "OnlyExactBuiltinOrLocalClassDeclarationResolvesType (\"w3-fake\",True)"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.VerifiedReadTests.OptionalVocabularyAndMissingBindingFailClosed",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs",
+      "sourceSha256": "66b023c9d44aa9bbf8956f3c8a7db466858c81b4a9fa561f3e6f86a05e83f062",
+      "cases": [
+        "OptionalVocabularyAndMissingBindingFailClosed"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3BoundaryTests.ParsingAcrossAllFourSourcesSharesOneFiveSecondBudget",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3BoundaryTests.cs",
+      "sourceSha256": "1a7cab83d965451e1be8dbb80e4b21c12dc20d7db23c84cd0fede4773efdcdb3",
+      "cases": [
+        "ParsingAcrossAllFourSourcesSharesOneFiveSecondBudget"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3BoundaryTests.ProfileHasExactMatrixAndStableHash",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3BoundaryTests.cs",
+      "sourceSha256": "1a7cab83d965451e1be8dbb80e4b21c12dc20d7db23c84cd0fede4773efdcdb3",
+      "cases": [
+        "ProfileHasExactMatrixAndStableHash"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M5ExpressionTests.ProjectionAnonymousCycleAndNamedSubclassCycleAreDistinct",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M5ExpressionTests.cs",
+      "sourceSha256": "3767dd3ab4c6ca6428adc1af4f8884a788dfeba92ce7ffd2f83088c1775387d7",
+      "cases": [
+        "ProjectionAnonymousCycleAndNamedSubclassCycleAreDistinct"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M5ExpressionTests.ProjectionBlankPrefixSharedReferencesAndSourcesAreIsolated",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M5ExpressionTests.cs",
+      "sourceSha256": "3767dd3ab4c6ca6428adc1af4f8884a788dfeba92ce7ffd2f83088c1775387d7",
+      "cases": [
+        "ProjectionBlankPrefixSharedReferencesAndSourcesAreIsolated"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M5ExpressionTests.ProjectionCancellationPropagates",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M5ExpressionTests.cs",
+      "sourceSha256": "3767dd3ab4c6ca6428adc1af4f8884a788dfeba92ce7ffd2f83088c1775387d7",
+      "cases": [
+        "ProjectionCancellationPropagates"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M5ExpressionTests.ProjectionCardinalityPreservesLexicalAndDiagnosesInvalid",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M5ExpressionTests.cs",
+      "sourceSha256": "3767dd3ab4c6ca6428adc1af4f8884a788dfeba92ce7ffd2f83088c1775387d7",
+      "cases": [
+        "ProjectionCardinalityPreservesLexicalAndDiagnosesInvalid (\" 12 \",True)",
+        "ProjectionCardinalityPreservesLexicalAndDiagnosesInvalid (\"+\",False)",
+        "ProjectionCardinalityPreservesLexicalAndDiagnosesInvalid (\"+0002\",True)",
+        "ProjectionCardinalityPreservesLexicalAndDiagnosesInvalid (\"-0\",True)",
+        "ProjectionCardinalityPreservesLexicalAndDiagnosesInvalid (\"-1\",False)",
+        "ProjectionCardinalityPreservesLexicalAndDiagnosesInvalid (\"0\",True)",
+        "ProjectionCardinalityPreservesLexicalAndDiagnosesInvalid (\"1 2\",False)",
+        "ProjectionCardinalityPreservesLexicalAndDiagnosesInvalid (\"1.0\",False)",
+        "ProjectionCardinalityPreservesLexicalAndDiagnosesInvalid (\"123456789012345678901234567890\",True)",
+        "ProjectionCardinalityPreservesLexicalAndDiagnosesInvalid (\"1e2\",False)",
+        "ProjectionCardinalityPreservesLexicalAndDiagnosesInvalid (\"１２\",False)"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M5ExpressionTests.ProjectionCardinalityRejectsWrongTypeAndLanguage",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M5ExpressionTests.cs",
+      "sourceSha256": "3767dd3ab4c6ca6428adc1af4f8884a788dfeba92ce7ffd2f83088c1775387d7",
+      "cases": [
+        "ProjectionCardinalityRejectsWrongTypeAndLanguage"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M5ExpressionTests.ProjectionListOrderAndLongListDoNotUseExpressionDepth",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M5ExpressionTests.cs",
+      "sourceSha256": "3767dd3ab4c6ca6428adc1af4f8884a788dfeba92ce7ffd2f83088c1775387d7",
+      "cases": [
+        "ProjectionListOrderAndLongListDoNotUseExpressionDepth"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M5ExpressionTests.ProjectionMalformedListsNeverBecomeComplete",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M5ExpressionTests.cs",
+      "sourceSha256": "3767dd3ab4c6ca6428adc1af4f8884a788dfeba92ce7ffd2f83088c1775387d7",
+      "cases": [
+        "ProjectionMalformedListsNeverBecomeComplete (\"branch\")",
+        "ProjectionMalformedListsNeverBecomeComplete (\"broken\")",
+        "ProjectionMalformedListsNeverBecomeComplete (\"cycle\")"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M5ExpressionTests.ProjectionNodeAndDepthBudgetFailClosed",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M5ExpressionTests.cs",
+      "sourceSha256": "3767dd3ab4c6ca6428adc1af4f8884a788dfeba92ce7ffd2f83088c1775387d7",
+      "cases": [
+        "ProjectionNodeAndDepthBudgetFailClosed"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M5ExpressionTests.ProjectionQualifiedCardinalityRequiresUniqueQualifier",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M5ExpressionTests.cs",
+      "sourceSha256": "3767dd3ab4c6ca6428adc1af4f8884a788dfeba92ce7ffd2f83088c1775387d7",
+      "cases": [
+        "ProjectionQualifiedCardinalityRequiresUniqueQualifier (\"onClass\")",
+        "ProjectionQualifiedCardinalityRequiresUniqueQualifier (\"onDataRange\")"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M5ExpressionTests.ProjectionRestrictionHasValuePreservesSupportedValueKinds",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M5ExpressionTests.cs",
+      "sourceSha256": "3767dd3ab4c6ca6428adc1af4f8884a788dfeba92ce7ffd2f83088c1775387d7",
+      "cases": [
+        "ProjectionRestrictionHasValuePreservesSupportedValueKinds"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M5ExpressionTests.ProjectionRestrictionQuantifierHasLegalTarget",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M5ExpressionTests.cs",
+      "sourceSha256": "3767dd3ab4c6ca6428adc1af4f8884a788dfeba92ce7ffd2f83088c1775387d7",
+      "cases": [
+        "ProjectionRestrictionQuantifierHasLegalTarget (\"allValuesFrom\")",
+        "ProjectionRestrictionQuantifierHasLegalTarget (\"someValuesFrom\")"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M5ExpressionTests.ProjectionRestrictionRejectsAmbiguousOrMalformedShape",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M5ExpressionTests.cs",
+      "sourceSha256": "3767dd3ab4c6ca6428adc1af4f8884a788dfeba92ce7ffd2f83088c1775387d7",
+      "cases": [
+        "ProjectionRestrictionRejectsAmbiguousOrMalformedShape (\"blank-property\")",
+        "ProjectionRestrictionRejectsAmbiguousOrMalformedShape (\"literal-property\")",
+        "ProjectionRestrictionRejectsAmbiguousOrMalformedShape (\"missing-property\")",
+        "ProjectionRestrictionRejectsAmbiguousOrMalformedShape (\"missing-type\")",
+        "ProjectionRestrictionRejectsAmbiguousOrMalformedShape (\"no-constructor\")",
+        "ProjectionRestrictionRejectsAmbiguousOrMalformedShape (\"ordinary-qualifier\")",
+        "ProjectionRestrictionRejectsAmbiguousOrMalformedShape (\"qualified-literal-property\")",
+        "ProjectionRestrictionRejectsAmbiguousOrMalformedShape (\"two-cardinalities\")",
+        "ProjectionRestrictionRejectsAmbiguousOrMalformedShape (\"two-constructors\")",
+        "ProjectionRestrictionRejectsAmbiguousOrMalformedShape (\"two-properties\")"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M5ExpressionTests.ProjectionSharedListTailDoesNotBecomeCycle",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M5ExpressionTests.cs",
+      "sourceSha256": "3767dd3ab4c6ca6428adc1af4f8884a788dfeba92ce7ffd2f83088c1775387d7",
+      "cases": [
+        "ProjectionSharedListTailDoesNotBecomeCycle"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M5ExpressionTests.ProjectionUnknownTermsAndImportsHaveSeparateSupport",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M5ExpressionTests.cs",
+      "sourceSha256": "3767dd3ab4c6ca6428adc1af4f8884a788dfeba92ce7ffd2f83088c1775387d7",
+      "cases": [
+        "ProjectionUnknownTermsAndImportsHaveSeparateSupport"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.VerifiedReadTests.PublishedGraphDoesNotReceiveTemporaryMarkerAllowance",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs",
+      "sourceSha256": "66b023c9d44aa9bbf8956f3c8a7db466858c81b4a9fa561f3e6f86a05e83f062",
+      "cases": [
+        "PublishedGraphDoesNotReceiveTemporaryMarkerAllowance"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.RoundtripTests.PublishedGraphsAreIsolatedAndLexicalMismatchIsRejected",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/RoundtripTests.cs",
+      "sourceSha256": "259f0fc7bbf62d7027fab0c0b5186005caec0fa0ee9c4f8d117869c84460047e",
+      "cases": [
+        "PublishedGraphsAreIsolatedAndLexicalMismatchIsRejected"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.RoundtripTests.PublishedShaclUsesTheSameOntologyContext",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/RoundtripTests.cs",
+      "sourceSha256": "259f0fc7bbf62d7027fab0c0b5186005caec0fa0ee9c4f8d117869c84460047e",
+      "cases": [
+        "PublishedShaclUsesTheSameOntologyContext"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M4ImpactReportTests.ReadRejectsPartialScopeAndPersistedCanonicalTamper",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs",
+      "sourceSha256": "40037aefaac1a5fc171971341532d57e1cadbbabd3a47c88e5e2e8233bd4482d",
+      "cases": [
+        "ReadRejectsPartialScopeAndPersistedCanonicalTamper"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M5ServiceTests.RealHistoricalSnapshotAndReimportRetainExactSourceAndBlankGraph",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M5ServiceTests.cs",
+      "sourceSha256": "d167d324e968fa3bd3b013e666c941a7e25c6cf898d58dd2011ef9379e70922f",
+      "cases": [
+        "RealHistoricalSnapshotAndReimportRetainExactSourceAndBlankGraph"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M5ServiceTests.RealReadOnlySnapshotPreservesRawBytesAndDoesNotWrite",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M5ServiceTests.cs",
+      "sourceSha256": "d167d324e968fa3bd3b013e666c941a7e25c6cf898d58dd2011ef9379e70922f",
+      "cases": [
+        "RealReadOnlySnapshotPreservesRawBytesAndDoesNotWrite"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M5ExpressionTests.RealRiotMalformedOwlHasExplicitProjectionDiagnostics",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M5ExpressionTests.cs",
+      "sourceSha256": "3767dd3ab4c6ca6428adc1af4f8884a788dfeba92ce7ffd2f83088c1775387d7",
+      "cases": [
+        "RealRiotMalformedOwlHasExplicitProjectionDiagnostics (\"broken\")",
+        "RealRiotMalformedOwlHasExplicitProjectionDiagnostics (\"cardinality\")",
+        "RealRiotMalformedOwlHasExplicitProjectionDiagnostics (\"cycle\")",
+        "RealRiotMalformedOwlHasExplicitProjectionDiagnostics (\"unknown\")"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M5ExpressionTests.RealRiotNodeBudgetPreservesSourceAndFailsClosed",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M5ExpressionTests.cs",
+      "sourceSha256": "3767dd3ab4c6ca6428adc1af4f8884a788dfeba92ce7ffd2f83088c1775387d7",
+      "cases": [
+        "RealRiotNodeBudgetPreservesSourceAndFailsClosed"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.RoundtripTests.RealRiotPreservesUnsupportedSourceAndTypedLexical",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/RoundtripTests.cs",
+      "sourceSha256": "259f0fc7bbf62d7027fab0c0b5186005caec0fa0ee9c4f8d117869c84460047e",
+      "cases": [
+        "RealRiotPreservesUnsupportedSourceAndTypedLexical"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M5ExpressionTests.RealRiotReadsAdvancedFixtureWithoutLosingSourceOrEnablingPublish",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M5ExpressionTests.cs",
+      "sourceSha256": "3767dd3ab4c6ca6428adc1af4f8884a788dfeba92ce7ffd2f83088c1775387d7",
+      "cases": [
+        "RealRiotReadsAdvancedFixtureWithoutLosingSourceOrEnablingPublish"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M5ExpressionTests.RealRiotRestrictionNegativeShapesPreserveSourceHash",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M5ExpressionTests.cs",
+      "sourceSha256": "3767dd3ab4c6ca6428adc1af4f8884a788dfeba92ce7ffd2f83088c1775387d7",
+      "cases": [
+        "RealRiotRestrictionNegativeShapesPreserveSourceHash (\"all-literal\")",
+        "RealRiotRestrictionNegativeShapesPreserveSourceHash (\"missing-on-property\")",
+        "RealRiotRestrictionNegativeShapesPreserveSourceHash (\"multiple-constructors\")",
+        "RealRiotRestrictionNegativeShapesPreserveSourceHash (\"qualified-literal-property\")",
+        "RealRiotRestrictionNegativeShapesPreserveSourceHash (\"some-literal\")"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M5ExpressionTests.RealRiotSeparatesFourSourceBlankScopesAndPreservesLiteralMetadata",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M5ExpressionTests.cs",
+      "sourceSha256": "3767dd3ab4c6ca6428adc1af4f8884a788dfeba92ce7ffd2f83088c1775387d7",
+      "cases": [
+        "RealRiotSeparatesFourSourceBlankScopesAndPreservesLiteralMetadata"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M5ServiceTests.RealScopeAuthorizationPrecedesProjectionRequests",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M5ServiceTests.cs",
+      "sourceSha256": "d167d324e968fa3bd3b013e666c941a7e25c6cf898d58dd2011ef9379e70922f",
+      "cases": [
+        "RealScopeAuthorizationPrecedesProjectionRequests"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M5ServiceTests.RealTamperedRevisionHashCannotProducePreservedSnapshot",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M5ServiceTests.cs",
+      "sourceSha256": "d167d324e968fa3bd3b013e666c941a7e25c6cf898d58dd2011ef9379e70922f",
+      "cases": [
+        "RealTamperedRevisionHashCannotProducePreservedSnapshot"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.RoundtripTests.RelativeIriAndExactEditPreserveRemainingGraph",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/RoundtripTests.cs",
+      "sourceSha256": "259f0fc7bbf62d7027fab0c0b5186005caec0fa0ee9c4f8d117869c84460047e",
+      "cases": [
+        "RelativeIriAndExactEditPreserveRemainingGraph"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.DraftRevisionTests.RenameFailureAndNameBoundsLeaveCommittedNameUnchanged",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+      "sourceSha256": "2779b2eb6b545c4d6c2dc96b234606f917d13ad12667cc96406218e4ed818b63",
+      "cases": [
+        "RenameFailureAndNameBoundsLeaveCommittedNameUnchanged"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.DraftRevisionTests.RenamePersistsThroughReopenListReplayAndStructuralEdit",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+      "sourceSha256": "2779b2eb6b545c4d6c2dc96b234606f917d13ad12667cc96406218e4ed818b63",
+      "cases": [
+        "RenamePersistsThroughReopenListReplayAndStructuralEdit"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3BoundaryTests.RenamedBlankNodesCompareExactlyAndNearMissIsDifferent",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3BoundaryTests.cs",
+      "sourceSha256": "1a7cab83d965451e1be8dbb80e4b21c12dc20d7db23c84cd0fede4773efdcdb3",
+      "cases": [
+        "RenamedBlankNodesCompareExactlyAndNearMissIsDifferent"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M4ImpactReportTests.ReportIdentityIdempotencyAndAuditAreFrozenToFirstInput",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M4ImpactReportTests.cs",
+      "sourceSha256": "40037aefaac1a5fc171971341532d57e1cadbbabd3a47c88e5e2e8233bd4482d",
+      "cases": [
+        "ReportIdentityIdempotencyAndAuditAreFrozenToFirstInput"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M2EditingTests.RiotLanguageTermCanBeCopiedAndDeletedPrecisely",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M2EditingTests.cs",
+      "sourceSha256": "009d6e55f2d6e10e35dedbd8897cd127d13d4f378bfdcce5abdcae2867bf058e",
+      "cases": [
+        "RiotLanguageTermCanBeCopiedAndDeletedPrecisely"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M4ServiceTests.RoleAndCompleteScopePrecedeAnyJenaAccess",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M4ServiceTests.cs",
+      "sourceSha256": "0c633b36bbda59225b031c15b88be659627b690e874cf6d716736d55cf7c3fc4",
+      "cases": [
+        "RoleAndCompleteScopePrecedeAnyJenaAccess (False)",
+        "RoleAndCompleteScopePrecedeAnyJenaAccess (True)"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.RoundtripTests.RuntimeMustImplementCanonicalBoundary",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/RoundtripTests.cs",
+      "sourceSha256": "259f0fc7bbf62d7027fab0c0b5186005caec0fa0ee9c4f8d117869c84460047e",
+      "cases": [
+        "RuntimeMustImplementCanonicalBoundary"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M4VersionDiffTests.SharedBudgetFailureIsIndeterminateForAllFourSources",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M4VersionDiffTests.cs",
+      "sourceSha256": "e9c7c039c2c715e0310904d84b8b983f5ea9cd09683e97aa3d7449ba2e9b52e8",
+      "cases": [
+        "SharedBudgetFailureIsIndeterminateForAllFourSources (False)",
+        "SharedBudgetFailureIsIndeterminateForAllFourSources (True)"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M3GovernanceTests.SkosPolicyReturnsExactSourceDiagnostic",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M3GovernanceTests.cs",
+      "sourceSha256": "e13bccbc4003062e769f369d510caf56c6d606cac53772f43a1fe9881870d141",
+      "cases": [
+        "SkosPolicyReturnsExactSourceDiagnostic (\"cycle\",\"skos_hierarchy_cycle\")",
+        "SkosPolicyReturnsExactSourceDiagnostic (\"deprecated\",\"semantic_reference_deprecated\")",
+        "SkosPolicyReturnsExactSourceDiagnostic (\"invalid-term\",\"skos_label_term_invalid\")",
+        "SkosPolicyReturnsExactSourceDiagnostic (\"mapping-scheme\",\"skos_mapping_scheme_conflict\")",
+        "SkosPolicyReturnsExactSourceDiagnostic (\"missing-concept\",\"skos_concept_reference_missing\")",
+        "SkosPolicyReturnsExactSourceDiagnostic (\"missing-scheme\",\"skos_scheme_reference_missing\")",
+        "SkosPolicyReturnsExactSourceDiagnostic (\"no-language\",\"skos_label_language_required\")",
+        "SkosPolicyReturnsExactSourceDiagnostic (\"notation\",\"skos_notation_duplicate\")",
+        "SkosPolicyReturnsExactSourceDiagnostic (\"related\",\"skos_related_hierarchy_conflict\")",
+        "SkosPolicyReturnsExactSourceDiagnostic (\"s13\",\"skos_label_relation_conflict\")",
+        "SkosPolicyReturnsExactSourceDiagnostic (\"s14\",\"skos_pref_label_conflict\")",
+        "SkosPolicyReturnsExactSourceDiagnostic (\"s46\",\"skos_mapping_relation_conflict\")",
+        "SkosPolicyReturnsExactSourceDiagnostic (\"unknown-language\",\"language_policy_unknown\")"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.DraftRevisionTests.SourceHistoryValidationAndPublicationBindingAreReal",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+      "sourceSha256": "2779b2eb6b545c4d6c2dc96b234606f917d13ad12667cc96406218e4ed818b63",
+      "cases": [
+        "SourceHistoryValidationAndPublicationBindingAreReal"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.RoundtripTests.SourceTripleAndProjectionBudgetsFailExplicitly",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/RoundtripTests.cs",
+      "sourceSha256": "259f0fc7bbf62d7027fab0c0b5186005caec0fa0ee9c4f8d117869c84460047e",
+      "cases": [
+        "SourceTripleAndProjectionBudgetsFailExplicitly"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.ShaclTests.StandardNegativeReportsLocateRealFailure",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/ShaclTests.cs",
+      "sourceSha256": "839825def05c78411206497adfc8480e716fd2691f5230e3c2532c0d55e80bf1",
+      "cases": [
+        "StandardNegativeReportsLocateRealFailure (\"\",\"MinCountConstraintComponent\")",
+        "StandardNegativeReportsLocateRealFailure (\"<urn:h> a <urn:synthetic:metals:Heat> ; <urn:synthetic:metals:castIn> <urn:x> .\",\"ClassConstraintComponent\")",
+        "StandardNegativeReportsLocateRealFailure (\"<urn:x> <urn:ontology-platform:vocabulary:externalId> 12 .\",\"DatatypeConstraintComponent\")",
+        "StandardNegativeReportsLocateRealFailure (\"<urn:x> <urn:ontology-platform:vocabulary:weight> 101.0 .\",\"MaxInclusiveConstraintComponent\")"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.ShaclTests.StandardSampleConforms",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/ShaclTests.cs",
+      "sourceSha256": "839825def05c78411206497adfc8480e716fd2691f5230e3c2532c0d55e80bf1",
+      "cases": [
+        "StandardSampleConforms"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M3UnitTests.StandardSourceFailureKeepsExactPredicate",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M3UnitTests.cs",
+      "sourceSha256": "a07ce8990979b4ff9ca7f8aa5ec065a8561dd38cb6e5950855368bd0bec1396c",
+      "cases": [
+        "StandardSourceFailureKeepsExactPredicate (\"provenance\",\"http://www.w3.org/ns/prov#wasDerivedFrom\")",
+        "StandardSourceFailureKeepsExactPredicate (\"synthetic\",\"urn:ontology-platform:semantics:synthetic\")"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3BoundaryTests.SymmetricNonIsomorphicGraphsExhaustTheSharedSearchBudget",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3BoundaryTests.cs",
+      "sourceSha256": "1a7cab83d965451e1be8dbb80e4b21c12dc20d7db23c84cd0fede4773efdcdb3",
+      "cases": [
+        "SymmetricNonIsomorphicGraphsExhaustTheSharedSearchBudget"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.VerifiedReadTests.SyntheticNonBmpLabelSurvivesValidationAndPublication",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs",
+      "sourceSha256": "66b023c9d44aa9bbf8956f3c8a7db466858c81b4a9fa561f3e6f86a05e83f062",
+      "cases": [
+        "SyntheticNonBmpLabelSurvivesValidationAndPublication (\"😀\")",
+        "SyntheticNonBmpLabelSurvivesValidationAndPublication (\"𠀀\")"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.VerifiedReadTests.TemporaryMarkerDoesNotConsumeBusinessTripleBudget",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs",
+      "sourceSha256": "66b023c9d44aa9bbf8956f3c8a7db466858c81b4a9fa561f3e6f86a05e83f062",
+      "cases": [
+        "TemporaryMarkerDoesNotConsumeBusinessTripleBudget (4999)",
+        "TemporaryMarkerDoesNotConsumeBusinessTripleBudget (5000)",
+        "TemporaryMarkerDoesNotConsumeBusinessTripleBudget (5001)"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.RoundtripTests.ThirdConcurrentOperationIsRejected",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/RoundtripTests.cs",
+      "sourceSha256": "259f0fc7bbf62d7027fab0c0b5186005caec0fa0ee9c4f8d117869c84460047e",
+      "cases": [
+        "ThirdConcurrentOperationIsRejected"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3BoundaryTests.TwentyCorpusRowsUseAssertedOnlySupportAndShapesBlankException",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3BoundaryTests.cs",
+      "sourceSha256": "1a7cab83d965451e1be8dbb80e4b21c12dc20d7db23c84cd0fede4773efdcdb3",
+      "cases": [
+        "TwentyCorpusRowsUseAssertedOnlySupportAndShapesBlankException"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M4ServiceTests.TwoConcurrentWritersHaveOneCasWinnerAndOneAudit",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M4ServiceTests.cs",
+      "sourceSha256": "0c633b36bbda59225b031c15b88be659627b690e874cf6d716736d55cf7c3fc4",
+      "cases": [
+        "TwoConcurrentWritersHaveOneCasWinnerAndOneAudit"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3BoundaryTests.UndeclaredCustomFactsRequireAnExplicitPropertyOrAnnotation",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3BoundaryTests.cs",
+      "sourceSha256": "1a7cab83d965451e1be8dbb80e4b21c12dc20d7db23c84cd0fede4773efdcdb3",
+      "cases": [
+        "UndeclaredCustomFactsRequireAnExplicitPropertyOrAnnotation"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.DraftRevisionTests.UnicodeEditPersistsExactHistoryAndHonestSourceDiff",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/DraftRevisionTests.cs",
+      "sourceSha256": "2779b2eb6b545c4d6c2dc96b234606f917d13ad12667cc96406218e4ed818b63",
+      "cases": [
+        "UnicodeEditPersistsExactHistoryAndHonestSourceDiff"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M3UnitTests.UnitFailuresHaveExactSourceDiagnostics",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M3UnitTests.cs",
+      "sourceSha256": "a07ce8990979b4ff9ca7f8aa5ec065a8561dd38cb6e5950855368bd0bec1396c",
+      "cases": [
+        "UnitFailuresHaveExactSourceDiagnostics (\"deprecated-canonical\",\"semantic_reference_deprecated\")",
+        "UnitFailuresHaveExactSourceDiagnostics (\"dimension\",\"dimension_reference_missing\")",
+        "UnitFailuresHaveExactSourceDiagnostics (\"dimension-mismatch\",\"unit_dimension_mismatch\")",
+        "UnitFailuresHaveExactSourceDiagnostics (\"duplicate\",\"unit_definition_conflict\")",
+        "UnitFailuresHaveExactSourceDiagnostics (\"exponent\",\"dimension_definition_invalid\")",
+        "UnitFailuresHaveExactSourceDiagnostics (\"exponent-range\",\"dimension_definition_invalid\")",
+        "UnitFailuresHaveExactSourceDiagnostics (\"exponent-type\",\"dimension_definition_invalid\")",
+        "UnitFailuresHaveExactSourceDiagnostics (\"precision\",\"unit_precision_unknown\")",
+        "UnitFailuresHaveExactSourceDiagnostics (\"property-duplicate\",\"property_unit_binding_invalid\")",
+        "UnitFailuresHaveExactSourceDiagnostics (\"property-missing\",\"property_unit_binding_invalid\")",
+        "UnitFailuresHaveExactSourceDiagnostics (\"quantity\",\"quantity_kind_reference_missing\")",
+        "UnitFailuresHaveExactSourceDiagnostics (\"quantity-duplicate\",\"quantity_kind_reference_missing\")",
+        "UnitFailuresHaveExactSourceDiagnostics (\"quantity-mismatch\",\"unit_quantity_kind_mismatch\")",
+        "UnitFailuresHaveExactSourceDiagnostics (\"same-exponents\",\"unit_dimension_mismatch\")",
+        "UnitFailuresHaveExactSourceDiagnostics (\"source\",\"unit_source_required\")",
+        "UnitFailuresHaveExactSourceDiagnostics (\"source-duplicate\",\"unit_source_required\")",
+        "UnitFailuresHaveExactSourceDiagnostics (\"source-label\",\"unit_source_required\")",
+        "UnitFailuresHaveExactSourceDiagnostics (\"unit-missing\",\"unit_reference_missing\")",
+        "UnitFailuresHaveExactSourceDiagnostics (\"version\",\"unit_version_reference_missing\")"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M3ServiceTests.UnitGovernanceBindsRealAssessment",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M3ServiceTests.cs",
+      "sourceSha256": "268f7692863c7d392812845592241a497ff980b97a2d0559777969a8ac83d3f6",
+      "cases": [
+        "UnitGovernanceBindsRealAssessment (\"deprecated-canonical\",Fail)",
+        "UnitGovernanceBindsRealAssessment (\"mismatch\",Fail)",
+        "UnitGovernanceBindsRealAssessment (\"unknown\",Indeterminate)",
+        "UnitGovernanceBindsRealAssessment (\"valid\",Pass)"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.ShaclTests.UnsafeShapesRejectedBeforeExecution",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/ShaclTests.cs",
+      "sourceSha256": "839825def05c78411206497adfc8480e716fd2691f5230e3c2532c0d55e80bf1",
+      "cases": [
+        "UnsafeShapesRejectedBeforeExecution (\"<urn:s> <http://www.w3.org/2002/07/owl#imports> <http://192.0.2.1/never> .\")",
+        "UnsafeShapesRejectedBeforeExecution (\"<urn:s> <http://www.w3.org/ns/shacl#js> <urn:q> .\")",
+        "UnsafeShapesRejectedBeforeExecution (\"<urn:s> <http://www.w3.org/ns/shacl#node> <urn:s> .\")",
+        "UnsafeShapesRejectedBeforeExecution (\"<urn:s> <http://www.w3.org/ns/shacl#path> [ <http://www.w3.org/ns/shacl#inversePath> <urn:p> ] .\")",
+        "UnsafeShapesRejectedBeforeExecution (\"<urn:s> <http://www.w3.org/ns/shacl#property> <urn:s> ; <http://www.w3.org/ns/shacl#path> <urn:p> .\")",
+        "UnsafeShapesRejectedBeforeExecution (\"<urn:s> <http://www.w3.org/ns/shacl#sparql> <urn:q> .\")"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M4ServiceTests.ValidHistoryCannotBeReplacedOrUnlockedByUnrelatedError",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M4ServiceTests.cs",
+      "sourceSha256": "0c633b36bbda59225b031c15b88be659627b690e874cf6d716736d55cf7c3fc4",
+      "cases": [
+        "ValidHistoryCannotBeReplacedOrUnlockedByUnrelatedError (\"delete\")",
+        "ValidHistoryCannotBeReplacedOrUnlockedByUnrelatedError (\"expand\")",
+        "ValidHistoryCannotBeReplacedOrUnlockedByUnrelatedError (\"from\")",
+        "ValidHistoryCannotBeReplacedOrUnlockedByUnrelatedError (\"hide-with-error\")",
+        "ValidHistoryCannotBeReplacedOrUnlockedByUnrelatedError (\"target\")",
+        "ValidHistoryCannotBeReplacedOrUnlockedByUnrelatedError (\"type\")"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M3GovernanceTests.ValidMultilingualAndCrossSchemeMappingHaveNoDiagnostics",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M3GovernanceTests.cs",
+      "sourceSha256": "e13bccbc4003062e769f369d510caf56c6d606cac53772f43a1fe9881870d141",
+      "cases": [
+        "ValidMultilingualAndCrossSchemeMappingHaveNoDiagnostics"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.VerifiedReadTests.VerifiedReadCancellationAndTimeoutCleanTemporaryGraphs",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs",
+      "sourceSha256": "66b023c9d44aa9bbf8956f3c8a7db466858c81b4a9fa561f3e6f86a05e83f062",
+      "cases": [
+        "VerifiedReadCancellationAndTimeoutCleanTemporaryGraphs (False)",
+        "VerifiedReadCancellationAndTimeoutCleanTemporaryGraphs (True)"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.VerifiedReadTests.VerifiedReadRetainsAggregateBusinessTripleBudget",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs",
+      "sourceSha256": "66b023c9d44aa9bbf8956f3c8a7db466858c81b4a9fa561f3e6f86a05e83f062",
+      "cases": [
+        "VerifiedReadRetainsAggregateBusinessTripleBudget (4999)",
+        "VerifiedReadRetainsAggregateBusinessTripleBudget (5000)",
+        "VerifiedReadRetainsAggregateBusinessTripleBudget (5001)"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.VerifiedReadTests.VerifiedReadReturnsExactlyTheComparedBatch",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/VerifiedReadTests.cs",
+      "sourceSha256": "66b023c9d44aa9bbf8956f3c8a7db466858c81b4a9fa561f3e6f86a05e83f062",
+      "cases": [
+        "VerifiedReadReturnsExactlyTheComparedBatch"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M4VersionDiffTests.VersionDiffBindsActualPersistedSourcesAndRejectsCrossAssetOrTamper",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M4VersionDiffTests.cs",
+      "sourceSha256": "e9c7c039c2c715e0310904d84b8b983f5ea9cd09683e97aa3d7449ba2e9b52e8",
+      "cases": [
+        "VersionDiffBindsActualPersistedSourcesAndRejectsCrossAssetOrTamper"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M3VocabularyTests.VersionThreeKeepsHistoricalProfiles",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M3VocabularyTests.cs",
+      "sourceSha256": "c224b5b6d38ef714ad4c3555a201ec8d82d75633d90ea9831f07b2399b96db35",
+      "cases": [
+        "VersionThreeKeepsHistoricalProfiles"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.SemanticTests.G3M3VocabularyTests.VocabularyInterfacesAreImplemented",
+      "source": "backend/tests/OntologyPlatform.SemanticTests/G3M3VocabularyTests.cs",
+      "sourceSha256": "c224b5b6d38ef714ad4c3555a201ec8d82d75633d90ea9831f07b2399b96db35",
+      "cases": [
+        "VocabularyInterfacesAreImplemented"
+      ]
+    }
+  ],
+  "scope": "ALL_CASES_METHOD_PROCESS_ISOLATION"
+}

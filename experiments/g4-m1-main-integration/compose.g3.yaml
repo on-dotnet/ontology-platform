@@ -93,6 +93,7 @@ services:
     networks:
     - front
   api:
+    init: true
     ports:
     - "127.0.0.1:15100:15100"
     platform: linux/arm64

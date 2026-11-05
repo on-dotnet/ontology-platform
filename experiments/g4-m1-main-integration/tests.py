@@ -517,6 +517,37 @@ class ExecutionRegressionTests(unittest.TestCase):
 
 
 class ComposeBoundaryTests(unittest.TestCase):
+    def test_api_init_declared_and_actual_state_are_required(self):
+        """真实Compose及实际快照均拒绝API缺失/错误Init，覆盖恢复副本。"""
+        import copy
+        from unittest.mock import patch
+        from contextlib import ExitStack
+        import runtime as rt,consumer_check as cc
+        rid='b-continue-20990101-98';m={'runId':rid,'privateDirectory':str(rt.private_dir(rid)),'images':rt.IMAGES}
+        for group,profile in [('g3',None),('m1',None),('m1','lease')]:
+            command=rt.compose_command(group)+(['--profile',profile] if profile else [])+['config','--format','json']
+            result=subprocess.run(command,env=rt.compose_environment(m),capture_output=True,timeout=20);self.assertEqual(result.returncode,0,result.stderr)
+            config=json.loads(result.stdout)
+            for name in ('api','api-recovery'):
+                if name not in config['services']:continue
+                self.assertIs(config['services'][name].get('init'),True)
+                for value in (None,False,'true',1):
+                    bad=copy.deepcopy(config)
+                    if value is None:bad['services'][name].pop('init')
+                    else:bad['services'][name]['init']=value
+                    with self.assertRaisesRegex(ValueError,'API_INIT_REQUIRED'):cc.check_compose(m,bad,group)
+        with tempfile.TemporaryDirectory(dir=ARTIFACTS) as directory:
+            for service in ('api','api-recovery'):
+                for number,init in enumerate((None,False,'true',1,True)):
+                    item={'Config':{'Labels':{'com.docker.compose.service':service},'Image':rt.IMAGES['aspnet']},'Image':'sha256:fixture','HostConfig':{'Memory':1024,'Privileged':False,'ReadonlyRootfs':True,'Init':init},'State':{'Running':True,'Paused':False},'Mounts':[]}
+                    result=subprocess.CompletedProcess([],0,json.dumps({'services':{service:{'volumes':[]}}}).encode(),b'')
+                    with ExitStack() as stack:
+                        stack.enter_context(patch.object(rt,'ARTIFACTS',Path(directory)));stack.enter_context(patch.object(rt,'docker',return_value=b'fixture\n'));stack.enter_context(patch.object(rt,'verify_engine'));stack.enter_context(patch.object(rt.subprocess,'run',return_value=result));stack.enter_context(patch.object(rt,'inspect_owned',return_value=item));stack.enter_context(patch.object(rt,'observed_volume_usage',return_value=0));stack.enter_context(patch.object(rt,'update_runtime'))
+                        if init is True:
+                            value=rt.resource_snapshot(m,'m1',service+str(number));self.assertIs(value['containers'][0]['init'],True)
+                        else:
+                            with self.assertRaisesRegex(ValueError,'ACTUAL_API_INIT_REQUIRED'):rt.resource_snapshot(m,'m1',service+str(number))
+
     def test_actual_config_positive_and_mutations(self):
         import copy
         import runtime as rt, consumer_check as cc

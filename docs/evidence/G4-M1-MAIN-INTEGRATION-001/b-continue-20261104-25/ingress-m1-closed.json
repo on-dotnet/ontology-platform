@@ -1,0 +1,65 @@
+{
+  "status": "PASS",
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-25",
+  "testedCommit": "9daa51a7dd08f5b9dc139419f4851a9212da231f",
+  "pid": 22756,
+  "processReceiptSha256": "5c5e94442dd22cd9ca0e2c4f55c988d70505533f3090fc24eb08403d6344e09e",
+  "portsReleased": [
+    15432,
+    15180,
+    15100,
+    15300
+  ],
+  "execExits": [
+    {
+      "utc": "2026-11-05T00:20:30.801320+00:00",
+      "pid": 22756,
+      "event": "exec_exited",
+      "execId": "7ca6d756e0264ee9531dcf6709d6e8dd38351bdeabf7cde5a098c92d1be0c224",
+      "token": "g4-relay-b-continue-20261104-25-1d1697abd2d643bdb6e8a051a5358dd4",
+      "containerId": "e5b35b69c791e6f103b8967b07577041c4036bc2a41324d94a83958ffe82be7f",
+      "running": false,
+      "exitCode": 111
+    },
+    {
+      "utc": "2026-11-05T00:20:31.867205+00:00",
+      "pid": 22756,
+      "event": "exec_exited",
+      "execId": "2c5ae5c9dbb39906081ecdf985fa402c7e7c9ff214e4aa3b6e520520140188dd",
+      "token": "g4-relay-b-continue-20261104-25-5fe79929e7994998b730c284e8be3b20",
+      "containerId": "e5b35b69c791e6f103b8967b07577041c4036bc2a41324d94a83958ffe82be7f",
+      "running": false,
+      "exitCode": 0
+    }
+  ],
+  "remoteObservations": [
+    {
+      "event": "reap_exec_created",
+      "execId": "54a13e8b5af0733197f05fb6c377250e78c7d10924d2cb74234d5fcb18dab55e",
+      "mode": "terminate"
+    },
+    {
+      "event": "reap_exec_created",
+      "execId": "8ecaf44febce38927c0d730ca58f76366eb940c9cf2e96fbd90156058d1ca450",
+      "mode": "inspect"
+    },
+    {
+      "event": "remote_reaped",
+      "observations": [
+        {
+          "execId": "54a13e8b5af0733197f05fb6c377250e78c7d10924d2cb74234d5fcb18dab55e",
+          "mode": "terminate",
+          "pids": [],
+          "exitCode": 0
+        },
+        {
+          "execId": "8ecaf44febce38927c0d730ca58f76366eb940c9cf2e96fbd90156058d1ca450",
+          "mode": "inspect",
+          "pids": [],
+          "exitCode": 0
+        }
+      ]
+    }
+  ]
+}

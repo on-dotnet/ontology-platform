@@ -1,0 +1,31 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-25",
+  "testedCommit": "9daa51a7dd08f5b9dc139419f4851a9212da231f",
+  "command": [
+    "docker",
+    "--context",
+    "desktop-linux",
+    "exec",
+    "e5b35b69c791e6f103b8967b07577041c4036bc2a41324d94a83958ffe82be7f",
+    "pg_dump",
+    "-U",
+    "platform",
+    "-d",
+    "platform",
+    "-Fc"
+  ],
+  "startedAtUtc": "2026-11-05T00:22:51.543028+00:00",
+  "endedAtUtc": "2026-11-05T00:22:54.624401+00:00",
+  "elapsedSeconds": 3.0809606250040815,
+  "exitCode": 0,
+  "timingStatus": "OBSERVED",
+  "timedOut": false,
+  "executedInputDrift": false,
+  "inputHashes": {},
+  "manifestSha256": "762abecb4799f01ec16fd65ffcb1a1b2d98aba3a6cd4e3856f28d5717baddfa6",
+  "commandSha256": "349e1f3b5f2e5282caabe3da7ba4190fb9ecd18a17302a78b7c34260befa11e6",
+  "logSha256": "66aa54e1e0ede35f4294b84bad756297a32c40e6afea3f6a6e931213f8bbdc3a",
+  "logBytes": 160021,
+  "logVisibility": "PRIVATE"
+}

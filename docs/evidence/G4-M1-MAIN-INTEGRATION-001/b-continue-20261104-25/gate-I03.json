@@ -1,0 +1,108 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-25",
+  "testedCommit": "9daa51a7dd08f5b9dc139419f4851a9212da231f",
+  "manifestSha256": "762abecb4799f01ec16fd65ffcb1a1b2d98aba3a6cd4e3856f28d5717baddfa6",
+  "result": {
+    "status": "PARTIAL",
+    "cases": [
+      {
+        "environment": "Production",
+        "override": "environment",
+        "exitCode": -6,
+        "timedOut": false,
+        "logSha256": "9dbc9cb975f13860f953412b5e79302425c3460c53a6d05d99deaa8fc03af693",
+        "exactG4Rejection": true
+      },
+      {
+        "environment": "Production",
+        "override": "command-line",
+        "exitCode": -6,
+        "timedOut": false,
+        "logSha256": "9dbc9cb975f13860f953412b5e79302425c3460c53a6d05d99deaa8fc03af693",
+        "exactG4Rejection": true
+      },
+      {
+        "environment": "Staging",
+        "override": "environment",
+        "exitCode": -6,
+        "timedOut": false,
+        "logSha256": "9dbc9cb975f13860f953412b5e79302425c3460c53a6d05d99deaa8fc03af693",
+        "exactG4Rejection": true
+      },
+      {
+        "environment": "Staging",
+        "override": "command-line",
+        "exitCode": -6,
+        "timedOut": false,
+        "logSha256": "9dbc9cb975f13860f953412b5e79302425c3460c53a6d05d99deaa8fc03af693",
+        "exactG4Rejection": true
+      }
+    ],
+    "developmentAndDisabled": "PENDING_REAL_RUNTIME",
+    "hostGraph": [
+      {
+        "enabled": false,
+        "allowEmptyPublicSchema": null,
+        "workerRegistered": false,
+        "adapterRegistered": false,
+        "routesRegistered": false,
+        "allowedSchemas": null,
+        "status": "PASS"
+      },
+      {
+        "enabled": false,
+        "allowEmptyPublicSchema": false,
+        "workerRegistered": false,
+        "adapterRegistered": false,
+        "routesRegistered": false,
+        "allowedSchemas": null,
+        "status": "PASS"
+      },
+      {
+        "enabled": false,
+        "allowEmptyPublicSchema": true,
+        "workerRegistered": false,
+        "adapterRegistered": false,
+        "routesRegistered": false,
+        "allowedSchemas": null,
+        "status": "PASS"
+      },
+      {
+        "enabled": true,
+        "allowEmptyPublicSchema": null,
+        "workerRegistered": true,
+        "adapterRegistered": true,
+        "routesRegistered": true,
+        "allowedSchemas": [
+          "production"
+        ],
+        "status": "PASS"
+      },
+      {
+        "enabled": true,
+        "allowEmptyPublicSchema": false,
+        "workerRegistered": true,
+        "adapterRegistered": true,
+        "routesRegistered": true,
+        "allowedSchemas": [
+          "production"
+        ],
+        "status": "PASS"
+      },
+      {
+        "enabled": true,
+        "allowEmptyPublicSchema": true,
+        "workerRegistered": true,
+        "adapterRegistered": true,
+        "routesRegistered": true,
+        "allowedSchemas": [
+          "production",
+          "public"
+        ],
+        "status": "PASS"
+      }
+    ],
+    "rejectionPathsPassed": true
+  }
+}

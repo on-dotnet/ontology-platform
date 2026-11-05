@@ -120,3 +120,12 @@ G3六容器真实OIDC跨组织切换及finally恢复通过；首个缺CSRF POST�
 Run24 / Tefecfb0ee33bca8b8217e66359efaf956f653f63：R1/R2独立PASS，严格离线Restore5.679秒exit0，PREFLIGHT通过。并行只读早检确认I06 wrong-san重建后快照仍按server证书声明审核，必在真实TLS负例前ACTUAL_BIND_SOURCE拒绝。为止损，精确停止正在进行的SelfTest独立组91203，原始83.538秒exit-15、inputDrift=false及输出保存；未运行native/Web或产品容器，不视为产品失败或PASS。
 
 仅runtime/readback/tests贯穿两固定certificate_variant，记录实际Compose配置SHA；非法值在registry重命名前拒绝、G3不接受wrong-san，通用挂载检查不放宽，finally恢复server。两新回归先RED后GREEN、完整55测试5.980秒PASS，实际Compose双变体与独立审查通过；真实TLS负例尚NOT_RUN，须新T/Run完整验收。四无占用工具副本26841文件510579088逻辑字节按独立精确清单回收，incidentKEEP保持；monitor90477初次6秒缺席检查未通过，后续实际ps exit1已核实，原记录保留。main/M2/中间V3均未执行。
+
+
+Run25 / T9daa51a7dd08f5b9dc139419f4851a9212da231f：R1/R2独立PASS（Restore5.543秒），原27套SelfTest405.482秒exit0、55任务测试、native/Web通过（780总344PASS436SKIP0FAIL、Web379）。I05 PASS、I03 PARTIAL；I02首次完整PASS，四模块462项、Security156项、G2合同121项及真实G3 OIDC/CSRF、发布V1→V2故障恢复→回滚、语义与审计重读均通过。I01跳过仍待后续fixture逐案闭合。
+
+I04在CREATE权限负例停止：真实日志准确42501/connections/permission denied，原API作为PID1保持运行，30秒终态断言失败。原始失败、配置及160021字节PGDMP数据库见证私有KEEP，G3原行/审计未变、connections schema未创建。相同构建/配置非PID1短诊断exit134；仅给任务三API服务启用Engine内置init，并在声明/实际快照强制布尔Init。五文件补丁独立Review与56任务测试通过。新API实际PID1 docker-init→dotnet，内置init SHA ab2244312e069c6c97bece2437f61fb01db474eae5b0f1ce006162e212eae5b0，短诊断3.322秒内exit134及准确拒绝，原配置恢复。初次诊断因Docker缺席文本大小写停止，原失败及旧Web精确删除见证保留，v2继续后通过。此诊断不提升原T的I04；I06/I07/I08仍NOT_RUN，必须新T完整验收。
+
+本轮四模块28对象、G3切换退役6对象、诊断旧Web/API及最终10对象均按准确登记完成回收，最终零容器、KEEP3网络8卷保持。monitor96363实际释放，锁屏/熄屏240次重叠心跳已观测，完整会话连续性仍NOT_VERIFIED。包容量只读预估已超过15MiB（估计26.44MiB且不含后续证据/元数据），未构包、不修改硬限制或删历史。继续独立产品验收，最终I08如受阻须单列具体审批；main/M2未执行。
+
+Run25四工具副本首版因占用拒绝，0删除；新v2冻结当前VM PID15481完整身份及553只读FD集合，独立审查后实际回收26919文件/512583869逻辑字节，四路径lstat ENOENT，事故KEEP不变。系统VM未操作，物理空间/FD释放NOT_VERIFIED。精确计划、原拒绝及实际日志均保留。

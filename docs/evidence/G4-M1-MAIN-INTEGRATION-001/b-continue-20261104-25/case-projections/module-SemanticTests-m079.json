@@ -1,0 +1,73 @@
+{
+  "cases": [
+    {
+      "case": "ProjectionCardinalityPreservesLexicalAndDiagnosesInvalid (\"0\",True)",
+      "status": "PASS",
+      "line": 1
+    },
+    {
+      "case": "ProjectionCardinalityPreservesLexicalAndDiagnosesInvalid (\"+0002\",True)",
+      "status": "PASS",
+      "line": 2
+    },
+    {
+      "case": "ProjectionCardinalityPreservesLexicalAndDiagnosesInvalid (\"-0\",True)",
+      "status": "PASS",
+      "line": 3
+    },
+    {
+      "case": "ProjectionCardinalityPreservesLexicalAndDiagnosesInvalid (\" 12 \",True)",
+      "status": "PASS",
+      "line": 4
+    },
+    {
+      "case": "ProjectionCardinalityPreservesLexicalAndDiagnosesInvalid (\"123456789012345678901234567890\",True)",
+      "status": "PASS",
+      "line": 5
+    },
+    {
+      "case": "ProjectionCardinalityPreservesLexicalAndDiagnosesInvalid (\"-1\",False)",
+      "status": "PASS",
+      "line": 6
+    },
+    {
+      "case": "ProjectionCardinalityPreservesLexicalAndDiagnosesInvalid (\"1.0\",False)",
+      "status": "PASS",
+      "line": 7
+    },
+    {
+      "case": "ProjectionCardinalityPreservesLexicalAndDiagnosesInvalid (\"1e2\",False)",
+      "status": "PASS",
+      "line": 8
+    },
+    {
+      "case": "ProjectionCardinalityPreservesLexicalAndDiagnosesInvalid (\"1 2\",False)",
+      "status": "PASS",
+      "line": 9
+    },
+    {
+      "case": "ProjectionCardinalityPreservesLexicalAndDiagnosesInvalid (\"+\",False)",
+      "status": "PASS",
+      "line": 10
+    },
+    {
+      "case": "ProjectionCardinalityPreservesLexicalAndDiagnosesInvalid (\"１２\",False)",
+      "status": "PASS",
+      "line": 11
+    }
+  ],
+  "summary": {
+    "total": 11,
+    "PASS": 11,
+    "FAIL": 0,
+    "SKIP": 0
+  },
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-25",
+  "testedCommit": "9daa51a7dd08f5b9dc139419f4851a9212da231f",
+  "project": "SemanticTests",
+  "assemblySha256": "e80c0033c96de532a6536a3fc578eb725a80e80687efd34066695b5d42f5c752",
+  "rawLogSha256": "80e287889ae449e80b1b76a0615516eb00f704df5a297e0dad4b38726710ca99",
+  "commandReceiptSha256": "59c4670ad3c8832d0f0e9980ff5bb0b3e0b876561a0dba808b2d84af6cc2044d",
+  "command": "module-SemanticTests-m079"
+}

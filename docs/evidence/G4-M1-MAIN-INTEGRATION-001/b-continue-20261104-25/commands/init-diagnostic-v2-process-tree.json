@@ -1,0 +1,30 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261104-25",
+  "testedCommit": "9daa51a7dd08f5b9dc139419f4851a9212da231f",
+  "command": [
+    "docker",
+    "--context",
+    "desktop-linux",
+    "exec",
+    "8c697e2bf2141435e674aee25ac75dd3fd92eaabe82adea2cb24df326d44d654",
+    "/bin/sh",
+    "-c",
+    "sha256sum /sbin/docker-init; /sbin/docker-init --version; ps -eo pid,ppid,comm"
+  ],
+  "startedAtUtc": "2026-11-05T00:36:13.931019+00:00",
+  "endedAtUtc": "2026-11-05T00:36:17.010857+00:00",
+  "elapsedSeconds": 3.0798148329995456,
+  "exitCode": 0,
+  "timingStatus": "OBSERVED",
+  "timedOut": false,
+  "executedInputDrift": false,
+  "inputHashes": {
+    "/bin/sh": "84ca7f9b83021621e16059a1c7850df72a462d879e8239d566236ca6ddd00953"
+  },
+  "manifestSha256": "762abecb4799f01ec16fd65ffcb1a1b2d98aba3a6cd4e3856f28d5717baddfa6",
+  "commandSha256": "39f739534e3801a9d6b7b435495e767c68a44447a8ae88c9131049b832761be5",
+  "logSha256": "1c84b834729f2f1c0df5157a811f7167bc6c2d4e2cffad597d3fa23858426cf3",
+  "logBytes": 231,
+  "logVisibility": "PRIVATE"
+}

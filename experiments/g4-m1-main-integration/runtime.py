@@ -1015,6 +1015,7 @@ def resource_snapshot(m, group, name, *, certificate_variant='server'):
     for ident in ids:
         item=inspect_owned(m,ident);service=item['Config']['Labels']['com.docker.compose.service']
         require(service in declarations and service not in container_ids,'ACTUAL_SERVICE_SET')
+        if service in ('api','api-recovery'):require(item['HostConfig'].get('Init') is True,'ACTUAL_API_INIT_REQUIRED')
         require(item['Config']['Image'] in IMAGES.values(),'ACTUAL_IMAGE')
         memory+=item['HostConfig']['Memory'];require(item['HostConfig']['Memory']>0,'UNBOUNDED_MEMORY')
         require(not item['HostConfig']['Privileged'] and item['HostConfig']['ReadonlyRootfs'],'ACTUAL_PRIVILEGE')
@@ -1028,7 +1029,7 @@ def resource_snapshot(m, group, name, *, certificate_variant='server'):
                 require(len(observed)>=6 and observed[2].isdigit(),'VOLUME_USAGE_FORMAT')
                 volumes[mount['Name']]={'usedBytes':int(observed[2])*1024,'containerId':ident,'destination':mount['Destination']}
         container_ids[service]=ident
-        rows.append(dict(id=ident,service=service,image=item['Image'],running=item['State']['Running'],paused=item['State']['Paused'],memoryBytes=item['HostConfig']['Memory'],bindMappings=bindings,mounts=[{k:v for k,v in x.items() if k in ('Type','Name','Source','Destination','RW')} for x in item['Mounts']]))
+        rows.append(dict(id=ident,service=service,image=item['Image'],init=item['HostConfig'].get('Init'),running=item['State']['Running'],paused=item['State']['Paused'],memoryBytes=item['HostConfig']['Memory'],bindMappings=bindings,mounts=[{k:v for k,v in x.items() if k in ('Type','Name','Source','Destination','RW')} for x in item['Mounts']]))
     require(memory<=6*1024**3,'ACTUAL_MEMORY_BUDGET')
     used=observed_volume_usage(m,volumes)
     require(used<3*1024**3,'VOLUME_STOP_THRESHOLD')
