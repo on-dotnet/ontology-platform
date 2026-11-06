@@ -243,3 +243,6 @@ I07在source-permission-limited浏览器场景POST202后超时；原BLOCKED不�
 只在ignored提案目录准备catalog.tsx及connections.test.ts两文件补丁：初始history/job读取owner互锁，保留代际/撤权/操作owner；新初读反例原代码4RED，隔离候选23文件385测试、类型/lint零错误，非作者限定Review PASS。产品文件未修改；待批精确补丁SHA4a9735481c2dfeae38dae68a0924d18695c74ada247d7cd8f2d175ea2f3c3293，详情见本Run PRODUCT-P1-SCOPE-REQUEST.md。I08及补充并发回归均未运行，不标完整验收或READY。
 
 失败收尾11对象/16命令准确删除，实时独立核对KEEP3网8卷不变、M1入口2477 Exec实际退出；59已知模式17680项扫描无发现。四工具副本27064文件516938419逻辑字节按VM95205/707只读FD计划删除，事故KEEP保持，不操作VM、物理释放NOT_VERIFIED；monitor73680准确释放。私有原始资料、失败、恢复映射、分支/工作树KEEP。15MiB硬限制保持，无新V3/main/M2。
+
+
+Run38启动：用户已明确批准Run37精确两文件补丁，并批准按影响验收。旧整链每次重跑要求由新批准覆盖；T37未变输入经逐项核对后标记复用，重跑Web全套、竞态回归、完整I07及必要兼容烟测。详见本轮IMPACT-ACCEPTANCE-APPROVAL.md。15MiB/main/M2边界保持，当前验收未完成。

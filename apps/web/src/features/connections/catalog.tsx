@@ -21,6 +21,13 @@ export function CatalogPanel({ connection, etag, canManage, onDenied, parentBusy
   const [replay, setReplay] = useState<(() => Promise<void>) | null>(null);
   const disabled = connection.state === "DISABLED";
   const access = useRef({ generation: 0, revoked: false });
+  // 初始读取先占位；所有目录/任务读取按准确 owner 释放，禁止迟到结果提前解锁。
+  const [initialReadOwner] = useState(() => Symbol("initial-catalog-read"));
+  const readOwners = useRef(new Set<symbol>(disabled ? [] : [initialReadOwner]));
+  const [readingCatalog, setReadingCatalog] = useState(!disabled);
+  function publishReads() { void Promise.resolve().then(() => { if (!access.current.revoked) setReadingCatalog(readOwners.current.size > 0); }); }
+  function beginRead() { const owner = Symbol("catalog-read"); readOwners.current.add(owner); publishReads(); return owner; }
+  function finishRead(owner: symbol) { readOwners.current.delete(owner); publishReads(); }
   const [revalidating, setRevalidating] = useState(false);
   // 每次短 HTTP 操作独占令牌；迟到 finally 不得释放另一操作或新挂载面板的锁。
   const activeOperation = useRef<symbol | null>(null);
@@ -66,10 +73,11 @@ export function CatalogPanel({ connection, etag, canManage, onDenied, parentBusy
     finally { if (current(generation, signal)) setRevalidating(false); }
   }
   /** 每次读取绑定当前代际，撤权、卸载或较新的拒绝发生后，旧响应不得恢复目录。 */
-  async function readCatalogs(cursor = "", signal?: AbortSignal) {
+  async function readCatalogs(cursor = "", signal?: AbortSignal, owner = beginRead()) {
     const generation = access.current.generation;
     try { const result = await client.catalogs(connection.id, cursor, signal); if (current(generation, signal)) { setHistory(result.data); setRevalidating(false); } }
     catch (cause) { if (current(generation, signal)) await catalogFailure(cause, signal); }
+    finally { finishRead(owner); }
   }
   async function readSnapshot(snapshotId: string) {
     const generation = access.current.generation;
@@ -77,17 +85,20 @@ export function CatalogPanel({ connection, etag, canManage, onDenied, parentBusy
     catch (cause) { if (current(generation)) await catalogFailure(cause); }
   }
   useEffect(() => {
-    if (disabled) return;
+    if (disabled) { finishRead(initialReadOwner); return; }
     const controller = new AbortController();
-    void Promise.resolve().then(() => { if (!controller.signal.aborted) return readCatalogs("", controller.signal); });
-    return () => controller.abort();
+    const owner = beginRead(); finishRead(initialReadOwner);
+    void Promise.resolve().then(() => { if (!controller.signal.aborted) return readCatalogs("", controller.signal, owner); });
+    return () => { controller.abort(); finishRead(owner); };
     // 身份拒绝回调由父级提供，不作为查询重启条件。
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [connection.id, jobId, disabled, refresh]);
   useEffect(() => {
     if (!jobId || disabled) return;
-    const controller = new AbortController(); let timer: ReturnType<typeof setTimeout>; let attempts = 0;
+    const controller = new AbortController(); let timer: ReturnType<typeof setTimeout>;
+    let pendingRead: symbol | null = null; let attempts = 0;
     async function poll() {
+      const owner = beginRead(); pendingRead = owner;
       const generation = access.current.generation;
       try {
         const result = await client.job(connection.id, jobId, controller.signal);
@@ -96,12 +107,13 @@ export function CatalogPanel({ connection, etag, canManage, onDenied, parentBusy
         if (["QUEUED", "RUNNING"].includes(result.data.status)) { if (++attempts < 20) timer = setTimeout(poll, 1500); else setPaused(true); }
         else await readCatalogs("", controller.signal);
       } catch (cause) { if (current(generation, controller.signal)) failure(cause); }
+      finally { finishRead(owner); if (pendingRead === owner) pendingRead = null; }
     }
-    void poll(); return () => { controller.abort(); clearTimeout(timer); };
+    void poll(); return () => { controller.abort(); clearTimeout(timer); if (pendingRead) finishRead(pendingRead); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [connection.id, jobId, disabled, refresh]);
   async function run(work: () => Promise<void>) {
-    if (parentBusy || activeOperation.current || revalidating || access.current.revoked) return;
+    if (parentBusy || activeOperation.current || readOwners.current.size > 0 || revalidating || access.current.revoked) return;
     const generation = access.current.generation;
     const owner = Symbol("catalog-operation");
     // 父级同步裁决补足 props 尚未重渲染的同周期窗口。
@@ -125,10 +137,10 @@ export function CatalogPanel({ connection, etag, canManage, onDenied, parentBusy
     void run(async () => { const result = await client.cancel(connection.id, job.jobId, body, etag); if (!current(generation)) return; setJob(result.data); setRefresh(value => value + 1); });
   }
   function resume() {
-    if (parentBusy || activeOperation.current || revalidating) return;
+    if (parentBusy || activeOperation.current || readOwners.current.size > 0 || revalidating) return;
     setError(null); setPaused(false); setRefresh(value => value + 1);
   }
-  const interactionBusy = parentBusy || busy || revalidating;
+  const interactionBusy = parentBusy || busy || revalidating || readingCatalog;
   const running = !!job && ["QUEUED", "RUNNING"].includes(job.status);
   return <section className="connection-card"><div className="connection-heading"><div><h2>源目录</h2><p>仅包含当前允许的表、视图与字段，不读取业务行。</p></div>{canManage && <button disabled={disabled || interactionBusy || running || connection.state !== "ACTIVE" || !connection.probeFresh || !etag} onClick={discover}>发现目录</button>}</div>
     <RequestError error={error} retry={interactionBusy ? undefined : resume} />
