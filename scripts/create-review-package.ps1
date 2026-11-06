@@ -68,6 +68,72 @@ function Invoke-ReviewGit {
     } finally { $buffer.Dispose(); $process.Dispose() }
 }
 
+function Test-ReviewArgvApproval {
+    param([string]$Repository, [string]$Base, [string]$Head, [int]$Version, [string]$WorkItem)
+    # 仅信任工具固定策略和已提交批准原文；ZIP字段不提供额外权限。
+    if ($Version -ne 3 -or $WorkItem -cne 'G4-M1-MAIN-INTEGRATION-001' -or $Base -cne 'd1a61daffe844475b07705797e3ad325cc3f2945') { return $false }
+    $record = 'docs/tasks/G4-M1-MAIN-INTEGRATION-001/ARGV-APPROVAL.md'
+    $exists = Invoke-ReviewGit $Repository @('cat-file', '-e', ($Head + ':' + $record)) -AllowFailure
+    if ($exists.ExitCode -ne 0) { return $false }
+    $bytes = (Invoke-ReviewGit $Repository @('cat-file', 'blob', ($Head + ':' + $record))).Bytes
+    if ((Get-ReviewHash $bytes) -cne 'a9226c4d33e51ae568eba350cf8622b35df510e551222b62416d11f35c9ea3ae' -or
+        (Invoke-ReviewGit $Repository @('merge-base', '--is-ancestor', '03ce658c04fc810e7a10dc14eea1d64124ddbf12', $Head) -AllowFailure).ExitCode -ne 0) {
+        throw 'ARGV_APPROVAL: committed approval or candidate ancestry differs'
+    }
+    return $true
+}
+
+function Test-ReviewGitArgvBudget {
+    param([string[]]$Arguments)
+    # Windows实际ArgumentList渲染尚未验明，拒绝此专用路径而不推定兼容。
+    if ($IsWindows) { throw 'ARGV_PLATFORM_UNVERIFIED: Windows command rendering is not verified' }
+    $executable = @(Get-Command git -CommandType Application)[0].Source
+    $full = @($executable, '--no-optional-locks', '-c', 'core.autocrlf=false', '-c', 'core.quotePath=false', '-c', 'color.ui=false') + $Arguments
+    $bytes = [long]0
+    foreach ($argument in $full) { $bytes += $script:utf8.GetByteCount($argument) + 1 }
+    return $full.Count -le 256 -and $bytes -le 8192
+}
+
+function Get-ReviewBoundedTextDiff {
+    param([string]$Repository, [string]$Base, [string]$Head, [object[]]$Changes, [string[]]$Options)
+    $text = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+    $binary = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+    foreach ($change in $Changes) {
+        # PowerShell会展开空集合，故直接根据类型向集合添加。
+        foreach ($path in @($change.path, $change.previousPath)) {
+            if ($path) {
+                if ($change.isBinary) { $null = $binary.Add($path) } else { $null = $text.Add($path) }
+            }
+        }
+    }
+    if ($text.Overlaps($binary)) { throw 'ARGV_PATH_OVERLAP: text and binary paths overlap' }
+    if ($text.Count -eq 0) { return @{ Bytes = [byte[]]::new(0); Text = ''; ExitCode = 0 } }
+    $spec = @($text | Sort-Object -CaseSensitive | ForEach-Object { ':(literal)' + $_ })
+    $arguments = $Options + @('--text', $Base, $Head, '--') + $spec
+    if (-not (Test-ReviewGitArgvBudget $arguments)) {
+        $spec = @('.') + @($binary | Sort-Object -CaseSensitive | ForEach-Object { ':(exclude,literal)' + $_ })
+        $arguments = $Options + @('--text', $Base, $Head, '--') + $spec
+        if (-not (Test-ReviewGitArgvBudget $arguments)) { throw 'ARGV_BUDGET: both exact representations exceed the approved budget' }
+    }
+    $names = @('diff', '--no-color', '--no-ext-diff', '--no-textconv', '--no-renames', '--name-only', '-z', $Base, $Head, '--') + $spec
+    if (-not (Test-ReviewGitArgvBudget $names)) { throw 'ARGV_BUDGET: path-set verification exceeds the approved budget' }
+    $result = $null
+    foreach ($phase in @('before', 'after')) {
+        $raw = (Invoke-ReviewGit $Repository $names).Text
+        if ($raw.Length -gt 0 -and $raw[-1] -ne [char]0) { throw 'ARGV_PATH_SET: missing path terminator' }
+        $observed = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+        foreach ($path in $raw.Split([char]0, [StringSplitOptions]::RemoveEmptyEntries)) {
+            if (-not $observed.Add($path)) { throw 'ARGV_PATH_SET: duplicate observed path' }
+        }
+        if (-not $text.SetEquals($observed)) { throw 'ARGV_PATH_SET: observed paths differ from classified text paths' }
+        if ($phase -eq 'before') {
+            # 真实E2BIG/平台失败不重试；原异常传播，调用方保留见证。
+            $result = Invoke-ReviewGit $Repository $arguments
+        }
+    }
+    return $result
+}
+
 function Assert-ReviewPath {
     param([string]$Path)
     if ([string]::IsNullOrWhiteSpace($Path) -or $Path.Contains('\') -or $Path -match '(^/|:|[\x00-\x1f\x7f])' -or
@@ -372,7 +438,9 @@ function Get-ReviewSnapshot {
         }
         # 文本集合由原始blob判定，强制--text，避免已提交或本地attributes把文本差异隐藏成binary。
         $textPaths = @($changes | Where-Object { -not $_.isBinary } | ForEach-Object { $_.path; if ($_.previousPath) { $_.previousPath } } | Sort-Object -Unique -CaseSensitive | ForEach-Object { ':(literal)' + $_ })
-        if ($textPaths.Count -gt 0) { $diff = Invoke-ReviewGit $Repository ($diffOptions + @('--text', $Base, $Head, '--') + $textPaths) }
+        if (Test-ReviewArgvApproval $Repository $Base $Head $Version $WorkItem) {
+            $diff = Get-ReviewBoundedTextDiff $Repository $Base $Head $changes.ToArray() $diffOptions
+        } elseif ($textPaths.Count -gt 0) { $diff = Invoke-ReviewGit $Repository ($diffOptions + @('--text', $Base, $Head, '--') + $textPaths) }
         Assert-ReviewContent $diff.Bytes 'complete text patch including removed lines'
         $members.Add('git/changed-files.json', $script:utf8.GetBytes((ConvertTo-Json -InputObject $changes.ToArray() -Depth 12) + "`n"))
         $members.Add('evidence-index.json', $script:utf8.GetBytes((ConvertTo-Json -InputObject $evidenceIndex.ToArray() -Depth 12) + "`n"))

@@ -207,3 +207,10 @@ I07六个真实浏览器场景完成，U01–U06通过（U05独立聚合闭合�
 正式I08于同T执行，已知59秘密模式扫描15035项无发现；模块28对象、G3切换6对象及最后5容器2网络4卷准确回收，最终16命令/11准确缺席与独立实时后验，KEEP0容器3网络8卷保持。四可再生副本26919文件512583830逻辑字节按新VM41420/556只读FD精确计划删除，事故KEEP未变，VM未操作，物理空间释放NOT_VERIFIED。monitor22354首次因macOS实际Python路径与启动argv不等在信号前拒绝，原helper/失败保留；v2核对实际完整命令/出生/driverSHA后准确释放并独立ps确认不存在。398心跳含260锁屏熄屏心跳，观测日志0ms确认Sleep，sessionContinuity仍NOT_VERIFIED。
 
 本轮全部产品与运行资源门禁已完成；I08交付总体仍PARTIAL，唯一V3/独立重开/包外回执尚未完成，不能标READY_FOR_CHATGPT_MAIN_MERGE_APPROVAL。15MiB硬限制仍生效，64MiB单任务例外仅提案已审未获批准；共享合同/构包脚本/测试未改。当前仅增补本任务说明、无损证据及四张代表截图，旧失败、私有原件、单文件归档原始字节/Git blob/恢复映射保持；CI/Windows/Intel NOT_RUN、供应链限制保留；main未更新，M2未进入。
+
+
+2026-11-06 用户仅批准构包变更A，变更B容量例外未批准。独立调查确认55.17MiB主要来自同任务历史Run证据全量入包及证据全文再次进入diff；原始失败保留不等于全部原文须重复随包。源码、Run34证据和非证据完整diff基础组合约5.29MiB，尚缺关键失败/审批链/全恢复索引/ZIP开销，未证明最终15MiB满足。优先准备可审减量合同，撤回将64MiB视为必需的判断；未实施减量、未改原证据或历史。分析见packaging-a-20261106-01/PACKAGING-SIZE-ANALYSIS.md。
+
+A仅修改已批三共享文件及任务批准/证据：精确V3/Task/Base/H祖先/批准原文SHA准入；完整argv256项、Unix8192字节，Windows实际渲染未验明则明确拒绝。原文本literal超预算时使用经before/after集合验证的二进制literal补集，重叠/双超预算/真实启动失败均停止。原blob分类、完整diff、双侧安全扫描、15MiB及V1/V2/无批准旧V3保持。4项新增回归先RED后GREEN，原版107项全过后按独立审查补强同fixture literal/complement字节相等、特殊路径/rename/delete、同时生效externaldiff/textconv及Windows预期拒绝；最终完整verify -SelfTest469.978秒exit0，其中ReviewPackage107项0失败，输入无漂移。真实旧H的10998文本路径由生产新函数生成252090543字节，SHA与原差异精确一致。新鲜上下文非作者源码/定向Review无开放P0/P1/P2。
+
+本次26文件PyYAML本地只读复制，使用后lsof无占用、逐hash校验并准确回收606501逻辑字节，源不变；monitor98664以子进程句柄准确释放、ps exit1空，能源观测保留实际summary。A工程增量不把Run34绑定成新输入实测：最终构包选择/diff政策待明确，完整稳定候选仍须适用真实验收、唯一V3和独立重开后才能闭合I08。未新建产品运行组，不重复尚未稳定的整栈；15MiB保持，B未执行，main/M2未执行。

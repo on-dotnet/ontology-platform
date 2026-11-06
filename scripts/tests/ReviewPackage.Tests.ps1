@@ -853,6 +853,134 @@ for i in range(53):
         Assert-True ($again.Exit -ne 0 -and $again.Output.Contains('OUTPUT_EXISTS')) 'Existing ZIP was overwritten'
         Assert-True ((Get-FileHash $zip.FullName).Hash -ceq $before) 'Existing delivery bytes changed'
     }
+    Case 'argv bounded diff preserves literal text and binary classification' {
+        . $PackageScript -Library
+        if ($IsWindows) {
+            $rejected = $false
+            try { $null = Test-ReviewGitArgvBudget @('diff') } catch { $rejected = $_.Exception.Message.Contains('ARGV_PLATFORM_UNVERIFIED') }
+            Assert-True $rejected 'Unverified Windows renderer accepted'
+            return
+        }
+        $names = @('中文 空格.txt', 'Case.txt', 'case-other.txt', 'literal[abc].txt', ':magic.txt')
+        foreach ($name in $names) { Write-Fixture $name "text`n" }
+        Write-Fixture '.gitattributes' "*.txt -diff`n"
+        [IO.File]::WriteAllBytes((Join-Path $script:repo 'image.bin'), [byte[]]@(0, 1, 2, 3))
+        $script:head = Commit-Fixture
+        $paths = @((Invoke-ReviewGit $script:repo @('diff', '--name-only', '-z', '--no-renames', $script:base, $script:head)).Text.Split([char]0, [StringSplitOptions]::RemoveEmptyEntries))
+        $changes = @($paths | ForEach-Object { @{ path = $_; previousPath = $null; isBinary = ($_ -ceq 'image.bin') } })
+        $options = @('diff', '--no-color', '--full-index', '--no-ext-diff', '--no-textconv', '--no-renames')
+        $expected = Invoke-ReviewGit $script:repo ($options + @('--text', $script:base, $script:head, '--') + @($paths | Where-Object { $_ -cne 'image.bin' } | ForEach-Object { ':(literal)' + $_ }))
+        $actual = Get-ReviewBoundedTextDiff $script:repo $script:base $script:head $changes $options
+        Assert-True ((Get-ReviewHash $actual.Bytes) -ceq (Get-ReviewHash $expected.Bytes)) 'Bounded diff changed literal/attributes text bytes'
+        Assert-True (-not (Test-ReviewGitArgvBudget @('diff', ('中' * 3000)))) 'UTF8 byte budget ignored'
+        Assert-True (-not (Test-ReviewGitArgvBudget (@('diff') + @(1..260 | ForEach-Object { 'x' })))) 'Argument count budget ignored'
+        $prefix = @(@(Get-Command git -CommandType Application)[0].Source, '--no-optional-locks', '-c', 'core.autocrlf=false', '-c', 'core.quotePath=false', '-c', 'color.ui=false')
+        $prefixBytes = 1
+        foreach ($item in $prefix) { $prefixBytes += [Text.Encoding]::UTF8.GetByteCount($item) + 1 }
+        Assert-True (Test-ReviewGitArgvBudget @(('a' * (8192 - $prefixBytes)))) '8192-byte boundary rejected'
+        Assert-True (-not (Test-ReviewGitArgvBudget @(('a' * (8193 - $prefixBytes))))) '8193-byte boundary accepted'
+        Assert-True (Test-ReviewGitArgvBudget @(1..(256 - $prefix.Count) | ForEach-Object { 'x' })) '256-argument boundary rejected'
+        Assert-True (-not (Test-ReviewGitArgvBudget @(1..(257 - $prefix.Count) | ForEach-Object { 'x' }))) '257-argument boundary accepted'
+    }
+    Case 'argv large text set uses exact complement and rejects omissions' {
+        . $PackageScript -Library
+        if ($IsWindows) {
+            $rejected = $false
+            try { $null = Test-ReviewGitArgvBudget @('diff') } catch { $rejected = $_.Exception.Message.Contains('ARGV_PLATFORM_UNVERIFIED') }
+            Assert-True $rejected 'Unverified Windows renderer accepted'
+            return
+        }
+        Write-Fixture 'old name.txt' "rename content`n"
+        $script:base = Commit-Fixture
+        $null = Git @('mv', 'old name.txt', '新 name.txt')
+        Remove-Item -LiteralPath (Join-Path $script:repo 'app.txt')
+        foreach ($name in @('中文 空格.txt', 'Case.txt', 'case-other.txt', 'literal[abc].txt', ':magic.txt')) { Write-Fixture $name "literal text`n" }
+        foreach ($i in 1..300) { Write-Fixture ('many/{0:D4}.txt' -f $i) "value $i`n" }
+        Write-Fixture '.gitattributes' "*.txt diff=argvprobe`n"
+        [IO.File]::WriteAllBytes((Join-Path $script:repo 'image.bin'), [byte[]]@(0, 5, 8))
+        $script:head = Commit-Fixture
+        $null = Git @('config', 'diff.external', 'false')
+        $external = Invoke-ReviewGit $script:repo @('diff', $script:base, $script:head) -AllowFailure
+        Assert-True ($external.ExitCode -ne 0) 'External diff fault was not exercised'
+        $null = Git @('config', '--unset', 'diff.external')
+        $null = Git @('config', 'diff.argvprobe.textconv', 'false')
+        $textconv = Invoke-ReviewGit $script:repo @('diff', '--no-ext-diff', $script:base, $script:head) -AllowFailure
+        Assert-True ($textconv.ExitCode -ne 0) 'Textconv fault was not exercised'
+        $null = Git @('config', 'diff.external', 'false')
+        $paths = @((Invoke-ReviewGit $script:repo @('diff', '--name-only', '-z', '--no-renames', $script:base, $script:head)).Text.Split([char]0, [StringSplitOptions]::RemoveEmptyEntries))
+        $changes = @($paths | ForEach-Object { @{ path = $_; previousPath = $null; isBinary = ($_ -ceq 'image.bin') } })
+        $options = @('diff', '--no-color', '--full-index', '--no-ext-diff', '--no-textconv', '--no-renames')
+        $expected = Invoke-ReviewGit $script:repo ($options + @('--text', $script:base, $script:head, '--') + @($paths | Where-Object { $_ -cne 'image.bin' } | ForEach-Object { ':(literal)' + $_ }))
+        $actual = Get-ReviewBoundedTextDiff $script:repo $script:base $script:head $changes $options
+        Assert-True ((Get-ReviewHash $actual.Bytes) -ceq (Get-ReviewHash $expected.Bytes)) 'Complement diff changed bytes'
+        $bad = @($changes | Where-Object path -cne 'many/0001.txt')
+        $rejected = $false
+        try { $null = Get-ReviewBoundedTextDiff $script:repo $script:base $script:head $bad $options } catch { $rejected = $_.Exception.Message.Contains('ARGV_PATH_SET') }
+        Assert-True $rejected 'Missing text path accepted'
+        $rejected = $false
+        try { $null = Get-ReviewBoundedTextDiff $script:repo $script:base $script:head ($changes + @(@{path='image.bin';previousPath=$null;isBinary=$false})) $options } catch { $rejected = $_.Exception.Message.Contains('ARGV_PATH_OVERLAP') }
+        Assert-True $rejected 'Binary/text overlap accepted'
+        $manyBinary = @(1..300 | ForEach-Object { @{path=('binary/{0}.bin' -f $_);previousPath=$null;isBinary=$true} })
+        $rejected = $false
+        try { $null = Get-ReviewBoundedTextDiff $script:repo $script:base $script:head ($changes + $manyBinary) $options } catch { $rejected = $_.Exception.Message.Contains('ARGV_BUDGET') }
+        Assert-True $rejected 'Both oversized vectors accepted'
+        Assert-True (-not (Test-ReviewArgvApproval $script:repo $script:base $script:head 3 'TEST-001')) 'Foreign task granted exception'
+        Assert-True (-not (Test-ReviewArgvApproval $script:repo $script:base $script:head 2 'G4-M1-MAIN-INTEGRATION-001')) 'V2 granted exception'
+    }
+    Case 'argv approval binds exact committed record version task base and ancestry' {
+        # 仅在隔离工具副本替换fixture提交身份；生产入口没有fixture或环境旁路。
+        $copy = Join-Path $fixtureRoot 'argv-fixture-tool.ps1'
+        $source = [IO.File]::ReadAllText($PackageScript).Replace('d1a61daffe844475b07705797e3ad325cc3f2945', $script:base).Replace('03ce658c04fc810e7a10dc14eea1d64124ddbf12', $script:base)
+        [IO.File]::WriteAllText($copy, $source)
+        . $copy -Library
+        $task = 'G4-M1-MAIN-INTEGRATION-001'
+        Assert-True (-not (Test-ReviewArgvApproval $script:repo $script:base $script:head 3 $task)) 'Missing approval granted permission'
+        $approvalPath = 'docs/tasks/G4-M1-MAIN-INTEGRATION-001/ARGV-APPROVAL.md'
+        $actualApproval = Join-Path (Split-Path (Split-Path $PackageScript -Parent) -Parent) $approvalPath
+        Write-Fixture $approvalPath ([IO.File]::ReadAllText($actualApproval))
+        $script:head = Commit-Fixture
+        Assert-True (Test-ReviewArgvApproval $script:repo $script:base $script:head 3 $task) 'Exact approval rejected'
+        foreach ($version in @(1, 2)) { Assert-True (-not (Test-ReviewArgvApproval $script:repo $script:base $script:head $version $task)) 'Historical version granted permission' }
+        Assert-True (-not (Test-ReviewArgvApproval $script:repo $script:base $script:head 3 'OTHER')) 'Foreign task granted permission'
+        Assert-True (-not (Test-ReviewArgvApproval $script:repo ('f' * 40) $script:head 3 $task)) 'Wrong base granted permission'
+        # 独立使用不存在的祖先，批准原文仍准确。
+        $wrongAncestor = $source.Replace("'--is-ancestor', '$($script:base)'", "'--is-ancestor', '$('f' * 40)'")
+        [IO.File]::WriteAllText($copy, $wrongAncestor)
+        . $copy -Library
+        $rejected = $false
+        try { $null = Test-ReviewArgvApproval $script:repo $script:base $script:head 3 $task } catch { $rejected = $_.Exception.Message.Contains('ARGV_APPROVAL') }
+        Assert-True $rejected 'Unknown ancestor accepted'
+        [IO.File]::WriteAllText($copy, $source)
+        . $copy -Library
+        Write-Fixture $approvalPath "tampered approval`n"
+        $script:head = Commit-Fixture
+        $rejected = $false
+        try { $null = Test-ReviewArgvApproval $script:repo $script:base $script:head 3 $task } catch { $rejected = $_.Exception.Message.Contains('ARGV_APPROVAL') }
+        Assert-True $rejected 'Tampered approval accepted'
+    }
+    Case 'argv bounded diff preserves delete rename and binary-only result' {
+        . $PackageScript -Library
+        if ($IsWindows) {
+            $rejected = $false
+            try { $null = Test-ReviewGitArgvBudget @('diff') } catch { $rejected = $_.Exception.Message.Contains('ARGV_PLATFORM_UNVERIFIED') }
+            Assert-True $rejected 'Unverified Windows renderer accepted'
+            return
+        }
+        Write-Fixture 'old name.txt' "renamed content`n"
+        $before = Commit-Fixture
+        $null = Git @('mv', 'old name.txt', '新 name.txt')
+        Remove-Item -LiteralPath (Join-Path $script:repo 'app.txt')
+        $after = Commit-Fixture
+        $changes = @(@{path='新 name.txt';previousPath='old name.txt';isBinary=$false}, @{path='app.txt';previousPath=$null;isBinary=$false})
+        $options = @('diff', '--no-color', '--full-index', '--no-ext-diff', '--no-textconv', '--no-renames')
+        $expected = Invoke-ReviewGit $script:repo ($options + @('--text', $before, $after, '--'))
+        $actual = Get-ReviewBoundedTextDiff $script:repo $before $after $changes $options
+        Assert-True ((Get-ReviewHash $actual.Bytes) -ceq (Get-ReviewHash $expected.Bytes)) 'Rename/delete bytes differ'
+        [IO.File]::WriteAllBytes((Join-Path $script:repo 'only.bin'), [byte[]]@(0, 1, 4))
+        $binaryHead = Commit-Fixture
+        $actual = Get-ReviewBoundedTextDiff $script:repo $after $binaryHead @(@{path='only.bin';previousPath=$null;isBinary=$true}) $options
+        Assert-True ($actual.Bytes.Length -eq 0 -and $actual.ExitCode -eq 0) 'Binary-only diff emitted text'
+    }
     Case 'valid committed evidence preserves command and status' {
         Write-Fixture 'docs/evidence/TEST-001/checks.json' (@{ checks = @(@{ name = 'fixture'; command = 'pwsh fixture.ps1'; status = 'PASS'; exitCode = 0; output = '1 assertion passed' }); ci = @{ status = 'NOT_VERIFIED' } } | ConvertTo-Json -Depth 6)
         $script:head = Commit-Fixture

@@ -1,0 +1,25 @@
+{
+  "command": [
+    "/usr/bin/sandbox-exec",
+    "-p",
+    "(version 1) (allow default) (deny network-outbound (remote ip \"*:*\")) (allow network-outbound (remote ip \"localhost:*\"))",
+    "pwsh",
+    "-NoProfile",
+    "-File",
+    "scripts/verify.ps1",
+    "-SelfTest"
+  ],
+  "startedAtUtc": "2026-11-06T06:27:29.627973+00:00",
+  "endedAtUtc": "2026-11-06T06:35:19.610213+00:00",
+  "elapsedSeconds": 469.9780113750021,
+  "exitCode": 0,
+  "inputHashes": {
+    "scripts/create-review-package.ps1": "69e1ef914d3b3a4a61806ebef807f00f0e0d7ecd9b0788aad0096217012c8dd7",
+    "scripts/tests/ReviewPackage.Tests.ps1": "437134ad9b91822115876c8966b35a396a34a5fd0109c5df1548e9a5ce42c15b",
+    "scripts/verify.ps1": "02422e9a55ba5f5e8b59c56d42d8a230dd4eec1389e7eae090185eafc7e4f6fa",
+    "docs/tasks/G4-M1-MAIN-INTEGRATION-001/ARGV-APPROVAL.md": "a9226c4d33e51ae568eba350cf8622b35df510e551222b62416d11f35c9ea3ae"
+  },
+  "executedInputDrift": false,
+  "logSha256": "3a4e46fffa25c0299bf2d0f4974b411b0ba6473df3b51c796d63d907e718a172",
+  "executorSha256": "75f2d8bcc9207650632833a58bd3d1610660d18079d34969477a2eec1ba13ef2"
+}

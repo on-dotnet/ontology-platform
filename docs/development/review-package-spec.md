@@ -10,6 +10,14 @@
 例：`pwsh -NoProfile -File scripts/create-review-package.ps1 -BaseSha <Base> -HeadSha <Head> -TaskId <Task> -Status PARTIAL -EvidencePath docs/evidence/<Task>/validation.json -ValidationSource LOCAL`。
 
 显式 `-ValidationSource GITHUB` 继续按下面原V3规则实查同Head run与双job。历史无validationSource字段的V3仍走原GITHUB路径；V1/V2保持原合同，不改历史SHA。下文保留历史合同；与本段冲突时当前新建LOCAL执行本段。
+## G4-M1-MAIN-INTEGRATION-001 专用 argv 准入（仅变更 A）
+
+2026-11-06 用户仅批准命令行长度修复，批准原文见 `docs/tasks/G4-M1-MAIN-INTEGRATION-001/ARGV-APPROVAL.md`，SHA256=`a9226c4d33e51ae568eba350cf8622b35df510e551222b62416d11f35c9ea3ae`。这不批准容量例外或证据减量：15MiB、全部当前任务证据、完整文本diff等既有要求保持。
+
+仅 V3、TaskId=`G4-M1-MAIN-INTEGRATION-001`、Base=`d1a61daffe844475b07705797e3ad325cc3f2945`、Head包含 `03ce658c04fc810e7a10dc14eea1d64124ddbf12` 且已提交批准blob与可信工具固定散列一致时，创建与VerifyOnly共同启用有界文本pathspec。V1/V2和无该批准的历史V3保持原行为；ZIP字段、CLI和环境变量不能授予此权限。
+
+保留两侧原始blob前8000字节的二进制分类及全部内容安全检查。完整argv含可执行名、固定Git选项及所有参数，不超过256项；Unix实际UTF-8含每项NUL不超过8192字节。优先准确文本literal集合，超预算则尝试根范围减准确二进制literal集合；文本/二进制重叠、两种表示均超预算、执行前后实际name-only集合与目标文本集合不同均拒绝。真实启动仍失败时保留原异常并停止，不增大预算或拆分拼接diff。Windows实际ArgumentList渲染尚未核验，该专用路径明确拒绝并保留NOT_VERIFIED；不得把Mac成功当作Windows通过。
+
 ## V3 默认 compact 合同（G3-M1-CLOSEOUT-002）
 
 人类2026-10-27正式授权本轮工程纠偏，默认创建 `schemaVersion=3`。历史V1/V2的格式和原始ZIP/SHA保持；`VerifyOnly`按manifest版本分派，显式 `-SchemaVersion 1` / `2` 仍可创建历史格式。下面V2/V1章节仅适用其对应版本，不扩大V3。

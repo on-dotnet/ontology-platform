@@ -1,0 +1,42 @@
+{
+  "reviewer": "/root/argv_review",
+  "status": "PASS",
+  "scope": "changeA engineering increment ready to commit; not final product/package acceptance",
+  "selfTest": {
+    "seconds": 469.978,
+    "exitCode": 0,
+    "reviewPackageCases": 107,
+    "failures": 0,
+    "inputDrift": false
+  },
+  "archive": {
+    "entries": 26,
+    "exactPublic": 13,
+    "reversibleLogs": 9,
+    "ignoredKeep": 4,
+    "byteHashVerified": true
+  },
+  "cleanup": {
+    "pythonFiles": 26,
+    "logicalBytes": 606501,
+    "targetAbsent": true,
+    "sourceHashesUnchanged": true,
+    "monitorPid": 98664,
+    "psExitCode": 1,
+    "psStdoutEmpty": true
+  },
+  "findings": [
+    "no open P0/P1/P2",
+    "17publicfiles limited content check and diff-check passed",
+    "size analysis moved without byte change",
+    "Run34 not relabeled as new source-input product pass",
+    "15MiB unchanged; B/main/M2 not implemented; finalpackage/reopen pending"
+  ],
+  "hashes": {
+    "scripts/create-review-package.ps1": "69e1ef914d3b3a4a61806ebef807f00f0e0d7ecd9b0788aad0096217012c8dd7",
+    "scripts/tests/ReviewPackage.Tests.ps1": "437134ad9b91822115876c8966b35a396a34a5fd0109c5df1548e9a5ce42c15b",
+    "docs/evidence/G4-M1-MAIN-INTEGRATION-001/packaging-a-20261106-01/artifact-index.json": "a6491bedb4a8ab4f9acff91f5bdc1301df69e5bc72be6428ae0f08d69b34878d",
+    "docs/evidence/G4-M1-MAIN-INTEGRATION-001/packaging-a-20261106-01/raw-test-output.json": "7b04702d1b93b32a445df36ef8cbedaa11f9b2d90b0dd41c75dee1f50a851179"
+  },
+  "observedAtUtc": "2026-11-06T06:39:50.822627+00:00"
+}
