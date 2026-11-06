@@ -2,7 +2,7 @@
 
 状态：源码及适用验收 READY_FOR_REVIEW；最终 `G4_ENG_WORKFLOW_READY_FOR_CHATGPT_REVIEW` 以包外回执确认唯一V3与独立重开为准。本文件是唯一当前交接，不预填未来ZIP散列。
 
-Base：`709d22ac11880539669d032550a056d7d761dda8`。最终源码：`15ab45f8eda0304b086331f9052c2c6b58f51236`；证据提交及交付Head从包manifest读取。分支 `codex/g4-eng-workflow-001`，Master树 `/Users/chasen/.codex/worktrees/g4-eng-workflow-001/ontology-platform`。原M1 ZIP SHA `b82c8db92d0da05d95214f5fe5286f4c6dbdf9ce7e71b936787478bd3d13bf9a` 保持不变，阶段C已核实；main未更新。
+Base：`709d22ac11880539669d032550a056d7d761dda8`。最终源码：`6475629b4aa305795d7a9937d4edebf749c8e262`；证据提交及交付Head从包manifest读取。分支 `codex/g4-eng-workflow-001`，Master树 `/Users/chasen/.codex/worktrees/g4-eng-workflow-001/ontology-platform`。原M1 ZIP SHA `b82c8db92d0da05d95214f5fe5286f4c6dbdf9ce7e71b936787478bd3d13bf9a` 保持不变，阶段C已核实；main未更新。
 
 授权：[附件03原文](../evidence/G4-ENG-WORKFLOW-001/authorization.md)。固定验收：[EG-01～12](../evidence/G4-ENG-WORKFLOW-001/acceptance-scenarios.json)。目标为幂等环境、影响验收、缓存复用、失败止损、精简证据与工程入口。非目标：业务/迁移/锁版本、M1冻结交付、M2/G6、CI/全局配置、付费服务及main更新。
 
@@ -18,8 +18,8 @@ Master单写根AGENTS/PLANS/现行政策、gate登记、workflow.py、工程入�
 - 当前同树重复prepare及正式CLI：exit0，下载/物化/restore均为0。Master共两次实际restore，第二次因身份定义硬化；Writer一次。无相同最终环境的无理由restore。
 - API/Web各真实构建一次，OS外网拒绝、no restore，无警告/错误；401运行产物与烟测前后绑定，独立重算一致。
 - 真实短烟测：`wf-a4ed156ebbf9`，两检查PASS、0skip：OIDC→UI→API→PG五阶段及缺CSRF403。74.10秒，五容器，卷约278MiB。relay active0，全部自身容器停止。镜像准入/内部网络/fixture权限先前失败及短定位原样保留。
-- 完整工程SelfTest一次，exit0，477.47秒；原始命令摘要可解析478项，不冒充全部产品测试总数。其间只变更workflow资格实现、测试与gate登记；原Full保持旧身份，**不作为当前键REUSED**。非作者接受其未变项＋最终17个定向回归＋当前格式检查的精确差异覆盖，不重复无关Full/M1整链。
-- 实际FRESH→Git→REUSED闭环通过：源码15ab45f8，原Run b645a58e...，证据f934508a，资格Run d6702940...。重新核验原Git源码/日志SHA、平台/工具/政策，输出REUSED且没有新exitCode；仅格式检查FRESH。纯证据变化未触发backend/Web/restore。
+- 完整工程SelfTest一次，exit0，477.47秒；原始命令摘要可解析478项，不冒充全部产品测试总数。后续只变更workflow资格/证据发布/路径预检实现、测试与gate登记；原Full保持旧身份，**不作为当前键REUSED**。非作者接受其未变项＋最终18个定向回归＋当前格式检查的精确差异覆盖，不重复无关Full/M1整链。
+- 实际FRESH→Git→REUSED闭环通过：最终源码6475629b，原Run 999e6aeb...，证据64b7cf1a；前一f934证明保留为历史。重新核验原Git源码/日志SHA、平台/工具/政策，输出REUSED且没有新exitCode；仅格式检查FRESH。纯证据变化未触发backend/Web/restore。
 - 一条隔离非作者上下文的两个规则决定案例通过：分析不写入、不安装/回main；失败/可变原件不复用，不无条件重跑长链。未声称模型A/B收益百分比。
 - 本任务有界电源监测47.6分钟、96心跳，其中82次锁屏且外接显示器熄灭；策略持续满足，任务自有PID已按身份校验精确释放。系统会话连续性仍NOT_VERIFIED，不将无Sleep事件扩大为全程证明。
 - CI、Windows、Intel NOT_RUN；`.codex` setup/actions格式未核实，未创建/宣称自动启用。环境准备实现限定已核验Mac ARM64输入；未来任务需其明确运行准入，不自动进入M2。

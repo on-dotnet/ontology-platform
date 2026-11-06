@@ -2,8 +2,8 @@
   "taskId": "G4-ENG-WORKFLOW-001",
   "status": "VALIDATED_PENDING_FINAL_PACKAGE",
   "base": "709d22ac11880539669d032550a056d7d761dda8",
-  "sourceCommit": "15ab45f8eda0304b086331f9052c2c6b58f51236",
-  "evidenceCommit": "f934508a00d7e4cbf90dff85caaf84027c263d37",
+  "sourceCommit": "6475629b4aa305795d7a9937d4edebf749c8e262",
+  "evidenceCommit": "64b7cf1a7d2b2498500973f1da93315f1150ead6",
   "platform": "macOS ARM64",
   "ci": "NOT_RUN",
   "windows": "NOT_RUN",
@@ -15,54 +15,9 @@
     "exitCode": 0,
     "elapsedSeconds": 477.47194024999044,
     "sourceAtStart": "2d7d55c0b7eb50e9f9d73074c74f82a5e02baeea",
-    "bindingLimitation": "Only workflow.py, its tests and gate registry changed during this Full. Original receipt unchanged; not eligible as current-key REUSED. Unchanged Full checks plus subsequent 17 current focused tests and fresh static validation form impact coverage accepted by independent reviewer.",
+    "bindingLimitation": "Only workflow.py, its tests and gate registry changed during this Full. Original receipt unchanged; not eligible as current-key REUSED. Unchanged Full checks plus subsequent 17 current focused tests and fresh static validation form impact coverage accepted by independent reviewer. Final package compatibility patch is covered by 18 current tests, actual txt publication and immutable Git reuse; no Full rerun.",
     "originalLog": "gates/2034e61550864d94b1628ac42edf888a/engineering-full.txt",
     "originalLogSha256": "fa33c1753b29338fc202e70852c2e7532bf691bf74dd9347078ab7658a8bcd8a"
-  },
-  "reuseProof": {
-    "status": "PASS",
-    "coverage": "affected engineering gates only; product coverage requires separate task acceptance",
-    "checks": [
-      {
-        "gate": "engineering",
-        "status": "PASS",
-        "executionMode": "REUSED",
-        "sourceCommit": "15ab45f8eda0304b086331f9052c2c6b58f51236",
-        "sourceRun": "b645a58e78e84031b377240eef531940",
-        "evidenceCommit": "f934508a00d7e4cbf90dff85caaf84027c263d37",
-        "evidencePath": "docs/evidence/G4-ENG-WORKFLOW-001/gates/b645a58e78e84031b377240eef531940/engineering.json",
-        "evidenceSha256": "937afabfae4b3729dd0abe8f7e900cfbf4d4cf8af51d8bfdbbc1c6832290e973",
-        "inputKey": "c4b524ae184b6317b8f1f3d99ac7d8ff54741cbf6120bf04a46ccdd477b4e7f5",
-        "reason": "Immutable original success, identical input/environment/policy",
-        "qualificationCommand": "workflow.py verify --plan <current controlled plan> --reuse <index>"
-      },
-      {
-        "gate": "policy",
-        "status": "PASS",
-        "executionMode": "FRESH",
-        "command": [
-          "pwsh",
-          "-NoProfile",
-          "-File",
-          "scripts/verify.ps1"
-        ],
-        "exitCode": 0,
-        "tests": 0,
-        "skipped": 0,
-        "diagnostic": false,
-        "hypothesis": null,
-        "inputsUnchanged": true,
-        "errorSignature": null,
-        "elapsedSeconds": 6.6675721250067,
-        "inputKey": "bf600387a80f0cc80e6dcb71462d1a2b08e382c75f8b038407e7e6543cb83684",
-        "environmentKey": "c6e3edf2c4edb224471d92b35c105dcce94f39782090b5d53c408e2fbd529fc4",
-        "policyKey": "fd5b91cc49d356038de3f2cf17f15bcb408cd88f16a7d1b8f1c3c01be2a42293",
-        "evidenceSha256": "86d36cbfdd6ca8f343ff1aaef644798ab1cd1df427ad9303bee4354c46fbb19d",
-        "logPath": "artifacts/workflow/G4-ENG-WORKFLOW-001/runs/d67029407e5b46b7957a6c11346bab7a/policy.log",
-        "sourceRun": "d67029407e5b46b7957a6c11346bab7a",
-        "sourceCommit": "f934508a00d7e4cbf90dff85caaf84027c263d37"
-      }
-    ]
   },
   "plan": {
     "schemaVersion": 1,
@@ -157,7 +112,7 @@
     "fullSelfTestRuns": 1,
     "realSmokeRunsWithContainers": 3,
     "realSmokeAdmissionFailuresBeforeContainers": 1,
-    "freshToReusedProofs": 1,
+    "freshToReusedProofs": 2,
     "initialShortCommandsTiming": "UNKNOWN",
     "nestedTimingSummed": false
   },
@@ -241,6 +196,18 @@
     "host-monitor.summary.json": {
       "sha256": "f4ec99b8005dfb0c6ffd83269c6dd5470525ecd4a53bf33412b040ebde678258",
       "utf8": "{\"displayOff\": \"OBSERVED\", \"endedAtUtc\": \"2026-11-06T17:22:02.664064+00:00\", \"heartbeatCount\": 96, \"lockedDisplayOffHeartbeatCount\": 82, \"lockedHeartbeatCount\": 83, \"maxHeartbeatGapMs\": 30084, \"measuredElapsedMs\": 2856394, \"ownerPid\": 13246, \"policyContinuouslyReady\": true, \"schemaVersion\": 1, \"sessionContinuity\": \"NOT_VERIFIED\", \"sleep\": {\"confirmedSleepMs\": 0, \"events\": [], \"limitation\": \"只计日志可确认的Sleep至Wake/DarkWake区间；无事件不证明未知窗口从未睡眠。\", \"status\": \"OBSERVED_LOG_WINDOW\"}, \"startedAtUtc\": \"2026-11-06T16:34:26.220854+00:00\", \"stoppedBySignal\": true, \"taskId\": \"G4-ENG-WORKFLOW-001\"}\n"
+    },
+    "final-package-check.log": {
+      "sha256": "9ebe518b49d21c6440f09863b73d6115ee5f11849ab149c311ce5e25fdfee7e2",
+      "utf8": "{\"status\": \"BLOCKED\", \"reason\": \"FULL_COMMIT_REQUIRED\"}\n"
+    },
+    "final-package.log": {
+      "sha256": "cc86d8bf0210280bbf3e52c38c2a352bb9dd127c079f856a354f5b2e5c383b16",
+      "utf8": "FAIL: FORBIDDEN_PATH: credential, environment, cache, binary, model or database member rejected; value suppressed\n"
+    },
+    "package-path-regression-before.txt": {
+      "sha256": "dfe80aed5fd8b311e7d482bd2e24157d34c1f0c1f0c93fdb6379b86376d818ad",
+      "utf8": "...........E......\n======================================================================\nERROR: test_published_output_uses_existing_package_path_and_content_rules (__main__.WorkflowTests.test_published_output_uses_existing_package_path_and_content_rules)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/chasen/.codex/worktrees/g4-eng-workflow-001/ontology-platform/scripts/tests/Workflow.Tests.py\", line 153, in test_published_output_uses_existing_package_path_and_content_rules\n    output=self.w.write_gate_output(Path(d),'engineering',b'Ran 2 tests in 0.01s\\nOK\\n')\n           ^^^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'workflow' has no attribute 'write_gate_output'\n\n----------------------------------------------------------------------\nRan 18 tests in 0.568s\n\nFAILED (errors=1)\n"
     }
   },
   "scenarioCoverage": {
@@ -267,9 +234,9 @@
   "independentReview": {
     "reviewer": "/root/reviewer",
     "status": "PASS",
-    "sourceCommit": "15ab45f8eda0304b086331f9052c2c6b58f51236",
-    "evidenceCommit": "f934508a00d7e4cbf90dff85caaf84027c263d37",
-    "conclusion": "Source, drift defense, exact Full delta coverage, independently recomputed Git reuse PASS; final package reopening pending"
+    "sourceCommit": "6475629b4aa305795d7a9937d4edebf749c8e262",
+    "evidenceCommit": "64b7cf1a7d2b2498500973f1da93315f1150ead6",
+    "scope": "Final source, package dependency, byte-identical output recovery map, current 18 tests, immutable txt reuse and final three documents independently rechecked; ZIP reopen remains pending"
   },
   "worktreeCloseout": {
     "master": {
@@ -365,6 +332,106 @@
     "rejectedBeforeZip": true,
     "reason": "Existing V3 forbids .log members; original command stdout bytes migrated to .txt, unchanged safety rules",
     "historicalRows": "Original JSON logPath and Git receipts remain unchanged; outputRecoveryMap locates identical current package text",
-    "requiredDelta": "18 focused tests and actual current FRESH-to-Git-to-REUSED proof"
+    "requiredDelta": "18 focused tests and actual current FRESH-to-Git-to-REUSED proof",
+    "freshRun": "999e6aeb963f4e839e969bedc409f1fa",
+    "reuseStatus": "PASS",
+    "currentEvidenceCommit": "64b7cf1a7d2b2498500973f1da93315f1150ead6"
+  },
+  "historicalReuseProof": {
+    "status": "PASS",
+    "coverage": "affected engineering gates only; product coverage requires separate task acceptance",
+    "checks": [
+      {
+        "gate": "engineering",
+        "status": "PASS",
+        "executionMode": "REUSED",
+        "sourceCommit": "15ab45f8eda0304b086331f9052c2c6b58f51236",
+        "sourceRun": "b645a58e78e84031b377240eef531940",
+        "evidenceCommit": "f934508a00d7e4cbf90dff85caaf84027c263d37",
+        "evidencePath": "docs/evidence/G4-ENG-WORKFLOW-001/gates/b645a58e78e84031b377240eef531940/engineering.json",
+        "evidenceSha256": "937afabfae4b3729dd0abe8f7e900cfbf4d4cf8af51d8bfdbbc1c6832290e973",
+        "inputKey": "c4b524ae184b6317b8f1f3d99ac7d8ff54741cbf6120bf04a46ccdd477b4e7f5",
+        "reason": "Immutable original success, identical input/environment/policy",
+        "qualificationCommand": "workflow.py verify --plan <current controlled plan> --reuse <index>"
+      },
+      {
+        "gate": "policy",
+        "status": "PASS",
+        "executionMode": "FRESH",
+        "command": [
+          "pwsh",
+          "-NoProfile",
+          "-File",
+          "scripts/verify.ps1"
+        ],
+        "exitCode": 0,
+        "tests": 0,
+        "skipped": 0,
+        "diagnostic": false,
+        "hypothesis": null,
+        "inputsUnchanged": true,
+        "errorSignature": null,
+        "elapsedSeconds": 6.6675721250067,
+        "inputKey": "bf600387a80f0cc80e6dcb71462d1a2b08e382c75f8b038407e7e6543cb83684",
+        "environmentKey": "c6e3edf2c4edb224471d92b35c105dcce94f39782090b5d53c408e2fbd529fc4",
+        "policyKey": "fd5b91cc49d356038de3f2cf17f15bcb408cd88f16a7d1b8f1c3c01be2a42293",
+        "evidenceSha256": "86d36cbfdd6ca8f343ff1aaef644798ab1cd1df427ad9303bee4354c46fbb19d",
+        "logPath": "artifacts/workflow/G4-ENG-WORKFLOW-001/runs/d67029407e5b46b7957a6c11346bab7a/policy.log",
+        "sourceRun": "d67029407e5b46b7957a6c11346bab7a",
+        "sourceCommit": "f934508a00d7e4cbf90dff85caaf84027c263d37"
+      }
+    ]
+  },
+  "reuseProof": {
+    "status": "PASS",
+    "coverage": "affected engineering gates only; product coverage requires separate task acceptance",
+    "checks": [
+      {
+        "gate": "engineering",
+        "status": "PASS",
+        "executionMode": "REUSED",
+        "sourceCommit": "6475629b4aa305795d7a9937d4edebf749c8e262",
+        "sourceRun": "999e6aeb963f4e839e969bedc409f1fa",
+        "evidenceCommit": "64b7cf1a7d2b2498500973f1da93315f1150ead6",
+        "evidencePath": "docs/evidence/G4-ENG-WORKFLOW-001/gates/999e6aeb963f4e839e969bedc409f1fa/engineering.json",
+        "evidenceSha256": "913451068410e96301b22cb6bf53e9550fdd2e7d5091b8b6c590673a093ec3f0",
+        "inputKey": "bf53af306dc92791983b971c5389afa44661d01b6b495802dcec48eaac386e73",
+        "reason": "Immutable original success, identical input/environment/policy",
+        "qualificationCommand": "workflow.py verify --plan <current controlled plan> --reuse <index>"
+      },
+      {
+        "gate": "policy",
+        "status": "PASS",
+        "executionMode": "FRESH",
+        "command": [
+          "pwsh",
+          "-NoProfile",
+          "-File",
+          "scripts/verify.ps1"
+        ],
+        "exitCode": 0,
+        "tests": 0,
+        "skipped": 0,
+        "diagnostic": false,
+        "hypothesis": null,
+        "inputsUnchanged": true,
+        "errorSignature": null,
+        "elapsedSeconds": 6.677989125018939,
+        "inputKey": "401739ee353f6870209d74a6bd5453ca83c277a856e8a2c7f1722a87b22aa186",
+        "environmentKey": "c6e3edf2c4edb224471d92b35c105dcce94f39782090b5d53c408e2fbd529fc4",
+        "policyKey": "3b3fc8c3a7859a92f4793bfa95ebf26999a34b4aa28c995264507bf4a99aff3e",
+        "evidenceSha256": "a94fdf1bc60ac2a221707a3b257b7dc54cccbdc044ace3a04d3e50fc20624148",
+        "logPath": "artifacts/workflow/G4-ENG-WORKFLOW-001/runs/406505af042d40f4a77cf39219fa92c4/policy.txt",
+        "sourceRun": "406505af042d40f4a77cf39219fa92c4",
+        "sourceCommit": "64b7cf1a7d2b2498500973f1da93315f1150ead6"
+      }
+    ]
+  },
+  "historicalIndependentReview": {
+    "reviewer": "/root/reviewer",
+    "status": "PASS",
+    "sourceCommit": "15ab45f8eda0304b086331f9052c2c6b58f51236",
+    "evidenceCommit": "f934508a00d7e4cbf90dff85caaf84027c263d37",
+    "conclusion": "Source, drift defense, exact Full delta coverage, independently recomputed Git reuse PASS; final package reopening pending"
   }
 }

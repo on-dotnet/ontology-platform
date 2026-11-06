@@ -1,7 +1,7 @@
 {
   "evidenceSchemaVersion": 2,
   "validationSource": "LOCAL",
-  "testedCommit": "15ab45f8eda0304b086331f9052c2c6b58f51236",
+  "testedCommit": "6475629b4aa305795d7a9937d4edebf749c8e262",
   "checks": [
     {
       "name": "dependency-prepare",
@@ -36,7 +36,7 @@
       "command": "python3 -B scripts/maintenance/workflow.py verify --task G4-ENG-WORKFLOW-001 --plan delta-plan.json --publish-evidence",
       "status": "PASS",
       "exitCode": 0,
-      "output": "17 current focused tests exit0, inputsUnchanged=true, plus fresh repository static verification."
+      "output": "18 final current focused tests exit0, inputsUnchanged=true, including original V3 path acceptance/refusal; actual txt publication plus fresh repository static verification."
     },
     {
       "name": "immutable-reuse",
@@ -67,7 +67,7 @@
     "windows": "NOT_RUN",
     "intel": "NOT_RUN",
     "actualAgentActiveTime": "UNKNOWN",
-    "fullInputDeltaDisposition": "Original Full unchanged checks plus current 17-case focused delta; never mark old Full as current input-key REUSED",
+    "fullInputDeltaDisposition": "Original Full unchanged checks plus current 18-case focused delta and txt publication/reuse; old Full never current-key REUSED",
     "packageAndIndependentReopen": "See external delivery receipt; not predeclared here"
   }
 }
