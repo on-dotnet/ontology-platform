@@ -1,0 +1,21 @@
+{
+  "command": [
+    "/usr/bin/sandbox-exec",
+    "-p",
+    "(version 1) (allow default) (deny network-outbound (remote ip \"*:*\")) (allow network-outbound (remote ip \"localhost:*\"))",
+    "/opt/homebrew/opt/python@3.13/bin/python3.13",
+    "-B",
+    "experiments/g4-m1-main-integration/tests.py"
+  ],
+  "startedAtUtc": "2026-11-06T08:52:22.966156+00:00",
+  "endedAtUtc": "2026-11-06T08:52:57.256859+00:00",
+  "elapsedSeconds": 34.290442708996125,
+  "exitCode": 0,
+  "inputHashes": {
+    "experiments/g4-m1-main-integration/runtime.py": "62c742a1a2d862cd82e89f3af5ee60418e546a6aa417daae562291b011fde8f8",
+    "experiments/g4-m1-main-integration/tests.py": "c9cf23c223ebc7ac28741cfb03401d1a026a1090ad0d912b110b135733ab853d"
+  },
+  "inputDrift": false,
+  "logSha256": "f7a01ef32c18917f94afbdd484ffd4ef07870dd0568f9b77dd05aaa76e33dfee",
+  "executorSha256": "b26e7695313c4c2640caec8a3414ca239d86e89e132e3286c3a72643da4281d3"
+}

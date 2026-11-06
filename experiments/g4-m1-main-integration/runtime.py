@@ -1111,8 +1111,62 @@ def configure_api(m, group, *, apply=True):
     write_json(path,config,private=True)
 
 
-class PauseGuard:
-    """暂停故障有独立会话的准确ID恢复守护；主入口异常退出也不能留下暂停。"""
+def restore_paused_container(identity, *, runner=None):
+    """准确恢复同Engine/代际的暂停；仅接纳实证的重复恢复，保留每次真实输出。"""
+    import base64
+    import hashlib
+    import json
+    import subprocess
+    import datetime
+    result={'status':'FAIL','reason':'RESTORE_NOT_COMPLETED','commands':[]}
+    invoke=runner or subprocess.run
+    def command(arguments):
+        argv=['docker','--context','desktop-linux',*arguments]
+        row={'command':argv,'startedAtUtc':datetime.datetime.now(datetime.timezone.utc).isoformat()}
+        result['commands'].append(row)
+        try:
+            process=invoke(argv,capture_output=True,timeout=5)
+            output,error=process.stdout,process.stderr
+            row.update(exitCode=process.returncode,timedOut=False)
+        except (OSError,subprocess.TimeoutExpired) as failure:
+            output=getattr(failure,'stdout',None) or b'';error=getattr(failure,'stderr',None) or b''
+            row.update(exitCode=None,timedOut=isinstance(failure,subprocess.TimeoutExpired),errorType=type(failure).__name__)
+        finally:row['endedAtUtc']=datetime.datetime.now(datetime.timezone.utc).isoformat()
+        row.update(stdoutBytes=len(output),stderrBytes=len(error),stdoutSha256=hashlib.sha256(output).hexdigest(),stderrSha256=hashlib.sha256(error).hexdigest(),stdoutBase64=base64.b64encode(output).decode(),stderrBase64=base64.b64encode(error).decode())
+        return row['exitCode'],output,error
+    def observed():
+        code,raw,_=command(['info','--format','{{json .}}'])
+        if code!=0:raise ValueError('RESTORE_ENGINE_OBSERVATION')
+        engine=json.loads(raw)
+        if not isinstance(engine,dict):raise ValueError('RESTORE_INVALID_OBSERVATION')
+        if engine.get('ID')!=identity['engineId'] or engine.get('ServerVersion')!=identity['serverVersion']:raise ValueError('RESTORE_ENGINE_DRIFT')
+        code,raw,_=command(['inspect',identity['containerId']])
+        if code!=0:raise ValueError('RESTORE_CONTAINER_OBSERVATION')
+        values=json.loads(raw)
+        if not isinstance(values,list) or len(values)!=1:raise ValueError('RESTORE_CONTAINER_OBSERVATION')
+        item=values[0]
+        if not isinstance(item,dict) or not isinstance(item.get('State'),dict) or not isinstance(item.get('Config'),dict) or not isinstance(item['Config'].get('Labels'),dict):raise ValueError('RESTORE_INVALID_OBSERVATION')
+        state=item['State'];labels=item['Config']['Labels']
+        if not (item['Id']==identity['containerId'] and item['Image']==identity['image'] and item['Created']==identity['created'] and state['StartedAt']==identity['startedAt'] and labels.get('ontology.task-id')==identity['taskId'] and labels.get('ontology.run-id')==identity['runId']):raise ValueError('RESTORE_CONTAINER_DRIFT')
+        if state['Running'] is not True or not isinstance(state['Paused'],bool):raise ValueError('RESTORE_CONTAINER_STATE')
+        return {'running':True,'paused':state['Paused'],'identityVerified':True}
+    try:
+        result['before']=observed();code=0;output=b'';error=b''
+        if result['before']['paused']:code,output,error=command(['unpause',identity['containerId']])
+        result['after']=observed()
+        if result['after']['paused']:raise ValueError('RESTORE_STILL_PAUSED')
+        if code!=0:
+            expected=('Error response from daemon: Container '+identity['containerId']+' is not paused\n').encode()
+            if code!=1 or output!=b'' or error!=expected:raise ValueError('RESTORE_UNPAUSE_FAILED')
+        result.update(status='PASS',reason='CONCURRENT_RESTORE_CONFIRMED' if code==1 else ('RESTORED' if result['before']['paused'] else 'ALREADY_RESTORED'))
+    except ValueError as failure:
+        result['reason']=str(failure) if str(failure).startswith('RESTORE_') else 'RESTORE_INVALID_JSON'
+    except (KeyError,TypeError,IndexError):result['reason']='RESTORE_INVALID_OBSERVATION'
+    return result
+
+
+class _ApiPauseGuard:
+    """保留已验API租约故障时序；此兼容路径未扩为新的代际恢复合同。"""
     def __init__(self,m,service,seconds=19):
         self.m=m;self.service=service;self.seconds=seconds;self.guard=None
         require(service in ('pg-source','api','rustfs') and 1<=seconds<=100,'PAUSE_BOUNDARY')
@@ -1146,6 +1200,100 @@ if p.returncode==0:
         if self.guard.poll() is None:
             self.guard.terminate();self.guard.wait(timeout=5)
         write_json(ARTIFACTS/self.m['runId']/('pause-'+self.service+'-'+str(self.guard.pid)+'-end.json'),dict(self.record,pausedAfter=False,guardExitCode=self.guard.returncode))
+
+
+
+class PauseGuard:
+    """同代际恢复与独立守护共用严格判据；私有原输出和公开结束记录完整保留。"""
+    def __init__(self,m,service,seconds=19):
+        self.m=m;self.service=service;self.seconds=seconds;self.guard=None
+        require(service in ('pg-source','api','rustfs') and 1<=seconds<=100,'PAUSE_BOUNDARY')
+        self.ident=runtime_value(m)['containerIds'][service]
+
+    def __enter__(self):
+        if self.service=='api':return _ApiPauseGuard.__enter__(self)
+        import inspect
+        import secrets
+        item=TaskEngine(self.m).owned(self.ident,self.service) if self.service=='api' else inspect_owned(self.m,self.ident,self.service)
+        require(item['State']['Running'] and not item['State']['Paused'],'PAUSE_INITIAL_STATE')
+        self.identity={'engineId':ENGINE,'serverVersion':'29.9.2','containerId':self.ident,'taskId':TASK,'runId':self.m['runId'],'image':item['Image'],'created':item['Created'],'startedAt':item['State']['StartedAt']}
+        logs=boundary(private_dir(self.m['runId'])/'logs',ROOT);logs.mkdir(mode=0o700,parents=True,exist_ok=True)
+        token=secrets.token_hex(8);self.private_paths={name:logs/('pause-'+token+'-'+name) for name in ('guard.json','guard.stdout','guard.stderr','main.json')}
+        script='import json,sys,time,os\n'+inspect.getsource(restore_paused_container)+'''\ntime.sleep(int(sys.argv[1]))
+result=restore_paused_container(json.loads(sys.argv[2]))
+raw=(json.dumps(result,indent=2)+'\\n').encode()
+with os.fdopen(os.open(sys.argv[3],os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600),'wb') as stream:stream.write(raw)
+sys.exit(0 if result['status']=='PASS' else 2)
+'''
+        handles=[]
+        try:
+            for name in ('guard.stdout','guard.stderr'):handles.append(os.fdopen(os.open(self.private_paths[name],os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600),'wb'))
+            self.guard=subprocess.Popen([sys.executable,'-B','-c',script,str(self.seconds),json.dumps(self.identity),str(self.private_paths['guard.json'])],start_new_session=True,stdout=handles[0],stderr=handles[1])
+        finally:
+            for handle in handles:handle.close()
+        self.guard_started=time.monotonic()
+        self.record={'containerId':self.ident,'guardPid':self.guard.pid,'deadlineSeconds':self.seconds,'guardScriptSha256':digest(script.encode()),'identity':self.identity,'startedAtUtc':datetime.datetime.now(datetime.timezone.utc).isoformat()}
+        try:
+            write_json(ARTIFACTS/self.m['runId']/('pause-'+self.service+'-'+str(self.guard.pid)+'-start.json'),self.record)
+            docker(self.m,['pause',self.ident])
+            require(inspect_owned(self.m,self.ident,self.service)['State']['Paused'],'PAUSE_NOT_OBSERVED')
+            require(self.guard.poll() is None,'PAUSE_GUARD_EXPIRED_BEFORE_BODY')
+            return self
+        except BaseException:
+            self.__exit__(*sys.exc_info());raise
+
+    def __exit__(self,*exc):
+        if self.service=='api':return _ApiPauseGuard.__exit__(self,*exc)
+        failure=None;result=None;files={};guard_result=None;cancelled=False
+        try:
+            result=restore_paused_container(self.identity)
+            path=self.private_paths['main.json']
+            with os.fdopen(os.open(path,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600),'wb') as stream:stream.write((json.dumps(result,indent=2)+'\n').encode())
+            require(result['status']=='PASS','PAUSE_RESTORE_FAILED')
+        except BaseException as error:failure=error
+        finally:
+            try:
+                if self.guard.poll() is None:
+                    # 只有主恢复已实证成功时才取消睡眠守护；否则让独立守护完成恢复。
+                    if result and result.get('status')=='PASS' and time.monotonic()-self.guard_started < self.seconds-1:cancelled=True;self.guard.terminate()
+                    self.guard.wait(timeout=5 if cancelled else self.seconds+30)
+                if self.guard.returncode not in ((0,-15) if cancelled else (0,)):raise ValueError('PAUSE_GUARD_FAILED')
+                if self.private_paths['guard.json'].exists():
+                    parsed=json.loads(self.private_paths['guard.json'].read_bytes())
+                    require(isinstance(parsed,dict) and parsed.get('status')=='PASS' and isinstance(parsed.get('commands'),list),'PAUSE_GUARD_FAILED')
+                    guard_result=parsed
+                elif not cancelled:raise ValueError('PAUSE_GUARD_RECEIPT_MISSING')
+            except BaseException as error:
+                failure=failure or error
+                # 精确自建子进程；超时后结束自身守护，不能静默留下它。
+                if self.guard.poll() is None:
+                    try:self.guard.kill();self.guard.wait(timeout=5)
+                    except BaseException as cleanup_error:failure=failure or cleanup_error
+            for name,path in self.private_paths.items():
+                try:
+                    if path.exists():
+                        raw=path.read_bytes();files[name]={'bytes':len(raw),'sha256':digest(raw),'privatePath':str(path)}
+                except BaseException as error:failure=failure or error;files[name]={'observationError':type(error).__name__}
+            def public(value):
+                if value is None:return None
+                required={'command','startedAtUtc','endedAtUtc','exitCode','timedOut','stdoutBytes','stderrBytes','stdoutSha256','stderrSha256','stdoutBase64','stderrBase64'}
+                require(isinstance(value,dict) and set(value)<= {'status','reason','before','after','commands'} and isinstance(value.get('commands'),list),'PAUSE_RECEIPT_SCHEMA')
+                rows=[]
+                for row in value['commands']:
+                    require(isinstance(row,dict) and required<=set(row) and set(row)<=required|{'errorType'},'PAUSE_RECEIPT_SCHEMA')
+                    require(row['command'] in (['docker','--context','desktop-linux','info','--format','{{json .}}'],['docker','--context','desktop-linux','inspect',self.ident],['docker','--context','desktop-linux','unpause',self.ident]),'PAUSE_RECEIPT_COMMAND')
+                    rows.append({k:v for k,v in row.items() if k not in ('stdoutBase64','stderrBase64')})
+                for name in ('before','after'):
+                    if name in value:require(isinstance(value[name],dict) and set(value[name])=={'running','paused','identityVerified'} and all(isinstance(v,bool) for v in value[name].values()),'PAUSE_RECEIPT_STATE')
+                return {**value,'commands':rows}
+            safe_result=None;safe_guard=None
+            try:safe_result=public(result);safe_guard=public(guard_result)
+            except BaseException as error:failure=failure or error
+            end=dict(self.record,status='PASS' if failure is None else 'FAIL',restore=safe_result,guardRestore=safe_guard,guardExitCode=self.guard.returncode,guardCancelledAfterVerifiedRestore=cancelled,guardReleased=self.guard.poll() is not None,bodyErrorType=type(exc[1]).__name__ if exc and exc[1] else None,recoveryErrorType=type(failure).__name__ if failure else None,privateOutputs=files)
+            try:write_json(ARTIFACTS/self.m['runId']/('pause-'+self.service+'-'+str(self.guard.pid)+'-end.json'),end)
+            except BaseException as error:failure=failure or error
+        if not exc[0] and failure is not None:raise failure
+        return False
 
 
 if __name__ == '__main__':

@@ -1,0 +1,20 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261106-35",
+  "status": "ENVIRONMENT_BLOCKED",
+  "command": [
+    "python3",
+    "-B",
+    "experiments/g4-m1-main-integration/tests.py"
+  ],
+  "exitCode": 1,
+  "testCount": 80,
+  "failures": 2,
+  "errors": 3,
+  "reportedTestSeconds": 13.014,
+  "timingStatus": "PROCESS_UTC_NOT_RECORDED",
+  "cause": "Default desktop sandbox refused Unix/loopback bind (3 PermissionError) and two actual Edge launches. All task source bytes unchanged for second execution under scoped OS external-network deny policy.",
+  "logSha256": "acc39a6223713d50899b12014a346e26854c800b9a03b2872c5c1ad32cc18335",
+  "originalPreserved": true,
+  "notProductFailureOrPass": true
+}

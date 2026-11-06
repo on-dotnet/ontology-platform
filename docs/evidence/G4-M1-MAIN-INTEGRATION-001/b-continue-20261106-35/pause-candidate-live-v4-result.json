@@ -1,0 +1,64 @@
+{
+  "status": "DIAGNOSTIC_PASS_NOT_FORMAL_GATE",
+  "productBuildCommit": "5493b22da9d296a1d91208775aefd9c380a69b79",
+  "candidateRuntimeBlockSha256": "c58034985be2303087fba17f14fb67ba5e71e631b3420476afce253cc6a2b48d",
+  "candidateUnchangedAtEnd": true,
+  "executorSha256": "a95bf1cf9d48589892b882a229a027a0172837ecfacd7bfcf60d5d1b0e6b95b8",
+  "cases": [
+    {
+      "mode": "normal",
+      "startedAtUtc": "2026-11-06T08:43:57.408489+00:00",
+      "endedAtUtc": "2026-11-06T08:43:58.000818+00:00",
+      "errorType": null,
+      "observations": [],
+      "endReceipt": "pause-pg-source-9915-end.json",
+      "endSha256": "cad17abc3a2a1b96a500bbe930792c469ee24ff86d905bd4566d086e60713168",
+      "restoreReason": "RESTORED",
+      "guardExitCode": -15,
+      "sameGenerationRunningUnpaused": true
+    },
+    {
+      "mode": "guard-first",
+      "startedAtUtc": "2026-11-06T08:43:58.000991+00:00",
+      "endedAtUtc": "2026-11-06T08:44:17.373402+00:00",
+      "errorType": null,
+      "observations": [
+        {
+          "interleaving": "main observed paused; real independent guard restored before main unpause"
+        }
+      ],
+      "endReceipt": "pause-pg-source-9956-end.json",
+      "endSha256": "b283258e8b25c9fb8ef673cb5890c1a64cbcfb0596c31f6f3fd4723311c98356",
+      "restoreReason": "CONCURRENT_RESTORE_CONFIRMED",
+      "guardExitCode": 0,
+      "sameGenerationRunningUnpaused": true
+    },
+    {
+      "mode": "already-restored",
+      "startedAtUtc": "2026-11-06T08:44:17.373565+00:00",
+      "endedAtUtc": "2026-11-06T08:44:17.649155+00:00",
+      "errorType": null,
+      "observations": [
+        {
+          "otherRestorerCommand": [
+            "docker",
+            "--context",
+            "desktop-linux",
+            "unpause",
+            "acd04d17e97dce9861e2bec5257ba804a1b614edeac837a863c53af4c8eb1f16"
+          ],
+          "exitCode": 0,
+          "stdout": "acd04d17e97dce9861e2bec5257ba804a1b614edeac837a863c53af4c8eb1f16\n",
+          "stderr": ""
+        }
+      ],
+      "endReceipt": "pause-pg-source-10296-end.json",
+      "endSha256": "76b910468e7af5c483caa336cc3f9b99ad08a7d15293ed0b2b0bbab3ceb7784a",
+      "restoreReason": "ALREADY_RESTORED",
+      "guardExitCode": -15,
+      "sameGenerationRunningUnpaused": true
+    }
+  ],
+  "canonicalSourceUntouched": true,
+  "originalI06StillBlocked": true
+}

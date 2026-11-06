@@ -1,0 +1,41 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261106-35",
+  "status": "PASS",
+  "reviewer": "/root/argv_review",
+  "scope": "Task runtime/tests only. Original API methods byte-equivalent; readback unchanged. PG/RustFS recovery predicate, original command bytes, body exception priority, exact own child cleanup. Not formal product acceptance.",
+  "sourceHashes": {
+    "experiments/g4-m1-main-integration/runtime.py": "62c742a1a2d862cd82e89f3af5ee60418e546a6aa417daae562291b011fde8f8",
+    "experiments/g4-m1-main-integration/tests.py": "c9cf23c223ebc7ac28741cfb03401d1a026a1090ad0d912b110b135733ab853d"
+  },
+  "rawReview": "Current canonical source review passed; no open P0/P1/P2. Parent-kill fixture correctly uses temporary private root and exact ID assertions; case actually passed. API old methods identical; readback unchanged; diff-check exit0. First default sandbox task run had 2 FAIL/3 ERROR and remains failed. Expanded authorized run and SelfTest tracked separately. Original I06 not upgraded.",
+  "priorFindings": [
+    {
+      "finding": "unexpected stdout accepted",
+      "resolution": "exact empty stdout required; old negative FAIL, new PASS"
+    },
+    {
+      "finding": "malformed guard row masked body and dropped end receipt",
+      "resolution": "schema validation within guarded serialization; old negative FAIL, new PASS"
+    },
+    {
+      "finding": "guard wait budget insufficient",
+      "resolution": "seconds+30 covers 25 seconds commands; old test FAIL new PASS"
+    },
+    {
+      "finding": "engine/labels invalid shape loses collected commands",
+      "resolution": "explicit dict checks; old 3 ERROR and new PASS"
+    },
+    {
+      "finding": "proposed API prepared identity creates restart gap",
+      "resolution": "proposal abandoned; original API preserved; readback unchanged"
+    },
+    {
+      "finding": "parent fixture private root and exact ID check",
+      "resolution": "fixed before canonical test run"
+    }
+  ],
+  "taskTestsReceiptSha256": "86d1fe6eb0ebc78ce0c970ab4b94899812bb2d68825e6af2313d5b282a954270",
+  "selfTest": "RUNNING",
+  "originalI06StillBlocked": true
+}

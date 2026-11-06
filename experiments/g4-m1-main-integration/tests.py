@@ -717,11 +717,11 @@ class RecoveryGuardTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(dir=ARTIFACTS) as d:
             directory=Path(d);fake=directory/'docker';state=directory/'state.json'
             ident='f'*64;run='b-continue-20990101-97'
-            value={'Id':ident,'Config':{'Labels':{'ontology.task-id':'G4-M1-MAIN-INTEGRATION-001','ontology.run-id':run,'com.docker.compose.service':'pg-source'}},'State':{'Running':True,'Paused':False},'unpauseCalls':0}
+            value={'Id':ident,'Image':'image','Created':'created','Config':{'Labels':{'ontology.task-id':'G4-M1-MAIN-INTEGRATION-001','ontology.run-id':run,'com.docker.compose.service':'pg-source'}},'State':{'Running':True,'Paused':False,'StartedAt':'started'},'unpauseCalls':0}
             state.write_text(json.dumps(value))
-            code="#!/usr/bin/env python3\nimport os,json,sys\nfrom pathlib import Path\np=Path(os.environ['GUARD_FIXTURE_STATE']);v=json.loads(p.read_text());a=sys.argv[3:]\nassert sys.argv[1:3]==['--context','desktop-linux'] and a[1]==v['Id']\nif a[0]=='inspect':print(json.dumps([v]))\nelif a[0] in ('pause','unpause'):\n v['State']['Paused']=a[0]=='pause';v['unpauseCalls']+=int(a[0]=='unpause');p.write_text(json.dumps(v))\nelse:sys.exit(2)\n"
+            code="#!/usr/bin/env python3\nimport os,json,sys\nfrom pathlib import Path\np=Path(os.environ['GUARD_FIXTURE_STATE']);v=json.loads(p.read_text());a=sys.argv[3:]\nassert sys.argv[1:3]==['--context','desktop-linux']\nif a[0]=='info':print(json.dumps({'ID':'7a8785bb-6b6e-4ae4-8065-996f4bf83016','ServerVersion':'29.9.2'}))\nelif a[0]=='inspect':assert a[1]==v['Id'];print(json.dumps([v]))\nelif a[0] in ('pause','unpause'):\n assert a[1]==v['Id']\n v['State']['Paused']=a[0]=='pause';v['unpauseCalls']+=int(a[0]=='unpause');p.write_text(json.dumps(v))\nelse:sys.exit(2)\n"
             fake.write_text(code);fake.chmod(0o755)
-            child_code="import sys,time;from pathlib import Path;sys.path.insert(0,"+repr(str(HERE))+");import runtime as r;r.ARTIFACTS=Path("+repr(str(directory))+");r.runtime_value=lambda m:{'containerIds':{'pg-source':"+repr(ident)+"}};guard=r.PauseGuard({'runId':"+repr(run)+"},'pg-source',1);guard.__enter__();print(guard.guard.pid,flush=True);time.sleep(60)"
+            child_code="import sys,time;from pathlib import Path;sys.path.insert(0,"+repr(str(HERE))+");import runtime as r;r.ARTIFACTS=Path("+repr(str(directory))+");r.private_dir=lambda run:Path("+repr(str(directory))+");r.runtime_value=lambda m:{'containerIds':{'pg-source':"+repr(ident)+"}};guard=r.PauseGuard({'runId':"+repr(run)+"},'pg-source',1);guard.__enter__();print(guard.guard.pid,flush=True);time.sleep(60)"
             env=dict(os.environ,PATH=str(directory)+os.pathsep+os.environ['PATH'],GUARD_FIXTURE_STATE=str(state),PYTHONDONTWRITEBYTECODE='1')
             child=subprocess.Popen([sys.executable,'-B','-c',child_code],env=env,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,start_new_session=True)
             guard_pid=None
@@ -733,6 +733,9 @@ class RecoveryGuardTests(unittest.TestCase):
                 deadline=time.monotonic()+4
                 while json.loads(state.read_text())['State']['Paused'] and time.monotonic()<deadline:time.sleep(.05)
                 after=json.loads(state.read_text());self.assertFalse(after['State']['Paused']);self.assertEqual(after['unpauseCalls'],1)
+                receipts=list((directory/'logs').glob('*guard.json'))
+                while not receipts and time.monotonic()<deadline:time.sleep(.05);receipts=list((directory/'logs').glob('*guard.json'))
+                self.assertEqual(len(receipts),1);receipt=json.loads(receipts[0].read_text());self.assertEqual(receipt['status'],'PASS');self.assertEqual(len(receipt['commands']),5)
             finally:
                 if child.poll() is None:os.killpg(child.pid,signal.SIGKILL);child.wait(timeout=3)
                 if guard_pid:
@@ -1612,6 +1615,106 @@ class HandoffLifecycleTests(unittest.TestCase):
                 elif mode=='unknown':self.assertEqual(output.read_bytes(),b'unknown prior output');self.assertFalse((a/rid/'actual-v2-manifest.json').exists())
                 else:self.assertEqual(output.read_bytes(),b'changed input');self.assertEqual((a/rid/'actual-v2-manifest.json').read_bytes(),captured[0])
 
+
+
+
+import copy,time
+from unittest.mock import patch
+import runtime
+
+class RestoreTests(unittest.TestCase):
+ def fixture(self,mode='concurrent'):
+  identity={'engineId':runtime.ENGINE,'serverVersion':'29.9.2','containerId':'a'*64,'taskId':runtime.TASK,'runId':'b-continue-20261106-35','image':'sha256:'+'b'*64,'created':'created','startedAt':'started'}
+  item={'Id':identity['containerId'],'Image':identity['image'],'Created':identity['created'],'Config':{'Labels':{'ontology.task-id':identity['taskId'],'ontology.run-id':identity['runId']}},'State':{'Running':True,'Paused':True,'StartedAt':identity['startedAt']}}
+  state={'inspects':0};calls=[]
+  def runner(command,**kwargs):
+   calls.append(command);action=command[3]
+   if action=='info':return subprocess.CompletedProcess(command,0,json.dumps([] if mode=='engine-list' else (None if mode=='engine-null' else {'ID':identity['engineId'],'ServerVersion':identity['serverVersion']})).encode(),b'')
+   if action=='inspect':
+    state['inspects']+=1;value=copy.deepcopy(item)
+    value['State']['Paused']=mode!='already' and state['inspects']==1
+    if mode=='still-paused':value['State']['Paused']=True
+    if state['inspects']>1:
+     if mode=='stopped':value['State']['Running']=False
+     if mode in ('Created','Image'):value[mode]='drift'
+     if mode=='StartedAt':value['State'][mode]='drift'
+     if mode in ('task','run'):value['Config']['Labels']['ontology.'+mode+'-id']='drift'
+    if mode=='inspect-failed':return subprocess.CompletedProcess(command,1,b'',b'failed')
+    if mode=='timeout':raise subprocess.TimeoutExpired(command,5)
+    if mode=='labels-null':value['Config']['Labels']=None
+    if mode=='state-list':value['State']=[]
+    if mode=='item-null':value=None
+    return subprocess.CompletedProcess(command,0,json.dumps([value]).encode(),b'')
+   self.assertEqual(action,'unpause')
+   message=('Error response from daemon: Container '+identity['containerId']+' is not paused\n').encode()
+   if mode=='wrong-id':message=message.replace(b'a'*64,b'c'*64)
+   if mode=='extra-error':message+=b'additional failure\n'
+   code=0 if mode in ('normal','still-paused') else (2 if mode=='other-code' else 1)
+   return subprocess.CompletedProcess(command,code,b'unexpected' if mode=='extra-output' else (b'' if code else (identity['containerId']+'\n').encode()),message if code else b'')
+  return identity,runner,calls
+ def test_real_classified_restore_outcomes(self):
+  for mode in ('engine-list','engine-null','labels-null','state-list','item-null','normal','concurrent','already','wrong-id','extra-error','extra-output','other-code','timeout','inspect-failed','Created','Image','StartedAt','task','run','still-paused','stopped'):
+   with self.subTest(mode=mode):
+    identity,runner,calls=self.fixture(mode);result=runtime.restore_paused_container(identity,runner=runner)
+    self.assertEqual(result['status'],'PASS' if mode in ('normal','concurrent','already') else 'FAIL')
+    if mode=='concurrent':self.assertEqual([r['exitCode'] for r in result['commands'] if r['command'][3]=='unpause'],[1])
+    if mode=='already':self.assertFalse(any(c[3]=='unpause' for c in calls))
+
+class Child:
+ def __init__(self,code=None,timeout=False):self.pid=123;self.returncode=code;self.timeout=timeout;self.waits=[];self.killed=False
+ def poll(self):return self.returncode
+ def terminate(self):self.returncode=-15
+ def kill(self):self.killed=True;self.returncode=-9
+ def wait(self,timeout):
+  self.waits.append(timeout)
+  if self.timeout and not self.killed:raise runtime.subprocess.TimeoutExpired('fixture',timeout)
+  if self.returncode is None:self.returncode=0
+  return self.returncode
+class PauseExitTests(unittest.TestCase):
+ def exercise(self,mode,body):
+  with tempfile.TemporaryDirectory(dir=runtime.ARTIFACTS) as temporary:
+   folder=Path(temporary);records=[]
+   guard=runtime.PauseGuard.__new__(runtime.PauseGuard)
+   guard.m={'runId':folder.name};guard.ident='a'*64;guard.identity={};guard.seconds=19;guard.service='pg-source';guard.record={'containerId':guard.ident}
+   guard.private_paths={n:folder/n for n in ('main.json','guard.json','guard.stdout','guard.stderr')}
+   guard.guard_started=time.monotonic();guard.guard=Child()
+   result={'status':'PASS','reason':'ALREADY_RESTORED','commands':[]}
+   if mode=='restore-fails':result['status']='FAIL'
+   if mode in ('bad-row','bad-json','guard-fails'):
+    guard.guard.returncode=2 if mode=='guard-fails' else 0
+    guard.private_paths['guard.json'].write_text('{bad' if mode=='bad-json' else json.dumps({'status':'PASS','commands':[None]}))
+   if mode=='occupied':guard.private_paths['main.json'].write_text('original')
+   if mode in ('wait-budget','guard-timeout'):
+    guard.guard_started-=20;guard.guard.timeout=mode=='guard-timeout'
+    guard.private_paths['guard.json'].write_text(json.dumps(result))
+   def write(path,value):
+    if mode=='end-fails':raise OSError('end failed')
+    records.append(value)
+   error=RuntimeError('body failed') if body else None;caught=None
+   class Entered(type(guard)):
+    def __enter__(self):return self
+   guard.__class__=Entered
+   with patch.dict(vars(runtime),restore_paused_container=lambda identity:result,write_json=write):
+    try:
+     with guard:
+      if error:raise error
+    except BaseException as failure:caught=failure
+   if body:self.assertIs(caught,error)
+   elif mode in ('normal','wait-budget'):self.assertIsNone(caught)
+   else:self.assertIsNotNone(caught)
+   self.assertIsNotNone(guard.guard.poll())
+   if mode!='end-fails':
+    self.assertEqual(len(records),1)
+    self.assertEqual(records[0]['status'],'PASS' if mode in ('normal','wait-budget') else 'FAIL')
+    self.assertNotIn('Base64',json.dumps(records))
+   if mode=='occupied':self.assertEqual(guard.private_paths['main.json'].read_text(),'original')
+   else:self.assertEqual(guard.private_paths['main.json'].stat().st_mode&0o777,0o600)
+   if mode=='wait-budget':self.assertGreaterEqual(guard.guard.waits[0],19+25)
+   if mode=='guard-timeout':self.assertTrue(guard.guard.killed)
+ def test_body_priority_receipt_failures_and_guard_cleanup(self):
+  for mode in ('normal','restore-fails','bad-row','bad-json','guard-fails','occupied','end-fails','wait-budget','guard-timeout'):
+   for body in (False,True):
+    with self.subTest(mode=mode,body=body):self.exercise(mode,body)
 
 if __name__ == '__main__':
     ARTIFACTS.mkdir(parents=True, exist_ok=True)

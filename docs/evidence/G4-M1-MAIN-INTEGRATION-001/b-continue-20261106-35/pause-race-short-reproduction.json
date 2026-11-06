@@ -1,0 +1,54 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261106-35",
+  "testedCommit": "5493b22da9d296a1d91208775aefd9c380a69b79",
+  "executorSha256": "50dca1c6b9c28c3c6f009e82747fcc76440fb6a84e17f49d02b9f92e97de8a69",
+  "runtimeSha256": "e6edcd5b2b3385003b0ced4951bb19fa4b9d0e96eff39e6793c6cfd8df3efe35",
+  "scheduledInterleaving": true,
+  "observedFailure": "DOCKER_COMMAND_FAILED",
+  "commands": [
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "pause",
+        "acd04d17e97dce9861e2bec5257ba804a1b614edeac837a863c53af4c8eb1f16"
+      ],
+      "startedAtUtc": "2026-11-06T08:13:17.584931+00:00",
+      "endedAtUtc": "2026-11-06T08:13:17.623969+00:00",
+      "exitCode": 0,
+      "stdout": "acd04d17e97dce9861e2bec5257ba804a1b614edeac837a863c53af4c8eb1f16\n",
+      "stderr": ""
+    },
+    {
+      "phase": "MAIN_OBSERVED_PAUSED",
+      "containerId": "acd04d17e97dce9861e2bec5257ba804a1b614edeac837a863c53af4c8eb1f16",
+      "created": "2026-11-06T07:59:02.095133254Z",
+      "image": "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+      "startedAt": "2026-11-06T07:59:02.208717462Z"
+    },
+    {
+      "phase": "REAL_GUARD_RESTORED_BEFORE_MAIN_UNPAUSE",
+      "utc": "2026-11-06T08:13:36.725260+00:00"
+    },
+    {
+      "command": [
+        "docker",
+        "--context",
+        "desktop-linux",
+        "unpause",
+        "acd04d17e97dce9861e2bec5257ba804a1b614edeac837a863c53af4c8eb1f16"
+      ],
+      "startedAtUtc": "2026-11-06T08:13:36.725346+00:00",
+      "endedAtUtc": "2026-11-06T08:13:36.742837+00:00",
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "Error response from daemon: Container acd04d17e97dce9861e2bec5257ba804a1b614edeac837a863c53af4c8eb1f16 is not paused\n"
+    }
+  ],
+  "guardExitCode": 0,
+  "finalSameGenerationRunningUnpaused": true,
+  "notOriginalFailureCommandProof": true,
+  "notProductGatePass": true
+}

@@ -1,0 +1,127 @@
+{
+  "containerId": "acd04d17e97dce9861e2bec5257ba804a1b614edeac837a863c53af4c8eb1f16",
+  "guardPid": 8961,
+  "deadlineSeconds": 19,
+  "guardScriptSha256": "85e29df813795a997b42c40dcf69c2ac3c0cc8c51086f285f11fc10b78bf7a7b",
+  "identity": {
+    "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016",
+    "serverVersion": "29.9.2",
+    "containerId": "acd04d17e97dce9861e2bec5257ba804a1b614edeac837a863c53af4c8eb1f16",
+    "taskId": "G4-M1-MAIN-INTEGRATION-001",
+    "runId": "b-continue-20261106-35",
+    "image": "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+    "created": "2026-11-06T07:59:02.095133254Z",
+    "startedAt": "2026-11-06T07:59:02.208717462Z"
+  },
+  "startedAtUtc": "2026-11-06T08:40:17.370962+00:00",
+  "status": "PASS",
+  "restore": {
+    "status": "PASS",
+    "reason": "ALREADY_RESTORED",
+    "commands": [
+      {
+        "command": [
+          "docker",
+          "--context",
+          "desktop-linux",
+          "info",
+          "--format",
+          "{{json .}}"
+        ],
+        "startedAtUtc": "2026-11-06T08:40:17.429718+00:00",
+        "exitCode": 0,
+        "timedOut": false,
+        "endedAtUtc": "2026-11-06T08:40:17.496634+00:00",
+        "stdoutBytes": 13152,
+        "stderrBytes": 0,
+        "stdoutSha256": "78e08cdae2d4b507e918830d118140ef9cea94c43361cc32206394942d44fa99",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "command": [
+          "docker",
+          "--context",
+          "desktop-linux",
+          "inspect",
+          "acd04d17e97dce9861e2bec5257ba804a1b614edeac837a863c53af4c8eb1f16"
+        ],
+        "startedAtUtc": "2026-11-06T08:40:17.496771+00:00",
+        "exitCode": 0,
+        "timedOut": false,
+        "endedAtUtc": "2026-11-06T08:40:17.512156+00:00",
+        "stdoutBytes": 18136,
+        "stderrBytes": 0,
+        "stdoutSha256": "91ea1f49c541542995a0da7660df01efdc5d037c4fb286b952449e39816e97ac",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "command": [
+          "docker",
+          "--context",
+          "desktop-linux",
+          "info",
+          "--format",
+          "{{json .}}"
+        ],
+        "startedAtUtc": "2026-11-06T08:40:17.512311+00:00",
+        "exitCode": 0,
+        "timedOut": false,
+        "endedAtUtc": "2026-11-06T08:40:17.585141+00:00",
+        "stdoutBytes": 13152,
+        "stderrBytes": 0,
+        "stdoutSha256": "b041582dade27d12343ee9eea3d5d4c2f5cafa95198d241475eeb39db0baa1b6",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "command": [
+          "docker",
+          "--context",
+          "desktop-linux",
+          "inspect",
+          "acd04d17e97dce9861e2bec5257ba804a1b614edeac837a863c53af4c8eb1f16"
+        ],
+        "startedAtUtc": "2026-11-06T08:40:17.585279+00:00",
+        "exitCode": 0,
+        "timedOut": false,
+        "endedAtUtc": "2026-11-06T08:40:17.600835+00:00",
+        "stdoutBytes": 18136,
+        "stderrBytes": 0,
+        "stdoutSha256": "91ea1f49c541542995a0da7660df01efdc5d037c4fb286b952449e39816e97ac",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "before": {
+      "running": true,
+      "paused": false,
+      "identityVerified": true
+    },
+    "after": {
+      "running": true,
+      "paused": false,
+      "identityVerified": true
+    }
+  },
+  "guardRestore": null,
+  "guardExitCode": -15,
+  "guardCancelledAfterVerifiedRestore": true,
+  "guardReleased": true,
+  "bodyErrorType": null,
+  "recoveryErrorType": null,
+  "privateOutputs": {
+    "guard.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "privatePath": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261106-35/logs/pause-f69be697b0f45efd-guard.stdout"
+    },
+    "guard.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "privatePath": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261106-35/logs/pause-f69be697b0f45efd-guard.stderr"
+    },
+    "main.json": {
+      "bytes": 86188,
+      "sha256": "8d9359bb9b3968e8545b9342acf5f5d63733259dcdfc561e9de25a906975c650",
+      "privatePath": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261106-35/logs/pause-f69be697b0f45efd-main.json"
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "status": "OBSERVED_POST_FAILURE_ONLY",
+  "commandKey": "4f4319d5a32bac0a141c5d661b2b3fdf1b043f3ba2be556dfaaaf71b738e6d7e",
+  "persistentProbe": {
+    "status": "CANCELLED",
+    "stages": [
+      {
+        "name": "NETWORK",
+        "status": "PASS",
+        "durationMs": 0,
+        "diagnosticCode": null
+      },
+      {
+        "name": "TLS",
+        "status": "FAIL",
+        "durationMs": 1481,
+        "diagnosticCode": "connection_cancelled"
+      },
+      {
+        "name": "AUTH",
+        "status": "NOT_RUN",
+        "durationMs": 0,
+        "diagnosticCode": null
+      },
+      {
+        "name": "READ_ONLY",
+        "status": "NOT_RUN",
+        "durationMs": 0,
+        "diagnosticCode": null
+      },
+      {
+        "name": "METADATA",
+        "status": "NOT_RUN",
+        "durationMs": 0,
+        "diagnosticCode": null
+      }
+    ]
+  },
+  "notGatePass": true
+}

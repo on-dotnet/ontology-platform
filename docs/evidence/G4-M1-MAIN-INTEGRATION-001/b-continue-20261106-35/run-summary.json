@@ -1,0 +1,65 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261106-35",
+  "testedCommit": "5493b22da9d296a1d91208775aefd9c380a69b79",
+  "status": "BLOCKED_WITH_WITNESS",
+  "gates": {
+    "R2": "PASS",
+    "I01": "PARTIAL_PENDING_FIXTURE_CLOSURE",
+    "I02": "PASS",
+    "I03": "PARTIAL_PENDING_FIXTURE_CLOSURE",
+    "I04": "PASS",
+    "I05": "PASS",
+    "I06": "BLOCKED_WITH_WITNESS",
+    "I07": "NOT_RUN",
+    "I08": "NOT_RUN"
+  },
+  "failure": "I06 pause recovery DOCKER_COMMAND_FAILED; original stderr unavailable. Actual scheduled guard-first replay reproduces exact duplicate unpause exit1. Original gate not upgraded.",
+  "repair": "Only task runtime/tests. Strict pg-source/rustfs restore checks exact Engine/container generation, command exit and exact diagnostic. API original100s compatibility path unchanged; no new strict-generation assurance claimed for API.",
+  "engineering": {
+    "taskTests": 80,
+    "taskTestsExitCode": 0,
+    "selfTestSeconds": 530.8000374170078,
+    "selfTestExitCode": 0,
+    "reviewPackageTests": 129,
+    "inputDrift": false,
+    "independentReview": "PASS",
+    "newStableFullAcceptance": "NOT_RUN"
+  },
+  "resources": {
+    "finalDeletedObjects": 11,
+    "keepContainers": 0,
+    "keepNetworks": 3,
+    "keepVolumes": 8,
+    "fourToolCopiesRemoved": true,
+    "toolFiles": 26919,
+    "toolLogicalBytes": 512583838,
+    "oldPlanRefusedBeforeDelete": true,
+    "newPlanRequiresZeroOpenDescriptors": true,
+    "hostMonitorReleased": true,
+    "oldIncidentKeepUnchanged": true,
+    "physicalSpaceReclamation": "NOT_VERIFIED"
+  },
+  "nextRun": "b-continue-20261106-36",
+  "delivery": {
+    "maximumZipBytes": 15728640,
+    "package": "NOT_CREATED",
+    "mainUpdated": false,
+    "M2Started": false,
+    "CI": "NOT_RUN",
+    "Windows": "NOT_RUN",
+    "Intel": "NOT_RUN"
+  },
+  "hashes": {
+    "gate-I06.json": "2b42c3c3fcdd9773f39c790afb7205221dda1f32d224df1287f65cb494933d94",
+    "pause-race-short-reproduction.json": "a0dc752739d6a67b60ea9a8bb19565f44ee45f1c35ff60057910e430065389d5",
+    "pause-candidate-live-v5-result.json": "6d7c5b882e0977c3de0ff6f7abadbf525e7525179175298e8f20a79a5ce9de90",
+    "review-pause-repair-source.json": "1bf9456eed2cb27029c8e2346d3734188b83ab3817e37c77dfbfb193a6dace74",
+    "repair-engineering-complete.json": "45b080455b6c429f1f6584bccd081c932a29173b6a1944f139e8a539c9903fa8",
+    "failed-run-resource-reclaimed.json": "eb3964cebcd0771e82bc068006ce68fe04dc506e3fb64ce0be992e112048ceff",
+    "cleanup-original-refusal.json": "e99f7a5f7b1e7614d68ab6e08c09d245815cabaeced6887a278c7b7129996cff",
+    "cleanup-applied-v2.jsonl": "22c2d4a5d3b1ee7effc5789cb0525885fe147bcd8c356c514f652752beb9a005",
+    "review-copy-cleanup-v2.json": "902893abc60ab395f6197868e3e18491efa669b5d24a8c6038ad96ac3ba49943",
+    "host-monitor-released.json": "9e671622d8f15856abc70cc469c3c1ae9c3925eae4b86218d382c3efae3debe6"
+  }
+}

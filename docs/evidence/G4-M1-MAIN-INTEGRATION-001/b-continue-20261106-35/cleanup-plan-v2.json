@@ -1,0 +1,82 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "root": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform",
+  "createdAtUtc": "2026-11-06T09:03:51.590368+00:00",
+  "expiresAtUtc": "2026-11-06T09:48:51.590368+00:00",
+  "expectedHead": "5493b22da9d296a1d91208775aefd9c380a69b79",
+  "executorSha256": "377e84b3dda7ce35772fbbcd41d83a78f9e3d52cb2ea28d4c9be1e16688f8218",
+  "candidates": [
+    {
+      "path": ".tools/pythonlibs",
+      "files": 26,
+      "bytes": 606501,
+      "links": 0,
+      "entries": 31,
+      "fingerprint": "36f32b6d875878f7c241d29977deef425943c861505f0caaa65aa9ebead63e57"
+    },
+    {
+      "path": ".tools/pnpm/package",
+      "files": 454,
+      "bytes": 22861430,
+      "links": 0,
+      "entries": 560,
+      "fingerprint": "9c5fcdb4e022d7e8d4001e88448c86d1df65a9625792b013357f77cec9c431a7"
+    },
+    {
+      "path": "node_modules",
+      "files": 26430,
+      "bytes": 489111443,
+      "links": 1268,
+      "entries": 31190,
+      "fingerprint": "a9f84957c8a736175ed91e10a980ee7a918a47c7ee5464dddd04b36367fcf52a"
+    },
+    {
+      "path": "apps/web/node_modules",
+      "files": 9,
+      "bytes": 4464,
+      "links": 15,
+      "entries": 34,
+      "fingerprint": "93cd68a0893542346963a5727ea14031513cdb75ca5ebb9d4a60fe5277353dda"
+    }
+  ],
+  "keep": {
+    ".tools/dotnet-home": {
+      "files": 13,
+      "bytes": 2881013,
+      "links": 0,
+      "entries": 22,
+      "fingerprint": "158a3c213251c4331033147bd4926409a23b6eab151f2a820d1fe182d435cfa5"
+    }
+  },
+  "occupancy": {
+    "containers": 0,
+    "paths": [
+      {
+        "path": ".tools/pythonlibs",
+        "exitCode": 1,
+        "stdoutEmpty": true,
+        "stderrEmpty": true
+      },
+      {
+        "path": ".tools/pnpm/package",
+        "exitCode": 1,
+        "stdoutEmpty": true,
+        "stderrEmpty": true
+      },
+      {
+        "path": "node_modules",
+        "exitCode": 1,
+        "stdoutEmpty": true,
+        "stderrEmpty": true
+      },
+      {
+        "path": "apps/web/node_modules",
+        "exitCode": 1,
+        "stdoutEmpty": true,
+        "stderrEmpty": true
+      }
+    ],
+    "acceptance": "no open descriptors; no VM exception"
+  },
+  "copyReceiptSha256": "e7c2524a61401b720c36e033fc2e2a1ed2e70f67e5f1af737b1d929af040ffe1"
+}

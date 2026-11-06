@@ -1,0 +1,53 @@
+{
+  "state": {
+    "command": [
+      "docker",
+      "--context",
+      "desktop-linux",
+      "inspect",
+      "--format",
+      "{{json .State}}",
+      "acd04d17e97dce9861e2bec5257ba804a1b614edeac837a863c53af4c8eb1f16"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "3ffac3d55244cbfae9f3bac75492922729cc36e768e1a261b0a663838e8e5813",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout": "{\"Status\":\"running\",\"Running\":true,\"Paused\":false,\"Restarting\":false,\"OOMKilled\":false,\"Dead\":false,\"Pid\":49767,\"ExitCode\":0,\"Error\":\"\",\"StartedAt\":\"2026-11-06T07:59:02.208717462Z\",\"FinishedAt\":\"0001-01-01T00:00:00Z\",\"Health\":{\"Status\":\"healthy\",\"FailingStreak\":0,\"Log\":[{\"Start\":\"2026-11-06T08:07:18.035544886Z\",\"End\":\"2026-11-06T08:07:18.083031678Z\",\"ExitCode\":0,\"Output\":\"/var/run/postgresql:5432 - accepting connections\\n\"},{\"Start\":\"2026-11-06T08:07:20.083876346Z\",\"End\":\"2026-11-06T08:07:20.131312096Z\",\"ExitCode\":0,\"Output\":\"/var/run/postgresql:5432 - accepting connections\\n\"},{\"Start\":\"2026-11-06T08:07:22.133371597Z\",\"End\":\"2026-11-06T08:07:22.18144743Z\",\"ExitCode\":0,\"Output\":\"/var/run/postgresql:5432 - accepting connections\\n\"},{\"Start\":\"2026-11-06T08:07:24.186285125Z\",\"End\":\"2026-11-06T08:07:24.235474042Z\",\"ExitCode\":0,\"Output\":\"/var/run/postgresql:5432 - accepting connections\\n\"},{\"Start\":\"2026-11-06T08:07:26.236893376Z\",\"End\":\"2026-11-06T08:07:26.284944209Z\",\"ExitCode\":0,\"Output\":\"/var/run/postgresql:5432 - accepting connections\\n\"}]}}\n",
+    "stderr": ""
+  },
+  "events": {
+    "command": [
+      "docker",
+      "--context",
+      "desktop-linux",
+      "events",
+      "--since",
+      "2026-11-06T08:05:15Z",
+      "--until",
+      "2026-11-06T08:06:00Z",
+      "--filter",
+      "container=acd04d17e97dce9861e2bec5257ba804a1b614edeac837a863c53af4c8eb1f16",
+      "--format",
+      "{{json .}}"
+    ],
+    "exitCode": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout": "",
+    "stderr": ""
+  },
+  "guard": {
+    "command": [
+      "ps",
+      "-p",
+      "271",
+      "-o",
+      "pid=,lstart=,args="
+    ],
+    "exitCode": 1,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout": "",
+    "stderr": ""
+  }
+}

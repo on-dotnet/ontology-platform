@@ -1,0 +1,44 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261106-35",
+  "testedCommit": "5493b22da9d296a1d91208775aefd9c380a69b79",
+  "startedUtc": "2026-11-06T08:03:59.405Z",
+  "checks": [
+    {
+      "name": "http_state_unchanged_after_targeted_audit_fault",
+      "status": "PASS"
+    }
+  ],
+  "http": [
+    {
+      "method": "GET",
+      "route": "/api/v1/connections/{id}",
+      "status": 200,
+      "durationMs": 26,
+      "jsonBody": true
+    },
+    {
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/test",
+      "status": 503,
+      "durationMs": 31,
+      "jsonBody": true,
+      "code": "dependency_unavailable"
+    },
+    {
+      "method": "GET",
+      "route": "/api/v1/connections/{id}",
+      "status": 200,
+      "durationMs": 26,
+      "jsonBody": true
+    }
+  ],
+  "scope": "ONE_HTTP_ACTION_ONLY",
+  "databaseRollbackLeaseFenceEvidence": "NOT_RUN_BY_THIS_CONSUMER",
+  "action": "audit-fail",
+  "connectionId": "22c83adc68c0444097e59402c1648b20",
+  "auditStage": "start",
+  "commandKey": "b704770efc8460ac7bada45738cd9e7b07dd0a7d80041ff7671d696fe6c9c074",
+  "status": "PASS",
+  "completedUtc": "2026-11-06T08:04:00.789Z"
+}

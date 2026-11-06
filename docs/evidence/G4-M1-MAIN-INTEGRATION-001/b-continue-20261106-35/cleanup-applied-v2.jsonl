@@ -1,0 +1,10 @@
+{"phase": "BEFORE", "planSha256": "441957e55fd1cecffc0f8d918262d100ec1b39d3badf4e1484c24279062133b6", "occupancy": {"containers": 0, "paths": [{"path": ".tools/pythonlibs", "exitCode": 1, "stdoutEmpty": true, "stderrEmpty": true}, {"path": ".tools/pnpm/package", "exitCode": 1, "stdoutEmpty": true, "stderrEmpty": true}, {"path": "node_modules", "exitCode": 1, "stdoutEmpty": true, "stderrEmpty": true}, {"path": "apps/web/node_modules", "exitCode": 1, "stdoutEmpty": true, "stderrEmpty": true}], "acceptance": "no open descriptors; no VM exception"}}
+{"phase": "COMMAND", "path": ".tools/pythonlibs", "operation": "shutil.rmtree", "expectedFingerprint": "36f32b6d875878f7c241d29977deef425943c861505f0caaa65aa9ebead63e57"}
+{"phase": "AFTER", "path": ".tools/pythonlibs", "exitCode": 0, "diagnostic": "lstat ENOENT"}
+{"phase": "COMMAND", "path": ".tools/pnpm/package", "operation": "shutil.rmtree", "expectedFingerprint": "9c5fcdb4e022d7e8d4001e88448c86d1df65a9625792b013357f77cec9c431a7"}
+{"phase": "AFTER", "path": ".tools/pnpm/package", "exitCode": 0, "diagnostic": "lstat ENOENT"}
+{"phase": "COMMAND", "path": "node_modules", "operation": "shutil.rmtree", "expectedFingerprint": "a9f84957c8a736175ed91e10a980ee7a918a47c7ee5464dddd04b36367fcf52a"}
+{"phase": "AFTER", "path": "node_modules", "exitCode": 0, "diagnostic": "lstat ENOENT"}
+{"phase": "COMMAND", "path": "apps/web/node_modules", "operation": "shutil.rmtree", "expectedFingerprint": "93cd68a0893542346963a5727ea14031513cdb75ca5ebb9d4a60fe5277353dda"}
+{"phase": "AFTER", "path": "apps/web/node_modules", "exitCode": 0, "diagnostic": "lstat ENOENT"}
+{"phase": "COMPLETE", "keepVerified": true, "deleted": 4, "physicalBytesFreed": "NOT_VERIFIED", "vmProcess": "NOT_TOUCHED", "openDescriptorReclamation": "NOT_VERIFIED"}

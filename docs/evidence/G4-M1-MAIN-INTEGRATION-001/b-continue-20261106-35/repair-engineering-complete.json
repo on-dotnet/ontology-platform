@@ -1,0 +1,62 @@
+{
+  "status": "PASS",
+  "scope": "Final repair engineering checks only; original Run35 product failure retained",
+  "sourceHashes": {
+    "experiments/g4-m1-main-integration/runtime.py": "62c742a1a2d862cd82e89f3af5ee60418e546a6aa417daae562291b011fde8f8",
+    "experiments/g4-m1-main-integration/tests.py": "c9cf23c223ebc7ac28741cfb03401d1a026a1090ad0d912b110b135733ab853d"
+  },
+  "taskTests": {
+    "command": [
+      "/usr/bin/sandbox-exec",
+      "-p",
+      "(version 1) (allow default) (deny network-outbound (remote ip \"*:*\")) (allow network-outbound (remote ip \"localhost:*\"))",
+      "/opt/homebrew/opt/python@3.13/bin/python3.13",
+      "-B",
+      "experiments/g4-m1-main-integration/tests.py"
+    ],
+    "startedAtUtc": "2026-11-06T08:52:22.966156+00:00",
+    "endedAtUtc": "2026-11-06T08:52:57.256859+00:00",
+    "elapsedSeconds": 34.290442708996125,
+    "exitCode": 0,
+    "inputHashes": {
+      "experiments/g4-m1-main-integration/runtime.py": "62c742a1a2d862cd82e89f3af5ee60418e546a6aa417daae562291b011fde8f8",
+      "experiments/g4-m1-main-integration/tests.py": "c9cf23c223ebc7ac28741cfb03401d1a026a1090ad0d912b110b135733ab853d"
+    },
+    "inputDrift": false,
+    "logSha256": "f7a01ef32c18917f94afbdd484ffd4ef07870dd0568f9b77dd05aaa76e33dfee",
+    "executorSha256": "b26e7695313c4c2640caec8a3414ca239d86e89e132e3286c3a72643da4281d3"
+  },
+  "selfTest": {
+    "command": [
+      "/usr/bin/sandbox-exec",
+      "-p",
+      "(version 1) (allow default) (deny network-outbound (remote ip \"*:*\")) (allow network-outbound (remote ip \"localhost:*\"))",
+      "pwsh",
+      "-NoProfile",
+      "-File",
+      "scripts/verify.ps1",
+      "-SelfTest"
+    ],
+    "startedAtUtc": "2026-11-06T08:52:57.257534+00:00",
+    "endedAtUtc": "2026-11-06T09:01:48.060507+00:00",
+    "elapsedSeconds": 530.8000374170078,
+    "exitCode": 0,
+    "inputHashes": {
+      "experiments/g4-m1-main-integration/runtime.py": "62c742a1a2d862cd82e89f3af5ee60418e546a6aa417daae562291b011fde8f8",
+      "experiments/g4-m1-main-integration/tests.py": "c9cf23c223ebc7ac28741cfb03401d1a026a1090ad0d912b110b135733ab853d"
+    },
+    "inputDrift": false,
+    "logSha256": "5850b4314cde2c6083b817a75d2d3ff4f1f67a5e699e30e04b4e5fd75cb8624c",
+    "executorSha256": "b26e7695313c4c2640caec8a3414ca239d86e89e132e3286c3a72643da4281d3"
+  },
+  "reviewPackageTests": 129,
+  "reviewPackageFailures": 0,
+  "newStableFullAcceptance": "NOT_RUN",
+  "nextRun": "b-continue-20261106-36",
+  "apiCompatibility": "Original API100s methods preserved exactly; no new strict-generation guarantee for API",
+  "readbackUnchanged": true,
+  "scopeFiles": [
+    "experiments/g4-m1-main-integration/runtime.py",
+    "experiments/g4-m1-main-integration/tests.py"
+  ]
+}
