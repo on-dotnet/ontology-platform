@@ -51,4 +51,18 @@ class EnvironmentTests(unittest.TestCase):
         self.assertEqual(a['contentKey'],b['contentKey'])
         self.assertNotEqual(a['workspaceKey'],b['workspaceKey'])
 
+    def test_web_marker_ignores_backend_key_and_binds_web_locks(self):
+        m=self.load()
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory).resolve();(root/'apps/web').mkdir(parents=True)
+            for name in ('package.json','apps/web/package.json','pnpm-lock.yaml','pnpm-workspace.yaml','.node-version'):
+                (root/name).write_text('same')
+            admission={'pnpm':{'integrity':'approved'},'files':[{'path':'node','sha256':'abc'}]}
+            old=root/'artifacts/workflow/TASK/environment/old-backend-key'
+            new=old.with_name('new-backend-key')
+            first=m.web_marker(root,old,admission)
+            self.assertEqual(first,m.web_marker(root,new,admission))
+            (root/'pnpm-lock.yaml').write_text('changed')
+            self.assertNotEqual(first,m.web_marker(root,new,admission))
+
 if __name__=='__main__': unittest.main()

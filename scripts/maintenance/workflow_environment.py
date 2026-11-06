@@ -105,7 +105,7 @@ def locks(root):
         projects.append(dict(path=str(project.relative_to(root)),packages=sorted(expected)))
         for p in (project,lock):inputs[str(p.relative_to(root))]=digest(p.read_bytes())
     require(declared=={(name,row[0]) for name,row in SDK_ARCHIVES.items()},'SDK_DECLARATION_DRIFT')
-    for name in ('global.json','Directory.Build.props','Directory.Build.targets','Directory.Packages.props','NuGet.Config','package.json','pnpm-lock.yaml','pnpm-workspace.yaml','apps/web/package.json'):
+    for name in ('global.json','Directory.Build.props','Directory.Build.targets','Directory.Packages.props','NuGet.Config','package.json','pnpm-lock.yaml','pnpm-workspace.yaml','apps/web/package.json','.node-version'):
         p=root/name
         if p.is_file():inputs[name]=digest(p.read_bytes())
     require(json.loads((root/'global.json').read_text())['sdk']['version']=='10.0.402','SDK_VERSION_DRIFT')
@@ -228,7 +228,9 @@ def verify_web_cache(web,store):
     with sqlite3.connect('file:'+str(store)+'?mode=ro&immutable=1',uri=True) as db:
         indexed={key.split('\t')[-1]:(key,blob) for key,blob in db.execute('select key,data from package_index')}
     verified=[]
+    ordinary(web/'node_modules/.pnpm')
     for folder in sorted((web/'node_modules/.pnpm').iterdir()):
+        ordinary(folder)
         modules=folder/'node_modules'
         if not modules.is_dir():continue
         candidates=[]
@@ -246,7 +248,7 @@ def verify_web_cache(web,store):
             require(index['algo']=='sha512','INDEX_ALGORITHM')
             files=[]
             for name,entry in index['files'].items():
-                path=package/name
+                path=ordinary(package/name)
                 require('..' not in Path(name).parts and not Path(name).is_absolute(),'INDEX_PATH')
                 require(path.is_file() and not path.is_symlink(),'INDEX_FILE_MISSING')
                 actual=hashlib.sha512(path.read_bytes()).hexdigest()
@@ -267,6 +269,15 @@ def verify_web_cache(web,store):
     return verified
 
 
+def web_marker(root,home,admission):
+    """Web状态按自身输入持久化；后端锁/项目变化不清空已核验Web材料。"""
+    files={name:digest(ordinary(root/name).read_bytes()) for name in ('package.json','apps/web/package.json','pnpm-lock.yaml','pnpm-workspace.yaml','.node-version')}
+    node_files=[row for row in admission['files'] if '/node@24/' in row['path']]
+    key=digest(canonical(dict(files=files,pnpm=admission['pnpm']['integrity'],node=node_files,
+                              platform=platform.system()+'-'+platform.machine(),osVersion=platform.mac_ver()[0])))
+    return ordinary(home.parents[1]/'web-state'/(key+'.json'))
+
+
 def prepare_web(root,home,admission,projects,env,run_dir,node):
     """逐文件确认已审内容后仅首次复制；所有链接、shim及pnpm工作区重绑定本树。"""
     source=Path(admission['webSource']['root'])
@@ -274,9 +285,10 @@ def prepare_web(root,home,admission,projects,env,run_dir,node):
     for name in ('package.json','apps/web/package.json','pnpm-lock.yaml','pnpm-workspace.yaml'):
         require((source/name).read_bytes()==(root/name).read_bytes(),'WEB_LOCK_DRIFT')
     copied=0
-    marker=home/'web-ready.json'
-    if marker.exists():
-        require(json.loads(marker.read_text())['root']==str(root),'WEB_OLD_ROOT')
+    marker=web_marker(root,home,admission)
+    legacy=[p for p in home.parent.glob('*/web-ready.json') if ordinary(p).is_file() and json.loads(p.read_text()).get('root')==str(root)]
+    if marker.exists() or legacy:
+        if marker.exists():require(json.loads(marker.read_text())['root']==str(root),'WEB_OLD_ROOT')
         rows=verify_web_cache(root,store)
     else:
         rows=verify_web_cache(source,store)
@@ -346,7 +358,7 @@ def prepare(root,task):
     require({k:v['contentHash'] for k,v in approved.items()}==packages,'APPROVED_CURRENT_LOCK_CLOSURE')
     for row in admission['files']:
         p=ordinary(row['path']);require(p.is_file() and digest(p.read_bytes())==row['sha256'],'APPROVED_TOOL_DRIFT')
-    inputs=dict(platform=platform.system()+'-'+platform.machine(),files=input_files,tools=admission['files'],sdk=SDK_ARCHIVES,
+    inputs=dict(platform=platform.system()+'-'+platform.machine(),osVersion=platform.mac_ver()[0],files=input_files,tools=admission['files'],sdk=SDK_ARCHIVES,
                 archives={k:v['archiveSha256'] for k,v in approved.items()})
     identity=identities(inputs,root)
     home=ordinary(root/'artifacts/workflow'/task/'environment'/identity['contentKey'])
