@@ -1,0 +1,39 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261106-36",
+  "testedCommit": "a789cdd93ed3544603521e4edc91a9b11d4b30fd",
+  "command": [
+    "/opt/homebrew/opt/node@24/bin/node",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/experiments/g4-m1-main-integration/fault.mjs",
+    "--run-id",
+    "b-continue-20261106-36",
+    "--expected-head",
+    "a789cdd93ed3544603521e4edc91a9b11d4b30fd",
+    "--resource-manifest",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261106-36/resource-manifest.json",
+    "--runtime-file",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261106-36/runtime.json",
+    "--action",
+    "probe-denial",
+    "--evidence-dir",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261106-36/fault-source-owner"
+  ],
+  "startedAtUtc": "2026-11-06T09:50:43.812547+00:00",
+  "endedAtUtc": "2026-11-06T09:50:55.027449+00:00",
+  "elapsedSeconds": 11.214850915974239,
+  "exitCode": 0,
+  "timingStatus": "OBSERVED",
+  "timedOut": false,
+  "executedInputDrift": false,
+  "inputHashes": {
+    "/opt/homebrew/opt/node@24/bin/node": "0d78c9bca217f53c2dc21a067246ee4a81c1f4fa111ee64d572b45fa1ff39189",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/experiments/g4-m1-main-integration/fault.mjs": "2b8c1b5a2951d5c9f3789ef469d0ec796009a7762e3fa4f957ccf3fdc3a5af48",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261106-36/resource-manifest.json": "cd5fae7a45ba7889328044d0a161603c3dddebccadad7a21d3ad69cf0e80f249",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261106-36/runtime.json": "7c133b2ce18eff8a7b47efa37989e8ccd809714df7d68312914681c8fcd4e000"
+  },
+  "manifestSha256": "cd5fae7a45ba7889328044d0a161603c3dddebccadad7a21d3ad69cf0e80f249",
+  "commandSha256": "711dfc32f179fed2673d55db0dc9ea73839463171cd10d0cefe7d7cd42074603",
+  "logSha256": "e159143c3265b5fc14a975b18ed6625a677ee4b8f1410b7c3fe50f460f248e0b",
+  "logBytes": 273,
+  "logVisibility": "PRIVATE"
+}

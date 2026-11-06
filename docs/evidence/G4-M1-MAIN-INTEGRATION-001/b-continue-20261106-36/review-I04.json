@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "reviewer": "/root/consumer_review",
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261106-36",
+  "testedCommit": "a789cdd93ed3544603521e4edc91a9b11d4b30fd",
+  "gateSha256": "f8b04d1f95b11f96a66c167ba37d07428e1ccd7fe497c941511a239e0d08c38a",
+  "rawReview": "Run36 I04独立只读审查PASS，无P0/P1，同T/manifest/build未漂移。真实拒绝exit134，42501/CREATE SCHEMA connections/数据库CREATE权限拒绝/G4Composition.InitializeG4Async调用准确。G4disabled及ApplyMigrations=false未迁移；恢复后首次/重复迁移投影完全相同，专属connections历史准确。15张G3表及原52审计摘要保持；源PG前后字节相同/历史0。切换退休4容器2卷；两卷BEFORE→rm0→准确缺席1，余对象及KEEP保持。G3入口305Exec真实退出，6端口释放。三次健康重启后Web实际namespace与API一致，准确issuer OIDC302跳转通过；仅证明登录入口恢复，不扩大成三次完整fresh登录。未访问live或写文件，I06及I01/I03闭合仍待证据。",
+  "hashes": {
+    "migration-complete.json": "80e2359a2215a912095f92d241ac1500c82ead6bec265fda33cfdbc6fffc4af5",
+    "permissionRaw": "07b9021aae8ba08d9c7c0a9d530e5ae92ec220bed40881df0da050e57ad8c524",
+    "firstAndRepeat": "270dcfea1002f9972e18ae8f23b0eba3ad0a9bf348d35dbac1dec1cf0865544c",
+    "sourceBeforeAfter": "c9b0727fc5e727ce30a91ab41f7b18c0f6bec0c7b26941c2c026e3ae951cd186",
+    "retiredVolumes": "ed02b9d7fc1d281f9613a379087cddf9b232d9a6db4a8bd3570d7718b8cd6ffa",
+    "ingressTransition": "33b0c8d25b71e22e19c1cc1d31cf1af04a83e302d6a5077140f6f7bddfc02d4a"
+  }
+}

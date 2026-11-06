@@ -1,0 +1,85 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261106-36",
+  "testedCommit": "a789cdd93ed3544603521e4edc91a9b11d4b30fd",
+  "command": [
+    "docker",
+    "--context",
+    "desktop-linux",
+    "exec",
+    "-i",
+    "05a02f0b1a4d18712e55603d2223cf4e0a8aadae54d6521a8fb51ef447481889",
+    "psql",
+    "-X",
+    "-qAt",
+    "-U",
+    "postgres",
+    "-d",
+    "fixture",
+    "-v",
+    "ON_ERROR_STOP=1"
+  ],
+  "pid": 66608,
+  "startedAtUtc": "2026-11-06T09:55:53.101691+00:00",
+  "endedAtUtc": "2026-11-06T09:57:11.762928+00:00",
+  "elapsedSeconds": 78.66084633301944,
+  "exitCode": 0,
+  "timingStatus": "OBSERVED",
+  "stderrFile": "source-session-3193bcb1d30f4adf85ffa88937d1ec71.stderr",
+  "stderrSha256": "1171843e1276fce1fa40aadb886df7e20ce93fbc18a2a8478aa2524935de47d7",
+  "stderrBytes": 46,
+  "stderrComplete": true,
+  "processGroupReleased": true,
+  "failureCode": null,
+  "cleanupFailure": null,
+  "queries": [
+    {
+      "querySha256": "75f10b70446b500d99611e78cb654d19dfa24765ccf6ba6eaa6a0867365f7bf3",
+      "startedAtUtc": "2026-11-06T09:55:56.151516+00:00",
+      "status": "RECEIVED_JSON",
+      "endedAtUtc": "2026-11-06T09:55:56.153649+00:00"
+    },
+    {
+      "querySha256": "7300f1424ebb3ce167eae051b83115436251f7fcae36c2466101be945b6e9bd2",
+      "startedAtUtc": "2026-11-06T09:56:07.209660+00:00",
+      "status": "RECEIVED_JSON",
+      "endedAtUtc": "2026-11-06T09:56:07.210336+00:00"
+    },
+    {
+      "querySha256": "7300f1424ebb3ce167eae051b83115436251f7fcae36c2466101be945b6e9bd2",
+      "startedAtUtc": "2026-11-06T09:56:07.271885+00:00",
+      "status": "RECEIVED_JSON",
+      "endedAtUtc": "2026-11-06T09:56:07.273160+00:00"
+    },
+    {
+      "querySha256": "7300f1424ebb3ce167eae051b83115436251f7fcae36c2466101be945b6e9bd2",
+      "startedAtUtc": "2026-11-06T09:56:07.334733+00:00",
+      "status": "RECEIVED_JSON",
+      "endedAtUtc": "2026-11-06T09:56:07.335928+00:00"
+    },
+    {
+      "querySha256": "7300f1424ebb3ce167eae051b83115436251f7fcae36c2466101be945b6e9bd2",
+      "startedAtUtc": "2026-11-06T09:56:07.387675+00:00",
+      "status": "RECEIVED_JSON",
+      "endedAtUtc": "2026-11-06T09:56:07.388453+00:00"
+    },
+    {
+      "querySha256": "7300f1424ebb3ce167eae051b83115436251f7fcae36c2466101be945b6e9bd2",
+      "startedAtUtc": "2026-11-06T09:56:07.449662+00:00",
+      "status": "RECEIVED_JSON",
+      "endedAtUtc": "2026-11-06T09:56:07.450421+00:00"
+    },
+    {
+      "querySha256": "7300f1424ebb3ce167eae051b83115436251f7fcae36c2466101be945b6e9bd2",
+      "startedAtUtc": "2026-11-06T09:56:07.511234+00:00",
+      "status": "RECEIVED_JSON",
+      "endedAtUtc": "2026-11-06T09:56:07.511859+00:00"
+    },
+    {
+      "querySha256": "7300f1424ebb3ce167eae051b83115436251f7fcae36c2466101be945b6e9bd2",
+      "startedAtUtc": "2026-11-06T09:57:00.105689+00:00",
+      "status": "RECEIVED_JSON",
+      "endedAtUtc": "2026-11-06T09:57:00.107461+00:00"
+    }
+  ]
+}

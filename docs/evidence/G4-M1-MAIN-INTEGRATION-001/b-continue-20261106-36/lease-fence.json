@@ -1,0 +1,41 @@
+{
+  "status": "PASS",
+  "before": {
+    "snapshots": 2,
+    "audits": 3
+  },
+  "jobId": "62497cffcaf4454f8a8c739ce19c1e45",
+  "first": {
+    "status": "RUNNING",
+    "fence": 1,
+    "attempt": 1,
+    "expired": false,
+    "snapshot": null
+  },
+  "expired": {
+    "status": "RUNNING",
+    "fence": 1,
+    "attempt": 1,
+    "expired": true,
+    "snapshot": null
+  },
+  "takeover": {
+    "status": "RUNNING",
+    "fence": 2,
+    "attempt": 2,
+    "expired": false,
+    "snapshot": null
+  },
+  "terminal": {
+    "status": "SUCCEEDED",
+    "fence": 2,
+    "attempt": 2,
+    "expired": null,
+    "snapshot": "d55c4fda0eb74e8c80b2c688b365295f"
+  },
+  "after": {
+    "snapshots": 3,
+    "audits": 4
+  },
+  "oldWorkerRecoveredWithoutDuplicate": true
+}

@@ -1,0 +1,191 @@
+{
+  "status": "PASS",
+  "cases": [
+    {
+      "stage": "start",
+      "beforeCount": "0",
+      "afterCount": "0",
+      "httpFailure": {
+        "taskId": "G4-M1-MAIN-INTEGRATION-001",
+        "runId": "b-continue-20261106-36",
+        "testedCommit": "a789cdd93ed3544603521e4edc91a9b11d4b30fd",
+        "startedUtc": "2026-11-06T09:52:46.930Z",
+        "checks": [
+          {
+            "name": "http_state_unchanged_after_targeted_audit_fault",
+            "status": "PASS"
+          }
+        ],
+        "http": [
+          {
+            "method": "GET",
+            "route": "/api/v1/connections/{id}",
+            "status": 200,
+            "durationMs": 25,
+            "jsonBody": true
+          },
+          {
+            "method": "POST",
+            "route": "/api/v1/connections/{id}/test",
+            "status": 503,
+            "durationMs": 27,
+            "jsonBody": true,
+            "code": "dependency_unavailable"
+          },
+          {
+            "method": "GET",
+            "route": "/api/v1/connections/{id}",
+            "status": 200,
+            "durationMs": 27,
+            "jsonBody": true
+          }
+        ],
+        "scope": "ONE_HTTP_ACTION_ONLY",
+        "databaseRollbackLeaseFenceEvidence": "NOT_RUN_BY_THIS_CONSUMER",
+        "action": "audit-fail",
+        "connectionId": "372af78238fa48d1868809b511474255",
+        "auditStage": "start",
+        "commandKey": "b50615570653b23b7b4c284552abaa952a3d7be41e9903ced1dc7566f2104c3c",
+        "status": "PASS",
+        "completedUtc": "2026-11-06T09:52:48.284Z"
+      },
+      "recovery": {
+        "taskId": "G4-M1-MAIN-INTEGRATION-001",
+        "runId": "b-continue-20261106-36",
+        "testedCommit": "a789cdd93ed3544603521e4edc91a9b11d4b30fd",
+        "startedUtc": "2026-11-06T09:53:10.228Z",
+        "checks": [
+          {
+            "name": "same_command_succeeds_after_fault_removed",
+            "status": "PASS"
+          }
+        ],
+        "http": [
+          {
+            "method": "GET",
+            "route": "/api/v1/connections/{id}",
+            "status": 200,
+            "durationMs": 24,
+            "jsonBody": true
+          },
+          {
+            "method": "POST",
+            "route": "/api/v1/connections/{id}/test",
+            "status": 200,
+            "durationMs": 39,
+            "jsonBody": true
+          },
+          {
+            "method": "GET",
+            "route": "/api/v1/connections/{id}",
+            "status": 200,
+            "durationMs": 33,
+            "jsonBody": true
+          }
+        ],
+        "scope": "ONE_HTTP_ACTION_ONLY",
+        "databaseRollbackLeaseFenceEvidence": "NOT_RUN_BY_THIS_CONSUMER",
+        "action": "audit-retry",
+        "connectionId": "372af78238fa48d1868809b511474255",
+        "auditStage": "start",
+        "commandKey": "b50615570653b23b7b4c284552abaa952a3d7be41e9903ced1dc7566f2104c3c",
+        "probeId": "862af4fbe29d414ba66de7f3109d055b",
+        "status": "PASS",
+        "completedUtc": "2026-11-06T09:53:11.593Z"
+      }
+    },
+    {
+      "stage": "complete",
+      "beforeCount": "0",
+      "afterCount": "1",
+      "httpFailure": {
+        "taskId": "G4-M1-MAIN-INTEGRATION-001",
+        "runId": "b-continue-20261106-36",
+        "testedCommit": "a789cdd93ed3544603521e4edc91a9b11d4b30fd",
+        "startedUtc": "2026-11-06T09:53:44.518Z",
+        "checks": [
+          {
+            "name": "http_state_unchanged_after_targeted_audit_fault",
+            "status": "PASS"
+          }
+        ],
+        "http": [
+          {
+            "method": "GET",
+            "route": "/api/v1/connections/{id}",
+            "status": 200,
+            "durationMs": 25,
+            "jsonBody": true
+          },
+          {
+            "method": "POST",
+            "route": "/api/v1/connections/{id}/test",
+            "status": 503,
+            "durationMs": 39,
+            "jsonBody": true,
+            "code": "dependency_unavailable"
+          },
+          {
+            "method": "GET",
+            "route": "/api/v1/connections/{id}",
+            "status": 200,
+            "durationMs": 24,
+            "jsonBody": true
+          }
+        ],
+        "scope": "ONE_HTTP_ACTION_ONLY",
+        "databaseRollbackLeaseFenceEvidence": "NOT_RUN_BY_THIS_CONSUMER",
+        "action": "audit-fail",
+        "connectionId": "372af78238fa48d1868809b511474255",
+        "auditStage": "complete",
+        "commandKey": "1bc117e85806ffd2fc16127e7ed374bd333871e5e8a682d976d5b5d3f16a26f4",
+        "status": "PASS",
+        "completedUtc": "2026-11-06T09:53:45.853Z"
+      },
+      "recovery": {
+        "taskId": "G4-M1-MAIN-INTEGRATION-001",
+        "runId": "b-continue-20261106-36",
+        "testedCommit": "a789cdd93ed3544603521e4edc91a9b11d4b30fd",
+        "startedUtc": "2026-11-06T09:54:07.777Z",
+        "checks": [
+          {
+            "name": "same_command_replays_recovered_failure_without_false_success",
+            "status": "PASS"
+          }
+        ],
+        "http": [
+          {
+            "method": "GET",
+            "route": "/api/v1/connections/{id}",
+            "status": 200,
+            "durationMs": 24,
+            "jsonBody": true
+          },
+          {
+            "method": "POST",
+            "route": "/api/v1/connections/{id}/test",
+            "status": 200,
+            "durationMs": 23,
+            "jsonBody": true
+          },
+          {
+            "method": "GET",
+            "route": "/api/v1/connections/{id}",
+            "status": 200,
+            "durationMs": 22,
+            "jsonBody": true
+          }
+        ],
+        "scope": "ONE_HTTP_ACTION_ONLY",
+        "databaseRollbackLeaseFenceEvidence": "NOT_RUN_BY_THIS_CONSUMER",
+        "action": "audit-replay-failed",
+        "connectionId": "372af78238fa48d1868809b511474255",
+        "auditStage": "complete",
+        "commandKey": "1bc117e85806ffd2fc16127e7ed374bd333871e5e8a682d976d5b5d3f16a26f4",
+        "probeId": "265755e135fd412e89311d924e24aa1b",
+        "status": "PASS",
+        "completedUtc": "2026-11-06T09:54:09.013Z"
+      }
+    }
+  ]
+}

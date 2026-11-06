@@ -1,0 +1,32 @@
+{
+  "status": "PASS",
+  "reviewer": "/root/consumer_review",
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261106-36",
+  "testedCommit": "a789cdd93ed3544603521e4edc91a9b11d4b30fd",
+  "manifestSha256": "cd5fae7a45ba7889328044d0a161603c3dddebccadad7a21d3ad69cf0e80f249",
+  "drivers": {
+    "run.py": "5b116dbecb5be44588f83ba48be243a8eecb39677c666dd61835dfcf444e2f57",
+    "consumer_check.py": "a76a6729baacff296880419cdc434dd927c8272afd3bbd3779661a442f29e450",
+    "runtime.py": "62c742a1a2d862cd82e89f3af5ee60418e546a6aa417daae562291b011fde8f8",
+    "pg_fixture.py": "0b3e95134d76bb356fa2f14f21da58886675d6c553b2daf2f643895dc4591f51",
+    "module-tests.py": "0d8485fab6d9f037ce1851984f4c6d0f40b628775f66302cc4740ed2f2ca0d96",
+    "startup-boundary.py": "256bba53361f407d0a4071c9c7bd951019418e2193e56aaa604155510d04289c",
+    "migration-boundary.py": "c5c154ee542faa2120276fcd9e096e81b3084194fc2060d6e614d8d270257a18",
+    "contract-check.mjs": "3a7f662352a1d182f0f53f96703cfbb1f8d6f152443d3ab5bc8b2a525c5b01ea",
+    "http.mjs": "c98e018d1748a3bb57a2ee70e71574633a1616e238528eb2f45c02aba83281eb",
+    "browser.mjs": "0af8da9bbd7202fb83d4c0e86f3b0b4122dd1ba995a7db6102a6a630c9cfbf8f",
+    "fault.mjs": "2b8c1b5a2951d5c9f3789ef469d0ec796009a7762e3fa4f957ccf3fdc3a5af48",
+    "g3-compatibility.mjs": "705d972ae2f48107c445be8ae575096ee39b55b3b01112e26d1a206923437c9d",
+    "readback.py": "1d5b6001c554043682b7dc94028d9829546e5f05791b170cd5267fd7310f453c",
+    "closeout.py": "fd6b97e94348e72d4dced2e1197b5686971ad01c160a1db0a2af97a7b15f449b",
+    "tests.py": "c9cf23c223ebc7ac28741cfb03401d1a026a1090ad0d912b110b135733ab853d",
+    "host_continuity.py": "abd4385e1b05a86f5a12582a7e95a1fcc4a29c333eb23d2d952229744ed68984",
+    "compose.m1.yaml": "7a3b6ffc11ca7283e3bdaa5d61223df6d1f1b84a2e7c769f3f28aa7a5eea329f",
+    "compose.g3.yaml": "3231f1f0ff3c3d9aabcd8b58b589d1adc0d267c8e2af1335d2b1e5777416c53d",
+    "hooks/pre-push": "5eaef2482b8b75cb1deb7cca9703f591a0a15c2459e49c5192b4382ccb7ad474"
+  },
+  "rawReview": "Run36 R1 actual read-only PASS; one same-T/Run formal R2 allowed. Clean HEAD/19 committed drivers/11 tools;21 locks includeMacRID;168 actual GetContentHash plus shared archives/privatefeed exactSHA;2 privateSDK full members fixed archives. Packagecache only2SDKs,CLI/HTTP/scratch/tmp empty isolated. OS all-network/global-write deny, exactRun/tmp/21obj whitelist, sharedNuGetread deny,-m:1,certgenerationOFF. Incidentfingerprint unchanged;monitor34438 bounded14400secs, continuity not claimed.",
+  "contentHashReceiptSha256": "b313e3fc1c5f4027e62f2449259176dc6ca5582618e23953211fd1805c95e1c6",
+  "contentHashOutputSha256": "2f0346956d3e373a2124b1fc603236157a318a37cc4c966b5ccd4228d8ce12df"
+}

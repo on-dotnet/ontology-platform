@@ -1,0 +1,49 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261106-36",
+  "testedCommit": "a789cdd93ed3544603521e4edc91a9b11d4b30fd",
+  "command": [
+    "docker",
+    "--context",
+    "desktop-linux",
+    "exec",
+    "-i",
+    "05a02f0b1a4d18712e55603d2223cf4e0a8aadae54d6521a8fb51ef447481889",
+    "psql",
+    "-X",
+    "-qAt",
+    "-U",
+    "postgres",
+    "-d",
+    "fixture",
+    "-v",
+    "ON_ERROR_STOP=1"
+  ],
+  "pid": 66619,
+  "startedAtUtc": "2026-11-06T09:55:56.191577+00:00",
+  "endedAtUtc": "2026-11-06T09:57:11.751364+00:00",
+  "elapsedSeconds": 75.55943350002053,
+  "exitCode": 0,
+  "timingStatus": "OBSERVED",
+  "stderrFile": "source-session-c95a69486f56485c9e264460898ee9a8.stderr",
+  "stderrSha256": "1171843e1276fce1fa40aadb886df7e20ce93fbc18a2a8478aa2524935de47d7",
+  "stderrBytes": 46,
+  "stderrComplete": true,
+  "processGroupReleased": true,
+  "failureCode": null,
+  "cleanupFailure": null,
+  "queries": [
+    {
+      "querySha256": "1065dcecdd9ca5810da1d694d1384deb58005e81444ed12aa8fce9cf4265eab9",
+      "startedAtUtc": "2026-11-06T09:55:56.195090+00:00",
+      "status": "RECEIVED_JSON",
+      "endedAtUtc": "2026-11-06T09:55:56.242154+00:00"
+    },
+    {
+      "querySha256": "fa4126bfec224f8ae3622da249f763ccb998ba94f22bbb80f0624f17901959fd",
+      "startedAtUtc": "2026-11-06T09:56:38.247639+00:00",
+      "status": "RECEIVED_JSON",
+      "endedAtUtc": "2026-11-06T09:56:38.248275+00:00"
+    }
+  ]
+}

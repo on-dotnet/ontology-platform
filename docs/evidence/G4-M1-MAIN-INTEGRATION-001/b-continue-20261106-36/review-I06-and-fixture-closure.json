@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "scope": "I06/I01/I03 only; I07 BLOCKED/I08 NOT_RUN",
+  "reviewer": "/root/consumer_review",
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261106-36",
+  "testedCommit": "a789cdd93ed3544603521e4edc91a9b11d4b30fd",
+  "hashes": {
+    "gate-I06.json": "cf3cf9a3aa220abc97051949374acba37b7aefcdcce6a461531b067077000d5b",
+    "fixture-case-closure.json": "e53c14369ae30384ecbc0afd41691a7cb6420076e32caeac3947c0e8c380dc4d",
+    "gate-I01-closure.json": "fe2f48465b2b95aab5d280e710d898767c4e7e8355c5d8046ce2196fc1527f09",
+    "gate-I03-closure.json": "d7125de87f74cab25fa469fc6ee0f02a25cea19bba9f6fb9fd2288124845dc9a",
+    "credential-db-closure.json": "4ac193d5c27285f22b5f0ccb70b0c6d7b12dceef0285297914ce9fbdfbf0e621",
+    "gate-I07.json": "66a3b3a4d436a45696a627d0da00fcdd11a2becd7e566386a00753fef1492d5a"
+  },
+  "rawReview": "263份案例投影逐原日志/命令/程序集核验；780=344PASS+436SKIP，历史260与本轮SKIP并集436/436准确PASS见证。PG9组20例/public7场景；HTTP59/凭据11/跨组织3/schema2通过，原exit2/局部限制保留并后置闭合。三角色ACL恢复、两审计回滚、client持久CANCELLED、catalog真实worker消失+CANCELLED/noSnapshot、lease自然到期1→2且无重复、旧snapshot不变均通过。自然过期/密文清除/轮换/密码恢复通过；跨组织user/profile恢复后freshOIDC原身份；合成引用撤销非产品撤销API。I07确定P1适配缺陷readback718无参__exit__，runtime1295 exc[0]必IndexError；pause68926实际同代际恢复、unpause0/guard-15/released，end先写不能证明调用正常返回。原I07BLOCKED保持。全程只读。"
+}

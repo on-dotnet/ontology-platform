@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "scope": "Pause/client cancellation subcase, not I06 overall",
+  "reviewer": "/root/argv_review",
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261106-36",
+  "testedCommit": "a789cdd93ed3544603521e4edc91a9b11d4b30fd",
+  "hashes": {
+    "pause-pg-source-65788-end.json": "283ffdfd53eddc5ae64f04d24a012363d86b7e410aa602cbf54200ff239fc228",
+    "client-cancel.json": "5b2a3da7ee77403ac0c36f6b2e129ec3b983c22e9ba75b8d2499bede08450685",
+    "commands/fault-client-cancel.json": "87a142f5efc158efc010c736a02c302d187e6fd985978843ecf958e5242f949c"
+  },
+  "rawReview": "Run36恢复/客户端取消子项后验通过，不代表I06整体。同T/manifest/guard脚本散列匹配；主RESTORED，守护随后ALREADY_RESTORED、exit0且回收。9条Docker命令全部exit0，Engine/ID/Image/Created/StartedAt/TaskRun前后一致，4份私有原件0600且字节/长度/SHA与公开投影一致。取消命令exit0，原HTTP报告主动取消，持久CANCELLED/connection_cancelled；body及恢复异常均为空，无异常替换。本次是主先恢复，不冒充并发exit1分支实测。"
+}

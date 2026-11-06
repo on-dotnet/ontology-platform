@@ -1,0 +1,144 @@
+{
+  "containerId": "05a02f0b1a4d18712e55603d2223cf4e0a8aadae54d6521a8fb51ef447481889",
+  "guardPid": 70241,
+  "deadlineSeconds": 19,
+  "guardScriptSha256": "85e29df813795a997b42c40dcf69c2ac3c0cc8c51086f285f11fc10b78bf7a7b",
+  "identity": {
+    "engineId": "7a8785bb-6b6e-4ae4-8065-996f4bf83016",
+    "serverVersion": "29.9.2",
+    "containerId": "05a02f0b1a4d18712e55603d2223cf4e0a8aadae54d6521a8fb51ef447481889",
+    "taskId": "G4-M1-MAIN-INTEGRATION-001",
+    "runId": "b-continue-20261106-36",
+    "image": "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+    "created": "2026-11-06T09:47:47.763350668Z",
+    "startedAt": "2026-11-06T10:02:38.640770428Z"
+  },
+  "startedAtUtc": "2026-11-06T10:09:30.811521+00:00",
+  "status": "PASS",
+  "restore": {
+    "status": "PASS",
+    "reason": "RESTORED",
+    "commands": [
+      {
+        "command": [
+          "docker",
+          "--context",
+          "desktop-linux",
+          "info",
+          "--format",
+          "{{json .}}"
+        ],
+        "startedAtUtc": "2026-11-06T10:09:30.847736+00:00",
+        "exitCode": 0,
+        "timedOut": false,
+        "endedAtUtc": "2026-11-06T10:09:30.921618+00:00",
+        "stdoutBytes": 13152,
+        "stderrBytes": 0,
+        "stdoutSha256": "02912231acf09ef044be721dd7d03dd1c04bfd4ab79eb9ec2f6ec6f2898b54fd",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "command": [
+          "docker",
+          "--context",
+          "desktop-linux",
+          "inspect",
+          "05a02f0b1a4d18712e55603d2223cf4e0a8aadae54d6521a8fb51ef447481889"
+        ],
+        "startedAtUtc": "2026-11-06T10:09:30.921756+00:00",
+        "exitCode": 0,
+        "timedOut": false,
+        "endedAtUtc": "2026-11-06T10:09:30.937332+00:00",
+        "stdoutBytes": 18133,
+        "stderrBytes": 0,
+        "stdoutSha256": "2f53a27aa9883d2c2387f5351042dcb47a29a69ad6afac261a63073edf237c54",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "command": [
+          "docker",
+          "--context",
+          "desktop-linux",
+          "unpause",
+          "05a02f0b1a4d18712e55603d2223cf4e0a8aadae54d6521a8fb51ef447481889"
+        ],
+        "startedAtUtc": "2026-11-06T10:09:30.937480+00:00",
+        "exitCode": 0,
+        "timedOut": false,
+        "endedAtUtc": "2026-11-06T10:09:30.960163+00:00",
+        "stdoutBytes": 65,
+        "stderrBytes": 0,
+        "stdoutSha256": "29ff9859ac0052e816ff8f33c574ed20bd1ac8fdea4b3864b0e139c686b351cf",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "command": [
+          "docker",
+          "--context",
+          "desktop-linux",
+          "info",
+          "--format",
+          "{{json .}}"
+        ],
+        "startedAtUtc": "2026-11-06T10:09:30.960200+00:00",
+        "exitCode": 0,
+        "timedOut": false,
+        "endedAtUtc": "2026-11-06T10:09:31.024142+00:00",
+        "stdoutBytes": 13152,
+        "stderrBytes": 0,
+        "stdoutSha256": "db1b8c36b91ee390509dcb6a41a72f58b3b2bf7f999f74576e986ff370d2cb86",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "command": [
+          "docker",
+          "--context",
+          "desktop-linux",
+          "inspect",
+          "05a02f0b1a4d18712e55603d2223cf4e0a8aadae54d6521a8fb51ef447481889"
+        ],
+        "startedAtUtc": "2026-11-06T10:09:31.024284+00:00",
+        "exitCode": 0,
+        "timedOut": false,
+        "endedAtUtc": "2026-11-06T10:09:31.039978+00:00",
+        "stdoutBytes": 18181,
+        "stderrBytes": 0,
+        "stdoutSha256": "1299b5e7ccba50051b3a8b7d519067c4be0c6eb9c0bf3301e69ae63debf9ebed",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "before": {
+      "running": true,
+      "paused": true,
+      "identityVerified": true
+    },
+    "after": {
+      "running": true,
+      "paused": false,
+      "identityVerified": true
+    }
+  },
+  "guardRestore": null,
+  "guardExitCode": -15,
+  "guardCancelledAfterVerifiedRestore": true,
+  "guardReleased": true,
+  "bodyErrorType": null,
+  "recoveryErrorType": null,
+  "privateOutputs": {
+    "guard.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "privatePath": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261106-36/logs/pause-54d6f6e01c08fe07-guard.stdout"
+    },
+    "guard.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "privatePath": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261106-36/logs/pause-54d6f6e01c08fe07-guard.stderr"
+    },
+    "main.json": {
+      "bytes": 86962,
+      "sha256": "82637a97ab069ca52579d2947dafb25fc6a53915872cc2845d819741b4f7b304",
+      "privatePath": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261106-36/logs/pause-54d6f6e01c08fe07-main.json"
+    }
+  }
+}

@@ -1671,7 +1671,7 @@ class Child:
   if self.returncode is None:self.returncode=0
   return self.returncode
 class PauseExitTests(unittest.TestCase):
- def exercise(self,mode,body):
+ def exercise(self,mode,body,manual=False):
   with tempfile.TemporaryDirectory(dir=runtime.ARTIFACTS) as temporary:
    folder=Path(temporary);records=[]
    guard=runtime.PauseGuard.__new__(runtime.PauseGuard)
@@ -1696,8 +1696,13 @@ class PauseExitTests(unittest.TestCase):
    guard.__class__=Entered
    with patch.dict(vars(runtime),restore_paused_container=lambda identity:result,write_json=write):
     try:
-     with guard:
-      if error:raise error
+     if manual:
+      try:
+       if error:raise error
+      finally:guard.__exit__()
+     else:
+      with guard:
+       if error:raise error
     except BaseException as failure:caught=failure
    if body:self.assertIs(caught,error)
    elif mode in ('normal','wait-budget'):self.assertIsNone(caught)
@@ -1705,12 +1710,30 @@ class PauseExitTests(unittest.TestCase):
    self.assertIsNotNone(guard.guard.poll())
    if mode!='end-fails':
     self.assertEqual(len(records),1)
+    self.assertEqual(records[0]['bodyErrorType'],'RuntimeError' if body else None)
     self.assertEqual(records[0]['status'],'PASS' if mode in ('normal','wait-budget') else 'FAIL')
     self.assertNotIn('Base64',json.dumps(records))
    if mode=='occupied':self.assertEqual(guard.private_paths['main.json'].read_text(),'original')
    else:self.assertEqual(guard.private_paths['main.json'].stat().st_mode&0o777,0o600)
    if mode=='wait-budget':self.assertGreaterEqual(guard.guard.waits[0],19+25)
    if mode=='guard-timeout':self.assertTrue(guard.guard.killed)
+ def test_manual_finally_exit_preserves_body_and_restoration_failures(self):
+  for mode in ('normal','restore-fails','bad-row','bad-json','guard-fails','occupied','end-fails','wait-budget','guard-timeout'):
+   for body in (False,True):
+    with self.subTest(mode=mode,body=body):self.exercise(mode,body,manual=True)
+ def test_manual_finally_after_entry_failure_does_not_mask_original(self):
+  for phase in ('admission','spawn'):
+   with self.subTest(phase=phase),tempfile.TemporaryDirectory(dir=ARTIFACTS) as folder:
+    failure=RuntimeError('entry failure');guard=None;captured=None
+    item={'Image':'image','Created':'created','State':{'Running':True,'Paused':False,'StartedAt':'started'}}
+    with patch.object(runtime,'runtime_value',return_value={'containerIds':{'pg-source':'a'*64}}),patch.object(runtime,'inspect_owned',side_effect=failure if phase=='admission' else None,return_value=item),patch.object(runtime,'private_dir',return_value=Path(folder)),patch.object(runtime.subprocess,'Popen',side_effect=failure),patch.object(runtime,'docker') as docker:
+     try:
+      try:
+       guard=runtime.PauseGuard({'runId':'fixture'},'pg-source');guard.__enter__()
+      finally:
+       if guard:guard.__exit__()
+     except BaseException as actual:captured=actual
+     self.assertIs(captured,failure);docker.assert_not_called();self.assertIsNone(guard.guard)
  def test_body_priority_receipt_failures_and_guard_cleanup(self):
   for mode in ('normal','restore-fails','bad-row','bad-json','guard-fails','occupied','end-fails','wait-budget','guard-timeout'):
    for body in (False,True):

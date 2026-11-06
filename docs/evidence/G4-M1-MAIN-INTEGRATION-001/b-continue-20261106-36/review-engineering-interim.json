@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "reviewer": "/root/argv_review",
+  "scope": "Engineering interim only; I01/I03 remain PARTIAL",
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261106-36",
+  "testedCommit": "a789cdd93ed3544603521e4edc91a9b11d4b30fd",
+  "hashes": {
+    "gate-I01.json": "82c2d644fd62dd773f9c3d4b6c5489a5ec23ef3adc385c17f5050de57b96cc39",
+    "gate-I03.json": "f80374ec2727c9ecdb182fccc0dcb63681670dde2bd7dc625aa8f6f660b4fc1b",
+    "gate-I05.json": "6a6049db224843475d5a54576163a497ecd71640335806239a4c375750c9e77d",
+    "build-inputs.json": "ba7e688e3ce5f940f9ce4bf6004290d3c0366630af141a1e9f0e4a9a0477f9df"
+  },
+  "rawReview": "Run36 工程中间审查通过，未发现证据矛盾或输入漂移；I01/I03仍为 PARTIAL。独立核对19个driver、1782个构建文件、14份命令原日志及输入散列一致。SelfTest exit0，构包129零失败；任务80通过；Web379通过。8个基线原日志与逐案投影一致：780总计、344PASS、436SKIP、0FAIL，436夹具项尚未闭合。I05真实导出比较、3份生成文件逐字节一致、6负例通过。I03四个拒绝原日志准确命中M1只允许隔离开发环境、非超时；6个真实Host图与编译输入一致，Development/disabled真实运行待完成。未重跑、未修改或访问live，不提前判定整轮产品通过。"
+}

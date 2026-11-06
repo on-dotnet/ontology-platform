@@ -1,0 +1,64 @@
+{
+  "status": "PASS",
+  "sourceContainerId": "05a02f0b1a4d18712e55603d2223cf4e0a8aadae54d6521a8fb51ef447481889",
+  "beforeSha256": "86f74eae3bfbb57ddf8c3d0dbf917e8f8329412b8c8edd693e5a38fb033b178e",
+  "afterSha256": "59534a13ff41d49e751038b4ba4385a200f73c7f55383ce37b3eed4785251c5d",
+  "readerIo": {
+    "beforeNetworkConnections": 19,
+    "afterNetworkConnections": 19,
+    "scope": "all non-Unix connection received events, including TCP-only and TLS/auth rejection",
+    "pooling": false,
+    "adapterPath": "backend/src/Modules/Connections/OntologyPlatform.Modules.Connections/Adapters/PgSourceAdapter.cs",
+    "adapterSha256": "79ed3e5a753140aea25534d5b1b3d3bf95c3b63375e7460798d4d6b486445d02"
+  },
+  "http": {
+    "taskId": "G4-M1-MAIN-INTEGRATION-001",
+    "runId": "b-continue-20261106-36",
+    "testedCommit": "a789cdd93ed3544603521e4edc91a9b11d4b30fd",
+    "startedUtc": "2026-11-06T09:49:26.257Z",
+    "checks": [
+      {
+        "name": "disabled_probe_discovery_and_history_denied",
+        "status": "PASS"
+      }
+    ],
+    "http": [
+      {
+        "method": "GET",
+        "route": "/api/v1/connections/{id}",
+        "status": 200,
+        "durationMs": 24,
+        "jsonBody": true
+      },
+      {
+        "method": "POST",
+        "route": "/api/v1/connections/{id}/test",
+        "status": 409,
+        "durationMs": 27,
+        "jsonBody": true
+      },
+      {
+        "method": "POST",
+        "route": "/api/v1/connections/{id}/discoveries",
+        "status": 409,
+        "durationMs": 26,
+        "jsonBody": true
+      },
+      {
+        "method": "GET",
+        "route": "/api/v1/connections/{id}/catalogs",
+        "status": 403,
+        "durationMs": 27,
+        "jsonBody": true,
+        "code": "catalog_access_forbidden"
+      }
+    ],
+    "scope": "ONE_HTTP_ACTION_ONLY",
+    "databaseRollbackLeaseFenceEvidence": "NOT_RUN_BY_THIS_CONSUMER",
+    "action": "disabled-denials",
+    "connectionId": "87797a17f48644529436a975455d2373",
+    "auditStage": "start",
+    "status": "PASS",
+    "completedUtc": "2026-11-06T09:49:27.694Z"
+  }
+}

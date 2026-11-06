@@ -1,0 +1,169 @@
+{
+  "before": {
+    "container": {
+      "owned": [
+        {
+          "id": "926238e748020c174551f56bef16f64856f8a9191705dc262607ae1e2bb2e7e8",
+          "created": "2026-11-06T09:24:28.868191881Z"
+        },
+        {
+          "id": "a2b354e17748a5ed3450ab82e3818773bb1c5647e5aeea53d70e7f5f85b92302",
+          "created": "2026-11-06T09:24:28.863168131Z"
+        },
+        {
+          "id": "b0a1ca3e06d3dc4d104e9d348024a0a0879c13725096c853cc8e24603d8628cd",
+          "created": "2026-11-06T09:24:28.862207631Z"
+        }
+      ],
+      "keep": []
+    },
+    "network": {
+      "owned": [
+        {
+          "id": "cd9ebf25236e0579992b741247e267c57126cdd7701503c281a825dab3d90529",
+          "created": "2026-11-06T09:24:28.850277673Z"
+        }
+      ],
+      "keep": [
+        "80ac07a0bfc7ad5bdedefec78a3a66c97c4c74093c4a8533f05f4cb96bcbc4d0",
+        "d0d5a2f287bdc7aeb2934794f716a08b53883f93745aad3ac768dd0a27e8f2ed",
+        "e66d65cfe0714eb9fde22ab801d77393aeb653344362c0faac45292d829dab8e"
+      ]
+    },
+    "volume": {
+      "owned": [
+        {
+          "id": "ontology-g4-main-b-continue-20261106-36_fuseki-data",
+          "created": "2026-11-06T09:24:28Z"
+        },
+        {
+          "id": "ontology-g4-main-b-continue-20261106-36_platform-data",
+          "created": "2026-11-06T09:24:28Z"
+        },
+        {
+          "id": "ontology-g4-main-b-continue-20261106-36_rustfs-data",
+          "created": "2026-11-06T09:24:28Z"
+        }
+      ],
+      "keep": [
+        "g2-ef979bd04cc0-alloy-data",
+        "g2-ef979bd04cc0-fuseki-data",
+        "g2-ef979bd04cc0-grafana-data",
+        "g2-ef979bd04cc0-loki-data",
+        "g2-ef979bd04cc0-postgres-data",
+        "g2-ef979bd04cc0-prometheus-data",
+        "g2-ef979bd04cc0-rustfs-data",
+        "g2-ef979bd04cc0-tempo-data"
+      ]
+    }
+  },
+  "commands": [
+    {
+      "command": [
+        "stop",
+        "--time",
+        "10",
+        "926238e748020c174551f56bef16f64856f8a9191705dc262607ae1e2bb2e7e8"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "rm",
+        "926238e748020c174551f56bef16f64856f8a9191705dc262607ae1e2bb2e7e8"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "stop",
+        "--time",
+        "10",
+        "a2b354e17748a5ed3450ab82e3818773bb1c5647e5aeea53d70e7f5f85b92302"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "rm",
+        "a2b354e17748a5ed3450ab82e3818773bb1c5647e5aeea53d70e7f5f85b92302"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "stop",
+        "--time",
+        "10",
+        "b0a1ca3e06d3dc4d104e9d348024a0a0879c13725096c853cc8e24603d8628cd"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "rm",
+        "b0a1ca3e06d3dc4d104e9d348024a0a0879c13725096c853cc8e24603d8628cd"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "network",
+        "rm",
+        "cd9ebf25236e0579992b741247e267c57126cdd7701503c281a825dab3d90529"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "volume",
+        "rm",
+        "ontology-g4-main-b-continue-20261106-36_fuseki-data"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "volume",
+        "rm",
+        "ontology-g4-main-b-continue-20261106-36_platform-data"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "volume",
+        "rm",
+        "ontology-g4-main-b-continue-20261106-36_rustfs-data"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "after": {
+    "container": {
+      "owned": [],
+      "keep": []
+    },
+    "network": {
+      "owned": [],
+      "keep": [
+        "80ac07a0bfc7ad5bdedefec78a3a66c97c4c74093c4a8533f05f4cb96bcbc4d0",
+        "d0d5a2f287bdc7aeb2934794f716a08b53883f93745aad3ac768dd0a27e8f2ed",
+        "e66d65cfe0714eb9fde22ab801d77393aeb653344362c0faac45292d829dab8e"
+      ]
+    },
+    "volume": {
+      "owned": [],
+      "keep": [
+        "g2-ef979bd04cc0-alloy-data",
+        "g2-ef979bd04cc0-fuseki-data",
+        "g2-ef979bd04cc0-grafana-data",
+        "g2-ef979bd04cc0-loki-data",
+        "g2-ef979bd04cc0-postgres-data",
+        "g2-ef979bd04cc0-prometheus-data",
+        "g2-ef979bd04cc0-rustfs-data",
+        "g2-ef979bd04cc0-tempo-data"
+      ]
+    }
+  }
+}

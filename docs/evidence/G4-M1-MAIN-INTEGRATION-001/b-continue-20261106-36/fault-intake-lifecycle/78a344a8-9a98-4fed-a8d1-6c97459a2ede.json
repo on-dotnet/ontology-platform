@@ -1,0 +1,50 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261106-36",
+  "testedCommit": "a789cdd93ed3544603521e4edc91a9b11d4b30fd",
+  "startedUtc": "2026-11-06T09:49:54.185Z",
+  "checks": [
+    {
+      "name": "two_actual_intake_receipts_kept_private",
+      "status": "PASS"
+    }
+  ],
+  "http": [
+    {
+      "method": "GET",
+      "route": "/api/v1/connections/{id}",
+      "status": 200,
+      "durationMs": 28,
+      "jsonBody": true
+    },
+    {
+      "method": "POST",
+      "route": "/api/v1/connection-secrets",
+      "status": 201,
+      "durationMs": 28,
+      "jsonBody": true
+    },
+    {
+      "method": "POST",
+      "route": "/api/v1/connection-secrets",
+      "status": 201,
+      "durationMs": 28,
+      "jsonBody": true
+    },
+    {
+      "method": "POST",
+      "route": "/api/v1/connection-secrets",
+      "status": 201,
+      "durationMs": 28,
+      "jsonBody": true
+    }
+  ],
+  "scope": "ONE_HTTP_ACTION_ONLY",
+  "databaseRollbackLeaseFenceEvidence": "NOT_RUN_BY_THIS_CONSUMER",
+  "action": "intake-lifecycle",
+  "connectionId": "372af78238fa48d1868809b511474255",
+  "auditStage": "start",
+  "naturalExpiry": "2026-11-06T09:59:55.3725712+00:00",
+  "status": "PASS",
+  "completedUtc": "2026-11-06T09:49:55.618Z"
+}

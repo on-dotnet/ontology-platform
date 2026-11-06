@@ -1,0 +1,203 @@
+{
+  "cases": [
+    {
+      "case": "RejectsBypassedTargetPolicy (\"host\",\"connection_network_forbidden\")",
+      "status": "PASS",
+      "line": 1
+    },
+    {
+      "case": "RejectsBypassedTargetPolicy (\"multi-host\",\"connection_network_forbidden\")",
+      "status": "PASS",
+      "line": 2
+    },
+    {
+      "case": "RejectsBypassedTargetPolicy (\"port\",\"connection_network_forbidden\")",
+      "status": "PASS",
+      "line": 3
+    },
+    {
+      "case": "RejectsBypassedTargetPolicy (\"database\",\"connection_network_forbidden\")",
+      "status": "PASS",
+      "line": 4
+    },
+    {
+      "case": "RejectsBypassedTargetPolicy (\"username\",\"connection_network_forbidden\")",
+      "status": "PASS",
+      "line": 5
+    },
+    {
+      "case": "RejectsBypassedTargetPolicy (\"tls\",\"connection_tls_untrusted\")",
+      "status": "PASS",
+      "line": 6
+    },
+    {
+      "case": "RejectsBypassedTargetPolicy (\"schema\",\"catalog_access_forbidden\")",
+      "status": "PASS",
+      "line": 7
+    },
+    {
+      "case": "RejectsBypassedTargetPolicy (\"schema-sql\",\"catalog_access_forbidden\")",
+      "status": "PASS",
+      "line": 8
+    },
+    {
+      "case": "RejectsBypassedTargetPolicy (\"schema-empty\",\"catalog_access_forbidden\")",
+      "status": "PASS",
+      "line": 9
+    },
+    {
+      "case": "RejectsBypassedTargetPolicy (\"schema-null\",\"catalog_access_forbidden\")",
+      "status": "PASS",
+      "line": 10
+    },
+    {
+      "case": "RejectsBypassedTargetPolicy (\"schema-public\",\"catalog_access_forbidden\")",
+      "status": "PASS",
+      "line": 11
+    },
+    {
+      "case": "RejectsBypassedTargetPolicy (\"schema-duplicate\",\"catalog_access_forbidden\")",
+      "status": "PASS",
+      "line": 12
+    },
+    {
+      "case": "ExplicitPublicPolicyIsBoundedAndFrozen",
+      "status": "PASS",
+      "line": 13
+    },
+    {
+      "case": "RejectsExpandedServerPolicy (\"host\")",
+      "status": "PASS",
+      "line": 14
+    },
+    {
+      "case": "RejectsExpandedServerPolicy (\"port\")",
+      "status": "PASS",
+      "line": 15
+    },
+    {
+      "case": "RejectsExpandedServerPolicy (\"database\")",
+      "status": "PASS",
+      "line": 16
+    },
+    {
+      "case": "RejectsExpandedServerPolicy (\"username\")",
+      "status": "PASS",
+      "line": 17
+    },
+    {
+      "case": "RejectsExpandedServerPolicy (\"schema\")",
+      "status": "PASS",
+      "line": 18
+    },
+    {
+      "case": "RequiresExplicitServerTrust (\"\")",
+      "status": "PASS",
+      "line": 19
+    },
+    {
+      "case": "RequiresExplicitServerTrust (\"ca.pem\")",
+      "status": "PASS",
+      "line": 20
+    },
+    {
+      "case": "RejectsInvalidSecretBeforeNetwork (\"\")",
+      "status": "PASS",
+      "line": 21
+    },
+    {
+      "case": "RejectsInvalidSecretBeforeNetwork (\"synthetic\\0injection\")",
+      "status": "PASS",
+      "line": 22
+    },
+    {
+      "case": "CancellationPreservesUnobservedStages",
+      "status": "PASS",
+      "line": 23
+    },
+    {
+      "case": "RealFixturePreservesAuthorizedMetadata",
+      "status": "SKIP",
+      "line": 24
+    },
+    {
+      "case": "VerifyFullAndAuthorizedSelectSucceed",
+      "status": "SKIP",
+      "line": 26
+    },
+    {
+      "case": "ExactPublicSchemaBoundaryUsesActualCatalog",
+      "status": "SKIP",
+      "line": 28
+    },
+    {
+      "case": "UntrustedRootIsRejectedBeforeAuthentication",
+      "status": "SKIP",
+      "line": 30
+    },
+    {
+      "case": "WrongPasswordIsRejectedAfterVerifiedTls",
+      "status": "SKIP",
+      "line": 32
+    },
+    {
+      "case": "SourceAclRejectsEveryUnapprovedOperation (\"insert\")",
+      "status": "SKIP",
+      "line": 34
+    },
+    {
+      "case": "SourceAclRejectsEveryUnapprovedOperation (\"update\")",
+      "status": "SKIP",
+      "line": 36
+    },
+    {
+      "case": "SourceAclRejectsEveryUnapprovedOperation (\"delete\")",
+      "status": "SKIP",
+      "line": 38
+    },
+    {
+      "case": "SourceAclRejectsEveryUnapprovedOperation (\"create-table\")",
+      "status": "SKIP",
+      "line": 40
+    },
+    {
+      "case": "SourceAclRejectsEveryUnapprovedOperation (\"create-schema\")",
+      "status": "SKIP",
+      "line": 42
+    },
+    {
+      "case": "SourceAclRejectsEveryUnapprovedOperation (\"temporary\")",
+      "status": "SKIP",
+      "line": 44
+    },
+    {
+      "case": "SourceAclRejectsEveryUnapprovedOperation (\"maintenance\")",
+      "status": "SKIP",
+      "line": 46
+    },
+    {
+      "case": "SourceAclRejectsEveryUnapprovedOperation (\"otherplant\")",
+      "status": "SKIP",
+      "line": 48
+    },
+    {
+      "case": "WrongServerNameIsRejectedBeforeAuthentication",
+      "status": "SKIP",
+      "line": 50
+    }
+  ],
+  "summary": {
+    "total": 37,
+    "PASS": 23,
+    "FAIL": 0,
+    "SKIP": 14
+  },
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261106-36",
+  "testedCommit": "a789cdd93ed3544603521e4edc91a9b11d4b30fd",
+  "project": "ConnectionsTests",
+  "assemblySha256": "19a703c4f43bc14054b1b1e720b663cf60d8a34986ced4e0e60b524fcd50f863",
+  "rawLogSha256": "ad12885b084fab60d9993c179ff65f396f5a7bd4a1526bf9b6cc88ec62ed3d76",
+  "commandReceiptSha256": "4cfca9a88010acb2ac7850b1fe6c15c872929571711cc3bd479c9358bcbf243b",
+  "command": "baseline-ConnectionsTests"
+}

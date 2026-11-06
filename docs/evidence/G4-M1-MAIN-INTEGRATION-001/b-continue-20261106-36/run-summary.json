@@ -1,0 +1,71 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261106-36",
+  "testedCommit": "a789cdd93ed3544603521e4edc91a9b11d4b30fd",
+  "status": "BLOCKED_WITH_WITNESS",
+  "gates": {
+    "R2": "PASS",
+    "I01": "PASS",
+    "I02": "PASS",
+    "I03": "PASS",
+    "I04": "PASS",
+    "I05": "PASS",
+    "I06": "PASS",
+    "I07": "BLOCKED_WITH_WITNESS",
+    "I08": "NOT_RUN"
+  },
+  "failure": "I07 existing manual guard.__exit__() caller met new unconditional exc[0]; IndexError after successful restoration. Original end PASS means restoration only, not successful overall exit.",
+  "repair": "Only2 runtime lines after unchanged API delegation: normalize missing exception tuple from sys.exc_info, return False if guard never created (pause never issued). Tests add18manual combinations/2entry-failure cases and body evidence assertion.",
+  "engineering": {
+    "oldTargetedFailures": 13,
+    "newTargetedMethods": 3,
+    "exitCombinations": 36,
+    "entryFailures": 2,
+    "realManualDiagnosticCases": 2,
+    "taskTests": 82,
+    "taskExitCode": 0,
+    "selfTestAfterRepair": "PENDING_STABLE_T37_I01",
+    "sourceReview": "PASS"
+  },
+  "acceptanceFacts": {
+    "restoreProjects": 21,
+    "restorePackages": 168,
+    "restoreSeconds": 5.7525463750062045,
+    "selfTestSeconds": 488.9936736669915,
+    "originalTaskTests": 80,
+    "webTests": 379,
+    "baselineTotal": 780,
+    "baselinePass": 344,
+    "originalBaselineSkip": 436,
+    "fixtureCasesClosed": 436,
+    "moduleCases": 462,
+    "I06": "independently verified; does not upgrade I07"
+  },
+  "cleanup": {
+    "finalOwnedObjectsDeleted": 11,
+    "keepNetworks": 3,
+    "keepVolumes": 8,
+    "toolDirectoriesDeleted": 4,
+    "toolFiles": 26919,
+    "toolLogicalBytes": 512583852,
+    "hostMonitorReleased": true,
+    "incidentKeepUnchanged": true,
+    "physicalReclamation": "NOT_VERIFIED"
+  },
+  "nextRun": "b-continue-20261106-37",
+  "packageLimitBytes": 15728640,
+  "package": "NOT_CREATED",
+  "mainUpdated": false,
+  "M2Started": false,
+  "hashes": {
+    "gate-I07.json": "66a3b3a4d436a45696a627d0da00fcdd11a2becd7e566386a00753fef1492d5a",
+    "pipeline-I07.log": "9771a8e04e379121f343747f9eb44a88ec0e7685fed19ac18dcc0deefafcc83c",
+    "manual-exit-live-result.json": "d6893f23cdcbbcacb7c90361495c1db53b6eb20836c7fbf5d53a1b5c0273440c",
+    "review-manual-exit-candidate.json": "3055f4b8e9d4c8a7fe0af2557ff5d5c291a412df084d6ef9fc1c997c4151f216",
+    "repair-task-tests-receipt.json": "aebc3c57e66f7ee6fbf56d820825c78acd9f10a2a3a6a9e4c8fe09cf70bf3bef",
+    "review-I06-and-fixture-closure.json": "efe188e8c118448509d976bd223bf2f1ffbf786c0743e185f930ebd5b2efa2f5",
+    "failed-run-resource-reclaimed.json": "08963494989bc53d5cc93fc3c9a6f950d1339d5cc608eec61242092a07cd315a",
+    "cleanup-applied.jsonl": "048bb9f3480196710bcd3649dffaf018d5df7e56449c5b361683baaba8630c6e",
+    "host-monitor-released.json": "e13ccf3efb784f7648168232f9c5f1d18682f18918e40c07b223cc18c816f7ad"
+  }
+}

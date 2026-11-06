@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "reviewer": "/root/argv_review",
+  "scope": "Candidate runtime/tests only; not stable Run37 acceptance",
+  "sourceHashes": {
+    "runtime.py": "23523867a3f31a8067e90305410a7f384f7f2a73c4995b769e4be825224938ee",
+    "tests.py": "6158589d12703f5116b84ee0ebe59d2475303b92521d7624b6736cbd19d1461a"
+  },
+  "diagnosticSha256": "d6893f23cdcbbcacb7c90361495c1db53b6eb20836c7fbf5d53a1b5c0273440c",
+  "rawReview": "候选独立审查PASS，无P0/P1/P2。两行仅PG/RustFS：正常无参退出、finally原异常、无守护进入失败；API/readback未变。旧13FAIL→新3方法通过（36退出组合+2进入失败）。两次真实短诊断10条Docker原命令、6份0600私有文件、同代际身份/散列一致，原ValueError准确保留。canonical尚干净，原I07失败保持；不替代应用后检查和新Run验收。"
+}

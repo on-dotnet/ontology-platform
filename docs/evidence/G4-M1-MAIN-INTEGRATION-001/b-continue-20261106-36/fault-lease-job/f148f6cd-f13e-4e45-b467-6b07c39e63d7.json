@@ -1,0 +1,32 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261106-36",
+  "testedCommit": "a789cdd93ed3544603521e4edc91a9b11d4b30fd",
+  "startedUtc": "2026-11-06T09:56:05.943Z",
+  "checks": [],
+  "http": [
+    {
+      "method": "GET",
+      "route": "/api/v1/connections/{id}",
+      "status": 200,
+      "durationMs": 24,
+      "jsonBody": true
+    },
+    {
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/discoveries",
+      "status": 202,
+      "durationMs": 25,
+      "jsonBody": true
+    }
+  ],
+  "scope": "ONE_HTTP_ACTION_ONLY",
+  "databaseRollbackLeaseFenceEvidence": "NOT_RUN_BY_THIS_CONSUMER",
+  "action": "job-start",
+  "connectionId": "372af78238fa48d1868809b511474255",
+  "auditStage": "complete",
+  "jobId": "62497cffcaf4454f8a8c739ce19c1e45",
+  "jobStatus": "QUEUED",
+  "status": "PASS",
+  "completedUtc": "2026-11-06T09:56:07.204Z"
+}

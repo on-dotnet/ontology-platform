@@ -1,0 +1,73 @@
+{
+  "status": "DRY_RUN",
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261106-36",
+  "before": {
+    "container": {
+      "owned": [
+        {
+          "id": "8afafb4e077b747b31eab31d248919e4f63073bd37539feac4e1898d2175f380",
+          "created": "2026-11-06T09:36:46.388026292Z"
+        },
+        {
+          "id": "d543858d4252b88906d38ab5b416e2c95429d0bb53fb25d694312d40c0649b7c",
+          "created": "2026-11-06T09:36:46.387038042Z"
+        }
+      ],
+      "keep": []
+    },
+    "network": {
+      "owned": [
+        {
+          "id": "1223ef3ad6192c58eca31be0a3cc0e3cbb923f76fdb101a08a018091b14bd298",
+          "created": "2026-11-06T09:36:46.371989625Z"
+        }
+      ],
+      "keep": [
+        "80ac07a0bfc7ad5bdedefec78a3a66c97c4c74093c4a8533f05f4cb96bcbc4d0",
+        "d0d5a2f287bdc7aeb2934794f716a08b53883f93745aad3ac768dd0a27e8f2ed",
+        "e66d65cfe0714eb9fde22ab801d77393aeb653344362c0faac45292d829dab8e"
+      ]
+    },
+    "volume": {
+      "owned": [
+        {
+          "id": "ontology-g4-main-b-continue-20261106-36_api-keyring",
+          "created": "2026-11-06T09:36:46Z"
+        },
+        {
+          "id": "ontology-g4-main-b-continue-20261106-36_fuseki-data",
+          "created": "2026-11-06T09:36:46Z"
+        },
+        {
+          "id": "ontology-g4-main-b-continue-20261106-36_keycloak-data",
+          "created": "2026-11-06T09:36:46Z"
+        },
+        {
+          "id": "ontology-g4-main-b-continue-20261106-36_platform-data",
+          "created": "2026-11-06T09:36:46Z"
+        },
+        {
+          "id": "ontology-g4-main-b-continue-20261106-36_rustfs-data",
+          "created": "2026-11-06T09:36:46Z"
+        }
+      ],
+      "keep": [
+        "g2-ef979bd04cc0-alloy-data",
+        "g2-ef979bd04cc0-fuseki-data",
+        "g2-ef979bd04cc0-grafana-data",
+        "g2-ef979bd04cc0-loki-data",
+        "g2-ef979bd04cc0-postgres-data",
+        "g2-ef979bd04cc0-prometheus-data",
+        "g2-ef979bd04cc0-rustfs-data",
+        "g2-ef979bd04cc0-tempo-data"
+      ]
+    }
+  },
+  "candidates": [
+    "ontology-g4-main-b-continue-20261106-36_fuseki-data",
+    "ontology-g4-main-b-continue-20261106-36_rustfs-data"
+  ],
+  "commands": [],
+  "deleted": []
+}

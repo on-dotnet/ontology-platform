@@ -1244,6 +1244,8 @@ sys.exit(0 if result['status']=='PASS' else 2)
 
     def __exit__(self,*exc):
         if self.service=='api':return _ApiPauseGuard.__exit__(self,*exc)
+        if not exc:exc=sys.exc_info()
+        if self.guard is None:return False
         failure=None;result=None;files={};guard_result=None;cancelled=False
         try:
             result=restore_paused_container(self.identity)
