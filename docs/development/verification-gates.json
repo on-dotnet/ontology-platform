@@ -1,0 +1,262 @@
+{
+  "schemaVersion": 1,
+  "gates": {
+    "policy": {
+      "inputs": [
+        "AGENTS.md",
+        "PLANS.md",
+        "docs/tasks/*",
+        "docs/development/*.md",
+        "docs/evidence/**/*.md",
+        "docs/evidence/**/*.txt",
+        "docs/evidence/G4-ENG-WORKFLOW-001/summary.json",
+        "docs/evidence/G4-ENG-WORKFLOW-001/validation.json",
+        "docs/evidence/G4-ENG-WORKFLOW-001/skills.json",
+        "docs/evidence/G4-ENG-WORKFLOW-001/gates/**/*.json",
+        "docs/evidence/G4-ENG-WORKFLOW-001/gates/**/*.log",
+        "docs/evidence/G4-ENG-WORKFLOW-001/initial-regressions.json"
+      ],
+      "needs": [],
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "scripts/verify.ps1"
+      ],
+      "testsRequired": false
+    },
+    "environment": {
+      "inputs": [
+        "global.json",
+        "Directory.*",
+        "NuGet.Config",
+        "backend/**/packages*.lock.json",
+        "package.json",
+        "pnpm-lock.yaml",
+        "pnpm-workspace.yaml",
+        ".node-version",
+        "apps/web/package.json",
+        "infra/**",
+        "experiments/**/compose*.yaml"
+      ],
+      "needs": [],
+      "command": null
+    },
+    "contract": {
+      "inputs": [
+        "backend/src/Contracts/**",
+        "docs/contracts/**",
+        "apps/web/scripts/**",
+        "backend/src/Hosts/**",
+        "backend/src/Modules/Governance/**"
+      ],
+      "needs": [
+        "environment"
+      ],
+      "command": null
+    },
+    "backend": {
+      "inputs": [
+        "backend/**",
+        "scripts/acceptance/*.py",
+        "scripts/acceptance/*.ps1",
+        "experiments/g4-m1-main-integration/*.py",
+        "experiments/g4-m1-main-integration/*.sql"
+      ],
+      "needs": [
+        "contract",
+        "environment"
+      ],
+      "command": null
+    },
+    "web": {
+      "inputs": [
+        "apps/web/**",
+        "scripts/tests/*Web*"
+      ],
+      "needs": [
+        "contract"
+      ],
+      "command": null
+    },
+    "interaction": {
+      "inputs": [
+        "scripts/acceptance/*.mjs",
+        "experiments/g4-m1-main-integration/*.mjs",
+        "docs/evidence/**/browser*.mjs"
+      ],
+      "needs": [
+        "web",
+        "backend"
+      ],
+      "command": null
+    },
+    "engineering": {
+      "inputs": [
+        "scripts/maintenance/workflow.py",
+        "scripts/tests/Workflow.Tests.py",
+        "docs/development/verification-gates.json",
+        "docs/evidence/G4-ENG-WORKFLOW-001/acceptance-scenarios.json"
+      ],
+      "needs": [
+        "preflight"
+      ],
+      "command": [
+        "python3",
+        "-B",
+        "scripts/tests/Workflow.Tests.py"
+      ],
+      "testsRequired": true
+    },
+    "package": {
+      "inputs": [
+        "scripts/create-review-package.ps1",
+        "scripts/*review*",
+        "scripts/tests/ReviewPackage*",
+        "scripts/tests/EvidencePreflight*",
+        "scripts/tests/FrozenEvidence*"
+      ],
+      "needs": [],
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "scripts/tests/ReviewPackage.Tests.ps1"
+      ],
+      "testsRequired": true
+    },
+    "preflight": {
+      "inputs": [
+        "scripts/maintenance/execution_preflight.py",
+        "scripts/maintenance/g4_m1_preflight.py",
+        "scripts/tests/ExecutionPreflight.Tests.py"
+      ],
+      "needs": [],
+      "command": [
+        "python3",
+        "-B",
+        "scripts/tests/ExecutionPreflight.Tests.py"
+      ],
+      "testsRequired": true
+    },
+    "engineering-full": {
+      "inputs": [
+        "scripts/verify.ps1"
+      ],
+      "needs": [],
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "scripts/verify.ps1",
+        "-SelfTest"
+      ],
+      "testsRequired": true
+    },
+    "task_run_timeline": {
+      "inputs": [
+        "scripts/maintenance/task_run_timeline.py",
+        "scripts/tests/TaskRunTimeline.Tests.py"
+      ],
+      "needs": [],
+      "command": [
+        "python3",
+        "-B",
+        "scripts/tests/TaskRunTimeline.Tests.py"
+      ],
+      "testsRequired": true
+    },
+    "host_continuity": {
+      "inputs": [
+        "scripts/maintenance/host_continuity.py",
+        "scripts/tests/HostContinuity.Tests.py"
+      ],
+      "needs": [],
+      "command": [
+        "python3",
+        "-B",
+        "scripts/tests/HostContinuity.Tests.py"
+      ],
+      "testsRequired": true
+    },
+    "cleanup_resources": {
+      "inputs": [
+        "scripts/maintenance/cleanup_resources.py",
+        "scripts/tests/CleanupResources.Tests.py"
+      ],
+      "needs": [],
+      "command": [
+        "python3",
+        "-B",
+        "scripts/tests/CleanupResources.Tests.py"
+      ],
+      "testsRequired": true
+    },
+    "canonical_fuseki": {
+      "inputs": [
+        "scripts/maintenance/canonical_fuseki.py",
+        "scripts/tests/CanonicalFuseki.Tests.py"
+      ],
+      "needs": [],
+      "command": [
+        "python3",
+        "-B",
+        "scripts/tests/CanonicalFuseki.Tests.py"
+      ],
+      "testsRequired": true
+    },
+    "fuseki_ci_cache": {
+      "inputs": [
+        "scripts/maintenance/fuseki_ci_cache.py",
+        "scripts/tests/FusekiCiCache.Tests.py"
+      ],
+      "needs": [],
+      "command": [
+        "python3",
+        "-B",
+        "scripts/tests/FusekiCiCache.Tests.py"
+      ],
+      "testsRequired": true
+    },
+    "fuseki_transfer": {
+      "inputs": [
+        "scripts/maintenance/fuseki_transfer.py",
+        "scripts/tests/FusekiTransfer.Tests.py"
+      ],
+      "needs": [],
+      "command": [
+        "python3",
+        "-B",
+        "scripts/tests/FusekiTransfer.Tests.py"
+      ],
+      "testsRequired": true
+    },
+    "environment-prepare": {
+      "inputs": [
+        "scripts/maintenance/workflow_environment.py",
+        "scripts/tests/WorkflowEnvironment.Tests.py"
+      ],
+      "needs": [],
+      "command": [
+        "python3",
+        "-B",
+        "scripts/tests/WorkflowEnvironment.Tests.py"
+      ],
+      "testsRequired": true
+    },
+    "smoke-adapter": {
+      "inputs": [
+        "scripts/maintenance/workflow_smoke.py",
+        "scripts/maintenance/workflow-smoke.mjs",
+        "scripts/tests/WorkflowSmoke.Tests.py"
+      ],
+      "needs": [],
+      "command": [
+        "python3",
+        "-B",
+        "scripts/tests/WorkflowSmoke.Tests.py"
+      ],
+      "testsRequired": true
+    }
+  }
+}

@@ -1,53 +1,38 @@
 # AI 研发效率与交付规则
 
+现行规则由最新人类授权限定；[本地验证政策](local-validation-policy.md)优先，系统/平台安全边界不变。历史任务证据与授权保留原字节；历史版本可从Git恢复。本页统一当前规则，不要求恢复时重复读取整段历史会话。
 
-> 2026-10-29 人类覆盖授权：[本地优先、按需CI政策](local-validation-policy.md)优先于下文旧的同HeadCI强制条款。增量集成、资源收尾与最终交付以适用本地真实验收、独立Review及已提交源码/输入绑定为门禁；Actions默认手动按需，未运行如实NOT_RUN，费用/权限/依赖边界不变。历史记录不改。
-本合同从G3-M1-CLOSEOUT-002起适用于Master、子Agent及换机器后的Codex。人类当前明确授权为上限；禁止借效率扩大业务阶段、调用付费模型或跳过安全。历史耗时和失败事实不重写。
+1. **Preflight-first**：fetch并核对任务Base、工作树/活跃引用和owned_paths。先核对工具、当前平台锁闭包、MSBuild SDK resolver、真实入口及资源准入，再运行CLI。缺前提写BLOCKED/NOT_RUN，不安装下载或改全局PATH/SDK/Docker/WSL来补齐。
+2. **先合同后并行**：冻结公共合同、正反测试与路径所有权。共享工程配置Single Writer；独立作者独立托管Worktree，Master只在明确批准下集成main。按独立写项拆分，不为小格式修复反复派新团队或逐patch审批。
+3. **分层测试**：以[gate登记](verification-gates.json)规划静态/单测→相关集成→短真实烟测。默认按程序集/夹具组批量执行。必要要求最终由FRESH或有效REUSED覆盖，才称适用完整验收；不是每Run从I01重开整链。原显式Full命令不缩减；稳定工程输入一次有理由的完整SelfTest，之后纯说明/证据变化不重跑产品。
+4. **持续集成**：可验证里程碑提交、普通push任务分支。main由Master唯一集成且必须另有当前授权；任务授权禁止main时停止于任务分支。CI按需，已跑记录真实run/job/Head；未跑NOT_RUN，不将本地PASS冒充CI或其他平台成功。
+5. **证据分层**：每个原始日志/二进制保存一次，摘要引用SHA/Git blob。一个当前状态保存目标/非目标、Base/Head、环境、门禁状态、失败指纹和下一动作。失败保留命令/真实exit/短窗口/复现入口；不向上下文塞全部日志。代表截图默认≤12张、PNG目标≤3MiB。
+6. **交付冻结顺序**：源码/格式→适用测试→非作者Review→提交→当前输入绑定→唯一[V3包](review-package-spec.md)→独立重开→回执。先预检格式、身份、规模、argv及证据Schema；最终diff-check必须exit0。正常迭代不产中间PARTIAL ZIP；>10MiB解释构成，>15MiB先去重复而非提限，历史V1/V2仍可重开。
+7. **真实效率数据**：复用`task_run_timeline.py` schema2记录真实UTC/单调耗时/exitCode，timingStatus独立。分列运行次数、restore次数、完整SelfTest、复用与拒绝重复失败次数、证据体积；父子命令计时不相加。未观测的Agent活跃/等待是UNKNOWN，未运行NOT_RUN，无法验证NOT_VERIFIED。
+8. **阶段资源收尾**：创建即记录TaskId/RunId/准确ID/内容键/恢复入口。环境缓存寿命按任务/依赖键，Run失败不删重建。每Run独立fixture与输出，禁止把临时数据库放bin/obj。只停不需要的自身服务；关闭后按[生命周期](resource-lifecycle.md)准确白名单/期限/指纹/前后证据/强后验回收。安全候选存在却0删除FAIL；每个KEEP说明对象、理由、解除条件。
+9. **防跨会话丢规则**：新Master从当前授权及唯一状态进入，读取本规则、构包合同与生命周期的适用部分。任务refs/证据可以证明来源；不能把不可取得的旧聊天当统一DEFERRED理由。过程证据从精确Git对象恢复，ignored只做聚合清单。
+10. **不以速度换安全**：零测试、失败、被跳过或缺原件不能代表产品PASS。真实DB/OIDC/UI/权限/回滚不能由Mock或容器Running代替。禁止全局prune/restart/改DB、未知数据删除、收费调用和跨项目清理；socket不可用不写Docker PASS。
 
-1. **Preflight-first**：编码前核实最新origin/main、工作树/活跃任务、锁定SDK/Node/pnpm/Python、依赖受锁恢复、真实测试入口、Docker socket/容器健康、迁移兼容、OpenAPI/TS生成及基线。基础失败先分类并保存短复现，环境缺失BLOCKED/NOT_RUN，不混作业务失败。
-2. **先合同后并行**：Master冻结DTO、错误码、事务、资源命名、证据Schema和owned_paths，正反契约测试及独立审查通过后再派独立托管Worktree。共享配置/锁/CI/迁移Single Writer；Master唯一集成main。
-3. **分层测试**：静态/单测 → 模块真实集成 → 纵向E2E → 完整验收。廉价门禁失败先修复；增量只跑受影响项，稳定产品输入跑适用本地完整验收。预先写明命令/退出码/实际测试数；零测试不是PASS。
-4. **持续集成**：每个可运行纵向切片审查后及时提交推送并分批集成，首次真实集成不得留到最后。发现兼容或导入竞态先缩小复现，禁止反复整栈盲跑。
-5. **证据分层**：失败保存命令、exit、短摘要、关键日志窗口、复现入口。过程截图和全量遥测进本地归档；稳定代表截图按页面/主题/视口最多一张、默认12张/PNG压缩目标3MiB。Git原始证据不删，正式V3只保留关键证据与精确Git恢复索引，ignored按目录/类别聚合。
-6. **交付冻结顺序**：源码/格式 → 测试 → 独立Review → 提交 → 本地验证绑定（CI按需） → 唯一V3构包 → 独立重开 → 交付回执。CI必须实查run与engineering/governance-integration两个job及Head；构包失败修对应原因，不改CI事实或重做无关业务。git diff --check必须exit0。
-7. **真实效率数据**：记录UTC开始/结束、实现/等待/环境/测试/CI/返工/封包时间；无观测写UNKNOWN。墙钟跨度和活跃工时分列，不从聊天时间推断活跃工时；并行区间不可相加当墙钟。
-8. **阶段资源收尾**：开始/结束核对分支、Worktree、Docker容器/卷/镜像/history、ignored和ZIP。本任务资源优先；历史资源逐项归属，保留一套日常环境与确有唯一价值项。精确白名单/期限/指纹/后验、独立审查后Apply。每个KEEP有准确对象、理由与解除条件；有安全候选却0删除FAIL。
-9. **防跨会话丢规则**：新Master必须读当前授权、任务/交接、资源清单、本合同、构包与生命周期规范，并fetch最新origin/main。依赖DAG、所有权、进度/实际commit及待审事项持久化Git；聊天不作为唯一恢复证据。
-10. **不以速度换安全**：不跳过真实数据库/权限/回滚测试，不以Mock代真实集成，不强推、不全局prune、不未知数据删除、不改历史。socket权限错误须准确报告；物理容量无证据NOT_VERIFIED，未运行平台NOT_RUN。
+## 环境准备与运行身份
 
-自动化入口：`pwsh -NoProfile -File scripts/verify.ps1 -SelfTest`包含规则可发现性/EOF、V3完整性、安全清理及canonical构建正反例；CI另执行真实数据库/语义集成。规则测试只证明入口与冻结条款存在，不等于产品正确或真实清理。
+`workflow.py prepare --task <Task>`核验已批准本地内容，在首次CLI前设置私有CLI_HOME、NuGet/SDK缓存、证书策略和OS网络边界。项目--configfile不能单独约束SDK resolver。缺失/损坏/多余链接拒绝启动SDK，缺资源报精确差异，不隐式下载。
 
+内容键绑定OS/arch、工具/锁/SDK来源；Web另有其Node/pnpm/锁键。工作树路径独立绑定，换树重验路径敏感状态；新Head不自动清空缓存。相同依赖第二次prepare下载/物化/无理由restore为0。共享内容先逐成员验证再复用；node_modules必须重新绑定和验证shim/workspace，bin/obj/.next不跨树无条件复制；私有runtime/凭证绝不跨任务复用。
 
-canonical构建失败必须原子保留严格allowlist receipt：安全命令/TaskId/RunId/context hash、退出或TIMEOUT/耗时、输出hash/size、有限静态BuildKit阶段和固定错误类别；同时输出同一脱敏摘要供临时CI日志恢复。不能只返回generic REFUSED或只留下临时runner本地路径，不输出原始env/buildargs/秘密，不为了PASS任意延长预算或无限retry。
+运行环境键另绑定Docker context/Engine、实际镜像、配方与拓扑。Fuseki仍仅canonical内容寻址构建及已校验共享镜像。跨Run镜像restore/save同路径、精确平台/全输入、load前后身份校验；未知容量拒绝保存，Actions仅现有批准SHA/配额。既有真实cold/warm记录可按输入复用，不为普通开发重复证明。
 
-M2起canonical冷下载采用固定Apache dlcdn/archive同版本主备、原SHA512与HTTPS限跳，每次最多180秒且最多2次；成功下载后坏hash立即失败，不将hash失败当网络fallback。外层600秒保持。CI先canonical冷构建再restore，后续集成必须命中相同内容寻址镜像并记录实际receipt，禁止重复随机build。真实冷构建与cache-hit计数另验，静态规则不是产品PASS。
+长验收前 `execution_preflight.py check --milestone <支持阶段>`核对准确audit/DI/消费者。短烟测必须真实OIDC→API→源PG→UI动作及拒绝/取消路径；API重建后核对全部依赖实例与网络命名空间，旧Web不得沿用。新环境/拓扑/权限/会话改变需重测。烟测绑定当前源码与构建产物，静态前置与历史在线状态不替代它。
 
-## G3-M3 E0执行入口
+Mac长任务先`host_continuity.py preflight`，用户能源设置持续有效；有界monitor及电源日志只记录实际锁屏/外屏熄灭/睡眠窗口。不改全局电源、不用-d/-u；单命令caffeinate不能代整会话保证，结束释放自身临时进程。
 
-M3起CI在应用restore之前先计算`canonical_fuseki.py --identity`，按精确平台/全部构建输入恢复专用镜像归档，再执行canonical校验。`contextSha256`与包含helper/platform的`inputFingerprint`分别记录；禁止将旧context标签误认为新输入身份。官方cache restore/save固定已批准SHA，restore/save目录必须一致（目录参与GitHub cache version）；不设restore-keys且拒绝非精确matched-key。PR只恢复，可信push才保存。PUBLIC仓库用量API已实测无认证200，预算查询不发送令牌；归档≤512MiB且仓库已有占用+候选≤1GiB才写入，不增权限、不改费用设置、API失败停止保存。总量上限保守低于现有已含配额，不推断账单。
+## 影响、复用和失败止损
 
-镜像tar/receipt先校验文件、路径、散列、平台、manifest/config/layers及准确image ID，再load与inspect；现代OCI根摘要和旧config摘要区别验证。新canonical禁用额外attestation以保持单运行平台归档。warm继承producer下载校验事实，不宣称本runner又下载并算SHA512。必须保留不同RunId、新runner的真实cold/export与restore/load证据；同run reused不能替代。
+`workflow.py plan --base <Base> --head <Head> --output <ignored计划>`绑定已提交候选；`verify --task <Task> --plan <计划>`重新计算计划防篡改。登记源码、测试/预期、驱动/SQL、生成器、配置/锁、平台、镜像/fixture和权限的传递输入；docs/evidence中的可执行文件也是输入，未知高风险路径阻断覆盖声明。
 
-失败状态使用独立精确failureStateKey，可信push在canonical失败后仍保存有限摘要；同input/env候选先做≤20秒固定官方源短复现，重现同终态错误则BLOCKED，不能再无条件跑600秒。输入/环境变化失效；最终门禁的`--final-gate`必须显式真实执行。BuildKit重复错误summary不重复累计阶段；中途主源失败后备源恢复不能把最终PASS分类为失败。
+前端组件只使Web/交互失效；I07驱动只使相关驱动/交互失效；共享合同/授权/SDK等传播到消费者；打包器只重验打包/来源/兼容。产品gate未配置当前任务准入执行器则NOT_RUN，不自动启动历史M1整链，也不宣称覆盖。
 
-完整浏览器链由`workspace-smoke.mjs`前置真实OIDC状态验收，独立短入口为`node scripts/acceptance/g2-live-browser.mjs <本树私有runtime.json> --workspace-smoke-only --smoke-fault-check`；默认source、显式graph/canvas/source、取消/保存、历史diff、窄屏与只读权限均有断言。注入隐藏canvas应短FAIL，恢复后PASS。禁止用默认改graph或吞异常迎合旧脚本。
+输入键是内容身份，HEAD/RunId仅审计归属。复用必须重新核验原命令成功、非零有效测试/skip要求、精确Git原件及SHA、相同输入/兼容环境政策、没有推翻结果的新缺陷。`--publish-evidence`输出本任务单份原件，提交后`--reuse <精确Git索引>`消费；输出原T/Run/提交/证据SHA/键/资格命令，executionMode=FRESH|REUSED，与旧status枚举分开。不能把REUSED写成本轮exit0。
 
-证据编码早期先运行`new-review-evidence.ps1`生成当前Schema，再用`test-review-evidence.ps1 -EvidenceFile <文件> -ExpectedHead <SHA>`预检；生产构包器共用同一规范化实现，历史metadata保留原字节。截图/ignored边界也须早检。TaskRunTimeline用`task_run_timeline.py run ... -- <命令>`记录真实单调时钟与UTC，CI用`ci --step-id <固定标签> --task-type TEST -- <命令>`自动关联同job前序；`summary --path <JSONL>`分列跨度、区间union、累计、重叠、可观察关键路径和重验。并发append在锁内分配attempt，原始参数/聊天/令牌不入记录，Agent活跃/思考UNKNOWN。
+失败指纹绑定相关输入、构建、平台/环境与错误类别。相同指纹无新条件拒绝昂贵链；`--diagnostic`只允许≤20秒短诊断。连续三次同类失败停止扩写，要求最小复现及机制说明；新相关输入与`--hypothesis`提供修订依据，不是全项目永久失败阈值。只有确认瞬态才有界复测，保留全部结果，禁止跑到绿。
 
-## G3-M4执行纠偏：关键路径与前置防线
-
-2026-10-31人类明确要求本轮立即收敛并永久防复发；既有安全/验证/资源门禁不减。
-
-- 已确认阻断先组成最小关键路径：语义修复与真实正反例→发布四点/既有fixture→首次报告API/UI→稳定输入适用完整门禁→独立Review/提交绑定→唯一V3/原有资源收尾。未确认新风险先做不超过20秒的短复现；不要继续扩展临时验收工具、泛化框架或非阻断边角。
-- 每次调度只传精确Base/Head、owned_paths、当前diff、失败指纹、下一条已核实命令和完成条件；复用既有Agent/树，按一个可运行里程碑批量审查，不为每个小修反复暂停/恢复writer或让Reviewer占槽等待。新代理仅传必要上下文，工具输出先筛摘要，完整历史留证据。
-- 从bootstrap/rg核实解释器、项目及测试路径；先廉价编译，编译通过才开真实容器。错误路径在前置探测拒绝，不能用不存在路径的命令冒充产品失败。
-- 新写用例公共合同必须登记精确审计action、DI、事务回执与幂等边界；真实生成审计必须写入/重读验证。依赖IRI必须精确受控，定义删除按声明种类与消费角色建立正反回归，不能依赖过宽前缀或其它类型留存。
-- 已通过项只按精确输入绑定复用；稳定输入仍完成适用完整门禁。不从命令计时推测Agent思考/审查/调度活跃时长；无可观察进展的长间隔触发一次阻断/下一命令诊断，未观测原因仍UNKNOWN，不能用累计命令时长解释全部墙钟。
-
-## M5 E0 可执行前置防线
-
-`host_continuity.py preflight/monitor/fixture/cli`仅只读能源状态或标准任务级断言；Mac依用户设置的AC sleep=0允许显示器正常熄灭，锁屏与外接显示器睡眠通过IOConsoleLocked/CoreGraphics及连续心跳分别实测，整任务有界监测并最终精确终止。官方状态API只采集布尔值，不抓屏。权限/平台不足明确NOT_VERIFIED/NOT_APPLICABLE。
-
-`execution_preflight.py check`在实际长入口前核实项目/CLI帮助、audit action真实白名单、DI注册、launcher/checkpoint/browser全部阶段消费者。静态登记不代实际组合根和短真实请求；新读操作仍保留原安全拒绝审计。`run --cost`按输入hash/受控构建身份版本/实际平台/错误类别止损，不能改RunId绕过。同失败短复现仍失败先修输入；稳定候选完整真实验收不豁免。
-
-SelfTest过程日志放ignored artifacts，PreflightLogs真实并发写入验证日志不进入源码扫描且源码错误仍拒绝。证据预检与正式构包共用Schema，截图签名/IHDR/真实像素与viewport早核；VerifyOnly是制品门禁，不是产品验收。TaskRunTimeline schema2保持原UTC和真实exitCode/outcome，timingStatus独立；仅有效UTC区间计union/overlap，全部单调累计另列。sleep/wake必须有系统窗口/hash，不从CLOCK_DRIFT推因果。人工等待/Agent思考与活跃UNKNOWN。
+证据生成/修改后用`test-review-evidence.ps1`复用正式Schema检查；包VerifyOnly只验证制品，不代产品测试。准入脚本和规则回归证明边界，不冒充真实服务或资源回收。

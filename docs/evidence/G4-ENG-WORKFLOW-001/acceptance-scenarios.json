@@ -1,0 +1,79 @@
+{
+  "taskId": "G4-ENG-WORKFLOW-001",
+  "status": "SPECIFICATION_NOT_EXECUTED",
+  "purpose": "下一个Codex任务的回归夹具/验收要求，不是已通过的测试结果",
+  "scenarios": [
+    {
+      "id": "EG-01",
+      "arrange": "同工作树、相同锁及工具连续prepare两次",
+      "action": "第二次依赖复用",
+      "assertion": "新增包下载=0；SDK下载=0；重新复制/物化=0；无理由restore=0；允许校验和新回执"
+    },
+    {
+      "id": "EG-02",
+      "arrange": "新工作树或路径变化，已存在合格内容缓存",
+      "action": "核验路径敏感状态",
+      "assertion": "内容缓存可复用；旧pnpm绝对路径被检测/重建；不复制旧runtime凭证；无隐式下载"
+    },
+    {
+      "id": "EG-03",
+      "arrange": "缺失当前RID锁包、SDK缓存损坏或多余链接",
+      "action": "在实际SDK运行前拒绝",
+      "assertion": "ENVIRONMENT_BLOCKED；不给网络解析机会；保留精确缺口；无全局证书/缓存修改"
+    },
+    {
+      "id": "EG-04",
+      "arrange": "仅修改connections前端组件及测试，后端/锁/驱动未变",
+      "action": "选择相关Web/交互安全测试",
+      "assertion": "不触发后端restore/I02-I06整链；复用明确原T/SHA/输入键；真实新缺陷必须新测"
+    },
+    {
+      "id": "EG-05",
+      "arrange": "只修改I07驱动或打包器",
+      "action": "局部失效传播",
+      "assertion": "分别只失效相关驱动/I07或包完整性/兼容；无关gate保留；不是按新HEAD全部清零"
+    },
+    {
+      "id": "EG-06",
+      "arrange": "共享合同/权限/生成器/SDK锁发生语义变化",
+      "action": "传递失效",
+      "assertion": "相关消费者重测；未映射的高风险变化不能被当成无影响；允许有证据的无关复用"
+    },
+    {
+      "id": "EG-07",
+      "arrange": "原报告FAIL、被跳过或原件缺失/散列失配",
+      "action": "禁止复用为PASS",
+      "assertion": "REUSED资格拒绝；原失败不重写；旧状态和当前修复分别保留"
+    },
+    {
+      "id": "EG-08",
+      "arrange": "相同失败指纹、无新假设再次请求长链",
+      "action": "拒绝盲跑",
+      "assertion": "不启动昂贵流程；短复现可执行；改变相关条件后才允许新尝试"
+    },
+    {
+      "id": "EG-09",
+      "arrange": "API重建、旧Web运行身份失效，或上Run夹具污染",
+      "action": "烟测及时发现并定向恢复",
+      "assertion": "先验证实际服务链；仅恢复本任务依赖实例；fixture与构建目录分开；不全局重启Docker"
+    },
+    {
+      "id": "EG-10",
+      "arrange": "中间Run失败但任务仍ACTIVE/SUSPENDED",
+      "action": "保留可复用缓存",
+      "assertion": "不反复删/建工具；无用自身运行资源可精确停止；历史数据和他人工作树不动"
+    },
+    {
+      "id": "EG-11",
+      "arrange": "只有规则/证据改动且准备最终包",
+      "action": "机械核验声明范围及包",
+      "assertion": "新鲜验证reuse资格/政策/来源；不把旧产品测试说成新跑；当前包≤15MiB；原始日志不重复存储"
+    },
+    {
+      "id": "EG-12",
+      "arrange": "通用skill建议安装、全量跑或隔离失败改main；或用户只要求分析",
+      "action": "项目范围约束生效",
+      "assertion": "零下载/不自动main优先；分析不得改仓库；未运行平台明确NOT_RUN；无需为普通格式修复逐patch审批"
+    }
+  ]
+}

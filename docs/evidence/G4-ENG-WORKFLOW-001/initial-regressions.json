@@ -1,0 +1,38 @@
+{
+  "taskId": "G4-ENG-WORKFLOW-001",
+  "status": "OBSERVED_FAILURES_PRESERVED",
+  "timing": "UNKNOWN: initial short tool invocations not JSONL-instrumented",
+  "observations": [
+    {
+      "command": "python3 -B scripts/tests/Workflow.Tests.py",
+      "exitCode": 1,
+      "result": "initial missing entry: 1 failure, 6 skipped; implementation then 7 passed"
+    },
+    {
+      "command": "python3 -B scripts/tests/Workflow.Tests.py",
+      "exitCode": 1,
+      "result": "path glob and unknown maintenance: 2 failures, 2 missing-function errors; then 11 passed"
+    },
+    {
+      "command": "python3 -B scripts/tests/Workflow.Tests.py",
+      "exitCode": 1,
+      "result": "timeout helper absent: 1 error; then 14 passed"
+    },
+    {
+      "command": "pwsh -NoProfile -File scripts/verify.ps1",
+      "exitCode": 1,
+      "result": "missing local structured parser, then variable name triggered finite secret scanner; prepared PyYAML and renamed variable, scanner unchanged, static exit0"
+    },
+    {
+      "command": "workflow_smoke.smoke(root, task)",
+      "exitCode": 1,
+      "result": "IMAGE_ADMISSION before containers: imported approved image exact ID and platform matched but RepoDigests empty; corrected exact ID validation"
+    },
+    {
+      "command": "workflow_smoke.smoke(root, task)",
+      "exitCode": 2,
+      "runId": "wf-db9d59da97ad",
+      "result": "LOCAL_HTTP_READINESS_TIMEOUT; internal Docker network has no host publish; all 5 owned containers stopped"
+    }
+  ]
+}

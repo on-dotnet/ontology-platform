@@ -10,7 +10,7 @@
 
 每任务记录ID、授权/非目标、依赖DAG、Owner/Reviewer、BaseSha、任务分支、规范化Worktree路径、owned_paths、read_only_dependencies、公共合同Owner、验收命令、负例、证据和停止条件。
 
-最新V2已获人类明确确认：独立写入Agent在独立Worktree和分支工作，main由Master唯一集成。优先Codex托管Worktree；不可用再用原生Git，目录不得互相嵌套。只切分支共用目录不是隔离。默认2–3独立写项，保留只读审查能力；只读研究不要求Worktree。
+最新V2已获人类明确确认：独立写入Agent在独立Worktree和分支工作，main由Master唯一集成。优先Codex托管Worktree；不可用再用原生Git，目录不得互相嵌套。只切分支共用目录不是隔离。按独立写入需要拆分；G4-ENG-WORKFLOW-001 默认一个作者和一位非作者 Reviewer，保留只读审查能力；只读研究不要求Worktree。
 
 根构建配置、CI、锁文件、AGENTS/PLANS、公共DTO、迁移、Design Tokens、AppHost公共配置同一时刻单写者。共享修改先提议Owner，不直接覆盖。不能隔离时记录原因，先并行只读后串行写入，不恢复旧的禁用Worktree解读。
 
@@ -20,7 +20,7 @@
 2. 可验证里程碑原子commit并及时push任务分支。未完成成果可远程备份，但标DRAFT/PARTIAL，不等于可合并。
 3. 实际命令、退出码、版本、测试数、NOT_RUN及修复写证据；消息不是唯一可恢复记录，不包含认证材料。
 4. 独立Reviewer只读；Owner复现修复并复验，Master检查分支头/合同及集成检查。自报不等于通过。
-5. 已验收成果通过可追踪PR/merge/cherry-pick分批进入main，及时push，不等整个G1结束。冲突由对应Owner/Master处理；关键失败保留分支和现场。
+5. 仅在当前任务明确批准 main 更新时，已验收成果才通过可追踪PR/merge/cherry-pick分批进入main，及时push。G4-ENG-WORKFLOW-001 只提交任务分支。冲突由对应Owner/Master处理；关键失败保留分支和现场。
 6. CI必须记录run ID/URL、commit和结论；commit status为空不表示成功或失败。不可读取记NOT_VERIFIED。
 7. Worktree仅在审查归档且安全集成后清理；保留含未整合成果的目录。交接列明各树/分支、剩余事项和恢复步骤。
 

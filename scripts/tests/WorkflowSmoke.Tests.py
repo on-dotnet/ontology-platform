@@ -24,6 +24,12 @@ class SmokeTests(unittest.TestCase):
         rows={name:{'Id':ident,'Config':{'Labels':{'ontology.task-id':self.smoke.TASK,'ontology.run-id':runtime['runId'],'com.docker.compose.service':name},'Image':self.smoke.IMAGES[name]},'Image':runtime['imageIds'][name],'State':{'Running':True,'Paused':False},'HostConfig':{'Memory':768*1024**2,'NetworkMode':'container:'+ids['api'] if name=='web' else 'front'}} for name,ident in ids.items()}
         return runtime,rows,engine
 
+    def test_loaded_approved_image_identity_without_repo_alias(self):
+        ref=self.smoke.IMAGES['pg-source']
+        self.smoke.validate_image({'Architecture':'arm64','Os':'linux','Id':ref.split('@')[1],'RepoDigests':[]},ref)
+        with self.assertRaises(ValueError):
+            self.smoke.validate_image({'Architecture':'arm64','Os':'linux','Id':'sha256:'+'0'*64},ref)
+
     def test_valid_current_topology(self):
         self.assertTrue(self.smoke.validate_topology(*self.topology()))
 

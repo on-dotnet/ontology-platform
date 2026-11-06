@@ -145,7 +145,7 @@ def fixture(root, private, run):
     command([openssl,'req','-new','-newkey','rsa:2048','-noenc','-subj','/CN=pg-source','-keyout','server.key','-out','server.csr'],cwd=private)
     private_write(private/'server.ext','basicConstraints=critical,CA:FALSE\nkeyUsage=critical,digitalSignature,keyEncipherment\nextendedKeyUsage=serverAuth\nsubjectAltName=DNS:pg-source\n')
     command([openssl,'x509','-req','-in','server.csr','-CA','ca.crt','-CAkey','ca.key','-set_serial','0x'+secrets.token_hex(16),'-days','2','-sha256','-extfile','server.ext','-out','server.crt'],cwd=private)
-    password=(private/'reader-password').read_text()
+    reader_password=(private/'reader-password').read_text()
     private_write(private/'init.sql',"""\\set ON_ERROR_STOP on
 CREATE ROLE fixture_reader LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOINHERIT NOREPLICATION NOBYPASSRLS PASSWORD '%s';
 REVOKE CREATE, TEMPORARY ON DATABASE fixture FROM PUBLIC;
@@ -157,7 +157,7 @@ CREATE TABLE production.heat_event(id bigint PRIMARY KEY, tap_temp numeric(8,2))
 GRANT USAGE ON SCHEMA production TO fixture_reader;
 GRANT SELECT ON production.heat_event TO fixture_reader;
 ALTER ROLE fixture_reader IN DATABASE fixture SET default_transaction_read_only = on;
-""" % password)
+""" % reader_password)
     private_write(private/'pg_hba.conf','local all postgres trust\nlocal all all reject\nhostnossl all all all reject\nhostssl fixture fixture_reader all scram-sha-256\nhostssl all all all reject\n')
     api=private/'api';api.mkdir(mode=0o700)
     (api/'g4-key').write_bytes(secrets.token_bytes(32));(api/'g4-key').chmod(0o600)
@@ -296,6 +296,12 @@ def validate_build(root):
     return {'inputKey':receipt['inputKey'],'receiptSha256':digest(path.read_bytes()),'outputKey':digest(json.dumps(receipt['outputs'],sort_keys=True).encode())}
 
 
+def validate_image(item, reference):
+    """已批准的内容寻址导入镜像可无RepoDigests；仍要求精确ID/平台。"""
+    require(item.get('Architecture')=='arm64' and item.get('Os')=='linux' and
+            item.get('Id')==reference.split('@')[1],'IMAGE_ADMISSION')
+
+
 def smoke(root, task, *, node=None):
     """新环境运行一次短真实路径；失败保留证据，finally只停本Run资源。"""
     root=Path(root).resolve();require(task==TASK,'TASK_NOT_AUTHORIZED')
@@ -316,7 +322,7 @@ def smoke(root, task, *, node=None):
     runtime.update(engine=engine(root),containerIds={},imageIds={})
     for service,image in IMAGES.items():
         item=json.loads(docker(root,'image','inspect',image))[0]
-        require(item['Architecture']=='arm64' and image in item.get('RepoDigests',[]),'IMAGE_ADMISSION')
+        validate_image(item,image)
         runtime['imageIds'][service]=item['Id']
     compose=private/'compose.json';config=recipe(root,private,run,compose)
     prefix=['docker','--context',CONTEXT,'compose','-f',str(compose)]

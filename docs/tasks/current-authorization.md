@@ -1,3 +1,11 @@
+# 2026-11-07 G4-ENG-WORKFLOW-001 当前授权
+
+用户明确要求执行已批准附件03，基于已合并 main `709d22ac11880539669d032550a056d7d761dda8` 使用独立 Worktree；阶段C包外成功回执已核实。任务卡：[G4-ENG-WORKFLOW-001](G4-ENG-WORKFLOW-001.md)。只工程流程优化，不改M1冻结交付、不更新main、不进入M2、不下载/升级依赖或收费调用。
+
+先一页实施清单，范围内持续实现，无需逐patch审批。一个作者与非作者Review；当前依据为[效率规则](../development/ai-development-efficiency.md)、[Review V3合同](../development/review-package-spec.md)、[生命周期](../development/resource-lifecycle.md)及[本地政策](../development/local-validation-policy.md)。下列历史授权原文保留，不作为本任务扩权依据。
+
+---
+
 # 2026-11-01 G4-M1-RECOVERY-001 最新授权
 
 用户正式批准恢复实施及 AMBER-A1 内部合成非分发风险接受；任务卡 [G4-M1-RECOVERY-001](G4-M1-RECOVERY-001.md)。仅四固定ARM64镜像受控取证及原M1 P3–P5、64KiB安全修复；不合main、不改G3/G6、不启动M2。以下历史授权原样保留。
