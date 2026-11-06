@@ -211,23 +211,95 @@ def volume_observation(root, runtime):
     return sizes
 
 
+def resource_manifest(root, runtime, config, private, phase):
+    """创建前写准确期望名称，随后逐项观察；不存在与不可观察均不冒充删除。"""
+    result={'taskId':TASK,'runId':runtime['runId'],'engine':runtime['engine'],'phase':phase,
+            'containerIds':dict(runtime['containerIds']),'volumes':{},'networks':{},
+            'decision':'KEEP_UNTIL_REVIEWED_CLOSEOUT','privateRuntime':str(private/'runtime.json'),
+            'recipeSha256':digest((private/'compose.json').read_bytes())}
+    for category,kind in (('volumes','volume'),('networks','network')):
+        for name,item in config[category].items():
+            row={'expectedName':item['name'],'observation':'NOT_VERIFIED'}
+            if phase!='PLANNED':
+                try:
+                    actual=json.loads(docker(root,kind,'inspect',item['name']))[0]
+                    labels=actual.get('Labels',{})
+                    require(labels.get('ontology.task-id')==TASK and labels.get('ontology.run-id')==runtime['runId'],'RESOURCE_OWNER')
+                    row.update(observation='OBSERVED',identity=actual['Name'] if kind=='volume' else actual['Id'])
+                except (ValueError,OSError,subprocess.SubprocessError):
+                    row['reason']='EXACT_OBJECT_NOT_OBSERVABLE'
+            result[category][name]=row
+    return result
+
+
+def replace_manifest(path, value):
+    """同目录原子更新回执；PLANNED内容保留准确名称，不删除原始运行证据。"""
+    pending=path.with_name(path.name+'.'+uuid.uuid4().hex+'.next')
+    private_write(pending,value);os.replace(pending,path)
+
+
 def stop_owned(root, runtime):
-    """只停止精确本Run容器；保留持久资源给审查后的白名单收尾。"""
-    stopped=[]
-    require(runtime['engine']==engine(root),'ENGINE_DRIFT_DURING_STOP')
+    """逐对象停止已验证本Run容器；一项失败不阻止其余安全项。"""
+    result={'stopped':[],'failures':[]}
     for service,ident in runtime['containerIds'].items():
-        row=json.loads(docker(root,'inspect',ident))[0]
-        require(row['Id']==ident and row['Config']['Labels'].get('ontology.task-id')==TASK and row['Config']['Labels'].get('ontology.run-id')==runtime['runId'],'STOP_OWNER')
-        docker(root,'stop','--time','10',ident,timeout=20)
-        after=json.loads(docker(root,'inspect',ident))[0]
-        require(not after['State']['Running'],'STOP_POSTCONDITION')
-        stopped.append(ident)
-    return stopped
+        try:
+            require(runtime['engine']==engine(root),'ENGINE_DRIFT_DURING_STOP')
+            row=json.loads(docker(root,'inspect',ident))[0]
+            require(row['Id']==ident and row['Config']['Labels'].get('ontology.task-id')==TASK and row['Config']['Labels'].get('ontology.run-id')==runtime['runId'],'STOP_OWNER')
+            docker(root,'stop','--time','10',ident,timeout=20)
+            after=json.loads(docker(root,'inspect',ident))[0]
+            require(not after['State']['Running'],'STOP_POSTCONDITION')
+            result['stopped'].append(ident)
+        except (ValueError,OSError,subprocess.SubprocessError) as exc:
+            result['failures'].append({'service':service,'id':ident,'reason':str(exc) if isinstance(exc,ValueError) else type(exc).__name__})
+    return result
+
+
+def build_input_key(root):
+    """只绑定受Git管理的产品构建与配方输入；不绑定HEAD、Run或过程证据。"""
+    root=Path(root).resolve()
+    paths=subprocess.check_output(['git','ls-files','--cached','--others','--exclude-standard','-z'],cwd=root).decode().split('\0')
+    fixed={'global.json','NuGet.Config','package.json','pnpm-lock.yaml','pnpm-workspace.yaml','.node-version','.npmrc'}
+    selected=[]
+    for relative in sorted(set(paths)-{''}):
+        if not (relative.startswith(('backend/','apps/web/','experiments/g4-m1-main-integration/compose.')) or relative in fixed or relative.startswith('Directory.')):continue
+        # 无Git ignore的隔离测试也排除生成目录；生成状态独立由outputs绑定。
+        if any(part in ('bin','obj','node_modules','.next') for part in Path(relative).parts):continue
+        path=boundary(root/relative,root)
+        selected.append([relative,digest(path.read_bytes()) if path.is_file() else 'MISSING'])
+    require(selected,'BUILD_INPUT_EMPTY')
+    return digest(json.dumps(selected,separators=(',',':')).encode())
+
+
+def build_outputs(root):
+    """绑定API运行目录及Next运行产物；不纳入可变cache/trace和调试报告。"""
+    root=Path(root).resolve();result={}
+    trees=(root/'backend/src/Hosts/OntologyPlatform.Api/bin/Debug/net10.0',root/'apps/web/.next')
+    require((trees[0]/'OntologyPlatform.Api.dll').is_file() and (trees[1]/'required-server-files.json').is_file(),'BUILD_OUTPUT_MISSING')
+    for tree in trees:
+        for path in sorted(tree.rglob('*')):
+            relative=path.relative_to(tree)
+            if relative.parts[0] in ('cache','diagnostics','types') or path.name in ('trace','trace-build') or path.suffix=='.pdb':continue
+            boundary(path,root)
+            if path.is_file():result[str(path.relative_to(root))]=digest(path.read_bytes())
+    return result
+
+
+def validate_build(root):
+    """烟测前后复核本树真实构建回执，拒绝旧源码或产物混用。"""
+    root=Path(root).resolve()
+    path=boundary(root/'artifacts/workflow'/TASK/'build-receipt.json',root,exists=True)
+    receipt=json.loads(path.read_text())
+    require(receipt.get('status')=='PASS' and receipt.get('worktree')==str(root),'BUILD_RECEIPT_IDENTITY')
+    require(receipt.get('inputKey')==build_input_key(root),'BUILD_INPUT_DRIFT')
+    require(receipt.get('outputs')==build_outputs(root),'BUILD_OUTPUT_DRIFT')
+    return {'inputKey':receipt['inputKey'],'receiptSha256':digest(path.read_bytes()),'outputKey':digest(json.dumps(receipt['outputs'],sort_keys=True).encode())}
 
 
 def smoke(root, task, *, node=None):
     """新环境运行一次短真实路径；失败保留证据，finally只停本Run资源。"""
     root=Path(root).resolve();require(task==TASK,'TASK_NOT_AUTHORIZED')
+    build_binding=validate_build(root)
     for path in ('backend/src/Hosts/OntologyPlatform.Api/bin/Debug/net10.0/OntologyPlatform.Api.dll','apps/web/.next/required-server-files.json','apps/web/node_modules/@playwright/test/package.json'):
         require((root/path).is_file(),'SMOKE_BUILD_INPUT_MISSING: '+path)
     node=node or shutil.which('node');require(node is not None,'NODE_MISSING')
@@ -249,6 +321,8 @@ def smoke(root, task, *, node=None):
     compose=private/'compose.json';config=recipe(root,private,run,compose)
     prefix=['docker','--context',CONTEXT,'compose','-f',str(compose)]
     result={'taskId':TASK,'runId':run,'status':'FAIL','productExecution':False,'recipeSha256':digest(compose.read_bytes()),'resourceManifest':str(evidence/'resources.json')}
+    result['buildBinding']=build_binding
+    private_write(evidence/'resources.json',resource_manifest(root,runtime,config,private,'PLANNED'))
     start=time.monotonic()
     try:
         command([*prefix,'create','--pull','never',*SERVICES],cwd=root,timeout=120)
@@ -256,7 +330,7 @@ def smoke(root, task, *, node=None):
             ident=command([*prefix,'ps','--all','--quiet',service],cwd=root).decode().strip()
             require(re.fullmatch('[0-9a-f]{64}',ident),'CREATED_ID_MISSING')
             runtime['containerIds'][service]=ident
-        private_write(evidence/'resources.json',{'taskId':TASK,'runId':run,'engine':runtime['engine'],'containerIds':runtime['containerIds'],'volumes':{k:v['name'] for k,v in config['volumes'].items()},'decision':'KEEP_UNTIL_REVIEWED_CLOSEOUT','privateRuntime':str(private/'runtime.json')})
+        replace_manifest(evidence/'resources.json',resource_manifest(root,runtime,config,private,'CREATED'))
         command([*prefix,'start',*SERVICES],cwd=root,timeout=120)
         wait_http('http://localhost:15180/realms/master/.well-known/openid-configuration',timeout=180)
         env=dict(os.environ,WAVE2_KEYCLOAK_ADMIN_PASSWORD=(private/'keycloak-password').read_text())
@@ -281,7 +355,9 @@ def smoke(root, task, *, node=None):
         private_write(evidence/'browser.json',report)
         require(code==0 and report['status']=='PASS' and report['tests']==2,'SMOKE_ASSERTIONS')
         after=snapshot(root,runtime);require(after==runtime['beforeTopology'],'TOPOLOGY_CHANGED_DURING_SMOKE')
-        result.update(status='PASS',productExecution=True,checks=report,topology=after,volumeBytesAfter=volume_observation(root,runtime))
+        require(validate_build(root)==build_binding,'BUILD_CHANGED_DURING_SMOKE')
+        runtime_key=digest(json.dumps({'engine':runtime['engine'],'images':runtime['imageIds'],'recipe':result['recipeSha256'],'topology':after},sort_keys=True).encode())
+        result.update(status='PASS',productExecution=True,checks=report,topology=after,runtimeKey=runtime_key,volumeBytesAfter=volume_observation(root,runtime))
     except (ValueError,OSError,subprocess.SubprocessError) as exc:
         result['reason']=str(exc) if isinstance(exc,ValueError) else type(exc).__name__
     finally:
@@ -298,8 +374,9 @@ def smoke(root, task, *, node=None):
                 result['resourceRecovery']='NOT_VERIFIED'
         result['containerIds']=runtime['containerIds']
         if runtime['containerIds']:
-            try: result['stoppedContainerIds']=stop_owned(root,runtime)
-            except (ValueError,OSError,subprocess.SubprocessError): result.update(status='FAIL',cleanup='STOP_FAILED_KEEP_EXACT_MANIFEST')
+            stopped=stop_owned(root,runtime);result['stoppedContainerIds']=stopped['stopped']
+            if stopped['failures']:result.update(status='FAIL',cleanup='STOP_FAILED_KEEP_EXACT_MANIFEST',stopFailures=stopped['failures'])
+        replace_manifest(evidence/'resources.json',resource_manifest(root,runtime,config,private,'AFTER_STOP'))
         result['elapsedSeconds']=time.monotonic()-start
         private_write(evidence/'receipt.json',result)
     return result

@@ -5,6 +5,8 @@ import json
 from pathlib import Path
 import tempfile
 import sys
+import subprocess
+from unittest.mock import patch
 import unittest
 
 ROOT=Path(__file__).resolve().parents[2]
@@ -63,6 +65,50 @@ class SmokeTests(unittest.TestCase):
             raw,code=self.smoke.bounded_browser([sys.executable,'-c','print("safe"); raise SystemExit(7)'],Path(directory),timeout=3)
             self.assertEqual(code,7)
             self.assertEqual(raw.strip(),b'safe')
+
+    def test_stop_failure_does_not_skip_other_owned_instances(self):
+        runtime,rows,identity=self.topology();calls=[]
+        def fake_docker(root,*args,**kwargs):
+            if args[0]=='inspect':
+                row=next(v for v in rows.values() if v['Id']==args[1]);return json.dumps([row]).encode()
+            if args[0]=='stop':
+                calls.append(args[-1])
+                if args[-1]==runtime['containerIds']['pg-source']:raise ValueError('STOP_FAILED')
+                next(v for v in rows.values() if v['Id']==args[-1])['State']['Running']=False
+                return b''
+            self.fail('unexpected external action')
+        with patch.object(self.smoke,'engine',return_value=identity),patch.object(self.smoke,'docker',side_effect=fake_docker):
+            result=self.smoke.stop_owned(ROOT,runtime)
+        self.assertEqual(set(calls),set(runtime['containerIds'].values()))
+        self.assertEqual(len(result['stopped']),4)
+        self.assertEqual(len(result['failures']),1)
+
+    def test_build_binding_rejects_changed_source_or_output(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory).resolve();subprocess.run(['git','init','-q',str(root)],check=True)
+            (root/'backend/src').mkdir(parents=True);(root/'backend/src/a.cs').write_text('source')
+            subprocess.run(['git','add','.'],cwd=root,check=True)
+            api=root/'backend/src/Hosts/OntologyPlatform.Api/bin/Debug/net10.0';api.mkdir(parents=True)
+            web=root/'apps/web/.next';web.mkdir(parents=True)
+            (api/'OntologyPlatform.Api.dll').write_bytes(b'assembly');(web/'required-server-files.json').write_text('{}')
+            receipt=root/'artifacts/workflow/G4-ENG-WORKFLOW-001/build-receipt.json';receipt.parent.mkdir(parents=True)
+            receipt.write_text(json.dumps({'status':'PASS','worktree':str(root),'inputKey':self.smoke.build_input_key(root),'outputs':self.smoke.build_outputs(root)}))
+            self.smoke.validate_build(root)
+            (api/'OntologyPlatform.Api.dll').write_bytes(b'changed')
+            with self.assertRaisesRegex(ValueError,'BUILD_OUTPUT_DRIFT'):self.smoke.validate_build(root)
+            (api/'OntologyPlatform.Api.dll').write_bytes(b'assembly');(root/'backend/src/a.cs').write_text('changed source')
+            with self.assertRaisesRegex(ValueError,'BUILD_INPUT_DRIFT'):self.smoke.validate_build(root)
+
+    def test_planned_resources_exist_before_external_creation(self):
+        runtime,_,_=self.topology()
+        with tempfile.TemporaryDirectory() as directory:
+            private=Path(directory);(private/'compose.json').write_text('{}')
+            config={'volumes':{'data':{'name':'ontology-workflow-wf-0123456789ab_data'}},'networks':{'front':{'name':'ontology-workflow-wf-0123456789ab_front'}}}
+            with patch.object(self.smoke,'docker',side_effect=AssertionError('no external creation or inspection')):
+                manifest=self.smoke.resource_manifest(ROOT,runtime,config,private,'PLANNED')
+            self.assertEqual(manifest['volumes']['data']['expectedName'],config['volumes']['data']['name'])
+            self.assertEqual(manifest['networks']['front']['observation'],'NOT_VERIFIED')
+            self.assertEqual(manifest['engine'],runtime['engine'])
 
     def test_entry_exists(self):
         self.assertTrue(Path(SPEC.origin).is_file(),'short smoke adapter missing')
