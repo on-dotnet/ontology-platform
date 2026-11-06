@@ -280,6 +280,19 @@ def engineering_process_environment(task):
     return child_environment
 
 
+def write_gate_output(directory, name, raw):
+    # 可交付命令文本保持原字节，使用既有V3允许的文本格式。
+    output=directory/(name+'.txt');output.write_bytes(raw);os.chmod(output,0o600)
+    return output
+
+
+def validate_package_paths(root, paths):
+    # 直接复用构包器的路径边界，预检不能维护一份会漂移的放行规则。
+    command=". ./scripts/create-review-package.ps1 -Library; try { foreach ($p in ([Console]::In.ReadToEnd() | ConvertFrom-Json)) { Assert-ReviewPath $p } } catch { exit 1 }"
+    result=subprocess.run(['pwsh','-NoProfile','-Command',command],cwd=root,input=json.dumps(paths),text=True,capture_output=True)
+    if result.returncode: raise ValueError('PACKAGE_PATH_REJECTED: existing V3 path policy; values suppressed')
+
+
 def verify(task, path, reuse=None, publish=False, diagnostic=False, hypothesis=None):
     expected=json.loads(safe_file(path).read_text())
     actual=plan(expected['base'],expected['head'])
@@ -330,7 +343,7 @@ def verify(task, path, reuse=None, publish=False, diagnostic=False, hypothesis=N
             guard.record(cost,code if code else (0 if passed else 65))
             evidence_dir=run
             published_dir=safe_file(ROOT/'docs/evidence'/task/'gates'/run.name) if publish else run
-            log=evidence_dir/(name+'.log');log.write_bytes(raw);os.chmod(log,0o600)
+            log=write_gate_output(evidence_dir,name,raw)
             row=dict(gate=name,status='PASS' if passed else 'FAIL',executionMode='FRESH',
                 command=gate['command'],exitCode=code,tests=tests,skipped=skipped,diagnostic=diagnostic,hypothesis=hypothesis,inputsUnchanged=inputs_unchanged,
                 errorSignature=error_signature(raw,code) if not passed else None,
@@ -346,7 +359,7 @@ def verify(task, path, reuse=None, publish=False, diagnostic=False, hypothesis=N
         target=safe_file(ROOT/'docs/evidence'/task/'gates'/run.name);target.mkdir(parents=True)
         for row in rows:
             if row.get('executionMode')!='FRESH': continue
-            for suffix in ('.log','.json'): os.replace(run/(row['gate']+suffix),target/(row['gate']+suffix))
+            for suffix in ('.txt','.json'): os.replace(run/(row['gate']+suffix),target/(row['gate']+suffix))
             write(run/(row['gate']+'.state.json'),{k:row[k] for k in ('status','inputKey','environmentKey','errorSignature')})
     write(run/'receipt.json',result)
     return result
@@ -380,6 +393,10 @@ def package_budget(root, base, head, task):
 
 def package_check(task, base, head, evidence):
     result=package_budget(ROOT,base,head,task)
+    paths=set(git(ROOT,'ls-tree','-r','--name-only','-z',head).decode().split('\0'))
+    paths.update(git(ROOT,'diff','--name-only','-z','--no-renames',base,head,'--').decode().split('\0'))
+    validate_package_paths(ROOT,sorted(paths-{''}))
+    result['pathPolicy']='PASS: existing V3 rules'
     proc=subprocess.run(['pwsh','-NoProfile','-File','scripts/verify.ps1'],cwd=ROOT,env=engineering_process_environment(task))
     result['formatExitCode']=proc.returncode
     if proc.returncode: result['status']='BLOCKED'

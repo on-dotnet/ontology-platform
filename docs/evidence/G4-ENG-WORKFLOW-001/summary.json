@@ -16,7 +16,7 @@
     "elapsedSeconds": 477.47194024999044,
     "sourceAtStart": "2d7d55c0b7eb50e9f9d73074c74f82a5e02baeea",
     "bindingLimitation": "Only workflow.py, its tests and gate registry changed during this Full. Original receipt unchanged; not eligible as current-key REUSED. Unchanged Full checks plus subsequent 17 current focused tests and fresh static validation form impact coverage accepted by independent reviewer.",
-    "originalLog": "gates/2034e61550864d94b1628ac42edf888a/engineering-full.log",
+    "originalLog": "gates/2034e61550864d94b1628ac42edf888a/engineering-full.txt",
     "originalLogSha256": "fa33c1753b29338fc202e70852c2e7532bf691bf74dd9347078ab7658a8bcd8a"
   },
   "reuseProof": {
@@ -302,5 +302,69 @@
     "policyContinuouslyReady": true,
     "sessionContinuity": "NOT_VERIFIED",
     "globalPowerSettingsChanged": false
+  },
+  "outputRecoveryMap": [
+    {
+      "originalCommit": "a2b5ed18fc484b9bfef0b2d82169868c79136a94",
+      "originalPath": "docs/evidence/G4-ENG-WORKFLOW-001/gates/2034e61550864d94b1628ac42edf888a/engineering-full.log",
+      "currentPath": "docs/evidence/G4-ENG-WORKFLOW-001/gates/2034e61550864d94b1628ac42edf888a/engineering-full.txt",
+      "sha256": "fa33c1753b29338fc202e70852c2e7532bf691bf74dd9347078ab7658a8bcd8a",
+      "sizeBytes": 44135
+    },
+    {
+      "originalCommit": "a2b5ed18fc484b9bfef0b2d82169868c79136a94",
+      "originalPath": "docs/evidence/G4-ENG-WORKFLOW-001/gates/2034e61550864d94b1628ac42edf888a/engineering.log",
+      "currentPath": "docs/evidence/G4-ENG-WORKFLOW-001/gates/2034e61550864d94b1628ac42edf888a/engineering.txt",
+      "sha256": "c52e7ed5b7825a07baf4fe1d7b5b59c9566ddd184cf87d881f903a09a9bbbe1c",
+      "sizeBytes": 114
+    },
+    {
+      "originalCommit": "a2b5ed18fc484b9bfef0b2d82169868c79136a94",
+      "originalPath": "docs/evidence/G4-ENG-WORKFLOW-001/gates/2034e61550864d94b1628ac42edf888a/environment-prepare.log",
+      "currentPath": "docs/evidence/G4-ENG-WORKFLOW-001/gates/2034e61550864d94b1628ac42edf888a/environment-prepare.txt",
+      "sha256": "d26bdd8902cfd9615fdc56631c8cf5c6f50365669f489e98ad81e93f48fdb11a",
+      "sizeBytes": 104
+    },
+    {
+      "originalCommit": "a2b5ed18fc484b9bfef0b2d82169868c79136a94",
+      "originalPath": "docs/evidence/G4-ENG-WORKFLOW-001/gates/2034e61550864d94b1628ac42edf888a/host_continuity.log",
+      "currentPath": "docs/evidence/G4-ENG-WORKFLOW-001/gates/2034e61550864d94b1628ac42edf888a/host_continuity.txt",
+      "sha256": "e6cfeaff7f40e06c03f85917b7ccd4c0b4f6378d7f57e6056770069f646daae9",
+      "sizeBytes": 441
+    },
+    {
+      "originalCommit": "a2b5ed18fc484b9bfef0b2d82169868c79136a94",
+      "originalPath": "docs/evidence/G4-ENG-WORKFLOW-001/gates/2034e61550864d94b1628ac42edf888a/policy.log",
+      "currentPath": "docs/evidence/G4-ENG-WORKFLOW-001/gates/2034e61550864d94b1628ac42edf888a/policy.txt",
+      "sha256": "0a9dd22830f0e5e74b167a38121fe0fb8ac59d2234ff54e4db69d2db750ecf36",
+      "sizeBytes": 558
+    },
+    {
+      "originalCommit": "a2b5ed18fc484b9bfef0b2d82169868c79136a94",
+      "originalPath": "docs/evidence/G4-ENG-WORKFLOW-001/gates/2034e61550864d94b1628ac42edf888a/smoke-adapter.log",
+      "currentPath": "docs/evidence/G4-ENG-WORKFLOW-001/gates/2034e61550864d94b1628ac42edf888a/smoke-adapter.txt",
+      "sha256": "6b08ea4338911358dc83bc6f0226197dcde1e772d103b3df5392805088087a9d",
+      "sizeBytes": 113
+    },
+    {
+      "originalCommit": "a2b5ed18fc484b9bfef0b2d82169868c79136a94",
+      "originalPath": "docs/evidence/G4-ENG-WORKFLOW-001/gates/b645a58e78e84031b377240eef531940/engineering.log",
+      "currentPath": "docs/evidence/G4-ENG-WORKFLOW-001/gates/b645a58e78e84031b377240eef531940/engineering.txt",
+      "sha256": "937afabfae4b3729dd0abe8f7e900cfbf4d4cf8af51d8bfdbbc1c6832290e973",
+      "sizeBytes": 116
+    },
+    {
+      "originalCommit": "a2b5ed18fc484b9bfef0b2d82169868c79136a94",
+      "originalPath": "docs/evidence/G4-ENG-WORKFLOW-001/gates/b645a58e78e84031b377240eef531940/policy.log",
+      "currentPath": "docs/evidence/G4-ENG-WORKFLOW-001/gates/b645a58e78e84031b377240eef531940/policy.txt",
+      "sha256": "dc47b07eb9667f890f68b33bfe3195824b85cb5b9dc4586b663d4a52150c2a1f",
+      "sizeBytes": 558
+    }
+  ],
+  "packageCorrection": {
+    "rejectedBeforeZip": true,
+    "reason": "Existing V3 forbids .log members; original command stdout bytes migrated to .txt, unchanged safety rules",
+    "historicalRows": "Original JSON logPath and Git receipts remain unchanged; outputRecoveryMap locates identical current package text",
+    "requiredDelta": "18 focused tests and actual current FRESH-to-Git-to-REUSED proof"
   }
 }

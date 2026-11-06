@@ -148,6 +148,14 @@ class WorkflowTests(unittest.TestCase):
         self.assertEqual(self.w.select_gates(['docs/evidence/OTHER/fixture.json'])['status'],'BLOCKED')
         self.assertEqual(self.w.select_gates(['docs/evidence/OTHER/driver.py'])['status'],'BLOCKED')
 
+    def test_published_output_uses_existing_package_path_rules(self):
+        with tempfile.TemporaryDirectory() as d:
+            output=self.w.write_gate_output(Path(d),'engineering',b'Ran 2 tests in 0.01s\nOK\n')
+            self.assertEqual(output.read_bytes(),b'Ran 2 tests in 0.01s\nOK\n')
+            self.w.validate_package_paths(ROOT,['docs/evidence/TEST/'+output.name])
+            with self.assertRaisesRegex(ValueError,'PACKAGE_PATH_REJECTED'):
+                self.w.validate_package_paths(ROOT,['docs/evidence/TEST/forbidden.log'])
+
     def test_package_estimate_requires_exact_commits(self):
         with tempfile.TemporaryDirectory() as d:
             with self.assertRaisesRegex(ValueError,'FULL_COMMIT_REQUIRED'):

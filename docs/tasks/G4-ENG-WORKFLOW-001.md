@@ -37,7 +37,7 @@ python3 -B scripts/maintenance/workflow.py package-check --task G4-ENG-WORKFLOW-
 python3 -B scripts/maintenance/workflow.py closeout --task G4-ENG-WORKFLOW-001 --dry-run
 ```
 
-publish-evidence在全部gate结束后发布，避免输出污染同轮输入。仓库默认忽略`.log`，提交原件时必须逐文件 `git add -f -- docs/evidence/<Task>/gates/<Run>/<Gate>.log`，与对应JSON一起提交，再建 `{gate:{commit,path}}` 索引。未知输入阻断，产品gate没有本任务执行器则NOT_RUN，不隐式调用旧M1整链。
+publish-evidence在全部gate结束后发布，避免输出污染同轮输入。可交付原命令输出使用`.txt`，保持原字节并经过既有V3安全扫描，与对应JSON一起提交，再建 `{gate:{commit,path}}` 索引。初次构包在写ZIP前拒绝旧`.log`路径；原Git记录与JSON保持不变，包内等字节文本恢复映射见summary.outputRecoveryMap。未知输入阻断，产品gate没有本任务执行器则NOT_RUN，不隐式调用旧M1整链。
 
 smoke要求当前树已构建API/Web及`artifacts/workflow/<Task>/build-receipt.json`（当前输入键/产物SHA、实际成功构建），然后 `workflow.py smoke --task G4-ENG-WORKFLOW-001`；不能只凭DLL存在复用旧产物。重复smoke不自动build/restore。诊断用verify的`--diagnostic`（≤20秒）；三次同类失败需新相关输入和`--hypothesis`，全部旧失败保留。
 
