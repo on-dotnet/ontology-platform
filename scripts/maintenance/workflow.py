@@ -16,6 +16,7 @@ import shutil
 import zlib
 import signal
 import datetime as dt
+from functools import lru_cache
 
 ROOT = Path(__file__).resolve().parents[2]
 REGISTRY = ROOT / 'docs/development/verification-gates.json'
@@ -29,6 +30,7 @@ def canonical(value):
     return json.dumps(value, sort_keys=True, separators=(',', ':')).encode()
 
 
+@lru_cache(maxsize=1)
 def registry():
     return json.loads(REGISTRY.read_text())['gates']
 
@@ -68,14 +70,29 @@ def input_patterns(name, visited=None):
 def input_key(root, name):
     paths = set(git(root, 'ls-files', '--cached', '--others', '--exclude-standard', '-z').decode().split('\0'))-{''}
     entries = []
+    patterns=input_patterns(name)
     for path in sorted(paths):
-        if not matches(path, input_patterns(name)): continue
+        if not matches(path, patterns): continue
         p = root/path
         if p.is_symlink(): raise ValueError('INPUT_LINKED: '+path)
         entries.append([path, digest(p.read_bytes()) if p.is_file() else 'DELETED'])
     closure=set()
     input_patterns(name,closure)
     return digest(canonical([{n:registry()[n] for n in sorted(closure)}, entries]))
+
+
+def committed_input_key(root, name, commit):
+    """从原测试提交重算相关源码内容，不能只信回执自报输入键。"""
+    patterns=input_patterns(name);entries=[]
+    for entry in git(root,'ls-tree','-r','-z',commit).split(b'\0'):
+        if not entry: continue
+        info,path=entry.split(b'\t',1);path=path.decode()
+        if not matches(path,patterns): continue
+        mode,kind,oid=info.decode().split()
+        if kind!='blob' or mode not in ('100644','100755'): raise ValueError('REUSE_SOURCE_SPECIAL')
+        entries.append([path,digest(git(root,'cat-file','blob',oid))])
+    closure=set();input_patterns(name,closure)
+    return digest(canonical([{n:registry()[n] for n in sorted(closure)},sorted(entries)]))
 
 
 def reusable(row, key, environment, policy, evidence):
@@ -123,11 +140,14 @@ def plan(base, head):
     base=git(ROOT,'rev-parse','--verify',base+'^{commit}').decode().strip()
     head=git(ROOT,'rev-parse','--verify',head+'^{commit}').decode().strip()
     subprocess.run(['git','merge-base','--is-ancestor',base,head],cwd=ROOT,check=True)
+    if git(ROOT,'rev-parse','HEAD').decode().strip()!=head: raise ValueError('PLAN_HEAD_NOT_CHECKED_OUT')
     if git(ROOT,'status','--porcelain').strip(): raise ValueError('PLAN_DIRTY: commit the candidate first')
     paths=sorted(set(git(ROOT,'diff','--name-only','--no-renames','-z',base,head).decode().split('\0'))-{''})
     result=select_gates(paths)
-    return dict(schemaVersion=1,base=base,head=head,paths=paths,registrySha256=digest(REGISTRY.read_bytes()),
-                inputKeys={name:input_key(ROOT,name) for name in registry()},**result)
+    keys={name:input_key(ROOT,name) for name in registry()}
+    if git(ROOT,'status','--porcelain').strip() or git(ROOT,'rev-parse','HEAD').decode().strip()!=head:
+        raise ValueError('PLAN_INPUT_CHANGED_DURING_CHECK')
+    return dict(schemaVersion=1,base=base,head=head,paths=paths,registrySha256=digest(REGISTRY.read_bytes()),inputKeys=keys,**result)
 
 
 def ordered(names):
@@ -162,7 +182,13 @@ def engineering_environment():
         path=shutil.which(name)
         if not path: raise ValueError('TOOL_MISSING: '+name)
         tools[name]=digest(Path(path).resolve().read_bytes())
-    return digest(canonical([platform.system(),platform.machine(),tools]))
+    parser_root=safe_file(ROOT/'.tools/pythonlibs')
+    parser_files={}
+    if parser_root.is_dir():
+        for p in sorted(parser_root.rglob('*')):
+            safe_file(p)
+            if p.is_file(): parser_files[str(p.relative_to(parser_root))]=digest(p.read_bytes())
+    return digest(canonical([platform.system(),platform.release(),platform.machine(),tools,parser_files]))
 
 
 def policy_key(name='engineering'):
@@ -193,6 +219,8 @@ def load_reuse(index, gate, key, environment, policy):
            row.get('command')==registry()[gate]['command'] and row.get('evidenceSha256')==digest(log) and
            re.fullmatch('[0-9a-f]{40}',row.get('sourceCommit','')) is not None and bool(row.get('sourceRun')))
     if not valid: raise ValueError('REUSE_INELIGIBLE: '+gate)
+    subprocess.run(['git','merge-base','--is-ancestor',row['sourceCommit'],commit],cwd=ROOT,check=True,capture_output=True)
+    if committed_input_key(ROOT,gate,row['sourceCommit'])!=key: raise ValueError('REUSE_SOURCE_INPUT_MISMATCH')
     return dict(gate=gate,status='PASS',executionMode='REUSED',sourceCommit=row['sourceCommit'],
                 sourceRun=row['sourceRun'],evidenceCommit=commit,evidencePath=path,evidenceSha256=digest(log),
                 inputKey=key,reason='Immutable original success, identical input/environment/policy',
@@ -211,6 +239,18 @@ def execute_gate(command, root, timeout=1800, environment=None):
         else: child.kill()
         out,err=child.communicate()
         return 124,out+err
+
+
+def error_signature(raw, code):
+    text=raw.decode(errors='replace')
+    cases=sorted(set(re.findall(r'(?:FAIL|ERROR): ([A-Za-z0-9_.]+)',text)))
+    categories=sorted(set(re.findall(r'\b([A-Z][A-Z0-9_]{4,})(?=:)',text)))
+    if cases or categories: return digest(canonical([code,cases,categories]))
+    lines=[line for line in text.splitlines() if re.search(r'error|failed|exception',line,re.I)]
+    normalized=re.sub(r'(?<!\w)/[^\s]+','<path>','\n'.join(lines[-5:]))
+    normalized=re.sub(r'\b[0-9a-f]{16,}\b','<hash>',normalized)
+    normalized=re.sub(r'\d+(?:\.\d+)?','<number>',normalized)
+    return digest(canonical([code,normalized or 'COMMAND_FAILED']))
 
 
 def record_timing(directory, task, run, name, key, start, elapsed, code):
@@ -237,8 +277,13 @@ def verify(task, path, reuse=None, publish=False, diagnostic=False, hypothesis=N
     spec=importlib.util.spec_from_file_location('execution_preflight',ROOT/'scripts/maintenance/execution_preflight.py')
     helper=importlib.util.module_from_spec(spec);spec.loader.exec_module(helper)
     environment=engineering_environment()
-    prepared=prepare(task)
-    child_environment=prepared['environment']
+    # 工程门禁不触发.NET/Web准备；缺工具由对应命令准确失败。
+    child_environment={k:v for k,v in os.environ.items() if k in ('PATH','LANG','LC_ALL','SystemRoot')}
+    child_environment.update(PYTHONDONTWRITEBYTECODE='1',NEXT_TELEMETRY_DISABLED='1',PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD='1')
+    parser_root=safe_file(ROOT/'.tools/pythonlibs')
+    if parser_root.is_dir(): child_environment['PYTHONPATH']=str(parser_root)
+    cli=directory/'engineering-cli-home';cli.mkdir(exist_ok=True)
+    child_environment.update(DOTNET_CLI_HOME=str(cli),DOTNET_SKIP_FIRST_TIME_EXPERIENCE='1',DOTNET_GENERATE_ASPNET_CERTIFICATE='false',DOTNET_CLI_TELEMETRY_OPTOUT='1',DOTNET_CLI_WORKLOAD_UPDATE_NOTIFY_DISABLE='true')
     rows=[];outcomes={}
     for name in ordered(set(actual['affected']) | set(index)):
         gate=registry()[name];key=actual['inputKeys'][name];policy=policy_key(name)
@@ -275,7 +320,7 @@ def verify(task, path, reuse=None, publish=False, diagnostic=False, hypothesis=N
             log=evidence_dir/(name+'.log');log.write_bytes(raw);os.chmod(log,0o600)
             row=dict(gate=name,status='PASS' if passed else 'FAIL',executionMode='FRESH',
                 command=gate['command'],exitCode=code,tests=tests,skipped=skipped,diagnostic=diagnostic,hypothesis=hypothesis,
-                errorSignature=digest(raw[-4096:]) if not passed else None,
+                errorSignature=error_signature(raw,code) if not passed else None,
                 elapsedSeconds=elapsed,inputKey=key,environmentKey=environment,policyKey=policy,
                 evidenceSha256=digest(raw),logPath=str(log.relative_to(ROOT)),sourceRun=run.name,sourceCommit=actual['head'])
             write(evidence_dir/(name+'.json'),row);

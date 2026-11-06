@@ -5,6 +5,7 @@ import {createRequire} from 'node:module';
 const root=resolve(import.meta.dirname,'../..');
 let browser;
 let phase='runtime';
+let probeStages=[];
 const check=(value,code)=>{if(!value)throw new Error(code);};
 async function privateFile(path){
  const absolute=resolve(path), prefix=resolve(root,'.tools/security/g4-eng-workflow-001')+sep;
@@ -50,10 +51,11 @@ try{
  }
  await click('安全录入凭据','/api/v1/connection-secrets',201);
  const probe=await click('测试草稿','/api/v1/connections/tests',200);
+ probeStages=(probe.stages??[]).filter(s=>['NETWORK','TLS','AUTH','READ_ONLY','METADATA'].includes(s.name)).map(s=>({name:s.name,status:['PASS','FAIL','NOT_RUN'].includes(s.status)?s.status:'UNKNOWN'}));
  check(probe.status==='TEST_OK'&&['NETWORK','TLS','AUTH','READ_ONLY','METADATA'].every(name=>probe.stages.some(s=>s.name===name&&s.status==='PASS')),'PG_PROBE');
  await expect(page.getByRole('region',{name:'连接测试报告'}).locator('ol li')).toHaveCount(5);
  check(!(await page.locator('body').innerText()).includes(secret),'VISIBLE_SECRET');
  console.log(JSON.stringify({status:'PASS',tests:2,skipped:0,taskId:runtime.taskId,runId:runtime.runId,checks:['OIDC_UI_PG_PROBE','AUTHENTICATED_CSRF_REJECTION']}));
 }catch(error){
- console.log(JSON.stringify({status:'FAIL',tests:0,skipped:0,phase,reason:error instanceof Error&&/^[A-Z_]+$/.test(error.message)?error.message:'BROWSER_OR_TRANSPORT'}));process.exitCode=1;
+ console.log(JSON.stringify({status:'FAIL',tests:0,skipped:0,phase,probeStages,reason:error instanceof Error&&/^[A-Z_]+$/.test(error.message)?error.message:'BROWSER_OR_TRANSPORT'}));process.exitCode=1;
 }finally{if(browser)await browser.close();}

@@ -93,6 +93,12 @@ class WorkflowTests(unittest.TestCase):
         self.assertLess(order.index('environment'),order.index('backend'))
         self.assertLess(order.index('backend'),order.index('interaction'))
 
+    def test_failure_signature_ignores_time_and_temporary_path(self):
+        first=b'FAIL: test_boundary (Tests)\n/tmp/run123/a.py\nRan 2 tests in 0.05s'
+        second=b'FAIL: test_boundary (Tests)\n/tmp/run456/a.py\nRan 2 tests in 12.45s'
+        self.assertEqual(self.w.error_signature(first,1),self.w.error_signature(second,1))
+        self.assertNotEqual(self.w.error_signature(first,1),self.w.error_signature(b'FAIL: test_other (Tests)',1))
+
     def test_timeout_keeps_actual_exit_and_output(self):
         code,raw=self.w.execute_gate([sys.executable,'-u','-c','import time; print("started"); time.sleep(5)'],ROOT,0.05)
         self.assertEqual(code,124)
@@ -102,22 +108,25 @@ class WorkflowTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             root=Path(d)
             subprocess.run(['git','init','-q',d],check=True)
+            subprocess.run(['git','-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','--allow-empty','-qm','source'],cwd=root,check=True)
+            source=subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip()
+            key=self.w.input_key(root,'engineering')
             folder=root/'docs/evidence/TEST';folder.mkdir(parents=True)
             log=folder/'run.log';log.write_text('Ran 2 tests in 0.01s\nOK\n')
-            row=dict(gate='engineering',status='PASS',exitCode=0,tests=2,skipped=0,inputKey='key',environmentKey='env',policyKey='policy',command=self.w.registry()['engineering']['command'],sourceCommit='a'*40,sourceRun='T1',logPath='docs/evidence/TEST/run.log',evidenceSha256=self.w.digest(log.read_bytes()))
+            row=dict(gate='engineering',status='PASS',exitCode=0,tests=2,skipped=0,inputKey=key,environmentKey='env',policyKey='policy',command=self.w.registry()['engineering']['command'],sourceCommit=source,sourceRun='T1',logPath='docs/evidence/TEST/run.log',evidenceSha256=self.w.digest(log.read_bytes()))
             (folder/'receipt.json').write_text(json.dumps(row))
             subprocess.run(['git','add','.'],cwd=root,check=True)
             subprocess.run(['git','-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','-qm','evidence'],cwd=root,check=True)
             commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip()
             index={'engineering':{'commit':commit,'path':'docs/evidence/TEST/receipt.json'}}
             with patch.object(self.w,'ROOT',root):
-                reused=self.w.load_reuse(index,'engineering','key','env','policy')
+                reused=self.w.load_reuse(index,'engineering',key,'env','policy')
                 self.assertEqual(reused['executionMode'],'REUSED')
                 self.assertNotIn('exitCode',reused)
                 with self.assertRaisesRegex(ValueError,'REUSE_INELIGIBLE'):
                     self.w.load_reuse(index,'engineering','changed','env','policy')
                 log.write_text('tampered working copy')
-                self.assertEqual(self.w.load_reuse(index,'engineering','key','env','policy')['evidenceCommit'],commit)
+                self.assertEqual(self.w.load_reuse(index,'engineering',key,'env','policy')['evidenceCommit'],commit)
 
     def test_doc_executable_fixture_is_not_treated_as_prose(self):
         self.assertEqual(self.w.select_gates(['docs/evidence/OTHER/fixture.json'])['status'],'BLOCKED')
