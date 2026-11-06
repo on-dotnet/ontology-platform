@@ -1,0 +1,73 @@
+{
+  "evidenceSchemaVersion": 2,
+  "validationSource": "LOCAL",
+  "testedCommit": "15ab45f8eda0304b086331f9052c2c6b58f51236",
+  "checks": [
+    {
+      "name": "dependency-prepare",
+      "command": "python3 -B scripts/maintenance/workflow.py prepare --task G4-ENG-WORKFLOW-001",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Formal CLI exit0; final repeat materializedFiles=0, restoreCount=0, downloads=0; actual source closure and workspace checks in summary."
+    },
+    {
+      "name": "current-build",
+      "command": "dotnet build --no-restore; pnpm --dir apps/web run build",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Both actual current-tree commands exit0 under OS network boundary. Exact commands and output hashes in summary; 401 artifact binding independently rechecked."
+    },
+    {
+      "name": "real-smoke",
+      "command": "Python workflow_smoke.smoke(root, task, node=preparedNode)",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Run wf-a4ed156ebbf9: two real checks PASS, 0 skip, actual browser exit0; new task runtime and exact topology bound."
+    },
+    {
+      "name": "full-engineering-original",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1 -SelfTest",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Actual original Full exit0, 477.47s. Original source identity retained; not reused as current Full key. Unchanged checks plus current focused delta accepted by non-author."
+    },
+    {
+      "name": "focused-current-delta",
+      "command": "python3 -B scripts/maintenance/workflow.py verify --task G4-ENG-WORKFLOW-001 --plan delta-plan.json --publish-evidence",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "17 current focused tests exit0, inputsUnchanged=true, plus fresh repository static verification."
+    },
+    {
+      "name": "immutable-reuse",
+      "command": "python3 -B scripts/maintenance/workflow.py verify --task G4-ENG-WORKFLOW-001 --plan reuse-plan.json --reuse reuse-index.json",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Qualification command exit0; original engineering test REUSED (no new test exitCode), policy FRESH; independently recomputed from Git."
+    },
+    {
+      "name": "owned-resource-closeout",
+      "command": "python3 /tmp/g4-clean-run.py <three explicitly reviewed RunIds>",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "33 exact objects removed with Engine/owner/reference rechecks and correct not-found postconditions; all per-object actual commands and exits preserved."
+    }
+  ],
+  "ci": {
+    "status": "NOT_RUN",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  },
+  "metadata": {
+    "taskId": "G4-ENG-WORKFLOW-001",
+    "review": "Independent review PASS for final source, drift defense, exact Full delta coverage, immutable Git reuse, and each resource whitelist.",
+    "platform": "macOS ARM64",
+    "windows": "NOT_RUN",
+    "intel": "NOT_RUN",
+    "actualAgentActiveTime": "UNKNOWN",
+    "fullInputDeltaDisposition": "Original Full unchanged checks plus current 17-case focused delta; never mark old Full as current input-key REUSED",
+    "packageAndIndependentReopen": "See external delivery receipt; not predeclared here"
+  }
+}
