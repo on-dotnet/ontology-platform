@@ -6,6 +6,8 @@ from pathlib import Path
 import tempfile
 import sys
 import subprocess
+import socket
+import threading
 from unittest.mock import patch
 import unittest
 
@@ -115,6 +117,32 @@ class SmokeTests(unittest.TestCase):
             self.assertEqual(manifest['volumes']['data']['expectedName'],config['volumes']['data']['name'])
             self.assertEqual(manifest['networks']['front']['observation'],'NOT_VERIFIED')
             self.assertEqual(manifest['engine'],runtime['engine'])
+
+    def test_relay_only_accepts_fixed_current_task_targets(self):
+        runtime,_,_=self.topology()
+        token='wf-relay-'+runtime['runId']+'-'+'a'*32
+        command=self.smoke.relay_command(runtime,15180,token)
+        self.assertEqual(command[:5],['docker','--context','desktop-linux','exec','-i'])
+        self.assertEqual(command[5],runtime['containerIds']['web'])
+        with self.assertRaisesRegex(ValueError,'RELAY_TARGET'):
+            self.smoke.relay_command(runtime,80,token)
+        runtime['taskId']='OTHER'
+        with self.assertRaisesRegex(ValueError,'RELAY_IDENTITY'):
+            self.smoke.relay_command(runtime,15180,token)
+
+    def test_relay_real_duplex_stream_releases_own_process(self):
+        runtime,_,_=self.topology();relay=self.smoke.HostRelay(ROOT,runtime)
+        actual_popen=subprocess.Popen;children=[]
+        script="import os,sys; print('PID '+str(os.getpid()),file=sys.stderr,flush=True);\nwhile True:\n data=os.read(0,65536)\n if not data:break\n os.write(1,data)"
+        def local_transport(args,**kwargs):
+            child=actual_popen([sys.executable,'-c',script],**kwargs);children.append(child);return child
+        left,right=socket.socketpair()
+        with patch.object(self.smoke.subprocess,'Popen',side_effect=local_transport),patch.object(self.smoke,'docker',return_value=b''):
+            thread=threading.Thread(target=relay.forward,args=(right,15100));thread.start()
+            left.settimeout(5);left.sendall(b'opaque test request');self.assertEqual(left.recv(64),b'opaque test request')
+            left.close();thread.join(timeout=5)
+        self.assertFalse(thread.is_alive());self.assertFalse(relay.active)
+        self.assertTrue(all(child.poll() is not None for child in children))
 
     def test_entry_exists(self):
         self.assertTrue(Path(SPEC.origin).is_file(),'short smoke adapter missing')

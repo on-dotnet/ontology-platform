@@ -10,6 +10,9 @@ import secrets
 import signal
 import shutil
 import socket
+import socketserver
+import select
+import threading
 import subprocess
 import time
 import urllib.request
@@ -44,6 +47,132 @@ process.chdir(dir);
 const require=createRequire(path.join(dir,'package.json'));
 await require('next/dist/server/lib/start-server').startServer({dir,hostname:'0.0.0.0',port:15300,isDev:false,allowRetry:false,keepAliveTimeout:5000});
 """
+
+
+RELAY_NODE=r"""const net=require('node:net');
+const port=Number(process.argv[1]),token=process.argv[2];
+if(![15100,15180].includes(port)||!/^wf-relay-wf-[a-f0-9]{12}-[a-f0-9]{32}$/.test(token))process.exit(2);
+process.stderr.write('PID '+process.pid+'\n');
+const peer=port===15100?['127.0.0.1',15100]:['keycloak-test',8080];
+const socket=net.connect({host:peer[0],port:peer[1]});
+const finish=()=>{socket.destroy();process.exit(0);};
+const timer=setTimeout(finish,45000);timer.unref();
+socket.setTimeout(30000,finish);socket.on('error',finish);
+process.stdout.on('error',finish);process.stdin.on('error',finish);
+process.stdin.on('end',finish);socket.on('end',()=>{process.stdout.end();});
+process.stdin.pipe(socket);socket.pipe(process.stdout);
+"""
+RELAY_STOP_NODE=r"""const fs=require('node:fs');
+const pid=Number(process.argv[1]),token=process.argv[2];
+if(!Number.isInteger(pid)||pid<1||!/^wf-relay-wf-[a-f0-9]{12}-[a-f0-9]{32}$/.test(token))process.exit(2);
+function owned(){try{const a=fs.readFileSync('/proc/'+pid+'/cmdline').toString().split('\0');return a.includes(token)&&(a[0]==='node'||a[0].endsWith('/node'));}catch(e){if(e.code==='ENOENT')return false;throw e;}}
+if(owned())process.kill(pid,'SIGTERM');
+const deadline=Date.now()+2000;
+const timer=setInterval(()=>{if(!owned()){clearInterval(timer);process.exit(0);}if(Date.now()>deadline){clearInterval(timer);process.exit(3);}},50);
+"""
+
+
+def relay_command(runtime, port, token):
+    """只允许当前准确Web实例执行两个固定内部目标，不接受地址/脚本输入。"""
+    require(runtime.get('taskId')==TASK and re.fullmatch('wf-[a-f0-9]{12}',runtime.get('runId','')),'RELAY_IDENTITY')
+    require(port in (15100,15180),'RELAY_TARGET')
+    require(re.fullmatch('wf-relay-'+runtime['runId']+'-[a-f0-9]{32}',token),'RELAY_TOKEN')
+    ident=runtime['containerIds']['web'];require(re.fullmatch('[a-f0-9]{64}',ident),'RELAY_CONTAINER')
+    return ['docker','--context',CONTEXT,'exec','-i',ident,'node','-e',RELAY_NODE,str(port),token]
+
+
+class HostRelay:
+    """内部网络专用stdio入口：仅loopback，两固定端口，16连接/45秒/总480秒。"""
+    def __init__(self, root, runtime):
+        self.root=root;self.runtime=runtime;self.servers=[];self.threads=[]
+        self.stop=threading.Event();self.lock=threading.Lock();self.slots=threading.BoundedSemaphore(16)
+        self.active={};self.failures=[];self.connections=0;self.timer=None
+
+    def start(self):
+        snapshot(self.root,self.runtime)
+        owner=self
+        class Server(socketserver.ThreadingTCPServer):
+            allow_reuse_address=False
+            daemon_threads=True
+            block_on_close=False
+            request_queue_size=32
+            def handle_error(self, request, address):
+                owner.failures.append('RELAY_HANDLER_FAILED')
+        class Handler(socketserver.BaseRequestHandler):
+            def handle(self):owner.forward(self.request,self.server.server_address[1])
+        try:
+            for port in (15100,15180):
+                server=Server(('127.0.0.1',port),Handler);self.servers.append(server)
+                thread=threading.Thread(target=server.serve_forever,kwargs={'poll_interval':.1},daemon=True)
+                thread.start();self.threads.append(thread)
+            self.timer=threading.Timer(480,self.expire);self.timer.daemon=True;self.timer.start()
+            return self
+        except Exception:
+            self.close();raise
+
+    def forward(self, client, port):
+        if self.stop.is_set() or not self.slots.acquire(blocking=False):return
+        process=None;pid=None;token='wf-relay-'+self.runtime['runId']+'-'+uuid.uuid4().hex
+        try:
+            process=subprocess.Popen(relay_command(self.runtime,port,token),cwd=self.root,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,start_new_session=True,bufsize=0)
+            client.settimeout(5)
+            with self.lock:self.active[token]=(client,process);self.connections+=1
+            ready,_,_=select.select([process.stderr],[],[],5)
+            require(ready,'RELAY_PID_TIMEOUT')
+            line=process.stderr.readline(80).decode();require(re.fullmatch(r'PID [1-9][0-9]*\n',line),'RELAY_PID')
+            pid=int(line.split()[1]);deadline=time.monotonic()+45
+            while not self.stop.is_set() and time.monotonic()<deadline:
+                readable,_,_=select.select([client,process.stdout],[],[],.5)
+                if client in readable:
+                    data=client.recv(65536)
+                    if not data:break
+                    offset=0
+                    while offset<len(data):
+                        written=process.stdin.write(data[offset:]);require(written and written>0,'RELAY_PIPE_WRITE');offset+=written
+                if process.stdout in readable:
+                    data=os.read(process.stdout.fileno(),65536)
+                    if not data:break
+                    client.sendall(data)
+        except (OSError,ValueError,subprocess.SubprocessError):
+            # 单连接关闭/启动期拒绝只影响该连接，不打印流量或原始异常。
+            pass
+        finally:
+            try:client.close()
+            except OSError:pass
+            if process:
+                try:process.stdin.close()
+                except OSError:pass
+                if pid:
+                    try:docker(self.root,'exec',self.runtime['containerIds']['web'],'node','-e',RELAY_STOP_NODE,str(pid),token,timeout=5)
+                    except (OSError,ValueError,subprocess.SubprocessError):self.failures.append('RELAY_CHILD_RELEASE_NOT_VERIFIED')
+                try:process.wait(timeout=2)
+                except subprocess.TimeoutExpired:
+                    process.kill();process.wait(timeout=2)
+                for stream in (process.stdout,process.stderr):stream.close()
+            with self.lock:self.active.pop(token,None)
+            self.slots.release()
+
+    def expire(self):
+        self.failures.append('RELAY_LIFETIME_EXPIRED');self.close()
+
+    def close(self):
+        with self.lock:
+            if self.stop.is_set():return {'connections':self.connections,'active':len(self.active),'failures':list(self.failures)}
+            self.stop.set();active=list(self.active.values())
+        if self.timer:self.timer.cancel()
+        for server in self.servers:server.shutdown();server.server_close()
+        for client,_ in active:
+            try:client.shutdown(socket.SHUT_RDWR)
+            except OSError:pass
+        deadline=time.monotonic()+12
+        while time.monotonic()<deadline:
+            with self.lock:
+                if not self.active:break
+            time.sleep(.05)
+        with self.lock:
+            if self.active:self.failures.append('RELAY_ACTIVE_AT_CLOSE')
+        for thread in self.threads:thread.join(timeout=1)
+        return {'connections':self.connections,'active':len(self.active),'failures':list(self.failures)}
 
 
 def require(condition, code):
@@ -329,7 +458,7 @@ def smoke(root, task, *, node=None):
     result={'taskId':TASK,'runId':run,'status':'FAIL','productExecution':False,'recipeSha256':digest(compose.read_bytes()),'resourceManifest':str(evidence/'resources.json')}
     result['buildBinding']=build_binding
     private_write(evidence/'resources.json',resource_manifest(root,runtime,config,private,'PLANNED'))
-    start=time.monotonic()
+    start=time.monotonic();relay=None
     try:
         command([*prefix,'create','--pull','never',*SERVICES],cwd=root,timeout=120)
         for service in SERVICES:
@@ -338,6 +467,7 @@ def smoke(root, task, *, node=None):
             runtime['containerIds'][service]=ident
         replace_manifest(evidence/'resources.json',resource_manifest(root,runtime,config,private,'CREATED'))
         command([*prefix,'start',*SERVICES],cwd=root,timeout=120)
+        relay=HostRelay(root,runtime).start()
         wait_http('http://localhost:15180/realms/master/.well-known/openid-configuration',timeout=180)
         env=dict(os.environ,WAVE2_KEYCLOAK_ADMIN_PASSWORD=(private/'keycloak-password').read_text())
         command(['python3','-B',str(root/'infra/security/bootstrap-keycloak.py'),'--profile','g2','--keycloak-origin','http://localhost:15180','--public-origin',runtime['publicOrigin'],'--runtime-output',runtime['realmFile']],cwd=root,env=env,timeout=60)
@@ -367,6 +497,9 @@ def smoke(root, task, *, node=None):
     except (ValueError,OSError,subprocess.SubprocessError) as exc:
         result['reason']=str(exc) if isinstance(exc,ValueError) else type(exc).__name__
     finally:
+        if relay:
+            result['relayCloseout']=relay.close()
+            if result['relayCloseout'] and result['relayCloseout']['failures']:result.update(status='FAIL',relay='CLOSEOUT_NOT_VERIFIED')
         # create/start部分失败也只按当前项目和服务逐项找回准确ID，不漏掉自身已创建实例。
         for service in SERVICES:
             if service in runtime['containerIds']: continue
