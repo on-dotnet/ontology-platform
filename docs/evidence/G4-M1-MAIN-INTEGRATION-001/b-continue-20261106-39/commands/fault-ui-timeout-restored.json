@@ -1,0 +1,39 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261106-39",
+  "testedCommit": "0f7b74e1f832d079cf68e762e7688277917ffc90",
+  "command": [
+    "/opt/homebrew/opt/node@24/bin/node",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/experiments/g4-m1-main-integration/fault.mjs",
+    "--run-id",
+    "b-continue-20261106-39",
+    "--expected-head",
+    "0f7b74e1f832d079cf68e762e7688277917ffc90",
+    "--resource-manifest",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261106-39/resource-manifest.json",
+    "--runtime-file",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261106-39/runtime.json",
+    "--action",
+    "probe-refresh",
+    "--evidence-dir",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261106-39/fault-ui-timeout-restored"
+  ],
+  "startedAtUtc": "2026-11-06T13:42:26.329162+00:00",
+  "endedAtUtc": "2026-11-06T13:42:37.499065+00:00",
+  "elapsedSeconds": 11.169862000009743,
+  "exitCode": 0,
+  "timingStatus": "OBSERVED",
+  "timedOut": false,
+  "executedInputDrift": false,
+  "inputHashes": {
+    "/opt/homebrew/opt/node@24/bin/node": "0d78c9bca217f53c2dc21a067246ee4a81c1f4fa111ee64d572b45fa1ff39189",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/experiments/g4-m1-main-integration/fault.mjs": "2b8c1b5a2951d5c9f3789ef469d0ec796009a7762e3fa4f957ccf3fdc3a5af48",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261106-39/resource-manifest.json": "429f706b884cbef8cebc2b34abed626a03b5d39fd3150aa91dd16d7a34ed853b",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261106-39/runtime.json": "e406376e5cac99c5d5a609e10fbc65eb655312aeb8cd533ca3faf5da757ce81e"
+  },
+  "manifestSha256": "429f706b884cbef8cebc2b34abed626a03b5d39fd3150aa91dd16d7a34ed853b",
+  "commandSha256": "bac4d46ead777ea5583b8492a1fe59d49e5ec00125103f7590273687ad0ea0e6",
+  "logSha256": "41d3c500133ffeafaa969af89fe92bd60a820c2e4609addf42c7227407c99d0d",
+  "logBytes": 282,
+  "logVisibility": "PRIVATE"
+}

@@ -1,0 +1,161 @@
+{
+  "evidenceSchemaVersion": 2,
+  "checks": [
+    {
+      "name": "impact-init",
+      "command": "python3 -B artifacts/g4-m1-main-integration-001/b-continue-20261106-39/impact-run.py init",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Qualified immutable T37 evidence reuse,19 unchanged drivers,1426 identical backend files; not a new I01-I06 run. Receipt SHA256=49fe69b3e07fa4772ea0b845b52935a5f603b3fd5035384d6ae50ea6fac4ec43"
+    },
+    {
+      "name": "impact-setup",
+      "command": "python3 -B artifacts/g4-m1-main-integration-001/b-continue-20261106-39/impact-run.py setup",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Fresh HTTP baseline59checks135requests; provision21/52; DB lineage24. Raw consumer exit2 preserved for limited scenarios. Receipt SHA256=c7b83f9a3683e80dd57cedf719069324dc4a6b494fdc69d96da53ce9f12db8f8"
+    },
+    {
+      "name": "impact-race",
+      "command": "python3 -B artifacts/g4-m1-main-integration-001/b-continue-20261106-39/impact-run.py race",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Fresh real403 delayed-response regression; disabled/noPOST then original403/revalidation/original202/jobURL/PARTIAL; ACL restored. Receipt SHA256=e260ebdd1004a44878ef0c5fd06134d803f5e1b7d29f9b27d2728cd010f9bfda"
+    },
+    {
+      "name": "impact-I07",
+      "command": "python3 -B artifacts/g4-m1-main-integration-001/b-continue-20261106-39/impact-run.py I07",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Complete canonical six-scenario UI acceptance. All six UI cases closed, including aggregated U05; actual source cancellation while lock held, durable CANCELLED/no snapshot and refresh recovery. Receipt SHA256=4235c123c77b6b769954624378497cb9603b1c791b9cf0346b9c2fa88b19e6c9"
+    },
+    {
+      "name": "impact-cleanup",
+      "command": "python3 -B artifacts/g4-m1-main-integration-001/b-continue-20261106-39/impact-run.py cleanup",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "11 exact Docker objects removed;16 successful commands; accurate absence and3networks8old volumes KEEP;47 known synthetic-secret patterns/17582items/no findings. Receipt SHA256=06fc545e713f559eb88e15b1e7ebc4fa9b9ab97ae4ea228cda39ac568043cbea"
+    },
+    {
+      "name": "impact-web-lint",
+      "command": "/usr/bin/sandbox-exec -p '(version 1) (allow default) (deny network-outbound (remote ip \"*:*\")) (allow network-outbound (remote ip \"localhost:*\"))' /opt/homebrew/opt/node@24/bin/node /Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/pnpm/package/bin/pnpm.cjs --config.verifyDepsBeforeRun=error --dir apps/web run lint",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Actual command exit0; log SHA256=050c69da23536758722729aeda55a8d0fb9d557495ef6d33d70873a3b64a71c1"
+    },
+    {
+      "name": "impact-web-typecheck",
+      "command": "/usr/bin/sandbox-exec -p '(version 1) (allow default) (deny network-outbound (remote ip \"*:*\")) (allow network-outbound (remote ip \"localhost:*\"))' /opt/homebrew/opt/node@24/bin/node /Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/pnpm/package/bin/pnpm.cjs --config.verifyDepsBeforeRun=error --dir apps/web run typecheck",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Actual command exit0; log SHA256=8366207267355d3e3d5bf3bf6e8c94c5f93f6078c34f08973fa2b38cdda6cc92"
+    },
+    {
+      "name": "impact-web-test",
+      "command": "/usr/bin/sandbox-exec -p '(version 1) (allow default) (deny network-outbound (remote ip \"*:*\")) (allow network-outbound (remote ip \"localhost:*\"))' /opt/homebrew/opt/node@24/bin/node /Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/pnpm/package/bin/pnpm.cjs --config.verifyDepsBeforeRun=error --dir apps/web run test",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "23 files388 tests passed; Actual command exit0; log SHA256=43c64d3ce86cf875e82b71cb5a75fa09e05505e4ea894d0325f38e30245fa25b"
+    },
+    {
+      "name": "impact-web-build",
+      "command": "/usr/bin/sandbox-exec -p '(version 1) (allow default) (deny network-outbound (remote ip \"*:*\")) (allow network-outbound (remote ip \"localhost:*\"))' /opt/homebrew/opt/node@24/bin/node /Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/pnpm/package/bin/pnpm.cjs --config.verifyDepsBeforeRun=error --dir apps/web run build",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Actual command exit0; log SHA256=b7ab6f728d81a1e8392b626eddf8b2411a8dae047dc028e9dade0988e788d142"
+    },
+    {
+      "name": "diff-main",
+      "command": "git diff --check d1a61daffe844475b07705797e3ad325cc3f2945 0f7b74e1f832d079cf68e762e7688277917ffc90",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Actual command exit0; log SHA256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "diff-candidate",
+      "command": "git diff --check 99753df6f03b184e40b431a5b5aba89d8fa67087 0f7b74e1f832d079cf68e762e7688277917ffc90",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Actual command exit0; log SHA256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "exact-tool-copy-cleanup",
+      "command": "python3 -B artifacts/g4-m1-main-integration-001/b-continue-20261106-39/cleanup-copies.py --apply b1077d58e153331e65a218be06f83f64f271b1471ce521a852974e99ec632a22",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "4 exact directories removed;27021files515448006logical bytes;4 actual AFTER exit0/ENOENT; incident KEEP retained. Physical/FD reclamation NOT_VERIFIED. Journal SHA256=4c38c18af7652f330e17c4f8ca815715fea45bbc9daace6c07e5c3c4fef1ecd3"
+    },
+    {
+      "name": "exact-host-release",
+      "command": "python3 -B artifacts/g4-m1-main-integration-001/b-continue-20261106-39/release-host.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Exact PID36053/birth/command checked;SIGTERM;actual ps missing; independent postcheck. Receipt SHA256=30a35af0c49bdba2ed392a854c2d9a619467efa762bbd030721c804e1527d1d2"
+    },
+    {
+      "name": "CI",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Manual-only CI not invoked."
+    },
+    {
+      "name": "Windows",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Not executed; no substitution by Mac results."
+    },
+    {
+      "name": "Intel",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Not executed; no substitution by Mac ARM64 results."
+    },
+    {
+      "name": "I08-package-reopen",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Performed only after H commit; cannot self-certify inside immutable ZIP. External receipt must bind exact ZIP/H and independent VerifyOnly."
+    }
+  ],
+  "ci": {
+    "status": "NOT_RUN",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  },
+  "metadata": {
+    "taskId": "G4-M1-MAIN-INTEGRATION-001",
+    "actualAgentActiveTime": "UNKNOWN",
+    "runId": "b-continue-20261106-39",
+    "approvedMain": "d1a61daffe844475b07705797e3ad325cc3f2945",
+    "manifestSha256": "429f706b884cbef8cebc2b34abed626a03b5d39fd3150aa91dd16d7a34ed853b",
+    "impactPolicy": "APPROVED_BY_USER",
+    "reusedSourceCommit": "79d1d42f43e8e7da23e905da18a374037b6b22a3",
+    "reuseReceiptSha256": "44805bb08552260c2ff475d2b4c12bf875933c539069d4a7b41ed695e677c92f",
+    "acceptanceMatrixSha256": "f4bb4b4608c261817569be577b05d7f8618d53a8cd48a834d59b389a6580698e",
+    "independentProductReviewSha256": "fff01654500df3f113c586e1a8645a4d11101c411d41249368cd20d03b154a23",
+    "independentResourceReviewSha256": "d6a98532168684f2b5fc5115c32a8baac8386ac10e1f72d75d87da261e436d83",
+    "scope": "Applicable local product and resource gates satisfied under explicitly approved impact policy; final delivery closes outside ZIP.",
+    "limits": [
+      "AMBER-A1/LICENSE_PARTIAL",
+      "CI/Windows/Intel NOT_RUN",
+      "sessionContinuity NOT_VERIFIED",
+      "physicalSpaceAndFdReclamation NOT_VERIFIED",
+      "defaultBridgeTransitionObserved; cause NOT_VERIFIED"
+    ],
+    "supplementalExecutedInputs": {
+      "cleanup-copies.py": "1517c8c2f33c4414804d341bfdc1e677673a0cc9f0bd6b8da63d47421183247a",
+      "release-host.py": "df4ca4c93e65b6cff42f738bec7c5531aafb12f02e4dd2ed4a9609c2ac675496",
+      "finalize-evidence.py": "aed6113c5e3b7bc99b85d4671cd2e7d44c7a408efcafa072c350fe7e803f56a5",
+      "archive-public-evidence.py": "e9dce99d8dfaa1f742df48bacd46b846b90871704f72ad077bb7c2689cbccf29"
+    },
+    "priorFailures": "Preserved immutable; all reuse and fresh execution distinguished; no main/M2"
+  },
+  "validationSource": "LOCAL",
+  "testedCommit": "0f7b74e1f832d079cf68e762e7688277917ffc90"
+}

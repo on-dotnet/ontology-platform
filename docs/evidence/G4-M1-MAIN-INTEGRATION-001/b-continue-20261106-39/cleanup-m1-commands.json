@@ -1,0 +1,233 @@
+{
+  "before": {
+    "container": {
+      "owned": [
+        {
+          "id": "a95b5342ee15f1f16d21ea4c16dbf297b13194fce55b5c354a2da4b950a39cb4",
+          "created": "2026-11-06T13:38:00.688990917Z"
+        },
+        {
+          "id": "8ccf6287e0dc098706afbc1e44fe51829e104473664a7becb60b3c71f7aa6ce5",
+          "created": "2026-11-06T13:38:00.654458459Z"
+        },
+        {
+          "id": "0c257ea26e7b197e33f982df139cdbbff0093c1e1e7a5bccec3a485a904a25fb",
+          "created": "2026-11-06T13:38:00.651865834Z"
+        },
+        {
+          "id": "475daee743ff1fba108b78ba1ca97ddea9795394c44e67a8fa47e87b90faa9c6",
+          "created": "2026-11-06T13:38:00.650915084Z"
+        },
+        {
+          "id": "7912bbca968e4f70a3bfc23766a1cc02a9afe1b79e784fd2f140d1d05da0de6b",
+          "created": "2026-11-06T13:38:00.650867334Z"
+        }
+      ],
+      "keep": []
+    },
+    "network": {
+      "owned": [
+        {
+          "id": "5e30d5bcdfd9fbc7188f7407deeeadc24888db507555cf34d3c500990b429746",
+          "created": "2026-11-06T13:38:00.631960959Z"
+        },
+        {
+          "id": "66c4ac86176f3ba6a26b410b2c5f087fcaad3f954cef4ba45d9f740653a6f08d",
+          "created": "2026-11-06T13:38:00.632193875Z"
+        }
+      ],
+      "keep": [
+        "2e979318b6c55963a8daae6a40fda88731528b431ec159511202724ae8fa2caf",
+        "80ac07a0bfc7ad5bdedefec78a3a66c97c4c74093c4a8533f05f4cb96bcbc4d0",
+        "e66d65cfe0714eb9fde22ab801d77393aeb653344362c0faac45292d829dab8e"
+      ]
+    },
+    "volume": {
+      "owned": [
+        {
+          "id": "ontology-g4-main-b-continue-20261106-39_api-keyring",
+          "created": "2026-11-06T13:38:00Z"
+        },
+        {
+          "id": "ontology-g4-main-b-continue-20261106-39_keycloak-data",
+          "created": "2026-11-06T13:38:00Z"
+        },
+        {
+          "id": "ontology-g4-main-b-continue-20261106-39_platform-data",
+          "created": "2026-11-06T13:38:00Z"
+        },
+        {
+          "id": "ontology-g4-main-b-continue-20261106-39_source-data",
+          "created": "2026-11-06T13:38:00Z"
+        }
+      ],
+      "keep": [
+        "g2-ef979bd04cc0-alloy-data",
+        "g2-ef979bd04cc0-fuseki-data",
+        "g2-ef979bd04cc0-grafana-data",
+        "g2-ef979bd04cc0-loki-data",
+        "g2-ef979bd04cc0-postgres-data",
+        "g2-ef979bd04cc0-prometheus-data",
+        "g2-ef979bd04cc0-rustfs-data",
+        "g2-ef979bd04cc0-tempo-data"
+      ]
+    }
+  },
+  "commands": [
+    {
+      "command": [
+        "stop",
+        "--time",
+        "10",
+        "a95b5342ee15f1f16d21ea4c16dbf297b13194fce55b5c354a2da4b950a39cb4"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "rm",
+        "a95b5342ee15f1f16d21ea4c16dbf297b13194fce55b5c354a2da4b950a39cb4"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "stop",
+        "--time",
+        "10",
+        "8ccf6287e0dc098706afbc1e44fe51829e104473664a7becb60b3c71f7aa6ce5"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "rm",
+        "8ccf6287e0dc098706afbc1e44fe51829e104473664a7becb60b3c71f7aa6ce5"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "stop",
+        "--time",
+        "10",
+        "0c257ea26e7b197e33f982df139cdbbff0093c1e1e7a5bccec3a485a904a25fb"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "rm",
+        "0c257ea26e7b197e33f982df139cdbbff0093c1e1e7a5bccec3a485a904a25fb"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "stop",
+        "--time",
+        "10",
+        "475daee743ff1fba108b78ba1ca97ddea9795394c44e67a8fa47e87b90faa9c6"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "rm",
+        "475daee743ff1fba108b78ba1ca97ddea9795394c44e67a8fa47e87b90faa9c6"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "stop",
+        "--time",
+        "10",
+        "7912bbca968e4f70a3bfc23766a1cc02a9afe1b79e784fd2f140d1d05da0de6b"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "rm",
+        "7912bbca968e4f70a3bfc23766a1cc02a9afe1b79e784fd2f140d1d05da0de6b"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "network",
+        "rm",
+        "5e30d5bcdfd9fbc7188f7407deeeadc24888db507555cf34d3c500990b429746"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "network",
+        "rm",
+        "66c4ac86176f3ba6a26b410b2c5f087fcaad3f954cef4ba45d9f740653a6f08d"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "volume",
+        "rm",
+        "ontology-g4-main-b-continue-20261106-39_api-keyring"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "volume",
+        "rm",
+        "ontology-g4-main-b-continue-20261106-39_keycloak-data"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "volume",
+        "rm",
+        "ontology-g4-main-b-continue-20261106-39_platform-data"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "volume",
+        "rm",
+        "ontology-g4-main-b-continue-20261106-39_source-data"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "after": {
+    "container": {
+      "owned": [],
+      "keep": []
+    },
+    "network": {
+      "owned": [],
+      "keep": [
+        "2e979318b6c55963a8daae6a40fda88731528b431ec159511202724ae8fa2caf",
+        "80ac07a0bfc7ad5bdedefec78a3a66c97c4c74093c4a8533f05f4cb96bcbc4d0",
+        "e66d65cfe0714eb9fde22ab801d77393aeb653344362c0faac45292d829dab8e"
+      ]
+    },
+    "volume": {
+      "owned": [],
+      "keep": [
+        "g2-ef979bd04cc0-alloy-data",
+        "g2-ef979bd04cc0-fuseki-data",
+        "g2-ef979bd04cc0-grafana-data",
+        "g2-ef979bd04cc0-loki-data",
+        "g2-ef979bd04cc0-postgres-data",
+        "g2-ef979bd04cc0-prometheus-data",
+        "g2-ef979bd04cc0-rustfs-data",
+        "g2-ef979bd04cc0-tempo-data"
+      ]
+    }
+  }
+}

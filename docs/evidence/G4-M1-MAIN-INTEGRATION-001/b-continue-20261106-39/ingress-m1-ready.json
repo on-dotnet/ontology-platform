@@ -1,0 +1,59 @@
+{
+  "pid": 36910,
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261106-39",
+  "testedCommit": "0f7b74e1f832d079cf68e762e7688277917ffc90",
+  "manifestSha256": "429f706b884cbef8cebc2b34abed626a03b5d39fd3150aa91dd16d7a34ed853b",
+  "runtimeSha256": "23523867a3f31a8067e90305410a7f384f7f2a73c4995b769e4be825224938ee",
+  "engineSocket": "unix:///Users/chasen/.docker/run/docker.sock",
+  "apiVersion": "1.56",
+  "routes": [
+    {
+      "service": "platform-pg",
+      "targetId": "7912bbca968e4f70a3bfc23766a1cc02a9afe1b79e784fd2f140d1d05da0de6b",
+      "providerId": "7912bbca968e4f70a3bfc23766a1cc02a9afe1b79e784fd2f140d1d05da0de6b",
+      "brokerId": "7912bbca968e4f70a3bfc23766a1cc02a9afe1b79e784fd2f140d1d05da0de6b",
+      "networkId": "5e30d5bcdfd9fbc7188f7407deeeadc24888db507555cf34d3c500990b429746",
+      "targetIp": "172.18.0.3",
+      "connectIp": "127.0.0.1",
+      "port": 5432,
+      "hostPort": 15432
+    },
+    {
+      "service": "keycloak-test",
+      "targetId": "475daee743ff1fba108b78ba1ca97ddea9795394c44e67a8fa47e87b90faa9c6",
+      "providerId": "475daee743ff1fba108b78ba1ca97ddea9795394c44e67a8fa47e87b90faa9c6",
+      "brokerId": "7912bbca968e4f70a3bfc23766a1cc02a9afe1b79e784fd2f140d1d05da0de6b",
+      "networkId": "5e30d5bcdfd9fbc7188f7407deeeadc24888db507555cf34d3c500990b429746",
+      "targetIp": "172.18.0.2",
+      "connectIp": "172.18.0.2",
+      "port": 8080,
+      "hostPort": 15180
+    },
+    {
+      "service": "api",
+      "targetId": "0c257ea26e7b197e33f982df139cdbbff0093c1e1e7a5bccec3a485a904a25fb",
+      "providerId": "0c257ea26e7b197e33f982df139cdbbff0093c1e1e7a5bccec3a485a904a25fb",
+      "brokerId": "7912bbca968e4f70a3bfc23766a1cc02a9afe1b79e784fd2f140d1d05da0de6b",
+      "networkId": "5e30d5bcdfd9fbc7188f7407deeeadc24888db507555cf34d3c500990b429746",
+      "targetIp": "172.18.0.4",
+      "connectIp": "172.18.0.4",
+      "port": 15100,
+      "hostPort": 15100
+    },
+    {
+      "service": "web",
+      "targetId": "a95b5342ee15f1f16d21ea4c16dbf297b13194fce55b5c354a2da4b950a39cb4",
+      "providerId": "0c257ea26e7b197e33f982df139cdbbff0093c1e1e7a5bccec3a485a904a25fb",
+      "brokerId": "7912bbca968e4f70a3bfc23766a1cc02a9afe1b79e784fd2f140d1d05da0de6b",
+      "networkId": "5e30d5bcdfd9fbc7188f7407deeeadc24888db507555cf34d3c500990b429746",
+      "targetIp": "172.18.0.4",
+      "connectIp": "172.18.0.4",
+      "port": 15300,
+      "hostPort": 15300
+    }
+  ],
+  "maxConcurrent": 32,
+  "connectionSeconds": 120,
+  "processSeconds": 14400
+}

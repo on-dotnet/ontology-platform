@@ -1,0 +1,48 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261106-39",
+  "deleted": {
+    "containers": 5,
+    "networks": 2,
+    "volumes": 4,
+    "toolDirectories": 4,
+    "toolFiles": 27021,
+    "toolLogicalBytes": 515448006
+  },
+  "released": "own host and ingress process groups;4ports",
+  "keep": [
+    {
+      "object": "codex/g4-m1-main-integration-001 and current worktree",
+      "reason": "Unintegrated reviewed candidate and approval recovery",
+      "release": "Explicit later integration/lifecycle approval"
+    },
+    {
+      "object": "artifacts/g4-m1-main-integration-001 and historical review ZIPs",
+      "reason": "Original successes/failures and recovery mapping requested to be retained",
+      "release": "Explicit lifecycle approval; never overwrite originals"
+    },
+    {
+      "object": ".tools/security/g4-m1-main-integration-001-* and task private temp/runtime",
+      "reason": "Private raw logs/certificates/forensic recovery; excluded from package",
+      "release": "Explicit integration and private recovery lifecycle approval"
+    },
+    {
+      "object": ".tools/dotnet-home",
+      "reason": "Incident recovery KEEP; fingerprint unchanged",
+      "release": "Separate reviewed recovery decision"
+    },
+    {
+      "object": "Backend/API/Web build outputs and T37 offline restore/cache",
+      "reason": "Immutable tested-input proof and reproducibility; no downloads",
+      "release": "After integration approval and verified recovery basis"
+    },
+    {
+      "object": "3 default Docker networks and8 old G2 volumes",
+      "reason": "Preserved development environment; outside this task cleanup ownership",
+      "release": "Separate lifecycle approval"
+    }
+  ],
+  "physicalSpaceFreed": "NOT_VERIFIED",
+  "bridge": "Transition during pre-creation read-only observation recorded; actual post-freeze KEEP verified",
+  "finalZip": "KEEP unique candidate after creation until explicit integration/lifecycle approval"
+}

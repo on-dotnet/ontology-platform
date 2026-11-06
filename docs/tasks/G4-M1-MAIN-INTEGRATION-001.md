@@ -1,6 +1,6 @@
 # G4-M1-MAIN-INTEGRATION-001
 
-状态：B / IN_PROGRESS；Run38取消互锁缺陷已获精确修复批准，Run39按影响验收；尚未达到main审批关口。
+状态：B / FINAL_DELIVERY_PENDING；Run39按获批影响范围产品及资源验收通过、无开放P0/P1；待唯一V3独立重开及包外回执闭合。
 
 最新用户授权：继续B、按影响验收，并应用已审取消修正精确补丁c07539a54965042b584adc0220dec17dfe78e57046019121234727b1ab2619fe；不更新main、不进入M2。2026-11-02 Plan及后续逐次例外为历史授权链。原始审批见本任务证据p0/original-documents.json 中的 approval-original.md；完整计划见G4-M1-MAIN-INTEGRATION-001/PLAN.md。
 
@@ -255,3 +255,10 @@ Run38 / Taac57224cb27fe2f35dfd39a0d7b3b84e2a652ee：按用户新批准影响策�
 Run38初始setup因Docker默认bridge准确ID替换阻断，原因NOT_VERIFIED；固定4份差异见证和5/2/4对象后，已审断点续行通过，host/none/8卷保持，原KEEP全过程不变不成立。最终实际回收11Docker对象16命令、monitor27577，独立实时后验与1606Ingress exec退出证据通过；47已知秘密模式扫描无发现。四工具副本27019文件515223892字节按KEEP_ACTIVE_TASK留给同任务继续，精确指纹和事故KEEP经独立核验；最终I08或取消时解除，避免每轮无意义删除再复制。
 
 Run39沿用按影响验收，只重新执行受影响Web和完整I07/必要烟测，未变后端继续复用。原始失败、审批恢复材料及Git恢复映射保持，15MiB/main/M2边界不变，无新V3或READY声明。
+
+
+Run39 / T0f7b74e1f832d079cf68e762e7688277917ffc90：获批取消修正已应用并独立核对exact bytes。T37原15回执固定Git blob、19drivers、1426后端文件复用，NOT_REEXECUTED；新Web23文件388测试及lint/type/build、HTTP59/135+provision21/52、24项DB lineage、真实403竞态及完整I07六场景全部通过。真实取消worker471在源锁仍持有时消失、持久CANCELLED/无snapshot及刷新恢复通过，非作者完整影响范围Review无开放P0/P1，1803构建文件与28命令原日志核验一致。
+
+本轮在创建资源前执行只读Docker system df，bridge966d...→2e979...先被观察并记录；其后原严格start_group KEEP比较通过，不重启/改全局配置。实际回收11Docker对象16成功命令及4工具目录27021文件515448006逻辑字节；host36053和ingress/4端口释放，非作者实时后验PASS。旧incident/私有原始证据/分支工作树/构建缓存KEEP，VM不操作、物理空间及FD回收NOT_VERIFIED。
+
+最终validation为LOCAL schema2，明确复用和新执行；I08构包/重开必须在此证据提交后由包外回执闭合，不预造PASS。validation包含17项记录，格式检查及4截图预算通过。唯一V3仍保持15MiB，CI/Windows/Intel和供应链/连续性限制保留。后续仅冻结H→唯一V3→独立VerifyOnly→远端回读→包外回执；main/M2/G6未执行。

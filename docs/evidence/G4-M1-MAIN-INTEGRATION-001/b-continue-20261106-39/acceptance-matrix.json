@@ -1,0 +1,82 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261106-39",
+  "testedCommit": "0f7b74e1f832d079cf68e762e7688277917ffc90",
+  "policy": "User-approved impact-based acceptance; old pass evidence explicitly reused",
+  "gates": [
+    {
+      "gate": "I01",
+      "qualification": "SATISFIED_BY_APPROVED_IMPACT_REUSE",
+      "originalTestedCommit": "79d1d42f43e8e7da23e905da18a374037b6b22a3",
+      "reexecution": "NOT_REEXECUTED_FOR_UNCHANGED_PART",
+      "scope": "Backend/SelfTest T37 reused; Web four commands fresh T39",
+      "bindingReceipt": "impact-reuse.json",
+      "bindingSha256": "44805bb08552260c2ff475d2b4c12bf875933c539069d4a7b41ed695e677c92f"
+    },
+    {
+      "gate": "I02",
+      "qualification": "SATISFIED_BY_APPROVED_IMPACT_REUSE",
+      "originalTestedCommit": "79d1d42f43e8e7da23e905da18a374037b6b22a3",
+      "reexecution": "NOT_REEXECUTED_FOR_UNCHANGED_PART",
+      "scope": "G3/modules T37 reused; real HTTP/browser compatibility fresh T39",
+      "bindingReceipt": "impact-reuse.json",
+      "bindingSha256": "44805bb08552260c2ff475d2b4c12bf875933c539069d4a7b41ed695e677c92f"
+    },
+    {
+      "gate": "I03",
+      "qualification": "SATISFIED_BY_APPROVED_IMPACT_REUSE",
+      "originalTestedCommit": "79d1d42f43e8e7da23e905da18a374037b6b22a3",
+      "reexecution": "NOT_REEXECUTED_FOR_UNCHANGED_PART",
+      "scope": "T37 startup/host graph and fixture closure reused",
+      "bindingReceipt": "impact-reuse.json",
+      "bindingSha256": "44805bb08552260c2ff475d2b4c12bf875933c539069d4a7b41ed695e677c92f"
+    },
+    {
+      "gate": "I04",
+      "qualification": "SATISFIED_BY_APPROVED_IMPACT_REUSE",
+      "originalTestedCommit": "79d1d42f43e8e7da23e905da18a374037b6b22a3",
+      "reexecution": "NOT_REEXECUTED_FOR_UNCHANGED_PART",
+      "scope": "T37 migration and source isolation reused",
+      "bindingReceipt": "impact-reuse.json",
+      "bindingSha256": "44805bb08552260c2ff475d2b4c12bf875933c539069d4a7b41ed695e677c92f"
+    },
+    {
+      "gate": "I05",
+      "qualification": "SATISFIED_BY_APPROVED_IMPACT_REUSE",
+      "originalTestedCommit": "79d1d42f43e8e7da23e905da18a374037b6b22a3",
+      "reexecution": "NOT_REEXECUTED_FOR_UNCHANGED_PART",
+      "scope": "T37 real export/regeneration/negative checks reused",
+      "bindingReceipt": "impact-reuse.json",
+      "bindingSha256": "44805bb08552260c2ff475d2b4c12bf875933c539069d4a7b41ed695e677c92f"
+    },
+    {
+      "gate": "I06",
+      "qualification": "SATISFIED_BY_APPROVED_IMPACT_REUSE",
+      "originalTestedCommit": "79d1d42f43e8e7da23e905da18a374037b6b22a3",
+      "reexecution": "NOT_REEXECUTED_FOR_UNCHANGED_PART",
+      "scope": "T37 lifecycle/security/436 exact fixture closure reused",
+      "bindingReceipt": "impact-reuse.json",
+      "bindingSha256": "44805bb08552260c2ff475d2b4c12bf875933c539069d4a7b41ed695e677c92f"
+    },
+    {
+      "gate": "I07",
+      "qualification": "PASS_FRESH_T39",
+      "testCommit": "0f7b74e1f832d079cf68e762e7688277917ffc90",
+      "receipt": "impact-I07.json",
+      "sha256": "4235c123c77b6b769954624378497cb9603b1c791b9cf0346b9c2fa88b19e6c9",
+      "rawScenarioExit2": "Preserved; aggregate checks every required UI observation including source/DB cancellation witness"
+    },
+    {
+      "gate": "I08",
+      "qualification": "RUNTIME_AND_REVIEW_PASS_DELIVERY_PENDING",
+      "receipts": [
+        "impact-cleanup.json",
+        "cleanup-applied.jsonl",
+        "host-monitor-released.json",
+        "review-resource-final.json"
+      ],
+      "closure": "Unique committed-H V3, independent VerifyOnly and external receipt occur after this immutable evidence is committed."
+    }
+  ],
+  "priorFailures": "All retained; no former BLOCKED receipt rewritten"
+}

@@ -1,0 +1,49 @@
+{
+  "status": "PASS",
+  "scope": "approved impact product acceptance; resource execution and delivery pending",
+  "reviewer": "/root/argv_review",
+  "testedCommit": "0f7b74e1f832d079cf68e762e7688277917ffc90",
+  "openP0": 0,
+  "openP1": 0,
+  "checks": {
+    "exactApprovedProduct": true,
+    "immutableReuseSources": 15,
+    "unchangedDrivers": 19,
+    "unchangedBackendFiles": 1426,
+    "allBuildFiles": 1803,
+    "boundCommandLogs": 28,
+    "webFiles": 23,
+    "webTests": 388,
+    "webFourCommandsExitZero": true,
+    "httpBaselineChecks": 59,
+    "httpBaselineRequests": 135,
+    "httpProvisionChecks": 21,
+    "httpProvisionRequests": 52,
+    "lineageChecks": 24,
+    "real403Race": "PASS",
+    "canonicalI07Scenarios": 6,
+    "cancelledWithoutSnapshot": true,
+    "sourceWorkerPid": 471,
+    "sourceLockHeldAtWorkerDisappearance": true,
+    "visualScreenshotsReviewed": 4
+  },
+  "evidenceHashes": {
+    "impact-I07.json": "4235c123c77b6b769954624378497cb9603b1c791b9cf0346b9c2fa88b19e6c9",
+    "browser-cancel-source.json": "f7bf564d16e2a0c0fe95840f65d4ee76cbacadc79a1f9ece4e34baa4dbaa6dec",
+    "resources-m1-owned.json": "fc9f54cdbe235a255cda2b8888e1ee0649599d2df97534b4ba409f2e0380f1bf",
+    "resources-m1-created.json": "a5ecb4d349cf25686e3526f373091ba0671e40fda82e0d1de69c51651e1a74cb"
+  },
+  "cleanupAdmission": {
+    "status": "PASS",
+    "containers": 5,
+    "networks": 2,
+    "volumes": 4,
+    "keep": "this Run frozen3default networks8old volumes; initial bridge transition retained"
+  },
+  "limitations": [
+    "CI/Windows/Intel NOT_RUN",
+    "AMBER-A1/LICENSE_PARTIAL",
+    "15MiB hard cap",
+    "no main/M2"
+  ]
+}

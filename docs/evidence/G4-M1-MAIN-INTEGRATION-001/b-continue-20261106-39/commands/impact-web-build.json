@@ -1,0 +1,34 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261106-39",
+  "testedCommit": "0f7b74e1f832d079cf68e762e7688277917ffc90",
+  "command": [
+    "/usr/bin/sandbox-exec",
+    "-p",
+    "(version 1) (allow default) (deny network-outbound (remote ip \"*:*\")) (allow network-outbound (remote ip \"localhost:*\"))",
+    "/opt/homebrew/opt/node@24/bin/node",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/pnpm/package/bin/pnpm.cjs",
+    "--config.verifyDepsBeforeRun=error",
+    "--dir",
+    "apps/web",
+    "run",
+    "build"
+  ],
+  "startedAtUtc": "2026-11-06T13:37:18.860389+00:00",
+  "endedAtUtc": "2026-11-06T13:37:20.556647+00:00",
+  "elapsedSeconds": 1.6961613750027027,
+  "exitCode": 0,
+  "timingStatus": "OBSERVED",
+  "timedOut": false,
+  "executedInputDrift": false,
+  "inputHashes": {
+    "/usr/bin/sandbox-exec": "58839ef01b4eef8aac0d2aa8f9d1c074ae45aafe3533965b030672450064acc8",
+    "/opt/homebrew/opt/node@24/bin/node": "0d78c9bca217f53c2dc21a067246ee4a81c1f4fa111ee64d572b45fa1ff39189",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/pnpm/package/bin/pnpm.cjs": "67b035e322203961795e8e34ca63a08c37a4386eda94107fb3d28f3246d882ad"
+  },
+  "manifestSha256": "429f706b884cbef8cebc2b34abed626a03b5d39fd3150aa91dd16d7a34ed853b",
+  "commandSha256": "0c4becb43cb1dc9a051cd7b07f44b8dfec2306340f1e02322854972f8b07aa38",
+  "logSha256": "b7ab6f728d81a1e8392b626eddf8b2411a8dae047dc028e9dade0988e788d142",
+  "logBytes": 873,
+  "logVisibility": "TASK_EVIDENCE"
+}

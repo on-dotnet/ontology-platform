@@ -1,0 +1,18 @@
+{
+  "status": "PASS",
+  "scope": "EVIDENCE_SCHEMA_ONLY",
+  "exitCode": 0,
+  "command": [
+    "pwsh",
+    "-NoProfile",
+    "-File",
+    "scripts/test-review-evidence.ps1",
+    "-EvidenceFile",
+    "artifacts/g4-m1-main-integration-001/b-continue-20261106-39/validation.json",
+    "-ExpectedHead",
+    "0f7b74e1f832d079cf68e762e7688277917ffc90",
+    "-ScreenshotSelection",
+    "docs/evidence/G4-M1-MAIN-INTEGRATION-001/review-screenshots.json"
+  ],
+  "rawOutput": "{\"screenshotCompressedBytes\":317602,\"screenshotCount\":4,\"checks\":17,\"scope\":\"EVIDENCE_SCHEMA_ONLY\",\"status\":\"PASS\",\"product\":\"NOT_RUN\",\"actualCi\":\"NOT_VERIFIED\"}\n"
+}
