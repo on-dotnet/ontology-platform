@@ -78,7 +78,10 @@ function Case {
     param([string]$Name, [scriptblock]$Action)
     if ($Name -notlike $CaseFilter) { return }
     try { New-Fixture; & $Action; $results.Add([pscustomobject]@{ Name = $Name; Status = 'PASS' }); Write-Output "PASS: $Name" }
-    catch { $results.Add([pscustomobject]@{ Name = $Name; Status = 'FAIL' }); Write-Output "FAIL: $Name -- $($_.Exception.Message)" }
+    catch {
+        $status = if ($_.Exception.Message.StartsWith('TEST_NOT_RUN:')) { 'NOT_RUN' } else { 'FAIL' }
+        $results.Add([pscustomobject]@{ Name = $Name; Status = $status }); Write-Output "${status}: $Name -- $($_.Exception.Message)"
+    }
 }
 try {
     $null = New-Item -ItemType Directory -Force $fixtureRoot
@@ -981,6 +984,246 @@ for i in range(53):
         $actual = Get-ReviewBoundedTextDiff $script:repo $after $binaryHead @(@{path='only.bin';previousPath=$null;isBinary=$true}) $options
         Assert-True ($actual.Bytes.Length -eq 0 -and $actual.ExitCode -eq 0) 'Binary-only diff emitted text'
     }
+    function Assert-ReductionWindowsRefusal {
+        . $PackageScript -Library
+        $rejected = $false
+        try { $null = Test-ReviewGitArgvBudget @('diff') } catch { $rejected = $_.Exception.Message.Contains('ARGV_PLATFORM_UNVERIFIED') }
+        Assert-True $rejected 'Unverified Windows renderer accepted'
+        throw 'TEST_NOT_RUN: Windows refusal verified; approved Unix reduction scenario not run on this platform'
+    }
+    function New-ReductionFixture {
+        $script:reductionTask = 'G4-M1-MAIN-INTEGRATION-001'
+        $script:reductionRoot = "docs/evidence/$script:reductionTask/"
+        $script:reductionRun = 'b-continue-20261106-35'
+        $script:reductionValidation = $script:reductionRoot + $script:reductionRun + '/validation.json'
+        $script:reductionSelectionPath = $script:reductionRoot + 'review-evidence-selection.json'
+        $script:reductionRequired = @(
+            'b-continue-20261104-32/gate-I06.json',
+            'b-continue-20261104-33/gate-I07.json',
+            'b-continue-20261104-23/archive-migration-applied.json',
+            'packaging-a-20261106-01/PACKAGING-SIZE-ANALYSIS.md',
+            'packaging-reduction-20261106-01/IMPLEMENTATION-PLAN.md'
+        ) | ForEach-Object { $script:reductionRoot + $_ }
+        foreach ($path in $script:reductionRequired) { Write-Fixture $path "FAIL: original historical fixture witness $path`n" }
+        Write-Fixture ($script:reductionRoot + 'old/omitted.txt') "old diagnostic bytes preserved`n"
+        Write-Fixture ($script:reductionRoot + $script:reductionRun + '/gate-I01.json') "fixture full run member`n"
+        foreach ($record in @('ARGV-APPROVAL.md', 'REDUCTION-APPROVAL.md')) {
+            $path = "docs/tasks/$script:reductionTask/$record"
+            Write-Fixture $path ([IO.File]::ReadAllText((Join-Path (Split-Path (Split-Path $PackageScript -Parent) -Parent) $path)))
+        }
+        $script:reductionTested = Commit-Fixture
+        Write-LocalFixture $script:reductionValidation (@{ evidenceSchemaVersion = 2; validationSource = 'LOCAL'; testedCommit = $script:reductionTested; checks = @(@{ name = 'fixture-local'; command = 'fixture only'; status = 'PASS'; exitCode = 0; output = 'not a product claim' }); ci = @{ status = 'NOT_RUN'; runId = $null; url = $null; commit = $null; conclusion = $null } } | ConvertTo-Json -Depth 6)
+        $script:reductionSelection = @{ schemaVersion = 1; finalRun = $script:reductionRun; validationPath = $script:reductionValidation; retainedPaths = @($script:reductionRequired) }
+        Write-Fixture $script:reductionSelectionPath ($script:reductionSelection | ConvertTo-Json -Depth 6)
+        $script:head = Commit-Fixture
+        $script:reductionTool = Join-Path $fixtureRoot ([guid]::NewGuid().ToString('N') + '.ps1')
+        # 仅隔离副本替换实际提交身份，生产入口没有fixture旁路。
+        $source = [IO.File]::ReadAllText($PackageScript).Replace('d1a61daffe844475b07705797e3ad325cc3f2945', $script:base).Replace('03ce658c04fc810e7a10dc14eea1d64124ddbf12', $script:base).Replace('9ed3b9283acc81805737fb19efd3123281010103', $script:base)
+        [IO.File]::WriteAllText($script:reductionTool, $source)
+    }
+    function Invoke-ReductionPackage {
+        param([string]$VerifyPath = '', [string]$Evidence = $script:reductionValidation)
+        $arguments = @('-NoProfile', '-File', $script:reductionTool, '-Root', $script:repo)
+        if ($VerifyPath) { $arguments += @('-VerifyOnly', '-PackagePath', $VerifyPath) }
+        else { $arguments += @('-BaseSha', $script:base, '-HeadSha', $script:head, '-TaskId', $script:reductionTask, '-Status', 'PARTIAL', '-ValidationSource', 'LOCAL', '-EvidencePath', $Evidence) }
+        $output = & pwsh @arguments 2>&1
+        return @{ Exit = $LASTEXITCODE; Output = ($output -join "`n") }
+    }
+    Case 'reduction retains early schema consumer without optional policy fields' {
+        . $PackageScript -Library
+        $path = 'docs/evidence/PREFLIGHT/validation.json'
+        $bytes = [Text.Encoding]::UTF8.GetBytes((@{ checks = @(@{name='fixture';command='synthetic';status='PASS';exitCode=0;output='one fixture check'});ci=@{status='NOT_VERIFIED'} } | ConvertTo-Json -Depth 8) + "`n")
+        $snapshot = @{ GitBytes = @{ $path = $bytes }; Mapping = @(); DiffCheckExit = 0 }
+        $value = Get-ReviewEvidence $snapshot $path 'PARTIAL' $null
+        Assert-True ($value.checks.Count -eq 1 -and $value.checks[0].status -ceq 'PASS') 'Early schema-only consumer changed'
+    }
+    Case 'reduction V3 includes complete final run and failures with exact omitted recovery' {
+        if ($IsWindows) { Assert-ReductionWindowsRefusal }
+        New-ReductionFixture
+        $actual = Invoke-ReductionPackage
+        Assert-True ($actual.Exit -eq 0) "Reduction creation failed: $($actual.Output)"
+        $zip = @(Get-ChildItem (Join-Path $script:repo 'artifacts/reviews') -Filter '*.zip')[0].FullName
+        $archive = [IO.Compression.ZipFile]::OpenRead($zip)
+        try {
+            $manifest = Read-ZipText $archive 'manifest.json' | ConvertFrom-Json -AsHashtable
+            Assert-True ($manifest.evidenceReduction.policyId -ceq 'G4-M1-15M-EVIDENCE-1') 'Trusted reduction policy absent'
+            $paths = @($manifest.sourceMembers.gitPath)
+            foreach ($path in @($script:reductionValidation, $script:reductionSelectionPath, ($script:reductionRoot + $script:reductionRun + '/gate-I01.json')) + $script:reductionRequired) { Assert-True ($paths -ccontains $path) 'Required witness not included' }
+            Assert-True ($paths -cnotcontains ($script:reductionRoot + 'old/omitted.txt')) 'Historical payload still duplicated'
+            $index = Read-ZipText $archive 'evidence-index.json' | ConvertFrom-Json
+            $omitted = @($index | Where-Object gitPath -CEQ ($script:reductionRoot + 'old/omitted.txt'))[0]
+            Assert-True ($null -eq $omitted.archivePath -and $omitted.commit -ceq $script:head) 'Omitted evidence lacks exact commit'
+            $blob = Git @('rev-parse', ($script:head + ':' + $omitted.gitPath))
+            Assert-True ($blob -ceq $omitted.blobOid -and $omitted.sha256.Length -eq 64 -and $omitted.sizeBytes -gt 0 -and $omitted.recovery) 'Omitted evidence lacks exact recovery'
+            $patch = Read-ZipText $archive 'git/diff-text.patch'
+            Assert-True ($patch.Contains('app.txt') -and -not $patch.Contains('old diagnostic bytes preserved') -and -not $patch.Contains('fixture full run member')) 'Source patch incomplete or evidence duplicated'
+            $changes = Read-ZipText $archive 'git/changed-files.json' | ConvertFrom-Json
+            $change = @($changes | Where-Object path -CEQ $omitted.gitPath)[0]
+            Assert-True ($change.patchDisposition -ceq 'evidence-index-only' -and -not $change.isBinary -and $change.head.commit -ceq $script:head -and $change.head.blobOid -ceq $blob) 'Evidence misclassified or change recovery incomplete'
+            $failure = @($manifest.sourceMembers | Where-Object gitPath -CEQ $script:reductionRequired[0])[0]
+            Assert-True ((Read-ZipText $archive $failure.archivePath).StartsWith('FAIL:')) 'Historical failure rewritten'
+        } finally { $archive.Dispose() }
+        $reopen = Invoke-ReductionPackage -VerifyPath $zip
+        Assert-True ($reopen.Exit -eq 0) "Reduction independent reopen failed: $($reopen.Output)"
+    }
+    Case 'reduction policy binds exact approval task base version and ancestry' {
+        New-ReductionFixture
+        . $script:reductionTool -Library
+        $policy = Get-ReviewReductionPolicy $script:repo $script:base $script:head 3 $script:reductionTask
+        Assert-True ($policy.policyId -ceq 'G4-M1-15M-EVIDENCE-1') 'Approved policy not enabled'
+        foreach ($version in @(1, 2)) { Assert-True ($null -eq (Get-ReviewReductionPolicy $script:repo $script:base $script:head $version $script:reductionTask)) 'Old version changed' }
+        Assert-True ($null -eq (Get-ReviewReductionPolicy $script:repo $script:base $script:head 3 'OTHER')) 'Foreign task granted policy'
+        Assert-True ($null -eq (Get-ReviewReductionPolicy $script:repo ('f' * 40) $script:head 3 $script:reductionTask)) 'Foreign base granted policy'
+        $source = [IO.File]::ReadAllText($script:reductionTool)
+        [IO.File]::WriteAllText($script:reductionTool, $source.Replace("'--is-ancestor', '$($script:base)'", "'--is-ancestor', '$('f' * 40)'"))
+        . $script:reductionTool -Library
+        $rejected = $false
+        try { $null = Get-ReviewReductionPolicy $script:repo $script:base $script:head 3 $script:reductionTask } catch { $rejected = $_.Exception.Message.Contains('REDUCTION_APPROVAL') }
+        Assert-True $rejected 'Approved blob with unknown reduction ancestor accepted'
+        [IO.File]::WriteAllText($script:reductionTool, $source)
+        . $script:reductionTool -Library
+        $record = "docs/tasks/$script:reductionTask/REDUCTION-APPROVAL.md"
+        Write-Fixture $record "tampered`n"
+        $script:head = Commit-Fixture
+        $rejected = $false
+        try { $null = Get-ReviewReductionPolicy $script:repo $script:base $script:head 3 $script:reductionTask } catch { $rejected = $_.Exception.Message.Contains('REDUCTION_APPROVAL') }
+        Assert-True $rejected 'Tampered approval granted policy'
+        Remove-Item (Join-Path $script:repo $record)
+        $script:head = Commit-Fixture
+        Assert-True ($null -eq (Get-ReviewReductionPolicy $script:repo $script:base $script:head 3 $script:reductionTask)) 'Missing approval granted policy'
+    }
+    foreach ($badSelection in @('missing', 'extra-field', 'wrong-run', 'foreign-path', 'duplicate', 'absent-path', 'missing-critical', 'outside-validation', 'png')) {
+        Case "reduction selection rejects $badSelection" {
+            New-ReductionFixture
+            switch ($badSelection) {
+                'missing' { Remove-Item (Join-Path $script:repo $script:reductionSelectionPath) }
+                'extra-field' { $script:reductionSelection.allowOmission = $true }
+                'wrong-run' { $script:reductionSelection.finalRun = '../other' }
+                'foreign-path' { $script:reductionSelection.retainedPaths += 'docs/evidence/TEST-001/result.txt' }
+                'duplicate' { $script:reductionSelection.retainedPaths += $script:reductionRequired[0] }
+                'absent-path' { $script:reductionSelection.retainedPaths += $script:reductionRoot + 'absent.txt' }
+                'missing-critical' { $script:reductionSelection.retainedPaths = @($script:reductionRequired | Select-Object -Skip 1) }
+                'outside-validation' { $script:reductionSelection.validationPath = $script:reductionRequired[0] }
+                'png' { Write-Fixture ($script:reductionRoot + 'fake.png') 'not an image'; $script:reductionSelection.retainedPaths += $script:reductionRoot + 'fake.png' }
+            }
+            if ($badSelection -ne 'missing') { Write-Fixture $script:reductionSelectionPath ($script:reductionSelection | ConvertTo-Json -Depth 6) }
+            $script:head = Commit-Fixture
+            $actual = Invoke-ReductionPackage
+            Assert-True ($actual.Exit -ne 0 -and $actual.Output.Contains('REDUCTION_SELECTION')) "Invalid selection accepted or unrelated failure: $($actual.Output)"
+        }
+    }
+    Case 'reduction refuses validation outside the committed selected path' {
+        if ($IsWindows) { Assert-ReductionWindowsRefusal }
+        New-ReductionFixture
+        $other = $script:reductionRoot + 'unselected-validation.json'
+        Write-Fixture $other ([IO.File]::ReadAllText((Join-Path $script:repo $script:reductionValidation)))
+        $script:head = Commit-Fixture
+        $actual = Invoke-ReductionPackage -Evidence $other
+        Assert-True ($actual.Exit -ne 0 -and $actual.Output.Contains('REDUCTION_EVIDENCE')) "Unselected validation accepted: $($actual.Output)"
+    }
+    Case 'reduction preserves both cross-boundary rename directions and deleted evidence recovery' {
+        if ($IsWindows) { Assert-ReductionWindowsRefusal }
+        New-ReductionFixture
+        Write-Fixture ($script:reductionRoot + 'out.txt') "unique outward rename bytes`n"
+        Write-Fixture 'incoming.txt' "unique inward rename bytes`n"
+        Write-Fixture ($script:reductionRoot + 'deleted.txt') "original deleted evidence`n"
+        [IO.File]::WriteAllBytes((Join-Path $script:repo 'binary.dat'), [byte[]]@(0, 3, 4))
+        $before = Commit-Fixture
+        $null = Git @('mv', ($script:reductionRoot + 'out.txt'), 'outgoing.txt')
+        $null = Git @('mv', 'incoming.txt', ($script:reductionRoot + 'in.txt'))
+        Remove-Item (Join-Path $script:repo ($script:reductionRoot + 'deleted.txt'))
+        [IO.File]::WriteAllBytes((Join-Path $script:repo 'binary.dat'), [byte[]]@(0, 3, 5))
+        $after = Commit-Fixture
+        [IO.File]::WriteAllText($script:reductionTool, [IO.File]::ReadAllText($script:reductionTool).Replace($script:base, $before))
+        . $script:reductionTool -Library
+        $snapshot = Get-ReviewSnapshot $script:repo $before $after 3 $script:reductionTask
+        $changes = [Text.Encoding]::UTF8.GetString($snapshot.Members['git/changed-files.json']) | ConvertFrom-Json
+        $renames = @($changes | Where-Object changeType -Like 'R*')
+        Assert-True ($renames.Count -eq 2 -and @($renames | Where-Object patchDisposition -CNE 'full-text').Count -eq 0) 'Cross-boundary rename omitted'
+        $options = @('diff', '--no-color', '--full-index', '--no-ext-diff', '--no-textconv', '--no-renames', '--text', $before, $after, '--', ':(literal)outgoing.txt', (':(literal)' + $script:reductionRoot + 'out.txt'), ':(literal)incoming.txt', (':(literal)' + $script:reductionRoot + 'in.txt'))
+        $expected = Invoke-ReviewGit $script:repo $options
+        Assert-True ((Get-ReviewHash $expected.Bytes) -ceq (Get-ReviewHash $snapshot.Members['git/diff-text.patch'])) 'Cross-boundary patch differs from full literal patch'
+        $deleted = @($changes | Where-Object path -CEQ ($script:reductionRoot + 'deleted.txt'))[0]
+        Assert-True ($null -eq $deleted.head -and $deleted.base.commit -ceq $before -and $deleted.patchDisposition -ceq 'evidence-index-only') 'Deleted evidence recovery missing'
+        $bytes = (Invoke-ReviewGit $script:repo @('cat-file', 'blob', $deleted.base.blobOid)).Bytes
+        Assert-True ((Get-ReviewHash $bytes) -ceq $deleted.base.sha256 -and $bytes.Length -eq $deleted.base.sizeBytes) 'Deleted evidence does not recover exactly'
+        Assert-True (@($changes | Where-Object patchDisposition -CEQ 'binary-index-only').Count -eq 1) 'Binary classification changed'
+    }
+    Case 'reduction bounded directory exclusion is exact and ambiguous paths fail closed' {
+        if ($IsWindows) { Assert-ReductionWindowsRefusal }
+        . $PackageScript -Library
+        $changes = @()
+        foreach ($i in 1..270) {
+            $sourcePath = "source-$i.txt"; $evidencePath = "docs/evidence/TEST-001/old-$i.txt"
+            Write-Fixture $sourcePath "source $i`n"; Write-Fixture $evidencePath "evidence $i`n"
+            $changes += @{path=$sourcePath;previousPath=$null;isBinary=$false;patchDisposition='full-text'}, @{path=$evidencePath;previousPath=$null;isBinary=$false;patchDisposition='evidence-index-only'}
+        }
+        $after = Commit-Fixture
+        $options = @('diff', '--no-color', '--full-index', '--no-ext-diff', '--no-textconv', '--no-renames')
+        $expected = Invoke-ReviewGit $script:repo ($options + @('--text', $script:head, $after, '--') + @(1..270 | ForEach-Object { ":(literal)source-$_.txt" }))
+        $actual = Get-ReviewBoundedTextDiff $script:repo $script:head $after $changes $options -EvidenceIndexOnly
+        Assert-True ((Get-ReviewHash $expected.Bytes) -ceq (Get-ReviewHash $actual.Bytes)) 'Directory compression changed source patch'
+        $changes += @{path='source-1.txt';previousPath=$null;isBinary=$false;patchDisposition='evidence-index-only'}
+        $rejected = $false
+        try { $null = Get-ReviewBoundedTextDiff $script:repo $script:head $after $changes $options -EvidenceIndexOnly } catch { $rejected = $_.Exception.Message.Contains('ARGV_PATH_OVERLAP') }
+        Assert-True $rejected 'Same path included and excluded silently'
+    }
+    Case 'reduction scans removed index-only evidence for finite secrets' {
+        if ($IsWindows) { Assert-ReductionWindowsRefusal }
+        New-ReductionFixture
+        $path = $script:reductionRoot + 'deleted-secret.txt'
+        Write-Fixture $path (('gh' + 'p_') + ('A' * 36) + "`n")
+        $before = Commit-Fixture
+        Remove-Item (Join-Path $script:repo $path)
+        $after = Commit-Fixture
+        [IO.File]::WriteAllText($script:reductionTool, [IO.File]::ReadAllText($script:reductionTool).Replace($script:base, $before))
+        . $script:reductionTool -Library
+        $rejected = $false
+        try { $null = Get-ReviewSnapshot $script:repo $before $after 3 $script:reductionTask } catch { $rejected = $_.Exception.Message.Contains('SECRET_PATTERN') }
+        Assert-True $rejected 'Index-only deletion bypassed secret scan'
+    }
+    Case 'reduction retains 15MiB creation and reopen hard limit' {
+        if ($IsWindows) { Assert-ReductionWindowsRefusal }
+        New-ReductionFixture
+        $actual = Invoke-ReductionPackage
+        Assert-True ($actual.Exit -eq 0) "Fixture creation failed: $($actual.Output)"
+        $zip = @(Get-ChildItem (Join-Path $script:repo 'artifacts/reviews') -Filter '*.zip')[0].FullName
+        $bytes = [byte[]]::new(16MB); [Random]::new(1615).NextBytes($bytes); $bytes[0] = 0
+        $archive = [IO.Compression.ZipFile]::Open($zip, [IO.Compression.ZipArchiveMode]::Update)
+        try {
+            $stream = $archive.CreateEntry('oversize.dat', [IO.Compression.CompressionLevel]::NoCompression).Open()
+            try { $stream.Write($bytes) } finally { $stream.Dispose() }
+        } finally { $archive.Dispose() }
+        $bad = Invoke-ReductionPackage -VerifyPath $zip
+        Assert-True ($bad.Exit -ne 0 -and $bad.Output.Contains('PACKAGE_SIZE')) "Reopen size limit weakened: $($bad.Output)"
+        [IO.File]::WriteAllBytes((Join-Path $script:repo ($script:reductionRoot + $script:reductionRun + '/large.dat')), $bytes)
+        $script:head = Commit-Fixture
+        $actual = Invoke-ReductionPackage
+        Assert-True ($actual.Exit -ne 0 -and $actual.Output.Contains('PACKAGE_SIZE')) "Creation size limit weakened: $($actual.Output)"
+        Assert-True (@(Get-ChildItem (Join-Path $script:repo 'artifacts/reviews') -Filter '*.zip').Count -eq 1 -and @(Get-ChildItem (Join-Path $script:repo 'artifacts/reviews') -Filter '*.partial').Count -eq 0) 'Oversized creation published or left partial'
+    }
+    foreach ($tamper in @('policy', 'missing-policy', 'index', 'diff', 'changes')) {
+        Case "reduction VerifyOnly rejects rehashed $tamper" {
+            if ($IsWindows) { Assert-ReductionWindowsRefusal }
+            New-ReductionFixture
+            $actual = Invoke-ReductionPackage
+            Assert-True ($actual.Exit -eq 0) "Fixture creation failed: $($actual.Output)"
+            $zip = @(Get-ChildItem (Join-Path $script:repo 'artifacts/reviews') -Filter '*.zip')[0].FullName
+            $archive = [IO.Compression.ZipFile]::Open($zip, [IO.Compression.ZipArchiveMode]::Update)
+            try {
+                if ($tamper -in @('policy', 'missing-policy')) {
+                    $m = Read-ZipText $archive 'manifest.json' | ConvertFrom-Json -AsHashtable
+                    if ($tamper -eq 'policy') { $m.evidenceReduction.finalRun = 'b-continue-20261106-99' } else { $m.Remove('evidenceReduction') }
+                    Replace-ZipMember $archive 'manifest.json' ([Text.Encoding]::UTF8.GetBytes(($m | ConvertTo-Json -Depth 20)))
+                } else {
+                    $name = switch ($tamper) { 'index' { 'evidence-index.json' }; 'diff' { 'git/diff-text.patch' }; 'changes' { 'git/changed-files.json' } }
+                    Replace-ZipMember $archive $name ([Text.Encoding]::UTF8.GetBytes("[]`n"))
+                }
+            } finally { $archive.Dispose() }
+            $bad = Invoke-ReductionPackage -VerifyPath $zip
+            Assert-True ($bad.Exit -ne 0 -and ($bad.Output.Contains('REDUCTION_POLICY') -or $bad.Output.Contains('HEAD_MISMATCH'))) "Rehashed mutation accepted or unrelated failure: $($bad.Output)"
+        }
+    }
     Case 'valid committed evidence preserves command and status' {
         Write-Fixture 'docs/evidence/TEST-001/checks.json' (@{ checks = @(@{ name = 'fixture'; command = 'pwsh fixture.ps1'; status = 'PASS'; exitCode = 0; output = '1 assertion passed' }); ci = @{ status = 'NOT_VERIFIED' } } | ConvertTo-Json -Depth 6)
         $script:head = Commit-Fixture
@@ -997,5 +1240,6 @@ for i in range(53):
 }
 if ($results.Count -eq 0) { throw 'No matching review-package tests ran' }
 $failed = @($results | Where-Object Status -eq 'FAIL').Count
-Write-Output "ReviewPackage: $($results.Count) tests, $failed failures; product/container tests NOT_RUN."
+$notRun = @($results | Where-Object Status -eq 'NOT_RUN').Count
+Write-Output "ReviewPackage: $($results.Count) tests, $failed failures, $notRun platform cases NOT_RUN; product/container tests NOT_RUN."
 if ($failed -gt 0) { throw 'Review package self-tests failed' }

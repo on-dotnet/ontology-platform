@@ -1,0 +1,30 @@
+{
+  "reviewer": "/root/argv_review",
+  "mode": "READ_ONLY_NON_AUTHOR",
+  "status": "PASS",
+  "openP0": 0,
+  "openP1": 0,
+  "openP2": 0,
+  "scope": "Current three-file reduction implementation; not full product acceptance",
+  "inputs": {
+    "scripts/create-review-package.ps1": "7fb1e0e153addc6ed261a856beac4e7d9af820cf0fde75bcc4c3340f22dd8b7f",
+    "scripts/tests/ReviewPackage.Tests.ps1": "8df99b40c0385171a8b72bcffe23271488e8abb8889b59af3e0f5f4b71a14550",
+    "docs/development/review-package-spec.md": "efabc485bf638eb06f64a517c7d5aa5fb1eb5cdd4f286085025585d0e0dee3a5",
+    "docs/tasks/G4-M1-MAIN-INTEGRATION-001/REDUCTION-APPROVAL.md": "a877177b0da6056fdfc3f9c607b70afea71fec0c677a998cf3a7ecdf56e49a64",
+    "docs/evidence/G4-M1-MAIN-INTEGRATION-001/review-evidence-selection.json": "1295b51934af42438eb666519761788537fe84fbc80dec36cee84025403a576e"
+  },
+  "findingsResolved": [
+    "Windows refusal is actually asserted and NOT_RUN is explicitly recorded instead of silent PASS",
+    "Exact approved record with invalid new policy ancestor is rejected in isolated fixture"
+  ],
+  "observedTests": [
+    "21 directed cases PASS before review fixes",
+    "1 independent ancestry case PASS after review fix"
+  ],
+  "pending": [
+    "full SelfTest",
+    "historical selection independent review",
+    "new stable candidate full real acceptance",
+    "final ZIP and independent reopen"
+  ]
+}

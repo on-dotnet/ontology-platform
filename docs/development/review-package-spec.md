@@ -18,6 +18,18 @@
 
 保留两侧原始blob前8000字节的二进制分类及全部内容安全检查。完整argv含可执行名、固定Git选项及所有参数，不超过256项；Unix实际UTF-8含每项NUL不超过8192字节。优先准确文本literal集合，超预算则尝试根范围减准确二进制literal集合；文本/二进制重叠、两种表示均超预算、执行前后实际name-only集合与目标文本集合不同均拒绝。真实启动仍失败时保留原异常并停止，不增大预算或拆分拼接diff。Windows实际ArgumentList渲染尚未核验，该专用路径明确拒绝并保留NOT_VERIFIED；不得把Mac成功当作Windows通过。
 
+## G4-M1-MAIN-INTEGRATION-001：保持15MiB的证据选择增量
+
+2026-11-06用户随后批准“先保持15M，请继续”及已经说明的减量方向。此增量仅覆盖上段变更A当时尚未批准的证据选择/纯证据diff部分，原A批准记录和历史合同不改写。批准原文为`docs/tasks/G4-M1-MAIN-INTEGRATION-001/REDUCTION-APPROVAL.md`，SHA256=`a877177b0da6056fdfc3f9c607b70afea71fec0c677a998cf3a7ecdf56e49a64`。
+
+仅V3、上述准确TaskId、Base=`d1a61daffe844475b07705797e3ad325cc3f2945`、Head包含`9ed3b9283acc81805737fb19efd3123281010103`且已提交批准散列吻合时启用`G4-M1-15M-EVIDENCE-1`。还须满足变更A可信批准。无批准旧包、V1/V2及其他任务按原规则；损坏批准拒绝，CLI/环境变量/manifest不能自授策略。创建与VerifyOnly共用Git重算，15MiB硬限、10MiB分类报告、PNG12张/3MiB及像素核验不变。
+
+已提交`docs/evidence/<TaskId>/review-evidence-selection.json`使用闭合schema1：`schemaVersion`、`finalRun`、`validationPath`、`retainedPaths`。finalRun是本任务`b-continue-YYYYMMDD-NN`，其全部Head非PNG证据自动入包；validationPath必须准确属于该Run并有payload映射，与CLI/manifest EvidencePath相同。选择文件自身入包，retainedPaths只接受存在、唯一、准确的本任务非PNG路径。工具强制保留Run32 I06失败、Run33 I07失败、无损迁移映射、体积根因和实施合同；独立Review另核实SDK首次联网/离线恢复、格式及迁移授权、产品修复和审查等完整关键链。文件名或选择策略不证明测试通过；最终验收及原失败状态不重写。
+
+全部Head常规文件和全部变更双侧原始blob仍做有限安全扫描。所有Head证据保留commit/blob OID/SHA256/size/path/恢复索引；包括不随包的同任务早期Run证据。changed-files完整包含所有文本/二进制增删及重命名，每个非空侧增加commit与准确blob恢复命令。`patchDisposition`为`full-text`、`evidence-index-only`或`binary-index-only`，不改isBinary真实分类。仅实际存在的两侧都在docs/evidence内时可省略证据文本patch；任一侧为非证据的文本重命名两端全部保留。全范围diff-check不减量；删除侧仍可逐字节从Git恢复，原件不删除，历史不改写。
+
+argv仍优先准确文本集合，再准确排除集合。仅当目标文本集合没有证据路径时，允许把证据排除项折叠为整个docs/evidence目录；包含/排除重叠、前后实际name-only集合不等或预算不足均拒绝，不拆分拼接或提高预算。manifest.evidenceReduction固定绑定策略、批准及选择SHA、finalRun、validationPath、diff范围；重开重新推导并比较，包括拒绝删除或伪造策略字段。摘要明确纯证据差异为双侧索引，不再宣称全部证据全文patch随包。此包仍需受控Git对象访问才能恢复省略字节，不是完整离线审计归档。
+
 ## V3 默认 compact 合同（G3-M1-CLOSEOUT-002）
 
 人类2026-10-27正式授权本轮工程纠偏，默认创建 `schemaVersion=3`。历史V1/V2的格式和原始ZIP/SHA保持；`VerifyOnly`按manifest版本分派，显式 `-SchemaVersion 1` / `2` 仍可创建历史格式。下面V2/V1章节仅适用其对应版本，不扩大V3。

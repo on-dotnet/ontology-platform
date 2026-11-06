@@ -214,3 +214,7 @@ I07六个真实浏览器场景完成，U01–U06通过（U05独立聚合闭合�
 A仅修改已批三共享文件及任务批准/证据：精确V3/Task/Base/H祖先/批准原文SHA准入；完整argv256项、Unix8192字节，Windows实际渲染未验明则明确拒绝。原文本literal超预算时使用经before/after集合验证的二进制literal补集，重叠/双超预算/真实启动失败均停止。原blob分类、完整diff、双侧安全扫描、15MiB及V1/V2/无批准旧V3保持。4项新增回归先RED后GREEN，原版107项全过后按独立审查补强同fixture literal/complement字节相等、特殊路径/rename/delete、同时生效externaldiff/textconv及Windows预期拒绝；最终完整verify -SelfTest469.978秒exit0，其中ReviewPackage107项0失败，输入无漂移。真实旧H的10998文本路径由生产新函数生成252090543字节，SHA与原差异精确一致。新鲜上下文非作者源码/定向Review无开放P0/P1/P2。
 
 本次26文件PyYAML本地只读复制，使用后lsof无占用、逐hash校验并准确回收606501逻辑字节，源不变；monitor98664以子进程句柄准确释放、ps exit1空，能源观测保留实际summary。A工程增量不把Run34绑定成新输入实测：最终构包选择/diff政策待明确，完整稳定候选仍须适用真实验收、唯一V3和独立重开后才能闭合I08。未新建产品运行组，不重复尚未稳定的整栈；15MiB保持，B未执行，main/M2未执行。
+
+2026-11-06 用户随后明确批准“先保持15M，请继续”及已说明的证据减量方向。新策略仅本任务固定Base/祖先/准确批准blob生效，最终Run全非PNG、关键失败/审批/恢复链随包；纯证据文本用完整双侧blob索引替代重复patch，完整非证据文本及跨界重命名两端保留。创建/VerifyOnly重算同一策略，15MiB不变，旧包兼容。92项历史选择链独立审查PASS（91项原Git字节和1项新合同），另加入本次工程原始失败/修复与审查记录；预定Run35尚未执行，当前不能交付ZIP。
+
+本次首次完整SelfTest在230.756869秒因早期schema消费者没有可选ReductionPolicy字段而exit1；原始日志和回执保留。仅构包器添加兼容guard，新增missing-property真实RED→GREEN、既有EvidencePreflight23项通过，独立复审无开放问题。新输入完整SelfTest exit0，ReviewPackage129测试/0失败/本机0平台NOT_RUN。两次精确26文件PyYAML副本及各自host monitor均按自身句柄/散列/占用检查释放，原共享工具不变。具体命令、时长、散列和原始输出见packaging-reduction-20261106-01；此为工程增量，不替代新稳定T的完整真实验收。Master继续冻结新T并执行Run35，不更新main、不进入M2。

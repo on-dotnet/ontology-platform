@@ -94,15 +94,67 @@ function Test-ReviewGitArgvBudget {
     return $full.Count -le 256 -and $bytes -le 8192
 }
 
+function Get-ReviewReductionPolicy {
+    param([string]$Repository, [string]$Base, [string]$Head, [int]$Version, [string]$WorkItem)
+    if ($Version -ne 3 -or $WorkItem -cne 'G4-M1-MAIN-INTEGRATION-001' -or $Base -cne 'd1a61daffe844475b07705797e3ad325cc3f2945') { return $null }
+    $approvalPath = 'docs/tasks/G4-M1-MAIN-INTEGRATION-001/REDUCTION-APPROVAL.md'
+    $approvalHash = 'a877177b0da6056fdfc3f9c607b70afea71fec0c677a998cf3a7ecdf56e49a64'
+    if ((Invoke-ReviewGit $Repository @('cat-file', '-e', ($Head + ':' + $approvalPath)) -AllowFailure).ExitCode -ne 0) { return $null }
+    $approval = (Invoke-ReviewGit $Repository @('cat-file', 'blob', ($Head + ':' + $approvalPath))).Bytes
+    if ((Get-ReviewHash $approval) -cne $approvalHash -or
+        (Invoke-ReviewGit $Repository @('merge-base', '--is-ancestor', '9ed3b9283acc81805737fb19efd3123281010103', $Head) -AllowFailure).ExitCode -ne 0) {
+        throw 'REDUCTION_APPROVAL: committed approval or ancestry differs'
+    }
+    $prefix = "docs/evidence/$WorkItem/"
+    $selectionPath = $prefix + 'review-evidence-selection.json'
+    if ((Invoke-ReviewGit $Repository @('cat-file', '-e', ($Head + ':' + $selectionPath)) -AllowFailure).ExitCode -ne 0) { throw 'REDUCTION_SELECTION: committed selection required' }
+    $bytes = (Invoke-ReviewGit $Repository @('cat-file', 'blob', ($Head + ':' + $selectionPath))).Bytes
+    try { $selection = $script:utf8.GetString($bytes) | ConvertFrom-Json -AsHashtable } catch { throw 'REDUCTION_SELECTION: invalid JSON' }
+    if ($selection -isnot [Collections.IDictionary] -or $selection.Count -ne 4 -or
+        @('schemaVersion', 'finalRun', 'validationPath', 'retainedPaths').Where({ -not $selection.ContainsKey($_) }).Count -gt 0 -or
+        $selection.schemaVersion -ne 1 -or $selection.finalRun -isnot [string] -or $selection.finalRun -cnotmatch '^b-continue-[0-9]{8}-[0-9]{2}$' -or
+        $selection.validationPath -isnot [string] -or $selection.retainedPaths -isnot [array]) { throw 'REDUCTION_SELECTION: closed schema1 required' }
+    $runPrefix = $prefix + $selection.finalRun + '/'
+    $treePaths = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+    foreach ($path in (Invoke-ReviewGit $Repository @('ls-tree', '-r', '--name-only', '-z', $Head, '--', $prefix)).Text.Split([char]0, [StringSplitOptions]::RemoveEmptyEntries)) { $null = $treePaths.Add($path) }
+    $selected = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+    $retained = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+    foreach ($path in $selection.retainedPaths) {
+        if ($path -isnot [string] -or -not $path.StartsWith($prefix, [StringComparison]::Ordinal) -or
+            $path.EndsWith('.png', [StringComparison]::OrdinalIgnoreCase) -or -not $treePaths.Contains($path) -or -not $retained.Add($path)) {
+            throw 'REDUCTION_SELECTION: retained paths must be exact unique committed task non-PNG evidence'
+        }
+        Assert-ReviewPath $path
+        $null = $selected.Add($path)
+    }
+    # 固定最低历史见证；额外关键链须由独立Reviewer核实，不把名称当测试PASS。
+    foreach ($relative in @('b-continue-20261104-32/gate-I06.json', 'b-continue-20261104-33/gate-I07.json',
+        'b-continue-20261104-23/archive-migration-applied.json', 'packaging-a-20261106-01/PACKAGING-SIZE-ANALYSIS.md',
+        'packaging-reduction-20261106-01/IMPLEMENTATION-PLAN.md')) {
+        if (-not $retained.Contains($prefix + $relative)) { throw 'REDUCTION_SELECTION: required historical failure/recovery/contract witness absent' }
+    }
+    foreach ($path in $treePaths) {
+        if ($path.StartsWith($runPrefix, [StringComparison]::Ordinal) -and -not $path.EndsWith('.png', [StringComparison]::OrdinalIgnoreCase)) { $null = $selected.Add($path) }
+    }
+    if (-not $selection.validationPath.StartsWith($runPrefix, [StringComparison]::Ordinal) -or -not $selected.Contains($selection.validationPath)) {
+        throw 'REDUCTION_SELECTION: validation must be committed non-PNG evidence in the complete final run'
+    }
+    $null = $selected.Add($selectionPath)
+    $binding = [ordered]@{ policyId = 'G4-M1-15M-EVIDENCE-1'; approvalPath = $approvalPath; approvalSha256 = $approvalHash
+        selectionPath = $selectionPath; selectionSha256 = Get-ReviewHash $bytes; finalRun = $selection.finalRun; validationPath = $selection.validationPath
+        diffScope = 'Full non-evidence text changes including cross-boundary renames; pure evidence and binary changes recoverable from complete Base/Head blob index.' }
+    return @{ policyId = $binding.policyId; Binding = $binding; SelectedPaths = $selected }
+}
+
 function Get-ReviewBoundedTextDiff {
-    param([string]$Repository, [string]$Base, [string]$Head, [object[]]$Changes, [string[]]$Options)
+    param([string]$Repository, [string]$Base, [string]$Head, [object[]]$Changes, [string[]]$Options, [switch]$EvidenceIndexOnly)
     $text = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
     $binary = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
     foreach ($change in $Changes) {
         # PowerShell会展开空集合，故直接根据类型向集合添加。
         foreach ($path in @($change.path, $change.previousPath)) {
             if ($path) {
-                if ($change.isBinary) { $null = $binary.Add($path) } else { $null = $text.Add($path) }
+                if ($change.isBinary -or ($EvidenceIndexOnly -and $change.patchDisposition -ceq 'evidence-index-only')) { $null = $binary.Add($path) } else { $null = $text.Add($path) }
             }
         }
     }
@@ -111,7 +163,11 @@ function Get-ReviewBoundedTextDiff {
     $spec = @($text | Sort-Object -CaseSensitive | ForEach-Object { ':(literal)' + $_ })
     $arguments = $Options + @('--text', $Base, $Head, '--') + $spec
     if (-not (Test-ReviewGitArgvBudget $arguments)) {
-        $spec = @('.') + @($binary | Sort-Object -CaseSensitive | ForEach-Object { ':(exclude,literal)' + $_ })
+        # 只有目标文本集合不含任何证据路径，才允许用整个证据目录压缩排除向量。
+        $collapseEvidence = $EvidenceIndexOnly -and @($text | Where-Object { $_.StartsWith('docs/evidence/', [StringComparison]::Ordinal) }).Count -eq 0
+        $excluded = @($binary | Where-Object { -not $collapseEvidence -or -not $_.StartsWith('docs/evidence/', [StringComparison]::Ordinal) } | Sort-Object -CaseSensitive)
+        $spec = @('.') + @($excluded | ForEach-Object { ':(exclude,literal)' + $_ })
+        if ($collapseEvidence) { $spec += ':(exclude,literal)docs/evidence' }
         $arguments = $Options + @('--text', $Base, $Head, '--') + $spec
         if (-not (Test-ReviewGitArgvBudget $arguments)) { throw 'ARGV_BUDGET: both exact representations exceed the approved budget' }
     }
@@ -313,6 +369,7 @@ function Get-ReviewSnapshot {
     if ($ancestry.ExitCode -ne 0) { throw 'ANCESTRY: BaseSha is not an ancestor of HeadSha' }
     $state = Invoke-ReviewGit $Repository @('status', '--porcelain=v1', '--untracked-files=all')
     if ($state.Bytes.Length -ne 0) { throw 'DIRTY_TREE: commit tracked/untracked delivery changes before packaging; file contents suppressed' }
+    $reduction = Get-ReviewReductionPolicy $Repository $Base $Head $Version $WorkItem
     $ignored = Invoke-ReviewGit $Repository @('ls-files', '--others', '--ignored', '--exclude-standard', '-z')
     $ignoredPaths = @($ignored.Text.Split([char]0, [StringSplitOptions]::RemoveEmptyEntries))
     # 忽略项仅报告路径，不读取其内容；它们不是交付输入。
@@ -377,6 +434,7 @@ function Get-ReviewSnapshot {
             } else {
                 $isEvidence = $path.StartsWith('docs/evidence/', [StringComparison]::Ordinal)
                 $include = -not $isEvidence -or $path.StartsWith("docs/evidence/$WorkItem/", [StringComparison]::Ordinal)
+                if ($null -ne $reduction -and $isEvidence) { $include = $reduction.SelectedPaths.Contains($path) }
                 if ($Version -eq 3 -and $isEvidence -and $path.EndsWith('.png', [StringComparison]::OrdinalIgnoreCase)) {
                     $include = $selectedScreenshots.Contains($path)
                     if ($include -and $VerifyPngDimensions) {
@@ -400,7 +458,7 @@ function Get-ReviewSnapshot {
                         gitPath = $path; commit = $Head; blobOid = $blobs[$path]; sha256 = $hash; sizeBytes = $bytes.Length
                         archivePath = $destination; testScope = $path.Substring(14).Split('/')[0]
                         recovery = "git show ${Head}:$path (raw Git blob); https://github.com/on-dotnet/ontology-platform/blob/$Head/$([uri]::EscapeDataString($path).Replace('%2F', '/'))"
-                        retention = $(if ($include) { 'Included once in this package and retained in Git.' } else { 'Historical evidence retained in Git; requires access to this repository at the explicit commit. Not a standalone offline audit archive.' })
+                        retention = $(if ($include) { 'Included once in this package and retained in Git.' } elseif ($null -ne $reduction) { 'Index-only evidence retained in Git; exact commit/blob recovery requires repository access. Not a standalone offline audit archive.' } else { 'Historical evidence retained in Git; requires access to this repository at the explicit commit. Not a standalone offline audit archive.' })
                     })
                 }
             }
@@ -433,12 +491,24 @@ function Get-ReviewSnapshot {
                 Assert-ReviewContent $data 'changed Base/Head blob'
                 if ([Array]::IndexOf($data, [byte]0, 0, [Math]::Min(8000, $data.Length)) -ge 0) { $binary = $true }
                 $sides[$side] = [ordered]@{ path = $sidePath; blobOid = $oid; sha256 = Get-ReviewHash $data; sizeBytes = $data.Length; mode = $mode }
+                if ($null -ne $reduction) {
+                    $sides[$side].commit = if ($side -eq 'base') { $Base } else { $Head }
+                    $sides[$side].recovery = "git cat-file blob $oid"
+                }
             }
-            $changes.Add([ordered]@{ path = $newPath; previousPath = $(if ($oldPath -cne $newPath) { $oldPath } else { $null }); changeType = $kind; isBinary = $binary; base = $sides.base; head = $sides.head; recovery = 'git cat-file blob <base.blobOid or head.blobOid>; requires controlled repository access.' })
+            $change = [ordered]@{ path = $newPath; previousPath = $(if ($oldPath -cne $newPath) { $oldPath } else { $null }); changeType = $kind; isBinary = $binary; base = $sides.base; head = $sides.head; recovery = 'git cat-file blob <base.blobOid or head.blobOid>; requires controlled repository access.' }
+            if ($null -ne $reduction) {
+                $pureEvidence = @($sides.Values | Where-Object { $null -ne $_ -and -not $_.path.StartsWith('docs/evidence/', [StringComparison]::Ordinal) }).Count -eq 0
+                $change.patchDisposition = if ($binary) { 'binary-index-only' } elseif ($pureEvidence) { 'evidence-index-only' } else { 'full-text' }
+            }
+            $changes.Add($change)
         }
         # 文本集合由原始blob判定，强制--text，避免已提交或本地attributes把文本差异隐藏成binary。
         $textPaths = @($changes | Where-Object { -not $_.isBinary } | ForEach-Object { $_.path; if ($_.previousPath) { $_.previousPath } } | Sort-Object -Unique -CaseSensitive | ForEach-Object { ':(literal)' + $_ })
-        if (Test-ReviewArgvApproval $Repository $Base $Head $Version $WorkItem) {
+        if ($null -ne $reduction) {
+            if (-not (Test-ReviewArgvApproval $Repository $Base $Head $Version $WorkItem)) { throw 'REDUCTION_APPROVAL: bounded argv approval required' }
+            $diff = Get-ReviewBoundedTextDiff $Repository $Base $Head $changes.ToArray() $diffOptions -EvidenceIndexOnly
+        } elseif (Test-ReviewArgvApproval $Repository $Base $Head $Version $WorkItem) {
             $diff = Get-ReviewBoundedTextDiff $Repository $Base $Head $changes.ToArray() $diffOptions
         } elseif ($textPaths.Count -gt 0) { $diff = Invoke-ReviewGit $Repository ($diffOptions + @('--text', $Base, $Head, '--') + $textPaths) }
         Assert-ReviewContent $diff.Bytes 'complete text patch including removed lines'
@@ -456,7 +526,7 @@ function Get-ReviewSnapshot {
     $members.Add('git/commits.txt', $commits.Bytes)
     $members.Add('git/status.txt', $script:utf8.GetBytes("OBSERVED: clean tracked and untracked delivery at packaging time.`nIgnored paths excluded; see manifest.$(if ($Version -eq 3) { 'ignoredInventory' } else { 'excludedIgnoredPaths' }).`n"))
     $members.Add('git/diff-check.txt', $script:utf8.GetBytes("exitCode=$($check.ExitCode)`n" + $check.Text))
-    return @{ Members = $members; Mapping = $mapping.ToArray(); Ignored = $ignoredPaths; ScreenshotCount = $selectedScreenshots.Count; ScreenshotCompressedBytes = $screenshotCompressedBytes; DiffCheckExit = $check.ExitCode; GitBytes = $gitBytes }
+    return @{ Members = $members; Mapping = $mapping.ToArray(); Ignored = $ignoredPaths; ScreenshotCount = $selectedScreenshots.Count; ScreenshotCompressedBytes = $screenshotCompressedBytes; DiffCheckExit = $check.ExitCode; GitBytes = $gitBytes; ReductionPolicy = $(if ($null -ne $reduction) { $reduction.Binding } else { $null }) }
 }
 
 function Read-ReviewEvidenceSchema {
@@ -507,6 +577,10 @@ function Get-ReviewLocalBinding {
 
 function Get-ReviewEvidence {
     param($Snapshot, [string]$Path, [string]$DeclaredStatus, $RuntimeCi, [bool]$Local = $false)
+    # 早期schema消费者只有精简Snapshot；完整创建/重开才带可选策略。
+    if ($Snapshot.ContainsKey('ReductionPolicy') -and $null -ne $Snapshot.ReductionPolicy -and ($Path -cne $Snapshot.ReductionPolicy.validationPath -or @($Snapshot.Mapping | Where-Object gitPath -CEQ $Path).Count -ne 1)) {
+        throw 'REDUCTION_EVIDENCE: exact selected validation and included payload required'
+    }
     $evidence = @{ checks = @(@{ name = 'task-validation'; command = $null; status = 'NOT_RUN'; exitCode = $null; output = 'No committed evidence input supplied.' }); ci = @{ status = 'NOT_VERIFIED'; runId = $null; url = $null; commit = $null; conclusion = $null } }
     if ($Path) {
         Assert-ReviewPath $Path
@@ -559,6 +633,12 @@ function Test-ReviewArchive {
     $pixelCheck = $manifest.schemaVersion -eq 3 -and $manifest.screenshotPolicy.ContainsKey('dimensionsVerified')
     if ($pixelCheck -and $manifest.screenshotPolicy.dimensionsVerified -cne $true) { throw 'MANIFEST_INVALID: PNG dimension policy invalid' }
     $snapshot = Get-ReviewSnapshot $Repository $manifest.baseSha $manifest.headSha $manifest.schemaVersion $manifest.taskId $pixelCheck
+    $recordedReduction = if ($manifest.ContainsKey('evidenceReduction')) { $manifest.evidenceReduction } else { $null }
+    if (($null -ne $recordedReduction) -ne ($null -ne $snapshot.ReductionPolicy) -or
+        ($null -ne $snapshot.ReductionPolicy -and -not [Text.Json.Nodes.JsonNode]::DeepEquals(
+            [Text.Json.Nodes.JsonNode]::Parse(($recordedReduction | ConvertTo-Json -Depth 8)),
+            [Text.Json.Nodes.JsonNode]::Parse(($snapshot.ReductionPolicy | ConvertTo-Json -Depth 8))))) { throw 'REDUCTION_POLICY: recorded policy differs from trusted committed inputs' }
+    if ($null -eq $snapshot.ReductionPolicy -and $manifest.ContainsKey('evidenceReduction')) { throw 'REDUCTION_POLICY: policy field not permitted for legacy package' }
     $observedCi = $manifest.runtimeCi
     # 旧V3没有来源字段，继续按原GitHub合同重开；V1/V2保持原行为。
     $localValidation = $manifest.schemaVersion -eq 3 -and $manifest.ContainsKey('validationSource') -and $manifest.validationSource -ceq 'LOCAL'
@@ -617,7 +697,7 @@ function Test-ReviewArchive {
     }
     if ($checksums.Count -ne $actual.Count - 1) { throw 'HASH_MISSING: every non-checksum member must have a SHA256 entry' }
     if (($manifest.sourceMembers | ConvertTo-Json -Depth 8 -Compress) -cne ($snapshot.Mapping | ConvertTo-Json -Depth 8 -Compress)) { throw 'MANIFEST_INVALID: committed source mapping differs' }
-    return [ordered]@{ status = 'PASS'; checks = @('reopen', 'paths', 'forbidden-members', 'finite-secret-patterns', 'complete-member-set', 'member-sha256', 'source-blob-and-head', 'full-base-head-diff'); memberCount = $actual.Count }
+    return [ordered]@{ status = 'PASS'; checks = @('reopen', 'paths', 'forbidden-members', 'finite-secret-patterns', 'complete-member-set', 'member-sha256', 'source-blob-and-head', $(if ($null -ne $snapshot.ReductionPolicy) { 'full-source-diff-and-complete-evidence-blob-index' } else { 'full-base-head-diff' })); memberCount = $actual.Count }
 }
 
 if ($Library) { return }
@@ -672,6 +752,10 @@ try {
         Assert-ReviewIgnoredInventory $manifest.ignoredInventory
         $manifest.screenshotPolicy = [ordered]@{ selectionPath = "docs/evidence/$TaskId/review-screenshots.json"; maxCount = 12; maxCompressedBytes = 3MB; selectedCount = $snapshot.ScreenshotCount; dimensionsVerified = $true; compressedBytes = $snapshot.ScreenshotCompressedBytes; default = 'Only explicitly selected stable representative PNG evidence; all omitted evidence remains recoverable from indexed Git blobs.' }
     }
+    if ($null -ne $snapshot.ReductionPolicy) {
+        $manifest.evidenceReduction = $snapshot.ReductionPolicy
+        $manifest.snapshotPolicy = 'All current non-evidence sources; complete final-run non-PNG evidence plus explicitly retained witnesses and selected PNGs, each payload once. Full source text patch including cross-boundary renames; pure evidence and binary changes indexed on both sides. Exact Git access required for omitted bytes.'
+    }
     $members = $snapshot.Members
     $members.Add('manifest.json', $script:utf8.GetBytes(($manifest | ConvertTo-Json -Depth 16) + "`n"))
     if ($SchemaVersion -eq 1) { $members.Add('evidence/validation.json', $script:utf8.GetBytes(($evidence | ConvertTo-Json -Depth 12) + "`n")) }
@@ -685,6 +769,11 @@ try {
         $summary = "# $TaskId 审查摘要`n`n状态：$Status。BaseSha：$BaseSha；HeadSha：$HeadSha；分支：$branch。`n`n范围：source为全部现行非证据源码/配置/测试/合同/ADR；review-evidence为本任务已提交证据。相同内容只保留一个payload，映射见manifest.sourceMembers。原始validation见映射，实际CI见git/ci.json与manifest。`n`n差异：git/diff-text.patch保留全部文本差异；git/changed-files.json记录每项变更的Base/Head原始blob OID、SHA256、大小、路径、类型；二进制不内嵌补丁。evidence-index.json完整列出历史证据与恢复方式。省略字节需要访问受控Git仓库，不能把此包声称为完整离线审计归档。`n`n验证：逐项命令/退出码见manifest与任务validation；CI为$($evidence.ci.status)，CI成功/失败元数据均要求同Head。空证据不是PASS；构包/重开仅证明有限完整性检查。`n`n安全与限制：已提交源、变更两侧原blob、文本补丁和成员做有限凭证检查；不包含ignored私有配置/凭证/缓存/数据库。不代替完整安全审计。被保留资源、未运行平台及实际回收量见本任务delivery-report。`n`n后续：停在当前关口，等待复审，不自动开始G3或下一阶段。`n"
     }
     if ($SchemaVersion -eq 3) { $summary += "`nV3：验证来源=$ValidationSource。LOCAL从已提交checks和源码blob重算并独立重开，不调用GitHub；GITHUB实际查询同Head run及两个job，历史无来源字段V3维持原规则。PNG仅保留已提交选择清单中的最终稳定代表，最多12张/压缩3MiB。ignored仅聚合元数据，完整路径清单只存本地artifact。软目标10MiB、硬上限15MiB；Slim不等于独立离线审计包。`n" }
+    if ($null -ne $snapshot.ReductionPolicy) {
+        $summary = $summary.Replace('review-evidence为本任务已提交证据。', 'review-evidence为最终Run全部非PNG证据、明确保留的关键失败/审批/恢复链和独立选择的代表PNG。')
+        $summary = $summary.Replace('git/diff-text.patch保留全部文本差异；', 'git/diff-text.patch保留完整非证据文本差异及跨证据/源码重命名两端；纯证据文本和二进制变更不重复内嵌patch，逐项patchDisposition与双侧恢复入口见git/changed-files.json；')
+        $summary += "`n本任务15MiB策略：$($snapshot.ReductionPolicy.policyId)，批准及选择SHA见manifest.evidenceReduction。原始Git证据、失败状态及删除侧blob全部保留；省略的证据字节须从受控Git对象恢复。`n"
+    }
     $members.Add('REVIEW_SUMMARY.md', $script:utf8.GetBytes($summary))
     $lines = foreach ($name in @($members.Keys | Sort-Object -CaseSensitive)) { Assert-ReviewPath $name; Assert-ReviewContent $members[$name] 'generated member'; (Get-ReviewHash $members[$name]) + '  ' + $name }
     $members.Add('SHA256SUMS.txt', $script:utf8.GetBytes(($lines -join "`n") + "`n"))

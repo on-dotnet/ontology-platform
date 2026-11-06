@@ -1,0 +1,19 @@
+{
+  "reviewer": "/root/argv_review",
+  "mode": "READ_ONLY_NON_AUTHOR",
+  "status": "PASS",
+  "inputs": {
+    "scripts/create-review-package.ps1": "065cc2c523c18592a943e5329ecc3e7a856bea01a1efae83ba6f3e689f6c2c2b",
+    "scripts/tests/ReviewPackage.Tests.ps1": "018b689b91f2ef826e9ce7799b820410ba70553cba81b7a8c1138b68de092e11"
+  },
+  "rootCause": "Get-ReviewEvidence accessed optional ReductionPolicy under StrictMode for the existing schema-only consumer snapshot",
+  "fix": "ContainsKey guard only; full Get-ReviewSnapshot still always carries the derived policy and VerifyOnly compares it",
+  "observed": [
+    "missing-property regression RED then GREEN",
+    "23 existing EvidencePreflight checks PASS",
+    "independent compact-snapshot success",
+    "independent full-policy missing payload and wrong EvidencePath refusal"
+  ],
+  "priorFullSelfTest": "FAIL preserved; new-input full rerun required",
+  "preliminaryShortFixture": "short-schema-red.txt rejected a malformed fixture name before reaching the bug; retained but not counted as root-cause reproduction"
+}

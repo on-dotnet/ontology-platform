@@ -1,0 +1,26 @@
+{
+  "command": [
+    "/opt/homebrew/opt/python@3.13/bin/python3.13",
+    "-B",
+    "scripts/maintenance/execution_preflight.py",
+    "check",
+    "--milestone",
+    "G4-M1",
+    "--phase",
+    "contract"
+  ],
+  "startedAtUtc": "2026-11-06T07:09:00.286931+00:00",
+  "endedAtUtc": "2026-11-06T07:09:00.371550+00:00",
+  "elapsedSeconds": 0.08465200001955964,
+  "exitCode": 0,
+  "inputHashes": {
+    "scripts/create-review-package.ps1": "065cc2c523c18592a943e5329ecc3e7a856bea01a1efae83ba6f3e689f6c2c2b",
+    "scripts/tests/ReviewPackage.Tests.ps1": "018b689b91f2ef826e9ce7799b820410ba70553cba81b7a8c1138b68de092e11",
+    "scripts/verify.ps1": "02422e9a55ba5f5e8b59c56d42d8a230dd4eec1389e7eae090185eafc7e4f6fa",
+    "docs/tasks/G4-M1-MAIN-INTEGRATION-001/ARGV-APPROVAL.md": "a9226c4d33e51ae568eba350cf8622b35df510e551222b62416d11f35c9ea3ae",
+    "docs/tasks/G4-M1-MAIN-INTEGRATION-001/REDUCTION-APPROVAL.md": "a877177b0da6056fdfc3f9c607b70afea71fec0c677a998cf3a7ecdf56e49a64"
+  },
+  "executedInputDrift": false,
+  "logSha256": "f147de4676b60a5c19fbeb725005651bf955cb9c8822cbcd826ab345a15390ed",
+  "executorSha256": "2efc83b98bce30ff2db9757b6c80fe08e32df94d86bb8d37a3a4c2740d45e5c3"
+}
