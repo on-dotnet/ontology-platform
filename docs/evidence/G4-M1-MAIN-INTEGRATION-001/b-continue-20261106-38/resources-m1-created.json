@@ -1,0 +1,282 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261106-38",
+  "group": "m1",
+  "certificateVariant": "server",
+  "composeConfigSha256": "0c1b16992adb92313f4457eaf7398224cb87ef8432a5ae9ef8790c681aef6fe0",
+  "containers": [
+    {
+      "id": "58ca4e42daaa38acc4a82f57e0ae152464808a10d3a125d575d09dcbc9f31206",
+      "service": "web",
+      "image": "sha256:a52166d89cfcc66ea62d10535ca712d161cece5d77ff4cfa758866b6b75ccb3f",
+      "init": null,
+      "running": true,
+      "paused": false,
+      "memoryBytes": 1073741824,
+      "bindMappings": [
+        {
+          "nativeSource": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261106-38/helpers/loopback-proxy.mjs",
+          "daemonSource": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261106-38/helpers/loopback-proxy.mjs",
+          "destination": "/run/loopback-proxy.mjs",
+          "readOnly": true
+        },
+        {
+          "nativeSource": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/node_modules",
+          "daemonSource": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/node_modules",
+          "destination": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/node_modules",
+          "readOnly": true
+        },
+        {
+          "nativeSource": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/apps/web",
+          "daemonSource": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/apps/web",
+          "destination": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/apps/web",
+          "readOnly": true
+        },
+        {
+          "nativeSource": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/apps/web/node_modules",
+          "daemonSource": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/apps/web/node_modules",
+          "destination": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/apps/web/node_modules",
+          "readOnly": true
+        }
+      ],
+      "mounts": [
+        {
+          "Type": "bind",
+          "Source": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261106-38/helpers/loopback-proxy.mjs",
+          "Destination": "/run/loopback-proxy.mjs",
+          "RW": false
+        },
+        {
+          "Type": "bind",
+          "Source": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/node_modules",
+          "Destination": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/node_modules",
+          "RW": false
+        },
+        {
+          "Type": "bind",
+          "Source": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/apps/web",
+          "Destination": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/apps/web",
+          "RW": false
+        },
+        {
+          "Type": "bind",
+          "Source": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/apps/web/node_modules",
+          "Destination": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/apps/web/node_modules",
+          "RW": false
+        }
+      ]
+    },
+    {
+      "id": "8c31c8c691e2b0200e7b1b48f42b50d2b0c3002e2ea37f48302a6ccb08d773ea",
+      "service": "api",
+      "image": "sha256:3a05e37c371f358d2b5cb9687d9992171b34b8c9146c283bef865bdbd2c53c55",
+      "init": true,
+      "running": true,
+      "paused": false,
+      "memoryBytes": 1073741824,
+      "bindMappings": [
+        {
+          "nativeSource": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/bin/Debug/net10.0",
+          "daemonSource": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/bin/Debug/net10.0",
+          "destination": "/app",
+          "readOnly": true
+        },
+        {
+          "nativeSource": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261106-38/api",
+          "daemonSource": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261106-38/api",
+          "destination": "/private/api",
+          "readOnly": true
+        }
+      ],
+      "mounts": [
+        {
+          "Type": "bind",
+          "Source": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/backend/src/Hosts/OntologyPlatform.Api/bin/Debug/net10.0",
+          "Destination": "/app",
+          "RW": false
+        },
+        {
+          "Type": "volume",
+          "Name": "ontology-g4-main-b-continue-20261106-38_api-keyring",
+          "Source": "/var/lib/docker/volumes/ontology-g4-main-b-continue-20261106-38_api-keyring/_data",
+          "Destination": "/keyring",
+          "RW": true
+        },
+        {
+          "Type": "bind",
+          "Source": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261106-38/api",
+          "Destination": "/private/api",
+          "RW": false
+        }
+      ]
+    },
+    {
+      "id": "f757c66b5b6da3e2e1f4c5febcb345a90ae2a82f622ce718b53eb022a092b852",
+      "service": "platform-pg",
+      "image": "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+      "init": null,
+      "running": true,
+      "paused": false,
+      "memoryBytes": 805306368,
+      "bindMappings": [
+        {
+          "nativeSource": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261106-38/platform-password",
+          "daemonSource": "/host_mnt/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261106-38/platform-password",
+          "destination": "/run/secrets/platform-password",
+          "readOnly": true
+        }
+      ],
+      "mounts": [
+        {
+          "Type": "bind",
+          "Source": "/host_mnt/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261106-38/platform-password",
+          "Destination": "/run/secrets/platform-password",
+          "RW": false
+        },
+        {
+          "Type": "volume",
+          "Name": "ontology-g4-main-b-continue-20261106-38_platform-data",
+          "Source": "/var/lib/docker/volumes/ontology-g4-main-b-continue-20261106-38_platform-data/_data",
+          "Destination": "/var/lib/postgresql",
+          "RW": true
+        }
+      ]
+    },
+    {
+      "id": "b04bad5a868e7b91bbd9fffddad1c5914961232b1b6a150ec6a6a03d0b1a0f95",
+      "service": "keycloak-test",
+      "image": "sha256:e1c1331f4a3e826016bdee2193335ed21685f0fd075c70bcb4d8fa7eeba9e1b4",
+      "init": null,
+      "running": true,
+      "paused": false,
+      "memoryBytes": 1073741824,
+      "bindMappings": [
+        {
+          "nativeSource": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261106-38/keycloak-password",
+          "daemonSource": "/host_mnt/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261106-38/keycloak-password",
+          "destination": "/run/secrets/keycloak-password",
+          "readOnly": true
+        }
+      ],
+      "mounts": [
+        {
+          "Type": "volume",
+          "Name": "ontology-g4-main-b-continue-20261106-38_keycloak-data",
+          "Source": "/var/lib/docker/volumes/ontology-g4-main-b-continue-20261106-38_keycloak-data/_data",
+          "Destination": "/opt/keycloak/data",
+          "RW": true
+        },
+        {
+          "Type": "bind",
+          "Source": "/host_mnt/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261106-38/keycloak-password",
+          "Destination": "/run/secrets/keycloak-password",
+          "RW": false
+        }
+      ]
+    },
+    {
+      "id": "0de0048066715af4c36688fc24b422e789ad8aa2bc840d5584e385106839df93",
+      "service": "pg-source",
+      "image": "sha256:9a74990a5c776ff210361b67616b347750c66c36ea0dfbb4f575d19fcc3d8437",
+      "init": true,
+      "running": true,
+      "paused": false,
+      "memoryBytes": 805306368,
+      "bindMappings": [
+        {
+          "nativeSource": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261106-38/init.sql",
+          "daemonSource": "/host_mnt/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261106-38/init.sql",
+          "destination": "/run/secrets/init.sql",
+          "readOnly": true
+        },
+        {
+          "nativeSource": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261106-38/pg_hba.conf",
+          "daemonSource": "/host_mnt/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261106-38/pg_hba.conf",
+          "destination": "/run/secrets/pg_hba.conf",
+          "readOnly": true
+        },
+        {
+          "nativeSource": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261106-38/postgres-password",
+          "daemonSource": "/host_mnt/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261106-38/postgres-password",
+          "destination": "/run/secrets/postgres-password",
+          "readOnly": true
+        },
+        {
+          "nativeSource": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261106-38/server.crt",
+          "daemonSource": "/host_mnt/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261106-38/server.crt",
+          "destination": "/run/secrets/server.crt",
+          "readOnly": true
+        },
+        {
+          "nativeSource": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261106-38/server.key",
+          "daemonSource": "/host_mnt/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261106-38/server.key",
+          "destination": "/run/secrets/server.key",
+          "readOnly": true
+        }
+      ],
+      "mounts": [
+        {
+          "Type": "bind",
+          "Source": "/host_mnt/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261106-38/init.sql",
+          "Destination": "/run/secrets/init.sql",
+          "RW": false
+        },
+        {
+          "Type": "bind",
+          "Source": "/host_mnt/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261106-38/pg_hba.conf",
+          "Destination": "/run/secrets/pg_hba.conf",
+          "RW": false
+        },
+        {
+          "Type": "bind",
+          "Source": "/host_mnt/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261106-38/postgres-password",
+          "Destination": "/run/secrets/postgres-password",
+          "RW": false
+        },
+        {
+          "Type": "bind",
+          "Source": "/host_mnt/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261106-38/server.crt",
+          "Destination": "/run/secrets/server.crt",
+          "RW": false
+        },
+        {
+          "Type": "bind",
+          "Source": "/host_mnt/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/.tools/security/g4-m1-main-integration-001-b-continue-20261106-38/server.key",
+          "Destination": "/run/secrets/server.key",
+          "RW": false
+        },
+        {
+          "Type": "volume",
+          "Name": "ontology-g4-main-b-continue-20261106-38_source-data",
+          "Source": "/var/lib/docker/volumes/ontology-g4-main-b-continue-20261106-38_source-data/_data",
+          "Destination": "/var/lib/postgresql",
+          "RW": true
+        }
+      ]
+    }
+  ],
+  "totalMemoryBytes": 4831838208,
+  "observedVolumes": {
+    "ontology-g4-main-b-continue-20261106-38_api-keyring": {
+      "usedBytes": 0,
+      "containerId": "8c31c8c691e2b0200e7b1b48f42b50d2b0c3002e2ea37f48302a6ccb08d773ea",
+      "destination": "/keyring"
+    },
+    "ontology-g4-main-b-continue-20261106-38_platform-data": {
+      "usedBytes": 48840704,
+      "containerId": "f757c66b5b6da3e2e1f4c5febcb345a90ae2a82f622ce718b53eb022a092b852",
+      "destination": "/var/lib/postgresql"
+    },
+    "ontology-g4-main-b-continue-20261106-38_keycloak-data": {
+      "usedBytes": 192856064,
+      "containerId": "b04bad5a868e7b91bbd9fffddad1c5914961232b1b6a150ec6a6a03d0b1a0f95",
+      "destination": "/opt/keycloak/data"
+    },
+    "ontology-g4-main-b-continue-20261106-38_source-data": {
+      "usedBytes": 65699840,
+      "containerId": "0de0048066715af4c36688fc24b422e789ad8aa2bc840d5584e385106839df93",
+      "destination": "/var/lib/postgresql"
+    }
+  },
+  "observedVolumeUsedBytes": 307396608
+}

@@ -1,0 +1,35 @@
+{
+  "status": "BLOCKED",
+  "reviewer": "/root/argv_review",
+  "scope": "T38 unified source/reuse/Web/browser/screenshot/runtime review",
+  "testedCommit": "aac57224cb27fe2f35dfd39a0d7b3b84e2a652ee",
+  "findings": [
+    {
+      "severity": "P1",
+      "code": "CANCEL_BLOCKED_BY_PENDING_SOURCE_HISTORY",
+      "productScope": "catalog.tsx run and cancellation disabled share readOwners; actual history has source IO; exact original pending HTTP sequence not captured",
+      "resolution": "new exact candidate awaits approval"
+    }
+  ],
+  "verified": [
+    "15 original receipts equal fixed H37 Git blobs",
+    "19 drivers and1426 backend files unchanged",
+    "all1795 actual build hashes",
+    "4 Git-bound helper files",
+    "Web23files385PASS and four commands0",
+    "HTTP59/135 provision21/52 lineagePASS",
+    "real403 race jobURL/PARTIAL and ACL recovery",
+    "4 screenshots visually inspected; narrow tables show horizontally visible area only"
+  ],
+  "cleanupAdmission": {
+    "status": "PASS_EXACT_WHITELIST",
+    "counts": {
+      "containers": 5,
+      "networks": 2,
+      "volumes": 4
+    },
+    "resourceManifestSha256": "007ae9fc506aaaaee9716451b8c37bad988b1bbc56989f4add1d57c8b7c6e8e4",
+    "keep": "post-reviewed bridge transition baseline; causeNOT_VERIFIED",
+    "actualExecution": "SEPARATE_RECEIPT_REQUIRED"
+  }
+}

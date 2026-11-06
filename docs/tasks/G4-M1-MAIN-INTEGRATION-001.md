@@ -1,8 +1,8 @@
 # G4-M1-MAIN-INTEGRATION-001
 
-状态：B / BLOCKED_WITH_WITNESS；P0限定准入通过；稳定产品验收未启动。
+状态：B / IN_PROGRESS；Run38取消互锁缺陷已获精确修复批准，Run39按影响验收；尚未达到main审批关口。
 
-最新用户授权：按2026-11-02 Plan审查执行授权执行。原始审批见本任务证据p0/original-documents.json 中的 approval-original.md；完整计划见G4-M1-MAIN-INTEGRATION-001/PLAN.md。
+最新用户授权：继续B、按影响验收，并应用已审取消修正精确补丁c07539a54965042b584adc0220dec17dfe78e57046019121234727b1ab2619fe；不更新main、不进入M2。2026-11-02 Plan及后续逐次例外为历史授权链。原始审批见本任务证据p0/original-documents.json 中的 approval-original.md；完整计划见G4-M1-MAIN-INTEGRATION-001/PLAN.md。
 
 ApprovedMain=d1a61daffe844475b07705797e3ad325cc3f2945；CandidateSourceHead=99753df6f03b184e40b431a5b5aba89d8fa67087；TaskBranch=codex/g4-m1-main-integration-001。Master唯一作者与共享输入责任人，非作者Reviewer只读。
 
@@ -246,3 +246,12 @@ I07在source-permission-limited浏览器场景POST202后超时；原BLOCKED不�
 
 
 Run38启动：用户已明确批准Run37精确两文件补丁，并批准按影响验收。旧整链每次重跑要求由新批准覆盖；T37未变输入经逐项核对后标记复用，重跑Web全套、竞态回归、完整I07及必要兼容烟测。详见本轮IMPACT-ACCEPTANCE-APPROVAL.md。15MiB/main/M2边界保持，当前验收未完成。
+
+
+Run38 / Taac57224cb27fe2f35dfd39a0d7b3b84e2a652ee：按用户新批准影响策略，15份T37原证据固定H37 Git blob、19drivers、1426后端产物核实复用，明确NOT_REEXECUTED。Web23文件385测试及lint/type/build新执行通过；HTTP59/135、provision21/52、lineage与真实403竞态/PARTIAL恢复通过。完整I07最后取消场景失败，两个握手均ACK但无取消POST；新增读取互锁连带阻止已授权运行任务取消。原作业最终SUCCEEDED，原失败不改；源码及2RED证实阻塞路径，不补造原现场完整网络顺序。
+
+最小取消候选仅两文件，Cancel允许越过未完成源读取但保留父锁、操作owner、撤权/重验及当前渲染代际，Discover保持互锁；隔离23文件388测试、类型/lint0，独立ReviewPASS。用户已明确批准精确patchSHA c07539a54965042b584adc0220dec17dfe78e57046019121234727b1ab2619fe，现应用并冻结下一T。
+
+Run38初始setup因Docker默认bridge准确ID替换阻断，原因NOT_VERIFIED；固定4份差异见证和5/2/4对象后，已审断点续行通过，host/none/8卷保持，原KEEP全过程不变不成立。最终实际回收11Docker对象16命令、monitor27577，独立实时后验与1606Ingress exec退出证据通过；47已知秘密模式扫描无发现。四工具副本27019文件515223892字节按KEEP_ACTIVE_TASK留给同任务继续，精确指纹和事故KEEP经独立核验；最终I08或取消时解除，避免每轮无意义删除再复制。
+
+Run39沿用按影响验收，只重新执行受影响Web和完整I07/必要烟测，未变后端继续复用。原始失败、审批恢复材料及Git恢复映射保持，15MiB/main/M2边界不变，无新V3或READY声明。

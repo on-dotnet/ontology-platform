@@ -1,0 +1,33 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261106-38",
+  "testedCommit": "aac57224cb27fe2f35dfd39a0d7b3b84e2a652ee",
+  "command": [
+    "/usr/bin/sandbox-exec",
+    "-p",
+    "(version 1) (allow default) (deny network-outbound (remote ip \"*:*\")) (allow network-outbound (remote ip \"localhost:*\"))",
+    "/opt/homebrew/opt/node@24/bin/node",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/apps/web/node_modules/vitest/vitest.mjs",
+    "run",
+    "--config",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261106-38/cancel-proposal/full.config.mjs"
+  ],
+  "startedAtUtc": "2026-11-06T13:22:39.651350+00:00",
+  "endedAtUtc": "2026-11-06T13:22:40.436733+00:00",
+  "elapsedSeconds": 0.785280292009702,
+  "exitCode": 0,
+  "timingStatus": "OBSERVED",
+  "timedOut": false,
+  "executedInputDrift": false,
+  "inputHashes": {
+    "/usr/bin/sandbox-exec": "58839ef01b4eef8aac0d2aa8f9d1c074ae45aafe3533965b030672450064acc8",
+    "/opt/homebrew/opt/node@24/bin/node": "0d78c9bca217f53c2dc21a067246ee4a81c1f4fa111ee64d572b45fa1ff39189",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/apps/web/node_modules/vitest/vitest.mjs": "39db22f579acf5639bbb17a261408debbde03f4692c0c439e77e7f13aeba74d6",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/artifacts/g4-m1-main-integration-001/b-continue-20261106-38/cancel-proposal/full.config.mjs": "db1607e88a5d3a4109865a6f77c39554e1f62ec64a4b3e530b8c0c783849090b"
+  },
+  "manifestSha256": "d7cd76735941dd1740a649bf4ba26d2456b8065d7ccd916fe23427057da4b5b2",
+  "commandSha256": "24e1e2ed8974b1cf840993e7b6aa8b0b27d70d7368d04878e2c4bf2b1c303d81",
+  "logSha256": "8c7e69f9ad92640c19e8a3d4660943b1294f488becda1f40e1ca5e9432e87ac5",
+  "logBytes": 242,
+  "logVisibility": "TASK_EVIDENCE"
+}

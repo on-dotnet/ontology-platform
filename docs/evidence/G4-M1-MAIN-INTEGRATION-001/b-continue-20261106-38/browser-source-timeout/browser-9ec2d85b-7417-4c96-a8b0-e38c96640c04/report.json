@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "startedAtUtc": "2026-11-06T13:14:29.121Z",
+  "cases": {
+    "M1-U01": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U02": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U03": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U04": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U05": {
+      "status": "NOT_RUN",
+      "observed": [
+        "actual_probe_pending_before_response",
+        "real_tcp_connected_tls_timeout_at_least_eight_seconds",
+        "timeout_failure_and_enabled_retry_action_no_second_paused_probe"
+      ],
+      "reason": "aggregate_requires_loading_timeout_cancel_partial_and_refresh_evidence_across_controlled_runs"
+    },
+    "M1-U06": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    }
+  },
+  "http": [
+    {
+      "method": "GET",
+      "route": "/auth/csrf",
+      "status": 200,
+      "durationMs": 60
+    },
+    {
+      "method": "GET",
+      "route": "/api/v1/connections",
+      "status": 200,
+      "durationMs": 639,
+      "scope": "operator_initial_list_readiness"
+    },
+    {
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/test",
+      "status": 200,
+      "durationMs": 10068,
+      "pendingBeforeResponse": true,
+      "pendingCategories": [
+        "PROBE_RUNNING"
+      ]
+    }
+  ],
+  "screenshots": [],
+  "productExecution": true,
+  "runId": "b-continue-20261106-38",
+  "scenario": "source-timeout",
+  "driverSha256": "0af8da9bbd7202fb83d4c0e86f3b0b4122dd1ba995a7db6102a6a630c9cfbf8f",
+  "initialListReady": true,
+  "sourcePauseHandshake": {
+    "event": "SOURCE_TIMEOUT_READY",
+    "status": "MARKER_ACKNOWLEDGED",
+    "readyAtUtc": "2026-11-06T13:14:30.480Z",
+    "acknowledgedAtUtc": "2026-11-06T13:14:30.546Z"
+  },
+  "timeoutObservation": {
+    "clientDurationMs": 10068,
+    "reportDurationMs": 10004,
+    "tlsDurationMs": 10000,
+    "networkPassed": true,
+    "tlsFailed": true,
+    "probeStatus": "TEST_FAILED",
+    "diagnosticCode": "connection_source_unavailable",
+    "pendingBeforeResponse": true,
+    "pendingCategories": [
+      "PROBE_RUNNING"
+    ]
+  },
+  "completedAtUtc": "2026-11-06T13:14:40.916Z",
+  "exitCode": 2
+}

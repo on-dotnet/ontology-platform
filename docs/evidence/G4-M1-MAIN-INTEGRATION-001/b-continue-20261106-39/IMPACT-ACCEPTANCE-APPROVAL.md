@@ -1,0 +1,7 @@
+# Run39：获批取消修正，继续按影响验收
+
+用户已批准Run38精确取消补丁c07539a54965042b584adc0220dec17dfe78e57046019121234727b1ab2619fe，原始批准在Run38/cancel-patch-user-approval.json。保留先前按影响验收批准：T37未变backend/19drivers/1426构建字节核对复用，Web四项、真实HTTP烟测、403竞态、完整原样I07重新执行。不重跑Nuget恢复、完整SelfTest或后端I02–I06。
+
+Run39只是新产品提交/证据身份，不是另一轮后端整链。执行器沿用已审Run38，唯一适配为获批产品SHA及既有活跃工具副本核验复用：冻结KEEP SHA、4目录准确指纹、原copyReceipt、完整锁内包逐文件SHA512以及实际PyYAML导入/pnpm版本；不重新复制/安装。恢复材料原件、Run38失败保持。资源采用新隔离Run，旧5容器2网络4卷及monitor已独立后验回收；3网8旧卷按已审恢复基线KEEP，最初默认bridge替换原因仍NOT_VERIFIED。
+
+源码和执行器/配置/实际构建散列冻结；新辅助脚本不继承旧SelfTest PASS。15MiB上限、main/M2/G6及零下载/费用/GPU边界保持。最终I08前精确回收本任务工具副本；当前复用不是最终清理完成。

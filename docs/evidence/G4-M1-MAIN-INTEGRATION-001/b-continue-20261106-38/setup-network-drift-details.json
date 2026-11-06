@@ -1,0 +1,62 @@
+{
+  "networks": [
+    {
+      "id": "80ac07a0bfc7ad5bdedefec78a3a66c97c4c74093c4a8533f05f4cb96bcbc4d0",
+      "exitCode": 0,
+      "stdoutSha256": "2f833a9f377efdbf520d3381390c6dd96cd5758bfea0a7dc05c107657f945309",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "Name": "host",
+      "Id": "80ac07a0bfc7ad5bdedefec78a3a66c97c4c74093c4a8533f05f4cb96bcbc4d0",
+      "Created": "2026-10-25T01:37:03.981006875Z",
+      "Scope": "local",
+      "Driver": "host",
+      "Internal": false,
+      "Labels": {},
+      "Options": {}
+    },
+    {
+      "id": "966dcd480bef93042ed47f5d4baf57240f35f0fe6751f38fafc9692d4d410639",
+      "exitCode": 0,
+      "stdoutSha256": "33d71907b49469957a09cd21950ddec423e84e5eac209bb60603be52f2b23bca",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "Name": "bridge",
+      "Id": "966dcd480bef93042ed47f5d4baf57240f35f0fe6751f38fafc9692d4d410639",
+      "Created": "2026-11-06T13:05:40.110199666Z",
+      "Scope": "local",
+      "Driver": "bridge",
+      "Internal": false,
+      "Labels": {},
+      "Options": {
+        "com.docker.network.bridge.default_bridge": "true",
+        "com.docker.network.bridge.enable_icc": "true",
+        "com.docker.network.bridge.enable_ip_masquerade": "true",
+        "com.docker.network.bridge.host_binding_ipv4": "0.0.0.0",
+        "com.docker.network.bridge.name": "docker0",
+        "com.docker.network.driver.mtu": "65535"
+      }
+    },
+    {
+      "id": "aaf97836e6ff6772c2c803b98e952de7a3d0507aa8f9ed48a98bc1928ef2dc42",
+      "exitCode": 1,
+      "stdoutSha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "stderrSha256": "437e28ae4fe8f7b9cf769aeca323a1b32646b99fdb073362d26661bc4aef0562",
+      "diagnostic": "Error response from daemon: network aaf97836e6ff6772c2c803b98e952de7a3d0507aa8f9ed48a98bc1928ef2dc42 not found"
+    },
+    {
+      "id": "e66d65cfe0714eb9fde22ab801d77393aeb653344362c0faac45292d829dab8e",
+      "exitCode": 0,
+      "stdoutSha256": "bcf5b643991a396cc4ddca9a2b3f69946fedcaaf614982d741b52d482e6d40d9",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "Name": "none",
+      "Id": "e66d65cfe0714eb9fde22ab801d77393aeb653344362c0faac45292d829dab8e",
+      "Created": "2026-10-25T01:37:03.980171666Z",
+      "Scope": "local",
+      "Driver": "null",
+      "Internal": false,
+      "Labels": {},
+      "Options": {}
+    }
+  ],
+  "eventsExitCode": 0,
+  "events": []
+}

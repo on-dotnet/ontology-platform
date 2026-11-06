@@ -1,0 +1,54 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261106-38",
+  "status": "KEEP_ACTIVE_TASK",
+  "copies": [
+    {
+      "path": ".tools/pythonlibs",
+      "files": 26,
+      "bytes": 606501,
+      "links": 0,
+      "entries": 31,
+      "fingerprint": "bbefbec715a64ad2688e9998557ec1fa3d56c93a33ffe2242c19028c87aa4373"
+    },
+    {
+      "path": ".tools/pnpm/package",
+      "files": 454,
+      "bytes": 22861430,
+      "links": 0,
+      "entries": 560,
+      "fingerprint": "9abd03d78c2e821ff1a292737fe1292c995c18686b569ae2bf8064c3dc1a8def"
+    },
+    {
+      "path": "node_modules",
+      "files": 26530,
+      "bytes": 491751487,
+      "links": 1268,
+      "entries": 31294,
+      "fingerprint": "1560d5a6bb4e21136b53956c41bf8eb0a09f6e802755d5a911c9f9da52d70b17"
+    },
+    {
+      "path": "apps/web/node_modules",
+      "files": 9,
+      "bytes": 4474,
+      "links": 15,
+      "entries": 34,
+      "fingerprint": "f48b3532da8b33d3b59d406e279dbb25e8f2608fd643165152948ed61daf425b"
+    }
+  ],
+  "copyReceiptSha256": "e7c2524a61401b720c36e033fc2e2a1ed2e70f67e5f1af737b1d929af040ffe1",
+  "reason": "Same active integration task: exact candidate review/approved continuation needs pinned local tools. Retain once across impact attempts instead of repeated delete/reclone. No global/shared source changes.",
+  "releaseCondition": "Final I08 after accepted runtime tests and Review, or explicit task cancellation; exact whitelist revalidate before deletion",
+  "limits": "Not final resource closeout PASS; copied paths logical size known; physical reclamation NOT_APPLICABLE_NOW",
+  "incidentHome": {
+    "path": ".tools/dotnet-home",
+    "status": "KEEP_INCIDENT_RECOVERY",
+    "fingerprint": {
+      "files": 13,
+      "bytes": 2881013,
+      "links": 0,
+      "entries": 22,
+      "fingerprint": "158a3c213251c4331033147bd4926409a23b6eab151f2a820d1fe182d435cfa5"
+    }
+  }
+}

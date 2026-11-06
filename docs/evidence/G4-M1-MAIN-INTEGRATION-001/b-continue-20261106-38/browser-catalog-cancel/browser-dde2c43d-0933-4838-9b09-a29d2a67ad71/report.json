@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "startedAtUtc": "2026-11-06T13:15:40.387Z",
+  "cases": {
+    "M1-U01": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U02": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U03": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U04": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U05": {
+      "status": "FAIL",
+      "observed": [],
+      "reason": "browser_or_transport_error",
+      "failure": {
+        "code": "browser_or_transport_error",
+        "category": "runtime"
+      },
+      "phase": "U05_catalog_cancel_query_handshake"
+    },
+    "M1-U06": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    }
+  },
+  "http": [
+    {
+      "method": "GET",
+      "route": "/auth/csrf",
+      "status": 200,
+      "durationMs": 54
+    },
+    {
+      "method": "GET",
+      "route": "/api/v1/connections",
+      "status": 200,
+      "durationMs": 613,
+      "scope": "operator_initial_list_readiness"
+    },
+    {
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/discoveries",
+      "status": 202,
+      "durationMs": 92
+    },
+    {
+      "method": "GET",
+      "route": "/connections/{id}/discoveries/{jobId}",
+      "status": 200,
+      "durationMs": 28
+    }
+  ],
+  "screenshots": [],
+  "productExecution": true,
+  "runId": "b-continue-20261106-38",
+  "scenario": "catalog-cancel",
+  "driverSha256": "0af8da9bbd7202fb83d4c0e86f3b0b4122dd1ba995a7db6102a6a630c9cfbf8f",
+  "initialListReady": true,
+  "catalogCancelHandshakes": [
+    {
+      "event": "CATALOG_CANCEL_READY",
+      "status": "MARKER_ACKNOWLEDGED",
+      "readyAtUtc": "2026-11-06T13:15:41.725Z",
+      "acknowledgedAtUtc": "2026-11-06T13:15:41.728Z"
+    },
+    {
+      "event": "CATALOG_JOB_STARTED",
+      "status": "MARKER_ACKNOWLEDGED",
+      "readyAtUtc": "2026-11-06T13:15:41.851Z",
+      "acknowledgedAtUtc": "2026-11-06T13:15:41.918Z"
+    }
+  ],
+  "cancelObservation": {
+    "jobId": "484611a9eeed4718acc940587571365c",
+    "createdStatus": "QUEUED",
+    "persistedStatus": "QUEUED",
+    "terminalStatus": "NOT_VERIFIED"
+  },
+  "completedAtUtc": "2026-11-06T13:15:47.159Z",
+  "exitCode": 1
+}
