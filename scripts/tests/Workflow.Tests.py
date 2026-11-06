@@ -93,6 +93,22 @@ class WorkflowTests(unittest.TestCase):
         self.assertLess(order.index('environment'),order.index('backend'))
         self.assertLess(order.index('backend'),order.index('interaction'))
 
+    def test_full_identity_tracks_tests_without_default_full_schedule(self):
+        paths=['scripts/tests/WorkflowEnvironment.Tests.py']
+        self.assertNotIn('engineering-full',self.w.select_gates(paths)['affected'])
+        self.assertTrue(self.w.matches(paths[0],self.w.input_patterns('engineering-full')))
+        self.assertTrue(self.w.matches('scripts/maintenance/workflow_smoke.py',self.w.input_patterns('engineering-full')))
+
+    def test_registry_edit_is_detected_despite_cached_definitions(self):
+        raw=self.w.REGISTRY.read_bytes()
+        key=self.w.input_key(ROOT,'engineering');policy=self.w.policy_key('engineering')
+        with tempfile.TemporaryDirectory() as d:
+            path=Path(d)/'registry.json';path.write_bytes(raw)
+            with patch.object(self.w,'REGISTRY',path):
+                self.assertTrue(self.w.inputs_stable(ROOT,'engineering',key,policy,self.w.digest(raw)))
+                path.write_bytes(raw+b' ')
+                self.assertFalse(self.w.inputs_stable(ROOT,'engineering',key,policy,self.w.digest(raw)))
+
     def test_failure_signature_ignores_time_and_temporary_path(self):
         first=b'FAIL: test_boundary (Tests)\n/tmp/run123/a.py\nRan 2 tests in 0.05s'
         second=b'FAIL: test_boundary (Tests)\n/tmp/run456/a.py\nRan 2 tests in 12.45s'
@@ -113,7 +129,7 @@ class WorkflowTests(unittest.TestCase):
             key=self.w.input_key(root,'engineering')
             folder=root/'docs/evidence/TEST';folder.mkdir(parents=True)
             log=folder/'run.log';log.write_text('Ran 2 tests in 0.01s\nOK\n')
-            row=dict(gate='engineering',status='PASS',exitCode=0,tests=2,skipped=0,inputKey=key,environmentKey='env',policyKey='policy',command=self.w.registry()['engineering']['command'],sourceCommit=source,sourceRun='T1',logPath='docs/evidence/TEST/run.log',evidenceSha256=self.w.digest(log.read_bytes()))
+            row=dict(gate='engineering',status='PASS',inputsUnchanged=True,exitCode=0,tests=2,skipped=0,inputKey=key,environmentKey='env',policyKey='policy',command=self.w.registry()['engineering']['command'],sourceCommit=source,sourceRun='T1',logPath='docs/evidence/TEST/run.log',evidenceSha256=self.w.digest(log.read_bytes()))
             (folder/'receipt.json').write_text(json.dumps(row))
             subprocess.run(['git','add','.'],cwd=root,check=True)
             subprocess.run(['git','-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','-qm','evidence'],cwd=root,check=True)

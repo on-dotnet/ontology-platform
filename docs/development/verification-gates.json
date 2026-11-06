@@ -151,7 +151,27 @@
         "scripts/verify.ps1",
         "-SelfTest"
       ],
-      "testsRequired": true
+      "testsRequired": true,
+      "identityInputs": [
+        "scripts/**",
+        "backend/**",
+        "apps/web/**",
+        "infra/**",
+        "experiments/**",
+        ".github/**",
+        "global.json",
+        "Directory.*",
+        "NuGet.Config",
+        "package.json",
+        "pnpm*",
+        ".node-version",
+        "docs/contracts/**",
+        "docs/bootstrap/**",
+        "docs/evidence/**/*.py",
+        "docs/evidence/**/*.ps1",
+        "docs/evidence/**/*.mjs",
+        "docs/evidence/**/*.sql"
+      ]
     },
     "task_run_timeline": {
       "inputs": [

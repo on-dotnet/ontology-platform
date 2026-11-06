@@ -64,7 +64,7 @@ def input_patterns(name, visited=None):
     if name in visited: return []
     visited.add(name)
     gate = registry()[name]
-    return gate['inputs'] + [p for dep in gate['needs'] for p in input_patterns(dep, visited)]
+    return gate['inputs'] + gate.get('identityInputs',[]) + [p for dep in gate['needs'] for p in input_patterns(dep, visited)]
 
 
 def input_key(root, name):
@@ -213,7 +213,7 @@ def load_reuse(index, gate, key, environment, policy):
         raise ValueError('REUSE_LOG_BOUNDARY')
     log=git(ROOT,'show',commit+':'+log_path)
     tests,skips=test_counts(log.decode(errors='replace'),'auto')
-    valid=(row.get('status')=='PASS' and row.get('exitCode')==0 and tests>0 and skips==0 and
+    valid=(row.get('inputsUnchanged') is True and row.get('status')=='PASS' and row.get('exitCode')==0 and tests>0 and skips==0 and
            row.get('tests')==tests and row.get('skipped')==skips and row.get('gate')==gate and
            row.get('inputKey')==key and row.get('environmentKey')==environment and row.get('policyKey')==policy and
            row.get('command')==registry()[gate]['command'] and row.get('evidenceSha256')==digest(log) and
@@ -263,6 +263,23 @@ def record_timing(directory, task, run, name, key, start, elapsed, code):
     timeline.append(directory/'timeline.jsonl',row,assign_attempt=True)
 
 
+def inputs_stable(root, name, key, policy, registry_sha):
+    """登记原字节另行比较，缓存不能掩盖命令执行期间的政策变化。"""
+    return digest(REGISTRY.read_bytes())==registry_sha and input_key(root,name)==key and policy_key(name)==policy
+
+
+def engineering_process_environment(task):
+    directory=state_dir(task)
+    # 工程门禁不触发.NET/Web准备；缺工具由对应命令准确失败。
+    child_environment={k:v for k,v in os.environ.items() if k in ('PATH','LANG','LC_ALL','SystemRoot')}
+    child_environment.update(PYTHONDONTWRITEBYTECODE='1',NEXT_TELEMETRY_DISABLED='1',PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD='1')
+    parser_root=safe_file(ROOT/'.tools/pythonlibs')
+    if parser_root.is_dir(): child_environment['PYTHONPATH']=str(parser_root)
+    cli=directory/'engineering-cli-home';cli.mkdir(exist_ok=True)
+    child_environment.update(DOTNET_CLI_HOME=str(cli),DOTNET_SKIP_FIRST_TIME_EXPERIENCE='1',DOTNET_GENERATE_ASPNET_CERTIFICATE='false',DOTNET_CLI_TELEMETRY_OPTOUT='1',DOTNET_CLI_WORKLOAD_UPDATE_NOTIFY_DISABLE='true')
+    return child_environment
+
+
 def verify(task, path, reuse=None, publish=False, diagnostic=False, hypothesis=None):
     expected=json.loads(safe_file(path).read_text())
     actual=plan(expected['base'],expected['head'])
@@ -277,15 +294,10 @@ def verify(task, path, reuse=None, publish=False, diagnostic=False, hypothesis=N
     spec=importlib.util.spec_from_file_location('execution_preflight',ROOT/'scripts/maintenance/execution_preflight.py')
     helper=importlib.util.module_from_spec(spec);spec.loader.exec_module(helper)
     environment=engineering_environment()
-    # 工程门禁不触发.NET/Web准备；缺工具由对应命令准确失败。
-    child_environment={k:v for k,v in os.environ.items() if k in ('PATH','LANG','LC_ALL','SystemRoot')}
-    child_environment.update(PYTHONDONTWRITEBYTECODE='1',NEXT_TELEMETRY_DISABLED='1',PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD='1')
-    parser_root=safe_file(ROOT/'.tools/pythonlibs')
-    if parser_root.is_dir(): child_environment['PYTHONPATH']=str(parser_root)
-    cli=directory/'engineering-cli-home';cli.mkdir(exist_ok=True)
-    child_environment.update(DOTNET_CLI_HOME=str(cli),DOTNET_SKIP_FIRST_TIME_EXPERIENCE='1',DOTNET_GENERATE_ASPNET_CERTIFICATE='false',DOTNET_CLI_TELEMETRY_OPTOUT='1',DOTNET_CLI_WORKLOAD_UPDATE_NOTIFY_DISABLE='true')
+    child_environment=engineering_process_environment(task)
     rows=[];outcomes={}
     for name in ordered(set(actual['affected']) | set(index)):
+        if digest(REGISTRY.read_bytes())!=actual['registrySha256']: raise ValueError('REGISTRY_CHANGED_DURING_RUN')
         gate=registry()[name];key=actual['inputKeys'][name];policy=policy_key(name)
         if any(outcomes.get(dep) not in (None,'PASS') for dep in gate['needs']):
             rows.append(dict(gate=name,status='NOT_RUN',reason='Upstream failed or unavailable'));outcomes[name]='NOT_RUN';continue
@@ -293,7 +305,7 @@ def verify(task, path, reuse=None, publish=False, diagnostic=False, hypothesis=N
             rows.append(dict(gate=name,status='NOT_RUN',reason='Product gate requires task-specific admitted executor'))
             outcomes[name]='NOT_RUN';continue
         previous_failures=[]
-        for old in sorted((directory/'runs').glob('*/'+name+'.json'), key=lambda p:p.stat().st_mtime):
+        for old in sorted([*(directory/'runs').glob('*/'+name+'.json'),*(directory/'runs').glob('*/'+name+'.state.json')], key=lambda p:p.stat().st_mtime):
             prior=json.loads(safe_file(old).read_text())
             if prior.get('status')=='PASS': previous_failures=[]
             elif prior.get('status')=='FAIL': previous_failures.append(prior)
@@ -313,22 +325,29 @@ def verify(task, path, reuse=None, publish=False, diagnostic=False, hypothesis=N
             elapsed=time.monotonic()-start
             record_timing(directory,task,run.name,name,key,started,elapsed,code)
             tests,skipped=test_counts(raw.decode(errors='replace'),'auto')
-            passed=code==0 and (not gate.get('testsRequired') or tests>0 and skipped==0)
+            inputs_unchanged=inputs_stable(ROOT,name,key,policy,actual['registrySha256'])
+            passed=code==0 and inputs_unchanged and (not gate.get('testsRequired') or tests>0 and skipped==0)
             guard.record(cost,code if code else (0 if passed else 65))
-            evidence_dir=safe_file(ROOT/'docs/evidence'/task/'gates'/run.name) if publish else run
-            evidence_dir.mkdir(parents=True,exist_ok=True)
+            evidence_dir=run
+            published_dir=safe_file(ROOT/'docs/evidence'/task/'gates'/run.name) if publish else run
             log=evidence_dir/(name+'.log');log.write_bytes(raw);os.chmod(log,0o600)
             row=dict(gate=name,status='PASS' if passed else 'FAIL',executionMode='FRESH',
-                command=gate['command'],exitCode=code,tests=tests,skipped=skipped,diagnostic=diagnostic,hypothesis=hypothesis,
+                command=gate['command'],exitCode=code,tests=tests,skipped=skipped,diagnostic=diagnostic,hypothesis=hypothesis,inputsUnchanged=inputs_unchanged,
                 errorSignature=error_signature(raw,code) if not passed else None,
                 elapsedSeconds=elapsed,inputKey=key,environmentKey=environment,policyKey=policy,
-                evidenceSha256=digest(raw),logPath=str(log.relative_to(ROOT)),sourceRun=run.name,sourceCommit=actual['head'])
+                evidenceSha256=digest(raw),logPath=str((published_dir/log.name).relative_to(ROOT)),sourceRun=run.name,sourceCommit=actual['head'])
             write(evidence_dir/(name+'.json'),row);
-            if publish: write(run/(name+'.json'),{k:v for k,v in row.items() if k!='command'})
             rows.append(row);outcomes[name]=row['status']
             if not passed: break
     result=dict(status='PASS' if rows and all(x['status']=='PASS' for x in rows) else 'BLOCKED',
                 coverage='affected engineering gates only; product coverage requires separate task acceptance',checks=rows)
+    # 全部命令结束才发布，证据输出不能污染同轮后续gate的输入。
+    if publish:
+        target=safe_file(ROOT/'docs/evidence'/task/'gates'/run.name);target.mkdir(parents=True)
+        for row in rows:
+            if row.get('executionMode')!='FRESH': continue
+            for suffix in ('.log','.json'): os.replace(run/(row['gate']+suffix),target/(row['gate']+suffix))
+            write(run/(row['gate']+'.state.json'),{k:row[k] for k in ('status','inputKey','environmentKey','errorSignature')})
     write(run/'receipt.json',result)
     return result
 
@@ -361,12 +380,12 @@ def package_budget(root, base, head, task):
 
 def package_check(task, base, head, evidence):
     result=package_budget(ROOT,base,head,task)
-    proc=subprocess.run(['pwsh','-NoProfile','-File','scripts/verify.ps1'],cwd=ROOT)
+    proc=subprocess.run(['pwsh','-NoProfile','-File','scripts/verify.ps1'],cwd=ROOT,env=engineering_process_environment(task))
     result['formatExitCode']=proc.returncode
     if proc.returncode: result['status']='BLOCKED'
     if evidence:
         proc=subprocess.run(['pwsh','-NoProfile','-File','scripts/test-review-evidence.ps1',
-                             '-EvidenceFile',str(safe_file(evidence)),'-ExpectedHead',head],cwd=ROOT)
+                             '-EvidenceFile',str(safe_file(evidence)),'-ExpectedHead',head],cwd=ROOT,env=engineering_process_environment(task))
         result['evidenceSchemaExitCode']=proc.returncode
         if proc.returncode: result['status']='BLOCKED'
     else:
