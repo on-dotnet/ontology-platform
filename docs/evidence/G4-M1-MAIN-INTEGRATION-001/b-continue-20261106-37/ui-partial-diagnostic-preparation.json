@@ -1,0 +1,20 @@
+{
+  "status": "PREPARATION_FAILURES_RETAINED",
+  "scope": "No product or gate outcome change",
+  "records": [
+    {
+      "file": "ui-partial-readback-v1-syntax-not-executed.py",
+      "result": "SyntaxError in generated SQL string before any execution"
+    },
+    {
+      "file": "ui-partial-readback-v2-query-failed.py",
+      "log": "ui-partial-readback.log",
+      "result": "Read-only SQL used nonexistent StartedAtUtc; wrapper returned DOCKER_COMMAND_FAILED; original stderr was not retained by existing wrapper; do not reconstruct"
+    },
+    {
+      "file": "ui-partial-readback.py",
+      "log": "ui-partial-readback-v3.log",
+      "result": "Corrected entity projection executed exit0; original failed browser job PARTIAL, sourceSELECT restored"
+    }
+  ]
+}

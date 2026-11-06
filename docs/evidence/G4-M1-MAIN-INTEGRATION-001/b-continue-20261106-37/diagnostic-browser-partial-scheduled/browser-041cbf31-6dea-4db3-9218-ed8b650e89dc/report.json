@@ -1,0 +1,142 @@
+{
+  "schemaVersion": 1,
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "startedAtUtc": "2026-11-06T11:34:45.835Z",
+  "cases": {
+    "M1-U01": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U02": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U03": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U04": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    },
+    "M1-U05": {
+      "status": "FAIL",
+      "observed": [],
+      "reason": "browser_timeout",
+      "failure": {
+        "code": "browser_timeout",
+        "category": "timeout"
+      },
+      "phase": "diagnostic_wait_job_url"
+    },
+    "M1-U06": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "reason": "not_executed"
+    }
+  },
+  "http": [
+    {
+      "method": "GET",
+      "route": "/auth/csrf",
+      "status": 200,
+      "durationMs": 49
+    },
+    {
+      "method": "GET",
+      "route": "/api/v1/connections",
+      "status": 200,
+      "durationMs": 586,
+      "scope": "operator_initial_list_readiness"
+    },
+    {
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/discoveries",
+      "status": 202,
+      "durationMs": 73
+    }
+  ],
+  "screenshots": [],
+  "productExecution": true,
+  "diagnosticEvents": [
+    {
+      "event": "navigation",
+      "utc": "2026-11-06T11:34:46.857Z",
+      "matchesJob": false
+    },
+    {
+      "event": "navigation",
+      "utc": "2026-11-06T11:34:46.984Z",
+      "matchesJob": false
+    },
+    {
+      "event": "response",
+      "utc": "2026-11-06T11:34:47.032Z",
+      "method": "GET",
+      "route": "/api/v1/connections/{id}",
+      "status": 200
+    },
+    {
+      "event": "held_actual_catalog",
+      "utc": "2026-11-06T11:34:47.091Z",
+      "status": 403,
+      "bodySha256": "1a00ac4205d325ae7313aadea640c30a844058ad5f391caf64a7de33f279c28b"
+    },
+    {
+      "event": "click_while_initial_catalog_held",
+      "utc": "2026-11-06T11:34:47.091Z"
+    },
+    {
+      "event": "released_actual_catalog",
+      "utc": "2026-11-06T11:34:47.133Z"
+    },
+    {
+      "event": "response",
+      "utc": "2026-11-06T11:34:47.133Z",
+      "method": "GET",
+      "route": "/api/v1/connections/{id}/catalogs",
+      "status": 403
+    },
+    {
+      "event": "response",
+      "utc": "2026-11-06T11:34:47.160Z",
+      "method": "GET",
+      "route": "/api/v1/connections/{id}",
+      "status": 200
+    },
+    {
+      "event": "released_actual_discover_after_revalidation",
+      "utc": "2026-11-06T11:34:47.163Z",
+      "status": 202,
+      "bodySha256": "6e549b0a7f2aa8aa1e39e36a0dbc21ac56d787b11b8bfac8f32772982973ef7b"
+    },
+    {
+      "event": "response",
+      "utc": "2026-11-06T11:34:47.164Z",
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/discoveries",
+      "status": 202
+    },
+    {
+      "event": "before_wait_url",
+      "utc": "2026-11-06T11:34:47.165Z",
+      "matchesJob": false
+    },
+    {
+      "event": "case_error",
+      "utc": "2026-11-06T11:35:02.167Z",
+      "phase": "diagnostic_wait_job_url",
+      "matchesJob": false
+    }
+  ],
+  "runId": "b-continue-20261106-37",
+  "scenario": "source-permission-limited",
+  "driverSha256": "0d000836c99bcb52a477a4be3d573bc5b3c502ffebe435023447a78250831e59",
+  "initialListReady": true,
+  "completedAtUtc": "2026-11-06T11:35:02.415Z",
+  "exitCode": 1
+}

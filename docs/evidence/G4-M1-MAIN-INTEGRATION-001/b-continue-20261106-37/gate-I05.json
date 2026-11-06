@@ -1,0 +1,29 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261106-37",
+  "testedCommit": "79d1d42f43e8e7da23e905da18a374037b6b22a3",
+  "manifestSha256": "cdf8aba49d8a11ab1ff3b5f2d1c594d092106a84459e34c1fc84c834916c6f68",
+  "result": {
+    "status": "PASS",
+    "scope": "Actual exported G4 OpenAPI + frozen G1/G2/G4 generators; G3 contract schema is in G2",
+    "generated": [
+      {
+        "source": "g1-platform.openapi.json",
+        "target": "generated.ts",
+        "sha256": "725dc4b85709aac229b6743e5f5309d981e7a6a8a46a06212206acf1a71e918d"
+      },
+      {
+        "source": "g2-platform.openapi.json",
+        "target": "g2-generated.ts",
+        "sha256": "8ddd4379164ccc1313aefe7846db391c665e093d349cfe0a2f62edcb9bfa9b17"
+      },
+      {
+        "source": "g4-connections.openapi.json",
+        "target": "g4-generated.ts",
+        "sha256": "1bde16a67d02216d0389205e2d29993be7a6992818e2c847e98e8a704d6e8a44"
+      }
+    ],
+    "negativeCases": 6,
+    "runtimeSha256": "a38327b30c71844347d5bba10edce272a008eb7fd3855f73ef277d3eedfe862f"
+  }
+}

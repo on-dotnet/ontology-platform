@@ -1,0 +1,78 @@
+{
+  "cases": [
+    {
+      "case": "RealFixturePreservesAuthorizedMetadata",
+      "status": "PASS",
+      "line": 2
+    },
+    {
+      "case": "VerifyFullAndAuthorizedSelectSucceed",
+      "status": "PASS",
+      "line": 3
+    },
+    {
+      "case": "UntrustedRootIsRejectedBeforeAuthentication",
+      "status": "PASS",
+      "line": 4
+    },
+    {
+      "case": "WrongPasswordIsRejectedAfterVerifiedTls",
+      "status": "PASS",
+      "line": 5
+    },
+    {
+      "case": "SourceAclRejectsEveryUnapprovedOperation (\"insert\")",
+      "status": "PASS",
+      "line": 6
+    },
+    {
+      "case": "SourceAclRejectsEveryUnapprovedOperation (\"update\")",
+      "status": "PASS",
+      "line": 7
+    },
+    {
+      "case": "SourceAclRejectsEveryUnapprovedOperation (\"delete\")",
+      "status": "PASS",
+      "line": 8
+    },
+    {
+      "case": "SourceAclRejectsEveryUnapprovedOperation (\"create-table\")",
+      "status": "PASS",
+      "line": 9
+    },
+    {
+      "case": "SourceAclRejectsEveryUnapprovedOperation (\"create-schema\")",
+      "status": "PASS",
+      "line": 10
+    },
+    {
+      "case": "SourceAclRejectsEveryUnapprovedOperation (\"temporary\")",
+      "status": "PASS",
+      "line": 11
+    },
+    {
+      "case": "SourceAclRejectsEveryUnapprovedOperation (\"maintenance\")",
+      "status": "PASS",
+      "line": 12
+    },
+    {
+      "case": "SourceAclRejectsEveryUnapprovedOperation (\"otherplant\")",
+      "status": "PASS",
+      "line": 13
+    }
+  ],
+  "summary": {
+    "total": 12,
+    "PASS": 12,
+    "FAIL": 0,
+    "SKIP": 0
+  },
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261106-37",
+  "testedCommit": "79d1d42f43e8e7da23e905da18a374037b6b22a3",
+  "project": "ConnectionsTests",
+  "assemblySha256": "92bec54cc8a2c589330f224ee5db6d42ab7a569a82b712e2de7a78bbd6477340",
+  "rawLogSha256": "026c667c8917b263eaea6dc087f676a9cd883d9c228a2bee1debb737c34be83a",
+  "commandReceiptSha256": "d83fd49aaf5cf14c4b9deab591b20ccd45e725a6dfe98e4c66152c855b3c6d26",
+  "command": "pg-real-tls-acl"
+}

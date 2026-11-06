@@ -1,0 +1,226 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261106-37",
+  "testedCommit": "79d1d42f43e8e7da23e905da18a374037b6b22a3",
+  "project": "AgentTests",
+  "assemblySha256": "17a58f590d710953cddd73d9862665e23181d11a879d0d14c8bf62e7d091a0d2",
+  "baselineSha256": "fe7a9d2e2c909f1dc0085e542e1ac0c1d8ab0dd3cd01c4be712624e5663cef4a",
+  "methods": [
+    {
+      "method": "OntologyPlatform.AgentTests.AgentMigrationTests.ActualMigrationDownGuard",
+      "source": "backend/tests/OntologyPlatform.AgentTests/AgentMigrationTests.cs",
+      "sourceSha256": "835c8dfc77af155d0431ded1fb738b32fbcdf6f2856e3a6a8b367e7505e2efc7",
+      "cases": [
+        "ActualMigrationDownGuard (\"concurrent\")",
+        "ActualMigrationDownGuard (\"empty\")",
+        "ActualMigrationDownGuard (\"nonempty\")"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.AgentTests.PersistenceTests.AgentsHaveRealMigration",
+      "source": "backend/tests/OntologyPlatform.AgentTests/PersistenceTests.cs",
+      "sourceSha256": "dda6f6b873c988a56e284754043e8967ec69f5f091ceaa8705ae9d1c244d39b0",
+      "cases": [
+        "AgentsHaveRealMigration"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.AgentTests.RunFaultTests.AuditFailureRollsBackRunAndIdempotencyReceipt",
+      "source": "backend/tests/OntologyPlatform.AgentTests/RunFaultTests.cs",
+      "sourceSha256": "a38f431149f3d1707c90ad16f212341d70fb5c64b711e97bb3160988ab2fab64",
+      "cases": [
+        "AuditFailureRollsBackRunAndIdempotencyReceipt"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.AgentTests.RunFlowTests.CancelUsesCurrentSequenceAndFencesWorker",
+      "source": "backend/tests/OntologyPlatform.AgentTests/RunFlowTests.cs",
+      "sourceSha256": "8e72fb7f05039cebe675b76bd79c480b473319d22f8c941542e3dfdff20b93eb",
+      "cases": [
+        "CancelUsesCurrentSequenceAndFencesWorker"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.AgentTests.RunFlowTests.CommittedRunReplaysAfterGrantOrProviderConfigChange",
+      "source": "backend/tests/OntologyPlatform.AgentTests/RunFlowTests.cs",
+      "sourceSha256": "8e72fb7f05039cebe675b76bd79c480b473319d22f8c941542e3dfdff20b93eb",
+      "cases": [
+        "CommittedRunReplaysAfterGrantOrProviderConfigChange"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.AgentTests.RunFaultTests.ConcurrentCreateHasSingleCommittedRun",
+      "source": "backend/tests/OntologyPlatform.AgentTests/RunFaultTests.cs",
+      "sourceSha256": "a38f431149f3d1707c90ad16f212341d70fb5c64b711e97bb3160988ab2fab64",
+      "cases": [
+        "ConcurrentCreateHasSingleCommittedRun"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.AgentTests.RunFlowTests.DeterministicModeRequiresDevelopmentHost",
+      "source": "backend/tests/OntologyPlatform.AgentTests/RunFlowTests.cs",
+      "sourceSha256": "8e72fb7f05039cebe675b76bd79c480b473319d22f8c941542e3dfdff20b93eb",
+      "cases": [
+        "DeterministicModeRequiresDevelopmentHost"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.AgentTests.RunFlowTests.DisabledProviderCannotPretendCompletion",
+      "source": "backend/tests/OntologyPlatform.AgentTests/RunFlowTests.cs",
+      "sourceSha256": "8e72fb7f05039cebe675b76bd79c480b473319d22f8c941542e3dfdff20b93eb",
+      "cases": [
+        "DisabledProviderCannotPretendCompletion"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.AgentTests.MessageChunkTests.EmptyAndAsciiTextPreserveExactLength",
+      "source": "backend/tests/OntologyPlatform.AgentTests/MessageChunkTests.cs",
+      "sourceSha256": "6961fcf6ab55104eed0b88829cb214d887182b4a7a19d72e796d959954240483",
+      "cases": [
+        "EmptyAndAsciiTextPreserveExactLength (0,0)",
+        "EmptyAndAsciiTextPreserveExactLength (4096,1)",
+        "EmptyAndAsciiTextPreserveExactLength (4097,2)",
+        "EmptyAndAsciiTextPreserveExactLength (8193,3)"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.AgentTests.TransportTests.HttpSecurityRejectsAnonymousCsrfOriginAndMalformedIdentity",
+      "source": "backend/tests/OntologyPlatform.AgentTests/TransportTests.cs",
+      "sourceSha256": "ffb174bc1c099e4de6171995679f40087662f447100d720f8b7c3dd31913f68a",
+      "cases": [
+        "HttpSecurityRejectsAnonymousCsrfOriginAndMalformedIdentity"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.AgentTests.RunFlowTests.InvalidAndFutureCursorRejected",
+      "source": "backend/tests/OntologyPlatform.AgentTests/RunFlowTests.cs",
+      "sourceSha256": "8e72fb7f05039cebe675b76bd79c480b473319d22f8c941542e3dfdff20b93eb",
+      "cases": [
+        "InvalidAndFutureCursorRejected"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.AgentTests.RunFlowTests.LeaseTakeoverRejectsStaleFencingToken",
+      "source": "backend/tests/OntologyPlatform.AgentTests/RunFlowTests.cs",
+      "sourceSha256": "8e72fb7f05039cebe675b76bd79c480b473319d22f8c941542e3dfdff20b93eb",
+      "cases": [
+        "LeaseTakeoverRejectsStaleFencingToken"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.AgentTests.RunFlowTests.MafInvokesRealPublishedGatewayAndPersistsEvents",
+      "source": "backend/tests/OntologyPlatform.AgentTests/RunFlowTests.cs",
+      "sourceSha256": "8e72fb7f05039cebe675b76bd79c480b473319d22f8c941542e3dfdff20b93eb",
+      "cases": [
+        "MafInvokesRealPublishedGatewayAndPersistsEvents"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.AgentTests.RunFlowTests.MessageAndEventCountBudgetsPersistFailure",
+      "source": "backend/tests/OntologyPlatform.AgentTests/RunFlowTests.cs",
+      "sourceSha256": "8e72fb7f05039cebe675b76bd79c480b473319d22f8c941542e3dfdff20b93eb",
+      "cases": [
+        "MessageAndEventCountBudgetsPersistFailure"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.AgentTests.MessageChunkTests.NonBmpResultLabelSurvivesMessageBoundaryAndReplay",
+      "source": "backend/tests/OntologyPlatform.AgentTests/MessageChunkTests.cs",
+      "sourceSha256": "6961fcf6ab55104eed0b88829cb214d887182b4a7a19d72e796d959954240483",
+      "cases": [
+        "NonBmpResultLabelSurvivesMessageBoundaryAndReplay (\"😀\")",
+        "NonBmpResultLabelSurvivesMessageBoundaryAndReplay (\"𠀀\")"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.AgentTests.RunFlowTests.OldRunKeepsSnapshotAcrossNewPublishAndRollback",
+      "source": "backend/tests/OntologyPlatform.AgentTests/RunFlowTests.cs",
+      "sourceSha256": "8e72fb7f05039cebe675b76bd79c480b473319d22f8c941542e3dfdff20b93eb",
+      "cases": [
+        "OldRunKeepsSnapshotAcrossNewPublishAndRollback"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.AgentTests.RunFaultTests.OversizedToolEventPersistsOnlySafeFailure",
+      "source": "backend/tests/OntologyPlatform.AgentTests/RunFaultTests.cs",
+      "sourceSha256": "a38f431149f3d1707c90ad16f212341d70fb5c64b711e97bb3160988ab2fab64",
+      "cases": [
+        "OversizedToolEventPersistsOnlySafeFailure"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.AgentTests.RunFaultTests.PersistentCancelPropagatesToDownstreamToken",
+      "source": "backend/tests/OntologyPlatform.AgentTests/RunFaultTests.cs",
+      "sourceSha256": "a38f431149f3d1707c90ad16f212341d70fb5c64b711e97bb3160988ab2fab64",
+      "cases": [
+        "PersistentCancelPropagatesToDownstreamToken"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.AgentTests.RunFlowTests.ProviderIdempotencyOwnerAndCompleteScopeFailClosed",
+      "source": "backend/tests/OntologyPlatform.AgentTests/RunFlowTests.cs",
+      "sourceSha256": "8e72fb7f05039cebe675b76bd79c480b473319d22f8c941542e3dfdff20b93eb",
+      "cases": [
+        "ProviderIdempotencyOwnerAndCompleteScopeFailClosed"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.AgentTests.MessageChunkTests.PublishedUnicodeLabelSurvivesRealGatewayAndMaf",
+      "source": "backend/tests/OntologyPlatform.AgentTests/MessageChunkTests.cs",
+      "sourceSha256": "6961fcf6ab55104eed0b88829cb214d887182b4a7a19d72e796d959954240483",
+      "cases": [
+        "PublishedUnicodeLabelSurvivesRealGatewayAndMaf (\"😀\")",
+        "PublishedUnicodeLabelSurvivesRealGatewayAndMaf (\"𠀀\")"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.AgentTests.TransportTests.RealMcpSdkListsExactlyThreeAndCallsPublishedGateway",
+      "source": "backend/tests/OntologyPlatform.AgentTests/TransportTests.cs",
+      "sourceSha256": "ffb174bc1c099e4de6171995679f40087662f447100d720f8b7c3dd31913f68a",
+      "cases": [
+        "RealMcpSdkListsExactlyThreeAndCallsPublishedGateway"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.AgentTests.TransportTests.SlowSseConnectionIsBoundedAndDisconnectDoesNotCancel",
+      "source": "backend/tests/OntologyPlatform.AgentTests/TransportTests.cs",
+      "sourceSha256": "ffb174bc1c099e4de6171995679f40087662f447100d720f8b7c3dd31913f68a",
+      "cases": [
+        "SlowSseConnectionIsBoundedAndDisconnectDoesNotCancel"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.AgentTests.TransportTests.SseHttpCursorErrorsAreAccurate",
+      "source": "backend/tests/OntologyPlatform.AgentTests/TransportTests.cs",
+      "sourceSha256": "ffb174bc1c099e4de6171995679f40087662f447100d720f8b7c3dd31913f68a",
+      "cases": [
+        "SseHttpCursorErrorsAreAccurate"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.AgentTests.TransportTests.SseRechecksChangedScopeAndAbsoluteSessionExpiry",
+      "source": "backend/tests/OntologyPlatform.AgentTests/TransportTests.cs",
+      "sourceSha256": "ffb174bc1c099e4de6171995679f40087662f447100d720f8b7c3dd31913f68a",
+      "cases": [
+        "SseRechecksChangedScopeAndAbsoluteSessionExpiry"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.AgentTests.TransportTests.SseReplaysAndLogoutRevokesExistingConnection",
+      "source": "backend/tests/OntologyPlatform.AgentTests/TransportTests.cs",
+      "sourceSha256": "ffb174bc1c099e4de6171995679f40087662f447100d720f8b7c3dd31913f68a",
+      "cases": [
+        "SseReplaysAndLogoutRevokesExistingConnection"
+      ]
+    },
+    {
+      "method": "OntologyPlatform.AgentTests.RunFaultTests.ToolAndAbsoluteTimeBudgetsFailClosed",
+      "source": "backend/tests/OntologyPlatform.AgentTests/RunFaultTests.cs",
+      "sourceSha256": "a38f431149f3d1707c90ad16f212341d70fb5c64b711e97bb3160988ab2fab64",
+      "cases": [
+        "ToolAndAbsoluteTimeBudgetsFailClosed"
+      ]
+    }
+  ],
+  "scope": "ALL_CASES_METHOD_PROCESS_ISOLATION"
+}

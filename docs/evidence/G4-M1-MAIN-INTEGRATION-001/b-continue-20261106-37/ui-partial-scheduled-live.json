@@ -1,0 +1,34 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261106-37",
+  "testedCommit": "79d1d42f43e8e7da23e905da18a374037b6b22a3",
+  "manifestSha256": "cdf8aba49d8a11ab1ff3b5f2d1c594d092106a84459e34c1fc84c834916c6f68",
+  "executorSha256": "8da2fa25b5be14deff8ac521689617ddd72e4dce5b1535035b5f294059f3d13f",
+  "diagnosticDriverSha256": "0d000836c99bcb52a477a4be3d573bc5b3c502ffebe435023447a78250831e59",
+  "canonicalDriverSha256": "0af8da9bbd7202fb83d4c0e86f3b0b4122dd1ba995a7db6102a6a630c9cfbf8f",
+  "beforeAcl": {
+    "select": true
+  },
+  "injectedAcl": {
+    "select": false
+  },
+  "afterAcl": {
+    "select": true
+  },
+  "errors": [],
+  "observation": {
+    "taskId": "G4-M1-MAIN-INTEGRATION-001",
+    "scenario": "source-permission-limited",
+    "status": "FAIL",
+    "caseStatuses": {
+      "M1-U01": "NOT_RUN",
+      "M1-U02": "NOT_RUN",
+      "M1-U03": "NOT_RUN",
+      "M1-U04": "NOT_RUN",
+      "M1-U05": "FAIL",
+      "M1-U06": "NOT_RUN"
+    },
+    "failure": null
+  },
+  "scope": "One deterministic diagnostic delaying only original actual HTTP responses; bodies/status unchanged; phase/response observations; original I07 remains BLOCKED; no gate promotion"
+}

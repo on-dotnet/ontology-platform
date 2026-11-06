@@ -1,0 +1,14 @@
+{
+  "command": [
+    "git",
+    "diff",
+    "--cached",
+    "--check"
+  ],
+  "exitCode": 2,
+  "stdout": "docs/evidence/G4-M1-MAIN-INTEGRATION-001/b-continue-20261106-37/two-file-product-fix.patch:244: trailing whitespace.\n+ \n",
+  "stderr": "",
+  "reason": "New uncommitted standard unified patch context-only blank line has mandatory leading space, rejected by repository diff-check. Preserve original patch bytes in two independent UTF8 envelopes and ignored original; remove only new direct payload before first commit. No historical bytes changed.",
+  "originalPatchSha256": "4a9735481c2dfeae38dae68a0924d18695c74ada247d7cd8f2d175ea2f3c3293",
+  "currentScopeSha256": "2936feb98622719a0f44bd1f347b08d67a574d5a59e5713e5ef344e664a0c208"
+}

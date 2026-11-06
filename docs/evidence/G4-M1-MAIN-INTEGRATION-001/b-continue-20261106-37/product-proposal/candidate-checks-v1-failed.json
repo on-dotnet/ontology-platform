@@ -1,0 +1,54 @@
+{
+  "scope": "Isolated candidate TS compiler host replacement and lintText; production files remain unchanged; not stable-T acceptance",
+  "executorSha256": "61a916f7e939b4e0db85385c51ce9b7b6a6c56e0c199bd001ff01caf7d5aed57",
+  "overrides": {
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/apps/web/src/features/connections/catalog.tsx": "89289bad92c5c9b704095f11b23365aa26fba53ca9c7cfc6e175f8849009c451",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/apps/web/src/features/connections/connections.test.ts": "87712479050b9d2e575df345fb83e9a8a2f69778ab328705ec75917b9de126a8"
+  },
+  "typeErrors": [],
+  "lint": [
+    {
+      "filePath": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/apps/web/src/features/connections/catalog.tsx",
+      "errorCount": 3,
+      "warningCount": 0,
+      "messages": [
+        {
+          "ruleId": "react-hooks/refs",
+          "severity": 2,
+          "message": "Error: Cannot access refs during render\n\nReact refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).\n\n/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/apps/web/src/features/connections/catalog.tsx:25:62\n  23 |   // 初始读取先占位；所有目录/任务读取按准确 owner 释放，禁止迟到结果提前解锁。\n  24 |   const initialReadOwner = useRef(Symbol(\"initial-catalog-read\"));\n> 25 |   const readOwners = useRef(new Set<symbol>(disabled ? [] : [initialReadOwner.current]));\n     |                                                              ^^^^^^^^^^^^^^^^^^^^^^^^ Cannot access ref value during render\n  26 |   const [readingCatalog, setReadingCatalog] = useState(!disabled);\n  27 |   function beginRead() { const owner = Symbol(\"catalog-read\"); readOwners.current.add(owner); setReadingCatalog(true); return owner; }\n  28 |   function finishRead(owner: symbol) { readOwners.current.delete(owner); setReadingCatalog(readOwners.current.size > 0); }",
+          "line": 25,
+          "column": 62,
+          "nodeType": null,
+          "endLine": 25,
+          "endColumn": 86
+        },
+        {
+          "ruleId": "react-hooks/refs",
+          "severity": 2,
+          "message": "Error: Cannot access refs during render\n\nReact refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).\n\n/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/apps/web/src/features/connections/catalog.tsx:25:62\n  23 |   // 初始读取先占位；所有目录/任务读取按准确 owner 释放，禁止迟到结果提前解锁。\n  24 |   const initialReadOwner = useRef(Symbol(\"initial-catalog-read\"));\n> 25 |   const readOwners = useRef(new Set<symbol>(disabled ? [] : [initialReadOwner.current]));\n     |                                                              ^^^^^^^^^^^^^^^^^^^^^^^^ Cannot access ref value during render\n  26 |   const [readingCatalog, setReadingCatalog] = useState(!disabled);\n  27 |   function beginRead() { const owner = Symbol(\"catalog-read\"); readOwners.current.add(owner); setReadingCatalog(true); return owner; }\n  28 |   function finishRead(owner: symbol) { readOwners.current.delete(owner); setReadingCatalog(readOwners.current.size > 0); }",
+          "line": 25,
+          "column": 62,
+          "nodeType": null,
+          "endLine": 25,
+          "endColumn": 86
+        },
+        {
+          "ruleId": "react-hooks/set-state-in-effect",
+          "severity": 2,
+          "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\n/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/apps/web/src/features/connections/catalog.tsx:89:19\n  87 |     if (disabled) { finishRead(initialReadOwner.current); return; }\n  88 |     const controller = new AbortController();\n> 89 |     const owner = beginRead(); finishRead(initialReadOwner.current);\n     |                   ^^^^^^^^^ Avoid calling setState() directly within an effect\n  90 |     void Promise.resolve().then(() => { if (!controller.signal.aborted) return readCatalogs(\"\", controller.signal, owner); });\n  91 |     return () => { controller.abort(); finishRead(owner); };\n  92 |     // 身份拒绝回调由父级提供，不作为查询重启条件。",
+          "line": 89,
+          "column": 19,
+          "nodeType": null,
+          "endLine": 89,
+          "endColumn": 28
+        }
+      ]
+    },
+    {
+      "filePath": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/apps/web/src/features/connections/connections.test.ts",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    }
+  ]
+}

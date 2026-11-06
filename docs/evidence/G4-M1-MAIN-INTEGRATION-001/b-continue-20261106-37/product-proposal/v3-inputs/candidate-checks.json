@@ -1,0 +1,44 @@
+{
+  "scope": "Isolated candidate TS compiler host replacement and lintText; production files remain unchanged; not stable-T acceptance",
+  "executorSha256": "61a916f7e939b4e0db85385c51ce9b7b6a6c56e0c199bd001ff01caf7d5aed57",
+  "overrides": {
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/apps/web/src/features/connections/catalog.tsx": "b8a8e03b773ef0192443eb6156d3b1ae13e43e76e5af6555fb1112b29b374ee9",
+    "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/apps/web/src/features/connections/connections.test.ts": "87712479050b9d2e575df345fb83e9a8a2f69778ab328705ec75917b9de126a8"
+  },
+  "typeErrors": [],
+  "lint": [
+    {
+      "filePath": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/apps/web/src/features/connections/catalog.tsx",
+      "errorCount": 2,
+      "warningCount": 0,
+      "messages": [
+        {
+          "ruleId": "react-hooks/immutability",
+          "severity": 2,
+          "message": "Error: This value cannot be modified\n\nModifying a value used previously in an effect function or as an effect dependency is not allowed. Consider moving the modification before calling useEffect().\n\n/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/apps/web/src/features/connections/catalog.tsx:51:7\n  49 |     setError(cause);\n  50 |     if (cause instanceof PlatformApiError && [401, 403].includes(cause.status)) {\n> 51 |       access.current = { generation: access.current.generation + 1, revoked: true };\n     |       ^^^^^^ `access` cannot be modified\n  52 |       setSnapshot(null); setHistory(null); setJob(null); setReplay(null); releaseOperation(activeOperation.current); setRevalidating(false); onDenied(cause);\n  53 |     }\n  54 |   }",
+          "line": 51,
+          "column": 7,
+          "nodeType": null,
+          "endLine": 51,
+          "endColumn": 13
+        },
+        {
+          "ruleId": "react-hooks/immutability",
+          "severity": 2,
+          "message": "Error: This value cannot be modified\n\nModifying a value used previously in an effect function or as an effect dependency is not allowed. Consider moving the modification before calling useEffect().\n\n/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/apps/web/src/features/connections/catalog.tsx:58:26\n  56 |   async function catalogFailure(cause: unknown, signal?: AbortSignal) {\n  57 |     if (!(cause instanceof PlatformApiError) || cause.status !== 403 || cause.code !== \"catalog_access_forbidden\") { failure(cause); return; }\n> 58 |     const generation = ++access.current.generation;\n     |                          ^^^^^^^^^^^^^^ `access` cannot be modified\n  59 |     setError(cause); setSnapshot(null); setHistory(null); setJob(null); setReplay(null); releaseOperation(activeOperation.current); setRevalidating(true);\n  60 |     try {\n  61 |       const latest = await client.get(connection.id, signal);",
+          "line": 58,
+          "column": 26,
+          "nodeType": null,
+          "endLine": 58,
+          "endColumn": 40
+        }
+      ]
+    },
+    {
+      "filePath": "/Users/chasen/.codex/worktrees/g4-m1-main-integration-001/ontology-platform/apps/web/src/features/connections/connections.test.ts",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    }
+  ]
+}

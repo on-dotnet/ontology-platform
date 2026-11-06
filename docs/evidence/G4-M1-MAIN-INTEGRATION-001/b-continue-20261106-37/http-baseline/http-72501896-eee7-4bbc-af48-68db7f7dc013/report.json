@@ -1,0 +1,2577 @@
+{
+  "schemaVersion": 1,
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "startedAtUtc": "2026-11-06T11:07:11.333Z",
+  "productExecution": true,
+  "matrix": {
+    "M1-C01": {
+      "status": "PASS",
+      "observed": [
+        "unknown_top_level",
+        "old_connectionProfile",
+        "old_secretInput",
+        "actor_context",
+        "unknown_command_action",
+        "canonical_body_reaches_reference_validation_without_binding"
+      ],
+      "remaining": []
+    },
+    "M1-C02": {
+      "status": "PASS",
+      "observed": [
+        "create_exact_integer_zero_only",
+        "update_positive_integer_strong_etag_and_revision_match_required"
+      ],
+      "remaining": []
+    },
+    "M1-C03": {
+      "status": "PASS",
+      "observed": [
+        "ORACLE_precise_profile_not_enabled",
+        "DORIS_precise_profile_not_enabled",
+        "TDENGINE_precise_profile_not_enabled",
+        "WEB_API_precise_profile_not_enabled",
+        "postgres_verifyfull_and_exact_source_required"
+      ],
+      "remaining": []
+    },
+    "M1-C04": {
+      "status": "PASS",
+      "observed": [
+        "design_wrapper_rejected"
+      ],
+      "remaining": []
+    },
+    "M1-C05": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-C06": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-C07": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-C08": {
+      "status": "NOT_RUN",
+      "observed": [
+        "configuration_change_invalidates_previous_probe",
+        "new_probe_uses_changed_display_name_envelope_hash",
+        "secret_rotation_increments_version_and_invalidates_probe"
+      ],
+      "remaining": [
+        "Only displayName and SecretVersion changed; a valid SourceConfig profile change was not executed because the approved runnable profile is fixed."
+      ]
+    },
+    "M1-C09": {
+      "status": "PASS",
+      "observed": [
+        "probe_success_does_not_activate_connection",
+        "connection_probe_job_catalog_distinct_states"
+      ],
+      "remaining": []
+    },
+    "M1-C10": {
+      "status": "PASS",
+      "observed": [
+        "six_server_policies_connections",
+        "six_server_policies_catalogs",
+        "six_server_policies_connections",
+        "six_server_policies_connection-secrets",
+        "six_server_policies_test",
+        "six_server_policies_discoveries",
+        "server_stored_full_scope_checked_before_stale_cas"
+      ],
+      "remaining": []
+    },
+    "M1-C11": {
+      "status": "NOT_RUN",
+      "observed": [
+        "authentication_before_oversize_and_json",
+        "csrf_before_oversize_and_json",
+        "origin_csrf_size_json_precedence_and_safe_problem"
+      ],
+      "remaining": [
+        "Full priority/error taxonomy still needs all transport and fixture failure classes."
+      ]
+    },
+    "M1-C12": {
+      "status": "NOT_RUN",
+      "observed": [
+        "connection_revision_etag_trace_correspond",
+        "probe_and_job_trace_match_committed_audit"
+      ],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-C13": {
+      "status": "NOT_RUN",
+      "observed": [
+        "observed_connection_audit_actions_in_fixed_allowlist"
+      ],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-C14": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-C15": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-C16": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-P01": {
+      "status": "PASS",
+      "observed": [
+        "real_verifyfull_five_stage_probe"
+      ],
+      "remaining": []
+    },
+    "M1-P02": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-P03": {
+      "status": "NOT_RUN",
+      "observed": [
+        "real_auth_failure_after_network_and_tls"
+      ],
+      "remaining": [
+        "Source-side bounded retry count is not exposed by public HTTP."
+      ]
+    },
+    "M1-P04": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-P05": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-P06": {
+      "status": "NOT_RUN",
+      "observed": [
+        "sql_cte_function_multistatement_and_identifier_payloads_rejected"
+      ],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-P07": {
+      "status": "NOT_RUN",
+      "observed": [
+        "same_scope_different_actor_ref_rejected",
+        "same_actor_different_scope_ref_rejected",
+        "forged_other_org_scope_denied_not_cross_org_identity_test",
+        "wrong_purpose_intake_rejected",
+        "bound_ref_new_command_and_intake_replay_rejected"
+      ],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-P08": {
+      "status": "NOT_RUN",
+      "observed": [
+        "auditor_redacted_config",
+        "executed_http_responses_scanned_in_memory_no_sensitive_values"
+      ],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-P09": {
+      "status": "NOT_RUN",
+      "observed": [
+        "previous_bound_ref_cannot_be_reused_after_rotation",
+        "new_probe_uses_current_secret_version"
+      ],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-P10": {
+      "status": "PASS",
+      "observed": [
+        "created_only_draft_without_inherited_probe"
+      ],
+      "remaining": []
+    },
+    "M1-P11": {
+      "status": "PASS",
+      "observed": [
+        "exact_create_replay_same_response_and_etag",
+        "different_payload_does_not_change_entity",
+        "committed_create_audit_once_no_replay_or_conflict_audit",
+        "probe_replay_same_persistent_id"
+      ],
+      "remaining": []
+    },
+    "M1-P12": {
+      "status": "PASS",
+      "observed": [
+        "concurrent_patch_one_commit_one_409",
+        "concurrent_enable_one_commit_one_409",
+        "old_etag_enable_disable_rejected",
+        "concurrent_disable_one_commit_one_409"
+      ],
+      "remaining": []
+    },
+    "M1-P13": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-P14": {
+      "status": "NOT_RUN",
+      "observed": [
+        "disabled_probe_discovery_and_history_requests_denied"
+      ],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-E01": {
+      "status": "PASS",
+      "observed": [
+        "current_scope_and_source_role_only_production_heat_event"
+      ],
+      "remaining": []
+    },
+    "M1-E02": {
+      "status": "PASS",
+      "observed": [
+        "native_numeric_timestamp_timestamptz_jsonb_array_nullable"
+      ],
+      "remaining": []
+    },
+    "M1-E03": {
+      "status": "NOT_RUN",
+      "observed": [
+        "same_content_fingerprint_stable_new_snapshot_old_projection_unchanged"
+      ],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-E04": {
+      "status": "NOT_RUN",
+      "observed": [
+        "other_schemas_absent_from_actual_catalog"
+      ],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-E05": {
+      "status": "PASS",
+      "observed": [
+        "durable_job_recovered_by_new_real_oidc_session"
+      ],
+      "remaining": []
+    },
+    "M1-E06": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-E07": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-E08": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-U01": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-U02": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-U03": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-U04": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-U05": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-U06": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-R01": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-R02": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-R03": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-R04": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    },
+    "M1-R05": {
+      "status": "NOT_RUN",
+      "observed": [],
+      "remaining": [
+        "outside_executed_http_assertions"
+      ]
+    }
+  },
+  "checks": [
+    {
+      "id": "M1-C10",
+      "name": "six_server_policies_connections",
+      "status": "PASS",
+      "facts": {
+        "responseIndex": 3
+      }
+    },
+    {
+      "id": "M1-C10",
+      "name": "six_server_policies_catalogs",
+      "status": "PASS",
+      "facts": {
+        "responseIndex": 4
+      }
+    },
+    {
+      "id": "M1-C10",
+      "name": "six_server_policies_connections",
+      "status": "PASS",
+      "facts": {
+        "responseIndex": 5
+      }
+    },
+    {
+      "id": "M1-C10",
+      "name": "six_server_policies_connection-secrets",
+      "status": "PASS",
+      "facts": {
+        "responseIndex": 6
+      }
+    },
+    {
+      "id": "M1-C10",
+      "name": "six_server_policies_test",
+      "status": "PASS",
+      "facts": {
+        "responseIndex": 7
+      }
+    },
+    {
+      "id": "M1-C10",
+      "name": "six_server_policies_discoveries",
+      "status": "PASS",
+      "facts": {
+        "responseIndex": 8
+      }
+    },
+    {
+      "id": "M1-C11",
+      "name": "authentication_before_oversize_and_json",
+      "status": "PASS",
+      "facts": {
+        "responseIndex": 9
+      }
+    },
+    {
+      "id": "M1-C11",
+      "name": "csrf_before_oversize_and_json",
+      "status": "PASS",
+      "facts": {
+        "responseIndex": 10
+      }
+    },
+    {
+      "id": "M1-C11",
+      "name": "origin_csrf_size_json_precedence_and_safe_problem",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-C01",
+      "name": "unknown_top_level",
+      "status": "PASS",
+      "facts": {
+        "responseIndex": 13
+      }
+    },
+    {
+      "id": "M1-C01",
+      "name": "old_connectionProfile",
+      "status": "PASS",
+      "facts": {
+        "responseIndex": 14
+      }
+    },
+    {
+      "id": "M1-C01",
+      "name": "old_secretInput",
+      "status": "PASS",
+      "facts": {
+        "responseIndex": 15
+      }
+    },
+    {
+      "id": "M1-C01",
+      "name": "actor_context",
+      "status": "PASS",
+      "facts": {
+        "responseIndex": 16
+      }
+    },
+    {
+      "id": "M1-C01",
+      "name": "unknown_command_action",
+      "status": "PASS",
+      "facts": {
+        "responseIndex": 17
+      }
+    },
+    {
+      "id": "M1-C01",
+      "name": "canonical_body_reaches_reference_validation_without_binding",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-C04",
+      "name": "design_wrapper_rejected",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-C02",
+      "name": "create_exact_integer_zero_only",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-C03",
+      "name": "ORACLE_precise_profile_not_enabled",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-C03",
+      "name": "DORIS_precise_profile_not_enabled",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-C03",
+      "name": "TDENGINE_precise_profile_not_enabled",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-C03",
+      "name": "WEB_API_precise_profile_not_enabled",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-C03",
+      "name": "postgres_verifyfull_and_exact_source_required",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-P06",
+      "name": "sql_cte_function_multistatement_and_identifier_payloads_rejected",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-P07",
+      "name": "same_scope_different_actor_ref_rejected",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-P07",
+      "name": "same_actor_different_scope_ref_rejected",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-P07",
+      "name": "forged_other_org_scope_denied_not_cross_org_identity_test",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-P07",
+      "name": "wrong_purpose_intake_rejected",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-P10",
+      "name": "created_only_draft_without_inherited_probe",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-P11",
+      "name": "exact_create_replay_same_response_and_etag",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-P11",
+      "name": "different_payload_does_not_change_entity",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-P11",
+      "name": "committed_create_audit_once_no_replay_or_conflict_audit",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-P07",
+      "name": "bound_ref_new_command_and_intake_replay_rejected",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-P08",
+      "name": "auditor_redacted_config",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-C12",
+      "name": "connection_revision_etag_trace_correspond",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-C02",
+      "name": "update_positive_integer_strong_etag_and_revision_match_required",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-C10",
+      "name": "server_stored_full_scope_checked_before_stale_cas",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-P01",
+      "name": "real_verifyfull_five_stage_probe",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-P11",
+      "name": "probe_replay_same_persistent_id",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-C09",
+      "name": "probe_success_does_not_activate_connection",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-E01",
+      "name": "current_scope_and_source_role_only_production_heat_event",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-E02",
+      "name": "native_numeric_timestamp_timestamptz_jsonb_array_nullable",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-E05",
+      "name": "durable_job_recovered_by_new_real_oidc_session",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-C09",
+      "name": "connection_probe_job_catalog_distinct_states",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-E03",
+      "name": "same_content_fingerprint_stable_new_snapshot_old_projection_unchanged",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-E04",
+      "name": "other_schemas_absent_from_actual_catalog",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-C12",
+      "name": "probe_and_job_trace_match_committed_audit",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-C13",
+      "name": "observed_connection_audit_actions_in_fixed_allowlist",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-P03",
+      "name": "real_auth_failure_after_network_and_tls",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-P12",
+      "name": "concurrent_patch_one_commit_one_409",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-C08",
+      "name": "configuration_change_invalidates_previous_probe",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-C08",
+      "name": "new_probe_uses_changed_display_name_envelope_hash",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-C08",
+      "name": "secret_rotation_increments_version_and_invalidates_probe",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-P09",
+      "name": "previous_bound_ref_cannot_be_reused_after_rotation",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-P09",
+      "name": "new_probe_uses_current_secret_version",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-P12",
+      "name": "concurrent_enable_one_commit_one_409",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-P12",
+      "name": "old_etag_enable_disable_rejected",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-P12",
+      "name": "concurrent_disable_one_commit_one_409",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-P14",
+      "name": "disabled_probe_discovery_and_history_requests_denied",
+      "status": "PASS"
+    },
+    {
+      "id": "M1-P08",
+      "name": "executed_http_responses_scanned_in_memory_no_sensitive_values",
+      "status": "PASS",
+      "facts": {
+        "responseScanCount": 135
+      }
+    }
+  ],
+  "http": [
+    {
+      "index": 0,
+      "phase": "oidc_operator-ab_csrf_request",
+      "method": "GET",
+      "route": "/auth/csrf",
+      "status": 200,
+      "startedAtUtc": "2026-11-06T11:07:12.452Z",
+      "durationMs": 50,
+      "traceId": "47ff61b0aa5dd9651d1d258bda813c16",
+      "expectedStatus": 200
+    },
+    {
+      "index": 1,
+      "phase": "oidc_auditor-ab_csrf_request",
+      "method": "GET",
+      "route": "/auth/csrf",
+      "status": 200,
+      "startedAtUtc": "2026-11-06T11:07:13.072Z",
+      "durationMs": 46,
+      "traceId": "7d89ce256f03b8c4cd447cdbc3a3d74e",
+      "expectedStatus": 200
+    },
+    {
+      "index": 2,
+      "phase": "oidc_viewer-ab_csrf_request",
+      "method": "GET",
+      "route": "/auth/csrf",
+      "status": 200,
+      "startedAtUtc": "2026-11-06T11:07:13.682Z",
+      "durationMs": 40,
+      "traceId": "74aed71538bb9a8d39e9d39f52eda88f",
+      "expectedStatus": 200
+    },
+    {
+      "index": 3,
+      "phase": "authorization_priority",
+      "method": "GET",
+      "route": "/api/v1/connections",
+      "status": 403,
+      "startedAtUtc": "2026-11-06T11:07:13.725Z",
+      "durationMs": 45,
+      "traceId": "ced5baa8fb389fca03ba48e725e90ba9",
+      "responseSha256": "101b88f9790906b8a7d757fb0aae3fc75c11697751432eb6b99f9f667d402ddc",
+      "code": "authorization_denied",
+      "expectedStatus": 403,
+      "expectedCode": "authorization_denied"
+    },
+    {
+      "index": 4,
+      "phase": "authorization_priority",
+      "method": "GET",
+      "route": "/api/v1/connections/{id}/catalogs",
+      "status": 403,
+      "startedAtUtc": "2026-11-06T11:07:13.771Z",
+      "durationMs": 28,
+      "traceId": "e6035da18ae490102eb96e494ec9573a",
+      "responseSha256": "d09a87ff3485dd9d5238e288d23718a2c4aa3f56b6159c1b95117fcc6c2421ba",
+      "code": "authorization_denied",
+      "expectedStatus": 403,
+      "expectedCode": "authorization_denied"
+    },
+    {
+      "index": 5,
+      "phase": "authorization_priority",
+      "method": "POST",
+      "route": "/api/v1/connections",
+      "status": 403,
+      "startedAtUtc": "2026-11-06T11:07:13.799Z",
+      "durationMs": 25,
+      "traceId": "609721e79ee55594f81a28085beec82c",
+      "responseSha256": "c06e0a5fe7da820632286eec70c2f30265e4327d146bd7277b3dc21967f6860c",
+      "code": "authorization_denied",
+      "expectedStatus": 403,
+      "expectedCode": "authorization_denied"
+    },
+    {
+      "index": 6,
+      "phase": "authorization_priority",
+      "method": "POST",
+      "route": "/api/v1/connection-secrets",
+      "status": 403,
+      "startedAtUtc": "2026-11-06T11:07:13.824Z",
+      "durationMs": 25,
+      "traceId": "7c026103d7b8415468bc41e1cc3c5f06",
+      "responseSha256": "192dd932d85312fc029fc17e8f2e6a0ea746048be9e4cf156c0e884f14f49dc0",
+      "code": "authorization_denied",
+      "expectedStatus": 403,
+      "expectedCode": "authorization_denied"
+    },
+    {
+      "index": 7,
+      "phase": "authorization_priority",
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/test",
+      "status": 403,
+      "startedAtUtc": "2026-11-06T11:07:13.849Z",
+      "durationMs": 25,
+      "traceId": "35ca845bc435f70b55fbe63c8932261c",
+      "responseSha256": "1f5301bbb5bfe85926e2178fcf93136f22da5333cadc8c48fa36638efdb9841d",
+      "code": "authorization_denied",
+      "expectedStatus": 403,
+      "expectedCode": "authorization_denied"
+    },
+    {
+      "index": 8,
+      "phase": "authorization_priority",
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/discoveries",
+      "status": 403,
+      "startedAtUtc": "2026-11-06T11:07:13.874Z",
+      "durationMs": 25,
+      "traceId": "b1c9a08c4200920d03a5d68a439b2088",
+      "responseSha256": "ed42bf35fbeb1f824a4ad32707eb2559ac1ecfc7fc2c28220bc254a983876107",
+      "code": "authorization_denied",
+      "expectedStatus": 403,
+      "expectedCode": "authorization_denied"
+    },
+    {
+      "index": 9,
+      "phase": "authorization_priority",
+      "method": "POST",
+      "route": "/api/v1/connection-secrets",
+      "status": 401,
+      "startedAtUtc": "2026-11-06T11:07:13.899Z",
+      "durationMs": 24,
+      "traceId": "8ed03922f0368900239144ba210a6d87",
+      "responseSha256": "98919c02935a55d8585cf5a2910164a6da84eaf20816f637c7f528af7fdda75a",
+      "code": "authentication_required",
+      "expectedStatus": 401,
+      "expectedCode": "authentication_required"
+    },
+    {
+      "index": 10,
+      "phase": "authorization_priority",
+      "method": "POST",
+      "route": "/api/v1/connection-secrets",
+      "status": 403,
+      "startedAtUtc": "2026-11-06T11:07:13.923Z",
+      "durationMs": 26,
+      "traceId": "ef5739296c1726b3441f27618cdb8807",
+      "responseSha256": "3f775451598cbfca98eee9f17b46fc9990ef9fbc4adfa8b0d876ad3b5996adec",
+      "code": "csrf_rejected",
+      "expectedStatus": 403,
+      "expectedCode": "csrf_rejected"
+    },
+    {
+      "index": 11,
+      "phase": "authorization_priority",
+      "method": "POST",
+      "route": "/api/v1/connections",
+      "status": 403,
+      "startedAtUtc": "2026-11-06T11:07:13.949Z",
+      "durationMs": 25,
+      "traceId": "d4cb2d43dcc6485626963a349e2146fc",
+      "responseSha256": "a6b61121a8dade256c8e721f4089f6119322810cc4b73929ef161bc916a05f3e",
+      "code": "origin_rejected",
+      "expectedStatus": 403,
+      "expectedCode": "origin_rejected"
+    },
+    {
+      "index": 12,
+      "phase": "authorization_priority",
+      "method": "POST",
+      "route": "/api/v1/connection-secrets",
+      "status": 413,
+      "startedAtUtc": "2026-11-06T11:07:13.974Z",
+      "durationMs": 24,
+      "traceId": "eb448358b9d0fef01eb322a7aa3fdafe",
+      "responseSha256": "0a0703df73398d0b5e4e7d4d7e0daeb330f2c99f2a7fed62df572645348cdb57",
+      "code": "connection_profile_invalid",
+      "expectedStatus": 413,
+      "expectedCode": "connection_profile_invalid"
+    },
+    {
+      "index": 13,
+      "phase": "strict_create_contract",
+      "method": "POST",
+      "route": "/api/v1/connections",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:13.999Z",
+      "durationMs": 33,
+      "traceId": "f9ef8138bbf33585641a384d927361b8",
+      "responseSha256": "b4372402686b69f0065a56ce6f3b84a112c11c08292134e8111c7335cd4a1872",
+      "code": "connection_profile_invalid",
+      "expectedStatus": 422,
+      "expectedCode": "connection_profile_invalid"
+    },
+    {
+      "index": 14,
+      "phase": "strict_create_contract",
+      "method": "POST",
+      "route": "/api/v1/connections",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:14.032Z",
+      "durationMs": 25,
+      "traceId": "a7d2541cd4c725e2408a975461145389",
+      "responseSha256": "b46d485f9b45cdfed69208149bec1ac99c72862ee7617d074b32093a8aa2705e",
+      "code": "connection_profile_invalid",
+      "expectedStatus": 422,
+      "expectedCode": "connection_profile_invalid"
+    },
+    {
+      "index": 15,
+      "phase": "strict_create_contract",
+      "method": "POST",
+      "route": "/api/v1/connections",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:14.058Z",
+      "durationMs": 24,
+      "traceId": "c0b910289fdb3b88a73c0bd81040cade",
+      "responseSha256": "7248b0d661d419a68de45ca5caa8b78ca9765147b4cdb49f46edf365af1fd3e1",
+      "code": "connection_profile_invalid",
+      "expectedStatus": 422,
+      "expectedCode": "connection_profile_invalid"
+    },
+    {
+      "index": 16,
+      "phase": "strict_create_contract",
+      "method": "POST",
+      "route": "/api/v1/connections",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:14.082Z",
+      "durationMs": 23,
+      "traceId": "1162a0ce305905f7e47d4cae04d73291",
+      "responseSha256": "ded808aaa1918455a24db4ec024f38c6352b6276065d099430f2b0c5961d56e9",
+      "code": "connection_profile_invalid",
+      "expectedStatus": 422,
+      "expectedCode": "connection_profile_invalid"
+    },
+    {
+      "index": 17,
+      "phase": "strict_create_contract",
+      "method": "POST",
+      "route": "/api/v1/connections",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:14.106Z",
+      "durationMs": 24,
+      "traceId": "bbeb99f6ad2dd67f5a06a9998f629110",
+      "responseSha256": "36107a5a8f0b4570f5f324704a0cc940152e9ea98af742eed5efd9b79c25988f",
+      "code": "connection_profile_invalid",
+      "expectedStatus": 422,
+      "expectedCode": "connection_profile_invalid"
+    },
+    {
+      "index": 18,
+      "phase": "strict_create_contract",
+      "method": "POST",
+      "route": "/api/v1/connections",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:14.130Z",
+      "durationMs": 34,
+      "traceId": "da6a8d8b14a08f9e47da3d0b342e3078",
+      "responseSha256": "46f8a5911acc9586e27ef10f4c31d863fdce9954245e2cbf5cf3965e8d7b9565",
+      "code": "connection_secret_expired",
+      "expectedStatus": 422,
+      "expectedCode": "connection_secret_expired"
+    },
+    {
+      "index": 19,
+      "phase": "strict_create_contract",
+      "method": "POST",
+      "route": "/api/v1/connections",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:14.164Z",
+      "durationMs": 24,
+      "traceId": "d9e6a4f2b6e9809bbfd2e345908ceb3a",
+      "responseSha256": "9d38e1ed4adf1d8ebb560ecfddc8c2dc2405dace368cc4a8dc2547b31f727769",
+      "code": "connection_profile_invalid",
+      "expectedStatus": 422,
+      "expectedCode": "connection_profile_invalid"
+    },
+    {
+      "index": 20,
+      "phase": "strict_create_contract",
+      "method": "POST",
+      "route": "/api/v1/connections",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:14.188Z",
+      "durationMs": 27,
+      "traceId": "d7f37b31419d7b9db92658a590c4dcac",
+      "responseSha256": "a422fd8f353d232521a51dea4f64afed6e000e2fdeee16a0515776646fa4fc51",
+      "code": "connection_profile_invalid",
+      "expectedStatus": 422,
+      "expectedCode": "connection_profile_invalid"
+    },
+    {
+      "index": 21,
+      "phase": "strict_create_contract",
+      "method": "POST",
+      "route": "/api/v1/connections",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:14.215Z",
+      "durationMs": 25,
+      "traceId": "f6c806ca44206cbea1e6f1861f0d36c3",
+      "responseSha256": "b472761b111e08eb43e9cd656897022dca00867b81da3a9c8a735bfc9255b721",
+      "code": "connection_profile_invalid",
+      "expectedStatus": 422,
+      "expectedCode": "connection_profile_invalid"
+    },
+    {
+      "index": 22,
+      "phase": "strict_create_contract",
+      "method": "POST",
+      "route": "/api/v1/connections",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:14.240Z",
+      "durationMs": 24,
+      "traceId": "dbb689f70a02da44f0103e2a595dd2c3",
+      "responseSha256": "45d9cd66cda7d28443a2b227eaa156e6c1a41193027c25ef6f640b30d64bff79",
+      "code": "connection_profile_invalid",
+      "expectedStatus": 422,
+      "expectedCode": "connection_profile_invalid"
+    },
+    {
+      "index": 23,
+      "phase": "strict_create_contract",
+      "method": "POST",
+      "route": "/api/v1/connections",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:14.264Z",
+      "durationMs": 25,
+      "traceId": "2de8f28ed51a32a24a958db933634b75",
+      "responseSha256": "9eaa0b63caf96a4edff6a9969ec78bf343bdecb32aabb8c202ec7a1b1b910815",
+      "code": "connection_profile_invalid",
+      "expectedStatus": 422,
+      "expectedCode": "connection_profile_invalid"
+    },
+    {
+      "index": 24,
+      "phase": "strict_create_contract",
+      "method": "POST",
+      "route": "/api/v1/connections",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:14.290Z",
+      "durationMs": 24,
+      "traceId": "9d9639f71251396c10b3c6685c9eb642",
+      "responseSha256": "3e435d47337cbd51c99ff53325a2770200677dfa19b8b8c8b4c3c60559c58317",
+      "code": "connection_profile_invalid",
+      "expectedStatus": 422,
+      "expectedCode": "connection_profile_invalid"
+    },
+    {
+      "index": 25,
+      "phase": "strict_create_contract",
+      "method": "POST",
+      "route": "/api/v1/connections",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:14.315Z",
+      "durationMs": 25,
+      "traceId": "318cc567cd253c566376cc7eeaa22c37",
+      "responseSha256": "913a880cb471f953386ffae304f3ebc4c421d9839d159d38ac8764f2439db676",
+      "code": "connection_profile_invalid",
+      "expectedStatus": 422,
+      "expectedCode": "connection_profile_invalid"
+    },
+    {
+      "index": 26,
+      "phase": "strict_create_contract",
+      "method": "POST",
+      "route": "/api/v1/connections",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:14.341Z",
+      "durationMs": 23,
+      "traceId": "0d5833e3fa0905a58624d3908e2b6514",
+      "responseSha256": "fd7bc8c4e874f332f58e3cc7b752d587daa9bcfeb33dfdccecea93ade68af7d6",
+      "code": "connection_profile_invalid",
+      "expectedStatus": 422,
+      "expectedCode": "connection_profile_invalid"
+    },
+    {
+      "index": 27,
+      "phase": "strict_create_contract",
+      "method": "POST",
+      "route": "/api/v1/connections",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:14.365Z",
+      "durationMs": 23,
+      "traceId": "f6c4f20073c8ff8b3e749ab118f75ba5",
+      "responseSha256": "1c673b60450fc6dddf89ff13912c50944a1819af1ab928d1046714b30a842e7a",
+      "code": "connection_profile_invalid",
+      "expectedStatus": 422,
+      "expectedCode": "connection_profile_invalid"
+    },
+    {
+      "index": 28,
+      "phase": "strict_create_contract",
+      "method": "POST",
+      "route": "/api/v1/connections",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:14.389Z",
+      "durationMs": 24,
+      "traceId": "f3e386f61680e2f4d63a8faeac09a376",
+      "responseSha256": "7cf00667082499387af56ded402f1a1bab4d30a777e8660eef6e6d7d88fb5bf0",
+      "code": "connection_profile_invalid",
+      "expectedStatus": 422,
+      "expectedCode": "connection_profile_invalid"
+    },
+    {
+      "index": 29,
+      "phase": "strict_create_contract",
+      "method": "POST",
+      "route": "/api/v1/connections",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:14.413Z",
+      "durationMs": 25,
+      "traceId": "e93899522d03f161c19be8f6d9dbe316",
+      "responseSha256": "5ee5946b56f6edeb62e19b5c792a425edeab6b1c506c7027d2791fff5f3988f0",
+      "code": "connection_profile_invalid",
+      "expectedStatus": 422,
+      "expectedCode": "connection_profile_invalid"
+    },
+    {
+      "index": 30,
+      "phase": "strict_create_contract",
+      "method": "POST",
+      "route": "/api/v1/connections",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:14.439Z",
+      "durationMs": 23,
+      "traceId": "f35e1e363d2918b9bbad254547d9056d",
+      "responseSha256": "4028a7cb2a319e04dd55c6e349f3ada546b96dc3d2e7e3a83940fb7ebc96fcda",
+      "code": "connection_profile_invalid",
+      "expectedStatus": 422,
+      "expectedCode": "connection_profile_invalid"
+    },
+    {
+      "index": 31,
+      "phase": "strict_create_contract",
+      "method": "POST",
+      "route": "/api/v1/connections",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:14.463Z",
+      "durationMs": 24,
+      "traceId": "60cbf36e5e8da766f8a2f3dc009211d1",
+      "responseSha256": "cd0712b97df24e41691c0b2e4c5dfba995865623b34a96a3f4726a1a1d9b2d4c",
+      "code": "connection_profile_invalid",
+      "expectedStatus": 422,
+      "expectedCode": "connection_profile_invalid"
+    },
+    {
+      "index": 32,
+      "phase": "strict_create_contract",
+      "method": "POST",
+      "route": "/api/v1/connections",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:14.487Z",
+      "durationMs": 25,
+      "traceId": "0099a2a1918d61c3976c940c16b12b30",
+      "responseSha256": "b217cd742af8c68dc1e00bf5fb22e8cb6842eab4c55796ebbf9239078d47e52e",
+      "code": "connection_profile_invalid",
+      "expectedStatus": 422,
+      "expectedCode": "connection_profile_invalid"
+    },
+    {
+      "index": 33,
+      "phase": "strict_create_contract",
+      "method": "POST",
+      "route": "/api/v1/connections",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:14.512Z",
+      "durationMs": 26,
+      "traceId": "e14f17d66edfb0a9d63dc7ecabe40c82",
+      "responseSha256": "e434f225c5a3a104d0fe1b33cfa41320971b94f87d0de3d7c42017473b4cfcb2",
+      "code": "connector_not_enabled",
+      "expectedStatus": 422,
+      "expectedCode": "connector_not_enabled"
+    },
+    {
+      "index": 34,
+      "phase": "strict_create_contract",
+      "method": "POST",
+      "route": "/api/v1/connections",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:14.539Z",
+      "durationMs": 24,
+      "traceId": "f4e2b773a9d609f7dc19624451def7b5",
+      "responseSha256": "09051c8378c92c7705405a2629b4bd74a41e95baaf3a51e7dab07884b766ab8a",
+      "code": "connection_profile_invalid",
+      "expectedStatus": 422,
+      "expectedCode": "connection_profile_invalid"
+    },
+    {
+      "index": 35,
+      "phase": "strict_create_contract",
+      "method": "POST",
+      "route": "/api/v1/connections",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:14.563Z",
+      "durationMs": 26,
+      "traceId": "b59356917a65d8e9114dabedde6c5ade",
+      "responseSha256": "1fdf2e54e46c6e3aaee84e8546a0a0ae00e11fe53588c5f2ebd4a98205d3952e",
+      "code": "connector_not_enabled",
+      "expectedStatus": 422,
+      "expectedCode": "connector_not_enabled"
+    },
+    {
+      "index": 36,
+      "phase": "strict_create_contract",
+      "method": "POST",
+      "route": "/api/v1/connections",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:14.589Z",
+      "durationMs": 25,
+      "traceId": "53d8096193ae965054de6ecae4050cb3",
+      "responseSha256": "d8e9037f03b6684fca531728d7c79a0aa1c4940641769593d51ced48cdb70b92",
+      "code": "connection_profile_invalid",
+      "expectedStatus": 422,
+      "expectedCode": "connection_profile_invalid"
+    },
+    {
+      "index": 37,
+      "phase": "strict_create_contract",
+      "method": "POST",
+      "route": "/api/v1/connections",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:14.615Z",
+      "durationMs": 24,
+      "traceId": "752434bfc71450a82328292f2d5a8a94",
+      "responseSha256": "14274841511a02a345b75159573d959263405c0456a9599ea9efa0689c6427e4",
+      "code": "connector_not_enabled",
+      "expectedStatus": 422,
+      "expectedCode": "connector_not_enabled"
+    },
+    {
+      "index": 38,
+      "phase": "strict_create_contract",
+      "method": "POST",
+      "route": "/api/v1/connections",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:14.640Z",
+      "durationMs": 24,
+      "traceId": "c546951f207d99cc0095ce85a8686240",
+      "responseSha256": "3a25c3b97bb2738790e4b015f89264a22b886fc2f35d9c6d7dd75d0eac05208e",
+      "code": "connection_profile_invalid",
+      "expectedStatus": 422,
+      "expectedCode": "connection_profile_invalid"
+    },
+    {
+      "index": 39,
+      "phase": "strict_create_contract",
+      "method": "POST",
+      "route": "/api/v1/connections",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:14.665Z",
+      "durationMs": 31,
+      "traceId": "34e747a82587110c3400874fcc877cc4",
+      "responseSha256": "9e4a414431dec199cfdc5ad9d25d223d0426c6ba3cf15cfb5adc16ad41c535ee",
+      "code": "connector_not_enabled",
+      "expectedStatus": 422,
+      "expectedCode": "connector_not_enabled"
+    },
+    {
+      "index": 40,
+      "phase": "strict_create_contract",
+      "method": "POST",
+      "route": "/api/v1/connections",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:14.697Z",
+      "durationMs": 25,
+      "traceId": "fc384f6f190a96b02a97ab51bbfed93a",
+      "responseSha256": "aca70b85c8713c5dee61cb2af4c4164ebdc74bef3da0f863ce95aeebd5ccd530",
+      "code": "connection_profile_invalid",
+      "expectedStatus": 422,
+      "expectedCode": "connection_profile_invalid"
+    },
+    {
+      "index": 41,
+      "phase": "strict_create_contract",
+      "method": "POST",
+      "route": "/api/v1/connections",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:14.722Z",
+      "durationMs": 23,
+      "traceId": "ae6b0a9a07b0ecbb32a19ca86fe2360b",
+      "responseSha256": "a5f127e1c382dcd52be85feb995ceb7f207048a33fbb58f1e4b163b8205c585a",
+      "code": "connection_profile_invalid",
+      "expectedStatus": 422,
+      "expectedCode": "connection_profile_invalid"
+    },
+    {
+      "index": 42,
+      "phase": "strict_create_contract",
+      "method": "POST",
+      "route": "/api/v1/connections",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:14.746Z",
+      "durationMs": 24,
+      "traceId": "7ec99897b9b35d2ccc9989de4622d7c8",
+      "responseSha256": "389e66211ca7aabac3a1861826f23baac6269b8b2bcda5b4f8fc4163ab9f2b46",
+      "code": "connection_tls_untrusted",
+      "expectedStatus": 422,
+      "expectedCode": "connection_tls_untrusted"
+    },
+    {
+      "index": 43,
+      "phase": "strict_create_contract",
+      "method": "POST",
+      "route": "/api/v1/connections",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:14.770Z",
+      "durationMs": 26,
+      "traceId": "a4f63bfb8334da2d3d610050ca1319fb",
+      "responseSha256": "8c7d006810b122c49848c49ae2157586bebb392c34f94f0401ca80ffeaed5c71",
+      "code": "connection_tls_untrusted",
+      "expectedStatus": 422,
+      "expectedCode": "connection_tls_untrusted"
+    },
+    {
+      "index": 44,
+      "phase": "strict_create_contract",
+      "method": "POST",
+      "route": "/api/v1/connections",
+      "status": 403,
+      "startedAtUtc": "2026-11-06T11:07:14.797Z",
+      "durationMs": 26,
+      "traceId": "630bb4d0259e0332ff9a2c4b92212aa4",
+      "responseSha256": "fbf3e8f93aba5274d2e52f1c8fec04ec3eeb9a912d46d3e152085b47b6353728",
+      "code": "connection_network_forbidden",
+      "expectedStatus": 403,
+      "expectedCode": "connection_network_forbidden"
+    },
+    {
+      "index": 45,
+      "phase": "sql_and_reference_boundaries",
+      "method": "POST",
+      "route": "/api/v1/connection-secrets",
+      "status": 201,
+      "startedAtUtc": "2026-11-06T11:07:14.824Z",
+      "durationMs": 39,
+      "traceId": "9d78169371fa3881fb6908aec9d3de2b",
+      "expectedStatus": 201
+    },
+    {
+      "index": 46,
+      "phase": "sql_and_reference_boundaries",
+      "method": "POST",
+      "route": "/api/v1/connections/tests",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:14.864Z",
+      "durationMs": 24,
+      "traceId": "4b3edbcd6b9eb92d976fc8c4410454e7",
+      "responseSha256": "830960ba48694a54bd7968248de2c9edf83e434e67c40a9a4ec1f41a1dd255a6",
+      "code": "connection_profile_invalid",
+      "expectedStatus": 422,
+      "expectedCode": "connection_profile_invalid"
+    },
+    {
+      "index": 47,
+      "phase": "sql_and_reference_boundaries",
+      "method": "POST",
+      "route": "/api/v1/connections/tests",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:14.889Z",
+      "durationMs": 23,
+      "traceId": "ed54441cf6714f63c8d5901f23c197c4",
+      "responseSha256": "d7866fd062fd2715f4717988f5a9e12bbf0ae0d10ae19d01d04120499bd649af",
+      "code": "connection_profile_invalid",
+      "expectedStatus": 422,
+      "expectedCode": "connection_profile_invalid"
+    },
+    {
+      "index": 48,
+      "phase": "sql_and_reference_boundaries",
+      "method": "POST",
+      "route": "/api/v1/connections/tests",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:14.913Z",
+      "durationMs": 23,
+      "traceId": "d8925bdd557c313f336bfe9fcf40c6ea",
+      "responseSha256": "1b4955abf3c6019ef3afd79c50503c735499219a001bb1e724b8d191618cbeae",
+      "code": "connection_profile_invalid",
+      "expectedStatus": 422,
+      "expectedCode": "connection_profile_invalid"
+    },
+    {
+      "index": 49,
+      "phase": "sql_and_reference_boundaries",
+      "method": "POST",
+      "route": "/api/v1/connections/tests",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:14.937Z",
+      "durationMs": 24,
+      "traceId": "1a96d3a47db50774a8211c09a4f2568d",
+      "responseSha256": "162da1022d5ba9ccd90947d6524ebfcbba6830854284e05c156870de1af8b9e4",
+      "code": "connection_profile_invalid",
+      "expectedStatus": 422,
+      "expectedCode": "connection_profile_invalid"
+    },
+    {
+      "index": 50,
+      "phase": "sql_and_reference_boundaries",
+      "method": "POST",
+      "route": "/api/v1/connections/tests",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:14.961Z",
+      "durationMs": 26,
+      "traceId": "be7b2d59f340d7676d8042d37500d425",
+      "responseSha256": "92204d83a6515387249ea09215199ce1e7779124a82ece05363eb5ba7d8ca501",
+      "code": "connection_profile_invalid",
+      "expectedStatus": 422,
+      "expectedCode": "connection_profile_invalid"
+    },
+    {
+      "index": 51,
+      "phase": "oidc_operator-a_csrf_request",
+      "method": "GET",
+      "route": "/auth/csrf",
+      "status": 200,
+      "startedAtUtc": "2026-11-06T11:07:15.576Z",
+      "durationMs": 41,
+      "traceId": "f057b06e4d962dc07ece970c76cd5972",
+      "expectedStatus": 200
+    },
+    {
+      "index": 52,
+      "phase": "sql_and_reference_boundaries",
+      "method": "POST",
+      "route": "/api/v1/connections",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:15.621Z",
+      "durationMs": 37,
+      "traceId": "0bdc3954a3eacef7efbce01394d6c5ce",
+      "responseSha256": "fad1949ffe5021342f4ad2b4284ebe42d1a45821f2836cb691c89ae163bff016",
+      "code": "connection_secret_expired",
+      "expectedStatus": 422,
+      "expectedCode": "connection_secret_expired"
+    },
+    {
+      "index": 53,
+      "phase": "sql_and_reference_boundaries",
+      "method": "POST",
+      "route": "/api/v1/connections",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:15.658Z",
+      "durationMs": 26,
+      "traceId": "5a9c83d83667e3b1a088fd33df538fc4",
+      "responseSha256": "68f2d5bcb023bbe1b9de8f863035d3ad568bbfd348c86c04b051eb8c2fd248a3",
+      "code": "connection_secret_expired",
+      "expectedStatus": 422,
+      "expectedCode": "connection_secret_expired"
+    },
+    {
+      "index": 54,
+      "phase": "sql_and_reference_boundaries",
+      "method": "POST",
+      "route": "/api/v1/connections",
+      "status": 403,
+      "startedAtUtc": "2026-11-06T11:07:15.685Z",
+      "durationMs": 23,
+      "traceId": "bf38d5d17a9af08c73eb704b2a19aca7",
+      "responseSha256": "00213edc4b7f4d05aa962a983b726e3a642947371ec757b36b20712fc79c8642",
+      "code": "connection_scope_forbidden",
+      "expectedStatus": 403,
+      "expectedCode": "connection_scope_forbidden"
+    },
+    {
+      "index": 55,
+      "phase": "sql_and_reference_boundaries",
+      "method": "POST",
+      "route": "/api/v1/connection-secrets",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:15.708Z",
+      "durationMs": 24,
+      "traceId": "ed0b69bdd99ba5beb73e6c1b6066cb7a",
+      "responseSha256": "70e7ab88aacde8566a2d9e4ef7ff4028dafbab07efe2a84e7f1ad4ea33d3baac",
+      "code": "connection_profile_invalid",
+      "expectedStatus": 422,
+      "expectedCode": "connection_profile_invalid"
+    },
+    {
+      "index": 56,
+      "phase": "persistent_create_and_idempotency",
+      "method": "POST",
+      "route": "/api/v1/connection-secrets",
+      "status": 201,
+      "startedAtUtc": "2026-11-06T11:07:15.732Z",
+      "durationMs": 25,
+      "traceId": "aa7614f5de968d8f2ee25a52dcf7a035",
+      "expectedStatus": 201
+    },
+    {
+      "index": 57,
+      "phase": "persistent_create_and_idempotency",
+      "method": "POST",
+      "route": "/api/v1/connections",
+      "status": 201,
+      "startedAtUtc": "2026-11-06T11:07:15.757Z",
+      "durationMs": 33,
+      "traceId": "e7292e71d2db07bcaeda4e958f6cd71c",
+      "responseSha256": "e84dafebf8aea732df369bf1947dc3edae13afe3c3ebc8c0f787ef973dfa35b2",
+      "state": "DRAFT",
+      "expectedStatus": 201
+    },
+    {
+      "index": 58,
+      "phase": "persistent_create_and_idempotency",
+      "method": "POST",
+      "route": "/api/v1/connections",
+      "status": 201,
+      "startedAtUtc": "2026-11-06T11:07:15.791Z",
+      "durationMs": 24,
+      "traceId": "94c8a3018c8fdf6be13f3ede646a70b3",
+      "responseSha256": "e84dafebf8aea732df369bf1947dc3edae13afe3c3ebc8c0f787ef973dfa35b2",
+      "state": "DRAFT",
+      "expectedStatus": 201
+    },
+    {
+      "index": 59,
+      "phase": "persistent_create_and_idempotency",
+      "method": "POST",
+      "route": "/api/v1/connections",
+      "status": 409,
+      "startedAtUtc": "2026-11-06T11:07:15.815Z",
+      "durationMs": 26,
+      "traceId": "6c1348e62152dfbf41e1d12fd67cf856",
+      "responseSha256": "caed3302527db65553c7cbb9ee34c0d77185dfdc9d71820fbb201a282ae2498a",
+      "code": "connection_version_conflict",
+      "expectedStatus": 409,
+      "expectedCode": "connection_version_conflict"
+    },
+    {
+      "index": 60,
+      "phase": "persistent_create_and_idempotency",
+      "method": "GET",
+      "route": "/api/v1/connections/{id}",
+      "status": 200,
+      "startedAtUtc": "2026-11-06T11:07:15.841Z",
+      "durationMs": 26,
+      "traceId": "0b66e3e3f5bd2122543a0ef0e069b543",
+      "responseSha256": "abf6f71b2cb291d5e409e40af0c94766fde88bc031eff09572aa456131986225",
+      "state": "DRAFT",
+      "expectedStatus": 200
+    },
+    {
+      "index": 61,
+      "phase": "persistent_create_and_idempotency",
+      "method": "GET",
+      "route": "/api/v1/platform/audit",
+      "status": 200,
+      "startedAtUtc": "2026-11-06T11:07:15.867Z",
+      "durationMs": 32,
+      "traceId": "2e7bb15d8607cbdd1b9d588280e99a96",
+      "responseSha256": "5137bac1acacf9755f92e1e09b3da8bbe4c0647fdcd9eb764a1e61cfd50a5f09",
+      "expectedStatus": 200
+    },
+    {
+      "index": 62,
+      "phase": "persistent_create_and_idempotency",
+      "method": "POST",
+      "route": "/api/v1/connections",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:15.899Z",
+      "durationMs": 24,
+      "traceId": "cff9981c54f783493a3069406cb8f6cf",
+      "responseSha256": "f2475ca96ffb663e25f55b449645f44fdeb2cef5d1786063af22817ce97b7485",
+      "code": "connection_secret_expired",
+      "expectedStatus": 422,
+      "expectedCode": "connection_secret_expired"
+    },
+    {
+      "index": 63,
+      "phase": "persistent_create_and_idempotency",
+      "method": "POST",
+      "route": "/api/v1/connection-secrets",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:15.924Z",
+      "durationMs": 25,
+      "traceId": "905fba52cad6447cac61a55823f61a42",
+      "responseSha256": "a5e281c13ace4b7822386f7d6e43283de7e620479e364e8ac4ad360534d81375",
+      "code": "connection_secret_expired",
+      "expectedStatus": 422,
+      "expectedCode": "connection_secret_expired"
+    },
+    {
+      "index": 64,
+      "phase": "persistent_create_and_idempotency",
+      "method": "GET",
+      "route": "/api/v1/connections/{id}",
+      "status": 200,
+      "startedAtUtc": "2026-11-06T11:07:15.950Z",
+      "durationMs": 25,
+      "traceId": "308c00da5eba98e1c8e4a7b525e28c03",
+      "responseSha256": "66f2b92fa8c115496adf418904bf279dc26bf222eb053f4611dc6c1614df4761",
+      "state": "DRAFT",
+      "expectedStatus": 200
+    },
+    {
+      "index": 65,
+      "phase": "update_integer_and_etag_boundaries",
+      "method": "GET",
+      "route": "/api/v1/connections/{id}",
+      "status": 200,
+      "startedAtUtc": "2026-11-06T11:07:15.975Z",
+      "durationMs": 24,
+      "traceId": "84ef44d089053f83da1d19f027bd176a",
+      "responseSha256": "abf6f71b2cb291d5e409e40af0c94766fde88bc031eff09572aa456131986225",
+      "state": "DRAFT",
+      "expectedStatus": 200
+    },
+    {
+      "index": 66,
+      "phase": "update_integer_and_etag_boundaries",
+      "method": "PATCH",
+      "route": "/api/v1/connections/{id}",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:16.000Z",
+      "durationMs": 24,
+      "traceId": "7f76a546ebd8f108af4c04ae65e43177",
+      "responseSha256": "7e842b4924fd05da2f4404eeb525227eec86c82cec62374d6cf6c0f03fa5767c",
+      "code": "connection_profile_invalid",
+      "expectedStatus": 422,
+      "expectedCode": "connection_profile_invalid"
+    },
+    {
+      "index": 67,
+      "phase": "update_integer_and_etag_boundaries",
+      "method": "PATCH",
+      "route": "/api/v1/connections/{id}",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:16.024Z",
+      "durationMs": 26,
+      "traceId": "9141c0a42d983e8c7f6cfa414e7fa2d7",
+      "responseSha256": "e2e63ff890394df3bf48d18a675a179cb8ee2c0f99f1df3d442f56865fc95e01",
+      "code": "connection_profile_invalid",
+      "expectedStatus": 422,
+      "expectedCode": "connection_profile_invalid"
+    },
+    {
+      "index": 68,
+      "phase": "update_integer_and_etag_boundaries",
+      "method": "PATCH",
+      "route": "/api/v1/connections/{id}",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:16.050Z",
+      "durationMs": 25,
+      "traceId": "fe19a312fb180fe7a404207a2762b296",
+      "responseSha256": "e6f21e35f25ea56da9fadd17ed213e6f3fae1e586005d00870d7fb0196f1a661",
+      "code": "connection_profile_invalid",
+      "expectedStatus": 422,
+      "expectedCode": "connection_profile_invalid"
+    },
+    {
+      "index": 69,
+      "phase": "update_integer_and_etag_boundaries",
+      "method": "PATCH",
+      "route": "/api/v1/connections/{id}",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:16.075Z",
+      "durationMs": 25,
+      "traceId": "48d16bf7eb1aa81f318a9503f0555f9e",
+      "responseSha256": "8adb8ddb0e006d31d09b3032381d665a604480db861890c1bb34d77d1b9ba1e3",
+      "code": "connection_profile_invalid",
+      "expectedStatus": 422,
+      "expectedCode": "connection_profile_invalid"
+    },
+    {
+      "index": 70,
+      "phase": "update_integer_and_etag_boundaries",
+      "method": "PATCH",
+      "route": "/api/v1/connections/{id}",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:16.100Z",
+      "durationMs": 27,
+      "traceId": "e1c36953d358f588b72d628516f4d208",
+      "responseSha256": "c57740ccd6083b3803b9ab11cee5508f5bc823f5aee5e24d71c056a24d1c267e",
+      "code": "connection_profile_invalid",
+      "expectedStatus": 422,
+      "expectedCode": "connection_profile_invalid"
+    },
+    {
+      "index": 71,
+      "phase": "update_integer_and_etag_boundaries",
+      "method": "PATCH",
+      "route": "/api/v1/connections/{id}",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:16.127Z",
+      "durationMs": 25,
+      "traceId": "cc501c088c4253d861a813ae8f113f00",
+      "responseSha256": "6a4fd47171fbc08113ab072946aa4900fc0d1e75fb341c7191dc3f2c0c574dbc",
+      "code": "connection_profile_invalid",
+      "expectedStatus": 422,
+      "expectedCode": "connection_profile_invalid"
+    },
+    {
+      "index": 72,
+      "phase": "update_integer_and_etag_boundaries",
+      "method": "PATCH",
+      "route": "/api/v1/connections/{id}",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:16.152Z",
+      "durationMs": 25,
+      "traceId": "c76a98245704bfd4f93a9b133dd779fc",
+      "responseSha256": "166eb9fb8182c4bc3822e506b8028d2bbc3b437feaac16ed75f736e48b0433e3",
+      "code": "connection_profile_invalid",
+      "expectedStatus": 422,
+      "expectedCode": "connection_profile_invalid"
+    },
+    {
+      "index": 73,
+      "phase": "update_integer_and_etag_boundaries",
+      "method": "PATCH",
+      "route": "/api/v1/connections/{id}",
+      "status": 428,
+      "startedAtUtc": "2026-11-06T11:07:16.177Z",
+      "durationMs": 25,
+      "traceId": "41bb79d58f9f38b3b332516581b39adf",
+      "responseSha256": "f485ca51fa2d16629ef665d8f71787aeaa4825205a257cfa9611179fe7a5a961",
+      "code": "revision_required",
+      "expectedStatus": 428,
+      "expectedCode": "revision_required"
+    },
+    {
+      "index": 74,
+      "phase": "update_integer_and_etag_boundaries",
+      "method": "PATCH",
+      "route": "/api/v1/connections/{id}",
+      "status": 400,
+      "startedAtUtc": "2026-11-06T11:07:16.203Z",
+      "durationMs": 27,
+      "traceId": "f9e6389236226502151db768f866ba39",
+      "responseSha256": "253c928bfa37812e576ae2ad06d2474928f6c63c82376683b1d74c61b680e03c",
+      "code": "invalid_revision",
+      "expectedStatus": 400,
+      "expectedCode": "invalid_revision"
+    },
+    {
+      "index": 75,
+      "phase": "update_integer_and_etag_boundaries",
+      "method": "PATCH",
+      "route": "/api/v1/connections/{id}",
+      "status": 400,
+      "startedAtUtc": "2026-11-06T11:07:16.231Z",
+      "durationMs": 25,
+      "traceId": "4fe9536927eac1c9ba70165448f246fa",
+      "responseSha256": "55348fc339ac3168d7a3d9d707a8d63d21cbae14d8c89995ee877e3476d513e0",
+      "code": "invalid_revision",
+      "expectedStatus": 400,
+      "expectedCode": "invalid_revision"
+    },
+    {
+      "index": 76,
+      "phase": "update_integer_and_etag_boundaries",
+      "method": "PATCH",
+      "route": "/api/v1/connections/{id}",
+      "status": 400,
+      "startedAtUtc": "2026-11-06T11:07:16.256Z",
+      "durationMs": 25,
+      "traceId": "b6b8f95661127656e732186b11062dc8",
+      "responseSha256": "92084771f3ec8d4708c0b8b0ec179bb7d912b7dbda975c0d02b953bc558e869b",
+      "code": "invalid_revision",
+      "expectedStatus": 400,
+      "expectedCode": "invalid_revision"
+    },
+    {
+      "index": 77,
+      "phase": "update_integer_and_etag_boundaries",
+      "method": "PATCH",
+      "route": "/api/v1/connections/{id}",
+      "status": 409,
+      "startedAtUtc": "2026-11-06T11:07:16.282Z",
+      "durationMs": 25,
+      "traceId": "7d9db98d5f0b3b5a62d9bc1f74c7500e",
+      "responseSha256": "9c87d30c00144e2059b837ac2a7f7d00802b216fb5308b411210f664fda9c764",
+      "code": "connection_version_conflict",
+      "expectedStatus": 409,
+      "expectedCode": "connection_version_conflict"
+    },
+    {
+      "index": 78,
+      "phase": "trusted_resource_scope",
+      "method": "GET",
+      "route": "/api/v1/connections/{id}",
+      "status": 200,
+      "startedAtUtc": "2026-11-06T11:07:16.307Z",
+      "durationMs": 24,
+      "traceId": "309d82e52bbff6ab36f9cea45bfc66d7",
+      "responseSha256": "abf6f71b2cb291d5e409e40af0c94766fde88bc031eff09572aa456131986225",
+      "state": "DRAFT",
+      "expectedStatus": 200
+    },
+    {
+      "index": 79,
+      "phase": "trusted_resource_scope",
+      "method": "PATCH",
+      "route": "/api/v1/connections/{id}",
+      "status": 200,
+      "startedAtUtc": "2026-11-06T11:07:16.331Z",
+      "durationMs": 31,
+      "traceId": "1c50de144a942af66956ac7996d47647",
+      "responseSha256": "974f7db3ae296f1ffe2f22991b0d51fdc93505c58c070de70da400d05cd969f8",
+      "state": "DRAFT",
+      "expectedStatus": 200
+    },
+    {
+      "index": 80,
+      "phase": "oidc_operator-a_csrf_request",
+      "method": "GET",
+      "route": "/auth/csrf",
+      "status": 200,
+      "startedAtUtc": "2026-11-06T11:07:16.961Z",
+      "durationMs": 44,
+      "traceId": "dacb27053a99813010f491f958a94d43",
+      "expectedStatus": 200
+    },
+    {
+      "index": 81,
+      "phase": "trusted_resource_scope",
+      "method": "GET",
+      "route": "/api/v1/connections/{id}",
+      "status": 403,
+      "startedAtUtc": "2026-11-06T11:07:17.008Z",
+      "durationMs": 36,
+      "traceId": "7fc6630879fa2f382951bd128dba197a",
+      "responseSha256": "c8f2ff83ef0a818327aa05646fae3a0ec9ec917a429498c61e5e65307b9f8c4e",
+      "code": "connection_scope_forbidden",
+      "expectedStatus": 403,
+      "expectedCode": "connection_scope_forbidden"
+    },
+    {
+      "index": 82,
+      "phase": "trusted_resource_scope",
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/test",
+      "status": 403,
+      "startedAtUtc": "2026-11-06T11:07:17.045Z",
+      "durationMs": 27,
+      "traceId": "5cf08d6bb41a0ff7d287e6014b089126",
+      "responseSha256": "4d9d581b0d9f582add341fed1dcce439c9d8106b8785a06f8759cc6abf7f8ee7",
+      "code": "connection_scope_forbidden",
+      "expectedStatus": 403,
+      "expectedCode": "connection_scope_forbidden"
+    },
+    {
+      "index": 83,
+      "phase": "trusted_resource_scope",
+      "method": "GET",
+      "route": "/api/v1/connections/{id}",
+      "status": 200,
+      "startedAtUtc": "2026-11-06T11:07:17.073Z",
+      "durationMs": 23,
+      "traceId": "96b667600041c414108f7bd695c5fd01",
+      "responseSha256": "aca5f82dfe86d836deda0b1e61dfd21604c4578c421273aefdbf6aea525e99d4",
+      "state": "DRAFT",
+      "expectedStatus": 200
+    },
+    {
+      "index": 84,
+      "phase": "trusted_resource_scope",
+      "method": "PATCH",
+      "route": "/api/v1/connections/{id}",
+      "status": 200,
+      "startedAtUtc": "2026-11-06T11:07:17.096Z",
+      "durationMs": 25,
+      "traceId": "bdbaa996878d883edeb9f8bfa1e6bad7",
+      "responseSha256": "befd56341c7c5f0787adaafcd5ac205eab960b4176dc56c95bb40e975b6b43f0",
+      "state": "DRAFT",
+      "expectedStatus": 200
+    },
+    {
+      "index": 85,
+      "phase": "real_probe_and_enable",
+      "method": "GET",
+      "route": "/api/v1/connections/{id}",
+      "status": 200,
+      "startedAtUtc": "2026-11-06T11:07:17.121Z",
+      "durationMs": 23,
+      "traceId": "f2fd957d91fcb5b039d502ce72428685",
+      "responseSha256": "f8a63d796774c9a38f15985399361765481a19884041a67085260e46f9c860e5",
+      "state": "DRAFT",
+      "expectedStatus": 200
+    },
+    {
+      "index": 86,
+      "phase": "real_probe_and_enable",
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/test",
+      "status": "TEST_OK",
+      "startedAtUtc": "2026-11-06T11:07:17.144Z",
+      "durationMs": 85,
+      "traceId": "fe5c0f7f18c7e1f3a64a44d1ba618650",
+      "responseSha256": "13c3b629282edc51054678ad3ca607b5cfd5006d6793386adb57ca3f14436057",
+      "expectedStatus": 200
+    },
+    {
+      "index": 87,
+      "phase": "real_probe_and_enable",
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/test",
+      "status": "TEST_OK",
+      "startedAtUtc": "2026-11-06T11:07:17.229Z",
+      "durationMs": 25,
+      "traceId": "8af9474406ac23267423a94f1a5a2be1",
+      "responseSha256": "13c3b629282edc51054678ad3ca607b5cfd5006d6793386adb57ca3f14436057",
+      "expectedStatus": 200
+    },
+    {
+      "index": 88,
+      "phase": "real_probe_and_enable",
+      "method": "GET",
+      "route": "/api/v1/connections/{id}",
+      "status": 200,
+      "startedAtUtc": "2026-11-06T11:07:17.254Z",
+      "durationMs": 26,
+      "traceId": "b95997942457d7ba7a532758677fce15",
+      "responseSha256": "5fb0ddb7233d6c21a7261abe9bd0aca62082002dcebb05b23c8dd92e3db1209e",
+      "state": "DRAFT",
+      "expectedStatus": 200
+    },
+    {
+      "index": 89,
+      "phase": "real_probe_and_enable",
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/enable",
+      "status": 200,
+      "startedAtUtc": "2026-11-06T11:07:17.280Z",
+      "durationMs": 41,
+      "traceId": "a913dae28805c3144bb86480544cbf34",
+      "responseSha256": "a714993727c03d00b2cb46dfeda45460c11b86715c228632662f940fd71076b4",
+      "state": "ACTIVE",
+      "expectedStatus": 200
+    },
+    {
+      "index": 90,
+      "phase": "catalog_snapshot_and_new_oidc_session",
+      "method": "GET",
+      "route": "/api/v1/connections/{id}",
+      "status": 200,
+      "startedAtUtc": "2026-11-06T11:07:17.322Z",
+      "durationMs": 25,
+      "traceId": "c07576dec0081b3ad32e19f6419835c7",
+      "responseSha256": "bec21bdbe5ecff2d179e8e30894184d47d8e00925e562e2e0d8dcd0b76fe2585",
+      "state": "ACTIVE",
+      "expectedStatus": 200
+    },
+    {
+      "index": 91,
+      "phase": "catalog_snapshot_and_new_oidc_session",
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/discoveries",
+      "status": "QUEUED",
+      "startedAtUtc": "2026-11-06T11:07:17.348Z",
+      "durationMs": 38,
+      "traceId": "18e43f677a96acdac9f3ee00dbf844b3",
+      "responseSha256": "32a9bcec13af5ff5572fe1a361c256aaea2d98f6da38bea03aafdb785914767d",
+      "expectedStatus": 202
+    },
+    {
+      "index": 92,
+      "phase": "catalog_snapshot_and_new_oidc_session",
+      "method": "GET",
+      "route": "/api/v1/connections/{id}/discoveries/{id}",
+      "status": "QUEUED",
+      "startedAtUtc": "2026-11-06T11:07:17.387Z",
+      "durationMs": 29,
+      "traceId": "94be45ec02eb9670fc835a2c13a0e251",
+      "responseSha256": "88a165797a0fd8666a1a4de91bd3a3424d7ba1509ce2c0dacf616de069a4189a",
+      "expectedStatus": 200
+    },
+    {
+      "index": 93,
+      "phase": "catalog_snapshot_and_new_oidc_session",
+      "method": "GET",
+      "route": "/api/v1/connections/{id}/discoveries/{id}",
+      "status": "SUCCEEDED",
+      "startedAtUtc": "2026-11-06T11:07:18.419Z",
+      "durationMs": 64,
+      "traceId": "126265b2a0aa2e00eb60caff78014886",
+      "responseSha256": "64d15134b1220f6675d5e6690745f12869d2a5c259543aceb42641b30a4f8f97",
+      "expectedStatus": 200
+    },
+    {
+      "index": 94,
+      "phase": "catalog_snapshot_and_new_oidc_session",
+      "method": "GET",
+      "route": "/api/v1/catalogs/{id}",
+      "status": "READY",
+      "startedAtUtc": "2026-11-06T11:07:18.484Z",
+      "durationMs": 54,
+      "traceId": "44765714437be1c8e225ab63d70691ad",
+      "responseSha256": "481abc47493e4193943a0da4572ace8e26aec9c5c62ea5cb8b9fdfa71d6ec619",
+      "expectedStatus": 200
+    },
+    {
+      "index": 95,
+      "phase": "oidc_operator-ab_csrf_request",
+      "method": "GET",
+      "route": "/auth/csrf",
+      "status": 200,
+      "startedAtUtc": "2026-11-06T11:07:19.125Z",
+      "durationMs": 44,
+      "traceId": "f3b177ad27994ad4f51c173b015205be",
+      "expectedStatus": 200
+    },
+    {
+      "index": 96,
+      "phase": "catalog_snapshot_and_new_oidc_session",
+      "method": "GET",
+      "route": "/api/v1/connections/{id}/discoveries/{id}",
+      "status": "SUCCEEDED",
+      "startedAtUtc": "2026-11-06T11:07:19.173Z",
+      "durationMs": 33,
+      "traceId": "3d6f5d28d4c9fc232493087d7b5d6260",
+      "responseSha256": "64d15134b1220f6675d5e6690745f12869d2a5c259543aceb42641b30a4f8f97",
+      "expectedStatus": 200
+    },
+    {
+      "index": 97,
+      "phase": "catalog_snapshot_and_new_oidc_session",
+      "method": "GET",
+      "route": "/api/v1/connections/{id}",
+      "status": 200,
+      "startedAtUtc": "2026-11-06T11:07:19.207Z",
+      "durationMs": 23,
+      "traceId": "fccde6d547aea9f36ef466182da7a05a",
+      "responseSha256": "bec21bdbe5ecff2d179e8e30894184d47d8e00925e562e2e0d8dcd0b76fe2585",
+      "state": "ACTIVE",
+      "expectedStatus": 200
+    },
+    {
+      "index": 98,
+      "phase": "catalog_snapshot_and_new_oidc_session",
+      "method": "GET",
+      "route": "/api/v1/connections/{id}",
+      "status": 200,
+      "startedAtUtc": "2026-11-06T11:07:19.230Z",
+      "durationMs": 23,
+      "traceId": "6bf3526a8786da43d6ccc6c44f643a89",
+      "responseSha256": "bec21bdbe5ecff2d179e8e30894184d47d8e00925e562e2e0d8dcd0b76fe2585",
+      "state": "ACTIVE",
+      "expectedStatus": 200
+    },
+    {
+      "index": 99,
+      "phase": "catalog_snapshot_and_new_oidc_session",
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/discoveries",
+      "status": "QUEUED",
+      "startedAtUtc": "2026-11-06T11:07:19.253Z",
+      "durationMs": 26,
+      "traceId": "21c734ff6df0da4cc206c837cc700e8e",
+      "responseSha256": "aaf71733ce8238159ea4d82367e73c2dc3a3ce5964f7d48631eafaf860030448",
+      "expectedStatus": 202
+    },
+    {
+      "index": 100,
+      "phase": "catalog_snapshot_and_new_oidc_session",
+      "method": "GET",
+      "route": "/api/v1/connections/{id}/discoveries/{id}",
+      "status": "QUEUED",
+      "startedAtUtc": "2026-11-06T11:07:19.279Z",
+      "durationMs": 23,
+      "traceId": "6c62f0f892efb31161474be216f52d01",
+      "responseSha256": "eada015e0e7e873629807a84f4e8397a996c976af2ac88a954a459c6a2d29459",
+      "expectedStatus": 200
+    },
+    {
+      "index": 101,
+      "phase": "catalog_snapshot_and_new_oidc_session",
+      "method": "GET",
+      "route": "/api/v1/connections/{id}/discoveries/{id}",
+      "status": "SUCCEEDED",
+      "startedAtUtc": "2026-11-06T11:07:20.304Z",
+      "durationMs": 63,
+      "traceId": "5a5b5482f598d7bc3466837f6a9b0c90",
+      "responseSha256": "6b64875b34777e2b16a29a794b961da1ddb3873a45f2c4d2185e4bb9efe8ac80",
+      "expectedStatus": 200
+    },
+    {
+      "index": 102,
+      "phase": "catalog_snapshot_and_new_oidc_session",
+      "method": "GET",
+      "route": "/api/v1/catalogs/{id}",
+      "status": "READY",
+      "startedAtUtc": "2026-11-06T11:07:20.368Z",
+      "durationMs": 43,
+      "traceId": "75cb98361a74782f3ad90b61d9522352",
+      "responseSha256": "0c4d310c2bde6465ac2875375aa1a5cb13bddab1fbe3065b44f0259662e59f20",
+      "expectedStatus": 200
+    },
+    {
+      "index": 103,
+      "phase": "catalog_snapshot_and_new_oidc_session",
+      "method": "GET",
+      "route": "/api/v1/catalogs/{id}",
+      "status": "READY",
+      "startedAtUtc": "2026-11-06T11:07:20.411Z",
+      "durationMs": 34,
+      "traceId": "cea4c85551dab28f2a3e73e13970fc32",
+      "responseSha256": "481abc47493e4193943a0da4572ace8e26aec9c5c62ea5cb8b9fdfa71d6ec619",
+      "expectedStatus": 200
+    },
+    {
+      "index": 104,
+      "phase": "catalog_snapshot_and_new_oidc_session",
+      "method": "GET",
+      "route": "/api/v1/platform/audit",
+      "status": 200,
+      "startedAtUtc": "2026-11-06T11:07:20.446Z",
+      "durationMs": 31,
+      "traceId": "e15a32a37247ffbcea7b917836cac78c",
+      "responseSha256": "63187aded5b93fb097370ccc9fc18d108b391957f1b221648be1360742a60b26",
+      "expectedStatus": 200
+    },
+    {
+      "index": 105,
+      "phase": "wrong_password_real_authentication",
+      "method": "POST",
+      "route": "/api/v1/connection-secrets",
+      "status": 201,
+      "startedAtUtc": "2026-11-06T11:07:20.478Z",
+      "durationMs": 25,
+      "traceId": "3ac8f9dad713a65179390164a10bc3e0",
+      "expectedStatus": 201
+    },
+    {
+      "index": 106,
+      "phase": "wrong_password_real_authentication",
+      "method": "POST",
+      "route": "/api/v1/connections/tests",
+      "status": "TEST_FAILED",
+      "startedAtUtc": "2026-11-06T11:07:20.503Z",
+      "durationMs": 32,
+      "traceId": "5d4b54e0654088a240d065f03847010d",
+      "responseSha256": "a2a2e38469c60b0f743750646e305603bc3386d694b84698df41cc53b20b4133",
+      "expectedStatus": 200
+    },
+    {
+      "index": 107,
+      "phase": "concurrent_patch_and_rotation_invalidation",
+      "method": "GET",
+      "route": "/api/v1/connections/{id}",
+      "status": 200,
+      "startedAtUtc": "2026-11-06T11:07:20.536Z",
+      "durationMs": 26,
+      "traceId": "dea8fefded17dcb9a4c8544302817073",
+      "responseSha256": "bec21bdbe5ecff2d179e8e30894184d47d8e00925e562e2e0d8dcd0b76fe2585",
+      "state": "ACTIVE",
+      "expectedStatus": 200
+    },
+    {
+      "index": 108,
+      "phase": "concurrent_patch_and_rotation_invalidation",
+      "method": "PATCH",
+      "route": "/api/v1/connections/{id}",
+      "status": 200,
+      "startedAtUtc": "2026-11-06T11:07:20.562Z",
+      "durationMs": 28,
+      "traceId": "f53b27d608f68d3d136551c4d3d1f2b6",
+      "responseSha256": "a91aeaa32521195367b1fd808a85cb25191d0b9ffcbb493283c81f61f3e17550",
+      "state": "DRAFT"
+    },
+    {
+      "index": 109,
+      "phase": "concurrent_patch_and_rotation_invalidation",
+      "method": "PATCH",
+      "route": "/api/v1/connections/{id}",
+      "status": 409,
+      "startedAtUtc": "2026-11-06T11:07:20.562Z",
+      "durationMs": 28,
+      "traceId": "ce09836cb1449130a7b90194e050c749",
+      "responseSha256": "5bb6ec1cf7cb69214060c3a1d3210efd4c53f207a1844e7716d5ee7660745ffc",
+      "code": "connection_version_conflict"
+    },
+    {
+      "index": 110,
+      "phase": "concurrent_patch_and_rotation_invalidation",
+      "method": "GET",
+      "route": "/api/v1/connections/{id}",
+      "status": 200,
+      "startedAtUtc": "2026-11-06T11:07:20.591Z",
+      "durationMs": 24,
+      "traceId": "4c0a9d991433b01e655d3ac0761e5704",
+      "responseSha256": "8da0663c7e3b6b7ea11c001354933c52158fcc869844a6f02da028bf0c0b1eed",
+      "state": "DRAFT",
+      "expectedStatus": 200
+    },
+    {
+      "index": 111,
+      "phase": "concurrent_patch_and_rotation_invalidation",
+      "method": "GET",
+      "route": "/api/v1/connections/{id}/probes/{id}",
+      "status": "TEST_OK",
+      "startedAtUtc": "2026-11-06T11:07:20.615Z",
+      "durationMs": 26,
+      "traceId": "32764a0dae0c6894d977deffbad3295a",
+      "responseSha256": "d78298171ff761794c725b43e84a02910c023226add5e33c108de6cc6a8a76f5",
+      "expectedStatus": 200
+    },
+    {
+      "index": 112,
+      "phase": "concurrent_patch_and_rotation_invalidation",
+      "method": "GET",
+      "route": "/api/v1/connections/{id}",
+      "status": 200,
+      "startedAtUtc": "2026-11-06T11:07:20.642Z",
+      "durationMs": 24,
+      "traceId": "9afa794eafbdf860575826f58ea55af1",
+      "responseSha256": "8da0663c7e3b6b7ea11c001354933c52158fcc869844a6f02da028bf0c0b1eed",
+      "state": "DRAFT",
+      "expectedStatus": 200
+    },
+    {
+      "index": 113,
+      "phase": "concurrent_patch_and_rotation_invalidation",
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/test",
+      "status": "TEST_OK",
+      "startedAtUtc": "2026-11-06T11:07:20.667Z",
+      "durationMs": 35,
+      "traceId": "0c99abb2a88bdfa26ac20248d8e2b55e",
+      "responseSha256": "fdfbbd1e29adb54549fe978e725d7a5ece93ffd9165eebb100dd71ff188d661f",
+      "expectedStatus": 200
+    },
+    {
+      "index": 114,
+      "phase": "concurrent_patch_and_rotation_invalidation",
+      "method": "POST",
+      "route": "/api/v1/connection-secrets",
+      "status": 201,
+      "startedAtUtc": "2026-11-06T11:07:20.703Z",
+      "durationMs": 27,
+      "traceId": "414686db45c9f68c64967c898bb6aba7",
+      "expectedStatus": 201
+    },
+    {
+      "index": 115,
+      "phase": "concurrent_patch_and_rotation_invalidation",
+      "method": "GET",
+      "route": "/api/v1/connections/{id}",
+      "status": 200,
+      "startedAtUtc": "2026-11-06T11:07:20.730Z",
+      "durationMs": 25,
+      "traceId": "fcc64fd071ecb2f7dfe210b2c20e54b5",
+      "responseSha256": "4cc27af151f5818c69087d2104a79536fc2be829ab0b706051451a6d99a4ff09",
+      "state": "DRAFT",
+      "expectedStatus": 200
+    },
+    {
+      "index": 116,
+      "phase": "concurrent_patch_and_rotation_invalidation",
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/rotate-secret",
+      "status": 200,
+      "startedAtUtc": "2026-11-06T11:07:20.756Z",
+      "durationMs": 27,
+      "traceId": "e4457708f58ca3a368257e6468bf8a05",
+      "responseSha256": "39c79acb3d274ff4797e66a107b5ce606ef96237449502f92b7d0565eab184a1",
+      "state": "DRAFT",
+      "expectedStatus": 200
+    },
+    {
+      "index": 117,
+      "phase": "concurrent_patch_and_rotation_invalidation",
+      "method": "GET",
+      "route": "/api/v1/connections/{id}/probes/{id}",
+      "status": "TEST_OK",
+      "startedAtUtc": "2026-11-06T11:07:20.784Z",
+      "durationMs": 23,
+      "traceId": "a0c87752936d30db1d0591fb5199c447",
+      "responseSha256": "fc4bbe62aef23cb7ee970323404531be68e520c68e509234847f321fe9f02927",
+      "expectedStatus": 200
+    },
+    {
+      "index": 118,
+      "phase": "concurrent_patch_and_rotation_invalidation",
+      "method": "POST",
+      "route": "/api/v1/connections/tests",
+      "status": 422,
+      "startedAtUtc": "2026-11-06T11:07:20.808Z",
+      "durationMs": 24,
+      "traceId": "3457594d243bd9b688e557b823ae1372",
+      "responseSha256": "e3f91a55f94580c9db877ad2873af8909f09098eb7503db099dfe0e9bf92d8c7",
+      "code": "connection_secret_expired",
+      "expectedStatus": 422,
+      "expectedCode": "connection_secret_expired"
+    },
+    {
+      "index": 119,
+      "phase": "concurrent_patch_and_rotation_invalidation",
+      "method": "GET",
+      "route": "/api/v1/connections/{id}",
+      "status": 200,
+      "startedAtUtc": "2026-11-06T11:07:20.833Z",
+      "durationMs": 24,
+      "traceId": "ccf01235fe63a91045a63ed2ad284035",
+      "responseSha256": "c57a85ada8c12eccba45a8a5abebc2128d6d9305a67fce4c2318713bec71d5fc",
+      "state": "DRAFT",
+      "expectedStatus": 200
+    },
+    {
+      "index": 120,
+      "phase": "concurrent_patch_and_rotation_invalidation",
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/test",
+      "status": "TEST_OK",
+      "startedAtUtc": "2026-11-06T11:07:20.857Z",
+      "durationMs": 36,
+      "traceId": "d0b72635f486205e06caf621eed52143",
+      "responseSha256": "3cb69d1da39814adf08b888a2923b9956e60390905bc06eb9380c535a04b7bcc",
+      "expectedStatus": 200
+    },
+    {
+      "index": 121,
+      "phase": "concurrent_patch_and_rotation_invalidation",
+      "method": "GET",
+      "route": "/api/v1/connections/{id}",
+      "status": 200,
+      "startedAtUtc": "2026-11-06T11:07:20.893Z",
+      "durationMs": 26,
+      "traceId": "60288edabea9209268fefa408028aad4",
+      "responseSha256": "d477cf85523ddc035049d114aa6ce828d14bb6d81a2ab0a8f26c64a8b224b02b",
+      "state": "DRAFT",
+      "expectedStatus": 200
+    },
+    {
+      "index": 122,
+      "phase": "concurrent_patch_and_rotation_invalidation",
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/enable",
+      "status": 200,
+      "startedAtUtc": "2026-11-06T11:07:20.920Z",
+      "durationMs": 41,
+      "traceId": "b9a1309bd0ff0ecf90d7c0b85a55b60a",
+      "responseSha256": "85168d4f9a687196e7956336bd60bb03f22b94415b8dad1a71511e717ea2f4b3",
+      "state": "ACTIVE"
+    },
+    {
+      "index": 123,
+      "phase": "concurrent_patch_and_rotation_invalidation",
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/enable",
+      "status": 409,
+      "startedAtUtc": "2026-11-06T11:07:20.920Z",
+      "durationMs": 42,
+      "traceId": "5e9e68e3e581c078eb5448f89f61971d",
+      "responseSha256": "141575bc2ef970765c00ac979a190c9fd3d01ea3f58a2f979f577cd225c38534",
+      "code": "connection_version_conflict"
+    },
+    {
+      "index": 124,
+      "phase": "concurrent_patch_and_rotation_invalidation",
+      "method": "GET",
+      "route": "/api/v1/connections/{id}",
+      "status": 200,
+      "startedAtUtc": "2026-11-06T11:07:20.962Z",
+      "durationMs": 25,
+      "traceId": "b6f624990ce4bc8d34f392be7887b105",
+      "responseSha256": "a7a82ef45dbfb54be3790824c94fa4ea5820895926c16c6c544f07c4813c70b5",
+      "state": "ACTIVE",
+      "expectedStatus": 200
+    },
+    {
+      "index": 125,
+      "phase": "concurrent_patch_and_rotation_invalidation",
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/enable",
+      "status": 409,
+      "startedAtUtc": "2026-11-06T11:07:20.988Z",
+      "durationMs": 25,
+      "traceId": "53c48fa39d981e550dd8355142a4b13f",
+      "responseSha256": "d22f1468300bb4a4f242f11ba83d0e3cf0559770dcd614d1c9b1541293b1f25d",
+      "code": "connection_version_conflict",
+      "expectedStatus": 409,
+      "expectedCode": "connection_version_conflict"
+    },
+    {
+      "index": 126,
+      "phase": "concurrent_patch_and_rotation_invalidation",
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/disable",
+      "status": 409,
+      "startedAtUtc": "2026-11-06T11:07:21.013Z",
+      "durationMs": 25,
+      "traceId": "165d9c26ad05569de33de4d7128af9d2",
+      "responseSha256": "ff5f0dacdc4be1e8c1eb5c3aec98505b07f7b8f55297a79c56e6e26e7843bc41",
+      "code": "connection_version_conflict",
+      "expectedStatus": 409,
+      "expectedCode": "connection_version_conflict"
+    },
+    {
+      "index": 127,
+      "phase": "disable_and_current_authorization",
+      "method": "GET",
+      "route": "/api/v1/connections/{id}",
+      "status": 200,
+      "startedAtUtc": "2026-11-06T11:07:21.038Z",
+      "durationMs": 26,
+      "traceId": "a955c76d3023962981dd443b960aaf3b",
+      "responseSha256": "a7a82ef45dbfb54be3790824c94fa4ea5820895926c16c6c544f07c4813c70b5",
+      "state": "ACTIVE",
+      "expectedStatus": 200
+    },
+    {
+      "index": 128,
+      "phase": "disable_and_current_authorization",
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/disable",
+      "status": 200,
+      "startedAtUtc": "2026-11-06T11:07:21.065Z",
+      "durationMs": 26,
+      "traceId": "a7c80c6903df42071ae79d19d49e00ed",
+      "responseSha256": "df1f4d28b572998a37887f5051865fbc8f23ab5493ddfc888b5ae6f2faf3d0b8",
+      "state": "DISABLED"
+    },
+    {
+      "index": 129,
+      "phase": "disable_and_current_authorization",
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/disable",
+      "status": 409,
+      "startedAtUtc": "2026-11-06T11:07:21.065Z",
+      "durationMs": 27,
+      "traceId": "3bc678f62f980f15f5b88a17c8c8a295",
+      "responseSha256": "21631534c5ecfbd3b2100a224e54a6f97c4dbc964cd6242f50c5d2b3d48c46f4",
+      "code": "connection_version_conflict"
+    },
+    {
+      "index": 130,
+      "phase": "disable_and_current_authorization",
+      "method": "GET",
+      "route": "/api/v1/connections/{id}",
+      "status": 200,
+      "startedAtUtc": "2026-11-06T11:07:21.093Z",
+      "durationMs": 25,
+      "traceId": "20833aed6b600442e7198447a68e6d1c",
+      "responseSha256": "653eca5cd4d086715f32677a9ad361fbba85b3742c946fb78816d30bde45ae43",
+      "state": "DISABLED",
+      "expectedStatus": 200
+    },
+    {
+      "index": 131,
+      "phase": "disable_and_current_authorization",
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/test",
+      "status": 409,
+      "startedAtUtc": "2026-11-06T11:07:21.118Z",
+      "durationMs": 25,
+      "traceId": "73b76ea0533009a3b4f7021c145cb3a5",
+      "responseSha256": "0944d89fe0823b6cb9aec71b574fa23944f2c6ca7ddfc04bfbbe92bf28baf0b8",
+      "code": "connection_disabled",
+      "expectedStatus": 409,
+      "expectedCode": "connection_disabled"
+    },
+    {
+      "index": 132,
+      "phase": "disable_and_current_authorization",
+      "method": "POST",
+      "route": "/api/v1/connections/{id}/discoveries",
+      "status": 409,
+      "startedAtUtc": "2026-11-06T11:07:21.143Z",
+      "durationMs": 25,
+      "traceId": "58779fdf893812c3fa4b2dee853de394",
+      "responseSha256": "dcd977a8d9c1d6d8fc396f1f8b70aed70b3e15cd339ac00ac1749dea1c43c74c",
+      "code": "connection_probe_stale",
+      "expectedStatus": 409,
+      "expectedCode": "connection_probe_stale"
+    },
+    {
+      "index": 133,
+      "phase": "disable_and_current_authorization",
+      "method": "GET",
+      "route": "/api/v1/connections/{id}/catalogs",
+      "status": 403,
+      "startedAtUtc": "2026-11-06T11:07:21.168Z",
+      "durationMs": 27,
+      "traceId": "fe7232fbb0e9858e074bbc50fc0f0ec2",
+      "responseSha256": "ac3658666b0dfa67c290e265b99e55324652b87c2108f86deb65c097071fbb67",
+      "code": "catalog_access_forbidden",
+      "expectedStatus": 403,
+      "expectedCode": "catalog_access_forbidden"
+    },
+    {
+      "index": 134,
+      "phase": "disable_and_current_authorization",
+      "method": "GET",
+      "route": "/api/v1/catalogs/{id}",
+      "status": 403,
+      "startedAtUtc": "2026-11-06T11:07:21.195Z",
+      "durationMs": 26,
+      "traceId": "145505d55fdbb0d56ceab20b699e7fcf",
+      "responseSha256": "eecbfb192dbd4280ceefbc607cb490facf78ce3cc51736865682f8838859194a",
+      "code": "catalog_access_forbidden",
+      "expectedStatus": 403,
+      "expectedCode": "catalog_access_forbidden"
+    }
+  ],
+  "fixtures": {
+    "connectionId": "d0aa1efb193a47bfa53ac00b85aebe9b",
+    "probeId": "cc9ad32c5f604208b291793e1a70e4c3",
+    "jobId": "6d68949cca9f4749b1a04a2b52251b63",
+    "snapshotId": "96cec0bc1e1e4c97905bc16047a03bd5",
+    "finalConnectionState": "DISABLED"
+  },
+  "requirements": {
+    "M1-P07": [
+      "Actual other-organization identity; natural 10-minute SecretRef expiry; controlled revoked-reference witness. Invalid purpose cannot be issued through public intake."
+    ],
+    "M1-P08": [
+      "Master scans ordinary logs, Trace, ZIP and browser storage separately; this runner only scans actual HTTP responses in memory."
+    ],
+    "M1-P09": [
+      "Change synthetic source password and prove old physical credentials cannot be reused; version increment alone does not prove pool eviction."
+    ],
+    "M1-P14": [
+      "Correlate denied post-disable requests with source-side absence of I/O; HTTP rejection alone does not prove no adapter call."
+    ],
+    "M1-E03": [
+      "Source DDL plus immutable stored snapshot witness, beyond repeated equal-content fingerprint."
+    ],
+    "M1-E06": [
+      "Hold real catalog work; persist cancel and observe Npgsql cancellation. Kill exact task API during RUNNING; restart after 30-second lease and verify fence/attempt from private platform DB."
+    ],
+    "M1-E07": [
+      "Inject failure only into Governance audit INSERT while Connections writes remain possible; verify transaction rollback through HTTP and private task DB. Do not replace with total DB outage."
+    ],
+    "M1-E08": [
+      "Master applies authorized no-row DDL on production.heat_event and compares old/new immutable DB snapshots with actual projected STALE read."
+    ],
+    "M1-R04": [
+      "Separate authorized G3 actual regression entry; this driver never writes G3 or publishes releases."
+    ]
+  },
+  "runId": "b-continue-20261106-37",
+  "scenario": "baseline",
+  "driverSha256": "c98e018d1748a3bb57a2ee70e71574633a1616e238528eb2f45c02aba83281eb",
+  "publicSourceConfigSha256": "c765d365fac6db8866d64acdd42ad007069faa5ea9508cbfbcdee47f0e4d05ed",
+  "completedAtUtc": "2026-11-06T11:07:21.447Z",
+  "exitCode": 2
+}

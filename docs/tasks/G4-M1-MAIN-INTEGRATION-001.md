@@ -234,3 +234,12 @@ Run36 / Ta789cdd93ed3544603521e4edc91a9b11d4b30fd：R1/R2独立通过，严格�
 I07恢复已完成后发生适配IndexError：既有readback718手动guard.__exit__()未传参数，新恢复代码末尾无条件exc[0]访问空tuple。正式pause68926的end先写，真实unpause0、guard-15及同代际Running/非Paused均确认；该end的PASS只表示恢复，不能解释整个调用成功。原I07保持BLOCKED，I08未执行。仅runtime新增两行：API原分支后将无参退出规范为sys.exc_info()；guard尚未创建且未发pause时返回False，保留进入原异常。readback/API原路径不变。新增无参finally与进入失败回归，旧13失败→新3测试方法通过（36退出组合+2进入失败）；两次同容器真实短诊断验证正常退出和原ValueError保留。已审候选应用后82任务测试33.917秒exit0，source hash与独立Review一致；新完整SelfTest安排在冻结T37的正式I01，不复用Run36通过结果。
 
 本轮失败收尾11对象/16命令/准确缺席与独立实时后验通过，KEEP3网8卷保持；59合成秘密模式16801项无发现。四副本26919文件512583852逻辑字节准确删除，FD全释放时允许空子集、有占用仍绑定VM55349完整身份及冻结只读FD集合，不操作VM，事故KEEP不变。monitor34438已精确释放；原失败、私有原件、候选和946项公开产物/70项UTF8封装保持。下一稳定Run37完整重新验收；证据选择149关键项，15MiB不变，无V3/main/M2。
+
+
+Run37 / T79d1d42f43e8e7da23e905da18a374037b6b22a3：严格离线R2通过，完整SelfTest464.402秒、82任务测试、native/Web通过；I02四模块462案例/G3兼容/Security156/G2Contract121及I04/I05通过。I06与263投影原始日志获独立Review，历史260与当前skip并集436/436真实闭合，I01/I03后置PASS。原暂停恢复/无参退出已通过本轮实际超时路径。
+
+I07在source-permission-limited浏览器场景POST202后超时；原BLOCKED不改。准确原job350ms内PARTIAL/catalog_permission_limited、无snapshot、源ACL已恢复。实际CatalogPanel调度与真实浏览器确定时序证实产品P1：初始目录403递增代际，丢弃已创建任务的202，未保存job URL/恢复入口。原正式失败未捕获精确网络顺序，不能倒推补造；自然短诊断成功与确定调度失败均保留。确定调度只延迟准确真实403/202原字节，ACLtrue→false→true，独立后验与输入绑定通过。
+
+只在ignored提案目录准备catalog.tsx及connections.test.ts两文件补丁：初始history/job读取owner互锁，保留代际/撤权/操作owner；新初读反例原代码4RED，隔离候选23文件385测试、类型/lint零错误，非作者限定Review PASS。产品文件未修改；待批精确补丁SHA4a9735481c2dfeae38dae68a0924d18695c74ada247d7cd8f2d175ea2f3c3293，详情见本Run PRODUCT-P1-SCOPE-REQUEST.md。I08及补充并发回归均未运行，不标完整验收或READY。
+
+失败收尾11对象/16命令准确删除，实时独立核对KEEP3网8卷不变、M1入口2477 Exec实际退出；59已知模式17680项扫描无发现。四工具副本27064文件516938419逻辑字节按VM95205/707只读FD计划删除，事故KEEP保持，不操作VM、物理释放NOT_VERIFIED；monitor73680准确释放。私有原始资料、失败、恢复映射、分支/工作树KEEP。15MiB硬限制保持，无新V3/main/M2。

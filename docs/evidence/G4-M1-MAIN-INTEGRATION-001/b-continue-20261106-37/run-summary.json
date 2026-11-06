@@ -1,0 +1,83 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261106-37",
+  "testedCommit": "79d1d42f43e8e7da23e905da18a374037b6b22a3",
+  "status": "WAITING_FOR_EXACT_TWO_FILE_PRODUCT_WRITE_APPROVAL",
+  "gates": {
+    "I01": {
+      "status": "PASS",
+      "receipt": "gate-I01-closure.json",
+      "sha256": "96e1c740edbd1100056ef3d6926ad02238df862a2d655cd2ed9cb7382f6f0c9a"
+    },
+    "I02": {
+      "status": "PASS",
+      "receipt": "gate-I02.json",
+      "sha256": "725ac146493dcf41fd150b26e7e5c7aee926a1f45727020024c15b9701010ea0"
+    },
+    "I03": {
+      "status": "PASS",
+      "receipt": "gate-I03-closure.json",
+      "sha256": "9c333bcf83b542ce3ef6a3bd16432bc21e55779d3c2dcd4abca67751abcf7c24"
+    },
+    "I04": {
+      "status": "PASS",
+      "receipt": "gate-I04.json",
+      "sha256": "1c354a4504bde7f56da54d13a2e22e8ae12dabae6cdabdf4fd13c3569ae09cdc"
+    },
+    "I05": {
+      "status": "PASS",
+      "receipt": "gate-I05.json",
+      "sha256": "ed0bdaf11ad628c3888598facdc61435a58a8768879087ab35d56f59f79ddeb1"
+    },
+    "I06": {
+      "status": "PASS",
+      "receipt": "gate-I06.json",
+      "sha256": "c1b616ebe702cd6eeef20880269fd0b141ecf3651608c262738686c6262e559b"
+    },
+    "I07": {
+      "status": "BLOCKED_WITH_WITNESS",
+      "receipt": "gate-I07.json",
+      "sha256": "ff2905420a57b07c7e7d52009b5566219a53e3e7a1db0af0379b0e9ffca5088b"
+    },
+    "I08": {
+      "status": "NOT_RUN",
+      "reason": "Open product P1 / I07 blocked"
+    }
+  },
+  "originalFailurePreserved": true,
+  "productCandidateApplied": false,
+  "candidatePatchSha256": "4a9735481c2dfeae38dae68a0924d18695c74ada247d7cd8f2d175ea2f3c3293",
+  "candidateValidation": {
+    "scope": "isolated only",
+    "webFiles": 23,
+    "webTests": 385,
+    "typeErrors": 0,
+    "lintErrors": 0,
+    "lintWarnings": 0,
+    "independentReview": "PASS_FOR_SCOPE_REQUEST_ONLY"
+  },
+  "resources": {
+    "dockerDeleted": 11,
+    "dockerKeepNetworks": 3,
+    "dockerKeepVolumes": 8,
+    "toolCopiesDeleted": 4,
+    "toolFiles": 27064,
+    "toolLogicalBytes": 516938419,
+    "physicalBytesFreed": "NOT_VERIFIED",
+    "vm": "NOT_TOUCHED",
+    "privateRecovery": "KEEP",
+    "branchWorktree": "KEEP",
+    "hostMonitor": "RELEASED"
+  },
+  "delivery": {
+    "zipLimitMiB": 15,
+    "newV3": "NOT_RUN",
+    "mainUpdate": "NOT_AUTHORIZED_NOT_EXECUTED",
+    "M2": "NOT_AUTHORIZED_NOT_EXECUTED"
+  },
+  "limitations": [
+    "CI/Windows/Intel NOT_RUN",
+    "AMBER-A1/LICENSE_PARTIAL",
+    "original I07 exact network ordering NOT_VERIFIED; deterministic live P1 reproduced"
+  ]
+}

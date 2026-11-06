@@ -1,0 +1,55 @@
+{
+  "taskId": "G4-M1-MAIN-INTEGRATION-001",
+  "runId": "b-continue-20261106-37",
+  "testedCommit": "79d1d42f43e8e7da23e905da18a374037b6b22a3",
+  "executorSha256": "be5a73f70890700f3e3e2fe97ddc1165b6fc2462d72d431a1b02aa1e530c85dd",
+  "failedGateSha256": "ff2905420a57b07c7e7d52009b5566219a53e3e7a1db0af0379b0e9ffca5088b",
+  "jobs": [
+    {
+      "Id": "720a1c3cc7e24ed7b97535475fd0b540",
+      "Status": "PARTIAL",
+      "DiagnosticCode": "catalog_permission_limited",
+      "CreatedAtUtc": "2026-11-06T11:21:43.18996+00:00",
+      "CompletedAtUtc": "2026-11-06T11:21:43.539703+00:00",
+      "SnapshotId": null,
+      "Attempt": 1,
+      "Fence": 1
+    },
+    {
+      "Id": "a2f12111a72641d69ccf53f72b889880",
+      "Status": "SUCCEEDED",
+      "DiagnosticCode": null,
+      "CreatedAtUtc": "2026-11-06T11:16:18.270998+00:00",
+      "CompletedAtUtc": "2026-11-06T11:16:18.289271+00:00",
+      "SnapshotId": "9895379c10aa4893bdb7d14edc6dbc1f",
+      "Attempt": 1,
+      "Fence": 1
+    },
+    {
+      "Id": "a38f6bb0cf7749afa2f11d2eb6df6269",
+      "Status": "SUCCEEDED",
+      "DiagnosticCode": null,
+      "CreatedAtUtc": "2026-11-06T11:14:10.496712+00:00",
+      "CompletedAtUtc": "2026-11-06T11:14:41.712483+00:00",
+      "SnapshotId": "394f6fd895e244ff9babef67076e98c9",
+      "Attempt": 2,
+      "Fence": 2
+    },
+    {
+      "Id": "377eb18f2eda409981f57802ea84fe98",
+      "Status": "CANCELLED",
+      "DiagnosticCode": "connection_cancelled",
+      "CreatedAtUtc": "2026-11-06T11:12:56.124564+00:00",
+      "CompletedAtUtc": "2026-11-06T11:12:57.210155+00:00",
+      "SnapshotId": null,
+      "Attempt": 1,
+      "Fence": 1
+    }
+  ],
+  "restoredAcl": {
+    "select": true
+  },
+  "sourceRunning": true,
+  "sourcePaused": false,
+  "scope": "Read-only post-failure observation; original I07 remains BLOCKED"
+}
