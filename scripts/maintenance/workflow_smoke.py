@@ -7,6 +7,7 @@ import os
 from pathlib import Path
 import re
 import secrets
+import signal
 import shutil
 import socket
 import subprocess
@@ -109,6 +110,20 @@ def snapshot(root, runtime):
                      'startedAt':row['State']['StartedAt']} for service,row in rows.items()}
 
 
+def bounded_browser(args, root, timeout=180):
+    """超时精确终止本次独立进程组，避免留下浏览器子进程。"""
+    process=subprocess.Popen(args,cwd=root,stdout=subprocess.PIPE,stderr=subprocess.PIPE,start_new_session=True)
+    try:
+        stdout,_=process.communicate(timeout=timeout)
+        return stdout,process.returncode
+    except subprocess.TimeoutExpired:
+        os.killpg(process.pid,signal.SIGTERM)
+        try: stdout,_=process.communicate(timeout=5)
+        except subprocess.TimeoutExpired:
+            os.killpg(process.pid,signal.SIGKILL);stdout,_=process.communicate(timeout=5)
+        return stdout,124
+
+
 def wait_http(url, headers=None, timeout=90):
     opener=urllib.request.build_opener(urllib.request.ProxyHandler({}))
     deadline=time.monotonic()+timeout
@@ -189,7 +204,7 @@ def recipe(root, private, run, output):
 def volume_observation(root, runtime):
     """实测本任务三个数据卷用量；达到3GiB立即停止，不声称硬配额。"""
     sizes={}
-    for service,path in (('pg-source','/var/lib/postgresql'),('platform-pg','/var/lib/postgresql'),('keycloak-test','/opt/keycloak/data')):
+    for service,path in (('pg-source','/var/lib/postgresql'),('platform-pg','/var/lib/postgresql'),('keycloak-test','/opt/keycloak/data'),('api','/keyring')):
         raw=docker(root,'exec',runtime['containerIds'][service],'du','-sk',path,timeout=20).decode()
         sizes[service]=int(raw.split()[0])*1024
     require(sum(sizes.values())<3*1024**3,'VOLUME_STOP_THRESHOLD')
@@ -260,10 +275,11 @@ def smoke(root, task, *, node=None):
         browser_command=[node,str(root/'scripts/maintenance/workflow-smoke.mjs'),str(private/'runtime.json')]
         require(os.uname().sysname=='Darwin' and Path('/usr/bin/sandbox-exec').is_file(),'OFFLINE_OS_BOUNDARY_UNAVAILABLE')
         browser_command=['/usr/bin/sandbox-exec','-p','(version 1) (allow default) (deny network-outbound (remote ip "*:*")) (allow network-outbound (remote ip "localhost:*"))',*browser_command]
-        process=subprocess.run(browser_command,cwd=root,capture_output=True,timeout=180)
-        private_write(evidence/'browser.json',json.loads(process.stdout))
-        result['browserExitCode']=process.returncode
-        report=json.loads(process.stdout);require(process.returncode==0 and report['status']=='PASS' and report['tests']==2,'SMOKE_ASSERTIONS')
+        stdout,code=bounded_browser(browser_command,root)
+        result['browserExitCode']=code
+        report=json.loads(stdout) if stdout.strip() else {'status':'FAIL','reason':'BROWSER_TIMEOUT_OR_EMPTY','tests':0}
+        private_write(evidence/'browser.json',report)
+        require(code==0 and report['status']=='PASS' and report['tests']==2,'SMOKE_ASSERTIONS')
         after=snapshot(root,runtime);require(after==runtime['beforeTopology'],'TOPOLOGY_CHANGED_DURING_SMOKE')
         result.update(status='PASS',productExecution=True,checks=report,topology=after,volumeBytesAfter=volume_observation(root,runtime))
     except (ValueError,OSError,subprocess.SubprocessError) as exc:

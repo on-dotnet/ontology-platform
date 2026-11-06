@@ -4,6 +4,7 @@ import importlib.util
 import json
 from pathlib import Path
 import tempfile
+import sys
 import unittest
 
 ROOT=Path(__file__).resolve().parents[2]
@@ -54,6 +55,14 @@ class SmokeTests(unittest.TestCase):
                 self.smoke.boundary(root.parent/'old-runtime.json',root)
             with self.assertRaisesRegex(ValueError,'LINKED_PATH'):
                 self.smoke.boundary(root/'link/runtime.json',root)
+
+    def test_browser_timeout_has_real_exit_and_no_retry(self):
+        with tempfile.TemporaryDirectory() as directory:
+            raw,code=self.smoke.bounded_browser([sys.executable,'-c','import time; time.sleep(10)'],Path(directory),timeout=.1)
+            self.assertEqual(code,124)
+            raw,code=self.smoke.bounded_browser([sys.executable,'-c','print("safe"); raise SystemExit(7)'],Path(directory),timeout=3)
+            self.assertEqual(code,7)
+            self.assertEqual(raw.strip(),b'safe')
 
     def test_entry_exists(self):
         self.assertTrue(Path(SPEC.origin).is_file(),'short smoke adapter missing')
