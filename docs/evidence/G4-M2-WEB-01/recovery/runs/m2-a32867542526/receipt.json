@@ -1,0 +1,169 @@
+{
+  "taskId": "G4-M2-WEB-01",
+  "runId": "m2-a32867542526",
+  "status": "PASS",
+  "buildBinding": {
+    "api": {
+      "receiptSha256": "a78772e89d6e37c303b0342b0bd7119c0cd438eb9b870225f4068661593479fc",
+      "inputKey": "0e88c807f465ee9ad931659fa2014eb792f89e0b97b8b792953225eebcddf94a",
+      "outputKey": "ecd3e5e4065cd6d3bbdfcf52da729077776d75f6e37d71571102a37cb7768235"
+    },
+    "web": {
+      "receiptSha256": "a7e8c2cb4ba2fd36fa4bcbaddfc148d84fb6e140a5938bb5b68ff91996b7ddbe",
+      "inputKey": "439c389610620588cc76d9b822a3d3e559dff62b98810c104aefd629ef2d288d",
+      "outputKey": "0730acf318856cb38f3f33f1ecb60ac1427f42c1f6adfc6247c72a97326c36ad"
+    }
+  },
+  "tests": 15,
+  "budgetBefore": {
+    "dataBytes": {
+      "platform-pg": 48857088,
+      "keycloak-test": 193433600,
+      "api": 4096
+    },
+    "privateAndOutputBytes": 46597,
+    "dataStopBytes": 3221225472,
+    "outputStopBytes": 1073741824
+  },
+  "browserExitCode": 0,
+  "budgetAfter": {
+    "dataBytes": {
+      "platform-pg": 49315840,
+      "keycloak-test": 193822720,
+      "api": 4096
+    },
+    "privateAndOutputBytes": 47616,
+    "dataStopBytes": 3221225472,
+    "outputStopBytes": 1073741824
+  },
+  "relayCloseout": {
+    "connections": 22,
+    "active": 0,
+    "failures": []
+  },
+  "containerIds": {
+    "web-source": "02aeb3f338f9927337813e183eafc9cd240d25c1e1d151ebaa56c21bef5a8be9",
+    "platform-pg": "30a54bc4402284576418db993d337dec3d32fd5b90721747aff2d2ada163b637",
+    "keycloak-test": "5c6a06cb087ca229c99d595f6ccaa4b2220bf7f5fac07f4a4bc0a624e23666d7",
+    "api": "3e767c67302eb1c2ffbdd219ba1fa14b2fdc17db5de75f3d405dbaa8786fce9e",
+    "web": "3786a6d032ab50d75b5818a89c60e4860076a24d1d06fbbaef454ad8903fd1c9"
+  },
+  "cleanup": [
+    {
+      "kind": "container",
+      "id": "02aeb3f338f9927337813e183eafc9cd240d25c1e1d151ebaa56c21bef5a8be9",
+      "before": true,
+      "command": "docker rm -f exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "container",
+      "id": "30a54bc4402284576418db993d337dec3d32fd5b90721747aff2d2ada163b637",
+      "before": true,
+      "command": "docker rm -f exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "container",
+      "id": "5c6a06cb087ca229c99d595f6ccaa4b2220bf7f5fac07f4a4bc0a624e23666d7",
+      "before": true,
+      "command": "docker rm -f exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "container",
+      "id": "3e767c67302eb1c2ffbdd219ba1fa14b2fdc17db5de75f3d405dbaa8786fce9e",
+      "before": true,
+      "command": "docker rm -f exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "container",
+      "id": "3786a6d032ab50d75b5818a89c60e4860076a24d1d06fbbaef454ad8903fd1c9",
+      "before": true,
+      "command": "docker rm -f exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "volume",
+      "id": "ontology-workflow-m2-a32867542526_api-keyring",
+      "before": true,
+      "command": "docker volume rm exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "volume",
+      "id": "ontology-workflow-m2-a32867542526_keycloak-data",
+      "before": true,
+      "command": "docker volume rm exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "volume",
+      "id": "ontology-workflow-m2-a32867542526_platform-data",
+      "before": true,
+      "command": "docker volume rm exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "network",
+      "id": "ontology-workflow-m2-a32867542526_front",
+      "before": true,
+      "command": "docker network rm exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "network",
+      "id": "ontology-workflow-m2-a32867542526_source",
+      "before": true,
+      "command": "docker network rm exact-id",
+      "afterAbsent": true
+    }
+  ],
+  "apiLogSummary": {
+    "bytes": 18623,
+    "sha256": "df9f981fa1133cd0a5de6290c946e3638472b5fc974b160a63c4d692093e46e1",
+    "exceptionTypes": []
+  },
+  "webLogSummary": {
+    "bytes": 141,
+    "sha256": "505083df7bd8a0c90ef7162b1d39463bf0c43f024ecf302634e4e31059771037",
+    "exceptionTypes": []
+  },
+  "sourceStats": {
+    "requests": 27,
+    "authRejected": 0,
+    "aborted": 5,
+    "connections": 27,
+    "closedSockets": 27,
+    "sni": [
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source"
+    ]
+  }
+}

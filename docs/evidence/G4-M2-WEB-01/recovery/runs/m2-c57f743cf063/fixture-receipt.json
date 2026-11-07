@@ -1,0 +1,44 @@
+{
+  "taskId": "G4-M2-WEB-01",
+  "runId": "m2-c57f743cf063",
+  "status": "FAIL",
+  "containerIds": [
+    "841110aefe323cac5792956f2bda7a7dd611728f529a15f5af0f690ca404386d",
+    "0464900460b35661d6f20f3b3ed149630f3f08280e64fa7d26e604754bde5868"
+  ],
+  "networkId": "48e34b3709325d621c386b69dc61567d1ac36162d8eb4631cffd1d72908c6d3c",
+  "tests": [
+    {
+      "category": "RealWebFixture",
+      "exitCode": 2,
+      "seconds": 2.2767052090202924,
+      "minimumExpected": 12,
+      "logSha256": "9afc20e9e12ff5ff9e4aee77dade650086341b80fc1b7683a8828f41015582db"
+    }
+  ],
+  "privateRuntime": "/Users/chasen/.codex/worktrees/g4-m2-web-01/ontology-platform/.tools/security/g4-m2-web-01/m2-c57f743cf063",
+  "cleanup": [
+    {
+      "id": "0464900460b35661d6f20f3b3ed149630f3f08280e64fa7d26e604754bde5868",
+      "before": true,
+      "command": "docker rm -f exact-id",
+      "result": "0464900460b35661d6f20f3b3ed149630f3f08280e64fa7d26e604754bde5868",
+      "afterAbsent": true
+    },
+    {
+      "id": "841110aefe323cac5792956f2bda7a7dd611728f529a15f5af0f690ca404386d",
+      "before": true,
+      "command": "docker rm -f exact-id",
+      "result": "841110aefe323cac5792956f2bda7a7dd611728f529a15f5af0f690ca404386d",
+      "afterAbsent": true
+    },
+    {
+      "id": "48e34b3709325d621c386b69dc61567d1ac36162d8eb4631cffd1d72908c6d3c",
+      "before": true,
+      "command": "docker network rm exact-id",
+      "afterAbsent": true
+    }
+  ],
+  "reason": "REAL_TEST_FAILED: RealWebFixture",
+  "privateRuntimeDisposition": "KEEP: task-owned credentials excluded from ZIP; required until final lifecycle review"
+}

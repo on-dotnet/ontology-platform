@@ -1,0 +1,85 @@
+{
+  "buildBinding": {
+    "receiptSha256": "6c8a3caa2b3296bb17aad92950fd274cc3a58dd4e9c156a686ea68d89bb00765",
+    "inputKey": "0e88c807f465ee9ad931659fa2014eb792f89e0b97b8b792953225eebcddf94a",
+    "outputKey": "ec7f9b5a2e77df597435ca34a48ee91492eec47bc5256459c31479556292ea23"
+  },
+  "taskId": "G4-M2-WEB-01",
+  "runId": "m2-f28cfacc77ca",
+  "status": "PASS",
+  "containerIds": [
+    "8afcbb864d8cdf9981ec97a86aa26b3fa5df489a9b5a95f95d42372b989bb234",
+    "aef301666bc41e047369cf115af9ea69f11ddc324822b0cac54e478cdadd4463",
+    "e55fecd3c9f7e4a50058ad5abbc14a8c59e5539e64fb942adafd238a2d2e9ebe"
+  ],
+  "networkId": "7470cc7813f8f78227c942805652e4a9b99770adc684b2707b2487ff476a69f6",
+  "tests": [
+    {
+      "category": "RealWebFixture",
+      "exitCode": 0,
+      "seconds": 1.1927376249805093,
+      "minimumExpected": 12,
+      "logSha256": "a3d6918a3d10d3c1a1133efa444999e00d17e454eb069e461f79be61169ca70e"
+    },
+    {
+      "category": "RealWebDnsRejection",
+      "exitCode": 0,
+      "seconds": 1.203933999990113,
+      "minimumExpected": 1,
+      "logSha256": "de73c0a20a9185681ffa539684a7e524ae0ead95de18bc2ebf9a7e5b50a09674"
+    }
+  ],
+  "privateRuntime": "/Users/chasen/.codex/worktrees/g4-m2-web-01/ontology-platform/.tools/security/g4-m2-web-01/m2-f28cfacc77ca",
+  "cleanup": [
+    {
+      "id": "e55fecd3c9f7e4a50058ad5abbc14a8c59e5539e64fb942adafd238a2d2e9ebe",
+      "before": true,
+      "command": "docker rm -f exact-id",
+      "result": "e55fecd3c9f7e4a50058ad5abbc14a8c59e5539e64fb942adafd238a2d2e9ebe",
+      "afterAbsent": true
+    },
+    {
+      "id": "aef301666bc41e047369cf115af9ea69f11ddc324822b0cac54e478cdadd4463",
+      "before": true,
+      "command": "docker rm -f exact-id",
+      "result": "aef301666bc41e047369cf115af9ea69f11ddc324822b0cac54e478cdadd4463",
+      "afterAbsent": true
+    },
+    {
+      "id": "8afcbb864d8cdf9981ec97a86aa26b3fa5df489a9b5a95f95d42372b989bb234",
+      "before": true,
+      "command": "docker rm -f exact-id",
+      "result": "8afcbb864d8cdf9981ec97a86aa26b3fa5df489a9b5a95f95d42372b989bb234",
+      "afterAbsent": true
+    },
+    {
+      "id": "7470cc7813f8f78227c942805652e4a9b99770adc684b2707b2487ff476a69f6",
+      "before": true,
+      "command": "docker network rm exact-id",
+      "afterAbsent": true
+    }
+  ],
+  "sourceStats": {
+    "requests": 11,
+    "authRejected": 1,
+    "aborted": 1,
+    "connections": 13,
+    "closedSockets": 13,
+    "sni": [
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source"
+    ]
+  },
+  "privateRuntimeDisposition": "KEEP: task-owned credentials excluded from ZIP; required until final lifecycle review"
+}

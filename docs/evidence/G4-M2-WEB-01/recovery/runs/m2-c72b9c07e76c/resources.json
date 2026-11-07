@@ -1,0 +1,49 @@
+{
+  "taskId": "G4-M2-WEB-01",
+  "runId": "m2-c72b9c07e76c",
+  "engine": {
+    "id": "7a8785bb-6b6e-4ae4-8065-996f4bf83016",
+    "version": "29.9.2",
+    "context": "desktop-linux"
+  },
+  "phase": "CREATED",
+  "containerIds": {
+    "web-source": "4b2c36001c58c235afc262b113c263408634ed482953432fdb471022228fe37e",
+    "platform-pg": "fb9f975606d14a90026128f75fbb2264050e78a12564a85e73240c29a7bbff0f",
+    "keycloak-test": "00a5111c19558e7309fe2228f2711de6b5f47f730f427945f22a582676177e7a",
+    "api": "7655010e6401e61e09aa2fff9133044430cba50bc5ed96651f3856a9af86ce0e",
+    "web": "b9f21f1cd5cb09c69cb3420047986d7a4029130306269c060e924142e2af531e"
+  },
+  "volumes": {
+    "api-keyring": {
+      "expectedName": "ontology-workflow-m2-c72b9c07e76c_api-keyring",
+      "observation": "OBSERVED",
+      "identity": "ontology-workflow-m2-c72b9c07e76c_api-keyring"
+    },
+    "keycloak-data": {
+      "expectedName": "ontology-workflow-m2-c72b9c07e76c_keycloak-data",
+      "observation": "OBSERVED",
+      "identity": "ontology-workflow-m2-c72b9c07e76c_keycloak-data"
+    },
+    "platform-data": {
+      "expectedName": "ontology-workflow-m2-c72b9c07e76c_platform-data",
+      "observation": "OBSERVED",
+      "identity": "ontology-workflow-m2-c72b9c07e76c_platform-data"
+    }
+  },
+  "networks": {
+    "front": {
+      "expectedName": "ontology-workflow-m2-c72b9c07e76c_front",
+      "observation": "OBSERVED",
+      "identity": "dbb280ef997f39c60dcf61fc8c7d3554bb35cc42ec121a16a1e58f47c9dc7519"
+    },
+    "source": {
+      "expectedName": "ontology-workflow-m2-c72b9c07e76c_source",
+      "observation": "OBSERVED",
+      "identity": "50a3144b7b33d1e3882a79b4283189ad9154364595a174150305f62425427c9b"
+    }
+  },
+  "decision": "KEEP_UNTIL_REVIEWED_CLOSEOUT",
+  "privateRuntime": "/Users/chasen/.codex/worktrees/g4-m2-web-01/ontology-platform/.tools/security/g4-m2-web-01/m2-c72b9c07e76c/runtime.json",
+  "recipeSha256": "306d25b0cc1b48b7e155bea034aa2c55fe9c6562cc1310e39a02098a750999da"
+}

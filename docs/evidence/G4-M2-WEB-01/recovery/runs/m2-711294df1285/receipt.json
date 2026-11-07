@@ -1,0 +1,126 @@
+{
+  "taskId": "G4-M2-WEB-01",
+  "runId": "m2-711294df1285",
+  "status": "FAIL",
+  "buildBinding": {
+    "inputKey": "32f27bd43b85e3c367e8db6ef7818acfd6705d32228c3b6585d3c0a2218d9025",
+    "receiptSha256": "3773038b5c6908ef6907dd7532e2a3aecdf0a25442b8736c3c895406bea05a33",
+    "outputKey": "936d70059679a64ea477ebd6eec8f092374302f5595dcb30f93adb05a9264bce"
+  },
+  "tests": 7,
+  "browserExitCode": 1,
+  "reason": "M2_BROWSER_FAILED",
+  "relayCloseout": {
+    "connections": 20,
+    "active": 0,
+    "failures": []
+  },
+  "containerIds": {
+    "web-source": "bfe744ac45f88220152e0db42a4eff5843703694deedbe2b74779df9e06bfd41",
+    "platform-pg": "d956d2b1383ef9e883b48afc79c16352db7d3fa5907799ac4f24212f8bfea2f1",
+    "keycloak-test": "68ef9c57a2eee2ddbfc80cc5d8d2d67916defd1e13154ded7a3c73e50205e5c8",
+    "api": "9b0b615e68e0ba814d43123512c4aa7cf669957791aa5477c896c9567b6987c2",
+    "web": "b270126250c87150eb194f392bb9bee8ce9ae7f2500d3e9f94b3c9fd4b21cf02"
+  },
+  "cleanup": [
+    {
+      "kind": "container",
+      "id": "bfe744ac45f88220152e0db42a4eff5843703694deedbe2b74779df9e06bfd41",
+      "before": true,
+      "command": "docker rm -f exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "container",
+      "id": "d956d2b1383ef9e883b48afc79c16352db7d3fa5907799ac4f24212f8bfea2f1",
+      "before": true,
+      "command": "docker rm -f exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "container",
+      "id": "68ef9c57a2eee2ddbfc80cc5d8d2d67916defd1e13154ded7a3c73e50205e5c8",
+      "before": true,
+      "command": "docker rm -f exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "container",
+      "id": "9b0b615e68e0ba814d43123512c4aa7cf669957791aa5477c896c9567b6987c2",
+      "before": true,
+      "command": "docker rm -f exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "container",
+      "id": "b270126250c87150eb194f392bb9bee8ce9ae7f2500d3e9f94b3c9fd4b21cf02",
+      "before": true,
+      "command": "docker rm -f exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "volume",
+      "id": "ontology-workflow-m2-711294df1285_api-keyring",
+      "before": true,
+      "command": "docker volume rm exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "volume",
+      "id": "ontology-workflow-m2-711294df1285_keycloak-data",
+      "before": true,
+      "command": "docker volume rm exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "volume",
+      "id": "ontology-workflow-m2-711294df1285_platform-data",
+      "before": true,
+      "command": "docker volume rm exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "network",
+      "id": "ontology-workflow-m2-711294df1285_front",
+      "before": true,
+      "command": "docker network rm exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "network",
+      "id": "ontology-workflow-m2-711294df1285_source",
+      "before": true,
+      "command": "docker network rm exact-id",
+      "afterAbsent": true
+    }
+  ],
+  "apiLogSummary": {
+    "bytes": 7931,
+    "sha256": "63c6d3aa8cad3371a5ade1a456bc00e6b6f60a971fd7e815487a3ae8774ea327",
+    "exceptionTypes": []
+  },
+  "webLogSummary": {
+    "bytes": 141,
+    "sha256": "b5a51bd4f0b2f68a8d9f829bb874969c459397bbd0a3e749ef1552e83b593763",
+    "exceptionTypes": []
+  },
+  "sourceStats": {
+    "requests": 10,
+    "authRejected": 0,
+    "aborted": 0,
+    "connections": 10,
+    "closedSockets": 10,
+    "sni": [
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source"
+    ]
+  }
+}

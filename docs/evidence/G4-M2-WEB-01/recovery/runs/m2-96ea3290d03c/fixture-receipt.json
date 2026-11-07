@@ -1,0 +1,36 @@
+{
+  "taskId": "G4-M2-WEB-01",
+  "runId": "m2-96ea3290d03c",
+  "status": "FAIL",
+  "containerIds": [
+    "7bfc3abe18b6fd2074ff83e7c83c60f8670201f6f345e705b1455deabdaed4ab",
+    "a3223049d2517c23fa3b80dad0c21c7046ed9baa5cd18256bde63cf109245c65"
+  ],
+  "networkId": "e980d9c3caeec4660d4de2d68467798b59646eed9cf060276033179a7f29710e",
+  "tests": [],
+  "privateRuntime": "/Users/chasen/.codex/worktrees/g4-m2-web-01/ontology-platform/.tools/security/g4-m2-web-01/m2-96ea3290d03c",
+  "cleanup": [
+    {
+      "id": "a3223049d2517c23fa3b80dad0c21c7046ed9baa5cd18256bde63cf109245c65",
+      "before": true,
+      "command": "docker rm -f exact-id",
+      "result": "a3223049d2517c23fa3b80dad0c21c7046ed9baa5cd18256bde63cf109245c65",
+      "afterAbsent": true
+    },
+    {
+      "id": "7bfc3abe18b6fd2074ff83e7c83c60f8670201f6f345e705b1455deabdaed4ab",
+      "before": true,
+      "command": "docker rm -f exact-id",
+      "result": "7bfc3abe18b6fd2074ff83e7c83c60f8670201f6f345e705b1455deabdaed4ab",
+      "afterAbsent": true
+    },
+    {
+      "id": "e980d9c3caeec4660d4de2d68467798b59646eed9cf060276033179a7f29710e",
+      "before": true,
+      "command": "docker network rm exact-id",
+      "afterAbsent": true
+    }
+  ],
+  "reason": "Command '['docker', '--context', 'desktop-linux', 'wait', 'a3223049d2517c23fa3b80dad0c21c7046ed9baa5cd18256bde63cf109245c65']' timed out after 55 seconds",
+  "privateRuntimeDisposition": "KEEP: task-owned credentials excluded from ZIP; required until final lifecycle review"
+}

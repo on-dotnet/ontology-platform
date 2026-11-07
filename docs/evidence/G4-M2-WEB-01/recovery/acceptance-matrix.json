@@ -1,0 +1,79 @@
+{
+  "taskId": "G4-M2-WEB-01",
+  "testedCommit": "325bd87fe5e67fa8137176461800651de5bb1b08",
+  "rows": [
+    {
+      "kind": "unit",
+      "status": "PASS",
+      "tests": 29,
+      "skipped": 0,
+      "execution": "FRESH original; gate REUSED with FRESH qualification",
+      "proof": {
+        "path": "docs/evidence/G4-M2-WEB-01/recovery/local/unit-current.json",
+        "sha256": "4a6c9656dd6468d0e15145155fd41980857fb93a7a8c9a5102be292fa8ff8a15"
+      }
+    },
+    {
+      "kind": "wire",
+      "status": "PASS",
+      "tests": 16,
+      "skipped": 0,
+      "execution": "FRESH original; gate REUSED with FRESH qualification",
+      "proof": {
+        "path": "docs/evidence/G4-M2-WEB-01/recovery/local/wire-current.json",
+        "sha256": "5992100fd2d92bb5d3fdbfbed2d6973a2e9ade7b5194b9678ddda80917edc347"
+      }
+    },
+    {
+      "kind": "ui",
+      "status": "PASS",
+      "tests": 119,
+      "skipped": 0,
+      "execution": "FRESH original; gate REUSED with FRESH qualification",
+      "proof": {
+        "path": "docs/evidence/G4-M2-WEB-01/recovery/local/ui-current.json",
+        "sha256": "c9ca49b4b79df2dd8e761d5f87dfffdb89b8433ecfa65fcc85bf3cb242f12ecd"
+      }
+    },
+    {
+      "kind": "https",
+      "status": "PASS",
+      "tests": 13,
+      "skipped": 0,
+      "execution": "FRESH original; gate REUSED with FRESH qualification",
+      "proof": {
+        "path": "docs/evidence/G4-M2-WEB-01/recovery/runs/m2-5e5a2f7a62de/fixture-receipt.json",
+        "sha256": "12477aed59a1db563fb775374dd84f0450acc0269551fae9d75d16240dca981e"
+      }
+    },
+    {
+      "kind": "pg",
+      "status": "PASS",
+      "tests": 1,
+      "skipped": 0,
+      "execution": "FRESH original; gate REUSED with FRESH qualification",
+      "proof": {
+        "path": "docs/evidence/G4-M2-WEB-01/recovery/runs/m2-beb513edec23/pg-receipt.json",
+        "sha256": "50456d873f58b6bec46069df7b295a6f708198553358c19774a9ceaf37ce8946"
+      }
+    },
+    {
+      "kind": "smoke",
+      "status": "PASS",
+      "tests": 19,
+      "skipped": 0,
+      "execution": "FRESH original; gate REUSED with FRESH qualification",
+      "proof": {
+        "path": "docs/evidence/G4-M2-WEB-01/recovery/runs/m2-c72b9c07e76c/receipt.json",
+        "sha256": "df8f06832fabcb77e1a9e14d0bef2ac1b32310b92e2b87034524091925206078"
+      }
+    }
+  ],
+  "notRun": [
+    "GitHub CI",
+    "Windows",
+    "Intel Mac",
+    "M1 unrelated full acceptance"
+  ],
+  "scope": "Only approved synthetic fixed Web GET API_KEY_REF; no general public-origin support"
+}

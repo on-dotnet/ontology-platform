@@ -1,0 +1,80 @@
+{
+  "taskId": "G4-M2-WEB-01",
+  "runId": "m2-0edf40dfce9e",
+  "status": "PASS",
+  "containerIds": [
+    "607c8e629f4b18eaecf5a5501bbb745d06a8f49ce86055b546e70e63ca08a81e",
+    "22ad7892092d36b4fc64a1f79df1afb90a8d9080c305b4693158f797b98f8784",
+    "16a4efb57042eeb17a3aea4e0b21b78019e1a29add4df0d3d1784c0c52a798f8"
+  ],
+  "networkId": "c1058b0a28aa617e3466efc37a2205d044911f7ca7175b011c8e34707aff63a0",
+  "tests": [
+    {
+      "category": "RealWebFixture",
+      "exitCode": 0,
+      "seconds": 1.2023263330047484,
+      "minimumExpected": 12,
+      "logSha256": "bb233fcc6454a11d91fa56f65edc4de5f14dbb4a552f7ca192a253a2423dc3f4"
+    },
+    {
+      "category": "RealWebDnsRejection",
+      "exitCode": 0,
+      "seconds": 1.203714624978602,
+      "minimumExpected": 1,
+      "logSha256": "9222d60c9180f98f9cc634e25886511dc2f8058fe8e80e835bf04dec23efa6a1"
+    }
+  ],
+  "privateRuntime": "/Users/chasen/.codex/worktrees/g4-m2-web-01/ontology-platform/.tools/security/g4-m2-web-01/m2-0edf40dfce9e",
+  "cleanup": [
+    {
+      "id": "16a4efb57042eeb17a3aea4e0b21b78019e1a29add4df0d3d1784c0c52a798f8",
+      "before": true,
+      "command": "docker rm -f exact-id",
+      "result": "16a4efb57042eeb17a3aea4e0b21b78019e1a29add4df0d3d1784c0c52a798f8",
+      "afterAbsent": true
+    },
+    {
+      "id": "22ad7892092d36b4fc64a1f79df1afb90a8d9080c305b4693158f797b98f8784",
+      "before": true,
+      "command": "docker rm -f exact-id",
+      "result": "22ad7892092d36b4fc64a1f79df1afb90a8d9080c305b4693158f797b98f8784",
+      "afterAbsent": true
+    },
+    {
+      "id": "607c8e629f4b18eaecf5a5501bbb745d06a8f49ce86055b546e70e63ca08a81e",
+      "before": true,
+      "command": "docker rm -f exact-id",
+      "result": "607c8e629f4b18eaecf5a5501bbb745d06a8f49ce86055b546e70e63ca08a81e",
+      "afterAbsent": true
+    },
+    {
+      "id": "c1058b0a28aa617e3466efc37a2205d044911f7ca7175b011c8e34707aff63a0",
+      "before": true,
+      "command": "docker network rm exact-id",
+      "afterAbsent": true
+    }
+  ],
+  "sourceStats": {
+    "requests": 11,
+    "authRejected": 1,
+    "aborted": 1,
+    "connections": 13,
+    "closedSockets": 13,
+    "sni": [
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source"
+    ]
+  },
+  "privateRuntimeDisposition": "KEEP: task-owned credentials excluded from ZIP; required until final lifecycle review"
+}

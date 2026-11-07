@@ -1,0 +1,76 @@
+{
+  "taskId": "G4-M2-WEB-01",
+  "buildBindings": {
+    "connections": {
+      "receiptSha256": "6c8a3caa2b3296bb17aad92950fd274cc3a58dd4e9c156a686ea68d89bb00765",
+      "inputKey": "0e88c807f465ee9ad931659fa2014eb792f89e0b97b8b792953225eebcddf94a",
+      "outputKey": "ec7f9b5a2e77df597435ca34a48ee91492eec47bc5256459c31479556292ea23"
+    },
+    "wire": {
+      "receiptSha256": "42e6fae91da3b22cbbc953df8228aaf8e886a5846d79adbd98719c0cbb807290",
+      "inputKey": "0e88c807f465ee9ad931659fa2014eb792f89e0b97b8b792953225eebcddf94a",
+      "outputKey": "82d8717c706eb79ddf81f9f5b07c3046be104edcc590c91097f6bf8f924866e7"
+    },
+    "api": {
+      "receiptSha256": "a78772e89d6e37c303b0342b0bd7119c0cd438eb9b870225f4068661593479fc",
+      "inputKey": "0e88c807f465ee9ad931659fa2014eb792f89e0b97b8b792953225eebcddf94a",
+      "outputKey": "ecd3e5e4065cd6d3bbdfcf52da729077776d75f6e37d71571102a37cb7768235"
+    },
+    "web": {
+      "receiptSha256": "a7e8c2cb4ba2fd36fa4bcbaddfc148d84fb6e140a5938bb5b68ff91996b7ddbe",
+      "inputKey": "439c389610620588cc76d9b822a3d3e559dff62b98810c104aefd629ef2d288d",
+      "outputKey": "0730acf318856cb38f3f33f1ecb60ac1427f42c1f6adfc6247c72a97326c36ad"
+    }
+  },
+  "proofs": {
+    "prepare1": {
+      "path": "docs/evidence/G4-M2-WEB-01/recovery/environment/prepare-delivery-1.json",
+      "sha256": "53d3bb47b83ba2d58b0eb003b6eb04eed6a5099de36f5374681fb5eca5c10192"
+    },
+    "prepare2": {
+      "path": "docs/evidence/G4-M2-WEB-01/recovery/environment/prepare-delivery-2.json",
+      "sha256": "2e55fa0383f01495ed85f8ee9b4409d72114857606dc140204509e8bbc8bd0a1"
+    },
+    "unit": {
+      "path": "docs/evidence/G4-M2-WEB-01/recovery/local/unit-current.json",
+      "sha256": "4a6c9656dd6468d0e15145155fd41980857fb93a7a8c9a5102be292fa8ff8a15"
+    },
+    "wire": {
+      "path": "docs/evidence/G4-M2-WEB-01/recovery/local/wire-current.json",
+      "sha256": "5992100fd2d92bb5d3fdbfbed2d6973a2e9ade7b5194b9678ddda80917edc347"
+    },
+    "ui": {
+      "path": "docs/evidence/G4-M2-WEB-01/recovery/local/ui-current.json",
+      "sha256": "c9ca49b4b79df2dd8e761d5f87dfffdb89b8433ecfa65fcc85bf3cb242f12ecd"
+    },
+    "https": {
+      "path": "docs/evidence/G4-M2-WEB-01/recovery/runs/m2-5e5a2f7a62de/fixture-receipt.json",
+      "sha256": "12477aed59a1db563fb775374dd84f0450acc0269551fae9d75d16240dca981e"
+    },
+    "pg": {
+      "path": "docs/evidence/G4-M2-WEB-01/recovery/runs/m2-beb513edec23/pg-receipt.json",
+      "sha256": "50456d873f58b6bec46069df7b295a6f708198553358c19774a9ceaf37ce8946"
+    },
+    "smoke": {
+      "path": "docs/evidence/G4-M2-WEB-01/recovery/runs/m2-c72b9c07e76c/receipt.json",
+      "sha256": "df8f06832fabcb77e1a9e14d0bef2ac1b32310b92e2b87034524091925206078"
+    }
+  },
+  "gates": {
+    "environment": {
+      "inputKey": "2ff059bd8dcc013ee91b5b19d19505f986f9cb572e5a1db45da1d7a30eaead9a"
+    },
+    "contract": {
+      "inputKey": "2c9703c05960cd43cc119ae80ac04f0eaebc93bbb6fbadaac7ca77a40e5ef9e6"
+    },
+    "backend": {
+      "inputKey": "2f25aea29454fabad302821bb0415c9190f242b92b7a73e6c84f373b7ef111e0"
+    },
+    "web": {
+      "inputKey": "997d67e8dade285aa3087c8c5f0e68992bd028ffe0cd9c1fcfb9c2b319979792"
+    },
+    "interaction": {
+      "inputKey": "3889cc81bb90dbe6107b850506c142ffc45c00ab5c559bd76fde7e7dec559cab"
+    }
+  }
+}

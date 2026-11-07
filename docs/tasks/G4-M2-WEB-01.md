@@ -1,6 +1,6 @@
 # G4-M2-WEB-01｜一页实施清单与唯一状态
 
-状态：**IMPLEMENTING / 缓存与结构准入已闭合，真实网络及产品验收进行中**；不是 READY_FOR_CHATGPT_REVIEW。
+状态：**VERIFIED_PENDING_PACKAGE / 产品真实验收完成，按影响工程门禁及最终包复核进行中**。
 授权：2026-11-07 用户明确批准附件单 Web HTTPS GET；[附件](../evidence/G4-M2-WEB-01/authorization.md)。
 Base：`b3b68500d76ab5965fcc540afb883ca605cb15dd`，真实 fetch 一致；分支 `codex/g4-m2-web-01`。
 Worktree：`/Users/chasen/.codex/worktrees/g4-m2-web-01/ontology-platform`；Master 单写，p0_review 非作者只读。
@@ -8,9 +8,9 @@ Worktree：`/Users/chasen/.codex/worktrees/g4-m2-web-01/ontology-platform`；Mas
 ## 清单
 
 - [x] P0：核实基线/独立树、DTO/SPI/16路由、宿主资源、既有环境入口、官方 .NET HTTP API；详情见[P0](../evidence/G4-M2-WEB-01/p0.md)。
-- [ ] P0闭合：Web认证合同裁决；离线Web缓存来源核验与两次幂等prepare；TaskId消费者准入；TLS/socket平台见证。
-- [ ] 公共分发：准确文件冻结后编写PG/Web正反合同测试→非作者Review→最小typed dispatcher；PG不变，其他三类型继续拒绝。
-- [ ] Web：可信精确operation/HostPolicy注册→DNS全地址与socket绑定→正常TLS→固定GET/认证→有界目录/取消/生命周期。
+- [x] P0闭合：Web认证合同裁决；离线Web缓存来源核验与两次幂等prepare；TaskId消费者准入；TLS/socket平台见证。
+- [x] 公共分发：准确文件冻结后编写PG/Web正反合同测试→非作者Review→最小typed dispatcher；PG不变，其他三类型继续拒绝。
+- [x] Web：可信精确operation/HostPolicy注册→DNS全地址与socket绑定→正常TLS→固定GET/认证→有界目录/取消/生命周期。
 - [ ] 验收：先真实OIDC/API/HTTPS/UI烟测；再workflow plan/verify按影响执行安全负例、权限/SecretRef、PG回归、取消见证及浏览器闭环。
 - [ ] 产品交付：独立Review→提交/输入绑定→唯一V3→独立重开→回执；不更新main。
 
@@ -23,7 +23,7 @@ Worktree：`/Users/chasen/.codex/worktrees/g4-m2-web-01/ontology-platform`；Mas
 ## 恢复与停止
 
 [P0增量已获批准](../evidence/G4-M2-WEB-01/p0-decision-approval.md)，先环境及消费者准入再产品实现；普通修复无需逐补丁审批。现有prepare失败不重复整链。保留当前离线缓存和原始运行日志，任务未关闭；不清旧任务资源。
-历史P0阻断见证保持不变；当前产品验收尚未完成。后续最终产品ZIP必须在真实验收完成后另行形成。
+历史P0阻断见证保持不变；当前真实产品验收已完成；历史失败原件保留，最终产品 ZIP 待门禁与独立重开后另行形成。
 
 ## 恢复阶段冻结路径（Master单写）
 

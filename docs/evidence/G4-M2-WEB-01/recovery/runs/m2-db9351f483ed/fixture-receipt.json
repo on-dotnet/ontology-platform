@@ -1,0 +1,103 @@
+{
+  "driverInputs": {
+    "scripts/maintenance/workflow_m2_build.py": "39ae9d829f7d58fa16184d4a113e52539c729a4fcf4234af6730cc3dff88d2ca",
+    "scripts/maintenance/workflow_m2_evidence.py": "124fdcc853cc5fbe2697b873ae9c6232ec395df3b01031f19ec816957a31cf46",
+    "scripts/maintenance/workflow_m2_fixture.py": "50ec4d30c4bee27805dd9c22b8cd9314c2fa75b16305e44cc47d72ae28356bf1",
+    "scripts/maintenance/workflow_m2_smoke.py": "06a58ef9a47acb4f0594c6d8c83869f0715b66429545b4fd4cd5a2533810e978",
+    "scripts/maintenance/workflow_m2_web.py": "6ad6d8052a91958d57a847c15d9bd1d2c8f21d66294941740f6ce8baba5bc251",
+    "scripts/maintenance/workflow-m2-web.mjs": "e25144a92af19fa5e92ee93f35d148b4fbb1e1e55dd0b3d4e2636d35d4b558ab",
+    "scripts/maintenance/workflow_smoke.py": "bd399193424217afd315c00f6e30ea8dd809e2ac65d8add8b5d5743bf8959e47",
+    "experiments/g4-m2-web-01/https-fixture.mjs": "523838ced9f476b053eca72c40ddd57da35f59da6bfd3d7224e00e47ae345562"
+  },
+  "buildBinding": {
+    "receiptSha256": "6c8a3caa2b3296bb17aad92950fd274cc3a58dd4e9c156a686ea68d89bb00765",
+    "inputKey": "0e88c807f465ee9ad931659fa2014eb792f89e0b97b8b792953225eebcddf94a",
+    "outputKey": "ec7f9b5a2e77df597435ca34a48ee91492eec47bc5256459c31479556292ea23"
+  },
+  "taskId": "G4-M2-WEB-01",
+  "runId": "m2-db9351f483ed",
+  "status": "PASS",
+  "containerIds": [
+    "8b4837744203b007f4415a12d341c732f83d0c5e28a636e2c8daa0d702236b75",
+    "d701b9eebf4a5e067a6694615d29761bb705ac978b9f27d4aa0e7e2c8855a832",
+    "e4858c8ec0d00262ea66cc72e7174687437108b40242378fdc75466b151242dc"
+  ],
+  "networkId": "10c0a1b3a69205b495a17e914b34e986d8f2a633b60057b34e54c770d5058802",
+  "tests": [
+    {
+      "category": "RealWebFixture",
+      "exitCode": 0,
+      "seconds": 1.2001047499943525,
+      "minimumExpected": 12,
+      "logSha256": "7dfb7bf1e80a4399e6b8d21afdaef58a019bfc3a95b5235a39b63c9bf9cacb59"
+    },
+    {
+      "category": "RealWebDnsRejection",
+      "exitCode": 0,
+      "seconds": 1.204425915988395,
+      "minimumExpected": 1,
+      "logSha256": "84f2ad7259412caeaea4d75a23aaef5513dac3ce9e395f0bb5484d6b3d2683d7"
+    }
+  ],
+  "privateRuntime": "/Users/chasen/.codex/worktrees/g4-m2-web-01/ontology-platform/.tools/security/g4-m2-web-01/m2-db9351f483ed",
+  "cleanup": [
+    {
+      "id": "e4858c8ec0d00262ea66cc72e7174687437108b40242378fdc75466b151242dc",
+      "before": true,
+      "command": "docker rm -f exact-id",
+      "result": "e4858c8ec0d00262ea66cc72e7174687437108b40242378fdc75466b151242dc",
+      "afterAbsent": true
+    },
+    {
+      "id": "d701b9eebf4a5e067a6694615d29761bb705ac978b9f27d4aa0e7e2c8855a832",
+      "before": true,
+      "command": "docker rm -f exact-id",
+      "result": "d701b9eebf4a5e067a6694615d29761bb705ac978b9f27d4aa0e7e2c8855a832",
+      "afterAbsent": true
+    },
+    {
+      "id": "8b4837744203b007f4415a12d341c732f83d0c5e28a636e2c8daa0d702236b75",
+      "before": true,
+      "command": "docker rm -f exact-id",
+      "result": "8b4837744203b007f4415a12d341c732f83d0c5e28a636e2c8daa0d702236b75",
+      "afterAbsent": true
+    },
+    {
+      "id": "10c0a1b3a69205b495a17e914b34e986d8f2a633b60057b34e54c770d5058802",
+      "before": true,
+      "command": "docker network rm exact-id",
+      "afterAbsent": true
+    }
+  ],
+  "sourceStats": {
+    "requests": 11,
+    "authRejected": 1,
+    "aborted": 1,
+    "connections": 13,
+    "closedSockets": 13,
+    "sni": [
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source"
+    ]
+  },
+  "testStatus": "PASS",
+  "cleanupExpected": [
+    "10c0a1b3a69205b495a17e914b34e986d8f2a633b60057b34e54c770d5058802",
+    "8b4837744203b007f4415a12d341c732f83d0c5e28a636e2c8daa0d702236b75",
+    "d701b9eebf4a5e067a6694615d29761bb705ac978b9f27d4aa0e7e2c8855a832",
+    "e4858c8ec0d00262ea66cc72e7174687437108b40242378fdc75466b151242dc"
+  ],
+  "cleanupComplete": true,
+  "privateRuntimeDisposition": "KEEP: task-owned credentials excluded from ZIP; required until final lifecycle review"
+}

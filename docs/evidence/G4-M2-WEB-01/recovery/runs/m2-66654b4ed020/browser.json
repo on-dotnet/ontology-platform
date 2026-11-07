@@ -1,0 +1,17 @@
+{
+  "status": "FAIL",
+  "tests": 6,
+  "skipped": 0,
+  "phase": "authorization_viewer_api",
+  "checks": [
+    "REAL_OIDC",
+    "AUTHENTICATED_CSRF_REJECTION",
+    "INTAKE_REPLAY_AND_PURPOSE_CONFLICT",
+    "PG_WEB_BIDIRECTIONAL_CREATE_AND_DRAFT_REJECTION",
+    "UNSUPPORTED_AUTH_PAGINATION_NO_IO",
+    "CROSS_SCOPE_BINDING_REJECT"
+  ],
+  "errorType": "Error",
+  "errorClass": "TRANSPORT",
+  "reason": "BROWSER_OR_TRANSPORT"
+}

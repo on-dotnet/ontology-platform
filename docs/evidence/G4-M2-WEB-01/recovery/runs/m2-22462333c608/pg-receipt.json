@@ -1,0 +1,47 @@
+{
+  "taskId": "G4-M2-WEB-01",
+  "runId": "m2-22462333c608",
+  "status": "PASS",
+  "buildBinding": {
+    "receiptSha256": "6c8a3caa2b3296bb17aad92950fd274cc3a58dd4e9c156a686ea68d89bb00765",
+    "inputKey": "0e88c807f465ee9ad931659fa2014eb792f89e0b97b8b792953225eebcddf94a",
+    "outputKey": "ec7f9b5a2e77df597435ca34a48ee91492eec47bc5256459c31479556292ea23"
+  },
+  "containers": [
+    "b883b5697da1c20e4f9abba834f6723e9ba42d19cc29f8399cdff928087bbccd",
+    "cb1ba2a4d8c0c2dbd05e9a4afa5d6dfb019d2fb483a1f86bf1765c9a28fea1a3"
+  ],
+  "cleanup": [
+    {
+      "kind": "container",
+      "id": "cb1ba2a4d8c0c2dbd05e9a4afa5d6dfb019d2fb483a1f86bf1765c9a28fea1a3",
+      "before": true,
+      "command": "docker rm -f exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "container",
+      "id": "b883b5697da1c20e4f9abba834f6723e9ba42d19cc29f8399cdff928087bbccd",
+      "before": true,
+      "command": "docker rm -f exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "volume",
+      "id": "ontology-workflow-m2-22462333c608_source-data",
+      "before": true,
+      "command": "docker volume rm exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "network",
+      "id": "ontology-workflow-m2-22462333c608_source",
+      "before": true,
+      "command": "docker network rm exact-id",
+      "afterAbsent": true
+    }
+  ],
+  "exitCode": 0,
+  "logSha256": "afa09ea7bd762382ebaa4bf64980e49746fda0132bf1ed4030a7774babc56e8b",
+  "tests": 1
+}

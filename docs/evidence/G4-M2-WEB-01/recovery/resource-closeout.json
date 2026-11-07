@@ -1,0 +1,129 @@
+{
+  "taskId": "G4-M2-WEB-01",
+  "status": "PASS",
+  "checkedAt": "2026-11-07T02:17:12.173192+00:00",
+  "labelPostchecks": [
+    {
+      "command": [
+        "docker",
+        "ps",
+        "-aq",
+        "--filter",
+        "label=ontology.task=G4-M2-WEB-01"
+      ],
+      "exitCode": 0,
+      "remainingIds": []
+    },
+    {
+      "command": [
+        "docker",
+        "volume",
+        "ls",
+        "-q",
+        "--filter",
+        "label=ontology.task=G4-M2-WEB-01"
+      ],
+      "exitCode": 0,
+      "remainingIds": []
+    },
+    {
+      "command": [
+        "docker",
+        "network",
+        "ls",
+        "-q",
+        "--filter",
+        "label=ontology.task=G4-M2-WEB-01"
+      ],
+      "exitCode": 0,
+      "remainingIds": []
+    },
+    {
+      "command": [
+        "docker",
+        "ps",
+        "-aq",
+        "--filter",
+        "label=ontology.task-id=G4-M2-WEB-01"
+      ],
+      "exitCode": 0,
+      "remainingIds": []
+    },
+    {
+      "command": [
+        "docker",
+        "volume",
+        "ls",
+        "-q",
+        "--filter",
+        "label=ontology.task-id=G4-M2-WEB-01"
+      ],
+      "exitCode": 0,
+      "remainingIds": []
+    },
+    {
+      "command": [
+        "docker",
+        "network",
+        "ls",
+        "-q",
+        "--filter",
+        "label=ontology.task-id=G4-M2-WEB-01"
+      ],
+      "exitCode": 0,
+      "remainingIds": []
+    }
+  ],
+  "finalRunDeletions": [
+    {
+      "runId": "m2-c72b9c07e76c",
+      "removed": 10,
+      "expectedIds": [
+        "00a5111c19558e7309fe2228f2711de6b5f47f730f427945f22a582676177e7a",
+        "4b2c36001c58c235afc262b113c263408634ed482953432fdb471022228fe37e",
+        "7655010e6401e61e09aa2fff9133044430cba50bc5ed96651f3856a9af86ce0e",
+        "b9f21f1cd5cb09c69cb3420047986d7a4029130306269c060e924142e2af531e",
+        "fb9f975606d14a90026128f75fbb2264050e78a12564a85e73240c29a7bbff0f",
+        "ontology-workflow-m2-c72b9c07e76c_api-keyring",
+        "ontology-workflow-m2-c72b9c07e76c_front",
+        "ontology-workflow-m2-c72b9c07e76c_keycloak-data",
+        "ontology-workflow-m2-c72b9c07e76c_platform-data",
+        "ontology-workflow-m2-c72b9c07e76c_source"
+      ]
+    },
+    {
+      "runId": "m2-5e5a2f7a62de",
+      "removed": 4,
+      "expectedIds": [
+        "357a077c3976f3e18f2276bdc496a40c456b98f01775ad3a13935adde968266f",
+        "3ed3dcf813b3957ba9a303bd0f61f87248bbfbacd2381ae84122236a0af109a8",
+        "b4f65283f691827eacc48887eb4f7e0cd8d1e69b60c96586a0d58ca93872d3eb",
+        "bd493cfe603145289d706746ff3d8147a25dcdd266157959f5cb3f2d74aa6ec5"
+      ]
+    },
+    {
+      "runId": "m2-beb513edec23",
+      "removed": 4,
+      "expectedIds": [
+        "1f67bdc8c1b717408bbdc8fc709217db6253b52ddac124920c2ff42031bfe37e",
+        "4d915da2c86d6d3d79947ca4a768f782689f8cc645b5c57821ac01ed26ac2409",
+        "ontology-workflow-m2-beb513edec23_source",
+        "ontology-workflow-m2-beb513edec23_source-data"
+      ]
+    }
+  ],
+  "wholeWorktreeAllocatedBytes": 2862297088,
+  "maxObservedRuntimeDataBytes": 260218880,
+  "wholeTreePlusRuntimeBelow3GiB": true,
+  "runtimeMemoryConfiguredBytes": 4294967296,
+  "runtimeDeploymentUnits": 6,
+  "privateRuntimes": "KEEP: review pending; task credentials excluded from ZIP; remove only after explicit closeout and reference audit",
+  "caches": "KEEP: validated reusable environment/node cache; no download; retained until review closeout and no other references",
+  "worktree": "KEEP: active unintegrated task branch; main unchanged",
+  "protectedUserFiles": "KEEP and restore after package verification; manifest in ignored .tools/protected-user-files/g4-m2-web-01",
+  "historicalBlockedZip": {
+    "sha256": "fb42f650b5e51f8dad15b2c3a1f65b0239a79a86c90074beb9e734d3139fc73a",
+    "unchanged": true
+  },
+  "buildHistory": "No Docker builds or build history removal performed; no prune or daemon restart"
+}

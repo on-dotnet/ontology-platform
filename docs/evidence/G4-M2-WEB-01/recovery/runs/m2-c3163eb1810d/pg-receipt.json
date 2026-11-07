@@ -1,0 +1,65 @@
+{
+  "driverInputs": {
+    "scripts/maintenance/workflow_m2_build.py": "39ae9d829f7d58fa16184d4a113e52539c729a4fcf4234af6730cc3dff88d2ca",
+    "scripts/maintenance/workflow_m2_evidence.py": "124fdcc853cc5fbe2697b873ae9c6232ec395df3b01031f19ec816957a31cf46",
+    "scripts/maintenance/workflow_m2_fixture.py": "50ec4d30c4bee27805dd9c22b8cd9314c2fa75b16305e44cc47d72ae28356bf1",
+    "scripts/maintenance/workflow_m2_smoke.py": "06a58ef9a47acb4f0594c6d8c83869f0715b66429545b4fd4cd5a2533810e978",
+    "scripts/maintenance/workflow_m2_web.py": "6ad6d8052a91958d57a847c15d9bd1d2c8f21d66294941740f6ce8baba5bc251",
+    "scripts/maintenance/workflow-m2-web.mjs": "e25144a92af19fa5e92ee93f35d148b4fbb1e1e55dd0b3d4e2636d35d4b558ab",
+    "scripts/maintenance/workflow_smoke.py": "bd399193424217afd315c00f6e30ea8dd809e2ac65d8add8b5d5743bf8959e47",
+    "experiments/g4-m2-web-01/https-fixture.mjs": "523838ced9f476b053eca72c40ddd57da35f59da6bfd3d7224e00e47ae345562"
+  },
+  "taskId": "G4-M2-WEB-01",
+  "runId": "m2-c3163eb1810d",
+  "status": "PASS",
+  "buildBinding": {
+    "receiptSha256": "6c8a3caa2b3296bb17aad92950fd274cc3a58dd4e9c156a686ea68d89bb00765",
+    "inputKey": "0e88c807f465ee9ad931659fa2014eb792f89e0b97b8b792953225eebcddf94a",
+    "outputKey": "ec7f9b5a2e77df597435ca34a48ee91492eec47bc5256459c31479556292ea23"
+  },
+  "containers": [
+    "3cc3ced7f006f25fd03ec6063360a043d27fba0e1359b1ed7e7a3a50d5c8b972",
+    "0e89e3d59aa68d8721b78eba57befa2ff243f476e8f9c5052b5a7976755b9819"
+  ],
+  "cleanup": [
+    {
+      "kind": "container",
+      "id": "0e89e3d59aa68d8721b78eba57befa2ff243f476e8f9c5052b5a7976755b9819",
+      "before": true,
+      "command": "docker rm -f exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "container",
+      "id": "3cc3ced7f006f25fd03ec6063360a043d27fba0e1359b1ed7e7a3a50d5c8b972",
+      "before": true,
+      "command": "docker rm -f exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "volume",
+      "id": "ontology-workflow-m2-c3163eb1810d_source-data",
+      "before": true,
+      "command": "docker volume rm exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "network",
+      "id": "ontology-workflow-m2-c3163eb1810d_source",
+      "before": true,
+      "command": "docker network rm exact-id",
+      "afterAbsent": true
+    }
+  ],
+  "exitCode": 0,
+  "logSha256": "f7d60eb4155ced44ab45d143bd3deab4905e3d4caee1fe5531eda15603184275",
+  "tests": 1,
+  "testStatus": "PASS",
+  "cleanupExpected": [
+    "0e89e3d59aa68d8721b78eba57befa2ff243f476e8f9c5052b5a7976755b9819",
+    "3cc3ced7f006f25fd03ec6063360a043d27fba0e1359b1ed7e7a3a50d5c8b972",
+    "ontology-workflow-m2-c3163eb1810d_source",
+    "ontology-workflow-m2-c3163eb1810d_source-data"
+  ],
+  "cleanupComplete": true
+}
