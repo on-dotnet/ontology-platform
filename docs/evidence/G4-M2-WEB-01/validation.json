@@ -30,6 +30,27 @@
       "command": null,
       "exitCode": null,
       "output": "No source implementation; P0 blocked. No PG/Web/TLS/browser/real cancellation acceptance claimed."
+    },
+    {
+      "name": "evidence-schema",
+      "status": "PASS",
+      "command": "pwsh -NoProfile -File scripts/test-review-evidence.ps1 -EvidenceFile docs/evidence/G4-M2-WEB-01/validation.json -ExpectedHead b3b68500d76ab5965fcc540afb883ca605cb15dd",
+      "exitCode": 0,
+      "output": "4 checks normalized; EVIDENCE_SCHEMA_ONLY PASS; product NOT_RUN."
+    },
+    {
+      "name": "impact-plan-verify",
+      "status": "BLOCKED",
+      "command": "python3 -B scripts/maintenance/workflow.py verify --task G4-M2-WEB-01 --plan artifacts/workflow/G4-M2-WEB-01/p0-plan.json",
+      "exitCode": 2,
+      "output": "UNMAPPED_INPUTS: new task JSON evidence is not registered. No product gates ran; no historical full chain invoked."
+    },
+    {
+      "name": "independent-p0-review",
+      "status": "BLOCKED",
+      "command": null,
+      "exitCode": null,
+      "output": "Non-author p0_review confirms credential boundary decisions; see independent-review.md."
     }
   ],
   "ci": {
