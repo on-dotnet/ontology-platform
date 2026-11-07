@@ -118,3 +118,9 @@
 全部M4实现范围的适用本地真实门禁已完成，候选testedCommit=9ae30173cf900524c387489f48a97fbb244c9d07；代码独立Review通过，具体绑定/原失败与风险见G3-M4任务卡及交接。Master继续原授权内的main集成、准确Synthetic资源回收、唯一Review ZIP V3与独立重开；尚未生成最终交付标记，不扩大M5/G4/G5。未运行CI/Windows/Intel及未观测活跃时间不写PASS。
 
 M4资源实际收尾：获审候选已在main；8任务卷+1fixture精确回收，A两refs本地/远端原子删除。原生另活跃task guard保护的两B树/refsKEEP，原文/未知owner/解除条件已逐项记录，不绕过。当前仅生成唯一V3并独立重开、交付后停等复审，M5/G4/G5未授权。
+
+---
+
+# 2026-11-07 G4-M2-WEB-01 最新明确授权（追加）
+
+本会话用户明确批准[附件](../evidence/G4-M2-WEB-01/authorization.md)单Web HTTPS GET切片，基线b3b68500d76ab5965fcc540afb883ca605cb15dd，新独立Worktree及codex/g4-m2-web-01；先一页清单/P0，通过后范围内持续实施。此段取代历史任务对M2未授权的限制，仅对本任务有效。允许附件限定合成隔离资源：最多6进程/容器、容器6GiB、源fixture最多2个且合计不超过512MiB；数据3GiB、过程产物1GiB停止阈值。禁止新增下载/依赖/费用、公共DTO/数据库语义/权限变更、其他Adapter、main更新及M3/G6。当前唯一状态见[任务卡](G4-M2-WEB-01.md)。P0发现需边界裁决，产品未实施；历史授权与证据原样保留。

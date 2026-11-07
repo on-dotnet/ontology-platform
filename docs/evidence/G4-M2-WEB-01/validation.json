@@ -1,0 +1,48 @@
+{
+  "evidenceSchemaVersion": 2,
+  "validationSource": "LOCAL",
+  "testedCommit": "b3b68500d76ab5965fcc540afb883ca605cb15dd",
+  "checks": [
+    {
+      "name": "baseline",
+      "status": "PASS",
+      "command": "git fetch origin && git rev-parse origin/main",
+      "exitCode": 0,
+      "output": "b3b68500d76ab5965fcc540afb883ca605cb15dd"
+    },
+    {
+      "name": "p0-environment",
+      "status": "BLOCKED",
+      "command": "python3 -B scripts/maintenance/workflow.py prepare --task G4-M2-WEB-01",
+      "exitCode": 2,
+      "output": "Offline backend restore exit0; stale Web source path missing. See prepare-failure.json."
+    },
+    {
+      "name": "authentication-contract",
+      "status": "BLOCKED",
+      "command": null,
+      "exitCode": null,
+      "output": "Public secret purpose and no-secret lifecycle require human boundary decision."
+    },
+    {
+      "name": "product-tests",
+      "status": "NOT_RUN",
+      "command": null,
+      "exitCode": null,
+      "output": "No source implementation; P0 blocked. No PG/Web/TLS/browser/real cancellation acceptance claimed."
+    }
+  ],
+  "ci": {
+    "status": "NOT_RUN",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  },
+  "metadata": {
+    "taskStatus": "P0_BLOCKED",
+    "productTestCount": 0,
+    "reuse": "No historical product PASS reused",
+    "attachmentSha256": "fe964701899cadc97b656083ce5412b4f82a1635896eb424a285a7fe164fe88b"
+  }
+}
