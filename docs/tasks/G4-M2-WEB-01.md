@@ -1,6 +1,6 @@
 # G4-M2-WEB-01｜一页实施清单与唯一状态
 
-状态：**VERIFIED_PENDING_PACKAGE / 产品及按影响工程门禁通过，等待最终包独立重开**。
+状态：**VERIFIED_PENDING_PACKAGE / 产品、工程及非作者代码 Review 通过**。最终交付状态由唯一 ZIP 独立重开后的包外回执确认为 `G4_M2_WEB_01_READY_FOR_CHATGPT_REVIEW`。
 授权：2026-11-07 用户明确批准附件单 Web HTTPS GET；[附件](../evidence/G4-M2-WEB-01/authorization.md)。
 Base：`b3b68500d76ab5965fcc540afb883ca605cb15dd`，真实 fetch 一致；分支 `codex/g4-m2-web-01`。
 Worktree：`/Users/chasen/.codex/worktrees/g4-m2-web-01/ontology-platform`；Master 单写，p0_review 非作者只读。

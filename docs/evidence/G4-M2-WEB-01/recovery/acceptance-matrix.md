@@ -24,3 +24,5 @@
 HTTPS/DNS 负例包括错误 SAN、非可信证书、重定向、JSON 超限/形态不符、取消与 DNS 混合/非允许地址拒绝；证书通过任务私有 CA、SAN/SNI 和 socket peer 核验，未关闭 TLS 校验。服务只暴露声明的逻辑 VIEW 与三字段，不持久化响应业务值。
 
 GitHub CI、Windows、Intel Mac 均 NOT_RUN；无关 M1 全量验收 NOT_RUN / 本次不适用。长任务的锁屏/熄屏仅以本次有界 host monitor 为证，跨会话持续性 NOT_VERIFIED。历史失败和旧 P0 BLOCKED ZIP 保留，不参与当前 PASS 资格。资源与原用户文件的 KEEP 理由及解除条件见 resource-closeout.json。
+
+最终显示格式处理：当前 UI 原始 stdout 完整保留于 local/ui-current.log.raw.json；local/ui-current.log 仅移除额外末尾 LF，转换关系明确登记于 receipt。五产品门禁对当前显示副本及当前原件索引重新核验 PASS，见 display-qualification.json；没有新运行测试。此前门禁中的旧 proof SHA 可从对应 sourceCommit 恢复，不反向覆盖旧运行。

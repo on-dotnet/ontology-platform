@@ -32,3 +32,7 @@ PG m2-beb513edec23 独立核验 exit 0：1 PASS / 0 skip、原始日志与当前
 ## 最终门禁与证据格式复核
 
 Reviewer 独立核对最终 10 门禁的发布日志 SHA、exit/status；工程 18、环境 6 从指定提交提取原 JSON/日志并验证实际 summary，检查 exit 0。当前无未关闭代码 P0/P1。最终 Git 全差异检查发现批准文档尾空格和 UI 日志额外 EOF 空行；依 Reviewer 建议，原始字节保留于无损 envelope，当前 UI display transcript 仅去除额外末尾 LF，原 command/exitCode/timing 不变，不称为新 Run。原批准文档 SHA 以 recovery/p0-approval-original.json 中完整原 bytes 为准，MD 为排版规范化显示副本。最终转换关系和 ZIP 重开另有独立实证。
+
+## 最终可归档结论
+
+Reviewer 独立断言 exit 0：批准 envelope 解码 bytes 与 Downloads 原批准附件完全一致，SHA256 `89b6a38e17e5af611824e8851c2d814f496bbc7a334fe470a40dbf618f283e9c`；UI raw bytes 与 6640341f 父提交原 log 一致，display 精确等于 raw.rstrip(LF)+LF；批准显示副本仅去除行尾 space/tab。当前 Base..HEAD diff-check exit 0；display-qualification 五门禁 PASS，REUSED 标识正确。无未关闭 P0/P1。源码及实际验收 Review 通过；唯一最终 ZIP 的独立 VerifyOnly 和 SHA/Head 核对结果写入包外回执，避免修改包内内容形成循环。

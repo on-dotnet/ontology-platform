@@ -1,0 +1,141 @@
+{
+  "status": "PASS",
+  "command": "workflow_m2_evidence.verify current gate input keys after lossless display conversion",
+  "exitCode": 0,
+  "results": [
+    {
+      "status": "PASS",
+      "gate": "environment",
+      "executionMode": "REUSED",
+      "qualification": "Original successful results, exact current inputs and original bytes revalidated; product not rerun",
+      "originalEvidence": [
+        {
+          "kind": "prepare1",
+          "path": "docs/evidence/G4-M2-WEB-01/recovery/environment/prepare-delivery-1.json",
+          "sha256": "53d3bb47b83ba2d58b0eb003b6eb04eed6a5099de36f5374681fb5eca5c10192",
+          "sourceRun": "/Users/chasen/.codex/worktrees/g4-m2-web-01/ontology-platform/artifacts/workflow/G4-M2-WEB-01/environment/82d5e96e401f664b673bdde638a153e94c1df2360163697b3162493545aef60a/runs/3cae4583f2bd483486b556cc9bb86354",
+          "tests": 1
+        },
+        {
+          "kind": "prepare2",
+          "path": "docs/evidence/G4-M2-WEB-01/recovery/environment/prepare-delivery-2.json",
+          "sha256": "2e55fa0383f01495ed85f8ee9b4409d72114857606dc140204509e8bbc8bd0a1",
+          "sourceRun": "/Users/chasen/.codex/worktrees/g4-m2-web-01/ontology-platform/artifacts/workflow/G4-M2-WEB-01/environment/82d5e96e401f664b673bdde638a153e94c1df2360163697b3162493545aef60a/runs/bcb66857a3104832b38e04fe5ee54027",
+          "tests": 1
+        }
+      ],
+      "tests": 2,
+      "skipped": 0
+    },
+    {
+      "status": "PASS",
+      "gate": "contract",
+      "executionMode": "REUSED",
+      "qualification": "Original successful results, exact current inputs and original bytes revalidated; product not rerun",
+      "originalEvidence": [
+        {
+          "kind": "wire",
+          "path": "docs/evidence/G4-M2-WEB-01/recovery/local/wire-current.json",
+          "sha256": "5992100fd2d92bb5d3fdbfbed2d6973a2e9ade7b5194b9678ddda80917edc347",
+          "sourceRun": null,
+          "tests": 16
+        },
+        {
+          "kind": "unit",
+          "path": "docs/evidence/G4-M2-WEB-01/recovery/local/unit-current.json",
+          "sha256": "4a6c9656dd6468d0e15145155fd41980857fb93a7a8c9a5102be292fa8ff8a15",
+          "sourceRun": null,
+          "tests": 29
+        }
+      ],
+      "tests": 45,
+      "skipped": 0
+    },
+    {
+      "status": "PASS",
+      "gate": "backend",
+      "executionMode": "REUSED",
+      "qualification": "Original successful results, exact current inputs and original bytes revalidated; product not rerun",
+      "originalEvidence": [
+        {
+          "kind": "unit",
+          "path": "docs/evidence/G4-M2-WEB-01/recovery/local/unit-current.json",
+          "sha256": "4a6c9656dd6468d0e15145155fd41980857fb93a7a8c9a5102be292fa8ff8a15",
+          "sourceRun": null,
+          "tests": 29
+        },
+        {
+          "kind": "https",
+          "path": "docs/evidence/G4-M2-WEB-01/recovery/runs/m2-5e5a2f7a62de/fixture-receipt.json",
+          "sha256": "12477aed59a1db563fb775374dd84f0450acc0269551fae9d75d16240dca981e",
+          "sourceRun": "m2-5e5a2f7a62de",
+          "tests": 13
+        },
+        {
+          "kind": "pg",
+          "path": "docs/evidence/G4-M2-WEB-01/recovery/runs/m2-beb513edec23/pg-receipt.json",
+          "sha256": "50456d873f58b6bec46069df7b295a6f708198553358c19774a9ceaf37ce8946",
+          "sourceRun": "m2-beb513edec23",
+          "tests": 1
+        },
+        {
+          "kind": "smoke",
+          "path": "docs/evidence/G4-M2-WEB-01/recovery/runs/m2-c72b9c07e76c/receipt.json",
+          "sha256": "df8f06832fabcb77e1a9e14d0bef2ac1b32310b92e2b87034524091925206078",
+          "sourceRun": "m2-c72b9c07e76c",
+          "tests": 19
+        }
+      ],
+      "tests": 62,
+      "skipped": 0
+    },
+    {
+      "status": "PASS",
+      "gate": "web",
+      "executionMode": "REUSED",
+      "qualification": "Original successful results, exact current inputs and original bytes revalidated; product not rerun",
+      "originalEvidence": [
+        {
+          "kind": "ui",
+          "path": "docs/evidence/G4-M2-WEB-01/recovery/local/ui-current.json",
+          "sha256": "653310c3e3b4c6c557be62cb318e96cd51edb0d4c89517de8adb1e48ce24f8ec",
+          "sourceRun": null,
+          "tests": 119
+        },
+        {
+          "kind": "smoke",
+          "path": "docs/evidence/G4-M2-WEB-01/recovery/runs/m2-c72b9c07e76c/receipt.json",
+          "sha256": "df8f06832fabcb77e1a9e14d0bef2ac1b32310b92e2b87034524091925206078",
+          "sourceRun": "m2-c72b9c07e76c",
+          "tests": 19
+        }
+      ],
+      "tests": 138,
+      "skipped": 0
+    },
+    {
+      "status": "PASS",
+      "gate": "interaction",
+      "executionMode": "REUSED",
+      "qualification": "Original successful results, exact current inputs and original bytes revalidated; product not rerun",
+      "originalEvidence": [
+        {
+          "kind": "https",
+          "path": "docs/evidence/G4-M2-WEB-01/recovery/runs/m2-5e5a2f7a62de/fixture-receipt.json",
+          "sha256": "12477aed59a1db563fb775374dd84f0450acc0269551fae9d75d16240dca981e",
+          "sourceRun": "m2-5e5a2f7a62de",
+          "tests": 13
+        },
+        {
+          "kind": "smoke",
+          "path": "docs/evidence/G4-M2-WEB-01/recovery/runs/m2-c72b9c07e76c/receipt.json",
+          "sha256": "df8f06832fabcb77e1a9e14d0bef2ac1b32310b92e2b87034524091925206078",
+          "sourceRun": "m2-c72b9c07e76c",
+          "tests": 19
+        }
+      ],
+      "tests": 32,
+      "skipped": 0
+    }
+  ]
+}

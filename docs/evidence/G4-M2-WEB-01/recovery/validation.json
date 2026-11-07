@@ -72,6 +72,13 @@
       "command": "python3 -B /tmp/g4-m2-resources.py",
       "exitCode": 0,
       "output": "Final runs removed 18 exact resources; both task-label sets empty. Current UI transform cache exact cleanup 22 files. See resource-closeout.json and ui-cache-cleanup.json."
+    },
+    {
+      "name": "display-proof-qualification",
+      "status": "PASS",
+      "command": "python3 -B: workflow_m2_evidence.verify(task, gate, workflow.input_key(currentRoot, gate)) for five product gates",
+      "exitCode": 0,
+      "output": "Five current qualifications PASS after deterministic EOF display conversion; original stdout retained; see display-qualification.json."
     }
   ],
   "ci": {
