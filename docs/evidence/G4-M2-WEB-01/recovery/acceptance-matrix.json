@@ -1,6 +1,6 @@
 {
   "taskId": "G4-M2-WEB-01",
-  "testedCommit": "325bd87fe5e67fa8137176461800651de5bb1b08",
+  "testedCommit": "761e961dd06d020ff75c175134a1ec25f7a671b7",
   "rows": [
     {
       "kind": "unit",
@@ -76,5 +76,17 @@
     "Intel Mac",
     "M1 unrelated full acceptance"
   ],
-  "scope": "Only approved synthetic fixed Web GET API_KEY_REF; no general public-origin support"
+  "scope": "Only approved synthetic fixed Web GET API_KEY_REF; no general public-origin support",
+  "productExecutedCommit": "325bd87fe5e67fa8137176461800651de5bb1b08",
+  "engineering": {
+    "gates": 10,
+    "status": "PASS",
+    "taskAdmissionFresh": 13,
+    "reused": {
+      "engineering": 18,
+      "environmentPrepare": 6,
+      "smokeAdapter": 14
+    },
+    "proof": "workflow-v3-final.json"
+  }
 }

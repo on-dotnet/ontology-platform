@@ -40,3 +40,5 @@ Reviewer 独立断言 exit 0：批准 envelope 解码 bytes 与 Downloads 原批
 ## V3 路径适配独立复核
 
 Reviewer 审实际 diff：仅资格器精确自身历史散列排除及原日志后缀读取；其余执行驱动键集合/值完全相等。专项 RED 两个真实失败、GREEN 13 项通过；覆盖七个驱动逐一修改/缺失、未知键、原日志 SHA 篡改和双路径歧义拒绝。独立脚本 exit 0，核对 39 项 MOVE 的新 bytes 与当时 HEAD 原 bytes 相等、SHA 一致且旧路径缺席；三份真实设施 receipt bytes 完全未改。新资格器重核 HTTPS 13 / PG 1 / smoke 19 及当前构建 PASS。无新增 P0/P1，允许进入当前资格候选按影响验收；真实产品执行结果仍为 325bd87f 上的 REUSED。
+
+归档适配后的最终按影响执行 run `488e2b43700f446398efccbfa0ba2c52`：10 门禁 PASS；资格/专项实际测试提交 `761e961dd06d020ff75c175134a1ec25f7a671b7`。13 项准入 FRESH，工程18/环境6/shared smoke14 经原提交核验 REUSED，五产品门禁 FRESH 资格复核 / REUSED 实际产品执行。最终交付提交仅增补文档，source 输入以该 TestedCommit 绑定；独立 ZIP 重开追加结论保存在包外回执。

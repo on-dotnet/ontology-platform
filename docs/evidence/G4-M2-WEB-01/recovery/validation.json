@@ -1,7 +1,7 @@
 {
   "evidenceSchemaVersion": 2,
   "validationSource": "LOCAL",
-  "testedCommit": "325bd87fe5e67fa8137176461800651de5bb1b08",
+  "testedCommit": "761e961dd06d020ff75c175134a1ec25f7a671b7",
   "checks": [
     {
       "name": "unit",
@@ -62,9 +62,9 @@
     {
       "name": "impact-gates",
       "status": "PASS",
-      "command": "python3 -B scripts/maintenance/workflow.py verify --task G4-M2-WEB-01 --plan artifacts/workflow/G4-M2-WEB-01/final-plan-clean-cache.json --reuse artifacts/workflow/G4-M2-WEB-01/reuse-engineering.json --publish-evidence",
+      "command": "python3 -B scripts/maintenance/workflow.py verify --task G4-M2-WEB-01 --plan artifacts/workflow/G4-M2-WEB-01/v3-final-plan.json --reuse artifacts/workflow/G4-M2-WEB-01/reuse-archive.json --publish-evidence",
       "exitCode": 0,
-      "output": "10 affected gates PASS; current original-evidence qualification FRESH; product execution REUSED; engineering 18/environment 6 immutable reused; task admission 11/shared smoke 14 FRESH. See recovery/workflow-final.json."
+      "output": "10 affected gates PASS; 13 task admission tests FRESH; original engineering18/environment6/shared smoke14 REUSED; five product qualifications FRESH / product execution REUSED. See workflow-v3-final.json."
     },
     {
       "name": "resource-closeout",
@@ -99,7 +99,8 @@
       "Intel Mac",
       "unrelated M1 full acceptance"
     ],
-    "inputReuse": "All product/driver tracked inputs unchanged since testedCommit; only allowed docs increments. No sum of overlapping product gates.",
-    "uiTranscript": "Original raw bytes retained; deterministic EOF display conversion independently verified, not a fresh test run"
+    "inputReuse": "Final testedCommit verifies current qualification code plus reused immutable product execution; product sources and seven execution drivers unchanged since productExecutedCommit. Only qualification parser and its rejection tests changed; final delivery only docs increments.",
+    "uiTranscript": "Original raw bytes retained; deterministic EOF display conversion independently verified, not a fresh test run",
+    "productExecutedCommit": "325bd87fe5e67fa8137176461800651de5bb1b08"
   }
 }

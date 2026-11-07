@@ -1,0 +1,56 @@
+{
+  "gate": "environment",
+  "status": "PASS",
+  "executionMode": "REUSED",
+  "qualificationMode": "FRESH",
+  "productProof": {
+    "status": "PASS",
+    "gate": "environment",
+    "executionMode": "REUSED",
+    "qualification": "Original successful results, exact current inputs and original bytes revalidated; product not rerun",
+    "originalEvidence": [
+      {
+        "kind": "prepare1",
+        "path": "docs/evidence/G4-M2-WEB-01/recovery/environment/prepare-delivery-1.json",
+        "sha256": "53d3bb47b83ba2d58b0eb003b6eb04eed6a5099de36f5374681fb5eca5c10192",
+        "sourceRun": "/Users/chasen/.codex/worktrees/g4-m2-web-01/ontology-platform/artifacts/workflow/G4-M2-WEB-01/environment/82d5e96e401f664b673bdde638a153e94c1df2360163697b3162493545aef60a/runs/3cae4583f2bd483486b556cc9bb86354",
+        "tests": 1
+      },
+      {
+        "kind": "prepare2",
+        "path": "docs/evidence/G4-M2-WEB-01/recovery/environment/prepare-delivery-2.json",
+        "sha256": "2e55fa0383f01495ed85f8ee9b4409d72114857606dc140204509e8bbc8bd0a1",
+        "sourceRun": "/Users/chasen/.codex/worktrees/g4-m2-web-01/ontology-platform/artifacts/workflow/G4-M2-WEB-01/environment/82d5e96e401f664b673bdde638a153e94c1df2360163697b3162493545aef60a/runs/bcb66857a3104832b38e04fe5ee54027",
+        "tests": 1
+      }
+    ],
+    "tests": 2,
+    "skipped": 0
+  },
+  "command": [
+    "python3",
+    "-B",
+    "scripts/maintenance/workflow_m2_evidence.py",
+    "--task",
+    "G4-M2-WEB-01",
+    "--gate",
+    "environment",
+    "--input-key",
+    "8f36fc28b615b160d217aa94e7c288c519d1064af19170490ea916815da6c8a9"
+  ],
+  "exitCode": 0,
+  "tests": 2,
+  "skipped": 0,
+  "diagnostic": false,
+  "hypothesis": null,
+  "inputsUnchanged": true,
+  "errorSignature": null,
+  "elapsedSeconds": 6.071983583999099,
+  "inputKey": "8f36fc28b615b160d217aa94e7c288c519d1064af19170490ea916815da6c8a9",
+  "environmentKey": "2154e84e3432062f8aa77aed68db0dcffc9f7f2e8531a7e3033ec2294f4a4938",
+  "policyKey": "fa0d4f7ee07516e7e53599ce98742de635666dfb06e7cb08979755b4209960a3",
+  "evidenceSha256": "e27bffbbda503fe822600e2276ec07b5f27575c99f28f803f6faa8bb1fd9c12e",
+  "logPath": "docs/evidence/G4-M2-WEB-01/gates/488e2b43700f446398efccbfa0ba2c52/environment.txt",
+  "sourceRun": "488e2b43700f446398efccbfa0ba2c52",
+  "sourceCommit": "761e961dd06d020ff75c175134a1ec25f7a671b7"
+}

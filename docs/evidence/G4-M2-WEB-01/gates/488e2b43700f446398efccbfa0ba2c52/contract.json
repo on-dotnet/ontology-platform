@@ -1,0 +1,56 @@
+{
+  "gate": "contract",
+  "status": "PASS",
+  "executionMode": "REUSED",
+  "qualificationMode": "FRESH",
+  "productProof": {
+    "status": "PASS",
+    "gate": "contract",
+    "executionMode": "REUSED",
+    "qualification": "Original successful results, exact current inputs and original bytes revalidated; product not rerun",
+    "originalEvidence": [
+      {
+        "kind": "wire",
+        "path": "docs/evidence/G4-M2-WEB-01/recovery/local/wire-current.json",
+        "sha256": "92775f3a5140146b6ffb98a6e944c2e92c70f3011e7013f7dae5b840b7f26ffc",
+        "sourceRun": null,
+        "tests": 16
+      },
+      {
+        "kind": "unit",
+        "path": "docs/evidence/G4-M2-WEB-01/recovery/local/unit-current.json",
+        "sha256": "a544250d879b7188324361ad363b272812992ea65585c69c69188a40061d0679",
+        "sourceRun": null,
+        "tests": 29
+      }
+    ],
+    "tests": 45,
+    "skipped": 0
+  },
+  "command": [
+    "python3",
+    "-B",
+    "scripts/maintenance/workflow_m2_evidence.py",
+    "--task",
+    "G4-M2-WEB-01",
+    "--gate",
+    "contract",
+    "--input-key",
+    "8e2342b04bfb4c6b3b65f4d3bb21cb8ca2b7e9ee80e83844935750075d5f2094"
+  ],
+  "exitCode": 0,
+  "tests": 45,
+  "skipped": 0,
+  "diagnostic": false,
+  "hypothesis": null,
+  "inputsUnchanged": true,
+  "errorSignature": null,
+  "elapsedSeconds": 0.22345870800199918,
+  "inputKey": "8e2342b04bfb4c6b3b65f4d3bb21cb8ca2b7e9ee80e83844935750075d5f2094",
+  "environmentKey": "2154e84e3432062f8aa77aed68db0dcffc9f7f2e8531a7e3033ec2294f4a4938",
+  "policyKey": "155b8da0e7f341ca051ee542f8df15cc482aeb105efe64750c9bb5a3684f093b",
+  "evidenceSha256": "9ad4059d79de3f0fbc3cb5cbc55b531fab245869afb80dcc7c57024919269466",
+  "logPath": "docs/evidence/G4-M2-WEB-01/gates/488e2b43700f446398efccbfa0ba2c52/contract.txt",
+  "sourceRun": "488e2b43700f446398efccbfa0ba2c52",
+  "sourceCommit": "761e961dd06d020ff75c175134a1ec25f7a671b7"
+}
