@@ -40,16 +40,14 @@
         ".node-version",
         "apps/web/package.json",
         "infra/**",
-        "experiments/**/compose*.yaml"
-      ],
-      "needs": [],
-      "command": null,
-      "identityInputs": [
+        "experiments/**/compose*.yaml",
         "scripts/maintenance/workflow_m2_*.py",
         "scripts/maintenance/workflow-m2-web.mjs",
         "scripts/maintenance/workflow_smoke.py",
         "experiments/g4-m2-web-01/**"
-      ]
+      ],
+      "needs": [],
+      "command": null
     },
     "contract": {
       "inputs": [
@@ -57,18 +55,16 @@
         "docs/contracts/**",
         "apps/web/scripts/**",
         "backend/src/Hosts/**",
-        "backend/src/Modules/Governance/**"
-      ],
-      "needs": [
-        "environment"
-      ],
-      "command": null,
-      "identityInputs": [
+        "backend/src/Modules/Governance/**",
         "scripts/maintenance/workflow_m2_*.py",
         "scripts/maintenance/workflow-m2-web.mjs",
         "scripts/maintenance/workflow_smoke.py",
         "experiments/g4-m2-web-01/**"
-      ]
+      ],
+      "needs": [
+        "environment"
+      ],
+      "command": null
     },
     "backend": {
       "inputs": [
@@ -76,53 +72,47 @@
         "scripts/acceptance/*.py",
         "scripts/acceptance/*.ps1",
         "experiments/g4-m1-main-integration/*.py",
-        "experiments/g4-m1-main-integration/*.sql"
+        "experiments/g4-m1-main-integration/*.sql",
+        "scripts/maintenance/workflow_m2_*.py",
+        "scripts/maintenance/workflow-m2-web.mjs",
+        "scripts/maintenance/workflow_smoke.py",
+        "experiments/g4-m2-web-01/**"
       ],
       "needs": [
         "contract",
         "environment"
       ],
-      "command": null,
-      "identityInputs": [
-        "scripts/maintenance/workflow_m2_*.py",
-        "scripts/maintenance/workflow-m2-web.mjs",
-        "scripts/maintenance/workflow_smoke.py",
-        "experiments/g4-m2-web-01/**"
-      ]
+      "command": null
     },
     "web": {
       "inputs": [
         "apps/web/**",
-        "scripts/tests/*Web*"
-      ],
-      "needs": [
-        "contract"
-      ],
-      "command": null,
-      "identityInputs": [
+        "scripts/tests/*Web*",
         "scripts/maintenance/workflow_m2_*.py",
         "scripts/maintenance/workflow-m2-web.mjs",
         "scripts/maintenance/workflow_smoke.py",
         "experiments/g4-m2-web-01/**"
-      ]
+      ],
+      "needs": [
+        "contract"
+      ],
+      "command": null
     },
     "interaction": {
       "inputs": [
         "scripts/acceptance/*.mjs",
         "experiments/g4-m1-main-integration/*.mjs",
-        "docs/evidence/**/browser*.mjs"
+        "docs/evidence/**/browser*.mjs",
+        "scripts/maintenance/workflow_m2_*.py",
+        "scripts/maintenance/workflow-m2-web.mjs",
+        "scripts/maintenance/workflow_smoke.py",
+        "experiments/g4-m2-web-01/**"
       ],
       "needs": [
         "web",
         "backend"
       ],
-      "command": null,
-      "identityInputs": [
-        "scripts/maintenance/workflow_m2_*.py",
-        "scripts/maintenance/workflow-m2-web.mjs",
-        "scripts/maintenance/workflow_smoke.py",
-        "experiments/g4-m2-web-01/**"
-      ]
+      "command": null
     },
     "engineering": {
       "inputs": [

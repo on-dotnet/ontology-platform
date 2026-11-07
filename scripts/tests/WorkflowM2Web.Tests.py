@@ -85,6 +85,15 @@ class AdmissionTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,'CONSUMER_MISSING'):m.structural(Path(d).resolve(),'G4-M2-WEB-01')
 
 class CloseoutTests(unittest.TestCase):
+    def test_driver_only_change_activates_product_qualification(self):
+        import sys
+        sys.path.insert(0,str(ROOT/'scripts/maintenance'))
+        import workflow
+        for path in ('scripts/maintenance/workflow-m2-web.mjs','scripts/maintenance/workflow_m2_smoke.py','scripts/maintenance/workflow_m2_evidence.py'):
+            plan=workflow.select_gates([path])
+            self.assertEqual(plan['status'],'PLANNED')
+            self.assertTrue({'environment','contract','backend','web','interaction'}<=set(plan['affected']))
+
     def test_cleanup_exception_cannot_leave_pass_and_missing_object_fails(self):
         import sys
         sys.path.insert(0,str(ROOT/'scripts/maintenance'))
