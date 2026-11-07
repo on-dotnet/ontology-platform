@@ -36,3 +36,7 @@ Reviewer 独立核对最终 10 门禁的发布日志 SHA、exit/status；工程 
 ## 最终可归档结论
 
 Reviewer 独立断言 exit 0：批准 envelope 解码 bytes 与 Downloads 原批准附件完全一致，SHA256 `89b6a38e17e5af611824e8851c2d814f496bbc7a334fe470a40dbf618f283e9c`；UI raw bytes 与 6640341f 父提交原 log 一致，display 精确等于 raw.rstrip(LF)+LF；批准显示副本仅去除行尾 space/tab。当前 Base..HEAD diff-check exit 0；display-qualification 五门禁 PASS，REUSED 标识正确。无未关闭 P0/P1。源码及实际验收 Review 通过；唯一最终 ZIP 的独立 VerifyOnly 和 SHA/Head 核对结果写入包外回执，避免修改包内内容形成循环。
+
+## V3 路径适配独立复核
+
+Reviewer 审实际 diff：仅资格器精确自身历史散列排除及原日志后缀读取；其余执行驱动键集合/值完全相等。专项 RED 两个真实失败、GREEN 13 项通过；覆盖七个驱动逐一修改/缺失、未知键、原日志 SHA 篡改和双路径歧义拒绝。独立脚本 exit 0，核对 39 项 MOVE 的新 bytes 与当时 HEAD 原 bytes 相等、SHA 一致且旧路径缺席；三份真实设施 receipt bytes 完全未改。新资格器重核 HTTPS 13 / PG 1 / smoke 19 及当前构建 PASS。无新增 P0/P1，允许进入当前资格候选按影响验收；真实产品执行结果仍为 325bd87f 上的 REUSED。

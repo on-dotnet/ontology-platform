@@ -1,0 +1,29 @@
+......E...E..
+======================================================================
+ERROR: test_archived_text_requires_original_hash_and_unambiguous_path (__main__.CloseoutTests.test_archived_text_requires_original_hash_and_unambiguous_path)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g4-m2-web-01/ontology-platform/scripts/tests/WorkflowM2Web.Tests.py", line 148, in test_archived_text_requires_original_hash_and_unambiguous_path
+    self.assertEqual(evidence.read_log(path,digest),raw)
+                     ^^^^^^^^^^^^^^^^^
+AttributeError: module 'workflow_m2_evidence' has no attribute 'read_log'
+
+======================================================================
+ERROR: test_only_qualification_parser_excluded_from_execution_driver_identity (__main__.CloseoutTests.test_only_qualification_parser_excluded_from_execution_driver_identity)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g4-m2-web-01/ontology-platform/scripts/tests/WorkflowM2Web.Tests.py", line 163, in test_only_qualification_parser_excluded_from_execution_driver_identity
+    evidence.closed(row)
+    ~~~~~~~~~~~~~~~^^^^^
+  File "/Users/chasen/.codex/worktrees/g4-m2-web-01/ontology-platform/scripts/maintenance/workflow_m2_evidence.py", line 36, in closed
+    require(row['driverInputs']==build.driver_inputs(),'ORIGINAL_DRIVER_DRIFT')
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g4-m2-web-01/ontology-platform/scripts/maintenance/workflow_m2_evidence.py", line 14, in require
+    if not value:raise ValueError(code)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+ValueError: ORIGINAL_DRIVER_DRIFT
+
+----------------------------------------------------------------------
+Ran 13 tests in 0.033s
+
+FAILED (errors=2)

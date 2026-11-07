@@ -1,0 +1,24 @@
+{
+  "taskId": "G4-M2-WEB-01",
+  "kind": "unit",
+  "exitCode": 0,
+  "buildBinding": {
+    "receiptSha256": "6c8a3caa2b3296bb17aad92950fd274cc3a58dd4e9c156a686ea68d89bb00765",
+    "inputKey": "0e88c807f465ee9ad931659fa2014eb792f89e0b97b8b792953225eebcddf94a",
+    "outputKey": "ec7f9b5a2e77df597435ca34a48ee91492eec47bc5256459c31479556292ea23"
+  },
+  "log": "unit-current.log",
+  "logSha256": "e7415256627ff149f4c5991a6ab405cad7fcf77ead19791f64df5c2247cd2028",
+  "command": [
+    "/usr/local/share/dotnet/dotnet",
+    "/Users/chasen/.codex/worktrees/g4-m2-web-01/ontology-platform/backend/tests/OntologyPlatform.ConnectionsTests/bin/Debug/net10.0/OntologyPlatform.ConnectionsTests.dll",
+    "--filter",
+    "FullyQualifiedName~SourceDispatcherTests|(FullyQualifiedName~WebAdapterTests&TestCategory!=RealWebFixture&TestCategory!=RealWebDnsRejection)|(FullyQualifiedName~PgAdapterTests&TestCategory!=RealPgFixture)",
+    "--minimum-expected-tests",
+    "29",
+    "--no-ansi",
+    "--progress",
+    "off"
+  ],
+  "elapsedSeconds": 0.26667487499071285
+}

@@ -10,7 +10,7 @@
 | Connections UI | 119 PASS，0 skip | local/ui-current.json + 原始日志 |
 | TypeScript / lint | 两项 exit 0 | local/typecheck-current.json、lint-current.json；零字节日志以无损 envelope 保存 |
 | 真实 HTTPS / DNS | 12 + 1 PASS，0 skip | runs/m2-5e5a2f7a62de/fixture-receipt.json + 两份 MTP 日志 |
-| PostgreSQL 原实现回归 | 1 PASS，0 skip；真实数据库及 VerifyFull 对照 | runs/m2-beb513edec23/pg-receipt.json + pg-test.log |
+| PostgreSQL 原实现回归 | 1 PASS，0 skip；真实数据库及 VerifyFull 对照 | runs/m2-beb513edec23/pg-receipt.json + pg-test.txt |
 | 真实 OIDC/API/UI/HTTPS 闭环 | 19 PASS，0 skip | runs/m2-c72b9c07e76c/browser.json、receipt.json |
 | 泄漏与审计 | 平台 dump、API/Web 日志扫描通过；11 类审计动作存在；原业务数据未归档 | 同一 smoke receipt |
 | 资源清理 | 最终三 run 18 项准确资源删除后验通过；两个任务标签查询均无残留 | resource-closeout.json 及每 run resources/receipt |
@@ -25,4 +25,6 @@ HTTPS/DNS 负例包括错误 SAN、非可信证书、重定向、JSON 超限/形
 
 GitHub CI、Windows、Intel Mac 均 NOT_RUN；无关 M1 全量验收 NOT_RUN / 本次不适用。长任务的锁屏/熄屏仅以本次有界 host monitor 为证，跨会话持续性 NOT_VERIFIED。历史失败和旧 P0 BLOCKED ZIP 保留，不参与当前 PASS 资格。资源与原用户文件的 KEEP 理由及解除条件见 resource-closeout.json。
 
-最终显示格式处理：当前 UI 原始 stdout 完整保留于 local/ui-current.log.raw.json；local/ui-current.log 仅移除额外末尾 LF，转换关系明确登记于 receipt。五产品门禁对当前显示副本及当前原件索引重新核验 PASS，见 display-qualification.json；没有新运行测试。此前门禁中的旧 proof SHA 可从对应 sourceCommit 恢复，不反向覆盖旧运行。
+最终显示格式处理：当前 UI 原始 stdout 完整保留于 local/ui-current.log.raw.json；local/ui-current.txt 仅移除额外末尾 LF，转换关系明确登记于 receipt。五产品门禁对当前显示副本及当前原件索引重新核验 PASS，见 display-qualification.json；没有新运行测试。此前门禁中的旧 proof SHA 可从对应 sourceCommit 恢复，不反向覆盖旧运行。
+
+V3 后缀适配：真实原始日志原字节移动为 `.txt`，完整映射及同 SHA 见 v3-log-path-moves.json。资格器只排除自身这个不执行产品的解析文件的历史 driver hash；其余七个执行驱动的键集合和 hash、全部产品构建输出仍严格相等。当前资格器由当前 workflow 输入和 13 项准入测试（含双后缀歧义、SHA 篡改、七驱动缺失/改变与未知驱动拒绝）绑定。未重跑产品，未改构包规则。

@@ -22,6 +22,13 @@ def read(path,sha=None):
     return raw
 
 
+def read_log(path,sha):
+    """V3归档只改后缀；仍核验原日志字节，双路径拒绝歧义。"""
+    archived=path.with_suffix('.txt')
+    require(not (path.exists() and archived.exists()),'PROOF_LOG_AMBIGUOUS')
+    return read(path if path.exists() else archived,sha)
+
+
 def mtp(raw,minimum):
     text=raw.decode();values=[]
     for names in [('total','总计'),('failed','失败'),('succeeded','成功'),('skipped','已跳过')]:
@@ -33,7 +40,10 @@ def mtp(raw,minimum):
 def closed(row):
     require(row.get('status')=='PASS' and row.get('testStatus')=='PASS' and row.get('cleanupComplete') is True,'RUN_NOT_PASS')
     require(sorted(item['id'] for item in row['cleanup'])==row['cleanupExpected'] and all(item['afterAbsent'] is True for item in row['cleanup']),'CLEANUP_NOT_CLOSED')
-    require(row['driverInputs']==build.driver_inputs(),'ORIGINAL_DRIVER_DRIFT')
+    # 本资格解析器不执行产品设施；其当前源码由workflow输入与专项门禁绑定。
+    parser='scripts/maintenance/workflow_m2_evidence.py'
+    execution=lambda values:{key:value for key,value in values.items() if key!=parser}
+    require(execution(row['driverInputs'])==execution(build.driver_inputs()),'ORIGINAL_DRIVER_DRIFT')
 
 
 def original(kind,path,current):
@@ -56,11 +66,11 @@ def original(kind,path,current):
         require({item['category'] for item in row['tests']}=={'RealWebFixture','RealWebDnsRejection'},'HTTPS_CATEGORIES')
         total=0
         for item in row['tests']:
-            require(item['exitCode']==0,'HTTPS_EXIT');total+=mtp(read(path.parent/(item['category']+'.log'),item['logSha256']),12 if item['category']=='RealWebFixture' else 1)
+            require(item['exitCode']==0,'HTTPS_EXIT');total+=mtp(read_log(path.parent/(item['category']+'.log'),item['logSha256']),12 if item['category']=='RealWebFixture' else 1)
         return total,row
     if kind=='pg':
         require(row['exitCode']==0 and row['buildBinding']==current['connections'],'PG_BUILD_EXIT')
-        return mtp(read(path.parent/'pg-test.log',row['logSha256']),1),row
+        return mtp(read_log(path.parent/'pg-test.log',row['logSha256']),1),row
     require(kind=='smoke' and row['browserExitCode']==0 and row['buildBinding']=={target:current[target] for target in ('api','web')},'SMOKE_BINDING_EXIT')
     report=json.loads(read(path.parent/'browser.json',row['browserSha256']))
     require(report['status']=='PASS' and report['taskId']==build.TASK and report['runId']==row['runId'] and report['skipped']==0 and len(report['checks'])==report['tests'] and set(report['checks'])==SMOKE_CHECKS,'SMOKE_CHECKS')

@@ -135,6 +135,37 @@ class CloseoutTests(unittest.TestCase):
             with self.assertRaises(ValueError):evidence.mtp(raw,1)
         self.assertEqual(evidence.mtp(b'total: 2 failed: 0 succeeded: 2 skipped: 0',1),2)
 
+    def test_archived_text_requires_original_hash_and_unambiguous_path(self):
+        import sys
+        from unittest.mock import patch
+        sys.path.insert(0,str(ROOT/'scripts/maintenance'))
+        import workflow_m2_evidence as evidence
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory).resolve();path=root/'docs/evidence/G4-M2-WEB-01/pg-test.log';path.parent.mkdir(parents=True)
+            raw=b'total: 1 failed: 0 succeeded: 1 skipped: 0\n';digest=evidence.build.sha(raw)
+            with patch.object(evidence.build,'ROOT',root):
+                archived=path.with_suffix('.txt');archived.write_bytes(raw)
+                self.assertEqual(evidence.read_log(path,digest),raw)
+                archived.write_bytes(raw+b'tampered')
+                with self.assertRaisesRegex(ValueError,'PROOF_SHA'):evidence.read_log(path,digest)
+                archived.write_bytes(raw);path.write_bytes(raw)
+                with self.assertRaisesRegex(ValueError,'AMBIGUOUS'):evidence.read_log(path,digest)
+                archived.unlink();self.assertEqual(evidence.read_log(path,digest),raw)
+
+    def test_only_qualification_parser_excluded_from_execution_driver_identity(self):
+        import sys
+        from unittest.mock import patch
+        sys.path.insert(0,str(ROOT/'scripts/maintenance'))
+        import workflow_m2_evidence as evidence
+        current=evidence.build.driver_inputs();parser='scripts/maintenance/workflow_m2_evidence.py'
+        original={**current,parser:'historical-parser'}
+        row={'status':'PASS','testStatus':'PASS','cleanupComplete':True,'cleanup':[],'cleanupExpected':[],'driverInputs':original}
+        evidence.closed(row)
+        for path in set(current)-{parser}:
+            for changed in ({**original,path:'different'}, {k:v for k,v in original.items() if k!=path}):
+                with self.assertRaisesRegex(ValueError,'ORIGINAL_DRIVER_DRIFT'):evidence.closed({**row,'driverInputs':changed})
+        with self.assertRaisesRegex(ValueError,'ORIGINAL_DRIVER_DRIFT'):evidence.closed({**row,'driverInputs':{**original,'unknown-driver':'x'}})
+
     def test_product_executor_rejects_wrong_task_or_gate(self):
         import sys
         sys.path.insert(0,str(ROOT/'scripts/maintenance'))
