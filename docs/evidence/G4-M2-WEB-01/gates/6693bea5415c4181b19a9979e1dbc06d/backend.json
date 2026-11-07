@@ -1,0 +1,70 @@
+{
+  "gate": "backend",
+  "status": "PASS",
+  "executionMode": "REUSED",
+  "qualificationMode": "FRESH",
+  "productProof": {
+    "status": "PASS",
+    "gate": "backend",
+    "executionMode": "REUSED",
+    "qualification": "Original successful results, exact current inputs and original bytes revalidated; product not rerun",
+    "originalEvidence": [
+      {
+        "kind": "unit",
+        "path": "docs/evidence/G4-M2-WEB-01/recovery/local/unit-current.json",
+        "sha256": "4a6c9656dd6468d0e15145155fd41980857fb93a7a8c9a5102be292fa8ff8a15",
+        "sourceRun": null,
+        "tests": 29
+      },
+      {
+        "kind": "https",
+        "path": "docs/evidence/G4-M2-WEB-01/recovery/runs/m2-5e5a2f7a62de/fixture-receipt.json",
+        "sha256": "12477aed59a1db563fb775374dd84f0450acc0269551fae9d75d16240dca981e",
+        "sourceRun": "m2-5e5a2f7a62de",
+        "tests": 13
+      },
+      {
+        "kind": "pg",
+        "path": "docs/evidence/G4-M2-WEB-01/recovery/runs/m2-beb513edec23/pg-receipt.json",
+        "sha256": "50456d873f58b6bec46069df7b295a6f708198553358c19774a9ceaf37ce8946",
+        "sourceRun": "m2-beb513edec23",
+        "tests": 1
+      },
+      {
+        "kind": "smoke",
+        "path": "docs/evidence/G4-M2-WEB-01/recovery/runs/m2-c72b9c07e76c/receipt.json",
+        "sha256": "df8f06832fabcb77e1a9e14d0bef2ac1b32310b92e2b87034524091925206078",
+        "sourceRun": "m2-c72b9c07e76c",
+        "tests": 19
+      }
+    ],
+    "tests": 62,
+    "skipped": 0
+  },
+  "command": [
+    "python3",
+    "-B",
+    "scripts/maintenance/workflow_m2_evidence.py",
+    "--task",
+    "G4-M2-WEB-01",
+    "--gate",
+    "backend",
+    "--input-key",
+    "2f25aea29454fabad302821bb0415c9190f242b92b7a73e6c84f373b7ef111e0"
+  ],
+  "exitCode": 0,
+  "tests": 62,
+  "skipped": 0,
+  "diagnostic": false,
+  "hypothesis": null,
+  "inputsUnchanged": true,
+  "errorSignature": null,
+  "elapsedSeconds": 0.20177254098234698,
+  "inputKey": "2f25aea29454fabad302821bb0415c9190f242b92b7a73e6c84f373b7ef111e0",
+  "environmentKey": "2154e84e3432062f8aa77aed68db0dcffc9f7f2e8531a7e3033ec2294f4a4938",
+  "policyKey": "e9c08465ffd0edf40976be6d7518e6624e9f1e68daa9083f96f12df568726986",
+  "evidenceSha256": "8f7deaef9992f6d2e2e594ed57724b9a2a29a84e78c64c91ce44b1a602816b66",
+  "logPath": "docs/evidence/G4-M2-WEB-01/gates/6693bea5415c4181b19a9979e1dbc06d/backend.txt",
+  "sourceRun": "6693bea5415c4181b19a9979e1dbc06d",
+  "sourceCommit": "7455be3ac5121d37d53f6c2d84c48457d8d7ddfa"
+}

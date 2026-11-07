@@ -1,0 +1,97 @@
+{
+  "evidenceSchemaVersion": 2,
+  "validationSource": "LOCAL",
+  "testedCommit": "325bd87fe5e67fa8137176461800651de5bb1b08",
+  "checks": [
+    {
+      "name": "unit",
+      "status": "PASS",
+      "command": "/usr/local/share/dotnet/dotnet /Users/chasen/.codex/worktrees/g4-m2-web-01/ontology-platform/backend/tests/OntologyPlatform.ConnectionsTests/bin/Debug/net10.0/OntologyPlatform.ConnectionsTests.dll --filter FullyQualifiedName~SourceDispatcherTests|(FullyQualifiedName~WebAdapterTests&TestCategory!=RealWebFixture&TestCategory!=RealWebDnsRejection)|(FullyQualifiedName~PgAdapterTests&TestCategory!=RealPgFixture) --minimum-expected-tests 29 --no-ansi --progress off",
+      "exitCode": 0,
+      "output": "Original result and exact build binding: recovery/local/unit-current.json; original log SHA e7415256627ff149f4c5991a6ab405cad7fcf77ead19791f64df5c2247cd2028"
+    },
+    {
+      "name": "wire",
+      "status": "PASS",
+      "command": "/usr/local/share/dotnet/dotnet /Users/chasen/.codex/worktrees/g4-m2-web-01/ontology-platform/backend/tests/OntologyPlatform.G2ContractTests/bin/Debug/net10.0/OntologyPlatform.G2ContractTests.dll --filter FullyQualifiedName~G4WireContractTests --minimum-expected-tests 16 --no-ansi --progress off",
+      "exitCode": 0,
+      "output": "Original result and exact build binding: recovery/local/wire-current.json; original log SHA a49d785b2ec03cc8653f0ce71202e7a87d15e593a7bd95b91f649d1aa902e293"
+    },
+    {
+      "name": "ui",
+      "status": "PASS",
+      "command": "/Users/chasen/.codex/worktrees/g4-m2-web-01/ontology-platform/apps/web/node_modules/.bin/vitest run src/features/connections/connections.test.ts --no-cache --no-color",
+      "exitCode": 0,
+      "output": "Original result and exact build binding: recovery/local/ui-current.json; original log SHA df4780dc29d325836fdc8373f57b1c8bf29d33c3df019c017adefd6781d92772"
+    },
+    {
+      "name": "typecheck",
+      "status": "PASS",
+      "command": "/Users/chasen/.codex/worktrees/g4-m2-web-01/ontology-platform/apps/web/node_modules/.bin/tsc --noEmit",
+      "exitCode": 0,
+      "output": "Original result and exact build binding: recovery/local/typecheck-current.json; original log SHA e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "lint",
+      "status": "PASS",
+      "command": "/Users/chasen/.codex/worktrees/g4-m2-web-01/ontology-platform/apps/web/node_modules/.bin/eslint src/features/connections/create.tsx src/features/connections/detail.tsx src/features/connections/form-model.ts src/features/connections/connections.test.ts",
+      "exitCode": 0,
+      "output": "Original result and exact build binding: recovery/local/lint-current.json; original log SHA e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "fixture-test",
+      "status": "PASS",
+      "command": "python3 -B scripts/maintenance/workflow_m2_web.py fixture-test --task G4-M2-WEB-01",
+      "exitCode": 0,
+      "output": "13 PASS / 0 skip; run m2-5e5a2f7a62de, cleanup 4/4"
+    },
+    {
+      "name": "pg-regression",
+      "status": "PASS",
+      "command": "python3 -B scripts/maintenance/workflow_m2_web.py pg-regression --task G4-M2-WEB-01",
+      "exitCode": 0,
+      "output": "1 PASS / 0 skip; run m2-beb513edec23, cleanup 4/4"
+    },
+    {
+      "name": "smoke",
+      "status": "PASS",
+      "command": "python3 -B scripts/maintenance/workflow_m2_web.py smoke --task G4-M2-WEB-01",
+      "exitCode": 0,
+      "output": "19 PASS / 0 skip; run m2-c72b9c07e76c, cleanup 10/10; 11 audits and leak scan PASS"
+    },
+    {
+      "name": "impact-gates",
+      "status": "PASS",
+      "command": "python3 -B scripts/maintenance/workflow.py verify --task G4-M2-WEB-01 --plan artifacts/workflow/G4-M2-WEB-01/final-plan-clean-cache.json --reuse artifacts/workflow/G4-M2-WEB-01/reuse-engineering.json --publish-evidence",
+      "exitCode": 0,
+      "output": "10 affected gates PASS; current original-evidence qualification FRESH; product execution REUSED; engineering 18/environment 6 immutable reused; task admission 11/shared smoke 14 FRESH. See recovery/workflow-final.json."
+    },
+    {
+      "name": "resource-closeout",
+      "status": "PASS",
+      "command": "python3 -B /tmp/g4-m2-resources.py",
+      "exitCode": 0,
+      "output": "Final runs removed 18 exact resources; both task-label sets empty. Current UI transform cache exact cleanup 22 files. See resource-closeout.json and ui-cache-cleanup.json."
+    }
+  ],
+  "ci": {
+    "status": "NOT_RUN",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  },
+  "metadata": {
+    "taskStatus": "VERIFIED_PENDING_PACKAGE",
+    "independentReview": "recovery/independent-review.md; final ZIP independent reopen recorded outside ZIP",
+    "actualAcceptance": "recovery/acceptance-matrix.json",
+    "historicalFailuresPreserved": true,
+    "notRun": [
+      "GitHub CI",
+      "Windows",
+      "Intel Mac",
+      "unrelated M1 full acceptance"
+    ],
+    "inputReuse": "All product/driver tracked inputs unchanged since testedCommit; only allowed docs increments. No sum of overlapping product gates."
+  }
+}

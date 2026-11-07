@@ -1,6 +1,6 @@
 # G4-M2-WEB-01｜一页实施清单与唯一状态
 
-状态：**VERIFIED_PENDING_PACKAGE / 产品真实验收完成，按影响工程门禁及最终包复核进行中**。
+状态：**VERIFIED_PENDING_PACKAGE / 产品及按影响工程门禁通过，等待最终包独立重开**。
 授权：2026-11-07 用户明确批准附件单 Web HTTPS GET；[附件](../evidence/G4-M2-WEB-01/authorization.md)。
 Base：`b3b68500d76ab5965fcc540afb883ca605cb15dd`，真实 fetch 一致；分支 `codex/g4-m2-web-01`。
 Worktree：`/Users/chasen/.codex/worktrees/g4-m2-web-01/ontology-platform`；Master 单写，p0_review 非作者只读。
@@ -11,7 +11,7 @@ Worktree：`/Users/chasen/.codex/worktrees/g4-m2-web-01/ontology-platform`；Mas
 - [x] P0闭合：Web认证合同裁决；离线Web缓存来源核验与两次幂等prepare；TaskId消费者准入；TLS/socket平台见证。
 - [x] 公共分发：准确文件冻结后编写PG/Web正反合同测试→非作者Review→最小typed dispatcher；PG不变，其他三类型继续拒绝。
 - [x] Web：可信精确operation/HostPolicy注册→DNS全地址与socket绑定→正常TLS→固定GET/认证→有界目录/取消/生命周期。
-- [ ] 验收：先真实OIDC/API/HTTPS/UI烟测；再workflow plan/verify按影响执行安全负例、权限/SecretRef、PG回归、取消见证及浏览器闭环。
+- [x] 验收：先真实OIDC/API/HTTPS/UI烟测；再workflow plan/verify按影响执行安全负例、权限/SecretRef、PG回归、取消见证及浏览器闭环。
 - [ ] 产品交付：独立Review→提交/输入绑定→唯一V3→独立重开→回执；不更新main。
 
 ## 所有权与依赖

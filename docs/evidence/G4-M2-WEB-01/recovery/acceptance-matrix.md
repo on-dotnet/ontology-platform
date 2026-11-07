@@ -14,7 +14,7 @@
 | 真实 OIDC/API/UI/HTTPS 闭环 | 19 PASS，0 skip | runs/m2-c72b9c07e76c/browser.json、receipt.json |
 | 泄漏与审计 | 平台 dump、API/Web 日志扫描通过；11 类审计动作存在；原业务数据未归档 | 同一 smoke receipt |
 | 资源清理 | 最终三 run 18 项准确资源删除后验通过；两个任务标签查询均无残留 | resource-closeout.json 及每 run resources/receipt |
-| 按影响工程门禁 | 见最终 gates 回执；不将原测试复用说成重跑 | ../gates/ 下发布的最终回执 |
+| 按影响工程门禁 | 10 个受影响门禁 PASS；工程 18 / 环境 6 REUSED；任务准入 11 / shared smoke 14 FRESH；policy exit 0 | ../gates/ 下发布的最终回执 |
 | 独立 Review | 无未关闭 P0/P1；证据及 ZIP 实际复核分别记录 | independent-review.md；ZIP 重开记录在包外回执 |
 
 每组真实测试是在本任务中 FRESH 执行。随后产品门禁标记 REUSED，并 FRESH 重核原始 bytes/SHA、日志中的实际计数/exit、当前驱动及四类构建完整输出绑定、清理预期 ID；不依据 manifest 自报 PASS，不累加重叠门禁中的测试数。精确命令、退出码、时间及散列保存在原始 JSON；可机器读取的索引为 acceptance-matrix.json 和 product-proof-index.json。

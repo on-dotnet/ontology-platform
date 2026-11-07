@@ -1,0 +1,56 @@
+{
+  "gate": "web",
+  "status": "PASS",
+  "executionMode": "REUSED",
+  "qualificationMode": "FRESH",
+  "productProof": {
+    "status": "PASS",
+    "gate": "web",
+    "executionMode": "REUSED",
+    "qualification": "Original successful results, exact current inputs and original bytes revalidated; product not rerun",
+    "originalEvidence": [
+      {
+        "kind": "ui",
+        "path": "docs/evidence/G4-M2-WEB-01/recovery/local/ui-current.json",
+        "sha256": "9d43caca7f76de7145c3882c5b2a36a350b6497ac12e25879a5ba1a16af05e8f",
+        "sourceRun": null,
+        "tests": 119
+      },
+      {
+        "kind": "smoke",
+        "path": "docs/evidence/G4-M2-WEB-01/recovery/runs/m2-c72b9c07e76c/receipt.json",
+        "sha256": "df8f06832fabcb77e1a9e14d0bef2ac1b32310b92e2b87034524091925206078",
+        "sourceRun": "m2-c72b9c07e76c",
+        "tests": 19
+      }
+    ],
+    "tests": 138,
+    "skipped": 0
+  },
+  "command": [
+    "python3",
+    "-B",
+    "scripts/maintenance/workflow_m2_evidence.py",
+    "--task",
+    "G4-M2-WEB-01",
+    "--gate",
+    "web",
+    "--input-key",
+    "997d67e8dade285aa3087c8c5f0e68992bd028ffe0cd9c1fcfb9c2b319979792"
+  ],
+  "exitCode": 0,
+  "tests": 138,
+  "skipped": 0,
+  "diagnostic": false,
+  "hypothesis": null,
+  "inputsUnchanged": true,
+  "errorSignature": null,
+  "elapsedSeconds": 0.19963695798651315,
+  "inputKey": "997d67e8dade285aa3087c8c5f0e68992bd028ffe0cd9c1fcfb9c2b319979792",
+  "environmentKey": "2154e84e3432062f8aa77aed68db0dcffc9f7f2e8531a7e3033ec2294f4a4938",
+  "policyKey": "e246b661e51aef292c68c1619b7cfdb1574ee0daf7668e3a16663cace839653b",
+  "evidenceSha256": "9d8b0e9190807d6f994f03966182cca0a8705fbffb93fd12af31f2b60e8e989e",
+  "logPath": "docs/evidence/G4-M2-WEB-01/gates/6693bea5415c4181b19a9979e1dbc06d/web.txt",
+  "sourceRun": "6693bea5415c4181b19a9979e1dbc06d",
+  "sourceCommit": "7455be3ac5121d37d53f6c2d84c48457d8d7ddfa"
+}
