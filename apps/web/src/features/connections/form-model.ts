@@ -60,3 +60,10 @@ export function configFromForm(form: ConnectionForm): ConnectionConfig {
     case "WEB_API": return { type: form.type, profile: { baseOrigin: v.baseOrigin, operationId: v.operationId, method: v.method, approvedPath: v.approvedPath, authentication: v.authentication, pagination: v.pagination, hostPolicyRef: v.hostPolicyRef } };
   }
 }
+
+/** 可执行模式决定凭据用途；服务端仍独立核验准确目标、范围和用途。 */
+export function runnablePurpose(form: ConnectionForm): "POSTGRESQL_READONLY" | "WEB_API_KEY" | null {
+  if (form.type === "POSTGRESQL") return "POSTGRESQL_READONLY";
+  if (form.type === "WEB_API" && form.values.method === "GET" && form.values.authentication === "API_KEY_REF" && form.values.pagination === "NONE") return "WEB_API_KEY";
+  return null;
+}

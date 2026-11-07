@@ -17,7 +17,7 @@ public sealed partial class ConnectionApplicationService : IConnectionRequestHan
     private readonly ITransactionalAuditWriter audit;
 
     /// <summary>唯一真实源适配器。</summary>
-    private readonly IPgSourceAdapter adapter;
+    private readonly ConnectionSourceDispatcher adapter;
 
     /// <summary>只在服务端使用的AEAD服务。</summary>
     private readonly ConnectionSecretCipher cipher;
@@ -25,15 +25,12 @@ public sealed partial class ConnectionApplicationService : IConnectionRequestHan
     /// <summary>后台任务实时身份重验。</summary>
     private readonly IConnectionSessionAuthority authority;
 
-    /// <summary>服务器明确批准的空public合成例外，默认关闭。</summary>
-    private readonly bool allowEmptyPublic;
-
     /// <summary>统一可测试UTC时钟。</summary>
     private readonly TimeProvider clock;
 
     /// <summary>依赖均由Master组合，不跨模块写治理表。</summary>
     public ConnectionApplicationService(IDbContextFactory<ConnectionsDbContext> factory, ITransactionalAuditWriter audit,
-        IPgSourceAdapter adapter, ConnectionSecretCipher cipher, IConnectionSessionAuthority authority, TimeProvider clock, PgAdapterOptions options)
+        ConnectionSourceDispatcher adapter, ConnectionSecretCipher cipher, IConnectionSessionAuthority authority, TimeProvider clock)
     {
         this.factory = factory;
         this.audit = audit;
@@ -41,14 +38,7 @@ public sealed partial class ConnectionApplicationService : IConnectionRequestHan
         this.cipher = cipher;
         this.authority = authority;
         this.clock = clock;
-        // 同步复制服务器上限；只有精确B显式允许空public，默认A不受后续数组修改影响。
-        var serverSchemas = options.AllowedSchemas?.ToArray();
-        allowEmptyPublic = serverSchemas switch
-        {
-            ["production"] => false,
-            ["production", "public"] => true,
-            _ => throw new PgSourceException("connection_network_forbidden")
-        };
+
     }
 
     /// <summary>执行固定操作并重新检查身份角色；未来传输不能绕过HTTP已做的字段规则。</summary>
@@ -104,17 +94,8 @@ public sealed partial class ConnectionApplicationService : IConnectionRequestHan
             throw new SemanticOperationException(403, "connection_scope_forbidden");
     }
 
-    /// <summary>唯一受控PG运行子集，其他配置只能用于表单预览。</summary>
-    private PgConnectionProfile Pg(ConnectionConfig config)
-    {
-        G4ConnectionRules.Config(config);
-        if (config is not PgConnectionConfig pg) throw new SemanticOperationException(422, "connector_not_enabled");
-        if (pg.Profile.SslMode != "VerifyFull") throw new SemanticOperationException(422, "connection_tls_untrusted");
-        if (pg.Profile.Host != "pg-source" || pg.Profile.Port != 5432 || pg.Profile.Database != "fixture"
-            || pg.Profile.Username != "fixture_reader" || (pg.Profile.AllowedSchemas is not ["production"] && !(allowEmptyPublic && pg.Profile.AllowedSchemas is ["production", "public"])))
-            throw new SemanticOperationException(403, "connection_network_forbidden");
-        return pg.Profile;
-    }
+    /// <summary>绑定前及每次源IO前重验准确类型、服务器目标和资源范围。</summary>
+    private ConnectionConfig Source(ConnectionConfig config, ResourceScope scope) => adapter.Validate(config, scope);
 
     /// <summary>资源不存在或范围不符统一拒绝，未授权调用不会得到资源详情。</summary>
     private static async Task<ConnectionRecord> FindAsync(ConnectionsDbContext db, ActorContext actor, string? id, CancellationToken token)
@@ -162,7 +143,7 @@ public sealed partial class ConnectionApplicationService : IConnectionRequestHan
         {
             // Ref不从任何普通GET或连接响应公开。
             var receipt = Decode<SecretIntakeReceipt>(previous.ReceiptJson);
-            _ = await UnboundSecretAsync(db, call.Actor, receipt.SecretRef, Decode<ResourceScope>(previous.ScopeJson), token);
+            _ = await UnboundSecretAsync(db, call.Actor, receipt.SecretRef, Decode<ResourceScope>(previous.ScopeJson), ((ConnectionSecretIntakeRequest)call.Body!).Purpose, token);
         }
         return new ConnectionReply { Value = JsonSerializer.Deserialize(previous.ReceiptJson, type, G4ConnectionJson.Options)!, Etag = previous.Etag, StatusCode = previous.StatusCode };
     }
@@ -229,10 +210,12 @@ public sealed partial class ConnectionApplicationService : IConnectionRequestHan
     /// <summary>operator可见非秘密配置，auditor只得到固定脱敏只读投影。</summary>
     private async Task<ConnectionView> ViewAsync(ConnectionsDbContext db, ActorContext actor, ConnectionRecord row, CancellationToken token)
     {
-        // 所有已存连接本阶段均是经过验证的PG配置。
+        // 持久配置为经过服务器目标核验的PG或Web类型。
         var config = Decode<ConnectionConfig>(row.ConfigJson);
         if (!actor.Roles.Contains("platform.operator") && config is PgConnectionConfig pg)
             config = pg with { Profile = pg.Profile with { Host = "redacted", Database = "redacted", Username = "redacted", AllowedSchemas = ["redacted"] } };
+        if (!actor.Roles.Contains("platform.operator") && config is WebApiConnectionConfig web)
+            config = web with { Profile = web.Profile with { BaseOrigin = "https://redacted.invalid", OperationId = "redacted", ApprovedPath = "/redacted", HostPolicyRef = "redacted" } };
         return new ConnectionView
         {
             Id = row.Id,
@@ -266,7 +249,7 @@ public sealed partial class ConnectionApplicationService : IConnectionRequestHan
     /// <summary>授权先在PG过滤，再进行50项键集分页。</summary>
     private async Task<ConnectionReply> ListAsync(ConnectionInvocation call, CancellationToken token)
     {
-        // 不同连接类型尚无已保存对象，合法非PG筛选返回真实空集合。
+        // 类型筛选作用于服务器自身序列化的判别字段，不改变数据库结构。
         if (!string.IsNullOrEmpty(call.Type) && call.Type is not ("POSTGRESQL" or "ORACLE" or "DORIS" or "TDENGINE" or "WEB_API"))
             throw new SemanticOperationException(422, "connection_profile_invalid");
         if (!string.IsNullOrEmpty(call.State) && call.State is not ("DRAFT" or "ACTIVE" or "DISABLED"))
@@ -277,7 +260,12 @@ public sealed partial class ConnectionApplicationService : IConnectionRequestHan
         // 资源完整site集合必须被当前actor覆盖。
         var query = db.Connections.Where(row => row.OrganizationId == call.Actor.OrganizationId && row.SiteIds.All(site => call.Actor.SiteIds.Contains(site)));
         if (!string.IsNullOrEmpty(call.State)) query = query.Where(row => row.State == call.State);
-        if (!string.IsNullOrEmpty(call.Type) && call.Type != "POSTGRESQL") query = query.Where(row => false);
+        if (!string.IsNullOrEmpty(call.Type))
+        {
+            // 引号由JSON结构生成；用户字符串中的引号已转义，不能冒充判别字段。
+            var marker = "\"type\":\"" + call.Type + "\"";
+            query = query.Where(row => row.ConfigJson.Contains(marker));
+        }
         if (after.Length > 0) query = query.Where(row => string.Compare(row.Id, after) > 0);
         // 多取一项仅用于判断下一页，不返回越界对象。
         var rows = await query.OrderBy(row => row.Id).Take(51).ToArrayAsync(token);

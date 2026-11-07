@@ -7,6 +7,22 @@ namespace OntologyPlatform.G2ContractTests;
 [TestClass]
 public sealed class G4WireContractTests
 {
+    /// <summary>新增Web用途只扩展精确字符串值域，未知用途仍拒绝。</summary>
+    [TestMethod]
+    public void SecretIntakeAcceptsOnlyApprovedTypedPurposes()
+    {
+        // 其它字段保持合法且无真实凭据，隔离Purpose校验边界。
+        var request = new ConnectionSecretIntakeRequest
+        {
+            SecretValue = "synthetic-key", Purpose = "WEB_API_KEY",
+            ScopeSelection = new ResourceScope { OrganizationId = "org-demo", SiteIds = ["site-a"] },
+            Command = new CommandContext { CommandId = "cmd", IdempotencyKey = "key", ExpectedRevision = 0, Reason = "合成用途校验" }
+        };
+        G4ConnectionRules.Validate(request);
+        G4ConnectionRules.Validate(request with { Purpose = "POSTGRESQL_READONLY" });
+        Assert.Throws<SemanticOperationException>(() => G4ConnectionRules.Validate(request with { Purpose = "OTHER" }));
+    }
+
     /// <summary>配置判别与字段一致且可真实往返。</summary>
     [TestMethod]
     [DataRow("POSTGRESQL", "{\"host\":\"pg-source\",\"port\":5432,\"database\":\"fixture\",\"username\":\"fixture_reader\",\"sslMode\":\"VerifyFull\",\"allowedSchemas\":[\"production\"]}")]

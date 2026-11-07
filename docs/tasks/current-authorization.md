@@ -124,3 +124,7 @@ M4资源实际收尾：获审候选已在main；8任务卷+1fixture精确回收�
 # 2026-11-07 G4-M2-WEB-01 最新明确授权（追加）
 
 本会话用户明确批准[附件](../evidence/G4-M2-WEB-01/authorization.md)单Web HTTPS GET切片，基线b3b68500d76ab5965fcc540afb883ca605cb15dd，新独立Worktree及codex/g4-m2-web-01；先一页清单/P0，通过后范围内持续实施。此段取代历史任务对M2未授权的限制，仅对本任务有效。允许附件限定合成隔离资源：最多6进程/容器、容器6GiB、源fixture最多2个且合计不超过512MiB；数据3GiB、过程产物1GiB停止阈值。禁止新增下载/依赖/费用、公共DTO/数据库语义/权限变更、其他Adapter、main更新及M3/G6。当前唯一状态见[任务卡](G4-M2-WEB-01.md)。P0发现需边界裁决，产品未实施；历史授权与证据原样保留。
+
+## 2026-11-07 P0合同扩展与恢复（最新明确授权）
+
+用户批准[p0-decision-approval](../evidence/G4-M2-WEB-01/p0-decision-approval.md)：现有任务树继续，仅新增WEB_API_KEY用途字符串校验，当前运行仅API_KEY_REF/GET/Pagination=NONE。NONE/OAuth/其他分页暂缓；不改其他DTO、数据库语义/迁移、路由/权限、依赖。先修复Web缓存/消费者准入，再分发合同独立Review及产品闭环。原BLOCKED ZIP保持原字节；普通修复持续实施，不更新main。

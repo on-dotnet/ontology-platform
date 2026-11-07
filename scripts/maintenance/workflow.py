@@ -314,6 +314,9 @@ def verify(task, path, reuse=None, publish=False, diagnostic=False, hypothesis=N
         gate=registry()[name];key=actual['inputKeys'][name];policy=policy_key(name)
         if any(outcomes.get(dep) not in (None,'PASS') for dep in gate['needs']):
             rows.append(dict(gate=name,status='NOT_RUN',reason='Upstream failed or unavailable'));outcomes[name]='NOT_RUN';continue
+        product_qualification=not gate['command'] and task=='G4-M2-WEB-01' and name in {'environment','contract','backend','web','interaction'}
+        if not gate['command'] and task=='G4-M2-WEB-01' and name in {'environment','contract','backend','web','interaction'}:
+            gate={**gate,'command':['python3','-B','scripts/maintenance/workflow_m2_evidence.py','--task',task,'--gate',name,'--input-key',key],'testsRequired':True}
         if not gate['command']:
             rows.append(dict(gate=name,status='NOT_RUN',reason='Product gate requires task-specific admitted executor'))
             outcomes[name]='NOT_RUN';continue
@@ -327,9 +330,9 @@ def verify(task, path, reuse=None, publish=False, diagnostic=False, hypothesis=N
             if not hypothesis or chain[-1]['inputKey']==key:
                 raise ValueError('THREE_REPAIR_FAILURES: run short diagnosis; changed input plus --hypothesis required for '+name)
         with helper.FailureState(directory/'failures.json',digest(canonical([key,environment,policy])),name,policy) as guard:
-            cost='short' if diagnostic else 'expensive'
+            cost='short' if diagnostic or product_qualification else 'expensive'
             guard.allow(cost)
-            previous=None if diagnostic else load_reuse(index,name,key,environment,policy)
+            previous=None if diagnostic or product_qualification else load_reuse(index,name,key,environment,policy)
             if previous:
                 rows.append(previous);outcomes[name]='PASS';continue
             if name not in actual['affected']: continue
@@ -338,13 +341,18 @@ def verify(task, path, reuse=None, publish=False, diagnostic=False, hypothesis=N
             elapsed=time.monotonic()-start
             record_timing(directory,task,run.name,name,key,started,elapsed,code)
             tests,skipped=test_counts(raw.decode(errors='replace'),'auto')
+            product_proof={}
+            if product_qualification and code==0:
+                product_proof=json.loads(raw)
+                if product_proof.get('status')!='PASS' or product_proof.get('executionMode')!='REUSED':raise ValueError('PRODUCT_QUALIFICATION_INVALID')
+                tests=product_proof['tests'];skipped=product_proof['skipped']
             inputs_unchanged=inputs_stable(ROOT,name,key,policy,actual['registrySha256'])
             passed=code==0 and inputs_unchanged and (not gate.get('testsRequired') or tests>0 and skipped==0)
             guard.record(cost,code if code else (0 if passed else 65))
             evidence_dir=run
             published_dir=safe_file(ROOT/'docs/evidence'/task/'gates'/run.name) if publish else run
             log=write_gate_output(evidence_dir,name,raw)
-            row=dict(gate=name,status='PASS' if passed else 'FAIL',executionMode='FRESH',
+            row=dict(gate=name,status='PASS' if passed else 'FAIL',executionMode='REUSED' if product_qualification else 'FRESH',qualificationMode='FRESH',productProof=product_proof,
                 command=gate['command'],exitCode=code,tests=tests,skipped=skipped,diagnostic=diagnostic,hypothesis=hypothesis,inputsUnchanged=inputs_unchanged,
                 errorSignature=error_signature(raw,code) if not passed else None,
                 elapsedSeconds=elapsed,inputKey=key,environmentKey=environment,policyKey=policy,
@@ -358,7 +366,7 @@ def verify(task, path, reuse=None, publish=False, diagnostic=False, hypothesis=N
     if publish:
         target=safe_file(ROOT/'docs/evidence'/task/'gates'/run.name);target.mkdir(parents=True)
         for row in rows:
-            if row.get('executionMode')!='FRESH': continue
+            if row.get('executionMode')!='FRESH' and row.get('qualificationMode')!='FRESH': continue
             for suffix in ('.txt','.json'): os.replace(run/(row['gate']+suffix),target/(row['gate']+suffix))
             write(run/(row['gate']+'.state.json'),{k:row[k] for k in ('status','inputKey','environmentKey','errorSignature')})
     write(run/'receipt.json',result)

@@ -7,17 +7,32 @@ namespace OntologyPlatform.Modules.Connections;
 public sealed partial class ConnectionApplicationService
 {
     /// <summary>只允许同actor、同精确scope、用途正确、未使用且未过期的引用。</summary>
-    private async Task<ConnectionSecretRecord> UnboundSecretAsync(ConnectionsDbContext db, ActorContext actor, string id, ResourceScope scope, CancellationToken token)
+    private async Task<ConnectionSecretRecord> UnboundSecretAsync(ConnectionsDbContext db, ActorContext actor, string id, ResourceScope scope, string expectedPurpose, CancellationToken token)
     {
         // 在同事务内串行化引用绑定，两个连接不能消费同一Ref。
         if (db.Database.CurrentTransaction is not null) await LockAsync(db, "secret:" + id, token);
         // 先组织与owner过滤，绝不解密不属于调用者的秘密。
         var row = await db.ConnectionSecrets.SingleOrDefaultAsync(value => value.Id == id && value.OrganizationId == actor.OrganizationId && value.Owner == actor.SubjectId, token);
-        if (row is null || row.UsedAtUtc is not null || row.ExpiresAtUtc <= clock.GetUtcNow() || row.Purpose != "POSTGRESQL_READONLY"
+        if (row is null || row.UsedAtUtc is not null || row.ExpiresAtUtc <= clock.GetUtcNow() || row.Purpose != expectedPurpose
             || Encode(Normalize(new ResourceScope { OrganizationId = row.OrganizationId, SiteIds = row.SiteIds })) != Encode(Normalize(scope)))
             throw new SemanticOperationException(422, "connection_secret_expired");
         DemandScope(actor, scope);
         return row;
+    }
+
+    /// <summary>每次消费绑定秘密均验证用途、连接、版本及完整scope；不改变既有资源管理权限。</summary>
+    private async Task<ConnectionSecretRecord> BoundSecretAsync(ConnectionsDbContext db, ConnectionRecord connection, CancellationToken token)
+    {
+        // 目标与类型必须先于解密验证，不能因旧Probe通过而跳过。
+        var config = Source(Decode<ConnectionConfig>(connection.ConfigJson), Scope(connection));
+        // 当前连接只接受准确绑定且已消费的同版本秘密，不受入库前TTL重新激活影响。
+        var secret = await db.ConnectionSecrets.SingleOrDefaultAsync(value => value.Id == connection.SecretId, token);
+        if (secret is null || secret.ConnectionId != connection.Id || secret.UsedAtUtc is null || secret.Version != connection.SecretVersion
+            || secret.OrganizationId != connection.OrganizationId || string.IsNullOrEmpty(secret.Owner)
+            || !secret.SiteIds.Order(StringComparer.Ordinal).SequenceEqual(connection.SiteIds.Order(StringComparer.Ordinal)))
+            throw new SemanticOperationException(422, "connection_secret_expired");
+        ConnectionSourceDispatcher.DemandPurpose(config, secret.Purpose);
+        return secret;
     }
 
     /// <summary>签发合成密钥引用与审计同事务，秘密原文不进入幂等回执。</summary>
@@ -49,14 +64,14 @@ public sealed partial class ConnectionApplicationService
     /// <summary>绑定一次性秘密并始终创建DRAFT，绝不继承未保存Probe。</summary>
     private Task<ConnectionReply> CreateAsync(ConnectionInvocation call, CancellationToken token)
     {
-        // 非PG在任何写入或秘密消费前拒绝。
+        // 未实现类型/认证/分页在任何写入或秘密消费前拒绝。
         var request = (ConnectionCreateRequest)call.Body!;
-        _ = Pg(request.Config);
+        _ = Source(request.Config, request.ScopeSelection);
         DemandScope(call.Actor, request.ScopeSelection);
         return CommandAsync<ConnectionView>(call, request.Command, "connection.create", 201, async (db, ct) =>
         {
             // 先验证引用owner/用途/TTL，再创建绑定对象。
-            var secret = await UnboundSecretAsync(db, call.Actor, request.SecretRef!, request.ScopeSelection, ct);
+            var secret = await UnboundSecretAsync(db, call.Actor, request.SecretRef!, request.ScopeSelection, ConnectionSourceDispatcher.SecretPurpose(request.Config), ct);
             // 创建仅使用当前可信scope，不把草稿Probe当已保存成功事实。
             var row = new ConnectionRecord
             {
@@ -90,16 +105,24 @@ public sealed partial class ConnectionApplicationService
             Cas(call, row, command);
             // 原范围保存在回执，scope编辑后重放也必须保持原范围权限。
             var before = Scope(row);
+            // 所有编辑/轮换/禁用先检查当前已绑定凭据的准确用途和范围。
+            var currentSecret = await BoundSecretAsync(db, row, ct);
             if (row.State == "DISABLED") throw new SemanticOperationException(409, "connection_disabled");
             if (call.Body is ConnectionPatchRequest patch)
             {
-                if (patch.Config is not null) { _ = Pg(patch.Config); row.ConfigJson = Encode(patch.Config); }
+                if (patch.Config is not null)
+                {
+                    ConnectionSourceDispatcher.DemandSameTarget(Decode<ConnectionConfig>(row.ConfigJson), patch.Config);
+                    _ = Source(patch.Config, patch.ScopeSelection ?? Scope(row));
+                    row.ConfigJson = Encode(patch.Config);
+                }
                 if (patch.DisplayName is not null) row.DisplayName = patch.DisplayName;
                 if (patch.ScopeSelection is not null)
                 {
                     DemandScope(call.Actor, patch.ScopeSelection);
+                    _ = Source(Decode<ConnectionConfig>(row.ConfigJson), patch.ScopeSelection);
                     // 凭据AAD必须随完整授权范围原子重新绑定，而不是丢失AEAD保护。
-                    var secret = await db.ConnectionSecrets.SingleAsync(value => value.Id == row.SecretId, ct);
+                    var secret = currentSecret;
                     // 明文仅内存用于同事务重新加密，不返回调用者。
                     var value = cipher.Decrypt(secret);
                     row.SiteIds = Normalize(patch.ScopeSelection).SiteIds;
@@ -112,7 +135,7 @@ public sealed partial class ConnectionApplicationService
             else if (call.Body is ConnectionRotateSecretRequest rotate)
             {
                 // 新秘密签发操作者及完整范围必须与本次命令一致。
-                var next = await UnboundSecretAsync(db, call.Actor, rotate.SecretRef, Scope(row), ct);
+                var next = await UnboundSecretAsync(db, call.Actor, rotate.SecretRef, Scope(row), ConnectionSourceDispatcher.SecretPurpose(Decode<ConnectionConfig>(row.ConfigJson)), ct);
                 // 更新AEAD版本时先解密原版本，再以新绑定版本重加密。
                 var value = cipher.Decrypt(next);
                 next.Version = row.SecretVersion + 1;
@@ -120,7 +143,7 @@ public sealed partial class ConnectionApplicationService
                 next.UsedAtUtc = clock.GetUtcNow();
                 next.ConnectionId = row.Id;
                 // 撤销旧版本密文，历史审计仍保留版本引用。
-                var previous = await db.ConnectionSecrets.SingleAsync(secret => secret.Id == row.SecretId, ct);
+                var previous = currentSecret;
                 previous.Ciphertext = string.Empty;
                 previous.Tag = string.Empty;
                 previous.Nonce = string.Empty;

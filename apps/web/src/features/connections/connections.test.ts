@@ -1,7 +1,7 @@
 import { createElement, isValidElement, type ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
-import { configFromForm, formFromConfig, newForm, validateForm, type ConnectionForm, type ConnectionType } from "./form-model";
+import { runnablePurpose, configFromForm, formFromConfig, newForm, validateForm, type ConnectionForm, type ConnectionType } from "./form-model";
 import { ConfigurationForm } from "./form";
 import { CreateConnection } from "./create";
 import ConnectionListPage from "../../app/data/connections/page";
@@ -593,4 +593,22 @@ describe("详情与目录操作的异步互锁（组件回归）", () => {
     } finally { host.unmount(); view.unmount(); vi.useRealTimers(); }
   });
 
+});
+
+/** Web用途按服务器支持的窄模式选择；预览合同不等于可执行。 */
+describe("M2 Web认证用途", () => {
+  it("只允许GET/API_KEY_REF/NONE分页，其他连接器不借用Web凭据", () => {
+    const form = newForm("WEB_API", "合成Web");
+    form.values.authentication = "API_KEY_REF";
+    expect(runnablePurpose(form)).toBe("WEB_API_KEY");
+    for (const authentication of ["NONE", "OAUTH_CLIENT_CREDENTIALS_REF"]) {
+      expect(runnablePurpose({ ...form, values: { ...form.values, authentication } })).toBeNull();
+    }
+    for (const pagination of ["PAGE", "OFFSET", "CURSOR", "LINK"]) {
+      expect(runnablePurpose({ ...form, values: { ...form.values, pagination } })).toBeNull();
+    }
+    expect(runnablePurpose({ ...form, values: { ...form.values, method: "POST" } })).toBeNull();
+    expect(runnablePurpose(newForm("POSTGRESQL"))).toBe("POSTGRESQL_READONLY");
+    for (const type of ["ORACLE", "DORIS", "TDENGINE"] as const) expect(runnablePurpose(newForm(type))).toBeNull();
+  });
 });

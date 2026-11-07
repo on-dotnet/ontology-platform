@@ -30,6 +30,7 @@ public sealed partial class ConnectionApplicationService
             if (!await authority.IsCurrentAsync(call.SessionReference, call.Actor, ct)) throw new SemanticOperationException(401, "authentication_required");
             if (await db.CatalogJobs.AnyAsync(value => value.ConnectionId == row.Id && (value.Status == "QUEUED" || value.Status == "RUNNING"), ct))
                 throw new SemanticOperationException(409, "connection_version_conflict");
+            _ = await BoundSecretAsync(db, row, ct);
             // 捕获当前输入版本和受保护会话引用，后台每次重新验证。
             var job = new CatalogJobRecord
             {
@@ -58,6 +59,7 @@ public sealed partial class ConnectionApplicationService
                 // 取消仍需当前资源范围及CAS，不能跨连接取消任务。
                 var row = await FindAsync(db, call.Actor, call.Id, ct);
                 Cas(call, row, ((ConnectionMutationCommand)call.Body!).Command);
+                _ = await BoundSecretAsync(db, row, ct);
                 // 捕获范围仍需被当前身份覆盖。
                 var job = await FindJobAsync(db, call, ct);
                 job.CancelRequested = true;
@@ -98,11 +100,12 @@ public sealed partial class ConnectionApplicationService
         var row = await FindAsync(db, call.Actor, call.Id, token);
         if (row.State == "DISABLED") throw new SemanticOperationException(403, "catalog_access_forbidden");
         // 当前源ACL必须真实可用，不能单信历史Probe。
-        var credential = await db.ConnectionSecrets.SingleAsync(value => value.Id == row.SecretId, token);
+        var credential = await BoundSecretAsync(db, row, token);
         // Adapter不读取业务行，发生撤权或故障时失败关闭。
         CatalogObject[] visible;
-        try { visible = await adapter.DiscoverAsync(Pg(Decode<ConnectionConfig>(row.ConfigJson)), cipher.Decrypt(credential), token); }
+        try { visible = await WithCurrentSourceAsync(call, row, ct => adapter.DiscoverAsync(Decode<ConnectionConfig>(row.ConfigJson), Scope(row), cipher.Decrypt(credential), ct), token); }
         catch (PgSourceException) { throw new SemanticOperationException(403, "catalog_access_forbidden"); }
+        catch (OperationCanceledException) { throw new SemanticOperationException(403, "catalog_access_forbidden"); }
         if (!await authority.IsCurrentAsync(call.SessionReference, call.Actor, token)) throw new SemanticOperationException(401, "authentication_required");
         // 源调用后刷新资源，编辑或撤权不能让旧输入通过。
         await db.Entry(row).ReloadAsync(token);
@@ -118,7 +121,7 @@ public sealed partial class ConnectionApplicationService
         // 本页最多返回50项，源目录总大小在Adapter受限。
         var records = await query.OrderBy(value => value.Id).Take(call.Operation == "catalog" ? 1 : 51).ToArrayAsync(token);
         // 完整当前目录指纹同时识别新增对象、字段和属性变化，不仅识别旧字段消失。
-        var currentFingerprint = CanonicalCatalog(visible).Fingerprint;
+        var currentFingerprint = CanonicalCatalog(visible, Decode<ConnectionConfig>(row.ConfigJson)).Fingerprint;
         // 任何当前不可见字段都不能由历史快照恢复。
         var views = records.Take(50).Select(value =>
         {
@@ -151,13 +154,14 @@ public sealed partial class ConnectionApplicationService
 
     /// <summary>以冻结的适配器版本与排序规则生成目录及指纹，供快照写入和当前状态读取共用。</summary>
     /// <param name="objects">当前授权范围内由真实适配器返回的有界目录。</param>
+    /// <param name="config">当前配置用于区分适配器版本，PG原指纹规则保持。</param>
     /// <returns>排序后的目录与保持历史字节规则的内容指纹。</returns>
-    private static (CatalogObject[] Objects, string Fingerprint) CanonicalCatalog(CatalogObject[] objects)
+    private static (CatalogObject[] Objects, string Fingerprint) CanonicalCatalog(CatalogObject[] objects, ConnectionConfig config)
     {
         // 排序只规范化已有目录，不添加字段或改变旧快照内容。
         var canonical = objects.OrderBy(value => value.Schema, StringComparer.Ordinal).ThenBy(value => value.Name, StringComparer.Ordinal)
             .ThenBy(value => value.Kind, StringComparer.Ordinal).Select(value => value with { Fields = value.Fields.OrderBy(field => field.Ordinal).ThenBy(field => field.Name, StringComparer.Ordinal).ToArray() }).ToArray();
-        return (canonical, Hash(Encode(new { AdapterVersion = "pg-m1-v1", Objects = canonical })));
+        return (canonical, Hash(Encode(new { AdapterVersion = config is WebApiConnectionConfig ? "web-m2-v1" : "pg-m1-v1", Objects = canonical })));
     }
 
 }

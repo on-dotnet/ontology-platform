@@ -100,10 +100,11 @@ public sealed partial class ConnectionApplicationService
             var connection = await FindAsync(read, actor, claimed.ConnectionId, deadline.Token);
             if (!Matches(claimed, connection)) throw new OperationCanceledException();
             // 用当前版本建立全新物理连接。
-            var secret = await read.ConnectionSecrets.SingleAsync(value => value.Id == connection.SecretId, deadline.Token);
-            objects = await adapter.DiscoverAsync(Pg(Decode<ConnectionConfig>(connection.ConfigJson)), cipher.Decrypt(secret), deadline.Token);
+            var secret = await BoundSecretAsync(read, connection, deadline.Token);
+            objects = await adapter.DiscoverAsync(Decode<ConnectionConfig>(connection.ConfigJson), Scope(connection), cipher.Decrypt(secret), deadline.Token);
             status = "SUCCEEDED";
         }
+        catch (SemanticOperationException) { status = "FAILED"; diagnostic = "connection_auth_failed"; }
         catch (OperationCanceledException) { status = "CANCELLED"; diagnostic = "connection_cancelled"; }
         catch (PgSourceException exception)
         {
@@ -139,7 +140,7 @@ public sealed partial class ConnectionApplicationService
         if (status == "SUCCEEDED" && objects is not null)
         {
             // 排序后的内容和适配器版本构成指纹，捕获时间不参与内容相等性。
-            var canonical = CanonicalCatalog(objects);
+            var canonical = CanonicalCatalog(objects, Decode<ConnectionConfig>(row.ConfigJson));
             // 快照是新行，绝不修改历史内容。
             var snapshot = new CatalogSnapshotView
             {
@@ -195,4 +196,76 @@ public sealed partial class ConnectionApplicationService
             }
         }
     }
+    /// <summary>保存连接的每次源访问独立观察资源和会话；不跨网络持有数据库事务。</summary>
+    /// <typeparam name="T">真实Adapter返回类型。</typeparam>
+    /// <param name="call">当前可信调用及会话。</param>
+    /// <param name="captured">源调用前已授权的精确资源版本。</param>
+    /// <param name="action">接收实际取消令牌的源调用。</param>
+    /// <param name="token">请求取消令牌。</param>
+    /// <returns>仍与当前资源绑定的源结果。</returns>
+    private async Task<T> WithCurrentSourceAsync<T>(ConnectionInvocation call, ConnectionRecord captured, Func<CancellationToken, Task<T>> action, CancellationToken token)
+    {
+        // 捕获不可变比较值，避免后续EF刷新改变观察条件。
+        var id = captured.Id;
+        // 修订覆盖配置、scope、禁用及轮换的现有CAS语义。
+        var revision = captured.Revision;
+        // 双重绑定秘密版本及配置内容，拒绝旧输入结果。
+        var secretVersion = captured.SecretVersion;
+        // 内容哈希只属于配置，不包含秘密值。
+        var configHash = captured.ConfigHash;
+        // 当前源操作同时受请求和资源变化取消。
+        using var operation = CancellationTokenSource.CreateLinkedTokenSource(token);
+        // 结束后停止轮询，不等待源总期限。
+        using var observing = CancellationTokenSource.CreateLinkedTokenSource(operation.Token);
+        // 每次以全新上下文重核，不使用跟踪缓存或持有事务。
+        async Task CheckAsync(CancellationToken checkToken)
+        {
+            // 只读取当前准确连接，不读取或输出密文。
+            await using var currentDb = await factory.CreateDbContextAsync(checkToken);
+            // 删除、禁用和任意修订变化均失败关闭。
+            var current = await currentDb.Connections.AsNoTracking().SingleOrDefaultAsync(value => value.Id == id, checkToken);
+            if (current is null || current.State == "DISABLED" || current.Revision != revision
+                || current.SecretVersion != secretVersion || current.ConfigHash != configHash
+                || !await authority.IsCurrentAsync(call.SessionReference, call.Actor, checkToken))
+            {
+                await operation.CancelAsync();
+                throw new OperationCanceledException(operation.Token);
+            }
+        }
+        // 将持久状态变化传播到实际HTTP/数据库socket。
+        async Task ObserveAsync()
+        {
+            try
+            {
+                while (!observing.IsCancellationRequested)
+                {
+                    await Task.Delay(250, observing.Token);
+                    await CheckAsync(observing.Token);
+                }
+            }
+            catch (OperationCanceledException) when (observing.IsCancellationRequested) { }
+            catch
+            {
+                await operation.CancelAsync();
+                throw;
+            }
+        }
+        await CheckAsync(operation.Token);
+        // 观察器故障同样取消源访问，不能失效开放。
+        var watch = ObserveAsync();
+        try
+        {
+            // Adapter必须将该令牌传至DNS、socket及正文读取。
+            var result = await action(operation.Token);
+            await CheckAsync(operation.Token);
+            operation.Token.ThrowIfCancellationRequested();
+            return result;
+        }
+        finally
+        {
+            await observing.CancelAsync();
+            try { await watch; } catch (OperationCanceledException) { }
+        }
+    }
+
 }

@@ -40,6 +40,15 @@ public static class G4Composition
             AllowedSchemas = builder.Configuration.GetValue<bool>("G4:AllowEmptyPublicSchema") ? ["production", "public"] : ["production"]
         });
         builder.Services.AddSingleton<IPgSourceAdapter, PgSourceAdapter>();
+        builder.Services.AddSingleton<WebOperationPolicy>();
+        builder.Services.AddSingleton(new WebAdapterOptions
+        {
+            TaskId = builder.Configuration["G4:Web:TaskId"] ?? string.Empty,
+            RunId = builder.Configuration["G4:Web:RunId"] ?? string.Empty,
+            RootCertificatePath = builder.Configuration["G4:Web:RootCertificatePath"] ?? string.Empty
+        });
+        builder.Services.AddSingleton<IWebSourceAdapter, WebSourceAdapter>();
+        builder.Services.AddSingleton<ConnectionSourceDispatcher>();
         builder.Services.AddSingleton(provider => new ConnectionSecretCipher(builder.Configuration["G4:KeyFile"] ?? string.Empty));
         builder.Services.AddSingleton<IConnectionSessionAuthority, G4SessionAuthority>();
         builder.Services.AddScoped<ConnectionApplicationService>();

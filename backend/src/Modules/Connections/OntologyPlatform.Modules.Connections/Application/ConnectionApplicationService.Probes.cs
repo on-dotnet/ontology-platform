@@ -38,7 +38,9 @@ public sealed partial class ConnectionApplicationService
         // 请求模型已通过严格字段与修订验证。
         var command = draft?.Command ?? ((ConnectionMutationCommand)call.Body!).Command;
         // 只由创建预约的请求持有真实源输入，重放不会重新连接。
-        PgConnectionProfile? profile = null;
+        ConnectionConfig? profile = null;
+        // 保存后源调用捕获当前资源版本供持续观察。
+        ConnectionRecord? sourceConnection = null;
         // 明文仅留在当前调用内存，不进入报告或命令回执。
         string? secret = null;
         // 同事务预约可在进程中断后保持真实RUNNING记录。
@@ -57,10 +59,11 @@ public sealed partial class ConnectionApplicationService
             // 同一保存连接只允许一个未过期探测。
             if (row is not null && await db.ConnectionProbes.AnyAsync(value => value.ConnectionId == row.Id && value.Deadline > clock.GetUtcNow()
                 && value.ReportJson.Contains("RUNNING"), ct)) throw new SemanticOperationException(409, "connection_version_conflict");
-            profile = Pg(draft?.Config ?? Decode<ConnectionConfig>(row!.ConfigJson));
+            sourceConnection = row;
+            profile = Source(draft?.Config ?? Decode<ConnectionConfig>(row!.ConfigJson), scope);
             // 草稿Ref尚未消费；保存连接使用已绑定版本，不受入库TTL影响。
-            var credential = draft is not null ? await UnboundSecretAsync(db, call.Actor, draft.SecretRef, scope, ct)
-                : await db.ConnectionSecrets.SingleAsync(value => value.Id == row!.SecretId, ct);
+            var credential = draft is not null ? await UnboundSecretAsync(db, call.Actor, draft.SecretRef, scope, ConnectionSourceDispatcher.SecretPurpose(profile), ct)
+                : await BoundSecretAsync(db, row!, ct);
             secret = cipher.Decrypt(credential);
             // 真实开始时刻是唯一期限依据。
             var now = clock.GetUtcNow();
@@ -111,7 +114,9 @@ public sealed partial class ConnectionApplicationService
         {
             if (!await authority.IsCurrentAsync(call.SessionReference, call.Actor, deadline.Token))
                 throw new OperationCanceledException();
-            stages = await adapter.ProbeAsync(profile, secret, deadline.Token);
+            stages = sourceConnection is null
+                ? await adapter.ProbeAsync(profile, original.Scope, secret, deadline.Token)
+                : await WithCurrentSourceAsync(call, sourceConnection, ct => adapter.ProbeAsync(profile, original.Scope, secret, ct), deadline.Token);
         }
         catch (OperationCanceledException)
         {

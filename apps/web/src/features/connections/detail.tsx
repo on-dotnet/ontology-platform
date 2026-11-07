@@ -6,7 +6,7 @@ import { PlatformApiError } from "../../lib/api/client";
 import { command } from "../../lib/api/g2-client";
 import { createConnectionsClient } from "./api";
 import { ConfigurationForm } from "./form";
-import { configFromForm, formFromConfig, validateForm, type ConnectionForm } from "./form-model";
+import { runnablePurpose, configFromForm, formFromConfig, validateForm, type ConnectionForm } from "./form-model";
 import { ProbeReport, RequestError, stateLabels } from "./status";
 import { CatalogPanel } from "./catalog";
 const client = createConnectionsClient();
@@ -93,11 +93,13 @@ export function ConnectionDetail({ id, canManage }: { id: string; canManage: boo
   function rotate() {
     if (parentPending.current || catalogOwner.current) return;
     if (!view || secret.length < 8 || secret.length > 4096) { setErrors({ secret: "新凭据长度须为 8–4096 字符。" }); return; }
+    const purpose = runnablePurpose(formFromConfig(view.displayName, view.config));
+    if (!purpose) { setErrors({ secret: "当前认证模式尚不可执行。" }); return; }
     const value = secret;
     // intake失败要求重新录入，不保留闭包中的原秘密供一般重放。
     parentPending.current = true;
     setBusy("轮换凭据"); setError(null); setSecret(""); setReplay(null);
-    void client.intake({ secretValue: value, scopeSelection: view.scope, purpose: "POSTGRESQL_READONLY", command: command(0, "录入轮换凭据") }).then(async result => {
+    void client.intake({ secretValue: value, scopeSelection: view.scope, purpose, command: command(0, "录入轮换凭据") }).then(async result => {
       const body = { secretRef: result.data.secretRef, command: command(view.configRevision, "轮换连接凭据") };
       const action = async () => { accept(await client.rotate(id, body, etag)); await refresh(false); };
       setReplay(() => action);

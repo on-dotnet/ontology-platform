@@ -16,7 +16,11 @@ public sealed partial class ConnectionApplicationService
         // HMAC包括前置ETag，不存凭据散列。
         var requestHash = cipher.RequestHash(Encode(new { call.Body, call.Etag }));
         // 仅完成预约的请求获得真实源输入。
-        PgConnectionProfile profile;
+        ConnectionConfig profile;
+        // 保存准确源版本供事务外持续观察。
+        ConnectionRecord sourceConnection;
+        // 捕获已授权范围供typed分发在源IO前复核。
+        ResourceScope scope;
         // 合成秘密只留当前调用内存。
         string secret;
         // 同一事务完成当前授权、CAS、Probe资格和预约。
@@ -34,9 +38,11 @@ public sealed partial class ConnectionApplicationService
             Cas(call, row, command);
             if (row.State == "DISABLED" || !await FreshAsync(db, row, token)) throw new SemanticOperationException(409, "connection_probe_stale");
             if (!await authority.IsCurrentAsync(call.SessionReference, call.Actor, token)) throw new SemanticOperationException(401, "authentication_required");
-            profile = Pg(Decode<ConnectionConfig>(row.ConfigJson));
+            sourceConnection = row;
+            scope = Scope(row);
+            profile = Source(Decode<ConnectionConfig>(row.ConfigJson), scope);
             // 凭据仅在完整授权通过后解密。
-            var credential = await db.ConnectionSecrets.SingleAsync(value => value.Id == row.SecretId, token);
+            var credential = await BoundSecretAsync(db, row, token);
             secret = cipher.Decrypt(credential);
             db.ConnectionCommands.Add(new ConnectionCommandRecord
             {
@@ -58,7 +64,7 @@ public sealed partial class ConnectionApplicationService
         try
         {
             // Adapter使用新的VerifyFull物理连接重新验证当前只读权限。
-            var stages = await adapter.ProbeAsync(profile, secret, token);
+            var stages = await WithCurrentSourceAsync(call, sourceConnection, ct => adapter.ProbeAsync(profile, scope, secret, ct), token);
             if (stages.Any(value => value.Status != "PASS")) failure = "connection_probe_stale";
         }
         catch (OperationCanceledException) { failure = "connection_cancelled"; }

@@ -29,7 +29,7 @@ public static class G4ConnectionRules
             case ConnectionSecretIntakeRequest secret:
                 Command(secret.Command, true);
                 Scope(secret.ScopeSelection);
-                Require(secret.SecretValue is { Length: >= 8 and <= 4096 } && secret.Purpose == "POSTGRESQL_READONLY");
+                Require(secret.SecretValue is { Length: >= 8 and <= 4096 } && secret.Purpose is "POSTGRESQL_READONLY" or "WEB_API_KEY");
                 break;
             case ConnectionDraftProbeRequest probe:
                 Command(probe.Command, true);

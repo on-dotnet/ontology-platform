@@ -19,6 +19,11 @@ import urllib.request
 import uuid
 
 TASK='G4-ENG-WORKFLOW-001'
+M2_TASK='G4-M2-WEB-01'
+
+def admitted(task,run):
+    return (task==TASK and re.fullmatch('wf-[a-f0-9]{12}',run or '')) or (task==M2_TASK and re.fullmatch('m2-[a-f0-9]{12}',run or ''))
+
 SERVICES=('pg-source','platform-pg','keycloak-test','api','web')
 CONTEXT='desktop-linux'
 IMAGES={
@@ -32,7 +37,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {createRequire} from 'node:module';
 const root=process.env.G4_ROOT;
-if(process.env.WORKFLOW_TASK!=='G4-ENG-WORKFLOW-001'||!/^wf-[0-9a-f]{12}$/.test(process.env.G4_RUN_ID))process.exit(2);
+if(!((process.env.WORKFLOW_TASK==='G4-ENG-WORKFLOW-001'&&/^wf-[0-9a-f]{12}$/.test(process.env.G4_RUN_ID))||(process.env.WORKFLOW_TASK==='G4-M2-WEB-01'&&/^m2-[0-9a-f]{12}$/.test(process.env.G4_RUN_ID))))process.exit(2);
 const server=net.createServer(client=>{
  const remote=net.connect({host:'keycloak-test',port:8080});
  const close=()=>{client.destroy();remote.destroy();};
@@ -51,7 +56,7 @@ await require('next/dist/server/lib/start-server').startServer({dir,hostname:'0.
 
 RELAY_NODE=r"""const net=require('node:net');
 const port=Number(process.argv[1]),token=process.argv[2];
-if(![15100,15180].includes(port)||!/^wf-relay-wf-[a-f0-9]{12}-[a-f0-9]{32}$/.test(token))process.exit(2);
+if(![15100,15180].includes(port)||!/^wf-relay-(?:wf|m2)-[a-f0-9]{12}-[a-f0-9]{32}$/.test(token))process.exit(2);
 process.stderr.write('PID '+process.pid+'\n');
 const peer=port===15100?['127.0.0.1',15100]:['keycloak-test',8080];
 const socket=net.connect({host:peer[0],port:peer[1]});
@@ -64,7 +69,7 @@ process.stdin.pipe(socket);socket.pipe(process.stdout);
 """
 RELAY_STOP_NODE=r"""const fs=require('node:fs');
 const pid=Number(process.argv[1]),token=process.argv[2];
-if(!Number.isInteger(pid)||pid<1||!/^wf-relay-wf-[a-f0-9]{12}-[a-f0-9]{32}$/.test(token))process.exit(2);
+if(!Number.isInteger(pid)||pid<1||!/^wf-relay-(?:wf|m2)-[a-f0-9]{12}-[a-f0-9]{32}$/.test(token))process.exit(2);
 function owned(){try{const a=fs.readFileSync('/proc/'+pid+'/cmdline').toString().split('\0');return a.includes(token)&&(a[0]==='node'||a[0].endsWith('/node'));}catch(e){if(e.code==='ENOENT')return false;throw e;}}
 if(owned())process.kill(pid,'SIGTERM');
 const deadline=Date.now()+2000;
@@ -74,7 +79,7 @@ const timer=setInterval(()=>{if(!owned()){clearInterval(timer);process.exit(0);}
 
 def relay_command(runtime, port, token):
     """只允许当前准确Web实例执行两个固定内部目标，不接受地址/脚本输入。"""
-    require(runtime.get('taskId')==TASK and re.fullmatch('wf-[a-f0-9]{12}',runtime.get('runId','')),'RELAY_IDENTITY')
+    require(admitted(runtime.get('taskId'),runtime.get('runId')),'RELAY_IDENTITY')
     require(port in (15100,15180),'RELAY_TARGET')
     require(re.fullmatch('wf-relay-'+runtime['runId']+'-[a-f0-9]{32}',token),'RELAY_TOKEN')
     ident=runtime['containerIds']['web'];require(re.fullmatch('[a-f0-9]{64}',ident),'RELAY_CONTAINER')
@@ -105,7 +110,7 @@ class HostRelay:
                 server=Server(('127.0.0.1',port),Handler);self.servers.append(server)
                 thread=threading.Thread(target=server.serve_forever,kwargs={'poll_interval':.1},daemon=True)
                 thread.start();self.threads.append(thread)
-            self.timer=threading.Timer(480,self.expire);self.timer.daemon=True;self.timer.start()
+            self.timer=threading.Timer(840 if self.runtime['taskId']==M2_TASK else 480,self.expire);self.timer.daemon=True;self.timer.start()
             return self
         except Exception:
             self.close();raise
@@ -215,16 +220,16 @@ def engine(root):
 
 def validate_topology(runtime, rows, current_engine):
     """API重建、旧Web网络身份、他人容器、预算漂移均先拒绝。"""
-    require(runtime.get('taskId')==TASK and re.fullmatch('wf-[0-9a-f]{12}',runtime.get('runId','')),'RUNTIME_IDENTITY')
+    require(admitted(runtime.get('taskId'),runtime.get('runId')),'RUNTIME_IDENTITY')
     require(runtime['engine']==current_engine,'ENGINE_DRIFT')
-    require(set(rows)==set(SERVICES) and set(runtime['containerIds'])==set(SERVICES),'SERVICE_SET')
+    require(set(rows)==set(SERVICES if runtime['taskId']==TASK else ('web-source','platform-pg','keycloak-test','api','web')) and set(runtime['containerIds'])==set(rows),'SERVICE_SET')
     total=0
     for service,row in rows.items():
         require(row['Id']==runtime['containerIds'][service] and re.fullmatch('[0-9a-f]{64}',row['Id']),'CONTAINER_REPLACED')
         labels=row['Config']['Labels']
-        require(labels.get('ontology.task-id')==TASK and labels.get('ontology.run-id')==runtime['runId'],'RESOURCE_OWNER')
+        require(labels.get('ontology.task-id')==runtime['taskId'] and labels.get('ontology.run-id')==runtime['runId'],'RESOURCE_OWNER')
         require(labels.get('com.docker.compose.service')==service,'SERVICE_OWNER')
-        require(row['Config']['Image']==IMAGES[service] and row['Image']==runtime['imageIds'][service],'IMAGE_DRIFT')
+        require(row['Config']['Image']==IMAGES['web' if service=='web-source' else service] and row['Image']==runtime['imageIds'][service],'IMAGE_DRIFT')
         require(row['State']['Running'] and not row['State'].get('Paused'),'SERVICE_NOT_RUNNING')
         memory=row['HostConfig']['Memory'];require(0<memory<=1024**3,'RESOURCE_MEMORY');total+=memory
     require(total<=6*1024**3,'RESOURCE_BUDGET')
@@ -265,8 +270,9 @@ def wait_http(url, headers=None, timeout=90):
     raise ValueError('LOCAL_HTTP_READINESS_TIMEOUT')
 
 
-def fixture(root, private, run):
+def fixture(root, private, run, task=TASK):
     """每Run独立无业务行fixture；不触碰编译目录或系统信任。"""
+    require(admitted(task,run),'FIXTURE_IDENTITY')
     for name in ('postgres-password','reader-password','platform-password','keycloak-password'):
         private_write(private/name,secrets.token_urlsafe(36))
     openssl=shutil.which('openssl');require(openssl is not None,'OPENSSL_MISSING')
@@ -292,7 +298,7 @@ ALTER ROLE fixture_reader IN DATABASE fixture SET default_transaction_read_only 
     api=private/'api';api.mkdir(mode=0o700)
     (api/'g4-key').write_bytes(secrets.token_bytes(32));(api/'g4-key').chmod(0o600)
     shutil.copyfile(private/'ca.crt',api/'ca.crt')
-    runtime={'taskId':TASK,'runId':run,'worktree':str(root),'publicOrigin':'http://localhost:15100',
+    runtime={'taskId':task,'runId':run,'worktree':str(root),'publicOrigin':'http://localhost:15100',
              'realmFile':str(private/'realm.json'),'sourceSecretFile':str(private/'reader-password'),
              'certificatePath':str(api/'keyring.pfx'),'certificatePassword':secrets.token_urlsafe(40),'healthKey':secrets.token_urlsafe(32)}
     private_write(private/'certificate-input.json',runtime)
@@ -303,8 +309,9 @@ ALTER ROLE fixture_reader IN DATABASE fixture SET default_transaction_read_only 
     return runtime
 
 
-def recipe(root, private, run, output):
+def recipe(root, private, run, output, task=TASK):
     """从固定已审配方派生当前任务五服务；不改历史源、不继承历史身份。"""
+    require(admitted(task,run),'RECIPE_IDENTITY')
     env=dict(os.environ,G4_RUN_ID=run,G4_PRIVATE_DIR=str(private),G4_ROOT=str(root),
         G4_HOST_UID=str(os.getuid()),G4_HOST_GID=str(os.getgid()),G4_HELPERS=str(private),
         G4_SHARED_WEB_MODULES=str(root/'apps/web/node_modules'),G4_SHARED_ROOT_MODULES=str(root/'node_modules'),
@@ -316,15 +323,15 @@ def recipe(root, private, run, output):
     value['services']={name:value['services'][name] for name in SERVICES}
     for service,item in value['services'].items():
         require(item['image']==IMAGES[service] and item['pull_policy']=='never','RECIPE_IMAGE')
-        item['labels']['ontology.task-id']=TASK
+        item['labels']['ontology.task-id']=task
         item['labels']['ontology.run-id']=run
         item['labels']['ontology.synthetic']='true'
         item.pop('profiles',None)
-    value['services']['web']['environment']['WORKFLOW_TASK']=TASK
+    value['services']['web']['environment']['WORKFLOW_TASK']=task
     for collection in ('volumes','networks'):
         for name,item in value[collection].items():
             item['name']='ontology-workflow-'+run+'_'+name
-            item.setdefault('labels',{})['ontology.task-id']=TASK
+            item.setdefault('labels',{})['ontology.task-id']=task
             item['labels']['ontology.run-id']=run
     private_write(private/'loopback-proxy.mjs',WEB_HELPER)
     private_write(output,value)
@@ -343,7 +350,7 @@ def volume_observation(root, runtime):
 
 def resource_manifest(root, runtime, config, private, phase):
     """创建前写准确期望名称，随后逐项观察；不存在与不可观察均不冒充删除。"""
-    result={'taskId':TASK,'runId':runtime['runId'],'engine':runtime['engine'],'phase':phase,
+    result={'taskId':runtime['taskId'],'runId':runtime['runId'],'engine':runtime['engine'],'phase':phase,
             'containerIds':dict(runtime['containerIds']),'volumes':{},'networks':{},
             'decision':'KEEP_UNTIL_REVIEWED_CLOSEOUT','privateRuntime':str(private/'runtime.json'),
             'recipeSha256':digest((private/'compose.json').read_bytes())}
@@ -354,7 +361,7 @@ def resource_manifest(root, runtime, config, private, phase):
                 try:
                     actual=json.loads(docker(root,kind,'inspect',item['name']))[0]
                     labels=actual.get('Labels',{})
-                    require(labels.get('ontology.task-id')==TASK and labels.get('ontology.run-id')==runtime['runId'],'RESOURCE_OWNER')
+                    require(labels.get('ontology.task-id')==runtime['taskId'] and labels.get('ontology.run-id')==runtime['runId'],'RESOURCE_OWNER')
                     row.update(observation='OBSERVED',identity=actual['Name'] if kind=='volume' else actual['Id'])
                 except (ValueError,OSError,subprocess.SubprocessError):
                     row['reason']='EXACT_OBJECT_NOT_OBSERVABLE'
@@ -375,7 +382,7 @@ def stop_owned(root, runtime):
         try:
             require(runtime['engine']==engine(root),'ENGINE_DRIFT_DURING_STOP')
             row=json.loads(docker(root,'inspect',ident))[0]
-            require(row['Id']==ident and row['Config']['Labels'].get('ontology.task-id')==TASK and row['Config']['Labels'].get('ontology.run-id')==runtime['runId'],'STOP_OWNER')
+            require(row['Id']==ident and row['Config']['Labels'].get('ontology.task-id')==runtime['taskId'] and row['Config']['Labels'].get('ontology.run-id')==runtime['runId'],'STOP_OWNER')
             docker(root,'stop','--time','10',ident,timeout=20)
             after=json.loads(docker(root,'inspect',ident))[0]
             require(not after['State']['Running'],'STOP_POSTCONDITION')
@@ -415,10 +422,11 @@ def build_outputs(root):
     return result
 
 
-def validate_build(root):
+def validate_build(root, task=TASK):
     """烟测前后复核本树真实构建回执，拒绝旧源码或产物混用。"""
     root=Path(root).resolve()
-    path=boundary(root/'artifacts/workflow'/TASK/'build-receipt.json',root,exists=True)
+    require(task in (TASK,M2_TASK),'BUILD_TASK')
+    path=boundary(root/'artifacts/workflow'/task/'build-receipt.json',root,exists=True)
     receipt=json.loads(path.read_text())
     require(receipt.get('status')=='PASS' and receipt.get('worktree')==str(root),'BUILD_RECEIPT_IDENTITY')
     require(receipt.get('inputKey')==build_input_key(root),'BUILD_INPUT_DRIFT')
