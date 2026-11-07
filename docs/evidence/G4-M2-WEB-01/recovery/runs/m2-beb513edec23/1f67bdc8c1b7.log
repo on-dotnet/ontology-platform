@@ -1,0 +1,71 @@
+The files belonging to this database system will be owned by user "postgres".
+This user must also own the server process.
+
+The database cluster will be initialized with locale "en_US.utf8".
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are enabled.
+
+fixing permissions on existing directory /var/lib/postgresql/18/docker ... ok
+creating subdirectories ... ok
+selecting dynamic shared memory implementation ... posix
+selecting default "max_connections" ... 100
+selecting default "shared_buffers" ... 128MB
+selecting default time zone ... Etc/UTC
+creating configuration files ... ok
+running bootstrap script ... ok
+performing post-bootstrap initialization ... ok
+syncing data to disk ... ok
+
+
+Success. You can now start the database server using:
+
+    pg_ctl -D /var/lib/postgresql/18/docker -l logfile start
+
+waiting for server to start....2026-11-07 02:16:06.474 UTC [62] LOG:  starting PostgreSQL 18.6 (Debian 18.6-1.pgdg13+2) on aarch64-unknown-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+2026-11-07 02:16:06.474 UTC [62] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+2026-11-07 02:16:06.474 UTC [68] LOG:  database system was shut down at 2026-11-07 02:16:06 UTC
+2026-11-07 02:16:06.475 UTC [62] LOG:  database system is ready to accept connections
+ done
+server started
+2026-11-07 02:16:06.581 UTC [74] LOG:  connection received: host=[local]
+2026-11-07 02:16:06.582 UTC [74] LOG:  connection authenticated: user="postgres" method=trust (/var/lib/postgresql/pg_hba.conf:1)
+2026-11-07 02:16:06.582 UTC [74] LOG:  connection authorized: user=postgres database=postgres application_name=psql
+2026-11-07 02:16:06.584 UTC [74] LOG:  disconnection: session time: 0:00:00.002 user=postgres database=postgres host=[local]
+2026-11-07 02:16:06.594 UTC [76] LOG:  connection received: host=[local]
+2026-11-07 02:16:06.594 UTC [76] LOG:  connection authenticated: user="postgres" method=trust (/var/lib/postgresql/pg_hba.conf:1)
+2026-11-07 02:16:06.594 UTC [76] LOG:  connection authorized: user=postgres database=postgres application_name=psql
+CREATE DATABASE
+2026-11-07 02:16:06.608 UTC [76] LOG:  disconnection: session time: 0:00:00.013 user=postgres database=postgres host=[local]
+
+
+/usr/local/bin/docker-entrypoint.sh: running /docker-entrypoint-initdb.d/10-fixture.sql
+2026-11-07 02:16:06.616 UTC [78] LOG:  connection received: host=[local]
+2026-11-07 02:16:06.616 UTC [78] LOG:  connection authenticated: user="postgres" method=trust (/var/lib/postgresql/pg_hba.conf:1)
+2026-11-07 02:16:06.616 UTC [78] LOG:  connection authorized: user=postgres database=fixture application_name=psql
+CREATE ROLE
+REVOKE
+GRANT
+REVOKE
+REVOKE
+CREATE SCHEMA
+REVOKE
+CREATE TABLE
+GRANT
+GRANT
+ALTER ROLE
+2026-11-07 02:16:06.619 UTC [78] LOG:  disconnection: session time: 0:00:00.003 user=postgres database=fixture host=[local]
+
+
+waiting for server to shut down....2026-11-07 02:16:06.620 UTC [62] LOG:  received fast shutdown request
+2026-11-07 02:16:06.620 UTC [62] LOG:  aborting any active transactions
+2026-11-07 02:16:06.620 UTC [62] LOG:  background worker "logical replication launcher" (PID 71) exited with exit code 1
+2026-11-07 02:16:06.621 UTC [66] LOG:  shutting down
+2026-11-07 02:16:06.621 UTC [66] LOG:  checkpoint starting: shutdown immediate
+2026-11-07 02:16:06.623 UTC [66] LOG:  checkpoint complete: wrote 956 buffers (5.8%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.003 s, sync=0.001 s, total=0.003 s; sync files=316, longest=0.001 s, average=0.000 s; distance=4383 kB, estimate=4383 kB; lsn=0/1BA9698, redo lsn=0/1BA9698
+2026-11-07 02:16:06.626 UTC [62] LOG:  database system is shut down
+ done
+server stopped
+
+PostgreSQL init process complete; ready for start up.
