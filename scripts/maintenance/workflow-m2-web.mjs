@@ -20,7 +20,7 @@ try{
  const stats=async()=>JSON.parse(await privateFile(fixture+'/stats.json'));
  const {chromium,expect}=createRequire(resolve(root,'apps/web/package.json'))('@playwright/test');
  browser=await chromium.launch({channel:'msedge',headless:true});
- const context=await browser.newContext({serviceWorkers:'block'});
+ const context=await browser.newContext({serviceWorkers:'block',extraHTTPHeaders:{Connection:'close'}});
  await context.route('**/*',route=>new Set([runtime.publicOrigin,'http://localhost:15180']).has(new URL(route.request().url()).origin)?route.continue():route.abort());
  context.setDefaultTimeout(12000);const page=await context.newPage(),user=realm.identities['g2-operator-ab'];
  phase='oidc';await page.goto(runtime.publicOrigin+'/auth/login?returnUrl=%2Fdata%2Fconnections');
@@ -28,10 +28,10 @@ try{
  await page.waitForURL(url=>url.origin===runtime.publicOrigin&&url.pathname==='/data/connections');
  const cookie=(await context.cookies()).find(x=>x.name==='.OntologyPlatform.Session');check(cookie?.httpOnly&&cookie.sameSite==='Lax','SESSION_COOKIE');checks.push('REAL_OIDC');
  const origin=runtime.publicOrigin;
- async function get(path){const response=await context.request.get(origin+path,{maxRedirects:0});return {status:response.status(),data:await response.json(),etag:response.headers().etag};}
+ async function get(path){const response=await context.request.get(origin+path,{maxRedirects:0,headers:{Connection:'close'}});return {status:response.status(),data:await response.json(),etag:response.headers().etag};}
  async function send(path,body,revision,method='POST'){
   const csrf=await get('/auth/csrf');check(csrf.status===200,'CSRF_TOKEN');
-  const headers={Origin:origin,'X-CSRF-TOKEN':csrf.data.requestToken,'Content-Type':'application/json'};if(revision!==undefined){const resource=path.match(/^\/api\/v1\/connections\/[^/]+/);check(resource,'ETAG_RESOURCE');const current=await get(resource[0]);check(current.status===200&&current.etag,'ETAG_READ');headers['If-Match']=current.etag;}
+  const headers={Connection:'close',Origin:origin,'X-CSRF-TOKEN':csrf.data.requestToken,'Content-Type':'application/json'};if(revision!==undefined){const resource=path.match(/^\/api\/v1\/connections\/[^/]+/);check(resource,'ETAG_RESOURCE');const current=await get(resource[0]);check(current.status===200&&current.etag,'ETAG_READ');headers['If-Match']=current.etag;}
   const response=await context.request.fetch(origin+path,{method,data:body,headers,maxRedirects:0});return {status:response.status(),data:await response.json(),etag:response.headers().etag};
  }
  const scope={organizationId:'org-demo',siteIds:['site-a']};
@@ -60,6 +60,18 @@ try{
  check((await stats()).requests===beforeUnsupported,'UNSUPPORTED_IO');checks.push('UNSUPPORTED_AUTH_PAGINATION_NO_IO');
  const bSecret=await intake('WEB_API_KEY',{organizationId:'org-demo',siteIds:['site-b']});
  check((await send('/api/v1/connections',{displayName:'跨范围',config,scopeSelection:scope,secretRef:bSecret.data.secretRef,command:command()})).status===422,'CROSS_SCOPE');checks.push('CROSS_SCOPE_BINDING_REJECT');
+ phase='authorization';
+ const scopeControl=await create();
+ const scopeB={organizationId:'org-demo',siteIds:['site-b']},pgB=await intake('POSTGRESQL_READONLY',scopeB);const scopedPg=await send('/api/v1/connections',{displayName:'范围对照PG草稿',scopeSelection:scopeB,config:pg,secretRef:pgB.data.secretRef,command:command()});check(scopedPg.status===201,'SCOPE_CONTROL_CREATE');
+ for(const [identity,kind] of [['g2-viewer-a','viewer'],['g2-operator-a','scope'],['g2-operator-a','owner']]){
+  phase='authorization_'+kind+'_login';
+  const child=await browser.newContext({serviceWorkers:'block',extraHTTPHeaders:{Connection:'close'}});await child.route('**/*',route=>new Set([origin,'http://localhost:15180']).has(new URL(route.request().url()).origin)?route.continue():route.abort());
+  const tab=await child.newPage(),actor=realm.identities[identity];await tab.goto(origin+'/auth/login?returnUrl=%2F');await tab.locator('#username').fill(actor.username);await tab.locator('#password').fill(actor.password);await tab.locator('#kc-login').click();await tab.waitForURL(url=>url.origin===origin&&url.pathname==='/');phase='authorization_'+kind+'_api';
+  const tokenResponse=await child.request.get(origin+'/auth/csrf');check(tokenResponse.status()===200,'AUTH_CSRF_STATUS');const token=await tokenResponse.json();check(typeof token.requestToken==='string','AUTH_CSRF_SHAPE');
+  if(kind==='scope'){check((await child.request.get(origin+base(scopeControl.id))).status()===200,'READ_SCOPE_POSITIVE');check((await child.request.get(origin+base(scopedPg.data.id))).status()===403,'READ_SCOPE');}
+  else {const body=kind==='viewer'?{secretValue:key,scopeSelection:scope,purpose:'WEB_API_KEY',command:command()}:{displayName:'不同owner',config,scopeSelection:scope,secretRef:initial.data.secretRef,command:command()};const response=await child.request.post(origin+(kind==='viewer'?'/api/v1/connection-secrets':'/api/v1/connections'),{data:body,headers:{Origin:origin,'X-CSRF-TOKEN':token.requestToken}});check(response.status()===(kind==='viewer'?403:422),'IDENTITY_REJECTION');}
+  await child.close();checks.push('AUTHORIZATION_'+kind.toUpperCase());
+ }
  phase='ui_web';await page.getByRole('link',{name:'新建连接',exact:true}).click();await page.getByRole('combobox',{name:/^数据源类型/}).selectOption('WEB_API');
  await page.locator('input[name=displayName]').fill('Web '+runtime.runId);
  for(const [name,value]of Object.entries(config.profile)){const select=page.locator('select[name='+name+']');if(await select.count())await select.selectOption(value);else await page.locator('input[name='+name+']').fill(value);}
@@ -103,17 +115,6 @@ try{
  }
  await mode('normal');let cancelRow=await probeEnable(await create());const cancelBefore=await stats();await mode('stall-body');const queued=await mutate(cancelRow,'discoveries');check(queued.status===202,'CANCEL_QUEUE');await until(async()=>(await stats()).requests>cancelBefore.requests,'CANCEL_SOURCE_STARTED');
  check((await send(base(cancelRow.id)+'/discoveries/'+queued.data.jobId+'/cancel',{command:command(cancelRow.configRevision)},cancelRow.configRevision)).status===200,'CANCEL_COMMAND');await until(async()=>(await stats()).aborted>cancelBefore.aborted,'CANCEL_SOURCE_ABORTED');await mode('normal');checks.push('EXPLICIT_CANCEL_CLOSES_SOCKET');
- phase='authorization';
- const scopeB={organizationId:'org-demo',siteIds:['site-b']},pgB=await intake('POSTGRESQL_READONLY',scopeB);const scopedPg=await send('/api/v1/connections',{displayName:'范围对照PG草稿',scopeSelection:scopeB,config:pg,secretRef:pgB.data.secretRef,command:command()});check(scopedPg.status===201,'SCOPE_CONTROL_CREATE');
- for(const [identity,kind] of [['g2-viewer-a','viewer'],['g2-operator-a','scope'],['g2-operator-a','owner']]){
-  phase='authorization_'+kind+'_login';
-  const child=await browser.newContext({serviceWorkers:'block'});await child.route('**/*',route=>new Set([origin,'http://localhost:15180']).has(new URL(route.request().url()).origin)?route.continue():route.abort());
-  const tab=await child.newPage(),actor=realm.identities[identity];await tab.goto(origin+'/auth/login?returnUrl=%2F');await tab.locator('#username').fill(actor.username);await tab.locator('#password').fill(actor.password);await tab.locator('#kc-login').click();await tab.waitForURL(url=>url.origin===origin&&url.pathname==='/');phase='authorization_'+kind+'_api';
-  const token=await (await child.request.get(origin+'/auth/csrf')).json();
-  if(kind==='scope'){check((await child.request.get(origin+base(cancelRow.id))).status()===200,'READ_SCOPE_POSITIVE');check((await child.request.get(origin+base(scopedPg.data.id))).status()===403,'READ_SCOPE');}
-  else {const body=kind==='viewer'?{secretValue:key,scopeSelection:scope,purpose:'WEB_API_KEY',command:command()}:{displayName:'不同owner',config,scopeSelection:scope,secretRef:initial.data.secretRef,command:command()};const response=await child.request.post(origin+(kind==='viewer'?'/api/v1/connection-secrets':'/api/v1/connections'),{data:body,headers:{Origin:origin,'X-CSRF-TOKEN':token.requestToken}});check(response.status()===(kind==='viewer'?403:422),'IDENTITY_REJECTION');}
-  await child.close();checks.push('AUTHORIZATION_'+kind.toUpperCase());
- }
  phase='natural_expiry';
  const expires=Math.max(Date.parse(initial.data.expiresAtUtc),expiries.get(cancelRow.id));check(Number.isFinite(expires)&&expires<Date.now()+610000,'EXPIRY_BOUND');
  while(Date.now()<=expires+100){await writeFile(resolve(file,'../progress.json'),JSON.stringify({phase,secondsRemaining:Math.max(0,Math.ceil((expires-Date.now())/1000)),checks:checks.length}));await new Promise(resolve=>setTimeout(resolve,Math.min(5000,Math.max(100,expires-Date.now()+101))));}
@@ -122,5 +123,5 @@ try{
  check((await send('/api/v1/connection-secrets',initial.body)).status===422,'EXPIRED_REPLAY');check((await stats()).requests===expiryBefore,'EXPIRED_IO');
  check((await mutate(cancelRow,'test')).data.status==='TEST_OK','BOUND_SECRET_TTL');checks.push('NATURAL_EXPIRY_NO_REACTIVATION_BOUND_SECRET_REMAINS_VALID');
  console.log(JSON.stringify({status:'PASS',tests:checks.length,skipped:0,taskId:runtime.taskId,runId:runtime.runId,checks}));
-}catch(error){console.log(JSON.stringify({status:'FAIL',tests:checks.length,skipped:0,phase,checks,errorType:error?.name??'Unknown',reason:error instanceof Error&&/^[A-Z_]+$/.test(error.message)?error.message:'BROWSER_OR_TRANSPORT'}));process.exitCode=1;}
+}catch(error){console.log(JSON.stringify({status:'FAIL',tests:checks.length,skipped:0,phase,checks,errorType:error?.name??'Unknown',transportCode:(error?.message??'').match(/ECONNRESET|ECONNREFUSED|ETIMEDOUT|socket hang up/)?.[0]??null,errorClass:/header.*string/i.test(error?.message??'')?'HEADER_VALUE':/JSON|Unexpected token/i.test(error?.message??'')?'JSON':/ECONN|socket|fetch failed/i.test(error?.message??'')?'TRANSPORT':/Timeout/i.test(error?.message??'')?'TIMEOUT':'OTHER',reason:error instanceof Error&&/^[A-Z_]+$/.test(error.message)?error.message:'BROWSER_OR_TRANSPORT'}));process.exitCode=1;}
 finally{if(browser)await browser.close();}
