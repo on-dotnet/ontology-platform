@@ -24,3 +24,5 @@ Reviewer 已独立读取历史 15 组 smoke 和 13 例 fixture 成功原件；�
 ## 最终真实原件独立复核
 
 Reviewer 后续只读断言 exit 0：m2-c72b9c07e76c 的 browser SHA、准确 19 组 / 0 skip、当前 driver/API/Web 构建绑定及 10 项清理 ID 一致；11 类审计和泄漏扫描通过。m2-5e5a2f7a62de 原始两日志 SHA 与 MTP summary 12+1=13 / 0 skip / exit 0、当前 driver/Connections 绑定及 4 项清理 ID 一致。Reviewer 未重跑设施。PG、最终 workflow 和 ZIP 重开另行核验。
+
+PG m2-beb513edec23 独立核验 exit 0：1 PASS / 0 skip、原始日志与当前 driver/build 绑定一致、4/4 清理闭合。三组最终运行矩阵准确。原彩色 UI 日志虽然 119 PASS，但资格解析 VITEST_SUMMARY 失败；该失败保留于 gates/b2dbf5fac9fe4140be3121c2bb064ac0，原日志及回执复制到 history/ui-colored-original。Master 仅重跑无色 UI 单元 119 PASS，未改任何冻结驱动或产品代码。
