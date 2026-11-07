@@ -28,3 +28,7 @@ Reviewer 后续只读断言 exit 0：m2-c72b9c07e76c 的 browser SHA、准确 19
 PG m2-beb513edec23 独立核验 exit 0：1 PASS / 0 skip、原始日志与当前 driver/build 绑定一致、4/4 清理闭合。三组最终运行矩阵准确。原彩色 UI 日志虽然 119 PASS，但资格解析 VITEST_SUMMARY 失败；该失败保留于 gates/b2dbf5fac9fe4140be3121c2bb064ac0，原日志及回执复制到 history/ui-colored-original。Master 仅重跑无色 UI 单元 119 PASS，未改任何冻结驱动或产品代码。
 
 无色 UI 原件后续独立复核 exit 0：119 PASS、receipt/log SHA 和当前 Web 构建绑定一致；独立 diff-check exit 0。Reviewer 已读取 22 个转换缓存文件的精确清理记录，未操作资源。最终 workflow run 6693bea5415c4181b19a9979e1dbc06d 全部 10 个受影响门禁 PASS，等待 Reviewer 对该最后回执独立复核。
+
+## 最终门禁与证据格式复核
+
+Reviewer 独立核对最终 10 门禁的发布日志 SHA、exit/status；工程 18、环境 6 从指定提交提取原 JSON/日志并验证实际 summary，检查 exit 0。当前无未关闭代码 P0/P1。最终 Git 全差异检查发现批准文档尾空格和 UI 日志额外 EOF 空行；依 Reviewer 建议，原始字节保留于无损 envelope，当前 UI display transcript 仅去除额外末尾 LF，原 command/exitCode/timing 不变，不称为新 Run。原批准文档 SHA 以 recovery/p0-approval-original.json 中完整原 bytes 为准，MD 为排版规范化显示副本。最终转换关系和 ZIP 重开另有独立实证。

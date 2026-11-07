@@ -22,7 +22,7 @@
       "status": "PASS",
       "command": "/Users/chasen/.codex/worktrees/g4-m2-web-01/ontology-platform/apps/web/node_modules/.bin/vitest run src/features/connections/connections.test.ts --no-cache --no-color",
       "exitCode": 0,
-      "output": "Original result and exact build binding: recovery/local/ui-current.json; original log SHA df4780dc29d325836fdc8373f57b1c8bf29d33c3df019c017adefd6781d92772"
+      "output": "119 PASS; original stdout preserved losslessly in local/ui-current.log.raw.json; display transcript removes only extra final LF. Same actual exitCode/run/timing; see local/ui-current.json."
     },
     {
       "name": "typecheck",
@@ -92,6 +92,7 @@
       "Intel Mac",
       "unrelated M1 full acceptance"
     ],
-    "inputReuse": "All product/driver tracked inputs unchanged since testedCommit; only allowed docs increments. No sum of overlapping product gates."
+    "inputReuse": "All product/driver tracked inputs unchanged since testedCommit; only allowed docs increments. No sum of overlapping product gates.",
+    "uiTranscript": "Original raw bytes retained; deterministic EOF display conversion independently verified, not a fresh test run"
   }
 }

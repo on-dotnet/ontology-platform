@@ -1,10 +1,10 @@
 # G4-M2-WEB-01｜P0 最小合同裁决与原任务继续执行指令
 
-**任务身份**：`G4-M2-WEB-01`  
-**审查状态**：`APPROVED_WITH_CONDITIONS_FOR_SCOPE_EXTENSION`（仅新增 Web API Key 凭据用途，不代表 P0、产品或主线验收通过）  
-**已审 Base**：`b3b68500d76ab5965fcc540afb883ca605cb15dd`  
-**当前任务 Head**：`38a889a8004663120291c8bac34f7b30dc0b45c5`（开始写入前重新核实）  
-**已有 P0 BLOCKED ZIP**：SHA-256 `fb42f650b5e51f8dad15b2c3a1f65b0239a79a86c90074beb9e734d3139fc73a`（保持原样；仅作为历史阻断证据）。  
+**任务身份**：`G4-M2-WEB-01`
+**审查状态**：`APPROVED_WITH_CONDITIONS_FOR_SCOPE_EXTENSION`（仅新增 Web API Key 凭据用途，不代表 P0、产品或主线验收通过）
+**已审 Base**：`b3b68500d76ab5965fcc540afb883ca605cb15dd`
+**当前任务 Head**：`38a889a8004663120291c8bac34f7b30dc0b45c5`（开始写入前重新核实）
+**已有 P0 BLOCKED ZIP**：SHA-256 `fb42f650b5e51f8dad15b2c3a1f65b0239a79a86c90074beb9e734d3139fc73a`（保持原样；仅作为历史阻断证据）。
 **本文件用途**：附加到**原 Codex Master 会话**，在现有 Worktree/分支继续。不新建 M2 会话或 Worktree，不重写 M1 或 G4-ENG 历史，不合并 main。
 
 ## 1. 技术裁决——只批准以下公共行为增量
