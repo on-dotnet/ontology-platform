@@ -30,3 +30,6 @@ read_only_dependencies：全部产品源码、锁文件、历史 docs/evidence�
 最终源码关口：非作者源码及原件复核通过。首次FullSelfTest exit0，508.845865792秒；原输入保留，后续资格/失败身份与取消增量以定向测试覆盖，不冒充当前Full key。当前一般工程18、环境6、smoke14、M2准入13、交付协议13通过；UI389、HTTPS13、PG1、实际OIDC/CSRF/API取消3通过。当前资格入口PASS；旧Web29/16/119/13/1/19按原Head重核，TTL未重复。
 
 尚待：提交候选后受控plan/verify当前绑定，旧ZIP干净树重开、唯一正式V3、非作者独立重开和包外回执。首次旧包重开因DIRTY_TREE拒绝的事实保留；尚无新正式构包尝试。
+
+
+交付前关口：受控plan/verify的11项门禁PASS；旧Web ZIP已在干净树重开PASS（1011成员，原SHA不变）；现有V3预算/路径/格式/schema预检PASS，预估约4MiB。最终运行/独立重开状态以包外 `G4-ENG-DELIVERY-002-receipt.json` 为唯一后置状态；不将本卡预填为尚未发生的包装成功。
