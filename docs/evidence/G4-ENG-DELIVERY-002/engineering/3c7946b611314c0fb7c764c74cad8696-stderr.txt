@@ -1,0 +1,20 @@
+E.............
+======================================================================
+ERROR: test_browser_timeout_has_real_exit_and_no_retry (__main__.SmokeTests.test_browser_timeout_has_real_exit_and_no_retry)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g4-eng-delivery-002/ontology-platform/scripts/tests/WorkflowSmoke.Tests.py", line 74, in test_browser_timeout_has_real_exit_and_no_retry
+    raw,code=self.smoke.bounded_browser([sys.executable,'-c','print("safe"); raise SystemExit(7)'],Path(directory),timeout=3)
+             ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g4-eng-delivery-002/ontology-platform/scripts/maintenance/workflow_smoke.py", line 258, in bounded_browser
+    result=run(args,root,task=current_task(TASK),timeout=timeout,stage='browser')
+  File "/Users/chasen/.codex/worktrees/g4-eng-delivery-002/ontology-platform/scripts/maintenance/workflow_execution.py", line 96, in run
+    root=ordinary(root)
+  File "/Users/chasen/.codex/worktrees/g4-eng-delivery-002/ontology-platform/scripts/maintenance/workflow_execution.py", line 69, in ordinary
+    raise ValueError('EXECUTION_LINKED_PATH')
+ValueError: EXECUTION_LINKED_PATH
+
+----------------------------------------------------------------------
+Ran 14 tests in 0.169s
+
+FAILED (errors=1)

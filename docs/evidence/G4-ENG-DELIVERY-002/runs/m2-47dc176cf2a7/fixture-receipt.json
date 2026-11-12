@@ -1,0 +1,110 @@
+{
+  "environmentFingerprint": "47058b8ea2708b6376c6c7d2d4dcc49d39b1ffd5dd276c9334531e55b7761137",
+  "productAdmissionTaskId": "G4-M2-WEB-01",
+  "driverInputs": {
+    "scripts/maintenance/workflow_m2_web.py": "151c75db94eead4787a421bc8b19bf0fdc68ffb89da50af7dbe1659088e47377",
+    "scripts/maintenance/workflow_m2_fixture.py": "5d128d2fabcb484dcab26119a84ff4b4022f8608f26ba94de6988fda4824bca2",
+    "scripts/maintenance/workflow_m2_smoke.py": "8e486ee8f0a99784c580cbd9f71b2413f0fe4066b8a2e691a066fd27af58bd83",
+    "scripts/maintenance/workflow_m2_build.py": "a72074d9b8af7fb1fc1fd22b1a18e63b44049151b14d43f64d818b0373aed410",
+    "scripts/maintenance/workflow_smoke.py": "979f766b45813fe539c5f6848f71cf3f496ce452d4ffff66405d4c8c19834656",
+    "scripts/maintenance/workflow_execution.py": "eb21a6e92a3e5dc732d6ff957f184ef9f1236b6291de7ee6adf950399c450fd1",
+    "scripts/maintenance/workflow_environment.py": "e341a2f1d684c3ceeba1b2f6baac1d6a2bc81a6b3ad1c487b60b5554e8524335",
+    "scripts/maintenance/workflow_web_cache.py": "7bd74f79222674634702f13523e777068db6af558464ce3269edc93c27be7ed9",
+    "scripts/maintenance/workflow.py": "37fab4b608100d019c16a2c624e9c02e5ca533f2d651d68db66e2df6f543cc39",
+    "scripts/maintenance/workflow-m2-web.mjs": "4865a0d755eda53eaf579b2b04a506fb80cf3e941c2573f155389de42f846141",
+    "scripts/maintenance/workflow_m2_evidence.py": "3f8ada8c297bf15325abee06da4acfa5cef8b809177b41a60fdae4ed9c902831",
+    "scripts/maintenance/workflow_evidence.py": "270076ea05bc5e1c63c81536325d6544b3250dd94d06cf0bc9729a30188ea328",
+    "experiments/g4-m2-web-01/https-fixture.mjs": "523838ced9f476b053eca72c40ddd57da35f59da6bfd3d7224e00e47ae345562"
+  },
+  "buildBinding": {
+    "receiptSha256": "29838a01ab9826e708e0d98059b049440b8fcfce0a84c738afb0d01221ce5b6b",
+    "inputKey": "0e88c807f465ee9ad931659fa2014eb792f89e0b97b8b792953225eebcddf94a",
+    "outputKey": "32f0c94332211d62bed0b22b44ad3d0189f7ccc1053bef75e88a9950e8a284b0"
+  },
+  "taskId": "G4-ENG-DELIVERY-002",
+  "runId": "m2-47dc176cf2a7",
+  "status": "PASS",
+  "containerIds": [
+    "e9f5d061fe1425ff981d8e791889e008863f4488cd250e92eb5d69ac241b6215",
+    "753c6591d64a840bae2171b7467055d161d24b86abe1d30da4d5f1e2cf029a34",
+    "1cf6b5b64fe4f6bcba6857c0146696fd7c29849167f3aee90ea65a9622eae8ce"
+  ],
+  "networkId": "17b40705bc8807d436308bfc82b98ed67c0a42bf54c2a0562f3e3d9133d90591",
+  "tests": [
+    {
+      "category": "RealWebFixture",
+      "exitCode": 0,
+      "seconds": 1.0065166669955943,
+      "minimumExpected": 12,
+      "logSha256": "3be210777b2e6ba2f8034206bb86f12baf6f52f7ce18af0f4ee4f1cdaaf3a59e"
+    },
+    {
+      "category": "RealWebDnsRejection",
+      "exitCode": 0,
+      "seconds": 0.3037545830011368,
+      "minimumExpected": 1,
+      "logSha256": "afa85e061d98d34688a52987d4881a6263188778772938f33f7a75606a19d97d"
+    }
+  ],
+  "privateRuntime": "/Users/chasen/.codex/worktrees/g4-eng-delivery-002/ontology-platform/.tools/security/g4-eng-delivery-002/m2-47dc176cf2a7",
+  "cleanup": [
+    {
+      "id": "1cf6b5b64fe4f6bcba6857c0146696fd7c29849167f3aee90ea65a9622eae8ce",
+      "before": true,
+      "command": "docker rm -f exact-id",
+      "result": "1cf6b5b64fe4f6bcba6857c0146696fd7c29849167f3aee90ea65a9622eae8ce",
+      "afterAbsent": true
+    },
+    {
+      "id": "753c6591d64a840bae2171b7467055d161d24b86abe1d30da4d5f1e2cf029a34",
+      "before": true,
+      "command": "docker rm -f exact-id",
+      "result": "753c6591d64a840bae2171b7467055d161d24b86abe1d30da4d5f1e2cf029a34",
+      "afterAbsent": true
+    },
+    {
+      "id": "e9f5d061fe1425ff981d8e791889e008863f4488cd250e92eb5d69ac241b6215",
+      "before": true,
+      "command": "docker rm -f exact-id",
+      "result": "e9f5d061fe1425ff981d8e791889e008863f4488cd250e92eb5d69ac241b6215",
+      "afterAbsent": true
+    },
+    {
+      "id": "17b40705bc8807d436308bfc82b98ed67c0a42bf54c2a0562f3e3d9133d90591",
+      "before": true,
+      "command": "docker network rm exact-id",
+      "afterAbsent": true
+    }
+  ],
+  "sourceStats": {
+    "requests": 11,
+    "authRejected": 1,
+    "aborted": 1,
+    "connections": 13,
+    "closedSockets": 13,
+    "sni": [
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source",
+      "web-source"
+    ]
+  },
+  "testStatus": "PASS",
+  "cleanupExpected": [
+    "17b40705bc8807d436308bfc82b98ed67c0a42bf54c2a0562f3e3d9133d90591",
+    "1cf6b5b64fe4f6bcba6857c0146696fd7c29849167f3aee90ea65a9622eae8ce",
+    "753c6591d64a840bae2171b7467055d161d24b86abe1d30da4d5f1e2cf029a34",
+    "e9f5d061fe1425ff981d8e791889e008863f4488cd250e92eb5d69ac241b6215"
+  ],
+  "cleanupComplete": true,
+  "privateRuntimeDisposition": "KEEP: task-owned credentials excluded from ZIP; required until final lifecycle review"
+}

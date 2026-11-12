@@ -1,0 +1,70 @@
+{
+  "driverInputs": {
+    "scripts/maintenance/workflow_m2_web.py": "ff9943e6fa00047f4cd01bcbd80248b7f62ffa9258ba71e8779063213b9258c9",
+    "scripts/maintenance/workflow_m2_fixture.py": "5af8721ea602ba485fcd91c00ee93530ae05c5541a934754ce0551c072155888",
+    "scripts/maintenance/workflow_m2_smoke.py": "8edccc29d6658e5edfa992fef080b86b32ffd0f721d9ad05234d2d6ae33459dc",
+    "scripts/maintenance/workflow_m2_build.py": "fde95eb5425cd8fbf63840c4a332350cb34605d9320d79536e8fcc7f8aa1aaca",
+    "scripts/maintenance/workflow_smoke.py": "f170c24e82546689b1086f6a957ef2b4c6e8b1c29a660ef960e71c720c2b656d",
+    "scripts/maintenance/workflow_execution.py": "7da6ee4d6779aef9c715df0db90d55173b71ca45c8f302925d3ab18dd96d20c9",
+    "scripts/maintenance/workflow_environment.py": "e341a2f1d684c3ceeba1b2f6baac1d6a2bc81a6b3ad1c487b60b5554e8524335",
+    "scripts/maintenance/workflow_web_cache.py": "7bd74f79222674634702f13523e777068db6af558464ce3269edc93c27be7ed9",
+    "scripts/maintenance/workflow.py": "eddd8146c977154aaf69b1a9a760c506a66bfd0b8405b91b2912b065e23e5296",
+    "scripts/maintenance/workflow-m2-web.mjs": "4865a0d755eda53eaf579b2b04a506fb80cf3e941c2573f155389de42f846141",
+    "scripts/maintenance/workflow_m2_evidence.py": "76d6aca60cf142ca8f2020dcf2890799349c4a1b7fac8ede5cb24d70b4739ae1",
+    "scripts/maintenance/workflow_evidence.py": "0b9ea208bec8fb711400b5dcd9d6b5a7d10e5f19e576715e882a57144d3e8c4e",
+    "experiments/g4-m2-web-01/https-fixture.mjs": "523838ced9f476b053eca72c40ddd57da35f59da6bfd3d7224e00e47ae345562"
+  },
+  "taskId": "G4-ENG-DELIVERY-002",
+  "runId": "m2-9eecac420dbd",
+  "status": "PASS",
+  "buildBinding": {
+    "receiptSha256": "29838a01ab9826e708e0d98059b049440b8fcfce0a84c738afb0d01221ce5b6b",
+    "inputKey": "0e88c807f465ee9ad931659fa2014eb792f89e0b97b8b792953225eebcddf94a",
+    "outputKey": "32f0c94332211d62bed0b22b44ad3d0189f7ccc1053bef75e88a9950e8a284b0"
+  },
+  "containers": [
+    "324bc7f3880e3b0cef0f3c2f2a7dcd4e8cffa07710b12cbef0b266c000d61653",
+    "0c31bb61423e533461baa086ee9bcaacf6544c4a6ab20150c46372812ffdc1e0"
+  ],
+  "cleanup": [
+    {
+      "kind": "container",
+      "id": "0c31bb61423e533461baa086ee9bcaacf6544c4a6ab20150c46372812ffdc1e0",
+      "before": true,
+      "command": "docker rm -f exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "container",
+      "id": "324bc7f3880e3b0cef0f3c2f2a7dcd4e8cffa07710b12cbef0b266c000d61653",
+      "before": true,
+      "command": "docker rm -f exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "volume",
+      "id": "ontology-workflow-m2-9eecac420dbd_source-data",
+      "before": true,
+      "command": "docker volume rm exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "network",
+      "id": "ontology-workflow-m2-9eecac420dbd_source",
+      "before": true,
+      "command": "docker network rm exact-id",
+      "afterAbsent": true
+    }
+  ],
+  "exitCode": 0,
+  "logSha256": "05d71e549d123c0eeacad9a83e2f88fcede79f5a383d5686f1b99005823d2b10",
+  "tests": 1,
+  "testStatus": "PASS",
+  "cleanupExpected": [
+    "0c31bb61423e533461baa086ee9bcaacf6544c4a6ab20150c46372812ffdc1e0",
+    "324bc7f3880e3b0cef0f3c2f2a7dcd4e8cffa07710b12cbef0b266c000d61653",
+    "ontology-workflow-m2-9eecac420dbd_source",
+    "ontology-workflow-m2-9eecac420dbd_source-data"
+  ],
+  "cleanupComplete": true
+}

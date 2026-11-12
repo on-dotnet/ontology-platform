@@ -36,3 +36,14 @@ Mac长任务先`host_continuity.py preflight`，用户能源设置持续有效�
 失败指纹绑定相关输入、构建、平台/环境与错误类别。相同指纹无新条件拒绝昂贵链；`--diagnostic`只允许≤20秒短诊断。连续三次同类失败停止扩写，要求最小复现及机制说明；新相关输入与`--hypothesis`提供修订依据，不是全项目永久失败阈值。只有确认瞬态才有界复测，保留全部结果，禁止跑到绿。
 
 证据生成/修改后用`test-review-evidence.ps1`复用正式Schema检查；包VerifyOnly只验证制品，不代产品测试。准入脚本和规则回归证明边界，不冒充真实服务或资源回收。
+
+
+## G4-ENG-DELIVERY-002 公共执行与资格
+
+主要工程、环境、构建、M2设施与归档检查复用 `workflow_execution.py`；FailureState身份不含RunId，M2操作入口额外绑定稳定产品/执行输入、真实Engine/context/镜像/工具。只读Git对象、文件散列和宿主策略为轻量例外；服务使用START/READY/END，等待单独记录。记录START未闭合为UNKNOWN；超时分类与真实退出码分列，清理不受测试失败止损拦截。
+
+stdout/stderr原字节仅在任务私有commands目录保留。目录可能包含合成凭据、HTTP会话、pg_dump和服务日志，禁止整体发布。公开原件经 `workflow_evidence.py` 调用现有V3路径和内容扫描后才写入；空/ANSI/异常编码等沿用base64封装，先扫描原字节，恢复后重新核对散列。有限扫描不是完整数据分类。
+
+`workflow_m2_build.driver_layers()`显式登记执行层与资格层；未知驱动拒绝复用。历史资格绑定准确WebHead及原件，不等于当前驱动执行；新runner的TLS/取消策略必须有新短场景覆盖。单纯解释器更新可重新核验不变原件，不能抹去历史失败。自然TTL仅在产品语义和原断言驱动均未变时复用。
+
+锁定Vitest通过JSON报告检查用例及套件级状态。锁定MSTest的实际help没有TRX/JUnit输出扩展，不下载扩展、不伪造机器报告，使用唯一完整一致的MTP摘要兼容入口。当前不消费XML报告，未知格式一律拒绝。Vite及Vitest文件转换缓存分别指定到任务runtime目录，不豁免node_modules正文。

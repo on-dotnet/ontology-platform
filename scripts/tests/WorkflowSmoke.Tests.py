@@ -12,6 +12,7 @@ from unittest.mock import patch
 import unittest
 
 ROOT=Path(__file__).resolve().parents[2]
+sys.path.insert(0,str(ROOT/'scripts/maintenance'))
 SPEC=importlib.util.spec_from_file_location('workflow_smoke',ROOT/'scripts/maintenance/workflow_smoke.py')
 
 class SmokeTests(unittest.TestCase):
@@ -68,9 +69,9 @@ class SmokeTests(unittest.TestCase):
 
     def test_browser_timeout_has_real_exit_and_no_retry(self):
         with tempfile.TemporaryDirectory() as directory:
-            raw,code=self.smoke.bounded_browser([sys.executable,'-c','import time; time.sleep(10)'],Path(directory),timeout=.1)
+            raw,code=self.smoke.bounded_browser([sys.executable,'-c','import time; time.sleep(10)'],Path(directory).resolve(),timeout=.1)
             self.assertEqual(code,124)
-            raw,code=self.smoke.bounded_browser([sys.executable,'-c','print("safe"); raise SystemExit(7)'],Path(directory),timeout=3)
+            raw,code=self.smoke.bounded_browser([sys.executable,'-c','print("safe"); raise SystemExit(7)'],Path(directory).resolve(),timeout=3)
             self.assertEqual(code,7)
             self.assertEqual(raw.strip(),b'safe')
 

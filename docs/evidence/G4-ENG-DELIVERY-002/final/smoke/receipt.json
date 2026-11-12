@@ -1,0 +1,192 @@
+{
+  "environmentFingerprint": "47058b8ea2708b6376c6c7d2d4dcc49d39b1ffd5dd276c9334531e55b7761137",
+  "driverInputs": {
+    "scripts/maintenance/workflow_m2_web.py": "ff9943e6fa00047f4cd01bcbd80248b7f62ffa9258ba71e8779063213b9258c9",
+    "scripts/maintenance/workflow_m2_fixture.py": "5d128d2fabcb484dcab26119a84ff4b4022f8608f26ba94de6988fda4824bca2",
+    "scripts/maintenance/workflow_m2_smoke.py": "8e486ee8f0a99784c580cbd9f71b2413f0fe4066b8a2e691a066fd27af58bd83",
+    "scripts/maintenance/workflow_m2_build.py": "a72074d9b8af7fb1fc1fd22b1a18e63b44049151b14d43f64d818b0373aed410",
+    "scripts/maintenance/workflow_smoke.py": "979f766b45813fe539c5f6848f71cf3f496ce452d4ffff66405d4c8c19834656",
+    "scripts/maintenance/workflow_execution.py": "eb21a6e92a3e5dc732d6ff957f184ef9f1236b6291de7ee6adf950399c450fd1",
+    "scripts/maintenance/workflow_environment.py": "e341a2f1d684c3ceeba1b2f6baac1d6a2bc81a6b3ad1c487b60b5554e8524335",
+    "scripts/maintenance/workflow_web_cache.py": "7bd74f79222674634702f13523e777068db6af558464ce3269edc93c27be7ed9",
+    "scripts/maintenance/workflow.py": "37fab4b608100d019c16a2c624e9c02e5ca533f2d651d68db66e2df6f543cc39",
+    "scripts/maintenance/workflow-m2-web.mjs": "4865a0d755eda53eaf579b2b04a506fb80cf3e941c2573f155389de42f846141",
+    "scripts/maintenance/workflow_m2_evidence.py": "3f8ada8c297bf15325abee06da4acfa5cef8b809177b41a60fdae4ed9c902831",
+    "scripts/maintenance/workflow_evidence.py": "0b9ea208bec8fb711400b5dcd9d6b5a7d10e5f19e576715e882a57144d3e8c4e",
+    "experiments/g4-m2-web-01/https-fixture.mjs": "523838ced9f476b053eca72c40ddd57da35f59da6bfd3d7224e00e47ae345562"
+  },
+  "taskId": "G4-ENG-DELIVERY-002",
+  "runId": "m2-3435174c5157",
+  "status": "PASS",
+  "buildBinding": {
+    "api": {
+      "receiptSha256": "ed9ab73d8d9b9a6bf123a2035485bfb743310c5cdfb479d465751663a9ac4b68",
+      "inputKey": "0e88c807f465ee9ad931659fa2014eb792f89e0b97b8b792953225eebcddf94a",
+      "outputKey": "b04271852822f93a1c48e61a04c93749550978db5e9277b917d952b68ff0d16d"
+    },
+    "web": {
+      "receiptSha256": "16a3615731d2e3ae1d40716b6f0002193797225c562e6b34f58eca2690adb785",
+      "inputKey": "3122770fb2b27f45051b4a1ba088598842fe7d3fb2fc529f00111608a025cbe7",
+      "outputKey": "a68575cc302f4b1d83e464bd5a464ed362618dfb43fa2982fcfedbc7ac5492d9"
+    }
+  },
+  "tests": 3,
+  "budgetBefore": {
+    "dataBytes": {
+      "platform-pg": 48857088,
+      "keycloak-test": 193929216,
+      "api": 4096
+    },
+    "privateAndOutputBytes": 46996,
+    "dataStopBytes": 3221225472,
+    "outputStopBytes": 1073741824
+  },
+  "browserExitCode": 0,
+  "browserSha256": "84aebb483b82a27ab8f61ea13c6e2e4d4f9504e3e806d5fb25cc2808158622b3",
+  "secretAndBodyLeakScan": {
+    "platformDump": true,
+    "apiWebLogs": true,
+    "auditActions": [
+      "connection.secret.intake",
+      "connection.create",
+      "connection.probe.start",
+      "connection.probe.complete",
+      "connection.enable",
+      "connection.catalog.start",
+      "connection.catalog.finish",
+      "connection.catalog.cancel"
+    ],
+    "rawDataSaved": true,
+    "rawDataDisposition": "PRIVATE_ONLY: command stdout contains dump/log data; never publish command directory wholesale"
+  },
+  "budgetAfter": {
+    "dataBytes": {
+      "platform-pg": 49127424,
+      "keycloak-test": 194318336,
+      "api": 4096
+    },
+    "privateAndOutputBytes": 54544,
+    "dataStopBytes": 3221225472,
+    "outputStopBytes": 1073741824
+  },
+  "relayCloseout": {
+    "connections": 68,
+    "active": 0,
+    "failures": []
+  },
+  "containerIds": {
+    "web-source": "edbe14fb62592d23686fb44fa36074515b3ce92a5d3fa5fe28579a1a57fb547a",
+    "platform-pg": "e56db75775bb0be4311aa910ce4b3ff164180f5c7cd2e29cf851ddf08c945dd9",
+    "keycloak-test": "f61b52c5e36ab6a7edb88c6f9e06e9621f7c0fc149e3b3718d80da095915761f",
+    "api": "cdb83af9d1278bdb19ebb227347ede5a45e4ae3a7d0516161f48581bd24aa929",
+    "web": "480d4a4efe0247601dcf0cdfc61a43e271d4fa4ecd06681abe2c2047ecadfaf2"
+  },
+  "cleanup": [
+    {
+      "kind": "container",
+      "id": "edbe14fb62592d23686fb44fa36074515b3ce92a5d3fa5fe28579a1a57fb547a",
+      "before": true,
+      "command": "docker rm -f exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "container",
+      "id": "e56db75775bb0be4311aa910ce4b3ff164180f5c7cd2e29cf851ddf08c945dd9",
+      "before": true,
+      "command": "docker rm -f exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "container",
+      "id": "f61b52c5e36ab6a7edb88c6f9e06e9621f7c0fc149e3b3718d80da095915761f",
+      "before": true,
+      "command": "docker rm -f exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "container",
+      "id": "cdb83af9d1278bdb19ebb227347ede5a45e4ae3a7d0516161f48581bd24aa929",
+      "before": true,
+      "command": "docker rm -f exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "container",
+      "id": "480d4a4efe0247601dcf0cdfc61a43e271d4fa4ecd06681abe2c2047ecadfaf2",
+      "before": true,
+      "command": "docker rm -f exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "volume",
+      "id": "ontology-workflow-m2-3435174c5157_api-keyring",
+      "before": true,
+      "command": "docker volume rm exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "volume",
+      "id": "ontology-workflow-m2-3435174c5157_keycloak-data",
+      "before": true,
+      "command": "docker volume rm exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "volume",
+      "id": "ontology-workflow-m2-3435174c5157_platform-data",
+      "before": true,
+      "command": "docker volume rm exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "network",
+      "id": "ontology-workflow-m2-3435174c5157_front",
+      "before": true,
+      "command": "docker network rm exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "network",
+      "id": "ontology-workflow-m2-3435174c5157_source",
+      "before": true,
+      "command": "docker network rm exact-id",
+      "afterAbsent": true
+    }
+  ],
+  "testStatus": "PASS",
+  "cleanupExpected": [
+    "480d4a4efe0247601dcf0cdfc61a43e271d4fa4ecd06681abe2c2047ecadfaf2",
+    "cdb83af9d1278bdb19ebb227347ede5a45e4ae3a7d0516161f48581bd24aa929",
+    "e56db75775bb0be4311aa910ce4b3ff164180f5c7cd2e29cf851ddf08c945dd9",
+    "edbe14fb62592d23686fb44fa36074515b3ce92a5d3fa5fe28579a1a57fb547a",
+    "f61b52c5e36ab6a7edb88c6f9e06e9621f7c0fc149e3b3718d80da095915761f",
+    "ontology-workflow-m2-3435174c5157_api-keyring",
+    "ontology-workflow-m2-3435174c5157_front",
+    "ontology-workflow-m2-3435174c5157_keycloak-data",
+    "ontology-workflow-m2-3435174c5157_platform-data",
+    "ontology-workflow-m2-3435174c5157_source"
+  ],
+  "cleanupComplete": true,
+  "apiLogSummary": {
+    "bytes": 3058,
+    "sha256": "d74ef421b5079c1d62c38bbde76d7d0b69cad5691d178a22b135d86c1403cb91",
+    "exceptionTypes": []
+  },
+  "webLogSummary": {
+    "bytes": 141,
+    "sha256": "5b0a3bb1a9a6bcb032bd198ab7733e6614bfcf1f3bd32aeb7a646376528cdbe1",
+    "exceptionTypes": []
+  },
+  "sourceStats": {
+    "requests": 3,
+    "authRejected": 0,
+    "aborted": 1,
+    "connections": 3,
+    "closedSockets": 3,
+    "sni": [
+      "web-source",
+      "web-source",
+      "web-source"
+    ]
+  }
+}

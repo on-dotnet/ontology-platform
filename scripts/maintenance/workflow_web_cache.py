@@ -156,7 +156,7 @@ def binding(root,rows,shims,links,adapter):
 
 def prepare(root,home,admission,projects,env,run_dir,node,adapter):
     """只允许本任务从两个明确批准的同仓库现存候选迁移。"""
-    require(home.parents[1].name==TASK,'TASK_ID')
+    require(home.parents[1].name in (TASK,'G4-ENG-DELIVERY-002'),'TASK_ID')
     marker=adapter.web_marker(root,home,admission)
     store=adapter.ordinary(admission['playwrightAndAjv']['store'])
     copied=0
@@ -206,8 +206,9 @@ def prepare(root,home,admission,projects,env,run_dir,node,adapter):
         require(binding(root,actual,actual_shims,actual_links,adapter)==expected_binding,'WEB_COPY_CONTENT_DRIFT')
     command=adapter.offline([node,str(home/'pnpm/package/bin/pnpm.cjs'),'--config.verifyDepsBeforeRun=error','--dir','apps/web','run','lint','--help'],root,home,projects)
     command[2]+=' (allow file-write* (literal '+json.dumps(str(root/'node_modules/.pnpm-workspace-state-v1.json'))+'))'
-    proc=subprocess.run(command,cwd=root,env=env,capture_output=True,timeout=60)
-    adapter.materialize(run_dir/'web-dependency-check.log',proc.stdout+proc.stderr)
+    from workflow_execution import run
+    proc=run(command,root,task=home.parents[1].name,environment=env,timeout=60,stage='web-dependency-check')
+    adapter.materialize(run_dir/'web-dependency-check.txt',proc.stdout+proc.stderr)
     require(proc.returncode==0,'PNPM_DEPENDENCY_STATE_FAILED')
     adapter.materialize(marker,adapter.canonical(dict(root=str(root),source=source_identity,binding=binding(root,rows,shims,links,adapter)))+b'\n')
     return dict(status='DEPENDENCIES_READY',packages=len(rows),materializedTrees=copied,download=0,install=0,restore=0,contentFiles=sum(len(row['files']) for row in rows),source=source_identity)

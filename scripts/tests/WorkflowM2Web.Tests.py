@@ -161,7 +161,7 @@ class CloseoutTests(unittest.TestCase):
         original={**current,parser:'historical-parser'}
         row={'status':'PASS','testStatus':'PASS','cleanupComplete':True,'cleanup':[],'cleanupExpected':[],'driverInputs':original}
         evidence.closed(row)
-        for path in set(current)-{parser}:
+        for path in {p for p in current if evidence.build.driver_layers()[p]=='execution'}:
             for changed in ({**original,path:'different'}, {k:v for k,v in original.items() if k!=path}):
                 with self.assertRaisesRegex(ValueError,'ORIGINAL_DRIVER_DRIFT'):evidence.closed({**row,'driverInputs':changed})
         with self.assertRaisesRegex(ValueError,'ORIGINAL_DRIVER_DRIFT'):evidence.closed({**row,'driverInputs':{**original,'unknown-driver':'x'}})

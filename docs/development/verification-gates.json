@@ -18,7 +18,8 @@
         "docs/evidence/G4-M2-WEB-01/*.json",
         "docs/evidence/G4-M2-WEB-01/recovery/**/*.json",
         "docs/evidence/G4-M2-WEB-01/gates/**/*.json",
-        "docs/evidence/G4-M2-WEB-01/recovery/**/*.log"
+        "docs/evidence/G4-M2-WEB-01/recovery/**/*.log",
+        "docs/evidence/G4-ENG-DELIVERY-002/**/*.json"
       ],
       "needs": [],
       "command": [
@@ -131,7 +132,11 @@
         "-B",
         "scripts/tests/Workflow.Tests.py"
       ],
-      "testsRequired": true
+      "testsRequired": true,
+      "identityInputs": [
+        "scripts/maintenance/workflow_execution.py",
+        "scripts/maintenance/workflow_evidence.py"
+      ]
     },
     "package": {
       "inputs": [
@@ -288,7 +293,11 @@
         "-B",
         "scripts/tests/WorkflowEnvironment.Tests.py"
       ],
-      "testsRequired": true
+      "testsRequired": true,
+      "identityInputs": [
+        "scripts/maintenance/workflow_execution.py",
+        "scripts/maintenance/workflow_evidence.py"
+      ]
     },
     "smoke-adapter": {
       "inputs": [
@@ -308,7 +317,11 @@
         "-B",
         "scripts/tests/WorkflowSmoke.Tests.py"
       ],
-      "testsRequired": true
+      "testsRequired": true,
+      "identityInputs": [
+        "scripts/maintenance/workflow_execution.py",
+        "scripts/maintenance/workflow_evidence.py"
+      ]
     },
     "m2-task-admission": {
       "inputs": [
@@ -327,6 +340,24 @@
         "python3",
         "-B",
         "scripts/tests/WorkflowM2Web.Tests.py"
+      ],
+      "testsRequired": true,
+      "identityInputs": [
+        "scripts/maintenance/workflow_execution.py",
+        "scripts/maintenance/workflow_evidence.py"
+      ]
+    },
+    "delivery-protocol": {
+      "inputs": [
+        "scripts/maintenance/workflow_execution.py",
+        "scripts/maintenance/workflow_evidence.py",
+        "scripts/tests/WorkflowDelivery.Tests.py"
+      ],
+      "needs": [],
+      "command": [
+        "python3",
+        "-B",
+        "scripts/tests/WorkflowDelivery.Tests.py"
       ],
       "testsRequired": true
     }

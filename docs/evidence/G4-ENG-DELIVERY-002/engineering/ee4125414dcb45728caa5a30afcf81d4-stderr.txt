@@ -1,0 +1,19 @@
+....E......
+======================================================================
+ERROR: test_nested_timing_union_and_unfinished_start (__main__.IntegrationTests.test_nested_timing_union_and_unfinished_start)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g4-eng-delivery-002/ontology-platform/scripts/tests/WorkflowDelivery.Tests.py", line 115, in test_nested_timing_union_and_unfinished_start
+    append(path,dict(commandId=ident,event='START',startedAtUtc='2026-11-12T00:00:%02d+00:00'%start))
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g4-eng-delivery-002/ontology-platform/scripts/maintenance/workflow_execution.py", line 74, in append
+    with ordinary(path).open('ab') as stream:
+         ~~~~~~~~^^^^^^
+  File "/Users/chasen/.codex/worktrees/g4-eng-delivery-002/ontology-platform/scripts/maintenance/workflow_execution.py", line 69, in ordinary
+    raise ValueError('EXECUTION_LINKED_PATH')
+ValueError: EXECUTION_LINKED_PATH
+
+----------------------------------------------------------------------
+Ran 11 tests in 5.258s
+
+FAILED (errors=1)

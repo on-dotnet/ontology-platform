@@ -52,16 +52,32 @@ def finish_cleanup(state):
     state['cleanupComplete']=complete;state['status']=state['testStatus'] if complete else 'FAIL'
 
 
+def driver_layers():
+    """显式登记执行、资格、归档层；新增未映射 M2 模块关闭复用。"""
+    execution=('workflow_m2_web.py','workflow_m2_fixture.py','workflow_m2_smoke.py','workflow_m2_build.py','workflow_smoke.py','workflow_execution.py','workflow_environment.py','workflow_web_cache.py','workflow.py','workflow-m2-web.mjs')
+    qualification=('workflow_m2_evidence.py','workflow_evidence.py')
+    rows={ 'scripts/maintenance/'+name:'execution' for name in execution}
+    rows.update({'scripts/maintenance/'+name:'qualification' for name in qualification})
+    rows['experiments/g4-m2-web-01/https-fixture.mjs']='execution'
+    unknown={str(path.relative_to(ROOT)) for path in (ROOT/'scripts/maintenance').glob('workflow_m2_*.py')}-set(rows)
+    if unknown:raise ValueError('UNMAPPED_EXECUTION_INPUT')
+    return rows
+
+
 def driver_inputs():
-    """绑定本任务所有测试驱动及实际HTTPS源，不把驱动修改冒充已验输入。"""
-    paths=[*sorted((ROOT/'scripts/maintenance').glob('workflow_m2_*.py')),ROOT/'scripts/maintenance/workflow-m2-web.mjs',ROOT/'scripts/maintenance/workflow_smoke.py',ROOT/'experiments/g4-m2-web-01/https-fixture.mjs']
-    return {str(path.relative_to(ROOT)):sha(path.read_bytes()) for path in paths}
+    return {path:sha((ROOT/path).read_bytes()) for path in driver_layers()}
 
 
-def validate(target):
-    path=ROOT/'artifacts/workflow'/TASK/(target+'-build-binding.json')
+def execution_unchanged(previous):
+    layers=driver_layers();current=driver_inputs()
+    if set(previous)!=set(current):return False
+    return all(previous[path]==current[path] for path in current if layers[path]=='execution')
+
+
+def validate(target,task=TASK):
+    path=ROOT/'artifacts/workflow'/task/(target+'-build-binding.json')
     receipt=json.loads(path.read_text())
-    if receipt.get('status')!='PASS' or receipt.get('taskId')!=TASK or receipt.get('worktree')!=str(ROOT) or receipt.get('inputKey')!=inputs(target) or receipt.get('outputs')!=outputs(target):raise ValueError('BUILD_BINDING_MISMATCH')
+    if receipt.get('status')!='PASS' or receipt.get('taskId')!=task or receipt.get('worktree')!=str(ROOT) or receipt.get('inputKey')!=inputs(target) or receipt.get('outputs')!=outputs(target):raise ValueError('BUILD_BINDING_MISMATCH')
     return {'receiptSha256':sha(path.read_bytes()),'inputKey':receipt['inputKey'],'outputKey':sha(json.dumps(receipt['outputs'],sort_keys=True).encode())}
 
 
@@ -73,14 +89,15 @@ def build(target,prepared):
         cwd=ROOT/'apps/web';command=[str(cwd/'node_modules/.bin/next'),'build','--webpack'];profile='(version 1) (allow default) (deny network-outbound)'
     else:
         command=[receipt['dotnet'],'build',TARGETS[target],'--no-restore','--disable-build-servers','-m:1','-v:q'];profile='(version 1) (allow default) (deny network*)'
-    start=time.monotonic();result=subprocess.run(['/usr/bin/sandbox-exec','-p',profile,*command],cwd=cwd,env=env,capture_output=True,timeout=180)
-    directory=ROOT/'artifacts/workflow'/TASK;log=directory/(target+'-bound-build.log');log.write_bytes(result.stdout+result.stderr)
-    value=dict(taskId=TASK,worktree=str(ROOT),target=target,status='PASS' if result.returncode==0 and initial==inputs(target) else 'FAIL',exitCode=result.returncode,elapsedSeconds=time.monotonic()-start,inputKey=initial,logSha256=sha(log.read_bytes()),command=command,outputs=outputs(target) if result.returncode==0 else {})
+    from workflow_execution import run
+    start=time.monotonic();result=run(['/usr/bin/sandbox-exec','-p',profile,*command],cwd,task=receipt['taskId'],environment=env,timeout=180,input_key=initial)
+    directory=ROOT/'artifacts/workflow'/receipt['taskId'];log=directory/(target+'-bound-build.txt');log.write_bytes(result.stdout+result.stderr)
+    value=dict(taskId=receipt['taskId'],worktree=str(ROOT),target=target,status='PASS' if result.returncode==0 and initial==inputs(target) else 'FAIL',exitCode=result.returncode,elapsedSeconds=time.monotonic()-start,inputKey=initial,logSha256=sha(log.read_bytes()),command=command,outputs=outputs(target) if result.returncode==0 else {})
     (directory/(target+'-build-binding.json')).write_text(json.dumps(value,indent=2)+'\n')
     return {key:value[key] for key in ('target','status','exitCode','elapsedSeconds','inputKey')}
 
 if __name__=='__main__':
     import argparse
     parser=argparse.ArgumentParser();parser.add_argument('--task',required=True);parser.add_argument('--target',choices=TARGETS,required=True);parser.add_argument('--prepared',required=True);args=parser.parse_args()
-    if args.task!=TASK:raise SystemExit(2)
+    if args.task not in (TASK,'G4-ENG-DELIVERY-002'):raise SystemExit(2)
     result=build(args.target,args.prepared);print(json.dumps(result));raise SystemExit(0 if result['status']=='PASS' else 2)

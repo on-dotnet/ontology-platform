@@ -19,6 +19,8 @@ import datetime as dt
 from functools import lru_cache
 
 ROOT = Path(__file__).resolve().parents[2]
+if str(Path(__file__).resolve().parent) not in sys.path:
+    sys.path.insert(0,str(Path(__file__).resolve().parent))
 REGISTRY = ROOT / 'docs/development/verification-gates.json'
 
 
@@ -167,6 +169,7 @@ def ordered(names):
 
 def test_counts(text, kind):
     """读取真实测试框架摘要，缺摘要不把exit0解释为测试成功。"""
+    if re.search(r'(?m)^(?:FAILED|FAIL:|ERROR:)|(?:failures|errors)=[1-9]',text):return 0,0
     counts=[int(x) for x in re.findall(r'Ran (\d+) tests? in',text)]
     skips=[int(x) for x in re.findall(r'skipped=(\d+)',text)]
     package=re.search(r'ReviewPackage: (\d+) tests, (\d+) failures, (\d+) platform cases NOT_RUN',text)
@@ -212,6 +215,10 @@ def load_reuse(index, gate, key, environment, policy):
     if not log_path.startswith(str(Path(path).parent)+'/') or '..' in log_path.split('/'):
         raise ValueError('REUSE_LOG_BOUNDARY')
     log=git(ROOT,'show',commit+':'+log_path)
+    if row.get('publishedLog',{}).get('encoding')=='base64':
+        import base64
+        envelope=json.loads(log);log=base64.b64decode(envelope['base64'],validate=True)
+        if digest(log)!=envelope['sha256']:raise ValueError('REUSE_ENVELOPE_HASH')
     tests,skips=test_counts(log.decode(errors='replace'),'auto')
     valid=(row.get('inputsUnchanged') is True and row.get('status')=='PASS' and row.get('exitCode')==0 and tests>0 and skips==0 and
            row.get('tests')==tests and row.get('skipped')==skips and row.get('gate')==gate and
@@ -227,18 +234,11 @@ def load_reuse(index, gate, key, environment, policy):
                 qualificationCommand='workflow.py verify --plan <current controlled plan> --reuse <index>')
 
 
-def execute_gate(command, root, timeout=1800, environment=None):
-    """有界子进程，超时终止本次进程组并保存其真实输出。"""
-    child=subprocess.Popen(command,cwd=root,env=environment,stdout=subprocess.PIPE,stderr=subprocess.PIPE,
-                           start_new_session=os.name!='nt')
-    try:
-        out,err=child.communicate(timeout=timeout)
-        return child.returncode,out+err
-    except subprocess.TimeoutExpired:
-        if os.name!='nt': os.killpg(child.pid,signal.SIGKILL)
-        else: child.kill()
-        out,err=child.communicate()
-        return 124,out+err
+def execute_gate(command, root, timeout=1800, environment=None, *, task='WORKFLOW', run_id=None, input_key=None, environment_key=None):
+    """一般工程入口复用公共执行器；合并输出仅为兼容展示，原件双流独立保留。"""
+    from workflow_execution import run
+    result=run(command,root,task=task,run_id=run_id,input_key=input_key,environment_key=environment_key,timeout=timeout,environment=environment)
+    return result.returncode,result.stdout+result.stderr
 
 
 def error_signature(raw, code):
@@ -314,8 +314,8 @@ def verify(task, path, reuse=None, publish=False, diagnostic=False, hypothesis=N
         gate=registry()[name];key=actual['inputKeys'][name];policy=policy_key(name)
         if any(outcomes.get(dep) not in (None,'PASS') for dep in gate['needs']):
             rows.append(dict(gate=name,status='NOT_RUN',reason='Upstream failed or unavailable'));outcomes[name]='NOT_RUN';continue
-        product_qualification=not gate['command'] and task=='G4-M2-WEB-01' and name in {'environment','contract','backend','web','interaction'}
-        if not gate['command'] and task=='G4-M2-WEB-01' and name in {'environment','contract','backend','web','interaction'}:
+        product_qualification=not gate['command'] and task in ('G4-M2-WEB-01','G4-ENG-DELIVERY-002') and name in {'environment','contract','backend','web','interaction'}
+        if not gate['command'] and task in ('G4-M2-WEB-01','G4-ENG-DELIVERY-002') and name in {'environment','contract','backend','web','interaction'}:
             gate={**gate,'command':['python3','-B','scripts/maintenance/workflow_m2_evidence.py','--task',task,'--gate',name,'--input-key',key],'testsRequired':True}
         if not gate['command']:
             rows.append(dict(gate=name,status='NOT_RUN',reason='Product gate requires task-specific admitted executor'))
@@ -337,7 +337,7 @@ def verify(task, path, reuse=None, publish=False, diagnostic=False, hypothesis=N
                 rows.append(previous);outcomes[name]='PASS';continue
             if name not in actual['affected']: continue
             start=time.monotonic();started=dt.datetime.now(dt.timezone.utc).isoformat()
-            code,raw=execute_gate(gate['command'],ROOT,20 if diagnostic else 1800,child_environment)
+            code,raw=execute_gate(gate['command'],ROOT,20 if diagnostic else 1800,child_environment,task=task,run_id=run.name,input_key=key,environment_key=environment)
             elapsed=time.monotonic()-start
             record_timing(directory,task,run.name,name,key,started,elapsed,code)
             tests,skipped=test_counts(raw.decode(errors='replace'),'auto')
@@ -367,7 +367,10 @@ def verify(task, path, reuse=None, publish=False, diagnostic=False, hypothesis=N
         target=safe_file(ROOT/'docs/evidence'/task/'gates'/run.name);target.mkdir(parents=True)
         for row in rows:
             if row.get('executionMode')!='FRESH' and row.get('qualificationMode')!='FRESH': continue
-            for suffix in ('.txt','.json'): os.replace(run/(row['gate']+suffix),target/(row['gate']+suffix))
+            from workflow_evidence import publish as publish_raw
+            record=publish_raw(ROOT,str((target/(row['gate']+'.txt')).relative_to(ROOT)),(run/(row['gate']+'.txt')).read_bytes())
+            row['publishedLog']=record;row['logPath']=record['path']
+            write(target/(row['gate']+'.json'),row)
             write(run/(row['gate']+'.state.json'),{k:row[k] for k in ('status','inputKey','environmentKey','errorSignature')})
     write(run/'receipt.json',result)
     return result
@@ -405,14 +408,14 @@ def package_check(task, base, head, evidence):
     paths.update(git(ROOT,'diff','--name-only','-z','--no-renames',base,head,'--').decode().split('\0'))
     validate_package_paths(ROOT,sorted(paths-{''}))
     result['pathPolicy']='PASS: existing V3 rules'
-    proc=subprocess.run(['pwsh','-NoProfile','-File','scripts/verify.ps1'],cwd=ROOT,env=engineering_process_environment(task))
-    result['formatExitCode']=proc.returncode
-    if proc.returncode: result['status']='BLOCKED'
+    code,_=execute_gate(['pwsh','-NoProfile','-File','scripts/verify.ps1'],ROOT,environment=engineering_process_environment(task),task=task)
+    result['formatExitCode']=code
+    if code: result['status']='BLOCKED'
     if evidence:
-        proc=subprocess.run(['pwsh','-NoProfile','-File','scripts/test-review-evidence.ps1',
-                             '-EvidenceFile',str(safe_file(evidence)),'-ExpectedHead',head],cwd=ROOT,env=engineering_process_environment(task))
-        result['evidenceSchemaExitCode']=proc.returncode
-        if proc.returncode: result['status']='BLOCKED'
+        code,_=execute_gate(['pwsh','-NoProfile','-File','scripts/test-review-evidence.ps1',
+                             '-EvidenceFile',str(safe_file(evidence)),'-ExpectedHead',head],ROOT,environment=engineering_process_environment(task),task=task)
+        result['evidenceSchemaExitCode']=code
+        if code: result['status']='BLOCKED'
     else:
         result.update(status='BLOCKED',evidenceSchema='NOT_RUN: supply --evidence before final acceptance')
     return result

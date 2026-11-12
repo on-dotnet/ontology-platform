@@ -140,14 +140,15 @@ def offline(command,root,home,projects):
 
 def run(command,root,home,projects,env,label,run_dir,timeout=180):
     """每次命令真实计时且保留有界日志；超时也是失败事实。"""
+    from workflow_execution import run as execute
     started=time.monotonic()
-    try:
-        proc=subprocess.run(offline(command,root,home,projects),cwd=root,env=env,capture_output=True,timeout=timeout)
-        raw=proc.stdout+proc.stderr;code=proc.returncode
-    except subprocess.TimeoutExpired as exc:
-        raw=(exc.stdout or b'')+(exc.stderr or b'');code=124
-    materialize(run_dir/(label+'.log'),raw)
-    row=dict(command=command,exitCode=code,elapsedSeconds=time.monotonic()-started,outputSha256=digest(raw))
+    task=home.parent.parent.name
+    proc=execute(offline(command,root,home,projects),root,task=task,run_id=run_dir.name,
+                 stage=label,environment=env,timeout=timeout,input_key=home.name,
+                 identity_key=digest(canonical([label,command])))
+    raw=proc.stdout+proc.stderr;code=proc.returncode
+    materialize(run_dir/(label+'.txt'),raw)
+    row=dict(command=command,exitCode=proc.receipt['exitCode'],classification=proc.receipt['classification'],elapsedSeconds=time.monotonic()-started,outputSha256=digest(raw))
     materialize(run_dir/(label+'.json'),canonical(row)+b'\n')
     require(code==0,label+'_FAILED_'+str(code))
     return raw
@@ -433,11 +434,11 @@ def prepare_locked(root,task,home,projects,packages,approved,admission,identity)
     if previous.is_file():
         prior=json.loads(previous.read_text());require(prior['workspaceKey']==identity['workspaceKey'],'WORKSPACE_CHANGED')
         assets=verify_assets(root,home,projects,packages,approved)
-    elif task=='G4-M2-WEB-01' and all((root/Path(p['path']).parent/'obj/project.assets.json').is_file() for p in projects):
+    elif task in ('G4-M2-WEB-01','G4-ENG-DELIVERY-002') and all((root/Path(p['path']).parent/'obj/project.assets.json').is_file() for p in projects):
         # 上次Web失败不使已成功的后端闭包失效；逐项目/包重新核验真实内容和绝对路径。
         assets=verify_assets(root,home,projects,packages,approved)
         require(any(json.loads(p.read_text()).get('exitCode')==0 and
-                    digest(p.with_suffix('.log').read_bytes())==json.loads(p.read_text()).get('outputSha256')
+                    digest((p.with_suffix('.txt') if p.with_suffix('.txt').exists() else p.with_suffix('.log')).read_bytes())==json.loads(p.read_text()).get('outputSha256')
                     for p in (home/'runs').glob('*/restore.json')),'BACKEND_REUSE_EVIDENCE_MISSING')
     else:
         failure=home/'restore-failure.json'
@@ -447,7 +448,7 @@ def prepare_locked(root,task,home,projects,packages,approved,admission,identity)
             restores=1;assets=verify_assets(root,home,projects,packages,approved)
         except Exception:
             materialize(failure,canonical(dict(**identity,run=str(run_dir)))+b'\n');raise
-    if task=='G4-M2-WEB-01':
+    if task in ('G4-M2-WEB-01','G4-ENG-DELIVERY-002'):
         spec=importlib.util.spec_from_file_location('workflow_web_cache',root/'scripts/maintenance/workflow_web_cache.py')
         web_adapter=importlib.util.module_from_spec(spec);spec.loader.exec_module(web_adapter)
         web=web_adapter.prepare(root,home,admission,projects,env,run_dir,node,types.SimpleNamespace(**globals()))

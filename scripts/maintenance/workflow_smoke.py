@@ -22,7 +22,7 @@ TASK='G4-ENG-WORKFLOW-001'
 M2_TASK='G4-M2-WEB-01'
 
 def admitted(task,run):
-    return (task==TASK and re.fullmatch('wf-[a-f0-9]{12}',run or '')) or (task==M2_TASK and re.fullmatch('m2-[a-f0-9]{12}',run or ''))
+    return (task==TASK and re.fullmatch('wf-[a-f0-9]{12}',run or '')) or (task in (M2_TASK,'G4-ENG-DELIVERY-002') and re.fullmatch('m2-[a-f0-9]{12}',run or ''))
 
 SERVICES=('pg-source','platform-pg','keycloak-test','api','web')
 CONTEXT='desktop-linux'
@@ -37,7 +37,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {createRequire} from 'node:module';
 const root=process.env.G4_ROOT;
-if(!((process.env.WORKFLOW_TASK==='G4-ENG-WORKFLOW-001'&&/^wf-[0-9a-f]{12}$/.test(process.env.G4_RUN_ID))||(process.env.WORKFLOW_TASK==='G4-M2-WEB-01'&&/^m2-[0-9a-f]{12}$/.test(process.env.G4_RUN_ID))))process.exit(2);
+if(!((process.env.WORKFLOW_TASK==='G4-ENG-WORKFLOW-001'&&/^wf-[0-9a-f]{12}$/.test(process.env.G4_RUN_ID))||(['G4-M2-WEB-01','G4-ENG-DELIVERY-002'].includes(process.env.WORKFLOW_TASK)&&/^m2-[0-9a-f]{12}$/.test(process.env.G4_RUN_ID))))process.exit(2);
 const server=net.createServer(client=>{
  const remote=net.connect({host:'keycloak-test',port:8080});
  const close=()=>{client.destroy();remote.destroy();};
@@ -92,6 +92,8 @@ class HostRelay:
         self.root=root;self.runtime=runtime;self.servers=[];self.threads=[]
         self.stop=threading.Event();self.lock=threading.Lock();self.slots=threading.BoundedSemaphore(16)
         self.active={};self.failures=[];self.connections=0;self.timer=None
+        from workflow_execution import CONTEXT
+        self.parent_id=CONTEXT.get().get('parent_id')
 
     def start(self):
         snapshot(self.root,self.runtime)
@@ -117,14 +119,17 @@ class HostRelay:
 
     def forward(self, client, port):
         if self.stop.is_set() or not self.slots.acquire(blocking=False):return
-        process=None;pid=None;token='wf-relay-'+self.runtime['runId']+'-'+uuid.uuid4().hex
+        process=None;service=None;pid=None;token='wf-relay-'+self.runtime['runId']+'-'+uuid.uuid4().hex
         try:
-            process=subprocess.Popen(relay_command(self.runtime,port,token),cwd=self.root,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,start_new_session=True,bufsize=0)
+            from workflow_execution import Service
+            service=Service(relay_command(self.runtime,port,token),self.root,self.runtime['taskId'],self.parent_id)
+            process=service.process
             client.settimeout(5)
             with self.lock:self.active[token]=(client,process);self.connections+=1
             ready,_,_=select.select([process.stderr],[],[],5)
             require(ready,'RELAY_PID_TIMEOUT')
             line=process.stderr.readline(80).decode();require(re.fullmatch(r'PID [1-9][0-9]*\n',line),'RELAY_PID')
+            service.err.extend(line.encode());service.ready()
             pid=int(line.split()[1]);deadline=time.monotonic()+45
             while not self.stop.is_set() and time.monotonic()<deadline:
                 readable,_,_=select.select([client,process.stdout],[],[],.5)
@@ -136,6 +141,7 @@ class HostRelay:
                         written=process.stdin.write(data[offset:]);require(written and written>0,'RELAY_PIPE_WRITE');offset+=written
                 if process.stdout in readable:
                     data=os.read(process.stdout.fileno(),65536)
+                    service.out.extend(data)
                     if not data:break
                     client.sendall(data)
         except (OSError,ValueError,subprocess.SubprocessError):
@@ -145,15 +151,17 @@ class HostRelay:
             try:client.close()
             except OSError:pass
             if process:
-                try:process.stdin.close()
+                try:process.stdin.close();process.stdin=None
                 except OSError:pass
                 if pid:
                     try:docker(self.root,'exec',self.runtime['containerIds']['web'],'node','-e',RELAY_STOP_NODE,str(pid),token,timeout=5)
                     except (OSError,ValueError,subprocess.SubprocessError):self.failures.append('RELAY_CHILD_RELEASE_NOT_VERIFIED')
-                try:process.wait(timeout=2)
+                try:tail_out,tail_err=process.communicate(timeout=2)
                 except subprocess.TimeoutExpired:
-                    process.kill();process.wait(timeout=2)
+                    os.killpg(process.pid,signal.SIGKILL);tail_out,tail_err=process.communicate(timeout=2)
+                service.out.extend(tail_out);service.err.extend(tail_err)
                 for stream in (process.stdout,process.stderr):stream.close()
+                service.finish()
             with self.lock:self.active.pop(token,None)
             self.slots.release()
 
@@ -203,7 +211,8 @@ def private_write(path, value):
 
 def command(args, *, cwd, env=None, timeout=60):
     """捕获诊断但不回显可能含私有配置的原始输出。"""
-    proc=subprocess.run(args,cwd=cwd,env=env,capture_output=True,timeout=timeout)
+    from workflow_execution import run, current_task
+    proc=run(args,cwd,task=current_task(TASK),environment=env,timeout=timeout)
     require(proc.returncode==0,'COMMAND_FAILED: '+Path(args[0]).name+' exit='+str(proc.returncode))
     return proc.stdout
 
@@ -246,19 +255,18 @@ def snapshot(root, runtime):
 
 def bounded_browser(args, root, timeout=180):
     """超时精确终止本次独立进程组，避免留下浏览器子进程。"""
-    process=subprocess.Popen(args,cwd=root,stdout=subprocess.PIPE,stderr=subprocess.PIPE,start_new_session=True)
-    try:
-        stdout,_=process.communicate(timeout=timeout)
-        return stdout,process.returncode
-    except subprocess.TimeoutExpired:
-        os.killpg(process.pid,signal.SIGTERM)
-        try: stdout,_=process.communicate(timeout=5)
-        except subprocess.TimeoutExpired:
-            os.killpg(process.pid,signal.SIGKILL);stdout,_=process.communicate(timeout=5)
-        return stdout,124
+    from workflow_execution import run,current_task
+    result=run(args,root,task=current_task(TASK),timeout=timeout,stage='browser')
+    return result.stdout,result.returncode
 
 
 def wait_http(url, headers=None, timeout=90):
+    from workflow_execution import waiting,current_task
+    with waiting(Path(__file__).resolve().parents[2],current_task(TASK),'http-readiness'):
+        return _wait_http(url,headers,timeout)
+
+
+def _wait_http(url, headers=None, timeout=90):
     opener=urllib.request.build_opener(urllib.request.ProxyHandler({}))
     deadline=time.monotonic()+timeout
     while time.monotonic()<deadline:

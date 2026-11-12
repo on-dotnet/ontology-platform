@@ -1,0 +1,185 @@
+{
+  "driverInputs": {
+    "scripts/maintenance/workflow_m2_build.py": "08774626d7ac58e281e5b0279d203ba61000de90e547fee725c01239b552f4ed",
+    "scripts/maintenance/workflow_m2_evidence.py": "de64296f29d3fac86abeefc330d19d7889f192a2e9bc14675fccff13e27b0355",
+    "scripts/maintenance/workflow_m2_fixture.py": "898d30bc0787a1b35f050d2c0b05f840c248d3ee08f92ab9681b207ad5a2cc46",
+    "scripts/maintenance/workflow_m2_smoke.py": "0a57f89541b46fe03a5f5fc890e95cd74ccc05c8032ec8884c10cd23e436d37e",
+    "scripts/maintenance/workflow_m2_web.py": "97ce845551a75831d63ef5fd0aa134788e745beb8b75441d0c43a5644c88fa09",
+    "scripts/maintenance/workflow-m2-web.mjs": "4865a0d755eda53eaf579b2b04a506fb80cf3e941c2573f155389de42f846141",
+    "scripts/maintenance/workflow_smoke.py": "2244d661c84f1135a3453a2e761ef5daae73d35ae6466e02decf894039bcd489",
+    "experiments/g4-m2-web-01/https-fixture.mjs": "523838ced9f476b053eca72c40ddd57da35f59da6bfd3d7224e00e47ae345562"
+  },
+  "taskId": "G4-ENG-DELIVERY-002",
+  "runId": "m2-a473daa849fc",
+  "status": "PASS",
+  "buildBinding": {
+    "api": {
+      "receiptSha256": "ed9ab73d8d9b9a6bf123a2035485bfb743310c5cdfb479d465751663a9ac4b68",
+      "inputKey": "0e88c807f465ee9ad931659fa2014eb792f89e0b97b8b792953225eebcddf94a",
+      "outputKey": "b04271852822f93a1c48e61a04c93749550978db5e9277b917d952b68ff0d16d"
+    },
+    "web": {
+      "receiptSha256": "16a3615731d2e3ae1d40716b6f0002193797225c562e6b34f58eca2690adb785",
+      "inputKey": "3122770fb2b27f45051b4a1ba088598842fe7d3fb2fc529f00111608a025cbe7",
+      "outputKey": "a68575cc302f4b1d83e464bd5a464ed362618dfb43fa2982fcfedbc7ac5492d9"
+    }
+  },
+  "tests": 3,
+  "budgetBefore": {
+    "dataBytes": {
+      "platform-pg": 48857088,
+      "keycloak-test": 193712128,
+      "api": 4096
+    },
+    "privateAndOutputBytes": 46996,
+    "dataStopBytes": 3221225472,
+    "outputStopBytes": 1073741824
+  },
+  "browserExitCode": 0,
+  "browserSha256": "b87c7200d7d6b1d7b080f003beb4f7bab1f289be67ec83ca077ee2f5043cfdda",
+  "secretAndBodyLeakScan": {
+    "platformDump": true,
+    "apiWebLogs": true,
+    "auditActions": [
+      "connection.secret.intake",
+      "connection.create",
+      "connection.probe.start",
+      "connection.probe.complete",
+      "connection.enable",
+      "connection.catalog.start",
+      "connection.catalog.finish",
+      "connection.catalog.cancel"
+    ],
+    "rawDataSaved": false
+  },
+  "budgetAfter": {
+    "dataBytes": {
+      "platform-pg": 49127424,
+      "keycloak-test": 194101248,
+      "api": 4096
+    },
+    "privateAndOutputBytes": 54544,
+    "dataStopBytes": 3221225472,
+    "outputStopBytes": 1073741824
+  },
+  "relayCloseout": {
+    "connections": 64,
+    "active": 0,
+    "failures": []
+  },
+  "containerIds": {
+    "web-source": "2561a7b09bac53157cd3ef500b916a9a58540345b3fa8cc2b2d85c4c34b22ca1",
+    "platform-pg": "083381515c0bd193b314f9cfc37beefe3e8f4744fd1884702fb554fdb29155b7",
+    "keycloak-test": "3b70f6baaf34d04e0d08f9b9013864549f8e4b1e5dc6ecc48b31d7c1aaf6aac0",
+    "api": "d0caf710a2f995501ca7bb76a14bdd967c89223263eee177e8d19bc2cbc31394",
+    "web": "3fd6db57489686c7332794e4c09afc8e2ef07e55e13e9cc063ac6215bc2fe81a"
+  },
+  "cleanup": [
+    {
+      "kind": "container",
+      "id": "2561a7b09bac53157cd3ef500b916a9a58540345b3fa8cc2b2d85c4c34b22ca1",
+      "before": true,
+      "command": "docker rm -f exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "container",
+      "id": "083381515c0bd193b314f9cfc37beefe3e8f4744fd1884702fb554fdb29155b7",
+      "before": true,
+      "command": "docker rm -f exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "container",
+      "id": "3b70f6baaf34d04e0d08f9b9013864549f8e4b1e5dc6ecc48b31d7c1aaf6aac0",
+      "before": true,
+      "command": "docker rm -f exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "container",
+      "id": "d0caf710a2f995501ca7bb76a14bdd967c89223263eee177e8d19bc2cbc31394",
+      "before": true,
+      "command": "docker rm -f exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "container",
+      "id": "3fd6db57489686c7332794e4c09afc8e2ef07e55e13e9cc063ac6215bc2fe81a",
+      "before": true,
+      "command": "docker rm -f exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "volume",
+      "id": "ontology-workflow-m2-a473daa849fc_api-keyring",
+      "before": true,
+      "command": "docker volume rm exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "volume",
+      "id": "ontology-workflow-m2-a473daa849fc_keycloak-data",
+      "before": true,
+      "command": "docker volume rm exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "volume",
+      "id": "ontology-workflow-m2-a473daa849fc_platform-data",
+      "before": true,
+      "command": "docker volume rm exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "network",
+      "id": "ontology-workflow-m2-a473daa849fc_front",
+      "before": true,
+      "command": "docker network rm exact-id",
+      "afterAbsent": true
+    },
+    {
+      "kind": "network",
+      "id": "ontology-workflow-m2-a473daa849fc_source",
+      "before": true,
+      "command": "docker network rm exact-id",
+      "afterAbsent": true
+    }
+  ],
+  "testStatus": "PASS",
+  "cleanupExpected": [
+    "083381515c0bd193b314f9cfc37beefe3e8f4744fd1884702fb554fdb29155b7",
+    "2561a7b09bac53157cd3ef500b916a9a58540345b3fa8cc2b2d85c4c34b22ca1",
+    "3b70f6baaf34d04e0d08f9b9013864549f8e4b1e5dc6ecc48b31d7c1aaf6aac0",
+    "3fd6db57489686c7332794e4c09afc8e2ef07e55e13e9cc063ac6215bc2fe81a",
+    "d0caf710a2f995501ca7bb76a14bdd967c89223263eee177e8d19bc2cbc31394",
+    "ontology-workflow-m2-a473daa849fc_api-keyring",
+    "ontology-workflow-m2-a473daa849fc_front",
+    "ontology-workflow-m2-a473daa849fc_keycloak-data",
+    "ontology-workflow-m2-a473daa849fc_platform-data",
+    "ontology-workflow-m2-a473daa849fc_source"
+  ],
+  "cleanupComplete": true,
+  "apiLogSummary": {
+    "bytes": 2922,
+    "sha256": "b22367eb5389b22756e2fb8b1bff751eb5b9566a2aa2bc48a3202caf102ad7a4",
+    "exceptionTypes": []
+  },
+  "webLogSummary": {
+    "bytes": 141,
+    "sha256": "5ccf6106322314d41cd3482c4fcdefa0f73b47ddcb73690d6be6d4f24298438e",
+    "exceptionTypes": []
+  },
+  "sourceStats": {
+    "requests": 3,
+    "authRejected": 0,
+    "aborted": 1,
+    "connections": 3,
+    "closedSockets": 3,
+    "sni": [
+      "web-source",
+      "web-source",
+      "web-source"
+    ]
+  }
+}

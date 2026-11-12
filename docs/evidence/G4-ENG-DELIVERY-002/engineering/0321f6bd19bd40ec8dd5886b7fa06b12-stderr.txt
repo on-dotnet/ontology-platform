@@ -1,0 +1,27 @@
+E..........E..
+======================================================================
+ERROR: test_browser_timeout_has_real_exit_and_no_retry (__main__.SmokeTests.test_browser_timeout_has_real_exit_and_no_retry)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g4-eng-delivery-002/ontology-platform/scripts/tests/WorkflowSmoke.Tests.py", line 71, in test_browser_timeout_has_real_exit_and_no_retry
+    raw,code=self.smoke.bounded_browser([sys.executable,'-c','import time; time.sleep(10)'],Path(directory),timeout=.1)
+             ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g4-eng-delivery-002/ontology-platform/scripts/maintenance/workflow_smoke.py", line 257, in bounded_browser
+    from workflow_execution import run,current_task
+ModuleNotFoundError: No module named 'workflow_execution'
+
+======================================================================
+ERROR: test_relay_real_duplex_stream_releases_own_process (__main__.SmokeTests.test_relay_real_duplex_stream_releases_own_process)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/chasen/.codex/worktrees/g4-eng-delivery-002/ontology-platform/scripts/tests/WorkflowSmoke.Tests.py", line 134, in test_relay_real_duplex_stream_releases_own_process
+    runtime,_,_=self.topology();relay=self.smoke.HostRelay(ROOT,runtime)
+                                      ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/Users/chasen/.codex/worktrees/g4-eng-delivery-002/ontology-platform/scripts/maintenance/workflow_smoke.py", line 95, in __init__
+    from workflow_execution import CONTEXT
+ModuleNotFoundError: No module named 'workflow_execution'
+
+----------------------------------------------------------------------
+Ran 14 tests in 0.048s
+
+FAILED (errors=2)
