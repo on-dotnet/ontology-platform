@@ -434,7 +434,7 @@ def prepare_locked(root,task,home,projects,packages,approved,admission,identity)
     if previous.is_file():
         prior=json.loads(previous.read_text());require(prior['workspaceKey']==identity['workspaceKey'],'WORKSPACE_CHANGED')
         assets=verify_assets(root,home,projects,packages,approved)
-    elif task in ('G4-M2-WEB-01','G4-ENG-DELIVERY-002') and all((root/Path(p['path']).parent/'obj/project.assets.json').is_file() for p in projects):
+    elif task in ('G4-M2-WEB-01','G4-ENG-DELIVERY-002','G4-M2-DORIS-01') and all((root/Path(p['path']).parent/'obj/project.assets.json').is_file() for p in projects):
         # 上次Web失败不使已成功的后端闭包失效；逐项目/包重新核验真实内容和绝对路径。
         assets=verify_assets(root,home,projects,packages,approved)
         require(any(json.loads(p.read_text()).get('exitCode')==0 and
@@ -448,7 +448,7 @@ def prepare_locked(root,task,home,projects,packages,approved,admission,identity)
             restores=1;assets=verify_assets(root,home,projects,packages,approved)
         except Exception:
             materialize(failure,canonical(dict(**identity,run=str(run_dir)))+b'\n');raise
-    if task in ('G4-M2-WEB-01','G4-ENG-DELIVERY-002'):
+    if task in ('G4-M2-WEB-01','G4-ENG-DELIVERY-002','G4-M2-DORIS-01'):
         spec=importlib.util.spec_from_file_location('workflow_web_cache',root/'scripts/maintenance/workflow_web_cache.py')
         web_adapter=importlib.util.module_from_spec(spec);spec.loader.exec_module(web_adapter)
         web=web_adapter.prepare(root,home,admission,projects,env,run_dir,node,types.SimpleNamespace(**globals()))

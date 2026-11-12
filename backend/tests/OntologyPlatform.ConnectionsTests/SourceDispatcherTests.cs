@@ -87,6 +87,32 @@ public sealed class SourceDispatcherTests
         Assert.Throws<SemanticOperationException>(() => ConnectionSourceDispatcher.DemandSameTarget(Pg(), original));
     }
 
+    /// <summary>Doris六个目标字段必须全部保持一致，避免旧凭据被送到新目标。</summary>
+    [TestMethod]
+    public void DorisExistingCredentialCannotChangeAnyTargetField()
+    {
+        // 配置只用于比较，未调用任何网络适配器。
+        var profile = new DorisConnectionProfile { FeHost = "localhost", QueryPort = 19030, Catalog = "internal", Database = "fixture", Username = "fixture_reader", Tls = true };
+        // 不同对象但相同字段应被视为同一目标。
+        var original = new DorisConnectionConfig { Profile = profile };
+        ConnectionSourceDispatcher.DemandSameTarget(original, new DorisConnectionConfig { Profile = profile with { } });
+        // 逐个目标字段变更，验证任何一项都不能转移旧凭据。
+        foreach (var changed in new[]
+        {
+            profile with { FeHost = "other.invalid" },
+            profile with { QueryPort = 19031 },
+            profile with { Catalog = "external" },
+            profile with { Database = "other" },
+            profile with { Username = "admin" },
+            profile with { Tls = false }
+        })
+        {
+            Assert.Throws<SemanticOperationException>(() => ConnectionSourceDispatcher.DemandSameTarget(original, new DorisConnectionConfig { Profile = changed }));
+        }
+        Assert.Throws<SemanticOperationException>(() => ConnectionSourceDispatcher.DemandSameTarget(original, Pg()));
+        Assert.Throws<SemanticOperationException>(() => ConnectionSourceDispatcher.DemandSameTarget(original, Web()));
+    }
+
     /// <summary>合成Web operation，不含密钥。</summary>
     private static WebApiConnectionConfig Web() => new() { Profile = new WebApiConnectionProfile { BaseOrigin = "https://web-source:8443", OperationId = "fixture-items", Method = "GET", ApprovedPath = "/v1/items", Authentication = "API_KEY_REF", Pagination = "NONE", HostPolicyRef = "g4-m2-web-01" } };
 

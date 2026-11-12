@@ -45,11 +45,12 @@ public sealed class ConnectionSourceDispatcher
         if (SecretPurpose(config) != purpose) throw new SemanticOperationException(422, "connection_secret_expired");
     }
 
-    /// <summary>已有凭据不能随着编辑转移到另一类型或Web目标；需新建并重新签发。</summary>
+    /// <summary>已有凭据不能随着编辑转移到另一类型或Web、Doris目标；需新建并重新签发。</summary>
     public static void DemandSameTarget(ConnectionConfig before, ConnectionConfig after)
     {
         if (before.GetType() != after.GetType() || before is WebApiConnectionConfig oldWeb
-            && after is WebApiConnectionConfig newWeb && oldWeb.Profile != newWeb.Profile)
+            && after is WebApiConnectionConfig newWeb && oldWeb.Profile != newWeb.Profile
+            || before is DorisConnectionConfig oldDoris && after is DorisConnectionConfig newDoris && oldDoris.Profile != newDoris.Profile)
             throw new SemanticOperationException(422, "connection_profile_invalid");
     }
 

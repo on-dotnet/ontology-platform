@@ -12,6 +12,22 @@ class CacheTests(unittest.TestCase):
         spec=importlib.util.spec_from_file_location('workflow_web_cache',ROOT/'scripts/maintenance/workflow_web_cache.py')
         module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);return module
 
+    def test_doris_cache_admission_preserves_unknown_task_rejection(self):
+        from types import SimpleNamespace
+        m=self.load()
+        def reached_marker(*args):
+            raise RuntimeError('ADMITTED_CACHE_BOUNDARY')
+        adapter=SimpleNamespace(web_marker=reached_marker)
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory).resolve()
+            for task in ('G4-M2-DORIS-01','G4-M2-WEB-01','G4-ENG-DELIVERY-002'):
+                home=root/'artifacts/workflow'/task/'environment/key'
+                with self.assertRaisesRegex(RuntimeError,'ADMITTED_CACHE_BOUNDARY'):
+                    m.prepare(root,home,{},[],{},root,'node',adapter)
+            home=root/'artifacts/workflow/UNAPPROVED/environment/key'
+            with self.assertRaisesRegex(ValueError,'TASK_ID'):
+                m.prepare(root,home,{},[],{},root,'node',adapter)
+
     def test_rebound_shim_requires_exact_declared_target_and_node(self):
         m=self.load()
         with tempfile.TemporaryDirectory() as d:

@@ -29,7 +29,7 @@ public static class G4ConnectionRules
             case ConnectionSecretIntakeRequest secret:
                 Command(secret.Command, true);
                 Scope(secret.ScopeSelection);
-                Require(secret.SecretValue is { Length: >= 8 and <= 4096 } && secret.Purpose is "POSTGRESQL_READONLY" or "WEB_API_KEY");
+                Require(secret.SecretValue is { Length: >= 8 and <= 4096 } && secret.Purpose is "POSTGRESQL_READONLY" or "WEB_API_KEY" or "DORIS_READONLY");
                 break;
             case ConnectionDraftProbeRequest probe:
                 Command(probe.Command, true);
@@ -66,7 +66,7 @@ public static class G4ConnectionRules
                 break;
             case DorisConnectionConfig { Profile: not null } doris:
                 Require(Host(doris.Profile.FeHost) && Port(doris.Profile.QueryPort) && Text(doris.Profile.Catalog, 128)
-                    && Text(doris.Profile.Database, 63) && Text(doris.Profile.Username, 63));
+                    && Text(doris.Profile.Database, 63) && Text(doris.Profile.Username, 63) && doris.Profile.Tls);
                 break;
             case TdengineConnectionConfig { Profile: not null } td:
                 // 仅解析配置预览的URI，不向目标发送网络请求。

@@ -1,0 +1,89 @@
+{
+  "evidenceSchemaVersion": 1,
+  "checks": [
+    {
+      "name": "bounded-metadata",
+      "command": "python3 -B /private/tmp/g4-doris-admission-metadata.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Official index/manifest/config and nuspec metadata recorded; 35734 response bytes; zero layer/package payload; original ledger retained."
+    },
+    {
+      "name": "nuget-registration-initial",
+      "command": "bounded official registration GET and JSON parse",
+      "status": "FAIL",
+      "exitCode": 1,
+      "output": "Gzip response caused UnicodeDecodeError; original failed attempt retained in checksum request ledger with conservative budget reserve."
+    },
+    {
+      "name": "nuget-registration-decoded",
+      "command": "bounded official registration/catalog GET with gzip decoding",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Official MySqlConnector 2.6.2 packageSize and SHA512 obtained; no payload."
+    },
+    {
+      "name": "pruning-evaluation",
+      "command": "dotnet msbuild -t:AddPrunePackageReferences -getProperty:TargetFramework,RestoreEnablePackagePruning -getItem:PrunePackageReference,FrameworkReference",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Seven root project evaluations exit0 using SDK10.0.402; no restore/build; command originals in task ignored commands."
+    },
+    {
+      "name": "doris-runtime",
+      "command": null,
+      "status": "NOT_RUN",
+      "exitCode": null,
+      "output": "Acquisition and execution gates separate; no service startup or product test."
+    },
+    {
+      "name": "cache-admission-regression",
+      "command": "python3 -B scripts/tests/WorkflowM2Web.Tests.py; python3 -B scripts/tests/WorkflowEnvironment.Tests.py",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "14 + 6 tests passed; no service validation."
+    },
+    {
+      "name": "doris-wire-static",
+      "command": "G2ContractTests.dll --filter FullyQualifiedName~G4WireContractTests",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "RED 17 total/2 failed; after minimal rules change GREEN 17 passed/0 failed/0 skipped."
+    },
+    {
+      "name": "doris-target-static",
+      "command": "ConnectionsTests.dll --filter FullyQualifiedName~SourceDispatcherTests",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "RED 5 total/1 failed; after full Doris Profile comparison GREEN 5 passed/0 failed/0 skipped."
+    }
+  ],
+  "ci": {
+    "status": "NOT_RUN",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  },
+  "metadata": {
+    "taskId": "G4-M2-DORIS-01",
+    "runId": "admission-20261112-01",
+    "timingStatus": "NOT_VERIFIED",
+    "note": "Metadata shell timing not promoted to complete stage timing; msbuild commands use shared schema2 execution channel.",
+    "temporaryHelpers": [
+      {
+        "path": "/private/tmp/g4-doris-admission-metadata.py",
+        "sha256": "247b02cf0f429f4cd81a54656f086b3e8ab31ce6df24442fbe712468a31c0530",
+        "lifecycle": "KEEP until admitted acquisition and final evidence review"
+      },
+      {
+        "path": "/private/tmp/g4-doris-acquire.py",
+        "sha256": "cbde66d6594c81e3f218403e119285b9b2a09e4e9bbd2c8b596c07348b09782b",
+        "lifecycle": "KEEP until admitted acquisition and final evidence review"
+      }
+    ],
+    "acquirerReview": "cbde66d6594c81e3f218403e119285b9b2a09e4e9bbd2c8b596c07348b09782b; reviewer-requested read1 EOF fix applied before any payload acquisition; previous 1fb2 identity was never run.",
+    "staticReview": "p0_reviewer independently read command originals and current diff; PASS for static increment only.",
+    "stoppedInvocation": "First GREEN call lacked source input_key and was refused before test execution; unchanged-failure guard preserved; next invocation supplied changed source input key."
+  }
+}

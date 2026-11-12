@@ -1,0 +1,1040 @@
+{
+  "taskId": "G4-M2-DORIS-01",
+  "runId": "admission-20261112-01",
+  "createdUtc": "2026-11-12T14:37:44.287317+00:00",
+  "responseBodyBytes": 35734,
+  "layerPayloadBytes": 0,
+  "packagePayloadBytes": 0,
+  "requests": [
+    {
+      "method": "GET",
+      "host": "auth.docker.io",
+      "path": "/token",
+      "status": 200,
+      "responseBodyBytes": 5485,
+      "contentLength": 0,
+      "redirects": [],
+      "secretResponseNotSaved": true
+    },
+    {
+      "method": "GET",
+      "host": "registry-1.docker.io",
+      "path": "/v2/apache/doris/manifests/sha256:390413325a93d9121768bda153ccaa3c7a8da4aa0fd2a466406cddc14a6399b2",
+      "status": 200,
+      "responseBodyBytes": 1609,
+      "contentLength": 1609,
+      "redirects": [],
+      "secretResponseNotSaved": false
+    },
+    {
+      "method": "GET",
+      "host": "registry-1.docker.io",
+      "path": "/v2/apache/doris/manifests/sha256:c7b4288a34affac9fe809a2895565b4d558ea3b85fbf5d29bb1ec27d398e4f02",
+      "status": 200,
+      "responseBodyBytes": 2583,
+      "contentLength": 2583,
+      "redirects": [],
+      "secretResponseNotSaved": false
+    },
+    {
+      "method": "GET",
+      "host": "registry-1.docker.io",
+      "path": "/v2/apache/doris/blobs/sha256:797cdda22ec2ad4b32814a91d8a71287469b0821d487419a0727cba950d3e16a",
+      "status": 200,
+      "responseBodyBytes": 5829,
+      "contentLength": 5829,
+      "redirects": [
+        {
+          "status": 307,
+          "host": "production.cloudfront.docker.com",
+          "https": true
+        }
+      ],
+      "secretResponseNotSaved": false
+    },
+    {
+      "method": "HEAD",
+      "host": "registry-1.docker.io",
+      "path": "/v2/apache/doris/blobs/sha256:0ec3d86457676c7af7a3b6d29565e0e8b30ed98afe5d606e00e565101f812623",
+      "status": 200,
+      "responseBodyBytes": 0,
+      "contentLength": 27383877,
+      "redirects": [],
+      "secretResponseNotSaved": false
+    },
+    {
+      "method": "HEAD",
+      "host": "registry-1.docker.io",
+      "path": "/v2/apache/doris/blobs/sha256:554be43ba448c7fe59ddc1543095922e2a933a35ab11d6baf398b8d19a556626",
+      "status": 200,
+      "responseBodyBytes": 0,
+      "contentLength": 190530569,
+      "redirects": [],
+      "secretResponseNotSaved": false
+    },
+    {
+      "method": "HEAD",
+      "host": "registry-1.docker.io",
+      "path": "/v2/apache/doris/blobs/sha256:e1e6bb1f133a45e810b6a0cf41c683bbe8260ca150ff3039247045b88c75a197",
+      "status": 200,
+      "responseBodyBytes": 0,
+      "contentLength": 198256830,
+      "redirects": [],
+      "secretResponseNotSaved": false
+    },
+    {
+      "method": "HEAD",
+      "host": "registry-1.docker.io",
+      "path": "/v2/apache/doris/blobs/sha256:b11dcbb0475108c8b33da8bf355175deec832856e347f8a64c7795f4afaba5ef",
+      "status": 200,
+      "responseBodyBytes": 0,
+      "contentLength": 112093075,
+      "redirects": [],
+      "secretResponseNotSaved": false
+    },
+    {
+      "method": "HEAD",
+      "host": "registry-1.docker.io",
+      "path": "/v2/apache/doris/blobs/sha256:32f4172ec8464ab61d3841b6171e362a9a5cf94987c10bfbebec05ef3aa6776d",
+      "status": 200,
+      "responseBodyBytes": 0,
+      "contentLength": 22315829,
+      "redirects": [],
+      "secretResponseNotSaved": false
+    },
+    {
+      "method": "HEAD",
+      "host": "registry-1.docker.io",
+      "path": "/v2/apache/doris/blobs/sha256:4919f131077145d72efa374c3e05fb9b4b94d821e1e4ede13e289265e1a28c6a",
+      "status": 200,
+      "responseBodyBytes": 0,
+      "contentLength": 5737587,
+      "redirects": [],
+      "secretResponseNotSaved": false
+    },
+    {
+      "method": "HEAD",
+      "host": "registry-1.docker.io",
+      "path": "/v2/apache/doris/blobs/sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1",
+      "status": 200,
+      "responseBodyBytes": 0,
+      "contentLength": 32,
+      "redirects": [],
+      "secretResponseNotSaved": false
+    },
+    {
+      "method": "HEAD",
+      "host": "registry-1.docker.io",
+      "path": "/v2/apache/doris/blobs/sha256:3fba320f44ac8c3abe5e4720f40a7118735b99a7c6fefeb62d19b7cb0545039e",
+      "status": 200,
+      "responseBodyBytes": 0,
+      "contentLength": 206,
+      "redirects": [],
+      "secretResponseNotSaved": false
+    },
+    {
+      "method": "HEAD",
+      "host": "registry-1.docker.io",
+      "path": "/v2/apache/doris/blobs/sha256:2e247f5fa5cab7b3213229fb8ca365bf4a4df0de9c9aa612ffef388f91975f5d",
+      "status": 200,
+      "responseBodyBytes": 0,
+      "contentLength": 906694614,
+      "redirects": [],
+      "secretResponseNotSaved": false
+    },
+    {
+      "method": "HEAD",
+      "host": "registry-1.docker.io",
+      "path": "/v2/apache/doris/blobs/sha256:c42b5f265740c85383d54b5decf2557c557a1bc7a2a3b6b4fd683248db2a1acd",
+      "status": 200,
+      "responseBodyBytes": 0,
+      "contentLength": 3925,
+      "redirects": [],
+      "secretResponseNotSaved": false
+    },
+    {
+      "method": "HEAD",
+      "host": "registry-1.docker.io",
+      "path": "/v2/apache/doris/blobs/sha256:bfc535f222757250c409fa75733522433723d9044a4032a1a06472edb94d4f63",
+      "status": 200,
+      "responseBodyBytes": 0,
+      "contentLength": 8246,
+      "redirects": [],
+      "secretResponseNotSaved": false
+    },
+    {
+      "method": "HEAD",
+      "host": "registry-1.docker.io",
+      "path": "/v2/apache/doris/blobs/sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1",
+      "status": 200,
+      "responseBodyBytes": 0,
+      "contentLength": 32,
+      "redirects": [],
+      "secretResponseNotSaved": false
+    },
+    {
+      "method": "GET",
+      "host": "registry-1.docker.io",
+      "path": "/v2/apache/doris/manifests/sha256:d911ae3826491598be4e383cba83011a266091b8fdc6c34c036280220cc4fea9",
+      "status": 200,
+      "responseBodyBytes": 1609,
+      "contentLength": 1609,
+      "redirects": [],
+      "secretResponseNotSaved": false
+    },
+    {
+      "method": "GET",
+      "host": "registry-1.docker.io",
+      "path": "/v2/apache/doris/manifests/sha256:1d4ccee8d7cc5e33f1c16e0b3ce764f5f764c396ea5e938a8793f88682c982f7",
+      "status": 200,
+      "responseBodyBytes": 2773,
+      "contentLength": 2773,
+      "redirects": [],
+      "secretResponseNotSaved": false
+    },
+    {
+      "method": "GET",
+      "host": "registry-1.docker.io",
+      "path": "/v2/apache/doris/blobs/sha256:73ecf335c13ec0c54d269a4cc2e04273b7bc29ce5f8c0d78f8ab9c3357e83f97",
+      "status": 200,
+      "responseBodyBytes": 6062,
+      "contentLength": 6062,
+      "redirects": [
+        {
+          "status": 307,
+          "host": "production.cloudfront.docker.com",
+          "https": true
+        }
+      ],
+      "secretResponseNotSaved": false
+    },
+    {
+      "method": "HEAD",
+      "host": "registry-1.docker.io",
+      "path": "/v2/apache/doris/blobs/sha256:0ec3d86457676c7af7a3b6d29565e0e8b30ed98afe5d606e00e565101f812623",
+      "status": 200,
+      "responseBodyBytes": 0,
+      "contentLength": 27383877,
+      "redirects": [],
+      "secretResponseNotSaved": false
+    },
+    {
+      "method": "HEAD",
+      "host": "registry-1.docker.io",
+      "path": "/v2/apache/doris/blobs/sha256:554be43ba448c7fe59ddc1543095922e2a933a35ab11d6baf398b8d19a556626",
+      "status": 200,
+      "responseBodyBytes": 0,
+      "contentLength": 190530569,
+      "redirects": [],
+      "secretResponseNotSaved": false
+    },
+    {
+      "method": "HEAD",
+      "host": "registry-1.docker.io",
+      "path": "/v2/apache/doris/blobs/sha256:e1e6bb1f133a45e810b6a0cf41c683bbe8260ca150ff3039247045b88c75a197",
+      "status": 200,
+      "responseBodyBytes": 0,
+      "contentLength": 198256830,
+      "redirects": [],
+      "secretResponseNotSaved": false
+    },
+    {
+      "method": "HEAD",
+      "host": "registry-1.docker.io",
+      "path": "/v2/apache/doris/blobs/sha256:b11dcbb0475108c8b33da8bf355175deec832856e347f8a64c7795f4afaba5ef",
+      "status": 200,
+      "responseBodyBytes": 0,
+      "contentLength": 112093075,
+      "redirects": [],
+      "secretResponseNotSaved": false
+    },
+    {
+      "method": "HEAD",
+      "host": "registry-1.docker.io",
+      "path": "/v2/apache/doris/blobs/sha256:32f4172ec8464ab61d3841b6171e362a9a5cf94987c10bfbebec05ef3aa6776d",
+      "status": 200,
+      "responseBodyBytes": 0,
+      "contentLength": 22315829,
+      "redirects": [],
+      "secretResponseNotSaved": false
+    },
+    {
+      "method": "HEAD",
+      "host": "registry-1.docker.io",
+      "path": "/v2/apache/doris/blobs/sha256:4919f131077145d72efa374c3e05fb9b4b94d821e1e4ede13e289265e1a28c6a",
+      "status": 200,
+      "responseBodyBytes": 0,
+      "contentLength": 5737587,
+      "redirects": [],
+      "secretResponseNotSaved": false
+    },
+    {
+      "method": "HEAD",
+      "host": "registry-1.docker.io",
+      "path": "/v2/apache/doris/blobs/sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1",
+      "status": 200,
+      "responseBodyBytes": 0,
+      "contentLength": 32,
+      "redirects": [],
+      "secretResponseNotSaved": false
+    },
+    {
+      "method": "HEAD",
+      "host": "registry-1.docker.io",
+      "path": "/v2/apache/doris/blobs/sha256:3fba320f44ac8c3abe5e4720f40a7118735b99a7c6fefeb62d19b7cb0545039e",
+      "status": 200,
+      "responseBodyBytes": 0,
+      "contentLength": 206,
+      "redirects": [],
+      "secretResponseNotSaved": false
+    },
+    {
+      "method": "HEAD",
+      "host": "registry-1.docker.io",
+      "path": "/v2/apache/doris/blobs/sha256:0aff30e4296501bf49cebb63495d11114c0ec9cf373d0f0d0944050209237d8e",
+      "status": 200,
+      "responseBodyBytes": 0,
+      "contentLength": 2197391046,
+      "redirects": [],
+      "secretResponseNotSaved": false
+    },
+    {
+      "method": "HEAD",
+      "host": "registry-1.docker.io",
+      "path": "/v2/apache/doris/blobs/sha256:80aa21c7748d82846514860ab20f7660edf7df98cde307f62566c0b9c424f22a",
+      "status": 200,
+      "responseBodyBytes": 0,
+      "contentLength": 8993,
+      "redirects": [],
+      "secretResponseNotSaved": false
+    },
+    {
+      "method": "HEAD",
+      "host": "registry-1.docker.io",
+      "path": "/v2/apache/doris/blobs/sha256:c8a0ceb658945454c8b0f71f0703f370ffdc1dc44426949964dcd1f6fe4c3d98",
+      "status": 200,
+      "responseBodyBytes": 0,
+      "contentLength": 2651,
+      "redirects": [],
+      "secretResponseNotSaved": false
+    },
+    {
+      "method": "HEAD",
+      "host": "registry-1.docker.io",
+      "path": "/v2/apache/doris/blobs/sha256:e8e21aa96c92b7a7f311f1a166661054cf3fe4a55197a4b3539a48302810a8ee",
+      "status": 200,
+      "responseBodyBytes": 0,
+      "contentLength": 2263,
+      "redirects": [],
+      "secretResponseNotSaved": false
+    },
+    {
+      "method": "HEAD",
+      "host": "registry-1.docker.io",
+      "path": "/v2/apache/doris/blobs/sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1",
+      "status": 200,
+      "responseBodyBytes": 0,
+      "contentLength": 32,
+      "redirects": [],
+      "secretResponseNotSaved": false
+    },
+    {
+      "method": "GET",
+      "host": "api.nuget.org",
+      "path": "/v3-flatcontainer/mysqlconnector/2.6.2/mysqlconnector.nuspec",
+      "status": 200,
+      "responseBodyBytes": 5072,
+      "contentLength": 5072,
+      "redirects": [],
+      "secretResponseNotSaved": false
+    },
+    {
+      "method": "HEAD",
+      "host": "api.nuget.org",
+      "path": "/v3-flatcontainer/mysqlconnector/2.6.2/mysqlconnector.2.6.2.nupkg",
+      "status": 200,
+      "responseBodyBytes": 0,
+      "contentLength": 3842388,
+      "redirects": [],
+      "secretResponseNotSaved": false
+    },
+    {
+      "method": "GET",
+      "host": "api.nuget.org",
+      "path": "/v3-flatcontainer/microsoft.extensions.logging.abstractions/8.0.2/microsoft.extensions.logging.abstractions.nuspec",
+      "status": 200,
+      "responseBodyBytes": 2977,
+      "contentLength": 2977,
+      "redirects": [],
+      "secretResponseNotSaved": false
+    },
+    {
+      "method": "HEAD",
+      "host": "api.nuget.org",
+      "path": "/v3-flatcontainer/microsoft.extensions.logging.abstractions/8.0.2/microsoft.extensions.logging.abstractions.8.0.2.nupkg",
+      "status": 200,
+      "responseBodyBytes": 0,
+      "contentLength": 801164,
+      "redirects": [],
+      "secretResponseNotSaved": false
+    },
+    {
+      "method": "GET",
+      "host": "api.nuget.org",
+      "path": "/v3-flatcontainer/microsoft.extensions.dependencyinjection.abstractions/8.0.2/microsoft.extensions.dependencyinjection.abstractions.nuspec",
+      "status": 200,
+      "responseBodyBytes": 1735,
+      "contentLength": 1735,
+      "redirects": [],
+      "secretResponseNotSaved": false
+    },
+    {
+      "method": "HEAD",
+      "host": "api.nuget.org",
+      "path": "/v3-flatcontainer/microsoft.extensions.dependencyinjection.abstractions/8.0.2/microsoft.extensions.dependencyinjection.abstractions.8.0.2.nupkg",
+      "status": 200,
+      "responseBodyBytes": 0,
+      "contentLength": 278862,
+      "redirects": [],
+      "secretResponseNotSaved": false
+    }
+  ],
+  "images": [
+    {
+      "tag": "fe-4.0.8",
+      "index": "sha256:390413325a93d9121768bda153ccaa3c7a8da4aa0fd2a466406cddc14a6399b2",
+      "manifest": "sha256:c7b4288a34affac9fe809a2895565b4d558ea3b85fbf5d29bb1ec27d398e4f02",
+      "config": {
+        "mediaType": "application/vnd.oci.image.config.v1+json",
+        "digest": "sha256:797cdda22ec2ad4b32814a91d8a71287469b0821d487419a0727cba950d3e16a",
+        "size": 5829
+      },
+      "layers": [
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:0ec3d86457676c7af7a3b6d29565e0e8b30ed98afe5d606e00e565101f812623",
+          "size": 27383877
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:554be43ba448c7fe59ddc1543095922e2a933a35ab11d6baf398b8d19a556626",
+          "size": 190530569
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:e1e6bb1f133a45e810b6a0cf41c683bbe8260ca150ff3039247045b88c75a197",
+          "size": 198256830
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:b11dcbb0475108c8b33da8bf355175deec832856e347f8a64c7795f4afaba5ef",
+          "size": 112093075
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:32f4172ec8464ab61d3841b6171e362a9a5cf94987c10bfbebec05ef3aa6776d",
+          "size": 22315829
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:4919f131077145d72efa374c3e05fb9b4b94d821e1e4ede13e289265e1a28c6a",
+          "size": 5737587
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1",
+          "size": 32
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:3fba320f44ac8c3abe5e4720f40a7118735b99a7c6fefeb62d19b7cb0545039e",
+          "size": 206
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:2e247f5fa5cab7b3213229fb8ca365bf4a4df0de9c9aa612ffef388f91975f5d",
+          "size": 906694614
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:c42b5f265740c85383d54b5decf2557c557a1bc7a2a3b6b4fd683248db2a1acd",
+          "size": 3925
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:bfc535f222757250c409fa75733522433723d9044a4032a1a06472edb94d4f63",
+          "size": 8246
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1",
+          "size": 32
+        }
+      ],
+      "platform": "linux/arm64",
+      "identity": "PASS",
+      "layerHeadChecks": [
+        {
+          "digest": "sha256:0ec3d86457676c7af7a3b6d29565e0e8b30ed98afe5d606e00e565101f812623",
+          "size": 27383877,
+          "status": "PASS"
+        },
+        {
+          "digest": "sha256:554be43ba448c7fe59ddc1543095922e2a933a35ab11d6baf398b8d19a556626",
+          "size": 190530569,
+          "status": "PASS"
+        },
+        {
+          "digest": "sha256:e1e6bb1f133a45e810b6a0cf41c683bbe8260ca150ff3039247045b88c75a197",
+          "size": 198256830,
+          "status": "PASS"
+        },
+        {
+          "digest": "sha256:b11dcbb0475108c8b33da8bf355175deec832856e347f8a64c7795f4afaba5ef",
+          "size": 112093075,
+          "status": "PASS"
+        },
+        {
+          "digest": "sha256:32f4172ec8464ab61d3841b6171e362a9a5cf94987c10bfbebec05ef3aa6776d",
+          "size": 22315829,
+          "status": "PASS"
+        },
+        {
+          "digest": "sha256:4919f131077145d72efa374c3e05fb9b4b94d821e1e4ede13e289265e1a28c6a",
+          "size": 5737587,
+          "status": "PASS"
+        },
+        {
+          "digest": "sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1",
+          "size": 32,
+          "status": "PASS"
+        },
+        {
+          "digest": "sha256:3fba320f44ac8c3abe5e4720f40a7118735b99a7c6fefeb62d19b7cb0545039e",
+          "size": 206,
+          "status": "PASS"
+        },
+        {
+          "digest": "sha256:2e247f5fa5cab7b3213229fb8ca365bf4a4df0de9c9aa612ffef388f91975f5d",
+          "size": 906694614,
+          "status": "PASS"
+        },
+        {
+          "digest": "sha256:c42b5f265740c85383d54b5decf2557c557a1bc7a2a3b6b4fd683248db2a1acd",
+          "size": 3925,
+          "status": "PASS"
+        },
+        {
+          "digest": "sha256:bfc535f222757250c409fa75733522433723d9044a4032a1a06472edb94d4f63",
+          "size": 8246,
+          "status": "PASS"
+        },
+        {
+          "digest": "sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1",
+          "size": 32,
+          "status": "PASS"
+        }
+      ]
+    },
+    {
+      "tag": "be-4.0.8",
+      "index": "sha256:d911ae3826491598be4e383cba83011a266091b8fdc6c34c036280220cc4fea9",
+      "manifest": "sha256:1d4ccee8d7cc5e33f1c16e0b3ce764f5f764c396ea5e938a8793f88682c982f7",
+      "config": {
+        "mediaType": "application/vnd.oci.image.config.v1+json",
+        "digest": "sha256:73ecf335c13ec0c54d269a4cc2e04273b7bc29ce5f8c0d78f8ab9c3357e83f97",
+        "size": 6062
+      },
+      "layers": [
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:0ec3d86457676c7af7a3b6d29565e0e8b30ed98afe5d606e00e565101f812623",
+          "size": 27383877
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:554be43ba448c7fe59ddc1543095922e2a933a35ab11d6baf398b8d19a556626",
+          "size": 190530569
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:e1e6bb1f133a45e810b6a0cf41c683bbe8260ca150ff3039247045b88c75a197",
+          "size": 198256830
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:b11dcbb0475108c8b33da8bf355175deec832856e347f8a64c7795f4afaba5ef",
+          "size": 112093075
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:32f4172ec8464ab61d3841b6171e362a9a5cf94987c10bfbebec05ef3aa6776d",
+          "size": 22315829
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:4919f131077145d72efa374c3e05fb9b4b94d821e1e4ede13e289265e1a28c6a",
+          "size": 5737587
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1",
+          "size": 32
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:3fba320f44ac8c3abe5e4720f40a7118735b99a7c6fefeb62d19b7cb0545039e",
+          "size": 206
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:0aff30e4296501bf49cebb63495d11114c0ec9cf373d0f0d0944050209237d8e",
+          "size": 2197391046
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:80aa21c7748d82846514860ab20f7660edf7df98cde307f62566c0b9c424f22a",
+          "size": 8993
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:c8a0ceb658945454c8b0f71f0703f370ffdc1dc44426949964dcd1f6fe4c3d98",
+          "size": 2651
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:e8e21aa96c92b7a7f311f1a166661054cf3fe4a55197a4b3539a48302810a8ee",
+          "size": 2263
+        },
+        {
+          "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+          "digest": "sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1",
+          "size": 32
+        }
+      ],
+      "platform": "linux/arm64",
+      "identity": "PASS",
+      "layerHeadChecks": [
+        {
+          "digest": "sha256:0ec3d86457676c7af7a3b6d29565e0e8b30ed98afe5d606e00e565101f812623",
+          "size": 27383877,
+          "status": "PASS"
+        },
+        {
+          "digest": "sha256:554be43ba448c7fe59ddc1543095922e2a933a35ab11d6baf398b8d19a556626",
+          "size": 190530569,
+          "status": "PASS"
+        },
+        {
+          "digest": "sha256:e1e6bb1f133a45e810b6a0cf41c683bbe8260ca150ff3039247045b88c75a197",
+          "size": 198256830,
+          "status": "PASS"
+        },
+        {
+          "digest": "sha256:b11dcbb0475108c8b33da8bf355175deec832856e347f8a64c7795f4afaba5ef",
+          "size": 112093075,
+          "status": "PASS"
+        },
+        {
+          "digest": "sha256:32f4172ec8464ab61d3841b6171e362a9a5cf94987c10bfbebec05ef3aa6776d",
+          "size": 22315829,
+          "status": "PASS"
+        },
+        {
+          "digest": "sha256:4919f131077145d72efa374c3e05fb9b4b94d821e1e4ede13e289265e1a28c6a",
+          "size": 5737587,
+          "status": "PASS"
+        },
+        {
+          "digest": "sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1",
+          "size": 32,
+          "status": "PASS"
+        },
+        {
+          "digest": "sha256:3fba320f44ac8c3abe5e4720f40a7118735b99a7c6fefeb62d19b7cb0545039e",
+          "size": 206,
+          "status": "PASS"
+        },
+        {
+          "digest": "sha256:0aff30e4296501bf49cebb63495d11114c0ec9cf373d0f0d0944050209237d8e",
+          "size": 2197391046,
+          "status": "PASS"
+        },
+        {
+          "digest": "sha256:80aa21c7748d82846514860ab20f7660edf7df98cde307f62566c0b9c424f22a",
+          "size": 8993,
+          "status": "PASS"
+        },
+        {
+          "digest": "sha256:c8a0ceb658945454c8b0f71f0703f370ffdc1dc44426949964dcd1f6fe4c3d98",
+          "size": 2651,
+          "status": "PASS"
+        },
+        {
+          "digest": "sha256:e8e21aa96c92b7a7f311f1a166661054cf3fe4a55197a4b3539a48302810a8ee",
+          "size": 2263,
+          "status": "PASS"
+        },
+        {
+          "digest": "sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1",
+          "size": 32,
+          "status": "PASS"
+        }
+      ]
+    }
+  ],
+  "packages": [
+    {
+      "id": "MySqlConnector",
+      "version": "2.6.2",
+      "nuspecSha256": "0732cef6bcdebe200e2d4783ba23abaf4a649a07122cdda2eef7a4b45eafcfef",
+      "license": "MIT",
+      "groups": [
+        {
+          "framework": "net10.0",
+          "dependencies": [
+            {
+              "id": "Microsoft.Extensions.Logging.Abstractions",
+              "version": "8.0.2",
+              "exclude": "Build,Analyzers"
+            },
+            {
+              "id": "Microsoft.Extensions.DependencyInjection.Abstractions",
+              "version": "8.0.2",
+              "exclude": "Build,Analyzers"
+            }
+          ]
+        },
+        {
+          "framework": ".NETFramework4.6.2",
+          "dependencies": [
+            {
+              "id": "Microsoft.Extensions.Logging.Abstractions",
+              "version": "8.0.2",
+              "exclude": "Build,Analyzers"
+            },
+            {
+              "id": "System.Diagnostics.DiagnosticSource",
+              "version": "8.0.1",
+              "exclude": "Build,Analyzers"
+            },
+            {
+              "id": "System.Threading.Tasks.Extensions",
+              "version": "4.6.3",
+              "exclude": "Build,Analyzers"
+            },
+            {
+              "id": "Microsoft.Extensions.DependencyInjection.Abstractions",
+              "version": "8.0.2",
+              "exclude": "Build,Analyzers"
+            }
+          ]
+        },
+        {
+          "framework": ".NETFramework4.7.1",
+          "dependencies": [
+            {
+              "id": "Microsoft.Extensions.Logging.Abstractions",
+              "version": "8.0.2",
+              "exclude": "Build,Analyzers"
+            },
+            {
+              "id": "System.Diagnostics.DiagnosticSource",
+              "version": "8.0.1",
+              "exclude": "Build,Analyzers"
+            },
+            {
+              "id": "System.Threading.Tasks.Extensions",
+              "version": "4.6.3",
+              "exclude": "Build,Analyzers"
+            },
+            {
+              "id": "Microsoft.Extensions.DependencyInjection.Abstractions",
+              "version": "8.0.2",
+              "exclude": "Build,Analyzers"
+            }
+          ]
+        },
+        {
+          "framework": ".NETFramework4.8",
+          "dependencies": [
+            {
+              "id": "Microsoft.Extensions.Logging.Abstractions",
+              "version": "8.0.2",
+              "exclude": "Build,Analyzers"
+            },
+            {
+              "id": "System.Diagnostics.DiagnosticSource",
+              "version": "8.0.1",
+              "exclude": "Build,Analyzers"
+            },
+            {
+              "id": "System.Threading.Tasks.Extensions",
+              "version": "4.6.3",
+              "exclude": "Build,Analyzers"
+            },
+            {
+              "id": "Microsoft.Extensions.DependencyInjection.Abstractions",
+              "version": "8.0.2",
+              "exclude": "Build,Analyzers"
+            }
+          ]
+        },
+        {
+          "framework": "net6.0",
+          "dependencies": [
+            {
+              "id": "Microsoft.Extensions.Logging.Abstractions",
+              "version": "8.0.2",
+              "exclude": "Build,Analyzers"
+            },
+            {
+              "id": "System.Diagnostics.DiagnosticSource",
+              "version": "8.0.1",
+              "exclude": "Build,Analyzers"
+            },
+            {
+              "id": "Microsoft.Extensions.DependencyInjection.Abstractions",
+              "version": "8.0.2",
+              "exclude": "Build,Analyzers"
+            }
+          ]
+        },
+        {
+          "framework": "net8.0",
+          "dependencies": [
+            {
+              "id": "Microsoft.Extensions.Logging.Abstractions",
+              "version": "8.0.2",
+              "exclude": "Build,Analyzers"
+            },
+            {
+              "id": "Microsoft.Extensions.DependencyInjection.Abstractions",
+              "version": "8.0.2",
+              "exclude": "Build,Analyzers"
+            }
+          ]
+        },
+        {
+          "framework": "net9.0",
+          "dependencies": [
+            {
+              "id": "Microsoft.Extensions.Logging.Abstractions",
+              "version": "8.0.2",
+              "exclude": "Build,Analyzers"
+            },
+            {
+              "id": "Microsoft.Extensions.DependencyInjection.Abstractions",
+              "version": "8.0.2",
+              "exclude": "Build,Analyzers"
+            }
+          ]
+        },
+        {
+          "framework": ".NETStandard2.0",
+          "dependencies": [
+            {
+              "id": "Microsoft.Extensions.Logging.Abstractions",
+              "version": "8.0.2",
+              "exclude": "Build,Analyzers"
+            },
+            {
+              "id": "System.Diagnostics.DiagnosticSource",
+              "version": "8.0.1",
+              "exclude": "Build,Analyzers"
+            },
+            {
+              "id": "System.Threading.Tasks.Extensions",
+              "version": "4.6.3",
+              "exclude": "Build,Analyzers"
+            },
+            {
+              "id": "Microsoft.Extensions.DependencyInjection.Abstractions",
+              "version": "8.0.2",
+              "exclude": "Build,Analyzers"
+            }
+          ]
+        },
+        {
+          "framework": ".NETStandard2.1",
+          "dependencies": [
+            {
+              "id": "Microsoft.Extensions.Logging.Abstractions",
+              "version": "8.0.2",
+              "exclude": "Build,Analyzers"
+            },
+            {
+              "id": "System.Diagnostics.DiagnosticSource",
+              "version": "8.0.1",
+              "exclude": "Build,Analyzers"
+            },
+            {
+              "id": "Microsoft.Extensions.DependencyInjection.Abstractions",
+              "version": "8.0.2",
+              "exclude": "Build,Analyzers"
+            }
+          ]
+        }
+      ],
+      "payloadBytes": 3842388,
+      "url": "https://api.nuget.org/v3-flatcontainer/mysqlconnector/2.6.2/mysqlconnector.2.6.2.nupkg"
+    },
+    {
+      "id": "Microsoft.Extensions.Logging.Abstractions",
+      "version": "8.0.2",
+      "nuspecSha256": "f72f30b2bb68e7c41ac1970b1866df719aec52ceb556d51a0f5e96067b1bdf93",
+      "license": "MIT",
+      "groups": [
+        {
+          "framework": ".NETFramework4.6.2",
+          "dependencies": [
+            {
+              "id": "Microsoft.Extensions.DependencyInjection.Abstractions",
+              "version": "8.0.2",
+              "exclude": "Build,Analyzers"
+            },
+            {
+              "id": "System.Diagnostics.DiagnosticSource",
+              "version": "8.0.1",
+              "exclude": "Build,Analyzers"
+            },
+            {
+              "id": "System.Buffers",
+              "version": "4.5.1",
+              "exclude": "Build,Analyzers"
+            },
+            {
+              "id": "System.Memory",
+              "version": "4.5.5",
+              "exclude": "Build,Analyzers"
+            }
+          ]
+        },
+        {
+          "framework": "net6.0",
+          "dependencies": [
+            {
+              "id": "Microsoft.Extensions.DependencyInjection.Abstractions",
+              "version": "8.0.2",
+              "exclude": "Build,Analyzers"
+            },
+            {
+              "id": "System.Diagnostics.DiagnosticSource",
+              "version": "8.0.1",
+              "exclude": "Build,Analyzers"
+            }
+          ]
+        },
+        {
+          "framework": "net7.0",
+          "dependencies": [
+            {
+              "id": "Microsoft.Extensions.DependencyInjection.Abstractions",
+              "version": "8.0.2",
+              "exclude": "Build,Analyzers"
+            },
+            {
+              "id": "System.Diagnostics.DiagnosticSource",
+              "version": "8.0.1",
+              "exclude": "Build,Analyzers"
+            }
+          ]
+        },
+        {
+          "framework": "net8.0",
+          "dependencies": [
+            {
+              "id": "Microsoft.Extensions.DependencyInjection.Abstractions",
+              "version": "8.0.2",
+              "exclude": "Build,Analyzers"
+            }
+          ]
+        },
+        {
+          "framework": ".NETStandard2.0",
+          "dependencies": [
+            {
+              "id": "Microsoft.Extensions.DependencyInjection.Abstractions",
+              "version": "8.0.2",
+              "exclude": "Build,Analyzers"
+            },
+            {
+              "id": "System.Diagnostics.DiagnosticSource",
+              "version": "8.0.1",
+              "exclude": "Build,Analyzers"
+            },
+            {
+              "id": "System.Buffers",
+              "version": "4.5.1",
+              "exclude": "Build,Analyzers"
+            },
+            {
+              "id": "System.Memory",
+              "version": "4.5.5",
+              "exclude": "Build,Analyzers"
+            }
+          ]
+        }
+      ],
+      "payloadBytes": 801164,
+      "url": "https://api.nuget.org/v3-flatcontainer/microsoft.extensions.logging.abstractions/8.0.2/microsoft.extensions.logging.abstractions.8.0.2.nupkg"
+    },
+    {
+      "id": "Microsoft.Extensions.DependencyInjection.Abstractions",
+      "version": "8.0.2",
+      "nuspecSha256": "361eac72bf0e0673fc24c11da45bab9487f5b1d8ed19d7fddb18216c47aa2557",
+      "license": "MIT",
+      "groups": [
+        {
+          "framework": ".NETFramework4.6.2",
+          "dependencies": [
+            {
+              "id": "Microsoft.Bcl.AsyncInterfaces",
+              "version": "8.0.0",
+              "exclude": "Build,Analyzers"
+            },
+            {
+              "id": "System.Threading.Tasks.Extensions",
+              "version": "4.5.4",
+              "exclude": "Build,Analyzers"
+            }
+          ]
+        },
+        {
+          "framework": "net6.0",
+          "dependencies": []
+        },
+        {
+          "framework": "net7.0",
+          "dependencies": []
+        },
+        {
+          "framework": "net8.0",
+          "dependencies": []
+        },
+        {
+          "framework": ".NETStandard2.0",
+          "dependencies": [
+            {
+              "id": "Microsoft.Bcl.AsyncInterfaces",
+              "version": "8.0.0",
+              "exclude": "Build,Analyzers"
+            },
+            {
+              "id": "System.Threading.Tasks.Extensions",
+              "version": "4.5.4",
+              "exclude": "Build,Analyzers"
+            }
+          ]
+        },
+        {
+          "framework": ".NETStandard2.1",
+          "dependencies": []
+        }
+      ],
+      "payloadBytes": 278862,
+      "url": "https://api.nuget.org/v3-flatcontainer/microsoft.extensions.dependencyinjection.abstractions/8.0.2/microsoft.extensions.dependencyinjection.abstractions.8.0.2.nupkg"
+    }
+  ],
+  "failures": []
+}

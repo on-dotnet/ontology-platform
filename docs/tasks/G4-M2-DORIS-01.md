@@ -1,20 +1,24 @@
-# G4-M2-DORIS-01｜P0 一页状态
+# G4-M2-DORIS-01｜条件执行清单
 
-唯一状态：**G4_M2_DORIS_P0_BLOCKED_WITH_WITNESS**（2026-11-12）。核对与申请已形成；关键制品元数据和运行资源尚未闭合，不代表产品失败或获准实施。
+唯一状态：**WAITING_USER_IMAGE_DOWNLOAD / RUNTIME_NOT_ADMITTED**（2026-11-12）。[A–F已授权](../evidence/G4-M2-DORIS-01/conditional-authorization.md)；P0历史结论见提交6f985b6a，未改写历史申请。
 
-| 项目 | 当前事实 |
-|---|---|
-| 授权 | 本会话明确批准附件 P0；后续补充单机测试，以及方案、Docker Compose 必须进入源码供测试/生产使用。后者纳入待批实施范围，不解锁本轮代码、下载和运行 |
-| Base | `11595ecb6560f7ed6ceca54666d32b7afcae7f35`；本轮 fetch 后 origin/main 相同 |
-| 分支 / Worktree | `codex/g4-m2-doris-01`；`/Users/chasen/.codex/worktrees/g4-m2-doris-01/ontology-platform`，原生托管创建，无安装/setup |
-| Owner / Reviewer | Master 唯一文档作者；`/root/p0_reviewer` 非作者只读；无产品 Writer |
-| RunId / 资源 | `p0-20261112-01`；仅本树/分支，KEEP 至本任务后续实施及审查完成；不清理历史资源 |
-| 已核对 | Doris 4.0.8 FE/BE 官方 ARM64 标签身份；MySqlConnector 2.6.2 nuspec；现行 DTO/凭据/DI/UI/执行器；宿主32GiB、12核、磁盘可用283GiB、Docker可见7.75GiB |
-| 关键缺项 | Registry manifest/config 读取保存被自动审批拒绝；逐层大小/命中、完整供应链组成及转向域名未验。Logging 8.0.2 元数据页面两次超时，停止重复。官方 FE8GB+BE16GB 开发建议超过现有VM，缩减合成预算须明确接受并实测 |
-| 产品边界 | 单机1FE+1BE、单副本、固定FE/internal catalog/单database，仅元数据。FE/BE是同机必要组件，不是多节点要求。Compose及测试/生产配置源码化，但无生产系统访问、部署或写入 |
-| 验证 | 文档格式/相对链接/diff-check exit0；非作者Review PASS（仅P0文档）；产品测试、完整SelfTest、prepare、CI、Windows/Intel、TLS/权限/取消真实服务全部 NOT_RUN |
-| 本轮非目标 | 不下载依赖/镜像层、不安装、不启动、不生成证书、不改产品/锁/共享脚本、不制作ZIP、不更新main |
+- Base/origin/main：`11595ecb6560f7ed6ceca54666d32b7afcae7f35`，本轮fetch核实一致；P0 Head `6f985b6a3c9558213a63a428ddec5eca3e05057b`，申请SHA256与批准附件一致。
+- 分支：`codex/g4-m2-doris-01`；托管树：`/Users/chasen/.codex/worktrees/g4-m2-doris-01/ontology-platform`；Master单写，原非作者Reviewer继续；RunId=`admission-20261112-01`。
+- 边界：仅单机1FE+1BE/internal/fixture元数据；DORIS-LOCAL-01风险接受不等于安全PASS；G4生产Guard保留，禁止生产访问、更新main、未批制品/架构/预算；无中间ZIP。
+- 资源：FE4GiB+BE6GiB，4容器总12GiB、宿主额外4GiB；用户已确认VM调整并保持能源策略；读回15.63GiB、0运行容器。载荷后置与执行准入前设施不启动。载荷≤5GiB/NuGet≤10MiB、解包≤100MiB、磁盘新增≤25GiB、过程≤1GiB。
 
-**owned_paths（仅P0）**：`docs/tasks/G4-M2-DORIS-01.md`、`docs/evidence/G4-M2-DORIS-01/admission-request.md`、`docs/tasks/current-authorization.md`（仅追加）。其它路径均 read_only_dependencies，重点为 Contracts/G4、Connections、Api/G4、Web connections、workflow 系列、verification-gates、现行工程政策。公共合同与锁后续仍由 Master 单写。
+## 顺序与验收
 
-**下一动作**：审阅[一次性准入申请](../evidence/G4-M2-DORIS-01/admission-request.md)中的 A–F 决策及硬停止条件；批准后在本会话、本树、本分支继续。先补齐被拒元数据与精确闭包，再准备/实施，不另建工程优化或恢复任务；未获批停止于 P0。
+- [x] 有界元数据：逐字节校验index→ARM64 manifest→config、层清单/HEAD域名、net10依赖闭包、精确缓存/保守预算；非作者获取准入。
+- [ ] 条件获取：缺失载荷、hash/签名/许可/组成/CVE检查、下载/磁盘累计；未知保留，非作者执行准入。
+- [ ] 用户VM通知及资源/能源前提→有界ARM64启动、直接TLS/只读/源端取消最短见证；失败短定位不盲跑。
+- [ ] 本任务TaskId/门禁/Vitest路径→凭据合同定向测试与Review→Adapter/UI/Compose；总deadline10秒，取消清理有界。
+- [ ] 影响测试、真实生命周期/合成恢复、适用PG/Web兼容、稳定输入Review/提交→唯一V3独立重开及回执。
+
+## 冻结路径与保留
+
+[准确路径清单](../evidence/G4-M2-DORIS-01/owned-paths.md)已冻结。Master owned_paths采用[申请第6节](../evidence/G4-M2-DORIS-01/admission-request.md#6-后续源码交付和执行路径本轮不修改)逐项路径，现均在条件授权内，补充 `apps/web/vitest.config.ts`；本任务文档证据为 `docs/tasks/G4-M2-DORIS-01.md`、`docs/tasks/current-authorization.md`（追加）、`docs/evidence/G4-M2-DORIS-01/**`。新增部署/适配器/测试路径按申请，未列出源码只读；公共合同、锁、部署配置、执行器Single Writer。依赖/锁新增变化超出批准名单即停止对应获取，不为凑名单降级。
+
+read_only_dependencies：AGENTS/PLANS、架构合同、现行政策、既有PG/Web实现/历史证据；必要消费链修改限申请路径。KEEP当前树/分支与后续有效内容缓存，解除条件为任务最终审查及明确回收；不清历史资源。保护当前两项未跟踪 `.DS_Store`。
+
+获取准入独立PASS；首层27,383,877 bytes已校验，随后匿名token到期HTTP401停止。2026-11-12用户明确改为自行下载两项Doris镜像，Agent停止获取与依赖实施，待用户通知后同树继续；服务NOT_RUN；静态合同17+5项及缓存回归20项PASS且独立Review通过，Doris分发仍关闭。当前离线prepare一次成功、下载0；原失败保留。600秒能源观察策略持续符合、锁屏熄屏未见证，非整会话连续性PASS。

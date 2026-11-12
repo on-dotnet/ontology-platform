@@ -7,7 +7,7 @@ namespace OntologyPlatform.G2ContractTests;
 [TestClass]
 public sealed class G4WireContractTests
 {
-    /// <summary>新增Web用途只扩展精确字符串值域，未知用途仍拒绝。</summary>
+    /// <summary>三个已批准用途仅扩展精确字符串值域，未知用途仍拒绝。</summary>
     [TestMethod]
     public void SecretIntakeAcceptsOnlyApprovedTypedPurposes()
     {
@@ -20,7 +20,18 @@ public sealed class G4WireContractTests
         };
         G4ConnectionRules.Validate(request);
         G4ConnectionRules.Validate(request with { Purpose = "POSTGRESQL_READONLY" });
+        G4ConnectionRules.Validate(request with { Purpose = "DORIS_READONLY" });
         Assert.Throws<SemanticOperationException>(() => G4ConnectionRules.Validate(request with { Purpose = "OTHER" }));
+    }
+
+    /// <summary>Doris明文配置在请求验证阶段拒绝，不能消费凭据后才降级。</summary>
+    [TestMethod]
+    public void DorisPlaintextIsRejectedBeforeCredentialConsumption()
+    {
+        // 固定合法配置，仅切换TLS以隔离降级输入。
+        var profile = new DorisConnectionProfile { FeHost = "doris-fe", QueryPort = 9030, Catalog = "internal", Database = "fixture", Username = "fixture_reader", Tls = true };
+        G4ConnectionRules.Config(new DorisConnectionConfig { Profile = profile });
+        Assert.Throws<SemanticOperationException>(() => G4ConnectionRules.Config(new DorisConnectionConfig { Profile = profile with { Tls = false } }));
     }
 
     /// <summary>配置判别与字段一致且可真实往返。</summary>

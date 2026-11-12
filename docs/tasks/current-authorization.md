@@ -141,3 +141,8 @@ M4资源实际收尾：获审候选已在main；8任务卷+1fixture精确回收�
 # 2026-11-12 G4-M2-DORIS-01 P0 最新明确授权（追加）
 
 用户本会话明确批准附件P0，以main `11595ecb6560f7ed6ceca54666d32b7afcae7f35`独立托管树进行精确依赖/制品/许可/资源/DORIS_READONLY和最小范围核对，仅交一页状态及准入申请，允许普通提交/push文档分支。补充要求单机测试及方案、Docker Compose源码化供测试/生产使用，纳入后续待批实施，不解锁本轮产品代码。禁止下载依赖/镜像层、安装、启动服务、产品实现、完整测试、ZIP和main更新。只读非作者Review；同会话同树等待后续精确批准，不另建工程优化/恢复任务。唯一状态见[G4-M2-DORIS-01](G4-M2-DORIS-01.md)。历史授权原样保留。
+
+
+## 2026-11-12 Doris A–F 条件执行授权（最新）
+
+用户明确批准[修订授权](../evidence/G4-M2-DORIS-01/conditional-authorization.md)。立即允许单响应8MiB、累计64MiB的公开有界元数据（含经manifest绑定的config JSON，不含层载荷）；精确身份/依赖/域名/预算及非作者获取准入通过后允许指定载荷取得，下载后内容/风险检查与资源准入通过后实施。DORIS-LOCAL-01仅本机隔离合成非分发无生产凭据，未知供应链项保留NOT_VERIFIED。FE4/BE6、总容器12GiB/4容器、宿主4GiB、磁盘25GiB、载荷5GiB（NuGet10MiB）上限。VM由用户调整通知，实测可见至少15GiB前禁止相关设施启动。批准申请范围Adapter/UI/Compose/合同/TaskId门禁及Vitest绑定，不解除G4生产Guard、不更新main。沿用同树同会话，条件缺失只停依赖操作，不逐补丁审批、不生成中间ZIP。
