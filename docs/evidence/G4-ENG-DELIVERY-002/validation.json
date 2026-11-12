@@ -1,0 +1,52 @@
+{
+  "evidenceSchemaVersion": 2,
+  "validationSource": "LOCAL",
+  "testedCommit": "5dd764a1a7a7e24cc0379d690cfcd694d4436b8d",
+  "checks": [
+    {
+      "name": "current-controlled-gates",
+      "command": "python3 -B scripts/maintenance/workflow.py verify --task G4-ENG-DELIVERY-002 --plan artifacts/workflow/G4-ENG-DELIVERY-002/delivery-plan.json --publish-evidence",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "11 affected gates PASS; five product gates are fresh qualification of already executed proofs, not five new product runs. Source candidate 5dd764a1a7a7e24cc0379d690cfcd694d4436b8d"
+    },
+    {
+      "name": "original-full-engineering-plus-delta",
+      "command": "pwsh -NoProfile -File scripts/verify.ps1 -SelfTest; focused current qualification/identity tests",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "Original Full exit0 in 508.845865792s; explicit original input fingerprint retained; current deltas covered by focused tests and controlled verify."
+    },
+    {
+      "name": "independent-source-review",
+      "command": "non-author read-only review and two real-entrypoint short-process witnesses",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "No unclosed P1; per-entrypoint process count1, termination unknown effective70/raw0; evidence hashes independently checked."
+    },
+    {
+      "name": "stable-product-and-resources",
+      "command": "workflow_m2_web.py fixture-test / pg-regression / smoke --task G4-ENG-DELIVERY-002",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": "TLS13, PG1, real OIDC/CSRF/API cancellation3; stable exact cleanup18/18. UI machine report389. Natural TTL original requalified, not rerun."
+    }
+  ],
+  "ci": {
+    "status": "NOT_RUN",
+    "runId": null,
+    "url": null,
+    "commit": null,
+    "conclusion": null
+  },
+  "metadata": {
+    "taskId": "G4-ENG-DELIVERY-002",
+    "acceptance": "acceptance.json plus post-package receipt",
+    "efficiency": "efficiency.json plus final outside-package totals",
+    "limitations": [
+      "Mac ARM64 only; Windows/Intel/CI NOT_RUN",
+      "Host lock/display-off NOT_VERIFIED; 45s monitored policy ready, no confirmed sleep",
+      "Initial uninstrumented interval and model/human wait UNKNOWN"
+    ]
+  }
+}

@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "taskId": "G4-ENG-DELIVERY-002",
+  "snapshot": "before official packaging; package-outside receipt provides final totals",
+  "observedStartAtUtc": "2026-11-12T09:30:03.850819+00:00",
+  "observedEndAtUtc": "2026-11-12T10:14:13.096955+00:00",
+  "preInstrumentation": "UNKNOWN: initial read/fetch/worktree setup preceded command instrumentation",
+  "prepareAttempts": 5,
+  "successfulPrepareReceipts": [
+    {
+      "runDirectory": "/Users/chasen/.codex/worktrees/g4-eng-delivery-002/ontology-platform/artifacts/workflow/G4-ENG-DELIVERY-002/environment/82d5e96e401f664b673bdde638a153e94c1df2360163697b3162493545aef60a/runs/e5a0a739cc974377b859ca5cd79bd43d",
+      "downloads": 0,
+      "materializedFiles": 0,
+      "restoreCount": 0,
+      "webMaterializedTrees": 2
+    },
+    {
+      "runDirectory": "/Users/chasen/.codex/worktrees/g4-eng-delivery-002/ontology-platform/artifacts/workflow/G4-ENG-DELIVERY-002/environment/82d5e96e401f664b673bdde638a153e94c1df2360163697b3162493545aef60a/runs/e7b409807def4a8fad65c96ba5604d18",
+      "downloads": 0,
+      "materializedFiles": 0,
+      "restoreCount": 0,
+      "webMaterializedTrees": 0
+    },
+    {
+      "runDirectory": "/Users/chasen/.codex/worktrees/g4-eng-delivery-002/ontology-platform/artifacts/workflow/G4-ENG-DELIVERY-002/environment/82d5e96e401f664b673bdde638a153e94c1df2360163697b3162493545aef60a/runs/4ff2f0014a7e4b67bb0f98973447800b",
+      "downloads": 0,
+      "materializedFiles": 0,
+      "restoreCount": 0,
+      "webMaterializedTrees": 0
+    }
+  ],
+  "initialMaterializedFiles": "UNKNOWN: initial prepare failed after creation before aggregate receipt; no fabricated count",
+  "restoreCommands": 1,
+  "downloads": 0,
+  "fullSelfTest": {
+    "count": 1,
+    "exitCode": 0,
+    "elapsedSeconds": 508.8458657919982,
+    "reason": "shared verification infrastructure changed; later qualification/identity deltas covered by focused tests, original input key not reused as current"
+  },
+  "products": {
+    "freshRuns": 11,
+    "stableCounts": {
+      "ui": 389,
+      "https": 13,
+      "pg": 1,
+      "shortApi": 3
+    },
+    "historicalRequalifiedCounts": {
+      "unit": 29,
+      "wire": 16,
+      "ui": 119,
+      "https": 13,
+      "pg": 1,
+      "fullBrowser": 19
+    },
+    "naturalTtlExecutions": 0,
+    "duplicateScopeWarning": "Do not add overlapping gate counts or count historical requalification as fresh execution"
+  },
+  "duplicateFailureWitnesses": {
+    "regressionEntrypoints": 2,
+    "independentReviewerEntrypoints": 2,
+    "scope": "unique entrypoint witnesses; repeated test-suite invocations are not added"
+  },
+  "officialPackageAttempts": 0,
+  "oldPackageReopenAttempts": 1,
+  "oldPackageReopenFailure": "DIRTY_TREE retained; clean committed root retry pending",
+  "resources": {
+    "runs": 11,
+    "exactUniqueIds": 68,
+    "closed": 68
+  },
+  "timing": {
+    "commandIntervalUnionSeconds": 1028.7661645412445,
+    "unknownCommands": [],
+    "blockedStarts": 0,
+    "modelReasoningSeconds": "UNKNOWN",
+    "humanWaitSeconds": "UNKNOWN"
+  },
+  "publicEvidenceBytes": 527256,
+  "ci": "NOT_RUN"
+}

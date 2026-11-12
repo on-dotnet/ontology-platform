@@ -1,0 +1,164 @@
+{
+  "gate": "interaction",
+  "status": "PASS",
+  "executionMode": "REUSED",
+  "qualificationMode": "FRESH",
+  "productProof": {
+    "status": "PASS",
+    "executionMode": "REUSED",
+    "qualificationMode": "FRESH",
+    "tests": 406,
+    "skipped": 0,
+    "counts": {
+      "https": 13,
+      "pg": 1,
+      "smoke": 3,
+      "ui": 389
+    },
+    "originalEvidence": [
+      {
+        "path": "docs/evidence/G4-ENG-DELIVERY-002/stable/https/fixture-receipt.json",
+        "sha256": "cdde9f2d31f817e24b7a869e99c66425a3995df0b7ff711c72ec1d3c911b46a6"
+      },
+      {
+        "path": "docs/evidence/G4-ENG-DELIVERY-002/stable/pg/pg-receipt.json",
+        "sha256": "b4171f73b90bb28c5c620bb77ee8b7bd706d216811abf76fcbea9ba533132117"
+      },
+      {
+        "path": "docs/evidence/G4-ENG-DELIVERY-002/stable/smoke/receipt.json",
+        "sha256": "a8b123ed7a1185efe8c248fba9dac428ab2e39896ba8f4f26a159d73f9996e78"
+      }
+    ],
+    "historicalQualification": {
+      "status": "PASS",
+      "qualificationMode": "FRESH",
+      "productExecutions": 0,
+      "originals": [
+        {
+          "kind": "unit",
+          "tests": 29,
+          "sourceCommit": "820855bc239d409b9931bf4e3ba669592afb2123",
+          "path": "docs/evidence/G4-M2-WEB-01/recovery/local/unit-current.json",
+          "sha256": "a544250d879b7188324361ad363b272812992ea65585c69c69188a40061d0679",
+          "qualification": "PASS",
+          "executionMode": "HISTORICAL_REQUALIFIED"
+        },
+        {
+          "kind": "wire",
+          "tests": 16,
+          "sourceCommit": "820855bc239d409b9931bf4e3ba669592afb2123",
+          "path": "docs/evidence/G4-M2-WEB-01/recovery/local/wire-current.json",
+          "sha256": "92775f3a5140146b6ffb98a6e944c2e92c70f3011e7013f7dae5b840b7f26ffc",
+          "qualification": "PASS",
+          "executionMode": "HISTORICAL_REQUALIFIED"
+        },
+        {
+          "kind": "ui",
+          "tests": 119,
+          "sourceCommit": "820855bc239d409b9931bf4e3ba669592afb2123",
+          "path": "docs/evidence/G4-M2-WEB-01/recovery/local/ui-current.json",
+          "sha256": "94d936e11b53c6387df7491dd355a79dfc7569dc0f20104bcb1b914c0f641060",
+          "qualification": "PASS",
+          "executionMode": "HISTORICAL_REQUALIFIED"
+        },
+        {
+          "kind": "https",
+          "tests": 13,
+          "sourceCommit": "820855bc239d409b9931bf4e3ba669592afb2123",
+          "path": "docs/evidence/G4-M2-WEB-01/recovery/runs/m2-5e5a2f7a62de/fixture-receipt.json",
+          "sha256": "12477aed59a1db563fb775374dd84f0450acc0269551fae9d75d16240dca981e",
+          "qualification": "PASS",
+          "executionMode": "HISTORICAL_REQUALIFIED"
+        },
+        {
+          "kind": "pg",
+          "tests": 1,
+          "sourceCommit": "820855bc239d409b9931bf4e3ba669592afb2123",
+          "path": "docs/evidence/G4-M2-WEB-01/recovery/runs/m2-beb513edec23/pg-receipt.json",
+          "sha256": "50456d873f58b6bec46069df7b295a6f708198553358c19774a9ceaf37ce8946",
+          "qualification": "PASS",
+          "executionMode": "HISTORICAL_REQUALIFIED"
+        },
+        {
+          "kind": "smoke",
+          "tests": 19,
+          "sourceCommit": "820855bc239d409b9931bf4e3ba669592afb2123",
+          "path": "docs/evidence/G4-M2-WEB-01/recovery/runs/m2-c72b9c07e76c/receipt.json",
+          "sha256": "df8f06832fabcb77e1a9e14d0bef2ac1b32310b92e2b87034524091925206078",
+          "qualification": "PASS",
+          "executionMode": "HISTORICAL_REQUALIFIED"
+        }
+      ],
+      "naturalTtl": {
+        "executionMode": "REUSED",
+        "scope": "Natural expiry assertion and unchanged backend semantic inputs only",
+        "assertionDriverSha256": "4865a0d755eda53eaf579b2b04a506fb80cf3e941c2573f155389de42f846141"
+      },
+      "currentDriverCoverage": "Historical orchestration is not current execution coverage; new runner requires fresh targeted TLS/cancellation proof",
+      "layers": {
+        "scripts/maintenance/workflow_m2_web.py": "execution",
+        "scripts/maintenance/workflow_m2_fixture.py": "execution",
+        "scripts/maintenance/workflow_m2_smoke.py": "execution",
+        "scripts/maintenance/workflow_m2_build.py": "execution",
+        "scripts/maintenance/workflow_smoke.py": "execution",
+        "scripts/maintenance/workflow_execution.py": "execution",
+        "scripts/maintenance/workflow_environment.py": "execution",
+        "scripts/maintenance/workflow_web_cache.py": "execution",
+        "scripts/maintenance/workflow.py": "execution",
+        "scripts/maintenance/workflow-m2-web.mjs": "execution",
+        "scripts/maintenance/workflow_m2_evidence.py": "qualification",
+        "scripts/maintenance/workflow_evidence.py": "qualification",
+        "experiments/g4-m2-web-01/https-fixture.mjs": "execution"
+      },
+      "currentDriverInputs": {
+        "scripts/maintenance/workflow_m2_web.py": "151c75db94eead4787a421bc8b19bf0fdc68ffb89da50af7dbe1659088e47377",
+        "scripts/maintenance/workflow_m2_fixture.py": "5d128d2fabcb484dcab26119a84ff4b4022f8608f26ba94de6988fda4824bca2",
+        "scripts/maintenance/workflow_m2_smoke.py": "8e486ee8f0a99784c580cbd9f71b2413f0fe4066b8a2e691a066fd27af58bd83",
+        "scripts/maintenance/workflow_m2_build.py": "a72074d9b8af7fb1fc1fd22b1a18e63b44049151b14d43f64d818b0373aed410",
+        "scripts/maintenance/workflow_smoke.py": "979f766b45813fe539c5f6848f71cf3f496ce452d4ffff66405d4c8c19834656",
+        "scripts/maintenance/workflow_execution.py": "eb21a6e92a3e5dc732d6ff957f184ef9f1236b6291de7ee6adf950399c450fd1",
+        "scripts/maintenance/workflow_environment.py": "e341a2f1d684c3ceeba1b2f6baac1d6a2bc81a6b3ad1c487b60b5554e8524335",
+        "scripts/maintenance/workflow_web_cache.py": "7bd74f79222674634702f13523e777068db6af558464ce3269edc93c27be7ed9",
+        "scripts/maintenance/workflow.py": "37fab4b608100d019c16a2c624e9c02e5ca533f2d651d68db66e2df6f543cc39",
+        "scripts/maintenance/workflow-m2-web.mjs": "4865a0d755eda53eaf579b2b04a506fb80cf3e941c2573f155389de42f846141",
+        "scripts/maintenance/workflow_m2_evidence.py": "e10e8cd2b493e0487f8502e2eaeefdc03d3324ff62d7c3e3c8582a149ce8cdf5",
+        "scripts/maintenance/workflow_evidence.py": "270076ea05bc5e1c63c81536325d6544b3250dd94d06cf0bc9729a30188ea328",
+        "experiments/g4-m2-web-01/https-fixture.mjs": "523838ced9f476b053eca72c40ddd57da35f59da6bfd3d7224e00e47ae345562"
+      }
+    },
+    "limitation": "Counts overlap between gates; current short runs are not a new natural TTL or full historical browser run"
+  },
+  "command": [
+    "python3",
+    "-B",
+    "scripts/maintenance/workflow_m2_evidence.py",
+    "--task",
+    "G4-ENG-DELIVERY-002",
+    "--gate",
+    "interaction",
+    "--input-key",
+    "02b1bf9886bcf16419d8bfca947c8b6116716962b2a31221d5644fa63b21e18b"
+  ],
+  "exitCode": 0,
+  "tests": 406,
+  "skipped": 0,
+  "diagnostic": false,
+  "hypothesis": null,
+  "inputsUnchanged": true,
+  "errorSignature": null,
+  "elapsedSeconds": 5.558724500006065,
+  "inputKey": "02b1bf9886bcf16419d8bfca947c8b6116716962b2a31221d5644fa63b21e18b",
+  "environmentKey": "bcef3c1608217e3fdd5492e0064d25937fd33ce68942937e516d10af47a821da",
+  "policyKey": "677e702efe43a1ddd7c95f784ac35a2dd8c8c7444b3bcb7b0dafcc7ba132b3d1",
+  "evidenceSha256": "458d32161445f4c9177a5194c43b055fb8b9972dc6550e5d5a2dc650adc3b4ca",
+  "logPath": "docs/evidence/G4-ENG-DELIVERY-002/gates/12eda7df3bf94f2fbbd1e5a363073b7d/interaction.txt",
+  "sourceRun": "12eda7df3bf94f2fbbd1e5a363073b7d",
+  "sourceCommit": "5dd764a1a7a7e24cc0379d690cfcd694d4436b8d",
+  "publishedLog": {
+    "originalPath": "docs/evidence/G4-ENG-DELIVERY-002/gates/12eda7df3bf94f2fbbd1e5a363073b7d/interaction.txt",
+    "sha256": "458d32161445f4c9177a5194c43b055fb8b9972dc6550e5d5a2dc650adc3b4ca",
+    "sizeBytes": 5366,
+    "encoding": "raw",
+    "path": "docs/evidence/G4-ENG-DELIVERY-002/gates/12eda7df3bf94f2fbbd1e5a363073b7d/interaction.txt"
+  }
+}
