@@ -134,3 +134,10 @@ M4资源实际收尾：获审候选已在main；8任务卷+1fixture精确回收�
 ## 2026-11-07 P0合同扩展与恢复（最新明确授权）
 
 用户批准[p0-decision-approval](../evidence/G4-M2-WEB-01/p0-decision-approval.md)：现有任务树继续，仅新增WEB_API_KEY用途字符串校验，当前运行仅API_KEY_REF/GET/Pagination=NONE。NONE/OAuth/其他分页暂缓；不改其他DTO、数据库语义/迁移、路由/权限、依赖。先修复Web缓存/消费者准入，再分发合同独立Review及产品闭环。原BLOCKED ZIP保持原字节；普通修复持续实施，不更新main。
+
+
+---
+
+# 2026-11-12 G4-M2-DORIS-01 P0 最新明确授权（追加）
+
+用户本会话明确批准附件P0，以main `11595ecb6560f7ed6ceca54666d32b7afcae7f35`独立托管树进行精确依赖/制品/许可/资源/DORIS_READONLY和最小范围核对，仅交一页状态及准入申请，允许普通提交/push文档分支。补充要求单机测试及方案、Docker Compose源码化供测试/生产使用，纳入后续待批实施，不解锁本轮产品代码。禁止下载依赖/镜像层、安装、启动服务、产品实现、完整测试、ZIP和main更新。只读非作者Review；同会话同树等待后续精确批准，不另建工程优化/恢复任务。唯一状态见[G4-M2-DORIS-01](G4-M2-DORIS-01.md)。历史授权原样保留。
